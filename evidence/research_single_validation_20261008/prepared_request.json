@@ -1,0 +1,560 @@
+{
+  "model": "deepseek-flash",
+  "max_tokens": 3000,
+  "messages": [
+    {
+      "role": "system",
+      "content": "Investigate only the scoped evidence. Use the advertised evidence reader for additional pages (outer arguments/reason/tool_version envelope), or investigation_return with direct report fields. Exactly one native call per turn. Facts and counterevidence require exact visible source values. Interpretation and support explanations are semantically unassessed. Principal may return explicit dispositions for completed reports; investigators cannot dispose or delegate. Suggestions authorize no computation."
+    },
+    {
+      "role": "user",
+      "content": "{\"allowed_tools\":[\"evidence.read\"],\"delegation_budget_limit\":{\"backend_solves\":0,\"model_calls\":1,\"tool_calls\":1,\"wall_s\":180.0,\"worker_calls\":0},\"evidence_directory\":{\"continuation\":\"Use evidence.read at /entries with next_offset until null. An overview requires /entries/<original index>. No source is dropped from this directory.\",\"delegate\":\"Use original entry.reference in child evidence; set parent_id to this investigation_id, role investigator, tools and budget no greater than this request. Do not delegate the directory as scientific evidence.\",\"inline_entries\":[{\"availability\":\"available\",\"fields\":[{\"pointer\":\"/accepted_noninitialization_plans\",\"value_type\":\"int\"},{\"pointer\":\"/accepted_plans\",\"value_type\":\"int\"},{\"pointer\":\"/applied_tension_ranges\",\"value_type\":\"list\"},{\"pointer\":\"/candidate\",\"value_type\":\"dict\"},{\"pointer\":\"/complete\",\"value_type\":\"bool\"},{\"pointer\":\"/configuration\",\"value_type\":\"dict\"},{\"pointer\":\"/control_period_s\",\"value_type\":\"float\"},{\"pointer\":\"/control_updates\",\"value_type\":\"int\"},{\"pointer\":\"/converged_updates\",\"value_type\":\"int\"},{\"pointer\":\"/coordinate_frame\",\"value_type\":\"str\"},{\"pointer\":\"/deadline_misses\",\"value_type\":\"int\"},{\"pointer\":\"/error_convention\",\"value_type\":\"str\"},{\"pointer\":\"/result_type\",\"value_type\":\"str\"},{\"pointer\":\"/sampled_settling\",\"value_type\":\"dict\"},{\"pointer\":\"/signed_position_error_m\",\"value_type\":\"list\"},{\"pointer\":\"/simulated_duration_s\",\"value_type\":\"float\"},{\"pointer\":\"/simulation\",\"value_type\":\"dict\"},{\"pointer\":\"/solver_error_count\",\"value_type\":\"int\"},{\"pointer\":\"/target_position_m\",\"value_type\":\"list\"},{\"pointer\":\"/task_accepted\",\"value_type\":\"bool\"},{\"pointer\":\"/terminal_error_m\",\"value_type\":\"float\"},{\"pointer\":\"/terminal_position_m\",\"value_type\":\"list\"},{\"pointer\":\"/terminal_tip_speed_m_s\",\"value_type\":\"float\"},{\"pointer\":\"/valid_complete_execution\",\"value_type\":\"bool\"}],\"identity_and_version\":{\"coordinate_frame\":\"world\",\"execution_id\":\"494deb38d6374deb8f741e96f2430826\",\"result_type\":\"free_reach\"},\"material\":\"free_reach\",\"metadata_only\":true,\"other_fields_at_root\":true,\"questions\":\"Inspect original fields for recorded observations, identity, applicability, failures or limitations; metadata establishes no scientific conclusion.\",\"read\":{\"byte_limit\":4096,\"limit\":8,\"offset\":0,\"pointer\":\"\",\"reference\":{\"artifact_id\":\"6903669a345e76c1dd2958ada4d067bfde06d02f102ce017db06c9a241c7dd51\",\"media_type\":\"application/json\"}},\"reference\":{\"artifact_id\":\"6903669a345e76c1dd2958ada4d067bfde06d02f102ce017db06c9a241c7dd51\",\"media_type\":\"application/json\"}}],\"query\":{\"byte_limit\":4096,\"limit\":2,\"offset\":0,\"pointer\":\"/entries\",\"reference\":{\"artifact_id\":\"308c775196bde0fcba3f822b91cbe3ae84f4bfe5017083239b44a0dfaabc2328\",\"media_type\":\"application/json\"}},\"reference\":{\"artifact_id\":\"308c775196bde0fcba3f822b91cbe3ae84f4bfe5017083239b44a0dfaabc2328\",\"media_type\":\"application/json\"},\"total_entries\":1,\"version\":\"1.0.0\"},\"investigation_id\":\"single-saved-fact\",\"organization_limits\":{\"concurrency\":1,\"max_depth\":2,\"maximum_count\":1},\"output_bytes\":16384,\"question\":\"Using ONLY the supplied sampled_settling page, briefly state whether the recorded sampled settling passed. Return 2-3 facts with exact source references, JSON pointers and values (including passed and one observed value/limit), then a short interpretation. This is historical sampled evidence, not a continuous-time guarantee or a causal diagnosis. Return investigation_return directly. No evidence query, child, disposition or further model turn is authorized. If insufficient, explicitly report unknowns.\",\"reads\":[{\"page\":{\"content\":{\"available\":true,\"continuous_time_guarantee\":false,\"max_error_m\":0.06672099201814737,\"max_speed_m_s\":0.20679063000945364,\"passed\":false,\"position_limit_m\":0.01,\"speed_limit_m_s\":0.02,\"window_s\":0.05},\"kind\":\"content\",\"next_offset\":null,\"offset\":0,\"pointer\":\"/sampled_settling\",\"presentation\":\"original\",\"returned_items\":8,\"source\":{\"artifact_id\":\"6903669a345e76c1dd2958ada4d067bfde06d02f102ce017db06c9a241c7dd51\",\"media_type\":\"application/json\"},\"total_items\":8},\"pointer\":\"/sampled_settling\",\"reference\":{\"artifact_id\":\"6903669a345e76c1dd2958ada4d067bfde06d02f102ce017db06c9a241c7dd51\",\"media_type\":\"application/json\"}}],\"remaining_budget\":{\"backend_solves\":0,\"model_calls\":1,\"tool_calls\":1,\"wall_s\":180.0,\"worker_calls\":0},\"role\":\"investigator\",\"stopping\":[\"One provider attempt; no retry or protocol correction\",\"Only supplied prefetch; no additional reads or delegation\",\"Stop at terminal outcome, deadline, recipient/configuration drift or persistence failure\",\"Unknown retains reservation; old activities remain stopped\"],\"timeout_s\":180.0,\"working_context\":{\"case_id\":null,\"chronology\":null,\"contradictions\":[],\"detail_access\":\"Use the advertised evidence.read with the original reference and JSON pointer; bounded pages preserve source scope.\",\"evidence_that_would_change_decision\":[],\"fact_archive\":{\"archived_count\":0,\"inline_count\":0,\"pointer\":\"/facts\",\"reference\":{\"artifact_id\":\"69a5a5c3d4a916b9ca4a56f468daac9848ecb661cf2496a3d422ab79cac086da\",\"media_type\":\"application/json\"},\"scope\":\"Complete request-scoped canonical archive; archive retention is not model visibility.\"},\"hypotheses\":[],\"known_review_issues\":[],\"legal_actions\":{\"submit_return\":{}},\"model_callable_archive_read\":true,\"observations_scope\":\"Observed bound facts; frozen_pre_experiment_background is historical.\",\"operational_facts\":null,\"phase_boundaries\":null,\"purpose\":\"research_decision\",\"recorded_replications\":[],\"rejected_claims\":{},\"remaining_budget\":null,\"repeatability_scope\":\"No explicit matching repeat in this supplied scope; other scopes are not ruled out.\",\"retrieval_permission_scope\":{\"investigation_id\":\"single-saved-fact\",\"run_id\":\"mainline3-single-8fa2cae7f64f\"},\"roles\":{\"latest_attempt\":null,\"latest_completed_evaluation\":null,\"selected_incumbent\":null,\"source_baseline\":null},\"scientific_question\":\"Using ONLY the supplied sampled_settling page, briefly state whether the recorded sampled settling passed. Return 2-3 facts with exact source references, JSON pointers and values (including passed and one observed value/limit), then a short interpretation. This is historical sampled evidence, not a continuous-time guarantee or a causal diagnosis. Return investigation_return directly. No evidence query, child, disposition or further model turn is authorized. If insufficient, explicitly report unknowns.\",\"sources\":{\"pointer\":\"/packet\",\"reference\":{\"artifact_id\":\"c7deec5b842bf5c61bcc98e29e4be6cc7309a3d5beffd989b90f455f8f26aeb9\",\"media_type\":\"application/json\"},\"verified_retrievable\":true},\"stop\":null,\"unchanged_acceptance\":null,\"unresolved_questions\":[],\"version\":\"evidence_context_assembly@1.0.0\"}}"
+    }
+  ],
+  "tools": [
+    {
+      "type": "function",
+      "function": {
+        "name": "investigation_return",
+        "description": "Bounded evidence report",
+        "parameters": {
+          "$defs": {
+            "AdoptedClaim": {
+              "additionalProperties": false,
+              "properties": {
+                "statement": {
+                  "maxLength": 1000,
+                  "minLength": 1,
+                  "title": "Statement",
+                  "type": "string"
+                },
+                "supporting_facts": {
+                  "items": {
+                    "$ref": "#/$defs/SourceFact"
+                  },
+                  "maxItems": 12,
+                  "minItems": 1,
+                  "title": "Supporting Facts",
+                  "type": "array"
+                },
+                "scope": {
+                  "description": "Exact inspected source fields declaring applicability, e.g. result_type, execution_id, or prediction scope.",
+                  "items": {
+                    "$ref": "#/$defs/SourceFact"
+                  },
+                  "maxItems": 8,
+                  "minItems": 1,
+                  "title": "Scope",
+                  "type": "array"
+                },
+                "support_explanation": {
+                  "description": "Principal explanation linking these facts to this claim; semantic correctness remains unassessed.",
+                  "maxLength": 2000,
+                  "minLength": 1,
+                  "title": "Support Explanation",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "statement",
+                "supporting_facts",
+                "scope",
+                "support_explanation"
+              ],
+              "title": "AdoptedClaim",
+              "type": "object"
+            },
+            "Budget": {
+              "additionalProperties": false,
+              "properties": {
+                "tool_calls": {
+                  "minimum": 0,
+                  "title": "Tool Calls",
+                  "type": "integer"
+                },
+                "model_calls": {
+                  "minimum": 0,
+                  "title": "Model Calls",
+                  "type": "integer"
+                },
+                "backend_solves": {
+                  "minimum": 0,
+                  "title": "Backend Solves",
+                  "type": "integer"
+                },
+                "worker_calls": {
+                  "minimum": 0,
+                  "title": "Worker Calls",
+                  "type": "integer"
+                },
+                "wall_s": {
+                  "minimum": 0,
+                  "title": "Wall S",
+                  "type": "number"
+                }
+              },
+              "required": [
+                "tool_calls",
+                "model_calls",
+                "backend_solves",
+                "worker_calls",
+                "wall_s"
+              ],
+              "title": "Budget",
+              "type": "object"
+            },
+            "EvidenceRef": {
+              "additionalProperties": false,
+              "properties": {
+                "artifact_id": {
+                  "pattern": "^[a-f0-9]{64}$",
+                  "title": "Artifact Id",
+                  "type": "string"
+                },
+                "media_type": {
+                  "default": "application/json",
+                  "title": "Media Type",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "artifact_id"
+              ],
+              "title": "EvidenceRef",
+              "type": "object"
+            },
+            "InvestigationOrder": {
+              "additionalProperties": false,
+              "properties": {
+                "investigation_id": {
+                  "pattern": "^[A-Za-z0-9_-]{1,80}$",
+                  "title": "Investigation Id",
+                  "type": "string"
+                },
+                "parent_id": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null,
+                  "title": "Parent Id"
+                },
+                "role": {
+                  "default": "investigator",
+                  "enum": [
+                    "principal",
+                    "coordinator",
+                    "investigator"
+                  ],
+                  "title": "Role",
+                  "type": "string"
+                },
+                "question": {
+                  "maxLength": 2000,
+                  "minLength": 1,
+                  "title": "Question",
+                  "type": "string"
+                },
+                "evidence": {
+                  "description": "Finite authorized source scope; metadata is paged, never all bodies prefetched.",
+                  "items": {
+                    "$ref": "#/$defs/EvidenceRef"
+                  },
+                  "maxItems": 256,
+                  "minItems": 1,
+                  "title": "Evidence",
+                  "type": "array"
+                },
+                "queries": {
+                  "items": {
+                    "$ref": "#/$defs/ReadEvidence"
+                  },
+                  "maxItems": 12,
+                  "title": "Queries",
+                  "type": "array"
+                },
+                "allowed_tools": {
+                  "items": {
+                    "const": "evidence.read",
+                    "type": "string"
+                  },
+                  "maxItems": 1,
+                  "minItems": 1,
+                  "title": "Allowed Tools",
+                  "type": "array"
+                },
+                "budget": {
+                  "$ref": "#/$defs/Budget"
+                },
+                "timeout_s": {
+                  "exclusiveMinimum": 0,
+                  "maximum": 180,
+                  "title": "Timeout S",
+                  "type": "number"
+                },
+                "stop_conditions": {
+                  "items": {
+                    "type": "string"
+                  },
+                  "maxItems": 6,
+                  "minItems": 1,
+                  "title": "Stop Conditions",
+                  "type": "array"
+                },
+                "output_bytes": {
+                  "default": 16384,
+                  "maximum": 16384,
+                  "minimum": 1024,
+                  "title": "Output Bytes",
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "investigation_id",
+                "question",
+                "evidence",
+                "budget",
+                "timeout_s",
+                "stop_conditions"
+              ],
+              "title": "InvestigationOrder",
+              "type": "object"
+            },
+            "PrincipalDisposition": {
+              "additionalProperties": false,
+              "properties": {
+                "investigation_id": {
+                  "title": "Investigation Id",
+                  "type": "string"
+                },
+                "report": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/$defs/EvidenceRef"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null
+                },
+                "disposition": {
+                  "enum": [
+                    "accept",
+                    "defer",
+                    "reject"
+                  ],
+                  "title": "Disposition",
+                  "type": "string"
+                },
+                "evidence_used": {
+                  "items": {
+                    "$ref": "#/$defs/SourceFact"
+                  },
+                  "maxItems": 12,
+                  "title": "Evidence Used",
+                  "type": "array"
+                },
+                "adopted_claims": {
+                  "items": {
+                    "$ref": "#/$defs/AdoptedClaim"
+                  },
+                  "maxItems": 8,
+                  "title": "Adopted Claims",
+                  "type": "array"
+                },
+                "semantic_claims_unassessed": {
+                  "items": {
+                    "type": "string"
+                  },
+                  "maxItems": 12,
+                  "title": "Semantic Claims Unassessed",
+                  "type": "array"
+                },
+                "remaining_unknowns": {
+                  "items": {
+                    "type": "string"
+                  },
+                  "maxItems": 12,
+                  "title": "Remaining Unknowns",
+                  "type": "array"
+                },
+                "reason": {
+                  "maxLength": 2000,
+                  "minLength": 1,
+                  "title": "Reason",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "investigation_id",
+                "disposition",
+                "reason"
+              ],
+              "title": "PrincipalDisposition",
+              "type": "object"
+            },
+            "ReadEvidence": {
+              "additionalProperties": false,
+              "properties": {
+                "reference": {
+                  "$ref": "#/$defs/EvidenceRef",
+                  "description": "Existing immutable evidence reference, not a node_id. A build has no evaluation or trajectory to read."
+                },
+                "pointer": {
+                  "default": "",
+                  "description": "JSON Pointer into original evidence, e.g. /detail or /signals/0/values. Empty reads the root. Oversized nested content returns a labeled overview with valid child pointers; follow those pointers using the same source reference.",
+                  "title": "Pointer",
+                  "type": "string"
+                },
+                "offset": {
+                  "default": 0,
+                  "minimum": 0,
+                  "title": "Offset",
+                  "type": "integer"
+                },
+                "limit": {
+                  "default": 20,
+                  "maximum": 100,
+                  "minimum": 1,
+                  "title": "Limit",
+                  "type": "integer"
+                },
+                "byte_limit": {
+                  "default": 4096,
+                  "description": "Requested content byte cap; response and observation envelopes also count toward the inline limit. Pages may be smaller. Follow next_offset at the same pointer.",
+                  "maximum": 8192,
+                  "minimum": 128,
+                  "title": "Byte Limit",
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "reference"
+              ],
+              "title": "ReadEvidence",
+              "type": "object"
+            },
+            "SourceFact": {
+              "additionalProperties": false,
+              "properties": {
+                "statement": {
+                  "maxLength": 1000,
+                  "minLength": 1,
+                  "title": "Statement",
+                  "type": "string"
+                },
+                "reference": {
+                  "$ref": "#/$defs/EvidenceRef"
+                },
+                "pointer": {
+                  "maxLength": 300,
+                  "title": "Pointer",
+                  "type": "string"
+                },
+                "value": {
+                  "title": "Value"
+                },
+                "source_identity": {
+                  "additionalProperties": true,
+                  "description": "Optional exact identity fields carried by the original source, never current-candidate attribution.",
+                  "title": "Source Identity",
+                  "type": "object"
+                }
+              },
+              "required": [
+                "statement",
+                "reference",
+                "pointer",
+                "value"
+              ],
+              "title": "SourceFact",
+              "type": "object"
+            }
+          },
+          "additionalProperties": false,
+          "properties": {
+            "facts": {
+              "items": {
+                "$ref": "#/$defs/SourceFact"
+              },
+              "maxItems": 12,
+              "title": "Facts",
+              "type": "array"
+            },
+            "counterevidence": {
+              "items": {
+                "$ref": "#/$defs/SourceFact"
+              },
+              "maxItems": 8,
+              "title": "Counterevidence",
+              "type": "array"
+            },
+            "unknowns": {
+              "items": {
+                "type": "string"
+              },
+              "maxItems": 8,
+              "title": "Unknowns",
+              "type": "array"
+            },
+            "interpretation": {
+              "maxLength": 3000,
+              "title": "Interpretation",
+              "type": "string"
+            },
+            "proposed_next_checks": {
+              "items": {
+                "type": "string"
+              },
+              "maxItems": 6,
+              "title": "Proposed Next Checks",
+              "type": "array"
+            },
+            "children": {
+              "items": {
+                "$ref": "#/$defs/InvestigationOrder"
+              },
+              "maxItems": 3,
+              "title": "Children",
+              "type": "array"
+            },
+            "dispositions": {
+              "description": "Principal-only explicit structured decisions; the runner submits them through the public disposition tool.",
+              "items": {
+                "$ref": "#/$defs/PrincipalDisposition"
+              },
+              "maxItems": 3,
+              "title": "Dispositions",
+              "type": "array"
+            },
+            "completion": {
+              "default": "complete",
+              "enum": [
+                "complete",
+                "incomplete"
+              ],
+              "title": "Completion",
+              "type": "string"
+            }
+          },
+          "required": [
+            "interpretation"
+          ],
+          "title": "InvestigationReturn",
+          "type": "object"
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "tool_720b551d99ff78e89e02c44fe48b8fb974566ea8",
+        "description": "evidence.read@1.0.0: Read immutable saved evidence with JSON Pointer and offset paging. An oversized subtree returns a labeled pointer overview, not original content. Follow its pointers using the same source reference and next_offset at the same pointer. No solve or evaluation is performed. Reads stored evidence only; it never performs endpoint analysis.",
+        "parameters": {
+          "$defs": {
+            "EvidenceRef": {
+              "additionalProperties": false,
+              "properties": {
+                "artifact_id": {
+                  "pattern": "^[a-f0-9]{64}$",
+                  "title": "Artifact Id",
+                  "type": "string"
+                },
+                "media_type": {
+                  "default": "application/json",
+                  "title": "Media Type",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "artifact_id"
+              ],
+              "title": "EvidenceRef",
+              "type": "object"
+            }
+          },
+          "additionalProperties": false,
+          "description": "Shared provider schema/decoder contract; domain arguments remain Host-owned.",
+          "properties": {
+            "arguments": {
+              "additionalProperties": false,
+              "properties": {
+                "reference": {
+                  "$ref": "#/$defs/EvidenceRef",
+                  "description": "Existing immutable evidence reference, not a node_id. A build has no evaluation or trajectory to read."
+                },
+                "pointer": {
+                  "default": "",
+                  "description": "JSON Pointer into original evidence, e.g. /detail or /signals/0/values. Empty reads the root. Oversized nested content returns a labeled overview with valid child pointers; follow those pointers using the same source reference.",
+                  "title": "Pointer",
+                  "type": "string"
+                },
+                "offset": {
+                  "default": 0,
+                  "minimum": 0,
+                  "title": "Offset",
+                  "type": "integer"
+                },
+                "limit": {
+                  "default": 20,
+                  "maximum": 100,
+                  "minimum": 1,
+                  "title": "Limit",
+                  "type": "integer"
+                },
+                "byte_limit": {
+                  "default": 4096,
+                  "description": "Requested content byte cap; response and observation envelopes also count toward the inline limit. Pages may be smaller. Follow next_offset at the same pointer.",
+                  "maximum": 8192,
+                  "minimum": 128,
+                  "title": "Byte Limit",
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "reference"
+              ],
+              "title": "ReadEvidence",
+              "type": "object",
+              "description": "Only the selected tool domain fields belong here. Required: reference. Do not include nested reason; reason belongs only in the outer envelope."
+            },
+            "reason": {
+              "description": "Required outer transport metadata: an English explanation for requesting this tool. A nested arguments.reason does not supply this field.",
+              "maxLength": 2000,
+              "minLength": 1,
+              "title": "Reason",
+              "type": "string"
+            },
+            "evidence": {
+              "description": "Optional outer transport evidence references. Route citations belong separately in arguments.evidence when required by the route schema.",
+              "items": {
+                "$ref": "#/$defs/EvidenceRef"
+              },
+              "title": "Evidence",
+              "type": "array"
+            },
+            "tool_version": {
+              "description": "Required outer transport metadata: exactly the version declared for this tool.",
+              "title": "Tool Version",
+              "type": "string",
+              "const": "1.0.0"
+            }
+          },
+          "required": [
+            "arguments",
+            "reason",
+            "tool_version"
+          ],
+          "title": "ToolEnvelope",
+          "type": "object"
+        }
+      }
+    }
+  ],
+  "tool_choice": "required"
+}

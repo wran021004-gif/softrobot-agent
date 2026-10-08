@@ -1,0 +1,222 @@
+{
+  "结果": "单请求真实公共验证失败：收到 HTTP 400 拒绝。失败记录与结算路径可核查；未得到有效调查报告。",
+  "活动": "mainline3-single-8fa2cae7f64f",
+  "起点": "ebec1c4861d7b7dbc0cb47bf667aa8c4a0efd650",
+  "本地真正尝试传输": true,
+  "依据": "一次 investigation_provider_attempt、transport_callable_invocations=1，原始 HTTPError 与 HTTP 400 接收事实相互支持。",
+  "响应": {
+    "响应头已接收": true,
+    "错误正文已完整读取": true,
+    "正文已保存": false,
+    "有效报告": false,
+    "脱敏失败证据已保存": true,
+    "供应商请求编号": null,
+    "说明": "response_received 与 response_body_received 均为 true。正常 completion 响应计数 received_responses=0 不表示没有收到 HTTP 错误响应。错误正文未归档，不能从当前封存证据还原其详细拒绝内容。"
+  },
+  "失败": {
+    "环节": "transport",
+    "异常包装类别": "RuntimeError",
+    "原始异常类别": "HTTPError",
+    "已有脱敏分类": "http",
+    "HTTP状态": 400,
+    "脱敏消息": "Bad Request",
+    "发生时间": "2026-10-08T04:28:49.132344+00:00",
+    "失败记录耗时秒": 2.9839999999967404,
+    "本地请求编号": "investigation-single-saved-fact",
+    "执行编号": "34284ad407b9423db55ff233ee7215c4",
+    "原失败证据": {
+      "artifact_id": "78e07173cb0d034e4308e7a0ac515429775dcbbe03da612449ca2f03fbafc1b6",
+      "media_type": "application/json"
+    },
+    "持久化失败": false
+  },
+  "费用与边界": {
+    "供应商实际尝试": 1,
+    "公共提交": 1,
+    "公共状态收集": 1,
+    "初始预取": 1,
+    "额外读取": 0,
+    "共用项目工具使用": 3,
+    "节点原预留": {
+      "backend_solves": 0,
+      "model_calls": 1,
+      "tool_calls": 1,
+      "wall_s": 180.0,
+      "worker_calls": 0
+    },
+    "节点已结算": {
+      "backend_solves": 0,
+      "model_calls": 1,
+      "tool_calls": 1,
+      "wall_s": 3.014999999984866,
+      "worker_calls": 0
+    },
+    "总账本占用": {
+      "tool_calls": 3,
+      "model_calls": 1,
+      "backend_solves": 0,
+      "worker_calls": 0,
+      "wall_s": 3.999999999970896
+    },
+    "本活动未决预留": 0,
+    "实际供应商token": null,
+    "实际供应商费用": null,
+    "说明": "本地模型调用单位按一次已确认尝试结算；这不是已知 token 数或供应商收费金额。错误分类和 HTTP 拒绝不证明没有费用。",
+    "节点总时限秒": 180,
+    "活动总时限秒": 240,
+    "返回上限字节": 16384,
+    "实际请求输出限制": 3000,
+    "实际请求测量": {
+      "actual_input_tokens": null,
+      "characters": 18441,
+      "configured_context_limit_tokens": 1000000,
+      "estimated_input_tokens": 26633,
+      "input_budget_tokens": 160000,
+      "interaction_reserve_tokens": 8192,
+      "method": "Conservative estimate: one token per serialized UTF-8 byte plus configured framing; no appropriate installed tokenizer. Includes all messages, schemas and wire metadata.",
+      "passed": true,
+      "response_reserve_tokens": 3000,
+      "utf8_bytes": 18441
+    },
+    "请求字节估算不等于服务端接收或实际token": true
+  },
+  "收尾": {
+    "result": {
+      "disposition_record": null,
+      "failure_record": {
+        "artifact_id": "78e07173cb0d034e4308e7a0ac515429775dcbbe03da612449ca2f03fbafc1b6",
+        "media_type": "application/json"
+      },
+      "investigation_id": "single-saved-fact",
+      "progress": {
+        "actual_usage_known": false,
+        "code_commit": "ebec1c4861d7b7dbc0cb47bf667aa8c4a0efd650",
+        "code_worktree_dirty": true,
+        "dependency_identity": "5fce29e727584d92481d0173d642244b769dae90cb9853673dc5f2e4c82d75d7",
+        "elapsed_s": 2.9839999999967404,
+        "grant_id": "mainline3-single-8fa2cae7f64f",
+        "http_status": 400,
+        "project_id": "mainline3-single-8fa2cae7f64f",
+        "provider_request_id": null,
+        "received_responses": 0,
+        "report_saved": false,
+        "response_body_received": true,
+        "response_received": true,
+        "response_saved": false,
+        "saved_responses": 0,
+        "settlement_completed": true,
+        "stage": "settlement",
+        "transport_attempted": true,
+        "transport_callable_invocations": 1,
+        "turn": 0,
+        "valid_report": false
+      },
+      "reason": "INVESTIGATION_FAILED_AT_TRANSPORT",
+      "result": null,
+      "status": "failed"
+    },
+    "public_receipts": [
+      {
+        "contract_version": "1.2.0",
+        "request_id": "single-submit",
+        "execution_id": "9fba627d592c4f5bb4a6db7d7adec62d",
+        "caller": "local-human",
+        "tool_id": "research.investigate",
+        "tool_version": "1.0.0",
+        "result_contract": "InvestigationResult",
+        "result_version": "1.0.0",
+        "execution_status": "completed",
+        "solver_status": "not_run",
+        "analysis_status": "not_assessed",
+        "task_success": null,
+        "output": {
+          "artifact_id": "81ff185b543f9c14d5d120625443b892aac450b9b1b78398fddc1fb7deab8e51",
+          "media_type": "application/json"
+        },
+        "error": null,
+        "cache_hit": false,
+        "original_execution_id": null,
+        "charged": {
+          "tool_calls": 1,
+          "model_calls": 0,
+          "backend_solves": 0,
+          "worker_calls": 0,
+          "wall_s": 0.0
+        }
+      },
+      {
+        "contract_version": "1.2.0",
+        "request_id": "single-collect-0",
+        "execution_id": "2b16d74aef2a42b29aadbe1c42745709",
+        "caller": "local-human",
+        "tool_id": "research.investigation_status",
+        "tool_version": "1.0.0",
+        "result_contract": "InvestigationResult",
+        "result_version": "1.0.0",
+        "execution_status": "completed",
+        "solver_status": "not_run",
+        "analysis_status": "not_assessed",
+        "task_success": null,
+        "output": {
+          "artifact_id": "8ebb9886a4e49bcd48488462fe7508a5ede039862bec908309e9e5a10cbf3317",
+          "media_type": "application/json"
+        },
+        "error": null,
+        "cache_hit": false,
+        "original_execution_id": null,
+        "charged": {
+          "tool_calls": 1,
+          "model_calls": 0,
+          "backend_solves": 0,
+          "worker_calls": 0,
+          "wall_s": 0.9849999999860302
+        }
+      }
+    ],
+    "elapsed_s": 5.10999999998603,
+    "thread_active_at_close": false,
+    "thread_completed_before_close": true,
+    "provider_cancellation_confirmed": false,
+    "cleanup": "Owned investigation thread finished before application close"
+  },
+  "历史": {
+    "原活动继续停止": true,
+    "原封存文件与账本未改变": true,
+    "原尝试数": 2,
+    "原保存响应": 0,
+    "原未决模型单位": 12,
+    "原两项预留未转移或释放": true,
+    "说明": "本次 HTTP 400 不能归因为旧两次请求。旧请求原因、到达情况、实际用量和费用仍未知。"
+  },
+  "验证边界": {
+    "离线最终检查": 3,
+    "早期失败记录": "evidence/research_single_validation_20261008_offline/attempt_01.json",
+    "离线夹具修正": "首轮将收尾压缩到两秒，公共准备尚未结束便停止；改用五秒起的间隔和四十秒收尾，并在清理前等待线程退出。未缩短真实入口的活动期限。",
+    "外部接收方": "https://api.deepseek.com",
+    "模型": "deepseek-flash",
+    "既有配置未变": true,
+    "自动重试": 0,
+    "协议纠正请求": 0,
+    "额外模型报告": 0,
+    "额外探测": 0,
+    "后端操作": 0,
+    "工作进程操作": 0,
+    "科学操作": 0,
+    "第二版开发": false,
+    "真实有效调查报告": false,
+    "按需追读": "unverified",
+    "协调调查": "unverified",
+    "主线三全部通过": false
+  },
+  "最小后续处理": [
+    "仅依据本次记录将问题收窄到 HTTP 请求被拒绝；不再使用笼统超时描述。",
+    "离线核对已保存的实际 payload 与当前适配器的请求结构，包括工具定义及 schema 引用；本次没有足够证据确认具体被拒绝字段，不能断言模型不可用或网络故障。",
+    "当前没有保存错误正文或供应商请求编号，缺少细化 HTTP 400 原因的证据。后续如需改进，先做允许字段、有限长度的错误信息保存工程与离线检查，再另行授权一个新的付费公共请求。",
+    "不复用旧未决授权、不追加本次请求，不进入完整直接/协调调查或变半径实验。"
+  ],
+  "发布": {
+    "repository": "https://github.com/wran021004-gif/softrobot-agent.git",
+    "branch": "feat/gvs-dynamics",
+    "内容": "单节点包装、三项针对性离线检查及失败历史、中文能力说明和本轮非秘密证据；普通推送，远端SHA在最终答复核对。"
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "investigation_id": "single-saved-fact",
+  "parent_id": null,
+  "role": "investigator",
+  "question": "Using ONLY the supplied sampled_settling page, briefly state whether the recorded sampled settling passed. Return 2-3 facts with exact source references, JSON pointers and values (including passed and one observed value/limit), then a short interpretation. This is historical sampled evidence, not a continuous-time guarantee or a causal diagnosis. Return investigation_return directly. No evidence query, child, disposition or further model turn is authorized. If insufficient, explicitly report unknowns.",
+  "evidence": [
+    {
+      "artifact_id": "6903669a345e76c1dd2958ada4d067bfde06d02f102ce017db06c9a241c7dd51",
+      "media_type": "application/json"
+    }
+  ],
+  "queries": [
+    {
+      "reference": {
+        "artifact_id": "6903669a345e76c1dd2958ada4d067bfde06d02f102ce017db06c9a241c7dd51",
+        "media_type": "application/json"
+      },
+      "pointer": "/sampled_settling",
+      "offset": 0,
+      "limit": 20,
+      "byte_limit": 2048
+    }
+  ],
+  "allowed_tools": [
+    "evidence.read"
+  ],
+  "budget": {
+    "tool_calls": 1,
+    "model_calls": 1,
+    "backend_solves": 0,
+    "worker_calls": 0,
+    "wall_s": 180.0
+  },
+  "timeout_s": 180.0,
+  "stop_conditions": [
+    "One provider attempt; no retry or protocol correction",
+    "Only supplied prefetch; no additional reads or delegation",
+    "Stop at terminal outcome, deadline, recipient/configuration drift or persistence failure",
+    "Unknown retains reservation; old activities remain stopped"
+  ],
+  "output_bytes": 16384
+}

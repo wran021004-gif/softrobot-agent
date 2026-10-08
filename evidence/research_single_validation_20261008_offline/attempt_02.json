@@ -1,0 +1,884 @@
+{
+  "tests": 3,
+  "failures": [],
+  "errors": [],
+  "observations": {
+    "test_additional_read_is_rejected_without_second_provider_request": {
+      "gate": {
+        "version": "single_validation_gate@1.0.0",
+        "source": "bundle.json",
+        "bundle_identity": "400e791f7b9d4b1f35e091d9dd2b8a0652f2c5cd63e3fa63c0f28c9cd3ec9c50",
+        "recorded_attempts": 1,
+        "public_operation_count": 2,
+        "node_count": 1,
+        "successful_prefetch_count": 1,
+        "followup_read_count": 0,
+        "rejected_followup_count": 1,
+        "followup_capability": "unverified; only initial prefetch authorized",
+        "principal_inspection_count": 0,
+        "coordinated_capability": "unverified",
+        "limits_passed": true,
+        "single_report_passed": false,
+        "scope": "Only this single public request. Formal exit/status does not establish all Mainline 3 gates."
+      },
+      "lifecycle": {
+        "result": {
+          "disposition_record": null,
+          "failure_record": null,
+          "investigation_id": "single-saved-fact",
+          "progress": {
+            "actual_usage_known": true,
+            "code_commit": "ebec1c4861d7b7dbc0cb47bf667aa8c4a0efd650",
+            "code_worktree_dirty": true,
+            "dependency_identity": "5fce29e727584d92481d0173d642244b769dae90cb9853673dc5f2e4c82d75d7",
+            "elapsed_s": 2.51500000001397,
+            "grant_id": "mainline3-single-0d5ff28ddb9a",
+            "http_status": null,
+            "project_id": "mainline3-single-0d5ff28ddb9a",
+            "provider_request_id": null,
+            "received_responses": 1,
+            "report_saved": true,
+            "response_body_received": true,
+            "response_received": true,
+            "response_saved": true,
+            "saved_responses": 1,
+            "settlement_completed": true,
+            "stage": "settlement",
+            "transport_attempted": true,
+            "transport_callable_invocations": 1,
+            "turn": 1,
+            "valid_report": true,
+            "version": "investigation_progress@1.0.0"
+          },
+          "reason": null,
+          "result": {
+            "artifact_id": "fb6dd15a70e20739473c7bb481575ca75b84578fdeac663564e8941eb93b5a85",
+            "media_type": "application/json"
+          },
+          "status": "incomplete"
+        },
+        "public_receipts": [
+          {
+            "contract_version": "1.2.0",
+            "request_id": "single-submit",
+            "execution_id": "cb613e7af8e54e50a67e95b75699c515",
+            "caller": "local-human",
+            "tool_id": "research.investigate",
+            "tool_version": "1.0.0",
+            "result_contract": "InvestigationResult",
+            "result_version": "1.0.0",
+            "execution_status": "completed",
+            "solver_status": "not_run",
+            "analysis_status": "not_assessed",
+            "task_success": null,
+            "output": {
+              "artifact_id": "81ff185b543f9c14d5d120625443b892aac450b9b1b78398fddc1fb7deab8e51",
+              "media_type": "application/json"
+            },
+            "error": null,
+            "cache_hit": false,
+            "original_execution_id": null,
+            "charged": {
+              "tool_calls": 1,
+              "model_calls": 0,
+              "backend_solves": 0,
+              "worker_calls": 0,
+              "wall_s": 0.0
+            }
+          },
+          {
+            "contract_version": "1.2.0",
+            "request_id": "single-collect-0",
+            "execution_id": "c2885156081f45a7bdba1ef6ac6436d6",
+            "caller": "local-human",
+            "tool_id": "research.investigation_status",
+            "tool_version": "1.0.0",
+            "result_contract": "InvestigationResult",
+            "result_version": "1.0.0",
+            "execution_status": "completed",
+            "solver_status": "not_run",
+            "analysis_status": "not_assessed",
+            "task_success": null,
+            "output": {
+              "artifact_id": "0d76f071d5f95f92520e662defa7130a1d9783e815876db38e891aed37b1c0c8",
+              "media_type": "application/json"
+            },
+            "error": null,
+            "cache_hit": false,
+            "original_execution_id": null,
+            "charged": {
+              "tool_calls": 1,
+              "model_calls": 0,
+              "backend_solves": 0,
+              "worker_calls": 0,
+              "wall_s": 1.0309999999881256
+            }
+          }
+        ],
+        "elapsed_s": 4.687999999994645,
+        "thread_active_at_close": false,
+        "thread_completed_before_close": true,
+        "provider_cancellation_confirmed": false,
+        "cleanup": "Owned investigation thread finished before application close"
+      },
+      "ledger": {
+        "limit": {
+          "backend_solves": 0,
+          "model_calls": 1,
+          "tool_calls": 9,
+          "wall_s": 240.0,
+          "worker_calls": 0
+        },
+        "used": {
+          "tool_calls": 3,
+          "model_calls": 1,
+          "backend_solves": 0,
+          "worker_calls": 0,
+          "wall_s": 3.514999999984866
+        },
+        "remaining": {
+          "backend_solves": 0,
+          "model_calls": 0,
+          "tool_calls": 6,
+          "wall_s": 236.48500000001513,
+          "worker_calls": 0
+        },
+        "occupied": {}
+      },
+      "node": {
+        "single-saved-fact": {
+          "children": [],
+          "directory": {
+            "artifact_id": "308c775196bde0fcba3f822b91cbe3ae84f4bfe5017083239b44a0dfaabc2328",
+            "media_type": "application/json"
+          },
+          "measurement": {
+            "actual_input_tokens": null,
+            "characters": 18429,
+            "configured_context_limit_tokens": 1000000,
+            "estimated_input_tokens": 26621,
+            "input_budget_tokens": 160000,
+            "interaction_reserve_tokens": 8192,
+            "method": "Conservative estimate: one token per serialized UTF-8 byte plus configured framing; no appropriate installed tokenizer. Includes all messages, schemas and wire metadata.",
+            "passed": true,
+            "response_reserve_tokens": 3000,
+            "utf8_bytes": 18429
+          },
+          "order": {
+            "allowed_tools": [
+              "evidence.read"
+            ],
+            "budget": {
+              "backend_solves": 0,
+              "model_calls": 1,
+              "tool_calls": 1,
+              "wall_s": 180.0,
+              "worker_calls": 0
+            },
+            "evidence": [
+              {
+                "artifact_id": "6903669a345e76c1dd2958ada4d067bfde06d02f102ce017db06c9a241c7dd51",
+                "media_type": "application/json"
+              }
+            ],
+            "investigation_id": "single-saved-fact",
+            "output_bytes": 16384,
+            "parent_id": null,
+            "queries": [
+              {
+                "byte_limit": 2048,
+                "limit": 20,
+                "offset": 0,
+                "pointer": "/sampled_settling",
+                "reference": {
+                  "artifact_id": "6903669a345e76c1dd2958ada4d067bfde06d02f102ce017db06c9a241c7dd51",
+                  "media_type": "application/json"
+                }
+              }
+            ],
+            "question": "Using ONLY the supplied sampled_settling page, briefly state whether the recorded sampled settling passed. Return 2-3 facts with exact source references, JSON pointers and values (including passed and one observed value/limit), then a short interpretation. This is historical sampled evidence, not a continuous-time guarantee or a causal diagnosis. Return investigation_return directly. No evidence query, child, disposition or further model turn is authorized. If insufficient, explicitly report unknowns.",
+            "role": "investigator",
+            "stop_conditions": [
+              "One provider attempt; no retry or protocol correction",
+              "Only supplied prefetch; no additional reads or delegation",
+              "Stop at terminal outcome, deadline, recipient/configuration drift or persistence failure",
+              "Unknown retains reservation; old activities remain stopped"
+            ],
+            "timeout_s": 180.0
+          },
+          "progress": {
+            "actual_usage_known": true,
+            "code_commit": "ebec1c4861d7b7dbc0cb47bf667aa8c4a0efd650",
+            "code_worktree_dirty": true,
+            "dependency_identity": "5fce29e727584d92481d0173d642244b769dae90cb9853673dc5f2e4c82d75d7",
+            "elapsed_s": 2.51500000001397,
+            "grant_id": "mainline3-single-0d5ff28ddb9a",
+            "http_status": null,
+            "project_id": "mainline3-single-0d5ff28ddb9a",
+            "provider_request_id": null,
+            "received_responses": 1,
+            "report_saved": true,
+            "response_body_received": true,
+            "response_received": true,
+            "response_saved": true,
+            "saved_responses": 1,
+            "settlement_completed": true,
+            "stage": "settlement",
+            "transport_attempted": true,
+            "transport_callable_invocations": 1,
+            "turn": 1,
+            "valid_report": true,
+            "version": "investigation_progress@1.0.0"
+          },
+          "reads": [
+            {
+              "content_identity": "daa449cdafeedb47586aedef0959667bc0ac308669c93d8f5b9945fdef8b980e",
+              "metadata_only": false,
+              "page": {
+                "content": {
+                  "available": true,
+                  "continuous_time_guarantee": false,
+                  "max_error_m": 0.06672099201814737,
+                  "max_speed_m_s": 0.20679063000945364,
+                  "passed": false,
+                  "position_limit_m": 0.01,
+                  "speed_limit_m_s": 0.02,
+                  "window_s": 0.05
+                },
+                "kind": "content",
+                "next_offset": null,
+                "offset": 0,
+                "pointer": "/sampled_settling",
+                "presentation": "original",
+                "returned_items": 8,
+                "source": {
+                  "artifact_id": "6903669a345e76c1dd2958ada4d067bfde06d02f102ce017db06c9a241c7dd51",
+                  "media_type": "application/json"
+                },
+                "total_items": 8
+              },
+              "pointer": "/sampled_settling",
+              "query": {
+                "byte_limit": 2048,
+                "limit": 20,
+                "offset": 0,
+                "pointer": "/sampled_settling",
+                "reference": {
+                  "artifact_id": "6903669a345e76c1dd2958ada4d067bfde06d02f102ce017db06c9a241c7dd51",
+                  "media_type": "application/json"
+                }
+              },
+              "reference": {
+                "artifact_id": "6903669a345e76c1dd2958ada4d067bfde06d02f102ce017db06c9a241c7dd51",
+                "media_type": "application/json"
+              }
+            }
+          ],
+          "reason": null,
+          "result": {
+            "artifact_id": "fb6dd15a70e20739473c7bb481575ca75b84578fdeac663564e8941eb93b5a85",
+            "media_type": "application/json"
+          },
+          "started_unix": 1791433644.8510065,
+          "status": "incomplete",
+          "usage": {
+            "backend_solves": 0,
+            "model_calls": 1,
+            "tool_calls": 1,
+            "wall_s": 0.0,
+            "worker_calls": 0
+          }
+        }
+      },
+      "real_provider_requests": 0,
+      "credential_loads": 0,
+      "science": 0
+    },
+    "test_owning_application_waits_for_thread": {
+      "gate": {
+        "version": "single_validation_gate@1.0.0",
+        "source": "bundle.json",
+        "bundle_identity": "5110dc689fe78520cfb5b058dca5d863a562a515afd3903f47eaebbac0356316",
+        "recorded_attempts": 1,
+        "public_operation_count": 2,
+        "node_count": 1,
+        "successful_prefetch_count": 1,
+        "followup_read_count": 0,
+        "rejected_followup_count": 0,
+        "followup_capability": "unverified; only initial prefetch authorized",
+        "principal_inspection_count": 0,
+        "coordinated_capability": "unverified",
+        "limits_passed": true,
+        "single_report_passed": true,
+        "scope": "Only this single public request. Formal exit/status does not establish all Mainline 3 gates."
+      },
+      "lifecycle": {
+        "result": {
+          "disposition_record": null,
+          "failure_record": null,
+          "investigation_id": "single-saved-fact",
+          "progress": {
+            "actual_usage_known": true,
+            "code_commit": "ebec1c4861d7b7dbc0cb47bf667aa8c4a0efd650",
+            "code_worktree_dirty": true,
+            "dependency_identity": "5fce29e727584d92481d0173d642244b769dae90cb9853673dc5f2e4c82d75d7",
+            "elapsed_s": 2.5309999999881256,
+            "grant_id": "mainline3-single-4e790ae0c6d0",
+            "http_status": null,
+            "project_id": "mainline3-single-4e790ae0c6d0",
+            "provider_request_id": null,
+            "received_responses": 1,
+            "report_saved": true,
+            "response_body_received": true,
+            "response_received": true,
+            "response_saved": true,
+            "saved_responses": 1,
+            "settlement_completed": true,
+            "stage": "settlement",
+            "transport_attempted": true,
+            "transport_callable_invocations": 1,
+            "turn": 0,
+            "valid_report": true,
+            "version": "investigation_progress@1.0.0"
+          },
+          "reason": null,
+          "result": {
+            "artifact_id": "5bceabe0b597e3100de64c47fc2d0e54454f0220581280b8eb6ca223d81b5388",
+            "media_type": "application/json"
+          },
+          "status": "completed"
+        },
+        "public_receipts": [
+          {
+            "contract_version": "1.2.0",
+            "request_id": "single-submit",
+            "execution_id": "a480f5f5d2604a699b091920b0872657",
+            "caller": "local-human",
+            "tool_id": "research.investigate",
+            "tool_version": "1.0.0",
+            "result_contract": "InvestigationResult",
+            "result_version": "1.0.0",
+            "execution_status": "completed",
+            "solver_status": "not_run",
+            "analysis_status": "not_assessed",
+            "task_success": null,
+            "output": {
+              "artifact_id": "81ff185b543f9c14d5d120625443b892aac450b9b1b78398fddc1fb7deab8e51",
+              "media_type": "application/json"
+            },
+            "error": null,
+            "cache_hit": false,
+            "original_execution_id": null,
+            "charged": {
+              "tool_calls": 1,
+              "model_calls": 0,
+              "backend_solves": 0,
+              "worker_calls": 0,
+              "wall_s": 0.0
+            }
+          },
+          {
+            "contract_version": "1.2.0",
+            "request_id": "single-collect-0",
+            "execution_id": "b9c653ef0bae45d48f729a42c9a03b7f",
+            "caller": "local-human",
+            "tool_id": "research.investigation_status",
+            "tool_version": "1.0.0",
+            "result_contract": "InvestigationResult",
+            "result_version": "1.0.0",
+            "execution_status": "completed",
+            "solver_status": "not_run",
+            "analysis_status": "not_assessed",
+            "task_success": null,
+            "output": {
+              "artifact_id": "d1477840706c670b2588bf664439c15d285a4a87fd76ddc58007761233b0f71e",
+              "media_type": "application/json"
+            },
+            "error": null,
+            "cache_hit": false,
+            "original_execution_id": null,
+            "charged": {
+              "tool_calls": 1,
+              "model_calls": 0,
+              "backend_solves": 0,
+              "worker_calls": 0,
+              "wall_s": 1.0
+            }
+          }
+        ],
+        "elapsed_s": 4.687999999994645,
+        "thread_active_at_close": false,
+        "thread_completed_before_close": true,
+        "provider_cancellation_confirmed": false,
+        "cleanup": "Owned investigation thread finished before application close"
+      },
+      "ledger": {
+        "limit": {
+          "backend_solves": 0,
+          "model_calls": 1,
+          "tool_calls": 9,
+          "wall_s": 240.0,
+          "worker_calls": 0
+        },
+        "used": {
+          "tool_calls": 3,
+          "model_calls": 1,
+          "backend_solves": 0,
+          "worker_calls": 0,
+          "wall_s": 3.515999999974156
+        },
+        "remaining": {
+          "backend_solves": 0,
+          "model_calls": 0,
+          "tool_calls": 6,
+          "wall_s": 236.48400000002584,
+          "worker_calls": 0
+        },
+        "occupied": {}
+      },
+      "node": {
+        "single-saved-fact": {
+          "children": [],
+          "directory": {
+            "artifact_id": "308c775196bde0fcba3f822b91cbe3ae84f4bfe5017083239b44a0dfaabc2328",
+            "media_type": "application/json"
+          },
+          "measurement": {
+            "actual_input_tokens": null,
+            "characters": 18429,
+            "configured_context_limit_tokens": 1000000,
+            "estimated_input_tokens": 26621,
+            "input_budget_tokens": 160000,
+            "interaction_reserve_tokens": 8192,
+            "method": "Conservative estimate: one token per serialized UTF-8 byte plus configured framing; no appropriate installed tokenizer. Includes all messages, schemas and wire metadata.",
+            "passed": true,
+            "response_reserve_tokens": 3000,
+            "utf8_bytes": 18429
+          },
+          "order": {
+            "allowed_tools": [
+              "evidence.read"
+            ],
+            "budget": {
+              "backend_solves": 0,
+              "model_calls": 1,
+              "tool_calls": 1,
+              "wall_s": 180.0,
+              "worker_calls": 0
+            },
+            "evidence": [
+              {
+                "artifact_id": "6903669a345e76c1dd2958ada4d067bfde06d02f102ce017db06c9a241c7dd51",
+                "media_type": "application/json"
+              }
+            ],
+            "investigation_id": "single-saved-fact",
+            "output_bytes": 16384,
+            "parent_id": null,
+            "queries": [
+              {
+                "byte_limit": 2048,
+                "limit": 20,
+                "offset": 0,
+                "pointer": "/sampled_settling",
+                "reference": {
+                  "artifact_id": "6903669a345e76c1dd2958ada4d067bfde06d02f102ce017db06c9a241c7dd51",
+                  "media_type": "application/json"
+                }
+              }
+            ],
+            "question": "Using ONLY the supplied sampled_settling page, briefly state whether the recorded sampled settling passed. Return 2-3 facts with exact source references, JSON pointers and values (including passed and one observed value/limit), then a short interpretation. This is historical sampled evidence, not a continuous-time guarantee or a causal diagnosis. Return investigation_return directly. No evidence query, child, disposition or further model turn is authorized. If insufficient, explicitly report unknowns.",
+            "role": "investigator",
+            "stop_conditions": [
+              "One provider attempt; no retry or protocol correction",
+              "Only supplied prefetch; no additional reads or delegation",
+              "Stop at terminal outcome, deadline, recipient/configuration drift or persistence failure",
+              "Unknown retains reservation; old activities remain stopped"
+            ],
+            "timeout_s": 180.0
+          },
+          "progress": {
+            "actual_usage_known": true,
+            "code_commit": "ebec1c4861d7b7dbc0cb47bf667aa8c4a0efd650",
+            "code_worktree_dirty": true,
+            "dependency_identity": "5fce29e727584d92481d0173d642244b769dae90cb9853673dc5f2e4c82d75d7",
+            "elapsed_s": 2.5309999999881256,
+            "grant_id": "mainline3-single-4e790ae0c6d0",
+            "http_status": null,
+            "project_id": "mainline3-single-4e790ae0c6d0",
+            "provider_request_id": null,
+            "received_responses": 1,
+            "report_saved": true,
+            "response_body_received": true,
+            "response_received": true,
+            "response_saved": true,
+            "saved_responses": 1,
+            "settlement_completed": true,
+            "stage": "settlement",
+            "transport_attempted": true,
+            "transport_callable_invocations": 1,
+            "turn": 0,
+            "valid_report": true,
+            "version": "investigation_progress@1.0.0"
+          },
+          "reads": [
+            {
+              "content_identity": "daa449cdafeedb47586aedef0959667bc0ac308669c93d8f5b9945fdef8b980e",
+              "metadata_only": false,
+              "page": {
+                "content": {
+                  "available": true,
+                  "continuous_time_guarantee": false,
+                  "max_error_m": 0.06672099201814737,
+                  "max_speed_m_s": 0.20679063000945364,
+                  "passed": false,
+                  "position_limit_m": 0.01,
+                  "speed_limit_m_s": 0.02,
+                  "window_s": 0.05
+                },
+                "kind": "content",
+                "next_offset": null,
+                "offset": 0,
+                "pointer": "/sampled_settling",
+                "presentation": "original",
+                "returned_items": 8,
+                "source": {
+                  "artifact_id": "6903669a345e76c1dd2958ada4d067bfde06d02f102ce017db06c9a241c7dd51",
+                  "media_type": "application/json"
+                },
+                "total_items": 8
+              },
+              "pointer": "/sampled_settling",
+              "query": {
+                "byte_limit": 2048,
+                "limit": 20,
+                "offset": 0,
+                "pointer": "/sampled_settling",
+                "reference": {
+                  "artifact_id": "6903669a345e76c1dd2958ada4d067bfde06d02f102ce017db06c9a241c7dd51",
+                  "media_type": "application/json"
+                }
+              },
+              "reference": {
+                "artifact_id": "6903669a345e76c1dd2958ada4d067bfde06d02f102ce017db06c9a241c7dd51",
+                "media_type": "application/json"
+              }
+            }
+          ],
+          "reason": null,
+          "result": {
+            "artifact_id": "5bceabe0b597e3100de64c47fc2d0e54454f0220581280b8eb6ca223d81b5388",
+            "media_type": "application/json"
+          },
+          "started_unix": 1791433653.744821,
+          "status": "completed",
+          "usage": {
+            "backend_solves": 0,
+            "model_calls": 1,
+            "tool_calls": 1,
+            "wall_s": 0.0,
+            "worker_calls": 0
+          }
+        }
+      },
+      "real_provider_requests": 0,
+      "credential_loads": 0,
+      "science": 0
+    },
+    "test_single_report_seals_and_stops": {
+      "gate": {
+        "version": "single_validation_gate@1.0.0",
+        "source": "bundle.json",
+        "bundle_identity": "a1fa6a5713cf8c17672f3c3ab1a4cb53b553695030cc9c837e55870354f27c44",
+        "recorded_attempts": 1,
+        "public_operation_count": 2,
+        "node_count": 1,
+        "successful_prefetch_count": 1,
+        "followup_read_count": 0,
+        "rejected_followup_count": 0,
+        "followup_capability": "unverified; only initial prefetch authorized",
+        "principal_inspection_count": 0,
+        "coordinated_capability": "unverified",
+        "limits_passed": true,
+        "single_report_passed": true,
+        "scope": "Only this single public request. Formal exit/status does not establish all Mainline 3 gates."
+      },
+      "lifecycle": {
+        "result": {
+          "disposition_record": null,
+          "failure_record": null,
+          "investigation_id": "single-saved-fact",
+          "progress": {
+            "actual_usage_known": true,
+            "code_commit": "ebec1c4861d7b7dbc0cb47bf667aa8c4a0efd650",
+            "code_worktree_dirty": true,
+            "dependency_identity": "5fce29e727584d92481d0173d642244b769dae90cb9853673dc5f2e4c82d75d7",
+            "elapsed_s": 2.4219999999913853,
+            "grant_id": "mainline3-single-c7d980eb320c",
+            "http_status": null,
+            "project_id": "mainline3-single-c7d980eb320c",
+            "provider_request_id": null,
+            "received_responses": 1,
+            "report_saved": true,
+            "response_body_received": true,
+            "response_received": true,
+            "response_saved": true,
+            "saved_responses": 1,
+            "settlement_completed": true,
+            "stage": "settlement",
+            "transport_attempted": true,
+            "transport_callable_invocations": 1,
+            "turn": 0,
+            "valid_report": true,
+            "version": "investigation_progress@1.0.0"
+          },
+          "reason": null,
+          "result": {
+            "artifact_id": "5bceabe0b597e3100de64c47fc2d0e54454f0220581280b8eb6ca223d81b5388",
+            "media_type": "application/json"
+          },
+          "status": "completed"
+        },
+        "public_receipts": [
+          {
+            "contract_version": "1.2.0",
+            "request_id": "single-submit",
+            "execution_id": "7d2f9004fd4442968254a21db81a7575",
+            "caller": "local-human",
+            "tool_id": "research.investigate",
+            "tool_version": "1.0.0",
+            "result_contract": "InvestigationResult",
+            "result_version": "1.0.0",
+            "execution_status": "completed",
+            "solver_status": "not_run",
+            "analysis_status": "not_assessed",
+            "task_success": null,
+            "output": {
+              "artifact_id": "81ff185b543f9c14d5d120625443b892aac450b9b1b78398fddc1fb7deab8e51",
+              "media_type": "application/json"
+            },
+            "error": null,
+            "cache_hit": false,
+            "original_execution_id": null,
+            "charged": {
+              "tool_calls": 1,
+              "model_calls": 0,
+              "backend_solves": 0,
+              "worker_calls": 0,
+              "wall_s": 0.0
+            }
+          },
+          {
+            "contract_version": "1.2.0",
+            "request_id": "single-collect-0",
+            "execution_id": "4ab49d67bc264736a8d1121f6e5a758e",
+            "caller": "local-human",
+            "tool_id": "research.investigation_status",
+            "tool_version": "1.0.0",
+            "result_contract": "InvestigationResult",
+            "result_version": "1.0.0",
+            "execution_status": "completed",
+            "solver_status": "not_run",
+            "analysis_status": "not_assessed",
+            "task_success": null,
+            "output": {
+              "artifact_id": "ef37a36982ccfde289b1d0aa90ea5a9b7ae929c8713e24951a3baa65d3f318df",
+              "media_type": "application/json"
+            },
+            "error": null,
+            "cache_hit": false,
+            "original_execution_id": null,
+            "charged": {
+              "tool_calls": 1,
+              "model_calls": 0,
+              "backend_solves": 0,
+              "worker_calls": 0,
+              "wall_s": 1.0
+            }
+          }
+        ],
+        "elapsed_s": 4.530999999988126,
+        "thread_active_at_close": false,
+        "thread_completed_before_close": true,
+        "provider_cancellation_confirmed": false,
+        "cleanup": "Owned investigation thread finished before application close"
+      },
+      "ledger": {
+        "limit": {
+          "backend_solves": 0,
+          "model_calls": 1,
+          "tool_calls": 9,
+          "wall_s": 240.0,
+          "worker_calls": 0
+        },
+        "used": {
+          "tool_calls": 3,
+          "model_calls": 1,
+          "backend_solves": 0,
+          "worker_calls": 0,
+          "wall_s": 3.4070000000065193
+        },
+        "remaining": {
+          "backend_solves": 0,
+          "model_calls": 0,
+          "tool_calls": 6,
+          "wall_s": 236.59299999999348,
+          "worker_calls": 0
+        },
+        "occupied": {}
+      },
+      "node": {
+        "single-saved-fact": {
+          "children": [],
+          "directory": {
+            "artifact_id": "308c775196bde0fcba3f822b91cbe3ae84f4bfe5017083239b44a0dfaabc2328",
+            "media_type": "application/json"
+          },
+          "measurement": {
+            "actual_input_tokens": null,
+            "characters": 18429,
+            "configured_context_limit_tokens": 1000000,
+            "estimated_input_tokens": 26621,
+            "input_budget_tokens": 160000,
+            "interaction_reserve_tokens": 8192,
+            "method": "Conservative estimate: one token per serialized UTF-8 byte plus configured framing; no appropriate installed tokenizer. Includes all messages, schemas and wire metadata.",
+            "passed": true,
+            "response_reserve_tokens": 3000,
+            "utf8_bytes": 18429
+          },
+          "order": {
+            "allowed_tools": [
+              "evidence.read"
+            ],
+            "budget": {
+              "backend_solves": 0,
+              "model_calls": 1,
+              "tool_calls": 1,
+              "wall_s": 180.0,
+              "worker_calls": 0
+            },
+            "evidence": [
+              {
+                "artifact_id": "6903669a345e76c1dd2958ada4d067bfde06d02f102ce017db06c9a241c7dd51",
+                "media_type": "application/json"
+              }
+            ],
+            "investigation_id": "single-saved-fact",
+            "output_bytes": 16384,
+            "parent_id": null,
+            "queries": [
+              {
+                "byte_limit": 2048,
+                "limit": 20,
+                "offset": 0,
+                "pointer": "/sampled_settling",
+                "reference": {
+                  "artifact_id": "6903669a345e76c1dd2958ada4d067bfde06d02f102ce017db06c9a241c7dd51",
+                  "media_type": "application/json"
+                }
+              }
+            ],
+            "question": "Using ONLY the supplied sampled_settling page, briefly state whether the recorded sampled settling passed. Return 2-3 facts with exact source references, JSON pointers and values (including passed and one observed value/limit), then a short interpretation. This is historical sampled evidence, not a continuous-time guarantee or a causal diagnosis. Return investigation_return directly. No evidence query, child, disposition or further model turn is authorized. If insufficient, explicitly report unknowns.",
+            "role": "investigator",
+            "stop_conditions": [
+              "One provider attempt; no retry or protocol correction",
+              "Only supplied prefetch; no additional reads or delegation",
+              "Stop at terminal outcome, deadline, recipient/configuration drift or persistence failure",
+              "Unknown retains reservation; old activities remain stopped"
+            ],
+            "timeout_s": 180.0
+          },
+          "progress": {
+            "actual_usage_known": true,
+            "code_commit": "ebec1c4861d7b7dbc0cb47bf667aa8c4a0efd650",
+            "code_worktree_dirty": true,
+            "dependency_identity": "5fce29e727584d92481d0173d642244b769dae90cb9853673dc5f2e4c82d75d7",
+            "elapsed_s": 2.4219999999913853,
+            "grant_id": "mainline3-single-c7d980eb320c",
+            "http_status": null,
+            "project_id": "mainline3-single-c7d980eb320c",
+            "provider_request_id": null,
+            "received_responses": 1,
+            "report_saved": true,
+            "response_body_received": true,
+            "response_received": true,
+            "response_saved": true,
+            "saved_responses": 1,
+            "settlement_completed": true,
+            "stage": "settlement",
+            "transport_attempted": true,
+            "transport_callable_invocations": 1,
+            "turn": 0,
+            "valid_report": true,
+            "version": "investigation_progress@1.0.0"
+          },
+          "reads": [
+            {
+              "content_identity": "daa449cdafeedb47586aedef0959667bc0ac308669c93d8f5b9945fdef8b980e",
+              "metadata_only": false,
+              "page": {
+                "content": {
+                  "available": true,
+                  "continuous_time_guarantee": false,
+                  "max_error_m": 0.06672099201814737,
+                  "max_speed_m_s": 0.20679063000945364,
+                  "passed": false,
+                  "position_limit_m": 0.01,
+                  "speed_limit_m_s": 0.02,
+                  "window_s": 0.05
+                },
+                "kind": "content",
+                "next_offset": null,
+                "offset": 0,
+                "pointer": "/sampled_settling",
+                "presentation": "original",
+                "returned_items": 8,
+                "source": {
+                  "artifact_id": "6903669a345e76c1dd2958ada4d067bfde06d02f102ce017db06c9a241c7dd51",
+                  "media_type": "application/json"
+                },
+                "total_items": 8
+              },
+              "pointer": "/sampled_settling",
+              "query": {
+                "byte_limit": 2048,
+                "limit": 20,
+                "offset": 0,
+                "pointer": "/sampled_settling",
+                "reference": {
+                  "artifact_id": "6903669a345e76c1dd2958ada4d067bfde06d02f102ce017db06c9a241c7dd51",
+                  "media_type": "application/json"
+                }
+              },
+              "reference": {
+                "artifact_id": "6903669a345e76c1dd2958ada4d067bfde06d02f102ce017db06c9a241c7dd51",
+                "media_type": "application/json"
+              }
+            }
+          ],
+          "reason": null,
+          "result": {
+            "artifact_id": "5bceabe0b597e3100de64c47fc2d0e54454f0220581280b8eb6ca223d81b5388",
+            "media_type": "application/json"
+          },
+          "started_unix": 1791433662.6582413,
+          "status": "completed",
+          "usage": {
+            "backend_solves": 0,
+            "model_calls": 1,
+            "tool_calls": 1,
+            "wall_s": 0.0,
+            "worker_calls": 0
+          }
+        }
+      },
+      "real_provider_requests": 0,
+      "credential_loads": 0,
+      "science": 0
+    }
+  },
+  "boundary": "Production Host/public dispatcher/native parser/Store/ledger; external transport only substituted",
+  "real_provider_requests": 0,
+  "credential_loads": 0,
+  "scientific_operations": 0
+}
