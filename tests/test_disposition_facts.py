@@ -140,3 +140,11 @@ class SelectableTests(TestCase):
         self.assertEqual(packet['counterevidence'],['keep']);self.assertLess(len(encode(wire)),60000)
         page=self.dispatch._query(self.principal,ReadEvidence(reference=ref,pointer='/choices/0/message/reasoning_content',limit=100,byte_limit=4096))
         self.assertEqual(page['page']['content'],'a'*100);self.assertEqual(page['page']['next_offset'],100)
+        wire['messages'].append(dict(role='user',content='Complete explicit recovery read, not a repeated acknowledgement'))
+        packet=json.loads(wire['messages'][1]['content']);packet['investigation_id']='principal'
+        wire['messages'][1]['content']=encode(packet)
+        self.dispatch._selectable=lambda:True
+        self.dispatch._append_correction(wire,dict(tool_calls=calls),'read',dict(issues=[]))
+        corrected=json.loads(wire['messages'][1]['content'])['correction']
+        self.assertEqual(corrected['prior_response_archive']['references'],[ref])
+        self.assertEqual(corrected['retained_explicit_user_turns'][0]['content'],'Complete explicit recovery read, not a repeated acknowledgement')

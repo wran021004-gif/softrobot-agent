@@ -679,6 +679,8 @@ class InvestigationDispatcher:
 
     def _append_evidence_turn(self,payload,calls,response,order):
         packet=json.loads(payload['messages'][1]['content'])
+        retained=[m for m in payload['messages'][2:] if m.get('role')=='user']
+        if retained:packet.setdefault('retained_explicit_context_turns',[]).extend(retained)
         packet.setdefault('confirmed_followup_evidence',[]).append(dict(native_calls=calls,result=response))
         refs=self.store.session(self.run_id)['state']['investigations'][order.investigation_id].get('provider_response_refs',[])
         packet['prior_response_archive']=dict(references=refs,
@@ -726,8 +728,12 @@ class InvestigationDispatcher:
         retained=[m for m in payload['messages'][2:] if m.get('role')=='tool']
         calls=assistant['tool_calls']
         packet=json.loads(payload['messages'][1]['content'])
+        node=self.store.session(self.run_id)['state'].get('investigations',{}).get(packet.get('investigation_id'),{})
+        refs=node.get('provider_response_refs',[])
         packet['correction']=dict(received_native_calls=calls,feedback=feedback,
             retained_tool_results=retained,
+            retained_explicit_user_turns=[m for m in payload['messages'][2:] if m.get('role')=='user'],
+            prior_response_archive=dict(references=refs,query=dict(reference=refs[-1],pointer='/choices/0/message/reasoning_content',offset=0,limit=3000,byte_limit=4096) if refs else None),
             omitted='Prior reasoning and repeated assistant acknowledgements are archive-only; full original responses and requests are queryable in Store investigation_provider_response/attempt events. Original reports, unknowns, counterevidence, inspected pages and budgets remain in this packet.')
         payload['messages']=[payload['messages'][0],dict(role='user',content=encode(packet))]
 
