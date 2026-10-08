@@ -1,0 +1,52 @@
+"""Saved public-chain gate; material review is supplied by the coding agent."""
+import json
+from tools.state_io import read,digest
+from tools.research_v1_continue import OUT,ROOT
+from tools.platform_store import zero,Store
+from tools.research_investigations import InvestigationDispatcher,InvestigationOrder,InvestigationReturn
+
+def generate_b():
+    manifest=read(OUT/'validation_manifest.json');p=manifest['phases']['coordinated']
+    bundle=read(OUT/'coordinated_bundle.json');result=read(OUT/'coordinated_result.json')
+    nodes=bundle['state']['investigations'];events=bundle['events'];arts=bundle['artifacts'];store=Store(ROOT/p['output'])
+    attempts=[e for e in events if e['kind']=='investigation_provider_attempt']
+    calls=bundle['calls'];used=store.remaining()['used'];unknown=[c['request_id'] for c in calls if c['status'] in ('running','unknown')]
+    settings=[]
+    for e in attempts:
+        r=arts[e['outputs'][0]['artifact_id']];w=r['payload']
+        settings.append(w['model']=='deepseek-flash' and w['thinking']=={'type':'enabled'} and w['tool_choice']=='auto' and r['measurement']['passed']
+            and any(w['reasoning_effort']==v['reasoning_effort'] and w['max_tokens']==v['max_tokens'] and v['supported'] for v in manifest['conditional_length_recovery']['configurations']))
+    chains=[]
+    for target in result['targets']:
+        key=target['investigation_id'];node=nodes[key];reads=node['reads'];proof=[]
+        report=arts[node['result']['artifact_id']]
+        for e in attempts:
+            if e.get('request_id')!='investigation-'+key:continue
+            wire=arts[e['outputs'][0]['artifact_id']]['payload']
+            for message in wire['messages']:
+                if message.get('role')!='tool':continue
+                try:page=json.loads(message['content'])
+                except ValueError:continue
+                matching=[r for r in reads if r['page']==page and not r.get('metadata_only')]
+                for r in matching:
+                    cited=[f for f in [*report['facts'],*report['counterevidence']] if f['reference']==r['reference'] and (f['pointer']==r['pointer'] or f['pointer'].startswith(r['pointer']+'/'))]
+                    if cited:proof.append(dict(attempt_sequence=e['sequence'],read_identity=r['content_identity'],cited_pointers=[f['pointer'] for f in cited]))
+        chains.append(dict(investigation_id=key,new_report=node['result'],native_selected_read_followup_and_citation=bool(proof),proof=proof))
+    bounds=all(n['order']['budget']==p['allocations'][k]['budget'] and n['usage']['model_calls']<=n['order']['budget']['model_calls'] and n['usage']['tool_calls']<=16 for k,n in nodes.items())
+    principal=nodes['principal-coordinated-v2'];principal_report=arts[principal['result']['artifact_id']]
+    dispositions=[store.artifact(store.artifact(r['output'])['disposition_record']) for r in result['receipts']]
+    inspected=all(d['decision']['disposition']!='accept' or d['inspection_links'] for d in dispositions)
+    protections=all((n['order']['budget']['model_calls']-p['allocations'][k]['exploration_requests'])==p['allocations'][k]['protected_delivery_requests'] for k,n in nodes.items())
+    gates=dict(preserved_A='pass' if read(OUT/'A_preserved.json')['accepted'] else 'fail',
+        historical_plan_import='pass' if bundle['state']['historical_investigations']['coordinator-plan']['new_investigation_executed'] is False else 'fail',
+        two_new_valid_reports='pass' if len(chains)==2 and all(nodes[t['investigation_id']]['status']=='completed' and c['native_selected_read_followup_and_citation'] for t,c in zip(result['targets'],chains)) else 'fail',
+        actual_synthesis='pass' if nodes['coordinator-summary']['status']=='completed' and nodes['coordinator-summary']['result']==result['coordinator_synthesis'] else 'fail',
+        public_dispositions='pass' if len(dispositions)==2 and len(principal_report['dispositions'])==2 and all(r['execution_status']=='completed' for r in result['receipts']) else 'fail',
+        original_evidence_inspection='pass' if inspected and bundle['state'].get('principal_investigation_reads') else 'fail',
+        material_audit='pass' if result['material_review']['report']==result['report'] and result['material_review']['material_correctness']=='pass' else 'fail',
+        exact_allocation_and_protection='pass' if bounds and protections else 'fail',
+        request_capacity_and_settings='pass' if settings and all(settings) else 'fail',
+        accounting='pass' if not unknown and used['model_calls']==len(attempts) and all(used[k]<=p['project_budget'][k] for k in used) else 'fail',
+        correction_and_probe_caps='pass' if bundle['state'].get('investigation_protocol_corrections_used',0)<=6 and all(bundle['state'].get('investigation_corrections_by_role',{}).get(k,0)<=3 for k in ('principal','other')) and bundle['state'].get('recovery_probes_used',0)<=2 else 'fail')
+    return dict(version='mainline3.continue_gate@1.0.0',gates=gates,passed=all(v=='pass' for v in gates.values()),new_requests=len(attempts),usage=used,
+        unknown_reservations=unknown,chains=chains,manifest_identity=digest(manifest),bundle_identity=digest(bundle),separate_material_audit=result['material_review'])

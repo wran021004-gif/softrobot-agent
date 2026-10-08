@@ -103,16 +103,28 @@ class InvestigationDispatcher:
         allowed=set(grant['allowed_tools']);evidence=self._sources(session,grant)
         if order.role=='principal' and order.parent_id:raise ValueError('PRINCIPAL_REQUIRES_ROOT_SCOPE')
         if order.parent_id:
-            parent=nodes.get(order.parent_id)
+            parent=nodes.get(order.parent_id) or session['state'].get('historical_investigations',{}).get(order.parent_id)
             if not parent or parent['order']['role']!='coordinator' or parent['order']['parent_id'] is not None:
                 raise ValueError('INVESTIGATION_MAX_DEPTH_OR_PARENT')
             if order.role!='investigator':raise ValueError('ONLY_INVESTIGATOR_CHILDREN')
             if parent.get('status')!='completed':raise ValueError('COORDINATOR_RESULT_REQUIRED')
             proposed=parent.get('children',[])
-            if plain(order) not in proposed:raise ValueError('CHILD_NOT_REQUESTED_BY_COORDINATOR')
+            binding=grant.get('historical_execution_bindings',{}).get(order.parent_id)
+            if binding and parent.get('kind')=='historical_reuse':
+                if binding['report']!=parent['result'] or binding['proposed_children']!=proposed:
+                    raise ValueError('HISTORICAL_PLANNING_BINDING_MISMATCH')
+                if plain(order) not in binding['authorized_children']:
+                    raise ValueError('CHILD_NOT_AUTHORIZED_BY_NEW_BINDING')
+                original=next((p for p in proposed if p['investigation_id']==order.investigation_id),None)
+                if original is None or {k:v for k,v in plain(order).items() if k!='budget'}!={k:v for k,v in original.items() if k!='budget'}:
+                    raise ValueError('HISTORICAL_CHILD_SCOPE_CHANGED')
+                parent_budget=binding['delegation_per_node_budget']
+            else:
+                if plain(order) not in proposed:raise ValueError('CHILD_NOT_REQUESTED_BY_COORDINATOR')
+                parent_budget=parent['order']['budget']
             allowed &= set(parent['order']['allowed_tools'])
             evidence &= {r['artifact_id'] for r in parent['order']['evidence']}
-            if any(v>parent['order']['budget'][k] for k,v in plain(order.budget).items()):
+            if any(v>parent_budget[k] for k,v in plain(order.budget).items()):
                 raise ValueError('CHILD_BUDGET_SCOPE_EXCEEDED')
         if set(order.allowed_tools)-allowed:raise ValueError('CHILD_TOOL_SCOPE_EXCEEDED')
         if {r.artifact_id for r in order.evidence}-evidence:raise ValueError('CHILD_EVIDENCE_SCOPE_EXCEEDED')
@@ -123,6 +135,8 @@ class InvestigationDispatcher:
         if budget['wall_s']<order.timeout_s:raise ValueError('INVESTIGATION_TIMEOUT_EXCEEDS_GRANT')
         if order.output_bytes>grant.get('output_bytes',16384):raise ValueError('INVESTIGATION_OUTPUT_CAPACITY_EXCEEDS_GRANT')
         if any(v>grant['per_node_budget'][k] for k,v in budget.items()):raise ValueError('INVESTIGATION_NODE_BUDGET_EXCEEDED')
+        allocation=grant.get('delivery_allocations',{}).get(order.investigation_id)
+        if allocation and budget!=allocation['budget']:raise ValueError('FROZEN_ROLE_ALLOCATION_MISMATCH')
         return session,grant
 
     def _sources(self,session,grant):
@@ -243,7 +257,10 @@ class InvestigationDispatcher:
             continuation='Use evidence.read at /entries with next_offset until null. An overview requires /entries/<original index>. No source is dropped from this directory.',
             delegate='Use original entry.reference in child evidence; set parent_id to this investigation_id, role investigator, tools and budget no greater than this request. Do not delegate the directory as scientific evidence.')
         if order.role=='principal':
-            packet['principal_inspection_records']=session['state'].get('principal_investigation_reads',[])
+            # Prefetches above are already public, role-attributable inspections.
+            # Refresh their committed state before constructing selectable handles.
+            session=self.store.session(self.run_id)
+            packet['principal_inspection_records']=self._inspection_view(session['state'].get('principal_investigation_reads',[]))
             ids={r.artifact_id for r in order.evidence}
             packet['disposition_targets']=[dict(investigation_id=k,report=n['result'])
                 for k,n in self._reports().items()
@@ -348,6 +365,8 @@ class InvestigationDispatcher:
     def _query(self,order,query):
         # Recheck root/parent/activity authority on every operation. Rejected reads
         # consume an evidence operation too, within the common node reservation.
+        node=self.store.session(self.run_id)['state']['investigations'][order.investigation_id]
+        if node.get('submission_phase')=='report_delivery':raise ValueError('INVESTIGATION_REPORT_DELIVERY_READ_DENIED')
         self._consume(order,'tool_calls')
         if 'evidence.read' not in order.allowed_tools:raise ValueError('INVESTIGATION_READ_NOT_GRANTED')
         node=self.store.session(self.run_id)['state']['investigations'][order.investigation_id]
@@ -454,6 +473,9 @@ class InvestigationDispatcher:
         try:
             ref,uncertain=self._failure(order,row,progress,exc,started)
             reason='INVESTIGATION_FAILED_AT_'+progress['stage'].upper()
+            import re
+            code=str(exc).split(':',1)[0]
+            if re.fullmatch(r'[A-Z][A-Z0-9_]{2,120}',code):reason+=': '+code
             if uncertain:
                 self.store.mark_unknown(self.run_id,row['request_id'])
                 self._state(order.investigation_id,status='unconfirmed',reason=reason)
@@ -484,7 +506,7 @@ class InvestigationDispatcher:
     def _initial_progress(self):
         snapshot=self.store.session(self.run_id)['snapshot']
         return dict(stage='request_preparation',turn=None,transport_attempted=False,transport_callable_invocations=0,
-            response_received=False,response_body_received=False,response_saved=False,valid_report=False,report_saved=False,
+            response_received=False,response_body_received=False,body_persisted=False,response_saved=False,response_decoded=False,valid_report=False,report_saved=False,
             settlement_completed=False,actual_usage_known=False,received_responses=0,saved_responses=0,
             http_status=None,provider_request_id=None,
             project_id=self.store.config()['project_id'],grant_id=self.store.config()['grant_id'],
@@ -527,6 +549,43 @@ class InvestigationDispatcher:
         return {k:usage[k] for k in ('prompt_tokens','completion_tokens','total_tokens')
             if type(usage.get(k)) is int and usage[k]>=0}
 
+    def _receive(self,order,row,progress,metadata,text=None,omission=None):
+        """Safe reception receipt first, original UTF-8 representation second."""
+        parsed=None
+        if text is not None:
+            try:parsed=json.loads(text)
+            except ValueError:pass
+        usage=self._reported_usage(parsed)
+        record=dict(version='investigation_reception@1.0.0',turn=progress.get('turn'),
+            transport_attempted=metadata.get('transport_attempted',True),response_received=metadata.get('response_received',True),
+            complete_body_received=metadata.get('response_body_received'),http_status=metadata.get('http_status'),
+            provider_request_id=metadata.get('provider_request_id'),provider_usage=usage,
+            body_persisted=False,representation=None,omission_reason=omission)
+        progress.update(response_received=record['response_received'],response_body_received=record['complete_body_received'],
+            http_status=record['http_status'],provider_request_id=record['provider_request_id'],actual_usage_known=usage is not None)
+        with self.store.transaction() as db:
+            ref=self.store.put(db,record)
+            self.store.event(db,self.run_id,'investigation_reception','received',request=row['request_id'],execution=row['execution_id'],outputs=[ref])
+            state=self.store.session(self.run_id,db)['state'];node=state['investigations'][order.investigation_id]
+            node.setdefault('reception_refs',[]).append(plain(ref));node['progress']=dict(progress)
+            self.store.update_state(db,self.run_id,state)
+        if text is None:return
+        try:self._check_response_body(parsed if parsed is not None else dict(body=text))
+        except ValueError:
+            with self.store.transaction() as db:
+                rejected=dict(record,omission_reason='mandatory_secret_check; complete body not retained')
+                self.store.event(db,self.run_id,'investigation_reception','body_omitted',request=row['request_id'],execution=row['execution_id'],outputs=[self.store.put(db,rejected)])
+            raise
+        progress['stage']='response_evidence_save'
+        with self.store.transaction() as db:
+            body=self.store.put(db,dict(representation='complete_original_utf8_text',utf8_text=text,
+                original_utf8_sha256=__import__('hashlib').sha256(text.encode('utf-8')).hexdigest()))
+            saved=dict(record,body_persisted=True,representation='complete_original_utf8_text',body=plain(body))
+            self.store.event(db,self.run_id,'investigation_reception','body_persisted',request=row['request_id'],execution=row['execution_id'],outputs=[self.store.put(db,saved)])
+            state=self.store.session(self.run_id,db)['state'];node=state['investigations'][order.investigation_id]
+            node.setdefault('original_body_refs',[]).append(plain(body));progress['body_persisted']=True
+            node['progress']=dict(progress);self.store.update_state(db,self.run_id,state)
+
     def _execute(self,order,row,*,transport=None,reuse_saved_reads=False,correction_context=None):
         started=time.monotonic()
         baseline=deepcopy(self.store.session(self.run_id)['state']['investigations'][order.investigation_id]['usage'])
@@ -554,6 +613,7 @@ class InvestigationDispatcher:
                 adapter.request_host=self.host
                 def transport(wire):
                     adapter.request_config=effective_config(self.host)
+                    adapter.request_config['_response_observer']=lambda metadata,text,omission:self._receive(order,row,progress,metadata,text,omission)
                     node=self.store.session(self.run_id)['state']['investigations'][order.investigation_id]
                     adapter.request_config['timeout_s']=min(adapter.request_config['timeout_s'],max(.001,order.timeout_s-(time.time()-node['started_unix'])))
                     return adapter.respond(wire,0)
@@ -567,6 +627,7 @@ class InvestigationDispatcher:
                 self.store.event(db,self.run_id,'investigation_response','validated',request=request_id,
                     execution=row['execution_id'],outputs=[response])
             progress['report_saved']=True
+            self._state(order.investigation_id,validated_report_ref=plain(response))
             progress['stage']='settlement'
             self._checkpoint(order,row,progress,'started',started)
             receipt=self._receipt(row,'completed')
@@ -599,10 +660,28 @@ class InvestigationDispatcher:
             config=effective_config(self.host)
             node=self.store.session(self.run_id)['state']['investigations'][order.investigation_id]
             context=json.loads(payload['messages'][1]['content'])
+            _,grant=self._grant()
+            allocation=grant.get('delivery_allocations',{}).get(order.investigation_id)
+            if allocation:
+                report_phase=node['usage']['model_calls']>=allocation['exploration_requests']
+                phase='report_delivery' if report_phase else 'exploration'
+                self._state(order.investigation_id,submission_phase=phase)
+                if report_phase:
+                    payload['tools']=[t for t in payload['tools'] if t['function']['name']=='investigation_return']
+                context['workbench']=dict(phase=phase,resolved_questions=[dict(pointer=r['pointer'],reference=r['reference'],page_kind=r['page']['kind']) for r in node['reads']],
+                    unresolved_questions=[order.question,'Model must declare unresolved questions and missing evidence explicitly in its report.'],
+                    material_in_current_request='Initial reads, confirmed_followup_evidence, and complete native assistant/tool history',
+                    exploration_requests_remaining=max(0,allocation['exploration_requests']-node['usage']['model_calls']),
+                    report_requests_remaining=min(allocation['protected_delivery_requests'],order.budget.model_calls-node['usage']['model_calls']),
+                    correction_opportunities_remaining=min(grant.get('protocol_correction_limit',0)-self.store.session(self.run_id)['state'].get('investigation_protocol_corrections_used',0),
+                        grant.get('protocol_correction_role_limits',{}).get('principal' if order.role=='principal' else 'other',0)-self.store.session(self.run_id)['state'].get('investigation_corrections_by_role',{}).get('principal' if order.role=='principal' else 'other',0)),
+                    instruction='Submit the strongest supported investigation_return with explicit unknowns now.' if report_phase else 'Read only necessary scoped evidence; a supported incomplete-evidence report is acceptable.')
             context['remaining_budget']={k:max(0,v-node['usage'][k]) for k,v in plain(order.budget).items()}
             context['remaining_budget']['wall_s']=max(0,order.timeout_s-(time.time()-node['started_unix']))
             payload['messages'][1]['content']=encode(context)
             self._configure_payload(payload,config)
+            if node.get('provider_setting_override'):
+                payload.update({k:node['provider_setting_override'][k] for k in ('reasoning_effort','max_tokens')})
             # Everything accumulated, all schemas, results and output reserve.
             measurement=check_outgoing_request(payload,config,'research_decision')
             try:self._consume(order,'model_calls')
@@ -627,6 +706,10 @@ class InvestigationDispatcher:
             progress['received_responses']+=1
             self._checkpoint(order,row,progress,'received',started)
             returned=plain(raw) if isinstance(raw,InvestigationReturn) else getattr(raw,'raw',raw)
+            # Offline substitutes and legacy transports also retain safe usage before body admission.
+            with self.store.transaction() as db:
+                self.store.event(db,self.run_id,'investigation_token_accounting','received',request=row['request_id'],execution=row['execution_id'],outputs=[self.store.put(db,dict(turn=turn,
+                    byte_estimate=measurement,provider_usage=self._reported_usage(returned),provider_usage_source='Provider-reported; independent of body persistence.'))])
             self._check_response_body(returned)  # Check body and native arguments before original evidence saving.
             with self.store.transaction() as db:
                 response_ref=self.store.put(db,returned)
@@ -638,6 +721,7 @@ class InvestigationDispatcher:
                     byte_estimate=measurement,provider_usage=self._reported_usage(returned),
                     provider_usage_source='Returned provider usage only; byte estimates are not actual token counts.'))])
             progress.update(stage='response_parse',response_saved=True)
+            progress['response_decoded']=isinstance(returned,dict)
             progress['saved_responses']+=1
             progress['actual_usage_known']=self._reported_usage(returned) is not None
             self._checkpoint(order,row,progress,'saved',started)
@@ -646,17 +730,29 @@ class InvestigationDispatcher:
             if isinstance(raw,InvestigationReturn):return raw  # Historical offline boundary.
             if hasattr(raw,'raw'):raw=raw.raw
             message=raw['choices'][0]['message'];calls=message.get('tool_calls',[])
-            if raw['choices'][0].get('finish_reason')=='length':raise ValueError('INVESTIGATION_RESPONSE_TRUNCATED')
+            if raw['choices'][0].get('finish_reason')=='length':
+                code='INVESTIGATION_REASONING_ONLY_LENGTH' if not calls and not message.get('content') else 'INVESTIGATION_RESPONSE_TRUNCATED'
+                exc=ValueError(code)
+                if not self._length_recovery(order,payload,message,exc):raise exc
+                turn+=1;continue
+            if allocation and report_phase and calls and calls[0]['function']['name']!='investigation_return':
+                exc=ValueError('RETURN_REPORT_DELIVERY_PHASE_REQUIRED')
+                feedback=self._protocol_feedback(order,exc)
+                if feedback is None:raise exc
+                self._append_correction(payload,self._assistant_history(message),calls[0]['id'],feedback)
+                turn+=1;continue
             if not calls or len(calls)!=1:
                 exc=ValueError('INVESTIGATION_NO_NATIVE_TOOL_CALL' if not calls else 'EXACTLY_ONE_NATIVE_TOOL_CALL_REQUIRED')
                 feedback=self._protocol_feedback(order,exc) if self._selectable() else None
                 if feedback is None:raise exc
-                self._append_correction(payload,dict(role='assistant',content=message.get('content'),tool_calls=calls),None,feedback)
+                self._append_correction(payload,self._assistant_history(message),None,feedback)
                 turn+=1
                 continue
             if calls[0]['function']['name']=='investigation_return':
+                progress['stage']='formal_submission_validation'
                 try:
                     report=self._decode(raw)
+                    progress['response_decoded']=True
                     reads=self.store.session(self.run_id)['state']['investigations'][order.investigation_id]['reads']
                     self._validate_return(order,report,reads)
                     return report
@@ -696,15 +792,31 @@ class InvestigationDispatcher:
             assistant=dict(role='assistant',content=message.get('content'),tool_calls=calls)
             if 'reasoning_content' in message:assistant['reasoning_content']=message['reasoning_content']
             if self._selectable():
-                self._append_evidence_turn(payload,calls,response,order)
+                self._append_evidence_turn(payload,calls,response,order,assistant=assistant)
             else:payload['messages'].extend([assistant,dict(role='tool',tool_call_id=calls[0]['id'],content=encode(response))])
             turn+=1
 
-    def _append_evidence_turn(self,payload,calls,response,order):
+    @staticmethod
+    def _assistant_history(message):
+        return {k:deepcopy(v) for k,v in message.items() if k in ('role','content','reasoning_content','tool_calls')}
+
+    @staticmethod
+    def _inspection_view(records):
+        # Source bodies are already in initial/native pages and selectable fields.
+        return [{k:deepcopy(v) for k,v in r.items() if k in ('reference','pointer','inspection_id','request_id','execution_id','inspection_origin','content_identity')}
+            for r in records]
+
+    def _append_evidence_turn(self,payload,calls,response,order,assistant=None):
         packet=json.loads(payload['messages'][1]['content'])
-        retained=[m for m in payload['messages'][2:] if m.get('role')=='user']
-        if retained:packet.setdefault('retained_explicit_context_turns',[]).extend(retained)
-        packet.setdefault('confirmed_followup_evidence',[]).append(dict(native_calls=calls,result=response))
+        # Each page body appears once, in its native tool response. References
+        # are valid only while that original response remains in this request.
+        confirmed=packet.setdefault('confirmed_followup_evidence',[])
+        identity=digest(response)
+        prior=next((x for x in confirmed if x.get('result_identity')==identity),None)
+        prefetched=next((i for i,r in enumerate(packet.get('reads',[])) if r.get('page')==response),None)
+        repeated=prior is not None or prefetched is not None
+        location=prior['material_in_current_request'] if prior else ('/messages/1/content/reads/'+str(prefetched)+'/page' if prefetched is not None else '/messages/'+str(len(payload['messages'])+1)+'/content')
+        confirmed.append(dict(tool_call_id=calls[0]['id'],result_identity=identity,material_in_current_request=location,repeated_read=repeated))
         _,grant=self._grant()
         if order.role=='principal' and grant.get('inspected_supplemental_catalog'):
             from tools.disposition_facts import catalog
@@ -717,13 +829,16 @@ class InvestigationDispatcher:
                     report_item_pointer=e['report_item_pointer'],reference=e['fact']['reference'],pointer=e['fact']['pointer'],value_type=e['value_type'],value=e['fact']['value']) for e in body['entries']])
             packet['fact_catalog']=dict(reference=ref,content=view,complete_details_query=dict(reference=ref,pointer='/entries/0',limit=100,byte_limit=65536),
                 presentation='Only actually inspected supplemental fields are selectable; all report facts retained. Remaining authorized sources stay queryable via directory. Full catalog provenance is immutable and retrievable.')
-            packet['principal_inspection_records']=records
+            packet['principal_inspection_records']=self._inspection_view(records)
             self._state(order.investigation_id,fact_catalog=ref)
         refs=self.store.session(self.run_id)['state']['investigations'][order.investigation_id].get('provider_response_refs',[])
         packet['prior_response_archive']=dict(references=refs,
-            presentation='New explicit evidence user turn after a confirmed received native read and its public result. Complete prior provider responses including all thinking are immutable in Store and queryable with evidence_read; prior reasoning and repeated acknowledgements are archive-only, not omitted evidence or adopted conclusions. All original reports, counterevidence, unknowns, every confirmed read/result, decisions, errors and current permissions/budgets remain visible.',
+            presentation='Complete archives remain separate from reports. Required assistant reasoning and native tool responses remain in this active interaction. Repeated bodies reference their first still-visible occurrence.',
             query=dict(reference=refs[-1],pointer='/choices/0/message/reasoning_content',offset=0,limit=3000,byte_limit=4096) if refs else None)
-        payload['messages']=[payload['messages'][0],dict(role='user',content=encode(packet))]
+        payload['messages'][1]['content']=encode(packet)
+        if assistant is None:raise ValueError('PROVIDER_ASSISTANT_HISTORY_REQUIRED')
+        result=response if not repeated else dict(material_in_current_request=location,result_identity=identity,repeated_read=True)
+        payload['messages'].extend([assistant,dict(role='tool',tool_call_id=calls[0]['id'],content=encode(result))])
 
     def _protocol_feedback(self,order,exc):
         """A received, unexecuted invalid return; never transport/length retry.
@@ -769,21 +884,36 @@ class InvestigationDispatcher:
             return feedback
 
     def _append_correction(self,payload,assistant,call_id,feedback):
-        if not self._selectable():
-            payload['messages'].extend([assistant,dict(role='tool',tool_call_id=call_id,content=encode(feedback))]);return
-        # Complete provider history is already saved; all original pages and
-        # counterevidence stay in the current packet. Follow-up pages are kept.
-        retained=[m for m in payload['messages'][2:] if m.get('role')=='tool']
-        calls=assistant['tool_calls']
-        packet=json.loads(payload['messages'][1]['content'])
-        node=self.store.session(self.run_id)['state'].get('investigations',{}).get(packet.get('investigation_id'),{})
-        refs=node.get('provider_response_refs',[])
-        packet['correction']=dict(received_native_calls=calls,feedback=feedback,
-            retained_tool_results=retained,
-            retained_explicit_user_turns=[m for m in payload['messages'][2:] if m.get('role')=='user'],
-            prior_response_archive=dict(references=refs,query=dict(reference=refs[-1],pointer='/choices/0/message/reasoning_content',offset=0,limit=3000,byte_limit=4096) if refs else None),
-            omitted='Prior reasoning and repeated assistant acknowledgements are archive-only; full original responses and requests are queryable in Store investigation_provider_response/attempt events. Original reports, unknowns, counterevidence, inspected pages and budgets remain in this packet.')
-        payload['messages']=[payload['messages'][0],dict(role='user',content=encode(packet))]
+        if call_id is None:
+            payload['messages'].extend([assistant,dict(role='user',content=encode(feedback))]);return
+        payload['messages'].extend([assistant,dict(role='tool',tool_call_id=call_id,content=encode(feedback))]);return
+
+    def _length_recovery(self,order,payload,message,exc):
+        """Frozen conditional probes, paid from this node; no partial execution."""
+        _,grant=self._grant();policy=grant.get('conditional_length_recovery')
+        if not policy:return False
+        state=self.store.session(self.run_id)['state'];used=state.get('recovery_probes_used',0)
+        options=[v for v in policy['configurations'][1:] if v['supported']]
+        if used>=min(2,len(options)):return False
+        option=options[used]
+        correction=ValueError('RETURN_COMPLETE_FOCUSED_SUBMISSION_REQUIRED')
+        correction.issue=dict(code=str(exc),classification='response received, no formal decision' if str(exc)=='INVESTIGATION_REASONING_ONLY_LENGTH' else 'truncated formal content; no partial fields executed',
+            failure_key='length:'+order.investigation_id,requirement='Submit one complete concise native report, with explicit unknowns. Prior response remains original evidence.')
+        feedback=self._protocol_feedback(order,correction)
+        if feedback is None:return False
+        assistant=self._assistant_history(message);calls=message.get('tool_calls',[])
+        self._append_correction(payload,assistant,calls[0]['id'] if len(calls)==1 else None,feedback)
+        payload['max_tokens']=option['max_tokens']
+        payload['reasoning_effort']=option['reasoning_effort']
+        from tools.context_assembly import check_outgoing_request
+        from tools.platform_models import effective_config
+        check_outgoing_request(payload,effective_config(self.host),'research_decision')
+        with self.store.transaction() as db:
+            state=self.store.session(self.run_id,db)['state'];state['recovery_probes_used']=used+1
+            state['investigations'][order.investigation_id]['provider_setting_override']=option
+            self.store.update_state(db,self.run_id,state)
+            self.store.event(db,self.run_id,'investigation_recovery_probe','scheduled',request='investigation-'+order.investigation_id,outputs=[self.store.put(db,dict(trigger=str(exc),selected=option,original_retained=True))])
+        return True
 
     def _decode(self, raw):
         if isinstance(raw,InvestigationReturn):return raw  # Explicit offline fixture boundary.
@@ -943,6 +1073,17 @@ class InvestigationDispatcher:
                 if saved is None:
                     originals=[e for e in self.store.events(self.run_id) if e['kind']=='investigation_provider_response'
                         and e['request_id']==row['request_id'] and e['execution_id']==row['execution_id']]
+                    receptions=[e for e in self.store.events(self.run_id) if e['kind']=='investigation_reception' and e['status']=='body_persisted'
+                        and e['request_id']==row['request_id'] and e['execution_id']==row['execution_id']]
+                    if receptions and (not originals or receptions[-1]['sequence']>originals[-1]['sequence']):
+                        reception=self.store.artifact(receptions[-1]['outputs'][0])
+                        original=self.store.artifact(reception['body'])
+                        raw=json.loads(original['utf8_text'])
+                        self._check_response_body(raw)
+                        with self.store.transaction() as db:
+                            ref=self.store.put(db,raw)
+                            self.store.event(db,self.run_id,'investigation_provider_response','locally_recovered',request=row['request_id'],execution=row['execution_id'],inputs=[reception['body']],outputs=[ref])
+                        originals=[*originals,dict(outputs=[plain(ref)])]
                     if originals:
                         progress['stage']='response_evidence_read'
                         raw=self.store.artifact(originals[-1]['outputs'][0])
@@ -1083,6 +1224,9 @@ class InvestigationDispatcher:
         with self.store.transaction() as db:
             ref=self.store.put(db,record);state=self.store.session(self.run_id,db)['state']
             collection='historical_investigations' if args.investigation_id in state.get('historical_investigations',{}) else 'investigations'
+            node=state[collection][args.investigation_id]
+            previous=node.get('disposition_record')
+            if previous and previous!=plain(ref):node.setdefault('disposition_versions',[]).append(previous)
             state[collection][args.investigation_id]['principal_disposition']=record
             state[collection][args.investigation_id]['disposition_record']=plain(ref)
             self.store.update_state(db,self.run_id,state)

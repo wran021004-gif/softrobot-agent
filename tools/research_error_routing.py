@@ -4,7 +4,15 @@ from pydantic import ValidationError
 
 def classify(exc, *, stage=None):
     code = str(exc).split(':', 1)[0]
-    if code.startswith(('MODEL_NODE_INCOMPLETE','INVESTIGATION_MODEL_CALLS_BUDGET_EXHAUSTED','INVESTIGATION_ELAPSED_LIMIT')):
+    if code=='INVESTIGATION_REASONING_ONLY_LENGTH':
+        category,action='reasoning_only_length','record_response_received_no_formal_decision_then_frozen_conditional_recovery'
+    elif code=='INVESTIGATION_RESPONSE_TRUNCATED':
+        category,action='truncated_formal_content','retain_original_execute_nothing_partial_then_frozen_conditional_recovery'
+    elif code=='INVESTIGATION_NO_NATIVE_TOOL_CALL':
+        category,action='model_protocol','retain_explanation_identify_missing_formal_submission'
+    elif stage in ('response_evidence_save','response_parse','response_evidence_read') and code not in ('INVESTIGATION_NO_NATIVE_TOOL_CALL','EXACTLY_ONE_NATIVE_TOOL_CALL_REQUIRED'):
+        category,action='received_local_failure','recover_safe_saved_material_revalidate_without_retransmission'
+    elif code.startswith(('MODEL_NODE_INCOMPLETE','INVESTIGATION_MODEL_CALLS_BUDGET_EXHAUSTED','INVESTIGATION_ELAPSED_LIMIT')):
         category, action = 'bounded_stop', 'save_cumulative_limits_and_stop_dependent_stages'
     elif stage in ('program_expansion', 'report_evidence_save', 'settlement'):
         category, action = 'program_construction', 'local_repair_and_saved_raw_return_revalidation'

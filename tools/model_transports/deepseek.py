@@ -21,7 +21,7 @@ def sanitize_provider_text(value, key, limit=8192):
     value = re.sub(r'(?i)authorization\s*[:=]\s*[^\r\n]+', 'Authorization: [REDACTED]', value)
     value = re.sub(r'(?i)bearer\s+[^\s"\'<>]+', 'Bearer [REDACTED]', value)
     value = re.sub(r'(?i)((?:cookie|set-cookie|x-api-key)\s*[:=]\s*)[^\r\n]+', r'\1[REDACTED]', value)
-    value = re.sub(r'(?i)([a-z][a-z0-9+.-]*://)[^/\s@]+@', r'\1[REDACTED]@', value)
+    value = re.sub(r'(?i)(?<![a-z0-9+.-])([a-z][a-z0-9+.-]*://)[^/\s@]+@', r'\1[REDACTED]@', value)
     value = re.sub(r'(?<![\w])[^:\s/@]+:[^@\s/]+@', '[REDACTED]@', value)
     value = re.sub(r'(?i)((?:api[_-]?key|access_token|password|token)["\']?\s*[:=]\s*["\']?)[^\s"\'&,}]+', r'\1[REDACTED]', value)
     return value if limit is None else value[:limit]
@@ -183,13 +183,27 @@ def request_completion(config, payload, key):
     started = time.monotonic()
     state = dict(stage='transport', transport_attempted=True, response_received=None,
                  response_body_received=None,http_status=None, provider_request_id=None)
+    observer=config.get('_response_observer')
+    def observe(body=None):
+        if observer is None:return
+        text=None;omission=None
+        if body is not None:
+            try:text=body.decode('utf-8',errors='strict')
+            except UnicodeError:omission='body_not_utf8; original bytes not retained'
+            if text is not None and sanitize_provider_text(text,key,None)!=text:
+                text=None;omission='sensitive_response_text; original body not retained'
+        observer(dict(state),text,omission)
+        if omission and omission.startswith('sensitive_response_text'):
+            raise ValueError('INVESTIGATION_RESPONSE_SECRET_TEXT')
     try:
         with build_opener(NoRedirect).open(request, timeout=config['timeout_s']) as response:
             state.update(stage='response_read', response_received=True,
                          http_status=getattr(response, 'status', None),
                          provider_request_id=response_identifiers(getattr(response, 'headers', None)))
+            observe()  # Reception facts survive a later read, parse or body write failure.
             body = response.read()
             state['response_body_received']=True
+            observe(body)  # Safe original representation is durable before business decoding.
             state['stage'] = 'response_parse'
             parsed = json.loads(body.decode('utf-8'))
             if not isinstance(parsed, dict):

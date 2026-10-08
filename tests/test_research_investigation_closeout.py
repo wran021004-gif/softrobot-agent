@@ -233,7 +233,7 @@ class InvestigationCloseoutTests(TestCase):
         wrong=deepcopy(decision);wrong['report']=ref
         self.assertIn('REPORT_BINDING_MISMATCH',invoke(host,'research.investigation_disposition',wrong,request_id='wrong-report')['error'])
         wrong=deepcopy(decision);wrong['adopted_claims'][0]['supporting_facts']=[scope]
-        self.assertIn('ADOPTED_FACT_NOT_LINKED_TO_REPORT',invoke(host,'research.investigation_disposition',wrong,request_id='unrelated-citation')['error'])
+        self.assertIn('DISPOSITION_FACT_BINDING',invoke(host,'research.investigation_disposition',wrong,request_id='unrelated-citation')['error'])
         receipt,accepted=self.public(host,'research.investigation_disposition',decision,'supported-accept')
         record=host.store.artifact(accepted['disposition_record'])
         self.assertEqual(len(record['inspection_links']),2);self.assertTrue(record['semantic_claims_unassessed'])

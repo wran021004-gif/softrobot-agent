@@ -42,6 +42,12 @@ def bind(ctx, args):
     entry=dict(status='completed',result=plain(args.report),kind='historical_reuse',
         original=plain(args),original_execution_id=old.lookup(node.get('request_run_id',args.source_run_id),'investigation-'+args.source_node)['execution_id'],
         old_validation=validation,new_investigation_executed=False)
+    if node['order']['role']=='coordinator':
+        binding=grant.get('historical_execution_bindings',{}).get(args.source_node)
+        if not binding or binding['report']!=plain(args.report) or binding['proposed_children']!=node['children']:
+            raise ValueError('HISTORICAL_COORDINATOR_EXECUTION_BINDING_REQUIRED')
+        entry.update(order=node['order'],children=node['children'],execution_binding=binding,
+            own_inference_allowance=0,delegation_allowance=binding['delegation_per_node_budget'])
     with ctx.store.transaction() as db:
         state=ctx.store.session(ctx.run_id,db)['state']
         if args.source_node in state.get('investigations',{}) or args.source_node in state.get('historical_investigations',{}):raise ValueError('HISTORICAL_NODE_COLLISION')
