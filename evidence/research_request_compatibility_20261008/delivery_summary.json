@@ -1,0 +1,263 @@
+{
+  "结果": "completed",
+  "单请求报告通过": true,
+  "活动": "mainline3-single-c7acb8a6bb83",
+  "冻结代码": "f8a6b2e59358c68c31e767d2d8d5a5d90a4dd59a",
+  "代码身份说明": "启动时生产代码已提交并以文件哈希冻结；进度中 code_worktree_dirty=true 包含本轮尚未提交的新证据目录，不表示使用了未冻结的生产代码。",
+  "请求设置": {
+    "model": "deepseek-flash",
+    "thinking": {
+      "type": "enabled"
+    },
+    "reasoning_effort": "high",
+    "tool_choice": "auto",
+    "max_tokens": 3000
+  },
+  "兼容性": "实际请求消除了 thinking 与 required/指定工具的不兼容组合；保留批准配置和原生返回校验。历史 HTTP 400 原文缺失，不能确认唯一原因。",
+  "接收与保存": {
+    "transport_attempted": true,
+    "response_received": true,
+    "response_body_received": true,
+    "http_status": 200,
+    "provider_request_id": null,
+    "response_saved": true,
+    "valid_report": true,
+    "report_saved": true,
+    "settlement_completed": true,
+    "actual_usage_known": true
+  },
+  "失败证据": null,
+  "有效原生报告": {
+    "children": [],
+    "completion": "complete",
+    "counterevidence": [],
+    "dispositions": [],
+    "facts": [
+      {
+        "pointer": "/sampled_settling/passed",
+        "reference": {
+          "artifact_id": "6903669a345e76c1dd2958ada4d067bfde06d02f102ce017db06c9a241c7dd51",
+          "media_type": "application/json"
+        },
+        "source_identity": {},
+        "statement": "The sampled settling record reports passed = false.",
+        "value": false
+      },
+      {
+        "pointer": "/sampled_settling/max_error_m",
+        "reference": {
+          "artifact_id": "6903669a345e76c1dd2958ada4d067bfde06d02f102ce017db06c9a241c7dd51",
+          "media_type": "application/json"
+        },
+        "source_identity": {},
+        "statement": "Observed maximum position error in the sampled settling window is 0.06672099201814737 m against a position limit of 0.01 m.",
+        "value": 0.06672099201814737
+      },
+      {
+        "pointer": "/sampled_settling/max_speed_m_s",
+        "reference": {
+          "artifact_id": "6903669a345e76c1dd2958ada4d067bfde06d02f102ce017db06c9a241c7dd51",
+          "media_type": "application/json"
+        },
+        "source_identity": {},
+        "statement": "Observed maximum speed in the sampled settling window is 0.20679063000945364 m/s against a speed limit of 0.02 m/s, with window_s = 0.05 and continuous_time_guarantee = false.",
+        "value": 0.20679063000945364
+      }
+    ],
+    "interpretation": "Within the single supplied sampled_settling page (source artifact 6903669a345e76c1dd2958ada4d067bfde06d02f102ce017db06c9a241c7dd51, pointer /sampled_settling), the recorded sampled settling did not pass: passed is false, and the sampled maxima exceed the stated limits (0.06672 m vs 0.01 m position limit; 0.20679 m/s vs 0.02 m/s speed limit) over a 0.05 s window. This is a historical sampled observation only; the page itself flags continuous_time_guarantee = false, so it is not a continuous-time guarantee, and no causal diagnosis or mechanism is supported by these fields.",
+    "proposed_next_checks": [],
+    "unknowns": [
+      "No additional evidence scope was supplied or read: only the single sampled_settling page was prefetched, so other fields of the parent record (e.g. /terminal_error_m, /control_updates) and any other executions remain uninspected.",
+      "The sampling density/instants behind the reported maxima and the exact pass/fail criterion definition beyond the listed limits are not shown on this page."
+    ]
+  },
+  "费用": {
+    "实际供应商尝试": 1,
+    "公共操作": 2,
+    "初始预取": 1,
+    "已完成追读": 0,
+    "拒绝追读": 0,
+    "节点原预留": {
+      "backend_solves": 0,
+      "model_calls": 1,
+      "tool_calls": 1,
+      "wall_s": 180.0,
+      "worker_calls": 0
+    },
+    "节点结算": {
+      "backend_solves": 0,
+      "model_calls": 1,
+      "tool_calls": 1,
+      "wall_s": 6.594000000011874,
+      "worker_calls": 0
+    },
+    "项目账本": {
+      "limit": {
+        "backend_solves": 0,
+        "model_calls": 1,
+        "tool_calls": 9,
+        "wall_s": 240.0,
+        "worker_calls": 0
+      },
+      "used": {
+        "tool_calls": 3,
+        "model_calls": 1,
+        "backend_solves": 0,
+        "worker_calls": 0,
+        "wall_s": 7.609000000025844
+      },
+      "remaining": {
+        "backend_solves": 0,
+        "model_calls": 0,
+        "tool_calls": 6,
+        "wall_s": 232.39099999997416,
+        "worker_calls": 0
+      },
+      "occupied": {}
+    },
+    "本活动未决预留": [],
+    "供应商返回token记录": [
+      {
+        "completion_tokens": 868,
+        "prompt_tokens": 5052,
+        "total_tokens": 5920
+      }
+    ],
+    "供应商金额": null,
+    "说明": "本地模型单位和工具单位是项目账本成本，不等于供应商 token 或金额。仅以供应商返回 usage 记录 token；缺失或金额不明继续未知。"
+  },
+  "应用收尾": {
+    "result": {
+      "disposition_record": null,
+      "failure_record": null,
+      "investigation_id": "single-saved-fact",
+      "progress": {
+        "actual_usage_known": true,
+        "code_commit": "f8a6b2e59358c68c31e767d2d8d5a5d90a4dd59a",
+        "code_worktree_dirty": true,
+        "dependency_identity": "f58643c9b73c68593c296ccbf9e7a5bfa41d562afbe66a955baa648d1270d062",
+        "elapsed_s": 6.625,
+        "grant_id": "mainline3-single-c7acb8a6bb83",
+        "http_status": 200,
+        "project_id": "mainline3-single-c7acb8a6bb83",
+        "provider_request_id": null,
+        "received_responses": 1,
+        "report_saved": true,
+        "response_body_received": true,
+        "response_received": true,
+        "response_saved": true,
+        "saved_responses": 1,
+        "settlement_completed": true,
+        "stage": "settlement",
+        "transport_attempted": true,
+        "transport_callable_invocations": 1,
+        "turn": 0,
+        "valid_report": true,
+        "version": "investigation_progress@1.0.0"
+      },
+      "reason": null,
+      "result": {
+        "artifact_id": "da2f01f794faa2594884c27e6a5bd1279592d4d0caae9774fd4472b02789d4c6",
+        "media_type": "application/json"
+      },
+      "status": "completed"
+    },
+    "public_receipts": [
+      {
+        "contract_version": "1.2.0",
+        "request_id": "single-submit",
+        "execution_id": "380fb38feda040bdbf8e89b3af02961a",
+        "caller": "local-human",
+        "tool_id": "research.investigate",
+        "tool_version": "1.0.0",
+        "result_contract": "InvestigationResult",
+        "result_version": "1.0.0",
+        "execution_status": "completed",
+        "solver_status": "not_run",
+        "analysis_status": "not_assessed",
+        "task_success": null,
+        "output": {
+          "artifact_id": "81ff185b543f9c14d5d120625443b892aac450b9b1b78398fddc1fb7deab8e51",
+          "media_type": "application/json"
+        },
+        "error": null,
+        "cache_hit": false,
+        "original_execution_id": null,
+        "charged": {
+          "tool_calls": 1,
+          "model_calls": 0,
+          "backend_solves": 0,
+          "worker_calls": 0,
+          "wall_s": 0.0
+        }
+      },
+      {
+        "contract_version": "1.2.0",
+        "request_id": "single-collect-0",
+        "execution_id": "3c74f9f31ed14dd590af4497e05e7938",
+        "caller": "local-human",
+        "tool_id": "research.investigation_status",
+        "tool_version": "1.0.0",
+        "result_contract": "InvestigationResult",
+        "result_version": "1.0.0",
+        "execution_status": "completed",
+        "solver_status": "not_run",
+        "analysis_status": "not_assessed",
+        "task_success": null,
+        "output": {
+          "artifact_id": "56f4952792192ff4a01c7a92b5616fe735a9693caaa49ef837820a42afdaf20e",
+          "media_type": "application/json"
+        },
+        "error": null,
+        "cache_hit": false,
+        "original_execution_id": null,
+        "charged": {
+          "tool_calls": 1,
+          "model_calls": 0,
+          "backend_solves": 0,
+          "worker_calls": 0,
+          "wall_s": 1.0150000000139698
+        }
+      }
+    ],
+    "elapsed_s": 8.735000000015134,
+    "thread_active_at_close": false,
+    "thread_completed_before_close": true,
+    "provider_cancellation_confirmed": false,
+    "cleanup": "Owned investigation thread finished before application close"
+  },
+  "历史": {
+    "原两次未知请求": 2,
+    "原模型未决预留单位": 12,
+    "原活动继续停止": true,
+    "原文件和账本未改变": true,
+    "上一次单请求": "原 HTTP 400 接收及失败结算记录保持原样；错误原文不能恢复。",
+    "未知": [
+      "原两次请求到达情况、结果、原因、token 和供应商费用",
+      "本次供应商金额"
+    ],
+    "说明": "本次结果不释放、迁移或重新激活旧预留。12 是旧未决模型单位，不是十二次实际请求。"
+  },
+  "验证": {
+    "离线8项通过": true,
+    "失败检查": [
+      "offline/attempt_01.json",
+      "offline/attempt_02.json"
+    ],
+    "按需追读": "unverified; only initial prefetch",
+    "principal_inspection": 0,
+    "formal_disposition": 0,
+    "协调调查": "unverified",
+    "主线三全部通过": false,
+    "科学操作": 0,
+    "机器人改善验证": false,
+    "第二版开发": false
+  },
+  "人工可核查摘要": "三项事实的来源及数值与唯一预取页一致：passed=false，max_error_m=0.06672099201814737，max_speed_m_s=0.20679063000945364。解释只比较页内限值，不构成新科学结论。",
+  "后续建议": "另行授权有界完整直接调查，独立预算与停止条件，显式验收调查者选择的追读、原始来源核查和正式处置；本轮不启动。",
+  "发布": {
+    "repository": "https://github.com/wran021004-gif/softrobot-agent.git",
+    "branch": "feat/gvs-dynamics",
+    "scope": "兼容性与安全错误字段修复、针对性检查、现有能力文档追加及本轮非秘密证据；普通推送并核对远端 SHA。"
+  }
+}
