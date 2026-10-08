@@ -19,7 +19,7 @@ class ReadEvidence(Contract):
     pointer: str = Field(default='', description='JSON Pointer into original evidence, e.g. /detail or /signals/0/values. Empty reads the root. Oversized nested content returns a labeled overview with valid child pointers; follow those pointers using the same source reference.')
     offset: int = Field(default=0, ge=0)
     limit: int = Field(default=20, ge=1, le=100)
-    byte_limit: int = Field(default=4096, ge=128, le=8192, description='Requested content byte cap; response and observation envelopes also count toward the inline limit. Pages may be smaller. Follow next_offset at the same pointer.')
+    byte_limit: int = Field(default=4096, ge=128, le=65536, description='Requested content byte cap; ordinary pages retain the 6000-byte envelope limit. Principal completed-report pages may use their explicitly frozen larger allowance. Follow next_offset at the same pointer.')
 
 
 class EvidencePage(Contract):

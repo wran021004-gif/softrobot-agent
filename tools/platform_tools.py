@@ -172,7 +172,7 @@ def retain_evidence(pages, page, attribution=None):
     return pages
 
 
-def bounded_evidence_page(value, args):
+def bounded_evidence_page(value, args, *, envelope_bytes=6000):
     """Pure original-document paging shared by host reads and context archives."""
     if args.pointer:
         if not args.pointer.startswith('/'):
@@ -196,7 +196,7 @@ def bounded_evidence_page(value, args):
         result=c.EvidencePage(source=args.reference,pointer=args.pointer,content=page,
             next_offset=end if end<total else None,kind=kind,offset=args.offset,total_items=total,returned_items=count,presentation='original')
         measured=plain(result)
-        if len(encode(measured['content']).encode('utf8'))<=args.byte_limit and len(encode(measured).encode('utf8'))<=6000:
+        if len(encode(measured['content']).encode('utf8'))<=args.byte_limit and len(encode(measured).encode('utf8'))<=envelope_bytes:
             return result
         if count>1: count=max(1,count//2)
         elif kind=='content' and isinstance(value,(dict,list)): kind='overview'

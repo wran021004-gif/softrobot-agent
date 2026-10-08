@@ -165,12 +165,14 @@ def generate(bundle, review=None):
     bounds=all(r['provider_attempts']<=6 and r.get('usage',{}).get('tool_calls',0)<=8 for r in rows)
     principal=[r for r in rows if r['role']=='principal']
     bounds &= all(r.get('usage',{}).get('tool_calls',0)+sum(e['kind']=='principal_inspection' for e in events)<=8 for r in principal)
-    bounds &= len(nodes)<=3 and not charged['backend_solves'] and not charged['worker_calls'] and attempts<=18
+    coordinated=bundle['mode']=='coordinated'
+    bounds &= len(nodes)<=(4 if coordinated else 3) and not charged['backend_solves'] and not charged['worker_calls'] and attempts<=(24 if coordinated else 18)
+    bounds &= all(n['order'].get('timeout_s',180)<=600 and (n.get('progress',{}).get('elapsed_s') or 0)<=n['order'].get('timeout_s',180)+5 for n in nodes.values())
     model=bundle.get('snapshot',{}).get('input',{}).get('policy',{}).get('model',{})
     requests=[artifacts[e['outputs'][0]['artifact_id']].get('payload',{}) for e in events if e['kind']=='investigation_provider_attempt']
     compatible=bool(model and requests) and all(p.get('model')==model.get('model')=='deepseek-flash'
         and p.get('thinking')=={'type':'enabled'} and p.get('reasoning_effort')=='high'
-        and p.get('tool_choice')=='auto' and p.get('max_tokens')==3000 for p in requests)
+        and p.get('tool_choice')=='auto' and p.get('max_tokens')==min(model.get('investigation_max_tokens',3000),model.get('max_tokens',3000)) for p in requests)
     acceptance_count=sum(d['record']['decision']['disposition']=='accept' for d in dispositions)
     expected_reports = sorted(n['result']['artifact_id'] for n in investigators if n.get('result'))
     material = bool(review and review.get('bundle_identity') == digest(bundle)

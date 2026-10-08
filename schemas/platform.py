@@ -173,6 +173,7 @@ class ModelToolNaming(Contract):
 
 
 class ModelConfig(Contract):
+    investigation_max_tokens: int = Field(default=3000, ge=1, le=32768)
     adapter: Identifier = 'offline'
     adapter_version: str = '1.0.0'
     parameters: dict = Field(default_factory=dict)
