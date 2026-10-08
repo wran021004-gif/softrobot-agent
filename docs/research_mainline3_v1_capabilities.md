@@ -145,3 +145,15 @@ The separately authorized activity froze the existing `deepseek-flash` configura
 The owning activity was stopped; coordinated validation and the fixed changed-radius case remain unexecuted. No scientific operation, backend attempt, automatic provider retry, implementation repair or Version 2 development occurred. Actual recorded attempts are distinct from the ledger's conservative unresolved charges: 12 model-call units, 20 tool-call units and 363.798 seconds, including two full node reservations of six model calls, eight evidence operations and 180 seconds each. Settled public-call costs are four tools and 3.798 seconds; provider tokens, elapsed costs and billing remain unknown. The current dispatcher does not preserve the transport exception in its unconfirmed node state, so the exact failure cause cannot be reconstructed from the saved records. No causal explanation is asserted.
 
 The [delivery report](../evidence/research_mainline3_validation_20261008/delivery_report.json) retains the frozen manifest, requests, events, read provenance, original ledger rows, failed gate and stopping evidence. Three explicit gate regression tests passed; the delivered gate reproduces exactly from its saved bundle. The [Version 2 handoff](../evidence/research_mainline3_validation_20261008/version2_handoff.json) preserves tendon/layout, segment-count and verified-combination work as a separate future assignment. Offline engineering coverage remains historical; this stopped activity supplies no live interface or changed-radius acceptance.
+
+## 失败可诊断性与安全恢复工程交付：2026-10-08
+
+公共调查路径现在保留请求准备、传输、HTTP 接收与正文接收、原生解析与校验、响应/报告保存、结算各阶段的已知事实。去掉统一 `TimeoutError` 包装，复用既有传输分类与脱敏函数；错误证据只接受允许字段、有限长度消息和关联身份，不保存异常全文、头、环境或错误正文。供应商请求编号与本地请求/执行编号分开，未知字段留空。响应正文及嵌套原生参数通过秘密检查后，才沿原有 Store 机制保存。诊断保存失败时，仅向现有 stderr 尽力输出最小脱敏记录，不承诺存储故障时完整落盘。
+
+恢复先核对原有效报告、已保存的原生报告响应和封存账本回执。解析失败后结算再失败时，两次原因分别保留并关联；只有原事实确认了本地失败或有效结果，才能补做相应结算。正文中断、证据暂不可读或接收结果未知时，预留继续保留。恢复仍受当前活动、冻结范围、父子权限、期限及停止状态约束，不重发供应商请求，也不解除停止状态。
+
+针对性离线检查覆盖 11 个方法：10 个完整检查通过，结算处理最后更新后，4 个受影响方法（含 1 个新增方法）复核通过。生产 Host、公共调度、原生处理、Store、账本与跨进程所有权均实际使用，只替换外部传输或指定故障点。覆盖连接/DNS/TLS/HTTP/超时分类、HTTP 头后正文中断、解析失败、响应与有效报告保存失败、结算故障、诊断写入失败、线程仍活跃及进程中断恢复、停止/过期拒绝、敏感属性与嵌套参数防泄露。早期 Windows 清理错误和夹具并发拒绝保留在证据中，未放宽生产权限或预算。
+
+原活动仍停止；原封存文件与 SQLite 字节哈希、账本和两项未决预留均未改变。历史只确认两次尝试、没有保存的响应，原因、到达情况、token 用量与供应商费用仍未知。历史已结算为 4 次公共工具操作及约 3.798 秒；两节点未决预留合计 12 模型单位、16 证据单位、360 秒，总账本占用为 12 模型单位、20 工具单位、约 363.798 秒。12 单位不能解释为 12 次实际请求。
+
+本轮凭据加载、真实模型请求、连通性探测及科学计算均为零；第二版未开发。详见[中文交付报告](../evidence/research_failure_recovery_20261008/delivery_report.json)。建议下一轮先另行授权一个新的公共调查请求：最多一次供应商尝试、零重试、零科学计算，并对明确结果或分阶段失败记录进行审查；建议不授权本轮执行，也不复活旧活动。单请求记录可靠后再考虑完整直接/协调调查。本轮不宣称原网络故障已解决、真实模型调查完成或机器人改善。

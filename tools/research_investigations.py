@@ -5,13 +5,14 @@ validates each proposal. No scientific computation is performed by this service.
 """
 from copy import deepcopy
 import json
+import sys
 import time
 from threading import Thread
 from typing import Literal
 from pydantic import Field
 from schemas.common import Contract
 from schemas.platform import Budget, EvidenceRef
-from tools.platform_store import plain, zero
+from tools.platform_store import plain, zero, now, encode
 from tools.state_io import digest
 from schemas.platform_operations import ReadEvidence
 
@@ -72,6 +73,8 @@ class InvestigationResult(Contract):
     result: EvidenceRef | None = None
     reason: str | None = None
     disposition_record: EvidenceRef | None = None
+    failure_record: EvidenceRef | None = None
+    progress: dict | None = None
 
 
 class InvestigationStatus(Contract):
@@ -260,11 +263,13 @@ class InvestigationDispatcher:
                 try:self._execute(order,row)
                 finally:ownership.__exit__(None,None,None)
             Thread(target=run,name='investigation-'+order.investigation_id,daemon=True).start()
-        except BaseException:
+        except Exception as exc:
             ownership.__exit__(None,None,None)
             if row and fresh:
-                self.store.complete(row,self._receipt(row,'failed','INVESTIGATION_LAUNCH_FAILED'),actual_cost=zero())
-                self._state(order.investigation_id,status='failed',reason='INVESTIGATION_LAUNCH_FAILED')
+                progress=self._initial_progress()
+                progress['stage']='investigation_launch'
+                self._handle_failure(order,row,progress,exc,time.monotonic())
+                return self.recover(order.investigation_id)
             raise
         return InvestigationResult(investigation_id=order.investigation_id,status='pending',reason='Submission accepted; collect through investigation_status. No automatic replay.')
 
@@ -306,11 +311,154 @@ class InvestigationDispatcher:
             self.store.update_state(db,self.run_id,state)
         return read
 
+    def _checkpoint(self,order,row,progress,status,started=None):
+        """Use the original event/artifact/state transaction, not another log."""
+        if started is not None:progress['elapsed_s']=max(0,time.monotonic()-started)
+        with self.store.transaction() as db:
+            record=dict(version='investigation_progress@1.0.0',**progress)
+            ref=self.store.put(db,record)
+            self.store.event(db,self.run_id,'investigation_progress',status,
+                request=row['request_id'],execution=row['execution_id'],outputs=[ref])
+            state=self.store.session(self.run_id,db)['state']
+            state['investigations'][order.investigation_id]['progress']=record
+            self.store.update_state(db,self.run_id,state)
+
+    def _failure(self,order,row,progress,exc,started):
+        """Bounded allowlist; a failed diagnostic write falls back to stderr only."""
+        from tools.model_transports.deepseek import safe_failure_metadata
+        config=self.store.session(self.run_id)['snapshot']['input']['policy']['model']
+        details=safe_failure_metadata(exc,config,started,classify_transport=progress['stage']=='transport')
+        for field in ('transport_attempted','response_received','response_body_received'):
+            if details[field] is not None:progress[field]=details[field]
+        for field in ('http_status','provider_request_id'):
+            if details[field] is not None:progress[field]=details[field]
+        # The wrapper's type is recorded separately from the original transport reason.
+        measured=max(0,time.monotonic()-started)
+        if not progress.get('recovering'):progress['elapsed_s']=measured
+        record=dict(version='investigation_failure@1.0.0',run_id=self.run_id,
+            investigation_id=order.investigation_id,request_id=row['request_id'],
+            execution_id=row['execution_id'],timestamp=now(),elapsed_s=progress.get('elapsed_s'),
+            measured_operation_elapsed_s=measured,
+            exception_type=type(exc).__name__[:100],
+            cause_exception_type=type(exc.__cause__).__name__[:100] if exc.__cause__ else None,
+            details=details,progress=dict(progress),persistence_failed=False,
+            retry_authorized=False,billing_known=False)
+        uncertain=(progress['valid_report'] or progress['stage'] in (
+            'response_evidence_save','report_evidence_save','settlement','recovery',
+            'response_evidence_read','report_evidence_read')
+            or details['transport_stage']=='response_read'
+            or (progress['transport_attempted'] and progress['response_received'] is not True))
+        record['resolution']='unconfirmed' if uncertain else 'confirmed_local_failure'
+        try:
+            with self.store.transaction() as db:
+                ref=plain(self.store.put(db,record))
+                self.store.event(db,self.run_id,'investigation_failure',record['resolution'],
+                    request=row['request_id'],execution=row['execution_id'],outputs=[ref])
+                state=self.store.session(self.run_id,db)['state']
+                node=state['investigations'][order.investigation_id]
+                node.update(failure_record=ref,progress=dict(progress))
+                self.store.update_state(db,self.run_id,state)
+            return ref,uncertain
+        except Exception as persistence_exc:
+            self._diagnostic_fallback(record,persistence_exc)
+            return None,True  # No durable diagnostic is not a safe settlement proof.
+
+    @staticmethod
+    def _diagnostic_fallback(record,exc):
+        try:
+            # Existing process stderr is best effort; no raw exception/traceback/body.
+            minimal={k:record.get(k) for k in ('version','run_id','investigation_id','request_id',
+                'execution_id','timestamp','elapsed_s','exception_type','cause_exception_type')}
+            minimal.update(persistence_failed=True,persistence_exception_type=type(exc).__name__[:100],
+                progress=record.get('progress'),details=record.get('details'))
+            print(encode(minimal),file=sys.stderr,flush=True)
+        except Exception:
+            pass  # Storage and stderr can both fail. No guarantee of a persisted record.
+
+    def _handle_failure(self,order,row,progress,exc,started):
+        ref=None
+        try:
+            ref,uncertain=self._failure(order,row,progress,exc,started)
+            reason='INVESTIGATION_FAILED_AT_'+progress['stage'].upper()
+            if uncertain:
+                self.store.mark_unknown(self.run_id,row['request_id'])
+                self._state(order.investigation_id,status='unconfirmed',reason=reason)
+            else:
+                progress['stage']='settlement'
+                self.store.complete(row,self._receipt(row,'failed',reason),elapsed=time.monotonic()-started,
+                    actual_cost=self.store.session(self.run_id)['state']['investigations'][order.investigation_id]['usage'])
+                progress['settlement_completed']=True
+                self._state(order.investigation_id,status='failed',reason=reason,progress=dict(progress))
+        except Exception as persistence_exc:
+            if progress['stage']=='settlement':
+                progress['related_failure_record']=ref
+                try:self._failure(order,row,progress,persistence_exc,started)
+                except Exception:
+                    self._diagnostic_fallback(dict(run_id=self.run_id,investigation_id=order.investigation_id,
+                        request_id=row['request_id'],execution_id=row['execution_id'],timestamp=now(),
+                        exception_type=type(exc).__name__[:100],progress=dict(progress)),persistence_exc)
+            else:
+                self._diagnostic_fallback(dict(run_id=self.run_id,investigation_id=order.investigation_id,
+                    request_id=row['request_id'],execution_id=row['execution_id'],timestamp=now(),
+                    exception_type=type(exc).__name__[:100],progress=dict(progress)),persistence_exc)
+            # Preserve escrow even when recording or failure settlement also fails.
+            try:
+                self.store.mark_unknown(self.run_id,row['request_id'])
+                self._state(order.investigation_id,status='unconfirmed',progress=dict(progress))
+            except Exception:pass
+
+    def _initial_progress(self):
+        snapshot=self.store.session(self.run_id)['snapshot']
+        return dict(stage='request_preparation',turn=None,transport_attempted=False,transport_callable_invocations=0,
+            response_received=False,response_body_received=False,response_saved=False,valid_report=False,report_saved=False,
+            settlement_completed=False,actual_usage_known=False,received_responses=0,saved_responses=0,
+            http_status=None,provider_request_id=None,
+            project_id=self.store.config()['project_id'],grant_id=self.store.config()['grant_id'],
+            code_commit=snapshot['project_commit'],code_worktree_dirty=snapshot['worktree_dirty'],dependency_identity=digest(snapshot['dependencies']))
+
+    @staticmethod
+    def _check_response_body(returned):
+        from tools.context_assembly import _no_secrets
+        from tools.model_transports.deepseek import sanitize_provider_text
+        _no_secrets(returned)
+        def check(value):
+            if isinstance(value,dict):
+                for v in value.values():check(v)
+            elif isinstance(value,list):
+                for v in value:check(v)
+            elif isinstance(value,str):
+                if sanitize_provider_text(value,'',None)!=value:
+                    raise ValueError('INVESTIGATION_RESPONSE_SECRET_TEXT')
+                # Native arguments are encoded JSON strings, not transparent dicts.
+                if value.lstrip().startswith(('{','[')):
+                    try:nested=json.loads(value)
+                    except ValueError:return
+                    _no_secrets(nested);check(nested)
+        check(returned)
+
+    @staticmethod
+    def _query_error_code(exc):
+        # Preserve known service codes without copying Pydantic inputs or exception text.
+        code=str(exc).split(':',1)[0]
+        return code if code in ('QUERY_SOURCE_OUT_OF_SCOPE','INVESTIGATION_READ_NOT_GRANTED',
+            'INVESTIGATION_TOOL_CALLS_BUDGET_EXHAUSTED','INVESTIGATION_MODEL_CALLS_BUDGET_EXHAUSTED',
+            'INVESTIGATION_ELAPSED_LIMIT','EVIDENCE_UNAVAILABLE','INVESTIGATION_ACTIVITY_GRANT_REQUIRED',
+            'INVESTIGATION_FROZEN_GRANT_CHANGED','INVESTIGATION_DEADLINE_EXPIRED') else 'INVALID_EVIDENCE_QUERY'
+
+    @staticmethod
+    def _reported_usage(returned):
+        usage=returned.get('usage') if isinstance(returned,dict) else None
+        if not isinstance(usage,dict):return None
+        if not all(type(usage.get(k)) is int and usage[k]>=0 for k in ('prompt_tokens','completion_tokens')):return None
+        return {k:usage[k] for k in ('prompt_tokens','completion_tokens','total_tokens')
+            if type(usage.get(k)) is int and usage[k]>=0}
+
     def _execute(self,order,row,*,transport=None):
         started=time.monotonic()
         request_id=row['request_id']
-        validated=False
+        progress=self._initial_progress()
         try:
+            self._checkpoint(order,row,progress,'started',started)
             if not self.host.compatibility()['compatible']:raise ValueError('INVESTIGATION_DEPENDENCIES_CHANGED')
             self._state(order.investigation_id,status='running')
             order,payload,reads,measurement=self.prepare(order,executing=True)
@@ -327,36 +475,34 @@ class InvestigationDispatcher:
                     node=self.store.session(self.run_id)['state']['investigations'][order.investigation_id]
                     adapter.request_config['timeout_s']=min(adapter.request_config['timeout_s'],max(.001,order.timeout_s-(time.time()-node['started_unix'])))
                     return adapter.respond(wire,0)
-            report=self._interact(order,row,payload,transport,started)
+            report=self._interact(order,row,payload,transport,started,progress)
+            progress['stage']='report_validation'
             reads=self.store.session(self.run_id)['state']['investigations'][order.investigation_id]['reads']
             self._validate_return(order,report,reads)
+            progress.update(stage='report_evidence_save',valid_report=True)
             with self.store.transaction() as db:
                 response=self.store.put(db,dict(report=plain(report),elapsed_s=time.monotonic()-started))
                 self.store.event(db,self.run_id,'investigation_response','validated',request=request_id,
                     execution=row['execution_id'],outputs=[response])
-            validated=True
+            progress['report_saved']=True
+            progress['stage']='settlement'
+            self._checkpoint(order,row,progress,'started',started)
             receipt=self._receipt(row,'completed')
             sealed=self.store.complete(row,receipt,plain(report),elapsed=time.monotonic()-started,
                 actual_cost=self.store.session(self.run_id)['state']['investigations'][order.investigation_id]['usage'])
+            progress['settlement_completed']=True
+            self._checkpoint(order,row,progress,'completed',started)
             self._state(order.investigation_id,status='completed' if report.completion=='complete' else 'incomplete',result=sealed['output'],children=plain(report)['children'])
-        except (TimeoutError,ConnectionError):
-            self.store.mark_unknown(self.run_id,request_id)
-            self._state(order.investigation_id,status='unconfirmed')
         except Exception as exc:
-            if validated:
-                self.store.mark_unknown(self.run_id,request_id)
-                self._state(order.investigation_id,status='unconfirmed',reason='Validated result saved; settlement needs reconciliation')
-            else:
-                self.store.complete(row,self._receipt(row,'failed',str(exc)),elapsed=time.monotonic()-started,
-                    actual_cost=self.store.session(self.run_id)['state']['investigations'][order.investigation_id]['usage'])
-                self._state(order.investigation_id,status='failed',reason=str(exc))
-    def _interact(self,order,row,payload,transport,started):
+            self._handle_failure(order,row,progress,exc,started)
+    def _interact(self,order,row,payload,transport,started,progress):
         from tools.context_assembly import check_outgoing_request
         from tools.platform_models import DeepSeekAdapter,effective_config
         from schemas.platform import ModelResponse
         from tools.platform_store import encode
         turn=0
         while True:
+            progress.update(stage='request_preparation',turn=turn)
             config=effective_config(self.host)
             node=self.store.session(self.run_id)['state']['investigations'][order.investigation_id]
             context=json.loads(payload['messages'][1]['content'])
@@ -371,14 +517,32 @@ class InvestigationDispatcher:
                 return InvestigationReturn(completion='incomplete',interpretation='Insufficient bounded interaction',unknowns=[str(exc)])
             with self.store.transaction() as db:
                 self.store.event(db,self.run_id,'investigation_provider_attempt','started',request=row['request_id'],execution=row['execution_id'],outputs=[self.store.put(db,dict(turn=turn,payload=payload,measurement=measurement))])
-            try:raw=transport(deepcopy(payload))
-            except Exception as exc:raise TimeoutError('TRANSPORT_UNCONFIRMED: '+str(exc)) from exc
+            progress.update(stage='transport',transport_attempted=None,response_received=None,response_body_received=None,
+                response_saved=False,http_status=None,provider_request_id=None,actual_usage_known=False)
+            self._checkpoint(order,row,progress,'started',started)
+            progress['transport_attempted']=True
+            progress['transport_callable_invocations']+=1
+            raw=transport(deepcopy(payload))  # Preserve original exception and transport metadata.
+            progress.update(stage='response_evidence_save',response_received=True,response_body_received=True)
+            metadata=getattr(raw,'transport_metadata',{})
+            from tools.model_transports.deepseek import response_identifiers
+            if isinstance(metadata,dict):
+                status=metadata.get('http_status')
+                progress['http_status']=status if type(status) is int and 100<=status<=599 else None
+                progress['provider_request_id']=response_identifiers({'x-request-id':metadata.get('provider_request_id')})
+            progress['received_responses']+=1
+            self._checkpoint(order,row,progress,'received',started)
+            returned=plain(raw) if isinstance(raw,InvestigationReturn) else getattr(raw,'raw',raw)
+            self._check_response_body(returned)  # Check body and native arguments before original evidence saving.
             with self.store.transaction() as db:
-                returned=plain(raw) if isinstance(raw,InvestigationReturn) else getattr(raw,'raw',raw)
                 self.store.event(db,self.run_id,'investigation_provider_response','returned',request=row['request_id'],execution=row['execution_id'],outputs=[self.store.put(db,returned)])
                 self.store.event(db,self.run_id,'investigation_token_accounting','recorded',request=row['request_id'],execution=row['execution_id'],outputs=[self.store.put(db,dict(turn=turn,
-                    byte_estimate=measurement,provider_usage=returned.get('usage') if isinstance(returned,dict) else None,
+                    byte_estimate=measurement,provider_usage=self._reported_usage(returned),
                     provider_usage_source='Returned provider usage only; byte estimates are not actual token counts.'))])
+            progress.update(stage='response_parse',response_saved=True)
+            progress['saved_responses']+=1
+            progress['actual_usage_known']=self._reported_usage(returned) is not None
+            self._checkpoint(order,row,progress,'saved',started)
             if time.monotonic()-started>order.timeout_s:
                 return InvestigationReturn(completion='incomplete',interpretation='Elapsed limit exceeded after provider return',unknowns=['INVESTIGATION_ELAPSED_LIMIT'])
             if isinstance(raw,InvestigationReturn):return raw  # Historical offline boundary.
@@ -396,7 +560,7 @@ class InvestigationDispatcher:
                 read=self._query(order,query)
                 response=read['page']
             except ValueError as exc:
-                response=dict(error=str(exc),scope='Evidence unavailable or operation rejected; no expanded authority')
+                response=dict(error=self._query_error_code(exc),scope='Evidence unavailable or operation rejected; no expanded authority')
                 with self.store.transaction() as db:
                     self.store.event(db,self.run_id,'investigator_read','rejected',request=row['request_id'],outputs=[self.store.put(db,dict(decision=decision,result=response))])
             assistant=dict(role='assistant',content=message.get('content'),tool_calls=calls)
@@ -477,21 +641,80 @@ class InvestigationDispatcher:
         try:ownership.__enter__()
         except OSError:
             node=self.store.session(self.run_id)['state']['investigations'][key]
-            return InvestigationResult(investigation_id=key,status=node['status'] if node['status'] in ('pending','running') else 'running')
+            return InvestigationResult(investigation_id=key,status=node['status'] if node['status'] in ('pending','running') else 'running',
+                failure_record=node.get('failure_record'),progress=node.get('progress'))
         try:return self._recover_unowned(key,self.store.lookup(self.run_id,row['request_id']))
         finally:ownership.__exit__(None,None,None)
 
     def _recover_unowned(self,key,row):
+        node=self.store.session(self.run_id)['state']['investigations'][key]
+        order=InvestigationOrder.model_validate(node['order'])
+        self._scope(order)  # Same current root/parent/source/tool authority as dispatch.
         if not row['receipt']:
             responses=[e for e in self.store.events(self.run_id) if e['kind']=='investigation_response'
                 and e['status']=='validated' and e['request_id']==row['request_id'] and e['execution_id']==row['execution_id']]
-            if responses:
-                saved=self.store.artifact(responses[-1]['outputs'][0])
-                node=self.store.session(self.run_id)['state']['investigations'][key]
-                report=InvestigationReturn.model_validate(saved['report'])
-                self._validate_return(InvestigationOrder.model_validate(node['order']),report,node['reads'])
-                self.store.complete(row,self._receipt(row,'completed'),plain(report),elapsed=saved['elapsed_s'],
-                    actual_cost=node.get('usage',{**zero(),'model_calls':1,'tool_calls':len(node['reads'])}))
+            progress=dict(node.get('progress',{}))
+            progress['recovering']=True
+            progress.setdefault('stage','recovery')
+            for field in ('transport_attempted','response_received','response_body_received','response_saved','valid_report','report_saved','settlement_completed','actual_usage_known'):
+                progress.setdefault(field,None)  # Historical absence is not a false observation.
+            started=time.monotonic()
+            try:
+                progress['stage']='report_evidence_read'
+                saved=self.store.artifact(responses[-1]['outputs'][0]) if responses else None
+                if saved is None:
+                    originals=[e for e in self.store.events(self.run_id) if e['kind']=='investigation_provider_response'
+                        and e['request_id']==row['request_id'] and e['execution_id']==row['execution_id']]
+                    if originals:
+                        progress['stage']='response_evidence_read'
+                        raw=self.store.artifact(originals[-1]['outputs'][0])
+                        self._check_response_body(raw)
+                        calls=raw.get('choices',[{}])[0].get('message',{}).get('tool_calls',[]) if isinstance(raw,dict) else []
+                        if len(calls)==1 and calls[0].get('function',{}).get('name')=='investigation_return':
+                            progress.update(stage='report_validation',response_received=True,response_saved=True)
+                            report=self._decode(raw)
+                            self._validate_return(order,report,node['reads'])
+                            progress.update(valid_report=True,response_received=True,response_saved=True)
+                            failure=self.store.artifact(node['failure_record']) if node.get('failure_record') else None
+                            elapsed=failure['elapsed_s'] if failure else max(json.loads(row['reserved'])['wall_s'],progress.get('elapsed_s',0.))
+                            saved=dict(report=plain(report),elapsed_s=elapsed,
+                                recovered_from_response=originals[-1]['outputs'][0],
+                                elapsed_accounting='saved failure measurement' if failure else 'conservative reservation; exact process end unknown')
+                            progress['stage']='report_evidence_save'
+                            with self.store.transaction() as db:
+                                ref=self.store.put(db,saved)
+                                self.store.event(db,self.run_id,'investigation_response','validated',request=row['request_id'],
+                                    execution=row['execution_id'],inputs=[originals[-1]['outputs'][0]],outputs=[ref])
+                if saved is not None:
+                    progress['stage']='report_validation'
+                    report=InvestigationReturn.model_validate(saved['report'])
+                    self._validate_return(order,report,node['reads'])
+                    progress.update(valid_report=True,report_saved=True,stage='settlement')
+                    self.store.complete(row,self._receipt(row,'completed'),plain(report),elapsed=saved['elapsed_s'],
+                        actual_cost=node.get('usage',{**zero(),'model_calls':1,'tool_calls':len(node['reads'])}))
+                    progress['settlement_completed']=True
+                    self._state(key,progress=progress)
+                    row=self.store.lookup(self.run_id,row['request_id'])
+                elif not row['receipt']:
+                    # A durably confirmed local failure can also need settlement.
+                    # This requires reception/no-call facts, not merely an error category.
+                    failures=[e for e in self.store.events(self.run_id) if e['kind']=='investigation_failure'
+                        and e['status']=='confirmed_local_failure' and e['request_id']==row['request_id']
+                        and e['execution_id']==row['execution_id']]
+                    if failures:
+                        failure=self.store.artifact(failures[-1]['outputs'][0]);known=failure['progress']
+                        not_sent=known.get('transport_attempted') is False and known.get('transport_callable_invocations')==0
+                        received=known.get('response_received') is True and (
+                            known.get('response_body_received') is True or (failure['details']['http_status'] or 0)>=400)
+                        if not_sent or received:
+                            progress['stage']='settlement'
+                            self.store.complete(row,self._receipt(row,'failed','INVESTIGATION_FAILED_AT_'+known['stage'].upper()),
+                                elapsed=failure['elapsed_s'],actual_cost=node['usage'])
+                            progress['settlement_completed']=True
+                            self._state(key,progress=progress)
+                            row=self.store.lookup(self.run_id,row['request_id'])
+            except Exception as exc:
+                self._handle_failure(order,row,progress,exc,started)
                 row=self.store.lookup(self.run_id,row['request_id'])
         # Reconcile sealed ledger result first, including crash after settlement.
         if row['receipt']:
@@ -500,10 +723,16 @@ class InvestigationDispatcher:
             if status=='completed':
                 report=self.store.artifact(receipt['output']);updates['children']=report.get('children',[])
                 if report.get('completion')=='incomplete':updates['status']='incomplete'
+            progress=dict(self.store.session(self.run_id)['state']['investigations'][key].get('progress',{}))
+            if progress:progress['settlement_completed']=True;updates['progress']=progress
             self._state(key,**updates)
-            return InvestigationResult(investigation_id=key,**{k:updates.get(k) for k in ('status','result','reason')})
+            node=self.store.session(self.run_id)['state']['investigations'][key]
+            return InvestigationResult(investigation_id=key,**{k:updates.get(k) for k in ('status','result','reason')},
+                failure_record=node.get('failure_record'),progress=node.get('progress'))
         self.store.mark_unknown(self.run_id,row['request_id']);self._state(key,status='unconfirmed')
-        return InvestigationResult(investigation_id=key,status='unconfirmed',reason='No sealed result; reservation retained. Reconcile original provider request; no automatic retry or release.')
+        node=self.store.session(self.run_id)['state']['investigations'][key]
+        return InvestigationResult(investigation_id=key,status='unconfirmed',reason='No sealed result; reservation retained. Reconcile original provider request; no automatic retry or release.',
+            failure_record=node.get('failure_record'),progress=node.get('progress'))
 
     def disposition(self,value):
         self._grant()
