@@ -1,6 +1,22 @@
-# 主线三版本一：新授权历史处置复验的停止验收
+"""Chinese bounded acceptance report from saved facts, no provider call."""
+from pathlib import Path
+from tools.state_io import read,atomic_json
+from tools.platform_store import now
+from evidence.research_v1_resume_20261008.delivery_audit import audit,OUT,ROOT
 
-2026-10-08，`feat/gvs-dynamics`。活动 `mainline3-v1-resume-4cb91c2be1db`。统一原生调查契约、显式历史交接和真实主模型复验已执行；**主模型正式处置门禁失败，版本一整体真实验收未通过**。协调调查与固定半径验证均未启动，版本二入口仍阻塞。
+
+def render():
+    facts=audit();m=read(OUT/'validation_manifest.json');b=read(OUT/'reuse_bundle.json')
+    responses=[e for e in b['events'] if e['kind']=='investigation_provider_response']
+    last=b['artifacts'][responses[-1]['outputs'][0]['artifact_id']]
+    principal=b['state']['investigations']['principal-historical-disposition']
+    rows=[]
+    for mode,label in [('reuse','历史报告处置复验'),('coordinated','真实协调调查'),('fixed','固定半径数学与闭环')]:
+        p=facts['phases'][mode];u=p['used'];budget=p['budget']
+        rows.append(f"| {label} | {u['model_calls']} / {budget['model_calls']} | {u['tool_calls']} / {budget['tool_calls']} | {u['backend_solves']} / {budget['backend_solves']} | {u['wall_s']:.3f} / {budget['wall_s']:.0f} |")
+    report=f"""# 主线三版本一：新授权历史处置复验的停止验收
+
+2026-10-08，`feat/gvs-dynamics`。活动 `{m['activity_id']}`。统一原生调查契约、显式历史交接和真实主模型复验已执行；**主模型正式处置门禁失败，版本一整体真实验收未通过**。协调调查与固定半径验证均未启动，版本二入口仍阻塞。
 
 本次承接已审查提交 `9b2db8ab3f42a2147bd8eecee391e804072845cc`。旧活动继续停止，两次旧未知请求、未决预留、旧费用与全部历史失败均未改写。原完成报告保留于本次证据目录 `historical_delivery_before.md`，也可从该旧提交读取。新授权、新项目账本没有迁移或释放旧费用；[历史核验](../evidence/research_v1_resume_20261008/stages/historical_after.json)为 unchanged=true。
 
@@ -26,7 +42,7 @@
 
 第二次请求返回两份拟采纳意见，解释区分了秒单位与时钟定义、采样窗口聚合与窗口内部轨迹、完整执行与优化收敛，并保留官方 `task_accepted=false`。但部分 adopted_claims 的 supporting_facts 不在所绑定的调查报告内，公共校验以 `ADOPTED_FACT_NOT_LINKED_TO_REPORT` 拒绝返回。独立审查没有把这些拟采纳意见当成正式记录。
 
-安排并实际发送 **1 次付费协议纠正**。完整纠正输入离线保守估计 137343，低于 160000；实际最终发送另有保存的完整容量检查。第三次提供方响应为 `finish_reason=length`，32768 生成 token 全用于思考，原生调用数量为 0，没有完整报告。这不是可纠正的完整无效调用；length 恢复关闭，不能增加生成额度或重跑争取通过。原逻辑节点 900 秒包含暂停、修复和等待，时限保持原值并已耗尽。
+安排并实际发送 **1 次付费协议纠正**。完整纠正输入离线保守估计 137343，低于 160000；实际最终发送另有保存的完整容量检查。第三次提供方响应为 `finish_reason={last['choices'][0]['finish_reason']}`，32768 生成 token 全用于思考，原生调用数量为 0，没有完整报告。这不是可纠正的完整无效调用；length 恢复关闭，不能增加生成额度或重跑争取通过。原逻辑节点 900 秒包含暂停、修复和等待，时限保持原值并已耗尽。
 
 **公共正式采纳/暂缓/拒绝记录均为 0。** 没有有效主模型返回，不能让未执行的正式处置或独立解释门禁通过。[程序门禁](../evidence/research_v1_resume_20261008/stages/reuse_gate.json)及[独立审查](../evidence/research_v1_resume_20261008/stages/reuse_material_review.json)保留失败。
 
@@ -34,7 +50,7 @@
 
 真实协调调查未启动：协调者提案、两名新调查者、自主原始追读→后续请求→有效报告→主模型正式处置链路均未覆盖。不能用本轮复用的历史报告冒充协调子调查。
 
-固定半径阶段未启动。唯一候选仍为近段绳路半径比例 **1.01**、远段 **0.99**，精确起点 `evidence/research_native_development_v3_20261007/store/artifacts/3ae03b4e4ddac2e5099ae5823fc0dd7dd9d338dfba6b7d435729d4e5ab41665b.json`，拟用 `candidate.family@1.2.0`、`controller.gvs_nmpc@9.0.0`。构建、真实数学准备/线性化、控制指标、有限端点分析及内部求解、后端、官方评价、控制报告的本轮次数全部为 0；没有本轮终点位置、保持位置/速度、输入越界、求解器错误或闭环成本可报告。任务、权重、结构、初态、周期、时长、保持阈值及继承 v7 的规则未更改，实验 v8 未晋升。
+固定半径阶段未启动。唯一候选仍为近段绳路半径比例 **1.01**、远段 **0.99**，精确起点 `{m['fixed_source']}`，拟用 `candidate.family@1.2.0`、`controller.gvs_nmpc@9.0.0`。构建、真实数学准备/线性化、控制指标、有限端点分析及内部求解、后端、官方评价、控制报告的本轮次数全部为 0；没有本轮终点位置、保持位置/速度、输入越界、求解器错误或闭环成本可报告。任务、权重、结构、初态、周期、时长、保持阈值及继承 v7 的规则未更改，实验 v8 未晋升。
 
 旧 Stage336 的有效完整但任务失败结果继续保留：误差 0.06672099201814737 m，任务接受 false，采样保持 false，输入越界 0.0 N、求解器错误 0。这些旧结果不能改写为本轮固定半径验证。
 
@@ -53,13 +69,11 @@
 
 | 阶段 | 模型尝试 | 项目工具操作 | 后端尝试 | 账本累计秒 |
 | --- | ---: | ---: | ---: | ---: |
-| 历史报告处置复验 | 3 / 8 | 11 / 128 | 0 / 0 | 270.093 / 2400 |
-| 真实协调调查 | 0 / 32 | 0 / 512 | 0 / 0 | 0.000 / 8000 |
-| 固定半径数学与闭环 | 0 / 0 | 0 / 14 | 0 / 2 | 0.000 / 6000 |
+{chr(10).join(rows)}
 
-主模型逻辑节点累计 **3 / 8** 次模型、**4** 次节点证据操作，另有 1 次公共独立源检查，共 **5 / 12**。两个历史交接及提交/收集的公共工具操作另外计入项目工具额度。付费协议纠正安排/实发 **1 / 1**，主模型阶段额度 2、全场上限 6；余下额度不转移，未要求耗尽。实现修复 **3 / 4**，自动传输重试 0，数学内部求解 0，后端 0。三个模型请求均完整收到并保存，当前没有在途线程或未决新预留。
+主模型逻辑节点累计 **{principal['usage']['model_calls']} / 8** 次模型、**{principal['usage']['tool_calls']}** 次节点证据操作，另有 1 次公共独立源检查，共 **5 / 12**。两个历史交接及提交/收集的公共工具操作另外计入项目工具额度。付费协议纠正安排/实发 **1 / 1**，主模型阶段额度 2、全场上限 6；余下额度不转移，未要求耗尽。实现修复 **3 / 4**，自动传输重试 0，数学内部求解 0，后端 0。三个模型请求均完整收到并保存，当前没有在途线程或未决新预留。
 
-供应商累计 `prompt_tokens=80206`、`completion_tokens=64308`、`total_tokens=144514`；金额账单未知。累计执行账本 **270.093 s**，应用阶段墙钟（含两次恢复）**274.204 s**，分别列示。工程、离线验证、独立审查、等待授权和交付的包含式区间，由[程序成本审计](../evidence/research_v1_resume_20261008/stages/delivery_audit.json)按冻结起点计算；不称为纯活跃工程 CPU，也不把应用墙钟等同于账本时间。
+供应商累计 `prompt_tokens={facts['provider_tokens']['prompt_tokens']}`、`completion_tokens={facts['provider_tokens']['completion_tokens']}`、`total_tokens={facts['provider_tokens']['total_tokens']}`；金额账单未知。累计执行账本 **{facts['ledger_wall_s']:.3f} s**，应用阶段墙钟（含两次恢复）**{facts['application_wall_s']:.3f} s**，分别列示。工程、离线验证、独立审查、等待授权和交付的包含式区间，由[程序成本审计](../evidence/research_v1_resume_20261008/stages/delivery_audit.json)按冻结起点计算；不称为纯活跃工程 CPU，也不把应用墙钟等同于账本时间。
 
 一次自动审批拒绝阻止首轮外发，进程未启动、供应商尝试为 0；用户在聊天明确确认任务范围、目的地和预算后继续。拒绝与确认分别留档，此后没有重复索要同一授权。人工/工程介入包括 Codex 契约实现、三次有限修复、容量与解释审查、这次明确用户授权及交付；没有替代模型报告。
 
@@ -68,3 +82,21 @@
 交付[版本二入口与剩余限制](research_mainline3_v2_handoff.md)，仍不实施绳数、布局或段数开发。后续不能恢复旧 STOP、改写历史、重置节点时限、替换活动绕过未知状态，或从协调/科学额度借用主模型纠正额度。
 
 整个待推送区间从 `9b2db8a` 开始审查，限定本任务代码、测试、文档和非秘密证据。[发布检查](../evidence/research_v1_resume_20261008/stages/publication_scope_review.json)核对范围和秘密风险；仅普通推送授权的 `feat/gvs-dynamics`，最终远端 SHA 与工作区状态见推送后的 `publication_result.json`。发布该失败验收不会使正式处置、协调或固定案例门禁通过。
+"""
+    (ROOT/'docs/research_mainline3_v1_completion.md').write_text(report,encoding='utf8')
+    handoff=f"""# 主线三版本二交接：入口仍阻塞
+
+本轮新授权活动 `{m['activity_id']}` 的[验收结论](research_mainline3_v1_completion.md)为正式处置门禁失败。两份旧调查报告通过公共历史交接复用；新主模型的拟采纳返回来源链不成立，纠正响应在 32768 思考 token 用尽后 length 结束，没有原生报告调用。原逻辑节点 900 秒保持累计并已耗尽。正式处置记录 0，协调调查和固定半径数学/闭环均未运行。
+
+版本二尚不能进入。后续需另行明确授权和有限预算处理未完成的主模型真实处置；不能把已有无效返回人工改成成功，不能自动重发 length 响应，不能重置本轮计数或解除旧未知预留。本轮已用模型 3、项目工具 11、付费协议纠正 1、实现修复 3，科学/后端 0；完整账本和失败可从本次 `stages/reuse_bundle.json` 复核。
+
+恢复真实版本一验收链后，依次完成真实协调调查和唯一固定案例。固定案例入口为 `tools.research_v1_resume` 中受前置门禁约束的 fixed 阶段，候选近段半径比例 1.01、远段 0.99，精确原文件 `{m['fixed_source']}`；保留 candidate.family@1.2.0、controller.gvs_nmpc@9.0.0 和继承 v7 的停止规则。实验 v8 不晋升，不调参、不扩展搜索，有效完整的物理失败不构成第二次后端重跑理由。
+
+版本二未来范围限于明确有限的绳数、绳路布局、段数及必要组合，冻结候选数量、权限、来源和预算；须新增拓扑/路由/输入顺序/张力限额一致性、串联连接和初始化/离散化/控制维度核查，并逐候选绑定数学与闭环结果。本轮未实施这些能力。实时部署、机器人性能改善、诊断效率优势均未证明。旧 Stage336 失败、本次失败和旧停止活动继续保留。
+"""
+    (ROOT/'docs/research_mainline3_v2_handoff.md').write_text(handoff,encoding='utf8')
+    atomic_json(OUT/'delivery_report_generation.json',dict(timestamp=now(),facts_source='delivery_audit.json',provider_calls=0,
+        output=['docs/research_mainline3_v1_completion.md','docs/research_mainline3_v2_handoff.md'],version1_gate_passed=False,version2_implemented=False))
+
+
+if __name__=='__main__':render()
