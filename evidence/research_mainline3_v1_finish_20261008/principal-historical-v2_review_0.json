@@ -1,0 +1,13 @@
+{
+  "version": "material_components@2.0.0",
+  "report": {"artifact_id": "20a4d70f7cf60538227438a8b788c1ad9abdcb0eefc837b10bac869bb5d31752", "media_type": "application/json"},
+  "material_correctness": "pass",
+  "coverage": "仅审查实际返回的 reach-question 一份处置；不代表已完成两份处置，也不允许进入阶段 B。",
+  "reviewer": "Codex independent source/material review, zero additional provider judge requests",
+  "supported_claims": ["执行身份及坐标约定精确。", "终点位置、目标、有符号误差及欧氏误差来自原报告；新版指标视图单独支持历史 reach 判据、阈值与记录失败。", "保持窗口对象支持采样位置和速度超限、passed=false、无连续保证；指标视图仅作为新增主模型依据。", "单步预测范围限制不推出到达或保持成功。"],
+  "unknowns_assessment": "未直接读取配置/评价器原件、只读聚合而未读窗口序列，是其真实读取范围的限制；有完整指标视图并不等于该模型亲自复算。未用这些未知抹去记录失败。",
+  "wording_notes": ["interpretation 中 Both reports accepted 与实际只返回一份决定不一致；属于必须补齐的协议覆盖问题。", "窗口 recorded_result=null 指分项记录字段，recorded_window_result=false 仍被保留；可接受但宜表达更清楚。"],
+  "blocking_issues": [],
+  "protocol_issues": [{"path": "/dispositions", "missing_investigation_id": "timing-question", "reason": "本轮冻结目标要求对两份历史报告分别正式处置，当前只有 reach-question。"}],
+  "gate_scope": "returned-material-only; formal two-report stage gate remains incomplete"
+}

@@ -1,0 +1,137 @@
+"""Read-only cost/coverage closeout. No provider, science, grant or recovery."""
+from pathlib import Path
+from collections import Counter
+import hashlib
+import json
+import time
+from tools.state_io import read, atomic_json, digest
+from tools.platform_store import now, zero
+
+ROOT=Path(__file__).resolve().parents[2]
+OUT=Path(__file__).resolve().parent
+
+def summarize(mode):
+    b=read(OUT/(mode+'_bundle.json')); events=b['events']; arts=b['artifacts']
+    sends=[e for e in events if e['kind']=='investigation_provider_attempt']
+    responses=[e for e in events if e['kind']=='investigation_provider_response']
+    tokens=Counter(); details=[]
+    for e in responses:
+        body=arts[e['outputs'][0]['artifact_id']]; usage=body.get('usage',{})
+        for k in ('prompt_tokens','completion_tokens','total_tokens'):
+            if type(usage.get(k)) is int:tokens[k]+=usage[k]
+        details.append(dict(sequence=e['sequence'],request_id=e['request_id'],response=e['outputs'][0],provider_usage=usage))
+    used=zero(); unknown=[]
+    for c in b['calls']:
+        for k,v in (c.get('charged') or {}).items():used[k]+=v
+        if c['status']=='unknown':
+            unknown.append({k:c[k] for k in ('run_id','request_id','execution_id','status','reserved','charged','receipt')})
+    external=sum((c.get('charged') or {}).get('tool_calls',0) for c in b['calls'] if c['caller']!='investigation-dispatcher')
+    actual_evidence=sum(e['kind']=='investigator_read' for e in events)
+    corrections=[dict(sequence=e['sequence'],feedback=e['outputs'][0],content=arts[e['outputs'][0]['artifact_id']])
+        for e in events if e['kind']=='investigation_protocol_correction']
+    lifecycles=[dict(file=p.name,**read(p)) for p in sorted(OUT.glob(mode+'*lifecycle.json'))]
+    return dict(actual_model_requests=len(sends),saved_provider_responses=len(responses),
+        provider_tokens_known_sum=dict(tokens),provider_tokens_missing_responses=len(sends)-len(responses),
+        money_amount=None,money_status='Supplier invoice absent; do not estimate or label unknown response free',
+        ledger_charged=used,actual_project_tools_observed=external+actual_evidence,
+        tool_accounting='Observed public operations plus investigator read attempts; unknown call reservation remains conservatively charged, not released.',
+        paid_corrections=len(corrections),correction_records=corrections,unknown_calls=unknown,
+        application_segments=lifecycles,application_active_segments_s=sum(x['application_wall_s'] for x in lifecycles),
+        nodes={k:dict(status=n['status'],started_unix=n['started_unix'],original_deadline_unix=n['started_unix']+n['order']['timeout_s'],
+            assigned_budget=n['order']['budget'],usage=n['usage'],progress=n.get('progress'),result=n.get('result'),reason=n.get('reason'))
+            for k,n in b['state']['investigations'].items()},provider_usage_details=details)
+
+def main():
+    a=summarize('reuse');b=summarize('coordinated');m=read(OUT/'validation_manifest.json');start=read(OUT/'activity_start.json')
+    sealed=read(OUT/'sealed_history.json')
+    verified=all(hashlib.sha256((ROOT/k).read_bytes()).hexdigest()==v for k,v in sealed.items())
+    mismatch=read(ROOT/'evidence/research_disposition_facts_20261008/specific_mismatches.json')
+    mismatch_counts=dict(Counter(r['classification'] for r in mismatch['rows']))
+    block=dict(version='mainline3.finish_gate@1.0.0',passed=False,
+        gates=dict(coordinator_plan='pass',two_new_execution_chains='pass',two_valid_new_reports='fail',
+            coordinator_synthesis='not_reached',principal_dispositions='not_reached',material_correctness='not_reached'),
+        reasons=['reach-holding-interpretation exhausted its frozen assigned 8 model requests (authorized per-node maximum is 12); last response was a read, not a report.',
+            'timing-integrity-limits response 8 was received (HTTP 200) but not durably saved; original request is unknown, no blind retry or reservation release. Original safe failure omitted exact local code; do not infer its cause.'],
+        budgets_exhausted='Reach child assigned bound only. Stage B total and global authorization are not exhausted.',
+        unknown_calls=b['unknown_calls'],success_not_fabricated=True)
+    atomic_json(OUT/'coordinated_gate.json',block)
+    c=dict(status='not_started',reason='Stage B gate failed; dependent scientific execution unauthorized by frozen sequence',
+        public_tools=0,model_requests=0,math_operations=0,backend_attempts=0,
+        fixed_identity_check=read(OUT/'fixed_identity_check.json'),configuration_identity_only=True)
+    close=dict(version='mainline3.closeout@1.0.0',activity_id=start['activity_id'],generated_at=now(),
+        known_base=start['known_base'],historical_evidence_unchanged=verified,sealed_file_count=len(sealed),
+        old_activity_accounting=read(OUT/'old_activity_accounting.json'),old_mismatch_audit=dict(path='evidence/research_disposition_facts_20261008/specific_mismatches.json',sha256=hashlib.sha256((ROOT/'evidence/research_disposition_facts_20261008/specific_mismatches.json').read_bytes()).hexdigest(),classification_counts=mismatch_counts),
+        A=dict(status='passed',gate=read(OUT/'reuse_gate.json'),accounting=a),
+        B=dict(status='blocked',gate=block,accounting=b),C=c,
+        totals=dict(actual_model_requests=a['actual_model_requests']+b['actual_model_requests'],
+            paid_corrections=a['paid_corrections']+b['paid_corrections'],
+            actual_project_tools_observed=a['actual_project_tools_observed']+b['actual_project_tools_observed'],
+            conservative_tool_ledger=a['ledger_charged']['tool_calls']+b['ledger_charged']['tool_calls'],
+            conservative_ledger_s=a['ledger_charged']['wall_s']+b['ledger_charged']['wall_s'],
+            implementation_repairs_after_freeze=m['implementation_repairs_used'],
+            new_scientific_operations=0,new_backend_attempts=0,unknown_supplier_responses=1,money_amount=None),
+        clocks=dict(started_unix=start['started_unix'],absolute_deadline_unix=start['deadline_unix'],
+            protected_delivery_cutoff_unix=start['execution_cutoff_unix'],elapsed_activity_wall_s=time.time()-start['started_unix'],
+            preparation_s=read(OUT/'reuse_launch.json')['started_unix']-start['started_unix'],
+            engineering_time='Preparation plus separately recorded repair/review intervals; elapsed activity includes them. Ledger and active application segments are separate measures, neither is an estimate of all engineering time.'),
+        version_one_complete=False,version_two_entry='blocked; draft only; no rope-count/layout/segment implementation',
+        operational_disclosure=f'Historical reuse, independent review and {m["implementation_repairs_used"]} implementation repairs with 3 same-node recovery sessions. Not uninterrupted or unattended.',
+        output_polishing_model_requests=0)
+    atomic_json(OUT/'delivery_facts.json',close)
+    text=f'''# 主线三版本一：本轮交付与剩余阻塞（2026-10-08）
+
+本轮完成工程修复、离线检查和阶段 A 的真实主模型正式处置。阶段 B 启动了新协调者与两名新调查者，但没有得到两份有效新报告，门禁未通过；阶段 C 未启动。**版本一没有整体完成，版本二目前只有条件性交接草案。**
+
+起点核对为 `{start['known_base']}`，分支 `feat/gvs-dynamics`，开始时工作区干净。活动 `{start['activity_id']}` 使用新的授权；{len(sealed)} 份封存历史文件逐字节核对未变，旧 STOP、费用和未知请求保持原状。具体运行事实与逐请求账目见 [delivery_facts.json](../evidence/research_mainline3_v1_finish_20261008/delivery_facts.json)。
+
+## 具体失配与修复
+
+保留并复用旧失配逐项档案 `specific_mismatches.json`，其中分类计数为 `{json.dumps(mismatch_counts,ensure_ascii=False)}`。档案包含原响应、报告、决定位置、来源路径、精确类型和值以及报告对应项。真实来源中的新增字段不能冒充子报告事实；报告整对象中的真实叶字段可以显式投影；身份、类型、精确值冲突分别拒绝。错误码本身不证明事实捏造。
+
+既有可选择事实句柄和确定性展开继续使用。报告依据、主模型补充依据和适用范围分开，公共读取产生检查记录，模型解释另行审查。来源链、模型报告和完整请求档案分别保存。
+
+新增错误分流先处理程序和容量问题，再决定是否需要付费纠正。重复页面导致的容量问题本地修复；原模型选择不改写。范围反馈指出具体判断和缺失来源的合法句柄。遗漏、重复或外来处置目标在生产解析时明确拒绝。纠正限制按不可变报告目标累计，阶段总额也独立检查。
+
+冻结后共 {m['implementation_repairs_used']} 次工程修复：已收到的长度耗尽响应恢复入口；重复页容量与具体范围反馈；逐报告纠正限制和完整目标集；安全保存失败诊断与有界停止分流；调查报告身份错误的逐字段定位。第四、五次仅离线验证，不宣称得到新的真实覆盖。第八次计时响应已丢失完整持久正文，无法根据新诊断回填旧原因，不重发、不释放未知账目。第七次保存回答本地重验仍无效：`/facts/0/source_identity` 把不在原根字段的 candidate_id、owner_run_id 当作根身份；合法反馈说明实际根字段和原查询入口，不改写成嵌套别名。
+
+## 指标与离线证据
+
+统一历史视图绑定原候选、执行、评价器和控制报告版本。历史 `evaluate.reach@1.0.0` 验收完整采样执行和终点距离；保持由当时控制报告单独记录，不能反套当前联合标准。原终点误差 0.06672099201814737 m / 0.01 m，保持位置和速度分别失败（速度 0.20679063000945364 m/s / 0.02 m/s，窗口 [0.3,0.35] s）。官方整体 false 保留。已绑定档案信号可复算的分项、仅官方记录和材料缺失分别呈现；没有新增后端计算。
+
+离线检查覆盖原真实回答重验、精确绑定与投影、错误类型/值/身份/版本、补充依据归属、采纳/暂缓/拒绝、schema 与执行一致、完整 wire 容量及回取，以及“整体失败但到达通过”“不能复算但官方失败仍保留”等反例。冻结前最终针对检查 26 项通过；第四次修复相关检查 11 项通过，第五次最终 10 项通过。较早广泛回归存在失败，原日志保留；第四次混合回归先出现两个旧夹具失败，修正其 schema 与回调签名后重跑通过。不宣称全测试套件通过。来源合法仍不自动证明科学判断成立。
+
+## 三阶段实际范围
+
+**A 通过。** 两份旧调查报告经过公共历史交接，新的主模型实际读取报告、在后续请求使用反馈、选择窄范围判断，程序展开后独立审查并记录两个公共处置回执。到达与保持的记录失败各自有依据；单步预测不替代验收。计时数值保留，因果、全局最优和实机部署没有被采纳。关于历史 `_s` 字段“未声明单位”的过谨慎措辞单独记录为非实质问题，没有改写模型决定。
+
+**B 未通过。** 协调者真实规划两个不同问题；两名新调查者真实查询，历史报告没有冒充新调查。协调者、到达调查者、计时调查者各使用 8 次请求。到达调查者把全部请求用于查询，剩下的未完成记录由程序产生，不能当成模型有效报告。计时调查第 8 次响应收到但保存失败，只有前 7 次持久响应；未知请求保留。预先把子节点分配为 8 次低于授权上限 12 次，是本轮分配过紧，不是阶段总预算耗尽。没有扩大冻结额度或更换节点重置；综合和最终主模型处置均未发生。
+
+**C 未覆盖。** 修正后的完整路径已与仓库原清单和文件哈希核对。唯一近段 1.01、远段 0.99 半径修改及 `candidate.family@1.2.0` / `controller.gvs_nmpc@9.0.0` 已核验，任务、结构、初态、周期、时长和 v7 配方保持相同，v8 不晋升。由于 B 门禁失败，候选构建、数学准备/线性化、控制指标、有限端点、闭环、官方评价、控制报告与新增公共联合评价没有执行。配置核对不等于科学验证。
+
+## 请求、费用与时钟
+
+| 项目 | A | B | C |
+| --- | ---: | ---: | ---: |
+| 实际模型请求 | {a['actual_model_requests']} | {b['actual_model_requests']} | 0 |
+| 保存供应商响应 | {a['saved_provider_responses']} | {b['saved_provider_responses']} | 0 |
+| 付费纠正 | {a['paid_corrections']} | {b['paid_corrections']} | 0 |
+| 实际可观察项目工具操作 | {a['actual_project_tools_observed']} | {b['actual_project_tools_observed']} | 0 |
+| 保守账本工具操作 | {a['ledger_charged']['tool_calls']} | {b['ledger_charged']['tool_calls']} | 0 |
+| 累计账本秒 | {a['ledger_charged']['wall_s']:.3f} | {b['ledger_charged']['wall_s']:.3f} | 0 |
+| 应用运行段秒（不含段间工程介入） | {a['application_active_segments_s']:.3f} | {b['application_active_segments_s']:.3f} | 0 |
+| 新数学操作 / 后端尝试 | 0 / 0 | 0 / 0 | 0 / 0 |
+
+供应商已知 token 合计：A `{dict(a['provider_tokens_known_sum'])}`；B `{dict(b['provider_tokens_known_sum'])}`。B 一次响应的 token 和金额未知；没有供应商账单，因此不填造货币金额。未知计时调用的 8 次模型、16 次工具和 2400 秒预留仍保守占账，其中实际观察到 8 次请求与 5 次查询；账本 `occupied={{}}` 不代表该 unknown 请求已确认或费用获退还。
+
+累计实际请求 {close['totals']['actual_model_requests']} / 48，付费纠正 {close['totals']['paid_corrections']} / 10，冻结后修复 {m['implementation_repairs_used']} / 6。没有额外裁判或润色模型。A 的两次重复读取和容量停顿、B 分配过紧及保存诊断不足均记录为可能可避免的工程成本；所有调用与纠正照常计数，不事后退还额度或捏造节省金额。绝对十小时截止与收尾保护保持原起点，活动墙钟、阶段累计账本、节点原截止和应用运行段单独保存。工程准备、修复和审查计入活动墙钟；不把其差值伪称精确工程工时。
+
+## 交接
+
+不能以当前材料宣布版本一完成或允许进入版本二结构开发。恢复需先解决计时原请求的未知持久结果，并在明确的新授权与节点额度关系下补足 B 的有效报告、综合和正式处置，然后执行 C 原固定科学配置。版本二草案按“有限绳数与布局 → 段数 → 必要组合”推进，复用本轮接口，同时先补上查询预算临近耗尽的报告回收设计。本轮没有开发绳数、布局或段数。
+
+完整请求、思考、原响应、工具反馈和来源均保持档案可追溯；省略重复文件的发布清单将说明位置与哈希。推送审查、远端 SHA 和最终工作区记录见同目录的交付核验文件。此次包含工程介入和恢复，不能宣称无中断、无人介入的一次性闭环。
+'''
+    (ROOT/'docs/research_mainline3_v1_completion.md').write_text(text,encoding='utf-8')
+    print(json.dumps(close['totals'],ensure_ascii=True))
+
+if __name__=='__main__':main()

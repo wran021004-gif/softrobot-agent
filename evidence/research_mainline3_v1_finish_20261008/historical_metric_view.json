@@ -1,0 +1,143 @@
+{
+  "version": "research.metric_view@1.0.0",
+  "candidate_id": "proposal-build",
+  "execution_id": "494deb38d6374deb8f741e96f2430826",
+  "configuration": {
+    "artifact_id": "803e8fb2cda1fa2035f18c2051cb2cb83c4dabf26b13f9391c2a49e1cc1b4f5c",
+    "media_type": "application/json"
+  },
+  "definition_identity": "c17a89e1cbed38cb66112323f2039f81c3588ea3da9d47d993f766c2f417e522",
+  "reach": {
+    "value": 0.06672099201814737,
+    "unit": "m",
+    "time_window_s": [
+      0.35,
+      0.35
+    ],
+    "sources": [
+      {
+        "reference": {
+          "artifact_id": "bbfd79bb55c2ad4683740663f1ec921d8f9a9784c70fb902c0e30bf2f36b3339",
+          "media_type": "application/json"
+        },
+        "pointer": "/metrics/0"
+      },
+      {
+        "reference": {
+          "artifact_id": "803e8fb2cda1fa2035f18c2051cb2cb83c4dabf26b13f9391c2a49e1cc1b4f5c",
+          "media_type": "application/json"
+        },
+        "pointer": "/effective/task/evaluator"
+      }
+    ],
+    "criterion_version": "evaluate.reach@1.0.0",
+    "recorded_result": false,
+    "recomputed_result": false,
+    "independent_recomputation": "available",
+    "missing_material": [],
+    "threshold": 0.01
+  },
+  "holding": {
+    "position": {
+      "value": 0.06672099201814737,
+      "unit": "m",
+      "time_window_s": [
+        0.3,
+        0.35
+      ],
+      "sources": [
+        {
+          "reference": {
+            "artifact_id": "ae9c754b80bce2e45773ba70841779055a79584d009b61e1622a19f424edbb82",
+            "media_type": "application/json"
+          },
+          "pointer": "/detail/sampled_settling/max_error_m"
+        }
+      ],
+      "criterion_version": "controller.gvs_nmpc@6.0.0/sampled_settling",
+      "recorded_result": null,
+      "recomputed_result": false,
+      "independent_recomputation": "available",
+      "missing_material": [],
+      "threshold": 0.01,
+      "motion_source": {
+        "reference": {
+          "artifact_id": "8f1a4230282a9e52ada126f075eabc64317c39c287786c05ffadc5ca547d55aa",
+          "media_type": "application/json"
+        },
+        "pointer": ""
+      }
+    },
+    "speed": {
+      "value": 0.20679063000945364,
+      "unit": "m/s",
+      "time_window_s": [
+        0.3,
+        0.35
+      ],
+      "sources": [
+        {
+          "reference": {
+            "artifact_id": "ae9c754b80bce2e45773ba70841779055a79584d009b61e1622a19f424edbb82",
+            "media_type": "application/json"
+          },
+          "pointer": "/detail/sampled_settling/max_speed_m_s"
+        }
+      ],
+      "criterion_version": "controller.gvs_nmpc@6.0.0/sampled_settling",
+      "recorded_result": null,
+      "recomputed_result": false,
+      "independent_recomputation": "available",
+      "missing_material": [],
+      "threshold": 0.02,
+      "motion_source": {
+        "reference": {
+          "artifact_id": "8f1a4230282a9e52ada126f075eabc64317c39c287786c05ffadc5ca547d55aa",
+          "media_type": "application/json"
+        },
+        "pointer": ""
+      }
+    },
+    "recorded_window_result": false,
+    "recorded_available": true,
+    "continuous_time_guarantee": false
+  },
+  "integrity": {
+    "evaluation_validity": "valid",
+    "execution_complete": true,
+    "solver_error_count": 0,
+    "force_bound_violation_n": 0.0,
+    "sources": [
+      {
+        "reference": {
+          "artifact_id": "bbfd79bb55c2ad4683740663f1ec921d8f9a9784c70fb902c0e30bf2f36b3339",
+          "media_type": "application/json"
+        },
+        "pointer": "/validity"
+      },
+      {
+        "reference": {
+          "artifact_id": "ae9c754b80bce2e45773ba70841779055a79584d009b61e1622a19f424edbb82",
+          "media_type": "application/json"
+        },
+        "pointer": "/detail"
+      }
+    ]
+  },
+  "official": {
+    "recorded_result": false,
+    "source": {
+      "reference": {
+        "artifact_id": "bbfd79bb55c2ad4683740663f1ec921d8f9a9784c70fb902c0e30bf2f36b3339",
+        "media_type": "application/json"
+      },
+      "pointer": "/task_success"
+    },
+    "definition": "Historical evaluate.reach@1.0.0 checks complete sampled execution and terminal distance only; sampled holding is separately recorded by profile. Never infer component failure solely from overall failure."
+  },
+  "limitations": [
+    "Unavailable independent recomputation does not erase a recorded official result.",
+    "One-step prediction agreement is neither reach nor holding acceptance.",
+    "Recomputed holding uses archived motion samples, not a new backend solve or continuous guarantee."
+  ]
+}

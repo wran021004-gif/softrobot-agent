@@ -1,0 +1,41 @@
+{
+  "version": "mainline3.finish_gate@1.0.0",
+  "passed": false,
+  "gates": {
+    "coordinator_plan": "pass",
+    "two_new_execution_chains": "pass",
+    "two_valid_new_reports": "fail",
+    "coordinator_synthesis": "not_reached",
+    "principal_dispositions": "not_reached",
+    "material_correctness": "not_reached"
+  },
+  "reasons": [
+    "reach-holding-interpretation exhausted its frozen assigned 8 model requests (authorized per-node maximum is 12); last response was a read, not a report.",
+    "timing-integrity-limits response 8 was received (HTTP 200) but not durably saved; original request is unknown, no blind retry or reservation release. Original safe failure omitted exact local code; do not infer its cause."
+  ],
+  "budgets_exhausted": "Reach child assigned bound only. Stage B total and global authorization are not exhausted.",
+  "unknown_calls": [
+    {
+      "run_id": "mainline3-coordinated",
+      "request_id": "investigation-timing-integrity-limits",
+      "execution_id": "863dee47f07040ebb166e13168c519b7",
+      "status": "unknown",
+      "reserved": {
+        "backend_solves": 0,
+        "model_calls": 8,
+        "tool_calls": 16,
+        "wall_s": 2400.0,
+        "worker_calls": 0
+      },
+      "charged": {
+        "backend_solves": 0,
+        "model_calls": 8,
+        "tool_calls": 16,
+        "wall_s": 2400.0,
+        "worker_calls": 0
+      },
+      "receipt": null
+    }
+  ],
+  "success_not_fabricated": true
+}

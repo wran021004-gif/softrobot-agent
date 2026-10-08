@@ -1,0 +1,1405 @@
+{
+  "version": "mainline3.closeout@1.0.0",
+  "activity_id": "mainline3-v1-finish-dcf23687722e",
+  "generated_at": "2026-10-08T12:31:28.097253+00:00",
+  "known_base": "6b4f7d85e4ae937ba6117afde1e47cd9fcc6a36c",
+  "historical_evidence_unchanged": true,
+  "sealed_file_count": 191,
+  "old_activity_accounting": {
+    "project": {
+      "authorization_source": "evidence/research_disposition_facts_20261008/stages/authorization.json; phase reuse",
+      "budget": {
+        "backend_solves": 0,
+        "model_calls": 8,
+        "tool_calls": 128,
+        "wall_s": 2400.0,
+        "worker_calls": 0
+      },
+      "contract_version": "1.0.0",
+      "exclusive_resources": {},
+      "grant_id": "mainline3-v1-facts-5b50c31fc0f0-reuse",
+      "project_id": "mainline3-v1-facts-5b50c31fc0f0-reuse",
+      "purpose": "development"
+    },
+    "ledger": {
+      "limit": {
+        "backend_solves": 0,
+        "model_calls": 8,
+        "tool_calls": 128,
+        "wall_s": 2400.0,
+        "worker_calls": 0
+      },
+      "used": {
+        "tool_calls": 12,
+        "model_calls": 4,
+        "backend_solves": 0,
+        "worker_calls": 0,
+        "wall_s": 227.81399999998393
+      },
+      "remaining": {
+        "backend_solves": 0,
+        "model_calls": 4,
+        "tool_calls": 116,
+        "wall_s": 2172.186000000016,
+        "worker_calls": 0
+      },
+      "occupied": {}
+    },
+    "sessions": {
+      "mainline3-reuse": "stopped",
+      "mainline3-reuse-repair1": "stopped",
+      "mainline3-reuse-repair2": "stopped"
+    }
+  },
+  "old_mismatch_audit": {
+    "path": "evidence/research_disposition_facts_20261008/specific_mismatches.json",
+    "sha256": "2ca633147c968d05579b2f8248184f62ed2c6f6338e6a622589e096f174bc7d2",
+    "classification_counts": {
+      "exact_report_fact": 34,
+      "new_fact_absent_from_report": 6
+    }
+  },
+  "A": {
+    "status": "passed",
+    "gate": {
+      "version": "mainline3.finish_gate@1.0.0",
+      "frozen_manifest_identity": "4662bd5894dfa38a5c063e4dd2a196662db0c56957eeed73032f8f61afc88bf8",
+      "bundle_identity": "912e649fd77dd44261bb4c1ce6a7cfcd88e2e0fc11bc45e93123c0fb9e1ec156",
+      "gates": {
+        "immutable_archive": "pass",
+        "bounded_accounting": "pass",
+        "actual_provider": "pass",
+        "approved_settings_and_wire_capacity": "pass",
+        "formal_dispositions": "pass",
+        "material_correctness": "pass",
+        "necessary_read_followup": "pass",
+        "node_bounds": "pass",
+        "historical_handoff": "pass"
+      },
+      "passed": true,
+      "necessary_report_read_closures": [
+        {
+          "target": {
+            "investigation_id": "reach-question",
+            "report": {
+              "artifact_id": "83a7c6d7daf53191cdae94add80da47df813e34f066619d01635c48103eea8f1",
+              "media_type": "application/json"
+            }
+          },
+          "read_sequences": [
+            33,
+            72,
+            79
+          ],
+          "followup_send_sequences": [
+            34,
+            41,
+            73,
+            73
+          ]
+        },
+        {
+          "target": {
+            "investigation_id": "timing-question",
+            "report": {
+              "artifact_id": "714d62810b34966ad07259793c10d96c7676f35ffee2ea5b6352adb513f6fbff",
+              "media_type": "application/json"
+            }
+          },
+          "read_sequences": [
+            40
+          ],
+          "followup_send_sequences": [
+            41
+          ]
+        }
+      ],
+      "usage": {
+        "tool_calls": 12,
+        "model_calls": 9,
+        "backend_solves": 0,
+        "worker_calls": 0,
+        "wall_s": 549.8429999999353
+      },
+      "unknown_reservations": [],
+      "material_review": {
+        "report": {
+          "artifact_id": "88b3d7e6dea9408dc0e313c25ed921b3ce61f4de39877f02e0a1042e5ad4e809",
+          "media_type": "application/json"
+        },
+        "material_correctness": "pass",
+        "version": "material_components@2.0.0",
+        "reviewer": "Independent Codex source and claim review; no provider judge",
+        "timestamp": "2026-10-08T12:05:52.110406+00:00",
+        "decision_coverage": [
+          "reach-question",
+          "timing-question"
+        ],
+        "claim_reviews": {
+          "reach": [
+            "Identity fields match original execution.",
+            "Exact terminal geometry and evaluator-bound view support the recorded failed reach; official false is not erased.",
+            "Sampled window position and speed fail their distinct bound criteria; no continuous guarantee.",
+            "One-step aligned predictions are correctly limited and do not establish reach/holding."
+          ],
+          "timing": [
+            "Identity and recorded validity match.",
+            "Numeric period/update/duration/computation/deadline values match archived record; no bottleneck cause adopted.",
+            "Recorded real_time_demonstrated false supports withholding deployment-performance claim.",
+            "Absence of inline clock semantics and reference-only objects is confirmed in the chosen root; unknown claims are confined to unread source contents, not absence throughout the repository."
+          ]
+        },
+        "nonblocking_wording": [
+          "The historical report says units not stated, while _s field names conventionally denote seconds. This overly cautious wording does not change any selected value, observed deadline/false flag, outcome or next action; units and accounting are independently fixed in the delivery metric view.",
+          "Raw criterion artifacts remain unread by model, but the model explicitly relies on the available deterministic criterion view for recorded reach/holding; it does not turn unavailable raw recomputation into success."
+        ],
+        "blocking_issues": [],
+        "consequences": "Accept narrow descriptive subsets only, not full old report conclusions or causal/global/real-robot claims. Legitimate conservative unknowns do not prevent interface progression.",
+        "source_chain_review": "Selected report and supplemental handles remain distinct and bind to validated source paths, exact values and execution; no model decision added by expansion."
+      },
+      "no_scientific_conclusion_required": true
+    },
+    "accounting": {
+      "actual_model_requests": 9,
+      "saved_provider_responses": 9,
+      "provider_tokens_known_sum": {
+        "prompt_tokens": 289205,
+        "completion_tokens": 122266,
+        "total_tokens": 411471
+      },
+      "provider_tokens_missing_responses": 0,
+      "money_amount": null,
+      "money_status": "Supplier invoice absent; do not estimate or label unknown response free",
+      "ledger_charged": {
+        "tool_calls": 12,
+        "model_calls": 9,
+        "backend_solves": 0,
+        "worker_calls": 0,
+        "wall_s": 549.8429999999353
+      },
+      "actual_project_tools_observed": 12,
+      "tool_accounting": "Observed public operations plus investigator read attempts; unknown call reservation remains conservatively charged, not released.",
+      "paid_corrections": 4,
+      "correction_records": [
+        {
+          "sequence": 26,
+          "feedback": {
+            "artifact_id": "62340a209e257c98e28cd23d635a3b01222fcb9be24c4a9972faf8d3da20458e",
+            "media_type": "application/json"
+          },
+          "content": {
+            "error": "INVALID_UNEXECUTED_REPORT",
+            "error_routing": {
+              "action": "precise_feedback_with_same_node_limits",
+              "automatic_transport_retry": false,
+              "category": "model_protocol",
+              "cost_owner": "Actual requests remain charged to original stage and node; no refunds. Local repair is engineering time.",
+              "paid_correction_eligible": true,
+              "version": "research.error_routing@1.0.0"
+            },
+            "issues": [
+              {
+                "code": "EXACTLY_ONE_NATIVE_TOOL_CALL_REQUIRED"
+              }
+            ],
+            "requirement": "Resubmit the complete advertised investigation_return. Principal dispositions select catalog handles; supporting_facts use report handles, additional_support uses explicitly principal supplemental handles, scope declares applicability separately. Projection is extraction only. Each issue identifies the failed decision position and legal structure; choose conclusions yourself. No disposition was executed. Current report/evidence and original permissions, counters and deadline remain in force; complete prior responses are archived."
+          }
+        },
+        {
+          "sequence": 54,
+          "feedback": {
+            "artifact_id": "ff40a2e7c909faeed016d80b0ea8f68e3a8c3cfd0f46cdee7db8c1733f10643c",
+            "media_type": "application/json"
+          },
+          "content": {
+            "error": "INVALID_UNEXECUTED_REPORT",
+            "error_routing": {
+              "action": "precise_feedback_with_same_node_limits",
+              "automatic_transport_retry": false,
+              "category": "model_protocol",
+              "cost_owner": "Actual requests remain charged to original stage and node; no refunds. Local repair is engineering time.",
+              "paid_correction_eligible": true,
+              "version": "research.error_routing@1.0.0"
+            },
+            "issues": [
+              {
+                "inspection": "Exact input passed existing guard; archived response and formal output were inspected locally first. This new request genuinely needs protocol output and spends a paid correction.",
+                "legal": "Same advertised investigation_return; a small supported adopted subset, concrete defer, or reject is valid. No required scientific verdict.",
+                "path": "/choices/0",
+                "query": {
+                  "byte_limit": 4096,
+                  "limit": 3000,
+                  "offset": 0,
+                  "pointer": "/choices/0/message/reasoning_content",
+                  "reference": {
+                    "artifact_id": "2139e4c45d4bc42bd975237909ac85b416c73a33d6461daea823923b314cc57d",
+                    "media_type": "application/json"
+                  }
+                },
+                "reason": "Confirmed finish_reason=length; all 32768 completion tokens were reasoning; no native formal decision exists to expand or revalidate."
+              }
+            ],
+            "requirement": "Resubmit the complete advertised investigation_return. Principal dispositions select catalog handles; supporting_facts use report handles, additional_support uses explicitly principal supplemental handles, scope declares applicability separately. Projection is extraction only. Each issue identifies the failed decision position and legal structure; choose conclusions yourself. No disposition was executed. Current report/evidence and original permissions, counters and deadline remain in force; complete prior responses are archived."
+          }
+        },
+        {
+          "sequence": 65,
+          "feedback": {
+            "artifact_id": "ab9bfcf5aededb27dacc6699e36bedb8bf88fd4b929525af5efe206767baf7a8",
+            "media_type": "application/json"
+          },
+          "content": {
+            "error": "INVALID_UNEXECUTED_REPORT",
+            "error_routing": {
+              "action": "precise_feedback_with_same_node_limits",
+              "automatic_transport_retry": false,
+              "category": "model_protocol",
+              "cost_owner": "Actual requests remain charged to original stage and node; no refunds. Local repair is engineering time.",
+              "paid_correction_eligible": true,
+              "version": "research.error_routing@1.0.0"
+            },
+            "issues": [
+              {
+                "code": "ADOPTED_CLAIM_SCOPE_SOURCE_MISMATCH"
+              }
+            ],
+            "requirement": "Resubmit the complete advertised investigation_return. Principal dispositions select catalog handles; supporting_facts use report handles, additional_support uses explicitly principal supplemental handles, scope declares applicability separately. Projection is extraction only. Each issue identifies the failed decision position and legal structure; choose conclusions yourself. No disposition was executed. Current report/evidence and original permissions, counters and deadline remain in force; complete prior responses are archived."
+          }
+        },
+        {
+          "sequence": 104,
+          "feedback": {
+            "artifact_id": "ccd975ec37138d2ab5b50cdb74f76231a96be0e313180c16808d6dc91bed323b",
+            "media_type": "application/json"
+          },
+          "content": {
+            "error": "INVALID_UNEXECUTED_REPORT",
+            "error_routing": {
+              "action": "precise_feedback_with_same_node_limits",
+              "automatic_transport_retry": false,
+              "category": "model_protocol",
+              "cost_owner": "Actual requests remain charged to original stage and node; no refunds. Local repair is engineering time.",
+              "paid_correction_eligible": true,
+              "version": "research.error_routing@1.0.0"
+            },
+            "issues": [
+              {
+                "failure_key": "report:714d62810b34966ad07259793c10d96c7676f35ffee2ea5b6352adb513f6fbff",
+                "legal": {
+                  "expected": [
+                    "reach-question",
+                    "timing-question"
+                  ],
+                  "missing": [
+                    "timing-question"
+                  ],
+                  "structure": "Exactly one formal accept/defer/reject disposition per declared report; choose decisions yourself."
+                },
+                "path": "/dispositions",
+                "reason": "missing, duplicate or foreign formal disposition target",
+                "selection": [
+                  "reach-question"
+                ]
+              }
+            ],
+            "requirement": "Resubmit the complete advertised investigation_return. Principal dispositions select catalog handles; supporting_facts use report handles, additional_support uses explicitly principal supplemental handles, scope declares applicability separately. Projection is extraction only. Each issue identifies the failed decision position and legal structure; choose conclusions yourself. No disposition was executed. Current report/evidence and original permissions, counters and deadline remain in force; complete prior responses are archived."
+          }
+        }
+      ],
+      "unknown_calls": [],
+      "application_segments": [
+        {
+          "file": "reuse_lifecycle.json",
+          "application_wall_s": 226.28099999998813,
+          "ended_at": "2026-10-08T11:33:56.294662+00:00",
+          "unknown_reservations": {}
+        },
+        {
+          "file": "reuse_recovery1_lifecycle.json",
+          "application_wall_s": 205.07800000000861,
+          "ended_at": "2026-10-08T11:41:49.089605+00:00",
+          "unknown_reservations": {}
+        },
+        {
+          "file": "reuse_recovery2_lifecycle.json",
+          "application_wall_s": 358.5779999999795,
+          "ended_at": "2026-10-08T11:55:19.653997+00:00",
+          "unknown_reservations": {}
+        },
+        {
+          "file": "reuse_recovery3_lifecycle.json",
+          "application_wall_s": 132.0,
+          "ended_at": "2026-10-08T12:05:58.587240+00:00",
+          "unknown_reservations": {}
+        }
+      ],
+      "application_active_segments_s": 921.9369999999763,
+      "nodes": {
+        "principal-historical-v2": {
+          "status": "completed",
+          "started_unix": 1791459015.4161303,
+          "original_deadline_unix": 1791462615.4161303,
+          "assigned_budget": {
+            "backend_solves": 0,
+            "model_calls": 12,
+            "tool_calls": 22,
+            "wall_s": 3600.0,
+            "worker_calls": 0
+          },
+          "usage": {
+            "backend_solves": 0,
+            "model_calls": 9,
+            "tool_calls": 4,
+            "wall_s": 0.0,
+            "worker_calls": 0
+          },
+          "progress": {
+            "actual_usage_known": true,
+            "code_commit": "dd45e0d89c7c41f2d4f51a064ea5d88c17b45aee",
+            "code_worktree_dirty": true,
+            "dependency_identity": "9468d848e04bb84644cd2f66ffaf6b2092357c8d642b955f27b0be981cb07a83",
+            "elapsed_s": 52.390999999974156,
+            "grant_id": "mainline3-v1-finish-dcf23687722e-reuse",
+            "http_status": 200,
+            "project_id": "mainline3-v1-finish-dcf23687722e-reuse",
+            "provider_request_id": null,
+            "received_responses": 1,
+            "report_saved": true,
+            "response_body_received": true,
+            "response_received": true,
+            "response_saved": true,
+            "saved_responses": 1,
+            "settlement_completed": true,
+            "stage": "settlement",
+            "transport_attempted": true,
+            "transport_callable_invocations": 1,
+            "turn": 0,
+            "valid_report": true,
+            "version": "investigation_progress@1.0.0"
+          },
+          "result": {
+            "artifact_id": "88b3d7e6dea9408dc0e313c25ed921b3ce61f4de39877f02e0a1042e5ad4e809",
+            "media_type": "application/json"
+          },
+          "reason": "INVESTIGATION_FAILED_AT_REQUEST_PREPARATION"
+        }
+      },
+      "provider_usage_details": [
+        {
+          "sequence": 23,
+          "request_id": "investigation-principal-historical-v2",
+          "response": {
+            "artifact_id": "f4eff30e11c79abd8846ea2f3eb3b4aa585bd90c13b2e4070d96cdb7a045b99a",
+            "media_type": "application/json"
+          },
+          "provider_usage": {
+            "completion_tokens": 284,
+            "completion_tokens_details": {
+              "reasoning_tokens": 51
+            },
+            "prompt_cache_hit_tokens": 896,
+            "prompt_cache_miss_tokens": 23331,
+            "prompt_tokens": 24227,
+            "prompt_tokens_details": {
+              "cached_tokens": 896
+            },
+            "total_tokens": 24511
+          }
+        },
+        {
+          "sequence": 30,
+          "request_id": "investigation-principal-historical-v2",
+          "response": {
+            "artifact_id": "5cf06772dd137555adc9e6c84b51c802cd277737aa9eff4be7120868e88b280b",
+            "media_type": "application/json"
+          },
+          "provider_usage": {
+            "completion_tokens": 489,
+            "completion_tokens_details": {
+              "reasoning_tokens": 354
+            },
+            "prompt_cache_hit_tokens": 2944,
+            "prompt_cache_miss_tokens": 21932,
+            "prompt_tokens": 24876,
+            "prompt_tokens_details": {
+              "cached_tokens": 2944
+            },
+            "total_tokens": 25365
+          }
+        },
+        {
+          "sequence": 37,
+          "request_id": "investigation-principal-historical-v2",
+          "response": {
+            "artifact_id": "fad1fce18d949790ffc58a71995a3ac8d949d97549cc7fdf4ac533476ccc6c25",
+            "media_type": "application/json"
+          },
+          "provider_usage": {
+            "completion_tokens": 15069,
+            "completion_tokens_details": {
+              "reasoning_tokens": 14919
+            },
+            "prompt_cache_hit_tokens": 2944,
+            "prompt_cache_miss_tokens": 26062,
+            "prompt_tokens": 29006,
+            "prompt_tokens_details": {
+              "cached_tokens": 2944
+            },
+            "total_tokens": 44075
+          }
+        },
+        {
+          "sequence": 44,
+          "request_id": "investigation-principal-historical-v2",
+          "response": {
+            "artifact_id": "2139e4c45d4bc42bd975237909ac85b416c73a33d6461daea823923b314cc57d",
+            "media_type": "application/json"
+          },
+          "provider_usage": {
+            "completion_tokens": 32768,
+            "completion_tokens_details": {
+              "reasoning_tokens": 32768
+            },
+            "prompt_cache_hit_tokens": 6784,
+            "prompt_cache_miss_tokens": 24769,
+            "prompt_tokens": 31553,
+            "prompt_tokens_details": {
+              "cached_tokens": 6784
+            },
+            "total_tokens": 64321
+          }
+        },
+        {
+          "sequence": 61,
+          "request_id": "investigation-principal-historical-v2-received-1",
+          "response": {
+            "artifact_id": "158d06b50982c89ffab26bb750d6427d02e6e20ae4e12a8645b5d876961c31a0",
+            "media_type": "application/json"
+          },
+          "provider_usage": {
+            "completion_tokens": 14432,
+            "completion_tokens_details": {
+              "reasoning_tokens": 10716
+            },
+            "prompt_cache_hit_tokens": 3840,
+            "prompt_cache_miss_tokens": 27406,
+            "prompt_tokens": 31246,
+            "prompt_tokens_details": {
+              "cached_tokens": 3840
+            },
+            "total_tokens": 45678
+          }
+        },
+        {
+          "sequence": 69,
+          "request_id": "investigation-principal-historical-v2-received-1",
+          "response": {
+            "artifact_id": "dc6c22ba6bd2613aa6fe78be0e2e785f5b8b982e01b52b7b4b89df5b7ba2c691",
+            "media_type": "application/json"
+          },
+          "provider_usage": {
+            "completion_tokens": 15890,
+            "completion_tokens_details": {
+              "reasoning_tokens": 15755
+            },
+            "prompt_cache_hit_tokens": 3072,
+            "prompt_cache_miss_tokens": 33326,
+            "prompt_tokens": 36398,
+            "prompt_tokens_details": {
+              "cached_tokens": 3072
+            },
+            "total_tokens": 52288
+          }
+        },
+        {
+          "sequence": 76,
+          "request_id": "investigation-principal-historical-v2-received-1",
+          "response": {
+            "artifact_id": "98601536528fbb9666ff3d87db2b3523461bdaf9c1e4d331df1779309d027762",
+            "media_type": "application/json"
+          },
+          "provider_usage": {
+            "completion_tokens": 17982,
+            "completion_tokens_details": {
+              "reasoning_tokens": 17831
+            },
+            "prompt_cache_hit_tokens": 3072,
+            "prompt_cache_miss_tokens": 37667,
+            "prompt_tokens": 40739,
+            "prompt_tokens_details": {
+              "cached_tokens": 3072
+            },
+            "total_tokens": 58721
+          }
+        },
+        {
+          "sequence": 92,
+          "request_id": "investigation-principal-historical-v2-local-2",
+          "response": {
+            "artifact_id": "2cdf8f4e7abf01ccb1e18e408e0116bc9f8149ff058a42d5477311bf656da1e6",
+            "media_type": "application/json"
+          },
+          "provider_usage": {
+            "completion_tokens": 14097,
+            "completion_tokens_details": {
+              "reasoning_tokens": 10080
+            },
+            "prompt_cache_hit_tokens": 3840,
+            "prompt_cache_miss_tokens": 31800,
+            "prompt_tokens": 35640,
+            "prompt_tokens_details": {
+              "cached_tokens": 3840
+            },
+            "total_tokens": 49737
+          }
+        },
+        {
+          "sequence": 111,
+          "request_id": "investigation-principal-historical-v2-protocol-3",
+          "response": {
+            "artifact_id": "6fc02264d4bb3bc778c149c6bc76145dcd8271e223ff7b045ba96c03c13a0fa6",
+            "media_type": "application/json"
+          },
+          "provider_usage": {
+            "completion_tokens": 11255,
+            "completion_tokens_details": {
+              "reasoning_tokens": 4081
+            },
+            "prompt_cache_hit_tokens": 3840,
+            "prompt_cache_miss_tokens": 31680,
+            "prompt_tokens": 35520,
+            "prompt_tokens_details": {
+              "cached_tokens": 3840
+            },
+            "total_tokens": 46775
+          }
+        }
+      ]
+    }
+  },
+  "B": {
+    "status": "blocked",
+    "gate": {
+      "version": "mainline3.finish_gate@1.0.0",
+      "passed": false,
+      "gates": {
+        "coordinator_plan": "pass",
+        "two_new_execution_chains": "pass",
+        "two_valid_new_reports": "fail",
+        "coordinator_synthesis": "not_reached",
+        "principal_dispositions": "not_reached",
+        "material_correctness": "not_reached"
+      },
+      "reasons": [
+        "reach-holding-interpretation exhausted its frozen assigned 8 model requests (authorized per-node maximum is 12); last response was a read, not a report.",
+        "timing-integrity-limits response 8 was received (HTTP 200) but not durably saved; original request is unknown, no blind retry or reservation release. Original safe failure omitted exact local code; do not infer its cause."
+      ],
+      "budgets_exhausted": "Reach child assigned bound only. Stage B total and global authorization are not exhausted.",
+      "unknown_calls": [
+        {
+          "run_id": "mainline3-coordinated",
+          "request_id": "investigation-timing-integrity-limits",
+          "execution_id": "863dee47f07040ebb166e13168c519b7",
+          "status": "unknown",
+          "reserved": {
+            "backend_solves": 0,
+            "model_calls": 8,
+            "tool_calls": 16,
+            "wall_s": 2400.0,
+            "worker_calls": 0
+          },
+          "charged": {
+            "backend_solves": 0,
+            "model_calls": 8,
+            "tool_calls": 16,
+            "wall_s": 2400.0,
+            "worker_calls": 0
+          },
+          "receipt": null
+        }
+      ],
+      "success_not_fabricated": true
+    },
+    "accounting": {
+      "actual_model_requests": 24,
+      "saved_provider_responses": 23,
+      "provider_tokens_known_sum": {
+        "prompt_tokens": 191863,
+        "completion_tokens": 42643,
+        "total_tokens": 234506
+      },
+      "provider_tokens_missing_responses": 1,
+      "money_amount": null,
+      "money_status": "Supplier invoice absent; do not estimate or label unknown response free",
+      "ledger_charged": {
+        "tool_calls": 36,
+        "model_calls": 24,
+        "backend_solves": 0,
+        "worker_calls": 0,
+        "wall_s": 2605.7660000000033
+      },
+      "actual_project_tools_observed": 25,
+      "tool_accounting": "Observed public operations plus investigator read attempts; unknown call reservation remains conservatively charged, not released.",
+      "paid_corrections": 2,
+      "correction_records": [
+        {
+          "sequence": 151,
+          "feedback": {
+            "artifact_id": "62340a209e257c98e28cd23d635a3b01222fcb9be24c4a9972faf8d3da20458e",
+            "media_type": "application/json"
+          },
+          "content": {
+            "error": "INVALID_UNEXECUTED_REPORT",
+            "error_routing": {
+              "action": "precise_feedback_with_same_node_limits",
+              "automatic_transport_retry": false,
+              "category": "model_protocol",
+              "cost_owner": "Actual requests remain charged to original stage and node; no refunds. Local repair is engineering time.",
+              "paid_correction_eligible": true,
+              "version": "research.error_routing@1.0.0"
+            },
+            "issues": [
+              {
+                "code": "EXACTLY_ONE_NATIVE_TOOL_CALL_REQUIRED"
+              }
+            ],
+            "requirement": "Resubmit the complete advertised investigation_return. Principal dispositions select catalog handles; supporting_facts use report handles, additional_support uses explicitly principal supplemental handles, scope declares applicability separately. Projection is extraction only. Each issue identifies the failed decision position and legal structure; choose conclusions yourself. No disposition was executed. Current report/evidence and original permissions, counters and deadline remain in force; complete prior responses are archived."
+          }
+        },
+        {
+          "sequence": 173,
+          "feedback": {
+            "artifact_id": "f6652717dcdb7a5aa04c00437d1cd2ff8a16f2c12b0cf9b6a942bc846401b848",
+            "media_type": "application/json"
+          },
+          "content": {
+            "error": "INVALID_UNEXECUTED_REPORT",
+            "error_routing": {
+              "action": "precise_feedback_with_same_node_limits",
+              "automatic_transport_retry": false,
+              "category": "model_protocol",
+              "cost_owner": "Actual requests remain charged to original stage and node; no refunds. Local repair is engineering time.",
+              "paid_correction_eligible": true,
+              "version": "research.error_routing@1.0.0"
+            },
+            "issues": [
+              {
+                "code": "RETURN_SOURCE_IDENTITY_MISMATCH"
+              }
+            ],
+            "requirement": "Resubmit the complete advertised investigation_return. Principal dispositions select catalog handles; supporting_facts use report handles, additional_support uses explicitly principal supplemental handles, scope declares applicability separately. Projection is extraction only. Each issue identifies the failed decision position and legal structure; choose conclusions yourself. No disposition was executed. Current report/evidence and original permissions, counters and deadline remain in force; complete prior responses are archived."
+          }
+        }
+      ],
+      "unknown_calls": [
+        {
+          "run_id": "mainline3-coordinated",
+          "request_id": "investigation-timing-integrity-limits",
+          "execution_id": "863dee47f07040ebb166e13168c519b7",
+          "status": "unknown",
+          "reserved": {
+            "backend_solves": 0,
+            "model_calls": 8,
+            "tool_calls": 16,
+            "wall_s": 2400.0,
+            "worker_calls": 0
+          },
+          "charged": {
+            "backend_solves": 0,
+            "model_calls": 8,
+            "tool_calls": 16,
+            "wall_s": 2400.0,
+            "worker_calls": 0
+          },
+          "receipt": null
+        }
+      ],
+      "application_segments": [
+        {
+          "file": "coordinated_lifecycle.json",
+          "application_wall_s": 245.60899999999674,
+          "ended_at": "2026-10-08T12:10:32.756687+00:00",
+          "unknown_reservations": {}
+        }
+      ],
+      "application_active_segments_s": 245.60899999999674,
+      "nodes": {
+        "coordinator-plan": {
+          "status": "completed",
+          "started_unix": 1791461188.1406956,
+          "original_deadline_unix": 1791463588.1406956,
+          "assigned_budget": {
+            "backend_solves": 0,
+            "model_calls": 8,
+            "tool_calls": 16,
+            "wall_s": 2400.0,
+            "worker_calls": 0
+          },
+          "usage": {
+            "backend_solves": 0,
+            "model_calls": 8,
+            "tool_calls": 7,
+            "wall_s": 0.0,
+            "worker_calls": 0
+          },
+          "progress": {
+            "actual_usage_known": true,
+            "code_commit": "dd45e0d89c7c41f2d4f51a064ea5d88c17b45aee",
+            "code_worktree_dirty": true,
+            "dependency_identity": "9468d848e04bb84644cd2f66ffaf6b2092357c8d642b955f27b0be981cb07a83",
+            "elapsed_s": 107.28100000001723,
+            "grant_id": "mainline3-v1-finish-dcf23687722e-coordinated",
+            "http_status": 200,
+            "project_id": "mainline3-v1-finish-dcf23687722e-coordinated",
+            "provider_request_id": null,
+            "received_responses": 8,
+            "report_saved": true,
+            "response_body_received": true,
+            "response_received": true,
+            "response_saved": true,
+            "saved_responses": 8,
+            "settlement_completed": true,
+            "stage": "settlement",
+            "transport_attempted": true,
+            "transport_callable_invocations": 8,
+            "turn": 7,
+            "valid_report": true,
+            "version": "investigation_progress@1.0.0"
+          },
+          "result": {
+            "artifact_id": "c0f8698940153ebe884b204135f3841cb519b30e8fc7212b42662412c1bcc8e0",
+            "media_type": "application/json"
+          },
+          "reason": null
+        },
+        "reach-holding-interpretation": {
+          "status": "incomplete",
+          "started_unix": 1791461299.0460052,
+          "original_deadline_unix": 1791463699.0460052,
+          "assigned_budget": {
+            "backend_solves": 0,
+            "model_calls": 8,
+            "tool_calls": 16,
+            "wall_s": 2400.0,
+            "worker_calls": 0
+          },
+          "usage": {
+            "backend_solves": 0,
+            "model_calls": 8,
+            "tool_calls": 8,
+            "wall_s": 0.0,
+            "worker_calls": 0
+          },
+          "progress": {
+            "actual_usage_known": true,
+            "code_commit": "dd45e0d89c7c41f2d4f51a064ea5d88c17b45aee",
+            "code_worktree_dirty": true,
+            "dependency_identity": "9468d848e04bb84644cd2f66ffaf6b2092357c8d642b955f27b0be981cb07a83",
+            "elapsed_s": 94.95300000000861,
+            "grant_id": "mainline3-v1-finish-dcf23687722e-coordinated",
+            "http_status": 200,
+            "project_id": "mainline3-v1-finish-dcf23687722e-coordinated",
+            "provider_request_id": null,
+            "received_responses": 8,
+            "report_saved": true,
+            "response_body_received": true,
+            "response_received": true,
+            "response_saved": true,
+            "saved_responses": 8,
+            "settlement_completed": true,
+            "stage": "settlement",
+            "transport_attempted": true,
+            "transport_callable_invocations": 8,
+            "turn": 8,
+            "valid_report": true,
+            "version": "investigation_progress@1.0.0"
+          },
+          "result": {
+            "artifact_id": "fb6dd15a70e20739473c7bb481575ca75b84578fdeac663564e8941eb93b5a85",
+            "media_type": "application/json"
+          },
+          "reason": null
+        },
+        "timing-integrity-limits": {
+          "status": "unconfirmed",
+          "started_unix": 1791461302.3053033,
+          "original_deadline_unix": 1791463702.3053033,
+          "assigned_budget": {
+            "backend_solves": 0,
+            "model_calls": 8,
+            "tool_calls": 16,
+            "wall_s": 2400.0,
+            "worker_calls": 0
+          },
+          "usage": {
+            "backend_solves": 0,
+            "model_calls": 8,
+            "tool_calls": 5,
+            "wall_s": 0.0,
+            "worker_calls": 0
+          },
+          "progress": {
+            "actual_usage_known": false,
+            "code_commit": "dd45e0d89c7c41f2d4f51a064ea5d88c17b45aee",
+            "code_worktree_dirty": true,
+            "dependency_identity": "9468d848e04bb84644cd2f66ffaf6b2092357c8d642b955f27b0be981cb07a83",
+            "elapsed_s": 130.09400000001187,
+            "grant_id": "mainline3-v1-finish-dcf23687722e-coordinated",
+            "http_status": 200,
+            "project_id": "mainline3-v1-finish-dcf23687722e-coordinated",
+            "provider_request_id": null,
+            "received_responses": 8,
+            "report_saved": false,
+            "response_body_received": true,
+            "response_received": true,
+            "response_saved": false,
+            "saved_responses": 7,
+            "settlement_completed": false,
+            "stage": "response_evidence_save",
+            "transport_attempted": true,
+            "transport_callable_invocations": 8,
+            "turn": 7,
+            "valid_report": false
+          },
+          "result": null,
+          "reason": "INVESTIGATION_FAILED_AT_RESPONSE_EVIDENCE_SAVE"
+        }
+      },
+      "provider_usage_details": [
+        {
+          "sequence": 11,
+          "request_id": "investigation-coordinator-plan",
+          "response": {
+            "artifact_id": "50649a9514a74dc22b8f0ab7116964c812d75b3d9a085a2b09e2043ee3220a59",
+            "media_type": "application/json"
+          },
+          "provider_usage": {
+            "completion_tokens": 205,
+            "completion_tokens_details": {
+              "reasoning_tokens": 52
+            },
+            "prompt_cache_hit_tokens": 128,
+            "prompt_cache_miss_tokens": 4528,
+            "prompt_tokens": 4656,
+            "prompt_tokens_details": {
+              "cached_tokens": 128
+            },
+            "total_tokens": 4861
+          }
+        },
+        {
+          "sequence": 18,
+          "request_id": "investigation-coordinator-plan",
+          "response": {
+            "artifact_id": "f03858b025b16a65fa937228b1dab629e441e660b70e457ff5fbb80963fcf39b",
+            "media_type": "application/json"
+          },
+          "provider_usage": {
+            "completion_tokens": 510,
+            "completion_tokens_details": {
+              "reasoning_tokens": 373
+            },
+            "prompt_cache_hit_tokens": 2816,
+            "prompt_cache_miss_tokens": 3156,
+            "prompt_tokens": 5972,
+            "prompt_tokens_details": {
+              "cached_tokens": 2816
+            },
+            "total_tokens": 6482
+          }
+        },
+        {
+          "sequence": 25,
+          "request_id": "investigation-coordinator-plan",
+          "response": {
+            "artifact_id": "55437fbaf31921e24fb7ecf097550507ea3851bba4fa64f944eded2d59f92352",
+            "media_type": "application/json"
+          },
+          "provider_usage": {
+            "completion_tokens": 952,
+            "completion_tokens_details": {
+              "reasoning_tokens": 804
+            },
+            "prompt_cache_hit_tokens": 3968,
+            "prompt_cache_miss_tokens": 3139,
+            "prompt_tokens": 7107,
+            "prompt_tokens_details": {
+              "cached_tokens": 3968
+            },
+            "total_tokens": 8059
+          }
+        },
+        {
+          "sequence": 32,
+          "request_id": "investigation-coordinator-plan",
+          "response": {
+            "artifact_id": "df5e23407e8ebd2ed25bd16241fe9978fad26348f76235d42101b7ab7ee976c9",
+            "media_type": "application/json"
+          },
+          "provider_usage": {
+            "completion_tokens": 930,
+            "completion_tokens_details": {
+              "reasoning_tokens": 780
+            },
+            "prompt_cache_hit_tokens": 4992,
+            "prompt_cache_miss_tokens": 2859,
+            "prompt_tokens": 7851,
+            "prompt_tokens_details": {
+              "cached_tokens": 4992
+            },
+            "total_tokens": 8781
+          }
+        },
+        {
+          "sequence": 39,
+          "request_id": "investigation-coordinator-plan",
+          "response": {
+            "artifact_id": "576c8c4c1026b4ba06f75018c031e75da038f8558aab3a6316eb420b668bd197",
+            "media_type": "application/json"
+          },
+          "provider_usage": {
+            "completion_tokens": 2650,
+            "completion_tokens_details": {
+              "reasoning_tokens": 2477
+            },
+            "prompt_cache_hit_tokens": 5760,
+            "prompt_cache_miss_tokens": 2893,
+            "prompt_tokens": 8653,
+            "prompt_tokens_details": {
+              "cached_tokens": 5760
+            },
+            "total_tokens": 11303
+          }
+        },
+        {
+          "sequence": 46,
+          "request_id": "investigation-coordinator-plan",
+          "response": {
+            "artifact_id": "f71e058076957fff423b12993c617bbfa32822dcf3a877f96ffc3055665ea77d",
+            "media_type": "application/json"
+          },
+          "provider_usage": {
+            "completion_tokens": 691,
+            "completion_tokens_details": {
+              "reasoning_tokens": 482
+            },
+            "prompt_cache_hit_tokens": 6528,
+            "prompt_cache_miss_tokens": 2540,
+            "prompt_tokens": 9068,
+            "prompt_tokens_details": {
+              "cached_tokens": 6528
+            },
+            "total_tokens": 9759
+          }
+        },
+        {
+          "sequence": 53,
+          "request_id": "investigation-coordinator-plan",
+          "response": {
+            "artifact_id": "3adb72a3c9c28c1090c466fa4867237b4537d240aae5f020627df8d209c6444f",
+            "media_type": "application/json"
+          },
+          "provider_usage": {
+            "completion_tokens": 6117,
+            "completion_tokens_details": {
+              "reasoning_tokens": 5946
+            },
+            "prompt_cache_hit_tokens": 6912,
+            "prompt_cache_miss_tokens": 2350,
+            "prompt_tokens": 9262,
+            "prompt_tokens_details": {
+              "cached_tokens": 6912
+            },
+            "total_tokens": 15379
+          }
+        },
+        {
+          "sequence": 60,
+          "request_id": "investigation-coordinator-plan",
+          "response": {
+            "artifact_id": "4757197c4d202ef3a36e0b6e34830bf694869fe9cbcaedfcfef719c288a4d830",
+            "media_type": "application/json"
+          },
+          "provider_usage": {
+            "completion_tokens": 6182,
+            "completion_tokens_details": {
+              "reasoning_tokens": 4657
+            },
+            "prompt_cache_hit_tokens": 7040,
+            "prompt_cache_miss_tokens": 2683,
+            "prompt_tokens": 9723,
+            "prompt_tokens_details": {
+              "cached_tokens": 7040
+            },
+            "total_tokens": 15905
+          }
+        },
+        {
+          "sequence": 85,
+          "request_id": "investigation-reach-holding-interpretation",
+          "response": {
+            "artifact_id": "54b3f58f553c902781d07616fe4247d17d3858bd179f700d86d259d32ffdbaaf",
+            "media_type": "application/json"
+          },
+          "provider_usage": {
+            "completion_tokens": 193,
+            "completion_tokens_details": {
+              "reasoning_tokens": 47
+            },
+            "prompt_cache_hit_tokens": 3584,
+            "prompt_cache_miss_tokens": 1390,
+            "prompt_tokens": 4974,
+            "prompt_tokens_details": {
+              "cached_tokens": 3584
+            },
+            "total_tokens": 5167
+          }
+        },
+        {
+          "sequence": 92,
+          "request_id": "investigation-timing-integrity-limits",
+          "response": {
+            "artifact_id": "58473dd46573b091cc9bb985f362d562030d8e53d8c180e1f7e8659aae99f252",
+            "media_type": "application/json"
+          },
+          "provider_usage": {
+            "completion_tokens": 222,
+            "completion_tokens_details": {
+              "reasoning_tokens": 88
+            },
+            "prompt_cache_hit_tokens": 3584,
+            "prompt_cache_miss_tokens": 1382,
+            "prompt_tokens": 4966,
+            "prompt_tokens_details": {
+              "cached_tokens": 3584
+            },
+            "total_tokens": 5188
+          }
+        },
+        {
+          "sequence": 99,
+          "request_id": "investigation-timing-integrity-limits",
+          "response": {
+            "artifact_id": "9dffc21271fb08bba89503414d140702762bf9b667b9f3ea7e71fc135dfbde37",
+            "media_type": "application/json"
+          },
+          "provider_usage": {
+            "completion_tokens": 330,
+            "completion_tokens_details": {
+              "reasoning_tokens": 186
+            },
+            "prompt_cache_hit_tokens": 2944,
+            "prompt_cache_miss_tokens": 2955,
+            "prompt_tokens": 5899,
+            "prompt_tokens_details": {
+              "cached_tokens": 2944
+            },
+            "total_tokens": 6229
+          }
+        },
+        {
+          "sequence": 106,
+          "request_id": "investigation-reach-holding-interpretation",
+          "response": {
+            "artifact_id": "0d1540b8d154948aca049510f53380231a794e23a9e1e1f36765c9c713652445",
+            "media_type": "application/json"
+          },
+          "provider_usage": {
+            "completion_tokens": 461,
+            "completion_tokens_details": {
+              "reasoning_tokens": 311
+            },
+            "prompt_cache_hit_tokens": 2944,
+            "prompt_cache_miss_tokens": 2963,
+            "prompt_tokens": 5907,
+            "prompt_tokens_details": {
+              "cached_tokens": 2944
+            },
+            "total_tokens": 6368
+          }
+        },
+        {
+          "sequence": 113,
+          "request_id": "investigation-timing-integrity-limits",
+          "response": {
+            "artifact_id": "fd2ffee174974bc266a82f4f1a2793b410cde67cda135e90f3694de1c2be1460",
+            "media_type": "application/json"
+          },
+          "provider_usage": {
+            "completion_tokens": 319,
+            "completion_tokens_details": {
+              "reasoning_tokens": 182
+            },
+            "prompt_cache_hit_tokens": 3584,
+            "prompt_cache_miss_tokens": 3760,
+            "prompt_tokens": 7344,
+            "prompt_tokens_details": {
+              "cached_tokens": 3584
+            },
+            "total_tokens": 7663
+          }
+        },
+        {
+          "sequence": 120,
+          "request_id": "investigation-reach-holding-interpretation",
+          "response": {
+            "artifact_id": "68923c922b47cff3bcbf18398352e18ee47d7aba7c336cf6bcec002cfe1573fd",
+            "media_type": "application/json"
+          },
+          "provider_usage": {
+            "completion_tokens": 1529,
+            "completion_tokens_details": {
+              "reasoning_tokens": 1356
+            },
+            "prompt_cache_hit_tokens": 3584,
+            "prompt_cache_miss_tokens": 3767,
+            "prompt_tokens": 7351,
+            "prompt_tokens_details": {
+              "cached_tokens": 3584
+            },
+            "total_tokens": 8880
+          }
+        },
+        {
+          "sequence": 127,
+          "request_id": "investigation-timing-integrity-limits",
+          "response": {
+            "artifact_id": "093a4e7184d81d6432d2c18bc370732c267f832c49d640a55b53b3592aa0c96e",
+            "media_type": "application/json"
+          },
+          "provider_usage": {
+            "completion_tokens": 813,
+            "completion_tokens_details": {
+              "reasoning_tokens": 653
+            },
+            "prompt_cache_hit_tokens": 4992,
+            "prompt_cache_miss_tokens": 3714,
+            "prompt_tokens": 8706,
+            "prompt_tokens_details": {
+              "cached_tokens": 4992
+            },
+            "total_tokens": 9519
+          }
+        },
+        {
+          "sequence": 134,
+          "request_id": "investigation-reach-holding-interpretation",
+          "response": {
+            "artifact_id": "a3fc7f45431abdec075f99adbd1f17b181f86002f346746b8df57af9cc840bcb",
+            "media_type": "application/json"
+          },
+          "provider_usage": {
+            "completion_tokens": 1228,
+            "completion_tokens_details": {
+              "reasoning_tokens": 1068
+            },
+            "prompt_cache_hit_tokens": 4992,
+            "prompt_cache_miss_tokens": 3717,
+            "prompt_tokens": 8709,
+            "prompt_tokens_details": {
+              "cached_tokens": 4992
+            },
+            "total_tokens": 9937
+          }
+        },
+        {
+          "sequence": 141,
+          "request_id": "investigation-timing-integrity-limits",
+          "response": {
+            "artifact_id": "61a87d8f01df4ae3b0f5834d9c676c62ae765cb8cf1aa0c9fd2d66536bdfcd5b",
+            "media_type": "application/json"
+          },
+          "provider_usage": {
+            "completion_tokens": 1872,
+            "completion_tokens_details": {
+              "reasoning_tokens": 1712
+            },
+            "prompt_cache_hit_tokens": 6272,
+            "prompt_cache_miss_tokens": 2771,
+            "prompt_tokens": 9043,
+            "prompt_tokens_details": {
+              "cached_tokens": 6272
+            },
+            "total_tokens": 10915
+          }
+        },
+        {
+          "sequence": 148,
+          "request_id": "investigation-timing-integrity-limits",
+          "response": {
+            "artifact_id": "15b7c60d711093250a2fd2fb3d41a2450c422274bba8baa5287eda2c55dd8afc",
+            "media_type": "application/json"
+          },
+          "provider_usage": {
+            "completion_tokens": 274,
+            "completion_tokens_details": {
+              "reasoning_tokens": 0
+            },
+            "prompt_cache_hit_tokens": 6528,
+            "prompt_cache_miss_tokens": 3975,
+            "prompt_tokens": 10503,
+            "prompt_tokens_details": {
+              "cached_tokens": 6528
+            },
+            "total_tokens": 10777
+          }
+        },
+        {
+          "sequence": 155,
+          "request_id": "investigation-reach-holding-interpretation",
+          "response": {
+            "artifact_id": "762b3a05e57fc59097aab78866d3fae0431e0c0864e9511ed8c1d92c7c560639",
+            "media_type": "application/json"
+          },
+          "provider_usage": {
+            "completion_tokens": 1131,
+            "completion_tokens_details": {
+              "reasoning_tokens": 985
+            },
+            "prompt_cache_hit_tokens": 6272,
+            "prompt_cache_miss_tokens": 2771,
+            "prompt_tokens": 9043,
+            "prompt_tokens_details": {
+              "cached_tokens": 6272
+            },
+            "total_tokens": 10174
+          }
+        },
+        {
+          "sequence": 162,
+          "request_id": "investigation-reach-holding-interpretation",
+          "response": {
+            "artifact_id": "1e6589feb71eec8322b257086613b9b5af88a9783fa54964a287a622713efde2",
+            "media_type": "application/json"
+          },
+          "provider_usage": {
+            "completion_tokens": 790,
+            "completion_tokens_details": {
+              "reasoning_tokens": 634
+            },
+            "prompt_cache_hit_tokens": 6528,
+            "prompt_cache_miss_tokens": 3966,
+            "prompt_tokens": 10494,
+            "prompt_tokens_details": {
+              "cached_tokens": 6528
+            },
+            "total_tokens": 11284
+          }
+        },
+        {
+          "sequence": 169,
+          "request_id": "investigation-timing-integrity-limits",
+          "response": {
+            "artifact_id": "953995c483c9cce688dbfa4dd9e7254a434ba93de0bd4a9acd6553bb75627e1f",
+            "media_type": "application/json"
+          },
+          "provider_usage": {
+            "completion_tokens": 6874,
+            "completion_tokens_details": {
+              "reasoning_tokens": 2446
+            },
+            "prompt_cache_hit_tokens": 7936,
+            "prompt_cache_miss_tokens": 3473,
+            "prompt_tokens": 11409,
+            "prompt_tokens_details": {
+              "cached_tokens": 7936
+            },
+            "total_tokens": 18283
+          }
+        },
+        {
+          "sequence": 177,
+          "request_id": "investigation-reach-holding-interpretation",
+          "response": {
+            "artifact_id": "19809ef2c16fe7677e54215741043825e6a585d97696fdc054d07630d94bc956",
+            "media_type": "application/json"
+          },
+          "provider_usage": {
+            "completion_tokens": 5426,
+            "completion_tokens_details": {
+              "reasoning_tokens": 5255
+            },
+            "prompt_cache_hit_tokens": 7936,
+            "prompt_cache_miss_tokens": 3998,
+            "prompt_tokens": 11934,
+            "prompt_tokens_details": {
+              "cached_tokens": 7936
+            },
+            "total_tokens": 17360
+          }
+        },
+        {
+          "sequence": 184,
+          "request_id": "investigation-reach-holding-interpretation",
+          "response": {
+            "artifact_id": "a35c5f1318af373ed7c49616218be51cd73c8b154754a8f9f9a8ee03f762ea07",
+            "media_type": "application/json"
+          },
+          "provider_usage": {
+            "completion_tokens": 2944,
+            "completion_tokens_details": {
+              "reasoning_tokens": 2787
+            },
+            "prompt_cache_hit_tokens": 9344,
+            "prompt_cache_miss_tokens": 3945,
+            "prompt_tokens": 13289,
+            "prompt_tokens_details": {
+              "cached_tokens": 9344
+            },
+            "total_tokens": 16233
+          }
+        }
+      ]
+    }
+  },
+  "C": {
+    "status": "not_started",
+    "reason": "Stage B gate failed; dependent scientific execution unauthorized by frozen sequence",
+    "public_tools": 0,
+    "model_requests": 0,
+    "math_operations": 0,
+    "backend_attempts": 0,
+    "fixed_identity_check": {
+      "source": "evidence/research_native_development_v3_20261007/store/artifacts/3ae03b4e4ddac2e5099ae5823fc0dd7dd9d338dfba6b7d435729d4e5ab41665b.json",
+      "source_artifact": "3ae03b4e4ddac2e5099ae5823fc0dd7dd9d338dfba6b7d435729d4e5ab41665b",
+      "manifest": "evidence/research_native_development_v3_20261007/store/sha256_manifest.json",
+      "file_sha256": "3ae03b4e4ddac2e5099ae5823fc0dd7dd9d338dfba6b7d435729d4e5ab41665b",
+      "source_candidate": "batch-396bdbbae02626d3-0",
+      "source_builder": "candidate.family",
+      "source_builder_version": "1.1.0",
+      "source_controller_version": "7.0.0",
+      "candidate_builder": "candidate.family@1.2.0",
+      "controller": "controller.gvs_nmpc@9.0.0",
+      "task_robot_seed_and_v7_recipe_unchanged": true,
+      "changes": {
+        "design/near_routing_radius_scale": 1.01,
+        "design/far_routing_radius_scale": 0.99
+      }
+    },
+    "configuration_identity_only": true
+  },
+  "totals": {
+    "actual_model_requests": 33,
+    "paid_corrections": 6,
+    "actual_project_tools_observed": 37,
+    "conservative_tool_ledger": 48,
+    "conservative_ledger_s": 3155.6089999999385,
+    "implementation_repairs_after_freeze": 5,
+    "new_scientific_operations": 0,
+    "new_backend_attempts": 0,
+    "unknown_supplier_responses": 1,
+    "money_amount": null
+  },
+  "clocks": {
+    "started_unix": 1791457028.0,
+    "absolute_deadline_unix": 1791493028.0,
+    "protected_delivery_cutoff_unix": 1791491228.0,
+    "elapsed_activity_wall_s": 5660.098250865936,
+    "preparation_s": 1982.0190136432648,
+    "engineering_time": "Preparation plus separately recorded repair/review intervals; elapsed activity includes them. Ledger and active application segments are separate measures, neither is an estimate of all engineering time."
+  },
+  "version_one_complete": false,
+  "version_two_entry": "blocked; draft only; no rope-count/layout/segment implementation",
+  "operational_disclosure": "Historical reuse, independent review and 5 implementation repairs with 3 same-node recovery sessions. Not uninterrupted or unattended.",
+  "output_polishing_model_requests": 0
+}
