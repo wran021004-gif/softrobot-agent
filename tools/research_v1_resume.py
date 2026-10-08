@@ -37,6 +37,7 @@ def prepare(out):
     if out.exists():raise ValueError('NEW_AUTHORIZATION_DIRECTORY_REQUIRED')
     cfg=model_configuration(configuration())
     cfg['policy']['model']['parameters']['investigation_contract']='business_fields_v2'
+    cfg['policy']['model']['adapter_version']='7.0.0'
     cfg['policy']['model']['timeout_s']=900.
     identity='mainline3-v1-resume-'+uuid4().hex[:12]
     node={**zero(),'model_calls':8,'tool_calls':12,'wall_s':900.}
@@ -155,13 +156,20 @@ def execute(out,mode):
     prior=dict(coordinated='reuse',fixed='coordinated').get(mode)
     if prior and not read(out/(prior+'_gate.json'))['passed']:raise ValueError('DEPENDENT_GATE_NOT_PASSED')
     root=ROOT/stage['output']
-    if root.exists() or (out/(mode+'_launch.json')).exists():raise ValueError('NO_STAGE_RESTART_OR_COUNTER_RESET')
+    recovery=m.get('preflight_recovery',{}).get(mode)
+    if (out/(mode+'_launch.json')).exists() or (root.exists() and not recovery):raise ValueError('NO_STAGE_RESTART_OR_COUNTER_RESET')
     grant=read(out/(mode+'_grant.json'))
     if digest(grant)!=stage['grant_identity']:raise ValueError('FROZEN_GRANT_CHANGED')
     cfg['run_id']='mainline3-'+mode
     cfg['policy'].update(route=None,budget=stage['project_budget'],allowed_tools=list(stage['tool_bindings']),
         tool_bindings=stage['tool_bindings'],timeout_s=stage['project_budget']['wall_s'],operation_allowances=stage['operation_allowances'])
-    store=Store(root);store.create(grant);host=Host(root,cfg['run_id']);host.create(cfg);host.resume()
+    store=Store(root)
+    if root.exists():
+        with store.connect(True) as db:
+            if db.execute('SELECT COUNT(*) FROM sessions').fetchone()[0] or db.execute('SELECT COUNT(*) FROM calls').fetchone()[0]:raise ValueError('PREFLIGHT_RECOVERY_REQUIRES_NO_STARTED_SESSION_OR_OPERATION')
+        if store.config()['project_id']!=grant['project_id'] or any(store.remaining()['used'].values()) or store.remaining()['occupied']:raise ValueError('PREFLIGHT_RECOVERY_IDENTITY_OR_LEDGER_MISMATCH')
+    else:store.create(grant)
+    host=Host(root,cfg['run_id']);host.create(cfg);host.resume()
     began=time.monotonic();atomic_json(out/(mode+'_launch.json'),dict(timestamp=now(),code_commit=m['code_commit'],model_requests_before=0))
     try:
         if mode!='fixed':

@@ -12,6 +12,7 @@ class Empty(Contract):
 
 
 CONTRACTS = [('platform.empty', '1.0.0', Empty)]
+from tools.investigation_contract import NativeInvestigationParameters
 CONTRACTS += [('platform.' + name, '1.0.0', schema) for name, schema in [
     ('mathematical_model', math_contracts.MathematicalModel),
     ('model_use_assessment', math_contracts.ModelUseAssessment),
@@ -34,6 +35,10 @@ CONTRACTS += [('platform.' + name, '1.0.0', schema) for name, schema in [
     ('diagnostic_report', diagnostic_contracts.DiagnosticReport),
 ]]
 EXTENSIONS = [
+    Extension('deepseek', 'model_adapter', '7.0.0', NativeInvestigationParameters, ModelResponse,
+        'tools.investigation_contract:BusinessFieldsAdapter', 'Native business fields from shared authoritative contracts; historical envelopes remain versioned',
+        sources=('tools/investigation_contract.py','tools/platform_models.py','tools/model_transports/deepseek.py'),
+        capabilities=dict(real_requests=True,text=True,images=False,timeout='network request deadline',cancellation='between requests')),
     Extension('candidate.controller', 'candidate_builder', '1.0.0', Empty, SessionInput,
         'tools.platform_candidates:apply_control', 'Apply existing typed controller parameters',
         sources=('tools/platform_candidates.py', 'schemas/platform_operations.py')),
