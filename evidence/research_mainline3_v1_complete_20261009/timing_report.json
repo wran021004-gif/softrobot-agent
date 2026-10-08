@@ -1,0 +1,379 @@
+{
+  "children": [],
+  "completion": "complete",
+  "counterevidence": [
+    {
+      "pointer": "/real_time_demonstrated",
+      "reference": {
+        "artifact_id": "6903669a345e76c1dd2958ada4d067bfde06d02f102ce017db06c9a241c7dd51",
+        "media_type": "application/json"
+      },
+      "source_identity": {
+        "coordinate_frame": "world",
+        "execution_id": "494deb38d6374deb8f741e96f2430826",
+        "result_type": "free_reach"
+      },
+      "statement": "Recorded real-time demonstration flag is false (the measured run did not demonstrate real time).",
+      "value": false
+    },
+    {
+      "pointer": "/holding/continuous_time_guarantee",
+      "reference": {
+        "artifact_id": "d8b39c99b5595562aa7e7fec23a3f8767cd724537e8988da0ffefbc6bf7abb27",
+        "media_type": "application/json"
+      },
+      "source_identity": {
+        "candidate_id": "proposal-build",
+        "configuration": {
+          "artifact_id": "803e8fb2cda1fa2035f18c2051cb2cb83c4dabf26b13f9391c2a49e1cc1b4f5c",
+          "media_type": "application/json"
+        },
+        "execution_id": "494deb38d6374deb8f741e96f2430826"
+      },
+      "statement": "Recorded holding continuous-time guarantee flag is false; no continuous-time guarantee is present.",
+      "value": false
+    },
+    {
+      "pointer": "/holding/position",
+      "reference": {
+        "artifact_id": "d8b39c99b5595562aa7e7fec23a3f8767cd724537e8988da0ffefbc6bf7abb27",
+        "media_type": "application/json"
+      },
+      "source_identity": {
+        "candidate_id": "proposal-build",
+        "configuration": {
+          "artifact_id": "803e8fb2cda1fa2035f18c2051cb2cb83c4dabf26b13f9391c2a49e1cc1b4f5c",
+          "media_type": "application/json"
+        },
+        "execution_id": "494deb38d6374deb8f741e96f2430826"
+      },
+      "statement": "Recorded holding position criterion: value 0.06672099201814737 m against threshold 0.01 m, time_window_s [0.3,0.35], recorded_window_result false, recorded_result null, independent_recomputation 'available' but recomputation not performed (recomputed_result false).",
+      "value": {
+        "criterion_version": "controller.gvs_nmpc@6.0.0/sampled_settling",
+        "independent_recomputation": "available",
+        "missing_material": [],
+        "motion_source": {
+          "pointer": "",
+          "reference": {
+            "artifact_id": "8f1a4230282a9e52ada126f075eabc64317c39c287786c05ffadc5ca547d55aa",
+            "media_type": "application/json"
+          }
+        },
+        "recomputed_result": false,
+        "recorded_result": null,
+        "sources": [
+          {
+            "pointer": "/detail/sampled_settling/max_error_m",
+            "reference": {
+              "artifact_id": "ae9c754b80bce2e45773ba70841779055a79584d009b61e1622a19f424edbb82",
+              "media_type": "application/json"
+            }
+          }
+        ],
+        "threshold": 0.01,
+        "time_window_s": [
+          0.3,
+          0.35
+        ],
+        "unit": "m",
+        "value": 0.06672099201814737
+      }
+    },
+    {
+      "pointer": "/holding/speed",
+      "reference": {
+        "artifact_id": "d8b39c99b5595562aa7e7fec23a3f8767cd724537e8988da0ffefbc6bf7abb27",
+        "media_type": "application/json"
+      },
+      "source_identity": {
+        "candidate_id": "proposal-build",
+        "configuration": {
+          "artifact_id": "803e8fb2cda1fa2035f18c2051cb2cb83c4dabf26b13f9391c2a49e1cc1b4f5c",
+          "media_type": "application/json"
+        },
+        "execution_id": "494deb38d6374deb8f741e96f2430826"
+      },
+      "statement": "Recorded holding speed criterion: value 0.20679063000945364 m/s against threshold 0.02 m/s, recorded_window_result false, independent_recomputation 'available' but recomputed_result false.",
+      "value": {
+        "criterion_version": "controller.gvs_nmpc@6.0.0/sampled_settling",
+        "independent_recomputation": "available",
+        "missing_material": [],
+        "motion_source": {
+          "pointer": "",
+          "reference": {
+            "artifact_id": "8f1a4230282a9e52ada126f075eabc64317c39c287786c05ffadc5ca547d55aa",
+            "media_type": "application/json"
+          }
+        },
+        "recomputed_result": false,
+        "recorded_result": null,
+        "sources": [
+          {
+            "pointer": "/detail/sampled_settling/max_speed_m_s",
+            "reference": {
+              "artifact_id": "ae9c754b80bce2e45773ba70841779055a79584d009b61e1622a19f424edbb82",
+              "media_type": "application/json"
+            }
+          }
+        ],
+        "threshold": 0.02,
+        "time_window_s": [
+          0.3,
+          0.35
+        ],
+        "unit": "m/s",
+        "value": 0.20679063000945364
+      }
+    },
+    {
+      "pointer": "/official",
+      "reference": {
+        "artifact_id": "d8b39c99b5595562aa7e7fec23a3f8767cd724537e8988da0ffefbc6bf7abb27",
+        "media_type": "application/json"
+      },
+      "source_identity": {
+        "candidate_id": "proposal-build",
+        "configuration": {
+          "artifact_id": "803e8fb2cda1fa2035f18c2051cb2cb83c4dabf26b13f9391c2a49e1cc1b4f5c",
+          "media_type": "application/json"
+        },
+        "execution_id": "494deb38d6374deb8f741e96f2430826"
+      },
+      "statement": "Recorded official result is false (source pointer /task_success in evaluation bbfd79bb...); the definition notes historical evaluate.reach@1.0.0 checks complete sampled execution and terminal distance only and that component failure must never be inferred solely from overall failure.",
+      "value": {
+        "definition": "Historical evaluate.reach@1.0.0 checks complete sampled execution and terminal distance only; sampled holding is separately recorded by profile. Never infer component failure solely from overall failure.",
+        "recorded_result": false,
+        "source": {
+          "pointer": "/task_success",
+          "reference": {
+            "artifact_id": "bbfd79bb55c2ad4683740663f1ec921d8f9a9784c70fb902c0e30bf2f36b3339",
+            "media_type": "application/json"
+          }
+        }
+      }
+    }
+  ],
+  "dispositions": [],
+  "facts": [
+    {
+      "pointer": "/control_period_s",
+      "reference": {
+        "artifact_id": "6903669a345e76c1dd2958ada4d067bfde06d02f102ce017db06c9a241c7dd51",
+        "media_type": "application/json"
+      },
+      "source_identity": {
+        "coordinate_frame": "world",
+        "execution_id": "494deb38d6374deb8f741e96f2430826",
+        "result_type": "free_reach"
+      },
+      "statement": "Recorded control period for execution 494deb38d6374deb8f741e96f2430826 is 0.01 s.",
+      "value": 0.01
+    },
+    {
+      "pointer": "/control_updates",
+      "reference": {
+        "artifact_id": "6903669a345e76c1dd2958ada4d067bfde06d02f102ce017db06c9a241c7dd51",
+        "media_type": "application/json"
+      },
+      "source_identity": {
+        "coordinate_frame": "world",
+        "execution_id": "494deb38d6374deb8f741e96f2430826",
+        "result_type": "free_reach"
+      },
+      "statement": "Recorded number of control updates is 35.",
+      "value": 35
+    },
+    {
+      "pointer": "/deadline_misses",
+      "reference": {
+        "artifact_id": "6903669a345e76c1dd2958ada4d067bfde06d02f102ce017db06c9a241c7dd51",
+        "media_type": "application/json"
+      },
+      "source_identity": {
+        "coordinate_frame": "world",
+        "execution_id": "494deb38d6374deb8f741e96f2430826",
+        "result_type": "free_reach"
+      },
+      "statement": "Recorded number of deadline misses is 35, equal to the recorded control update count.",
+      "value": 35
+    },
+    {
+      "pointer": "/mean_complete_update_s",
+      "reference": {
+        "artifact_id": "6903669a345e76c1dd2958ada4d067bfde06d02f102ce017db06c9a241c7dd51",
+        "media_type": "application/json"
+      },
+      "source_identity": {
+        "coordinate_frame": "world",
+        "execution_id": "494deb38d6374deb8f741e96f2430826",
+        "result_type": "free_reach"
+      },
+      "statement": "Recorded mean complete update time is 18.34727874570526 s (measured/computed field, not a guarantee).",
+      "value": 18.34727874570526
+    },
+    {
+      "pointer": "/measured_computation_s",
+      "reference": {
+        "artifact_id": "6903669a345e76c1dd2958ada4d067bfde06d02f102ce017db06c9a241c7dd51",
+        "media_type": "application/json"
+      },
+      "source_identity": {
+        "coordinate_frame": "world",
+        "execution_id": "494deb38d6374deb8f741e96f2430826",
+        "result_type": "free_reach"
+      },
+      "statement": "Recorded measured computation time is 645.8279999999795 s (measured/computed field, not a guarantee).",
+      "value": 645.8279999999795
+    },
+    {
+      "pointer": "/simulated_duration_s",
+      "reference": {
+        "artifact_id": "6903669a345e76c1dd2958ada4d067bfde06d02f102ce017db06c9a241c7dd51",
+        "media_type": "application/json"
+      },
+      "source_identity": {
+        "coordinate_frame": "world",
+        "execution_id": "494deb38d6374deb8f741e96f2430826",
+        "result_type": "free_reach"
+      },
+      "statement": "Recorded simulated duration is 0.35000000000000003 s.",
+      "value": 0.35000000000000003
+    },
+    {
+      "pointer": "/solver_error_count",
+      "reference": {
+        "artifact_id": "6903669a345e76c1dd2958ada4d067bfde06d02f102ce017db06c9a241c7dd51",
+        "media_type": "application/json"
+      },
+      "source_identity": {
+        "coordinate_frame": "world",
+        "execution_id": "494deb38d6374deb8f741e96f2430826",
+        "result_type": "free_reach"
+      },
+      "statement": "Recorded solver error count is 0.",
+      "value": 0
+    },
+    {
+      "pointer": "/force_bound_violation_n",
+      "reference": {
+        "artifact_id": "6903669a345e76c1dd2958ada4d067bfde06d02f102ce017db06c9a241c7dd51",
+        "media_type": "application/json"
+      },
+      "source_identity": {
+        "coordinate_frame": "world",
+        "execution_id": "494deb38d6374deb8f741e96f2430826",
+        "result_type": "free_reach"
+      },
+      "statement": "Recorded force bound violation is 0.0 N.",
+      "value": 0.0
+    },
+    {
+      "pointer": "/evaluation_validity",
+      "reference": {
+        "artifact_id": "6903669a345e76c1dd2958ada4d067bfde06d02f102ce017db06c9a241c7dd51",
+        "media_type": "application/json"
+      },
+      "source_identity": {
+        "coordinate_frame": "world",
+        "execution_id": "494deb38d6374deb8f741e96f2430826",
+        "result_type": "free_reach"
+      },
+      "statement": "Recorded evaluation validity is 'valid'.",
+      "value": "valid"
+    },
+    {
+      "pointer": "/one_step_prediction_summary",
+      "reference": {
+        "artifact_id": "6903669a345e76c1dd2958ada4d067bfde06d02f102ce017db06c9a241c7dd51",
+        "media_type": "application/json"
+      },
+      "source_identity": {
+        "coordinate_frame": "world",
+        "execution_id": "494deb38d6374deb8f741e96f2430826",
+        "result_type": "free_reach"
+      },
+      "statement": "Recorded one-step prediction summary: 35 aligned first-step predictions in world frame, mean tip difference 0.004160104467167267 m, maximum tip difference 0.006041094970688899 m, missing [], scope 'Only accepted first-step predictions matched to next execution timestamp; no future-plan replay comparison'.",
+      "value": {
+        "aligned_count": 35,
+        "frame": "world",
+        "maximum_tip_difference_m": 0.006041094970688899,
+        "mean_tip_difference_m": 0.004160104467167267,
+        "missing": [],
+        "scope": "Only accepted first-step predictions matched to next execution timestamp; no future-plan replay comparison"
+      }
+    },
+    {
+      "pointer": "/integrity",
+      "reference": {
+        "artifact_id": "d8b39c99b5595562aa7e7fec23a3f8767cd724537e8988da0ffefbc6bf7abb27",
+        "media_type": "application/json"
+      },
+      "source_identity": {
+        "candidate_id": "proposal-build",
+        "configuration": {
+          "artifact_id": "803e8fb2cda1fa2035f18c2051cb2cb83c4dabf26b13f9391c2a49e1cc1b4f5c",
+          "media_type": "application/json"
+        },
+        "execution_id": "494deb38d6374deb8f741e96f2430826"
+      },
+      "statement": "Recorded integrity block: evaluation_validity 'valid', execution_complete true, force_bound_violation_n 0.0, solver_error_count 0, with sources /validity (bbfd79bb...) and /detail (ae9c754b...).",
+      "value": {
+        "evaluation_validity": "valid",
+        "execution_complete": true,
+        "force_bound_violation_n": 0.0,
+        "solver_error_count": 0,
+        "sources": [
+          {
+            "pointer": "/validity",
+            "reference": {
+              "artifact_id": "bbfd79bb55c2ad4683740663f1ec921d8f9a9784c70fb902c0e30bf2f36b3339",
+              "media_type": "application/json"
+            }
+          },
+          {
+            "pointer": "/detail",
+            "reference": {
+              "artifact_id": "ae9c754b80bce2e45773ba70841779055a79584d009b61e1622a19f424edbb82",
+              "media_type": "application/json"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "pointer": "/limitations",
+      "reference": {
+        "artifact_id": "d8b39c99b5595562aa7e7fec23a3f8767cd724537e8988da0ffefbc6bf7abb27",
+        "media_type": "application/json"
+      },
+      "source_identity": {
+        "candidate_id": "proposal-build",
+        "configuration": {
+          "artifact_id": "803e8fb2cda1fa2035f18c2051cb2cb83c4dabf26b13f9391c2a49e1cc1b4f5c",
+          "media_type": "application/json"
+        },
+        "execution_id": "494deb38d6374deb8f741e96f2430826"
+      },
+      "statement": "Recorded limitations (verbatim): 'Unavailable independent recomputation does not erase a recorded official result.'; 'One-step prediction agreement is neither reach nor holding acceptance.'; 'Recomputed holding uses archived motion samples, not a new backend solve or continuous guarantee.'",
+      "value": [
+        "Unavailable independent recomputation does not erase a recorded official result.",
+        "One-step prediction agreement is neither reach nor holding acceptance.",
+        "Recomputed holding uses archived motion samples, not a new backend solve or continuous guarantee."
+      ]
+    }
+  ],
+  "interpretation": "Scoped to the two original archived sources only, for candidate 'proposal-build' (execution 494deb38d6374deb8f741e96f2430826).\n\nTIMING (S1 = 6903669a345e76c1dd2958ada4d067bfde06d02f102ce017db06c9a241c7dd51). Nominal control period /control_period_s = 0.01 s with /control_updates = 35 over /simulated_duration_s = 0.35000000000000003 s. The recorded computed timing is far larger than the control period: /mean_complete_update_s = 18.34727874570526 s and total /measured_computation_s = 645.8279999999795 s. Every update is recorded as late: /deadline_misses = 35, equal to /control_updates = 35, and /real_time_demonstrated = false. These are recorded measurement/computation fields, not capability guarantees.\n\nINTEGRITY (S1 and S2 = d8b39c99b5595562aa7e7fec23a3f8767cd724537e8988da0ffefbc6bf7abb27). S1 /evaluation_validity = 'valid', /solver_error_count = 0, /force_bound_violation_n = 0.0. S2 /integrity mirrors this: evaluation_validity 'valid', execution_complete true, force_bound_violation_n 0.0, solver_error_count 0. So the recorded limits are timing and settling-holding, not solver or force faults.\n\nGUARANTEE DISTINCTION. S2 /holding/continuous_time_guarantee = false; no continuous-time guarantee is recorded. Holding is recorded-only: /holding/recorded_available = true, /holding/recorded_window_result = false, with /holding/position value 0.06672099201814737 m (> 0.01 m threshold) and /holding/speed value 0.20679063000945364 m/s (> 0.02 m/s threshold). The /integrity block is an integrity record, distinct from the measured timing fields above.\n\nPREDICTION vs ACCEPTANCE. S1 /one_step_prediction_summary: aligned_count 35, frame 'world', mean_tip_difference_m 0.004160104467167267, maximum_tip_difference_m 0.006041094970688899, missing []. Its own scope notes only accepted first-step predictions matched to the next execution timestamp and no future-plan replay comparison. Per S2 /limitations, one-step prediction agreement is neither reach nor holding acceptance.\n\nRECOMPUTATION AND OFFICIAL RESULT. S2 marks independent_recomputation 'available' for holding, reach and official, yet recomputed_result = false throughout and holding recorded_result = null. Per S2 /limitations, unavailable independent recomputation does not erase a recorded official result. The recorded official result stands: /official/recorded_result = false (/task_success), and /reach/recorded_result = false with /reach/value = 0.06672099201814737 m.",
+  "proposed_next_checks": [
+    "Read evaluation artifact bbfd79bb55c2ad4683740663f1ec921d8f9a9784c70fb902c0e30bf2f36b3339 at /validity and /metrics/0 to confirm the recorded official reach value (out of current scope).",
+    "Read report artifact ae9c754b80bce2e45773ba70841779055a79584d009b61e1622a19f424edbb82 at /detail/sampled_settling to confirm the holding window measurements.",
+    "Read configuration artifact 803e8fb2cda1fa2035f18c2051cb2cb83c4dabf26b13f9391c2a49e1cc1b4f5c and simulation artifact 558e0a1edb1aad3f9b6839a1994b7237980c5f4f3b8b7ff879684bf6b22d7655 for control/real-time settings and any deadline criterion.",
+    "Read motion-source artifact 8f1a4230282a9e52ada126f075eabc64317c39c287786c05ffadc5ca547d55aa to examine the basis for holding recomputation availability."
+  ],
+  "unknowns": [
+    "No field defines the deadline criterion or per-update deadline budget, so /deadline_misses = 35 cannot be quantified beyond the recorded count relative to /control_period_s = 0.01.",
+    "No per-update timing series is present in these two sources; only /mean_complete_update_s and /measured_computation_s aggregate values are recorded.",
+    "The reference artifacts cited by the sources (configuration 803e8fb2..., simulation 558e0a1e..., report ae9c754b..., evaluation bbfd79bb..., prediction evidence 6195a874..., motion source 8f1a4230...) were not read and remain outside this scope.",
+    "Whether independent recomputation was actually performed is not stated beyond recomputed_result = false and independent_recomputation = 'available'.",
+    "No repeat or independent replication is present in the two scoped sources."
+  ]
+}

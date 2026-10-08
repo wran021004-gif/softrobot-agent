@@ -1,12 +1,8 @@
-# Research Mainline 3 V2 interface handoff — conditional, 2026-10-09
+# 主线三版本二接口交接（条件性，未验证新拓扑）
 
-V2 is prepared as the next separately scoped development goal, but V1 has not passed. A remains accepted; B has one valid new timing report, no valid new reach report, no two-report synthesis or completed final dispositions, and a failed material audit. C was not executed. See the [current V1 delivery](research_mainline3_v1_completion.md) and [facts](../evidence/research_mainline3_v1_complete_20261009/delivery_facts.json). Historical missing responses and unresolved reservations remain sealed; their recovery is not a prerequisite for fresh authorized work.
+当前活动 `mainline3-v1-continue-edd8c668acb1` 保持 A 的既有接受范围，B 在 14 次请求后因非主模型恢复额度 3/3 耗尽而失败，C 未执行。**V1 尚未整体完成；本文件交付可审阅的接口准备，不宣布 V2 已可执行或允许新增实验。** [当前完成记录](research_mainline3_v1_completion.md)与[新活动账目](../evidence/research_mainline3_v1_continue_20261008/delivery_facts.json)保留执行身份和未知费用。旧计时正文不可恢复仍保持不确定；恢复它不是将来新授权的必备前提。缺失的是 B 新报告、综合、正式处置及材料审查，以及 C 固定案例。
 
-The next development order remains limited tendon counts and actuator layouts, then segment-count changes, then finite necessary combinations. No topology combinations were implemented or validated here. The existing concrete interfaces and comparison requirements below remain the handoff; no architecture or scheduler redesign is proposed.
-
-Changed or exposed gaps: the model-response content gates were removed throughout the affected paths; full original responses now persist before business processing. Request purposes are enforced separately with actual dispatch counts and original role deadlines. Explicit restoration must retain the immutable catalog supplied to the model; the local repair verifies unchanged contents/owners before binding it. Large principal correction histories can still exceed full-input capacity. New reports must correctly distinguish an available failed recomputation from an absent result, and must satisfy original-evidence inspection and per-source applicability requirements. These are material closeout gaps, not evidence of reasoning-token exhaustion.
-
-The [timing report](../evidence/research_mainline3_v1_complete_20261009/timing_report.json) and [audits](../evidence/research_mainline3_v1_complete_20261009/principal_material_audit.json) preserve useful partial work. Completing the missing new reach report under appropriately scoped authority, then two-report synthesis/dispositions/audit and the fixed C case, remains necessary before declaring V1 closed. No unused ordinary or recovery quota can be transferred to bypass the exhausted reach correction allowance.
+本轮只修正了 V1 调查持久化／历史／容量接口，没有修改 V2 公共拓扑入口或启动拓扑研究。未来先通过原 B/C 门禁，之后另行冻结有限拓扑案例、任务、初态、资源比较和预算。有效但物理失败的 C 可完成接口验证，不能以调参追求成功。
 
 ## 现有代码与需补齐的边界
 
