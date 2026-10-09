@@ -17,6 +17,29 @@ class ContinuationTests(TestCase):
     setUp=fixture.CapacityBindingTests.setUp
     cleanup=fixture.CapacityBindingTests.cleanup
 
+    def test_saved_synthesis_and_complete_correction_under_new_capacity(self):
+        from tools import research_v1_continue as activity
+        from tools.context_assembly import check_outgoing_request
+        from tools.platform_models import effective_config
+        from tools.investigation_contract import contract
+        directory=fixture.ROOT/'evidence/research_mainline3_v1_closeout_20261009'
+        raw=read(directory/'synthesis_first_response.json')
+        args=raw['choices'][0]['message']['tool_calls'][0]['function']['arguments']
+        self.assertGreater(len(json.loads(args)['interpretation']),3000)
+        contract(selectable=True,selected_reports=True,role='coordinator',allow_children=False).parse('investigation_return',args)
+        cfg=effective_config(self.host);cfg['context_bytes']=4194304
+        wire=read(directory/'repair2_saved_synthesis_wire.json');original=deepcopy(wire)
+        transport_calls=[]
+        def send(adapter,config,payload):
+            measured=check_outgoing_request(payload,config,'research_decision')
+            self.assertEqual(measured['input_budget_tokens'],950000)
+            transport_calls.append(deepcopy(payload))
+            return fixture.native({})
+        from tools.platform_models import DeepSeekAdapter
+        with patch.object(DeepSeekAdapter,'_transport',new=send):
+            adapter=DeepSeekAdapter();adapter.request_config=cfg;adapter.respond(wire,1)
+        self.assertEqual(transport_calls,[original]);self.assertEqual(wire,original)
+
     def test_selected_investigator_projection_and_actual_sent_restoration(self):
         sends=[]
         def transport(wire):
@@ -135,7 +158,7 @@ class ContinuationTests(TestCase):
             collected=invoke(self.host,'research.investigation_status',dict(investigation_id='investigator'),request_id='collect-four')
         self.assertEqual(submitted['execution_status'],'completed')
         self.assertEqual(self.host.store.artifact(collected['output'])['status'],'completed')
-        self.assertEqual(len(sends),5)
+        self.assertEqual(len(sends),3 if reuse else 5)
         self.assertEqual(self.target_counts()['targets']['report:investigator']['used'],4)
         node=self.host.store.session(self.host.run_id)['state']['investigations']['investigator']
         self.assertEqual(node['requests_by_purpose'],dict(ordinary=1,model_correction=4,engineering_recovery=0))
@@ -150,7 +173,7 @@ class ContinuationTests(TestCase):
             sends.append(wire)
             return fixture.native(dict(interpretation='Report version '+str(len(sends)),facts=[dict(statement='Invalid scalar',reference=self.ref,pointer='/scalar',value=len(sends))]))
         result=self.dispatch.dispatch(plain(self.order),transport=transport)
-        self.assertEqual(result.status,'failed');self.assertEqual(len(sends),5)
+        self.assertEqual(result.status,'failed');self.assertEqual(len(sends),3 if reuse else 5)
         state=deepcopy(self.host.store.session(self.host.run_id)['state']);cfg=deepcopy(self.host.store.session(self.host.run_id)['snapshot']['input'])
         cfg['run_id']='target-restored'
         from tools.platform_host import Host
@@ -436,12 +459,18 @@ class ContinuationTests(TestCase):
         self.assertEqual(node['provider_requests'][0]['outcome'],'failed')
 
     def test_public_import_new_b_synthesis_disposition_and_automatic_c_gate(self):
+        self._public_import_chain()
+
+    def test_reused_reports_public_chain_and_automatic_c(self):
+        self._public_import_chain(reuse=True)
+
+    def _public_import_chain(self,reuse=False):
         from tools import research_v1_continue as activity
         from tools import research_v1_continue_gate as gate
         out=self.folder/'continuation-fixture-evidence'
         with patch.object(activity,'OUT',out),patch.object(gate,'OUT',out),patch('tools.platform_store.ROOT',self.folder):
             import time
-            activity.start(started_unix=time.time()-2000);atomic_json(out/'offline_gate.json',dict(passed=True,scope='Fixture bootstrap only; no real grant'))
+            activity.start(started_unix=time.time()-2000,reuse_both_reports=reuse);atomic_json(out/'offline_gate.json',dict(passed=True,scope='Fixture bootstrap only; no real grant'))
             activity.freeze();host,m,p=activity.host_for('coordinated',create=True)
             authorization=read(out/'authorization.json')
             self.assertTrue(gate.correction_consistency(authorization,p,orders=p['authorized_children'])['passed'])
@@ -476,27 +505,38 @@ class ContinuationTests(TestCase):
                     failures={k:host.store.artifact(n['failure_record']) if n.get('failure_record') else n.get('reason') for k,n in host.store.session(host.run_id)['state']['investigations'].items() if n['status']!='completed'}
                     self.fail(str(exc)+' '+json.dumps(dict(failures=failures),ensure_ascii=False))
             atomic_json(out/'material_audit.json',dict(report=result['report'],material_correctness='pass',scope='Fixture structure only; no live/material empirical claim'))
+            if reuse:
+                atomic_json(out/'coordinated_gate.json',dict(passed=False))
+                with self.assertRaisesRegex(ValueError,'B_GATE_REQUIRED'):activity.execute_c()
+                before_result=deepcopy(result)
+                first=host.store.artifact(result['report'])['dispositions'][0]
+                receipt=invoke(host,'research.investigation_disposition',first,request_id='dispose-'+first['investigation_id'])
+                result['receipts'].append(receipt);atomic_json(out/'coordinated_result.json',result)
+                invalid=read(out/'material_audit.json');invalid['material_correctness']='incomplete';atomic_json(out/'material_audit.json',invalid)
+                with self.assertRaisesRegex(ValueError,'SEPARATE_MATERIAL_AUDIT_FAILED'):activity.close_b()
+                invalid['material_correctness']='pass';atomic_json(out/'material_audit.json',invalid)
             with patch.object(activity,'execute_c',return_value='automatic fixed C invoked') as c:
                 self.assertEqual(activity.close_b(),'automatic fixed C invoked');c.assert_called_once()
             self.assertTrue(read(out/'coordinated_gate.json')['passed'])
-            self.assertEqual(len(sends),5)
+            self.assertEqual(len(sends),3 if reuse else 5)
             self.assertNotIn('timing-integrity-limits',counts)
-            state=host.store.session(host.run_id)['state'];self.assertEqual(len(state['historical_investigations']),2)
+            if reuse:self.assertNotIn('reach-holding-interpretation',counts)
+            state=host.store.session(host.run_id)['state'];self.assertEqual(len(state['historical_investigations']),3 if reuse else 2)
             self.assertGreater(m['preparation_wall_s'],2000)
             self.assertEqual(p['sequential_reservations']['preparation_s'],m['preparation_wall_s'])
             self.assertEqual(host.store.lookup(host.run_id,'offline-preparation')['status'],'completed')
-            self.assertEqual(state['investigations']['principal-coordinated-v2']['reserved_wall_s'],2400.)
+            if not reuse:self.assertEqual(state['investigations']['principal-coordinated-v2']['reserved_wall_s'],2400.)
             for key in ('coordinator-summary','principal-coordinated-v2'):
                 node=state['investigations'][key]
                 self.assertLess(node['reserved_wall_s'],node['order']['timeout_s'])
-                self.assertEqual(node['execution_deadline_unix'],node['started_unix']+node['order']['timeout_s'])
+                if not reuse:self.assertEqual(node['execution_deadline_unix'],node['started_unix']+node['order']['timeout_s'])
             self.assertEqual(state['investigations']['principal-coordinated-v2']['requests_by_purpose'],dict(ordinary=1,model_correction=1,engineering_recovery=0))
             self.assertTrue(all(w['model']=='deepseek-flash' and w['max_tokens']==32768 for w in sends))
             self.assertTrue(gate.correction_consistency(authorization,p,grant=state['role_context']['investigation_grant'],
                 orders=[n['order'] for n in state['investigations'].values()])['passed'])
             self.assertEqual(state['historical_investigations']['coordinator-plan']['own_inference_allowance'],0)
             self.assertEqual({k:n['order']['budget']['model_calls'] for k,n in state['investigations'].items()},
-                {'reach-holding-interpretation':12,'coordinator-summary':6,'principal-coordinated-v2':18})
+                {'coordinator-summary':40,'principal-coordinated-v2':40} if reuse else {'reach-holding-interpretation':12,'coordinator-summary':6,'principal-coordinated-v2':18})
             self.assertFalse(any(e['kind']=='investigation_provider_attempt' and e.get('request_id')=='investigation-coordinator-plan' for e in host.store.events(host.run_id)))
             atomic_json(out/'fixture_repair_verification.json',dict(passed=True,scope='Offline migration fixture only'))
             before=deepcopy(state['investigations'])
@@ -507,4 +547,4 @@ class ContinuationTests(TestCase):
                 self.assertEqual(after[key]['usage'],node['usage'])
                 self.assertEqual(after[key]['started_unix'],node['started_unix'])
                 self.assertEqual(after[key]['execution_deadline_unix'],node['execution_deadline_unix'])
-            self.assertEqual(len(sends),5)
+            self.assertEqual(len(sends),3 if reuse else 5)

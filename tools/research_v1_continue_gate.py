@@ -9,17 +9,18 @@ def correction_consistency(authorization,phase,*,grant=None,orders=()):
     """Existing offline/public gate: frozen authority must match the executor."""
     from tools.research_v1_continue import task_allocations,correction_policy
     allocations=task_allocations();policy=correction_policy()
+    shared=policy['version']=='mainline3.shared_completion@2.0.0'
     checks=dict(authorization=authorization.get('task_allocations')==allocations and authorization.get('correction_policy')==policy,
         frozen_tasks=phase['allocations']==allocations,frozen_corrections=phase.get('correction_policy')==policy,
         common_requests=phase['project_budget']['model_calls']==40,
-        node_envelope=phase['node_budget']=={**zero(),'model_calls':18,'tool_calls':24,'wall_s':3600.},
-        aggregate_envelope=phase['total_node_budget']=={**zero(),'model_calls':40,'tool_calls':60,'wall_s':10200.})
+        node_envelope=phase['node_budget']==(allocations['coordinator-summary']['budget'] if shared else {**zero(),'model_calls':18,'tool_calls':24,'wall_s':3600.}),
+        aggregate_envelope=phase['total_node_budget']==({**zero(),'model_calls':40,'tool_calls':256,'wall_s':28200.} if shared else {**zero(),'model_calls':40,'tool_calls':60,'wall_s':10200.}))
     if grant is not None:
         checks['actual_grant']=(grant.get('correction_policy')==policy and grant.get('delivery_allocations')==allocations
             and grant['per_node_budget']==phase['node_budget'] and grant['total_budget']==phase['total_node_budget']
             and grant.get('sequential_reservations')==phase.get('sequential_reservations'))
     checks['actual_orders']=all(o['investigation_id'] in allocations and o['budget']==allocations[o['investigation_id']]['budget']
-        and o['timeout_s']==allocations[o['investigation_id']]['timeout_s'] for o in orders)
+        and o['timeout_s']==allocations[o['investigation_id']]['timeout_s'] for o in orders if not shared or o['role']!='investigator')
     return dict(passed=all(checks.values()),checks=checks,policy_version=policy['version'])
 
 def generate_b(out=None):
@@ -27,6 +28,7 @@ def generate_b(out=None):
         from tools.research_v1_continue import OUT as out
     OUT=out
     manifest=read(OUT/'validation_manifest.json');p=manifest['phases']['coordinated']
+    shared=p.get('correction_policy',{}).get('version')=='mainline3.shared_completion@2.0.0'
     bundle=read(OUT/'coordinated_bundle.json');result=read(OUT/'coordinated_result.json')
     nodes=bundle['state']['investigations'];historical=bundle['state'].get('historical_investigations',{});reports={**historical,**nodes}
     events=bundle['events'];arts=bundle['artifacts'];store=Store(ROOT/p['output'])
@@ -81,11 +83,11 @@ def generate_b(out=None):
         with store.connect(True) as db:
             row=db.execute("SELECT value FROM meta WHERE key='investigation_target_accounting'").fetchone()
         accounting=json.loads(row[0]) if row else None
-        target_bounds=target_bounds and accounting is not None and all(t['used']<=4 for t in accounting['targets'].values())
+        target_bounds=target_bounds and accounting is not None and all(t['used']<=p['correction_policy']['maximum'] for t in accounting['targets'].values())
     gates=dict(preserved_A='pass' if read(OUT/'A_preserved.json')['accepted'] else 'fail',
         historical_plan_import='pass' if bundle['state']['historical_investigations']['coordinator-plan']['new_investigation_executed'] is False else 'fail',
         cumulative_report_coverage='pass' if len(chains)==2 and all(reports[t['investigation_id']]['status']=='completed' and c['native_selected_read_followup_and_citation'] for t,c in zip(result['targets'],chains))
-            and reports['reach-holding-interpretation'].get('kind')!='historical_reuse'
+            and (reports['reach-holding-interpretation'].get('kind')=='historical_reuse' if shared else reports['reach-holding-interpretation'].get('kind')!='historical_reuse')
             and (reports['timing-integrity-limits'].get('kind')=='historical_reuse' or result.get('necessary_timing_revision')) else 'fail',
         actual_synthesis='pass' if nodes['coordinator-summary']['status']=='completed' and nodes['coordinator-summary']['result']==result['coordinator_synthesis']
             and all(t['report']['artifact_id'] in synthesis_sources for t in result['targets']) else 'fail',

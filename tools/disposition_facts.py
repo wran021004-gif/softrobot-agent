@@ -18,7 +18,7 @@ class FactSelection(Contract):
 
 
 class SelectedSourceFact(FactSelection):
-    statement: str = Field(min_length=1,max_length=1000)
+    statement: str = Field(min_length=1)
     catalog: EvidenceRef
     catalog_version: Literal['1.0.0']
 
@@ -70,11 +70,11 @@ def expand_source(dispatcher,selected,node,*,path):
 
 
 class SelectedClaim(Contract):
-    statement: str = Field(min_length=1, max_length=1000)
+    statement: str = Field(min_length=1)
     supporting_facts: list[FactSelection] = Field(min_length=1, max_length=12)
     additional_support: list[FactSelection] = Field(default_factory=list, max_length=12, description='Principal supplemental original-source facts, never attributed to the investigator report.')
     scope: list[FactSelection] = Field(min_length=1, max_length=8)
-    support_explanation: str = Field(min_length=1, max_length=2000)
+    support_explanation: str = Field(min_length=1)
 
 
 class SelectedDisposition(Contract):
@@ -87,7 +87,7 @@ class SelectedDisposition(Contract):
     adopted_claims: list[SelectedClaim] = Field(default_factory=list, max_length=8)
     semantic_claims_unassessed: list[str] = Field(default_factory=list, max_length=12)
     remaining_unknowns: list[str] = Field(default_factory=list, max_length=12)
-    reason: str = Field(min_length=1, max_length=2000)
+    reason: str = Field(min_length=1)
 
 
 class BindingError(ValueError):

@@ -15,7 +15,7 @@ from tools.bound_reporting import ledger, model_packet
 
 VERSION = 'evidence_context_assembly@1.0.0'
 ROOT = Path(__file__).resolve().parents[1]
-INPUT_BUDGET = {'research_decision': 160000, 'final_report': 96000}
+INPUT_BUDGET = {'research_decision': 950000, 'final_report': 950000}
 INTERACTION_RESERVE = 8192
 ARCHIVE_FIELDS = {'protected_hashes', 'sha256_manifest', 'file_hashes', 'hashes', 'receipts',
                   'trajectory', 'trajectories', 'raw_trace', 'runtime_objects'}

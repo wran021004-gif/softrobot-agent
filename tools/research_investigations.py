@@ -26,13 +26,13 @@ class InvestigationOrder(Contract):
     disposition_ids: list[str] | None = Field(default=None,max_length=3,description='Explicit principal report targets; other completed reports may be synthesis context only.')
     allowed_tools: list[Literal['evidence.read']] = Field(default_factory=lambda:['evidence.read'],min_length=1,max_length=1)
     budget: Budget
-    timeout_s: float = Field(gt=0,le=3600)
+    timeout_s: float = Field(gt=0,le=36000)
     stop_conditions: list[str] = Field(min_length=1,max_length=6)
-    output_bytes: int = Field(default=16384,ge=1024,le=65536)
+    output_bytes: int = Field(default=16384,ge=1024,le=1048576)
 
 
 class SourceFact(Contract):
-    statement: str = Field(min_length=1,max_length=1000)
+    statement: str = Field(min_length=1)
     reference: EvidenceRef
     pointer: str = Field(max_length=300)
     value: object
@@ -40,11 +40,11 @@ class SourceFact(Contract):
 
 
 class AdoptedClaim(Contract):
-    statement: str = Field(min_length=1,max_length=1000)
+    statement: str = Field(min_length=1)
     supporting_facts: list[SourceFact] = Field(min_length=1,max_length=12)
     additional_support: list[SourceFact] = Field(default_factory=list,max_length=12,description='Explicit principal supplemental evidence; not report facts.')
     scope: list[SourceFact] = Field(min_length=1,max_length=8,description='Exact inspected source fields declaring applicability, e.g. result_type, execution_id, or prediction scope.')
-    support_explanation: str = Field(min_length=1,max_length=2000,description='Principal explanation linking these facts to this claim; semantic correctness remains unassessed.')
+    support_explanation: str = Field(min_length=1,description='Principal explanation linking these facts to this claim; semantic correctness remains unassessed.')
 
 
 class PrincipalDisposition(Contract):
@@ -55,7 +55,7 @@ class PrincipalDisposition(Contract):
     adopted_claims: list[AdoptedClaim] = Field(default_factory=list,max_length=8)
     semantic_claims_unassessed: list[str] = Field(default_factory=list,max_length=12)
     remaining_unknowns: list[str] = Field(default_factory=list,max_length=12)
-    reason: str = Field(min_length=1,max_length=2000)
+    reason: str = Field(min_length=1)
     selection_provenance: dict | None = None
 
 
@@ -63,7 +63,7 @@ class InvestigationReturn(Contract):
     facts: list[SourceFact] = Field(default_factory=list,max_length=12)
     counterevidence: list[SourceFact] = Field(default_factory=list,max_length=8)
     unknowns: list[str] = Field(default_factory=list,max_length=8)
-    interpretation: str = Field(max_length=3000)
+    interpretation: str
     proposed_next_checks: list[str] = Field(default_factory=list,max_length=6)
     children: list[InvestigationOrder] = Field(default_factory=list,max_length=3)
     dispositions: list[PrincipalDisposition] = Field(default_factory=list,max_length=3,description='Principal-only explicit structured decisions; the runner submits them through the public disposition tool.')
@@ -106,7 +106,7 @@ class InvestigationDispatcher:
         """
         policy=grant.get('correction_policy')
         if not policy:return None
-        if policy.get('version')!='mainline3.target_corrections@1.0.0' or (policy.get('planned'),policy.get('maximum'))!=(2,4):
+        if not (policy.get('version')=='mainline3.shared_completion@2.0.0' and policy.get('maximum')==40) and (policy.get('version')!='mainline3.target_corrections@1.0.0' or (policy.get('planned'),policy.get('maximum'))!=(2,4)):
             raise ValueError('INVESTIGATION_CORRECTION_POLICY_INVALID')
         allocations=grant.get('delivery_allocations',{})
         if set(policy['targets'])!=set(allocations) or any(a.get('request_purposes') for a in allocations.values()):
@@ -365,6 +365,12 @@ class InvestigationDispatcher:
             downstream=sum(plan['nodes'][k]['protected_s'] for k in spec['downstream'])+plan['public_overhead_protected_s']
             cost['wall_s']=min(spec['reserve_s'],available-downstream)
             if cost['wall_s']<spec['minimum_dispatch_s']:raise ValueError('B_REMAINING_TIME_INSUFFICIENT: '+encode(dict(available_s=available,protected_downstream_s=downstream,minimum_dispatch_s=spec['minimum_dispatch_s'])))
+        shared=reservation_grant.get('correction_policy',{}).get('version')=='mainline3.shared_completion@2.0.0'
+        if shared:
+            remaining=self.store.spendable(self.run_id)['remaining']
+            cost['model_calls']=min(cost['model_calls'],remaining['model_calls'])
+            cost['tool_calls']=min(cost['tool_calls'],remaining['tool_calls'])
+            cost['wall_s']=min(cost['wall_s'],reservation_grant['deadline_unix']-time.time()-downstream)
         def guard(db):
             session,grant=self._scope(order,db);state=session['state'];nodes=state.setdefault('investigations',{})
             state['investigation_grant_identity']=digest(grant)
@@ -372,13 +378,14 @@ class InvestigationDispatcher:
             if sum(n['status'] in ('pending','running','unconfirmed') for n in nodes.values())>=grant['max_concurrency']:
                 raise ValueError('INVESTIGATION_CONCURRENCY_EXCEEDED')
             total={k:sum(n['order']['budget'][k] for n in nodes.values())+plain(order.budget)[k] for k in zero()}
-            if any(total[k]>grant['total_budget'][k] for k in total):raise ValueError('INVESTIGATION_TOTAL_GRANT_EXCEEDED')
+            if not shared and any(total[k]>grant['total_budget'][k] for k in total):raise ValueError('INVESTIGATION_TOTAL_GRANT_EXCEEDED')
             accounting=self._target_accounting(grant,db)
             task=(accounting['tasks'].setdefault(order.investigation_id,dict(usage=zero(),started_unix=time.time()))
                 if accounting is not None else dict(usage=zero(),started_unix=time.time()))
             if accounting is not None:self._save_target_accounting(db,accounting)
             nodes[order.investigation_id]=dict(order=plain(order),status='pending',reads=[],usage=deepcopy(task['usage']),started_unix=task['started_unix'],
                 reserved_wall_s=cost['wall_s'],execution_deadline_unix=task['started_unix']+order.timeout_s)
+            if shared:nodes[order.investigation_id]['execution_deadline_unix']=min(task['started_unix']+order.timeout_s,grant['deadline_unix']-downstream)
             self.store.update_state(db,self.run_id,state)
         row,fresh=self.store.reserve(self.run_id,request_id,digest(plain(order)),'investigation-dispatcher',
             cost,parent=order.parent_id,kind='investigation',guard=guard)
@@ -1114,7 +1121,7 @@ class InvestigationDispatcher:
         stopped=None
         for target in targets:
             entry=accounting['targets'].get(target,{})
-            if entry.get('used',0)>=4:stopped='target_correction_limit'
+            if entry.get('used',0)>=grant['correction_policy']['maximum']:stopped='target_correction_limit'
             elif entry.get('last_failure')==failure_identity:stopped='unchanged_failure_and_feedback'
         elapsed_remaining=order.timeout_s-(time.time()-task['started_unix'])
         remaining_task=order.budget.model_calls-task['usage']['model_calls']
