@@ -1,0 +1,24 @@
+{
+  "defect_id": "complete-native-history-capacity",
+  "failure": "Second pending synthesis model correction exceeded unchanged complete-input guard after a preserved correction response. Time wiring also incorrectly used a financial reservation as a shorter node deadline.",
+  "affected_paths": [
+    "tools/context_assembly.py",
+    "tools/research_investigations.py",
+    "tools/research_v1_continue.py",
+    "tests/test_research_v1_continue.py"
+  ],
+  "verification": "repair2_verification.json",
+  "started_unix": 1791516940.492373,
+  "restore_authoritative_node_deadlines": [
+    "coordinator-summary"
+  ],
+  "deadline_explanation": "Restore only original started_unix + frozen 1800 s order; preserve prior 1200 s reservation guard separately. Original 1800 s deadline has expired. No clock reset, deadline restart or authorized provider dispatch.",
+  "purpose": "Second and final same-capacity-defect local repair/verification cycle; actual choices, reasoning, source visibility, counters and grant stay bound. No new model request is authorized past original deadline.",
+  "repair": 2,
+  "same_defect_cycle": 2,
+  "new_run": "mainline3-coordinated-repair2",
+  "original_run": "mainline3-coordinated-repair1",
+  "code_revision": "eccbea7fa1f5aecea274ba1fff242e8c3bcb4e09",
+  "unchanged_authority": true,
+  "new_grant_capacity": 0
+}

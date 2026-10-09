@@ -1,3 +1,31 @@
+# Mainline 3 V2 handoff revision ? V1 remains gated, 2026-10-09
+
+This revision supersedes the status statements in the historical handoff retained below. The [V1 blocker delivery](research_mainline3_v1_completion.md) preserves accepted A, the original coordinator plan, and the imported valid timing report. It adds a formally valid new reach report and two real synthesis submissions. Synthesis remains invalid; formal principal dispositions and C remain missing. **V2 is not ready to execute.** The original synthesis node expired at 11:49:40 Shanghai time. The activity is stopped; its unused quotas and pending correction do not authorize a restart.
+
+## Reusable closeout entry points
+
+- `tools/research_v1_continue.py`: `start`/`freeze`/`bind_sources`/`import_timing`, missing-work-only `stage_b`, bounded `bind_current_repair`, `close_b` and `execute_c`. Normal routing reuses timing from `research_mainline3_v1_complete_20261009`; it does not dispatch timing unless a necessary revision is specified. Sequential financial reservations protect downstream work independently of node ceilings.
+- `tools/investigation_contract.py`: opt-in `selected_reports_v4`; existing v3 remains supported. Investigators select handles and extraction-only projections. `tools/disposition_facts.py::investigator_catalog/expand_source` retains scope, visibility, original identity and exact type/value checks, with original model choices separated from deterministic expansion. Units appear only where the archive declares them.
+- `tools/research_investigations.py`: actual-sent source and principal catalog bindings survive restoration/migration. Saved replay sends no request; pending genuine corrections remain corrections; engineering requests have separate purposes. Stable-target accounting preserves planned two/actionable maximum four corrections with unchanged task/grant/deadline limits. `engineering_recovery` cannot dispatch past the original node deadline.
+- `tools/research_metric_view.py::archived_recomputation_presentation`: availability and pass/fail are separate shared fields. Archived false is a failed criterion, not absence or a new investigator calculation.
+- `tools/context_assembly.py::compact_investigation_request/expand_investigation_context/expand_investigation_arguments`: full current-input fitting uses lossless references to still-present exact values, preserves native reasoning, call IDs, feedback and meanings, and retains immutable original catalogs. Repair 2's saved second synthesis correction fits 156,562/160,000 conservative input tokens; its live dispatch remained prohibited by deadline.
+- `tools/research_v1_continue_gate.py::correction_consistency/generate_b`: successful completion requires cumulative selected reports, real synthesis, both formal dispositions, qualifying original inspection/public receipts, supported final claims and consistent accounting. The current bounded gate record explicitly reports missing stages; no successful gate or new principal judgment is asserted.
+- `tools/research_mainline3.py::fixed_pipeline` and the existing `close_b` connection: retain the seven fixed public components plus `research.task_acceptance` as the eighth. No alternate scientific runner was introduced. The source-relative 1.01/0.99 case and V7 settings remain static, unexecuted inputs.
+
+## Remaining V1 gaps and review boundary
+
+The reach report's formal bindings are valid, but its uncertainty about available false recomputation and one unnecessary proposed check must not be adopted. The imported timing report's incorrect false-as-unavailable and absent `/official` field interpretations remain explicitly audited. Actual coordinator synthesis must cite inspected fields of both selected reports; its latest original-source citation was correctly rejected for missing visibility. Principal original inspections, exactly two formal report dispositions, public receipts and final supported material review remain absent. No material conclusion was written on the model's behalf.
+
+There were seven new provider requests and 280,418 known tokens, with no unknown new response or reservation. Provider monetary cost remains unknown. Two post-freeze capacity repairs were used; the second completed locally after the original synthesis deadline. The shorter financial-reservation deadline defect was corrected without restarting the authorized clock. Further execution needs separately reviewed scope that preserves this stopped activity, original reports, counters and costs. The saved pending request is diagnostic/recovery evidence, not an executable permission. Do not reopen old missing-body searches or transfer old allowances.
+
+After V1 review and completion of the remaining B/C evidence, V2's order remains **limited tendon counts/layouts ? segment-count changes ? necessary representative combinations**. The concrete topology, state mapping, dynamics, transmission, routing ownership and evaluator requirements in the retained interface tables below remain applicable. New templates require explicit compatible dimensions, source identities, controller/backend construction and independently authorized finite validation. This activity implemented and executed no V2 topology case.
+
+## Historical handoff ? unchanged prior activity record
+
+The following text is the earlier handoff, retained verbatim. Its current-status wording applies to that earlier activity.
+
+---
+
 # Research Mainline 3 V2 interface handoff — conditional, 2026-10-09
 
 V2 is prepared as the next separately scoped development goal, but V1 has not passed. A remains accepted; B has one valid new timing report, no valid new reach report, no two-report synthesis or completed final dispositions, and a failed material audit. C was not executed. See the [current V1 delivery](research_mainline3_v1_completion.md) and [facts](../evidence/research_mainline3_v1_complete_20261009/delivery_facts.json). Historical missing responses and unresolved reservations remain sealed; their recovery is not a prerequisite for fresh authorized work.

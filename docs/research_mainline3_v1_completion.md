@@ -1,3 +1,54 @@
+# Mainline 3 V1 closeout revision ? bounded blocker, 2026-10-09
+
+This revision supersedes the current-status statements in the historical text retained below. Activity `mainline3-v1-complete-fedcd7c1a3a9` performed real B work and stopped with a bounded blocker. **A remains accepted; B remains incomplete; C was not executed; V1 and V2 are not accepted.** This is the authorized blocker delivery, not a successful V1 validation. See [delivery facts](../evidence/research_mainline3_v1_closeout_20261009/delivery_facts.json), [blocker](../evidence/research_mainline3_v1_closeout_20261009/bounded_blocker.json), [bundle](../evidence/research_mainline3_v1_closeout_20261009/coordinated_bundle.json), and [ledger](../evidence/research_mainline3_v1_closeout_20261009/coordinated_ledger.json).
+
+## Completed work and remaining gates
+
+A and the accepted historical coordinator plan were imported without paid reruns. The timing report from `research_mainline3_v1_complete_20261009` was imported through the public handoff with its original six reads, provenance and material audit, without dispatching a timing investigator. Its unchanged report is `0b029cbf696005a745429dab46593f1a265b4bc35a1a4fc4819a3726420b2215`; the [import receipt](../evidence/research_mainline3_v1_closeout_20261009/timing_import.json) does not transfer old execution permissions or imply principal inspection.
+
+The new [reach report](../evidence/research_mainline3_v1_closeout_20261009/reach_report.json), `a711e11944748af5b81bf1796359f9e612329573429d6fddfb3577548158bcc9`, passes formal binding. Original model selections and exact expansions are separately preserved in the bundle. It used two exploratory turns before its first report attempt. The old invalid report remains unchanged. Its [material audit](../evidence/research_mainline3_v1_closeout_20261009/reach_material_audit.json) still rejects unqualified adoption: `/unknowns/0` questions the procedural meaning of available failed recomputations, and one proposed check is unnecessary for establishing those known failures. Timing also retains its historical false-as-unavailable and absent `/official` field interpretation defects. Supported portions could be accepted in a formal principal decision; none was manufactured here.
+
+The coordinator actually received both complete selected reports and made two native submissions. The ordinary response exceeded the 3,000-character interpretation limit; its preserved first correction shortened the interpretation but selected `/task_accepted` from an original source it had not inspected. Source visibility validation correctly rejected that citation. Both complete provider responses, native reasoning, tool-call IDs, feedback and usages were saved. No valid synthesis or principal report was produced, and there are zero formal principal dispositions or disposition receipts. The [separate material audit](../evidence/research_mainline3_v1_closeout_20261009/material_audit.json) is incomplete, with no model-adopted claims. The [B record](../evidence/research_mainline3_v1_closeout_20261009/coordinated_gate.json) explicitly describes an incomplete chain; it does not claim that the successful public completion gate ran.
+
+## Exact bounded recovery limit
+
+Synthesis dispatched at 11:19:40.294335 Shanghai time with a frozen 1,800-second node ceiling. Its original deadline was **2026-10-09T11:49:40.294335+08:00**. Two targeted post-freeze capacity repair/verification cycles preserved the same task, project grant, counters and response history. Repair 1 allowed one already-pending genuine model correction to be sent. Repair 2 fits the next complete request at 156,562 conservative input tokens against the unchanged 160,000 guard, with 32,768 output and 8,192 interaction reserves under the 1,000,000 context limit. Native argument expansion is lossless and reasoning/IDs remain unchanged.
+
+A time-wiring defect also used the 1,200-second financial reservation as a shorter node deadline. Repair 2 separates reservations from the original node ceiling and records the old guard. It restores only the original `started_unix + 1800`, which had already expired. The actual saved-response recovery path returned `INVESTIGATION_ELAPSED_LIMIT` before transport, with zero new requests. Unused request capacity cannot restart that clock. Both same-defect repair cycles are consumed; optional length probes were ineligible because neither response was a reasoning-only length termination or truncated return. No replacement grant or historical STOP revival occurred.
+
+## Supported historical conclusions
+
+These observations concern historical Stage 3.36 only. Official reach failed: terminal error 0.06672099201814737 m against 0.01 m. Sampled settling also failed: maximum error 0.06672099201814737 m and speed 0.20679063000945364 m/s against 0.01 m and 0.02 m/s over the recorded 0.05 s window. The archived reach, holding-position and holding-speed recomputations are **available and failed**; Boolean false is not missing evidence. `/official` has no recomputation fields.
+
+That execution was complete and valid, with zero solver errors and zero force-bound violation. All 35 updates missed the 0.01 s deadline; mean complete update was 18.34727874570526 s. Real-time feasibility was not demonstrated. Sampled observations do not establish a dominant physical cause, continuous-time guarantee, real-robot feasibility or global optimality. No new robot outcome is claimed.
+
+## Actual usage and verification
+
+| Task | Ordinary | Model correction | Engineering recovery | Total / ceiling | New evidence operations |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| reach-holding-interpretation | 3 | 2 | 0 | 5/12 | 2 |
+| timing-integrity-limits | 0 | 0 | 0 | 0/4 | 0 |
+| coordinator-summary | 1 | 1 | 0 | 2/6 | 2 |
+| principal-coordinated-v2 | 0 | 0 | 0 | 0/18 | 0 |
+
+Seven provider requests yielded seven complete saved responses, totaling **280,418 reported tokens** (222,765 prompt; 57,653 completion). Duplicate reception/accounting records and historical usage are excluded. Monetary costs remain unknown without an invoice. No new response body or reservation is unknown. The B ledger records 10 operations and 3495.257979 seconds, including preparation 1340.109048 charged once and repairs 1913.211931. Remaining authorization is 33 requests, 502 operations and 8504.742021 ledger seconds; none was transferred or used to evade the expired node. Node elapsed time includes repair waits even where ledger node usage contains no wall counter. The exact task/correction counters and response usages are in the delivery facts and [target accounting](../evidence/research_mainline3_v1_closeout_20261009/target_accounting.json).
+
+The activity clock remains 10:54:52?20:54:52 Shanghai, with execution cutoff 20:24:52 and delivery protection intact. Preparation, repair, review and delivery elapsed time remain cumulative. The older activity's 18 requests, 17 complete saved responses, 393,122 known tokens and unknown costs remain historical; its missing body was not searched again.
+
+The focused [offline integration gate](../evidence/research_mainline3_v1_closeout_20261009/offline_gate.json) covers selected field projections, archived availability semantics, actual-sent catalog restoration, saved principal request capacity, imported timing, public report/synthesis/disposition wiring, correction accounting and mocked automatic C. Demonstrated failures were repaired and only affected checks rerun. Repair 2's three affected checks and one deadline/reservation integration check passed; the PowerShell redirected-stderr wrapper in one log reported shell exit 1 although unittest recorded all three cases `OK`. No full suite, paired robot validation, stress test, paid connectivity test or scientific solve ran. Fixture reports are explicitly offline substitutes. Repair 2's fitting is locally verified, with no live post-repair request because the node expired.
+
+## Fixed C and code delivery
+
+C still has **zero model calls, public operations, mathematical computations and backend solves**. Candidate configuration, linearization, control metrics, bounded endpoint, controller adaptation, closed-loop outcome and evaluation identities remain unproduced. [Static source review](../evidence/research_mainline3_v1_closeout_20261009/fixed_static_binding.json) preserves near/far scales 1.01/0.99, `candidate.family@1.2.0`, `controller.gvs_nmpc@9.0.0`, the unchanged task/robot/seed and V7 recipe (horizon 10, tolerance 1e-6, maximum 120 iterations/30 CPU seconds, feasible-return 5?15 seconds). This is source inspection, not scientific execution. Physical routing ownership includes far tendons through near guides; source-relative scaling is non-cumulative. The [actual admission check](../evidence/research_mainline3_v1_closeout_20261009/automatic_C_guard.json) confirms `close_b` rejects the incomplete material review and `execute_c` rejects the failed B gate before a C store or operation is created. A valid complete physical failure would complete C after B acceptance; no threshold or recipe was changed.
+
+Actual environment: Conda `softagent`, Python 3.11.16, NumPy 2.4.6, SciPy 1.17.1, CasADi 3.7.2, MuJoCo 3.13.0, Pydantic 2.13.5; MATLAB unused. No dependencies were upgraded. Baseline `e89712c6`; integration `a7d521df`; repair 1 `6be496bf`; repair 2 `eccbea7f`. The ordinary delivery commits are descendants of these revisions on `feat/gvs-dynamics`. The push result and one published-head verification are recorded in the closeout evidence and final delivery response. Credentials and unrelated files are excluded. [Sealed-history verification](../evidence/research_mainline3_v1_closeout_20261009/sealed_history_check.json) confirms historical bytes, including Stage 3.36, are unchanged.
+
+## Historical completion text ? unchanged prior activity record
+
+The following text is retained verbatim as the earlier delivery. Its current-status wording refers to that earlier activity.
+
+---
+
 # Research Mainline 3 V1 partial delivery — 2026-10-09
 
 V1 remains incomplete. Accepted A and the valid historical coordinator plan are preserved. This fresh activity completed one new timing/integrity report; the reach/holding investigator exhausted its two model corrections without a valid report. B therefore fails its two-report gate, and the fixed C case was not executed. V2 remains a conditional handoff.

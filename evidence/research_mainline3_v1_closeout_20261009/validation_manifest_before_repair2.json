@@ -1,6 +1,6 @@
 {
   "activity_id": "mainline3-v1-complete-fedcd7c1a3a9",
-  "code_commit": "eccbea7fa1f5aecea274ba1fff242e8c3bcb4e09",
+  "code_commit": "6be496bf87950ce883e39cb56e0f51699a331e6a",
   "code_identity": {
     "configs/deepseek.yaml": "77daae8f464ce48fc297fccfdc1dc4244cf7ce288054bf7b57d14139daad42b6",
     "configs/design_tendon_arm.yaml": "cc0b861a43690d1e824b29deb688e9877b4e315c15ae61a1ae3974ce7cfa007d",
@@ -238,7 +238,7 @@
     "tools/closeout_campaign.py": "230f37d29d8c54e1560735792ba46899d109209457735691cdc9bab58e92e9ba",
     "tools/closeout_state.py": "eb8d3d4c82633b3db5ecf0b4d819e431bf255982f0fd13b1a73a85fa9ae66773",
     "tools/closeout_validation.py": "94f4d6151e9fb40c28753687770ff173c110e8150cee78236de36e22caa131a0",
-    "tools/context_assembly.py": "689e4499fd47d7ff547e0f9eab2b73442ca6c553148e21e6002f4f93a6ebb92e",
+    "tools/context_assembly.py": "5a1edb89721e59c4066d1cfae33f316a30430a4561a2e2d27936849b93c6d49d",
     "tools/current_research_authority.py": "c90a70aefedac1e871e1f3607b6e94f983168b34c387cbc4bb1d902076329879",
     "tools/debug_tools.py": "788c9505646b29a05fc373e38433142180974cfc567f7e389306820acccd50df",
     "tools/deepseek_adapter.py": "69c4c09c1e76a77443cb5f08addafd060f441cb02fb92dd524debd98d1f6abef",
@@ -334,7 +334,7 @@
     "tools/research_disposition_revalidate.py": "4c3cbb63b6556f786b39f3f2e3a446b244d255675fcf4beb847ef6d3afcca626",
     "tools/research_error_routing.py": "d079724ef13d213899087c7a5deebcc94e31e77d6bbda9544e60b4bd2225217f",
     "tools/research_execution.py": "7bb2aded7e8d7707caf047f3fd1f8183910b5567c9be4a89fda60cedffa578a4",
-    "tools/research_investigations.py": "5de6a7052386207197c00fe1af44773249b83d44cfdba4217a7686797b5ecb37",
+    "tools/research_investigations.py": "a36669f900db17830293bab73e671061dd2b514f557cfb5233e25dbe8daf9fdd",
     "tools/research_joint_evaluation.py": "1be5f19bb121193334622bde6ad932819e119e80ae8087477d3d7c12967940fb",
     "tools/research_mainline3.py": "9090ef6da7f8634eab02c7e8fbdb8a5a0232fe6fa239cd5c7bf4a1a5d01d41d0",
     "tools/research_metric_view.py": "f43ba5b4027a05ec8b1a3720e898bba7826243106469c56a3883dc08ea31a1b1",
@@ -342,7 +342,7 @@
     "tools/research_single_validation.py": "5b45d2c5f00b31780ef6f0802f502596627386cf2d9e5def93553533ebadecd5",
     "tools/research_spec.py": "df3e03575a54a4c67c5dc4b6a42625eda6940cfe980d1ca8874dd67a06c9b153",
     "tools/research_tasks.py": "65a5bb2af256e7a46ce891085f1d63237312e17c860fbdbd1998bb80e6d85bbd",
-    "tools/research_v1_continue.py": "8c2482c7024764fee47e19c8f0a1eb4f652cd1a5047a1e2671799ef111fe159a",
+    "tools/research_v1_continue.py": "d95f385866d60efe3f7bd19b8941acf14376993de66d4ad87cf431c66d78126e",
     "tools/research_v1_continue_gate.py": "eb3a6957351ef8c2bfb43fc2b7badc9f9451792a9fc0ab9713818f408e13b6ed",
     "tools/research_v1_delivery.py": "3b4a80ad5797810d65a15018f4057de104e6d5845b081f51d3a3b9419d83f249",
     "tools/research_v1_finish.py": "91d3dbd847de717fe237c00a2cb4d39842b9c7bfb72c592934c25806dc40c5ab",
@@ -388,7 +388,7 @@
     "tools/workbench_view.py": "44504a8579d60ec1ef06e7fea752836ced23e4601719f7739f8962e5045ef2fa",
     "tools/workbench_worker.py": "b27b408e3e3de85abe2e10005986025cc19ba547451d1a7458878164ced3424b",
     "tools/working_state.py": "8eb6bb9e1ebeb2285a9279e2f39b2c869f90d175d3d6ca59f2db6b8fd174da97",
-    "tests/test_research_v1_continue.py": "2975d0dd76e22afa4b4f23dbdbd1c9e5f53fd3f69ad4219b845b42fbd0f4a567"
+    "tests/test_research_v1_continue.py": "e695d6620e7cc2a5d6691ae3f71f584c926e7f334a2cb8c2f36346e51ea3f094"
   },
   "configuration_identity": "c3127a4539f442feeef49af3d0b613f1fb32d4a4e91c95b5d51e1f53886a708f",
   "phases": {
@@ -642,7 +642,7 @@
         "minimum_remaining_s": 2550.0,
         "rationale": "Reserve at actual sequential dispatch from existing ledger remaining capacity, protect downstream delivery, release unused confirmed reservations on settlement. Optional timing needs a concrete necessary revision. No transfer of request allocations or previous activity allowances."
       },
-      "active_run_id": "mainline3-coordinated-repair2"
+      "active_run_id": "mainline3-coordinated-repair1"
     },
     "fixed": {
       "project_budget": {
@@ -701,7 +701,7 @@
     }
   },
   "frozen_at": "2026-10-09T03:17:12.052045+00:00",
-  "implementation_repairs_used": 2,
+  "implementation_repairs_used": 1,
   "implementation_repair_ceiling": 4,
   "same_defect_repair_ceiling": 2,
   "conditional_length_recovery": {
@@ -1726,30 +1726,6 @@
       "new_run": "mainline3-coordinated-repair1",
       "original_run": "mainline3-coordinated",
       "code_revision": "6be496bf87950ce883e39cb56e0f51699a331e6a",
-      "unchanged_authority": true,
-      "new_grant_capacity": 0
-    },
-    {
-      "defect_id": "complete-native-history-capacity",
-      "failure": "Second pending synthesis model correction exceeded unchanged complete-input guard after a preserved correction response. Time wiring also incorrectly used a financial reservation as a shorter node deadline.",
-      "affected_paths": [
-        "tools/context_assembly.py",
-        "tools/research_investigations.py",
-        "tools/research_v1_continue.py",
-        "tests/test_research_v1_continue.py"
-      ],
-      "verification": "repair2_verification.json",
-      "started_unix": 1791516940.492373,
-      "restore_authoritative_node_deadlines": [
-        "coordinator-summary"
-      ],
-      "deadline_explanation": "Restore only original started_unix + frozen 1800 s order; preserve prior 1200 s reservation guard separately. Original 1800 s deadline has expired. No clock reset, deadline restart or authorized provider dispatch.",
-      "purpose": "Second and final same-capacity-defect local repair/verification cycle; actual choices, reasoning, source visibility, counters and grant stay bound. No new model request is authorized past original deadline.",
-      "repair": 2,
-      "same_defect_cycle": 2,
-      "new_run": "mainline3-coordinated-repair2",
-      "original_run": "mainline3-coordinated-repair1",
-      "code_revision": "eccbea7fa1f5aecea274ba1fff242e8c3bcb4e09",
       "unchanged_authority": true,
       "new_grant_capacity": 0
     }

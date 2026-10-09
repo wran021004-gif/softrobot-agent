@@ -1,0 +1,449 @@
+{
+  "version": "mainline3.v1.bounded_delivery@1.0.0",
+  "activity": {
+    "activity_id": "mainline3-v1-complete-fedcd7c1a3a9",
+    "started_unix": 1791514492.0,
+    "deadline_unix": 1791550492.0,
+    "execution_cutoff_unix": 1791548692.0,
+    "started_at": "2026-10-09T02:54:52+00:00",
+    "reviewed_baseline": "e89712c6b8a07df4e712711bc2edb2836f93f953",
+    "observed_head": "e89712c6b8a07df4e712711bc2edb2836f93f953",
+    "remote_fetch": "Target branch fetched once; inspect any advancement and preserve completed work",
+    "includes": "Preparation, repairs, pauses, offline review, live execution and delivery"
+  },
+  "status": "bounded_blocker_delivery",
+  "V1_complete": false,
+  "V2_ready": false,
+  "A": {
+    "accepted": true,
+    "new_requests": 0,
+    "preserved": "A_preserved.json"
+  },
+  "B": {
+    "accepted": false,
+    "completed_new_reach": {
+      "investigation_id": "reach-holding-interpretation",
+      "report": {
+        "artifact_id": "a711e11944748af5b81bf1796359f9e612329573429d6fddfb3577548158bcc9",
+        "media_type": "application/json"
+      }
+    },
+    "reused_timing": {
+      "investigation_id": "timing-integrity-limits",
+      "report": {
+        "artifact_id": "0b029cbf696005a745429dab46593f1a265b4bc35a1a4fc4819a3726420b2215",
+        "media_type": "application/json"
+      }
+    },
+    "historical_coordinator": {
+      "artifact_id": "c0f8698940153ebe884b204135f3841cb519b30e8fc7212b42662412c1bcc8e0",
+      "media_type": "application/json"
+    },
+    "synthesis_valid": false,
+    "principal_dispositions": 0,
+    "original_inspections_by_principal": 0,
+    "material_audit": "material_audit.json",
+    "gate": "coordinated_gate.json",
+    "blocker": {
+      "version": "mainline3.bounded_blocker@1.0.0",
+      "recorded_unix": 1791518049.7129817,
+      "run_id": "mainline3-coordinated-repair2",
+      "status": "bounded_blocker",
+      "B_passed": false,
+      "C_executed": false,
+      "node": "coordinator-summary",
+      "node_started_unix": 1791515980.2943351,
+      "frozen_timeout_s": 1800.0,
+      "original_deadline_unix": 1791517780.2943351,
+      "prior_reservation_guard_unix": 1791517180.2943351,
+      "exception": "INVESTIGATION_ELAPSED_LIMIT",
+      "local_recovery_provider_calls": 0,
+      "total_provider_calls": 7,
+      "repair_cycles_used": 2,
+      "same_defect_cycle_ceiling": 2,
+      "pending_correction_not_sent": true,
+      "wire_capacity_passed": true,
+      "probes_used": 0,
+      "probe_ineligible_reason": "No reasoning-only length termination or truncated formal output; both complete responses saved. Original node deadline expired.",
+      "remaining_allowances_not_transferred": true,
+      "clocks_not_reset": true,
+      "new_grant_capacity": 0,
+      "consequence": "Synthesis invalid; principal dispositions absent. B acceptance unavailable and unchanged C remains gated. No model-authored report, disposition, mathematical result or robot outcome manufactured."
+    }
+  },
+  "C": {
+    "executed": false,
+    "public_operations": 0,
+    "model_requests": 0,
+    "backend_solves": 0,
+    "mathematical_results": null,
+    "execution_id": null,
+    "evaluation_id": null,
+    "configuration": {
+      "source": "evidence/research_native_development_v3_20261007/store/artifacts/3ae03b4e4ddac2e5099ae5823fc0dd7dd9d338dfba6b7d435729d4e5ab41665b.json",
+      "source_artifact": "3ae03b4e4ddac2e5099ae5823fc0dd7dd9d338dfba6b7d435729d4e5ab41665b",
+      "manifest": "evidence/research_native_development_v3_20261007/store/sha256_manifest.json",
+      "file_sha256": "3ae03b4e4ddac2e5099ae5823fc0dd7dd9d338dfba6b7d435729d4e5ab41665b",
+      "source_candidate": "batch-396bdbbae02626d3-0",
+      "source_builder": "candidate.family",
+      "source_builder_version": "1.1.0",
+      "source_controller_version": "7.0.0",
+      "candidate_builder": "candidate.family@1.2.0",
+      "controller": "controller.gvs_nmpc@9.0.0",
+      "task_robot_seed_and_v7_recipe_unchanged": true,
+      "changes": {
+        "design/near_routing_radius_scale": 1.01,
+        "design/far_routing_radius_scale": 0.99
+      }
+    },
+    "static_source_review_only": "fixed_static_binding.json",
+    "reason": "B has not passed; original automatic guard prevents C."
+  },
+  "usage": {
+    "tasks": [
+      {
+        "task": "reach-holding-interpretation",
+        "engineering_recovery": 0,
+        "model_correction": 2,
+        "ordinary": 3,
+        "total": 5,
+        "limit": 12,
+        "new_evidence_operations": 2,
+        "recorded_reads": 10,
+        "node_start_unix": 1791515858.5436668,
+        "node_time_ceiling_s": 3600.0,
+        "charged_execution_wall_s": 119.32800000003772
+      },
+      {
+        "task": "timing-integrity-limits",
+        "ordinary": 0,
+        "model_correction": 0,
+        "engineering_recovery": 0,
+        "total": 0,
+        "limit": 4,
+        "new_evidence_operations": 0,
+        "recorded_reads": 0,
+        "node_start_unix": null,
+        "node_time_ceiling_s": 1200.0,
+        "charged_execution_wall_s": 0
+      },
+      {
+        "task": "coordinator-summary",
+        "engineering_recovery": 0,
+        "model_correction": 1,
+        "ordinary": 1,
+        "total": 2,
+        "limit": 6,
+        "new_evidence_operations": 2,
+        "recorded_reads": 2,
+        "node_start_unix": 1791515980.2943351,
+        "node_time_ceiling_s": 1800.0,
+        "charged_execution_wall_s": 117.56199999997625
+      },
+      {
+        "task": "principal-coordinated-v2",
+        "ordinary": 0,
+        "model_correction": 0,
+        "engineering_recovery": 0,
+        "total": 0,
+        "limit": 18,
+        "new_evidence_operations": 0,
+        "recorded_reads": 0,
+        "node_start_unix": null,
+        "node_time_ceiling_s": 3600.0,
+        "charged_execution_wall_s": 0
+      }
+    ],
+    "provider_requests": 7,
+    "unique_saved_complete_responses": 7,
+    "response_usage": [
+      {
+        "response": "506ab6fb-49b7-49c5-b159-4afea9d84c6d",
+        "reference": {
+          "artifact_id": "77fcd3ae7d79da2f30606b8843630be03035cae757cbfec61cb4dba06eac3d51",
+          "media_type": "application/json"
+        },
+        "request": "investigation-reach-holding-interpretation",
+        "run_id": "mainline3-coordinated",
+        "usage": {
+          "completion_tokens": 8412,
+          "completion_tokens_details": {
+            "reasoning_tokens": 8278
+          },
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 21501,
+          "prompt_tokens": 21501,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          },
+          "total_tokens": 29913
+        },
+        "finish_reason": "tool_calls",
+        "complete_saved": true
+      },
+      {
+        "response": "760dc7a5-a177-4711-8275-aabdd07ac60b",
+        "reference": {
+          "artifact_id": "e57cfc9203a7e7eeec8fa3073aa04af3021c838a591b2f7188db9f5b41c16003",
+          "media_type": "application/json"
+        },
+        "request": "investigation-reach-holding-interpretation",
+        "run_id": "mainline3-coordinated",
+        "usage": {
+          "completion_tokens": 135,
+          "completion_tokens_details": {
+            "reasoning_tokens": 13
+          },
+          "prompt_cache_hit_tokens": 3328,
+          "prompt_cache_miss_tokens": 26992,
+          "prompt_tokens": 30320,
+          "prompt_tokens_details": {
+            "cached_tokens": 3328
+          },
+          "total_tokens": 30455
+        },
+        "finish_reason": "tool_calls",
+        "complete_saved": true
+      },
+      {
+        "response": "bf0e9698-643e-4572-ab2a-337a6c8f5ece",
+        "reference": {
+          "artifact_id": "a9468eb48af74cd8f507b7b4a2c70c03ccd9958d32ff4430e1030bc7a6f4971d",
+          "media_type": "application/json"
+        },
+        "request": "investigation-reach-holding-interpretation",
+        "run_id": "mainline3-coordinated",
+        "usage": {
+          "completion_tokens": 176,
+          "completion_tokens_details": {
+            "reasoning_tokens": 53
+          },
+          "prompt_cache_hit_tokens": 2432,
+          "prompt_cache_miss_tokens": 27895,
+          "prompt_tokens": 30327,
+          "prompt_tokens_details": {
+            "cached_tokens": 2432
+          },
+          "total_tokens": 30503
+        },
+        "finish_reason": "tool_calls",
+        "complete_saved": true
+      },
+      {
+        "response": "b9efb48b-41b4-446d-9ee5-1f2f827c3a79",
+        "reference": {
+          "artifact_id": "0eb830275fbd7e0ff19cac35bbfc9dbe929e9a32e45366d296123c55c2237f63",
+          "media_type": "application/json"
+        },
+        "request": "investigation-reach-holding-interpretation",
+        "run_id": "mainline3-coordinated",
+        "usage": {
+          "completion_tokens": 12032,
+          "completion_tokens_details": {
+            "reasoning_tokens": 6972
+          },
+          "prompt_cache_hit_tokens": 10368,
+          "prompt_cache_miss_tokens": 20506,
+          "prompt_tokens": 30874,
+          "prompt_tokens_details": {
+            "cached_tokens": 10368
+          },
+          "total_tokens": 42906
+        },
+        "finish_reason": "tool_calls",
+        "complete_saved": true
+      },
+      {
+        "response": "14298b6f-de92-4f46-8b91-80d6aba6b54c",
+        "reference": {
+          "artifact_id": "5cc9cfceec7606b5b596dd6e6dc9f1aa90a541a4b2b2ee3868f7bfd9c6d8ca29",
+          "media_type": "application/json"
+        },
+        "request": "investigation-reach-holding-interpretation",
+        "run_id": "mainline3-coordinated",
+        "usage": {
+          "completion_tokens": 6932,
+          "completion_tokens_details": {
+            "reasoning_tokens": 2400
+          },
+          "prompt_cache_hit_tokens": 10368,
+          "prompt_cache_miss_tokens": 32913,
+          "prompt_tokens": 43281,
+          "prompt_tokens_details": {
+            "cached_tokens": 10368
+          },
+          "total_tokens": 50213
+        },
+        "finish_reason": "tool_calls",
+        "complete_saved": true
+      },
+      {
+        "response": "18be9083-8358-4ab9-8a72-a03a839017e9",
+        "reference": {
+          "artifact_id": "3f4ebc936d9fe84ee7e878b1d8f29a4d43013bb7b178e9e4bbe6c8896bf4cc1c",
+          "media_type": "application/json"
+        },
+        "request": "investigation-coordinator-summary",
+        "run_id": "mainline3-coordinated",
+        "usage": {
+          "completion_tokens": 25526,
+          "completion_tokens_details": {
+            "reasoning_tokens": 21019
+          },
+          "prompt_cache_hit_tokens": 3456,
+          "prompt_cache_miss_tokens": 23272,
+          "prompt_tokens": 26728,
+          "prompt_tokens_details": {
+            "cached_tokens": 3456
+          },
+          "total_tokens": 52254
+        },
+        "finish_reason": "tool_calls",
+        "complete_saved": true
+      },
+      {
+        "response": "1c4e6073-ad4b-405c-8716-2a535fa08fa5",
+        "reference": {
+          "artifact_id": "e4b7d480db46d5f00dd2757308fd6844d0078640d7fafc5c87de0ca0d3e97d8d",
+          "media_type": "application/json"
+        },
+        "request": "investigation-coordinator-summary-correction-resume-1",
+        "run_id": "mainline3-coordinated-repair1",
+        "usage": {
+          "completion_tokens": 4440,
+          "completion_tokens_details": {
+            "reasoning_tokens": 29
+          },
+          "prompt_cache_hit_tokens": 128,
+          "prompt_cache_miss_tokens": 39606,
+          "prompt_tokens": 39734,
+          "prompt_tokens_details": {
+            "cached_tokens": 128
+          },
+          "total_tokens": 44174
+        },
+        "finish_reason": "tool_calls",
+        "complete_saved": true
+      }
+    ],
+    "known_tokens": {
+      "prompt_tokens": 222765,
+      "completion_tokens": 57653,
+      "total_tokens": 280418,
+      "prompt_cache_hit_tokens": 30080,
+      "prompt_cache_miss_tokens": 192685
+    },
+    "token_scope": "Exactly seven unique new provider response IDs; reception/accounting duplicates and historical responses excluded.",
+    "provider_monetary_cost": null,
+    "provider_monetary_cost_status": "unknown; no provider invoice or monetary receipt",
+    "unknown_response_bodies": 0,
+    "unknown_reservations": [],
+    "ledger": {
+      "limit": {
+        "backend_solves": 0,
+        "model_calls": 40,
+        "tool_calls": 512,
+        "wall_s": 12000.0,
+        "worker_calls": 0
+      },
+      "used": {
+        "tool_calls": 10,
+        "model_calls": 7,
+        "backend_solves": 0,
+        "worker_calls": 0,
+        "wall_s": 3495.2579791183816
+      },
+      "remaining": {
+        "backend_solves": 0,
+        "model_calls": 33,
+        "tool_calls": 502,
+        "wall_s": 8504.742020881618,
+        "worker_calls": 0
+      },
+      "occupied": {}
+    },
+    "correction_counters": "target_accounting.json",
+    "conditional_probes": 0,
+    "engineering_recovery_requests": 0,
+    "preparation_wall_s": 1340.109047651291,
+    "preparation_charged_once": true,
+    "repair_wall_s": 1913.2119314670563,
+    "activity_elapsed_s_at_delivery_facts": 3746.9548819065094,
+    "unused_allowances_not_transferred": true
+  },
+  "verification": {
+    "offline": "offline_gate.json",
+    "postfreeze_repair1": "repair1_verification.json",
+    "postfreeze_repair2": "repair2_verification.json",
+    "deadline_reservation_check": "repair2_deadline_reservation_check.log",
+    "C_mocked_in_offline_integration": true,
+    "actual_C_guard": "automatic_C_guard.json",
+    "no_full_suite": true,
+    "no_scientific_validation": true,
+    "limits": "Offline fixture acceptance proves production-path wiring only; live synthesis/principal/full B and C did not complete. Repair 2 fitting remained offline after original synthesis node expired."
+  },
+  "repairs": [
+    {
+      "defect_id": "complete-native-history-capacity",
+      "failure": "Saved synthesis ordinary response has 85116 bytes of native reasoning and a 3066-character interpretation; the locally assembled correction exceeded unchanged 160000 conservative input guard before any corrective send.",
+      "affected_paths": [
+        "tools/context_assembly.py",
+        "tools/investigation_contract.py",
+        "tools/research_investigations.py",
+        "tools/research_v1_continue_gate.py",
+        "tests/test_research_v1_continue.py"
+      ],
+      "verification": "repair1_verification.json",
+      "started_unix": 1791516081.083847,
+      "purpose": "Restore the preserved planned model correction; local engineering repair sends no request and spends no correction counter. Original clocks, task ceilings and report versions remain.",
+      "repair": 1,
+      "same_defect_cycle": 1,
+      "new_run": "mainline3-coordinated-repair1",
+      "original_run": "mainline3-coordinated",
+      "code_revision": "6be496bf87950ce883e39cb56e0f51699a331e6a",
+      "unchanged_authority": true,
+      "new_grant_capacity": 0
+    },
+    {
+      "defect_id": "complete-native-history-capacity",
+      "failure": "Second pending synthesis model correction exceeded unchanged complete-input guard after a preserved correction response. Time wiring also incorrectly used a financial reservation as a shorter node deadline.",
+      "affected_paths": [
+        "tools/context_assembly.py",
+        "tools/research_investigations.py",
+        "tools/research_v1_continue.py",
+        "tests/test_research_v1_continue.py"
+      ],
+      "verification": "repair2_verification.json",
+      "started_unix": 1791516940.492373,
+      "restore_authoritative_node_deadlines": [
+        "coordinator-summary"
+      ],
+      "deadline_explanation": "Restore only original started_unix + frozen 1800 s order; preserve prior 1200 s reservation guard separately. Original 1800 s deadline has expired. No clock reset, deadline restart or authorized provider dispatch.",
+      "purpose": "Second and final same-capacity-defect local repair/verification cycle; actual choices, reasoning, source visibility, counters and grant stay bound. No new model request is authorized past original deadline.",
+      "repair": 2,
+      "same_defect_cycle": 2,
+      "new_run": "mainline3-coordinated-repair2",
+      "original_run": "mainline3-coordinated-repair1",
+      "code_revision": "eccbea7fa1f5aecea274ba1fff242e8c3bcb4e09",
+      "unchanged_authority": true,
+      "new_grant_capacity": 0
+    }
+  ],
+  "historical_activity": {
+    "provider_requests": 18,
+    "complete_saved_responses": 17,
+    "known_tokens": 393122,
+    "cost_unknown": true,
+    "missing_body_search": false,
+    "capacity_transferred": false,
+    "source": "../research_mainline3_v1_complete_20261009/delivery_facts.json"
+  },
+  "code": {
+    "reviewed_baseline": "e89712c6b8a07df4e712711bc2edb2836f93f953",
+    "integration": "a7d521df384a1c7c3de13918097646af56164af1",
+    "repair1": "6be496bf87950ce883e39cb56e0f51699a331e6a",
+    "repair2": "eccbea7fa1f5aecea274ba1fff242e8c3bcb4e09",
+    "ordinary_push_branch": "feat/gvs-dynamics",
+    "ordinary_push_status": "pending_delivery_commit_and_push"
+  }
+}
