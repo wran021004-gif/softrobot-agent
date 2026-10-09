@@ -40,6 +40,21 @@ class ContinuationTests(TestCase):
             adapter=DeepSeekAdapter();adapter.request_config=cfg;adapter.respond(wire,1)
         self.assertEqual(transport_calls,[original]);self.assertEqual(wire,original)
 
+    def test_saved_principal_wrong_catalog_gets_actionable_binding_feedback(self):
+        from tools.disposition_facts import BindingError
+        source=fixture.ROOT/'evidence/research_mainline3_v1_handoff_20261009'
+        raw=read(source/'principal_saved_response3.json')
+        from tools import research_v1_continue as activity
+        manifest=read(source/'validation_manifest.json')
+        store=Store(fixture.ROOT/manifest['phases']['coordinated']['output'])
+        session=store.session('mainline3-coordinated')
+        with patch.object(self.dispatch.store,'session',return_value=session):
+            with self.assertRaises(BindingError) as raised:self.dispatch._decode(raw,node_id='principal-coordinated-v2')
+        issue=raised.exception.issue
+        self.assertEqual(issue['path'],'/facts/0/catalog')
+        self.assertEqual(issue['legal']['expected_catalog'],session['state']['investigations']['principal-coordinated-v2']['source_fact_catalog'])
+        self.assertIn('not interchangeable',issue['legal']['requirement'])
+
     def test_selected_investigator_projection_and_actual_sent_restoration(self):
         sends=[]
         def transport(wire):

@@ -552,6 +552,23 @@ def continue_repair():
         # First replay complete saved outputs locally. This sends zero requests.
         for key,node in store.session(host.run_id)['state'].get('investigations',{}).items():
             if node['status']!='completed':d.recover(key)
+        if reuse_both():
+            from examples.gvs_nmpc_route_experiment import load_credential
+            load_credential(Path.home()/'.codex/.env')
+            for key,node in store.session(host.run_id)['state'].get('investigations',{}).items():
+                if node['status']=='completed':continue
+                order=InvestigationOrder.model_validate(node['order']);raw=store.artifact(node['provider_response_refs'][-1])
+                try:
+                    report=d._decode(raw,node_id=key);d._validate_return(order,report,node['reads'])
+                except ValueError as exc:
+                    feedback=d._protocol_feedback(order,exc)
+                    if feedback is None:raise
+                    origin=node.get('request_run_id',host.run_id)
+                    attempts=[e for e in store.events(origin) if e['kind']=='investigation_provider_attempt' and e['request_id']==node.get('active_request_id','investigation-'+key)]
+                    payload=store.artifact(attempts[-1]['outputs'][0])['payload']
+                    message=raw['choices'][0]['message'];call=message['tool_calls'][0]
+                    d._append_correction(payload,d._assistant_history(message),call['id'],feedback)
+                    d.engineering_recovery(key,'Saved response confirms invalid source catalog selection; corrected actionable feedback, same native conversation',resume_payload=payload,request_purpose='model_correction')
         return stage_b(host,m,p)
     from examples.gvs_nmpc_route_experiment import load_credential
     load_credential(Path.home()/'.codex/.env')

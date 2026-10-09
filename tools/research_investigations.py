@@ -515,7 +515,7 @@ class InvestigationDispatcher:
         if not old['receipt'] or json.loads(old['receipt'])['execution_status']!='failed':raise ValueError('CONFIRMED_NEW_ACTIVITY_FAILURE_REQUIRED')
         failure=self.store.artifact(node['failure_record'])
         routing=failure['details']['error_routing']['category']
-        if routing not in ('program_construction','received_local_failure','transport_or_unknown','capacity'):raise ValueError('GENUINE_ENGINEERING_FAILURE_REQUIRED')
+        if routing not in ('program_construction','received_local_failure','transport_or_unknown','capacity') and not (request_purpose=='model_correction' and routing=='model_protocol'):raise ValueError('GENUINE_ENGINEERING_FAILURE_REQUIRED')
         order=InvestigationOrder.model_validate(node['order']);_,grant=self._scope(order)
         accounting=self._target_accounting(grant)
         if request_purpose not in ('engineering_recovery','model_correction'):raise ValueError('RECOVERY_REQUEST_PURPOSE_INVALID')
@@ -533,6 +533,9 @@ class InvestigationDispatcher:
         if remaining_s<=0:raise ValueError('INVESTIGATION_ELAPSED_LIMIT')
         request=old['request_id']+('-correction-resume-' if request_purpose=='model_correction' else '-engineering-')+str(node.get('requests_by_purpose',{}).get(request_purpose,0)+1)
         reservation={k:v-node['usage'][k] for k,v in plain(order.budget).items()};reservation['wall_s']=remaining_s
+        if grant.get('correction_policy',{}).get('version')=='mainline3.shared_completion@2.0.0':
+            available=self.store.spendable(self.run_id)['remaining']
+            for resource in ('model_calls','tool_calls','wall_s'):reservation[resource]=min(reservation[resource],available[resource])
         with self.store.transaction() as db:
             state=self.store.session(self.run_id,db)['state'];n=state['investigations'][key]
             n.update(next_request_purpose=request_purpose,next_request_reason=reason,active_request_id=request,request_run_id=self.run_id,status='pending')
@@ -664,7 +667,7 @@ class InvestigationDispatcher:
                 self._state(order.investigation_id,status='unconfirmed',reason=reason)
             else:
                 progress['stage']='settlement'
-                self.store.complete(row,self._receipt(row,'failed',reason),elapsed=time.monotonic()-started,
+                self.store.complete(row,self._receipt(row,'failed',reason),elapsed=progress['elapsed_s'] if progress.get('recovering') else time.monotonic()-started,
                     actual_cost={k:v-(baseline or zero())[k] for k,v in self.store.session(self.run_id)['state']['investigations'][order.investigation_id]['usage'].items()})
                 progress['settlement_completed']=True
                 self._state(order.investigation_id,status='failed',reason=reason,progress=dict(progress))
@@ -1177,6 +1180,8 @@ class InvestigationDispatcher:
                     if isinstance(exc,ValidationError) else [getattr(exc,'issue',dict(code=str(exc)))])
                 feedback=dict(error='INVALID_UNEXECUTED_REPORT',issues=issues,error_routing=routing,
                     requirement='Correct the precise reported defect and resubmit the advertised native result. Choose conclusions independently; source inspections, task/common requests and deadlines remain in force. Up to two planned and at most four corrections per stable target, with actionable extensions only.')
+                if grant['correction_policy']['version']=='mainline3.shared_completion@2.0.0':
+                    feedback['requirement']='Correct the precise actionable defect and resubmit the advertised native result under the shared 40-request ceiling. Preserve original inspections and both formal disposition targets. Unchanged failing field and feedback stop further corrections.'
                 return self._target_feedback(order,exc,feedback,state,grant,db)
             purposes=allocation.get('request_purposes')
             if purposes:
@@ -1264,7 +1269,7 @@ class InvestigationDispatcher:
                 links=[]
                 if self._selected_reports():
                     from tools.disposition_facts import expand_source
-                    candidates=[n for n in eligible
+                    candidates=eligible if node_id else [n for n in eligible
                         if any(plain(f.catalog)==n.get('source_fact_catalog') for f in [*report.facts,*report.counterevidence])]
                     if (report.facts or report.counterevidence) and len(candidates)!=1:raise ValueError('REPORT_SOURCE_CATALOG_NODE_BINDING_REQUIRED')
                     for area in ('facts','counterevidence'):

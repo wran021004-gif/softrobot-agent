@@ -46,7 +46,8 @@ def expand_source(dispatcher,selected,node,*,path):
     from tools.research_investigations import SourceFact
     selected=SelectedSourceFact.model_validate(selected)
     if plain(selected.catalog)!=node.get('source_fact_catalog'):
-        raise BindingError(path+'/catalog',selected.catalog,'unknown or stale investigator catalog')
+        raise BindingError(path+'/catalog',selected.catalog,'unknown or stale source fact catalog',
+            dict(expected_catalog=node.get('source_fact_catalog'),requirement='Top-level facts/counterevidence use source_fact_catalog source-* handles. Principal disposition selections use the separate fact_catalog fact-* handles; they are not interchangeable. Facts may be empty if all adopted evidence is represented inside the required formal dispositions.'))
     body=dispatcher.store.artifact(selected.catalog)
     if (body['version']!=selected.catalog_version or body['investigation_id']!=node['order']['investigation_id']
         or body['order_identity']!=digest(node['order']) or body['activity_run_id'] not in {dispatcher.run_id,node.get('source_catalog_origin_run_id')}):
