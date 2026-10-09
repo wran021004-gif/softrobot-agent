@@ -41,7 +41,10 @@ def bind(ctx, args):
     if validation['historical_node_identity']!=digest(node):raise ValueError('HISTORICAL_VALIDATION_BINDING_MISMATCH')
     entry=dict(status='completed',result=plain(args.report),kind='historical_reuse',
         original=plain(args),original_execution_id=old.lookup(node.get('request_run_id',args.source_run_id),'investigation-'+args.source_node)['execution_id'],
-        old_validation=validation,new_investigation_executed=False)
+        old_validation=validation,new_investigation_executed=False,reads=node.get('reads',[]),
+        source_bindings=node['order']['evidence'],source_node=args.source_node,source_run_id=args.source_run_id,
+        source_project_id=args.source_project_id,source_database_sha256=args.source_database_sha256,
+        historical_validation=plain(args.historical_validation),execution_permissions_transferred=False)
     if node['order']['role']=='coordinator':
         binding=grant.get('historical_execution_bindings',{}).get(args.source_node)
         if not binding or binding['report']!=plain(args.report) or binding['proposed_children']!=node['children']:

@@ -23,7 +23,8 @@ from tools.context_assembly import _no_secrets
 
 ROOT=Path(__file__).resolve().parents[1]
 OLD=ROOT/'evidence/research_mainline3_v1_finish_20261008'
-OUT=ROOT/'evidence/research_mainline3_v1_continue_20261008'
+REUSE=ROOT/'evidence/research_mainline3_v1_complete_20261009'
+OUT=ROOT/'evidence/research_mainline3_v1_closeout_20261009'
 TOOLS={k:'1.0.0' for k in ('research.investigate','research.investigation_status','research.investigation_read','research.investigation_disposition','research.investigation_handoff')}
 PRIOR_FAILED=[
  'tests.test_research_investigation_closeout.InvestigationCloseoutTests.test_paginated_original_pointer_binding',
@@ -57,7 +58,7 @@ def start(authorization=None, started_unix=None):
     from datetime import datetime,timezone
     atomic_json(OUT/'activity_start.json',dict(activity_id='mainline3-v1-complete-'+uuid4().hex[:12],started_unix=began,
         deadline_unix=began+36000,execution_cutoff_unix=began+34200,started_at=datetime.fromtimestamp(began,timezone.utc).isoformat(),
-        reviewed_baseline='0867abc6424db87fe6b9e933a33163c2072a54e2',observed_head=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip(),
+        reviewed_baseline='e89712c6b8a07df4e712711bc2edb2836f93f953',observed_head=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip(),
         remote_fetch='Target branch fetched once; inspect any advancement and preserve completed work',
         includes='Preparation, repairs, pauses, offline review, live execution and delivery'))
     atomic_json(OUT/'authorization.json',dict(source=str(authorization) if authorization else 'Offline fixture',
@@ -71,14 +72,14 @@ def start(authorization=None, started_unix=None):
         forbidden='Parameter optimization, paid A rerun, extra scientific cases, V2 experiments, force push, uncertain request retransmission'))
     previous=ROOT/'evidence/research_mainline3_v1_continue_20261008'
     paths=[ROOT/'runs/stage336_manual_20261001_090616/platform.sqlite']
-    for olddir in (OLD,previous):
+    for olddir in (OLD,previous,REUSE):
         paths.extend(p for p in olddir.rglob('*') if p.is_file())
         oldmanifest=read(olddir/'validation_manifest.json')
         paths.extend(ROOT/p['output']/'platform.sqlite' for p in oldmanifest['phases'].values() if (ROOT/p['output']/'platform.sqlite').exists())
     atomic_json(OUT/'sealed_history.json',{p.relative_to(ROOT).as_posix():sha(p) for p in paths})
     facts=read(previous/'delivery_facts.json')
-    atomic_json(OUT/'historical_uncertainties.json',dict(previous_delivery=(previous/'delivery_facts.json').relative_to(ROOT).as_posix(),
-        preserved=facts['historical_uncertainty'],previous_usage=facts['provider_usage'],previous_B=facts['B'],
+    atomic_json(OUT/'historical_uncertainties.json',dict(previous_delivery=(REUSE/'delivery_facts.json').relative_to(ROOT).as_posix(),
+        sealed_delivery=read(REUSE/'delivery_facts.json'),
         no_old_nodes_reopened=True,no_search_for_missing_bodies=True))
     atomic_json(OUT/'A_preserved.json',dict(source=(previous/'A_preserved.json').relative_to(ROOT).as_posix(),gate=read(previous/'A_preserved.json'),
         coverage='Historical investigator reports reused; new principal dispositions in prior activity. No new A model/investigator/scientific work.',
@@ -93,8 +94,23 @@ def allocation(ordinary,correction,recovery,protected):
 
 def config():
     cfg=model_configuration(configuration())
-    cfg['policy']['model'].update(adapter_version='8.0.0',parameters=dict(investigation_contract='selectable_facts_v3'),timeout_s=600.)
+    cfg['policy']['model'].update(adapter_version='8.0.0',parameters=dict(investigation_contract='selected_reports_v4'),timeout_s=600.)
     return cfg
+
+
+def sequential_reservation_plan(preparation_s):
+    # Maximum task allowances remain unchanged; dormant timing is not reserved.
+    nodes={
+        'reach-holding-interpretation':dict(reserve_s=1800.,minimum_dispatch_s=600.,protected_s=600.,downstream=['coordinator-summary','principal-coordinated-v2']),
+        'timing-integrity-limits':dict(reserve_s=1200.,minimum_dispatch_s=300.,protected_s=0.,downstream=['coordinator-summary','principal-coordinated-v2'],dormant=True),
+        'coordinator-summary':dict(reserve_s=1200.,minimum_dispatch_s=600.,protected_s=600.,downstream=['principal-coordinated-v2']),
+        'principal-coordinated-v2':dict(reserve_s=2400.,minimum_dispatch_s=1200.,protected_s=1200.,downstream=[])}
+    minimum=sum(n['minimum_dispatch_s'] for n in nodes.values() if not n.get('dormant'))+150.
+    if preparation_s+minimum>12000:raise ValueError('B_PREPARATION_AND_PROTECTED_REMAINING_WORK_INSUFFICIENT: '+encode(dict(preparation_s=preparation_s,minimum_remaining_s=minimum,ceiling_s=12000.)))
+    return dict(version='mainline3.sequential_reservations@1.0.0',nodes=nodes,public_overhead_protected_s=150.,
+        preparation_s=preparation_s,preparation_charged_once=True,maximum_node_allowances_s=10200.,
+        initial_mandatory_reservations_s=5400.,minimum_remaining_s=minimum,
+        rationale='Reserve at actual sequential dispatch from existing ledger remaining capacity, protect downstream delivery, release unused confirmed reservations on settlement. Optional timing needs a concrete necessary revision. No transfer of request allocations or previous activity allowances.')
 
 def freeze():
     if (OUT/'validation_manifest.json').exists():raise ValueError('ALREADY_FROZEN')
@@ -121,7 +137,7 @@ def freeze():
     probes=dict(configurations=[dict(name='default',reasoning_effort='high',max_tokens=32768,supported=True),
         dict(name='probe1',reasoning_effort='low',max_tokens=32768,supported=True),dict(name='probe2',reasoning_effort='high',max_tokens=65536,supported=True)],
         support_source=['https://api-docs.deepseek.com/api/create-chat-completion/','https://api-docs.deepseek.com/guides/thinking_mode/'],
-        verified_date='2026-10-08',live_support_probe_requests=0,
+        verified_date='2026-10-09',live_support_probe_requests=0,
         trigger='Reasoning-only length or truncated formal return after local faults excluded; no partial fields executed',
         selection='First blocking case uses probe1, next blocking case probe2; at most two total. Role may continue its selected supported setting only after valid delivery. No other combinations.',
         subsequent='Original role ceiling, correction allowance and full actual request guard remain mandatory; evidence comparison retains valid delivery, material audit, usage and elapsed.')
@@ -132,7 +148,7 @@ def freeze():
         frozen_at=now(),implementation_repairs_used=0,implementation_repair_ceiling=4,same_defect_repair_ceiling=2,
         conditional_length_recovery=probes,historical_parent=parent,historical_bundle_identity=digest(b),
         fixed_identity=fixed_identity(),fixed_changes=fixed_identity()['changes'],total_new_provider_requests=40,
-        gates=dict(B='Two new valid reports, actual synthesis, two public principal dispositions, original evidence inspections, receipts and separate coding-agent material audit',
+        gates=dict(B='One new valid reach report, imported valid historical timing report or explicitly necessary revision, actual synthesis of selected versions, two public principal dispositions, original evidence inspections, receipts and separate coding-agent material audit',
             C='Eight public components, changed-geometry identities, complete valid execution; physical failure is legitimate completion'),
         executability=dict(B_node_reservations=dict(model_calls=40,tool_calls=60,wall_s=10200),B_public_overhead_max=dict(tool_calls=30,wall_s=150),
             B_project=dict(model_calls=40,tool_calls=512,wall_s=12000),concurrency=1,collector='Sequential submission and collection; deadlines start at actual dispatch',
@@ -143,7 +159,11 @@ def freeze():
     if not correction_consistency(read(OUT/'authorization.json'),phases['coordinated'],orders=children)['passed']:
         raise ValueError('CORRECTION_POLICY_CONSISTENCY_REQUIRED')
     manifest['preparation_wall_s']=max(0,time.time()-read(OUT/'activity_start.json')['started_unix'])
-    if manifest['preparation_wall_s']+10200+150>12000:raise ValueError('PREPARATION_AND_MAXIMUM_ROLE_RESERVATIONS_DO_NOT_FIT')
+    phases['coordinated']['sequential_reservations']=sequential_reservation_plan(manifest['preparation_wall_s'])
+    manifest['executability']['B_node_reservations']=dict(maximum_allowances=manifest['executability']['B_node_reservations'],
+        actual_dispatch_plan=phases['coordinated']['sequential_reservations'])
+    manifest['timing_reuse']=dict(directory=REUSE.relative_to(ROOT).as_posix(),report=read(REUSE/'coordinated_bundle.json')['state']['investigations']['timing-integrity-limits']['result'],
+        material_audit_identity=digest(read(REUSE/'timing_material_audit.json')),new_timing_request_required=False)
     atomic_json(OUT/'frozen_configuration.json',cfg);atomic_json(OUT/'validation_manifest.json',manifest)
 
 def check():
@@ -189,9 +209,10 @@ def bind_sources(host,m,p):
         grant=dict(max_count=4,max_concurrency=1,allowed_tools=['evidence.read'],evidence=sources,include_completed_reports=True,
             per_node_budget=p['node_budget'],total_budget=p['total_node_budget'],output_bytes=65536,deadline_unix=read(OUT/'activity_start.json')['execution_cutoff_unix'],
             correction_policy=p['correction_policy'],
+            sequential_reservations=p['sequential_reservations'],
             inspected_supplemental_catalog=True,delivery_allocations=p['allocations'],conditional_length_recovery=m['conditional_length_recovery'],
             historical_handoffs=[descriptor],historical_execution_bindings={'coordinator-plan':binding})
-        prior=read(ROOT/'evidence/research_mainline3_v1_continue_20261008/coordinated_bundle.json')
+        prior=read(REUSE/'coordinated_bundle.json')
         grant['imported_query_results']={}
         for key in (c['investigation_id'] for c in p['authorized_children']):
             pages=[]
@@ -209,12 +230,33 @@ def bind_sources(host,m,p):
     if receipt['execution_status']!='completed':raise ValueError('PUBLIC_COORDINATOR_IMPORT_FAILED: '+str(receipt.get('error')))
     atomic_json(OUT/'coordinator_import.json',dict(receipt=receipt,original_proposals=parent['children'],new_host_binding=binding,new_planning_requests=0,
         source_import_is_role_inspection=False,scope_preserved=True))
+    import_timing(host,m)
     return sources
+
+
+def import_timing(host,m):
+    bundle=read(REUSE/'coordinated_bundle.json');manifest=read(REUSE/'validation_manifest.json');phase=manifest['phases']['coordinated']
+    run=phase.get('active_run_id','mainline3-coordinated');old=Store(ROOT/phase['output'])
+    node=old.session(run)['state']['investigations']['timing-integrity-limits'];report=node['result']
+    if report!=m['timing_reuse']['report'] or node['status']!='completed':raise ValueError('TIMING_REUSE_VERSION_CHANGED')
+    with host.store.transaction() as db:
+        if plain(host.store.put(db,old.artifact(report)))!=report:raise ValueError('TIMING_REUSE_IDENTITY_CHANGED')
+        validation=plain(host.store.put(db,dict(historical_node_identity=digest(node),formal_valid=True,material_audit=read(REUSE/'timing_material_audit.json'),unqualified_adoption_supported=False)))
+        descriptor=dict(source_directory=phase['output'],source_run_id=run,source_project_id=bundle['project']['project_id'],source_database_sha256=sha(old.db),source_node='timing-integrity-limits',report=report,historical_validation=validation)
+        state=host.store.session(host.run_id,db)['state'];grant=state['role_context']['investigation_grant']
+        grant['historical_handoffs'].append(descriptor)
+        # Audit is supplied as limitations, with original identity and provenance.
+        grant['evidence'].append(validation);state['investigation_grant_identity']=digest(grant)
+        host.store.update_state(db,host.run_id,state)
+    receipt=invoke(host,'research.investigation_handoff',descriptor,request_id='import-timing-report')
+    if receipt['execution_status']!='completed':raise ValueError('PUBLIC_TIMING_IMPORT_FAILED: '+str(receipt.get('error')))
+    atomic_json(OUT/'timing_import.json',dict(receipt=receipt,report=report,provenance=descriptor,limitations=validation,new_provider_requests=0,source_inspection_not_implied=True))
+    return report
 
 def collect(host,key):
     node=host.store.session(host.run_id)['state']['investigations'][key]
     t=next((t for t in threading.enumerate() if t.name=='investigation-'+key),None)
-    if t:t.join(max(0,node['order']['timeout_s']-(time.time()-node['started_unix']))+5)
+    if t:t.join(max(0,node.get('execution_deadline_unix',node['started_unix']+node['order']['timeout_s'])-time.time())+5)
     r=invoke(host,'research.investigation_status',dict(investigation_id=key),request_id='collect-'+key)
     if r['execution_status']!='completed':raise ValueError('PUBLIC_COLLECTION_FAILED: '+str(r.get('error')))
     result=host.store.artifact(r['output'])
@@ -246,20 +288,23 @@ def stage_b(host,m,p,transport=None):
         load_credential(Path.home()/'.codex/.env')
     reports=[]
     for child in children:
+        if child['investigation_id']=='timing-integrity-limits':
+            reports.append(read(OUT/'timing_import.json')['report']);continue
         if child['investigation_id'] not in host.store.session(host.run_id)['state'].get('investigations',{}):submit(host,child)
         reports.append(collect(host,child['investigation_id']))
     targets=[dict(investigation_id=c['investigation_id'],report=r) for c,r in zip(children,reports)]
     queries=[dict(reference=r,pointer='',limit=100,byte_limit=65536) for r in reports]
     synthesis=root_order(p,'coordinator-summary','coordinator',
-        'Actually synthesize both new investigator reports, including counterevidence and unknowns. Return a concise sourced investigation_return. Distinguish official historical reach and sampled settling from timing and integrity. Do not delegate, dispose, infer a dominant cause, or conduct new science. Facts may cite exact inspected report fields; scientific conclusions remain your own.',[*sources,*reports],queries)
+        'Actually synthesize the new reach report and imported historical timing report, including counterevidence and unknowns. Cite inspected fields from BOTH selected report versions. Timing material audit identifies false-as-unavailable and absent /official field interpretations; use archived recomputation presentation to distinguish available failed results. Do not silently adopt these incorrect claims. Return a concise sourced investigation_return with supported observations and unresolved causes. Do not delegate, dispose, or conduct science.',[*sources,*reports],queries)
     if 'coordinator-summary' not in host.store.session(host.run_id)['state'].get('investigations',{}):submit(host,synthesis)
     combined=collect(host,'coordinator-summary')
     # These prefetches are role-attributable operations inside the principal node reservation.
-    original_queries=[dict(reference=sources[0],pointer='',offset=i,limit=15,byte_limit=4096) for i in (0,15,30)]
-    original_queries.append(dict(reference=sources[1],pointer='/limitations',limit=100,byte_limit=4096))
+    original_queries=[dict(reference=r,pointer='',limit=100,byte_limit=65536) for r in sources]
+    timing_limitations=read(OUT/'timing_import.json')['limitations']
+    original_queries.append(dict(reference=timing_limitations,pointer='/material_audit/defects',limit=100,byte_limit=4096))
     principal=root_order(p,'principal-coordinated-v2','principal',
-        'Read the two complete new investigator reports, actual coordinator synthesis, and necessary original evidence now present in your prefetched pages. Submit exactly one formal accept/defer/reject disposition per declared report through investigation_return. Select catalog handles for report-linked support, explicit additional_support and per-source scope. Independently evaluate material claims and explicit unknowns. Official historical failure remains recorded; limited recomputation does not erase it. One-step predictions do not establish reach, settling, causality or real-robot feasibility. Adopt only supported portions, or defer/reject with precise reasons. No desired scientific conclusion is mandated.',
-        [*sources,*reports,combined],[*queries,dict(reference=combined,pointer='',limit=100,byte_limit=65536),*original_queries])
+        'Read the complete new reach report, imported historical timing report, actual synthesis and original sources in prefetched pages. Submit exactly one formal accept/defer/reject disposition per declared report. Timing audit identifies false-as-unavailable and absent /official recomputation-field errors: evaluate these and adopt only supported portions or defer/reject. Use catalog handles, explicit additional_support and separate scope for EVERY source cited in each adopted claim. Historical reach/holding failure remains recorded; predictions do not establish acceptance, causality or real-robot feasibility. Select conclusions independently. No new science.',
+        [*sources,*reports,combined,timing_limitations],[*queries,dict(reference=combined,pointer='',limit=100,byte_limit=65536),*original_queries])
     principal['disposition_ids']=[t['investigation_id'] for t in targets]
     if 'principal-coordinated-v2' not in host.store.session(host.run_id)['state'].get('investigations',{}):submit(host,principal)
     report=collect(host,'principal-coordinated-v2')
@@ -311,9 +356,12 @@ def execute_c():
         stop(host,'FIXED C TERMINAL; physical failure never authorizes tuning or improved-result rerun')
         export(OUT,'fixed')
 
-def bind_repair():
+def bind_repair(record=None):
     """One explicit version migration in the original grant; no STOP revival."""
     m=read(OUT/'validation_manifest.json');p=m['phases']['coordinated'];old_run=p.get('active_run_id','mainline3-coordinated')
+    if p.get('sequential_reservations'):
+        if not record:raise ValueError('CONCRETE_REPAIR_RECORD_REQUIRED')
+        return bind_current_repair(m,p,old_run,record)
     store=Store(ROOT/p['output']);old=store.session(old_run)
     if old['status']!='stopped' or m['implementation_repairs_used']>=4:raise ValueError('BOUNDED_STOPPED_REPAIR_REQUIRED')
     saved=read(OUT/'coordinated_bundle.json');atomic_json(OUT/'coordinated_bundle_before_repair1.json',saved)
@@ -368,8 +416,45 @@ def bind_repair():
     if fresh:store.complete(r,dict(request_id=r['request_id'],execution_id=r['execution_id'],tool_id='engineering.repair',tool_version='1.0.0',execution_status='completed',caller='coding-agent-repair',charged=zero(),cache_hit=False),record,elapsed=elapsed,actual_cost=cost,kind='engineering_repair')
     atomic_json(OUT/'repair1_accounting.json',dict(repair_wall_s=elapsed,project_ledger=store.remaining(),coding_operations='Bounded patch, source/receipt inspection, affected offline checks, ordinary commit and version binding; shell operations are engineering, not fabricated public source reads.'))
 
+def bind_current_repair(m,p,old_run,record):
+    """Targeted current-activity migration; ledger/counters/clocks are unchanged."""
+    if m['implementation_repairs_used']>=4:raise ValueError('POST_FREEZE_REPAIR_CEILING')
+    prior=[r for r in m.get('repairs',[]) if r['defect_id']==record['defect_id']]
+    if len(prior)>=2:raise ValueError('SAME_DEFECT_REPAIR_CEILING')
+    clock=read(OUT/'activity_start.json')
+    if time.time()>=clock['execution_cutoff_unix']:raise ValueError('PROTECTED_DELIVERY_CUTOFF')
+    if not read(OUT/record['verification'])['passed']:raise ValueError('FOCUSED_REPAIR_VERIFICATION_REQUIRED')
+    store=Store(ROOT/p['output']);old=store.session(old_run)
+    if any(t.name.startswith('investigation-') for t in threading.enumerate()):raise ValueError('ACTIVE_INVESTIGATION_NO_REPAIR_MIGRATION')
+    index=m['implementation_repairs_used']+1;new_run='mainline3-coordinated-repair'+str(index)
+    cfg=deepcopy(old['snapshot']['input']);cfg['run_id']=new_run
+    host=Host(store.root,new_run);host.create(cfg);host.resume()
+    state=deepcopy(old['state']);state['original_stopped_run']=old_run
+    for node in state.get('investigations',{}).values():
+        node.setdefault('request_run_id',old_run)
+        for field,origin in [('fact_catalog','catalog_origin_run_id'),('source_fact_catalog','source_catalog_origin_run_id')]:
+            if node.get(field):node.setdefault(origin,store.artifact(node[field])['activity_run_id'])
+    with store.transaction() as db:store.update_state(db,new_run,state)
+    atomic_json(OUT/('validation_manifest_before_repair'+str(index)+'.json'),m)
+    for path in record['affected_paths']:m['code_identity'][path]=sha(ROOT/path)
+    record=dict(record,repair=index,same_defect_cycle=len(prior)+1,new_run=new_run,original_run=old_run,
+        code_revision=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip(),unchanged_authority=True,new_grant_capacity=0)
+    m.update(code_commit=record['code_revision'],implementation_repairs_used=index);p['active_run_id']=new_run
+    m.setdefault('repairs',[]).append(record);atomic_json(OUT/'validation_manifest.json',m)
+    elapsed=max(0,time.time()-record['started_unix']);cost={**zero(),'wall_s':elapsed}
+    row,fresh=store.reserve(new_run,'engineering-repair'+str(index),digest(record),'coding-agent-repair',cost,kind='engineering_repair')
+    if fresh:store.complete(row,dict(request_id=row['request_id'],execution_id=row['execution_id'],tool_id='engineering.repair',tool_version='1.0.0',execution_status='completed',caller='coding-agent-repair',charged=zero(),cache_hit=False),record,elapsed=elapsed,actual_cost=cost,kind='engineering_repair')
+    atomic_json(OUT/('repair'+str(index)+'.json'),record)
+    return host
+
+
 def continue_repair():
     host,m,p=host_for('coordinated');store=host.store;d=InvestigationDispatcher(host)
+    if p.get('sequential_reservations'):
+        # First replay complete saved outputs locally. This sends zero requests.
+        for key,node in store.session(host.run_id)['state'].get('investigations',{}).items():
+            if node['status']!='completed':d.recover(key)
+        return stage_b(host,m,p)
     from examples.gvs_nmpc_route_experiment import load_credential
     load_credential(Path.home()/'.codex/.env')
     for key in ('reach-holding-interpretation','timing-integrity-limits'):
@@ -427,13 +512,14 @@ def main():
     global OUT
     parser=argparse.ArgumentParser();parser.add_argument('action',choices=['start','freeze','execute-b','close-b','check','bind-repair','continue-repair'])
     parser.add_argument('--directory',type=Path);parser.add_argument('--authorization',type=Path);parser.add_argument('--started-unix',type=float)
+    parser.add_argument('--repair-record',type=Path)
     args=parser.parse_args()
     if args.directory:OUT=args.directory.resolve()
     if not OUT.is_relative_to(ROOT/'evidence'):raise ValueError('ACTIVITY_DIRECTORY_OUTSIDE_EVIDENCE')
     if args.action=='start':start(args.authorization,args.started_unix)
     elif args.action=='freeze':freeze()
     elif args.action=='check':check()
-    elif args.action=='bind-repair':bind_repair()
+    elif args.action=='bind-repair':bind_repair(read(args.repair_record) if args.repair_record else None)
     elif args.action=='continue-repair':continue_repair()
     elif args.action=='close-b':close_b()
     else:

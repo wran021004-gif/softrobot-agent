@@ -17,6 +17,58 @@ class FactSelection(Contract):
     projection: str = Field(default='', description='Relative JSON Pointer into this original fact; extraction only, no calculations or conversions.')
 
 
+class SelectedSourceFact(FactSelection):
+    statement: str = Field(min_length=1,max_length=1000)
+    catalog: EvidenceRef
+    catalog_version: Literal['1.0.0']
+
+
+def investigator_catalog(dispatcher,order):
+    """All authorized root fields; selecting a handle still requires inspection."""
+    entries=[]
+    for ref in order.evidence:
+        source=dispatcher.store.artifact(ref)
+        fields=source.items() if isinstance(source,dict) else [('',source)]
+        for key,value in fields:
+            pointer='/'+str(key).replace('~','~0').replace('/','~1') if key!='' else ''
+            entry=dict(reference=plain(ref),pointer=pointer,value=deepcopy(value),
+                value_type=type(value).__name__,source_identity=source_identity(source))
+            entry['handle']='source-'+digest(entry)
+            entries.append(entry)
+    body=dict(kind='investigator_fact_catalog',version=CATALOG_VERSION,activity_run_id=dispatcher.run_id,
+        investigation_id=order.investigation_id,order_identity=digest(plain(order)),entries=entries,
+        rules='Select a root handle with an extraction-only relative projection. Exact original values and identities are expanded by the program. Only fields in inspected content pages may support facts or counterevidence; availability is not inspection.')
+    with dispatcher.store.transaction() as db:ref=plain(dispatcher.store.put(db,body))
+    return ref,body
+
+
+def expand_source(dispatcher,selected,node,*,path):
+    from tools.research_investigations import SourceFact
+    selected=SelectedSourceFact.model_validate(selected)
+    if plain(selected.catalog)!=node.get('source_fact_catalog'):
+        raise BindingError(path+'/catalog',selected.catalog,'unknown or stale investigator catalog')
+    body=dispatcher.store.artifact(selected.catalog)
+    if (body['version']!=selected.catalog_version or body['investigation_id']!=node['order']['investigation_id']
+        or body['order_identity']!=digest(node['order']) or body['activity_run_id'] not in {dispatcher.run_id,node.get('source_catalog_origin_run_id')}):
+        raise BindingError(path+'/catalog',selected.catalog,'investigator ownership, source version or authorization changed')
+    entry=next((e for e in body['entries'] if e['handle']==selected.handle),None)
+    if not entry or entry['reference'] not in node['order']['evidence']:
+        raise BindingError(path+'/handle',selected,'unknown or unauthorized source handle')
+    try:value=project(entry['value'],selected.projection)
+    except (ValueError,KeyError,IndexError,TypeError):
+        raise BindingError(path+'/projection',selected,'invalid extraction-only projection') from None
+    fact=SourceFact(statement=selected.statement,reference=entry['reference'],pointer=entry['pointer']+selected.projection,
+        value=value,source_identity=entry['source_identity'])
+    dispatcher._validate_fact(fact,'RETURN')
+    if not any(dispatcher._visible(fact,r) for r in node['reads']):
+        raise BindingError(path,selected,'selected original field has not been inspected',dict(query=dict(reference=entry['reference'],pointer=fact.pointer)))
+    link=dict(model_selection=plain(selected),expanded_fact=plain(fact),value_type=type(value).__name__)
+    # Units remain exact source evidence, when the selected object declares them.
+    if isinstance(value,dict):
+        link['declared_units']={k:deepcopy(value[k]) for k in ('unit','units') if k in value}
+    return fact,link
+
+
 class SelectedClaim(Contract):
     statement: str = Field(min_length=1, max_length=1000)
     supporting_facts: list[FactSelection] = Field(min_length=1, max_length=12)

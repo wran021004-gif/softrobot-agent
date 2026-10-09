@@ -857,6 +857,45 @@ def fit_request(wire, config, purpose, *, archive):
     raise ValueError('CONTEXT_PREPARATION_REQUIRED_MATERIAL_EXCEEDS_BUDGET: '+str(path)+'; '+json.dumps(report(),sort_keys=True))
 
 
+def compact_investigation_request(payload):
+    """Deduplicate derived catalog values against exact pages in this wire.
+
+    Native calls, reasoning and tool-call IDs stay intact. Immutable catalogs
+    retain all values. A reference points only to still-present original content.
+    """
+    wire=deepcopy(payload)
+    if len(wire.get('messages',[]))<2:return wire
+    try:packet=json.loads(wire['messages'][1]['content'])
+    except (ValueError,TypeError):return wire
+    if 'fact_catalog' not in packet and 'source_fact_catalog' not in packet:return wire
+    available={}
+    def index(value,path):
+        if isinstance(value,(dict,list)):
+            if len(encode(value))>256 and not (isinstance(value,dict) and 'material_in_current_request' in value):
+                available.setdefault(digest(value),path)
+            children=value.items() if isinstance(value,dict) else enumerate(value)
+            for k,v in children:index(v,path+'/'+pointer_part(k))
+    for i,r in enumerate(packet.get('reads',[])):
+        index(r.get('page'),f'/messages/1/content/reads/{i}/page')
+    for i,m in enumerate(wire['messages']):
+        if m.get('role')!='tool':continue
+        try:body=json.loads(m['content'])
+        except (ValueError,TypeError):continue
+        index(body,f'/messages/{i}/content')
+    def compact(value):
+        if isinstance(value,(dict,list)) and len(encode(value))>256:
+            identity=digest(value)
+            if identity in available:return dict(material_in_current_request=available[identity],exact_content_identity=identity)
+            if isinstance(value,dict):return {k:compact(v) for k,v in value.items()}
+            return [compact(v) for v in value]
+        return value
+    for entry in packet.get('fact_catalog',{}).get('content',{}).get('entries',[]):
+        if 'value' in entry:entry['value']=compact(entry['value'])
+    packet['catalog_value_presentation']='Value references resolve to exact retained pages in this request; content paths address decoded message JSON. Complete immutable catalogs remain queryable.'
+    wire['messages'][1]['content']=encode(packet)
+    return wire
+
+
 def assemble_request(payload, config, purpose, packet, *, archive, authority=None, context_slot=None):
     """Finalize actual outgoing schemas/messages, preserving provider settings."""
     result = assemble_context(purpose, packet, archive=archive, authority=authority)
@@ -891,6 +930,7 @@ def assemble_request(payload, config, purpose, packet, *, archive, authority=Non
     issues=[]
     try:inspect(json.loads(wire['messages'][1]['content']))
     except ValueError as exc:issues.append(str(exc))
+    wire=compact_investigation_request(wire)
     wire,fitting=fit_request(wire,config,purpose,archive=archive)
     result['audit'].update(**fitting,
         before_measurement=measure_input(payload, config, purpose),

@@ -1,0 +1,27 @@
+{
+  "verified_date": "2026-10-09",
+  "sources": [
+    "https://api-docs.deepseek.com/api/create-chat-completion/",
+    "https://api-docs.deepseek.com/guides/thinking_mode/"
+  ],
+  "default": {
+    "model": "deepseek-flash",
+    "thinking": "enabled",
+    "reasoning_effort": "high",
+    "max_tokens": 32768,
+    "tool_choice": "auto"
+  },
+  "conditional": [
+    {
+      "reasoning_effort": "low",
+      "max_tokens": 32768
+    },
+    {
+      "reasoning_effort": "high",
+      "max_tokens": 65536
+    }
+  ],
+  "probes": 0,
+  "live_connectivity_checks": 0,
+  "trigger": "Actual blocking reasoning-only length or truncated formal output after local faults excluded; all existing request/correction/context limits apply"
+}

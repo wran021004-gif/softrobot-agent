@@ -5,6 +5,23 @@ from tools.state_io import digest
 VERSION = 'research.metric_view@1.0.0'
 
 
+def archived_recomputation_presentation(view,reference):
+    """Interpret archived result fields; no calculation or investigator execution."""
+    rows=[]
+    for pointer,item in [('/reach',view['reach']),('/holding/position',view['holding']['position']),('/holding/speed',view['holding']['speed'])]:
+        available=item.get('independent_recomputation')=='available'
+        result=item.get('recomputed_result')
+        rows.append(dict(reference=reference,pointer=pointer,
+            availability='available' if available else 'unavailable',
+            assessment=('pass' if result is True else 'fail' if result is False else 'cannot_assess') if available else 'cannot_assess',
+            archived_result=result,result_pointer=pointer+'/recomputed_result',
+            availability_pointer=pointer+'/independent_recomputation',
+            origin='Recomputation from archived evidence; not a new investigator calculation',
+            official_result_preserved=True))
+    return dict(version='research.archived_recomputation_presentation@1.0.0',observations=rows,
+        rules='An available Boolean false is a failed criterion. It is not absence of recomputation. /official has no recomputation fields; cite actual archived pointers.')
+
+
 def build(facts, resolve):
     refs = dict(configuration=facts['configuration'], evaluation=facts['evaluation'],
                 profile=facts['report']['reference'], simulation=facts['simulation'])

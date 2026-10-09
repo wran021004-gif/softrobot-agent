@@ -16,7 +16,7 @@ class NativeInvestigationParameters(Contract):
 
 
 class SelectableFactParameters(Contract):
-    investigation_contract: Literal['selectable_facts_v3'] = 'selectable_facts_v3'
+    investigation_contract: Literal['selectable_facts_v3','selected_reports_v4'] = 'selectable_facts_v3'
 
 
 class NativeContract:
@@ -45,7 +45,7 @@ class NativeContract:
             reason='Native investigation business decision under frozen v2 contract.'))
 
 
-def contract(*,selectable=False):
+def contract(*,selectable=False,selected_reports=False):
     from schemas.platform_operations import ReadEvidence
     from tools.research_investigations import InvestigationReturn
     if selectable:
@@ -54,8 +54,14 @@ def contract(*,selectable=False):
         class SelectableReturn(InvestigationReturn):
             dispositions: list[SelectedDisposition] = Field(default_factory=list,max_length=3)
         InvestigationReturn=SelectableReturn
+    if selected_reports:
+        from tools.disposition_facts import SelectedSourceFact
+        class SelectedReportReturn(InvestigationReturn):
+            facts: list[SelectedSourceFact] = Field(default_factory=list,max_length=12)
+            counterevidence: list[SelectedSourceFact] = Field(default_factory=list,max_length=8)
+        InvestigationReturn=SelectedReportReturn
     return NativeContract(dict(
-        investigation_return=('investigation_return', '3.0.0' if selectable else '2.0.0', InvestigationReturn),
+        investigation_return=('investigation_return', '4.0.0' if selected_reports else '3.0.0' if selectable else '2.0.0', InvestigationReturn),
         evidence_read=('evidence.read', '1.0.0', ReadEvidence)))
 
 

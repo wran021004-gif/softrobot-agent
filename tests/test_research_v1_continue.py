@@ -16,6 +16,69 @@ class ContinuationTests(TestCase):
     setUp=fixture.CapacityBindingTests.setUp
     cleanup=fixture.CapacityBindingTests.cleanup
 
+    def test_selected_investigator_projection_and_actual_sent_restoration(self):
+        sends=[]
+        def transport(wire):
+            sends.append(deepcopy(wire));packet=json.loads(wire['messages'][1]['content']);cat=packet['source_fact_catalog']
+            entry=next(e for e in cat['entries'] if e['pointer']=='/nested')
+            return fixture.native(dict(facts=[dict(statement='Fixture exact nested scalar',catalog=cat['reference'],catalog_version='1.0.0',handle=entry['handle'],projection='/scalar')],
+                counterevidence=[dict(statement='Fixture failed Boolean',catalog=cat['reference'],catalog_version='1.0.0',handle=next(e['handle'] for e in cat['entries'] if e['pointer']=='/flag'))],interpretation='Offline fixture only'))
+        with patch.object(InvestigationDispatcher,'_selected_reports',return_value=True),patch.object(InvestigationDispatcher,'_selectable',return_value=True),patch.object(InvestigationDispatcher,'_native_v2',return_value=True):
+            result=self.dispatch.dispatch(plain(self.order),transport=transport)
+            self.assertEqual(result.status,'completed',result.reason)
+            report=self.host.store.artifact(result.result)
+            self.assertEqual(report['facts'][0]['pointer'],'/nested/scalar')
+            self.assertEqual(report['facts'][0]['value'],self.source['nested']['scalar'])
+            self.assertIs(report['counterevidence'][0]['value'],False)
+            node=self.host.store.session(self.host.run_id)['state']['investigations']['investigator']
+            retained=deepcopy(node)
+            self.dispatch.prepare(self.order,executing=True,reuse_saved_reads=True)
+            self.dispatch._bind_resume_catalog(self.order,sends[0],retained)
+            self.assertEqual(self.host.store.session(self.host.run_id)['state']['investigations']['investigator']['source_fact_catalog'],retained['source_fact_catalog'])
+            self.assertEqual(len(sends),1)
+            events=[e for e in self.host.store.events(self.host.run_id) if e['kind']=='investigator_selection_expansion']
+            link=self.host.store.artifact(events[0]['outputs'][0])
+            self.assertNotEqual(link['original_selection_reference'],link['deterministic_expansion_reference'])
+            # A legitimate implementation migration may change only run origin.
+            original=self.host.store.artifact(retained['source_fact_catalog']);migrated=deepcopy(original)
+            migrated['activity_run_id']='authorized-original-run'
+            with self.host.store.transaction() as db:sent=plain(self.host.store.put(db,migrated))
+            payload=deepcopy(sends[0]);packet=json.loads(payload['messages'][1]['content']);packet['source_fact_catalog']['reference']=sent
+            payload['messages'][1]['content']=json.dumps(packet)
+            prior=dict(retained,source_fact_catalog=sent,source_catalog_origin_run_id='authorized-original-run')
+            self.dispatch._bind_resume_catalog(self.order,payload,prior)
+            self.assertEqual(self.host.store.session(self.host.run_id)['state']['investigations']['investigator']['source_fact_catalog'],sent)
+            changed=deepcopy(original);changed['entries'][0]['value']='changed'
+            with self.host.store.transaction() as db:bad=plain(self.host.store.put(db,changed))
+            self.dispatch._state('investigator',source_fact_catalog=bad)
+            with self.assertRaisesRegex(ValueError,'CONTENT_OR_BINDING_CHANGED'):self.dispatch._bind_resume_catalog(self.order,payload,prior)
+            self.dispatch._state('investigator',source_fact_catalog=retained['source_fact_catalog'],status='failed')
+            replay=self.dispatch._decode(fixture.native(link['model_selection']),node_id='investigator')
+            self.assertEqual(replay.facts[0].value,self.source['nested']['scalar'])
+            self.assertEqual(self.host.store.session(self.host.run_id)['state']['investigations']['investigator']['usage']['model_calls'],1)
+
+    def test_available_failed_archived_recomputation_is_not_unavailable(self):
+        from tools.research_metric_view import archived_recomputation_presentation
+        view=dict(reach=dict(independent_recomputation='available',recomputed_result=False),holding=dict(
+            position=dict(independent_recomputation='available',recomputed_result=True),speed=dict(independent_recomputation='unavailable',recomputed_result=None)))
+        rows=archived_recomputation_presentation(view,self.ref)['observations']
+        self.assertEqual([(r['availability'],r['assessment']) for r in rows],[('available','fail'),('available','pass'),('unavailable','cannot_assess')])
+        self.assertIs(rows[0]['archived_result'],False)
+
+    def test_saved_principal_overflow_fits_without_changing_native_history(self):
+        from tools.context_assembly import compact_investigation_request,measure_input,check_outgoing_request
+        from tools.platform_models import effective_config
+        cfg=effective_config(self.host)
+        source=fixture.ROOT/'evidence/research_mainline3_v1_complete_20261009'
+        for name in ('principal_capacity_failed_wire.json','principal_capacity_repaired_wire.json'):
+            wire=read(source/name);before=deepcopy(wire);fixed=compact_investigation_request(wire)
+            check_outgoing_request(fixed,cfg,'research_decision')
+            self.assertEqual(wire,before)
+            self.assertEqual(fixed['messages'][2:],wire['messages'][2:])
+            self.assertEqual(fixed['tools'],wire['tools'])
+            self.assertEqual(fixed['max_tokens'],32768)
+            self.assertLess(measure_input(fixed,cfg,'research_decision')['utf8_bytes'],measure_input(wire,cfg,'research_decision')['utf8_bytes'])
+
     def grant(self,**updates):
         with self.host.store.transaction() as db:
             state=self.host.store.session(self.host.run_id,db)['state'];g=state['role_context']['investigation_grant'];g.update(updates)
@@ -362,7 +425,8 @@ class ContinuationTests(TestCase):
         from tools import research_v1_continue_gate as gate
         out=self.folder/'continuation-fixture-evidence'
         with patch.object(activity,'OUT',out),patch.object(gate,'OUT',out),patch('tools.platform_store.ROOT',self.folder):
-            activity.start();atomic_json(out/'offline_gate.json',dict(passed=True,scope='Fixture bootstrap only; no real grant'))
+            import time
+            activity.start(started_unix=time.time()-2000);atomic_json(out/'offline_gate.json',dict(passed=True,scope='Fixture bootstrap only; no real grant'))
             activity.freeze();host,m,p=activity.host_for('coordinated',create=True)
             authorization=read(out/'authorization.json')
             self.assertTrue(gate.correction_consistency(authorization,p,orders=p['authorized_children'])['passed'])
@@ -379,11 +443,17 @@ class ContinuationTests(TestCase):
                         answer=fixture.native({});answer['choices'][0]['message']['reasoning_content']='Preserve required provider history'
                         answer['choices'][0]['message']['tool_calls'][0]['function']=dict(name='evidence_read',arguments=json.dumps(dict(reference=rawref,pointer=pointer)))
                         return answer
-                    return fixture.native(dict(facts=[dict(statement='Exact recorded fixture value',reference=rawref,pointer=pointer,value=source[pointer[1:]])],interpretation='Offline evidence-only fixture; no scientific material acceptance'))
+                    cat=packet['source_fact_catalog'];entry=next(e for e in cat['entries'] if e['reference']==rawref and e['pointer']==pointer)
+                    return fixture.native(dict(facts=[dict(statement='Exact recorded fixture value',catalog=cat['reference'],catalog_version='1.0.0',handle=entry['handle'])],interpretation='Offline evidence-only fixture; no scientific material acceptance'))
                 if packet['role']=='coordinator':
-                    r=packet['reads'][0]
-                    return fixture.native(dict(facts=[dict(statement='First report interpretation',reference=r['reference'],pointer='/interpretation',value=r['page']['content']['interpretation'])],interpretation='Actual fixture synthesis of both inspected reports; scientific semantics unassessed'))
+                    cat=packet['source_fact_catalog'];selected=[]
+                    for r in packet['reads'][:2]:
+                        entry=next(e for e in cat['entries'] if e['reference']==r['reference'] and e['pointer']=='/interpretation')
+                        selected.append(dict(statement='Inspected fixture report interpretation',catalog=cat['reference'],catalog_version='1.0.0',handle=entry['handle']))
+                    return fixture.native(dict(facts=selected,interpretation='Actual fixture synthesis of both inspected reports; scientific semantics unassessed'))
                 cat=packet['fact_catalog'];entry=next(e for e in cat['content']['entries'] if e['origin']=='principal_additional' and e['pointer']=='/execution_id')
+                if counts[key]==1:
+                    return fixture.native(dict(interpretation='Offline intentionally missing formal targets',dispositions=[]))
                 return fixture.native(dict(interpretation='Fixture formal dispositions only',dispositions=[dict(**t,catalog=cat['reference'],catalog_version='1.0.0',disposition='defer',evidence_used=[dict(handle=entry['handle'])],reason='Offline fixture leaves semantics unassessed') for t in packet['disposition_targets']]))
             with patch('tools.platform_models.DeepSeekAdapter._transport',new=transport),patch('examples.gvs_nmpc_route_experiment.load_credential',side_effect=AssertionError('OFFLINE_CREDENTIAL_BARRIER')):
                 try:result=activity.stage_b(host,m,p,transport=True)
@@ -394,11 +464,28 @@ class ContinuationTests(TestCase):
             with patch.object(activity,'execute_c',return_value='automatic fixed C invoked') as c:
                 self.assertEqual(activity.close_b(),'automatic fixed C invoked');c.assert_called_once()
             self.assertTrue(read(out/'coordinated_gate.json')['passed'])
-            self.assertEqual(len(sends),6)
-            state=host.store.session(host.run_id)['state'];self.assertEqual(len(state['historical_investigations']),1)
+            self.assertEqual(len(sends),5)
+            self.assertNotIn('timing-integrity-limits',counts)
+            state=host.store.session(host.run_id)['state'];self.assertEqual(len(state['historical_investigations']),2)
+            self.assertGreater(m['preparation_wall_s'],2000)
+            self.assertEqual(p['sequential_reservations']['preparation_s'],m['preparation_wall_s'])
+            self.assertEqual(host.store.lookup(host.run_id,'offline-preparation')['status'],'completed')
+            self.assertEqual(state['investigations']['principal-coordinated-v2']['reserved_wall_s'],2400.)
+            self.assertEqual(state['investigations']['principal-coordinated-v2']['requests_by_purpose'],dict(ordinary=1,model_correction=1,engineering_recovery=0))
+            self.assertTrue(all(w['model']=='deepseek-flash' and w['max_tokens']==32768 for w in sends))
             self.assertTrue(gate.correction_consistency(authorization,p,grant=state['role_context']['investigation_grant'],
                 orders=[n['order'] for n in state['investigations'].values()])['passed'])
             self.assertEqual(state['historical_investigations']['coordinator-plan']['own_inference_allowance'],0)
             self.assertEqual({k:n['order']['budget']['model_calls'] for k,n in state['investigations'].items()},
-                {'reach-holding-interpretation':12,'timing-integrity-limits':4,'coordinator-summary':6,'principal-coordinated-v2':18})
+                {'reach-holding-interpretation':12,'coordinator-summary':6,'principal-coordinated-v2':18})
             self.assertFalse(any(e['kind']=='investigation_provider_attempt' and e.get('request_id')=='investigation-coordinator-plan' for e in host.store.events(host.run_id)))
+            atomic_json(out/'fixture_repair_verification.json',dict(passed=True,scope='Offline migration fixture only'))
+            before=deepcopy(state['investigations'])
+            migrated=activity.bind_repair(dict(defect_id='offline-migration-fixture',failure='Fixture-only version binding',
+                affected_paths=['tools/research_v1_continue.py'],verification='fixture_repair_verification.json',started_unix=time.time()))
+            after=migrated.store.session(migrated.run_id)['state']['investigations']
+            for key,node in before.items():
+                self.assertEqual(after[key]['usage'],node['usage'])
+                self.assertEqual(after[key]['started_unix'],node['started_unix'])
+                self.assertEqual(after[key]['execution_deadline_unix'],node['execution_deadline_unix'])
+            self.assertEqual(len(sends),5)
