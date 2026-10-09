@@ -526,7 +526,7 @@ def bind_fixed_repair(record):
     if host.store.lookup(host.run_id,'fixed-profile')['status']!='failed':raise ValueError('FAILED_PROFILE_RECEIPT_REQUIRED')
     with host.store.connect(True) as db:
         if db.execute("SELECT COUNT(*) FROM calls WHERE status IN ('running','unknown')").fetchone()[0]:raise ValueError('NO_UNCONFIRMED_C_REPLAY')
-    atomic_json(OUT/'validation_manifest_before_C_reporting_repair.json',m)
+    if not (OUT/'validation_manifest_before_C_reporting_repair.json').exists():atomic_json(OUT/'validation_manifest_before_C_reporting_repair.json',m)
     revision=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip()
     for path in record['affected_paths']:m['code_identity'][path]=sha(ROOT/path)
     record=dict(record,code_revision=revision,backend_execution=host.store.lookup(host.run_id,'fixed-simulation')['execution_id'],
@@ -534,6 +534,25 @@ def bind_fixed_repair(record):
     p.update(reporting_recovery=True,profile_request_id='fixed-profile-recovery1')
     m.update(code_commit=revision,implementation_repairs_used=m['implementation_repairs_used']+1)
     m.setdefault('repairs',[]).append(record);atomic_json(OUT/'validation_manifest.json',m);atomic_json(OUT/'C_reporting_repair.json',record)
+    changed=host.compatibility()['changed']
+    if changed:
+        from tools.platform_registry import dependency_closure
+        before=host.store.session(host.run_id)['snapshot'];after=deepcopy(before)
+        for key in changed:
+            name,version=key.rsplit('@',1);current=dependency_closure([host.reg.get(name,version)],host.reg)[key]
+            allowed=deepcopy(before['dependencies'][key])
+            allowed['sources']['extensions/tendon_family/gvs_reporting.py']=current['sources']['extensions/tendon_family/gvs_reporting.py']
+            if current!=allowed:raise ValueError('C_REPORTING_DEPENDENCY_MIGRATION_EXCEEDS_REPAIR')
+            after['dependencies'][key]=current
+        with host.store.transaction() as db:
+            boundary=dict(authorization=(OUT/'authorization.json').relative_to(ROOT).as_posix(),
+                before_snapshot=plain(host.store.put(db,before)),after_snapshot=plain(host.store.put(db,after)),
+                changed_dependencies=changed,changed_source='extensions/tendon_family/gvs_reporting.py',
+                code_revision=revision,science_changed=False,backend_reexecuted=False,receipts_and_grant_preserved=True)
+            ref=host.store.put(db,boundary);host.store.event(db,host.run_id,'C_reporting_dependency_migration','completed',outputs=[ref])
+            db.execute('UPDATE sessions SET snapshot=? WHERE run_id=?',(boundary['after_snapshot']['artifact_id'],host.run_id))
+            state=host.store.session(host.run_id,db)['state'];state['C_reporting_dependency_migration']=plain(ref);host.store.update_state(db,host.run_id,state)
+        atomic_json(OUT/'C_reporting_dependency_migration.json',boundary)
     host.resume();elapsed=max(0,time.time()-record['started_unix']);cost={**zero(),'wall_s':elapsed}
     row,fresh=host.store.reserve(host.run_id,'C-reporting-engineering-repair',digest(record),'coding-agent-repair',cost,kind='engineering_repair')
     if fresh:host.store.complete(row,dict(request_id=row['request_id'],execution_id=row['execution_id'],tool_id='engineering.repair',tool_version='1.0.0',execution_status='completed',caller='coding-agent-repair',charged=zero(),cache_hit=False),record,elapsed=elapsed,actual_cost=cost,kind='engineering_repair')
