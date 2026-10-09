@@ -20,6 +20,7 @@ OUT=ROOT/'evidence/research_mainline3_v2_20261009'
 RUN=ROOT/'runs/mainline3-v2-20261009'
 STARTED_UNIX=1791526756.
 LIMITS=dict(model_calls=40,tool_calls=1024,backend_solves=6,worker_calls=0,wall_s=43200.)
+REPORT_OUTPUT_BYTES=1048576
 TOOLS={'research.prepare_candidate':'1.0.0','analysis.linearize_configuration':'1.0.0',
     'analysis.control_metrics':'2.0.0','analysis.bounded_endpoint':'1.0.0',
     'simulation.run':'1.0.0','evaluation.run':'1.0.0','control.profile_report':'1.0.0',
@@ -77,6 +78,8 @@ def public_dimensions(ctx,args):
 
 
 def public_report(ctx,args):
+    if len(json.dumps(plain(args),ensure_ascii=False).encode('utf8'))>REPORT_OUTPUT_BYTES:
+        raise ValueError('V2_CAPABILITY_REPORT_EXCEEDS_1_MIB_ALLOWANCE')
     candidate=ctx.artifact(args.configuration)
     selection=ctx.store.session(ctx.run_id)['state'].get('v2_template_selection',{})
     if candidate['baseline_identity']!=digest(plain(ctx.input)) or candidate['changes']!=selection.get('changes'):
@@ -166,8 +169,9 @@ def native_session():
         if menu['execution_status']!='completed':raise ValueError('V2_NATIVE_CATALOG_HANDOFF_FAILED: '+str(menu))
         with host.store.transaction() as db:
             state=host.store.session(host.run_id,db)['state']
-            state['role_context']=dict(role='design',phase='finite_capability_use',
+            state['role_context']=dict(role='research',phase='finite_capability_use',
                 shared_provider_capacity=True,evidence=evidence,
+                report_output_bytes=REPORT_OUTPUT_BYTES,
                 capability_catalog=host.store.artifact(menu['output']),capability_catalog_reference=menu['output'],
                 execution_evidence={key:host.store.artifact(ref) for key,ref in evidence.items()},
                 activity_deadline_unix=activity['execution_cutoff_unix'],

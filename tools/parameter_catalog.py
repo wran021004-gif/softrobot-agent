@@ -179,6 +179,13 @@ def effective_catalog(effective, grant=None, validation_evidence=None, reg=None)
                 invalidated=['candidate-specific equilibrium/linearization/endpoint/screen','controller plans and warm states',
                     'trajectories, evaluation, profiles, acceptance and comparisons'],
                 rule='Exact configuration identity and provenance bind every result; rebuild after relevant edits. Cache/replay is not a repetition.'))
+        if definition.version=='2.0.0' and path not in (validation_evidence or {}):
+            from extensions.tendon_family.finite_templates import catalog as finite_catalog
+            row['validation_evidence']=dict(
+                status='finite_template_focused_offline_checked' if path=='template' else 'declared_domain_not_exhaustively_validated',
+                reference='tests/test_research_v2.py::FiniteV2Tests',
+                exact_start_configuration=finite_catalog()['t0_configuration'],
+                scientific_claim='Selected templates and mutations have focused checks; completed closed-loop receipts apply only to their exact configurations. No full continuous-domain validation or robustness is inferred.')
         rows.append(row)
     result=dict(version=CATALOG_VERSION, capability_version=capability['version'],
         builder=dict(extension_id=definition.extension_id,version=definition.version),

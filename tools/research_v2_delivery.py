@@ -92,7 +92,10 @@ def case_summary(key,manifest):
         profile_metrics={k:profile.get(k) for k in ('valid_complete_execution','solver_status','official_task_success','terminal_error_m',
             'sampled_settling','updates','solver_error_count','solver_failure_flags','hold_last_responses',
             'accepted_noninitialization_plans','initialization_selected','force_bound_violation_n',
-            'deadline_misses','mean_update_s','graph_construction_s','solver_construction_s','real_time_demonstrated')},
+            'converged_updates','optimization_status_counts','raw_termination_counts','maximum_plan_violation',
+            'max_projection_residual_rad_m','max_rate_projection_residual_rad_m_s','backend_timings_s',
+            'tension_range_n','numerical_preparation','deadline_misses','mean_update_s',
+            'graph_construction_s','solver_construction_s','real_time_demonstrated')},
         unchanged_scientific_conditions=True,
         limitations=finite.catalog()['unsupported'],
         incumbent_promoted=False,performance_ablation_claim=False)
