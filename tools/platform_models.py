@@ -698,7 +698,7 @@ def run_loop(host, adapter=None):
                 if stopped is not None:
                     return stopped
                 continue
-            if state['repairs'] > config['max_repairs']:
+            if state['repairs'] > config['max_repairs'] and not state.get('role_context',{}).get('shared_provider_capacity'):
                 return _stop(host, 'failed', 'BOUNDED_REPAIR_LIMIT')
             if state['repeated'] >= config['max_no_progress']:
                 return _stop(host, 'stopped', 'NO_NEW_INFORMATION_LOOP')

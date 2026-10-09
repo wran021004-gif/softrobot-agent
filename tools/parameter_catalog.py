@@ -33,6 +33,9 @@ def study_input(effective, grants=None, *, builder_version='1.1.0'):
     The archived robot bytes (including metadata) stay identical. New selectors'
     baseline values represent the incumbent's absolute source-relative choices.
     """
+    if builder_version == '2.0.0':
+        from extensions.tendon_family.finite_templates import study_input as finite_study_input
+        return finite_study_input(effective,grants)
     from extensions.tendon_family.gvs_profile import execution_scope
     result = deepcopy(effective)
     original_scope = execution_scope(effective)
@@ -105,14 +108,18 @@ def effective_catalog(effective, grant=None, validation_evidence=None, reg=None)
         reasons.append('Source-relative physical decision source is missing')
     else:
         try:
-            if [c['id'] for c in design['components']] != [c['id'] for c in source['components']]:
+            if definition.version=='2.0.0':
+                from extensions.tendon_family.finite_templates import check_robot
+                check_robot(design,policy['discretization']['data'])
+            elif [c['id'] for c in design['components']] != [c['id'] for c in source['components']]:
                 raise ValueError('SEGMENT_TOPOLOGY_CHANGED')
             if policy['controller']['version'] == '9.0.0':
                 from extensions.tendon_family.routing_radius import normalize
                 normalize(design,source)
-            normalize_supported(design,source)
-            for data in (design,source):data.pop('metadata',None)
-            if design!=source:raise ValueError('FIXED_TOPOLOGY_ROUTING_OR_SECTION_LAYOUT_CHANGED')
+            if definition.version!='2.0.0':
+                normalize_supported(design,source)
+                for data in (design,source):data.pop('metadata',None)
+                if design!=source:raise ValueError('FIXED_TOPOLOGY_ROUTING_OR_SECTION_LAYOUT_CHANGED')
         except (ValueError,KeyError,IndexError,TypeError) as exc:
             reasons.append('Structural projection/compatibility unavailable: '+str(exc))
     configured = {**space.get('parameters',{}), **space.get('control_parameters',{})}
@@ -129,7 +136,8 @@ def effective_catalog(effective, grant=None, validation_evidence=None, reg=None)
             reason.append('Routing mutation requires reach controller.gvs_nmpc@9.0.0')
         if not spec: reason.append('Candidate builder has no connected mutation declaration for this effective input')
         supported = not reason
-        current = parameter_value(effective,path) if spec else None
+        try:current = parameter_value(effective,path) if spec else None
+        except ValueError:current = None  # Explicit inactive component in a finite template.
         permitted = supported and domain is not None
         if domain is not None and spec:
             if row['type']=='choice':
@@ -142,7 +150,12 @@ def effective_catalog(effective, grant=None, validation_evidence=None, reg=None)
                 legal=row['legal_domain']
                 if row['operation'] == 'routing_radius_scale':
                     from extensions.tendon_family.routing_radius import envelope
-                    legal = envelope(space['semantic_source'], row['components'][0])
+                    routing_source=space['semantic_source']
+                    if definition.version=='2.0.0':
+                        from extensions.tendon_family.finite_templates import catalog,template_id
+                        applicable=row.get('applicable_templates',list(catalog()['templates']))
+                        routing_source=catalog()['templates'][template_id(effective['robot']['structure']['data']) if current is not None else applicable[0]]['design']
+                    legal = envelope(routing_source, row['components'][0])
                     row['legal_domain'] = legal
                     if lo <= legal['exclusive_minimum'] or (legal['exclusive_maximum'] is not None and hi >= legal['exclusive_maximum']):
                         raise ValueError('GRANT_EXCEEDS_ROUTING_GEOMETRY: '+path)
@@ -175,5 +188,10 @@ def effective_catalog(effective, grant=None, validation_evidence=None, reg=None)
         subset_selection='All comparison groups may choose any subset of usable_pool within frozen domains; no per-batch permission.',
         version_rule='Newly connected capability requires a new shared capability/study version.',
         execution_permission='Parameter permission does not consume or override the separate frozen execution budget.')
+    if definition.version=='2.0.0':
+        from extensions.tendon_family.finite_templates import catalog,template_id
+        result.update(templates=capability['templates'],selected_template=template_id(effective['robot']['structure']['data']),
+            selection=dict(path='template',syntax={'template':'T1'},method='search.family_explicit@1.0.0'),
+            execution_model=catalog()['execution_model'],unsupported=catalog()['unsupported'])
     result['identity']=digest(result)
     return result

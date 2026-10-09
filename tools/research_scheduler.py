@@ -66,6 +66,7 @@ def capabilities(store, run_id, records,*,as_of_unix=None):
         if reason:gaps[action]=reason
         else:legal[action]=dict(paths=list(paths),minimum_batch=capacity['requirement'],methods=methods,
             domains={p:pool[p]['granted_range'] for p in paths},
+            methods_by_path={p:(['search.family_explicit@1.0.0'] if pool[p]['builder_spec']['type']=='choice' else methods) for p in paths},
             mixed_semantics='structure_search permits joint structural/control subsets; each point constructs all selected values followed by one execution with the selected versioned controller. Online solving is separately accounted.',
             method_semantics={'search.family_coordinate@1.0.0':'Numerically generated continuous coordinate proposals; categorical paths unavailable.',
                 'search.family_explicit@1.0.0':'Evaluate a model-authored finite sequence; categorical values enumerated, never interpolated.'})

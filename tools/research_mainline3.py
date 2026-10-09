@@ -35,24 +35,27 @@ def configuration(grants=None):
     return study_input(source,grants,builder_version='1.2.0')
 
 
-def fixed_pipeline(host, *, changes, protocol, target, execute_backend=False, executor=None, profile_request_id='fixed-profile'):
+def fixed_pipeline(host, *, changes, protocol, target, execute_backend=False, executor=None,
+                   profile_request_id=None, candidate_id='fixed-radius', request_prefix='fixed'):
     """All computations go through Host; injected executor is a labelled fixture."""
     call=executor or (lambda tool,args,key: invoke(host,tool,args,request_id=key))
     rows=[]
+    profile_request_id=profile_request_id or request_prefix+'-profile'
+    def key(name):return request_prefix+'-'+name
     def step(tool,args,key):
         receipt=call(tool,args,key);rows.append(receipt)
         if receipt.get('execution_status')!='completed':raise ValueError('FIXED_PIPELINE_COMPONENT_INCOMPLETE: '+key)
         return receipt
-    built=step('research.prepare_candidate',dict(candidate_id='fixed-radius',changes=changes),'fixed-build')
+    built=step('research.prepare_candidate',dict(candidate_id=candidate_id,changes=changes),key('build'))
     prepared=host.store.artifact(built['output'])
     linear=step('analysis.linearize_configuration',dict(configuration=prepared['configuration'],
-        expected_content_identity=prepared['content_identity'],protocol=protocol),'fixed-linear')
-    step('analysis.control_metrics',dict(models=[linear['output']],protocol=protocol,implementation='scipy'),'fixed-metrics')
-    step('analysis.bounded_endpoint',dict(models=[linear['output']],protocol=protocol,target=target),'fixed-endpoint')
+        expected_content_identity=prepared['content_identity'],protocol=protocol),key('linear'))
+    step('analysis.control_metrics',dict(models=[linear['output']],protocol=protocol,implementation='scipy'),key('metrics'))
+    step('analysis.bounded_endpoint',dict(models=[linear['output']],protocol=protocol,target=target),key('endpoint'))
     if execute_backend:
-        simulation=step('simulation.run',dict(candidate_id='fixed-radius',changes=changes),'fixed-simulation')
-        step('evaluation.run',dict(result=simulation['output'],execution_id=simulation['execution_id']),'fixed-evaluation')
-        step('control.profile_report',dict(simulation_request_id='fixed-simulation',evaluation_request_id='fixed-evaluation'),profile_request_id)
+        simulation=step('simulation.run',dict(candidate_id=candidate_id,changes=changes),key('simulation'))
+        step('evaluation.run',dict(result=simulation['output'],execution_id=simulation['execution_id']),key('evaluation'))
+        step('control.profile_report',dict(simulation_request_id=key('simulation'),evaluation_request_id=key('evaluation')),profile_request_id)
     return dict(mode='isolated_execution_substitutes' if executor else 'actual_host_execution',receipts=rows,
         scientific_validation='pending' if executor or not execute_backend else 'Read official evaluation/profile; no inferred success')
 

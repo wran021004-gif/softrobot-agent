@@ -43,6 +43,8 @@ def _candidate(inp, changes, reg):
         if isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value) or not lo <= value <= hi:
             raise ValueError('PARAMETER_OUT_OF_BOUNDS: ' + key)
     candidate = SessionInput.model_validate(builder.resolve()(inp.model_copy(deep=True), parameters, changes))
+    initializer=builder.hook('candidate_initializer')
+    if initializer:initializer(inp,candidate)
     # Builder may alter physical design, declared discretization and controller/
     # model parameter payloads. Extension identities and the task stay fixed.
     before, after = plain(inp), plain(candidate)
@@ -52,6 +54,7 @@ def _candidate(inp, changes, reg):
         data['policy']['controller']['parameters']['data'] = {}
         if data['policy']['dynamics_model'] is not None:
             data['policy']['dynamics_model']['parameters']['data'] = {}
+        if initializer:data['task']['initializer']['parameters']['data']={}
     if before != after:
         raise ValueError('CANDIDATE_CHANGED_FROZEN_TASK_OR_POLICY')
     reg.parse(candidate.robot.structure)
@@ -96,7 +99,11 @@ def simulate(ctx, args):
         if prepare:
             prepare(ctx, controller, inp)
         backend.compile(inp, ctx.reg)
-        backend.initialize(Payload.model_validate(ctx.snapshot['initial']), controller)
+        if ctx.reg.get(inp.policy.candidate_builder.extension_id,inp.policy.candidate_builder.version,'candidate_builder').hook('candidate_initializer'):
+            initializer,initial_parameters=ctx.reg.bind(inp.task.initializer,'initializer')
+            initial=initializer.resolve()(initial_parameters,inp.seed)
+        else:initial=Payload.model_validate(ctx.snapshot['initial'])
+        backend.initialize(initial, controller)
         result = backend.run(folder=ctx.folder / 'backend', timeout_s=ctx.timeout_s)
         ctx.reg.parse(result.data)
         ctx.reg.parse(result.initial_state)
@@ -138,7 +145,9 @@ def evaluate(ctx, args):
         evaluator=ctx.input.task.evaluator.model_dump(mode='json'), backend=result.backend_id, model=result.model_id,
         evaluator_dependencies=ctx.snapshot['dependencies'][evaluator.extension_id + '@' + evaluator.version],
         backend_dependencies=ctx.snapshot['dependencies'][ctx.input.policy.backend.extension_id + '@' + ctx.input.policy.backend.version]))
-    outcome = evaluator.resolve()(ctx.input.task, result, args.result, ctx.reg, identity)
+    owned=ctx.store.artifact(metadata['candidate_input'])
+    candidate_task=SessionInput.model_validate(owned['effective']).task
+    outcome = evaluator.resolve()(candidate_task, result, args.result, ctx.reg, identity)
     outcome = outcome.model_copy(update=dict(source_execution_id=source_execution,
         original_execution_id=metadata.get('original_execution_id'),
         candidate_id=metadata['candidate'], evaluator_version=evaluator.version))

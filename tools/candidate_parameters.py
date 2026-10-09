@@ -9,6 +9,12 @@ STRUCTURAL_PATHS=('components/near/length_m','components/far/length_m','design/s
 def parameter_value(effective,path):
     path=canonical_path(path)
     space=effective['policy']['candidate_builder']['parameters']['data']
+    if effective['policy']['candidate_builder'].get('version')=='2.0.0':
+        from extensions.tendon_family.finite_templates import template_id
+        if path=='template':return template_id(effective['robot']['structure']['data'])
+        if path.startswith('design/'):
+            return effective['robot']['structure']['data'].get('metadata',{}).get('v2_selections',{}).get(
+                path,'baseline' if path.endswith('material_scenario') else 1.)
     selections=effective['robot']['structure']['data'].get('metadata',{}).get('design_decisions',{}).get('selections',{})
     if path in selections:return selections[path]
     if path in space.get('semantic_decisions',{}):
@@ -31,6 +37,11 @@ def fixed_configuration(effective,variables):
     if space.get('semantic_decisions') or any(p.startswith('design/') for p in variables):
         design.get('metadata',{}).pop('design_decisions',None)
     for path in variables:
+        if path=='template':
+            fixed['robot']['structure']['data']='<complete finite template variable>'
+            fixed['policy']['discretization']='<template-owned mesh variable>'
+            fixed['task']['initializer']='<template-owned named initialization variable>'
+            continue
         decision=space.get('semantic_decisions',{}).get(path,{})
         if path in ('design/section_scale','design/material_scenario') or decision:
             components=decision.get('components',['near','far'])
@@ -66,13 +77,17 @@ def scientific_fixed_scope(effective,variables):
     from extensions.tendon_family.gvs_profile import execution_scope
     scope=execution_scope(effective);masked=fixed_configuration(effective,variables)
     scope['robot']['identity']=digest(masked['robot']);scope['controller']=masked['policy']['controller']
+    if 'template' in variables:
+        scope['discretization']=masked['policy']['discretization']
+        scope['task']['identity']=digest(masked['task'])
+        scope['task']['initializer']=digest(masked['task']['initializer'])
     return scope
 
 
 def comparison_scope(effective):
     from extensions.tendon_family.candidate import REACH_WEIGHT_PATHS
     builder=effective['policy']['candidate_builder']
-    if builder.get('extension_id')=='candidate.family' and builder.get('version') in ('1.1.0','1.2.0'):
+    if builder.get('extension_id')=='candidate.family' and builder.get('version') in ('1.1.0','1.2.0','2.0.0'):
         from tools.parameter_catalog import effective_catalog
         return scientific_fixed_scope(effective,effective_catalog(effective)['usable_pool'])
     return scientific_fixed_scope(effective,[*STRUCTURAL_PATHS,*REACH_WEIGHT_PATHS])

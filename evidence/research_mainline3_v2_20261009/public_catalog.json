@@ -1,0 +1,2046 @@
+{
+  "version": "1.0.0",
+  "capability_version": "2.0.0",
+  "builder": {
+    "extension_id": "candidate.family",
+    "version": "2.0.0"
+  },
+  "effective_identity": "9232b00291ae9b49400d67ac26707711c7ce8cf6415511f2e3141a255b774c0c",
+  "parameters": [
+    {
+      "id": "template",
+      "kind": "physical_design",
+      "type": "choice",
+      "unit": "1",
+      "operation": "complete_template",
+      "components": [
+        "selected complete serial design"
+      ],
+      "meaning": "Named complete finite design and template-owned mesh; categorical explicit enumeration only.",
+      "schema": "family.space:templates",
+      "legal_domain": {
+        "options": [
+          "T0",
+          "T1",
+          "T2",
+          "T3"
+        ]
+      },
+      "task_families": [
+        "task.reach"
+      ],
+      "controller_versions": [
+        "10.0.0"
+      ],
+      "effective_locations": [
+        "robot/structure/data",
+        "policy/discretization"
+      ],
+      "coupled_constraints": [
+        "Independent one-to-one actuator/tendon mapping; ideal tension only.",
+        "T2/T3 split distal region into explicitly initialized middle/far components.",
+        "Template-specific lengths and continuous parameter ownership apply."
+      ],
+      "derived_quantities": [
+        "all physical/reduced/backend/input dimensions and orderings"
+      ],
+      "current_value": "T0",
+      "experiment_granted_domain": {
+        "options": [
+          "T0",
+          "T1",
+          "T2",
+          "T3"
+        ]
+      },
+      "builder_domain": {
+        "options": [
+          "T0",
+          "T1",
+          "T2",
+          "T3"
+        ]
+      },
+      "technical_support": {
+        "supported": true,
+        "reasons": []
+      },
+      "study_permission": {
+        "permitted": true,
+        "reason": null
+      },
+      "validation_evidence": {
+        "status": "offline_mutation_resolved_compiler_and_mjcf_checked",
+        "reference": "tests/test_parameter_catalog.py::ParameterCatalogTests",
+        "exact_start_configuration": "285236abf99bf36894fa08410ac82fefa177a80179c4ceba15d95f8d1bc8d978",
+        "scientific_claim": "No robustness or closed-loop outcome is inferred from capability."
+      },
+      "mutation_mechanism": "candidate.family@2.0.0: complete_template",
+      "required_rebuilds": [
+        "resolved physics",
+        "backend robot mesh/model",
+        "reduced geometry and structural basis",
+        "state projection",
+        "controller graph/solver",
+        "candidate initializer and warm-state regeneration"
+      ],
+      "reuse": {
+        "allowed": [
+          "Frozen task/reference/evaluator/timing/environment and unchanged topology/input order",
+          "Compatible bounded historical tensions as numerical guesses only"
+        ],
+        "invalidated": [
+          "candidate-specific equilibrium/linearization/endpoint/screen",
+          "controller plans and warm states",
+          "trajectories, evaluation, profiles, acceptance and comparisons"
+        ],
+        "rule": "Exact configuration identity and provenance bind every result; rebuild after relevant edits. Cache/replay is not a repetition."
+      }
+    },
+    {
+      "id": "components/near/length_m",
+      "kind": "physical_design",
+      "type": "number",
+      "unit": "m",
+      "meaning": "near flexible segment length; attachment station fractions remain fixed.",
+      "schema": "family.design:Segment.length_m",
+      "legal_domain": {
+        "exclusive_minimum": 0
+      },
+      "operation": "set",
+      "components": [
+        "near"
+      ],
+      "effective_locations": [
+        "robot/structure/data/components/near/length_m"
+      ],
+      "coupled_constraints": [
+        "Fixed serial topology, cell counts, section stations and tendon routing; compiler checks geometry."
+      ],
+      "derived_quantities": [
+        "cell length",
+        "mass",
+        "inertia",
+        "hinge stiffness/damping",
+        "tendon site positions"
+      ],
+      "task_families": [
+        "task.reach"
+      ],
+      "controller_versions": [
+        "10.0.0"
+      ],
+      "per_template_domains": {
+        "T0": {
+          "type": "number",
+          "bounds": [
+            0.152,
+            0.168
+          ],
+          "unit": "m"
+        },
+        "T1": {
+          "type": "number",
+          "bounds": [
+            0.152,
+            0.168
+          ],
+          "unit": "m"
+        },
+        "T2": {
+          "type": "number",
+          "bounds": [
+            0.152,
+            0.168
+          ],
+          "unit": "m"
+        },
+        "T3": {
+          "type": "number",
+          "bounds": [
+            0.152,
+            0.168
+          ],
+          "unit": "m"
+        }
+      },
+      "applicable_templates": [
+        "T0",
+        "T1",
+        "T2",
+        "T3"
+      ],
+      "current_value": 0.16,
+      "experiment_granted_domain": {
+        "bounds": [
+          0.152,
+          0.168
+        ]
+      },
+      "builder_domain": {
+        "bounds": [
+          0.152,
+          0.168
+        ]
+      },
+      "technical_support": {
+        "supported": true,
+        "reasons": []
+      },
+      "study_permission": {
+        "permitted": true,
+        "reason": null
+      },
+      "validation_evidence": {
+        "status": "offline_mutation_resolved_compiler_and_mjcf_checked",
+        "reference": "tests/test_parameter_catalog.py::ParameterCatalogTests",
+        "exact_start_configuration": "285236abf99bf36894fa08410ac82fefa177a80179c4ceba15d95f8d1bc8d978",
+        "scientific_claim": "No robustness or closed-loop outcome is inferred from capability."
+      },
+      "mutation_mechanism": "candidate.family@2.0.0: set",
+      "required_rebuilds": [
+        "resolved physics",
+        "backend robot mesh/model",
+        "reduced geometry and structural basis",
+        "state projection",
+        "controller graph/solver",
+        "candidate initializer and warm-state regeneration"
+      ],
+      "reuse": {
+        "allowed": [
+          "Frozen task/reference/evaluator/timing/environment and unchanged topology/input order",
+          "Compatible bounded historical tensions as numerical guesses only"
+        ],
+        "invalidated": [
+          "candidate-specific equilibrium/linearization/endpoint/screen",
+          "controller plans and warm states",
+          "trajectories, evaluation, profiles, acceptance and comparisons"
+        ],
+        "rule": "Exact configuration identity and provenance bind every result; rebuild after relevant edits. Cache/replay is not a repetition."
+      }
+    },
+    {
+      "id": "design/near_section_scale",
+      "kind": "physical_design",
+      "type": "number",
+      "unit": "1",
+      "meaning": "Uniform positive scale of all near section dimensions against original semantic_source.; V2 source is the selected executed-radius template, and 1/baseline preserves it.",
+      "schema": "family.space:SemanticDecision.section_scale",
+      "legal_domain": {
+        "exclusive_minimum": 0
+      },
+      "operation": "section_scale",
+      "components": [
+        "near"
+      ],
+      "effective_locations": [
+        "robot/structure/data/components/near/sections/*/section/parameters/*"
+      ],
+      "coupled_constraints": [
+        "Only ellipse/rectangle; preserve aspect ratios, station layout and section orientation.",
+        "One scale owner per segment; common and per-segment scale selectors cannot overlap.",
+        "Tendon offsets and straight frictionless routing remain fixed; this scale changes the bending section and backend mesh."
+      ],
+      "derived_quantities": [
+        "area",
+        "bending second moments",
+        "mass",
+        "inertia",
+        "hinge stiffness/damping",
+        "backend mesh"
+      ],
+      "task_families": [
+        "task.reach"
+      ],
+      "controller_versions": [
+        "10.0.0"
+      ],
+      "per_template_domains": {
+        "T0": {
+          "type": "number",
+          "bounds": [
+            0.95,
+            1.05
+          ],
+          "unit": "1"
+        },
+        "T1": {
+          "type": "number",
+          "bounds": [
+            0.95,
+            1.05
+          ],
+          "unit": "1"
+        },
+        "T2": {
+          "type": "number",
+          "bounds": [
+            0.95,
+            1.05
+          ],
+          "unit": "1"
+        },
+        "T3": {
+          "type": "number",
+          "bounds": [
+            0.95,
+            1.05
+          ],
+          "unit": "1"
+        }
+      },
+      "applicable_templates": [
+        "T0",
+        "T1",
+        "T2",
+        "T3"
+      ],
+      "current_value": 1.0,
+      "experiment_granted_domain": {
+        "bounds": [
+          0.95,
+          1.05
+        ]
+      },
+      "builder_domain": {
+        "bounds": [
+          0.95,
+          1.05
+        ]
+      },
+      "technical_support": {
+        "supported": true,
+        "reasons": []
+      },
+      "study_permission": {
+        "permitted": true,
+        "reason": null
+      },
+      "validation_evidence": {
+        "status": "offline_mutation_resolved_compiler_and_mjcf_checked",
+        "reference": "tests/test_parameter_catalog.py::ParameterCatalogTests",
+        "exact_start_configuration": "285236abf99bf36894fa08410ac82fefa177a80179c4ceba15d95f8d1bc8d978",
+        "scientific_claim": "No robustness or closed-loop outcome is inferred from capability."
+      },
+      "mutation_mechanism": "candidate.family@2.0.0: section_scale",
+      "required_rebuilds": [
+        "resolved physics",
+        "backend robot mesh/model",
+        "reduced geometry and structural basis",
+        "state projection",
+        "controller graph/solver",
+        "candidate initializer and warm-state regeneration"
+      ],
+      "reuse": {
+        "allowed": [
+          "Frozen task/reference/evaluator/timing/environment and unchanged topology/input order",
+          "Compatible bounded historical tensions as numerical guesses only"
+        ],
+        "invalidated": [
+          "candidate-specific equilibrium/linearization/endpoint/screen",
+          "controller plans and warm states",
+          "trajectories, evaluation, profiles, acceptance and comparisons"
+        ],
+        "rule": "Exact configuration identity and provenance bind every result; rebuild after relevant edits. Cache/replay is not a repetition."
+      }
+    },
+    {
+      "id": "design/near_material_scenario",
+      "kind": "physical_design",
+      "type": "choice",
+      "unit": "1",
+      "meaning": "near numerical Young modulus scenario against original semantic_source.; V2 source is the selected executed-radius template, and 1/baseline preserves it.",
+      "schema": "family.space:SemanticDecision.material_scenario",
+      "legal_domain": {
+        "options": [
+          "baseline",
+          "compliant",
+          "stiff"
+        ]
+      },
+      "operation": "material_scenario",
+      "components": [
+        "near"
+      ],
+      "effective_locations": [
+        "robot/structure/data/components/near/physics/young_pa"
+      ],
+      "coupled_constraints": [
+        "Numerical simulation scenarios, not validated commercial materials. Young modulus alone is multiplied; original density and bending viscosity are retained.",
+        "Density and bending viscosity stay fixed; no independently mixed material properties.",
+        "One scenario owner per segment; common and per-segment material selectors cannot overlap."
+      ],
+      "derived_quantities": [
+        "Young modulus",
+        "hinge stiffness"
+      ],
+      "task_families": [
+        "task.reach"
+      ],
+      "controller_versions": [
+        "10.0.0"
+      ],
+      "per_template_domains": {
+        "T0": {
+          "type": "choice",
+          "options": [
+            "baseline",
+            "compliant",
+            "stiff"
+          ],
+          "unit": "1"
+        },
+        "T1": {
+          "type": "choice",
+          "options": [
+            "baseline",
+            "compliant",
+            "stiff"
+          ],
+          "unit": "1"
+        },
+        "T2": {
+          "type": "choice",
+          "options": [
+            "baseline",
+            "compliant",
+            "stiff"
+          ],
+          "unit": "1"
+        },
+        "T3": {
+          "type": "choice",
+          "options": [
+            "baseline",
+            "compliant",
+            "stiff"
+          ],
+          "unit": "1"
+        }
+      },
+      "applicable_templates": [
+        "T0",
+        "T1",
+        "T2",
+        "T3"
+      ],
+      "current_value": "baseline",
+      "experiment_granted_domain": {
+        "options": [
+          "baseline",
+          "compliant",
+          "stiff"
+        ]
+      },
+      "builder_domain": {
+        "options": [
+          "baseline",
+          "compliant",
+          "stiff"
+        ]
+      },
+      "technical_support": {
+        "supported": true,
+        "reasons": []
+      },
+      "study_permission": {
+        "permitted": true,
+        "reason": null
+      },
+      "validation_evidence": {
+        "status": "offline_mutation_resolved_compiler_and_mjcf_checked",
+        "reference": "tests/test_parameter_catalog.py::ParameterCatalogTests",
+        "exact_start_configuration": "285236abf99bf36894fa08410ac82fefa177a80179c4ceba15d95f8d1bc8d978",
+        "scientific_claim": "No robustness or closed-loop outcome is inferred from capability."
+      },
+      "mutation_mechanism": "candidate.family@2.0.0: material_scenario",
+      "required_rebuilds": [
+        "resolved physics",
+        "backend robot mesh/model",
+        "reduced geometry and structural basis",
+        "state projection",
+        "controller graph/solver",
+        "candidate initializer and warm-state regeneration"
+      ],
+      "reuse": {
+        "allowed": [
+          "Frozen task/reference/evaluator/timing/environment and unchanged topology/input order",
+          "Compatible bounded historical tensions as numerical guesses only"
+        ],
+        "invalidated": [
+          "candidate-specific equilibrium/linearization/endpoint/screen",
+          "controller plans and warm states",
+          "trajectories, evaluation, profiles, acceptance and comparisons"
+        ],
+        "rule": "Exact configuration identity and provenance bind every result; rebuild after relevant edits. Cache/replay is not a repetition."
+      }
+    },
+    {
+      "id": "design/near_routing_radius_scale",
+      "kind": "physical_design",
+      "type": "number",
+      "unit": "1",
+      "operation": "routing_radius_scale",
+      "components": [
+        "near"
+      ],
+      "schema": "family.space:SemanticDecision.routing_radius_scale",
+      "meaning": "Uniform local transverse routing offset scale against immutable semantic_source, owned by physical segment near; V2 source is the selected executed-radius template, and 1/baseline preserves it.",
+      "legal_domain": {
+        "exclusive_minimum": 0.3352050749659349,
+        "exclusive_maximum": 1.0616777098837307,
+        "reason": "Positive scale; rigid envelope clearance and strict hole separation; full compiler checks still required"
+      },
+      "task_families": [
+        "task.reach"
+      ],
+      "controller_versions": [
+        "10.0.0"
+      ],
+      "effective_locations": [
+        "segment-owned tendon attachment offsets and rigid guide holes"
+      ],
+      "coupled_constraints": [
+        "Base belongs to root flexible segment; rigid locations belong to closest upstream flexible ancestor.",
+        "Boundary guide holes transform once by upstream owner, including distal tendons. Anchors use their physical attachment owner.",
+        "Longitudinal stations, angle/layout, hole diameter, sections and actuator drum radius stay separate.",
+        "Bounds derived from source guide envelopes/hole separation; full compiler span checks required."
+      ],
+      "derived_quantities": [
+        "tendon lengths and derivatives",
+        "force mapping",
+        "reduced routing graph",
+        "controller preparation"
+      ],
+      "per_template_domains": {
+        "T0": {
+          "type": "number",
+          "bounds": [
+            0.98,
+            1.02
+          ],
+          "unit": "1"
+        },
+        "T1": {
+          "type": "number",
+          "bounds": [
+            0.98,
+            1.02
+          ],
+          "unit": "1"
+        },
+        "T2": {
+          "type": "number",
+          "bounds": [
+            0.98,
+            1.02
+          ],
+          "unit": "1"
+        },
+        "T3": {
+          "type": "number",
+          "bounds": [
+            0.98,
+            1.02
+          ],
+          "unit": "1"
+        }
+      },
+      "applicable_templates": [
+        "T0",
+        "T1",
+        "T2",
+        "T3"
+      ],
+      "current_value": 1.0,
+      "experiment_granted_domain": {
+        "bounds": [
+          0.98,
+          1.02
+        ]
+      },
+      "builder_domain": {
+        "bounds": [
+          0.98,
+          1.02
+        ]
+      },
+      "technical_support": {
+        "supported": true,
+        "reasons": []
+      },
+      "study_permission": {
+        "permitted": true,
+        "reason": null
+      },
+      "validation_evidence": {
+        "status": "pending_changed_radius_closed_loop",
+        "reference": "tests/test_research_mainline3.py::Mainline3EngineeringTests",
+        "exact_start_configuration": "3ae03b4e4ddac2e5099ae5823fc0dd7dd9d338dfba6b7d435729d4e5ab41665b",
+        "scientific_claim": "No robustness or closed-loop outcome is inferred from capability."
+      },
+      "mutation_mechanism": "candidate.family@2.0.0: routing_radius_scale",
+      "required_rebuilds": [
+        "resolved physics",
+        "backend robot mesh/model",
+        "reduced geometry and structural basis",
+        "state projection",
+        "controller graph/solver",
+        "candidate initializer and warm-state regeneration"
+      ],
+      "reuse": {
+        "allowed": [
+          "Frozen task/reference/evaluator/timing/environment and unchanged topology/input order",
+          "Compatible bounded historical tensions as numerical guesses only"
+        ],
+        "invalidated": [
+          "candidate-specific equilibrium/linearization/endpoint/screen",
+          "controller plans and warm states",
+          "trajectories, evaluation, profiles, acceptance and comparisons"
+        ],
+        "rule": "Exact configuration identity and provenance bind every result; rebuild after relevant edits. Cache/replay is not a repetition."
+      }
+    },
+    {
+      "id": "components/far/length_m",
+      "kind": "physical_design",
+      "type": "number",
+      "unit": "m",
+      "meaning": "far flexible segment length; attachment station fractions remain fixed.",
+      "schema": "family.design:Segment.length_m",
+      "legal_domain": {
+        "exclusive_minimum": 0
+      },
+      "operation": "set",
+      "components": [
+        "far"
+      ],
+      "effective_locations": [
+        "robot/structure/data/components/far/length_m"
+      ],
+      "coupled_constraints": [
+        "Fixed serial topology, cell counts, section stations and tendon routing; compiler checks geometry."
+      ],
+      "derived_quantities": [
+        "cell length",
+        "mass",
+        "inertia",
+        "hinge stiffness/damping",
+        "tendon site positions"
+      ],
+      "task_families": [
+        "task.reach"
+      ],
+      "controller_versions": [
+        "10.0.0"
+      ],
+      "per_template_domains": {
+        "T0": {
+          "type": "number",
+          "bounds": [
+            0.1045,
+            0.1155
+          ],
+          "unit": "m"
+        },
+        "T1": {
+          "type": "number",
+          "bounds": [
+            0.1045,
+            0.1155
+          ],
+          "unit": "m"
+        },
+        "T2": {
+          "type": "number",
+          "bounds": [
+            0.05225,
+            0.05775
+          ],
+          "unit": "m"
+        },
+        "T3": {
+          "type": "number",
+          "bounds": [
+            0.05225,
+            0.05775
+          ],
+          "unit": "m"
+        }
+      },
+      "applicable_templates": [
+        "T0",
+        "T1",
+        "T2",
+        "T3"
+      ],
+      "current_value": 0.11,
+      "experiment_granted_domain": {
+        "bounds": [
+          0.05225,
+          0.1155
+        ]
+      },
+      "builder_domain": {
+        "bounds": [
+          0.05225,
+          0.1155
+        ]
+      },
+      "technical_support": {
+        "supported": true,
+        "reasons": []
+      },
+      "study_permission": {
+        "permitted": true,
+        "reason": null
+      },
+      "validation_evidence": {
+        "status": "offline_mutation_resolved_compiler_and_mjcf_checked",
+        "reference": "tests/test_parameter_catalog.py::ParameterCatalogTests",
+        "exact_start_configuration": "285236abf99bf36894fa08410ac82fefa177a80179c4ceba15d95f8d1bc8d978",
+        "scientific_claim": "No robustness or closed-loop outcome is inferred from capability."
+      },
+      "mutation_mechanism": "candidate.family@2.0.0: set",
+      "required_rebuilds": [
+        "resolved physics",
+        "backend robot mesh/model",
+        "reduced geometry and structural basis",
+        "state projection",
+        "controller graph/solver",
+        "candidate initializer and warm-state regeneration"
+      ],
+      "reuse": {
+        "allowed": [
+          "Frozen task/reference/evaluator/timing/environment and unchanged topology/input order",
+          "Compatible bounded historical tensions as numerical guesses only"
+        ],
+        "invalidated": [
+          "candidate-specific equilibrium/linearization/endpoint/screen",
+          "controller plans and warm states",
+          "trajectories, evaluation, profiles, acceptance and comparisons"
+        ],
+        "rule": "Exact configuration identity and provenance bind every result; rebuild after relevant edits. Cache/replay is not a repetition."
+      }
+    },
+    {
+      "id": "design/far_section_scale",
+      "kind": "physical_design",
+      "type": "number",
+      "unit": "1",
+      "meaning": "Uniform positive scale of all far section dimensions against original semantic_source.; V2 source is the selected executed-radius template, and 1/baseline preserves it.",
+      "schema": "family.space:SemanticDecision.section_scale",
+      "legal_domain": {
+        "exclusive_minimum": 0
+      },
+      "operation": "section_scale",
+      "components": [
+        "far"
+      ],
+      "effective_locations": [
+        "robot/structure/data/components/far/sections/*/section/parameters/*"
+      ],
+      "coupled_constraints": [
+        "Only ellipse/rectangle; preserve aspect ratios, station layout and section orientation.",
+        "One scale owner per segment; common and per-segment scale selectors cannot overlap.",
+        "Tendon offsets and straight frictionless routing remain fixed; this scale changes the bending section and backend mesh."
+      ],
+      "derived_quantities": [
+        "area",
+        "bending second moments",
+        "mass",
+        "inertia",
+        "hinge stiffness/damping",
+        "backend mesh"
+      ],
+      "task_families": [
+        "task.reach"
+      ],
+      "controller_versions": [
+        "10.0.0"
+      ],
+      "per_template_domains": {
+        "T0": {
+          "type": "number",
+          "bounds": [
+            0.95,
+            1.05
+          ],
+          "unit": "1"
+        },
+        "T1": {
+          "type": "number",
+          "bounds": [
+            0.95,
+            1.05
+          ],
+          "unit": "1"
+        },
+        "T2": {
+          "type": "number",
+          "bounds": [
+            0.95,
+            1.05
+          ],
+          "unit": "1"
+        },
+        "T3": {
+          "type": "number",
+          "bounds": [
+            0.95,
+            1.05
+          ],
+          "unit": "1"
+        }
+      },
+      "applicable_templates": [
+        "T0",
+        "T1",
+        "T2",
+        "T3"
+      ],
+      "current_value": 1.0,
+      "experiment_granted_domain": {
+        "bounds": [
+          0.95,
+          1.05
+        ]
+      },
+      "builder_domain": {
+        "bounds": [
+          0.95,
+          1.05
+        ]
+      },
+      "technical_support": {
+        "supported": true,
+        "reasons": []
+      },
+      "study_permission": {
+        "permitted": true,
+        "reason": null
+      },
+      "validation_evidence": {
+        "status": "offline_mutation_resolved_compiler_and_mjcf_checked",
+        "reference": "tests/test_parameter_catalog.py::ParameterCatalogTests",
+        "exact_start_configuration": "285236abf99bf36894fa08410ac82fefa177a80179c4ceba15d95f8d1bc8d978",
+        "scientific_claim": "No robustness or closed-loop outcome is inferred from capability."
+      },
+      "mutation_mechanism": "candidate.family@2.0.0: section_scale",
+      "required_rebuilds": [
+        "resolved physics",
+        "backend robot mesh/model",
+        "reduced geometry and structural basis",
+        "state projection",
+        "controller graph/solver",
+        "candidate initializer and warm-state regeneration"
+      ],
+      "reuse": {
+        "allowed": [
+          "Frozen task/reference/evaluator/timing/environment and unchanged topology/input order",
+          "Compatible bounded historical tensions as numerical guesses only"
+        ],
+        "invalidated": [
+          "candidate-specific equilibrium/linearization/endpoint/screen",
+          "controller plans and warm states",
+          "trajectories, evaluation, profiles, acceptance and comparisons"
+        ],
+        "rule": "Exact configuration identity and provenance bind every result; rebuild after relevant edits. Cache/replay is not a repetition."
+      }
+    },
+    {
+      "id": "design/far_material_scenario",
+      "kind": "physical_design",
+      "type": "choice",
+      "unit": "1",
+      "meaning": "far numerical Young modulus scenario against original semantic_source.; V2 source is the selected executed-radius template, and 1/baseline preserves it.",
+      "schema": "family.space:SemanticDecision.material_scenario",
+      "legal_domain": {
+        "options": [
+          "baseline",
+          "compliant",
+          "stiff"
+        ]
+      },
+      "operation": "material_scenario",
+      "components": [
+        "far"
+      ],
+      "effective_locations": [
+        "robot/structure/data/components/far/physics/young_pa"
+      ],
+      "coupled_constraints": [
+        "Numerical simulation scenarios, not validated commercial materials. Young modulus alone is multiplied; original density and bending viscosity are retained.",
+        "Density and bending viscosity stay fixed; no independently mixed material properties.",
+        "One scenario owner per segment; common and per-segment material selectors cannot overlap."
+      ],
+      "derived_quantities": [
+        "Young modulus",
+        "hinge stiffness"
+      ],
+      "task_families": [
+        "task.reach"
+      ],
+      "controller_versions": [
+        "10.0.0"
+      ],
+      "per_template_domains": {
+        "T0": {
+          "type": "choice",
+          "options": [
+            "baseline",
+            "compliant",
+            "stiff"
+          ],
+          "unit": "1"
+        },
+        "T1": {
+          "type": "choice",
+          "options": [
+            "baseline",
+            "compliant",
+            "stiff"
+          ],
+          "unit": "1"
+        },
+        "T2": {
+          "type": "choice",
+          "options": [
+            "baseline",
+            "compliant",
+            "stiff"
+          ],
+          "unit": "1"
+        },
+        "T3": {
+          "type": "choice",
+          "options": [
+            "baseline",
+            "compliant",
+            "stiff"
+          ],
+          "unit": "1"
+        }
+      },
+      "applicable_templates": [
+        "T0",
+        "T1",
+        "T2",
+        "T3"
+      ],
+      "current_value": "baseline",
+      "experiment_granted_domain": {
+        "options": [
+          "baseline",
+          "compliant",
+          "stiff"
+        ]
+      },
+      "builder_domain": {
+        "options": [
+          "baseline",
+          "compliant",
+          "stiff"
+        ]
+      },
+      "technical_support": {
+        "supported": true,
+        "reasons": []
+      },
+      "study_permission": {
+        "permitted": true,
+        "reason": null
+      },
+      "validation_evidence": {
+        "status": "offline_mutation_resolved_compiler_and_mjcf_checked",
+        "reference": "tests/test_parameter_catalog.py::ParameterCatalogTests",
+        "exact_start_configuration": "285236abf99bf36894fa08410ac82fefa177a80179c4ceba15d95f8d1bc8d978",
+        "scientific_claim": "No robustness or closed-loop outcome is inferred from capability."
+      },
+      "mutation_mechanism": "candidate.family@2.0.0: material_scenario",
+      "required_rebuilds": [
+        "resolved physics",
+        "backend robot mesh/model",
+        "reduced geometry and structural basis",
+        "state projection",
+        "controller graph/solver",
+        "candidate initializer and warm-state regeneration"
+      ],
+      "reuse": {
+        "allowed": [
+          "Frozen task/reference/evaluator/timing/environment and unchanged topology/input order",
+          "Compatible bounded historical tensions as numerical guesses only"
+        ],
+        "invalidated": [
+          "candidate-specific equilibrium/linearization/endpoint/screen",
+          "controller plans and warm states",
+          "trajectories, evaluation, profiles, acceptance and comparisons"
+        ],
+        "rule": "Exact configuration identity and provenance bind every result; rebuild after relevant edits. Cache/replay is not a repetition."
+      }
+    },
+    {
+      "id": "design/far_routing_radius_scale",
+      "kind": "physical_design",
+      "type": "number",
+      "unit": "1",
+      "operation": "routing_radius_scale",
+      "components": [
+        "far"
+      ],
+      "schema": "family.space:SemanticDecision.routing_radius_scale",
+      "meaning": "Uniform local transverse routing offset scale against immutable semantic_source, owned by physical segment far; V2 source is the selected executed-radius template, and 1/baseline preserves it.",
+      "legal_domain": {
+        "exclusive_minimum": 0.0,
+        "exclusive_maximum": null,
+        "reason": "Positive scale; rigid envelope clearance and strict hole separation; full compiler checks still required"
+      },
+      "task_families": [
+        "task.reach"
+      ],
+      "controller_versions": [
+        "10.0.0"
+      ],
+      "effective_locations": [
+        "segment-owned tendon attachment offsets and rigid guide holes"
+      ],
+      "coupled_constraints": [
+        "Base belongs to root flexible segment; rigid locations belong to closest upstream flexible ancestor.",
+        "Boundary guide holes transform once by upstream owner, including distal tendons. Anchors use their physical attachment owner.",
+        "Longitudinal stations, angle/layout, hole diameter, sections and actuator drum radius stay separate.",
+        "Bounds derived from source guide envelopes/hole separation; full compiler span checks required."
+      ],
+      "derived_quantities": [
+        "tendon lengths and derivatives",
+        "force mapping",
+        "reduced routing graph",
+        "controller preparation"
+      ],
+      "per_template_domains": {
+        "T0": {
+          "type": "number",
+          "bounds": [
+            0.98,
+            1.02
+          ],
+          "unit": "1"
+        },
+        "T1": {
+          "type": "number",
+          "bounds": [
+            0.98,
+            1.02
+          ],
+          "unit": "1"
+        },
+        "T2": {
+          "type": "number",
+          "bounds": [
+            0.98,
+            1.02
+          ],
+          "unit": "1"
+        },
+        "T3": {
+          "type": "number",
+          "bounds": [
+            0.98,
+            1.02
+          ],
+          "unit": "1"
+        }
+      },
+      "applicable_templates": [
+        "T0",
+        "T1",
+        "T2",
+        "T3"
+      ],
+      "current_value": 1.0,
+      "experiment_granted_domain": {
+        "bounds": [
+          0.98,
+          1.02
+        ]
+      },
+      "builder_domain": {
+        "bounds": [
+          0.98,
+          1.02
+        ]
+      },
+      "technical_support": {
+        "supported": true,
+        "reasons": []
+      },
+      "study_permission": {
+        "permitted": true,
+        "reason": null
+      },
+      "validation_evidence": {
+        "status": "pending_changed_radius_closed_loop",
+        "reference": "tests/test_research_mainline3.py::Mainline3EngineeringTests",
+        "exact_start_configuration": "3ae03b4e4ddac2e5099ae5823fc0dd7dd9d338dfba6b7d435729d4e5ab41665b",
+        "scientific_claim": "No robustness or closed-loop outcome is inferred from capability."
+      },
+      "mutation_mechanism": "candidate.family@2.0.0: routing_radius_scale",
+      "required_rebuilds": [
+        "resolved physics",
+        "backend robot mesh/model",
+        "reduced geometry and structural basis",
+        "state projection",
+        "controller graph/solver",
+        "candidate initializer and warm-state regeneration"
+      ],
+      "reuse": {
+        "allowed": [
+          "Frozen task/reference/evaluator/timing/environment and unchanged topology/input order",
+          "Compatible bounded historical tensions as numerical guesses only"
+        ],
+        "invalidated": [
+          "candidate-specific equilibrium/linearization/endpoint/screen",
+          "controller plans and warm states",
+          "trajectories, evaluation, profiles, acceptance and comparisons"
+        ],
+        "rule": "Exact configuration identity and provenance bind every result; rebuild after relevant edits. Cache/replay is not a repetition."
+      }
+    },
+    {
+      "id": "control/recipe/holding_tip_speed_weight",
+      "kind": "control_objective",
+      "type": "number",
+      "unit": "1",
+      "meaning": "Per-second squared spatial speed weight on nodes at/after the configured task settling-window start. Requires explicit settling settings.",
+      "schema": "family.gvs_trajectory_parameters:holding_tip_speed_weight",
+      "legal_domain": {
+        "options": [
+          0
+        ],
+        "intervals": [
+          [
+            0.0001,
+            1.0
+          ]
+        ]
+      },
+      "operation": "set",
+      "components": [
+        "controller"
+      ],
+      "effective_locations": [
+        "policy/controller/parameters/data/recipe/holding_tip_speed_weight"
+      ],
+      "coupled_constraints": [
+        "Squared world tip speed normalized by fixed tip_speed_scale_m_s.",
+        "Holding cost follows fixed holding window; this objective does not change task acceptance."
+      ],
+      "derived_quantities": [
+        "controller objective terms"
+      ],
+      "task_families": [
+        "task.reach"
+      ],
+      "controller_versions": [
+        "10.0.0"
+      ],
+      "per_template_domains": {
+        "T0": {
+          "type": "number",
+          "bounds": [
+            0.025,
+            0.1
+          ],
+          "unit": "1"
+        },
+        "T1": {
+          "type": "number",
+          "bounds": [
+            0.025,
+            0.1
+          ],
+          "unit": "1"
+        },
+        "T2": {
+          "type": "number",
+          "bounds": [
+            0.025,
+            0.1
+          ],
+          "unit": "1"
+        },
+        "T3": {
+          "type": "number",
+          "bounds": [
+            0.025,
+            0.1
+          ],
+          "unit": "1"
+        }
+      },
+      "applicable_templates": [
+        "T0",
+        "T1",
+        "T2",
+        "T3"
+      ],
+      "current_value": 0.05,
+      "experiment_granted_domain": {
+        "bounds": [
+          0.025,
+          0.1
+        ]
+      },
+      "builder_domain": {
+        "bounds": [
+          0.025,
+          0.1
+        ]
+      },
+      "technical_support": {
+        "supported": true,
+        "reasons": []
+      },
+      "study_permission": {
+        "permitted": true,
+        "reason": null
+      },
+      "validation_evidence": {
+        "status": "offline_mutation_resolved_compiler_and_mjcf_checked",
+        "reference": "tests/test_parameter_catalog.py::ParameterCatalogTests",
+        "exact_start_configuration": "285236abf99bf36894fa08410ac82fefa177a80179c4ceba15d95f8d1bc8d978",
+        "scientific_claim": "No robustness or closed-loop outcome is inferred from capability."
+      },
+      "mutation_mechanism": "candidate.family@2.0.0: set",
+      "required_rebuilds": [
+        "controller graph/solver",
+        "warm-state regeneration"
+      ],
+      "reuse": {
+        "allowed": [
+          "Frozen task/reference/evaluator/timing/environment and unchanged topology/input order",
+          "Compatible bounded historical tensions as numerical guesses only"
+        ],
+        "invalidated": [
+          "candidate-specific equilibrium/linearization/endpoint/screen",
+          "controller plans and warm states",
+          "trajectories, evaluation, profiles, acceptance and comparisons"
+        ],
+        "rule": "Exact configuration identity and provenance bind every result; rebuild after relevant edits. Cache/replay is not a repetition."
+      }
+    },
+    {
+      "id": "control/recipe/terminal_tip_speed_weight",
+      "kind": "control_objective",
+      "type": "number",
+      "unit": "1",
+      "meaning": "Dimensionless terminal weight on squared world tip speed / tip_speed_scale_m_s. Zero preserves legacy cost.",
+      "schema": "family.gvs_trajectory_parameters:terminal_tip_speed_weight",
+      "legal_domain": {
+        "options": [
+          0
+        ],
+        "intervals": [
+          [
+            0.0001,
+            1.0
+          ]
+        ]
+      },
+      "operation": "set",
+      "components": [
+        "controller"
+      ],
+      "effective_locations": [
+        "policy/controller/parameters/data/recipe/terminal_tip_speed_weight"
+      ],
+      "coupled_constraints": [
+        "Squared world tip speed normalized by fixed tip_speed_scale_m_s.",
+        "Holding cost follows fixed holding window; this objective does not change task acceptance."
+      ],
+      "derived_quantities": [
+        "controller objective terms"
+      ],
+      "task_families": [
+        "task.reach"
+      ],
+      "controller_versions": [
+        "10.0.0"
+      ],
+      "per_template_domains": {
+        "T0": {
+          "type": "number",
+          "bounds": [
+            0.025,
+            0.1
+          ],
+          "unit": "1"
+        },
+        "T1": {
+          "type": "number",
+          "bounds": [
+            0.025,
+            0.1
+          ],
+          "unit": "1"
+        },
+        "T2": {
+          "type": "number",
+          "bounds": [
+            0.025,
+            0.1
+          ],
+          "unit": "1"
+        },
+        "T3": {
+          "type": "number",
+          "bounds": [
+            0.025,
+            0.1
+          ],
+          "unit": "1"
+        }
+      },
+      "applicable_templates": [
+        "T0",
+        "T1",
+        "T2",
+        "T3"
+      ],
+      "current_value": 0.1,
+      "experiment_granted_domain": {
+        "bounds": [
+          0.025,
+          0.1
+        ]
+      },
+      "builder_domain": {
+        "bounds": [
+          0.025,
+          0.1
+        ]
+      },
+      "technical_support": {
+        "supported": true,
+        "reasons": []
+      },
+      "study_permission": {
+        "permitted": true,
+        "reason": null
+      },
+      "validation_evidence": {
+        "status": "offline_mutation_resolved_compiler_and_mjcf_checked",
+        "reference": "tests/test_parameter_catalog.py::ParameterCatalogTests",
+        "exact_start_configuration": "285236abf99bf36894fa08410ac82fefa177a80179c4ceba15d95f8d1bc8d978",
+        "scientific_claim": "No robustness or closed-loop outcome is inferred from capability."
+      },
+      "mutation_mechanism": "candidate.family@2.0.0: set",
+      "required_rebuilds": [
+        "controller graph/solver",
+        "warm-state regeneration"
+      ],
+      "reuse": {
+        "allowed": [
+          "Frozen task/reference/evaluator/timing/environment and unchanged topology/input order",
+          "Compatible bounded historical tensions as numerical guesses only"
+        ],
+        "invalidated": [
+          "candidate-specific equilibrium/linearization/endpoint/screen",
+          "controller plans and warm states",
+          "trajectories, evaluation, profiles, acceptance and comparisons"
+        ],
+        "rule": "Exact configuration identity and provenance bind every result; rebuild after relevant edits. Cache/replay is not a repetition."
+      }
+    },
+    {
+      "id": "components/middle/length_m",
+      "kind": "physical_design",
+      "type": "number",
+      "unit": "m",
+      "meaning": "middle flexible segment length; attachment station fractions remain fixed.",
+      "schema": "family.design:Segment.length_m",
+      "legal_domain": {
+        "exclusive_minimum": 0
+      },
+      "operation": "set",
+      "components": [
+        "middle"
+      ],
+      "effective_locations": [
+        "robot/structure/data/components/middle/length_m"
+      ],
+      "coupled_constraints": [
+        "Fixed serial topology, cell counts, section stations and tendon routing; compiler checks geometry."
+      ],
+      "derived_quantities": [
+        "cell length",
+        "mass",
+        "inertia",
+        "hinge stiffness/damping",
+        "tendon site positions"
+      ],
+      "task_families": [
+        "task.reach"
+      ],
+      "controller_versions": [
+        "10.0.0"
+      ],
+      "per_template_domains": {
+        "T2": {
+          "type": "number",
+          "bounds": [
+            0.05225,
+            0.05775
+          ],
+          "unit": "m"
+        },
+        "T3": {
+          "type": "number",
+          "bounds": [
+            0.05225,
+            0.05775
+          ],
+          "unit": "m"
+        }
+      },
+      "applicable_templates": [
+        "T2",
+        "T3"
+      ],
+      "current_value": null,
+      "experiment_granted_domain": {
+        "bounds": [
+          0.05225,
+          0.05775
+        ]
+      },
+      "builder_domain": {
+        "bounds": [
+          0.05225,
+          0.05775
+        ]
+      },
+      "technical_support": {
+        "supported": true,
+        "reasons": []
+      },
+      "study_permission": {
+        "permitted": true,
+        "reason": null
+      },
+      "validation_evidence": {
+        "status": "offline_mutation_resolved_compiler_and_mjcf_checked",
+        "reference": "tests/test_parameter_catalog.py::ParameterCatalogTests",
+        "exact_start_configuration": "285236abf99bf36894fa08410ac82fefa177a80179c4ceba15d95f8d1bc8d978",
+        "scientific_claim": "No robustness or closed-loop outcome is inferred from capability."
+      },
+      "mutation_mechanism": "candidate.family@2.0.0: set",
+      "required_rebuilds": [
+        "resolved physics",
+        "backend robot mesh/model",
+        "reduced geometry and structural basis",
+        "state projection",
+        "controller graph/solver",
+        "candidate initializer and warm-state regeneration"
+      ],
+      "reuse": {
+        "allowed": [
+          "Frozen task/reference/evaluator/timing/environment and unchanged topology/input order",
+          "Compatible bounded historical tensions as numerical guesses only"
+        ],
+        "invalidated": [
+          "candidate-specific equilibrium/linearization/endpoint/screen",
+          "controller plans and warm states",
+          "trajectories, evaluation, profiles, acceptance and comparisons"
+        ],
+        "rule": "Exact configuration identity and provenance bind every result; rebuild after relevant edits. Cache/replay is not a repetition."
+      }
+    },
+    {
+      "id": "design/middle_section_scale",
+      "kind": "physical_design",
+      "type": "number",
+      "unit": "1",
+      "meaning": "Uniform positive scale of all middle section dimensions against original semantic_source.; V2 source is the selected executed-radius template, and 1/baseline preserves it.",
+      "schema": "family.space:SemanticDecision.section_scale",
+      "legal_domain": {
+        "exclusive_minimum": 0
+      },
+      "operation": "section_scale",
+      "components": [
+        "middle"
+      ],
+      "effective_locations": [
+        "robot/structure/data/components/middle/sections/*/section/parameters/*"
+      ],
+      "coupled_constraints": [
+        "Only ellipse/rectangle; preserve aspect ratios, station layout and section orientation.",
+        "One scale owner per segment; common and per-segment scale selectors cannot overlap.",
+        "Tendon offsets and straight frictionless routing remain fixed; this scale changes the bending section and backend mesh."
+      ],
+      "derived_quantities": [
+        "area",
+        "bending second moments",
+        "mass",
+        "inertia",
+        "hinge stiffness/damping",
+        "backend mesh"
+      ],
+      "task_families": [
+        "task.reach"
+      ],
+      "controller_versions": [
+        "10.0.0"
+      ],
+      "per_template_domains": {
+        "T2": {
+          "type": "number",
+          "bounds": [
+            0.95,
+            1.05
+          ],
+          "unit": "1"
+        },
+        "T3": {
+          "type": "number",
+          "bounds": [
+            0.95,
+            1.05
+          ],
+          "unit": "1"
+        }
+      },
+      "applicable_templates": [
+        "T2",
+        "T3"
+      ],
+      "current_value": 1.0,
+      "experiment_granted_domain": {
+        "bounds": [
+          0.95,
+          1.05
+        ]
+      },
+      "builder_domain": {
+        "bounds": [
+          0.95,
+          1.05
+        ]
+      },
+      "technical_support": {
+        "supported": true,
+        "reasons": []
+      },
+      "study_permission": {
+        "permitted": true,
+        "reason": null
+      },
+      "validation_evidence": {
+        "status": "offline_mutation_resolved_compiler_and_mjcf_checked",
+        "reference": "tests/test_parameter_catalog.py::ParameterCatalogTests",
+        "exact_start_configuration": "285236abf99bf36894fa08410ac82fefa177a80179c4ceba15d95f8d1bc8d978",
+        "scientific_claim": "No robustness or closed-loop outcome is inferred from capability."
+      },
+      "mutation_mechanism": "candidate.family@2.0.0: section_scale",
+      "required_rebuilds": [
+        "resolved physics",
+        "backend robot mesh/model",
+        "reduced geometry and structural basis",
+        "state projection",
+        "controller graph/solver",
+        "candidate initializer and warm-state regeneration"
+      ],
+      "reuse": {
+        "allowed": [
+          "Frozen task/reference/evaluator/timing/environment and unchanged topology/input order",
+          "Compatible bounded historical tensions as numerical guesses only"
+        ],
+        "invalidated": [
+          "candidate-specific equilibrium/linearization/endpoint/screen",
+          "controller plans and warm states",
+          "trajectories, evaluation, profiles, acceptance and comparisons"
+        ],
+        "rule": "Exact configuration identity and provenance bind every result; rebuild after relevant edits. Cache/replay is not a repetition."
+      }
+    },
+    {
+      "id": "design/middle_material_scenario",
+      "kind": "physical_design",
+      "type": "choice",
+      "unit": "1",
+      "meaning": "middle numerical Young modulus scenario against original semantic_source.; V2 source is the selected executed-radius template, and 1/baseline preserves it.",
+      "schema": "family.space:SemanticDecision.material_scenario",
+      "legal_domain": {
+        "options": [
+          "baseline",
+          "compliant",
+          "stiff"
+        ]
+      },
+      "operation": "material_scenario",
+      "components": [
+        "middle"
+      ],
+      "effective_locations": [
+        "robot/structure/data/components/middle/physics/young_pa"
+      ],
+      "coupled_constraints": [
+        "Numerical simulation scenarios, not validated commercial materials. Young modulus alone is multiplied; original density and bending viscosity are retained.",
+        "Density and bending viscosity stay fixed; no independently mixed material properties.",
+        "One scenario owner per segment; common and per-segment material selectors cannot overlap."
+      ],
+      "derived_quantities": [
+        "Young modulus",
+        "hinge stiffness"
+      ],
+      "task_families": [
+        "task.reach"
+      ],
+      "controller_versions": [
+        "10.0.0"
+      ],
+      "per_template_domains": {
+        "T2": {
+          "type": "choice",
+          "options": [
+            "baseline",
+            "compliant",
+            "stiff"
+          ],
+          "unit": "1"
+        },
+        "T3": {
+          "type": "choice",
+          "options": [
+            "baseline",
+            "compliant",
+            "stiff"
+          ],
+          "unit": "1"
+        }
+      },
+      "applicable_templates": [
+        "T2",
+        "T3"
+      ],
+      "current_value": "baseline",
+      "experiment_granted_domain": {
+        "options": [
+          "baseline",
+          "compliant",
+          "stiff"
+        ]
+      },
+      "builder_domain": {
+        "options": [
+          "baseline",
+          "compliant",
+          "stiff"
+        ]
+      },
+      "technical_support": {
+        "supported": true,
+        "reasons": []
+      },
+      "study_permission": {
+        "permitted": true,
+        "reason": null
+      },
+      "validation_evidence": {
+        "status": "offline_mutation_resolved_compiler_and_mjcf_checked",
+        "reference": "tests/test_parameter_catalog.py::ParameterCatalogTests",
+        "exact_start_configuration": "285236abf99bf36894fa08410ac82fefa177a80179c4ceba15d95f8d1bc8d978",
+        "scientific_claim": "No robustness or closed-loop outcome is inferred from capability."
+      },
+      "mutation_mechanism": "candidate.family@2.0.0: material_scenario",
+      "required_rebuilds": [
+        "resolved physics",
+        "backend robot mesh/model",
+        "reduced geometry and structural basis",
+        "state projection",
+        "controller graph/solver",
+        "candidate initializer and warm-state regeneration"
+      ],
+      "reuse": {
+        "allowed": [
+          "Frozen task/reference/evaluator/timing/environment and unchanged topology/input order",
+          "Compatible bounded historical tensions as numerical guesses only"
+        ],
+        "invalidated": [
+          "candidate-specific equilibrium/linearization/endpoint/screen",
+          "controller plans and warm states",
+          "trajectories, evaluation, profiles, acceptance and comparisons"
+        ],
+        "rule": "Exact configuration identity and provenance bind every result; rebuild after relevant edits. Cache/replay is not a repetition."
+      }
+    },
+    {
+      "id": "design/middle_routing_radius_scale",
+      "kind": "physical_design",
+      "type": "number",
+      "unit": "1",
+      "operation": "routing_radius_scale",
+      "components": [
+        "middle"
+      ],
+      "schema": "family.space:SemanticDecision.routing_radius_scale",
+      "meaning": "Uniform local transverse routing offset scale against immutable semantic_source, owned by physical segment middle; V2 source is the selected executed-radius template, and 1/baseline preserves it.",
+      "legal_domain": {
+        "exclusive_minimum": 0.0,
+        "exclusive_maximum": null,
+        "reason": "Positive scale; rigid envelope clearance and strict hole separation; full compiler checks still required"
+      },
+      "task_families": [
+        "task.reach"
+      ],
+      "controller_versions": [
+        "10.0.0"
+      ],
+      "effective_locations": [
+        "segment-owned tendon attachment offsets and rigid guide holes"
+      ],
+      "coupled_constraints": [
+        "Base belongs to root flexible segment; rigid locations belong to closest upstream flexible ancestor.",
+        "Boundary guide holes transform once by upstream owner, including distal tendons. Anchors use their physical attachment owner.",
+        "Longitudinal stations, angle/layout, hole diameter, sections and actuator drum radius stay separate.",
+        "Bounds derived from source guide envelopes/hole separation; full compiler span checks required."
+      ],
+      "derived_quantities": [
+        "tendon lengths and derivatives",
+        "force mapping",
+        "reduced routing graph",
+        "controller preparation"
+      ],
+      "per_template_domains": {
+        "T2": {
+          "type": "number",
+          "bounds": [
+            0.98,
+            1.02
+          ],
+          "unit": "1"
+        },
+        "T3": {
+          "type": "number",
+          "bounds": [
+            0.98,
+            1.02
+          ],
+          "unit": "1"
+        }
+      },
+      "applicable_templates": [
+        "T2",
+        "T3"
+      ],
+      "current_value": 1.0,
+      "experiment_granted_domain": {
+        "bounds": [
+          0.98,
+          1.02
+        ]
+      },
+      "builder_domain": {
+        "bounds": [
+          0.98,
+          1.02
+        ]
+      },
+      "technical_support": {
+        "supported": true,
+        "reasons": []
+      },
+      "study_permission": {
+        "permitted": true,
+        "reason": null
+      },
+      "validation_evidence": {
+        "status": "pending_changed_radius_closed_loop",
+        "reference": "tests/test_research_mainline3.py::Mainline3EngineeringTests",
+        "exact_start_configuration": "3ae03b4e4ddac2e5099ae5823fc0dd7dd9d338dfba6b7d435729d4e5ab41665b",
+        "scientific_claim": "No robustness or closed-loop outcome is inferred from capability."
+      },
+      "mutation_mechanism": "candidate.family@2.0.0: routing_radius_scale",
+      "required_rebuilds": [
+        "resolved physics",
+        "backend robot mesh/model",
+        "reduced geometry and structural basis",
+        "state projection",
+        "controller graph/solver",
+        "candidate initializer and warm-state regeneration"
+      ],
+      "reuse": {
+        "allowed": [
+          "Frozen task/reference/evaluator/timing/environment and unchanged topology/input order",
+          "Compatible bounded historical tensions as numerical guesses only"
+        ],
+        "invalidated": [
+          "candidate-specific equilibrium/linearization/endpoint/screen",
+          "controller plans and warm states",
+          "trajectories, evaluation, profiles, acceptance and comparisons"
+        ],
+        "rule": "Exact configuration identity and provenance bind every result; rebuild after relevant edits. Cache/replay is not a repetition."
+      }
+    }
+  ],
+  "usable_pool": [
+    "template",
+    "components/near/length_m",
+    "design/near_section_scale",
+    "design/near_material_scenario",
+    "design/near_routing_radius_scale",
+    "components/far/length_m",
+    "design/far_section_scale",
+    "design/far_material_scenario",
+    "design/far_routing_radius_scale",
+    "control/recipe/holding_tip_speed_weight",
+    "control/recipe/terminal_tip_speed_weight",
+    "components/middle/length_m",
+    "design/middle_section_scale",
+    "design/middle_material_scenario",
+    "design/middle_routing_radius_scale"
+  ],
+  "integration_backlog": [
+    {
+      "id": "section_shape",
+      "kind": "physical_design",
+      "reason": "Backend compiler supports several shapes; stable reach compatibility only admits fixed ellipse/rectangle shape, station layout and uniform per-segment scaling. Changed-shape projection/controller validation is absent.",
+      "target_version": "later"
+    },
+    {
+      "id": "independent_material_properties",
+      "kind": "physical_design",
+      "reason": "Density and viscosity are represented but no manufacturing-consistent material declaration or study-validated coupled material mapping exists; Young-only scenarios are explicitly numerical.",
+      "target_version": "later"
+    },
+    {
+      "id": "natural_curvature",
+      "kind": "physical_design",
+      "reason": "Compiler represents rest curvature, but stable reach scope freezes it; no research mutation adapter, preload-consistent initial challenge mapping or changed-rest-shape controller validation is connected.",
+      "target_version": "later"
+    },
+    {
+      "id": "payload_mass_and_inertia",
+      "kind": "physical_design",
+      "reason": "Rigid payload mass, COM and full inertia tensor are represented, but stable reach scope freezes rigid components; no coupled physically consistent payload mutation, projection/controller validation or study initialization mapping is connected.",
+      "target_version": "later"
+    },
+    {
+      "id": "omitted_physics",
+      "kind": "numerical_model",
+      "reason": "Serial bending model omits shear, stretch, torsion, tendon friction, rope elasticity and motor dynamics; these are not editable supported physical effects.",
+      "target_version": "later"
+    },
+    {
+      "id": "solver_recipe",
+      "kind": "numerical_model",
+      "reason": "First study freezes stable v7 horizon, stopping rules and solver budgets; arbitrary numerical recipe mutation is not connected to this candidate builder.",
+      "target_version": "later"
+    },
+    {
+      "id": "arbitrary_topology",
+      "reason": "Only T0-T3 complete templates and their owned meshes supported."
+    },
+    {
+      "id": "coupled_actuation",
+      "reason": "Independent tension input bypasses motor execution; coupled drives are unsupported."
+    }
+  ],
+  "subset_selection": "All comparison groups may choose any subset of usable_pool within frozen domains; no per-batch permission.",
+  "version_rule": "Newly connected capability requires a new shared capability/study version.",
+  "execution_permission": "Parameter permission does not consume or override the separate frozen execution budget.",
+  "templates": {
+    "T0": {
+      "discretization": {
+        "cells": {
+          "far": 12,
+          "near": 12
+        },
+        "coordinates": "two_principal_bending_angles_per_cell",
+        "model": "serial_bending_cells_v1",
+        "version": "serial_bending_discretization_v1"
+      },
+      "difference": "Exact executed V1 robot and mesh",
+      "initialization": {
+        "regions": {
+          "near": [
+            "near"
+          ],
+          "distal": [
+            "far"
+          ]
+        },
+        "scientific_integrated_bends_rad": {
+          "near": [
+            0.0,
+            0.0
+          ],
+          "distal": [
+            0.0,
+            0.0
+          ]
+        },
+        "scientific_integrated_rates_rad_s": {
+          "near": [
+            0.0,
+            0.0
+          ],
+          "distal": [
+            0.0,
+            0.0
+          ]
+        }
+      }
+    },
+    "T1": {
+      "discretization": {
+        "cells": {
+          "far": 12,
+          "near": 12
+        },
+        "coordinates": "two_principal_bending_angles_per_cell",
+        "model": "serial_bending_cells_v1",
+        "version": "serial_bending_discretization_v1"
+      },
+      "difference": "Four tendons at each of two routing rings; 90 degree spacing; independent actuator per tendon",
+      "initialization": {
+        "regions": {
+          "near": [
+            "near"
+          ],
+          "distal": [
+            "far"
+          ]
+        },
+        "scientific_integrated_bends_rad": {
+          "near": [
+            0.0,
+            0.0
+          ],
+          "distal": [
+            0.0,
+            0.0
+          ]
+        },
+        "scientific_integrated_rates_rad_s": {
+          "near": [
+            0.0,
+            0.0
+          ],
+          "distal": [
+            0.0,
+            0.0
+          ]
+        }
+      }
+    },
+    "T2": {
+      "discretization": {
+        "cells": {
+          "near": 12,
+          "middle": 6,
+          "far": 6
+        },
+        "coordinates": "two_principal_bending_angles_per_cell",
+        "model": "serial_bending_cells_v1",
+        "version": "serial_bending_discretization_v1"
+      },
+      "difference": "Distal 0.11 m taper split into two 0.055 m components; extra 2 g guide and guide inertia; added intermediate routes",
+      "initialization": {
+        "regions": {
+          "near": [
+            "near"
+          ],
+          "distal": [
+            "middle",
+            "far"
+          ]
+        },
+        "scientific_integrated_bends_rad": {
+          "near": [
+            0.0,
+            0.0
+          ],
+          "distal": [
+            0.0,
+            0.0
+          ]
+        },
+        "scientific_integrated_rates_rad_s": {
+          "near": [
+            0.0,
+            0.0
+          ],
+          "distal": [
+            0.0,
+            0.0
+          ]
+        }
+      }
+    },
+    "T3": {
+      "discretization": {
+        "cells": {
+          "near": 12,
+          "middle": 6,
+          "far": 6
+        },
+        "coordinates": "two_principal_bending_angles_per_cell",
+        "model": "serial_bending_cells_v1",
+        "version": "serial_bending_discretization_v1"
+      },
+      "difference": "T1 independent eight-channel layout combined with T2 distal split",
+      "initialization": {
+        "regions": {
+          "near": [
+            "near"
+          ],
+          "distal": [
+            "middle",
+            "far"
+          ]
+        },
+        "scientific_integrated_bends_rad": {
+          "near": [
+            0.0,
+            0.0
+          ],
+          "distal": [
+            0.0,
+            0.0
+          ]
+        },
+        "scientific_integrated_rates_rad_s": {
+          "near": [
+            0.0,
+            0.0
+          ],
+          "distal": [
+            0.0,
+            0.0
+          ]
+        }
+      }
+    }
+  },
+  "selected_template": "T0",
+  "selection": {
+    "path": "template",
+    "syntax": {
+      "template": "T1"
+    },
+    "method": "search.family_explicit@1.0.0"
+  },
+  "execution_model": "ideal_tension: tendon-force limits enforced; actuator travel/velocity declared only",
+  "unsupported": [
+    "arbitrary topologies",
+    "coupled actuation",
+    "motor-realistic NMPC",
+    "shear",
+    "axial stretch",
+    "torsion",
+    "tendon friction",
+    "rope elasticity",
+    "self collision"
+  ],
+  "identity": "d92799d046532146b0cb782a364564f67c0be5368ca84e4d5abb52ab56ef2069"
+}

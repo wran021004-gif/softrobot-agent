@@ -712,3 +712,37 @@ EXTENSIONS.append(replace(_routing_builder, version='1.2.0',
         'parameter_support':dict(controller=['controller.gvs_nmpc@7.0.0','controller.gvs_nmpc@9.0.0','controller.gvs_nmpc@5.0.0'],
             backend=['backend.family_mujoco@1.1.0'], model=['model.serial_bending_cells@1.0.0'],
             task_families=['task.reach','task.tracking'])}))
+
+# Finite independently actuated serial templates; old compatibility domains stay sealed.
+from . import finite_templates
+_finite_sources=(*_routing_builder.sources,'extensions/tendon_family/routing_radius.py',
+    'extensions/tendon_family/finite_templates.py')
+EXTENSIONS.append(replace(_reach_v7,version='10.0.0',
+    sources=(*_reach_v7.sources,'extensions/tendon_family/routing_radius.py','extensions/tendon_family/finite_templates.py'),
+    assets=(*_reach_v7.assets,finite_templates.ASSET),
+    description='Finite T0-T3 independently actuated reach layouts with candidate-owned dimensions, named segment initialization, V7 stopping behavior and ideal tendon tension execution.',
+    capabilities={**_reach_v7.capabilities,'finite_templates':['T0','T1','T2','T3'],
+        'independent_tendon_inputs':True,'coupled_actuation':False,'motor_realistic':False}))
+EXTENSIONS.append(replace(_routing_builder,version='2.0.0',
+    binding='extensions.tendon_family.finite_templates:apply',sources=_finite_sources,
+    assets=(*_routing_builder.assets,finite_templates.ASSET),
+    description='Named categorical finite structural pool T0-T3, complete template-owned meshes and per-component continuous physical parameters.',
+    capabilities={**_routing_builder.capabilities,
+        'authorize_changes':'extensions.tendon_family.finite_templates:authorize',
+        'candidate_initializer':'extensions.tendon_family.finite_templates:validate_initializer',
+        'parameter_declarations':'extensions.tendon_family.finite_templates:declarations',
+        'parameter_capability_version':'2.0.0',
+        'parameter_support':dict(controller=['controller.gvs_nmpc@10.0.0'],
+            backend=['backend.family_mujoco@1.1.0'],model=['model.serial_bending_cells@1.0.0'],task_families=['task.reach']),
+        'categorical_search':'search.family_explicit@1.0.0'}))
+
+from tools import research_v2
+for name,request,binding,description in (
+    ('research.capability_catalog',research_v2.Empty,'public_catalog','Discover the actual granted finite V2 templates and their per-template continuous domains; no execution.'),
+    ('research.select_template',research_v2.TemplateSelection,'public_select','Select a granted finite template through registered explicit categorical search; returns changes for research.prepare_candidate.'),
+    ('research.candidate_dimensions',research_v2.CandidateDimensions,'public_dimensions','Inspect exact owned candidate dimensions, coordinate/channel order and bounded numerical initialization; no scientific solve.'),
+    ('research.capability_report',research_v2.CapabilityReport,'public_report','Stop the engineered V2 capability-use session with a limited interpretation of the exact selected configuration and original representative execution evidence.')):
+    EXTENSIONS.append(Extension(name,'tool','1.0.0',request,research_v2.CapabilityResult,
+        'tools.research_v2:'+binding,description,
+        sources=('tools/research_v2.py','extensions/tendon_family/finite_templates.py','tools/parameter_catalog.py','tools/platform_search.py'),
+        assets=(finite_templates.ASSET,),capabilities=dict(category='research',role='public_tool')))

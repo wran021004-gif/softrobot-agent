@@ -78,6 +78,9 @@ def candidate_facts(baseline, configuration, reference, candidate_id, owner_run_
 
     def value(inp, path):
         path = canonical_path(path)
+        if baseline['policy']['candidate_builder'].get('version')=='2.0.0':
+            from tools.candidate_parameters import parameter_value
+            return parameter_value(inp,path)
         if path in space.get('semantic_decisions', {}):
             return inp['robot']['structure']['data'].get('metadata', {}).get('design_decisions', {}).get('selections', {}).get(path, space['semantic_decisions'][path]['baseline_value'])
         for prefix, field in (('control/', 'controller'), ('model/', 'dynamics_model')):
@@ -107,7 +110,16 @@ def candidate_facts(baseline, configuration, reference, candidate_id, owner_run_
                     if path.lower().endswith(suffix)), None)
             parameters.append(dict(path=path, **values, baseline_delta=after-before if numeric else None, unit=unit))
     extra = {}
-    if space.get('semantic_decisions'):
+    if baseline['policy']['candidate_builder'].get('version')=='2.0.0':
+        from .finite_templates import template_id
+        from .design_decisions import physical_summary
+        design=effective['robot']['structure']['data']
+        extra=dict(template=template_id(design),physical_summary=physical_summary(design,effective['policy']['discretization']['data']),
+            topology_changes=dict(before_components=[c['id'] for c in baseline['robot']['structure']['data']['components']],
+                after_components=[c['id'] for c in design['components']],
+                before_tendons=[t['id'] for t in baseline['robot']['structure']['data']['tendons']],
+                after_tendons=[t['id'] for t in design['tendons']]))
+    elif space.get('semantic_decisions'):
         from .design_decisions import physical_effects, physical_summary
         design = effective['robot']['structure']['data']
         effects = physical_effects(space['semantic_source'], design)
@@ -246,7 +258,7 @@ def apply(inp, parameters, changes, *, semantic_expander=None):
     from .contracts import GVSTrajectoryParameters
     from .gvs_profile import ProfileControl, ReachControl
     from .tracking import TrackingControl
-    control_type=({'1.0.0':GVSTrajectoryParameters,'2.0.0':ProfileControl,'3.0.0':ReachControl,'4.0.0':ReachControl,'5.0.0':TrackingControl,'6.0.0':ReachControl,'7.0.0':ReachControl,'8.0.0':ReachControl,'9.0.0':ReachControl}[inp.policy.controller.version]
+    control_type=({'1.0.0':GVSTrajectoryParameters,'2.0.0':ProfileControl,'3.0.0':ReachControl,'4.0.0':ReachControl,'5.0.0':TrackingControl,'6.0.0':ReachControl,'7.0.0':ReachControl,'8.0.0':ReachControl,'9.0.0':ReachControl,'10.0.0':ReachControl}[inp.policy.controller.version]
         if inp.policy.controller.extension_id=='controller.gvs_nmpc' else
         GVSLQRControl if inp.policy.controller.extension_id in ('controller.gvs_lqr','controller.gvs_sampled_lqr') else Control)
     control=control_type.model_validate(inp.policy.controller.parameters.data).model_dump(mode='json')
