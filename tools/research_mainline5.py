@@ -114,7 +114,12 @@ def native_tools(w):
             receipt=invoke(w.host,_name,use['input'],request_id=request_id)
             result=dict(receipt=receipt,content=w.store.artifact(receipt['output']) if receipt.get('output') else None)
             if _name=='research.decide' and receipt['execution_status']=='completed':
-                row=accepted(w,result['content']['reference']);apply_decision(w,row)
+                row=accepted(w,result['content']['reference'])
+                try:apply_decision(w,row)
+                except Exception as exc:
+                    row['execution_error']=dict(type=type(exc).__name__,message=str(exc))
+                    w.status='execution_stopped';service.persist(w)
+                    raise
                 result.update(research_status=w.status,feedback=w.store.artifact(w.feedback))
             return dict(toolUseId=use['toolUseId'],status='success' if receipt['execution_status']=='completed' else 'error',
                 content=[{'text':json.dumps(result,ensure_ascii=False)}])
@@ -199,7 +204,11 @@ def recover_business(w):
         if response:settle(w.host,row,response)
         else:w.store.mark_unknown(w.host.run_id,row['request_id'])
     ref=w.store.session(w.host.run_id)['state'].get('handoffs',{}).get('research_decision')
-    if ref:apply_decision(w,accepted(w,ref))
+    if ref:
+        row=accepted(w,ref)
+        if row.get('execution_error') and not (row.get('feedback_result') or row.get('stop_processed')):
+            w.status='running'
+        apply_decision(w,row)
     if pending(w.host):raise ValueError('UNKNOWN_PROVIDER_OUTCOME_REQUIRES_RECONCILIATION')
 
 

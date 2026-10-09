@@ -208,6 +208,12 @@ def historical_parameter_comparison(original,policy,paths):
         space=policy['candidate_builder']['parameters']['data']
         allowed={**space.get('parameters',{}),**space.get('control_parameters',{}),
                  **space.get('model_parameters',{}),**space.get('discretization_parameters',{})}
+        if projected['policy']['candidate_builder'].get('version')=='2.0.0':
+            from extensions.tendon_family.finite_templates import selected_space
+            from schemas.platform import SessionInput
+            _,selected=selected_space(SessionInput.model_validate(projected),
+                projected['policy']['candidate_builder']['parameters']['data'],{})
+            allowed={**selected.parameters,**selected.control_parameters,'template':{}}
         if set(paths)-set(allowed):raise ValueError('HISTORICAL_PARAMETER_OUTSIDE_CURRENT_GRANT')
         return dict(available=True,values={p:parameter_value(projected,p) for p in paths},
             original_configuration_identity=digest(original),parameter_projection_identity=digest(projected),

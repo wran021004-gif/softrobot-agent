@@ -199,3 +199,41 @@ class Mainline5Tests(TestCase):
         asyncio.run(m5.converse(w,LoopBoundClient(),'Offline continuation check'))
         self.assertEqual(len(loops),2);self.assertIs(loops[0],loops[1])
         self.assertIn('native tool',prompts[1]);self.assertEqual(w.status,'model_stopped')
+
+    def test_historical_material_comparison_respects_template_active_paths(self):
+        from tools.candidate_parameters import historical_parameter_comparison,historical_parameter_projection,scientific_fixed_scope
+        w=self.w;paths=[f'design/{name}_material_scenario' for name in ('near','middle','far')]
+        policy=s.configuration()['policy']
+        for index,record in enumerate(w.records[:4]):
+            original=w.store.artifact(record['facts']['configuration'])['effective']
+            comparison=historical_parameter_comparison(original,policy,paths)
+            self.assertEqual(comparison['available'],index in (2,3))
+            if comparison['available']:
+                projected=historical_parameter_projection(original,policy)
+                scientific_fixed_scope(projected,paths)
+                self.assertEqual(comparison['values'],{p:'baseline' for p in paths})
+            else:
+                self.assertIn('OUTSIDE_CURRENT_GRANT',comparison['reason'])
+
+    def test_accepted_business_failure_pauses_and_recovers_before_new_send(self):
+        w=self.w;w.status='running';s.configure(w)
+        ref=s.save(w.store,{'decision':{'action':'control_search'}})
+        output=s.save(w.store,{'reference':ref})
+        native=next(t for t in m5.native_tools(w) if t.tool_name=='research_decide')
+        before=w.store.remaining()
+        with patch.object(m5,'invoke',return_value={'execution_status':'completed','output':output}), \
+                patch.object(m5,'apply_decision',side_effect=KeyError('offline business fault')):
+            with self.assertRaises(KeyError):
+                native._tool_func({'toolUseId':'offline-pending-business','input':{'action':'control_search'}})
+        restored=s.restore(w.directory)
+        self.assertEqual(restored.status,'execution_stopped')
+        self.assertIn('execution_error',restored.rounds[-1])
+        with restored.store.transaction() as db:
+            state=restored.store.session(restored.host.run_id,db)['state']
+            state.setdefault('handoffs',{})['research_decision']=ref
+            restored.store.update_state(db,restored.host.run_id,state)
+        def repaired(current,row):
+            self.assertEqual(current.status,'running')
+            row['feedback_result']={'mode':'offline repaired receipt'}
+        with patch.object(m5,'apply_decision',side_effect=repaired):m5.recover_business(restored)
+        self.assertEqual(restored.store.remaining(),before)
