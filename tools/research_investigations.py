@@ -893,7 +893,7 @@ class InvestigationDispatcher:
                 accounting=self._target_accounting(grant)
                 if accounting is not None:
                     identities=grant['correction_policy']['targets'][order.investigation_id]
-                    context['workbench']['correction_opportunities_remaining']={target:max(0,4-accounting['targets'].get(target,{}).get('used',0))
+                    context['workbench']['correction_opportunities_remaining']={target:max(0,grant['correction_policy']['maximum']-accounting['targets'].get(target,{}).get('used',0))
                         for target in [identities['report'],*identities['dispositions'].values()]}
                     context['workbench']['correction_policy']=grant['correction_policy']['extension']
             context['remaining_budget']={k:max(0,v-node['usage'][k]) for k,v in plain(order.budget).items()}
