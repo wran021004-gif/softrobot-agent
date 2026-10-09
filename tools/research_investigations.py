@@ -1601,6 +1601,50 @@ class InvestigationDispatcher:
         if role in ('investigator','coordinator') or self.host.actor.split(':',1)[0] in ('investigator','coordinator'):
             raise ValueError('PRINCIPAL_ONLY_DISPOSITION_AUTHORITY')
 
+    def disposition_receipt(self, investigation_id, revision):
+        """Retrieve a stable business receipt; no conversation recovery is scheduled."""
+        self._grant();self._principal_authority()
+        row=self.store.lookup(self.run_id,'disposition-'+digest([investigation_id,revision]))
+        return json.loads(row['receipt']) if row and row['receipt'] else None
+
+    def submit_disposition(self, value, revision):
+        """Opt-in atomic submission for runtimes delivering native tools at least once.
+
+        The existing validator and disposition version list remain authoritative.
+        The business key excludes transport call IDs; conflicting delivery cannot
+        replace a committed decision. Legacy callers keep their existing API.
+        """
+        self._grant();self._principal_authority()
+        if type(revision) is not int or revision<1:raise ValueError('INVALID_DISPOSITION_REVISION')
+        args=PrincipalDisposition.model_validate(value)
+        request_id='disposition-'+digest([args.investigation_id,revision])
+        payload_hash=digest(dict(decision=plain(args),revision=revision))
+        old=self.store.lookup(self.run_id,request_id)
+        if old:
+            if old['request_hash']!=payload_hash:raise ValueError('DISPOSITION_REVISION_CONFLICT')
+            if old['receipt']:return json.loads(old['receipt'])
+        # No judgment rewriting: use exactly the existing public validation.
+        record=self.disposition(args,validate_only=True)
+        row,_=self.store.reserve(self.run_id,request_id,payload_hash,self.host.actor,
+            {**zero(),'tool_calls':1},kind='formal_disposition')
+        with self.store.transaction() as db:
+            current=self.store.lookup(self.run_id,request_id,db)
+            if current['receipt']:return json.loads(current['receipt'])
+            state=self.store.session(self.run_id,db)['state']
+            collection='historical_investigations' if args.investigation_id in state.get('historical_investigations',{}) else 'investigations'
+            node=state[collection][args.investigation_id]
+            if revision!=node.get('submission_revision',0)+1:raise ValueError('DISPOSITION_REVISION_SEQUENCE')
+            ref=self.store.put(db,record)
+            previous=node.get('disposition_record')
+            if previous and previous!=plain(ref):node.setdefault('disposition_versions',[]).append(previous)
+            node.update(principal_disposition=record,disposition_record=plain(ref),submission_revision=revision)
+            self.store.update_state(db,self.run_id,state)
+            self.store.event(db,self.run_id,'principal_disposition','recorded',inputs=[args.report] if args.report else [],outputs=[ref])
+            receipt=dict(request_id=request_id,execution_id=row['execution_id'],caller=self.host.actor,
+                tool_id='research.investigation_disposition',tool_version='1.0.0',execution_status='completed',
+                result_contract='PrincipalDisposition',result_version='1.0.0',charged=zero())
+            return self.store.complete(row,receipt,record,kind='formal_disposition',db=db)
+
 
 def dispatch(ctx,args):
     from tools.platform_workers import Coordinator
