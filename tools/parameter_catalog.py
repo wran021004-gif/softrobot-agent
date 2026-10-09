@@ -88,6 +88,22 @@ def effective_catalog(effective, grant=None, validation_evidence=None, reg=None)
     from extensions.tendon_family.candidate import check_value
     from tools.platform_store import plain
     effective = plain(effective)
+    if effective['policy']['candidate_builder'].get('version')=='3.0.0':
+        from extensions.tendon_family.generated_serial import check_robot
+        design=effective['robot']['structure']['data'];check_robot(design,effective['policy']['discretization']['data'])
+        recipe=design['metadata']['recipe'];rows=[]
+        values={**recipe,'tendon_count':len(design['tendons']),'actuator_count':len(design['actuators'])}
+        values.update({f'length/{i}':l for i,l in enumerate(recipe['lengths_m'])})
+        values.update({f'control/recipe/{k}':effective['policy']['controller']['parameters']['data']['recipe'][k]
+            for k in ('holding_tip_speed_weight','terminal_tip_speed_weight')})
+        for key,value in values.items():
+            rows.append(dict(id=key,current_value=value,technical_support=dict(supported=True,reasons=[]),
+                study_permission=dict(permitted=False,reason='Resolved execution recipe; free/fixed domains belong to typed design problem'),
+                validation_evidence=dict(status='constructed',scientific_claim='Exact closed-loop receipts required for physical validation')))
+        return dict(version=CATALOG_VERSION,capability_version='3.0.0',builder=effective['policy']['candidate_builder'],
+            parameters=rows,usable_pool=[],search='search.design_mixed@1.0.0',
+            supported=dict(physical_segments=[2,4],group_tendons=[3,4],independent_actuators='one per tendon'),
+            integration_backlog=['coupled_actuation','arbitrary_graphs','motor_mass'],identity=digest(values))
     definition, capability = _declarations(effective, reg)
     policy = effective['policy']
     support = definition.capabilities['parameter_support']

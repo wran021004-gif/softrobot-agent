@@ -76,6 +76,9 @@ def public_dimensions(ctx,args):
         raise ValueError('V2_OWNED_CONFIGURATION_REFERENCE_REQUIRED: use the nested PreparedCandidate.configuration reference, not the preparation receipt output/wrapper')
     if candidate['baseline_identity']!=digest(plain(ctx.input)) or digest(candidate['effective'])!=candidate['content_identity']:
         raise ValueError('V2_DIMENSIONS_OWNED_CONFIGURATION_REQUIRED')
+    if candidate['effective']['policy']['controller']['version']=='11.0.0':
+        from extensions.tendon_family.generated_serial import dimensions
+        return CapabilityResult(detail=dimensions(SessionInput.model_validate(candidate['effective'])))
     return CapabilityResult(detail=finite.dimensions(SessionInput.model_validate(candidate['effective'])))
 
 

@@ -9,6 +9,14 @@ STRUCTURAL_PATHS=('components/near/length_m','components/far/length_m','design/s
 def parameter_value(effective,path):
     path=canonical_path(path)
     space=effective['policy']['candidate_builder']['parameters']['data']
+    if effective['policy']['candidate_builder'].get('version')=='3.0.0':
+        recipe=space['recipe']
+        if path in recipe:return recipe[path]
+        if path=='tendon_count' or path=='actuator_count':return recipe['proximal_tendons']+recipe['distal_tendons']
+        if path.startswith('length/'):
+            index=int(path.split('/')[1])
+            if index>=recipe['segment_count']:raise ValueError('INACTIVE_LENGTH_COORDINATE')
+            return recipe['lengths_m'][index]
     if effective['policy']['candidate_builder'].get('version')=='2.0.0':
         from extensions.tendon_family.finite_templates import template_id
         if path=='template':return template_id(effective['robot']['structure']['data'])
@@ -95,6 +103,9 @@ def scientific_fixed_scope(effective,variables):
 def comparison_scope(effective):
     from extensions.tendon_family.candidate import REACH_WEIGHT_PATHS
     builder=effective['policy']['candidate_builder']
+    if builder.get('version')=='3.0.0':
+        from extensions.tendon_family.gvs_profile import execution_scope
+        return execution_scope(effective)  # Exact generated recipe; no historical rebinding.
     if builder.get('extension_id')=='candidate.family' and builder.get('version') in ('1.1.0','1.2.0','2.0.0'):
         from tools.parameter_catalog import effective_catalog
         return scientific_fixed_scope(effective,effective_catalog(effective)['usable_pool'])
@@ -109,6 +120,10 @@ def planning_configuration(store,candidate,policy):
 def project_planning_configuration(original,policy):
     """Shared source projection for archived planning and the fixed study runner."""
     effective=deepcopy(original)
+    if policy.get('candidate_builder',{}).get('version')=='3.0.0':
+        if original['policy']['candidate_builder'].get('version')!='3.0.0':
+            raise ValueError('HISTORICAL_GENERATOR_REBINDING_FORBIDDEN_USE_REASONING_EVIDENCE')
+        return effective
     current=policy.get('candidate_builder',{}).get('parameters',{}).get('data',{})
     builder=policy.get('candidate_builder',{})
     if builder.get('extension_id')=='candidate.family' and builder.get('version')=='2.0.0':

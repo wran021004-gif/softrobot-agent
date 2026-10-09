@@ -746,3 +746,27 @@ for name,request,binding,description in (
         'tools.research_v2:'+binding,description,
         sources=('tools/research_v2.py','extensions/tendon_family/finite_templates.py','tools/parameter_catalog.py','tools/platform_search.py'),
         assets=(finite_templates.ASSET,),capabilities=dict(category='research',role='public_tool')))
+
+from . import generated_serial
+_generated_sources=(*_finite_sources,'extensions/tendon_family/generated_serial.py')
+EXTENSIONS.append(replace(_reach_v7,version='11.0.0',sources=(*_reach_v7.sources,*_generated_sources),
+    assets=(*_reach_v7.assets,finite_templates.ASSET),
+    description='Rule-generated 2-4 flexible segments, independent 3/4 tendon groups; inherited V7 NMPC and explicit candidate pretension initialization.',
+    capabilities={**_reach_v7.capabilities,'generator':generated_serial.GENERATOR,'independent_tendon_inputs':True}))
+EXTENSIONS.append(replace(_routing_builder,version='3.0.0',input_schema=generated_serial.GeneratorSpace,
+    binding='extensions.tendon_family.generated_serial:apply',sources=_generated_sources,assets=(finite_templates.ASSET,),
+    capabilities={**_routing_builder.capabilities,
+        'authorize_changes':'extensions.tendon_family.generated_serial:authorize',
+        'candidate_initializer':'extensions.tendon_family.generated_serial:validate_initializer',
+        'parameter_declarations':'extensions.tendon_family.generated_serial:declarations',
+        'parameter_support':dict(controller=['controller.gvs_nmpc@11.0.0'],backend=['backend.family_mujoco@1.1.0'],
+            model=['model.serial_bending_cells@1.0.0'],task_families=['task.reach'])}))
+
+from schemas.design_optimization import DesignOptimizationProblem,DesignOptimizationResult
+CONTRACTS += [('family.generator_space','1.0.0',generated_serial.GeneratorSpace),
+    ('research.design_optimization_problem','1.0.0',DesignOptimizationProblem),
+    ('research.design_optimization_result','1.0.0',DesignOptimizationResult)]
+EXTENSIONS.append(Extension('search.design_mixed','tool','1.0.0',DesignOptimizationProblem,DesignOptimizationResult,
+    'tools.design_optimization:solve_tool','Bounded hierarchical integer/categorical enumeration and feedback-driven continuous robot design search.',
+    sources=(*_generated_sources,'schemas/design_optimization.py','tools/design_optimization.py','tools/execution_completion.py'),
+    assets=(finite_templates.ASSET,),capabilities=dict(category='optimization',role='public_tool',delegated_execution=True),side_effects='backend'))
