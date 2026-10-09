@@ -104,7 +104,9 @@ def bind(h):
         if db.execute('SELECT COUNT(*) FROM calls').fetchone()[0]:raise ValueError('FREEZE_REQUIRES_ZERO_CALLS')
     before=h.store.session(h.run_id)['snapshot'];after=compile_input(before['input'],h.reg)
     after.update(project_commit=subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip(),worktree_dirty=False)
-    if after['input_identity']!=before['input_identity']:raise ValueError('FREEZE_CHANGED_SCIENCE')
+    from extensions.tendon_family.gvs_profile import execution_scope
+    if after['instance_identity']!=before['instance_identity'] or execution_scope(after['input'])!=execution_scope(before['input']):
+        raise ValueError('FREEZE_CHANGED_SCIENCE')
     with h.store.transaction() as db:
         ref=h.store.put(db,after);db.execute('UPDATE sessions SET snapshot=? WHERE run_id=?',(ref.artifact_id,h.run_id))
         state=h.store.session(h.run_id,db)['state'];state['mixed_freeze']=after['project_commit'];h.store.update_state(db,h.run_id,state)
