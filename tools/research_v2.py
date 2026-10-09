@@ -189,7 +189,10 @@ def bind_before_dispatch():
     host=Host(RUN,'mainline3-v2')
     with closing(host.store.connect(True)) as db:
         if db.execute('SELECT COUNT(*) FROM calls').fetchone()[0]:raise ValueError('PRE_DISPATCH_BINDING_REQUIRES_ZERO_CALLS')
-    session=host.store.session(host.run_id);old=session['snapshot']
+        raw=db.execute('SELECT snapshot FROM sessions WHERE run_id=?',(host.run_id,)).fetchone()[0]
+    # A demonstrated pre-dispatch engineering serialization failure is repaired
+    # from its exact saved snapshot; no calls or grants have been issued anew.
+    old=read(OUT/'pre_dispatch_snapshot.json')['before'] if raw.startswith('{') else host.store.session(host.run_id)['snapshot']
     current=compile_input(old['input'],host.reg)
     assert current['instance_identity']==old['instance_identity']
     current.update(project_commit=subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip(),
@@ -197,7 +200,8 @@ def bind_before_dispatch():
     atomic_json(OUT/'pre_dispatch_snapshot.json',dict(before=old,after=current,
         rule='Before any provider/scientific calls; same input, activity start, grant and cumulative ledger; only finalized engineering dependency snapshot'))
     with host.store.transaction() as db:
-        db.execute('UPDATE sessions SET snapshot=? WHERE run_id=?',(json.dumps(current),host.run_id))
+        reference=host.store.put(db,current)
+        db.execute('UPDATE sessions SET snapshot=? WHERE run_id=?',(reference.artifact_id,host.run_id))
         host.store.event(db,host.run_id,'engineering','pre_dispatch_binding',outputs=[host.store.put(db,dict(
             before_dependencies=old['dependencies'],after_dependencies=current['dependencies']))])
     elapsed=time.time()-STARTED_UNIX
