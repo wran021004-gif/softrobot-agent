@@ -31,6 +31,24 @@ PRIOR_FAILED=[
  'tests.test_research_investigation_closeout.InvestigationCloseoutTests.test_scope_budget_and_complete_outgoing_overflow',
  'tests.test_research_mainline3.Mainline3EngineeringTests.test_unconfirmed_recovery_no_redispatch_and_confirmed_failure']
 
+def task_allocations():
+    # Purpose remains accounting metadata; only the task ceiling limits calls.
+    limits={'reach-holding-interpretation':(12,16,3600.,4,2),
+        'timing-integrity-limits':(4,8,1200.,1,2),
+        'coordinator-summary':(6,12,1800.,3,2),
+        'principal-coordinated-v2':(18,24,3600.,4,14)}
+    return {key:dict(budget={**zero(),'model_calls':calls,'tool_calls':ops,'wall_s':seconds},
+        exploration_requests=reads,protected_delivery_requests=protected,
+        timeout_s=seconds) for key,(calls,ops,seconds,protected,reads) in limits.items()}
+
+def correction_policy():
+    return dict(version='mainline3.target_corrections@1.0.0',planned=2,maximum=4,
+        extension='Latest saved output and precise actionable feedback; unchanged failing field and feedback stop; no cosmetic extensions',
+        targets={key:dict(report='report:'+key,dispositions={target:'disposition:'+target
+            for target in ('reach-holding-interpretation','timing-integrity-limits')} if key=='principal-coordinated-v2' else {})
+            for key in task_allocations()},
+        accounting='Project ledger; stable targets exclude report versions, session and dispatch IDs; engineering recovery is separate')
+
 def start(authorization=None, started_unix=None):
     if OUT.exists():raise ValueError('NEW_ACTIVITY_ALREADY_EXISTS')
     OUT.mkdir(parents=True)
@@ -39,16 +57,14 @@ def start(authorization=None, started_unix=None):
     from datetime import datetime,timezone
     atomic_json(OUT/'activity_start.json',dict(activity_id='mainline3-v1-complete-'+uuid4().hex[:12],started_unix=began,
         deadline_unix=began+36000,execution_cutoff_unix=began+34200,started_at=datetime.fromtimestamp(began,timezone.utc).isoformat(),
-        reviewed_baseline='be3cfef2b1655b4d0321dd96b69202361a2ef87e',observed_head=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip(),
-        remote_fetch='Target branch fetched once successfully; no advancement; initial sandbox FETCH_HEAD denial resolved by authorized escalation',
+        reviewed_baseline='0867abc6424db87fe6b9e933a33163c2072a54e2',observed_head=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip(),
+        remote_fetch='Target branch fetched once; inspect any advancement and preserve completed work',
         includes='Preparation, repairs, pauses, offline review, live execution and delivery'))
     atomic_json(OUT/'authorization.json',dict(source=str(authorization) if authorization else 'Offline fixture',
         text=Path(authorization).read_text(encoding='utf-8-sig') if authorization else 'Offline fixture only',
         recipient='https://api.deepseek.com',model='deepseek-flash',thinking='enabled',reasoning_effort='high',tool_choice='auto',max_tokens=32768,
         data_scope='Only non-secret task-scoped research data through existing credential loader',A_new_requests=0,B_new_requests=40,
-        request_purposes=dict(reach=dict(ordinary=8,model_correction=2,engineering_recovery=2),
-            timing=dict(ordinary=8,model_correction=2,engineering_recovery=2),synthesis=dict(ordinary=4,model_correction=1,engineering_recovery=1),
-            principal=dict(ordinary=6,model_correction=3,engineering_recovery=1)),consecutive_corrections=2,probes=2,
+        task_allocations=task_allocations(),correction_policy=correction_policy(),probes=2,
         post_freeze_repairs=4,same_defect_repair_cycles=2,B_tools=512,B_wall_s=12000,C_tools=28,C_wall_s=6000,
         C_models=0,C_backend_executions=2,C_second_execution='Engineering invalid/incomplete only, unchanged science',
         deadline_hours=10,delivery_protection_minutes=30,investigator_concurrency=1,ordinary_push_branch='feat/gvs-dynamics',
@@ -87,13 +103,14 @@ def freeze():
     if parent['status']!='completed':raise ValueError('VALID_HISTORICAL_PLAN_REQUIRED')
     InvestigationReturn.model_validate(b['artifacts'][parent['result']['artifact_id']])
     children=deepcopy(parent['children'])
-    for child in children:child['budget']=allocation(8,2,2,4)['budget']
-    allocations={c['investigation_id']:allocation(8,2,2,4) for c in children}
-    allocations.update({'coordinator-summary':allocation(4,1,1,3),'principal-coordinated-v2':allocation(6,3,1,4)})
+    allocations=task_allocations()
+    for child in children:
+        child['budget']=allocations[child['investigation_id']]['budget']
+        child['timeout_s']=allocations[child['investigation_id']]['timeout_s']
     activity=read(OUT/'activity_start.json')['activity_id']
     phases=dict(coordinated=dict(project_budget={**zero(),'model_calls':40,'tool_calls':512,'wall_s':12000.},
-        node_budget=allocation(8,2,2,4)['budget'],total_node_budget={**zero(),'model_calls':40,'tool_calls':64,'wall_s':9600.},
-        node_count=4,node_timeout_s=2400.,tool_bindings=TOOLS,operation_allowances={t:dict(reserve_s=5.,timeout_s=30.) for t in TOOLS},
+        node_budget={**zero(),'model_calls':18,'tool_calls':24,'wall_s':3600.},total_node_budget={**zero(),'model_calls':40,'tool_calls':60,'wall_s':10200.},
+        node_count=4,node_timeout_s=3600.,correction_policy=correction_policy(),tool_bindings=TOOLS,operation_allowances={t:dict(reserve_s=5.,timeout_s=30.) for t in TOOLS},
         allocations=allocations,authorized_children=children),fixed=dict(project_budget={**zero(),'tool_calls':28,'backend_solves':2,'wall_s':6000.},
         tool_bindings={**FIXED_TOOLS,'research.task_acceptance':'1.0.0'}))
     reserves=(30.,700.,150.,500.,4400.,30.,60.,30.)
@@ -117,13 +134,16 @@ def freeze():
         fixed_identity=fixed_identity(),fixed_changes=fixed_identity()['changes'],total_new_provider_requests=40,
         gates=dict(B='Two new valid reports, actual synthesis, two public principal dispositions, original evidence inspections, receipts and separate coding-agent material audit',
             C='Eight public components, changed-geometry identities, complete valid execution; physical failure is legitimate completion'),
-        executability=dict(B_node_reservations=dict(model_calls=40,tool_calls=64,wall_s=9600),B_public_overhead_max=dict(tool_calls=30,wall_s=150),
+        executability=dict(B_node_reservations=dict(model_calls=40,tool_calls=60,wall_s=10200),B_public_overhead_max=dict(tool_calls=30,wall_s=150),
             B_project=dict(model_calls=40,tool_calls=512,wall_s=12000),concurrency=1,collector='Sequential submission and collection; deadlines start at actual dispatch',
             C_primary_reserved_wall_s=sum(reserves),C_second='Only after engineering-invalid first; sufficient residual original grant required',
             all_role_limits_exact=True,coordinator_planning_new_inference_allowance=0),no_automatic_provider_retries=True)
     if not read(OUT/'offline_gate.json')['passed']:raise ValueError('OFFLINE_GATE_REQUIRED')
+    from tools.research_v1_continue_gate import correction_consistency
+    if not correction_consistency(read(OUT/'authorization.json'),phases['coordinated'],orders=children)['passed']:
+        raise ValueError('CORRECTION_POLICY_CONSISTENCY_REQUIRED')
     manifest['preparation_wall_s']=max(0,time.time()-read(OUT/'activity_start.json')['started_unix'])
-    if manifest['preparation_wall_s']+9600+150>12000:raise ValueError('PREPARATION_AND_MAXIMUM_ROLE_RESERVATIONS_DO_NOT_FIT')
+    if manifest['preparation_wall_s']+10200+150>12000:raise ValueError('PREPARATION_AND_MAXIMUM_ROLE_RESERVATIONS_DO_NOT_FIT')
     atomic_json(OUT/'frozen_configuration.json',cfg);atomic_json(OUT/'validation_manifest.json',manifest)
 
 def check():
@@ -168,7 +188,7 @@ def bind_sources(host,m,p):
             delegation_per_node_budget=p['node_budget'],own_inference_allowance=0,original_budget_preserved=parent['order']['budget'])
         grant=dict(max_count=4,max_concurrency=1,allowed_tools=['evidence.read'],evidence=sources,include_completed_reports=True,
             per_node_budget=p['node_budget'],total_budget=p['total_node_budget'],output_bytes=65536,deadline_unix=read(OUT/'activity_start.json')['execution_cutoff_unix'],
-            protocol_correction_limit=8,protocol_correction_per_node=3,protocol_correction_per_decision=2,
+            correction_policy=p['correction_policy'],
             inspected_supplemental_catalog=True,delivery_allocations=p['allocations'],conditional_length_recovery=m['conditional_length_recovery'],
             historical_handoffs=[descriptor],historical_execution_bindings={'coordinator-plan':binding})
         prior=read(ROOT/'evidence/research_mainline3_v1_continue_20261008/coordinated_bundle.json')
@@ -180,6 +200,9 @@ def bind_sources(host,m,p):
                 if any(x['query']==r['query'] for x in pages):continue
                 pages.append(dict(r,imported_from=dict(activity=prior['project']['project_id'],run='mainline3-coordinated-repair1',investigation_id=key)))
             grant['imported_query_results'][key]=pages
+        from tools.research_v1_continue_gate import correction_consistency
+        consistency=correction_consistency(read(OUT/'authorization.json'),p,grant=grant,orders=p['authorized_children'])
+        if not consistency['passed']:raise ValueError('CORRECTION_POLICY_CONSISTENCY_REQUIRED')
         state=host.store.session(host.run_id,db)['state'];state.update(role_context=dict(role='principal',investigation_grant=grant),investigation_grant_identity=digest(grant))
         host.store.update_state(db,host.run_id,state)
     receipt=invoke(host,'research.investigation_handoff',descriptor,request_id='import-coordinator-plan')
@@ -210,7 +233,7 @@ def submit(host,order):
 
 def root_order(p,key,role,question,evidence,queries):
     return plain(InvestigationOrder(investigation_id=key,role=role,question=question,evidence=evidence,queries=queries,
-        budget=p['allocations'][key]['budget'],timeout_s=2400,output_bytes=65536,
+        budget=p['allocations'][key]['budget'],timeout_s=p['allocations'][key].get('timeout_s',2400),output_bytes=65536,
         stop_conditions=['Scoped saved evidence only; zero scientific execution and retries.',
             'Exact source values and original source identities; explicit uncertainty.','Protect frozen report delivery capacity; evidence insufficiency is a valid report.']))
 
@@ -363,10 +386,13 @@ def continue_repair():
         # This explicitly paid recovery is separate from genuine model corrections.
         with store.transaction() as db:
             state=store.session(host.run_id,db)['state'];g=state['role_context']['investigation_grant'];used=state.get('investigation_protocol_corrections_used',0);other=state.get('investigation_corrections_by_role',{}).get('other',0)
-            if used>=g['protocol_correction_limit'] or other>=3:raise ValueError('PAID_RECOVERY_ALLOWANCE_EXHAUSTED')
-            state['investigation_protocol_corrections_used']=used+1;state.setdefault('investigation_corrections_by_role',{})['other']=other+1
+            if not g.get('correction_policy'):
+                if used>=g['protocol_correction_limit'] or other>=3:raise ValueError('PAID_RECOVERY_ALLOWANCE_EXHAUSTED')
+                state['investigation_protocol_corrections_used']=used+1;state.setdefault('investigation_corrections_by_role',{})['other']=other+1
             state['investigations'][key].setdefault('request_history',[]).append(dict(run_id=original_run,request_id=original['request_id'],execution_id=original['execution_id'],usage=deepcopy(node['usage'])))
             state['investigations'][key].update(request_run_id=host.run_id,active_request_id=request,status='pending')
+            if g.get('correction_policy'):
+                state['investigations'][key].update(next_request_purpose='engineering_recovery',next_request_reason='Confirmed engineering defect repaired locally')
             store.update_state(db,host.run_id,state);store.event(db,host.run_id,'investigation_paid_recovery','authorized',request=request,outputs=[store.put(db,dict(branch='program_history_repair' if key.startswith('reach') else 'new_replacement_after_body_omission',logical_node=key,original_receipt=json.loads(original['receipt']),cumulative_node_usage=node['usage'],same_node_deadline=node['started_unix']+order.timeout_s))])
         row,fresh=store.reserve(host.run_id,request,digest(dict(original_execution=original['execution_id'],repair=1)),'investigation-dispatcher',reservation,kind='investigation')
         if not fresh:raise ValueError('NO_REPAIR_REQUEST_REDISPATCH')

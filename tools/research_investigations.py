@@ -98,6 +98,31 @@ class InvestigationDispatcher:
         if deadline is not None and time.time()>=deadline:raise ValueError('INVESTIGATION_DEADLINE_EXPIRED')
         return session,grant
 
+    def _target_accounting(self,grant,db=None):
+        """Opt-in current-grant counters in the existing project ledger.
+
+        Session snapshots are views, not the authority for these counters.
+        Historical grants never enter this path.
+        """
+        policy=grant.get('correction_policy')
+        if not policy:return None
+        if policy.get('version')!='mainline3.target_corrections@1.0.0' or (policy.get('planned'),policy.get('maximum'))!=(2,4):
+            raise ValueError('INVESTIGATION_CORRECTION_POLICY_INVALID')
+        allocations=grant.get('delivery_allocations',{})
+        if set(policy['targets'])!=set(allocations) or any(a.get('request_purposes') for a in allocations.values()):
+            raise ValueError('INVESTIGATION_CORRECTION_ALLOCATION_CONFLICT')
+        identity=digest(dict(policy=policy,allocations=allocations,deadline=grant.get('deadline_unix')))
+        if db is None:
+            with self.store.connect(True) as connection:return self._target_accounting(grant,connection)
+        row=db.execute("SELECT value FROM meta WHERE key='investigation_target_accounting'").fetchone()
+        value=json.loads(row[0]) if row else dict(identity=identity,tasks={},targets={})
+        if value['identity']!=identity:raise ValueError('INVESTIGATION_TARGET_AUTHORITY_CHANGED')
+        return value
+
+    @staticmethod
+    def _save_target_accounting(db,value):
+        db.execute("INSERT OR REPLACE INTO meta VALUES ('investigation_target_accounting',?)",(encode(value),))
+
     def _scope(self, order, db=None):
         session,grant=self._grant(db);nodes=session['state'].get('investigations',{})
         allowed=set(grant['allowed_tools']);evidence=self._sources(session,grant)
@@ -116,7 +141,8 @@ class InvestigationDispatcher:
                 if plain(order) not in binding['authorized_children']:
                     raise ValueError('CHILD_NOT_AUTHORIZED_BY_NEW_BINDING')
                 original=next((p for p in proposed if p['investigation_id']==order.investigation_id),None)
-                if original is None or {k:v for k,v in plain(order).items() if k!='budget'}!={k:v for k,v in original.items() if k!='budget'}:
+                mutable=('budget','timeout_s') if grant.get('correction_policy') else ('budget',)
+                if original is None or {k:v for k,v in plain(order).items() if k not in mutable}!={k:v for k,v in original.items() if k not in mutable}:
                     raise ValueError('HISTORICAL_CHILD_SCOPE_CHANGED')
                 parent_budget=binding['delegation_per_node_budget']
             else:
@@ -137,6 +163,8 @@ class InvestigationDispatcher:
         if any(v>grant['per_node_budget'][k] for k,v in budget.items()):raise ValueError('INVESTIGATION_NODE_BUDGET_EXCEEDED')
         allocation=grant.get('delivery_allocations',{}).get(order.investigation_id)
         if allocation and budget!=allocation['budget']:raise ValueError('FROZEN_ROLE_ALLOCATION_MISMATCH')
+        if self._target_accounting(grant,db) is not None:
+            if not allocation or order.timeout_s!=allocation['timeout_s']:raise ValueError('FROZEN_TASK_OR_TIMEOUT_MISMATCH')
         return session,grant
 
     def _sources(self,session,grant):
@@ -322,7 +350,11 @@ class InvestigationDispatcher:
                 raise ValueError('INVESTIGATION_CONCURRENCY_EXCEEDED')
             total={k:sum(n['order']['budget'][k] for n in nodes.values())+plain(order.budget)[k] for k in zero()}
             if any(total[k]>grant['total_budget'][k] for k in total):raise ValueError('INVESTIGATION_TOTAL_GRANT_EXCEEDED')
-            nodes[order.investigation_id]=dict(order=plain(order),status='pending',reads=[],usage=zero(),started_unix=time.time())
+            accounting=self._target_accounting(grant,db)
+            task=(accounting['tasks'].setdefault(order.investigation_id,dict(usage=zero(),started_unix=time.time()))
+                if accounting is not None else dict(usage=zero(),started_unix=time.time()))
+            if accounting is not None:self._save_target_accounting(db,accounting)
+            nodes[order.investigation_id]=dict(order=plain(order),status='pending',reads=[],usage=deepcopy(task['usage']),started_unix=task['started_unix'])
             self.store.update_state(db,self.run_id,state)
         row,fresh=self.store.reserve(self.run_id,request_id,digest(plain(order)),'investigation-dispatcher',
             plain(order.budget),parent=order.parent_id,kind='investigation',guard=guard)
@@ -369,11 +401,17 @@ class InvestigationDispatcher:
 
     def _consume(self,order,resource):
         with self.store.transaction() as db:
-            self._scope(order,db)
+            _,grant=self._scope(order,db)
             state=self.store.session(self.run_id,db)['state'];node=state['investigations'][order.investigation_id]
+            accounting=self._target_accounting(grant,db)
+            if accounting is not None:
+                task=accounting['tasks'][order.investigation_id]
+                node.update(usage=deepcopy(task['usage']),started_unix=task['started_unix'])
             if time.time()-node['started_unix']>=order.timeout_s:raise ValueError('INVESTIGATION_ELAPSED_LIMIT')
             if node['usage'][resource]>=plain(order.budget)[resource]:raise ValueError('INVESTIGATION_'+resource.upper()+'_BUDGET_EXHAUSTED')
             node['usage'][resource]+=1
+            if accounting is not None:
+                task['usage']=deepcopy(node['usage']);self._save_target_accounting(db,accounting)
             self.store.update_state(db,self.run_id,state)
 
     def _provider_start(self,order,row,payload,measurement,turn):
@@ -381,20 +419,48 @@ class InvestigationDispatcher:
         with self.store.transaction() as db:
             _,grant=self._scope(order,db)
             state=self.store.session(self.run_id,db)['state'];node=state['investigations'][order.investigation_id]
+            accounting=self._target_accounting(grant,db)
+            if accounting is not None:
+                task=accounting['tasks'][order.investigation_id]
+                node.update(usage=deepcopy(task['usage']),started_unix=task['started_unix'])
             if time.time()-node['started_unix']>=order.timeout_s:raise ValueError('INVESTIGATION_ELAPSED_LIMIT')
             if node['usage']['model_calls']>=order.budget.model_calls:raise ValueError('INVESTIGATION_MODEL_CALLS_BUDGET_EXHAUSTED')
             allocation=grant.get('delivery_allocations',{}).get(order.investigation_id,{})
             purpose=node.get('next_request_purpose','ordinary')
             reason=node.get('next_request_reason','Planned evidence interaction or first formal submission')
-            used=node.setdefault('requests_by_purpose',dict(ordinary=0,model_correction=0,engineering_recovery=0))
+            if accounting is not None and task.get('pending_correction') and purpose!='engineering_recovery':
+                purpose='model_correction';reason=task['pending_correction']['reason']
+            used=(task.setdefault('requests_by_purpose',dict(ordinary=0,model_correction=0,engineering_recovery=0))
+                if accounting is not None else node.setdefault('requests_by_purpose',dict(ordinary=0,model_correction=0,engineering_recovery=0)))
             limits=allocation.get('request_purposes')
             if limits and used[purpose]>=limits[purpose]:raise ValueError('INVESTIGATION_'+purpose.upper()+'_ALLOWANCE_EXHAUSTED')
-            common=sum(n['usage']['model_calls'] for n in state['investigations'].values())
+            common=sum(t['usage']['model_calls'] for t in accounting['tasks'].values()) if accounting is not None else sum(n['usage']['model_calls'] for n in state['investigations'].values())
             if common>=grant['total_budget']['model_calls']:raise ValueError('INVESTIGATION_COMMON_MODEL_BUDGET_EXHAUSTED')
+            correction=None
+            if accounting is not None:
+                correction=task.get('pending_correction')
+                if purpose=='model_correction':
+                    if not correction:raise ValueError('INVESTIGATION_TARGET_CORRECTION_NOT_AUTHORIZED')
+                    for target in correction['targets']:
+                        entry=accounting['targets'][target]
+                        if entry.get('used',0)>=grant['correction_policy']['maximum']:raise ValueError('INVESTIGATION_TARGET_CORRECTION_EXHAUSTED')
+                        entry['used']=entry.get('used',0)+1
+                        entry['last_failure']=correction['failure_identity']
+                    task.pop('pending_correction')
+                elif correction and purpose=='engineering_recovery':
+                    # Local construction failed before the scheduled corrective
+                    # request was sent. Explicit engineering recovery is one
+                    # request in its own category, with no correction charge.
+                    task.pop('pending_correction');correction=None
+                elif correction:raise ValueError('INVESTIGATION_PENDING_CORRECTION_PURPOSE_MISMATCH')
             used[purpose]+=1;node['usage']['model_calls']+=1
+            if accounting is not None:
+                node['requests_by_purpose']=deepcopy(used)
+                task['usage']=deepcopy(node['usage']);self._save_target_accounting(db,accounting)
             node.pop('next_request_purpose',None);node.pop('next_request_reason',None)
             record=dict(turn=turn,purpose=purpose,triggering_reason=reason,payload=payload,measurement=measurement,
                 invocation=node['usage']['model_calls'],code_commit=self.store.session(self.run_id,db)['snapshot']['project_commit'])
+            if correction:record['correction_authorization']=correction
             node.setdefault('provider_requests',[]).append(dict(turn=turn,purpose=purpose,triggering_reason=reason,outcome='started'))
             self.store.update_state(db,self.run_id,state)
             self.store.event(db,self.run_id,'investigation_provider_attempt','started',request=row['request_id'],execution=row['execution_id'],outputs=[self.store.put(db,record)])
@@ -420,8 +486,15 @@ class InvestigationDispatcher:
         routing=failure['details']['error_routing']['category']
         if routing not in ('program_construction','received_local_failure','transport_or_unknown'):raise ValueError('GENUINE_ENGINEERING_FAILURE_REQUIRED')
         order=InvestigationOrder.model_validate(node['order']);_,grant=self._scope(order)
-        limits=grant['delivery_allocations'][key]['request_purposes']
-        if node.get('requests_by_purpose',{}).get('engineering_recovery',0)>=limits['engineering_recovery']:raise ValueError('ENGINEERING_RECOVERY_ALLOWANCE_EXHAUSTED')
+        accounting=self._target_accounting(grant)
+        if accounting is not None:
+            task=accounting['tasks'][key]
+            node.update(usage=deepcopy(task['usage']),started_unix=task['started_unix'],
+                requests_by_purpose=deepcopy(task.get('requests_by_purpose',{})))
+        limits=grant['delivery_allocations'][key].get('request_purposes')
+        if limits and node.get('requests_by_purpose',{}).get('engineering_recovery',0)>=limits['engineering_recovery']:raise ValueError('ENGINEERING_RECOVERY_ALLOWANCE_EXHAUSTED')
+        if self._target_accounting(grant) is not None and node['usage']['model_calls']>=order.budget.model_calls:
+            raise ValueError('INVESTIGATION_MODEL_CALLS_BUDGET_EXHAUSTED')
         remaining_s=order.timeout_s-(time.time()-node['started_unix'])
         if remaining_s<=0:raise ValueError('INVESTIGATION_ELAPSED_LIMIT')
         request=old['request_id']+'-engineering-'+str(node.get('requests_by_purpose',{}).get('engineering_recovery',0)+1)
@@ -647,6 +720,12 @@ class InvestigationDispatcher:
         request_id=row['request_id']
         progress=self._initial_progress()
         try:
+            _,grant=self._grant();accounting=self._target_accounting(grant)
+            if accounting is not None:
+                task=accounting['tasks'][order.investigation_id]
+                baseline=deepcopy(task['usage'])
+                self._state(order.investigation_id,usage=deepcopy(task['usage']),started_unix=task['started_unix'],
+                    requests_by_purpose=deepcopy(task.get('requests_by_purpose',{})))
             self._checkpoint(order,row,progress,'started',started)
             if not self.host.compatibility()['compatible']:raise ValueError('INVESTIGATION_DEPENDENCIES_CHANGED')
             self._state(order.investigation_id,status='running')
@@ -762,6 +841,12 @@ class InvestigationDispatcher:
                     correction_opportunities_remaining=min(grant.get('protocol_correction_limit',0)-self.store.session(self.run_id)['state'].get('investigation_protocol_corrections_used',0),
                         purposes['model_correction']-node.get('requests_by_purpose',{}).get('model_correction',0) if purposes else grant.get('protocol_correction_role_limits',{}).get('principal' if order.role=='principal' else 'other',0)-self.store.session(self.run_id)['state'].get('investigation_corrections_by_role',{}).get('principal' if order.role=='principal' else 'other',0)),
                     instruction='Submit the strongest supported investigation_return with explicit unknowns now.' if report_phase else 'Read only necessary scoped evidence; a supported incomplete-evidence report is acceptable.')
+                accounting=self._target_accounting(grant)
+                if accounting is not None:
+                    identities=grant['correction_policy']['targets'][order.investigation_id]
+                    context['workbench']['correction_opportunities_remaining']={target:max(0,4-accounting['targets'].get(target,{}).get('used',0))
+                        for target in [identities['report'],*identities['dispositions'].values()]}
+                    context['workbench']['correction_policy']=grant['correction_policy']['extension']
             context['remaining_budget']={k:max(0,v-node['usage'][k]) for k,v in plain(order.budget).items()}
             context['remaining_budget']['wall_s']=max(0,order.timeout_s-(time.time()-node['started_unix']))
             payload['messages'][1]['content']=encode(context)
@@ -802,6 +887,10 @@ class InvestigationDispatcher:
                 self.store.event(db,self.run_id,'investigation_provider_response','returned',request=row['request_id'],execution=row['execution_id'],outputs=[response_ref])
                 state=self.store.session(self.run_id,db)['state']
                 state['investigations'][order.investigation_id].setdefault('provider_response_refs',[]).append(plain(response_ref))
+                accounting=self._target_accounting(grant,db)
+                if accounting is not None:
+                    accounting['tasks'][order.investigation_id]['latest_output']=plain(response_ref)
+                    self._save_target_accounting(db,accounting)
                 self.store.update_state(db,self.run_id,state)
                 self.store.event(db,self.run_id,'investigation_token_accounting','recorded',request=row['request_id'],execution=row['execution_id'],outputs=[self.store.put(db,dict(turn=turn,
                     byte_estimate=measurement,provider_usage=self._reported_usage(returned),
@@ -936,6 +1025,77 @@ class InvestigationDispatcher:
         result=response if not repeated else dict(material_in_current_request=location,result_identity=identity,repeated_read=True)
         payload['messages'].extend([assistant,dict(role='tool',tool_call_id=calls[0]['id'],content=encode(result))])
 
+    def _target_feedback(self,order,exc,feedback,state,grant,db):
+        """Authorize a correction; charge it only at the provider boundary."""
+        accounting=self._target_accounting(grant,db);task=accounting['tasks'][order.investigation_id]
+        node=state['investigations'][order.investigation_id]
+        refs=node.get('provider_response_refs',[])
+        source=task.get('latest_output') or (refs[-1] if refs else None)
+        if not source:return None  # Local replay alone cannot authorize a paid correction.
+        raw=self.store.artifact(source,db=db)
+        message=raw['choices'][0]['message'];calls=message.get('tool_calls',[])
+        try:submission=json.loads(calls[0]['function']['arguments']) if len(calls)==1 else {}
+        except (ValueError,KeyError,TypeError):submission={}
+        issue=getattr(exc,'issue',{})
+        binding=grant['correction_policy']['targets'][order.investigation_id]
+        decisions=submission.get('dispositions',[]) if isinstance(submission,dict) else []
+        selected=[]
+        for defect in feedback['issues']:
+            path=defect.get('path',[])
+            parts=path.strip('/').split('/') if isinstance(path,str) else list(path)
+            if len(parts)>1 and parts[0]=='dispositions':
+                try:selected.append(decisions[int(parts[1])]['investigation_id'])
+                except (ValueError,IndexError,KeyError,TypeError):pass
+        selected.extend(issue.get('legal',{}).get('missing',[]))
+        if issue.get('target_investigation_id'):selected.append(issue['target_investigation_id'])
+        targets=sorted({binding['dispositions'][key] for key in selected if key in binding['dispositions']}) or [binding['report']]
+        # Compare the failing field and precise feedback, excluding volatile old
+        # failure keys. Changing a report version or unrelated prose is no progress.
+        defects=[]
+        from tools.platform_handoff import pointer
+        for defect in feedback['issues']:
+            precise={k:v for k,v in defect.items() if k!='failure_key'}
+            path=defect.get('path',[])
+            path=path if isinstance(path,str) else '/'+ '/'.join(str(p) for p in path)
+            try:failed=defect.get('selection',defect.get('failed_field')) if ('selection' in defect or 'failed_field' in defect) else (pointer(submission,path) if path and path!='/' else [c['function']['name'] for c in calls])
+            except (KeyError,IndexError,ValueError,TypeError):failed=defect.get('selection',message.get('content'))
+            defects.append(dict(feedback=precise,failed_field=failed))
+        failure_identity=digest(defects)
+        pending=task.get('pending_correction')
+        if pending:
+            if pending['failure_identity']!=failure_identity:raise ValueError('INVESTIGATION_CORRECTION_ALREADY_PENDING')
+            return pending['feedback']
+        stopped=None
+        for target in targets:
+            entry=accounting['targets'].get(target,{})
+            if entry.get('used',0)>=4:stopped='target_correction_limit'
+            elif entry.get('last_failure')==failure_identity:stopped='unchanged_failure_and_feedback'
+        elapsed_remaining=order.timeout_s-(time.time()-task['started_unix'])
+        remaining_task=order.budget.model_calls-task['usage']['model_calls']
+        remaining_stage=grant['total_budget']['model_calls']-sum(t['usage']['model_calls'] for t in accounting['tasks'].values())
+        if elapsed_remaining<=0 or remaining_task<=0 or remaining_stage<=0:stopped='request_or_elapsed_limit'
+        extending=any(accounting['targets'].get(t,{}).get('used',0)>=2 for t in targets)
+        actionable=all(d.get('path') or d.get('legal') or d.get('requirement') for d in feedback['issues'])
+        if extending and (not actionable or issue.get('cosmetic',False)):stopped='no_actionable_extension_defect'
+        if stopped:
+            self.store.event(db,self.run_id,'investigation_target_correction','stopped',request='investigation-'+order.investigation_id,
+                outputs=[self.store.put(db,dict(reason=stopped,targets=targets,latest_output=source,issues=feedback['issues']))])
+            return None
+        authorization=dict(targets=targets,latest_output=source,failure_identity=failure_identity,
+            ordinals={t:accounting['targets'].get(t,{}).get('used',0)+1 for t in targets},extension=extending,
+            reason='Latest saved output and precise actionable remaining defect' if extending else 'Planned target correction',
+            remaining_task_requests=remaining_task,remaining_stage_requests=remaining_stage,
+            remaining_node_s=elapsed_remaining,activity_deadline_unix=grant.get('deadline_unix'))
+        feedback['correction_authorization']=authorization
+        task['pending_correction']=dict(authorization,feedback=deepcopy(feedback))
+        for target in targets:accounting['targets'].setdefault(target,dict(used=0))
+        self._save_target_accounting(db,accounting)
+        node.update(next_request_purpose='model_correction',next_request_reason=authorization['reason'])
+        self.store.update_state(db,self.run_id,state)
+        self.store.event(db,self.run_id,'investigation_protocol_correction','scheduled',request='investigation-'+order.investigation_id,
+            outputs=[self.store.put(db,feedback)])
+        return feedback
+
     def _protocol_feedback(self,order,exc):
         """A received, unexecuted invalid return; never transport/length retry.
 
@@ -959,6 +1119,12 @@ class InvestigationDispatcher:
             group_used=state.get('investigation_corrections_by_role',{}).get(group,0)
             group_limit=grant.get('protocol_correction_role_limits',{}).get(group,grant.get('protocol_correction_limit',0))
             allocation=grant.get('delivery_allocations',{}).get(order.investigation_id,{})
+            if grant.get('correction_policy'):
+                issues=([dict(path=list(e['loc']),type=e['type'],message=e['msg']) for e in exc.errors(include_input=False,include_url=False)]
+                    if isinstance(exc,ValidationError) else [getattr(exc,'issue',dict(code=str(exc)))])
+                feedback=dict(error='INVALID_UNEXECUTED_REPORT',issues=issues,error_routing=routing,
+                    requirement='Correct the precise reported defect and resubmit the advertised native result. Choose conclusions independently; source inspections, task/common requests and deadlines remain in force. Up to two planned and at most four corrections per stable target, with actionable extensions only.')
+                return self._target_feedback(order,exc,feedback,state,grant,db)
             purposes=allocation.get('request_purposes')
             if purposes:
                 if node.get('requests_by_purpose',{}).get('model_correction',0)>=purposes['model_correction']:return None
@@ -1089,7 +1255,15 @@ class InvestigationDispatcher:
             if any(v>plain(order.budget)[k] for k,v in plain(child.budget).items()):raise ValueError('CHILD_BUDGET_SCOPE_EXCEEDED')
         if report.dispositions and order.role!='principal':raise ValueError('PRINCIPAL_ONLY_DISPOSITION_AUTHORITY')
         if order.role=='principal':
-            for decision in report.dispositions:self.disposition(decision,validate_only=True)
+            for index,decision in enumerate(report.dispositions):
+                try:self.disposition(decision,validate_only=True)
+                except ValueError as exc:
+                    issue=getattr(exc,'issue',dict(code=str(exc)))
+                    issue['target_investigation_id']=decision.investigation_id
+                    if not str(issue.get('path','')).startswith('/dispositions/'):
+                        issue['path']=f'/dispositions/{index}'+issue.get('path','')
+                    exc.issue=issue
+                    raise
 
     def _validate_fact(self,fact,label):
         from tools.platform_handoff import pointer
@@ -1282,13 +1456,19 @@ class InvestigationDispatcher:
             report_reads=[r for n in state.get('investigations',{}).values() if n['order']['role']=='principal' for r in n.get('reads',[])]
             report_reads+=reads
             if not any(self._visible(SourceFact(statement='Complete bound report',reference=result.result,pointer='',value=report),r) for r in report_reads):
-                raise ValueError('PRINCIPAL_MUST_INSPECT_COMPLETE_REPORT')
+                exc=ValueError('PRINCIPAL_MUST_INSPECT_COMPLETE_REPORT')
+                exc.issue=dict(code=str(exc),failed_field=args.investigation_id,legal=dict(requirement='Inspect the complete current bound report through the public evidence interface'))
+                raise exc
         facts=[*args.evidence_used,*[f for c in args.adopted_claims for f in (*c.supporting_facts,*c.additional_support,*c.scope)]]
         for fact in facts:
             if fact.reference.artifact_id not in self._sources(*self._grant()):raise ValueError('PRINCIPAL_SOURCE_OUT_OF_SCOPE')
             self._validate_fact(fact,'PRINCIPAL')
             matching=[r for r in reads if self._visible(fact,r)]
-            if not matching:raise ValueError('PRINCIPAL_MUST_INSPECT_SOURCE')
+            if not matching:
+                exc=ValueError('PRINCIPAL_MUST_INSPECT_SOURCE')
+                exc.issue=dict(code=str(exc),failed_field=dict(reference=plain(fact.reference),pointer=fact.pointer),
+                    legal=dict(query=dict(reference=plain(fact.reference),pointer=fact.pointer),requirement='Perform the missing independent source inspection or narrow/defer the decision'))
+                raise exc
             inspection_links.append(dict(fact=plain(fact),inspection_ids=[r['inspection_id'] for r in matching]))
         def key(f):return encode({k:plain(f)[k] for k in ('reference','pointer','value')})
         returned={key(f) for f in (*report['facts'],*report['counterevidence'])}

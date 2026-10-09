@@ -21,6 +21,166 @@ class ContinuationTests(TestCase):
             state=self.host.store.session(self.host.run_id,db)['state'];g=state['role_context']['investigation_grant'];g.update(updates)
             state['investigation_grant_identity']=digest(g);self.host.store.update_state(db,self.host.run_id,state)
 
+    def target_grant(self,role='investigator'):
+        from tools.research_v1_continue import correction_policy
+        policy=correction_policy();policy['targets']={'investigator':dict(report='report:investigator',
+            dispositions={'reach':'disposition:reach','timing':'disposition:timing'} if role=='principal' else {})}
+        alloc=dict(budget=plain(self.order.budget),timeout_s=self.order.timeout_s,
+            exploration_requests=0,protected_delivery_requests=1)
+        self.order=self.order.model_copy(update=dict(role=role))
+        # Deliberately conflicting historical counters prove the opt-in executor
+        # uses the new rule, rather than merely advertising it in the manifest.
+        self.grant(correction_policy=policy,delivery_allocations={'investigator':alloc},
+            total_budget={**plain(self.order.budget),'model_calls':40,'tool_calls':60,'wall_s':10200.},
+            protocol_correction_limit=0,protocol_correction_role_limits={'principal':0,'other':0},
+            protocol_correction_per_node=0,protocol_correction_per_decision=0)
+        with self.host.store.transaction() as db:
+            state=self.host.store.session(self.host.run_id,db)['state']
+            state.update(investigation_protocol_corrections_used=99,investigation_corrections_by_role={'principal':99,'other':99})
+            self.host.store.update_state(db,self.host.run_id,state)
+
+    def target_counts(self):
+        grant=self.host.store.session(self.host.run_id)['state']['role_context']['investigation_grant']
+        return self.dispatch._target_accounting(grant)
+
+    def test_current_target_policy_four_corrections_through_public_executor(self):
+        self.target_grant();sends=[]
+        def transport(adapter,config,wire):
+            sends.append(deepcopy(wire))
+            value=len(sends) if len(sends)<=4 else self.source['scalar']
+            return fixture.native(dict(interpretation='Offline correction example',facts=[dict(statement='Exact scalar',reference=self.ref,pointer='/scalar',value=value)]))
+        with patch('tools.platform_models.DeepSeekAdapter._transport',new=transport):
+            submitted=invoke(self.host,'research.investigate',plain(self.order),request_id='four-corrections')
+            import threading
+            for t in threading.enumerate():
+                if t.name=='investigation-investigator':t.join(30)
+            collected=invoke(self.host,'research.investigation_status',dict(investigation_id='investigator'),request_id='collect-four')
+        self.assertEqual(submitted['execution_status'],'completed')
+        self.assertEqual(self.host.store.artifact(collected['output'])['status'],'completed')
+        self.assertEqual(len(sends),5)
+        self.assertEqual(self.target_counts()['targets']['report:investigator']['used'],4)
+        node=self.host.store.session(self.host.run_id)['state']['investigations']['investigator']
+        self.assertEqual(node['requests_by_purpose'],dict(ordinary=1,model_correction=4,engineering_recovery=0))
+        feedback=[json.loads(w['messages'][-1]['content'])['correction_authorization'] for w in sends[1:]]
+        self.assertEqual([f['extension'] for f in feedback],[False,False,True,True])
+        self.assertEqual([f['ordinals']['report:investigator'] for f in feedback],[1,2,3,4])
+        self.assertTrue(all(f['latest_output'] and f['remaining_task_requests']>0 and f['remaining_stage_requests']>0 for f in feedback))
+
+    def test_target_cap_survives_report_versions_session_restore_and_redispatch(self):
+        self.target_grant();sends=[]
+        def transport(wire):
+            sends.append(wire)
+            return fixture.native(dict(interpretation='Report version '+str(len(sends)),facts=[dict(statement='Invalid scalar',reference=self.ref,pointer='/scalar',value=len(sends))]))
+        result=self.dispatch.dispatch(plain(self.order),transport=transport)
+        self.assertEqual(result.status,'failed');self.assertEqual(len(sends),5)
+        state=deepcopy(self.host.store.session(self.host.run_id)['state']);cfg=deepcopy(self.host.store.session(self.host.run_id)['snapshot']['input'])
+        cfg['run_id']='target-restored'
+        from tools.platform_host import Host
+        restored=Host(self.folder,cfg['run_id']);restored.create(cfg);restored.resume()
+        state['investigations']['investigator'].update(usage={k:0 for k in plain(self.order.budget)},started_unix=10**12,
+            protocol_corrections_used=0,consecutive_model_corrections=0)
+        with restored.store.transaction() as db:
+            # Another saved report/version cannot create a new correction target.
+            ref=plain(restored.store.put(db,fixture.native(dict(interpretation='Another report version',facts=[]))))
+            state['investigations']['investigator']['provider_response_refs'].append(ref)
+            restored.store.update_state(db,restored.run_id,state)
+        d=InvestigationDispatcher(restored);exc=ValueError('RETURN_SOURCE_VALUE_MISMATCH')
+        exc.issue=dict(path='/facts/0/value',original_value=self.source['scalar'],supplied_value=7)
+        self.assertIsNone(d._protocol_feedback(self.order,exc))
+        self.assertEqual(self.target_counts()['targets']['report:investigator']['used'],4)
+        stopped=next(e for e in reversed(restored.store.events(restored.run_id)) if e['kind']=='investigation_target_correction')
+        self.assertEqual(restored.store.artifact(stopped['outputs'][0])['latest_output'],self.target_counts()['tasks']['investigator']['latest_output'])
+        with self.assertRaisesRegex(ValueError,'FROZEN_TASK_OR_TIMEOUT_MISMATCH'):
+            d.dispatch(plain(self.order.model_copy(update=dict(investigation_id='replacement'))),transport=lambda wire:self.fail('No provider redispatch'))
+
+    def test_unchanged_failure_and_cosmetic_versions_stop_without_extension(self):
+        self.target_grant();sends=[]
+        def transport(wire):
+            sends.append(wire)
+            return fixture.native(dict(interpretation='Cosmetic version '+str(len(sends)),facts=[dict(statement='Same invalid scalar',reference=self.ref,pointer='/scalar',value=1)]))
+        result=self.dispatch.dispatch(plain(self.order),transport=transport)
+        self.assertEqual(result.status,'failed');self.assertEqual(len(sends),2)
+        self.assertEqual(self.target_counts()['targets']['report:investigator']['used'],1)
+        events=self.host.store.events(self.host.run_id)
+        stop=next(e for e in events if e['kind']=='investigation_target_correction' and e['status']=='stopped')
+        self.assertEqual(self.host.store.artifact(stop['outputs'][0])['reason'],'unchanged_failure_and_feedback')
+
+    def test_target_policy_request_and_deadline_stops_and_zero_cost_local_feedback(self):
+        self.target_grant();order,row,_=self.dispatch._reserve(plain(self.order))
+        with self.host.store.transaction() as db:
+            state=self.host.store.session(self.host.run_id,db)['state']
+            raw=fixture.native(dict(interpretation='Saved defect',facts=[]))
+            state['investigations']['investigator']['provider_response_refs']=[plain(self.host.store.put(db,raw))]
+            self.host.store.update_state(db,self.host.run_id,state)
+        exc=ValueError('RETURN_SOURCE_VALUE_MISMATCH');exc.issue=dict(path='/facts/0/value',supplied_value=1,original_value=self.source['scalar'])
+        feedback=self.dispatch._protocol_feedback(order,exc)
+        self.assertIsNotNone(feedback)
+        self.assertEqual(self.target_counts()['targets']['report:investigator']['used'],0)
+        # Pending local feedback and failed request assembly spend no requests.
+        self.assertEqual(self.dispatch._protocol_feedback(order,exc),feedback)
+        self.assertEqual(self.target_counts()['tasks']['investigator']['usage']['model_calls'],0)
+        with self.host.store.transaction() as db:
+            grant=self.host.store.session(self.host.run_id,db)['state']['role_context']['investigation_grant']
+            value=self.dispatch._target_accounting(grant,db);value['tasks']['investigator'].pop('pending_correction')
+            value['tasks']['investigator']['usage']['model_calls']=order.budget.model_calls
+            self.dispatch._save_target_accounting(db,value)
+        self.assertIsNone(self.dispatch._protocol_feedback(order,exc))
+        with self.assertRaisesRegex(ValueError,'MODEL_CALLS_BUDGET_EXHAUSTED'):
+            self.dispatch._provider_start(order,row,{},dict(passed=True),0)
+        with self.host.store.transaction() as db:
+            value=self.dispatch._target_accounting(grant,db)
+            value['tasks']['investigator']['usage']['model_calls']=0
+            value['tasks']['other-task']=dict(usage={**plain(self.order.budget),'model_calls':40})
+            self.dispatch._save_target_accounting(db,value)
+        self.assertIsNone(self.dispatch._protocol_feedback(order,exc))
+        with self.assertRaisesRegex(ValueError,'COMMON_MODEL_BUDGET_EXHAUSTED'):
+            self.dispatch._provider_start(order,row,{},dict(passed=True),0)
+        with self.host.store.transaction() as db:
+            value=self.dispatch._target_accounting(grant,db)
+            value['tasks'].pop('other-task')
+            value['tasks']['investigator']['usage']['model_calls']=0;value['tasks']['investigator']['started_unix']=0
+            self.dispatch._save_target_accounting(db,value)
+        self.assertIsNone(self.dispatch._protocol_feedback(order,exc))
+        with self.assertRaisesRegex(ValueError,'ELAPSED_LIMIT'):
+            self.dispatch._provider_start(order,row,{},dict(passed=True),0)
+
+    def test_current_policy_engineering_recovery_does_not_charge_corrections(self):
+        self.target_grant()
+        def broken(wire):
+            exc=RuntimeError('DEEPSEEK_HTTP_400')
+            exc.transport_state=dict(transport_attempted=True,response_received=True,response_body_received=True,http_status=400,stage='transport')
+            exc.provider_response=dict(status_code=400)
+            raise exc
+        self.assertEqual(self.dispatch.dispatch(plain(self.order),transport=broken).status,'failed')
+        from tools.platform_host import Host
+        d=InvestigationDispatcher(Host(self.folder,self.host.run_id))
+        result=d.engineering_recovery('investigator','Confirmed transport defect repaired locally',transport=lambda wire:fixture.native(dict(interpretation='Offline recovered report')))
+        self.assertEqual(result.status,'completed')
+        counts=self.target_counts()
+        self.assertEqual(counts['targets'],{})
+        self.assertEqual(counts['tasks']['investigator']['requests_by_purpose'],dict(ordinary=1,model_correction=0,engineering_recovery=1))
+
+    def test_disposition_targets_ignore_report_version_and_charge_independently(self):
+        self.target_grant(role='principal');order,row,_=self.dispatch._reserve(plain(self.order))
+        def saved(version,target):
+            with self.host.store.transaction() as db:
+                state=self.host.store.session(self.host.run_id,db)['state']
+                raw=fixture.native(dict(interpretation='Version '+str(version),dispositions=[dict(investigation_id=target,report={'artifact_id':str(version)*64,'media_type':'application/json'})]))
+                node=state['investigations']['investigator'];node.setdefault('provider_response_refs',[]).append(plain(self.host.store.put(db,raw)))
+                self.host.store.update_state(db,self.host.run_id,state)
+        for i in range(1,5):
+            saved(i,'reach');exc=ValueError('DISPOSITION_FACT_BINDING')
+            exc.issue=dict(path='/dispositions/0/adopted_claims/0/scope',selection=[i],reason='Missing selected source scope',legal=dict(requirement='Select exact scope'),failure_key='report:'+str(i)*64)
+            self.assertIsNotNone(self.dispatch._protocol_feedback(order,exc))
+            self.dispatch._provider_start(order,row,{},dict(passed=True),i)
+        saved(5,'reach');exc.issue['selection']=[5]
+        self.assertIsNone(self.dispatch._protocol_feedback(order,exc))
+        saved(6,'timing');exc.issue['selection']=[6]
+        self.assertIsNotNone(self.dispatch._protocol_feedback(order,exc))
+        self.dispatch._provider_start(order,row,{},dict(passed=True),5)
+        counts=self.target_counts()['targets']
+        self.assertEqual(counts['disposition:reach']['used'],4);self.assertEqual(counts['disposition:timing']['used'],1)
+
     def test_public_delivery_protection_and_native_history(self):
         self.grant(delivery_allocations={'investigator':dict(budget=plain(self.order.budget),exploration_requests=2,protected_delivery_requests=4)})
         sends=[]
@@ -204,6 +364,10 @@ class ContinuationTests(TestCase):
         with patch.object(activity,'OUT',out),patch.object(gate,'OUT',out),patch('tools.platform_store.ROOT',self.folder):
             activity.start();atomic_json(out/'offline_gate.json',dict(passed=True,scope='Fixture bootstrap only; no real grant'))
             activity.freeze();host,m,p=activity.host_for('coordinated',create=True)
+            authorization=read(out/'authorization.json')
+            self.assertTrue(gate.correction_consistency(authorization,p,orders=p['authorized_children'])['passed'])
+            conflicting=deepcopy(p);conflicting['allocations']['principal-coordinated-v2']['budget']['model_calls']=12
+            self.assertFalse(gate.correction_consistency(authorization,conflicting)['passed'])
             sends=[];counts={}
             original=read(activity.OLD/'coordinated_bundle.json');rawref=original['state']['investigations']['coordinator-plan']['order']['evidence'][0]
             source=original['artifacts'][rawref['artifact_id']]
@@ -232,7 +396,9 @@ class ContinuationTests(TestCase):
             self.assertTrue(read(out/'coordinated_gate.json')['passed'])
             self.assertEqual(len(sends),6)
             state=host.store.session(host.run_id)['state'];self.assertEqual(len(state['historical_investigations']),1)
+            self.assertTrue(gate.correction_consistency(authorization,p,grant=state['role_context']['investigation_grant'],
+                orders=[n['order'] for n in state['investigations'].values()])['passed'])
             self.assertEqual(state['historical_investigations']['coordinator-plan']['own_inference_allowance'],0)
             self.assertEqual({k:n['order']['budget']['model_calls'] for k,n in state['investigations'].items()},
-                {'reach-holding-interpretation':12,'timing-integrity-limits':12,'coordinator-summary':6,'principal-coordinated-v2':10})
+                {'reach-holding-interpretation':12,'timing-integrity-limits':4,'coordinator-summary':6,'principal-coordinated-v2':18})
             self.assertFalse(any(e['kind']=='investigation_provider_attempt' and e.get('request_id')=='investigation-coordinator-plan' for e in host.store.events(host.run_id)))
