@@ -50,6 +50,11 @@ def capabilities(store, run_id, records,*,as_of_unix=None):
     compatibility=task_adapter(inp).check_compatibility()['technical_compatibility']
     stable=compatibility['status']=='supported'
     pool=resolved_pool(inp)
+    role=store.session(run_id)['state'].get('role_context',{})
+    if inp['policy']['candidate_builder'].get('version')=='2.0.0':
+        from tools.candidate_parameters import planning_configuration
+        for record in records:
+            pool.update(resolved_pool(planning_configuration(store,record['facts']['candidate'],inp['policy'])))
     legal={}; gaps={}; reg=registry()
     methods=[m+'@1.0.0' for m in ('search.family_coordinate','search.family_explicit')
         if reg.inspect(reg.get(m,'1.0.0','search'),{m:'1.0.0'})['executable']]
@@ -57,6 +62,8 @@ def capabilities(store, run_id, records,*,as_of_unix=None):
                          ('structure_search',list(pool))]:
         reason=None
         if not stable:reason='Selected task/controller pairing incompatible: '+compatibility['reason']
+        elif role.get('development_backend_remaining')==0:reason='Bounded development execution allocation exhausted'
+        elif role.get('mathematical_operations_remaining')==0:reason='Bounded public mathematical operation allocation exhausted'
         elif not proposal_only and not capacity['sufficient']:reason='Complete execution and delivery reservation unavailable: '+str(capacity['shortfalls'])
         elif not paths or (action=='structure_search' and not any(not p.startswith('control/') for p in paths)):
             reason='Authorized builder paths unavailable'

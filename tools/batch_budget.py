@@ -22,7 +22,12 @@ def downstream_available(store,run_id,db=None,*,as_of_unix=None):
             project['wall_s']=min(project['wall_s'],max(0,permissions['elapsed_deadline_unix']-(time.time() if as_of_unix is None else as_of_unix)))
         # Child executions charge the project, not the research-role session.
         # Protect the full frozen paired allowance until search has ended.
-        reserve=dict(backend_solves=20) if conditional else dict(backend_solves=20,tool_calls=60,wall_s=19800.)
+        if permissions.get('phase_budget_policy')=='bounded_mainline4@1.0.0':
+            # One nominal study: two verification and two identified-repair
+            # replacements. Never activate the older twenty-run campaign.
+            reserve=dict(backend_solves=4,tool_calls=16,wall_s=3960.)
+        else:
+            reserve=dict(backend_solves=20) if conditional else dict(backend_solves=20,tool_calls=60,wall_s=19800.)
         for k,v in reserve.items():
             project[k]=max(0,project[k]-v)
         if conditional:

@@ -1,0 +1,337 @@
+{
+  "activity_id": "mainline4-20261009",
+  "started_unix": 1791533202.0,
+  "deadline_unix": 1791576402.0,
+  "execution_cutoff_unix": 1791574602.0,
+  "limits": {
+    "model_calls": 60,
+    "tool_calls": 1024,
+    "backend_solves": 10,
+    "worker_calls": 0,
+    "wall_s": 43200.0
+  },
+  "mathematical_operations": 48,
+  "development_backend_limit": 6,
+  "verification_backend_limit": 2,
+  "technical_replacement_limit": 2,
+  "nominal": {
+    "contract_version": "1.0.0",
+    "task_id": "family-multisegment-dev",
+    "task_version": "1.0.0",
+    "name": "Independent development validation of a serial multi-segment soft arm",
+    "status": "development_valid",
+    "source": "Development task with fixed target, tolerance and scoring; historical tasks are unchanged",
+    "family": "task.reach",
+    "goal": {
+      "contract": "reference.reach_goal",
+      "version": "1.0.0",
+      "data": {
+        "target_m": [
+          0.29,
+          0.035,
+          0.19
+        ]
+      }
+    },
+    "environment": {
+      "contract": "experiment.assembly",
+      "version": "1.0.0",
+      "data": {
+        "environment": {
+          "coordinate_frame": "world_base_x_forward_yz_cross_section",
+          "environment_id": "reach_free",
+          "gravity_m_s2": [
+            0.0,
+            0.0,
+            -9.81
+          ],
+          "gravity_source": "main@245a785 reach_free environment; Human-owned benchmark gravity",
+          "lights": [
+            {
+              "direction": [
+                0.0,
+                0.0,
+                -1.0
+              ],
+              "position_m": [
+                0.0,
+                0.0,
+                2.0
+              ]
+            }
+          ],
+          "objects": [
+            {
+              "conaffinity": 1,
+              "contype": 0,
+              "half_size_m": [
+                2.0,
+                2.0,
+                0.1
+              ],
+              "kind": "plane",
+              "name": "floor",
+              "position_m": [
+                0.0,
+                0.0,
+                -0.02
+              ]
+            }
+          ],
+          "schema_version": "1",
+          "truth_status": "HUMAN_OWNED",
+          "units": "SI"
+        },
+        "external_forces": [],
+        "floor_id": "floor",
+        "mount": {
+          "position_m": [
+            0.0,
+            0.0,
+            0.15
+          ],
+          "quaternion_wxyz": [
+            1.0,
+            0.0,
+            0.0,
+            0.0
+          ]
+        }
+      }
+    },
+    "robot_families": [
+      "tendon_robot_family"
+    ],
+    "actuator_channels": [
+      "actuator_commands"
+    ],
+    "initializer": {
+      "extension_id": "initialize.family",
+      "version": "1.0.0",
+      "parameters": {
+        "contract": "family.initial",
+        "version": "1.0.0",
+        "data": {
+          "qpos_rad": {
+            "far_cell_0_y": 0.0,
+            "far_cell_0_z": 0.0,
+            "far_cell_10_y": 0.0,
+            "far_cell_10_z": 0.0,
+            "far_cell_11_y": 0.0,
+            "far_cell_11_z": 0.0,
+            "far_cell_1_y": 0.0,
+            "far_cell_1_z": 0.0,
+            "far_cell_2_y": 0.0,
+            "far_cell_2_z": 0.0,
+            "far_cell_3_y": 0.0,
+            "far_cell_3_z": 0.0,
+            "far_cell_4_y": 0.0,
+            "far_cell_4_z": 0.0,
+            "far_cell_5_y": 0.0,
+            "far_cell_5_z": 0.0,
+            "far_cell_6_y": 0.0,
+            "far_cell_6_z": 0.0,
+            "far_cell_7_y": 0.0,
+            "far_cell_7_z": 0.0,
+            "far_cell_8_y": 0.0,
+            "far_cell_8_z": 0.0,
+            "far_cell_9_y": 0.0,
+            "far_cell_9_z": 0.0,
+            "near_cell_0_y": 0.0,
+            "near_cell_0_z": 0.0,
+            "near_cell_10_y": 0.0,
+            "near_cell_10_z": 0.0,
+            "near_cell_11_y": 0.0,
+            "near_cell_11_z": 0.0,
+            "near_cell_1_y": 0.0,
+            "near_cell_1_z": 0.0,
+            "near_cell_2_y": 0.0,
+            "near_cell_2_z": 0.0,
+            "near_cell_3_y": 0.0,
+            "near_cell_3_z": 0.0,
+            "near_cell_4_y": 0.0,
+            "near_cell_4_z": 0.0,
+            "near_cell_5_y": 0.0,
+            "near_cell_5_z": 0.0,
+            "near_cell_6_y": 0.0,
+            "near_cell_6_z": 0.0,
+            "near_cell_7_y": 0.0,
+            "near_cell_7_z": 0.0,
+            "near_cell_8_y": 0.0,
+            "near_cell_8_z": 0.0,
+            "near_cell_9_y": 0.0,
+            "near_cell_9_z": 0.0
+          },
+          "qvel_rad_s": {
+            "far_cell_0_y": 0.0,
+            "far_cell_0_z": 0.0,
+            "far_cell_10_y": 0.0,
+            "far_cell_10_z": 0.0,
+            "far_cell_11_y": 0.0,
+            "far_cell_11_z": 0.0,
+            "far_cell_1_y": 0.0,
+            "far_cell_1_z": 0.0,
+            "far_cell_2_y": 0.0,
+            "far_cell_2_z": 0.0,
+            "far_cell_3_y": 0.0,
+            "far_cell_3_z": 0.0,
+            "far_cell_4_y": 0.0,
+            "far_cell_4_z": 0.0,
+            "far_cell_5_y": 0.0,
+            "far_cell_5_z": 0.0,
+            "far_cell_6_y": 0.0,
+            "far_cell_6_z": 0.0,
+            "far_cell_7_y": 0.0,
+            "far_cell_7_z": 0.0,
+            "far_cell_8_y": 0.0,
+            "far_cell_8_z": 0.0,
+            "far_cell_9_y": 0.0,
+            "far_cell_9_z": 0.0,
+            "near_cell_0_y": 0.0,
+            "near_cell_0_z": 0.0,
+            "near_cell_10_y": 0.0,
+            "near_cell_10_z": 0.0,
+            "near_cell_11_y": 0.0,
+            "near_cell_11_z": 0.0,
+            "near_cell_1_y": 0.0,
+            "near_cell_1_z": 0.0,
+            "near_cell_2_y": 0.0,
+            "near_cell_2_z": 0.0,
+            "near_cell_3_y": 0.0,
+            "near_cell_3_z": 0.0,
+            "near_cell_4_y": 0.0,
+            "near_cell_4_z": 0.0,
+            "near_cell_5_y": 0.0,
+            "near_cell_5_z": 0.0,
+            "near_cell_6_y": 0.0,
+            "near_cell_6_z": 0.0,
+            "near_cell_7_y": 0.0,
+            "near_cell_7_z": 0.0,
+            "near_cell_8_y": 0.0,
+            "near_cell_8_z": 0.0,
+            "near_cell_9_y": 0.0,
+            "near_cell_9_z": 0.0
+          },
+          "unspecified": "zero"
+        }
+      }
+    },
+    "timing": {
+      "timestep_s": 0.0005,
+      "control_period_s": 0.01,
+      "sample_period_s": 0.01,
+      "duration_s": 0.35,
+      "termination": [
+        "duration",
+        "numerical_failure"
+      ]
+    },
+    "evaluator": {
+      "extension_id": "evaluate.reach",
+      "version": "1.0.0",
+      "parameters": {
+        "contract": "reference.reach_evaluation",
+        "version": "1.0.0",
+        "data": {
+          "tolerance_m": 0.01
+        }
+      }
+    },
+    "objectives": [
+      {
+        "metric": "position_error",
+        "direction": "minimize",
+        "units": "m",
+        "weight": 1.0
+      }
+    ],
+    "failure_policy": "retain_invalid_and_constraint_failures",
+    "observations": [
+      {
+        "name": "tip_position",
+        "entity": "tip",
+        "dimension": 3,
+        "units": "m",
+        "frame": "world",
+        "phase": "post_step",
+        "missing": "unsupported"
+      }
+    ],
+    "sampling": {
+      "split": "development",
+      "seeds": [
+        17
+      ],
+      "aggregation": "per_instance",
+      "window_s": [
+        0.0,
+        0.35
+      ]
+    }
+  },
+  "seed": 17,
+  "controller": {
+    "extension_id": "controller.gvs_nmpc",
+    "version": "10.0.0",
+    "parameters": {
+      "contract": "family.gvs_reach_control",
+      "version": "1.0.0",
+      "data": {
+        "numerical_source": "bundled_guess",
+        "recipe": {
+          "basis": {
+            "strategy": "structural_linear"
+          },
+          "constraint_jacobian_mode": "reverse",
+          "curvature_scale_rad_m": 10.0,
+          "evaluation_threads": 1,
+          "feasible_return": {
+            "budget_s": 15.0,
+            "minimum_s": 5.0,
+            "relative_improvement": 0.1
+          },
+          "holding_brake_lead_s": 0.0,
+          "holding_tip_speed_weight": 0.05,
+          "horizon": 10,
+          "max_cpu_s": 30.0,
+          "max_iterations": 120,
+          "max_unusable_updates": 3,
+          "position_error_scale_m": null,
+          "rate_scale_rad_m_s": 1000.0,
+          "recover_returned_tensions": false,
+          "regenerate_warm_states": true,
+          "seed_position_tolerance_fraction": 0.5,
+          "seed_speed_limit_m_s": 0.02,
+          "substeps": 1,
+          "tension_weight": 0.0001,
+          "terminal_tip_speed_weight": 0.1,
+          "terminal_velocity_weight": 0.0001,
+          "terminal_weight": 5.0,
+          "tip_speed_scale_m_s": 0.02,
+          "tolerance": 1e-06,
+          "tracking_weight": 1.0,
+          "variation_weight": 0.001,
+          "velocity_weight": 0.0001
+        },
+        "settling": {
+          "position_limit_m": 0.01,
+          "speed_limit_m_s": 0.02,
+          "window_s": 0.05
+        }
+      }
+    }
+  },
+  "entry_template": "T1",
+  "retained_reference": "historical T0",
+  "offline": false,
+  "scientific_versions": {
+    "builder": "candidate.family@2.0.0",
+    "controller": "controller.gvs_nmpc@10.0.0"
+  },
+  "scope": "One nominal condition; ideal tension; no robustness, realtime or controller-family selection",
+  "history_links": [
+    "evidence/research_mainline3_v2_20261009/completion.json",
+    "evidence/research_mainline3_v1_handoff_20261009/fixed_result.json"
+  ],
+  "engineering_interventions": []
+}

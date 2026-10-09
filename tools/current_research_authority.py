@@ -44,7 +44,7 @@ def _ledger_prefixes(value,events):
             if key in reservations:raise ValueError('ACCOUNTING_DUPLICATED_RESERVATION')
             reservations[key]=e;replay[key]=dict(execution_id=eid,status='running',cost=e['cost'])
         elif key in replay and e.get('parent_id')==reservations[key]['event_id'] and e['status'] in ('completed','failed','rejected'):
-            if e['kind'] not in ('model_raw_response','model_transport','model_decision','model_length_failure','model_protocol_failure','result_provenance') and e['cost'].get('tool_calls',0)+e['cost'].get('model_calls',0)+e['cost'].get('backend_solves',0):
+            if e['kind'] not in ('model_raw_response','model_transport','model_decision','model_length_failure','model_protocol_failure','result_provenance') and (e['cost'].get('tool_calls',0)+e['cost'].get('model_calls',0)+e['cost'].get('backend_solves',0) or e['kind']=='engineering'):
                 if replay[key]['status']!='running' and replay[key]['cost']!=e['cost']:raise ValueError('ACCOUNTING_REPEATED_SETTLEMENT_CHANGED')
                 replay[key]=dict(execution_id=eid,status=e['status'],cost=e['cost'])
         used=zero()

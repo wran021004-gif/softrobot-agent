@@ -34,6 +34,14 @@ def parameter_value(effective,path):
 def fixed_configuration(effective,variables):
     fixed=deepcopy(effective)
     design=fixed['robot']['structure']['data'];space=fixed['policy']['candidate_builder']['parameters']['data']
+    if fixed['policy']['candidate_builder'].get('version')=='2.0.0':
+        from extensions.tendon_family.finite_templates import selected_space
+        from schemas.platform import SessionInput
+        _,selected=selected_space(SessionInput.model_validate(effective),space,{})
+        space=selected.model_dump(mode='json')
+        # Selection bookkeeping is derived from the physical design. Physical
+        # locations below, rather than metadata, enforce the fixed conditions.
+        design.get('metadata',{}).pop('v2_selections',None)
     if space.get('semantic_decisions') or any(p.startswith('design/') for p in variables):
         design.get('metadata',{}).pop('design_decisions',None)
     for path in variables:
@@ -103,6 +111,22 @@ def project_planning_configuration(original,policy):
     effective=deepcopy(original)
     current=policy.get('candidate_builder',{}).get('parameters',{}).get('data',{})
     builder=policy.get('candidate_builder',{})
+    if builder.get('extension_id')=='candidate.family' and builder.get('version')=='2.0.0':
+        from extensions.tendon_family.finite_templates import check_robot
+        check_robot(original['robot']['structure']['data'],original['policy']['discretization']['data'])
+        effective['policy']['candidate_builder']=deepcopy(builder)
+        effective['policy']['editable']=deepcopy(policy['editable'])
+        # Controller 9 evidence remains historical. Only future preparation
+        # adopts the explicitly authorized V10 compatibility envelope, whose
+        # numerical recipe must be identical to the original recipe.
+        old=original['policy']['controller'];current_controller=policy['controller']
+        if old['extension_id']!=current_controller['extension_id'] or old['version'] not in ('9.0.0','10.0.0'):
+            raise ValueError('V2_PLANNING_CONTROLLER_PROJECTION_UNSUPPORTED')
+        effective['policy']['controller']['version']='10.0.0'
+        from extensions.tendon_family.gvs_profile import execution_scope
+        checked=deepcopy(effective);checked['policy']['controller']['version']=old['version']
+        if execution_scope(checked)!=execution_scope(original):raise ValueError('PLANNING_CAPABILITY_PROJECTION_CHANGED_SCIENCE')
+        return effective
     future=builder.get('extension_id')=='candidate.family' and builder.get('version') in ('1.1.0','1.2.0')
     if future or any(p in current.get('parameters',{}) for p in STRUCTURAL_PATHS):
         if future:

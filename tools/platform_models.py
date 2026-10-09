@@ -310,7 +310,7 @@ def effective_config(host):
 
 
 def delivery_instruction(host):
-    if host.store.session(host.run_id)['snapshot']['input']['policy']['model'].get('adapter_version') in ('3.0.0','4.0.0','5.0.0','6.0.0'):
+    if host.store.session(host.run_id)['snapshot']['input']['policy']['model'].get('adapter_version') in ('3.0.0','4.0.0','5.0.0','6.0.0','7.0.0','8.0.0'):
         return 'Invoke the advertised native tool using business fields directly; correct only the reported invalid fields. No outer metadata or argument envelope. '
     state = host.store.session(host.run_id)['state']
     role = state.get('role_context', {})
@@ -757,10 +757,15 @@ def _model_failure(host, receipt, advance_turn=True):
     eligible=recovery is None or (recovery.get('enabled',True) and failure.get('without_usable_action'))
     decision_recovery=state.get('role_context',{}).get('decision_recovery_policy')
     if decision_recovery:eligible=False  # Preserve provider token/timeout settings.
-    if truncated and eligible and not state.get('length_retries_used', 0):
+    bounded=state.get('role_context',{}).get('campaign_permissions',{}).get('phase_budget_policy')=='bounded_mainline4@1.0.0'
+    config=host.store.session(host.run_id)['snapshot']['input']['policy']['model']
+    length_limit=(config.get('protocol_recovery') or {}).get('max_total',1) if bounded else 1
+    if truncated and eligible and state.get('length_retries_used', 0)<length_limit:
+        if bounded and (state['turn']+1>=config['max_turns'] or host.store.remaining()['remaining']['model_calls']<1):
+            return _stop(host,'failed','MODEL_LENGTH_RETRY_BUDGET_EXHAUSTED: normal request/turn budget')
         with host.store.transaction() as db:
             state = host.store.session(host.run_id, db)['state']
-            state['length_retries_used'] = 1
+            state['length_retries_used'] = state.get('length_retries_used',0)+1
             state['protocol_correction'] = dict(
                 type='length_truncation', request_id=receipt['request_id'], response=failure['response'],
                 finish_reason='length', errors=[], requirement=(
@@ -802,7 +807,8 @@ def _model_failure(host, receipt, advance_turn=True):
                 errors=failure.get('protocol_errors', []),
                 requirement=(problem +
                     'None of those calls was executed. Return exactly one tool call now and wait for its result. '
-                    + ('' if config.get('adapter_version') in ('3.0.0','4.0.0','5.0.0','6.0.0') else
+                    + ('Pass the advertised business fields directly in the function arguments, with no outer arguments/reason/tool_version wrapper. '
+                    if config.get('adapter_version') in ('3.0.0','4.0.0','5.0.0','6.0.0','7.0.0','8.0.0') else
                     'Function arguments must be a JSON-encoded object with outer arguments (object), reason (nonempty English string), and tool_version (declared version); evidence is optional. Outer reason is separate from arguments.reason. ')
                     + delivery_instruction(host) +
                     f"After this scheduled correction, remaining allowances: total {limits['max_total']-total-1}, "

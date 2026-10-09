@@ -130,6 +130,16 @@ def effective_catalog(effective, grant=None, validation_evidence=None, reg=None)
         row = deepcopy(declaration); path = row['id']; spec = configured.get(path)
         domain = deepcopy(grant.get(path))
         reason = list(reasons)
+        if definition.version=='2.0.0' and path!='template':
+            from extensions.tendon_family.finite_templates import specifications,template_id
+            active=specifications(template_id(effective['robot']['structure']['data'])).get(path)
+            if active is None:
+                reason.append('Parameter inactive for selected finite template')
+            elif domain is not None:
+                if active['type']=='number':
+                    domain['bounds']=[max(domain['bounds'][0],active['bounds'][0]),min(domain['bounds'][1],active['bounds'][1])]
+                    if domain['bounds'][0]>domain['bounds'][1]:reason.append('Grant has no selected-template domain intersection')
+                else:domain['options']=[v for v in domain['options'] if v in active['options']]
         if effective['task']['family'] not in row.get('task_families', support['task_families']):
             reason.append('Incompatible task: this parameter is outside the tracking length-only envelope')
         if policy['controller']['version'] not in row.get('controller_versions', [policy['controller']['version']]):
