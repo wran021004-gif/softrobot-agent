@@ -48,7 +48,8 @@ def generate_b(out=None):
         for e in attempts:
             if not e.get('request_id','').startswith('investigation-'+key):continue
             wire=arts[e['outputs'][0]['artifact_id']]['payload']
-            initial=json.loads(wire['messages'][1]['content'])
+            from tools.context_assembly import expand_investigation_context
+            initial=expand_investigation_context(json.loads(wire['messages'][1]['content']))
             for r in initial.get('reads',[]):
                 cited=[f for f in [*report['facts'],*report['counterevidence']] if f['reference']==r['reference'] and InvestigationDispatcher._visible(None,SourceFact.model_validate(f),r)]
                 if cited:proof.append(dict(attempt_sequence=e['sequence'],read_identity=r.get('content_identity',digest(r['page'])),cited_pointers=[f['pointer'] for f in cited],origin=r.get('inspection_origin','prefetch')))

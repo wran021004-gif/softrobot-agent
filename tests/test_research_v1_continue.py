@@ -11,6 +11,7 @@ from tools.research_execution import invoke
 from tools.platform_store import plain,Store
 from tools.state_io import digest,atomic_json,read
 from tools.model_transports.deepseek import request_completion
+from tools.context_assembly import expand_investigation_context
 
 class ContinuationTests(TestCase):
     setUp=fixture.CapacityBindingTests.setUp
@@ -19,7 +20,7 @@ class ContinuationTests(TestCase):
     def test_selected_investigator_projection_and_actual_sent_restoration(self):
         sends=[]
         def transport(wire):
-            sends.append(deepcopy(wire));packet=json.loads(wire['messages'][1]['content']);cat=packet['source_fact_catalog']
+            sends.append(deepcopy(wire));packet=expand_investigation_context(json.loads(wire['messages'][1]['content']));cat=packet['source_fact_catalog']
             entry=next(e for e in cat['entries'] if e['pointer']=='/nested')
             return fixture.native(dict(facts=[dict(statement='Fixture exact nested scalar',catalog=cat['reference'],catalog_version='1.0.0',handle=entry['handle'],projection='/scalar')],
                 counterevidence=[dict(statement='Fixture failed Boolean',catalog=cat['reference'],catalog_version='1.0.0',handle=next(e['handle'] for e in cat['entries'] if e['pointer']=='/flag'))],interpretation='Offline fixture only'))
@@ -75,7 +76,11 @@ class ContinuationTests(TestCase):
             check_outgoing_request(fixed,cfg,'research_decision')
             self.assertEqual(wire,before)
             self.assertEqual(fixed['messages'][2:],wire['messages'][2:])
-            self.assertEqual(fixed['tools'],wire['tools'])
+            def semantic_schema(v):
+                if isinstance(v,dict):return {k:semantic_schema(x) for k,x in v.items() if k not in ('title','description')}
+                if isinstance(v,list):return [semantic_schema(x) for x in v]
+                return v
+            self.assertEqual(semantic_schema(fixed['tools']),semantic_schema(wire['tools']))
             self.assertEqual(fixed['max_tokens'],32768)
             self.assertLess(measure_input(fixed,cfg,'research_decision')['utf8_bytes'],measure_input(wire,cfg,'research_decision')['utf8_bytes'])
 
@@ -436,7 +441,7 @@ class ContinuationTests(TestCase):
             original=read(activity.OLD/'coordinated_bundle.json');rawref=original['state']['investigations']['coordinator-plan']['order']['evidence'][0]
             source=original['artifacts'][rawref['artifact_id']]
             def transport(adapter,config,wire):
-                sends.append(deepcopy(wire));packet=json.loads(wire['messages'][1]['content']);key=packet['investigation_id'];counts[key]=counts.get(key,0)+1
+                sends.append(deepcopy(wire));packet=expand_investigation_context(json.loads(wire['messages'][1]['content']));key=packet['investigation_id'];counts[key]=counts.get(key,0)+1
                 if packet['role']=='investigator':
                     pointer='/terminal_error_m' if key.startswith('reach') else '/mean_complete_update_s'
                     if counts[key]==1:

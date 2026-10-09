@@ -189,9 +189,10 @@ class InvestigationDispatcher:
     def _selected_reports(self):
         return self.store.session(self.run_id)['snapshot']['input']['policy']['model'].get('parameters',{}).get('investigation_contract')=='selected_reports_v4'
 
-    def _contract(self):
+    def _contract(self,order=None):
         from tools.investigation_contract import contract
-        return contract(selectable=self._selectable(),selected_reports=self._selected_reports())
+        return contract(selectable=self._selectable(),selected_reports=self._selected_reports(),
+            role=order.role if order else None,allow_children=bool(order and order.role=='coordinator' and order.investigation_id!='coordinator-summary' and not order.parent_id))
 
     def _directory(self,order):
         """A derived Store artifact, not another archive or an access grant.
@@ -283,7 +284,7 @@ class InvestigationDispatcher:
         native=encode_chat(ModelInput(context={'policy':{'tool_bindings':{'evidence.read':'1.0.0'}}},tools=[definition],content=[ModelContent(kind='text',text='Scoped evidence reader')]),native_config)
         payload['tools'].extend(native['tools'])
         if self._native_v2():
-            payload['tools']=self._contract().tools()
+            payload['tools']=self._contract(order).tools()
         self._configure_payload(payload,native_config)
         payload['messages'][0]['content']=('Investigate only the scoped evidence. Use the advertised evidence reader for additional pages (outer arguments/reason/tool_version envelope), or investigation_return with direct report fields. Exactly one native call per turn. Facts and counterevidence require exact visible source values. Interpretation and support explanations are semantically unassessed. Principal may return explicit dispositions for completed reports; investigators cannot dispose or delegate. Suggestions authorize no computation.')
         if self._native_v2():
@@ -494,7 +495,7 @@ class InvestigationDispatcher:
             node['provider_requests'][-1].update(outcome=outcome,failure_cause=failure)
             self.store.update_state(db,self.run_id,state)
 
-    def engineering_recovery(self,key,reason,*,transport=None,resume_payload=None):
+    def engineering_recovery(self,key,reason,*,transport=None,resume_payload=None,request_purpose='engineering_recovery'):
         """Explicit confirmed new-activity failure recovery; same node and grant.
 
         Saved-response revalidation is attempted first and costs no requests.
@@ -503,36 +504,39 @@ class InvestigationDispatcher:
         result=self.recover(key)
         if result.status=='completed':return result
         node=self.store.session(self.run_id)['state']['investigations'][key]
-        old=self.store.lookup(self.run_id,node.get('active_request_id','investigation-'+key))
+        old=self.store.lookup(node.get('request_run_id',self.run_id),node.get('active_request_id','investigation-'+key))
         if not old['receipt'] or json.loads(old['receipt'])['execution_status']!='failed':raise ValueError('CONFIRMED_NEW_ACTIVITY_FAILURE_REQUIRED')
         failure=self.store.artifact(node['failure_record'])
         routing=failure['details']['error_routing']['category']
-        if routing not in ('program_construction','received_local_failure','transport_or_unknown'):raise ValueError('GENUINE_ENGINEERING_FAILURE_REQUIRED')
+        if routing not in ('program_construction','received_local_failure','transport_or_unknown','capacity'):raise ValueError('GENUINE_ENGINEERING_FAILURE_REQUIRED')
         order=InvestigationOrder.model_validate(node['order']);_,grant=self._scope(order)
         accounting=self._target_accounting(grant)
+        if request_purpose not in ('engineering_recovery','model_correction'):raise ValueError('RECOVERY_REQUEST_PURPOSE_INVALID')
+        if request_purpose=='model_correction' and (accounting is None or not accounting['tasks'][key].get('pending_correction')):
+            raise ValueError('PRESERVED_PENDING_CORRECTION_REQUIRED')
         if accounting is not None:
             task=accounting['tasks'][key]
             node.update(usage=deepcopy(task['usage']),started_unix=task['started_unix'],
                 requests_by_purpose=deepcopy(task.get('requests_by_purpose',{})))
         limits=grant['delivery_allocations'][key].get('request_purposes')
-        if limits and node.get('requests_by_purpose',{}).get('engineering_recovery',0)>=limits['engineering_recovery']:raise ValueError('ENGINEERING_RECOVERY_ALLOWANCE_EXHAUSTED')
+        if limits and node.get('requests_by_purpose',{}).get(request_purpose,0)>=limits[request_purpose]:raise ValueError('RECOVERY_REQUEST_ALLOWANCE_EXHAUSTED')
         if self._target_accounting(grant) is not None and node['usage']['model_calls']>=order.budget.model_calls:
             raise ValueError('INVESTIGATION_MODEL_CALLS_BUDGET_EXHAUSTED')
         remaining_s=node.get('execution_deadline_unix',node['started_unix']+order.timeout_s)-time.time()
         if remaining_s<=0:raise ValueError('INVESTIGATION_ELAPSED_LIMIT')
-        request=old['request_id']+'-engineering-'+str(node.get('requests_by_purpose',{}).get('engineering_recovery',0)+1)
+        request=old['request_id']+('-correction-resume-' if request_purpose=='model_correction' else '-engineering-')+str(node.get('requests_by_purpose',{}).get(request_purpose,0)+1)
         reservation={k:v-node['usage'][k] for k,v in plain(order.budget).items()};reservation['wall_s']=remaining_s
         with self.store.transaction() as db:
             state=self.store.session(self.run_id,db)['state'];n=state['investigations'][key]
-            n.update(next_request_purpose='engineering_recovery',next_request_reason=reason,active_request_id=request,request_run_id=self.run_id,status='pending')
+            n.update(next_request_purpose=request_purpose,next_request_reason=reason,active_request_id=request,request_run_id=self.run_id,status='pending')
             self.store.update_state(db,self.run_id,state)
-            self.store.event(db,self.run_id,'investigation_paid_recovery','authorized',request=request,outputs=[self.store.put(db,dict(reason=reason,original_failure=node['failure_record'],same_node_deadline=node['started_unix']+order.timeout_s))])
+            self.store.event(db,self.run_id,'investigation_paid_recovery','authorized',request=request,outputs=[self.store.put(db,dict(reason=reason,purpose=request_purpose,original_failure=node['failure_record'],same_node_deadline=node['started_unix']+order.timeout_s))])
         row,fresh=self.store.reserve(self.run_id,request,digest(dict(original_execution=old['execution_id'],reason=reason)),'investigation-dispatcher',reservation,kind='investigation')
         if not fresh:raise ValueError('NO_RECOVERY_REDISPATCH')
         from tools.workbench import owner
         with owner(self.host.folder,'.investigation-'+key+'.lock'):
             self._execute(order,row,transport=transport,reuse_saved_reads=True,resume_payload=resume_payload,
-                correction_context=dict(engineering_recovery=reason,scope='Same current authorization, original counters and deadline. Submit supported findings and explicit unknowns.'))
+                correction_context=None if request_purpose=='model_correction' else dict(engineering_recovery=reason,scope='Same current authorization, original counters and deadline. Submit supported findings and explicit unknowns.'))
         return self.recover(key)
 
     def _query(self,order,query):
@@ -810,7 +814,8 @@ class InvestigationDispatcher:
     def _bind_resume_catalog(self,order,payload,retained_node):
         """Keep the immutable authority actually supplied before local restoration."""
         if not self._selectable():return
-        packet=json.loads(payload['messages'][1]['content'])
+        from tools.context_assembly import expand_investigation_context
+        packet=expand_investigation_context(json.loads(payload['messages'][1]['content']))
         fields=['fact_catalog'] if order.role=='principal' else []
         if self._selected_reports():fields.append('source_fact_catalog')
         for field in fields:self._bind_catalog_field(order,packet,retained_node,field)
@@ -853,7 +858,8 @@ class InvestigationDispatcher:
             progress.update(stage='request_preparation',turn=turn)
             config=effective_config(self.host)
             node=self.store.session(self.run_id)['state']['investigations'][order.investigation_id]
-            context=json.loads(payload['messages'][1]['content'])
+            from tools.context_assembly import expand_investigation_context
+            context=expand_investigation_context(json.loads(payload['messages'][1]['content']))
             _,grant=self._grant()
             allocation=grant.get('delivery_allocations',{}).get(order.investigation_id)
             if allocation:
@@ -977,7 +983,7 @@ class InvestigationDispatcher:
             if self._native_v2():
                 from tools.investigation_contract import contract
                 try:
-                    decision=self._contract().request(calls[0]['function']['name'],calls[0]['function']['arguments'],turn)
+                    decision=self._contract(order).request(calls[0]['function']['name'],calls[0]['function']['arguments'],turn)
                 except ValueError as exc:
                     feedback=self._protocol_feedback(order,exc)
                     if feedback is None:raise
@@ -1027,7 +1033,12 @@ class InvestigationDispatcher:
         return {key:{k:deepcopy(v) for k,v in node.items() if k in fields} for key,node in nodes.items()}
 
     def _append_evidence_turn(self,payload,calls,response,order,assistant=None):
-        packet=json.loads(payload['messages'][1]['content'])
+        from tools.context_assembly import expand_investigation_context
+        packet=expand_investigation_context(json.loads(payload['messages'][1]['content']))
+        if self._selected_reports():
+            ref=self.store.session(self.run_id)['state']['investigations'][order.investigation_id]['source_fact_catalog']
+            body=self.store.artifact(ref)
+            packet['source_fact_catalog']['entries']=[{k:v for k,v in e.items() if k!='value'} for e in body['entries']]
         # Each page body appears once, in its native tool response. References
         # are valid only while that original response remains in this request.
         confirmed=packet.setdefault('confirmed_followup_evidence',[])
@@ -1232,7 +1243,8 @@ class InvestigationDispatcher:
         calls=raw['choices'][0]['message']['tool_calls']
         if len(calls)!=1 or calls[0]['function']['name']!='investigation_return':raise ValueError('BOUNDED_RETURN_REQUIRED')
         if self._native_v2():
-            report=self._contract().parse('investigation_return',calls[0]['function']['arguments'])
+            bound=self.store.session(self.run_id)['state'].get('investigations',{}).get(node_id) if node_id else None
+            report=self._contract(InvestigationOrder.model_validate(bound['order']) if bound else None).parse('investigation_return',calls[0]['function']['arguments'])
             if self._selectable():
                 from tools.disposition_facts import expand
                 # Selection carries its own immutable catalog reference. The

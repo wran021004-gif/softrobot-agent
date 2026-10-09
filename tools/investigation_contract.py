@@ -45,7 +45,7 @@ class NativeContract:
             reason='Native investigation business decision under frozen v2 contract.'))
 
 
-def contract(*,selectable=False,selected_reports=False):
+def contract(*,selectable=False,selected_reports=False,role=None,allow_children=True):
     from schemas.platform_operations import ReadEvidence
     from tools.research_investigations import InvestigationReturn
     if selectable:
@@ -60,6 +60,14 @@ def contract(*,selectable=False,selected_reports=False):
             facts: list[SelectedSourceFact] = Field(default_factory=list,max_length=12)
             counterevidence: list[SelectedSourceFact] = Field(default_factory=list,max_length=8)
         InvestigationReturn=SelectedReportReturn
+        if role and role!='principal':
+            class ReportWithoutDispositions(InvestigationReturn):
+                dispositions: list[object] = Field(default_factory=list,max_length=0)
+            InvestigationReturn=ReportWithoutDispositions
+        if role and not allow_children:
+            class ReportWithoutDelegation(InvestigationReturn):
+                children: list[object] = Field(default_factory=list,max_length=0)
+            InvestigationReturn=ReportWithoutDelegation
     return NativeContract(dict(
         investigation_return=('investigation_return', '4.0.0' if selected_reports else '3.0.0' if selectable else '2.0.0', InvestigationReturn),
         evidence_read=('evidence.read', '1.0.0', ReadEvidence)))

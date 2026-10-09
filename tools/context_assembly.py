@@ -857,6 +857,21 @@ def fit_request(wire, config, purpose, *, archive):
     raise ValueError('CONTEXT_PREPARATION_REQUIRED_MATERIAL_EXCEEDS_BUDGET: '+str(path)+'; '+json.dumps(report(),sort_keys=True))
 
 
+def expand_investigation_context(packet):
+    """Resolve only lossless aliases into material retained in this context."""
+    from tools.disposition_facts import project
+    def expand(value,seen=()):
+        if isinstance(value,dict):
+            if set(value)=={'$current_request_value'}:
+                path=value['$current_request_value']
+                if path in seen:raise ValueError('CURRENT_REQUEST_ALIAS_CYCLE')
+                return expand(project(packet,path),(*seen,path))
+            return {k:expand(v,seen) for k,v in value.items()}
+        if isinstance(value,list):return [expand(v,seen) for v in value]
+        return value
+    return expand(packet)
+
+
 def compact_investigation_request(payload):
     """Deduplicate derived catalog values against exact pages in this wire.
 
@@ -865,9 +880,24 @@ def compact_investigation_request(payload):
     """
     wire=deepcopy(payload)
     if len(wire.get('messages',[]))<2:return wire
-    try:packet=json.loads(wire['messages'][1]['content'])
+    try:packet=expand_investigation_context(json.loads(wire['messages'][1]['content']))
     except (ValueError,TypeError):return wire
     if 'fact_catalog' not in packet and 'source_fact_catalog' not in packet:return wire
+    source_catalog=packet.get('source_fact_catalog')
+    if source_catalog:
+        # Unsupplied original bodies remain in the immutable authorized catalog
+        # and directory; exposing their repeated root metadata adds no evidence.
+        def observed(entry):
+            root=entry['pointer']
+            for r in packet.get('reads',[]):
+                if r['reference']!=entry['reference'] or r['page']['kind']!='content':continue
+                prefix=r['pointer']
+                if prefix==root or prefix.startswith(root+'/'):return True
+                if not prefix and isinstance(r['page']['content'],dict) and root[1:].replace('~1','/').replace('~0','~') in r['page']['content']:return True
+            return False
+        source_catalog['entries']=[e for e in source_catalog['entries'] if observed(e)]
+        source_catalog['complete_details_query']=dict(reference=source_catalog['reference'],pointer='/entries',offset=0,limit=2,byte_limit=4096)
+        source_catalog['presentation']='Inline handles name inspected root fields; all authorized original handles and bindings remain in this SAME immutable catalog. Additional originals stay in the directory and can be read. An extraction is valid only within actual inspected content.'
     available={}
     def index(value,path):
         if isinstance(value,(dict,list)):
@@ -892,7 +922,33 @@ def compact_investigation_request(payload):
     for entry in packet.get('fact_catalog',{}).get('content',{}).get('entries',[]):
         if 'value' in entry:entry['value']=compact(entry['value'])
     packet['catalog_value_presentation']='Value references resolve to exact retained pages in this request; content paths address decoded message JSON. Complete immutable catalogs remain queryable.'
-    wire['messages'][1]['content']=encode(packet)
+    if 'working_context' in packet:
+        packet['working_context']={k:v for k,v in packet['working_context'].items() if v is not None and v!=[] and v!={}}
+    # Repeated exact bindings inside full reports/metadata are also losslessly
+    # shared. Scientific facts, counterevidence, unknowns and source paths remain.
+    seen={}
+    def share(value,path=''):
+        if isinstance(value,(dict,list,str)):
+            body=encode(value);identity=digest(value)
+            if len(body)>128 and identity in seen:
+                marker={'$current_request_value':seen[identity]}
+                if len(encode(marker))<len(body):return marker
+            if len(body)>128:seen.setdefault(identity,path)
+            if isinstance(value,str):return value
+            children=value.items() if isinstance(value,dict) else enumerate(value)
+            result={k:share(v,path+'/'+pointer_part(k)) for k,v in children}
+            return result if isinstance(value,dict) else list(result.values())
+        return value
+    shared=share(packet)
+    if expand_investigation_context(shared)!=packet:raise ValueError('CURRENT_REQUEST_ALIAS_NOT_LOSSLESS')
+    shared['current_request_alias_rule']='A sole $current_request_value object means the EXACT identical value at that JSON Pointer in this decoded user context. Expand it there. The original target remains present; no native history was shortened.'
+    wire['messages'][1]['content']=encode(shared)
+    def schema_annotations(value):
+        if isinstance(value,dict):return {k:schema_annotations(v) for k,v in value.items() if k not in ('title','description')}
+        if isinstance(value,list):return [schema_annotations(v) for v in value]
+        return value
+    for tool in wire.get('tools',[]):
+        tool['function']['parameters']=schema_annotations(tool['function']['parameters'])
     return wire
 
 
