@@ -2,6 +2,7 @@
 from copy import deepcopy
 import json
 from unittest import TestCase
+import asyncio
 from unittest.mock import patch
 from uuid import uuid4
 import httpx
@@ -183,3 +184,18 @@ class Mainline5Tests(TestCase):
         self.assertEqual(w.store.remaining()['used']['model_calls'],before+1)
         self.assertNotIn('unconsumed_response',m5.pilot(w.host))
         self.assertTrue(any('reasoningContent' in block for message in agent.messages for block in message['content']))
+
+    def test_explicit_continuations_share_live_client_event_loop(self):
+        w=self.w;w.status='running';loops=[];prompts=[]
+        class LoopBoundClient:
+            async def invoke_async(self,prompt):
+                current=asyncio.get_running_loop()
+                if loops:
+                    self_loop=loops[0]
+                    if self_loop is not current or self_loop.is_closed():
+                        raise RuntimeError('Event loop is closed')
+                    w.status='model_stopped'
+                loops.append(current);prompts.append(prompt)
+        asyncio.run(m5.converse(w,LoopBoundClient(),'Offline continuation check'))
+        self.assertEqual(len(loops),2);self.assertIs(loops[0],loops[1])
+        self.assertIn('native tool',prompts[1]);self.assertEqual(w.status,'model_stopped')

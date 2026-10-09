@@ -2,6 +2,7 @@
 from copy import deepcopy
 from pathlib import Path
 import argparse
+import asyncio
 import importlib.metadata
 import json
 import os
@@ -214,25 +215,29 @@ def run(directory=service.RUN):
         agent=build_live(w)
         prompt=None if pilot(w.host).get('unconsumed_response') else (
             'Continue the same authorized Mainline5 activity from CURRENT_BUSINESS_PACKET. Consume actual saved feedback and deliver research_decide. Do not repeat sealed executions.')
-        while w.status not in ('model_stopped','execution_stopped'):
-            if time.time()>=w.spec['execution_cutoff_unix']:raise ValueError('DELIVERY_WINDOW_REACHED')
-            try:agent(prompt)
-            except MaxTokensReachedException:
-                # Public Strands behavior already saves the partial message.
-                # A subsequent explicit invocation shares the same send ledger.
-                record(w.host,'mainline5_incomplete_response',dict(reason='max_tokens',
-                    partial_history_owner='Strands',decision_accepted=False))
-            if w.status not in ('model_stopped','execution_stopped'):
-                prompt=('No final formal research disposition was received. Continue through a native tool now. '
-                    'Use the current exact schema and F aliases. Choose one justified bounded next action; '
-                    'you do not need to solve the whole study before observing its first outcomes. '
-                    'If the preceding response was length-truncated, it is retained as incomplete reasoning, not an accepted decision. '
-                    'Do not replay sealed experiments; STOP remains available when justified.')
+        asyncio.run(converse(w,agent,prompt))
     except Exception as exc:
         atomic_json(w.directory/'failure.json',dict(type=type(exc).__name__,message=str(exc),usage=w.store.remaining()))
         service.persist(w);service.export(w);raise
     service.persist(w);service.export(w)
     return w
+
+
+async def converse(w,agent,prompt):
+    # Keep the injected AsyncOpenAI client's connections on one event loop
+    # across explicit continuation calls and framework summary requests.
+    while w.status not in ('model_stopped','execution_stopped'):
+        if time.time()>=w.spec['execution_cutoff_unix']:raise ValueError('DELIVERY_WINDOW_REACHED')
+        try:await agent.invoke_async(prompt)
+        except MaxTokensReachedException:
+            record(w.host,'mainline5_incomplete_response',dict(reason='max_tokens',
+                partial_history_owner='Strands',decision_accepted=False))
+        if w.status not in ('model_stopped','execution_stopped'):
+            prompt=('No final formal research disposition was received. Continue through a native tool now. '
+                'Use the current exact schema and F aliases. Choose one justified bounded next action; '
+                'you do not need to solve the whole study before observing its first outcomes. '
+                'If the preceding response was length-truncated, it is retained as incomplete reasoning, not an accepted decision. '
+                'Do not replay sealed experiments; STOP remains available when justified.')
 
 
 def main():
