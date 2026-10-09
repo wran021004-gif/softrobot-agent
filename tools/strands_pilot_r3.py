@@ -69,10 +69,11 @@ class LiveBoundary(httpx.AsyncBaseTransport):
     decoding. An unconsumed confirmed response is replayed only for its exact
     request; uncertainty blocks further sends and retains its reservation.
     """
-    def __init__(self,host,transport=None):
+    def __init__(self,host,transport=None,*,allow_truncated_response=False):
         self.host=host
         self.inner=transport or httpx.AsyncHTTPTransport(retries=0)
         self.last_request=None
+        self.allow_truncated_response=allow_truncated_response
 
     async def handle_async_request(self,request):
         host=self.host;store=host.store;run=host.run_id
@@ -137,7 +138,7 @@ class LiveBoundary(httpx.AsyncBaseTransport):
                 ref=store.put(db,reception)
                 store.event(db,run,'r3_response','metadata_saved',request=key,execution=row['execution_id'],outputs=[ref])
             settle(host,row,reception)
-            if 'length' in (reception['finish_reasons'] or []):
+            if 'length' in (reception['finish_reasons'] or []) and not self.allow_truncated_response:
                 raise ValueError('R3_LENGTH_TRUNCATED_NO_NATIVE_SUBMISSION')
             return httpx.Response(response.status_code,content=body,request=request)
         except BaseException as exc:

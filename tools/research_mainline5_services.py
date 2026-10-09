@@ -168,6 +168,15 @@ def aliases(w,ref):
         for a,h in mapping.items() if state['fact_catalog'][h]['selector']['reference']==ref}
 
 
+def decision_aliases(values):
+    """Present useful scalar facts; exact originals remain in evidence.read."""
+    words=('status','accepted','metric','holding_tip_speed_weight','terminal_tip_speed_weight',
+        'rank','classification','residual','available','passed','tip_speed','tip_error','candidate_id')
+    def scalar(v):
+        return isinstance(v,(str,int,float,bool)) or (isinstance(v,list) and all(isinstance(x,(int,float)) for x in v))
+    return {a:v for a,v in values.items() if scalar(v['value']) and any(word in v['pointer'] for word in words)}
+
+
 def operation_results(w):
     rows=[]
     with w.store.connect(True) as db:calls=[dict(r) for r in db.execute('SELECT * FROM calls WHERE run_id=? AND receipt IS NOT NULL',(w.host.run_id,))]
@@ -243,12 +252,15 @@ def configure(w):
     final=w.status=='verification_reporting'
     if final:cap['legal']={'stop':dict(reason='Sealed trajectory, interpret exact verification')}
     current=w.store.artifact(w.feedback)
-    packet=dict(history=study_history(w.store,w.records,retained_baseline=w.baseline['candidate'],
-        selected_source=w.source,latest_tested=w.latest,selection=w.selected),
+    packet=dict(history=dict(retained_reference=w.baseline['candidate'],selected_source=w.source,
+        latest_tested=w.latest,selected_deliverable=w.selected,records=[dict(role=r['role'],candidate=r['facts']['candidate'],
+            original_store=r['source_store'],acceptance=r['acceptance'],
+            controller_version=w.store.artifact(r['facts']['configuration'])['effective']['policy']['controller']['version'],
+            source_commit=r.get('source_commit'),receipts=r.get('receipts',{})) for r in w.records]),
         current_batch_source=w.source,predecessor_decision=w.previous_decision,
-        current_feedback=dict(reference=current['result'],content=current['content'],aliases=aliases(w,current['result'])),
+        current_feedback=dict(reference=current['result'],content=current['content'],aliases=decision_aliases(aliases(w,current['result']))),
         capabilities=cap,scope=w.spec,study=dict(development_used=development,verification=w.verification),
-        mathematical_evidence=historical_math_packet(w),native_results=recent,
+        mathematical_evidence=[{**m,'aliases':decision_aliases(m['aliases'])} for m in historical_math_packet(w)],native_results=recent,
         source_catalogs={r['role']:source_catalog(w,r) for r in w.records},selected_template=w.spec.get('selected_template'))
     from schemas.platform_analysis import TaskAnalysisProtocol,EndpointTarget
     from extensions.tendon_family.finite_templates import catalog

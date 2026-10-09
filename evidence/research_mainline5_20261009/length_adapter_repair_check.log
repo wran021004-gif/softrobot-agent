@@ -1,0 +1,63 @@
+test_length_response_is_saved_and_consumed_by_strands (tests.test_research_mainline5.Mainline5Tests.test_length_response_is_saved_and_consumed_by_strands) ... ERROR
+
+======================================================================
+ERROR: test_length_response_is_saved_and_consumed_by_strands (tests.test_research_mainline5.Mainline5Tests.test_length_response_is_saved_and_consumed_by_strands)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\softrobot-agent\.worktrees\strands-mainline5\tests\test_research_mainline5.py", line 180, in test_length_response_is_saved_and_consumed_by_strands
+    agent('Offline length-conversion check only')
+  File "D:\softrobot-agent\.mainline5-env\Lib\site-packages\strands\agent\agent.py", line 914, in __call__
+    return run_async(
+           ^^^^^^^^^^
+  File "D:\softrobot-agent\.mainline5-env\Lib\site-packages\strands\_async.py", line 45, in run_async
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "C:\Users\gugugaga\miniconda3\envs\softagent\Lib\concurrent\futures\_base.py", line 456, in result
+    return self.__get_result()
+           ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\gugugaga\miniconda3\envs\softagent\Lib\concurrent\futures\_base.py", line 401, in __get_result
+    raise self._exception
+  File "C:\Users\gugugaga\miniconda3\envs\softagent\Lib\concurrent\futures\thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\softrobot-agent\.mainline5-env\Lib\site-packages\opentelemetry\instrumentation\threading\__init__.py", line 162, in wrapped_func
+    return original_func(*func_args, **func_kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\softrobot-agent\.mainline5-env\Lib\site-packages\strands\_async.py", line 38, in execute
+    return asyncio.run(execute_async())
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\gugugaga\miniconda3\envs\softagent\Lib\asyncio\runners.py", line 190, in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+  File "C:\Users\gugugaga\miniconda3\envs\softagent\Lib\asyncio\runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\gugugaga\miniconda3\envs\softagent\Lib\asyncio\base_events.py", line 654, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "D:\softrobot-agent\.mainline5-env\Lib\site-packages\strands\_async.py", line 33, in execute_async
+    return await async_func()
+           ^^^^^^^^^^^^^^^^^^
+  File "D:\softrobot-agent\.mainline5-env\Lib\site-packages\strands\agent\agent.py", line 935, in _invoke_async_and_flush
+    return await self.invoke_async(prompt, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\softrobot-agent\.mainline5-env\Lib\site-packages\strands\agent\agent.py", line 1017, in invoke_async
+    async for event in events:
+  File "D:\softrobot-agent\.mainline5-env\Lib\site-packages\strands\agent\agent.py", line 1434, in stream_async
+    async for event in events:
+  File "D:\softrobot-agent\.mainline5-env\Lib\site-packages\strands\agent\agent.py", line 1578, in _run_loop
+    async for event in self._middleware_registry.invoke(
+  File "D:\softrobot-agent\.mainline5-env\Lib\site-packages\strands\_middleware\registry.py", line 167, in invoke
+    async for event in gen:
+  File "D:\softrobot-agent\.mainline5-env\Lib\site-packages\strands\agent\agent.py", line 1733, in terminal
+    async for event in events:
+  File "D:\softrobot-agent\.mainline5-env\Lib\site-packages\strands\agent\agent.py", line 1788, in _execute_event_loop_cycle
+    async for event in events:
+  File "D:\softrobot-agent\.mainline5-env\Lib\site-packages\strands\event_loop\event_loop.py", line 314, in event_loop_cycle
+    raise MaxTokensReachedException(
+strands.types.exceptions.MaxTokensReachedException: Model stopped generating due to maximum token limit. The partial message has been added to the conversation history. You can continue by calling the agent again. For more information see: https://strandsagents.com/docs/user-guide/concepts/agents/agent-loop/#maxtokensreachedexception
+
+----------------------------------------------------------------------
+Ran 1 test in 21.945s
+
+FAILED (errors=1)

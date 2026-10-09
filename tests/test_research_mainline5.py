@@ -164,3 +164,22 @@ class Mainline5Tests(TestCase):
         with self.assertRaisesRegex(ValueError,'SAVED_RESPONSE_MUST_BE_PROCESSED_FIRST'):
             asyncio.run(boundary.handle_async_request(httpx.Request('POST','https://api.deepseek.com/chat/completions',json=different)))
         boundary.consumed()
+
+    def test_length_response_is_saved_and_consumed_by_strands(self):
+        w=self.w;w.status='running';s.persist(w)
+        count=[]
+        def fixture(request):
+            count.append(True);body=completion(text='')
+            body['choices'][0]['finish_reason']='length'
+            body['choices'][0]['message']['reasoning_content']='Offline truncated reasoning substitute.'
+            body['usage']=dict(prompt_tokens=3,completion_tokens=4,total_tokens=7,
+                completion_tokens_details=dict(reasoning_tokens=4))
+            return httpx.Response(200,json=body)
+        before=w.store.remaining()['used']['model_calls']
+        agent=m5.build_live(w,transport=httpx.MockTransport(fixture),key='offline-no-secret')
+        from strands.types.exceptions import MaxTokensReachedException
+        with self.assertRaises(MaxTokensReachedException):agent('Offline length-conversion check only')
+        self.assertEqual(len(count),1)
+        self.assertEqual(w.store.remaining()['used']['model_calls'],before+1)
+        self.assertNotIn('unconsumed_response',m5.pilot(w.host))
+        self.assertTrue(any('reasoningContent' in block for message in agent.messages for block in message['content']))

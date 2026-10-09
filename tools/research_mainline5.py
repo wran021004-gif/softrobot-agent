@@ -12,6 +12,7 @@ from uuid import uuid4
 from strands.tools.tools import PythonAgentTool
 from strands.tools.executors import SequentialToolExecutor
 from strands.hooks.events import BeforeModelCallEvent,AfterModelCallEvent,BeforeToolCallEvent,AfterToolCallEvent
+from strands.types.exceptions import MaxTokensReachedException
 from tools import research_mainline5_services as service
 from tools.strands_pilot import build_harness
 from tools.strands_pilot_r3 import LiveBoundary,live_model_class,pilot,pending,received,settle,record
@@ -123,6 +124,9 @@ def native_tools(w):
 
 
 class ResearchBoundary(LiveBoundary):
+    def __init__(self,host,transport=None):
+        super().__init__(host,transport,allow_truncated_response=True)
+
     async def handle_async_request(self,request):
         wire=json.loads(request.content)
         if wire.get('tools') and not pilot(self.host).get('unconsumed_response'):
@@ -208,8 +212,22 @@ def run(directory=service.RUN):
     service.persist(w)
     try:
         agent=build_live(w)
-        agent(None if pilot(w.host).get('unconsumed_response') else
+        prompt=None if pilot(w.host).get('unconsumed_response') else (
             'Continue the same authorized Mainline5 activity from CURRENT_BUSINESS_PACKET. Consume actual saved feedback and deliver research_decide. Do not repeat sealed executions.')
+        while w.status not in ('model_stopped','execution_stopped'):
+            if time.time()>=w.spec['execution_cutoff_unix']:raise ValueError('DELIVERY_WINDOW_REACHED')
+            try:agent(prompt)
+            except MaxTokensReachedException:
+                # Public Strands behavior already saves the partial message.
+                # A subsequent explicit invocation shares the same send ledger.
+                record(w.host,'mainline5_incomplete_response',dict(reason='max_tokens',
+                    partial_history_owner='Strands',decision_accepted=False))
+            if w.status not in ('model_stopped','execution_stopped'):
+                prompt=('No final formal research disposition was received. Continue through a native tool now. '
+                    'Use the current exact schema and F aliases. Choose one justified bounded next action; '
+                    'you do not need to solve the whole study before observing its first outcomes. '
+                    'If the preceding response was length-truncated, it is retained as incomplete reasoning, not an accepted decision. '
+                    'Do not replay sealed experiments; STOP remains available when justified.')
     except Exception as exc:
         atomic_json(w.directory/'failure.json',dict(type=type(exc).__name__,message=str(exc),usage=w.store.remaining()))
         service.persist(w);service.export(w);raise
