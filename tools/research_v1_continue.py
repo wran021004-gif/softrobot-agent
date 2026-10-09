@@ -629,4 +629,8 @@ def main():
             for t in [t for t in threading.enumerate() if t.name.startswith('investigation-')]:t.join(2405)
             stop(host,'NEW B BLOCKED; preserve partial results and uncertain reservations');export(OUT,'coordinated');raise
 
-if __name__=='__main__':main()
+if __name__=='__main__':
+    # Gate imports must share the CLI's selected activity directory and policy.
+    import sys
+    sys.modules['tools.research_v1_continue']=sys.modules[__name__]
+    main()

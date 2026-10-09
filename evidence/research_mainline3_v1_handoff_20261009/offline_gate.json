@@ -13,5 +13,11 @@
     "Moved original provenance import outside active Store transaction to avoid SQLite lock",
     "Corrected fixture saved-text assertion and adapter boundary call"
   ],
-  "full_suite_run": false
+  "full_suite_run": false,
+  "cli_repair": {
+    "defect": "CLI module double import caused gate to read historical default OUT rather than new --directory policy",
+    "repair": "Share __main__ module under tools.research_v1_continue before CLI dispatch",
+    "new_requests": 0,
+    "historical_activity_unchanged": true
+  }
 }
