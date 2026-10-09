@@ -188,6 +188,17 @@ def reconstruct_motion(files, rows, target):
     return motion,physics
 
 
+def report_configuration(candidate, baseline):
+    """Report the receipt-owned executed geometry, retaining baseline ownership."""
+    from schemas.platform import CandidateInput
+    from tools.state_io import digest
+    owned=CandidateInput.model_validate(candidate)
+    if owned.baseline_identity!=digest(plain(baseline)) or owned.content_identity!=digest(plain(owned.effective)):
+        raise ValueError('REPORT_CANDIDATE_SCOPE_MISMATCH')
+    checked_control(owned.effective)
+    return owned.effective
+
+
 def report(ctx,args):
     from .gvs_profile import ProfileOutput
     checked_control(ctx.input)
@@ -204,8 +215,7 @@ def report(ctx,args):
         raise ValueError('REPORT_EVALUATION_EXECUTION_MISMATCH')
     metadata=ctx.store.session(ctx.run_id)['state']['result_executions'][sim['execution_id']]
     candidate=ctx.artifact(metadata['candidate_input'])
-    if execution_scope(candidate['effective'])!=execution_scope(ctx.input):
-        raise ValueError('REPORT_CANDIDATE_SCOPE_MISMATCH')
+    executed=report_configuration(candidate,ctx.input)
     bundle=None
     for event in ctx.store.events(ctx.run_id):
         if event['kind']=='simulation' and event['execution_id']==sim['execution_id']:
@@ -223,13 +233,13 @@ def report(ctx,args):
     files={f['filename']:ctx.store.artifact(f['reference'],raw=True) for f in bundle['files']}
     rows=json.loads(gzip.decompress(files['trajectory.json.gz']))
     observations=json.loads(files['controller_observations.json'])
-    motion,physics=reconstruct_motion(files,rows,ctx.input.task.goal.data if ctx.input.task.family=='task.tracking' else ctx.input.task.goal.data['target_m'])
-    output=summarize(ctx.input.task,ctx.artifact(sim['output']),plain(evaluation),rows,observations,motion,
-        [t['force_limit_n'] for t in physics['tendons']],None if ctx.input.task.family=='task.tracking' else settling_for(ctx.input))
+    motion,physics=reconstruct_motion(files,rows,executed.task.goal.data if executed.task.family=='task.tracking' else executed.task.goal.data['target_m'])
+    output=summarize(executed.task,ctx.artifact(sim['output']),plain(evaluation),rows,observations,motion,
+        [t['force_limit_n'] for t in physics['tendons']],None if executed.task.family=='task.tracking' else settling_for(executed))
     preparations=[e['outputs'][0] for e in ctx.store.events(ctx.run_id)
         if e['kind']=='control_preparation' and e['execution_id']==sim['execution_id']]
-    output.update(task=plain(ctx.input.task),execution_scope=execution_scope(ctx.input),
-        control_parameters=plain(ctx.input.policy.controller.parameters),
+    output.update(task=plain(executed.task),execution_scope=execution_scope(executed),
+        control_parameters=plain(executed.policy.controller.parameters),
         numerical_preparation=None if not preparations else ctx.artifact(preparations[-1]))
     output.update(simulation=sim['output'],evaluation=ev['output'],execution_id=sim['execution_id'],
         configuration=metadata['candidate_input'],candidate_id=candidate['candidate_id'],

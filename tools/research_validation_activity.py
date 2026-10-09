@@ -1,5 +1,6 @@
 """Freeze and archive a bounded validation; execute the existing runner unchanged."""
 import argparse
+import base64
 import importlib.metadata
 import json
 import os
@@ -92,7 +93,9 @@ def export(out, mode, *, run_id=None):
     store=Store(ROOT/manifest['phases'][mode]['output'])
     with store.connect(True) as db:
         session=store.session(run_id or 'mainline3-'+mode, db)
-        artifacts={r['id']:json.loads(r['body']) for r in db.execute('SELECT id,body FROM artifacts')}
+        artifacts={r['id']:json.loads(r['body']) for r in db.execute("SELECT id,body FROM artifacts WHERE media='application/json'")}
+        binaries={r['id']:dict(media_type=r['media'],representation='complete_original_bytes_base64',base64_bytes=base64.b64encode(r['body']).decode('ascii'))
+            for r in db.execute("SELECT id,media,body FROM artifacts WHERE media!='application/json'")}
         calls=[]
         for r in db.execute('SELECT * FROM calls ORDER BY rowid'):
             row=dict(r)
@@ -102,6 +105,7 @@ def export(out, mode, *, run_id=None):
         bundle=dict(mode=mode, transport='real_configured_deepseek', project=store.config(db),
             state=session['state'], snapshot=session['snapshot'], artifacts=artifacts, calls=calls,
             events=[json.loads(r['body']) for r in db.execute('SELECT body FROM events ORDER BY seq')])
+        if binaries:bundle['binary_artifacts']=binaries
     atomic_json(out/(mode+'_bundle.json'), bundle)
     atomic_json(out/(mode+'_ledger.json'), store.remaining())
     print(encode(dict(mode=mode, nodes={k:dict(status=n['status'],usage=n.get('usage'),reason=n.get('reason'))

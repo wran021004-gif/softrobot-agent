@@ -35,7 +35,7 @@ def configuration(grants=None):
     return study_input(source,grants,builder_version='1.2.0')
 
 
-def fixed_pipeline(host, *, changes, protocol, target, execute_backend=False, executor=None):
+def fixed_pipeline(host, *, changes, protocol, target, execute_backend=False, executor=None, profile_request_id='fixed-profile'):
     """All computations go through Host; injected executor is a labelled fixture."""
     call=executor or (lambda tool,args,key: invoke(host,tool,args,request_id=key))
     rows=[]
@@ -52,7 +52,7 @@ def fixed_pipeline(host, *, changes, protocol, target, execute_backend=False, ex
     if execute_backend:
         simulation=step('simulation.run',dict(candidate_id='fixed-radius',changes=changes),'fixed-simulation')
         step('evaluation.run',dict(result=simulation['output'],execution_id=simulation['execution_id']),'fixed-evaluation')
-        step('control.profile_report',dict(simulation_request_id='fixed-simulation',evaluation_request_id='fixed-evaluation'),'fixed-profile')
+        step('control.profile_report',dict(simulation_request_id='fixed-simulation',evaluation_request_id='fixed-evaluation'),profile_request_id)
     return dict(mode='isolated_execution_substitutes' if executor else 'actual_host_execution',receipts=rows,
         scientific_validation='pending' if executor or not execute_backend else 'Read official evaluation/profile; no inferred success')
 

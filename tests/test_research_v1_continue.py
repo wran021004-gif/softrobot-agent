@@ -55,6 +55,20 @@ class ContinuationTests(TestCase):
         self.assertEqual(issue['legal']['expected_catalog'],session['state']['investigations']['principal-coordinated-v2']['source_fact_catalog'])
         self.assertIn('not interchangeable',issue['legal']['requirement'])
 
+    def test_saved_changed_geometry_report_uses_owned_candidate_scope(self):
+        from extensions.tendon_family.gvs_reporting import report_configuration
+        from extensions.tendon_family.gvs_profile import execution_scope
+        from schemas.platform import SessionInput
+        source=fixture.ROOT/'evidence/research_mainline3_v1_handoff_20261009'
+        manifest=read(source/'validation_manifest.json');store=Store(fixture.ROOT/manifest['phases']['fixed']['output'])
+        session=store.session('mainline3-fixed');baseline=SessionInput.model_validate(session['snapshot']['input'])
+        metadata=session['state']['result_executions'][json.loads(store.lookup('mainline3-fixed','fixed-simulation')['receipt'])['execution_id']]
+        candidate=store.artifact(metadata['candidate_input']);executed=report_configuration(candidate,baseline)
+        self.assertEqual(plain(executed),candidate['effective'])
+        self.assertNotEqual(execution_scope(executed),execution_scope(baseline))
+        changed=deepcopy(candidate);changed['baseline_identity']='0'*64
+        with self.assertRaisesRegex(ValueError,'REPORT_CANDIDATE_SCOPE_MISMATCH'):report_configuration(changed,baseline)
+
     def test_selected_investigator_projection_and_actual_sent_restoration(self):
         sends=[]
         def transport(wire):

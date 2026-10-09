@@ -433,19 +433,22 @@ def execute_c():
     manifest=read(OUT/'validation_manifest.json')
     host,m,p=host_for('fixed',create=not (ROOT/manifest['phases']['fixed']['output']).exists());cfg=host.store.session(host.run_id)['snapshot']['input']
     if (OUT/'fixed_result.json').exists():return read(OUT/'fixed_result.json')
+    if p.get('reporting_recovery') and host.store.session(host.run_id)['status']=='stopped':host.resume()
     from schemas.platform_analysis import TaskAnalysisProtocol,EndpointTarget
     source=cfg['policy']['candidate_builder']['parameters']['data']['semantic_source']
     protocol=TaskAnalysisProtocol(baseline_lengths_m={c['id']:c['length_m'] for c in source['components'] if c['kind']=='flexible_segment'},duration_s=cfg['task']['timing']['duration_s'],period_s=cfg['task']['timing']['control_period_s'],frequency_rad_s=[.1,1.,10.])
     target=EndpointTarget(position_m=cfg['task']['goal']['data']['target_m'],position_tolerance_m=cfg['task']['evaluator']['parameters']['data']['tolerance_m'],position_scale_m=.01)
     with host.store.transaction() as db:pr=plain(host.store.put(db,protocol));tr=plain(host.store.put(db,target))
     try:
-        result=fixed_pipeline(host,changes=m['fixed_changes'],protocol=pr,target=tr,execute_backend=True)
+        result=fixed_pipeline(host,changes=m['fixed_changes'],protocol=pr,target=tr,execute_backend=True,
+            profile_request_id=p.get('profile_request_id','fixed-profile'))
         evaluation=result['receipts'][5];profile=result['receipts'][6]
         configuration_ref=host.store.artifact(profile['output'])['detail']['configuration']
         joint=invoke(host,'research.task_acceptance',dict(configuration=configuration_ref,evaluation=evaluation['output'],profile=profile['output']),request_id='fixed-joint-acceptance')
         result['receipts'].append(joint)
         if joint['execution_status']!='completed':raise ValueError('PUBLIC_JOINT_ACCEPTANCE_FAILED')
-        result.update(joint_acceptance=host.store.artifact(joint['output'])['detail'],code_commit=m['code_commit'])
+        result.update(joint_acceptance=host.store.artifact(joint['output'])['detail'],code_commit=m['code_commit'],
+            backend_code_commit=read(OUT/'fixed_launch.json')['code_commit'])
         atomic_json(OUT/'fixed_result.json',result)
     finally:
         stop(host,'FIXED C TERMINAL; physical failure never authorizes tuning or improved-result rerun')
@@ -453,6 +456,7 @@ def execute_c():
 
 def bind_repair(record=None):
     """One explicit version migration in the original grant; no STOP revival."""
+    if record and record.get('phase')=='fixed':return bind_fixed_repair(record)
     m=read(OUT/'validation_manifest.json');p=m['phases']['coordinated'];old_run=p.get('active_run_id','mainline3-coordinated')
     if p.get('sequential_reservations'):
         if not record:raise ValueError('CONCRETE_REPAIR_RECORD_REQUIRED')
@@ -510,6 +514,30 @@ def bind_repair(record=None):
     r,fresh=store.reserve(new_run,'engineering-repair1',digest(record),'coding-agent-repair',cost,kind='engineering_repair')
     if fresh:store.complete(r,dict(request_id=r['request_id'],execution_id=r['execution_id'],tool_id='engineering.repair',tool_version='1.0.0',execution_status='completed',caller='coding-agent-repair',charged=zero(),cache_hit=False),record,elapsed=elapsed,actual_cost=cost,kind='engineering_repair')
     atomic_json(OUT/'repair1_accounting.json',dict(repair_wall_s=elapsed,project_ledger=store.remaining(),coding_operations='Bounded patch, source/receipt inspection, affected offline checks, ordinary commit and version binding; shell operations are engineering, not fabricated public source reads.'))
+
+def bind_fixed_repair(record):
+    """Resume reporting from completed C receipts, with no backend replacement."""
+    m=read(OUT/'validation_manifest.json');p=m['phases']['fixed']
+    if not reuse_both() or not read(OUT/record['verification'])['passed']:raise ValueError('FOCUSED_C_REPORTING_REPAIR_REQUIRED')
+    if time.time()>=read(OUT/'activity_start.json')['execution_cutoff_unix']:raise ValueError('PROTECTED_DELIVERY_CUTOFF')
+    host=Host(ROOT/p['output'],'mainline3-fixed')
+    for key in ('fixed-build','fixed-linear','fixed-metrics','fixed-endpoint','fixed-simulation','fixed-evaluation'):
+        if host.store.lookup(host.run_id,key)['status']!='completed':raise ValueError('COMPLETED_C_RECEIPTS_REQUIRED')
+    if host.store.lookup(host.run_id,'fixed-profile')['status']!='failed':raise ValueError('FAILED_PROFILE_RECEIPT_REQUIRED')
+    with host.store.connect(True) as db:
+        if db.execute("SELECT COUNT(*) FROM calls WHERE status IN ('running','unknown')").fetchone()[0]:raise ValueError('NO_UNCONFIRMED_C_REPLAY')
+    atomic_json(OUT/'validation_manifest_before_C_reporting_repair.json',m)
+    revision=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip()
+    for path in record['affected_paths']:m['code_identity'][path]=sha(ROOT/path)
+    record=dict(record,code_revision=revision,backend_execution=host.store.lookup(host.run_id,'fixed-simulation')['execution_id'],
+        backend_code_commit=read(OUT/'fixed_launch.json')['code_commit'],new_backend_allowance=0,original_B_outcome_unchanged=True)
+    p.update(reporting_recovery=True,profile_request_id='fixed-profile-recovery1')
+    m.update(code_commit=revision,implementation_repairs_used=m['implementation_repairs_used']+1)
+    m.setdefault('repairs',[]).append(record);atomic_json(OUT/'validation_manifest.json',m);atomic_json(OUT/'C_reporting_repair.json',record)
+    host.resume();elapsed=max(0,time.time()-record['started_unix']);cost={**zero(),'wall_s':elapsed}
+    row,fresh=host.store.reserve(host.run_id,'C-reporting-engineering-repair',digest(record),'coding-agent-repair',cost,kind='engineering_repair')
+    if fresh:host.store.complete(row,dict(request_id=row['request_id'],execution_id=row['execution_id'],tool_id='engineering.repair',tool_version='1.0.0',execution_status='completed',caller='coding-agent-repair',charged=zero(),cache_hit=False),record,elapsed=elapsed,actual_cost=cost,kind='engineering_repair')
+    return host
 
 def bind_current_repair(m,p,old_run,record):
     """Targeted current-activity migration; ledger/counters/clocks are unchanged."""
