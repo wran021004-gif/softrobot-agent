@@ -93,7 +93,9 @@ class Allocation:
 
 def continuous_space(problem,structure):
     allocation=Allocation(problem.lengths,structure['segment_count']);initial=dict(allocation.initial)
-    for k,v in problem.variables.items():
+    variables=problem.variables.items()
+    if problem.method.name=='hierarchical_coordinate_v1_1':variables=sorted(variables)
+    for k,v in variables:
         if isinstance(v,Continuous):initial[k]=(v.initial-v.bounds[0])/(v.bounds[1]-v.bounds[0])
     return allocation,initial
 
@@ -267,7 +269,8 @@ def solve(problem,host=None,*,evaluator=None,state=None,save_state=None):
                 incumbent=min(eligible,key=lambda r:rank(r,problem));structure={k:incumbent['resolved']['parameters'][k] for k in ('segment_count','proximal_tendons','distal_tendons','material')}
                 inner=state['inner'].setdefault(digest(structure),dict(iteration=0,step=problem.method.step))
                 if inner['step']<problem.method.minimum_step:state['termination']='minimum_coordinate_step';break
-                names=list(incumbent['latent_coordinates']);proposal=coordinate_proposal(dict(best=list(incumbent['latent_coordinates'].values()),**inner))
+                names=list(continuous_space(problem,structure)[1]) if problem.method.name=='hierarchical_coordinate_v1_1' else list(incumbent['latent_coordinates'])
+                proposal=coordinate_proposal(dict(best=[incumbent['latent_coordinates'][k] for k in names],**inner))
                 latent=dict(zip(names,proposal['x']));phase='feedback_coordinate';feedback=incumbent['candidate_id']
                 inner['iteration']+=1
                 if inner['iteration']%(2*len(names))==0:inner['step']/=2

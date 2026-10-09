@@ -7,6 +7,19 @@
       "scientific_behavior_changed": false,
       "provider_sends": 0,
       "backend_launches": 0
+    },
+    {
+      "stage": "after sealed principal STOP",
+      "finding": "JSON sorted keys changed v1 coordinate schedule after restoration",
+      "repair": "Length indices ascending, then scalar variable names sorted; reconstruct proposal vector from named keys, never serialized dictionary order",
+      "scientific_behavior_changed": true,
+      "new_method": "hierarchical_coordinate_v1_1",
+      "legacy_method_retained": "hierarchical_coordinate_v1",
+      "actual_live_method": "hierarchical_coordinate_v1",
+      "affected_scope": "Restored v1 coordinate scheduling and input-order-dependent scalar scheduling; physics, controller and completed live evidence unchanged",
+      "new_provider_sends": 0,
+      "new_backend_launches": 0,
+      "proof": "recovery_coordinate_observation.json"
     }
   ]
 }

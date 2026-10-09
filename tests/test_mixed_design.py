@@ -16,6 +16,34 @@ from tools.platform_tasks import compile_input
 
 
 class MixedDesignTests(TestCase):
+    def test_json_restoration_preserves_feedback_schedule(self):
+        import json
+        p=example(False);p['budget']['max_evaluations']=8
+        p['variables']['terminal_tip_speed_weight']=dict(kind='continuous',bounds=[.025,.1],initial=.1)
+        # Scalar insertion order is deliberately different from canonical order.
+        p['variables']=dict(reversed(list(p['variables'].items())))
+        def evaluator(problem,values,candidate_id):
+            score=.3+10*(values['lengths_m'][0]-.16)+.1*(values['holding_tip_speed_weight']+values['terminal_tip_speed_weight'])
+            return dict(status='evaluated',acceptance=dict(accepted=False,status='valid_failure',metrics=dict(
+                terminal_error_m=score,holding_max_error_m=score,holding_max_speed_m_s=score)),evidence=dict(substituted=True))
+        expected=plain(solve(p,evaluator=evaluator));checkpoint={};before=[];after=[]
+        class Interrupted(Exception):pass
+        def save(value):
+            if len(value['evaluated'])==2 and value['pending'] is None:
+                checkpoint.update(json.loads(json.dumps(value,sort_keys=True)))
+                raise Interrupted()
+        def first(problem,values,candidate_id):
+            before.append(candidate_id);return evaluator(problem,values,candidate_id)
+        def resumed(problem,values,candidate_id):
+            after.append(candidate_id);return evaluator(problem,values,candidate_id)
+        with self.assertRaises(Interrupted):solve(p,evaluator=first,save_state=save)
+        actual=plain(solve(p,evaluator=resumed,state=checkpoint))
+        self.assertEqual(expected['evaluated'],actual['evaluated'])
+        self.assertEqual(expected['termination_reason'],actual['termination_reason'])
+        self.assertFalse(set(before)&set(after))
+        self.assertEqual(len(before)+len(after),len(actual['evaluated']))
+        self.assertEqual(p['method']['name'],'hierarchical_coordinate_v1_1')
+
     def test_fixed_integer_conditional_and_exact_simplex(self):
         p=example();p['variables']['terminal_tip_speed_weight']=dict(kind='continuous',bounds=[.1,.1],initial=.1)
         problem,topology=validate_problem(p)

@@ -57,7 +57,8 @@ class Structure(Contract):
 
 
 class Method(Contract):
-    name: Literal['hierarchical_coordinate_v1'] = 'hierarchical_coordinate_v1'
+    # Preserve the archived method; new work uses an order independent of JSON.
+    name: Literal['hierarchical_coordinate_v1','hierarchical_coordinate_v1_1'] = 'hierarchical_coordinate_v1_1'
     initial_structures: list[Structure] = Field(default_factory=list,max_length=3)
     step: FiniteFloat = Field(default=.25,gt=0,le=.5)
     minimum_step: FiniteFloat = Field(default=.03125,gt=0,le=.5)

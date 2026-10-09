@@ -6,6 +6,15 @@
 use `tools.design_optimization.solve(problem, authorized_host)`. Strands and
 direct calls share the numerical solver and receipt-backed execution service.
 
+The default numerical method is `hierarchical_coordinate_v1_1`: active length
+indices come first, followed by sorted scalar variable names. Proposals reconstruct
+their vector from these named coordinates, so JSON key ordering cannot change
+the resumed search. `hierarchical_coordinate_v1` remains available to reconstruct
+the archived study. Its restored coordinate order is not stable; use v1_1 for new
+problems. The completed first study used v1 at commit
+`8220d634fa369eec65691a8779f4f87357b6329d`, without interruption. The repair was
+checked offline after STOP; it is not a second physical study.
+
 The rule-generated `serial_two_group_v1` family supports 2–4 physical flexible
 segments, a proximal and a distal tendon group, independently 3 or 4 tendons
 per group, and one actuator per tendon. Total tendon and actuator counts are
@@ -97,6 +106,13 @@ Unknown backend/provider outcomes retain reservations and block blind replay.
 Use original Store and framework sessions for recovery; exported archives are
 evidence, not a fresh grant. Historical roots/owners are linked explicitly;
 historical evidence is never rebound to the new generator for exact execution reuse.
+
+The delivered activity is stopped. Its directory, original clock, grant and
+receipts must not be reset to create new experiment capacity. The reusable
+`solve(problem, authorized_host)` service and native schemas can be used in
+another explicitly authorized activity with its own grant and clock. Public
+requests there may supply different legal length baselines; this first activity
+intentionally freezes its original baseline and initialization rules.
 
 The export keeps exact requests/responses, search states, solver/controller
 inputs, trajectories, receipts, and checkpoints once in `immutable_artifacts.tar.gz`.

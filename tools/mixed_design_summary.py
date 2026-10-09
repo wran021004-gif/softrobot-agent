@@ -3,6 +3,7 @@ from pathlib import Path
 import hashlib
 import io
 import json
+import subprocess
 import tarfile
 import time
 from tools.platform_store import plain
@@ -31,9 +32,28 @@ def summarize(h):
                 r['execution_status'] in ('accepted','valid_failure') for r in rows)))
     updates=0
     for r in rows+confirmations:updates+=r['evidence'].get('feedback',{}).get('actual_applied_control_updates') or 0
+    exactness=[]
+    from copy import deepcopy
+    for r in confirmations:
+        a=h.store.session(r['used_feedback'])['snapshot'];b=h.store.session(r['candidate_id'])['snapshot']
+        x=deepcopy(a['input']);y=deepcopy(b['input']);x.pop('run_id');y.pop('run_id')
+        exactness.append(dict(selected_candidate_id=r['used_feedback'],confirmation_candidate_id=r['candidate_id'],
+            identical_input_except_run_id=x==y,input_identity=digest(x),same_dependencies=a['dependencies']==b['dependencies'],
+            same_project_commit=a['project_commit']==b['project_commit']))
+    from schemas.design_optimization import Method
+    historical_manifest=json.loads((Path(__file__).resolve().parents[1]/'evidence/research_mainline5_20261009/archive_manifest.json').read_text())
     return dict(activity_id=h.run_id,status=state['mixed_status'],implementation_commit=state.get('mixed_freeze'),
+        delivery_source_commit=subprocess.check_output(['git','rev-parse','HEAD'],cwd=Path(__file__).resolve().parents[1],text=True).strip(),
+        methods=dict(actual_live=[s['problem']['method']['name'] for s in searches],delivered_default=Method().name,
+            recovery_repair_evidence='recovery_coordinate_observation.json',repair_physically_retested=False),
         specification=state['mixed_spec'],problems=[s['problem'] for s in searches],
         optimization_results=[result_from_state(h,s) for s in searches],confirmations=confirmations,
+        confirmation_exactness=exactness,
+        factual_annotations=['One fresh confirmation was executed. All three physical metrics match this development observation exactly; no deterministic or statistical reproducibility guarantee follows.',
+            'The principal wording "no replication" does not erase the fresh confirmation; no broader repeatability campaign was performed.'],
+        historical_evidence=dict(comparison='historical_comparison.json',source_commit='600fab815fc048fbe251b4594cc39411e2bf58ab',
+            original_archive='evidence/research_mainline5_20261009/immutable_artifacts.tar.gz',
+            archive_sha256=historical_manifest['sha256'],original_ownership_preserved=True),
         original_principal_decisions=[dict(reference=ref,content=h.store.artifact(ref)) for ref in state['mixed_decisions']],
         support=dict(declared_segment_counts=[2,3,4],declared_group_counts=[3,4],constructed_and_executed=support,
             additional_offline_constructed=[[2,3,3],[3,4,4],[4,3,4]],unexecuted_domain_is_not_validated=True),
