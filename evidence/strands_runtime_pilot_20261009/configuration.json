@@ -1,0 +1,68 @@
+{
+  "harness": "strands-harness==0.2.0",
+  "sdk": "strands-agents==1.59.0",
+  "provider": {
+    "adapter": "deepseek",
+    "adapter_version": "8.0.0",
+    "base_url": "https://api.deepseek.com",
+    "context_bytes": 4194304,
+    "context_guard": {
+      "context_limit_tokens": 1000000,
+      "estimate": "one token per serialized UTF-8 byte plus framing; conservative estimate, not tokenization",
+      "framing_headroom_tokens": 8192,
+      "source": "https://api-docs.deepseek.com/quick_start/pricing/",
+      "verified_date": "2026-10-03"
+    },
+    "investigation_max_tokens": 32768,
+    "max_no_progress": 3,
+    "max_repairs": 2,
+    "max_tokens": 32768,
+    "max_turns": 24,
+    "model": "deepseek-flash",
+    "parameters": {
+      "investigation_contract": "selected_reports_v4"
+    },
+    "protocol_recovery": {
+      "max_consecutive": 1,
+      "max_total": 2
+    },
+    "reasoning_effort": "high",
+    "strategy": "strategy.tool",
+    "strategy_version": "1.0.0",
+    "supports_images": false,
+    "supports_text": true,
+    "supports_tools": true,
+    "thinking": "enabled",
+    "timeout_s": 600.0,
+    "tool_naming": {
+      "mapping_identity": "ae769b2a4822b5f771cf13adb207ddaacbf36b90d1fe8232fa562f3638014a68",
+      "scheme": "readable_v1"
+    }
+  },
+  "registered_tools": [
+    "discover_evidence",
+    "get_receipt",
+    "read_original",
+    "retrieve_context",
+    "submit_result"
+  ],
+  "session_id": "strands-pilot-294ed67bfd64",
+  "disabled": [
+    "shell",
+    "read",
+    "write",
+    "edit",
+    "web_fetch",
+    "web_search",
+    "programmatic_tool_caller",
+    "subagent",
+    "background_tasks",
+    "memory",
+    "skills",
+    "todos",
+    "environment"
+  ],
+  "retry_controllers": 0,
+  "context": "auto",
+  "transport": "httpx.MockTransport; fixtures only"
+}
