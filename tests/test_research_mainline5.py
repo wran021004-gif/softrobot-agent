@@ -237,3 +237,12 @@ class Mainline5Tests(TestCase):
             row['feedback_result']={'mode':'offline repaired receipt'}
         with patch.object(m5,'apply_decision',side_effect=repaired):m5.recover_business(restored)
         self.assertEqual(restored.store.remaining(),before)
+
+    def test_continuation_exposes_exact_current_feedback_without_new_send(self):
+        w=self.w;s.configure(w);before=w.store.remaining()
+        prompt=m5.continuation_prompt(w);facts=json.loads(prompt.split('\n',1)[1])
+        ref=w.store.artifact(w.feedback)['result']
+        self.assertEqual(facts['current_feedback_reference'],ref)
+        self.assertTrue(facts['current_feedback_aliases'])
+        self.assertEqual(facts['current_feedback_aliases'],s.decision_aliases(s.aliases(w,ref)))
+        self.assertEqual(w.store.remaining(),before)

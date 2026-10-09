@@ -222,8 +222,7 @@ def run(directory=service.RUN):
     service.persist(w)
     try:
         agent=build_live(w)
-        prompt=None if pilot(w.host).get('unconsumed_response') else (
-            'Continue the same authorized Mainline5 activity from CURRENT_BUSINESS_PACKET. Consume actual saved feedback and deliver research_decide. Do not repeat sealed executions.')
+        prompt=None if pilot(w.host).get('unconsumed_response') else continuation_prompt(w)
         asyncio.run(converse(w,agent,prompt))
     except Exception as exc:
         atomic_json(w.directory/'failure.json',dict(type=type(exc).__name__,message=str(exc),usage=w.store.remaining()))
@@ -242,11 +241,33 @@ async def converse(w,agent,prompt):
             record(w.host,'mainline5_incomplete_response',dict(reason='max_tokens',
                 partial_history_owner='Strands',decision_accepted=False))
         if w.status not in ('model_stopped','execution_stopped'):
-            prompt=('No final formal research disposition was received. Continue through a native tool now. '
-                'Use the current exact schema and F aliases. Choose one justified bounded next action; '
-                'you do not need to solve the whole study before observing its first outcomes. '
-                'If the preceding response was length-truncated, it is retained as incomplete reasoning, not an accepted decision. '
-                'Do not replay sealed experiments; STOP remains available when justified.')
+            prompt=continuation_prompt(w)
+
+
+def continuation_prompt(w):
+    """Present current business facts in the explicit Strands continuation.
+
+    Avoid stale tool-result prose becoming the apparent activity state. This
+    neither chooses a research action nor replaces framework-owned history.
+    """
+    current=w.store.artifact(w.feedback);completed=[]
+    for record in w.records:
+        if record['source_store']!=str(w.directory):continue
+        candidate=record['facts']['candidate'];cfg=w.store.artifact(candidate['configuration'])['effective']
+        recipe=cfg['policy']['controller']['parameters']['data']['recipe']
+        completed.append(dict(candidate=candidate,accepted=record['acceptance']['accepted'],
+            status=record['acceptance']['status'],metrics=record['acceptance']['metrics'],
+            actual_weights={k:recipe[k] for k in ('holding_tip_speed_weight','terminal_tip_speed_weight')},
+            actual_structural_selections=cfg['robot']['structure']['data'].get('metadata',{}).get('v2_selections',{})))
+    binding=dict(current_feedback_reference=current['result'],current_feedback_status=current['content'].get('status'),
+        current_feedback_aliases=service.decision_aliases(service.aliases(w,current['result'])),
+        completed_new_executions=completed,actual_verification=w.verification)
+    return ('Continue the SAME Mainline5 activity through a native tool. The following current business facts supersede '
+        'stale prose saying sealed operations are still unexecuted. Evidence artifacts themselves do not contain an /aliases '
+        'or /reference_view member: copy the exact current_feedback_aliases below; use their original pointers for evidence reads. '
+        'An accepted decision must cite this CURRENT feedback, not only the initial_evidence artifact. '
+        'Interpret the actual results and choose your own justified legal next action or STOP. Do not repeat sealed experiments. '
+        'Length-truncated reasoning is incomplete and remains in Strands history.\n'+json.dumps(binding,ensure_ascii=False))
 
 
 def main():
