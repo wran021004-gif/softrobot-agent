@@ -44,10 +44,8 @@ class ContinuationTests(TestCase):
         from tools.disposition_facts import BindingError
         source=fixture.ROOT/'evidence/research_mainline3_v1_handoff_20261009'
         raw=read(source/'principal_saved_response3.json')
-        from tools import research_v1_continue as activity
-        manifest=read(source/'validation_manifest.json')
-        store=Store(fixture.ROOT/manifest['phases']['coordinated']['output'])
-        session=store.session('mainline3-coordinated')
+        bundle=read(source/'coordinated_bundle.json')
+        session=dict(state=bundle['state'],snapshot=bundle['snapshot'])
         with patch.object(self.dispatch.store,'session',return_value=session):
             with self.assertRaises(BindingError) as raised:self.dispatch._decode(raw,node_id='principal-coordinated-v2')
         issue=raised.exception.issue
@@ -60,10 +58,10 @@ class ContinuationTests(TestCase):
         from extensions.tendon_family.gvs_profile import execution_scope
         from schemas.platform import SessionInput
         source=fixture.ROOT/'evidence/research_mainline3_v1_handoff_20261009'
-        manifest=read(source/'validation_manifest.json');store=Store(fixture.ROOT/manifest['phases']['fixed']['output'])
-        session=store.session('mainline3-fixed');baseline=SessionInput.model_validate(session['snapshot']['input'])
-        metadata=session['state']['result_executions'][json.loads(store.lookup('mainline3-fixed','fixed-simulation')['receipt'])['execution_id']]
-        candidate=store.artifact(metadata['candidate_input']);executed=report_configuration(candidate,baseline)
+        bundle=read(source/'fixed_bundle.json');baseline=SessionInput.model_validate(bundle['snapshot']['input'])
+        execution=read(source/'fixed_result.json')['receipts'][4]['execution_id']
+        metadata=bundle['state']['result_executions'][execution]
+        candidate=bundle['artifacts'][metadata['candidate_input']['artifact_id']];executed=report_configuration(candidate,baseline)
         self.assertEqual(plain(executed),candidate['effective'])
         self.assertNotEqual(execution_scope(executed),execution_scope(baseline))
         changed=deepcopy(candidate);changed['baseline_identity']='0'*64

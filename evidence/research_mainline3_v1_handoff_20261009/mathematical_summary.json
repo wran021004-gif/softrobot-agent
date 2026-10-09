@@ -1,0 +1,1353 @@
+{
+  "status": "Three public mathematical operations complete; three available local operating points and one unavailable geometric intermediate point recorded without retry.",
+  "operations": {
+    "fixed-linear": {
+      "receipt": {
+        "analysis_status": "not_assessed",
+        "cache_hit": false,
+        "caller": "local-human",
+        "charged": {
+          "backend_solves": 0,
+          "model_calls": 0,
+          "tool_calls": 1,
+          "wall_s": 13.796999999962281,
+          "worker_calls": 0
+        },
+        "contract_version": "1.2.0",
+        "error": null,
+        "execution_id": "c5cca41e1bbc4e59b5f2c0dd3ec956b3",
+        "execution_status": "completed",
+        "original_execution_id": null,
+        "output": {
+          "artifact_id": "0696f0f33ec55f73c745606cfce5622305e9fc8337bf5543ef82123d81d12353",
+          "media_type": "application/json"
+        },
+        "request_id": "fixed-linear",
+        "result_contract": "AnalysisResult",
+        "result_version": "1.0.0",
+        "solver_status": "not_run",
+        "task_success": null,
+        "tool_id": "analysis.linearize_configuration",
+        "tool_version": "1.0.0"
+      },
+      "kind": "candidate_linearization",
+      "records": [
+        {
+          "point": {
+            "actual_time_s": null,
+            "available": true,
+            "construction": {
+              "achieved_world_point_m": [
+                0.29799999999999993,
+                0.0,
+                0.15
+              ],
+              "execution_data_used": false,
+              "initializer_source": {
+                "extension_id": "initialize.family",
+                "parameters": {
+                  "contract": "family.initial",
+                  "data": {
+                    "qpos_rad": {
+                      "far_cell_0_y": 0.0,
+                      "far_cell_0_z": 0.0,
+                      "far_cell_10_y": 0.0,
+                      "far_cell_10_z": 0.0,
+                      "far_cell_11_y": 0.0,
+                      "far_cell_11_z": 0.0,
+                      "far_cell_1_y": 0.0,
+                      "far_cell_1_z": 0.0,
+                      "far_cell_2_y": 0.0,
+                      "far_cell_2_z": 0.0,
+                      "far_cell_3_y": 0.0,
+                      "far_cell_3_z": 0.0,
+                      "far_cell_4_y": 0.0,
+                      "far_cell_4_z": 0.0,
+                      "far_cell_5_y": 0.0,
+                      "far_cell_5_z": 0.0,
+                      "far_cell_6_y": 0.0,
+                      "far_cell_6_z": 0.0,
+                      "far_cell_7_y": 0.0,
+                      "far_cell_7_z": 0.0,
+                      "far_cell_8_y": 0.0,
+                      "far_cell_8_z": 0.0,
+                      "far_cell_9_y": 0.0,
+                      "far_cell_9_z": 0.0,
+                      "near_cell_0_y": 0.0,
+                      "near_cell_0_z": 0.0,
+                      "near_cell_10_y": 0.0,
+                      "near_cell_10_z": 0.0,
+                      "near_cell_11_y": 0.0,
+                      "near_cell_11_z": 0.0,
+                      "near_cell_1_y": 0.0,
+                      "near_cell_1_z": 0.0,
+                      "near_cell_2_y": 0.0,
+                      "near_cell_2_z": 0.0,
+                      "near_cell_3_y": 0.0,
+                      "near_cell_3_z": 0.0,
+                      "near_cell_4_y": 0.0,
+                      "near_cell_4_z": 0.0,
+                      "near_cell_5_y": 0.0,
+                      "near_cell_5_z": 0.0,
+                      "near_cell_6_y": 0.0,
+                      "near_cell_6_z": 0.0,
+                      "near_cell_7_y": 0.0,
+                      "near_cell_7_z": 0.0,
+                      "near_cell_8_y": 0.0,
+                      "near_cell_8_z": 0.0,
+                      "near_cell_9_y": 0.0,
+                      "near_cell_9_z": 0.0
+                    },
+                    "qvel_rad_s": {
+                      "far_cell_0_y": 0.0,
+                      "far_cell_0_z": 0.0,
+                      "far_cell_10_y": 0.0,
+                      "far_cell_10_z": 0.0,
+                      "far_cell_11_y": 0.0,
+                      "far_cell_11_z": 0.0,
+                      "far_cell_1_y": 0.0,
+                      "far_cell_1_z": 0.0,
+                      "far_cell_2_y": 0.0,
+                      "far_cell_2_z": 0.0,
+                      "far_cell_3_y": 0.0,
+                      "far_cell_3_z": 0.0,
+                      "far_cell_4_y": 0.0,
+                      "far_cell_4_z": 0.0,
+                      "far_cell_5_y": 0.0,
+                      "far_cell_5_z": 0.0,
+                      "far_cell_6_y": 0.0,
+                      "far_cell_6_z": 0.0,
+                      "far_cell_7_y": 0.0,
+                      "far_cell_7_z": 0.0,
+                      "far_cell_8_y": 0.0,
+                      "far_cell_8_z": 0.0,
+                      "far_cell_9_y": 0.0,
+                      "far_cell_9_z": 0.0,
+                      "near_cell_0_y": 0.0,
+                      "near_cell_0_z": 0.0,
+                      "near_cell_10_y": 0.0,
+                      "near_cell_10_z": 0.0,
+                      "near_cell_11_y": 0.0,
+                      "near_cell_11_z": 0.0,
+                      "near_cell_1_y": 0.0,
+                      "near_cell_1_z": 0.0,
+                      "near_cell_2_y": 0.0,
+                      "near_cell_2_z": 0.0,
+                      "near_cell_3_y": 0.0,
+                      "near_cell_3_z": 0.0,
+                      "near_cell_4_y": 0.0,
+                      "near_cell_4_z": 0.0,
+                      "near_cell_5_y": 0.0,
+                      "near_cell_5_z": 0.0,
+                      "near_cell_6_y": 0.0,
+                      "near_cell_6_z": 0.0,
+                      "near_cell_7_y": 0.0,
+                      "near_cell_7_z": 0.0,
+                      "near_cell_8_y": 0.0,
+                      "near_cell_8_z": 0.0,
+                      "near_cell_9_y": 0.0,
+                      "near_cell_9_z": 0.0
+                    },
+                    "unspecified": "zero"
+                  },
+                  "version": "1.0.0"
+                },
+                "version": "1.0.0"
+              },
+              "input_source": "family.design.tendons[].pretension_n",
+              "method": "actual initializer projected by existing controller preparation plus declared tendon pretension",
+              "position_residual_m": 0.053749418601506754,
+              "static_equilibrium": false
+            },
+            "name": "standardized_initial_pretension",
+            "phase": "configuration_standardized_initial_pretension",
+            "remaining_task_s": 0.35,
+            "scope": "standardized initial/pretension"
+          },
+          "model": {
+            "artifact_id": "80c6ca50cd43880f347255c1ec3aeba3fbbc9f477ef5d4990e173d7882b696b4",
+            "media_type": "application/json"
+          },
+          "construction": {
+            "method": "actual initializer projected by existing controller preparation plus declared tendon pretension",
+            "position_residual_m": 0.053749418601506754
+          },
+          "derivative_check": null
+        },
+        {
+          "point": {
+            "actual_time_s": null,
+            "available": true,
+            "construction": {
+              "achieved_world_point_m": [
+                0.29799999999999993,
+                0.0,
+                0.15
+              ],
+              "execution_trajectory_used": false,
+              "method": "existing immutable controller preparation/numerical-source logic",
+              "numerical_source": "bundled_guess",
+              "position_residual_m": 0.053749418601506754,
+              "preparation_provenance": {
+                "actual_initial_state_source": "Candidate Task initializer then measured backend state at every update",
+                "current_scope": {
+                  "backend": {
+                    "extension_id": "backend.family_mujoco",
+                    "parameters": {
+                      "contract": "family.mujoco_parameters",
+                      "data": {},
+                      "version": "1.0.0"
+                    },
+                    "version": "1.1.0"
+                  },
+                  "controller": {
+                    "extension_id": "controller.gvs_nmpc",
+                    "parameters": {
+                      "contract": "family.gvs_reach_control",
+                      "data": {
+                        "numerical_source": "bundled_guess",
+                        "recipe": {
+                          "basis": {
+                            "strategy": "structural_linear"
+                          },
+                          "constraint_jacobian_mode": "reverse",
+                          "curvature_scale_rad_m": 10.0,
+                          "evaluation_threads": 1,
+                          "feasible_return": {
+                            "budget_s": 15.0,
+                            "minimum_s": 5.0,
+                            "relative_improvement": 0.1
+                          },
+                          "holding_brake_lead_s": 0.0,
+                          "holding_tip_speed_weight": 0.05,
+                          "horizon": 10,
+                          "max_cpu_s": 30.0,
+                          "max_iterations": 120,
+                          "max_unusable_updates": 3,
+                          "position_error_scale_m": null,
+                          "rate_scale_rad_m_s": 1000.0,
+                          "recover_returned_tensions": false,
+                          "regenerate_warm_states": true,
+                          "seed_position_tolerance_fraction": 0.5,
+                          "seed_speed_limit_m_s": 0.02,
+                          "substeps": 1,
+                          "tension_weight": 0.0001,
+                          "terminal_tip_speed_weight": 0.1,
+                          "terminal_velocity_weight": 0.0001,
+                          "terminal_weight": 5.0,
+                          "tip_speed_scale_m_s": 0.02,
+                          "tolerance": 1e-06,
+                          "tracking_weight": 1.0,
+                          "variation_weight": 0.001,
+                          "velocity_weight": 0.0001
+                        },
+                        "settling": {
+                          "position_limit_m": 0.01,
+                          "speed_limit_m_s": 0.02,
+                          "window_s": 0.05
+                        }
+                      },
+                      "version": "1.0.0"
+                    },
+                    "version": "9.0.0"
+                  },
+                  "discretization": {
+                    "contract": "family.discretization",
+                    "data": {
+                      "cells": {
+                        "far": 12,
+                        "near": 12
+                      },
+                      "coordinates": "two_principal_bending_angles_per_cell",
+                      "model": "serial_bending_cells_v1",
+                      "version": "serial_bending_discretization_v1"
+                    },
+                    "version": "1.0.0"
+                  },
+                  "execution_model": {
+                    "extension_id": "model.serial_bending_cells",
+                    "parameters": {
+                      "contract": "family.dynamics_model",
+                      "data": {},
+                      "version": "1.0.0"
+                    },
+                    "version": "1.0.0"
+                  },
+                  "robot": {
+                    "family": "tendon_robot_family",
+                    "identity": "0a0bad0e7e50ba6329801c180c5dc7466617de865ce373e6f0bb494637a88306"
+                  },
+                  "seed": 17,
+                  "task": {
+                    "environment": "5cee25b33f4ff19cb0abd93651ce9077a81665990f07d8f5a4967497e8e82a4d",
+                    "family": "task.reach",
+                    "goal": "7906a8d6f1938670b3b029be161c8f1869097280b1ee24a198da30b2fff4c264",
+                    "identity": "d0f438cf0a0149adba72f8358cdcbbe21ddd5a32fbd066c5a9f03d7f092e2df7",
+                    "initializer": "18ab6a6c8e5909fe738ba3b5722e7b423985abe57486bc16e69f897a7a0b4cc8",
+                    "timing": {
+                      "control_period_s": 0.01,
+                      "duration_s": 0.35,
+                      "sample_period_s": 0.01,
+                      "termination": [
+                        "duration",
+                        "numerical_failure"
+                      ],
+                      "timestep_s": 0.0005
+                    }
+                  }
+                },
+                "historical_source": {
+                  "artifact_id": "ef29737728ddd95d0e5da3bde818d910bee86abe04f13bf41521277f7e216d68",
+                  "media_type": "application/json"
+                },
+                "historical_states_reused": false,
+                "nominal_is_current_target_solution": false,
+                "physics_identity": "bcc9eb5d0e68be3134e5111167079e99585be5f491b8f7bd6def7dafb553e80e",
+                "previous_input_source": "compatible bounded historical initial input",
+                "resolved_basis_identity": "9ad3d2a110fd584207feee3d971231ad00f9c62707cecb998d7102e342564e2f",
+                "reused": true,
+                "source_kind": "compatible_historical_tensions_only",
+                "validity": "Tensions are numerical guesses; placeholder states must be regenerated using candidate dynamics before use"
+              },
+              "static_equilibrium": false
+            },
+            "name": "controller_start_input",
+            "phase": "configuration_controller_start_input",
+            "remaining_task_s": 0.35,
+            "scope": "controller-start input"
+          },
+          "model": {
+            "artifact_id": "f3695c30a6db6dd39fa20054ab98d64a0b2d2e9c1bcc0fbdbdfede23e560a813",
+            "media_type": "application/json"
+          },
+          "construction": {
+            "method": "existing immutable controller preparation/numerical-source logic",
+            "position_residual_m": 0.053749418601506754
+          },
+          "derivative_check": null
+        },
+        {
+          "point": {
+            "actual_time_s": null,
+            "available": true,
+            "construction": {
+              "achieved_world_point_m": [
+                0.29000000158311595,
+                0.035000000108621594,
+                0.19000000010994994
+              ],
+              "execution_data_used": false,
+              "iterations": 16,
+              "maximum_iterations": 20,
+              "message": "Optimization terminated successfully",
+              "method": "single bounded-tension target-associated static SLSQP attempt; no recovery",
+              "position_limit_m": 0.01,
+              "position_residual_m": 1.5906425803966992e-09,
+              "q_bounds": "unbounded, matching existing GVS inverse-static authorization",
+              "requested_world_point_m": [
+                0.29,
+                0.035,
+                0.19
+              ],
+              "solver": "scipy.optimize.SLSQP",
+              "static_force_tolerance": 1e-10,
+              "static_residual_inf": 2.1180973641676815e-15,
+              "status": 0,
+              "success": true,
+              "tension_bounds_n": [
+                [
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  8.0,
+                  8.0,
+                  8.0,
+                  8.0,
+                  8.0,
+                  8.0
+                ]
+              ]
+            },
+            "name": "target_equilibrium",
+            "phase": "configuration_target_static_equilibrium",
+            "remaining_task_s": 0.35,
+            "scope": "target-associated static attempt"
+          },
+          "model": {
+            "artifact_id": "9830d35e29ec20e1d9e86eb3625345c6f8fed774f2cfa3b7b66861123292cc81",
+            "media_type": "application/json"
+          },
+          "construction": {
+            "method": "single bounded-tension target-associated static SLSQP attempt; no recovery",
+            "position_limit_m": 0.01,
+            "position_residual_m": 1.5906425803966992e-09,
+            "static_force_tolerance": 1e-10,
+            "static_residual_inf": 2.1180973641676815e-15,
+            "status": 0,
+            "success": true
+          },
+          "derivative_check": null
+        },
+        {
+          "name": "halfway_waypoint",
+          "available": false,
+          "reason": "Geometric intermediate construction unavailable within the frozen single-attempt limits."
+        }
+      ],
+      "limitations": [
+        "Local unconstrained frozen Jacobians; finite Gramians do not establish unilateral bounded-input feasibility.",
+        "Open-loop authority does not establish closed-loop stability, settling, or real-time execution.",
+        "Numerical agreement is implementation verification, not physical model validation.",
+        "Saved non-equilibrium frequency curves are frozen-Jacobian resolvents, not measured steady-state responses.",
+        "Intermediate waypoint is geometric and is not asserted to be a static equilibrium.",
+        "Owned candidate configuration-only analysis; no execution outcomes or trajectories were used."
+      ]
+    },
+    "fixed-metrics": {
+      "receipt": {
+        "analysis_status": "not_assessed",
+        "cache_hit": false,
+        "caller": "local-human",
+        "charged": {
+          "backend_solves": 0,
+          "model_calls": 0,
+          "tool_calls": 1,
+          "wall_s": 1.047000000020489,
+          "worker_calls": 0
+        },
+        "contract_version": "1.2.0",
+        "error": null,
+        "execution_id": "36e06eb02e4242b1a0fd167cbb0dba25",
+        "execution_status": "completed",
+        "original_execution_id": null,
+        "output": {
+          "artifact_id": "eddd946cf01795f9513e5efcaf3dcd756c8c754c7bcb7ffcd09146ea20efb46b",
+          "media_type": "application/json"
+        },
+        "request_id": "fixed-metrics",
+        "result_contract": "AnalysisResult",
+        "result_version": "2.0.0",
+        "solver_status": "not_run",
+        "task_success": null,
+        "tool_id": "analysis.control_metrics",
+        "tool_version": "2.0.0"
+      },
+      "kind": "control_metrics",
+      "records": [
+        {
+          "operating_point": {
+            "actual_time_s": null,
+            "available": true,
+            "construction": {
+              "achieved_world_point_m": [
+                0.29799999999999993,
+                0.0,
+                0.15
+              ],
+              "execution_data_used": false,
+              "initializer_source": {
+                "extension_id": "initialize.family",
+                "parameters": {
+                  "contract": "family.initial",
+                  "data": {
+                    "qpos_rad": {
+                      "far_cell_0_y": 0.0,
+                      "far_cell_0_z": 0.0,
+                      "far_cell_10_y": 0.0,
+                      "far_cell_10_z": 0.0,
+                      "far_cell_11_y": 0.0,
+                      "far_cell_11_z": 0.0,
+                      "far_cell_1_y": 0.0,
+                      "far_cell_1_z": 0.0,
+                      "far_cell_2_y": 0.0,
+                      "far_cell_2_z": 0.0,
+                      "far_cell_3_y": 0.0,
+                      "far_cell_3_z": 0.0,
+                      "far_cell_4_y": 0.0,
+                      "far_cell_4_z": 0.0,
+                      "far_cell_5_y": 0.0,
+                      "far_cell_5_z": 0.0,
+                      "far_cell_6_y": 0.0,
+                      "far_cell_6_z": 0.0,
+                      "far_cell_7_y": 0.0,
+                      "far_cell_7_z": 0.0,
+                      "far_cell_8_y": 0.0,
+                      "far_cell_8_z": 0.0,
+                      "far_cell_9_y": 0.0,
+                      "far_cell_9_z": 0.0,
+                      "near_cell_0_y": 0.0,
+                      "near_cell_0_z": 0.0,
+                      "near_cell_10_y": 0.0,
+                      "near_cell_10_z": 0.0,
+                      "near_cell_11_y": 0.0,
+                      "near_cell_11_z": 0.0,
+                      "near_cell_1_y": 0.0,
+                      "near_cell_1_z": 0.0,
+                      "near_cell_2_y": 0.0,
+                      "near_cell_2_z": 0.0,
+                      "near_cell_3_y": 0.0,
+                      "near_cell_3_z": 0.0,
+                      "near_cell_4_y": 0.0,
+                      "near_cell_4_z": 0.0,
+                      "near_cell_5_y": 0.0,
+                      "near_cell_5_z": 0.0,
+                      "near_cell_6_y": 0.0,
+                      "near_cell_6_z": 0.0,
+                      "near_cell_7_y": 0.0,
+                      "near_cell_7_z": 0.0,
+                      "near_cell_8_y": 0.0,
+                      "near_cell_8_z": 0.0,
+                      "near_cell_9_y": 0.0,
+                      "near_cell_9_z": 0.0
+                    },
+                    "qvel_rad_s": {
+                      "far_cell_0_y": 0.0,
+                      "far_cell_0_z": 0.0,
+                      "far_cell_10_y": 0.0,
+                      "far_cell_10_z": 0.0,
+                      "far_cell_11_y": 0.0,
+                      "far_cell_11_z": 0.0,
+                      "far_cell_1_y": 0.0,
+                      "far_cell_1_z": 0.0,
+                      "far_cell_2_y": 0.0,
+                      "far_cell_2_z": 0.0,
+                      "far_cell_3_y": 0.0,
+                      "far_cell_3_z": 0.0,
+                      "far_cell_4_y": 0.0,
+                      "far_cell_4_z": 0.0,
+                      "far_cell_5_y": 0.0,
+                      "far_cell_5_z": 0.0,
+                      "far_cell_6_y": 0.0,
+                      "far_cell_6_z": 0.0,
+                      "far_cell_7_y": 0.0,
+                      "far_cell_7_z": 0.0,
+                      "far_cell_8_y": 0.0,
+                      "far_cell_8_z": 0.0,
+                      "far_cell_9_y": 0.0,
+                      "far_cell_9_z": 0.0,
+                      "near_cell_0_y": 0.0,
+                      "near_cell_0_z": 0.0,
+                      "near_cell_10_y": 0.0,
+                      "near_cell_10_z": 0.0,
+                      "near_cell_11_y": 0.0,
+                      "near_cell_11_z": 0.0,
+                      "near_cell_1_y": 0.0,
+                      "near_cell_1_z": 0.0,
+                      "near_cell_2_y": 0.0,
+                      "near_cell_2_z": 0.0,
+                      "near_cell_3_y": 0.0,
+                      "near_cell_3_z": 0.0,
+                      "near_cell_4_y": 0.0,
+                      "near_cell_4_z": 0.0,
+                      "near_cell_5_y": 0.0,
+                      "near_cell_5_z": 0.0,
+                      "near_cell_6_y": 0.0,
+                      "near_cell_6_z": 0.0,
+                      "near_cell_7_y": 0.0,
+                      "near_cell_7_z": 0.0,
+                      "near_cell_8_y": 0.0,
+                      "near_cell_8_z": 0.0,
+                      "near_cell_9_y": 0.0,
+                      "near_cell_9_z": 0.0
+                    },
+                    "unspecified": "zero"
+                  },
+                  "version": "1.0.0"
+                },
+                "version": "1.0.0"
+              },
+              "input_source": "family.design.tendons[].pretension_n",
+              "method": "actual initializer projected by existing controller preparation plus declared tendon pretension",
+              "position_residual_m": 0.053749418601506754,
+              "static_equilibrium": false
+            },
+            "name": "standardized_initial_pretension",
+            "phase": "configuration_standardized_initial_pretension",
+            "remaining_task_s": 0.35,
+            "scope": "standardized initial/pretension"
+          },
+          "model_reference": {
+            "artifact_id": "80c6ca50cd43880f347255c1ec3aeba3fbbc9f477ef5d4990e173d7882b696b4",
+            "media_type": "application/json"
+          },
+          "validity": {
+            "equilibrium": false,
+            "frequency_interpretation": "non-equilibrium local frozen Jacobian",
+            "normalized_drift_inf_s_inv": 803.4189494043604
+          },
+          "authority": {
+            "connected_band_rad_s": null,
+            "frequency_rad_s": [
+              0.1,
+              1.0,
+              10.0
+            ],
+            "minimum_singular_value": [
+              1.1055013017298253e-15,
+              2.25307902823461e-15,
+              6.363302145673848e-15
+            ],
+            "reason": "No independently justified task-required MIMO gain threshold; usable bandwidth undefined.",
+            "rule": "Smallest singular value >= threshold, connected grid band starting at lowest frequency; no extrapolation.",
+            "threshold": null
+          }
+        },
+        {
+          "operating_point": {
+            "actual_time_s": null,
+            "available": true,
+            "construction": {
+              "achieved_world_point_m": [
+                0.29799999999999993,
+                0.0,
+                0.15
+              ],
+              "execution_trajectory_used": false,
+              "method": "existing immutable controller preparation/numerical-source logic",
+              "numerical_source": "bundled_guess",
+              "position_residual_m": 0.053749418601506754,
+              "preparation_provenance": {
+                "actual_initial_state_source": "Candidate Task initializer then measured backend state at every update",
+                "current_scope": {
+                  "backend": {
+                    "extension_id": "backend.family_mujoco",
+                    "parameters": {
+                      "contract": "family.mujoco_parameters",
+                      "data": {},
+                      "version": "1.0.0"
+                    },
+                    "version": "1.1.0"
+                  },
+                  "controller": {
+                    "extension_id": "controller.gvs_nmpc",
+                    "parameters": {
+                      "contract": "family.gvs_reach_control",
+                      "data": {
+                        "numerical_source": "bundled_guess",
+                        "recipe": {
+                          "basis": {
+                            "strategy": "structural_linear"
+                          },
+                          "constraint_jacobian_mode": "reverse",
+                          "curvature_scale_rad_m": 10.0,
+                          "evaluation_threads": 1,
+                          "feasible_return": {
+                            "budget_s": 15.0,
+                            "minimum_s": 5.0,
+                            "relative_improvement": 0.1
+                          },
+                          "holding_brake_lead_s": 0.0,
+                          "holding_tip_speed_weight": 0.05,
+                          "horizon": 10,
+                          "max_cpu_s": 30.0,
+                          "max_iterations": 120,
+                          "max_unusable_updates": 3,
+                          "position_error_scale_m": null,
+                          "rate_scale_rad_m_s": 1000.0,
+                          "recover_returned_tensions": false,
+                          "regenerate_warm_states": true,
+                          "seed_position_tolerance_fraction": 0.5,
+                          "seed_speed_limit_m_s": 0.02,
+                          "substeps": 1,
+                          "tension_weight": 0.0001,
+                          "terminal_tip_speed_weight": 0.1,
+                          "terminal_velocity_weight": 0.0001,
+                          "terminal_weight": 5.0,
+                          "tip_speed_scale_m_s": 0.02,
+                          "tolerance": 1e-06,
+                          "tracking_weight": 1.0,
+                          "variation_weight": 0.001,
+                          "velocity_weight": 0.0001
+                        },
+                        "settling": {
+                          "position_limit_m": 0.01,
+                          "speed_limit_m_s": 0.02,
+                          "window_s": 0.05
+                        }
+                      },
+                      "version": "1.0.0"
+                    },
+                    "version": "9.0.0"
+                  },
+                  "discretization": {
+                    "contract": "family.discretization",
+                    "data": {
+                      "cells": {
+                        "far": 12,
+                        "near": 12
+                      },
+                      "coordinates": "two_principal_bending_angles_per_cell",
+                      "model": "serial_bending_cells_v1",
+                      "version": "serial_bending_discretization_v1"
+                    },
+                    "version": "1.0.0"
+                  },
+                  "execution_model": {
+                    "extension_id": "model.serial_bending_cells",
+                    "parameters": {
+                      "contract": "family.dynamics_model",
+                      "data": {},
+                      "version": "1.0.0"
+                    },
+                    "version": "1.0.0"
+                  },
+                  "robot": {
+                    "family": "tendon_robot_family",
+                    "identity": "0a0bad0e7e50ba6329801c180c5dc7466617de865ce373e6f0bb494637a88306"
+                  },
+                  "seed": 17,
+                  "task": {
+                    "environment": "5cee25b33f4ff19cb0abd93651ce9077a81665990f07d8f5a4967497e8e82a4d",
+                    "family": "task.reach",
+                    "goal": "7906a8d6f1938670b3b029be161c8f1869097280b1ee24a198da30b2fff4c264",
+                    "identity": "d0f438cf0a0149adba72f8358cdcbbe21ddd5a32fbd066c5a9f03d7f092e2df7",
+                    "initializer": "18ab6a6c8e5909fe738ba3b5722e7b423985abe57486bc16e69f897a7a0b4cc8",
+                    "timing": {
+                      "control_period_s": 0.01,
+                      "duration_s": 0.35,
+                      "sample_period_s": 0.01,
+                      "termination": [
+                        "duration",
+                        "numerical_failure"
+                      ],
+                      "timestep_s": 0.0005
+                    }
+                  }
+                },
+                "historical_source": {
+                  "artifact_id": "ef29737728ddd95d0e5da3bde818d910bee86abe04f13bf41521277f7e216d68",
+                  "media_type": "application/json"
+                },
+                "historical_states_reused": false,
+                "nominal_is_current_target_solution": false,
+                "physics_identity": "bcc9eb5d0e68be3134e5111167079e99585be5f491b8f7bd6def7dafb553e80e",
+                "previous_input_source": "compatible bounded historical initial input",
+                "resolved_basis_identity": "9ad3d2a110fd584207feee3d971231ad00f9c62707cecb998d7102e342564e2f",
+                "reused": true,
+                "source_kind": "compatible_historical_tensions_only",
+                "validity": "Tensions are numerical guesses; placeholder states must be regenerated using candidate dynamics before use"
+              },
+              "static_equilibrium": false
+            },
+            "name": "controller_start_input",
+            "phase": "configuration_controller_start_input",
+            "remaining_task_s": 0.35,
+            "scope": "controller-start input"
+          },
+          "model_reference": {
+            "artifact_id": "f3695c30a6db6dd39fa20054ab98d64a0b2d2e9c1bcc0fbdbdfede23e560a813",
+            "media_type": "application/json"
+          },
+          "validity": {
+            "equilibrium": false,
+            "frequency_interpretation": "non-equilibrium local frozen Jacobian",
+            "normalized_drift_inf_s_inv": 86726.33610679982
+          },
+          "authority": {
+            "connected_band_rad_s": null,
+            "frequency_rad_s": [
+              0.1,
+              1.0,
+              10.0
+            ],
+            "minimum_singular_value": [
+              3.239842939075274e-15,
+              3.7020335035964225e-15,
+              4.6294165645821286e-15
+            ],
+            "reason": "No independently justified task-required MIMO gain threshold; usable bandwidth undefined.",
+            "rule": "Smallest singular value >= threshold, connected grid band starting at lowest frequency; no extrapolation.",
+            "threshold": null
+          }
+        },
+        {
+          "operating_point": {
+            "actual_time_s": null,
+            "available": true,
+            "construction": {
+              "achieved_world_point_m": [
+                0.29000000158311595,
+                0.035000000108621594,
+                0.19000000010994994
+              ],
+              "execution_data_used": false,
+              "iterations": 16,
+              "maximum_iterations": 20,
+              "message": "Optimization terminated successfully",
+              "method": "single bounded-tension target-associated static SLSQP attempt; no recovery",
+              "position_limit_m": 0.01,
+              "position_residual_m": 1.5906425803966992e-09,
+              "q_bounds": "unbounded, matching existing GVS inverse-static authorization",
+              "requested_world_point_m": [
+                0.29,
+                0.035,
+                0.19
+              ],
+              "solver": "scipy.optimize.SLSQP",
+              "static_force_tolerance": 1e-10,
+              "static_residual_inf": 2.1180973641676815e-15,
+              "status": 0,
+              "success": true,
+              "tension_bounds_n": [
+                [
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  8.0,
+                  8.0,
+                  8.0,
+                  8.0,
+                  8.0,
+                  8.0
+                ]
+              ]
+            },
+            "name": "target_equilibrium",
+            "phase": "configuration_target_static_equilibrium",
+            "remaining_task_s": 0.35,
+            "scope": "target-associated static attempt"
+          },
+          "model_reference": {
+            "artifact_id": "9830d35e29ec20e1d9e86eb3625345c6f8fed774f2cfa3b7b66861123292cc81",
+            "media_type": "application/json"
+          },
+          "validity": {
+            "equilibrium": true,
+            "frequency_interpretation": "equilibrium LTI transfer",
+            "normalized_drift_inf_s_inv": 1.1672436076268337e-07
+          },
+          "authority": {
+            "connected_band_rad_s": null,
+            "frequency_rad_s": [
+              0.1,
+              1.0,
+              10.0
+            ],
+            "minimum_singular_value": [
+              1.6623925595697324,
+              1.661447429300592,
+              1.5801058185548862
+            ],
+            "reason": "No independently justified task-required MIMO gain threshold; usable bandwidth undefined.",
+            "rule": "Smallest singular value >= threshold, connected grid band starting at lowest frequency; no extrapolation.",
+            "threshold": null
+          }
+        }
+      ],
+      "limitations": [
+        "Local unconstrained frozen Jacobians; finite Gramians do not establish unilateral bounded-input feasibility.",
+        "Open-loop authority does not establish closed-loop stability, settling, or real-time execution.",
+        "Numerical agreement is implementation verification, not physical model validation.",
+        "Saved non-equilibrium frequency curves are frozen-Jacobian resolvents, not measured steady-state responses."
+      ]
+    },
+    "fixed-endpoint": {
+      "receipt": {
+        "analysis_status": "not_assessed",
+        "cache_hit": false,
+        "caller": "local-human",
+        "charged": {
+          "backend_solves": 0,
+          "model_calls": 0,
+          "tool_calls": 1,
+          "wall_s": 1.4369999999762513,
+          "worker_calls": 0
+        },
+        "contract_version": "1.2.0",
+        "error": null,
+        "execution_id": "e02fafeb64c446b18b2227a475584589",
+        "execution_status": "completed",
+        "original_execution_id": null,
+        "output": {
+          "artifact_id": "9ea501a2d8bbfbf00bbbebf3dab035863958e8843e41067bb30529d5a69071ed",
+          "media_type": "application/json"
+        },
+        "request_id": "fixed-endpoint",
+        "result_contract": "AnalysisResult",
+        "result_version": "1.0.0",
+        "solver_status": "not_run",
+        "task_success": null,
+        "tool_id": "analysis.bounded_endpoint",
+        "tool_version": "1.0.0"
+      },
+      "kind": "bounded_endpoint",
+      "records": [
+        {
+          "operating_point": {
+            "actual_time_s": null,
+            "available": true,
+            "construction": {
+              "achieved_world_point_m": [
+                0.29799999999999993,
+                0.0,
+                0.15
+              ],
+              "execution_data_used": false,
+              "initializer_source": {
+                "extension_id": "initialize.family",
+                "parameters": {
+                  "contract": "family.initial",
+                  "data": {
+                    "qpos_rad": {
+                      "far_cell_0_y": 0.0,
+                      "far_cell_0_z": 0.0,
+                      "far_cell_10_y": 0.0,
+                      "far_cell_10_z": 0.0,
+                      "far_cell_11_y": 0.0,
+                      "far_cell_11_z": 0.0,
+                      "far_cell_1_y": 0.0,
+                      "far_cell_1_z": 0.0,
+                      "far_cell_2_y": 0.0,
+                      "far_cell_2_z": 0.0,
+                      "far_cell_3_y": 0.0,
+                      "far_cell_3_z": 0.0,
+                      "far_cell_4_y": 0.0,
+                      "far_cell_4_z": 0.0,
+                      "far_cell_5_y": 0.0,
+                      "far_cell_5_z": 0.0,
+                      "far_cell_6_y": 0.0,
+                      "far_cell_6_z": 0.0,
+                      "far_cell_7_y": 0.0,
+                      "far_cell_7_z": 0.0,
+                      "far_cell_8_y": 0.0,
+                      "far_cell_8_z": 0.0,
+                      "far_cell_9_y": 0.0,
+                      "far_cell_9_z": 0.0,
+                      "near_cell_0_y": 0.0,
+                      "near_cell_0_z": 0.0,
+                      "near_cell_10_y": 0.0,
+                      "near_cell_10_z": 0.0,
+                      "near_cell_11_y": 0.0,
+                      "near_cell_11_z": 0.0,
+                      "near_cell_1_y": 0.0,
+                      "near_cell_1_z": 0.0,
+                      "near_cell_2_y": 0.0,
+                      "near_cell_2_z": 0.0,
+                      "near_cell_3_y": 0.0,
+                      "near_cell_3_z": 0.0,
+                      "near_cell_4_y": 0.0,
+                      "near_cell_4_z": 0.0,
+                      "near_cell_5_y": 0.0,
+                      "near_cell_5_z": 0.0,
+                      "near_cell_6_y": 0.0,
+                      "near_cell_6_z": 0.0,
+                      "near_cell_7_y": 0.0,
+                      "near_cell_7_z": 0.0,
+                      "near_cell_8_y": 0.0,
+                      "near_cell_8_z": 0.0,
+                      "near_cell_9_y": 0.0,
+                      "near_cell_9_z": 0.0
+                    },
+                    "qvel_rad_s": {
+                      "far_cell_0_y": 0.0,
+                      "far_cell_0_z": 0.0,
+                      "far_cell_10_y": 0.0,
+                      "far_cell_10_z": 0.0,
+                      "far_cell_11_y": 0.0,
+                      "far_cell_11_z": 0.0,
+                      "far_cell_1_y": 0.0,
+                      "far_cell_1_z": 0.0,
+                      "far_cell_2_y": 0.0,
+                      "far_cell_2_z": 0.0,
+                      "far_cell_3_y": 0.0,
+                      "far_cell_3_z": 0.0,
+                      "far_cell_4_y": 0.0,
+                      "far_cell_4_z": 0.0,
+                      "far_cell_5_y": 0.0,
+                      "far_cell_5_z": 0.0,
+                      "far_cell_6_y": 0.0,
+                      "far_cell_6_z": 0.0,
+                      "far_cell_7_y": 0.0,
+                      "far_cell_7_z": 0.0,
+                      "far_cell_8_y": 0.0,
+                      "far_cell_8_z": 0.0,
+                      "far_cell_9_y": 0.0,
+                      "far_cell_9_z": 0.0,
+                      "near_cell_0_y": 0.0,
+                      "near_cell_0_z": 0.0,
+                      "near_cell_10_y": 0.0,
+                      "near_cell_10_z": 0.0,
+                      "near_cell_11_y": 0.0,
+                      "near_cell_11_z": 0.0,
+                      "near_cell_1_y": 0.0,
+                      "near_cell_1_z": 0.0,
+                      "near_cell_2_y": 0.0,
+                      "near_cell_2_z": 0.0,
+                      "near_cell_3_y": 0.0,
+                      "near_cell_3_z": 0.0,
+                      "near_cell_4_y": 0.0,
+                      "near_cell_4_z": 0.0,
+                      "near_cell_5_y": 0.0,
+                      "near_cell_5_z": 0.0,
+                      "near_cell_6_y": 0.0,
+                      "near_cell_6_z": 0.0,
+                      "near_cell_7_y": 0.0,
+                      "near_cell_7_z": 0.0,
+                      "near_cell_8_y": 0.0,
+                      "near_cell_8_z": 0.0,
+                      "near_cell_9_y": 0.0,
+                      "near_cell_9_z": 0.0
+                    },
+                    "unspecified": "zero"
+                  },
+                  "version": "1.0.0"
+                },
+                "version": "1.0.0"
+              },
+              "input_source": "family.design.tendons[].pretension_n",
+              "method": "actual initializer projected by existing controller preparation plus declared tendon pretension",
+              "position_residual_m": 0.053749418601506754,
+              "static_equilibrium": false
+            },
+            "name": "standardized_initial_pretension",
+            "phase": "configuration_standardized_initial_pretension",
+            "remaining_task_s": 0.35,
+            "scope": "standardized initial/pretension"
+          },
+          "model_reference": {
+            "artifact_id": "80c6ca50cd43880f347255c1ec3aeba3fbbc9f477ef5d4990e173d7882b696b4",
+            "media_type": "application/json"
+          },
+          "position_only": {
+            "status": "feasible_in_local_model",
+            "checks": {
+              "finite": true,
+              "lower_bounds": true,
+              "position": true,
+              "speed": true,
+              "upper_bounds": true
+            },
+            "solver": {
+              "iterations": 22,
+              "maximum_iterations": 100,
+              "message": "Optimization terminated successfully",
+              "name": "scipy.optimize.SLSQP",
+              "status": 0,
+              "success": true
+            },
+            "model_scope": "Frozen continuous local affine model, exact ZOH held inputs; not nonlinear or physical feasibility."
+          },
+          "position_and_braking": {
+            "status": "undetermined",
+            "checks": {
+              "finite": true,
+              "lower_bounds": true,
+              "position": true,
+              "speed": false,
+              "upper_bounds": true
+            },
+            "solver": {
+              "iterations": 100,
+              "maximum_iterations": 100,
+              "message": "Iteration limit reached",
+              "name": "scipy.optimize.SLSQP",
+              "status": 9,
+              "success": false
+            },
+            "model_scope": "Frozen continuous local affine model, exact ZOH held inputs; not nonlinear or physical feasibility."
+          }
+        },
+        {
+          "operating_point": {
+            "actual_time_s": null,
+            "available": true,
+            "construction": {
+              "achieved_world_point_m": [
+                0.29799999999999993,
+                0.0,
+                0.15
+              ],
+              "execution_trajectory_used": false,
+              "method": "existing immutable controller preparation/numerical-source logic",
+              "numerical_source": "bundled_guess",
+              "position_residual_m": 0.053749418601506754,
+              "preparation_provenance": {
+                "actual_initial_state_source": "Candidate Task initializer then measured backend state at every update",
+                "current_scope": {
+                  "backend": {
+                    "extension_id": "backend.family_mujoco",
+                    "parameters": {
+                      "contract": "family.mujoco_parameters",
+                      "data": {},
+                      "version": "1.0.0"
+                    },
+                    "version": "1.1.0"
+                  },
+                  "controller": {
+                    "extension_id": "controller.gvs_nmpc",
+                    "parameters": {
+                      "contract": "family.gvs_reach_control",
+                      "data": {
+                        "numerical_source": "bundled_guess",
+                        "recipe": {
+                          "basis": {
+                            "strategy": "structural_linear"
+                          },
+                          "constraint_jacobian_mode": "reverse",
+                          "curvature_scale_rad_m": 10.0,
+                          "evaluation_threads": 1,
+                          "feasible_return": {
+                            "budget_s": 15.0,
+                            "minimum_s": 5.0,
+                            "relative_improvement": 0.1
+                          },
+                          "holding_brake_lead_s": 0.0,
+                          "holding_tip_speed_weight": 0.05,
+                          "horizon": 10,
+                          "max_cpu_s": 30.0,
+                          "max_iterations": 120,
+                          "max_unusable_updates": 3,
+                          "position_error_scale_m": null,
+                          "rate_scale_rad_m_s": 1000.0,
+                          "recover_returned_tensions": false,
+                          "regenerate_warm_states": true,
+                          "seed_position_tolerance_fraction": 0.5,
+                          "seed_speed_limit_m_s": 0.02,
+                          "substeps": 1,
+                          "tension_weight": 0.0001,
+                          "terminal_tip_speed_weight": 0.1,
+                          "terminal_velocity_weight": 0.0001,
+                          "terminal_weight": 5.0,
+                          "tip_speed_scale_m_s": 0.02,
+                          "tolerance": 1e-06,
+                          "tracking_weight": 1.0,
+                          "variation_weight": 0.001,
+                          "velocity_weight": 0.0001
+                        },
+                        "settling": {
+                          "position_limit_m": 0.01,
+                          "speed_limit_m_s": 0.02,
+                          "window_s": 0.05
+                        }
+                      },
+                      "version": "1.0.0"
+                    },
+                    "version": "9.0.0"
+                  },
+                  "discretization": {
+                    "contract": "family.discretization",
+                    "data": {
+                      "cells": {
+                        "far": 12,
+                        "near": 12
+                      },
+                      "coordinates": "two_principal_bending_angles_per_cell",
+                      "model": "serial_bending_cells_v1",
+                      "version": "serial_bending_discretization_v1"
+                    },
+                    "version": "1.0.0"
+                  },
+                  "execution_model": {
+                    "extension_id": "model.serial_bending_cells",
+                    "parameters": {
+                      "contract": "family.dynamics_model",
+                      "data": {},
+                      "version": "1.0.0"
+                    },
+                    "version": "1.0.0"
+                  },
+                  "robot": {
+                    "family": "tendon_robot_family",
+                    "identity": "0a0bad0e7e50ba6329801c180c5dc7466617de865ce373e6f0bb494637a88306"
+                  },
+                  "seed": 17,
+                  "task": {
+                    "environment": "5cee25b33f4ff19cb0abd93651ce9077a81665990f07d8f5a4967497e8e82a4d",
+                    "family": "task.reach",
+                    "goal": "7906a8d6f1938670b3b029be161c8f1869097280b1ee24a198da30b2fff4c264",
+                    "identity": "d0f438cf0a0149adba72f8358cdcbbe21ddd5a32fbd066c5a9f03d7f092e2df7",
+                    "initializer": "18ab6a6c8e5909fe738ba3b5722e7b423985abe57486bc16e69f897a7a0b4cc8",
+                    "timing": {
+                      "control_period_s": 0.01,
+                      "duration_s": 0.35,
+                      "sample_period_s": 0.01,
+                      "termination": [
+                        "duration",
+                        "numerical_failure"
+                      ],
+                      "timestep_s": 0.0005
+                    }
+                  }
+                },
+                "historical_source": {
+                  "artifact_id": "ef29737728ddd95d0e5da3bde818d910bee86abe04f13bf41521277f7e216d68",
+                  "media_type": "application/json"
+                },
+                "historical_states_reused": false,
+                "nominal_is_current_target_solution": false,
+                "physics_identity": "bcc9eb5d0e68be3134e5111167079e99585be5f491b8f7bd6def7dafb553e80e",
+                "previous_input_source": "compatible bounded historical initial input",
+                "resolved_basis_identity": "9ad3d2a110fd584207feee3d971231ad00f9c62707cecb998d7102e342564e2f",
+                "reused": true,
+                "source_kind": "compatible_historical_tensions_only",
+                "validity": "Tensions are numerical guesses; placeholder states must be regenerated using candidate dynamics before use"
+              },
+              "static_equilibrium": false
+            },
+            "name": "controller_start_input",
+            "phase": "configuration_controller_start_input",
+            "remaining_task_s": 0.35,
+            "scope": "controller-start input"
+          },
+          "model_reference": {
+            "artifact_id": "f3695c30a6db6dd39fa20054ab98d64a0b2d2e9c1bcc0fbdbdfede23e560a813",
+            "media_type": "application/json"
+          },
+          "position_only": {
+            "status": "feasible_in_local_model",
+            "checks": {
+              "finite": true,
+              "lower_bounds": true,
+              "position": true,
+              "speed": true,
+              "upper_bounds": true
+            },
+            "solver": {
+              "iterations": 15,
+              "maximum_iterations": 100,
+              "message": "Optimization terminated successfully",
+              "name": "scipy.optimize.SLSQP",
+              "status": 0,
+              "success": true
+            },
+            "model_scope": "Frozen continuous local affine model, exact ZOH held inputs; not nonlinear or physical feasibility."
+          },
+          "position_and_braking": {
+            "status": "feasible_in_local_model",
+            "checks": {
+              "finite": true,
+              "lower_bounds": true,
+              "position": true,
+              "speed": true,
+              "upper_bounds": true
+            },
+            "solver": {
+              "iterations": 22,
+              "maximum_iterations": 100,
+              "message": "Optimization terminated successfully",
+              "name": "scipy.optimize.SLSQP",
+              "status": 0,
+              "success": true
+            },
+            "model_scope": "Frozen continuous local affine model, exact ZOH held inputs; not nonlinear or physical feasibility."
+          }
+        },
+        {
+          "operating_point": {
+            "actual_time_s": null,
+            "available": true,
+            "construction": {
+              "achieved_world_point_m": [
+                0.29000000158311595,
+                0.035000000108621594,
+                0.19000000010994994
+              ],
+              "execution_data_used": false,
+              "iterations": 16,
+              "maximum_iterations": 20,
+              "message": "Optimization terminated successfully",
+              "method": "single bounded-tension target-associated static SLSQP attempt; no recovery",
+              "position_limit_m": 0.01,
+              "position_residual_m": 1.5906425803966992e-09,
+              "q_bounds": "unbounded, matching existing GVS inverse-static authorization",
+              "requested_world_point_m": [
+                0.29,
+                0.035,
+                0.19
+              ],
+              "solver": "scipy.optimize.SLSQP",
+              "static_force_tolerance": 1e-10,
+              "static_residual_inf": 2.1180973641676815e-15,
+              "status": 0,
+              "success": true,
+              "tension_bounds_n": [
+                [
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  8.0,
+                  8.0,
+                  8.0,
+                  8.0,
+                  8.0,
+                  8.0
+                ]
+              ]
+            },
+            "name": "target_equilibrium",
+            "phase": "configuration_target_static_equilibrium",
+            "remaining_task_s": 0.35,
+            "scope": "target-associated static attempt"
+          },
+          "model_reference": {
+            "artifact_id": "9830d35e29ec20e1d9e86eb3625345c6f8fed774f2cfa3b7b66861123292cc81",
+            "media_type": "application/json"
+          },
+          "position_only": {
+            "status": "feasible_in_local_model",
+            "checks": {
+              "finite": true,
+              "lower_bounds": true,
+              "position": true,
+              "speed": true,
+              "upper_bounds": true
+            },
+            "solver": {
+              "iterations": 1,
+              "maximum_iterations": 100,
+              "message": "Optimization terminated successfully",
+              "name": "scipy.optimize.SLSQP",
+              "status": 0,
+              "success": true
+            },
+            "model_scope": "Frozen continuous local affine model, exact ZOH held inputs; not nonlinear or physical feasibility."
+          },
+          "position_and_braking": {
+            "status": "feasible_in_local_model",
+            "checks": {
+              "finite": true,
+              "lower_bounds": true,
+              "position": true,
+              "speed": true,
+              "upper_bounds": true
+            },
+            "solver": {
+              "iterations": 1,
+              "maximum_iterations": 100,
+              "message": "Optimization terminated successfully",
+              "name": "scipy.optimize.SLSQP",
+              "status": 0,
+              "success": true
+            },
+            "model_scope": "Frozen continuous local affine model, exact ZOH held inputs; not nonlinear or physical feasibility."
+          }
+        }
+      ],
+      "limitations": [
+        "Local unconstrained frozen Jacobians; finite Gramians do not establish unilateral bounded-input feasibility.",
+        "Open-loop authority does not establish closed-loop stability, settling, or real-time execution.",
+        "Numerical agreement is implementation verification, not physical model validation.",
+        "Saved non-equilibrium frequency curves are frozen-Jacobian resolvents, not measured steady-state responses.",
+        "A feasible witness is local-model evidence only; undetermined is not infeasible.",
+        "The speed constraint is a terminal braking diagnostic and does not alter the reach evaluator or establish settling."
+      ]
+    }
+  },
+  "new_backend_execution_count": 0,
+  "local_model_does_not_establish_physical_feasibility": true
+}

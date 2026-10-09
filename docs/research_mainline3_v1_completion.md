@@ -1,3 +1,48 @@
+# Mainline 3 V1 authorized scope complete ? 2026-10-09
+
+This current-status revision supersedes the dated status statements retained below. **A is preserved, B is accepted, and fixed C completed one valid backend execution. V1's authorized interface closeout is complete.** Joint physical acceptance is `valid_failure`: reach and holding position passed, holding speed failed. V2 has a current starting point; no V2 topology expansion was implemented. See [delivery facts](../evidence/research_mainline3_v1_handoff_20261009/delivery_facts.json), [B gate](../evidence/research_mainline3_v1_handoff_20261009/coordinated_gate.json), [C gate](../evidence/research_mainline3_v1_handoff_20261009/fixed_gate.json), and [V2 handoff](research_mainline3_v2_handoff.md).
+
+## B: actual completion with verified reuse
+
+The fresh activity is linked to stopped activity `mainline3-v1-complete-fedcd7c1a3a9`. A and the historical coordinator plan were preserved without new execution. Both exact reports were imported through public handoffs with original identities, reads, source bindings and audits: reach `a711e11944748af5b81bf1796359f9e612329573429d6fddfb3577548158bcc9` and timing `0b029cbf696005a745429dab46593f1a265b4bc35a1a4fc4819a3726420b2215`. Investigator and planning requests were zero. The prior expired node was not revived.
+
+The coordinator produced [actual synthesis](../evidence/research_mainline3_v1_handoff_20261009/synthesis_report.json), `079bc37b250bbe3620bb8febdc8edae13d8eddbab3b232c7d91e47be1d402d75`, after reading both reports and relevant originals. The [principal report](../evidence/research_mainline3_v1_handoff_20261009/principal_report.json), `1e8a784a4f17a535402e0aac7eb83a3961adfa63fe4c06b9dba53071bab480fb`, returned exactly two partial `accept` dispositions. Public receipt executions are `bf28d775de6944978770c6abe46b444e` (reach) and `c9caef28ccc84b9aad22158739509f35` (timing); complete receipts are in [the result](../evidence/research_mainline3_v1_handoff_20261009/coordinated_result.json).
+
+The [material review](../evidence/research_mainline3_v1_handoff_20261009/material_audit.json) passes eight adopted claims within historical Stage 3.36 scope. Available recomputations with false values record failed criteria; `/official` has no recomputation fields. Unsupported historical interpretations and two overstatements in synthesis/principal caveats are explicitly excluded. Zero recorded solver-error counters do not diagnose optimizer quality or physical cause. No unqualified whole-report adoption, promoted-candidate attribution, real-robot claim or manual replacement of model decisions occurred.
+
+## C: unchanged case, separate outcomes
+
+The authoritative source is `3ae03b4e4ddac2e5099ae5823fc0dd7dd9d338dfba6b7d435729d4e5ab41665b`, candidate `batch-396bdbbae02626d3-0`. Only near/far tendon-routing radius scales changed to 1.01/0.99, using `candidate.family@1.2.0` and `controller.gvs_nmpc@9.0.0`. Task, seed 17, initialization, actuator limits and the V7 recipe are unchanged. [Geometry review](../evidence/research_mainline3_v1_handoff_20261009/geometry_review.json) verifies all 24 physical routing locations and single scaling of shared guides by their physical owner. [Controller review](../evidence/research_mainline3_v1_handoff_20261009/controller_binding_review.json) verifies the executed changed robot, exact recipe and warm-state regeneration.
+
+| Result | Actual evidence |
+| --- | --- |
+| Mathematical preparation | Three public operations complete; three available local models. Halfway construction unavailable; initial position-and-braking diagnostic undetermined. Frozen non-equilibrium Jacobians are distinguished from the target equilibrium LTI model. Local feasibility is not physical feasibility. |
+| Execution validity | Complete valid 0.35 s execution, 35 updates, zero solver errors and zero force violations. |
+| Official reach | Passed: 0.00313144378856093 m against 0.01 m. |
+| Sampled holding position | Passed: 0.0033622899352609 m against 0.01 m over 0.05 s. |
+| Sampled holding speed / joint outcome | Failed: 0.0268176708469683 m/s against 0.02 m/s; joint `valid_failure`. |
+| Timing | 35/35 deadline misses; mean complete update 12.33183248 s against 0.01 s. Real time not demonstrated. |
+
+Execution `197bceb6ff8f44b48a35bc4f79b3528d` uses prepared configuration `77a1406779dbbf5c440e8077796eeb222446001587d1a9befea0c64bbc146925`. Simulation `e2c5a5ed18220463ac6583996a18351cdd978b879e54e5820ebaa6165979b9cd` and evaluation `6314170dd823eab26d13296eb5afee1cfe24cb2f5117334414d1d66e8d266892` are bound to the same execution. [Final C records](../evidence/research_mainline3_v1_handoff_20261009/fixed_result.json), [mathematical summary](../evidence/research_mainline3_v1_handoff_20261009/mathematical_summary.json), and [material review](../evidence/research_mainline3_v1_handoff_20261009/C_material_review.json) retain the complete outputs and limitations.
+
+A profile baseline-scope defect and binary export defect were repaired after the valid backend completed. Six existing receipts were reused; the failed profile receipt remains and a corrected profile/joint receipt completes reporting. Exact report-only dependency migration retains original snapshot, science, grant and receipts. There was **one backend execution**, with no tuning, paired comparison, extra seed or second attempt.
+
+## Verification, resources and versions
+
+Focused saved-request/public-chain checks passed: the saved over-3,000-character synthesis parses, the complete correction request passes the actual outgoing capacity path, both reports import without investigators, native fixture synthesis and two dispositions trigger mocked automatic C, incomplete B blocks C, and recovery reuses receipts. Demonstrated catalog/event-recovery and owned-candidate reporting defects received only affected saved-output checks. No full suite or extra model judge ran.
+
+Actual use: **17/40 provider requests**, 719,024 prompt + 115,686 completion = **834,710 provider-reported tokens**, **41/512 public workflow operations**, three mathematical operations, and one backend execution. Purpose counts are 12 ordinary, five model corrections, zero engineering-recovery requests. All 17 complete responses are saved; duplicate reception/accounting events are excluded. Monetary cost remains unknown. Recorded engineering intervals total 1096.171 s; total activity elapsed at closeout is 2314.125 s, with residual review/delivery overhead separately reported. The overall ten-hour deadline and protected downstream/delivery time were retained.
+
+The [new administrative policy](../evidence/research_mainline3_v1_handoff_20261009/administrative_policy.json) removes prose-length rejection and uses 950,000 conservative input-estimate ceilings, 4 MiB serialized context, 1 MiB reports, 1,000,000 total context, and unchanged 32,768/8,192 reservations and 600 s individual request timeout. Actual token usage, estimates, serialized bytes, reservations and node lifetime remain distinct. Corrections share the common budget without historical role/purpose counters. Historical rejections remain historical.
+
+Initial 13 B requests used `1dbdb2d01fc0fefbaa75159fec2a49b20b807cea`; the last four B requests and C backend used `32f693c9b5666723d4fa5701e06bd2481ab7e2cf`. C reporting used `e0907e71dc104dc2ce47101a533041492c76c763`. Implementation file hashes and intervening repairs are retained in the [manifest](../evidence/research_mainline3_v1_handoff_20261009/validation_manifest.json). Environment versions are in [environment.json](../evidence/research_mainline3_v1_handoff_20261009/environment.json); no dependencies were upgraded. [History verification](../evidence/research_mainline3_v1_handoff_20261009/sealed_history_check.json) confirms original activity and Stage 3.36 bytes unchanged. No genuine V1 blocker remains.
+
+## Historical status records ? preserved verbatim
+
+The following dated text describes earlier activities and retains their original outcomes and limits.
+
+---
+
 # Mainline 3 V1 closeout revision ? bounded blocker, 2026-10-09
 
 This revision supersedes the current-status statements in the historical text retained below. Activity `mainline3-v1-complete-fedcd7c1a3a9` performed real B work and stopped with a bounded blocker. **A remains accepted; B remains incomplete; C was not executed; V1 and V2 are not accepted.** This is the authorized blocker delivery, not a successful V1 validation. See [delivery facts](../evidence/research_mainline3_v1_closeout_20261009/delivery_facts.json), [blocker](../evidence/research_mainline3_v1_closeout_20261009/bounded_blocker.json), [bundle](../evidence/research_mainline3_v1_closeout_20261009/coordinated_bundle.json), and [ledger](../evidence/research_mainline3_v1_closeout_20261009/coordinated_ledger.json).

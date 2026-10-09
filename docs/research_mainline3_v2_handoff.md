@@ -1,3 +1,28 @@
+# Mainline 3 V2 entry after V1 closeout ? 2026-10-09
+
+V1's authorized interface scope is complete: A is preserved, B passes with both reused reports, actual synthesis and two partial principal accept dispositions, and C has one complete valid fixed execution. C passed reach and sampled holding position but failed holding speed; real time was not demonstrated. These physical limitations remain and do not prevent the V1 interface closeout. See [current V1 completion](research_mainline3_v1_completion.md), [delivery facts](../evidence/research_mainline3_v1_handoff_20261009/delivery_facts.json), and [fixed C result](../evidence/research_mainline3_v1_handoff_20261009/fixed_result.json).
+
+No V2 topology expansion was implemented. The next separately scoped development order remains **limited tendon counts and routing/actuator layouts ? segment-count changes with state/input/projection/initialization adaptation ? necessary representative combinations**. Use the concrete interface map retained below.
+
+The current starting point is candidate `fixed-radius`, configuration `77a1406779dbbf5c440e8077796eeb222446001587d1a9befea0c64bbc146925`, with `candidate.family@1.2.0` and `controller.gvs_nmpc@9.0.0`. Source-relative routing and physical guide ownership are verified, mathematical preparation and all eight public C components are connected, and reporting now binds the owned executed geometry rather than the baseline. Complete [C receipts](../evidence/research_mainline3_v1_handoff_20261009/fixed_result.json) and the lossless JSON/binary [C bundle](../evidence/research_mainline3_v1_handoff_20261009/fixed_bundle.json) provide the reproducible boundary. Backend code is `32f693c9b5666723d4fa5701e06bd2481ab7e2cf`; reporting code is `e0907e71dc104dc2ce47101a533041492c76c763`.
+
+| First V2 work | Existing concrete entry |
+| --- | --- |
+| Declare one finite tendon/routing/actuator layout with named IDs, ordering, transmission and limits | `extensions/tendon_family/contracts.py`, `candidate.py`, `design_decisions.py`, `parameter_capabilities.py`; preserve old version domains and source-relative changes. |
+| Resolve and validate its physical routes and dimensions | `compiler.py`, `routing_radius.py`; near-owned guides used by far tendons retain near ownership and shared holes change once. |
+| Construct compatible input/controller mappings before finite validation | `gvs_basis.py`, `gvs_casadi.py`, `gvs_projection.py`, `gvs_trajectory.py`, `gvs_profile.py`, `gvs_nmpc.py`; current fixed near/far compatibility does not establish arbitrary new topology support. |
+| Connect to the existing scientific/public path | `tools.research_mainline3.fixed_pipeline`, `tools.research_execution`, `tools.research_tasks`; keep configuration, analysis, backend, evaluation and profile identities consistent. |
+
+Freeze the limited layout's explicit counts, channels, actuator coupling and compatibility boundaries before implementation. Then handle segment-count changes with matching state/input dimensions, projection and semantic initialization, followed only by necessary representative combinations. The retained task/resource comparison rules and model limitations remain applicable. No broad topology search, controller weight search, real-robot claim or V2 experiment is authorized by this completed task.
+
+B's available-failed recomputation distinction, independent source inspection, exact formal target versions and partial-adoption material review are now working evidence boundaries. Old STOPs, invalid responses, costs and unknown historical billing remain sealed. They are not prerequisites to this next goal; neither reports nor the old coordinator plan need regeneration. The new common-budget administrative policy and saved-response recovery are available without reopening old grants.
+
+## Historical handoffs ? preserved verbatim
+
+The following dated text retains the earlier conditional statuses and interface map. Its missing-B/C statements describe those earlier activities.
+
+---
+
 # Mainline 3 V2 handoff revision ? V1 remains gated, 2026-10-09
 
 This revision supersedes the status statements in the historical handoff retained below. The [V1 blocker delivery](research_mainline3_v1_completion.md) preserves accepted A, the original coordinator plan, and the imported valid timing report. It adds a formally valid new reach report and two real synthesis submissions. Synthesis remains invalid; formal principal dispositions and C remain missing. **V2 is not ready to execute.** The original synthesis node expired at 11:49:40 Shanghai time. The activity is stopped; its unused quotas and pending correction do not authorize a restart.

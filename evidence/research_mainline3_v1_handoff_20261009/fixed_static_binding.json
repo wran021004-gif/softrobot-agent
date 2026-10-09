@@ -1,0 +1,74 @@
+{
+  "status": "static_review_before_C",
+  "source": {
+    "source": "evidence/research_native_development_v3_20261007/store/artifacts/3ae03b4e4ddac2e5099ae5823fc0dd7dd9d338dfba6b7d435729d4e5ab41665b.json",
+    "source_artifact": "3ae03b4e4ddac2e5099ae5823fc0dd7dd9d338dfba6b7d435729d4e5ab41665b",
+    "manifest": "evidence/research_native_development_v3_20261007/store/sha256_manifest.json",
+    "file_sha256": "3ae03b4e4ddac2e5099ae5823fc0dd7dd9d338dfba6b7d435729d4e5ab41665b",
+    "source_candidate": "batch-396bdbbae02626d3-0",
+    "source_builder": "candidate.family",
+    "source_builder_version": "1.1.0",
+    "source_controller_version": "7.0.0",
+    "candidate_builder": "candidate.family@1.2.0",
+    "controller": "controller.gvs_nmpc@9.0.0",
+    "task_robot_seed_and_v7_recipe_unchanged": true,
+    "changes": {
+      "design/near_routing_radius_scale": 1.01,
+      "design/far_routing_radius_scale": 0.99
+    }
+  },
+  "checks": {
+    "task_unchanged": true,
+    "robot_unchanged": true,
+    "seed_unchanged": true,
+    "controller_recipe_unchanged": true,
+    "source_identity_matches": true
+  },
+  "recipe": {
+    "numerical_source": "bundled_guess",
+    "recipe": {
+      "basis": {
+        "strategy": "structural_linear"
+      },
+      "constraint_jacobian_mode": "reverse",
+      "curvature_scale_rad_m": 10.0,
+      "evaluation_threads": 1,
+      "feasible_return": {
+        "budget_s": 15.0,
+        "minimum_s": 5.0,
+        "relative_improvement": 0.1
+      },
+      "holding_brake_lead_s": 0.0,
+      "holding_tip_speed_weight": 0.05,
+      "horizon": 10,
+      "max_cpu_s": 30.0,
+      "max_iterations": 120,
+      "max_unusable_updates": 3,
+      "position_error_scale_m": null,
+      "rate_scale_rad_m_s": 1000.0,
+      "recover_returned_tensions": false,
+      "regenerate_warm_states": true,
+      "seed_position_tolerance_fraction": 0.5,
+      "seed_speed_limit_m_s": 0.02,
+      "substeps": 1,
+      "tension_weight": 0.0001,
+      "terminal_tip_speed_weight": 0.1,
+      "terminal_velocity_weight": 0.0001,
+      "terminal_weight": 5.0,
+      "tip_speed_scale_m_s": 0.02,
+      "tolerance": 1e-06,
+      "tracking_weight": 1.0,
+      "variation_weight": 0.001,
+      "velocity_weight": 0.0001
+    },
+    "settling": {
+      "position_limit_m": 0.01,
+      "speed_limit_m_s": 0.02,
+      "window_s": 0.05
+    }
+  },
+  "source_recipe_identity": "d9699f2a000c203473568a2a6e7c9c76281cf9d4b6080c290808a1e5f3aa955d",
+  "frozen_recipe_identity": "d9699f2a000c203473568a2a6e7c9c76281cf9d4b6080c290808a1e5f3aa955d",
+  "physical_ownership_rule": "Shared guide hole modified once by owning physical segment; far tendon passing through a near-owned guide receives near scale. Every transform reads coordinates from semantic_source, not the preceding candidate.",
+  "code_commit": "1dbdb2d01fc0fefbaa75159fec2a49b20b807cea"
+}

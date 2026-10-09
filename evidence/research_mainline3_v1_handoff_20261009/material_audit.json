@@ -1,0 +1,159 @@
+{
+  "version": "coding_agent.material_audit@1.0.0",
+  "report": {
+    "artifact_id": "1e8a784a4f17a535402e0aac7eb83a3961adfa63fe4c06b9dba53071bab480fb",
+    "media_type": "application/json"
+  },
+  "material_correctness": "pass",
+  "formal_model_dispositions": [
+    {
+      "investigation_id": "reach-holding-interpretation",
+      "report": {
+        "artifact_id": "a711e11944748af5b81bf1796359f9e612329573429d6fddfb3577548158bcc9",
+        "media_type": "application/json"
+      },
+      "disposition": "accept",
+      "partial_adoption": true
+    },
+    {
+      "investigation_id": "timing-integrity-limits",
+      "report": {
+        "artifact_id": "0b029cbf696005a745429dab46593f1a265b4bc35a1a4fc4819a3726420b2215",
+        "media_type": "application/json"
+      },
+      "disposition": "accept",
+      "partial_adoption": true
+    }
+  ],
+  "review_method": "Read actual synthesis, final principal report and adopted claims, original factual result and metric view, original report audits, exact fact/support/scope bindings. No paid reviewer, investigator rewrite, or new scientific computation.",
+  "adopted_claims": [
+    {
+      "investigation_id": "reach-holding-interpretation",
+      "claim_index": 0,
+      "statement": "The historical official reach outcome for this archived execution is recorded as not accepted, and the recorded failure is a finite terminal position offset rather than a solver fault.",
+      "material_correctness": "pass_for_historical_recorded_scope",
+      "exact_source_value_type_identity": true,
+      "cited_sources": [
+        "6903669a345e76c1dd2958ada4d067bfde06d02f102ce017db06c9a241c7dd51",
+        "d8b39c99b5595562aa7e7fec23a3f8767cd724537e8988da0ffefbc6bf7abb27"
+      ]
+    },
+    {
+      "investigation_id": "reach-holding-interpretation",
+      "claim_index": 1,
+      "statement": "The recorded sampled holding criteria fail: the sampled position error exceeds its position threshold and the sampled tip speed exceeds its speed threshold over the recorded sampling window.",
+      "material_correctness": "pass_for_historical_recorded_scope",
+      "exact_source_value_type_identity": true,
+      "cited_sources": [
+        "6903669a345e76c1dd2958ada4d067bfde06d02f102ce017db06c9a241c7dd51",
+        "d8b39c99b5595562aa7e7fec23a3f8767cd724537e8988da0ffefbc6bf7abb27"
+      ]
+    },
+    {
+      "investigation_id": "reach-holding-interpretation",
+      "claim_index": 2,
+      "statement": "The archived independent recomputation for the reach, holding position and holding speed criteria is available with empty missing material yet reports a false recomputed result, that is, an available failed criterion rather than absent recomputation.",
+      "material_correctness": "pass_for_historical_recorded_scope",
+      "exact_source_value_type_identity": true,
+      "cited_sources": [
+        "d8b39c99b5595562aa7e7fec23a3f8767cd724537e8988da0ffefbc6bf7abb27"
+      ]
+    },
+    {
+      "investigation_id": "reach-holding-interpretation",
+      "claim_index": 3,
+      "statement": "The archived execution was valid and complete without solver or force-bound faults, so the recorded non-acceptance is not attributable to solver errors or force violations.",
+      "material_correctness": "pass_for_historical_recorded_scope",
+      "exact_source_value_type_identity": true,
+      "cited_sources": [
+        "6903669a345e76c1dd2958ada4d067bfde06d02f102ce017db06c9a241c7dd51",
+        "d8b39c99b5595562aa7e7fec23a3f8767cd724537e8988da0ffefbc6bf7abb27"
+      ]
+    },
+    {
+      "investigation_id": "timing-integrity-limits",
+      "claim_index": 0,
+      "statement": "The recorded timing places the measured mean complete update time and the total measured computation time far above the nominal control period, with every recorded control update counted as a deadline miss and real time not demonstrated; these are measured or computed values, not capability guarantees.",
+      "material_correctness": "pass_for_historical_recorded_scope",
+      "exact_source_value_type_identity": true,
+      "cited_sources": [
+        "6903669a345e76c1dd2958ada4d067bfde06d02f102ce017db06c9a241c7dd51"
+      ]
+    },
+    {
+      "investigation_id": "timing-integrity-limits",
+      "claim_index": 1,
+      "statement": "The archived execution is recorded as valid and complete with zero force-bound violations and zero solver errors, so the recorded limits are timing and settling rather than solver or force faults.",
+      "material_correctness": "pass_for_historical_recorded_scope",
+      "exact_source_value_type_identity": true,
+      "cited_sources": [
+        "6903669a345e76c1dd2958ada4d067bfde06d02f102ce017db06c9a241c7dd51",
+        "d8b39c99b5595562aa7e7fec23a3f8767cd724537e8988da0ffefbc6bf7abb27"
+      ]
+    },
+    {
+      "investigation_id": "timing-integrity-limits",
+      "claim_index": 2,
+      "statement": "The archived one-step prediction summary covers aligned world-frame first-step predictions with small mean and maximum tip differences and no missing entries, and its own scope limits it to accepted first-step predictions matched to the next execution timestamp with no future-plan replay comparison, so it is neither reach nor holding acceptance.",
+      "material_correctness": "pass_for_historical_recorded_scope",
+      "exact_source_value_type_identity": true,
+      "cited_sources": [
+        "6903669a345e76c1dd2958ada4d067bfde06d02f102ce017db06c9a241c7dd51",
+        "d8b39c99b5595562aa7e7fec23a3f8767cd724537e8988da0ffefbc6bf7abb27"
+      ]
+    },
+    {
+      "investigation_id": "timing-integrity-limits",
+      "claim_index": 3,
+      "statement": "The holding record rests on sampled evidence without a continuous-time guarantee, and the recorded official result stands because unavailable independent recomputation does not erase a recorded official result.",
+      "material_correctness": "pass_for_historical_recorded_scope",
+      "exact_source_value_type_identity": true,
+      "cited_sources": [
+        "d8b39c99b5595562aa7e7fec23a3f8767cd724537e8988da0ffefbc6bf7abb27"
+      ]
+    }
+  ],
+  "scope": "Historical Stage 3.36 execution 494deb38d6374deb8f741e96f2430826, proposal-build, free_reach only; excludes promoted candidate and new C.",
+  "supported": [
+    "Recorded reach failure: 0.06672099201814737 m versus0.01m",
+    "Recorded sampled holding failure: position0.06672099201814737m and speed0.20679063000945364m/s versus0.01m and0.02m/s",
+    "Available archived reach/holding-position/holding-speed recomputations have false failed criterion results; /official has no recomputation fields",
+    "Recorded valid complete execution with zero reported solver errors and force violations; no diagnosis of optimizer quality or dominant cause",
+    "35/35 deadline misses, mean18.34727874570526s versus0.01s; real time not demonstrated",
+    "Prediction agreement does not establish task acceptance or real-robot/continuous-time feasibility"
+  ],
+  "excluded_interpretations": [
+    {
+      "location": "/interpretation final paragraph and /unknowns/0",
+      "issue": "Says holding outcome rests only on recorded window and sampled_settling. The same report and inspected metric view establish available failed holding component recomputations; these independently support the failed component criteria. Do not adopt the exclusive wording."
+    },
+    {
+      "location": "/unknowns/3",
+      "issue": "No per-update series limits distribution/attribution, but does not prevent aggregate comparison of 18.34727874570526 s with 0.01 s or reported 35/35 misses. Do not adopt inability to quantify the aggregate shortfall."
+    },
+    {
+      "location": "principal /interpretation and both dispositions /remaining_unknowns",
+      "issue": "Exclusive wording that holding outcome rests only on recorded-window/profile checks is excluded. Adopted reach claim2 and claim3 correctly establish available failed component recomputations in addition to those recorded checks."
+    },
+    {
+      "location": "timing disposition /remaining_unknowns/0 and principal /interpretation",
+      "issue": "Absent per-update timing series limits distribution/causal attribution but does not prevent aggregate comparison of measured mean/total and35/35 misses; inability to quantify aggregate shortfall is excluded."
+    },
+    {
+      "location": "adopted integrity claims",
+      "issue": "Read as absence of recorded solver-error and force-limit faults only. Zero error counters do not rule out solver convergence/initialization limitations or establish a dominant physical cause; principal separately leaves cause unknown."
+    },
+    {
+      "location": "timing adopted claim3 (zero-based)",
+      "issue": "Unavailable recomputation does not erase a recorded official result is an inspected general limitations rule, not a claim that this execution lacks its available failed recomputations."
+    }
+  ],
+  "unqualified_entire_reports_adopted": false,
+  "original_reports_unchanged": true,
+  "remaining_limitations": [
+    "No unique physical diagnosis, continuous-time guarantee, real-robot validation or global optimality",
+    "Referenced underlying evaluation/details/motion/configuration/simulation were not inspected by principal; adopted observations are bound to directly inspected archival summary and metric-view content",
+    "Principal reads include one rejected out-of-scope evaluation read; it conveys no inspection credit"
+  ],
+  "decision_authorship": "Actual model; coding-agent review neither substitutes nor rewrites dispositions"
+}
