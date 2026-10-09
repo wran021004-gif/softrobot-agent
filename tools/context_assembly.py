@@ -862,14 +862,32 @@ def expand_investigation_context(packet):
     from tools.disposition_facts import project
     def expand(value,seen=()):
         if isinstance(value,dict):
-            if set(value)=={'$current_request_value'}:
-                path=value['$current_request_value']
+            if set(value) in ({'$current_request_value'},{'$context_at'}):
+                path=next(iter(value.values()))
                 if path in seen:raise ValueError('CURRENT_REQUEST_ALIAS_CYCLE')
                 return expand(project(packet,path),(*seen,path))
             return {k:expand(v,seen) for k,v in value.items()}
         if isinstance(value,list):return [expand(v,seen) for v in value]
         return value
     return expand(packet)
+
+
+def expand_investigation_arguments(payload, message_index, call_index):
+    """Decode exact argument aliases from still-present native call history."""
+    from tools.disposition_facts import project
+    def resolve(value, seen=()):
+        if isinstance(value, dict):
+            if set(value) in ({'$arg_at'}, {'$current_request_argument'}):
+                mi, ci, pointer = next(iter(value.values()))
+                key = (mi, ci, pointer)
+                if key in seen:raise ValueError('CURRENT_ARGUMENT_ALIAS_CYCLE')
+                original = json.loads(payload['messages'][mi]['tool_calls'][ci]['function']['arguments'])
+                return resolve(project(original, pointer), (*seen, key))
+            return {k:resolve(v, seen) for k,v in value.items()}
+        if isinstance(value,list):return [resolve(v, seen) for v in value]
+        return value
+    arguments = payload['messages'][message_index]['tool_calls'][call_index]['function']['arguments']
+    return resolve(json.loads(arguments))
 
 
 def compact_investigation_request(payload):
@@ -898,6 +916,11 @@ def compact_investigation_request(payload):
         source_catalog['entries']=[e for e in source_catalog['entries'] if observed(e)]
         source_catalog['complete_details_query']=dict(reference=source_catalog['reference'],pointer='/entries',offset=0,limit=2,byte_limit=4096)
         source_catalog['presentation']='Inline handles name inspected root fields; all authorized original handles and bindings remain in this SAME immutable catalog. Additional originals stay in the directory and can be read. An extraction is valid only within actual inspected content.'
+        for entry in source_catalog['entries']:entry.pop('source_identity',None)
+    directory=packet.get('evidence_directory')
+    if directory:
+        directory['inline_entries']=[{k:v for k,v in e.items() if k!='fields'} for e in directory.get('inline_entries',[])]
+        directory['field_metadata_query']='Complete field names/types remain in this same immutable directory; its declared paginated query retains every authorized source. No scientific source body was removed.'
     available={}
     def index(value,path):
         if isinstance(value,(dict,list)):
@@ -923,17 +946,17 @@ def compact_investigation_request(payload):
         if 'value' in entry:entry['value']=compact(entry['value'])
     packet['catalog_value_presentation']='Value references resolve to exact retained pages in this request; content paths address decoded message JSON. Complete immutable catalogs remain queryable.'
     if 'working_context' in packet:
-        packet['working_context']={k:v for k,v in packet['working_context'].items() if v is not None and v!=[] and v!={}}
+        packet['working_context']={k:v for k,v in packet['working_context'].items() if k in ('version','retrieval_permission_scope','repeatability_scope','detail_access','legal_actions','observations_scope')}
     # Repeated exact bindings inside full reports/metadata are also losslessly
     # shared. Scientific facts, counterevidence, unknowns and source paths remain.
     seen={}
     def share(value,path=''):
         if isinstance(value,(dict,list,str)):
             body=encode(value);identity=digest(value)
-            if len(body)>128 and identity in seen:
-                marker={'$current_request_value':seen[identity]}
+            if len(body)>80 and identity in seen:
+                marker={'$context_at':seen[identity]}
                 if len(encode(marker))<len(body):return marker
-            if len(body)>128:seen.setdefault(identity,path)
+            if len(body)>80:seen.setdefault(identity,path)
             if isinstance(value,str):return value
             children=value.items() if isinstance(value,dict) else enumerate(value)
             result={k:share(v,path+'/'+pointer_part(k)) for k,v in children}
@@ -941,7 +964,7 @@ def compact_investigation_request(payload):
         return value
     shared=share(packet)
     if expand_investigation_context(shared)!=packet:raise ValueError('CURRENT_REQUEST_ALIAS_NOT_LOSSLESS')
-    shared['current_request_alias_rule']='A sole $current_request_value object means the EXACT identical value at that JSON Pointer in this decoded user context. Expand it there. The original target remains present; no native history was shortened.'
+    shared['current_request_alias_rule']='A sole $context_at object extracts the EXACT identical value at its JSON Pointer in this decoded context. The original target remains here; all report evidence and unknowns are retained.'
     wire['messages'][1]['content']=encode(shared)
     def schema_annotations(value):
         if isinstance(value,dict):return {k:schema_annotations(v) for k,v in value.items() if k not in ('title','description')}
@@ -949,6 +972,38 @@ def compact_investigation_request(payload):
         return value
     for tool in wire.get('tools',[]):
         tool['function']['parameters']=schema_annotations(tool['function']['parameters'])
+    # A correction often repeats the same selections with one changed field.
+    # Keep each native call ID/name/reasoning and every tool reply. Share only
+    # exact repeated JSON argument values against an earlier retained call.
+    argument_values={}
+    for mi,message in enumerate(wire['messages']):
+        if message.get('role')!='assistant':continue
+        for ci,call in enumerate(message.get('tool_calls',[])):
+            if call.get('function',{}).get('name')!='investigation_return':continue
+            try:original=expand_investigation_arguments(wire,mi,ci)
+            except (ValueError,TypeError):continue
+            local={}
+            def argument_share(value,path=''):
+                if isinstance(value,(dict,list,str)):
+                    body=encode(value);identity=digest(value)
+                    available={**argument_values,**local}
+                    if len(body)>80 and identity in available:
+                        marker={'$arg_at':available[identity]}
+                        if len(encode(marker))<len(body):return marker
+                    if len(body)>80:local.setdefault(identity,[mi,ci,path])
+                    if isinstance(value,str):return value
+                    children=value.items() if isinstance(value,dict) else enumerate(value)
+                    parts={k:argument_share(v,path+'/'+pointer_part(k)) for k,v in children}
+                    return parts if isinstance(value,dict) else list(parts.values())
+                return value
+            presented=argument_share(original)
+            if presented!=original:call['function']['arguments']=encode(presented)
+            if expand_investigation_arguments(wire,mi,ci)!=original:
+                raise ValueError('CURRENT_ARGUMENT_ALIAS_NOT_LOSSLESS')
+            argument_values.update({k:v for k,v in local.items() if k not in argument_values})
+    if any('$arg_at' in c.get('function',{}).get('arguments','') for m in wire['messages'] for c in m.get('tool_calls',[])):
+        rule=' Historical $arg_at:[message_index,call_index,pointer] extracts the EXACT earlier JSON value from that retained call argument string. Original choices are archived unchanged; no old call executes. New returns require full business fields.'
+        if rule not in wire['messages'][0]['content']:wire['messages'][0]['content']+=rule
     return wire
 
 

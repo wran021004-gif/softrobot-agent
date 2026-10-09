@@ -378,7 +378,7 @@ class InvestigationDispatcher:
                 if accounting is not None else dict(usage=zero(),started_unix=time.time()))
             if accounting is not None:self._save_target_accounting(db,accounting)
             nodes[order.investigation_id]=dict(order=plain(order),status='pending',reads=[],usage=deepcopy(task['usage']),started_unix=task['started_unix'],
-                reserved_wall_s=cost['wall_s'],execution_deadline_unix=task['started_unix']+min(order.timeout_s,cost['wall_s']))
+                reserved_wall_s=cost['wall_s'],execution_deadline_unix=task['started_unix']+order.timeout_s)
             self.store.update_state(db,self.run_id,state)
         row,fresh=self.store.reserve(self.run_id,request_id,digest(plain(order)),'investigation-dispatcher',
             cost,parent=order.parent_id,kind='investigation',guard=guard)

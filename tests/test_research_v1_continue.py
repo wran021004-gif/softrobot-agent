@@ -75,7 +75,17 @@ class ContinuationTests(TestCase):
             wire=read(source/name);before=deepcopy(wire);fixed=compact_investigation_request(wire)
             check_outgoing_request(fixed,cfg,'research_decision')
             self.assertEqual(wire,before)
-            self.assertEqual(fixed['messages'][2:],wire['messages'][2:])
+            from tools.context_assembly import expand_investigation_arguments
+            for mi,(actual,original) in enumerate(zip(fixed['messages'][2:],wire['messages'][2:]),2):
+                if original.get('role')!='assistant':
+                    self.assertEqual(actual,original);continue
+                self.assertEqual({k:v for k,v in actual.items() if k!='tool_calls'},
+                    {k:v for k,v in original.items() if k!='tool_calls'})
+                for ci,(a,b) in enumerate(zip(actual.get('tool_calls',[]),original.get('tool_calls',[]))):
+                    self.assertEqual(a['id'],b['id']);self.assertEqual(a['function']['name'],b['function']['name'])
+                    if b['function']['name']=='investigation_return':
+                        self.assertEqual(expand_investigation_arguments(fixed,mi,ci),expand_investigation_arguments(wire,mi,ci))
+                    else:self.assertEqual(a,b)
             def semantic_schema(v):
                 if isinstance(v,dict):return {k:semantic_schema(x) for k,x in v.items() if k not in ('title','description')}
                 if isinstance(v,list):return [semantic_schema(x) for x in v]
@@ -476,6 +486,10 @@ class ContinuationTests(TestCase):
             self.assertEqual(p['sequential_reservations']['preparation_s'],m['preparation_wall_s'])
             self.assertEqual(host.store.lookup(host.run_id,'offline-preparation')['status'],'completed')
             self.assertEqual(state['investigations']['principal-coordinated-v2']['reserved_wall_s'],2400.)
+            for key in ('coordinator-summary','principal-coordinated-v2'):
+                node=state['investigations'][key]
+                self.assertLess(node['reserved_wall_s'],node['order']['timeout_s'])
+                self.assertEqual(node['execution_deadline_unix'],node['started_unix']+node['order']['timeout_s'])
             self.assertEqual(state['investigations']['principal-coordinated-v2']['requests_by_purpose'],dict(ordinary=1,model_correction=1,engineering_recovery=0))
             self.assertTrue(all(w['model']=='deepseek-flash' and w['max_tokens']==32768 for w in sends))
             self.assertTrue(gate.correction_consistency(authorization,p,grant=state['role_context']['investigation_grant'],

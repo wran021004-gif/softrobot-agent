@@ -1,0 +1,44 @@
+{
+  "passed": true,
+  "measurement": {
+    "characters": 147918,
+    "utf8_bytes": 148370,
+    "estimated_input_tokens": 156562,
+    "actual_input_tokens": null,
+    "method": "Conservative estimate: one token per serialized UTF-8 byte plus configured framing; no appropriate installed tokenizer. Includes all messages, schemas and wire metadata.",
+    "input_budget_tokens": 160000,
+    "configured_context_limit_tokens": 1000000,
+    "response_reserve_tokens": 32768,
+    "interaction_reserve_tokens": 8192,
+    "passed": true
+  },
+  "provider_requests": 0,
+  "native_history": [
+    {
+      "message_index": 2,
+      "tool_call_id": "call_00_9KVCIjdkvGxhJTp91P651195",
+      "function": "investigation_return",
+      "reasoning_bytes": 84091,
+      "argument_roundtrip": true
+    },
+    {
+      "message_index": 4,
+      "tool_call_id": "call_00_zlxstC1sL6gDuaQPW9K89592",
+      "function": "investigation_return",
+      "reasoning_bytes": 122,
+      "argument_roundtrip": true
+    }
+  ],
+  "lossless_argument_roundtrip": true,
+  "scientific_evidence_not_discarded": true,
+  "affected_checks": {
+    "path": "repair2_affected_checks.log",
+    "tests": 3,
+    "passed": 3,
+    "unittest_outcome": "OK",
+    "powershell_stream_exit_artifact": "Redirected unittest stderr caused shell exit 1 despite all three test cases passing; outcome read from test log"
+  },
+  "deadline_check": "repair2_deadline_reservation_check.log",
+  "input_guard_unchanged": 160000,
+  "no_length_probe": true
+}

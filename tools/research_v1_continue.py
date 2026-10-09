@@ -430,8 +430,11 @@ def bind_current_repair(m,p,old_run,record):
     cfg=deepcopy(old['snapshot']['input']);cfg['run_id']=new_run
     host=Host(store.root,new_run);host.create(cfg);host.resume()
     state=deepcopy(old['state']);state['original_stopped_run']=old_run
-    for node in state.get('investigations',{}).values():
+    for key,node in state.get('investigations',{}).items():
         node.setdefault('request_run_id',old_run)
+        if key in record.get('restore_authoritative_node_deadlines',[]):
+            node['prior_reservation_guard_unix']=node.get('execution_deadline_unix')
+            node['execution_deadline_unix']=node['started_unix']+node['order']['timeout_s']
         for field,origin in [('fact_catalog','catalog_origin_run_id'),('source_fact_catalog','source_catalog_origin_run_id')]:
             if node.get(field):node.setdefault(origin,store.artifact(node[field])['activity_run_id'])
     with store.transaction() as db:store.update_state(db,new_run,state)
