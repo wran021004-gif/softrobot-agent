@@ -13,6 +13,7 @@ $studyPython = 'D:\softrobot-agent\.mainline5-env\Scripts\python.exe'
 & $studyPython -m tools.research_mainline5 run
 & $studyPython -m tools.research_mainline5 status
 & $studyPython -m tools.research_mainline5 export
+& $studyPython -m tools.research_mainline5_summary
 ```
 
 Preparation imports provenance-preserving evidence from the explicit historical
@@ -45,6 +46,27 @@ resends. Confirmed unconsumed responses may be replayed only for the exact saved
 request; do not replace the ledger, delete the checkpoint or replenish a budget.
 A valid physical failure is a completed experiment. Completed STOP is preserved.
 
+The delivered runtime keeps all explicit `invoke_async` continuations on one
+event loop. Its HTTP client must not be carried between synchronous Agent calls
+that close their event loops. The recorded initial length response was confirmed
+and replayed without a new send; the later connection-cleanup failure was proven
+to occur before transmission and reconciled with its charged slot retained.
+Other unknown outcomes still block continuation. See the repair records in the
+new evidence bundle; these repairs changed no scientific configuration.
+Historical parameter comparisons now use the projected template's active paths;
+two-segment historical records cannot supply a middle material selector. An
+accepted operation that fails business execution pauses at `execution_stopped`.
+Recovery reconciles that same immutable operation before another model request.
+If a scoped repair changes a registered dependency hash, review and record the
+exact before/after binding before resuming; do not disable dependency checks or
+rewrite completed child snapshots. The delivered material repair records its
+single reviewed helper-source change and unchanged scientific input identity.
+Explicit continuations present the exact current feedback reference, its usable
+F aliases and completed actual configurations prominently. These aliases are
+derived from Store facts and are not `/aliases` members of the original evidence
+artifact. The model owns the next action; this factual projection does not
+prescribe a candidate or conclusion and does not replace Strands history.
+
 Credentials load only in live execution through the existing loader for
 `$HOME\.codex\.env`; auth headers are not archived. DeepSeek Flash uses enabled
 thinking, high effort, 32768 output tokens, 600-second timeout and tool choice
@@ -69,3 +91,15 @@ framework context/restoration behavior retain their accepted pilot evidence.
 Focused checks use clearly labeled model/backend substitutes; they do not count
 as scientific evidence. The delivered nominal results do not establish robustness,
 global optimality, real-time performance or completion of all Mainline 5.
+
+`research_mainline5_summary` packages new immutable Store artifacts, physics
+files and framework checkpoints into `immutable_artifacts.tar.gz`; member hashes
+are listed in `archive_manifest.json`. Exact wires and original response bytes
+are reached through the Store/event references. Historical evidence retains its
+original artifact/owner identities and committed archive links. The original
+local Store and framework session remain under `runs/mainline5-20261009`; recover
+from them, rather than preparing a replacement activity from an exported report.
+Large full session/state and frozen dependency JSON files are indexed by
+`metadata_archive_index.json` under the archive's `metadata/` prefix. Their exact
+bytes and hashes are retained; the delivery omits the corresponding expanded
+copies. Small reports, ledger and retrieval indexes remain directly readable.

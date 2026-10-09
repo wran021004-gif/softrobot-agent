@@ -1,0 +1,69 @@
+{
+  "harness": "strands-harness==0.2.0",
+  "sdk": "strands-agents==1.59.0",
+  "provider": {
+    "adapter": "deepseek",
+    "adapter_version": "8.0.0",
+    "base_url": "https://api.deepseek.com",
+    "context_bytes": 4194304,
+    "context_guard": {
+      "context_limit_tokens": 1000000,
+      "estimate": "one token per serialized UTF-8 byte plus framing; conservative estimate, not tokenization",
+      "framing_headroom_tokens": 8192,
+      "source": "https://api-docs.deepseek.com/quick_start/pricing/",
+      "verified_date": "2026-10-03"
+    },
+    "investigation_max_tokens": 32768,
+    "max_no_progress": 3,
+    "max_repairs": 10,
+    "max_tokens": 32768,
+    "max_turns": 60,
+    "model": "deepseek-flash",
+    "parameters": {
+      "investigation_contract": "selected_reports_v4"
+    },
+    "protocol_recovery": {
+      "max_consecutive": 60,
+      "max_total": 60
+    },
+    "reasoning_effort": "high",
+    "strategy": "strategy.tool",
+    "strategy_version": "1.0.0",
+    "supports_images": false,
+    "supports_text": true,
+    "supports_tools": true,
+    "thinking": "enabled",
+    "timeout_s": 600.0
+  },
+  "registered_tools": [
+    "analysis_bounded_endpoint",
+    "analysis_control_metrics",
+    "analysis_linearize_configuration",
+    "diagnosis_inspect_evidence",
+    "evidence_read",
+    "research_candidate_dimensions",
+    "research_capability_catalog",
+    "research_decide",
+    "research_prepare_candidate",
+    "retrieve_context"
+  ],
+  "session_id": "mainline5-research",
+  "disabled": [
+    "shell",
+    "read",
+    "write",
+    "edit",
+    "web_fetch",
+    "web_search",
+    "programmatic_tool_caller",
+    "subagent",
+    "background_tasks",
+    "memory",
+    "skills",
+    "todos",
+    "environment"
+  ],
+  "retry_controllers": 0,
+  "context": "auto",
+  "transport": "accounted live boundary"
+}
