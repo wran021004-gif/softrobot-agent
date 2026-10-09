@@ -52,7 +52,7 @@ class DeepSeekPilotModel(OpenAIModel):
         return result
 
 
-def initialize(directory,activity,model_budget=32):
+def initialize(directory,activity,model_budget=32,*,authorization=None,started_unix=None):
     """Import exact saved artifacts into a new read/decision-only business session.
 
     Robot setup is frozen data, not recompiled or granted for execution. Only
@@ -64,13 +64,16 @@ def initialize(directory,activity,model_budget=32):
     if directory.exists():raise ValueError('PILOT_ALREADY_EXISTS_USE_RESUME')
     bundle=read(SAVED/'fixed_bundle.json')
     cfg=deepcopy(bundle['snapshot']['input']);cfg['run_id']=activity
-    budget={**zero(),'model_calls':model_budget,'tool_calls':128,'wall_s':3600.}
+    began=time.time() if started_unix is None else started_unix
+    live=authorization is not None
+    duration=21600. if live else 3600.
+    budget={**zero(),'model_calls':40 if live else model_budget,'tool_calls':512 if live else 128,'wall_s':duration}
     cfg['policy'].update(budget=budget,allowed_tools=['research.investigation_read','research.investigation_disposition'],
         tool_bindings={'research.investigation_read':'1.0.0','research.investigation_disposition':'1.0.0'},
         operation_allowances={},timeout_s=5.)
     store=Store(directory/'business')
-    store.create(dict(project_id=activity,grant_id=activity,authorization_source='R0-R2 offline pilot; fixtures only',
-        budget=budget,exclusive_resources={}))
+    store.create(dict(project_id=activity,grant_id=activity,authorization_source=authorization or 'R0-R2 offline pilot; fixtures only',
+        budget=budget,exclusive_resources={'provider_request':1} if live else {}))
     reg=registry()
     snap=dict(input=cfg,input_identity=digest(cfg),initial=bundle['snapshot']['initial'],
         instance_identity=bundle['snapshot']['instance_identity'],
@@ -78,7 +81,6 @@ def initialize(directory,activity,model_budget=32):
             reg.get('research.investigation_disposition','1.0.0')],reg),
         import_scope='saved robot data; pure evidence and formal-decision services only')
     store.create_session(snap)
-    began=time.time()
     with store.transaction() as db:
         refs=[]
         for identity in SOURCE_IDS:
@@ -89,22 +91,23 @@ def initialize(directory,activity,model_budget=32):
         evaluation=bundle['artifacts'][SOURCE_IDS[0]]
         report=plain(InvestigationReturn(facts=[dict(statement='Saved official reach error',reference=refs[0],
             pointer='/metrics/0/value',value=evaluation['metrics'][0]['value'])],
-            interpretation='Offline fixture report extracted from the original fixed-C evaluation.',
+            interpretation='Extraction-only report from the saved fixed-C evaluation; no new experiment or scientific interpretation.' if live else 'Offline fixture report extracted from the original fixed-C evaluation.',
             unknowns=['Physical cause and live model compatibility are unassessed.']))
         report_ref=plain(store.put(db,report))
-        long_ref=plain(store.put(db,[dict(identity='controlled-long-original',index=i,value=0.0268176708469683,
+        long_ref=None if live else plain(store.put(db,[dict(identity='controlled-long-original',index=i,value=0.0268176708469683,
             units='m/s',padding='Controlled offload fixture material. '*8) for i in range(64)]))
-        directory_ref=plain(store.put(db,dict(sources=refs,report=report_ref,long_material=long_ref,
-            target=TARGET,meaning='Saved fixed-C source identities; new offline disposition namespace')))
+        directory_ref=plain(store.put(db,dict(sources=refs,report=report_ref,**({} if live else dict(long_material=long_ref)),
+            target=TARGET,meaning='Saved fixed-C source identities; new principal judgment, no new robot experiment' if live else 'Saved fixed-C source identities; new offline disposition namespace')))
         state=store.session(activity,db)['state']
-        state.update(role_context=dict(role='principal',investigation_grant=dict(evidence=[*refs,report_ref,long_ref,directory_ref],
-            include_completed_reports=True,deadline_unix=began+3600.)),
-            historical_investigations={TARGET:dict(status='completed',result=report_ref,kind='explicit_fixture_report',
+        state.update(role_context=dict(role='principal',investigation_grant=dict(evidence=[*refs,report_ref,directory_ref]+([long_ref] if long_ref else []),
+            include_completed_reports=True,deadline_unix=began+duration)),
+            historical_investigations={TARGET:dict(status='completed',result=report_ref,kind='extraction_only_report' if live else 'explicit_fixture_report',
                 source_bindings=refs,new_investigation_executed=False)},
-            pilot=dict(activity_id=activity,started_unix=began,deadline_unix=began+3600.,
+            pilot=dict(activity_id=activity,started_unix=began,deadline_unix=began+duration,
                 provider=deepcopy(bundle['snapshot']['input']['policy']['model']),directory=directory_ref,
                 sources=refs,report=report_ref,long_material=long_ref,fixture_requests=0,fixture_tokens=0,
                 live_model_requests=0,mathematical_solves=0,robot_backend_executions=0))
+        if live:state['pilot'].update(mode='live-r3',request_deadline_unix=began+duration-1800.,phase='prepared')
         store.update_state(db,activity,state,'running')
     host=Host(store.root,activity,actor='strands-pilot')
     host.folder.mkdir(parents=True,exist_ok=True)
@@ -158,7 +161,9 @@ class FixtureBoundary:
         return httpx.Response(200,json=response,request=request)
 
 
-def build_harness(host,responses,*,context_test=False,crash_after_submit=False,crash_before_request=False):
+def build_harness(host,responses=None,*,context_test=False,crash_after_submit=False,crash_before_request=False,
+        transport=None,api_key=None,context_config=None,instructions=None,model_class=DeepSeekPilotModel,tool_executor=None,
+        decision_contract=None):
     state=host.store.session(host.run_id)['state'];provider=state['pilot']['provider']
     dispatcher=InvestigationDispatcher(host)
 
@@ -179,7 +184,7 @@ def build_harness(host,responses,*,context_test=False,crash_after_submit=False,c
         return invoke_read(reference,pointer,offset,limit,byte_limit,tool_version)
 
     @tool
-    def submit_result(decision:dict,revision:int)->dict:
+    def submit_result(decision:(decision_contract or dict),revision:int)->dict:
         """Submit a principal decision through the existing validator. A revision key is stable across delivery IDs."""
         try:receipt=dispatcher.submit_disposition(decision,revision)
         except (ValueError,TypeError) as exc:return dict(error=str(exc),issue=getattr(exc,'issue',None))
@@ -191,10 +196,10 @@ def build_harness(host,responses,*,context_test=False,crash_after_submit=False,c
         """Retrieve the committed formal receipt by target and revision, after a restart or lost tool return."""
         return dict(receipt=dispatcher.disposition_receipt(investigation_id,revision))
 
-    client=AsyncOpenAI(api_key='offline-fixture-no-credential',base_url=provider['base_url'],max_retries=0,
-        timeout=provider['timeout_s'],http_client=httpx.AsyncClient(transport=httpx.MockTransport(
-            FixtureBoundary(host,responses,crash_before_request=crash_before_request))))
-    model=DeepSeekPilotModel(model_id=provider['model'],stream=False,
+    client=AsyncOpenAI(api_key=api_key or 'offline-fixture-no-credential',base_url=provider['base_url'],max_retries=0,
+        timeout=provider['timeout_s'],http_client=httpx.AsyncClient(transport=transport or httpx.MockTransport(
+            FixtureBoundary(host,responses,crash_before_request=crash_before_request)),follow_redirects=False))
+    model=model_class(model_id=provider['model'],stream=False,
         context_window_limit=provider['context_guard']['context_limit_tokens'],
         params=dict(max_tokens=provider['max_tokens'],reasoning_effort=provider['reasoning_effort'],
             extra_body=dict(thinking=dict(type=provider['thinking']))),
@@ -204,16 +209,18 @@ def build_harness(host,responses,*,context_test=False,crash_after_submit=False,c
         # Public built-in strategies, not another compressor or capacity estimator.
         context=dict(strategies=[Offload.truncate('tool_results',{'preview_tokens':32}).when(threshold=150),
             Offload.summarize('user_text',{'model':model}).when(threshold=250,preserve_recent=1)])
+    if context_config is not None:context=context_config(model)
     agent=create_harness(model=model,tools=[discover_evidence,read_original,submit_result,get_receipt],
-        instructions='Inspect the saved evidence, submit your formal principal decision using the native tool, and recover its receipt. This activity permits evidence and decisions only.',
+        instructions=instructions or 'Inspect the saved evidence, submit your formal principal decision using the native tool, and recover its receipt. This activity permits evidence and decisions only.',
         builtin_tools=[],builtin_plugins=[],background_tasks=False,memory=False,skills=False,
         context_manager=context,session=dict(id=host.run_id,dir=str(host.store.root.parent/'sessions')),
-        retry_strategy=None,callback_handler=None,caching=False)
+        retry_strategy=None,callback_handler=None,caching=False,tool_executor=tool_executor)
     atomic_json(host.store.root.parent/'configuration.json',dict(harness='strands-harness==0.2.0',sdk='strands-agents==1.59.0',
         provider=provider,registered_tools=sorted(agent.tool_names),session_id=host.run_id,
         disabled=['shell','read','write','edit','web_fetch','web_search','programmatic_tool_caller','subagent',
             'background_tasks','memory','skills','todos','environment'],retry_controllers=0,
-        context='public test strategies' if context_test else 'auto',transport='httpx.MockTransport; fixtures only'))
+        context='public R3 strategies' if context_config else 'public test strategies' if context_test else 'auto',
+        transport='accounted live boundary' if transport else 'httpx.MockTransport; fixtures only'))
     return agent
 
 
