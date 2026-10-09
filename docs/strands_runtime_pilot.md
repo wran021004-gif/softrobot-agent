@@ -1,6 +1,6 @@
 # Strands runtime pilot: R0–R2 offline acceptance
 
-R3 now has an executable live entry point. Its bounded run verified real request accounting, original reads, framework summarization/offloading and new-process retrieval, but exhausted 40 attempts before a valid formal submission. **R3 is not accepted.** See the [Chinese R3 stop report and commands](strands_runtime_pilot_r3.md). The R0–R2 evidence below remains the offline baseline.
+**The pilot's formal submission is closed and its handoff documented.** The original R3 activity exhausted 40 attempts without a valid submission; a separately authorized linked closeout used 3 of 24 additional attempts and obtained one durable native submission and receipt. See the [closeout report and usable entry](strands_runtime_pilot_closeout.md). The [original R3 stop report](strands_runtime_pilot_r3.md) and R0–R2 evidence below remain the historical baseline.
 
 The offline integration passes A–G using `strands-harness==0.2.0`, `strands-agents==1.59.0`, Python 3.11.16, controlled HTTP model fixtures, and the existing evidence, submission, and accounting services. [Results](../evidence/strands_runtime_pilot_20261009/results.json), [configuration](../evidence/strands_runtime_pilot_20261009/configuration.json), and [manifest](../evidence/strands_runtime_pilot_20261009/manifest.json) record the checks. **Live model requests: 0; mathematical solves: 0; robot backend executions: 0.** This establishes offline integration and recovery, not live DeepSeek compatibility, autonomous research quality, or physical improvement.
 

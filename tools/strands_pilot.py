@@ -213,10 +213,10 @@ def build_harness(host,responses=None,*,context_test=False,crash_after_submit=Fa
     agent=create_harness(model=model,tools=[discover_evidence,read_original,submit_result,get_receipt],
         instructions=instructions or 'Inspect the saved evidence, submit your formal principal decision using the native tool, and recover its receipt. This activity permits evidence and decisions only.',
         builtin_tools=[],builtin_plugins=[],background_tasks=False,memory=False,skills=False,
-        context_manager=context,session=dict(id=host.run_id,dir=str(host.store.root.parent/'sessions')),
+        context_manager=context,session=dict(id=state['pilot'].get('framework_session_id',host.run_id),dir=str(host.store.root.parent/'sessions')),
         retry_strategy=None,callback_handler=None,caching=False,tool_executor=tool_executor)
     atomic_json(host.store.root.parent/'configuration.json',dict(harness='strands-harness==0.2.0',sdk='strands-agents==1.59.0',
-        provider=provider,registered_tools=sorted(agent.tool_names),session_id=host.run_id,
+        provider=provider,registered_tools=sorted(agent.tool_names),session_id=state['pilot'].get('framework_session_id',host.run_id),
         disabled=['shell','read','write','edit','web_fetch','web_search','programmatic_tool_caller','subagent',
             'background_tasks','memory','skills','todos','environment'],retry_controllers=0,
         context='public R3 strategies' if context_config else 'public test strategies' if context_test else 'auto',

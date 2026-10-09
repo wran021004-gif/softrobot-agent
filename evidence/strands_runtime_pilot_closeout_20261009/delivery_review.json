@@ -1,0 +1,93 @@
+{
+  "activity": "strands-pilot-r3-20261009-closeout",
+  "status": "formal submission closed and handoff documented",
+  "receipt": {
+    "analysis_status": "not_assessed",
+    "cache_hit": false,
+    "caller": "strands-pilot",
+    "charged": {
+      "backend_solves": 0,
+      "model_calls": 0,
+      "tool_calls": 1,
+      "wall_s": 0.0,
+      "worker_calls": 0
+    },
+    "contract_version": "1.2.0",
+    "error": null,
+    "execution_id": "e9df3cce32044440a337b5828672bd2b",
+    "execution_status": "completed",
+    "original_execution_id": null,
+    "output": {
+      "artifact_id": "eb789c94b314a8f92ff30c90b86176bad758a3dd20a91b474856529a01898794",
+      "media_type": "application/json"
+    },
+    "request_id": "disposition-9ce322e145585d886575aa88d034b1051f26d99879c9bffa68321e4afe0454b5",
+    "result_contract": "PrincipalDisposition",
+    "result_version": "1.0.0",
+    "solver_status": "not_run",
+    "task_success": null,
+    "tool_id": "research.investigation_disposition",
+    "tool_version": "1.0.0"
+  },
+  "judgments": {
+    "arrival": {
+      "value": 0.0031314437885609334,
+      "limit": 0.01,
+      "unit": "m",
+      "passed": true
+    },
+    "holding_position": {
+      "value": 0.0033622899352609014,
+      "limit": 0.01,
+      "unit": "m",
+      "passed": true
+    },
+    "holding_speed": {
+      "value": 0.026817670846968282,
+      "limit": 0.02,
+      "unit": "m/s",
+      "passed": false
+    },
+    "joint": {
+      "status": "valid_failure",
+      "accepted": false,
+      "execution_id": "197bceb6ff8f44b48a35bc4f79b3528d"
+    }
+  },
+  "review": "The accepted model reason explicitly states arrival pass, holding position pass, holding speed fail and joint valid_failure; values and limits match the cited original objects. Report acceptance is not joint task success. The model record is unchanged.",
+  "new_request_usage": {
+    "attempts": 3,
+    "confirmed_responses": 3,
+    "pending": [],
+    "summaries": 0,
+    "actual_wire_configuration_preserved": true,
+    "actual_timeout_600s": true,
+    "usage_totals": {
+      "prompt_tokens": 247608,
+      "completion_tokens": 5859,
+      "total_tokens": 253467,
+      "reasoning_tokens": 1076
+    },
+    "money": null
+  },
+  "new_tool_usage": {
+    "mathematical_solves": 0,
+    "backend_solves": 0,
+    "robot_executions": 0,
+    "legacy_turn": 0,
+    "legacy_notes": [],
+    "public_tool_operations": 2,
+    "completed_invocation_scope_records": 1,
+    "zero_forbidden_calls_in_completed_invocations": true,
+    "failed_invocation_scope_records": 0
+  },
+  "original_preservation": {
+    "original_files_unchanged": true,
+    "predecessor": "strands-pilot-r3-20261009"
+  },
+  "cumulative_evidence": [
+    "evidence/strands_runtime_pilot_r3_20261009/acceptance.json",
+    "evidence/strands_runtime_pilot_20261009/results.json"
+  ],
+  "limitation_annotation": "Pinned live provider compatibility and native closeout are observed here; the extraction report wording about unassessed compatibility remains verbatim, and long-term reliability remains unassessed."
+}

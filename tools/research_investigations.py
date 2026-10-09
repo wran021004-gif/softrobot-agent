@@ -51,7 +51,7 @@ class PrincipalDisposition(Contract):
     investigation_id: str
     report: EvidenceRef | None = None
     disposition: Literal['accept','defer','reject']
-    evidence_used: list[SourceFact] = Field(default_factory=list,max_length=12)
+    evidence_used: list[SourceFact] = Field(default_factory=list)
     adopted_claims: list[AdoptedClaim] = Field(default_factory=list,max_length=8)
     semantic_claims_unassessed: list[str] = Field(default_factory=list,max_length=12)
     remaining_unknowns: list[str] = Field(default_factory=list,max_length=12)

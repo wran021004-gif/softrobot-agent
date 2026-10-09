@@ -199,7 +199,9 @@ originals exactly. Read the report before using it. The extraction-only report a
 joint success. Acceptance of source-supported claims does not mean success of the robot task.
 scope is a LIST of SourceFact objects, not a free-form identity dictionary; for example
 an independently inspected /source_execution_id string from the evaluation. evidence_used
-is also a list of SourceFact objects (at most 12); adopted_claims is a list (at most 8).
+is also a list of SourceFact objects with no item-count cap; adopted_claims is a list (at most 8).
+An object citation must contain the entire exact object. Cite individual JSON-pointer
+fields when using only part of an object; partial objects do not match whole objects.
 Only the directory's three sources and report are in this grant. Linked simulation,
 configuration and prediction references are metadata, not newly authorized readable sources.
 Do not retry an unchanged failed read. Use pointer-targeted pages for relevant fields;
@@ -244,10 +246,13 @@ def build_live(host,transport=None,key=None):
         from examples.gvs_nmpc_route_experiment import load_credential
         load_credential(Path.home()/'.codex/.env')
         key=os.environ['DEEPSEEK_API_KEY']
-    continuation=pilot(host)['phase']=='checkpoint_saved'
+    continuation=pilot(host)['phase'] in ('checkpoint_saved','closeout_ready')
     agent=build_harness(host,transport=boundary,api_key=key,context_config=lambda model:context_config(model,continuation),
         instructions=INSTRUCTIONS,model_class=live_model_class(boundary),tool_executor=SequentialToolExecutor(),
         decision_contract=PrincipalDisposition)
+    # Snapshot restoration includes its old system prompt. Refresh the interface
+    # instructions through the public Agent property, retaining all saved messages.
+    agent.system_prompt=INSTRUCTIONS
     # Evidence and submission already reserve their public operation in Store.
     # Receipt lookup and built-in stash retrieval need the same public-tool budget.
     auxiliary={}
@@ -405,7 +410,7 @@ def audit(host):
         value=host.store.artifact(event['outputs'][0]);result=value['result'];use=value['tool_use']
         try:text_value=json.loads(result['content'][0].get('text','null'))
         except ValueError:text_value=None
-        if use['name']=='submit_result' and isinstance(text_value,dict) and 'error' in text_value:
+        if use['name']=='submit_result' and isinstance(text_value,dict) and text_value.get('error') is not None:
             errors.append(dict(sequence=event['sequence'],error=text_value['error'],issue=text_value.get('issue')))
         if event['sequence']>checkpoint and use['name']=='retrieve_context' and result['status']=='success':
             try:
