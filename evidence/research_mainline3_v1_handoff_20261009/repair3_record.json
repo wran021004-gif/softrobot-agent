@@ -1,0 +1,10 @@
+{
+  "defect_id": "migrated_request_event_recovery",
+  "failure": "Recovery searched only the migrated session events, overlooking complete original request responses and leaving known invalid submission reserved as unknown.",
+  "affected_paths": [
+    "tools/research_investigations.py"
+  ],
+  "verification": "repair3_verification.json",
+  "started_unix": 1791522513.9361691,
+  "correction": "Read originating request events plus migration recovery events and lookup original receipt owner. Exact catalog error remains rejected; settle preserved13 requests,28 operations and original elapsed. No quota refunds or new scientific/model execution."
+}

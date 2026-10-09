@@ -1414,8 +1414,10 @@ class InvestigationDispatcher:
         node=self.store.session(self.run_id)['state']['investigations'][key]
         order=InvestigationOrder.model_validate(node['order'])
         self._scope(order)  # Same current root/parent/source/tool authority as dispatch.
+        events=self.store.events(row['run_id'])
+        if row['run_id']!=self.run_id:events=sorted([*events,*self.store.events(self.run_id)],key=lambda e:e['sequence'])
         if not row['receipt']:
-            responses=[e for e in self.store.events(self.run_id) if e['kind']=='investigation_response'
+            responses=[e for e in events if e['kind']=='investigation_response'
                 and e['status']=='validated' and e['request_id']==row['request_id'] and e['execution_id']==row['execution_id']]
             progress=dict(node.get('progress',{}))
             progress['recovering']=True
@@ -1427,9 +1429,9 @@ class InvestigationDispatcher:
                 progress['stage']='report_evidence_read'
                 saved=self.store.artifact(responses[-1]['outputs'][0]) if responses else None
                 if saved is None:
-                    originals=[e for e in self.store.events(self.run_id) if e['kind']=='investigation_provider_response'
+                    originals=[e for e in events if e['kind']=='investigation_provider_response'
                         and e['request_id']==row['request_id'] and e['execution_id']==row['execution_id']]
-                    receptions=[e for e in self.store.events(self.run_id) if e['kind']=='investigation_reception' and e['status']=='body_persisted'
+                    receptions=[e for e in events if e['kind']=='investigation_reception' and e['status']=='body_persisted'
                         and e['request_id']==row['request_id'] and e['execution_id']==row['execution_id']]
                     if receptions and (not originals or receptions[-1]['sequence']>originals[-1]['sequence']):
                         reception=self.store.artifact(receptions[-1]['outputs'][0])
@@ -1468,11 +1470,11 @@ class InvestigationDispatcher:
                         actual_cost=node.get('usage',{**zero(),'model_calls':1,'tool_calls':len(node['reads'])}))
                     progress['settlement_completed']=True
                     self._state(key,progress=progress)
-                    row=self.store.lookup(self.run_id,row['request_id'])
+                    row=self.store.lookup(row['run_id'],row['request_id'])
                 elif not row['receipt']:
                     # A durably confirmed local failure can also need settlement.
                     # This requires reception/no-call facts, not merely an error category.
-                    failures=[e for e in self.store.events(self.run_id) if e['kind']=='investigation_failure'
+                    failures=[e for e in events if e['kind']=='investigation_failure'
                         and e['status']=='confirmed_local_failure' and e['request_id']==row['request_id']
                         and e['execution_id']==row['execution_id']]
                     if failures:
@@ -1486,10 +1488,10 @@ class InvestigationDispatcher:
                                 elapsed=failure['elapsed_s'],actual_cost=node['usage'])
                             progress['settlement_completed']=True
                             self._state(key,progress=progress)
-                            row=self.store.lookup(self.run_id,row['request_id'])
+                            row=self.store.lookup(row['run_id'],row['request_id'])
             except Exception as exc:
                 self._handle_failure(order,row,progress,exc,started)
-                row=self.store.lookup(self.run_id,row['request_id'])
+                row=self.store.lookup(row['run_id'],row['request_id'])
         # Reconcile sealed ledger result first, including crash after settlement.
         if row['receipt']:
             receipt=json.loads(row['receipt']);status='completed' if receipt['execution_status']=='completed' else 'failed'
@@ -1503,7 +1505,7 @@ class InvestigationDispatcher:
             node=self.store.session(self.run_id)['state']['investigations'][key]
             return InvestigationResult(investigation_id=key,**{k:updates.get(k) for k in ('status','result','reason')},
                 failure_record=node.get('failure_record'),progress=node.get('progress'))
-        self.store.mark_unknown(self.run_id,row['request_id']);self._state(key,status='unconfirmed')
+        self.store.mark_unknown(row['run_id'],row['request_id']);self._state(key,status='unconfirmed')
         node=self.store.session(self.run_id)['state']['investigations'][key]
         return InvestigationResult(investigation_id=key,status='unconfirmed',reason='No sealed result; reservation retained. Reconcile original provider request; no automatic retry or release.',
             failure_record=node.get('failure_record'),progress=node.get('progress'))
