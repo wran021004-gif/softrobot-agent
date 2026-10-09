@@ -1,0 +1,764 @@
+{
+  "passed": true,
+  "reviewed_by": "coding agent; no paid reviewer",
+  "final_report": {
+    "label": "engineered capability-use test",
+    "original_execution_id": "7099708881f242b1836e982bdf3374e1",
+    "report": {
+      "configuration": {
+        "artifact_id": "999d62ef8f50cebe226b58a98c3a7ae3427c943b1064c245194a9c03813ed853",
+        "media_type": "application/json"
+      },
+      "execution_evidence": {
+        "artifact_id": "9d4729281c63e0991feb9545d54c94afeeefab4963c8a4e6e159bd854682e672",
+        "media_type": "application/json"
+      },
+      "interpretation": "Prepared one supported nonbaseline finite template (T1) via research.select_template and research.prepare_candidate, and confirmed its owned configuration through research.candidate_dimensions: component_order [\"near\",\"mid_guide\",\"connector\",\"far\",\"payload\"], 8 actuator commands (near_motor0-3, far_motor0-3), 12 reduced coordinates (near.kappa_y/z_node_0-2 and far.kappa_y/z_node_0-2), reduced_state 24, backend_position/velocity 48, tendon_input 8, with enforced 0 <= tendon force <= candidate force_limit_n. This identifies T1: four independent tendons at each of two routing rings with a 12 near + 12 far serial bending-cell discretization. No simulation, evaluation or profiling was executed for this prepared candidate. The supplied original T1 execution record (owner mainline3-v2, protocol offline_reach_hold_v1, seed 17, duration 0.35 s, 0 new backend solves) is a valid, completed execution that did not meet the task: execution_complete=true, evaluation_validity=valid, force_bounds passed (0 N), solver_errors=0, holding_coverage passed, yet evaluator task_success=false with terminal reach error 0.06645818270480622 m > 0.01 m, holding position 0.19454125069054856 m > 0.01 m, and holding speed 4.39014737268117 m/s > 0.02 m/s. Reach, holding position, holding speed and timing are separate facts; none substitutes for another. Timing: 35 deadline misses, mean update 16.835 s against a 0.01 s control period, real_time_demonstrated=false (real_time_required=false); termination includes duration and numerical_failure. This report asserts construction/dimension validity for the prepared configuration and reports the owner's recorded outcome; it makes no causal, optimization-gain, motor-realistic or superiority claim.",
+      "limitations": [
+        "No backend simulation, evaluation or control-profile run was granted for the prepared candidate; only construction, dimension inspection and a pre-existing execution record are reported (0 new backend solves; execution pending).",
+        "The execution evidence is the original T1 record owned by mainline3-v2; the prepared model-session configuration shares the same scientific scope but has a different configuration identity, so the record is not a re-execution of the prepared candidate.",
+        "Single seed (17) and single development instance/aggregation; no variability, robustness, repeatability or generalization is established.",
+        "Only the T1 template is covered; no comparison against T0, T2, T3 or any baseline, and no ranking, is established by this report.",
+        "Acceptance is the fixed evaluator/tolerance; sampled holding uses a 0.05 s window (6 samples) with no continuous-time guarantee, and the recorded termination includes numerical_failure.",
+        "The serial bending model omits shear, stretch, torsion, tendon friction, rope elasticity and motor dynamics; the execution model is ideal independent tension with no coupled motor-realistic actuation, and 'compliant/stiff' material scenarios are numerical, not validated materials.",
+        "Template choice is categorical enumeration; no autonomous topology invention and no optimization were performed.",
+        "Simulated duration/control period, applied updates, initialization selections and measured wall time are distinct facts and are not interchanged here."
+      ]
+    },
+    "scientific_claims": "No autonomous topology invention, optimization gain or research superiority established",
+    "template": "T1"
+  },
+  "supported_claims": {
+    "selected_template": "T1",
+    "dimensions": {
+      "reduced_coordinate": 12,
+      "reduced_state": 24,
+      "backend_position": 48,
+      "backend_velocity": 48,
+      "tendon_input": 8,
+      "actuator_command": 8
+    },
+    "original_execution_id": "7099708881f242b1836e982bdf3374e1",
+    "same_scientific_scope": true,
+    "original_ownership_preserved": true,
+    "original_owner": "mainline3-v2",
+    "criteria": {
+      "evaluation_validity": {
+        "limit": null,
+        "passed": true,
+        "reason": null,
+        "unit": null,
+        "value": "valid"
+      },
+      "evaluator:task_bound": {
+        "limit": 0.01,
+        "passed": false,
+        "reason": null,
+        "unit": "m",
+        "value": 0.06645818270480622
+      },
+      "execution_complete": {
+        "limit": null,
+        "passed": true,
+        "reason": null,
+        "unit": null,
+        "value": true
+      },
+      "force_bounds": {
+        "limit": 1e-08,
+        "passed": true,
+        "reason": null,
+        "unit": "N",
+        "value": 0.0
+      },
+      "holding_coverage": {
+        "limit": 6,
+        "passed": true,
+        "reason": null,
+        "unit": "inclusive uniform samples",
+        "value": true
+      },
+      "holding_position": {
+        "limit": 0.01,
+        "passed": false,
+        "reason": null,
+        "unit": "m",
+        "value": 0.19454125069054856
+      },
+      "holding_speed": {
+        "limit": 0.02,
+        "passed": false,
+        "reason": null,
+        "unit": "m/s",
+        "value": 4.39014737268117
+      },
+      "solver_errors": {
+        "limit": 0,
+        "passed": true,
+        "reason": null,
+        "unit": "count",
+        "value": 0
+      },
+      "task_evaluator": {
+        "limit": null,
+        "passed": false,
+        "reason": null,
+        "unit": null,
+        "value": false
+      }
+    },
+    "timing": {
+      "control_period_s": 0.01,
+      "deadline_misses": 35,
+      "duration_s": 0.35,
+      "mean_update_s": 16.83504212857224,
+      "real_time_demonstrated": false,
+      "real_time_required": false,
+      "sample_period_s": 0.01,
+      "simulation_wall_s": 592.0780000000377,
+      "termination": [
+        "duration",
+        "numerical_failure"
+      ],
+      "timestep_s": 0.0005
+    },
+    "new_native_backend_executions": 0
+  },
+  "scope_clarifications": [
+    "timing.termination is the configured allowed stop-condition list, not an observed termination cause. The trajectory is complete with 35 updates; no claim that numerical_failure occurred is adopted.",
+    "new_backend_solves=0 describes acceptance composition and this native reuse, not the original T1 run. That run used one backend execution.",
+    "Zero solver-error counters do not establish optimizer convergence or a physical cause. Full optimizer delivery counts are in the original profile and V2 summaries."
+  ],
+  "native_call_chain": [
+    {
+      "request_id": "native-catalog-handoff",
+      "tool": "research.capability_catalog",
+      "arguments": {},
+      "status": "completed",
+      "error": null,
+      "receipt": {
+        "analysis_status": "not_assessed",
+        "cache_hit": false,
+        "caller": "local-human",
+        "charged": {
+          "backend_solves": 0,
+          "model_calls": 0,
+          "tool_calls": 1,
+          "wall_s": 1.327999999979511,
+          "worker_calls": 0
+        },
+        "contract_version": "1.2.0",
+        "error": null,
+        "execution_id": "deae87532d8949eaaf6ba9d5d060bbf9",
+        "execution_status": "completed",
+        "original_execution_id": null,
+        "output": {
+          "artifact_id": "71ee809c6e8bd752ef8c16554eabca55e32a0bd46f8add19dbbcdcbb81119268",
+          "media_type": "application/json"
+        },
+        "request_id": "native-catalog-handoff",
+        "result_contract": "CapabilityResult",
+        "result_version": "1.0.0",
+        "solver_status": "not_run",
+        "task_success": null,
+        "tool_id": "research.capability_catalog",
+        "tool_version": "1.0.0"
+      }
+    },
+    {
+      "request_id": "model-0-tool",
+      "tool": "research.select_template",
+      "arguments": {
+        "template": "T2"
+      },
+      "status": "completed",
+      "error": null,
+      "receipt": {
+        "analysis_status": "not_assessed",
+        "cache_hit": false,
+        "caller": "model",
+        "charged": {
+          "backend_solves": 0,
+          "model_calls": 0,
+          "tool_calls": 1,
+          "wall_s": 1.952999999979511,
+          "worker_calls": 0
+        },
+        "contract_version": "1.2.0",
+        "error": null,
+        "execution_id": "12c02e6992af4da790e8512e50329509",
+        "execution_status": "completed",
+        "original_execution_id": null,
+        "output": {
+          "artifact_id": "137a3493549a5fed4da4d3602f8fe4384c132e0849f36e7d3b241c855e8361d7",
+          "media_type": "application/json"
+        },
+        "request_id": "model-0-tool",
+        "result_contract": "CapabilityResult",
+        "result_version": "1.0.0",
+        "solver_status": "not_run",
+        "task_success": null,
+        "tool_id": "research.select_template",
+        "tool_version": "1.0.0"
+      }
+    },
+    {
+      "request_id": "model-1-tool",
+      "tool": "research.prepare_candidate",
+      "arguments": {
+        "candidate_id": "mainline3-v2-t2-development",
+        "changes": {
+          "template": "T2"
+        }
+      },
+      "status": "completed",
+      "error": null,
+      "receipt": {
+        "analysis_status": "not_assessed",
+        "cache_hit": false,
+        "caller": "model",
+        "charged": {
+          "backend_solves": 0,
+          "model_calls": 0,
+          "tool_calls": 1,
+          "wall_s": 1.7809999999590218,
+          "worker_calls": 0
+        },
+        "contract_version": "1.2.0",
+        "error": null,
+        "execution_id": "2c73fcf7dcb34e7d86c7439df03ee219",
+        "execution_status": "completed",
+        "original_execution_id": null,
+        "output": {
+          "artifact_id": "804af1a77cf077c98ea9c7712ac11ce49cedb6c5c143ffcf32235dc194971a44",
+          "media_type": "application/json"
+        },
+        "request_id": "model-1-tool",
+        "result_contract": "PreparedCandidate",
+        "result_version": "1.0.0",
+        "solver_status": "not_run",
+        "task_success": null,
+        "tool_id": "research.prepare_candidate",
+        "tool_version": "1.0.0"
+      }
+    },
+    {
+      "request_id": "model-2-tool",
+      "tool": "research.candidate_dimensions",
+      "arguments": {
+        "configuration": {
+          "artifact_id": "2ea177e2de6976a55a109cbdd20b5732cfd6472b17fcb2253bac1e6c44b598e8",
+          "media_type": "application/json"
+        }
+      },
+      "status": "completed",
+      "error": null,
+      "receipt": {
+        "analysis_status": "not_assessed",
+        "cache_hit": false,
+        "caller": "model",
+        "charged": {
+          "backend_solves": 0,
+          "model_calls": 0,
+          "tool_calls": 1,
+          "wall_s": 1.0630000000237487,
+          "worker_calls": 0
+        },
+        "contract_version": "1.2.0",
+        "error": null,
+        "execution_id": "b5eed674dfe64ba5b2353b925560abc5",
+        "execution_status": "completed",
+        "original_execution_id": null,
+        "output": {
+          "artifact_id": "c0fb53ce096134c0f22ab75c0ccfe17b047ac7ddd1a2d50e315c70b191a00fdc",
+          "media_type": "application/json"
+        },
+        "request_id": "model-2-tool",
+        "result_contract": "CapabilityResult",
+        "result_version": "1.0.0",
+        "solver_status": "not_run",
+        "task_success": null,
+        "tool_id": "research.candidate_dimensions",
+        "tool_version": "1.0.0"
+      }
+    },
+    {
+      "request_id": "model-3-tool",
+      "tool": "evidence.read",
+      "arguments": {
+        "byte_limit": 6000,
+        "limit": 20,
+        "offset": 0,
+        "pointer": "/detail/dimensions",
+        "reference": {
+          "artifact_id": "c0fb53ce096134c0f22ab75c0ccfe17b047ac7ddd1a2d50e315c70b191a00fdc",
+          "media_type": "application/json"
+        }
+      },
+      "status": "completed",
+      "error": null,
+      "receipt": {
+        "analysis_status": "not_assessed",
+        "cache_hit": false,
+        "caller": "model",
+        "charged": {
+          "backend_solves": 0,
+          "model_calls": 0,
+          "tool_calls": 1,
+          "wall_s": 1.0160000000032596,
+          "worker_calls": 0
+        },
+        "contract_version": "1.2.0",
+        "error": null,
+        "execution_id": "cb07833ba00a41f7b37855cd96f47757",
+        "execution_status": "completed",
+        "original_execution_id": null,
+        "output": {
+          "artifact_id": "a8cad9387017b031cc5f027370856d456db362941f182fc55f97f60212ac9a04",
+          "media_type": "application/json"
+        },
+        "request_id": "model-3-tool",
+        "result_contract": "EvidencePage",
+        "result_version": "1.0.0",
+        "solver_status": "not_run",
+        "task_success": null,
+        "tool_id": "evidence.read",
+        "tool_version": "1.0.0"
+      }
+    },
+    {
+      "request_id": "model-4-tool",
+      "tool": "research.capability_report",
+      "arguments": {
+        "configuration": {
+          "artifact_id": "804af1a77cf077c98ea9c7712ac11ce49cedb6c5c143ffcf32235dc194971a44",
+          "media_type": "application/json"
+        },
+        "execution_evidence": {
+          "artifact_id": "e3d2b5af063f278c63b19f272c3bde4bb3fb0037c2ddf6f0d3fa471a4a14882e",
+          "media_type": "application/json"
+        },
+        "interpretation": "Finite capability-use check. From the granted capability catalog (reference 71ee809c6e8bd752ef8c16554eabca55e32a0bd46f8add19dbbcdcbb81119268) the non-baseline finite template T2 (independent per-tendon actuation with an explicit zero-initialized middle/far distal split) was selected and the model-session candidate was prepared; the owned prepared configuration is artifact 804af1a7cf077c98ea9c7712ac11ce49cedb6c5c143ffcf32235dc194971a44. Its owned geometry/schema overview (research.candidate_dimensions artifact c0fb53ce096134c0f22ab75c0ccfe17b047ac7ddd1a2d50e315c70b191a00fdc, pointer /detail/dimensions, read as artifact a8cad9387017b031cc5f027370856d456db362941f182fc55f97f60212ac9a04) reports 6 actuator commands, 6 tendon inputs, 48 backend position and 48 backend velocity coordinates, 18 reduced coordinates and 36 reduced states — a structural description, not a performance result. The supplied original execution evidence (artifact e3d2b5af063f278c63b19f272c3bde4bb3fb0037c2ddf6f0d3fa471a4a14882e, execution owner mainline3-v2, protocol offline_reach_hold_v1, status valid_failure) shows execution_complete true, evaluation_validity valid, solver_errors 0 and force_bounds 0.0 N, while the false criteria are: terminal_error_m 0.011093377940363218 m above the 0.01 m tolerance; holding_max_error_m 0.023420466402621826 m above the 0.01 m settling limit; and holding_max_speed_m_s 1.1210197701767821 above the 0.02 m/s settling limit. Reach (terminal position), holding position, holding speed and timing are separate facts: reach missed tolerance, sampled settling missed both limits (holding_coverage of 6 samples is available and passed as a coverage check only), and timing records real_time_demonstrated false with 35 deadline misses over a 0.35 s duration. No new simulation was run and the prepared candidate has no fresh trajectory, evaluation or profile; the cited receipt binds only to its own exact executed configuration, and the prepared candidate shares scientific scope but carries no new result.",
+        "limitations": [
+          "No execution was run in this session: the model-session candidate was only selected, prepared and dimension-inspected, so no new reach, holding-position, holding-speed or timing outcome is produced for it, and no duplicate run was performed.",
+          "The cited original execution evidence is a valid failure, not an acceptance: the reach target was not reached within the 0.01 m tolerance and the holding position (>0.01 m) and holding speed (>0.02 m/s) limits were exceeded. These false criteria mean failed, not unavailable.",
+          "Reach, holding position, holding speed and computation timing are independent recorded facts; they are reported separately and are not collapsed into an overall success or ranking.",
+          "The evidence binds only to its own exact executed configuration (execution owner mainline3-v2, single seed, single finite template); the prepared candidate's exact configuration differs, so the receipt cannot be transferred and the result is not replicated, robust or general.",
+          "No causal diagnosis is asserted: the failed metrics are not attributed to the T2 template choice or to any individual parameter, and no optimization gain, research superiority or autonomous topology invention is claimed.",
+          "Actuation is independent ideal tension with a straight frictionless tendon model that omits shear, axial stretch, torsion, tendon friction, rope elasticity and motor dynamics; motor-realistic execution and real-time feasibility are therefore not demonstrated (real_time_demonstrated false, 35 deadline misses)."
+        ]
+      },
+      "status": "failed",
+      "error": "'baseline_identity'",
+      "receipt": {
+        "analysis_status": "not_assessed",
+        "cache_hit": false,
+        "caller": "model",
+        "charged": {
+          "backend_solves": 0,
+          "model_calls": 0,
+          "tool_calls": 1,
+          "wall_s": 1.0,
+          "worker_calls": 0
+        },
+        "contract_version": "1.2.0",
+        "error": "'baseline_identity'",
+        "execution_id": "5b68c56af25a479794aa70095deada3e",
+        "execution_status": "failed",
+        "original_execution_id": null,
+        "output": null,
+        "request_id": "model-4-tool",
+        "result_contract": null,
+        "result_version": "1.0.0",
+        "solver_status": "not_run",
+        "task_success": null,
+        "tool_id": "research.capability_report",
+        "tool_version": "1.0.0"
+      }
+    },
+    {
+      "request_id": "model-5-tool",
+      "tool": "evidence.read",
+      "arguments": {
+        "byte_limit": 4096,
+        "limit": 20,
+        "offset": 0,
+        "pointer": "",
+        "reference": {
+          "artifact_id": "804af1a77cf077c98ea9c7712ac11ce49cedb6c5c143ffcf32235dc194971a44",
+          "media_type": "application/json"
+        }
+      },
+      "status": "completed",
+      "error": null,
+      "receipt": {
+        "analysis_status": "not_assessed",
+        "cache_hit": false,
+        "caller": "model",
+        "charged": {
+          "backend_solves": 0,
+          "model_calls": 0,
+          "tool_calls": 1,
+          "wall_s": 1.0310000000172295,
+          "worker_calls": 0
+        },
+        "contract_version": "1.2.0",
+        "error": null,
+        "execution_id": "fd63d11dc46746d3b77034ebc5940f0f",
+        "execution_status": "completed",
+        "original_execution_id": null,
+        "output": {
+          "artifact_id": "8601290cfa546870f89564f921ca7766d1b9abb72790627e40b7814befaba7e3",
+          "media_type": "application/json"
+        },
+        "request_id": "model-5-tool",
+        "result_contract": "EvidencePage",
+        "result_version": "1.0.0",
+        "solver_status": "not_run",
+        "task_success": null,
+        "tool_id": "evidence.read",
+        "tool_version": "1.0.0"
+      }
+    },
+    {
+      "request_id": "model-6-tool",
+      "tool": "research.select_template",
+      "arguments": {
+        "template": "T2"
+      },
+      "status": "completed",
+      "error": null,
+      "receipt": {
+        "analysis_status": "not_assessed",
+        "cache_hit": false,
+        "caller": "model",
+        "charged": {
+          "backend_solves": 0,
+          "model_calls": 0,
+          "tool_calls": 1,
+          "wall_s": 1.922000000020489,
+          "worker_calls": 0
+        },
+        "contract_version": "1.2.0",
+        "error": null,
+        "execution_id": "1cac865acb5f4c54877ba3ec63ff9c3b",
+        "execution_status": "completed",
+        "original_execution_id": null,
+        "output": {
+          "artifact_id": "137a3493549a5fed4da4d3602f8fe4384c132e0849f36e7d3b241c855e8361d7",
+          "media_type": "application/json"
+        },
+        "request_id": "model-6-tool",
+        "result_contract": "CapabilityResult",
+        "result_version": "1.0.0",
+        "solver_status": "not_run",
+        "task_success": null,
+        "tool_id": "research.select_template",
+        "tool_version": "1.0.0"
+      }
+    },
+    {
+      "request_id": "model-7-tool",
+      "tool": "research.prepare_candidate",
+      "arguments": {
+        "candidate_id": "mainline3-v2-T2-model-session",
+        "changes": {
+          "template": "T2"
+        }
+      },
+      "status": "completed",
+      "error": null,
+      "receipt": {
+        "analysis_status": "not_assessed",
+        "cache_hit": false,
+        "caller": "model",
+        "charged": {
+          "backend_solves": 0,
+          "model_calls": 0,
+          "tool_calls": 1,
+          "wall_s": 1.75,
+          "worker_calls": 0
+        },
+        "contract_version": "1.2.0",
+        "error": null,
+        "execution_id": "46c8ada3a760402582f6da7729ed5a0b",
+        "execution_status": "completed",
+        "original_execution_id": null,
+        "output": {
+          "artifact_id": "9eb5e5ca7c9c04b9670573feeb14d3539f8720848e0033f64be83e2a90f42e29",
+          "media_type": "application/json"
+        },
+        "request_id": "model-7-tool",
+        "result_contract": "PreparedCandidate",
+        "result_version": "1.0.0",
+        "solver_status": "not_run",
+        "task_success": null,
+        "tool_id": "research.prepare_candidate",
+        "tool_version": "1.0.0"
+      }
+    },
+    {
+      "request_id": "model-8-tool",
+      "tool": "research.select_template",
+      "arguments": {
+        "template": "T1"
+      },
+      "status": "completed",
+      "error": null,
+      "receipt": {
+        "analysis_status": "not_assessed",
+        "cache_hit": false,
+        "caller": "model",
+        "charged": {
+          "backend_solves": 0,
+          "model_calls": 0,
+          "tool_calls": 1,
+          "wall_s": 1.952999999979511,
+          "worker_calls": 0
+        },
+        "contract_version": "1.2.0",
+        "error": null,
+        "execution_id": "9787418651ca42b58e91160c0b941d8a",
+        "execution_status": "completed",
+        "original_execution_id": null,
+        "output": {
+          "artifact_id": "5828f9530da51de21b07c2e489eb61be3ba48841ef5bb5873c758b1f9240cb02",
+          "media_type": "application/json"
+        },
+        "request_id": "model-8-tool",
+        "result_contract": "CapabilityResult",
+        "result_version": "1.0.0",
+        "solver_status": "not_run",
+        "task_success": null,
+        "tool_id": "research.select_template",
+        "tool_version": "1.0.0"
+      }
+    },
+    {
+      "request_id": "model-9-tool",
+      "tool": "research.prepare_candidate",
+      "arguments": {
+        "candidate_id": "candidate-t1-dev",
+        "changes": {
+          "template": "T1"
+        }
+      },
+      "status": "completed",
+      "error": null,
+      "receipt": {
+        "analysis_status": "not_assessed",
+        "cache_hit": false,
+        "caller": "model",
+        "charged": {
+          "backend_solves": 0,
+          "model_calls": 0,
+          "tool_calls": 1,
+          "wall_s": 1.7349999999860302,
+          "worker_calls": 0
+        },
+        "contract_version": "1.2.0",
+        "error": null,
+        "execution_id": "ffc6fcafc92d43d18ac08583fb118664",
+        "execution_status": "completed",
+        "original_execution_id": null,
+        "output": {
+          "artifact_id": "2b5e9cfaa6881c5cd1583a2f1ec05fe16c734d7dd7a600a2bea10bd70fbf94ea",
+          "media_type": "application/json"
+        },
+        "request_id": "model-9-tool",
+        "result_contract": "PreparedCandidate",
+        "result_version": "1.0.0",
+        "solver_status": "not_run",
+        "task_success": null,
+        "tool_id": "research.prepare_candidate",
+        "tool_version": "1.0.0"
+      }
+    },
+    {
+      "request_id": "model-10-tool",
+      "tool": "research.candidate_dimensions",
+      "arguments": {
+        "configuration": {
+          "artifact_id": "999d62ef8f50cebe226b58a98c3a7ae3427c943b1064c245194a9c03813ed853",
+          "media_type": "application/json"
+        }
+      },
+      "status": "completed",
+      "error": null,
+      "receipt": {
+        "analysis_status": "not_assessed",
+        "cache_hit": false,
+        "caller": "model",
+        "charged": {
+          "backend_solves": 0,
+          "model_calls": 0,
+          "tool_calls": 1,
+          "wall_s": 1.047000000020489,
+          "worker_calls": 0
+        },
+        "contract_version": "1.2.0",
+        "error": null,
+        "execution_id": "e63af288bf174828996444c04c9a21dc",
+        "execution_status": "completed",
+        "original_execution_id": null,
+        "output": {
+          "artifact_id": "29b2b9ed43db020dae54a530e59f5aae95cac90584b555e3c61a6f34fa008d5d",
+          "media_type": "application/json"
+        },
+        "request_id": "model-10-tool",
+        "result_contract": "CapabilityResult",
+        "result_version": "1.0.0",
+        "solver_status": "not_run",
+        "task_success": null,
+        "tool_id": "research.candidate_dimensions",
+        "tool_version": "1.0.0"
+      }
+    },
+    {
+      "request_id": "model-11-tool",
+      "tool": "evidence.read",
+      "arguments": {
+        "byte_limit": 8192,
+        "limit": 20,
+        "offset": 0,
+        "pointer": "/detail",
+        "reference": {
+          "artifact_id": "29b2b9ed43db020dae54a530e59f5aae95cac90584b555e3c61a6f34fa008d5d",
+          "media_type": "application/json"
+        }
+      },
+      "status": "completed",
+      "error": null,
+      "receipt": {
+        "analysis_status": "not_assessed",
+        "cache_hit": false,
+        "caller": "model",
+        "charged": {
+          "backend_solves": 0,
+          "model_calls": 0,
+          "tool_calls": 1,
+          "wall_s": 1.047000000020489,
+          "worker_calls": 0
+        },
+        "contract_version": "1.2.0",
+        "error": null,
+        "execution_id": "14167c5ffc5c4625a96fef31c4e4ce28",
+        "execution_status": "completed",
+        "original_execution_id": null,
+        "output": {
+          "artifact_id": "63a45cf6b8c0bc536592c976ad5bfa4ba2a476a3ed812d1b13f0b1b894b3eb91",
+          "media_type": "application/json"
+        },
+        "request_id": "model-11-tool",
+        "result_contract": "EvidencePage",
+        "result_version": "1.0.0",
+        "solver_status": "not_run",
+        "task_success": null,
+        "tool_id": "evidence.read",
+        "tool_version": "1.0.0"
+      }
+    },
+    {
+      "request_id": "model-12-tool",
+      "tool": "evidence.read",
+      "arguments": {
+        "byte_limit": 4096,
+        "limit": 20,
+        "offset": 0,
+        "pointer": "",
+        "reference": {
+          "artifact_id": "2b5e9cfaa6881c5cd1583a2f1ec05fe16c734d7dd7a600a2bea10bd70fbf94ea",
+          "media_type": "application/json"
+        }
+      },
+      "status": "completed",
+      "error": null,
+      "receipt": {
+        "analysis_status": "not_assessed",
+        "cache_hit": false,
+        "caller": "model",
+        "charged": {
+          "backend_solves": 0,
+          "model_calls": 0,
+          "tool_calls": 1,
+          "wall_s": 1.047000000020489,
+          "worker_calls": 0
+        },
+        "contract_version": "1.2.0",
+        "error": null,
+        "execution_id": "d352d48a0ff6434fa950bf02e8e68a5a",
+        "execution_status": "completed",
+        "original_execution_id": null,
+        "output": {
+          "artifact_id": "2f72a8b8f2daa4facf701d897d736d16893be0e35c9bad58e59e8f61125d1933",
+          "media_type": "application/json"
+        },
+        "request_id": "model-12-tool",
+        "result_contract": "EvidencePage",
+        "result_version": "1.0.0",
+        "solver_status": "not_run",
+        "task_success": null,
+        "tool_id": "evidence.read",
+        "tool_version": "1.0.0"
+      }
+    },
+    {
+      "request_id": "model-13-tool",
+      "tool": "research.capability_report",
+      "arguments": {
+        "configuration": {
+          "artifact_id": "999d62ef8f50cebe226b58a98c3a7ae3427c943b1064c245194a9c03813ed853",
+          "media_type": "application/json"
+        },
+        "execution_evidence": {
+          "artifact_id": "9d4729281c63e0991feb9545d54c94afeeefab4963c8a4e6e159bd854682e672",
+          "media_type": "application/json"
+        },
+        "interpretation": "Prepared one supported nonbaseline finite template (T1) via research.select_template and research.prepare_candidate, and confirmed its owned configuration through research.candidate_dimensions: component_order [\"near\",\"mid_guide\",\"connector\",\"far\",\"payload\"], 8 actuator commands (near_motor0-3, far_motor0-3), 12 reduced coordinates (near.kappa_y/z_node_0-2 and far.kappa_y/z_node_0-2), reduced_state 24, backend_position/velocity 48, tendon_input 8, with enforced 0 <= tendon force <= candidate force_limit_n. This identifies T1: four independent tendons at each of two routing rings with a 12 near + 12 far serial bending-cell discretization. No simulation, evaluation or profiling was executed for this prepared candidate. The supplied original T1 execution record (owner mainline3-v2, protocol offline_reach_hold_v1, seed 17, duration 0.35 s, 0 new backend solves) is a valid, completed execution that did not meet the task: execution_complete=true, evaluation_validity=valid, force_bounds passed (0 N), solver_errors=0, holding_coverage passed, yet evaluator task_success=false with terminal reach error 0.06645818270480622 m > 0.01 m, holding position 0.19454125069054856 m > 0.01 m, and holding speed 4.39014737268117 m/s > 0.02 m/s. Reach, holding position, holding speed and timing are separate facts; none substitutes for another. Timing: 35 deadline misses, mean update 16.835 s against a 0.01 s control period, real_time_demonstrated=false (real_time_required=false); termination includes duration and numerical_failure. This report asserts construction/dimension validity for the prepared configuration and reports the owner's recorded outcome; it makes no causal, optimization-gain, motor-realistic or superiority claim.",
+        "limitations": [
+          "No backend simulation, evaluation or control-profile run was granted for the prepared candidate; only construction, dimension inspection and a pre-existing execution record are reported (0 new backend solves; execution pending).",
+          "The execution evidence is the original T1 record owned by mainline3-v2; the prepared model-session configuration shares the same scientific scope but has a different configuration identity, so the record is not a re-execution of the prepared candidate.",
+          "Single seed (17) and single development instance/aggregation; no variability, robustness, repeatability or generalization is established.",
+          "Only the T1 template is covered; no comparison against T0, T2, T3 or any baseline, and no ranking, is established by this report.",
+          "Acceptance is the fixed evaluator/tolerance; sampled holding uses a 0.05 s window (6 samples) with no continuous-time guarantee, and the recorded termination includes numerical_failure.",
+          "The serial bending model omits shear, stretch, torsion, tendon friction, rope elasticity and motor dynamics; the execution model is ideal independent tension with no coupled motor-realistic actuation, and 'compliant/stiff' material scenarios are numerical, not validated materials.",
+          "Template choice is categorical enumeration; no autonomous topology invention and no optimization were performed.",
+          "Simulated duration/control period, applied updates, initialization selections and measured wall time are distinct facts and are not interchanged here."
+        ]
+      },
+      "status": "completed",
+      "error": null,
+      "receipt": {
+        "analysis_status": "not_assessed",
+        "cache_hit": false,
+        "caller": "model",
+        "charged": {
+          "backend_solves": 0,
+          "model_calls": 0,
+          "tool_calls": 1,
+          "wall_s": 1.1410000000032596,
+          "worker_calls": 0
+        },
+        "contract_version": "1.2.0",
+        "error": null,
+        "execution_id": "93b1ff28ec5c42059dcd7398655b0de0",
+        "execution_status": "completed",
+        "original_execution_id": null,
+        "output": {
+          "artifact_id": "39989b81938a030c0ede4de4e137b3dc6487b22eb825f3a4bf4d2689f3a6a264",
+          "media_type": "application/json"
+        },
+        "request_id": "model-13-tool",
+        "result_contract": "CapabilityResult",
+        "result_version": "1.0.0",
+        "solver_status": "not_run",
+        "task_success": null,
+        "tool_id": "research.capability_report",
+        "tool_version": "1.0.0"
+      }
+    }
+  ],
+  "first_failed_report_preserved": true,
+  "provider_requests_after_first_failed_report": 9,
+  "post_session_feedback_repair": "Schema/reference guidance now names PreparedCandidate.configuration; saved failed call verifies actionable rejection without any new request or ledger mutation."
+}

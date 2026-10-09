@@ -36,7 +36,7 @@ class TemplateSelection(Contract):
 
 
 class CandidateDimensions(Contract):
-    configuration: EvidenceRef
+    configuration: EvidenceRef = Field(description='Owned candidate reference from PreparedCandidate.configuration; never the preparation receipt output/wrapper')
 
 
 class CapabilityResult(Contract):
@@ -44,7 +44,7 @@ class CapabilityResult(Contract):
 
 
 class CapabilityReport(Contract):
-    configuration: EvidenceRef
+    configuration: EvidenceRef = Field(description='Owned candidate reference from PreparedCandidate.configuration; never the preparation receipt output/wrapper')
     execution_evidence: EvidenceRef
     interpretation: str = Field(min_length=1)
     limitations: list[str] = Field(min_length=1)
@@ -72,6 +72,8 @@ def public_select(ctx,args):
 
 def public_dimensions(ctx,args):
     candidate=ctx.artifact(args.configuration)
+    if not isinstance(candidate,dict) or 'baseline_identity' not in candidate:
+        raise ValueError('V2_OWNED_CONFIGURATION_REFERENCE_REQUIRED: use the nested PreparedCandidate.configuration reference, not the preparation receipt output/wrapper')
     if candidate['baseline_identity']!=digest(plain(ctx.input)) or digest(candidate['effective'])!=candidate['content_identity']:
         raise ValueError('V2_DIMENSIONS_OWNED_CONFIGURATION_REQUIRED')
     return CapabilityResult(detail=finite.dimensions(SessionInput.model_validate(candidate['effective'])))
@@ -81,6 +83,8 @@ def public_report(ctx,args):
     if len(json.dumps(plain(args),ensure_ascii=False).encode('utf8'))>REPORT_OUTPUT_BYTES:
         raise ValueError('V2_CAPABILITY_REPORT_EXCEEDS_1_MIB_ALLOWANCE')
     candidate=ctx.artifact(args.configuration)
+    if not isinstance(candidate,dict) or 'baseline_identity' not in candidate:
+        raise ValueError('V2_OWNED_CONFIGURATION_REFERENCE_REQUIRED: use the nested PreparedCandidate.configuration reference, not the preparation receipt output/wrapper')
     selection=ctx.store.session(ctx.run_id)['state'].get('v2_template_selection',{})
     if candidate['baseline_identity']!=digest(plain(ctx.input)) or candidate['changes']!=selection.get('changes'):
         raise ValueError('V2_REPORT_REQUIRES_OWN_SELECTED_PREPARATION')
@@ -254,6 +258,10 @@ def scientific_case(host,key):
         evaluation=rows[5]['output'],profile=rows[6]['output']),'v2-'+key+'-acceptance')
     if acceptance.get('execution_status')!='completed':raise ValueError('V2_ACCEPTANCE_INCOMPLETE: '+str(acceptance))
     result['receipts']=rows;result['joint_acceptance']=host.store.artifact(acceptance['output'])['detail']
+    result['scientific_validation']=dict(
+        execution_complete=result['joint_acceptance']['components']['execution_complete']['passed'],
+        evaluation_validity=result['joint_acceptance']['components']['evaluation_validity']['value'],
+        physical_acceptance=result['joint_acceptance']['status'],acceptance_reference=acceptance['output'])
     atomic_json(OUT/(key+'_result.json'),result)
     return result
 

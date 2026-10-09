@@ -1,3 +1,15 @@
+# Mainline 3 V2 capability release complete ? 2026-10-09
+
+This current-status entry supersedes the dated status statements preserved below. The separate V2 authorization was fulfilled: the finite T0?T3 public pool now uses `candidate.family@2.0.0` and `controller.gvs_nmpc@10.0.0`; T1/T2/T3 each completed one valid physical failure through all eight public scientific components. A real native capability session selected, prepared, inspected and reported a supported nonbaseline candidate. V1 remains closed and its historical evidence is unchanged.
+
+See the [V2 completion report](research_mainline3_v2_completion.md) for exact public selection syntax, template definitions/orderings, changed dimensions, initialization, independent ideal-tension boundary, scientific identities/outcomes, support table, native review, cumulative resources and remaining limitations. The structural release is complete; physical task acceptance and real-time control are not demonstrated by these new cases. No new incumbent or optimization gain is claimed.
+
+Mainline 4 starts from the saved [T1 configuration and finite pool](../evidence/research_mainline3_v2_20261009/mainline4_start.json). Run `python -m tools.research_v2_entry --prepare --template T1` in the installed softagent environment for solve-free preparation. The runnable public execution entry accepts a separately supplied new Mainline 4 grant; no historical activity or unused capacity is reopened. Coupled drives, arbitrary topology and motor-realistic NMPC remain unsupported.
+
+The former handoff is archived byte-for-byte in [this evidence file](../evidence/research_mainline3_v2_20261009/previous_research_mainline3_v2_handoff.md) and retained verbatim below. Its earlier statements about missing V2 authority or implementation describe historical states.
+
+---
+
 # Mainline 3 V2 entry after V1 closeout ? 2026-10-09
 
 V1's authorized interface scope is complete: A is preserved, B passes with both reused reports, actual synthesis and two partial principal accept dispositions, and C has one complete valid fixed execution. C passed reach and sampled holding position but failed holding speed; real time was not demonstrated. These physical limitations remain and do not prevent the V1 interface closeout. See [current V1 completion](research_mainline3_v1_completion.md), [delivery facts](../evidence/research_mainline3_v1_handoff_20261009/delivery_facts.json), and [fixed C result](../evidence/research_mainline3_v1_handoff_20261009/fixed_result.json).

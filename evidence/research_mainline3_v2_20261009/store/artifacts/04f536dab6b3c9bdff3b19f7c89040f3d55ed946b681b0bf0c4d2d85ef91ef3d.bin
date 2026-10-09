@@ -1,0 +1,1161 @@
+{
+  "contract": "family.design",
+  "version": "1.0.0",
+  "data": {
+    "version": "tendon_family_v1",
+    "id": "mainline3_v2_T1",
+    "components": [
+      {
+        "id": "near",
+        "kind": "flexible_segment",
+        "connection": {
+          "part": "fixed_base",
+          "s": 0.0,
+          "position_m": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "quaternion_wxyz": [
+            1.0,
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        "length_m": 0.16,
+        "sections": [
+          {
+            "s": 0.0,
+            "section": {
+              "kind": "ellipse",
+              "parameters": {
+                "semi_y_m": 0.0095,
+                "semi_z_m": 0.0076
+              },
+              "outer_yz_m": [],
+              "holes_yz_m": [],
+              "angle_rad": 0.35
+            }
+          }
+        ],
+        "interpolation": "step",
+        "physics": {
+          "mode": "material",
+          "density_kg_m3": 1100.0,
+          "young_pa": 7200000.0,
+          "line_density_kg_m": null,
+          "bending_ei_nm2": null,
+          "bending_viscosity_nm2_s": [
+            0.0005,
+            0.0007
+          ]
+        },
+        "natural_curvature_rad_m": [
+          0.0,
+          0.0
+        ]
+      },
+      {
+        "id": "mid_guide",
+        "kind": "guide",
+        "connection": {
+          "part": "near",
+          "s": 1.0,
+          "position_m": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "quaternion_wxyz": [
+            1.0,
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        "mass_kg": 0.002,
+        "com_local_m": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "inertia_com_local_kg_m2": [
+          [
+            4e-07,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            2e-07,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            2e-07
+          ]
+        ],
+        "envelope_halfsize_m": [
+          0.002,
+          0.025,
+          0.025
+        ],
+        "guide_holes": {
+          "far_h0": [
+            0.0,
+            0.01699479340146133,
+            0.014314517010421492
+          ],
+          "far_h1": [
+            0.0,
+            -0.01431451701042149,
+            0.01699479340146133
+          ],
+          "far_h2": [
+            0.0,
+            -0.016994793401461334,
+            -0.01431451701042149
+          ],
+          "far_h3": [
+            0.0,
+            0.014314517010421489,
+            -0.016994793401461334
+          ],
+          "near_h0": [
+            0.0,
+            0.01781761038515377,
+            0.0036118084338542127
+          ],
+          "near_h1": [
+            0.0,
+            -0.0036118084338542114,
+            0.01781761038515377
+          ],
+          "near_h2": [
+            0.0,
+            -0.01781761038515377,
+            -0.0036118084338542106
+          ],
+          "near_h3": [
+            0.0,
+            0.0036118084338542093,
+            -0.01781761038515377
+          ]
+        },
+        "hole_radius_m": 0.0015
+      },
+      {
+        "id": "connector",
+        "kind": "rigid_connector",
+        "connection": {
+          "part": "mid_guide",
+          "s": 0.0,
+          "position_m": [
+            0.002,
+            0.0,
+            0.0
+          ],
+          "quaternion_wxyz": [
+            1.0,
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        "mass_kg": 0.003,
+        "com_local_m": [
+          0.006,
+          0.0,
+          0.0
+        ],
+        "inertia_com_local_kg_m2": [
+          [
+            5e-08,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            7e-08,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            7e-08
+          ]
+        ],
+        "envelope_halfsize_m": [
+          0.006,
+          0.006,
+          0.006
+        ],
+        "guide_holes": {},
+        "hole_radius_m": 0.0
+      },
+      {
+        "id": "far",
+        "kind": "flexible_segment",
+        "connection": {
+          "part": "connector",
+          "s": 0.0,
+          "position_m": [
+            0.012,
+            0.0,
+            0.0
+          ],
+          "quaternion_wxyz": [
+            1.0,
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        "length_m": 0.11,
+        "sections": [
+          {
+            "s": 0.0,
+            "section": {
+              "kind": "rectangle",
+              "parameters": {
+                "height_z_m": 0.0095,
+                "width_y_m": 0.0133
+              },
+              "outer_yz_m": [],
+              "holes_yz_m": [],
+              "angle_rad": -0.25
+            }
+          },
+          {
+            "s": 1.0,
+            "section": {
+              "kind": "rectangle",
+              "parameters": {
+                "height_z_m": 0.008549999999999999,
+                "width_y_m": 0.0114
+              },
+              "outer_yz_m": [],
+              "holes_yz_m": [],
+              "angle_rad": 0.15
+            }
+          }
+        ],
+        "interpolation": "linear",
+        "physics": {
+          "mode": "material",
+          "density_kg_m3": 1050.0,
+          "young_pa": 5400000.0,
+          "line_density_kg_m": null,
+          "bending_ei_nm2": null,
+          "bending_viscosity_nm2_s": [
+            0.0003,
+            0.0004
+          ]
+        },
+        "natural_curvature_rad_m": [
+          0.0,
+          0.0
+        ]
+      },
+      {
+        "id": "payload",
+        "kind": "payload",
+        "connection": {
+          "part": "far",
+          "s": 1.0,
+          "position_m": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "quaternion_wxyz": [
+            1.0,
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        "mass_kg": 0.01,
+        "com_local_m": [
+          0.007,
+          0.001,
+          -0.002
+        ],
+        "inertia_com_local_kg_m2": [
+          [
+            6e-07,
+            1e-07,
+            0.0
+          ],
+          [
+            1e-07,
+            8e-07,
+            1e-07
+          ],
+          [
+            0.0,
+            1e-07,
+            9e-07
+          ]
+        ],
+        "envelope_halfsize_m": [
+          0.009,
+          0.009,
+          0.008
+        ],
+        "guide_holes": {},
+        "hole_radius_m": 0.0
+      }
+    ],
+    "tendons": [
+      {
+        "id": "near_t0",
+        "points": [
+          {
+            "attachment": {
+              "part": "fixed_base",
+              "s": 0.0,
+              "position_m": [
+                0.0,
+                0.01781761038515377,
+                0.0036118084338542127
+              ],
+              "quaternion_wxyz": [
+                1.0,
+                0.0,
+                0.0,
+                0.0
+              ]
+            },
+            "hole": null,
+            "role": "start"
+          },
+          {
+            "attachment": {
+              "part": "near",
+              "s": 0.5,
+              "position_m": [
+                0.0,
+                0.018352138696708386,
+                0.0035034541808385863
+              ],
+              "quaternion_wxyz": [
+                1.0,
+                0.0,
+                0.0,
+                0.0
+              ]
+            },
+            "hole": null,
+            "role": "guide"
+          },
+          {
+            "attachment": {
+              "part": "mid_guide",
+              "s": 0.0,
+              "position_m": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "quaternion_wxyz": [
+                1.0,
+                0.0,
+                0.0,
+                0.0
+              ]
+            },
+            "hole": "near_h0",
+            "role": "anchor"
+          }
+        ],
+        "diameter_m": 0.001,
+        "model": "straight_frictionless",
+        "length_servo_gain_n_m": 900.0,
+        "pretension_n": 0.2,
+        "force_limit_n": 8.0
+      },
+      {
+        "id": "near_t1",
+        "points": [
+          {
+            "attachment": {
+              "part": "fixed_base",
+              "s": 0.0,
+              "position_m": [
+                0.0,
+                -0.0036118084338542114,
+                0.01781761038515377
+              ],
+              "quaternion_wxyz": [
+                1.0,
+                0.0,
+                0.0,
+                0.0
+              ]
+            },
+            "hole": null,
+            "role": "start"
+          },
+          {
+            "attachment": {
+              "part": "near",
+              "s": 0.5,
+              "position_m": [
+                0.0,
+                -0.003503454180838585,
+                0.018352138696708386
+              ],
+              "quaternion_wxyz": [
+                1.0,
+                0.0,
+                0.0,
+                0.0
+              ]
+            },
+            "hole": null,
+            "role": "guide"
+          },
+          {
+            "attachment": {
+              "part": "mid_guide",
+              "s": 0.0,
+              "position_m": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "quaternion_wxyz": [
+                1.0,
+                0.0,
+                0.0,
+                0.0
+              ]
+            },
+            "hole": "near_h1",
+            "role": "anchor"
+          }
+        ],
+        "diameter_m": 0.001,
+        "model": "straight_frictionless",
+        "length_servo_gain_n_m": 900.0,
+        "pretension_n": 0.2,
+        "force_limit_n": 8.0
+      },
+      {
+        "id": "near_t2",
+        "points": [
+          {
+            "attachment": {
+              "part": "fixed_base",
+              "s": 0.0,
+              "position_m": [
+                0.0,
+                -0.01781761038515377,
+                -0.0036118084338542106
+              ],
+              "quaternion_wxyz": [
+                1.0,
+                0.0,
+                0.0,
+                0.0
+              ]
+            },
+            "hole": null,
+            "role": "start"
+          },
+          {
+            "attachment": {
+              "part": "near",
+              "s": 0.5,
+              "position_m": [
+                0.0,
+                -0.018352138696708386,
+                -0.003503454180838584
+              ],
+              "quaternion_wxyz": [
+                1.0,
+                0.0,
+                0.0,
+                0.0
+              ]
+            },
+            "hole": null,
+            "role": "guide"
+          },
+          {
+            "attachment": {
+              "part": "mid_guide",
+              "s": 0.0,
+              "position_m": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "quaternion_wxyz": [
+                1.0,
+                0.0,
+                0.0,
+                0.0
+              ]
+            },
+            "hole": "near_h2",
+            "role": "anchor"
+          }
+        ],
+        "diameter_m": 0.001,
+        "model": "straight_frictionless",
+        "length_servo_gain_n_m": 900.0,
+        "pretension_n": 0.2,
+        "force_limit_n": 8.0
+      },
+      {
+        "id": "near_t3",
+        "points": [
+          {
+            "attachment": {
+              "part": "fixed_base",
+              "s": 0.0,
+              "position_m": [
+                0.0,
+                0.0036118084338542093,
+                -0.01781761038515377
+              ],
+              "quaternion_wxyz": [
+                1.0,
+                0.0,
+                0.0,
+                0.0
+              ]
+            },
+            "hole": null,
+            "role": "start"
+          },
+          {
+            "attachment": {
+              "part": "near",
+              "s": 0.5,
+              "position_m": [
+                0.0,
+                0.003503454180838583,
+                -0.018352138696708386
+              ],
+              "quaternion_wxyz": [
+                1.0,
+                0.0,
+                0.0,
+                0.0
+              ]
+            },
+            "hole": null,
+            "role": "guide"
+          },
+          {
+            "attachment": {
+              "part": "mid_guide",
+              "s": 0.0,
+              "position_m": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "quaternion_wxyz": [
+                1.0,
+                0.0,
+                0.0,
+                0.0
+              ]
+            },
+            "hole": "near_h3",
+            "role": "anchor"
+          }
+        ],
+        "diameter_m": 0.001,
+        "model": "straight_frictionless",
+        "length_servo_gain_n_m": 900.0,
+        "pretension_n": 0.2,
+        "force_limit_n": 8.0
+      },
+      {
+        "id": "far_t0",
+        "points": [
+          {
+            "attachment": {
+              "part": "fixed_base",
+              "s": 0.0,
+              "position_m": [
+                0.0,
+                0.01699479340146133,
+                0.014314517010421492
+              ],
+              "quaternion_wxyz": [
+                1.0,
+                0.0,
+                0.0,
+                0.0
+              ]
+            },
+            "hole": null,
+            "role": "start"
+          },
+          {
+            "attachment": {
+              "part": "near",
+              "s": 0.5,
+              "position_m": [
+                0.0,
+                0.01750463720350517,
+                0.013885081500108849
+              ],
+              "quaternion_wxyz": [
+                1.0,
+                0.0,
+                0.0,
+                0.0
+              ]
+            },
+            "hole": null,
+            "role": "guide"
+          },
+          {
+            "attachment": {
+              "part": "mid_guide",
+              "s": 0.0,
+              "position_m": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "quaternion_wxyz": [
+                1.0,
+                0.0,
+                0.0,
+                0.0
+              ]
+            },
+            "hole": "far_h0",
+            "role": "guide"
+          },
+          {
+            "attachment": {
+              "part": "far",
+              "s": 0.5,
+              "position_m": [
+                0.0,
+                0.013326610271244925,
+                0.011224848982429527
+              ],
+              "quaternion_wxyz": [
+                1.0,
+                0.0,
+                0.0,
+                0.0
+              ]
+            },
+            "hole": null,
+            "role": "guide"
+          },
+          {
+            "attachment": {
+              "part": "far",
+              "s": 1.0,
+              "position_m": [
+                0.0,
+                0.011660783987339308,
+                0.009821742859625835
+              ],
+              "quaternion_wxyz": [
+                1.0,
+                0.0,
+                0.0,
+                0.0
+              ]
+            },
+            "hole": null,
+            "role": "anchor"
+          }
+        ],
+        "diameter_m": 0.001,
+        "model": "straight_frictionless",
+        "length_servo_gain_n_m": 900.0,
+        "pretension_n": 0.2,
+        "force_limit_n": 8.0
+      },
+      {
+        "id": "far_t1",
+        "points": [
+          {
+            "attachment": {
+              "part": "fixed_base",
+              "s": 0.0,
+              "position_m": [
+                0.0,
+                -0.01431451701042149,
+                0.01699479340146133
+              ],
+              "quaternion_wxyz": [
+                1.0,
+                0.0,
+                0.0,
+                0.0
+              ]
+            },
+            "hole": null,
+            "role": "start"
+          },
+          {
+            "attachment": {
+              "part": "near",
+              "s": 0.5,
+              "position_m": [
+                0.0,
+                -0.013885081500108847,
+                0.01750463720350517
+              ],
+              "quaternion_wxyz": [
+                1.0,
+                0.0,
+                0.0,
+                0.0
+              ]
+            },
+            "hole": null,
+            "role": "guide"
+          },
+          {
+            "attachment": {
+              "part": "mid_guide",
+              "s": 0.0,
+              "position_m": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "quaternion_wxyz": [
+                1.0,
+                0.0,
+                0.0,
+                0.0
+              ]
+            },
+            "hole": "far_h1",
+            "role": "guide"
+          },
+          {
+            "attachment": {
+              "part": "far",
+              "s": 0.5,
+              "position_m": [
+                0.0,
+                -0.011224848982429527,
+                0.013326610271244925
+              ],
+              "quaternion_wxyz": [
+                1.0,
+                0.0,
+                0.0,
+                0.0
+              ]
+            },
+            "hole": null,
+            "role": "guide"
+          },
+          {
+            "attachment": {
+              "part": "far",
+              "s": 1.0,
+              "position_m": [
+                0.0,
+                -0.009821742859625835,
+                0.011660783987339308
+              ],
+              "quaternion_wxyz": [
+                1.0,
+                0.0,
+                0.0,
+                0.0
+              ]
+            },
+            "hole": null,
+            "role": "anchor"
+          }
+        ],
+        "diameter_m": 0.001,
+        "model": "straight_frictionless",
+        "length_servo_gain_n_m": 900.0,
+        "pretension_n": 0.2,
+        "force_limit_n": 8.0
+      },
+      {
+        "id": "far_t2",
+        "points": [
+          {
+            "attachment": {
+              "part": "fixed_base",
+              "s": 0.0,
+              "position_m": [
+                0.0,
+                -0.016994793401461334,
+                -0.01431451701042149
+              ],
+              "quaternion_wxyz": [
+                1.0,
+                0.0,
+                0.0,
+                0.0
+              ]
+            },
+            "hole": null,
+            "role": "start"
+          },
+          {
+            "attachment": {
+              "part": "near",
+              "s": 0.5,
+              "position_m": [
+                0.0,
+                -0.01750463720350517,
+                -0.013885081500108847
+              ],
+              "quaternion_wxyz": [
+                1.0,
+                0.0,
+                0.0,
+                0.0
+              ]
+            },
+            "hole": null,
+            "role": "guide"
+          },
+          {
+            "attachment": {
+              "part": "mid_guide",
+              "s": 0.0,
+              "position_m": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "quaternion_wxyz": [
+                1.0,
+                0.0,
+                0.0,
+                0.0
+              ]
+            },
+            "hole": "far_h2",
+            "role": "guide"
+          },
+          {
+            "attachment": {
+              "part": "far",
+              "s": 0.5,
+              "position_m": [
+                0.0,
+                -0.013326610271244927,
+                -0.011224848982429526
+              ],
+              "quaternion_wxyz": [
+                1.0,
+                0.0,
+                0.0,
+                0.0
+              ]
+            },
+            "hole": null,
+            "role": "guide"
+          },
+          {
+            "attachment": {
+              "part": "far",
+              "s": 1.0,
+              "position_m": [
+                0.0,
+                -0.01166078398733931,
+                -0.009821742859625834
+              ],
+              "quaternion_wxyz": [
+                1.0,
+                0.0,
+                0.0,
+                0.0
+              ]
+            },
+            "hole": null,
+            "role": "anchor"
+          }
+        ],
+        "diameter_m": 0.001,
+        "model": "straight_frictionless",
+        "length_servo_gain_n_m": 900.0,
+        "pretension_n": 0.2,
+        "force_limit_n": 8.0
+      },
+      {
+        "id": "far_t3",
+        "points": [
+          {
+            "attachment": {
+              "part": "fixed_base",
+              "s": 0.0,
+              "position_m": [
+                0.0,
+                0.014314517010421489,
+                -0.016994793401461334
+              ],
+              "quaternion_wxyz": [
+                1.0,
+                0.0,
+                0.0,
+                0.0
+              ]
+            },
+            "hole": null,
+            "role": "start"
+          },
+          {
+            "attachment": {
+              "part": "near",
+              "s": 0.5,
+              "position_m": [
+                0.0,
+                0.013885081500108845,
+                -0.017504637203505174
+              ],
+              "quaternion_wxyz": [
+                1.0,
+                0.0,
+                0.0,
+                0.0
+              ]
+            },
+            "hole": null,
+            "role": "guide"
+          },
+          {
+            "attachment": {
+              "part": "mid_guide",
+              "s": 0.0,
+              "position_m": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "quaternion_wxyz": [
+                1.0,
+                0.0,
+                0.0,
+                0.0
+              ]
+            },
+            "hole": "far_h3",
+            "role": "guide"
+          },
+          {
+            "attachment": {
+              "part": "far",
+              "s": 0.5,
+              "position_m": [
+                0.0,
+                0.011224848982429526,
+                -0.013326610271244927
+              ],
+              "quaternion_wxyz": [
+                1.0,
+                0.0,
+                0.0,
+                0.0
+              ]
+            },
+            "hole": null,
+            "role": "guide"
+          },
+          {
+            "attachment": {
+              "part": "far",
+              "s": 1.0,
+              "position_m": [
+                0.0,
+                0.009821742859625834,
+                -0.01166078398733931
+              ],
+              "quaternion_wxyz": [
+                1.0,
+                0.0,
+                0.0,
+                0.0
+              ]
+            },
+            "hole": null,
+            "role": "anchor"
+          }
+        ],
+        "diameter_m": 0.001,
+        "model": "straight_frictionless",
+        "length_servo_gain_n_m": 900.0,
+        "pretension_n": 0.2,
+        "force_limit_n": 8.0
+      }
+    ],
+    "actuators": [
+      {
+        "id": "near_motor0",
+        "command_type": "displacement",
+        "units": "m",
+        "drum_radius_m": null,
+        "transmission": [
+          {
+            "tendon": "near_t0",
+            "ratio": 1.0
+          }
+        ],
+        "limits": [
+          -0.015,
+          0.015
+        ],
+        "velocity_limit": 0.025
+      },
+      {
+        "id": "near_motor1",
+        "command_type": "displacement",
+        "units": "m",
+        "drum_radius_m": null,
+        "transmission": [
+          {
+            "tendon": "near_t1",
+            "ratio": 1.0
+          }
+        ],
+        "limits": [
+          -0.015,
+          0.015
+        ],
+        "velocity_limit": 0.025
+      },
+      {
+        "id": "near_motor2",
+        "command_type": "displacement",
+        "units": "m",
+        "drum_radius_m": null,
+        "transmission": [
+          {
+            "tendon": "near_t2",
+            "ratio": 1.0
+          }
+        ],
+        "limits": [
+          -0.015,
+          0.015
+        ],
+        "velocity_limit": 0.025
+      },
+      {
+        "id": "near_motor3",
+        "command_type": "displacement",
+        "units": "m",
+        "drum_radius_m": null,
+        "transmission": [
+          {
+            "tendon": "near_t3",
+            "ratio": 1.0
+          }
+        ],
+        "limits": [
+          -0.015,
+          0.015
+        ],
+        "velocity_limit": 0.025
+      },
+      {
+        "id": "far_motor0",
+        "command_type": "displacement",
+        "units": "m",
+        "drum_radius_m": null,
+        "transmission": [
+          {
+            "tendon": "far_t0",
+            "ratio": 1.0
+          }
+        ],
+        "limits": [
+          -0.015,
+          0.015
+        ],
+        "velocity_limit": 0.025
+      },
+      {
+        "id": "far_motor1",
+        "command_type": "displacement",
+        "units": "m",
+        "drum_radius_m": null,
+        "transmission": [
+          {
+            "tendon": "far_t1",
+            "ratio": 1.0
+          }
+        ],
+        "limits": [
+          -0.015,
+          0.015
+        ],
+        "velocity_limit": 0.025
+      },
+      {
+        "id": "far_motor2",
+        "command_type": "displacement",
+        "units": "m",
+        "drum_radius_m": null,
+        "transmission": [
+          {
+            "tendon": "far_t2",
+            "ratio": 1.0
+          }
+        ],
+        "limits": [
+          -0.015,
+          0.015
+        ],
+        "velocity_limit": 0.025
+      },
+      {
+        "id": "far_motor3",
+        "command_type": "displacement",
+        "units": "m",
+        "drum_radius_m": null,
+        "transmission": [
+          {
+            "tendon": "far_t3",
+            "ratio": 1.0
+          }
+        ],
+        "limits": [
+          -0.015,
+          0.015
+        ],
+        "velocity_limit": 0.025
+      }
+    ],
+    "tip": {
+      "part": "payload",
+      "s": 0.0,
+      "position_m": [
+        0.014,
+        0.0,
+        0.0
+      ],
+      "quaternion_wxyz": [
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "metadata": {
+      "finite_template": "T1",
+      "initialization": "zero named segment integrated bends/rates; distal split explicitly zero",
+      "source_configuration": "77a1406779dbbf5c440e8077796eeb222446001587d1a9befea0c64bbc146925"
+    }
+  }
+}

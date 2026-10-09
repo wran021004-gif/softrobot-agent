@@ -109,12 +109,21 @@ def summarize():
     assert native['status']=='stopped' and report
     requests=[]
     store=Store(RUN)
+    reservations={(e['run_id'],e['request_id']):e for e in manifest['events']
+        if e['kind']=='model_request' and e['status']=='reserved'}
+    from tools.context_assembly import measure_input
     for event in manifest['events']:
         if event['kind']=='model_raw_response':
             raw=store.artifact(event['outputs'][0])
             response=raw.get('raw',raw)
+            reservation=reservations[event['run_id'],event['request_id']]
+            measurement=measure_input(store.artifact(reservation['inputs'][0]),
+                store.artifact(reservation['inputs'][1]),'research_decision')
+            assert measurement['passed']
             requests.append(dict(run_id=event['run_id'],request_id=event['request_id'],execution_id=event['execution_id'],
-                response=event['outputs'][0],usage=response.get('usage'),finish_reason=response.get('choices',[{}])[0].get('finish_reason')))
+                request=reservation['inputs'][0],configuration=reservation['inputs'][1],
+                capacity_measurement=measurement,response=event['outputs'][0],usage=response.get('usage'),
+                finish_reason=response.get('choices',[{}])[0].get('finish_reason')))
     assert len({(r['run_id'],r['request_id']) for r in requests})==len(requests)
     ledger=read(OUT/'cumulative_ledger.json')
     known=[r['usage'] for r in requests if r.get('usage')]
@@ -126,9 +135,12 @@ def summarize():
     resource=dict(provider_requests=ledger['used']['model_calls'],tokens=tokens,
         response_coverage=dict(saved_complete_responses=len(requests),known_usage=len(known)),
         public_operations=ledger['used']['tool_calls'],mathematical_operations=len(mathematics),backend_attempts=len(backend),
+        internal_nmpc_updates=sum(s['profile_metrics']['updates'] for s in summaries.values()),
         actual_elapsed_s=time.time()-read(OUT/'activity.json')['started_unix'],
         ledger_wall_s=ledger['used']['wall_s'],provider_monetary_cost=None,
+        recorded_initial_engineering_s=next(r['charged']['wall_s'] for r in manifest['calls'] if r['request_id']=='engineering-initial'),
         engineering_interventions=read(OUT/'activity.json')['engineering_interventions'])
+    resource['unattributed_review_delivery_overhead_s']=resource['actual_elapsed_s']-resource['ledger_wall_s']
     assert resource['provider_requests']<=40 and resource['public_operations']<=1024 and resource['mathematical_operations']<=32 and resource['backend_attempts']<=6
     assert resource['actual_elapsed_s']<43200
     atomic_json(OUT/'provider_usage.json',dict(requests=requests,totals=tokens,monetary_cost=None))
