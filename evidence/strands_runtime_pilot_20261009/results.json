@@ -1,0 +1,1190 @@
+{
+  "assessment": "offline acceptance passed",
+  "scenarios": {
+    "A": {
+      "passed": true,
+      "activity_id": "strands-pilot-294ed67bfd64",
+      "receipt": {
+        "analysis_status": "not_assessed",
+        "cache_hit": false,
+        "caller": "strands-pilot",
+        "charged": {
+          "backend_solves": 0,
+          "model_calls": 0,
+          "tool_calls": 1,
+          "wall_s": 0.0,
+          "worker_calls": 0
+        },
+        "contract_version": "1.2.0",
+        "error": null,
+        "execution_id": "051193cf4f5a4119a0ec62b0a0c9ecc0",
+        "execution_status": "completed",
+        "original_execution_id": null,
+        "output": {
+          "artifact_id": "188f0928e5a85babfeb086a04a885fb202ddee2acabd0ed9022e5f45938c6342",
+          "media_type": "application/json"
+        },
+        "request_id": "disposition-9ce322e145585d886575aa88d034b1051f26d99879c9bffa68321e4afe0454b5",
+        "result_contract": "PrincipalDisposition",
+        "result_version": "1.0.0",
+        "solver_status": "not_run",
+        "task_success": null,
+        "tool_id": "research.investigation_disposition",
+        "tool_version": "1.0.0"
+      },
+      "accounting": {
+        "limit": {
+          "backend_solves": 0,
+          "model_calls": 32,
+          "tool_calls": 128,
+          "wall_s": 3600.0,
+          "worker_calls": 0
+        },
+        "used": {
+          "tool_calls": 7,
+          "model_calls": 9,
+          "backend_solves": 0,
+          "worker_calls": 0,
+          "wall_s": 0.6720000000204891
+        },
+        "remaining": {
+          "backend_solves": 0,
+          "model_calls": 23,
+          "tool_calls": 121,
+          "wall_s": 3599.3279999999795,
+          "worker_calls": 0
+        },
+        "occupied": {}
+      },
+      "fixture_requests": 9,
+      "fixture_tokens": 1080,
+      "real_provider_tokens": null,
+      "real_cost": null,
+      "deadline_unix": 1791537121.9574492,
+      "scope_invocations": {
+        "httpx.AsyncHTTPTransport.handle_async_request": 0,
+        "httpx.HTTPTransport.handle_request": 0,
+        "tools.platform_host.Host.run": 0,
+        "tools.platform_host.Host.context": 0,
+        "tools.platform_models.run_loop": 0,
+        "tools.platform_models.payload_for": 0,
+        "tools.platform_models.input_for": 0,
+        "tools.platform_models.DeepSeekAdapter._transport": 0,
+        "tools.research_investigations.InvestigationDispatcher._interact": 0,
+        "tools.research_investigations.InvestigationDispatcher._append_correction": 0,
+        "tools.research_investigations.InvestigationDispatcher.engineering_recovery": 0,
+        "tools.context_assembly.compact_investigation_request": 0,
+        "tools.platform_tools.simulate": 0,
+        "tools.research_mainline3.fixed_pipeline": 0,
+        "tools.research_execution.linearize_configuration": 0,
+        "extensions.optimization.ipopt.IpoptSolver.solve": 0,
+        "extensions.tendon_family.backends.MujocoBackend.solve": 0,
+        "scipy.optimize.minimize": 0,
+        "scipy.optimize.least_squares": 0,
+        "scipy.integrate.solve_ivp": 0
+      },
+      "validator_invocations": 2,
+      "frozen_components": {
+        "evaluation_validity": {
+          "limit": null,
+          "passed": true,
+          "reason": null,
+          "unit": null,
+          "value": "valid"
+        },
+        "evaluator:task_bound": {
+          "limit": 0.01,
+          "passed": true,
+          "reason": null,
+          "unit": "m",
+          "value": 0.0031314437885609334
+        },
+        "execution_complete": {
+          "limit": null,
+          "passed": true,
+          "reason": null,
+          "unit": null,
+          "value": true
+        },
+        "force_bounds": {
+          "limit": 1e-08,
+          "passed": true,
+          "reason": null,
+          "unit": "N",
+          "value": 0.0
+        },
+        "holding_coverage": {
+          "limit": 6,
+          "passed": true,
+          "reason": null,
+          "unit": "inclusive uniform samples",
+          "value": true
+        },
+        "holding_position": {
+          "limit": 0.01,
+          "passed": true,
+          "reason": null,
+          "unit": "m",
+          "value": 0.0033622899352609014
+        },
+        "holding_speed": {
+          "limit": 0.02,
+          "passed": false,
+          "reason": null,
+          "unit": "m/s",
+          "value": 0.026817670846968282
+        },
+        "solver_errors": {
+          "limit": 0,
+          "passed": true,
+          "reason": null,
+          "unit": "count",
+          "value": 0
+        },
+        "task_evaluator": {
+          "limit": null,
+          "passed": true,
+          "reason": null,
+          "unit": null,
+          "value": true
+        }
+      },
+      "provider": {
+        "max_tokens": 32768,
+        "messages": null,
+        "model": "deepseek-flash",
+        "reasoning_effort": "high",
+        "stream": false,
+        "thinking": {
+          "type": "enabled"
+        },
+        "tools": null
+      },
+      "registered_tools": [
+        "discover_evidence",
+        "get_receipt",
+        "read_original",
+        "retrieve_context",
+        "submit_result"
+      ],
+      "protocol_sample": {
+        "content": [
+          {
+            "text": "Inspect source discovery",
+            "type": "text"
+          }
+        ],
+        "reasoning_content": "Controlled reasoning preserved across native tool turns.",
+        "role": "assistant",
+        "tool_calls": [
+          {
+            "function": {
+              "arguments": "{\"offset\": 0, \"limit\": 2}",
+              "name": "discover_evidence"
+            },
+            "id": "discover-1",
+            "type": "function"
+          }
+        ]
+      },
+      "pagination": {
+        "content": {
+          "long_material": {
+            "artifact_id": "e479130312e906b9d6d6d916b10e020741313712e8fe308bae451a23f94fd127",
+            "media_type": "application/json"
+          },
+          "meaning": "Saved fixed-C source identities; new offline disposition namespace"
+        },
+        "kind": "content",
+        "next_offset": 2,
+        "offset": 0,
+        "pointer": "",
+        "presentation": "original",
+        "returned_items": 2,
+        "source": {
+          "artifact_id": "63e737e1d471a0834be2b5711749609767655fd095a7f7be5f43f41671caaf57",
+          "media_type": "application/json"
+        },
+        "total_items": 5
+      }
+    },
+    "B": {
+      "passed": true,
+      "activity_id": "strands-pilot-68d41cd1937d",
+      "receipt": {
+        "analysis_status": "not_assessed",
+        "cache_hit": false,
+        "caller": "strands-pilot",
+        "charged": {
+          "backend_solves": 0,
+          "model_calls": 0,
+          "tool_calls": 1,
+          "wall_s": 0.0,
+          "worker_calls": 0
+        },
+        "contract_version": "1.2.0",
+        "error": null,
+        "execution_id": "9991edcc13f647b7aba4580cb861d8f7",
+        "execution_status": "completed",
+        "original_execution_id": null,
+        "output": {
+          "artifact_id": "8f47acb8cc6740f228aa71885f5907ee0a2ecc815e3f7d7aa22ba9566f516912",
+          "media_type": "application/json"
+        },
+        "request_id": "disposition-9ce322e145585d886575aa88d034b1051f26d99879c9bffa68321e4afe0454b5",
+        "result_contract": "PrincipalDisposition",
+        "result_version": "1.0.0",
+        "solver_status": "not_run",
+        "task_success": null,
+        "tool_id": "research.investigation_disposition",
+        "tool_version": "1.0.0"
+      },
+      "accounting": {
+        "limit": {
+          "backend_solves": 0,
+          "model_calls": 32,
+          "tool_calls": 128,
+          "wall_s": 3600.0,
+          "worker_calls": 0
+        },
+        "used": {
+          "tool_calls": 7,
+          "model_calls": 10,
+          "backend_solves": 0,
+          "worker_calls": 0,
+          "wall_s": 0.6709999998565763
+        },
+        "remaining": {
+          "backend_solves": 0,
+          "model_calls": 22,
+          "tool_calls": 121,
+          "wall_s": 3599.3290000001434,
+          "worker_calls": 0
+        },
+        "occupied": {}
+      },
+      "fixture_requests": 10,
+      "fixture_tokens": 1200,
+      "real_provider_tokens": null,
+      "real_cost": null,
+      "deadline_unix": 1791536430.5097835,
+      "scope_invocations": {
+        "httpx.AsyncHTTPTransport.handle_async_request": 0,
+        "httpx.HTTPTransport.handle_request": 0,
+        "tools.platform_host.Host.run": 0,
+        "tools.platform_host.Host.context": 0,
+        "tools.platform_models.run_loop": 0,
+        "tools.platform_models.payload_for": 0,
+        "tools.platform_models.input_for": 0,
+        "tools.platform_models.DeepSeekAdapter._transport": 0,
+        "tools.research_investigations.InvestigationDispatcher._interact": 0,
+        "tools.research_investigations.InvestigationDispatcher._append_correction": 0,
+        "tools.research_investigations.InvestigationDispatcher.engineering_recovery": 0,
+        "tools.context_assembly.compact_investigation_request": 0,
+        "tools.platform_tools.simulate": 0,
+        "tools.research_mainline3.fixed_pipeline": 0,
+        "tools.research_execution.linearize_configuration": 0,
+        "extensions.optimization.ipopt.IpoptSolver.solve": 0,
+        "extensions.tendon_family.backends.MujocoBackend.solve": 0,
+        "scipy.optimize.minimize": 0,
+        "scipy.optimize.least_squares": 0,
+        "scipy.integrate.solve_ivp": 0
+      },
+      "validator_feedback": {
+        "error": "PRINCIPAL_SOURCE_VALUE_MISMATCH: /metrics/0/value",
+        "issue": {
+          "code": "PRINCIPAL_SOURCE_VALUE_MISMATCH",
+          "path": "/value",
+          "reference": {
+            "artifact_id": "6314170dd823eab26d13296eb5afee1cfe24cb2f5117334414d1d66e8d266892",
+            "media_type": "application/json"
+          },
+          "pointer": "/metrics/0/value",
+          "supplied_value": 0.5,
+          "supplied_type": "float",
+          "original_value": 0.0031314437885609334,
+          "original_type": "float"
+        }
+      },
+      "business_effects": 1
+    },
+    "C": {
+      "passed": true,
+      "activity_id": "strands-pilot-4349f8f95381",
+      "receipt": {
+        "analysis_status": "not_assessed",
+        "cache_hit": false,
+        "caller": "strands-pilot",
+        "charged": {
+          "backend_solves": 0,
+          "model_calls": 0,
+          "tool_calls": 1,
+          "wall_s": 0.0,
+          "worker_calls": 0
+        },
+        "contract_version": "1.2.0",
+        "error": null,
+        "execution_id": "3b4958f9a2fe47658d663b7c7f944905",
+        "execution_status": "completed",
+        "original_execution_id": null,
+        "output": {
+          "artifact_id": "6873c310c7b441d8547021877ff8ff11c2282a8fcc16b80322f3a0cd4eb8c71f",
+          "media_type": "application/json"
+        },
+        "request_id": "disposition-9ce322e145585d886575aa88d034b1051f26d99879c9bffa68321e4afe0454b5",
+        "result_contract": "PrincipalDisposition",
+        "result_version": "1.0.0",
+        "solver_status": "not_run",
+        "task_success": null,
+        "tool_id": "research.investigation_disposition",
+        "tool_version": "1.0.0"
+      },
+      "accounting": {
+        "limit": {
+          "backend_solves": 0,
+          "model_calls": 32,
+          "tool_calls": 128,
+          "wall_s": 3600.0,
+          "worker_calls": 0
+        },
+        "used": {
+          "tool_calls": 7,
+          "model_calls": 9,
+          "backend_solves": 0,
+          "worker_calls": 0,
+          "wall_s": 0.6560000000754371
+        },
+        "remaining": {
+          "backend_solves": 0,
+          "model_calls": 23,
+          "tool_calls": 121,
+          "wall_s": 3599.3439999999246,
+          "worker_calls": 0
+        },
+        "occupied": {}
+      },
+      "fixture_requests": 9,
+      "fixture_tokens": 1080,
+      "real_provider_tokens": null,
+      "real_cost": null,
+      "deadline_unix": 1791536434.7059264,
+      "scope_invocations": {
+        "httpx.AsyncHTTPTransport.handle_async_request": 0,
+        "httpx.HTTPTransport.handle_request": 0,
+        "tools.platform_host.Host.run": 0,
+        "tools.platform_host.Host.context": 0,
+        "tools.platform_models.run_loop": 0,
+        "tools.platform_models.payload_for": 0,
+        "tools.platform_models.input_for": 0,
+        "tools.platform_models.DeepSeekAdapter._transport": 0,
+        "tools.research_investigations.InvestigationDispatcher._interact": 0,
+        "tools.research_investigations.InvestigationDispatcher._append_correction": 0,
+        "tools.research_investigations.InvestigationDispatcher.engineering_recovery": 0,
+        "tools.context_assembly.compact_investigation_request": 0,
+        "tools.platform_tools.simulate": 0,
+        "tools.research_mainline3.fixed_pipeline": 0,
+        "tools.research_execution.linearize_configuration": 0,
+        "extensions.optimization.ipopt.IpoptSolver.solve": 0,
+        "extensions.tendon_family.backends.MujocoBackend.solve": 0,
+        "scipy.optimize.minimize": 0,
+        "scipy.optimize.least_squares": 0,
+        "scipy.integrate.solve_ivp": 0
+      },
+      "termination_code": 73,
+      "new_process": true,
+      "requests_before_restart": 6,
+      "restored_tool_ids": [
+        "discover-1",
+        "discover-2",
+        "metric-read",
+        "scope-read",
+        "holding-original",
+        "joint-original"
+      ]
+    },
+    "D": {
+      "passed": true,
+      "activity_id": "strands-pilot-6635c075812a",
+      "receipt": {
+        "analysis_status": "not_assessed",
+        "cache_hit": false,
+        "caller": "strands-pilot",
+        "charged": {
+          "backend_solves": 0,
+          "model_calls": 0,
+          "tool_calls": 1,
+          "wall_s": 0.0,
+          "worker_calls": 0
+        },
+        "contract_version": "1.2.0",
+        "error": null,
+        "execution_id": "ec0906f4d1a041d0bb5d931d2d737d7d",
+        "execution_status": "completed",
+        "original_execution_id": null,
+        "output": {
+          "artifact_id": "4d8c0a7388aedc9649ef45b8c5549a5773cff481f35a3c5e63fe03764bc452d3",
+          "media_type": "application/json"
+        },
+        "request_id": "disposition-9ce322e145585d886575aa88d034b1051f26d99879c9bffa68321e4afe0454b5",
+        "result_contract": "PrincipalDisposition",
+        "result_version": "1.0.0",
+        "solver_status": "not_run",
+        "task_success": null,
+        "tool_id": "research.investigation_disposition",
+        "tool_version": "1.0.0"
+      },
+      "accounting": {
+        "limit": {
+          "backend_solves": 0,
+          "model_calls": 32,
+          "tool_calls": 128,
+          "wall_s": 3600.0,
+          "worker_calls": 0
+        },
+        "used": {
+          "tool_calls": 9,
+          "model_calls": 10,
+          "backend_solves": 0,
+          "worker_calls": 0,
+          "wall_s": 0.6089999999385327
+        },
+        "remaining": {
+          "backend_solves": 0,
+          "model_calls": 22,
+          "tool_calls": 119,
+          "wall_s": 3599.3910000000615,
+          "worker_calls": 0
+        },
+        "occupied": {}
+      },
+      "fixture_requests": 10,
+      "fixture_tokens": 1200,
+      "real_provider_tokens": null,
+      "real_cost": null,
+      "deadline_unix": 1791536585.2110686,
+      "scope_invocations": {
+        "httpx.AsyncHTTPTransport.handle_async_request": 0,
+        "httpx.HTTPTransport.handle_request": 0,
+        "tools.platform_host.Host.run": 0,
+        "tools.platform_host.Host.context": 0,
+        "tools.platform_models.run_loop": 0,
+        "tools.platform_models.payload_for": 0,
+        "tools.platform_models.input_for": 0,
+        "tools.platform_models.DeepSeekAdapter._transport": 0,
+        "tools.research_investigations.InvestigationDispatcher._interact": 0,
+        "tools.research_investigations.InvestigationDispatcher._append_correction": 0,
+        "tools.research_investigations.InvestigationDispatcher.engineering_recovery": 0,
+        "tools.context_assembly.compact_investigation_request": 0,
+        "tools.platform_tools.simulate": 0,
+        "tools.research_mainline3.fixed_pipeline": 0,
+        "tools.research_execution.linearize_configuration": 0,
+        "extensions.optimization.ipopt.IpoptSolver.solve": 0,
+        "extensions.tendon_family.backends.MujocoBackend.solve": 0,
+        "scipy.optimize.minimize": 0,
+        "scipy.optimize.least_squares": 0,
+        "scipy.integrate.solve_ivp": 0
+      },
+      "termination_code": 74,
+      "new_process": true,
+      "original_receipt": {
+        "analysis_status": "not_assessed",
+        "cache_hit": false,
+        "caller": "strands-pilot",
+        "charged": {
+          "backend_solves": 0,
+          "model_calls": 0,
+          "tool_calls": 1,
+          "wall_s": 0.0,
+          "worker_calls": 0
+        },
+        "contract_version": "1.2.0",
+        "error": null,
+        "execution_id": "ec0906f4d1a041d0bb5d931d2d737d7d",
+        "execution_status": "completed",
+        "original_execution_id": null,
+        "output": {
+          "artifact_id": "4d8c0a7388aedc9649ef45b8c5549a5773cff481f35a3c5e63fe03764bc452d3",
+          "media_type": "application/json"
+        },
+        "request_id": "disposition-9ce322e145585d886575aa88d034b1051f26d99879c9bffa68321e4afe0454b5",
+        "result_contract": "PrincipalDisposition",
+        "result_version": "1.0.0",
+        "solver_status": "not_run",
+        "task_success": null,
+        "tool_id": "research.investigation_disposition",
+        "tool_version": "1.0.0"
+      },
+      "changed_payload_rejected": true,
+      "budget_before_restart": {
+        "limit": {
+          "backend_solves": 0,
+          "model_calls": 32,
+          "tool_calls": 128,
+          "wall_s": 3600.0,
+          "worker_calls": 0
+        },
+        "used": {
+          "tool_calls": 7,
+          "model_calls": 7,
+          "backend_solves": 0,
+          "worker_calls": 0,
+          "wall_s": 0.6089999999385327
+        },
+        "remaining": {
+          "backend_solves": 0,
+          "model_calls": 25,
+          "tool_calls": 121,
+          "wall_s": 3599.3910000000615,
+          "worker_calls": 0
+        },
+        "occupied": {}
+      },
+      "revision_2_receipt": {
+        "contract_version": "1.2.0",
+        "request_id": "disposition-6778accff1de44b30b808a1546c7c547287e42230c5733d27a91d6a356c09de8",
+        "execution_id": "e524be0e4e514720a54b60ad841da120",
+        "caller": "strands-pilot",
+        "tool_id": "research.investigation_disposition",
+        "tool_version": "1.0.0",
+        "result_contract": "PrincipalDisposition",
+        "result_version": "1.0.0",
+        "execution_status": "completed",
+        "solver_status": "not_run",
+        "analysis_status": "not_assessed",
+        "task_success": null,
+        "output": {
+          "artifact_id": "2c65bec503a985ead1ed846b4f30f3eeb011752a97059d73c786bb4dbd37c6ef",
+          "media_type": "application/json"
+        },
+        "error": null,
+        "cache_hit": false,
+        "original_execution_id": null,
+        "charged": {
+          "tool_calls": 1,
+          "model_calls": 0,
+          "backend_solves": 0,
+          "worker_calls": 0,
+          "wall_s": 0.0
+        }
+      },
+      "original_record": {
+        "bound_report": {
+          "artifact_id": "6b379323a075502393f526b45f6c3b672f68b0afa055255980c2574509edecbe",
+          "media_type": "application/json"
+        },
+        "decision": {
+          "adopted_claims": [
+            {
+              "additional_support": [],
+              "scope": [
+                {
+                  "pointer": "/source_execution_id",
+                  "reference": {
+                    "artifact_id": "6314170dd823eab26d13296eb5afee1cfe24cb2f5117334414d1d66e8d266892",
+                    "media_type": "application/json"
+                  },
+                  "source_identity": {},
+                  "statement": "Original source execution",
+                  "value": "197bceb6ff8f44b48a35bc4f79b3528d"
+                }
+              ],
+              "statement": "Retain the exact saved official reach result within its original execution.",
+              "support_explanation": "Exact saved metric and bound original execution; this does not imply joint success.",
+              "supporting_facts": [
+                {
+                  "pointer": "/metrics/0/value",
+                  "reference": {
+                    "artifact_id": "6314170dd823eab26d13296eb5afee1cfe24cb2f5117334414d1d66e8d266892",
+                    "media_type": "application/json"
+                  },
+                  "source_identity": {},
+                  "statement": "Saved official reach error",
+                  "value": 0.0031314437885609334
+                }
+              ]
+            }
+          ],
+          "disposition": "accept",
+          "evidence_used": [],
+          "investigation_id": "fixed-C-offline-report",
+          "reason": "Offline fixture partial adoption only.",
+          "remaining_unknowns": [
+            "Live-model compatibility and physical causal explanations unassessed."
+          ],
+          "report": {
+            "artifact_id": "6b379323a075502393f526b45f6c3b672f68b0afa055255980c2574509edecbe",
+            "media_type": "application/json"
+          },
+          "selection_provenance": null,
+          "semantic_claims_unassessed": []
+        },
+        "independently_inspected": true,
+        "inspection_links": [
+          {
+            "fact": {
+              "pointer": "/metrics/0/value",
+              "reference": {
+                "artifact_id": "6314170dd823eab26d13296eb5afee1cfe24cb2f5117334414d1d66e8d266892",
+                "media_type": "application/json"
+              },
+              "source_identity": {},
+              "statement": "Saved official reach error",
+              "value": 0.0031314437885609334
+            },
+            "inspection_ids": [
+              "80ae525f834943bd8a6919ddd1ead87d0e613a9d7b14eb62196124e25ca07f57"
+            ]
+          },
+          {
+            "fact": {
+              "pointer": "/source_execution_id",
+              "reference": {
+                "artifact_id": "6314170dd823eab26d13296eb5afee1cfe24cb2f5117334414d1d66e8d266892",
+                "media_type": "application/json"
+              },
+              "source_identity": {},
+              "statement": "Original source execution",
+              "value": "197bceb6ff8f44b48a35bc4f79b3528d"
+            },
+            "inspection_ids": [
+              "301bd77ae6758de2387699a5fb6f98307be74cdd8b89da41915c9177e731478c"
+            ]
+          }
+        ],
+        "limitations": [
+          "Live-model compatibility and physical causal explanations unassessed."
+        ],
+        "original_source_identities": [
+          {
+            "identity": {
+              "candidate_id": "fixed-radius",
+              "source_execution_id": "197bceb6ff8f44b48a35bc4f79b3528d"
+            },
+            "reference": {
+              "artifact_id": "6314170dd823eab26d13296eb5afee1cfe24cb2f5117334414d1d66e8d266892",
+              "media_type": "application/json"
+            }
+          },
+          {
+            "identity": {
+              "candidate_id": "fixed-radius",
+              "source_execution_id": "197bceb6ff8f44b48a35bc4f79b3528d"
+            },
+            "reference": {
+              "artifact_id": "6314170dd823eab26d13296eb5afee1cfe24cb2f5117334414d1d66e8d266892",
+              "media_type": "application/json"
+            }
+          }
+        ],
+        "rationale_unassessed": "Offline fixture partial adoption only.",
+        "report_counterevidence": [],
+        "report_interpretation_unassessed": "Offline fixture report extracted from the original fixed-C evaluation.",
+        "report_unknowns": [
+          "Physical cause and live model compatibility are unassessed."
+        ],
+        "semantic_claims_unassessed": [
+          {
+            "statement": "Retain the exact saved official reach result within its original execution.",
+            "support_explanation": "Exact saved metric and bound original execution; this does not imply joint success."
+          }
+        ],
+        "semantic_correctness": "unassessed; structural/source validation does not prove scientific interpretation",
+        "source_validation": "references, original values, identities and declared scope fields checked"
+      },
+      "atomic_rollback_verified": true,
+      "revision_3_receipt": {
+        "contract_version": "1.2.0",
+        "request_id": "disposition-0c7d34443dd333571835a7013de884ca7ee24850bc3337046492670cb24c1fc7",
+        "execution_id": "04ed100e34774a20a7b5b2dfa2e0c5fa",
+        "caller": "strands-pilot",
+        "tool_id": "research.investigation_disposition",
+        "tool_version": "1.0.0",
+        "result_contract": "PrincipalDisposition",
+        "result_version": "1.0.0",
+        "execution_status": "completed",
+        "solver_status": "not_run",
+        "analysis_status": "not_assessed",
+        "task_success": null,
+        "output": {
+          "artifact_id": "3f7cbb6609944aeb8a25b252beb6db710b7a840e82a103751b90294af024a0ed",
+          "media_type": "application/json"
+        },
+        "error": null,
+        "cache_hit": false,
+        "original_execution_id": null,
+        "charged": {
+          "tool_calls": 1,
+          "model_calls": 0,
+          "backend_solves": 0,
+          "worker_calls": 0,
+          "wall_s": 0.0
+        }
+      }
+    },
+    "F": {
+      "passed": true,
+      "activity_id": "strands-pilot-92c71635dcce",
+      "receipt": null,
+      "accounting": {
+        "limit": {
+          "backend_solves": 0,
+          "model_calls": 1,
+          "tool_calls": 128,
+          "wall_s": 3600.0,
+          "worker_calls": 0
+        },
+        "used": {
+          "tool_calls": 0,
+          "model_calls": 1,
+          "backend_solves": 0,
+          "worker_calls": 0,
+          "wall_s": 5.0
+        },
+        "remaining": {
+          "backend_solves": 0,
+          "model_calls": 0,
+          "tool_calls": 128,
+          "wall_s": 3595.0,
+          "worker_calls": 0
+        },
+        "occupied": {}
+      },
+      "fixture_requests": 1,
+      "fixture_tokens": 0,
+      "real_provider_tokens": null,
+      "real_cost": null,
+      "deadline_unix": 1791536454.005752,
+      "scope_invocations": {
+        "httpx.AsyncHTTPTransport.handle_async_request": 0,
+        "httpx.HTTPTransport.handle_request": 0,
+        "tools.platform_host.Host.run": 0,
+        "tools.platform_host.Host.context": 0,
+        "tools.platform_models.run_loop": 0,
+        "tools.platform_models.payload_for": 0,
+        "tools.platform_models.input_for": 0,
+        "tools.platform_models.DeepSeekAdapter._transport": 0,
+        "tools.research_investigations.InvestigationDispatcher._interact": 0,
+        "tools.research_investigations.InvestigationDispatcher._append_correction": 0,
+        "tools.research_investigations.InvestigationDispatcher.engineering_recovery": 0,
+        "tools.context_assembly.compact_investigation_request": 0,
+        "tools.platform_tools.simulate": 0,
+        "tools.research_mainline3.fixed_pipeline": 0,
+        "tools.research_execution.linearize_configuration": 0,
+        "extensions.optimization.ipopt.IpoptSolver.solve": 0,
+        "extensions.tendon_family.backends.MujocoBackend.solve": 0,
+        "scipy.optimize.minimize": 0,
+        "scipy.optimize.least_squares": 0,
+        "scipy.integrate.solve_ivp": 0
+      },
+      "termination_code": 75,
+      "new_process": true,
+      "unresolved_request": {
+        "run_id": "strands-pilot-92c71635dcce",
+        "request_id": "fixture-request-a83c9c775c3a46a68e264fb1daa5cf1f",
+        "request_hash": "8b2f63f638c84bc67475bafbe4b908f480e105edfa192cba44e899ae414e0e55",
+        "execution_id": "79c838b955fa4585b0c6599702115e57",
+        "caller": "fixture-provider",
+        "status": "unknown",
+        "reserved": "{\"backend_solves\":0,\"model_calls\":1,\"tool_calls\":0,\"wall_s\":5.0,\"worker_calls\":0}",
+        "charged": "{\"backend_solves\":0,\"model_calls\":1,\"tool_calls\":0,\"wall_s\":5.0,\"worker_calls\":0}",
+        "resources": "[]",
+        "cache_key": null,
+        "receipt": null,
+        "parent_id": "ad79b447d82441178a4dcaa2cd9d8456"
+      },
+      "blocked_auxiliary_and_ordinary": [
+        {
+          "purpose": "summarization",
+          "request": {
+            "artifact_id": "e05f9f864979f3d261536d0af87140b4d8c290db89ae029a3f226e16593f8901",
+            "media_type": "application/json"
+          },
+          "sent": false
+        },
+        {
+          "purpose": "conversation",
+          "request": {
+            "artifact_id": "3ac140c75ed05ccde2c7e87ac1f763202ec428f8063992d3a615f311a1de2fcd",
+            "media_type": "application/json"
+          },
+          "sent": false
+        }
+      ]
+    },
+    "G": {
+      "passed": true,
+      "activity_id": "strands-pilot-a709b8b40313",
+      "receipt": {
+        "analysis_status": "not_assessed",
+        "cache_hit": false,
+        "caller": "strands-pilot",
+        "charged": {
+          "backend_solves": 0,
+          "model_calls": 0,
+          "tool_calls": 1,
+          "wall_s": 0.0,
+          "worker_calls": 0
+        },
+        "contract_version": "1.2.0",
+        "error": null,
+        "execution_id": "4321f5767b1941c5be7650dc3d887082",
+        "execution_status": "completed",
+        "original_execution_id": null,
+        "output": {
+          "artifact_id": "7ca99ae22fcbc0e72fc2c7cba281e7e38d6e06f5654497eaa45772c0d7f2e575",
+          "media_type": "application/json"
+        },
+        "request_id": "disposition-9ce322e145585d886575aa88d034b1051f26d99879c9bffa68321e4afe0454b5",
+        "result_contract": "PrincipalDisposition",
+        "result_version": "1.0.0",
+        "solver_status": "not_run",
+        "task_success": null,
+        "tool_id": "research.investigation_disposition",
+        "tool_version": "1.0.0"
+      },
+      "accounting": {
+        "limit": {
+          "backend_solves": 0,
+          "model_calls": 32,
+          "tool_calls": 128,
+          "wall_s": 3600.0,
+          "worker_calls": 0
+        },
+        "used": {
+          "tool_calls": 7,
+          "model_calls": 9,
+          "backend_solves": 0,
+          "worker_calls": 0,
+          "wall_s": 0.6099999999278225
+        },
+        "remaining": {
+          "backend_solves": 0,
+          "model_calls": 23,
+          "tool_calls": 121,
+          "wall_s": 3599.390000000072,
+          "worker_calls": 0
+        },
+        "occupied": {}
+      },
+      "fixture_requests": 9,
+      "fixture_tokens": 1080,
+      "real_provider_tokens": null,
+      "real_cost": null,
+      "deadline_unix": 1791536455.1367247,
+      "scope_invocations": {
+        "httpx.AsyncHTTPTransport.handle_async_request": 0,
+        "httpx.HTTPTransport.handle_request": 0,
+        "tools.platform_host.Host.run": 0,
+        "tools.platform_host.Host.context": 0,
+        "tools.platform_models.run_loop": 0,
+        "tools.platform_models.payload_for": 0,
+        "tools.platform_models.input_for": 0,
+        "tools.platform_models.DeepSeekAdapter._transport": 0,
+        "tools.research_investigations.InvestigationDispatcher._interact": 0,
+        "tools.research_investigations.InvestigationDispatcher._append_correction": 0,
+        "tools.research_investigations.InvestigationDispatcher.engineering_recovery": 0,
+        "tools.context_assembly.compact_investigation_request": 0,
+        "tools.platform_tools.simulate": 0,
+        "tools.research_mainline3.fixed_pipeline": 0,
+        "tools.research_execution.linearize_configuration": 0,
+        "extensions.optimization.ipopt.IpoptSolver.solve": 0,
+        "extensions.tendon_family.backends.MujocoBackend.solve": 0,
+        "scipy.optimize.minimize": 0,
+        "scipy.optimize.least_squares": 0,
+        "scipy.integrate.solve_ivp": 0
+      },
+      "historical_sha256": {
+        "activity_start.json": "bcb5d3bdea8e56845541b29aa7d4ed99bbe616487c958ba3cdc1c7b305e47de3",
+        "administrative_policy.json": "81d9f5c456b9ebd8d7e4c10d0685f47947c38bab5d569c8a2ae27b7f704c1eef",
+        "authorization.json": "9d8692de270a413f23babb402550feaf08c208f44a52c38f61c9f1d408c5794c",
+        "A_preserved.json": "7df309632719fa5f0696a26bb311980c8c3568b335c9eef3e70236513e585086",
+        "controller_binding_review.json": "87de27a157d9a411dc29c7e051f4acc560a35ae5c317d756bbdcec69eb1edf8e",
+        "coordinated_bundle.json": "429add774f9c9e63c65de6868ddfdbb3a99a8c29c944be0fadbb052d9ce811e8",
+        "coordinated_gate.json": "9f64d28775e5c3d9cc569430bdba3b9725b3cc997c7a76650bb91da48a3fcb5c",
+        "coordinated_grant.json": "cfec1ec545fdcf0a52d1ce950c36631d29f84a1234756954e0998b6615038ff4",
+        "coordinated_launch.json": "9a5de216db78dac9ab192d6ea0b117196404254e280ec3c19ec42e5955acbb89",
+        "coordinated_ledger.json": "0e1bbc85ef811691d9baacd86c9da1b1bbb971f7e17853833611d3fff28a5bd2",
+        "coordinated_result.json": "0311f0bf5723cfab564744c8eb69d3a9e0e3bb8a260488e55cdd24cb774f9f4f",
+        "coordinator-summary_completed.json": "098cd8e67bf79907b100d5dfbb9e86d24f5297627ac03c922e2f2809487f9099",
+        "coordinator-summary_submission.json": "f8c15787a27adc3a826e36cba1156834c5d69636e98cd03981e9df0eb1a1c92e",
+        "coordinator_import.json": "e0ad8670b5865eb1f97ca4e7e19dac2b8c77afb21e7f68e5dfe0f1fcd05d1b70",
+        "C_material_review.json": "d5f1cad9f36f14035e402bafae8852cd10a605ef82c67361b343e0751b53606f",
+        "C_reporting_dependency_migration.json": "4f13b6f8f98e28612ac57e10c1a444c263aaa20b1c075da106cae3d7d8e56852",
+        "C_reporting_repair.json": "3699c3dff0da5a0400f08854b52af5327cc24fc3f5e262bbf54e129df19bf9f1",
+        "C_reporting_repair_bind_failure.json": "ae870d02c4686cee5fd7d1b687bab952a56cb1ebe65f6d06f49a1a46d29e0564",
+        "C_reporting_repair_record.json": "1cee910b5b614a6e9b125ae4725fb126be30cf53db42d54efaae6e94601c4a3d",
+        "C_reporting_repair_verification.json": "c9ce703c9b1303c2231912142fe75b2933920479732552c9e101a1e35120253f",
+        "delivery_facts.json": "123f05a6440f1b845308228aafa27e2297ebf149e5fccdda7fc7b6a875601a37",
+        "documentation_history_check.json": "ffe601df9e3edf2c8c174bae796e22806b4202ff0246a909953a6b9d3015caf6",
+        "environment.json": "613f32f9809985c70d51d2f9ee543476a31a5949dc713eae34a2e8154b5a5809",
+        "finalize_evidence.py": "14d1c4064f6e3859a3b8fcafc9a20598d759578b0b8d4b3570bb49cdcf949143",
+        "fixed_bundle.json": "120d310155592dfcae8cf610912c8d8a1f44443c81044a8807e3a2a86e560d29",
+        "fixed_evaluation.json": "790145d6e789c7364799aa5484e745f86e58e58da019725eb92d9fe82211884d",
+        "fixed_gate.json": "9d335e01b809bfa0acd7664ee07d85c3382a9b740693c2e6008fa766cc5a032f",
+        "fixed_grant.json": "57a6f307e34f2e56e2fac7ee386a795251a92a0eb3eae352cab49aa004cc65e5",
+        "fixed_joint_acceptance.json": "05b2d84a28cc498b26c4c283475517ee7e415e992833e8c0677f7f8ce6518c87",
+        "fixed_launch.json": "08cc690f4b162d8d22a7ffd3e0f372418f2faff101eeec6584016f530305932c",
+        "fixed_ledger.json": "e8a6259f2987e52dc2b0a1b0372595217e3a33696293ab507d0b7383732073a2",
+        "fixed_profile.json": "8d74932736b01202bfb4d9194220f45bd30b0274524d52dfacf9100c99feb17b",
+        "fixed_result.json": "3744e68091471036722645946cce1f43777d1976f81e938080cef7e89c60185d",
+        "fixed_static_binding.json": "9a234227743945bf731f25dfcfe6b472d38ee5188608c603cace4a4fd52a1229",
+        "frozen_configuration.json": "be0cb0f7eb71a033b6ee0cdbfb33a14d90bd0b2e69cf703f648d6ac7f2ed0636",
+        "geometry_review.json": "55b7ed7bb68840a37e819197ae7a23ea70b92bdd68a7e129c229a7b16ab902a4",
+        "historical_uncertainties.json": "78ea0cf5c38621fbedc1c18334ca56874fe01a0f1dddcdc30d504a3cd2b87055",
+        "material_audit.json": "c49c06abf904bca16462849d5c7dfab13c11f6745aa72f08ddc1a07673e11c72",
+        "mathematical_summary.json": "f94d88cb7fd764fc74f6a8a694fdbc442b2899b4a201fb48a6592450cc98877b",
+        "offline_gate.json": "fe680df0a836fb35c07478f4361e9e2c8f6de398d769d0b8f46737f9fd80e3a5",
+        "predispatch_cli_repair.json": "a6040dcbe5519e15a4ba8830ee9628cc5c31496f67a2ca8a102b97547f138473",
+        "principal-coordinated-v2_collection_failure.json": "53a7338e05c12d7f54fd6391c0dc59e12a1f7e67ec41437ff161c1a4722db07b",
+        "principal-coordinated-v2_completed.json": "23b75f6a884986a1deae297f29ebf0b35de74f18d29f9ba6b22173e0e6911238",
+        "principal-coordinated-v2_submission.json": "3d82c0cd2785539fc8d68e50ce38135da4846e01fd36b0f7bb45f73cfa77f9c9",
+        "principal_report.json": "5de85ae9fc3f2f43f0ce243fb9d81ef1010765f65643b3914c84de3683208c4b",
+        "principal_saved_response1.json": "4e2684e49b0e2935d9814232ebec671d4b53ee1e3861112a4fb20f3e8d1f75f0",
+        "principal_saved_response2.json": "c85a1f1c9298234217f78104feeec525305cd88f20ca0086ccecd027cc279fef",
+        "principal_saved_response3.json": "4da53b013b6fec7e7ccfd035e01e79cfc35f6b4b591f75a4dc2a1444edeceeb6",
+        "prior_failed_checks.json": "683273674fe466e8503c206f26b0737e1d04997e7fdbd4637ff12989ebd9a6aa",
+        "provider_usage.json": "3659106f3af7ca0768b4c05a5eb7a975f444fe13e0a2084036a81d4e5f9cc46f",
+        "reach_import.json": "dd2d82a2e2ecf4ae1778f86696639540b09bd2b3b2552fa11d03038db3b28371",
+        "repair1.json": "014b25af89e6b305951288d00702a3515a30999f79477da2a967b73777353a1d",
+        "repair1_record.json": "a28b783d8c325b7c526d5639d57a2e9d9a20bc06a43ec29e4c9e759b11abe15c",
+        "repair1_verification.json": "935cf282552d4c61d0ac372467f14d0eeb550a73e9047528233284e8b5538ad6",
+        "repair2.json": "4e176c09f7b01e74620c18db8f894483f2a2763afda43b44b8dd6cdbf0e2df77",
+        "repair2_record.json": "054b0be962c797378c72345b4be34a616539a17f85e3e48ea8c618e2d77e120a",
+        "repair3.json": "188c9e83215dfd5d8457c974912b1d8a62181a1c0fac14c136ca1ff820c625d8",
+        "repair3_local_recovery.json": "63437fc0e23d0a3ffc5af48b647d72e91f8630f0950cf26e143bbe9eb83c7e78",
+        "repair3_record.json": "b7c69733ed843afd3e33d8966c745bf6233b64dd8a23caf68db468ebc4511b7c",
+        "repair3_verification.json": "eaee2f555fe574a28ee9eb27655485abd989487d9b79a85216f48e52986d4b4e",
+        "sealed_history.json": "1d7d7d2cc9fa57cc4405c698692c5f8ebf40ca938d7a5ae47e6e9360926d8d76",
+        "sealed_history_check.json": "81b157ca74cf9210bc7d165858c4390e051e95077c91b38e28c11ae360586bbb",
+        "synthesis_material_review.json": "57dd1521d3bf12ce4733b1a0c38c2d98173df34372115725b6d144a136e954a3",
+        "synthesis_report.json": "a2453d4382560bba86f7dffdbc1dd27a577eb422ac99ce9789f5555cd1cf006e",
+        "timing_import.json": "006824a4484d3cea2c7973a95d80fd60ebafdf3e36ab820bcc3d9d74bc13bf9b",
+        "validation_manifest.json": "437d201a0f32e837dd79d4a60e63e5b6e32d4b3d970b421668136f06b003be9a",
+        "validation_manifest_before_C_reporting_repair.json": "dc72e4eb0421a7877f2391ecdcd8701e165acaa502dc38561f58742367518948",
+        "validation_manifest_before_repair1.json": "c335cbc1839b04c14022c0ad1097b608b059adf8038bac2cb16bfa4dd8ad9e42",
+        "validation_manifest_before_repair2.json": "83e3fe838b547c79804d2f5a053f39f267463ab6f7b6e0bfd60d1549d495d6f6",
+        "validation_manifest_before_repair3.json": "12665d12f44ea6bf935a1ccdfc322472ba439102202f87176b229828ea8482f3"
+      },
+      "legacy_turn": 0,
+      "legacy_conversation_notes": 0
+    },
+    "E": {
+      "passed": true,
+      "activity_id": "strands-pilot-0d5631bf5cba",
+      "receipt": null,
+      "accounting": {
+        "limit": {
+          "backend_solves": 0,
+          "model_calls": 32,
+          "tool_calls": 128,
+          "wall_s": 3600.0,
+          "worker_calls": 0
+        },
+        "used": {
+          "tool_calls": 1,
+          "model_calls": 6,
+          "backend_solves": 0,
+          "worker_calls": 0,
+          "wall_s": 0.0779999999795109
+        },
+        "remaining": {
+          "backend_solves": 0,
+          "model_calls": 26,
+          "tool_calls": 127,
+          "wall_s": 3599.9220000000205,
+          "worker_calls": 0
+        },
+        "occupied": {}
+      },
+      "fixture_requests": 6,
+      "fixture_tokens": 720,
+      "real_provider_tokens": null,
+      "real_cost": null,
+      "deadline_unix": 1791536829.0771034,
+      "scope_invocations": {
+        "httpx.AsyncHTTPTransport.handle_async_request": 0,
+        "httpx.HTTPTransport.handle_request": 0,
+        "tools.platform_host.Host.run": 0,
+        "tools.platform_host.Host.context": 0,
+        "tools.platform_models.run_loop": 0,
+        "tools.platform_models.payload_for": 0,
+        "tools.platform_models.input_for": 0,
+        "tools.platform_models.DeepSeekAdapter._transport": 0,
+        "tools.research_investigations.InvestigationDispatcher._interact": 0,
+        "tools.research_investigations.InvestigationDispatcher._append_correction": 0,
+        "tools.research_investigations.InvestigationDispatcher.engineering_recovery": 0,
+        "tools.context_assembly.compact_investigation_request": 0,
+        "tools.platform_tools.simulate": 0,
+        "tools.research_mainline3.fixed_pipeline": 0,
+        "tools.research_execution.linearize_configuration": 0,
+        "extensions.optimization.ipopt.IpoptSolver.solve": 0,
+        "extensions.tendon_family.backends.MujocoBackend.solve": 0,
+        "scipy.optimize.minimize": 0,
+        "scipy.optimize.least_squares": 0,
+        "scipy.integrate.solve_ivp": 0
+      },
+      "new_process": true,
+      "retrieved_original": {
+        "content": [
+          {
+            "identity": "controlled-long-original",
+            "index": 0,
+            "padding": "Controlled offload fixture material. Controlled offload fixture material. Controlled offload fixture material. Controlled offload fixture material. Controlled offload fixture material. Controlled offload fixture material. Controlled offload fixture material. Controlled offload fixture material. ",
+            "units": "m/s",
+            "value": 0.0268176708469683
+          },
+          {
+            "identity": "controlled-long-original",
+            "index": 1,
+            "padding": "Controlled offload fixture material. Controlled offload fixture material. Controlled offload fixture material. Controlled offload fixture material. Controlled offload fixture material. Controlled offload fixture material. Controlled offload fixture material. Controlled offload fixture material. ",
+            "units": "m/s",
+            "value": 0.0268176708469683
+          },
+          {
+            "identity": "controlled-long-original",
+            "index": 2,
+            "padding": "Controlled offload fixture material. Controlled offload fixture material. Controlled offload fixture material. Controlled offload fixture material. Controlled offload fixture material. Controlled offload fixture material. Controlled offload fixture material. Controlled offload fixture material. ",
+            "units": "m/s",
+            "value": 0.0268176708469683
+          },
+          {
+            "identity": "controlled-long-original",
+            "index": 3,
+            "padding": "Controlled offload fixture material. Controlled offload fixture material. Controlled offload fixture material. Controlled offload fixture material. Controlled offload fixture material. Controlled offload fixture material. Controlled offload fixture material. Controlled offload fixture material. ",
+            "units": "m/s",
+            "value": 0.0268176708469683
+          },
+          {
+            "identity": "controlled-long-original",
+            "index": 4,
+            "padding": "Controlled offload fixture material. Controlled offload fixture material. Controlled offload fixture material. Controlled offload fixture material. Controlled offload fixture material. Controlled offload fixture material. Controlled offload fixture material. Controlled offload fixture material. ",
+            "units": "m/s",
+            "value": 0.0268176708469683
+          },
+          {
+            "identity": "controlled-long-original",
+            "index": 5,
+            "padding": "Controlled offload fixture material. Controlled offload fixture material. Controlled offload fixture material. Controlled offload fixture material. Controlled offload fixture material. Controlled offload fixture material. Controlled offload fixture material. Controlled offload fixture material. ",
+            "units": "m/s",
+            "value": 0.0268176708469683
+          },
+          {
+            "identity": "controlled-long-original",
+            "index": 6,
+            "padding": "Controlled offload fixture material. Controlled offload fixture material. Controlled offload fixture material. Controlled offload fixture material. Controlled offload fixture material. Controlled offload fixture material. Controlled offload fixture material. Controlled offload fixture material. ",
+            "units": "m/s",
+            "value": 0.0268176708469683
+          },
+          {
+            "identity": "controlled-long-original",
+            "index": 7,
+            "padding": "Controlled offload fixture material. Controlled offload fixture material. Controlled offload fixture material. Controlled offload fixture material. Controlled offload fixture material. Controlled offload fixture material. Controlled offload fixture material. Controlled offload fixture material. ",
+            "units": "m/s",
+            "value": 0.0268176708469683
+          }
+        ],
+        "kind": "content",
+        "next_offset": 8,
+        "offset": 0,
+        "pointer": "",
+        "presentation": "original",
+        "returned_items": 8,
+        "source": {
+          "artifact_id": "e479130312e906b9d6d6d916b10e020741313712e8fe308bae451a23f94fd127",
+          "media_type": "application/json"
+        },
+        "total_items": 64
+      },
+      "context_markers": [
+        "{'role': 'user', 'content': [{'text': '[Summarized: text block, ~2,759 tokens]\\n\\nFixture summary retaining the saved source identity, exact values and units. [ref: ef9427c5-b42e-4286-96da-3d1d89f9d683_0]'}], 'tracking_id': 'ef9427c5-b42e-4286-96da-3d1d89f9d683'}",
+        "{'role': 'user', 'content': [{'toolResult': {'toolUseId': 'long-original', 'status': 'success', 'content': [{'text': '[Truncated: 1 block, ~1,077 tokens]\\n\\n{\"receipt\": {\"contract_version\": \"1.2.0\", \"request_id\": \"pilot-read-66de4eb1\\n\\n[... 4,179 chars elided ...]\\n\\nedia_type\": \"application/json\"}, \"total_items\": 64}}\\n\\n[Stashed] [ref: long-original_0]'}]}}], 'tracking_id': 'f43dc363-01a4-4da3-a5e0-c8480c3579d5'}"
+      ],
+      "summarization_requests": 1
+    },
+    "provider_saved": {
+      "passed": true,
+      "activity_id": "strands-pilot-39548e690002",
+      "receipt": null,
+      "accounting": {
+        "limit": {
+          "backend_solves": 0,
+          "model_calls": 32,
+          "tool_calls": 128,
+          "wall_s": 3600.0,
+          "worker_calls": 0
+        },
+        "used": {
+          "tool_calls": 0,
+          "model_calls": 2,
+          "backend_solves": 0,
+          "worker_calls": 0,
+          "wall_s": 0.0
+        },
+        "remaining": {
+          "backend_solves": 0,
+          "model_calls": 30,
+          "tool_calls": 128,
+          "wall_s": 3600.0,
+          "worker_calls": 0
+        },
+        "occupied": {}
+      },
+      "fixture_requests": 2,
+      "fixture_tokens": 14258,
+      "real_provider_tokens": null,
+      "real_cost": null,
+      "deadline_unix": 1791537124.142462,
+      "scope_invocations": {
+        "httpx.AsyncHTTPTransport.handle_async_request": 0,
+        "httpx.HTTPTransport.handle_request": 0,
+        "tools.platform_host.Host.run": 0,
+        "tools.platform_host.Host.context": 0,
+        "tools.platform_models.run_loop": 0,
+        "tools.platform_models.payload_for": 0,
+        "tools.platform_models.input_for": 0,
+        "tools.platform_models.DeepSeekAdapter._transport": 0,
+        "tools.research_investigations.InvestigationDispatcher._interact": 0,
+        "tools.research_investigations.InvestigationDispatcher._append_correction": 0,
+        "tools.research_investigations.InvestigationDispatcher.engineering_recovery": 0,
+        "tools.context_assembly.compact_investigation_request": 0,
+        "tools.platform_tools.simulate": 0,
+        "tools.research_mainline3.fixed_pipeline": 0,
+        "tools.research_execution.linearize_configuration": 0,
+        "extensions.optimization.ipopt.IpoptSolver.solve": 0,
+        "extensions.tendon_family.backends.MujocoBackend.solve": 0,
+        "scipy.optimize.minimize": 0,
+        "scipy.optimize.least_squares": 0,
+        "scipy.integrate.solve_ivp": 0
+      },
+      "source_response": {
+        "artifact_id": "9c8d1f285a860cba1c146de01652010d6719802f755c5b7c1adc44cbcb0b9d9a",
+        "media_type": "application/json"
+      },
+      "original_reasoning_characters": 7324,
+      "original_tool_ids": [
+        "call_00_1ypPlHlD1UTrbHUYs1Nf6736"
+      ],
+      "formal_submission": false,
+      "meaning": "Historical usage replay is simulated usage here; no live provider request."
+    }
+  },
+  "passed": true,
+  "initial_run": "runs/strands-pilot-acceptance-1/results.json",
+  "affected_reruns": [
+    "D atomic rollback addition",
+    "E corrected text-block decoding and exact original equality",
+    "A provider formatter public-method delegation and explicit business tool bindings"
+  ],
+  "additional_check": "saved provider response conversion through actual Harness",
+  "live_model_requests": 0,
+  "mathematical_solves": 0,
+  "robot_backend_executions": 0,
+  "accepted_fixture_requests": 56,
+  "fixture_usage": "Simulated usage, including historical response usage replay. No real provider requests or costs.",
+  "remaining": [
+    "R3 DeepSeek endpoint compatibility",
+    "real summarization quality",
+    "live boundary timeout semantics",
+    "scientific improvements and autonomous research unassessed"
+  ]
+}

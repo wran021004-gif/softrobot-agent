@@ -213,12 +213,56 @@ def apply(inp,space,changes):
     inp=inp.model_copy(update={'policy':inp.policy.model_copy(update={
         'editable':{p:tuple(s['bounds']) for p,s in active.items() if s['type']=='number'}})})
     result=standard(inp,selected,changes,semantic_expander=semantic_expand)
+    validate_constructed(result,selected)
     initialization=semantic_initialization(result.robot.structure.data,result.policy.discretization.data,
         result.policy.controller.parameters.data['recipe']['basis'])
     if key!='T0':
         result.task.initializer.parameters.data.clear()
         result.task.initializer.parameters.data.update(initialization['initial'])
     return result.model_copy(update={'policy':result.policy.model_copy(update={'editable':original_editable})})
+
+
+def validate_constructed(inp,space):
+    """Check actual physical values against the fixed template semantic source.
+
+    Metadata never expands authorization. Routing normalization independently
+    checks every owned location, including each shared hole exactly once.
+    """
+    from .candidate import check_value
+    from .design_decisions import MATERIAL_FACTORS
+    from .routing_radius import normalize
+    design=plain(inp.robot.structure.data);source=plain(space.semantic_source)
+    original={c['id']:c for c in source['components']}
+    selections=design.get('metadata',{}).get('v2_selections',{})
+    scales=normalize(deepcopy(design),source)
+    def check_ratio(path,actual):
+        lo,hi=space.parameters[path]['bounds']
+        # Division of constructed floats can differ by a machine rounding bit.
+        if lo-1e-12<=actual<=hi+1e-12:actual=min(hi,max(lo,actual))
+        check_value(path,actual,space.parameters[path],{})
+    for c in design['components']:
+        if c['kind']!='flexible_segment':continue
+        name=c['id'];old=original[name]
+        path=f'components/{name}/length_m'
+        if path in space.parameters:check_value(path,c['length_m'],space.parameters[path],{})
+        for operation in ('section_scale','material_scenario','routing_radius_scale'):
+            path=f'design/{name}_{operation}'
+            if path not in space.parameters:continue
+            declared=selections.get(path,'baseline' if operation=='material_scenario' else 1.)
+            check_value(path,declared,space.parameters[path],{})
+            if operation=='section_scale':
+                ratios=[b['section']['parameters'][k]/v for a,b in zip(old['sections'],c['sections'])
+                    for k,v in a['section']['parameters'].items()]
+                actual=ratios[0]
+                if not np.allclose(ratios,declared,rtol=1e-10,atol=1e-12):raise ValueError('FINITE_SECTION_SOURCE_BINDING')
+                check_ratio(path,actual)
+            elif operation=='material_scenario':
+                if not np.isclose(c['physics']['young_pa']/old['physics']['young_pa'],MATERIAL_FACTORS[declared],rtol=1e-10):
+                    raise ValueError('FINITE_MATERIAL_SOURCE_BINDING')
+            else:
+                actual=scales.get(name,1.)
+                if not np.isclose(actual,declared,rtol=1e-10,atol=1e-12):raise ValueError('FINITE_ROUTING_SOURCE_BINDING')
+                check_ratio(path,actual)
 
 
 def validate_initializer(before,after):

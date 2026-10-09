@@ -266,12 +266,14 @@ def refresh(host, *, as_of_unix=None):
         host.store.update_state(db,host.run_id,state)
 
 
-def check_payload(host,payload):
+def check_payload(host,payload,*,research_packet=None):
     session=host.store.session(host.run_id)
     if session['status']!='running':return  # Sending is denied separately at the boundary.
     role=session['state'].get('role_context',{})
     if not role.get('refresh_current_authority'):return
-    packet=json.loads(payload['messages'][1]['content'])['role_context']['research_packet']
+    # Strands carries the explicitly bound current business packet in its
+    # system context; the legacy entry retains its existing wire layout.
+    packet=research_packet if research_packet is not None else json.loads(payload['messages'][1]['content'])['role_context']['research_packet']
     stamp=role['authority_snapshot'];snapshot=host.store.artifact(stamp['reference'])
     if stamp['session_id']!=host.run_id or stamp['campaign_id']!=host.store.config()['project_id'] or packet['capabilities']['authority_snapshot']!=stamp:
         raise ValueError('REQUEST_CURRENT_AUTHORITY_BINDING_MISMATCH')
@@ -279,7 +281,8 @@ def check_payload(host,payload):
     if packet['capabilities']['legal']!=actual['legal'] or packet['capabilities']['remaining']!=actual['remaining']:
         raise ValueError('REQUEST_CURRENT_AUTHORITY_MENU_OR_BUDGET_MISMATCH')
     function=next(t for t in payload['tools'] if t['function']['name']=='research_decide')
-    if set(function['function']['parameters']['anyOf'][0]['properties']['action']['enum'])!=set(actual['legal']):
+    schema=function['function']['parameters'];schema=schema.get('anyOf',[schema])[0]
+    if set(schema['properties']['action']['enum'])!=set(actual['legal']):
         raise ValueError('REQUEST_CURRENT_AUTHORITY_SCHEMA_MISMATCH')
 
 

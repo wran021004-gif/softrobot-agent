@@ -3,7 +3,7 @@
 Working directories are not transactions. External side effects can finish without
 a commit; such reservations remain unknown and are never automatically replayed.
 """
-from contextlib import contextmanager, closing
+from contextlib import contextmanager, closing, nullcontext
 from datetime import datetime, timezone
 import hashlib
 import json
@@ -304,8 +304,9 @@ class Store:
             # SQLite column count checked by focused tests, not separate accounting.
             return self.lookup(run_id, request_id, db), True
 
-    def complete(self, row, receipt, output=None, elapsed=0., kind='tool', *, result_execution=None, actual_cost=None):
-        with self.transaction() as db:
+    def complete(self, row, receipt, output=None, elapsed=0., kind='tool', *, result_execution=None, actual_cost=None, db=None):
+        # A pure business service may seal its state and receipt in one transaction.
+        with (self.transaction() if db is None else nullcontext(db)) as db:
             current = self.lookup(row['run_id'], row['request_id'], db)
             if current['receipt']:
                 return json.loads(current['receipt'])

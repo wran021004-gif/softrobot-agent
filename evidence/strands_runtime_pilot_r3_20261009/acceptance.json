@@ -1,0 +1,372 @@
+{
+  "activity": "strands-pilot-r3-20261009",
+  "assessment": "R3 incomplete; evidence-backed stop",
+  "request_boundary": {
+    "attempts": 40,
+    "confirmed_responses": 40,
+    "pending": [],
+    "summaries": 2,
+    "actual_wire_configuration_preserved": true,
+    "actual_timeout_600s": true,
+    "usage_totals": {
+      "prompt_tokens": 926544,
+      "completion_tokens": 60129,
+      "total_tokens": 986673,
+      "reasoning_tokens": 22148
+    },
+    "money": null
+  },
+  "framework": {
+    "checkpoint_observed": true,
+    "invocations": [
+      {
+        "action": "read",
+        "context": {
+          "message_count": 58,
+          "offloaded": true,
+          "pid": 30304,
+          "summary": false
+        },
+        "pid": 30304,
+        "result": "I've read all four top-level artifacts (with retries past intermittent `PermissionError`s) and paged the originals. Below is my provisional assessment. **No `submit_result` was called in this stage.**\n\n---\n\n## 1. Evidence directory (discovered identities)\n\nFrom `discover_evidence` (target `/`):\n\n- **target (directory/investigation)**: `fixed-C-offline-report` — meaning: *\"Saved fixed-C source identities; new principal judgment, no new robot experiment\"*\n- **investigation report**: `66ff0f1c550ccd2117f33d64831ac206629a3858b01e50fb97fefc5106153abf`\n- **sources**:\n  - `6314170dd823eab26d13296eb5afee1cfe24cb2f5117334414d1d66e8d266892` — saved evaluation\n  - `400226bfd9f0d75d698037f494987054f3030fce7813612c11f6f4d4e5d6ab13` — profile / holding-window report\n  - `5582561d4de48e4450f5619024d2a92296a6f7ed12c77c470cd8d573aa588627` — joint-acceptance record\n\nNote: `discover_evidence` exposes only `artifact_id`/`media_type` per source; no per-source identity objects. The extractor's fact carries `source_identity: {}` (empty).\n\n## 2. Extraction-only report (`66ff0f…3abf`) — read first\n\nPage (`/`), `completion: \"complete\"`, `children: []`, `counterevidence: []`, `dispositions: []`, `proposed_next_checks: []`:\n- `/interpretation`: *\"Extraction-only report from the saved fixed-C evaluation; no new experiment or scientific interpretation.\"*\n- `/unknowns`: `[\"Physical cause and live model compatibility are unassessed.\"]`\n- `/facts` (exactly **one** fact, `/facts/0`):\n  - `statement`: \"Saved official reach error\"\n  - `reference`: `{artifact_id: 6314170d…6892}`\n  - `pointer`: `/metrics/0/value`\n  - `value`: `0.0031314437885609334`\n  - `source_identity`: `{}`\n\nThe report asserts **no** joint success and carries no conclusion beyond this one extracted value.\n\n## 3. Saved evaluation (`6314170d…6892`)\n\n- `/candidate_id` `\"fixed-radius\"`; `/comparison_identity` `\"3c24b89e5c9abc7589dc69839f25d5050be1b212d31a2dec86dba230198c92c8\"`\n- `/evaluator` `\"evaluate.reach\"`, `/evaluator_version` `\"1.0.0\"`\n- `/metrics/0` `{name:\"position_error\", units:\"m\", value: 0.0031314437885609334}`\n- `/constraints/0` `{name:\"task_bound\", limit: 0.01, observed: 0.0031314437885609334, satisfied: true, units:\"m\"}`\n- `/task_success` `true`, `/validity` `\"valid\"`, `/reason` `null`\n- `/original_execution_id` = `/source_execution_id` = `\"197bceb6ff8f44b48a35bc4f79b3528d\"`; `/source` `{artifact_id: e2c5a5ed…b9cd}`\n\n## 4. Holding-window report / profile (`400226bf…6ab13`, `/detail`, 61 keys, fully paged)\n\n- `/detail/execution_id` `\"197bceb6ff8f44b48a35bc4f79b3528d\"`; `/detail/candidate_id` `\"fixed-radius\"`; `/detail/valid_complete_execution` `true`; `/detail/official_task_success` `true`; `/detail/evaluation_validity` `\"valid\"`\n- **`/detail/sampled_settling`**: `{available: true, continuous_time_guarantee: false, max_error_m: 0.0033622899352609014, max_speed_m_s: 0.026817670846968282, passed: false, position_limit_m: 0.01, speed_limit_m_s: 0.02, window_s: 0.05}`\n- `/detail/control_parameters/data/settling`: `{position_limit_m: 0.01, speed_limit_m_s: 0.02, window_s: 0.05}`\n- `/detail/motion_summary`: `terminal_error_m 0.003131443788560934`, `terminal_tip_speed_m_s 0.021786196764909577`, `tolerance_m 0.01`, `minimum_sampled_error_m 0.0030266910650862838` (t = `0.34`), `signed_terminal_position_error_m [-0.0013318447842898262, 0.0013510435253333078, 0.00249134723877098]`, scope string: *\"Sampled observations, not continuous-time guarantees or new acceptance criteria.\"*\n- `/detail/terminal_position_m [0.28866815521571015, 0.03635104352533331, 0.19249134723877098]`; `/detail/terminal_tip_speed_m_s 0.021786196764909577`; `/detail/last_valid_error_m 0.003131443788560934`; `/detail/last_valid_time_s 0.35000000000000003`; `/detail/minimum_error_m 0.0030266910650862838`\n- `/detail/error_phases` final errors `0.0064112544937656776`, `0.004340393322173238`, `0.003131443788560934`\n- Activity: `/detail/updates 35`, `/detail/accepted_plans 35`, `/detail/accepted_noninitialization_plans 28`, `/detail/deadline_misses 35`, `optimization_status_counts {feasible_early_stop: 35}`, `raw_termination_counts {User_Requested_Stop: 35}`, `/detail/real_time_demonstrated false`, `/detail/solver_status \"completed\"`, `solver_error_count 0`, `/detail/force_bound_violation_n 0.0`, `tension_range_n [0.0007952079435134748, 6.114000412250329]`\n- Identity/scope (`/detail/execution_scope`): task identity `d0f438cf0a0149adba72f8358cdcbbe21ddd5a32fbd066c5a9f03d7f092e2df7` (task_id `family-multisegment-dev`, goal `target_m [0.29, 0.035, 0.19]`, evaluator `evaluate.reach` `tolerance_m 0.01`), robot identity `0a0bad0e7e50ba6329801c180c5dc7466617de865ce373e6f0bb494637a88306`, seed `17`, controller `controller.gvs_nmpc` v`9.0.0`, numerical source `bundled_guess`; timing `control_period_s 0.01`, `duration_s 0.35`, `sample_period_s 0.01`, `timestep_s 0.0005`\n- `/detail/diagnostic_limitations`: *\"Sampled observations do not identify a dominant cause.\"* / *\"Force proximity alone does not imply a required physical design change.\"* / *\"Ideal tensions; omitted shear, stretch, torsion, tendon friction and actuator dynamics.\"*\n\n## 5. Joint-acceptance record (`5582561d…8627`, `/detail`)\n\n- `/detail/accepted` **false**; `/detail/status` **\"valid_failure\"**; `/detail/protocol_id` `\"offline_reach_hold_v1\"`; `/detail/contract` `\"research.task_acceptance\"`, `/detail/version` `\"1.0.0\"`; `composition_authority`: *\"research.task_acceptance@1.0.0; historical official evaluation retained separately\"*\n- `/detail/components`:\n  - `evaluation_validity`: passed `true`, value `\"valid\"`\n  - `evaluator:task_bound`: limit `0.01` m, passed `true`, value `0.0031314437885609334`\n  - `execution_complete`: passed `true`, value `true`\n  - `force_bounds`: limit `1e-08` N, passed `true`, value `0.0`\n  - `holding_coverage`: limit `6` (\"inclusive uniform samples\"), passed `true`, value `true`\n  - `holding_position`: limit `0.01` m, passed `true`, value `0.0033622899352609014`\n  - **`holding_speed`: limit `0.02` m/s, passed `false`, value `0.026817670846968282`**\n  - `solver_errors`: limit `0`, passed `true`, value `0`\n  - `task_evaluator`: passed `true`, value `true`\n- `/detail/metrics`: `{holding_max_error_m 0.0033622899352609014, holding_max_speed_m_s 0.026817670846968282, terminal_error_m 0.0031314437885609334}`\n- `/detail/official_recorded_task_success` `true`; `/detail/new_backend_solves` `0`; `/detail/continuous_time_guarantee` **false**; `/detail/task_identity` `d0f438cf0a0149adba72f8358cdcbbe21ddd5a32fbd066c5a9f03d7f092e2df7`; `/detail/execution_id` `197bceb6ff8f44b48a35bc4f79b3528d`; `/detail/timing` `{deadline_misses 35, mean_update_s 12.331832479999866, simulation_wall_s 433.625, real_time_demonstrated false, real_time_required false, control_period_s 0.01, duration_s 0.35, sample_period_s 0.01, timestep_s 0.0005, termination [\"duration\",\"numerical_failure\"]}`\n- `/detail/evidence_binding`: evaluation → `6314170d…6892`, profile → `400226bf…6ab13`, simulation → `e2c5a5ed…b9cd`; `evaluation_binding.original_execution_id` = `source_execution_id` = `197bceb6ff8f44b48a35bc4f79b3528d`\n\n## 6. Criterion-by-criterion verdict\n\n| Criterion | Limit | Observed | Verdict |\n|---|---|---|---|\n| Arrival (reach/task bound) | 0.01 m | 0.0031314437885609334 m (`/metrics/0/value`; `/constraints/0`) | **Satisfied** |\n| Holding **position** | 0.01 m | 0.0033622899352609014 m | **Satisfied** |\n| Holding **speed** | 0.02 m/s | 0.026817670846968282 m/s | **NOT satisfied** |\n| Holding coverage | 6 inclusive uniform samples | present (true) | Satisfied |\n| **Joint acceptance** | `accepted` | **false** (`valid_failure`) | **NOT satisfied** |\n\n- **Arrival** and **holding position** pass; **holding speed** fails by ~34% over the limit (0.026817670846968282 > 0.02 m/s), and terminal tip speed `0.021786196764909577 m/s` also exceeds `0.02 m/s`.\n- **Joint acceptance fails solely on `holding_speed`**; all other composite components pass.\n\n## 7. Valid execution vs task success (the distinction the case hinges on)\n\n- The execution is **valid and complete**: `validity \"valid\"`, `valid_complete_execution true`, `evaluation_validity \"valid\"`, `execution_complete true`, `solver_errors 0`, `force_bounds 0.0`, `evaluation_validity passed`.\n- The **official/historical evaluator** (`evaluate.reach@1.0.0`, arrival-only) recorded `task_success true` / `official_recorded_task_success true` — the reach target was met.\n- The **pilot joint acceptance** (`research.task_acceptance@1.0.0`, protocol `offline_reach_hold_v1`) is **not** met: `accepted false`, `status \"valid_failure\"`. So \"valid execution\" ≠ \"joint acceptance\" ≠ \"task success.\"\n- The extraction-only report supports **only** the reach-error value, and asserts **no** joint success. Adopting its claim therefore does **not** constitute acceptance of robot-task/joint success.\n\n## 8. Limits on causal claims and new-candidate scope\n\n- **Sampled, not continuous**: `continuous_time_guarantee false` in both the settling block and the acceptance record; holding window is 0.05 s sampled at 6 inclusive uniform samples (`sample_period_s 0.01`). Significance/peak of the in-window speed is observational; motion summary itself disclaims continuous-time guarantees.\n- **No causal attribution**: profile `diagnostic_limitations` states sampled observations do not identify a dominant cause, and force proximity ≠ required design change; the extraction report's `unknowns` say physical cause and live-model compatibility are unassessed.\n- **Modeled/ideal physics**: \"Ideal tensions; omitted shear, stretch, torsion, tendon friction and actuator dynamics\" — no physical-robot claim.\n- **Not real-time**: `real_time_demonstrated false`, `deadline_misses 35` of 35 updates, `mean_update_s 12.331832479999866` s vs `control_period_s 0.01` s, `simulation_wall_s 433.625` s, numerical source `bundled_guess`.\n- **Scope of the candidate**: this is one candidate (`fixed-radius`, i.e., the fixed-C case), one seed (`17`), one task identity, one execution (`197bceb6…`), one target `[0.29, 0.035, 0.19]`, `new_backend_solves 0`, `recovered_plans 0`, no new experiment. Results do not transfer to other candidates/seeds/targets.\n- **Independent-read limits**: nested referenced artifacts (`simulation` `e2c5a5ed…b9cd`, `motion` `27c1929f…8bd0`, `configuration` `77a14067…6925`, `one_step_prediction_evidence` `1e7ac586…d557`) return `EVIDENCE_MISSING_OR_CHANGED` / permission denied via `read_original`; motion-level verification therefore rests on the profile's aggregates. Several source reads also intermittently returned `PermissionError` and were retried.\n\n## 9. Plan for native submission after restart (not executed now)\n\n- `investigation_id`: `fixed-C-offline-report`\n- `report`: `{ artifact_id: \"66ff0f1c550ccd2117f33d64831ac206629a3858b01e50fb97fefc5106153abf\", media_type: \"application/json\" }`\n- `disposition`: **accept** — the saved bundle is internally consistent, complete, and faithfully extracted; acceptance refers to the source-supported claims, **not** to task/joint success.\n- `adopted_claims` (exactly one, report-supported):\n  - `statement`: \"The saved official reach evaluation (`evaluate.reach@1.0.0`) reports the terminal tip position error as 0.0031314437885609334 m, which is within the 0.01 m task bound.\"\n  - `supporting_facts`: `[{statement:\"Saved official reach error\", reference:{artifact_id:\"6314170dd823eab26d13296eb5afee1cfe24cb2f5117334414d1d66e8d266892\"}, pointer:\"/metrics/0/value\", value:0.0031314437885609334, source_identity:{}}]`\n  - `scope`: `{candidate_id:\"fixed-radius\", comparison_identity:\"3c24b89e5c9abc7589dc69839f25d5050be1b212d31a2dec86dba230198c92c8\", evaluator:\"evaluate.reach\", evaluator_version:\"1.0.0\", execution_id:\"197bceb6ff8f44b48a35bc4f79b3528d\", task_identity:\"d0f438cf0a0149adba72f8358cdcbbe21ddd5a32fbd066c5a9f03d7f092e2df7\"}`\n  - `support_explanation`: the report's single fact binds `/metrics/0/value` of `6314170d…6892` to the same 0.0031314437885609334 value, corroborated by `/constraints/0` (task_bound 0.01 m, satisfied true).\n- `evidence_used` (independently read originals; not part of `adopted_claims`): the evaluation's `/constraints/0` and `/validity`; the profile's `/detail/sampled_settling` (`max_speed_m_s 0.026817670846968282`, `passed false`), `/detail/motion_summary`, identity fields, timing; and the acceptance record's `/detail/components` (incl. `holding_speed` limit 0.02 m/s, passed `false`), `/detail/metrics`, `/detail/status \"valid_failure\"`, `/detail/accepted false`, `/detail/timing`.\n- `remaining_unknowns`: physical cause of the holding-speed exceedance; live-model compatibility; continuous-time (non-sampled) behavior; behavior for other candidates/seeds/targets; unreadable nested artifacts (`e2c5a5ed…b9cd`, `27c1929f…8bd0`, `77a14067…6925`, `1e7ac586…d557`).\n- `reason`: state plainly that arrival and holding **position** are satisfied (0.0031314437885609334 m and 0.0033622899352609014 m ≤ 0.01 m), holding **speed** is **not** (0.026817670846968282 > 0.02 m/s), so **joint acceptance is false** (`valid_failure`) even though the historical `evaluate.reach` recorded task success; acceptance of the report's claim is not task/joint success; note the no-causal / sampled-only / non-real-time / single-candidate scope limits linked to `evidence_used`.\n- `revision`: `1`.\n\n**Provisional bottom line:** the saved execution is a **valid, complete** run that **satisfies arrival and holding position** but **fails holding speed**, hence **fails joint acceptance** (`valid_failure`); the single extraction-report claim (official reach error 0.0031314437885609334 m) is the only item eligible for adoption. I will not call `submit_result` until the post-restart stage.\n",
+        "scope": {
+          "extensions.optimization.ipopt.IpoptSolver.solve": 0,
+          "extensions.tendon_family.backends.MujocoBackend.solve": 0,
+          "scipy.integrate.solve_ivp": 0,
+          "scipy.optimize.least_squares": 0,
+          "scipy.optimize.minimize": 0,
+          "tools.context_assembly.compact_investigation_request": 0,
+          "tools.platform_host.Host.context": 0,
+          "tools.platform_host.Host.run": 0,
+          "tools.platform_models.DeepSeekAdapter._transport": 0,
+          "tools.platform_models.input_for": 0,
+          "tools.platform_models.payload_for": 0,
+          "tools.platform_models.run_loop": 0,
+          "tools.platform_tools.simulate": 0,
+          "tools.research_execution.linearize_configuration": 0,
+          "tools.research_investigations.InvestigationDispatcher._append_correction": 0,
+          "tools.research_investigations.InvestigationDispatcher._interact": 0,
+          "tools.research_investigations.InvestigationDispatcher.engineering_recovery": 0,
+          "tools.research_mainline3.fixed_pipeline": 0
+        }
+      },
+      {
+        "action": "checkpoint",
+        "context": {
+          "message_count": 60,
+          "offloaded": true,
+          "pid": 26432,
+          "summary": true
+        },
+        "pid": 26432,
+        "result": "## Progress note (for restart) — no submission made\n\n**Status:** evidence review complete; no `submit_result` called.\n\n**Offloaded `read_original` reference keys for exact re-retrieval (via `retrieve_context`):**\n- `call_00_as8wY7VhQv04iWLbPUUl6414_0` — report `66ff0f1c…3abf`, full page (1 fact: reach error `0.0031314437885609334`, ptr `/metrics/0/value`)\n- `call_00_XLbUErHdJlZOtOTR0sKn3636_0` — **evaluation** `6314170dd823…6892` (task_bound 0.01 m, valid, task_success true)\n- `call_00_uQluSGcJRb2y9FmSnk130085_0` — gate **profile** `400226bf…6ab13` `/detail` offset 0\n- `call_00_HVbH51cqDMYMpEe1rfJ07742_0` — profile `/detail` offset 16 (execution_scope identities)\n- `call_00_BJ44nZezbvBtLrP0osQr1294_0` — profile `/detail` offset 36 (`motion_summary`)\n- `call_00_ET_rQdSNrBDIZ0W2GZNYtTJ8782_0` — profile `/detail` offset 39 (official_task_success true)\n- `call_00_114y6CvK3us1j9TfZkkU8754_0` — profile `/detail` offset 54 (task/goal/initializer)\n- `call_00_P2W3Et1WKP56CCZ5DYIw4260_0` — **joint-acceptance record** `5582561d…8627` (accepted false, `holding_speed` passed false, `valid_failure`)\n- Inline (not offloaded) profile pages: offsets 32, 38, 47, 57.\n\n**Key values to preserve:** arrival `0.0031314437885609334 m` ≤ `0.01 m` (pass); holding position `0.0033622899352609014 m` ≤ `0.01 m` (pass); holding speed `0.026817670846968282 m/s` > `0.02 m/s` (**fail**); joint `accepted:false` / `valid_failure`; execution `197bceb6…528d`; task `d0f438cf…2df7`; candidate `fixed-radius`; target `fixed-C-offline-report`.\n\n**Remaining native work at restart (do not submit this stage):** call `submit_result` with `revision:1`, `investigation_id:\"fixed-C-offline-report\"`, `report` → `66ff0f1c…3abf`, `disposition:accept`, the one report-supported `adopted_claims` entry, `evidence_used` = independently read evaluation/profile/acceptance facts (additional_support left empty), `remaining_unknowns` (holding-speed cause, live-model compatibility, continuous-time behavior, other seeds/targets, unreadable nested artifacts) and a `reason` stating arrival+position pass, speed fails → no joint success; then query `get_receipt`. Re-confirm each cited field against the keys above before committing; expect intermittent `PermissionError` / `EVIDENCE_MISSING_OR_CHANGED` on out-of-scope nested IDs — do not retry those.\n",
+        "scope": {
+          "extensions.optimization.ipopt.IpoptSolver.solve": 0,
+          "extensions.tendon_family.backends.MujocoBackend.solve": 0,
+          "scipy.integrate.solve_ivp": 0,
+          "scipy.optimize.least_squares": 0,
+          "scipy.optimize.minimize": 0,
+          "tools.context_assembly.compact_investigation_request": 0,
+          "tools.platform_host.Host.context": 0,
+          "tools.platform_host.Host.run": 0,
+          "tools.platform_models.DeepSeekAdapter._transport": 0,
+          "tools.platform_models.input_for": 0,
+          "tools.platform_models.payload_for": 0,
+          "tools.platform_models.run_loop": 0,
+          "tools.platform_tools.simulate": 0,
+          "tools.research_execution.linearize_configuration": 0,
+          "tools.research_investigations.InvestigationDispatcher._append_correction": 0,
+          "tools.research_investigations.InvestigationDispatcher._interact": 0,
+          "tools.research_investigations.InvestigationDispatcher.engineering_recovery": 0,
+          "tools.research_mainline3.fixed_pipeline": 0
+        }
+      }
+    ],
+    "restored_requests": 9,
+    "pids_before": [
+      26432,
+      30304
+    ],
+    "pids_after": [
+      32388
+    ],
+    "distinct_new_process": true,
+    "restored_tool_history": [
+      {
+        "sequence": 374,
+        "paired_tool_ids": [
+          "call_00_WMetSa3fHTrVeeJW6GfW2600",
+          "call_00_as8wY7VhQv04iWLbPUUl6414",
+          "call_01_ylTkMWahKVC0zKkGottj9371",
+          "call_00_jx6YQMzOFuZH6FgJvaot1031",
+          "call_00_uvvcGr0mA5RttLHu06fY1885",
+          "call_01_coFYmYkt8QqRMkLZBW0C1684",
+          "call_00_IDrxczZaw0op4riPOJsB1761",
+          "call_01_mij0K3abtnlUCInzbQcK1688",
+          "call_02_XcyMzBnx4mg89XBU3Yi21994",
+          "call_00_XLbUErHdJlZOtOTR0sKn3636",
+          "call_01_tGt5mhOzR1I9FNaDF9qC5326",
+          "call_02_2tcerbZifHW6yG5eHsuS1417",
+          "call_00_HtsJzcNYeZOwTqlcgS2u2967",
+          "call_00_uQluSGcJRb2y9FmSnk130085",
+          "call_01_EZuYtb6Gtgzp05LwHswB1354",
+          "call_02_WQKy3xYu2wZdr6HQ0zX12782",
+          "call_00_ET_kfjKq5xvN4Re42wgzNtT0444",
+          "call_00_HVbH51cqDMYMpEe1rfJ07742",
+          "call_01_Qc7ltQWRBnbJ4cTfeaDH5638",
+          "call_00_ET_UaaifZATjCIuWVr3RVAV5958",
+          "call_00_OpslLS0fpFsSQROpaasI1636",
+          "call_01_Py07vGOUDyQM8WgeIPdg8917",
+          "call_00_BJ44nZezbvBtLrP0osQr1294",
+          "call_01_5EDZGOYLLNznfpu0WKDU6212",
+          "call_00_ET_EAI5qG7CInnRR86nxsfJ7982",
+          "call_00_nPgsGVu8AG9hzjZTlZ8p5262",
+          "call_01_RlYBMpjzBxIIH9vyufRt7234",
+          "call_00_ET_rQdSNrBDIZ0W2GZNYtTJ8782",
+          "call_01_ET_1LgdSBSerjbfRFcRIZjl4462",
+          "call_00_ET_2iTAA5CkCNsNaIO4UeW63433",
+          "call_00_4iihAUlW0rU18VZrQF883399",
+          "call_01_gRSPv3bGuZ8B02ZOu9Po6763",
+          "call_00_114y6CvK3us1j9TfZkkU8754",
+          "call_01_Nz4uS0FTcNaaxmE7yys84958",
+          "call_00_ET_h7OsW3JMpsjaVWqQrnbc0866",
+          "call_00_foT6kd5bPdy2l3ZwCbuW2706",
+          "call_01_WDSNDRviJ8wNMIU4Ijuh3285",
+          "call_00_P2W3Et1WKP56CCZ5DYIw4260",
+          "call_01_0Z2gvxN3GdsvUIzO94AJ8044",
+          "call_00_ET_nCqqPBIJEz9BbKMtDlhV5232",
+          "call_00_ql8rJdeCiLu0LQHrT3EP3033",
+          "call_01_PTii6SdJIr9ZfcT4e2Yi3557",
+          "call_02_v04nsFjD6J06AHhYA2As0938",
+          "call_00_7ovDINibwZm1L6bWRnHn2277",
+          "call_01_P6Xx1DDQ9oNvzYgo7tSp6768",
+          "call_00_QEtoPFdbuwgwr8TAVG5h7541",
+          "call_01_1WQDpXGdtpvAgo8ab3o81556",
+          "call_00_9Tw6GyoAYc2kozY159Fv2861",
+          "call_01_Xmp4Z0wBUEHdXhSc1XNY9188",
+          "call_00_r7X0QqYk3o4IQ8nuKH2S8684",
+          "call_01_zv3tYaEXI9dLJs8ZzKqn6865",
+          "call_02_Q53aUAMz7vaPGuZnhbqO8214"
+        ],
+        "tool_pairs_complete": true,
+        "assistant_reasoning_fields": 23
+      },
+      {
+        "sequence": 388,
+        "paired_tool_ids": [
+          "call_00_WMetSa3fHTrVeeJW6GfW2600",
+          "call_00_as8wY7VhQv04iWLbPUUl6414",
+          "call_01_ylTkMWahKVC0zKkGottj9371",
+          "call_00_jx6YQMzOFuZH6FgJvaot1031",
+          "call_00_uvvcGr0mA5RttLHu06fY1885",
+          "call_01_coFYmYkt8QqRMkLZBW0C1684",
+          "call_00_IDrxczZaw0op4riPOJsB1761",
+          "call_01_mij0K3abtnlUCInzbQcK1688",
+          "call_02_XcyMzBnx4mg89XBU3Yi21994",
+          "call_00_XLbUErHdJlZOtOTR0sKn3636",
+          "call_01_tGt5mhOzR1I9FNaDF9qC5326",
+          "call_02_2tcerbZifHW6yG5eHsuS1417",
+          "call_00_HtsJzcNYeZOwTqlcgS2u2967",
+          "call_00_uQluSGcJRb2y9FmSnk130085",
+          "call_01_EZuYtb6Gtgzp05LwHswB1354",
+          "call_02_WQKy3xYu2wZdr6HQ0zX12782",
+          "call_00_ET_kfjKq5xvN4Re42wgzNtT0444",
+          "call_00_HVbH51cqDMYMpEe1rfJ07742",
+          "call_01_Qc7ltQWRBnbJ4cTfeaDH5638",
+          "call_00_ET_UaaifZATjCIuWVr3RVAV5958",
+          "call_00_OpslLS0fpFsSQROpaasI1636",
+          "call_01_Py07vGOUDyQM8WgeIPdg8917",
+          "call_00_BJ44nZezbvBtLrP0osQr1294",
+          "call_01_5EDZGOYLLNznfpu0WKDU6212",
+          "call_00_ET_EAI5qG7CInnRR86nxsfJ7982",
+          "call_00_nPgsGVu8AG9hzjZTlZ8p5262",
+          "call_01_RlYBMpjzBxIIH9vyufRt7234",
+          "call_00_ET_rQdSNrBDIZ0W2GZNYtTJ8782",
+          "call_01_ET_1LgdSBSerjbfRFcRIZjl4462",
+          "call_00_ET_2iTAA5CkCNsNaIO4UeW63433",
+          "call_00_4iihAUlW0rU18VZrQF883399",
+          "call_01_gRSPv3bGuZ8B02ZOu9Po6763",
+          "call_00_114y6CvK3us1j9TfZkkU8754",
+          "call_01_Nz4uS0FTcNaaxmE7yys84958",
+          "call_00_ET_h7OsW3JMpsjaVWqQrnbc0866",
+          "call_00_foT6kd5bPdy2l3ZwCbuW2706",
+          "call_01_WDSNDRviJ8wNMIU4Ijuh3285",
+          "call_00_P2W3Et1WKP56CCZ5DYIw4260",
+          "call_01_0Z2gvxN3GdsvUIzO94AJ8044",
+          "call_00_ET_nCqqPBIJEz9BbKMtDlhV5232",
+          "call_00_ql8rJdeCiLu0LQHrT3EP3033",
+          "call_01_PTii6SdJIr9ZfcT4e2Yi3557",
+          "call_02_v04nsFjD6J06AHhYA2As0938",
+          "call_00_7ovDINibwZm1L6bWRnHn2277",
+          "call_01_P6Xx1DDQ9oNvzYgo7tSp6768",
+          "call_00_QEtoPFdbuwgwr8TAVG5h7541",
+          "call_01_1WQDpXGdtpvAgo8ab3o81556",
+          "call_00_9Tw6GyoAYc2kozY159Fv2861",
+          "call_01_Xmp4Z0wBUEHdXhSc1XNY9188",
+          "call_00_r7X0QqYk3o4IQ8nuKH2S8684",
+          "call_01_zv3tYaEXI9dLJs8ZzKqn6865",
+          "call_02_Q53aUAMz7vaPGuZnhbqO8214",
+          "call_00_A4V6XdJKYVB6gj6a4SSW0115",
+          "call_01_f0rk5pxvwOCuu2X4OwL00184"
+        ],
+        "tool_pairs_complete": true,
+        "assistant_reasoning_fields": 24
+      }
+    ],
+    "retrievals": [
+      {
+        "sequence": 381,
+        "pid": 32388,
+        "stash_reference": "call_00_P2W3Et1WKP56CCZ5DYIw4260_0",
+        "source": {
+          "artifact_id": "5582561d4de48e4450f5619024d2a92296a6f7ed12c77c470cd8d573aa588627",
+          "media_type": "application/json"
+        },
+        "pointer": "",
+        "exact_public_page_equal": true,
+        "public_page_output": {
+          "artifact_id": "73e4b49d82a98287ca364f59e0ab5ce414633513f27094e3a56ea6c2c5bb3ae4",
+          "media_type": "application/json"
+        }
+      },
+      {
+        "sequence": 385,
+        "pid": 32388,
+        "stash_reference": "call_00_XLbUErHdJlZOtOTR0sKn3636_0",
+        "source": {
+          "artifact_id": "6314170dd823eab26d13296eb5afee1cfe24cb2f5117334414d1d66e8d266892",
+          "media_type": "application/json"
+        },
+        "pointer": "",
+        "exact_public_page_equal": true,
+        "public_page_output": {
+          "artifact_id": "74fdb14947463ef04b876ac716ad2cb22acc17fe6c49d4d3951be549f15d8337",
+          "media_type": "application/json"
+        }
+      }
+    ]
+  },
+  "frozen_facts": {
+    "arrival": {
+      "value": 0.0031314437885609334,
+      "limit": 0.01,
+      "unit": "m",
+      "passed": true
+    },
+    "holding_position": {
+      "value": 0.0033622899352609014,
+      "limit": 0.01,
+      "unit": "m",
+      "passed": true
+    },
+    "holding_speed": {
+      "value": 0.026817670846968282,
+      "limit": 0.02,
+      "unit": "m/s",
+      "passed": false
+    },
+    "joint": {
+      "status": "valid_failure",
+      "accepted": false,
+      "execution_id": "197bceb6ff8f44b48a35bc4f79b3528d"
+    }
+  },
+  "formal": {
+    "receipt": null,
+    "business_effects": 0,
+    "validation_failures": [
+      {
+        "sequence": 394,
+        "error": "2 validation errors for PrincipalDisposition\nevidence_used\n  List should have at most 12 items after validation, not 13 [type=too_long, input_value=[{'statement': 'Saved eva... 'source_identity': {}}], input_type=list]\n    For further information visit https://errors.pydantic.dev/2.14/v/too_long\nadopted_claims.0.scope\n  Input should be a valid list [type=list_type, input_value={'candidate_id': 'fixed-r...2', 'validity': 'valid'}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.14/v/list_type",
+        "issue": null
+      },
+      {
+        "sequence": 402,
+        "error": "12 validation errors for PrincipalDisposition\nadopted_claims.0.scope.0.statement\n  Field required [type=missing, input_value={'artifact_id': '6314170d...d', 'validity': 'valid'}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.14/v/missing\nadopted_claims.0.scope.0.reference\n  Field required [type=missing, input_value={'artifact_id': '6314170d...d', 'validity': 'valid'}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.14/v/missing\nadopted_claims.0.scope.0.pointer\n  Field required [type=missing, input_value={'artifact_id': '6314170d...d', 'validity': 'valid'}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.14/v/missing\nadopted_claims.0.scope.0.value\n  Field required [type=missing, input_value={'artifact_id': '6314170d...d', 'validity': 'valid'}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.14/v/missing\nadopted_claims.0.scope.0.artifact_id\n  Extra inputs are not permitted [type=extra_forbidden, input_value='6314170dd823eab26d13296e...117334414d1d66e8d266892', input_type=str]\n    For further information visit https://errors.pydantic.dev/2.14/v/extra_forbidden\nadopted_claims.0.scope.0.candidate_id\n  Extra inputs are not permitted [type=extra_forbidden, input_value='fixed-radius', input_type=str]\n    For further information visit https://errors.pydantic.dev/2.14/v/extra_forbidden\nadopted_claims.0.scope.0.comparison_identity\n  Extra inputs are not permitted [type=extra_forbidden, input_value='3c24b89e5c9abc7589dc6983...31a2dec86dba230198c92c8', input_type=str]\n    For further information visit https://errors.pydantic.dev/2.14/v/extra_forbidden\nadopted_claims.0.scope.0.evaluator\n  Extra inputs are not permitted [type=extra_forbidden, input_value='evaluate.reach', input_type=str]\n    For further information visit https://errors.pydantic.dev/2.14/v/extra_forbidden\nadopted_claims.0.scope.0.evaluator_version\n  Extra inputs are not permitted [type=extra_forbidden, input_value='1.0.0', input_type=str]\n    For further information visit https://errors.pydantic.dev/2.14/v/extra_forbidden\nadopted_claims.0.scope.0.original_execution_id\n  Extra inputs are not permitted [type=extra_forbidden, input_value='197bceb6ff8f44b48a35bc4f79b3528d', input_type=str]\n    For further information visit https://errors.pydantic.dev/2.14/v/extra_forbidden\nadopted_claims.0.scope.0.source_execution_id\n  Extra inputs are not permitted [type=extra_forbidden, input_value='197bceb6ff8f44b48a35bc4f79b3528d', input_type=str]\n    For further information visit https://errors.pydantic.dev/2.14/v/extra_forbidden\nadopted_claims.0.scope.0.validity\n  Extra inputs are not permitted [type=extra_forbidden, input_value='valid', input_type=str]\n    For further information visit https://errors.pydantic.dev/2.14/v/extra_forbidden",
+        "issue": null
+      },
+      {
+        "sequence": 410,
+        "error": "PRINCIPAL_SOURCE_VALUE_MISMATCH: /detail/motion_summary",
+        "issue": {
+          "code": "PRINCIPAL_SOURCE_VALUE_MISMATCH",
+          "path": "/value",
+          "reference": {
+            "artifact_id": "400226bfd9f0d75d698037f494987054f3030fce7813612c11f6f4d4e5d6ab13",
+            "media_type": "application/json"
+          },
+          "pointer": "/detail/motion_summary",
+          "supplied_value": {
+            "minimum_sampled_error_m": 0.0030266910650862838,
+            "terminal_error_m": 0.003131443788560934,
+            "terminal_tip_speed_m_s": 0.021786196764909577,
+            "tolerance_m": 0.01
+          },
+          "supplied_type": "dict",
+          "original_value": {
+            "entered_tolerance_earlier_but_ended_outside": false,
+            "error_convention": "actual_tip minus target; world frame",
+            "late_change_definition": "last sampled error minus first sampled error in stated interval",
+            "late_error_change_m": -0.00023084614669996754,
+            "late_interval_s": [
+              0.3,
+              0.35
+            ],
+            "late_sample_interval_s": [
+              0.3,
+              0.35000000000000003
+            ],
+            "minimum_sampled_error_m": 0.0030266910650862838,
+            "minimum_sampled_error_time_s": 0.34,
+            "scope": "Sampled observations, not continuous-time guarantees or new acceptance criteria.",
+            "signed_terminal_position_error_m": [
+              -0.0013318447842898262,
+              0.0013510435253333078,
+              0.00249134723877098
+            ],
+            "terminal_error_m": 0.003131443788560934,
+            "terminal_tip_speed_m_s": 0.021786196764909577,
+            "tolerance_m": 0.01
+          },
+          "original_type": "dict"
+        }
+      },
+      {
+        "sequence": 418,
+        "error": "1 validation error for PrincipalDisposition\nevidence_used\n  List should have at most 12 items after validation, not 13 [type=too_long, input_value=[{'pointer': '/constraint... 'timestep_s': 0.0005}}], input_type=list]\n    For further information visit https://errors.pydantic.dev/2.14/v/too_long",
+        "issue": null
+      },
+      {
+        "sequence": 426,
+        "error": "1 validation error for PrincipalDisposition\nevidence_used\n  List should have at most 12 items after validation, not 13 [type=too_long, input_value=[{'pointer': '/constraint...ntrol_period_s': 0.01}}], input_type=list]\n    For further information visit https://errors.pydantic.dev/2.14/v/too_long",
+        "issue": null
+      },
+      {
+        "sequence": 434,
+        "error": "PRINCIPAL_INVALID_SINGLE_JSON_POINTER: /detail/execution_scope/task/goal/data/target_m",
+        "issue": null
+      },
+      {
+        "sequence": 442,
+        "error": "1 validation error for PrincipalDisposition\nevidence_used\n  List should have at most 12 items after validation, not 13 [type=too_long, input_value=[{'pointer': '/constraint...f44b48a35bc4f79b3528d'}], input_type=list]\n    For further information visit https://errors.pydantic.dev/2.14/v/too_long",
+        "issue": null
+      }
+    ],
+    "repeated_lookup_equal": true,
+    "lookup_ledger_unchanged": true,
+    "citations": [],
+    "complete": false
+  },
+  "scope": {
+    "mathematical_solves": 0,
+    "backend_solves": 0,
+    "robot_executions": 0,
+    "legacy_turn": 0,
+    "legacy_notes": [],
+    "public_tool_operations": 61,
+    "completed_invocation_scope_records": 2,
+    "zero_forbidden_calls_in_completed_invocations": true,
+    "failed_invocation_scope_records": 0
+  },
+  "limitation": "Planned saved-boundary continuation only. No claim of recovery after a real in-flight crash, long-term reliability, cost reduction, or improved science. Formal source validation does not replace manual semantic review."
+}

@@ -84,7 +84,7 @@ class SelectedDisposition(Contract):
     catalog: EvidenceRef
     catalog_version: Literal['1.0.0']
     disposition: Literal['accept', 'defer', 'reject']
-    evidence_used: list[FactSelection] = Field(default_factory=list, max_length=12)
+    evidence_used: list[FactSelection] = Field(default_factory=list)
     adopted_claims: list[SelectedClaim] = Field(default_factory=list, max_length=8)
     semantic_claims_unassessed: list[str] = Field(default_factory=list, max_length=12)
     remaining_unknowns: list[str] = Field(default_factory=list, max_length=12)
