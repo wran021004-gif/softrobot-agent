@@ -246,3 +246,21 @@ class Mainline5Tests(TestCase):
         self.assertTrue(facts['current_feedback_aliases'])
         self.assertEqual(facts['current_feedback_aliases'],s.decision_aliases(s.aliases(w,ref)))
         self.assertEqual(w.store.remaining(),before)
+
+    def test_current_feedback_refreshes_inside_one_agent_invocation(self):
+        w=self.w;w.status='running';old=w.store.artifact(w.feedback)['result'];wires=[];new=[]
+        def wire(request):
+            body=json.loads(request.content);wires.append(body)
+            if len(wires)==1:
+                new.append(s.feedback(w,{'status':'offline_feedback_changed','fact':7},'offline_boundary'))
+                return httpx.Response(200,json=completion('research_capability_catalog',{},call_id='offline-refresh-read'))
+            aliases=s.decision_aliases(s.aliases(w,new[0]));alias=next(iter(aliases))
+            return httpx.Response(200,json=completion('research_decide',dict(action='stop',evidence=[alias],
+                observations=[dict(evidence=alias,value=aliases[alias]['value'])],
+                reasoning='Labeled offline state refresh only',stop_reason='Offline fixture stopped'),call_id='offline-refreshed-stop'))
+        agent=m5.build_live(w,transport=httpx.MockTransport(wire),key='offline-no-secret')
+        agent('Offline boundary refresh check; no physics')
+        self.assertEqual(len(wires),2);self.assertEqual(w.status,'model_stopped')
+        prefix=next(m['content'] for m in wires[1]['messages'] if m['role']=='system').split('\nCURRENT_BUSINESS_PACKET\n')[0]
+        facts=json.loads(prefix.split('\nCURRENT_CONFIRMED_FACTS\n')[1].split('\n',1)[1])
+        self.assertEqual(facts['current_feedback_reference'],new[0]);self.assertNotEqual(new[0],old)

@@ -170,7 +170,8 @@ def build_live(w,*,transport=None,key=None):
                 if t.tool_name=='research_decide':t.tool_spec['inputSchema']['json']['properties']['action']['enum']=decision['properties']['action']['enum']
             return  # Confirmed replay adds no send; dispatch still revalidates current authority.
         packet=service.configure(w)
-        agent.system_prompt=INSTRUCTIONS+'\nCURRENT_BUSINESS_PACKET\n'+json.dumps(packet,ensure_ascii=False)
+        agent.system_prompt=(INSTRUCTIONS+'\nCURRENT_CONFIRMED_FACTS\n'+continuation_prompt(w)+
+            '\nCURRENT_BUSINESS_PACKET\n'+json.dumps(packet,ensure_ascii=False))
         allowed=packet['capabilities']['legal']
         for t in tools:
             if t.tool_name=='research_decide':t.tool_spec['inputSchema']['json']['properties']['action']['enum']=list(allowed)
