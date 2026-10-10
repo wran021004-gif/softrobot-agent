@@ -106,10 +106,11 @@ def _segment_pose(length,ky,kz):
 
 
 class _SymbolicKinematics:
-    def __init__(self, topology, q, integration_steps, resolved):
+    def __init__(self, topology, q, integration_steps, resolved, lengths=None):
         self.design, self.components, self.chain, self.segments = topology
         self.q = q
         self.resolved = resolved
+        self.lengths = lengths or {}
         self.coefficients = {
             segment.segment: q[segment_slice(segment)]
             for segment in resolved.segments
@@ -128,7 +129,7 @@ class _SymbolicKinematics:
         for midpoint, width in integration_intervals(segment_basis(self.resolved, segment.id), u, self.integration_steps):
             curvature = ca.mtimes(_dm(basis_matrix(self.resolved, segment_basis(self.resolved, segment.id), midpoint)), coefficients)
             ky, kz = curvature[0], curvature[1]
-            transform = ca.mtimes(transform, _segment_pose(segment.length_m * width, ky, kz))
+            transform = ca.mtimes(transform, _segment_pose(self.lengths.get(segment.id, segment.length_m) * width, ky, kz))
         return transform
 
     def point_pose(self, part, s):
@@ -193,7 +194,18 @@ def _angular_jacobian(rotation, q):
 class GVSCasadiFunctions:
     """One native MX graph exposing dynamics terms and their derivatives."""
 
-    def __init__(self, expression: GVSContinuousDynamicsExpression):
+    def __init__(self, expression: GVSContinuousDynamicsExpression, *, lengths=None, design_input=None):
+        """Optional symbolic lengths stay in the graph, outside numeric contracts.
+
+        A supplied length map requires an explicit independent design input.
+        Fixed-design callers retain their original function signatures.
+        """
+        if lengths is not None and design_input is None:
+            raise ValueError('SYMBOLIC_LENGTHS_REQUIRE_DESIGN_INPUT')
+        self.design_input = design_input
+        extra = [] if design_input is None else [design_input]
+        extra_names = [] if design_input is None else ['d']
+        lengths = lengths or {}
         self.expression = expression
         self.design = expression.design
         self.parameters = expression.parameters
@@ -208,7 +220,7 @@ class GVSCasadiFunctions:
         u = ca.MX.sym('u', m)
         acceleration = ca.MX.sym('acceleration', n)
         state = _SymbolicKinematics(
-            topology, q, self.parameters.integration_steps_per_segment, self.resolved
+            topology, q, self.parameters.integration_steps_per_segment, self.resolved, lengths
         )
 
         descriptors = _mass_descriptors(
@@ -220,6 +232,12 @@ class GVSCasadiFunctions:
         inertial_wrench = ca.MX.zeros(n, 1)
         gravity_vector = _dm(expression.gravity_robot_base_m_s2)
         for descriptor_index, descriptor in enumerate(descriptors):
+            # Section tensors and normalized quadrature are frozen. Undo only
+            # the numeric integration length, retaining every tensor entry.
+            length_factor = 1
+            if descriptor['kind'] == 'segment' and descriptor['component'] in lengths:
+                length_factor = lengths[descriptor['component']] / topology[1][descriptor['component']].length_m
+            sample_mass = descriptor['mass'] * length_factor
             pose = (
                 state.point_pose(descriptor['component'], descriptor['s'])
                 if descriptor['kind'] == 'segment'
@@ -230,11 +248,11 @@ class GVSCasadiFunctions:
             jv = ca.jacobian(position, q)
             jw = _angular_jacobian(rotation, q)
             inertia_world = ca.mtimes(
-                [rotation, _dm(descriptor['inertia']), rotation.T]
+                [rotation, _dm(descriptor['inertia']) * length_factor, rotation.T]
             )
-            mass += descriptor['mass'] * ca.mtimes(jv.T, jv)
+            mass += sample_mass * ca.mtimes(jv.T, jv)
             mass += ca.mtimes([jw.T, inertia_world, jw])
-            gravity += descriptor['mass'] * ca.mtimes(jv.T, gravity_vector)
+            gravity += sample_mass * ca.mtimes(jv.T, gravity_vector)
             # Project each rigid mass sample's inertial wrench directly. This
             # is the same Christoffel contraction of M(q), without forming and
             # differentiating every entry of the generalized mass matrix.
@@ -242,7 +260,7 @@ class GVSCasadiFunctions:
             angular_velocity = ca.mtimes(jw, qdot)
             linear_bias = ca.jtimes(linear_velocity, q, qdot)
             angular_bias = ca.jtimes(angular_velocity, q, qdot)
-            bias += descriptor['mass'] * ca.mtimes(jv.T, linear_bias)
+            bias += sample_mass * ca.mtimes(jv.T, linear_bias)
             bias += ca.mtimes(jw.T,
                 ca.mtimes(inertia_world, angular_bias) +
                 ca.cross(angular_velocity, ca.mtimes(inertia_world, angular_velocity)))
@@ -258,13 +276,13 @@ class GVSCasadiFunctions:
             omega = ca.vertcat(spin[2,1],spin[0,2],spin[1,0])
             alpha = ca.jtimes(omega,q,qdot) + ca.jtimes(omega,qdot,acceleration)
             torque = ca.mtimes(inertia_world,alpha) + ca.cross(omega,ca.mtimes(inertia_world,omega))
-            projected_wrench = ca.jtimes(position,q,descriptor['mass']*linear_acceleration,True)
+            projected_wrench = ca.jtimes(position,q,sample_mass*linear_acceleration,True)
             rotation_covector = ca.reshape(ca.mtimes(_skew(torque),rotation)/2,9,1)
             projected_wrench += ca.jtimes(rotation_vector,q,rotation_covector,True)
             # Keep directional/adjoint derivative graphs local to each sample.
             sample_wrench = ca.Function('gvs_mass_wrench_'+str(descriptor_index),
-                [q,qdot,acceleration],[projected_wrench])
-            inertial_wrench += sample_wrench(q,qdot,acceleration)
+                [q,qdot,acceleration]+extra,[projected_wrench])
+            inertial_wrench += sample_wrench(*([q,qdot,acceleration]+extra))
         mass = (mass + mass.T) / 2
 
         elastic = ca.MX.zeros(n, 1)
@@ -280,7 +298,7 @@ class GVSCasadiFunctions:
             for node, weight in basis_quadrature(local, self.parameters.quadrature_points_per_segment):
                 basis = _dm(basis_matrix(self.resolved, local, float(node)))
                 stiffness, viscosity = _stiffness_and_damping(segment, float(node))
-                scale = segment.length_m * float(weight)
+                scale = lengths.get(segment.id, segment.length_m) * float(weight)
                 local_elastic += scale * ca.mtimes(
                     [basis.T, _dm(stiffness), ca.mtimes(basis, local_q) - natural]
                 )
@@ -326,18 +344,18 @@ class GVSCasadiFunctions:
             'gravity_force', 'tendon_generalized_force', 'tendon_lengths_m',
             'tendon_length_jacobian', 'velocity_bias',
         ]
-        self.function = ca.Function('gvs_dynamics', [x, u], outputs, ['x', 'u'], names)
+        self.function = ca.Function('gvs_dynamics', [x, u]+extra, outputs, ['x', 'u']+extra_names, names)
         # Implicit transcription uses force balance directly, avoiding the
         # ill-scaled acceleration residual of this stiff bending model.
-        self.implicit_terms = ca.Function('gvs_implicit_terms', [x,u],
-            [mass,tendon_force+gravity-bias-elastic-damping], ['x','u'], ['mass','force'])
-        self.implicit_residual=ca.Function('gvs_force_balance',[x,u,acceleration],
+        self.implicit_terms = ca.Function('gvs_implicit_terms', [x,u]+extra,
+            [mass,tendon_force+gravity-bias-elastic-damping], ['x','u']+extra_names, ['mass','force'])
+        self.implicit_residual=ca.Function('gvs_force_balance',[x,u,acceleration]+extra,
             [inertial_wrench-(tendon_force+gravity-elastic-damping)],
             # Sample wrench calls inline here. Share repeated MX kinematics
             # and derivative expressions without expanding the graph to SX.
             {'cse':True,'der_options':{'cse':True}})
         self._linearization = None
-        self._linearization_symbols = (x,u,xdot)
+        self._linearization_symbols = (x,u,xdot,extra,extra_names)
         static_residual = tendon_force + gravity - elastic
         self.q_symbol = q
         self.u_symbol = u
@@ -345,22 +363,25 @@ class GVSCasadiFunctions:
         self.tip_position_expression = state.attachment_pose(self.design.tip)[:3, 3]
         self.static_equilibrium = ca.Function(
             'gvs_static_equilibrium',
-            [q, u],
+            [q, u]+extra,
             [static_residual, ca.jacobian(static_residual, q)],
-            ['q', 'u'],
+            ['q', 'u']+extra_names,
             ['residual', 'jacobian'],
         )
 
-    def evaluate(self, x, u):
-        values = self.function(x=np.asarray(x, dtype=float), u=np.asarray(u, dtype=float))
+    def evaluate(self, x, u, d=None):
+        kwargs = {} if self.design_input is None else {'d': d}
+        if self.design_input is not None and d is None:
+            raise ValueError('DESIGN_INPUT_REQUIRED')
+        values = self.function(x=np.asarray(x, dtype=float), u=np.asarray(u, dtype=float), **kwargs)
         return {name: np.asarray(values[name], dtype=float) for name in self.function.name_out()}
 
     @property
     def linearization(self):
         if self._linearization is None:
-            x,u,xdot=self._linearization_symbols
-            self._linearization=ca.Function('gvs_linearization',[x,u],
-                [ca.jacobian(xdot,x),ca.jacobian(xdot,u),xdot],['x','u'],['A','B','drift'])
+            x,u,xdot,extra,extra_names=self._linearization_symbols
+            self._linearization=ca.Function('gvs_linearization',[x,u]+extra,
+                [ca.jacobian(xdot,x),ca.jacobian(xdot,u),xdot],['x','u']+extra_names,['A','B','drift'])
         return self._linearization
 
     def linearize(self, x, u):

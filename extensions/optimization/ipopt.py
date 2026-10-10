@@ -229,6 +229,8 @@ class IpoptSolver:
         }
         if self.parameters.max_cpu_s is not None:
             options['ipopt.max_cpu_time']=float(self.parameters.max_cpu_s)
+        if self.parameters.max_wall_s is not None:
+            options['ipopt.max_wall_time']=float(self.parameters.max_wall_s)
         cache_key=(bundle.expression_digest,bundle.serialized_function,problem.objective.direction,
                    self.parameters.constraint_jacobian_mode)
         cached=cache_key in self._compiled
@@ -320,7 +322,7 @@ class IpoptSolver:
             status = 'converged'
         elif selector is not None and selector.stop_reason is not None and violation<=1e-5:
             status = 'feasible_early_stop'
-        elif return_status in ('Maximum_Iterations_Exceeded', 'Maximum_CpuTime_Exceeded'):
+        elif return_status in ('Maximum_Iterations_Exceeded', 'Maximum_CpuTime_Exceeded', 'Maximum_WallTime_Exceeded'):
             status = 'iteration_limit'
         elif 'Infeasible' in return_status:
             status = 'infeasible'
