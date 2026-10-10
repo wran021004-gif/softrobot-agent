@@ -1,0 +1,66 @@
+{
+  "action": "control_revision",
+  "candidates": [],
+  "comparison": null,
+  "control": {
+    "candidate": {
+      "artifact_id": "0e16077e9183ebcd64729eb982aa5a73e5eb03e111d5d7ed402552ca16db345b",
+      "media_type": "application/json"
+    },
+    "feasible_return_budget_s": 15.0,
+    "holding_tip_speed_weight": 0.05,
+    "preceding_execution": {
+      "artifact_id": "c98d59c56637081f80228d07f031b13376ff61997fdab85e56f6cd347718c413",
+      "media_type": "application/json"
+    },
+    "record_update_ids": [
+      20
+    ],
+    "recover_returned_tensions": true,
+    "substeps": 1,
+    "terminal_tip_speed_weight": 0.1
+  },
+  "diagnostic_candidate": null,
+  "disposition": "Spend the one remaining post-regeneration scientific step on the scoped 15 s closed-loop revision: exact immutable candidate 0e16077e9183ebcd64729eb982aa5a73e5eb03e111d5d7ed402552ca16db345b, preceding execution imported as c98d59c56637081f80228d07f031b13376ff61997fdab85e56f6cd347718c413, and only recover_returned_tensions false -> true (15 s feasible-return budget, 30 s CPU, 120 iterations, weights 0.05/0.10, substeps 1, record update 20). Ceilings are not quotas and this is not a generic endorsement of recovery: it is one bounded test of the mechanism at the single recorded update, chosen because the discretized check already succeeded (8.777700788442644e-13, 0 violations, objective 22.260486146614134 below the selected 1697.0857483254906). No second MuJoCo launch, no 30 s regeneration, no warm_start_comparison, no repair of the top-level selected 0.2 N initialization, no other factor changed. The earlier model's original STOP disposition and its factual corrections (one paired experiment, two local NLP attempts, no numerical repeat after the reporting recovery, actual stops budget_best_feasible / User_Requested_Stop, CPU cap distinct from the wall budget) are preserved separately from this new action.",
+  "expected_observation": "One new MuJoCo launch within the 1800 s allowance (plus 30 s evaluation, 60 s profile) in which recorded update 20 shows whether the regenerated, feasible, lower-objective returned-tension plan is accepted and actuated, and which returns sampled terminal error, holding max error/speed, deadline misses, optimization status counts and per-update timings directly comparable to the recovery-disabled baseline run (terminal 0.09552487867011847 m, holding max error 0.1931520788542894 m, holding max speed 3.2498304807417395 m/s, 35 deadline misses, recovered_plans 0, mean_recovery_s 0.0). Any gain is reported only as sampled closed-loop evidence at this update, not as continuous-time, real-time, hardware or general superiority evidence, and the 0.30 s horizon endpoint is not treated as 0.35 s task acceptance.",
+  "fixed_conditions": "Frozen specification and physics unchanged: two flexible segments 0.16 m / 0.11 m, 24 cells, structural_linear, six ideal tension channels in fixed order bounded [0,8] N, target [0.29,0.035,0.19] m, mount [0,0,0.15] m identity quaternion, gravity [0,0,-9.81], named zero initial physical state, 0.35 s duration with 0.01 s control and sample periods and 0.0005 s physics (35 input switches), 0.05 s holding window with endpoint included, 0.01 m terminal/holding position limit and 0.02 m/s holding speed limit, seed 17, unchanged stopping settings max_cpu_s 30 / max_iterations 120 / minimum_s 5 / relative_improvement 0.1 / tolerance 1e-6, and the unchanged 1e-5 feasibility threshold. Material, sectioning, routing, guides, rigid parts and payload are untouched; no full-horizon codesign, no BDF change, no other model or hardware, no IPOPT; historical simulation stays synchronous so latency does not skip virtual control updates.",
+  "hypothesis": "Enabling the recovery path at the single recorded update 20 (t = 0.20 s) will let the controller act on the regenerated, exactly-tension-preserving, discretized-feasible returned plan (schedule baf4b78a0e788bca82c843c13196676ea0e2e7ed61cfc608c36f9c1b5d248368; residual 8.777700788442644e-13 scaled, 0 violations; objective 22.260486146614134 versus the selected 1697.0857483254906 and the rejected returned 22.30603877987936; horizon-end position error 0.004818508931420792 m versus returned 0.00504527763239229 m) instead of the 0.2 N non-equilibrium initialization, so that the sampled closed loop at and after update 20 differs measurably from the recovery-disabled recording (terminal error 0.09552487867011847 m, holding max error 0.1931520788542894 m, holding max speed 3.2498304807417395 m/s, 35 deadline misses, 0 recovered plans). This tests whether restored discretized numerical feasibility transfers to actual sampled closed-loop behaviour, and does not assume it does.",
+  "limitations": [
+    "Sampled evidence only: 0.01 s control/sample with 0.0005 s physics, no continuous-time guarantee, and the .30 s horizon endpoint is not .35 s task acceptance.",
+    "Recovery acts at update 20 only under a 15 s feasible-return budget; behaviour at other updates, other states, or other budgets is not tested and cannot be extrapolated.",
+    "No unique causal attribution: any change is joint with whatever the revision perturbs, and the fixed controller still enforces the unchanged 1e-5 threshold and stopping settings.",
+    "The unresolved same-time projection difference 4.3975 mm / 0.021396 m/s and the unrecorded historical CPU-time consumption remain open, and a small generalized-force residual still does not bound Cartesian force, tendon error or trajectory error.",
+    "One launch including failure; if the run fails to launch or exceeds allowance it is recorded as that single launch, and no numerical result already sealed may be repeated to improve reporting."
+  ],
+  "requested_nlp_solves": 0,
+  "requested_replays": 0,
+  "revision_or_stop_rule": "Read the returned closed-loop result before anything else, then STOP: no second MuJoCo launch, no further regeneration, no warm_start_comparison, no ceiling change, and no repeat of any sealed numerical result. Report the actual sampled metrics (recorded update 20 decision, terminal error, holding max error and speed, deadline misses, optimization status and policy-stop counts, per-update timings) against the recovery-disabled baseline, and explicitly separate original NLP progress, restored discretized numerical feasibility, post-regeneration objective improvement, and sampled closed-loop result. If the revision cannot launch or exceeds its allowance, record that as the single permitted launch including failure and STOP with the failure stated rather than retried. STOP cites every new result and seals further sends.",
+  "saved_plan": null,
+  "supporting_evidence": [
+    {
+      "artifact_id": "2456fa4af4666ccab570f8e547ff15ccaf5b87923131f3145dc4e6e185a41dc4",
+      "media_type": "application/json"
+    },
+    {
+      "artifact_id": "1fcd15bac5b41dd51cde02385ea967a6f2b376e36669696c1c4a65c8f667fb20",
+      "media_type": "application/json"
+    },
+    {
+      "artifact_id": "1074959ef843e7b79b6c14ffad293cd8b8a098ca57a95b55fc237a25835970cc",
+      "media_type": "application/json"
+    },
+    {
+      "artifact_id": "c98d59c56637081f80228d07f031b13376ff61997fdab85e56f6cd347718c413",
+      "media_type": "application/json"
+    },
+    {
+      "artifact_id": "2ef9f26a8f0cf8d61c5108fac8e8c750743f8e94d3b154abf1c135363a00f133",
+      "media_type": "application/json"
+    },
+    {
+      "artifact_id": "0e16077e9183ebcd64729eb982aa5a73e5eb03e111d5d7ed402552ca16db345b",
+      "media_type": "application/json"
+    }
+  ],
+  "weakening_observation": "No recovered plan at update 20 (recovered_plans 0, hold_last_responses, or the returned tensions demonstrably not used), or sampled metrics unchanged or worse than the recovery-disabled recording (terminal error >= 0.09552487867011847 m, holding max error >= 0.1931520788542894 m, holding max speed >= 3.2498304807417395 m/s, deadline misses >= 35) would show that the discretized feasibility gain (8.777700788442644e-13 scaled, objective change -0.045552633265224074) does not transfer to sampled closed-loop behaviour at this update. A launch failure or allowance overrun at 1800 s weakens the test as well, by leaving the closed-loop half of the research question unresolved at the cost of the single permitted launch."
+}

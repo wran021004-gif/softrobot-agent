@@ -76,3 +76,13 @@ legacy ToolResult metric pointers. This platform uses content-addressed
 No matching finalized legacy run exists. The procedure stays a reference-backed
 draft; no fabricated validation, human approval, database or provenance migration
 is introduced to admit it.
+
+The subsequent [feasibility-recovery investigation](nmpc_feasibility_completion.md)
+reused these facts without repeating the pair or projection study. Its
+[bounded procedure](nmpc_feasibility_procedure.md) extends steps3,7-10 with exact
+row decoding, unchanged-tension implicit regeneration, both selected/raw metric
+comparators and a flag-only live revision. One saved15s return was restored to
+scaled residual8.78e-13/objective22.2605; one new live run improved terminal error
+to3.016mm and holding error to3.464mm but failed the unchanged holding-speed
+limit (.024643 >.02m/s). The memory extension stays a reference-backed draft.
+This evidence does not convert the procedure into always enabling recovery.

@@ -1,0 +1,49 @@
+{
+  "action": "reintegrate_saved_tensions",
+  "candidates": [],
+  "comparison": null,
+  "control": null,
+  "diagnostic_candidate": null,
+  "disposition": "Proceed with regeneration #1 of at most two, on the baseline 15 s arm's returned schedule only (checkpoint_1 is the identical schedule identity, so it is deduplicated; checkpoint_2 and both 30 s schedules are distinct and are not touched here). Ordering follows the routing rule: check the baseline 15 s returned schedule before committing to a 15 s closed-loop revision, and treat a 30 s-only repair as extrapolation. The selected 0.2 N plan (schedule_identity 3f9266991f74bc38318be7c31f4bc40d6352886701634787af009781fda290d2) is left unrepaired, and the prior model's original STOP disposition plus its factual corrections (single paired experiment, no numerical repeat after the reporting recovery, actual stops budget_best_feasible / User_Requested_Stop, CPU cap distinct from wall budget) are preserved separately from this new action. Locked interpretations carried forward: the .30 s horizon endpoint is not .35 s task acceptance; a small generalized-force residual is not Cartesian force or tendon error and not a small trajectory error; the same-time projection difference 4.3975 mm / 0.021396 m/s stays an open limitation; initial 0.2 N is not an equilibrium.",
+  "expected_observation": "Within the 180 s wall a regenerated plan for the baseline arm that: (i) preserves the exact returned tension schedule (deduplicated - returned and checkpoint_1 share identity baf4b78a0e78..., so checkpoint_1 is not regenerated separately); (ii) preserves the saved .20 s timing and record update 20, horizon 0.2-0.30 s; (iii) reports dynamics_equalities max scaled residual <= 1e-5 with 0 violations, versus 120 violations and 0.0427 now; (iv) reports an objective and terminal/endpoint metrics for the regenerated states that may differ from 22.30603877987936 because only the states move under fixed tensions. This counts as restored discretized numerical feasibility, not as original NLP progress, physical improvement, or sampled closed-loop improvement.",
+  "fixed_conditions": "Frozen specification untouched: two flexible segments (0.16 m / 0.11 m), 24 mesh cells, structural_linear, six ideal tension channels in order near_t0,near_t1,near_t2,far_t0,far_t1,far_t2 within [0,8] N; target [0.29,0.035,0.19] m, mount [0,0,0.15] m with identity wxyz quaternion, gravity [0,0,-9.81]; named zero initial physical state; duration 0.35 s at 0.01 s control/sample and 0.0005 s physics, i.e. 35 input switches; 0.05 s holding window with endpoint included; terminal and holding position limit 0.01 m and holding speed limit 0.02 m/s; seed 17; unchanged stopping settings (max_cpu_s 30, max_iterations 120, minimum_s 5, relative_improvement 0.1, tolerance 1e-6). The action regenerates states only at the saved update 20 / t=0.20 s under unchanged tensions, launches no MuJoCo run, solves no NLP, uses no IPOPT, does not touch the top-level selected 0.2 N initialization plan, and does not relax the 1e-5 threshold; at most one of the two available distinct regenerations is spent here, at 180 s.",
+  "hypothesis": "The baseline-15s returned schedule (schedule_identity baf4b78a0e788bca82c843c13196676ea0e2e7ed61cfc608c36f9c1b5d248368, objective 22.30603877987936, tensions in [0,8] N) is recorded as infeasible because the returned STATES are inconsistent with the returned TENSIONS, not because the tensions themselves require infeasible states: at update 20 / t=0.20 s all 120 generalized-force rows exceed the 1e-5 scaled threshold (worst dynamics_3_13, coordinate near.kappa_y_node_1, interval [0.23,0.24) s, physical 4.2687068291809294e-05 N*m^2/rad, normalizer 0.001, scaled 0.042687068291809294), while kinematic consistency (max scaled 3.55e-16), variable bounds and initial-state rows are all satisfied. Therefore re-integrating the states from the measured update-20 state with the existing implicit root finder, holding the returned tensions fixed, will restore feasibility of the SAME tension schedule (max scaled generalized-force residual <= 1e-5, 0 rows above threshold) with no new optimization, no IPOPT and no change to the schedule.",
+  "limitations": [
+    "Regeneration can only repair state consistency under the fixed returned tensions in the frozen discrete equations; it cannot alter the tension schedule, the 1e-5 threshold, weights, or the objective definition.",
+    "A feasible regenerated plan is not sampler acceptance, not closed-loop improvement, not continuous-time validity, and not real-time or hardware evidence.",
+    "Generalization from this 15 s arm to the 30 s arm, to other updates, or to other states would be extrapolation; only one distinct regeneration is exercised here.",
+    "The unresolved 4.3975 mm position / 0.021396 m/s same-time projection difference and the unavailable historical CPU-time measurement are not addressed by this action.",
+    "Historical simulations are synchronous and latency does not skip virtual control updates, so any later closed-loop comparison inherits that sampling convention and the 35 deadline misses already observed."
+  ],
+  "requested_nlp_solves": 0,
+  "requested_replays": 0,
+  "revision_or_stop_rule": "Read the regenerated result before anything else, then take at most ONE further scientific step, exclusively: (a) if the regenerated max scaled generalized-force residual is <= 1e-5 with 0 violations AND the regenerated plan is materially better than the selected plan (objective well below 1697.0857483254906 and terminal error well below 0.18044854420779968 m), run control_revision: exact immutable candidate 0e16077e9183ebcd64729eb982aa5a73e5eb03e111d5d7ed402552ca16db345b, preceding execution c98d59c56637081f80228d07f031b13376ff61997fdab85e56f6cd347718c413, recover_returned_tensions false -> true, feasible_return_budget_s 15, max_cpu_s 30, max_iterations 120, holding/terminal tip-speed weights 0.05/0.10, substeps 1, record_update_ids [20] - the single remaining MuJoCo launch within 1800 s plus 30 s evaluation and 60 s profile; (b) if residual remains above 1e-5 but the root finder converged, spend the one remaining distinct regeneration on the 30 s arm returned schedule (56369b81976826291a8dd1f2ce1eb4d0e5be775865fbe3a1eeabce0cd1ad622d, source b8849bb48a87ba8eccf5974d1272ffb49cfd705443cbfbd7e515b416f9f30bb3, label returned, deduplicated against its identical checkpoint_1) and then STOP, citing that repairing only the 30 s arm does not back a 15 s claim; (c) otherwise STOP, citing the exact audits and the regeneration output. Never run two further steps, never repair the selected initialization, never raise another ceiling, and never repeat a sealed numerical result.",
+  "saved_plan": {
+    "max_wall_s": 180.0,
+    "plan_label": "returned",
+    "regenerated_reference": null,
+    "source_problem": {
+      "artifact_id": "1074959ef843e7b79b6c14ffad293cd8b8a098ca57a95b55fc237a25835970cc",
+      "media_type": "application/json"
+    }
+  },
+  "supporting_evidence": [
+    {
+      "artifact_id": "1fcd15bac5b41dd51cde02385ea967a6f2b376e36669696c1c4a65c8f667fb20",
+      "media_type": "application/json"
+    },
+    {
+      "artifact_id": "1074959ef843e7b79b6c14ffad293cd8b8a098ca57a95b55fc237a25835970cc",
+      "media_type": "application/json"
+    },
+    {
+      "artifact_id": "2ef9f26a8f0cf8d61c5108fac8e8c750743f8e94d3b154abf1c135363a00f133",
+      "media_type": "application/json"
+    },
+    {
+      "artifact_id": "c98d59c56637081f80228d07f031b13376ff61997fdab85e56f6cd347718c413",
+      "media_type": "application/json"
+    }
+  ],
+  "weakening_observation": "Any scaled generalized-force row still above 1e-5 after regeneration (in particular the same near.kappa_y_node_1 rows 12-16 over 0.23-0.30 s), a root-finder non-convergence or wall stop at 180 s, or a max scaled residual close to the returned 0.0427 would show the 15 s recorded infeasibility is not a state-only consistency defect: the returned tension schedule could not be converted into a feasible plan by regeneration, so a closed-loop revision at 15 s would have no regenerated plan to act on. A weaker but still weakening outcome is a feasible regenerated trajectory that is no longer useful (objective at or above the selected plan's 1697.0857483254906 or terminal error no better than the selected plan's 0.18044854420779968 m): feasibility would then not imply a still-useful plan."
+}

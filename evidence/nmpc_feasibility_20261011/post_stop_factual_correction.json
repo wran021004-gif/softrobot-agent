@@ -1,0 +1,57 @@
+{
+  "schema": "post_stop_factual_correction_v1",
+  "model_original_disposition": {
+    "artifact_id": "6488fdcb4672df1d8a521ca4d99fdcbdf112a75f53a33d1ae835a2766147a5fc",
+    "media_type": "application/json"
+  },
+  "original_model_preserved": true,
+  "does_not_reopen_activity": true,
+  "no_provider_send_after_stop": true,
+  "corrections": [
+    {
+      "model_claim": "The regeneration and control revision reproduced already-sealed operations and are evidentially inert.",
+      "fact": "This fresh activity executed one new saved-tension regeneration and one new MuJoCo launch, each once. Current-packet/feedback/context retrieval reused their references afterward; that is evidence reading, not another numerical execution. New feedback IDs are 2456fa4a... and a370a238...; new simulation is cda6509a699545d7b59b9be854c60d08, distinct from baseline21b607607bf442a6b6d9494dda897ea8.",
+      "sources": [
+        "calls.json",
+        "events.json",
+        "10_reintegrate_saved_tensions.json",
+        "11_closed_loop.json"
+      ]
+    },
+    {
+      "model_claim": "Recovery was enabled at the single recorded update20; other updates were not repaired.",
+      "fact": "The standalone diagnostic used saved update20. The recovery flag was enabled throughout all35 live updates, using each current simulator measurement. Recovered deliveries occurred at updates [0, 1, 2, 3, 13, 23]. Update20 snapshot recording is evidence capture; its delivered plan was IPOPT-selected at iteration6, without selected recovery.",
+      "reference": {
+        "artifact_id": "e442f060ed1a2f64b0542c3c45ee81744467a0651c73297e77bbce33b59d61bc",
+        "media_type": "application/octet-stream"
+      }
+    },
+    {
+      "model_claim": "horizon_end_speed_improved is unsupported because speed rose .101116 to .102305 m/s.",
+      "fact": "The feedback outcome compares regenerated metrics with the original FEASIBLE selected initialization: .367882 -> .102305 m/s, so the flag is true under its implemented comparator. Versus the REJECTED raw plan, speed worsened .101116 -> .102305 m/s; report both comparisons explicitly.",
+      "reference": {
+        "artifact_id": "2456fa4af4666ccab570f8e547ff15ccaf5b87923131f3145dc4e6e185a41dc4",
+        "media_type": "application/json"
+      }
+    },
+    {
+      "model_claim": "Budget state:0 backend launches, numerical_s2981.58, provider_requests14, public_tool_calls57.",
+      "fact": "These describe remaining allowances (some from the pre-third-send packet), not used counts. Actual used:1 launch,3 provider sends,8 public calls; recorded scientific-function charge618.416653s. Remaining after STOP:0 launches,13 sends,56 calls and2981.583347 scientific seconds.",
+      "sources": [
+        "state.json",
+        "ledger.json",
+        "calls.json"
+      ]
+    },
+    {
+      "model_claim": "No IPOPT was used in this round.",
+      "fact": "Pure saved-tension regeneration launched no IPOPT and no standalone local NLP was requested. The new simulation attempted35 internal NMPC solves, separately charged to the simulation allowance. An existing synthetic contract test also ran one toy IPOPT solve.",
+      "sources": [
+        "focused_checks.json",
+        "11_closed_loop.json"
+      ]
+    }
+  ],
+  "confirmed_disposition": "Model chose STOP after actual new regeneration and simulation feedback; preserved unchanged. No more provider sends.",
+  "scientific_conclusion": "Numerical feasibility and useful predicted motion survived regeneration. The recovery-enabled simulation substantially improved sampled motion, but unchanged holding-speed acceptance still failed."
+}

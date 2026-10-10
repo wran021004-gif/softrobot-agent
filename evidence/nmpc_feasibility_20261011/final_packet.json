@@ -1,0 +1,4358 @@
+{
+  "frozen_specification": {
+    "study_id": "nmpc-feasibility-20261011",
+    "investigation": "feasibility_recovery",
+    "authorization": "User attachment 2968d1a1-5058-4775-b11c-ccb8e3e3994c/pasted-text-1.txt: scoped experiments, non-secret DeepSeek sends, commits and ordinary push to feat/nmpc-feasibility-recovery",
+    "base_commit": "b83b5b4fe03f97ccca3ad173187c0d80bb65ceba",
+    "started_unix": 1791650714,
+    "source_execution": "21b607607bf442a6b6d9494dda897ea8",
+    "source_owner": "casadi-nmpc-research-20261010-cl-afc46a23b0c9",
+    "candidate": "0e16077e9183ebcd64729eb982aa5a73e5eb03e111d5d7ed402552ca16db345b",
+    "frozen_task": {
+      "lengths_m": [
+        0.16,
+        0.11
+      ],
+      "design_search": false,
+      "topology": "two flexible segments, six ideal tension channels, unchanged materials, sections, routing, guides, rigid components and payload",
+      "mesh_cells": 24,
+      "basis": "structural_linear",
+      "tendon_order": [
+        "near_t0",
+        "near_t1",
+        "near_t2",
+        "far_t0",
+        "far_t1",
+        "far_t2"
+      ],
+      "tension_bounds_n": [
+        0,
+        8
+      ],
+      "target_m": [
+        0.29,
+        0.035,
+        0.19
+      ],
+      "mount_m": [
+        0,
+        0,
+        0.15
+      ],
+      "mount_quaternion_wxyz": [
+        1,
+        0,
+        0,
+        0
+      ],
+      "gravity_m_s2": [
+        0,
+        0,
+        -9.81
+      ],
+      "physical_initial_state": "named zero positions and velocities",
+      "numerical_guess_n": 0.2,
+      "duration_s": 0.35,
+      "control_period_s": 0.01,
+      "sample_period_s": 0.01,
+      "physics_step_s": 0.0005,
+      "holding_window_s": 0.05,
+      "holding_endpoint_included": true,
+      "terminal_position_limit_m": 0.01,
+      "holding_position_limit_m": 0.01,
+      "holding_speed_limit_m_s": 0.02,
+      "seed": 17
+    },
+    "allowed_factors": {
+      "recover_returned_tensions": [
+        false,
+        true
+      ]
+    },
+    "unchanged_stopping_settings": {
+      "max_cpu_s": 30,
+      "max_iterations": 120,
+      "minimum_s": 5,
+      "relative_improvement": 0.1,
+      "tolerance": 1e-06
+    },
+    "stopping_interpretation": "Report actual policy and raw solver termination. If another condition ends a 30s-budget solve, extending feasible-return time is not isolated and cannot be declared ineffective. Never automatically raise another ceiling.",
+    "budgets": {
+      "representative_saved_states": 1,
+      "paired_local_comparisons": 1,
+      "new_local_nlp_attempts": 2,
+      "pair_wall_s": 300,
+      "full_nlp_solves": 0,
+      "new_independent_replays": 0,
+      "physical_launches": 1,
+      "physical_allowance_s": 1800,
+      "evaluation_allowance_s": 30,
+      "profile_allowance_s": 60,
+      "total_numerical_s": 3600,
+      "actual_provider_requests": 16,
+      "protected_final_provider_sends": 4,
+      "public_workflow_calls": 64,
+      "overall_activity_s": 21600,
+      "delivery_reserve_s": 1800,
+      "other_llm_workers": 0,
+      "real_hardware": 0,
+      "saved_candidate_regenerations": 2,
+      "regeneration_wall_s": 180,
+      "local_nlp_combined_s": 300
+    },
+    "action_menu": [
+      "inspect_residuals",
+      "reintegrate_saved_tensions",
+      "warm_start_comparison",
+      "control_revision",
+      "diagnose",
+      "stop"
+    ],
+    "completion": "Evidence-supported diagnosis and recommendation-only procedure; robot success is not required. Model may STOP early.",
+    "research_question": "Can a recorded lower-objective but dynamically infeasible NMPC plan be converted into a numerically feasible, still-useful plan by regenerating its states under unchanged tensions, and can that mechanism improve closed-loop behavior?",
+    "saved_state": {
+      "update_id": 20,
+      "time_s": 0.2
+    },
+    "methods_supplied_by_task": [
+      "Exact residual audit without new optimization",
+      "Existing implicit root-finder state regeneration under unchanged tensions",
+      "Optional regenerated warm-seed comparison",
+      "Optional recovery flag false to true"
+    ],
+    "model_decisions": [
+      "Saved rejected plan selection",
+      "One evidence-driven next scientific step or STOP",
+      "Original disposition"
+    ],
+    "fixed_controller": {
+      "feasible_return_budget_s": 15,
+      "max_cpu_s": 30,
+      "max_iterations": 120,
+      "holding_tip_speed_weight": 0.05,
+      "terminal_tip_speed_weight": 0.1,
+      "substeps": 1,
+      "feasibility_threshold": 1e-05
+    }
+  },
+  "source_binding": {
+    "artifact_id": "b91d6cd639b622f39bf9498950523c95f0a4b734c243a87dc68ef8453e63282d",
+    "media_type": "application/json"
+  },
+  "candidate": {
+    "artifact_id": "0e16077e9183ebcd64729eb982aa5a73e5eb03e111d5d7ed402552ca16db345b",
+    "media_type": "application/json"
+  },
+  "baseline_execution_reference": {
+    "artifact_id": "c98d59c56637081f80228d07f031b13376ff61997fdab85e56f6cd347718c413",
+    "media_type": "application/json"
+  },
+  "prior_context_references": {
+    "docs/nmpc_initialization_completion.md": {
+      "artifact_id": "3771f9700adbeb1b8a0062fc2deef95bfa5532fe498142fe394ccbb6e1185200",
+      "media_type": "text/plain"
+    },
+    "docs/nmpc_initialization_procedure.md": {
+      "artifact_id": "6493585f583f0cf52abefc0a55ecdc916b480fe00d9196710ae193f1121cfe7b",
+      "media_type": "text/plain"
+    },
+    "docs/nmpc_initialization_runbook.md": {
+      "artifact_id": "10e8d24a9706fc3c817ad3853fbb21490e5916116b470409bcdf7646da9ccba6",
+      "media_type": "text/plain"
+    },
+    "examples/nmpc_initialization/specification.json": {
+      "artifact_id": "1571dcaa09a5e403ebe709a1209c92faa947be2107e478d72d47afe539faaae3",
+      "media_type": "text/plain"
+    },
+    "memory/nmpc_initialization_case_draft.json": {
+      "artifact_id": "032e7ab65bfe55a083f9f084221e9d6fc4a871714e171a830d43d17190a683c5",
+      "media_type": "text/plain"
+    },
+    "pair_baseline_numerical": {
+      "artifact_id": "5402bfdb6cc709820e088ea253dd29fefe717aeaf140cab4afa4c861f54479f5",
+      "media_type": "application/json"
+    },
+    "pair_baseline_snapshot": {
+      "artifact_id": "1074959ef843e7b79b6c14ffad293cd8b8a098ca57a95b55fc237a25835970cc",
+      "media_type": "application/json"
+    },
+    "pair_variant_numerical": {
+      "artifact_id": "8adfa0ca50d52c3113c1fecd3f38afdb88c8324ca90ba97f5d7d4cb24073b513",
+      "media_type": "application/json"
+    },
+    "pair_variant_snapshot": {
+      "artifact_id": "b8849bb48a87ba8eccf5974d1272ffb49cfd705443cbfbd7e515b416f9f30bb3",
+      "media_type": "application/json"
+    },
+    "post_stop_factual_correction": {
+      "artifact_id": "0d75887fdeb1eeb0d68d4a09815c157ee498dd13850115f55c31a95d8f06f44d",
+      "media_type": "application/json"
+    },
+    "scientific_summary": {
+      "artifact_id": "70747c72feeb72a59fc5ab8c63498a135197c3c258520e88a0f362e0a360878e",
+      "media_type": "application/json"
+    },
+    "source_binding": {
+      "artifact_id": "b91d6cd639b622f39bf9498950523c95f0a4b734c243a87dc68ef8453e63282d",
+      "media_type": "application/json"
+    }
+  },
+  "supplied_prior_context": {
+    "admission": "Known legacy EvidenceRef/ArtifactReference mismatch; no repeat admission check or fabricated approval.",
+    "confirmed_facts": [
+      "One paired experiment/two solves; recovered reporting with no numerical repeat.",
+      "Both actual stops budget_best_feasible/User_Requested_Stop; CPU and wall limits differ.",
+      "Improved recorded raw/retained candidates infeasible; selected objective1697.08574832549/.2N each.",
+      "Projection difference4.3975mm and velocity vector .021396m/s remains unresolved.",
+      "Historical terminal95.5mm, holding193.2mm/speed3.25m/s fail sampled acceptance."
+    ],
+    "procedure_steps": [
+      "Freeze task and physics; import owned immutable vectors; distinguish raw/selected/returned.",
+      "Inspect exact named/scaled rows and aligned timestamps; .30s endpoint outside .35s task acceptance.",
+      "State hypothesis/weakening observation, execute once, preserve numerical result before reports.",
+      "Separate model-consistency result from simulator acceptance; maintain reference-backed case/procedure drafts."
+    ],
+    "source": "Explicit startup reads supplied by Codex; not autonomous retrieval"
+  },
+  "post_stop_factual_corrections": {
+    "actual_disposition": "Model chose STOP after receiving projection and recovered paired feedback; no revision or new simulation. No further provider send.",
+    "corrections": [
+      {
+        "fact": "Only one paired experiment and two local NLP attempts occurred. The failure is that same experiment reporting under an inherited60s native allowance; its sealed output was recovered without numerical retries.",
+        "model_claim": "A redundant re-run returned an engineering failure.",
+        "source": "calls.json; state.json reporting_recoveries; recovered pair reporting_recovery"
+      },
+      {
+        "fact": "IPOPT max_cpu_s is a CPU time cap, distinct from the feasible-return wall budget. Both observed actual stops are budget_best_feasible/User_Requested_Stop. Wall30.685s alone is not evidence of a CPU stop. No actual CPU consumption was recorded.",
+        "model_claim": "30s wall return budget coincides with fixed30s CPU cap; binding obstacle under allowed30s CPU.",
+        "source": "saved_state_comparison rows termination and parameters"
+      },
+      {
+        "fact": "The recorded returned and retained lower-objective/least-infeasible candidates violate dynamics equalities above1e-5; neither run selected a better feasible plan. This establishes the local selected outcome, not all unseen iterates or a unique historical cause. Longer budget reduced raw objective and residuals. Do not generalize this negative selection result as extension being ineffective.",
+        "model_claim": "Every improved non-seed candidate remained infeasible; insufficient return time is not the cause.",
+        "source": "saved_state_comparison plans verification named_residuals"
+      }
+    ],
+    "does_not_reopen_activity": true,
+    "model_original_disposition": {
+      "artifact_id": "a92b6dbc023d10bf5232ad206265182154df921dc6b1c856d527110b567e9308",
+      "media_type": "application/json"
+    },
+    "original_model_preserved": true,
+    "schema": "post_stop_factual_correction_v1",
+    "unresolved": [
+      "Historical warm-start and unseen iterate behavior",
+      "Other states and factors",
+      "Closed-loop improvement",
+      "Unique/dominant causal attribution"
+    ]
+  },
+  "paired_saved_plans": [
+    {
+      "label": "pair_baseline_snapshot",
+      "source_problem": {
+        "artifact_id": "1074959ef843e7b79b6c14ffad293cd8b8a098ca57a95b55fc237a25835970cc",
+        "media_type": "application/json"
+      },
+      "budget_s": 15.0,
+      "plans": [
+        {
+          "label": "checkpoint_1",
+          "schedule_identity": "baf4b78a0e788bca82c843c13196676ea0e2e7ed61cfc608c36f9c1b5d248368",
+          "verification": {
+            "elapsed_s": 15.573852800007444,
+            "feasible_at_1e_5": false,
+            "iteration": 18,
+            "label": "checkpoint_1",
+            "named_residuals": {
+              "dynamics_equalities": {
+                "max_scaled_residual": 0.042687068291809294,
+                "violations_over_1e_5": 120,
+                "worst": {
+                  "name": "dynamics_3_13",
+                  "scaled_residual": 0.042687068291809294
+                }
+              },
+              "initial_state_consistency": {
+                "max_scaled_residual": 0.0,
+                "violations_over_1e_5": 0,
+                "worst": {
+                  "name": "x/0/0",
+                  "scaled_residual": 0.0
+                }
+              },
+              "variable_bounds": {
+                "max_scaled_residual": 0.0,
+                "violations_over_1e_5": 0,
+                "worst": {
+                  "name": "x/0/0",
+                  "scaled_residual": 0.0
+                }
+              }
+            },
+            "objective": 22.30603877987936,
+            "roles": [
+              "best_lower_objective_infeasible"
+            ],
+            "scaled_violation": 0.042687068291809294
+          },
+          "metrics": {
+            "deadline": null,
+            "deadline_status": "outside_recorded_horizon",
+            "first_input_n": [
+              7.708171232087982,
+              7.933365211483741,
+              0.040117942774017444,
+              7.969713805871028,
+              7.8972596067174345,
+              0.02213355296564737
+            ],
+            "first_step": {
+              "position_error_m": 0.17334186297353238,
+              "time_s": 0.21000000000000002,
+              "tip_speed_m_s": 0.7098461260683409,
+              "tip_velocity_m_s": [
+                0.4629323056251414,
+                0.05247556488811691,
+                0.5355572034736296
+              ]
+            },
+            "horizon_interval_s": [
+              0.2,
+              0.30000000000000004
+            ],
+            "input_max_n": [
+              7.708171232087982,
+              7.933365211483741,
+              7.968537224837312,
+              7.969713805871028,
+              7.8972596067174345,
+              7.946447916893008
+            ],
+            "input_min_n": [
+              0.6123679301895697,
+              0.0033546301228146724,
+              0.040117942774017444,
+              0.113210596108026,
+              0.5681303638907832,
+              0.02213355296564737
+            ],
+            "terminal": {
+              "position_error_m": 0.00504527763239229,
+              "time_s": 0.30000000000000004,
+              "tip_speed_m_s": 0.10111618926984874,
+              "tip_velocity_m_s": [
+                0.08415786169090829,
+                -0.008900682818158544,
+                0.05534180963286585
+              ]
+            }
+          },
+          "objective_components": {
+            "holding_tip_speed": 0.012780604665569842,
+            "running_curvature_rate": 2.3277781696627127,
+            "running_position": 9.191244170432915,
+            "running_tension": 0.0017292907964771749,
+            "running_tension_variation": 0.0045823232605572166,
+            "terminal_curvature_rate": 6.939061968551258,
+            "terminal_position": 1.2727413193958976,
+            "terminal_tip_speed": 2.5561209331139683,
+            "total": 22.306038779879355
+          }
+        },
+        {
+          "label": "checkpoint_2",
+          "schedule_identity": "b12c29df67bc874ff43d9b4c5cb78cb4d57441830bbcdc16dfd3dc8a81c1d134",
+          "verification": {
+            "elapsed_s": 12.437717399967369,
+            "feasible_at_1e_5": false,
+            "iteration": 14,
+            "label": "checkpoint_2",
+            "named_residuals": {
+              "dynamics_equalities": {
+                "max_scaled_residual": 0.013844345207850856,
+                "violations_over_1e_5": 119,
+                "worst": {
+                  "name": "dynamics_4_13",
+                  "scaled_residual": 0.013844345207850856
+                }
+              },
+              "initial_state_consistency": {
+                "max_scaled_residual": 0.0,
+                "violations_over_1e_5": 0,
+                "worst": {
+                  "name": "x/0/0",
+                  "scaled_residual": 0.0
+                }
+              },
+              "variable_bounds": {
+                "max_scaled_residual": 0.0,
+                "violations_over_1e_5": 0,
+                "worst": {
+                  "name": "x/0/0",
+                  "scaled_residual": 0.0
+                }
+              }
+            },
+            "objective": 27.527303922251036,
+            "roles": [
+              "least_infeasible_noninitialization"
+            ],
+            "scaled_violation": 0.013844345207850856
+          },
+          "metrics": {
+            "deadline": null,
+            "deadline_status": "outside_recorded_horizon",
+            "first_input_n": [
+              6.267139661818884,
+              7.945482022217582,
+              0.031293780639347374,
+              7.986891689736809,
+              7.058024259123453,
+              0.016400288456389245
+            ],
+            "first_step": {
+              "position_error_m": 0.17360070227420166,
+              "time_s": 0.21000000000000002,
+              "tip_speed_m_s": 0.6797949661256409,
+              "tip_velocity_m_s": [
+                0.4483802346287717,
+                0.10931576892634337,
+                0.49912565935649034
+              ]
+            },
+            "horizon_interval_s": [
+              0.2,
+              0.30000000000000004
+            ],
+            "input_max_n": [
+              6.267139661818884,
+              7.945482022217582,
+              7.9476142594377785,
+              7.997967145025648,
+              7.058024259123453,
+              7.9986212988294145
+            ],
+            "input_min_n": [
+              1.6762423178518617,
+              0.2189033299473659,
+              0.031293780639347374,
+              0.0769917976973157,
+              1.412228127707265,
+              0.014985894000763347
+            ],
+            "terminal": {
+              "position_error_m": 0.0076359648235503706,
+              "time_s": 0.30000000000000004,
+              "tip_speed_m_s": 0.13337450264735876,
+              "tip_velocity_m_s": [
+                0.11673972179381184,
+                0.0030666580338519003,
+                0.06442973630581712
+              ]
+            }
+          },
+          "objective_components": {
+            "holding_tip_speed": 0.022235947445537883,
+            "running_curvature_rate": 1.8882782452698577,
+            "running_position": 9.50554937036066,
+            "running_tension": 0.0015531209374604724,
+            "running_tension_variation": 0.003343275800303693,
+            "terminal_curvature_rate": 8.743756534004707,
+            "terminal_position": 2.915397939324932,
+            "terminal_tip_speed": 4.4471894891075765,
+            "total": 27.527303922251033
+          }
+        },
+        {
+          "label": "initial",
+          "schedule_identity": "3f9266991f74bc38318be7c31f4bc40d6352886701634787af009781fda290d2",
+          "verification": {
+            "elapsed_s": 0.0,
+            "feasible_at_1e_5": true,
+            "iteration": -1,
+            "label": "initial",
+            "named_residuals": {
+              "dynamics_equalities": {
+                "max_scaled_residual": 2.927345865710862e-14,
+                "violations_over_1e_5": 0,
+                "worst": {
+                  "name": "dynamics_4_14",
+                  "scaled_residual": 2.927345865710862e-14
+                }
+              },
+              "initial_state_consistency": {
+                "max_scaled_residual": 0.0,
+                "violations_over_1e_5": 0,
+                "worst": {
+                  "name": "x/0/0",
+                  "scaled_residual": 0.0
+                }
+              },
+              "variable_bounds": {
+                "max_scaled_residual": 0.0,
+                "violations_over_1e_5": 0,
+                "worst": {
+                  "name": "x/0/0",
+                  "scaled_residual": 0.0
+                }
+              }
+            },
+            "objective": 1697.0857483254906,
+            "roles": [
+              "initial"
+            ],
+            "scaled_violation": 2.927345865710862e-14
+          },
+          "metrics": {
+            "deadline": null,
+            "deadline_status": "outside_recorded_horizon",
+            "first_input_n": [
+              0.2,
+              0.2,
+              0.2,
+              0.2,
+              0.2,
+              0.2
+            ],
+            "first_step": {
+              "position_error_m": 0.18335173202642793,
+              "time_s": 0.21000000000000002,
+              "tip_speed_m_s": 0.504787502636009,
+              "tip_velocity_m_s": [
+                -0.29038086061565754,
+                0.1165330778927977,
+                -0.3961179374409092
+              ]
+            },
+            "horizon_interval_s": [
+              0.2,
+              0.30000000000000004
+            ],
+            "input_max_n": [
+              0.2,
+              0.2,
+              0.2,
+              0.2,
+              0.2,
+              0.2
+            ],
+            "input_min_n": [
+              0.2,
+              0.2,
+              0.2,
+              0.2,
+              0.2,
+              0.2
+            ],
+            "terminal": {
+              "position_error_m": 0.18044854420779968,
+              "time_s": 0.30000000000000004,
+              "tip_speed_m_s": 0.36788167193139326,
+              "tip_velocity_m_s": [
+                0.2011371689631054,
+                0.019080502405199647,
+                0.30743568145631633
+              ]
+            }
+          },
+          "objective_components": {
+            "holding_tip_speed": 0.16917115567879654,
+            "running_curvature_rate": 0.004755560092844297,
+            "running_position": 34.95725462149024,
+            "running_tension": 2.400000000000001e-06,
+            "running_tension_variation": 0.0,
+            "terminal_curvature_rate": 0.03647811675769534,
+            "terminal_position": 1628.0838553357116,
+            "terminal_tip_speed": 33.83423113575931,
+            "total": 1697.0857483254908
+          }
+        },
+        {
+          "label": "returned",
+          "schedule_identity": "baf4b78a0e788bca82c843c13196676ea0e2e7ed61cfc608c36f9c1b5d248368",
+          "verification": {
+            "elapsed_s": 15.583082799974363,
+            "feasible_at_1e_5": false,
+            "iteration": 18,
+            "label": "returned",
+            "named_residuals": {
+              "dynamics_equalities": {
+                "max_scaled_residual": 0.042687068291809294,
+                "violations_over_1e_5": 120,
+                "worst": {
+                  "name": "dynamics_3_13",
+                  "scaled_residual": 0.042687068291809294
+                }
+              },
+              "initial_state_consistency": {
+                "max_scaled_residual": 0.0,
+                "violations_over_1e_5": 0,
+                "worst": {
+                  "name": "x/0/0",
+                  "scaled_residual": 0.0
+                }
+              },
+              "variable_bounds": {
+                "max_scaled_residual": 0.0,
+                "violations_over_1e_5": 0,
+                "worst": {
+                  "name": "x/0/0",
+                  "scaled_residual": 0.0
+                }
+              }
+            },
+            "objective": 22.30603877987936,
+            "roles": [
+              "returned"
+            ],
+            "scaled_violation": 0.042687068291809294
+          },
+          "metrics": {
+            "deadline": null,
+            "deadline_status": "outside_recorded_horizon",
+            "first_input_n": [
+              7.708171232087982,
+              7.933365211483741,
+              0.040117942774017444,
+              7.969713805871028,
+              7.8972596067174345,
+              0.02213355296564737
+            ],
+            "first_step": {
+              "position_error_m": 0.17334186297353238,
+              "time_s": 0.21000000000000002,
+              "tip_speed_m_s": 0.7098461260683409,
+              "tip_velocity_m_s": [
+                0.4629323056251414,
+                0.05247556488811691,
+                0.5355572034736296
+              ]
+            },
+            "horizon_interval_s": [
+              0.2,
+              0.30000000000000004
+            ],
+            "input_max_n": [
+              7.708171232087982,
+              7.933365211483741,
+              7.968537224837312,
+              7.969713805871028,
+              7.8972596067174345,
+              7.946447916893008
+            ],
+            "input_min_n": [
+              0.6123679301895697,
+              0.0033546301228146724,
+              0.040117942774017444,
+              0.113210596108026,
+              0.5681303638907832,
+              0.02213355296564737
+            ],
+            "terminal": {
+              "position_error_m": 0.00504527763239229,
+              "time_s": 0.30000000000000004,
+              "tip_speed_m_s": 0.10111618926984874,
+              "tip_velocity_m_s": [
+                0.08415786169090829,
+                -0.008900682818158544,
+                0.05534180963286585
+              ]
+            }
+          },
+          "objective_components": {
+            "holding_tip_speed": 0.012780604665569842,
+            "running_curvature_rate": 2.3277781696627127,
+            "running_position": 9.191244170432915,
+            "running_tension": 0.0017292907964771749,
+            "running_tension_variation": 0.0045823232605572166,
+            "terminal_curvature_rate": 6.939061968551258,
+            "terminal_position": 1.2727413193958976,
+            "terminal_tip_speed": 2.5561209331139683,
+            "total": 22.306038779879355
+          }
+        },
+        {
+          "label": "selected",
+          "schedule_identity": "3f9266991f74bc38318be7c31f4bc40d6352886701634787af009781fda290d2",
+          "verification": {
+            "elapsed_s": 1.474895599996671,
+            "feasible_at_1e_5": true,
+            "iteration": 0,
+            "label": "selected",
+            "named_residuals": {
+              "dynamics_equalities": {
+                "max_scaled_residual": 2.927345865710862e-14,
+                "violations_over_1e_5": 0,
+                "worst": {
+                  "name": "dynamics_4_14",
+                  "scaled_residual": 2.927345865710862e-14
+                }
+              },
+              "initial_state_consistency": {
+                "max_scaled_residual": 0.0,
+                "violations_over_1e_5": 0,
+                "worst": {
+                  "name": "x/0/0",
+                  "scaled_residual": 0.0
+                }
+              },
+              "variable_bounds": {
+                "max_scaled_residual": 0.0,
+                "violations_over_1e_5": 0,
+                "worst": {
+                  "name": "x/0/0",
+                  "scaled_residual": 0.0
+                }
+              }
+            },
+            "objective": 1697.0857483254906,
+            "roles": [
+              "selected"
+            ],
+            "scaled_violation": 2.927345865710862e-14
+          },
+          "metrics": {
+            "deadline": null,
+            "deadline_status": "outside_recorded_horizon",
+            "first_input_n": [
+              0.2,
+              0.2,
+              0.2,
+              0.2,
+              0.2,
+              0.2
+            ],
+            "first_step": {
+              "position_error_m": 0.18335173202642793,
+              "time_s": 0.21000000000000002,
+              "tip_speed_m_s": 0.504787502636009,
+              "tip_velocity_m_s": [
+                -0.29038086061565754,
+                0.1165330778927977,
+                -0.3961179374409092
+              ]
+            },
+            "horizon_interval_s": [
+              0.2,
+              0.30000000000000004
+            ],
+            "input_max_n": [
+              0.2,
+              0.2,
+              0.2,
+              0.2,
+              0.2,
+              0.2
+            ],
+            "input_min_n": [
+              0.2,
+              0.2,
+              0.2,
+              0.2,
+              0.2,
+              0.2
+            ],
+            "terminal": {
+              "position_error_m": 0.18044854420779968,
+              "time_s": 0.30000000000000004,
+              "tip_speed_m_s": 0.36788167193139326,
+              "tip_velocity_m_s": [
+                0.2011371689631054,
+                0.019080502405199647,
+                0.30743568145631633
+              ]
+            }
+          },
+          "objective_components": {
+            "holding_tip_speed": 0.16917115567879654,
+            "running_curvature_rate": 0.004755560092844297,
+            "running_position": 34.95725462149024,
+            "running_tension": 2.400000000000001e-06,
+            "running_tension_variation": 0.0,
+            "terminal_curvature_rate": 0.03647811675769534,
+            "terminal_position": 1628.0838553357116,
+            "terminal_tip_speed": 33.83423113575931,
+            "total": 1697.0857483254908
+          }
+        }
+      ]
+    },
+    {
+      "label": "pair_variant_snapshot",
+      "source_problem": {
+        "artifact_id": "b8849bb48a87ba8eccf5974d1272ffb49cfd705443cbfbd7e515b416f9f30bb3",
+        "media_type": "application/json"
+      },
+      "budget_s": 30.0,
+      "plans": [
+        {
+          "label": "checkpoint_1",
+          "schedule_identity": "56369b81976826291a8dd1f2ce1eb4d0e5be775865fbe3a1eeabce0cd1ad622d",
+          "verification": {
+            "elapsed_s": 30.676008699985687,
+            "feasible_at_1e_5": false,
+            "iteration": 37,
+            "label": "checkpoint_1",
+            "named_residuals": {
+              "dynamics_equalities": {
+                "max_scaled_residual": 0.0009537607210136773,
+                "violations_over_1e_5": 84,
+                "worst": {
+                  "name": "dynamics_5_13",
+                  "scaled_residual": 0.0009537607210136773
+                }
+              },
+              "initial_state_consistency": {
+                "max_scaled_residual": 0.0,
+                "violations_over_1e_5": 0,
+                "worst": {
+                  "name": "x/0/0",
+                  "scaled_residual": 0.0
+                }
+              },
+              "variable_bounds": {
+                "max_scaled_residual": 0.0,
+                "violations_over_1e_5": 0,
+                "worst": {
+                  "name": "x/0/0",
+                  "scaled_residual": 0.0
+                }
+              }
+            },
+            "objective": 18.37680755669539,
+            "roles": [
+              "best_lower_objective_infeasible"
+            ],
+            "scaled_violation": 0.0009537607210136773
+          },
+          "metrics": {
+            "deadline": null,
+            "deadline_status": "outside_recorded_horizon",
+            "first_input_n": [
+              7.986810661609267,
+              7.997910177754159,
+              0.0013905772121645464,
+              7.998739728757508,
+              7.996584441342273,
+              0.0007104365301422446
+            ],
+            "first_step": {
+              "position_error_m": 0.17322208677796394,
+              "time_s": 0.21000000000000002,
+              "tip_speed_m_s": 0.7229886075190416,
+              "tip_velocity_m_s": [
+                0.46875981217698603,
+                0.05100168108411498,
+                0.5480653187501594
+              ]
+            },
+            "horizon_interval_s": [
+              0.2,
+              0.30000000000000004
+            ],
+            "input_max_n": [
+              7.993776772522498,
+              7.997910177754159,
+              7.997097590077826,
+              7.998739728757508,
+              7.996584441342273,
+              7.994864295837708
+            ],
+            "input_min_n": [
+              0.000492319080861961,
+              0.003758699474210059,
+              0.0013905772121645464,
+              0.006133918897889211,
+              0.008107751231986142,
+              0.0007104365301422446
+            ],
+            "terminal": {
+              "position_error_m": 0.0044401169521277074,
+              "time_s": 0.30000000000000004,
+              "tip_speed_m_s": 0.0625472104765867,
+              "tip_velocity_m_s": [
+                0.05319399020440485,
+                0.014337262087314586,
+                0.029614115897250236
+              ]
+            }
+          },
+          "objective_components": {
+            "holding_tip_speed": 0.004890191923003046,
+            "running_curvature_rate": 2.707695329554045,
+            "running_position": 9.035649484308863,
+            "running_tension": 0.0018213007290973024,
+            "running_tension_variation": 0.006535224392354861,
+            "terminal_curvature_rate": 4.656445713758823,
+            "terminal_position": 0.985731927428592,
+            "terminal_tip_speed": 0.9780383846006093,
+            "total": 18.37680755669539
+          }
+        },
+        {
+          "label": "checkpoint_2",
+          "schedule_identity": "b984a5b965be878b84fa5c8d64290d0193f84c1d382993db468b49c7e71f3dc2",
+          "verification": {
+            "elapsed_s": 25.07462669996312,
+            "feasible_at_1e_5": false,
+            "iteration": 30,
+            "label": "checkpoint_2",
+            "named_residuals": {
+              "dynamics_equalities": {
+                "max_scaled_residual": 0.0007145889734799793,
+                "violations_over_1e_5": 83,
+                "worst": {
+                  "name": "dynamics_4_13",
+                  "scaled_residual": 0.0007145889734799793
+                }
+              },
+              "initial_state_consistency": {
+                "max_scaled_residual": 0.0,
+                "violations_over_1e_5": 0,
+                "worst": {
+                  "name": "x/0/0",
+                  "scaled_residual": 0.0
+                }
+              },
+              "variable_bounds": {
+                "max_scaled_residual": 0.0,
+                "violations_over_1e_5": 0,
+                "worst": {
+                  "name": "x/0/0",
+                  "scaled_residual": 0.0
+                }
+              }
+            },
+            "objective": 18.674613911154186,
+            "roles": [
+              "least_infeasible_noninitialization"
+            ],
+            "scaled_violation": 0.0007145889734799793
+          },
+          "metrics": {
+            "deadline": null,
+            "deadline_status": "outside_recorded_horizon",
+            "first_input_n": [
+              7.861614099699875,
+              7.995139696323546,
+              0.0027496937107574296,
+              7.997712605487566,
+              7.989669872101042,
+              0.0012838135234900256
+            ],
+            "first_step": {
+              "position_error_m": 0.17323547689826316,
+              "time_s": 0.21000000000000002,
+              "tip_speed_m_s": 0.7219746999309696,
+              "tip_velocity_m_s": [
+                0.468701497875581,
+                0.04776822271449675,
+                0.54706907253865
+              ]
+            },
+            "horizon_interval_s": [
+              0.2,
+              0.30000000000000004
+            ],
+            "input_max_n": [
+              7.861614099699875,
+              7.995139696323546,
+              7.99118992113423,
+              7.997712605487566,
+              7.989669872101042,
+              7.982517114608658
+            ],
+            "input_min_n": [
+              0.09813369716832349,
+              0.01192482054604568,
+              0.0027496937107574296,
+              0.09250860506885392,
+              0.032952414920829357,
+              0.0012838135234900256
+            ],
+            "terminal": {
+              "position_error_m": 0.004525815821251759,
+              "time_s": 0.30000000000000004,
+              "tip_speed_m_s": 0.07421940209461991,
+              "tip_velocity_m_s": [
+                0.06313030301216392,
+                0.0068274628987764555,
+                0.03842486485651016
+              ]
+            }
+          },
+          "objective_components": {
+            "holding_tip_speed": 0.00688564955910359,
+            "running_curvature_rate": 2.663149119472314,
+            "running_position": 9.057560044776235,
+            "running_tension": 0.0018025842276727507,
+            "running_tension_variation": 0.006167488733896069,
+            "terminal_curvature_rate": 4.537768670169611,
+            "terminal_position": 1.024150442394637,
+            "terminal_tip_speed": 1.3771299118207179,
+            "total": 18.674613911154182
+          }
+        },
+        {
+          "label": "initial",
+          "schedule_identity": "3f9266991f74bc38318be7c31f4bc40d6352886701634787af009781fda290d2",
+          "verification": {
+            "elapsed_s": 0.0,
+            "feasible_at_1e_5": true,
+            "iteration": -1,
+            "label": "initial",
+            "named_residuals": {
+              "dynamics_equalities": {
+                "max_scaled_residual": 2.927345865710862e-14,
+                "violations_over_1e_5": 0,
+                "worst": {
+                  "name": "dynamics_4_14",
+                  "scaled_residual": 2.927345865710862e-14
+                }
+              },
+              "initial_state_consistency": {
+                "max_scaled_residual": 0.0,
+                "violations_over_1e_5": 0,
+                "worst": {
+                  "name": "x/0/0",
+                  "scaled_residual": 0.0
+                }
+              },
+              "variable_bounds": {
+                "max_scaled_residual": 0.0,
+                "violations_over_1e_5": 0,
+                "worst": {
+                  "name": "x/0/0",
+                  "scaled_residual": 0.0
+                }
+              }
+            },
+            "objective": 1697.0857483254906,
+            "roles": [
+              "initial"
+            ],
+            "scaled_violation": 2.927345865710862e-14
+          },
+          "metrics": {
+            "deadline": null,
+            "deadline_status": "outside_recorded_horizon",
+            "first_input_n": [
+              0.2,
+              0.2,
+              0.2,
+              0.2,
+              0.2,
+              0.2
+            ],
+            "first_step": {
+              "position_error_m": 0.18335173202642793,
+              "time_s": 0.21000000000000002,
+              "tip_speed_m_s": 0.504787502636009,
+              "tip_velocity_m_s": [
+                -0.29038086061565754,
+                0.1165330778927977,
+                -0.3961179374409092
+              ]
+            },
+            "horizon_interval_s": [
+              0.2,
+              0.30000000000000004
+            ],
+            "input_max_n": [
+              0.2,
+              0.2,
+              0.2,
+              0.2,
+              0.2,
+              0.2
+            ],
+            "input_min_n": [
+              0.2,
+              0.2,
+              0.2,
+              0.2,
+              0.2,
+              0.2
+            ],
+            "terminal": {
+              "position_error_m": 0.18044854420779968,
+              "time_s": 0.30000000000000004,
+              "tip_speed_m_s": 0.36788167193139326,
+              "tip_velocity_m_s": [
+                0.2011371689631054,
+                0.019080502405199647,
+                0.30743568145631633
+              ]
+            }
+          },
+          "objective_components": {
+            "holding_tip_speed": 0.16917115567879654,
+            "running_curvature_rate": 0.004755560092844297,
+            "running_position": 34.95725462149024,
+            "running_tension": 2.400000000000001e-06,
+            "running_tension_variation": 0.0,
+            "terminal_curvature_rate": 0.03647811675769534,
+            "terminal_position": 1628.0838553357116,
+            "terminal_tip_speed": 33.83423113575931,
+            "total": 1697.0857483254908
+          }
+        },
+        {
+          "label": "returned",
+          "schedule_identity": "56369b81976826291a8dd1f2ce1eb4d0e5be775865fbe3a1eeabce0cd1ad622d",
+          "verification": {
+            "elapsed_s": 30.685413100000005,
+            "feasible_at_1e_5": false,
+            "iteration": 37,
+            "label": "returned",
+            "named_residuals": {
+              "dynamics_equalities": {
+                "max_scaled_residual": 0.0009537607210136773,
+                "violations_over_1e_5": 84,
+                "worst": {
+                  "name": "dynamics_5_13",
+                  "scaled_residual": 0.0009537607210136773
+                }
+              },
+              "initial_state_consistency": {
+                "max_scaled_residual": 0.0,
+                "violations_over_1e_5": 0,
+                "worst": {
+                  "name": "x/0/0",
+                  "scaled_residual": 0.0
+                }
+              },
+              "variable_bounds": {
+                "max_scaled_residual": 0.0,
+                "violations_over_1e_5": 0,
+                "worst": {
+                  "name": "x/0/0",
+                  "scaled_residual": 0.0
+                }
+              }
+            },
+            "objective": 18.37680755669539,
+            "roles": [
+              "returned"
+            ],
+            "scaled_violation": 0.0009537607210136773
+          },
+          "metrics": {
+            "deadline": null,
+            "deadline_status": "outside_recorded_horizon",
+            "first_input_n": [
+              7.986810661609267,
+              7.997910177754159,
+              0.0013905772121645464,
+              7.998739728757508,
+              7.996584441342273,
+              0.0007104365301422446
+            ],
+            "first_step": {
+              "position_error_m": 0.17322208677796394,
+              "time_s": 0.21000000000000002,
+              "tip_speed_m_s": 0.7229886075190416,
+              "tip_velocity_m_s": [
+                0.46875981217698603,
+                0.05100168108411498,
+                0.5480653187501594
+              ]
+            },
+            "horizon_interval_s": [
+              0.2,
+              0.30000000000000004
+            ],
+            "input_max_n": [
+              7.993776772522498,
+              7.997910177754159,
+              7.997097590077826,
+              7.998739728757508,
+              7.996584441342273,
+              7.994864295837708
+            ],
+            "input_min_n": [
+              0.000492319080861961,
+              0.003758699474210059,
+              0.0013905772121645464,
+              0.006133918897889211,
+              0.008107751231986142,
+              0.0007104365301422446
+            ],
+            "terminal": {
+              "position_error_m": 0.0044401169521277074,
+              "time_s": 0.30000000000000004,
+              "tip_speed_m_s": 0.0625472104765867,
+              "tip_velocity_m_s": [
+                0.05319399020440485,
+                0.014337262087314586,
+                0.029614115897250236
+              ]
+            }
+          },
+          "objective_components": {
+            "holding_tip_speed": 0.004890191923003046,
+            "running_curvature_rate": 2.707695329554045,
+            "running_position": 9.035649484308863,
+            "running_tension": 0.0018213007290973024,
+            "running_tension_variation": 0.006535224392354861,
+            "terminal_curvature_rate": 4.656445713758823,
+            "terminal_position": 0.985731927428592,
+            "terminal_tip_speed": 0.9780383846006093,
+            "total": 18.37680755669539
+          }
+        },
+        {
+          "label": "selected",
+          "schedule_identity": "3f9266991f74bc38318be7c31f4bc40d6352886701634787af009781fda290d2",
+          "verification": {
+            "elapsed_s": 1.533152499992866,
+            "feasible_at_1e_5": true,
+            "iteration": 0,
+            "label": "selected",
+            "named_residuals": {
+              "dynamics_equalities": {
+                "max_scaled_residual": 2.927345865710862e-14,
+                "violations_over_1e_5": 0,
+                "worst": {
+                  "name": "dynamics_4_14",
+                  "scaled_residual": 2.927345865710862e-14
+                }
+              },
+              "initial_state_consistency": {
+                "max_scaled_residual": 0.0,
+                "violations_over_1e_5": 0,
+                "worst": {
+                  "name": "x/0/0",
+                  "scaled_residual": 0.0
+                }
+              },
+              "variable_bounds": {
+                "max_scaled_residual": 0.0,
+                "violations_over_1e_5": 0,
+                "worst": {
+                  "name": "x/0/0",
+                  "scaled_residual": 0.0
+                }
+              }
+            },
+            "objective": 1697.0857483254906,
+            "roles": [
+              "selected"
+            ],
+            "scaled_violation": 2.927345865710862e-14
+          },
+          "metrics": {
+            "deadline": null,
+            "deadline_status": "outside_recorded_horizon",
+            "first_input_n": [
+              0.2,
+              0.2,
+              0.2,
+              0.2,
+              0.2,
+              0.2
+            ],
+            "first_step": {
+              "position_error_m": 0.18335173202642793,
+              "time_s": 0.21000000000000002,
+              "tip_speed_m_s": 0.504787502636009,
+              "tip_velocity_m_s": [
+                -0.29038086061565754,
+                0.1165330778927977,
+                -0.3961179374409092
+              ]
+            },
+            "horizon_interval_s": [
+              0.2,
+              0.30000000000000004
+            ],
+            "input_max_n": [
+              0.2,
+              0.2,
+              0.2,
+              0.2,
+              0.2,
+              0.2
+            ],
+            "input_min_n": [
+              0.2,
+              0.2,
+              0.2,
+              0.2,
+              0.2,
+              0.2
+            ],
+            "terminal": {
+              "position_error_m": 0.18044854420779968,
+              "time_s": 0.30000000000000004,
+              "tip_speed_m_s": 0.36788167193139326,
+              "tip_velocity_m_s": [
+                0.2011371689631054,
+                0.019080502405199647,
+                0.30743568145631633
+              ]
+            }
+          },
+          "objective_components": {
+            "holding_tip_speed": 0.16917115567879654,
+            "running_curvature_rate": 0.004755560092844297,
+            "running_position": 34.95725462149024,
+            "running_tension": 2.400000000000001e-06,
+            "running_tension_variation": 0.0,
+            "terminal_curvature_rate": 0.03647811675769534,
+            "terminal_position": 1628.0838553357116,
+            "terminal_tip_speed": 33.83423113575931,
+            "total": 1697.0857483254908
+          }
+        }
+      ]
+    }
+  ],
+  "results": [
+    {
+      "operation": "closed_loop",
+      "reference": {
+        "artifact_id": "c98d59c56637081f80228d07f031b13376ff61997fdab85e56f6cd347718c413",
+        "media_type": "application/json"
+      },
+      "status": "evaluated",
+      "costs_s": {
+        "construction": 0.46247679996304214,
+        "evaluation": 1.6869999999762513,
+        "profile": 3.172000000020489,
+        "simulation": 680.5939999999828,
+        "total": 685.9154767999426
+      },
+      "acceptance": {
+        "accepted": false,
+        "components": {
+          "evaluation_validity": {
+            "limit": null,
+            "passed": true,
+            "reason": null,
+            "unit": null,
+            "value": "valid"
+          },
+          "evaluator:task_bound": {
+            "limit": 0.01,
+            "passed": false,
+            "reason": null,
+            "unit": "m",
+            "value": 0.09552487867011847
+          },
+          "execution_complete": {
+            "limit": null,
+            "passed": true,
+            "reason": null,
+            "unit": null,
+            "value": true
+          },
+          "force_bounds": {
+            "limit": 1e-08,
+            "passed": true,
+            "reason": null,
+            "unit": "N",
+            "value": 0.0
+          },
+          "holding_coverage": {
+            "limit": 6,
+            "passed": true,
+            "reason": null,
+            "unit": "inclusive uniform samples",
+            "value": true
+          },
+          "holding_position": {
+            "limit": 0.01,
+            "passed": false,
+            "reason": null,
+            "unit": "m",
+            "value": 0.1931520788542894
+          },
+          "holding_speed": {
+            "limit": 0.02,
+            "passed": false,
+            "reason": null,
+            "unit": "m/s",
+            "value": 3.2498304807417395
+          },
+          "solver_errors": {
+            "limit": 0,
+            "passed": true,
+            "reason": null,
+            "unit": "count",
+            "value": 0
+          },
+          "task_evaluator": {
+            "limit": null,
+            "passed": false,
+            "reason": null,
+            "unit": null,
+            "value": false
+          }
+        },
+        "continuous_time_guarantee": false,
+        "contract": "research.task_acceptance",
+        "evaluator_tension_channels": null,
+        "evidence_binding": {
+          "evaluation": {
+            "artifact_id": "2ef9f26a8f0cf8d61c5108fac8e8c750743f8e94d3b154abf1c135363a00f133",
+            "media_type": "application/json"
+          },
+          "evaluation_binding": {
+            "original_execution_id": "21b607607bf442a6b6d9494dda897ea8",
+            "source": {
+              "artifact_id": "84e834e46165cecbe3bcdaeb2377076d658b67f617b3391e639b5dfdf0c6b53c",
+              "media_type": "application/json"
+            },
+            "source_execution_id": "21b607607bf442a6b6d9494dda897ea8"
+          },
+          "profile": {
+            "artifact_id": "01e6d1614badd047e2f25c5e71e0ecd9aff9dcfd11443a5baa885cd438e2e416",
+            "media_type": "application/json"
+          },
+          "profile_binding": {
+            "evaluation": {
+              "artifact_id": "2ef9f26a8f0cf8d61c5108fac8e8c750743f8e94d3b154abf1c135363a00f133",
+              "media_type": "application/json"
+            },
+            "execution_id": "21b607607bf442a6b6d9494dda897ea8",
+            "simulation": {
+              "artifact_id": "84e834e46165cecbe3bcdaeb2377076d658b67f617b3391e639b5dfdf0c6b53c",
+              "media_type": "application/json"
+            }
+          },
+          "simulation": {
+            "artifact_id": "84e834e46165cecbe3bcdaeb2377076d658b67f617b3391e639b5dfdf0c6b53c",
+            "media_type": "application/json"
+          }
+        },
+        "execution_id": "21b607607bf442a6b6d9494dda897ea8",
+        "issues": [],
+        "metrics": {
+          "holding_max_error_m": 0.1931520788542894,
+          "holding_max_speed_m_s": 3.2498304807417395,
+          "terminal_error_m": 0.09552487867011847
+        },
+        "missing": [],
+        "protocol_id": "offline_reach_hold_v1",
+        "sources": {
+          "evaluation": {
+            "artifact_id": "2ef9f26a8f0cf8d61c5108fac8e8c750743f8e94d3b154abf1c135363a00f133",
+            "media_type": "application/json"
+          },
+          "profile": {
+            "artifact_id": "01e6d1614badd047e2f25c5e71e0ecd9aff9dcfd11443a5baa885cd438e2e416",
+            "media_type": "application/json"
+          }
+        },
+        "status": "valid_failure",
+        "task_family": "task.reach",
+        "task_identity": "2b26edb492214c426263441b6adb52d7aafe41a828436d6b48a1171374a1026c",
+        "timing": {
+          "control_period_s": 0.01,
+          "deadline_misses": 35,
+          "duration_s": 0.35,
+          "mean_update_s": 19.292457457139555,
+          "real_time_demonstrated": false,
+          "real_time_required": false,
+          "sample_period_s": 0.01,
+          "simulation_wall_s": 680.5939999999828,
+          "termination": [
+            "duration",
+            "numerical_failure"
+          ],
+          "timestep_s": 0.0005
+        },
+        "version": "1.0.0"
+      },
+      "control": {
+        "candidate": {
+          "artifact_id": "0e16077e9183ebcd64729eb982aa5a73e5eb03e111d5d7ed402552ca16db345b",
+          "media_type": "application/json"
+        },
+        "holding_tip_speed_weight": 0.05,
+        "preceding_execution": null,
+        "terminal_tip_speed_weight": 0.1
+      },
+      "revision": {
+        "attribution": "No unique causal attribution; changed structure and control are jointly reported.",
+        "changed_factors": [
+          "structure/controller evaluation"
+        ],
+        "exact_weight_changes": {},
+        "preceding_execution": null
+      },
+      "resolved_configuration": {
+        "artifact_id": "a65d6653ca6b7d063633788e01b1d0a89950e35a0472946dc23a67407b424b90",
+        "media_type": "application/json"
+      },
+      "wiring_reference": {
+        "artifact_id": "a5869638404e88c4740110813df4a5b3fa71c7816df86a3958858d6e43559cbc",
+        "media_type": "application/json"
+      },
+      "holding_motion": [
+        {
+          "contacts": 0,
+          "rate_projection_residual_rad_m_s": 0.5237078293217188,
+          "time_s": 0.3,
+          "tip_error_m": 0.1931520788542894,
+          "tip_position_m": [
+            0.24803361944444408,
+            0.019334389494223378,
+            0.0021140316141697955
+          ],
+          "tip_speed_m_s": 0.3402971552513413,
+          "tip_velocity_m_s": [
+            0.1950696281904432,
+            0.034218184085815395,
+            0.2767293080027249
+          ],
+          "velocity_error_m_s": 0.3402971552513413
+        },
+        {
+          "contacts": 0,
+          "rate_projection_residual_rad_m_s": 89.71488852172017,
+          "time_s": 0.31,
+          "tip_error_m": 0.18357520159663054,
+          "tip_position_m": [
+            0.25579023030088954,
+            0.01901973885682115,
+            0.010349846779433078
+          ],
+          "tip_speed_m_s": 1.6944583379966989,
+          "tip_velocity_m_s": [
+            1.114499079324789,
+            -0.04309118706653739,
+            1.2756269090090289
+          ],
+          "velocity_error_m_s": 1.6944583379966989
+        },
+        {
+          "contacts": 0,
+          "rate_projection_residual_rad_m_s": 74.37699413290049,
+          "time_s": 0.32,
+          "tip_error_m": 0.16408225322251016,
+          "tip_position_m": [
+            0.26817194727263083,
+            0.018568644500042565,
+            0.028208367048412675
+          ],
+          "tip_speed_m_s": 2.571651663387887,
+          "tip_velocity_m_s": [
+            1.2213969177158255,
+            -0.04761445472374928,
+            2.262590265801859
+          ],
+          "velocity_error_m_s": 2.571651663387887
+        },
+        {
+          "contacts": 0,
+          "rate_projection_residual_rad_m_s": 63.74364359887521,
+          "time_s": 0.33,
+          "tip_error_m": 0.13589891645811183,
+          "tip_position_m": [
+            0.2784685290911622,
+            0.018084352390662094,
+            0.05565193883377332
+          ],
+          "tip_speed_m_s": 3.2498304807417395,
+          "tip_velocity_m_s": [
+            0.7463743850727164,
+            -0.05217066931803577,
+            3.162530893466231
+          ],
+          "velocity_error_m_s": 3.2498304807417395
+        },
+        {
+          "contacts": 0,
+          "rate_projection_residual_rad_m_s": 74.69666263538522,
+          "time_s": 0.34,
+          "tip_error_m": 0.10760067561604521,
+          "tip_position_m": [
+            0.2823852527036372,
+            0.018680018696563366,
+            0.0839171115264229
+          ],
+          "tip_speed_m_s": 2.5412801401146736,
+          "tip_velocity_m_s": [
+            0.10022875546364302,
+            0.08048178754546778,
+            2.538027113525967
+          ],
+          "velocity_error_m_s": 2.5412801401146736
+        },
+        {
+          "contacts": 0,
+          "rate_projection_residual_rad_m_s": 41.745640192619476,
+          "time_s": 0.35000000000000003,
+          "tip_error_m": 0.09552487867011847,
+          "tip_position_m": [
+            0.28653917532210393,
+            0.019829522461607983,
+            0.09575095889746749
+          ],
+          "tip_speed_m_s": 0.5855655065829197,
+          "tip_velocity_m_s": [
+            0.4822341980825046,
+            0.12984857732877403,
+            0.3057392478324111
+          ],
+          "velocity_error_m_s": 0.5855655065829197
+        }
+      ],
+      "sampling": {
+        "closed_loop_s": 0.01,
+        "continuous_time_guarantee": false,
+        "historical_bdf_s": 0.0005,
+        "holding_endpoint_included": true
+      },
+      "unknowns": [],
+      "failure_categories": [
+        "scientific_failure"
+      ],
+      "execution_references": {
+        "executed_configuration": {
+          "artifact_id": "a14c071d10347cf775731b83791cd2a989cb641b4ead171fa6066a88d1f986ad",
+          "media_type": "application/json"
+        },
+        "execution_id": "21b607607bf442a6b6d9494dda897ea8",
+        "owner_run_id": "casadi-nmpc-research-20261010-cl-afc46a23b0c9",
+        "receipts": {
+          "evaluation": {
+            "analysis_status": "valid",
+            "cache_hit": false,
+            "caller": "casadi-feedback-research",
+            "charged": {
+              "backend_solves": 0,
+              "model_calls": 0,
+              "tool_calls": 1,
+              "wall_s": 1.6869999999762513,
+              "worker_calls": 0
+            },
+            "contract_version": "1.2.0",
+            "error": null,
+            "execution_id": "f77e771441074be0ad3ab025a2ac118e",
+            "execution_status": "completed",
+            "original_execution_id": null,
+            "output": {
+              "artifact_id": "2ef9f26a8f0cf8d61c5108fac8e8c750743f8e94d3b154abf1c135363a00f133",
+              "media_type": "application/json"
+            },
+            "request_id": "complete-evaluation",
+            "result_contract": "EvaluationResult",
+            "result_version": "1.2.0",
+            "solver_status": "not_run",
+            "task_success": false,
+            "tool_id": "evaluation.run",
+            "tool_version": "1.0.0"
+          },
+          "profile": {
+            "analysis_status": "not_assessed",
+            "cache_hit": false,
+            "caller": "casadi-feedback-research",
+            "charged": {
+              "backend_solves": 0,
+              "model_calls": 0,
+              "tool_calls": 1,
+              "wall_s": 3.172000000020489,
+              "worker_calls": 0
+            },
+            "contract_version": "1.2.0",
+            "error": null,
+            "execution_id": "77f0e9e2d17146c5ab4d571c1c801187",
+            "execution_status": "completed",
+            "original_execution_id": null,
+            "output": {
+              "artifact_id": "01e6d1614badd047e2f25c5e71e0ecd9aff9dcfd11443a5baa885cd438e2e416",
+              "media_type": "application/json"
+            },
+            "request_id": "complete-profile",
+            "result_contract": "ProfileOutput",
+            "result_version": "1.0.0",
+            "solver_status": "not_run",
+            "task_success": null,
+            "tool_id": "control.profile_report",
+            "tool_version": "1.0.0"
+          },
+          "simulation": {
+            "analysis_status": "not_assessed",
+            "cache_hit": false,
+            "caller": "casadi-feedback-research",
+            "charged": {
+              "backend_solves": 1,
+              "model_calls": 0,
+              "tool_calls": 1,
+              "wall_s": 680.5939999999828,
+              "worker_calls": 0
+            },
+            "contract_version": "1.2.0",
+            "error": null,
+            "execution_id": "21b607607bf442a6b6d9494dda897ea8",
+            "execution_status": "completed",
+            "original_execution_id": "21b607607bf442a6b6d9494dda897ea8",
+            "output": {
+              "artifact_id": "84e834e46165cecbe3bcdaeb2377076d658b67f617b3391e639b5dfdf0c6b53c",
+              "media_type": "application/json"
+            },
+            "request_id": "complete-simulation",
+            "result_contract": "BackendResult",
+            "result_version": "1.0.0",
+            "solver_status": "completed",
+            "task_success": null,
+            "tool_id": "simulation.run",
+            "tool_version": "1.0.0"
+          }
+        }
+      },
+      "actual_duration_s": 0.35000000000000003,
+      "completed_control_updates": 35,
+      "nmpc_internal_solves": 35,
+      "offline_nlp_slots_charged": 0,
+      "control_model_feedback": {
+        "accepted_noninitialization_plans": 5,
+        "accepted_plans": 35,
+        "backend_timings_s": {
+          "backend_call": 675.5786717999727,
+          "engine_compile": 0.023894999991171062,
+          "prepare_compile": 0.12708559999009594,
+          "solve": 675.4969369000173
+        },
+        "candidate_id": "casadi-nmpc-research-20261010-cl-afc46a23b0c9",
+        "complete": true,
+        "configuration": {
+          "artifact_id": "a14c071d10347cf775731b83791cd2a989cb641b4ead171fa6066a88d1f986ad",
+          "media_type": "application/json"
+        },
+        "converged_updates": 4,
+        "deadline_misses": 35,
+        "diagnostic_hypotheses": [],
+        "diagnostic_limitations": [
+          "Sampled observations do not identify a dominant cause.",
+          "Force proximity alone does not imply a required physical design change.",
+          "Ideal tensions; omitted shear, stretch, torsion, tendon friction and actuator dynamics."
+        ],
+        "drive_utilization": [
+          {
+            "limit_n": 8.0,
+            "maximum_n": 8.0,
+            "minimum_n": -0.0,
+            "near_upper_fraction": 0.08571428571428572,
+            "near_zero_fraction": 0.05714285714285714,
+            "tendon": "near_t0",
+            "tendon_index": 0
+          },
+          {
+            "limit_n": 8.0,
+            "maximum_n": 8.0,
+            "minimum_n": -0.0,
+            "near_upper_fraction": 0.08571428571428572,
+            "near_zero_fraction": 0.05714285714285714,
+            "tendon": "near_t1",
+            "tendon_index": 1
+          },
+          {
+            "limit_n": 8.0,
+            "maximum_n": 8.0,
+            "minimum_n": -0.0,
+            "near_upper_fraction": 0.05714285714285714,
+            "near_zero_fraction": 0.08571428571428572,
+            "tendon": "near_t2",
+            "tendon_index": 2
+          },
+          {
+            "limit_n": 8.0,
+            "maximum_n": 8.0,
+            "minimum_n": -0.0,
+            "near_upper_fraction": 0.11428571428571428,
+            "near_zero_fraction": 0.02857142857142857,
+            "tendon": "far_t0",
+            "tendon_index": 3
+          },
+          {
+            "limit_n": 8.0,
+            "maximum_n": 8.0,
+            "minimum_n": 5.8771380252315146e-08,
+            "near_upper_fraction": 0.08571428571428572,
+            "near_zero_fraction": 0.02857142857142857,
+            "tendon": "far_t1",
+            "tendon_index": 4
+          },
+          {
+            "limit_n": 8.0,
+            "maximum_n": 8.0,
+            "minimum_n": -0.0,
+            "near_upper_fraction": 0.02857142857142857,
+            "near_zero_fraction": 0.08571428571428572,
+            "tendon": "far_t2",
+            "tendon_index": 5
+          }
+        ],
+        "early_stopped_plans": 31,
+        "error_phases": [
+          {
+            "final_error_m": 0.11085764711121589,
+            "interval_s": [
+              0.0,
+              0.11666666666666665
+            ],
+            "maximum_error_m": 0.11085764711121589
+          },
+          {
+            "final_error_m": 0.19569589526295258,
+            "interval_s": [
+              0.11666666666666665,
+              0.2333333333333333
+            ],
+            "maximum_error_m": 0.19569589526295258
+          },
+          {
+            "final_error_m": 0.09552487867011847,
+            "interval_s": [
+              0.2333333333333333,
+              0.35
+            ],
+            "maximum_error_m": 0.19976773930649047
+          }
+        ],
+        "evaluation": {
+          "artifact_id": "2ef9f26a8f0cf8d61c5108fac8e8c750743f8e94d3b154abf1c135363a00f133",
+          "media_type": "application/json"
+        },
+        "evaluation_validity": "valid",
+        "execution_failure_reason": null,
+        "execution_id": "21b607607bf442a6b6d9494dda897ea8",
+        "force_bound_violation_n": 0.0,
+        "graph_construction_s": 2.74368500005221,
+        "hold_last_responses": 0,
+        "initialization_selected": 30,
+        "last_valid_error_m": 0.09552487867011847,
+        "last_valid_time_s": 0.35000000000000003,
+        "max_projection_residual_rad_m": 2.871926823613207,
+        "max_rate_projection_residual_rad_m_s": 89.71488852172017,
+        "max_sampled_contacts": 0,
+        "maximum_error_m": 0.19976773930649047,
+        "maximum_plan_violation": 4.0004782212582635e-06,
+        "mean_numerical_solve_s": 14.216540345717554,
+        "mean_preparation_s": 4.634366702852172,
+        "mean_recovery_integration_s": 0.0,
+        "mean_recovery_s": 0.0,
+        "mean_recovery_validation_s": 0.0,
+        "mean_update_s": 19.292457457139555,
+        "mean_validation_s": 0.14916803999970268,
+        "minimum_error_m": 0.05415701115293895,
+        "motion": {
+          "artifact_id": "371e55e726b1bddd2f2ac2acb9d1c5a7aaaa1354e295fe34056f510475708ab1",
+          "media_type": "application/json"
+        },
+        "motion_summary": {
+          "entered_tolerance_earlier_but_ended_outside": false,
+          "error_convention": "actual_tip minus target; world frame",
+          "late_change_definition": "last sampled error minus first sampled error in stated interval",
+          "late_error_change_m": -0.09762720018417093,
+          "late_interval_s": [
+            0.3,
+            0.35
+          ],
+          "late_sample_interval_s": [
+            0.3,
+            0.35000000000000003
+          ],
+          "minimum_sampled_error_m": 0.05415701115293895,
+          "minimum_sampled_error_time_s": 0.01,
+          "scope": "Sampled observations, not continuous-time guarantees or new acceptance criteria.",
+          "signed_terminal_position_error_m": [
+            -0.003460824677896046,
+            -0.01517047753839202,
+            -0.09424904110253252
+          ],
+          "terminal_error_m": 0.09552487867011847,
+          "terminal_tip_speed_m_s": 0.5855655065829197,
+          "tolerance_m": 0.01
+        },
+        "official_task_success": false,
+        "one_step_prediction_evidence": {
+          "artifact_id": "b20344b61673b361ba83fe826ec1979050384c0f91b312e46c865fae92ceeb48",
+          "media_type": "application/json"
+        },
+        "one_step_prediction_summary": {
+          "aligned_count": 35,
+          "frame": "world",
+          "maximum_speed_magnitude_difference_m_s": 0.16641097490046475,
+          "maximum_tip_difference_m": 0.009445293321661462,
+          "maximum_velocity_vector_difference_m_s": 0.2222882668262803,
+          "mean_tip_difference_m": 0.0036826415129965896,
+          "missing": [],
+          "scope": "Only accepted first-step predictions matched to next execution timestamp; no future-plan replay comparison",
+          "velocity_matched_count": 35,
+          "velocity_missing": []
+        },
+        "optimization_status_counts": {
+          "converged": 4,
+          "feasible_early_stop": 31
+        },
+        "per_update_delivery_s": [
+          30.261079900024924,
+          19.593929300026502,
+          19.55828230001498,
+          19.28687179996632,
+          19.99877030000789,
+          19.223384200013243,
+          19.471840899961535,
+          19.63148199999705,
+          20.1949212999898,
+          21.120498700009193,
+          21.107735999976285,
+          21.213960400025826,
+          21.15902239998104,
+          21.49833029997535,
+          21.432262799993623,
+          21.017007099988405,
+          21.24850270000752,
+          21.162022800010163,
+          21.022801899991464,
+          21.672273999953177,
+          21.255096000037156,
+          21.178855600010138,
+          21.151473600009922,
+          21.154099699982908,
+          21.004303199995775,
+          21.77609380002832,
+          21.177205399959348,
+          20.20297629997367,
+          19.982453000033274,
+          19.751352599996608,
+          15.115580400044564,
+          12.869495899998583,
+          8.101887199969497,
+          6.190867899975274,
+          3.449289299955126
+        ],
+        "policy_stop_reason_counts": {
+          "budget_best_feasible": 30,
+          "relative_seed_improvement": 1
+        },
+        "raw_termination_counts": {
+          "Solve_Succeeded": 4,
+          "User_Requested_Stop": 31
+        },
+        "real_time_demonstrated": false,
+        "recovered_plans": 0,
+        "sampled_settling": {
+          "available": true,
+          "continuous_time_guarantee": false,
+          "max_error_m": 0.1931520788542894,
+          "max_speed_m_s": 3.2498304807417395,
+          "passed": false,
+          "position_limit_m": 0.01,
+          "speed_limit_m_s": 0.02,
+          "window_s": 0.05
+        },
+        "simulation": {
+          "artifact_id": "84e834e46165cecbe3bcdaeb2377076d658b67f617b3391e639b5dfdf0c6b53c",
+          "media_type": "application/json"
+        },
+        "simulation_wall_s": 680.5939999999828,
+        "solver_construction_s": 5.520847699837759,
+        "solver_error_count": 0,
+        "solver_failure_flags": 0,
+        "solver_status": "completed",
+        "tension_range_n": [
+          -0.0,
+          8.0
+        ],
+        "terminal_error_m": 0.09552487867011847,
+        "terminal_position_m": [
+          0.28653917532210393,
+          0.019829522461607983,
+          0.09575095889746749
+        ],
+        "terminal_tip_speed_m_s": 0.5855655065829197,
+        "unusable_plans": 0,
+        "updates": 35,
+        "valid_complete_execution": true
+      }
+    },
+    {
+      "operation": "inspect_residuals",
+      "reference": {
+        "artifact_id": "1fcd15bac5b41dd51cde02385ea967a6f2b376e36669696c1c4a65c8f667fb20",
+        "media_type": "application/json"
+      },
+      "actual_executed_input_n": null,
+      "audits": [
+        {
+          "absolute_timing_verified": true,
+          "constraint_order_verified": true,
+          "coordinate_order": [
+            "near.kappa_y_node_0",
+            "near.kappa_y_node_1",
+            "near.kappa_y_node_2",
+            "near.kappa_z_node_0",
+            "near.kappa_z_node_1",
+            "near.kappa_z_node_2",
+            "distal1.kappa_y_node_0",
+            "distal1.kappa_y_node_1",
+            "distal1.kappa_y_node_2",
+            "distal1.kappa_z_node_0",
+            "distal1.kappa_z_node_1",
+            "distal1.kappa_z_node_2"
+          ],
+          "cost_s": 14.47066089999862,
+          "new_nlp_attempts": 0,
+          "normalization_source": "gvs_trajectory.implicit_step_residual: kinematic /10, implicit force /.001",
+          "plans": [
+            {
+              "count_above_1e_5": 0,
+              "feasible": true,
+              "groups": {
+                "generalized_force_balance": {
+                  "count_above_1e_5": 0,
+                  "max_scaled_residual": 2.927345865710862e-14
+                },
+                "kinematic_consistency": {
+                  "count_above_1e_5": 0,
+                  "max_scaled_residual": 8.326672684688674e-17
+                }
+              },
+              "label": "initial",
+              "max_scaled_residual": 2.927345865710862e-14,
+              "named_residuals": {
+                "dynamics_equalities": {
+                  "max_scaled_residual": 2.927345865710862e-14,
+                  "violations_over_1e_5": 0,
+                  "worst": {
+                    "name": "dynamics_4_14",
+                    "scaled_residual": 2.927345865710862e-14
+                  }
+                },
+                "initial_state_consistency": {
+                  "max_scaled_residual": 0.0,
+                  "violations_over_1e_5": 0,
+                  "worst": {
+                    "name": "x/0/0",
+                    "scaled_residual": 0.0
+                  }
+                },
+                "variable_bounds": {
+                  "max_scaled_residual": 0.0,
+                  "violations_over_1e_5": 0,
+                  "worst": {
+                    "name": "x/0/0",
+                    "scaled_residual": 0.0
+                  }
+                }
+              },
+              "objective": 1697.0857483254906,
+              "pointer": "/snapshot/plans/initial",
+              "ranked_violations": [
+                {
+                  "absolute_physical_residual": 2.927345865710862e-17,
+                  "absolute_scaled_residual": 2.927345865710862e-14,
+                  "constraint_name": "dynamics_4_14",
+                  "coordinate": "near.kappa_y_node_2",
+                  "end_s": 0.25,
+                  "interval_zero_based": 4,
+                  "kind": "generalized_force_balance",
+                  "normalization_denominator": 0.001,
+                  "physical_unit": "N*m^2/rad",
+                  "row_zero_based": 14,
+                  "signed_physical_residual": 2.927345865710862e-17,
+                  "signed_scaled_residual": 2.927345865710862e-14,
+                  "start_s": 0.24000000000000002
+                },
+                {
+                  "absolute_physical_residual": 2.6237692574149207e-17,
+                  "absolute_scaled_residual": 2.6237692574149207e-14,
+                  "constraint_name": "dynamics_2_14",
+                  "coordinate": "near.kappa_y_node_2",
+                  "end_s": 0.23,
+                  "interval_zero_based": 2,
+                  "kind": "generalized_force_balance",
+                  "normalization_denominator": 0.001,
+                  "physical_unit": "N*m^2/rad",
+                  "row_zero_based": 14,
+                  "signed_physical_residual": -2.6237692574149207e-17,
+                  "signed_scaled_residual": -2.6237692574149207e-14,
+                  "start_s": 0.22
+                },
+                {
+                  "absolute_physical_residual": 2.0166160408230382e-17,
+                  "absolute_scaled_residual": 2.0166160408230382e-14,
+                  "constraint_name": "dynamics_9_13",
+                  "coordinate": "near.kappa_y_node_1",
+                  "end_s": 0.30000000000000004,
+                  "interval_zero_based": 9,
+                  "kind": "generalized_force_balance",
+                  "normalization_denominator": 0.001,
+                  "physical_unit": "N*m^2/rad",
+                  "row_zero_based": 13,
+                  "signed_physical_residual": -2.0166160408230382e-17,
+                  "signed_scaled_residual": -2.0166160408230382e-14,
+                  "start_s": 0.29000000000000004
+                },
+                {
+                  "absolute_physical_residual": 1.6479873021779667e-17,
+                  "absolute_scaled_residual": 1.6479873021779667e-14,
+                  "constraint_name": "dynamics_6_13",
+                  "coordinate": "near.kappa_y_node_1",
+                  "end_s": 0.27,
+                  "interval_zero_based": 6,
+                  "kind": "generalized_force_balance",
+                  "normalization_denominator": 0.001,
+                  "physical_unit": "N*m^2/rad",
+                  "row_zero_based": 13,
+                  "signed_physical_residual": -1.6479873021779667e-17,
+                  "signed_scaled_residual": -1.6479873021779667e-14,
+                  "start_s": 0.26
+                },
+                {
+                  "absolute_physical_residual": 1.3877787807814457e-17,
+                  "absolute_scaled_residual": 1.3877787807814457e-14,
+                  "constraint_name": "dynamics_2_13",
+                  "coordinate": "near.kappa_y_node_1",
+                  "end_s": 0.23,
+                  "interval_zero_based": 2,
+                  "kind": "generalized_force_balance",
+                  "normalization_denominator": 0.001,
+                  "physical_unit": "N*m^2/rad",
+                  "row_zero_based": 13,
+                  "signed_physical_residual": -1.3877787807814457e-17,
+                  "signed_scaled_residual": -1.3877787807814457e-14,
+                  "start_s": 0.22
+                },
+                {
+                  "absolute_physical_residual": 1.3227266504323154e-17,
+                  "absolute_scaled_residual": 1.3227266504323154e-14,
+                  "constraint_name": "dynamics_7_14",
+                  "coordinate": "near.kappa_y_node_2",
+                  "end_s": 0.28,
+                  "interval_zero_based": 7,
+                  "kind": "generalized_force_balance",
+                  "normalization_denominator": 0.001,
+                  "physical_unit": "N*m^2/rad",
+                  "row_zero_based": 14,
+                  "signed_physical_residual": 1.3227266504323154e-17,
+                  "signed_scaled_residual": 1.3227266504323154e-14,
+                  "start_s": 0.27
+                },
+                {
+                  "absolute_physical_residual": 1.2576745200831851e-17,
+                  "absolute_scaled_residual": 1.2576745200831851e-14,
+                  "constraint_name": "dynamics_2_12",
+                  "coordinate": "near.kappa_y_node_0",
+                  "end_s": 0.23,
+                  "interval_zero_based": 2,
+                  "kind": "generalized_force_balance",
+                  "normalization_denominator": 0.001,
+                  "physical_unit": "N*m^2/rad",
+                  "row_zero_based": 12,
+                  "signed_physical_residual": -1.2576745200831851e-17,
+                  "signed_scaled_residual": -1.2576745200831851e-14,
+                  "start_s": 0.22
+                },
+                {
+                  "absolute_physical_residual": 1.1384122811097797e-17,
+                  "absolute_scaled_residual": 1.1384122811097797e-14,
+                  "constraint_name": "dynamics_6_14",
+                  "coordinate": "near.kappa_y_node_2",
+                  "end_s": 0.27,
+                  "interval_zero_based": 6,
+                  "kind": "generalized_force_balance",
+                  "normalization_denominator": 0.001,
+                  "physical_unit": "N*m^2/rad",
+                  "row_zero_based": 14,
+                  "signed_physical_residual": -1.1384122811097797e-17,
+                  "signed_scaled_residual": -1.1384122811097797e-14,
+                  "start_s": 0.26
+                }
+              ],
+              "source_reference": {
+                "artifact_id": "1074959ef843e7b79b6c14ffad293cd8b8a098ca57a95b55fc237a25835970cc",
+                "media_type": "application/json"
+              },
+              "worst_force": {
+                "absolute_physical_residual": 2.927345865710862e-17,
+                "absolute_scaled_residual": 2.927345865710862e-14,
+                "constraint_name": "dynamics_4_14",
+                "coordinate": "near.kappa_y_node_2",
+                "decomposition": {
+                  "difference": 5.421010862427522e-20,
+                  "exact_implicit_residual": 2.927345865710862e-17,
+                  "method": "Inertial and velocity terms isolated from exact implicit residual at zero rate/acceleration; all contributions evaluated at following state.",
+                  "physical_unit": "N*m^2/rad",
+                  "signed_terms": {
+                    "damping": -9.1413865858791e-06,
+                    "elastic": 0.0020110319232425813,
+                    "gravity": -0.0009441146119556385,
+                    "inertial": -0.0010051512431762685,
+                    "tendon": -5.389793799288927e-05,
+                    "velocity_dependent": 1.2732564681234866e-06
+                  },
+                  "sum": 2.9327668765732895e-17
+                },
+                "end_s": 0.25,
+                "interval_zero_based": 4,
+                "kind": "generalized_force_balance",
+                "normalization_denominator": 0.001,
+                "physical_unit": "N*m^2/rad",
+                "row_zero_based": 14,
+                "signed_physical_residual": 2.927345865710862e-17,
+                "signed_scaled_residual": 2.927345865710862e-14,
+                "start_s": 0.24000000000000002
+              }
+            },
+            {
+              "identical_vector_to": "initial",
+              "label": "selected"
+            },
+            {
+              "count_above_1e_5": 120,
+              "feasible": false,
+              "groups": {
+                "generalized_force_balance": {
+                  "count_above_1e_5": 120,
+                  "max_scaled_residual": 0.042687068291809294
+                },
+                "kinematic_consistency": {
+                  "count_above_1e_5": 0,
+                  "max_scaled_residual": 3.552713678800501e-16
+                }
+              },
+              "label": "returned",
+              "max_scaled_residual": 0.042687068291809294,
+              "named_residuals": {
+                "dynamics_equalities": {
+                  "max_scaled_residual": 0.042687068291809294,
+                  "violations_over_1e_5": 120,
+                  "worst": {
+                    "name": "dynamics_3_13",
+                    "scaled_residual": 0.042687068291809294
+                  }
+                },
+                "initial_state_consistency": {
+                  "max_scaled_residual": 0.0,
+                  "violations_over_1e_5": 0,
+                  "worst": {
+                    "name": "x/0/0",
+                    "scaled_residual": 0.0
+                  }
+                },
+                "variable_bounds": {
+                  "max_scaled_residual": 0.0,
+                  "violations_over_1e_5": 0,
+                  "worst": {
+                    "name": "x/0/0",
+                    "scaled_residual": 0.0
+                  }
+                }
+              },
+              "objective": 22.30603877987936,
+              "pointer": "/snapshot/plans/returned",
+              "ranked_violations": [
+                {
+                  "absolute_physical_residual": 4.2687068291809294e-05,
+                  "absolute_scaled_residual": 0.042687068291809294,
+                  "constraint_name": "dynamics_3_13",
+                  "coordinate": "near.kappa_y_node_1",
+                  "end_s": 0.24000000000000002,
+                  "interval_zero_based": 3,
+                  "kind": "generalized_force_balance",
+                  "normalization_denominator": 0.001,
+                  "physical_unit": "N*m^2/rad",
+                  "row_zero_based": 13,
+                  "signed_physical_residual": 4.2687068291809294e-05,
+                  "signed_scaled_residual": 0.042687068291809294,
+                  "start_s": 0.23
+                },
+                {
+                  "absolute_physical_residual": 3.0284359919673272e-05,
+                  "absolute_scaled_residual": 0.030284359919673272,
+                  "constraint_name": "dynamics_5_16",
+                  "coordinate": "near.kappa_z_node_1",
+                  "end_s": 0.26,
+                  "interval_zero_based": 5,
+                  "kind": "generalized_force_balance",
+                  "normalization_denominator": 0.001,
+                  "physical_unit": "N*m^2/rad",
+                  "row_zero_based": 16,
+                  "signed_physical_residual": -3.0284359919673272e-05,
+                  "signed_scaled_residual": -0.030284359919673272,
+                  "start_s": 0.25
+                },
+                {
+                  "absolute_physical_residual": 2.617718630412713e-05,
+                  "absolute_scaled_residual": 0.02617718630412713,
+                  "constraint_name": "dynamics_2_13",
+                  "coordinate": "near.kappa_y_node_1",
+                  "end_s": 0.23,
+                  "interval_zero_based": 2,
+                  "kind": "generalized_force_balance",
+                  "normalization_denominator": 0.001,
+                  "physical_unit": "N*m^2/rad",
+                  "row_zero_based": 13,
+                  "signed_physical_residual": 2.617718630412713e-05,
+                  "signed_scaled_residual": 0.02617718630412713,
+                  "start_s": 0.22
+                },
+                {
+                  "absolute_physical_residual": 2.5707788000473714e-05,
+                  "absolute_scaled_residual": 0.025707788000473714,
+                  "constraint_name": "dynamics_3_12",
+                  "coordinate": "near.kappa_y_node_0",
+                  "end_s": 0.24000000000000002,
+                  "interval_zero_based": 3,
+                  "kind": "generalized_force_balance",
+                  "normalization_denominator": 0.001,
+                  "physical_unit": "N*m^2/rad",
+                  "row_zero_based": 12,
+                  "signed_physical_residual": 2.5707788000473714e-05,
+                  "signed_scaled_residual": 0.025707788000473714,
+                  "start_s": 0.23
+                },
+                {
+                  "absolute_physical_residual": 2.2076794426518272e-05,
+                  "absolute_scaled_residual": 0.022076794426518272,
+                  "constraint_name": "dynamics_6_16",
+                  "coordinate": "near.kappa_z_node_1",
+                  "end_s": 0.27,
+                  "interval_zero_based": 6,
+                  "kind": "generalized_force_balance",
+                  "normalization_denominator": 0.001,
+                  "physical_unit": "N*m^2/rad",
+                  "row_zero_based": 16,
+                  "signed_physical_residual": 2.2076794426518272e-05,
+                  "signed_scaled_residual": 0.022076794426518272,
+                  "start_s": 0.26
+                },
+                {
+                  "absolute_physical_residual": 1.9482793142445304e-05,
+                  "absolute_scaled_residual": 0.019482793142445304,
+                  "constraint_name": "dynamics_4_13",
+                  "coordinate": "near.kappa_y_node_1",
+                  "end_s": 0.25,
+                  "interval_zero_based": 4,
+                  "kind": "generalized_force_balance",
+                  "normalization_denominator": 0.001,
+                  "physical_unit": "N*m^2/rad",
+                  "row_zero_based": 13,
+                  "signed_physical_residual": 1.9482793142445304e-05,
+                  "signed_scaled_residual": 0.019482793142445304,
+                  "start_s": 0.24000000000000002
+                },
+                {
+                  "absolute_physical_residual": 1.7107016725385546e-05,
+                  "absolute_scaled_residual": 0.017107016725385546,
+                  "constraint_name": "dynamics_5_13",
+                  "coordinate": "near.kappa_y_node_1",
+                  "end_s": 0.26,
+                  "interval_zero_based": 5,
+                  "kind": "generalized_force_balance",
+                  "normalization_denominator": 0.001,
+                  "physical_unit": "N*m^2/rad",
+                  "row_zero_based": 13,
+                  "signed_physical_residual": 1.7107016725385546e-05,
+                  "signed_scaled_residual": 0.017107016725385546,
+                  "start_s": 0.25
+                },
+                {
+                  "absolute_physical_residual": 1.679199091924287e-05,
+                  "absolute_scaled_residual": 0.01679199091924287,
+                  "constraint_name": "dynamics_3_14",
+                  "coordinate": "near.kappa_y_node_2",
+                  "end_s": 0.24000000000000002,
+                  "interval_zero_based": 3,
+                  "kind": "generalized_force_balance",
+                  "normalization_denominator": 0.001,
+                  "physical_unit": "N*m^2/rad",
+                  "row_zero_based": 14,
+                  "signed_physical_residual": 1.679199091924287e-05,
+                  "signed_scaled_residual": 0.01679199091924287,
+                  "start_s": 0.23
+                }
+              ],
+              "source_reference": {
+                "artifact_id": "1074959ef843e7b79b6c14ffad293cd8b8a098ca57a95b55fc237a25835970cc",
+                "media_type": "application/json"
+              },
+              "worst_force": {
+                "absolute_physical_residual": 4.2687068291809294e-05,
+                "absolute_scaled_residual": 0.042687068291809294,
+                "constraint_name": "dynamics_3_13",
+                "coordinate": "near.kappa_y_node_1",
+                "decomposition": {
+                  "difference": 3.469446951953614e-18,
+                  "exact_implicit_residual": 4.2687068291809294e-05,
+                  "method": "Inertial and velocity terms isolated from exact implicit residual at zero rate/acceleration; all contributions evaluated at following state.",
+                  "physical_unit": "N*m^2/rad",
+                  "signed_terms": {
+                    "damping": -0.002559349312935117,
+                    "elastic": 0.0030691276556639503,
+                    "gravity": -0.003938472818279961,
+                    "inertial": -0.021439590732874974,
+                    "tendon": 0.021523032572791933,
+                    "velocity_dependent": 0.0033879397039259787
+                  },
+                  "sum": 4.268706829181276e-05
+                },
+                "end_s": 0.24000000000000002,
+                "interval_zero_based": 3,
+                "kind": "generalized_force_balance",
+                "normalization_denominator": 0.001,
+                "physical_unit": "N*m^2/rad",
+                "row_zero_based": 13,
+                "signed_physical_residual": 4.2687068291809294e-05,
+                "signed_scaled_residual": 0.042687068291809294,
+                "start_s": 0.23
+              }
+            },
+            {
+              "identical_vector_to": "returned",
+              "label": "checkpoint_1"
+            },
+            {
+              "count_above_1e_5": 119,
+              "feasible": false,
+              "groups": {
+                "generalized_force_balance": {
+                  "count_above_1e_5": 119,
+                  "max_scaled_residual": 0.013844345207850856
+                },
+                "kinematic_consistency": {
+                  "count_above_1e_5": 0,
+                  "max_scaled_residual": 2.886579864025407e-16
+                }
+              },
+              "label": "checkpoint_2",
+              "max_scaled_residual": 0.013844345207850856,
+              "named_residuals": {
+                "dynamics_equalities": {
+                  "max_scaled_residual": 0.013844345207850856,
+                  "violations_over_1e_5": 119,
+                  "worst": {
+                    "name": "dynamics_4_13",
+                    "scaled_residual": 0.013844345207850856
+                  }
+                },
+                "initial_state_consistency": {
+                  "max_scaled_residual": 0.0,
+                  "violations_over_1e_5": 0,
+                  "worst": {
+                    "name": "x/0/0",
+                    "scaled_residual": 0.0
+                  }
+                },
+                "variable_bounds": {
+                  "max_scaled_residual": 0.0,
+                  "violations_over_1e_5": 0,
+                  "worst": {
+                    "name": "x/0/0",
+                    "scaled_residual": 0.0
+                  }
+                }
+              },
+              "objective": 27.527303922251036,
+              "pointer": "/snapshot/plans/checkpoint_2",
+              "ranked_violations": [
+                {
+                  "absolute_physical_residual": 1.3844345207850856e-05,
+                  "absolute_scaled_residual": 0.013844345207850856,
+                  "constraint_name": "dynamics_4_13",
+                  "coordinate": "near.kappa_y_node_1",
+                  "end_s": 0.25,
+                  "interval_zero_based": 4,
+                  "kind": "generalized_force_balance",
+                  "normalization_denominator": 0.001,
+                  "physical_unit": "N*m^2/rad",
+                  "row_zero_based": 13,
+                  "signed_physical_residual": 1.3844345207850856e-05,
+                  "signed_scaled_residual": 0.013844345207850856,
+                  "start_s": 0.24000000000000002
+                },
+                {
+                  "absolute_physical_residual": 1.345039286687437e-05,
+                  "absolute_scaled_residual": 0.01345039286687437,
+                  "constraint_name": "dynamics_6_13",
+                  "coordinate": "near.kappa_y_node_1",
+                  "end_s": 0.27,
+                  "interval_zero_based": 6,
+                  "kind": "generalized_force_balance",
+                  "normalization_denominator": 0.001,
+                  "physical_unit": "N*m^2/rad",
+                  "row_zero_based": 13,
+                  "signed_physical_residual": 1.345039286687437e-05,
+                  "signed_scaled_residual": 0.01345039286687437,
+                  "start_s": 0.26
+                },
+                {
+                  "absolute_physical_residual": 1.252679725170791e-05,
+                  "absolute_scaled_residual": 0.01252679725170791,
+                  "constraint_name": "dynamics_3_13",
+                  "coordinate": "near.kappa_y_node_1",
+                  "end_s": 0.24000000000000002,
+                  "interval_zero_based": 3,
+                  "kind": "generalized_force_balance",
+                  "normalization_denominator": 0.001,
+                  "physical_unit": "N*m^2/rad",
+                  "row_zero_based": 13,
+                  "signed_physical_residual": 1.252679725170791e-05,
+                  "signed_scaled_residual": 0.01252679725170791,
+                  "start_s": 0.23
+                },
+                {
+                  "absolute_physical_residual": 1.0296222674163746e-05,
+                  "absolute_scaled_residual": 0.010296222674163746,
+                  "constraint_name": "dynamics_2_13",
+                  "coordinate": "near.kappa_y_node_1",
+                  "end_s": 0.23,
+                  "interval_zero_based": 2,
+                  "kind": "generalized_force_balance",
+                  "normalization_denominator": 0.001,
+                  "physical_unit": "N*m^2/rad",
+                  "row_zero_based": 13,
+                  "signed_physical_residual": 1.0296222674163746e-05,
+                  "signed_scaled_residual": 0.010296222674163746,
+                  "start_s": 0.22
+                },
+                {
+                  "absolute_physical_residual": 1.0274862626065417e-05,
+                  "absolute_scaled_residual": 0.010274862626065417,
+                  "constraint_name": "dynamics_8_13",
+                  "coordinate": "near.kappa_y_node_1",
+                  "end_s": 0.29000000000000004,
+                  "interval_zero_based": 8,
+                  "kind": "generalized_force_balance",
+                  "normalization_denominator": 0.001,
+                  "physical_unit": "N*m^2/rad",
+                  "row_zero_based": 13,
+                  "signed_physical_residual": -1.0274862626065417e-05,
+                  "signed_scaled_residual": -0.010274862626065417,
+                  "start_s": 0.28
+                },
+                {
+                  "absolute_physical_residual": 8.737487103787842e-06,
+                  "absolute_scaled_residual": 0.008737487103787842,
+                  "constraint_name": "dynamics_6_12",
+                  "coordinate": "near.kappa_y_node_0",
+                  "end_s": 0.27,
+                  "interval_zero_based": 6,
+                  "kind": "generalized_force_balance",
+                  "normalization_denominator": 0.001,
+                  "physical_unit": "N*m^2/rad",
+                  "row_zero_based": 12,
+                  "signed_physical_residual": 8.737487103787842e-06,
+                  "signed_scaled_residual": 0.008737487103787842,
+                  "start_s": 0.26
+                },
+                {
+                  "absolute_physical_residual": 8.502104013523998e-06,
+                  "absolute_scaled_residual": 0.008502104013523998,
+                  "constraint_name": "dynamics_4_12",
+                  "coordinate": "near.kappa_y_node_0",
+                  "end_s": 0.25,
+                  "interval_zero_based": 4,
+                  "kind": "generalized_force_balance",
+                  "normalization_denominator": 0.001,
+                  "physical_unit": "N*m^2/rad",
+                  "row_zero_based": 12,
+                  "signed_physical_residual": 8.502104013523998e-06,
+                  "signed_scaled_residual": 0.008502104013523998,
+                  "start_s": 0.24000000000000002
+                },
+                {
+                  "absolute_physical_residual": 8.268430647682956e-06,
+                  "absolute_scaled_residual": 0.008268430647682956,
+                  "constraint_name": "dynamics_8_12",
+                  "coordinate": "near.kappa_y_node_0",
+                  "end_s": 0.29000000000000004,
+                  "interval_zero_based": 8,
+                  "kind": "generalized_force_balance",
+                  "normalization_denominator": 0.001,
+                  "physical_unit": "N*m^2/rad",
+                  "row_zero_based": 12,
+                  "signed_physical_residual": -8.268430647682956e-06,
+                  "signed_scaled_residual": -0.008268430647682956,
+                  "start_s": 0.28
+                }
+              ],
+              "source_reference": {
+                "artifact_id": "1074959ef843e7b79b6c14ffad293cd8b8a098ca57a95b55fc237a25835970cc",
+                "media_type": "application/json"
+              },
+              "worst_force": {
+                "absolute_physical_residual": 1.3844345207850856e-05,
+                "absolute_scaled_residual": 0.013844345207850856,
+                "constraint_name": "dynamics_4_13",
+                "coordinate": "near.kappa_y_node_1",
+                "decomposition": {
+                  "difference": 3.469446951953614e-18,
+                  "exact_implicit_residual": 1.3844345207850856e-05,
+                  "method": "Inertial and velocity terms isolated from exact implicit residual at zero rate/acceleration; all contributions evaluated at following state.",
+                  "physical_unit": "N*m^2/rad",
+                  "signed_terms": {
+                    "damping": -0.0028140526220794358,
+                    "elastic": 0.001962383831524605,
+                    "gravity": -0.003996329144933175,
+                    "inertial": -0.01886912556467009,
+                    "tendon": 0.020122931027460933,
+                    "velocity_dependent": 0.0036080368179050148
+                  },
+                  "sum": 1.3844345207854325e-05
+                },
+                "end_s": 0.25,
+                "interval_zero_based": 4,
+                "kind": "generalized_force_balance",
+                "normalization_denominator": 0.001,
+                "physical_unit": "N*m^2/rad",
+                "row_zero_based": 13,
+                "signed_physical_residual": 1.3844345207850856e-05,
+                "signed_scaled_residual": 0.013844345207850856,
+                "start_s": 0.24000000000000002
+              }
+            }
+          ],
+          "source_problem": {
+            "artifact_id": "1074959ef843e7b79b6c14ffad293cd8b8a098ca57a95b55fc237a25835970cc",
+            "media_type": "application/json"
+          },
+          "threshold": 1e-05,
+          "time_s": 0.2,
+          "update_id": 20,
+          "variable_order_verified": true
+        },
+        {
+          "absolute_timing_verified": true,
+          "constraint_order_verified": true,
+          "coordinate_order": [
+            "near.kappa_y_node_0",
+            "near.kappa_y_node_1",
+            "near.kappa_y_node_2",
+            "near.kappa_z_node_0",
+            "near.kappa_z_node_1",
+            "near.kappa_z_node_2",
+            "distal1.kappa_y_node_0",
+            "distal1.kappa_y_node_1",
+            "distal1.kappa_y_node_2",
+            "distal1.kappa_z_node_0",
+            "distal1.kappa_z_node_1",
+            "distal1.kappa_z_node_2"
+          ],
+          "cost_s": 11.246846199966967,
+          "new_nlp_attempts": 0,
+          "normalization_source": "gvs_trajectory.implicit_step_residual: kinematic /10, implicit force /.001",
+          "plans": [
+            {
+              "count_above_1e_5": 0,
+              "feasible": true,
+              "groups": {
+                "generalized_force_balance": {
+                  "count_above_1e_5": 0,
+                  "max_scaled_residual": 2.927345865710862e-14
+                },
+                "kinematic_consistency": {
+                  "count_above_1e_5": 0,
+                  "max_scaled_residual": 8.326672684688674e-17
+                }
+              },
+              "label": "initial",
+              "max_scaled_residual": 2.927345865710862e-14,
+              "named_residuals": {
+                "dynamics_equalities": {
+                  "max_scaled_residual": 2.927345865710862e-14,
+                  "violations_over_1e_5": 0,
+                  "worst": {
+                    "name": "dynamics_4_14",
+                    "scaled_residual": 2.927345865710862e-14
+                  }
+                },
+                "initial_state_consistency": {
+                  "max_scaled_residual": 0.0,
+                  "violations_over_1e_5": 0,
+                  "worst": {
+                    "name": "x/0/0",
+                    "scaled_residual": 0.0
+                  }
+                },
+                "variable_bounds": {
+                  "max_scaled_residual": 0.0,
+                  "violations_over_1e_5": 0,
+                  "worst": {
+                    "name": "x/0/0",
+                    "scaled_residual": 0.0
+                  }
+                }
+              },
+              "objective": 1697.0857483254906,
+              "pointer": "/snapshot/plans/initial",
+              "ranked_violations": [
+                {
+                  "absolute_physical_residual": 2.927345865710862e-17,
+                  "absolute_scaled_residual": 2.927345865710862e-14,
+                  "constraint_name": "dynamics_4_14",
+                  "coordinate": "near.kappa_y_node_2",
+                  "end_s": 0.25,
+                  "interval_zero_based": 4,
+                  "kind": "generalized_force_balance",
+                  "normalization_denominator": 0.001,
+                  "physical_unit": "N*m^2/rad",
+                  "row_zero_based": 14,
+                  "signed_physical_residual": 2.927345865710862e-17,
+                  "signed_scaled_residual": 2.927345865710862e-14,
+                  "start_s": 0.24000000000000002
+                },
+                {
+                  "absolute_physical_residual": 2.6237692574149207e-17,
+                  "absolute_scaled_residual": 2.6237692574149207e-14,
+                  "constraint_name": "dynamics_2_14",
+                  "coordinate": "near.kappa_y_node_2",
+                  "end_s": 0.23,
+                  "interval_zero_based": 2,
+                  "kind": "generalized_force_balance",
+                  "normalization_denominator": 0.001,
+                  "physical_unit": "N*m^2/rad",
+                  "row_zero_based": 14,
+                  "signed_physical_residual": -2.6237692574149207e-17,
+                  "signed_scaled_residual": -2.6237692574149207e-14,
+                  "start_s": 0.22
+                },
+                {
+                  "absolute_physical_residual": 2.0166160408230382e-17,
+                  "absolute_scaled_residual": 2.0166160408230382e-14,
+                  "constraint_name": "dynamics_9_13",
+                  "coordinate": "near.kappa_y_node_1",
+                  "end_s": 0.30000000000000004,
+                  "interval_zero_based": 9,
+                  "kind": "generalized_force_balance",
+                  "normalization_denominator": 0.001,
+                  "physical_unit": "N*m^2/rad",
+                  "row_zero_based": 13,
+                  "signed_physical_residual": -2.0166160408230382e-17,
+                  "signed_scaled_residual": -2.0166160408230382e-14,
+                  "start_s": 0.29000000000000004
+                },
+                {
+                  "absolute_physical_residual": 1.6479873021779667e-17,
+                  "absolute_scaled_residual": 1.6479873021779667e-14,
+                  "constraint_name": "dynamics_6_13",
+                  "coordinate": "near.kappa_y_node_1",
+                  "end_s": 0.27,
+                  "interval_zero_based": 6,
+                  "kind": "generalized_force_balance",
+                  "normalization_denominator": 0.001,
+                  "physical_unit": "N*m^2/rad",
+                  "row_zero_based": 13,
+                  "signed_physical_residual": -1.6479873021779667e-17,
+                  "signed_scaled_residual": -1.6479873021779667e-14,
+                  "start_s": 0.26
+                },
+                {
+                  "absolute_physical_residual": 1.3877787807814457e-17,
+                  "absolute_scaled_residual": 1.3877787807814457e-14,
+                  "constraint_name": "dynamics_2_13",
+                  "coordinate": "near.kappa_y_node_1",
+                  "end_s": 0.23,
+                  "interval_zero_based": 2,
+                  "kind": "generalized_force_balance",
+                  "normalization_denominator": 0.001,
+                  "physical_unit": "N*m^2/rad",
+                  "row_zero_based": 13,
+                  "signed_physical_residual": -1.3877787807814457e-17,
+                  "signed_scaled_residual": -1.3877787807814457e-14,
+                  "start_s": 0.22
+                },
+                {
+                  "absolute_physical_residual": 1.3227266504323154e-17,
+                  "absolute_scaled_residual": 1.3227266504323154e-14,
+                  "constraint_name": "dynamics_7_14",
+                  "coordinate": "near.kappa_y_node_2",
+                  "end_s": 0.28,
+                  "interval_zero_based": 7,
+                  "kind": "generalized_force_balance",
+                  "normalization_denominator": 0.001,
+                  "physical_unit": "N*m^2/rad",
+                  "row_zero_based": 14,
+                  "signed_physical_residual": 1.3227266504323154e-17,
+                  "signed_scaled_residual": 1.3227266504323154e-14,
+                  "start_s": 0.27
+                },
+                {
+                  "absolute_physical_residual": 1.2576745200831851e-17,
+                  "absolute_scaled_residual": 1.2576745200831851e-14,
+                  "constraint_name": "dynamics_2_12",
+                  "coordinate": "near.kappa_y_node_0",
+                  "end_s": 0.23,
+                  "interval_zero_based": 2,
+                  "kind": "generalized_force_balance",
+                  "normalization_denominator": 0.001,
+                  "physical_unit": "N*m^2/rad",
+                  "row_zero_based": 12,
+                  "signed_physical_residual": -1.2576745200831851e-17,
+                  "signed_scaled_residual": -1.2576745200831851e-14,
+                  "start_s": 0.22
+                },
+                {
+                  "absolute_physical_residual": 1.1384122811097797e-17,
+                  "absolute_scaled_residual": 1.1384122811097797e-14,
+                  "constraint_name": "dynamics_6_14",
+                  "coordinate": "near.kappa_y_node_2",
+                  "end_s": 0.27,
+                  "interval_zero_based": 6,
+                  "kind": "generalized_force_balance",
+                  "normalization_denominator": 0.001,
+                  "physical_unit": "N*m^2/rad",
+                  "row_zero_based": 14,
+                  "signed_physical_residual": -1.1384122811097797e-17,
+                  "signed_scaled_residual": -1.1384122811097797e-14,
+                  "start_s": 0.26
+                }
+              ],
+              "source_reference": {
+                "artifact_id": "b8849bb48a87ba8eccf5974d1272ffb49cfd705443cbfbd7e515b416f9f30bb3",
+                "media_type": "application/json"
+              },
+              "worst_force": {
+                "absolute_physical_residual": 2.927345865710862e-17,
+                "absolute_scaled_residual": 2.927345865710862e-14,
+                "constraint_name": "dynamics_4_14",
+                "coordinate": "near.kappa_y_node_2",
+                "decomposition": {
+                  "difference": 5.421010862427522e-20,
+                  "exact_implicit_residual": 2.927345865710862e-17,
+                  "method": "Inertial and velocity terms isolated from exact implicit residual at zero rate/acceleration; all contributions evaluated at following state.",
+                  "physical_unit": "N*m^2/rad",
+                  "signed_terms": {
+                    "damping": -9.1413865858791e-06,
+                    "elastic": 0.0020110319232425813,
+                    "gravity": -0.0009441146119556385,
+                    "inertial": -0.0010051512431762685,
+                    "tendon": -5.389793799288927e-05,
+                    "velocity_dependent": 1.2732564681234866e-06
+                  },
+                  "sum": 2.9327668765732895e-17
+                },
+                "end_s": 0.25,
+                "interval_zero_based": 4,
+                "kind": "generalized_force_balance",
+                "normalization_denominator": 0.001,
+                "physical_unit": "N*m^2/rad",
+                "row_zero_based": 14,
+                "signed_physical_residual": 2.927345865710862e-17,
+                "signed_scaled_residual": 2.927345865710862e-14,
+                "start_s": 0.24000000000000002
+              }
+            },
+            {
+              "identical_vector_to": "initial",
+              "label": "selected"
+            },
+            {
+              "count_above_1e_5": 84,
+              "feasible": false,
+              "groups": {
+                "generalized_force_balance": {
+                  "count_above_1e_5": 84,
+                  "max_scaled_residual": 0.0009537607210136773
+                },
+                "kinematic_consistency": {
+                  "count_above_1e_5": 0,
+                  "max_scaled_residual": 2.26929586233382e-14
+                }
+              },
+              "label": "returned",
+              "max_scaled_residual": 0.0009537607210136773,
+              "named_residuals": {
+                "dynamics_equalities": {
+                  "max_scaled_residual": 0.0009537607210136773,
+                  "violations_over_1e_5": 84,
+                  "worst": {
+                    "name": "dynamics_5_13",
+                    "scaled_residual": 0.0009537607210136773
+                  }
+                },
+                "initial_state_consistency": {
+                  "max_scaled_residual": 0.0,
+                  "violations_over_1e_5": 0,
+                  "worst": {
+                    "name": "x/0/0",
+                    "scaled_residual": 0.0
+                  }
+                },
+                "variable_bounds": {
+                  "max_scaled_residual": 0.0,
+                  "violations_over_1e_5": 0,
+                  "worst": {
+                    "name": "x/0/0",
+                    "scaled_residual": 0.0
+                  }
+                }
+              },
+              "objective": 18.37680755669539,
+              "pointer": "/snapshot/plans/returned",
+              "ranked_violations": [
+                {
+                  "absolute_physical_residual": 9.537607210136773e-07,
+                  "absolute_scaled_residual": 0.0009537607210136773,
+                  "constraint_name": "dynamics_5_13",
+                  "coordinate": "near.kappa_y_node_1",
+                  "end_s": 0.26,
+                  "interval_zero_based": 5,
+                  "kind": "generalized_force_balance",
+                  "normalization_denominator": 0.001,
+                  "physical_unit": "N*m^2/rad",
+                  "row_zero_based": 13,
+                  "signed_physical_residual": 9.537607210136773e-07,
+                  "signed_scaled_residual": 0.0009537607210136773,
+                  "start_s": 0.25
+                },
+                {
+                  "absolute_physical_residual": 7.445588825170935e-07,
+                  "absolute_scaled_residual": 0.0007445588825170935,
+                  "constraint_name": "dynamics_5_12",
+                  "coordinate": "near.kappa_y_node_0",
+                  "end_s": 0.26,
+                  "interval_zero_based": 5,
+                  "kind": "generalized_force_balance",
+                  "normalization_denominator": 0.001,
+                  "physical_unit": "N*m^2/rad",
+                  "row_zero_based": 12,
+                  "signed_physical_residual": 7.445588825170935e-07,
+                  "signed_scaled_residual": 0.0007445588825170935,
+                  "start_s": 0.25
+                },
+                {
+                  "absolute_physical_residual": 4.544461911590997e-07,
+                  "absolute_scaled_residual": 0.0004544461911590997,
+                  "constraint_name": "dynamics_9_13",
+                  "coordinate": "near.kappa_y_node_1",
+                  "end_s": 0.30000000000000004,
+                  "interval_zero_based": 9,
+                  "kind": "generalized_force_balance",
+                  "normalization_denominator": 0.001,
+                  "physical_unit": "N*m^2/rad",
+                  "row_zero_based": 13,
+                  "signed_physical_residual": -4.544461911590997e-07,
+                  "signed_scaled_residual": -0.0004544461911590997,
+                  "start_s": 0.29000000000000004
+                },
+                {
+                  "absolute_physical_residual": 4.5409232125610127e-07,
+                  "absolute_scaled_residual": 0.00045409232125610127,
+                  "constraint_name": "dynamics_9_16",
+                  "coordinate": "near.kappa_z_node_1",
+                  "end_s": 0.30000000000000004,
+                  "interval_zero_based": 9,
+                  "kind": "generalized_force_balance",
+                  "normalization_denominator": 0.001,
+                  "physical_unit": "N*m^2/rad",
+                  "row_zero_based": 16,
+                  "signed_physical_residual": -4.5409232125610127e-07,
+                  "signed_scaled_residual": -0.00045409232125610127,
+                  "start_s": 0.29000000000000004
+                },
+                {
+                  "absolute_physical_residual": 3.8739850468164083e-07,
+                  "absolute_scaled_residual": 0.00038739850468164083,
+                  "constraint_name": "dynamics_5_16",
+                  "coordinate": "near.kappa_z_node_1",
+                  "end_s": 0.26,
+                  "interval_zero_based": 5,
+                  "kind": "generalized_force_balance",
+                  "normalization_denominator": 0.001,
+                  "physical_unit": "N*m^2/rad",
+                  "row_zero_based": 16,
+                  "signed_physical_residual": -3.8739850468164083e-07,
+                  "signed_scaled_residual": -0.00038739850468164083,
+                  "start_s": 0.25
+                },
+                {
+                  "absolute_physical_residual": 3.7827990314459603e-07,
+                  "absolute_scaled_residual": 0.00037827990314459603,
+                  "constraint_name": "dynamics_6_13",
+                  "coordinate": "near.kappa_y_node_1",
+                  "end_s": 0.27,
+                  "interval_zero_based": 6,
+                  "kind": "generalized_force_balance",
+                  "normalization_denominator": 0.001,
+                  "physical_unit": "N*m^2/rad",
+                  "row_zero_based": 13,
+                  "signed_physical_residual": -3.7827990314459603e-07,
+                  "signed_scaled_residual": -0.00037827990314459603,
+                  "start_s": 0.26
+                },
+                {
+                  "absolute_physical_residual": 3.702410664003196e-07,
+                  "absolute_scaled_residual": 0.0003702410664003196,
+                  "constraint_name": "dynamics_9_15",
+                  "coordinate": "near.kappa_z_node_0",
+                  "end_s": 0.30000000000000004,
+                  "interval_zero_based": 9,
+                  "kind": "generalized_force_balance",
+                  "normalization_denominator": 0.001,
+                  "physical_unit": "N*m^2/rad",
+                  "row_zero_based": 15,
+                  "signed_physical_residual": -3.702410664003196e-07,
+                  "signed_scaled_residual": -0.0003702410664003196,
+                  "start_s": 0.29000000000000004
+                },
+                {
+                  "absolute_physical_residual": 3.3837882613615977e-07,
+                  "absolute_scaled_residual": 0.00033837882613615977,
+                  "constraint_name": "dynamics_4_13",
+                  "coordinate": "near.kappa_y_node_1",
+                  "end_s": 0.25,
+                  "interval_zero_based": 4,
+                  "kind": "generalized_force_balance",
+                  "normalization_denominator": 0.001,
+                  "physical_unit": "N*m^2/rad",
+                  "row_zero_based": 13,
+                  "signed_physical_residual": 3.3837882613615977e-07,
+                  "signed_scaled_residual": 0.00033837882613615977,
+                  "start_s": 0.24000000000000002
+                }
+              ],
+              "source_reference": {
+                "artifact_id": "b8849bb48a87ba8eccf5974d1272ffb49cfd705443cbfbd7e515b416f9f30bb3",
+                "media_type": "application/json"
+              },
+              "worst_force": {
+                "absolute_physical_residual": 9.537607210136773e-07,
+                "absolute_scaled_residual": 0.0009537607210136773,
+                "constraint_name": "dynamics_5_13",
+                "coordinate": "near.kappa_y_node_1",
+                "decomposition": {
+                  "difference": 1.734723475976807e-18,
+                  "exact_implicit_residual": 9.537607210136773e-07,
+                  "method": "Inertial and velocity terms isolated from exact implicit residual at zero rate/acceleration; all contributions evaluated at following state.",
+                  "physical_unit": "N*m^2/rad",
+                  "signed_terms": {
+                    "damping": -0.0031016894833525415,
+                    "elastic": -0.0001561988157033481,
+                    "gravity": -0.003953306613910676,
+                    "inertial": -0.01353358006316313,
+                    "tendon": 0.016417754284501502,
+                    "velocity_dependent": 0.004327974452349207
+                  },
+                  "sum": 9.53760721015412e-07
+                },
+                "end_s": 0.26,
+                "interval_zero_based": 5,
+                "kind": "generalized_force_balance",
+                "normalization_denominator": 0.001,
+                "physical_unit": "N*m^2/rad",
+                "row_zero_based": 13,
+                "signed_physical_residual": 9.537607210136773e-07,
+                "signed_scaled_residual": 0.0009537607210136773,
+                "start_s": 0.25
+              }
+            },
+            {
+              "identical_vector_to": "returned",
+              "label": "checkpoint_1"
+            },
+            {
+              "count_above_1e_5": 83,
+              "feasible": false,
+              "groups": {
+                "generalized_force_balance": {
+                  "count_above_1e_5": 83,
+                  "max_scaled_residual": 0.0007145889734799793
+                },
+                "kinematic_consistency": {
+                  "count_above_1e_5": 0,
+                  "max_scaled_residual": 1.554312234475219e-16
+                }
+              },
+              "label": "checkpoint_2",
+              "max_scaled_residual": 0.0007145889734799793,
+              "named_residuals": {
+                "dynamics_equalities": {
+                  "max_scaled_residual": 0.0007145889734799793,
+                  "violations_over_1e_5": 83,
+                  "worst": {
+                    "name": "dynamics_4_13",
+                    "scaled_residual": 0.0007145889734799793
+                  }
+                },
+                "initial_state_consistency": {
+                  "max_scaled_residual": 0.0,
+                  "violations_over_1e_5": 0,
+                  "worst": {
+                    "name": "x/0/0",
+                    "scaled_residual": 0.0
+                  }
+                },
+                "variable_bounds": {
+                  "max_scaled_residual": 0.0,
+                  "violations_over_1e_5": 0,
+                  "worst": {
+                    "name": "x/0/0",
+                    "scaled_residual": 0.0
+                  }
+                }
+              },
+              "objective": 18.674613911154186,
+              "pointer": "/snapshot/plans/checkpoint_2",
+              "ranked_violations": [
+                {
+                  "absolute_physical_residual": 7.145889734799793e-07,
+                  "absolute_scaled_residual": 0.0007145889734799793,
+                  "constraint_name": "dynamics_4_13",
+                  "coordinate": "near.kappa_y_node_1",
+                  "end_s": 0.25,
+                  "interval_zero_based": 4,
+                  "kind": "generalized_force_balance",
+                  "normalization_denominator": 0.001,
+                  "physical_unit": "N*m^2/rad",
+                  "row_zero_based": 13,
+                  "signed_physical_residual": 7.145889734799793e-07,
+                  "signed_scaled_residual": 0.0007145889734799793,
+                  "start_s": 0.24000000000000002
+                },
+                {
+                  "absolute_physical_residual": 5.269072081617171e-07,
+                  "absolute_scaled_residual": 0.0005269072081617171,
+                  "constraint_name": "dynamics_4_12",
+                  "coordinate": "near.kappa_y_node_0",
+                  "end_s": 0.25,
+                  "interval_zero_based": 4,
+                  "kind": "generalized_force_balance",
+                  "normalization_denominator": 0.001,
+                  "physical_unit": "N*m^2/rad",
+                  "row_zero_based": 12,
+                  "signed_physical_residual": 5.269072081617171e-07,
+                  "signed_scaled_residual": 0.0005269072081617171,
+                  "start_s": 0.24000000000000002
+                },
+                {
+                  "absolute_physical_residual": 4.5912606620908403e-07,
+                  "absolute_scaled_residual": 0.00045912606620908403,
+                  "constraint_name": "dynamics_5_13",
+                  "coordinate": "near.kappa_y_node_1",
+                  "end_s": 0.26,
+                  "interval_zero_based": 5,
+                  "kind": "generalized_force_balance",
+                  "normalization_denominator": 0.001,
+                  "physical_unit": "N*m^2/rad",
+                  "row_zero_based": 13,
+                  "signed_physical_residual": -4.5912606620908403e-07,
+                  "signed_scaled_residual": -0.00045912606620908403,
+                  "start_s": 0.25
+                },
+                {
+                  "absolute_physical_residual": 2.895312384296536e-07,
+                  "absolute_scaled_residual": 0.0002895312384296536,
+                  "constraint_name": "dynamics_5_12",
+                  "coordinate": "near.kappa_y_node_0",
+                  "end_s": 0.26,
+                  "interval_zero_based": 5,
+                  "kind": "generalized_force_balance",
+                  "normalization_denominator": 0.001,
+                  "physical_unit": "N*m^2/rad",
+                  "row_zero_based": 12,
+                  "signed_physical_residual": -2.895312384296536e-07,
+                  "signed_scaled_residual": -0.0002895312384296536,
+                  "start_s": 0.25
+                },
+                {
+                  "absolute_physical_residual": 2.894934278581396e-07,
+                  "absolute_scaled_residual": 0.0002894934278581396,
+                  "constraint_name": "dynamics_9_13",
+                  "coordinate": "near.kappa_y_node_1",
+                  "end_s": 0.30000000000000004,
+                  "interval_zero_based": 9,
+                  "kind": "generalized_force_balance",
+                  "normalization_denominator": 0.001,
+                  "physical_unit": "N*m^2/rad",
+                  "row_zero_based": 13,
+                  "signed_physical_residual": -2.894934278581396e-07,
+                  "signed_scaled_residual": -0.0002894934278581396,
+                  "start_s": 0.29000000000000004
+                },
+                {
+                  "absolute_physical_residual": 2.732720445243475e-07,
+                  "absolute_scaled_residual": 0.0002732720445243475,
+                  "constraint_name": "dynamics_8_16",
+                  "coordinate": "near.kappa_z_node_1",
+                  "end_s": 0.29000000000000004,
+                  "interval_zero_based": 8,
+                  "kind": "generalized_force_balance",
+                  "normalization_denominator": 0.001,
+                  "physical_unit": "N*m^2/rad",
+                  "row_zero_based": 16,
+                  "signed_physical_residual": -2.732720445243475e-07,
+                  "signed_scaled_residual": -0.0002732720445243475,
+                  "start_s": 0.28
+                },
+                {
+                  "absolute_physical_residual": 2.4058768064230684e-07,
+                  "absolute_scaled_residual": 0.00024058768064230684,
+                  "constraint_name": "dynamics_3_13",
+                  "coordinate": "near.kappa_y_node_1",
+                  "end_s": 0.24000000000000002,
+                  "interval_zero_based": 3,
+                  "kind": "generalized_force_balance",
+                  "normalization_denominator": 0.001,
+                  "physical_unit": "N*m^2/rad",
+                  "row_zero_based": 13,
+                  "signed_physical_residual": 2.4058768064230684e-07,
+                  "signed_scaled_residual": 0.00024058768064230684,
+                  "start_s": 0.23
+                },
+                {
+                  "absolute_physical_residual": 2.3222511588358308e-07,
+                  "absolute_scaled_residual": 0.00023222511588358308,
+                  "constraint_name": "dynamics_9_12",
+                  "coordinate": "near.kappa_y_node_0",
+                  "end_s": 0.30000000000000004,
+                  "interval_zero_based": 9,
+                  "kind": "generalized_force_balance",
+                  "normalization_denominator": 0.001,
+                  "physical_unit": "N*m^2/rad",
+                  "row_zero_based": 12,
+                  "signed_physical_residual": -2.3222511588358308e-07,
+                  "signed_scaled_residual": -0.00023222511588358308,
+                  "start_s": 0.29000000000000004
+                }
+              ],
+              "source_reference": {
+                "artifact_id": "b8849bb48a87ba8eccf5974d1272ffb49cfd705443cbfbd7e515b416f9f30bb3",
+                "media_type": "application/json"
+              },
+              "worst_force": {
+                "absolute_physical_residual": 7.145889734799793e-07,
+                "absolute_scaled_residual": 0.0007145889734799793,
+                "constraint_name": "dynamics_4_13",
+                "coordinate": "near.kappa_y_node_1",
+                "decomposition": {
+                  "difference": 0.0,
+                  "exact_implicit_residual": 7.145889734799793e-07,
+                  "method": "Inertial and velocity terms isolated from exact implicit residual at zero rate/acceleration; all contributions evaluated at following state.",
+                  "physical_unit": "N*m^2/rad",
+                  "signed_terms": {
+                    "damping": -0.0032116770768030956,
+                    "elastic": 0.0013829514559511554,
+                    "gravity": -0.003962653679989023,
+                    "inertial": -0.023352279709194873,
+                    "tendon": 0.022969126155809982,
+                    "velocity_dependent": 0.006175247443199334
+                  },
+                  "sum": 7.145889734799793e-07
+                },
+                "end_s": 0.25,
+                "interval_zero_based": 4,
+                "kind": "generalized_force_balance",
+                "normalization_denominator": 0.001,
+                "physical_unit": "N*m^2/rad",
+                "row_zero_based": 13,
+                "signed_physical_residual": 7.145889734799793e-07,
+                "signed_scaled_residual": 0.0007145889734799793,
+                "start_s": 0.24000000000000002
+              }
+            }
+          ],
+          "source_problem": {
+            "artifact_id": "b8849bb48a87ba8eccf5974d1272ffb49cfd705443cbfbd7e515b416f9f30bb3",
+            "media_type": "application/json"
+          },
+          "threshold": 1e-05,
+          "time_s": 0.2,
+          "update_id": 20,
+          "variable_order_verified": true
+        }
+      ],
+      "costs_s": {
+        "total": 27.43195499997819
+      },
+      "feasibility_operation": "inspect_residuals",
+      "interpretation": "Exact original discretized equations; generalized force defects do not bound trajectory error; unchanged threshold1e-5.",
+      "new_nlp_attempts": 0,
+      "source_binding": {
+        "artifact_id": "b91d6cd639b622f39bf9498950523c95f0a4b734c243a87dc68ef8453e63282d",
+        "media_type": "application/json"
+      },
+      "status": "completed"
+    },
+    {
+      "operation": "reintegrate_saved_tensions",
+      "reference": {
+        "artifact_id": "2456fa4af4666ccab570f8e547ff15ccaf5b87923131f3145dc4e6e185a41dc4",
+        "media_type": "application/json"
+      },
+      "actual_cost_s": 15.251874900015537,
+      "actual_executed_input_n": null,
+      "costs_s": {
+        "integration": 4.520101900037844,
+        "preparation": 9.351047699979972,
+        "total": 14.219284199993126,
+        "verification": 0.11594990000594407
+      },
+      "error": null,
+      "feasibility_operation": "reintegrate_saved_tensions",
+      "implementation": "3535db738326f9adb117fcb10527736060007757",
+      "new_nlp_attempts": 0,
+      "numerical_reference": {
+        "artifact_id": "22440796b402cf9b346b06b57d3355868a777fd8981b3874dc1a6bbb3a47abb9",
+        "media_type": "application/json"
+      },
+      "original_solver": {
+        "iterations": 18,
+        "raw_status": "User_Requested_Stop",
+        "status": "feasible_early_stop"
+      },
+      "outcome": {
+        "closed_loop_validated": false,
+        "feasible": true,
+        "finite": true,
+        "horizon_end_position_improved": true,
+        "horizon_end_speed_improved": true,
+        "lower_cost_than_selected": true,
+        "objective_change_from_rejected": -0.045552633265224074
+      },
+      "plan_label": "returned",
+      "root_solve_attempts": 10,
+      "scope": "Consistency within original discretized model; no independent simulation/continuous-time validation.",
+      "source_pointer": "/snapshot/plans/returned",
+      "source_problem": {
+        "artifact_id": "1074959ef843e7b79b6c14ffad293cd8b8a098ca57a95b55fc237a25835970cc",
+        "media_type": "application/json"
+      },
+      "source_snapshot_id": "b234577af8da07093e3563c4ef3aaa79ab19e3ba6477677ea8dcececd15e9c0f",
+      "state_changes": {
+        "q_linf_rad_m": 0.008359303277955643,
+        "qdot_linf_rad_m_s": 0.4598204690104808
+      },
+      "status": "completed",
+      "tensions_exactly_preserved": true,
+      "timing_exactly_preserved": true,
+      "worker_log_reference": {
+        "artifact_id": "63be7e41e020bc00ee1c7926929730c6f0a0b9c0c3d83427c76eb5acfba8dc67",
+        "media_type": "application/json"
+      },
+      "regenerated": {
+        "metrics": {
+          "deadline": null,
+          "deadline_status": "outside_recorded_horizon",
+          "first_input_n": [
+            7.708171232087982,
+            7.933365211483741,
+            0.040117942774017444,
+            7.969713805871028,
+            7.8972596067174345,
+            0.02213355296564737
+          ],
+          "first_step": {
+            "position_error_m": 0.17334143031300153,
+            "time_s": 0.21000000000000002,
+            "tip_position_m": [
+              0.26332721875440146,
+              0.010628603245795648,
+              0.02046578745329669
+            ],
+            "tip_speed_m_s": 0.7099085509817762,
+            "tip_velocity_m_s": [
+              0.4629703944561192,
+              0.05241234592271933,
+              0.535613209890372
+            ]
+          },
+          "horizon_interval_s": [
+            0.2,
+            0.30000000000000004
+          ],
+          "input_max_n": [
+            7.708171232087982,
+            7.933365211483741,
+            7.968537224837312,
+            7.969713805871028,
+            7.8972596067174345,
+            7.946447916893008
+          ],
+          "input_min_n": [
+            0.6123679301895697,
+            0.0033546301228146724,
+            0.040117942774017444,
+            0.113210596108026,
+            0.5681303638907832,
+            0.02213355296564737
+          ],
+          "terminal": {
+            "position_error_m": 0.004818508931420792,
+            "time_s": 0.30000000000000004,
+            "tip_position_m": [
+              0.2899682551276589,
+              0.03480340343986955,
+              0.1851856079950001
+            ],
+            "tip_speed_m_s": 0.10230541790371309,
+            "tip_velocity_m_s": [
+              0.08400668889324207,
+              -0.008742382181738426,
+              0.057730802068184026
+            ]
+          }
+        },
+        "objective_components": {
+          "holding_tip_speed": 0.013082998165566725,
+          "running_curvature_rate": 2.3287456445723516,
+          "running_position": 9.187040253092231,
+          "running_tension": 0.0017292907964771749,
+          "running_tension_variation": 0.0045823232605572166,
+          "terminal_curvature_rate": 6.947804587504505,
+          "terminal_position": 1.1609014161090971,
+          "terminal_tip_speed": 2.616599633113345,
+          "total": 22.260486146614127
+        },
+        "verification": {
+          "feasible": true,
+          "named_residuals": {
+            "dynamics_equalities": {
+              "max_scaled_residual": 8.777700788442644e-13,
+              "violations_over_1e_5": 0,
+              "worst": {
+                "name": "dynamics_9_13",
+                "scaled_residual": 8.777700788442644e-13
+              }
+            },
+            "initial_state_consistency": {
+              "max_scaled_residual": 0.0,
+              "violations_over_1e_5": 0,
+              "worst": {
+                "name": "x/0/0",
+                "scaled_residual": 0.0
+              }
+            },
+            "variable_bounds": {
+              "max_scaled_residual": 0.0,
+              "violations_over_1e_5": 0,
+              "worst": {
+                "name": "x/0/0",
+                "scaled_residual": 0.0
+              }
+            }
+          },
+          "objective": 22.260486146614134,
+          "scaled_violation": 8.777700788442644e-13
+        }
+      },
+      "original_selected": {
+        "metrics": {
+          "deadline": null,
+          "deadline_status": "outside_recorded_horizon",
+          "first_input_n": [
+            0.2,
+            0.2,
+            0.2,
+            0.2,
+            0.2,
+            0.2
+          ],
+          "first_step": {
+            "position_error_m": 0.18335173202642793,
+            "time_s": 0.21000000000000002,
+            "tip_position_m": [
+              0.25522590510687815,
+              0.01130689739758624,
+              0.011542002559350978
+            ],
+            "tip_speed_m_s": 0.504787502636009,
+            "tip_velocity_m_s": [
+              -0.29038086061565754,
+              0.1165330778927977,
+              -0.3961179374409092
+            ]
+          },
+          "horizon_interval_s": [
+            0.2,
+            0.30000000000000004
+          ],
+          "input_max_n": [
+            0.2,
+            0.2,
+            0.2,
+            0.2,
+            0.2,
+            0.2
+          ],
+          "input_min_n": [
+            0.2,
+            0.2,
+            0.2,
+            0.2,
+            0.2,
+            0.2
+          ],
+          "terminal": {
+            "position_error_m": 0.18044854420779968,
+            "time_s": 0.30000000000000004,
+            "tip_position_m": [
+              0.255315922549178,
+              0.017963477987473546,
+              0.013737557046839044
+            ],
+            "tip_speed_m_s": 0.36788167193139326,
+            "tip_velocity_m_s": [
+              0.2011371689631054,
+              0.019080502405199647,
+              0.30743568145631633
+            ]
+          }
+        },
+        "objective_components": {
+          "holding_tip_speed": 0.16917115567879654,
+          "running_curvature_rate": 0.004755560092844297,
+          "running_position": 34.95725462149024,
+          "running_tension": 2.400000000000001e-06,
+          "running_tension_variation": 0.0,
+          "terminal_curvature_rate": 0.03647811675769534,
+          "terminal_position": 1628.0838553357116,
+          "terminal_tip_speed": 33.83423113575931,
+          "total": 1697.0857483254908
+        },
+        "verification": {
+          "feasible": true,
+          "named_residuals": {
+            "dynamics_equalities": {
+              "max_scaled_residual": 2.927345865710862e-14,
+              "violations_over_1e_5": 0,
+              "worst": {
+                "name": "dynamics_4_14",
+                "scaled_residual": 2.927345865710862e-14
+              }
+            },
+            "initial_state_consistency": {
+              "max_scaled_residual": 0.0,
+              "violations_over_1e_5": 0,
+              "worst": {
+                "name": "x/0/0",
+                "scaled_residual": 0.0
+              }
+            },
+            "variable_bounds": {
+              "max_scaled_residual": 0.0,
+              "violations_over_1e_5": 0,
+              "worst": {
+                "name": "x/0/0",
+                "scaled_residual": 0.0
+              }
+            }
+          },
+          "objective": 1697.0857483254906,
+          "scaled_violation": 2.927345865710862e-14
+        }
+      },
+      "original_rejected": {
+        "metrics": {
+          "deadline": null,
+          "deadline_status": "outside_recorded_horizon",
+          "first_input_n": [
+            7.708171232087982,
+            7.933365211483741,
+            0.040117942774017444,
+            7.969713805871028,
+            7.8972596067174345,
+            0.02213355296564737
+          ],
+          "first_step": {
+            "position_error_m": 0.17334186297353238,
+            "time_s": 0.21000000000000002,
+            "tip_position_m": [
+              0.2633266508757184,
+              0.01062923889418013,
+              0.0204653430452873
+            ],
+            "tip_speed_m_s": 0.7098461260683409,
+            "tip_velocity_m_s": [
+              0.4629323056251414,
+              0.05247556488811691,
+              0.5355572034736296
+            ]
+          },
+          "horizon_interval_s": [
+            0.2,
+            0.30000000000000004
+          ],
+          "input_max_n": [
+            7.708171232087982,
+            7.933365211483741,
+            7.968537224837312,
+            7.969713805871028,
+            7.8972596067174345,
+            7.946447916893008
+          ],
+          "input_min_n": [
+            0.6123679301895697,
+            0.0033546301228146724,
+            0.040117942774017444,
+            0.113210596108026,
+            0.5681303638907832,
+            0.02213355296564737
+          ],
+          "terminal": {
+            "position_error_m": 0.00504527763239229,
+            "time_s": 0.30000000000000004,
+            "tip_position_m": [
+              0.29000906766063433,
+              0.03477037954775048,
+              0.1849599584710682
+            ],
+            "tip_speed_m_s": 0.10111618926984874,
+            "tip_velocity_m_s": [
+              0.08415786169090829,
+              -0.008900682818158544,
+              0.05534180963286585
+            ]
+          }
+        },
+        "objective_components": {
+          "holding_tip_speed": 0.012780604665569842,
+          "running_curvature_rate": 2.3277781696627127,
+          "running_position": 9.191244170432915,
+          "running_tension": 0.0017292907964771749,
+          "running_tension_variation": 0.0045823232605572166,
+          "terminal_curvature_rate": 6.939061968551258,
+          "terminal_position": 1.2727413193958976,
+          "terminal_tip_speed": 2.5561209331139683,
+          "total": 22.306038779879355
+        },
+        "verification": {
+          "feasible": false,
+          "named_residuals": {
+            "dynamics_equalities": {
+              "max_scaled_residual": 0.042687068291809294,
+              "violations_over_1e_5": 120,
+              "worst": {
+                "name": "dynamics_3_13",
+                "scaled_residual": 0.042687068291809294
+              }
+            },
+            "initial_state_consistency": {
+              "max_scaled_residual": 0.0,
+              "violations_over_1e_5": 0,
+              "worst": {
+                "name": "x/0/0",
+                "scaled_residual": 0.0
+              }
+            },
+            "variable_bounds": {
+              "max_scaled_residual": 0.0,
+              "violations_over_1e_5": 0,
+              "worst": {
+                "name": "x/0/0",
+                "scaled_residual": 0.0
+              }
+            }
+          },
+          "objective": 22.30603877987936,
+          "scaled_violation": 0.042687068291809294
+        }
+      }
+    },
+    {
+      "operation": "closed_loop",
+      "reference": {
+        "artifact_id": "a370a238d80c88a23e0a1272d9d288c2d1bea9e073cd231404e594724e280bb5",
+        "media_type": "application/json"
+      },
+      "status": "evaluated",
+      "costs_s": {
+        "construction": 0.37643579998984933,
+        "evaluation": 2.125,
+        "profile": 2.2810000000172295,
+        "simulation": 548.170999999973,
+        "total": 552.9534357999801
+      },
+      "acceptance": {
+        "accepted": false,
+        "components": {
+          "evaluation_validity": {
+            "limit": null,
+            "passed": true,
+            "reason": null,
+            "unit": null,
+            "value": "valid"
+          },
+          "evaluator:task_bound": {
+            "limit": 0.01,
+            "passed": true,
+            "reason": null,
+            "unit": "m",
+            "value": 0.0030163974451366277
+          },
+          "execution_complete": {
+            "limit": null,
+            "passed": true,
+            "reason": null,
+            "unit": null,
+            "value": true
+          },
+          "force_bounds": {
+            "limit": 1e-08,
+            "passed": true,
+            "reason": null,
+            "unit": "N",
+            "value": 0.0
+          },
+          "holding_coverage": {
+            "limit": 6,
+            "passed": true,
+            "reason": null,
+            "unit": "inclusive uniform samples",
+            "value": true
+          },
+          "holding_position": {
+            "limit": 0.01,
+            "passed": true,
+            "reason": null,
+            "unit": "m",
+            "value": 0.0034642672133837057
+          },
+          "holding_speed": {
+            "limit": 0.02,
+            "passed": false,
+            "reason": null,
+            "unit": "m/s",
+            "value": 0.02464272165060832
+          },
+          "solver_errors": {
+            "limit": 0,
+            "passed": true,
+            "reason": null,
+            "unit": "count",
+            "value": 0
+          },
+          "task_evaluator": {
+            "limit": null,
+            "passed": true,
+            "reason": null,
+            "unit": null,
+            "value": true
+          }
+        },
+        "continuous_time_guarantee": false,
+        "contract": "research.task_acceptance",
+        "evaluator_tension_channels": null,
+        "evidence_binding": {
+          "evaluation": {
+            "artifact_id": "0bd7200b9641e3d4574e3728bcb3720e5040ddae0fb05cc9243c05580e6db7aa",
+            "media_type": "application/json"
+          },
+          "evaluation_binding": {
+            "original_execution_id": "cda6509a699545d7b59b9be854c60d08",
+            "source": {
+              "artifact_id": "983ebc095d488357d3bf663e404e94ae649be9015740b0d225672153e799f1e5",
+              "media_type": "application/json"
+            },
+            "source_execution_id": "cda6509a699545d7b59b9be854c60d08"
+          },
+          "profile": {
+            "artifact_id": "e8b81453953cc886e9ad1e25b061adad4330d99f701e15850dc3ae8a55f00d16",
+            "media_type": "application/json"
+          },
+          "profile_binding": {
+            "evaluation": {
+              "artifact_id": "0bd7200b9641e3d4574e3728bcb3720e5040ddae0fb05cc9243c05580e6db7aa",
+              "media_type": "application/json"
+            },
+            "execution_id": "cda6509a699545d7b59b9be854c60d08",
+            "simulation": {
+              "artifact_id": "983ebc095d488357d3bf663e404e94ae649be9015740b0d225672153e799f1e5",
+              "media_type": "application/json"
+            }
+          },
+          "simulation": {
+            "artifact_id": "983ebc095d488357d3bf663e404e94ae649be9015740b0d225672153e799f1e5",
+            "media_type": "application/json"
+          }
+        },
+        "execution_id": "cda6509a699545d7b59b9be854c60d08",
+        "issues": [],
+        "metrics": {
+          "holding_max_error_m": 0.0034642672133837057,
+          "holding_max_speed_m_s": 0.02464272165060832,
+          "terminal_error_m": 0.0030163974451366277
+        },
+        "missing": [],
+        "protocol_id": "offline_reach_hold_v1",
+        "sources": {
+          "evaluation": {
+            "artifact_id": "0bd7200b9641e3d4574e3728bcb3720e5040ddae0fb05cc9243c05580e6db7aa",
+            "media_type": "application/json"
+          },
+          "profile": {
+            "artifact_id": "e8b81453953cc886e9ad1e25b061adad4330d99f701e15850dc3ae8a55f00d16",
+            "media_type": "application/json"
+          }
+        },
+        "status": "valid_failure",
+        "task_family": "task.reach",
+        "task_identity": "2b26edb492214c426263441b6adb52d7aafe41a828436d6b48a1171374a1026c",
+        "timing": {
+          "control_period_s": 0.01,
+          "deadline_misses": 35,
+          "duration_s": 0.35,
+          "mean_update_s": 15.431516122866222,
+          "real_time_demonstrated": false,
+          "real_time_required": false,
+          "sample_period_s": 0.01,
+          "simulation_wall_s": 548.170999999973,
+          "termination": [
+            "duration",
+            "numerical_failure"
+          ],
+          "timestep_s": 0.0005
+        },
+        "version": "1.0.0"
+      },
+      "control": {
+        "candidate": {
+          "artifact_id": "0e16077e9183ebcd64729eb982aa5a73e5eb03e111d5d7ed402552ca16db345b",
+          "media_type": "application/json"
+        },
+        "feasible_return_budget_s": 15.0,
+        "holding_tip_speed_weight": 0.05,
+        "preceding_execution": {
+          "artifact_id": "c98d59c56637081f80228d07f031b13376ff61997fdab85e56f6cd347718c413",
+          "media_type": "application/json"
+        },
+        "record_update_ids": [
+          20
+        ],
+        "recover_returned_tensions": true,
+        "substeps": 1,
+        "terminal_tip_speed_weight": 0.1
+      },
+      "revision": {
+        "attribution": "No unique causal attribution; changed structure and control are jointly reported.",
+        "changed_factors": [
+          "control"
+        ],
+        "exact_parameter_changes": {
+          "recover_returned_tensions": {
+            "after": true,
+            "before": false
+          }
+        },
+        "exact_weight_changes": {},
+        "preceding_execution": {
+          "artifact_id": "c98d59c56637081f80228d07f031b13376ff61997fdab85e56f6cd347718c413",
+          "media_type": "application/json"
+        }
+      },
+      "resolved_configuration": {
+        "artifact_id": "cd0beae77a895bbb76059da5fb1364358666638412aeb6f8a2dd7b86f1e54e7f",
+        "media_type": "application/json"
+      },
+      "wiring_reference": {
+        "artifact_id": "728d3ab4734064b3bb0c4dfe1c0dd09ec70abc97f58923988c66325999507c0a",
+        "media_type": "application/json"
+      },
+      "holding_motion": [
+        {
+          "contacts": 0,
+          "rate_projection_residual_rad_m_s": 3.822645024089736,
+          "time_s": 0.3,
+          "tip_error_m": 0.0034642672133837057,
+          "tip_position_m": [
+            0.2884867205314278,
+            0.03635160777563895,
+            0.1928078976114801
+          ],
+          "tip_speed_m_s": 0.02049382464772689,
+          "tip_velocity_m_s": [
+            0.015507759410276649,
+            -0.0002349140638053214,
+            -0.013395934538037304
+          ],
+          "velocity_error_m_s": 0.02049382464772689
+        },
+        {
+          "contacts": 0,
+          "rate_projection_residual_rad_m_s": 3.963794966443256,
+          "time_s": 0.31,
+          "tip_error_m": 0.003263144273239297,
+          "tip_position_m": [
+            0.2886388314260036,
+            0.036334716800453304,
+            0.19264836963502582
+          ],
+          "tip_speed_m_s": 0.02464272165060832,
+          "tip_velocity_m_s": [
+            0.01536805496805064,
+            -0.0028850294230675193,
+            -0.01904634406064242
+          ],
+          "velocity_error_m_s": 0.02464272165060832
+        },
+        {
+          "contacts": 0,
+          "rate_projection_residual_rad_m_s": 3.966765494179608,
+          "time_s": 0.32,
+          "tip_error_m": 0.003088198227357137,
+          "tip_position_m": [
+            0.2887479849388431,
+            0.0363053131202335,
+            0.19250311490671812
+          ],
+          "tip_speed_m_s": 0.015919994564079967,
+          "tip_velocity_m_s": [
+            0.008700076823261913,
+            -0.0032783992500429737,
+            -0.012923118375492593
+          ],
+          "velocity_error_m_s": 0.015919994564079967
+        },
+        {
+          "contacts": 0,
+          "rate_projection_residual_rad_m_s": 3.6033562215414334,
+          "time_s": 0.33,
+          "tip_error_m": 0.003020490221409683,
+          "tip_position_m": [
+            0.288766733126747,
+            0.03629773208379698,
+            0.19243275675636762
+          ],
+          "tip_speed_m_s": 0.006112427612270553,
+          "tip_velocity_m_s": [
+            -0.001061254965371538,
+            1.0835953804955861e-05,
+            -0.006019584021826332
+          ],
+          "velocity_error_m_s": 0.006112427612270553
+        },
+        {
+          "contacts": 0,
+          "rate_projection_residual_rad_m_s": 3.129193499106689,
+          "time_s": 0.34,
+          "tip_error_m": 0.0029956874979937824,
+          "tip_position_m": [
+            0.28873235050064155,
+            0.03630448545749555,
+            0.1923802365478236
+          ],
+          "tip_speed_m_s": 0.007305601376065319,
+          "tip_velocity_m_s": [
+            -0.004744887130035959,
+            0.0008818654160883382,
+            -0.005484539267531407
+          ],
+          "velocity_error_m_s": 0.007305601376065319
+        },
+        {
+          "contacts": 0,
+          "rate_projection_residual_rad_m_s": 2.704899337674056,
+          "time_s": 0.35000000000000003,
+          "tip_error_m": 0.0030163974451366277,
+          "tip_position_m": [
+            0.28865949203519287,
+            0.036320103624761665,
+            0.19235775706195668
+          ],
+          "tip_speed_m_s": 0.008933600877066154,
+          "tip_velocity_m_s": [
+            -0.008776400144445525,
+            0.0016683953969544923,
+            2.1953011519668802e-05
+          ],
+          "velocity_error_m_s": 0.008933600877066154
+        }
+      ],
+      "sampling": {
+        "closed_loop_s": 0.01,
+        "continuous_time_guarantee": false,
+        "historical_bdf_s": 0.0005,
+        "holding_endpoint_included": true
+      },
+      "unknowns": [],
+      "failure_categories": [
+        "scientific_failure"
+      ],
+      "partial_feedback": null,
+      "execution_references": {
+        "executed_configuration": {
+          "artifact_id": "bfc894a176d358b0823dde3d4ec6163cbeca79153a444d9e57d5d5738a1a68b3",
+          "media_type": "application/json"
+        },
+        "execution_id": "cda6509a699545d7b59b9be854c60d08",
+        "owner_run_id": "nmpc-feasibility-20261011-cl-6d9b9cdfaf69",
+        "receipts": {
+          "evaluation": {
+            "analysis_status": "valid",
+            "cache_hit": false,
+            "caller": "casadi-feedback-research",
+            "charged": {
+              "backend_solves": 0,
+              "model_calls": 0,
+              "tool_calls": 1,
+              "wall_s": 2.125,
+              "worker_calls": 0
+            },
+            "contract_version": "1.2.0",
+            "error": null,
+            "execution_id": "0a6ae1776c32437188154a9fc9968fc6",
+            "execution_status": "completed",
+            "original_execution_id": null,
+            "output": {
+              "artifact_id": "0bd7200b9641e3d4574e3728bcb3720e5040ddae0fb05cc9243c05580e6db7aa",
+              "media_type": "application/json"
+            },
+            "request_id": "complete-evaluation",
+            "result_contract": "EvaluationResult",
+            "result_version": "1.2.0",
+            "solver_status": "not_run",
+            "task_success": true,
+            "tool_id": "evaluation.run",
+            "tool_version": "1.0.0"
+          },
+          "profile": {
+            "analysis_status": "not_assessed",
+            "cache_hit": false,
+            "caller": "casadi-feedback-research",
+            "charged": {
+              "backend_solves": 0,
+              "model_calls": 0,
+              "tool_calls": 1,
+              "wall_s": 2.2810000000172295,
+              "worker_calls": 0
+            },
+            "contract_version": "1.2.0",
+            "error": null,
+            "execution_id": "35d8c38fd872421482eb417cc87e9921",
+            "execution_status": "completed",
+            "original_execution_id": null,
+            "output": {
+              "artifact_id": "e8b81453953cc886e9ad1e25b061adad4330d99f701e15850dc3ae8a55f00d16",
+              "media_type": "application/json"
+            },
+            "request_id": "complete-profile",
+            "result_contract": "ProfileOutput",
+            "result_version": "1.0.0",
+            "solver_status": "not_run",
+            "task_success": null,
+            "tool_id": "control.profile_report",
+            "tool_version": "1.0.0"
+          },
+          "simulation": {
+            "analysis_status": "not_assessed",
+            "cache_hit": false,
+            "caller": "casadi-feedback-research",
+            "charged": {
+              "backend_solves": 1,
+              "model_calls": 0,
+              "tool_calls": 1,
+              "wall_s": 548.170999999973,
+              "worker_calls": 0
+            },
+            "contract_version": "1.2.0",
+            "error": null,
+            "execution_id": "cda6509a699545d7b59b9be854c60d08",
+            "execution_status": "completed",
+            "original_execution_id": "cda6509a699545d7b59b9be854c60d08",
+            "output": {
+              "artifact_id": "983ebc095d488357d3bf663e404e94ae649be9015740b0d225672153e799f1e5",
+              "media_type": "application/json"
+            },
+            "request_id": "complete-simulation",
+            "result_contract": "BackendResult",
+            "result_version": "1.0.0",
+            "solver_status": "completed",
+            "task_success": null,
+            "tool_id": "simulation.run",
+            "tool_version": "1.0.0"
+          }
+        }
+      },
+      "actual_duration_s": 0.35000000000000003,
+      "completed_control_updates": 35,
+      "nmpc_internal_solves": 35,
+      "offline_nlp_slots_charged": 0,
+      "control_model_feedback": {
+        "accepted_noninitialization_plans": 32,
+        "accepted_plans": 35,
+        "applied_control_updates": 35,
+        "backend_timings_s": {
+          "backend_call": 540.9591573000071,
+          "engine_compile": 0.03645139996660873,
+          "prepare_compile": 0.20715309999650344,
+          "solve": 540.4267284999951
+        },
+        "candidate_id": "nmpc-feasibility-20261011-cl-6d9b9cdfaf69",
+        "complete": true,
+        "configuration": {
+          "artifact_id": "bfc894a176d358b0823dde3d4ec6163cbeca79153a444d9e57d5d5738a1a68b3",
+          "media_type": "application/json"
+        },
+        "converged_updates": 0,
+        "deadline_misses": 35,
+        "diagnostic_hypotheses": [],
+        "diagnostic_limitations": [
+          "Sampled observations do not identify a dominant cause.",
+          "Force proximity alone does not imply a required physical design change.",
+          "Ideal tensions; omitted shear, stretch, torsion, tendon friction and actuator dynamics."
+        ],
+        "drive_utilization": [
+          {
+            "limit_n": 8.0,
+            "maximum_n": 3.992974775683009,
+            "minimum_n": 2.8815627585484367,
+            "near_upper_fraction": 0.0,
+            "near_zero_fraction": 0.0,
+            "tendon": "near_t0",
+            "tendon_index": 0
+          },
+          {
+            "limit_n": 8.0,
+            "maximum_n": 4.679133996314275,
+            "minimum_n": 3.3845751602272722,
+            "near_upper_fraction": 0.0,
+            "near_zero_fraction": 0.0,
+            "tendon": "near_t1",
+            "tendon_index": 1
+          },
+          {
+            "limit_n": 8.0,
+            "maximum_n": 1.830877840304023,
+            "minimum_n": 0.21145763181075772,
+            "near_upper_fraction": 0.0,
+            "near_zero_fraction": 0.0,
+            "tendon": "near_t2",
+            "tendon_index": 2
+          },
+          {
+            "limit_n": 8.0,
+            "maximum_n": 5.5741021341906904,
+            "minimum_n": 2.332174108504794,
+            "near_upper_fraction": 0.0,
+            "near_zero_fraction": 0.0,
+            "tendon": "far_t0",
+            "tendon_index": 3
+          },
+          {
+            "limit_n": 8.0,
+            "maximum_n": 3.2222236018316064,
+            "minimum_n": 1.5274706044380504,
+            "near_upper_fraction": 0.0,
+            "near_zero_fraction": 0.0,
+            "tendon": "far_t1",
+            "tendon_index": 4
+          },
+          {
+            "limit_n": 8.0,
+            "maximum_n": 2.8093616207990397,
+            "minimum_n": 0.48794524234616576,
+            "near_upper_fraction": 0.0,
+            "near_zero_fraction": 0.0,
+            "tendon": "far_t2",
+            "tendon_index": 5
+          }
+        ],
+        "early_stopped_plans": 35,
+        "error_phases": [
+          {
+            "final_error_m": 0.003407193549138681,
+            "interval_s": [
+              0.0,
+              0.11666666666666665
+            ],
+            "maximum_error_m": 0.049406097237787015
+          },
+          {
+            "final_error_m": 0.003678766036641834,
+            "interval_s": [
+              0.11666666666666665,
+              0.2333333333333333
+            ],
+            "maximum_error_m": 0.004394173477115341
+          },
+          {
+            "final_error_m": 0.0030163974451366277,
+            "interval_s": [
+              0.2333333333333333,
+              0.35
+            ],
+            "maximum_error_m": 0.0035878224303303972
+          }
+        ],
+        "evaluation": {
+          "artifact_id": "0bd7200b9641e3d4574e3728bcb3720e5040ddae0fb05cc9243c05580e6db7aa",
+          "media_type": "application/json"
+        },
+        "evaluation_validity": "valid",
+        "execution_failure_reason": null,
+        "execution_id": "cda6509a699545d7b59b9be854c60d08",
+        "force_bound_violation_n": 0.0,
+        "graph_construction_s": 3.2827357999631204,
+        "hold_last_responses": 0,
+        "initialization_selected": 3,
+        "last_valid_error_m": 0.0030163974451366277,
+        "last_valid_time_s": 0.35000000000000003,
+        "max_projection_residual_rad_m": 1.7119834363221602,
+        "max_rate_projection_residual_rad_m_s": 19.95088796254611,
+        "max_sampled_contacts": 0,
+        "maximum_error_m": 0.049406097237787015,
+        "maximum_plan_violation": 9.836524339685866e-06,
+        "mean_numerical_solve_s": 8.8341729257156,
+        "mean_preparation_s": 5.304388785709826,
+        "mean_recovery_integration_s": 0.6935692657151127,
+        "mean_recovery_s": 0.7116714714294565,
+        "mean_recovery_validation_s": 0.01809344571416399,
+        "mean_update_s": 15.431516122866222,
+        "mean_validation_s": 0.20813502572044465,
+        "minimum_error_m": 0.0018085018378509472,
+        "motion": {
+          "artifact_id": "5491399634416b2ab636cb758ef6b0739ea9272d7ea93a89d5b2cf4f03b19245",
+          "media_type": "application/json"
+        },
+        "motion_summary": {
+          "entered_tolerance_earlier_but_ended_outside": false,
+          "error_convention": "actual_tip minus target; world frame",
+          "late_change_definition": "last sampled error minus first sampled error in stated interval",
+          "late_error_change_m": -0.000447869768247078,
+          "late_interval_s": [
+            0.3,
+            0.35
+          ],
+          "late_sample_interval_s": [
+            0.3,
+            0.35000000000000003
+          ],
+          "minimum_sampled_error_m": 0.0018085018378509472,
+          "minimum_sampled_error_time_s": 0.09,
+          "scope": "Sampled observations, not continuous-time guarantees or new acceptance criteria.",
+          "signed_terminal_position_error_m": [
+            -0.0013405079648071139,
+            0.001320103624761662,
+            0.002357757061956678
+          ],
+          "terminal_error_m": 0.0030163974451366277,
+          "terminal_tip_speed_m_s": 0.008933600877066154,
+          "tolerance_m": 0.01
+        },
+        "official_task_success": true,
+        "one_step_prediction_evidence": {
+          "artifact_id": "820fe5b3795d03764c376489b0b2299479ff72e392dab2540ae0a33b79b22547",
+          "media_type": "application/json"
+        },
+        "one_step_prediction_summary": {
+          "aligned_count": 35,
+          "frame": "world",
+          "maximum_speed_magnitude_difference_m_s": 0.08729621065100124,
+          "maximum_tip_difference_m": 0.0035762538464629554,
+          "maximum_velocity_vector_difference_m_s": 0.08802054619997453,
+          "mean_tip_difference_m": 0.002831834386842173,
+          "missing": [],
+          "scope": "Only accepted first-step predictions matched to next execution timestamp; no future-plan replay comparison",
+          "velocity_matched_count": 35,
+          "velocity_missing": []
+        },
+        "optimization_status_counts": {
+          "feasible_early_stop": 35
+        },
+        "other_feasible_deliveries": 29,
+        "per_update_delivery_s": [
+          44.36455460003344,
+          28.36285690002842,
+          25.540118699951563,
+          26.48720760003198,
+          17.302302500000224,
+          20.631361399951857,
+          15.545171899953857,
+          13.759620500029996,
+          15.157708899991121,
+          13.94673690001946,
+          14.299508200027049,
+          13.873094899987336,
+          14.095837500004563,
+          25.17890650004847,
+          13.87313369999174,
+          12.488906200043857,
+          22.13632829999551,
+          12.397832400049083,
+          12.373376299976371,
+          13.88747090002289,
+          18.809984499996062,
+          12.546753100003116,
+          12.516188200039323,
+          26.012611900048796,
+          12.4067438999773,
+          14.020784500055015,
+          11.722412000002805,
+          10.6044666999951,
+          11.47871589998249,
+          10.285195600008592,
+          9.606923300016206,
+          7.92867000005208,
+          3.434764500008896,
+          1.8064358999836259,
+          1.2203795000095852
+        ],
+        "policy_stop_reason_counts": {
+          "budget_best_feasible": 6,
+          "relative_seed_improvement": 26,
+          "verified_settled_seed": 3
+        },
+        "raw_termination_counts": {
+          "User_Requested_Stop": 35
+        },
+        "real_time_demonstrated": false,
+        "recovered_plans": 6,
+        "recovery_attempts": 6,
+        "recovery_failures": 0,
+        "recovery_root_solves": 60,
+        "sampled_settling": {
+          "available": true,
+          "continuous_time_guarantee": false,
+          "max_error_m": 0.0034642672133837057,
+          "max_speed_m_s": 0.02464272165060832,
+          "passed": false,
+          "position_limit_m": 0.01,
+          "speed_limit_m_s": 0.02,
+          "window_s": 0.05
+        },
+        "simulation": {
+          "artifact_id": "983ebc095d488357d3bf663e404e94ae649be9015740b0d225672153e799f1e5",
+          "media_type": "application/json"
+        },
+        "simulation_wall_s": 548.170999999973,
+        "solver_construction_s": 8.247216499992646,
+        "solver_error_count": 0,
+        "solver_failure_flags": 0,
+        "solver_status": "completed",
+        "tension_range_n": [
+          0.21145763181075772,
+          5.5741021341906904
+        ],
+        "terminal_error_m": 0.0030163974451366277,
+        "terminal_position_m": [
+          0.28865949203519287,
+          0.036320103624761665,
+          0.19235775706195668
+        ],
+        "terminal_tip_speed_m_s": 0.008933600877066154,
+        "unusable_plans": 0,
+        "updates": 35,
+        "valid_complete_execution": true
+      }
+    }
+  ],
+  "remaining_budget": {
+    "numerical_s": 2981.583347000039,
+    "nlp_solves": 0,
+    "independent_replays": 0,
+    "provider_requests": 13,
+    "protected_provider_sends": 4,
+    "public_tool_calls": 56,
+    "backend_launches": 0,
+    "activity_s": 19417.258357048035,
+    "scientific_window_s": 17617.258357048035,
+    "saved_regenerations": 1,
+    "new_local_nlp_attempts": 2,
+    "post_regeneration_steps": 0
+  },
+  "capabilities": {
+    "inspect_residuals": "Reuse exact residual audit; no NLP",
+    "reintegrate_saved_tensions": "180s unchanged schedule consistency check with existing implicit root finder",
+    "warm_start_comparison": "300s combined cold versus explicit regenerated warm seed; post-solve recovery disabled",
+    "control_revision": "Only recovery flag false->true; actual saved candidate configuration propagated into new simulation",
+    "stop": "May stop without simulation; cite all new results, no provider sends afterward"
+  }
+}

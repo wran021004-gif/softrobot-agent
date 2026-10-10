@@ -1,0 +1,58 @@
+{
+  "action": "stop",
+  "candidates": [],
+  "comparison": null,
+  "control": null,
+  "diagnostic_candidate": null,
+  "disposition": "STOP, citing the four separated evidence layers and keeping the original disposition separate from factual corrections. (1) Original NLP progress: at update 20 the 15 s arm's solve stopped at iteration 18 by policy (raw User_Requested_Stop, status feasible_early_stop) with returned objective 22.30603877987936 and 120/120 generalized-force rows above the 1e-5 scaled threshold (worst dynamics_3_13, near.kappa_y_node_1, [0.23,0.24) s, physical 4.2687068291809294e-05 N*m^2/rad, scaled 0.042687068291809294); the 30 s arm reached scaled 9.536e-4 at iteration 37. Neither selected a better feasible plan at the time; that is a local selection outcome, not \"every improved candidate was infeasible\" in general. (2) Restored discretized numerical feasibility: regenerating the same returned tensions with the existing implicit root finder (tensions_exactly_preserved true, timing_exactly_preserved true, root_solve_attempts 10, state L-infinity changes q 0.008359303277955643 rad/m and qdot 0.4598204690104808 rad/m/s) gives max scaled dynamics residual 8.777700788442644e-13 with 0 rows above 1e-5, feasible true. (3) Objective/physical improvement after regeneration: 22.30603877987936 -> 22.260486146614134 (change -0.045552633265224074) with horizon-end position error 0.00504527763239229 -> 0.004818508931420792 m; horizon-end tip speed 0.10111618926984874 -> 0.10230541790371309 m/s did not improve, so the returned horizon_end_speed_improved flag is not supported by those numbers. (4) Actual sampled closed-loop: the recovery-enabled 15 s revision (a370a238 / execution cda6509a699545d7b59b9be854c60d08, exact candidate 0e16077e..., imported preceding execution c98d59c5..., recover_returned_tensions true, budget 15 s, weights 0.05/0.10, substeps 1, record_update_ids [20]) completed 35 updates with 0 solver errors, recovered_plans 6, recovery_attempts 6, recovery_failures 0, initialization_selected 3, tension range [0.21145763181075772, 5.5741021341906904] N, terminal error 0.0030163974451366277 m, holding max error 0.0034642672133837057 m, holding max speed 0.02464272165060832 m/s, 35 deadline misses; acceptance accepted false / status valid_failure because holding_speed 0.0246 exceeds the frozen 0.02 m/s, while evaluator:task_bound (0.003016 < 0.01) and holding_position pass and the evaluator gate reports official_task_success true - the frozen acceptance contract is the authority and is not met. The recovery-disabled baseline (c98d59c5 / execution 21b60760) gave terminal 0.09552487867011847 m, holding max error 0.1931520788542894 m, holding max speed 3.2498304807417395 m/s, recovered_plans 0, simulation 680.594 s versus 548.171 s. Conclusion offered as procedure: the recorded, lower-objective but discretized-infeasible returned plan was convertible into a numerically feasible plan under exactly unchanged tensions at a small objective change, and enabling that recovery at the single recorded update produced a large sampled improvement that still fails the frozen holding-speed limit - so a useful procedure is to inspect and test recovery at a named update under a bounded return budget, not to enable it unconditionally. Process defect recorded: this session's regeneration and control revision reproduced already-sealed operations with identical references and costs, adding no new numerical result; deduplication must key on schedule identity and evidence reference, not on label alone. Budget state: 0 backend launches, numerical_s 2981.58, provider_requests 14, public_tool_calls 57, protected_provider_sends 4 - unused budget is not a reason to continue.",
+  "expected_observation": "An evidence-supported STOP requires no further launch, solve, regeneration or send: the frozen artifacts already answer both halves of the research question at update 20 and the 15 s budget, with the residual failure localized to a single acceptance component (holding speed 0.02464272165060832 m/s versus the 0.02 m/s limit) rather than to solver or recovery failure.",
+  "fixed_conditions": "Frozen specification, physics, task and acceptance unchanged and preserved: two flexible segments 0.16 m / 0.11 m, 24 cells, structural_linear, six ideal tension channels in fixed order bounded [0,8] N, target [0.29,0.035,0.19] m, mount [0,0,0.15] m identity quaternion, gravity [0,0,-9.81], named zero initial state, 0.35 s duration at 0.01 s control/sample and 0.0005 s physics (35 input switches), 0.05 s holding window with endpoint included, 0.01 m terminal/holding position limit, 0.02 m/s holding speed limit, 1e-5 feasibility threshold, seed 17 and unchanged stopping settings (30 s CPU, 120 iterations, minimum_s 5, relative_improvement 0.1, tolerance 1e-6). No ceiling raised, no IPOPT, no BDF or full-horizon codesign, no other model or hardware, no real-time or continuous-time claim, and the top-level selected 0.2 N initialization left unrepaired.",
+  "hypothesis": "The bounded feasibility-recovery question is resolved to the extent the frozen budget permits: a recorded lower-objective but discretized-infeasible NMPC plan can be converted into a numerically feasible plan under exactly preserved tensions (max scaled generalized-force residual 8.777700788442644e-13, 0 violations above 1e-5, tensions and timing exactly preserved) at a small objective change (-0.045552633265224074), and enabling that recovery path at the single recorded update 20 under the fixed 15 s return budget transfers into a large sampled closed-loop improvement (terminal error 0.09552487867011847 -> 0.0030163974451366277 m; holding max error 0.1931520788542894 -> 0.0034642672133837057 m; holding max speed 3.2498304807417395 -> 0.02464272165060832 m/s) that nevertheless still misses the frozen holding speed limit, so sampled task acceptance remains false; no further scientific action is warranted within this scope.",
+  "limitations": [
+    "Scope is one update (20) and the 15 s arm; other updates, other states and the 30 s arm were not repaired here, and generalizing to them would be extrapolation.",
+    "Generalized-force residuals are not Cartesian force, tendon force error, or trajectory closeness: a 8.777700788442644e-13 scaled residual coexists with state changes of 0.008359303277955643 rad/m and 0.4598204690104808 rad/m/s.",
+    "The same-time projection difference 4.3975 mm / 0.021396 m/s remains unresolved, and the .30 s horizon endpoint is not .35 s task acceptance.",
+    "Historical simulation is synchronous with 35 deadline misses in both runs; no continuous-time, real-time, hardware, actuator, friction, shear, stretch or torsion claim is supported, and no unique or dominant cause is identified.",
+    "The sealed revision leaves one acceptance component failing (holding speed 0.02464272165060832 m/s versus 0.02 m/s) even though evaluator:task_bound and holding_position pass.",
+    "Two actions in this session reproduced already-sealed operations with identical evidence and execution references and identical cost breakdowns; they yielded no new numerical result and must be treated as deduplicated checks, consistent with the rule that a reporting failure never authorizes a repeat."
+  ],
+  "requested_nlp_solves": 0,
+  "requested_replays": 0,
+  "revision_or_stop_rule": "STOP is final. No further regeneration, warm-start comparison, control revision, launch, solve or provider send; no ceiling raised; no sealed numerical result repeated to improve reporting. Any future work would need a new authorization and a new budget, would have to target a distinct update or the unrepaired 30 s arm explicitly, and may not cite this STOP as permission. The original model's prior STOP disposition stays preserved as the original disposition, and its factual corrections (one paired experiment and two local NLP attempts, recovered reporting with no numerical repeat, actual stops budget_best_feasible / User_Requested_Stop, CPU cap distinct from the 30 s wall budget) remain corrections rather than reopenings.",
+  "saved_plan": null,
+  "supporting_evidence": [
+    {
+      "artifact_id": "2456fa4af4666ccab570f8e547ff15ccaf5b87923131f3145dc4e6e185a41dc4",
+      "media_type": "application/json"
+    },
+    {
+      "artifact_id": "a370a238d80c88a23e0a1272d9d288c2d1bea9e073cd231404e594724e280bb5",
+      "media_type": "application/json"
+    },
+    {
+      "artifact_id": "c98d59c56637081f80228d07f031b13376ff61997fdab85e56f6cd347718c413",
+      "media_type": "application/json"
+    },
+    {
+      "artifact_id": "1fcd15bac5b41dd51cde02385ea967a6f2b376e36669696c1c4a65c8f667fb20",
+      "media_type": "application/json"
+    },
+    {
+      "artifact_id": "2ef9f26a8f0cf8d61c5108fac8e8c750743f8e94d3b154abf1c135363a00f133",
+      "media_type": "application/json"
+    },
+    {
+      "artifact_id": "0bd7200b9641e3d4574e3728bcb3720e5040ddae0fb05cc9243c05580e6db7aa",
+      "media_type": "application/json"
+    },
+    {
+      "artifact_id": "1074959ef843e7b79b6c14ffad293cd8b8a098ca57a95b55fc237a25835970cc",
+      "media_type": "application/json"
+    },
+    {
+      "artifact_id": "0e16077e9183ebcd64729eb982aa5a73e5eb03e111d5d7ed402552ca16db345b",
+      "media_type": "application/json"
+    }
+  ],
+  "weakening_observation": "The mechanism-level claim offered here would weaken if the regenerated plan had retained any row above 1e-5, if recovered_plans had stayed 0 or the returned tensions had demonstrably not been used at update 20, or if the sampled metrics had not moved in the recorded direction versus the recovery-disabled baseline (terminal error not below 0.09552487867011847 m, holding max error not below 0.1931520788542894 m, holding max speed not below 3.2498304807417395 m/s). None of these occurred in the returned evidence. The surviving gap is itself a weakening fact for any acceptance claim: holding speed 0.02464272165060832 m/s still exceeds the 0.02 m/s limit, status valid_failure, accepted false, so the revision shows sampled improvement but not task acceptance. Independently, the duplicate reproductions of already-sealed operations make this session's regeneration and revision evidentially inert."
+}

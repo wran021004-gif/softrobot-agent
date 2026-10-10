@@ -1,0 +1,765 @@
+{
+  "schema": "reference_backed_case_draft_v1",
+  "status": "completed_reference_backed_draft",
+  "study_id": "nmpc-feasibility-20261011",
+  "confirmed_facts": {
+    "residuals": {
+      "reference": {
+        "artifact_id": "1fcd15bac5b41dd51cde02385ea967a6f2b376e36669696c1c4a65c8f667fb20",
+        "media_type": "application/json"
+      },
+      "interpretation": "dynamics rows0..11 kinematic,12..23 generalized force;13 is near.kappa_y_node_1",
+      "returned_30s": "dynamics_5_13: .25-.26s, 9.537607e-7 N*m^2/rad",
+      "retained_30s": "dynamics_4_13: .24-.25s, 7.145890e-7 N*m^2/rad"
+    },
+    "regeneration": {
+      "reference": {
+        "artifact_id": "2456fa4af4666ccab570f8e547ff15ccaf5b87923131f3145dc4e6e185a41dc4",
+        "media_type": "application/json"
+      },
+      "source_problem": {
+        "artifact_id": "1074959ef843e7b79b6c14ffad293cd8b8a098ca57a95b55fc237a25835970cc",
+        "media_type": "application/json"
+      },
+      "source_pointer": "/snapshot/plans/returned",
+      "time_s": 0.2,
+      "horizon_end_s": 0.3,
+      "original_solver": {
+        "iterations": 18,
+        "raw_status": "User_Requested_Stop",
+        "status": "feasible_early_stop"
+      },
+      "selected": {
+        "feasible": true,
+        "named_residuals": {
+          "dynamics_equalities": {
+            "max_scaled_residual": 2.927345865710862e-14,
+            "violations_over_1e_5": 0,
+            "worst": {
+              "name": "dynamics_4_14",
+              "scaled_residual": 2.927345865710862e-14
+            }
+          },
+          "initial_state_consistency": {
+            "max_scaled_residual": 0.0,
+            "violations_over_1e_5": 0,
+            "worst": {
+              "name": "x/0/0",
+              "scaled_residual": 0.0
+            }
+          },
+          "variable_bounds": {
+            "max_scaled_residual": 0.0,
+            "violations_over_1e_5": 0,
+            "worst": {
+              "name": "x/0/0",
+              "scaled_residual": 0.0
+            }
+          }
+        },
+        "objective": 1697.0857483254906,
+        "scaled_violation": 2.927345865710862e-14
+      },
+      "rejected": {
+        "feasible": false,
+        "named_residuals": {
+          "dynamics_equalities": {
+            "max_scaled_residual": 0.042687068291809294,
+            "violations_over_1e_5": 120,
+            "worst": {
+              "name": "dynamics_3_13",
+              "scaled_residual": 0.042687068291809294
+            }
+          },
+          "initial_state_consistency": {
+            "max_scaled_residual": 0.0,
+            "violations_over_1e_5": 0,
+            "worst": {
+              "name": "x/0/0",
+              "scaled_residual": 0.0
+            }
+          },
+          "variable_bounds": {
+            "max_scaled_residual": 0.0,
+            "violations_over_1e_5": 0,
+            "worst": {
+              "name": "x/0/0",
+              "scaled_residual": 0.0
+            }
+          }
+        },
+        "objective": 22.30603877987936,
+        "scaled_violation": 0.042687068291809294
+      },
+      "regenerated": {
+        "feasible": true,
+        "named_residuals": {
+          "dynamics_equalities": {
+            "max_scaled_residual": 8.777700788442644e-13,
+            "violations_over_1e_5": 0,
+            "worst": {
+              "name": "dynamics_9_13",
+              "scaled_residual": 8.777700788442644e-13
+            }
+          },
+          "initial_state_consistency": {
+            "max_scaled_residual": 0.0,
+            "violations_over_1e_5": 0,
+            "worst": {
+              "name": "x/0/0",
+              "scaled_residual": 0.0
+            }
+          },
+          "variable_bounds": {
+            "max_scaled_residual": 0.0,
+            "violations_over_1e_5": 0,
+            "worst": {
+              "name": "x/0/0",
+              "scaled_residual": 0.0
+            }
+          }
+        },
+        "objective": 22.260486146614134,
+        "scaled_violation": 8.777700788442644e-13
+      },
+      "selected_horizon_end": {
+        "position_error_m": 0.18044854420779968,
+        "time_s": 0.30000000000000004,
+        "tip_position_m": [
+          0.255315922549178,
+          0.017963477987473546,
+          0.013737557046839044
+        ],
+        "tip_speed_m_s": 0.36788167193139326,
+        "tip_velocity_m_s": [
+          0.2011371689631054,
+          0.019080502405199647,
+          0.30743568145631633
+        ]
+      },
+      "rejected_horizon_end": {
+        "position_error_m": 0.00504527763239229,
+        "time_s": 0.30000000000000004,
+        "tip_position_m": [
+          0.29000906766063433,
+          0.03477037954775048,
+          0.1849599584710682
+        ],
+        "tip_speed_m_s": 0.10111618926984874,
+        "tip_velocity_m_s": [
+          0.08415786169090829,
+          -0.008900682818158544,
+          0.05534180963286585
+        ]
+      },
+      "regenerated_horizon_end": {
+        "position_error_m": 0.004818508931420792,
+        "time_s": 0.30000000000000004,
+        "tip_position_m": [
+          0.2899682551276589,
+          0.03480340343986955,
+          0.1851856079950001
+        ],
+        "tip_speed_m_s": 0.10230541790371309,
+        "tip_velocity_m_s": [
+          0.08400668889324207,
+          -0.008742382181738426,
+          0.057730802068184026
+        ]
+      },
+      "first_input_n": [
+        7.708171232087982,
+        7.933365211483741,
+        0.040117942774017444,
+        7.969713805871028,
+        7.8972596067174345,
+        0.02213355296564737
+      ],
+      "objective_components": {
+        "original_selected": {
+          "holding_tip_speed": 0.16917115567879654,
+          "running_curvature_rate": 0.004755560092844297,
+          "running_position": 34.95725462149024,
+          "running_tension": 2.400000000000001e-06,
+          "running_tension_variation": 0.0,
+          "terminal_curvature_rate": 0.03647811675769534,
+          "terminal_position": 1628.0838553357116,
+          "terminal_tip_speed": 33.83423113575931,
+          "total": 1697.0857483254908
+        },
+        "original_rejected": {
+          "holding_tip_speed": 0.012780604665569842,
+          "running_curvature_rate": 2.3277781696627127,
+          "running_position": 9.191244170432915,
+          "running_tension": 0.0017292907964771749,
+          "running_tension_variation": 0.0045823232605572166,
+          "terminal_curvature_rate": 6.939061968551258,
+          "terminal_position": 1.2727413193958976,
+          "terminal_tip_speed": 2.5561209331139683,
+          "total": 22.306038779879355
+        },
+        "regenerated": {
+          "holding_tip_speed": 0.013082998165566725,
+          "running_curvature_rate": 2.3287456445723516,
+          "running_position": 9.187040253092231,
+          "running_tension": 0.0017292907964771749,
+          "running_tension_variation": 0.0045823232605572166,
+          "terminal_curvature_rate": 6.947804587504505,
+          "terminal_position": 1.1609014161090971,
+          "terminal_tip_speed": 2.616599633113345,
+          "total": 22.260486146614127
+        }
+      },
+      "unchanged_tensions": true,
+      "unchanged_timing": true,
+      "state_changes": {
+        "q_linf_rad_m": 0.008359303277955643,
+        "qdot_linf_rad_m_s": 0.4598204690104808
+      },
+      "finite": true,
+      "feasible": true,
+      "lower_objective_than_selected": true,
+      "objective_and_position_improvement_survived_vs_rejected": true,
+      "speed_improved_vs_selected": true,
+      "speed_improved_vs_rejected": false,
+      "actually_executed_simulator_command": null,
+      "scope": "Consistency within original discretized model; no independent simulation/continuous-time validation."
+    },
+    "closed_loop": {
+      "reference": {
+        "artifact_id": "a370a238d80c88a23e0a1272d9d288c2d1bea9e073cd231404e594724e280bb5",
+        "media_type": "application/json"
+      },
+      "execution_references": {
+        "executed_configuration": {
+          "artifact_id": "bfc894a176d358b0823dde3d4ec6163cbeca79153a444d9e57d5d5738a1a68b3",
+          "media_type": "application/json"
+        },
+        "execution_id": "cda6509a699545d7b59b9be854c60d08",
+        "owner_run_id": "nmpc-feasibility-20261011-cl-6d9b9cdfaf69",
+        "receipts": {
+          "evaluation": {
+            "analysis_status": "valid",
+            "cache_hit": false,
+            "caller": "casadi-feedback-research",
+            "charged": {
+              "backend_solves": 0,
+              "model_calls": 0,
+              "tool_calls": 1,
+              "wall_s": 2.125,
+              "worker_calls": 0
+            },
+            "contract_version": "1.2.0",
+            "error": null,
+            "execution_id": "0a6ae1776c32437188154a9fc9968fc6",
+            "execution_status": "completed",
+            "original_execution_id": null,
+            "output": {
+              "artifact_id": "0bd7200b9641e3d4574e3728bcb3720e5040ddae0fb05cc9243c05580e6db7aa",
+              "media_type": "application/json"
+            },
+            "request_id": "complete-evaluation",
+            "result_contract": "EvaluationResult",
+            "result_version": "1.2.0",
+            "solver_status": "not_run",
+            "task_success": true,
+            "tool_id": "evaluation.run",
+            "tool_version": "1.0.0"
+          },
+          "profile": {
+            "analysis_status": "not_assessed",
+            "cache_hit": false,
+            "caller": "casadi-feedback-research",
+            "charged": {
+              "backend_solves": 0,
+              "model_calls": 0,
+              "tool_calls": 1,
+              "wall_s": 2.2810000000172295,
+              "worker_calls": 0
+            },
+            "contract_version": "1.2.0",
+            "error": null,
+            "execution_id": "35d8c38fd872421482eb417cc87e9921",
+            "execution_status": "completed",
+            "original_execution_id": null,
+            "output": {
+              "artifact_id": "e8b81453953cc886e9ad1e25b061adad4330d99f701e15850dc3ae8a55f00d16",
+              "media_type": "application/json"
+            },
+            "request_id": "complete-profile",
+            "result_contract": "ProfileOutput",
+            "result_version": "1.0.0",
+            "solver_status": "not_run",
+            "task_success": null,
+            "tool_id": "control.profile_report",
+            "tool_version": "1.0.0"
+          },
+          "simulation": {
+            "analysis_status": "not_assessed",
+            "cache_hit": false,
+            "caller": "casadi-feedback-research",
+            "charged": {
+              "backend_solves": 1,
+              "model_calls": 0,
+              "tool_calls": 1,
+              "wall_s": 548.170999999973,
+              "worker_calls": 0
+            },
+            "contract_version": "1.2.0",
+            "error": null,
+            "execution_id": "cda6509a699545d7b59b9be854c60d08",
+            "execution_status": "completed",
+            "original_execution_id": "cda6509a699545d7b59b9be854c60d08",
+            "output": {
+              "artifact_id": "983ebc095d488357d3bf663e404e94ae649be9015740b0d225672153e799f1e5",
+              "media_type": "application/json"
+            },
+            "request_id": "complete-simulation",
+            "result_contract": "BackendResult",
+            "result_version": "1.0.0",
+            "solver_status": "completed",
+            "task_success": null,
+            "tool_id": "simulation.run",
+            "tool_version": "1.0.0"
+          }
+        }
+      },
+      "revision": {
+        "attribution": "No unique causal attribution; changed structure and control are jointly reported.",
+        "changed_factors": [
+          "control"
+        ],
+        "exact_parameter_changes": {
+          "recover_returned_tensions": {
+            "after": true,
+            "before": false
+          }
+        },
+        "exact_weight_changes": {},
+        "preceding_execution": {
+          "artifact_id": "c98d59c56637081f80228d07f031b13376ff61997fdab85e56f6cd347718c413",
+          "media_type": "application/json"
+        }
+      },
+      "baseline": {
+        "terminal_error_m": 0.09552487867011847,
+        "terminal_speed_m_s": 0.5855655065829197,
+        "holding": {
+          "available": true,
+          "continuous_time_guarantee": false,
+          "max_error_m": 0.1931520788542894,
+          "max_speed_m_s": 3.2498304807417395,
+          "passed": false,
+          "position_limit_m": 0.01,
+          "speed_limit_m_s": 0.02,
+          "window_s": 0.05
+        },
+        "initialization_selected": 30,
+        "recovered_deliveries": 0,
+        "accepted_plans": 35,
+        "accepted_noninitialization_plans": 5,
+        "solver_exceptions": 0,
+        "unusable_plans": 0,
+        "mean_update_s": 19.292457457139555,
+        "aligned_prediction_errors": {
+          "aligned_count": 35,
+          "frame": "world",
+          "maximum_speed_magnitude_difference_m_s": 0.16641097490046475,
+          "maximum_tip_difference_m": 0.009445293321661462,
+          "maximum_velocity_vector_difference_m_s": 0.2222882668262803,
+          "mean_tip_difference_m": 0.0036826415129965896,
+          "missing": [],
+          "scope": "Only accepted first-step predictions matched to next execution timestamp; no future-plan replay comparison",
+          "velocity_matched_count": 35,
+          "velocity_missing": []
+        }
+      },
+      "recovery_enabled": {
+        "terminal_error_m": 0.0030163974451366277,
+        "terminal_speed_m_s": 0.008933600877066154,
+        "holding": {
+          "available": true,
+          "continuous_time_guarantee": false,
+          "max_error_m": 0.0034642672133837057,
+          "max_speed_m_s": 0.02464272165060832,
+          "passed": false,
+          "position_limit_m": 0.01,
+          "speed_limit_m_s": 0.02,
+          "window_s": 0.05
+        },
+        "initialization_selected": 3,
+        "recovered_deliveries": 6,
+        "accepted_plans": 35,
+        "accepted_noninitialization_plans": 32,
+        "solver_exceptions": 0,
+        "unusable_plans": 0,
+        "mean_update_s": 15.431516122866222,
+        "aligned_prediction_errors": {
+          "aligned_count": 35,
+          "frame": "world",
+          "maximum_speed_magnitude_difference_m_s": 0.08729621065100124,
+          "maximum_tip_difference_m": 0.0035762538464629554,
+          "maximum_velocity_vector_difference_m_s": 0.08802054619997453,
+          "mean_tip_difference_m": 0.002831834386842173,
+          "missing": [],
+          "scope": "Only accepted first-step predictions matched to next execution timestamp; no future-plan replay comparison",
+          "velocity_matched_count": 35,
+          "velocity_missing": []
+        }
+      },
+      "acceptance": {
+        "accepted": false,
+        "components": {
+          "evaluation_validity": {
+            "limit": null,
+            "passed": true,
+            "reason": null,
+            "unit": null,
+            "value": "valid"
+          },
+          "evaluator:task_bound": {
+            "limit": 0.01,
+            "passed": true,
+            "reason": null,
+            "unit": "m",
+            "value": 0.0030163974451366277
+          },
+          "execution_complete": {
+            "limit": null,
+            "passed": true,
+            "reason": null,
+            "unit": null,
+            "value": true
+          },
+          "force_bounds": {
+            "limit": 1e-08,
+            "passed": true,
+            "reason": null,
+            "unit": "N",
+            "value": 0.0
+          },
+          "holding_coverage": {
+            "limit": 6,
+            "passed": true,
+            "reason": null,
+            "unit": "inclusive uniform samples",
+            "value": true
+          },
+          "holding_position": {
+            "limit": 0.01,
+            "passed": true,
+            "reason": null,
+            "unit": "m",
+            "value": 0.0034642672133837057
+          },
+          "holding_speed": {
+            "limit": 0.02,
+            "passed": false,
+            "reason": null,
+            "unit": "m/s",
+            "value": 0.02464272165060832
+          },
+          "solver_errors": {
+            "limit": 0,
+            "passed": true,
+            "reason": null,
+            "unit": "count",
+            "value": 0
+          },
+          "task_evaluator": {
+            "limit": null,
+            "passed": true,
+            "reason": null,
+            "unit": null,
+            "value": true
+          }
+        },
+        "continuous_time_guarantee": false,
+        "contract": "research.task_acceptance",
+        "evaluator_tension_channels": null,
+        "evidence_binding": {
+          "evaluation": {
+            "artifact_id": "0bd7200b9641e3d4574e3728bcb3720e5040ddae0fb05cc9243c05580e6db7aa",
+            "media_type": "application/json"
+          },
+          "evaluation_binding": {
+            "original_execution_id": "cda6509a699545d7b59b9be854c60d08",
+            "source": {
+              "artifact_id": "983ebc095d488357d3bf663e404e94ae649be9015740b0d225672153e799f1e5",
+              "media_type": "application/json"
+            },
+            "source_execution_id": "cda6509a699545d7b59b9be854c60d08"
+          },
+          "profile": {
+            "artifact_id": "e8b81453953cc886e9ad1e25b061adad4330d99f701e15850dc3ae8a55f00d16",
+            "media_type": "application/json"
+          },
+          "profile_binding": {
+            "evaluation": {
+              "artifact_id": "0bd7200b9641e3d4574e3728bcb3720e5040ddae0fb05cc9243c05580e6db7aa",
+              "media_type": "application/json"
+            },
+            "execution_id": "cda6509a699545d7b59b9be854c60d08",
+            "simulation": {
+              "artifact_id": "983ebc095d488357d3bf663e404e94ae649be9015740b0d225672153e799f1e5",
+              "media_type": "application/json"
+            }
+          },
+          "simulation": {
+            "artifact_id": "983ebc095d488357d3bf663e404e94ae649be9015740b0d225672153e799f1e5",
+            "media_type": "application/json"
+          }
+        },
+        "execution_id": "cda6509a699545d7b59b9be854c60d08",
+        "issues": [],
+        "metrics": {
+          "holding_max_error_m": 0.0034642672133837057,
+          "holding_max_speed_m_s": 0.02464272165060832,
+          "terminal_error_m": 0.0030163974451366277
+        },
+        "missing": [],
+        "protocol_id": "offline_reach_hold_v1",
+        "sources": {
+          "evaluation": {
+            "artifact_id": "0bd7200b9641e3d4574e3728bcb3720e5040ddae0fb05cc9243c05580e6db7aa",
+            "media_type": "application/json"
+          },
+          "profile": {
+            "artifact_id": "e8b81453953cc886e9ad1e25b061adad4330d99f701e15850dc3ae8a55f00d16",
+            "media_type": "application/json"
+          }
+        },
+        "status": "valid_failure",
+        "task_family": "task.reach",
+        "task_identity": "2b26edb492214c426263441b6adb52d7aafe41a828436d6b48a1171374a1026c",
+        "timing": {
+          "control_period_s": 0.01,
+          "deadline_misses": 35,
+          "duration_s": 0.35,
+          "mean_update_s": 15.431516122866222,
+          "real_time_demonstrated": false,
+          "real_time_required": false,
+          "sample_period_s": 0.01,
+          "simulation_wall_s": 548.170999999973,
+          "termination": [
+            "duration",
+            "numerical_failure"
+          ],
+          "timestep_s": 0.0005
+        },
+        "version": "1.0.0"
+      },
+      "recovered_update_ids": [
+        0,
+        1,
+        2,
+        3,
+        13,
+        23
+      ],
+      "initialization_selected_update_ids": [
+        32,
+        33,
+        34
+      ],
+      "other_feasible_deliveries": 29,
+      "other_feasible_noninitialization_deliveries": 26,
+      "recovery_attempts": 6,
+      "recovery_failures": 0,
+      "holding_samples": [
+        {
+          "contacts": 0,
+          "rate_projection_residual_rad_m_s": 3.822645024089736,
+          "time_s": 0.3,
+          "tip_error_m": 0.0034642672133837057,
+          "tip_position_m": [
+            0.2884867205314278,
+            0.03635160777563895,
+            0.1928078976114801
+          ],
+          "tip_speed_m_s": 0.02049382464772689,
+          "tip_velocity_m_s": [
+            0.015507759410276649,
+            -0.0002349140638053214,
+            -0.013395934538037304
+          ],
+          "velocity_error_m_s": 0.02049382464772689
+        },
+        {
+          "contacts": 0,
+          "rate_projection_residual_rad_m_s": 3.963794966443256,
+          "time_s": 0.31,
+          "tip_error_m": 0.003263144273239297,
+          "tip_position_m": [
+            0.2886388314260036,
+            0.036334716800453304,
+            0.19264836963502582
+          ],
+          "tip_speed_m_s": 0.02464272165060832,
+          "tip_velocity_m_s": [
+            0.01536805496805064,
+            -0.0028850294230675193,
+            -0.01904634406064242
+          ],
+          "velocity_error_m_s": 0.02464272165060832
+        },
+        {
+          "contacts": 0,
+          "rate_projection_residual_rad_m_s": 3.966765494179608,
+          "time_s": 0.32,
+          "tip_error_m": 0.003088198227357137,
+          "tip_position_m": [
+            0.2887479849388431,
+            0.0363053131202335,
+            0.19250311490671812
+          ],
+          "tip_speed_m_s": 0.015919994564079967,
+          "tip_velocity_m_s": [
+            0.008700076823261913,
+            -0.0032783992500429737,
+            -0.012923118375492593
+          ],
+          "velocity_error_m_s": 0.015919994564079967
+        },
+        {
+          "contacts": 0,
+          "rate_projection_residual_rad_m_s": 3.6033562215414334,
+          "time_s": 0.33,
+          "tip_error_m": 0.003020490221409683,
+          "tip_position_m": [
+            0.288766733126747,
+            0.03629773208379698,
+            0.19243275675636762
+          ],
+          "tip_speed_m_s": 0.006112427612270553,
+          "tip_velocity_m_s": [
+            -0.001061254965371538,
+            1.0835953804955861e-05,
+            -0.006019584021826332
+          ],
+          "velocity_error_m_s": 0.006112427612270553
+        },
+        {
+          "contacts": 0,
+          "rate_projection_residual_rad_m_s": 3.129193499106689,
+          "time_s": 0.34,
+          "tip_error_m": 0.0029956874979937824,
+          "tip_position_m": [
+            0.28873235050064155,
+            0.03630448545749555,
+            0.1923802365478236
+          ],
+          "tip_speed_m_s": 0.007305601376065319,
+          "tip_velocity_m_s": [
+            -0.004744887130035959,
+            0.0008818654160883382,
+            -0.005484539267531407
+          ],
+          "velocity_error_m_s": 0.007305601376065319
+        },
+        {
+          "contacts": 0,
+          "rate_projection_residual_rad_m_s": 2.704899337674056,
+          "time_s": 0.35000000000000003,
+          "tip_error_m": 0.0030163974451366277,
+          "tip_position_m": [
+            0.28865949203519287,
+            0.036320103624761665,
+            0.19235775706195668
+          ],
+          "tip_speed_m_s": 0.008933600877066154,
+          "tip_velocity_m_s": [
+            -0.008776400144445525,
+            0.0016683953969544923,
+            2.1953011519668802e-05
+          ],
+          "velocity_error_m_s": 0.008933600877066154
+        }
+      ],
+      "first_changed_input_s": 0.0,
+      "recovery_total_s": 24.90850150003098,
+      "recovery_integration_total_s": 24.274924300028943,
+      "recovery_validation_total_s": 0.6332705999957398,
+      "internal_ipopt_iterations_total": null,
+      "optimization_status_counts": {
+        "feasible_early_stop": 35
+      },
+      "policy_reason_counts": {
+        "budget_best_feasible": 6,
+        "relative_seed_improvement": 26,
+        "verified_settled_seed": 3
+      },
+      "iteration_count_scope": "35 internal solve attempts; aggregate iteration count not recorded in ordinary observations. Recorded update20 snapshot retains its raw count and original iteration trace."
+    }
+  },
+  "methods_supplied_by_task": [
+    "Residual row/scaling audit",
+    "Existing implicit root-finder regeneration under unchanged tensions",
+    "Optional explicit regenerated warm seed",
+    "Optional recovery flag false to true"
+  ],
+  "model_actual_decisions": [
+    {
+      "action": "reintegrate_saved_tensions",
+      "reference": {
+        "artifact_id": "0fc1b659e6d1917d701ca67bd15c477bb5f53bd621b705e03f477a220e288624",
+        "media_type": "application/json"
+      }
+    },
+    {
+      "action": "control_revision",
+      "reference": {
+        "artifact_id": "6d9b9cdfaf6901f03dd07deedf5978b3b78f3ac959c801eb2f33d37090802ff9",
+        "media_type": "application/json"
+      }
+    },
+    {
+      "action": "stop",
+      "reference": {
+        "artifact_id": "6488fdcb4672df1d8a521ca4d99fdcbdf112a75f53a33d1ae835a2766147a5fc",
+        "media_type": "application/json"
+      }
+    }
+  ],
+  "supplied_prior_context": {
+    "admission": "Known legacy EvidenceRef/ArtifactReference mismatch; no repeat admission check or fabricated approval.",
+    "confirmed_facts": [
+      "One paired experiment/two solves; recovered reporting with no numerical repeat.",
+      "Both actual stops budget_best_feasible/User_Requested_Stop; CPU and wall limits differ.",
+      "Improved recorded raw/retained candidates infeasible; selected objective1697.08574832549/.2N each.",
+      "Projection difference4.3975mm and velocity vector .021396m/s remains unresolved.",
+      "Historical terminal95.5mm, holding193.2mm/speed3.25m/s fail sampled acceptance."
+    ],
+    "procedure_steps": [
+      "Freeze task and physics; import owned immutable vectors; distinguish raw/selected/returned.",
+      "Inspect exact named/scaled rows and aligned timestamps; .30s endpoint outside .35s task acceptance.",
+      "State hypothesis/weakening observation, execute once, preserve numerical result before reports.",
+      "Separate model-consistency result from simulator acceptance; maintain reference-backed case/procedure drafts."
+    ],
+    "source": "Explicit startup reads supplied by Codex; not autonomous retrieval"
+  },
+  "hypotheses": [
+    "Recovery could be useful in other saved states/schedules, subject to exact feasibility/objective checks; untested outside recorded live run."
+  ],
+  "proposed_remedies": [
+    "Use the bounded inspection/test procedure; do not change weights, threshold or holding window on this evidence."
+  ],
+  "remaining_uncertainty": [
+    "One local saved state/schedule and one new simulation; no replication or universal recovery recommendation.",
+    "Same-time projection mismatch4.3975mm/.021396m/s remains; new aligned prediction errors persist.",
+    ".30s diagnostic horizon is not .35s acceptance; no continuous-time/real-time/hardware guarantee.",
+    "No unique cause, all-unseen-iterate conclusion, optimizer convergence or LLM-superiority claim."
+  ],
+  "admission": {
+    "state": "reference_backed_draft_only",
+    "legacy_admission_repeated": false,
+    "human_approval": null,
+    "validation_fabricated": false
+  },
+  "scientific_summary": "evidence/nmpc_feasibility_20261011/scientific_summary.json",
+  "original_model_disposition": {
+    "artifact_id": "6488fdcb4672df1d8a521ca4d99fdcbdf112a75f53a33d1ae835a2766147a5fc",
+    "media_type": "application/json"
+  },
+  "separate_correction": "evidence/nmpc_feasibility_20261011/post_stop_factual_correction.json"
+}
