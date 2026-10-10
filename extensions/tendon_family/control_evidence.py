@@ -85,6 +85,7 @@ def plan_metrics(ws, states, tensions, time_s):
     for t,x in zip(times,states):
         tip,velocity=ws._motion(x[:ws.n],x[ws.n:]);tip=np.asarray(tip).ravel();velocity=np.asarray(velocity).ravel()
         motion.append(dict(time_s=float(t), position_error_m=float(np.linalg.norm(tip-ws.target)),
+            tip_position_m=tip.tolist(),
             tip_velocity_m_s=velocity.tolist(),tip_speed_m_s=float(np.linalg.norm(velocity))))
     deadline=next((m for m in motion if abs(m['time_s']-ws.duration)<1e-8),None)
     return dict(deadline=deadline, deadline_status='within_recorded_horizon' if deadline else 'outside_recorded_horizon',
@@ -104,11 +105,22 @@ def capture_snapshot(ws, solved, update_id, time_s, command, geometry):
             metrics=plan_metrics(ws,states,tensions,time_s),
             verification={k:v for k,v in point.items() if k!='vector'},
             objective_components=components,objective_component_difference=components['total']-point['objective'])
+    recovery=solved.get('recovery',{})
+    def add_plan(label,values):
+        states,tensions,previous=decode_plan(ws,[values[k] for k in d['variable_order']],d['variable_order'])
+        check=ws.solver.evaluate_candidate(ws.problem,values)
+        plans[label]=dict(states=states.tolist(),tensions=tensions.tolist(),
+            metrics=plan_metrics(ws,states,tensions,time_s),verification={k:v for k,v in check.items() if k!='constraint_values'},
+            objective_components=objective_components(ws,states,tensions,previous))
+    if recovery.get('candidate_optimum'):add_plan('regenerated',recovery['candidate_optimum'])
+    add_plan('delivered',solved['result']['optimum'])
     value=dict(schema_version='1.0.0',update_id=update_id,time_s=float(time_s),
         classification='new recorded control snapshot',measured_initial_state=solved['measured_initial_state'],
         previous_applied_input_n=solved['previous_tensions_n'],warm=solved['recording'],plans=plans,
-        selection=dict(accepted=solved['accepted'],selected_iteration=d['selected_feasible_iteration'],
-            source='ipopt_selected',reason=d['policy_stop_reason'],raw_stop=d['return_status']),
+        selection=dict(accepted=solved['accepted'],selected_iteration=None if recovery.get('selected') else d['selected_feasible_iteration'],
+            ipopt_selected_iteration=d['selected_feasible_iteration'],delivered_plan='delivered',
+            source='reintegrated_returned_iterate' if recovery.get('selected') else 'ipopt_selected',
+            reason=d['policy_stop_reason'],raw_stop=d['return_status']),
         actual_executed_input_n=list(command),iteration_trace=deepcopy(d['iteration_trace']),
         numerical_parameters=ws.parameters.model_dump(mode='json'),prediction_timing=solved['prediction_timing'],
         model=dict(id='model.gvs@1.0.0',basis=plain(ws.parameters.basis),
@@ -182,11 +194,11 @@ class ControlEvidence:
                 actual_input_n=row.get('actual_tension_n'),snapshot_id=None if snap is None else snap['snapshot_id'])
             if snap:
                 item['plans']={role:{k:v for k,v in value.items() if k not in ('states','tensions')}
-                    for role,value in snap['plans'].items() if role in ('initial','selected','returned')}
+                    for role,value in snap['plans'].items() if role in ('initial','selected','returned','regenerated','delivered')}
                 item['additional_checkpoint_roles']=[role for role in snap['plans'] if role.startswith('checkpoint')]
                 item['residual_definitions']=snap['residual_definitions']
                 item['first_command_change_from_initialization_n']=float(np.max(np.abs(
-                    np.asarray(snap['plans']['selected']['metrics']['first_input_n'])-snap['plans']['initial']['metrics']['first_input_n'])))
+                    np.asarray(snap['plans'].get('delivered',snap['plans']['selected'])['metrics']['first_input_n'])-snap['plans']['initial']['metrics']['first_input_n'])))
             else:missing.append(f'update:{index}:complete_warm_and_plans')
             records.append(item)
         observations=dict(updates=records,total_updates=len(updates),initialization_selected=sum(

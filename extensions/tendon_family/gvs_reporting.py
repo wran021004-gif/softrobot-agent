@@ -65,6 +65,10 @@ def summarize(task, result, evaluation, rows, observations, motion, limits, sett
         raw_termination_counts=dict(Counter(o.get('optimization_raw_status') or 'unavailable' for o in observations)),
         initialization_selected=sum(o.get('optimization_selected_iteration') in (-1,0) for o in observations),
         recovered_plans=sum(o.get('plan_source')=='reintegrated_returned_iterate' for o in observations),
+        recovery_attempts=sum(bool((o.get('feasibility_recovery') or {}).get('attempted')) for o in observations),
+        recovery_failures=sum(bool((o.get('feasibility_recovery') or {}).get('error')) for o in observations),
+        recovery_root_solves=sum((o.get('feasibility_recovery') or {}).get('root_solve_attempts',0) for o in observations),
+        other_feasible_deliveries=sum(bool(o.get('plan_accepted')) and o.get('plan_source')!='reintegrated_returned_iterate' for o in observations),
         accepted_noninitialization_plans=sum(bool(o.get('plan_accepted')) and
             (o.get('plan_source')=='reintegrated_returned_iterate' or
              (o.get('optimization_selected_iteration') is not None and o['optimization_selected_iteration']>0)) for o in observations),

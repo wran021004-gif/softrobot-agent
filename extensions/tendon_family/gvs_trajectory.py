@@ -205,7 +205,7 @@ class TrajectoryWorkspace:
         self.robot=robot;self.scene=task.environment;self._tail_solver=None
         self.last=None
 
-    def _extend_tail(self,state,tension,guess=None):
+    def _prepare_tail(self):
         construction=time.perf_counter()
         if self._tail_solver is None:
             p=GVSModelParameters(basis=self.parameters.basis)
@@ -222,11 +222,16 @@ class TrajectoryWorkspace:
             residual=ca.Function('tail_residual',[y,old,u],
                 [self._tail_residual(old,y*self.state_scales,u)],{'ad_weight':1.})
             self._tail_solver=ca.rootfinder('tail_step','newton',residual,{'abstol':1e-10,'max_iter':30})
-        construction_s=time.perf_counter()-construction
+        return time.perf_counter()-construction
+
+    def _extend_tail(self,state,tension,guess=None):
+        construction_s=self._prepare_tail()
         start=time.perf_counter()
         repeated_defect=float(np.max(abs(np.asarray(self._tail_residual(state,state,tension)))))
         following=np.asarray(self._tail_solver(np.asarray(state if guess is None else guess)/self.state_scales,state,tension)).ravel()*self.state_scales
         defect=float(np.max(abs(np.asarray(self._tail_residual(state,following,tension)))))
+        if not np.isfinite(following).all() or not np.isfinite(defect) or defect>1e-5:
+            raise RuntimeError('REGENERATED_STEP_FAILED_ORIGINAL_FEASIBILITY_CHECK')
         return following,dict(construction_s=construction_s,integration_s=time.perf_counter()-start,
             repeated_terminal_scaled_defect=repeated_defect,extended_tail_scaled_defect=defect)
 
@@ -360,6 +365,25 @@ class TrajectoryWorkspace:
             output['recording'] = recording
         return output
 
+    def regenerate_tensions(self,raw,measured_x,*,deadline=None):
+        """Reuse the live implicit root solve; never launch an NLP or reuse defects."""
+        start=time.perf_counter();repaired=dict(raw);state=np.asarray(measured_x)
+        steps=[];error=None
+        for j,v in enumerate(state):repaired[f'x/0/{j}']=float(v/self.state_scales[j])
+        try:
+            for k in range(1,self.parameters.horizon*self.parameters.substeps+1):
+                if deadline is not None and time.perf_counter()>=deadline:
+                    raise RuntimeError('REGENERATION_TIME_ALLOWANCE')
+                u=np.array([raw[f'u/{(k-1)//self.parameters.substeps}/{t}'] for t in self.tendons])
+                guess=np.array([raw[f'x/{k}/{j}'] for j in range(2*self.n)])*self.state_scales
+                state,diagnostic=self._extend_tail(state,u,guess)
+                steps.append(dict(node=k,**diagnostic))
+                for j,v in enumerate(state):repaired[f'x/{k}/{j}']=float(v/self.state_scales[j])
+        except RuntimeError as exc:error=str(exc)
+        return dict(optimum=repaired if error is None else None,
+            partial_states=[[repaired[f'x/{k}/{j}']*self.state_scales[j] for j in range(2*self.n)]
+                for k in range(len(steps)+1)],steps=steps,error=error,integration_s=time.perf_counter()-start)
+
     def _recover_returned(self,result,measured_x):
         """One feasibility recovery, with unchanged objective and constraints.
 
@@ -376,25 +400,22 @@ class TrajectoryWorkspace:
         if raw is None or d['returned_iterate_objective']>=result.objective_value:
             return result,recovery
         recovery['attempted']=True
-        repaired=dict(raw);state=np.asarray(measured_x)
-        for j,v in enumerate(state):repaired[f'x/0/{j}']=float(v/self.state_scales[j])
         try:
-            integration_start=time.perf_counter()
-            for k in range(1,self.parameters.horizon*self.parameters.substeps+1):
-                u=np.array([raw[f'u/{(k-1)//self.parameters.substeps}/{t}'] for t in self.tendons])
-                guess=np.array([raw[f'x/{k}/{j}'] for j in range(2*self.n)])*self.state_scales
-                state,_=self._extend_tail(state,u,guess)
-                for j,v in enumerate(state):repaired[f'x/{k}/{j}']=float(v/self.state_scales[j])
-            recovery['integration_s']=time.perf_counter()-integration_start
+            regenerated=self.regenerate_tensions(raw,measured_x)
+            recovery.update({k:v for k,v in regenerated.items() if k not in ('optimum','partial_states','steps')})
+            recovery['root_solve_attempts']=len(regenerated['steps'])+int(regenerated['error'] is not None)
+            if regenerated['error']:raise RuntimeError(regenerated['error'])
+            repaired=regenerated['optimum']
             validation_start=time.perf_counter()
             check=self.solver.evaluate_candidate(self.problem,repaired)
-            recovery.update(check,validation_s=time.perf_counter()-validation_start)
+            recovery.update({k:v for k,v in check.items() if k!='constraint_values'},validation_s=time.perf_counter()-validation_start)
+            if self.solver.diagnostic_trace:recovery['candidate_optimum']=repaired
             if check['feasible'] and check['objective']<result.objective_value:
                 recovery['selected']=True
                 recovery['first_command_change_n']=float(max(abs(repaired[f'u/0/{t}']-result.optimum[f'u/0/{t}']) for t in self.tendons))
                 # Feasibility recovery is not an IPOPT convergence event.
                 result=result.model_copy(update=dict(optimum=repaired,objective_value=check['objective'],
-                    constraint_violation=check['scaled_violation'],status='feasible_early_stop'))
+                    constraint_violation=check['scaled_violation']))
         except RuntimeError as exc:
             recovery['error']=str(exc)
         recovery['wall_s']=time.perf_counter()-start

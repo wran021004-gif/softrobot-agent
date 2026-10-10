@@ -17,13 +17,18 @@ from tools.casadi_feedback_service import ACTIVITY,budget,RESERVATIONS,SPEC,CEIL
 
 RUN=ROOT/'runs'/ACTIVITY
 INITIALIZATION=SPEC.get('investigation')=='initialization_diagnosis'
-OUT=ROOT/('evidence/nmpc_initialization_20261010' if INITIALIZATION else 'evidence/casadi_nmpc_research_20261010')
+FEASIBILITY=SPEC.get('investigation')=='feasibility_recovery'
+OUT=ROOT/('evidence/nmpc_feasibility_20261011' if FEASIBILITY else 'evidence/nmpc_initialization_20261010' if INITIALIZATION else 'evidence/casadi_nmpc_research_20261010')
 LIMITS=dict(model_calls=CEILINGS['actual_provider_requests'],tool_calls=CEILINGS['public_workflow_calls'],backend_solves=CEILINGS['physical_launches'],worker_calls=0,wall_s=CEILINGS['overall_activity_s'])
 TOOLS={name:'1.0.0' for name in ['math.casadi_feedback_'+s for s in ('solve','replay','plan')]+['evidence.read']}
 if INITIALIZATION:
     TOOLS={name:'1.0.0' for name in ('math.casadi_feedback_plan','evidence.read','diagnosis.inspect_evidence','diagnosis.saved_state_check')}
     from schemas.casadi_feedback import InitializationPlan
     ActivityPlan=InitializationPlan
+if FEASIBILITY:
+    TOOLS={name:'1.0.0' for name in ('math.casadi_feedback_plan','evidence.read','diagnosis.inspect_evidence','math.nmpc_feasibility_check')}
+    from schemas.casadi_feedback import FeasibilityPlan
+    ActivityPlan=FeasibilityPlan
 AUTHORIZATION=SPEC['authorization']+'; authorized non-secret research payload to https://api.deepseek.com/chat/completions; credentials for authentication only; scoped commit and ordinary push'
 
 def activity_start():
@@ -41,6 +46,8 @@ def configuration():
     allowances={name:dict(timeout_s=RESERVATIONS.get(name.rsplit('_',1)[-1],30.)+30.,reserve_s=RESERVATIONS.get(name.rsplit('_',1)[-1],1.)) for name in TOOLS}
     if INITIALIZATION:
         allowances['diagnosis.saved_state_check']=dict(timeout_s=CEILINGS['pair_wall_s'],reserve_s=CEILINGS['pair_wall_s'])
+    if FEASIBILITY:
+        allowances['math.nmpc_feasibility_check']=dict(timeout_s=300.,reserve_s=300.)
     base['policy'].update(budget=LIMITS,allowed_tools=[],tool_bindings=TOOLS,operation_allowances=allowances)
     base['policy']['model']['max_turns']=12
     values=dict(segment_count=2,proximal_tendons=3,distal_tendons=3,lengths_m=[.16,.11],material='baseline',
@@ -54,6 +61,9 @@ def host():return Host(RUN,ACTIVITY,actor='casadi-feedback-research')
 def prepare():
     h=host();STARTED=activity_start()
     if h.store.db.exists():
+        if FEASIBILITY:
+            from tools.nmpc_feasibility import prepare_evidence
+            prepare_evidence(h)
         if INITIALIZATION:
             from tools.nmpc_initialization import prepare_evidence
             prepare_evidence(h)
@@ -81,6 +91,9 @@ def prepare():
         base_commit=SPEC['base_commit'],historical_activities='sealed STOP; unused allowance unavailable'))
     if INITIALIZATION:
         from tools.nmpc_initialization import prepare_evidence
+        prepare_evidence(h)
+    if FEASIBILITY:
+        from tools.nmpc_feasibility import prepare_evidence
         prepare_evidence(h)
     return h
 
@@ -116,6 +129,9 @@ def bind(h,repair=False,reason=None):
 
 
 def compact_result(value):
+    if value.get('feasibility_operation'):
+        from tools.nmpc_feasibility import compact
+        return compact(value)
     keys=('status','termination_reason','iterations','solver_termination','checkpoint_reference','candidate_export_status',
         'trajectory_metrics','original_task_feasible','original_task_gaps','hard_max_normalized_violation',
         'relaxed_nlp_feasible','objective_components','physical_eligible','costs_s','process_elapsed_s',
@@ -137,6 +153,9 @@ def compact_result(value):
 
 
 def packet(h):
+    if FEASIBILITY:
+        from tools.nmpc_feasibility import packet as feasibility_packet
+        return feasibility_packet(h)
     if INITIALIZATION:
         from tools.nmpc_initialization import packet as initialization_packet
         return initialization_packet(h)
@@ -168,6 +187,8 @@ def packet(h):
 INSTRUCTIONS='You are the sole research principal in a bounded research activity. Choose freely from the native research_plan action menu: solve (one existing mathematical choice followed by independent BDF), diagnose (read-only referenced synthesis, no new numerical experiment), diagnostic_replay (one supported BDF numerical operation), closed_loop (evaluate an immutable saved candidate structure under target-based NMPC), control_revision (same candidate, preceding closed-loop result EvidenceRef, exact changes to two weights), or stop. Any may be the first action, including a justified STOP using imported evidence. No mandatory new NLP, replay or NMPC. Do not rediscover supplied history. Engineering and prior numerical diagnostics were implemented by Codex; your original choices remain separate from facts and corrections. All experiment requests need hypothesis, supporting_evidence, expected_observation, weakening_observation, fixed_conditions, parameters, revision_or_stop_rule, disposition and limitations. Closed-loop control.candidate is an exact immutable candidate reference, never manually reconstruct lengths. Holding speed weight default .05 and terminal speed weight default .10, both allowed .025 to .10. Other NMPC recipe fields frozen, initialization initial_state_pretension numerical guesses (not equilibrium). Saved offline schedule is not NMPC reference or applied sequence. Failed historical open-loop replay does not forbid valid structure-under-feedback testing or change historical acceptance. Control-only revision cites the preceding result, keeps candidate unchanged, and changes weights. Changing structure and control requires closed_loop and explicit joint attribution. Consume actual returned evidence before another experiment. Final STOP must cite all new scientific results if any. Preserve frozen two segments, six ideal bounded tensions 0..8 N, topology, materials, routing, basis, target, mount, gravity, named zero initial state, duration .35 s, control/sample .01 s, physics .0005 s, inclusive final .05 s holding, position .01 m/speed .02 m/s limits and seed17. Existing single constant d in [-1,1] only. Two new offline full-horizon NLP attempts, three BDF attempts, two MuJoCo launches including unsuccessful launches,900 s per NLP worker (570 s IPOPT),450 s per BDF,1800 s simulation plus existing30/60 s evaluation/profile,7200 total scientific/check/recovery seconds,16 actual provider sends including auxiliary/retries with last4 for feedback and STOP,64 public calls,6h including engineering with final30min delivery protected,zero other LLMs/hardware. NMPC internal solves belong to their launch, not standalone NLP slots. Ceilings are not quotas. Existing numerical checkpoint recovery, dependency guard and engineering pause apply. Acceptance is sampled .01 s for closed loop, unlike dense .0005 s BDF; no continuous-time or real-time guarantee. Report scientific, numerical, engineering and missing evidence distinctly. Do not infer global optimum, physical impossibility, unique cause, LLM superiority or old open-loop validation. Accepted native STOP seals all further provider sends.'
 if INITIALIZATION:
     from tools.nmpc_initialization import INSTRUCTIONS
+if FEASIBILITY:
+    from tools.nmpc_feasibility import INSTRUCTIONS
 
 
 def feedback_context_references(h):
@@ -176,7 +197,7 @@ def feedback_context_references(h):
     for event in h.store.events(ACTIVITY):
         if event['kind']!='model_original_tool_feedback':continue
         value=h.store.artifact(event['outputs'][0]);use=value['tool_use']
-        if use['name']!='research_plan' or use['input'].get('action') not in ('solve','diagnose','diagnostic_replay','closed_loop','control_revision','saved_state_comparison'):continue
+        if use['name']!='research_plan' or use['input'].get('action') in ('stop',None):continue
         result=value['result']
         if result['status']!='success':continue
         for index,content in enumerate(result.get('content',[])):
@@ -296,6 +317,9 @@ async def converse(h):
             elif plan.action=='saved_state_comparison':
                 from tools.nmpc_initialization import run_pair
                 value['operations'].append(run_pair(h,plan.comparison,'native-'+use['toolUseId']+'-pair'))
+            elif plan.action in ('inspect_residuals','reintegrate_saved_tensions','warm_start_comparison'):
+                from tools.nmpc_feasibility import run_operation
+                value['operations'].append(run_operation(h,plan,accepted['plan_reference'],'native-'+use['toolUseId']+'-saved'))
         value['remaining_budget']=budget(h.store);record(h,'model_plan_execution_feedback',value)
         return dict(toolUseId=use['toolUseId'],status='success' if receipt['execution_status']=='completed' else 'error',content=[dict(text=json.dumps(value))])
     def read_handler(use,**kwargs):
@@ -309,7 +333,7 @@ async def converse(h):
         return dict(toolUseId=use['toolUseId'],status='success' if receipt['execution_status']=='completed' else 'error',content=[dict(text=json.dumps(value))])
     tools=[PythonAgentTool('research_plan',dict(name='research_plan',description='Choose a bounded mathematical solve, referenced diagnosis, candidate feedback execution, control revision, or evidence-based STOP',inputSchema={'json':ActivityPlan.model_json_schema()}),plan_handler)]
     definition=h.reg.get('evidence.read');tools.append(PythonAgentTool('evidence_read',dict(name='evidence_read',description=definition.description,inputSchema={'json':definition.input_schema.model_json_schema()}),read_handler))
-    if INITIALIZATION:
+    if INITIALIZATION or FEASIBILITY:
         from tools.nmpc_initialization import add_inspection_tool
         add_inspection_tool(h,tools)
     agent=build_harness(h,transport=boundary,api_key=os.environ['DEEPSEEK_API_KEY'],instructions=INSTRUCTIONS,

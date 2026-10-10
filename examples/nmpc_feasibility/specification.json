@@ -1,0 +1,136 @@
+{
+  "study_id": "nmpc-feasibility-20261011",
+  "investigation": "feasibility_recovery",
+  "authorization": "User attachment 2968d1a1-5058-4775-b11c-ccb8e3e3994c/pasted-text-1.txt: scoped experiments, non-secret DeepSeek sends, commits and ordinary push to feat/nmpc-feasibility-recovery",
+  "base_commit": "b83b5b4fe03f97ccca3ad173187c0d80bb65ceba",
+  "started_unix": 1791650714,
+  "source_execution": "21b607607bf442a6b6d9494dda897ea8",
+  "source_owner": "casadi-nmpc-research-20261010-cl-afc46a23b0c9",
+  "candidate": "0e16077e9183ebcd64729eb982aa5a73e5eb03e111d5d7ed402552ca16db345b",
+  "frozen_task": {
+    "lengths_m": [
+      0.16,
+      0.11
+    ],
+    "design_search": false,
+    "topology": "two flexible segments, six ideal tension channels, unchanged materials, sections, routing, guides, rigid components and payload",
+    "mesh_cells": 24,
+    "basis": "structural_linear",
+    "tendon_order": [
+      "near_t0",
+      "near_t1",
+      "near_t2",
+      "far_t0",
+      "far_t1",
+      "far_t2"
+    ],
+    "tension_bounds_n": [
+      0,
+      8
+    ],
+    "target_m": [
+      0.29,
+      0.035,
+      0.19
+    ],
+    "mount_m": [
+      0,
+      0,
+      0.15
+    ],
+    "mount_quaternion_wxyz": [
+      1,
+      0,
+      0,
+      0
+    ],
+    "gravity_m_s2": [
+      0,
+      0,
+      -9.81
+    ],
+    "physical_initial_state": "named zero positions and velocities",
+    "numerical_guess_n": 0.2,
+    "duration_s": 0.35,
+    "control_period_s": 0.01,
+    "sample_period_s": 0.01,
+    "physics_step_s": 0.0005,
+    "holding_window_s": 0.05,
+    "holding_endpoint_included": true,
+    "terminal_position_limit_m": 0.01,
+    "holding_position_limit_m": 0.01,
+    "holding_speed_limit_m_s": 0.02,
+    "seed": 17
+  },
+  "allowed_factors": {
+    "recover_returned_tensions": [
+      false,
+      true
+    ]
+  },
+  "unchanged_stopping_settings": {
+    "max_cpu_s": 30,
+    "max_iterations": 120,
+    "minimum_s": 5,
+    "relative_improvement": 0.1,
+    "tolerance": 1e-06
+  },
+  "stopping_interpretation": "Report actual policy and raw solver termination. If another condition ends a 30s-budget solve, extending feasible-return time is not isolated and cannot be declared ineffective. Never automatically raise another ceiling.",
+  "budgets": {
+    "representative_saved_states": 1,
+    "paired_local_comparisons": 1,
+    "new_local_nlp_attempts": 2,
+    "pair_wall_s": 300,
+    "full_nlp_solves": 0,
+    "new_independent_replays": 0,
+    "physical_launches": 1,
+    "physical_allowance_s": 1800,
+    "evaluation_allowance_s": 30,
+    "profile_allowance_s": 60,
+    "total_numerical_s": 3600,
+    "actual_provider_requests": 16,
+    "protected_final_provider_sends": 4,
+    "public_workflow_calls": 64,
+    "overall_activity_s": 21600,
+    "delivery_reserve_s": 1800,
+    "other_llm_workers": 0,
+    "real_hardware": 0,
+    "saved_candidate_regenerations": 2,
+    "regeneration_wall_s": 180,
+    "local_nlp_combined_s": 300
+  },
+  "action_menu": [
+    "inspect_residuals",
+    "reintegrate_saved_tensions",
+    "warm_start_comparison",
+    "control_revision",
+    "diagnose",
+    "stop"
+  ],
+  "completion": "Evidence-supported diagnosis and recommendation-only procedure; robot success is not required. Model may STOP early.",
+  "research_question": "Can a recorded lower-objective but dynamically infeasible NMPC plan be converted into a numerically feasible, still-useful plan by regenerating its states under unchanged tensions, and can that mechanism improve closed-loop behavior?",
+  "saved_state": {
+    "update_id": 20,
+    "time_s": 0.2
+  },
+  "methods_supplied_by_task": [
+    "Exact residual audit without new optimization",
+    "Existing implicit root-finder state regeneration under unchanged tensions",
+    "Optional regenerated warm-seed comparison",
+    "Optional recovery flag false to true"
+  ],
+  "model_decisions": [
+    "Saved rejected plan selection",
+    "One evidence-driven next scientific step or STOP",
+    "Original disposition"
+  ],
+  "fixed_controller": {
+    "feasible_return_budget_s": 15,
+    "max_cpu_s": 30,
+    "max_iterations": 120,
+    "holding_tip_speed_weight": 0.05,
+    "terminal_tip_speed_weight": 0.1,
+    "substeps": 1,
+    "feasibility_threshold": 1e-05
+  }
+}

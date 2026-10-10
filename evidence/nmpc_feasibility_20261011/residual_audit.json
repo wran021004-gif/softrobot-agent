@@ -1,0 +1,1294 @@
+{
+  "feasibility_operation": "inspect_residuals",
+  "status": "completed",
+  "source_binding": {
+    "artifact_id": "b91d6cd639b622f39bf9498950523c95f0a4b734c243a87dc68ef8453e63282d",
+    "media_type": "application/json"
+  },
+  "audits": [
+    {
+      "source_problem": {
+        "artifact_id": "1074959ef843e7b79b6c14ffad293cd8b8a098ca57a95b55fc237a25835970cc",
+        "media_type": "application/json"
+      },
+      "update_id": 20,
+      "time_s": 0.2,
+      "coordinate_order": [
+        "near.kappa_y_node_0",
+        "near.kappa_y_node_1",
+        "near.kappa_y_node_2",
+        "near.kappa_z_node_0",
+        "near.kappa_z_node_1",
+        "near.kappa_z_node_2",
+        "distal1.kappa_y_node_0",
+        "distal1.kappa_y_node_1",
+        "distal1.kappa_y_node_2",
+        "distal1.kappa_z_node_0",
+        "distal1.kappa_z_node_1",
+        "distal1.kappa_z_node_2"
+      ],
+      "variable_order_verified": true,
+      "constraint_order_verified": true,
+      "absolute_timing_verified": true,
+      "normalization_source": "gvs_trajectory.implicit_step_residual: kinematic /10, implicit force /.001",
+      "threshold": 1e-05,
+      "new_nlp_attempts": 0,
+      "plans": [
+        {
+          "label": "initial",
+          "source_reference": {
+            "artifact_id": "1074959ef843e7b79b6c14ffad293cd8b8a098ca57a95b55fc237a25835970cc",
+            "media_type": "application/json"
+          },
+          "pointer": "/snapshot/plans/initial",
+          "objective": 1697.0857483254906,
+          "feasible": true,
+          "max_scaled_residual": 2.927345865710862e-14,
+          "count_above_1e_5": 0,
+          "groups": {
+            "kinematic_consistency": {
+              "max_scaled_residual": 8.326672684688674e-17,
+              "count_above_1e_5": 0
+            },
+            "generalized_force_balance": {
+              "max_scaled_residual": 2.927345865710862e-14,
+              "count_above_1e_5": 0
+            }
+          },
+          "named_residuals": {
+            "initial_state_consistency": {
+              "max_scaled_residual": 0.0,
+              "violations_over_1e_5": 0,
+              "worst": {
+                "name": "x/0/0",
+                "scaled_residual": 0.0
+              }
+            },
+            "dynamics_equalities": {
+              "max_scaled_residual": 2.927345865710862e-14,
+              "violations_over_1e_5": 0,
+              "worst": {
+                "name": "dynamics_4_14",
+                "scaled_residual": 2.927345865710862e-14
+              }
+            },
+            "variable_bounds": {
+              "max_scaled_residual": 0.0,
+              "violations_over_1e_5": 0,
+              "worst": {
+                "name": "x/0/0",
+                "scaled_residual": 0.0
+              }
+            }
+          },
+          "ranked_violations": [
+            {
+              "constraint_name": "dynamics_4_14",
+              "interval_zero_based": 4,
+              "start_s": 0.24000000000000002,
+              "end_s": 0.25,
+              "row_zero_based": 14,
+              "coordinate": "near.kappa_y_node_2",
+              "kind": "generalized_force_balance",
+              "signed_scaled_residual": 2.927345865710862e-14,
+              "absolute_scaled_residual": 2.927345865710862e-14,
+              "normalization_denominator": 0.001,
+              "physical_unit": "N*m^2/rad",
+              "signed_physical_residual": 2.927345865710862e-17,
+              "absolute_physical_residual": 2.927345865710862e-17
+            },
+            {
+              "constraint_name": "dynamics_2_14",
+              "interval_zero_based": 2,
+              "start_s": 0.22,
+              "end_s": 0.23,
+              "row_zero_based": 14,
+              "coordinate": "near.kappa_y_node_2",
+              "kind": "generalized_force_balance",
+              "signed_scaled_residual": -2.6237692574149207e-14,
+              "absolute_scaled_residual": 2.6237692574149207e-14,
+              "normalization_denominator": 0.001,
+              "physical_unit": "N*m^2/rad",
+              "signed_physical_residual": -2.6237692574149207e-17,
+              "absolute_physical_residual": 2.6237692574149207e-17
+            },
+            {
+              "constraint_name": "dynamics_9_13",
+              "interval_zero_based": 9,
+              "start_s": 0.29000000000000004,
+              "end_s": 0.30000000000000004,
+              "row_zero_based": 13,
+              "coordinate": "near.kappa_y_node_1",
+              "kind": "generalized_force_balance",
+              "signed_scaled_residual": -2.0166160408230382e-14,
+              "absolute_scaled_residual": 2.0166160408230382e-14,
+              "normalization_denominator": 0.001,
+              "physical_unit": "N*m^2/rad",
+              "signed_physical_residual": -2.0166160408230382e-17,
+              "absolute_physical_residual": 2.0166160408230382e-17
+            },
+            {
+              "constraint_name": "dynamics_6_13",
+              "interval_zero_based": 6,
+              "start_s": 0.26,
+              "end_s": 0.27,
+              "row_zero_based": 13,
+              "coordinate": "near.kappa_y_node_1",
+              "kind": "generalized_force_balance",
+              "signed_scaled_residual": -1.6479873021779667e-14,
+              "absolute_scaled_residual": 1.6479873021779667e-14,
+              "normalization_denominator": 0.001,
+              "physical_unit": "N*m^2/rad",
+              "signed_physical_residual": -1.6479873021779667e-17,
+              "absolute_physical_residual": 1.6479873021779667e-17
+            },
+            {
+              "constraint_name": "dynamics_2_13",
+              "interval_zero_based": 2,
+              "start_s": 0.22,
+              "end_s": 0.23,
+              "row_zero_based": 13,
+              "coordinate": "near.kappa_y_node_1",
+              "kind": "generalized_force_balance",
+              "signed_scaled_residual": -1.3877787807814457e-14,
+              "absolute_scaled_residual": 1.3877787807814457e-14,
+              "normalization_denominator": 0.001,
+              "physical_unit": "N*m^2/rad",
+              "signed_physical_residual": -1.3877787807814457e-17,
+              "absolute_physical_residual": 1.3877787807814457e-17
+            },
+            {
+              "constraint_name": "dynamics_7_14",
+              "interval_zero_based": 7,
+              "start_s": 0.27,
+              "end_s": 0.28,
+              "row_zero_based": 14,
+              "coordinate": "near.kappa_y_node_2",
+              "kind": "generalized_force_balance",
+              "signed_scaled_residual": 1.3227266504323154e-14,
+              "absolute_scaled_residual": 1.3227266504323154e-14,
+              "normalization_denominator": 0.001,
+              "physical_unit": "N*m^2/rad",
+              "signed_physical_residual": 1.3227266504323154e-17,
+              "absolute_physical_residual": 1.3227266504323154e-17
+            },
+            {
+              "constraint_name": "dynamics_2_12",
+              "interval_zero_based": 2,
+              "start_s": 0.22,
+              "end_s": 0.23,
+              "row_zero_based": 12,
+              "coordinate": "near.kappa_y_node_0",
+              "kind": "generalized_force_balance",
+              "signed_scaled_residual": -1.2576745200831851e-14,
+              "absolute_scaled_residual": 1.2576745200831851e-14,
+              "normalization_denominator": 0.001,
+              "physical_unit": "N*m^2/rad",
+              "signed_physical_residual": -1.2576745200831851e-17,
+              "absolute_physical_residual": 1.2576745200831851e-17
+            },
+            {
+              "constraint_name": "dynamics_6_14",
+              "interval_zero_based": 6,
+              "start_s": 0.26,
+              "end_s": 0.27,
+              "row_zero_based": 14,
+              "coordinate": "near.kappa_y_node_2",
+              "kind": "generalized_force_balance",
+              "signed_scaled_residual": -1.1384122811097797e-14,
+              "absolute_scaled_residual": 1.1384122811097797e-14,
+              "normalization_denominator": 0.001,
+              "physical_unit": "N*m^2/rad",
+              "signed_physical_residual": -1.1384122811097797e-17,
+              "absolute_physical_residual": 1.1384122811097797e-17
+            }
+          ],
+          "worst_force": {
+            "constraint_name": "dynamics_4_14",
+            "interval_zero_based": 4,
+            "start_s": 0.24000000000000002,
+            "end_s": 0.25,
+            "row_zero_based": 14,
+            "coordinate": "near.kappa_y_node_2",
+            "kind": "generalized_force_balance",
+            "signed_scaled_residual": 2.927345865710862e-14,
+            "absolute_scaled_residual": 2.927345865710862e-14,
+            "normalization_denominator": 0.001,
+            "physical_unit": "N*m^2/rad",
+            "signed_physical_residual": 2.927345865710862e-17,
+            "absolute_physical_residual": 2.927345865710862e-17,
+            "decomposition": {
+              "signed_terms": {
+                "inertial": -0.0010051512431762685,
+                "velocity_dependent": 1.2732564681234866e-06,
+                "elastic": 0.0020110319232425813,
+                "damping": -9.1413865858791e-06,
+                "gravity": -0.0009441146119556385,
+                "tendon": -5.389793799288927e-05
+              },
+              "sum": 2.9327668765732895e-17,
+              "exact_implicit_residual": 2.927345865710862e-17,
+              "difference": 5.421010862427522e-20,
+              "physical_unit": "N*m^2/rad",
+              "method": "Inertial and velocity terms isolated from exact implicit residual at zero rate/acceleration; all contributions evaluated at following state."
+            }
+          }
+        },
+        {
+          "label": "selected",
+          "identical_vector_to": "initial"
+        },
+        {
+          "label": "returned",
+          "source_reference": {
+            "artifact_id": "1074959ef843e7b79b6c14ffad293cd8b8a098ca57a95b55fc237a25835970cc",
+            "media_type": "application/json"
+          },
+          "pointer": "/snapshot/plans/returned",
+          "objective": 22.30603877987936,
+          "feasible": false,
+          "max_scaled_residual": 0.042687068291809294,
+          "count_above_1e_5": 120,
+          "groups": {
+            "kinematic_consistency": {
+              "max_scaled_residual": 3.552713678800501e-16,
+              "count_above_1e_5": 0
+            },
+            "generalized_force_balance": {
+              "max_scaled_residual": 0.042687068291809294,
+              "count_above_1e_5": 120
+            }
+          },
+          "named_residuals": {
+            "initial_state_consistency": {
+              "max_scaled_residual": 0.0,
+              "violations_over_1e_5": 0,
+              "worst": {
+                "name": "x/0/0",
+                "scaled_residual": 0.0
+              }
+            },
+            "dynamics_equalities": {
+              "max_scaled_residual": 0.042687068291809294,
+              "violations_over_1e_5": 120,
+              "worst": {
+                "name": "dynamics_3_13",
+                "scaled_residual": 0.042687068291809294
+              }
+            },
+            "variable_bounds": {
+              "max_scaled_residual": 0.0,
+              "violations_over_1e_5": 0,
+              "worst": {
+                "name": "x/0/0",
+                "scaled_residual": 0.0
+              }
+            }
+          },
+          "ranked_violations": [
+            {
+              "constraint_name": "dynamics_3_13",
+              "interval_zero_based": 3,
+              "start_s": 0.23,
+              "end_s": 0.24000000000000002,
+              "row_zero_based": 13,
+              "coordinate": "near.kappa_y_node_1",
+              "kind": "generalized_force_balance",
+              "signed_scaled_residual": 0.042687068291809294,
+              "absolute_scaled_residual": 0.042687068291809294,
+              "normalization_denominator": 0.001,
+              "physical_unit": "N*m^2/rad",
+              "signed_physical_residual": 4.2687068291809294e-05,
+              "absolute_physical_residual": 4.2687068291809294e-05
+            },
+            {
+              "constraint_name": "dynamics_5_16",
+              "interval_zero_based": 5,
+              "start_s": 0.25,
+              "end_s": 0.26,
+              "row_zero_based": 16,
+              "coordinate": "near.kappa_z_node_1",
+              "kind": "generalized_force_balance",
+              "signed_scaled_residual": -0.030284359919673272,
+              "absolute_scaled_residual": 0.030284359919673272,
+              "normalization_denominator": 0.001,
+              "physical_unit": "N*m^2/rad",
+              "signed_physical_residual": -3.0284359919673272e-05,
+              "absolute_physical_residual": 3.0284359919673272e-05
+            },
+            {
+              "constraint_name": "dynamics_2_13",
+              "interval_zero_based": 2,
+              "start_s": 0.22,
+              "end_s": 0.23,
+              "row_zero_based": 13,
+              "coordinate": "near.kappa_y_node_1",
+              "kind": "generalized_force_balance",
+              "signed_scaled_residual": 0.02617718630412713,
+              "absolute_scaled_residual": 0.02617718630412713,
+              "normalization_denominator": 0.001,
+              "physical_unit": "N*m^2/rad",
+              "signed_physical_residual": 2.617718630412713e-05,
+              "absolute_physical_residual": 2.617718630412713e-05
+            },
+            {
+              "constraint_name": "dynamics_3_12",
+              "interval_zero_based": 3,
+              "start_s": 0.23,
+              "end_s": 0.24000000000000002,
+              "row_zero_based": 12,
+              "coordinate": "near.kappa_y_node_0",
+              "kind": "generalized_force_balance",
+              "signed_scaled_residual": 0.025707788000473714,
+              "absolute_scaled_residual": 0.025707788000473714,
+              "normalization_denominator": 0.001,
+              "physical_unit": "N*m^2/rad",
+              "signed_physical_residual": 2.5707788000473714e-05,
+              "absolute_physical_residual": 2.5707788000473714e-05
+            },
+            {
+              "constraint_name": "dynamics_6_16",
+              "interval_zero_based": 6,
+              "start_s": 0.26,
+              "end_s": 0.27,
+              "row_zero_based": 16,
+              "coordinate": "near.kappa_z_node_1",
+              "kind": "generalized_force_balance",
+              "signed_scaled_residual": 0.022076794426518272,
+              "absolute_scaled_residual": 0.022076794426518272,
+              "normalization_denominator": 0.001,
+              "physical_unit": "N*m^2/rad",
+              "signed_physical_residual": 2.2076794426518272e-05,
+              "absolute_physical_residual": 2.2076794426518272e-05
+            },
+            {
+              "constraint_name": "dynamics_4_13",
+              "interval_zero_based": 4,
+              "start_s": 0.24000000000000002,
+              "end_s": 0.25,
+              "row_zero_based": 13,
+              "coordinate": "near.kappa_y_node_1",
+              "kind": "generalized_force_balance",
+              "signed_scaled_residual": 0.019482793142445304,
+              "absolute_scaled_residual": 0.019482793142445304,
+              "normalization_denominator": 0.001,
+              "physical_unit": "N*m^2/rad",
+              "signed_physical_residual": 1.9482793142445304e-05,
+              "absolute_physical_residual": 1.9482793142445304e-05
+            },
+            {
+              "constraint_name": "dynamics_5_13",
+              "interval_zero_based": 5,
+              "start_s": 0.25,
+              "end_s": 0.26,
+              "row_zero_based": 13,
+              "coordinate": "near.kappa_y_node_1",
+              "kind": "generalized_force_balance",
+              "signed_scaled_residual": 0.017107016725385546,
+              "absolute_scaled_residual": 0.017107016725385546,
+              "normalization_denominator": 0.001,
+              "physical_unit": "N*m^2/rad",
+              "signed_physical_residual": 1.7107016725385546e-05,
+              "absolute_physical_residual": 1.7107016725385546e-05
+            },
+            {
+              "constraint_name": "dynamics_3_14",
+              "interval_zero_based": 3,
+              "start_s": 0.23,
+              "end_s": 0.24000000000000002,
+              "row_zero_based": 14,
+              "coordinate": "near.kappa_y_node_2",
+              "kind": "generalized_force_balance",
+              "signed_scaled_residual": 0.01679199091924287,
+              "absolute_scaled_residual": 0.01679199091924287,
+              "normalization_denominator": 0.001,
+              "physical_unit": "N*m^2/rad",
+              "signed_physical_residual": 1.679199091924287e-05,
+              "absolute_physical_residual": 1.679199091924287e-05
+            }
+          ],
+          "worst_force": {
+            "constraint_name": "dynamics_3_13",
+            "interval_zero_based": 3,
+            "start_s": 0.23,
+            "end_s": 0.24000000000000002,
+            "row_zero_based": 13,
+            "coordinate": "near.kappa_y_node_1",
+            "kind": "generalized_force_balance",
+            "signed_scaled_residual": 0.042687068291809294,
+            "absolute_scaled_residual": 0.042687068291809294,
+            "normalization_denominator": 0.001,
+            "physical_unit": "N*m^2/rad",
+            "signed_physical_residual": 4.2687068291809294e-05,
+            "absolute_physical_residual": 4.2687068291809294e-05,
+            "decomposition": {
+              "signed_terms": {
+                "inertial": -0.021439590732874974,
+                "velocity_dependent": 0.0033879397039259787,
+                "elastic": 0.0030691276556639503,
+                "damping": -0.002559349312935117,
+                "gravity": -0.003938472818279961,
+                "tendon": 0.021523032572791933
+              },
+              "sum": 4.268706829181276e-05,
+              "exact_implicit_residual": 4.2687068291809294e-05,
+              "difference": 3.469446951953614e-18,
+              "physical_unit": "N*m^2/rad",
+              "method": "Inertial and velocity terms isolated from exact implicit residual at zero rate/acceleration; all contributions evaluated at following state."
+            }
+          }
+        },
+        {
+          "label": "checkpoint_1",
+          "identical_vector_to": "returned"
+        },
+        {
+          "label": "checkpoint_2",
+          "source_reference": {
+            "artifact_id": "1074959ef843e7b79b6c14ffad293cd8b8a098ca57a95b55fc237a25835970cc",
+            "media_type": "application/json"
+          },
+          "pointer": "/snapshot/plans/checkpoint_2",
+          "objective": 27.527303922251036,
+          "feasible": false,
+          "max_scaled_residual": 0.013844345207850856,
+          "count_above_1e_5": 119,
+          "groups": {
+            "kinematic_consistency": {
+              "max_scaled_residual": 2.886579864025407e-16,
+              "count_above_1e_5": 0
+            },
+            "generalized_force_balance": {
+              "max_scaled_residual": 0.013844345207850856,
+              "count_above_1e_5": 119
+            }
+          },
+          "named_residuals": {
+            "initial_state_consistency": {
+              "max_scaled_residual": 0.0,
+              "violations_over_1e_5": 0,
+              "worst": {
+                "name": "x/0/0",
+                "scaled_residual": 0.0
+              }
+            },
+            "dynamics_equalities": {
+              "max_scaled_residual": 0.013844345207850856,
+              "violations_over_1e_5": 119,
+              "worst": {
+                "name": "dynamics_4_13",
+                "scaled_residual": 0.013844345207850856
+              }
+            },
+            "variable_bounds": {
+              "max_scaled_residual": 0.0,
+              "violations_over_1e_5": 0,
+              "worst": {
+                "name": "x/0/0",
+                "scaled_residual": 0.0
+              }
+            }
+          },
+          "ranked_violations": [
+            {
+              "constraint_name": "dynamics_4_13",
+              "interval_zero_based": 4,
+              "start_s": 0.24000000000000002,
+              "end_s": 0.25,
+              "row_zero_based": 13,
+              "coordinate": "near.kappa_y_node_1",
+              "kind": "generalized_force_balance",
+              "signed_scaled_residual": 0.013844345207850856,
+              "absolute_scaled_residual": 0.013844345207850856,
+              "normalization_denominator": 0.001,
+              "physical_unit": "N*m^2/rad",
+              "signed_physical_residual": 1.3844345207850856e-05,
+              "absolute_physical_residual": 1.3844345207850856e-05
+            },
+            {
+              "constraint_name": "dynamics_6_13",
+              "interval_zero_based": 6,
+              "start_s": 0.26,
+              "end_s": 0.27,
+              "row_zero_based": 13,
+              "coordinate": "near.kappa_y_node_1",
+              "kind": "generalized_force_balance",
+              "signed_scaled_residual": 0.01345039286687437,
+              "absolute_scaled_residual": 0.01345039286687437,
+              "normalization_denominator": 0.001,
+              "physical_unit": "N*m^2/rad",
+              "signed_physical_residual": 1.345039286687437e-05,
+              "absolute_physical_residual": 1.345039286687437e-05
+            },
+            {
+              "constraint_name": "dynamics_3_13",
+              "interval_zero_based": 3,
+              "start_s": 0.23,
+              "end_s": 0.24000000000000002,
+              "row_zero_based": 13,
+              "coordinate": "near.kappa_y_node_1",
+              "kind": "generalized_force_balance",
+              "signed_scaled_residual": 0.01252679725170791,
+              "absolute_scaled_residual": 0.01252679725170791,
+              "normalization_denominator": 0.001,
+              "physical_unit": "N*m^2/rad",
+              "signed_physical_residual": 1.252679725170791e-05,
+              "absolute_physical_residual": 1.252679725170791e-05
+            },
+            {
+              "constraint_name": "dynamics_2_13",
+              "interval_zero_based": 2,
+              "start_s": 0.22,
+              "end_s": 0.23,
+              "row_zero_based": 13,
+              "coordinate": "near.kappa_y_node_1",
+              "kind": "generalized_force_balance",
+              "signed_scaled_residual": 0.010296222674163746,
+              "absolute_scaled_residual": 0.010296222674163746,
+              "normalization_denominator": 0.001,
+              "physical_unit": "N*m^2/rad",
+              "signed_physical_residual": 1.0296222674163746e-05,
+              "absolute_physical_residual": 1.0296222674163746e-05
+            },
+            {
+              "constraint_name": "dynamics_8_13",
+              "interval_zero_based": 8,
+              "start_s": 0.28,
+              "end_s": 0.29000000000000004,
+              "row_zero_based": 13,
+              "coordinate": "near.kappa_y_node_1",
+              "kind": "generalized_force_balance",
+              "signed_scaled_residual": -0.010274862626065417,
+              "absolute_scaled_residual": 0.010274862626065417,
+              "normalization_denominator": 0.001,
+              "physical_unit": "N*m^2/rad",
+              "signed_physical_residual": -1.0274862626065417e-05,
+              "absolute_physical_residual": 1.0274862626065417e-05
+            },
+            {
+              "constraint_name": "dynamics_6_12",
+              "interval_zero_based": 6,
+              "start_s": 0.26,
+              "end_s": 0.27,
+              "row_zero_based": 12,
+              "coordinate": "near.kappa_y_node_0",
+              "kind": "generalized_force_balance",
+              "signed_scaled_residual": 0.008737487103787842,
+              "absolute_scaled_residual": 0.008737487103787842,
+              "normalization_denominator": 0.001,
+              "physical_unit": "N*m^2/rad",
+              "signed_physical_residual": 8.737487103787842e-06,
+              "absolute_physical_residual": 8.737487103787842e-06
+            },
+            {
+              "constraint_name": "dynamics_4_12",
+              "interval_zero_based": 4,
+              "start_s": 0.24000000000000002,
+              "end_s": 0.25,
+              "row_zero_based": 12,
+              "coordinate": "near.kappa_y_node_0",
+              "kind": "generalized_force_balance",
+              "signed_scaled_residual": 0.008502104013523998,
+              "absolute_scaled_residual": 0.008502104013523998,
+              "normalization_denominator": 0.001,
+              "physical_unit": "N*m^2/rad",
+              "signed_physical_residual": 8.502104013523998e-06,
+              "absolute_physical_residual": 8.502104013523998e-06
+            },
+            {
+              "constraint_name": "dynamics_8_12",
+              "interval_zero_based": 8,
+              "start_s": 0.28,
+              "end_s": 0.29000000000000004,
+              "row_zero_based": 12,
+              "coordinate": "near.kappa_y_node_0",
+              "kind": "generalized_force_balance",
+              "signed_scaled_residual": -0.008268430647682956,
+              "absolute_scaled_residual": 0.008268430647682956,
+              "normalization_denominator": 0.001,
+              "physical_unit": "N*m^2/rad",
+              "signed_physical_residual": -8.268430647682956e-06,
+              "absolute_physical_residual": 8.268430647682956e-06
+            }
+          ],
+          "worst_force": {
+            "constraint_name": "dynamics_4_13",
+            "interval_zero_based": 4,
+            "start_s": 0.24000000000000002,
+            "end_s": 0.25,
+            "row_zero_based": 13,
+            "coordinate": "near.kappa_y_node_1",
+            "kind": "generalized_force_balance",
+            "signed_scaled_residual": 0.013844345207850856,
+            "absolute_scaled_residual": 0.013844345207850856,
+            "normalization_denominator": 0.001,
+            "physical_unit": "N*m^2/rad",
+            "signed_physical_residual": 1.3844345207850856e-05,
+            "absolute_physical_residual": 1.3844345207850856e-05,
+            "decomposition": {
+              "signed_terms": {
+                "inertial": -0.01886912556467009,
+                "velocity_dependent": 0.0036080368179050148,
+                "elastic": 0.001962383831524605,
+                "damping": -0.0028140526220794358,
+                "gravity": -0.003996329144933175,
+                "tendon": 0.020122931027460933
+              },
+              "sum": 1.3844345207854325e-05,
+              "exact_implicit_residual": 1.3844345207850856e-05,
+              "difference": 3.469446951953614e-18,
+              "physical_unit": "N*m^2/rad",
+              "method": "Inertial and velocity terms isolated from exact implicit residual at zero rate/acceleration; all contributions evaluated at following state."
+            }
+          }
+        }
+      ],
+      "cost_s": 14.47066089999862
+    },
+    {
+      "source_problem": {
+        "artifact_id": "b8849bb48a87ba8eccf5974d1272ffb49cfd705443cbfbd7e515b416f9f30bb3",
+        "media_type": "application/json"
+      },
+      "update_id": 20,
+      "time_s": 0.2,
+      "coordinate_order": [
+        "near.kappa_y_node_0",
+        "near.kappa_y_node_1",
+        "near.kappa_y_node_2",
+        "near.kappa_z_node_0",
+        "near.kappa_z_node_1",
+        "near.kappa_z_node_2",
+        "distal1.kappa_y_node_0",
+        "distal1.kappa_y_node_1",
+        "distal1.kappa_y_node_2",
+        "distal1.kappa_z_node_0",
+        "distal1.kappa_z_node_1",
+        "distal1.kappa_z_node_2"
+      ],
+      "variable_order_verified": true,
+      "constraint_order_verified": true,
+      "absolute_timing_verified": true,
+      "normalization_source": "gvs_trajectory.implicit_step_residual: kinematic /10, implicit force /.001",
+      "threshold": 1e-05,
+      "new_nlp_attempts": 0,
+      "plans": [
+        {
+          "label": "initial",
+          "source_reference": {
+            "artifact_id": "b8849bb48a87ba8eccf5974d1272ffb49cfd705443cbfbd7e515b416f9f30bb3",
+            "media_type": "application/json"
+          },
+          "pointer": "/snapshot/plans/initial",
+          "objective": 1697.0857483254906,
+          "feasible": true,
+          "max_scaled_residual": 2.927345865710862e-14,
+          "count_above_1e_5": 0,
+          "groups": {
+            "kinematic_consistency": {
+              "max_scaled_residual": 8.326672684688674e-17,
+              "count_above_1e_5": 0
+            },
+            "generalized_force_balance": {
+              "max_scaled_residual": 2.927345865710862e-14,
+              "count_above_1e_5": 0
+            }
+          },
+          "named_residuals": {
+            "initial_state_consistency": {
+              "max_scaled_residual": 0.0,
+              "violations_over_1e_5": 0,
+              "worst": {
+                "name": "x/0/0",
+                "scaled_residual": 0.0
+              }
+            },
+            "dynamics_equalities": {
+              "max_scaled_residual": 2.927345865710862e-14,
+              "violations_over_1e_5": 0,
+              "worst": {
+                "name": "dynamics_4_14",
+                "scaled_residual": 2.927345865710862e-14
+              }
+            },
+            "variable_bounds": {
+              "max_scaled_residual": 0.0,
+              "violations_over_1e_5": 0,
+              "worst": {
+                "name": "x/0/0",
+                "scaled_residual": 0.0
+              }
+            }
+          },
+          "ranked_violations": [
+            {
+              "constraint_name": "dynamics_4_14",
+              "interval_zero_based": 4,
+              "start_s": 0.24000000000000002,
+              "end_s": 0.25,
+              "row_zero_based": 14,
+              "coordinate": "near.kappa_y_node_2",
+              "kind": "generalized_force_balance",
+              "signed_scaled_residual": 2.927345865710862e-14,
+              "absolute_scaled_residual": 2.927345865710862e-14,
+              "normalization_denominator": 0.001,
+              "physical_unit": "N*m^2/rad",
+              "signed_physical_residual": 2.927345865710862e-17,
+              "absolute_physical_residual": 2.927345865710862e-17
+            },
+            {
+              "constraint_name": "dynamics_2_14",
+              "interval_zero_based": 2,
+              "start_s": 0.22,
+              "end_s": 0.23,
+              "row_zero_based": 14,
+              "coordinate": "near.kappa_y_node_2",
+              "kind": "generalized_force_balance",
+              "signed_scaled_residual": -2.6237692574149207e-14,
+              "absolute_scaled_residual": 2.6237692574149207e-14,
+              "normalization_denominator": 0.001,
+              "physical_unit": "N*m^2/rad",
+              "signed_physical_residual": -2.6237692574149207e-17,
+              "absolute_physical_residual": 2.6237692574149207e-17
+            },
+            {
+              "constraint_name": "dynamics_9_13",
+              "interval_zero_based": 9,
+              "start_s": 0.29000000000000004,
+              "end_s": 0.30000000000000004,
+              "row_zero_based": 13,
+              "coordinate": "near.kappa_y_node_1",
+              "kind": "generalized_force_balance",
+              "signed_scaled_residual": -2.0166160408230382e-14,
+              "absolute_scaled_residual": 2.0166160408230382e-14,
+              "normalization_denominator": 0.001,
+              "physical_unit": "N*m^2/rad",
+              "signed_physical_residual": -2.0166160408230382e-17,
+              "absolute_physical_residual": 2.0166160408230382e-17
+            },
+            {
+              "constraint_name": "dynamics_6_13",
+              "interval_zero_based": 6,
+              "start_s": 0.26,
+              "end_s": 0.27,
+              "row_zero_based": 13,
+              "coordinate": "near.kappa_y_node_1",
+              "kind": "generalized_force_balance",
+              "signed_scaled_residual": -1.6479873021779667e-14,
+              "absolute_scaled_residual": 1.6479873021779667e-14,
+              "normalization_denominator": 0.001,
+              "physical_unit": "N*m^2/rad",
+              "signed_physical_residual": -1.6479873021779667e-17,
+              "absolute_physical_residual": 1.6479873021779667e-17
+            },
+            {
+              "constraint_name": "dynamics_2_13",
+              "interval_zero_based": 2,
+              "start_s": 0.22,
+              "end_s": 0.23,
+              "row_zero_based": 13,
+              "coordinate": "near.kappa_y_node_1",
+              "kind": "generalized_force_balance",
+              "signed_scaled_residual": -1.3877787807814457e-14,
+              "absolute_scaled_residual": 1.3877787807814457e-14,
+              "normalization_denominator": 0.001,
+              "physical_unit": "N*m^2/rad",
+              "signed_physical_residual": -1.3877787807814457e-17,
+              "absolute_physical_residual": 1.3877787807814457e-17
+            },
+            {
+              "constraint_name": "dynamics_7_14",
+              "interval_zero_based": 7,
+              "start_s": 0.27,
+              "end_s": 0.28,
+              "row_zero_based": 14,
+              "coordinate": "near.kappa_y_node_2",
+              "kind": "generalized_force_balance",
+              "signed_scaled_residual": 1.3227266504323154e-14,
+              "absolute_scaled_residual": 1.3227266504323154e-14,
+              "normalization_denominator": 0.001,
+              "physical_unit": "N*m^2/rad",
+              "signed_physical_residual": 1.3227266504323154e-17,
+              "absolute_physical_residual": 1.3227266504323154e-17
+            },
+            {
+              "constraint_name": "dynamics_2_12",
+              "interval_zero_based": 2,
+              "start_s": 0.22,
+              "end_s": 0.23,
+              "row_zero_based": 12,
+              "coordinate": "near.kappa_y_node_0",
+              "kind": "generalized_force_balance",
+              "signed_scaled_residual": -1.2576745200831851e-14,
+              "absolute_scaled_residual": 1.2576745200831851e-14,
+              "normalization_denominator": 0.001,
+              "physical_unit": "N*m^2/rad",
+              "signed_physical_residual": -1.2576745200831851e-17,
+              "absolute_physical_residual": 1.2576745200831851e-17
+            },
+            {
+              "constraint_name": "dynamics_6_14",
+              "interval_zero_based": 6,
+              "start_s": 0.26,
+              "end_s": 0.27,
+              "row_zero_based": 14,
+              "coordinate": "near.kappa_y_node_2",
+              "kind": "generalized_force_balance",
+              "signed_scaled_residual": -1.1384122811097797e-14,
+              "absolute_scaled_residual": 1.1384122811097797e-14,
+              "normalization_denominator": 0.001,
+              "physical_unit": "N*m^2/rad",
+              "signed_physical_residual": -1.1384122811097797e-17,
+              "absolute_physical_residual": 1.1384122811097797e-17
+            }
+          ],
+          "worst_force": {
+            "constraint_name": "dynamics_4_14",
+            "interval_zero_based": 4,
+            "start_s": 0.24000000000000002,
+            "end_s": 0.25,
+            "row_zero_based": 14,
+            "coordinate": "near.kappa_y_node_2",
+            "kind": "generalized_force_balance",
+            "signed_scaled_residual": 2.927345865710862e-14,
+            "absolute_scaled_residual": 2.927345865710862e-14,
+            "normalization_denominator": 0.001,
+            "physical_unit": "N*m^2/rad",
+            "signed_physical_residual": 2.927345865710862e-17,
+            "absolute_physical_residual": 2.927345865710862e-17,
+            "decomposition": {
+              "signed_terms": {
+                "inertial": -0.0010051512431762685,
+                "velocity_dependent": 1.2732564681234866e-06,
+                "elastic": 0.0020110319232425813,
+                "damping": -9.1413865858791e-06,
+                "gravity": -0.0009441146119556385,
+                "tendon": -5.389793799288927e-05
+              },
+              "sum": 2.9327668765732895e-17,
+              "exact_implicit_residual": 2.927345865710862e-17,
+              "difference": 5.421010862427522e-20,
+              "physical_unit": "N*m^2/rad",
+              "method": "Inertial and velocity terms isolated from exact implicit residual at zero rate/acceleration; all contributions evaluated at following state."
+            }
+          }
+        },
+        {
+          "label": "selected",
+          "identical_vector_to": "initial"
+        },
+        {
+          "label": "returned",
+          "source_reference": {
+            "artifact_id": "b8849bb48a87ba8eccf5974d1272ffb49cfd705443cbfbd7e515b416f9f30bb3",
+            "media_type": "application/json"
+          },
+          "pointer": "/snapshot/plans/returned",
+          "objective": 18.37680755669539,
+          "feasible": false,
+          "max_scaled_residual": 0.0009537607210136773,
+          "count_above_1e_5": 84,
+          "groups": {
+            "kinematic_consistency": {
+              "max_scaled_residual": 2.26929586233382e-14,
+              "count_above_1e_5": 0
+            },
+            "generalized_force_balance": {
+              "max_scaled_residual": 0.0009537607210136773,
+              "count_above_1e_5": 84
+            }
+          },
+          "named_residuals": {
+            "initial_state_consistency": {
+              "max_scaled_residual": 0.0,
+              "violations_over_1e_5": 0,
+              "worst": {
+                "name": "x/0/0",
+                "scaled_residual": 0.0
+              }
+            },
+            "dynamics_equalities": {
+              "max_scaled_residual": 0.0009537607210136773,
+              "violations_over_1e_5": 84,
+              "worst": {
+                "name": "dynamics_5_13",
+                "scaled_residual": 0.0009537607210136773
+              }
+            },
+            "variable_bounds": {
+              "max_scaled_residual": 0.0,
+              "violations_over_1e_5": 0,
+              "worst": {
+                "name": "x/0/0",
+                "scaled_residual": 0.0
+              }
+            }
+          },
+          "ranked_violations": [
+            {
+              "constraint_name": "dynamics_5_13",
+              "interval_zero_based": 5,
+              "start_s": 0.25,
+              "end_s": 0.26,
+              "row_zero_based": 13,
+              "coordinate": "near.kappa_y_node_1",
+              "kind": "generalized_force_balance",
+              "signed_scaled_residual": 0.0009537607210136773,
+              "absolute_scaled_residual": 0.0009537607210136773,
+              "normalization_denominator": 0.001,
+              "physical_unit": "N*m^2/rad",
+              "signed_physical_residual": 9.537607210136773e-07,
+              "absolute_physical_residual": 9.537607210136773e-07
+            },
+            {
+              "constraint_name": "dynamics_5_12",
+              "interval_zero_based": 5,
+              "start_s": 0.25,
+              "end_s": 0.26,
+              "row_zero_based": 12,
+              "coordinate": "near.kappa_y_node_0",
+              "kind": "generalized_force_balance",
+              "signed_scaled_residual": 0.0007445588825170935,
+              "absolute_scaled_residual": 0.0007445588825170935,
+              "normalization_denominator": 0.001,
+              "physical_unit": "N*m^2/rad",
+              "signed_physical_residual": 7.445588825170935e-07,
+              "absolute_physical_residual": 7.445588825170935e-07
+            },
+            {
+              "constraint_name": "dynamics_9_13",
+              "interval_zero_based": 9,
+              "start_s": 0.29000000000000004,
+              "end_s": 0.30000000000000004,
+              "row_zero_based": 13,
+              "coordinate": "near.kappa_y_node_1",
+              "kind": "generalized_force_balance",
+              "signed_scaled_residual": -0.0004544461911590997,
+              "absolute_scaled_residual": 0.0004544461911590997,
+              "normalization_denominator": 0.001,
+              "physical_unit": "N*m^2/rad",
+              "signed_physical_residual": -4.544461911590997e-07,
+              "absolute_physical_residual": 4.544461911590997e-07
+            },
+            {
+              "constraint_name": "dynamics_9_16",
+              "interval_zero_based": 9,
+              "start_s": 0.29000000000000004,
+              "end_s": 0.30000000000000004,
+              "row_zero_based": 16,
+              "coordinate": "near.kappa_z_node_1",
+              "kind": "generalized_force_balance",
+              "signed_scaled_residual": -0.00045409232125610127,
+              "absolute_scaled_residual": 0.00045409232125610127,
+              "normalization_denominator": 0.001,
+              "physical_unit": "N*m^2/rad",
+              "signed_physical_residual": -4.5409232125610127e-07,
+              "absolute_physical_residual": 4.5409232125610127e-07
+            },
+            {
+              "constraint_name": "dynamics_5_16",
+              "interval_zero_based": 5,
+              "start_s": 0.25,
+              "end_s": 0.26,
+              "row_zero_based": 16,
+              "coordinate": "near.kappa_z_node_1",
+              "kind": "generalized_force_balance",
+              "signed_scaled_residual": -0.00038739850468164083,
+              "absolute_scaled_residual": 0.00038739850468164083,
+              "normalization_denominator": 0.001,
+              "physical_unit": "N*m^2/rad",
+              "signed_physical_residual": -3.8739850468164083e-07,
+              "absolute_physical_residual": 3.8739850468164083e-07
+            },
+            {
+              "constraint_name": "dynamics_6_13",
+              "interval_zero_based": 6,
+              "start_s": 0.26,
+              "end_s": 0.27,
+              "row_zero_based": 13,
+              "coordinate": "near.kappa_y_node_1",
+              "kind": "generalized_force_balance",
+              "signed_scaled_residual": -0.00037827990314459603,
+              "absolute_scaled_residual": 0.00037827990314459603,
+              "normalization_denominator": 0.001,
+              "physical_unit": "N*m^2/rad",
+              "signed_physical_residual": -3.7827990314459603e-07,
+              "absolute_physical_residual": 3.7827990314459603e-07
+            },
+            {
+              "constraint_name": "dynamics_9_15",
+              "interval_zero_based": 9,
+              "start_s": 0.29000000000000004,
+              "end_s": 0.30000000000000004,
+              "row_zero_based": 15,
+              "coordinate": "near.kappa_z_node_0",
+              "kind": "generalized_force_balance",
+              "signed_scaled_residual": -0.0003702410664003196,
+              "absolute_scaled_residual": 0.0003702410664003196,
+              "normalization_denominator": 0.001,
+              "physical_unit": "N*m^2/rad",
+              "signed_physical_residual": -3.702410664003196e-07,
+              "absolute_physical_residual": 3.702410664003196e-07
+            },
+            {
+              "constraint_name": "dynamics_4_13",
+              "interval_zero_based": 4,
+              "start_s": 0.24000000000000002,
+              "end_s": 0.25,
+              "row_zero_based": 13,
+              "coordinate": "near.kappa_y_node_1",
+              "kind": "generalized_force_balance",
+              "signed_scaled_residual": 0.00033837882613615977,
+              "absolute_scaled_residual": 0.00033837882613615977,
+              "normalization_denominator": 0.001,
+              "physical_unit": "N*m^2/rad",
+              "signed_physical_residual": 3.3837882613615977e-07,
+              "absolute_physical_residual": 3.3837882613615977e-07
+            }
+          ],
+          "worst_force": {
+            "constraint_name": "dynamics_5_13",
+            "interval_zero_based": 5,
+            "start_s": 0.25,
+            "end_s": 0.26,
+            "row_zero_based": 13,
+            "coordinate": "near.kappa_y_node_1",
+            "kind": "generalized_force_balance",
+            "signed_scaled_residual": 0.0009537607210136773,
+            "absolute_scaled_residual": 0.0009537607210136773,
+            "normalization_denominator": 0.001,
+            "physical_unit": "N*m^2/rad",
+            "signed_physical_residual": 9.537607210136773e-07,
+            "absolute_physical_residual": 9.537607210136773e-07,
+            "decomposition": {
+              "signed_terms": {
+                "inertial": -0.01353358006316313,
+                "velocity_dependent": 0.004327974452349207,
+                "elastic": -0.0001561988157033481,
+                "damping": -0.0031016894833525415,
+                "gravity": -0.003953306613910676,
+                "tendon": 0.016417754284501502
+              },
+              "sum": 9.53760721015412e-07,
+              "exact_implicit_residual": 9.537607210136773e-07,
+              "difference": 1.734723475976807e-18,
+              "physical_unit": "N*m^2/rad",
+              "method": "Inertial and velocity terms isolated from exact implicit residual at zero rate/acceleration; all contributions evaluated at following state."
+            }
+          }
+        },
+        {
+          "label": "checkpoint_1",
+          "identical_vector_to": "returned"
+        },
+        {
+          "label": "checkpoint_2",
+          "source_reference": {
+            "artifact_id": "b8849bb48a87ba8eccf5974d1272ffb49cfd705443cbfbd7e515b416f9f30bb3",
+            "media_type": "application/json"
+          },
+          "pointer": "/snapshot/plans/checkpoint_2",
+          "objective": 18.674613911154186,
+          "feasible": false,
+          "max_scaled_residual": 0.0007145889734799793,
+          "count_above_1e_5": 83,
+          "groups": {
+            "kinematic_consistency": {
+              "max_scaled_residual": 1.554312234475219e-16,
+              "count_above_1e_5": 0
+            },
+            "generalized_force_balance": {
+              "max_scaled_residual": 0.0007145889734799793,
+              "count_above_1e_5": 83
+            }
+          },
+          "named_residuals": {
+            "initial_state_consistency": {
+              "max_scaled_residual": 0.0,
+              "violations_over_1e_5": 0,
+              "worst": {
+                "name": "x/0/0",
+                "scaled_residual": 0.0
+              }
+            },
+            "dynamics_equalities": {
+              "max_scaled_residual": 0.0007145889734799793,
+              "violations_over_1e_5": 83,
+              "worst": {
+                "name": "dynamics_4_13",
+                "scaled_residual": 0.0007145889734799793
+              }
+            },
+            "variable_bounds": {
+              "max_scaled_residual": 0.0,
+              "violations_over_1e_5": 0,
+              "worst": {
+                "name": "x/0/0",
+                "scaled_residual": 0.0
+              }
+            }
+          },
+          "ranked_violations": [
+            {
+              "constraint_name": "dynamics_4_13",
+              "interval_zero_based": 4,
+              "start_s": 0.24000000000000002,
+              "end_s": 0.25,
+              "row_zero_based": 13,
+              "coordinate": "near.kappa_y_node_1",
+              "kind": "generalized_force_balance",
+              "signed_scaled_residual": 0.0007145889734799793,
+              "absolute_scaled_residual": 0.0007145889734799793,
+              "normalization_denominator": 0.001,
+              "physical_unit": "N*m^2/rad",
+              "signed_physical_residual": 7.145889734799793e-07,
+              "absolute_physical_residual": 7.145889734799793e-07
+            },
+            {
+              "constraint_name": "dynamics_4_12",
+              "interval_zero_based": 4,
+              "start_s": 0.24000000000000002,
+              "end_s": 0.25,
+              "row_zero_based": 12,
+              "coordinate": "near.kappa_y_node_0",
+              "kind": "generalized_force_balance",
+              "signed_scaled_residual": 0.0005269072081617171,
+              "absolute_scaled_residual": 0.0005269072081617171,
+              "normalization_denominator": 0.001,
+              "physical_unit": "N*m^2/rad",
+              "signed_physical_residual": 5.269072081617171e-07,
+              "absolute_physical_residual": 5.269072081617171e-07
+            },
+            {
+              "constraint_name": "dynamics_5_13",
+              "interval_zero_based": 5,
+              "start_s": 0.25,
+              "end_s": 0.26,
+              "row_zero_based": 13,
+              "coordinate": "near.kappa_y_node_1",
+              "kind": "generalized_force_balance",
+              "signed_scaled_residual": -0.00045912606620908403,
+              "absolute_scaled_residual": 0.00045912606620908403,
+              "normalization_denominator": 0.001,
+              "physical_unit": "N*m^2/rad",
+              "signed_physical_residual": -4.5912606620908403e-07,
+              "absolute_physical_residual": 4.5912606620908403e-07
+            },
+            {
+              "constraint_name": "dynamics_5_12",
+              "interval_zero_based": 5,
+              "start_s": 0.25,
+              "end_s": 0.26,
+              "row_zero_based": 12,
+              "coordinate": "near.kappa_y_node_0",
+              "kind": "generalized_force_balance",
+              "signed_scaled_residual": -0.0002895312384296536,
+              "absolute_scaled_residual": 0.0002895312384296536,
+              "normalization_denominator": 0.001,
+              "physical_unit": "N*m^2/rad",
+              "signed_physical_residual": -2.895312384296536e-07,
+              "absolute_physical_residual": 2.895312384296536e-07
+            },
+            {
+              "constraint_name": "dynamics_9_13",
+              "interval_zero_based": 9,
+              "start_s": 0.29000000000000004,
+              "end_s": 0.30000000000000004,
+              "row_zero_based": 13,
+              "coordinate": "near.kappa_y_node_1",
+              "kind": "generalized_force_balance",
+              "signed_scaled_residual": -0.0002894934278581396,
+              "absolute_scaled_residual": 0.0002894934278581396,
+              "normalization_denominator": 0.001,
+              "physical_unit": "N*m^2/rad",
+              "signed_physical_residual": -2.894934278581396e-07,
+              "absolute_physical_residual": 2.894934278581396e-07
+            },
+            {
+              "constraint_name": "dynamics_8_16",
+              "interval_zero_based": 8,
+              "start_s": 0.28,
+              "end_s": 0.29000000000000004,
+              "row_zero_based": 16,
+              "coordinate": "near.kappa_z_node_1",
+              "kind": "generalized_force_balance",
+              "signed_scaled_residual": -0.0002732720445243475,
+              "absolute_scaled_residual": 0.0002732720445243475,
+              "normalization_denominator": 0.001,
+              "physical_unit": "N*m^2/rad",
+              "signed_physical_residual": -2.732720445243475e-07,
+              "absolute_physical_residual": 2.732720445243475e-07
+            },
+            {
+              "constraint_name": "dynamics_3_13",
+              "interval_zero_based": 3,
+              "start_s": 0.23,
+              "end_s": 0.24000000000000002,
+              "row_zero_based": 13,
+              "coordinate": "near.kappa_y_node_1",
+              "kind": "generalized_force_balance",
+              "signed_scaled_residual": 0.00024058768064230684,
+              "absolute_scaled_residual": 0.00024058768064230684,
+              "normalization_denominator": 0.001,
+              "physical_unit": "N*m^2/rad",
+              "signed_physical_residual": 2.4058768064230684e-07,
+              "absolute_physical_residual": 2.4058768064230684e-07
+            },
+            {
+              "constraint_name": "dynamics_9_12",
+              "interval_zero_based": 9,
+              "start_s": 0.29000000000000004,
+              "end_s": 0.30000000000000004,
+              "row_zero_based": 12,
+              "coordinate": "near.kappa_y_node_0",
+              "kind": "generalized_force_balance",
+              "signed_scaled_residual": -0.00023222511588358308,
+              "absolute_scaled_residual": 0.00023222511588358308,
+              "normalization_denominator": 0.001,
+              "physical_unit": "N*m^2/rad",
+              "signed_physical_residual": -2.3222511588358308e-07,
+              "absolute_physical_residual": 2.3222511588358308e-07
+            }
+          ],
+          "worst_force": {
+            "constraint_name": "dynamics_4_13",
+            "interval_zero_based": 4,
+            "start_s": 0.24000000000000002,
+            "end_s": 0.25,
+            "row_zero_based": 13,
+            "coordinate": "near.kappa_y_node_1",
+            "kind": "generalized_force_balance",
+            "signed_scaled_residual": 0.0007145889734799793,
+            "absolute_scaled_residual": 0.0007145889734799793,
+            "normalization_denominator": 0.001,
+            "physical_unit": "N*m^2/rad",
+            "signed_physical_residual": 7.145889734799793e-07,
+            "absolute_physical_residual": 7.145889734799793e-07,
+            "decomposition": {
+              "signed_terms": {
+                "inertial": -0.023352279709194873,
+                "velocity_dependent": 0.006175247443199334,
+                "elastic": 0.0013829514559511554,
+                "damping": -0.0032116770768030956,
+                "gravity": -0.003962653679989023,
+                "tendon": 0.022969126155809982
+              },
+              "sum": 7.145889734799793e-07,
+              "exact_implicit_residual": 7.145889734799793e-07,
+              "difference": 0.0,
+              "physical_unit": "N*m^2/rad",
+              "method": "Inertial and velocity terms isolated from exact implicit residual at zero rate/acceleration; all contributions evaluated at following state."
+            }
+          }
+        }
+      ],
+      "cost_s": 11.246846199966967
+    }
+  ],
+  "interpretation": "Exact original discretized equations; generalized force defects do not bound trajectory error; unchanged threshold1e-5.",
+  "actual_executed_input_n": null,
+  "new_nlp_attempts": 0,
+  "costs_s": {
+    "total": 27.43195499997819
+  }
+}

@@ -47,6 +47,14 @@ class ControlChoice(Contract):
     feasible_return_budget_s: float = Field(default=15.,ge=15.,le=30.)
     substeps: Literal[1,2] = 1
     record_update_ids: list[int] = Field(default_factory=list,max_length=2)
+    recover_returned_tensions: bool = False
+
+
+class SavedPlanChoice(Contract):
+    source_problem: EvidenceRef = Field(description='Immutable paired snapshot reference, including exact source problem and plan vectors')
+    plan_label: Literal['returned','checkpoint_1','checkpoint_2'] = 'returned'
+    regenerated_reference: EvidenceRef | None = None
+    max_wall_s: float = Field(default=180.,gt=0,le=300.)
 
 
 class LocalComparison(Contract):
@@ -57,7 +65,7 @@ class LocalComparison(Contract):
 
 
 class Plan(Contract):
-    action: Literal['solve','diagnose','diagnostic_replay','closed_loop','control_revision','saved_state_comparison','stop']
+    action: Literal['solve','diagnose','diagnostic_replay','closed_loop','control_revision','saved_state_comparison','inspect_residuals','reintegrate_saved_tensions','warm_start_comparison','stop']
     hypothesis: str = Field(min_length=1)
     supporting_evidence: list[EvidenceRef] = Field(min_length=1)
     weakening_observation: str = Field(min_length=1)
@@ -67,6 +75,7 @@ class Plan(Contract):
     control: ControlChoice | None = None
     diagnostic_candidate: EvidenceRef | None = None
     comparison: LocalComparison | None = None
+    saved_plan: SavedPlanChoice | None = None
     requested_nlp_solves: int = Field(default=0,ge=0,le=2)
     requested_replays: int = Field(default=0,ge=0,le=2)
     revision_or_stop_rule: str = Field(min_length=1)
@@ -89,6 +98,8 @@ class Plan(Contract):
             raise ValueError('CONTROL_REVISION_REQUIRES_PRECEDING_EXECUTION')
         if (self.action=='saved_state_comparison') != (self.comparison is not None):
             raise ValueError('PAIRED_COMPARISON_REQUIRES_ONE_DECLARED_FACTOR')
+        if (self.action in ('inspect_residuals','reintegrate_saved_tensions','warm_start_comparison')) != (self.saved_plan is not None):
+            raise ValueError('SAVED_PLAN_ACTION_REQUIRES_EXACT_REFERENCE')
         return self
 
 
@@ -105,6 +116,22 @@ class CloseoutPlan(Plan):
     diagnostic_candidate: None = None
     control: None = None
     comparison: None = None
+    saved_plan: None = None
+
+
+class FeasibilityPlan(Plan):
+    action: Literal['diagnose','inspect_residuals','reintegrate_saved_tensions','warm_start_comparison','control_revision','stop']
+    candidates: list[Candidate] = Field(default_factory=list,max_length=0)
+    requested_nlp_solves: Literal[0] = 0
+    requested_replays: Literal[0] = 0
+    comparison: None = None
+    diagnostic_candidate: None = None
+
+
+class FeasibilityCheck(Contract):
+    operation: Literal['inspect_residuals','reintegrate_saved_tensions','warm_start_comparison']
+    choice: SavedPlanChoice
+    plan_reference: EvidenceRef
 
 
 class InitializationPlan(Plan):

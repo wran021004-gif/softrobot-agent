@@ -1,0 +1,43 @@
+{
+  "environment": {
+    "python": "3.11.16",
+    "casadi": "3.7.2",
+    "scipy": "1.17.1",
+    "mujoco": "3.13.0",
+    "strands-agents": "1.59.0",
+    "strands-harness": "0.2.0",
+    "upgraded": false
+  },
+  "checks": [
+    {
+      "command": "python -m unittest tests.test_gvs_feedback_recovery tests.test_control_evidence tests.test_nmpc_initialization",
+      "tests": 11,
+      "passed": 9,
+      "skipped": 2,
+      "wall_s": 9.3872304,
+      "synthetic_contract_nlp_solves": 1
+    },
+    {
+      "command": "python -m unittest tests.test_nmpc_feasibility",
+      "tests": 4,
+      "passed": 4,
+      "wall_s": 3.6391119
+    },
+    {
+      "command": "python -m unittest tests.test_nmpc_feasibility",
+      "tests": 6,
+      "passed": 5,
+      "failed": 1,
+      "wall_s": 3.7090183,
+      "failure": "Test fixture omitted workspace.problem; corrected before binding"
+    },
+    {
+      "command": "python -m unittest tests.test_nmpc_feasibility",
+      "tests": 6,
+      "passed": 6,
+      "wall_s": 3.6002487
+    }
+  ],
+  "focused_checks_wall_s": 20.3356093,
+  "scientific_local_nlp_attempts": 0
+}

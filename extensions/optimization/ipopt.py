@@ -411,7 +411,11 @@ class IpoptSolver:
         bundle=CasadiNLPExpression.model_validate(problem.objective_function.data)
         key=(bundle.expression_digest,bundle.serialized_function,problem.objective.direction,
              self.parameters.constraint_jacobian_mode)
-        function=self._compiled[key][0]
+        cached=self._compiled.get(key)
+        shared=_EXPRESSION_FUNCTIONS.get(bundle.expression_digest)
+        function=(cached[0] if cached is not None else
+            shared[1] if shared is not None and shared[0]==bundle.serialized_function else
+            ca.Function.deserialize(bundle.serialized_function))
         values=np.array([optimum[name] for name in bundle.variable_order])
         check=function(x=values);g=np.asarray(check['constraints']).ravel()
         objective=float(check['objective'])
@@ -420,6 +424,9 @@ class IpoptSolver:
         ubg=[math.inf if c.upper is None else c.upper for c in problem.constraints]
         violation=_violation(values,g,lbx,ubx,lbg,ubg)
         return dict(objective=objective,scaled_violation=violation,
+            constraint_values=g.tolist(),
+            named_residuals=_named_residual_summary(values,g,lbx,ubx,lbg,ubg,
+                bundle.variable_order,bundle.constraint_order),
             feasible=bool(np.isfinite(np.r_[values,g,objective]).all() and violation<=1e-5))
 
 

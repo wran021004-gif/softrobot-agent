@@ -79,6 +79,7 @@ def resolve_candidate(store, candidate_reference, source, control, run_id, polic
     cfg=resolved_input(problem,values,run_id,policy);inp=SessionInput.model_validate(cfg)
     cfg['policy']['controller']['parameters']['data']['recipe']['feasible_return']['budget_s']=choice.feasible_return_budget_s
     cfg['policy']['controller']['parameters']['data']['recipe']['substeps']=choice.substeps
+    cfg['policy']['controller']['parameters']['data']['recipe']['recover_returned_tensions']=choice.recover_returned_tensions
     inp=SessionInput.model_validate(cfg)
     dims=family.dimensions(inp);expr=expression(cfg)
     if candidate['coordinate_order']!=dims['coordinate_order'] or candidate['tendon_order']!=dims['tendon_input_order']:
@@ -94,6 +95,7 @@ def resolve_candidate(store, candidate_reference, source, control, run_id, polic
     for k in ('holding_tip_speed_weight','terminal_tip_speed_weight'):expected[k]=getattr(choice,k)
     expected['feasible_return']['budget_s']=choice.feasible_return_budget_s
     expected['substeps']=choice.substeps
+    expected['recover_returned_tensions']=choice.recover_returned_tensions
     if actual!=expected:raise ValueError('UNDECLARED_NMPC_RECIPE_CHANGE')
     physics=family.check_robot(inp.robot.structure.data,inp.policy.discretization.data)
     basis=resolve_basis(inp.robot.structure.data,problem.execution.recipe.basis)
@@ -121,11 +123,11 @@ def validate_control(store, state, choice, action):
     preceding=None;changes={};factors=['structure/controller evaluation']
     if choice.preceding_execution:
         rows=[r for r in state['results'] if r['operation']=='closed_loop' and r['reference']==plain(choice.preceding_execution) and
-            (not r.get('imported') or state.get('initialization_diagnosis'))]
+            (not r.get('imported') or state.get('initialization_diagnosis') or state.get('feasibility_recovery'))]
         if not rows:raise ValueError('PRECEDING_CURRENT_ACTIVITY_EXECUTION_REQUIRED')
         preceding=store.artifact(choice.preceding_execution)
-        for k in ('holding_tip_speed_weight','terminal_tip_speed_weight','feasible_return_budget_s','substeps'):
-            old=preceding['control'].get(k,15. if k=='feasible_return_budget_s' else 1);new=getattr(choice,k)
+        for k in ('holding_tip_speed_weight','terminal_tip_speed_weight','feasible_return_budget_s','substeps','recover_returned_tensions'):
+            old=preceding['control'].get(k,False if k=='recover_returned_tensions' else 15. if k=='feasible_return_budget_s' else 1);new=getattr(choice,k)
             if old!=new:changes[k]=dict(before=old,after=new)
         same=preceding['candidate']==plain(choice.candidate)
         if action=='control_revision' and (not same or not changes):raise ValueError('CONTROL_ONLY_REVISION_REQUIRES_SAME_CANDIDATE_AND_CHANGED_WEIGHTS')

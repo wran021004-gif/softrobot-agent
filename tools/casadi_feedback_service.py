@@ -8,7 +8,7 @@ from tools.platform_store import plain
 from tools.state_io import atomic_json, read, digest
 from tools.spec_tools import ROOT
 
-SPEC_PATH=ROOT/('examples/nmpc_initialization/specification.json' if os.environ.get('NMPC_INITIALIZATION_DIAGNOSIS')=='1' else 'examples/casadi_nmpc/specification.json')
+SPEC_PATH=ROOT/('examples/nmpc_feasibility/specification.json' if os.environ.get('NMPC_FEASIBILITY_RECOVERY')=='1' else 'examples/nmpc_initialization/specification.json' if os.environ.get('NMPC_INITIALIZATION_DIAGNOSIS')=='1' else 'examples/casadi_nmpc/specification.json')
 SPEC=read(SPEC_PATH)
 CEILINGS=SPEC['budgets']
 ACTIVITY=SPEC['study_id']
@@ -44,11 +44,14 @@ def plan(ctx,args):
     if state.get('pending'):raise ValueError('UNKNOWN_NUMERICAL_OUTCOME_INSPECT_FIRST')
     if state.get('engineering_pause') and args.action!='stop':raise ValueError('ENGINEERING_PAUSE_REQUIRES_LOCAL_RECOVERY')
     initialization=SPEC.get('investigation')=='initialization_diagnosis'
-    if initialization:
+    if SPEC.get('investigation')=='feasibility_recovery':
+        from tools.nmpc_feasibility import validate_plan
+        validate_plan(ctx.store,state,args)
+    elif initialization:
         from tools.nmpc_initialization import validate_plan
         validate_plan(ctx.store,state,args)
     elif args.action=='saved_state_comparison' or (args.control and
-        (args.control.feasible_return_budget_s!=15. or args.control.substeps!=1 or args.control.record_update_ids)):
+        (args.control.feasible_return_budget_s!=15. or args.control.substeps!=1 or args.control.record_update_ids or args.control.recover_returned_tensions)):
         raise ValueError('FRESH_INITIALIZATION_DIAGNOSIS_GRANT_REQUIRED')
     for ref in args.supporting_evidence:ctx.artifact(ref)
     new_results=[r for r in state['results'] if not r.get('imported')]
@@ -61,7 +64,7 @@ def plan(ctx,args):
         if state.get('last_expensive_decision_send')==send:
             raise ValueError('ONE_EXPENSIVE_EXPERIMENT_PER_PROVIDER_DECISION_CONSUME_FEEDBACK_FIRST')
         if ctx.store.remaining()['remaining']['model_calls']<=4:raise ValueError('FINAL_FOUR_PROVIDER_SENDS_PROTECTED')
-        reserve={'solve':1350.,'diagnostic_replay':450.,'closed_loop':1890.,'control_revision':1890.,'saved_state_comparison':300.}[args.action]
+        reserve={'solve':1350.,'diagnostic_replay':450.,'closed_loop':1890.,'control_revision':1890.,'saved_state_comparison':300.,'inspect_residuals':180.,'reintegrate_saved_tensions':180.,'warm_start_comparison':300.}[args.action]
         if state['numerical_s']+reserve>CEILINGS['total_numerical_s'] or time.time()+reserve>=state['cutoff_unix']:
             raise ValueError('OPERATION_CANNOT_FIT_REMAINING_BUDGET')
     batch='initial' if state['nlp_solves']==0 else 'revision'
@@ -84,6 +87,8 @@ def plan(ctx,args):
         current=ctx.store.session(ctx.run_id,db)['state']
         current['plans'].append(dict(reference=plain(ref),action=args.action,batch=batch if args.action=='solve' else None))
         if args.action not in ('stop','diagnose'):current['last_expensive_decision_send']=send
+        if SPEC.get('investigation')=='feasibility_recovery' and args.action=='control_revision':
+            current['post_regeneration_steps']+=1
         if args.action=='stop':current['research_status']='stopped';current['final_disposition']=plain(ref)
         ctx.store.update_state(db,ctx.run_id,current)
     return Result(detail=dict(accepted=True,plan_reference=plain(ref),batch=batch if args.action=='solve' else None,action=args.action,remaining_budget=budget(ctx.store)))

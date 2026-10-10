@@ -25,8 +25,9 @@ EXTENSIONS += [Extension('math.casadi_feedback_'+name,'tool','1.0.0',schema,Resu
     'tools.casadi_feedback_service:'+name,description,
     sources=EXTENSIONS[0].sources + ('tools/casadi_feedback_service.py','tools/casadi_feedback_worker.py',
         'tools/research_casadi_feedback.py','tools/casadi_closed_loop.py','schemas/casadi_feedback.py','tests/test_casadi_nmpc_research.py',
-        'tools/nmpc_initialization.py','tools/research_nmpc_initialization.py'),
-    assets=EXTENSIONS[0].assets+('examples/casadi_nmpc/specification.json','examples/nmpc_initialization/specification.json'),
+        'tools/nmpc_initialization.py','tools/research_nmpc_initialization.py',
+        'tools/nmpc_feasibility.py','tools/research_nmpc_feasibility.py'),
+    assets=EXTENSIONS[0].assets+('examples/casadi_nmpc/specification.json','examples/nmpc_initialization/specification.json','examples/nmpc_feasibility/specification.json'),
     dependencies=('casadi','numpy','scipy'),extension_dependencies=(('model.gvs','1.0.0'),('solver.ipopt','1.0.0')),
     capabilities={'category':'analysis','preflight':'tools.casadi_feedback_service:preflight'},
     cache=False,side_effects='new cumulative research activity; numerical evidence and model decision')
@@ -36,3 +37,12 @@ EXTENSIONS += [Extension('math.casadi_feedback_'+name,'tool','1.0.0',schema,Resu
         ('solve',ResearchSolve,'Execute an accepted model plan candidate with shared task slacks, original acceptance and hard residuals.'),
         ('replay',ResearchReplay,'Independent BDF replay from physical zero; diagnostic schedules permitted.'),
         ('plan',Plan,'Record any supported research action, evidence, parameters or native STOP; one expensive experiment per decision.'))]
+
+from schemas.casadi_feedback import FeasibilityCheck
+EXTENSIONS += [Extension('math.nmpc_feasibility_check','tool','1.0.0',FeasibilityCheck,Result,
+    'tools.nmpc_feasibility:check_tool','Inspect saved residuals, regenerate unchanged saved tensions without IPOPT, or compare regenerated warm seed with cold seed.',
+    sources=EXTENSIONS[-1].sources+('extensions/tendon_family/control_evidence.py','extensions/tendon_family/gvs_trajectory.py'),
+    assets=EXTENSIONS[-1].assets,dependencies=('casadi','numpy','scipy'),
+    extension_dependencies=(('model.gvs','1.0.0'),('solver.ipopt','1.0.0')),
+    capabilities={'category':'analysis','preflight':'tools.nmpc_feasibility:preflight'},
+    cache=False,side_effects='bounded saved-state numerical work and immutable evidence')]
