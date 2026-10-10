@@ -198,6 +198,14 @@ def provider_guard(h,wire):
 from tools.strands_pilot_r3 import LiveBoundary
 
 
+def protect_context_tool(retrieval,references):
+    from copy import deepcopy
+    from strands.tools.tools import normalize_tool_spec
+    spec=deepcopy(normalize_tool_spec(retrieval.tool_spec))
+    spec['inputSchema']['json']['properties']['reference']['enum']=references
+    retrieval.tool_spec=spec
+
+
 class FeedbackBoundary(LiveBoundary):
     async def handle_async_request(self,request):
         if not self.host.store.session(ACTIVITY)['state']['pilot'].get('unconsumed_response'):
@@ -293,9 +301,7 @@ async def converse(h):
             tools[1].tool_spec={**tools[1].tool_spec,'inputSchema':{'json':schema}}
             retrieval=agent.tool_registry.registry.get('retrieve_context')
             if retrieval:
-                schema=deepcopy(retrieval.tool_spec['inputSchema']['json'])
-                schema['properties']['reference']['enum']=feedback_context_references(h)
-                retrieval.tool_spec={**retrieval.tool_spec,'inputSchema':{'json':schema}}
+                protect_context_tool(retrieval,feedback_context_references(h))
             agent.system_prompt+='\nPROTECTED CLOSEOUT: native plan schema now permits STOP only; evidence reads are restricted to outstanding new-result references. Actual remaining sends are those in remaining_budget, with no separate extra reserve.'
     def before_tool(event):
         record(h,'model_original_tool_request',dict(tool_use=event.tool_use))

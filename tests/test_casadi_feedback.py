@@ -118,6 +118,12 @@ class PlanTests(unittest.TestCase):
             provider_guard(host,native)
             native['tools'][1]['function']['parameters']['properties']['reference']['enum']=['historical_0']
             with self.assertRaisesRegex(ValueError,'PROTECTED_RETRIEVAL'):provider_guard(host,native)
+        from strands.tools.tools import PythonAgentTool
+        from tools.research_casadi_feedback import protect_context_tool
+        retrieval=PythonAgentTool('retrieve_context',dict(name='retrieve_context',description='Fixture matching native direct JSON schema',
+            inputSchema=dict(type='object',properties=dict(reference=dict(type='string')),required=['reference'])),lambda *a:None)
+        protect_context_tool(retrieval,['fresh_0'])
+        self.assertEqual(retrieval.tool_spec['inputSchema']['json']['properties']['reference']['enum'],['fresh_0'])
         state['research_status']='stopped'
         with self.assertRaisesRegex(ValueError,'ACCEPTED_STOP_NO_MORE_SENDS'):
             asyncio.run(boundary.handle_async_request(request))
