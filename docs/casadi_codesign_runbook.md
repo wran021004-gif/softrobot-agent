@@ -19,7 +19,10 @@ $studyPython = 'D:\softrobot-agent\.mainline5-env\Scripts\python.exe'
 & $studyPython -m tools.research_casadi_codesign check
 & $studyPython -m tools.research_casadi_codesign solve --case A
 & $studyPython -m tools.research_casadi_codesign solve --case B
-# Pass the complete trajectory or solve evidence reference returned by a solve.
+# Persist the least-violating retained noninitial schedule when infeasible.
+& $studyPython -m tools.research_casadi_codesign select --case A
+& $studyPython -m tools.research_casadi_codesign select --case B
+# Pass the selected reference (or feasible solve/trajectory reference).
 & $studyPython -m tools.research_casadi_codesign replay --candidate '<EvidenceRef JSON>' --request-id replay-A
 & $studyPython -m tools.research_casadi_codesign status
 & $studyPython -m tools.research_casadi_codesign export
@@ -89,3 +92,24 @@ Physical eligibility requires mathematical feasibility, replay discrepancy
 limits of 1 mm/0.002 m/s, and the original reach/hold limits. Controller 11
 validation tests geometry/controller behavior, separately from optimized
 open-loop schedule execution.
+
+The recorded corrections use the existing exact automatic AD execution mode
+after a single equivalence check, with unchanged equations and fresh primary
+guesses:
+
+```powershell
+& $studyPython -m tools.research_casadi_codesign check --scope jacobian_execution --request-id full-constraint-jacobian-execution-check
+& $studyPython -m tools.research_casadi_codesign solve --case A --category correction --jacobian-mode automatic --request-id correction-A-exact-auto
+& $studyPython -m tools.research_casadi_codesign solve --case B --category correction --jacobian-mode automatic --request-id correction-B-exact-auto
+```
+
+These commands document the executed study. Its stopped grant is not reopened
+to repeat them. `select` does not optimize; it preserves solver-selected feasible
+candidates or selects the smallest independently recomputed normalized violation
+among retained noninitial checkpoints. Every selection names its source artifact.
+For reproducible inspection, `evidence.read` takes an `EvidenceRef` and JSON
+pointer such as `/costs_s`; the archived Store artifacts retain the complete
+dependency snapshot, solver trace, variables, inputs and replay trajectories.
+The generic receipt's `solver_status=not_run` is a backend-result envelope field;
+the mathematical tool's typed Feedback carries the actual IPOPT status and
+termination. Physical status is reported separately.

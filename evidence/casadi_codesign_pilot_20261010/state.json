@@ -6,14 +6,38 @@
     },
     "status": "passed"
   },
+  "casadi_closeout_summary": {
+    "artifact_id": "395bf6f8fc88b163b7aaf0efb00b38692227c10d86e1b8966d3dc61186f5ef9c",
+    "media_type": "application/json"
+  },
+  "casadi_completed_unix": 1791618201.212374,
   "casadi_cutoff_unix": 1791639067.0,
-  "casadi_freeze": "e3ffcf8216a9ec2cf7071c8ad828632ce284a3aa",
-  "casadi_numerical_s": 2189.6506740514887,
+  "casadi_focused_verification": {
+    "artifact_id": "8381bdce014906c3aaff659210abd82a5f85714ea82869e9803f1b5b32b0ef95",
+    "media_type": "application/json"
+  },
+  "casadi_freeze": "9af70b160ca8589f5e3cb0cabf73fb6a498bfba2",
+  "casadi_jacobian_execution_check": {
+    "reference": {
+      "artifact_id": "f7cbdf4dcc0ad4dc963519c9b766d06ef83569dc62d3dac4b3e4414042db3f4a",
+      "media_type": "application/json"
+    },
+    "status": "passed"
+  },
+  "casadi_numerical_s": 4296.347540951414,
   "casadi_preparation_unix": 1791612661.1001053,
   "casadi_python": "D:/softrobot-agent/.mainline5-env/Scripts/python.exe",
   "casadi_repairs": [
     {
       "artifact_id": "7c5ce1b58db6e0301bc90cf16a528b33011caa4f94dfb07ec0cd9699109df1bc",
+      "media_type": "application/json"
+    },
+    {
+      "artifact_id": "71bd310ed77b8b4b46c4ead47a0831ca50b3289db185c71730872213cdc65abd",
+      "media_type": "application/json"
+    },
+    {
+      "artifact_id": "7fe2a6fb7a17de5c69cbdcb32d663017cb11773f38cb5df84fbacf4a7680dc3a",
       "media_type": "application/json"
     }
   ],
@@ -53,14 +77,77 @@
         "media_type": "application/json"
       },
       "status": "integration_timeout"
+    },
+    {
+      "case": "A",
+      "operation": "replay",
+      "reference": {
+        "artifact_id": "17f4c956160c0081435f3c88d691c3f28af72eebb7bcacb6af0b95b205f1b404",
+        "media_type": "application/json"
+      },
+      "status": "completed"
+    },
+    {
+      "case": "B",
+      "operation": "replay",
+      "reference": {
+        "artifact_id": "f0a16837d1b2bd3e4c91ffc2faa4307d15d20ff190c0d5e2b5587af32451300f",
+        "media_type": "application/json"
+      },
+      "status": "completed"
+    },
+    {
+      "case": null,
+      "operation": "check",
+      "reference": {
+        "artifact_id": "f7cbdf4dcc0ad4dc963519c9b766d06ef83569dc62d3dac4b3e4414042db3f4a",
+        "media_type": "application/json"
+      },
+      "status": "passed"
+    },
+    {
+      "case": "A",
+      "operation": "solve",
+      "reference": {
+        "artifact_id": "baae52d1f11518a40982491879c4a0ab380c519a617a0588e989a0e496bebbf2",
+        "media_type": "application/json"
+      },
+      "status": "iteration_limit"
+    },
+    {
+      "case": "B",
+      "operation": "solve",
+      "reference": {
+        "artifact_id": "2579c06bb0cecb4a86f925e9af9dc34b554d13e2895b0d9b47c4a42265a2db9d",
+        "media_type": "application/json"
+      },
+      "status": "iteration_limit"
+    },
+    {
+      "case": "A",
+      "operation": "replay",
+      "reference": {
+        "artifact_id": "172caf84e701165ecd58bb4aa6de93d83e378b6fbaaddf7a6cf2eda9f660a1b1",
+        "media_type": "application/json"
+      },
+      "status": "completed"
+    },
+    {
+      "case": "B",
+      "operation": "replay",
+      "reference": {
+        "artifact_id": "df90bb4a5ed0a46b38b1dcbc26d46b892ce8a611eaa52d4094cf8f48379e3edf",
+        "media_type": "application/json"
+      },
+      "status": "completed"
     }
   ],
   "casadi_solve_categories": {
-    "correction": 0,
+    "correction": 2,
     "paired_second": 0,
     "primary": 2
   },
-  "casadi_solves": 2,
+  "casadi_solves": 4,
   "casadi_started_unix": 1791612067,
   "last_receipt": {
     "analysis_status": "not_assessed",
@@ -70,19 +157,19 @@
       "backend_solves": 0,
       "model_calls": 0,
       "tool_calls": 1,
-      "wall_s": 900.0234508514404,
+      "wall_s": 165.56199999997625,
       "worker_calls": 0
     },
     "contract_version": "1.2.0",
-    "error": "KNOWN_REPLAY_TIMEOUT_WORKER_ENDED_NO_OUTPUT",
-    "execution_id": "383815302d5641488fcab9b0c2e88051",
-    "execution_status": "failed",
+    "error": null,
+    "execution_id": "6715d14c15b445dca748442a9940076f",
+    "execution_status": "completed",
     "original_execution_id": null,
     "output": {
-      "artifact_id": "a17c7dd0c183d30eb5a93b638dfdd8b013cfe2ba8a7b3e73bb07d251ef0d5348",
+      "artifact_id": "0485a8778571a5dc50a614f038fb621dfa5fa217a50a4206397feb17f09e067f",
       "media_type": "application/json"
     },
-    "request_id": "primary-replay-A",
+    "request_id": "correction-replay-B-BDF",
     "result_contract": "Feedback",
     "result_version": "1.0.0",
     "solver_status": "not_run",
@@ -92,7 +179,44 @@
   },
   "model_notes": [],
   "pending": null,
-  "reads": {},
+  "reads": {
+    "da3f51eb270f410b9377e33e773dd720205406796d535516735e6e774dfb98bb": {
+      "content_hash": "b0611e14f6ed4889aef079192ac29bbf83bdb1683fb61ef2fd8adc85650a82ff",
+      "kind": "content",
+      "next_offset": null,
+      "offset": 0,
+      "pointer": "/costs_s",
+      "source": {
+        "artifact_id": "2579c06bb0cecb4a86f925e9af9dc34b554d13e2895b0d9b47c4a42265a2db9d",
+        "media_type": "application/json"
+      }
+    }
+  },
+  "recent_evidence": [
+    {
+      "content_identity": "b2faec2ab7dea461172bc8d43d06b4e81c2004fcf584263a29ea3dd48f54da85",
+      "page": {
+        "content": {
+          "assembly_and_guess": 30.815083699999377,
+          "mechanics_construction": 1.5917880999622867,
+          "solve": 570.4530108000035,
+          "solver_construction": 27.44341569999233,
+          "total": 631.7173331999802
+        },
+        "kind": "content",
+        "next_offset": null,
+        "offset": 0,
+        "pointer": "/costs_s",
+        "presentation": "original",
+        "returned_items": 5,
+        "source": {
+          "artifact_id": "2579c06bb0cecb4a86f925e9af9dc34b554d13e2895b0d9b47c4a42265a2db9d",
+          "media_type": "application/json"
+        },
+        "total_items": 5
+      }
+    }
+  ],
   "repairs": 0,
   "repeated": 0,
   "turn": 0

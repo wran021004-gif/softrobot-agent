@@ -1,0 +1,834 @@
+{
+  "activity": "casadi-codesign-pilot-20261010",
+  "base_commit": "34307384307158dba899ad2499a8b3e582f8356e",
+  "scientific_freeze": "9af70b160ca8589f5e3cb0cabf73fb6a498bfba2",
+  "records": [
+    {
+      "operation": "check",
+      "case": null,
+      "reference": {
+        "artifact_id": "0baeade541aec35ccbc2319dd7da441ddda91b962ce03c38e994c9b98585c296",
+        "media_type": "application/json"
+      },
+      "status": "passed",
+      "process_elapsed_s": 33.09695659996942,
+      "costs_s": {
+        "assembly": 18.81287720002001,
+        "mechanics": 2.7477111000334844,
+        "total": 30.83065540000098
+      }
+    },
+    {
+      "operation": "solve",
+      "case": "A",
+      "reference": {
+        "artifact_id": "2e8c7ceeb9dc90357f0ec10a5d1b966db94b3d53c10329e5b46823973ec74cb8",
+        "media_type": "application/json"
+      },
+      "status": "iteration_limit",
+      "process_elapsed_s": 641.6074153000372,
+      "costs_s": {
+        "assembly_and_guess": 19.649910800042562,
+        "mechanics_construction": 2.162918800022453,
+        "solve": 608.7109260000288,
+        "solver_construction": 8.242802699969616,
+        "total": 639.5801443000091
+      },
+      "category": "primary",
+      "lengths_m": [
+        0.16,
+        0.11
+      ],
+      "iterations": 33,
+      "termination": "Maximum_CpuTime_Exceeded",
+      "objective": {
+        "effort": 0.02644399379085853,
+        "total": 0.026492004874792908,
+        "variation_weighted": 4.801108393437879e-05
+      },
+      "normalized_violation": 11.048780758911773,
+      "trajectory_metrics": {
+        "holding_max_position_error_m": 0.00794863993844743,
+        "holding_max_speed_m_s": 0.06942270740589644,
+        "terminal_position_error_m": 0.00794863993844743
+      },
+      "largest_residuals": [
+        {
+          "name": "holding_speed_35",
+          "normalized_violation": 11.048780758911773,
+          "physical_violation": 0.049422707405896445,
+          "time_s": 0.35000000000000003,
+          "units": "m/s",
+          "physical_derivation": "limit*(sqrt(1+normalized violation)-1) for active squared-norm inequality"
+        },
+        {
+          "name": "holding_speed_30",
+          "normalized_violation": 5.415751884349924,
+          "physical_violation": 0.030658669087728407,
+          "time_s": 0.3,
+          "units": "m/s",
+          "physical_derivation": "limit*(sqrt(1+normalized violation)-1) for active squared-norm inequality"
+        },
+        {
+          "name": "holding_speed_34",
+          "normalized_violation": 4.410249131893286,
+          "physical_violation": 0.026519884487789892,
+          "time_s": 0.34,
+          "units": "m/s",
+          "physical_derivation": "limit*(sqrt(1+normalized violation)-1) for active squared-norm inequality"
+        },
+        {
+          "name": "holding_speed_32",
+          "normalized_violation": 4.407468829117349,
+          "physical_violation": 0.026507929771673773,
+          "time_s": 0.32,
+          "units": "m/s",
+          "physical_derivation": "limit*(sqrt(1+normalized violation)-1) for active squared-norm inequality"
+        },
+        {
+          "name": "holding_speed_33",
+          "normalized_violation": 3.168602628852118,
+          "physical_violation": 0.02083431218400583,
+          "time_s": 0.33,
+          "units": "m/s",
+          "physical_derivation": "limit*(sqrt(1+normalized violation)-1) for active squared-norm inequality"
+        },
+        {
+          "name": "holding_speed_31",
+          "normalized_violation": 1.4322580941279557,
+          "physical_violation": 0.011191396853157799,
+          "time_s": 0.31,
+          "units": "m/s",
+          "physical_derivation": "limit*(sqrt(1+normalized violation)-1) for active squared-norm inequality"
+        },
+        {
+          "name": "dynamics_31_16",
+          "normalized_violation": 0.0046264919326039515,
+          "physical_violation": 4.626491932603952e-06,
+          "time_s": 0.32,
+          "units": "N*m^2/rad"
+        },
+        {
+          "name": "dynamics_28_16",
+          "normalized_violation": 0.00429628477738352,
+          "physical_violation": 4.2962847773835196e-06,
+          "time_s": 0.29,
+          "units": "N*m^2/rad"
+        },
+        {
+          "name": "dynamics_27_16",
+          "normalized_violation": 0.003898933447547999,
+          "physical_violation": 3.898933447547999e-06,
+          "time_s": 0.28,
+          "units": "N*m^2/rad"
+        },
+        {
+          "name": "dynamics_29_16",
+          "normalized_violation": 0.0037951456642215838,
+          "physical_violation": 3.7951456642215838e-06,
+          "time_s": 0.3,
+          "units": "N*m^2/rad"
+        },
+        {
+          "name": "dynamics_32_16",
+          "normalized_violation": 0.0036797051958183287,
+          "physical_violation": 3.6797051958183287e-06,
+          "time_s": 0.33,
+          "units": "N*m^2/rad"
+        },
+        {
+          "name": "dynamics_26_16",
+          "normalized_violation": 0.0033674381421816037,
+          "physical_violation": 3.3674381421816037e-06,
+          "time_s": 0.27,
+          "units": "N*m^2/rad"
+        }
+      ],
+      "mathematical_feasibility": "infeasible_returned_iterate",
+      "jacobian_statistics": {
+        "n_call_nlp_jac_g": 35,
+        "t_proc_nlp_jac_g": 603.6689999999998,
+        "t_wall_nlp_jac_g": 603.6682620000001
+      }
+    },
+    {
+      "operation": "solve",
+      "case": "B",
+      "reference": {
+        "artifact_id": "09f8a7b07edc70e22ed6817e202824fea22de3b0d1686cc954b77b6f40b2d219",
+        "media_type": "application/json"
+      },
+      "status": "iteration_limit",
+      "process_elapsed_s": 614.9228513000417,
+      "costs_s": {
+        "assembly_and_guess": 19.99461659998633,
+        "mechanics_construction": 2.7698716999730095,
+        "solve": 580.9516357000102,
+        "solver_construction": 8.37503579998156,
+        "total": 613.5307851999532
+      },
+      "category": "primary",
+      "lengths_m": [
+        0.15749900578783532,
+        0.11250099421216467
+      ],
+      "iterations": 28,
+      "termination": "Maximum_CpuTime_Exceeded",
+      "objective": {
+        "effort": 0.03508387887144446,
+        "total": 0.035125720680954375,
+        "variation_weighted": 4.1841809509919e-05
+      },
+      "normalized_violation": 18.374598112070803,
+      "trajectory_metrics": {
+        "holding_max_position_error_m": 0.00624156126893325,
+        "holding_max_speed_m_s": 0.08803317127553865,
+        "terminal_position_error_m": 0.00624156126893325
+      },
+      "largest_residuals": [
+        {
+          "name": "holding_speed_34",
+          "normalized_violation": 18.374598112070803,
+          "physical_violation": 0.06803317127553864,
+          "time_s": 0.34,
+          "units": "m/s",
+          "physical_derivation": "limit*(sqrt(1+normalized violation)-1) for active squared-norm inequality"
+        },
+        {
+          "name": "holding_speed_33",
+          "normalized_violation": 8.18346695466181,
+          "physical_violation": 0.04060847120547361,
+          "time_s": 0.33,
+          "units": "m/s",
+          "physical_derivation": "limit*(sqrt(1+normalized violation)-1) for active squared-norm inequality"
+        },
+        {
+          "name": "holding_speed_35",
+          "normalized_violation": 7.469910884092,
+          "physical_violation": 0.038206222636731894,
+          "time_s": 0.35000000000000003,
+          "units": "m/s",
+          "physical_derivation": "limit*(sqrt(1+normalized violation)-1) for active squared-norm inequality"
+        },
+        {
+          "name": "holding_speed_30",
+          "normalized_violation": 4.467194225353017,
+          "physical_violation": 0.02676406408922568,
+          "time_s": 0.3,
+          "units": "m/s",
+          "physical_derivation": "limit*(sqrt(1+normalized violation)-1) for active squared-norm inequality"
+        },
+        {
+          "name": "holding_speed_32",
+          "normalized_violation": 2.2916936305040143,
+          "physical_violation": 0.016286050380299115,
+          "time_s": 0.32,
+          "units": "m/s",
+          "physical_derivation": "limit*(sqrt(1+normalized violation)-1) for active squared-norm inequality"
+        },
+        {
+          "name": "dynamics_34_13",
+          "normalized_violation": 0.017029622924959718,
+          "physical_violation": 1.7029622924959718e-05,
+          "time_s": 0.35000000000000003,
+          "units": "N*m^2/rad"
+        },
+        {
+          "name": "dynamics_25_13",
+          "normalized_violation": 0.0169208319416728,
+          "physical_violation": 1.69208319416728e-05,
+          "time_s": 0.26,
+          "units": "N*m^2/rad"
+        },
+        {
+          "name": "dynamics_28_13",
+          "normalized_violation": 0.016736843195362325,
+          "physical_violation": 1.6736843195362325e-05,
+          "time_s": 0.29,
+          "units": "N*m^2/rad"
+        },
+        {
+          "name": "dynamics_24_13",
+          "normalized_violation": 0.01671502624269491,
+          "physical_violation": 1.6715026242694912e-05,
+          "time_s": 0.25,
+          "units": "N*m^2/rad"
+        },
+        {
+          "name": "dynamics_26_13",
+          "normalized_violation": 0.016456350306480634,
+          "physical_violation": 1.6456350306480634e-05,
+          "time_s": 0.27,
+          "units": "N*m^2/rad"
+        },
+        {
+          "name": "dynamics_27_13",
+          "normalized_violation": 0.016036548808987926,
+          "physical_violation": 1.6036548808987926e-05,
+          "time_s": 0.28,
+          "units": "N*m^2/rad"
+        },
+        {
+          "name": "dynamics_23_13",
+          "normalized_violation": 0.01590201999554733,
+          "physical_violation": 1.590201999554733e-05,
+          "time_s": 0.24,
+          "units": "N*m^2/rad"
+        }
+      ],
+      "mathematical_feasibility": "infeasible_returned_iterate",
+      "jacobian_statistics": {
+        "n_call_nlp_jac_g": 30,
+        "t_proc_nlp_jac_g": 575.5800000000002,
+        "t_wall_nlp_jac_g": 575.5841310000001
+      }
+    },
+    {
+      "operation": "replay_timeout",
+      "case": "A",
+      "reference": {
+        "artifact_id": "45b007805bfa0576cc31f6237c08013c181cc92aa734feb4e19876073868f819",
+        "media_type": "application/json"
+      },
+      "status": "integration_timeout",
+      "process_elapsed_s": 900.0234508514404,
+      "costs_s": {}
+    },
+    {
+      "operation": "replay",
+      "case": "A",
+      "reference": {
+        "artifact_id": "17f4c956160c0081435f3c88d691c3f28af72eebb7bcacb6af0b95b205f1b404",
+        "media_type": "application/json"
+      },
+      "status": "completed",
+      "process_elapsed_s": 191.14965229999507,
+      "costs_s": {
+        "mechanics_construction": 2.5679980000131764,
+        "total": 190.06290010001976
+      },
+      "replay": {
+        "atol_q": 1e-09,
+        "atol_v": 1e-07,
+        "costs_s": {
+          "jacobian_construction": 18.948720399988815,
+          "total": 187.03544920001877
+        },
+        "dense_max_speed_disagreement_m_s": 0.10490469805985365,
+        "dense_max_tip_disagreement_m": 0.00864764763772209,
+        "dense_period_s": 0.0005,
+        "gates_passed": false,
+        "holding_max_position_error_m": 0.0046511319221283435,
+        "holding_max_speed_m_s": 0.08382222614263794,
+        "input_bounds_compliant": true,
+        "integration_counts": {
+          "nfev": 13800,
+          "njev": 35,
+          "nlu": 1309
+        },
+        "integration_failure": null,
+        "method": "scipy BDF, exact direct-graph state Jacobian, switch-by-switch continuous state",
+        "node_max_speed_disagreement_m_s": 0.10490469805985365,
+        "node_max_tip_disagreement_m": 0.008632681935108877,
+        "rtol": 1e-08,
+        "sampled_evaluator": {
+          "definition": "0.01 s position samples; instantaneous world tip Jacobian times velocity, matching existing evaluator evidence",
+          "holding_max_position_error_m": 0.0046511319221283435,
+          "holding_max_speed_m_s": 0.08206961824998076
+        },
+        "status": "completed",
+        "terminal_position_error_m": 0.0046511319221283435
+      },
+      "physical_eligible": false
+    },
+    {
+      "operation": "replay",
+      "case": "B",
+      "reference": {
+        "artifact_id": "f0a16837d1b2bd3e4c91ffc2faa4307d15d20ff190c0d5e2b5587af32451300f",
+        "media_type": "application/json"
+      },
+      "status": "completed",
+      "process_elapsed_s": 160.41528830002062,
+      "costs_s": {
+        "mechanics_construction": 2.338633299979847,
+        "total": 158.80131250002887
+      },
+      "replay": {
+        "atol_q": 1e-09,
+        "atol_v": 1e-07,
+        "costs_s": {
+          "jacobian_construction": 21.379252599959727,
+          "total": 156.46169939998072
+        },
+        "dense_max_speed_disagreement_m_s": 0.09416106458377228,
+        "dense_max_tip_disagreement_m": 0.008235914636292078,
+        "dense_period_s": 0.0005,
+        "gates_passed": false,
+        "holding_max_position_error_m": 0.007617087987178321,
+        "holding_max_speed_m_s": 0.12400939491902697,
+        "input_bounds_compliant": true,
+        "integration_counts": {
+          "nfev": 13498,
+          "njev": 35,
+          "nlu": 1284
+        },
+        "integration_failure": null,
+        "method": "scipy BDF, exact direct-graph state Jacobian, switch-by-switch continuous state",
+        "node_max_speed_disagreement_m_s": 0.09416106458377228,
+        "node_max_tip_disagreement_m": 0.008234605194322005,
+        "rtol": 1e-08,
+        "sampled_evaluator": {
+          "definition": "0.01 s position samples; instantaneous world tip Jacobian times velocity, matching existing evaluator evidence",
+          "holding_max_position_error_m": 0.007617087987178321,
+          "holding_max_speed_m_s": 0.12400939491902697
+        },
+        "status": "completed",
+        "terminal_position_error_m": 0.007617087987178321
+      },
+      "physical_eligible": false
+    },
+    {
+      "operation": "check",
+      "case": null,
+      "reference": {
+        "artifact_id": "f7cbdf4dcc0ad4dc963519c9b766d06ef83569dc62d3dac4b3e4414042db3f4a",
+        "media_type": "application/json"
+      },
+      "status": "passed",
+      "process_elapsed_s": 109.43612529995153,
+      "costs_s": {
+        "total": 106.2272608000203
+      }
+    },
+    {
+      "operation": "solve",
+      "case": "A",
+      "reference": {
+        "artifact_id": "baae52d1f11518a40982491879c4a0ab380c519a617a0588e989a0e496bebbf2",
+        "media_type": "application/json"
+      },
+      "status": "iteration_limit",
+      "process_elapsed_s": 637.2618813000154,
+      "costs_s": {
+        "assembly_and_guess": 29.92528379999567,
+        "mechanics_construction": 1.7399960000184365,
+        "solve": 573.5292761999881,
+        "solver_construction": 27.744519200001378,
+        "total": 634.1706279999926
+      },
+      "category": "correction",
+      "lengths_m": [
+        0.16,
+        0.11
+      ],
+      "iterations": 59,
+      "termination": "Maximum_CpuTime_Exceeded",
+      "objective": {
+        "effort": 0.013974686063606275,
+        "total": 0.014011085331497402,
+        "variation_weighted": 3.6399267891127516e-05
+      },
+      "normalized_violation": 0.21871979218041515,
+      "trajectory_metrics": {
+        "holding_max_position_error_m": 0.009817871371583587,
+        "holding_max_speed_m_s": 0.02207912853516112,
+        "terminal_position_error_m": 0.009811832152384034
+      },
+      "largest_residuals": [
+        {
+          "name": "holding_speed_30",
+          "normalized_violation": 0.21871979218041515,
+          "physical_violation": 0.002079128535161119,
+          "time_s": 0.3,
+          "units": "m/s",
+          "physical_derivation": "limit*(sqrt(1+normalized violation)-1) for active squared-norm inequality"
+        },
+        {
+          "name": "holding_speed_33",
+          "normalized_violation": 0.16112210079503608,
+          "physical_violation": 0.0015510751545720902,
+          "time_s": 0.33,
+          "units": "m/s",
+          "physical_derivation": "limit*(sqrt(1+normalized violation)-1) for active squared-norm inequality"
+        },
+        {
+          "name": "holding_speed_34",
+          "normalized_violation": 0.052522027377826186,
+          "physical_violation": 0.0005184992373012154,
+          "time_s": 0.34,
+          "units": "m/s",
+          "physical_derivation": "limit*(sqrt(1+normalized violation)-1) for active squared-norm inequality"
+        },
+        {
+          "name": "holding_speed_35",
+          "normalized_violation": 0.005041093428455268,
+          "physical_violation": 5.0347562358665776e-05,
+          "time_s": 0.35000000000000003,
+          "units": "m/s",
+          "physical_derivation": "limit*(sqrt(1+normalized violation)-1) for active squared-norm inequality"
+        },
+        {
+          "name": "dynamics_29_16",
+          "normalized_violation": 0.00024990349101455117,
+          "physical_violation": 2.4990349101455117e-07,
+          "time_s": 0.3,
+          "units": "N*m^2/rad"
+        },
+        {
+          "name": "dynamics_33_16",
+          "normalized_violation": 0.0001932502710907537,
+          "physical_violation": 1.932502710907537e-07,
+          "time_s": 0.34,
+          "units": "N*m^2/rad"
+        },
+        {
+          "name": "dynamics_29_15",
+          "normalized_violation": 0.0001738849068184077,
+          "physical_violation": 1.738849068184077e-07,
+          "time_s": 0.3,
+          "units": "N*m^2/rad"
+        },
+        {
+          "name": "dynamics_33_15",
+          "normalized_violation": 0.00015056798682563986,
+          "physical_violation": 1.5056798682563986e-07,
+          "time_s": 0.34,
+          "units": "N*m^2/rad"
+        },
+        {
+          "name": "dynamics_34_16",
+          "normalized_violation": 0.00011717426557237621,
+          "physical_violation": 1.1717426557237621e-07,
+          "time_s": 0.35000000000000003,
+          "units": "N*m^2/rad"
+        },
+        {
+          "name": "dynamics_33_13",
+          "normalized_violation": 9.748714173272348e-05,
+          "physical_violation": 9.748714173272348e-08,
+          "time_s": 0.34,
+          "units": "N*m^2/rad"
+        },
+        {
+          "name": "dynamics_29_17",
+          "normalized_violation": 8.430442733660523e-05,
+          "physical_violation": 8.430442733660523e-08,
+          "time_s": 0.3,
+          "units": "N*m^2/rad"
+        },
+        {
+          "name": "dynamics_29_13",
+          "normalized_violation": 7.757390197912772e-05,
+          "physical_violation": 7.757390197912772e-08,
+          "time_s": 0.3,
+          "units": "N*m^2/rad"
+        }
+      ],
+      "mathematical_feasibility": "infeasible_returned_iterate",
+      "jacobian_statistics": {
+        "n_call_nlp_jac_g": 61,
+        "t_proc_nlp_jac_g": 550.9730000000001,
+        "t_wall_nlp_jac_g": 550.975655
+      }
+    },
+    {
+      "operation": "solve",
+      "case": "B",
+      "reference": {
+        "artifact_id": "2579c06bb0cecb4a86f925e9af9dc34b554d13e2895b0d9b47c4a42265a2db9d",
+        "media_type": "application/json"
+      },
+      "status": "iteration_limit",
+      "process_elapsed_s": 635.261463599978,
+      "costs_s": {
+        "assembly_and_guess": 30.815083699999377,
+        "mechanics_construction": 1.5917880999622867,
+        "solve": 570.4530108000035,
+        "solver_construction": 27.44341569999233,
+        "total": 631.7173331999802
+      },
+      "category": "correction",
+      "lengths_m": [
+        0.1557815161660965,
+        0.1142184838339035
+      ],
+      "iterations": 57,
+      "termination": "Maximum_CpuTime_Exceeded",
+      "objective": {
+        "effort": 0.01281330361947096,
+        "total": 0.012845784940368173,
+        "variation_weighted": 3.248132089721223e-05
+      },
+      "normalized_violation": 0.7362588426447425,
+      "trajectory_metrics": {
+        "holding_max_position_error_m": 0.010017116129698283,
+        "holding_max_speed_m_s": 0.026353435014394178,
+        "terminal_position_error_m": 0.010017116129698283
+      },
+      "largest_residuals": [
+        {
+          "name": "holding_speed_34",
+          "normalized_violation": 0.7362588426447425,
+          "physical_violation": 0.006353435014394178,
+          "time_s": 0.34,
+          "units": "m/s",
+          "physical_derivation": "limit*(sqrt(1+normalized violation)-1) for active squared-norm inequality"
+        },
+        {
+          "name": "holding_speed_35",
+          "normalized_violation": 0.3217842908894901,
+          "physical_violation": 0.002993775600274873,
+          "time_s": 0.35000000000000003,
+          "units": "m/s",
+          "physical_derivation": "limit*(sqrt(1+normalized violation)-1) for active squared-norm inequality"
+        },
+        {
+          "name": "holding_speed_33",
+          "normalized_violation": 0.28515027546809346,
+          "physical_violation": 0.0026728937321030435,
+          "time_s": 0.33,
+          "units": "m/s",
+          "physical_derivation": "limit*(sqrt(1+normalized violation)-1) for active squared-norm inequality"
+        },
+        {
+          "name": "holding_speed_30",
+          "normalized_violation": 0.28030796264521163,
+          "physical_violation": 0.002630138865196665,
+          "time_s": 0.3,
+          "units": "m/s",
+          "physical_derivation": "limit*(sqrt(1+normalized violation)-1) for active squared-norm inequality"
+        },
+        {
+          "name": "holding_speed_32",
+          "normalized_violation": 0.1290845971695953,
+          "physical_violation": 0.0012516784953056836,
+          "time_s": 0.32,
+          "units": "m/s",
+          "physical_derivation": "limit*(sqrt(1+normalized violation)-1) for active squared-norm inequality"
+        },
+        {
+          "name": "holding_position_35",
+          "normalized_violation": 0.0034261555586150294,
+          "physical_violation": 1.711612969828247e-05,
+          "time_s": 0.35000000000000003,
+          "units": "m",
+          "physical_derivation": "limit*(sqrt(1+normalized violation)-1) for active squared-norm inequality"
+        },
+        {
+          "name": "terminal_position",
+          "normalized_violation": 0.0034261555586150294,
+          "physical_violation": 1.711612969828247e-05,
+          "time_s": 0.35,
+          "units": "m",
+          "physical_derivation": "limit*(sqrt(1+normalized violation)-1) for active squared-norm inequality"
+        },
+        {
+          "name": "holding_position_30",
+          "normalized_violation": 0.0012496689284893225,
+          "physical_violation": 6.246393770690251e-06,
+          "time_s": 0.3,
+          "units": "m",
+          "physical_derivation": "limit*(sqrt(1+normalized violation)-1) for active squared-norm inequality"
+        },
+        {
+          "name": "dynamics_34_13",
+          "normalized_violation": 0.0005220551053524434,
+          "physical_violation": 5.220551053524434e-07,
+          "time_s": 0.35000000000000003,
+          "units": "N*m^2/rad"
+        },
+        {
+          "name": "dynamics_34_16",
+          "normalized_violation": 0.0003550695722699345,
+          "physical_violation": 3.550695722699345e-07,
+          "time_s": 0.35000000000000003,
+          "units": "N*m^2/rad"
+        },
+        {
+          "name": "dynamics_34_12",
+          "normalized_violation": 0.00032350984328062093,
+          "physical_violation": 3.2350984328062093e-07,
+          "time_s": 0.35000000000000003,
+          "units": "N*m^2/rad"
+        },
+        {
+          "name": "dynamics_34_14",
+          "normalized_violation": 0.0002003872269400387,
+          "physical_violation": 2.003872269400387e-07,
+          "time_s": 0.35000000000000003,
+          "units": "N*m^2/rad"
+        }
+      ],
+      "mathematical_feasibility": "infeasible_returned_iterate",
+      "jacobian_statistics": {
+        "n_call_nlp_jac_g": 59,
+        "t_proc_nlp_jac_g": 548.6850000000001,
+        "t_wall_nlp_jac_g": 548.6863900000001
+      }
+    },
+    {
+      "operation": "replay",
+      "case": "A",
+      "reference": {
+        "artifact_id": "172caf84e701165ecd58bb4aa6de93d83e378b6fbaaddf7a6cf2eda9f660a1b1",
+        "media_type": "application/json"
+      },
+      "status": "completed",
+      "process_elapsed_s": 174.82822550000856,
+      "costs_s": {
+        "mechanics_construction": 1.487695400021039,
+        "total": 171.50461479998194
+      },
+      "replay": {
+        "atol_q": 1e-09,
+        "atol_v": 1e-07,
+        "costs_s": {
+          "jacobian_construction": 20.135288099991158,
+          "total": 170.01606180000817
+        },
+        "dense_max_speed_disagreement_m_s": 0.09968627190020311,
+        "dense_max_tip_disagreement_m": 0.008110578844214771,
+        "dense_period_s": 0.0005,
+        "gates_passed": false,
+        "holding_max_position_error_m": 0.0068755490460134456,
+        "holding_max_speed_m_s": 0.09799912805413251,
+        "input_bounds_compliant": true,
+        "integration_counts": {
+          "nfev": 13528,
+          "njev": 35,
+          "nlu": 1286
+        },
+        "integration_failure": null,
+        "method": "scipy BDF, exact direct-graph state Jacobian, switch-by-switch continuous state",
+        "node_max_speed_disagreement_m_s": 0.09968627190020311,
+        "node_max_tip_disagreement_m": 0.00810609985798637,
+        "rtol": 1e-08,
+        "sampled_evaluator": {
+          "definition": "0.01 s position samples; instantaneous world tip Jacobian times velocity, matching existing evaluator evidence",
+          "holding_max_position_error_m": 0.0068755490460134456,
+          "holding_max_speed_m_s": 0.09777012016142475
+        },
+        "status": "completed",
+        "terminal_position_error_m": 0.0054830658786144066
+      },
+      "physical_eligible": false
+    },
+    {
+      "operation": "replay",
+      "case": "B",
+      "reference": {
+        "artifact_id": "df90bb4a5ed0a46b38b1dcbc26d46b892ce8a611eaa52d4094cf8f48379e3edf",
+        "media_type": "application/json"
+      },
+      "status": "completed",
+      "process_elapsed_s": 164.1842500999919,
+      "costs_s": {
+        "mechanics_construction": 2.689126999990549,
+        "total": 162.541041199991
+      },
+      "replay": {
+        "atol_q": 1e-09,
+        "atol_v": 1e-07,
+        "costs_s": {
+          "jacobian_construction": 19.022216100012884,
+          "total": 159.8510231000255
+        },
+        "dense_max_speed_disagreement_m_s": 0.09375512862181758,
+        "dense_max_tip_disagreement_m": 0.007629475415376566,
+        "dense_period_s": 0.0005,
+        "gates_passed": false,
+        "holding_max_position_error_m": 0.006803818293563813,
+        "holding_max_speed_m_s": 0.09370431762296268,
+        "input_bounds_compliant": true,
+        "integration_counts": {
+          "nfev": 13366,
+          "njev": 35,
+          "nlu": 1273
+        },
+        "integration_failure": null,
+        "method": "scipy BDF, exact direct-graph state Jacobian, switch-by-switch continuous state",
+        "node_max_speed_disagreement_m_s": 0.09375512862181758,
+        "node_max_tip_disagreement_m": 0.0076132987830630425,
+        "rtol": 1e-08,
+        "sampled_evaluator": {
+          "definition": "0.01 s position samples; instantaneous world tip Jacobian times velocity, matching existing evaluator evidence",
+          "holding_max_position_error_m": 0.006803818293563813,
+          "holding_max_speed_m_s": 0.0935460312059468
+        },
+        "status": "completed",
+        "terminal_position_error_m": 0.005483997020869204
+      },
+      "physical_eligible": false
+    }
+  ],
+  "counts": {
+    "nlp_invocations": 4,
+    "primary": 2,
+    "paired_second": 0,
+    "correction": 2,
+    "replay_attempts": 5,
+    "replay_completed": 4,
+    "replay_known_timeout": 1,
+    "checks": 2,
+    "physical_launches": 0,
+    "provider_requests": 0
+  },
+  "physical_decision": "No candidate passes mathematical feasibility and independent replay gates; zero launches.",
+  "focused_verification": {
+    "artifact_id": "8381bdce014906c3aaff659210abd82a5f85714ea82869e9803f1b5b32b0ef95",
+    "media_type": "application/json"
+  },
+  "selected_latest": {
+    "A": {
+      "reference": {
+        "artifact_id": "6f121f12f89af153953972e5140b4e2fdd4b77ddb089fbc8c340457198af97b9",
+        "media_type": "application/json"
+      },
+      "selection": {
+        "source_solver": {
+          "artifact_id": "baae52d1f11518a40982491879c4a0ab380c519a617a0588e989a0e496bebbf2",
+          "media_type": "application/json"
+        },
+        "label": "least_violating_retained_diagnostic_iterate",
+        "objective": 0.014011085331497402,
+        "normalized_violation": 0.21871979218041515,
+        "iteration": 59
+      }
+    },
+    "B": {
+      "reference": {
+        "artifact_id": "c3f84b6a395889839273061f9cbd315b08376466dadf4459582ec4532eedf60d",
+        "media_type": "application/json"
+      },
+      "selection": {
+        "source_solver": {
+          "artifact_id": "2579c06bb0cecb4a86f925e9af9dc34b554d13e2895b0d9b47c4a42265a2db9d",
+          "media_type": "application/json"
+        },
+        "label": "least_violating_retained_diagnostic_iterate",
+        "objective": 0.012845784940368173,
+        "normalized_violation": 0.7362588426447425,
+        "iteration": 57
+      }
+    }
+  },
+  "limitations": [
+    "Primary A exceeded the 600 s solve ceiling by 8.711 s; preserved, later settings reserve 30 s.",
+    "First Radau replay timed out at 900.023 s; failure preserved and charged after explicit reconciliation.",
+    "All four NLPs are infeasible returned iterates; objectives do not establish design superiority.",
+    "Exact Jacobian execution dominates solve time; no global optimality, physical impossibility, real-time, motor or LLM advantage established."
+  ],
+  "numerical_s": 4296.347540951414,
+  "numerical_remaining_s": 2903.652459048586,
+  "postprocessing_s": 0.0414951000129804,
+  "previous_summary_reference": {
+    "artifact_id": "cd60145bcaa81137e5f00b425635c1df798af524fbde30271a03cbca6ef71fb6",
+    "media_type": "application/json"
+  },
+  "scientific_stop": {
+    "elapsed_s": 6134.103772163391,
+    "status": "STOP"
+  },
+  "delivery": "Same original activity clock; final Git delivery follows scientific STOP."
+}

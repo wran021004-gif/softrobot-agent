@@ -14,7 +14,48 @@
       "status": "passed",
       "unittest_s": 0.871,
       "process_wall_s": 3.8921182
+    },
+    {
+      "command": "fixed analysis tuple and analytic replay targeted checks",
+      "tests": 2,
+      "status": "passed",
+      "unittest_s": 0.982,
+      "process_wall_s": 4.445466
+    },
+    {
+      "command": "BDF analytic switching replay at global atol 1e-8",
+      "tests": 1,
+      "status": "failed",
+      "unittest_s": 0.26,
+      "process_wall_s": 4.6003242,
+      "max_error": 5.94316679e-08,
+      "reason": "Local solver errors accumulate across 35 restarts; corrected global analytic tolerance to 1e-7 (0.1 micrometre), 10000 times tighter than the 1 mm replay gate."
+    },
+    {
+      "command": "BDF analytic switching replay at global atol 1e-7",
+      "tests": 1,
+      "status": "passed",
+      "unittest_s": 0.234,
+      "process_wall_s": 3.4383896
+    },
+    {
+      "command": "current interface dimensions",
+      "status": "passed",
+      "process_wall_s": 1.6664743
+    },
+    {
+      "command": "primary retained schedule selections",
+      "status": "passed",
+      "process_wall_s": 3.1763148
+    },
+    {
+      "command": "new selection CLI two failed null-iteration checks and two successful repaired calls",
+      "status": "repaired_and_passed",
+      "process_wall_s": 9.4617281,
+      "reason": "Returned point metadata can have iteration None; filter uses explicit noninitial numbered checkpoints. No solver or integration invoked."
     }
   ],
-  "scope": "Fixed-design dynamics regression; frozen typed pair; analytic replay zero-state and input-switch continuity"
+  "scope": "Fixed-design dynamics regression; frozen typed pair; analytic replay zero-state and input-switch continuity",
+  "conservatively_charged_process_s": 34.069499400000005,
+  "accounting": "Measured whole processes, including incidental export/read time; conservative. Successful helper inner timing also retained separately."
 }

@@ -1,9 +1,9 @@
 # CasADi joint length and trajectory pilot, 2026-10-10
 
 The current-model CasADi path now constructs and actually executes fixed-design
-and joint-design trajectory NLPs. Both primary solves returned finite iterates
-without finding mathematical feasibility within their deadlines. Independent
-replay and final delivery are in progress; this file is finalized at closeout.
+and joint-design trajectory NLPs. Four actual bounded IPOPT solves returned
+finite iterates without finding mathematical feasibility within their deadlines.
+Independent replay tested both primary and corrected returned schedules.
 These outcomes do not establish that joint optimization is ineffective.
 SoRoMoX adoption remains deferred and both historical activities stay STOP.
 
@@ -91,9 +91,7 @@ The dominant primary solve cost was exact constraint Jacobian evaluation:
 603.668 s across 35 calls in A, and 575.584 s across 30 calls in B. Both graph
 builds took approximately 2–3 s for mechanics, 20 s for assembly/guess rollout,
 and 8 s for the IPOPT adapter. This measured derivative cost limits progress
-under the solve ceiling. Subsequent bounded numerical work, replay outcomes,
-physical eligibility, final cumulative costs and push status are added below
-at closeout. No global optimality, physical impossibility, real-time capability,
+under the solve ceiling. No global optimality, physical impossibility, real-time capability,
 motor validation or LLM-organizational advantage is inferred.
 
 The first adaptive Radau replay reached its 900 s process limit without a
@@ -131,9 +129,89 @@ was introduced.
 | Corrected case | Lengths, m | Iterations | Objective | Largest normalized violation | Solve seconds |
 |---|---|---:|---:|---:|---:|
 | A | 0.160000 / 0.110000 | 59 | 0.0140111 | 0.218720, speed at 0.30 s | 573.529 |
+| B | 0.155782 / 0.114218 | 57 | 0.0128458 | 0.736259, speed at 0.34 s | 570.453 |
 
 Corrected A remains infeasible: terminal error 9.812 mm, holding position
 maximum 9.818 mm, holding speed maximum 0.022079 m/s and force-balance residual
 up to 2.50e-7 N m²/rad. Its effort/weighted variation are
 0.013974686/0.0000363993. Exact Jacobians consumed 550.976 s across 61 calls,
 so changing AD execution improved progress without changing the physics.
+
+Corrected B also terminated `Maximum_CpuTime_Exceeded`, with no feasible iterate.
+Its terminal/holding position error is 10.017 mm and holding speed is
+0.026353 m/s. Effort/weighted variation are 0.012813304/0.0000324813.
+The smaller objective is attached to an infeasible trajectory and does not
+establish an advantage over A. Both corrected replay selections are their last
+retained iterations, 59 and 57. All four solves actually entered IPOPT; neither
+the two optional ramp solves nor another grid solve was dispatched.
+
+The final reporting commit adds meaningful physical task-residual units and
+compact trajectory metrics, plus a deterministic CLI for persisting returned
+schedule selections. It changes neither equations nor integration. Dependency
+migrations carry the original correctness proof on the same activity and grant;
+budgets and failed executions are preserved.
+
+The focused replay test initially required an unnecessarily tight global
+1e-8 analytic position tolerance across 35 adaptive BDF restarts. Its measured
+error was 5.94e-8. The corrected 1e-7 global tolerance (0.1 micrometre, 10,000
+times tighter than the replay gate) passed without changing integration
+tolerances. Both the failure and repair are retained in the verification ledger;
+no NLP was run as a test. A separate regression preserves the fixed-design
+analysis tuple and linearization API.
+
+The native `evidence.read` call retrieved corrected B's `/costs_s` from its
+immutable solver artifact through the actual Host. No live model request was
+needed. The mathematical tools' compact Feedback and referenced artifacts
+carry the actual solver/replay outcomes separately from physical status.
+
+| Corrected diagnostic replay | Terminal error, mm | Holding position maximum, mm | Dense holding speed, m/s | Dense tip disagreement, mm | Dense speed disagreement, m/s | Process seconds |
+|---|---:|---:|---:|---:|---:|---:|
+| A, iteration 59 | 5.483 | 6.876 | 0.09800 | 8.111 | 0.09969 | 174.828 |
+| B, iteration 57 | 5.484 | 6.804 | 0.09370 | 7.629 | 0.09376 | 164.184 |
+
+The corrected sampled holding speeds were 0.09777/0.09355 m/s. Both completed
+with no integration failure and compliant inputs. They fail the discrepancy
+and holding speed gates. Zero MuJoCo/controller-11 evaluations were launched
+because no mathematically feasible, replay-qualified candidate exists in this
+study. No claim about physical impossibility follows.
+
+| Cost, seconds | Primary A | Primary B | Corrected A | Corrected B |
+|---|---:|---:|---:|---:|
+| Mechanics construction | 2.163 | 2.770 | 1.740 | 1.592 |
+| Assembly and coherent guess | 19.650 | 19.995 | 29.925 | 30.815 |
+| Solver construction | 8.243 | 8.375 | 27.745 | 27.443 |
+| Numerical solve | 608.711 | 580.952 | 573.529 | 570.453 |
+| Full numerical process | 641.607 | 614.923 | 637.262 | 635.261 |
+
+Full process costs include construction and result extraction; inner timers
+are components, not additional charges. The mechanics/reference check cost
+33.097 s and the AD execution check 109.436 s. Four completed replay processes
+cost 690.577 s combined, and the known Radau failure cost 900.023 s. Focused
+verification/interface inspection and candidate-selection checks are charged
+conservatively at 34.069 s; inner selection/postprocessing costs are retained
+separately. Cumulative numerical work is **4296.348 s of 7200 s**, leaving
+2903.652 s unused. Backend and provider costs are zero. Twelve Host tool calls
+include the eleven scientific invocations and one evidence read. No capacity
+was replenished. Scientific STOP occurred after 6134.104 s of activity time;
+engineering delivery continues under the original eight-hour clock.
+
+The [compact result summary](../evidence/casadi_codesign_pilot_20261010/result_summary.json)
+and [immutable archive manifest](../evidence/casadi_codesign_pilot_20261010/archive_manifest.json)
+provide exact costs, identities and source artifact hashes. Implementation
+commits are `056a5cf8199b4cf4b654f6944926dfb2a572f81b`,
+`e3ffcf8216a9ec2cf7071c8ad828632ce284a3aa`,
+`39c71a1f5d56f0eb36237e91f49e27748a7ed5db`, and
+`9af70b160ca8589f5e3cb0cabf73fb6a498bfba2`; documentation/evidence closeout
+is a subsequent scoped commit. Ordinary push targets only
+`feat/casadi-codesign-pilot`.
+
+The existing-model joint optimization path works through differentiation,
+actual NLP execution, typed evidence and independent integration. Its bounded
+results establish neither feasibility nor a joint-design benefit. Exact
+constraint Jacobians still consumed 550.976/548.686 s in the corrected pair.
+The next justified study should first reduce that measured derivative cost,
+then compare a finer state grid with the same 35 control intervals and task
+constraints under a fresh bounded authorization. The substantial replay
+discrepancy motivates grid refinement; the present infeasible dynamics defects
+mean it cannot yet be attributed solely to the grid. No further solves are
+authorized by this stopped activity.
