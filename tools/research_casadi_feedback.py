@@ -18,7 +18,8 @@ from tools.casadi_feedback_service import ACTIVITY,budget,RESERVATIONS,SPEC,CEIL
 RUN=ROOT/'runs'/ACTIVITY
 INITIALIZATION=SPEC.get('investigation')=='initialization_diagnosis'
 FEASIBILITY=SPEC.get('investigation')=='feasibility_recovery'
-OUT=ROOT/('evidence/nmpc_feasibility_20261011' if FEASIBILITY else 'evidence/nmpc_initialization_20261010' if INITIALIZATION else 'evidence/casadi_nmpc_research_20261010')
+SETTLING=SPEC.get('investigation')=='settling_followup'
+OUT=ROOT/('evidence/nmpc_settling_20261011' if SETTLING else 'evidence/nmpc_feasibility_20261011' if FEASIBILITY else 'evidence/nmpc_initialization_20261010' if INITIALIZATION else 'evidence/casadi_nmpc_research_20261010')
 LIMITS=dict(model_calls=CEILINGS['actual_provider_requests'],tool_calls=CEILINGS['public_workflow_calls'],backend_solves=CEILINGS['physical_launches'],worker_calls=0,wall_s=CEILINGS['overall_activity_s'])
 TOOLS={name:'1.0.0' for name in ['math.casadi_feedback_'+s for s in ('solve','replay','plan')]+['evidence.read']}
 if INITIALIZATION:
@@ -29,6 +30,10 @@ if FEASIBILITY:
     TOOLS={name:'1.0.0' for name in ('math.casadi_feedback_plan','evidence.read','diagnosis.inspect_evidence','math.nmpc_feasibility_check')}
     from schemas.casadi_feedback import FeasibilityPlan
     ActivityPlan=FeasibilityPlan
+if SETTLING:
+    TOOLS={name:'1.0.0' for name in ('math.casadi_feedback_plan','evidence.read','diagnosis.inspect_evidence','math.nmpc_settling_check')}
+    from schemas.casadi_feedback import SettlingPlan
+    ActivityPlan=SettlingPlan
 AUTHORIZATION=SPEC['authorization']+'; authorized non-secret research payload to https://api.deepseek.com/chat/completions; credentials for authentication only; scoped commit and ordinary push'
 
 def activity_start():
@@ -52,6 +57,10 @@ def configuration():
     base['policy']['model']['max_turns']=12
     values=dict(segment_count=2,proximal_tendons=3,distal_tendons=3,lengths_m=[.16,.11],material='baseline',
         section_scale=1.,routing_scale=1.,pretension_n=.2,holding_tip_speed_weight=.05,terminal_tip_speed_weight=.1)
+    if SETTLING:
+        from tools.nmpc_settling import activity_configuration
+        allowances['math.nmpc_settling_check']=dict(timeout_s=300.,reserve_s=300.)
+        return activity_configuration(base['policy'])
     return resolved_input(source,values,ACTIVITY,base['policy'])
 
 
@@ -60,16 +69,24 @@ def host():return Host(RUN,ACTIVITY,actor='casadi-feedback-research')
 
 def prepare():
     h=host();STARTED=activity_start()
+    session_exists=False
     if h.store.db.exists():
+        with h.store.connect(True) as db:
+            session_exists=db.execute('SELECT 1 FROM sessions WHERE run_id=?',(ACTIVITY,)).fetchone() is not None
+    if session_exists:
         if FEASIBILITY:
             from tools.nmpc_feasibility import prepare_evidence
             prepare_evidence(h)
         if INITIALIZATION:
             from tools.nmpc_initialization import prepare_evidence
             prepare_evidence(h)
+        if SETTLING:
+            from tools.nmpc_settling import prepare_evidence
+            prepare_evidence(h)
         return h
-    h.store.create(ProjectConfig(project_id=ACTIVITY,grant_id=ACTIVITY+'-authorized',authorization_source=AUTHORIZATION,
-        budget=LIMITS,exclusive_resources={'provider_request':1,'backend.family_mujoco':1}))
+    if not h.store.db.exists():
+        h.store.create(ProjectConfig(project_id=ACTIVITY,grant_id=ACTIVITY+'-authorized',authorization_source=AUTHORIZATION,
+            budget=LIMITS,exclusive_resources={'provider_request':1,'backend.family_mujoco':1}))
     h.create(configuration());h.resume()
     with h.store.transaction() as db:
         cfg=h.store.session(ACTIVITY,db)['snapshot']['input'];state=h.store.session(ACTIVITY,db)['state']
@@ -94,6 +111,9 @@ def prepare():
         prepare_evidence(h)
     if FEASIBILITY:
         from tools.nmpc_feasibility import prepare_evidence
+        prepare_evidence(h)
+    if SETTLING:
+        from tools.nmpc_settling import prepare_evidence
         prepare_evidence(h)
     return h
 
@@ -129,6 +149,9 @@ def bind(h,repair=False,reason=None):
 
 
 def compact_result(value):
+    if value.get('settling_operation'):
+        from tools.nmpc_settling import compact
+        return compact(value)
     if value.get('feasibility_operation'):
         from tools.nmpc_feasibility import compact
         return compact(value)
@@ -137,7 +160,7 @@ def compact_result(value):
         'relaxed_nlp_feasible','objective_components','physical_eligible','costs_s','process_elapsed_s',
         'acceptance','control','revision','resolved_configuration','wiring_reference','holding_motion',
         'sampling','unknowns','failure_categories','partial_feedback','execution_references','actual_duration_s','completed_control_updates',
-        'nmpc_internal_solves','offline_nlp_slots_charged','initialization_comparison')
+        'nmpc_internal_solves','offline_nlp_slots_charged','initialization_comparison','settling_feedback')
     result={k:value[k] for k in keys if k in value}
     if 'same_time_tip_difference_m' in value:
         result.update({k:value[k] for k in ('update_id','time_s','full_simulator','reduced_position_m',
@@ -153,6 +176,9 @@ def compact_result(value):
 
 
 def packet(h):
+    if SETTLING:
+        from tools.nmpc_settling import packet as settling_packet
+        return settling_packet(h)
     if FEASIBILITY:
         from tools.nmpc_feasibility import packet as feasibility_packet
         return feasibility_packet(h)
@@ -189,6 +215,10 @@ if INITIALIZATION:
     from tools.nmpc_initialization import INSTRUCTIONS
 if FEASIBILITY:
     from tools.nmpc_feasibility import INSTRUCTIONS
+
+
+if SETTLING:
+    from tools.nmpc_settling import INSTRUCTIONS
 
 
 def feedback_context_references(h):
@@ -290,7 +320,7 @@ async def converse(h):
             plan=ActivityPlan.model_validate(use['input']);accepted=result['detail']
             if plan.action=='solve':
                 value['operations']=execute_batch(h,plan,accepted,'native-'+use['toolUseId'])
-            elif plan.action in ('closed_loop','control_revision'):
+            elif plan.action in ('closed_loop','control_revision','control_confirmation'):
                 from tools.casadi_closed_loop import run_closed_loop
                 try:
                     feedback=run_closed_loop(h,plan.control,accepted['plan_reference'],plan.action)
@@ -315,8 +345,12 @@ async def converse(h):
                 rr=invoke(h,'math.casadi_feedback_replay',dict(candidate=plain(plan.diagnostic_candidate)),request_id='native-'+use['toolUseId']+'-diagnostic')
                 value['operations'].append(dict(receipt=rr,feedback=h.store.artifact(rr['output']) if rr.get('output') else None))
             elif plan.action=='saved_state_comparison':
-                from tools.nmpc_initialization import run_pair
-                value['operations'].append(run_pair(h,plan.comparison,'native-'+use['toolUseId']+'-pair'))
+                if SETTLING:
+                    from tools.nmpc_settling import run_pair
+                    value['operations'].append(run_pair(h,plan.comparison,accepted['plan_reference'],'native-'+use['toolUseId']+'-pair'))
+                else:
+                    from tools.nmpc_initialization import run_pair
+                    value['operations'].append(run_pair(h,plan.comparison,'native-'+use['toolUseId']+'-pair'))
             elif plan.action in ('inspect_residuals','reintegrate_saved_tensions','warm_start_comparison'):
                 from tools.nmpc_feasibility import run_operation
                 value['operations'].append(run_operation(h,plan,accepted['plan_reference'],'native-'+use['toolUseId']+'-saved'))
@@ -333,7 +367,7 @@ async def converse(h):
         return dict(toolUseId=use['toolUseId'],status='success' if receipt['execution_status']=='completed' else 'error',content=[dict(text=json.dumps(value))])
     tools=[PythonAgentTool('research_plan',dict(name='research_plan',description='Choose a bounded mathematical solve, referenced diagnosis, candidate feedback execution, control revision, or evidence-based STOP',inputSchema={'json':ActivityPlan.model_json_schema()}),plan_handler)]
     definition=h.reg.get('evidence.read');tools.append(PythonAgentTool('evidence_read',dict(name='evidence_read',description=definition.description,inputSchema={'json':definition.input_schema.model_json_schema()}),read_handler))
-    if INITIALIZATION or FEASIBILITY:
+    if INITIALIZATION or FEASIBILITY or SETTLING:
         from tools.nmpc_initialization import add_inspection_tool
         add_inspection_tool(h,tools)
     agent=build_harness(h,transport=boundary,api_key=os.environ['DEEPSEEK_API_KEY'],instructions=INSTRUCTIONS,

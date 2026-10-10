@@ -26,8 +26,9 @@ EXTENSIONS += [Extension('math.casadi_feedback_'+name,'tool','1.0.0',schema,Resu
     sources=EXTENSIONS[0].sources + ('tools/casadi_feedback_service.py','tools/casadi_feedback_worker.py',
         'tools/research_casadi_feedback.py','tools/casadi_closed_loop.py','schemas/casadi_feedback.py','tests/test_casadi_nmpc_research.py',
         'tools/nmpc_initialization.py','tools/research_nmpc_initialization.py',
-        'tools/nmpc_feasibility.py','tools/research_nmpc_feasibility.py'),
-    assets=EXTENSIONS[0].assets+('examples/casadi_nmpc/specification.json','examples/nmpc_initialization/specification.json','examples/nmpc_feasibility/specification.json'),
+        'tools/nmpc_feasibility.py','tools/research_nmpc_feasibility.py',
+        'tools/nmpc_settling.py','tools/research_nmpc_settling.py'),
+    assets=EXTENSIONS[0].assets+('examples/casadi_nmpc/specification.json','examples/nmpc_initialization/specification.json','examples/nmpc_feasibility/specification.json','examples/nmpc_settling/specification.json'),
     dependencies=('casadi','numpy','scipy'),extension_dependencies=(('model.gvs','1.0.0'),('solver.ipopt','1.0.0')),
     capabilities={'category':'analysis','preflight':'tools.casadi_feedback_service:preflight'},
     cache=False,side_effects='new cumulative research activity; numerical evidence and model decision')
@@ -46,3 +47,12 @@ EXTENSIONS += [Extension('math.nmpc_feasibility_check','tool','1.0.0',Feasibilit
     extension_dependencies=(('model.gvs','1.0.0'),('solver.ipopt','1.0.0')),
     capabilities={'category':'analysis','preflight':'tools.nmpc_feasibility:preflight'},
     cache=False,side_effects='bounded saved-state numerical work and immutable evidence')]
+
+from schemas.casadi_feedback import SettlingCheck
+EXTENSIONS += [Extension('math.nmpc_settling_check','tool','1.0.0',SettlingCheck,Result,
+    'tools.nmpc_settling:check_tool','One owned recovery-enabled saved-state comparison, baseline versus one speed-weight change, identical new initialization; at most two local NLP attempts.',
+    sources=EXTENSIONS[-1].sources+('tools/nmpc_settling.py','tools/research_nmpc_settling.py'),
+    assets=EXTENSIONS[-1].assets,dependencies=('casadi','numpy','scipy'),
+    extension_dependencies=(('model.gvs','1.0.0'),('solver.ipopt','1.0.0')),
+    capabilities={'category':'analysis','preflight':'tools.nmpc_settling:preflight'},
+    cache=False,side_effects='bounded local numerical work and immutable evidence')]

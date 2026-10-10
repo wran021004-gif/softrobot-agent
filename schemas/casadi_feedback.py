@@ -65,7 +65,7 @@ class LocalComparison(Contract):
 
 
 class Plan(Contract):
-    action: Literal['solve','diagnose','diagnostic_replay','closed_loop','control_revision','saved_state_comparison','inspect_residuals','reintegrate_saved_tensions','warm_start_comparison','stop']
+    action: Literal['solve','diagnose','diagnostic_replay','closed_loop','control_revision','control_confirmation','saved_state_comparison','inspect_residuals','reintegrate_saved_tensions','warm_start_comparison','stop']
     hypothesis: str = Field(min_length=1)
     supporting_evidence: list[EvidenceRef] = Field(min_length=1)
     weakening_observation: str = Field(min_length=1)
@@ -81,6 +81,7 @@ class Plan(Contract):
     revision_or_stop_rule: str = Field(min_length=1)
     disposition: str = Field(min_length=1)
     limitations: list[str] = Field(min_length=1)
+    final_accounting: dict | None = None
 
     @model_validator(mode='after')
     def operations_match(self):
@@ -92,9 +93,9 @@ class Plan(Contract):
                 raise ValueError('DIAGNOSIS_REQUIRES_ONE_REFERENCED_REPLAY')
         elif self.candidates or self.requested_nlp_solves or self.requested_replays or self.diagnostic_candidate is not None:
             raise ValueError('STOP_REQUESTS_NO_EXPERIMENTS')
-        if (self.action in ('closed_loop','control_revision')) != (self.control is not None):
+        if (self.action in ('closed_loop','control_revision','control_confirmation')) != (self.control is not None):
             raise ValueError('CONTROL_ACTION_REQUIRES_EXACT_CANDIDATE_AND_WEIGHTS')
-        if self.action=='control_revision' and self.control.preceding_execution is None:
+        if self.action in ('control_revision','control_confirmation') and self.control.preceding_execution is None:
             raise ValueError('CONTROL_REVISION_REQUIRES_PRECEDING_EXECUTION')
         if (self.action=='saved_state_comparison') != (self.comparison is not None):
             raise ValueError('PAIRED_COMPARISON_REQUIRES_ONE_DECLARED_FACTOR')
@@ -148,3 +149,23 @@ class ActivityPlan(Plan):
     candidates: list[Candidate] = Field(default_factory=list,max_length=1)
     requested_nlp_solves: int = Field(default=0,ge=0,le=1)
     requested_replays: int = Field(default=0,ge=0,le=1)
+
+
+class SettlingComparison(LocalComparison):
+    changed_parameter: Literal['terminal_tip_speed_weight','holding_tip_speed_weight']
+    changed_value: float = Field(ge=.025,le=.10)
+
+
+class SettlingPlan(Plan):
+    action: Literal['diagnose','saved_state_comparison','control_revision','control_confirmation','stop']
+    candidates: list[Candidate] = Field(default_factory=list,max_length=0)
+    requested_nlp_solves: Literal[0] = 0
+    requested_replays: Literal[0] = 0
+    diagnostic_candidate: None = None
+    saved_plan: None = None
+    comparison: SettlingComparison | None = None
+
+
+class SettlingCheck(Contract):
+    choice: SettlingComparison
+    plan_reference: EvidenceRef

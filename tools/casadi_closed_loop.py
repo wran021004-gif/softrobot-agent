@@ -123,7 +123,7 @@ def validate_control(store, state, choice, action):
     preceding=None;changes={};factors=['structure/controller evaluation']
     if choice.preceding_execution:
         rows=[r for r in state['results'] if r['operation']=='closed_loop' and r['reference']==plain(choice.preceding_execution) and
-            (not r.get('imported') or state.get('initialization_diagnosis') or state.get('feasibility_recovery'))]
+            (not r.get('imported') or state.get('initialization_diagnosis') or state.get('feasibility_recovery') or state.get('settling_followup'))]
         if not rows:raise ValueError('PRECEDING_CURRENT_ACTIVITY_EXECUTION_REQUIRED')
         preceding=store.artifact(choice.preceding_execution)
         for k in ('holding_tip_speed_weight','terminal_tip_speed_weight','feasible_return_budget_s','substeps','recover_returned_tensions'):
@@ -131,6 +131,8 @@ def validate_control(store, state, choice, action):
             if old!=new:changes[k]=dict(before=old,after=new)
         same=preceding['candidate']==plain(choice.candidate)
         if action=='control_revision' and (not same or not changes):raise ValueError('CONTROL_ONLY_REVISION_REQUIRES_SAME_CANDIDATE_AND_CHANGED_WEIGHTS')
+        if action=='control_confirmation' and (not state.get('settling_followup') or not same or changes):
+            raise ValueError('EXACT_CONFIRMATION_REQUIRES_SAME_CANDIDATE_AND_UNCHANGED_CONTROL')
         factors=(['control'] if same else ['structure'])+(['control'] if changes and not same else [])
     return source,dict(preceding_execution=plain(choice.preceding_execution),exact_parameter_changes=changes,
         exact_weight_changes={k:v for k,v in changes.items() if k.endswith('_weight')},
@@ -153,6 +155,9 @@ def run_closed_loop(host, choice, plan_reference, action):
         operation_allowances=deepcopy(EXECUTION_ALLOWANCES))
     policy['operation_allowances']['simulation.run']=dict(timeout_s=1800.,reserve_s=1800.)
     cfg,wiring=resolve_candidate(host.store,choice.candidate,source,choice,owner,policy)
+    if state.get('settling_followup'):
+        from tools.nmpc_settling import verify_configuration
+        wiring['scientific_configuration_check']=verify_configuration(host.store,state,cfg,choice,action)
     construction=time.perf_counter()-started
     with host.store.transaction() as db:
         cfg_ref=host.store.put(db,cfg);wiring_ref=host.store.put(db,dict(wiring,resolved_configuration=plain(cfg_ref),plan_reference=plan_reference,revision=revision))
@@ -228,6 +233,12 @@ def finish_closed_loop(host, child=None, started=None):
         detail['initialization_comparison']=revision_comparison(host,detail)
         comparison_cost=time.perf_counter()-comparison_start
         costs['comparison']=comparison_cost;costs['total']+=comparison_cost
+    if state.get('settling_followup') and profile:
+        from tools.nmpc_settling import execution_feedback
+        comparison_start=time.perf_counter()
+        detail['settling_feedback']=execution_feedback(host.store,detail)
+        costs['settling_analysis']=time.perf_counter()-comparison_start
+        costs['total']+=costs['settling_analysis']
     with host.store.transaction() as db:
         ref=host.store.put(db,detail);state=host.store.session(ACTIVITY,db)['state']
         # Charge stages once even if reporting is recovered from existing receipts.

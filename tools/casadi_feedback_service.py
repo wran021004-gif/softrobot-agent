@@ -8,7 +8,7 @@ from tools.platform_store import plain
 from tools.state_io import atomic_json, read, digest
 from tools.spec_tools import ROOT
 
-SPEC_PATH=ROOT/('examples/nmpc_feasibility/specification.json' if os.environ.get('NMPC_FEASIBILITY_RECOVERY')=='1' else 'examples/nmpc_initialization/specification.json' if os.environ.get('NMPC_INITIALIZATION_DIAGNOSIS')=='1' else 'examples/casadi_nmpc/specification.json')
+SPEC_PATH=ROOT/('examples/nmpc_settling/specification.json' if os.environ.get('NMPC_SETTLING_FOLLOWUP')=='1' else 'examples/nmpc_feasibility/specification.json' if os.environ.get('NMPC_FEASIBILITY_RECOVERY')=='1' else 'examples/nmpc_initialization/specification.json' if os.environ.get('NMPC_INITIALIZATION_DIAGNOSIS')=='1' else 'examples/casadi_nmpc/specification.json')
 SPEC=read(SPEC_PATH)
 CEILINGS=SPEC['budgets']
 ACTIVITY=SPEC['study_id']
@@ -39,12 +39,26 @@ def validate_schedule(candidate):
 
 
 def plan(ctx,args):
+    start=time.perf_counter()
+    try:return _plan(ctx,args)
+    finally:
+        if SPEC.get('investigation')=='settling_followup':
+            with ctx.store.transaction() as db:
+                state=ctx.store.session(ctx.run_id,db)['state'];elapsed=time.perf_counter()-start
+                state['numerical_s']+=elapsed;state.setdefault('plan_validation_costs_s',[]).append(elapsed)
+                ctx.store.update_state(db,ctx.run_id,state)
+
+
+def _plan(ctx,args):
     state=ctx.store.session(ctx.run_id)['state']
     if state['research_status']=='stopped':raise ValueError('MODEL_STOP_SEALED')
     if state.get('pending'):raise ValueError('UNKNOWN_NUMERICAL_OUTCOME_INSPECT_FIRST')
     if state.get('engineering_pause') and args.action!='stop':raise ValueError('ENGINEERING_PAUSE_REQUIRES_LOCAL_RECOVERY')
     initialization=SPEC.get('investigation')=='initialization_diagnosis'
-    if SPEC.get('investigation')=='feasibility_recovery':
+    if SPEC.get('investigation')=='settling_followup':
+        from tools.nmpc_settling import validate_plan
+        validate_plan(ctx.store,state,args)
+    elif SPEC.get('investigation')=='feasibility_recovery':
         from tools.nmpc_feasibility import validate_plan
         validate_plan(ctx.store,state,args)
     elif initialization:
@@ -64,7 +78,7 @@ def plan(ctx,args):
         if state.get('last_expensive_decision_send')==send:
             raise ValueError('ONE_EXPENSIVE_EXPERIMENT_PER_PROVIDER_DECISION_CONSUME_FEEDBACK_FIRST')
         if ctx.store.remaining()['remaining']['model_calls']<=4:raise ValueError('FINAL_FOUR_PROVIDER_SENDS_PROTECTED')
-        reserve={'solve':1350.,'diagnostic_replay':450.,'closed_loop':1890.,'control_revision':1890.,'saved_state_comparison':300.,'inspect_residuals':180.,'reintegrate_saved_tensions':180.,'warm_start_comparison':300.}[args.action]
+        reserve={'solve':1350.,'diagnostic_replay':450.,'closed_loop':1890.,'control_revision':1890.,'control_confirmation':1890.,'saved_state_comparison':300.,'inspect_residuals':180.,'reintegrate_saved_tensions':180.,'warm_start_comparison':300.}[args.action]
         if state['numerical_s']+reserve>CEILINGS['total_numerical_s'] or time.time()+reserve>=state['cutoff_unix']:
             raise ValueError('OPERATION_CANNOT_FIT_REMAINING_BUDGET')
     batch='initial' if state['nlp_solves']==0 else 'revision'
@@ -77,11 +91,14 @@ def plan(ctx,args):
     if args.action=='diagnostic_replay':
         if state.get('replays',0)>=CEILINGS['new_independent_replays']:raise ValueError('THREE_REPLAY_CEILING')
         validate_schedule(ctx.artifact(args.diagnostic_candidate).get('candidate',ctx.artifact(args.diagnostic_candidate)))
-    if args.action in ('closed_loop','control_revision'):
+    if args.action in ('closed_loop','control_revision','control_confirmation'):
         from tools.casadi_closed_loop import validate_control,resolve_candidate
         source,revision=validate_control(ctx.store,state,args.control,args.action)
         if ctx.store.remaining()['remaining']['backend_solves']<=0:raise ValueError('TWO_CLOSED_LOOP_LAUNCH_CEILING')
-        resolve_candidate(ctx.store,args.control.candidate,source,args.control,ctx.run_id,plain(ctx.input.policy))
+        cfg,_=resolve_candidate(ctx.store,args.control.candidate,source,args.control,ctx.run_id,plain(ctx.input.policy))
+        if SPEC.get('investigation')=='settling_followup':
+            from tools.nmpc_settling import verify_configuration
+            verify_configuration(ctx.store,state,cfg,args.control,args.action)
     ref=ctx.save_artifact(plain(args),'model_plan_original')
     with ctx.store.transaction() as db:
         current=ctx.store.session(ctx.run_id,db)['state']
