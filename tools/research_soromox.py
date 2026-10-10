@@ -150,7 +150,11 @@ def export(h):
                 manifest.append(dict(name=name,sha256=hashlib.sha256(body).hexdigest(),bytes=info.size,media='application/json'))
     state = h.store.session(ACTIVITY)['state']
     atomic_json(OUT/'activity.json', read(RUN/'activity.json'))
-    atomic_json(OUT/'implementation_freeze.json', read(RUN/'implementation_freeze.json'))
+    freeze=read(RUN/'implementation_freeze.json')
+    original=next(e['outputs'][0] for e in h.store.events(ACTIVITY) if e['kind']=='implementation_freeze')
+    atomic_json(OUT/'implementation_freeze.json', dict(commit=freeze['commit'],
+        dependency_identity=digest(freeze['dependencies']), snapshot_reference=original,
+        dependencies_pointer='/dependencies', archive_member='artifacts/'+original['artifact_id']+'.json'))
     atomic_json(OUT/'events.json', h.store.events(ACTIVITY))
     atomic_json(OUT/'ledger.json', h.store.remaining())
     atomic_json(OUT/'state.json', state)

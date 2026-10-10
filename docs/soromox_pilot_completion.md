@@ -163,8 +163,8 @@ once, with zero scientific dispatch for delivery verification.
 The capability gained is an accountable differentiable source-geometry probe,
 native model admission evidence, and native LLM mathematical feedback with full
 immutable retrieval. Differentiable candidate dynamics and joint trajectory
-co-design were not gained. The new pilot Python code totals 768 lines: 89 mapping,
-190 primary checks, 46 follow-up checks, 392 contracts/registration/runtime, and
+co-design were not gained. The new pilot Python code totals 772 lines: 89 mapping,
+190 primary checks, 46 follow-up checks, 396 contracts/registration/runtime, and
 51 one-time repair recording; focused tests add 70 lines. Maintenance includes
 a separate Windows numerical environment, two lock layers, API/coordinate
 mapping checks and the endpoint API caveat. Extending this to faithful mechanics
