@@ -1,0 +1,52 @@
+{
+  "schema": "reference_backed_case_draft_v1",
+  "status": "investigation_pending_external_authorization",
+  "study_id": "nmpc-initialization-20261010",
+  "source_commit": "97aced4e75a6c3c6fecd851ae5bb0dc6be112f18",
+  "implementation_commit": "aae1ce5b5bb08df54e4a87b5d337d21d103b954a",
+  "source_execution": "21b607607bf442a6b6d9494dda897ea8",
+  "source_owner": "casadi-nmpc-research-20261010-cl-afc46a23b0c9",
+  "fixed_configuration": "examples/nmpc_initialization/specification.json#/frozen_task",
+  "symptoms": {
+    "applied_updates": 35, "numerically_accepted_plans": 35,
+    "initialization_selected": 30, "noninitialization_selected": 5,
+    "first_changed_input_s": 0.30,
+    "terminal_error_m": 0.09552487867011847,
+    "holding_max_error_m": 0.1931520788542894,
+    "holding_max_speed_m_s": 3.2498304807417395
+  },
+  "factual_findings": {
+    "first_holding_visible_in_prediction_s": 0.20,
+    "first_shortened_horizon_s": 0.26,
+    "historical_iteration_traces_available": false,
+    "initialization_is_exception_fallback": false
+  },
+  "tested_hypotheses": [],
+  "new_results": [],
+  "revision_executed": false,
+  "unresolved_questions": [
+    "Did a useful feasible noninitialization plan exist before the return budget?",
+    "Were useful lower-objective historical iterates rejected for numerical violations?",
+    "What changes under a same-state common-seed comparison?",
+    "Does a targeted revision improve measured closed-loop behavior?"
+  ],
+  "evidence": [
+    "evidence/nmpc_initialization_20261010/saved_timeline.json",
+    "evidence/nmpc_initialization_20261010/source_binding.json",
+    "evidence/casadi_nmpc_research_20261010/post_stop_correction.json"
+  ],
+  "lessons": [
+    "Synchronous simulation latency does not imply missed virtual-time actions.",
+    "Numerical feasibility does not establish task success.",
+    "Selected initialization is distinct from exception fallback.",
+    "Missing historical traces cannot establish why an unseen iterate was rejected.",
+    "A successful local comparison does not establish closed-loop improvement.",
+    "Another stopping condition ending a 30s-budget solve does not establish that extending the return budget is ineffective."
+  ],
+  "applicability_limits": ["One frozen simulated structure/task/controller; no unique cause, hardware result or global conclusion."],
+  "admission": {
+    "state": "draft_only",
+    "reason": "Platform EvidenceRef and SQLite/export-bundle provenance cannot satisfy older ArtifactReference and finalized RunRecord admission without an unsupported provenance migration.",
+    "human_approval": null, "validation_fabricated": false
+  }
+}

@@ -132,10 +132,10 @@ def make_timeline(reader,source):
             position_error_m=m['error_m'],tip_speed_m_s=m['speed_m_s'],aligned_prediction=a,
             costs_s={k:u.get(k) for k in ('state_preparation_s','warm_preparation_s','optimization_solve_s','plan_validation_s','update_wall_s','deadline_horizon_preparation_s','snapshot_capture_wall_s')},
             projection_residual_rad_m=u.get('gvs_projection_residual_max_rad_m')))
-    return dict(source_execution=EXECUTION,owner=source['owner'],manifest=source['manifest'],files=source['files'],rows=rows,
-        landmarks=dict(first_holding_visible_s=next(r['time_s'] for r in rows if r['first_holding_node_s'] is not None),
-            first_shortened_horizon_s=next(r['time_s'] for r in rows if r['effective_horizon']<rows[0]['effective_horizon']),
-            first_changed_input_s=next(r['time_s'] for r in rows if max(abs(v-.2) for v in r['applied_tension_n'])>1e-6)),
+    return dict(source_execution=source['execution_id'],owner=source['owner'],manifest=source['manifest'],files=source['files'],rows=rows,
+        landmarks=dict(first_holding_visible_s=next((r['time_s'] for r in rows if r['first_holding_node_s'] is not None),None),
+            first_shortened_horizon_s=next((r['time_s'] for r in rows if r['effective_horizon']<rows[0]['effective_horizon']),None),
+            first_changed_input_s=next((r['time_s'] for r in rows if r['applied_tension_n'] is not None and max(abs(v-.2) for v in r['applied_tension_n'])>1e-6),None)),
         missing=['Historical complete warm starts, raw/initial plan vectors, rejected iterates, scalar objectives and iteration counts were not recorded.' ] if not snapshots else [],
         aligned_prediction_missing=missing,projection_checks=[],
         corrections=['Synchronous wall-clock latency did not skip virtual-time control actions.',
@@ -143,6 +143,29 @@ def make_timeline(reader,source):
             'Numerical feasibility is distinct from task acceptance.',
             'Untested weights or longer solves cannot be declared ineffective.',
             'Curvature residual in rad/m is not a tip error in metres.'])
+
+
+def revision_comparison(h,detail):
+    reader=ControlEvidence(h.store);source=reader.resolve(detail['execution_references']['execution_id'])
+    timeline=make_timeline(reader,source);state=h.store.session(h.run_id)['state']
+    old=h.store.artifact(state['factual_packet_reference']);baseline=h.store.artifact(state['source_baseline_reference'])
+    def metrics(value,profile):
+        rows=value['rows'];first=value['landmarks']['first_changed_input_s']
+        changed=next((r for r in rows if r['time_s']==first),None)
+        inputs=np.asarray([r['applied_tension_n'] for r in rows if r['applied_tension_n'] is not None])
+        return dict(first_changed_input_s=first,landmarks=value['landmarks'],
+            position_error_at_first_change_m=None if changed is None else changed['position_error_m'],
+            subsequent_measured_errors=[dict(time_s=r['time_s'],error_m=r['position_error_m']) for r in rows if first is not None and r['time_s']>=first],
+            initialization_selected=profile['initialization_selected'],solver_status_counts=profile['optimization_status_counts'],
+            policy_reason_counts=profile['policy_stop_reason_counts'],holding=profile['sampled_settling'],
+            terminal_error_m=profile['terminal_error_m'],drive_utilization=profile['drive_utilization'],
+            total_input_variation_n=np.abs(np.diff(inputs,axis=0)).sum(axis=0).tolist(),
+            aligned_prediction=profile['one_step_prediction_summary'],
+            mean_update_s=profile['mean_update_s'],snapshot_cost_s=sum(r['costs_s'].get('snapshot_capture_wall_s') or 0 for r in rows))
+    with h.store.transaction() as db:ref=h.store.put(db,timeline)
+    return dict(baseline=metrics(old,baseline['profile']),revision=metrics(timeline,detail['profile']),
+        revised_timeline_reference=plain(ref),baseline_reference=state['source_baseline_reference'],
+        acceptance=detail['acceptance'],interpretation='Earlier changed actions alone are not improvement; compare measured error/holding and unchanged acceptance.')
 
 
 def validate_plan(store,state,args):

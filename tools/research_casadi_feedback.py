@@ -114,7 +114,7 @@ def compact_result(value):
         'relaxed_nlp_feasible','objective_components','physical_eligible','costs_s','process_elapsed_s',
         'acceptance','control','revision','resolved_configuration','wiring_reference','holding_motion',
         'sampling','unknowns','failure_categories','partial_feedback','execution_references','actual_duration_s','completed_control_updates',
-        'nmpc_internal_solves','offline_nlp_slots_charged')
+        'nmpc_internal_solves','offline_nlp_slots_charged','initialization_comparison')
     result={k:value[k] for k in keys if k in value}
     if 'changed_factor' in value:
         from tools.nmpc_initialization import compact_pair

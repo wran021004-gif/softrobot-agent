@@ -130,7 +130,8 @@ def validate_control(store, state, choice, action):
         same=preceding['candidate']==plain(choice.candidate)
         if action=='control_revision' and (not same or not changes):raise ValueError('CONTROL_ONLY_REVISION_REQUIRES_SAME_CANDIDATE_AND_CHANGED_WEIGHTS')
         factors=(['control'] if same else ['structure'])+(['control'] if changes and not same else [])
-    return source,dict(preceding_execution=plain(choice.preceding_execution),exact_weight_changes=changes,
+    return source,dict(preceding_execution=plain(choice.preceding_execution),exact_parameter_changes=changes,
+        exact_weight_changes={k:v for k,v in changes.items() if k.endswith('_weight')},
         changed_factors=factors,attribution='No unique causal attribution; changed structure and control are jointly reported.')
 
 
@@ -219,6 +220,12 @@ def finish_closed_loop(host, child=None, started=None):
         actual_duration_s=(partial or {}).get('actual_duration_s') if profile is None else profile['last_valid_time_s'],
         completed_control_updates=(partial or {}).get('applied_control_updates') if profile is None else profile.get('applied_control_updates',profile['updates']),
         nmpc_internal_solves=(partial or {}).get('attempted_control_plans') if profile is None else profile['updates'],offline_nlp_slots_charged=0)
+    if state.get('initialization_diagnosis') and profile:
+        from tools.nmpc_initialization import revision_comparison
+        comparison_start=time.perf_counter()
+        detail['initialization_comparison']=revision_comparison(host,detail)
+        comparison_cost=time.perf_counter()-comparison_start
+        costs['comparison']=comparison_cost;costs['total']+=comparison_cost
     with host.store.transaction() as db:
         ref=host.store.put(db,detail);state=host.store.session(ACTIVITY,db)['state']
         # Charge stages once even if reporting is recovered from existing receipts.
