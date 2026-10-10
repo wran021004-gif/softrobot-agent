@@ -180,6 +180,10 @@ async def converse(h):
             key=state['pilot']['unconsumed_response'];ev=next(e for e in h.store.events(ACTIVITY) if e['kind']=='r3_request' and e['request_id']==key)
             original=h.store.artifact(h.store.artifact(ev['outputs'][0])['request'])
             agent.system_prompt=next(m['content'] for m in original['messages'] if m['role']=='system');return
+        compatibility=h.compatibility()
+        if not compatibility['compatible']:
+            record(h,'engineering_dependency_checkpoint',compatibility,status='migration_required')
+            event.cancel='Committed repair migration required before another provider send';return
         current=packet(h);record(h,'model_decision_packet',current)
         agent.system_prompt=INSTRUCTIONS+'\nCURRENT_RESEARCH_PACKET\n'+json.dumps(current)
     def before_tool(event):record(h,'model_original_tool_request',dict(tool_use=event.tool_use))
@@ -199,6 +203,7 @@ async def converse(h):
                 record(h,'model_original_turn',dict(result=str(result)))
             except MaxTokensReachedException:record(h,'model_incomplete_response',dict(reason='max_tokens',partial_history_owner='Strands'))
             if pending(h):raise ValueError('UNKNOWN_PROVIDER_OUTCOME_NO_BLIND_REPEAT')
+            if not h.compatibility()['compatible']:raise ValueError('COMMITTED_REPAIR_MIGRATION_REQUIRED_NO_MORE_SENDS')
     except Exception as exc:
         record(h,'live_cycle_incomplete',dict(exception_type=type(exc).__name__,message=str(exc),remaining_budget=budget(h.store)),status='incomplete');raise
     finally:await boundary.aclose()
