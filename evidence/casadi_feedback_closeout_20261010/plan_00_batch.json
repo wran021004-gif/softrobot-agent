@@ -1,0 +1,57 @@
+{
+  "action": "batch",
+  "candidates": [
+    {
+      "design_bounds": [
+        0.0,
+        0.0
+      ],
+      "design_initial": 0.0,
+      "initialization": "saved_schedule",
+      "objective_mode": "task_gap",
+      "position_weight": 1.0,
+      "secondary_coefficient": 0.0,
+      "source_candidate": {
+        "artifact_id": "6f121f12f89af153953972e5140b4e2fdd4b77ddb089fbc8c340457198af97b9",
+        "media_type": "application/json"
+      },
+      "speed_weight": 1.0,
+      "substeps": 2
+    }
+  ],
+  "diagnostic_candidate": null,
+  "disposition": "Request one full NLP solve on the refined two-step grid at frozen design d=0, objective task_gap with default weights (position 1.0, speed 1.0, secondary 0.0), initialization saved_schedule from artifact 6f121f12...; evaluate with the standard independent BDF replay and report original (unsoftened) metrics plus slacks for the revision/STOP decision.",
+  "fixed_conditions": "Frozen: target [0.29,0.035,0.19] m, mount [0,0,0.15] with identity quaternion, gravity -9.81 m/s^2, duration 0.35 s with 35 control intervals at 0.01 s (physical timestep 0.0005 s, 24 mesh cells), named zero initial positions and velocities (hard), existing two-segment topology with six ideal tension channels, guides, rigid components and payload, existing material/sections and structural_linear basis, tension bounds [0,8] N hard, constant design throughout the trajectory within d in [-1,1], nonnegative shared position/speed slacks as the only relaxation, exact automatic AD for outer derivatives, local reverse derivatives retained. No physical launches; no integrator substitution; no controller search; no change to task, material, topology or horizon.",
+  "hypothesis": "The dominant residual in the historical corrected-A iterate is discretization error of the original 0.01 s integration grid, not the slack weights or the design value. Diagnose shows saved-NLP vs tightly-solved-original-grid agreement to 5.9e-7 m / 1.3e-5 m/s (so the saved schedule is a genuine original-grid optimum), while tightly-solved original vs tightly-solved two-step refined grid disagrees by 3.74 mm tip and 0.0467 m/s — far beyond the 1 mm / 0.002 m/s refinement gate. Therefore solving the SAME frozen-design (d=0) two-shared-slack gap problem on the refined grid (substeps=2, 0.005 s), warm-started from the diagnosed original-grid iterate (artifact 6f121f12... /candidate/states, 36 nodes, d=0.0, pretension_0_2, iteration 59), should move the returned iterate onto the refined physics and shrink the original-grid residual below the holding/terminal limits while keeping slacks the only relaxation.",
+  "limitations": [
+    "No physical validation: zero physical launches authorized, so no claim of real-hardware task success.",
+    "Design is frozen at the historical d=0 in this batch (design_bounds [0,0]), so no joint design/control conclusion can be drawn and corrected_B's worse d=0.767 point is not re-tested.",
+    "substeps=2 is a single two-step grid refinement, not a grid-convergence study; agreement at 0.005 s does not establish convergence.",
+    "Weights are kept at the default [1,1]; cross-weight comparison of original metrics is deferred to a single possible revision.",
+    "Replay-limit agreement is a numerical consistency check on one integrator, not physical truth; slacks are search-only and a relaxed feasible iterate is not task success.",
+    "One seed (17) and one initialization path; the warm start may bias iteration count and the located local solution.",
+    "Historical 'optimal reported' terminations were on relaxed formulations and previously failed to export vectors, so refinement was not yet demonstrated empirically."
+  ],
+  "requested_nlp_solves": 1,
+  "requested_replays": 1,
+  "revision_or_stop_rule": "After consuming the batch feedback and the independent BDF replay of any usable returned schedule: (a) if a usable schedule is returned whose replay agrees within 1 mm / 0.002 m/s and whose ORIGINAL unsoftened metrics satisfy holding and terminal 0.01 m and holding 0.02 m/s limits, STOP with that as the bounded numerical result (noting the residual normalization gate and slack values); (b) if the refined solve returns a usable schedule that still misses the unsoftened limits, spend the single revision solve on the supported lever the feedback most implicates — changed slack weights within [0.25,4] to expose which of position/speed carries the residual, or the saved schedule as a fresh initialization — never on extra solves; (c) if the batch returns only failures/unusable output, interpret honestly and either STOP or take one repair-free revision within budget; (d) if a third question about a NEW candidate arises, use at most one diagnostic replay, otherwise STOP.",
+  "supporting_evidence": [
+    {
+      "artifact_id": "ba8eaa8ab169e941436e096ab5bc367d70b3cc8f4591471923fc7f85e928a14c",
+      "media_type": "application/json"
+    },
+    {
+      "artifact_id": "6f121f12f89af153953972e5140b4e2fdd4b77ddb089fbc8c340457198af97b9",
+      "media_type": "application/json"
+    },
+    {
+      "artifact_id": "172caf84e701165ecd58bb4aa6de93d83e378b6fbaaddf7a6cf2eda9f660a1b1",
+      "media_type": "application/json"
+    },
+    {
+      "artifact_id": "baae52d1f11518a40982491879c4a0ab380c519a617a0588e989a0e496bebbf2",
+      "media_type": "application/json"
+    }
+  ],
+  "weakening_observation": "No trustworthy feasible schedule exists yet at any design point. Corrected_A (d=0) is a mathematical infeasible_returned_iterate: holding_max_speed 0.02208 m/s exceeds the 0.02 m/s holding limit while holding/terminal position errors (0.009818/0.009812 m) sit just under the 0.01 m limit, normalized_violation 0.21872. Corrected_B (d=0.767) is worse (violation 0.73626). The independent BDF replay of the saved schedule disagrees with its own NLP by 8.1 mm tip and 0.0997 m/s holding speed, far outside the 1 mm / 0.002 m/s replay limit, and the diagnose precision check (saved vs precision BDF: 6.3e-12 m, 4.7e-10 m/s) shows that disagreement is a discretization/model-consistency effect rather than BDF tolerance error. Historical refined solves also terminated at relaxed 'optimal' reports with unexported vectors, so refinement alone is not yet demonstrated to purchase feasibility."
+}

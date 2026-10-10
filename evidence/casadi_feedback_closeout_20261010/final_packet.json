@@ -1,0 +1,725 @@
+{
+  "frozen_specification": {
+    "study_id": "casadi-feedback-closeout-20261010",
+    "authorization": "User /goal attachment 10538cb4-4877-46cf-8cee-45cc00d9e1a7/pasted-text-1.txt",
+    "base_commit": "d9ce124244697f30df3a609942cb7591c3cf3f15",
+    "physical_source": "examples/casadi_codesign/case_A.json#/physical_source",
+    "frozen_task": {
+      "target_m": [
+        0.29,
+        0.035,
+        0.19
+      ],
+      "mount_m": [
+        0,
+        0,
+        0.15
+      ],
+      "mount_quaternion_wxyz": [
+        1,
+        0,
+        0,
+        0
+      ],
+      "gravity_m_s2": [
+        0,
+        0,
+        -9.81
+      ],
+      "duration_s": 0.35,
+      "control_intervals": 35,
+      "control_period_s": 0.01,
+      "physical_timestep_s": 0.0005,
+      "physical_mesh_cells": 24,
+      "seed": 17,
+      "physical_initial_state": "named_zero_positions_and_velocities",
+      "topology": "two flexible segments; six independent ideal tension channels; existing asymmetric routing, guides, rigid components and payload",
+      "mechanics": "existing material and sections; structural_linear basis; existing coordinate/tendon order",
+      "tension_bounds_n": [
+        0,
+        8
+      ],
+      "terminal_position_limit_m": 0.01,
+      "holding_position_limit_m": 0.01,
+      "holding_speed_limit_m_s": 0.02,
+      "holding_window_s": 0.05
+    },
+    "design": {
+      "rule": "L_proximal=0.16+0.0055*d; L_distal=0.11-0.0055*d",
+      "bounds": [
+        -1,
+        1
+      ],
+      "constant_throughout_trajectory": true
+    },
+    "search": {
+      "slacks": "Two shared nonnegative variables: position slack covers all holding and terminal normalized position squared inequalities; speed slack covers all holding normalized speed squared inequalities. Each inequality is normalized_squared <= 1 + its slack.",
+      "hard_constraints": [
+        "initial state",
+        "implicit force balance and kinematics",
+        "constant design domain",
+        "tension bounds",
+        "nonnegative slacks"
+      ],
+      "objective_menu": [
+        "task_gap",
+        "task_gap_with_effort"
+      ],
+      "task_gap_expression": "position_weight*s_position + speed_weight*s_speed",
+      "position_and_speed_weight_bounds": [
+        0.25,
+        4
+      ],
+      "default_weights": [
+        1,
+        1
+      ],
+      "secondary_coefficient_bounds": [
+        0,
+        0.001
+      ],
+      "secondary_expression": "coefficient * (mean((u/8)^2)+0.1*mean((diff(u)/8)^2)); weighted tradeoff, not lexicographic",
+      "initializations": [
+        "pretension_0_2",
+        "ramp_0_2_to_0_4",
+        "saved_schedule"
+      ],
+      "state_substeps": [
+        1,
+        2
+      ],
+      "refinement_gate": "Observed original-versus-refined reconstruction discrepancy exceeds 1 mm or 0.002 m/s with complete horizons",
+      "outer_derivatives": "automatic exact AD",
+      "local_derivatives": "reverse; historical speed trial reused without adoption"
+    },
+    "acceptance": {
+      "hard_normalized_residual_tolerance": 1e-05,
+      "task_gap_normalized_tolerance": 1e-05,
+      "slack_subtracted": false,
+      "replay_tip_disagreement_limit_m": 0.001,
+      "replay_speed_disagreement_limit_m_s": 0.002,
+      "independent_replay": "SciPy BDF from zero, continuous state across 35 original tension switches; default rtol=1e-8,atol_q=1e-9,atol_v=1e-7; dense 0.0005 s metrics separate from original-node metrics",
+      "physical_validation": "No physical launches authorized in this activity"
+    },
+    "diagnosis": {
+      "candidate": "evidence/casadi_codesign_pilot_20261010/07_solve_A.json#/candidate; corrected A iteration 59",
+      "source_solver": "baae52d1f11518a40982491879c4a0ab380c519a617a0588e989a0e496bebbf2",
+      "selected_candidate": "6f121f12f89af153953972e5140b4e2fdd4b77ddb089fbc8c340457198af97b9",
+      "comparisons": [
+        "saved NLP vs tightly solved original grid",
+        "original vs two-step refined grid",
+        "refined vs saved BDF",
+        "saved BDF vs one precision check"
+      ],
+      "root_tolerance": 1e-11,
+      "precision_bdf": {
+        "rtol": 1e-10,
+        "atol_q": 1e-11,
+        "atol_v": 1e-09
+      },
+      "no_design_search": true,
+      "reuse": "Import evidence/casadi_feedback_research_20261010/00_diagnose.json and 01_speed.json unchanged; no new historical numerical work"
+    },
+    "budgets": {
+      "full_nlp_solves": 2,
+      "initial_batch_solves": 1,
+      "revision_batch_solves": 1,
+      "solve_limit_s": 600,
+      "ipopt_cpu_wall_settings_s": 570,
+      "nlp_process_ceiling_s": 900,
+      "replay_process_ceiling_s": 450,
+      "diagnosis_process_ceiling_s": 900,
+      "speed_process_ceiling_s": 600,
+      "total_numerical_s": 3600,
+      "initial_investigation_s": 0,
+      "physical_launches": 0,
+      "physical_allowance_s": 0,
+      "actual_provider_requests": 12,
+      "protected_final_provider_sends": 4,
+      "public_workflow_calls": 48,
+      "other_llm_workers": 0,
+      "overall_activity_s": 14400,
+      "delivery_reserve_s": 1800,
+      "new_independent_replays": 3
+    },
+    "completion": "At least one real model-selected numerical batch executed and feedback consumed in an evidence-based revision or STOP; no fabricated model decision; feasibility/speedup/second batch are optional",
+    "historical_activities": "sealed STOP; previous unused budget cannot be used",
+    "started_unix": 1791624759.0
+  },
+  "historical": [
+    {
+      "name": "corrected_A",
+      "reference": {
+        "artifact_id": "baae52d1f11518a40982491879c4a0ab380c519a617a0588e989a0e496bebbf2",
+        "media_type": "application/json"
+      },
+      "lengths_m": [
+        0.16,
+        0.11
+      ],
+      "objective": {
+        "effort": 0.013974686063606275,
+        "total": 0.014011085331497402,
+        "variation_weighted": 3.6399267891127516e-05
+      },
+      "normalized_violation": 0.21871979218041515,
+      "metrics": {
+        "holding_max_position_error_m": 0.009817871371583587,
+        "holding_max_speed_m_s": 0.02207912853516112,
+        "terminal_position_error_m": 0.009811832152384034
+      },
+      "mathematical_feasibility": "infeasible_returned_iterate"
+    },
+    {
+      "name": "corrected_B",
+      "reference": {
+        "artifact_id": "2579c06bb0cecb4a86f925e9af9dc34b554d13e2895b0d9b47c4a42265a2db9d",
+        "media_type": "application/json"
+      },
+      "lengths_m": [
+        0.1557815161660965,
+        0.1142184838339035
+      ],
+      "objective": {
+        "effort": 0.01281330361947096,
+        "total": 0.012845784940368173,
+        "variation_weighted": 3.248132089721223e-05
+      },
+      "normalized_violation": 0.7362588426447425,
+      "metrics": {
+        "holding_max_position_error_m": 0.010017116129698283,
+        "holding_max_speed_m_s": 0.026353435014394178,
+        "terminal_position_error_m": 0.010017116129698283
+      },
+      "mathematical_feasibility": "infeasible_returned_iterate"
+    }
+  ],
+  "historical_replay": {
+    "reference": {
+      "artifact_id": "172caf84e701165ecd58bb4aa6de93d83e378b6fbaaddf7a6cf2eda9f660a1b1",
+      "media_type": "application/json"
+    },
+    "holding_speed_m_s": 0.09799912805413251,
+    "node_tip_disagreement_m": 0.00810609985798637
+  },
+  "saved_schedule_reference": {
+    "artifact_id": "6f121f12f89af153953972e5140b4e2fdd4b77ddb089fbc8c340457198af97b9",
+    "media_type": "application/json"
+  },
+  "results": [
+    {
+      "operation": "diagnose",
+      "reference": {
+        "artifact_id": "ba8eaa8ab169e941436e096ab5bc367d70b3cc8f4591471923fc7f85e928a14c",
+        "media_type": "application/json"
+      },
+      "candidate": null,
+      "imported": true,
+      "source": "evidence\\casadi_feedback_research_20261010\\00_diagnose.json",
+      "status": "completed",
+      "termination_reason": "Fixed corrected-A iteration-59 inputs and lengths; reconstructed continuously from zero; no design search",
+      "comparisons": {
+        "saved_bdf_vs_precision_bdf": {
+          "complete_horizon": true,
+          "max_speed_m_s": 4.707862087652596e-10,
+          "max_tip_m": 6.326105382398365e-12
+        },
+        "saved_nlp_vs_tight_original": {
+          "complete_horizon": true,
+          "max_speed_m_s": 1.308016452634832e-05,
+          "max_tip_m": 5.887482893548685e-07
+        },
+        "tight_original_vs_tight_refined": {
+          "complete_horizon": true,
+          "max_speed_m_s": 0.04672432046756268,
+          "max_tip_m": 0.0037435079986504567
+        },
+        "tight_refined_vs_saved_bdf": {
+          "complete_horizon": true,
+          "max_speed_m_s": 0.052987134579760016,
+          "max_tip_m": 0.0043648601940654876
+        }
+      },
+      "saved_nlp_metrics": {
+        "holding_max_position_error_m": 0.009817871371583587,
+        "holding_max_speed_m_s": 0.02207912853516112,
+        "terminal_position_error_m": 0.009811832152384034
+      },
+      "precision_bdf": {
+        "atol_q": 1e-11,
+        "atol_v": 1e-09,
+        "costs_s": {
+          "jacobian_construction": 12.897289099986665,
+          "total": 163.10335490002763
+        },
+        "dense_max_speed_disagreement_m_s": 0.09968627179788823,
+        "dense_max_tip_disagreement_m": 0.008110578846913718,
+        "dense_period_s": 0.0005,
+        "gates_passed": false,
+        "holding_max_position_error_m": 0.006875549041129858,
+        "holding_max_speed_m_s": 0.0979991276178837,
+        "input_bounds_compliant": true,
+        "integration_failure": null,
+        "method": "scipy BDF, exact direct-graph state Jacobian, switch-by-switch continuous state",
+        "node_max_speed_disagreement_m_s": 0.09968627179788823,
+        "node_max_tip_disagreement_m": 0.008106099860593293,
+        "rtol": 1e-10,
+        "status": "completed",
+        "terminal_position_error_m": 0.00548306587528728
+      },
+      "process_elapsed_s": 215.60840389999794,
+      "costs_s": {
+        "total": 213.07062850001967
+      }
+    },
+    {
+      "operation": "speed",
+      "reference": {
+        "artifact_id": "195f0d40d8dc83748a6c3410e0db0119d753e35b036f5dbb5a3c9ca413ab7074",
+        "media_type": "application/json"
+      },
+      "candidate": null,
+      "imported": true,
+      "source": "evidence\\casadi_feedback_research_20261010\\01_speed.json",
+      "status": "passed",
+      "termination_reason": "Single change: remove local step forced-reverse AD; full NLP remains exact automatic AD",
+      "modes": {
+        "automatic": {
+          "assembly_s": 28.38149269996211,
+          "full_cold_s": 5.154476399999112,
+          "full_derivative_construction_s": 17.547939100011718,
+          "full_warmed_s": [
+            5.158871199993882,
+            5.167357700003777
+          ],
+          "local_derivative_construction_s": 6.904930900025647,
+          "mechanics_construction_s": 1.526462099980563
+        },
+        "reverse": {
+          "assembly_s": 17.615476900013164,
+          "full_cold_s": 5.245000099996105,
+          "full_derivative_construction_s": 16.036224900046363,
+          "full_warmed_s": [
+            5.2185803999891505,
+            5.205002999980934
+          ],
+          "local_derivative_construction_s": 7.823299899988342,
+          "mechanics_construction_s": 2.860805700009223
+        }
+      },
+      "full_warmed_speed_ratio": 1.0094278851374723,
+      "setup_repayment_jacobian_calls": 974.9090984678829,
+      "adopted": false,
+      "selected_local_ad": "reverse",
+      "process_elapsed_s": 166.24472259997856,
+      "costs_s": {
+        "total": 163.7016659999499
+      }
+    },
+    {
+      "operation": "engineering_correction",
+      "reference": {
+        "artifact_id": "9721b538d8eef5c3b5cbab815b6c258450ea339ca54c4277340bf152f5eece09",
+        "media_type": "application/json"
+      },
+      "candidate": null,
+      "imported": false,
+      "source": null,
+      "status": "Codex engineering correction; original model plan preserved",
+      "termination_reason": "The historical corrected-A iteration-59 returned iterate was mathematically infeasible, not an established optimum. Agreement between saved and tightly reconstructed original-grid states does not establish optimality. One fixed schedule showed substantial time-discretization effects but did not identify a unique or dominant cause, exclude weights/design effects, or establish convergence of the 0.005 s grid. The historical solver problem predates the two-slack search formulation, so the new solve is not the same optimization problem. Saved-schedule initialization reuses tensions only and regenerates states continuously from the prescribed physical zero state at the chosen design and grid; saved 36-node states are not copied to the refined solve. Two historical refined solves actually returned optimal termination for the relaxed NLP, but their vectors were never saved and remain unrecoverable. These corrections concern evidence and execution semantics and prescribe no weights, design choice, hypothesis revision or final decision."
+    },
+    {
+      "operation": "solve",
+      "reference": {
+        "artifact_id": "d6618dc2f4e94822fa597b8868d154aa731a447537dcdcb2b6d04b6bc948eacf",
+        "media_type": "application/json"
+      },
+      "candidate": {
+        "artifact_id": "0e16077e9183ebcd64729eb982aa5a73e5eb03e111d5d7ed402552ca16db345b",
+        "media_type": "application/json"
+      },
+      "imported": false,
+      "source": null,
+      "status": "converged",
+      "termination_reason": "Solve_Succeeded",
+      "hard_max_normalized_violation": 9.990000002516815e-09,
+      "largest_hard_residuals": [
+        {
+          "kind": "variable_bound",
+          "name": "slack/position",
+          "normalized_violation": 9.990000002516815e-09
+        },
+        {
+          "kind": "variable_bound",
+          "name": "slack/speed",
+          "normalized_violation": 9.990000001910121e-09
+        },
+        {
+          "kind": "dynamics",
+          "name": "dynamics_69_16",
+          "normalized_violation": 4.4538157883966534e-10
+        },
+        {
+          "kind": "dynamics",
+          "name": "dynamics_68_16",
+          "normalized_violation": 3.8505960572865483e-10
+        },
+        {
+          "kind": "dynamics",
+          "name": "dynamics_69_15",
+          "normalized_violation": 2.9619676936848416e-10
+        },
+        {
+          "kind": "dynamics",
+          "name": "dynamics_69_13",
+          "normalized_violation": 2.9577403894143206e-10
+        },
+        {
+          "kind": "dynamics",
+          "name": "dynamics_68_15",
+          "normalized_violation": 2.6824137529246617e-10
+        },
+        {
+          "kind": "dynamics",
+          "name": "dynamics_69_14",
+          "normalized_violation": 2.1761634378184014e-10
+        }
+      ],
+      "relaxed_nlp_feasible": true,
+      "original_task_feasible": true,
+      "original_task_gaps": {
+        "position": 0.0,
+        "speed": 0.0
+      },
+      "slack_values": {
+        "position": -9.990000002516815e-09,
+        "speed": -9.990000001910121e-09
+      },
+      "trajectory_metrics": {
+        "holding_max_position_error_m": 0.0055149713558738205,
+        "holding_max_speed_m_s": 0.019741860867489795,
+        "terminal_position_error_m": 0.0055149713558738205
+      },
+      "objective_components": {
+        "effort": 0.2527623604405248,
+        "selected_search_objective": -1.9980000004426936e-08,
+        "variation_weighted": 9.243659766642626e-05
+      },
+      "process_elapsed_s": 552.9394045999506,
+      "costs_s": {
+        "assembly_and_guess": 44.28470150002977,
+        "mechanics_construction": 2.4649016999755986,
+        "solve": 466.9110327999806,
+        "solver_construction": 28.773582499998156,
+        "total": 546.5389615999884
+      },
+      "iterations": 22,
+      "solver_entered": true,
+      "solver_returned": true,
+      "solver_termination": "Solve_Succeeded",
+      "checkpoint_reference": {
+        "artifact_id": "33023b5a8d53dbd6c22dcc71d119a942cd54cce4a03df403c6934ccacb37916b",
+        "media_type": "application/json"
+      },
+      "candidate_export_status": "exported"
+    },
+    {
+      "operation": "replay",
+      "reference": {
+        "artifact_id": "442dd0920f1f7e2302aa9e3cf871b41bef545e6ed2fe90536565fa6b44a4f67a",
+        "media_type": "application/json"
+      },
+      "candidate": null,
+      "imported": false,
+      "source": null,
+      "status": "completed",
+      "termination_reason": "scipy BDF, exact direct-graph state Jacobian, switch-by-switch continuous state",
+      "replay": {
+        "atol_q": 1e-09,
+        "atol_v": 1e-07,
+        "costs_s": {
+          "jacobian_construction": 18.491288600023836,
+          "total": 191.556110000005
+        },
+        "dense_max_speed_disagreement_m_s": 0.04661230787294366,
+        "dense_max_tip_disagreement_m": 0.002459632177760401,
+        "dense_period_s": 0.0005,
+        "gates_passed": false,
+        "holding_max_position_error_m": 0.005422546931367737,
+        "holding_max_speed_m_s": 0.04312197213527256,
+        "input_bounds_compliant": true,
+        "integration_failure": null,
+        "method": "scipy BDF, exact direct-graph state Jacobian, switch-by-switch continuous state",
+        "node_max_speed_disagreement_m_s": 0.03068374311332374,
+        "node_max_tip_disagreement_m": 0.002449002850323481,
+        "rtol": 1e-08,
+        "status": "completed",
+        "terminal_position_error_m": 0.005422546931367737
+      },
+      "physical_eligible": false,
+      "process_elapsed_s": 195.29582389997086,
+      "costs_s": {
+        "mechanics_construction": 1.417025199974887,
+        "total": 192.9741124000284
+      }
+    },
+    {
+      "operation": "engineering_correction",
+      "reference": {
+        "artifact_id": "6f25a297e3e47904f21f74d80ef6a338ac681e0ee2dbcf6d0c42f571b68d5e1e",
+        "media_type": "application/json"
+      },
+      "candidate": null,
+      "imported": false,
+      "source": null,
+      "status": "Codex engineering correction to revision interpretation; original model revision preserved",
+      "termination_reason": "The initial new solve and historical corrected-A diagnostic use different schedules and different optimization formulations; their disagreement values cannot be treated as a controlled causal comparison proving a refinement gain or slow grid convergence. Both new solves use substeps=2. Tiny negative reported slacks (about -1e-8) are numerical bound relaxation, not negative physical gaps. Original acceptance uses unsoftened metrics. A coefficient of 0.001 is a weighted search tradeoff and does not guarantee zero slacks or improved physical speed margin. Lack of a preference among feasible slack-zero points does not establish global optimality, a unique cause for the returned margin, or exclusion of the other supported search choices. Candidate selection prioritizes hard validity, original task gaps, then effort; the report retains both selected and raw-returned vectors. These corrections prescribe no model revision or stopping decision."
+    },
+    {
+      "operation": "solve",
+      "reference": {
+        "artifact_id": "da497990ee77119b1563367e514766f7ec1585c424b831cf992b11789d4161c0",
+        "media_type": "application/json"
+      },
+      "candidate": {
+        "artifact_id": "e6b3852bd882803da67a8a147277bfb2305b9e431eb4569158a6da0565aa557e",
+        "media_type": "application/json"
+      },
+      "imported": false,
+      "source": null,
+      "status": "iteration_limit",
+      "termination_reason": "Maximum_CpuTime_Exceeded",
+      "hard_max_normalized_violation": 5.5284895037572765e-06,
+      "largest_hard_residuals": [
+        {
+          "kind": "dynamics",
+          "name": "dynamics_69_16",
+          "normalized_violation": 5.5284895037572765e-06
+        },
+        {
+          "kind": "dynamics",
+          "name": "dynamics_68_16",
+          "normalized_violation": 4.128811589279233e-06
+        },
+        {
+          "kind": "dynamics",
+          "name": "dynamics_69_13",
+          "normalized_violation": 3.4001077636996307e-06
+        },
+        {
+          "kind": "dynamics",
+          "name": "dynamics_66_13",
+          "normalized_violation": 3.1233578477469354e-06
+        },
+        {
+          "kind": "dynamics",
+          "name": "dynamics_69_17",
+          "normalized_violation": 2.9431154709776575e-06
+        },
+        {
+          "kind": "dynamics",
+          "name": "dynamics_67_13",
+          "normalized_violation": 2.8793341325583297e-06
+        },
+        {
+          "kind": "dynamics",
+          "name": "dynamics_66_12",
+          "normalized_violation": 2.7349879519336998e-06
+        },
+        {
+          "kind": "dynamics",
+          "name": "dynamics_60_13",
+          "normalized_violation": 2.6139382191961782e-06
+        }
+      ],
+      "relaxed_nlp_feasible": true,
+      "original_task_feasible": true,
+      "original_task_gaps": {
+        "position": 0.0,
+        "speed": 0.0
+      },
+      "slack_values": {
+        "position": 5.05974256094035e-07,
+        "speed": 5.062658074616648e-07
+      },
+      "trajectory_metrics": {
+        "holding_max_position_error_m": 0.005406667403151212,
+        "holding_max_speed_m_s": 0.019153983298427046,
+        "terminal_position_error_m": 0.005406667403151212
+      },
+      "objective_components": {
+        "effort": 0.2521211650754836,
+        "selected_search_objective": 0.00025322497750041267,
+        "variation_weighted": 9.157236137341281e-05
+      },
+      "process_elapsed_s": 661.4689877000055,
+      "costs_s": {
+        "assembly_and_guess": 46.97747690003598,
+        "mechanics_construction": 2.3977435000124387,
+        "solve": 572.0618575999979,
+        "solver_construction": 28.516757700010203,
+        "total": 654.1829237000202
+      },
+      "iterations": 34,
+      "solver_entered": true,
+      "solver_returned": true,
+      "solver_termination": "Maximum_CpuTime_Exceeded",
+      "checkpoint_reference": {
+        "artifact_id": "c6f9600197bec1766d8dfe395ad85ea525603127256e6c23a5b0ec05c9ee1818",
+        "media_type": "application/json"
+      },
+      "candidate_export_status": "exported"
+    },
+    {
+      "operation": "replay",
+      "reference": {
+        "artifact_id": "c888e7506e010333486abe962252894a4bcd37509b41a41f909e1a74e8276db5",
+        "media_type": "application/json"
+      },
+      "candidate": null,
+      "imported": false,
+      "source": null,
+      "status": "completed",
+      "termination_reason": "scipy BDF, exact direct-graph state Jacobian, switch-by-switch continuous state",
+      "replay": {
+        "atol_q": 1e-09,
+        "atol_v": 1e-07,
+        "costs_s": {
+          "jacobian_construction": 18.400656000012532,
+          "total": 196.95494840003084
+        },
+        "dense_max_speed_disagreement_m_s": 0.0464294465105341,
+        "dense_max_tip_disagreement_m": 0.0024634343034733914,
+        "dense_period_s": 0.0005,
+        "gates_passed": false,
+        "holding_max_position_error_m": 0.005434129588593931,
+        "holding_max_speed_m_s": 0.04218081986542973,
+        "input_bounds_compliant": true,
+        "integration_failure": null,
+        "method": "scipy BDF, exact direct-graph state Jacobian, switch-by-switch continuous state",
+        "node_max_speed_disagreement_m_s": 0.030600269603455424,
+        "node_max_tip_disagreement_m": 0.00245284221295794,
+        "rtol": 1e-08,
+        "status": "completed",
+        "terminal_position_error_m": 0.005434129588593931
+      },
+      "physical_eligible": false,
+      "process_elapsed_s": 200.71295150002697,
+      "costs_s": {
+        "mechanics_construction": 1.4344481999869458,
+        "total": 198.39017590001458
+      }
+    },
+    {
+      "operation": "original_node_comparison",
+      "reference": {
+        "artifact_id": "8e2f43d106c3e4e995c6652606c04dd900ea5d890c6f988e4e97b64b65c1f8ff",
+        "media_type": "application/json"
+      },
+      "candidate": null,
+      "imported": false,
+      "source": null,
+      "status": "completed",
+      "termination_reason": "Evaluate saved prediction/replay outputs at original 36 control-boundary nodes; no NLP, root solve or BDF invocation",
+      "comparisons": {
+        "initial": {
+          "complete_horizon": true,
+          "max_speed_m_s": 0.030463448878279405,
+          "max_tip_m": 0.00244758388203783
+        },
+        "revision": {
+          "complete_horizon": true,
+          "max_speed_m_s": 0.03037313202281851,
+          "max_tip_m": 0.002451771129619565
+        }
+      }
+    },
+    {
+      "operation": "engineering_correction",
+      "reference": {
+        "artifact_id": "7de39d3a3ba08faf7cfe65b89d1560623629d68682d76d118d687abc605019fe",
+        "media_type": "application/json"
+      },
+      "candidate": null,
+      "imported": false,
+      "source": null,
+      "status": "Codex engineering closeout correction; original scientific choices preserved",
+      "termination_reason": "Both requested new solves and both independent BDF replays settled. The second solve stopped at Maximum_CpuTime_Exceeded (34 solver iterations, 572.0618576 seconds of solve time); its exported schedule is the retained selected candidate at iteration 3, not the raw final iterate. Its original-node NLP holding speed is 0.0191539833 m/s; its dense BDF holding speed is 0.0421808199 m/s and dense disagreement is 0.0024634343 m / 0.0464294465 m/s, so the task speed and both disagreement criteria fail. The solver-return checkpoint and exact selected export are verified. The native feedback-retrieval tool succeeded on request 6 even though the old wrapper labeled its accounting receipt failed; original successful tool feedback and the old receipt are preserved, counts are unchanged, and future native-context receipts now match the actual outcome. The repair was migrated locally after compatibility cancelled continuation before a provider send; the task, grant, original execution identities, clock and all cumulative costs were preserved. No model decision has been fabricated. Numerical output evaluation at the original 36 nodes is supplied separately from all 71 refined-node and dense metrics."
+    },
+    {
+      "operation": "post_stop_correction",
+      "reference": {
+        "artifact_id": "87850bd1813d76ec6f3a4ad5fd69207fe5821c6d5db21eddbe0cc8c6f0a9e578",
+        "media_type": "application/json"
+      },
+      "candidate": null,
+      "imported": false,
+      "source": null,
+      "status": "Post-STOP Codex correction; not supplied to the model; original accepted STOP preserved",
+      "termination_reason": "The accepted STOP is supported as a bounded decision after two failed independent acceptance checks. It does not validate every scientific claim in its prose. Two different schedules and a changed search formulation cannot establish a controlled refinement gain or slow convergence relative to history. An iteration-3 retained candidate from a CPU-limited revision cannot refute an entire regularization mechanism, exclude warm-start artifacts, prove an intrinsic speed boundary, establish a dominant error cause, or exclude weight/design choices generally. Zero gap at one iterate does not show that changed weights cannot alter a search path or feasible basin. Both new candidates exist; the optional third replay could in principle answer a specific new question about one of them without another NLP, but the model chose no such question. Its quoted 1974.3 numerical seconds remaining preceded the final focused checks and saved-output evaluation; exact counters below use the recorded cumulative state. Its statements of under-one-percent speed changes are corrected by the numerical percentages below. Earlier separately labeled corrections were supplied before its final decision; this correction is recorded after acceptance with no further provider request."
+    }
+  ],
+  "historical_closeout": {
+    "status": "sealed STOP; 24 sends exhausted",
+    "actual_refined_solves": 2,
+    "iterations": [
+      18,
+      21
+    ],
+    "ipopt_times_s": [
+      221.178,
+      259.993
+    ],
+    "relaxed_termination": "optimal solution reported",
+    "export_failure": "Duplicate candidate argument; vectors not saved and cannot be recovered",
+    "original_task_and_replay": "unknown for both historical refined solves",
+    "diagnosis_scope": "One fixed schedule shows substantial discretization effects; no unique cause or 0.005 s convergence established",
+    "speed_trial": "Approximately 0.94 percent apparent improvement did not justify adoption; local reverse retained"
+  },
+  "accepted_plans": [
+    {
+      "action": "batch",
+      "batch": "initial",
+      "reference": {
+        "artifact_id": "253fdd1d967215a4412f650d0b80f23feec797465c4262c366065e75e1928cd3",
+        "media_type": "application/json"
+      }
+    },
+    {
+      "action": "batch",
+      "batch": "revision",
+      "reference": {
+        "artifact_id": "1266dc34d95be51f05bd71197a99d13654019f2bed07a5d364998f18312b8720",
+        "media_type": "application/json"
+      }
+    },
+    {
+      "action": "stop",
+      "batch": "revision",
+      "reference": {
+        "artifact_id": "fe431e088567b295535f8c2a8ec41500527f5288d3e6d722e02a0f149992da1f",
+        "media_type": "application/json"
+      }
+    }
+  ],
+  "research_status": "stopped",
+  "remaining_budget": {
+    "numerical_s": 1961.3005146000435,
+    "initial_investigation_s": 0.0,
+    "nlp_solves": 0,
+    "initial_solves": 0,
+    "revision_solves": 0,
+    "independent_replays": 1,
+    "provider_requests": 3,
+    "protected_provider_sends": 4,
+    "public_tool_calls": 34,
+    "backend_launches": 0,
+    "activity_s": 11392.564095497131,
+    "scientific_window_s": 9592.564095497131
+  },
+  "capabilities": {
+    "research_plan": "Typed batch of exactly one supported NLP choice; execute sequentially then independent BDF replay each usable schedule; subsequent revision, one diagnostic replay, or STOP",
+    "evidence_read": "Exact immutable reference and JSON pointer; basic facts already supplied",
+    "physical": "Zero physical launches authorized."
+  }
+}

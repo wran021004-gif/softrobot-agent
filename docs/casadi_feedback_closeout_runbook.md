@@ -51,6 +51,13 @@ each actual provider send, including auxiliary requests. Cancellation exits
 to engineering handling. Provider configuration, endpoint and authentication
 remain the established DeepSeek client; credentials are never evidence.
 
+In protected closeout, the actual native `research_plan` schema permits only
+STOP. Immutable reads exclude imported historical results. The existing SDK
+`retrieve_context` tool may retrieve only references to native feedback from
+new executions; its direct schema is normalized using Strands before adding
+the reference restriction. Auxiliary summarization cannot use those last four
+sends. Accepted STOP rejects every further actual send.
+
 `stop` seals either an accepted native model STOP or an explicitly incomplete
 engineering closeout. It does not invent a model decision. `export` writes
 non-secret plans, results, recoverable checkpoints, candidate schedules, wire
