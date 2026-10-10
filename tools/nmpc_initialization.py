@@ -58,15 +58,50 @@ class ArchiveReader(ControlEvidence):
 
 
 def prepare_evidence(h):
-    if h.store.session(h.run_id)['state'].get('initialization_diagnosis'):return
+    if h.store.session(h.run_id)['state'].get('initialization_diagnosis'):
+        return prepare_projection_packet(h)
     start=time.perf_counter()
-    try:return _prepare_evidence(h)
+    try:
+        _prepare_evidence(h)
+        return prepare_projection_packet(h,charge=False)
     finally:
         with h.store.transaction() as db:
             state=h.store.session(h.run_id,db)['state'];elapsed=time.perf_counter()-start
             state['numerical_s']+=elapsed
             state.setdefault('evidence_preparation_costs_s',[]).append(elapsed)
             h.store.update_state(db,h.run_id,state)
+
+
+def prepare_projection_packet(h,charge=True):
+    """One factual projection comparison before model-selected local experiments."""
+    state=h.store.session(h.run_id)['state']
+    if state.get('preliminary_projection_complete'):return
+    if state['paired_comparisons'] or state['pilot']['live_model_requests']:
+        raise ValueError('PRELIMINARY_PROJECTION_REQUIRES_PRE_EXPERIMENT_ACTIVITY')
+    index=20  # First recorded horizon in which the holding cost is visible.
+    if len(set(state['selected_states'])|{index})>2:raise ValueError('TWO_REPRESENTATIVE_STATE_CEILING')
+    start=time.perf_counter()
+    try:
+        comparison=projection_check(h,index)
+        comparison['selection_basis']='First holding-cost visibility in the recorded prediction horizon; factual inspection, no optimizer hypothesis.'
+        with h.store.transaction() as db:
+            state=h.store.session(h.run_id,db)['state'];ref=plain(h.store.put(db,comparison))
+            state.setdefault('projection_checks',{})[str(index)]=ref
+            if index not in state['selected_states']:state['selected_states'].append(index)
+            facts=h.store.artifact(state['factual_packet_reference'])
+            facts['projection_checks']=[dict(reference=ref,**comparison)]
+            state['factual_packet_reference']=plain(h.store.put(db,facts))
+            state['results'].append(dict(operation='projection_check',reference=ref))
+            state['preliminary_projection_complete']=True
+            h.store.update_state(db,h.run_id,state)
+        atomic_json(ROOT/'evidence/nmpc_initialization_20261010/saved_timeline.json',facts)
+        atomic_json(ROOT/'evidence/nmpc_initialization_20261010/preliminary_projection.json',comparison)
+    finally:
+        if charge:
+            with h.store.transaction() as db:
+                state=h.store.session(h.run_id,db)['state'];cost=time.perf_counter()-start
+                state['numerical_s']+=cost;state.setdefault('preliminary_projection_costs_s',[]).append(cost)
+                h.store.update_state(db,h.run_id,state)
 
 
 def _prepare_evidence(h):

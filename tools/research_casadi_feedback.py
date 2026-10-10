@@ -116,6 +116,10 @@ def compact_result(value):
         'sampling','unknowns','failure_categories','partial_feedback','execution_references','actual_duration_s','completed_control_updates',
         'nmpc_internal_solves','offline_nlp_slots_charged','initialization_comparison')
     result={k:value[k] for k in keys if k in value}
+    if 'same_time_tip_difference_m' in value:
+        result.update({k:value[k] for k in ('update_id','time_s','full_simulator','reduced_position_m',
+            'reduced_velocity_m_s','same_time_tip_difference_m','same_time_velocity_difference_m_s',
+            'source_state','scope')})
     if 'changed_factor' in value:
         from tools.nmpc_initialization import compact_pair
         result.update(compact_pair(value))
