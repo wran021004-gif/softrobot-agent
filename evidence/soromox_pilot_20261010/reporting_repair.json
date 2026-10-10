@@ -1,0 +1,1485 @@
+{
+  "commit": "1811aa6c18deeef892db3053a737b00816d12a7b",
+  "changes": {
+    "math.soromox_describe@1.0.0": {
+      "before": {
+        "conservative_reason": null,
+        "contracts": {},
+        "declaration": {
+          "binding": "tools.soromox_service:describe",
+          "cache": false,
+          "capabilities": {
+            "category": "mathematical_admission",
+            "preflight": "tools.soromox_service:preflight"
+          },
+          "contract_dependencies": [],
+          "extension_dependencies": [],
+          "kind": "tool",
+          "resources": [],
+          "side_effects": "immutable evidence and cumulative accounting"
+        },
+        "input_schema": {
+          "additionalProperties": false,
+          "properties": {
+            "case": {
+              "default": "A",
+              "enum": [
+                "A",
+                "B"
+              ],
+              "title": "Case",
+              "type": "string"
+            }
+          },
+          "title": "Operation",
+          "type": "object"
+        },
+        "output_schema": {
+          "$defs": {
+            "EvidenceRef": {
+              "additionalProperties": false,
+              "properties": {
+                "artifact_id": {
+                  "pattern": "^[a-f0-9]{64}$",
+                  "title": "Artifact Id",
+                  "type": "string"
+                },
+                "media_type": {
+                  "default": "application/json",
+                  "title": "Media Type",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "artifact_id"
+              ],
+              "title": "EvidenceRef",
+              "type": "object"
+            }
+          },
+          "additionalProperties": false,
+          "properties": {
+            "active_bounds": {
+              "items": {
+                "type": "string"
+              },
+              "title": "Active Bounds",
+              "type": "array"
+            },
+            "candidate_identity": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Candidate Identity"
+            },
+            "case": {
+              "enum": [
+                "A",
+                "B"
+              ],
+              "title": "Case",
+              "type": "string"
+            },
+            "consumption": {
+              "additionalProperties": true,
+              "title": "Consumption",
+              "type": "object"
+            },
+            "derivative_check": {
+              "additionalProperties": true,
+              "title": "Derivative Check",
+              "type": "object"
+            },
+            "design_values": {
+              "additionalProperties": true,
+              "title": "Design Values",
+              "type": "object"
+            },
+            "evidence_identity": {
+              "title": "Evidence Identity",
+              "type": "string"
+            },
+            "full_artifacts": {
+              "items": {
+                "$ref": "#/$defs/EvidenceRef"
+              },
+              "title": "Full Artifacts",
+              "type": "array"
+            },
+            "implementation_identity": {
+              "title": "Implementation Identity",
+              "type": "string"
+            },
+            "iterations": {
+              "default": 0,
+              "title": "Iterations",
+              "type": "integer"
+            },
+            "largest_residuals": {
+              "items": {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              "title": "Largest Residuals",
+              "type": "array"
+            },
+            "model_feasibility": {
+              "const": "not_established",
+              "default": "not_established",
+              "title": "Model Feasibility",
+              "type": "string"
+            },
+            "model_identity": {
+              "title": "Model Identity",
+              "type": "string"
+            },
+            "normalized_constraint_violations": {
+              "additionalProperties": true,
+              "title": "Normalized Constraint Violations",
+              "type": "object"
+            },
+            "objective_components": {
+              "additionalProperties": true,
+              "title": "Objective Components",
+              "type": "object"
+            },
+            "operation": {
+              "enum": [
+                "describe",
+                "solve",
+                "replay"
+              ],
+              "title": "Operation",
+              "type": "string"
+            },
+            "physical_validation": {
+              "const": "not_run",
+              "default": "not_run",
+              "title": "Physical Validation",
+              "type": "string"
+            },
+            "problem_identity": {
+              "title": "Problem Identity",
+              "type": "string"
+            },
+            "remaining_budget": {
+              "additionalProperties": true,
+              "title": "Remaining Budget",
+              "type": "object"
+            },
+            "replay": {
+              "additionalProperties": true,
+              "title": "Replay",
+              "type": "object"
+            },
+            "status": {
+              "enum": [
+                "model_incompatible",
+                "check_failed",
+                "entry_gate_rejected",
+                "candidate_rejected"
+              ],
+              "title": "Status",
+              "type": "string"
+            },
+            "termination_reason": {
+              "title": "Termination Reason",
+              "type": "string"
+            }
+          },
+          "required": [
+            "problem_identity",
+            "model_identity",
+            "implementation_identity",
+            "evidence_identity",
+            "operation",
+            "case",
+            "status",
+            "termination_reason",
+            "design_values",
+            "derivative_check",
+            "replay",
+            "consumption",
+            "remaining_budget",
+            "full_artifacts"
+          ],
+          "title": "Feedback",
+          "type": "object"
+        },
+        "packages": {
+          "pydantic": "2.14.0"
+        },
+        "python": "3.11.16 | packaged by Anaconda, Inc. | (main, Aug 27 2026, 14:36:16) [MSC v.1942 64 bit (AMD64)]",
+        "sources": {
+          "examples/soromox/case_A.json": "d84a7819d9a8f8a8ce150365c8b706ab9aa44aa6f7c034cee0ac75afa6436dc0",
+          "examples/soromox/case_B.json": "3968eda3e0d6b5acde7057eedaa80c366e23c918ecebf2c9562004ba8a94f497",
+          "extensions/tendon_family/soromox_mapping.py": "3e3a56c1da3d0abc7653e602576b6560c1d22608f488e890146f7eb9a6de5aa4",
+          "schemas/common.py": "dda50cda1458b487a99d485cf98c66e3e4f1cdce9f152844e223d02bd3639f5b",
+          "schemas/platform.py": "b23565d4959cb68c8fe97c98447594b6360b6203128578d3b42ecf248e1ec3da",
+          "schemas/platform_math.py": "d2ce6467dd038703c4aef0e0ea99cd49a3697e3b4b897737213dfdcded7edd86",
+          "schemas/soromox_pilot.py": "b2834d2dc487e0b916f4b66fdb99400e81a55a14e7476905198dc6957593c043",
+          "tools/platform_host.py": "054fb5d39b3bb9b438b54cf8b916f5fad3905b9cd56e877a78088c9a25f28742",
+          "tools/platform_registry.py": "b3923657d74b1f9cd526b5e65d3e3d8f08f2e78128479a3b7e677a4425bb9fcc",
+          "tools/platform_store.py": "98dd7aafb4467b3343ee4d301c0d5b3bebcf1cd0c4896053d342b05ddc6ca1e1",
+          "tools/platform_validation.py": "755a5057a9d462241c0b042cb9f91b8241b505de24955b74cea3d6c39b6a66c1",
+          "tools/soromox_service.py": "27fa5f8e464b1216c709736b2d4e6b9c84b443e82231bf9d9483431ef8304ea0",
+          "tools/soromox_worker.py": "8704fca639c10e69606b802415f90e61037beff455b82072b360b7c082d4a7e7"
+        },
+        "version": "1.0.0"
+      },
+      "after": {
+        "sources": {
+          "examples/soromox/case_A.json": "d84a7819d9a8f8a8ce150365c8b706ab9aa44aa6f7c034cee0ac75afa6436dc0",
+          "examples/soromox/case_B.json": "3968eda3e0d6b5acde7057eedaa80c366e23c918ecebf2c9562004ba8a94f497",
+          "extensions/tendon_family/soromox_mapping.py": "3e3a56c1da3d0abc7653e602576b6560c1d22608f488e890146f7eb9a6de5aa4",
+          "schemas/common.py": "dda50cda1458b487a99d485cf98c66e3e4f1cdce9f152844e223d02bd3639f5b",
+          "schemas/platform.py": "b23565d4959cb68c8fe97c98447594b6360b6203128578d3b42ecf248e1ec3da",
+          "schemas/platform_math.py": "d2ce6467dd038703c4aef0e0ea99cd49a3697e3b4b897737213dfdcded7edd86",
+          "schemas/soromox_pilot.py": "b2834d2dc487e0b916f4b66fdb99400e81a55a14e7476905198dc6957593c043",
+          "tools/platform_host.py": "054fb5d39b3bb9b438b54cf8b916f5fad3905b9cd56e877a78088c9a25f28742",
+          "tools/platform_registry.py": "b3923657d74b1f9cd526b5e65d3e3d8f08f2e78128479a3b7e677a4425bb9fcc",
+          "tools/platform_store.py": "98dd7aafb4467b3343ee4d301c0d5b3bebcf1cd0c4896053d342b05ddc6ca1e1",
+          "tools/platform_validation.py": "755a5057a9d462241c0b042cb9f91b8241b505de24955b74cea3d6c39b6a66c1",
+          "tools/soromox_service.py": "81d35360eb962916106203d89266d8b5b1cfc607743113c282206947bc4a60ed",
+          "tools/soromox_worker.py": "69062d71b4ebf3c18cdcbc12ab16533ffaed83c44d5087a743254f7c3e8cb751"
+        },
+        "python": "3.11.16 | packaged by Anaconda, Inc. | (main, Aug 27 2026, 14:36:16) [MSC v.1942 64 bit (AMD64)]",
+        "packages": {
+          "pydantic": "2.14.0"
+        },
+        "version": "1.0.0",
+        "input_schema": {
+          "additionalProperties": false,
+          "properties": {
+            "case": {
+              "default": "A",
+              "enum": [
+                "A",
+                "B"
+              ],
+              "title": "Case",
+              "type": "string"
+            }
+          },
+          "title": "Operation",
+          "type": "object"
+        },
+        "output_schema": {
+          "$defs": {
+            "EvidenceRef": {
+              "additionalProperties": false,
+              "properties": {
+                "artifact_id": {
+                  "pattern": "^[a-f0-9]{64}$",
+                  "title": "Artifact Id",
+                  "type": "string"
+                },
+                "media_type": {
+                  "default": "application/json",
+                  "title": "Media Type",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "artifact_id"
+              ],
+              "title": "EvidenceRef",
+              "type": "object"
+            }
+          },
+          "additionalProperties": false,
+          "properties": {
+            "problem_identity": {
+              "title": "Problem Identity",
+              "type": "string"
+            },
+            "model_identity": {
+              "title": "Model Identity",
+              "type": "string"
+            },
+            "implementation_identity": {
+              "title": "Implementation Identity",
+              "type": "string"
+            },
+            "candidate_identity": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Candidate Identity"
+            },
+            "evidence_identity": {
+              "title": "Evidence Identity",
+              "type": "string"
+            },
+            "operation": {
+              "enum": [
+                "describe",
+                "solve",
+                "replay"
+              ],
+              "title": "Operation",
+              "type": "string"
+            },
+            "case": {
+              "enum": [
+                "A",
+                "B"
+              ],
+              "title": "Case",
+              "type": "string"
+            },
+            "status": {
+              "enum": [
+                "model_incompatible",
+                "check_failed",
+                "entry_gate_rejected",
+                "candidate_rejected"
+              ],
+              "title": "Status",
+              "type": "string"
+            },
+            "termination_reason": {
+              "title": "Termination Reason",
+              "type": "string"
+            },
+            "iterations": {
+              "default": 0,
+              "title": "Iterations",
+              "type": "integer"
+            },
+            "objective_components": {
+              "additionalProperties": true,
+              "title": "Objective Components",
+              "type": "object"
+            },
+            "normalized_constraint_violations": {
+              "additionalProperties": true,
+              "title": "Normalized Constraint Violations",
+              "type": "object"
+            },
+            "largest_residuals": {
+              "items": {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              "title": "Largest Residuals",
+              "type": "array"
+            },
+            "design_values": {
+              "additionalProperties": true,
+              "title": "Design Values",
+              "type": "object"
+            },
+            "active_bounds": {
+              "items": {
+                "type": "string"
+              },
+              "title": "Active Bounds",
+              "type": "array"
+            },
+            "derivative_check": {
+              "additionalProperties": true,
+              "title": "Derivative Check",
+              "type": "object"
+            },
+            "replay": {
+              "additionalProperties": true,
+              "title": "Replay",
+              "type": "object"
+            },
+            "model_feasibility": {
+              "const": "not_established",
+              "default": "not_established",
+              "title": "Model Feasibility",
+              "type": "string"
+            },
+            "physical_validation": {
+              "const": "not_run",
+              "default": "not_run",
+              "title": "Physical Validation",
+              "type": "string"
+            },
+            "consumption": {
+              "additionalProperties": true,
+              "title": "Consumption",
+              "type": "object"
+            },
+            "remaining_budget": {
+              "additionalProperties": true,
+              "title": "Remaining Budget",
+              "type": "object"
+            },
+            "full_artifacts": {
+              "items": {
+                "$ref": "#/$defs/EvidenceRef"
+              },
+              "title": "Full Artifacts",
+              "type": "array"
+            }
+          },
+          "required": [
+            "problem_identity",
+            "model_identity",
+            "implementation_identity",
+            "evidence_identity",
+            "operation",
+            "case",
+            "status",
+            "termination_reason",
+            "design_values",
+            "derivative_check",
+            "replay",
+            "consumption",
+            "remaining_budget",
+            "full_artifacts"
+          ],
+          "title": "Feedback",
+          "type": "object"
+        },
+        "declaration": {
+          "kind": "tool",
+          "binding": "tools.soromox_service:describe",
+          "capabilities": {
+            "category": "mathematical_admission",
+            "preflight": "tools.soromox_service:preflight"
+          },
+          "resources": [],
+          "cache": false,
+          "side_effects": "immutable evidence and cumulative accounting",
+          "extension_dependencies": [],
+          "contract_dependencies": []
+        },
+        "conservative_reason": null,
+        "contracts": {}
+      }
+    },
+    "math.soromox_replay@1.0.0": {
+      "before": {
+        "conservative_reason": null,
+        "contracts": {},
+        "declaration": {
+          "binding": "tools.soromox_service:replay",
+          "cache": false,
+          "capabilities": {
+            "category": "mathematical_admission",
+            "preflight": "tools.soromox_service:preflight"
+          },
+          "contract_dependencies": [],
+          "extension_dependencies": [],
+          "kind": "tool",
+          "resources": [],
+          "side_effects": "immutable evidence and cumulative accounting"
+        },
+        "input_schema": {
+          "$defs": {
+            "EvidenceRef": {
+              "additionalProperties": false,
+              "properties": {
+                "artifact_id": {
+                  "pattern": "^[a-f0-9]{64}$",
+                  "title": "Artifact Id",
+                  "type": "string"
+                },
+                "media_type": {
+                  "default": "application/json",
+                  "title": "Media Type",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "artifact_id"
+              ],
+              "title": "EvidenceRef",
+              "type": "object"
+            }
+          },
+          "additionalProperties": false,
+          "properties": {
+            "candidate": {
+              "$ref": "#/$defs/EvidenceRef"
+            },
+            "case": {
+              "default": "A",
+              "enum": [
+                "A",
+                "B"
+              ],
+              "title": "Case",
+              "type": "string"
+            }
+          },
+          "required": [
+            "candidate"
+          ],
+          "title": "Replay",
+          "type": "object"
+        },
+        "output_schema": {
+          "$defs": {
+            "EvidenceRef": {
+              "additionalProperties": false,
+              "properties": {
+                "artifact_id": {
+                  "pattern": "^[a-f0-9]{64}$",
+                  "title": "Artifact Id",
+                  "type": "string"
+                },
+                "media_type": {
+                  "default": "application/json",
+                  "title": "Media Type",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "artifact_id"
+              ],
+              "title": "EvidenceRef",
+              "type": "object"
+            }
+          },
+          "additionalProperties": false,
+          "properties": {
+            "active_bounds": {
+              "items": {
+                "type": "string"
+              },
+              "title": "Active Bounds",
+              "type": "array"
+            },
+            "candidate_identity": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Candidate Identity"
+            },
+            "case": {
+              "enum": [
+                "A",
+                "B"
+              ],
+              "title": "Case",
+              "type": "string"
+            },
+            "consumption": {
+              "additionalProperties": true,
+              "title": "Consumption",
+              "type": "object"
+            },
+            "derivative_check": {
+              "additionalProperties": true,
+              "title": "Derivative Check",
+              "type": "object"
+            },
+            "design_values": {
+              "additionalProperties": true,
+              "title": "Design Values",
+              "type": "object"
+            },
+            "evidence_identity": {
+              "title": "Evidence Identity",
+              "type": "string"
+            },
+            "full_artifacts": {
+              "items": {
+                "$ref": "#/$defs/EvidenceRef"
+              },
+              "title": "Full Artifacts",
+              "type": "array"
+            },
+            "implementation_identity": {
+              "title": "Implementation Identity",
+              "type": "string"
+            },
+            "iterations": {
+              "default": 0,
+              "title": "Iterations",
+              "type": "integer"
+            },
+            "largest_residuals": {
+              "items": {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              "title": "Largest Residuals",
+              "type": "array"
+            },
+            "model_feasibility": {
+              "const": "not_established",
+              "default": "not_established",
+              "title": "Model Feasibility",
+              "type": "string"
+            },
+            "model_identity": {
+              "title": "Model Identity",
+              "type": "string"
+            },
+            "normalized_constraint_violations": {
+              "additionalProperties": true,
+              "title": "Normalized Constraint Violations",
+              "type": "object"
+            },
+            "objective_components": {
+              "additionalProperties": true,
+              "title": "Objective Components",
+              "type": "object"
+            },
+            "operation": {
+              "enum": [
+                "describe",
+                "solve",
+                "replay"
+              ],
+              "title": "Operation",
+              "type": "string"
+            },
+            "physical_validation": {
+              "const": "not_run",
+              "default": "not_run",
+              "title": "Physical Validation",
+              "type": "string"
+            },
+            "problem_identity": {
+              "title": "Problem Identity",
+              "type": "string"
+            },
+            "remaining_budget": {
+              "additionalProperties": true,
+              "title": "Remaining Budget",
+              "type": "object"
+            },
+            "replay": {
+              "additionalProperties": true,
+              "title": "Replay",
+              "type": "object"
+            },
+            "status": {
+              "enum": [
+                "model_incompatible",
+                "check_failed",
+                "entry_gate_rejected",
+                "candidate_rejected"
+              ],
+              "title": "Status",
+              "type": "string"
+            },
+            "termination_reason": {
+              "title": "Termination Reason",
+              "type": "string"
+            }
+          },
+          "required": [
+            "problem_identity",
+            "model_identity",
+            "implementation_identity",
+            "evidence_identity",
+            "operation",
+            "case",
+            "status",
+            "termination_reason",
+            "design_values",
+            "derivative_check",
+            "replay",
+            "consumption",
+            "remaining_budget",
+            "full_artifacts"
+          ],
+          "title": "Feedback",
+          "type": "object"
+        },
+        "packages": {
+          "pydantic": "2.14.0"
+        },
+        "python": "3.11.16 | packaged by Anaconda, Inc. | (main, Aug 27 2026, 14:36:16) [MSC v.1942 64 bit (AMD64)]",
+        "sources": {
+          "examples/soromox/case_A.json": "d84a7819d9a8f8a8ce150365c8b706ab9aa44aa6f7c034cee0ac75afa6436dc0",
+          "examples/soromox/case_B.json": "3968eda3e0d6b5acde7057eedaa80c366e23c918ecebf2c9562004ba8a94f497",
+          "extensions/tendon_family/soromox_mapping.py": "3e3a56c1da3d0abc7653e602576b6560c1d22608f488e890146f7eb9a6de5aa4",
+          "schemas/common.py": "dda50cda1458b487a99d485cf98c66e3e4f1cdce9f152844e223d02bd3639f5b",
+          "schemas/platform.py": "b23565d4959cb68c8fe97c98447594b6360b6203128578d3b42ecf248e1ec3da",
+          "schemas/platform_math.py": "d2ce6467dd038703c4aef0e0ea99cd49a3697e3b4b897737213dfdcded7edd86",
+          "schemas/soromox_pilot.py": "b2834d2dc487e0b916f4b66fdb99400e81a55a14e7476905198dc6957593c043",
+          "tools/platform_host.py": "054fb5d39b3bb9b438b54cf8b916f5fad3905b9cd56e877a78088c9a25f28742",
+          "tools/platform_registry.py": "b3923657d74b1f9cd526b5e65d3e3d8f08f2e78128479a3b7e677a4425bb9fcc",
+          "tools/platform_store.py": "98dd7aafb4467b3343ee4d301c0d5b3bebcf1cd0c4896053d342b05ddc6ca1e1",
+          "tools/platform_validation.py": "755a5057a9d462241c0b042cb9f91b8241b505de24955b74cea3d6c39b6a66c1",
+          "tools/soromox_service.py": "27fa5f8e464b1216c709736b2d4e6b9c84b443e82231bf9d9483431ef8304ea0",
+          "tools/soromox_worker.py": "8704fca639c10e69606b802415f90e61037beff455b82072b360b7c082d4a7e7"
+        },
+        "version": "1.0.0"
+      },
+      "after": {
+        "sources": {
+          "examples/soromox/case_A.json": "d84a7819d9a8f8a8ce150365c8b706ab9aa44aa6f7c034cee0ac75afa6436dc0",
+          "examples/soromox/case_B.json": "3968eda3e0d6b5acde7057eedaa80c366e23c918ecebf2c9562004ba8a94f497",
+          "extensions/tendon_family/soromox_mapping.py": "3e3a56c1da3d0abc7653e602576b6560c1d22608f488e890146f7eb9a6de5aa4",
+          "schemas/common.py": "dda50cda1458b487a99d485cf98c66e3e4f1cdce9f152844e223d02bd3639f5b",
+          "schemas/platform.py": "b23565d4959cb68c8fe97c98447594b6360b6203128578d3b42ecf248e1ec3da",
+          "schemas/platform_math.py": "d2ce6467dd038703c4aef0e0ea99cd49a3697e3b4b897737213dfdcded7edd86",
+          "schemas/soromox_pilot.py": "b2834d2dc487e0b916f4b66fdb99400e81a55a14e7476905198dc6957593c043",
+          "tools/platform_host.py": "054fb5d39b3bb9b438b54cf8b916f5fad3905b9cd56e877a78088c9a25f28742",
+          "tools/platform_registry.py": "b3923657d74b1f9cd526b5e65d3e3d8f08f2e78128479a3b7e677a4425bb9fcc",
+          "tools/platform_store.py": "98dd7aafb4467b3343ee4d301c0d5b3bebcf1cd0c4896053d342b05ddc6ca1e1",
+          "tools/platform_validation.py": "755a5057a9d462241c0b042cb9f91b8241b505de24955b74cea3d6c39b6a66c1",
+          "tools/soromox_service.py": "81d35360eb962916106203d89266d8b5b1cfc607743113c282206947bc4a60ed",
+          "tools/soromox_worker.py": "69062d71b4ebf3c18cdcbc12ab16533ffaed83c44d5087a743254f7c3e8cb751"
+        },
+        "python": "3.11.16 | packaged by Anaconda, Inc. | (main, Aug 27 2026, 14:36:16) [MSC v.1942 64 bit (AMD64)]",
+        "packages": {
+          "pydantic": "2.14.0"
+        },
+        "version": "1.0.0",
+        "input_schema": {
+          "$defs": {
+            "EvidenceRef": {
+              "additionalProperties": false,
+              "properties": {
+                "artifact_id": {
+                  "pattern": "^[a-f0-9]{64}$",
+                  "title": "Artifact Id",
+                  "type": "string"
+                },
+                "media_type": {
+                  "default": "application/json",
+                  "title": "Media Type",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "artifact_id"
+              ],
+              "title": "EvidenceRef",
+              "type": "object"
+            }
+          },
+          "additionalProperties": false,
+          "properties": {
+            "case": {
+              "default": "A",
+              "enum": [
+                "A",
+                "B"
+              ],
+              "title": "Case",
+              "type": "string"
+            },
+            "candidate": {
+              "$ref": "#/$defs/EvidenceRef"
+            }
+          },
+          "required": [
+            "candidate"
+          ],
+          "title": "Replay",
+          "type": "object"
+        },
+        "output_schema": {
+          "$defs": {
+            "EvidenceRef": {
+              "additionalProperties": false,
+              "properties": {
+                "artifact_id": {
+                  "pattern": "^[a-f0-9]{64}$",
+                  "title": "Artifact Id",
+                  "type": "string"
+                },
+                "media_type": {
+                  "default": "application/json",
+                  "title": "Media Type",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "artifact_id"
+              ],
+              "title": "EvidenceRef",
+              "type": "object"
+            }
+          },
+          "additionalProperties": false,
+          "properties": {
+            "problem_identity": {
+              "title": "Problem Identity",
+              "type": "string"
+            },
+            "model_identity": {
+              "title": "Model Identity",
+              "type": "string"
+            },
+            "implementation_identity": {
+              "title": "Implementation Identity",
+              "type": "string"
+            },
+            "candidate_identity": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Candidate Identity"
+            },
+            "evidence_identity": {
+              "title": "Evidence Identity",
+              "type": "string"
+            },
+            "operation": {
+              "enum": [
+                "describe",
+                "solve",
+                "replay"
+              ],
+              "title": "Operation",
+              "type": "string"
+            },
+            "case": {
+              "enum": [
+                "A",
+                "B"
+              ],
+              "title": "Case",
+              "type": "string"
+            },
+            "status": {
+              "enum": [
+                "model_incompatible",
+                "check_failed",
+                "entry_gate_rejected",
+                "candidate_rejected"
+              ],
+              "title": "Status",
+              "type": "string"
+            },
+            "termination_reason": {
+              "title": "Termination Reason",
+              "type": "string"
+            },
+            "iterations": {
+              "default": 0,
+              "title": "Iterations",
+              "type": "integer"
+            },
+            "objective_components": {
+              "additionalProperties": true,
+              "title": "Objective Components",
+              "type": "object"
+            },
+            "normalized_constraint_violations": {
+              "additionalProperties": true,
+              "title": "Normalized Constraint Violations",
+              "type": "object"
+            },
+            "largest_residuals": {
+              "items": {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              "title": "Largest Residuals",
+              "type": "array"
+            },
+            "design_values": {
+              "additionalProperties": true,
+              "title": "Design Values",
+              "type": "object"
+            },
+            "active_bounds": {
+              "items": {
+                "type": "string"
+              },
+              "title": "Active Bounds",
+              "type": "array"
+            },
+            "derivative_check": {
+              "additionalProperties": true,
+              "title": "Derivative Check",
+              "type": "object"
+            },
+            "replay": {
+              "additionalProperties": true,
+              "title": "Replay",
+              "type": "object"
+            },
+            "model_feasibility": {
+              "const": "not_established",
+              "default": "not_established",
+              "title": "Model Feasibility",
+              "type": "string"
+            },
+            "physical_validation": {
+              "const": "not_run",
+              "default": "not_run",
+              "title": "Physical Validation",
+              "type": "string"
+            },
+            "consumption": {
+              "additionalProperties": true,
+              "title": "Consumption",
+              "type": "object"
+            },
+            "remaining_budget": {
+              "additionalProperties": true,
+              "title": "Remaining Budget",
+              "type": "object"
+            },
+            "full_artifacts": {
+              "items": {
+                "$ref": "#/$defs/EvidenceRef"
+              },
+              "title": "Full Artifacts",
+              "type": "array"
+            }
+          },
+          "required": [
+            "problem_identity",
+            "model_identity",
+            "implementation_identity",
+            "evidence_identity",
+            "operation",
+            "case",
+            "status",
+            "termination_reason",
+            "design_values",
+            "derivative_check",
+            "replay",
+            "consumption",
+            "remaining_budget",
+            "full_artifacts"
+          ],
+          "title": "Feedback",
+          "type": "object"
+        },
+        "declaration": {
+          "kind": "tool",
+          "binding": "tools.soromox_service:replay",
+          "capabilities": {
+            "category": "mathematical_admission",
+            "preflight": "tools.soromox_service:preflight"
+          },
+          "resources": [],
+          "cache": false,
+          "side_effects": "immutable evidence and cumulative accounting",
+          "extension_dependencies": [],
+          "contract_dependencies": []
+        },
+        "conservative_reason": null,
+        "contracts": {}
+      }
+    },
+    "math.soromox_solve@1.0.0": {
+      "before": {
+        "conservative_reason": null,
+        "contracts": {},
+        "declaration": {
+          "binding": "tools.soromox_service:solve",
+          "cache": false,
+          "capabilities": {
+            "category": "mathematical_admission",
+            "preflight": "tools.soromox_service:preflight"
+          },
+          "contract_dependencies": [],
+          "extension_dependencies": [],
+          "kind": "tool",
+          "resources": [],
+          "side_effects": "immutable evidence and cumulative accounting"
+        },
+        "input_schema": {
+          "additionalProperties": false,
+          "properties": {
+            "case": {
+              "default": "A",
+              "enum": [
+                "A",
+                "B"
+              ],
+              "title": "Case",
+              "type": "string"
+            },
+            "initialization": {
+              "default": "pretension_0_2",
+              "enum": [
+                "pretension_0_2",
+                "ramp_0_2_to_0_4"
+              ],
+              "title": "Initialization",
+              "type": "string"
+            }
+          },
+          "title": "Solve",
+          "type": "object"
+        },
+        "output_schema": {
+          "$defs": {
+            "EvidenceRef": {
+              "additionalProperties": false,
+              "properties": {
+                "artifact_id": {
+                  "pattern": "^[a-f0-9]{64}$",
+                  "title": "Artifact Id",
+                  "type": "string"
+                },
+                "media_type": {
+                  "default": "application/json",
+                  "title": "Media Type",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "artifact_id"
+              ],
+              "title": "EvidenceRef",
+              "type": "object"
+            }
+          },
+          "additionalProperties": false,
+          "properties": {
+            "active_bounds": {
+              "items": {
+                "type": "string"
+              },
+              "title": "Active Bounds",
+              "type": "array"
+            },
+            "candidate_identity": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Candidate Identity"
+            },
+            "case": {
+              "enum": [
+                "A",
+                "B"
+              ],
+              "title": "Case",
+              "type": "string"
+            },
+            "consumption": {
+              "additionalProperties": true,
+              "title": "Consumption",
+              "type": "object"
+            },
+            "derivative_check": {
+              "additionalProperties": true,
+              "title": "Derivative Check",
+              "type": "object"
+            },
+            "design_values": {
+              "additionalProperties": true,
+              "title": "Design Values",
+              "type": "object"
+            },
+            "evidence_identity": {
+              "title": "Evidence Identity",
+              "type": "string"
+            },
+            "full_artifacts": {
+              "items": {
+                "$ref": "#/$defs/EvidenceRef"
+              },
+              "title": "Full Artifacts",
+              "type": "array"
+            },
+            "implementation_identity": {
+              "title": "Implementation Identity",
+              "type": "string"
+            },
+            "iterations": {
+              "default": 0,
+              "title": "Iterations",
+              "type": "integer"
+            },
+            "largest_residuals": {
+              "items": {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              "title": "Largest Residuals",
+              "type": "array"
+            },
+            "model_feasibility": {
+              "const": "not_established",
+              "default": "not_established",
+              "title": "Model Feasibility",
+              "type": "string"
+            },
+            "model_identity": {
+              "title": "Model Identity",
+              "type": "string"
+            },
+            "normalized_constraint_violations": {
+              "additionalProperties": true,
+              "title": "Normalized Constraint Violations",
+              "type": "object"
+            },
+            "objective_components": {
+              "additionalProperties": true,
+              "title": "Objective Components",
+              "type": "object"
+            },
+            "operation": {
+              "enum": [
+                "describe",
+                "solve",
+                "replay"
+              ],
+              "title": "Operation",
+              "type": "string"
+            },
+            "physical_validation": {
+              "const": "not_run",
+              "default": "not_run",
+              "title": "Physical Validation",
+              "type": "string"
+            },
+            "problem_identity": {
+              "title": "Problem Identity",
+              "type": "string"
+            },
+            "remaining_budget": {
+              "additionalProperties": true,
+              "title": "Remaining Budget",
+              "type": "object"
+            },
+            "replay": {
+              "additionalProperties": true,
+              "title": "Replay",
+              "type": "object"
+            },
+            "status": {
+              "enum": [
+                "model_incompatible",
+                "check_failed",
+                "entry_gate_rejected",
+                "candidate_rejected"
+              ],
+              "title": "Status",
+              "type": "string"
+            },
+            "termination_reason": {
+              "title": "Termination Reason",
+              "type": "string"
+            }
+          },
+          "required": [
+            "problem_identity",
+            "model_identity",
+            "implementation_identity",
+            "evidence_identity",
+            "operation",
+            "case",
+            "status",
+            "termination_reason",
+            "design_values",
+            "derivative_check",
+            "replay",
+            "consumption",
+            "remaining_budget",
+            "full_artifacts"
+          ],
+          "title": "Feedback",
+          "type": "object"
+        },
+        "packages": {
+          "pydantic": "2.14.0"
+        },
+        "python": "3.11.16 | packaged by Anaconda, Inc. | (main, Aug 27 2026, 14:36:16) [MSC v.1942 64 bit (AMD64)]",
+        "sources": {
+          "examples/soromox/case_A.json": "d84a7819d9a8f8a8ce150365c8b706ab9aa44aa6f7c034cee0ac75afa6436dc0",
+          "examples/soromox/case_B.json": "3968eda3e0d6b5acde7057eedaa80c366e23c918ecebf2c9562004ba8a94f497",
+          "extensions/tendon_family/soromox_mapping.py": "3e3a56c1da3d0abc7653e602576b6560c1d22608f488e890146f7eb9a6de5aa4",
+          "schemas/common.py": "dda50cda1458b487a99d485cf98c66e3e4f1cdce9f152844e223d02bd3639f5b",
+          "schemas/platform.py": "b23565d4959cb68c8fe97c98447594b6360b6203128578d3b42ecf248e1ec3da",
+          "schemas/platform_math.py": "d2ce6467dd038703c4aef0e0ea99cd49a3697e3b4b897737213dfdcded7edd86",
+          "schemas/soromox_pilot.py": "b2834d2dc487e0b916f4b66fdb99400e81a55a14e7476905198dc6957593c043",
+          "tools/platform_host.py": "054fb5d39b3bb9b438b54cf8b916f5fad3905b9cd56e877a78088c9a25f28742",
+          "tools/platform_registry.py": "b3923657d74b1f9cd526b5e65d3e3d8f08f2e78128479a3b7e677a4425bb9fcc",
+          "tools/platform_store.py": "98dd7aafb4467b3343ee4d301c0d5b3bebcf1cd0c4896053d342b05ddc6ca1e1",
+          "tools/platform_validation.py": "755a5057a9d462241c0b042cb9f91b8241b505de24955b74cea3d6c39b6a66c1",
+          "tools/soromox_service.py": "27fa5f8e464b1216c709736b2d4e6b9c84b443e82231bf9d9483431ef8304ea0",
+          "tools/soromox_worker.py": "8704fca639c10e69606b802415f90e61037beff455b82072b360b7c082d4a7e7"
+        },
+        "version": "1.0.0"
+      },
+      "after": {
+        "sources": {
+          "examples/soromox/case_A.json": "d84a7819d9a8f8a8ce150365c8b706ab9aa44aa6f7c034cee0ac75afa6436dc0",
+          "examples/soromox/case_B.json": "3968eda3e0d6b5acde7057eedaa80c366e23c918ecebf2c9562004ba8a94f497",
+          "extensions/tendon_family/soromox_mapping.py": "3e3a56c1da3d0abc7653e602576b6560c1d22608f488e890146f7eb9a6de5aa4",
+          "schemas/common.py": "dda50cda1458b487a99d485cf98c66e3e4f1cdce9f152844e223d02bd3639f5b",
+          "schemas/platform.py": "b23565d4959cb68c8fe97c98447594b6360b6203128578d3b42ecf248e1ec3da",
+          "schemas/platform_math.py": "d2ce6467dd038703c4aef0e0ea99cd49a3697e3b4b897737213dfdcded7edd86",
+          "schemas/soromox_pilot.py": "b2834d2dc487e0b916f4b66fdb99400e81a55a14e7476905198dc6957593c043",
+          "tools/platform_host.py": "054fb5d39b3bb9b438b54cf8b916f5fad3905b9cd56e877a78088c9a25f28742",
+          "tools/platform_registry.py": "b3923657d74b1f9cd526b5e65d3e3d8f08f2e78128479a3b7e677a4425bb9fcc",
+          "tools/platform_store.py": "98dd7aafb4467b3343ee4d301c0d5b3bebcf1cd0c4896053d342b05ddc6ca1e1",
+          "tools/platform_validation.py": "755a5057a9d462241c0b042cb9f91b8241b505de24955b74cea3d6c39b6a66c1",
+          "tools/soromox_service.py": "81d35360eb962916106203d89266d8b5b1cfc607743113c282206947bc4a60ed",
+          "tools/soromox_worker.py": "69062d71b4ebf3c18cdcbc12ab16533ffaed83c44d5087a743254f7c3e8cb751"
+        },
+        "python": "3.11.16 | packaged by Anaconda, Inc. | (main, Aug 27 2026, 14:36:16) [MSC v.1942 64 bit (AMD64)]",
+        "packages": {
+          "pydantic": "2.14.0"
+        },
+        "version": "1.0.0",
+        "input_schema": {
+          "additionalProperties": false,
+          "properties": {
+            "case": {
+              "default": "A",
+              "enum": [
+                "A",
+                "B"
+              ],
+              "title": "Case",
+              "type": "string"
+            },
+            "initialization": {
+              "default": "pretension_0_2",
+              "enum": [
+                "pretension_0_2",
+                "ramp_0_2_to_0_4"
+              ],
+              "title": "Initialization",
+              "type": "string"
+            }
+          },
+          "title": "Solve",
+          "type": "object"
+        },
+        "output_schema": {
+          "$defs": {
+            "EvidenceRef": {
+              "additionalProperties": false,
+              "properties": {
+                "artifact_id": {
+                  "pattern": "^[a-f0-9]{64}$",
+                  "title": "Artifact Id",
+                  "type": "string"
+                },
+                "media_type": {
+                  "default": "application/json",
+                  "title": "Media Type",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "artifact_id"
+              ],
+              "title": "EvidenceRef",
+              "type": "object"
+            }
+          },
+          "additionalProperties": false,
+          "properties": {
+            "problem_identity": {
+              "title": "Problem Identity",
+              "type": "string"
+            },
+            "model_identity": {
+              "title": "Model Identity",
+              "type": "string"
+            },
+            "implementation_identity": {
+              "title": "Implementation Identity",
+              "type": "string"
+            },
+            "candidate_identity": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Candidate Identity"
+            },
+            "evidence_identity": {
+              "title": "Evidence Identity",
+              "type": "string"
+            },
+            "operation": {
+              "enum": [
+                "describe",
+                "solve",
+                "replay"
+              ],
+              "title": "Operation",
+              "type": "string"
+            },
+            "case": {
+              "enum": [
+                "A",
+                "B"
+              ],
+              "title": "Case",
+              "type": "string"
+            },
+            "status": {
+              "enum": [
+                "model_incompatible",
+                "check_failed",
+                "entry_gate_rejected",
+                "candidate_rejected"
+              ],
+              "title": "Status",
+              "type": "string"
+            },
+            "termination_reason": {
+              "title": "Termination Reason",
+              "type": "string"
+            },
+            "iterations": {
+              "default": 0,
+              "title": "Iterations",
+              "type": "integer"
+            },
+            "objective_components": {
+              "additionalProperties": true,
+              "title": "Objective Components",
+              "type": "object"
+            },
+            "normalized_constraint_violations": {
+              "additionalProperties": true,
+              "title": "Normalized Constraint Violations",
+              "type": "object"
+            },
+            "largest_residuals": {
+              "items": {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              "title": "Largest Residuals",
+              "type": "array"
+            },
+            "design_values": {
+              "additionalProperties": true,
+              "title": "Design Values",
+              "type": "object"
+            },
+            "active_bounds": {
+              "items": {
+                "type": "string"
+              },
+              "title": "Active Bounds",
+              "type": "array"
+            },
+            "derivative_check": {
+              "additionalProperties": true,
+              "title": "Derivative Check",
+              "type": "object"
+            },
+            "replay": {
+              "additionalProperties": true,
+              "title": "Replay",
+              "type": "object"
+            },
+            "model_feasibility": {
+              "const": "not_established",
+              "default": "not_established",
+              "title": "Model Feasibility",
+              "type": "string"
+            },
+            "physical_validation": {
+              "const": "not_run",
+              "default": "not_run",
+              "title": "Physical Validation",
+              "type": "string"
+            },
+            "consumption": {
+              "additionalProperties": true,
+              "title": "Consumption",
+              "type": "object"
+            },
+            "remaining_budget": {
+              "additionalProperties": true,
+              "title": "Remaining Budget",
+              "type": "object"
+            },
+            "full_artifacts": {
+              "items": {
+                "$ref": "#/$defs/EvidenceRef"
+              },
+              "title": "Full Artifacts",
+              "type": "array"
+            }
+          },
+          "required": [
+            "problem_identity",
+            "model_identity",
+            "implementation_identity",
+            "evidence_identity",
+            "operation",
+            "case",
+            "status",
+            "termination_reason",
+            "design_values",
+            "derivative_check",
+            "replay",
+            "consumption",
+            "remaining_budget",
+            "full_artifacts"
+          ],
+          "title": "Feedback",
+          "type": "object"
+        },
+        "declaration": {
+          "kind": "tool",
+          "binding": "tools.soromox_service:solve",
+          "capabilities": {
+            "category": "mathematical_admission",
+            "preflight": "tools.soromox_service:preflight"
+          },
+          "resources": [],
+          "cache": false,
+          "side_effects": "immutable evidence and cumulative accounting",
+          "extension_dependencies": [],
+          "contract_dependencies": []
+        },
+        "conservative_reason": null,
+        "contracts": {}
+      }
+    }
+  },
+  "science_changed": false,
+  "original_admission": {
+    "artifact_id": "e688034bc591e73ab55f66fcb44f2e560be94178281a6151a35fbb8b4ccc2c47",
+    "media_type": "application/json"
+  },
+  "corrected_admission": {
+    "artifact_id": "3ae311b70ba6b6290e3f1fe2786c8f6bbedf9fb874e6fa7e557b682e72278cb1",
+    "media_type": "application/json"
+  },
+  "new_numerical_checks": 0,
+  "reasons": [
+    "Separate successful exact-routing checks from the failed native endpoint derivative",
+    "Preserve the empty original log; expose a valid JSON wrapper"
+  ]
+}

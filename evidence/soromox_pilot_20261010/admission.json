@@ -1,0 +1,1344 @@
+{
+  "checks": {
+    "basis_mismatch": {
+      "interpolated_legendre": [
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.37500000000000006,
+          0.75,
+          -0.12499999999999997
+        ],
+        [
+          8.326672684688674e-17,
+          1.0,
+          2.7755575615628914e-17
+        ],
+        [
+          -0.12499999999999992,
+          0.75,
+          0.375
+        ],
+        [
+          5.551115123125783e-17,
+          0.0,
+          1.0
+        ]
+      ],
+      "max_abs_basis_error": 0.25,
+      "normalized_s": [
+        0.0,
+        0.25,
+        0.5,
+        0.75,
+        1.0
+      ],
+      "required_hat": [
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.5,
+          0.5,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.5,
+          0.5
+        ],
+        [
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "time_s": null,
+      "variable": "near.kappa_y_node_1"
+    },
+    "constraint_jacobian": "not_run: no admitted dynamics transcription",
+    "exact_mapping_passed": true,
+    "independent_replay": "not_run: no admitted candidate",
+    "mechanics_design_derivatives": "not_established",
+    "native_factory_rejection": {
+      "message": "'structural_linear'",
+      "type": "KeyError"
+    },
+    "native_probe": {
+      "derivative_passed": false,
+      "fd_abs_error": 0.4999999999990006,
+      "label": "single unrotated link; not candidate mechanics",
+      "partial_length_derivative": [
+        0.0,
+        0.0,
+        1.5000000000000004
+      ],
+      "tip_m": [
+        0.0,
+        0.0,
+        0.16000000000000003
+      ]
+    },
+    "objective_gradient": "not_run: no admitted NLP",
+    "physical_initial_mapping": {
+      "coordinate_order": [
+        "near.kappa_y_node_0",
+        "near.kappa_y_node_1",
+        "near.kappa_y_node_2",
+        "near.kappa_z_node_0",
+        "near.kappa_z_node_1",
+        "near.kappa_z_node_2",
+        "distal1.kappa_y_node_0",
+        "distal1.kappa_y_node_1",
+        "distal1.kappa_y_node_2",
+        "distal1.kappa_z_node_0",
+        "distal1.kappa_z_node_1",
+        "distal1.kappa_z_node_2"
+      ],
+      "force_limits_n": [
+        8.0,
+        8.0,
+        8.0,
+        8.0,
+        8.0,
+        8.0
+      ],
+      "measured_initial_state": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "nominal": {
+        "q0": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "source": "candidate_initial_projection_not_equilibrium",
+        "u0": [
+          0.2,
+          0.2,
+          0.2,
+          0.2,
+          0.2,
+          0.2
+        ]
+      },
+      "provenance": {
+        "actual_initial_state_source": "Candidate Task initializer then measured backend state at every update",
+        "current_scope": {
+          "backend": {
+            "extension_id": "backend.family_mujoco",
+            "parameters": {
+              "contract": "family.mujoco_parameters",
+              "data": {},
+              "version": "1.0.0"
+            },
+            "version": "1.1.0"
+          },
+          "controller": {
+            "extension_id": "controller.gvs_nmpc",
+            "parameters": {
+              "contract": "family.gvs_reach_control",
+              "data": {
+                "numerical_source": "initial_state_pretension",
+                "recipe": {
+                  "basis": {
+                    "strategy": "structural_linear"
+                  },
+                  "constraint_jacobian_mode": "reverse",
+                  "curvature_scale_rad_m": 10.0,
+                  "evaluation_threads": 1,
+                  "feasible_return": {
+                    "budget_s": 15.0,
+                    "minimum_s": 5.0,
+                    "relative_improvement": 0.1
+                  },
+                  "holding_brake_lead_s": 0.0,
+                  "holding_tip_speed_weight": 0.05,
+                  "horizon": 10,
+                  "max_cpu_s": 30.0,
+                  "max_iterations": 120,
+                  "max_unusable_updates": 3,
+                  "position_error_scale_m": null,
+                  "rate_scale_rad_m_s": 1000.0,
+                  "recover_returned_tensions": false,
+                  "regenerate_warm_states": true,
+                  "seed_position_tolerance_fraction": 0.5,
+                  "seed_speed_limit_m_s": 0.02,
+                  "substeps": 1,
+                  "tension_weight": 0.0001,
+                  "terminal_tip_speed_weight": 0.1,
+                  "terminal_velocity_weight": 0.0001,
+                  "terminal_weight": 5.0,
+                  "tip_speed_scale_m_s": 0.02,
+                  "tolerance": 1e-06,
+                  "tracking_weight": 1.0,
+                  "variation_weight": 0.001,
+                  "velocity_weight": 0.0001
+                },
+                "settling": {
+                  "position_limit_m": 0.01,
+                  "speed_limit_m_s": 0.02,
+                  "window_s": 0.05
+                }
+              },
+              "version": "1.0.0"
+            },
+            "version": "11.0.0"
+          },
+          "discretization": {
+            "contract": "family.discretization",
+            "data": {
+              "cells": {
+                "distal1": 12,
+                "near": 12
+              },
+              "coordinates": "two_principal_bending_angles_per_cell",
+              "model": "serial_bending_cells_v1",
+              "version": "serial_bending_discretization_v1"
+            },
+            "version": "1.0.0"
+          },
+          "execution_model": {
+            "extension_id": "model.serial_bending_cells",
+            "parameters": {
+              "contract": "family.dynamics_model",
+              "data": {},
+              "version": "1.0.0"
+            },
+            "version": "1.0.0"
+          },
+          "robot": {
+            "family": "tendon_robot_family",
+            "identity": "0b451044ae9fec9e63965f429e833e1ed29b8b8d7c630c08fae1f38449273afd"
+          },
+          "seed": 17,
+          "task": {
+            "environment": "5cee25b33f4ff19cb0abd93651ce9077a81665990f07d8f5a4967497e8e82a4d",
+            "family": "task.reach",
+            "goal": "7906a8d6f1938670b3b029be161c8f1869097280b1ee24a198da30b2fff4c264",
+            "identity": "2b26edb492214c426263441b6adb52d7aafe41a828436d6b48a1171374a1026c",
+            "initializer": "ba01ba2b4441884d50bf9b7c54c572abd79d5b7bec57aed27708b63a75406930",
+            "timing": {
+              "control_period_s": 0.01,
+              "duration_s": 0.35,
+              "sample_period_s": 0.01,
+              "termination": [
+                "duration",
+                "numerical_failure"
+              ],
+              "timestep_s": 0.0005
+            }
+          }
+        },
+        "historical_states_reused": false,
+        "nominal_is_current_target_solution": false,
+        "physics_identity": "ff8127ff7de43b039544d8c5c2f4534bee17057b3a81fb6efe78eda9f12a19f5",
+        "previous_input_source": "candidate bounded pretension",
+        "resolved_basis_identity": "ca1a49e5a421b0480f5e5e9e235dba07e38a89dbd6f56dd8f42483087ef3238b",
+        "reused": false,
+        "source_kind": "project_initial_state_and_bounded_pretension",
+        "validity": "Tensions are numerical guesses; placeholder states must be regenerated using candidate dynamics before use"
+      },
+      "tendon_order": [
+        "near_t0",
+        "near_t1",
+        "near_t2",
+        "far_t0",
+        "far_t1",
+        "far_t2"
+      ],
+      "units": {
+        "q": "rad/m",
+        "qdot": "rad/(m*s)",
+        "tension": "N"
+      },
+      "warm_guess": {
+        "states": [
+          [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ]
+        ],
+        "tensions": [
+          [
+            0.2,
+            0.2,
+            0.2,
+            0.2,
+            0.2,
+            0.2
+          ],
+          [
+            0.2,
+            0.2,
+            0.2,
+            0.2,
+            0.2,
+            0.2
+          ],
+          [
+            0.2,
+            0.2,
+            0.2,
+            0.2,
+            0.2,
+            0.2
+          ],
+          [
+            0.2,
+            0.2,
+            0.2,
+            0.2,
+            0.2,
+            0.2
+          ],
+          [
+            0.2,
+            0.2,
+            0.2,
+            0.2,
+            0.2,
+            0.2
+          ],
+          [
+            0.2,
+            0.2,
+            0.2,
+            0.2,
+            0.2,
+            0.2
+          ],
+          [
+            0.2,
+            0.2,
+            0.2,
+            0.2,
+            0.2,
+            0.2
+          ],
+          [
+            0.2,
+            0.2,
+            0.2,
+            0.2,
+            0.2,
+            0.2
+          ],
+          [
+            0.2,
+            0.2,
+            0.2,
+            0.2,
+            0.2,
+            0.2
+          ],
+          [
+            0.2,
+            0.2,
+            0.2,
+            0.2,
+            0.2,
+            0.2
+          ]
+        ]
+      }
+    },
+    "representative_states": [
+      {
+        "casadi_evaluation_s": 0.00048099999548867345,
+        "central_difference": [
+          {
+            "max_abs_error": 9.357469714452865e-10,
+            "passed": true,
+            "step_m": 0.0001
+          },
+          {
+            "max_abs_error": 8.326575540174018e-12,
+            "passed": true,
+            "step_m": 1e-05
+          },
+          {
+            "max_abs_error": 1.9428893216488774e-10,
+            "passed": true,
+            "step_m": 1e-06
+          }
+        ],
+        "mapping_abs_error": 5.551115123125783e-17,
+        "partial_length_derivative": [
+          -9.71445146547012e-17,
+          0.0,
+          0.0,
+          0.9999767616569305,
+          0.9999767616569305,
+          0.9999767616569305,
+          0.0015603214691451513,
+          0.0015603214691451513,
+          0.0015603214691451513
+        ],
+        "q_rad_m": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "state_jacobian_abs_error": 6.938893903907228e-18,
+        "tendon_lengths_m": [
+          0.1600037182212963,
+          0.1600037182212963,
+          0.1600037182212963,
+          0.28421513939996745,
+          0.28421513939996745,
+          0.28421513939996745
+        ],
+        "tip_robot_base_m": [
+          0.2979999999999999,
+          0.0,
+          0.0
+        ],
+        "virtual_work_sign_error": 4.948774951028106e-13,
+        "warmed_jax_s": 0.0002302999491803348
+      },
+      {
+        "casadi_evaluation_s": 0.0005509000038728118,
+        "central_difference": [
+          {
+            "max_abs_error": 2.9267323016501923e-08,
+            "passed": true,
+            "step_m": 0.0001
+          },
+          {
+            "max_abs_error": 2.9855119418331633e-10,
+            "passed": true,
+            "step_m": 1e-05
+          },
+          {
+            "max_abs_error": 5.791878088245994e-11,
+            "passed": true,
+            "step_m": 1e-06
+          }
+        ],
+        "mapping_abs_error": 1.6653345369377348e-16,
+        "partial_length_derivative": [
+          -0.02931906059201573,
+          -0.3418041580650415,
+          0.36705717586006414,
+          0.9957443844706171,
+          0.973655433009836,
+          1.0232039058961648,
+          0.005695656089211777,
+          -0.06174575173311256,
+          0.06165541070831398
+        ],
+        "q_rad_m": [
+          -2.0,
+          -1.5454545454545454,
+          -1.0909090909090908,
+          -0.6363636363636365,
+          -0.18181818181818188,
+          0.2727272727272725,
+          0.7272727272727271,
+          1.1818181818181817,
+          1.6363636363636362,
+          2.090909090909091,
+          2.545454545454545,
+          3.0
+        ],
+        "state_jacobian_abs_error": 3.469446951953614e-18,
+        "tendon_lengths_m": [
+          0.1595422620662335,
+          0.156002733846504,
+          0.16394148140542653,
+          0.27867642569261336,
+          0.2869494854888997,
+          0.28673185395688594
+        ],
+        "tip_robot_base_m": [
+          0.2921330758438485,
+          0.010075215199286551,
+          0.04710213015416858
+        ],
+        "virtual_work_sign_error": 8.418889707145468e-12,
+        "warmed_jax_s": 0.00015510001685470343
+      },
+      {
+        "casadi_evaluation_s": 0.0005690999678336084,
+        "central_difference": [
+          {
+            "max_abs_error": 9.481470825481453e-10,
+            "passed": true,
+            "step_m": 0.0001
+          },
+          {
+            "max_abs_error": 1.7740109077915567e-11,
+            "passed": true,
+            "step_m": 1e-05
+          },
+          {
+            "max_abs_error": 8.737465612140838e-11,
+            "passed": true,
+            "step_m": 1e-06
+          }
+        ],
+        "mapping_abs_error": 1.1102230246251565e-16,
+        "partial_length_derivative": [
+          -0.00647389048336066,
+          0.013588111459460352,
+          -0.013588111459460435,
+          0.9836665293130684,
+          1.0235358772167076,
+          0.9870395440634503,
+          -0.0004123607244320367,
+          0.006545932700591262,
+          -0.003571718998632679
+        ],
+        "q_rad_m": [
+          0.0,
+          2.0,
+          0.0,
+          0.0,
+          2.0,
+          0.0,
+          0.0,
+          2.0,
+          0.0,
+          0.0,
+          2.0,
+          0.0
+        ],
+        "state_jacobian_abs_error": 1.0408340855860843e-17,
+        "tendon_lengths_m": [
+          0.1575728062619664,
+          0.16396066298671363,
+          0.15811328619419363,
+          0.2833279341645514,
+          0.2911534079809175,
+          0.278200976525792
+        ],
+        "tip_robot_base_m": [
+          0.28985685561768554,
+          0.041888848624547205,
+          -0.04188884862454719
+        ],
+        "virtual_work_sign_error": 1.270193536939343e-11,
+        "warmed_jax_s": 0.00016080000204965472
+      }
+    ],
+    "resolved_model": {
+      "actuator_command_order": [
+        "near_motor0",
+        "near_motor1",
+        "near_motor2",
+        "far_motor0",
+        "far_motor1",
+        "far_motor2"
+      ],
+      "assumptions": [
+        "bending only",
+        "straight frictionless discrete tendon spans",
+        "no motor dynamics",
+        "no contact"
+      ],
+      "backend_position_order": [
+        "near_cell_0_y",
+        "near_cell_0_z",
+        "near_cell_1_y",
+        "near_cell_1_z",
+        "near_cell_2_y",
+        "near_cell_2_z",
+        "near_cell_3_y",
+        "near_cell_3_z",
+        "near_cell_4_y",
+        "near_cell_4_z",
+        "near_cell_5_y",
+        "near_cell_5_z",
+        "near_cell_6_y",
+        "near_cell_6_z",
+        "near_cell_7_y",
+        "near_cell_7_z",
+        "near_cell_8_y",
+        "near_cell_8_z",
+        "near_cell_9_y",
+        "near_cell_9_z",
+        "near_cell_10_y",
+        "near_cell_10_z",
+        "near_cell_11_y",
+        "near_cell_11_z",
+        "distal1_cell_0_y",
+        "distal1_cell_0_z",
+        "distal1_cell_1_y",
+        "distal1_cell_1_z",
+        "distal1_cell_2_y",
+        "distal1_cell_2_z",
+        "distal1_cell_3_y",
+        "distal1_cell_3_z",
+        "distal1_cell_4_y",
+        "distal1_cell_4_z",
+        "distal1_cell_5_y",
+        "distal1_cell_5_z",
+        "distal1_cell_6_y",
+        "distal1_cell_6_z",
+        "distal1_cell_7_y",
+        "distal1_cell_7_z",
+        "distal1_cell_8_y",
+        "distal1_cell_8_z",
+        "distal1_cell_9_y",
+        "distal1_cell_9_z",
+        "distal1_cell_10_y",
+        "distal1_cell_10_z",
+        "distal1_cell_11_y",
+        "distal1_cell_11_z"
+      ],
+      "basis": {
+        "axes": [
+          "y",
+          "z"
+        ],
+        "coordinate_order": [
+          "near.kappa_y_node_0",
+          "near.kappa_y_node_1",
+          "near.kappa_y_node_2",
+          "near.kappa_z_node_0",
+          "near.kappa_z_node_1",
+          "near.kappa_z_node_2",
+          "distal1.kappa_y_node_0",
+          "distal1.kappa_y_node_1",
+          "distal1.kappa_y_node_2",
+          "distal1.kappa_z_node_0",
+          "distal1.kappa_z_node_1",
+          "distal1.kappa_z_node_2"
+        ],
+        "dimension": 12,
+        "representation_id": "gvs_bending_basis_v1",
+        "segments": [
+          {
+            "knots": [
+              0.0,
+              0.5,
+              1.0
+            ],
+            "length_m": 0.16,
+            "locations": [
+              {
+                "kinds": [
+                  "segment_boundary"
+                ],
+                "s": 0.0
+              },
+              {
+                "kinds": [
+                  "tendon_guide"
+                ],
+                "s": 0.5
+              },
+              {
+                "kinds": [
+                  "component_attachment",
+                  "rigid_attachment",
+                  "segment_boundary",
+                  "tendon_anchor",
+                  "tendon_guide"
+                ],
+                "s": 1.0
+              }
+            ],
+            "segment": "near",
+            "start": 0
+          },
+          {
+            "knots": [
+              0.0,
+              0.5,
+              1.0
+            ],
+            "length_m": 0.11,
+            "locations": [
+              {
+                "kinds": [
+                  "segment_boundary"
+                ],
+                "s": 0.0
+              },
+              {
+                "kinds": [
+                  "tendon_guide"
+                ],
+                "s": 0.5
+              },
+              {
+                "kinds": [
+                  "component_attachment",
+                  "rigid_attachment",
+                  "segment_boundary",
+                  "tendon_anchor"
+                ],
+                "s": 1.0
+              }
+            ],
+            "segment": "distal1",
+            "start": 6
+          }
+        ],
+        "specification": {
+          "strategy": "structural_linear"
+        }
+      },
+      "coordinate_order": [
+        "near.kappa_y_node_0",
+        "near.kappa_y_node_1",
+        "near.kappa_y_node_2",
+        "near.kappa_z_node_0",
+        "near.kappa_z_node_1",
+        "near.kappa_z_node_2",
+        "distal1.kappa_y_node_0",
+        "distal1.kappa_y_node_1",
+        "distal1.kappa_y_node_2",
+        "distal1.kappa_z_node_0",
+        "distal1.kappa_z_node_1",
+        "distal1.kappa_z_node_2"
+      ],
+      "dimensions": {
+        "actuator_command": 6,
+        "backend_position": 48,
+        "backend_velocity": 48,
+        "reduced_coordinate": 12,
+        "reduced_state": 24,
+        "tendon_input": 6
+      },
+      "gravity_m_s2": [
+        0.0,
+        0.0,
+        -9.81
+      ],
+      "input_abstraction": "independent ideal tension 0..8 N",
+      "mount_position_m": [
+        0.0,
+        0.0,
+        0.15
+      ],
+      "physical_initialization": {
+        "qpos_rad": {
+          "distal1_cell_0_y": 0.0,
+          "distal1_cell_0_z": 0.0,
+          "distal1_cell_10_y": 0.0,
+          "distal1_cell_10_z": 0.0,
+          "distal1_cell_11_y": 0.0,
+          "distal1_cell_11_z": 0.0,
+          "distal1_cell_1_y": 0.0,
+          "distal1_cell_1_z": 0.0,
+          "distal1_cell_2_y": 0.0,
+          "distal1_cell_2_z": 0.0,
+          "distal1_cell_3_y": 0.0,
+          "distal1_cell_3_z": 0.0,
+          "distal1_cell_4_y": 0.0,
+          "distal1_cell_4_z": 0.0,
+          "distal1_cell_5_y": 0.0,
+          "distal1_cell_5_z": 0.0,
+          "distal1_cell_6_y": 0.0,
+          "distal1_cell_6_z": 0.0,
+          "distal1_cell_7_y": 0.0,
+          "distal1_cell_7_z": 0.0,
+          "distal1_cell_8_y": 0.0,
+          "distal1_cell_8_z": 0.0,
+          "distal1_cell_9_y": 0.0,
+          "distal1_cell_9_z": 0.0,
+          "near_cell_0_y": 0.0,
+          "near_cell_0_z": 0.0,
+          "near_cell_10_y": 0.0,
+          "near_cell_10_z": 0.0,
+          "near_cell_11_y": 0.0,
+          "near_cell_11_z": 0.0,
+          "near_cell_1_y": 0.0,
+          "near_cell_1_z": 0.0,
+          "near_cell_2_y": 0.0,
+          "near_cell_2_z": 0.0,
+          "near_cell_3_y": 0.0,
+          "near_cell_3_z": 0.0,
+          "near_cell_4_y": 0.0,
+          "near_cell_4_z": 0.0,
+          "near_cell_5_y": 0.0,
+          "near_cell_5_z": 0.0,
+          "near_cell_6_y": 0.0,
+          "near_cell_6_z": 0.0,
+          "near_cell_7_y": 0.0,
+          "near_cell_7_z": 0.0,
+          "near_cell_8_y": 0.0,
+          "near_cell_8_z": 0.0,
+          "near_cell_9_y": 0.0,
+          "near_cell_9_z": 0.0
+        },
+        "qvel_rad_s": {
+          "distal1_cell_0_y": 0.0,
+          "distal1_cell_0_z": 0.0,
+          "distal1_cell_10_y": 0.0,
+          "distal1_cell_10_z": 0.0,
+          "distal1_cell_11_y": 0.0,
+          "distal1_cell_11_z": 0.0,
+          "distal1_cell_1_y": 0.0,
+          "distal1_cell_1_z": 0.0,
+          "distal1_cell_2_y": 0.0,
+          "distal1_cell_2_z": 0.0,
+          "distal1_cell_3_y": 0.0,
+          "distal1_cell_3_z": 0.0,
+          "distal1_cell_4_y": 0.0,
+          "distal1_cell_4_z": 0.0,
+          "distal1_cell_5_y": 0.0,
+          "distal1_cell_5_z": 0.0,
+          "distal1_cell_6_y": 0.0,
+          "distal1_cell_6_z": 0.0,
+          "distal1_cell_7_y": 0.0,
+          "distal1_cell_7_z": 0.0,
+          "distal1_cell_8_y": 0.0,
+          "distal1_cell_8_z": 0.0,
+          "distal1_cell_9_y": 0.0,
+          "distal1_cell_9_z": 0.0,
+          "near_cell_0_y": 0.0,
+          "near_cell_0_z": 0.0,
+          "near_cell_10_y": 0.0,
+          "near_cell_10_z": 0.0,
+          "near_cell_11_y": 0.0,
+          "near_cell_11_z": 0.0,
+          "near_cell_1_y": 0.0,
+          "near_cell_1_z": 0.0,
+          "near_cell_2_y": 0.0,
+          "near_cell_2_z": 0.0,
+          "near_cell_3_y": 0.0,
+          "near_cell_3_z": 0.0,
+          "near_cell_4_y": 0.0,
+          "near_cell_4_z": 0.0,
+          "near_cell_5_y": 0.0,
+          "near_cell_5_z": 0.0,
+          "near_cell_6_y": 0.0,
+          "near_cell_6_z": 0.0,
+          "near_cell_7_y": 0.0,
+          "near_cell_7_z": 0.0,
+          "near_cell_8_y": 0.0,
+          "near_cell_8_z": 0.0,
+          "near_cell_9_y": 0.0,
+          "near_cell_9_z": 0.0
+        },
+        "unspecified": "zero"
+      },
+      "tendon_input_order": [
+        "near_t0",
+        "near_t1",
+        "near_t2",
+        "far_t0",
+        "far_t1",
+        "far_t2"
+      ]
+    },
+    "section_tensors": [
+      {
+        "angle_rad": 0.35,
+        "area_m2": 0.00022682298958918306,
+        "bending_area_m4": [
+          [
+            3.4919477879733004e-09,
+            -5.934435841950655e-10
+          ],
+          [
+            -5.934435841950653e-10,
+            4.9010698843004464e-09
+          ]
+        ],
+        "normalized_s": 0.0,
+        "off_diagonal_m4": -5.934435841950655e-10,
+        "segment": "near"
+      },
+      {
+        "angle_rad": 0.35,
+        "area_m2": 0.00022682298958918306,
+        "bending_area_m4": [
+          [
+            3.4919477879733004e-09,
+            -5.934435841950655e-10
+          ],
+          [
+            -5.934435841950653e-10,
+            4.9010698843004464e-09
+          ]
+        ],
+        "normalized_s": 0.5,
+        "off_diagonal_m4": -5.934435841950655e-10,
+        "segment": "near"
+      },
+      {
+        "angle_rad": 0.35,
+        "area_m2": 0.00022682298958918306,
+        "bending_area_m4": [
+          [
+            3.4919477879733004e-09,
+            -5.934435841950655e-10
+          ],
+          [
+            -5.934435841950653e-10,
+            4.9010698843004464e-09
+          ]
+        ],
+        "normalized_s": 1.0,
+        "off_diagonal_m4": -5.934435841950655e-10,
+        "segment": "near"
+      },
+      {
+        "angle_rad": -0.25,
+        "area_m2": 0.00012634999999999998,
+        "bending_area_m4": [
+          [
+            1.006094761998263e-09,
+            2.186772546575341e-10
+          ],
+          [
+            2.1867725465753413e-10,
+            1.8066668213350693e-09
+          ]
+        ],
+        "normalized_s": 0.0,
+        "off_diagonal_m4": 2.186772546575341e-10,
+        "segment": "distal1"
+      },
+      {
+        "angle_rad": -0.04999999999999999,
+        "area_m2": 0.00011145874999999997,
+        "bending_area_m4": [
+          [
+            7.581810256076204e-10,
+            3.295160962565523e-11
+          ],
+          [
+            3.2951609625655244e-11,
+            1.415014978233525e-09
+          ]
+        ],
+        "normalized_s": 0.5,
+        "off_diagonal_m4": 3.295160962565523e-11,
+        "segment": "distal1"
+      },
+      {
+        "angle_rad": 0.15000000000000002,
+        "area_m2": 9.746999999999999e-05,
+        "bending_area_m4": [
+          [
+            6.040884201817975e-10,
+            -6.823931618519117e-11
+          ],
+          [
+            -6.823931618519114e-11,
+            1.045286736068202e-09
+          ]
+        ],
+        "normalized_s": 1.0,
+        "off_diagonal_m4": -6.823931618519117e-11,
+        "segment": "distal1"
+      }
+    ],
+    "supported_basis": [
+      "monomial",
+      "legendre",
+      "chebyshev",
+      "fourier",
+      "gaussian",
+      "imq"
+    ],
+    "tolerances": {
+      "central_steps_m": [
+        0.0001,
+        1e-05,
+        1e-06
+      ],
+      "curvature_basis_abs": 1e-10,
+      "design_derivative_abs": 1e-08,
+      "design_derivative_relative": 1e-05,
+      "mapping_abs": 1e-09,
+      "native_length_derivative_abs": 1e-07,
+      "state_jacobian_abs": 1e-08
+    }
+  },
+  "costs_s": {
+    "casadi_construction": 0.019411100016441196,
+    "mapping_cold_compile_and_evaluate": 1.3908319000038318,
+    "native_probe_cold_compile_and_evaluate": 3.1085155999753624,
+    "native_probe_construction": 7.299128299986478,
+    "worker_total": 12.225555199955124
+  },
+  "gate": "model_incompatible",
+  "implementation": "156b3de72743c6e014f5545e8f15b90240213185",
+  "log_reference": {
+    "artifact_id": "8ef6a808d849978a48a66e3005f21ff4f850e8f4002ad4c3fd4f8b223603c6b7",
+    "media_type": "application/json"
+  },
+  "original_admission_reference": {
+    "artifact_id": "e688034bc591e73ab55f66fcb44f2e560be94178281a6151a35fbb8b4ccc2c47",
+    "media_type": "application/json"
+  },
+  "original_log_reference": {
+    "artifact_id": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "media_type": "application/json"
+  },
+  "process_elapsed_s": 16.843572099984158,
+  "reasons": [
+    "Native GVS factory rejects structural_linear. Its six supported basis families lack the required nodal hat basis.",
+    "An equal-coordinate quadratic Legendre interpolation changes the strain field between structural knots; it is not a coordinate transform.",
+    "Native cross-section properties expose principal moments, whereas the source has rotated bending/inertial tensors and a distal rotation varying with arc position.",
+    "The minimal factory mapping also lacks the separately owned guide, connector and payload inertia/offset representation. They have not been homogenized or dropped.",
+    "Subdivision plus tied coordinates, tensor rotation and discrete rigid inertia would require a larger mechanics adapter and new validation; this bounded pilot stops at admission."
+  ],
+  "reporting_repair_commit": "1811aa6c18deeef892db3053a737b00816d12a7b",
+  "sources": {
+    "soromox.systems.components.cross_sections": {
+      "filename": "cross_sections.py",
+      "sha256": "838767b96e21e2e7299659b5049a445394203baccca1b0ee260757da44cfd60f"
+    },
+    "soromox.systems.gvs.specs": {
+      "filename": "specs.py",
+      "sha256": "b78d98095a249056bc2ef7454b357e7ac6f022746f307bcfce0024dd258ff2c8"
+    },
+    "soromox.systems.gvs.structures": {
+      "filename": "structures.py",
+      "sha256": "c323c588ff957479b3718aac1790ef885a487bc0878b6af5a4eb8879a8b62826"
+    }
+  },
+  "versions": {
+    "casadi": "3.7.2",
+    "cyipopt": "1.7.0",
+    "diffrax": "0.7.2",
+    "equinox": "0.13.8",
+    "jax": "0.10.2",
+    "jaxlib": "0.10.2",
+    "numpy": "2.4.6",
+    "pydantic": "2.14.0",
+    "scipy": "1.17.1",
+    "soromox": "0.5.0"
+  }
+}

@@ -68,6 +68,21 @@ source identities. The one-link native length-update check establishes only
 that native kinematics can differentiate a length; it says nothing about full
 candidate mechanics, material refresh, or optimal-design sensitivities.
 
+The delivered evidence also records one justified native endpoint follow-up at
+commit `1811aa6c`. Its subprocess command was
+`& $pilotPython -m tools.soromox_native_followup <output-json>` under the same
+Store reservation (`native-endpoint-followup`, 300 s ceiling). It compared the
+endpoint-abscissa, interior-abscissa and dedicated tips APIs, with identity pose,
+two states and three finite-difference steps. The dedicated tips API passed;
+the endpoint-abscissa derivative failed. These results are retained without
+rerunning the successful source-geometry checks. After the reporting repair,
+the original result is linked through `original_admission_reference`.
+
+The live smoke exhausted four provider requests during evidence inspection,
+with native tool use demonstrated and the final model explanation incomplete.
+No fifth request was sent. `smoke_outcome.json` retains this limitation and the
+subsequent transport-cleanup repair. No additional provider request is available.
+
 If mechanics admission fails, no trajectory objective/Jacobian, coherent state
 guess, solve, replay or MuJoCo launch is eligible. The frozen prospective
 objective is mean squared normalized effort plus 0.1 times mean squared tension

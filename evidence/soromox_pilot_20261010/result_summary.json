@@ -1,0 +1,73 @@
+{
+  "decision": "defer_adoption",
+  "base_commit": "2d13dfcc6395e09b53f6241dac3cae24ee69abb8",
+  "implementation_commit": "156b3de72743c6e014f5545e8f15b90240213185",
+  "reporting_repair_commit": "1811aa6c18deeef892db3053a737b00816d12a7b",
+  "delivery_repair_commit": "bb4c2d4213b5614777d9f1923155b6962bd8e9c2",
+  "activity_status": "stopped",
+  "nlp_primary": 0,
+  "nlp_additional": 0,
+  "closed_loop_launches": 0,
+  "replays": 0,
+  "numerical_processes": 2,
+  "numerical_s": 32.95769130002009,
+  "statistics": {
+    "mapping_abs_error_max": 1.6653345369377348e-16,
+    "jacobian_abs_error_max": 1.0408340855860843e-17,
+    "virtual_work_error_max": 1.270193536939343e-11,
+    "design_fd_error_max": 2.9267323016501923e-08,
+    "basis_coefficient_error": 0.25,
+    "native_endpoint_error_max": 0.49999999999997136,
+    "native_tips_error_max": 5.1933725098152195e-09,
+    "native_interior_error_max": 3.400737136338705e-09
+  },
+  "admission_costs_s": {
+    "casadi_construction": 0.019411100016441196,
+    "mapping_cold_compile_and_evaluate": 1.3908319000038318,
+    "native_probe_cold_compile_and_evaluate": 3.1085155999753624,
+    "native_probe_construction": 7.299128299986478,
+    "worker_total": 12.225555199955124
+  },
+  "native_followup_costs_s": {
+    "construction": 7.2541871999856085,
+    "worker_total": 14.501060199982021,
+    "cold_compile_unique": 7.118600700050592
+  },
+  "costs_note": "Cold timings include first evaluation; process totals include interpreter/import overhead. Setup/modeling split not separately instrumented.",
+  "smoke": {
+    "status": "tool_use_demonstrated_final_explanation_incomplete",
+    "actual_requests": 4,
+    "provider_elapsed_s": 8.032999999995809,
+    "prompt_tokens": 17963,
+    "completion_tokens": 1180,
+    "total_tokens": 19143,
+    "money": null,
+    "fifth_request_sent": false,
+    "stop_reason": "BUDGET_EXHAUSTED: project",
+    "original_cleanup_error": "AttributeError: 'AccountedDeepSeekModel' object has no attribute 'client'",
+    "tool_result": "1 describe plus 5 evidence.read calls; actual structured feedback consumed by later provider requests",
+    "continuation": "none; four-request ceiling exhausted",
+    "cleanup_repair": "close the owned LiveBoundary transport; preserve original execution and no new requests"
+  },
+  "code_lines": {
+    "extensions/tendon_family/soromox_mapping.py": 89,
+    "extensions/soromox_pilot/manifest.py": 22,
+    "schemas/soromox_pilot.py": 57,
+    "tools/soromox_worker.py": 190,
+    "tools/soromox_service.py": 113,
+    "tools/research_soromox.py": 200,
+    "tools/soromox_native_followup.py": 46,
+    "examples/soromox/record_scoped_repair.py": 51
+  },
+  "focused_checks": {
+    "unit_checks_passed": 5,
+    "unit_elapsed_s": 2.358,
+    "host_integration": [
+      "evidence.read corrected log",
+      "solve B admission rejection",
+      "replay invalid evidence rejection"
+    ],
+    "installed_dependencies": "pip check: no broken requirements",
+    "scientific_checks": "three source states, three length steps; native followup two states, three APIs, three length steps"
+  }
+}
