@@ -10,6 +10,7 @@ class Solve(Contract):
     initialization: Literal['pretension_0_2', 'ramp_0_2_to_0_4'] = 'pretension_0_2'
     substeps: Literal[1, 2] = 1
     category: Literal['primary', 'paired_second', 'correction'] = 'primary'
+    jacobian_mode: Literal['reverse', 'automatic'] = 'reverse'
 
 
 class Replay(Contract):
@@ -17,7 +18,7 @@ class Replay(Contract):
 
 
 class Check(Contract):
-    pass
+    scope: Literal['mechanics_reference', 'jacobian_execution'] = 'mechanics_reference'
 
 
 class Feedback(Contract):

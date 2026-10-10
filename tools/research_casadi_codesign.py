@@ -74,7 +74,7 @@ def bind(h):
     atomic_json(RUN/'implementation_freeze.json',dict(commit=commit,dependencies=snapshot['dependencies']))
 
 
-def migrate(h):
+def migrate(h,reason=None):
     """Explicit committed repair on the same grant, without repeating science."""
     from tools.platform_tasks import compile_input
     if subprocess.check_output(['git','status','--porcelain'],cwd=ROOT,text=True).strip():raise ValueError('COMMIT_REPAIR_BEFORE_MIGRATE')
@@ -89,10 +89,10 @@ def migrate(h):
     record=dict(previous_commit=state['casadi_freeze'],commit=commit,unix=time.time(),
         changed_dependencies=[key for key,value in snapshot['dependencies'].items() if old['dependencies'].get(key)!=value],
         prior_dependencies_identity=digest(old['dependencies']),new_dependencies_identity=digest(snapshot['dependencies']),
-        reason='Preserve three-entry analysis tuple and explicit design arguments; correct sampled replay speed definition; reserve 30 s IPOPT deadline margin after recorded 8.7 s primary-A overrun',
+        reason=reason or 'Preserve three-entry analysis tuple and explicit design arguments; correct sampled replay speed definition; reserve 30 s IPOPT deadline margin after recorded 8.7 s primary-A overrun',
         mathematical_equations_and_frozen_specifications='unchanged',
         correctness_evidence_carried=state['casadi_check']['reference'],
-        check_carry_reason='Mechanics/transcription expressions unchanged; only API tuple plumbing, offline time options, and sampled replay reporting changed',
+        check_carry_reason='Mechanics/transcription equations unchanged; runtime/API/reporting changes have separate focused checks',
         repeated_numerical_checks=0,reset_budgets=False)
     with h.store.transaction() as db:
         ref=h.store.put(db,snapshot);db.execute('UPDATE sessions SET snapshot=? WHERE run_id=?',(ref.artifact_id,ACTIVITY))
@@ -100,7 +100,7 @@ def migrate(h):
         state.setdefault('casadi_repairs',[]).append(plain(repair))
         h.store.update_state(db,ACTIVITY,state);h.store.event(db,ACTIVITY,'scoped_repair_migration','committed',outputs=[repair,ref])
     atomic_json(RUN/'implementation_freeze.json',dict(commit=commit,dependencies=snapshot['dependencies']))
-    atomic_json(OUT/'repair_migration.json',record)
+    atomic_json(OUT/('repair_migration_'+str(len(state['casadi_repairs']))+'.json'),record)
 
 
 def export(h):
@@ -112,7 +112,13 @@ def export(h):
             info=tarfile.TarInfo(name);info.size=len(row['body'])
             tar.addfile(info,io.BytesIO(row['body']));manifest.append(dict(name=name,sha256=row['id'],bytes=info.size,media=row['media']))
         calls=[dict(row) for row in db.execute('SELECT * FROM calls ORDER BY rowid')]
-    for filename,value in [('activity.json',read(RUN/'activity.json')),('implementation_freeze.json',read(RUN/'implementation_freeze.json')),
+    freeze=read(RUN/'implementation_freeze.json')
+    with h.store.connect(True) as db:
+        snapshot_id=db.execute('SELECT snapshot FROM sessions WHERE run_id=?',(ACTIVITY,)).fetchone()[0]
+    compact_freeze=dict(commit=freeze['commit'],dependency_identity=digest(freeze['dependencies']),
+        snapshot_reference=dict(artifact_id=snapshot_id,media_type='application/json'),dependencies_pointer='/dependencies',
+        archive_member='artifacts/'+snapshot_id+'.json')
+    for filename,value in [('activity.json',read(RUN/'activity.json')),('implementation_freeze.json',compact_freeze),
         ('state.json',h.store.session(ACTIVITY)['state']),('events.json',h.store.events(ACTIVITY)),('ledger.json',h.store.remaining()),('calls.json',calls)]:
         atomic_json(OUT/filename,value)
     state=h.store.session(ACTIVITY)['state']
@@ -126,12 +132,14 @@ def main():
     p=argparse.ArgumentParser();p.add_argument('command',choices=['prepare','bind','migrate','check','solve','replay','status','export','stop'])
     p.add_argument('--case',choices=['A','B'],default='A');p.add_argument('--initialization',default='pretension_0_2',choices=['pretension_0_2','ramp_0_2_to_0_4'])
     p.add_argument('--category',default='primary',choices=['primary','paired_second','correction']);p.add_argument('--substeps',type=int,default=1)
-    p.add_argument('--candidate');p.add_argument('--request-id');args=p.parse_args()
+    p.add_argument('--candidate');p.add_argument('--request-id');p.add_argument('--reason')
+    p.add_argument('--scope',choices=['mechanics_reference','jacobian_execution'],default='mechanics_reference')
+    p.add_argument('--jacobian-mode',choices=['reverse','automatic'],default='reverse');args=p.parse_args()
     h=prepare() if args.command=='prepare' else host()
     if args.command=='bind':bind(h)
-    if args.command=='migrate':migrate(h)
+    if args.command=='migrate':migrate(h,args.reason)
     if args.command in ('check','solve','replay'):
-        arguments={} if args.command=='check' else dict(case=args.case,initialization=args.initialization,category=args.category,substeps=args.substeps) if args.command=='solve' else dict(candidate=json.loads(args.candidate))
+        arguments=dict(scope=args.scope) if args.command=='check' else dict(case=args.case,initialization=args.initialization,category=args.category,substeps=args.substeps,jacobian_mode=args.jacobian_mode) if args.command=='solve' else dict(candidate=json.loads(args.candidate))
         receipt=invoke(h,'math.casadi_codesign_'+args.command,arguments,request_id=args.request_id or f'{args.command}-{args.case}-{args.initialization}-{args.category}-{args.substeps}')
         print(json.dumps(dict(receipt=receipt,feedback=h.store.artifact(receipt['output']) if receipt.get('output') else None)));return
     if args.command=='export':print(json.dumps(export(h)));return

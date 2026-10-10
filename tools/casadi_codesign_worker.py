@@ -87,11 +87,32 @@ def correctness(configuration):
         costs_s=dict(total=time.perf_counter()-started,mechanics=w.mechanics_construction_s,assembly=w.assembly_s))
 
 
+def jacobian_execution(configuration):
+    """Compare existing exact-AD execution modes on the same assembled graph."""
+    started=time.perf_counter();w=Workspace(configuration);problem=w.assemble('B','pretension_0_2')
+    z=ca.MX.sym('execution_z',len(problem.variables));g=w.value(z)[1]
+    values=np.array([problem.initial_guess[name] for name in problem.variables]);records={};matrices={}
+    atol,rtol=1e-8,1e-8
+    for mode in ('reverse','automatic'):
+        t=time.perf_counter();opts={'ad_weight':1.} if mode=='reverse' else {}
+        f=ca.Function('execution_constraints_'+mode,[z],[g],opts);j=f.jacobian()
+        construction=time.perf_counter()-t;t=time.perf_counter();matrix=j(values,ca.DM.zeros(g.numel()))
+        elapsed=time.perf_counter()-t;matrices[mode]=np.asarray(matrix)
+        records[mode]=dict(construction_s=construction,evaluation_s=elapsed,nnz=matrix.sparsity().nnz())
+    error=np.abs(matrices['reverse']-matrices['automatic'])
+    passed=bool(np.isfinite(error).all() and np.all(error<=atol+rtol*np.abs(matrices['reverse'])))
+    return dict(status='passed' if passed else 'failed',scope='jacobian_execution',
+        termination_reason='Exact automatic versus forced reverse AD on the same full-horizon constraint graph; no NLP invocation',
+        tolerances=dict(absolute=atol,relative=rtol),max_abs_error=float(error.max()),
+        design_column_nonzeros=int(np.count_nonzero(matrices['reverse'][:,0])),modes=records,
+        mathematical_equations='unchanged',nlp_invocations=0,costs_s=dict(total=time.perf_counter()-started))
+
+
 def solve(configuration,args,progress=None):
     started=time.perf_counter();w=Workspace(configuration,args['substeps'])
     problem=w.assemble(args['case'],args['initialization'])
     options=dict(max_iterations=1000,tolerance=1e-7,acceptable_tolerance=1e-6,
-        constraint_jacobian_mode='reverse',retain_feasible_iterate=True,hessian_approximation='limited-memory',
+        constraint_jacobian_mode=args.get('jacobian_mode','reverse'),retain_feasible_iterate=True,hessian_approximation='limited-memory',
         # IPOPT checks deadlines between iterations. The first primary reached
         # 608.7 s with 600 s options; retain it and reserve a 30 s margin henceforth.
         max_cpu_s=570.,max_wall_s=570.,print_level=5)
@@ -139,7 +160,8 @@ def main():
     parser=argparse.ArgumentParser();parser.add_argument('input');parser.add_argument('output');args=parser.parse_args()
     request=read(args.input);started=time.perf_counter()
     try:
-        if request['operation']=='check':result=correctness(request['configuration'])
+        if request['operation']=='check':
+            result=(jacobian_execution if request['arguments'].get('scope')=='jacobian_execution' else correctness)(request['configuration'])
         elif request['operation']=='solve':result=solve(request['configuration'],request['arguments'],request.get('progress'))
         else:result=replay(request['configuration'],request['candidate'])
     except Exception as exc:

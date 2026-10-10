@@ -12,6 +12,7 @@ EXTENSIONS = [Extension(name,'tool','1.0.0',schema,Feedback,
         'extensions/optimization/ipopt.py','extensions/optimization/contracts.py'),
     assets=('examples/casadi_codesign/case_A.json','examples/casadi_codesign/case_B.json'),
     dependencies=('casadi','numpy','scipy'),
+    extension_dependencies=(('model.gvs','1.0.0'),('solver.ipopt','1.0.0')),
     capabilities={'category':'analysis','preflight':'tools.casadi_codesign_service:preflight'},
     cache=False,side_effects='numerical solve or integration; retained evidence')
     for name,schema,binding,description in (

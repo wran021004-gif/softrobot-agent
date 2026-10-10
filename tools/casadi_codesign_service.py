@@ -42,8 +42,10 @@ def dispatch(ctx,args,operation):
         category=args.category
         if state['casadi_solves']>=6 or state['casadi_solve_categories'][category]>=2:
             raise ValueError('NLP_SOLVE_CEILING_REACHED')
-        if category=='primary' and (args.initialization!='pretension_0_2' or args.substeps!=1):
+        if category=='primary' and (args.initialization!='pretension_0_2' or args.substeps!=1 or args.jacobian_mode!='reverse'):
             raise ValueError('PRIMARY_INITIALIZATION_AND_GRID_FROZEN')
+        if args.jacobian_mode=='automatic' and (category!='correction' or state.get('casadi_jacobian_execution_check',{}).get('status')!='passed'):
+            raise ValueError('AUTOMATIC_AD_REQUIRES_SCOPED_CORRECTION_AND_EXECUTION_CHECK')
     inp,out,progress=ctx.folder/'worker_input.json',ctx.folder/'worker_output.json',ctx.folder/'worker_progress.json'
     request=dict(operation=operation,configuration=plain(ctx.input),arguments=plain(args),implementation=state['casadi_freeze'],progress=str(progress))
     if candidate:request['candidate']=candidate
@@ -70,7 +72,9 @@ def dispatch(ctx,args,operation):
         current=ctx.store.session(ctx.run_id,db)['state'];current['casadi_numerical_s']+=elapsed
         current.pop('casadi_pending',None)
         current.setdefault('casadi_results',[]).append(dict(operation=operation,case=case,status=result['status'],reference=plain(ref)))
-        if operation=='check':current['casadi_check']=dict(status=result['status'],reference=plain(ref))
+        if operation=='check':
+            key='casadi_jacobian_execution_check' if args.scope=='jacobian_execution' else 'casadi_check'
+            current[key]=dict(status=result['status'],reference=plain(ref))
         ctx.store.update_state(db,ctx.run_id,current)
     state=ctx.store.session(ctx.run_id)['state']
     trajectory=None

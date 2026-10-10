@@ -75,7 +75,11 @@ numerical process time at 7200 s. Process reservations include construction,
 checks, guess generation, solves and replay. Eight hours includes engineering,
 with the last 30 minutes protected. Re-running prepare does not reset capacity.
 
-Independent replay uses adaptive SciPy Radau with exact state Jacobians,
+The first Radau replay exceeded its 900 s reservation without a returned
+trajectory. Its original unknown event was reconciled to a known failed
+numerical worker after checking process absence and the installed Python
+timeout/kill behavior. The failed attempt remains charged and archived.
+Replacement replay uses adaptive SciPy BDF with exact direct-graph state Jacobians,
 relative tolerance 1e-8, curvature/rate absolute tolerances 1e-9/1e-7, and
 continuous state across each 0.01 s input switch. Dense output every 0.0005 s
 checks the task and compares optimizer tip outputs using documented linear

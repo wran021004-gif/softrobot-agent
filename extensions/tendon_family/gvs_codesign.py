@@ -133,20 +133,22 @@ class Workspace:
 
 
 def integrate(functions, tip, velocity, candidate, target, *, dense_period=.0005):
-    """Adaptive Radau integration restarted only at input switches, never states."""
+    """Adaptive BDF integration restarted only at input switches, never states."""
     started=time.perf_counter(); n=len(candidate['coordinate_order']); d=candidate['d']
     X=np.asarray(candidate['states']); times=np.asarray(candidate['times_s']); U=np.asarray(candidate['tensions_n'])
     state=np.zeros(2*n); replay_times=[0.]; replay_states=[state.copy()]; nfev=njev=nlu=0
-    x=ca.MX.sym('replay_x',2*n); u=ca.MX.sym('replay_u',len(U[0]))
-    rhs=functions.function(x,u,d)[0]
-    rhs_fn=ca.Function('replay_rhs',[x,u],[rhs])
-    jac_fn=ca.Function('replay_jac',[x,u],[ca.jacobian(rhs,x)],{'ad_weight':1.})
+    x,u,rhs=functions._linearization_symbols
+    dd=functions.design_input
+    # Use the direct xdot graph: avoid asking a ten-output dynamics wrapper
+    # for unused output Jacobians at every adaptive integration update.
+    rhs_fn=ca.Function('replay_rhs',[x,u,dd],[rhs],{'cse':True})
+    jac_fn=ca.Function('replay_jac',[x,u,dd],[ca.jacobian(rhs,x)],{'ad_weight':1.,'cse':True})
     jacobian_construction_s=time.perf_counter()-started
     failure=None
     for k,tension in enumerate(U):
         a,b=k*.01,(k+1)*.01
-        result=solve_ivp(lambda t,y:np.asarray(rhs_fn(y,tension)).ravel(), (a,b),state,
-            method='Radau', jac=lambda t,y:np.asarray(jac_fn(y,tension)), rtol=1e-8,
+        result=solve_ivp(lambda t,y:np.asarray(rhs_fn(y,tension,d)).ravel(), (a,b),state,
+            method='BDF', jac=lambda t,y:np.asarray(jac_fn(y,tension,d)), rtol=1e-8,
             atol=np.r_[np.full(n,1e-9),np.full(n,1e-7)], dense_output=True)
         nfev+=result.nfev; njev+=result.njev; nlu+=result.nlu
         if not result.success:
@@ -168,7 +170,7 @@ def integrate(functions, tip, velocity, candidate, target, *, dense_period=.0005
     errors=np.linalg.norm(rp-np.asarray(target),axis=1); speed=np.linalg.norm(rv,axis=1)
     hold=rt>=.30-1e-12
     result=dict(status='integration_failed' if failure else 'completed', integration_failure=failure,
-        method='scipy Radau, exact state Jacobian, switch-by-switch continuous state', rtol=1e-8,
+        method='scipy BDF, exact direct-graph state Jacobian, switch-by-switch continuous state', rtol=1e-8,
         atol_q=1e-9,atol_v=1e-7,dense_period_s=dense_period,
         node_max_tip_disagreement_m=float(np.max(np.linalg.norm(matched_p-op[valid],axis=1))),
         node_max_speed_disagreement_m_s=float(np.max(np.linalg.norm(matched_v-ov[valid],axis=1))),
