@@ -182,6 +182,8 @@ and unused solve slots do not authorize further sends or restarting this activit
 | Prescribed fixed-schedule precision BDF checks | 1 |
 | Numerical process time, s | 971.5112324 |
 | Initial investigation subset, s | 381.8531265 |
+| Sealed total elapsed activity, s | 3647.9512463 |
+| Engineering/reporting residual at closeout, s | 2455.4594697 |
 | Actual provider sends | 24 / 24 |
 | Public workflow calls | 21 / 96 |
 | Provider elapsed time, s | 197.595 |

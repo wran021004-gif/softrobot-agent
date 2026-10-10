@@ -308,22 +308,79 @@
       "costs_s": {
         "total": 163.7016659999499
       }
+    },
+    {
+      "operation": "engineering_review",
+      "reference": {
+        "artifact_id": "c6d8a4cab97a596966884b4d872cc7fc49046a46b7ff61270cc750562aa13ab2",
+        "media_type": "application/json"
+      },
+      "candidate": null,
+      "status": "interpretation_correction",
+      "termination_reason": "Corrections to initial plan interpretation: historical corrected A/B were bounded infeasible returned iterates, so neither local nor global optimality is established; fixed-input tight/coarse/refined/BDF evidence supports substantial discretization effects but does not prove a unique cause or a converged grid. The tested local automatic-AD change was NOT adopted: actual local step AD remains the prior reverse setting; outer NLP AD remains automatic exact AD. All typed model-selected candidate choices are executed unchanged. These corrections do not prescribe revision or STOP."
+    },
+    {
+      "operation": "solve",
+      "reference": {
+        "artifact_id": "19cb1d9da051227af9daa397d37edd2ad2bd5e67b5cdecc229de2adc7252c30b",
+        "media_type": "application/json"
+      },
+      "candidate": null,
+      "status": "numerical_error",
+      "termination_reason": "dict() got multiple values for keyword argument 'candidate'",
+      "process_elapsed_s": 274.5656786999898,
+      "costs_s": {
+        "total": 272.99486490001436
+      }
+    },
+    {
+      "operation": "solve",
+      "reference": {
+        "artifact_id": "7c65ccb4b5bddb4676e8de0fa5e2f3970332295a31ace144c2f71b16b72bafff",
+        "media_type": "application/json"
+      },
+      "candidate": null,
+      "status": "numerical_error",
+      "termination_reason": "dict() got multiple values for keyword argument 'candidate'",
+      "process_elapsed_s": 315.0924271999975,
+      "costs_s": {
+        "total": 312.63138109998545
+      }
+    },
+    {
+      "operation": "engineering_repair",
+      "reference": {
+        "artifact_id": "f36728fb9d0292c5b036e55922be4e109b0d832017b606442bbae1e1c8b75021",
+        "media_type": "application/json"
+      },
+      "candidate": null,
+      "status": "committed_focused_fix_passed",
+      "termination_reason": "Both initial runs DID enter and finish actual IPOPT before candidate report extraction failed. Generic receipt solver_status=not_run and backend_solves=0 do not mean no NLP: backend_solves counts physical backend launches. Retained IPOPT logs report successful solves with iterations/times [{\"reference\": {\"artifact_id\": \"19cb1d9da051227af9daa397d37edd2ad2bd5e67b5cdecc229de2adc7252c30b\", \"media_type\": \"application/json\"}, \"log_reference\": {\"artifact_id\": \"ebe0d3fd89769056b33999201bd4fbeea60945d8544ef67d2ab8a71acd36165d\", \"media_type\": \"application/json\"}, \"iterations\": 18.0, \"ipopt_elapsed_s\": 221.178, \"process_elapsed_s\": 274.5656786999898, \"ipopt_succeeded\": true}, {\"reference\": {\"artifact_id\": \"7c65ccb4b5bddb4676e8de0fa5e2f3970332295a31ace144c2f71b16b72bafff\", \"media_type\": \"application/json\"}, \"log_reference\": {\"artifact_id\": \"d149da3a66dd6310f14b9d65b43847e7f926c3c9ad390ace802200d7a1d7648d\", \"media_type\": \"application/json\"}, \"iterations\": 21.0, \"ipopt_elapsed_s\": 259.993, \"process_elapsed_s\": 315.0924271999975, \"ipopt_succeeded\": true}]. Their candidate vectors are unavailable, so independent task metrics/replay cannot be claimed. Duplicate candidate field is repaired and the solver-return checkpoint is retained before packaging; focused mocked-solver packaging test passes with zero new real NLP invocations. The repair is now committed/bound on the SAME clock and ledger. All 14 actual provider sends and 2 actual NLP solves remain spent; 2 model-selected revision slots and 10 provider sends remain. You may choose revision, diagnosis, or STOP; no batch is automatically repeated. Prior initial assertions of optima/unique cause/local automatic AD were corrected separately."
     }
   ],
-  "accepted_plans": [],
-  "research_status": "ready",
+  "accepted_plans": [
+    {
+      "action": "batch",
+      "batch": "initial",
+      "reference": {
+        "artifact_id": "519781993a5cf2f1eff3d2bd9a7be967b3366990893266c210aa12071c19cd35",
+        "media_type": "application/json"
+      }
+    }
+  ],
+  "research_status": "stopped",
   "remaining_budget": {
-    "numerical_s": 6818.1468735000235,
+    "numerical_s": 6228.488767600036,
     "initial_investigation_s": 1418.1468735000235,
-    "nlp_solves": 4,
-    "initial_solves": 2,
+    "nlp_solves": 2,
+    "initial_solves": 0,
     "revision_solves": 2,
-    "provider_requests": 24,
+    "provider_requests": 0,
     "protected_provider_sends": 4,
-    "public_tool_calls": 94,
+    "public_tool_calls": 75,
     "backend_launches": 1,
-    "activity_s": 27146.053198814392,
-    "scientific_window_s": 25346.053198814392
+    "activity_s": 25151.413864135742,
+    "scientific_window_s": 23351.413864135742
   },
   "capabilities": {
     "research_plan": "Typed batch of one/two supported NLP choices; execute sequentially then independent BDF replay each usable schedule; subsequent revision, one diagnostic replay, or STOP",

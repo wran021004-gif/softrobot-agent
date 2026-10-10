@@ -1,0 +1,67 @@
+{
+  "action": "batch",
+  "candidates": [
+    {
+      "design_bounds": [
+        -1.0,
+        1.0
+      ],
+      "design_initial": 0.0,
+      "initialization": "pretension_0_2",
+      "objective_mode": "task_gap",
+      "position_weight": 1.0,
+      "secondary_coefficient": 0.0,
+      "source_candidate": null,
+      "speed_weight": 1.0,
+      "substeps": 2
+    },
+    {
+      "design_bounds": [
+        -1.0,
+        1.0
+      ],
+      "design_initial": 0.0,
+      "initialization": "ramp_0_2_to_0_4",
+      "objective_mode": "task_gap",
+      "position_weight": 1.0,
+      "secondary_coefficient": 0.0,
+      "source_candidate": null,
+      "speed_weight": 1.0,
+      "substeps": 2
+    }
+  ],
+  "diagnostic_candidate": null,
+  "disposition": "Mechanism-first first batch of two sequential substeps=2 solves at frozen default weights and design start, differing only in initialization (pretension_0_2 vs ramp_0_2_to_0_4), each to be independently BDF-replayed by the harness. Purpose is to quantify how much of the historical 0.219/0.736 gap and the 9.80e-2 m/s replayed holding-speed peak is discretization artifact versus a real task-space shortfall. This is a search refutation/confirmation probe only; no acceptance claim, no design-search claim, and no physical validation claim is made from it.",
+  "fixed_conditions": "Frozen exactly as specified: target [0.29, 0.035, 0.19] m, mount [0,0,0.15] with identity quaternion, gravity [0,0,-9.81] m/s^2, duration 0.35 s, 35 control intervals at 0.01 s, physical timestep 5e-4 s, 24 mesh cells, seed 17, named zero positions/velocities initial state, two flexible segments with six independent ideal tension channels and existing asymmetric routing/guides/rigid components/payload, existing material and sections with the linear structural basis and existing coordinate/tendon order, tension bounds [0, 8] N, terminal and holding position limit 0.01 m, holding speed limit 0.02 m/s, holding window 0.05 s, constant design rule L_proximal=0.16+0.0055*d and L_distal=0.11-0.0055*d with d in [-1,1], the same two shared nonnegative slacks (position slack over all holding+terminal normalized position-squared inequalities, speed slack over all holding normalized speed-squared inequalities, each inequality normalized_squared <= 1 + slack) as search-only variables with slack_subtracted=false acceptance, hard initial state, force balance/kinematics, design domain and tension bounds, and exact automatic outer and local AD (no local forced-reverse). Only the batch knobs below vary: substeps=2 (the refinement the diagnosis gate demands), objective task_gap, position_weight=speed_weight=1, secondary_coefficient=0, design_initial=0.0, design_bounds [-1,1]; the two candidates differ only in initialization.",
+  "hypothesis": "The supplied diagnosis shows the historical schedules are genuine optima of the substeps=1 (original-grid) NLP but are not optima of the continuous dynamics: tightening the original grid barely moves the saved solution (max_tip 5.887e-7 m, max_speed 1.308e-5 m/s), whereas advancing the same tight solution to the two-substep refined grid moves it by 3.7435e-3 m and 4.6724e-2 m/s, and the BDF-replayed coarse schedule reaches a holding speed peak of 9.80e-2 m/s against the frozen 0.02 m/s limit. So the substeps=1 optimizer is exploiting temporal integration error to hide velocity peaks (NLP-implied speed slack ~0.219 vs replayed normalized-squared overshoot ~24), rather than reporting the true constraint landscape. Hypothesis under test: the reported task gap of a rewritten substeps=2 (refined-grid) solve will be materially larger/more honest and its BDF replay will agree with the NLP nodes far better than the coarse solve, and the replayed holding speed peak will fall toward the 0.02 m/s bound; a two-start probe at fixed weights isolates refinement from warm-start effects.",
+  "limitations": [
+    "Slacks are search-only; a relaxed iterate is not task success, and acceptance is judged on original (unsoftened) metrics with slack_subtracted=false at 1e-5 residual/gap tolerance.",
+    "Physical validation is not established by this cycle; no physical launch is scheduled and existing controller11 answers a different-input geometry question, not optimized-schedule equivalence.",
+    "No inference of physical impossibility, global optimality, joint-design advantage, or LLM superiority is drawn from these runs.",
+    "Two initializations at fixed weights cannot rule out other starts or weightings within the 4-solve total budget.",
+    "The refinement comparison is limited to substeps in {1,2}; convergence of the refined grid itself is not established by this batch.",
+    "A truncated or infeasible returned iterate would be reported as such and not re-labeled as feasible."
+  ],
+  "requested_nlp_solves": 2,
+  "requested_replays": 2,
+  "revision_or_stop_rule": "After consuming batch feedback: (a) if at least one substeps=2 schedule returns usable, passes the accepted replay gate (tip <= 1 mm, speed <= 0.002 m/s) and its original-metric gap is materially below the historical 0.219, spend the revision budget (up to two solves) on weight/initialization adjustment around the better start only; (b) if the refined grid still shows the same >1 mm / >0.002 m/s original-vs-refined disagreement pattern seen for the coarse solve, do not spend further solves on blind re-tuning: request one supported diagnostic replay on the better returned schedule or STOP with measured evidence; (c) if a solve truncates/fails, report the actual termination honestly and either STOP or use a single repair-free weight/initialization change inside budget; (d) never repeat a solver-identical solve and never treat a slack-relaxed iterate as task success.",
+  "supporting_evidence": [
+    {
+      "artifact_id": "ba8eaa8ab169e941436e096ab5bc367d70b3cc8f4591471923fc7f85e928a14c",
+      "media_type": "application/json"
+    },
+    {
+      "artifact_id": "172caf84e701165ecd58bb4aa6de93d83e378b6fbaaddf7a6cf2eda9f660a1b1",
+      "media_type": "application/json"
+    },
+    {
+      "artifact_id": "6f121f12f89af153953972e5140b4e2fdd4b77ddb089fbc8c340457198af97b9",
+      "media_type": "application/json"
+    },
+    {
+      "artifact_id": "195f0d40d8dc83748a6c3410e0db0119d753e35b036f5dbb5a3c9ca413ab7074",
+      "media_type": "application/json"
+    }
+  ],
+  "weakening_observation": "Two facts weaken the naive expectation that refinement fixes the gap. (1) The coarse grid is internally self-consistent (saved NLP vs tight original: 5.887e-7 m / 1.308e-5 m/s), so the historical iterates are not solver sloppiness; the discrepancy is purely discretization, and the BDF integrator itself is converged (saved BDF vs precision BDF: 6.33e-12 m / 4.71e-10 m/s), so no integration-accuracy lever remains. (2) Both historical returned iterates are infeasible_returned_iterates with normalized_violation 0.219 (corrected_A) and 0.736 (corrected_B), while the acceptance task-gap tolerance is 1e-5, i.e. ~2-4 orders of magnitude away; and the coarse-grid solution's replayed holding speed (9.80e-2 m/s) is ~4.9x the frozen 0.02 m/s bound. Therefore the honest expectation is a larger, truer reported gap and possible non-convergence or truncation at the 570 s IPOPT setting, not task acceptance. The AD experiment also returned no repayment (adopted false, full_warmed_speed_ratio 1.0094), so no compute-side lever is assumed."
+}
