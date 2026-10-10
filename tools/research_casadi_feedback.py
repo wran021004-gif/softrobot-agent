@@ -159,18 +159,40 @@ def packet(h):
 INSTRUCTIONS='''You are the sole research principal for one bounded CasADi feedback study. Engineering diagnostics and the AD speed experiment were prescribed by the user and implemented by Codex; do not claim you discovered them. Use the supplied packet. Do not rediscover already supplied facts. Call research_plan to propose AND REQUEST a first batch with exactly one supported candidate solve. The tool executes your choices and independently replays every usable returned schedule before returning actual feedback. After consuming it, choose one justified revision batch (at most one further solve), one supported diagnostic replay, or STOP. You own that choice; a second batch and a speedup are not required. Following any revision consume its results and provide a final STOP disposition citing actual evidence. If only failures are returned, interpret those honestly and stop or choose a supported repair-free revision within budget. Use original unsoftened metrics to compare different weights. Two shared nonnegative task slacks change search only, not acceptance. Hard initial conditions, dynamics, design and force bounds remain. A relaxed feasible iterate is not task success. Physical validation is not established by this cycle. The small typed plan must explain hypothesis/evidence, weakening observation, fixed conditions, chosen domain/objective/initialization/grid, operations/budget, revision/stop rule, disposition and limitations. Cite actual EvidenceRefs. No textual pseudo-tools, other agents, changed task/material/topology/time/initial state/limits, controller search, or unsupported integrators. Two full NLP attempts maximum (one initial/one revision), three new independent replays maximum with the third requiring a diagnostic question about a new candidate,600 seconds each,3600 total numerical seconds including engineering checks and recovery,12 ACTUAL provider sends including summaries,48 public workflow calls,four hours including engineering and final30min protected. Final four sends are for outstanding feedback and closeout only. Do not infer physical impossibility, global optimality, joint-design advantage or LLM superiority. When STOP is accepted, conclude briefly with actual numerical evidence and unresolved limits; request no further work.'''
 
 
+def feedback_context_references(h):
+    """Only native feedback containing new executions is relevant in closeout."""
+    references=[]
+    for event in h.store.events(ACTIVITY):
+        if event['kind']!='model_original_tool_feedback':continue
+        value=h.store.artifact(event['outputs'][0]);use=value['tool_use']
+        if use['name']!='research_plan' or use['input'].get('action') not in ('batch','diagnostic_replay'):continue
+        result=value['result']
+        if result['status']!='success':continue
+        for index,content in enumerate(result.get('content',[])):
+            try:feedback=json.loads(content.get('text','{}'))
+            except ValueError:continue
+            if feedback.get('operations'):references.append(use['toolUseId']+'_'+str(index))
+    return references
+
+
 def provider_guard(h,wire):
     """Check every actual send, including auxiliary requests and retries."""
     state=h.store.session(ACTIVITY)['state']
     if state.get('research_status')=='stopped':raise ValueError('ACCEPTED_STOP_NO_MORE_SENDS')
     if state.get('engineering_pause'):raise ValueError('ENGINEERING_PAUSE_NO_MORE_SENDS')
+    if state.get('pending'):raise ValueError('UNKNOWN_NUMERICAL_OUTCOME_NO_PROVIDER_SEND')
     if not h.compatibility()['compatible']:raise ValueError('DEPENDENCIES_CHANGED_BEFORE_PROVIDER_SEND')
     if h.store.remaining()['remaining']['model_calls']<=4:
         definitions={t['function']['name']:t['function'] for t in wire.get('tools',[])}
         plan=definitions.get('research_plan',{}).get('parameters',{})
         action=plan.get('properties',{}).get('action',{})
-        if action.get('const')!='stop' or set(definitions)-{'research_plan','evidence_read'}:
+        if action.get('const')!='stop' or set(definitions)-{'research_plan','evidence_read','retrieve_context'}:
             raise ValueError('PROTECTED_SEND_REQUIRES_NATIVE_STOP_SCHEMA_NO_AUXILIARY_SUMMARY')
+        retrieval=definitions.get('retrieve_context')
+        if retrieval:
+            advertised=retrieval.get('parameters',{}).get('properties',{}).get('reference',{}).get('enum')
+            if advertised is None or not set(advertised)<=set(feedback_context_references(h)):
+                raise ValueError('PROTECTED_RETRIEVAL_REQUIRES_NEW_EXECUTION_FEEDBACK_REFERENCES')
 
 
 from tools.strands_pilot_r3 import LiveBoundary
@@ -269,15 +291,26 @@ async def converse(h):
             schema=deepcopy(tools[1].tool_spec['inputSchema']['json'])
             schema['$defs']['EvidenceRef']['properties']['artifact_id']['enum']=[r['reference']['artifact_id'] for r in state['results'] if not r.get('imported')]
             tools[1].tool_spec={**tools[1].tool_spec,'inputSchema':{'json':schema}}
+            retrieval=agent.tool_registry.registry.get('retrieve_context')
+            if retrieval:
+                schema=deepcopy(retrieval.tool_spec['inputSchema']['json'])
+                schema['properties']['reference']['enum']=feedback_context_references(h)
+                retrieval.tool_spec={**retrieval.tool_spec,'inputSchema':{'json':schema}}
             agent.system_prompt+='\nPROTECTED CLOSEOUT: native plan schema now permits STOP only; evidence reads are restricted to outstanding new-result references. Actual remaining sends are those in remaining_budget, with no separate extra reserve.'
-    def before_tool(event):record(h,'model_original_tool_request',dict(tool_use=event.tool_use))
+    def before_tool(event):
+        record(h,'model_original_tool_request',dict(tool_use=event.tool_use))
+        if (h.store.remaining()['remaining']['model_calls']<=4 and event.tool_use['name']=='retrieve_context'
+            and event.tool_use['input'].get('reference') not in feedback_context_references(h)):
+            event.cancel_tool='Protected closeout permits retrieval of new execution feedback only.'
     def after_tool(event):
         record(h,'model_original_tool_feedback',dict(tool_use=event.tool_use,result=event.result))
         key='native-'+event.tool_use['toolUseId']
         if h.store.lookup(ACTIVITY,key) is None:
             row,_=h.store.reserve(ACTIVITY,key,digest(event.tool_use),h.actor,{**zero(),'tool_calls':1,'wall_s':0.})
             h.store.complete(row,dict(request_id=key,execution_id=row['execution_id'],caller=h.actor,
-                tool_id=event.tool_use['name'],tool_version='1.0.0',execution_status='failed',charged=zero()),event.result,kind='native_rejected')
+                tool_id=event.tool_use['name'],tool_version='1.0.0',
+                execution_status='completed' if event.result['status']=='success' else 'failed',charged=zero()),event.result,
+                kind='native_context' if event.tool_use['name']=='retrieve_context' else 'native_rejected')
     agent.hooks.add_callback(BeforeModelCallEvent,before_model);agent.hooks.add_callback(BeforeToolCallEvent,before_tool);agent.hooks.add_callback(AfterToolCallEvent,after_tool)
     try:
         while h.store.session(ACTIVITY)['state']['research_status']!='stopped':

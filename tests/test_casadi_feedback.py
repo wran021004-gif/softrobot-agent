@@ -111,6 +111,13 @@ class PlanTests(unittest.TestCase):
             asyncio.run(boundary.handle_async_request(request))
         from tools.research_casadi_feedback import provider_guard
         provider_guard(host,dict(tools=[dict(function=dict(name='research_plan',parameters=CloseoutPlan.model_json_schema()))]))
+        from unittest.mock import patch
+        native={'tools':[{'function':{'name':'research_plan','parameters':CloseoutPlan.model_json_schema()}},
+            {'function':{'name':'retrieve_context','parameters':{'properties':{'reference':{'type':'string','enum':['fresh_0']}}}}}]}
+        with patch('tools.research_casadi_feedback.feedback_context_references',return_value=['fresh_0']):
+            provider_guard(host,native)
+            native['tools'][1]['function']['parameters']['properties']['reference']['enum']=['historical_0']
+            with self.assertRaisesRegex(ValueError,'PROTECTED_RETRIEVAL'):provider_guard(host,native)
         state['research_status']='stopped'
         with self.assertRaisesRegex(ValueError,'ACCEPTED_STOP_NO_MORE_SENDS'):
             asyncio.run(boundary.handle_async_request(request))
