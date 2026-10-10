@@ -7,7 +7,7 @@ import os
 import subprocess
 import time
 from schemas.platform import ProjectConfig
-from schemas.casadi_feedback import Plan
+from schemas.casadi_feedback import Plan,CloseoutPlan
 from tools.platform_host import Host
 from tools.platform_store import plain,zero
 from tools.research_execution import invoke
@@ -166,6 +166,11 @@ async def converse(h):
         value['remaining_budget']=budget(h.store);record(h,'model_plan_execution_feedback',value)
         return dict(toolUseId=use['toolUseId'],status='success' if receipt['execution_status']=='completed' else 'error',content=[dict(text=json.dumps(value))])
     def read_handler(use,**kwargs):
+        if h.store.remaining()['remaining']['model_calls']<=4:
+            state=h.store.session(ACTIVITY)['state']
+            allowed={r['reference']['artifact_id'] for r in state['results']}
+            if use['input']['reference']['artifact_id'] not in allowed:
+                return dict(toolUseId=use['toolUseId'],status='error',content=[dict(text='Protected closeout: consume already supplied new results and submit STOP; historical rediscovery is unavailable.')])
         receipt=invoke(h,'evidence.read',use['input'],request_id='native-'+use['toolUseId'])
         value=dict(receipt=receipt,content=h.store.artifact(receipt['output']) if receipt.get('output') else None)
         return dict(toolUseId=use['toolUseId'],status='success' if receipt['execution_status']=='completed' else 'error',content=[dict(text=json.dumps(value))])
@@ -180,12 +185,21 @@ async def converse(h):
             key=state['pilot']['unconsumed_response'];ev=next(e for e in h.store.events(ACTIVITY) if e['kind']=='r3_request' and e['request_id']==key)
             original=h.store.artifact(h.store.artifact(ev['outputs'][0])['request'])
             agent.system_prompt=next(m['content'] for m in original['messages'] if m['role']=='system');return
+        if state['research_status']=='stopped':
+            event.cancel='Original native final disposition sealed; no extra closing provider send';return
         compatibility=h.compatibility()
         if not compatibility['compatible']:
             record(h,'engineering_dependency_checkpoint',compatibility,status='migration_required')
             event.cancel='Committed repair migration required before another provider send';return
         current=packet(h);record(h,'model_decision_packet',current)
         agent.system_prompt=INSTRUCTIONS+'\nCURRENT_RESEARCH_PACKET\n'+json.dumps(current)
+        if current['remaining_budget']['provider_requests']<=4:
+            tools[0].tool_spec={**tools[0].tool_spec,'inputSchema':{'json':CloseoutPlan.model_json_schema()}}
+            from copy import deepcopy
+            schema=deepcopy(tools[1].tool_spec['inputSchema']['json'])
+            schema['$defs']['EvidenceRef']['properties']['artifact_id']['enum']=[r['reference']['artifact_id'] for r in state['results']]
+            tools[1].tool_spec={**tools[1].tool_spec,'inputSchema':{'json':schema}}
+            agent.system_prompt+='\nPROTECTED CLOSEOUT: native plan schema now permits STOP only; evidence reads are restricted to outstanding new-result references. Actual remaining sends are those in remaining_budget, with no separate extra reserve.'
     def before_tool(event):record(h,'model_original_tool_request',dict(tool_use=event.tool_use))
     def after_tool(event):
         record(h,'model_original_tool_feedback',dict(tool_use=event.tool_use,result=event.result))

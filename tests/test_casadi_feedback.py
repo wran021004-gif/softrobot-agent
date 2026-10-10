@@ -9,6 +9,33 @@ from tools.casadi_feedback_worker import assess
 
 
 class PlanTests(unittest.TestCase):
+    def test_failed_initial_batch_can_be_revised_without_missing_replay(self):
+        from types import SimpleNamespace
+        from contextlib import nullcontext
+        import time
+        from tools.casadi_feedback_service import plan
+        from schemas.platform import EvidenceRef
+        ref=dict(artifact_id='a'*64,media_type='application/json')
+        state=dict(research_status='ready',results=[dict(operation='solve',reference=ref,candidate=None)],
+            plans=[dict(action='batch')],batch_counts=dict(initial=2,revision=0),nlp_solves=2,
+            numerical_s=0.,investigation_s=0.,cutoff_unix=time.time()+10000.,refined_grid_supported=True)
+        store=SimpleNamespace(session=lambda *a:dict(state=state),remaining=lambda:dict(remaining=dict(model_calls=10,tool_calls=80,backend_solves=1)),
+            transaction=lambda:nullcontext(None),update_state=lambda *a:None)
+        ctx=SimpleNamespace(store=store,run_id='casadi-feedback-research-20261010',artifact=lambda r:{},
+            save_artifact=lambda *a:EvidenceRef(**ref))
+        args=Plan(action='batch',hypothesis='h',supporting_evidence=[ref],weakening_observation='o',fixed_conditions='f',
+            candidates=[Candidate(substeps=2)],requested_nlp_solves=1,requested_replays=1,revision_or_stop_rule='r',disposition='d',limitations=['l'])
+        self.assertTrue(plan(ctx,args).detail['accepted'])
+        state['plans']=[dict(action='batch')];state['results'][0]['candidate']=ref
+        with self.assertRaisesRegex(ValueError,'AVAILABLE_INITIAL_CANDIDATE_REPLAY'):plan(ctx,args)
+
+    def test_protected_closeout_schema(self):
+        from schemas.casadi_feedback import CloseoutPlan
+        ref=dict(artifact_id='a'*64,media_type='application/json')
+        base=dict(hypothesis='h',supporting_evidence=[ref],weakening_observation='o',fixed_conditions='f',revision_or_stop_rule='r',disposition='d',limitations=['l'])
+        self.assertEqual(CloseoutPlan(action='stop',**base).action,'stop')
+        with self.assertRaises(ValidationError):CloseoutPlan(action='batch',**base)
+
     def test_solver_return_survives_candidate_packaging(self):
         from types import SimpleNamespace
         from unittest.mock import patch

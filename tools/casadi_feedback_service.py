@@ -45,7 +45,10 @@ def plan(ctx,args):
     batch='initial' if not state['plans'] else 'revision'
     if args.action=='batch':
         if sum(p['action']=='batch' for p in state['plans'])>=2:raise ValueError('AT_MOST_TWO_MODEL_BATCHES')
-        if new_results and not any(r['operation']=='replay' for r in new_results):raise ValueError('CONSUME_INITIAL_REPLAY_BEFORE_REVISION')
+        usable=[r['candidate'] for r in new_results if r['operation']=='solve' and r.get('candidate')]
+        replayed=[r.get('source_candidate') for r in new_results if r['operation']=='replay']
+        if any(candidate not in replayed for candidate in usable):
+            raise ValueError('CONSUME_AVAILABLE_INITIAL_CANDIDATE_REPLAY_BEFORE_REVISION')
         needed=len(args.candidates)
         if state['batch_counts'][batch]+needed>2 or state['nlp_solves']+needed>4:raise ValueError('FOUR_SOLVE_CEILING')
         if state['numerical_s']+needed*(RESERVATIONS['solve']+RESERVATIONS['replay'])>7200.:raise ValueError('BATCH_RESERVATION_EXCEEDS_NUMERICAL_ALLOWANCE')
@@ -121,7 +124,8 @@ def dispatch(ctx,args,operation):
     with ctx.store.transaction() as db:
         current=ctx.store.session(ctx.run_id,db)['state'];current['numerical_s']+=elapsed;current.pop('pending',None)
         if operation in ('diagnose','speed'):current['investigation_s']+=elapsed
-        current['results'].append(dict(operation=operation,status=result['status'],reference=plain(ref),candidate=plain(candidate_ref) if candidate_ref else None))
+        current['results'].append(dict(operation=operation,status=result['status'],reference=plain(ref),candidate=plain(candidate_ref) if candidate_ref else None,
+            source_candidate=plain(args.candidate) if operation=='replay' else None))
         if operation=='diagnose':
             comparisons=result.get('comparisons',{});a=comparisons.get('tight_original_vs_tight_refined',{});b=comparisons.get('tight_refined_vs_saved_bdf',{})
             current['refined_grid_supported']=bool(a.get('complete_horizon') and b.get('complete_horizon') and

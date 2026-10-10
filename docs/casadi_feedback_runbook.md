@@ -99,3 +99,14 @@ relaxed feasibility, original feasibility, replay accuracy and physical validati
 as separate findings. Task success, a speedup and a second batch are optional;
 a model-selected execution followed by actual evidence-based revision or STOP
 is required. A blocked live cycle must be labeled incomplete.
+
+The actual 2026-10-10 activity is now STOP with candidate/replay and requested
+revision incomplete; its 24 provider sends are exhausted. See the completion
+report for both implementation failures and the original model STOP text.
+The two initial NLPs really ran but failed candidate export. Delivered recovery
+now saves the solver-return checkpoint before extraction; this cannot recover
+vectors already lost by the old version. Revision requires source-matched replays
+only for initial candidates that actually exist. Final four sends expose a typed
+STOP-only plan schema and new-result-only evidence reads; an accepted STOP cancels
+further sends. These last repairs have focused test coverage and have not been
+validated by an additional live cycle. These commands must not reopen this study.

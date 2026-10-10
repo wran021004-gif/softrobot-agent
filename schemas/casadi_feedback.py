@@ -68,3 +68,12 @@ class Plan(Contract):
 
 class Result(Contract):
     detail: dict
+
+
+class CloseoutPlan(Plan):
+    """The final four sends can consume outstanding results and close only."""
+    action: Literal['stop']
+    candidates: list[Candidate] = Field(default_factory=list,max_length=0)
+    requested_nlp_solves: Literal[0] = 0
+    requested_replays: Literal[0] = 0
+    diagnostic_candidate: None = None
