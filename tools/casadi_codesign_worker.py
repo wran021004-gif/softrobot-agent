@@ -131,7 +131,9 @@ def solve(configuration,args,progress=None):
             units='rad/m' if j<w.n else 'N*m^2/rad'; physical=violation*(10. if j<w.n else .001)
             t=(k+1)*w.h
         else:
-            units='squared norm divided by limit squared';physical=None
+            limit=.02 if c.name.startswith('holding_speed_') else .01
+            units='m/s' if c.name.startswith('holding_speed_') else 'm'
+            physical=max(0.,limit*np.sqrt(max(0.,constraint[i]))-limit)
             t=.35 if c.name=='terminal_position' else int(c.name.rsplit('_',1)[1])*w.h
         largest.append(dict(name=c.name,time_s=t,normalized_violation=violation,physical_violation=physical,units=units))
     largest.sort(key=lambda r:r['normalized_violation'],reverse=True)

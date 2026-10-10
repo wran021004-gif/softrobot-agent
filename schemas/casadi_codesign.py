@@ -34,6 +34,7 @@ class Feedback(Contract):
     design_values: dict = Field(default_factory=dict)
     objective_components: dict = Field(default_factory=dict)
     largest_residuals: list[dict] = Field(default_factory=list)
+    trajectory_metrics: dict = Field(default_factory=dict)
     derivative_check: dict = Field(default_factory=dict)
     replay: dict = Field(default_factory=dict)
     mathematical_feasibility: str = 'not_established'

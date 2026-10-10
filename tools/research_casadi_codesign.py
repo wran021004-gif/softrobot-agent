@@ -128,8 +128,40 @@ def export(h):
     return dict(artifacts=len(manifest),numerical_s=state['casadi_numerical_s'],solves=state['casadi_solves'],ledger=h.store.remaining())
 
 
+def select(h,case):
+    """Persist a returned schedule, without invoking or restarting a solver."""
+    from copy import deepcopy
+    started=time.perf_counter()
+    rows=h.store.session(ACTIVITY)['state']['casadi_results']
+    row=next(row for row in reversed(rows) if row['operation']=='solve' and row['case']==case)
+    result=h.store.artifact(row['reference']);candidate=deepcopy(result['candidate'])
+    selection=dict(source_solver=row['reference'],label='solver_selected_candidate',
+        objective=result['objective_components']['total'],normalized_violation=result['normalized_max_violation'])
+    if not candidate['mathematical_feasible']:
+        points=[p for p in result['diagnostics']['retained_diagnostic_points'] if (p['iteration'] or 0)>0]
+        best=min(points,key=lambda p:p['scaled_violation'])
+        values=dict(zip(result['diagnostics']['variable_order'],best['vector']))
+        n=len(candidate['coordinate_order']);steps=len(candidate['states'])-1;d=values['design/d']
+        candidate.update(d=d,lengths_m=[.16+.0055*d,.11-.0055*d],
+            states=[[values[f'x/{k}/{j}']*(10. if j<n else 1000.) for j in range(2*n)] for k in range(steps+1)],
+            tensions_n=[[values[f'u/{k}/{j}']*8. for j in range(len(candidate['tendon_order']))] for k in range(steps)],
+            mathematical_feasible=best['feasible_at_1e_5'])
+        selection.update(label='least_violating_retained_diagnostic_iterate',iteration=best['iteration'],
+            normalized_violation=best['scaled_violation'],objective=best['objective'])
+    candidate['selection']=selection
+    value=dict(candidate=candidate,problem_identity=result['problem_identity'],implementation=result['implementation'],selection=selection)
+    with h.store.transaction() as db:
+        ref=h.store.put(db,value);elapsed=time.perf_counter()-started
+        state=h.store.session(ACTIVITY,db)['state'];state['casadi_numerical_s']+=elapsed
+        h.store.update_state(db,ACTIVITY,state)
+        h.store.event(db,ACTIVITY,'returned_candidate_selection','completed',inputs=[row['reference']],outputs=[ref],cost={**zero(),'wall_s':elapsed})
+    output=dict(reference=plain(ref),selection=selection)
+    atomic_json(OUT/f'selected_latest_{case}.json',output)
+    return output
+
+
 def main():
-    p=argparse.ArgumentParser();p.add_argument('command',choices=['prepare','bind','migrate','check','solve','replay','status','export','stop'])
+    p=argparse.ArgumentParser();p.add_argument('command',choices=['prepare','bind','migrate','check','solve','select','replay','status','export','stop'])
     p.add_argument('--case',choices=['A','B'],default='A');p.add_argument('--initialization',default='pretension_0_2',choices=['pretension_0_2','ramp_0_2_to_0_4'])
     p.add_argument('--category',default='primary',choices=['primary','paired_second','correction']);p.add_argument('--substeps',type=int,default=1)
     p.add_argument('--candidate');p.add_argument('--request-id');p.add_argument('--reason')
@@ -138,6 +170,7 @@ def main():
     h=prepare() if args.command=='prepare' else host()
     if args.command=='bind':bind(h)
     if args.command=='migrate':migrate(h,args.reason)
+    if args.command=='select':print(json.dumps(select(h,args.case)));return
     if args.command in ('check','solve','replay'):
         arguments=dict(scope=args.scope) if args.command=='check' else dict(case=args.case,initialization=args.initialization,category=args.category,substeps=args.substeps,jacobian_mode=args.jacobian_mode) if args.command=='solve' else dict(candidate=json.loads(args.candidate))
         receipt=invoke(h,'math.casadi_codesign_'+args.command,arguments,request_id=args.request_id or f'{args.command}-{args.case}-{args.initialization}-{args.category}-{args.substeps}')

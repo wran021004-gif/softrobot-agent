@@ -85,6 +85,7 @@ def dispatch(ctx,args,operation):
         evidence_identity=ref.artifact_id,status=result['status'],termination_reason=result['termination_reason'],
         iterations=result.get('iterations',0),design_values=dict(lengths_m=result.get('candidate',candidate or {}).get('lengths_m')) if (result.get('candidate') or candidate) else {},
         objective_components=result.get('objective_components',{}),largest_residuals=result.get('largest_residuals',[]),
+        trajectory_metrics=result.get('trajectory_metrics',{}),
         derivative_check=state.get('casadi_check',{}),replay=result.get('replay',{}),
         mathematical_feasibility=result.get('mathematical_feasibility','not_established'),trajectory=trajectory,
         full_artifacts=[ref,log],consumption=dict(numerical_s=state['casadi_numerical_s'],nlp_invocations=state['casadi_solves'],

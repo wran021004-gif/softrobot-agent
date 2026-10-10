@@ -95,3 +95,45 @@ under the solve ceiling. Subsequent bounded numerical work, replay outcomes,
 physical eligibility, final cumulative costs and push status are added below
 at closeout. No global optimality, physical impossibility, real-time capability,
 motor validation or LLM-organizational advantage is inferred.
+
+The first adaptive Radau replay reached its 900 s process limit without a
+trajectory artifact. Its original unknown event was retained, process absence
+was verified, and the installed Python timeout handler's kill/wait behavior
+was inspected before settling a known failure at 900.023 s. There was no
+automatic repeat of an unresolved outcome. A committed repair used adaptive
+SciPy BDF on the direct dynamics/state-Jacobian graph. An analytic switching
+test verified zero initialization and continuity. Both replacements completed
+the full horizon with finite bounded inputs and no integration failure.
+
+| Primary diagnostic replay | Terminal error, mm | Holding position maximum, mm | Holding speed maximum, m/s | Dense tip disagreement, mm | Dense speed disagreement, m/s | Process seconds |
+|---|---:|---:|---:|---:|---:|---:|
+| A, retained iteration 32 | 4.651 | 4.651 | 0.08382 | 8.648 | 0.10490 | 191.150 |
+| B, retained iteration 12 | 7.617 | 7.617 | 0.12401 | 8.236 | 0.09416 | 160.415 |
+
+The sampled instantaneous holding speed maxima were 0.08207/0.12401 m/s.
+Dense replay used 0.0005 s samples, `rtol=1e-8`, and curvature/rate absolute
+tolerances `1e-9/1e-7`. Disagreement uses linear interpolation of the optimizer's
+tip outputs; node discrepancies are retained separately. No optimizer state
+was used to initialize or reset integration. Neither primary passes the
+1 mm/0.002 m/s replay gates or the holding speed limit. Their replay trajectories
+are diagnostics of infeasible NLP iterates, not validated task solutions.
+
+A single additional derivative-execution check compared exact automatic and
+forced reverse AD on the same assembled transport graph. Its 18,931 Jacobian
+nonzeros agreed within 7.28e-12; the global design column touches 433 rows.
+One point evaluation took 8.932 s automatically versus 30.214 s in forced
+reverse mode. These transport-graph timings are not general solver performance
+claims. This concrete bottleneck justified the two allowed correction solves,
+with identical fresh 0.2 N guesses, original equations/weights, 570 s stopping
+settings and automatic exact AD. No second ramp initialization or random seed
+was introduced.
+
+| Corrected case | Lengths, m | Iterations | Objective | Largest normalized violation | Solve seconds |
+|---|---|---:|---:|---:|---:|
+| A | 0.160000 / 0.110000 | 59 | 0.0140111 | 0.218720, speed at 0.30 s | 573.529 |
+
+Corrected A remains infeasible: terminal error 9.812 mm, holding position
+maximum 9.818 mm, holding speed maximum 0.022079 m/s and force-balance residual
+up to 2.50e-7 N m²/rad. Its effort/weighted variation are
+0.013974686/0.0000363993. Exact Jacobians consumed 550.976 s across 61 calls,
+so changing AD execution improved progress without changing the physics.
