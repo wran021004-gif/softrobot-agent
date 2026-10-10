@@ -148,6 +148,19 @@ def solve(configuration,args,local_ad,saved_tensions=None,progress=None):
     options=dict(max_iterations=1000,tolerance=1e-7,acceptable_tolerance=1e-6,constraint_jacobian_mode='automatic',
         retain_feasible_iterate=True,hessian_approximation='limited-memory',max_cpu_s=570.,max_wall_s=570.,print_level=5)
     solver=IpoptSolver(options);solver.diagnostic_trace=True
+    order=list(problem.variables);names=[c.name for c in problem.constraints]
+    lb,ub,_=solver._bounds(problem,order)
+    dynamics=[i for i,name in enumerate(names) if name.startswith('dynamics_')]
+    positions=[i for i,name in enumerate(names) if name=='terminal_position' or name.startswith('holding_position_')]
+    speeds=[i for i,name in enumerate(names) if name.startswith('holding_speed_')]
+    pi,si=order.index('slack/position'),order.index('slack/speed')
+    controls=np.array([[order.index(f'u/{k}/{j}') for j in range(w.m)] for k in range(35)])
+    def incumbent_rank(x,g):
+        hard=float(max(np.max(np.maximum(np.asarray(lb)-x,x-np.asarray(ub)),initial=0.),np.max(np.abs(g[dynamics]),initial=0.)))
+        pg=max(0.,float(np.max(g[positions]+x[pi])-1.));sg=max(0.,float(np.max(g[speeds]+x[si])-1.))
+        u=x[controls];effort=float(np.mean(u*u)+.1*np.mean(np.diff(u,axis=0)**2))
+        return (hard>1e-5,hard if hard>1e-5 else 0.,max(pg,sg),pg+sg,effort)
+    solver.diagnostic_candidate_rank=incumbent_rank
     if progress:atomic_json(progress,dict(phase='solver_construction',unix=time.time()))
     result=solver.solve(problem);diagnostics=solver.last_diagnostics
     pool=[]

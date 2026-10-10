@@ -55,6 +55,7 @@ def plan(ctx,args):
             if candidate.substeps==2 and not state.get('refined_grid_supported'):raise ValueError('FINER_GRID_REQUIRES_DISCREPANCY_EVIDENCE')
             if candidate.source_candidate:validate_schedule(ctx.artifact(candidate.source_candidate).get('candidate',ctx.artifact(candidate.source_candidate)))
     if args.action=='diagnostic_replay':
+        if ctx.store.remaining()['remaining']['model_calls']<=4:raise ValueError('FINAL_FOUR_PROVIDER_SENDS_PROTECTED')
         if state.get('model_diagnostic_count',0)>=1:raise ValueError('ONE_SUPPORTED_MODEL_DIAGNOSTIC')
         validate_schedule(ctx.artifact(args.diagnostic_candidate).get('candidate',ctx.artifact(args.diagnostic_candidate)))
     ref=ctx.save_artifact(plain(args),'model_plan_original')
@@ -135,7 +136,8 @@ def dispatch(ctx,args,operation):
     if result.get('candidate'):compact['design_values']=dict(d=result['candidate']['d'],lengths_m=result['candidate']['lengths_m'],selection=result['candidate']['selection'])
     return Result(detail=dict(**compact,operation=operation,evidence_reference=plain(ref),candidate_reference=plain(candidate_ref) if candidate_ref else None,
         candidate_identity=digest(result['candidate']) if result.get('candidate') else None,implementation_identity=state['freeze'],
-        remaining_budget=budget(ctx.store),consumption=dict(numerical_s=ctx.store.session(ctx.run_id)['state']['numerical_s'],store=ctx.store.remaining()['used'])))
+        remaining_budget=budget(ctx.store),consumption=dict(numerical_s=ctx.store.session(ctx.run_id)['state']['numerical_s'],
+            process_elapsed_s=elapsed,store=ctx.store.remaining()['used'],store_active_reservation_s=reserve)))
 
 
 def diagnose(ctx,args):return dispatch(ctx,args,'diagnose')

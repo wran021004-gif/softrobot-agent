@@ -24,7 +24,7 @@ from schemas.casadi_feedback import Empty, Solve as ResearchSolve, Replay as Res
 EXTENSIONS += [Extension('math.casadi_feedback_'+name,'tool','1.0.0',schema,Result,
     'tools.casadi_feedback_service:'+name,description,
     sources=EXTENSIONS[0].sources + ('tools/casadi_feedback_service.py','tools/casadi_feedback_worker.py',
-        'tools/research_casadi_feedback.py','schemas/casadi_feedback.py'),
+        'tools/research_casadi_feedback.py','schemas/casadi_feedback.py','tests/test_casadi_feedback.py'),
     assets=EXTENSIONS[0].assets+('examples/casadi_feedback/specification.json',),
     dependencies=('casadi','numpy','scipy'),extension_dependencies=(('model.gvs','1.0.0'),('solver.ipopt','1.0.0')),
     capabilities={'category':'analysis','preflight':'tools.casadi_feedback_service:preflight'},

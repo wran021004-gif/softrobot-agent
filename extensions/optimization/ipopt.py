@@ -56,6 +56,7 @@ class _FeasibleIterate(ca.Callback):
     """Retain an iterate of this solve, never a plan from another initial state."""
     def __init__(self,nx,ng):
         ca.Callback.__init__(self);self.nx=nx;self.ng=ng
+        self.research_rank=None
         self.names=ca.nlpsol_out();self.construct('retain_feasible_iterate')
 
     def get_n_in(self):return ca.nlpsol_n_out()
@@ -86,6 +87,12 @@ class _FeasibleIterate(ca.Callback):
             self.trace.append(dict(iteration=self.iteration,elapsed_s=elapsed,objective=objective,
                 scaled_violation=violation,eligible=bool(np.isfinite(np.r_[x,g,objective]).all() and violation<=1e-5)))
             finite=bool(np.isfinite(np.r_[x,g,objective]).all())
+            if self.iteration>0 and finite and self.research_rank is not None:
+                rank=self.research_rank(x,g)
+                prior=self.checkpoints.get('research_incumbent')
+                if prior is None or rank<prior['research_rank']:
+                    self.checkpoints['research_incumbent']=dict(x=x.copy(),objective=objective,iteration=self.iteration,
+                        elapsed_s=elapsed,scaled_violation=violation,research_rank=rank)
             if self.iteration>0 and finite and violation>1e-5:
                 candidate=dict(x=x.copy(),objective=objective,iteration=self.iteration,
                     elapsed_s=elapsed,scaled_violation=violation)
@@ -170,6 +177,7 @@ class IpoptSolver:
         self.last_diagnostics = None
         self.diagnostic_trace = False
         self.diagnostic_work_cap = None  # Opt-in diagnostics only; production default unchanged.
+        self.diagnostic_candidate_rank = None  # Optional caller-defined rank over existing x/g, no model evaluation.
         self.last_returned_optimum = None
         self._compiled = {}
 
@@ -279,6 +287,7 @@ class IpoptSolver:
         if selector is not None:selector.reset(lbx,ubx,lbg,ubg,solve_start,
             self.parameters.feasible_return if self.diagnostic_work_cap is None else None,
             seed_objective,seed_settled,self.diagnostic_trace,self.diagnostic_work_cap)
+        if selector is not None:selector.research_rank=self.diagnostic_candidate_rank
         if selector is not None and seed_objective is not None and self.parameters.feasible_return is not None:
             selector.best=dict(x=np.asarray(x0),objective=seed_objective,iteration=-1,
                 elapsed_s=0.,scaled_violation=initial_violation,iteration_zero=False,
@@ -376,7 +385,7 @@ class IpoptSolver:
             retain('returned',returned_values,int(stats.get('iter_count',0)),solve_s)
             extras=[]
             if selector is not None and selector.checkpoints is not None:
-                for role in ('best_lower_objective_infeasible','least_infeasible_noninitialization'):
+                for role in ('best_lower_objective_infeasible','least_infeasible_noninitialization','research_incumbent'):
                     candidate=selector.checkpoints.get(role)
                     if candidate is None:continue
                     duplicate=next((row for row in extras if np.array_equal(row['x'],candidate['x'])),None)

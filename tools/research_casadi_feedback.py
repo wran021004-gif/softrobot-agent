@@ -95,7 +95,7 @@ def bind(h,repair=False,reason=None):
         if repair:
             record=dict(previous_commit=state['freeze'],commit=commit,reason=reason,reset_budgets=False,
                 dependencies_changed=[k for k,v in snapshot['dependencies'].items() if old['dependencies'].get(k)!=v])
-            repair_ref=h.store.put(db,record);state.setdefault('repairs',[]).append(plain(repair_ref))
+            repair_ref=h.store.put(db,record);state.setdefault('feedback_repairs',[]).append(plain(repair_ref))
             h.store.event(db,ACTIVITY,'scoped_repair_migration','committed',outputs=[repair_ref])
         state['freeze']=commit;h.store.update_state(db,ACTIVITY,state)
         h.store.event(db,ACTIVITY,'implementation_freeze','committed',outputs=[ref])

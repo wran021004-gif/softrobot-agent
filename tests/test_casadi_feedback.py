@@ -9,6 +9,19 @@ from tools.casadi_feedback_worker import assess
 
 
 class PlanTests(unittest.TestCase):
+    def test_generic_incumbent_keeps_original_gap_rank(self):
+        from extensions.optimization.ipopt import _FeasibleIterate
+        callback=_FeasibleIterate(1,1)
+        callback.reset([0.],[1.],[-np.inf],[1.],0.,trace=True)
+        callback.research_rank=lambda x,g:(float(x[0]),)
+        def invoke(x,objective):
+            args=[ca.DM([x]) if name=='x' else ca.DM([.5]) if name=='g' else ca.DM([objective]) if name=='f'
+                else ca.DM.zeros(callback.get_sparsity_in(i)) for i,name in enumerate(callback.names)]
+            callback.eval(args)
+        invoke(.9,0.);invoke(.8,1.);invoke(.2,9.)
+        self.assertAlmostEqual(callback.checkpoints['research_incumbent']['x'][0],.2)
+        self.assertEqual(callback.checkpoints['research_incumbent']['iteration'],2)
+
     def test_frozen_domains_and_weight_menu(self):
         for kwargs in [dict(design_bounds=(-1.1,1.)),dict(design_bounds=(.1,.2),design_initial=0.),
             dict(position_weight=0.),dict(speed_weight=4.1),dict(secondary_coefficient=.01),
