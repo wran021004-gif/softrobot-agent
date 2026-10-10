@@ -1,4 +1,8 @@
 {
+  "authorization_confirmation_reference": {
+    "artifact_id": "b46b5a23c43cfe9aecf75aa3bc3579899a2a40d2954b8af0b159e06be5f97487",
+    "media_type": "application/json"
+  },
   "candidate_sources": {
     "0e16077e9183ebcd64729eb982aa5a73e5eb03e111d5d7ed402552ca16db345b": {
       "checkpoint": {
@@ -39,6 +43,8 @@
       "source_activity": "casadi-feedback-closeout-20261010"
     }
   },
+  "closeout_status": "accepted_model_stop",
+  "completed_unix": 1791644238.4550261,
   "cutoff_unix": 1791660908,
   "delivery_read_verification_conservative_charge_s": 5.0,
   "dispatched_candidates": [],
@@ -46,20 +52,32 @@
     0.31513409997569397
   ],
   "factual_packet_reference": {
-    "artifact_id": "e2fc7e2a13c2889710065e68b8ca7f63e0baa77d8ff9f29e225cef43d6a3e605",
+    "artifact_id": "9af209c5fba553585565a23e2de0560682c81dd03759eddd3588aac1509f4ecd",
     "media_type": "application/json"
   },
   "feedback_repairs": [
     {
       "artifact_id": "c5c733d044945662211c71cfd761fdfba864353677210808449e5b2b0f76dd53",
       "media_type": "application/json"
+    },
+    {
+      "artifact_id": "d1b6b59ee04d0f6aff32f785109f53dce2cf0b2a4c7fecaf7ca7eb4525d55899",
+      "media_type": "application/json"
+    },
+    {
+      "artifact_id": "a187ced6539315695e956b3eb4f9ded1aba84a27c0f3c3fdb82254d787254bdb",
+      "media_type": "application/json"
     }
   ],
+  "final_disposition": {
+    "artifact_id": "a92b6dbc023d10bf5232ad206265182154df921dc6b1c856d527110b567e9308",
+    "media_type": "application/json"
+  },
   "focused_check_reference": {
     "artifact_id": "d028276d57c167c3b54ef566e208ad140adb412fc36f576d8cd5bebd9f02e78c",
     "media_type": "application/json"
   },
-  "freeze": "c07f2970199ba08c82a5be416c2189f1d0806085",
+  "freeze": "9ab5022a008825f222b761d78e5c1e339945335a",
   "historical": {
     "corrected_A": {
       "artifact_id": "baae52d1f11518a40982491879c4a0ab380c519a617a0588e989a0e496bebbf2",
@@ -122,17 +140,45 @@
   },
   "initialization_diagnosis": true,
   "investigation_s": 0.0,
-  "last_receipt": null,
+  "last_expensive_decision_send": 11,
+  "last_receipt": {
+    "analysis_status": "not_assessed",
+    "cache_hit": false,
+    "caller": "casadi-feedback-research",
+    "charged": {
+      "backend_solves": 0,
+      "model_calls": 0,
+      "tool_calls": 1,
+      "wall_s": 1.297000000020489,
+      "worker_calls": 0
+    },
+    "contract_version": "1.2.0",
+    "error": null,
+    "execution_id": "1503d9decc72426fa3d08b30ac504b1b",
+    "execution_status": "completed",
+    "original_execution_id": null,
+    "output": {
+      "artifact_id": "3e9984e070ebbe04bc86bf4933db6a6aae94e2e7806d0fa6c522c3183b935b43",
+      "media_type": "application/json"
+    },
+    "request_id": "native-call_00_oMxE8q7JXRZ6XaJjLT9E5682",
+    "result_contract": "Result",
+    "result_version": "1.0.0",
+    "solver_status": "not_run",
+    "task_success": null,
+    "tool_id": "math.casadi_feedback_plan",
+    "tool_version": "1.0.0"
+  },
   "local_ad": "reverse",
   "model_notes": [],
   "nlp_solves": 0,
-  "numerical_s": 27.406134099975695,
-  "paired_comparisons": 0,
+  "numerical_s": 114.40143579998008,
+  "paired_comparisons": 1,
   "pending": null,
   "pilot": {
     "activity_id": "nmpc-initialization-20261010",
     "framework_session_id": "nmpc-initialization-20261010",
-    "live_model_requests": 0,
+    "live_model_requests": 13,
     "provider": {
       "adapter": "deepseek",
       "adapter_version": "8.0.0",
@@ -170,18 +216,514 @@
     "request_deadline_unix": 1791660908,
     "started_unix": 1791641108
   },
-  "plans": [],
+  "plans": [
+    {
+      "action": "saved_state_comparison",
+      "batch": null,
+      "reference": {
+        "artifact_id": "9a6bfa17c7382831835405cd62706ed119de1c0ea8d7b54e95843da16aa686d0",
+        "media_type": "application/json"
+      }
+    },
+    {
+      "action": "stop",
+      "batch": null,
+      "reference": {
+        "artifact_id": "a92b6dbc023d10bf5232ad206265182154df921dc6b1c856d527110b567e9308",
+        "media_type": "application/json"
+      }
+    }
+  ],
   "preflight_reference": {
     "artifact_id": "5757ffc594db52133deb220a28138ad7521155e79e8e1297bd8a7252decc1858",
     "media_type": "application/json"
   },
+  "preliminary_projection_complete": true,
+  "preliminary_projection_costs_s": [
+    2.4363137999898754
+  ],
+  "projection_checks": {
+    "20": {
+      "artifact_id": "2e209b3067488272d402bb191b90326474e096046379a753aa3706ca37e39f31",
+      "media_type": "application/json"
+    }
+  },
   "python": "D:/softrobot-agent/.mainline5-env/Scripts/python.exe",
-  "reads": {},
+  "reads": {
+    "8a4da2926ce323817851b996aa6b53606b7274e3a5cec0666a6dda031257c038": {
+      "content_hash": "7d7b62c583d6b2bf57a0ed5f66c69dbd30f8488dbc3a2fdfdaa463d3d15209e5",
+      "kind": "content",
+      "next_offset": 1,
+      "offset": 0,
+      "pointer": "",
+      "source": {
+        "artifact_id": "ae307efd8a8342f61f6d80741633f26d82106fe8afb52b5b35f76bca4bafe950",
+        "media_type": "application/octet-stream"
+      }
+    },
+    "8d99a4de59312b543100c72a2cc181560b1daba50597e5bf25cc3d6b4e9b0c10": {
+      "content_hash": "5354a39ee9520f117524bb6f2e70b47474a3338f3d981b7f788ab5a23c8a5bed",
+      "kind": "content",
+      "next_offset": 1,
+      "offset": 0,
+      "pointer": "",
+      "source": {
+        "artifact_id": "b72a0771e9dcf0a640ec52a2787bed139aa16e5c7ce05b785750f56e66aab892",
+        "media_type": "application/octet-stream"
+      }
+    },
+    "c7af73194d69b3e2c6a8272840c5f7cea0bc1054a62b84d01188128047191210": {
+      "content_hash": "9a5d020fdd45e60c717e23f9b3a4488b23ee7cea88f255d17116683d66d6cd0c",
+      "kind": "content",
+      "next_offset": 20,
+      "offset": 0,
+      "pointer": "/20",
+      "source": {
+        "artifact_id": "b72a0771e9dcf0a640ec52a2787bed139aa16e5c7ce05b785750f56e66aab892",
+        "media_type": "application/octet-stream"
+      }
+    }
+  },
+  "recent_evidence": [
+    {
+      "content_identity": "9188d82af37c34af86bb0d0416fee8f3613d501a364cc3804b484d9b452ed2ab",
+      "page": {
+        "content": {
+          "mode": "gvs_nmpc"
+        },
+        "kind": "content",
+        "next_offset": 1,
+        "offset": 0,
+        "pointer": "",
+        "presentation": "original",
+        "returned_items": 1,
+        "source": {
+          "artifact_id": "ae307efd8a8342f61f6d80741633f26d82106fe8afb52b5b35f76bca4bafe950",
+          "media_type": "application/octet-stream"
+        },
+        "total_items": 13
+      }
+    },
+    {
+      "content_identity": "5ebbb65b0c867f2aa5ed9201082e13868061e456e8713c3cd6b176228bf39e69",
+      "page": {
+        "content": [
+          {
+            "actual_tension_n": [
+              0.2,
+              0.2,
+              0.2,
+              0.2,
+              0.2,
+              0.2
+            ],
+            "controller_boundary_wall_s": 30.25940569996601,
+            "deadline_horizon_preparation_s": 7.099995855242014e-06,
+            "deadline_missed": true,
+            "desired_tension_n": [
+              0.2,
+              0.2,
+              0.2,
+              0.2,
+              0.2,
+              0.2
+            ],
+            "effective_horizon": 10,
+            "failure_response_used": false,
+            "feasibility_recovery": {
+              "attempted": false,
+              "enabled": false,
+              "selected": false,
+              "wall_s": 0.0
+            },
+            "feasible_suboptimal_update": true,
+            "feedback": null,
+            "force_limit_saturated": [
+              false,
+              false,
+              false,
+              false,
+              false,
+              false
+            ],
+            "graph_construction_s": 2.74368500005221,
+            "gvs_projection_residual_max_rad_m": 0.0,
+            "gvs_q": [
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "gvs_qdot": [
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "measured_initial_state": [
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "one_step_prediction": {
+              "applied_tension_n": [
+                0.2,
+                0.2,
+                0.2,
+                0.2,
+                0.2,
+                0.2
+              ],
+              "frame": "world",
+              "integration": "implicit Euler",
+              "prediction_source": "accepted_plan",
+              "state": [
+                0.1566444379757251,
+                -0.006016533594349914,
+                -0.0335620476818371,
+                0.008679737161413376,
+                -0.003300062066848441,
+                -0.0033161519858341277,
+                -0.051267128013126266,
+                -0.02676360758450986,
+                -0.001148926471274795,
+                -0.0022595693323718366,
+                -0.004814589629057317,
+                -0.006097018855152086,
+                15.664443797572508,
+                -0.6016533594349913,
+                -3.3562047681837095,
+                0.8679737161413374,
+                -0.3300062066848442,
+                -0.3316151985834128,
+                -5.126712801312626,
+                -2.676360758450986,
+                -0.11489264712747947,
+                -0.2259569332371836,
+                -0.4814589629057317,
+                -0.6097018855152085
+              ],
+              "substeps": 1,
+              "time_s": 0.01,
+              "tip_position_m": [
+                0.29799746259168225,
+                -1.5501127356100556e-05,
+                0.14887806025289918
+              ],
+              "tip_velocity_m_s": [
+                -0.0005074805316789735,
+                -0.001550117812853952,
+                -0.11219312542174609
+              ]
+            },
+            "optimization_constraint_violation": 5.0459636469213365e-11,
+            "optimization_nonconverged": true,
+            "optimization_raw_status": "User_Requested_Stop",
+            "optimization_returned_violation": 0.024193142707022892,
+            "optimization_selected_iteration": 0,
+            "optimization_solve_s": 15.632484900008421,
+            "optimization_status": "feasible_early_stop",
+            "phase": "current_state_before_integration",
+            "plan_accepted": true,
+            "plan_source": "ipopt_selected",
+            "plan_validation_s": 0.08172580000245944,
+            "policy_stop_reason": "budget_best_feasible",
+            "predicted_tension_n": [
+              0.2,
+              0.2,
+              0.2,
+              0.2,
+              0.2,
+              0.2
+            ],
+            "prediction_timing": {
+              "beyond_task": "Holding continues beyond the task endpoint inside the prediction only; execution duration is unchanged.",
+              "braking_start_s": 0.3,
+              "current_time_s": 0.0,
+              "holding_active": [
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0
+              ],
+              "holding_brake_lead_s": 0.0,
+              "holding_start_s": 0.3,
+              "node_times_s": [
+                0.01,
+                0.02,
+                0.03,
+                0.04,
+                0.05,
+                0.06,
+                0.07,
+                0.08,
+                0.09,
+                0.1
+              ],
+              "task_endpoint_s": 0.35
+            },
+            "recovery_integration_s": 0.0,
+            "recovery_validation_s": 0.0,
+            "recovery_wall_s": 0.0,
+            "requested_tension_n": [
+              0.2,
+              0.2,
+              0.2,
+              0.2,
+              0.2,
+              0.2
+            ],
+            "solver_construction_s": 4.29559239995433,
+            "solver_error": null,
+            "solver_failed": false,
+            "state_preparation_s": 0.0016672000056132674,
+            "stop_requested": false,
+            "tension_tracking_error_n": [
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "time_s": 0.0,
+            "tip_position_m": [
+              0.2979999999999998,
+              0.0,
+              0.15
+            ],
+            "unusable_updates": 0,
+            "update_wall_s": 30.261079900024924,
+            "warm_preparation_s": 10.205457900010515
+          }
+        ],
+        "kind": "content",
+        "next_offset": 1,
+        "offset": 0,
+        "pointer": "",
+        "presentation": "original",
+        "returned_items": 1,
+        "source": {
+          "artifact_id": "b72a0771e9dcf0a640ec52a2787bed139aa16e5c7ce05b785750f56e66aab892",
+          "media_type": "application/octet-stream"
+        },
+        "total_items": 35
+      }
+    },
+    {
+      "content_identity": "76c2b9d5831a4e5ad1217471e452bf295a951ea10d703ebdcdb0380486be9019",
+      "page": {
+        "content": {
+          "desired_tension_n": [
+            0.2,
+            0.2,
+            0.2,
+            0.2,
+            0.2,
+            0.2
+          ],
+          "failure_response_used": false,
+          "feasible_suboptimal_update": true,
+          "force_limit_saturated": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "graph_construction_s": 2.74368500005221,
+          "gvs_q": [
+            5.552010262221193,
+            3.075856601599542,
+            1.3243740492848632,
+            0.6083798183622645,
+            0.3208992127400653,
+            0.13353492782158866,
+            4.233476420569801,
+            2.0382138602166617,
+            0.23001975789263285,
+            -0.5450353239426684,
+            -0.11937549346230933,
+            -0.039347802849884886
+          ],
+          "gvs_qdot": [
+            18.29355381703769,
+            12.142362476045838,
+            6.149897647532867,
+            5.587273396889966,
+            3.5872156531113206,
+            1.829034449328148,
+            30.22496431274106,
+            16.980634941674435,
+            2.6557084950461918,
+            -1.339996056591077,
+            0.874544203013553,
+            0.4200338918345874
+          ],
+          "measured_initial_state": [
+            5.552010262221193,
+            3.075856601599542,
+            1.3243740492848632,
+            0.6083798183622645,
+            0.3208992127400653,
+            0.13353492782158866,
+            4.233476420569801,
+            2.0382138602166617,
+            0.23001975789263285,
+            -0.5450353239426684,
+            -0.11937549346230933,
+            -0.039347802849884886,
+            18.29355381703769,
+            12.142362476045838,
+            6.149897647532867,
+            5.587273396889966,
+            3.5872156531113206,
+            1.829034449328148,
+            30.22496431274106,
+            16.980634941674435,
+            2.6557084950461918,
+            -1.339996056591077,
+            0.874544203013553,
+            0.4200338918345874
+          ],
+          "optimization_constraint_violation": 1.9799266393061288e-11,
+          "optimization_nonconverged": true,
+          "optimization_status": "feasible_early_stop",
+          "phase": "current_state_before_integration",
+          "plan_accepted": true,
+          "predicted_tension_n": [
+            0.2,
+            0.2,
+            0.2,
+            0.2,
+            0.2,
+            0.2
+          ],
+          "requested_tension_n": [
+            0.2,
+            0.2,
+            0.2,
+            0.2,
+            0.2,
+            0.2
+          ],
+          "solver_error": null,
+          "solver_failed": false,
+          "tension_tracking_error_n": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "time_s": 0.2,
+          "tip_position_m": [
+            0.2565512362263784,
+            0.010104721501771852,
+            0.011416548392878043
+          ]
+        },
+        "kind": "content",
+        "next_offset": 20,
+        "offset": 0,
+        "pointer": "/20",
+        "presentation": "original",
+        "returned_items": 20,
+        "source": {
+          "artifact_id": "b72a0771e9dcf0a640ec52a2787bed139aa16e5c7ce05b785750f56e66aab892",
+          "media_type": "application/octet-stream"
+        },
+        "total_items": 46
+      }
+    }
+  ],
   "refined_grid_supported": true,
   "repairs": 0,
   "repeated": 0,
   "replays": 0,
-  "research_status": "ready",
+  "reporting_recoveries": [
+    {
+      "original_failed_receipt": {
+        "analysis_status": "not_assessed",
+        "cache_hit": false,
+        "caller": "casadi-feedback-research",
+        "charged": {
+          "backend_solves": 0,
+          "model_calls": 0,
+          "tool_calls": 1,
+          "wall_s": 81.43699999997625,
+          "worker_calls": 0
+        },
+        "contract_version": "1.2.0",
+        "error": "OPERATION_TIMEOUT_EXCEEDED_AFTER_RETURN",
+        "execution_id": "fba768ddf94c4315810b7ffb2717defe",
+        "execution_status": "failed",
+        "original_execution_id": null,
+        "output": {
+          "artifact_id": "079c216a2f3bedddfd201811c3c49b408dde47aab9c5397a09d7e52fc03a6a6c",
+          "media_type": "application/json"
+        },
+        "request_id": "native-call_00_v29ooG3j0C93I27QGjNx9766-pair",
+        "result_contract": "DiagnosticEvidence",
+        "result_version": "1.0.0",
+        "solver_status": "not_run",
+        "task_success": null,
+        "tool_id": "diagnosis.saved_state_check",
+        "tool_version": "1.0.0"
+      },
+      "reference": {
+        "artifact_id": "abd59b6a25a1dc188ac5b36aabedab1b01e99c2ed494b4bca3e4ee7fa068e171",
+        "media_type": "application/json"
+      }
+    }
+  ],
+  "reporting_repair_test_charge_s": 2.857,
+  "research_status": "stopped",
   "results": [
     {
       "candidate": null,
@@ -309,9 +851,29 @@
       },
       "source_activity": "casadi-nmpc-research-20261010",
       "status": "evaluated"
+    },
+    {
+      "operation": "projection_check",
+      "reference": {
+        "artifact_id": "2e209b3067488272d402bb191b90326474e096046379a753aa3706ca37e39f31",
+        "media_type": "application/json"
+      }
+    },
+    {
+      "operation": "saved_state_comparison",
+      "recovered_from": {
+        "artifact_id": "079c216a2f3bedddfd201811c3c49b408dde47aab9c5397a09d7e52fc03a6a6c",
+        "media_type": "application/json"
+      },
+      "reference": {
+        "artifact_id": "abd59b6a25a1dc188ac5b36aabedab1b01e99c2ed494b4bca3e4ee7fa068e171",
+        "media_type": "application/json"
+      }
     }
   ],
-  "selected_states": [],
+  "selected_states": [
+    20
+  ],
   "source_baseline_reference": {
     "artifact_id": "c98d59c56637081f80228d07f031b13376ff61997fdab85e56f6cd347718c413",
     "media_type": "application/json"

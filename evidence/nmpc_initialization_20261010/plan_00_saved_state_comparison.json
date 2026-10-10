@@ -1,0 +1,37 @@
+{
+  "action": "saved_state_comparison",
+  "candidates": [],
+  "comparison": {
+    "changed_parameter": "feasible_return.budget_s",
+    "changed_value": 30.0,
+    "max_wall_s": 300.0,
+    "update_id": 20
+  },
+  "control": null,
+  "diagnostic_candidate": null,
+  "disposition": "Decision cites the two operation results the run actually returned. The returned closed_loop result (reference c98d59c56637081f80228d07f031b13376ff61997fdab85e56f6cd347718c413, operation \"closed_loop\", execution_id 21b607607bf442a6b6d9494dda897ea8) reports control feedback: initialization_selected 30, accepted_noninitialization_plans 5, stopped plans 31 via budget_best_feasible, early_stopped_plans 31, mean numerical solve 14.216540345717554 s, and optimization_status_counts {feasible_early_stop 31, converged 4}, with the applied tension held at [0.2]6 for updates 0-29 and only changing at time_s 0.30. The returned projection_check result (reference 2e209b3067488272d402bb191b90326474e096046379a753aa3706ca37e39f31, update_id 20, time_s 0.2) reports the reduced-vs-full same-time tip difference 0.004397505013137543 m at the first holding-visible state. Taken together at the first holding-visible state (update_id 20, effective_horizon 10), the recorded solve ends by the feasible-return policy returning the numerically feasible 0.2 N seed, while the same controller escapes it once the horizon shortens. I therefore run exactly the one allowed single-factor budget pair at update_id 20, changing only feasible_return.budget_s (15 vs 30) under a fresh common constant-0.2 N seed with regenerated model states.",
+  "expected_observation": "Baseline arm (feasible_return.budget_s = 15) reproduces at update_id 20 a numerically feasible, seed-returning early stop: optimization_raw_status \"User_Requested_Stop\", optimization_selected_iteration ~0, requested_tension_n = [0.2,0.2,0.2,0.2,0.2,0.2]. Changed arm (30 s) reports either (a) a strictly lower objective with a feasible plan differing from the constant 0.2 N seed (selected_iteration > 0, non-seed requested_tension_n), or (b) an explicit alternative termination (max_cpu_s = 30 cap or relative_seed_improvement) with the actual raw status, iteration count and objective recorded verbatim.",
+  "fixed_conditions": "Frozen two-segment topology, materials, sections, routing, guides, rigid components and payload; 24 mesh cells, structural_linear basis, tendon order near_t0..far_t2; tension bounds [0, 8] N; target [0.29, 0.035, 0.19] m; mount [0,0,0.15] m, quaternion wxyz [1,0,0,0]; gravity [0,0,-9.81]; named zero physical initial state; duration 0.35 s; control/sample 0.01 s; physics step 0.0005 s; seed 17; 35 input switches. Stopping settings held fixed: max_cpu_s = 30, max_iterations = 120, minimum_s = 5, relative_improvement = 0.1, tolerance = 1e-6. Both arms use one new common constant-previous-input seed (constant 0.2 N) with regenerated model states; only feasible_return.budget_s differs (15 vs 30); no historical warm plan is claimed or replayed.",
+  "hypothesis": "At the first holding-visible state (update_id 20, effective_horizon 10), the feasible-return budget is the binding controller stop: the returned closed_loop result shows 31 of 35 plans early-stopped via budget_best_feasible with the 0.2 N seed applied, and the first input change is delayed to time_s 0.30, while the same controller escapes the seed at effective_horizon 5 (relative_seed_improvement) and converges at horizon 4 and below. Raising feasible_return.budget_s to 30 s at the same state and seed will let the optimizer continue past ~15 s and yield a strictly lower-objective, still-feasible plan that differs from the constant 0.2 N seed.",
+  "limitations": [
+    "Historical complete warm starts, raw initial-plan vectors, rejected iterates, scalar objectives and iteration counts were not recorded, so this is a new common-seed pair, not a replay of the recorded solve.",
+    "A 30 s feasible-return budget coincides with the fixed 30 s CPU cap, so if the cap binds the budget factor is not cleanly isolated and the result must be reported as such.",
+    "Numerical feasibility and objective improvement at one state do not establish task acceptance, closed-loop improvement, a unique dominant cause, or structural impossibility.",
+    "The projection_check at state 20 shows a reduced-vs-full-simulator same-time tip difference of 0.004397505013137543 m, so arm comparisons share a discretization/model mismatch that is not itself the tested factor.",
+    "Single-state, single-seed evidence; results are not generalizable to all states, weights, or the full 0.35 s trajectory."
+  ],
+  "requested_nlp_solves": 0,
+  "requested_replays": 0,
+  "revision_or_stop_rule": "At most this one pair at update_id 20 (two local NLP attempts, pair wall <=300 s). If the 30 s arm yields a strictly lower-objective feasible non-seed plan, treat the feasible-return budget as a candidate lever and, before any closed-loop revision, run the one remaining permitted pair (an allowed weight factor) at a second representative state; if it returns the seed or stops at the CPU cap / by relative_seed_improvement, do not conclude the budget is ineffective for other states, report the actual termination reason, and proceed to a diagnostic STOP citing that reason rather than a further budget extension. Never lift max_cpu_s or any other limit.",
+  "supporting_evidence": [
+    {
+      "artifact_id": "c98d59c56637081f80228d07f031b13376ff61997fdab85e56f6cd347718c413",
+      "media_type": "application/json"
+    },
+    {
+      "artifact_id": "2e209b3067488272d402bb191b90326474e096046379a753aa3706ca37e39f31",
+      "media_type": "application/json"
+    }
+  ],
+  "weakening_observation": "If the 30 s-budget arm still returns the constant 0.2 N seed (objective not strictly below baseline, optimization_selected_iteration ~0) or terminates at the unchanged max_cpu_s = 30 cap / by relative_seed_improvement without a better incumbent, then the feasible-return budget is not the binding limitation at this state, and extending it must not be declared effective (nor ineffective for other states)."
+}

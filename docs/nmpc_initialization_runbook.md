@@ -44,7 +44,9 @@ post-step trajectory starts at .01 s.
 
 The pair selects update 1..34, its recorded projected state, preceding applied
 tensions, absolute time and effective horizon. Update zero is excluded explicitly.
-Mutable workspaces are separate. States are regenerated from repeated preceding
+Before model decisions, preparation supplies one factual same-time projection check
+at update20, charged and counted as a representative state. The model selects
+subsequent numerical work. Mutable workspaces are separate. States are regenerated from repeated preceding
 input; this is a new common seed, not historical warm replay. Same-time reduced
 kinematics and velocity are compared with the saved simulator state/Jacobian for
 the selected state. At most two distinct states and two pairs/four attempts are
@@ -64,7 +66,13 @@ Numerical results are saved before downstream presentation. Bounded snapshots
 contain initial/raw-returned/selected and relevant rejected iterates. Feasibility
 checks stay intact. A reporting failure pauses expensive work; recover retained
 artifacts rather than retrying the numerical solve. Commit a scoped repair, then
-use `migrate --reason ...`; the existing clock and counters persist.
+use `migrate --reason ...`; the existing clock and counters persist. The native saved-state operation must
+receive the existing authorized300s pair allowance, independently of the unchanged
+IPOPT CPU30s and feasible-return budget. For the sealed-after-return timeout defect,
+`recover` validates and reuses the original two outputs, preserves the failed receipt,
+and adds a recovery reference for model feedback. It never reruns either solve.
+Commit/migrate first, then recover and resume the same activity. Native rejection
+feedback lists exact required new-result references so STOP can cite all of them.
 
 A revision must explain an observed mechanism, keep the original candidate and
 change one factor. Select up to two previously diagnosed updates for detailed

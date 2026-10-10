@@ -1,0 +1,33 @@
+{
+  "schema": "post_stop_factual_correction_v1",
+  "model_original_disposition": {
+    "artifact_id": "a92b6dbc023d10bf5232ad206265182154df921dc6b1c856d527110b567e9308",
+    "media_type": "application/json"
+  },
+  "original_model_preserved": true,
+  "does_not_reopen_activity": true,
+  "corrections": [
+    {
+      "model_claim": "A redundant re-run returned an engineering failure.",
+      "fact": "Only one paired experiment and two local NLP attempts occurred. The failure is that same experiment reporting under an inherited60s native allowance; its sealed output was recovered without numerical retries.",
+      "source": "calls.json; state.json reporting_recoveries; recovered pair reporting_recovery"
+    },
+    {
+      "model_claim": "30s wall return budget coincides with fixed30s CPU cap; binding obstacle under allowed30s CPU.",
+      "fact": "IPOPT max_cpu_s is a CPU time cap, distinct from the feasible-return wall budget. Both observed actual stops are budget_best_feasible/User_Requested_Stop. Wall30.685s alone is not evidence of a CPU stop. No actual CPU consumption was recorded.",
+      "source": "saved_state_comparison rows termination and parameters"
+    },
+    {
+      "model_claim": "Every improved non-seed candidate remained infeasible; insufficient return time is not the cause.",
+      "fact": "The recorded returned and retained lower-objective/least-infeasible candidates violate dynamics equalities above1e-5; neither run selected a better feasible plan. This establishes the local selected outcome, not all unseen iterates or a unique historical cause. Longer budget reduced raw objective and residuals. Do not generalize this negative selection result as extension being ineffective.",
+      "source": "saved_state_comparison plans verification named_residuals"
+    }
+  ],
+  "actual_disposition": "Model chose STOP after receiving projection and recovered paired feedback; no revision or new simulation. No further provider send.",
+  "unresolved": [
+    "Historical warm-start and unseen iterate behavior",
+    "Other states and factors",
+    "Closed-loop improvement",
+    "Unique/dominant causal attribution"
+  ]
+}

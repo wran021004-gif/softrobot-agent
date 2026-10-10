@@ -1,0 +1,525 @@
+{
+  "study_id": "nmpc-initialization-20261010",
+  "status": "accepted_model_stop",
+  "source_execution": "21b607607bf442a6b6d9494dda897ea8",
+  "source_owner": "casadi-nmpc-research-20261010-cl-afc46a23b0c9",
+  "source_commit": "97aced4e75a6c3c6fecd851ae5bb0dc6be112f18",
+  "implementation_commit": "9ab5022a008825f222b761d78e5c1e339945335a",
+  "tested_factor": "feasible_return.budget_s",
+  "paired_evidence": {
+    "artifact_id": "abd59b6a25a1dc188ac5b36aabedab1b01e99c2ed494b4bca3e4ee7fa068e171",
+    "media_type": "application/json"
+  },
+  "projection_reference": {
+    "artifact_id": "2e209b3067488272d402bb191b90326474e096046379a753aa3706ca37e39f31",
+    "media_type": "application/json"
+  },
+  "model_original_final_disposition": {
+    "artifact_id": "a92b6dbc023d10bf5232ad206265182154df921dc6b1c856d527110b567e9308",
+    "media_type": "application/json"
+  },
+  "post_stop_correction": "post_stop_factual_correction.json",
+  "update_id": 20,
+  "time_s": 0.2,
+  "common_seed": "New constant previous-input seed with dynamics regeneration, no historical warm reconstruction",
+  "pair_complete_cost_s": 78.94831539998995,
+  "native_receipt_cost_s": 81.43699999997625,
+  "reporting_retries": 0,
+  "counts": {
+    "representative_states": 1,
+    "paired_comparisons": 1,
+    "local_nlp_attempts": 2,
+    "actual_provider_sends": 13,
+    "public_calls": 19,
+    "new_mujoco_launches": 0,
+    "new_internal_nmpc_solves": 0,
+    "full_horizon_nlps": 0,
+    "bdf_campaigns": 0,
+    "hardware": 0,
+    "other_models": 0
+  },
+  "scientific_wall_charged_s": 114.40143579998008,
+  "activity_elapsed_to_seal_s": 3130.4550261497498,
+  "ledger": {
+    "limit": {
+      "backend_solves": 1,
+      "model_calls": 16,
+      "tool_calls": 64,
+      "wall_s": 21600.0,
+      "worker_calls": 0
+    },
+    "used": {
+      "tool_calls": 19,
+      "model_calls": 13,
+      "backend_solves": 0,
+      "worker_calls": 0,
+      "wall_s": 3130.2706763744354
+    },
+    "remaining": {
+      "backend_solves": 1,
+      "model_calls": 3,
+      "tool_calls": 45,
+      "wall_s": 18469.729323625565,
+      "worker_calls": 0
+    },
+    "occupied": {}
+  },
+  "rows": [
+    {
+      "label": "baseline",
+      "budget_s": 15.0,
+      "termination": {
+        "actual_stop_reason": "budget_best_feasible",
+        "budget_effect_isolated": true,
+        "feasible_return_budget_s": 15.0,
+        "feasible_return_budget_triggered": true,
+        "interpretation": "Feasible-return budget triggered; interpret only this saved-state comparison.",
+        "iterations": 18,
+        "other_limits_increased": false,
+        "policy_stop_reason": "budget_best_feasible",
+        "policy_stop_s": 15.573852800007444,
+        "raw_return_status": "User_Requested_Stop",
+        "solve_s": 15.583082799974363
+      },
+      "selected_iteration": 0,
+      "selected_first_input_n": [
+        0.2,
+        0.2,
+        0.2,
+        0.2,
+        0.2,
+        0.2
+      ],
+      "selected_objective": 1697.0857483254906,
+      "selected_violation": 2.927345865710862e-14,
+      "raw_objective": 22.306038779879355,
+      "raw_verification": {
+        "elapsed_s": 15.583082799974363,
+        "feasible_at_1e_5": false,
+        "iteration": 18,
+        "label": "returned",
+        "named_residuals": {
+          "dynamics_equalities": {
+            "max_scaled_residual": 0.042687068291809294,
+            "violations_over_1e_5": 120,
+            "worst": {
+              "name": "dynamics_3_13",
+              "scaled_residual": 0.042687068291809294
+            }
+          },
+          "initial_state_consistency": {
+            "max_scaled_residual": 0.0,
+            "violations_over_1e_5": 0,
+            "worst": {
+              "name": "x/0/0",
+              "scaled_residual": 0.0
+            }
+          },
+          "variable_bounds": {
+            "max_scaled_residual": 0.0,
+            "violations_over_1e_5": 0,
+            "worst": {
+              "name": "x/0/0",
+              "scaled_residual": 0.0
+            }
+          }
+        },
+        "objective": 22.30603877987936,
+        "roles": [
+          "returned"
+        ],
+        "scaled_violation": 0.042687068291809294
+      },
+      "retained_least_infeasible": {
+        "metrics": {
+          "deadline": null,
+          "deadline_status": "outside_recorded_horizon",
+          "first_input_n": [
+            6.267139661818884,
+            7.945482022217582,
+            0.031293780639347374,
+            7.986891689736809,
+            7.058024259123453,
+            0.016400288456389245
+          ],
+          "first_step": {
+            "position_error_m": 0.17360070227420166,
+            "time_s": 0.21000000000000002,
+            "tip_speed_m_s": 0.6797949661256409,
+            "tip_velocity_m_s": [
+              0.4483802346287717,
+              0.10931576892634337,
+              0.49912565935649034
+            ]
+          },
+          "horizon_interval_s": [
+            0.2,
+            0.30000000000000004
+          ],
+          "input_max_n": [
+            6.267139661818884,
+            7.945482022217582,
+            7.9476142594377785,
+            7.997967145025648,
+            7.058024259123453,
+            7.9986212988294145
+          ],
+          "input_min_n": [
+            1.6762423178518617,
+            0.2189033299473659,
+            0.031293780639347374,
+            0.0769917976973157,
+            1.412228127707265,
+            0.014985894000763347
+          ],
+          "terminal": {
+            "position_error_m": 0.0076359648235503706,
+            "time_s": 0.30000000000000004,
+            "tip_speed_m_s": 0.13337450264735876,
+            "tip_velocity_m_s": [
+              0.11673972179381184,
+              0.0030666580338519003,
+              0.06442973630581712
+            ]
+          }
+        },
+        "objective_components": {
+          "holding_tip_speed": 0.022235947445537883,
+          "running_curvature_rate": 1.8882782452698577,
+          "running_position": 9.50554937036066,
+          "running_tension": 0.0015531209374604724,
+          "running_tension_variation": 0.003343275800303693,
+          "terminal_curvature_rate": 8.743756534004707,
+          "terminal_position": 2.915397939324932,
+          "terminal_tip_speed": 4.4471894891075765,
+          "total": 27.527303922251033
+        },
+        "verification": {
+          "elapsed_s": 12.437717399967369,
+          "feasible_at_1e_5": false,
+          "iteration": 14,
+          "label": "checkpoint_2",
+          "named_residuals": {
+            "dynamics_equalities": {
+              "max_scaled_residual": 0.013844345207850856,
+              "violations_over_1e_5": 119,
+              "worst": {
+                "name": "dynamics_4_13",
+                "scaled_residual": 0.013844345207850856
+              }
+            },
+            "initial_state_consistency": {
+              "max_scaled_residual": 0.0,
+              "violations_over_1e_5": 0,
+              "worst": {
+                "name": "x/0/0",
+                "scaled_residual": 0.0
+              }
+            },
+            "variable_bounds": {
+              "max_scaled_residual": 0.0,
+              "violations_over_1e_5": 0,
+              "worst": {
+                "name": "x/0/0",
+                "scaled_residual": 0.0
+              }
+            }
+          },
+          "objective": 27.527303922251036,
+          "roles": [
+            "least_infeasible_noninitialization"
+          ],
+          "scaled_violation": 0.013844345207850856
+        }
+      },
+      "selected_predicted_motion": {
+        "deadline": null,
+        "deadline_status": "outside_recorded_horizon",
+        "first_input_n": [
+          0.2,
+          0.2,
+          0.2,
+          0.2,
+          0.2,
+          0.2
+        ],
+        "first_step": {
+          "position_error_m": 0.18335173202642793,
+          "time_s": 0.21000000000000002,
+          "tip_speed_m_s": 0.504787502636009,
+          "tip_velocity_m_s": [
+            -0.29038086061565754,
+            0.1165330778927977,
+            -0.3961179374409092
+          ]
+        },
+        "horizon_interval_s": [
+          0.2,
+          0.30000000000000004
+        ],
+        "input_max_n": [
+          0.2,
+          0.2,
+          0.2,
+          0.2,
+          0.2,
+          0.2
+        ],
+        "input_min_n": [
+          0.2,
+          0.2,
+          0.2,
+          0.2,
+          0.2,
+          0.2
+        ],
+        "terminal": {
+          "position_error_m": 0.18044854420779968,
+          "time_s": 0.30000000000000004,
+          "tip_speed_m_s": 0.36788167193139326,
+          "tip_velocity_m_s": [
+            0.2011371689631054,
+            0.019080502405199647,
+            0.30743568145631633
+          ]
+        }
+      }
+    },
+    {
+      "label": "variant",
+      "budget_s": 30.0,
+      "termination": {
+        "actual_stop_reason": "budget_best_feasible",
+        "budget_effect_isolated": true,
+        "feasible_return_budget_s": 30.0,
+        "feasible_return_budget_triggered": true,
+        "interpretation": "Feasible-return budget triggered; interpret only this saved-state comparison.",
+        "iterations": 37,
+        "other_limits_increased": false,
+        "policy_stop_reason": "budget_best_feasible",
+        "policy_stop_s": 30.676008699985687,
+        "raw_return_status": "User_Requested_Stop",
+        "solve_s": 30.685413100000005
+      },
+      "selected_iteration": 0,
+      "selected_first_input_n": [
+        0.2,
+        0.2,
+        0.2,
+        0.2,
+        0.2,
+        0.2
+      ],
+      "selected_objective": 1697.0857483254906,
+      "selected_violation": 2.927345865710862e-14,
+      "raw_objective": 18.37680755669539,
+      "raw_verification": {
+        "elapsed_s": 30.685413100000005,
+        "feasible_at_1e_5": false,
+        "iteration": 37,
+        "label": "returned",
+        "named_residuals": {
+          "dynamics_equalities": {
+            "max_scaled_residual": 0.0009537607210136773,
+            "violations_over_1e_5": 84,
+            "worst": {
+              "name": "dynamics_5_13",
+              "scaled_residual": 0.0009537607210136773
+            }
+          },
+          "initial_state_consistency": {
+            "max_scaled_residual": 0.0,
+            "violations_over_1e_5": 0,
+            "worst": {
+              "name": "x/0/0",
+              "scaled_residual": 0.0
+            }
+          },
+          "variable_bounds": {
+            "max_scaled_residual": 0.0,
+            "violations_over_1e_5": 0,
+            "worst": {
+              "name": "x/0/0",
+              "scaled_residual": 0.0
+            }
+          }
+        },
+        "objective": 18.37680755669539,
+        "roles": [
+          "returned"
+        ],
+        "scaled_violation": 0.0009537607210136773
+      },
+      "retained_least_infeasible": {
+        "metrics": {
+          "deadline": null,
+          "deadline_status": "outside_recorded_horizon",
+          "first_input_n": [
+            7.861614099699875,
+            7.995139696323546,
+            0.0027496937107574296,
+            7.997712605487566,
+            7.989669872101042,
+            0.0012838135234900256
+          ],
+          "first_step": {
+            "position_error_m": 0.17323547689826316,
+            "time_s": 0.21000000000000002,
+            "tip_speed_m_s": 0.7219746999309696,
+            "tip_velocity_m_s": [
+              0.468701497875581,
+              0.04776822271449675,
+              0.54706907253865
+            ]
+          },
+          "horizon_interval_s": [
+            0.2,
+            0.30000000000000004
+          ],
+          "input_max_n": [
+            7.861614099699875,
+            7.995139696323546,
+            7.99118992113423,
+            7.997712605487566,
+            7.989669872101042,
+            7.982517114608658
+          ],
+          "input_min_n": [
+            0.09813369716832349,
+            0.01192482054604568,
+            0.0027496937107574296,
+            0.09250860506885392,
+            0.032952414920829357,
+            0.0012838135234900256
+          ],
+          "terminal": {
+            "position_error_m": 0.004525815821251759,
+            "time_s": 0.30000000000000004,
+            "tip_speed_m_s": 0.07421940209461991,
+            "tip_velocity_m_s": [
+              0.06313030301216392,
+              0.0068274628987764555,
+              0.03842486485651016
+            ]
+          }
+        },
+        "objective_components": {
+          "holding_tip_speed": 0.00688564955910359,
+          "running_curvature_rate": 2.663149119472314,
+          "running_position": 9.057560044776235,
+          "running_tension": 0.0018025842276727507,
+          "running_tension_variation": 0.006167488733896069,
+          "terminal_curvature_rate": 4.537768670169611,
+          "terminal_position": 1.024150442394637,
+          "terminal_tip_speed": 1.3771299118207179,
+          "total": 18.674613911154182
+        },
+        "verification": {
+          "elapsed_s": 25.07462669996312,
+          "feasible_at_1e_5": false,
+          "iteration": 30,
+          "label": "checkpoint_2",
+          "named_residuals": {
+            "dynamics_equalities": {
+              "max_scaled_residual": 0.0007145889734799793,
+              "violations_over_1e_5": 83,
+              "worst": {
+                "name": "dynamics_4_13",
+                "scaled_residual": 0.0007145889734799793
+              }
+            },
+            "initial_state_consistency": {
+              "max_scaled_residual": 0.0,
+              "violations_over_1e_5": 0,
+              "worst": {
+                "name": "x/0/0",
+                "scaled_residual": 0.0
+              }
+            },
+            "variable_bounds": {
+              "max_scaled_residual": 0.0,
+              "violations_over_1e_5": 0,
+              "worst": {
+                "name": "x/0/0",
+                "scaled_residual": 0.0
+              }
+            }
+          },
+          "objective": 18.674613911154186,
+          "roles": [
+            "least_infeasible_noninitialization"
+          ],
+          "scaled_violation": 0.0007145889734799793
+        }
+      },
+      "selected_predicted_motion": {
+        "deadline": null,
+        "deadline_status": "outside_recorded_horizon",
+        "first_input_n": [
+          0.2,
+          0.2,
+          0.2,
+          0.2,
+          0.2,
+          0.2
+        ],
+        "first_step": {
+          "position_error_m": 0.18335173202642793,
+          "time_s": 0.21000000000000002,
+          "tip_speed_m_s": 0.504787502636009,
+          "tip_velocity_m_s": [
+            -0.29038086061565754,
+            0.1165330778927977,
+            -0.3961179374409092
+          ]
+        },
+        "horizon_interval_s": [
+          0.2,
+          0.30000000000000004
+        ],
+        "input_max_n": [
+          0.2,
+          0.2,
+          0.2,
+          0.2,
+          0.2,
+          0.2
+        ],
+        "input_min_n": [
+          0.2,
+          0.2,
+          0.2,
+          0.2,
+          0.2,
+          0.2
+        ],
+        "terminal": {
+          "position_error_m": 0.18044854420779968,
+          "time_s": 0.30000000000000004,
+          "tip_speed_m_s": 0.36788167193139326,
+          "tip_velocity_m_s": [
+            0.2011371689631054,
+            0.019080502405199647,
+            0.30743568145631633
+          ]
+        }
+      }
+    }
+  ],
+  "outcome": "Returned/retained lower-objective candidates remain infeasible; selected feasible initialization unchanged. Actual stop is budget_best_feasible in both arms. No revision selected, no closed-loop improvement established.",
+  "limits_unchanged": [
+    "max_cpu_s30",
+    "max_iterations120",
+    "minimum_s5",
+    "relative_improvement0.1",
+    "tolerance1e-6",
+    "feasibility_threshold1e-5",
+    "robot/task/physics/acceptance"
+  ],
+  "uncertainties": [
+    "One state/common seed rather than historical warm replay",
+    "Unseen iterates and other states",
+    "Unique historical cause",
+    "Closed-loop improvement"
+  ]
+}

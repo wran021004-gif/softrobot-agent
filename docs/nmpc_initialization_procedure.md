@@ -1,7 +1,11 @@
 # Diagnostic procedure draft: initialization-dominated NMPC
 
 Recommendation only. This procedure has not been validated across executions or
-approved as an engineering-registry strategy. Its source is the
+approved as an engineering-registry strategy. One bounded comparison has now
+been completed: update20 with a new common seed, return budget15 vs30, both actual
+stops budget_best_feasible, raw objective/residual progress but unchanged feasible
+initialization selection. See the [scientific summary](../evidence/nmpc_initialization_20261010/scientific_summary.json).
+No closed-loop revision or improvement was demonstrated. Its source is the
 [saved timeline](../evidence/nmpc_initialization_20261010/saved_timeline.json)
 and original execution `21b607607bf442a6b6d9494dda897ea8`, whose ownership and
 artifact hashes are preserved in the
@@ -50,7 +54,12 @@ artifact hashes are preserved in the
    input variation, aligned prediction errors and complete computation costs.
 10. Stop when the evidence answers the bounded question, the principal chooses
     STOP, a ceiling is reached, or an engineering/interface failure requires repair.
-    Preserve negative results. A local comparison does not establish closed-loop
+    Preserve negative results. Save numerical artifacts before reporting; recover
+    sealed output after an interface failure without repeating solves or resetting
+    counters. Keep the original failed receipt and any model factual correction
+    separately from the original decision. CPU time and wall time differ; equal
+    numerical budget values are not evidence that the CPU cap actually stopped
+    the solver. Retained snapshots do not establish facts about all unseen iterates. A local comparison does not establish closed-loop
     improvement, and an unsuccessful controller does not establish impossibility.
 
 Retain these applicability limits: synchronous simulation latency does not imply
