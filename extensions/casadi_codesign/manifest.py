@@ -18,4 +18,20 @@ EXTENSIONS = [Extension(name,'tool','1.0.0',schema,Feedback,
     for name,schema,binding,description in (
         ('math.casadi_codesign_check',Check,'check','Focused symbolic mechanics and constraint derivative verification.'),
         ('math.casadi_codesign_solve',Solve,'solve','Execute frozen fixed or joint length trajectory NLP with IPOPT.'),
-        ('math.casadi_codesign_replay',Replay,'replay','Independent Radau forward integration of a returned bounded schedule.'))]
+        ('math.casadi_codesign_replay',Replay,'replay','Independent BDF forward integration of a returned bounded schedule.'))]
+
+from schemas.casadi_feedback import Empty, Solve as ResearchSolve, Replay as ResearchReplay, Plan, Result
+EXTENSIONS += [Extension('math.casadi_feedback_'+name,'tool','1.0.0',schema,Result,
+    'tools.casadi_feedback_service:'+name,description,
+    sources=EXTENSIONS[0].sources + ('tools/casadi_feedback_service.py','tools/casadi_feedback_worker.py',
+        'tools/research_casadi_feedback.py','schemas/casadi_feedback.py'),
+    assets=EXTENSIONS[0].assets+('examples/casadi_feedback/specification.json',),
+    dependencies=('casadi','numpy','scipy'),extension_dependencies=(('model.gvs','1.0.0'),('solver.ipopt','1.0.0')),
+    capabilities={'category':'analysis','preflight':'tools.casadi_feedback_service:preflight'},
+    cache=False,side_effects='new cumulative research activity; numerical evidence and model decision')
+    for name,schema,description in (
+        ('diagnose',Empty,'Prescribed corrected-A tight implicit and refined rollout, plus BDF precision check. No search.'),
+        ('speed',Empty,'One local automatic-AD experiment; same saved inputs and exact derivatives. No NLP.'),
+        ('solve',ResearchSolve,'Execute an accepted model plan candidate with shared task slacks, original acceptance and hard residuals.'),
+        ('replay',ResearchReplay,'Independent BDF replay from physical zero; diagnostic schedules permitted.'),
+        ('plan',Plan,'Record model hypothesis, evidence, bounded batch or diagnostic choice, or final STOP.'))]

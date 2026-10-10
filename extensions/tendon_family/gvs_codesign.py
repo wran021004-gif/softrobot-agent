@@ -33,7 +33,7 @@ def parameterized(expr):
 
 
 class Workspace:
-    def __init__(self, configuration, substeps=1):
+    def __init__(self, configuration, substeps=1, local_ad='reverse'):
         started = time.perf_counter()
         self.configuration = configuration
         self.expression = expression(configuration)
@@ -53,11 +53,44 @@ class Workspace:
         previous, following, u = ca.MX.sym('previous', 2*n), ca.MX.sym('following', 2*n), ca.MX.sym('u', m)
         step = ca.vertcat((following[:n]-previous[:n]-h*following[n:])/10.,
             f.implicit_residual(following, u, (following[n:]-previous[n:])/h, d)/.001)
+        self.local_ad = local_ad
         self.step = ca.Function('codesign_step', [previous, following, u, d], [step],
-            {'cse': True, 'ad_weight': 1.})
+            {'cse': True, **({'ad_weight': 1.} if local_ad == 'reverse' else {})})
         self.mechanics_construction_s = time.perf_counter()-started
 
-    def assemble(self, case, initialization):
+    def rollout(self, tension, design, *, abstol=1e-11):
+        """Reconstruct from zero, retaining each tight root residual and failure."""
+        started = time.perf_counter()
+        tension = np.asarray(tension, dtype=float)
+        if tension.shape != (35, self.m) or not np.isfinite(tension).all():
+            raise ValueError('ROLLOUT_REQUIRES_35_FINITE_COMMANDS')
+        y=ca.MX.sym('scaled_following',2*self.n); old=ca.MX.sym('old',2*self.n)
+        uu=ca.MX.sym('uu',self.m); dd=ca.MX.sym('rollout_d')
+        root_fn=ca.Function('guess_residual',[y,old,uu,dd],
+            [self.step(old,y*self.scales,uu,dd)])
+        root=ca.rootfinder('coherent_guess','newton',root_fn,
+            {'abstol':abstol,'max_iter':50,'error_on_fail':True})
+        construction=time.perf_counter()-started
+        states=[np.zeros(2*self.n)]; residuals=[]; failure=None
+        for k in range(self.steps):
+            before=time.perf_counter()
+            try:
+                following=np.asarray(root(states[-1]/self.scales,states[-1],tension[k//self.substeps],design)).ravel()*self.scales
+                residual=np.asarray(self.step(states[-1],following,tension[k//self.substeps],design)).ravel()
+                if not np.isfinite(np.r_[following,residual]).all():raise ValueError('NONFINITE_ROOT')
+                states.append(following)
+                residuals.append(dict(step=k,time_s=(k+1)*self.h,
+                    max_normalized_residual=float(np.max(np.abs(residual))),
+                    kinematic_max_rad_m=float(np.max(np.abs(residual[:self.n]))*10.),
+                    force_balance_max_N_m2_rad=float(np.max(np.abs(residual[self.n:]))*.001),
+                    elapsed_s=time.perf_counter()-before))
+            except Exception as exc:
+                failure=dict(step=k,time_s=(k+1)*self.h,message=str(exc));break
+        return dict(states=np.asarray(states).tolist(),times_s=(np.arange(len(states))*self.h).tolist(),
+            residuals=residuals,failure=failure,status='failed' if failure else 'completed',
+            costs_s=dict(construction=construction,total=time.perf_counter()-started),abstol=abstol)
+
+    def assemble(self, case, initialization, research=None, saved_tensions=None):
         started = time.perf_counter()
         n, m, steps = self.n, self.m, self.steps
         variables, symbols = {}, {}
@@ -65,7 +98,9 @@ class Workspace:
             variables[name] = dict(type='number', bounds=bounds, physical_scale=scale)
             symbols[name] = ca.MX.sym('w_'+str(len(symbols)))
             return symbols[name]*scale
-        d = variable('design/d', [0., 0.] if case=='A' else [-1., 1.])
+        domain = research['design_bounds'] if research else ([0., 0.] if case=='A' else [-1., 1.])
+        design_guess = research['design_initial'] if research else 0.
+        d = variable('design/d', domain)
         X = [ca.vertcat(*[variable(f'x/{k}/{j}', [0.,0.] if k==0 else [None,None], self.scales[j])
             for j in range(2*n)]) for k in range(steps+1)]
         U = [ca.vertcat(*[variable(f'u/{k}/{j}', [0.,1.], 8.) for j in range(m)]) for k in range(35)]
@@ -76,41 +111,52 @@ class Workspace:
         for k in range(steps):
             for j in range(2*n):
                 name=f'dynamics_{k}_{j}'; constraints[name]=residual[j,k]; bounds[name]=(0.,0.)
+        self.research=research
+        sp = variable('slack/position',[0.,None]) if research else 0.
+        sv = variable('slack/speed',[0.,None]) if research else 0.
         target = ca.DM(self.configuration['task']['goal']['data']['target_m'])
         for k in range(30*self.substeps, steps+1):
-            constraints[f'holding_position_{k}']=ca.sumsqr((self.tip(X[k][:n],d)-target)/.01)
-            constraints[f'holding_speed_{k}']=ca.sumsqr(self.velocity(X[k][:n],X[k][n:],d)/.02)
+            constraints[f'holding_position_{k}']=ca.sumsqr((self.tip(X[k][:n],d)-target)/.01)-sp
+            constraints[f'holding_speed_{k}']=ca.sumsqr(self.velocity(X[k][:n],X[k][n:],d)/.02)-sv
             bounds[f'holding_position_{k}']=(None,1.)
             bounds[f'holding_speed_{k}']=(None,1.)
-        constraints['terminal_position']=ca.sumsqr((self.tip(X[-1][:n],d)-target)/.01)
+        constraints['terminal_position']=ca.sumsqr((self.tip(X[-1][:n],d)-target)/.01)-sp
         bounds['terminal_position']=(None,1.)
         effort=sum(ca.sumsqr(u/8.) for u in U)/(35*m)
         variation=.1*sum(ca.sumsqr((b-a)/8.) for a,b in zip(U,U[1:]))/(34*m)
-        bundle, selectors=expression_payload(list(symbols), dict(variables=symbols, expression=effort+variation), constraints)
+        objective=effort+variation
+        if research:
+            objective=research['position_weight']*sp+research['speed_weight']*sv
+            if research['objective_mode']=='task_gap_with_effort':
+                objective+=research['secondary_coefficient']*(effort+variation)
+        bundle, selectors=expression_payload(list(symbols), dict(variables=symbols, expression=objective), constraints)
         self.value=ca.Function.deserialize(bundle.data['serialized_function'])
         self.components=ca.Function('codesign_objective_components', [ca.vertcat(*symbols.values())], [effort,variation])
         # A coherent implicit rollout from the prescribed zero state; no reach
         # constraint or equilibrium fiction enters this reproducible guess.
         tension=np.full((35,m),.2)
         if initialization=='ramp_0_2_to_0_4': tension[:]=np.linspace(.2,.4,35)[:,None]
-        y=ca.MX.sym('scaled_following',2*n); old=ca.MX.sym('old',2*n); uu=ca.MX.sym('uu',m)
-        root_expr=self.step(old,y*self.scales,uu,0.)
-        root_fn=ca.Function('guess_residual',[y,old,uu],[root_expr],{'ad_weight':1.})
-        root=ca.rootfinder('coherent_guess','newton',root_fn,{'abstol':1e-10,'max_iter':50,'error_on_fail':True})
-        states=[np.zeros(2*n)]
-        for k in range(steps):
-            states.append(np.asarray(root(states[-1]/self.scales,states[-1],tension[k//self.substeps])).ravel()*self.scales)
-        states=np.asarray(states)
-        guess={'design/d':0.}
+        if initialization=='saved_schedule':
+            if saved_tensions is None:raise ValueError('SAVED_SCHEDULE_REFERENCE_REQUIRED')
+            tension=np.asarray(saved_tensions,dtype=float)
+        rollout=self.rollout(tension,design_guess,abstol=1e-10)
+        if rollout['failure']:raise ValueError('INITIALIZATION_ROOT_FAILED: '+str(rollout['failure']))
+        states=np.asarray(rollout['states'])
+        guess={'design/d':design_guess}
+        if research:
+            metrics=self.metrics(dict(states=states,times_s=rollout['times_s'],d=design_guess))
+            guess.update({'slack/position':max(0.,(max(metrics['terminal_position_error_m'],metrics['holding_max_position_error_m'])/.01)**2-1.)+1e-4,
+                'slack/speed':max(0.,(metrics['holding_max_speed_m_s']/.02)**2-1.)+1e-4})
         guess.update({f'x/{k}/{j}':float(states[k,j]/self.scales[j]) for k in range(steps+1) for j in range(2*n)})
         guess.update({f'u/{k}/{j}':float(tension[k,j]/8.) for k in range(35) for j in range(m)})
         problem=OptimizationProblem(variables=variables,
-            objective=Objective(metric='normalized_tension_effort_variation',direction='minimize',units='dimensionless'),
+            objective=Objective(metric=research['objective_mode'] if research else 'normalized_tension_effort_variation',direction='minimize',units='dimensionless'),
             objective_function=bundle, constraints=[OptimizationConstraint(name=name,expression=selector,
                 units='normalized',lower=bounds[name][0],upper=bounds[name][1]) for name,selector in zip(constraints,selectors)],
             initial_guess=guess,horizon=35)
         self.assembly_s=time.perf_counter()-started
         self.initial_states=states
+        self.initial_rollout=rollout
         return problem
 
     def decode(self, values):
@@ -132,7 +178,7 @@ class Workspace:
             holding_max_speed_m_s=float(max(np.linalg.norm(speeds[hold],axis=1))))
 
 
-def integrate(functions, tip, velocity, candidate, target, *, dense_period=.0005):
+def integrate(functions, tip, velocity, candidate, target, *, dense_period=.0005, rtol=1e-8, atol_q=1e-9, atol_v=1e-7):
     """Adaptive BDF integration restarted only at input switches, never states."""
     started=time.perf_counter(); n=len(candidate['coordinate_order']); d=candidate['d']
     X=np.asarray(candidate['states']); times=np.asarray(candidate['times_s']); U=np.asarray(candidate['tensions_n'])
@@ -148,8 +194,8 @@ def integrate(functions, tip, velocity, candidate, target, *, dense_period=.0005
     for k,tension in enumerate(U):
         a,b=k*.01,(k+1)*.01
         result=solve_ivp(lambda t,y:np.asarray(rhs_fn(y,tension,d)).ravel(), (a,b),state,
-            method='BDF', jac=lambda t,y:np.asarray(jac_fn(y,tension,d)), rtol=1e-8,
-            atol=np.r_[np.full(n,1e-9),np.full(n,1e-7)], dense_output=True)
+            method='BDF', jac=lambda t,y:np.asarray(jac_fn(y,tension,d)), rtol=rtol,
+            atol=np.r_[np.full(n,atol_q),np.full(n,atol_v)], dense_output=True)
         nfev+=result.nfev; njev+=result.njev; nlu+=result.nlu
         if not result.success:
             failure=dict(interval=k,message=result.message,time_s=float(result.t[-1])); break
@@ -170,8 +216,8 @@ def integrate(functions, tip, velocity, candidate, target, *, dense_period=.0005
     errors=np.linalg.norm(rp-np.asarray(target),axis=1); speed=np.linalg.norm(rv,axis=1)
     hold=rt>=.30-1e-12
     result=dict(status='integration_failed' if failure else 'completed', integration_failure=failure,
-        method='scipy BDF, exact direct-graph state Jacobian, switch-by-switch continuous state', rtol=1e-8,
-        atol_q=1e-9,atol_v=1e-7,dense_period_s=dense_period,
+        method='scipy BDF, exact direct-graph state Jacobian, switch-by-switch continuous state', rtol=rtol,
+        atol_q=atol_q,atol_v=atol_v,dense_period_s=dense_period,
         node_max_tip_disagreement_m=float(np.max(np.linalg.norm(matched_p-op[valid],axis=1))),
         node_max_speed_disagreement_m_s=float(np.max(np.linalg.norm(matched_v-ov[valid],axis=1))),
         dense_max_tip_disagreement_m=float(max(np.linalg.norm(rp-dense_op,axis=1))),
