@@ -761,5 +761,92 @@
     "artifact_id": "6488fdcb4672df1d8a521ca4d99fdcbdf112a75f53a33d1ae835a2766147a5fc",
     "media_type": "application/json"
   },
-  "separate_correction": "evidence/nmpc_feasibility_20261011/post_stop_factual_correction.json"
+  "separate_correction": "evidence/nmpc_feasibility_20261011/post_stop_factual_correction.json",
+  "settling_followup": {
+    "study_id": "nmpc-settling-20261011",
+    "status": "reference_backed_draft",
+    "summary_file": "evidence/nmpc_settling_20261011/scientific_summary.json",
+    "diagnostic_reference": {
+      "artifact_id": "6829111c627768fcf8800054c676c4070b0989e0cfa908143c1e61c846ccf7c8",
+      "media_type": "application/json"
+    },
+    "baseline_reference": {
+      "artifact_id": "a370a238d80c88a23e0a1272d9d288c2d1bea9e073cd231404e594724e280bb5",
+      "media_type": "application/json"
+    },
+    "new_result_references": [
+      {
+        "artifact_id": "21a10d08e03e5cb4d3831f0671daecc0b8acedd31c4de78c2e55eb2e9bd5bdaf",
+        "media_type": "application/json"
+      },
+      {
+        "artifact_id": "12db137c5de38a024cbeb346dd1664bb9d3be161d1b3c023a15bd0e77ed7ab0e",
+        "media_type": "application/json"
+      }
+    ],
+    "confirmed_facts": {
+      "baseline_overspeed_times": [
+        0.3,
+        0.31
+      ],
+      "prediction_overestimates_at_first_hold_nodes": true,
+      "hold_cost_active": true,
+      "new_execution_metrics": [
+        {
+          "role": "development",
+          "reference": {
+            "artifact_id": "21a10d08e03e5cb4d3831f0671daecc0b8acedd31c4de78c2e55eb2e9bd5bdaf",
+            "media_type": "application/json"
+          },
+          "execution_id": "04c93bc37a834ae7b3fd7667ce8e4285",
+          "joint_acceptance": "accepted",
+          "terminal_error_m": 0.0029115629800811425,
+          "holding_max_error_m": 0.0029182520331237703,
+          "holding_max_speed_m_s": 0.00858328732166814,
+          "speed_exceedance_times_s": [],
+          "updates": 35,
+          "recovery": {
+            "attempts": 6,
+            "selected": 6,
+            "failed": 0,
+            "root_solves": 60
+          }
+        },
+        {
+          "role": "exact_confirmation",
+          "reference": {
+            "artifact_id": "12db137c5de38a024cbeb346dd1664bb9d3be161d1b3c023a15bd0e77ed7ab0e",
+            "media_type": "application/json"
+          },
+          "execution_id": "1523bfc7c97647ed85b1e85da6774d79",
+          "joint_acceptance": "valid_failure",
+          "terminal_error_m": 0.003349098993265394,
+          "holding_max_error_m": 0.004354572963672161,
+          "holding_max_speed_m_s": 0.05864844698807774,
+          "speed_exceedance_times_s": [
+            0.32,
+            0.33,
+            0.34,
+            0.35000000000000003
+          ],
+          "updates": 35,
+          "recovery": {
+            "attempts": 10,
+            "selected": 10,
+            "failed": 0,
+            "root_solves": 92
+          }
+        }
+      ]
+    },
+    "scope": "Frozen task and sampled acceptance; one tested speed-weight value, optional exact repeat; not robustness or automatic reuse",
+    "unknowns": [
+      "One tested weight/value does not establish ineffectiveness of all in-range speed weights.",
+      "One development and at most one exact configuration repeat do not establish robustness.",
+      "Complete historical late-iteration and cost decomposition remain unknown.",
+      "Sampled acceptance is not a continuous-time, real-time or hardware guarantee.",
+      "Wall-time based early termination may produce different numerical trajectories on an unchanged repeat."
+    ],
+    "formal_admission": "Not performed; no fabricated approval or automatic reuse"
+  }
 }

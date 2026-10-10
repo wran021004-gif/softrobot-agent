@@ -1,0 +1,946 @@
+[
+  {
+    "update_id": 29,
+    "next_sample_s": 0.3,
+    "baseline_predicted_speed_m_s": 0.02669946384988683,
+    "new_predicted_speed_m_s": 0.01616219363766082,
+    "measured_next_velocity": {
+      "frame": "world",
+      "measured_m_s": [
+        -0.005229113510832916,
+        0.00022569600677447166,
+        0.002134803235839747
+      ],
+      "measured_speed_m_s": 0.005652605740046014,
+      "measurement_method": "deterministically reconstructed J_site(q_backend) @ qdot_backend using sealed robot.xml and recorded serial joint order",
+      "predicted_m_s": [
+        0.008184091831898981,
+        0.0016227583111166673,
+        -0.013842102424559282
+      ],
+      "predicted_speed_m_s": 0.01616219363766082,
+      "prediction_method": "directly recorded accepted first-step endpoint velocity",
+      "scope": "Matched next timestamp and applied input; projected GVS prediction versus full serial-backend endpoint, not full state agreement",
+      "status": "aligned",
+      "vector_difference_norm_m_s": 0.020907591327788
+    },
+    "baseline_full_cost_breakdown": null,
+    "baseline_first_node_costs": {
+      "holding_tip_speed": 0.0008910767123392669,
+      "running_position": 6.24936294947225e-05,
+      "tension": 6.216839788668017e-05,
+      "variation": 2.5789482632444596e-08
+    },
+    "new_full_cost_breakdown": {
+      "running_position": 0.0007797578971943429,
+      "running_curvature_rate": 0.0035536039437599172,
+      "running_tension": 0.0005974681807450429,
+      "running_tension_variation": 6.227298934689868e-08,
+      "terminal_position": 0.03785792990321921,
+      "terminal_curvature_rate": 0.01531606190655311,
+      "terminal_tip_speed": 0.0003512584187389935,
+      "holding_tip_speed": 0.007084658847824945,
+      "total": 0.06554080137102491
+    },
+    "new_plan_summaries": {
+      "initial": {
+        "verification": {
+          "label": "initial",
+          "roles": [
+            "initial"
+          ],
+          "iteration": -1,
+          "elapsed_s": 0.0,
+          "objective": 0.09442560208396987,
+          "scaled_violation": 6.684895150453618e-11,
+          "feasible_at_1e_5": true,
+          "named_residuals": {
+            "initial_state_consistency": {
+              "max_scaled_residual": 0.0,
+              "violations_over_1e_5": 0,
+              "worst": {
+                "name": "x/0/0",
+                "scaled_residual": 0.0
+              }
+            },
+            "dynamics_equalities": {
+              "max_scaled_residual": 6.684895150453618e-11,
+              "violations_over_1e_5": 0,
+              "worst": {
+                "name": "dynamics_0_16",
+                "scaled_residual": 6.684895150453618e-11
+              }
+            },
+            "variable_bounds": {
+              "max_scaled_residual": 0.0,
+              "violations_over_1e_5": 0,
+              "worst": {
+                "name": "x/0/0",
+                "scaled_residual": 0.0
+              }
+            }
+          }
+        },
+        "first_step": {
+          "time_s": 0.3,
+          "position_error_m": 0.0016003733997819653,
+          "tip_position_m": [
+            0.2885949631957177,
+            0.03492297066000618,
+            0.19076232084985395
+          ],
+          "tip_velocity_m_s": [
+            0.004692723685754018,
+            0.0040937058734192,
+            -0.008095476214901788
+          ],
+          "tip_speed_m_s": 0.010213560520941961
+        },
+        "terminal": {
+          "time_s": 0.35,
+          "position_error_m": 0.0009682748804999767,
+          "tip_position_m": [
+            0.28904028543784166,
+            0.03510820613834253,
+            0.19006925052356125
+          ],
+          "tip_velocity_m_s": [
+            0.0047295602026428555,
+            0.00377021344000755,
+            -0.007603365703153024
+          ],
+          "tip_speed_m_s": 0.009715679034916724
+        }
+      },
+      "selected": {
+        "verification": {
+          "label": "selected",
+          "roles": [
+            "selected"
+          ],
+          "iteration": 6,
+          "elapsed_s": 5.215716500009876,
+          "objective": 0.06554080137102491,
+          "scaled_violation": 3.922418272562372e-06,
+          "feasible_at_1e_5": true,
+          "named_residuals": {
+            "initial_state_consistency": {
+              "max_scaled_residual": 0.0,
+              "violations_over_1e_5": 0,
+              "worst": {
+                "name": "x/0/0",
+                "scaled_residual": 0.0
+              }
+            },
+            "dynamics_equalities": {
+              "max_scaled_residual": 3.922418272562372e-06,
+              "violations_over_1e_5": 0,
+              "worst": {
+                "name": "dynamics_5_13",
+                "scaled_residual": 3.922418272562372e-06
+              }
+            },
+            "variable_bounds": {
+              "max_scaled_residual": 0.0,
+              "violations_over_1e_5": 0,
+              "worst": {
+                "name": "x/0/0",
+                "scaled_residual": 0.0
+              }
+            }
+          }
+        },
+        "first_step": {
+          "time_s": 0.3,
+          "position_error_m": 0.001544089562471899,
+          "tip_position_m": [
+            0.2886299538798728,
+            0.03489827299110381,
+            0.1907048672366624
+          ],
+          "tip_velocity_m_s": [
+            0.008184091831898981,
+            0.0016227583111166673,
+            -0.013842102424559282
+          ],
+          "tip_speed_m_s": 0.01616219363766082
+        },
+        "terminal": {
+          "time_s": 0.35,
+          "position_error_m": 0.0008701486068852747,
+          "tip_position_m": [
+            0.2891531197983384,
+            0.034868279722260594,
+            0.18984965941821885
+          ],
+          "tip_velocity_m_s": [
+            0.001155266127968268,
+            -0.000190267446383521,
+            -0.00018491118779531256
+          ],
+          "tip_speed_m_s": 0.0011853411639506889
+        }
+      },
+      "returned": {
+        "verification": {
+          "label": "returned",
+          "roles": [
+            "returned"
+          ],
+          "iteration": 6,
+          "elapsed_s": 5.221440199995413,
+          "objective": 0.06554080137102491,
+          "scaled_violation": 3.922418272562372e-06,
+          "feasible_at_1e_5": true,
+          "named_residuals": {
+            "initial_state_consistency": {
+              "max_scaled_residual": 0.0,
+              "violations_over_1e_5": 0,
+              "worst": {
+                "name": "x/0/0",
+                "scaled_residual": 0.0
+              }
+            },
+            "dynamics_equalities": {
+              "max_scaled_residual": 3.922418272562372e-06,
+              "violations_over_1e_5": 0,
+              "worst": {
+                "name": "dynamics_5_13",
+                "scaled_residual": 3.922418272562372e-06
+              }
+            },
+            "variable_bounds": {
+              "max_scaled_residual": 0.0,
+              "violations_over_1e_5": 0,
+              "worst": {
+                "name": "x/0/0",
+                "scaled_residual": 0.0
+              }
+            }
+          }
+        },
+        "first_step": {
+          "time_s": 0.3,
+          "position_error_m": 0.001544089562471899,
+          "tip_position_m": [
+            0.2886299538798728,
+            0.03489827299110381,
+            0.1907048672366624
+          ],
+          "tip_velocity_m_s": [
+            0.008184091831898981,
+            0.0016227583111166673,
+            -0.013842102424559282
+          ],
+          "tip_speed_m_s": 0.01616219363766082
+        },
+        "terminal": {
+          "time_s": 0.35,
+          "position_error_m": 0.0008701486068852747,
+          "tip_position_m": [
+            0.2891531197983384,
+            0.034868279722260594,
+            0.18984965941821885
+          ],
+          "tip_velocity_m_s": [
+            0.001155266127968268,
+            -0.000190267446383521,
+            -0.00018491118779531256
+          ],
+          "tip_speed_m_s": 0.0011853411639506889
+        }
+      },
+      "checkpoint_1": {
+        "verification": {
+          "label": "checkpoint_1",
+          "roles": [
+            "best_lower_objective_infeasible"
+          ],
+          "iteration": 4,
+          "elapsed_s": 4.321010000014212,
+          "objective": 0.06642390036456464,
+          "scaled_violation": 1.1122373340516074e-05,
+          "feasible_at_1e_5": false,
+          "named_residuals": {
+            "initial_state_consistency": {
+              "max_scaled_residual": 0.0,
+              "violations_over_1e_5": 0,
+              "worst": {
+                "name": "x/0/0",
+                "scaled_residual": 0.0
+              }
+            },
+            "dynamics_equalities": {
+              "max_scaled_residual": 1.1122373340516074e-05,
+              "violations_over_1e_5": 2,
+              "worst": {
+                "name": "dynamics_1_13",
+                "scaled_residual": 1.1122373340516074e-05
+              }
+            },
+            "variable_bounds": {
+              "max_scaled_residual": 0.0,
+              "violations_over_1e_5": 0,
+              "worst": {
+                "name": "x/0/0",
+                "scaled_residual": 0.0
+              }
+            }
+          }
+        },
+        "first_step": {
+          "time_s": 0.3,
+          "position_error_m": 0.0015529065429055852,
+          "tip_position_m": [
+            0.28862404632681915,
+            0.03490275092020929,
+            0.19071331117805557
+          ],
+          "tip_velocity_m_s": [
+            0.007594890177713105,
+            0.0020707108082142446,
+            -0.012997296634747845
+          ],
+          "tip_speed_m_s": 0.015195391402474829
+        },
+        "terminal": {
+          "time_s": 0.35,
+          "position_error_m": 0.0008828655409944597,
+          "tip_position_m": [
+            0.28912981356711775,
+            0.034911803872934334,
+            0.18987979775928143
+          ],
+          "tip_velocity_m_s": [
+            0.0012540258835110171,
+            0.000692443837147194,
+            -0.0007987057522432243
+          ],
+          "tip_speed_m_s": 0.0016401189782406433
+        }
+      },
+      "checkpoint_2": {
+        "verification": {
+          "label": "checkpoint_2",
+          "roles": [
+            "least_infeasible_noninitialization"
+          ],
+          "iteration": 5,
+          "elapsed_s": 4.765989999985322,
+          "objective": 0.07019924657379542,
+          "scaled_violation": 1.028921811833494e-05,
+          "feasible_at_1e_5": false,
+          "named_residuals": {
+            "initial_state_consistency": {
+              "max_scaled_residual": 0.0,
+              "violations_over_1e_5": 0,
+              "worst": {
+                "name": "x/0/0",
+                "scaled_residual": 0.0
+              }
+            },
+            "dynamics_equalities": {
+              "max_scaled_residual": 1.028921811833494e-05,
+              "violations_over_1e_5": 1,
+              "worst": {
+                "name": "dynamics_5_13",
+                "scaled_residual": 1.028921811833494e-05
+              }
+            },
+            "variable_bounds": {
+              "max_scaled_residual": 0.0,
+              "violations_over_1e_5": 0,
+              "worst": {
+                "name": "x/0/0",
+                "scaled_residual": 0.0
+              }
+            }
+          }
+        },
+        "first_step": {
+          "time_s": 0.3,
+          "position_error_m": 0.0015321437527120855,
+          "tip_position_m": [
+            0.2886380861793908,
+            0.03488879447176275,
+            0.19069302853815542
+          ],
+          "tip_velocity_m_s": [
+            0.008994518661165499,
+            0.0006741997617465268,
+            -0.015026650503160212
+          ],
+          "tip_speed_m_s": 0.01752587049504014
+        },
+        "terminal": {
+          "time_s": 0.35,
+          "position_error_m": 0.0008682541557081824,
+          "tip_position_m": [
+            0.28920332668193044,
+            0.03473919831703951,
+            0.18977381559438022
+          ],
+          "tip_velocity_m_s": [
+            0.0015383751671505465,
+            -0.0035478684434005086,
+            -0.00023917139263796326
+          ],
+          "tip_speed_m_s": 0.003874425325340392
+        }
+      },
+      "delivered": {
+        "verification": {
+          "objective": 0.06554080137102491,
+          "scaled_violation": 3.922418272562372e-06,
+          "named_residuals": {
+            "initial_state_consistency": {
+              "max_scaled_residual": 0.0,
+              "violations_over_1e_5": 0,
+              "worst": {
+                "name": "x/0/0",
+                "scaled_residual": 0.0
+              }
+            },
+            "dynamics_equalities": {
+              "max_scaled_residual": 3.922418272562372e-06,
+              "violations_over_1e_5": 0,
+              "worst": {
+                "name": "dynamics_5_13",
+                "scaled_residual": 3.922418272562372e-06
+              }
+            },
+            "variable_bounds": {
+              "max_scaled_residual": 0.0,
+              "violations_over_1e_5": 0,
+              "worst": {
+                "name": "x/0/0",
+                "scaled_residual": 0.0
+              }
+            }
+          },
+          "feasible": true
+        },
+        "first_step": {
+          "time_s": 0.3,
+          "position_error_m": 0.001544089562471899,
+          "tip_position_m": [
+            0.2886299538798728,
+            0.03489827299110381,
+            0.1907048672366624
+          ],
+          "tip_velocity_m_s": [
+            0.008184091831898981,
+            0.0016227583111166673,
+            -0.013842102424559282
+          ],
+          "tip_speed_m_s": 0.01616219363766082
+        },
+        "terminal": {
+          "time_s": 0.35,
+          "position_error_m": 0.0008701486068852747,
+          "tip_position_m": [
+            0.2891531197983384,
+            0.034868279722260594,
+            0.18984965941821885
+          ],
+          "tip_velocity_m_s": [
+            0.001155266127968268,
+            -0.000190267446383521,
+            -0.00018491118779531256
+          ],
+          "tip_speed_m_s": 0.0011853411639506889
+        }
+      }
+    },
+    "raw_solver": {
+      "accepted": true,
+      "selected_iteration": 6,
+      "ipopt_selected_iteration": 6,
+      "delivered_plan": "delivered",
+      "source": "ipopt_selected",
+      "reason": "relative_seed_improvement",
+      "raw_stop": "User_Requested_Stop"
+    },
+    "actual_applied_input_n": [
+      4.984428166287959,
+      5.4939610371376695,
+      2.2941972267672894,
+      4.082690147584879,
+      3.4342253748950293,
+      3.274394553664687
+    ],
+    "cross_weight_total_objective_ranking_performed": false
+  },
+  {
+    "update_id": 30,
+    "next_sample_s": 0.31,
+    "baseline_predicted_speed_m_s": 0.03133029630420272,
+    "new_predicted_speed_m_s": 0.028482369425458617,
+    "measured_next_velocity": {
+      "frame": "world",
+      "measured_m_s": [
+        0.001462721503190191,
+        -0.0014166088299557111,
+        -0.009768562933855187
+      ],
+      "measured_speed_m_s": 0.009978534790523753,
+      "measurement_method": "deterministically reconstructed J_site(q_backend) @ qdot_backend using sealed robot.xml and recorded serial joint order",
+      "predicted_m_s": [
+        0.014147180417791968,
+        6.210415172746967e-05,
+        -0.024720412565106625
+      ],
+      "predicted_speed_m_s": 0.028482369425458617,
+      "prediction_method": "directly recorded accepted first-step endpoint velocity",
+      "scope": "Matched next timestamp and applied input; projected GVS prediction versus full serial-backend endpoint, not full state agreement",
+      "status": "aligned",
+      "vector_difference_norm_m_s": 0.019663160921733123
+    },
+    "baseline_full_cost_breakdown": null,
+    "baseline_first_node_costs": {
+      "holding_tip_speed": 0.0012269843331364232,
+      "running_position": 3.968675920229651e-05,
+      "tension": 6.209623743773848e-05,
+      "variation": 1.3933347681927665e-08
+    },
+    "new_full_cost_breakdown": {
+      "running_position": 0.0006424655932374721,
+      "running_curvature_rate": 0.003523770333511663,
+      "running_tension": 0.0004985995180868764,
+      "running_tension_variation": 1.5054287029182395e-07,
+      "terminal_position": 0.04072216159446025,
+      "terminal_curvature_rate": 0.021307516598292605,
+      "terminal_tip_speed": 0.0008593645676338917,
+      "holding_tip_speed": 0.01046878831690037,
+      "total": 0.07802281706499342
+    },
+    "new_plan_summaries": {
+      "initial": {
+        "verification": {
+          "label": "initial",
+          "roles": [
+            "initial"
+          ],
+          "iteration": -1,
+          "elapsed_s": 0.0,
+          "objective": 0.08576615631475606,
+          "scaled_violation": 5.872398108151128e-11,
+          "feasible_at_1e_5": true,
+          "named_residuals": {
+            "initial_state_consistency": {
+              "max_scaled_residual": 0.0,
+              "violations_over_1e_5": 0,
+              "worst": {
+                "name": "x/0/0",
+                "scaled_residual": 0.0
+              }
+            },
+            "dynamics_equalities": {
+              "max_scaled_residual": 5.872398108151128e-11,
+              "violations_over_1e_5": 0,
+              "worst": {
+                "name": "dynamics_0_16",
+                "scaled_residual": 5.872398108151128e-11
+              }
+            },
+            "variable_bounds": {
+              "max_scaled_residual": 0.0,
+              "violations_over_1e_5": 0,
+              "worst": {
+                "name": "x/0/0",
+                "scaled_residual": 0.0
+              }
+            }
+          }
+        },
+        "first_step": {
+          "time_s": 0.31,
+          "position_error_m": 0.0015807332992002117,
+          "tip_position_m": [
+            0.2885883977031243,
+            0.03490499474343528,
+            0.19070503242470166
+          ],
+          "tip_velocity_m_s": [
+            0.009991581855622766,
+            0.0006074772538910331,
+            -0.017670944312815635
+          ],
+          "tip_speed_m_s": 0.020309185347970913
+        },
+        "terminal": {
+          "time_s": 0.35,
+          "position_error_m": 0.000983431108134277,
+          "tip_position_m": [
+            0.28902124996716966,
+            0.0349044348791641,
+            0.18999275946407546
+          ],
+          "tip_velocity_m_s": [
+            0.00287203100634371,
+            0.0008884479867965309,
+            -0.002964752430941307
+          ],
+          "tip_speed_m_s": 0.004222281243997711
+        }
+      },
+      "selected": {
+        "verification": {
+          "label": "selected",
+          "roles": [
+            "selected"
+          ],
+          "iteration": 6,
+          "elapsed_s": 4.514096699946094,
+          "objective": 0.07802281706499342,
+          "scaled_violation": 8.312076305097628e-06,
+          "feasible_at_1e_5": true,
+          "named_residuals": {
+            "initial_state_consistency": {
+              "max_scaled_residual": 0.0,
+              "violations_over_1e_5": 0,
+              "worst": {
+                "name": "x/0/0",
+                "scaled_residual": 0.0
+              }
+            },
+            "dynamics_equalities": {
+              "max_scaled_residual": 8.312076305097628e-06,
+              "violations_over_1e_5": 0,
+              "worst": {
+                "name": "dynamics_4_16",
+                "scaled_residual": 8.312076305097628e-06
+              }
+            },
+            "variable_bounds": {
+              "max_scaled_residual": 0.0,
+              "violations_over_1e_5": 0,
+              "worst": {
+                "name": "x/0/0",
+                "scaled_residual": 0.0
+              }
+            }
+          }
+        },
+        "first_step": {
+          "time_s": 0.31,
+          "position_error_m": 0.0015129878899861372,
+          "tip_position_m": [
+            0.2886302244739939,
+            0.03489957742032905,
+            0.1906346358555043
+          ],
+          "tip_velocity_m_s": [
+            0.014147180417791968,
+            6.210415172746967e-05,
+            -0.024720412565106625
+          ],
+          "tip_speed_m_s": 0.028482369425458617
+        },
+        "terminal": {
+          "time_s": 0.35,
+          "position_error_m": 0.0009024650862438973,
+          "tip_position_m": [
+            0.28913169468181,
+            0.03487759583484878,
+            0.18978667788055192
+          ],
+          "tip_velocity_m_s": [
+            0.001804205996890638,
+            0.00036215227744534786,
+            0.00022615198265894714
+          ],
+          "tip_speed_m_s": 0.0018540383681400895
+        }
+      },
+      "returned": {
+        "verification": {
+          "label": "returned",
+          "roles": [
+            "returned"
+          ],
+          "iteration": 32,
+          "elapsed_s": 15.00970369996503,
+          "objective": 0.1984755338826637,
+          "scaled_violation": 0.008274166197105403,
+          "feasible_at_1e_5": false,
+          "named_residuals": {
+            "initial_state_consistency": {
+              "max_scaled_residual": 0.0,
+              "violations_over_1e_5": 0,
+              "worst": {
+                "name": "x/0/0",
+                "scaled_residual": 0.0
+              }
+            },
+            "dynamics_equalities": {
+              "max_scaled_residual": 0.008274166197105403,
+              "violations_over_1e_5": 59,
+              "worst": {
+                "name": "dynamics_4_16",
+                "scaled_residual": 0.008274166197105403
+              }
+            },
+            "variable_bounds": {
+              "max_scaled_residual": 0.0,
+              "violations_over_1e_5": 0,
+              "worst": {
+                "name": "x/0/0",
+                "scaled_residual": 0.0
+              }
+            }
+          }
+        },
+        "first_step": {
+          "time_s": 0.31,
+          "position_error_m": 0.0012656559571005053,
+          "tip_position_m": [
+            0.28886588326606,
+            0.03486544856137702,
+            0.1905454907386068
+          ],
+          "tip_velocity_m_s": [
+            0.0367891883965729,
+            -0.003476188311507835,
+            -0.03397518908966735
+          ],
+          "tip_speed_m_s": 0.05019802527723825
+        },
+        "terminal": {
+          "time_s": 0.35,
+          "position_error_m": 0.0010782322794624397,
+          "tip_position_m": [
+            0.28901218073776036,
+            0.03458652287449132,
+            0.190125835687721
+          ],
+          "tip_velocity_m_s": [
+            -0.009486459734432772,
+            0.005814487882710795,
+            0.004225285590167054
+          ],
+          "tip_speed_m_s": 0.011901858088117095
+        }
+      },
+      "checkpoint_1": {
+        "verification": {
+          "label": "checkpoint_1",
+          "roles": [
+            "best_lower_objective_infeasible"
+          ],
+          "iteration": 13,
+          "elapsed_s": 7.2863739999593236,
+          "objective": 0.06436886303241832,
+          "scaled_violation": 0.006631562182840805,
+          "feasible_at_1e_5": false,
+          "named_residuals": {
+            "initial_state_consistency": {
+              "max_scaled_residual": 0.0,
+              "violations_over_1e_5": 0,
+              "worst": {
+                "name": "x/0/0",
+                "scaled_residual": 0.0
+              }
+            },
+            "dynamics_equalities": {
+              "max_scaled_residual": 0.006631562182840805,
+              "violations_over_1e_5": 58,
+              "worst": {
+                "name": "dynamics_4_13",
+                "scaled_residual": 0.006631562182840805
+              }
+            },
+            "variable_bounds": {
+              "max_scaled_residual": 0.0,
+              "violations_over_1e_5": 0,
+              "worst": {
+                "name": "x/0/0",
+                "scaled_residual": 0.0
+              }
+            }
+          }
+        },
+        "first_step": {
+          "time_s": 0.31,
+          "position_error_m": 0.0014237425619528213,
+          "tip_position_m": [
+            0.28872633400616543,
+            0.034897076213210546,
+            0.1906278730070471
+          ],
+          "tip_velocity_m_s": [
+            0.023529838827688256,
+            -0.00020837085082348224,
+            -0.02548603019669482
+          ],
+          "tip_speed_m_s": 0.03468767027137019
+        },
+        "terminal": {
+          "time_s": 0.35,
+          "position_error_m": 0.0005658811132369347,
+          "tip_position_m": [
+            0.28945164878290514,
+            0.03493504573339434,
+            0.1898762529989107
+          ],
+          "tip_velocity_m_s": [
+            0.0034380182801237863,
+            0.0006441227108932898,
+            0.0019029766669780442
+          ],
+          "tip_speed_m_s": 0.003981982415357545
+        }
+      },
+      "checkpoint_2": {
+        "verification": {
+          "label": "checkpoint_2",
+          "roles": [
+            "least_infeasible_noninitialization"
+          ],
+          "iteration": 5,
+          "elapsed_s": 4.13614629994845,
+          "objective": 0.08024331495068211,
+          "scaled_violation": 1.1877576467492538e-05,
+          "feasible_at_1e_5": false,
+          "named_residuals": {
+            "initial_state_consistency": {
+              "max_scaled_residual": 0.0,
+              "violations_over_1e_5": 0,
+              "worst": {
+                "name": "x/0/0",
+                "scaled_residual": 0.0
+              }
+            },
+            "dynamics_equalities": {
+              "max_scaled_residual": 1.1877576467492538e-05,
+              "violations_over_1e_5": 1,
+              "worst": {
+                "name": "dynamics_0_13",
+                "scaled_residual": 1.1877576467492538e-05
+              }
+            },
+            "variable_bounds": {
+              "max_scaled_residual": 0.0,
+              "violations_over_1e_5": 0,
+              "worst": {
+                "name": "x/0/0",
+                "scaled_residual": 0.0
+              }
+            }
+          }
+        },
+        "first_step": {
+          "time_s": 0.31,
+          "position_error_m": 0.0015228101158012077,
+          "tip_position_m": [
+            0.28862301512124355,
+            0.03490295282845756,
+            0.1906429969976277
+          ],
+          "tip_velocity_m_s": [
+            0.013431341261480446,
+            0.0004001174647456358,
+            -0.02388219561899749
+          ],
+          "tip_speed_m_s": 0.027402924837542517
+        },
+        "terminal": {
+          "time_s": 0.35,
+          "position_error_m": 0.0009204821372506765,
+          "tip_position_m": [
+            0.2891078420004436,
+            0.034914382747308056,
+            0.189790211642681
+          ],
+          "tip_velocity_m_s": [
+            0.0011918470420398185,
+            0.0017694253706140254,
+            -0.00010348952613640366
+          ],
+          "tip_speed_m_s": 0.0021359015885128187
+        }
+      },
+      "delivered": {
+        "verification": {
+          "objective": 0.07802281706499342,
+          "scaled_violation": 8.312076305097628e-06,
+          "named_residuals": {
+            "initial_state_consistency": {
+              "max_scaled_residual": 0.0,
+              "violations_over_1e_5": 0,
+              "worst": {
+                "name": "x/0/0",
+                "scaled_residual": 0.0
+              }
+            },
+            "dynamics_equalities": {
+              "max_scaled_residual": 8.312076305097628e-06,
+              "violations_over_1e_5": 0,
+              "worst": {
+                "name": "dynamics_4_16",
+                "scaled_residual": 8.312076305097628e-06
+              }
+            },
+            "variable_bounds": {
+              "max_scaled_residual": 0.0,
+              "violations_over_1e_5": 0,
+              "worst": {
+                "name": "x/0/0",
+                "scaled_residual": 0.0
+              }
+            }
+          },
+          "feasible": true
+        },
+        "first_step": {
+          "time_s": 0.31,
+          "position_error_m": 0.0015129878899861372,
+          "tip_position_m": [
+            0.2886302244739939,
+            0.03489957742032905,
+            0.1906346358555043
+          ],
+          "tip_velocity_m_s": [
+            0.014147180417791968,
+            6.210415172746967e-05,
+            -0.024720412565106625
+          ],
+          "tip_speed_m_s": 0.028482369425458617
+        },
+        "terminal": {
+          "time_s": 0.35,
+          "position_error_m": 0.0009024650862438973,
+          "tip_position_m": [
+            0.28913169468181,
+            0.03487759583484878,
+            0.18978667788055192
+          ],
+          "tip_velocity_m_s": [
+            0.001804205996890638,
+            0.00036215227744534786,
+            0.00022615198265894714
+          ],
+          "tip_speed_m_s": 0.0018540383681400895
+        }
+      }
+    },
+    "raw_solver": {
+      "accepted": true,
+      "selected_iteration": 6,
+      "ipopt_selected_iteration": 6,
+      "delivered_plan": "delivered",
+      "source": "ipopt_selected",
+      "reason": "budget_best_feasible",
+      "raw_stop": "User_Requested_Stop"
+    },
+    "actual_applied_input_n": [
+      4.996457968490995,
+      5.504835719244075,
+      2.268885450701963,
+      4.056198873056763,
+      3.419698053643064,
+      3.3021981945261047
+    ],
+    "cross_weight_total_objective_ranking_performed": false
+  }
+]

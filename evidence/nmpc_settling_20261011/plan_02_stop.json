@@ -1,0 +1,82 @@
+{
+  "action": "stop",
+  "candidates": [],
+  "comparison": null,
+  "control": null,
+  "diagnostic_candidate": null,
+  "disposition": "STOP. Inherited evidence (prior round, not new work): baseline recovery-enabled execution cda6509a699545d7b59b9be854c60d08 with holding_tip_speed_weight 0.05, result artifact a370a238d80c88a23e0a1272d9d288c2d1bea9e073cd231404e594724e280bb5, is a valid_failure whose only failing component is sampled holding_speed = 0.024643 m/s at t=0.31 s (0.020494 at t=0.30 s) with holding position 0.003464 m and terminal error 0.003016 m passing; the archived diagnosis (6829111c627768fcf8800054c676c4070b0989e0cfa908143c1e61c846ccf7c8) shows the holding penalty already active and correctly computed at updates 29/30 (first-node holding cost 0.000891/0.001227) and its first-step prediction already above the measured overspeed (0.0267 vs 0.0205; 0.0313 vs 0.0246), so persistence is not an absent or underestimated holding penalty. New work this round, one development plus one exact confirmation: (1) development execution 04c93bc37a834ae7b3fd7667ce8e4285, feedback artifact 21a10d08e03e5cb4d3831f0671daecc0b8acedd31c4de78c2e55eb2e9bd5bdaf, holding_tip_speed_weight raised 0.05 to 0.10 with recover_returned_tensions true, feasible_return_budget 15 s, substeps 1, terminal_tip_speed_weight 0.10 and everything else frozen, preceding_execution a370a238; accepted, sampled holding max speed 0.008583 m/s, holding position 0.002918 m, terminal error 0.002912 m, 0 solver errors, 6 recovery selections. (2) Confirmation execution 1523bfc7c97647ed85b1e85da6774d79, feedback artifact 12db137c5de38a024cbeb346dd1664bb9d3be161d1b3c023a15bd0e77ed7ab0e, identical candidate, weights, seed 17, named zero initial state, recovery and acceptance with preceding_execution 21a10d08; valid_failure, sampled holding max speed 0.058648 m/s (about 3x the limit and worse than the 0.05 baseline), per-sample .30-.35 s = 0.005653/0.009979/0.027209/0.058648/0.036177/0.027491 m/s, holding position 0.004355 m, terminal error 0.003349 m, near_t1 tension at the 8 N bound, 10 recovery selections. Sampled joint acceptance: development accepted (all components pass); confirmation not accepted (holding_speed fails, position/terminal/solver-errors/coverage pass). Confirmation status: performed once and did not repeat; this is a same-configuration, same-seed repetition result only, explicitly not a robustness, continuous-time, real-time, hardware or model-superiority claim, and no unique cause is attributed. Model contribution and limits are distinct: the GVS projected model places and computes the soft holding-speed penalty at the correct absolute node times and already predicts more overspeed than measured, but its projected first-step tip velocity differs from the full serial backend (mean tip difference 0.0028 m, max speed difference 0.088 m/s), the penalty is soft rather than a hard speed constraint, every solve early-stopped (converged_updates 0, 35/35 deadline misses, stops by relative_seed_improvement/budget_best_feasible/verified_settled_seed inside the 15 s feasible-return budget), and the ideal-tension model omits shear, stretch, torsion, tendon friction and actuator dynamics. Answer to the research question: with recovery enabled the two overspeed holding samples are not caused by an absent or mis-scaled holding penalty; and one in-range speed-weight change (holding_tip_speed_weight 0.05 to 0.10) produced one accepted closed loop but the same-configuration independent repetition did not reproduce it, so no repeatable improvement of the frozen task is demonstrated. No local NLP attempts, full NLP solves or independent replays were used (all 0). Accounting basis is the packet's pre-send template with its stated before-send timestamp; used and remaining budget are reported in final_accounting below.",
+  "expected_observation": "The study closes without further launches: development execution 04c93bc3 passes and confirmation execution 1523bfc7 fails, so the single-weight change is a non-repeating outcome at this seed and configuration and the remaining launch and numerical budgets stay unspent.",
+  "final_accounting": {
+    "budget_basis": "Latest decision packet before this provider send and its tool calls; final ledger separately records their actual charges",
+    "inherited_execution_id": "cda6509a699545d7b59b9be854c60d08",
+    "latest_feedback_reference": {
+      "artifact_id": "12db137c5de38a024cbeb346dd1664bb9d3be161d1b3c023a15bd0e77ed7ab0e",
+      "media_type": "application/json"
+    },
+    "new_execution_ids": [
+      "04c93bc37a834ae7b3fd7667ce8e4285",
+      "1523bfc7c97647ed85b1e85da6774d79"
+    ],
+    "remaining_budget": {
+      "activity_s": 19842.10532808304,
+      "backend_launches": 0,
+      "independent_replays": 0,
+      "local_nlp_attempts": 2,
+      "local_nlp_s": 300.0,
+      "local_pair_available": true,
+      "nlp_solves": 0,
+      "numerical_s": 2715.146789400037,
+      "protected_provider_sends": 4,
+      "provider_requests": 14,
+      "public_tool_calls": 56,
+      "scientific_window_s": 18042.10532808304
+    },
+    "used_budget": {
+      "local_nlp_attempts": 0,
+      "project": {
+        "backend_solves": 2,
+        "model_calls": 2,
+        "tool_calls": 8,
+        "wall_s": 977.2349999999278,
+        "worker_calls": 0
+      },
+      "scientific_s": 884.8532105999627
+    }
+  },
+  "fixed_conditions": "Frozen task and controller unchanged: two flexible segments 0.16/0.11 m, six ideal tension channels 0..8 N, structural_linear mesh 24, named zero initial positions/velocities with seed 17, 0.35 s duration, 0.01 s control and sample period, 0.0005 s physics step, holding window .30-.35 s inclusive of 6 samples, .01 m position and holding-speed .02 m/s limits, 35 input switches, feasible_return_budget 15 s, CPU 30 s, iterations 120, minimum 5 s / relative improvement 0.1, tolerance 1e-6, substeps 1, recover_returned_tensions true.",
+  "hypothesis": "With recovery enabled, the two overspeed holding samples persist because the soft holding-tip-speed penalty is small relative to the terminal-position term inside a solver that never converges, so a single in-range weight increase can at best yield an isolated better solve rather than a repeatable improvement of the frozen acceptance.",
+  "limitations": [
+    "No unique causal attribution; structure and control remain jointly reported.",
+    "Same-configuration same-seed repetition did not hold, so no robustness, real-time or continuous-time claim is made.",
+    "Sampled 6-point inclusive holding window is not a continuous-time guarantee.",
+    "Projected GVS predictions differ from the full serial backend, and ideal tensions omit shear, stretch, torsion, tendon friction and actuator dynamics.",
+    "All solves early-stopped without convergence, so wall-clock and initialization state influence the delivered iterates."
+  ],
+  "requested_nlp_solves": 0,
+  "requested_replays": 0,
+  "revision_or_stop_rule": "The pre-registered rule was to stop after the single confirmation regardless of outcome; the confirmation did not reproduce the development acceptance, so no further tuning trial is permitted and the study stops here.",
+  "saved_plan": null,
+  "supporting_evidence": [
+    {
+      "artifact_id": "a370a238d80c88a23e0a1272d9d288c2d1bea9e073cd231404e594724e280bb5",
+      "media_type": "application/json"
+    },
+    {
+      "artifact_id": "6829111c627768fcf8800054c676c4070b0989e0cfa908143c1e61c846ccf7c8",
+      "media_type": "application/json"
+    },
+    {
+      "artifact_id": "21a10d08e03e5cb4d3831f0671daecc0b8acedd31c4de78c2e55eb2e9bd5bdaf",
+      "media_type": "application/json"
+    },
+    {
+      "artifact_id": "12db137c5de38a024cbeb346dd1664bb9d3be161d1b3c023a15bd0e77ed7ab0e",
+      "media_type": "application/json"
+    },
+    {
+      "artifact_id": "0e16077e9183ebcd64729eb982aa5a73e5eb03e111d5d7ed402552ca16db345b",
+      "media_type": "application/json"
+    }
+  ],
+  "weakening_observation": "The confirmation already weakened the single-weight hypothesis: had the identical configuration repeated the development's acceptance it would support a repeatable improvement, but the confirmation failed at 0.058648 m/s holding speed with a tension at the 8 N bound, so the development acceptance stands only as a single-run observation."
+}

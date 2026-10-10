@@ -61,3 +61,32 @@ Endpoint speed slightly worsened versus the rejected plan. The single full
 holding maximum3.464mm, but exceeded .02m/s holding speed at .30s and .31s.
 Projection/prediction disagreement remains. No real-time or continuous-time
 guarantee, hardware transfer or unconditional remedy follows.
+
+## Recovery-enabled holding-speed follow-up
+
+The [follow-up summary](../evidence/nmpc_settling_20261011/scientific_summary.json)
+extends the earlier case. Use the latest recovery-enabled configuration and its
+owned immutable state; never substitute the older recovery-disabled state.
+Align sample t with update t-dt, check that predicted input equals actual input,
+and retain velocity vectors, not just scalar speed. At .30/.31s the archived
+predictions already overestimated actual speed and holding cost was active.
+Inspect h/dt factors and normalization; soft penalties do not impose hard
+sampled speed limits. Compute only saved first-node/terminal terms; missing
+whole-horizon vectors/cost decompositions and iteration traces remain unknown.
+
+A new local comparison, if chosen, uses one identical newly constructed seed in
+both arms and is not historical optimizer reproduction. Change one permitted
+speed weight, keep recovery True and all scientific settings frozen. Return
+actual local feedback before any closed-loop decision. A local gain need not
+transfer to the simulator. One unsuccessful tested value does not assess the
+whole allowed range. Preserve negative outcomes and all failed samples.
+
+An unchanged confirmation uses its own explicit native action, verifies complete
+scientific identity and starts independently from the prescribed initial state.
+Report exact configuration repetition separately from repeatability of numerical
+outputs and from robustness. Wall-time based solver stopping may differ across
+repeats. Use only one development and one optional exact confirmation. STOP
+binds latest execution/reference and timestamped used/remaining budget; concrete
+ledger corrections are returned before accepting STOP. No provider send follows
+accepted STOP. These remain reference-backed drafts with no legacy admission
+recheck, database, validation claim, human approval or automatic reuse.
