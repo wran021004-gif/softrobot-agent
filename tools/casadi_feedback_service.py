@@ -53,9 +53,9 @@ def plan(ctx,args):
     for ref in args.supporting_evidence:ctx.artifact(ref)
     new_results=[r for r in state['results'] if not r.get('imported')]
     if new_results and not any(plain(ref)==r['reference'] for ref in args.supporting_evidence for r in new_results):
-        raise ValueError('DECISION_MUST_CITE_ACTUAL_RETURNED_EVIDENCE')
+        raise ValueError('DECISION_MUST_CITE_ACTUAL_RETURNED_EVIDENCE: '+str([r['reference'] for r in new_results]))
     if args.action=='stop' and any(r['reference'] not in [plain(ref) for ref in args.supporting_evidence] for r in new_results):
-        raise ValueError('FINAL_STOP_MUST_ACCOUNT_FOR_ALL_NEW_RESULTS')
+        raise ValueError('FINAL_STOP_MUST_ACCOUNT_FOR_ALL_NEW_RESULTS: '+str([r['reference'] for r in new_results]))
     if args.action not in ('stop','diagnose'):
         send=state.get('pilot',{}).get('live_model_requests',0)
         if state.get('last_expensive_decision_send')==send:

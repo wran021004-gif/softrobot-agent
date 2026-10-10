@@ -40,6 +40,13 @@ class InitializationTests(unittest.TestCase):
         d.update(return_status='User_Requested_Stop',policy_stop_reason='relative_seed_improvement')
         self.assertEqual(termination_facts(d)['actual_stop_reason'],'relative_seed_improvement')
 
+    def test_native_pair_has_authorized_300s_allowance(self):
+        from tools import research_casadi_feedback as research
+        with patch.object(research,'INITIALIZATION',True),patch.dict(research.CEILINGS,pair_wall_s=300.):
+            cfg=research.configuration()
+        allowance=cfg['policy']['operation_allowances']['diagnosis.saved_state_check']
+        self.assertEqual(allowance,dict(timeout_s=300.,reserve_s=300.))
+
     def test_pair_uses_saved_time_previous_input_and_separate_seed_workspaces(self):
         captured=[];artifacts=[];cfg=self.cfg
         updates=[dict(time_s=.00,actual_tension_n=[.3]*6),

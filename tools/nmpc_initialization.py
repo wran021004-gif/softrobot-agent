@@ -274,6 +274,7 @@ def run_pair(h,choice,key):
             state=h.store.session(h.run_id,db)['state']
             state.setdefault('projection_checks',{})[str(index)]=plain(h.store.put(db,projection))
             h.store.update_state(db,h.run_id,state)
+
         allowance=choice.max_wall_s-(time.perf_counter()-start)
         args=dict(plain(choice),binding=state['source_binding'],operation='local_comparison',max_wall_s=allowance)
         # max_wall_s appears once and includes projection/preparation in the pair ceiling.
@@ -296,6 +297,43 @@ def run_pair(h,choice,key):
         with h.store.transaction() as db:
             state=h.store.session(h.run_id,db)['state'];state['numerical_s']+=time.perf_counter()-start
             h.store.update_state(db,h.run_id,state)
+
+
+def recover_pair_feedback(h):
+    """Use the already sealed numerical output; no solve, launch or counter reset."""
+    from tools.casadi_feedback_service import CEILINGS
+    start=time.perf_counter()
+    with h.store.connect(True) as db:
+        rows=[dict(r) for r in db.execute('SELECT * FROM calls') if r['request_id'].endswith('-pair')]
+    state=h.store.session(h.run_id)['state']
+    if not state.get('engineering_pause'):raise ValueError('PAIR_REPORTING_PAUSE_REQUIRED')
+    if len(rows)!=1:raise ValueError('UNIQUE_SEALED_PAIR_REQUIRED')
+    receipt=json.loads(rows[0]['receipt'])
+    if receipt.get('error')!='OPERATION_TIMEOUT_EXCEEDED_AFTER_RETURN' or not receipt.get('output'):
+        raise ValueError('SEALED_RETURNED_PAIR_OUTPUT_REQUIRED')
+    detail=h.store.artifact(receipt['output'])['detail']
+    if detail['new_local_solves']!=2 or len(detail['rows'])!=2 or detail['complete_cost_s']>CEILINGS['pair_wall_s']:
+        raise ValueError('RECOVERED_PAIR_MUST_FIT_ORIGINAL_300S_CEILING')
+    for row in detail['rows']:
+        h.store.artifact(row['reference']);h.store.artifact(row['numerical_reference'])
+        if row['parameters']['max_cpu_s']!=30. or row['parameters']['max_iterations']!=120:
+            raise ValueError('ORIGINAL_SOLVER_LIMITS_REQUIRED')
+    projection=state['projection_checks'][str(detail['update_id'])]
+    detail['projection_check']=h.store.artifact(projection)
+    detail['reporting_recovery']=dict(original_failed_receipt=receipt,numerical_result_reused=True,
+        numerical_retries=0,solver_limits_changed=False,authorized_pair_wall_s=CEILINGS['pair_wall_s'],
+        defect='Native tool used generic timeout60s rather than authorized pair ceiling300s; output was sealed after return.')
+    with h.store.transaction() as db:
+        state=h.store.session(h.run_id,db)['state'];ref=h.store.put(db,detail)
+        if any(r['operation']=='saved_state_comparison' and not r.get('imported') for r in state['results']):
+            raise ValueError('PAIR_ALREADY_RECOVERED')
+        state['results'].append(dict(operation='saved_state_comparison',reference=plain(ref),recovered_from=receipt['output']))
+        state.setdefault('reporting_recoveries',[]).append(dict(reference=plain(ref),original_failed_receipt=receipt))
+        state.pop('engineering_pause')
+        state['numerical_s']+=time.perf_counter()-start
+        h.store.update_state(db,h.run_id,state)
+        h.store.event(db,h.run_id,'pair_reporting_recovery','sealed_result_reused',inputs=[receipt['output']],outputs=[ref])
+    return dict(reference=plain(ref),result=compact_pair(detail))
 
 
 def packet(h):

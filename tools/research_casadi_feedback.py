@@ -39,6 +39,8 @@ def configuration():
     source=DesignOptimizationProblem.model_validate(read(ROOT/'examples/casadi_codesign/case_A.json')['physical_source'])
     base=native_configuration(ACTIVITY)
     allowances={name:dict(timeout_s=RESERVATIONS.get(name.rsplit('_',1)[-1],30.)+30.,reserve_s=RESERVATIONS.get(name.rsplit('_',1)[-1],1.)) for name in TOOLS}
+    if INITIALIZATION:
+        allowances['diagnosis.saved_state_check']=dict(timeout_s=CEILINGS['pair_wall_s'],reserve_s=CEILINGS['pair_wall_s'])
     base['policy'].update(budget=LIMITS,allowed_tools=[],tool_bindings=TOOLS,operation_allowances=allowances)
     base['policy']['model']['max_turns']=12
     values=dict(segment_count=2,proximal_tendons=3,distal_tendons=3,lengths_m=[.16,.11],material='baseline',
@@ -91,7 +93,12 @@ def bind(h,repair=False,reason=None):
     with h.store.connect(True) as db:
         if db.execute('SELECT COUNT(*) FROM calls WHERE receipt IS NULL').fetchone()[0]:raise ValueError('UNSEALED_RESERVATION_BLOCKS_BIND')
         if not repair and db.execute('SELECT COUNT(*) FROM calls').fetchone()[0]:raise ValueError('INITIAL_BIND_REQUIRES_ZERO_CALLS')
-    old=h.store.session(ACTIVITY)['snapshot'];snapshot=compile_input(old['input'],h.reg)
+    old=h.store.session(ACTIVITY)['snapshot']
+    from copy import deepcopy
+    bound_input=deepcopy(old['input'])
+    if INITIALIZATION:
+        bound_input['policy']['operation_allowances']['diagnosis.saved_state_check']=dict(timeout_s=CEILINGS['pair_wall_s'],reserve_s=CEILINGS['pair_wall_s'])
+    snapshot=compile_input(bound_input,h.reg)
     if snapshot['instance_identity']!=old['instance_identity']:raise ValueError('MIGRATION_CHANGED_FROZEN_TASK')
     commit=subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip()
     snapshot.update(project_commit=commit,worktree_dirty=False)
@@ -406,6 +413,9 @@ def main():
     p.add_argument('--reason');args=p.parse_args();h=prepare() if args.command=='prepare' else host()
     if args.command in ('bind','migrate'):bind(h,args.command=='migrate',args.reason)
     if args.command=='recover':
+        if INITIALIZATION:
+            from tools.nmpc_initialization import recover_pair_feedback
+            print(json.dumps(recover_pair_feedback(h)));return
         from tools.casadi_closed_loop import finish_closed_loop
         print(json.dumps(finish_closed_loop(h)));return
     if args.command=='live':asyncio.run(converse(h))
