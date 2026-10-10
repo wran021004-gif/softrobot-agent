@@ -1,0 +1,443 @@
+{
+  "contract_version": "1.0.0",
+  "problem": "soromox_fixed_topology_admission_v1",
+  "case": "A",
+  "mathematical_method": "implicit_euler_force_balance_jax_cyipopt_planned",
+  "physical_source": {
+    "contract": "research.design_optimization_problem",
+    "version": "1.0.0",
+    "study_id": "soromox-pilot-20261010",
+    "generator": "serial_two_group_v1",
+    "task": {
+      "contract_version": "1.0.0",
+      "task_id": "family-multisegment-dev",
+      "task_version": "1.0.0",
+      "name": "Independent development validation of a serial multi-segment soft arm",
+      "status": "development_valid",
+      "source": "Development task with fixed target, tolerance and scoring; historical tasks are unchanged",
+      "family": "task.reach",
+      "goal": {
+        "contract": "reference.reach_goal",
+        "version": "1.0.0",
+        "data": {
+          "target_m": [
+            0.29,
+            0.035,
+            0.19
+          ]
+        }
+      },
+      "environment": {
+        "contract": "experiment.assembly",
+        "version": "1.0.0",
+        "data": {
+          "environment": {
+            "coordinate_frame": "world_base_x_forward_yz_cross_section",
+            "environment_id": "reach_free",
+            "gravity_m_s2": [
+              0.0,
+              0.0,
+              -9.81
+            ],
+            "gravity_source": "main@245a785 reach_free environment; Human-owned benchmark gravity",
+            "lights": [
+              {
+                "direction": [
+                  0.0,
+                  0.0,
+                  -1.0
+                ],
+                "position_m": [
+                  0.0,
+                  0.0,
+                  2.0
+                ]
+              }
+            ],
+            "objects": [
+              {
+                "conaffinity": 1,
+                "contype": 0,
+                "half_size_m": [
+                  2.0,
+                  2.0,
+                  0.1
+                ],
+                "kind": "plane",
+                "name": "floor",
+                "position_m": [
+                  0.0,
+                  0.0,
+                  -0.02
+                ]
+              }
+            ],
+            "schema_version": "1",
+            "truth_status": "HUMAN_OWNED",
+            "units": "SI"
+          },
+          "external_forces": [],
+          "floor_id": "floor",
+          "mount": {
+            "position_m": [
+              0.0,
+              0.0,
+              0.15
+            ],
+            "quaternion_wxyz": [
+              1.0,
+              0.0,
+              0.0,
+              0.0
+            ]
+          }
+        }
+      },
+      "robot_families": [
+        "tendon_robot_family"
+      ],
+      "actuator_channels": [
+        "actuator_commands"
+      ],
+      "initializer": {
+        "extension_id": "initialize.family",
+        "version": "1.0.0",
+        "parameters": {
+          "contract": "family.initial",
+          "version": "1.0.0",
+          "data": {
+            "qpos_rad": {
+              "far_cell_0_y": 0.0,
+              "far_cell_0_z": 0.0,
+              "far_cell_10_y": 0.0,
+              "far_cell_10_z": 0.0,
+              "far_cell_11_y": 0.0,
+              "far_cell_11_z": 0.0,
+              "far_cell_1_y": 0.0,
+              "far_cell_1_z": 0.0,
+              "far_cell_2_y": 0.0,
+              "far_cell_2_z": 0.0,
+              "far_cell_3_y": 0.0,
+              "far_cell_3_z": 0.0,
+              "far_cell_4_y": 0.0,
+              "far_cell_4_z": 0.0,
+              "far_cell_5_y": 0.0,
+              "far_cell_5_z": 0.0,
+              "far_cell_6_y": 0.0,
+              "far_cell_6_z": 0.0,
+              "far_cell_7_y": 0.0,
+              "far_cell_7_z": 0.0,
+              "far_cell_8_y": 0.0,
+              "far_cell_8_z": 0.0,
+              "far_cell_9_y": 0.0,
+              "far_cell_9_z": 0.0,
+              "near_cell_0_y": 0.0,
+              "near_cell_0_z": 0.0,
+              "near_cell_10_y": 0.0,
+              "near_cell_10_z": 0.0,
+              "near_cell_11_y": 0.0,
+              "near_cell_11_z": 0.0,
+              "near_cell_1_y": 0.0,
+              "near_cell_1_z": 0.0,
+              "near_cell_2_y": 0.0,
+              "near_cell_2_z": 0.0,
+              "near_cell_3_y": 0.0,
+              "near_cell_3_z": 0.0,
+              "near_cell_4_y": 0.0,
+              "near_cell_4_z": 0.0,
+              "near_cell_5_y": 0.0,
+              "near_cell_5_z": 0.0,
+              "near_cell_6_y": 0.0,
+              "near_cell_6_z": 0.0,
+              "near_cell_7_y": 0.0,
+              "near_cell_7_z": 0.0,
+              "near_cell_8_y": 0.0,
+              "near_cell_8_z": 0.0,
+              "near_cell_9_y": 0.0,
+              "near_cell_9_z": 0.0
+            },
+            "qvel_rad_s": {
+              "far_cell_0_y": 0.0,
+              "far_cell_0_z": 0.0,
+              "far_cell_10_y": 0.0,
+              "far_cell_10_z": 0.0,
+              "far_cell_11_y": 0.0,
+              "far_cell_11_z": 0.0,
+              "far_cell_1_y": 0.0,
+              "far_cell_1_z": 0.0,
+              "far_cell_2_y": 0.0,
+              "far_cell_2_z": 0.0,
+              "far_cell_3_y": 0.0,
+              "far_cell_3_z": 0.0,
+              "far_cell_4_y": 0.0,
+              "far_cell_4_z": 0.0,
+              "far_cell_5_y": 0.0,
+              "far_cell_5_z": 0.0,
+              "far_cell_6_y": 0.0,
+              "far_cell_6_z": 0.0,
+              "far_cell_7_y": 0.0,
+              "far_cell_7_z": 0.0,
+              "far_cell_8_y": 0.0,
+              "far_cell_8_z": 0.0,
+              "far_cell_9_y": 0.0,
+              "far_cell_9_z": 0.0,
+              "near_cell_0_y": 0.0,
+              "near_cell_0_z": 0.0,
+              "near_cell_10_y": 0.0,
+              "near_cell_10_z": 0.0,
+              "near_cell_11_y": 0.0,
+              "near_cell_11_z": 0.0,
+              "near_cell_1_y": 0.0,
+              "near_cell_1_z": 0.0,
+              "near_cell_2_y": 0.0,
+              "near_cell_2_z": 0.0,
+              "near_cell_3_y": 0.0,
+              "near_cell_3_z": 0.0,
+              "near_cell_4_y": 0.0,
+              "near_cell_4_z": 0.0,
+              "near_cell_5_y": 0.0,
+              "near_cell_5_z": 0.0,
+              "near_cell_6_y": 0.0,
+              "near_cell_6_z": 0.0,
+              "near_cell_7_y": 0.0,
+              "near_cell_7_z": 0.0,
+              "near_cell_8_y": 0.0,
+              "near_cell_8_z": 0.0,
+              "near_cell_9_y": 0.0,
+              "near_cell_9_z": 0.0
+            },
+            "unspecified": "zero"
+          }
+        }
+      },
+      "timing": {
+        "timestep_s": 0.0005,
+        "control_period_s": 0.01,
+        "sample_period_s": 0.01,
+        "duration_s": 0.35,
+        "termination": [
+          "duration",
+          "numerical_failure"
+        ]
+      },
+      "evaluator": {
+        "extension_id": "evaluate.reach",
+        "version": "1.0.0",
+        "parameters": {
+          "contract": "reference.reach_evaluation",
+          "version": "1.0.0",
+          "data": {
+            "tolerance_m": 0.01
+          }
+        }
+      },
+      "objectives": [
+        {
+          "metric": "position_error",
+          "direction": "minimize",
+          "units": "m",
+          "weight": 1.0
+        }
+      ],
+      "failure_policy": "retain_invalid_and_constraint_failures",
+      "observations": [
+        {
+          "name": "tip_position",
+          "entity": "tip",
+          "dimension": 3,
+          "units": "m",
+          "frame": "world",
+          "phase": "post_step",
+          "missing": "unsupported"
+        }
+      ],
+      "sampling": {
+        "split": "development",
+        "seeds": [
+          17
+        ],
+        "aggregation": "per_instance",
+        "window_s": [
+          0.0,
+          0.35
+        ]
+      }
+    },
+    "execution": {
+      "seed": 17,
+      "controller": "controller.gvs_nmpc@11.0.0",
+      "numerical_source": "initial_state_pretension",
+      "physical_initial_state": "named_zero_positions_and_velocities",
+      "mesh": "24_cells_12_proximal_equal_distal",
+      "force_limit_n": 8.0,
+      "recipe": {
+        "position_error_scale_m": null,
+        "tip_speed_scale_m_s": 0.02,
+        "terminal_tip_speed_weight": 0.1,
+        "holding_tip_speed_weight": 0.05,
+        "holding_brake_lead_s": 0.0,
+        "recover_returned_tensions": false,
+        "seed_position_tolerance_fraction": 0.5,
+        "seed_speed_limit_m_s": 0.02,
+        "feasible_return": {
+          "minimum_s": 5.0,
+          "budget_s": 15.0,
+          "relative_improvement": 0.1
+        },
+        "regenerate_warm_states": true,
+        "terminal_velocity_weight": 0.0001,
+        "max_unusable_updates": 3,
+        "constraint_jacobian_mode": "reverse",
+        "curvature_scale_rad_m": 10.0,
+        "rate_scale_rad_m_s": 1000.0,
+        "max_cpu_s": 30.0,
+        "basis": {
+          "strategy": "structural_linear"
+        },
+        "horizon": 10,
+        "substeps": 1,
+        "tracking_weight": 1.0,
+        "terminal_weight": 5.0,
+        "velocity_weight": 0.0001,
+        "tension_weight": 0.0001,
+        "variation_weight": 0.001,
+        "max_iterations": 120,
+        "tolerance": 1e-06,
+        "evaluation_threads": 1
+      },
+      "settling": {
+        "window_s": 0.05,
+        "position_limit_m": 0.01,
+        "speed_limit_m_s": 0.02
+      }
+    },
+    "variables": {
+      "segment_count": {
+        "kind": "fixed",
+        "value": 2
+      },
+      "proximal_tendons": {
+        "kind": "fixed",
+        "value": 3
+      },
+      "distal_tendons": {
+        "kind": "fixed",
+        "value": 3
+      },
+      "material": {
+        "kind": "fixed",
+        "value": "baseline"
+      },
+      "section_scale": {
+        "kind": "fixed",
+        "value": 1.0
+      },
+      "routing_scale": {
+        "kind": "fixed",
+        "value": 1.0
+      },
+      "pretension_n": {
+        "kind": "fixed",
+        "value": 0.2
+      },
+      "holding_tip_speed_weight": {
+        "kind": "fixed",
+        "value": 0.05
+      },
+      "terminal_tip_speed_weight": {
+        "kind": "fixed",
+        "value": 0.1
+      }
+    },
+    "lengths": {
+      "free": false,
+      "total_flexible_length_m": 0.27,
+      "relative_range": 0.05,
+      "baseline_by_count": {
+        "2": [
+          0.16,
+          0.11
+        ]
+      },
+      "bounds_by_count": {},
+      "fixed_by_count": {
+        "2": {
+          "0": 0.16,
+          "1": 0.11
+        }
+      },
+      "constraint_tolerance_m": 1e-12
+    },
+    "fixed_tendon_count": null,
+    "fixed_actuator_count": null,
+    "objective": {
+      "feasibility": "joint_reach_hold_v1",
+      "ranking": "feasible_then_max_normalized_violation_then_sum_v1",
+      "accepted_resource_preference": "fewer_actuators"
+    },
+    "method": {
+      "name": "hierarchical_coordinate_v1_1",
+      "initial_structures": [],
+      "step": 0.25,
+      "minimum_step": 0.03125,
+      "stop_on_acceptance": false
+    },
+    "budget": {
+      "max_evaluations": 4,
+      "wall_s": 7200.0
+    }
+  },
+  "design": {
+    "lengths_m": [
+      0.16,
+      0.11
+    ],
+    "independent_variables": [],
+    "proximal_bounds_m": [
+      0.16,
+      0.16
+    ],
+    "distal_rule": "0.27 - L_proximal",
+    "total_flexible_length_m": 0.27,
+    "section_scale": 1.0,
+    "routing_scale": 1.0,
+    "material": "baseline"
+  },
+  "trajectory": {
+    "intervals": 35,
+    "period_s": 0.01,
+    "duration_s": 0.35,
+    "action": "piecewise_constant_tension",
+    "input_limits_n": [
+      0.0,
+      8.0
+    ],
+    "initial_physical_state": "named_zero_positions_and_velocities",
+    "holding_window_s": 0.05,
+    "terminal_position_limit_m": 0.01,
+    "holding_position_limit_m": 0.01,
+    "holding_speed_limit_m_s": 0.02
+  },
+  "normalized_objective": {
+    "effort_weight": 1.0,
+    "variation_weight": 0.1,
+    "expression": "mean((u/8)^2) + 0.1*mean((diff(u)/8)^2)"
+  },
+  "initializations": [
+    "pretension_0_2",
+    "ramp_0_2_to_0_4"
+  ],
+  "initialization_semantics": "numerical input guesses only; coherent states require admitted dynamics; never physical pretension",
+  "replay": {
+    "method": "independent adaptive integration respecting tension switching",
+    "tip_disagreement_limit_m": 0.001,
+    "speed_disagreement_limit_m_s": 0.002
+  },
+  "solver": {
+    "name": "cyipopt/IPOPT",
+    "max_solve_s": 300.0,
+    "hessian": "limited-memory",
+    "derivatives": "float64 gradient and explicitly sparse Jacobian; only after mechanics admission"
+  },
+  "stop_rule": "Stop at demonstrable model incompatibility; no NLP or physical execution then"
+}
