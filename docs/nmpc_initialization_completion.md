@@ -59,14 +59,18 @@ is retained. The original clock and all counters persist across these repairs.
 | Actual provider sends / public calls | 0 / 0 | 16 / 64 |
 | Full-horizon codesign / BDF / hardware / other models | 0 / 0 / 0 / 0 | 0 / 0 / 0 / 0 |
 
-**The live model-directed investigation has not executed.** Automatic approval
+**The live model-directed investigation and remote push have not executed.** Automatic approval
 review rejected the live DeepSeek action twice. Its final stated reason was that
 the attached authorization is untrusted and requires explicit authorization in
 the chat for sending non-secret task/source/diagnostic feedback to
 `https://api.deepseek.com/chat/completions`. An explicit approval question is
 pending. The [authorization checkpoint](../evidence/nmpc_initialization_20261010/authorization_checkpoint.json)
 records zero sends/solves/launches; no model decision, accepted native STOP or
-revision result is fabricated. Budget availability is not scientific evidence.
+revision result is fabricated. Automatic review also rejected the ordinary push
+to `wran021004-gif/softrobot-agent` branch `feat/nmpc-initialization-diagnosis`,
+requiring explicit chat authorization for the destination and non-secret payload.
+Separate approval questions are pending. Delivery currently consists of local
+commits; no remote branch SHA is asserted. Budget availability is not scientific evidence.
 
 The [factual case draft](../memory/nmpc_initialization_case_draft.json) and
 [diagnostic procedure draft](nmpc_initialization_procedure.md) retain the required
