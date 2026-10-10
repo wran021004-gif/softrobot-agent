@@ -44,10 +44,20 @@ class ControlChoice(Contract):
     holding_tip_speed_weight: float = Field(default=.05, ge=.025, le=.10)
     terminal_tip_speed_weight: float = Field(default=.10, ge=.025, le=.10)
     preceding_execution: EvidenceRef | None = None
+    feasible_return_budget_s: float = Field(default=15.,ge=15.,le=30.)
+    substeps: Literal[1,2] = 1
+    record_update_ids: list[int] = Field(default_factory=list,max_length=2)
+
+
+class LocalComparison(Contract):
+    update_id: int = Field(ge=1,le=34,description='Saved update; zero is excluded to avoid undefined preceding input.')
+    changed_parameter: Literal['feasible_return.budget_s','terminal_tip_speed_weight','holding_tip_speed_weight','substeps']
+    changed_value: float = Field(gt=0,le=30.)
+    max_wall_s: float = Field(default=300.,gt=0,le=300.)
 
 
 class Plan(Contract):
-    action: Literal['solve','diagnose','diagnostic_replay','closed_loop','control_revision','stop']
+    action: Literal['solve','diagnose','diagnostic_replay','closed_loop','control_revision','saved_state_comparison','stop']
     hypothesis: str = Field(min_length=1)
     supporting_evidence: list[EvidenceRef] = Field(min_length=1)
     weakening_observation: str = Field(min_length=1)
@@ -56,6 +66,7 @@ class Plan(Contract):
     candidates: list[Candidate] = Field(default_factory=list,max_length=1)
     control: ControlChoice | None = None
     diagnostic_candidate: EvidenceRef | None = None
+    comparison: LocalComparison | None = None
     requested_nlp_solves: int = Field(default=0,ge=0,le=2)
     requested_replays: int = Field(default=0,ge=0,le=2)
     revision_or_stop_rule: str = Field(min_length=1)
@@ -76,6 +87,8 @@ class Plan(Contract):
             raise ValueError('CONTROL_ACTION_REQUIRES_EXACT_CANDIDATE_AND_WEIGHTS')
         if self.action=='control_revision' and self.control.preceding_execution is None:
             raise ValueError('CONTROL_REVISION_REQUIRES_PRECEDING_EXECUTION')
+        if (self.action=='saved_state_comparison') != (self.comparison is not None):
+            raise ValueError('PAIRED_COMPARISON_REQUIRES_ONE_DECLARED_FACTOR')
         return self
 
 
@@ -91,6 +104,16 @@ class CloseoutPlan(Plan):
     requested_replays: Literal[0] = 0
     diagnostic_candidate: None = None
     control: None = None
+    comparison: None = None
+
+
+class InitializationPlan(Plan):
+    """Fresh diagnosis grant excludes full-horizon solves and BDF campaigns."""
+    action: Literal['diagnose','saved_state_comparison','control_revision','stop']
+    candidates: list[Candidate] = Field(default_factory=list,max_length=0)
+    requested_nlp_solves: Literal[0] = 0
+    requested_replays: Literal[0] = 0
+    diagnostic_candidate: None = None
 
 
 class ActivityPlan(Plan):

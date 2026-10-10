@@ -24,8 +24,9 @@ from schemas.casadi_feedback import Empty, Solve as ResearchSolve, Replay as Res
 EXTENSIONS += [Extension('math.casadi_feedback_'+name,'tool','1.0.0',schema,Result,
     'tools.casadi_feedback_service:'+name,description,
     sources=EXTENSIONS[0].sources + ('tools/casadi_feedback_service.py','tools/casadi_feedback_worker.py',
-        'tools/research_casadi_feedback.py','tools/casadi_closed_loop.py','schemas/casadi_feedback.py','tests/test_casadi_nmpc_research.py'),
-    assets=EXTENSIONS[0].assets+('examples/casadi_nmpc/specification.json',),
+        'tools/research_casadi_feedback.py','tools/casadi_closed_loop.py','schemas/casadi_feedback.py','tests/test_casadi_nmpc_research.py',
+        'tools/nmpc_initialization.py','tools/research_nmpc_initialization.py'),
+    assets=EXTENSIONS[0].assets+('examples/casadi_nmpc/specification.json','examples/nmpc_initialization/specification.json'),
     dependencies=('casadi','numpy','scipy'),extension_dependencies=(('model.gvs','1.0.0'),('solver.ipopt','1.0.0')),
     capabilities={'category':'analysis','preflight':'tools.casadi_feedback_service:preflight'},
     cache=False,side_effects='new cumulative research activity; numerical evidence and model decision')

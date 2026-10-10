@@ -13,12 +13,17 @@ from tools.platform_store import plain,zero
 from tools.research_execution import invoke
 from tools.state_io import atomic_json,read,digest
 from tools.spec_tools import ROOT
-from tools.casadi_feedback_service import ACTIVITY,budget,RESERVATIONS,SPEC,CEILINGS
+from tools.casadi_feedback_service import ACTIVITY,budget,RESERVATIONS,SPEC,CEILINGS,SPEC_PATH
 
 RUN=ROOT/'runs'/ACTIVITY
-OUT=ROOT/'evidence/casadi_nmpc_research_20261010'
+INITIALIZATION=SPEC.get('investigation')=='initialization_diagnosis'
+OUT=ROOT/('evidence/nmpc_initialization_20261010' if INITIALIZATION else 'evidence/casadi_nmpc_research_20261010')
 LIMITS=dict(model_calls=CEILINGS['actual_provider_requests'],tool_calls=CEILINGS['public_workflow_calls'],backend_solves=CEILINGS['physical_launches'],worker_calls=0,wall_s=CEILINGS['overall_activity_s'])
 TOOLS={name:'1.0.0' for name in ['math.casadi_feedback_'+s for s in ('solve','replay','plan')]+['evidence.read']}
+if INITIALIZATION:
+    TOOLS={name:'1.0.0' for name in ('math.casadi_feedback_plan','evidence.read','diagnosis.inspect_evidence','diagnosis.saved_state_check')}
+    from schemas.casadi_feedback import InitializationPlan
+    ActivityPlan=InitializationPlan
 AUTHORIZATION=SPEC['authorization']+'; authorized non-secret research payload to https://api.deepseek.com/chat/completions; credentials for authentication only; scoped commit and ordinary push'
 
 def activity_start():
@@ -46,7 +51,11 @@ def host():return Host(RUN,ACTIVITY,actor='casadi-feedback-research')
 
 def prepare():
     h=host();STARTED=activity_start()
-    if h.store.db.exists():return h
+    if h.store.db.exists():
+        if INITIALIZATION:
+            from tools.nmpc_initialization import prepare_evidence
+            prepare_evidence(h)
+        return h
     h.store.create(ProjectConfig(project_id=ACTIVITY,grant_id=ACTIVITY+'-authorized',authorization_source=AUTHORIZATION,
         budget=LIMITS,exclusive_resources={'provider_request':1,'backend.family_mujoco':1}))
     h.create(configuration());h.resume()
@@ -54,7 +63,7 @@ def prepare():
         cfg=h.store.session(ACTIVITY,db)['snapshot']['input'];state=h.store.session(ACTIVITY,db)['state']
         state.update(started_unix=STARTED,cutoff_unix=STARTED+CEILINGS['overall_activity_s']-CEILINGS['delivery_reserve_s'],numerical_s=0.,investigation_s=0.,nlp_solves=0,
             python='D:/softrobot-agent/.mainline5-env/Scripts/python.exe',
-            results=[],plans=[],dispatched_candidates=[],research_status='ready',spec_identity=digest(read(ROOT/'examples/casadi_nmpc/specification.json')))
+            results=[],plans=[],dispatched_candidates=[],research_status='ready',spec_identity=digest(read(SPEC_PATH)))
         state['pilot']=dict(activity_id=ACTIVITY,provider=cfg['policy']['model'],framework_session_id=ACTIVITY,
             live_model_requests=0,started_unix=STARTED,request_deadline_unix=STARTED+CEILINGS['overall_activity_s']-CEILINGS['delivery_reserve_s'])
         from tools.casadi_closed_loop import import_latest
@@ -64,16 +73,19 @@ def prepare():
         h.store.update_state(db,ACTIVITY,state)
         h.store.event(db,ACTIVITY,'historical_import','read_only_provenance_preserved',outputs=[h.store.put(db,history)])
     atomic_json(RUN/'activity.json',dict(activity_id=ACTIVITY,authorization=AUTHORIZATION,started_unix=STARTED,limits=LIMITS,
-        numerical_limit_s=CEILINGS['total_numerical_s'],initial_investigation_limit_s=0.,delivery_reserve_s=1800.,nlp_limit=2,replay_limit=3,
-        solve_limit_s=900.,ipopt_cpu_wall_s=570.,process_reservations=RESERVATIONS,
-        physical_launch_limit=2,physical_allowance_s=1800.,protected_provider_sends=4,
+        numerical_limit_s=CEILINGS['total_numerical_s'],initial_investigation_limit_s=0.,delivery_reserve_s=1800.,nlp_limit=CEILINGS['full_nlp_solves'],replay_limit=CEILINGS['new_independent_replays'],
+        solve_limit_s=300. if INITIALIZATION else 900.,ipopt_cpu_wall_s=30. if INITIALIZATION else 570.,process_reservations=RESERVATIONS,
+        physical_launch_limit=CEILINGS['physical_launches'],physical_allowance_s=1800.,protected_provider_sends=4,
         base_commit=SPEC['base_commit'],historical_activities='sealed STOP; unused allowance unavailable'))
+    if INITIALIZATION:
+        from tools.nmpc_initialization import prepare_evidence
+        prepare_evidence(h)
     return h
 
 
 def bind(h,repair=False,reason=None):
     from tools.platform_tasks import compile_input
-    if subprocess.check_output(['git','status','--porcelain'],cwd=ROOT,text=True).strip():raise ValueError('COMMIT_BEFORE_BIND_OR_MIGRATION')
+    if subprocess.check_output(['git','-c','core.longpaths=true','status','--porcelain'],cwd=ROOT,text=True).strip():raise ValueError('COMMIT_BEFORE_BIND_OR_MIGRATION')
     state=h.store.session(ACTIVITY)['state']
     if state.get('pending'):raise ValueError('PENDING_OUTCOME_BLOCKS_MIGRATION')
     with h.store.connect(True) as db:
@@ -104,6 +116,9 @@ def compact_result(value):
         'sampling','unknowns','failure_categories','partial_feedback','execution_references','actual_duration_s','completed_control_updates',
         'nmpc_internal_solves','offline_nlp_slots_charged')
     result={k:value[k] for k in keys if k in value}
+    if 'changed_factor' in value:
+        from tools.nmpc_initialization import compact_pair
+        result.update(compact_pair(value))
     if value.get('replay'):result['replay']={k:v for k,v in value['replay'].items() if k not in ('integration_counts','sampled_evaluator')}
     if value.get('profile'):
         result['control_model_feedback']={k:v for k,v in value['profile'].items() if k not in ('task','numerical_preparation','control_parameters','execution_scope')}
@@ -111,6 +126,9 @@ def compact_result(value):
 
 
 def packet(h):
+    if INITIALIZATION:
+        from tools.nmpc_initialization import packet as initialization_packet
+        return initialization_packet(h)
     state=h.store.session(ACTIVITY)['state'];history=state['historical'];results=[]
     for row in state['results']:
         value=h.store.artifact(row['reference'])
@@ -137,6 +155,8 @@ def packet(h):
 
 
 INSTRUCTIONS='You are the sole research principal in a bounded research activity. Choose freely from the native research_plan action menu: solve (one existing mathematical choice followed by independent BDF), diagnose (read-only referenced synthesis, no new numerical experiment), diagnostic_replay (one supported BDF numerical operation), closed_loop (evaluate an immutable saved candidate structure under target-based NMPC), control_revision (same candidate, preceding closed-loop result EvidenceRef, exact changes to two weights), or stop. Any may be the first action, including a justified STOP using imported evidence. No mandatory new NLP, replay or NMPC. Do not rediscover supplied history. Engineering and prior numerical diagnostics were implemented by Codex; your original choices remain separate from facts and corrections. All experiment requests need hypothesis, supporting_evidence, expected_observation, weakening_observation, fixed_conditions, parameters, revision_or_stop_rule, disposition and limitations. Closed-loop control.candidate is an exact immutable candidate reference, never manually reconstruct lengths. Holding speed weight default .05 and terminal speed weight default .10, both allowed .025 to .10. Other NMPC recipe fields frozen, initialization initial_state_pretension numerical guesses (not equilibrium). Saved offline schedule is not NMPC reference or applied sequence. Failed historical open-loop replay does not forbid valid structure-under-feedback testing or change historical acceptance. Control-only revision cites the preceding result, keeps candidate unchanged, and changes weights. Changing structure and control requires closed_loop and explicit joint attribution. Consume actual returned evidence before another experiment. Final STOP must cite all new scientific results if any. Preserve frozen two segments, six ideal bounded tensions 0..8 N, topology, materials, routing, basis, target, mount, gravity, named zero initial state, duration .35 s, control/sample .01 s, physics .0005 s, inclusive final .05 s holding, position .01 m/speed .02 m/s limits and seed17. Existing single constant d in [-1,1] only. Two new offline full-horizon NLP attempts, three BDF attempts, two MuJoCo launches including unsuccessful launches,900 s per NLP worker (570 s IPOPT),450 s per BDF,1800 s simulation plus existing30/60 s evaluation/profile,7200 total scientific/check/recovery seconds,16 actual provider sends including auxiliary/retries with last4 for feedback and STOP,64 public calls,6h including engineering with final30min delivery protected,zero other LLMs/hardware. NMPC internal solves belong to their launch, not standalone NLP slots. Ceilings are not quotas. Existing numerical checkpoint recovery, dependency guard and engineering pause apply. Acceptance is sampled .01 s for closed loop, unlike dense .0005 s BDF; no continuous-time or real-time guarantee. Report scientific, numerical, engineering and missing evidence distinctly. Do not infer global optimum, physical impossibility, unique cause, LLM superiority or old open-loop validation. Accepted native STOP seals all further provider sends.'
+if INITIALIZATION:
+    from tools.nmpc_initialization import INSTRUCTIONS
 
 
 def feedback_context_references(h):
@@ -145,7 +165,7 @@ def feedback_context_references(h):
     for event in h.store.events(ACTIVITY):
         if event['kind']!='model_original_tool_feedback':continue
         value=h.store.artifact(event['outputs'][0]);use=value['tool_use']
-        if use['name']!='research_plan' or use['input'].get('action') not in ('solve','diagnose','diagnostic_replay','closed_loop','control_revision'):continue
+        if use['name']!='research_plan' or use['input'].get('action') not in ('solve','diagnose','diagnostic_replay','closed_loop','control_revision','saved_state_comparison'):continue
         result=value['result']
         if result['status']!='success':continue
         for index,content in enumerate(result.get('content',[])):
@@ -235,7 +255,7 @@ async def converse(h):
         result=h.store.artifact(receipt['output']) if receipt.get('output') else None
         value=dict(plan_receipt=receipt,plan_result=result,operations=[])
         if receipt['execution_status']=='completed':
-            plan=Plan.model_validate(use['input']);accepted=result['detail']
+            plan=ActivityPlan.model_validate(use['input']);accepted=result['detail']
             if plan.action=='solve':
                 value['operations']=execute_batch(h,plan,accepted,'native-'+use['toolUseId'])
             elif plan.action in ('closed_loop','control_revision'):
@@ -262,6 +282,9 @@ async def converse(h):
             elif plan.action=='diagnostic_replay':
                 rr=invoke(h,'math.casadi_feedback_replay',dict(candidate=plain(plan.diagnostic_candidate)),request_id='native-'+use['toolUseId']+'-diagnostic')
                 value['operations'].append(dict(receipt=rr,feedback=h.store.artifact(rr['output']) if rr.get('output') else None))
+            elif plan.action=='saved_state_comparison':
+                from tools.nmpc_initialization import run_pair
+                value['operations'].append(run_pair(h,plan.comparison,'native-'+use['toolUseId']+'-pair'))
         value['remaining_budget']=budget(h.store);record(h,'model_plan_execution_feedback',value)
         return dict(toolUseId=use['toolUseId'],status='success' if receipt['execution_status']=='completed' else 'error',content=[dict(text=json.dumps(value))])
     def read_handler(use,**kwargs):
@@ -275,6 +298,9 @@ async def converse(h):
         return dict(toolUseId=use['toolUseId'],status='success' if receipt['execution_status']=='completed' else 'error',content=[dict(text=json.dumps(value))])
     tools=[PythonAgentTool('research_plan',dict(name='research_plan',description='Choose a bounded mathematical solve, referenced diagnosis, candidate feedback execution, control revision, or evidence-based STOP',inputSchema={'json':ActivityPlan.model_json_schema()}),plan_handler)]
     definition=h.reg.get('evidence.read');tools.append(PythonAgentTool('evidence_read',dict(name='evidence_read',description=definition.description,inputSchema={'json':definition.input_schema.model_json_schema()}),read_handler))
+    if INITIALIZATION:
+        from tools.nmpc_initialization import add_inspection_tool
+        add_inspection_tool(h,tools)
     agent=build_harness(h,transport=boundary,api_key=os.environ['DEEPSEEK_API_KEY'],instructions=INSTRUCTIONS,
         model_class=live_model_class(boundary),tool_executor=SequentialToolExecutor(),research_tools=tools,
         configuration_path=RUN/'framework_configuration.json',session_directory=RUN/'framework_sessions')
@@ -295,6 +321,7 @@ async def converse(h):
         current=packet(h);record(h,'model_decision_packet',current)
         agent.system_prompt=INSTRUCTIONS+'\nCURRENT_RESEARCH_PACKET\n'+json.dumps(current)
         if current['remaining_budget']['provider_requests']<=4:
+            agent.tool_registry.registry.pop('inspect_execution',None)
             tools[0].tool_spec={**tools[0].tool_spec,'inputSchema':{'json':CloseoutPlan.model_json_schema()}}
             from copy import deepcopy
             schema=deepcopy(tools[1].tool_spec['inputSchema']['json'])

@@ -25,8 +25,8 @@ class SavedStateCheck(Contract):
     binding: EvidenceRef
     update_id: int = Field(ge=1)
     operation: Literal['prediction_braking','local_comparison']
-    changed_parameter: Literal['terminal_tip_speed_weight','holding_tip_speed_weight'] | None = None
-    changed_value: float | None = Field(default=None,ge=.0001,le=1.)
+    changed_parameter: Literal['terminal_tip_speed_weight','holding_tip_speed_weight','feasible_return.budget_s','substeps'] | None = None
+    changed_value: float | None = Field(default=None,gt=0,le=30.)
     horizon_s: float = Field(default=.01,gt=0,le=.02)
     integration_step_s: float = Field(default=.002,gt=0,le=.01)
     max_wall_s: float = Field(default=180.,gt=0,le=300.)
@@ -136,18 +136,22 @@ def local_pair(ctx,args,reader,source,updates):
     from .control_evidence import plan_metrics,capture_snapshot
     if args.changed_parameter is None or args.changed_value is None:raise ValueError('SINGLE_PARAMETER_CHANGE_REQUIRED')
     inp=SessionInput.model_validate(source['configuration']);recipe=inp.policy.controller.parameters.data['recipe']
+    baseline_value=recipe_value(recipe,args.changed_parameter)
+    variant_recipe=changed_recipe(recipe,args.changed_parameter,args.changed_value)
+    if baseline_value==args.changed_value:raise ValueError('DECLARED_FACTOR_MUST_CHANGE')
     u=updates[args.update_id];previous=updates[args.update_id-1]['actual_tension_n'];state=u['measured_initial_state']
     horizon=u.get('effective_horizon',recipe['horizon']);start=time.perf_counter();rows=[]
     for label in ('baseline','variant'):
         if time.perf_counter()-start+60>args.max_wall_s:raise RuntimeError('LOCAL_PAIR_TIME_ALLOWANCE')
-        charge_units(ctx,'local_solves',1);p=deepcopy(recipe);p['horizon']=horizon
-        if label=='variant':p[args.changed_parameter]=args.changed_value
+        charge_units(ctx,'local_solves',1);p=deepcopy(recipe if label=='baseline' else variant_recipe);p['horizon']=horizon
         wall=time.perf_counter()
         ws=TrajectoryWorkspace(inp.task,inp.robot,p,state,previous,settling=inp.policy.controller.parameters.data['settling'])
         ws.solver.diagnostic_trace=True
         # New, common cold seed: repeat previous applied tensions, regenerate
         # candidate-model states. This is explicitly not a historical warm plan.
         solved=ws.solve(state,previous,elapsed_s=u['time_s'])
+        numerical_ref=ctx.save_artifact(dict(result=solved['result'],states=solved['states'],tensions=solved['tensions'],
+            diagnostics=solved['diagnostics']),'local_numerical_result')
         checked=ws.solver.evaluate_candidate(ws.problem,solved['result']['optimum'])
         metrics=plan_metrics(ws,np.array(solved['states']),np.array(solved['tensions']),u['time_s'])
         initial_tip=np.asarray(ws._motion(state[:ws.n],state[ws.n:])[0]).ravel()
@@ -160,23 +164,62 @@ def local_pair(ctx,args,reader,source,updates):
         limits=np.array([t['force_limit_n'] for t in inp.robot.structure.data['tendons']]);inputs=np.array(solved['tensions'])
         snap=capture_snapshot(ws,solved,args.update_id,u['time_s'],solved['tensions'][0],
             {'gvs_projection':dict(residual_max_rad_m=u.get('gvs_projection_residual_max_rad_m'))})
-        ref=ctx.save_artifact(dict(snapshot=snap,independent_verification=checked,parameters=p),'local_control_snapshot')
+        # Preserve the numerical result before any downstream presentation.
+        ref=ctx.save_artifact(dict(snapshot=snap,independent_verification=checked,parameters=p,
+            result=solved['result'],diagnostics=solved['diagnostics']),'local_control_snapshot')
         rows.append(dict(label=label,parameters=p,metrics=metrics,physical_motion=physical_motion,
+            plans={label:dict(verification=plan['verification'],objective_components=plan['objective_components'],metrics=plan['metrics'])
+                for label,plan in snap['plans'].items()},
             input_bounds_satisfied=bool(np.all(inputs>=-1e-8)&np.all(inputs<=limits+1e-8)),
             lower_input_margin_n=inputs.min(axis=0).tolist(),upper_input_margin_n=(limits-inputs.max(axis=0)).tolist(),
-            verification=checked,reference=plain(ref),
+            verification=checked,reference=plain(ref),numerical_reference=plain(numerical_ref),
             selected_iteration=solved['diagnostics']['selected_feasible_iteration'],
-            stop_reason=solved['diagnostics']['policy_stop_reason'],complete_cost_s=time.perf_counter()-wall))
+            stop_reason=solved['diagnostics']['policy_stop_reason'],
+            termination=termination_facts(solved['diagnostics']),complete_cost_s=time.perf_counter()-wall))
     return dict(update_id=args.update_id,time_s=u['time_s'],changed_factor=args.changed_parameter,
         initial_state_reference=dict(reference=source['files']['controller_observations.json'],pointer=f'/{args.update_id}/measured_initial_state'),
         previous_input_reference=dict(reference=source['files']['controller_observations.json'],pointer=f'/{args.update_id-1}/actual_tension_n'),
-        baseline_value=recipe[args.changed_parameter],variant_value=args.changed_value,rows=rows,
-        fixed=['robot','task','recorded projected state','previous applied input','horizon','integration','bounds','solver budgets','cold-seed protocol'],
+        baseline_value=baseline_value,variant_value=args.changed_value,rows=rows,
+        fixed=['robot','task','recorded projected state','previous applied input','absolute time','effective horizon','bounds','cold-seed protocol','all recipe fields except the declared factor'],
         seed='New constant previous-input seed with dynamics regeneration, no historical warm reconstruction',
         criteria=dict(independent_feasibility_max_scaled=1e-5,speed_reduction_fraction=.2,error_limit_m=.01),
         objectives='Differing objective definitions: raw scalar objectives are not ranked across variants',
         new_local_solves=2,complete_cost_s=time.perf_counter()-start,
         applicability='One local model comparison, not closed-loop or historical optimizer replay')
+
+
+def recipe_value(recipe,factor):
+    return recipe['feasible_return']['budget_s'] if factor=='feasible_return.budget_s' else recipe[factor]
+
+
+def changed_recipe(recipe,factor,value):
+    """Only the explicitly declared field changes; never lift another ceiling."""
+    p=deepcopy(recipe)
+    if factor=='feasible_return.budget_s':
+        if not 15.<=value<=30. or not p.get('feasible_return'):raise ValueError('FEASIBLE_RETURN_BUDGET_15_TO_30_REQUIRED')
+        p['feasible_return']['budget_s']=float(value)
+    elif factor in ('terminal_tip_speed_weight','holding_tip_speed_weight'):
+        if not .025<=value<=.10:raise ValueError('SPEED_WEIGHT_OUTSIDE_AUTHORIZATION')
+        p[factor]=float(value)
+    elif factor=='substeps':
+        if value not in (1,2):raise ValueError('SUBSTEPS_ONE_OR_TWO_REQUIRED')
+        p[factor]=int(value)
+    else:raise ValueError('UNAUTHORIZED_LOCAL_FACTOR')
+    return p
+
+
+def termination_facts(d):
+    reason=d.get('policy_stop_reason') or d['return_status']
+    budget=(d.get('options',{}).get('feasible_return') or {}).get('budget_s')
+    return dict(actual_stop_reason=reason,raw_return_status=d['return_status'],
+        policy_stop_reason=d.get('policy_stop_reason'),policy_stop_s=d.get('policy_stop_s'),
+        iterations=d['iterations'],solve_s=d['solve_s'],feasible_return_budget_s=budget,
+        feasible_return_budget_triggered=d.get('policy_stop_reason')=='budget_best_feasible',
+        budget_effect_isolated=d.get('policy_stop_reason')=='budget_best_feasible',
+        interpretation=('Feasible-return budget triggered; interpret only this saved-state comparison.'
+            if d.get('policy_stop_reason')=='budget_best_feasible' else
+            'Another stopping condition ended this solve; this result cannot establish that extending the feasible-return budget is ineffective.'),
+        other_limits_increased=False)
 
 
 def execute(ctx,args):

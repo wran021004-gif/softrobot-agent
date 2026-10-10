@@ -77,6 +77,9 @@ def resolve_candidate(store, candidate_reference, source, control, run_id, polic
     values=dict(old_recipe,lengths_m=list(candidate['lengths_m']),
         holding_tip_speed_weight=choice.holding_tip_speed_weight,terminal_tip_speed_weight=choice.terminal_tip_speed_weight)
     cfg=resolved_input(problem,values,run_id,policy);inp=SessionInput.model_validate(cfg)
+    cfg['policy']['controller']['parameters']['data']['recipe']['feasible_return']['budget_s']=choice.feasible_return_budget_s
+    cfg['policy']['controller']['parameters']['data']['recipe']['substeps']=choice.substeps
+    inp=SessionInput.model_validate(cfg)
     dims=family.dimensions(inp);expr=expression(cfg)
     if candidate['coordinate_order']!=dims['coordinate_order'] or candidate['tendon_order']!=dims['tendon_input_order']:
         raise ValueError('CANDIDATE_NAMED_COORDINATE_OR_TENDON_ORDER_MISMATCH')
@@ -89,6 +92,8 @@ def resolve_candidate(store, candidate_reference, source, control, run_id, polic
         raise ValueError('CANDIDATE_UNITS_MISMATCH')
     expected=plain(problem.execution.recipe);actual=cfg['policy']['controller']['parameters']['data']['recipe']
     for k in ('holding_tip_speed_weight','terminal_tip_speed_weight'):expected[k]=getattr(choice,k)
+    expected['feasible_return']['budget_s']=choice.feasible_return_budget_s
+    expected['substeps']=choice.substeps
     if actual!=expected:raise ValueError('UNDECLARED_NMPC_RECIPE_CHANGE')
     physics=family.check_robot(inp.robot.structure.data,inp.policy.discretization.data)
     basis=resolve_basis(inp.robot.structure.data,problem.execution.recipe.basis)
@@ -115,11 +120,12 @@ def validate_control(store, state, choice, action):
     if source is None:raise ValueError('IMMUTABLE_CANDIDATE_SOURCE_PROVENANCE_REQUIRED')
     preceding=None;changes={};factors=['structure/controller evaluation']
     if choice.preceding_execution:
-        rows=[r for r in state['results'] if r['operation']=='closed_loop' and r['reference']==plain(choice.preceding_execution) and not r.get('imported')]
+        rows=[r for r in state['results'] if r['operation']=='closed_loop' and r['reference']==plain(choice.preceding_execution) and
+            (not r.get('imported') or state.get('initialization_diagnosis'))]
         if not rows:raise ValueError('PRECEDING_CURRENT_ACTIVITY_EXECUTION_REQUIRED')
         preceding=store.artifact(choice.preceding_execution)
-        for k in ('holding_tip_speed_weight','terminal_tip_speed_weight'):
-            old=preceding['control'][k];new=getattr(choice,k)
+        for k in ('holding_tip_speed_weight','terminal_tip_speed_weight','feasible_return_budget_s','substeps'):
+            old=preceding['control'].get(k,15. if k=='feasible_return_budget_s' else 1);new=getattr(choice,k)
             if old!=new:changes[k]=dict(before=old,after=new)
         same=preceding['candidate']==plain(choice.candidate)
         if action=='control_revision' and (not same or not changes):raise ValueError('CONTROL_ONLY_REVISION_REQUIRES_SAME_CANDIDATE_AND_CHANGED_WEIGHTS')
@@ -174,7 +180,10 @@ def finish_closed_loop(host, child=None, started=None):
         if child.store.lookup(owner,'complete-simulation') is None:
             raise ValueError('RECOVERY_REQUIRES_EXISTING_LAUNCH_INSPECT_BEFORE_REPEAT')
         started=time.perf_counter()
-    result=complete_execution(child,cfg,owner)
+    from extensions.tendon_family.control_evidence import RECORD_UPDATE_IDS
+    token=RECORD_UPDATE_IDS.set(tuple(pending['control'].get('record_update_ids',[])))
+    try:result=complete_execution(child,cfg,owner)
+    finally:RECORD_UPDATE_IDS.reset(token)
     receipts=result.get('receipts',{});profile=None;motion=[];acceptance=None
     if result['status']=='evaluated':
         profile=host.store.artifact(result['profile_report']['reference'])['detail']

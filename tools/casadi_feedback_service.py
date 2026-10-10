@@ -8,7 +8,8 @@ from tools.platform_store import plain
 from tools.state_io import atomic_json, read, digest
 from tools.spec_tools import ROOT
 
-SPEC=read(ROOT/'examples/casadi_nmpc/specification.json')
+SPEC_PATH=ROOT/('examples/nmpc_initialization/specification.json' if os.environ.get('NMPC_INITIALIZATION_DIAGNOSIS')=='1' else 'examples/casadi_nmpc/specification.json')
+SPEC=read(SPEC_PATH)
 CEILINGS=SPEC['budgets']
 ACTIVITY=SPEC['study_id']
 RESERVATIONS=dict(diagnose=900.,speed=600.,solve=900.,replay=450.)
@@ -42,6 +43,13 @@ def plan(ctx,args):
     if state['research_status']=='stopped':raise ValueError('MODEL_STOP_SEALED')
     if state.get('pending'):raise ValueError('UNKNOWN_NUMERICAL_OUTCOME_INSPECT_FIRST')
     if state.get('engineering_pause') and args.action!='stop':raise ValueError('ENGINEERING_PAUSE_REQUIRES_LOCAL_RECOVERY')
+    initialization=SPEC.get('investigation')=='initialization_diagnosis'
+    if initialization:
+        from tools.nmpc_initialization import validate_plan
+        validate_plan(ctx.store,state,args)
+    elif args.action=='saved_state_comparison' or (args.control and
+        (args.control.feasible_return_budget_s!=15. or args.control.substeps!=1 or args.control.record_update_ids)):
+        raise ValueError('FRESH_INITIALIZATION_DIAGNOSIS_GRANT_REQUIRED')
     for ref in args.supporting_evidence:ctx.artifact(ref)
     new_results=[r for r in state['results'] if not r.get('imported')]
     if new_results and not any(plain(ref)==r['reference'] for ref in args.supporting_evidence for r in new_results):
@@ -53,7 +61,7 @@ def plan(ctx,args):
         if state.get('last_expensive_decision_send')==send:
             raise ValueError('ONE_EXPENSIVE_EXPERIMENT_PER_PROVIDER_DECISION_CONSUME_FEEDBACK_FIRST')
         if ctx.store.remaining()['remaining']['model_calls']<=4:raise ValueError('FINAL_FOUR_PROVIDER_SENDS_PROTECTED')
-        reserve={'solve':1350.,'diagnostic_replay':450.,'closed_loop':1890.,'control_revision':1890.}[args.action]
+        reserve={'solve':1350.,'diagnostic_replay':450.,'closed_loop':1890.,'control_revision':1890.,'saved_state_comparison':300.}[args.action]
         if state['numerical_s']+reserve>CEILINGS['total_numerical_s'] or time.time()+reserve>=state['cutoff_unix']:
             raise ValueError('OPERATION_CANNOT_FIT_REMAINING_BUDGET')
     batch='initial' if state['nlp_solves']==0 else 'revision'
