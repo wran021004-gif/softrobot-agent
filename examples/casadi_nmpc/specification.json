@@ -1,0 +1,172 @@
+{
+  "study_id": "casadi-nmpc-research-20261010",
+  "authorization": "User /goal attachment 7d35f365-ecc3-4970-ba92-ece5465d1580/pasted-text-1.txt; scoped model requests, experiments, commit and ordinary push",
+  "base_commit": "056707b4499327ad944df8b7f25460e79dabdee1",
+  "physical_source": "examples/casadi_codesign/case_A.json#/physical_source",
+  "frozen_task": {
+    "target_m": [
+      0.29,
+      0.035,
+      0.19
+    ],
+    "mount_m": [
+      0,
+      0,
+      0.15
+    ],
+    "mount_quaternion_wxyz": [
+      1,
+      0,
+      0,
+      0
+    ],
+    "gravity_m_s2": [
+      0,
+      0,
+      -9.81
+    ],
+    "duration_s": 0.35,
+    "control_intervals": 35,
+    "control_period_s": 0.01,
+    "physical_timestep_s": 0.0005,
+    "physical_mesh_cells": 24,
+    "seed": 17,
+    "physical_initial_state": "named_zero_positions_and_velocities",
+    "topology": "two flexible segments; six independent ideal tension channels; existing asymmetric routing, guides, rigid components and payload",
+    "mechanics": "existing material and sections; structural_linear basis; existing coordinate/tendon order",
+    "tension_bounds_n": [
+      0,
+      8
+    ],
+    "terminal_position_limit_m": 0.01,
+    "holding_position_limit_m": 0.01,
+    "holding_speed_limit_m_s": 0.02,
+    "holding_window_s": 0.05
+  },
+  "design": {
+    "rule": "L_proximal=0.16+0.0055*d; L_distal=0.11-0.0055*d",
+    "bounds": [
+      -1,
+      1
+    ],
+    "constant_throughout_trajectory": true
+  },
+  "search": {
+    "slacks": "Two shared nonnegative variables: position slack covers all holding and terminal normalized position squared inequalities; speed slack covers all holding normalized speed squared inequalities. Each inequality is normalized_squared <= 1 + its slack.",
+    "hard_constraints": [
+      "initial state",
+      "implicit force balance and kinematics",
+      "constant design domain",
+      "tension bounds",
+      "nonnegative slacks"
+    ],
+    "objective_menu": [
+      "task_gap",
+      "task_gap_with_effort"
+    ],
+    "task_gap_expression": "position_weight*s_position + speed_weight*s_speed",
+    "position_and_speed_weight_bounds": [
+      0.25,
+      4
+    ],
+    "default_weights": [
+      1,
+      1
+    ],
+    "secondary_coefficient_bounds": [
+      0,
+      0.001
+    ],
+    "secondary_expression": "coefficient * (mean((u/8)^2)+0.1*mean((diff(u)/8)^2)); weighted tradeoff, not lexicographic",
+    "initializations": [
+      "pretension_0_2",
+      "ramp_0_2_to_0_4",
+      "saved_schedule"
+    ],
+    "state_substeps": [
+      1,
+      2
+    ],
+    "refinement_gate": "Observed original-versus-refined reconstruction discrepancy exceeds 1 mm or 0.002 m/s with complete horizons",
+    "outer_derivatives": "automatic exact AD",
+    "local_derivatives": "reverse; historical speed trial reused without adoption"
+  },
+  "acceptance": {
+    "hard_normalized_residual_tolerance": 1e-05,
+    "task_gap_normalized_tolerance": 1e-05,
+    "slack_subtracted": false,
+    "replay_tip_disagreement_limit_m": 0.001,
+    "replay_speed_disagreement_limit_m_s": 0.002,
+    "independent_replay": "SciPy BDF from zero, continuous state across 35 original tension switches; default rtol=1e-8,atol_q=1e-9,atol_v=1e-7; dense 0.0005 s metrics separate from original-node metrics",
+    "physical_validation": "Exploratory MuJoCo feedback control; eligibility independent of historical open-loop failures. Existing sampled acceptance unchanged; not real hardware or real-time deployment."
+  },
+  "diagnosis": {
+    "candidate": "evidence/casadi_codesign_pilot_20261010/07_solve_A.json#/candidate; corrected A iteration 59",
+    "source_solver": "baae52d1f11518a40982491879c4a0ab380c519a617a0588e989a0e496bebbf2",
+    "selected_candidate": "6f121f12f89af153953972e5140b4e2fdd4b77ddb089fbc8c340457198af97b9",
+    "comparisons": [
+      "saved NLP vs tightly solved original grid",
+      "original vs two-step refined grid",
+      "refined vs saved BDF",
+      "saved BDF vs one precision check"
+    ],
+    "root_tolerance": 1e-11,
+    "precision_bdf": {
+      "rtol": 1e-10,
+      "atol_q": 1e-11,
+      "atol_v": 1e-09
+    },
+    "no_design_search": true,
+    "reuse": "Import evidence/casadi_feedback_research_20261010/00_diagnose.json and 01_speed.json unchanged; no new historical numerical work"
+  },
+  "budgets": {
+    "full_nlp_solves": 2,
+    "solve_limit_s": 900,
+    "ipopt_cpu_wall_settings_s": 570,
+    "nlp_process_ceiling_s": 900,
+    "replay_process_ceiling_s": 450,
+    "diagnosis_process_ceiling_s": 900,
+    "speed_process_ceiling_s": 600,
+    "total_numerical_s": 7200,
+    "initial_investigation_s": 0,
+    "physical_launches": 2,
+    "physical_allowance_s": 1800,
+    "actual_provider_requests": 16,
+    "protected_final_provider_sends": 4,
+    "public_workflow_calls": 64,
+    "other_llm_workers": 0,
+    "overall_activity_s": 21600,
+    "delivery_reserve_s": 1800,
+    "new_independent_replays": 3,
+    "evaluation_allowance_s": 30,
+    "profile_allowance_s": 60
+  },
+  "completion": "Accepted native STOP based on imported or new evidence; any supported first action. No mandatory solve, replay, NMPC or task success.",
+  "historical_activities": "sealed STOP; previous unused budget cannot be used",
+  "started_unix": 1791630767.0,
+  "control_adjustments": {
+    "holding_tip_speed_weight": {
+      "default": 0.05,
+      "bounds": [
+        0.025,
+        0.1
+      ]
+    },
+    "terminal_tip_speed_weight": {
+      "default": 0.1,
+      "bounds": [
+        0.025,
+        0.1
+      ]
+    }
+  },
+  "action_menu": [
+    "solve",
+    "diagnose",
+    "diagnostic_replay",
+    "closed_loop",
+    "control_revision",
+    "stop"
+  ],
+  "latest_evidence": "evidence/casadi_feedback_closeout_20261010; preserve candidates, checkpoints, plans, original-node comparisons and post-STOP correction"
+}

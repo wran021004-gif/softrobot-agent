@@ -9,32 +9,12 @@ from tools.casadi_feedback_worker import assess
 
 
 class PlanTests(unittest.TestCase):
-    def test_failed_initial_batch_can_be_revised_without_missing_replay(self):
-        from types import SimpleNamespace
-        from contextlib import nullcontext
-        import time
-        from tools.casadi_feedback_service import plan
-        from schemas.platform import EvidenceRef
-        ref=dict(artifact_id='a'*64,media_type='application/json')
-        state=dict(research_status='ready',results=[dict(operation='solve',reference=ref,candidate=None)],
-            plans=[dict(action='batch')],batch_counts=dict(initial=1,revision=0),nlp_solves=1,
-            numerical_s=0.,investigation_s=0.,cutoff_unix=time.time()+10000.,refined_grid_supported=True)
-        store=SimpleNamespace(session=lambda *a:dict(state=state),remaining=lambda:dict(remaining=dict(model_calls=10,tool_calls=80,backend_solves=1)),
-            transaction=lambda:nullcontext(None),update_state=lambda *a:None)
-        ctx=SimpleNamespace(store=store,run_id='casadi-feedback-research-20261010',artifact=lambda r:{},
-            save_artifact=lambda *a:EvidenceRef(**ref))
-        args=Plan(action='batch',hypothesis='h',supporting_evidence=[ref],weakening_observation='o',fixed_conditions='f',
-            candidates=[Candidate(substeps=2)],requested_nlp_solves=1,requested_replays=1,revision_or_stop_rule='r',disposition='d',limitations=['l'])
-        self.assertTrue(plan(ctx,args).detail['accepted'])
-        state['plans']=[dict(action='batch')];state['results'][0]['candidate']=ref
-        with self.assertRaisesRegex(ValueError,'AVAILABLE_INITIAL_CANDIDATE_REPLAY'):plan(ctx,args)
-
     def test_protected_closeout_schema(self):
         from schemas.casadi_feedback import CloseoutPlan
         ref=dict(artifact_id='a'*64,media_type='application/json')
-        base=dict(hypothesis='h',supporting_evidence=[ref],weakening_observation='o',fixed_conditions='f',revision_or_stop_rule='r',disposition='d',limitations=['l'])
+        base=dict(hypothesis='h',supporting_evidence=[ref],weakening_observation='o',expected_observation='e',fixed_conditions='f',revision_or_stop_rule='r',disposition='d',limitations=['l'])
         self.assertEqual(CloseoutPlan(action='stop',**base).action,'stop')
-        with self.assertRaises(ValidationError):CloseoutPlan(action='batch',**base)
+        with self.assertRaises(ValidationError):CloseoutPlan(action='solve',**base)
 
     def test_solver_return_survives_candidate_packaging(self):
         from types import SimpleNamespace
@@ -85,10 +65,10 @@ class PlanTests(unittest.TestCase):
         state={};ref=dict(artifact_id='a'*64,media_type='application/json')
         store=SimpleNamespace(artifact=lambda r:dict(detail=dict(status='engineering_error')),
             transaction=lambda:nullcontext(None),session=lambda *a:dict(state=state),update_state=lambda *a:None)
-        base=dict(action='batch',hypothesis='h',supporting_evidence=[ref],weakening_observation='o',fixed_conditions='f',
+        base=dict(action='solve',hypothesis='h',supporting_evidence=[ref],weakening_observation='o',expected_observation='e',fixed_conditions='f',
             candidates=[Candidate(),Candidate(substeps=2)],requested_nlp_solves=2,requested_replays=2,revision_or_stop_rule='r',disposition='d',limitations=['l'])
         with patch('tools.research_casadi_feedback.invoke',return_value=dict(execution_status='completed',output=ref)) as call:
-            operations=execute_batch(SimpleNamespace(store=store),Plan(**base),dict(batch='initial',plan_reference=ref),'fixture')
+            operations=execute_batch(SimpleNamespace(store=store),SimpleNamespace(candidates=[Candidate(),Candidate(substeps=2)]),dict(batch='initial',plan_reference=ref),'fixture')
         self.assertEqual(call.call_count,1);self.assertEqual(len(operations),1)
         self.assertEqual(state['engineering_pause']['unexecuted_choices'][0]['substeps'],2)
 
@@ -137,8 +117,8 @@ class PlanTests(unittest.TestCase):
         from tools.casadi_feedback_service import plan
         import time
         ref=dict(artifact_id='a'*64,media_type='application/json')
-        base=dict(hypothesis='h',supporting_evidence=[ref],weakening_observation='o',fixed_conditions='f',revision_or_stop_rule='r',disposition='d',limitations=['l'])
-        with self.assertRaises(ValidationError):ActivityPlan(action='batch',candidates=[Candidate(),Candidate()],requested_nlp_solves=2,requested_replays=2,**base)
+        base=dict(hypothesis='h',supporting_evidence=[ref],weakening_observation='o',expected_observation='e',fixed_conditions='f',revision_or_stop_rule='r',disposition='d',limitations=['l'])
+        with self.assertRaises(ValidationError):ActivityPlan(action='solve',candidates=[Candidate(),Candidate()],requested_nlp_solves=2,requested_replays=2,**base)
         state=dict(research_status='ready',results=[dict(operation='solve',reference=ref,candidate=None)],plans=[],numerical_s=0.,
             investigation_s=0.,nlp_solves=1,batch_counts=dict(initial=1,revision=0),cutoff_unix=time.time()+10000.)
         store=SimpleNamespace(session=lambda *a:dict(state=state),remaining=lambda:dict(remaining=dict(model_calls=4,tool_calls=40,backend_solves=0)),
@@ -170,11 +150,11 @@ class PlanTests(unittest.TestCase):
 
     def test_plan_operations_match(self):
         ref=dict(artifact_id='a'*64,media_type='application/json')
-        base=dict(hypothesis='h',supporting_evidence=[ref],weakening_observation='o',fixed_conditions='f',
+        base=dict(hypothesis='h',supporting_evidence=[ref],weakening_observation='o',expected_observation='e',fixed_conditions='f',
             revision_or_stop_rule='r',disposition='d',limitations=['l'])
-        with self.assertRaises(ValidationError):Plan(action='batch',**base)
+        with self.assertRaises(ValidationError):Plan(action='solve',**base)
         with self.assertRaises(ValidationError):Plan(action='stop',requested_nlp_solves=1,**base)
-        self.assertEqual(Plan(action='batch',candidates=[Candidate()],requested_nlp_solves=1,requested_replays=1,**base).action,'batch')
+        self.assertEqual(Plan(action='solve',candidates=[Candidate()],requested_nlp_solves=1,requested_replays=1,**base).action,'solve')
 
     def test_refined_rollout_actual_design_and_continuous_zero(self):
         # Analytic implicit integrator checks saved schedule, nonzero design and switches.

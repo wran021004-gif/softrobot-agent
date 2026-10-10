@@ -24,8 +24,8 @@ from schemas.casadi_feedback import Empty, Solve as ResearchSolve, Replay as Res
 EXTENSIONS += [Extension('math.casadi_feedback_'+name,'tool','1.0.0',schema,Result,
     'tools.casadi_feedback_service:'+name,description,
     sources=EXTENSIONS[0].sources + ('tools/casadi_feedback_service.py','tools/casadi_feedback_worker.py',
-        'tools/research_casadi_feedback.py','schemas/casadi_feedback.py','tests/test_casadi_feedback.py'),
-    assets=EXTENSIONS[0].assets+('examples/casadi_feedback/specification.json',),
+        'tools/research_casadi_feedback.py','tools/casadi_closed_loop.py','schemas/casadi_feedback.py','tests/test_casadi_nmpc_research.py'),
+    assets=EXTENSIONS[0].assets+('examples/casadi_nmpc/specification.json',),
     dependencies=('casadi','numpy','scipy'),extension_dependencies=(('model.gvs','1.0.0'),('solver.ipopt','1.0.0')),
     capabilities={'category':'analysis','preflight':'tools.casadi_feedback_service:preflight'},
     cache=False,side_effects='new cumulative research activity; numerical evidence and model decision')
@@ -34,4 +34,4 @@ EXTENSIONS += [Extension('math.casadi_feedback_'+name,'tool','1.0.0',schema,Resu
         ('speed',Empty,'One local automatic-AD experiment; same saved inputs and exact derivatives. No NLP.'),
         ('solve',ResearchSolve,'Execute an accepted model plan candidate with shared task slacks, original acceptance and hard residuals.'),
         ('replay',ResearchReplay,'Independent BDF replay from physical zero; diagnostic schedules permitted.'),
-        ('plan',Plan,'Record model hypothesis, evidence, bounded batch or diagnostic choice, or final STOP.'))]
+        ('plan',Plan,'Record any supported research action, evidence, parameters or native STOP; one expensive experiment per decision.'))]

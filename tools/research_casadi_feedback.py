@@ -16,9 +16,9 @@ from tools.spec_tools import ROOT
 from tools.casadi_feedback_service import ACTIVITY,budget,RESERVATIONS,SPEC,CEILINGS
 
 RUN=ROOT/'runs'/ACTIVITY
-OUT=ROOT/'evidence/casadi_feedback_closeout_20261010'
-LIMITS=dict(model_calls=CEILINGS['actual_provider_requests'],tool_calls=CEILINGS['public_workflow_calls'],backend_solves=0,worker_calls=0,wall_s=CEILINGS['overall_activity_s'])
-TOOLS={name:'1.0.0' for name in ['math.casadi_feedback_'+s for s in ('diagnose','speed','solve','replay','plan')]+['evidence.read']}
+OUT=ROOT/'evidence/casadi_nmpc_research_20261010'
+LIMITS=dict(model_calls=CEILINGS['actual_provider_requests'],tool_calls=CEILINGS['public_workflow_calls'],backend_solves=CEILINGS['physical_launches'],worker_calls=0,wall_s=CEILINGS['overall_activity_s'])
+TOOLS={name:'1.0.0' for name in ['math.casadi_feedback_'+s for s in ('solve','replay','plan')]+['evidence.read']}
 AUTHORIZATION=SPEC['authorization']+'; authorized non-secret research payload to https://api.deepseek.com/chat/completions; credentials for authentication only; scoped commit and ordinary push'
 
 def activity_start():
@@ -53,42 +53,20 @@ def prepare():
     with h.store.transaction() as db:
         cfg=h.store.session(ACTIVITY,db)['snapshot']['input'];state=h.store.session(ACTIVITY,db)['state']
         state.update(started_unix=STARTED,cutoff_unix=STARTED+CEILINGS['overall_activity_s']-CEILINGS['delivery_reserve_s'],numerical_s=0.,investigation_s=0.,nlp_solves=0,
-            python='D:/softrobot-agent/.mainline5-env/Scripts/python.exe',batch_counts=dict(initial=0,revision=0),
-            results=[],plans=[],dispatched_candidates=[],research_status='ready',spec_identity=digest(read(ROOT/'examples/casadi_feedback/specification.json')))
+            python='D:/softrobot-agent/.mainline5-env/Scripts/python.exe',
+            results=[],plans=[],dispatched_candidates=[],research_status='ready',spec_identity=digest(read(ROOT/'examples/casadi_nmpc/specification.json')))
         state['pilot']=dict(activity_id=ACTIVITY,provider=cfg['policy']['model'],framework_session_id=ACTIVITY,
             live_model_requests=0,started_unix=STARTED,request_deadline_unix=STARTED+CEILINGS['overall_activity_s']-CEILINGS['delivery_reserve_s'])
-        # Import selected historical artifacts with unchanged body/hash; no scientific charge.
-        from tools.casadi_feedback_worker import HISTORY
-        historical={}
-        for name,path in [('corrected_A',HISTORY/'07_solve_A.json'),('corrected_B',HISTORY/'08_solve_B.json'),
-            ('corrected_A_replay',HISTORY/'09_replay_A.json'),('mechanics_verification',HISTORY/'00_check_check.json')]:
-            value=read(path);ref=h.store.put(db,value);historical[name]=plain(ref)
-        # Selected source body is read from just its archive member, without full extraction.
-        import tarfile
-        selected=read(HISTORY/'selected_latest_A.json')['reference']
-        with tarfile.open(HISTORY/'immutable_artifacts.tar.gz','r:gz') as archive:
-            body=archive.extractfile('artifacts/'+selected['artifact_id']+'.json').read()
-        imported=h.store.put(db,json.loads(body))
-        if imported.artifact_id!=selected['artifact_id']:raise ValueError('HISTORICAL_SELECTED_HASH_CHANGED')
-        historical['selected_corrected_A']=plain(imported)
-        state['historical']=historical
-        # Evidence prerequisites are imports, not newly executed experiments.
-        for operation,filename in [('diagnose','00_diagnose.json'),('speed','01_speed.json')]:
-            path=ROOT/'evidence/casadi_feedback_research_20261010'/filename
-            value=read(path);ref=h.store.put(db,value)
-            state['results'].append(dict(operation=operation,reference=plain(ref),candidate=None,imported=True,source=str(path.relative_to(ROOT)),new_numerical_s=0.))
-        diagnosis=read(ROOT/'evidence/casadi_feedback_research_20261010/00_diagnose.json')
-        speed=read(ROOT/'evidence/casadi_feedback_research_20261010/01_speed.json')
-        comparison=diagnosis['comparisons']['tight_original_vs_tight_refined']
-        state['refined_grid_supported']=bool(comparison['complete_horizon'] and (comparison['max_tip_m']>.001 or comparison['max_speed_m_s']>.002))
-        state['speed_check_passed']=bool(speed['status']=='passed' and speed['equivalence_passed'])
-        state['local_ad']='reverse';state['replays']=0
+        from tools.casadi_closed_loop import import_latest
+        history,results,sources=import_latest(h.store,db)
+        state.update(historical=history,results=results,candidate_sources=sources,
+            refined_grid_supported=True,speed_check_passed=True,local_ad='reverse',replays=0)
         h.store.update_state(db,ACTIVITY,state)
-        h.store.event(db,ACTIVITY,'historical_import','read_only_provenance_preserved',outputs=[imported])
+        h.store.event(db,ACTIVITY,'historical_import','read_only_provenance_preserved',outputs=[h.store.put(db,history)])
     atomic_json(RUN/'activity.json',dict(activity_id=ACTIVITY,authorization=AUTHORIZATION,started_unix=STARTED,limits=LIMITS,
-        numerical_limit_s=3600.,initial_investigation_limit_s=0.,delivery_reserve_s=1800.,nlp_limit=2,replay_limit=3,
-        solve_limit_s=600.,ipopt_cpu_wall_s=570.,process_reservations=RESERVATIONS,
-        physical_launch_limit=0,physical_allowance_s=0.,protected_provider_sends=4,
+        numerical_limit_s=CEILINGS['total_numerical_s'],initial_investigation_limit_s=0.,delivery_reserve_s=1800.,nlp_limit=2,replay_limit=3,
+        solve_limit_s=900.,ipopt_cpu_wall_s=570.,process_reservations=RESERVATIONS,
+        physical_launch_limit=2,physical_allowance_s=1800.,protected_provider_sends=4,
         base_commit=SPEC['base_commit'],historical_activities='sealed STOP; unused allowance unavailable'))
     return h
 
@@ -118,45 +96,47 @@ def bind(h,repair=False,reason=None):
     atomic_json(RUN/'implementation_freeze.json',dict(commit=commit,snapshot_reference=plain(ref),dependency_identity=digest(snapshot['dependencies'])))
 
 
+def compact_result(value):
+    keys=('status','termination_reason','iterations','solver_termination','checkpoint_reference','candidate_export_status',
+        'trajectory_metrics','original_task_feasible','original_task_gaps','hard_max_normalized_violation',
+        'relaxed_nlp_feasible','objective_components','physical_eligible','costs_s','process_elapsed_s',
+        'acceptance','control','revision','resolved_configuration','wiring_reference','holding_motion',
+        'sampling','unknowns','failure_categories','execution_references','actual_duration_s','completed_control_updates',
+        'nmpc_internal_solves','offline_nlp_slots_charged')
+    result={k:value[k] for k in keys if k in value}
+    if value.get('replay'):result['replay']={k:v for k,v in value['replay'].items() if k not in ('integration_counts','sampled_evaluator')}
+    if value.get('profile'):
+        result['control_model_feedback']={k:v for k,v in value['profile'].items() if k not in ('task','numerical_preparation','control_parameters','execution_scope')}
+    return result
+
+
 def packet(h):
-    state=h.store.session(ACTIVITY)['state'];history=state['historical']
-    historical=[]
-    for name in ('corrected_A','corrected_B'):
-        value=h.store.artifact(history[name]);historical.append(dict(name=name,reference=history[name],
-            lengths_m=value['candidate']['lengths_m'],objective=value['objective_components'],
-            normalized_violation=value['normalized_max_violation'],metrics=value['trajectory_metrics'],
-            mathematical_feasibility=value['mathematical_feasibility']))
-    results=[]
+    state=h.store.session(ACTIVITY)['state'];history=state['historical'];results=[]
     for row in state['results']:
-        value=h.store.artifact(row['reference']);keys=('status','termination_reason','comparisons','saved_nlp_metrics','precision_bdf',
-            'modes','full_warmed_speed_ratio','setup_repayment_jacobian_calls','adopted','selected_local_ad',
-            'hard_max_normalized_violation','largest_hard_residuals','relaxed_nlp_feasible','original_task_feasible',
-            'original_task_gaps','slack_values','trajectory_metrics','objective_components','replay','physical_eligible','process_elapsed_s','costs_s')
-        detail={k:value[k] for k in keys if k in value}
-        for k in ('iterations','solver_entered','solver_returned','solver_termination','checkpoint_reference','candidate_export_status','original_packaging_failure'):
-            if k in value:detail[k]=value[k]
-        if 'comparisons' in detail:detail['comparisons']={k:{kk:vv for kk,vv in v.items() if not kk.startswith(('per_node','common_times'))} for k,v in detail['comparisons'].items()}
-        if 'modes' in detail:detail['modes']={k:{kk:vv for kk,vv in v.items() if kk!='local'} for k,v in detail['modes'].items()}
-        if 'precision_bdf' in detail:detail['precision_bdf']={k:v for k,v in detail['precision_bdf'].items() if k not in ('integration_counts','sampled_evaluator')}
-        if 'replay' in detail:detail['replay']={k:v for k,v in detail['replay'].items() if k not in ('integration_counts','sampled_evaluator')}
+        value=h.store.artifact(row['reference'])
+        if row['operation'] in ('diagnose','speed') and row.get('imported'):
+            detail={'status':value['status'],'reuse':'Already executed mechanics/mesh/precision diagnosis and unsuccessful AD speed trial; do not repeat.'}
+        else:detail=compact_result(value)
         results.append(dict(operation=row['operation'],reference=row['reference'],candidate=row.get('candidate'),
-            imported=row.get('imported',False),source=row.get('source'),**detail))
-    return dict(frozen_specification=read(ROOT/'examples/casadi_feedback/specification.json'),historical=historical,
-        historical_replay=dict(reference=history['corrected_A_replay'],holding_speed_m_s=.09799912805413251,node_tip_disagreement_m=.00810609985798637),
-        saved_schedule_reference=history['selected_corrected_A'],results=results,
-        historical_closeout=dict(status='sealed STOP; 24 sends exhausted',actual_refined_solves=2,iterations=[18,21],
-            ipopt_times_s=[221.178,259.993],relaxed_termination='optimal solution reported',
-            export_failure='Duplicate candidate argument; vectors not saved and cannot be recovered',
-            original_task_and_replay='unknown for both historical refined solves',
-            diagnosis_scope='One fixed schedule shows substantial discretization effects; no unique cause or 0.005 s convergence established',
-            speed_trial='Approximately 0.94 percent apparent improvement did not justify adoption; local reverse retained'),
+            imported=row.get('imported',False),source_activity=row.get('source_activity'),**detail))
+    candidates=[dict(reference=dict(artifact_id=aid,media_type='application/json'),**source,
+        design_values={k:h.store.artifact(dict(artifact_id=aid,media_type='application/json'))[k] for k in ('d','lengths_m','selection')})
+        for aid,source in state['candidate_sources'].items()]
+    return dict(frozen_specification=SPEC,candidates=candidates,results=results,imported_history=history,
+        established_facts=dict(prior_cycle='Two NLP attempts, two completed BDF replays, nine actual sends and accepted native STOP; both failed independent acceptance.',
+            initial=dict(iterations=22,predicted_holding_speed_m_s=.01974186,bdf_holding_speed_m_s=.04312197),
+            revision=dict(iterations=34,termination='Maximum_CpuTime_Exceeded',selected_iteration=3,predicted_holding_speed_m_s=.01915398,bdf_holding_speed_m_s=.04218082),
+            interpretation='About 2.18 percent replay speed improvement; initialization also changed and revision did not establish convergence. No isolated objective effect or unique cause.',
+            distinction='Optimization nodes, saved-input dense BDF and future NMPC feedback MuJoCo are separate evidence. NMPC success would not validate the old open-loop schedule.'),
         accepted_plans=state['plans'],research_status=state['research_status'],remaining_budget=budget(h.store),
-        capabilities=dict(research_plan='Typed batch of exactly one supported NLP choice; execute sequentially then independent BDF replay each usable schedule; subsequent revision, one diagnostic replay, or STOP',
-            evidence_read='Exact immutable reference and JSON pointer; basic facts already supplied',
-            physical='Zero physical launches authorized.'))
+        capabilities=dict(research_plan='Choose solve, referenced diagnosis, diagnostic_replay, closed_loop, control_revision or stop. One expensive experiment per decision; any action may be first.',
+            evidence_read='Exact immutable EvidenceRef and JSON pointer; compact facts already supplied',
+            physical='At most two MuJoCo feedback executions, no real hardware; failed open-loop acceptance does not block exploratory eligibility.'))
 
 
-INSTRUCTIONS='''You are the sole research principal for one bounded CasADi feedback study. Engineering diagnostics and the AD speed experiment were prescribed by the user and implemented by Codex; do not claim you discovered them. Use the supplied packet. Do not rediscover already supplied facts. Call research_plan to propose AND REQUEST a first batch with exactly one supported candidate solve. The tool executes your choices and independently replays every usable returned schedule before returning actual feedback. After consuming it, choose one justified revision batch (at most one further solve), one supported diagnostic replay, or STOP. You own that choice; a second batch and a speedup are not required. Following any revision consume its results and provide a final STOP disposition citing actual evidence. If only failures are returned, interpret those honestly and stop or choose a supported repair-free revision within budget. Use original unsoftened metrics to compare different weights. Two shared nonnegative task slacks change search only, not acceptance. Hard initial conditions, dynamics, design and force bounds remain. A relaxed feasible iterate is not task success. Physical validation is not established by this cycle. The small typed plan must explain hypothesis/evidence, weakening observation, fixed conditions, chosen domain/objective/initialization/grid, operations/budget, revision/stop rule, disposition and limitations. Cite actual EvidenceRefs. No textual pseudo-tools, other agents, changed task/material/topology/time/initial state/limits, controller search, or unsupported integrators. Two full NLP attempts maximum (one initial/one revision), three new independent replays maximum with the third requiring a diagnostic question about a new candidate,600 seconds each,3600 total numerical seconds including engineering checks and recovery,12 ACTUAL provider sends including summaries,48 public workflow calls,four hours including engineering and final30min protected. Final four sends are for outstanding feedback and closeout only. Do not infer physical impossibility, global optimality, joint-design advantage or LLM superiority. When STOP is accepted, conclude briefly with actual numerical evidence and unresolved limits; request no further work.'''
+
+
+INSTRUCTIONS='You are the sole research principal in a bounded research activity. Choose freely from the native research_plan action menu: solve (one existing mathematical choice followed by independent BDF), diagnose (read-only referenced synthesis, no new numerical experiment), diagnostic_replay (one supported BDF numerical operation), closed_loop (evaluate an immutable saved candidate structure under target-based NMPC), control_revision (same candidate, preceding closed-loop result EvidenceRef, exact changes to two weights), or stop. Any may be the first action, including a justified STOP using imported evidence. No mandatory new NLP, replay or NMPC. Do not rediscover supplied history. Engineering and prior numerical diagnostics were implemented by Codex; your original choices remain separate from facts and corrections. All experiment requests need hypothesis, supporting_evidence, expected_observation, weakening_observation, fixed_conditions, parameters, revision_or_stop_rule, disposition and limitations. Closed-loop control.candidate is an exact immutable candidate reference, never manually reconstruct lengths. Holding speed weight default .05 and terminal speed weight default .10, both allowed .025 to .10. Other NMPC recipe fields frozen, initialization initial_state_pretension numerical guesses (not equilibrium). Saved offline schedule is not NMPC reference or applied sequence. Failed historical open-loop replay does not forbid valid structure-under-feedback testing or change historical acceptance. Control-only revision cites the preceding result, keeps candidate unchanged, and changes weights. Changing structure and control requires closed_loop and explicit joint attribution. Consume actual returned evidence before another experiment. Final STOP must cite all new scientific results if any. Preserve frozen two segments, six ideal bounded tensions 0..8 N, topology, materials, routing, basis, target, mount, gravity, named zero initial state, duration .35 s, control/sample .01 s, physics .0005 s, inclusive final .05 s holding, position .01 m/speed .02 m/s limits and seed17. Existing single constant d in [-1,1] only. Two new offline full-horizon NLP attempts, three BDF attempts, two MuJoCo launches including unsuccessful launches,900 s per NLP worker (570 s IPOPT),450 s per BDF,1800 s simulation plus existing30/60 s evaluation/profile,7200 total scientific/check/recovery seconds,16 actual provider sends including auxiliary/retries with last4 for feedback and STOP,64 public calls,6h including engineering with final30min delivery protected,zero other LLMs/hardware. NMPC internal solves belong to their launch, not standalone NLP slots. Ceilings are not quotas. Existing numerical checkpoint recovery, dependency guard and engineering pause apply. Acceptance is sampled .01 s for closed loop, unlike dense .0005 s BDF; no continuous-time or real-time guarantee. Report scientific, numerical, engineering and missing evidence distinctly. Do not infer global optimum, physical impossibility, unique cause, LLM superiority or old open-loop validation. Accepted native STOP seals all further provider sends.'
 
 
 def feedback_context_references(h):
@@ -165,7 +145,7 @@ def feedback_context_references(h):
     for event in h.store.events(ACTIVITY):
         if event['kind']!='model_original_tool_feedback':continue
         value=h.store.artifact(event['outputs'][0]);use=value['tool_use']
-        if use['name']!='research_plan' or use['input'].get('action') not in ('batch','diagnostic_replay'):continue
+        if use['name']!='research_plan' or use['input'].get('action') not in ('solve','diagnose','diagnostic_replay','closed_loop','control_revision'):continue
         result=value['result']
         if result['status']!='success':continue
         for index,content in enumerate(result.get('content',[])):
@@ -256,8 +236,29 @@ async def converse(h):
         value=dict(plan_receipt=receipt,plan_result=result,operations=[])
         if receipt['execution_status']=='completed':
             plan=Plan.model_validate(use['input']);accepted=result['detail']
-            if plan.action=='batch':
+            if plan.action=='solve':
                 value['operations']=execute_batch(h,plan,accepted,'native-'+use['toolUseId'])
+            elif plan.action in ('closed_loop','control_revision'):
+                from tools.casadi_closed_loop import run_closed_loop
+                try:
+                    feedback=run_closed_loop(h,plan.control,accepted['plan_reference'],plan.action)
+                    value['operations'].append(dict(feedback=dict(detail=compact_result(feedback['detail']),evidence_reference=feedback['evidence_reference'])))
+                except Exception as exc:
+                    with h.store.transaction() as db:
+                        state=h.store.session(ACTIVITY,db)['state']
+                        failure=dict(status='engineering_error',exception_type=type(exc).__name__,reason=str(exc),pending=state.get('pending'))
+                        ref=h.store.put(db,failure);state['engineering_pause']=dict(reference=plain(ref),reason=str(exc))
+                        h.store.update_state(db,ACTIVITY,state)
+                    value['operations'].append(dict(feedback=failure,evidence_reference=plain(ref)))
+            elif plan.action=='diagnose':
+                detail=dict(status='completed',scope='Read-only referenced diagnosis; model hypothesis remains in original plan',
+                    plan_reference=accepted['plan_reference'],evidence=[plain(r) for r in plan.supporting_evidence],numerical_s=0.,
+                    facts=[dict(reference=plain(r),**compact_result(h.store.artifact(r))) for r in plan.supporting_evidence])
+                with h.store.transaction() as db:
+                    ref=h.store.put(db,detail);state=h.store.session(ACTIVITY,db)['state']
+                    state['results'].append(dict(operation='referenced_diagnosis',reference=plain(ref),candidate=None))
+                    h.store.update_state(db,ACTIVITY,state)
+                value['operations'].append(dict(feedback=detail,evidence_reference=plain(ref)))
             elif plan.action=='diagnostic_replay':
                 rr=invoke(h,'math.casadi_feedback_replay',dict(candidate=plain(plan.diagnostic_candidate)),request_id='native-'+use['toolUseId']+'-diagnostic')
                 value['operations'].append(dict(receipt=rr,feedback=h.store.artifact(rr['output']) if rr.get('output') else None))
@@ -272,7 +273,7 @@ async def converse(h):
         receipt=invoke(h,'evidence.read',use['input'],request_id='native-'+use['toolUseId'])
         value=dict(receipt=receipt,content=h.store.artifact(receipt['output']) if receipt.get('output') else None)
         return dict(toolUseId=use['toolUseId'],status='success' if receipt['execution_status']=='completed' else 'error',content=[dict(text=json.dumps(value))])
-    tools=[PythonAgentTool('research_plan',dict(name='research_plan',description='Propose/request an actual batch, justified revision or diagnostic, or final evidence-based STOP',inputSchema={'json':ActivityPlan.model_json_schema()}),plan_handler)]
+    tools=[PythonAgentTool('research_plan',dict(name='research_plan',description='Choose a bounded mathematical solve, referenced diagnosis, candidate feedback execution, control revision, or evidence-based STOP',inputSchema={'json':ActivityPlan.model_json_schema()}),plan_handler)]
     definition=h.reg.get('evidence.read');tools.append(PythonAgentTool('evidence_read',dict(name='evidence_read',description=definition.description,inputSchema={'json':definition.input_schema.model_json_schema()}),read_handler))
     agent=build_harness(h,transport=boundary,api_key=os.environ['DEEPSEEK_API_KEY'],instructions=INSTRUCTIONS,
         model_class=live_model_class(boundary),tool_executor=SequentialToolExecutor(),research_tools=tools,
@@ -322,7 +323,7 @@ async def converse(h):
         while h.store.session(ACTIVITY)['state']['research_status']!='stopped':
             from strands.types.exceptions import MaxTokensReachedException
             try:
-                result=await agent.invoke_async('Use the current research packet. Request your bounded first batch, consume actual results, then decide revision, a supported diagnostic, or STOP. Final disposition must cite real evidence.')
+                result=await agent.invoke_async('Use the current research packet. Choose any supported action or STOP, consume returned evidence, and decide the next direction. Final disposition must cite real evidence.')
                 record(h,'model_original_turn',dict(result=str(result)))
             except MaxTokensReachedException:record(h,'model_incomplete_response',dict(reason='max_tokens',partial_history_owner='Strands'))
             if cancelled:raise ValueError(cancelled[-1])
@@ -370,12 +371,12 @@ def stop(h):
 
 
 def main():
-    p=argparse.ArgumentParser();p.add_argument('command',choices=['prepare','bind','migrate','diagnose','speed','live','status','export','stop'])
+    p=argparse.ArgumentParser();p.add_argument('command',choices=['prepare','bind','migrate','recover','live','status','export','stop'])
     p.add_argument('--reason');args=p.parse_args();h=prepare() if args.command=='prepare' else host()
     if args.command in ('bind','migrate'):bind(h,args.command=='migrate',args.reason)
-    if args.command in ('diagnose','speed'):
-        receipt=invoke(h,'math.casadi_feedback_'+args.command,{},request_id='prescribed-'+args.command)
-        print(json.dumps(dict(receipt=receipt,feedback=h.store.artifact(receipt['output']) if receipt.get('output') else None)));return
+    if args.command=='recover':
+        from tools.casadi_closed_loop import finish_closed_loop
+        print(json.dumps(finish_closed_loop(h)));return
     if args.command=='live':asyncio.run(converse(h))
     if args.command=='stop':stop(h)
     if args.command=='export':print(json.dumps(export(h)));return

@@ -39,13 +39,22 @@ class Replay(Contract):
     candidate: EvidenceRef
 
 
+class ControlChoice(Contract):
+    candidate: EvidenceRef
+    holding_tip_speed_weight: float = Field(default=.05, ge=.025, le=.10)
+    terminal_tip_speed_weight: float = Field(default=.10, ge=.025, le=.10)
+    preceding_execution: EvidenceRef | None = None
+
+
 class Plan(Contract):
-    action: Literal['batch','diagnostic_replay','stop']
+    action: Literal['solve','diagnose','diagnostic_replay','closed_loop','control_revision','stop']
     hypothesis: str = Field(min_length=1)
     supporting_evidence: list[EvidenceRef] = Field(min_length=1)
     weakening_observation: str = Field(min_length=1)
+    expected_observation: str = Field(min_length=1)
     fixed_conditions: str = Field(min_length=1, description='Acknowledge frozen target, limits, topology, material, zero initial state, duration and 35 input switches')
-    candidates: list[Candidate] = Field(default_factory=list,max_length=2)
+    candidates: list[Candidate] = Field(default_factory=list,max_length=1)
+    control: ControlChoice | None = None
     diagnostic_candidate: EvidenceRef | None = None
     requested_nlp_solves: int = Field(default=0,ge=0,le=2)
     requested_replays: int = Field(default=0,ge=0,le=2)
@@ -55,14 +64,18 @@ class Plan(Contract):
 
     @model_validator(mode='after')
     def operations_match(self):
-        if self.action=='batch':
+        if self.action=='solve':
             if not self.candidates or self.requested_nlp_solves!=len(self.candidates) or self.requested_replays!=len(self.candidates) or self.diagnostic_candidate is not None:
-                raise ValueError('BATCH_REQUIRES_ONE_OR_TWO_SOLVES_WITH_REPLAYS')
+                raise ValueError('SOLVE_REQUIRES_ONE_CANDIDATE_AND_REPLAY')
         elif self.action=='diagnostic_replay':
             if self.candidates or self.requested_nlp_solves or self.requested_replays!=1 or self.diagnostic_candidate is None:
                 raise ValueError('DIAGNOSIS_REQUIRES_ONE_REFERENCED_REPLAY')
         elif self.candidates or self.requested_nlp_solves or self.requested_replays or self.diagnostic_candidate is not None:
             raise ValueError('STOP_REQUESTS_NO_EXPERIMENTS')
+        if (self.action in ('closed_loop','control_revision')) != (self.control is not None):
+            raise ValueError('CONTROL_ACTION_REQUIRES_EXACT_CANDIDATE_AND_WEIGHTS')
+        if self.action=='control_revision' and self.control.preceding_execution is None:
+            raise ValueError('CONTROL_REVISION_REQUIRES_PRECEDING_EXECUTION')
         return self
 
 
@@ -77,10 +90,11 @@ class CloseoutPlan(Plan):
     requested_nlp_solves: Literal[0] = 0
     requested_replays: Literal[0] = 0
     diagnostic_candidate: None = None
+    control: None = None
 
 
 class ActivityPlan(Plan):
-    """This grant permits exactly one choice in either batch."""
+    """One expensive experiment per decision; evidence diagnosis is solve-free."""
     candidates: list[Candidate] = Field(default_factory=list,max_length=1)
     requested_nlp_solves: int = Field(default=0,ge=0,le=1)
     requested_replays: int = Field(default=0,ge=0,le=1)

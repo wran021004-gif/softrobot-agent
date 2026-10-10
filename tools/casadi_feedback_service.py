@@ -8,7 +8,7 @@ from tools.platform_store import plain
 from tools.state_io import atomic_json, read, digest
 from tools.spec_tools import ROOT
 
-SPEC=read(ROOT/'examples/casadi_feedback/specification.json')
+SPEC=read(ROOT/'examples/casadi_nmpc/specification.json')
 CEILINGS=SPEC['budgets']
 ACTIVITY=SPEC['study_id']
 RESERVATIONS=dict(diagnose=900.,speed=600.,solve=900.,replay=450.)
@@ -21,12 +21,13 @@ def preflight(inp,args,reg):
 
 def budget(store):
     state=store.session(ACTIVITY)['state'];ledger=store.remaining()
-    return dict(numerical_s=float(CEILINGS['total_numerical_s'])-state['numerical_s'],initial_investigation_s=float(CEILINGS['initial_investigation_s'])-state['investigation_s'],
-        nlp_solves=CEILINGS['full_nlp_solves']-state['nlp_solves'],initial_solves=CEILINGS['initial_batch_solves']-state['batch_counts']['initial'],revision_solves=CEILINGS['revision_batch_solves']-state['batch_counts']['revision'],
+    return dict(numerical_s=float(CEILINGS['total_numerical_s'])-state['numerical_s'],
+        nlp_solves=CEILINGS['full_nlp_solves']-state['nlp_solves'],
         independent_replays=CEILINGS['new_independent_replays']-state.get('replays',0),
         provider_requests=ledger['remaining']['model_calls'],protected_provider_sends=4,
         public_tool_calls=ledger['remaining']['tool_calls'],backend_launches=ledger['remaining']['backend_solves'],
-        activity_s=state['cutoff_unix']+1800.-time.time(),scientific_window_s=state['cutoff_unix']-time.time())
+        activity_s=state['cutoff_unix']+CEILINGS['delivery_reserve_s']-time.time(),
+        scientific_window_s=state['cutoff_unix']-time.time())
 
 
 def validate_schedule(candidate):
@@ -42,37 +43,40 @@ def plan(ctx,args):
     if state.get('pending'):raise ValueError('UNKNOWN_NUMERICAL_OUTCOME_INSPECT_FIRST')
     if state.get('engineering_pause') and args.action!='stop':raise ValueError('ENGINEERING_PAUSE_REQUIRES_LOCAL_RECOVERY')
     for ref in args.supporting_evidence:ctx.artifact(ref)
-    new_results=[r for r in state['results'] if r['operation'] in ('solve','replay')]
-    if args.action!='batch' and not any(r['operation']=='solve' for r in new_results):raise ValueError('FIRST_MODEL_BATCH_EXECUTION_REQUIRED')
+    new_results=[r for r in state['results'] if not r.get('imported')]
     if new_results and not any(plain(ref)==r['reference'] for ref in args.supporting_evidence for r in new_results):
         raise ValueError('DECISION_MUST_CITE_ACTUAL_RETURNED_EVIDENCE')
-    batch='initial' if not state['plans'] else 'revision'
-    if args.action=='batch':
-        if sum(p['action']=='batch' for p in state['plans'])>=2:raise ValueError('AT_MOST_TWO_MODEL_BATCHES')
-        usable=[r['candidate'] for r in new_results if r['operation']=='solve' and r.get('candidate')]
-        replayed=[r.get('source_candidate') for r in new_results if r['operation']=='replay']
-        if any(candidate not in replayed for candidate in usable):
-            raise ValueError('CONSUME_AVAILABLE_INITIAL_CANDIDATE_REPLAY_BEFORE_REVISION')
-        needed=len(args.candidates)
-        if needed!=1:raise ValueError('THIS_ACTIVITY_REQUIRES_ONE_CANDIDATE_PER_BATCH')
-        if state['batch_counts'][batch]+needed>CEILINGS[batch+'_batch_solves'] or state['nlp_solves']+needed>CEILINGS['full_nlp_solves']:raise ValueError('TWO_ATTEMPT_CEILING')
-        if state['numerical_s']+needed*(RESERVATIONS['solve']+RESERVATIONS['replay'])>float(CEILINGS['total_numerical_s']):raise ValueError('BATCH_RESERVATION_EXCEEDS_NUMERICAL_ALLOWANCE')
+    if args.action=='stop' and any(r['reference'] not in [plain(ref) for ref in args.supporting_evidence] for r in new_results):
+        raise ValueError('FINAL_STOP_MUST_ACCOUNT_FOR_ALL_NEW_RESULTS')
+    if args.action not in ('stop','diagnose'):
+        send=state.get('pilot',{}).get('live_model_requests',0)
+        if state.get('last_expensive_decision_send')==send:
+            raise ValueError('ONE_EXPENSIVE_EXPERIMENT_PER_PROVIDER_DECISION_CONSUME_FEEDBACK_FIRST')
         if ctx.store.remaining()['remaining']['model_calls']<=4:raise ValueError('FINAL_FOUR_PROVIDER_SENDS_PROTECTED')
-        if time.time()+needed*1350.>=state['cutoff_unix']:raise ValueError('BATCH_CANNOT_FIT_SCIENTIFIC_WINDOW')
+        reserve={'solve':1350.,'diagnostic_replay':450.,'closed_loop':1890.,'control_revision':1890.}[args.action]
+        if state['numerical_s']+reserve>CEILINGS['total_numerical_s'] or time.time()+reserve>=state['cutoff_unix']:
+            raise ValueError('OPERATION_CANNOT_FIT_REMAINING_BUDGET')
+    batch='initial' if state['nlp_solves']==0 else 'revision'
+    if args.action=='solve':
+        if state['nlp_solves']>=CEILINGS['full_nlp_solves']:raise ValueError('TWO_ATTEMPT_CEILING')
+        if state.get('replays',0)>=CEILINGS['new_independent_replays']:raise ValueError('THREE_REPLAY_CEILING')
         for candidate in args.candidates:
             if candidate.substeps==2 and not state.get('refined_grid_supported'):raise ValueError('FINER_GRID_REQUIRES_DISCREPANCY_EVIDENCE')
             if candidate.source_candidate:validate_schedule(ctx.artifact(candidate.source_candidate).get('candidate',ctx.artifact(candidate.source_candidate)))
     if args.action=='diagnostic_replay':
-        if not any(r.get('candidate')==plain(args.diagnostic_candidate) for r in new_results if r['operation']=='solve'):raise ValueError('DIAGNOSTIC_REQUIRES_NEW_REAL_CANDIDATE')
-        if ctx.store.remaining()['remaining']['model_calls']<=4:raise ValueError('FINAL_FOUR_PROVIDER_SENDS_PROTECTED')
-        if state.get('model_diagnostic_count',0)>=1:raise ValueError('ONE_SUPPORTED_MODEL_DIAGNOSTIC')
+        if state.get('replays',0)>=CEILINGS['new_independent_replays']:raise ValueError('THREE_REPLAY_CEILING')
         validate_schedule(ctx.artifact(args.diagnostic_candidate).get('candidate',ctx.artifact(args.diagnostic_candidate)))
+    if args.action in ('closed_loop','control_revision'):
+        from tools.casadi_closed_loop import validate_control,resolve_candidate
+        source,revision=validate_control(ctx.store,state,args.control,args.action)
+        if ctx.store.remaining()['remaining']['backend_solves']<=0:raise ValueError('TWO_CLOSED_LOOP_LAUNCH_CEILING')
+        resolve_candidate(ctx.store,args.control.candidate,source,args.control,ctx.run_id,plain(ctx.input.policy))
     ref=ctx.save_artifact(plain(args),'model_plan_original')
     with ctx.store.transaction() as db:
         current=ctx.store.session(ctx.run_id,db)['state']
-        current['plans'].append(dict(reference=plain(ref),action=args.action,batch=batch))
+        current['plans'].append(dict(reference=plain(ref),action=args.action,batch=batch if args.action=='solve' else None))
+        if args.action not in ('stop','diagnose'):current['last_expensive_decision_send']=send
         if args.action=='stop':current['research_status']='stopped';current['final_disposition']=plain(ref)
-        elif args.action=='diagnostic_replay':current['model_diagnostic_count']=current.get('model_diagnostic_count',0)+1
         ctx.store.update_state(db,ctx.run_id,current)
     return Result(detail=dict(accepted=True,plan_reference=plain(ref),batch=batch,action=args.action,remaining_budget=budget(ctx.store)))
 
@@ -91,9 +95,9 @@ def dispatch(ctx,args,operation):
         raise ValueError('HISTORICAL_DIAGNOSIS_AND_SPEED_IMPORTED_NO_RERUN')
     if operation=='solve':
         if not state.get('speed_check_passed'):raise ValueError('CHANGED_DERIVATIVE_EXECUTION_CHECK_REQUIRED')
-        if state['nlp_solves']>=CEILINGS['full_nlp_solves'] or state['batch_counts'][args.batch]>=CEILINGS[args.batch+'_batch_solves']:raise ValueError('NLP_SOLVE_CEILING')
+        if state['nlp_solves']>=CEILINGS['full_nlp_solves']:raise ValueError('NLP_SOLVE_CEILING')
         accepted=next((p for p in state['plans'] if p['reference']==plain(args.plan_reference)),None)
-        if not accepted or accepted['action']!='batch' or accepted['batch']!=args.batch:raise ValueError('ACCEPTED_MODEL_PLAN_REQUIRED')
+        if not accepted or accepted['action']!='solve' or accepted['batch']!=args.batch:raise ValueError('ACCEPTED_MODEL_PLAN_REQUIRED')
         original=ctx.artifact(args.plan_reference)
         choices=plain(Candidate.model_validate({k:v for k,v in plain(args).items() if k in Candidate.model_fields}))
         if args.candidate_index>=len(original['candidates']) or choices!=original['candidates'][args.candidate_index]:raise ValueError('SOLVE_MUST_MATCH_MODEL_PLAN')
@@ -111,7 +115,7 @@ def dispatch(ctx,args,operation):
             request_id=ctx.request.request_id,reserved_s=reserve,started_unix=time.time())
         if operation=='replay':current['replays']=current.get('replays',0)+1
         if operation=='solve':
-            current['nlp_solves']+=1;current['batch_counts'][args.batch]+=1;current['dispatched_candidates'].append(key)
+            current['nlp_solves']+=1;current['dispatched_candidates'].append(key)
         ctx.store.update_state(db,ctx.run_id,current)
     env=os.environ.copy();env.update(OPENBLAS_NUM_THREADS='1',OMP_NUM_THREADS='1',MKL_NUM_THREADS='1')
     started=time.perf_counter()
@@ -153,7 +157,7 @@ def dispatch(ctx,args,operation):
     elapsed=time.perf_counter()-started
     log=ctx.save_artifact(dict(text=stdout.decode('utf8',errors='replace')),'feedback_worker_log')
     result.update(operation=operation,arguments=plain(args),implementation=state['freeze'],problem_identity=state['spec_identity'],
-        process_elapsed_s=elapsed,log_reference=plain(log),solve_ceiling_overrun_s=max(0.,result.get('costs_s',{}).get('solve',0.)-600.))
+        process_elapsed_s=elapsed,log_reference=plain(log),solve_ceiling_overrun_s=max(0.,result.get('costs_s',{}).get('solve',0.)-CEILINGS['solve_limit_s']))
     ref=ctx.save_artifact(result,'feedback_'+operation)
     candidate_ref=ctx.save_artifact(result['candidate'],'feedback_candidate') if result.get('candidate') else None
     with ctx.store.transaction() as db:
@@ -161,6 +165,9 @@ def dispatch(ctx,args,operation):
         if operation in ('diagnose','speed'):current['investigation_s']+=elapsed
         current['results'].append(dict(operation=operation,status=result['status'],reference=plain(ref),candidate=plain(candidate_ref) if candidate_ref else None,
             source_candidate=plain(args.candidate) if operation=='replay' else None))
+        if candidate_ref:
+            configuration_ref=ctx.store.put(db,request['configuration'])
+            current.setdefault('candidate_sources',{})[candidate_ref.artifact_id]=dict(configuration=plain(configuration_ref),checkpoint=plain(checkpoint_ref) if checkpoint_ref else None,solve=plain(ref),source_activity=ACTIVITY)
         if result['status'] in ('engineering_error','numerical_error'):
             current['engineering_pause']=dict(reference=plain(ref),reason=result['termination_reason'])
         if operation=='diagnose':

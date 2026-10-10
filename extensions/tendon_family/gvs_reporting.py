@@ -68,6 +68,10 @@ def summarize(task, result, evaluation, rows, observations, motion, limits, sett
             (o.get('plan_source')=='reintegrated_returned_iterate' or
              (o.get('optimization_selected_iteration') is not None and o['optimization_selected_iteration']>0)) for o in observations),
         converged_updates=sum(not o['optimization_nonconverged'] for o in observations),
+        early_stopped_plans=sum(o.get('optimization_status')=='feasible_early_stop' for o in observations),
+        unusable_plans=sum(not o.get('plan_accepted',False) for o in observations),
+        policy_stop_reason_counts=dict(Counter(o['policy_stop_reason'] for o in observations if o.get('policy_stop_reason'))),
+        execution_failure_reason=result['data']['data'].get('reason'),
         solver_error_count=sum(o.get('solver_error') is not None for o in observations),
         solver_failure_flags=sum(o['solver_failed'] for o in observations),
         hold_last_responses=sum(o['failure_response_used'] for o in observations),
@@ -113,11 +117,15 @@ def summarize(task, result, evaluation, rows, observations, motion, limits, sett
                 samples=[r for r in motion if abs(r['time_s']-k['time_s'])<=task.timing.sample_period_s+1e-9])
                 for k in knots[1:-1]]
             summary['tracking']['diagnostic_scope']='Segment endpoints overlap for diagnostics only. Global evaluation scores each time once. Zero reference speed/acceleration at a knot does not require or prove robot settling.'
-    comparisons, missing = aligned_predictions(rows, observations)
+    comparisons, missing = aligned_predictions(rows, observations, motion)
     summary['one_step_prediction_comparisons']=comparisons
     summary['one_step_prediction_summary']=dict(aligned_count=len(comparisons), missing=missing,
         maximum_tip_difference_m=max((r['tip_difference_m'] for r in comparisons),default=None),
         mean_tip_difference_m=float(np.mean([r['tip_difference_m'] for r in comparisons])) if comparisons else None,
+        velocity_matched_count=sum(r.get('velocity_difference_m_s') is not None for r in comparisons),
+        velocity_missing=[dict(time_s=r['start_s'],reason=r['velocity_missing_reason']) for r in comparisons if r.get('velocity_missing_reason')],
+        maximum_velocity_vector_difference_m_s=max((r['velocity_difference_m_s'] for r in comparisons if r.get('velocity_difference_m_s') is not None),default=None),
+        maximum_speed_magnitude_difference_m_s=max((r['speed_magnitude_difference_m_s'] for r in comparisons if r.get('speed_magnitude_difference_m_s') is not None),default=None),
         frame='world', scope='Only accepted first-step predictions matched to next execution timestamp; no future-plan replay comparison')
     summary['drive_utilization']=[dict(tendon_index=i,limit_n=limit,
         maximum_n=float(tensions[:,i].max()) if rows else None,
@@ -135,7 +143,7 @@ def summarize(task, result, evaluation, rows, observations, motion, limits, sett
 
 
 
-def aligned_predictions(rows, observations):
+def aligned_predictions(rows, observations, motion=None):
     comparisons=[]; missing=[]
     for o in observations:
         pred=o.get('one_step_prediction')
@@ -155,10 +163,22 @@ def aligned_predictions(rows, observations):
             elif difference>1e-8: reason='applied input mismatch'
             else:
                 r=following[0]
-                comparisons.append(dict(start_s=o['time_s'],end_s=pred['time_s'],frame='world',
+                comparison=dict(start_s=o['time_s'],end_s=pred['time_s'],frame='world',
                     applied_input_difference_n=difference,applied_tension_n=pred['applied_tension_n'],
                     predicted_tip_m=pred['tip_position_m'],measured_tip_m=r['tip_m'],
-                    tip_difference_m=float(np.linalg.norm(np.asarray(pred['tip_position_m'])-r['tip_m']))))
+                    tip_difference_m=float(np.linalg.norm(np.asarray(pred['tip_position_m'])-r['tip_m'])))
+                measured=[m for m in (motion or []) if abs(m['time_s']-pred['time_s'])<1e-8]
+                velocity=pred.get('tip_velocity_m_s')
+                if velocity is None:
+                    comparison['velocity_missing_reason']='predicted velocity vector unavailable'
+                elif len(measured)!=1 or 'tip_velocity_m_s' not in measured[0]:
+                    comparison['velocity_missing_reason']='saved-state world velocity missing or ambiguous'
+                else:
+                    actual_velocity=measured[0]['tip_velocity_m_s']
+                    comparison.update(predicted_tip_velocity_m_s=velocity,measured_tip_velocity_m_s=actual_velocity,
+                        velocity_difference_m_s=float(np.linalg.norm(np.asarray(velocity)-actual_velocity)),
+                        speed_magnitude_difference_m_s=float(abs(np.linalg.norm(velocity)-np.linalg.norm(actual_velocity))))
+                comparisons.append(comparison)
         if reason:missing.append(dict(time_s=o['time_s'],reason=reason))
     return comparisons,missing
 
@@ -182,7 +202,8 @@ def reconstruct_motion(files, rows, target):
             from .tracking import reference_at
             position,velocity=reference_at(target,row['time_s'])
         else:position,velocity=target,np.zeros(3)
-        motion.append(dict(velocity_error_m_s=float(np.linalg.norm(J@data.qvel-velocity)),time_s=row['time_s'],tip_speed_m_s=float(np.linalg.norm(J@data.qvel)),
+        motion.append(dict(tip_velocity_m_s=(J@data.qvel).tolist(),tip_position_m=list(row['tip_m']),
+            velocity_error_m_s=float(np.linalg.norm(J@data.qvel-velocity)),time_s=row['time_s'],tip_speed_m_s=float(np.linalg.norm(J@data.qvel)),
             tip_error_m=float(np.linalg.norm(np.asarray(row['tip_m'])-position)),contacts=int(data.ncon),
             rate_projection_residual_rad_m_s=projection['rate_projection_residual_max_rad_m_s']))
     return motion,physics
