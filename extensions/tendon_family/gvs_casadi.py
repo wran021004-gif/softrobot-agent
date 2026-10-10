@@ -355,7 +355,8 @@ class GVSCasadiFunctions:
             # and derivative expressions without expanding the graph to SX.
             {'cse':True,'der_options':{'cse':True}})
         self._linearization = None
-        self._linearization_symbols = (x,u,xdot,extra,extra_names)
+        # Existing analysis callers unpack this internal three-entry tuple.
+        self._linearization_symbols = (x,u,xdot)
         static_residual = tendon_force + gravity - elastic
         self.q_symbol = q
         self.u_symbol = u
@@ -379,20 +380,28 @@ class GVSCasadiFunctions:
     @property
     def linearization(self):
         if self._linearization is None:
-            x,u,xdot,extra,extra_names=self._linearization_symbols
+            x,u,xdot=self._linearization_symbols
+            extra=[] if self.design_input is None else [self.design_input]
+            extra_names=[] if self.design_input is None else ['d']
             self._linearization=ca.Function('gvs_linearization',[x,u]+extra,
                 [ca.jacobian(xdot,x),ca.jacobian(xdot,u),xdot],['x','u']+extra_names,['A','B','drift'])
         return self._linearization
 
-    def linearize(self, x, u):
+    def linearize(self, x, u, d=None):
+        kwargs = {} if self.design_input is None else {'d': d}
+        if self.design_input is not None and d is None:
+            raise ValueError('DESIGN_INPUT_REQUIRED')
         values = self.linearization(
-            x=np.asarray(x, dtype=float), u=np.asarray(u, dtype=float)
+            x=np.asarray(x, dtype=float), u=np.asarray(u, dtype=float), **kwargs
         )
         return tuple(np.asarray(values[name], dtype=float) for name in ('A', 'B', 'drift'))
 
-    def equilibrium_terms(self, q, u):
+    def equilibrium_terms(self, q, u, d=None):
+        kwargs = {} if self.design_input is None else {'d': d}
+        if self.design_input is not None and d is None:
+            raise ValueError('DESIGN_INPUT_REQUIRED')
         values = self.static_equilibrium(
-            q=np.asarray(q, dtype=float), u=np.asarray(u, dtype=float)
+            q=np.asarray(q, dtype=float), u=np.asarray(u, dtype=float), **kwargs
         )
         return tuple(
             np.asarray(values[name], dtype=float)

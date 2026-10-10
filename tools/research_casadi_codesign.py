@@ -74,6 +74,35 @@ def bind(h):
     atomic_json(RUN/'implementation_freeze.json',dict(commit=commit,dependencies=snapshot['dependencies']))
 
 
+def migrate(h):
+    """Explicit committed repair on the same grant, without repeating science."""
+    from tools.platform_tasks import compile_input
+    if subprocess.check_output(['git','status','--porcelain'],cwd=ROOT,text=True).strip():raise ValueError('COMMIT_REPAIR_BEFORE_MIGRATE')
+    state=h.store.session(ACTIVITY)['state']
+    if state.get('casadi_pending'):raise ValueError('PENDING_NUMERICAL_OUTCOME_BLOCKS_MIGRATION')
+    with h.store.connect(True) as db:
+        if db.execute('SELECT COUNT(*) FROM calls WHERE receipt IS NULL').fetchone()[0]:raise ValueError('UNSEALED_RESERVATION_BLOCKS_MIGRATION')
+    old=h.store.session(ACTIVITY)['snapshot'];snapshot=compile_input(old['input'],h.reg)
+    if snapshot['instance_identity']!=old['instance_identity']:raise ValueError('REPAIR_CHANGED_SCIENCE')
+    commit=subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip()
+    snapshot.update(project_commit=commit,worktree_dirty=False)
+    record=dict(previous_commit=state['casadi_freeze'],commit=commit,unix=time.time(),
+        changed_dependencies=[key for key,value in snapshot['dependencies'].items() if old['dependencies'].get(key)!=value],
+        prior_dependencies_identity=digest(old['dependencies']),new_dependencies_identity=digest(snapshot['dependencies']),
+        reason='Preserve three-entry analysis tuple and explicit design arguments; correct sampled replay speed definition; reserve 30 s IPOPT deadline margin after recorded 8.7 s primary-A overrun',
+        mathematical_equations_and_frozen_specifications='unchanged',
+        correctness_evidence_carried=state['casadi_check']['reference'],
+        check_carry_reason='Mechanics/transcription expressions unchanged; only API tuple plumbing, offline time options, and sampled replay reporting changed',
+        repeated_numerical_checks=0,reset_budgets=False)
+    with h.store.transaction() as db:
+        ref=h.store.put(db,snapshot);db.execute('UPDATE sessions SET snapshot=? WHERE run_id=?',(ref.artifact_id,ACTIVITY))
+        repair=h.store.put(db,record);state['casadi_freeze']=commit
+        state.setdefault('casadi_repairs',[]).append(plain(repair))
+        h.store.update_state(db,ACTIVITY,state);h.store.event(db,ACTIVITY,'scoped_repair_migration','committed',outputs=[repair,ref])
+    atomic_json(RUN/'implementation_freeze.json',dict(commit=commit,dependencies=snapshot['dependencies']))
+    atomic_json(OUT/'repair_migration.json',record)
+
+
 def export(h):
     import tarfile,io,hashlib
     OUT.mkdir(parents=True,exist_ok=True);manifest=[]
@@ -94,12 +123,13 @@ def export(h):
 
 
 def main():
-    p=argparse.ArgumentParser();p.add_argument('command',choices=['prepare','bind','check','solve','replay','status','export','stop'])
+    p=argparse.ArgumentParser();p.add_argument('command',choices=['prepare','bind','migrate','check','solve','replay','status','export','stop'])
     p.add_argument('--case',choices=['A','B'],default='A');p.add_argument('--initialization',default='pretension_0_2',choices=['pretension_0_2','ramp_0_2_to_0_4'])
     p.add_argument('--category',default='primary',choices=['primary','paired_second','correction']);p.add_argument('--substeps',type=int,default=1)
     p.add_argument('--candidate');p.add_argument('--request-id');args=p.parse_args()
     h=prepare() if args.command=='prepare' else host()
     if args.command=='bind':bind(h)
+    if args.command=='migrate':migrate(h)
     if args.command in ('check','solve','replay'):
         arguments={} if args.command=='check' else dict(case=args.case,initialization=args.initialization,category=args.category,substeps=args.substeps) if args.command=='solve' else dict(candidate=json.loads(args.candidate))
         receipt=invoke(h,'math.casadi_codesign_'+args.command,arguments,request_id=args.request_id or f'{args.command}-{args.case}-{args.initialization}-{args.category}-{args.substeps}')

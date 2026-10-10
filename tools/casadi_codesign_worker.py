@@ -92,7 +92,9 @@ def solve(configuration,args,progress=None):
     problem=w.assemble(args['case'],args['initialization'])
     options=dict(max_iterations=1000,tolerance=1e-7,acceptable_tolerance=1e-6,
         constraint_jacobian_mode='reverse',retain_feasible_iterate=True,hessian_approximation='limited-memory',
-        max_cpu_s=600.,max_wall_s=600.,print_level=5)
+        # IPOPT checks deadlines between iterations. The first primary reached
+        # 608.7 s with 600 s options; retain it and reserve a 30 s margin henceforth.
+        max_cpu_s=570.,max_wall_s=570.,print_level=5)
     solver=IpoptSolver(options); solver.diagnostic_trace=True
     if progress: atomic_json(progress,dict(phase='solver_construction',unix=time.time()))
     # IPOPT construction is measured separately by the existing adapter.

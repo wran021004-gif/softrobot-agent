@@ -58,7 +58,11 @@ retain normalized violations; task metrics retain metres and metres/second.
 
 Offline IPOPT uses exact first derivatives, sparse reverse-mode constraint
 Jacobians, limited-memory Hessians, retained feasible iterates, 1000 iterations
-and separate 600 s CPU/wall limits. The controller's feasible-return policy is
+and a 600 s solve ceiling. The original primary A used 600 s CPU/wall options
+and returned after 608.7 s because IPOPT checks between iterations. Its evidence
+is retained. Following that known overrun, 570 s CPU/wall options reserve a
+30 s stopping margin; comparisons identify the differing effective limits.
+The controller's feasible-return policy is
 absent. Graph construction is timed separately. A numerical invocation is
 counted before dispatch, with actual solver entry established by diagnostics
 and logs. Unknown outcomes retain their pending identity and forbid automatic
@@ -76,7 +80,7 @@ relative tolerance 1e-8, curvature/rate absolute tolerances 1e-9/1e-7, and
 continuous state across each 0.01 s input switch. Dense output every 0.0005 s
 checks the task and compares optimizer tip outputs using documented linear
 interpolation, while node discrepancies are retained separately. Sampled
-0.01 s position and successive-position speed definitions remain separate.
+0.01 s position and instantaneous Jacobian speed metrics remain separate.
 Physical eligibility requires mathematical feasibility, replay discrepancy
 limits of 1 mm/0.002 m/s, and the original reach/hold limits. Controller 11
 validation tests geometry/controller behavior, separately from optimized

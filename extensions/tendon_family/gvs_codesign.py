@@ -178,13 +178,13 @@ def integrate(functions, tip, velocity, candidate, target, *, dense_period=.0005
         holding_max_position_error_m=float(max(errors[hold])) if any(hold) else None,
         holding_max_speed_m_s=float(max(speed[hold])) if any(hold) else None,
         input_bounds_compliant=bool(np.isfinite(U).all() and U.min()>=0 and U.max()<=8),
-        sampled_evaluator=dict(definition='0.01 s position samples; speeds from successive tip position differences'),
+        sampled_evaluator=dict(definition='0.01 s position samples; instantaneous world tip Jacobian times velocity, matching existing evaluator evidence'),
         costs_s=dict(jacobian_construction=jacobian_construction_s,total=time.perf_counter()-started),
         integration_counts=dict(nfev=nfev,njev=njev,nlu=nlu))
     si=np.arange(0,len(rt),round(.01/dense_period)); sp=rp[si]; st=rt[si]
     sh=st>=.30-1e-12
     result['sampled_evaluator'].update(holding_max_position_error_m=float(max(np.linalg.norm(sp[sh]-target,axis=1))) if any(sh) else None,
-        holding_max_speed_m_s=float(max(np.linalg.norm(np.diff(sp,axis=0)/np.diff(st)[:,None],axis=1)[sh[1:]])) if any(sh[1:]) else None)
+        holding_max_speed_m_s=float(max(np.linalg.norm(rv[si][sh],axis=1))) if any(sh) else None)
     result['gates_passed']=bool(not failure and result['input_bounds_compliant'] and
         result['dense_max_tip_disagreement_m']<=.001 and result['dense_max_speed_disagreement_m_s']<=.002 and
         result['terminal_position_error_m']<=.01 and result['holding_max_position_error_m']<=.01 and result['holding_max_speed_m_s']<=.02)
