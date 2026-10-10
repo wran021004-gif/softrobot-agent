@@ -119,8 +119,13 @@ async def smoke(h):
     try:
         result = await agent.invoke_async('Inspect the frozen mathematical model through its describe tool and explain what the returned evidence permits next.')
         record(h, 'soromox_live_smoke', dict(elapsed_s=time.perf_counter()-started, result=str(result)))
+    except Exception as exc:
+        record(h, 'soromox_live_smoke', dict(elapsed_s=time.perf_counter()-started,
+            status='incomplete', exception_type=type(exc).__name__, message=str(exc),
+            accounting=h.store.remaining()), status='stopped')
+        raise
     finally:
-        await agent.model.client.close()
+        await boundary.aclose()
 
 
 def export(h):
@@ -136,6 +141,13 @@ def export(h):
             info = tarfile.TarInfo(name); info.size = len(row['body']); info.mtime = int(STARTED)
             tar.addfile(info, io.BytesIO(row['body']))
             manifest.append(dict(name=name, sha256=row['id'], bytes=info.size, media=row['media']))
+        for folder in (RUN/'framework_sessions',):
+            for path in sorted(folder.rglob('*')):
+                if not path.is_file(): continue
+                body=path.read_bytes(); name='framework/'+path.relative_to(folder).as_posix()
+                info=tarfile.TarInfo(name); info.size=len(body); info.mtime=int(STARTED)
+                tar.addfile(info,io.BytesIO(body))
+                manifest.append(dict(name=name,sha256=hashlib.sha256(body).hexdigest(),bytes=info.size,media='application/json'))
     state = h.store.session(ACTIVITY)['state']
     atomic_json(OUT/'activity.json', read(RUN/'activity.json'))
     atomic_json(OUT/'implementation_freeze.json', read(RUN/'implementation_freeze.json'))
@@ -144,6 +156,10 @@ def export(h):
     atomic_json(OUT/'state.json', state)
     if state.get('soromox_admission'):
         atomic_json(OUT/'admission.json', h.store.artifact(state['soromox_admission']))
+    if state.get('soromox_native_followup'):
+        atomic_json(OUT/'native_endpoint_followup.json', h.store.artifact(state['soromox_native_followup']))
+    if (RUN/'reporting_repair.json').exists():
+        atomic_json(OUT/'reporting_repair.json',read(RUN/'reporting_repair.json'))
     atomic_json(OUT/'archive_manifest.json', dict(members=manifest,
         archive_sha256=hashlib.sha256((OUT/'immutable_artifacts.tar.gz').read_bytes()).hexdigest()))
     with h.store.connect(True) as db:
