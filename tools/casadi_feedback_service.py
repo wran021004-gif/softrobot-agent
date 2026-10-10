@@ -8,7 +8,9 @@ from tools.platform_store import plain
 from tools.state_io import atomic_json, read, digest
 from tools.spec_tools import ROOT
 
-ACTIVITY='casadi-feedback-research-20261010'
+SPEC=read(ROOT/'examples/casadi_feedback/specification.json')
+CEILINGS=SPEC['budgets']
+ACTIVITY=SPEC['study_id']
 RESERVATIONS=dict(diagnose=900.,speed=600.,solve=900.,replay=450.)
 
 
@@ -19,8 +21,9 @@ def preflight(inp,args,reg):
 
 def budget(store):
     state=store.session(ACTIVITY)['state'];ledger=store.remaining()
-    return dict(numerical_s=7200.-state['numerical_s'],initial_investigation_s=1800.-state['investigation_s'],
-        nlp_solves=4-state['nlp_solves'],initial_solves=2-state['batch_counts']['initial'],revision_solves=2-state['batch_counts']['revision'],
+    return dict(numerical_s=float(CEILINGS['total_numerical_s'])-state['numerical_s'],initial_investigation_s=float(CEILINGS['initial_investigation_s'])-state['investigation_s'],
+        nlp_solves=CEILINGS['full_nlp_solves']-state['nlp_solves'],initial_solves=CEILINGS['initial_batch_solves']-state['batch_counts']['initial'],revision_solves=CEILINGS['revision_batch_solves']-state['batch_counts']['revision'],
+        independent_replays=CEILINGS['new_independent_replays']-state.get('replays',0),
         provider_requests=ledger['remaining']['model_calls'],protected_provider_sends=4,
         public_tool_calls=ledger['remaining']['tool_calls'],backend_launches=ledger['remaining']['backend_solves'],
         activity_s=state['cutoff_unix']+1800.-time.time(),scientific_window_s=state['cutoff_unix']-time.time())
@@ -37,6 +40,7 @@ def plan(ctx,args):
     state=ctx.store.session(ctx.run_id)['state']
     if state['research_status']=='stopped':raise ValueError('MODEL_STOP_SEALED')
     if state.get('pending'):raise ValueError('UNKNOWN_NUMERICAL_OUTCOME_INSPECT_FIRST')
+    if state.get('engineering_pause') and args.action!='stop':raise ValueError('ENGINEERING_PAUSE_REQUIRES_LOCAL_RECOVERY')
     for ref in args.supporting_evidence:ctx.artifact(ref)
     new_results=[r for r in state['results'] if r['operation'] in ('solve','replay')]
     if args.action!='batch' and not any(r['operation']=='solve' for r in new_results):raise ValueError('FIRST_MODEL_BATCH_EXECUTION_REQUIRED')
@@ -50,14 +54,16 @@ def plan(ctx,args):
         if any(candidate not in replayed for candidate in usable):
             raise ValueError('CONSUME_AVAILABLE_INITIAL_CANDIDATE_REPLAY_BEFORE_REVISION')
         needed=len(args.candidates)
-        if state['batch_counts'][batch]+needed>2 or state['nlp_solves']+needed>4:raise ValueError('FOUR_SOLVE_CEILING')
-        if state['numerical_s']+needed*(RESERVATIONS['solve']+RESERVATIONS['replay'])>7200.:raise ValueError('BATCH_RESERVATION_EXCEEDS_NUMERICAL_ALLOWANCE')
+        if needed!=1:raise ValueError('THIS_ACTIVITY_REQUIRES_ONE_CANDIDATE_PER_BATCH')
+        if state['batch_counts'][batch]+needed>CEILINGS[batch+'_batch_solves'] or state['nlp_solves']+needed>CEILINGS['full_nlp_solves']:raise ValueError('TWO_ATTEMPT_CEILING')
+        if state['numerical_s']+needed*(RESERVATIONS['solve']+RESERVATIONS['replay'])>float(CEILINGS['total_numerical_s']):raise ValueError('BATCH_RESERVATION_EXCEEDS_NUMERICAL_ALLOWANCE')
         if ctx.store.remaining()['remaining']['model_calls']<=4:raise ValueError('FINAL_FOUR_PROVIDER_SENDS_PROTECTED')
         if time.time()+needed*1350.>=state['cutoff_unix']:raise ValueError('BATCH_CANNOT_FIT_SCIENTIFIC_WINDOW')
         for candidate in args.candidates:
             if candidate.substeps==2 and not state.get('refined_grid_supported'):raise ValueError('FINER_GRID_REQUIRES_DISCREPANCY_EVIDENCE')
             if candidate.source_candidate:validate_schedule(ctx.artifact(candidate.source_candidate).get('candidate',ctx.artifact(candidate.source_candidate)))
     if args.action=='diagnostic_replay':
+        if not any(r.get('candidate')==plain(args.diagnostic_candidate) for r in new_results if r['operation']=='solve'):raise ValueError('DIAGNOSTIC_REQUIRES_NEW_REAL_CANDIDATE')
         if ctx.store.remaining()['remaining']['model_calls']<=4:raise ValueError('FINAL_FOUR_PROVIDER_SENDS_PROTECTED')
         if state.get('model_diagnostic_count',0)>=1:raise ValueError('ONE_SUPPORTED_MODEL_DIAGNOSTIC')
         validate_schedule(ctx.artifact(args.diagnostic_candidate).get('candidate',ctx.artifact(args.diagnostic_candidate)))
@@ -75,18 +81,17 @@ def dispatch(ctx,args,operation):
     state=ctx.store.session(ctx.run_id)['state'];reserve=RESERVATIONS[operation]
     if 'freeze' not in state:raise ValueError('COMMIT_AND_BIND_BEFORE_DISPATCH')
     if state.get('pending'):raise ValueError('UNKNOWN_NUMERICAL_OUTCOME_INSPECT_PENDING_FILES_NO_REPEAT')
+    if state.get('engineering_pause'):raise ValueError('ENGINEERING_PAUSE_REQUIRES_LOCAL_RECOVERY')
     if state['research_status']=='stopped':raise ValueError('MODEL_STOP_SEALED')
-    if state['numerical_s']+reserve>7200. or time.time()+reserve>=state['cutoff_unix']:raise ValueError('OPERATION_CANNOT_FIT_REMAINING_BUDGET')
+    if state['numerical_s']+reserve>float(CEILINGS['total_numerical_s']) or time.time()+reserve>=state['cutoff_unix']:raise ValueError('OPERATION_CANNOT_FIT_REMAINING_BUDGET')
     request=dict(activity=ACTIVITY,store_root=str(ctx.store.root),request_id=ctx.request.request_id,
         operation=operation,configuration=plain(ctx.input),arguments=plain(args),implementation=state['freeze'],
         local_ad=state.get('local_ad','reverse'))
     if operation in ('diagnose','speed'):
-        if any(r['operation']==operation for r in state['results']):raise ValueError('PRESCRIBED_OPERATION_ALREADY_RECORDED')
-        if state['investigation_s']+reserve>1800.:raise ValueError('INITIAL_INVESTIGATION_CEILING')
-    if operation=='speed' and not any(r['operation']=='diagnose' for r in state['results']):raise ValueError('DIAGNOSE_BEFORE_SPEED')
+        raise ValueError('HISTORICAL_DIAGNOSIS_AND_SPEED_IMPORTED_NO_RERUN')
     if operation=='solve':
         if not state.get('speed_check_passed'):raise ValueError('CHANGED_DERIVATIVE_EXECUTION_CHECK_REQUIRED')
-        if state['nlp_solves']>=4 or state['batch_counts'][args.batch]>=2:raise ValueError('NLP_SOLVE_CEILING')
+        if state['nlp_solves']>=CEILINGS['full_nlp_solves'] or state['batch_counts'][args.batch]>=CEILINGS[args.batch+'_batch_solves']:raise ValueError('NLP_SOLVE_CEILING')
         accepted=next((p for p in state['plans'] if p['reference']==plain(args.plan_reference)),None)
         if not accepted or accepted['action']!='batch' or accepted['batch']!=args.batch:raise ValueError('ACCEPTED_MODEL_PLAN_REQUIRED')
         original=ctx.artifact(args.plan_reference)
@@ -97,12 +102,14 @@ def dispatch(ctx,args,operation):
         if args.source_candidate:
             artifact=ctx.artifact(args.source_candidate);source=validate_schedule(artifact.get('candidate',artifact));request['saved_tensions']=source['tensions_n']
     if operation=='replay':
+        if state.get('replays',0)>=CEILINGS['new_independent_replays']:raise ValueError('THREE_REPLAY_CEILING')
         artifact=ctx.artifact(args.candidate);request['candidate']=validate_schedule(artifact.get('candidate',artifact))
     inp,out,progress=ctx.folder/'worker_input.json',ctx.folder/'worker_output.json',ctx.folder/'worker_progress.json'
     request['progress']=str(progress);atomic_json(inp,request)
     with ctx.store.transaction() as db:
         current=ctx.store.session(ctx.run_id,db)['state'];current['pending']=dict(operation=operation,input=str(inp),output=str(out),progress=str(progress),
             request_id=ctx.request.request_id,reserved_s=reserve,started_unix=time.time())
+        if operation=='replay':current['replays']=current.get('replays',0)+1
         if operation=='solve':
             current['nlp_solves']+=1;current['batch_counts'][args.batch]+=1;current['dispatched_candidates'].append(key)
         ctx.store.update_state(db,ctx.run_id,current)
@@ -115,6 +122,34 @@ def dispatch(ctx,args,operation):
     except subprocess.TimeoutExpired as exc:
         # subprocess.run has killed and waited for this known timeout, so settle it once.
         stdout=exc.stdout or b'';result=dict(status='worker_timeout',termination_reason='Known killed/waited worker exceeded operation-specific process ceiling',reserved_s=reserve)
+    checkpoint=read(progress) if progress.exists() else None
+    checkpoint_ref=None
+    if operation=='solve':
+        returned=bool(checkpoint and checkpoint.get('phase')=='solver_returned')
+        entered=returned or b'Total number of variables' in stdout or b'iter    objective' in stdout
+        if returned:checkpoint_ref=ctx.save_artifact(checkpoint,'feedback_numeric_checkpoint')
+        result.update(solver_entered=entered,solver_returned=returned,
+            checkpoint_reference=plain(checkpoint_ref) if checkpoint_ref else None,
+            candidate_export_status='exported' if result.get('candidate') else 'unavailable')
+        if returned and not result.get('candidate'):
+            # Settle packaging locally before any subsequent scientific dispatch.
+            failure=dict(result);recovery_input=ctx.folder/'recovery_input.json'
+            recovery_request=dict(request,operation='recover');atomic_json(recovery_input,recovery_request)
+            with ctx.store.transaction() as db:
+                current=ctx.store.session(ctx.run_id,db)['state'];current['pending']['input']=str(recovery_input)
+                ctx.store.update_state(db,ctx.run_id,current)
+            remaining=reserve-(time.perf_counter()-started)
+            if remaining>0:
+                try:
+                    process=subprocess.run([state['python'],'-m','tools.casadi_feedback_worker',str(recovery_input),str(out)],cwd=ROOT,env=env,
+                        stdout=subprocess.PIPE,stderr=subprocess.STDOUT,timeout=remaining)
+                    stdout+=process.stdout;result=read(out)
+                except subprocess.TimeoutExpired as exc:
+                    stdout+=exc.stdout or b''
+                    result=dict(status='engineering_error',termination_reason='Checkpoint recovery exceeded original worker allowance')
+            result.update(original_packaging_failure=failure,solver_entered=entered,solver_returned=True,
+                checkpoint_reference=plain(checkpoint_ref),candidate_export_status='recovered' if result.get('candidate') else 'unavailable')
+        if returned and 'solver_termination' not in result:result['solver_termination']=checkpoint['diagnostics']['return_status']
     elapsed=time.perf_counter()-started
     log=ctx.save_artifact(dict(text=stdout.decode('utf8',errors='replace')),'feedback_worker_log')
     result.update(operation=operation,arguments=plain(args),implementation=state['freeze'],problem_identity=state['spec_identity'],
@@ -126,6 +161,8 @@ def dispatch(ctx,args,operation):
         if operation in ('diagnose','speed'):current['investigation_s']+=elapsed
         current['results'].append(dict(operation=operation,status=result['status'],reference=plain(ref),candidate=plain(candidate_ref) if candidate_ref else None,
             source_candidate=plain(args.candidate) if operation=='replay' else None))
+        if result['status'] in ('engineering_error','numerical_error'):
+            current['engineering_pause']=dict(reference=plain(ref),reason=result['termination_reason'])
         if operation=='diagnose':
             comparisons=result.get('comparisons',{});a=comparisons.get('tight_original_vs_tight_refined',{});b=comparisons.get('tight_refined_vs_saved_bdf',{})
             current['refined_grid_supported']=bool(a.get('complete_horizon') and b.get('complete_horizon') and
@@ -135,7 +172,8 @@ def dispatch(ctx,args,operation):
     fields=('status','termination_reason','iterations','hard_max_normalized_violation','largest_hard_residuals','largest_relaxed_task_residuals',
         'relaxed_nlp_feasible','original_task_feasible','original_task_gaps','slack_values','trajectory_metrics','objective_components',
         'slack_definition','acceptance','physical_validation','replay','physical_eligible','comparisons','saved_nlp_metrics','precision_bdf',
-        'full_warmed_speed_ratio','setup_repayment_jacobian_calls','selected_local_ad','adopted','equivalence_passed','costs_s','process_elapsed_s','solve_ceiling_overrun_s')
+        'full_warmed_speed_ratio','setup_repayment_jacobian_calls','selected_local_ad','adopted','equivalence_passed','costs_s','process_elapsed_s','solve_ceiling_overrun_s',
+        'solver_entered','solver_returned','solver_termination','checkpoint_reference','candidate_export_status','original_packaging_failure','recovered_without_nlp')
     compact={k:result[k] for k in fields if k in result}
     if result.get('candidate'):compact['design_values']=dict(d=result['candidate']['d'],lengths_m=result['candidate']['lengths_m'],selection=result['candidate']['selection'])
     return Result(detail=dict(**compact,operation=operation,evidence_reference=plain(ref),candidate_reference=plain(candidate_ref) if candidate_ref else None,

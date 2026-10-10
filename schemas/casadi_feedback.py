@@ -77,3 +77,10 @@ class CloseoutPlan(Plan):
     requested_nlp_solves: Literal[0] = 0
     requested_replays: Literal[0] = 0
     diagnostic_candidate: None = None
+
+
+class ActivityPlan(Plan):
+    """This grant permits exactly one choice in either batch."""
+    candidates: list[Candidate] = Field(default_factory=list,max_length=1)
+    requested_nlp_solves: int = Field(default=0,ge=0,le=1)
+    requested_replays: int = Field(default=0,ge=0,le=1)

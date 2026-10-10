@@ -149,7 +149,7 @@ def assess(w, problem, values):
         effort=float(components[0]),variation_weighted=float(components[1]))
 
 
-def solve(configuration,args,local_ad,saved_tensions=None,progress=None):
+def solve(configuration,args,local_ad,saved_tensions=None,progress=None,execution=None):
     started=time.perf_counter();w=Workspace(configuration,args['substeps'],local_ad)
     problem=w.assemble('B',args['initialization'],args,saved_tensions)
     options=dict(max_iterations=1000,tolerance=1e-7,acceptable_tolerance=1e-6,constraint_jacobian_mode='automatic',
@@ -168,13 +168,27 @@ def solve(configuration,args,local_ad,saved_tensions=None,progress=None):
         u=x[controls];effort=float(np.mean(u*u)+.1*np.mean(np.diff(u,axis=0)**2))
         return (hard>1e-5,hard if hard>1e-5 else 0.,max(pg,sg),pg+sg,effort)
     solver.diagnostic_candidate_rank=incumbent_rank
-    if progress:atomic_json(progress,dict(phase='solver_construction',unix=time.time()))
+    if progress:atomic_json(progress,dict(phase='solver_entered',unix=time.time(),execution=execution))
     result=solver.solve(problem);diagnostics=solver.last_diagnostics
     # Preserve this actual solve before candidate extraction/report packaging.
     # A packaging repair may read it; it must not invoke another NLP.
-    if progress:atomic_json(progress,clean(dict(phase='solver_returned',unix=time.time(),
+    checkpoint=clean(dict(phase='solver_returned',unix=time.time(),execution=execution,
+        configuration=configuration,arguments=args,local_ad=local_ad,saved_tensions=saved_tensions,
+        variable_order=order,grid=dict(substeps=args['substeps'],control_intervals=35,control_period_s=.01),
+        options=options,initial_rollout=w.initial_rollout,
+        costs_s=dict(mechanics_construction=w.mechanics_construction_s,assembly_and_guess=w.assembly_s,
+            solver_construction=diagnostics['construction_s'],solve=diagnostics['solve_s'],total=time.perf_counter()-started),
         optimization_result=plain(result),diagnostics=diagnostics,
-        raw_returned_optimum=solver.last_returned_optimum)))
+        raw_returned_optimum=solver.last_returned_optimum))
+    if progress:atomic_json(progress,checkpoint)
+    return package_result(w,problem,checkpoint)
+
+
+def package_result(w,problem,checkpoint):
+    """Actual postsolve extraction, shared by normal export and recovery."""
+    from types import SimpleNamespace
+    result=SimpleNamespace(**checkpoint['optimization_result'])
+    diagnostics=checkpoint['diagnostics'];args=checkpoint['arguments']
     pool=[]
     for point in diagnostics['retained_diagnostic_points']:
         if (point['iteration'] or 0)<0:continue
@@ -193,10 +207,22 @@ def solve(configuration,args,local_ad,saved_tensions=None,progress=None):
             selected_search_objective=args['position_weight']*chosen['slack_values']['position']+args['speed_weight']*chosen['slack_values']['speed']+args['secondary_coefficient']*(chosen['effort']+chosen['variation_weighted'])),
         slack_definition='Two shared nonnegative slacks: one for all terminal/holding normalized position squared constraints; one for all holding normalized speed squared constraints',
         acceptance='Original hard dynamics/bounds and unsoftened position/speed limits; slack is never subtracted',
-        physical_validation='not_run',diagnostics=diagnostics,raw_returned=w.decode(solver.last_returned_optimum),
-        optimization_result=plain(result),options=options,initial_rollout=w.initial_rollout,
-        costs_s=dict(mechanics_construction=w.mechanics_construction_s,assembly_and_guess=w.assembly_s,
-            solver_construction=diagnostics['construction_s'],solve=diagnostics['solve_s'],total=time.perf_counter()-started))
+        physical_validation='not_run',diagnostics=diagnostics,raw_returned=w.decode(checkpoint['raw_returned_optimum']),
+        optimization_result=checkpoint['optimization_result'],options=checkpoint['options'],initial_rollout=checkpoint['initial_rollout'],
+        solver_entered=True,solver_returned=True,candidate_export_status='exported',execution=checkpoint['execution'],
+        costs_s=checkpoint['costs_s'])
+
+
+def recover(checkpoint):
+    """Rebuild only the graph and packaging; never construct or invoke IPOPT."""
+    started=time.perf_counter()
+    if checkpoint['phase']!='solver_returned':raise ValueError('RETURNED_NUMERIC_CHECKPOINT_REQUIRED')
+    w=Workspace(checkpoint['configuration'],checkpoint['arguments']['substeps'],checkpoint['local_ad'])
+    problem=w.assemble('B',checkpoint['arguments']['initialization'],checkpoint['arguments'],checkpoint.get('saved_tensions'))
+    if list(problem.variables)!=checkpoint['variable_order']:raise ValueError('CHECKPOINT_VARIABLE_ORDER_MISMATCH')
+    result=package_result(w,problem,checkpoint)
+    result.update(recovered_without_nlp=True,recovery_elapsed_s=time.perf_counter()-started)
+    return result
 
 
 def main():
@@ -205,18 +231,21 @@ def main():
     from tools.platform_store import Store
     store=Store(request['store_root']);state=store.session(request['activity'])['state']
     pending=state.get('pending',{})
-    if request['activity']!='casadi-feedback-research-20261010' or pending.get('request_id')!=request['request_id'] or pending.get('input')!=str(args.input):
+    from tools.casadi_feedback_service import ACTIVITY
+    if request['activity']!=ACTIVITY or pending.get('request_id')!=request['request_id'] or pending.get('input')!=str(args.input):
         raise ValueError('DIRECT_WORKER_REQUIRES_SHARED_ACTIVE_RESERVATION')
     try:
         op=request['operation'];cfg=request['configuration']
         if op=='diagnose':result=diagnose(cfg)
         elif op=='speed':result=speed(cfg)
-        elif op=='solve':result=solve(cfg,request['arguments'],request['local_ad'],request.get('saved_tensions'),request.get('progress'))
+        elif op=='solve':result=solve(cfg,request['arguments'],request['local_ad'],request.get('saved_tensions'),request.get('progress'),
+            dict(activity=request['activity'],request_id=request['request_id'],implementation=request['implementation'],worker_input=str(args.input)))
+        elif op=='recover':result=recover(read(request['progress']))
         else:
             from tools.casadi_codesign_worker import replay
             result=replay(cfg,request['candidate'])
     except Exception as exc:
-        result=dict(status='numerical_error',termination_reason=str(exc),exception_type=type(exc).__name__,
+        result=dict(status='engineering_error',termination_reason=str(exc),exception_type=type(exc).__name__,
             traceback=traceback.format_exc(),costs_s=dict(total=time.perf_counter()-started));traceback.print_exc()
     atomic_json(args.output,clean(result))
 

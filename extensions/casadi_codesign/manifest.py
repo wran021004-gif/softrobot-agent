@@ -20,7 +20,7 @@ EXTENSIONS = [Extension(name,'tool','1.0.0',schema,Feedback,
         ('math.casadi_codesign_solve',Solve,'solve','Execute frozen fixed or joint length trajectory NLP with IPOPT.'),
         ('math.casadi_codesign_replay',Replay,'replay','Independent BDF forward integration of a returned bounded schedule.'))]
 
-from schemas.casadi_feedback import Empty, Solve as ResearchSolve, Replay as ResearchReplay, Plan, Result
+from schemas.casadi_feedback import Empty, Solve as ResearchSolve, Replay as ResearchReplay, ActivityPlan as Plan, Result
 EXTENSIONS += [Extension('math.casadi_feedback_'+name,'tool','1.0.0',schema,Result,
     'tools.casadi_feedback_service:'+name,description,
     sources=EXTENSIONS[0].sources + ('tools/casadi_feedback_service.py','tools/casadi_feedback_worker.py',

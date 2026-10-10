@@ -17,7 +17,7 @@ class PlanTests(unittest.TestCase):
         from schemas.platform import EvidenceRef
         ref=dict(artifact_id='a'*64,media_type='application/json')
         state=dict(research_status='ready',results=[dict(operation='solve',reference=ref,candidate=None)],
-            plans=[dict(action='batch')],batch_counts=dict(initial=2,revision=0),nlp_solves=2,
+            plans=[dict(action='batch')],batch_counts=dict(initial=1,revision=0),nlp_solves=1,
             numerical_s=0.,investigation_s=0.,cutoff_unix=time.time()+10000.,refined_grid_supported=True)
         store=SimpleNamespace(session=lambda *a:dict(state=state),remaining=lambda:dict(remaining=dict(model_calls=10,tool_calls=80,backend_solves=1)),
             transaction=lambda:nullcontext(None),update_state=lambda *a:None)
@@ -38,10 +38,10 @@ class PlanTests(unittest.TestCase):
 
     def test_solver_return_survives_candidate_packaging(self):
         from types import SimpleNamespace
-        from unittest.mock import patch
+        from unittest.mock import patch,Mock
         from pathlib import Path
         from schemas.platform_math import OptimizationResult
-        from tools.casadi_feedback_worker import solve
+        from tools.casadi_feedback_worker import solve,recover
         from tools.state_io import read
         order=['design/d','slack/position','slack/speed']+[f'u/{k}/0' for k in range(35)]
         values=dict.fromkeys(order,0.)
@@ -51,22 +51,89 @@ class PlanTests(unittest.TestCase):
         w=SimpleNamespace(n=1,m=1,assemble=lambda *a:problem,decode=lambda v:dict(candidate),
             mechanics_construction_s=0.,assembly_s=0.,initial_rollout={})
         result=OptimizationResult(status='converged',optimum=values,objective_value=0.,constraint_violation=0.,iterations=3)
-        solver=SimpleNamespace(solve=lambda p:result,_bounds=lambda p,o:([0.]*len(o),[1.]*len(o),[0.]*len(o)),
+        solver=SimpleNamespace(solve=Mock(return_value=result),_bounds=lambda p,o:([0.]*len(o),[1.]*len(o),[0.]*len(o)),
             last_returned_optimum=values,last_diagnostics=dict(return_status='Solve_Succeeded',variable_order=order,
                 constraint_upper=[float('inf')],construction_s=0.,solve_s=0.,
                 retained_diagnostic_points=[dict(iteration=3,vector=list(values.values()),label='returned')]))
         assessment=dict(candidate=dict(candidate),hard_max_normalized_violation=0.,original_task_gaps=dict(position=0.,speed=0.),
             effort=0.,variation_weighted=0.,slack_values=dict(position=0.,speed=0.))
         args=dict(substeps=1,initialization='pretension_0_2',position_weight=1.,speed_weight=1.,secondary_coefficient=0.)
-        test_root=Path(__file__).resolve().parents[1]/'runs/casadi-feedback-research-20261010/checks'
+        test_root=Path(__file__).resolve().parents[1]/'runs/casadi-feedback-closeout-20261010/checks'
         test_root.mkdir(parents=True,exist_ok=True)
         with patch('tools.casadi_feedback_worker.Workspace',return_value=w),\
-            patch('tools.casadi_feedback_worker.IpoptSolver',return_value=solver),patch('tools.casadi_feedback_worker.assess',return_value=assessment):
-            progress=str(test_root/'completed_solve_packaging.json');output=solve({},args,'reverse',progress=progress)
+            patch('tools.casadi_feedback_worker.IpoptSolver',return_value=solver),patch('tools.casadi_feedback_worker.assess',side_effect=ValueError('injected extraction failure')):
+            progress=str(test_root/'completed_solve_packaging.json')
+            with self.assertRaisesRegex(ValueError,'injected extraction failure'):solve({},args,'reverse',progress=progress,execution=dict(request_id='original'))
+            saved=read(progress);self.assertEqual(saved['phase'],'solver_returned')
+            self.assertEqual(saved['raw_returned_optimum'],values)
+            self.assertEqual(saved['diagnostics']['constraint_upper'],[None])
+        with patch('tools.casadi_feedback_worker.Workspace',return_value=w),\
+            patch('tools.casadi_feedback_worker.IpoptSolver',side_effect=AssertionError('recovery must not invoke IPOPT')),\
+            patch('tools.casadi_feedback_worker.assess',return_value=assessment):
+            output=recover(saved)
             self.assertEqual(output['candidate']['selection']['iteration'],3)
             self.assertEqual(output['status'],'converged')
-            saved=read(progress);self.assertEqual(saved['phase'],'solver_returned')
-            self.assertEqual(saved['diagnostics']['constraint_upper'],[None])
+            self.assertEqual(output['execution'],dict(request_id='original'))
+            self.assertEqual(output['costs_s'],saved['costs_s'])
+            solver.solve.assert_called_once()
+
+    def test_batch_pauses_and_preserves_unexecuted_choice(self):
+        from types import SimpleNamespace
+        from contextlib import nullcontext
+        from unittest.mock import patch
+        from tools.research_casadi_feedback import execute_batch
+        state={};ref=dict(artifact_id='a'*64,media_type='application/json')
+        store=SimpleNamespace(artifact=lambda r:dict(detail=dict(status='engineering_error')),
+            transaction=lambda:nullcontext(None),session=lambda *a:dict(state=state),update_state=lambda *a:None)
+        base=dict(action='batch',hypothesis='h',supporting_evidence=[ref],weakening_observation='o',fixed_conditions='f',
+            candidates=[Candidate(),Candidate(substeps=2)],requested_nlp_solves=2,requested_replays=2,revision_or_stop_rule='r',disposition='d',limitations=['l'])
+        with patch('tools.research_casadi_feedback.invoke',return_value=dict(execution_status='completed',output=ref)) as call:
+            operations=execute_batch(SimpleNamespace(store=store),Plan(**base),dict(batch='initial',plan_reference=ref),'fixture')
+        self.assertEqual(call.call_count,1);self.assertEqual(len(operations),1)
+        self.assertEqual(state['engineering_pause']['unexecuted_choices'][0]['substeps'],2)
+
+    def test_provider_compatibility_and_protected_boundary(self):
+        import asyncio,json,httpx
+        from types import SimpleNamespace
+        from schemas.casadi_feedback import CloseoutPlan
+        from tools.research_casadi_feedback import FeedbackBoundary
+        sends=[];state=dict(research_status='ready',pilot={})
+        store=SimpleNamespace(session=lambda *a:dict(state=state),remaining=lambda:dict(remaining=dict(model_calls=4)))
+        host=SimpleNamespace(store=store,compatibility=lambda:dict(compatible=False))
+        transport=httpx.MockTransport(lambda request:sends.append(request))
+        boundary=FeedbackBoundary(host,transport=transport)
+        request=httpx.Request('POST','https://api.deepseek.com/chat/completions',json={})
+        with self.assertRaisesRegex(ValueError,'DEPENDENCIES_CHANGED_BEFORE_PROVIDER_SEND'):
+            asyncio.run(boundary.handle_async_request(request))
+        self.assertEqual(sends,[])
+        host.compatibility=lambda:dict(compatible=True)
+        with self.assertRaisesRegex(ValueError,'PROTECTED_SEND'):
+            asyncio.run(boundary.handle_async_request(request))
+        from tools.research_casadi_feedback import provider_guard
+        provider_guard(host,dict(tools=[dict(function=dict(name='research_plan',parameters=CloseoutPlan.model_json_schema()))]))
+        state['research_status']='stopped'
+        with self.assertRaisesRegex(ValueError,'ACCEPTED_STOP_NO_MORE_SENDS'):
+            asyncio.run(boundary.handle_async_request(request))
+        self.assertEqual(sends,[]);asyncio.run(boundary.aclose())
+
+    def test_activity_plan_and_accepted_native_stop(self):
+        from schemas.casadi_feedback import ActivityPlan
+        from schemas.platform import EvidenceRef
+        from types import SimpleNamespace
+        from contextlib import nullcontext
+        from tools.casadi_feedback_service import plan
+        import time
+        ref=dict(artifact_id='a'*64,media_type='application/json')
+        base=dict(hypothesis='h',supporting_evidence=[ref],weakening_observation='o',fixed_conditions='f',revision_or_stop_rule='r',disposition='d',limitations=['l'])
+        with self.assertRaises(ValidationError):ActivityPlan(action='batch',candidates=[Candidate(),Candidate()],requested_nlp_solves=2,requested_replays=2,**base)
+        state=dict(research_status='ready',results=[dict(operation='solve',reference=ref,candidate=None)],plans=[],numerical_s=0.,
+            investigation_s=0.,nlp_solves=1,batch_counts=dict(initial=1,revision=0),cutoff_unix=time.time()+10000.)
+        store=SimpleNamespace(session=lambda *a:dict(state=state),remaining=lambda:dict(remaining=dict(model_calls=4,tool_calls=40,backend_solves=0)),
+            transaction=lambda:nullcontext(None),update_state=lambda *a:None)
+        ctx=SimpleNamespace(store=store,run_id='fixture',artifact=lambda r:{},save_artifact=lambda *a:EvidenceRef(**ref))
+        result=plan(ctx,ActivityPlan(action='stop',**base))
+        self.assertTrue(result.detail['accepted']);self.assertEqual(state['final_disposition'],ref)
+        with self.assertRaisesRegex(ValueError,'MODEL_STOP_SEALED'):plan(ctx,ActivityPlan(action='stop',**base))
 
     def test_generic_incumbent_keeps_original_gap_rank(self):
         from extensions.optimization.ipopt import _FeasibleIterate
