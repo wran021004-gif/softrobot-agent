@@ -1,0 +1,333 @@
+{
+  "frozen_specification": {
+    "study_id": "casadi-feedback-research-20261010",
+    "authorization": "User attachment 3f3214c0-52b3-4856-a618-4a80ddfa3358/pasted-text-1.txt",
+    "base_commit": "94fa3b22522d8cc806128184a20de24f47024ca9",
+    "physical_source": "examples/casadi_codesign/case_A.json#/physical_source",
+    "frozen_task": {
+      "target_m": [
+        0.29,
+        0.035,
+        0.19
+      ],
+      "mount_m": [
+        0,
+        0,
+        0.15
+      ],
+      "mount_quaternion_wxyz": [
+        1,
+        0,
+        0,
+        0
+      ],
+      "gravity_m_s2": [
+        0,
+        0,
+        -9.81
+      ],
+      "duration_s": 0.35,
+      "control_intervals": 35,
+      "control_period_s": 0.01,
+      "physical_timestep_s": 0.0005,
+      "physical_mesh_cells": 24,
+      "seed": 17,
+      "physical_initial_state": "named_zero_positions_and_velocities",
+      "topology": "two flexible segments; six independent ideal tension channels; existing asymmetric routing, guides, rigid components and payload",
+      "mechanics": "existing material and sections; structural_linear basis; existing coordinate/tendon order",
+      "tension_bounds_n": [
+        0,
+        8
+      ],
+      "terminal_position_limit_m": 0.01,
+      "holding_position_limit_m": 0.01,
+      "holding_speed_limit_m_s": 0.02,
+      "holding_window_s": 0.05
+    },
+    "design": {
+      "rule": "L_proximal=0.16+0.0055*d; L_distal=0.11-0.0055*d",
+      "bounds": [
+        -1,
+        1
+      ],
+      "constant_throughout_trajectory": true
+    },
+    "search": {
+      "slacks": "Two shared nonnegative variables: position slack covers all holding and terminal normalized position squared inequalities; speed slack covers all holding normalized speed squared inequalities. Each inequality is normalized_squared <= 1 + its slack.",
+      "hard_constraints": [
+        "initial state",
+        "implicit force balance and kinematics",
+        "constant design domain",
+        "tension bounds",
+        "nonnegative slacks"
+      ],
+      "objective_menu": [
+        "task_gap",
+        "task_gap_with_effort"
+      ],
+      "task_gap_expression": "position_weight*s_position + speed_weight*s_speed",
+      "position_and_speed_weight_bounds": [
+        0.25,
+        4
+      ],
+      "default_weights": [
+        1,
+        1
+      ],
+      "secondary_coefficient_bounds": [
+        0,
+        0.001
+      ],
+      "secondary_expression": "coefficient * (mean((u/8)^2)+0.1*mean((diff(u)/8)^2)); weighted tradeoff, not lexicographic",
+      "initializations": [
+        "pretension_0_2",
+        "ramp_0_2_to_0_4",
+        "saved_schedule"
+      ],
+      "state_substeps": [
+        1,
+        2
+      ],
+      "refinement_gate": "Observed original-versus-refined reconstruction discrepancy exceeds 1 mm or 0.002 m/s with complete horizons",
+      "outer_derivatives": "automatic exact AD",
+      "local_derivatives": "Start historical forced reverse; one measured automatic-AD trial; adopt only after same-input value/derivative equivalence and useful repayment"
+    },
+    "acceptance": {
+      "hard_normalized_residual_tolerance": 1e-05,
+      "task_gap_normalized_tolerance": 1e-05,
+      "slack_subtracted": false,
+      "replay_tip_disagreement_limit_m": 0.001,
+      "replay_speed_disagreement_limit_m_s": 0.002,
+      "independent_replay": "SciPy BDF from zero, continuous state across 35 original tension switches; default rtol=1e-8,atol_q=1e-9,atol_v=1e-7; dense 0.0005 s metrics separate from original-node metrics",
+      "physical_validation": "Optional; no task validation claim without mathematical and replay acceptance. Existing controller11 answers a different-input geometry question, not optimized-schedule equivalence."
+    },
+    "diagnosis": {
+      "candidate": "evidence/casadi_codesign_pilot_20261010/07_solve_A.json#/candidate; corrected A iteration 59",
+      "source_solver": "baae52d1f11518a40982491879c4a0ab380c519a617a0588e989a0e496bebbf2",
+      "selected_candidate": "6f121f12f89af153953972e5140b4e2fdd4b77ddb089fbc8c340457198af97b9",
+      "comparisons": [
+        "saved NLP vs tightly solved original grid",
+        "original vs two-step refined grid",
+        "refined vs saved BDF",
+        "saved BDF vs one precision check"
+      ],
+      "root_tolerance": 1e-11,
+      "precision_bdf": {
+        "rtol": 1e-10,
+        "atol_q": 1e-11,
+        "atol_v": 1e-09
+      },
+      "no_design_search": true
+    },
+    "budgets": {
+      "full_nlp_solves": 4,
+      "initial_batch_solves": 2,
+      "revision_batch_solves": 2,
+      "solve_limit_s": 600,
+      "ipopt_cpu_wall_settings_s": 570,
+      "nlp_process_ceiling_s": 900,
+      "replay_process_ceiling_s": 450,
+      "diagnosis_process_ceiling_s": 900,
+      "speed_process_ceiling_s": 600,
+      "total_numerical_s": 7200,
+      "initial_investigation_s": 1800,
+      "physical_launches": 1,
+      "physical_allowance_s": 1800,
+      "actual_provider_requests": 24,
+      "protected_final_provider_sends": 4,
+      "public_workflow_calls": 96,
+      "other_llm_workers": 0,
+      "overall_activity_s": 28800,
+      "delivery_reserve_s": 1800
+    },
+    "completion": "At least one real model-selected numerical batch executed and feedback consumed in an evidence-based revision or STOP; no fabricated model decision; feasibility/speedup/second batch are optional",
+    "historical_activities": "sealed STOP; previous unused budget cannot be used"
+  },
+  "historical": [
+    {
+      "name": "corrected_A",
+      "reference": {
+        "artifact_id": "baae52d1f11518a40982491879c4a0ab380c519a617a0588e989a0e496bebbf2",
+        "media_type": "application/json"
+      },
+      "lengths_m": [
+        0.16,
+        0.11
+      ],
+      "objective": {
+        "effort": 0.013974686063606275,
+        "total": 0.014011085331497402,
+        "variation_weighted": 3.6399267891127516e-05
+      },
+      "normalized_violation": 0.21871979218041515,
+      "metrics": {
+        "holding_max_position_error_m": 0.009817871371583587,
+        "holding_max_speed_m_s": 0.02207912853516112,
+        "terminal_position_error_m": 0.009811832152384034
+      },
+      "mathematical_feasibility": "infeasible_returned_iterate"
+    },
+    {
+      "name": "corrected_B",
+      "reference": {
+        "artifact_id": "2579c06bb0cecb4a86f925e9af9dc34b554d13e2895b0d9b47c4a42265a2db9d",
+        "media_type": "application/json"
+      },
+      "lengths_m": [
+        0.1557815161660965,
+        0.1142184838339035
+      ],
+      "objective": {
+        "effort": 0.01281330361947096,
+        "total": 0.012845784940368173,
+        "variation_weighted": 3.248132089721223e-05
+      },
+      "normalized_violation": 0.7362588426447425,
+      "metrics": {
+        "holding_max_position_error_m": 0.010017116129698283,
+        "holding_max_speed_m_s": 0.026353435014394178,
+        "terminal_position_error_m": 0.010017116129698283
+      },
+      "mathematical_feasibility": "infeasible_returned_iterate"
+    }
+  ],
+  "historical_replay": {
+    "reference": {
+      "artifact_id": "172caf84e701165ecd58bb4aa6de93d83e378b6fbaaddf7a6cf2eda9f660a1b1",
+      "media_type": "application/json"
+    },
+    "holding_speed_m_s": 0.09799912805413251,
+    "node_tip_disagreement_m": 0.00810609985798637
+  },
+  "saved_schedule_reference": {
+    "artifact_id": "6f121f12f89af153953972e5140b4e2fdd4b77ddb089fbc8c340457198af97b9",
+    "media_type": "application/json"
+  },
+  "results": [
+    {
+      "operation": "diagnose",
+      "reference": {
+        "artifact_id": "ba8eaa8ab169e941436e096ab5bc367d70b3cc8f4591471923fc7f85e928a14c",
+        "media_type": "application/json"
+      },
+      "candidate": null,
+      "status": "completed",
+      "termination_reason": "Fixed corrected-A iteration-59 inputs and lengths; reconstructed continuously from zero; no design search",
+      "comparisons": {
+        "saved_bdf_vs_precision_bdf": {
+          "complete_horizon": true,
+          "max_speed_m_s": 4.707862087652596e-10,
+          "max_tip_m": 6.326105382398365e-12
+        },
+        "saved_nlp_vs_tight_original": {
+          "complete_horizon": true,
+          "max_speed_m_s": 1.308016452634832e-05,
+          "max_tip_m": 5.887482893548685e-07
+        },
+        "tight_original_vs_tight_refined": {
+          "complete_horizon": true,
+          "max_speed_m_s": 0.04672432046756268,
+          "max_tip_m": 0.0037435079986504567
+        },
+        "tight_refined_vs_saved_bdf": {
+          "complete_horizon": true,
+          "max_speed_m_s": 0.052987134579760016,
+          "max_tip_m": 0.0043648601940654876
+        }
+      },
+      "saved_nlp_metrics": {
+        "holding_max_position_error_m": 0.009817871371583587,
+        "holding_max_speed_m_s": 0.02207912853516112,
+        "terminal_position_error_m": 0.009811832152384034
+      },
+      "precision_bdf": {
+        "atol_q": 1e-11,
+        "atol_v": 1e-09,
+        "costs_s": {
+          "jacobian_construction": 12.897289099986665,
+          "total": 163.10335490002763
+        },
+        "dense_max_speed_disagreement_m_s": 0.09968627179788823,
+        "dense_max_tip_disagreement_m": 0.008110578846913718,
+        "dense_period_s": 0.0005,
+        "gates_passed": false,
+        "holding_max_position_error_m": 0.006875549041129858,
+        "holding_max_speed_m_s": 0.0979991276178837,
+        "input_bounds_compliant": true,
+        "integration_failure": null,
+        "method": "scipy BDF, exact direct-graph state Jacobian, switch-by-switch continuous state",
+        "node_max_speed_disagreement_m_s": 0.09968627179788823,
+        "node_max_tip_disagreement_m": 0.008106099860593293,
+        "rtol": 1e-10,
+        "status": "completed",
+        "terminal_position_error_m": 0.00548306587528728
+      },
+      "process_elapsed_s": 215.60840389999794,
+      "costs_s": {
+        "total": 213.07062850001967
+      }
+    },
+    {
+      "operation": "speed",
+      "reference": {
+        "artifact_id": "195f0d40d8dc83748a6c3410e0db0119d753e35b036f5dbb5a3c9ca413ab7074",
+        "media_type": "application/json"
+      },
+      "candidate": null,
+      "status": "passed",
+      "termination_reason": "Single change: remove local step forced-reverse AD; full NLP remains exact automatic AD",
+      "modes": {
+        "automatic": {
+          "assembly_s": 28.38149269996211,
+          "full_cold_s": 5.154476399999112,
+          "full_derivative_construction_s": 17.547939100011718,
+          "full_warmed_s": [
+            5.158871199993882,
+            5.167357700003777
+          ],
+          "local_derivative_construction_s": 6.904930900025647,
+          "mechanics_construction_s": 1.526462099980563
+        },
+        "reverse": {
+          "assembly_s": 17.615476900013164,
+          "full_cold_s": 5.245000099996105,
+          "full_derivative_construction_s": 16.036224900046363,
+          "full_warmed_s": [
+            5.2185803999891505,
+            5.205002999980934
+          ],
+          "local_derivative_construction_s": 7.823299899988342,
+          "mechanics_construction_s": 2.860805700009223
+        }
+      },
+      "full_warmed_speed_ratio": 1.0094278851374723,
+      "setup_repayment_jacobian_calls": 974.9090984678829,
+      "adopted": false,
+      "selected_local_ad": "reverse",
+      "process_elapsed_s": 166.24472259997856,
+      "costs_s": {
+        "total": 163.7016659999499
+      }
+    }
+  ],
+  "accepted_plans": [],
+  "research_status": "ready",
+  "remaining_budget": {
+    "numerical_s": 6818.1468735000235,
+    "initial_investigation_s": 1418.1468735000235,
+    "nlp_solves": 4,
+    "initial_solves": 2,
+    "revision_solves": 2,
+    "provider_requests": 24,
+    "protected_provider_sends": 4,
+    "public_tool_calls": 94,
+    "backend_launches": 1,
+    "activity_s": 27146.053198814392,
+    "scientific_window_s": 25346.053198814392
+  },
+  "capabilities": {
+    "research_plan": "Typed batch of one/two supported NLP choices; execute sequentially then independent BDF replay each usable schedule; subsequent revision, one diagnostic replay, or STOP",
+    "evidence_read": "Exact immutable reference and JSON pointer; basic facts already supplied",
+    "physical": "No scheduled physical operation in this numerical study. Existing controller11 is a different-input geometry test; optimized-schedule MuJoCo path unavailable. Zero physical launches unless a separately supported question-specific path is implemented within this activity."
+  }
+}

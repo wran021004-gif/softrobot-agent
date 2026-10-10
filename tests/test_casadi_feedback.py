@@ -12,7 +12,6 @@ class PlanTests(unittest.TestCase):
     def test_solver_return_survives_candidate_packaging(self):
         from types import SimpleNamespace
         from unittest.mock import patch
-        from tempfile import TemporaryDirectory
         from pathlib import Path
         from schemas.platform_math import OptimizationResult
         from tools.casadi_feedback_worker import solve
@@ -32,9 +31,11 @@ class PlanTests(unittest.TestCase):
         assessment=dict(candidate=dict(candidate),hard_max_normalized_violation=0.,original_task_gaps=dict(position=0.,speed=0.),
             effort=0.,variation_weighted=0.,slack_values=dict(position=0.,speed=0.))
         args=dict(substeps=1,initialization='pretension_0_2',position_weight=1.,speed_weight=1.,secondary_coefficient=0.)
-        with TemporaryDirectory() as folder,patch('tools.casadi_feedback_worker.Workspace',return_value=w),\
+        test_root=Path(__file__).resolve().parents[1]/'runs/casadi-feedback-research-20261010/checks'
+        test_root.mkdir(parents=True,exist_ok=True)
+        with patch('tools.casadi_feedback_worker.Workspace',return_value=w),\
             patch('tools.casadi_feedback_worker.IpoptSolver',return_value=solver),patch('tools.casadi_feedback_worker.assess',return_value=assessment):
-            progress=str(Path(folder)/'progress.json');output=solve({},args,'reverse',progress=progress)
+            progress=str(test_root/'completed_solve_packaging.json');output=solve({},args,'reverse',progress=progress)
             self.assertEqual(output['candidate']['selection']['iteration'],3)
             self.assertEqual(output['status'],'converged')
             saved=read(progress);self.assertEqual(saved['phase'],'solver_returned')
