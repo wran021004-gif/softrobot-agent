@@ -96,6 +96,7 @@ def checks(request):
             warmed_jax_s=warmed, casadi_evaluation_s=ca_elapsed, tip_robot_base_m=np.asarray(actual)[:3].tolist(),
             tendon_lengths_m=np.asarray(actual)[3:].tolist()))
 
+    mapping_passed = bool(passed)
     # Probe the actual supported factory; this object is NOT the current robot.
     segment = next(c for c in design['components'] if c['kind']=='flexible_segment')
     probe_link = LinkSpec.elliptical(length=.16, semi_major=.0095, semi_minor=.0076,
@@ -153,11 +154,11 @@ def checks(request):
         'The minimal factory mapping also lacks the separately owned guide, connector and payload inertia/offset representation. They have not been homogenized or dropped.',
         'Subdivision plus tied coordinates, tensor rotation and discrete rigid inertia would require a larger mechanics adapter and new validation; this bounded pilot stops at admission.'
     ]
-    if not passed or rejection is None or basis_error <= tolerances['curvature_basis_abs']:
+    if not mapping_passed or rejection is None or basis_error <= tolerances['curvature_basis_abs']:
         reasons.insert(0, 'Admission diagnostic failed; inspect all retained numerical records.')
     costs['worker_total'] = time.perf_counter()-started
-    return WorkerOutput(gate='model_incompatible' if passed and rejection and basis_error>tolerances['curvature_basis_abs'] else 'check_failed',
-        reasons=reasons, checks=dict(tolerances=tolerances, exact_mapping_passed=bool(passed), representative_states=records,
+    return WorkerOutput(gate='model_incompatible' if mapping_passed and rejection and basis_error>tolerances['curvature_basis_abs'] else 'check_failed',
+        reasons=reasons, checks=dict(tolerances=tolerances, exact_mapping_passed=mapping_passed, representative_states=records,
             resolved_model=dict(dimensions=request.dimensions['dimensions'], coordinate_order=request.dimensions['coordinate_order'],
                 tendon_input_order=request.dimensions['tendon_input_order'], actuator_command_order=request.dimensions['actuator_command_order'],
                 backend_position_order=request.dimensions['backend_position_order'],
@@ -168,8 +169,9 @@ def checks(request):
             native_factory_rejection=rejection, supported_basis=list(typing.get_args(BasisType)),
             basis_mismatch=dict(normalized_s=samples.tolist(), required_hat=hat.tolist(), interpolated_legendre=polynomial.tolist(),
                 max_abs_basis_error=basis_error, variable=local.segment+'.kappa_y_node_1', time_s=None),
-            section_tensors=sections, native_probe=dict(label='single unrotated link; not candidate mechanics',
-                tip_m=np.asarray(values[0]).tolist(), partial_length_derivative=np.asarray(values[1]).tolist(), fd_abs_error=native_error),
+            section_tensors=sections, native_probe=dict(label='single unrotated link in default native pose; not candidate mechanics',
+                tip_m=np.asarray(values[0]).tolist(), partial_length_derivative=np.asarray(values[1]).tolist(),
+                fd_abs_error=native_error, derivative_passed=native_error <= tolerances['native_length_derivative_abs']),
             physical_initial_mapping=request.dimensions['numerical_initialization'],
             objective_gradient='not_run: no admitted NLP', constraint_jacobian='not_run: no admitted dynamics transcription',
             mechanics_design_derivatives='not_established', independent_replay='not_run: no admitted candidate'),

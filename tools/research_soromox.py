@@ -9,7 +9,7 @@ import subprocess
 import time
 from schemas.platform import ProjectConfig
 from tools.platform_host import Host
-from tools.platform_store import Store, plain
+from tools.platform_store import Store, plain, zero
 from tools.research_execution import invoke
 from tools.state_io import atomic_json, read, digest
 from tools.spec_tools import ROOT
@@ -163,6 +163,14 @@ def main():
         print(json.dumps(value)); return
     if args.command=='smoke': asyncio.run(smoke(h))
     if args.command=='stop':
+        elapsed = time.time()-STARTED
+        engineering = max(0., elapsed-h.store.remaining()['used']['wall_s'])
+        row, fresh = h.store.reserve(ACTIVITY, 'pilot-engineering-closeout', digest({'started':STARTED}), h.actor,
+            {**zero(), 'wall_s':engineering}, kind='engineering')
+        if fresh:
+            h.store.complete(row, dict(request_id=row['request_id'], execution_id=row['execution_id'], caller=h.actor,
+                tool_id='engineering.soromox', tool_version='1.0.0', execution_status='completed', charged=zero()),
+                dict(elapsed_activity_s=elapsed, engineering_and_uninstrumented_setup_s=engineering), elapsed=engineering)
         with h.store.transaction() as db:
             state = h.store.session(ACTIVITY, db)['state']
             state['soromox_decision'] = 'defer_adoption'; state['soromox_completed_unix'] = time.time()

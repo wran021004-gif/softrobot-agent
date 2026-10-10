@@ -54,7 +54,7 @@ def admission(ctx):
     process = subprocess.run([str(interpreter), '-m', 'tools.soromox_worker', str(inp), str(out)],
         cwd=ROOT, env=env, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, timeout=timeout)
     elapsed = time.perf_counter()-started
-    log = ctx.save_artifact(process.stdout, 'soromox_worker_log')
+    log = ctx.save_artifact(dict(encoding='utf8', text=process.stdout.decode('utf8', errors='replace')), 'soromox_worker_log')
     if process.returncode == 0 and out.is_file():
         result = plain(WorkerOutput.model_validate(read(out)))
     else:
