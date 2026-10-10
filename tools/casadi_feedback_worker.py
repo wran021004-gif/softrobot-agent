@@ -13,6 +13,13 @@ from tools.spec_tools import ROOT
 HISTORY=ROOT/'evidence/casadi_codesign_pilot_20261010'
 
 
+def clean(value):
+    if isinstance(value,dict):return {k:clean(v) for k,v in value.items()}
+    if isinstance(value,(list,tuple)):return [clean(v) for v in value]
+    if isinstance(value,float) and not np.isfinite(value):return None
+    return value
+
+
 def outputs(w, candidate):
     x=np.asarray(candidate['states']);d=candidate['d']
     return dict(times_s=candidate['times_s'],
@@ -163,6 +170,11 @@ def solve(configuration,args,local_ad,saved_tensions=None,progress=None):
     solver.diagnostic_candidate_rank=incumbent_rank
     if progress:atomic_json(progress,dict(phase='solver_construction',unix=time.time()))
     result=solver.solve(problem);diagnostics=solver.last_diagnostics
+    # Preserve this actual solve before candidate extraction/report packaging.
+    # A packaging repair may read it; it must not invoke another NLP.
+    if progress:atomic_json(progress,clean(dict(phase='solver_returned',unix=time.time(),
+        optimization_result=plain(result),diagnostics=diagnostics,
+        raw_returned_optimum=solver.last_returned_optimum)))
     pool=[]
     for point in diagnostics['retained_diagnostic_points']:
         if (point['iteration'] or 0)<0:continue
@@ -176,7 +188,7 @@ def solve(configuration,args,local_ad,saved_tensions=None,progress=None):
     chosen=min(pool,key=rank);candidate=chosen['candidate']
     candidate.update(initialization=args['initialization'],selection=dict(label='hard_validity_then_original_task_gaps_then_effort',iteration=chosen['iteration']))
     return dict(status=result.status,termination_reason=diagnostics['return_status'],iterations=result.iterations,
-        **chosen,candidate=candidate,retained_candidate_assessments=[{k:v for k,v in p.items() if k!='candidate'} for p in pool],
+        **chosen,retained_candidate_assessments=[{k:v for k,v in p.items() if k!='candidate'} for p in pool],
         objective_components=dict(effort=chosen['effort'],variation_weighted=chosen['variation_weighted'],
             selected_search_objective=args['position_weight']*chosen['slack_values']['position']+args['speed_weight']*chosen['slack_values']['speed']+args['secondary_coefficient']*(chosen['effort']+chosen['variation_weighted'])),
         slack_definition='Two shared nonnegative slacks: one for all terminal/holding normalized position squared constraints; one for all holding normalized speed squared constraints',
@@ -206,11 +218,6 @@ def main():
     except Exception as exc:
         result=dict(status='numerical_error',termination_reason=str(exc),exception_type=type(exc).__name__,
             traceback=traceback.format_exc(),costs_s=dict(total=time.perf_counter()-started));traceback.print_exc()
-    def clean(v):
-        if isinstance(v,dict):return {k:clean(x) for k,x in v.items()}
-        if isinstance(v,list):return [clean(x) for x in v]
-        if isinstance(v,float) and not np.isfinite(v):return None
-        return v
     atomic_json(args.output,clean(result))
 
 

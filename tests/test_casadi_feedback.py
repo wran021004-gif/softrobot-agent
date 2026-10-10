@@ -9,6 +9,37 @@ from tools.casadi_feedback_worker import assess
 
 
 class PlanTests(unittest.TestCase):
+    def test_solver_return_survives_candidate_packaging(self):
+        from types import SimpleNamespace
+        from unittest.mock import patch
+        from tempfile import TemporaryDirectory
+        from pathlib import Path
+        from schemas.platform_math import OptimizationResult
+        from tools.casadi_feedback_worker import solve
+        from tools.state_io import read
+        order=['design/d','slack/position','slack/speed']+[f'u/{k}/0' for k in range(35)]
+        values=dict.fromkeys(order,0.)
+        problem=SimpleNamespace(variables={k:dict(type='number',bounds=[0.,1.]) for k in order},
+            constraints=[SimpleNamespace(name=k) for k in ['dynamics_0_0','terminal_position','holding_speed_35']])
+        candidate=dict(d=0.,lengths_m=[.16,.11])
+        w=SimpleNamespace(n=1,m=1,assemble=lambda *a:problem,decode=lambda v:dict(candidate),
+            mechanics_construction_s=0.,assembly_s=0.,initial_rollout={})
+        result=OptimizationResult(status='converged',optimum=values,objective_value=0.,constraint_violation=0.,iterations=3)
+        solver=SimpleNamespace(solve=lambda p:result,_bounds=lambda p,o:([0.]*len(o),[1.]*len(o),[0.]*len(o)),
+            last_returned_optimum=values,last_diagnostics=dict(return_status='Solve_Succeeded',variable_order=order,
+                constraint_upper=[float('inf')],construction_s=0.,solve_s=0.,
+                retained_diagnostic_points=[dict(iteration=3,vector=list(values.values()),label='returned')]))
+        assessment=dict(candidate=dict(candidate),hard_max_normalized_violation=0.,original_task_gaps=dict(position=0.,speed=0.),
+            effort=0.,variation_weighted=0.,slack_values=dict(position=0.,speed=0.))
+        args=dict(substeps=1,initialization='pretension_0_2',position_weight=1.,speed_weight=1.,secondary_coefficient=0.)
+        with TemporaryDirectory() as folder,patch('tools.casadi_feedback_worker.Workspace',return_value=w),\
+            patch('tools.casadi_feedback_worker.IpoptSolver',return_value=solver),patch('tools.casadi_feedback_worker.assess',return_value=assessment):
+            progress=str(Path(folder)/'progress.json');output=solve({},args,'reverse',progress=progress)
+            self.assertEqual(output['candidate']['selection']['iteration'],3)
+            self.assertEqual(output['status'],'converged')
+            saved=read(progress);self.assertEqual(saved['phase'],'solver_returned')
+            self.assertEqual(saved['diagnostics']['constraint_upper'],[None])
+
     def test_generic_incumbent_keeps_original_gap_rank(self):
         from extensions.optimization.ipopt import _FeasibleIterate
         callback=_FeasibleIterate(1,1)
