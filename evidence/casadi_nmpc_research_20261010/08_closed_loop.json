@@ -1,0 +1,2042 @@
+{
+  "acceptance": {
+    "accepted": false,
+    "components": {
+      "evaluation_validity": {
+        "limit": null,
+        "passed": true,
+        "reason": null,
+        "unit": null,
+        "value": "valid"
+      },
+      "evaluator:task_bound": {
+        "limit": 0.01,
+        "passed": false,
+        "reason": null,
+        "unit": "m",
+        "value": 0.09552487867011847
+      },
+      "execution_complete": {
+        "limit": null,
+        "passed": true,
+        "reason": null,
+        "unit": null,
+        "value": true
+      },
+      "force_bounds": {
+        "limit": 1e-08,
+        "passed": true,
+        "reason": null,
+        "unit": "N",
+        "value": 0.0
+      },
+      "holding_coverage": {
+        "limit": 6,
+        "passed": true,
+        "reason": null,
+        "unit": "inclusive uniform samples",
+        "value": true
+      },
+      "holding_position": {
+        "limit": 0.01,
+        "passed": false,
+        "reason": null,
+        "unit": "m",
+        "value": 0.1931520788542894
+      },
+      "holding_speed": {
+        "limit": 0.02,
+        "passed": false,
+        "reason": null,
+        "unit": "m/s",
+        "value": 3.2498304807417395
+      },
+      "solver_errors": {
+        "limit": 0,
+        "passed": true,
+        "reason": null,
+        "unit": "count",
+        "value": 0
+      },
+      "task_evaluator": {
+        "limit": null,
+        "passed": false,
+        "reason": null,
+        "unit": null,
+        "value": false
+      }
+    },
+    "continuous_time_guarantee": false,
+    "contract": "research.task_acceptance",
+    "evaluator_tension_channels": null,
+    "evidence_binding": {
+      "evaluation": {
+        "artifact_id": "2ef9f26a8f0cf8d61c5108fac8e8c750743f8e94d3b154abf1c135363a00f133",
+        "media_type": "application/json"
+      },
+      "evaluation_binding": {
+        "original_execution_id": "21b607607bf442a6b6d9494dda897ea8",
+        "source": {
+          "artifact_id": "84e834e46165cecbe3bcdaeb2377076d658b67f617b3391e639b5dfdf0c6b53c",
+          "media_type": "application/json"
+        },
+        "source_execution_id": "21b607607bf442a6b6d9494dda897ea8"
+      },
+      "profile": {
+        "artifact_id": "01e6d1614badd047e2f25c5e71e0ecd9aff9dcfd11443a5baa885cd438e2e416",
+        "media_type": "application/json"
+      },
+      "profile_binding": {
+        "evaluation": {
+          "artifact_id": "2ef9f26a8f0cf8d61c5108fac8e8c750743f8e94d3b154abf1c135363a00f133",
+          "media_type": "application/json"
+        },
+        "execution_id": "21b607607bf442a6b6d9494dda897ea8",
+        "simulation": {
+          "artifact_id": "84e834e46165cecbe3bcdaeb2377076d658b67f617b3391e639b5dfdf0c6b53c",
+          "media_type": "application/json"
+        }
+      },
+      "simulation": {
+        "artifact_id": "84e834e46165cecbe3bcdaeb2377076d658b67f617b3391e639b5dfdf0c6b53c",
+        "media_type": "application/json"
+      }
+    },
+    "execution_id": "21b607607bf442a6b6d9494dda897ea8",
+    "issues": [],
+    "metrics": {
+      "holding_max_error_m": 0.1931520788542894,
+      "holding_max_speed_m_s": 3.2498304807417395,
+      "terminal_error_m": 0.09552487867011847
+    },
+    "missing": [],
+    "protocol_id": "offline_reach_hold_v1",
+    "sources": {
+      "evaluation": {
+        "artifact_id": "2ef9f26a8f0cf8d61c5108fac8e8c750743f8e94d3b154abf1c135363a00f133",
+        "media_type": "application/json"
+      },
+      "profile": {
+        "artifact_id": "01e6d1614badd047e2f25c5e71e0ecd9aff9dcfd11443a5baa885cd438e2e416",
+        "media_type": "application/json"
+      }
+    },
+    "status": "valid_failure",
+    "task_family": "task.reach",
+    "task_identity": "2b26edb492214c426263441b6adb52d7aafe41a828436d6b48a1171374a1026c",
+    "timing": {
+      "control_period_s": 0.01,
+      "deadline_misses": 35,
+      "duration_s": 0.35,
+      "mean_update_s": 19.292457457139555,
+      "real_time_demonstrated": false,
+      "real_time_required": false,
+      "sample_period_s": 0.01,
+      "simulation_wall_s": 680.5939999999828,
+      "termination": [
+        "duration",
+        "numerical_failure"
+      ],
+      "timestep_s": 0.0005
+    },
+    "version": "1.0.0"
+  },
+  "actual_duration_s": 0.35000000000000003,
+  "candidate": {
+    "artifact_id": "0e16077e9183ebcd64729eb982aa5a73e5eb03e111d5d7ed402552ca16db345b",
+    "media_type": "application/json"
+  },
+  "completed_control_updates": 35,
+  "control": {
+    "candidate": {
+      "artifact_id": "0e16077e9183ebcd64729eb982aa5a73e5eb03e111d5d7ed402552ca16db345b",
+      "media_type": "application/json"
+    },
+    "holding_tip_speed_weight": 0.05,
+    "preceding_execution": null,
+    "terminal_tip_speed_weight": 0.1
+  },
+  "costs_s": {
+    "construction": 0.46247679996304214,
+    "evaluation": 1.6869999999762513,
+    "profile": 3.172000000020489,
+    "simulation": 680.5939999999828,
+    "total": 685.9154767999426
+  },
+  "execution": {
+    "completion_stages": {
+      "evaluation": {
+        "accounting_scope": "current_store",
+        "candidate_id": "casadi-nmpc-research-20261010-cl-afc46a23b0c9",
+        "charged_usage": {
+          "backend_solves": 0,
+          "model_calls": 0,
+          "tool_calls": 1,
+          "wall_s": 1.6869999999762513,
+          "worker_calls": 0
+        },
+        "configuration": {
+          "artifact_id": "a14c071d10347cf775731b83791cd2a989cb641b4ead171fa6066a88d1f986ad",
+          "media_type": "application/json"
+        },
+        "evaluator": {
+          "extension_id": "evaluate.reach",
+          "parameters": {
+            "contract": "reference.reach_evaluation",
+            "data": {
+              "tolerance_m": 0.01
+            },
+            "version": "1.0.0"
+          },
+          "version": "1.0.0"
+        },
+        "operation": "evaluation.run",
+        "receipt": {
+          "analysis_status": "valid",
+          "cache_hit": false,
+          "caller": "casadi-feedback-research",
+          "charged": {
+            "backend_solves": 0,
+            "model_calls": 0,
+            "tool_calls": 1,
+            "wall_s": 1.6869999999762513,
+            "worker_calls": 0
+          },
+          "contract_version": "1.2.0",
+          "error": null,
+          "execution_id": "f77e771441074be0ad3ab025a2ac118e",
+          "execution_status": "completed",
+          "original_execution_id": null,
+          "output": {
+            "artifact_id": "2ef9f26a8f0cf8d61c5108fac8e8c750743f8e94d3b154abf1c135363a00f133",
+            "media_type": "application/json"
+          },
+          "request_id": "complete-evaluation",
+          "result_contract": "EvaluationResult",
+          "result_version": "1.2.0",
+          "solver_status": "not_run",
+          "task_success": false,
+          "tool_id": "evaluation.run",
+          "tool_version": "1.0.0"
+        },
+        "source_execution_id": "21b607607bf442a6b6d9494dda897ea8",
+        "source_owner": "casadi-nmpc-research-20261010-cl-afc46a23b0c9",
+        "status": "completed",
+        "version": "1.0.0"
+      },
+      "profile": {
+        "accounting_scope": "current_store",
+        "candidate_id": "casadi-nmpc-research-20261010-cl-afc46a23b0c9",
+        "charged_usage": {
+          "backend_solves": 0,
+          "model_calls": 0,
+          "tool_calls": 1,
+          "wall_s": 3.172000000020489,
+          "worker_calls": 0
+        },
+        "configuration": {
+          "artifact_id": "a14c071d10347cf775731b83791cd2a989cb641b4ead171fa6066a88d1f986ad",
+          "media_type": "application/json"
+        },
+        "evaluator": {
+          "extension_id": "evaluate.reach",
+          "parameters": {
+            "contract": "reference.reach_evaluation",
+            "data": {
+              "tolerance_m": 0.01
+            },
+            "version": "1.0.0"
+          },
+          "version": "1.0.0"
+        },
+        "operation": "control.profile_report",
+        "receipt": {
+          "analysis_status": "not_assessed",
+          "cache_hit": false,
+          "caller": "casadi-feedback-research",
+          "charged": {
+            "backend_solves": 0,
+            "model_calls": 0,
+            "tool_calls": 1,
+            "wall_s": 3.172000000020489,
+            "worker_calls": 0
+          },
+          "contract_version": "1.2.0",
+          "error": null,
+          "execution_id": "77f0e9e2d17146c5ab4d571c1c801187",
+          "execution_status": "completed",
+          "original_execution_id": null,
+          "output": {
+            "artifact_id": "01e6d1614badd047e2f25c5e71e0ecd9aff9dcfd11443a5baa885cd438e2e416",
+            "media_type": "application/json"
+          },
+          "request_id": "complete-profile",
+          "result_contract": "ProfileOutput",
+          "result_version": "1.0.0",
+          "solver_status": "not_run",
+          "task_success": null,
+          "tool_id": "control.profile_report",
+          "tool_version": "1.0.0"
+        },
+        "source_execution_id": "21b607607bf442a6b6d9494dda897ea8",
+        "source_owner": "casadi-nmpc-research-20261010-cl-afc46a23b0c9",
+        "status": "completed",
+        "version": "1.0.0"
+      },
+      "simulation": {
+        "accounting_scope": "current_store",
+        "candidate_id": "casadi-nmpc-research-20261010-cl-afc46a23b0c9",
+        "charged_usage": {
+          "backend_solves": 1,
+          "model_calls": 0,
+          "tool_calls": 1,
+          "wall_s": 680.5939999999828,
+          "worker_calls": 0
+        },
+        "configuration": {
+          "artifact_id": "a14c071d10347cf775731b83791cd2a989cb641b4ead171fa6066a88d1f986ad",
+          "media_type": "application/json"
+        },
+        "evaluator": {
+          "extension_id": "evaluate.reach",
+          "parameters": {
+            "contract": "reference.reach_evaluation",
+            "data": {
+              "tolerance_m": 0.01
+            },
+            "version": "1.0.0"
+          },
+          "version": "1.0.0"
+        },
+        "operation": "simulation.run",
+        "receipt": {
+          "analysis_status": "not_assessed",
+          "cache_hit": false,
+          "caller": "casadi-feedback-research",
+          "charged": {
+            "backend_solves": 1,
+            "model_calls": 0,
+            "tool_calls": 1,
+            "wall_s": 680.5939999999828,
+            "worker_calls": 0
+          },
+          "contract_version": "1.2.0",
+          "error": null,
+          "execution_id": "21b607607bf442a6b6d9494dda897ea8",
+          "execution_status": "completed",
+          "original_execution_id": "21b607607bf442a6b6d9494dda897ea8",
+          "output": {
+            "artifact_id": "84e834e46165cecbe3bcdaeb2377076d658b67f617b3391e639b5dfdf0c6b53c",
+            "media_type": "application/json"
+          },
+          "request_id": "complete-simulation",
+          "result_contract": "BackendResult",
+          "result_version": "1.0.0",
+          "solver_status": "completed",
+          "task_success": null,
+          "tool_id": "simulation.run",
+          "tool_version": "1.0.0"
+        },
+        "source_execution_id": "21b607607bf442a6b6d9494dda897ea8",
+        "source_owner": "casadi-nmpc-research-20261010-cl-afc46a23b0c9",
+        "status": "completed",
+        "version": "1.0.0"
+      }
+    },
+    "configuration": {
+      "artifact_id": "a14c071d10347cf775731b83791cd2a989cb641b4ead171fa6066a88d1f986ad",
+      "media_type": "application/json"
+    },
+    "design_statement": {
+      "candidate_id": "casadi-nmpc-research-20261010-cl-afc46a23b0c9",
+      "configuration": {
+        "artifact_id": "a14c071d10347cf775731b83791cd2a989cb641b4ead171fa6066a88d1f986ad",
+        "media_type": "application/json"
+      },
+      "effective_identity": "927ad2d85cca5012d094f046629c8c733ae044b87df76f6bced499dc544cc61a",
+      "execution_id": "21b607607bf442a6b6d9494dda897ea8",
+      "frozen_baseline_identity": "a65d6653ca6b7d063633788e01b1d0a89950e35a0472946dc23a67407b424b90",
+      "owner_run_id": "casadi-nmpc-research-20261010-cl-afc46a23b0c9",
+      "parameters": []
+    },
+    "evaluation_data": {
+      "candidate_id": "casadi-nmpc-research-20261010-cl-afc46a23b0c9",
+      "comparison_identity": "dd3102e3f03a34f3c09d9b6bd318d6b26947767161d2cdcaf6d72c5c8ac31dcf",
+      "constraints": [
+        {
+          "limit": 0.01,
+          "name": "task_bound",
+          "observed": 0.09552487867011847,
+          "satisfied": false,
+          "units": "m"
+        }
+      ],
+      "contract_version": "1.2.0",
+      "evaluator": "evaluate.reach",
+      "evaluator_version": "1.0.0",
+      "metrics": [
+        {
+          "name": "position_error",
+          "units": "m",
+          "value": 0.09552487867011847
+        }
+      ],
+      "original_execution_id": "21b607607bf442a6b6d9494dda897ea8",
+      "reason": null,
+      "source": {
+        "artifact_id": "84e834e46165cecbe3bcdaeb2377076d658b67f617b3391e639b5dfdf0c6b53c",
+        "media_type": "application/json"
+      },
+      "source_execution_id": "21b607607bf442a6b6d9494dda897ea8",
+      "task_success": false,
+      "validity": "valid"
+    },
+    "execution_id": "21b607607bf442a6b6d9494dda897ea8",
+    "factual_result": {
+      "accepted_noninitialization_plans": 5,
+      "accepted_plans": 35,
+      "applied_tension_ranges": [
+        {
+          "limit_n": 8.0,
+          "maximum_n": 8.0,
+          "minimum_n": -0.0,
+          "tendon": "near_t0",
+          "tendon_index": 0
+        },
+        {
+          "limit_n": 8.0,
+          "maximum_n": 8.0,
+          "minimum_n": -0.0,
+          "tendon": "near_t1",
+          "tendon_index": 1
+        },
+        {
+          "limit_n": 8.0,
+          "maximum_n": 8.0,
+          "minimum_n": -0.0,
+          "tendon": "near_t2",
+          "tendon_index": 2
+        },
+        {
+          "limit_n": 8.0,
+          "maximum_n": 8.0,
+          "minimum_n": -0.0,
+          "tendon": "far_t0",
+          "tendon_index": 3
+        },
+        {
+          "limit_n": 8.0,
+          "maximum_n": 8.0,
+          "minimum_n": 5.8771380252315146e-08,
+          "tendon": "far_t1",
+          "tendon_index": 4
+        },
+        {
+          "limit_n": 8.0,
+          "maximum_n": 8.0,
+          "minimum_n": -0.0,
+          "tendon": "far_t2",
+          "tendon_index": 5
+        }
+      ],
+      "candidate": {
+        "candidate_id": "casadi-nmpc-research-20261010-cl-afc46a23b0c9",
+        "configuration": {
+          "artifact_id": "a14c071d10347cf775731b83791cd2a989cb641b4ead171fa6066a88d1f986ad",
+          "media_type": "application/json"
+        },
+        "execution_id": "21b607607bf442a6b6d9494dda897ea8",
+        "owner_run_id": "casadi-nmpc-research-20261010-cl-afc46a23b0c9"
+      },
+      "complete": true,
+      "configuration": {
+        "artifact_id": "a14c071d10347cf775731b83791cd2a989cb641b4ead171fa6066a88d1f986ad",
+        "media_type": "application/json"
+      },
+      "control_period_s": 0.01,
+      "control_updates": 35,
+      "converged_updates": 4,
+      "coordinate_frame": "world",
+      "deadline_misses": 35,
+      "error_convention": "actual_tip minus target",
+      "evaluation": {
+        "artifact_id": "2ef9f26a8f0cf8d61c5108fac8e8c750743f8e94d3b154abf1c135363a00f133",
+        "media_type": "application/json"
+      },
+      "evaluation_validity": "valid",
+      "execution_id": "21b607607bf442a6b6d9494dda897ea8",
+      "force_bound_violation_n": 0.0,
+      "hold_last_responses": 0,
+      "initialization_selected": 30,
+      "mean_complete_update_s": 19.292457457139555,
+      "measured_computation_s": 680.5939999999828,
+      "one_step_prediction_evidence": {
+        "artifact_id": "b20344b61673b361ba83fe826ec1979050384c0f91b312e46c865fae92ceeb48",
+        "media_type": "application/json"
+      },
+      "one_step_prediction_summary": {
+        "aligned_count": 35,
+        "frame": "world",
+        "maximum_speed_magnitude_difference_m_s": 0.16641097490046475,
+        "maximum_tip_difference_m": 0.009445293321661462,
+        "maximum_velocity_vector_difference_m_s": 0.2222882668262803,
+        "mean_tip_difference_m": 0.0036826415129965896,
+        "missing": [],
+        "scope": "Only accepted first-step predictions matched to next execution timestamp; no future-plan replay comparison",
+        "velocity_matched_count": 35,
+        "velocity_missing": []
+      },
+      "real_time_demonstrated": false,
+      "report": {
+        "execution_id": "21b607607bf442a6b6d9494dda897ea8",
+        "owner_run_id": "casadi-nmpc-research-20261010-cl-afc46a23b0c9",
+        "reference": {
+          "artifact_id": "01e6d1614badd047e2f25c5e71e0ecd9aff9dcfd11443a5baa885cd438e2e416",
+          "media_type": "application/json"
+        },
+        "request_id": "complete-profile"
+      },
+      "result_type": "free_reach",
+      "sampled_settling": {
+        "available": true,
+        "continuous_time_guarantee": false,
+        "max_error_m": 0.1931520788542894,
+        "max_speed_m_s": 3.2498304807417395,
+        "passed": false,
+        "position_limit_m": 0.01,
+        "speed_limit_m_s": 0.02,
+        "window_s": 0.05
+      },
+      "signed_position_error_m": [
+        -0.003460824677896046,
+        -0.01517047753839202,
+        -0.09424904110253252
+      ],
+      "simulated_duration_s": 0.35000000000000003,
+      "simulation": {
+        "artifact_id": "84e834e46165cecbe3bcdaeb2377076d658b67f617b3391e639b5dfdf0c6b53c",
+        "media_type": "application/json"
+      },
+      "solver_error_count": 0,
+      "target_position_m": [
+        0.29,
+        0.035,
+        0.19
+      ],
+      "task_accepted": false,
+      "terminal_error_m": 0.09552487867011847,
+      "terminal_position_m": [
+        0.28653917532210393,
+        0.019829522461607983,
+        0.09575095889746749
+      ],
+      "terminal_tip_speed_m_s": 0.5855655065829197,
+      "valid_complete_execution": true
+    },
+    "profile_producer_run_id": "casadi-nmpc-research-20261010-cl-afc46a23b0c9",
+    "profile_report": {
+      "execution_id": "21b607607bf442a6b6d9494dda897ea8",
+      "owner_run_id": "casadi-nmpc-research-20261010-cl-afc46a23b0c9",
+      "reference": {
+        "artifact_id": "01e6d1614badd047e2f25c5e71e0ecd9aff9dcfd11443a5baa885cd438e2e416",
+        "media_type": "application/json"
+      },
+      "request_id": "complete-profile"
+    },
+    "receipts": {
+      "evaluation": {
+        "analysis_status": "valid",
+        "cache_hit": false,
+        "caller": "casadi-feedback-research",
+        "charged": {
+          "backend_solves": 0,
+          "model_calls": 0,
+          "tool_calls": 1,
+          "wall_s": 1.6869999999762513,
+          "worker_calls": 0
+        },
+        "contract_version": "1.2.0",
+        "error": null,
+        "execution_id": "f77e771441074be0ad3ab025a2ac118e",
+        "execution_status": "completed",
+        "original_execution_id": null,
+        "output": {
+          "artifact_id": "2ef9f26a8f0cf8d61c5108fac8e8c750743f8e94d3b154abf1c135363a00f133",
+          "media_type": "application/json"
+        },
+        "request_id": "complete-evaluation",
+        "result_contract": "EvaluationResult",
+        "result_version": "1.2.0",
+        "solver_status": "not_run",
+        "task_success": false,
+        "tool_id": "evaluation.run",
+        "tool_version": "1.0.0"
+      },
+      "profile": {
+        "analysis_status": "not_assessed",
+        "cache_hit": false,
+        "caller": "casadi-feedback-research",
+        "charged": {
+          "backend_solves": 0,
+          "model_calls": 0,
+          "tool_calls": 1,
+          "wall_s": 3.172000000020489,
+          "worker_calls": 0
+        },
+        "contract_version": "1.2.0",
+        "error": null,
+        "execution_id": "77f0e9e2d17146c5ab4d571c1c801187",
+        "execution_status": "completed",
+        "original_execution_id": null,
+        "output": {
+          "artifact_id": "01e6d1614badd047e2f25c5e71e0ecd9aff9dcfd11443a5baa885cd438e2e416",
+          "media_type": "application/json"
+        },
+        "request_id": "complete-profile",
+        "result_contract": "ProfileOutput",
+        "result_version": "1.0.0",
+        "solver_status": "not_run",
+        "task_success": null,
+        "tool_id": "control.profile_report",
+        "tool_version": "1.0.0"
+      },
+      "simulation": {
+        "analysis_status": "not_assessed",
+        "cache_hit": false,
+        "caller": "casadi-feedback-research",
+        "charged": {
+          "backend_solves": 1,
+          "model_calls": 0,
+          "tool_calls": 1,
+          "wall_s": 680.5939999999828,
+          "worker_calls": 0
+        },
+        "contract_version": "1.2.0",
+        "error": null,
+        "execution_id": "21b607607bf442a6b6d9494dda897ea8",
+        "execution_status": "completed",
+        "original_execution_id": "21b607607bf442a6b6d9494dda897ea8",
+        "output": {
+          "artifact_id": "84e834e46165cecbe3bcdaeb2377076d658b67f617b3391e639b5dfdf0c6b53c",
+          "media_type": "application/json"
+        },
+        "request_id": "complete-simulation",
+        "result_contract": "BackendResult",
+        "result_version": "1.0.0",
+        "solver_status": "completed",
+        "task_success": null,
+        "tool_id": "simulation.run",
+        "tool_version": "1.0.0"
+      }
+    },
+    "status": "evaluated",
+    "structured_feedback": {
+      "acceptance_definition": {
+        "comparison": {
+          "applicable": true,
+          "policy": {
+            "computation": "Reported separately; never substitutes for reach or holding acceptance.",
+            "objective": "Raw scalar objectives under different weights are not ranked.",
+            "physical_metrics": [
+              "terminal_error_m",
+              "holding_max_error_m",
+              "holding_max_speed_m_s"
+            ],
+            "rule": "Joint acceptance first; otherwise componentwise physical comparison.",
+            "tolerance": 1e-09,
+            "tradeoff": "Any physical improvement accompanied by physical worsening is a trade-off, not overall improvement.",
+            "version": "1.0.0"
+          },
+          "source": "tools/acceptance_definitions.py::RANKING (settling campaign v1)"
+        },
+        "contract": "platform.acceptance_definition",
+        "historical_contract": null,
+        "holding": {
+          "continuous_time_guarantee": false,
+          "coverage": {
+            "definition": "Both endpoints, timestamps aligned to task sample_period_s; missing samples are unavailable, never a pass.",
+            "expected_sample_count": 6,
+            "recorded_available": true,
+            "source": {
+              "pointer": "/detail/sampled_settling/available",
+              "reference": {
+                "artifact_id": "01e6d1614badd047e2f25c5e71e0ecd9aff9dcfd11443a5baa885cd438e2e416",
+                "media_type": "application/json"
+              }
+            }
+          },
+          "duration": {
+            "definition": "Final closed interval [task duration - window, task duration].",
+            "source": {
+              "pointer": "/effective/policy/controller/parameters/data/settling/window_s",
+              "reference": {
+                "artifact_id": "a14c071d10347cf775731b83791cd2a989cb641b4ead171fa6066a88d1f986ad",
+                "media_type": "application/json"
+              }
+            },
+            "unit": "s",
+            "value": 0.05
+          },
+          "interval_s": [
+            0.3,
+            0.35
+          ],
+          "position": {
+            "definition": "Maximum sampled world tip position error in the final interval.",
+            "source": {
+              "pointer": "/effective/policy/controller/parameters/data/settling/position_limit_m",
+              "reference": {
+                "artifact_id": "a14c071d10347cf775731b83791cd2a989cb641b4ead171fa6066a88d1f986ad",
+                "media_type": "application/json"
+              }
+            },
+            "unit": "m",
+            "value": 0.01
+          },
+          "speed": {
+            "definition": "Maximum sampled world tip translational speed norm in the final interval.",
+            "source": {
+              "pointer": "/effective/policy/controller/parameters/data/settling/speed_limit_m_s",
+              "reference": {
+                "artifact_id": "a14c071d10347cf775731b83791cd2a989cb641b4ead171fa6066a88d1f986ad",
+                "media_type": "application/json"
+              }
+            },
+            "unit": "m/s",
+            "value": 0.02
+          }
+        },
+        "missing": [],
+        "speed": {
+          "definition": "Euclidean norm of tip-site translational Jacobian times recorded backend qvel, reconstructed with sealed robot.xml and qpos; no finite differencing",
+          "frame": "world",
+          "implementation": "extensions/tendon_family/gvs_reporting.py::reconstruct_motion",
+          "source": {
+            "pointer": "/*/tip_speed_m_s",
+            "reference": {
+              "artifact_id": "371e55e726b1bddd2f2ac2acb9d1c5a7aaaa1354e295fe34056f510475708ab1",
+              "media_type": "application/json"
+            }
+          },
+          "unit": "m/s"
+        },
+        "terminal": {
+          "definition": "Euclidean world tip position error at the final execution sample; sealed evaluate.reach is the outcome authority.",
+          "source": {
+            "pointer": "/effective/task/evaluator/parameters/data/tolerance_m",
+            "reference": {
+              "artifact_id": "a14c071d10347cf775731b83791cd2a989cb641b4ead171fa6066a88d1f986ad",
+              "media_type": "application/json"
+            }
+          },
+          "unit": "m",
+          "value": 0.01
+        },
+        "timing": {
+          "control_period": {
+            "definition": "Simulated control spacing; synchronous wall overruns do not imply skipped applied updates or injected actuator delay.",
+            "source": {
+              "pointer": "/effective/task/timing/control_period_s",
+              "reference": {
+                "artifact_id": "a14c071d10347cf775731b83791cd2a989cb641b4ead171fa6066a88d1f986ad",
+                "media_type": "application/json"
+              }
+            },
+            "unit": "s",
+            "value": 0.01
+          },
+          "duration": {
+            "definition": "Simulated task horizon, separate from computation wall time.",
+            "source": {
+              "pointer": "/effective/task/timing/duration_s",
+              "reference": {
+                "artifact_id": "a14c071d10347cf775731b83791cd2a989cb641b4ead171fa6066a88d1f986ad",
+                "media_type": "application/json"
+              }
+            },
+            "unit": "s",
+            "value": 0.35
+          },
+          "interpretation": "Applied updates, initialization selections, simulated duration and measured wall time are separate facts.",
+          "sample_period": {
+            "definition": "Retained backend sampling interval.",
+            "source": {
+              "pointer": "/effective/task/timing/sample_period_s",
+              "reference": {
+                "artifact_id": "a14c071d10347cf775731b83791cd2a989cb641b4ead171fa6066a88d1f986ad",
+                "media_type": "application/json"
+              }
+            },
+            "unit": "s",
+            "value": 0.01
+          }
+        },
+        "version": "1.0.0"
+      },
+      "actual_applied_control_updates": 35,
+      "completion": {
+        "evaluation": "completed",
+        "profile": "completed",
+        "simulation": "completed"
+      },
+      "configuration": {
+        "artifact_id": "a14c071d10347cf775731b83791cd2a989cb641b4ead171fa6066a88d1f986ad",
+        "media_type": "application/json"
+      },
+      "deadline_misses": 35,
+      "evaluator": {
+        "extension_id": "evaluate.reach",
+        "parameters": {
+          "contract": "reference.reach_evaluation",
+          "data": {
+            "tolerance_m": 0.01
+          },
+          "version": "1.0.0"
+        },
+        "version": "1.0.0"
+      },
+      "evidence": {
+        "commands": {
+          "artifact_id": "9e08f5a3d71688d83b551c6e0491d081b54ebe91766366118a7f54d282daaa7a",
+          "media_type": "application/octet-stream"
+        },
+        "evaluation": {
+          "artifact_id": "2ef9f26a8f0cf8d61c5108fac8e8c750743f8e94d3b154abf1c135363a00f133",
+          "media_type": "application/json"
+        },
+        "manifest": {
+          "artifact_id": "ee9e473add5c6f95ae2a4112255e56ddb6cda12526d477ff0a95030002fa2e3c",
+          "media_type": "application/json"
+        },
+        "motion": {
+          "artifact_id": "371e55e726b1bddd2f2ac2acb9d1c5a7aaaa1354e295fe34056f510475708ab1",
+          "media_type": "application/json"
+        },
+        "profile": {
+          "artifact_id": "01e6d1614badd047e2f25c5e71e0ecd9aff9dcfd11443a5baa885cd438e2e416",
+          "media_type": "application/json"
+        },
+        "simulation": {
+          "artifact_id": "84e834e46165cecbe3bcdaeb2377076d658b67f617b3391e639b5dfdf0c6b53c",
+          "media_type": "application/json"
+        }
+      },
+      "holding": {
+        "continuous_time_guarantee": false,
+        "coverage_complete": true,
+        "frame": "world",
+        "interval_s": [
+          0.3,
+          0.35
+        ],
+        "max_position_error_m": 0.1931520788542894,
+        "max_speed_m_s": 3.2498304807417395,
+        "position_limit_m": 0.01,
+        "position_passed": false,
+        "sample_count": 6,
+        "sample_times_s": [
+          0.3,
+          0.31,
+          0.32,
+          0.33,
+          0.34,
+          0.35000000000000003
+        ],
+        "speed_definition": "Euclidean norm of tip-site translational Jacobian times recorded backend qvel, reconstructed with sealed robot.xml and qpos; no finite differencing",
+        "speed_limit_m_s": 0.02,
+        "speed_passed": false,
+        "speed_units": "m/s"
+      },
+      "initialization_selected": 30,
+      "joint_reach_holding_success": false,
+      "mean_complete_update_s": 19.292457457139555,
+      "missing_data": [],
+      "newly_optimized_selected": 5,
+      "reach_only_success": false,
+      "simulated_duration_s": 0.35000000000000003,
+      "simulation_wall_s": 680.5939999999828,
+      "source_execution_id": "21b607607bf442a6b6d9494dda897ea8",
+      "source_owner": "casadi-nmpc-research-20261010-cl-afc46a23b0c9",
+      "terminal": {
+        "error_m": 0.09552487867011847,
+        "limit_m": 0.01,
+        "passed": false
+      },
+      "timing_qualification": "Initialization-selected plans apply control. Synchronous wall overruns do not establish skipped updates or simulated actuator delay."
+    }
+  },
+  "execution_references": {
+    "executed_configuration": {
+      "artifact_id": "a14c071d10347cf775731b83791cd2a989cb641b4ead171fa6066a88d1f986ad",
+      "media_type": "application/json"
+    },
+    "execution_id": "21b607607bf442a6b6d9494dda897ea8",
+    "owner_run_id": "casadi-nmpc-research-20261010-cl-afc46a23b0c9",
+    "receipts": {
+      "evaluation": {
+        "analysis_status": "valid",
+        "cache_hit": false,
+        "caller": "casadi-feedback-research",
+        "charged": {
+          "backend_solves": 0,
+          "model_calls": 0,
+          "tool_calls": 1,
+          "wall_s": 1.6869999999762513,
+          "worker_calls": 0
+        },
+        "contract_version": "1.2.0",
+        "error": null,
+        "execution_id": "f77e771441074be0ad3ab025a2ac118e",
+        "execution_status": "completed",
+        "original_execution_id": null,
+        "output": {
+          "artifact_id": "2ef9f26a8f0cf8d61c5108fac8e8c750743f8e94d3b154abf1c135363a00f133",
+          "media_type": "application/json"
+        },
+        "request_id": "complete-evaluation",
+        "result_contract": "EvaluationResult",
+        "result_version": "1.2.0",
+        "solver_status": "not_run",
+        "task_success": false,
+        "tool_id": "evaluation.run",
+        "tool_version": "1.0.0"
+      },
+      "profile": {
+        "analysis_status": "not_assessed",
+        "cache_hit": false,
+        "caller": "casadi-feedback-research",
+        "charged": {
+          "backend_solves": 0,
+          "model_calls": 0,
+          "tool_calls": 1,
+          "wall_s": 3.172000000020489,
+          "worker_calls": 0
+        },
+        "contract_version": "1.2.0",
+        "error": null,
+        "execution_id": "77f0e9e2d17146c5ab4d571c1c801187",
+        "execution_status": "completed",
+        "original_execution_id": null,
+        "output": {
+          "artifact_id": "01e6d1614badd047e2f25c5e71e0ecd9aff9dcfd11443a5baa885cd438e2e416",
+          "media_type": "application/json"
+        },
+        "request_id": "complete-profile",
+        "result_contract": "ProfileOutput",
+        "result_version": "1.0.0",
+        "solver_status": "not_run",
+        "task_success": null,
+        "tool_id": "control.profile_report",
+        "tool_version": "1.0.0"
+      },
+      "simulation": {
+        "analysis_status": "not_assessed",
+        "cache_hit": false,
+        "caller": "casadi-feedback-research",
+        "charged": {
+          "backend_solves": 1,
+          "model_calls": 0,
+          "tool_calls": 1,
+          "wall_s": 680.5939999999828,
+          "worker_calls": 0
+        },
+        "contract_version": "1.2.0",
+        "error": null,
+        "execution_id": "21b607607bf442a6b6d9494dda897ea8",
+        "execution_status": "completed",
+        "original_execution_id": "21b607607bf442a6b6d9494dda897ea8",
+        "output": {
+          "artifact_id": "84e834e46165cecbe3bcdaeb2377076d658b67f617b3391e639b5dfdf0c6b53c",
+          "media_type": "application/json"
+        },
+        "request_id": "complete-simulation",
+        "result_contract": "BackendResult",
+        "result_version": "1.0.0",
+        "solver_status": "completed",
+        "task_success": null,
+        "tool_id": "simulation.run",
+        "tool_version": "1.0.0"
+      }
+    }
+  },
+  "failure_categories": [
+    "scientific_failure"
+  ],
+  "holding_motion": [
+    {
+      "contacts": 0,
+      "rate_projection_residual_rad_m_s": 0.5237078293217188,
+      "time_s": 0.3,
+      "tip_error_m": 0.1931520788542894,
+      "tip_position_m": [
+        0.24803361944444408,
+        0.019334389494223378,
+        0.0021140316141697955
+      ],
+      "tip_speed_m_s": 0.3402971552513413,
+      "tip_velocity_m_s": [
+        0.1950696281904432,
+        0.034218184085815395,
+        0.2767293080027249
+      ],
+      "velocity_error_m_s": 0.3402971552513413
+    },
+    {
+      "contacts": 0,
+      "rate_projection_residual_rad_m_s": 89.71488852172017,
+      "time_s": 0.31,
+      "tip_error_m": 0.18357520159663054,
+      "tip_position_m": [
+        0.25579023030088954,
+        0.01901973885682115,
+        0.010349846779433078
+      ],
+      "tip_speed_m_s": 1.6944583379966989,
+      "tip_velocity_m_s": [
+        1.114499079324789,
+        -0.04309118706653739,
+        1.2756269090090289
+      ],
+      "velocity_error_m_s": 1.6944583379966989
+    },
+    {
+      "contacts": 0,
+      "rate_projection_residual_rad_m_s": 74.37699413290049,
+      "time_s": 0.32,
+      "tip_error_m": 0.16408225322251016,
+      "tip_position_m": [
+        0.26817194727263083,
+        0.018568644500042565,
+        0.028208367048412675
+      ],
+      "tip_speed_m_s": 2.571651663387887,
+      "tip_velocity_m_s": [
+        1.2213969177158255,
+        -0.04761445472374928,
+        2.262590265801859
+      ],
+      "velocity_error_m_s": 2.571651663387887
+    },
+    {
+      "contacts": 0,
+      "rate_projection_residual_rad_m_s": 63.74364359887521,
+      "time_s": 0.33,
+      "tip_error_m": 0.13589891645811183,
+      "tip_position_m": [
+        0.2784685290911622,
+        0.018084352390662094,
+        0.05565193883377332
+      ],
+      "tip_speed_m_s": 3.2498304807417395,
+      "tip_velocity_m_s": [
+        0.7463743850727164,
+        -0.05217066931803577,
+        3.162530893466231
+      ],
+      "velocity_error_m_s": 3.2498304807417395
+    },
+    {
+      "contacts": 0,
+      "rate_projection_residual_rad_m_s": 74.69666263538522,
+      "time_s": 0.34,
+      "tip_error_m": 0.10760067561604521,
+      "tip_position_m": [
+        0.2823852527036372,
+        0.018680018696563366,
+        0.0839171115264229
+      ],
+      "tip_speed_m_s": 2.5412801401146736,
+      "tip_velocity_m_s": [
+        0.10022875546364302,
+        0.08048178754546778,
+        2.538027113525967
+      ],
+      "velocity_error_m_s": 2.5412801401146736
+    },
+    {
+      "contacts": 0,
+      "rate_projection_residual_rad_m_s": 41.745640192619476,
+      "time_s": 0.35000000000000003,
+      "tip_error_m": 0.09552487867011847,
+      "tip_position_m": [
+        0.28653917532210393,
+        0.019829522461607983,
+        0.09575095889746749
+      ],
+      "tip_speed_m_s": 0.5855655065829197,
+      "tip_velocity_m_s": [
+        0.4822341980825046,
+        0.12984857732877403,
+        0.3057392478324111
+      ],
+      "velocity_error_m_s": 0.5855655065829197
+    }
+  ],
+  "nmpc_internal_solves": 35,
+  "offline_nlp_slots_charged": 0,
+  "plan_reference": {
+    "artifact_id": "afc46a23b0c981b61150ce32699425e65e9ec6b715829870e13a67ac3b136ad6",
+    "media_type": "application/json"
+  },
+  "profile": {
+    "accepted_noninitialization_plans": 5,
+    "accepted_plans": 35,
+    "backend_timings_s": {
+      "backend_call": 675.5786717999727,
+      "engine_compile": 0.023894999991171062,
+      "prepare_compile": 0.12708559999009594,
+      "solve": 675.4969369000173
+    },
+    "candidate_id": "casadi-nmpc-research-20261010-cl-afc46a23b0c9",
+    "complete": true,
+    "configuration": {
+      "artifact_id": "a14c071d10347cf775731b83791cd2a989cb641b4ead171fa6066a88d1f986ad",
+      "media_type": "application/json"
+    },
+    "control_parameters": {
+      "contract": "family.gvs_reach_control",
+      "data": {
+        "numerical_source": "initial_state_pretension",
+        "recipe": {
+          "basis": {
+            "strategy": "structural_linear"
+          },
+          "constraint_jacobian_mode": "reverse",
+          "curvature_scale_rad_m": 10.0,
+          "evaluation_threads": 1,
+          "feasible_return": {
+            "budget_s": 15.0,
+            "minimum_s": 5.0,
+            "relative_improvement": 0.1
+          },
+          "holding_brake_lead_s": 0.0,
+          "holding_tip_speed_weight": 0.05,
+          "horizon": 10,
+          "max_cpu_s": 30.0,
+          "max_iterations": 120,
+          "max_unusable_updates": 3,
+          "position_error_scale_m": null,
+          "rate_scale_rad_m_s": 1000.0,
+          "recover_returned_tensions": false,
+          "regenerate_warm_states": true,
+          "seed_position_tolerance_fraction": 0.5,
+          "seed_speed_limit_m_s": 0.02,
+          "substeps": 1,
+          "tension_weight": 0.0001,
+          "terminal_tip_speed_weight": 0.1,
+          "terminal_velocity_weight": 0.0001,
+          "terminal_weight": 5.0,
+          "tip_speed_scale_m_s": 0.02,
+          "tolerance": 1e-06,
+          "tracking_weight": 1.0,
+          "variation_weight": 0.001,
+          "velocity_weight": 0.0001
+        },
+        "settling": {
+          "position_limit_m": 0.01,
+          "speed_limit_m_s": 0.02,
+          "window_s": 0.05
+        }
+      },
+      "version": "1.0.0"
+    },
+    "converged_updates": 4,
+    "deadline_misses": 35,
+    "diagnostic_hypotheses": [],
+    "diagnostic_limitations": [
+      "Sampled observations do not identify a dominant cause.",
+      "Force proximity alone does not imply a required physical design change.",
+      "Ideal tensions; omitted shear, stretch, torsion, tendon friction and actuator dynamics."
+    ],
+    "drive_utilization": [
+      {
+        "limit_n": 8.0,
+        "maximum_n": 8.0,
+        "minimum_n": -0.0,
+        "near_upper_fraction": 0.08571428571428572,
+        "near_zero_fraction": 0.05714285714285714,
+        "tendon": "near_t0",
+        "tendon_index": 0
+      },
+      {
+        "limit_n": 8.0,
+        "maximum_n": 8.0,
+        "minimum_n": -0.0,
+        "near_upper_fraction": 0.08571428571428572,
+        "near_zero_fraction": 0.05714285714285714,
+        "tendon": "near_t1",
+        "tendon_index": 1
+      },
+      {
+        "limit_n": 8.0,
+        "maximum_n": 8.0,
+        "minimum_n": -0.0,
+        "near_upper_fraction": 0.05714285714285714,
+        "near_zero_fraction": 0.08571428571428572,
+        "tendon": "near_t2",
+        "tendon_index": 2
+      },
+      {
+        "limit_n": 8.0,
+        "maximum_n": 8.0,
+        "minimum_n": -0.0,
+        "near_upper_fraction": 0.11428571428571428,
+        "near_zero_fraction": 0.02857142857142857,
+        "tendon": "far_t0",
+        "tendon_index": 3
+      },
+      {
+        "limit_n": 8.0,
+        "maximum_n": 8.0,
+        "minimum_n": 5.8771380252315146e-08,
+        "near_upper_fraction": 0.08571428571428572,
+        "near_zero_fraction": 0.02857142857142857,
+        "tendon": "far_t1",
+        "tendon_index": 4
+      },
+      {
+        "limit_n": 8.0,
+        "maximum_n": 8.0,
+        "minimum_n": -0.0,
+        "near_upper_fraction": 0.02857142857142857,
+        "near_zero_fraction": 0.08571428571428572,
+        "tendon": "far_t2",
+        "tendon_index": 5
+      }
+    ],
+    "early_stopped_plans": 31,
+    "error_phases": [
+      {
+        "final_error_m": 0.11085764711121589,
+        "interval_s": [
+          0.0,
+          0.11666666666666665
+        ],
+        "maximum_error_m": 0.11085764711121589
+      },
+      {
+        "final_error_m": 0.19569589526295258,
+        "interval_s": [
+          0.11666666666666665,
+          0.2333333333333333
+        ],
+        "maximum_error_m": 0.19569589526295258
+      },
+      {
+        "final_error_m": 0.09552487867011847,
+        "interval_s": [
+          0.2333333333333333,
+          0.35
+        ],
+        "maximum_error_m": 0.19976773930649047
+      }
+    ],
+    "evaluation": {
+      "artifact_id": "2ef9f26a8f0cf8d61c5108fac8e8c750743f8e94d3b154abf1c135363a00f133",
+      "media_type": "application/json"
+    },
+    "evaluation_validity": "valid",
+    "execution_failure_reason": null,
+    "execution_id": "21b607607bf442a6b6d9494dda897ea8",
+    "execution_scope": {
+      "backend": {
+        "extension_id": "backend.family_mujoco",
+        "parameters": {
+          "contract": "family.mujoco_parameters",
+          "data": {},
+          "version": "1.0.0"
+        },
+        "version": "1.1.0"
+      },
+      "controller": {
+        "extension_id": "controller.gvs_nmpc",
+        "parameters": {
+          "contract": "family.gvs_reach_control",
+          "data": {
+            "numerical_source": "initial_state_pretension",
+            "recipe": {
+              "basis": {
+                "strategy": "structural_linear"
+              },
+              "constraint_jacobian_mode": "reverse",
+              "curvature_scale_rad_m": 10.0,
+              "evaluation_threads": 1,
+              "feasible_return": {
+                "budget_s": 15.0,
+                "minimum_s": 5.0,
+                "relative_improvement": 0.1
+              },
+              "holding_brake_lead_s": 0.0,
+              "holding_tip_speed_weight": 0.05,
+              "horizon": 10,
+              "max_cpu_s": 30.0,
+              "max_iterations": 120,
+              "max_unusable_updates": 3,
+              "position_error_scale_m": null,
+              "rate_scale_rad_m_s": 1000.0,
+              "recover_returned_tensions": false,
+              "regenerate_warm_states": true,
+              "seed_position_tolerance_fraction": 0.5,
+              "seed_speed_limit_m_s": 0.02,
+              "substeps": 1,
+              "tension_weight": 0.0001,
+              "terminal_tip_speed_weight": 0.1,
+              "terminal_velocity_weight": 0.0001,
+              "terminal_weight": 5.0,
+              "tip_speed_scale_m_s": 0.02,
+              "tolerance": 1e-06,
+              "tracking_weight": 1.0,
+              "variation_weight": 0.001,
+              "velocity_weight": 0.0001
+            },
+            "settling": {
+              "position_limit_m": 0.01,
+              "speed_limit_m_s": 0.02,
+              "window_s": 0.05
+            }
+          },
+          "version": "1.0.0"
+        },
+        "version": "11.0.0"
+      },
+      "discretization": {
+        "contract": "family.discretization",
+        "data": {
+          "cells": {
+            "distal1": 12,
+            "near": 12
+          },
+          "coordinates": "two_principal_bending_angles_per_cell",
+          "model": "serial_bending_cells_v1",
+          "version": "serial_bending_discretization_v1"
+        },
+        "version": "1.0.0"
+      },
+      "execution_model": {
+        "extension_id": "model.serial_bending_cells",
+        "parameters": {
+          "contract": "family.dynamics_model",
+          "data": {},
+          "version": "1.0.0"
+        },
+        "version": "1.0.0"
+      },
+      "robot": {
+        "family": "tendon_robot_family",
+        "identity": "0b451044ae9fec9e63965f429e833e1ed29b8b8d7c630c08fae1f38449273afd"
+      },
+      "seed": 17,
+      "task": {
+        "environment": "5cee25b33f4ff19cb0abd93651ce9077a81665990f07d8f5a4967497e8e82a4d",
+        "family": "task.reach",
+        "goal": "7906a8d6f1938670b3b029be161c8f1869097280b1ee24a198da30b2fff4c264",
+        "identity": "2b26edb492214c426263441b6adb52d7aafe41a828436d6b48a1171374a1026c",
+        "initializer": "ba01ba2b4441884d50bf9b7c54c572abd79d5b7bec57aed27708b63a75406930",
+        "timing": {
+          "control_period_s": 0.01,
+          "duration_s": 0.35,
+          "sample_period_s": 0.01,
+          "termination": [
+            "duration",
+            "numerical_failure"
+          ],
+          "timestep_s": 0.0005
+        }
+      }
+    },
+    "force_bound_violation_n": 0.0,
+    "graph_construction_s": 2.74368500005221,
+    "hold_last_responses": 0,
+    "initialization_selected": 30,
+    "last_valid_error_m": 0.09552487867011847,
+    "last_valid_time_s": 0.35000000000000003,
+    "max_projection_residual_rad_m": 2.871926823613207,
+    "max_rate_projection_residual_rad_m_s": 89.71488852172017,
+    "max_sampled_contacts": 0,
+    "maximum_error_m": 0.19976773930649047,
+    "maximum_plan_violation": 4.0004782212582635e-06,
+    "mean_numerical_solve_s": 14.216540345717554,
+    "mean_preparation_s": 4.634366702852172,
+    "mean_recovery_integration_s": 0.0,
+    "mean_recovery_s": 0.0,
+    "mean_recovery_validation_s": 0.0,
+    "mean_update_s": 19.292457457139555,
+    "mean_validation_s": 0.14916803999970268,
+    "minimum_error_m": 0.05415701115293895,
+    "motion": {
+      "artifact_id": "371e55e726b1bddd2f2ac2acb9d1c5a7aaaa1354e295fe34056f510475708ab1",
+      "media_type": "application/json"
+    },
+    "motion_summary": {
+      "entered_tolerance_earlier_but_ended_outside": false,
+      "error_convention": "actual_tip minus target; world frame",
+      "late_change_definition": "last sampled error minus first sampled error in stated interval",
+      "late_error_change_m": -0.09762720018417093,
+      "late_interval_s": [
+        0.3,
+        0.35
+      ],
+      "late_sample_interval_s": [
+        0.3,
+        0.35000000000000003
+      ],
+      "minimum_sampled_error_m": 0.05415701115293895,
+      "minimum_sampled_error_time_s": 0.01,
+      "scope": "Sampled observations, not continuous-time guarantees or new acceptance criteria.",
+      "signed_terminal_position_error_m": [
+        -0.003460824677896046,
+        -0.01517047753839202,
+        -0.09424904110253252
+      ],
+      "terminal_error_m": 0.09552487867011847,
+      "terminal_tip_speed_m_s": 0.5855655065829197,
+      "tolerance_m": 0.01
+    },
+    "numerical_preparation": {
+      "actual_initial_state_source": "Candidate Task initializer then measured backend state at every update",
+      "coordinate_order": [
+        "near.kappa_y_node_0",
+        "near.kappa_y_node_1",
+        "near.kappa_y_node_2",
+        "near.kappa_z_node_0",
+        "near.kappa_z_node_1",
+        "near.kappa_z_node_2",
+        "distal1.kappa_y_node_0",
+        "distal1.kappa_y_node_1",
+        "distal1.kappa_y_node_2",
+        "distal1.kappa_z_node_0",
+        "distal1.kappa_z_node_1",
+        "distal1.kappa_z_node_2"
+      ],
+      "cost_accounting": "Included in simulation.run reserved/charged wall time; graph/solver construction and state regeneration are separate execution costs",
+      "current_scope": {
+        "backend": {
+          "extension_id": "backend.family_mujoco",
+          "parameters": {
+            "contract": "family.mujoco_parameters",
+            "data": {},
+            "version": "1.0.0"
+          },
+          "version": "1.1.0"
+        },
+        "controller": {
+          "extension_id": "controller.gvs_nmpc",
+          "parameters": {
+            "contract": "family.gvs_reach_control",
+            "data": {
+              "numerical_source": "initial_state_pretension",
+              "recipe": {
+                "basis": {
+                  "strategy": "structural_linear"
+                },
+                "constraint_jacobian_mode": "reverse",
+                "curvature_scale_rad_m": 10.0,
+                "evaluation_threads": 1,
+                "feasible_return": {
+                  "budget_s": 15.0,
+                  "minimum_s": 5.0,
+                  "relative_improvement": 0.1
+                },
+                "holding_brake_lead_s": 0.0,
+                "holding_tip_speed_weight": 0.05,
+                "horizon": 10,
+                "max_cpu_s": 30.0,
+                "max_iterations": 120,
+                "max_unusable_updates": 3,
+                "position_error_scale_m": null,
+                "rate_scale_rad_m_s": 1000.0,
+                "recover_returned_tensions": false,
+                "regenerate_warm_states": true,
+                "seed_position_tolerance_fraction": 0.5,
+                "seed_speed_limit_m_s": 0.02,
+                "substeps": 1,
+                "tension_weight": 0.0001,
+                "terminal_tip_speed_weight": 0.1,
+                "terminal_velocity_weight": 0.0001,
+                "terminal_weight": 5.0,
+                "tip_speed_scale_m_s": 0.02,
+                "tolerance": 1e-06,
+                "tracking_weight": 1.0,
+                "variation_weight": 0.001,
+                "velocity_weight": 0.0001
+              },
+              "settling": {
+                "position_limit_m": 0.01,
+                "speed_limit_m_s": 0.02,
+                "window_s": 0.05
+              }
+            },
+            "version": "1.0.0"
+          },
+          "version": "11.0.0"
+        },
+        "discretization": {
+          "contract": "family.discretization",
+          "data": {
+            "cells": {
+              "distal1": 12,
+              "near": 12
+            },
+            "coordinates": "two_principal_bending_angles_per_cell",
+            "model": "serial_bending_cells_v1",
+            "version": "serial_bending_discretization_v1"
+          },
+          "version": "1.0.0"
+        },
+        "execution_model": {
+          "extension_id": "model.serial_bending_cells",
+          "parameters": {
+            "contract": "family.dynamics_model",
+            "data": {},
+            "version": "1.0.0"
+          },
+          "version": "1.0.0"
+        },
+        "robot": {
+          "family": "tendon_robot_family",
+          "identity": "0b451044ae9fec9e63965f429e833e1ed29b8b8d7c630c08fae1f38449273afd"
+        },
+        "seed": 17,
+        "task": {
+          "environment": "5cee25b33f4ff19cb0abd93651ce9077a81665990f07d8f5a4967497e8e82a4d",
+          "family": "task.reach",
+          "goal": "7906a8d6f1938670b3b029be161c8f1869097280b1ee24a198da30b2fff4c264",
+          "identity": "2b26edb492214c426263441b6adb52d7aafe41a828436d6b48a1171374a1026c",
+          "initializer": "ba01ba2b4441884d50bf9b7c54c572abd79d5b7bec57aed27708b63a75406930",
+          "timing": {
+            "control_period_s": 0.01,
+            "duration_s": 0.35,
+            "sample_period_s": 0.01,
+            "termination": [
+              "duration",
+              "numerical_failure"
+            ],
+            "timestep_s": 0.0005
+          }
+        }
+      },
+      "execution_scope": {
+        "backend": {
+          "extension_id": "backend.family_mujoco",
+          "parameters": {
+            "contract": "family.mujoco_parameters",
+            "data": {},
+            "version": "1.0.0"
+          },
+          "version": "1.1.0"
+        },
+        "controller": {
+          "extension_id": "controller.gvs_nmpc",
+          "parameters": {
+            "contract": "family.gvs_reach_control",
+            "data": {
+              "numerical_source": "initial_state_pretension",
+              "recipe": {
+                "basis": {
+                  "strategy": "structural_linear"
+                },
+                "constraint_jacobian_mode": "reverse",
+                "curvature_scale_rad_m": 10.0,
+                "evaluation_threads": 1,
+                "feasible_return": {
+                  "budget_s": 15.0,
+                  "minimum_s": 5.0,
+                  "relative_improvement": 0.1
+                },
+                "holding_brake_lead_s": 0.0,
+                "holding_tip_speed_weight": 0.05,
+                "horizon": 10,
+                "max_cpu_s": 30.0,
+                "max_iterations": 120,
+                "max_unusable_updates": 3,
+                "position_error_scale_m": null,
+                "rate_scale_rad_m_s": 1000.0,
+                "recover_returned_tensions": false,
+                "regenerate_warm_states": true,
+                "seed_position_tolerance_fraction": 0.5,
+                "seed_speed_limit_m_s": 0.02,
+                "substeps": 1,
+                "tension_weight": 0.0001,
+                "terminal_tip_speed_weight": 0.1,
+                "terminal_velocity_weight": 0.0001,
+                "terminal_weight": 5.0,
+                "tip_speed_scale_m_s": 0.02,
+                "tolerance": 1e-06,
+                "tracking_weight": 1.0,
+                "variation_weight": 0.001,
+                "velocity_weight": 0.0001
+              },
+              "settling": {
+                "position_limit_m": 0.01,
+                "speed_limit_m_s": 0.02,
+                "window_s": 0.05
+              }
+            },
+            "version": "1.0.0"
+          },
+          "version": "11.0.0"
+        },
+        "discretization": {
+          "contract": "family.discretization",
+          "data": {
+            "cells": {
+              "distal1": 12,
+              "near": 12
+            },
+            "coordinates": "two_principal_bending_angles_per_cell",
+            "model": "serial_bending_cells_v1",
+            "version": "serial_bending_discretization_v1"
+          },
+          "version": "1.0.0"
+        },
+        "execution_model": {
+          "extension_id": "model.serial_bending_cells",
+          "parameters": {
+            "contract": "family.dynamics_model",
+            "data": {},
+            "version": "1.0.0"
+          },
+          "version": "1.0.0"
+        },
+        "robot": {
+          "family": "tendon_robot_family",
+          "identity": "0b451044ae9fec9e63965f429e833e1ed29b8b8d7c630c08fae1f38449273afd"
+        },
+        "seed": 17,
+        "task": {
+          "environment": "5cee25b33f4ff19cb0abd93651ce9077a81665990f07d8f5a4967497e8e82a4d",
+          "family": "task.reach",
+          "goal": "7906a8d6f1938670b3b029be161c8f1869097280b1ee24a198da30b2fff4c264",
+          "identity": "2b26edb492214c426263441b6adb52d7aafe41a828436d6b48a1171374a1026c",
+          "initializer": "ba01ba2b4441884d50bf9b7c54c572abd79d5b7bec57aed27708b63a75406930",
+          "timing": {
+            "control_period_s": 0.01,
+            "duration_s": 0.35,
+            "sample_period_s": 0.01,
+            "termination": [
+              "duration",
+              "numerical_failure"
+            ],
+            "timestep_s": 0.0005
+          }
+        }
+      },
+      "force_limits_n": [
+        8.0,
+        8.0,
+        8.0,
+        8.0,
+        8.0,
+        8.0
+      ],
+      "historical_states_reused": false,
+      "nominal_is_current_target_solution": false,
+      "physics_identity": "ff8127ff7de43b039544d8c5c2f4534bee17057b3a81fb6efe78eda9f12a19f5",
+      "previous_input_source": "candidate bounded pretension",
+      "resolved_basis_identity": "ca1a49e5a421b0480f5e5e9e235dba07e38a89dbd6f56dd8f42483087ef3238b",
+      "reused": false,
+      "source": {
+        "artifact_id": "e244ec17dd4df1193bd15957b544b341b18f5e0350f6c328955704dc21c356e3",
+        "media_type": "application/json"
+      },
+      "source_kind": "project_initial_state_and_bounded_pretension",
+      "status": "completed",
+      "tendon_order": [
+        "near_t0",
+        "near_t1",
+        "near_t2",
+        "far_t0",
+        "far_t1",
+        "far_t2"
+      ],
+      "units": {
+        "q": "rad/m",
+        "qdot": "rad/(m*s)",
+        "tension": "N"
+      },
+      "validity": "Tensions are numerical guesses; placeholder states must be regenerated using candidate dynamics before use",
+      "wall_s": 0.1270174999954179,
+      "warm_guess_is_execution_evidence": false
+    },
+    "official_task_success": false,
+    "one_step_prediction_evidence": {
+      "artifact_id": "b20344b61673b361ba83fe826ec1979050384c0f91b312e46c865fae92ceeb48",
+      "media_type": "application/json"
+    },
+    "one_step_prediction_summary": {
+      "aligned_count": 35,
+      "frame": "world",
+      "maximum_speed_magnitude_difference_m_s": 0.16641097490046475,
+      "maximum_tip_difference_m": 0.009445293321661462,
+      "maximum_velocity_vector_difference_m_s": 0.2222882668262803,
+      "mean_tip_difference_m": 0.0036826415129965896,
+      "missing": [],
+      "scope": "Only accepted first-step predictions matched to next execution timestamp; no future-plan replay comparison",
+      "velocity_matched_count": 35,
+      "velocity_missing": []
+    },
+    "optimization_status_counts": {
+      "converged": 4,
+      "feasible_early_stop": 31
+    },
+    "per_update_delivery_s": [
+      30.261079900024924,
+      19.593929300026502,
+      19.55828230001498,
+      19.28687179996632,
+      19.99877030000789,
+      19.223384200013243,
+      19.471840899961535,
+      19.63148199999705,
+      20.1949212999898,
+      21.120498700009193,
+      21.107735999976285,
+      21.213960400025826,
+      21.15902239998104,
+      21.49833029997535,
+      21.432262799993623,
+      21.017007099988405,
+      21.24850270000752,
+      21.162022800010163,
+      21.022801899991464,
+      21.672273999953177,
+      21.255096000037156,
+      21.178855600010138,
+      21.151473600009922,
+      21.154099699982908,
+      21.004303199995775,
+      21.77609380002832,
+      21.177205399959348,
+      20.20297629997367,
+      19.982453000033274,
+      19.751352599996608,
+      15.115580400044564,
+      12.869495899998583,
+      8.101887199969497,
+      6.190867899975274,
+      3.449289299955126
+    ],
+    "policy_stop_reason_counts": {
+      "budget_best_feasible": 30,
+      "relative_seed_improvement": 1
+    },
+    "raw_termination_counts": {
+      "Solve_Succeeded": 4,
+      "User_Requested_Stop": 31
+    },
+    "real_time_demonstrated": false,
+    "recovered_plans": 0,
+    "sampled_settling": {
+      "available": true,
+      "continuous_time_guarantee": false,
+      "max_error_m": 0.1931520788542894,
+      "max_speed_m_s": 3.2498304807417395,
+      "passed": false,
+      "position_limit_m": 0.01,
+      "speed_limit_m_s": 0.02,
+      "window_s": 0.05
+    },
+    "simulation": {
+      "artifact_id": "84e834e46165cecbe3bcdaeb2377076d658b67f617b3391e639b5dfdf0c6b53c",
+      "media_type": "application/json"
+    },
+    "simulation_wall_s": 680.5939999999828,
+    "solver_construction_s": 5.520847699837759,
+    "solver_error_count": 0,
+    "solver_failure_flags": 0,
+    "solver_status": "completed",
+    "task": {
+      "actuator_channels": [
+        "actuator_commands"
+      ],
+      "contract_version": "1.0.0",
+      "environment": {
+        "contract": "experiment.assembly",
+        "data": {
+          "environment": {
+            "coordinate_frame": "world_base_x_forward_yz_cross_section",
+            "environment_id": "reach_free",
+            "gravity_m_s2": [
+              0.0,
+              0.0,
+              -9.81
+            ],
+            "gravity_source": "main@245a785 reach_free environment; Human-owned benchmark gravity",
+            "lights": [
+              {
+                "direction": [
+                  0.0,
+                  0.0,
+                  -1.0
+                ],
+                "position_m": [
+                  0.0,
+                  0.0,
+                  2.0
+                ]
+              }
+            ],
+            "objects": [
+              {
+                "conaffinity": 1,
+                "contype": 0,
+                "half_size_m": [
+                  2.0,
+                  2.0,
+                  0.1
+                ],
+                "kind": "plane",
+                "name": "floor",
+                "position_m": [
+                  0.0,
+                  0.0,
+                  -0.02
+                ]
+              }
+            ],
+            "schema_version": "1",
+            "truth_status": "HUMAN_OWNED",
+            "units": "SI"
+          },
+          "external_forces": [],
+          "floor_id": "floor",
+          "mount": {
+            "position_m": [
+              0.0,
+              0.0,
+              0.15
+            ],
+            "quaternion_wxyz": [
+              1.0,
+              0.0,
+              0.0,
+              0.0
+            ]
+          }
+        },
+        "version": "1.0.0"
+      },
+      "evaluator": {
+        "extension_id": "evaluate.reach",
+        "parameters": {
+          "contract": "reference.reach_evaluation",
+          "data": {
+            "tolerance_m": 0.01
+          },
+          "version": "1.0.0"
+        },
+        "version": "1.0.0"
+      },
+      "failure_policy": "retain_invalid_and_constraint_failures",
+      "family": "task.reach",
+      "goal": {
+        "contract": "reference.reach_goal",
+        "data": {
+          "target_m": [
+            0.29,
+            0.035,
+            0.19
+          ]
+        },
+        "version": "1.0.0"
+      },
+      "initializer": {
+        "extension_id": "initialize.family",
+        "parameters": {
+          "contract": "family.initial",
+          "data": {
+            "qpos_rad": {
+              "distal1_cell_0_y": 0.0,
+              "distal1_cell_0_z": 0.0,
+              "distal1_cell_10_y": 0.0,
+              "distal1_cell_10_z": 0.0,
+              "distal1_cell_11_y": 0.0,
+              "distal1_cell_11_z": 0.0,
+              "distal1_cell_1_y": 0.0,
+              "distal1_cell_1_z": 0.0,
+              "distal1_cell_2_y": 0.0,
+              "distal1_cell_2_z": 0.0,
+              "distal1_cell_3_y": 0.0,
+              "distal1_cell_3_z": 0.0,
+              "distal1_cell_4_y": 0.0,
+              "distal1_cell_4_z": 0.0,
+              "distal1_cell_5_y": 0.0,
+              "distal1_cell_5_z": 0.0,
+              "distal1_cell_6_y": 0.0,
+              "distal1_cell_6_z": 0.0,
+              "distal1_cell_7_y": 0.0,
+              "distal1_cell_7_z": 0.0,
+              "distal1_cell_8_y": 0.0,
+              "distal1_cell_8_z": 0.0,
+              "distal1_cell_9_y": 0.0,
+              "distal1_cell_9_z": 0.0,
+              "near_cell_0_y": 0.0,
+              "near_cell_0_z": 0.0,
+              "near_cell_10_y": 0.0,
+              "near_cell_10_z": 0.0,
+              "near_cell_11_y": 0.0,
+              "near_cell_11_z": 0.0,
+              "near_cell_1_y": 0.0,
+              "near_cell_1_z": 0.0,
+              "near_cell_2_y": 0.0,
+              "near_cell_2_z": 0.0,
+              "near_cell_3_y": 0.0,
+              "near_cell_3_z": 0.0,
+              "near_cell_4_y": 0.0,
+              "near_cell_4_z": 0.0,
+              "near_cell_5_y": 0.0,
+              "near_cell_5_z": 0.0,
+              "near_cell_6_y": 0.0,
+              "near_cell_6_z": 0.0,
+              "near_cell_7_y": 0.0,
+              "near_cell_7_z": 0.0,
+              "near_cell_8_y": 0.0,
+              "near_cell_8_z": 0.0,
+              "near_cell_9_y": 0.0,
+              "near_cell_9_z": 0.0
+            },
+            "qvel_rad_s": {
+              "distal1_cell_0_y": 0.0,
+              "distal1_cell_0_z": 0.0,
+              "distal1_cell_10_y": 0.0,
+              "distal1_cell_10_z": 0.0,
+              "distal1_cell_11_y": 0.0,
+              "distal1_cell_11_z": 0.0,
+              "distal1_cell_1_y": 0.0,
+              "distal1_cell_1_z": 0.0,
+              "distal1_cell_2_y": 0.0,
+              "distal1_cell_2_z": 0.0,
+              "distal1_cell_3_y": 0.0,
+              "distal1_cell_3_z": 0.0,
+              "distal1_cell_4_y": 0.0,
+              "distal1_cell_4_z": 0.0,
+              "distal1_cell_5_y": 0.0,
+              "distal1_cell_5_z": 0.0,
+              "distal1_cell_6_y": 0.0,
+              "distal1_cell_6_z": 0.0,
+              "distal1_cell_7_y": 0.0,
+              "distal1_cell_7_z": 0.0,
+              "distal1_cell_8_y": 0.0,
+              "distal1_cell_8_z": 0.0,
+              "distal1_cell_9_y": 0.0,
+              "distal1_cell_9_z": 0.0,
+              "near_cell_0_y": 0.0,
+              "near_cell_0_z": 0.0,
+              "near_cell_10_y": 0.0,
+              "near_cell_10_z": 0.0,
+              "near_cell_11_y": 0.0,
+              "near_cell_11_z": 0.0,
+              "near_cell_1_y": 0.0,
+              "near_cell_1_z": 0.0,
+              "near_cell_2_y": 0.0,
+              "near_cell_2_z": 0.0,
+              "near_cell_3_y": 0.0,
+              "near_cell_3_z": 0.0,
+              "near_cell_4_y": 0.0,
+              "near_cell_4_z": 0.0,
+              "near_cell_5_y": 0.0,
+              "near_cell_5_z": 0.0,
+              "near_cell_6_y": 0.0,
+              "near_cell_6_z": 0.0,
+              "near_cell_7_y": 0.0,
+              "near_cell_7_z": 0.0,
+              "near_cell_8_y": 0.0,
+              "near_cell_8_z": 0.0,
+              "near_cell_9_y": 0.0,
+              "near_cell_9_z": 0.0
+            },
+            "unspecified": "zero"
+          },
+          "version": "1.0.0"
+        },
+        "version": "1.0.0"
+      },
+      "name": "Independent development validation of a serial multi-segment soft arm",
+      "objectives": [
+        {
+          "direction": "minimize",
+          "metric": "position_error",
+          "units": "m",
+          "weight": 1.0
+        }
+      ],
+      "observations": [
+        {
+          "dimension": 3,
+          "entity": "tip",
+          "frame": "world",
+          "missing": "unsupported",
+          "name": "tip_position",
+          "phase": "post_step",
+          "units": "m"
+        }
+      ],
+      "robot_families": [
+        "tendon_robot_family"
+      ],
+      "sampling": {
+        "aggregation": "per_instance",
+        "seeds": [
+          17
+        ],
+        "split": "development",
+        "window_s": [
+          0.0,
+          0.35
+        ]
+      },
+      "source": "Development task with fixed target, tolerance and scoring; historical tasks are unchanged",
+      "status": "development_valid",
+      "task_id": "family-multisegment-dev",
+      "task_version": "1.0.0",
+      "timing": {
+        "control_period_s": 0.01,
+        "duration_s": 0.35,
+        "sample_period_s": 0.01,
+        "termination": [
+          "duration",
+          "numerical_failure"
+        ],
+        "timestep_s": 0.0005
+      }
+    },
+    "tension_range_n": [
+      -0.0,
+      8.0
+    ],
+    "terminal_error_m": 0.09552487867011847,
+    "terminal_position_m": [
+      0.28653917532210393,
+      0.019829522461607983,
+      0.09575095889746749
+    ],
+    "terminal_tip_speed_m_s": 0.5855655065829197,
+    "unusable_plans": 0,
+    "updates": 35,
+    "valid_complete_execution": true
+  },
+  "resolved_configuration": {
+    "artifact_id": "a65d6653ca6b7d063633788e01b1d0a89950e35a0472946dc23a67407b424b90",
+    "media_type": "application/json"
+  },
+  "revision": {
+    "attribution": "No unique causal attribution; changed structure and control are jointly reported.",
+    "changed_factors": [
+      "structure/controller evaluation"
+    ],
+    "exact_weight_changes": {},
+    "preceding_execution": null
+  },
+  "sampling": {
+    "closed_loop_s": 0.01,
+    "continuous_time_guarantee": false,
+    "historical_bdf_s": 0.0005,
+    "holding_endpoint_included": true
+  },
+  "status": "evaluated",
+  "unknowns": [],
+  "wiring_reference": {
+    "artifact_id": "a5869638404e88c4740110813df4a5b3fa71c7816df86a3958858d6e43559cbc",
+    "media_type": "application/json"
+  }
+}

@@ -78,7 +78,7 @@ def plan(ctx,args):
         if args.action not in ('stop','diagnose'):current['last_expensive_decision_send']=send
         if args.action=='stop':current['research_status']='stopped';current['final_disposition']=plain(ref)
         ctx.store.update_state(db,ctx.run_id,current)
-    return Result(detail=dict(accepted=True,plan_reference=plain(ref),batch=batch,action=args.action,remaining_budget=budget(ctx.store)))
+    return Result(detail=dict(accepted=True,plan_reference=plain(ref),batch=batch if args.action=='solve' else None,action=args.action,remaining_budget=budget(ctx.store)))
 
 
 def dispatch(ctx,args,operation):

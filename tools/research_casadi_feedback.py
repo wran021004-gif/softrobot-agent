@@ -101,7 +101,7 @@ def compact_result(value):
         'trajectory_metrics','original_task_feasible','original_task_gaps','hard_max_normalized_violation',
         'relaxed_nlp_feasible','objective_components','physical_eligible','costs_s','process_elapsed_s',
         'acceptance','control','revision','resolved_configuration','wiring_reference','holding_motion',
-        'sampling','unknowns','failure_categories','execution_references','actual_duration_s','completed_control_updates',
+        'sampling','unknowns','failure_categories','partial_feedback','execution_references','actual_duration_s','completed_control_updates',
         'nmpc_internal_solves','offline_nlp_slots_charged')
     result={k:value[k] for k in keys if k in value}
     if value.get('replay'):result['replay']={k:v for k,v in value['replay'].items() if k not in ('integration_counts','sampled_evaluator')}

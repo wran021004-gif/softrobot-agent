@@ -93,7 +93,8 @@ class WiringTests(unittest.TestCase):
 
     def test_first_action_control_revision_and_stop_with_failed_replay(self):
         from tools.casadi_feedback_service import plan
-        state=deepcopy(self.state);state.update(cutoff_unix=time.time()+10000,plans=[],nlp_solves=0,pilot={'live_model_requests':1})
+        state=deepcopy(self.state);state.update(cutoff_unix=time.time()+10000,plans=[],nlp_solves=0,pilot={'live_model_requests':1},
+            research_status='ready',results=[r for r in self.state['results'] if r.get('imported')])
         def artifact(ref):return self.host.store.artifact(ref)
         store=SimpleNamespace(session=lambda *a:dict(state=state),remaining=lambda:dict(remaining=dict(model_calls=16,tool_calls=64,backend_solves=2)),
             transaction=lambda:nullcontext(None),update_state=lambda *a:None,artifact=artifact)
@@ -102,7 +103,8 @@ class WiringTests(unittest.TestCase):
         evidence=state['historical']['post_stop_correction']
         for action in ('stop','diagnose','closed_loop'):
             choice=dict(candidate=plain(self.ref)) if action=='closed_loop' else None
-            self.assertTrue(plan(ctx,ActivityPlan(action=action,supporting_evidence=[evidence],control=choice,**BASE)).detail['accepted'])
+            accepted=plan(ctx,ActivityPlan(action=action,supporting_evidence=[evidence],control=choice,**BASE)).detail
+            self.assertTrue(accepted['accepted']);self.assertIsNone(accepted['batch'])
             state.update(research_status='ready',plans=[],last_expensive_decision_send=None)
         previous=dict(artifact_id='b'*64,media_type='application/json')
         old=dict(candidate=plain(self.ref),control=plain(ControlChoice(candidate=self.ref)))
@@ -119,6 +121,32 @@ class WiringTests(unittest.TestCase):
 
 
 class AlignmentTests(unittest.TestCase):
+    def test_failed_stage_returns_partial_state_feedback_without_new_launch(self):
+        import gzip,json
+        from tools.spec_tools import ROOT
+        from tools.casadi_closed_loop import saved_partial_feedback
+        from extensions.tendon_family.gvs_profile import profile_input
+        folder=ROOT/'runs/stage315_complete_control_20260927'
+        summary=json.loads((folder/'public_summary.json').read_text())
+        backend=ROOT/summary['backend_folder'];files={p.name:p.read_bytes() for p in backend.iterdir() if p.is_file()}
+        rows=json.loads(gzip.decompress(files['trajectory.json.gz']))[:4]
+        observations=json.loads(files['controller_observations.json'])[:3]
+        observations[-1].pop('actual_tension_n',None)  # attempted stop update was never applied
+        result=json.loads((folder/'public_result.json').read_text());result['solver_status']='failed'
+        result['data']['data']['reason']='CONTROLLER_STOP_REQUESTED'
+        cfg=profile_input('partial-fixture');source=dict(files={k:k for k in files},configuration=cfg,manifest='sealed-fixture')
+        store=SimpleNamespace(artifact=lambda ref,raw=False:files[ref] if raw else result)
+        receipt=dict(simulation=dict(output='result',execution_id='fixture',execution_status='failed',error='failed stage'))
+        with patch('extensions.tendon_family.control_evidence.ControlEvidence') as reader:
+            reader.return_value.resolve.return_value=source
+            reader.return_value.read_file.side_effect=lambda s,n,d:rows if n=='trajectory.json.gz' else observations
+            feedback=saved_partial_feedback(store,receipt)
+        self.assertTrue(feedback['available']);self.assertFalse(feedback['profile']['complete'])
+        self.assertIsNone(feedback['profile']['sampled_settling']['passed'])
+        self.assertEqual(feedback['attempted_control_plans'],3);self.assertEqual(feedback['applied_control_updates'],2)
+        self.assertEqual(feedback['termination_reason'],'CONTROLLER_STOP_REQUESTED')
+        self.assertEqual(feedback['holding_motion'],[])
+
     def test_saved_state_jacobian_velocity_without_advancing_simulation(self):
         import json
         import mujoco

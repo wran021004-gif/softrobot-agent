@@ -1,0 +1,41 @@
+{
+  "action": "stop",
+  "candidates": [],
+  "control": null,
+  "diagnostic_candidate": null,
+  "disposition": "Conclude the bounded activity with an evidence-cited STOP. New scientific result consumed: the immutable closed-loop evaluation c98d59c56637081f80228d07f031b13376ff61997fdab85e56f6cd347718c413 (valid_failure; sampled holding 0.193 m / 3.25 m/s, terminal 0.0955 m; 35/35 deadline misses; mean update 19.29 s; 4 converged / 31 budget-limited internal solves). Imported results cited: the two failed open-loop BDF replays 442dd0920f1f7e2302aa9e3cf871b41bef545e6ed2fe90536565fa6b44a4f67a and c888e7506e010333486abe962252894a4bcd37509b41a41f909e1a74e8276db5, and the post-STOP correction 87850bd1813d76ec6f3a4ad5fd69207fe5821c6d5db21eddbe0cc8c6f0a9e578 that bars over-reading. Preserve both candidates, checkpoints, plans, original-node comparisons and the post-STOP correction; report scientific, numerical, engineering and missing evidence separately.",
+  "expected_observation": "No additional experiment is expected to change the disposition: a two-weight revision would return another failure without isolating a cause, because the dominant confounds are a ~1900-fold control-rate shortfall and a one-step model-plant disagreement (0.166 m/s) that already exceeds the 0.02 m/s holding limit, neither of which is a function of the two tip-speed weights. Replays and further NLPs would likewise not discriminate among the remaining hypotheses under the frozen gates.",
+  "fixed_conditions": "frozen target [0.29,0.035,0.19] m; mount [0,0,0.15] m with quaternion wxyz [1,0,0,0]; gravity [0,0,-9.81] m/s^2; named zero initial state; duration 0.35 s; 35 control intervals at 0.01 s; physics 0.0005 s; two flexible segments, six independent ideal tension channels 0..8 N; existing topology, materials, routing, guides and structural-linear basis; inclusive last-0.05 s holding window; terminal/holding position limit 0.01 m and holding speed limit 0.02 m/s; seed 17; closed-loop acceptance sampled at 0.01 s, distinct from dense 0.0005 s BDF. All held fixed and unmodified by this STOP.",
+  "hypothesis": "The bounded activity should stop. The immutable converged candidate (d=0.0) under target-based NMPC feedback with default tip-speed weights is already evaluated and is a valid_failure: sampled holding max position error 0.193 m and holding max speed 3.25 m/s (limits 0.01 m and 0.02 m/s) and terminal error 0.0955 m (limit 0.01 m). That failure is large and multiply confounded, with verifiable compute starvation (35/35 deadline misses, mean update 19.29 s vs the 0.01 s control period; 31/35 internal solves early-stopped on budget) and one-step model-plant disagreement up to 0.0094 m and 0.166 m/s. A single two-weight control-only revision addresses neither confound and so cannot act as a discriminating test; the two independent open-loop BDF replays already failed their disagreement gates. Therefore no remaining supported action can plausibly change the disposition, and no unique or dominant cause is established.",
+  "limitations": [
+    "Closed-loop acceptance is sampled at 0.01 s with no continuous-time or real-time guarantee; it is not the dense 0.0005 s BDF criterion.",
+    "Exploratory simulated feedback only; no real hardware and no real-time deployment; 35/35 control deadline misses mean the NMPC was not executed in real time.",
+    "Multiple candidate causes (compute starvation, model-plant mismatch, control tuning, candidate structure) remain confounded; no unique or dominant cause is established.",
+    "Only the single candidate d=0.0 with default weights was evaluated under feedback; the two tip-speed weights were never varied in closed loop, so weight sensitivity is untested.",
+    "No design search, no weight sweep, and no alternative-structure evaluation were part of this step.",
+    "The evaluation reused the already-available immutable artifact; this decision added no new numerical work.",
+    "Results do not establish global optimality, physical impossibility, LLM superiority, or any old open-loop validation."
+  ],
+  "requested_nlp_solves": 0,
+  "requested_replays": 0,
+  "revision_or_stop_rule": "STOP now with no further provider sends, backend launches, NLP solves or replays; seal all prior evidence as-is. Do not present the closed-loop failure as proving structural or physical impossibility, real-time infeasibility, or a unique/dominant error cause; do not present the failed open-loop replays as validating or invalidating the closed-loop evaluation; do not claim global optimality or that no design/weight could ever succeed.",
+  "supporting_evidence": [
+    {
+      "artifact_id": "c98d59c56637081f80228d07f031b13376ff61997fdab85e56f6cd347718c413",
+      "media_type": "application/json"
+    },
+    {
+      "artifact_id": "442dd0920f1f7e2302aa9e3cf871b41bef545e6ed2fe90536565fa6b44a4f67a",
+      "media_type": "application/json"
+    },
+    {
+      "artifact_id": "c888e7506e010333486abe962252894a4bcd37509b41a41f909e1a74e8276db5",
+      "media_type": "application/json"
+    },
+    {
+      "artifact_id": "87850bd1813d76ec6f3a4ad5fd69207fe5821c6d5db21eddbe0cc8c6f0a9e578",
+      "media_type": "application/json"
+    }
+  ],
+  "weakening_observation": "This STOP would be weakened by a supported action carrying a specific, falsifiable, non-confounded hypothesis that could plausibly flip the disposition — for example an isolated mechanism able to restore a feasible control rate or reduce model-plant mismatch enough to matter, or an isolated weight effect not already bounded by the observed 162-fold limit violation. No such mechanism has been demonstrated within the frozen specification."
+}

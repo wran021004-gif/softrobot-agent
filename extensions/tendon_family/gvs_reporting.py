@@ -57,7 +57,8 @@ def summarize(task, result, evaluation, rows, observations, motion, limits, sett
             **plain(acceptance),continuous_time_guarantee=False,
             max_error_m=max(r['tip_error_m'] for r in window) if available else None,
             max_speed_m_s=max(r['tip_speed_m_s'] for r in window) if available else None),
-        updates=len(observations),accepted_plans=sum(o.get('plan_accepted',o.get('optimization_constraint_violation') is not None and
+        updates=len(observations),applied_control_updates=sum(o.get('actual_tension_n') is not None for o in observations),
+        accepted_plans=sum(o.get('plan_accepted',o.get('optimization_constraint_violation') is not None and
             o['optimization_constraint_violation']<=1e-5 and not o.get('stop_requested',False) and
             not o.get('failure_response_used',False)) for o in observations),
         optimization_status_counts=dict(Counter(o.get('optimization_status') or 'unavailable' for o in observations)),

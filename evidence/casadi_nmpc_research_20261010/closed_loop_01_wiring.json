@@ -1,0 +1,1102 @@
+{
+  "backend_binding": {
+    "extension_id": "backend.family_mujoco",
+    "parameters": {
+      "contract": "family.mujoco_parameters",
+      "data": {},
+      "version": "1.0.0"
+    },
+    "version": "1.1.0"
+  },
+  "candidate": {
+    "artifact_id": "0e16077e9183ebcd64729eb982aa5a73e5eb03e111d5d7ed402552ca16db345b",
+    "media_type": "application/json"
+  },
+  "candidate_unit_source": "Saved Workspace.decode physical scaling (q 10 rad/m, qdot 1000 rad/(m*s), tension 8 N); checked against generated numerical contract",
+  "changes": {},
+  "controller_binding": {
+    "extension_id": "controller.gvs_nmpc",
+    "parameters": {
+      "contract": "family.gvs_reach_control",
+      "data": {
+        "numerical_source": "initial_state_pretension",
+        "recipe": {
+          "basis": {
+            "strategy": "structural_linear"
+          },
+          "constraint_jacobian_mode": "reverse",
+          "curvature_scale_rad_m": 10.0,
+          "evaluation_threads": 1,
+          "feasible_return": {
+            "budget_s": 15.0,
+            "minimum_s": 5.0,
+            "relative_improvement": 0.1
+          },
+          "holding_brake_lead_s": 0.0,
+          "holding_tip_speed_weight": 0.05,
+          "horizon": 10,
+          "max_cpu_s": 30.0,
+          "max_iterations": 120,
+          "max_unusable_updates": 3,
+          "position_error_scale_m": null,
+          "rate_scale_rad_m_s": 1000.0,
+          "recover_returned_tensions": false,
+          "regenerate_warm_states": true,
+          "seed_position_tolerance_fraction": 0.5,
+          "seed_speed_limit_m_s": 0.02,
+          "substeps": 1,
+          "tension_weight": 0.0001,
+          "terminal_tip_speed_weight": 0.1,
+          "terminal_velocity_weight": 0.0001,
+          "terminal_weight": 5.0,
+          "tip_speed_scale_m_s": 0.02,
+          "tolerance": 1e-06,
+          "tracking_weight": 1.0,
+          "variation_weight": 0.001,
+          "velocity_weight": 0.0001
+        },
+        "settling": {
+          "position_limit_m": 0.01,
+          "speed_limit_m_s": 0.02,
+          "window_s": 0.05
+        }
+      },
+      "version": "1.0.0"
+    },
+    "version": "11.0.0"
+  },
+  "dimensions": {
+    "actuator_command_order": [
+      "near_motor0",
+      "near_motor1",
+      "near_motor2",
+      "far_motor0",
+      "far_motor1",
+      "far_motor2"
+    ],
+    "backend_position_order": [
+      "near_cell_0_y",
+      "near_cell_0_z",
+      "near_cell_1_y",
+      "near_cell_1_z",
+      "near_cell_2_y",
+      "near_cell_2_z",
+      "near_cell_3_y",
+      "near_cell_3_z",
+      "near_cell_4_y",
+      "near_cell_4_z",
+      "near_cell_5_y",
+      "near_cell_5_z",
+      "near_cell_6_y",
+      "near_cell_6_z",
+      "near_cell_7_y",
+      "near_cell_7_z",
+      "near_cell_8_y",
+      "near_cell_8_z",
+      "near_cell_9_y",
+      "near_cell_9_z",
+      "near_cell_10_y",
+      "near_cell_10_z",
+      "near_cell_11_y",
+      "near_cell_11_z",
+      "distal1_cell_0_y",
+      "distal1_cell_0_z",
+      "distal1_cell_1_y",
+      "distal1_cell_1_z",
+      "distal1_cell_2_y",
+      "distal1_cell_2_z",
+      "distal1_cell_3_y",
+      "distal1_cell_3_z",
+      "distal1_cell_4_y",
+      "distal1_cell_4_z",
+      "distal1_cell_5_y",
+      "distal1_cell_5_z",
+      "distal1_cell_6_y",
+      "distal1_cell_6_z",
+      "distal1_cell_7_y",
+      "distal1_cell_7_z",
+      "distal1_cell_8_y",
+      "distal1_cell_8_z",
+      "distal1_cell_9_y",
+      "distal1_cell_9_z",
+      "distal1_cell_10_y",
+      "distal1_cell_10_z",
+      "distal1_cell_11_y",
+      "distal1_cell_11_z"
+    ],
+    "coordinate_order": [
+      "near.kappa_y_node_0",
+      "near.kappa_y_node_1",
+      "near.kappa_y_node_2",
+      "near.kappa_z_node_0",
+      "near.kappa_z_node_1",
+      "near.kappa_z_node_2",
+      "distal1.kappa_y_node_0",
+      "distal1.kappa_y_node_1",
+      "distal1.kappa_y_node_2",
+      "distal1.kappa_z_node_0",
+      "distal1.kappa_z_node_1",
+      "distal1.kappa_z_node_2"
+    ],
+    "dimensions": {
+      "actuator_command": 6,
+      "backend_position": 48,
+      "backend_velocity": 48,
+      "reduced_coordinate": 12,
+      "reduced_state": 24,
+      "tendon_input": 6
+    },
+    "force_limits_n": [
+      8.0,
+      8.0,
+      8.0,
+      8.0,
+      8.0,
+      8.0
+    ],
+    "generator": "serial_two_group_v1",
+    "numerical_initialization": {
+      "coordinate_order": [
+        "near.kappa_y_node_0",
+        "near.kappa_y_node_1",
+        "near.kappa_y_node_2",
+        "near.kappa_z_node_0",
+        "near.kappa_z_node_1",
+        "near.kappa_z_node_2",
+        "distal1.kappa_y_node_0",
+        "distal1.kappa_y_node_1",
+        "distal1.kappa_y_node_2",
+        "distal1.kappa_z_node_0",
+        "distal1.kappa_z_node_1",
+        "distal1.kappa_z_node_2"
+      ],
+      "force_limits_n": [
+        8.0,
+        8.0,
+        8.0,
+        8.0,
+        8.0,
+        8.0
+      ],
+      "measured_initial_state": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "nominal": {
+        "q0": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "source": "candidate_initial_projection_not_equilibrium",
+        "u0": [
+          0.2,
+          0.2,
+          0.2,
+          0.2,
+          0.2,
+          0.2
+        ]
+      },
+      "provenance": {
+        "actual_initial_state_source": "Candidate Task initializer then measured backend state at every update",
+        "current_scope": {
+          "backend": {
+            "extension_id": "backend.family_mujoco",
+            "parameters": {
+              "contract": "family.mujoco_parameters",
+              "data": {},
+              "version": "1.0.0"
+            },
+            "version": "1.1.0"
+          },
+          "controller": {
+            "extension_id": "controller.gvs_nmpc",
+            "parameters": {
+              "contract": "family.gvs_reach_control",
+              "data": {
+                "numerical_source": "initial_state_pretension",
+                "recipe": {
+                  "basis": {
+                    "strategy": "structural_linear"
+                  },
+                  "constraint_jacobian_mode": "reverse",
+                  "curvature_scale_rad_m": 10.0,
+                  "evaluation_threads": 1,
+                  "feasible_return": {
+                    "budget_s": 15.0,
+                    "minimum_s": 5.0,
+                    "relative_improvement": 0.1
+                  },
+                  "holding_brake_lead_s": 0.0,
+                  "holding_tip_speed_weight": 0.05,
+                  "horizon": 10,
+                  "max_cpu_s": 30.0,
+                  "max_iterations": 120,
+                  "max_unusable_updates": 3,
+                  "position_error_scale_m": null,
+                  "rate_scale_rad_m_s": 1000.0,
+                  "recover_returned_tensions": false,
+                  "regenerate_warm_states": true,
+                  "seed_position_tolerance_fraction": 0.5,
+                  "seed_speed_limit_m_s": 0.02,
+                  "substeps": 1,
+                  "tension_weight": 0.0001,
+                  "terminal_tip_speed_weight": 0.1,
+                  "terminal_velocity_weight": 0.0001,
+                  "terminal_weight": 5.0,
+                  "tip_speed_scale_m_s": 0.02,
+                  "tolerance": 1e-06,
+                  "tracking_weight": 1.0,
+                  "variation_weight": 0.001,
+                  "velocity_weight": 0.0001
+                },
+                "settling": {
+                  "position_limit_m": 0.01,
+                  "speed_limit_m_s": 0.02,
+                  "window_s": 0.05
+                }
+              },
+              "version": "1.0.0"
+            },
+            "version": "11.0.0"
+          },
+          "discretization": {
+            "contract": "family.discretization",
+            "data": {
+              "cells": {
+                "distal1": 12,
+                "near": 12
+              },
+              "coordinates": "two_principal_bending_angles_per_cell",
+              "model": "serial_bending_cells_v1",
+              "version": "serial_bending_discretization_v1"
+            },
+            "version": "1.0.0"
+          },
+          "execution_model": {
+            "extension_id": "model.serial_bending_cells",
+            "parameters": {
+              "contract": "family.dynamics_model",
+              "data": {},
+              "version": "1.0.0"
+            },
+            "version": "1.0.0"
+          },
+          "robot": {
+            "family": "tendon_robot_family",
+            "identity": "0b451044ae9fec9e63965f429e833e1ed29b8b8d7c630c08fae1f38449273afd"
+          },
+          "seed": 17,
+          "task": {
+            "environment": "5cee25b33f4ff19cb0abd93651ce9077a81665990f07d8f5a4967497e8e82a4d",
+            "family": "task.reach",
+            "goal": "7906a8d6f1938670b3b029be161c8f1869097280b1ee24a198da30b2fff4c264",
+            "identity": "2b26edb492214c426263441b6adb52d7aafe41a828436d6b48a1171374a1026c",
+            "initializer": "ba01ba2b4441884d50bf9b7c54c572abd79d5b7bec57aed27708b63a75406930",
+            "timing": {
+              "control_period_s": 0.01,
+              "duration_s": 0.35,
+              "sample_period_s": 0.01,
+              "termination": [
+                "duration",
+                "numerical_failure"
+              ],
+              "timestep_s": 0.0005
+            }
+          }
+        },
+        "historical_states_reused": false,
+        "nominal_is_current_target_solution": false,
+        "physics_identity": "ff8127ff7de43b039544d8c5c2f4534bee17057b3a81fb6efe78eda9f12a19f5",
+        "previous_input_source": "candidate bounded pretension",
+        "resolved_basis_identity": "ca1a49e5a421b0480f5e5e9e235dba07e38a89dbd6f56dd8f42483087ef3238b",
+        "reused": false,
+        "source_kind": "project_initial_state_and_bounded_pretension",
+        "validity": "Tensions are numerical guesses; placeholder states must be regenerated using candidate dynamics before use"
+      },
+      "tendon_order": [
+        "near_t0",
+        "near_t1",
+        "near_t2",
+        "far_t0",
+        "far_t1",
+        "far_t2"
+      ],
+      "units": {
+        "q": "rad/m",
+        "qdot": "rad/(m*s)",
+        "tension": "N"
+      },
+      "warm_guess": {
+        "states": [
+          [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ]
+        ],
+        "tensions": [
+          [
+            0.2,
+            0.2,
+            0.2,
+            0.2,
+            0.2,
+            0.2
+          ],
+          [
+            0.2,
+            0.2,
+            0.2,
+            0.2,
+            0.2,
+            0.2
+          ],
+          [
+            0.2,
+            0.2,
+            0.2,
+            0.2,
+            0.2,
+            0.2
+          ],
+          [
+            0.2,
+            0.2,
+            0.2,
+            0.2,
+            0.2,
+            0.2
+          ],
+          [
+            0.2,
+            0.2,
+            0.2,
+            0.2,
+            0.2,
+            0.2
+          ],
+          [
+            0.2,
+            0.2,
+            0.2,
+            0.2,
+            0.2,
+            0.2
+          ],
+          [
+            0.2,
+            0.2,
+            0.2,
+            0.2,
+            0.2,
+            0.2
+          ],
+          [
+            0.2,
+            0.2,
+            0.2,
+            0.2,
+            0.2,
+            0.2
+          ],
+          [
+            0.2,
+            0.2,
+            0.2,
+            0.2,
+            0.2,
+            0.2
+          ],
+          [
+            0.2,
+            0.2,
+            0.2,
+            0.2,
+            0.2,
+            0.2
+          ]
+        ]
+      }
+    },
+    "physical_initialization": {
+      "qpos_rad": {
+        "distal1_cell_0_y": 0.0,
+        "distal1_cell_0_z": 0.0,
+        "distal1_cell_10_y": 0.0,
+        "distal1_cell_10_z": 0.0,
+        "distal1_cell_11_y": 0.0,
+        "distal1_cell_11_z": 0.0,
+        "distal1_cell_1_y": 0.0,
+        "distal1_cell_1_z": 0.0,
+        "distal1_cell_2_y": 0.0,
+        "distal1_cell_2_z": 0.0,
+        "distal1_cell_3_y": 0.0,
+        "distal1_cell_3_z": 0.0,
+        "distal1_cell_4_y": 0.0,
+        "distal1_cell_4_z": 0.0,
+        "distal1_cell_5_y": 0.0,
+        "distal1_cell_5_z": 0.0,
+        "distal1_cell_6_y": 0.0,
+        "distal1_cell_6_z": 0.0,
+        "distal1_cell_7_y": 0.0,
+        "distal1_cell_7_z": 0.0,
+        "distal1_cell_8_y": 0.0,
+        "distal1_cell_8_z": 0.0,
+        "distal1_cell_9_y": 0.0,
+        "distal1_cell_9_z": 0.0,
+        "near_cell_0_y": 0.0,
+        "near_cell_0_z": 0.0,
+        "near_cell_10_y": 0.0,
+        "near_cell_10_z": 0.0,
+        "near_cell_11_y": 0.0,
+        "near_cell_11_z": 0.0,
+        "near_cell_1_y": 0.0,
+        "near_cell_1_z": 0.0,
+        "near_cell_2_y": 0.0,
+        "near_cell_2_z": 0.0,
+        "near_cell_3_y": 0.0,
+        "near_cell_3_z": 0.0,
+        "near_cell_4_y": 0.0,
+        "near_cell_4_z": 0.0,
+        "near_cell_5_y": 0.0,
+        "near_cell_5_z": 0.0,
+        "near_cell_6_y": 0.0,
+        "near_cell_6_z": 0.0,
+        "near_cell_7_y": 0.0,
+        "near_cell_7_z": 0.0,
+        "near_cell_8_y": 0.0,
+        "near_cell_8_z": 0.0,
+        "near_cell_9_y": 0.0,
+        "near_cell_9_z": 0.0
+      },
+      "qvel_rad_s": {
+        "distal1_cell_0_y": 0.0,
+        "distal1_cell_0_z": 0.0,
+        "distal1_cell_10_y": 0.0,
+        "distal1_cell_10_z": 0.0,
+        "distal1_cell_11_y": 0.0,
+        "distal1_cell_11_z": 0.0,
+        "distal1_cell_1_y": 0.0,
+        "distal1_cell_1_z": 0.0,
+        "distal1_cell_2_y": 0.0,
+        "distal1_cell_2_z": 0.0,
+        "distal1_cell_3_y": 0.0,
+        "distal1_cell_3_z": 0.0,
+        "distal1_cell_4_y": 0.0,
+        "distal1_cell_4_z": 0.0,
+        "distal1_cell_5_y": 0.0,
+        "distal1_cell_5_z": 0.0,
+        "distal1_cell_6_y": 0.0,
+        "distal1_cell_6_z": 0.0,
+        "distal1_cell_7_y": 0.0,
+        "distal1_cell_7_z": 0.0,
+        "distal1_cell_8_y": 0.0,
+        "distal1_cell_8_z": 0.0,
+        "distal1_cell_9_y": 0.0,
+        "distal1_cell_9_z": 0.0,
+        "near_cell_0_y": 0.0,
+        "near_cell_0_z": 0.0,
+        "near_cell_10_y": 0.0,
+        "near_cell_10_z": 0.0,
+        "near_cell_11_y": 0.0,
+        "near_cell_11_z": 0.0,
+        "near_cell_1_y": 0.0,
+        "near_cell_1_z": 0.0,
+        "near_cell_2_y": 0.0,
+        "near_cell_2_z": 0.0,
+        "near_cell_3_y": 0.0,
+        "near_cell_3_z": 0.0,
+        "near_cell_4_y": 0.0,
+        "near_cell_4_z": 0.0,
+        "near_cell_5_y": 0.0,
+        "near_cell_5_z": 0.0,
+        "near_cell_6_y": 0.0,
+        "near_cell_6_z": 0.0,
+        "near_cell_7_y": 0.0,
+        "near_cell_7_z": 0.0,
+        "near_cell_8_y": 0.0,
+        "near_cell_8_z": 0.0,
+        "near_cell_9_y": 0.0,
+        "near_cell_9_z": 0.0
+      },
+      "unspecified": "zero"
+    },
+    "tendon_input_order": [
+      "near_t0",
+      "near_t1",
+      "near_t2",
+      "far_t0",
+      "far_t1",
+      "far_t2"
+    ],
+    "transmission": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ]
+  },
+  "eligibility": {
+    "eligible": true,
+    "historical_open_loop_acceptance_unchanged": true,
+    "replay_gate_required": false,
+    "scope": "exploratory structure under feedback control"
+  },
+  "model_binding": {
+    "extension_id": "model.serial_bending_cells",
+    "parameters": {
+      "contract": "family.dynamics_model",
+      "data": {},
+      "version": "1.0.0"
+    },
+    "version": "1.0.0"
+  },
+  "numerical_initialization": "initial_state_pretension: 0.2 N guesses; not equilibrium or physical initial tensions",
+  "offline_schedule_used": false,
+  "physics_identity": "ff8127ff7de43b039544d8c5c2f4534bee17057b3a81fb6efe78eda9f12a19f5",
+  "plan_reference": {
+    "artifact_id": "afc46a23b0c981b61150ce32699425e65e9ec6b715829870e13a67ac3b136ad6",
+    "media_type": "application/json"
+  },
+  "prediction_design_identity": "2dfc7f678654ae12e65eb8850b9a06928ec1b05ed5de5b5f6c366bf8f8a54dcb",
+  "prediction_model_identity": "42f50c6ff37ab86f514368d7fb155536f2721252d333ad50fe2347a788b64e37",
+  "projection": {
+    "coordinate_order": [
+      "near.kappa_y_node_0",
+      "near.kappa_y_node_1",
+      "near.kappa_y_node_2",
+      "near.kappa_z_node_0",
+      "near.kappa_z_node_1",
+      "near.kappa_z_node_2",
+      "distal1.kappa_y_node_0",
+      "distal1.kappa_y_node_1",
+      "distal1.kappa_y_node_2",
+      "distal1.kappa_z_node_0",
+      "distal1.kappa_z_node_1",
+      "distal1.kappa_z_node_2"
+    ],
+    "id": "backend_discrete_to_gvs_integrated_v2",
+    "reconstruction": "segment mean curvature from principal joint angle / actual cell length; least squares on exactly integrated basis split at knots",
+    "resolved_basis": {
+      "axes": [
+        "y",
+        "z"
+      ],
+      "coordinate_order": [
+        "near.kappa_y_node_0",
+        "near.kappa_y_node_1",
+        "near.kappa_y_node_2",
+        "near.kappa_z_node_0",
+        "near.kappa_z_node_1",
+        "near.kappa_z_node_2",
+        "distal1.kappa_y_node_0",
+        "distal1.kappa_y_node_1",
+        "distal1.kappa_y_node_2",
+        "distal1.kappa_z_node_0",
+        "distal1.kappa_z_node_1",
+        "distal1.kappa_z_node_2"
+      ],
+      "dimension": 12,
+      "representation_id": "gvs_bending_basis_v1",
+      "segments": [
+        {
+          "knots": [
+            0.0,
+            0.5,
+            1.0
+          ],
+          "length_m": 0.16,
+          "locations": [
+            {
+              "kinds": [
+                "segment_boundary"
+              ],
+              "s": 0.0
+            },
+            {
+              "kinds": [
+                "tendon_guide"
+              ],
+              "s": 0.5
+            },
+            {
+              "kinds": [
+                "component_attachment",
+                "rigid_attachment",
+                "segment_boundary",
+                "tendon_anchor",
+                "tendon_guide"
+              ],
+              "s": 1.0
+            }
+          ],
+          "segment": "near",
+          "start": 0
+        },
+        {
+          "knots": [
+            0.0,
+            0.5,
+            1.0
+          ],
+          "length_m": 0.11,
+          "locations": [
+            {
+              "kinds": [
+                "segment_boundary"
+              ],
+              "s": 0.0
+            },
+            {
+              "kinds": [
+                "tendon_guide"
+              ],
+              "s": 0.5
+            },
+            {
+              "kinds": [
+                "component_attachment",
+                "rigid_attachment",
+                "segment_boundary",
+                "tendon_anchor"
+              ],
+              "s": 1.0
+            }
+          ],
+          "segment": "distal1",
+          "start": 6
+        }
+      ],
+      "specification": {
+        "strategy": "structural_linear"
+      }
+    },
+    "segments": [
+      {
+        "condition_number": 1.9556438169636068,
+        "sample_count": 12,
+        "segment": "near"
+      },
+      {
+        "condition_number": 1.9556438169636077,
+        "sample_count": 12,
+        "segment": "distal1"
+      }
+    ],
+    "version": "2.0.0"
+  },
+  "resolved_configuration": {
+    "artifact_id": "a65d6653ca6b7d063633788e01b1d0a89950e35a0472946dc23a67407b424b90",
+    "media_type": "application/json"
+  },
+  "resolved_values": {
+    "distal_tendons": 3,
+    "family": "serial_two_group_v1",
+    "holding_tip_speed_weight": 0.05,
+    "lengths_m": [
+      0.16,
+      0.11
+    ],
+    "material": "baseline",
+    "pretension_n": 0.2,
+    "proximal_tendons": 3,
+    "routing_scale": 1.0,
+    "section_scale": 1.0,
+    "segment_count": 2,
+    "terminal_tip_speed_weight": 0.1
+  },
+  "revision": {
+    "attribution": "No unique causal attribution; changed structure and control are jointly reported.",
+    "changed_factors": [
+      "structure/controller evaluation"
+    ],
+    "exact_weight_changes": {},
+    "preceding_execution": null
+  },
+  "robot_design_identity": "2dfc7f678654ae12e65eb8850b9a06928ec1b05ed5de5b5f6c366bf8f8a54dcb",
+  "source": {
+    "checkpoint": {
+      "artifact_id": "33023b5a8d53dbd6c22dcc71d119a942cd54cce4a03df403c6934ccacb37916b",
+      "media_type": "application/json"
+    },
+    "configuration": {
+      "artifact_id": "f08697231f728bda2cb8ef0d95b2a5138f0d4c7589d6b35f4162e0fe42680d5b",
+      "media_type": "application/json"
+    },
+    "selection": {
+      "iteration": 22,
+      "label": "hard_validity_then_original_task_gaps_then_effort"
+    },
+    "solve": {
+      "artifact_id": "d6618dc2f4e94822fa597b8868d154aa731a447537dcdcb2b6d04b6bc948eacf",
+      "media_type": "application/json"
+    },
+    "source_activity": "casadi-feedback-closeout-20261010"
+  },
+  "units": {
+    "length": "m",
+    "q": "rad/m",
+    "qdot": "rad/(m*s)",
+    "tension": "N",
+    "time": "s"
+  },
+  "workspace_identity": "5fdc0206d5100537262a842e9d97e2db9ff7356b2097c224935bda7b788f64f4"
+}

@@ -1,0 +1,198 @@
+{
+  "label": "Post-STOP engineering/scientific correction; original native decision preserved; no additional model request",
+  "original_final_disposition": {
+    "artifact_id": "029e1d88ab3b650b25b13ae47a92c0bdf56376d2be3ab82a7c8f966d66f1b625",
+    "media_type": "application/json"
+  },
+  "closed_loop_result": {
+    "artifact_id": "c98d59c56637081f80228d07f031b13376ff61997fdab85e56f6cd347718c413",
+    "media_type": "application/json"
+  },
+  "corrections": [
+    {
+      "original_claim": "Compute starvation / control-rate shortfall is a demonstrated cause or dominant confound of this simulated task failure",
+      "corrected_fact": "The experiment uses synchronous virtual-time control. All 35 updates executed; wall latency and all 35 missed 10 ms wall deadlines do not establish skipped updates, actuator delay or compute starvation in simulated time. Real-time deployment is outside acceptance."
+    },
+    {
+      "original_claim": "31 internal solves were budget-limited or starved",
+      "corrected_fact": "31 plans were intentional feasible early stops with raw User_Requested_Stop; 4 Solve_Succeeded. Existing feasibility-return policy remained unchanged. An intentional early stop is suboptimal, not convergence or solver error; its latency does not identify a failure cause."
+    },
+    {
+      "original_claim": "One-step disagreement 0.166 m/s is the velocity-vector difference",
+      "corrected_fact": "Maximum speed-magnitude difference is 0.16641097490046475 m/s; maximum velocity-vector difference is 0.2222882668262803 m/s. They are different measurements; both had 35 aligned samples, no missing matches."
+    },
+    {
+      "original_claim": "Neither latency/model disagreement is a function of the two weights; one revision would necessarily fail; no supported action could change disposition",
+      "corrected_fact": "No control-only revision or other new experiment was chosen. Weight sensitivity, different bounded design choices and their prediction/latency effects remain untested. STOP is a bounded model decision, not evidence that alternatives cannot improve or a unique causal diagnosis."
+    }
+  ],
+  "preserved_facts": {
+    "acceptance": {
+      "accepted": false,
+      "components": {
+        "evaluation_validity": {
+          "limit": null,
+          "passed": true,
+          "reason": null,
+          "unit": null,
+          "value": "valid"
+        },
+        "evaluator:task_bound": {
+          "limit": 0.01,
+          "passed": false,
+          "reason": null,
+          "unit": "m",
+          "value": 0.09552487867011847
+        },
+        "execution_complete": {
+          "limit": null,
+          "passed": true,
+          "reason": null,
+          "unit": null,
+          "value": true
+        },
+        "force_bounds": {
+          "limit": 1e-08,
+          "passed": true,
+          "reason": null,
+          "unit": "N",
+          "value": 0.0
+        },
+        "holding_coverage": {
+          "limit": 6,
+          "passed": true,
+          "reason": null,
+          "unit": "inclusive uniform samples",
+          "value": true
+        },
+        "holding_position": {
+          "limit": 0.01,
+          "passed": false,
+          "reason": null,
+          "unit": "m",
+          "value": 0.1931520788542894
+        },
+        "holding_speed": {
+          "limit": 0.02,
+          "passed": false,
+          "reason": null,
+          "unit": "m/s",
+          "value": 3.2498304807417395
+        },
+        "solver_errors": {
+          "limit": 0,
+          "passed": true,
+          "reason": null,
+          "unit": "count",
+          "value": 0
+        },
+        "task_evaluator": {
+          "limit": null,
+          "passed": false,
+          "reason": null,
+          "unit": null,
+          "value": false
+        }
+      },
+      "continuous_time_guarantee": false,
+      "contract": "research.task_acceptance",
+      "evaluator_tension_channels": null,
+      "evidence_binding": {
+        "evaluation": {
+          "artifact_id": "2ef9f26a8f0cf8d61c5108fac8e8c750743f8e94d3b154abf1c135363a00f133",
+          "media_type": "application/json"
+        },
+        "evaluation_binding": {
+          "original_execution_id": "21b607607bf442a6b6d9494dda897ea8",
+          "source": {
+            "artifact_id": "84e834e46165cecbe3bcdaeb2377076d658b67f617b3391e639b5dfdf0c6b53c",
+            "media_type": "application/json"
+          },
+          "source_execution_id": "21b607607bf442a6b6d9494dda897ea8"
+        },
+        "profile": {
+          "artifact_id": "01e6d1614badd047e2f25c5e71e0ecd9aff9dcfd11443a5baa885cd438e2e416",
+          "media_type": "application/json"
+        },
+        "profile_binding": {
+          "evaluation": {
+            "artifact_id": "2ef9f26a8f0cf8d61c5108fac8e8c750743f8e94d3b154abf1c135363a00f133",
+            "media_type": "application/json"
+          },
+          "execution_id": "21b607607bf442a6b6d9494dda897ea8",
+          "simulation": {
+            "artifact_id": "84e834e46165cecbe3bcdaeb2377076d658b67f617b3391e639b5dfdf0c6b53c",
+            "media_type": "application/json"
+          }
+        },
+        "simulation": {
+          "artifact_id": "84e834e46165cecbe3bcdaeb2377076d658b67f617b3391e639b5dfdf0c6b53c",
+          "media_type": "application/json"
+        }
+      },
+      "execution_id": "21b607607bf442a6b6d9494dda897ea8",
+      "issues": [],
+      "metrics": {
+        "holding_max_error_m": 0.1931520788542894,
+        "holding_max_speed_m_s": 3.2498304807417395,
+        "terminal_error_m": 0.09552487867011847
+      },
+      "missing": [],
+      "protocol_id": "offline_reach_hold_v1",
+      "sources": {
+        "evaluation": {
+          "artifact_id": "2ef9f26a8f0cf8d61c5108fac8e8c750743f8e94d3b154abf1c135363a00f133",
+          "media_type": "application/json"
+        },
+        "profile": {
+          "artifact_id": "01e6d1614badd047e2f25c5e71e0ecd9aff9dcfd11443a5baa885cd438e2e416",
+          "media_type": "application/json"
+        }
+      },
+      "status": "valid_failure",
+      "task_family": "task.reach",
+      "task_identity": "2b26edb492214c426263441b6adb52d7aafe41a828436d6b48a1171374a1026c",
+      "timing": {
+        "control_period_s": 0.01,
+        "deadline_misses": 35,
+        "duration_s": 0.35,
+        "mean_update_s": 19.292457457139555,
+        "real_time_demonstrated": false,
+        "real_time_required": false,
+        "sample_period_s": 0.01,
+        "simulation_wall_s": 680.5939999999828,
+        "termination": [
+          "duration",
+          "numerical_failure"
+        ],
+        "timestep_s": 0.0005
+      },
+      "version": "1.0.0"
+    },
+    "updates": 35,
+    "accepted_plans": 35,
+    "converged_updates": 4,
+    "early_stopped_plans": 31,
+    "initialization_selected": 30,
+    "unusable_plans": 0,
+    "mean_update_s": 19.292457457139555,
+    "deadline_misses": 35,
+    "prediction_feedback": {
+      "aligned_count": 35,
+      "frame": "world",
+      "maximum_speed_magnitude_difference_m_s": 0.16641097490046475,
+      "maximum_tip_difference_m": 0.009445293321661462,
+      "maximum_velocity_vector_difference_m_s": 0.2222882668262803,
+      "mean_tip_difference_m": 0.0036826415129965896,
+      "missing": [],
+      "scope": "Only accepted first-step predictions matched to next execution timestamp; no future-plan replay comparison",
+      "velocity_matched_count": 35,
+      "velocity_missing": []
+    }
+  },
+  "submitted_to_model": false,
+  "new_simulations": 0,
+  "new_nlp": 0,
+  "new_bdf": 0,
+  "new_provider_sends": 0
+}

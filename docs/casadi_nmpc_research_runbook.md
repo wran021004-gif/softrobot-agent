@@ -101,7 +101,9 @@ Unknown reservations block new dispatch. Inspect existing receipts and partial
 artifacts before recovery. `recover` continues an existing pending closed-loop
 receipt chain without replacing its simulation; unresolved reservations stay
 pending. Failed or incomplete results return partial evidence and missing facts,
-and never launch automatic replacements. Engineering errors pause further sends.
+including saved-state duration, attempted/applied updates and termination when
+sealed exports are available. Partial inspection does not invent a completed profile
+or launch automatic replacements. Engineering errors pause further sends.
 For a scoped committed repair, `migrate --reason ...` preserves the grant, frozen
 task, counters and clock. Compatibility is checked before every actual send.
 The last four sends expose STOP-only plans and restrict native context retrieval

@@ -1,0 +1,43 @@
+{
+  "action": "closed_loop",
+  "candidates": [],
+  "control": {
+    "candidate": {
+      "artifact_id": "0e16077e9183ebcd64729eb982aa5a73e5eb03e111d5d7ed402552ca16db345b",
+      "media_type": "application/json"
+    },
+    "holding_tip_speed_weight": 0.05,
+    "preceding_execution": null,
+    "terminal_tip_speed_weight": 0.1
+  },
+  "diagnostic_candidate": null,
+  "disposition": "Execute one MuJoCo target-based NMPC closed-loop evaluation of the unchanged converged candidate (reference below), using default holding tip-speed weight 0.05 and terminal tip-speed weight 0.10, and consume the returned sampled metrics before any further plan.",
+  "expected_observation": "Closed-loop run returns sampled 0.01 s metrics with terminal and holding position errors <=0.01 m and holding max speed <=0.02 m/s on the unchanged candidate, NMPC internal solves returning within their launch, and tension commands confined to [0,8] N. If the structure is feedback-inadequate, expect holding max speed or terminal/holding position error to exceed limits, or repeated internal-solve failure, localized near the holding window.",
+  "fixed_conditions": "Frozen target [0.29,0.035,0.19] m; mount [0,0,0.15] m with quaternion wxyz [1,0,0,0]; gravity [0,0,-9.81] m/s^2; named zero initial state; duration 0.35 s; 35 control intervals at 0.01 s; physics timestep 0.0005 s; two flexible segments, six independent ideal tension channels 0..8 N; existing topology, materials, routing, guides, payload and structural-linear basis; inclusive final 0.05 s holding window; seed 17; sampled 0.01 s acceptance for closed loop (not dense 0.0005 s BDF). Candidate, and all NMPC recipe fields other than the two tip-speed weights, held fixed.",
+  "hypothesis": "Evaluating the immutable converged candidate structure (lengths 0.16/0.11 m, d=0.0, unchanged) under target-based NMPC feedback with default holding/terminal tip-speed weights (0.05/0.10) will satisfy the frozen sampled acceptance limits on the 0.01 s grid — terminal position error <=0.01 m, holding-window position error <=0.01 m, holding-window speed <=0.02 m/s — because per-sample re-solving compensates the model/integration drift that made the fixed open-loop schedule miss the dense BDF gates, and this is a genuinely separate axis: feedback re-planning, not open-loop validation.",
+  "limitations": [
+    "Closed-loop acceptance is sampled at 0.01 s and gives no continuous-time or real-time guarantee; it is not the dense 0.0005 s BDF criterion.",
+    "Exploratory simulated feedback only; no real hardware and no real-time deployment.",
+    "NMPC internal model may differ from the MuJoCo plant, so closed-loop success or failure would not validate the fixed open-loop schedule.",
+    "One candidate (d=0.0) and default weights; no design search or weight sweep in this step, so no claim about other structures or weights.",
+    "Not evidence of global optimality, physical impossibility, or a unique error cause."
+  ],
+  "requested_nlp_solves": 0,
+  "requested_replays": 0,
+  "revision_or_stop_rule": "If the closed loop meets the sampled limits, treat the structure as feedback-eligible and either run exactly one control_revision citing this result (candidate unchanged, varying only holding/terminal tip-speed weights within [0.025,0.10]) to probe weight sensitivity, or STOP citing this evidence. If it misses limits, do not infer structural infeasibility or a unique cause; either take one control_revision on the same candidate's two weights, or STOP citing this closed-loop evidence together with the two failed open-loop replays under attributed, non-unique causes.",
+  "supporting_evidence": [
+    {
+      "artifact_id": "8ee667c6070c0e924350fe2879560ce5eb7c49ad9efb56b3c05510e88d7420a3",
+      "media_type": "application/json"
+    },
+    {
+      "artifact_id": "d6618dc2f4e94822fa597b8868d154aa731a447537dcdcb2b6d04b6bc948eacf",
+      "media_type": "application/json"
+    },
+    {
+      "artifact_id": "87850bd1813d76ec6f3a4ad5fd69207fe5821c6d5db21eddbe0cc8c6f0a9e578",
+      "media_type": "application/json"
+    }
+  ],
+  "weakening_observation": "Sampled holding max speed >0.02 m/s, or terminal/holding position error >0.01 m, or repeated NMPC internal-solve failure/infeasibility, or commanded tensions leaving [0,8] N — any of these weakens the claim that this fixed candidate plus default weights closes the loop on the frozen task under feedback."
+}

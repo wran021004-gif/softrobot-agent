@@ -181,7 +181,13 @@ def finish_closed_loop(host, child=None, started=None):
         motion=host.store.artifact(profile['motion'])
         acceptance=assemble_acceptance(cfg,result['evaluation_data'],profile,
             evaluation_reference=receipts['evaluation']['output'],profile_reference=receipts['profile']['output'],motion=motion)
+    partial=None;partial_s=0.
+    if profile is None:
+        inspection=time.perf_counter()
+        partial=saved_partial_feedback(host.store,receipts)
+        partial_s=time.perf_counter()-inspection
     costs={k:r['charged']['wall_s'] for k,r in receipts.items()}
+    if partial_s:costs['saved_state_feedback']=partial_s
     costs.update(construction=pending['construction_s'],total=pending['construction_s']+sum(costs.values()))
     failures=[]
     if result['status']=='execution_unresolved':failures.append('missing_evidence_unknown_execution')
@@ -200,9 +206,10 @@ def finish_closed_loop(host, child=None, started=None):
         costs_s=costs,unknowns=[] if profile else ['Acceptance and complete control/model feedback unavailable; inspect retained receipts/artifacts'],
         failure_categories=failures,
         execution_references=dict(owner_run_id=owner,receipts=receipts,execution_id=result.get('execution_id'),executed_configuration=result.get('configuration')),
-        actual_duration_s=None if profile is None else profile['last_valid_time_s'],
-        completed_control_updates=None if profile is None else profile['updates'],
-        nmpc_internal_solves=None if profile is None else profile['updates'],offline_nlp_slots_charged=0)
+        partial_feedback=partial,
+        actual_duration_s=(partial or {}).get('actual_duration_s') if profile is None else profile['last_valid_time_s'],
+        completed_control_updates=(partial or {}).get('applied_control_updates') if profile is None else profile.get('applied_control_updates',profile['updates']),
+        nmpc_internal_solves=(partial or {}).get('attempted_control_plans') if profile is None else profile['updates'],offline_nlp_slots_charged=0)
     with host.store.transaction() as db:
         ref=host.store.put(db,detail);state=host.store.session(ACTIVITY,db)['state']
         # Charge stages once even if reporting is recovered from existing receipts.
@@ -216,3 +223,31 @@ def finish_closed_loop(host, child=None, started=None):
         host.store.update_state(db,ACTIVITY,state)
         host.store.event(db,ACTIVITY,'closed_loop_feedback',result['status'],outputs=[ref])
     return dict(detail=detail,evidence_reference=plain(ref))
+
+
+def saved_partial_feedback(store, receipts):
+    """Inspect sealed exports after a failed stage; never replace the execution."""
+    from extensions.tendon_family.control_evidence import ControlEvidence
+    from extensions.tendon_family.gvs_reporting import reconstruct_motion,summarize
+    from extensions.tendon_family.gvs_profile import settling_for
+    sim=receipts.get('simulation',{})
+    if not sim.get('output') or sim.get('execution_status')=='unknown':
+        return dict(available=False,missing=['No confirmed simulation output'],termination_reason=sim.get('error'))
+    try:
+        reader=ControlEvidence(store);source=reader.resolve(sim['execution_id'])
+        rows=reader.read_file(source,'trajectory.json.gz',[]);observations=reader.read_file(source,'controller_observations.json',[])
+        files={name:store.artifact(ref,raw=True) for name,ref in source['files'].items()}
+        task=SessionInput.model_validate(source['configuration']).task
+        motion,physics=reconstruct_motion(files,rows,task.goal.data['target_m'])
+        evaluation=store.artifact(receipts['evaluation']['output']) if receipts.get('evaluation',{}).get('output') else None
+        report=summarize(task,store.artifact(sim['output']),evaluation,rows,observations,motion,
+            [t['force_limit_n'] for t in physics['tendons']],settling_for(SessionInput.model_validate(source['configuration'])))
+        return dict(available=True,source_execution=sim['execution_id'],manifest=source['manifest'],
+            scope='Partial saved-state inspection; no completed profile receipt or changed acceptance',profile=report,
+            actual_duration_s=report['last_valid_time_s'],attempted_control_plans=len(observations),
+            applied_control_updates=sum(o.get('actual_tension_n') is not None for o in observations),
+            termination_reason=report['execution_failure_reason'] or sim.get('error'),
+            holding_motion=[m for m in motion if .30-1e-9<=m['time_s']<=.35+1e-9],
+            missing=['Authoritative completed profile and acceptance remain unavailable'])
+    except (ValueError,KeyError) as exc:
+        return dict(available=False,missing=[str(exc)],termination_reason=sim.get('error'))
