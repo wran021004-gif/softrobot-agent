@@ -134,6 +134,7 @@ class MechanicsTests(TestCase):
         with patch.object(backends,'atomic_json',side_effect=save):backends.save_nmpc_progress(folder,observations)
         saved=core.read(folder/'nmpc_updates.json')[0]['complete_update_record']
         self.assertNotIn('resolved_problem',saved);self.assertIn('resolved_problem_reference',saved)
+        self.assertLessEqual(len(saved['resolved_problem_reference']['filename']),len('nmpc_updates.json'))
         self.assertEqual(core.read(folder/saved['resolved_problem_reference']['filename']),{'graph':'fixture'})
         self.assertEqual(attempts.count('nmpc_updates.json'),1);self.assertEqual(len(observations),1)
         self.assertEqual(saved['problem_variables']['x']['bounds'],[1.,1.])

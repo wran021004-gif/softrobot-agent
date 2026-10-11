@@ -89,7 +89,7 @@ a fresh worker does not recreate cache/timing history. Production diagnostics
 retain the original tracing setting; fixed iteration is diagnostic only.
 
 Resolved problem definitions are stored once per graph/horizon in exported
-`nmpc_problem_<identity>.json` files. Each update keeps a hashed file reference and
+`p_<10-character-prefix>.json` files, with full hashes in each reference. Each update keeps a hashed file reference and
 its own complete variables/bounds/initial guess. Diagnosis verifies the file hash
 then restores that update's values. Progress replacement retries brief Windows
 reader conflicts for at most2s, outside the numerical solver; it never repeats a
@@ -99,6 +99,11 @@ computed updates (19 in the replaced file); two explicitly new launches are
 admitted after repair. Mechanics and BDF are reused, not repeated. A conservative
 dependency migration records the changed storage implementation and keeps all
 old costs and the task-start clock. No extra physical baseline is prescribed.
+The next launch failed on an overly long graph filename after its first computed
+update, before that input record was durable. This gap is reported, not reconstructed
+as observed data. Short graph filenames now match the known-working progress
+basename length; diagnosis verifies both full file and expression hashes. Both
+failed launches remain charged. Any continuation has a new explicit operation ID.
 
 ```powershell
 # Only for this study's known progress-write failure, after committing/migrating:

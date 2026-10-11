@@ -91,11 +91,11 @@ def reconcile_inspection(host):
 
 def archive_incomplete(host):
     """Preserve the known failed run, including its final temporary progress file."""
-    if core.state(host).get('incomplete_execution_evidence'):return core.state(host)['incomplete_execution_evidence']
-    s=core.state(host);records=[]
+    s=core.state(host);records=list(s.get('incomplete_execution_evidence',[]))
+    covered={r['original_result']['artifact_id'] for r in records}
     for ref in s['results']:
         r=host.store.artifact(ref)
-        if r['status']=='evaluated':continue
+        if r['status']=='evaluated' or ref['artifact_id'] in covered:continue
         receipt=r['execution']['receipts']['simulation'];execution_id=receipt['execution_id']
         folder=host.store.root/'sessions'/r['owner_run_id']/'executions'/execution_id/'backend'
         files=[];counts={}
@@ -116,6 +116,9 @@ def archive_incomplete(host):
             status='known_failed_launch; complete saved inputs preserved; no terminal/holding acceptance',
             last_command='Final temporary progress includes the computed command before MuJoCo control assignment/stepping; do not infer completed application.',
             additional_scientific_executions=0,additional_numerical_s=0.)
+        if not counts and 'nmpc_problem_' in (receipt.get('error') or ''):
+            metadata.update(computed_updates_before_failure=1,complete_record_gap=1,
+                missing_evidence='First controller solve returned, but graph path creation failed before progress persistence; original vector/action cannot be recovered and is not fabricated.')
         evidence=core.save(host,metadata,'incomplete_execution_saved_files');records.append(dict(reference=evidence,**metadata))
     searches=core.state(host)['searches']
     for v in searches.values():
@@ -130,10 +133,11 @@ def continue_control(host):
     original=s['integration_demonstration'];demo=host.store.artifact(original)
     solve=demo['mechanics'];replay=demo['replay'];source=solve['result']['reference']
     d=host.store.artifact(source)['candidate']['d']
+    attempt=sum(k.startswith('engineering-control-search-after-') for k in s['searches'])+1
     search=core.dispatch(host,plan('search',[source,replay['result']['reference'],*s['results']],search=dict(
         variables=['holding_tip_speed_weight'],bounds={'holding_tip_speed_weight':[.025,.10]},
         fixed=dict(d=d,holding_tip_speed_weight=.10,terminal_tip_speed_weight=.10),max_evaluations=2,step=.25,mechanics_source=source)),
-        'engineering-control-search-after-progress-repair',origin='engineering')
+        'engineering-control-search-after-storage-repair-'+str(attempt),origin='engineering')
     tested=search['result'].get('actually_explored',{})
     out=dict(status='connected' if len(tested.get('holding_tip_speed_weight',[]))>=2 else 'incomplete_actual_control_search',
         mechanics=solve,replay=replay,control_search=search,original_incomplete_demonstration=original,

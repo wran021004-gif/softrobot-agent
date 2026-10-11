@@ -18,7 +18,9 @@ def save_nmpc_progress(folder, observations):
     record=observations[-1].get('complete_update_record',{})
     definition=record.get('resolved_problem')
     if definition is not None:
-        name='nmpc_problem_'+record['model_identity']+'.json';path=folder/name
+        # Keep the basename no longer than nmpc_updates.json: the established
+        # Windows execution directory already approaches the legacy path limit.
+        name='p_'+record['model_identity'][:10]+'.json';path=folder/name
         if not path.exists():atomic_json(path,definition)
         record['resolved_problem_reference']=dict(filename=name,
             sha256=hashlib.sha256(path.read_bytes()).hexdigest(),

@@ -497,6 +497,8 @@ def local_diagnostic(host, query, key):
             definition=record['resolved_problem_reference'];body=host.store.artifact(source['files'][definition['filename']],raw=True)
             if hashlib.sha256(body).hexdigest()!=definition['sha256']:raise ValueError('RESOLVED_PROBLEM_DEFINITION_HASH_MISMATCH')
             record['resolved_problem']=json.loads(body)
+            if digest(record['resolved_problem']['objective_function'])!=record['model_identity']:
+                raise ValueError('RESOLVED_PROBLEM_EXPRESSION_IDENTITY_MISMATCH')
     if not record: raise ValueError('ACTUAL_COMPLETE_UPDATE_INPUT_REQUIRED')
     seconds=150.; reserve=q.repetitions*seconds
     if (s['local_solves']+q.repetitions>b['local_solves'] or s['local_solve_s']+reserve>b['local_solve_s'] or
