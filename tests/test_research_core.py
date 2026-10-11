@@ -133,3 +133,42 @@ class CoreTests(TestCase):
         self.assertNotEqual(updated['reference_candidate'],previous['reference_candidate'])
         self.assertTrue(updated['core_repairs'][-1]['improvement_requires_new_comparable_reference'])
         core.update(h,**previous)
+
+    def test_length_search_and_control_only_nonzero_fixed_length(self):
+        h=self.host;profile=core.state(h)['profile']
+        query=Search(variables=['d'],bounds={'d':(-1.,1.)},max_evaluations=3)
+        p=core.search_problem(h,query,3);seen=[]
+        def evaluator(problem,values,candidate_id):
+            seen.append(values)
+            return dict(status='evaluated',acceptance=dict(accepted=False,status='valid_failure',metrics=dict(
+                terminal_error_m=.02,holding_max_error_m=.02,holding_max_speed_m_s=.03)),evidence=dict(substituted=True))
+        result=solve(p,evaluator=evaluator,evaluation_profile=profile)
+        self.assertEqual(len(result.evaluated),3)
+        self.assertEqual({r['holding_tip_speed_weight'] for r in seen},{.1})
+        self.assertEqual({r['terminal_tip_speed_weight'] for r in seen},{.1})
+        self.assertGreater(len({tuple(r['lengths_m']) for r in seen}),1)
+        for r in seen:
+            d=(r['lengths_m'][0]-.16)/.0055
+            self.assertAlmostEqual(r['lengths_m'][1],.11-.0055*d)
+        q=Search(variables=['holding_tip_speed_weight'],bounds={'holding_tip_speed_weight':(.025,.1)},
+            fixed={'d':.5,'holding_tip_speed_weight':.1,'terminal_tip_speed_weight':.1})
+        p=core.search_problem(h,q,3);p,_=validate_problem(p,profile)
+        self.assertEqual(p.lengths.baseline_by_count['2'],[.16275,.10725])
+        self.assertFalse(p.lengths.free)
+
+    def test_local_result_reference_serialization_without_numerical_rerun(self):
+        from types import SimpleNamespace
+        h=self.host;previous=deepcopy(core.state(h))
+        ref=core.save(h,dict(execution_id='substituted-local-source',profile_identity=previous['profile']['identity']))
+        core.update(h,results=[ref])
+        def worker(args,**kwargs):
+            core.atomic_json(args[-1],dict(first_input_n=[.2]*6,status='substituted_no_numerical_solve'))
+            return SimpleNamespace(returncode=0,stdout=b'')
+        with patch('extensions.tendon_family.control_evidence.ControlEvidence.resolve',return_value={'configuration':previous['base_configuration']}), \
+            patch('extensions.tendon_family.control_evidence.ControlEvidence.read_file',return_value=[{'complete_update_record':{'saved_actual_input':True}}]), \
+            patch.object(core.subprocess,'run',side_effect=worker):
+            result=core.local_diagnostic(h,dict(execution=ref,update_id=0,repetitions=1),'fixture-local-serialization')
+        self.assertEqual(result['rows'][0]['source_execution'],ref)
+        row=h.store.lookup(h.run_id,'fixture-local-serialization-local-0')
+        self.assertIsNotNone(row['receipt']);self.assertEqual(core.state(h)['numerical_reserved_s'],0.)
+        core.update(h,**previous)

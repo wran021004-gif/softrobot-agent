@@ -423,7 +423,11 @@ def diagnose(host, refs):
             capture_s=sum(o.get('complete_record_capture_s',0.)+o.get('complete_update_record',{}).get('record_capture_s',0.)+o.get('snapshot_capture_wall_s',0.) for o in r['observations'])) for r in records],
         first_action_divergence=comparison[0] if comparison else None,action_divergences=comparison,
         unique_cause='unresolved; equality and differences are recorded, no causal rule imposed')
-    return dict(reference=save(host,value,'diagnosis'),**value)
+    ref=save(host,value,'diagnosis')
+    update(host,diagnostic_facts=[*state(host).get('diagnostic_facts',[]),dict(reference=ref,
+        status=value['status'],first_action_divergence=value['first_action_divergence'],
+        unique_cause=value['unique_cause'],execution_evidence=[{k:r[k] for k in ('execution_id','updates','complete_records','capture_s')} for r in value['execution_evidence']])])
+    return dict(reference=ref,**value)
 
 
 def local_diagnostic(host, query, key):
@@ -467,7 +471,7 @@ def local_diagnostic(host, query, key):
         except subprocess.TimeoutExpired:
             value=dict(status='known_killed_waited_diagnostic_timeout',timeout_s=seconds)
         elapsed=time.perf_counter()-start
-        value.update(execution_id=row['execution_id'],charged_numerical_s=elapsed,source_execution=q.execution,
+        value.update(execution_id=row['execution_id'],charged_numerical_s=elapsed,source_execution=plain(q.execution),
             source_update_id=q.update_id,origin='engineering' if key.startswith('engineering') else 'model')
         with host.store.transaction() as db:
             current=host.store.session(host.run_id,db)['state']
@@ -521,7 +525,8 @@ def packet(host):
             historical_costs='sealed source activity; not transferred or reset',supplied_context=True,autonomous_retrieval=False),
         resource_use=dict(shared_ledger=host.store.remaining(),numerical_s=s['numerical_s'],numerical_reserved_s=s['numerical_reserved_s'],
             local_solves=s['local_solves'],local_solve_s=s['local_solve_s'],admissible_batch=capacity(host,8)),
-        claims=claims(host),actual_retrievals=s['retrievals'],plans=s['plans'],status=s['research_status'])
+        claims=claims(host),actual_retrievals=s['retrievals'],plans=s['plans'],status=s['research_status'],
+        diagnostic_facts=s.get('diagnostic_facts',[]),local_diagnostic_evidence=s.get('diagnostics',[]))
 
 
 def dispatch(host, value, request_id, origin='model'):
