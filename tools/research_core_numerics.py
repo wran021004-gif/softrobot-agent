@@ -77,10 +77,11 @@ def import_history(host):
     ref=core.save(host,value,'imported_archived_mechanics')
     core.update(host,imported_mechanics_sources=[ref])
     old_folder='evidence/research_core_20261011'
-    old=core.read(core.ROOT/old_folder/'scientific_summary.json')['local_solve_outcomes'][0]
+    old_summary=core.read(core.ROOT/old_folder/'scientific_summary.json')
+    old=old_summary['local_solve_outcomes'][0]
     old_input=archived(old_folder,old['original_worker_input'])
     historical=imported_record(host,old_input['configuration'],old_input['record'],
-        dict(study_id='research-core-20261011',folder=old_folder,reference=old['original_worker_input'],update_id=1))
+        dict(study_id=old_summary['study_id'],folder=old_folder,reference=old['original_worker_input'],update_id=1))
     primary=next(r for r in summary['closed_loop'] if r['execution_id']=='d42321543b9a45bb97b3ff28aca097ae')
     source=execution_source(primary)
     observations=json.loads(archived(HISTORY,source['files']['controller_observations.json'],raw=True))

@@ -29,6 +29,10 @@ class NumericalTests(TestCase):
     def test_zero_model_guard_and_stop_pending_protection(self):
         with patch.object(self.host,'compatibility',return_value={'compatible':True}):
             core.guard(self.host,True)
+            plan=dict(action='propose',parameters=core.state(self.host)['spec']['reference_parameters'],
+                **{k:'fixture' for k in ('hypothesis','expected_observation','weakening_observation','fixed_conditions','stopping_condition','interpretation')})
+            output=core.dispatch(self.host,plan,'fixture-zero-model-default-origin')
+            self.assertEqual(self.host.store.artifact(output['plan'])['origin'],'engineering')
             core.update(self.host,pending={'known':'fixture'})
             with self.assertRaisesRegex(ValueError,'PENDING'):core.guard(self.host,True)
             core.update(self.host,pending=None,research_status='stopped')

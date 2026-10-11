@@ -654,6 +654,7 @@ def packet(host):
 
 def dispatch(host, value, request_id, origin='model'):
     """Native plan acceptance and internal batch use the same project Store."""
+    if state(host)['spec'].get('mode') == 'engineering_numerical':origin='engineering'
     plan=Plan.model_validate(value); old=host.store.lookup(host.run_id,request_id)
     if old:
         if old['request_hash']!=digest(plain(plan)): raise ValueError('OPERATION_ID_COLLISION')
