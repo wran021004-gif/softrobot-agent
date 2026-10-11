@@ -103,6 +103,15 @@ class GVSNMPCController:
         self.workspace.solver.diagnostic_trace=update_id in self.record_update_ids
         from .control_evidence import COMPLETE_UPDATE_INPUTS
         self.workspace.solver.complete_record=COMPLETE_UPDATE_INPUTS.get()
+        before_solve=None
+        if self.workspace.solver.complete_record:
+            from copy import deepcopy
+            self.workspace.solver.last_input_record=None
+            source=self.seed if self.seed is not None else self.workspace.last
+            before_solve=dict(measured_state=x.tolist(),previous_applied_input_n=self.previous.tolist(),
+                warm_source=None if source is None else deepcopy({k:source[k] for k in ('states','tensions')}),
+                source_kind='explicit' if self.seed is not None else 'workspace_last',
+                controller_identity=self.plan['identity'])
         try:
             solved=self.workspace.solve(x,self.previous,warm=self.seed,elapsed_s=t)
             success=solved['accepted']
@@ -158,6 +167,11 @@ class GVSNMPCController:
                     reason=self.last['policy_stop_reason'], failure_response=self.last['failure_response_used']))
             self.observations[-1]['complete_update_record']=record
             self.observations[-1]['complete_record_capture_s']=time.perf_counter()-capture_start
+        elif before_solve is not None:
+            self.observations[-1]['failed_update_input_record']=dict(**before_solve,
+                initialization=getattr(self.workspace.solver,'last_input_record',None),
+                error=error,actual_applied_action_n=list(command),
+                missing='No completed optimization result; missing solver inputs are not invented')
         if self.workspace.solver.diagnostic_trace and solved is not None:
             from .control_evidence import capture_snapshot
             capture_start=time.perf_counter()

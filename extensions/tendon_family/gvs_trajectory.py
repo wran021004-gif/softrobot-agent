@@ -431,6 +431,9 @@ class TrajectoryWorkspace:
         try:
             regenerated=self.regenerate_tensions(raw,measured_x)
             recovery.update({k:v for k,v in regenerated.items() if k not in ('optimum','partial_states','steps')})
+            if self.solver.diagnostic_trace or getattr(self.solver, 'complete_record', False):
+                recovery['partial_regenerated_states']=regenerated['partial_states']
+                recovery['root_trace']=regenerated['steps']
             recovery['root_solve_attempts']=len(regenerated['steps'])+int(regenerated['error'] is not None)
             if regenerated['error']:raise RuntimeError(regenerated['error'])
             repaired=regenerated['optimum']

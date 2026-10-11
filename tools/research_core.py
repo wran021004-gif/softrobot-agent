@@ -324,8 +324,12 @@ def search_problem(host, search, admitted):
     p['variables']={k:dict(kind='fixed',value=v) for k,v in fixed.items()}
     for k in q.variables:
         if k!='d': p['variables'][k]=dict(kind='continuous',bounds=list(q.bounds[k]),initial=getattr(q.fixed,k))
-    lengths=[.16+.0055*q.fixed.d,.11-.0055*q.fixed.d]
     free='d' in q.variables
+    # The public +/-5% bound refers to the physical nominal design, not the
+    # optimizer's chosen initial point. Use the closest nominal feasible point
+    # for allocation validation; pass the requested initialization separately.
+    baseline_d=min(max(0.,q.bounds['d'][0]),q.bounds['d'][1]) if free else q.fixed.d
+    lengths=[.16+.0055*baseline_d,.11-.0055*baseline_d]
     bounds=[[.16+.0055*q.bounds['d'][0],.16+.0055*q.bounds['d'][1]],
         [.11-.0055*q.bounds['d'][1],.11-.0055*q.bounds['d'][0]]] if free else [[v,v] for v in lengths]
     p['lengths']=dict(free=free,total_flexible_length_m=.27,baseline_by_count={'2':lengths},bounds_by_count={'2':bounds})
@@ -337,7 +341,7 @@ def search_problem(host, search, admitted):
 
 
 def run_search(host, query, key):
-    from tools.design_optimization import solve
+    from tools.design_optimization import solve, continuous_space, structures
     guard(host,True); q=Search.model_validate(query); admission=capacity(host,q.max_evaluations)
     if not admission['admitted']: return dict(status='budget_limited',admission=admission,evaluated=[])
     problem=search_problem(host,q,admission['admitted']); s=state(host)
@@ -360,7 +364,13 @@ def run_search(host, query, key):
     def checkpoint(value):
         searches=state(host)['searches']; searches[key]=deepcopy(value); update(host,searches=searches)
         return save(host,value,'search_checkpoint')
-    result=plain(solve(problem,evaluator=evaluator,state=s['searches'].get(key),save_state=checkpoint,evaluation_profile=s['profile']))
+    initial_latents=None
+    if 'd' in q.variables:
+        structure=structures(problem)[0];allocation,latent=continuous_space(problem,structure)
+        latent.update(allocation.encode([.16+.0055*q.fixed.d,.11-.0055*q.fixed.d]))
+        initial_latents={digest(structure):latent}
+    result=plain(solve(problem,evaluator=evaluator,state=s['searches'].get(key),save_state=checkpoint,
+        evaluation_profile=s['profile'],initial_latents=initial_latents))
     explored={k:sorted({r['resolved']['parameters'][k] for r in result['evaluated']}) for k in q.variables if k!='d'}
     if 'd' in q.variables: explored['d']=sorted({(r['resolved']['parameters']['lengths_m'][0]-.16)/.0055 for r in result['evaluated']})
     return dict(result=result,admission=admission,actually_explored=explored,
@@ -431,6 +441,7 @@ def diagnose(host, refs):
 
 
 def local_diagnostic(host, query, key):
+    guard(host,True)
     from schemas.research_core import LocalDiagnostic
     from extensions.tendon_family.control_evidence import ControlEvidence
     q=LocalDiagnostic.model_validate(query); s=state(host); b=s['spec']['budgets']
@@ -536,7 +547,7 @@ def dispatch(host, value, request_id, origin='model'):
         if old['request_hash']!=digest(plain(plan)): raise ValueError('OPERATION_ID_COLLISION')
         if old['receipt']: return host.store.artifact(json.loads(old['receipt'])['output'])
         raise ValueError('RECOVER_EXISTING_OPERATION_NO_NEW_EXECUTION')
-    guard(host,plan.action in ('execute','search','confirm'))
+    guard(host,plan.action in ('execute','search','confirm') or plan.diagnostic is not None)
     s=state(host)
     for r in plan.supporting_evidence: host.store.artifact(r)
     retrieved={r['artifact_id'] for r in s['retrievals']}

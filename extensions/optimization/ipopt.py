@@ -202,6 +202,7 @@ class IpoptSolver:
         return lower, upper, initial
 
     def solve(self, problem: OptimizationProblem, *, seed_settled=False) -> OptimizationResult:
+        self.last_input_record = None
         self.last_returned_optimum = None
         self.last_diagnostics=None
         problem = OptimizationProblem.model_validate(problem)

@@ -164,7 +164,7 @@ class CoreTests(TestCase):
         def worker(args,**kwargs):
             core.atomic_json(args[-1],dict(first_input_n=[.2]*6,status='substituted_no_numerical_solve'))
             return SimpleNamespace(returncode=0,stdout=b'')
-        with patch('extensions.tendon_family.control_evidence.ControlEvidence.resolve',return_value={'configuration':previous['base_configuration']}), \
+        with patch.object(core,'guard'),patch('extensions.tendon_family.control_evidence.ControlEvidence.resolve',return_value={'configuration':previous['base_configuration']}), \
             patch('extensions.tendon_family.control_evidence.ControlEvidence.read_file',return_value=[{'complete_update_record':{'saved_actual_input':True}}]), \
             patch.object(core.subprocess,'run',side_effect=worker):
             result=core.local_diagnostic(h,dict(execution=ref,update_id=0,repetitions=1),'fixture-local-serialization')
@@ -172,3 +172,41 @@ class CoreTests(TestCase):
         row=h.store.lookup(h.run_id,'fixture-local-serialization-local-0')
         self.assertIsNotNone(row['receipt']);self.assertEqual(core.state(h)['numerical_reserved_s'],0.)
         core.update(h,**previous)
+
+    def test_nonzero_length_initialization_and_restricted_bounds(self):
+        from tools.design_optimization import structures
+        h=self.host;profile=core.state(h)['profile']
+        for bounds,initial_d in [((-1.,1.),.5),((.5,1.),.75),((-1.,-.5),-.75)]:
+            q=Search(variables=['d'],bounds={'d':bounds},fixed={'d':initial_d,
+                'holding_tip_speed_weight':.1,'terminal_tip_speed_weight':.1},max_evaluations=2)
+            p=core.search_problem(h,q,2);s=structures(p)[0];allocation,latent=continuous_space(p,s)
+            latent.update(allocation.encode([.16+.0055*initial_d,.11-.0055*initial_d]));seen=[]
+            def evaluator(problem,values,candidate_id):
+                seen.append(values)
+                return dict(status='evaluated',acceptance=dict(accepted=False,status='valid_failure',metrics=dict(
+                    terminal_error_m=.02,holding_max_error_m=.02,holding_max_speed_m_s=.03)),evidence=dict(substituted=True))
+            solve(p,evaluator=evaluator,evaluation_profile=profile,initial_latents={core.digest(s):latent})
+            self.assertAlmostEqual(seen[0]['lengths_m'][0],.16+.0055*initial_d)
+            for values in seen:
+                d=(values['lengths_m'][0]-.16)/.0055
+                self.assertGreaterEqual(d,bounds[0]-1e-12);self.assertLessEqual(d,bounds[1]+1e-12)
+
+    def test_failed_preparation_keeps_actual_inputs_without_stale_vector(self):
+        import numpy as np
+        from types import SimpleNamespace
+        from extensions.tendon_family.gvs_nmpc import GVSNMPCController
+        from extensions.tendon_family.control_evidence import COMPLETE_UPDATE_INPUTS
+        controller=GVSNMPCController(core.state(self.host)['profile']['recipe'],.01)
+        controller.workspace=SimpleNamespace(solver=SimpleNamespace(last_input_record={'stale_previous_input':True}),
+            solve=lambda *args,**kwargs:(_ for _ in ()).throw(ValueError('preparation_failed')),last=None,graph_s=0.)
+        controller.seed=None;controller.previous=np.array([.2]*6);controller.observations=[]
+        controller.record_update_ids=[];controller.coordinate_order=['q'];controller.plan={'identity':'fixture-plan'}
+        controller.physics={};controller.unusable_updates=0
+        token=COMPLETE_UPDATE_INPUTS.set(True)
+        try:
+            with patch('extensions.tendon_family.gvs_nmpc.execute_ideal_tension',return_value=(np.array([.2]*6),{})):
+                controller.command(0.,{'tip':np.array([0.,0.,0.]),'gvs_projection':{'projection_residual_max_rad_m':0.}},[0.],[0.])
+        finally:COMPLETE_UPDATE_INPUTS.reset(token)
+        record=controller.observations[0]['failed_update_input_record']
+        self.assertEqual(record['previous_applied_input_n'],[.2]*6)
+        self.assertEqual(record['measured_state'],[0.,0.]);self.assertIsNone(record['initialization'])

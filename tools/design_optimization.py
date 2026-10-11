@@ -240,13 +240,21 @@ def evaluate(problem,structure,latent,candidate_id,phase,evaluator,feedback=None
         evidence=result['evidence'],execution_status=a['status'],used_feedback=feedback))
 
 
-def solve(problem,host=None,*,evaluator=None,state=None,save_state=None,evaluation_profile=None):
+def solve(problem,host=None,*,evaluator=None,state=None,save_state=None,evaluation_profile=None,initial_latents=None):
     """Bounded outer enumeration + feedback-directed inner coordinate proposals.
 
     Pending decoded proposals are sealed before execution. Recovery calls the
     existing complete_execution chain, which never repeats a sealed simulation.
     """
-    problem,topology=validate_problem(problem,evaluation_profile);identity=digest(dict(problem=plain(problem),evaluation_profile=evaluation_profile)) if evaluation_profile else digest(plain(problem))
+    problem,topology=validate_problem(problem,evaluation_profile)
+    identity_payload=dict(problem=plain(problem),evaluation_profile=evaluation_profile) if evaluation_profile else plain(problem)
+    if initial_latents is not None:
+        identity_payload=dict(problem=plain(problem),evaluation_profile=evaluation_profile,initial_latents=initial_latents)
+    identity=digest(identity_payload)
+    if initial_latents is not None:
+        legal={digest(s):s for s in topology}
+        if set(initial_latents)-set(legal):raise ValueError('INITIAL_LATENT_STRUCTURE_OUTSIDE_DOMAIN')
+        for key,latent in initial_latents.items():decode(problem,legal[key],latent)
     if host is not None:
         state=host.store.session(host.run_id)['state'].get('design_searches',{}).get(identity)
         evaluator=evaluator or ReceiptEvaluator(host)
@@ -268,7 +276,9 @@ def solve(problem,host=None,*,evaluator=None,state=None,save_state=None,evaluati
             if time.time()-state['started']>=problem.budget.wall_s:state['termination']='wall_budget_exhausted';break
             missing=[s for s in initial if digest(s) not in state['initialized']]
             if missing:
-                structure=missing[0];_,latent=continuous_space(problem,structure);phase='structural_initialization';feedback=None
+                structure=missing[0];_,latent=continuous_space(problem,structure)
+                if initial_latents is not None:latent=deepcopy(initial_latents.get(digest(structure),latent))
+                phase='structural_initialization';feedback=None
             else:
                 eligible=[r for r in state['evaluated'] if r['latent_coordinates']]
                 if not eligible:state['termination']='all_design_variables_fixed';break
