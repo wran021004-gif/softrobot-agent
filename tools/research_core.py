@@ -163,14 +163,14 @@ def allowance(s):
     return sum(s['spec']['execution_allowances'].values())
 
 
-def capacity(host, requested=1, confirmation=False):
+def capacity(host, requested=1, confirmation=False, *, root_operation=False):
     """Admit all internal launches, with two full confirmation slots and time."""
     s=state(host); b=s['spec']['budgets']; a=allowance(s)
     remaining=host.store.remaining()['remaining']; protect=0 if confirmation else 2
     science=b['numerical_s']-s['numerical_s']-s['numerical_reserved_s']
     available_time=min(science, s['cutoff_unix']-time.time(), remaining['wall_s'])
     fit=max(0,min(requested,int(remaining['backend_solves'])-protect,math.floor(available_time/a)-protect,
-        (int(remaining['tool_calls'])-3*protect)//3))
+        (int(remaining['tool_calls'])-4*protect-int(root_operation))//3))
     return dict(requested=requested, admitted=fit, internal_launches=fit, numerical_reservation_s=fit*a,
         confirmation_launch_reserve=protect, confirmation_time_reserve_s=protect*a,
         remaining_numerical_s=science, per_execution_s=a)
@@ -535,7 +535,7 @@ def packet(host):
                 synchronous_simulator='wall overrun did not skip simulated-time commands'),
             historical_costs='sealed source activity; not transferred or reset',supplied_context=True,autonomous_retrieval=False),
         resource_use=dict(shared_ledger=host.store.remaining(),numerical_s=s['numerical_s'],numerical_reserved_s=s['numerical_reserved_s'],
-            local_solves=s['local_solves'],local_solve_s=s['local_solve_s'],admissible_batch=capacity(host,8)),
+            local_solves=s['local_solves'],local_solve_s=s['local_solve_s'],admissible_batch=capacity(host,8,root_operation=True)),
         claims=claims(host),actual_retrievals=s['retrievals'],plans=s['plans'],status=s['research_status'],
         diagnostic_facts=s.get('diagnostic_facts',[]),local_diagnostic_evidence=s.get('diagnostics',[]))
 
@@ -554,7 +554,7 @@ def dispatch(host, value, request_id, origin='model'):
     if set(plan.experience_disposition)-retrieved: raise ValueError('DISPOSITION_REQUIRES_ACTUAL_RETRIEVAL')
     if plan.action=='stop' and any(r not in [plain(v) for v in plan.supporting_evidence] for r in s['results']):
         raise ValueError('STOP_MUST_CITE_ALL_NEW_EXPERIMENT_RESULTS')
-    admission=capacity(host,plan.search.max_evaluations if plan.search else 1,plan.action=='confirm')
+    admission=capacity(host,plan.search.max_evaluations if plan.search else 1,plan.action=='confirm',root_operation=True)
     if plan.action=='execute' and admission['admitted']<1: raise ValueError('CANDIDATE_PLUS_TWO_CONFIRMATIONS_CANNOT_FIT')
     row,_=host.store.reserve(host.run_id,request_id,digest(plain(plan)),host.actor,{**zero(),'tool_calls':1})
     ref=save(host,dict(origin=origin,request_id=request_id,original_plan=plain(plan),admission=admission),'original_research_plan')
@@ -571,6 +571,12 @@ def dispatch(host, value, request_id, origin='model'):
             selected=host.store.artifact(plan.selected_execution)
             if s.get('selected') and s['selected']!=plain(plan.selected_execution):
                 raise ValueError('POST_SELECTION_CONFIRMATIONS_CANNOT_CHANGE_SELECTION')
+            candidate=verify_candidate(host,selected['candidate'])
+            if selected['profile_identity']!=s['profile']['identity'] or selected['scientific_configuration']!=candidate['scientific_configuration']:
+                raise ValueError('CONFIRMATION_REQUIRES_SELECTED_COMPLETE_PARAMETERS_AND_EVALUATION_CONFIGURATION')
+            if not (selected.get('acceptance') or {}).get('accepted'):
+                raise ValueError('SELECTED_PASSING_EXECUTION_REQUIRED')
+            if admission['admitted']<1: raise ValueError('EXECUTION_AND_CONFIRMATION_RESERVE_CANNOT_FIT')
             update(host,selected=plain(plan.selected_execution))
             result=execute(host,selected['candidate'],request_id,role='confirmation',selected=plain(plan.selected_execution))
         else:

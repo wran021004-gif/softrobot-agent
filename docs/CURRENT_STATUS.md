@@ -1,4 +1,34 @@
-# Current development status - Milestones 4 and 5, 2026-10-07
+# Current development status - Unified research core, 2026-10-11
+
+The [unified core](research_core_runbook.md) now connects direct proposals,
+mathematical search, complete execution/evaluation, diagnosis, exact confirmation
+and native STOP through the existing async Strands/Host/Store path. Full resolved
+fixed/search parameters and evaluation configuration identify candidates;
+independent executions retain distinct identities and one cumulative ledger.
+Batches account for every internal simulation and protect two confirmation
+launches/time plus their workflow calls. Thirteen focused checks passed.
+
+The independent native study is sealed after an accepted model STOP: 13 actual
+provider requests, 38 public workflow operations, six fresh MuJoCo launches,
+two standalone local solves and about 3430.700 s cumulative numerical work.
+The model chose a fresh reference execution, an identical-parameter proposal
+and a two-evaluation d search. Both searched points failed holding speed.
+No post-selection confirmation ran, despite sufficient reserved resources.
+The current evaluation version 3 reference has two passes and one failure;
+all older version 2 results and costs remain. No parameter improvement or
+repeat-supported acceptance is claimed. Original model identity/role
+misinterpretations and rejected submissions are preserved and factually corrected
+in the [completion report](research_core_completion.md) and
+[canonical evidence](../evidence/research_core_20261011/scientific_summary.json).
+
+Remaining scientific work includes resolving timing-sensitive repeatability
+and obtaining two valid independent confirmations for a future selection.
+Offline schedule initialization and legacy skill admission are deferred;
+read-only draft retrieval is available but was not used in the native session.
+No stopped historical study was reopened. The prior status entries below remain
+historical evidence.
+
+# Historical development status - Milestones 4 and 5, 2026-10-07
 
 The explicitly authorized **same-ledger v3 continuation** is now sealed on a
 recurring archived-selector engineering defect. Both additional repair allowances

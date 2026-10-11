@@ -13,12 +13,16 @@ $studyPython = 'D:\softrobot-agent\.mainline5-env\Scripts\python.exe'
 & $studyPython -m unittest tests.test_research_core
 # Commit implementation and specification before numerical work.
 & $studyPython -m tools.research_core bind
-& $studyPython -m tools.research_core execute --plan runs/unified-research-20261011/reference_1.json --request-id engineering-reference-1
-& $studyPython -m tools.research_core execute --plan runs/unified-research-20261011/reference_2.json --request-id engineering-reference-2
+# Execute a typed plan JSON, with a new request ID only for an intentional new experiment.
+# The original reference plans are indexed in the delivery scientific_summary.json.
+$planPath = 'runs/unified-research-20261011/reference_1.json'
+& $studyPython -m tools.research_core execute --plan $planPath --request-id engineering-reference-1
 & $studyPython -m tools.research_core diagnose
 & $studyPython -m tools.research_core live
 & $studyPython -m tools.research_core status
 & $studyPython -m tools.research_core export
+# After accepted STOP, write the completion report and canonical archive without new experiments.
+& $studyPython -m tools.research_core_delivery
 ```
 
 `--spec` chooses a study specification. Its study ID, start clock, task/profile,
@@ -37,6 +41,11 @@ far=.11-.0055*d. No parameter-only candidate fabricates an offline trajectory.
 The existing mathematical coordinate method supplies internal proposals using
 the same candidate constructor and complete-execution evaluator as direct plans.
 Reported explored values distinguish declared variables from tested coordinates.
+Search keeps the requested initial coordinates separately from the structural
+domain's feasible nominal seed, including nonzero fixed d and subdomains that
+exclude zero. Every internal evaluation is admitted and executed on the same
+ledger, including baseline evaluations, duplicates needing fresh executions,
+failures and partial batches.
 
 Every plan includes hypothesis, supporting evidence, expected/weakening
 observations, fixed conditions, stopping condition and interpretation. Program
@@ -95,3 +104,16 @@ the usable core. Draft retrieval does not promote a draft into a validated skill
 The canonical evidence archive includes original model requests/responses and
 immutable simulations; compact indexes reference it without expanded duplicate
 physics exports. Credentials and authorization headers are excluded.
+
+The delivered study is sealed: do not replay its live command or change its
+specification to reset costs. To run an independent study, copy the specification,
+choose a fresh study ID and actual start timestamp, and use `--spec` consistently
+for prepare/bind/execute/live/export. Replaying an existing operation ID returns
+its recorded receipt; it is not an independent confirmation.
+
+This study retained evaluation version 2's two references and local diagnosis,
+then established version 3's new comparable reference after conservative
+versioning of scientific source changes to failed-input recording, recovery-root
+evidence and exact mathematical-search initialization. Source changes were
+committed before that reference. No cross-version improvement is attributed.
+The optional offline initialization and legacy skill admission remain deferred.

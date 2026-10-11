@@ -51,6 +51,14 @@ class CoreTests(TestCase):
             self.assertEqual(core.capacity(h,8)['admitted'],3)
             ledger['remaining']['backend_solves']=3
             self.assertEqual(core.capacity(h,8)['admitted'],1)
+            ledger['remaining']['tool_calls']=11
+            self.assertEqual(core.capacity(h,8)['admitted'],1)
+            self.assertEqual(core.capacity(h,8,root_operation=True)['admitted'],0)
+            ledger['remaining']['tool_calls']=4
+            self.assertEqual(core.capacity(h,1,True,root_operation=True)['admitted'],1)
+            ledger['remaining']['tool_calls']=3
+            self.assertEqual(core.capacity(h,1,True,root_operation=True)['admitted'],0)
+            ledger['remaining']['tool_calls']=128
             core.update(h,numerical_s=s['spec']['budgets']['numerical_s']-2*a+1)
             self.assertEqual(core.capacity(h,8)['admitted'],0)
             self.assertEqual(core.capacity(h,1,True)['admitted'],1)
@@ -96,6 +104,18 @@ class CoreTests(TestCase):
         with patch.object(core,'guard'):
             with self.assertRaisesRegex(ValueError,'CONFIRMATION_REQUIRES_SELECTED_COMPLETE'):
                 core.execute(h,wrong['candidate'],'fixture-confirm',role='confirmation',selected=ref)
+            core.update(h,results=[ref],selected=None)
+            plan=dict(action='confirm',selected_execution=ref,**{k:'fixture' for k in
+                ('hypothesis','expected_observation','weakening_observation','fixed_conditions','stopping_condition','interpretation')})
+            with self.assertRaisesRegex(ValueError,'CONFIRMATION_REQUIRES_SELECTED_COMPLETE'):
+                core.dispatch(h,plan,'fixture-invalid-selection')
+            self.assertIsNone(core.state(h)['selected'])
+            wrong['scientific_configuration']=c['scientific_configuration'];wrong['acceptance']={'accepted':False}
+            failed_ref=core.save(h,wrong);core.update(h,results=[ref,failed_ref])
+            plan['selected_execution']=failed_ref
+            with self.assertRaisesRegex(ValueError,'SELECTED_PASSING_EXECUTION_REQUIRED'):
+                core.dispatch(h,plan,'fixture-nonpassing-selection')
+            self.assertIsNone(core.state(h)['selected'])
         self.assertEqual(h.store.remaining()['used']['backend_solves'],0)
 
     def test_complete_record_path_does_not_require_trace_or_dual_guess(self):
