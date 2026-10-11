@@ -233,7 +233,30 @@ def integrate(functions, tip, velocity, candidate, target, *, dense_period=.0005
     sh=st>=.30-1e-12
     result['sampled_evaluator'].update(holding_max_position_error_m=float(max(np.linalg.norm(sp[sh]-target,axis=1))) if any(sh) else None,
         holding_max_speed_m_s=float(max(np.linalg.norm(rv[si][sh],axis=1))) if any(sh) else None)
-    result['gates_passed']=bool(not failure and result['input_bounds_compliant'] and
+    result['legacy_dense_interpolation_gates_passed']=bool(not failure and result['input_bounds_compliant'] and
         result['dense_max_tip_disagreement_m']<=.001 and result['dense_max_speed_disagreement_m_s']<=.002 and
         result['terminal_position_error_m']<=.01 and result['holding_max_position_error_m']<=.01 and result['holding_max_speed_m_s']<=.02)
+    classify_replay(result)
     return result, dict(times_s=rt.tolist(),states=rx.tolist(),tip_positions_m=rp.tolist(),tip_velocities_m_s=rv.tolist())
+
+
+def classify_replay(result):
+    """Separate official sampled task, node consistency and interpolation diagnostics."""
+    sampled=result['sampled_evaluator']
+    def bounded(value,limit):return value is not None and np.isfinite(value) and value<=limit
+    complete=result['status']=='completed' and not result['integration_failure']
+    task=bool(complete and result['input_bounds_compliant'] and
+        bounded(result['terminal_position_error_m'],.01) and
+        bounded(sampled['holding_max_position_error_m'],.01) and bounded(sampled['holding_max_speed_m_s'],.02))
+    consistent=bool(complete and bounded(result['node_max_tip_disagreement_m'],.001) and
+        bounded(result['node_max_speed_disagreement_m_s'],.002))
+    result.update(original_task_acceptance=dict(accepted=task,scope='Official .01s sampled original task; inclusive .30-.35s'),
+        integration_consistency=dict(passed=consistent,comparison='Independently integrated dynamics at optimizer node times',
+            tip_limit_m=.001,velocity_vector_limit_m_s=.002),
+        optimizer_interpolation_diagnostic=dict(tip_difference_m=result['dense_max_tip_disagreement_m'],
+            velocity_difference_m_s=result['dense_max_speed_disagreement_m_s'],
+            qualification='Comparison with linearly interpolated optimizer outputs; not a ground-truth continuous trajectory or acceptance gate'),
+        dense_time_diagnostic=dict(holding_max_position_error_m=result['holding_max_position_error_m'],
+            holding_max_speed_m_s=result['holding_max_speed_m_s'],scope='Dense integrated samples; separate from official acceptance; no continuous-time guarantee'),
+        gates_passed=bool(task and consistent))
+    return result

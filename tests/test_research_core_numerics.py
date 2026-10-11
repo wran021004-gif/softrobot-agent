@@ -86,3 +86,18 @@ class NumericalTests(TestCase):
             value=core.execute(h,candidate,'fixture-repeat',role='diagnostic_repetition',selected=previous)
             self.assertEqual(value,{'fixture':'no simulation'})
         self.assertEqual(core.state(h)['pending']['selected_execution'],previous)
+
+
+class ReplayClassificationTests(TestCase):
+    def test_interpolated_optimizer_velocity_is_not_an_acceptance_gate(self):
+        from extensions.tendon_family.gvs_codesign import classify_replay
+        value=dict(status='completed',integration_failure=None,input_bounds_compliant=True,
+            terminal_position_error_m=.001,node_max_tip_disagreement_m=.0001,node_max_speed_disagreement_m_s=.0001,
+            dense_max_tip_disagreement_m=.01,dense_max_speed_disagreement_m_s=.1,
+            holding_max_position_error_m=.003,holding_max_speed_m_s=.03,
+            sampled_evaluator=dict(holding_max_position_error_m=.003,holding_max_speed_m_s=.01))
+        report=classify_replay(value)
+        self.assertTrue(report['gates_passed']);self.assertTrue(report['original_task_acceptance']['accepted'])
+        self.assertEqual(report['dense_time_diagnostic']['holding_max_speed_m_s'],.03)
+        report['sampled_evaluator']['holding_max_speed_m_s']=.03
+        self.assertFalse(classify_replay(report)['gates_passed'])
