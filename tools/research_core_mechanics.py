@@ -50,8 +50,9 @@ def dispatch(host, operation, arguments, key):
     uses_validation=bool(validation and source_ref==validation.get('source') and counter=='bdf_replays')
     protected_job=int(bool(validation) and not uses_validation and counter=='bdf_replays')
     if counter and s.get(counter,0)+protected_job >= b[counter]: raise ValueError('MECHANICS_RESOURCE_CEILING: '+counter)
-    available = min(b['numerical_s']-s['numerical_s']-s['numerical_reserved_s'],s['cutoff_unix']-time.time(),host.store.remaining()['remaining']['wall_s'])
-    if uses_validation:available+=validation['seconds']
+    numerical_available=b['numerical_s']-s['numerical_s']-s['numerical_reserved_s']
+    if uses_validation:numerical_available+=validation['seconds']
+    available = min(numerical_available,s['cutoff_unix']-time.time(),host.store.remaining()['remaining']['wall_s'])
     protection=core.repetition_reserve(s)*core.allowance(s)
     if operation=='solve' and s['spec'].get('mode')=='engineering_numerical':
         verification=s['spec']['mechanics_allowances']['replay_s']

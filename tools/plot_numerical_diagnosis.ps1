@@ -46,7 +46,9 @@ foreach ($description in $plotDescriptions) {
                 if ($curve.name -like 'IE *nodes') { $item.MarkerStyle = 'Circle'; $item.MarkerSize = 5 }
                 if ($curve.name -like '*limit') { $item.BorderDashStyle = 'Dash' }
                 foreach ($point in $curve.points) {
-                    [void]$item.Points.AddXY([double]$point[0], [double]$point[1])
+                    if ([double]$point[0] -ge [double]$panel.x_min - 1e-10 -and [double]$point[0] -le [double]$panel.x_max + 1e-10) {
+                        [void]$item.Points.AddXY([double]$point[0], [double]$point[1])
+                    }
                 }
             }
             $panelIndex++

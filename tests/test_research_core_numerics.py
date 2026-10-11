@@ -80,6 +80,17 @@ class NumericalTests(TestCase):
         other=deepcopy(s['spec']);other.pop('mode');core.update(self.host,spec=other)
         self.assertEqual(core.capacity(self.host,8)['confirmation_launch_reserve'],2)
 
+    def test_reserved_validation_does_not_add_fictitious_activity_time(self):
+        s=core.state(self.host)
+        core.update(self.host,bdf_replays=5,numerical_reserved_s=450,
+            validation_reservation=dict(seconds=450,jobs=1,source=self.source),
+            cutoff_unix=time.time()+450+core.allowance(s)-100)
+        with patch.object(core,'guard'):
+            with self.assertRaisesRegex(ValueError,'REPETITION_RESERVE_CANNOT_FIT'):
+                mechanics.dispatch(self.host,'integrate',dict(source=self.source,method='BDF'),'no-clock-credit')
+        self.assertEqual(core.state(self.host)['bdf_replays'],5)
+        self.assertEqual(core.state(self.host)['numerical_reserved_s'],450)
+
     def test_identical_failing_case_can_use_repetition_reserve(self):
         h=self.host;s=core.state(h);candidate=s['reference_candidate'];c=h.store.artifact(candidate)
         previous=core.save(h,dict(candidate=candidate,profile_identity=s['profile']['identity'],
