@@ -44,3 +44,34 @@ def cached(output):
     return dict(output, operation_reuse=dict(cached_operation_receipt=True,
         additional_numerical_s=0., additional_scientific_executions=0,
         prior_result_costs='retained in saved result numerical_s; not newly incurred by receipt retrieval'))
+
+
+def mechanics_context(host, candidate):
+    from tools.research_core import state
+    s=state(host); relations=[host.store.artifact(r) for r in s.get('handoffs',[])
+        if host.store.artifact(r)['candidate']==plain(candidate)]
+    rows=[]
+    for relation in relations:
+        source=relation['mechanics_attempt']
+        replays=[dict(reference=r,**{k:host.store.artifact(r).get(k) for k in ('status','replay')})
+            for r in s.get('mechanics_results',[]) if host.store.artifact(r).get('source_mechanics')==source]
+        rows.append(dict(mechanics_attempt=source,offline_trajectory=relation['offline_trajectory'],
+            original_offline_task_accepted=relation['original_task_feasible'],relaxed_nlp_feasible=relation['relaxed_nlp_feasible'],
+            independent_model_replays=replays,
+            exploratory_closed_loop=not relation['original_task_feasible'] or not replays or
+                any(not (r.get('replay') or {}).get('gates_passed',False) for r in replays),
+            qualification='Offline task, independent model replay, and MuJoCo acceptance are separate gates.'))
+    # Repeated handoffs are provenance relations, not additional NLPs or replays.
+    unique={r['mechanics_attempt']['artifact_id']:r for r in rows}
+    return list(unique.values())
+
+
+def compact_local(row):
+    keys=('execution_id','historical_input','source_update_id','first_input_n','original_applied_action_n',
+          'exact_initialized_vector_equal','exact_bounds_equal','charged_numerical_s','diagnostic_trace_enabled')
+    result={k:row.get(k) for k in keys};i=dict(row.get('problem_inspection') or {})
+    recovery=i.get('original_recovery_selection') or {}
+    i['original_recovery_selection']={k:recovery.get(k) for k in ('attempted','selected','objective','parent_iteration')}
+    result.update(problem_inspection=i,local_iterations=(row.get('diagnostics') or {}).get('iterations'),
+        local_recovery_selection={k:(row.get('recovery') or {}).get(k) for k in ('attempted','selected','objective','parent_iteration')})
+    return result

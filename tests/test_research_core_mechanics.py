@@ -118,3 +118,41 @@ class MechanicsTests(TestCase):
         inspection=inspect_problem(ws,r)
         self.assertEqual(seen[0],{'z':2.,'a':3.});self.assertEqual(inspection['initial_objective_difference'],0.)
         self.assertTrue(inspection['variable_order_equal'])
+
+    def test_progress_reader_lock_retries_replacement_without_repeating_command(self):
+        from extensions.tendon_family import backends
+        folder=Path(self.temp.name)/'progress';folder.mkdir()
+        observations=[dict(complete_update_record=dict(model_identity='a'*64,resolved_problem={'graph':'fixture'},
+            problem_variables={'x':{'bounds':[1.,1.]}},initial_guess={'x':1.}))]
+        original=backends.atomic_json;attempts=[]
+        def save(path,value):
+            attempts.append(path.name)
+            if path.name=='nmpc_updates.json':
+                path.with_suffix('.json.tmp').write_text(core.json.dumps(value),encoding='utf8')
+                error=PermissionError('injected Windows reader lock');error.winerror=5;raise error
+            original(path,value)
+        with patch.object(backends,'atomic_json',side_effect=save):backends.save_nmpc_progress(folder,observations)
+        saved=core.read(folder/'nmpc_updates.json')[0]['complete_update_record']
+        self.assertNotIn('resolved_problem',saved);self.assertIn('resolved_problem_reference',saved)
+        self.assertEqual(core.read(folder/saved['resolved_problem_reference']['filename']),{'graph':'fixture'})
+        self.assertEqual(attempts.count('nmpc_updates.json'),1);self.assertEqual(len(observations),1)
+        self.assertEqual(saved['problem_variables']['x']['bounds'],[1.,1.])
+
+    def test_structure_improvement_requires_comparable_control_adaptation(self):
+        h=self.host;s=core.state(h);rows=[]
+        def execution(d,weight=.1,role='development',selected=None,error=.003):
+            candidate=core.construct(h,dict(d=d,holding_tip_speed_weight=weight,terminal_tip_speed_weight=.1),{'fixture':True})
+            c=h.store.artifact(candidate)
+            ref=core.save(h,dict(candidate=candidate,profile_identity=s['profile']['identity'],scientific_identity=c['identity'],
+                scientific_configuration=c['scientific_configuration'],status='evaluated',role=role,selected_execution=selected,
+                acceptance=dict(accepted=True,metrics=dict(terminal_error_m=error,holding_max_error_m=error,holding_max_speed_m_s=.01))))
+            rows.append(ref);return ref
+        execution(0.,error=.006);selected=execution(.5)
+        execution(.5,role='confirmation',selected=selected);execution(.5,role='confirmation',selected=selected)
+        core.update(h,results=rows,selected=selected)
+        self.assertTrue(core.claims(h)['limited_repeat_supported_acceptance'])
+        self.assertFalse(core.claims(h)['parameter_improvement_attribution_permitted'])
+        execution(0.,weight=.075,error=.006);execution(.5,weight=.075)
+        core.update(h,results=rows)
+        self.assertTrue(core.claims(h)['comparable_control_adaptation_for_structure_comparison'])
+        self.assertTrue(core.claims(h)['parameter_improvement_attribution_permitted'])

@@ -96,7 +96,8 @@ class CoreTests(TestCase):
         self.assertIn(retrieved['reference'],core.state(self.host)['retrievals'])
 
     def test_confirmation_rejects_complete_configuration_mismatch_before_launch(self):
-        h=self.host;c=core.verify_candidate(h,core.state(h)['reference_candidate'])
+        h=self.host;initial_launches=h.store.remaining()['used']['backend_solves']
+        c=core.verify_candidate(h,core.state(h)['reference_candidate'])
         wrong=dict(candidate=core.state(h)['reference_candidate'],profile_identity=c['profile_identity'],
             scientific_configuration=deepcopy(c['scientific_configuration']),acceptance={'accepted':True})
         wrong['scientific_configuration']['seed']=18
@@ -116,7 +117,7 @@ class CoreTests(TestCase):
             with self.assertRaisesRegex(ValueError,'SELECTED_PASSING_EXECUTION_REQUIRED'):
                 core.dispatch(h,plan,'fixture-nonpassing-selection')
             self.assertIsNone(core.state(h)['selected'])
-        self.assertEqual(h.store.remaining()['used']['backend_solves'],0)
+        self.assertEqual(h.store.remaining()['used']['backend_solves'],initial_launches)
 
     def test_complete_record_path_does_not_require_trace_or_dual_guess(self):
         from extensions.optimization.ipopt import IpoptSolver

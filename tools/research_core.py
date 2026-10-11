@@ -27,6 +27,7 @@ ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_SPEC = ROOT/'examples/research_core/specification.json'
 PYTHON = Path('D:/softrobot-agent/.mainline5-env/Scripts/python.exe')
 SCIENCE_FILES = ['extensions/tendon_family/gvs_nmpc.py', 'extensions/tendon_family/gvs_trajectory.py',
+    'extensions/tendon_family/backends.py',
     'extensions/optimization/ipopt.py', 'extensions/tendon_family/generated_serial.py',
     'extensions/tendon_family/gvs_profile.py', 'tools/design_optimization.py',
     'tools/execution_completion.py', 'tools/research_tasks.py',
@@ -306,12 +307,15 @@ def finish_execution(host, recovery=False):
         scientific_identity=c['identity'],scientific_configuration=c['scientific_configuration'],profile_identity=p['profile_identity'],
         evaluation_version=c['evaluation_version'],selected_execution=p['selected_execution'],
         acceptance=acceptance,profile=profile,execution=result,numerical_s=actual,
-        execution_id=result.get('execution_id'),owner_run_id=p['owner'],operation_key=p['operation_key'],
+        execution_id=result.get('execution_id') or receipts.get('simulation',{}).get('execution_id'),
+        owner_run_id=p['owner'],operation_key=p['operation_key'],
         owning_study=host.run_id, fresh_execution=True, cached_operation_receipt=False,
         candidate_artifact_reuse_does_not_reuse_execution=True,
         facts_classification='program-generated; principal interpretation remains in original plan',
         failure_categories=[] if acceptance and acceptance['accepted'] else
             ['scientific_task_failure'] if acceptance else ['engineering_or_missing_evidence'])
+    from tools.research_core_feedback import mechanics_context
+    detail['mechanics_context']=mechanics_context(host,p['candidate'])
     ref=save(host,detail,'experiment_result'); s=state(host)
     update(host,results=[*s['results'],ref],pending=None,numerical_reserved_s=0.,numerical_s=s['numerical_s']+actual)
     from tools.research_core_feedback import eligibility
@@ -321,11 +325,15 @@ def finish_execution(host, recovery=False):
 
 def compact_result(r):
     profile=r.get('profile') or {}
-    return {k:r.get(k) for k in ('status','role','candidate','candidate_id','scientific_identity','profile_identity','evaluation_version',
+    result={k:r.get(k) for k in ('status','role','candidate','candidate_id','scientific_identity','profile_identity','evaluation_version',
         'selected_execution','acceptance','execution_id','owner_run_id','owning_study','fresh_execution',
-        'cached_operation_receipt','numerical_s','failure_categories')} | dict(
+        'cached_operation_receipt','numerical_s','failure_categories','mechanics_context')} | dict(
         controller_facts={k:profile[k] for k in ('updates','applied_control_updates','initialization_selected','accepted_noninitialization_plans',
             'solver_error_count','unusable_plans','deadline_misses','one_step_prediction_summary') if k in profile})
+    if not result['execution_id']:
+        result['execution_id']=r.get('execution',{}).get('receipts',{}).get('simulation',{}).get('execution_id')
+        result['execution_identity_source']='sealed failed simulation receipt; no completed acceptance implied'
+    return result
 
 
 def search_problem(host, search, admitted):
@@ -396,7 +404,11 @@ def run_search(host, query, key):
         evaluation_profile=s['profile'],initial_latents=initial_latents))
     explored={k:sorted({r['resolved']['parameters'][k] for r in result['evaluated']}) for k in q.variables if k!='d'}
     if 'd' in q.variables: explored['d']=sorted({(r['resolved']['parameters']['lengths_m'][0]-.16)/.0055 for r in result['evaluated']})
-    return dict(result=result,admission=admission,actually_explored=explored,
+    attempted=[dict(reference=r,parameters=host.store.artifact(host.store.artifact(r)['candidate'])['parameters'],
+        **compact_result(host.store.artifact(r))) for r in state(host)['results']
+        if host.store.artifact(r)['operation_key'].startswith(key+':')]
+    return dict(result=result,admission=admission,actually_explored=explored,attempted_executions=attempted,
+        failed_or_incomplete_executions=[r['reference'] for r in attempted if r['status']!='evaluated' or not (r['acceptance'] or {}).get('accepted')],
         requested_variables=q.variables, fixed_parameters=plain(q.fixed), mechanics_source=plain(q.mechanics_source),
         distinct_configurations=len({r['scientific_identity'] for r in result['evaluated']}),
         not_explored=[k for k,v in explored.items() if len(v)<2],
@@ -480,7 +492,11 @@ def local_diagnostic(host, query, key):
         if result['profile_identity']!=s['profile']['identity']: raise ValueError('DIAGNOSTIC_PROFILE_MISMATCH')
         reader=ControlEvidence(host.store); source=reader.resolve(result['execution_id'])
         observations=reader.read_file(source,'controller_observations.json',[])
-        record=observations[q.update_id].get('complete_update_record')
+        record=deepcopy(observations[q.update_id].get('complete_update_record'))
+        if record and record.get('resolved_problem_reference'):
+            definition=record['resolved_problem_reference'];body=host.store.artifact(source['files'][definition['filename']],raw=True)
+            if hashlib.sha256(body).hexdigest()!=definition['sha256']:raise ValueError('RESOLVED_PROBLEM_DEFINITION_HASH_MISMATCH')
+            record['resolved_problem']=json.loads(body)
     if not record: raise ValueError('ACTUAL_COMPLETE_UPDATE_INPUT_REQUIRED')
     seconds=150.; reserve=q.repetitions*seconds
     if (s['local_solves']+q.repetitions>b['local_solves'] or s['local_solve_s']+reserve>b['local_solve_s'] or
@@ -541,18 +557,27 @@ def claims(host):
         m=r['acceptance']['metrics']
         ratios=[m['terminal_error_m']/.01,m['holding_max_error_m']/.01,m['holding_max_speed_m_s']/.02]
         return (max(ratios),sum(ratios))
-    improvement=bool(selected and comparable and score(selected)<min(score(r) for r in comparable))
+    def parameters(r):return host.store.artifact(r['candidate'])['parameters']
+    reference_d=host.store.artifact(s['reference_candidate'])['parameters']['d']
+    same_structure=bool(selected and abs(parameters(selected)['d']-reference_d)<1e-10)
+    def adapted(d):
+        return {(parameters(r)['holding_tip_speed_weight'],parameters(r)['terminal_tip_speed_weight']) for r in rows
+            if r['profile_identity']==current and r['status']=='evaluated' and r['role']!='confirmation' and abs(parameters(r)['d']-d)<1e-10}
+    comparable_adaptation=bool(selected and (same_structure or (len(adapted(reference_d))>=2 and adapted(reference_d)==adapted(parameters(selected)['d']))))
+    reference_structure=[r for r in rows if r['profile_identity']==current and r['status']=='evaluated' and abs(parameters(r)['d']-reference_d)<1e-10]
+    improvement=bool(selected and reference_structure and score(selected)<min(score(r) for r in reference_structure))
     return dict(current_version_comparable_reference_count=len(comparable),selected=s.get('selected'),
         independent_confirmation_count=len(confirmations),confirmation_failures=sum(not (r['acceptance'] or {}).get('accepted',False) for r in confirmations),
         limited_repeat_supported_acceptance=repeat,
         observed_fixed_metric_ranking_improved=improvement,
-        parameter_improvement_attribution_permitted=bool(repeat and improvement and selected['scientific_identity']!=reference),
+        comparable_control_adaptation_for_structure_comparison=comparable_adaptation,
+        parameter_improvement_attribution_permitted=bool(repeat and improvement and comparable_adaptation and selected['scientific_identity']!=reference),
         qualification='Task performance only without current-version comparable reference; two confirmations support limited tested acceptance, not general robustness. Fixed task metrics, never raw weighted NMPC objective.')
 
 
 def packet(host):
     s=state(host)
-    from tools.research_core_feedback import facts, eligibility
+    from tools.research_core_feedback import facts, eligibility, mechanics_context, compact_local
     return dict(specification=s['spec'],evaluation_profile=dict(identity=s['profile']['identity'],version=s['profile']['version'],
         recipe=s['profile']['recipe'],recording=s['profile']['recording'],acceptance=s['profile']['acceptance']),
         reference_candidate=s['reference_candidate'],candidates=[r for r in s['candidates'].values() if host.store.artifact(r)['profile_identity']==s['profile']['identity']],
@@ -561,7 +586,7 @@ def packet(host):
         mechanics_results=[dict(reference=r,**{k:host.store.artifact(r).get(k) for k in
             ('operation','status','trajectory_reference','relaxed_nlp_feasible','original_task_feasible','trajectory_metrics',
              'hard_max_normalized_violation','original_task_gaps','charged_numerical_s','replay','physical_validation')}) for r in s.get('mechanics_results',[])],
-        handoffs=[dict(reference=r,**host.store.artifact(r)) for r in s.get('handoffs',[])],
+        handoffs=[dict(reference=r,**host.store.artifact(r),current_validation=mechanics_context(host,host.store.artifact(r)['candidate'])) for r in s.get('handoffs',[])],
         historical_context=dict(reference=s['historical_context'],
             facts=dict(development=dict(terminal_error_mm=2.912,holding_speed_m_s=.008583,accepted=True),
                 independent_confirmation=dict(holding_speed_m_s=.058648,accepted=False),
@@ -579,10 +604,9 @@ def packet(host):
             facts='All210 inputs complete; actual search only d0/~.05 at .10/.10 and both failed speed; current-version reference2 passes/1 failure; zero confirmations; first divergence update1 despite equal input vectors; unique cause unresolved; previous model identity/cost interpretations were unsupported.'),
         claims=claims(host),actual_retrievals=s['retrievals'],plans=s['plans'],status=s['research_status'],
         diagnostic_facts=s.get('diagnostic_facts',[]),local_diagnostic_evidence=s.get('diagnostics',[]),
-        local_diagnostic_facts=[dict(reference=r,rows=[{k:v.get(k) for k in
-            ('execution_id','historical_input','source_update_id','first_input_n','original_applied_action_n',
-             'exact_initialized_vector_equal','exact_bounds_equal','charged_numerical_s','diagnostic_trace_enabled','problem_inspection')}
-            for v in host.store.artifact(r).get('rows',[])]) for r in s.get('diagnostics',[])])
+        local_diagnostic_facts=[dict(reference=r,rows=[compact_local(v)
+            for v in host.store.artifact(r).get('rows',[])]) for r in s.get('diagnostics',[])],
+        incomplete_execution_evidence=s.get('incomplete_execution_evidence',[]))
 
 
 def dispatch(host, value, request_id, origin='model'):

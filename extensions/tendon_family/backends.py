@@ -1,5 +1,6 @@
 """Existing platform lifecycle and evidence envelopes, independent engine execution."""
 import gzip
+import hashlib
 import json
 import time
 import numpy as np
@@ -10,6 +11,31 @@ from .scene import assemble
 from .contracts import Initial, Data
 from .signals import export
 from .execution import resolve_execution
+
+
+def save_nmpc_progress(folder, observations):
+    """Persist shared graph definitions once and tolerate brief Windows readers."""
+    record=observations[-1].get('complete_update_record',{})
+    definition=record.get('resolved_problem')
+    if definition is not None:
+        name='nmpc_problem_'+record['model_identity']+'.json';path=folder/name
+        if not path.exists():atomic_json(path,definition)
+        record['resolved_problem_reference']=dict(filename=name,
+            sha256=hashlib.sha256(path.read_bytes()).hexdigest(),
+            definition='shared objective/constraints/model; override variables and initial_guess with this update record')
+        del record['resolved_problem']
+    path=folder/'nmpc_updates.json'
+    try:atomic_json(path,observations)
+    except PermissionError as exc:
+        if getattr(exc,'winerror',None) not in (5,32,33):raise
+        # Numerical work has already completed. Retry only the existing temporary
+        # file's replacement, not the controller command or JSON serialization.
+        deadline=time.perf_counter()+2.
+        while True:
+            time.sleep(.05)
+            try:path.with_suffix(path.suffix+'.tmp').replace(path);break
+            except PermissionError:
+                if time.perf_counter()>=deadline:raise
 
 
 def physics_for(inp):
@@ -204,7 +230,7 @@ class MujocoBackend(MatlabBackend):
                         deadline_missed=elapsed>dt)
                     self.controller.last.update(timing)
                     self.controller.observations[-1].update(timing)
-                    atomic_json(self.folder/'nmpc_updates.json',self.controller.observations)
+                    save_nmpc_progress(self.folder,self.controller.observations)
                     if self.controller.stop_requested:
                         complete=False;reason='NMPC_SUSTAINED_UNUSABLE_REPLANNING';break
             else:

@@ -88,6 +88,24 @@ before solving. Historical inputs lack the full resolved serialized problem, and
 a fresh worker does not recreate cache/timing history. Production diagnostics
 retain the original tracing setting; fixed iteration is diagnostic only.
 
+Resolved problem definitions are stored once per graph/horizon in exported
+`nmpc_problem_<identity>.json` files. Each update keeps a hashed file reference and
+its own complete variables/bounds/initial guess. Diagnosis verifies the file hash
+then restores that update's values. Progress replacement retries brief Windows
+reader conflicts for at most2s, outside the numerical solver; it never repeats a
+controller command. A known incomplete launch is charged and its `.tmp` record
+is archived. The first engineering launch hit such a replacement failure after20
+computed updates (19 in the replaced file); two explicitly new launches are
+admitted after repair. Mechanics and BDF are reused, not repeated. A conservative
+dependency migration records the changed storage implementation and keeps all
+old costs and the task-start clock. No extra physical baseline is prescribed.
+
+```powershell
+# Only for this study's known progress-write failure, after committing/migrating:
+& $studyPython -m tools.research_core_demo archive-incomplete --spec $studySpec
+& $studyPython -m tools.research_core_demo continue-control --spec $studySpec
+```
+
 The original target `[.29,.035,.19]` m, physical zero state, mount/gravity,
 discretization/mapping, seed17, six ideal tensions0..8N, `.35s` duration, `.01s`
 control and `.0005s` physics are frozen. Holding includes `.30` through `.35s`, with
