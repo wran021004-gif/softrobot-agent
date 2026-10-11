@@ -75,3 +75,14 @@ class NumericalTests(TestCase):
         self.assertEqual(core.capacity(self.host,8)['confirmation_launch_reserve'],1)
         other=deepcopy(s['spec']);other.pop('mode');core.update(self.host,spec=other)
         self.assertEqual(core.capacity(self.host,8)['confirmation_launch_reserve'],2)
+
+    def test_identical_failing_case_can_use_repetition_reserve(self):
+        h=self.host;s=core.state(h);candidate=s['reference_candidate'];c=h.store.artifact(candidate)
+        previous=core.save(h,dict(candidate=candidate,profile_identity=s['profile']['identity'],
+            scientific_configuration=c['scientific_configuration'],acceptance={'accepted':False},status='evaluated',role='development'))
+        core.update(h,results=[previous])
+        ledger=h.store.remaining();ledger['remaining']['backend_solves']=1
+        with patch.object(core,'guard'),patch.object(h.store,'remaining',return_value=ledger),patch.object(core,'finish_execution',return_value={'fixture':'no simulation'}):
+            value=core.execute(h,candidate,'fixture-repeat',role='diagnostic_repetition',selected=previous)
+            self.assertEqual(value,{'fixture':'no simulation'})
+        self.assertEqual(core.state(h)['pending']['selected_execution'],previous)

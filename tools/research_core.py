@@ -616,6 +616,7 @@ def claims(host):
 def packet(host):
     s=state(host)
     from tools.research_core_feedback import facts, eligibility, mechanics_context, compact_local
+    from tools.research_core_numerics import compact_numerics
     return dict(specification=s['spec'],evaluation_profile=dict(identity=s['profile']['identity'],version=s['profile']['version'],
         recipe=s['profile']['recipe'],recording=s['profile']['recording'],acceptance=s['profile']['acceptance']),
         reference_candidate=s['reference_candidate'],candidates=[r for r in s['candidates'].values() if host.store.artifact(r)['profile_identity']==s['profile']['identity']],
@@ -623,7 +624,8 @@ def packet(host):
         decision_facts=facts(host),
         mechanics_results=[dict(reference=r,**{k:host.store.artifact(r).get(k) for k in
             ('operation','status','trajectory_reference','relaxed_nlp_feasible','original_task_feasible','trajectory_metrics',
-             'hard_max_normalized_violation','original_task_gaps','charged_numerical_s','replay','physical_validation')}) for r in s.get('mechanics_results',[])],
+             'hard_max_normalized_violation','original_task_gaps','charged_numerical_s','replay','physical_validation')},
+             numerical_diagnostics=compact_numerics(host.store.artifact(r))) for r in s.get('mechanics_results',[])],
         handoffs=[dict(reference=r,**host.store.artifact(r),current_validation=mechanics_context(host,host.store.artifact(r)['candidate'])) for r in s.get('handoffs',[])],
         historical_context=dict(reference=s['historical_context'],
             facts=dict(development=dict(terminal_error_mm=2.912,holding_speed_m_s=.008583,accepted=True),
@@ -636,7 +638,10 @@ def packet(host):
             historical_costs='sealed source activity; not transferred or reset',supplied_context=True,autonomous_retrieval=False),
         resource_use=dict(shared_ledger=host.store.remaining(),numerical_s=s['numerical_s'],numerical_reserved_s=s['numerical_reserved_s'],
             local_solves=s['local_solves'],local_solve_s=s['local_solve_s'],admissible_batch=capacity(host,8,root_operation=True)),
-        mechanics_resource_use=dict(offline_nlp=s.get('offline_nlp',0),bdf_replays=s.get('bdf_replays',0)),
+        mechanics_resource_use=dict(offline_nlp=s.get('offline_nlp',0),bdf_replays=s.get('bdf_replays',0),
+            independent_forward_integrations=s.get('bdf_replays',0) if s['spec'].get('mode')=='engineering_numerical' else None,
+            refinement_validation_reservation=s.get('validation_reservation')),
+        engineering_numerical_diagnosis=s.get('numerical_findings'),
         supplied_core_history=dict(reference=s.get('supplied_core_history'),original_study='unified-research-20261011',
             ownership='sealed historical evidence; not a fresh current-study execution',additional_numerical_s=0.,
             facts='All210 inputs complete; actual search only d0/~.05 at .10/.10 and both failed speed; current-version reference2 passes/1 failure; zero confirmations; first divergence update1 despite equal input vectors; unique cause unresolved; previous model identity/cost interpretations were unsupported.'),

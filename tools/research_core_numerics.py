@@ -118,6 +118,7 @@ def offline_diagnostic(request):
     started=time.perf_counter();p=request['diagnostic_parameters'];saved=request['candidate']
     if p.get('investigation')=='closed_loop':return closed_loop_analysis(request)
     w=Workspace(request['configuration'],p.get('substeps',1))
+    if p.get('fixed_interval'):return fixed_input_comparison(w,p['fixed_interval'])
     if request['operation']=='inspect':
         residuals=np.array([np.asarray(w.step(a,b,u,saved['d'])).ravel()
             for a,b,u in zip(saved['states'][:-1],saved['states'][1:],saved['tensions_n'])])
@@ -140,6 +141,51 @@ def offline_diagnostic(request):
     result,trajectory=integrate(w.functions,w.tip,w.velocity,saved,
         request['configuration']['task']['goal']['data']['target_m'],**p.get('tolerances',{}))
     return dict(status=result['status'],method='BDF',replay=result,trajectory=trajectory,forward_integration_jobs=1)
+
+
+def fixed_input_comparison(w,interval):
+    """One independent continuous integration, matched to an archived NMPC interval."""
+    import casadi as ca
+    from scipy.integrate import solve_ivp
+    state=np.asarray(interval['measured_state']);u=np.asarray(interval['applied_tension_n']);d=interval['d']
+    x,tension,rhs=w.functions._linearization_symbols;design=w.functions.design_input
+    rhs_fn=ca.Function('matched_rhs',[x,tension,design],[rhs],{'cse':True})
+    jac_fn=ca.Function('matched_jac',[x,tension,design],[ca.jacobian(rhs,x)],{'ad_weight':1.,'cse':True})
+    t0=interval['time_s'];times=t0+np.arange(21)*.0005
+    solution=solve_ivp(lambda t,y:np.asarray(rhs_fn(y,u,d)).ravel(),(t0,t0+.01),state,
+        method='BDF',jac=lambda t,y:np.asarray(jac_fn(y,u,d)),rtol=1e-10,
+        atol=np.r_[np.full(w.n,1e-11),np.full(w.n,1e-9)],dense_output=True)
+    if not solution.success:return dict(status='failed',message=solution.message,forward_integration_jobs=1)
+    states=solution.sol(times).T
+    trajectory=trajectory_outputs(w,dict(states=states.tolist(),times_s=times.tolist(),d=d))
+    reference=interval['alignment'];prediction=interval['implicit_predicted_state']
+    residual=np.asarray(w.step(state,prediction,u,d)).ravel()
+    actual_v=np.asarray(reference['measured_tip_velocity_m_s']);implicit_v=np.asarray(reference['predicted_tip_velocity_m_s'])
+    continuous_v=np.asarray(trajectory['tip_velocities_m_s'][-1]);actual_p=np.asarray(reference['measured_tip_m'])
+    return dict(status='completed',method='BDF matched NMPC interval',trajectory=trajectory,
+        source_interval=interval,forward_integration_jobs=1,
+        implicit_prediction_same_equations_max_normalized_residual=float(abs(residual).max()),
+        initial_projected_velocity_difference_m_s=float(np.linalg.norm(np.asarray(trajectory['tip_velocities_m_s'][0])-interval['initial_physical_velocity_m_s'])),
+        final_implicit_physical_velocity_difference_m_s=float(np.linalg.norm(implicit_v-actual_v)),
+        final_continuous_physical_velocity_difference_m_s=float(np.linalg.norm(continuous_v-actual_v)),
+        final_implicit_continuous_velocity_difference_m_s=float(np.linalg.norm(implicit_v-continuous_v)),
+        final_continuous_physical_position_difference_m=float(np.linalg.norm(np.asarray(trajectory['tip_positions_m'][-1])-actual_p)),
+        final_implicit_speed_m_s=float(np.linalg.norm(implicit_v)),final_continuous_speed_m_s=float(np.linalg.norm(continuous_v)),
+        final_physical_speed_m_s=float(np.linalg.norm(actual_v)),
+        qualification='Continuous integration starts from the exact recorded projected state; physical realization uses its full MuJoCo state. Remaining error can include projection and model differences.')
+
+
+def compact_numerics(value):
+    result={k:value.get(k) for k in ('method','substeps','metrics','forward_integration_jobs','maximum_normalized_residual',
+        'initial_state_max_abs','implicit_prediction_same_equations_max_normalized_residual',
+        'final_implicit_physical_velocity_difference_m_s','final_continuous_physical_velocity_difference_m_s',
+        'final_implicit_continuous_velocity_difference_m_s','final_physical_speed_m_s') if k in value}
+    if value.get('investigation')=='closed_loop':
+        result['aligned_closed_loop']=[dict(execution_id=r['execution_id'],peak_interval_s=[r['peak_velocity_disagreement']['start_s'],r['peak_velocity_disagreement']['end_s']],
+            peak_velocity_difference_m_s=r['peak_velocity_disagreement']['velocity_difference_m_s'],
+            holding_velocity_difference_m_s=r['holding_velocity_disagreement']['velocity_difference_m_s'],
+            initialization_selected=r['initialization_selected'],noninitialization_accepted=r['noninitialization_accepted'],unusable=r['unusable']) for r in value['runs']]
+    return result
 
 
 def experiment(host,operation,arguments,key,question,changed,fixed,discriminator):

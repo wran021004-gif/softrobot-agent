@@ -72,7 +72,9 @@ def dispatch(host, operation, arguments, key):
         u=np.asarray(c['tensions_n']); clipped=np.clip(u,0.,8.)
         if u.shape!=(35,6) or not np.isfinite(u).all() or np.max(abs(u-clipped))>1e-5:
             raise ValueError('FINITE_BOUNDED_RETURNED_SCHEDULE_REQUIRED')
-        c.update(tensions_n=clipped.tolist(),replay_input_clip_max_n=float(np.max(abs(u-clipped))))
+        if operation in ('integrate','inspect'):
+            c.update(frozen_input_identity=digest(c['tensions_n']),input_bound_tolerance_n=1e-5)
+        else:c.update(tensions_n=clipped.tolist(),replay_input_clip_max_n=float(np.max(abs(u-clipped))))
         request.update(candidate=c,source_mechanics=parameters.get('source',plain(arguments)),diagnostic_parameters=parameters)
     old=host.store.lookup(host.run_id,request['request_id'])
     if old:
@@ -160,6 +162,8 @@ def run_and_settle(host,row,request,pending,recovery=False):
     result=dict(reference=ref,**{k:value.get(k) for k in ('status','operation','execution_id','owning_study','termination_reason',
         'trajectory_reference','checkpoint_reference','relaxed_nlp_feasible','original_task_feasible','hard_max_normalized_violation',
         'trajectory_metrics','original_task_gaps','charged_numerical_s','costs_s','replay','physical_validation')})
+    from tools.research_core_numerics import compact_numerics
+    result['numerical_diagnostics']=compact_numerics(value)
     if value.get('candidate'):
         try:result['handoff']=handoff(host,ref)
         except ValueError as exc: result['handoff_failure']=str(exc)
