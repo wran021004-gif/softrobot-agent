@@ -76,6 +76,17 @@ class MechanicsTests(TestCase):
         self.assertIn('execution did not pass joint task acceptance',eligibility(h,failed)['reasons'])
         core.update(h,research_status='stopped');self.assertFalse(eligibility(h,ref)['eligible'])
 
+    def test_mixed_numerical_and_incomplete_diagnosis_does_not_resolve_physics(self):
+        h=self.host
+        numerical=core.save(h,dict(operation='replay',status='completed',execution_id='bdf-fixture',replay={'gates_passed':False}))
+        failed=core.save(h,dict(status='execution_incomplete',execution_id='failed-physics-fixture'))
+        core.update(h,mechanics_results=[numerical],results=[failed])
+        with patch('extensions.tendon_family.control_evidence.ControlEvidence.resolve',side_effect=AssertionError('no sealed physical export')):
+            output=core.diagnose(h,[numerical,failed])
+        self.assertFalse(output['numerical_evidence'][0]['physical_validation'])
+        self.assertFalse(output['incomplete_executions'][0]['acceptance_available'])
+        self.assertEqual(output['execution_evidence'],[])
+
     def test_boundary_control_search_two_distinct_configs_at_fixed_structure(self):
         from tools.design_optimization import solve
         h=self.host;profile=core.state(h)['profile']

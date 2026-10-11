@@ -445,12 +445,21 @@ def experience(host, query):
 
 def diagnose(host, refs):
     from extensions.tendon_family.control_evidence import ControlEvidence
-    results=[host.store.artifact(r) for r in refs]
-    reader=ControlEvidence(host.store); records=[]
-    for r in results:
-        if not r.get('execution_id'): continue
+    s=state(host); reader=ControlEvidence(host.store); records=[]; numerical=[]; incomplete=[]
+    for ref in refs:
+        r=host.store.artifact(ref)
+        if plain(ref) in s.get('mechanics_results',[]):
+            numerical.append(dict(reference=plain(ref),physical_validation=False,**{k:r.get(k) for k in
+                ('operation','status','execution_id','trajectory_metrics','relaxed_nlp_feasible','original_task_feasible','replay','charged_numerical_s')}))
+            continue
+        if plain(ref) in s['results'] and r.get('status')!='evaluated':
+            incomplete.append(dict(reference=plain(ref),**compact_result(r),acceptance_available=False,
+                archived_partial_evidence=s.get('incomplete_execution_evidence',[])))
+            continue
+        if not r.get('execution_id') or r.get('status')!='evaluated': continue
         source=reader.resolve(r['execution_id']); obs=reader.read_file(source,'controller_observations.json',[])
-        records.append(dict(execution_id=r['execution_id'],observations=obs,source=source))
+        records.append(dict(execution_id=r['execution_id'],observations=obs,source=source,
+            scientific_configuration=r.get('scientific_configuration'),profile_identity=r.get('profile_identity')))
     comparison=[]
     if len(records)>=2:
         a,b=records[-2:]; left=a['observations']; right=b['observations']
@@ -458,6 +467,8 @@ def diagnose(host, refs):
             if x['actual_tension_n']!=y['actual_tension_n']:
                 rx=x.get('complete_update_record',{}); ry=y.get('complete_update_record',{})
                 comparison.append(dict(update_id=index,time_s=x['time_s'],
+                    scientific_configuration_equal=a['scientific_configuration']==b['scientific_configuration'],
+                    evaluation_profile_equal=a['profile_identity']==b['profile_identity'],
                     maximum_action_difference_n=max(abs(i-j) for i,j in zip(x['actual_tension_n'],y['actual_tension_n'])),
                     measured_state_equal=x['measured_initial_state']==y['measured_initial_state'],
                     previous_input_equal=rx.get('previous_applied_input_n')==ry.get('previous_applied_input_n'),
@@ -465,6 +476,7 @@ def diagnose(host, refs):
                     initialized_vector_equal=rx.get('initialization',{}).get('initialized_vector')==ry.get('initialization',{}).get('initialized_vector'),
                     selection=[rx.get('selection'),ry.get('selection')],iterations=[x.get('optimization_selected_iteration'),y.get('optimization_selected_iteration')]))
     value=dict(status='read_only_diagnosis',sources=refs,
+        numerical_evidence=numerical,incomplete_executions=incomplete,
         execution_evidence=[dict(execution_id=r['execution_id'],source=r['source'],updates=len(r['observations']),
             complete_records=sum('complete_update_record' in o for o in r['observations']),
             capture_s=sum(o.get('complete_record_capture_s',0.)+o.get('complete_update_record',{}).get('record_capture_s',0.)+o.get('snapshot_capture_wall_s',0.) for o in r['observations'])) for r in records],
@@ -473,6 +485,7 @@ def diagnose(host, refs):
     ref=save(host,value,'diagnosis')
     update(host,diagnostic_facts=[*state(host).get('diagnostic_facts',[]),dict(reference=ref,
         status=value['status'],first_action_divergence=value['first_action_divergence'],
+        numerical_evidence=numerical,incomplete_executions=incomplete,
         unique_cause=value['unique_cause'],execution_evidence=[{k:r[k] for k in ('execution_id','updates','complete_records','capture_s')} for r in value['execution_evidence']])])
     return dict(reference=ref,**value)
 
@@ -771,7 +784,8 @@ async def converse(host):
                         if kind=='experience': value=experience(host,use['input'])
                         else:
                             q=EvidenceQuery.model_validate(use['input']); value=host.store.artifact(q.reference)
-                            if host.store.remaining()['remaining']['model_calls']<=4 and plain(q.reference) not in state(host)['results']:
+                            current_state=state(host)
+                            if host.store.remaining()['remaining']['model_calls']<=4 and plain(q.reference) not in [*current_state['results'],*current_state.get('mechanics_results',[])]:
                                 raise ValueError('PROTECTED_EVIDENCE_READ_REQUIRES_NEW_RESULT')
                             for part in q.pointer.strip('/').split('/') if q.pointer else []:
                                 part=part.replace('~1','/').replace('~0','~')
@@ -805,7 +819,7 @@ async def converse(host):
             native[0].tool_spec={**native[0].tool_spec,'inputSchema':{'json':schema}}
             agent.tool_registry.registry.pop('experience_retrieve',None)
             schema=EvidenceQuery.model_json_schema()
-            schema['$defs']['EvidenceRef']['properties']['artifact_id']['enum']=[r['artifact_id'] for r in s['results']]
+            schema['$defs']['EvidenceRef']['properties']['artifact_id']['enum']=[r['artifact_id'] for r in [*s['results'],*s.get('mechanics_results',[])]]
             native[2].tool_spec={**native[2].tool_spec,'inputSchema':{'json':schema}}
             retrieval=agent.tool_registry.registry.get('retrieve_context')
             if retrieval:
