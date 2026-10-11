@@ -20,6 +20,8 @@ $studySpec = 'examples/mechanics_control/specification.json'
 & $studyPython -m tools.research_core live --spec $studySpec
 & $studyPython -m tools.research_core status --spec $studySpec
 & $studyPython -m tools.research_core export --spec $studySpec
+# Once native STOP is accepted, package and verify saved evidence without new experiments:
+& $studyPython -m tools.research_core_mechanics_delivery --spec $studySpec
 ```
 
 These are the commands for this study, not a recipe for rerunning a sealed
@@ -124,3 +126,10 @@ They use substituted evaluators and do not add scientific simulations. The bound
 real demonstration is the integration execution. Final evidence includes original
 native decisions, exact source versions, counters, costs, complete execution inputs,
 confirmation status and a hashed non-secret artifact archive.
+
+The completion command verifies every archive member, exact raw failed-run files,
+distinct physical execution identities, settled calls, budget ceilings and no
+provider requests after accepted STOP. It reports the one unavailable input from
+the graph-path failure explicitly. Current mechanics results remain readable in
+protected closeout; read-only mixed diagnosis keeps offline and incomplete
+execution facts separate from complete MuJoCo evidence.
