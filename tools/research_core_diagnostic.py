@@ -13,7 +13,9 @@ from extensions.optimization.ipopt import IpoptSolver
 
 def inspect_problem(ws,recorded):
     """Evaluate saved inputs/plans without calling a numerical optimizer."""
-    order=list(ws.problem.variables)
+    # Artifact JSON sorts dictionary keys. The serialized expression retains
+    # the numerical variable order used by the solver.
+    order=ws.problem.objective_function.data['variable_order']
     initial={k:v for k,v in zip(order,recorded['initialization']['initialized_vector'])}
     check=ws.solver.evaluate_candidate(ws.problem,initial)
     selected=ws.solver.evaluate_candidate(ws.problem,recorded['selected_feasible_plan'])

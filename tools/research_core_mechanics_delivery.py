@@ -71,6 +71,7 @@ def deliver(host):
         engineering_demonstration=s.get('integration_demonstration'),original_plans=plans,
         diagnostics=[dict(reference=r,**host.store.artifact(r)) for r in s.get('diagnostics',[])],
         imported_diagnostic_sources=s.get('historical_diagnostic_sources',[]),
+        diagnostic_inspection_repairs=s.get('diagnostic_inspection_repairs',[]),
         experience_retrievals=s['retrievals'],experience_dispositions=[dict(plan=p['reference'],values=p['original_plan']['experience_disposition'])
             for p in plans if p['original_plan']['experience_disposition']],
         cumulative_resources=core.packet(host)['resource_use'],activity_elapsed_s=elapsed,

@@ -99,3 +99,22 @@ class MechanicsTests(TestCase):
         with patch.object(core,'guard'),patch.object(mechanics.subprocess,'run',side_effect=AssertionError('must not start')):
             with self.assertRaisesRegex(ValueError,'TWO_CONFIRMATIONS'):mechanics.dispatch(h,'solve',{},'no-fit')
         self.assertEqual(core.state(h)['offline_nlp'],0)
+
+    def test_diagnostic_inspection_uses_solver_order_after_sorted_json(self):
+        from tools.research_core_diagnostic import inspect_problem
+        seen=[]
+        def evaluate(problem,values):
+            seen.append(values)
+            return dict(objective=7.,scaled_violation=0.,constraint_values=[0.])
+        problem=SimpleNamespace(variables={'a':{},'z':{}},objective_function=SimpleNamespace(
+            data={'variable_order':['z','a']},model_dump=lambda **kw: {'serialized':'fixture'}),
+            constraints=[SimpleNamespace(name='dynamics',lower=0.,upper=0.)])
+        ws=SimpleNamespace(problem=problem,solver=SimpleNamespace(evaluate_candidate=evaluate),_tail_solver=None)
+        r=dict(initialization={'initialized_vector':[2.,3.],'variable_order':['z','a']},
+            model_identity=core.digest({'serialized':'fixture'}),selected_feasible_plan={'z':2.,'a':3.},
+            prediction_timing={'current_time_s':.01},mutable_workspace={'cached_solver':True},
+            diagnostics=dict(initial_objective=7.,initial_scaled_violation=0.,selected_feasible_candidate={'objective':7.},
+                constraint_values=[0.],constraint_order=['dynamics'],constraint_lower=[0.],constraint_upper=[0.]))
+        inspection=inspect_problem(ws,r)
+        self.assertEqual(seen[0],{'z':2.,'a':3.});self.assertEqual(inspection['initial_objective_difference'],0.)
+        self.assertTrue(inspection['variable_order_equal'])

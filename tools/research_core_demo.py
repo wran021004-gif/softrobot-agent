@@ -65,11 +65,33 @@ def integration(host):
     return dict(reference=ref,status=out['status'],resources=core.packet(host)['resource_use'])
 
 
+def reconcile_inspection(host):
+    """Repair reporting from already-computed initial checks, without a solve."""
+    core.guard(host);s=core.state(host)
+    if s.get('diagnostic_inspection_repairs'):return s['diagnostic_inspection_repairs']
+    refs=[];corrections=[]
+    for ref in s.get('diagnostics',[]):
+        value=host.store.artifact(ref)
+        for row in value.get('rows',[]):
+            inspection=row.get('problem_inspection')
+            if not inspection or not row.get('exact_variable_order_equal'):continue
+            row['original_pre_solve_inspection_report']=dict(inspection)
+            d=row['diagnostics']
+            inspection.update(initial_objective=d['initial_objective'],
+                initial_objective_difference=d['initial_objective']-inspection['original_initial_objective'],
+                initial_violation=d['initial_scaled_violation'],variable_order_equal=row['exact_variable_order_equal'],
+                reporting_correction='Used the actual pre-solve evaluation at the recorded initialized vector in solver order; original mistaken JSON-order report remains preserved.')
+        repaired=core.save(host,value,'diagnostic_inspection_reporting_correction');refs.append(repaired)
+        corrections.append(dict(original=ref,corrected=repaired,additional_numerical_s=0.,additional_solves=0))
+    core.update(host,diagnostics=refs,diagnostic_inspection_repairs=corrections)
+    return dict(status='corrected_from_saved_initial_checks',corrections=corrections)
+
+
 def main():
-    parser=argparse.ArgumentParser();parser.add_argument('command',choices=['diagnostic','integration'])
+    parser=argparse.ArgumentParser();parser.add_argument('command',choices=['diagnostic','integration','reconcile-inspection'])
     parser.add_argument('--spec',type=Path,required=True);args=parser.parse_args()
     spec=core.read(args.spec);host=Host(core.ROOT/'runs'/spec['study_id'],spec['study_id'],actor='unified-research')
-    value=diagnostic(host) if args.command=='diagnostic' else integration(host)
+    value={'diagnostic':diagnostic,'integration':integration,'reconcile-inspection':reconcile_inspection}[args.command](host)
     core.atomic_json(host.store.root/(args.command+'_engineering_receipt.json'),value)
     print(json.dumps({'command':args.command,'status':value.get('status'),
         'receipt':str(host.store.root/(args.command+'_engineering_receipt.json'))}))
