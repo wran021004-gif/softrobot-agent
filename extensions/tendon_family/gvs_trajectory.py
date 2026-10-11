@@ -6,6 +6,7 @@ import casadi as ca
 import numpy as np
 from schemas.platform import Binding, Objective, Payload
 from schemas.platform_math import OptimizationConstraint, OptimizationProblem, SystemContext
+from tools.state_io import digest
 from extensions.optimization.ipopt import IpoptSolver, expression_payload
 from .contracts import GVSModelParameters, GVSTrajectoryParameters
 from .gvs import GVSModel, coordinate_order
@@ -273,7 +274,7 @@ class TrajectoryWorkspace:
         source=warm if warm is not None else self.last
         # Recording is opt-in and never feeds values back into preparation/selection.
         recording = None
-        if self.solver.diagnostic_trace:
+        if self.solver.diagnostic_trace or getattr(self.solver, 'complete_record', False):
             from copy import deepcopy
             recording = dict(warm_source='explicit' if warm is not None else 'previous_selected',
                 warm_before_preparation=None if source is None else deepcopy({k:source[k] for k in ('states','tensions')}))
@@ -318,6 +319,7 @@ class TrajectoryWorkspace:
                 and v<=self.parameters.seed_speed_limit_m_s for e,v in metrics)
         preparation_s=time.perf_counter()-update_start
         start=time.perf_counter(); result=self.solver.solve(self.problem,seed_settled=seed_settled);total=time.perf_counter()-start
+        selected_before_recovery = dict(result.optimum) if getattr(self.solver, 'complete_record', False) else None
         recovery=dict(enabled=self.parameters.recover_returned_tensions,attempted=False,selected=False,wall_s=0.)
         if self.parameters.recover_returned_tensions and result.status in ('converged','iteration_limit','feasible_early_stop'):
             result,recovery=self._recover_returned(result,measured_x)
@@ -363,6 +365,32 @@ class TrajectoryWorkspace:
         output['update_wall_s']=time.perf_counter()-update_start
         if recording is not None:
             output['recording'] = recording
+        if getattr(self.solver, 'complete_record', False):
+            from copy import deepcopy
+            complete_capture_start=time.perf_counter()
+            output['complete_update'] = dict(warm=recording,
+                initialization=deepcopy(self.solver.last_input_record),
+                problem_variables=deepcopy(self.problem.variables),
+                initial_guess=deepcopy(self.problem.initial_guess),
+                raw_returned_plan=deepcopy(self.solver.last_returned_optimum),
+                selected_feasible_plan=selected_before_recovery,
+                recovery_candidate=deepcopy(recovery.get('candidate_optimum')),
+                delivered_plan=dict(result.optimum),
+                measured_state=list(measured_x), previous_applied_input_n=list(previous_u),
+                state_scales=self.state_scales.tolist(), tendon_order=list(self.tendons),
+                effective_horizon=self.parameters.horizon, prediction_timing=prediction_timing,
+                mutable_workspace=dict(last_plan_source='explicit' if warm is not None else 'workspace_last',
+                    cached_solver=self.solver.last_diagnostics['cached_solver'], tail_solver_ready=self._tail_solver is not None),
+                initialization_provenance='execution-local initial_state_pretension then shifted delivered plan; regenerate from measured state',
+                warm_preparation=deepcopy(output['warm_start']),
+                robot_identity=digest(self.robot.model_dump(mode='json')),
+                model_binding=self.problem.model_reference.model_dump(mode='json'),
+                model_identity=digest(self.problem.objective_function.model_dump(mode='json')),
+                controller_identity=digest(self.parameters.model_dump(mode='json')),
+                solver_identity=digest(self.solver.last_input_record['solver_options']),
+                initialization_identity=digest(dict(warm=recording,initialization=self.solver.last_input_record)),
+                diagnostics=deepcopy(self.solver.last_diagnostics), recovery=deepcopy(recovery))
+            output['complete_update']['record_capture_s']=time.perf_counter()-complete_capture_start
         return output
 
     def regenerate_tensions(self,raw,measured_x,*,deadline=None):
@@ -409,7 +437,7 @@ class TrajectoryWorkspace:
             validation_start=time.perf_counter()
             check=self.solver.evaluate_candidate(self.problem,repaired)
             recovery.update({k:v for k,v in check.items() if k!='constraint_values'},validation_s=time.perf_counter()-validation_start)
-            if self.solver.diagnostic_trace:recovery['candidate_optimum']=repaired
+            if self.solver.diagnostic_trace or getattr(self.solver, 'complete_record', False):recovery['candidate_optimum']=repaired
             if check['feasible'] and check['objective']<result.objective_value:
                 recovery['selected']=True
                 recovery['first_command_change_n']=float(max(abs(repaired[f'u/0/{t}']-result.optimum[f'u/0/{t}']) for t in self.tendons))

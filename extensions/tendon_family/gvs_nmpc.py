@@ -101,6 +101,8 @@ class GVSNMPCController:
         start=time.perf_counter();x=np.r_[q,v];error=None;solved=None
         update_id=len(self.observations)
         self.workspace.solver.diagnostic_trace=update_id in self.record_update_ids
+        from .control_evidence import COMPLETE_UPDATE_INPUTS
+        self.workspace.solver.complete_record=COMPLETE_UPDATE_INPUTS.get()
         try:
             solved=self.workspace.solve(x,self.previous,warm=self.seed,elapsed_s=t)
             success=solved['accepted']
@@ -147,6 +149,15 @@ class GVSNMPCController:
         self.observations.append(dict(time_s=t,phase='current_state_before_integration',
             tip_position_m=geometry['tip'].tolist(),gvs_q=list(q),gvs_qdot=list(v),
             measured_initial_state=x.tolist(),graph_construction_s=self.workspace.graph_s,**self.last))
+        if solved is not None and 'complete_update' in solved:
+            capture_start=time.perf_counter()
+            record=solved['complete_update']
+            record.update(update_id=update_id, time_s=float(t), actual_applied_action_n=list(command),
+                plan_identity=self.plan['identity'], coordinate_order=list(self.coordinate_order),
+                selection=dict(accepted=success, source=self.last['plan_source'],
+                    reason=self.last['policy_stop_reason'], failure_response=self.last['failure_response_used']))
+            self.observations[-1]['complete_update_record']=record
+            self.observations[-1]['complete_record_capture_s']=time.perf_counter()-capture_start
         if self.workspace.solver.diagnostic_trace and solved is not None:
             from .control_evidence import capture_snapshot
             capture_start=time.perf_counter()

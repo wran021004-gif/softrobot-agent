@@ -274,6 +274,12 @@ class IpoptSolver:
         construction_s=time.perf_counter()-construction_start
         if self.parameters.print_level:print('IPOPT solver ready',construction_s,'cached',cached,flush=True)
         lbx, ubx, x0 = self._bounds(problem, bundle.variable_order)
+        if getattr(self, 'complete_record', False):
+            self.last_input_record = dict(variable_order=list(bundle.variable_order),
+                initialized_vector=list(x0), variable_lower=[v if math.isfinite(v) else None for v in lbx],
+                variable_upper=[v if math.isfinite(v) else None for v in ubx],
+                solver_options=self.parameters.model_dump(mode='json'),
+                dual_initialization_used=False, call_arguments=['x0', 'lbx', 'ubx', 'lbg', 'ubg'])
         lbg = [-math.inf if item.lower is None else item.lower for item in problem.constraints]
         ubg = [math.inf if item.upper is None else item.upper for item in problem.constraints]
         initial_check_start=time.perf_counter()

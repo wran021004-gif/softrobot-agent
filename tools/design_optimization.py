@@ -134,13 +134,19 @@ def resolved_input(problem,values,run_id,policy):
     return plain(inp)
 
 
-def validate_problem(problem):
+def validate_problem(problem, evaluation_profile=None):
     problem=DesignOptimizationProblem.model_validate(problem)
     topology=structures(problem)
     for structure in topology:
         allocation,initial=continuous_space(problem,structure);decode(problem,structure,initial)
     # Scientific algorithm inherited, with only the declared two weights free.
     expected=family.catalog()['scientific_source']['policy']['controller']['parameters']['data']['recipe']
+    if evaluation_profile is not None:
+        if evaluation_profile.get('adapter') != 'unified_recovery_profile_v1' or not evaluation_profile.get('version'):
+            raise ValueError('VERSIONED_EVALUATION_PROFILE_REQUIRED')
+        expected=deepcopy(evaluation_profile['recipe'])
+        if not expected.get('recover_returned_tensions'):
+            raise ValueError('UNIFIED_PROFILE_REQUIRES_RECOVERY')
     actual=plain(problem.execution.recipe)
     for name in ('holding_tip_speed_weight','terminal_tip_speed_weight'):
         actual.pop(name);expected=deepcopy(expected);expected.pop(name,None)
@@ -226,7 +232,7 @@ def evaluate(problem,structure,latent,candidate_id,phase,evaluator,feedback=None
     resolved=resolve_report(cfg,values) if cfg else dict(parameters=values,segment_count=values['segment_count'],
         tendon_count=values['proximal_tendons']+values['distal_tendons'],actuator_count=values['proximal_tendons']+values['distal_tendons'])
     allocation,_=continuous_space(problem,structure)
-    return plain(EvaluatedDesign(candidate_id=candidate_id,phase=phase,scientific_identity=digest(values),
+    return plain(EvaluatedDesign(candidate_id=result.get('candidate_id',candidate_id),phase=phase,scientific_identity=result.get('scientific_identity',digest(values)),
         latent_coordinates=latent,resolved=resolved,feasible=a['accepted'],objective_values=dict(**m,
             max_normalized_ratio=max(ratios),sum_normalized_ratio=sum(ratios)),
         constraint_outcomes=dict(physical_acceptance=a,length_sum=abs(sum(values['lengths_m'])-problem.lengths.total_flexible_length_m)<=1e-12,
@@ -234,13 +240,13 @@ def evaluate(problem,structure,latent,candidate_id,phase,evaluator,feedback=None
         evidence=result['evidence'],execution_status=a['status'],used_feedback=feedback))
 
 
-def solve(problem,host=None,*,evaluator=None,state=None,save_state=None):
+def solve(problem,host=None,*,evaluator=None,state=None,save_state=None,evaluation_profile=None):
     """Bounded outer enumeration + feedback-directed inner coordinate proposals.
 
     Pending decoded proposals are sealed before execution. Recovery calls the
     existing complete_execution chain, which never repeats a sealed simulation.
     """
-    problem,topology=validate_problem(problem);identity=digest(plain(problem))
+    problem,topology=validate_problem(problem,evaluation_profile);identity=digest(dict(problem=plain(problem),evaluation_profile=evaluation_profile)) if evaluation_profile else digest(plain(problem))
     if host is not None:
         state=host.store.session(host.run_id)['state'].get('design_searches',{}).get(identity)
         evaluator=evaluator or ReceiptEvaluator(host)
@@ -276,7 +282,7 @@ def solve(problem,host=None,*,evaluator=None,state=None,save_state=None):
                 if inner['iteration']%(2*len(names))==0:inner['step']/=2
             values=decode(problem,structure,latent);scientific=digest(values)
             state['proposal_count']+=1
-            if any(r['scientific_identity']==scientific for r in state['evaluated']):
+            if any(digest(r['resolved']['parameters'])==scientific for r in state['evaluated']):
                 state['updates'].append(dict(kind='exact_cache_hit_no_backend',scientific_identity=scientific))
                 if state['proposal_count']>128:state['termination']='duplicate_proposal_limit'
                 save_state(state);continue

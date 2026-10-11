@@ -14,6 +14,7 @@ from tools.platform_store import plain
 from tools.state_io import digest
 
 RECORD_UPDATE_IDS = ContextVar('control_evidence_update_ids', default=())
+COMPLETE_UPDATE_INPUTS = ContextVar('complete_control_update_inputs', default=False)
 # Optional evidence capture after actuator application and before backend stepping.
 # The observer cannot supply a command or alter controller selection.
 PRE_STEP_OBSERVER = ContextVar('control_evidence_pre_step_observer', default=None)
