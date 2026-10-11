@@ -3,6 +3,7 @@ from typing import Literal
 from pydantic import Field, FiniteFloat, model_validator
 from schemas.common import Contract
 from schemas.platform import EvidenceRef
+from schemas.casadi_feedback import Candidate as MechanicsChoice
 
 
 class Parameters(Contract):
@@ -18,6 +19,7 @@ class Search(Contract):
     max_evaluations: int = Field(default=3, ge=1, le=8, strict=True)
     step: FiniteFloat = Field(default=.25, gt=0, le=.5)
     ranking: Literal['feasible_then_max_normalized_violation_then_sum_v1'] = 'feasible_then_max_normalized_violation_then_sum_v1'
+    mechanics_source: EvidenceRef | None = None
 
     @model_validator(mode='after')
     def domain(self):
@@ -39,7 +41,7 @@ class LocalDiagnostic(Contract):
 
 
 class Plan(Contract):
-    action: Literal['propose', 'execute', 'search', 'diagnose', 'confirm', 'stop']
+    action: Literal['propose', 'execute', 'search', 'mechanics', 'replay', 'diagnose', 'confirm', 'stop']
     hypothesis: str = Field(min_length=1)
     supporting_evidence: list[EvidenceRef] = Field(default_factory=list)
     expected_observation: str = Field(min_length=1)
@@ -52,15 +54,22 @@ class Plan(Contract):
     candidate: EvidenceRef | None = None
     selected_execution: EvidenceRef | None = None
     diagnostic: LocalDiagnostic | None = None
+    mechanics: MechanicsChoice | None = None
+    mechanics_source: EvidenceRef | None = None
     experience_disposition: dict[str, Literal['adopted', 'rejected', 'context_only']] = Field(default_factory=dict)
 
     @model_validator(mode='after')
     def required(self):
-        required = {'propose': 'parameters', 'execute': 'candidate', 'search': 'search', 'confirm': 'selected_execution'}
+        required = {'propose': 'parameters', 'execute': 'candidate', 'search': 'search', 'confirm': 'selected_execution',
+                    'mechanics': 'mechanics', 'replay': 'mechanics_source'}
         active = required.get(self.action)
-        for field in ('parameters', 'search', 'candidate', 'selected_execution'):
+        for field in ('parameters', 'search', 'candidate', 'selected_execution', 'mechanics'):
             if (getattr(self, field) is not None) != (field == active):
                 raise ValueError('ACTION_REQUIRES_ONLY_' + str(active))
+        if self.action=='replay' and self.mechanics_source is None:
+            raise ValueError('REPLAY_REQUIRES_OWNED_MECHANICS_RESULT')
+        if self.mechanics_source is not None and self.action not in ('propose','replay'):
+            raise ValueError('MECHANICS_SOURCE_REQUIRES_PROPOSE_OR_REPLAY; SEARCH_HAS_ITS_OWN_SOURCE')
         if self.diagnostic is not None and self.action!='diagnose':
             raise ValueError('LOCAL_DIAGNOSTIC_REQUIRES_DIAGNOSE_ACTION')
         return self

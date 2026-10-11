@@ -7,6 +7,32 @@ import numpy as np
 from schemas.platform import SessionInput
 from tools.state_io import read, atomic_json, digest
 from extensions.tendon_family.gvs_trajectory import TrajectoryWorkspace
+from schemas.platform_math import OptimizationProblem
+from extensions.optimization.ipopt import IpoptSolver
+
+
+def inspect_problem(ws,recorded):
+    """Evaluate saved inputs/plans without calling a numerical optimizer."""
+    order=list(ws.problem.variables)
+    initial={k:v for k,v in zip(order,recorded['initialization']['initialized_vector'])}
+    check=ws.solver.evaluate_candidate(ws.problem,initial)
+    selected=ws.solver.evaluate_candidate(ws.problem,recorded['selected_feasible_plan'])
+    old=recorded['diagnostics']
+    return dict(serialized_model_identity_equal=digest(ws.problem.objective_function.model_dump(mode='json'))==recorded['model_identity'],
+        complete_original_problem_available='resolved_problem' in recorded,
+        initial_objective=check['objective'],original_initial_objective=old['initial_objective'],
+        initial_objective_difference=check['objective']-old['initial_objective'],
+        initial_violation=check['scaled_violation'],original_initial_violation=old['initial_scaled_violation'],
+        selected_objective=selected['objective'],original_selected_objective=old['selected_feasible_candidate']['objective'],
+        maximum_selected_constraint_difference=max(abs(a-b) for a,b in zip(selected['constraint_values'],old['constraint_values'])),
+        variable_order_equal=order==recorded['initialization']['variable_order'],
+        constraint_order_equal=[c.name for c in ws.problem.constraints]==old['constraint_order'],
+        constraint_bounds_equal=all((c.lower,c.upper)==(lo,hi) for c,lo,hi in zip(ws.problem.constraints,old['constraint_lower'],old['constraint_upper'])),
+        prediction_timing=recorded['prediction_timing'],
+        original_mutable_workspace=recorded['mutable_workspace'],
+        reconstructed_mutable_workspace=dict(cached_solver=False,tail_solver_ready=ws._tail_solver is not None),
+        original_recovery_selection=recorded.get('recovery'),
+        qualification='Numeric agreement at saved points does not prove equality of every derivative or recreate timing/cache history.')
 
 
 def replay(request):
@@ -14,17 +40,29 @@ def replay(request):
     recorded=request['record']; recipe=dict(inp.policy.controller.parameters.data['recipe'])
     recipe['horizon']=recorded['effective_horizon']
     n=len(recorded['coordinate_order'])
-    ws=TrajectoryWorkspace(inp.task,inp.robot,recipe,[0.]*(2*n),[.2]*len(recorded['tendon_order']),
+    nominal=recorded.get('nominal_workspace',dict(x=[0.]*(2*n),u=[.2]*len(recorded['tendon_order'])))
+    ws=TrajectoryWorkspace(inp.task,inp.robot,recipe,nominal['x'],nominal['u'],
         settling=inp.policy.controller.parameters.data['settling'])
+    ws._set_prediction_time(recorded['prediction_timing']['current_time_s'])
+    if 'resolved_problem' in recorded:
+        ws.problem=OptimizationProblem.model_validate(recorded['resolved_problem'])
     ws.problem.variables.clear(); ws.problem.variables.update(recorded['problem_variables'])
     ws.problem.initial_guess.clear(); ws.problem.initial_guess.update(recorded['initial_guess'])
-    ws.solver.complete_record=True;ws.solver.diagnostic_trace=True
+    ws.solver=IpoptSolver(recorded['initialization']['solver_options'])
+    inspection=inspect_problem(ws,recorded)
+    ws.solver.complete_record=True
+    # Original update 1 had tracing disabled. Do not add timed callbacks when
+    # reconstructing production-policy behavior.
+    ws.solver.diagnostic_trace=recorded.get('diagnostic_trace_enabled','iteration_trace' in recorded['diagnostics'])
     if request['mode']=='fixed_iteration': ws.solver.diagnostic_work_cap=request['iteration_cap']
     result=ws.solver.solve(ws.problem,seed_settled=recorded['warm_preparation']['seed_settled'])
     selected=dict(result.optimum)
-    result,recovery=ws._recover_returned(result,recorded['measured_state'])
+    recovery=dict(enabled=ws.parameters.recover_returned_tensions,attempted=False,selected=False)
+    if ws.parameters.recover_returned_tensions and result.status in ('converged','iteration_limit','feasible_early_stop'):
+        result,recovery=ws._recover_returned(result,recorded['measured_state'])
     check=ws.solver.evaluate_candidate(ws.problem,result.optimum)
     return dict(mode=request['mode'],production_stopping_policy_unchanged=request['mode']=='production',
+        problem_inspection=inspection,diagnostic_trace_enabled=ws.solver.diagnostic_trace,
         iteration_cap=request['iteration_cap'] if request['mode']=='fixed_iteration' else None,
         original_input_identity=recorded['initialization_identity'],
         exact_initialized_vector_equal=ws.solver.last_input_record['initialized_vector']==recorded['initialization']['initialized_vector'],
@@ -35,7 +73,7 @@ def replay(request):
         verification=check,first_input_n=[result.optimum['u/0/'+t] for t in recorded['tendon_order']],
         original_applied_action_n=recorded['actual_applied_action_n'],
         numerical_s=time.perf_counter()-started,
-        qualification='Local identical-input comparison only; not physical task performance or unique causal attribution')
+        qualification='Recorded vector and problem comparison; cache/timing history is not recreated. No physical task performance or unique causal attribution.')
 
 
 if __name__=='__main__':

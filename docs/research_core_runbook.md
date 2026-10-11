@@ -1,5 +1,9 @@
 # Unified reach-and-hold research entry
 
+For the fresh mechanics/control integration, use the explicitly scoped commands
+in [mechanics_control_runbook.md](mechanics_control_runbook.md). The study below
+is historical and sealed; its default specification must not be executed again.
+
 Actual base: `1311b1228b1f01464b1ff3683482d923cb73ef03` from
 `origin/feat/nmpc-settling-followup`, fetched once with no newer commits.
 Worktree: `D:\softrobot-agent\.worktrees\unified-research-core`.

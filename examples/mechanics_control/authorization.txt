@@ -1,0 +1,245 @@
+Continue development of `softrobot-agent` through implementation, bounded scientific execution, documentation, commits, and push. Deliver the next usable research capability, with honest evidence of what works and what remains unresolved.
+
+I authorize committing the code, documentation, and non-secret evidence within this scope and normally pushing them to the `feat/mechanics-control-mainline` branch of https://github.com/wran021004-gif/softrobot-agent.git. I authorize new model requests and scientific experiments within the budgets below. Proceed autonomously through the steps; routine implementation choices, scoped fixes, experiments, commits, and ordinary pushes do not require further confirmation. Preserve unrelated work and existing history; do not force-push.
+
+1. Establish the working context efficiently.
+
+The verified source branch is `feat/unified-research-core`, at commit:
+
+`653530f67097deb064a23290b48054c5b59059c2`
+
+Fetch once and inspect whether that branch has advanced. Use this commit, or a compatible newer descendant after reviewing the relevant delta. Record the actual base. Do not restart from `main` or the older `1311b122` delivery.
+
+Create or reuse a suitable worktree for `feat/mechanics-control-mainline`. The expected Windows environment is:
+
+- Repository: `D:\softrobot-agent`
+- Suggested worktree: `D:\softrobot-agent\.worktrees\mechanics-control-mainline`
+- Shell: PowerShell
+- Python: `D:\softrobot-agent\.mainline5-env\Scripts\python.exe`
+- Existing lock: `requirements-strands-mainline5.lock`
+- Verified packages: Python 3.11.16, NumPy 2.4.6, SciPy 1.17.1, CasADi 3.7.2, MuJoCo 3.13.0, strands-agents 1.59.0, strands-harness 0.2.0.
+
+Reuse this environment. Inspect alternatives only if the documented interpreter is actually unavailable.
+
+Credentials are at `$HOME\.codex\.env`, equivalent to `Path.home() / ".codex" / ".env"`. Reuse the existing credential loader in `examples/gvs_nmpc_route_experiment.py`. Never print or commit credentials or authorization headers.
+
+Reuse the current native Strands research harness and its resolved provider configuration: DeepSeek `deepseek-flash`, thinking enabled, high reasoning effort, 32768 output tokens, and 600-second request timeout. The research core obtains this through `tools.research_v2.native_configuration`; the defaults in `configs/deepseek.yaml` are not the complete effective configuration. Preserve the established transport and sequential tool execution. No extra research agents, model judges, or connectivity-probe requests are needed.
+
+Start with these files, then follow relevant dependencies:
+
+- `docs/research_core_completion.md`
+- `docs/research_core_runbook.md`
+- `examples/research_core/specification.json`
+- `schemas/research_core.py`
+- `tools/research_core.py`
+- `tools/research_core_diagnostic.py`
+- `tools/design_optimization.py`
+
+For the mechanics integration, inspect:
+
+- `extensions/tendon_family/gvs_codesign.py`
+- `tools/casadi_feedback_worker.py`
+- `tools/casadi_codesign_worker.py`
+- `schemas/casadi_feedback.py`
+- The relevant portions of `tools/casadi_feedback_service.py`, `tools/casadi_codesign_service.py`, and `docs/casadi_feedback_closeout_runbook.md`.
+
+Avoid a broad repository audit.
+
+The delivered study is sealed. Create a fresh specification with a new study ID, actual start timestamp, this authorization, and independent counters. Use `--spec` consistently with the existing `tools.research_core` entry. Do not execute historical runbook commands against their default sealed study or reset historical budgets.
+
+2. Preserve what is already delivered and address the actual remaining gaps.
+
+The current core already provides direct parameter proposals, mathematical coordinate search, shared evaluation, independent execution identities, complete controller-update records, confirmation checks, budget accounting, and read-only experience retrieval. Extend these capabilities rather than rebuilding them.
+
+Relevant findings from the latest delivery:
+
+- All 210 controller-update attempts have complete input records.
+- The actual search evaluated `d=0` and approximately `d=0.05`; both control weights remained `0.10`. It therefore did not demonstrate an actual control-weight search.
+- Both search evaluations failed holding-speed acceptance.
+- The current-version reference has two passing executions and one failing execution. There were no independent post-selection confirmations.
+- In the recorded version-2 comparison, actions first diverged at update 1, at `0.01 s`, despite equal measured state, previous input, full warm-start source, and initialized vector.
+- Two reconstructed local solves agreed with each other, but their traced workspaces differed from the original execution. The unique cause remains unresolved.
+- The model confused immutable candidate identity with fresh execution identity and misinterpreted a real, positive-cost, study-owned execution as a zero-cost replay.
+- Offline schedule initialization and legacy skill admission remain deferred.
+
+The older `.10/.10` development pass and failed independent confirmation remain historical evidence, not proof of stable acceptance.
+
+The main development objective is to connect:
+
+**Mechanics-based structural and motion optimization → candidate handoff → control-parameter search at fixed structure → closed-loop feedback and independent confirmation → LLM selection of the next research action.**
+
+Keep the following optimization responsibilities explicit:
+
+| Operation | Numerical variables | Role |
+|---|---|---|
+| Offline mechanics optimization | Existing structural coordinate, states, and tensions | Generate or revise structural/motion candidates |
+| Runtime NMPC | Predicted states and future tensions | Control a fixed robot using fixed controller settings |
+| Outer control search | Selected NMPC weights | Adapt control to a fixed structural candidate |
+| Optional closed-loop structural search | Existing structural coordinate | Evidence-driven local correction, when justified |
+
+Use the existing coordinate-search method for outer control search. Implementing Bayesian optimization or differentiating through the complete NMPC/MuJoCo loop is unnecessary.
+
+Keep both research entrances: the LLM may propose explicit parameter values or configure a numerical search. They must share construction, evaluation, provenance, and accounting.
+
+This round excludes PCC, surrogate screening, additional structural parameters, topology expansion, new tasks, natural-language task decomposition, formal baseline campaigns, and a new memory infrastructure. Offline trajectory initialization and legacy skill admission are optional enhancements and must not delay the main delivery.
+
+3. Repair decision feedback and perform a bounded repeatability investigation.
+
+Make the model-facing feedback sufficient to use the existing interfaces correctly.
+
+Clearly distinguish:
+
+- Immutable candidate/configuration identity.
+- Fresh execution identity and owning study.
+- Imported historical evidence.
+- A cached operation receipt.
+- Previous execution cost versus additional cost incurred by the current operation.
+
+Identical configurations may legitimately share a candidate artifact while having separate executions and positive costs.
+
+Return exact usable evidence references, current confirmation eligibility, and concrete reasons for ineligibility. Confirmation must cite the required passing execution reference, not a candidate hash, receipt identifier, or unowned historical result. After an invalid submission, expose the relevant facts and valid reference shape without prescribing the scientific decision.
+
+Keep original model interpretations separate from program facts. Metadata such as role or phase does not establish a scientific configuration difference.
+
+Verify these feedback changes primarily with recorded results and focused fixtures.
+
+For repeatability, use the existing complete records and diagnostic worker. Investigate why reconstructed workspaces differ before treating a replay as the identical original optimization problem. Inspect the resolved problem, time schedule, initialization, bounds, objective/constraint values, relevant mutable state, and recovery selection.
+
+Use at most four new standalone local NMPC solves, with a combined 600-second allowance. A fixed-iteration comparison is permitted as a diagnostic, not an automatic production-policy replacement.
+
+Implement a narrowly justified correction if the evidence identifies one. Otherwise, report the unresolved mechanism and observed variability. Do not launch an open-ended repeatability campaign or make a unique causal diagnosis a prerequisite for integrating the research tools.
+
+Preserve complete records for new executions. Engineering completion means differences can be inspected and assessed; it does not mean the controller has been proved reliable.
+
+4. Connect the existing mechanics optimizer to the current study.
+
+Reuse the established CasADi/GVS implementation, retained-candidate logic, independent BDF replay, and checkpoint recovery.
+
+The older service wrappers contain historical study IDs, specifications, counters, and grants. Adapt or extract their numerical operations into a small current-study interface. Do not reopen an old activity, reset its counters, or select an old authorization mode through environment switches.
+
+The new interface must use the current study’s configuration, budget, evidence store, and provenance. Expose the mechanics solve and replay as research capabilities available to the LLM.
+
+Keep the existing structural domain:
+
+- `d ∈ [-1, 1]`
+- Near length: `0.16 + 0.0055*d` metres
+- Far length: `0.11 - 0.0055*d` metres
+- Total length: `0.27` metres.
+
+Return enough information for a real handoff: resolved structure, time grid, state and tension trajectories, variable ordering, objective definition, solver termination, raw versus retained selection, hard residuals, original task violations, replay results, and measured costs.
+
+Separate relaxed feasibility, original task acceptance, independent numerical replay, and MuJoCo closed-loop acceptance. BDF is an independent integration check of the model, not independent physical validation.
+
+Construct the corresponding closed-loop candidate through the existing shared constructor. Preserve the relationship to its mechanics attempt and trajectory evidence even when construction returns an already-existing immutable candidate.
+
+A structurally valid candidate whose offline trajectory fails may enter an explicitly exploratory closed-loop evaluation. Preserve the failure flags and do not relabel it as an offline success.
+
+Initially pass the optimized structure into the existing goal-based NMPC. Store the offline trajectory as evidence. Using that trajectory as an NMPC initial guess is optional.
+
+Preserve recovery from completed solver checkpoints: packaging or serialization failures must not silently cause a second optimization.
+
+5. Demonstrate actual control-weight search and run a genuine feedback session.
+
+For control adaptation, hold the selected structure fixed and allow the numerical search to vary one or both existing fields:
+
+- `holding_tip_speed_weight ∈ [0.025, 0.10]`
+- `terminal_tip_speed_weight ∈ [0.025, 0.10]`.
+
+Keep unused coordinates fixed. Record requested variables, actual evaluated values, distinct configurations, failures, and partial batches. Handle boundary initialization so a declared search does not silently evaluate only duplicates or structural changes.
+
+Rank with the existing fixed task metrics and ranking rule. Do not compare weighted NMPC objective values across different weights as if they used an unchanged scale.
+
+Preserve the frozen reach-and-hold task and established production recipe:
+
+- Target `[0.29, 0.035, 0.19]` metres.
+- Existing mount, gravity, robot discretization, and state mapping.
+- Duration `0.35 s`; control/sample interval `0.01 s`; physics step `0.0005 s`.
+- Inclusive holding samples from `0.30` through `0.35 s`.
+- Position tolerance `0.01 m`; holding-speed tolerance `0.02 m/s`.
+- Seed 17, physical zero initialization, six independent ideal tendon tensions bounded by `0–8 N`.
+- Recovery-enabled NMPC, initially using `.10/.10`, with the existing solver stopping policy.
+
+The `0.2 N` numerical initialization is not physical pretension or an equilibrium assumption. Offline optimization weights are separate from NMPC weights.
+
+Use two distinct acceptance activities:
+
+First, perform a minimal engineering-directed integration demonstration, explicitly labeled as engineering-selected:
+
+- One bounded real mechanics optimization using the existing structural degree of freedom.
+- Independent replay when a usable returned schedule exists.
+- Handoff of a valid returned structure to a real numerical control search.
+- At least two distinct control-weight configurations evaluated at that fixed structure.
+
+These are real scientific executions and count against the shared budget. Their purpose is to establish that the requested tools actually connect and operate. A pass is not required, and an optimizer returning the initial structure is not evidence of structural improvement.
+
+If a step cannot produce a usable output, preserve the failure and report that portion as incomplete. A control search on the reference structure can demonstrate that tool separately, but cannot substitute for a missing mechanics-to-control handoff.
+
+Then run one bounded native LLM feedback session using the actual results. The model must be able to choose a direct proposal, mechanics optimization, control search, permitted local structural search, diagnosis, confirmation, evidence retrieval, or STOP.
+
+The mainline defines tool responsibilities; it must not force every model decision through a fixed sequence. Let the model choose whether evidence supports control adaptation, structural revision, numerical/model diagnosis, or stopping. Do not encode rules such as “overspeed means increase this weight,” or claim saturation alone proves a structural limitation.
+
+Reuse existing read-only experience retrieval. Supplied startup examples are provided context, not autonomous retrieval. Record any actual retrieval and adoption or rejection; legacy drafts retain their status.
+
+Keep engineering-selected actions separate from LLM-selected actions. Do not count a prescribed integration demonstration as autonomous research.
+
+If the model selects a passing candidate for confirmation, use fresh independent executions with the complete configuration frozen. Preserve failures. Two successful confirmations support only the repository’s limited repeat-supported conclusion, not general robustness.
+
+Accept a justified STOP. Do not restart the session, manufacture a different model decision, or rerun until a passing outcome appears.
+
+6. Apply one shared, bounded budget.
+
+Create these ceilings in the fresh specification before scientific dispatch:
+
+| Resource | Maximum |
+|---|---:|
+| Actual provider requests | 32 |
+| Public workflow operations | 128 |
+| New full offline NLP attempts | 2 |
+| New independent BDF replays | 2 |
+| Full MuJoCo closed-loop launches | 8 |
+| Standalone local NMPC solves | 4 |
+| Combined standalone local-solve allowance | 600 s |
+| Total charged numerical time | 10,800 s |
+| Total activity duration, including engineering | 12 hours |
+| Protected delivery time | Final 30 minutes |
+| Protected provider requests for feedback/closeout | Final 4 |
+
+These are ceilings, not targets. Stop unnecessary work as soon as the delivery is sufficiently supported.
+
+Reuse established per-operation time limits and admission accounting. Include the mechanics solve and replay costs in the shared numerical budget. Preserve capacity for two confirmation launches and their existing combined 3,800-second allowance when admitting exploratory work. Reserve closeout capacity before launching additional experiments.
+
+Count all internal search evaluations, failed starts, timeouts, and real numerical checks. Internal NMPC recovery belongs to its enclosing simulation and must not be charged twice. Imported evidence and cached receipts do not constitute new scientific executions.
+
+Reuse completed results after recoverable reporting failures. Unknown outcomes retain their reservation until resolved; do not blindly repeat them.
+
+Commit and bind the implementation/specification before scientific execution. Use the existing migration mechanism for necessary repairs, preserving clocks, counters, and prior evidence. Version genuine scientific changes; avoid unnecessary new references for reporting-only edits. Include newly connected scientific dependencies in the appropriate provenance.
+
+Measure the actual costs of both offline optimization and closed-loop search. Do not assume the mechanics stage is cheap.
+
+7. Verify proportionately and deliver.
+
+Do not over-test or over-engineer.
+
+Use focused checks for the changed identity feedback, mechanics handoff, fixed-structure control search, shared accounting, and checkpoint recovery. Reuse existing relevant fixtures. Run the affected checks after concrete fixes; avoid repository-wide test campaigns, repeated historical derivative studies, dependency upgrades, generic defensive frameworks, and tests that merely mirror implementation.
+
+The bounded real integration demonstration is the scientific integration check. Do not add redundant simulations under a separate “testing” label.
+
+Report these outcomes separately:
+
+- Engineering interfaces connected.
+- Mechanics candidate successfully handed into closed-loop evaluation.
+- Actual numerical control-weight search performed.
+- LLM consumed real feedback and made a legal next decision or STOP.
+- Task improvement observed.
+- Independent confirmation supported or failed.
+- Repeatability limitations resolved or remaining.
+
+Comparisons between structures require comparable control-adaptation opportunities. If the evidence does not meet that condition, describe observations without attributing superiority to the structure.
+
+Update the runbook and write a concise completion report. Preserve a compact non-secret evidence archive containing the fresh specification, actual source versions, original model decisions, results, complete execution records, provenance, costs, and confirmation status. Clearly list unfinished optional enhancements.
+
+Finish by committing the scoped implementation, documentation, and evidence; normally push `feat/mechanics-control-mainline`; and verify the remote commit SHA.
+
+The final response should state what changed, the focused verification performed, actual scientific outcomes and costs, remaining limitations, and the pushed branch/commit with links to the report and evidence. Do not claim stable success, autonomous discovery, or causal diagnosis beyond what the recorded evidence supports.
+
+Proceed autonomously through implementation and delivery. Stop for user input only when an actual access blocker or a decision outside this authorization prevents further meaningful work.

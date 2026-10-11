@@ -369,6 +369,9 @@ class TrajectoryWorkspace:
             from copy import deepcopy
             complete_capture_start=time.perf_counter()
             output['complete_update'] = dict(warm=recording,
+                resolved_problem=self.problem.model_dump(mode='json'),
+                nominal_workspace=dict(x=self.nominal_x,u=self.nominal_u),
+                diagnostic_trace_enabled=self.solver.diagnostic_trace,
                 initialization=deepcopy(self.solver.last_input_record),
                 problem_variables=deepcopy(self.problem.variables),
                 initial_guess=deepcopy(self.problem.initial_guess),
