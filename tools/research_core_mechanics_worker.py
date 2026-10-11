@@ -22,6 +22,9 @@ def main():
                 dict(study_id=request['study_id'], request_id=request['request_id'],
                      implementation=request['implementation'], execution_id=row['execution_id']))
         elif request['operation'] == 'recover': value = recover(read(request['progress']))
+        elif request['operation'] in ('integrate','inspect'):
+            from tools.research_core_numerics import offline_diagnostic
+            value=offline_diagnostic(request)
         else:
             from tools.casadi_codesign_worker import replay
             value = replay(request['configuration'], request['candidate'])

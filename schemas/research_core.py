@@ -38,6 +38,8 @@ class LocalDiagnostic(Contract):
     repetitions: int = Field(default=2,ge=1,le=2,strict=True)
     mode: Literal['production', 'fixed_iteration'] = 'production'
     iteration_cap: int = Field(default=8,ge=1,le=120,strict=True)
+    reuse_solver: bool = False
+    prepare_tail: bool = False
 
 
 class Plan(Contract):

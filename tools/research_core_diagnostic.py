@@ -40,6 +40,9 @@ def inspect_problem(ws,recorded):
 def replay(request):
     started=time.perf_counter(); inp=SessionInput.model_validate(request['configuration'])
     recorded=request['record']; recipe=dict(inp.policy.controller.parameters.data['recipe'])
+    if recorded.get('resolved_problem_archive'):
+        from tools.research_core_numerics import archived
+        recorded=dict(recorded,resolved_problem=archived(**recorded['resolved_problem_archive']))
     recipe['horizon']=recorded['effective_horizon']
     n=len(recorded['coordinate_order'])
     nominal=recorded.get('nominal_workspace',dict(x=[0.]*(2*n),u=[.2]*len(recorded['tendon_order'])))
@@ -50,22 +53,40 @@ def replay(request):
         ws.problem=OptimizationProblem.model_validate(recorded['resolved_problem'])
     ws.problem.variables.clear(); ws.problem.variables.update(recorded['problem_variables'])
     ws.problem.initial_guess.clear(); ws.problem.initial_guess.update(recorded['initial_guess'])
-    ws.solver=IpoptSolver(recorded['initialization']['solver_options'])
+    options=dict(recorded['initialization']['solver_options'])
+    if request['mode']=='fixed_iteration':
+        options.update(max_cpu_s=None,max_wall_s=None,max_iterations=request['iteration_cap']+1)
+    ws.solver=IpoptSolver(options)
     inspection=inspect_problem(ws,recorded)
     ws.solver.complete_record=True
     # Original update 1 had tracing disabled. Do not add timed callbacks when
     # reconstructing production-policy behavior.
     ws.solver.diagnostic_trace=recorded.get('diagnostic_trace_enabled','iteration_trace' in recorded['diagnostics'])
     if request['mode']=='fixed_iteration': ws.solver.diagnostic_work_cap=request['iteration_cap']
+    if request.get('prepare_tail'):ws._prepare_tail()
+    prefix=None
+    if request.get('reuse_solver'):
+        prefix=_solve_record(ws,recorded)
+    value=_solve_record(ws,recorded)
+    value.update(mode=request['mode'],production_stopping_policy_unchanged=request['mode']=='production',
+        problem_inspection=inspection,diagnostic_trace_enabled=ws.solver.diagnostic_trace,
+        iteration_cap=request['iteration_cap'] if request['mode']=='fixed_iteration' else None,
+        stopping_controls=dict(options=options,callback_policy_enabled=request['mode']=='production',
+            fixed_cap_may_stop_early_on_convergence=True,external_timeout_s=150.*(1+int(bool(request.get('reuse_solver'))))),
+        solver_reused=bool(request.get('reuse_solver')),tail_prepared_before_solve=bool(request.get('prepare_tail')),
+        prefix=prefix,numerical_s=time.perf_counter()-started,
+        qualification='Recorded inputs; reuse prefix repeats this same input and does not recreate historical preceding-update/cache/timing history. Fixed work disables solver CPU/wall and feasible-return timers; convergence remains enabled.')
+    return value
+
+
+def _solve_record(ws,recorded):
     result=ws.solver.solve(ws.problem,seed_settled=recorded['warm_preparation']['seed_settled'])
     selected=dict(result.optimum)
     recovery=dict(enabled=ws.parameters.recover_returned_tensions,attempted=False,selected=False)
     if ws.parameters.recover_returned_tensions and result.status in ('converged','iteration_limit','feasible_early_stop'):
         result,recovery=ws._recover_returned(result,recorded['measured_state'])
     check=ws.solver.evaluate_candidate(ws.problem,result.optimum)
-    return dict(mode=request['mode'],production_stopping_policy_unchanged=request['mode']=='production',
-        problem_inspection=inspection,diagnostic_trace_enabled=ws.solver.diagnostic_trace,
-        iteration_cap=request['iteration_cap'] if request['mode']=='fixed_iteration' else None,
+    return dict(
         original_input_identity=recorded['initialization_identity'],
         exact_initialized_vector_equal=ws.solver.last_input_record['initialized_vector']==recorded['initialization']['initialized_vector'],
         exact_variable_order_equal=ws.solver.last_input_record['variable_order']==recorded['initialization']['variable_order'],
@@ -74,8 +95,8 @@ def replay(request):
         selected_feasible_plan=selected,recovery=recovery,diagnostics=ws.solver.last_diagnostics,
         verification=check,first_input_n=[result.optimum['u/0/'+t] for t in recorded['tendon_order']],
         original_applied_action_n=recorded['actual_applied_action_n'],
-        numerical_s=time.perf_counter()-started,
-        qualification='Recorded vector and problem comparison; cache/timing history is not recreated. No physical task performance or unique causal attribution.')
+        accepted_plan=result.optimum,
+        delivered_tension_n=[result.optimum['u/0/'+t] for t in recorded['tendon_order']])
 
 
 if __name__=='__main__':

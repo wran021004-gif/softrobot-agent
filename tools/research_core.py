@@ -36,7 +36,7 @@ SCIENCE_FILES = ['extensions/tendon_family/gvs_nmpc.py', 'extensions/tendon_fami
     'tools/casadi_feedback_worker.py', 'tools/casadi_codesign_worker.py',
     'tools/research_core_mechanics.py', 'tools/research_core_mechanics_worker.py']
 CORE_FILES = ['tools/research_core.py','tools/research_core_diagnostic.py','schemas/research_core.py',
-              'tools/research_core_feedback.py','tools/research_core_demo.py']
+              'tools/research_core_feedback.py','tools/research_core_demo.py','tools/research_core_numerics.py']
 
 
 def save(host, value, kind='core_evidence'):
@@ -77,6 +77,8 @@ def limits(spec):
 
 def prepare(spec_path=DEFAULT_SPEC, directory=None):
     spec = read(spec_path); run_id = spec['study_id']
+    if spec.get('mode') == 'engineering_numerical' and (spec['budgets']['provider_requests'] != 0 or spec['budgets']['protected_provider_requests'] != 0):
+        raise ValueError('NUMERICAL_MODE_REQUIRES_ZERO_MODEL_REQUESTS')
     directory = Path(directory or ROOT/'runs'/run_id)
     h = Host(directory, run_id, actor='unified-research')
     if h.store.db.exists():
@@ -175,10 +177,14 @@ def allowance(s):
     return sum(s['spec']['execution_allowances'].values())
 
 
+def repetition_reserve(s):
+    return s['spec'].get('diagnostic_protocol', {}).get('repetition_launch_reserve', 1) if s['spec'].get('mode') == 'engineering_numerical' else 2
+
+
 def capacity(host, requested=1, confirmation=False, *, root_operation=False):
     """Admit all internal launches, with two full confirmation slots and time."""
     s=state(host); b=s['spec']['budgets']; a=allowance(s)
-    remaining=host.store.remaining()['remaining']; protect=0 if confirmation else 2
+    remaining=host.store.remaining()['remaining']; protect=0 if confirmation else repetition_reserve(s)
     science=b['numerical_s']-s['numerical_s']-s['numerical_reserved_s']
     available_time=min(science, s['cutoff_unix']-time.time(), remaining['wall_s'])
     fit=max(0,min(requested,int(remaining['backend_solves'])-protect,math.floor(available_time/a)-protect,
@@ -196,7 +202,10 @@ def guard(host, expensive=False):
     if science_hashes()!=s['profile']['science_hashes'] or core_hashes()!=s.get('core_hashes') or not host.compatibility()['compatible']:
         raise ValueError('DEPENDENCIES_CHANGED_COMMIT_AND_MIGRATE_WITHOUT_RESETTING_COSTS')
     if time.time()>=s['cutoff_unix']: raise ValueError('PROTECTED_DELIVERY_WINDOW')
-    if expensive and host.store.remaining()['remaining']['model_calls']<=s['spec']['budgets']['protected_provider_requests']:
+    if s['spec'].get('mode') == 'engineering_numerical':
+        if host.store.remaining()['used']['model_calls'] or s['pilot']['live_model_requests']:
+            raise ValueError('NUMERICAL_MODE_MODEL_REQUEST_VIOLATION')
+    elif expensive and host.store.remaining()['remaining']['model_calls']<=s['spec']['budgets']['protected_provider_requests']:
         raise ValueError('LAST_FOUR_PROVIDER_REQUESTS_PROTECTED')
 
 
@@ -245,6 +254,13 @@ def execute(host, candidate_ref, operation_key, *, role='development', selected=
     construction_started=time.perf_counter()
     guard(host,expensive=True); s=state(host); c=verify_candidate(host,candidate_ref)
     confirmation=role=='confirmation'
+    repetition=role=='diagnostic_repetition'
+    if repetition:
+        if s['spec'].get('mode') != 'engineering_numerical' or plain(selected) not in s['results']:
+            raise ValueError('OWNED_DIAGNOSTIC_REPETITION_REQUIRED')
+        old=host.store.artifact(selected)
+        if old['candidate'] != plain(candidate_ref) or old['profile_identity'] != s['profile']['identity']:
+            raise ValueError('REPETITION_REQUIRES_IDENTICAL_CONFIGURATION')
     if confirmation:
         old=host.store.artifact(selected)
         if old['candidate']!=plain(candidate_ref) or old['profile_identity']!=s['profile']['identity'] or old['scientific_configuration']!=c['scientific_configuration']:
@@ -252,7 +268,7 @@ def execute(host, candidate_ref, operation_key, *, role='development', selected=
         if not old.get('acceptance',{}).get('accepted'): raise ValueError('SELECTED_PASSING_EXECUTION_REQUIRED')
         if sum(host.store.artifact(r)['role']=='confirmation' and host.store.artifact(r).get('selected_execution')==plain(selected) for r in s['results'])>=2:
             raise ValueError('TWO_POST_SELECTION_CONFIRMATIONS_ALREADY_RECORDED')
-    admission=capacity(host,1,confirmation)
+    admission=capacity(host,1,confirmation or repetition)
     if admission['admitted']<1: raise ValueError('EXECUTION_AND_CONFIRMATION_RESERVE_CANNOT_FIT')
     # A unique execution owner is persisted before starting any backend.
     owner=host.run_id+'-exec-'+uuid4().hex[:16]
@@ -513,15 +529,17 @@ def local_diagnostic(host, query, key):
             if digest(record['resolved_problem']['objective_function'])!=record['model_identity']:
                 raise ValueError('RESOLVED_PROBLEM_EXPRESSION_IDENTITY_MISMATCH')
     if not record: raise ValueError('ACTUAL_COMPLETE_UPDATE_INPUT_REQUIRED')
-    seconds=150.; reserve=q.repetitions*seconds
-    if (s['local_solves']+q.repetitions>b['local_solves'] or s['local_solve_s']+reserve>b['local_solve_s'] or
-        s['numerical_s']+s['numerical_reserved_s']+reserve+2*allowance(s)>b['numerical_s'] or
-        time.time()+reserve+2*allowance(s)>=s['cutoff_unix']):
+    seconds=150.*(1+int(q.reuse_solver)); reserve=q.repetitions*seconds
+    solves=q.repetitions*(1+int(q.reuse_solver)); protection=repetition_reserve(s)*allowance(s)
+    if (s['local_solves']+solves>b['local_solves'] or s['local_solve_s']+reserve>b['local_solve_s'] or
+        s['numerical_s']+s['numerical_reserved_s']+reserve+protection>b['numerical_s'] or
+        time.time()+reserve+protection>=s['cutoff_unix']):
         raise ValueError('LOCAL_DIAGNOSTIC_AND_CONFIRMATION_RESERVE_CANNOT_FIT')
     rows=[]
     for index in range(q.repetitions):
         request_id=key+'-local-'+str(index)
-        request=dict(configuration=source['configuration'],record=record,mode=q.mode,iteration_cap=q.iteration_cap)
+        request=dict(configuration=source['configuration'],record=record,mode=q.mode,iteration_cap=q.iteration_cap,
+            reuse_solver=q.reuse_solver,prepare_tail=q.prepare_tail)
         old=host.store.lookup(host.run_id,request_id)
         if old:
             if old['request_hash']!=digest(request): raise ValueError('DIAGNOSTIC_OPERATION_COLLISION')
@@ -529,12 +547,16 @@ def local_diagnostic(host, query, key):
             rows.append(host.store.artifact(json.loads(old['receipt'])['output'])); continue
         def charge(db):
             current=host.store.session(host.run_id,db)['state']
-            if current['local_solves']>=b['local_solves']: raise ValueError('LOCAL_SOLVE_CEILING')
-            current['local_solves']+=1;current['numerical_reserved_s']+=seconds
+            count=1+int(q.reuse_solver)
+            if current['local_solves']+count>b['local_solves']: raise ValueError('LOCAL_SOLVE_CEILING')
+            current['local_solves']+=count;current['numerical_reserved_s']+=seconds
             host.store.update_state(db,host.run_id,current)
         row,_=host.store.reserve(host.run_id,request_id,digest(request),host.actor,{**zero(),'wall_s':seconds},kind='local_diagnostic',guard=charge)
         folder=host.store.root/'local_diagnostics'/row['execution_id'];folder.mkdir(parents=True,exist_ok=True)
         inp,out=folder/'input.json',folder/'output.json';atomic_json(inp,request)
+        update(host,pending=dict(kind='local_diagnostic',worker_request_id=request_id,input=str(inp),output=str(out),
+            reserved_s=seconds,source_execution=plain(q.execution),source_update_id=q.update_id,historical_input=imported,
+            started_unix=time.time(),origin='engineering' if s['spec'].get('mode')=='engineering_numerical' or key.startswith('engineering') else 'model'))
         start=time.perf_counter();env=os.environ.copy();env.update(OPENBLAS_NUM_THREADS='1',OMP_NUM_THREADS='1',MKL_NUM_THREADS='1')
         try:
             process=subprocess.run([str(PYTHON),'-m','tools.research_core_diagnostic',str(inp),str(out)],cwd=ROOT,
@@ -545,10 +567,11 @@ def local_diagnostic(host, query, key):
         elapsed=time.perf_counter()-start
         value.update(execution_id=row['execution_id'],charged_numerical_s=elapsed,source_execution=plain(q.execution),
             historical_input=imported,owning_study=host.run_id,
-            source_update_id=q.update_id,origin='engineering' if key.startswith('engineering') else 'model')
+            source_update_id=q.update_id,origin='engineering' if s['spec'].get('mode')=='engineering_numerical' or key.startswith('engineering') else 'model',
+            charged_solve_attempts=1+int(q.reuse_solver))
         with host.store.transaction() as db:
             current=host.store.session(host.run_id,db)['state']
-            current['numerical_s']+=elapsed;current['local_solve_s']+=elapsed;current['numerical_reserved_s']-=seconds
+            current['numerical_s']+=elapsed;current['local_solve_s']+=elapsed;current['numerical_reserved_s']-=seconds;current['pending']=None
             host.store.update_state(db,host.run_id,current)
             host.store.complete(row,dict(request_id=request_id,execution_id=row['execution_id'],caller=host.actor,
                 tool_id='research.core_local_solve',tool_version='1.0.0',execution_status='completed',charged=zero()),value,elapsed=elapsed,db=db)
@@ -736,6 +759,8 @@ superiority claims. Current facts refresh at model boundaries; Strands owns hist
 
 
 async def converse(host):
+    if state(host)['spec'].get('mode') == 'engineering_numerical':
+        raise ValueError('NUMERICAL_MODE_FORBIDS_APPLICATION_MODEL_ENDPOINTS')
     from strands.tools.tools import PythonAgentTool
     from strands.tools.executors import SequentialToolExecutor
     from strands.hooks.events import BeforeModelCallEvent, BeforeToolCallEvent, AfterToolCallEvent
@@ -851,6 +876,9 @@ async def converse(host):
 
 
 def recover(host):
+    if (state(host).get('pending') or {}).get('kind') == 'local_diagnostic':
+        from tools.research_core_numerics import recover_local
+        return recover_local(host)
     from tools.strands_pilot_r3 import pending as provider_pending, received, settle
     for row in provider_pending(host):
         response=received(host,row['request_id'])

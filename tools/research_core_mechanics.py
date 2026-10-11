@@ -12,7 +12,7 @@ from tools.platform_store import plain, zero
 
 def source(host, reference):
     from tools.research_core import state
-    if plain(reference) not in state(host).get('mechanics_results', []):
+    if plain(reference) not in [*state(host).get('mechanics_results', []), *state(host).get('imported_mechanics_sources', [])]:
         raise ValueError('OWNED_CURRENT_STUDY_MECHANICS_RESULT_REQUIRED')
     value = host.store.artifact(reference)
     if value['operation'] != 'solve' or not value.get('candidate'):
@@ -44,10 +44,20 @@ def handoff(host, reference, parameters=None, provenance=None):
 def dispatch(host, operation, arguments, key):
     from tools import research_core as core
     core.guard(host,True); s = core.state(host); b = s['spec']['budgets']
-    reserve = s['spec']['mechanics_allowances'][operation+'_s']; counter = 'offline_nlp' if operation=='solve' else 'bdf_replays'
-    if s.get(counter,0) >= b[counter]: raise ValueError('MECHANICS_RESOURCE_CEILING: '+counter)
+    reserve = s['spec']['mechanics_allowances'][operation+'_s']; counter = 'offline_nlp' if operation=='solve' else None if operation=='inspect' else 'bdf_replays'
+    validation=s.get('validation_reservation')
+    source_ref=plain(arguments).get('source') if operation in ('integrate','inspect') else plain(arguments) if operation=='replay' else None
+    uses_validation=bool(validation and source_ref==validation.get('source') and counter=='bdf_replays')
+    protected_job=int(bool(validation) and not uses_validation and counter=='bdf_replays')
+    if counter and s.get(counter,0)+protected_job >= b[counter]: raise ValueError('MECHANICS_RESOURCE_CEILING: '+counter)
     available = min(b['numerical_s']-s['numerical_s']-s['numerical_reserved_s'],s['cutoff_unix']-time.time(),host.store.remaining()['remaining']['wall_s'])
-    if available < reserve+2*core.allowance(s): raise ValueError('MECHANICS_AND_TWO_CONFIRMATIONS_CANNOT_FIT')
+    if uses_validation:available+=validation['seconds']
+    protection=core.repetition_reserve(s)*core.allowance(s)
+    if operation=='solve' and s['spec'].get('mode')=='engineering_numerical':
+        verification=s['spec']['mechanics_allowances']['replay_s']
+        if s.get('bdf_replays',0)+1>b['bdf_replays'] or available < reserve+verification+protection:
+            raise ValueError('REFINEMENT_AND_INDEPENDENT_INTEGRATION_RESERVE_CANNOT_FIT')
+    if available < reserve+protection: raise ValueError('MECHANICS_AND_REPETITION_RESERVE_CANNOT_FIT')
     cfg,_ = core.configuration_for(host,s['spec']['reference_parameters'],host.run_id)
     request = dict(study_id=host.run_id,store_root=str(host.store.root),request_id=key+'-mechanics',
         operation=operation,configuration=cfg,implementation=s['freeze'],science_hashes=s['profile']['science_hashes'])
@@ -56,16 +66,31 @@ def dispatch(host, operation, arguments, key):
         if request['arguments'].get('source_candidate'):
             request['saved_tensions']=source(host,request['arguments']['source_candidate'])['candidate']['tensions_n']
     else:
-        v=source(host,arguments); c=deepcopy(v['candidate'])
+        parameters=plain(arguments) if operation in ('integrate','inspect') else {}
+        v=source(host,parameters['source'] if parameters else arguments); c=deepcopy(v['candidate'])
         import numpy as np
         u=np.asarray(c['tensions_n']); clipped=np.clip(u,0.,8.)
         if u.shape!=(35,6) or not np.isfinite(u).all() or np.max(abs(u-clipped))>1e-5:
             raise ValueError('FINITE_BOUNDED_RETURNED_SCHEDULE_REQUIRED')
         c.update(tensions_n=clipped.tolist(),replay_input_clip_max_n=float(np.max(abs(u-clipped))))
-        request.update(candidate=c,source_mechanics=plain(arguments))
+        request.update(candidate=c,source_mechanics=parameters.get('source',plain(arguments)),diagnostic_parameters=parameters)
+    old=host.store.lookup(host.run_id,request['request_id'])
+    if old:
+        if old['request_hash']!=digest(request):raise ValueError('NUMERICAL_OPERATION_ID_COLLISION')
+        if not old['receipt']:raise ValueError('UNKNOWN_NUMERICAL_OUTCOME_RECOVER_NO_REPEAT')
+        reference=json.loads(old['receipt'])['output'];value=host.store.artifact(reference)
+        return dict(reference=reference,status=value.get('status'),operation=operation,
+            operation_reuse=dict(additional_numerical_s=0.,additional_scientific_executions=0),
+            original_charged_numerical_s=value['charged_numerical_s'])
     def charge(db):
         current=host.store.session(host.run_id,db)['state']
-        current[counter]=current.get(counter,0)+1; current['numerical_reserved_s']+=reserve
+        if counter:current[counter]=current.get(counter,0)+1
+        if uses_validation:
+            current['numerical_reserved_s']-=validation['seconds'];current['validation_reservation']=None
+        if operation=='solve' and s['spec'].get('mode')=='engineering_numerical':
+            current['validation_reservation']=dict(seconds=verification,jobs=1,source=None)
+            current['numerical_reserved_s']+=verification
+        current['numerical_reserved_s']+=reserve
         host.store.update_state(db,host.run_id,current)
     row,_=host.store.reserve(host.run_id,request['request_id'],digest(request),host.actor,
         {**zero(),'wall_s':reserve},kind='mechanics',guard=charge)
@@ -125,6 +150,10 @@ def run_and_settle(host,row,request,pending,recovery=False):
         current=host.store.session(host.run_id,db)['state']
         current['numerical_s']+=charged;current['numerical_reserved_s']-=reserve;current['pending']=None
         current['mechanics_results']=[*current.get('mechanics_results',[]),ref]
+        if request['operation']=='solve' and current.get('validation_reservation'):
+            if value.get('candidate'):current['validation_reservation']['source']=ref
+            else:
+                current['numerical_reserved_s']-=current['validation_reservation']['seconds'];current['validation_reservation']=None
         host.store.update_state(db,host.run_id,current)
         host.store.complete(row,dict(request_id=row['request_id'],execution_id=row['execution_id'],caller=host.actor,
             tool_id='research.core_mechanics',tool_version='1.0.0',execution_status='completed',charged=zero()),value,elapsed=charged,db=db)
