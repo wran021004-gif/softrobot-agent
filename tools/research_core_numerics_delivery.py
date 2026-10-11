@@ -185,7 +185,7 @@ def build(host):
         limitations=['Grid refinement supports transcription error and numerical damping as a hypothesis; modal dissipation is not uniquely isolated.',
             'The original resolved offline NLP and earlier-controller runtime cache/history are unavailable; saved-point agreement is not a full runtime reconstruction.',
             'Fixed-work agreement is restricted to this complete update and does not establish production bitwise determinism.',
-            'Accurate integration improves the initial matched interval but does not explain the final holding error; projection/model and planning contributions remain unresolved.',
+            'Accurate integration improves the initial matched interval but does not explain the final fixed-input one-step discrepancy; effects on the complete closed loop and projection/model versus planning contributions remain unresolved.',
             'No control law/weight change, structural search or offline trajectory initialization was introduced.',
             'No offline refinement started: remaining integration slots were used for accuracy and matched model checks; no independent verification job remains.',
             'Two physical repetitions on one frozen task/seed give an observed range only; no stable parameter ranking or general robustness claim.'])
@@ -257,7 +257,7 @@ def _report(out,s):
         '|---|---:|---:|---:|']
     for row in c['matched_fixed_input']:
         lines.append(f"| update {row['source_update_id']} | {row['final_implicit_physical_velocity_difference_m_s']:.9f} | {row['final_continuous_physical_velocity_difference_m_s']:.9f} | {row['final_implicit_continuous_velocity_difference_m_s']:.9f} |")
-    lines+= ['', '两段保存的一步预测在同一 mass/force 方程下残差分别接近机器精度与 3.3e-11。初始区间说明离线与 NMPC 确有共同积分误差机制；末端区间里 IE/BDF 只差约 0.000985 m/s，物理误差却约 0.022 m/s。积分精度不能解释保持失败；投影/模型差异及软保持规划的贡献仍未分离。保持世界位置投影误差约 3 mm，单凭该值也不能确定主因。没有进行权重扫描或无依据的提前制动修改。','',
+    lines+= ['', '两段保存的一步预测在同一 mass/force 方程下残差分别接近机器精度与 3.3e-11。初始区间说明离线与 NMPC 确有共同积分误差机制；末端区间里 IE/BDF 只差约 0.000985 m/s，物理误差却约 0.022 m/s。该末端固定输入一步误差不能单由积分精度解释；投影/模型差异及软保持规划的贡献仍未分离。这不排除更精细积分改善整个闭环的可能性。保持世界位置投影误差约 3 mm，单凭该值也不能确定主因。没有进行权重扫描或无依据的提前制动修改。','',
         '![历史主案例的对齐反馈](../evidence/numerical_diagnosis_20261011/closed_loop_alignment.png)','',
         '## 两次新完整闭环与成本','',
         '| 新执行 | 保持位置误差 mm | 保持速度 m/s | 原任务接受 |',
@@ -268,7 +268,7 @@ def _report(out,s):
         '评价规则：每个待比较配置都需匹配的独立重复；保留失败与观察范围；范围重叠或求解变动尚未在性能尺度上测清时，拒绝参数优劣结论。一次有利结果不建立改进，固定迭代也不作为生产修复。', '',
         '![新主配置重复](../evidence/numerical_diagnosis_20261011/physical_repetitions.png)','',
         f"数值成本 {r['charged_numerical_s']:.3f}/10800 s；独立 NMPC {r['standalone_nmpc_attempts']}/8 次、{r['standalone_nmpc_s']:.3f}/1200 s（含两个前置解）；独立积分 {r['independent_integration_jobs']}/6；离线重优化 {r['offline_refinement_attempts']}/1；MuJoCo {r['mujoco_launches']}/4；模型请求 {r['research_model_requests']}/0。闭环内部 {r['internal_closed_loop_updates']} 次 NMPC 更新只计入各自仿真，没有重复收费。活动时间包含实施与交付，最大 8 h。",'',
-        '10 项独立的针对性检查通过；没有运行全仓套件、种子扫描或额外 smoke。70 条新控制输入与其原问题链接均验证；原研究缺失的一条输入仍不补造。归档/成员哈希已校验。', '',
+        f"{s['verification']['unique_focused_checks']} 项独立的针对性检查通过；没有运行全仓套件、种子扫描或额外 smoke。70 条新控制输入与其原问题链接均验证；原研究缺失的一条输入仍不补造。归档/成员哈希已校验。", '',
         '最小下一实验：新预算内，从主案例末端保存的完整 MuJoCo 状态与对应投影状态出发，固定同一命令，对比初始世界运动、短区间加速度和投影残差，区分降阶/状态投影误差与反馈规划误差；之后才选择控制适配。原离线候选若需要进一步优化，应使用更细转录并预留独立 BDF 验证，不能用旧离散任务通过作为验证。', '',
         '[诊断规范](../examples/numerical_diagnosis/specification.json) · [运行说明](numerical_diagnosis_runbook.md) · [机器摘要](../evidence/numerical_diagnosis_20261011/scientific_summary.json) · [归档清单](../evidence/numerical_diagnosis_20261011/archive_manifest.json) · [原封存报告](mechanics_control_completion.md)']
     (core.ROOT/'docs/numerical_diagnosis_completion.md').write_text('\n'.join(lines)+'\n',encoding='utf8')
