@@ -199,7 +199,11 @@ def bind(host, reason=None):
             raise ValueError('UNSEALED_RESERVATION_BLOCKS_BIND')
     old=host.store.session(host.run_id)['snapshot']; snapshot=compile_input(old['input'],host.reg)
     commit=subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip()
-    profile=deepcopy(s['profile']); changed=science_hashes()!=profile['science_hashes']
+    profile=deepcopy(s['profile'])
+    science_prefixes=('backend.','candidate.','controller.','evaluate.','initialize.','model.','solver.','task.')
+    changed_dependencies=[name for name,value in snapshot['dependencies'].items()
+        if name.startswith(science_prefixes) and old['dependencies'].get(name)!=value]
+    changed=science_hashes()!=profile['science_hashes'] or bool(changed_dependencies)
     if 'freeze' in s and not reason: raise ValueError('MIGRATION_REASON_REQUIRED')
     if changed:
         profile.pop('identity'); profile['version']+=1; profile['science_hashes']=science_hashes()
@@ -209,11 +213,13 @@ def bind(host, reason=None):
         ref=host.store.put(db,snapshot)
         db.execute('UPDATE sessions SET snapshot=? WHERE run_id=?',(ref.artifact_id,host.run_id))
         current=host.store.session(host.run_id,db)['state']
-        current.update(freeze=commit,profile=profile,core_hashes=core_hashes())
+        current.update(freeze=commit,profile=profile,core_hashes=core_hashes(),
+            scientific_dependencies={k:v for k,v in snapshot['dependencies'].items() if k.startswith(science_prefixes)})
         if changed: current['profile_history'].append(profile)
         if reason:
-            current.setdefault('repairs',[]).append(dict(reason=reason,previous_commit=s.get('freeze'),commit=commit,
+            current.setdefault('core_repairs',[]).append(dict(reason=reason,previous_commit=s.get('freeze'),commit=commit,
                 evaluation_version=profile['version'],material_behavior_change=changed,
+                changed_scientific_dependencies=changed_dependencies,
                 old_results_and_costs_retained=True,improvement_requires_new_comparable_reference=changed))
         host.store.update_state(db,host.run_id,current)
         host.store.event(db,host.run_id,'implementation_binding','committed',outputs=[ref])
@@ -607,6 +613,15 @@ async def converse(host):
     from tools.strands_pilot import build_harness
     from tools.strands_pilot_r3 import LiveBoundary, live_model_class, record, pending
     from examples.gvs_nmpc_route_experiment import load_credential
+    def feedback_context_references():
+        refs=[]
+        for event in host.store.events(host.run_id):
+            if event['kind']!='model_original_tool_feedback': continue
+            value=host.store.artifact(event['outputs'][0]);use=value['tool_use']
+            if use['name']!='research_plan' or use['input'].get('action') in ('stop',None): continue
+            if value['result']['status']!='success': continue
+            refs.extend(use['toolUseId']+'_'+str(i) for i,_ in enumerate(value['result'].get('content',[])))
+        return refs
     guard(host)
     if pending(host): raise ValueError('UNKNOWN_PROVIDER_OUTCOME_RECOVER_BEFORE_SEND')
     load_credential(Path.home()/'.codex'/'.env')
@@ -621,6 +636,11 @@ async def converse(host):
                     action=definitions.get('research_plan',{}).get('parameters',{}).get('properties',{}).get('action',{})
                     if action.get('const')!='stop' or set(definitions)-{'research_plan','evidence_read','retrieve_context'}:
                         raise ValueError('PROTECTED_SEND_REQUIRES_STOP_ONLY_NATIVE_SCHEMA')
+                    retrieval=definitions.get('retrieve_context')
+                    if retrieval:
+                        advertised=retrieval.get('parameters',{}).get('properties',{}).get('reference',{}).get('enum')
+                        if advertised is None or not set(advertised)<=set(feedback_context_references()):
+                            raise ValueError('PROTECTED_CONTEXT_RETRIEVAL_REQUIRES_EXISTING_FEEDBACK')
             return await super().handle_async_request(request)
     boundary=Boundary(host,allow_truncated_response=True)
     def handler(kind):
@@ -635,6 +655,8 @@ async def converse(host):
                         if kind=='experience': value=experience(host,use['input'])
                         else:
                             q=EvidenceQuery.model_validate(use['input']); value=host.store.artifact(q.reference)
+                            if host.store.remaining()['remaining']['model_calls']<=4 and plain(q.reference) not in state(host)['results']:
+                                raise ValueError('PROTECTED_EVIDENCE_READ_REQUIRES_NEW_RESULT')
                             for part in q.pointer.strip('/').split('/') if q.pointer else []:
                                 part=part.replace('~1','/').replace('~0','~')
                                 value=value[int(part)] if isinstance(value,list) else value[part]
@@ -664,11 +686,21 @@ async def converse(host):
             schema=Plan.model_json_schema(); schema['properties']['action']={'const':'stop','type':'string'}
             native[0].tool_spec={**native[0].tool_spec,'inputSchema':{'json':schema}}
             agent.tool_registry.registry.pop('experience_retrieve',None)
-            # Built-in context retrieval remains accounted by LiveBoundary and after_tool.
+            schema=EvidenceQuery.model_json_schema()
+            schema['$defs']['EvidenceRef']['properties']['artifact_id']['enum']=[r['artifact_id'] for r in s['results']]
+            native[2].tool_spec={**native[2].tool_spec,'inputSchema':{'json':schema}}
+            retrieval=agent.tool_registry.registry.get('retrieve_context')
+            if retrieval:
+                from strands.tools.tools import normalize_tool_spec
+                spec=deepcopy(normalize_tool_spec(retrieval.tool_spec))
+                spec['inputSchema']['json']['properties']['reference']['enum']=feedback_context_references()
+                retrieval.tool_spec=spec
             agent.system_prompt+='\nPROTECTED CLOSEOUT: consume supplied results and STOP only.'
     def before_tool(event):
         record(host,'model_original_tool_request',dict(tool_use=event.tool_use))
         if state(host)['research_status']=='stopped': event.cancel_tool='Accepted STOP seals further workflow work.'
+        if host.store.remaining()['remaining']['model_calls']<=4 and event.tool_use['name']=='retrieve_context' and event.tool_use['input'].get('reference') not in feedback_context_references():
+            event.cancel_tool='Protected closeout permits existing execution feedback only.'
     def after_tool(event):
         record(host,'model_original_tool_feedback',dict(tool_use=event.tool_use,result=event.result))
         key='native-'+event.tool_use['toolUseId']

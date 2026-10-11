@@ -105,3 +105,31 @@ class CoreTests(TestCase):
         problem=type('Problem',(),{'variables':{'x':{'type':'number','bounds':[None,None]}},'initial_guess':{'x':3.}})()
         lo,hi,x0=IpoptSolver._bounds(problem,['x'])
         self.assertEqual(x0,[3.]);self.assertEqual(lo,[-float('inf')]);self.assertEqual(hi,[float('inf')])
+
+    def test_fresh_execution_identity_and_shared_launch_accounting(self):
+        h=self.host;previous=deepcopy(core.state(h));start_usage=h.store.remaining()['used']['backend_solves']
+        def completed(child,cfg,candidate_id):
+            row,_=h.store.reserve(child.run_id,'complete-simulation',core.digest(cfg),h.actor,{**core.zero(),'backend_solves':1})
+            receipt=h.store.complete(row,dict(request_id=row['request_id'],execution_id=row['execution_id'],caller=h.actor,
+                tool_id='simulation.run',tool_version='1.0.0',execution_status='failed',charged=core.zero()),dict(substituted=True))
+            return dict(status='execution_incomplete',execution_id=row['execution_id'],receipts={'simulation':receipt})
+        with patch.object(core,'guard'),patch('tools.execution_completion.complete_execution',side_effect=completed):
+            a=core.execute(h,previous['reference_candidate'],'fixture-fresh-1')
+            b=core.execute(h,previous['reference_candidate'],'fixture-fresh-2')
+        self.assertEqual(a['candidate_id'],b['candidate_id'])
+        self.assertNotEqual(a['execution_id'],b['execution_id']);self.assertNotEqual(a['owner_run_id'],b['owner_run_id'])
+        self.assertEqual(h.store.remaining()['used']['backend_solves'],start_usage+2)
+        core.update(h,**previous)
+
+    def test_material_migration_keeps_costs_and_requires_new_reference(self):
+        h=self.host;previous=deepcopy(core.state(h))
+        core.update(h,freeze='previous-commit',numerical_s=123.,results=[core.save(h,{'sealed_previous_result':True})])
+        hashes=core.science_hashes();hashes['extensions/optimization/ipopt.py']='changed-solver-source'
+        with patch.object(core.subprocess,'check_output',side_effect=['','new-commit']),patch.object(core,'science_hashes',return_value=hashes):
+            core.bind(h,'demonstrated solver correction')
+        updated=core.state(h)
+        self.assertEqual(updated['numerical_s'],123.);self.assertEqual(len(updated['results']),1)
+        self.assertEqual(updated['profile']['version'],previous['profile']['version']+1)
+        self.assertNotEqual(updated['reference_candidate'],previous['reference_candidate'])
+        self.assertTrue(updated['core_repairs'][-1]['improvement_requires_new_comparable_reference'])
+        core.update(h,**previous)
