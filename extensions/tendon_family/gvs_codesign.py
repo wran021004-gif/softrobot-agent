@@ -186,6 +186,7 @@ def integrate(functions, tip, velocity, candidate, target, *, dense_period=.0005
     started=time.perf_counter(); n=len(candidate['coordinate_order']); d=candidate['d']
     X=np.asarray(candidate['states']); times=np.asarray(candidate['times_s']); U=np.asarray(candidate['tensions_n'])
     state=np.zeros(2*n); replay_times=[0.]; replay_states=[state.copy()]; nfev=njev=nlu=0
+    node_states=np.zeros_like(X);node_states[0]=state;matched_nodes=np.zeros(len(times),dtype=bool);matched_nodes[0]=True
     x,u,rhs=functions._linearization_symbols
     dd=functions.design_input
     # Use the direct xdot graph: avoid asking a ten-output dynamics wrapper
@@ -204,15 +205,19 @@ def integrate(functions, tip, velocity, candidate, target, *, dense_period=.0005
             failure=dict(interval=k,message=result.message,time_s=float(result.t[-1])); break
         sample=np.linspace(a,b,round(.01/dense_period)+1)[1:]
         replay_times.extend(sample.tolist()); replay_states.extend(result.sol(sample).T.tolist())
+        indices=np.flatnonzero((times>a+1e-12)&(times<=b+1e-12))
+        node_states[indices]=result.sol(times[indices]).T;matched_nodes[indices]=True
         state=result.y[:,-1]
     rt=np.asarray(replay_times); rx=np.asarray(replay_states)
     rp=np.array([np.asarray(tip(y[:n],d)).ravel() for y in rx])
     rv=np.array([np.asarray(velocity(y[:n],y[n:],d)).ravel() for y in rx])
     op=np.array([np.asarray(tip(y[:n],d)).ravel() for y in X])
     ov=np.array([np.asarray(velocity(y[:n],y[n:],d)).ravel() for y in X])
-    valid=times<=rt[-1]+1e-12
-    matched_p=np.array([np.interp(times[valid],rt,rp[:,j]) for j in range(3)]).T
-    matched_v=np.array([np.interp(times[valid],rt,rv[:,j]) for j in range(3)]).T
+    valid=matched_nodes
+    # Evaluate adaptive dense-output states at exact optimizer nodes. Linear
+    # interpolation of sampled world velocity can alias fast bending motion.
+    matched_p=np.array([np.asarray(tip(y[:n],d)).ravel() for y in node_states[valid]])
+    matched_v=np.array([np.asarray(velocity(y[:n],y[n:],d)).ravel() for y in node_states[valid]])
     # Also compare dense replay with linearly interpolated optimizer tip outputs.
     dense_op=np.array([np.interp(rt,times,op[:,j]) for j in range(3)]).T
     dense_ov=np.array([np.interp(rt,times,ov[:,j]) for j in range(3)]).T
@@ -220,6 +225,7 @@ def integrate(functions, tip, velocity, candidate, target, *, dense_period=.0005
     hold=rt>=.30-1e-12
     result=dict(status='integration_failed' if failure else 'completed', integration_failure=failure,
         method='scipy BDF, exact direct-graph state Jacobian, switch-by-switch continuous state', rtol=rtol,
+        node_comparison='BDF dense-output state evaluated at exact optimizer-node times; world kinematics evaluated from that state',
         atol_q=atol_q,atol_v=atol_v,dense_period_s=dense_period,
         node_max_tip_disagreement_m=float(np.max(np.linalg.norm(matched_p-op[valid],axis=1))),
         node_max_speed_disagreement_m_s=float(np.max(np.linalg.norm(matched_v-ov[valid],axis=1))),

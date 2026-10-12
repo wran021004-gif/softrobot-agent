@@ -149,7 +149,7 @@ def solve(configuration,args,progress=None):
 
 
 def replay(configuration,candidate):
-    started=time.perf_counter();w=Workspace(configuration,candidate['substeps'])
+    started=time.perf_counter();w=Workspace(configuration,candidate['substeps'],integration_method=candidate.get('integration_method','implicit_euler'))
     target=configuration['task']['goal']['data']['target_m']
     result,trajectory=integrate(w.functions,w.tip,w.velocity,candidate,target)
     return dict(status=result['status'],termination_reason=result['method'],case=candidate['case'],
