@@ -22,6 +22,12 @@ and charged; its partial plans cannot establish task acceptance. Do not recreate
 it to demonstrate its failure. Calibration and complete execution must share the
 runtime as well as iteration/horizon/mesh settings.
 
+The unset-variable start establishes a calibration/runtime mismatch, not its
+performance cause. A metadata-only process under the frozen startup variables
+reads NumPy, SciPy and CasADi OpenBLAS thread counters (all1 in this study). Live
+process DLL paths and OS thread count are separately recorded. This probe does
+not benchmark, solve, integrate or inject code into the live numerical process.
+
 Budgets: 2 offline optimizations, 6 standalone solves / 2400 seconds, 8 independent
 integration configurations, 4 complete execution starts, 28800 charged numerical
 seconds, and 12 activity hours including delivery. Failed starts and interruptions
@@ -45,6 +51,10 @@ serialized objective and constraints from selected execution
 recovery. Compare raw, selected, recovered and delivered plans, numerical residuals,
 absolute holding times, position and speed violations, first action and cost.
 Iteration-limited feasibility does not demonstrate convergence or task success.
+
+The commands below document completed offline development. The accepted new
+candidate is now frozen with its three-gate evidence. Do not launch another
+offline optimization, fixed-schedule rollout or mesh comparison in fc1012.
 
 Offline internal resolution is declared separately in `offline_recipe`. Preserve
 the physical zero state and the 35 zero-order-held commands. Diagnose the saved
@@ -71,6 +81,33 @@ the saved measured state and control-schedule guess. Any changed work limit, hor
 or mesh invalidates the execution estimate. Estimate with that check's comparison
 artifact. The estimate uses its measured work and all 35 historical update costs,
 includes construction/reporting and a 35% margin, and binds recipe and implementation.
+
+The later horizon-stratified estimator replaces whole-run scaling for any next
+start. It uses existing matched checks and saved full-execution update timings:
+26 updates at maximum horizon10 and nine deadline-shortened updates at horizons9
+through1. Each stratum takes its measured upper cost ratio without crediting a
+speedup; cold first-update cost is a separate floor. The setup/evidence allowance
+and35% watchdog margin are retained. The mistakenly extended horizon10 check at
+.29s is diagnostic only and excluded. No additional performance sweep is needed.
+
+```powershell
+python -m tools.fixed_task_runtime metadata
+# While pending: save a prospective estimate; leave active reservation unchanged.
+python -m tools.fixed_task_runtime estimate
+# After the original process exits and its ledger settles, before any next start:
+python -m tools.fixed_task_runtime estimate --apply
+python -m tools.fixed_task_milestone status
+```
+
+`--apply` rejects pending executions because their reserved allowance must settle
+using the value present at dispatch. The active watchdog also remains the one
+declared at dispatch. Check the original tool handle, exact process identity and
+saved files before recovery or another launch. A paused goal does not prove a
+stopped numerical process. An incomplete prefix cannot become an independent
+confirmation; that requires a fresh process and original physical zero state.
+The .0307537565m/s local delivered prediction is retained as a diagnostic, not an
+additional prohibition on complete validation. Final acceptance uses actual
+inclusive .30–.35s measurements.
 
 ```powershell
 python -m tools.fixed_task_milestone local --update 29 --iterations SELECTED --current --key selected-calibration
