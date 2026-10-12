@@ -45,6 +45,9 @@ def estimate(h,reference):
     if request['mode']=='research_current':recipe.update(request['current_recipe'])
     recipe['max_iterations']=request['iteration_cap']
     if recipe!=s['profile']['recipe']:raise ValueError('CALIBRATION_RECIPE_MUST_MATCH_SELECTED_RECIPE')
+    calibration_environment=request.get('numerical_environment',dict(OPENBLAS_NUM_THREADS='1',OMP_NUM_THREADS='1',MKL_NUM_THREADS='1'))
+    if s['spec'].get('numerical_environment') and calibration_environment!=s['spec']['numerical_environment']:
+        raise ValueError('CALIBRATION_RUNTIME_ENVIRONMENT_MUST_MATCH_EXECUTION')
     actual=v.get('actual_workspace_output',{}).get('complete_update',{}).get('effective_horizon',request['record']['effective_horizon'])
     expected=recipe['horizon']
     if request['configuration']['policy']['controller']['version'] in ('7.0.0','8.0.0','9.0.0','10.0.0','11.0.0'):
@@ -71,6 +74,8 @@ def estimate(h,reference):
     simulation=math.ceil(predicted*1.35)
     overhead=sum(value for name,value in s['spec']['execution_allowances'].items() if name!='simulation_s')
     value=dict(recipe_identity=digest(recipe),recipe=recipe,science_hashes=s['profile']['science_hashes'],
+        numerical_environment=s['spec'].get('numerical_environment',{}),
+        calibration_environment=request.get('numerical_environment',dict(OPENBLAS_NUM_THREADS='1',OMP_NUM_THREADS='1',MKL_NUM_THREADS='1')),
         measured_calibration=reference,source_update_id=v['source_update_id'],fresh_update_s=fresh_update,
         maximum_horizon=recipe['horizon'],measured_effective_horizon=actual,
         historical_matched_update_s=baseline_update,measured_cost_ratio=ratio,

@@ -113,6 +113,7 @@ def prepare(spec_path=DEFAULT_SPEC, directory=None):
         recording=dict(complete_update_inputs=spec['complete_update_inputs'],update_ids=spec['record_update_ids']),
         acceptance='unchanged joint sampled reach/hold; inclusive .30-.35s; .01m/.02m/s',
         confirmation=spec['confirmation'])
+    profile['execution_environment']=deepcopy(spec.get('numerical_environment',{}))
     profile['identity'] = digest(profile)
     update(h, spec=spec, base_configuration=cfg, profile=profile, profile_history=[profile],
         started_unix=spec['started_unix'], cutoff_unix=spec['started_unix']+spec['budgets']['activity_s']-spec['budgets']['delivery_reserve_s'],
@@ -256,10 +257,12 @@ def bind(host, reason=None, specification=None):
     science_prefixes=('backend.','candidate.','controller.','evaluate.','initialize.','model.','solver.','task.')
     changed_dependencies=[name for name,value in snapshot['dependencies'].items()
         if name.startswith(science_prefixes) and old['dependencies'].get(name)!=value]
-    changed=science_hashes()!=profile['science_hashes'] or bool(changed_dependencies)
+    selected_environment=s['spec'].get('numerical_environment',{})
+    changed=science_hashes()!=profile['science_hashes'] or bool(changed_dependencies) or profile.get('execution_environment',{})!=selected_environment
     if 'freeze' in s and not reason: raise ValueError('MIGRATION_REASON_REQUIRED')
     if changed:
         profile.pop('identity'); profile['version']+=1; profile['science_hashes']=science_hashes()
+        profile['execution_environment']=deepcopy(selected_environment)
         profile['identity']=digest(profile)
     snapshot.update(project_commit=commit,worktree_dirty=False)
     with host.store.transaction() as db:
@@ -285,12 +288,17 @@ def bind(host, reason=None, specification=None):
 def execute(host, candidate_ref, operation_key, *, role='development', selected=None):
     construction_started=time.perf_counter()
     guard(host,expensive=True); s=state(host); c=verify_candidate(host,candidate_ref)
+    expected_environment=s['spec'].get('numerical_environment',{})
+    if any(os.environ.get(key)!=value for key,value in expected_environment.items()):
+        raise ValueError('EXECUTION_REQUIRES_CALIBRATED_NUMERICAL_ENVIRONMENT_BEFORE_INTERPRETER_START')
     if s['spec'].get('require_configuration_cost_estimate'):
         estimate=s.get('execution_cost_estimate') or {}
         if estimate.get('recipe_identity')!=digest(s['profile']['recipe']):
             raise ValueError('CURRENT_CONFIGURATION_COST_REESTIMATE_REQUIRED')
         if estimate.get('science_hashes')!=s['profile']['science_hashes']:
             raise ValueError('CURRENT_IMPLEMENTATION_COST_REESTIMATE_REQUIRED')
+        if estimate.get('numerical_environment',{})!=expected_environment:
+            raise ValueError('CURRENT_RUNTIME_COST_REESTIMATE_REQUIRED')
     confirmation=role=='confirmation'
     repetition=role in ('diagnostic_repetition','engineering_repetition')
     if repetition:
@@ -362,6 +370,7 @@ def finish_execution(host, recovery=False):
     actual=stage_wall+max(0.,time.perf_counter()-started-(stage_wall-prior_wall))+p.get('construction_s',0.)
     detail=dict(status=result['status'],role=p['role'],candidate=p['candidate'],candidate_id=c['candidate_id'],
         implementation=s['freeze'],science_hashes=s['profile']['science_hashes'],
+        numerical_environment={key:os.environ.get(key) for key in s['spec'].get('numerical_environment',{})},
         scientific_identity=c['identity'],scientific_configuration=c['scientific_configuration'],profile_identity=p['profile_identity'],
         evaluation_version=c['evaluation_version'],selected_execution=p['selected_execution'],
         acceptance=acceptance,profile=profile,execution=result,numerical_s=actual,
@@ -563,7 +572,8 @@ def local_diagnostic(host, query, key):
     for index in range(q.repetitions):
         request_id=key+'-local-'+str(index)
         request=dict(configuration=source['configuration'],record=record,mode=q.mode,iteration_cap=q.iteration_cap,
-            reuse_solver=q.reuse_solver,prepare_tail=q.prepare_tail)
+            reuse_solver=q.reuse_solver,prepare_tail=q.prepare_tail,
+            numerical_environment=dict(OPENBLAS_NUM_THREADS='1',OMP_NUM_THREADS='1',MKL_NUM_THREADS='1'))
         if q.mode=='research_current':request['current_recipe']=s['profile']['recipe']
         old=host.store.lookup(host.run_id,request_id)
         if old:

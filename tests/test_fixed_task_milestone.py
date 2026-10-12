@@ -45,6 +45,13 @@ class AdmissionTests(TestCase):
                     with self.assertRaisesRegex(ValueError,'REESTIMATE_REQUIRED'):
                         core.execute(self.host,{},'must-not-launch')
 
+    def test_full_start_rejects_runtime_that_differs_from_calibration(self):
+        self.state['spec']['numerical_environment']=dict(OPENBLAS_NUM_THREADS='1',OMP_NUM_THREADS='1',MKL_NUM_THREADS='1')
+        with patch.object(core,'state',return_value=self.state),patch.object(core,'guard'),patch.object(core,'verify_candidate',return_value={}):
+            with patch.dict(core.os.environ,dict(OPENBLAS_NUM_THREADS='2',OMP_NUM_THREADS='1',MKL_NUM_THREADS='1')):
+                with self.assertRaisesRegex(ValueError,'CALIBRATED_NUMERICAL_ENVIRONMENT'):
+                    core.execute(self.host,{},'must-not-start-with-other-threads')
+
 
 class FixedScheduleTests(TestCase):
     def test_current_replay_applies_inherited_deadline_horizon(self):

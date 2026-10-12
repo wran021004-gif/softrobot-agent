@@ -7,6 +7,21 @@ dependency reinstall, length design, or open-loop success claim is authorized.
 The specification starts from the selected immutable nr1012 candidate and its
 complete recipe, rather than the initial historical specification.
 
+Set the same numerical runtime environment before launching the interpreter:
+
+```powershell
+$env:OPENBLAS_NUM_THREADS='1'
+$env:OMP_NUM_THREADS='1'
+$env:MKL_NUM_THREADS='1'
+```
+
+Standalone/integration workers already fix these values. Full execution now
+requires them at startup and records them in its profile/results. An early full
+start that inherited unset values was confirmed stopped, retained as incomplete,
+and charged; its partial plans cannot establish task acceptance. Do not recreate
+it to demonstrate its failure. Calibration and complete execution must share the
+runtime as well as iteration/horizon/mesh settings.
+
 Budgets: 2 offline optimizations, 6 standalone solves / 2400 seconds, 8 independent
 integration configurations, 4 complete execution starts, 28800 charged numerical
 seconds, and 12 activity hours including delivery. Failed starts and interruptions
