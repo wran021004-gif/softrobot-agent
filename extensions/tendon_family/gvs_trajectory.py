@@ -39,7 +39,7 @@ def implicit_step_residual(functions,n,m,h,method='implicit_euler'):
     return ca.Function('gvs_implicit_step_residual',[previous,following,tension],
         [ca.vertcat((following[:n]-previous[:n]-h*evaluation[n:])/10.,
             functions.implicit_residual(evaluation,tension,(following[n:]-previous[n:])/h)/.001)],
-        {'jac_penalty':0})
+        {'cse':True,'ad_weight':1.})
 
 
 

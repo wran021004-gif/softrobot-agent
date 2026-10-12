@@ -21,7 +21,7 @@ class RepairTests(TestCase):
         new=np.array([(1-h*h)/(1+h*h),-4*h/(1+h*h)])
         np.testing.assert_allclose(np.asarray(residual(old,new,0)).ravel(),0,atol=1e-10)
         self.assertLess(np.linalg.norm(new-[np.cos(2*h),-2*np.sin(2*h)]),3e-6)
-        self.assertEqual(Candidate(substeps=8,integration_method='implicit_midpoint').substeps,8)
+        self.assertEqual(Candidate(substeps=16,integration_method='implicit_midpoint').substeps,16)
 
     def test_research_policy_uses_real_workspace_effective_options(self):
         from tools.nmpc_settling import baseline_configuration

@@ -25,11 +25,11 @@ Use `select_recipe` in `tools.numerical_repair` to record an evidence-based reci
 ```powershell
 python -m tools.numerical_repair solve --key fixed1-midpoint8
 # Use the returned solve EvidenceRef as --source, preserving its exact tensions:
-python -m tools.numerical_repair verify --source '{"artifact_id":"RETURNED_ID","media_type":"application/json"}' --key verify-fixed1
+python -m tools.numerical_repair verify --source RETURNED_64_HEX_ARTIFACT_ID --key verify-fixed1
 python -m tools.numerical_repair gate
 python -m tools.numerical_repair execute --key fixed-reference
 # Repeat the returned passing execution EvidenceRef (fresh controller/process):
-python -m tools.numerical_repair repeat --source '{"artifact_id":"PASSING_EXECUTION_ID","media_type":"application/json"}' --key fixed-selected-repeat
+python -m tools.numerical_repair repeat --source PASSING_64_HEX_EXECUTION_ARTIFACT_ID --key fixed-selected-repeat
 ```
 
 A retained candidate must meet hard numerical feasibility and original task metrics. Its exact returned schedule is independently integrated from the original zero state and checked against both the unchanged original sampled task and all optimizer nodes (1 mm tip / 2 mm/s velocity-vector limits). One concrete evidence-based revision is permitted. Two future verification jobs/time and two passing complete executions are protected before preliminary work; each solve additionally reserves its own verification until consumed. Short fixed-input MuJoCo continuations count as independent integration configurations, not complete controller launches. Technical failures consume attempts and measured cost. Internal closed-loop NMPC work is charged within its complete execution only.
