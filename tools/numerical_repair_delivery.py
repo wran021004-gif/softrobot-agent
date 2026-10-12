@@ -48,6 +48,9 @@ def build(host):
             and option['max_wall_s'] is None and option['feasible_return'] is None
             and option['retain_feasible_iterate'] and option['max_iterations']==s['profile']['recipe']['max_iterations']
             for option in settings)
+        row['recorded_holding_first_step_predictions']=[dict(update_time_s=o['time_s'],prediction_time_s=p['time_s'],
+            predicted_speed_m_s=float(np.linalg.norm(p['tip_velocity_m_s'])))
+            for o in observations if (p:=o.get('one_step_prediction')) and .30-1e-9<=p['time_s']<=.35+1e-9]
         physical.append(row);groups[(v['candidate']['artifact_id'],v['profile_identity'])].append((row,observations,motion,commands))
     comparisons=[]
     for rows in groups.values():
@@ -133,6 +136,9 @@ def build(host):
     lines+=['','| 完整执行 | 用途 | 保持误差 m | 保持速度 m/s | 原任务通过 |','|---|---|---:|---:|---|']
     for row in physical:
         m=row['acceptance'].get('metrics',{});lines.append(f"| {row['execution_id']} | {row['role']} | {m.get('holding_max_error_m')} | {m.get('holding_max_speed_m_s')} | {row['acceptance'].get('accepted',False)} |")
+    lines+=['','选定配置的已记录保持首步预测：','']
+    for row in selected_physical:
+        lines.append(f"- `{row['execution_id']}`：{json.dumps(row['recorded_holding_first_step_predictions'],ensure_ascii=False)}")
     lines+=['','完整独立重复比较：','']
     for pair in comparisons:
         lines.append(f"- 完整命令最大差 {pair['full_command_max_difference_n']} N；世界位置向量最大差 {pair['world_position_max_vector_difference_m']} m；世界速度向量最大差 {pair['world_velocity_max_vector_difference_m_s']} m/s。只支持本次固定任务/seed 的两次观测，不声明一般鲁棒性或旧晋级协议通过。")
