@@ -40,6 +40,14 @@ def build(host):
         row=dict(reference=ref,execution_id=v['execution_id'],role=v['role'],status=v['status'],candidate=v['candidate'],
             selected_execution=v.get('selected_execution'),profile_identity=v['profile_identity'],acceptance=acceptance,
             numerical_s=v['numerical_s'],fresh_execution=v['fresh_execution'],complete_update_records=len(observations))
+        row['controller_evidence']={k:profile.get(k) for k in ('accepted_plans','accepted_noninitialization_plans',
+            'initialization_selected','solver_error_count','unusable_plans','raw_termination_counts',
+            'one_step_prediction_summary','valid_complete_execution')}
+        settings=[o['complete_update_record']['diagnostics']['options'] for o in observations]
+        row['research_stopping_observed']=bool(settings) and all(option['max_cpu_s'] is None
+            and option['max_wall_s'] is None and option['feasible_return'] is None
+            and option['retain_feasible_iterate'] and option['max_iterations']==s['profile']['recipe']['max_iterations']
+            for option in settings)
         physical.append(row);groups[(v['candidate']['artifact_id'],v['profile_identity'])].append((row,observations,motion,commands))
     comparisons=[]
     for rows in groups.values():
@@ -54,7 +62,9 @@ def build(host):
             support='Two observed executions on this frozen task/seed; no general robustness or historical promotion claim'))
     evidence={}
     for event in host.store.events(host.run_id):
-        if event['kind'] in ('projection_repair_comparison','projection_force_comparison','method_selection_comparison','controller_recipe_selection'):
+        if event['kind'] in ('projection_repair_comparison','projection_force_comparison','method_selection_comparison',
+            'controller_recipe_selection','restored_baseline_and_reused_C_identity','C_identity_roundoff_qualification',
+            'selected_work_policy_freeze'):
             evidence.setdefault(event['kind'],[]).extend(event['outputs'])
     gate=repair.length_admission(host)
     fixed_solves=[r for r in mechanics if r['operation']=='solve' and abs(r.get('structure',{}).get('d',10)-s['spec']['reference_parameters']['d'])<1e-10]
@@ -64,11 +74,23 @@ def build(host):
         and row['diagnostics']['options']['max_cpu_s'] is None and row['diagnostics']['options']['max_wall_s'] is None
         and row['diagnostics']['options']['max_iterations']==s['profile']['recipe']['max_iterations']
         for row in host.store.artifact(selected_policy)['rows'])
+    selected_physical=[row for row in physical if row['profile_identity']==s['profile']['identity']]
+    complete_selected=[row for row in selected_physical if row['status']=='evaluated']
+    closed_loop_status=('passed' if gate['matching_passing_executions'] else
+        'failed' if any(not row['acceptance'].get('accepted') for row in complete_selected) else
+        'incomplete' if selected_physical else 'not_attempted')
     statuses=dict(research_policy='passed' if policy_ok else 'incomplete',
         model_projection_comparison='passed' if evidence.get('projection_repair_comparison') else 'incomplete',
         fixed_offline='passed' if fixed_verified else 'failed' if any(row.get('trajectory_metrics') for row in fixed_solves) else 'incomplete' if fixed_solves else 'not_attempted',
-        fixed_closed_loop='passed' if gate['matching_passing_executions'] else 'failed' if any(row['status']=='evaluated' for row in physical) else 'incomplete' if physical else 'not_attempted',
+        fixed_closed_loop=closed_loop_status,
         optional_length_design='passed' if s.get('length_design_passed') else 'failed' if s.get('length_design_started') else 'not_attempted')
+    reasons=dict(research_policy='Real controller solver options and complete update records disable all internal timed returns; fixed numerical work and feasibility remain active.' if policy_ok else 'Selected numerical-policy verification is incomplete.',
+        model_projection_comparison='Archived baseline was reproduced; A/B/C controlled comparison retains a measured representable-dynamics limitation, with no isolated correction justified.',
+        fixed_offline='A new fixed candidate passes numerical feasibility, independent original sampled task and exact optimizer-node checks.' if fixed_verified else
+            'Both allowed fixed candidates pass numerical feasibility and independent original sampled task, but fail the unchanged 0.002 m/s node velocity-vector limit.',
+        fixed_closed_loop='The same frozen selected candidate/profile has two fresh original-task passes.' if closed_loop_status=='passed' else
+            'Selected original-task acceptance and its independent repetition are listed below; a diagnostic repetition cannot satisfy the two-pass gate.',
+        optional_length_design='Strict fixed-offline and two-pass feedback admission did not open; the conditional design attempt remains unused.')
     resources=dict(application_model_requests=host.store.remaining()['used']['model_calls'],
         standalone_controller_solves=s['local_solves'],standalone_controller_s=s['local_solve_s'],
         independent_integration_configurations=s['bdf_replays'],offline_attempts=s['offline_nlp'],
@@ -76,10 +98,11 @@ def build(host):
         internal_closed_loop_updates=updates,activity_elapsed_s=time.time()-s['started_unix'],ceilings=s['spec']['budgets'])
     summary=dict(schema='numerical_repair_delivery_v1',study_id=host.run_id,status='engineering_delivered',
         started_unix=s['started_unix'],base_commit=s['spec']['base_commit'],implementation_binding=s['freeze'],
-        source_versions=s['profile']['science_hashes'],profile_history=s['profile_history'],stages=statuses,
+        source_versions=s['profile']['science_hashes'],profile_history=s['profile_history'],stages=statuses,stage_reasons=reasons,
         fixed_task=dict(target_m=[.29,.035,.19],duration_s=.35,control_period_s=.01,physics_step_s=.0005,
             holding_window_s=[.30,.35],position_limit_m=.01,speed_limit_m_s=.02,seed=17,d=s['spec']['reference_parameters']['d']),
-        selected_recipe=s['profile']['recipe'],mechanics=mechanics,physical=physical,complete_run_comparisons=comparisons,
+        selected_recipe=s['profile']['recipe'],mechanics=mechanics,physical=physical,selected_physical=selected_physical,
+        robot_task_success=bool(fixed_verified and gate['matching_passing_executions']),complete_run_comparisons=comparisons,
         local_diagnostics=s.get('diagnostics',[]),repair_evidence=evidence,length_design_admission=gate,resources=resources,
         selected_policy_validation=selected_policy,runtime=dict(python=platform.python_version(),interpreter=str(core.PYTHON),
             packages={name:importlib.metadata.version(name) for name in ('numpy','scipy','casadi','mujoco','strands-agents','strands-harness')}),
@@ -91,13 +114,15 @@ def build(host):
     labels={'passed':'通过','failed':'失败','incomplete':'未完成','not_attempted':'未执行','passed_with_measured_limitation':'比较完成，保留已测局限'}
     lines=['# 数值执行修复 nr1012','',
         '研究评估策略、数值转录与预算准入已接入实际执行链。机器人任务状态以以下独立阶段验收为准。','',
-        '| 阶段 | 结果 |','|---|---|',*[f'| {k} | {labels[v]} |' for k,v in statuses.items()],'',
+        '| 阶段 | 结果 | 原因 |','|---|---|---|',*[f'| {k} | {labels[v]} | {reasons[k]} |' for k,v in statuses.items()],'',
         f"固定结构 d={s['spec']['reference_parameters']['d']}；任务、物理步长、原始零态、六腱界限与 inclusive 0.30–0.35 s 保持窗口冻结。",'',
         '`research_work_v1` 关闭内部 CPU/墙钟/可行返回计时，以数值收敛或已声明迭代上限停止。保留可行方案选择、返回张力重积分和外部 watchdog；中断为未完成。历史 timed 策略独立保留。',
         '',f"当前配方：{json.dumps(summary['selected_recipe'],ensure_ascii=False)}",'',
         '中点法在离线约束、零态暖启动、NMPC 约束、尾扩展与返回张力恢复中一致使用。35 条物理命令未增加；内部节点共享命令。独立 BDF 由精确节点的 dense-output 状态计算世界位置/速度，不再插值采样速度作为节点真值。',
         '', '模型比较恢复原 update 34 的 q/v、时刻和命令，并与归档短区间核对。A–B 末端速度差 0.013031459 m/s，B–C 0.010355492 m/s，A–C 0.022833211 m/s。起点 A–B 差 0.000188673 m/s；初始 GVS 世界位置约差 2.925 mm。虚功映射后的力项仍有差异，未隔离出符号、尺度或顺序错误；没有按单个端点拟合修正。此处是已测模型局限，不声称全部误差精确相加。',
         '', '局部分歧输入在两个 fresh 12 迭代研究策略求解中均可行，交付命令最大差 0 N；这不建立完整闭环重复性。',
+        '最终数值配置采用中点 16 子步、自动精确 AD、root tolerance 1e-8、最大 3 次迭代；保存 update 10 的真实控制路径验证数值可行。完整执行另逐次保存实际求解选项、返回/选中计划、恢复和交付命令。',
+        '', '唯一控制适配为 `window_normalized_v1`：对原 0.05 s 保持窗口的软速度代价按窗口长度归一化。保持权重仍为 0.08125，等效每秒速率为 1.625；终端权重仍为 0.10。这是公开的目标函数适配，原验收限值与数值停止配置不变。',
         '', '| 新离线尝试 | 原数值任务 | 硬残差 | 保持误差 m | 保持速度 m/s |', '|---|---|---:|---:|---:|']
     for row in fixed_solves:
         m=row.get('trajectory_metrics') or {};lines.append(f"| {row['execution_id']} | {row.get('original_task_feasible')} | {row.get('hard_max_normalized_violation')} | {m.get('holding_max_position_error_m')} | {m.get('holding_max_speed_m_s')} |")
@@ -108,6 +133,9 @@ def build(host):
     lines+=['','| 完整执行 | 用途 | 保持误差 m | 保持速度 m/s | 原任务通过 |','|---|---|---:|---:|---|']
     for row in physical:
         m=row['acceptance'].get('metrics',{});lines.append(f"| {row['execution_id']} | {row['role']} | {m.get('holding_max_error_m')} | {m.get('holding_max_speed_m_s')} | {row['acceptance'].get('accepted',False)} |")
+    lines+=['','完整独立重复比较：','']
+    for pair in comparisons:
+        lines.append(f"- 完整命令最大差 {pair['full_command_max_difference_n']} N；世界位置向量最大差 {pair['world_position_max_vector_difference_m']} m；世界速度向量最大差 {pair['world_velocity_max_vector_difference_m_s']} m/s。只支持本次固定任务/seed 的两次观测，不声明一般鲁棒性或旧晋级协议通过。")
     lines+=['',f"剩余障碍：{summary['barrier'] or '见机器摘要中的各阶段判定。'}",'',
         f"长度设计准入：{gate['passed']}。排查闭环、旧离线候选和单次通过不能替代新候选三项验证与同一选定配置两次 fresh 原任务通过。",'',
         f"数值成本 {resources['charged_numerical_s']:.3f}/21600 s；独立控制求解 {resources['standalone_controller_solves']}/10、{resources['standalone_controller_s']:.3f}/1500 s；积分配置 {resources['independent_integration_configurations']}/12；离线 {resources['offline_attempts']}/3；完整 MuJoCo {resources['complete_mujoco_launches']}/6；应用模型请求 {resources['application_model_requests']}/0。内部 NMPC 更新 {updates} 次计入所属完整执行，不重复收费。",'',

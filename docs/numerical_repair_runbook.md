@@ -56,3 +56,15 @@ python -m tools.numerical_repair gate
 Existing keys are historical receipts only when their original implementation/request identity matches; after migration, inspect those immutable references rather than re-dispatching an old key under new inputs. Recipe selection is recorded through `select_recipe` and profile history before each new comparison. Since neither fixed candidate passes node consistency, complete feedback observations cannot admit optional length design.
 
 Focused checks: `python -m unittest tests.test_numerical_repair tests.test_research_core_numerics`. Do not run the repository suite or provider probes. Export through the existing `research_core export` mechanism after an engineering STOP citing every new numerical/physical result. Deliver a machine summary, this runbook, completion report, immutable archive/manifest and ordinary HTTPS push with remote SHA verification.
+
+The complete baseline `fixed-reference-work3` delivered 35 feasible plans and zero solver errors, but failed holding speed at 0.1137886724412063 m/s. Its accepted plans contained excessive predicted holding speed even when predicted terminal speed was small. The one permitted controller adaptation is `holding_speed_cost_mode=window_normalized_v1` with window 0.05 s. It divides the soft holding integral by the original window length, retaining declared weights 0.08125 and 0.10; the effective per-second holding coefficient becomes 1.625. No hard speed constraint, task relaxation, simultaneous numerical change, or weight sweep is used.
+
+```powershell
+# After select_recipe records this single adaptation and the scoped commit:
+python -m tools.research_core migrate --spec examples/numerical_repair/specification.json --reason 'One evidence-supported window-normalized holding objective; preserve all numerical settings and failures'
+python -m tools.numerical_repair execute --key fixed-window-normalized
+python -m tools.numerical_repair repeat --source RETURNED_64_HEX_EXECUTION_ARTIFACT_ID --key fixed-window-normalized-repeat
+python -m tools.numerical_repair gate
+```
+
+The repeat command creates a new execution owner and controller process with exactly the source candidate/profile. A passing source uses `engineering_repetition`; a failed source uses `diagnostic_repetition`. Neither a failure repetition nor an incomplete execution can satisfy length admission. Preserve both complete command and world-trajectory comparisons. No further adaptation or third fixed optimization is admitted.
