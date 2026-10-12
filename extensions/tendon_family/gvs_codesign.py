@@ -15,7 +15,7 @@ from schemas.platform_math import SystemContext, OptimizationProblem, Optimizati
 
 def expression(configuration):
     inp = SessionInput.model_validate(configuration)
-    p = GVSModelParameters(basis={'strategy': 'structural_linear'})
+    p = GVSModelParameters(basis=inp.policy.controller.parameters.data.get('recipe',{}).get('basis',{'strategy':'structural_linear'}))
     from extensions.tendon_family.gvs_basis import resolve_basis
     n = resolve_basis(inp.robot.structure.data, p.basis).dimension
     system = GVSModel(p).build_system(inp.robot, p, None, SystemContext(
@@ -33,7 +33,7 @@ def parameterized(expr):
 
 
 class Workspace:
-    def __init__(self, configuration, substeps=1, local_ad='reverse'):
+    def __init__(self, configuration, substeps=1, local_ad='reverse', integration_method='implicit_euler'):
         started = time.perf_counter()
         self.configuration = configuration
         self.expression = expression(configuration)
@@ -41,6 +41,8 @@ class Workspace:
         self.n = n = len(self.expression.coordinate_order)
         self.m = m = len(self.expression.tendon_order)
         self.substeps = substeps
+        if integration_method not in ('implicit_euler','implicit_midpoint'):raise ValueError('UNKNOWN_INTEGRATION_METHOD')
+        self.integration_method=integration_method
         self.steps = steps = 35*substeps
         self.h = h = .01/substeps
         self.scales = np.r_[np.full(n, 10.), np.full(n, 1000.)]
@@ -51,8 +53,9 @@ class Workspace:
         self.tip = ca.Function('codesign_tip', [q, d], [tip])
         self.velocity = ca.Function('codesign_tip_velocity', [q, v, d], [ca.jtimes(tip, q, v)])
         previous, following, u = ca.MX.sym('previous', 2*n), ca.MX.sym('following', 2*n), ca.MX.sym('u', m)
-        step = ca.vertcat((following[:n]-previous[:n]-h*following[n:])/10.,
-            f.implicit_residual(following, u, (following[n:]-previous[n:])/h, d)/.001)
+        evaluation=following if integration_method=='implicit_euler' else (previous+following)/2
+        step = ca.vertcat((following[:n]-previous[:n]-h*evaluation[n:])/10.,
+            f.implicit_residual(evaluation, u, (following[n:]-previous[n:])/h, d)/.001)
         self.local_ad = local_ad
         self.step = ca.Function('codesign_step', [previous, following, u, d], [step],
             {'cse': True, **({'ad_weight': 1.} if local_ad == 'reverse' else {})})
@@ -165,7 +168,7 @@ class Workspace:
             states=[[values[f'x/{k}/{j}']*self.scales[j] for j in range(2*self.n)] for k in range(self.steps+1)],
             tensions_n=[[values[f'u/{k}/{j}']*8. for j in range(self.m)] for k in range(35)],
             coordinate_order=self.expression.coordinate_order, tendon_order=self.expression.tendon_order,
-            substeps=self.substeps)
+            substeps=self.substeps,integration_method=self.integration_method)
 
     def metrics(self, candidate):
         X=np.asarray(candidate['states']); d=candidate['d']

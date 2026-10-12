@@ -44,6 +44,8 @@ def replay(request):
         from tools.research_core_numerics import archived
         recorded=dict(recorded,resolved_problem=archived(**recorded['resolved_problem_archive']))
     recipe['horizon']=recorded['effective_horizon']
+    if request['mode']=='research_policy':
+        recipe.update(stopping_policy='research_work_v1',max_iterations=request['iteration_cap'])
     n=len(recorded['coordinate_order'])
     nominal=recorded.get('nominal_workspace',dict(x=[0.]*(2*n),u=[.2]*len(recorded['tendon_order'])))
     ws=TrajectoryWorkspace(inp.task,inp.robot,recipe,nominal['x'],nominal['u'],
@@ -54,6 +56,7 @@ def replay(request):
     ws.problem.variables.clear(); ws.problem.variables.update(recorded['problem_variables'])
     ws.problem.initial_guess.clear(); ws.problem.initial_guess.update(recorded['initial_guess'])
     options=dict(recorded['initialization']['solver_options'])
+    if request['mode']=='research_policy':options=ws.solver.parameters.model_dump(mode='json')
     if request['mode']=='fixed_iteration':
         options.update(max_cpu_s=None,max_wall_s=None,max_iterations=request['iteration_cap']+1)
     ws.solver=IpoptSolver(options)
@@ -70,7 +73,7 @@ def replay(request):
     value=_solve_record(ws,recorded)
     value.update(mode=request['mode'],production_stopping_policy_unchanged=request['mode']=='production',
         problem_inspection=inspection,diagnostic_trace_enabled=ws.solver.diagnostic_trace,
-        iteration_cap=request['iteration_cap'] if request['mode']=='fixed_iteration' else None,
+        iteration_cap=request['iteration_cap'] if request['mode'] in ('fixed_iteration','research_policy') else None,
         stopping_controls=dict(options=options,callback_policy_enabled=request['mode']=='production',
             fixed_cap_may_stop_early_on_convergence=True,external_timeout_s=150.*(1+int(bool(request.get('reuse_solver'))))),
         solver_reused=bool(request.get('reuse_solver')),tail_prepared_before_solve=bool(request.get('prepare_tail')),

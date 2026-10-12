@@ -30,13 +30,15 @@ def trajectory_functions(expression):
     return original if provider is None else provider(original)
 
 
-def implicit_step_residual(functions,n,m,h):
+def implicit_step_residual(functions,n,m,h,method='implicit_euler'):
     """Shared shooting and tail-initialization residual in physical coordinates."""
     previous=ca.MX.sym('previous_state',2*n);following=ca.MX.sym('next_state',2*n)
     tension=ca.MX.sym('tension',m)
+    if method not in ('implicit_euler','implicit_midpoint'):raise ValueError('UNKNOWN_INTEGRATION_METHOD')
+    evaluation=following if method=='implicit_euler' else (previous+following)/2
     return ca.Function('gvs_implicit_step_residual',[previous,following,tension],
-        [ca.vertcat((following[:n]-previous[:n]-h*following[n:])/10.,
-            functions.implicit_residual(following,tension,(following[n:]-previous[n:])/h)/.001)],
+        [ca.vertcat((following[:n]-previous[:n]-h*evaluation[n:])/10.,
+            functions.implicit_residual(evaluation,tension,(following[n:]-previous[n:])/h)/.001)],
         {'jac_penalty':0})
 
 
@@ -111,7 +113,7 @@ class GVSTrajectoryAssembler:
         if task.evaluator.extension_id!=('evaluate.tracking' if tracking else 'evaluate.reach'):
             raise ValueError('GVS_TRAJECTORY_REQUIRES_REACH_EVALUATOR')
         tolerance=p.position_error_scale_m or task.evaluator.parameters.data['max_position_error_m' if tracking else 'tolerance_m']
-        step_residual=implicit_step_residual(functions,n,m,h)
+        step_residual=implicit_step_residual(functions,n,m,h,p.integration_method)
         mapped=step_residual.map(steps,'thread',p.evaluation_threads)
         residuals=mapped(ca.horzcat(*X[:-1]),ca.horzcat(*X[1:]),
             ca.horzcat(*[U[k//p.substeps] for k in range(steps)]))
@@ -199,9 +201,10 @@ class TrajectoryWorkspace:
                     for k in ('initial_state','implicit_dynamics','tendon_force_bounds')]),
             context=SystemContext(x0=nominal_x,u0=nominal_u,scene=task.environment))
         self.graph_s=time.perf_counter()-start
+        research=self.parameters.stopping_policy=='research_work_v1'
         self.solver=IpoptSolver(dict(max_iterations=self.parameters.max_iterations,tolerance=self.parameters.tolerance,
-            max_cpu_s=self.parameters.max_cpu_s,retain_feasible_iterate=True,
-            feasible_return=self.parameters.feasible_return,
+            max_cpu_s=None if research else self.parameters.max_cpu_s,retain_feasible_iterate=True,
+            feasible_return=None if research else self.parameters.feasible_return,
             constraint_jacobian_mode=self.parameters.constraint_jacobian_mode))
         self.robot=robot;self.scene=task.environment;self._tail_solver=None
         self.last=None
@@ -218,7 +221,7 @@ class TrajectoryWorkspace:
             assembly=self.scene.data
             world_tip=ca.mtimes(ca.DM(quaternion_wxyz_to_rotation(assembly['mount']['quaternion_wxyz'])),local_tip)+ca.DM(assembly['mount']['position_m'])
             self._motion=ca.Function('warm_tip_motion',[q,v],[world_tip,ca.jacobian(world_tip,q)@v])
-            self._tail_residual=implicit_step_residual(functions,self.n,self.m,self.period/self.parameters.substeps)
+            self._tail_residual=implicit_step_residual(functions,self.n,self.m,self.period/self.parameters.substeps,self.parameters.integration_method)
             y=ca.MX.sym('scaled_next',2*self.n);old=ca.MX.sym('old',2*self.n);u=ca.MX.sym('u',self.m)
             residual=ca.Function('tail_residual',[y,old,u],
                 [self._tail_residual(old,y*self.state_scales,u)],{'ad_weight':1.})
@@ -336,7 +339,7 @@ class TrajectoryWorkspace:
             nominal_operating_state=self.nominal_x,measured_initial_state=list(measured_x),
             previous_tensions_n=list(previous_u),
             period_s=self.period,substeps=self.parameters.substeps,
-            integration='implicit Euler in mass/force form; q scale 10 rad/m, force scale .001 N*m^2/rad',
+            integration=self.parameters.integration_method,stopping_policy=self.parameters.stopping_policy,
             cost='Stage weights per second on squared tip/position scale, curvature rate/(1 rad/(m*s)), tension/(1 N) and delta tension/(1 N); terminal weights on squared tip/position scale, curvature rate and world tip speed/speed scale. Optional holding speed cost starts at max(0, task duration minus settling window minus holding_brake_lead_s), using absolute prediction-node times. Acceptance timing is unchanged. Position scale defaults to task tolerance. Smoothing is a design penalty.',
             cost_scales=dict(position_m=self.parameters.position_error_scale_m or self.goal_tolerance,
                 tip_speed_m_s=self.parameters.tip_speed_scale_m_s))

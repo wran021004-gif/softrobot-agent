@@ -117,8 +117,11 @@ def trajectory_outputs(w,candidate):
 def offline_diagnostic(request):
     from extensions.tendon_family.gvs_codesign import Workspace,integrate
     started=time.perf_counter();p=request['diagnostic_parameters'];saved=request['candidate']
+    if p.get('investigation')=='projection_continuation':
+        from tools.numerical_repair import projection_continuation
+        return projection_continuation(request)
     if p.get('investigation')=='closed_loop':return closed_loop_analysis(request)
-    w=Workspace(request['configuration'],p.get('substeps',1))
+    w=Workspace(request['configuration'],p.get('substeps',saved.get('substeps',1)),integration_method=p.get('integration_method',saved.get('integration_method','implicit_euler')))
     if p.get('fixed_interval'):return fixed_input_comparison(w,p['fixed_interval'])
     if request['operation']=='inspect':
         residuals=np.array([np.asarray(w.step(a,b,u,saved['d'])).ravel()
@@ -136,7 +139,7 @@ def offline_diagnostic(request):
     if p.get('method','implicit')=='implicit':
         rollout=w.rollout(saved['tensions_n'],saved['d'])
         candidate=dict(saved,states=rollout['states'],times_s=rollout['times_s'],substeps=w.substeps)
-        return dict(status=rollout['status'],method='implicit Euler',substeps=w.substeps,
+        return dict(status=rollout['status'],method=w.integration_method,substeps=w.substeps,
             trajectory=trajectory_outputs(w,candidate),rollout=rollout,
             metrics=w.metrics(candidate) if not rollout['failure'] else None,forward_integration_jobs=1)
     result,trajectory=integrate(w.functions,w.tip,w.velocity,saved,

@@ -994,6 +994,8 @@ class GVSDescription(Contract):
 
 
 class GVSTrajectoryParameters(Contract):
+    stopping_policy: Literal['historical_timed_v1', 'research_work_v1'] = 'historical_timed_v1'
+    integration_method: Literal['implicit_euler', 'implicit_midpoint'] = 'implicit_euler'
     position_error_scale_m: FiniteFloat | None = Field(default=None,gt=0,
         description='Position cost scale in m; None uses the task reach tolerance, without changing acceptance.')
     tip_speed_scale_m_s: FiniteFloat = Field(default=.02,gt=0,

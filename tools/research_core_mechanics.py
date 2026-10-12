@@ -54,6 +54,18 @@ def dispatch(host, operation, arguments, key):
     if uses_validation:numerical_available+=validation['seconds']
     available = min(numerical_available,s['cutoff_unix']-time.time(),host.store.remaining()['remaining']['wall_s'])
     protection=core.repetition_reserve(s)*core.allowance(s)
+    downstream=s['spec'].get('downstream_reserve',{})
+    if downstream:
+        protection=max(protection,max(0,downstream['passing_executions']-sum(bool((host.store.artifact(r).get('acceptance') or {}).get('accepted')) for r in s['results']))*core.allowance(s))
+        future_jobs=max(0,downstream['fixed_verifications']-s.get('fixed_validation_jobs',0))
+        if counter=='bdf_replays' and s.get(counter,0)+1+max(0,future_jobs-int(uses_validation))>b[counter]:
+            raise ValueError('DOWNSTREAM_FIXED_VERIFICATION_JOBS_PROTECTED')
+        if operation=='solve':
+            lo,hi=plain(arguments)['design_bounds']
+            if lo!=hi:
+                from tools.numerical_repair import length_admission
+                if not length_admission(host)['passed']:raise ValueError('LENGTH_DESIGN_REQUIRES_NEW_OFFLINE_AND_TWO_PASSING_EXECUTIONS')
+            elif s.get('fixed_offline_attempts',0)>=2:raise ValueError('TWO_FIXED_OFFLINE_ATTEMPTS_MAXIMUM')
     if operation=='solve' and s['spec'].get('mode')=='engineering_numerical':
         verification=s['spec']['mechanics_allowances']['replay_s']
         if s.get('bdf_replays',0)+1>b['bdf_replays'] or available < reserve+verification+protection:
@@ -64,6 +76,7 @@ def dispatch(host, operation, arguments, key):
         operation=operation,configuration=cfg,implementation=s['freeze'],science_hashes=s['profile']['science_hashes'])
     if operation=='solve':
         request['arguments']=plain(arguments)
+        request['offline_solver_s']=s['spec'].get('offline_solver_s',570.)
         if request['arguments'].get('source_candidate'):
             request['saved_tensions']=source(host,request['arguments']['source_candidate'])['candidate']['tensions_n']
     else:
@@ -88,6 +101,10 @@ def dispatch(host, operation, arguments, key):
     def charge(db):
         current=host.store.session(host.run_id,db)['state']
         if counter:current[counter]=current.get(counter,0)+1
+        if downstream and operation=='solve' and request['arguments']['design_bounds'][0]==request['arguments']['design_bounds'][1]:
+            current['fixed_offline_attempts']=current.get('fixed_offline_attempts',0)+1
+        if downstream and uses_validation:
+            current['fixed_validation_jobs']=current.get('fixed_validation_jobs',0)+1
         if uses_validation:
             current['numerical_reserved_s']-=validation['seconds'];current['validation_reservation']=None
         if operation=='solve' and s['spec'].get('mode')=='engineering_numerical':

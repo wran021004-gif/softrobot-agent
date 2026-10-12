@@ -241,7 +241,7 @@ class IpoptSolver:
         if self.parameters.max_wall_s is not None:
             options['ipopt.max_wall_time']=float(self.parameters.max_wall_s)
         cache_key=(bundle.expression_digest,bundle.serialized_function,problem.objective.direction,
-                   self.parameters.constraint_jacobian_mode)
+                   self.parameters.model_dump_json())
         cached=cache_key in self._compiled
         if not cached:
             if self.parameters.print_level:print('IPOPT constructing solver',flush=True)

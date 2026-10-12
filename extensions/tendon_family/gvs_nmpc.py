@@ -154,7 +154,7 @@ class GVSNMPCController:
             tip,velocity=self.workspace._motion(predicted[:len(q)],predicted[len(q):])
             self.last['one_step_prediction']=dict(time_s=t+self.period_s,state=predicted.tolist(),
                 tip_position_m=np.asarray(tip).ravel().tolist(),tip_velocity_m_s=np.asarray(velocity).ravel().tolist(),
-                frame='world',prediction_source='accepted_plan',applied_tension_n=list(command),integration='implicit Euler',substeps=node)
+                frame='world',prediction_source='accepted_plan',applied_tension_n=list(command),integration=self.parameters.integration_method,substeps=node)
         self.observations.append(dict(time_s=t,phase='current_state_before_integration',
             tip_position_m=geometry['tip'].tolist(),gvs_q=list(q),gvs_qdot=list(v),
             measured_initial_state=x.tolist(),graph_construction_s=self.workspace.graph_s,**self.last))

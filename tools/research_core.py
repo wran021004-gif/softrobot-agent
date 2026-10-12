@@ -27,6 +27,8 @@ ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_SPEC = ROOT/'examples/research_core/specification.json'
 PYTHON = Path('D:/softrobot-agent/.mainline5-env/Scripts/python.exe')
 SCIENCE_FILES = ['extensions/tendon_family/gvs_nmpc.py', 'extensions/tendon_family/gvs_trajectory.py',
+    'extensions/tendon_family/gvs_projection.py','extensions/tendon_family/contracts.py',
+    'extensions/optimization/contracts.py','schemas/casadi_feedback.py',
     'extensions/tendon_family/backends.py',
     'extensions/optimization/ipopt.py', 'extensions/tendon_family/generated_serial.py',
     'extensions/tendon_family/gvs_profile.py', 'tools/design_optimization.py',
@@ -36,7 +38,7 @@ SCIENCE_FILES = ['extensions/tendon_family/gvs_nmpc.py', 'extensions/tendon_fami
     'tools/casadi_feedback_worker.py', 'tools/casadi_codesign_worker.py',
     'tools/research_core_mechanics.py', 'tools/research_core_mechanics_worker.py']
 CORE_FILES = ['tools/research_core.py','tools/research_core_diagnostic.py','schemas/research_core.py',
-              'tools/research_core_feedback.py','tools/research_core_demo.py','tools/research_core_numerics.py']
+              'tools/research_core_feedback.py','tools/research_core_demo.py','tools/research_core_numerics.py','tools/numerical_repair.py']
 
 
 def save(host, value, kind='core_evidence'):
@@ -90,6 +92,7 @@ def prepare(spec_path=DEFAULT_SPEC, directory=None):
     cfg = baseline_configuration(); cfg['run_id'] = run_id
     # Recovery-enabled source is complete immutable execution evidence.
     cfg['policy']['controller']['parameters']['data']['recipe'].update({k:v for k,v in spec['reference_parameters'].items() if k != 'd'})
+    cfg['policy']['controller']['parameters']['data']['recipe'].update(spec.get('controller_recipe',{}))
     model = native_configuration(run_id)['policy']['model']
     cfg['policy'].update(model=model, budget=limits(spec), allowed_tools=['evidence.read'],
         tool_bindings={'evidence.read':'1.0.0'}, operation_allowances={'evidence.read':dict(timeout_s=30.,reserve_s=30.)})
@@ -277,7 +280,8 @@ def execute(host, candidate_ref, operation_key, *, role='development', selected=
     cfg['policy'].update(budget={**cfg['policy']['budget'],'model_calls':0},allowed_tools=[],
         tool_bindings={n:'1.0.0' for n in ('simulation.run','evaluation.run','control.profile_report')},
         operation_allowances=deepcopy(EXECUTION_ALLOWANCES))
-    cfg['policy']['operation_allowances']['simulation.run']=dict(timeout_s=1800.,reserve_s=1800.)
+    simulation_allowance=s['spec']['execution_allowances']['simulation_s']
+    cfg['policy']['operation_allowances']['simulation.run']=dict(timeout_s=simulation_allowance,reserve_s=simulation_allowance)
     if full_science(cfg)!=c['scientific_configuration']: raise ValueError('EXECUTION_CHANGED_FROZEN_SCIENCE')
     pending=dict(owner=owner,candidate=plain(candidate_ref),configuration=cfg,role=role,
         selected_execution=plain(selected),operation_key=operation_key,started_unix=time.time(),
