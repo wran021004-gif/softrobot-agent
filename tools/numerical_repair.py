@@ -19,7 +19,31 @@ def reference(value):
     return json.loads(value)
 
 
-def history_inputs(host):
+def history_inputs(host, *, folder=None, execution_id=None, offline_execution_id=None, updates=(29,19)):
+    if folder is not None:
+        if core.state(host).get('repair_history'):return core.state(host)['repair_history']
+        summary=core.read(core.ROOT/folder/'scientific_summary.json')
+        row=next(r for r in summary['physical'] if r['execution_id']==execution_id)
+        source=numerics.execution_source(row,folder)
+        candidate=numerics.archived(folder,source['result']['candidate'])
+        observations=numerics.archived(folder,source['files']['controller_observations.json'])
+        records={}
+        for index in updates:
+            record=deepcopy(observations[index]['complete_update_record'])
+            definition=record['resolved_problem_reference'];ref=source['files'][definition['filename']]
+            if ref['artifact_id']!=definition['sha256']:raise ValueError('SAVED_PROBLEM_IDENTITY_MISMATCH')
+            record['resolved_problem_archive']=dict(folder=folder,reference=ref)
+            records[str(index)]=numerics.imported_record(host,candidate['configuration'],record,
+                dict(study_id=summary['study_id'],folder=folder,execution_id=execution_id,update_id=index))
+        offline=next(r for r in summary['mechanics'] if r['execution_id']==offline_execution_id)
+        value=numerics.archived(folder,offline['reference'])
+        value.update(imported_historical_evidence=True,source_reference=offline['reference'],source_archive=folder,
+            additional_numerical_s=0.,confirmation_eligible=False)
+        ref=core.save(host,value,'imported_archived_mechanics')
+        info=dict(records=records,mechanics=ref,source_execution=execution_id,source_archive=folder,
+            resolved_profile=source['files']['resolved_control.json'] if 'resolved_control.json' in source['files'] else None)
+        core.update(host,repair_history=info,imported_mechanics_sources=[*core.state(host).get('imported_mechanics_sources',[]),ref])
+        return info
     info=numerics.import_history(host)
     summary=core.read(core.ROOT/numerics.HISTORY/'scientific_summary.json')
     row=next(r for r in summary['closed_loop'] if r['execution_id']=='d42321543b9a45bb97b3ff28aca097ae')

@@ -69,6 +69,10 @@ def replay(request):
         command=[value['result']['optimum']['u/0/'+t] for t in recorded['tendon_order']]
         return dict(mode=request['mode'],result=value['result'],diagnostics=value['diagnostics'],recovery=value['recovery'],
             verification=check,first_input_n=command,delivered_tension_n=command,actual_workspace_output=value,
+            task_plans={name:plan_task_metrics(ws,plan,recorded['prediction_timing']['current_time_s'])
+                for name,plan in dict(raw=value['complete_update']['raw_returned_plan'],
+                    selected=value['complete_update']['selected_feasible_plan'],recovered=value['complete_update']['recovery_candidate'],
+                    delivered=value['complete_update']['delivered_plan']).items() if plan is not None},
             numerical_s=time.perf_counter()-started,source_saved_input=recorded['initialization_identity'],
             qualification='Same saved measurement/previous command and control schedule guess; current method regenerates states and constructs a new problem through the actual complete workspace path.')
     ws._set_prediction_time(recorded['prediction_timing']['current_time_s'])
@@ -120,7 +124,25 @@ def _solve_record(ws,recorded):
         verification=check,first_input_n=[result.optimum['u/0/'+t] for t in recorded['tendon_order']],
         original_applied_action_n=recorded['actual_applied_action_n'],
         accepted_plan=result.optimum,
-        delivered_tension_n=[result.optimum['u/0/'+t] for t in recorded['tendon_order']])
+        delivered_tension_n=[result.optimum['u/0/'+t] for t in recorded['tendon_order']],
+        construction_s=ws.graph_s,task_plans={name:plan_task_metrics(ws,plan,recorded['prediction_timing']['current_time_s'])
+            for name,plan in dict(raw=ws.solver.last_returned_optimum,selected=selected,
+                recovered=recovery.get('candidate_optimum'),delivered=result.optimum).items() if plan is not None})
+
+
+def plan_task_metrics(ws,plan,time_s):
+    times=time_s+np.arange(ws.parameters.horizon*ws.parameters.substeps+1)*ws.period/ws.parameters.substeps
+    states=np.array([[plan[f'x/{k}/{j}']*ws.state_scales[j] for j in range(2*ws.n)] for k in range(len(times))])
+    motion=[ws._motion(x[:ws.n],x[ws.n:]) for x in states]
+    positions=np.array([np.asarray(p).ravel() for p,v in motion]);velocities=np.array([np.asarray(v).ravel() for p,v in motion])
+    hold=(times>=ws.holding_start-1e-12)&(times<=ws.duration+1e-12)
+    errors=np.linalg.norm(positions-np.asarray(ws.target),axis=1);speeds=np.linalg.norm(velocities,axis=1)
+    return dict(times_s=times.tolist(),position_error_m=errors.tolist(),speed_m_s=speeds.tolist(),
+        holding_node_count=int(hold.sum()),holding_max_position_error_m=float(errors[hold].max()) if any(hold) else None,
+        holding_max_speed_m_s=float(speeds[hold].max()) if any(hold) else None,
+        holding_position_violation_m=float(max(0,errors[hold].max()-.01)) if any(hold) else None,
+        holding_speed_violation_m_s=float(max(0,speeds[hold].max()-.02)) if any(hold) else None,
+        first_action_n=[plan['u/0/'+t] for t in ws.tendons],scope='Actual plan states; sampled prediction diagnostics, independent feasibility reported separately')
 
 
 if __name__=='__main__':

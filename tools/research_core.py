@@ -29,7 +29,7 @@ PYTHON = Path('D:/softrobot-agent/.mainline5-env/Scripts/python.exe')
 SCIENCE_FILES = ['extensions/tendon_family/gvs_nmpc.py', 'extensions/tendon_family/gvs_trajectory.py',
     'extensions/tendon_family/gvs_projection.py','extensions/tendon_family/contracts.py',
     'extensions/optimization/contracts.py','schemas/casadi_feedback.py',
-    'tools/numerical_repair.py',
+    'tools/numerical_repair.py','tools/fixed_task_milestone.py',
     'extensions/tendon_family/control_evidence.py',
     'extensions/tendon_family/backends.py',
     'extensions/optimization/ipopt.py', 'extensions/tendon_family/generated_serial.py',
@@ -40,7 +40,7 @@ SCIENCE_FILES = ['extensions/tendon_family/gvs_nmpc.py', 'extensions/tendon_fami
     'tools/casadi_feedback_worker.py', 'tools/casadi_codesign_worker.py',
     'tools/research_core_mechanics.py', 'tools/research_core_mechanics_worker.py']
 CORE_FILES = ['tools/research_core.py','tools/research_core_diagnostic.py','schemas/research_core.py',
-              'tools/research_core_feedback.py','tools/research_core_demo.py','tools/research_core_numerics.py','tools/numerical_repair.py']
+              'tools/research_core_feedback.py','tools/research_core_demo.py','tools/research_core_numerics.py','tools/numerical_repair.py','tools/fixed_task_milestone.py']
 
 
 def save(host, value, kind='core_evidence'):
@@ -91,7 +91,12 @@ def prepare(spec_path=DEFAULT_SPEC, directory=None):
     start = time.perf_counter()
     from tools.nmpc_settling import baseline_configuration
     from tools.research_v2 import native_configuration
-    cfg = baseline_configuration(); cfg['run_id'] = run_id
+    if spec.get('baseline_archive'):
+        from tools.research_core_numerics import archived
+        baseline=spec['baseline_archive']
+        cfg=deepcopy(archived(baseline['folder'],baseline['candidate'])['configuration'])
+    else:cfg = baseline_configuration()
+    cfg['run_id'] = run_id
     # Recovery-enabled source is complete immutable execution evidence.
     cfg['policy']['controller']['parameters']['data']['recipe'].update({k:v for k,v in spec['reference_parameters'].items() if k != 'd'})
     cfg['policy']['controller']['parameters']['data']['recipe'].update(spec.get('controller_recipe',{}))
@@ -179,6 +184,9 @@ def verify_candidate(host, reference):
 
 
 def allowance(s):
+    estimate=s.get('execution_cost_estimate')
+    if estimate and estimate['recipe_identity']==digest(s['profile']['recipe']):
+        return estimate['total_watchdog_s']
     return sum(s['spec']['execution_allowances'].values())
 
 
@@ -191,12 +199,18 @@ def capacity(host, requested=1, confirmation=False, *, root_operation=False):
     s=state(host); b=s['spec']['budgets']; a=allowance(s)
     remaining=host.store.remaining()['remaining']; protect=0 if confirmation else repetition_reserve(s)
     science=b['numerical_s']-s['numerical_s']-s['numerical_reserved_s']
-    available_time=min(science, s['cutoff_unix']-time.time(), remaining['wall_s'])
+    integration=s.get('validation_reservation',{}) or {}
+    required=s['spec'].get('execution_required_integrations',0)
+    jobs=max(0,required-s.get('fixed_validation_jobs',0))
+    extra=max(0.,jobs*s['spec'].get('mechanics_allowances',{}).get('replay_s',0.)-integration.get('seconds',0.))
+    integration_time=jobs*s['spec'].get('mechanics_allowances',{}).get('replay_s',0.)
+    available_time=min(science-extra, s['cutoff_unix']-time.time()-integration_time, remaining['wall_s']-integration_time)
     fit=max(0,min(requested,int(remaining['backend_solves'])-protect,math.floor(available_time/a)-protect,
         (int(remaining['tool_calls'])-4*protect-int(root_operation))//3))
     return dict(requested=requested, admitted=fit, internal_launches=fit, numerical_reservation_s=fit*a,
         confirmation_launch_reserve=protect, confirmation_time_reserve_s=protect*a,
-        remaining_numerical_s=science, per_execution_s=a)
+        remaining_numerical_s=science, per_execution_s=a,independent_integration_reserve_s=extra,
+        delivery_activity_reserve_s=b['delivery_reserve_s'],remaining_activity_s=s['cutoff_unix']-time.time())
 
 
 def guard(host, expensive=False):
@@ -258,6 +272,12 @@ def bind(host, reason=None):
 def execute(host, candidate_ref, operation_key, *, role='development', selected=None):
     construction_started=time.perf_counter()
     guard(host,expensive=True); s=state(host); c=verify_candidate(host,candidate_ref)
+    if s['spec'].get('require_configuration_cost_estimate'):
+        estimate=s.get('execution_cost_estimate') or {}
+        if estimate.get('recipe_identity')!=digest(s['profile']['recipe']):
+            raise ValueError('CURRENT_CONFIGURATION_COST_REESTIMATE_REQUIRED')
+        if estimate.get('science_hashes')!=s['profile']['science_hashes']:
+            raise ValueError('CURRENT_IMPLEMENTATION_COST_REESTIMATE_REQUIRED')
     confirmation=role=='confirmation'
     repetition=role in ('diagnostic_repetition','engineering_repetition')
     if repetition:
@@ -284,7 +304,7 @@ def execute(host, candidate_ref, operation_key, *, role='development', selected=
     cfg['policy'].update(budget={**cfg['policy']['budget'],'model_calls':0},allowed_tools=[],
         tool_bindings={n:'1.0.0' for n in ('simulation.run','evaluation.run','control.profile_report')},
         operation_allowances=deepcopy(EXECUTION_ALLOWANCES))
-    simulation_allowance=s['spec']['execution_allowances']['simulation_s']
+    simulation_allowance=s.get('execution_cost_estimate',{}).get('simulation_watchdog_s',s['spec']['execution_allowances']['simulation_s'])
     cfg['policy']['operation_allowances']['simulation.run']=dict(timeout_s=simulation_allowance,reserve_s=simulation_allowance)
     if full_science(cfg)!=c['scientific_configuration']: raise ValueError('EXECUTION_CHANGED_FROZEN_SCIENCE')
     pending=dict(owner=owner,candidate=plain(candidate_ref),configuration=cfg,role=role,
@@ -539,6 +559,10 @@ def local_diagnostic(host, query, key):
     if not record: raise ValueError('ACTUAL_COMPLETE_UPDATE_INPUT_REQUIRED')
     seconds=s['spec'].get('standalone_watchdog_s',150.)*(1+int(q.reuse_solver)); reserve=q.repetitions*seconds
     solves=q.repetitions*(1+int(q.reuse_solver)); protection=repetition_reserve(s)*allowance(s)
+    downstream=s['spec'].get('downstream_reserve',{})
+    if downstream:
+        protection=max(protection,downstream['passing_executions']*allowance(s))
+        protection+=max(0,downstream['fixed_verifications']-s.get('fixed_validation_jobs',0))*s['spec']['mechanics_allowances']['replay_s']
     if (s['local_solves']+solves>b['local_solves'] or s['local_solve_s']+reserve>b['local_solve_s'] or
         s['numerical_s']+s['numerical_reserved_s']+reserve+protection>b['numerical_s'] or
         time.time()+reserve+protection>=s['cutoff_unix']):

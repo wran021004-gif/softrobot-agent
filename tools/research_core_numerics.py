@@ -125,8 +125,8 @@ def offline_diagnostic(request):
     w=Workspace(request['configuration'],p.get('substeps',saved.get('substeps',1)),integration_method=p.get('integration_method',saved.get('integration_method','implicit_euler')))
     if p.get('fixed_interval'):return fixed_input_comparison(w,p['fixed_interval'])
     if request['operation']=='inspect':
-        residuals=np.array([np.asarray(w.step(a,b,u,saved['d'])).ravel()
-            for a,b,u in zip(saved['states'][:-1],saved['states'][1:],saved['tensions_n'])])
+        residuals=np.array([np.asarray(w.step(a,b,saved['tensions_n'][k//saved.get('substeps',1)],saved['d'])).ravel()
+            for k,(a,b) in enumerate(zip(saved['states'][:-1],saved['states'][1:]))])
         return dict(status='completed',saved_trajectory=trajectory_outputs(w,saved),metrics=w.metrics(saved),
             residuals=residuals.tolist(),maximum_normalized_residual=float(abs(residuals).max()),
             maximum_kinematic_residual_rad_m=float(abs(residuals[:,:w.n]).max()*10.),

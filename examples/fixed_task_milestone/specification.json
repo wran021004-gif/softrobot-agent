@@ -1,0 +1,133 @@
+{
+  "allowed_parameters": {
+    "d": [
+      -1,
+      1
+    ],
+    "holding_tip_speed_weight": [
+      0.025,
+      0.1
+    ],
+    "terminal_tip_speed_weight": [
+      0.025,
+      0.1
+    ]
+  },
+  "authorization": "User goal and attachment efc9c442-07c1-4835-acec-bad205609ffd/pasted-text-1.txt; fixed structure only; scoped commits and ordinary HTTPS push authorized; zero application model requests.",
+  "base_commit": "4774d7cf17cf78471d94c38aa08db7a9e0f2eb2d",
+  "budgets": {
+    "activity_s": 43200,
+    "bdf_replays": 8,
+    "delivery_reserve_s": 1800,
+    "local_solve_s": 2400,
+    "local_solves": 6,
+    "numerical_s": 28800,
+    "offline_nlp": 2,
+    "physical_launches": 4,
+    "protected_provider_requests": 0,
+    "provider_requests": 0,
+    "public_operations": 128
+  },
+  "complete_update_inputs": true,
+  "confirmation": {
+    "configuration": "Engineering support requires initial execution plus one independent repetition; historical promotion protocol is not claimed.",
+    "fresh_independent_repetitions": 1
+  },
+  "controller_recipe": {
+    "basis": {
+      "strategy": "structural_linear"
+    },
+    "constraint_jacobian_mode": "automatic",
+    "curvature_scale_rad_m": 10.0,
+    "evaluation_threads": 1,
+    "feasible_return": {
+      "budget_s": 15.0,
+      "minimum_s": 5.0,
+      "relative_improvement": 0.1
+    },
+    "holding_brake_lead_s": 0.0,
+    "holding_speed_cost_mode": "window_normalized_v1",
+    "holding_speed_cost_window_s": 0.05,
+    "holding_tip_speed_weight": 0.08125,
+    "horizon": 10,
+    "integration_method": "implicit_midpoint",
+    "max_cpu_s": 30.0,
+    "max_iterations": 3,
+    "max_unusable_updates": 3,
+    "position_error_scale_m": null,
+    "rate_scale_rad_m_s": 1000.0,
+    "recover_returned_tensions": true,
+    "regenerate_warm_states": true,
+    "root_tolerance": 1e-08,
+    "seed_position_tolerance_fraction": 0.5,
+    "seed_speed_limit_m_s": 0.02,
+    "stopping_policy": "research_work_v1",
+    "substeps": 16,
+    "tension_weight": 0.0001,
+    "terminal_tip_speed_weight": 0.1,
+    "terminal_velocity_weight": 0.0001,
+    "terminal_weight": 5.0,
+    "tip_speed_scale_m_s": 0.02,
+    "tolerance": 1e-06,
+    "tracking_weight": 1.0,
+    "variation_weight": 0.001,
+    "velocity_weight": 0.0001
+  },
+  "diagnostic_protocol": {
+    "failing_case_repetition_allowed": false,
+    "integration_counter": "Each independent GVS integration or short fixed-input MuJoCo continuation counts once; complete controller-driven launches are separate.",
+    "local_prefixes_counted": true,
+    "refinement_validation": {
+      "jobs": 1,
+      "seconds": 450
+    },
+    "repetition_launch_reserve": 1
+  },
+  "downstream_reserve": {
+    "fixed_verifications": 1,
+    "passing_executions": 2
+  },
+  "evaluation_version": 1,
+  "evidence_destination": "evidence/fixed_task_20261012",
+  "execution_allowances": {
+    "construction_s": 10,
+    "evaluation_s": 30,
+    "profile_s": 60,
+    "simulation_s": 8500
+  },
+  "mechanics_allowances": {
+    "inspect_s": 120,
+    "integrate_s": 450,
+    "replay_s": 450,
+    "solve_s": 3300
+  },
+  "mode": "engineering_numerical",
+  "offline_solver_s": 2500,
+  "ranking": "feasible_then_max_normalized_violation_then_sum_v1",
+  "record_update_ids": [],
+  "reference_parameters": {
+    "d": -0.43979400623619647,
+    "holding_tip_speed_weight": 0.08125,
+    "terminal_tip_speed_weight": 0.1
+  },
+  "standalone_watchdog_s": 450,
+  "start_clock_basis": "Current goal start, including engineering and delivery; 2026-10-12 20:13:39 Asia/Shanghai",
+  "started_unix": 1791807219,
+  "study_id": "fc1012",
+  "offline_recipe": {
+    "substeps": 32,
+    "integration_method": "implicit_midpoint"
+  },
+  "baseline_archive": {
+    "folder": "evidence/numerical_repair_20261012",
+    "candidate": {
+      "artifact_id": "0368da606f935472629556a89c5e2b9fb9f61e33a787084c2e340987f3e2d713",
+      "media_type": "application/json"
+    }
+  },
+  "baseline_execution_id": "1335ee31ad4f46e8b258de6523d07e68",
+  "baseline_offline_execution_id": "608691a6a16c4143bc0f12d67909bd43",
+  "execution_required_integrations": 1,
+  "require_configuration_cost_estimate": true,
+  "preliminary_execution_reserve_basis": "Prior 35-update costs scaled conservatively for the proposed 3 to 6 iteration comparison, 8500s; full dispatch also requires fresh matching-configuration calibration."
+}
