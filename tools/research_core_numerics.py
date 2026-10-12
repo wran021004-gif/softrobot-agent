@@ -120,6 +120,7 @@ def offline_diagnostic(request):
     if p.get('investigation')=='projection_continuation':
         from tools.numerical_repair import projection_continuation
         return projection_continuation(request)
+    if p.get('investigation')=='current_control_plans':return current_control_plans(request)
     if p.get('investigation')=='closed_loop':return closed_loop_analysis(request)
     w=Workspace(request['configuration'],p.get('substeps',saved.get('substeps',1)),integration_method=p.get('integration_method',saved.get('integration_method','implicit_euler')))
     if p.get('fixed_interval'):return fixed_input_comparison(w,p['fixed_interval'])
@@ -145,6 +146,34 @@ def offline_diagnostic(request):
     result,trajectory=integrate(w.functions,w.tip,w.velocity,saved,
         request['configuration']['task']['goal']['data']['target_m'],**p.get('tolerances',{}))
     return dict(status=result['status'],method='BDF',replay=result,trajectory=trajectory,forward_integration_jobs=1)
+
+
+def current_control_plans(request):
+    """One charged read-only assessment of the current complete accepted plans."""
+    from tools.platform_store import Store
+    from extensions.tendon_family.control_evidence import ControlEvidence
+    from extensions.tendon_family.gvs_codesign import Workspace
+    store=Store(request['store_root']);result=store.artifact(request['diagnostic_parameters']['current_result'])
+    reader=ControlEvidence(store);source=reader.resolve(result['execution_id'])
+    obs=reader.read_file(source,'controller_observations.json',[])
+    motion=store.artifact(result['profile']['motion']);w=Workspace(request['configuration'])
+    target=np.asarray(request['configuration']['task']['goal']['data']['target_m']);rows=[]
+    for observation in obs:
+        record=observation['complete_update_record'];plan=record['delivered_plan'];scales=np.asarray(record['state_scales'])
+        times=np.r_[record['time_s'],record['prediction_timing']['node_times_s']]
+        states=np.array([[plan[f'x/{k}/{j}']*scales[j] for j in range(2*w.n)] for k in range(len(times))])
+        velocities=np.array([np.asarray(w.velocity(x[:w.n],x[w.n:],request['candidate']['d'])).ravel() for x in states])
+        hold=(times>=.30-1e-9)&(times<=.35+1e-9)
+        current=next((m for m in motion if abs(m['time_s']-record['time_s'])<1e-9),None)
+        rows.append(dict(update_id=record['update_id'],time_s=record['time_s'],accepted=observation['plan_accepted'],
+            predicted_holding_max_speed_m_s=float(np.linalg.norm(velocities[hold],axis=1).max()) if any(hold) else None,
+            predicted_terminal_speed_m_s=float(np.linalg.norm(velocities[-1])),
+            measured_current_speed_m_s=None if current is None else current['tip_speed_m_s'],
+            delivered_tension_n=observation['actual_tension_n'],solver_iterations=record['diagnostics']['iterations'],
+            prediction_timing=record['prediction_timing']))
+    return dict(status='completed',investigation='current_control_plans',source_result=request['diagnostic_parameters']['current_result'],
+        rows=rows,holding_predictions_exceed_limit_at_updates=[r['update_id'] for r in rows if r['predicted_holding_max_speed_m_s'] is not None and r['predicted_holding_max_speed_m_s']>.02],
+        forward_integration_jobs=0,qualification='Accepted goal-based plans evaluated from their actual delivered states; original physical holding acceptance remains separate.')
 
 
 def fixed_input_comparison(w,interval):
