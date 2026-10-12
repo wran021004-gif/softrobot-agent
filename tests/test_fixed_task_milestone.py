@@ -47,6 +47,23 @@ class AdmissionTests(TestCase):
 
 
 class FixedScheduleTests(TestCase):
+    def test_current_replay_applies_inherited_deadline_horizon(self):
+        from extensions.tendon_family.gvs_profile import reach_input
+        from tools import research_core_diagnostic as diagnostic
+        cfg=reach_input('deadline-replay',timing=dict(duration_s=.35,control_period_s=.01))
+        cfg['policy']['controller']['version']='11.0.0'
+        record=dict(effective_horizon=6,coordinate_order=['q'],tendon_order=['u'],
+            prediction_timing=dict(current_time_s=.29))
+        for maximum,expected in [(10,6),(4,4)]:
+            recipe=dict(cfg['policy']['controller']['parameters']['data']['recipe'],horizon=maximum)
+            captured=[]
+            def workspace(*args,**kwargs):
+                captured.append(args[2]['horizon']);raise RuntimeError('captured before numerical construction')
+            with patch.object(diagnostic,'TrajectoryWorkspace',side_effect=workspace):
+                with self.assertRaisesRegex(RuntimeError,'captured'):
+                    diagnostic.replay(dict(configuration=cfg,record=record,mode='research_current',current_recipe=recipe,iteration_cap=3))
+            self.assertEqual(captured,[expected])
+
     def test_local_mesh_keeps_commands_boundaries_and_transcription_matched(self):
         import casadi as ca
         import numpy as np

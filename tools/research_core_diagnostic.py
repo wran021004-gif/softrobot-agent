@@ -44,7 +44,12 @@ def replay(request):
         from tools.research_core_numerics import archived
         recorded=dict(recorded,resolved_problem=archived(**recorded['resolved_problem_archive']))
     recipe['horizon']=recorded['effective_horizon']
-    if request['mode']=='research_current':recipe.update(request['current_recipe'])
+    if request['mode']=='research_current':
+        recipe.update(request['current_recipe'])
+        if inp.policy.controller.version in ('7.0.0','8.0.0','9.0.0','10.0.0','11.0.0'):
+            from extensions.tendon_family.gvs_nmpc import deadline_horizon
+            recipe['horizon']=deadline_horizon(inp.task.timing.duration_s,recorded['prediction_timing']['current_time_s'],
+                inp.task.timing.control_period_s,recipe['horizon'])
     if request['mode'] in ('research_policy','research_current'):
         recipe.update(stopping_policy='research_work_v1',max_iterations=request['iteration_cap'])
     n=len(recorded['coordinate_order'])

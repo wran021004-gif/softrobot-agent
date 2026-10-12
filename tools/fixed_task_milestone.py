@@ -45,10 +45,19 @@ def estimate(h,reference):
     if request['mode']=='research_current':recipe.update(request['current_recipe'])
     recipe['max_iterations']=request['iteration_cap']
     if recipe!=s['profile']['recipe']:raise ValueError('CALIBRATION_RECIPE_MUST_MATCH_SELECTED_RECIPE')
+    actual=v.get('actual_workspace_output',{}).get('complete_update',{}).get('effective_horizon',request['record']['effective_horizon'])
+    expected=recipe['horizon']
+    if request['configuration']['policy']['controller']['version'] in ('7.0.0','8.0.0','9.0.0','10.0.0','11.0.0'):
+        from extensions.tendon_family.gvs_nmpc import deadline_horizon
+        timing=request['configuration']['task']['timing']
+        expected=deadline_horizon(timing['duration_s'],request['record']['prediction_timing']['current_time_s'],timing['control_period_s'],recipe['horizon'])
+    if actual!=expected:raise ValueError('CALIBRATION_EFFECTIVE_HORIZON_MUST_MATCH_ACTUAL_CONTROLLER')
     summary=core.read(core.ROOT/HISTORY/'scientific_summary.json')
     old=next(r for r in summary['physical'] if r['execution_id']==s['repair_history']['source_execution'])
     source=numerics.execution_source(old,HISTORY)
     observations=numerics.archived(HISTORY,source['files']['controller_observations.json'])
+    if recipe['horizon']!=summary['selected_recipe']['horizon'] and actual!=recipe['horizon']:
+        raise ValueError('CHANGED_MAXIMUM_HORIZON_REQUIRES_CALIBRATION_AT_THAT_HORIZON')
     original=observations[v['source_update_id']]
     diagnostics=v['diagnostics'];warm=v.get('actual_workspace_output',{}).get('warm_start',{}).get('preparation_s',original['warm_preparation_s'])
     recovery=v.get('recovery',{}).get('wall_s',0.)
@@ -63,6 +72,7 @@ def estimate(h,reference):
     overhead=sum(value for name,value in s['spec']['execution_allowances'].items() if name!='simulation_s')
     value=dict(recipe_identity=digest(recipe),recipe=recipe,science_hashes=s['profile']['science_hashes'],
         measured_calibration=reference,source_update_id=v['source_update_id'],fresh_update_s=fresh_update,
+        maximum_horizon=recipe['horizon'],measured_effective_horizon=actual,
         historical_matched_update_s=baseline_update,measured_cost_ratio=ratio,
         predicted_simulation_s=predicted,simulation_watchdog_s=simulation,total_watchdog_s=simulation+overhead,
         safety_margin=1.35,estimated_unix=time.time(),
