@@ -48,6 +48,7 @@ def build(host):
             and option['max_wall_s'] is None and option['feasible_return'] is None
             and option['retain_feasible_iterate'] and option['max_iterations']==s['profile']['recipe']['max_iterations']
             for option in settings)
+        row['maximum_observed_iterations']=max((o['complete_update_record']['diagnostics']['iterations'] for o in observations),default=None)
         row['recorded_holding_first_step_predictions']=[dict(update_time_s=o['time_s'],prediction_time_s=p['time_s'],
             predicted_speed_m_s=float(np.linalg.norm(p['tip_velocity_m_s'])))
             for o in observations if (p:=o.get('one_step_prediction')) and .30-1e-9<=p['time_s']<=.35+1e-9]
@@ -78,6 +79,7 @@ def build(host):
         and row['diagnostics']['options']['max_iterations']==s['profile']['recipe']['max_iterations']
         for row in host.store.artifact(selected_policy)['rows'])
     selected_physical=[row for row in physical if row['profile_identity']==s['profile']['identity']]
+    policy_ok=policy_ok and bool(selected_physical) and all(row['research_stopping_observed'] for row in selected_physical)
     complete_selected=[row for row in selected_physical if row['status']=='evaluated']
     closed_loop_status=('passed' if gate['matching_passing_executions'] else
         'failed' if any(not row['acceptance'].get('accepted') for row in complete_selected) else
@@ -99,6 +101,7 @@ def build(host):
         independent_integration_configurations=s['bdf_replays'],offline_attempts=s['offline_nlp'],
         complete_mujoco_launches=host.store.remaining()['used']['backend_solves'],charged_numerical_s=s['numerical_s'],
         internal_closed_loop_updates=updates,activity_elapsed_s=time.time()-s['started_unix'],ceilings=s['spec']['budgets'])
+    resources['activity_as_of_unix']=time.time()
     summary=dict(schema='numerical_repair_delivery_v1',study_id=host.run_id,status='engineering_delivered',
         started_unix=s['started_unix'],base_commit=s['spec']['base_commit'],implementation_binding=s['freeze'],
         source_versions=s['profile']['science_hashes'],profile_history=s['profile_history'],stages=statuses,stage_reasons=reasons,
@@ -112,7 +115,7 @@ def build(host):
         barrier=s.get('remaining_barrier'),limitations=['Sampled task acceptance is not a continuous-time guarantee.',
             'The measured projection/representable dynamics discrepancy remains a tested model limitation.',
             'The fixed-input study restores available state fields; unarchived MuJoCo runtime fields are not claimed.',
-            'Repeated local solve agreement is not complete closed-loop repeatability; two complete passes support only this frozen task.'])
+            'Complete execution agreement does not establish original-task acceptance or broad robustness; diagnostic repetitions cannot satisfy length admission.'])
     atomic_json(out/'scientific_summary.json',summary)
     labels={'passed':'通过','failed':'失败','incomplete':'未完成','not_attempted':'未执行','passed_with_measured_limitation':'比较完成，保留已测局限'}
     lines=['# 数值执行修复 nr1012','',

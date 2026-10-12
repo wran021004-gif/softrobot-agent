@@ -2,7 +2,7 @@
 
 Use the existing worktree `D:\softrobot-agent\.worktrees\mechanics-control-mainline` and interpreter `D:\softrobot-agent\.mainline5-env\Scripts\python.exe`. Do not load provider credentials or call an application model. Historical studies stay sealed. The specification records the actual goal start and includes engineering and delivery activity in the 12 hour ceiling.
 
-All examples below use that interpreter as `python` from the worktree. The active ledger is `runs/nr1012`; never create a second ledger to reset costs. Existing operation keys return their original receipt when the request identity still matches. Use `research_core recover` for pending outcomes before migration or another dispatch.
+All examples below use that interpreter as `python` from the worktree. The active ledger is `runs/nr1012`; never create a second ledger to reset costs. Mechanics and diagnostic operation keys return their original receipt when the request identity still matches. Full `execute` and `repeat` commands deliberately start fresh executions: inspect pending/results first and never repeat a completed command to recover its output. Use `research_core recover` for pending outcomes before migration or another dispatch; read immutable result references when the outcome is already complete.
 
 ```powershell
 python -m tools.numerical_repair prepare
@@ -68,3 +68,7 @@ python -m tools.numerical_repair gate
 ```
 
 The repeat command creates a new execution owner and controller process with exactly the source candidate/profile. A passing source uses `engineering_repetition`; a failed source uses `diagnostic_repetition`. Neither a failure repetition nor an incomplete execution can satisfy length admission. Preserve both complete command and world-trajectory comparisons. No further adaptation or third fixed optimization is admitted.
+
+The selected `fixed-window-normalized` execution (`1335ee31ad4f46e8b258de6523d07e68`, result `b7e369f215151fe31441d11c9a162f8c1096cd6bb8fb10955ca68535af8f981d`) and fresh repeat (`03085a596aa84ec88c9e4b5e10c82642`, result `716a8613f57c91e9813559d26353374b398cbc9d5e16cd9c769bd87ca68717f5`) each complete 35 feasible updates with no solver errors. Both fail the unchanged original holding-speed limit: 0.025813858195278372 > 0.02 m/s. Holding position passes at 0.0073313765443279505 m. Captured accepted first-step predictions already contain holding overspeed, despite a low final predicted speed. These are complete failure-repetition evidence, not two original-task passes.
+
+Both allowed new fixed optimizations pass numerical feasibility and independent sampled-task acceptance, but fail exact optimizer-node velocity consistency. The revised 16-substep candidate's maximum velocity-vector difference is 0.003526347000457393 m/s at 0.290625 s, above 0.002 m/s. No optional length solve is dispatched. The remaining third offline slot is reserved for the conditional length stage and cannot become a third fixed attempt.
