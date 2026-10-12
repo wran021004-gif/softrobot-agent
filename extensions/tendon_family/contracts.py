@@ -998,6 +998,9 @@ class GVSTrajectoryParameters(Contract):
     integration_method: Literal['implicit_euler', 'implicit_midpoint'] = 'implicit_euler'
     root_tolerance: FiniteFloat = Field(default=1e-10,gt=0,le=1e-8,
         description='Scaled warm/tail/recovery Newton tolerance; complete plans still require independent feasibility <=1e-5.')
+    holding_speed_cost_mode: Literal['time_integral_v1','window_normalized_v1'] = 'time_integral_v1'
+    holding_speed_cost_window_s: FiniteFloat = Field(default=.05,gt=0,
+        description='Declared original holding-window duration used only to normalize the soft speed cost; acceptance is unchanged.')
     position_error_scale_m: FiniteFloat | None = Field(default=None,gt=0,
         description='Position cost scale in m; None uses the task reach tolerance, without changing acceptance.')
     tip_speed_scale_m_s: FiniteFloat = Field(default=.02,gt=0,

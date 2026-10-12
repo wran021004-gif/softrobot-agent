@@ -134,7 +134,7 @@ def main():
         with tarfile.open(out/'immutable_artifacts.tar.gz') as archive:
             for member in archive:
                 if hashlib.sha256(archive.extractfile(member).read()).hexdigest()!=member.name.split('/')[-1].split('.')[0]:raise ValueError('ARCHIVE_MEMBER_HASH_MISMATCH')
-        atomic_json(out/'verification.json',dict(archive_members_verified=len(manifest['members']),archive_sha256=manifest['archive_sha256'],focused_checks=13,repository_wide_suites=0))
+        atomic_json(out/'verification.json',dict(archive_members_verified=len(manifest['members']),archive_sha256=manifest['archive_sha256'],focused_checks=14,repository_wide_suites=0))
     print(json.dumps(dict(stages=summary['stages'],resources=summary['resources'],barrier=summary['barrier']),ensure_ascii=True))
 
 

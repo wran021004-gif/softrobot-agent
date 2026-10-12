@@ -30,6 +30,7 @@ SCIENCE_FILES = ['extensions/tendon_family/gvs_nmpc.py', 'extensions/tendon_fami
     'extensions/tendon_family/gvs_projection.py','extensions/tendon_family/contracts.py',
     'extensions/optimization/contracts.py','schemas/casadi_feedback.py',
     'tools/numerical_repair.py',
+    'extensions/tendon_family/control_evidence.py',
     'extensions/tendon_family/backends.py',
     'extensions/optimization/ipopt.py', 'extensions/tendon_family/generated_serial.py',
     'extensions/tendon_family/gvs_profile.py', 'tools/design_optimization.py',

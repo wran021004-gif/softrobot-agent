@@ -68,7 +68,8 @@ def objective_components(ws, states, tensions, previous):
         result['running_curvature_rate']+=h*p.velocity_weight*float(np.sum(state[ws.n:]**2))
         if p.holding_tip_speed_weight:
             active=ws.problem.initial_guess[f'holding/{k}']
-            result['holding_tip_speed']+=h*p.holding_tip_speed_weight*active*float(np.sum(np.asarray(speed)**2/p.tip_speed_scale_m_s**2))
+            normalization=p.holding_speed_cost_window_s if p.holding_speed_cost_mode=='window_normalized_v1' else 1.
+            result['holding_tip_speed']+=h*p.holding_tip_speed_weight/normalization*active*float(np.sum(np.asarray(speed)**2/p.tip_speed_scale_m_s**2))
     for k,u in enumerate(tensions):
         result['running_tension']+=ws.period*p.tension_weight*float(np.sum(u**2))
         result['running_tension_variation']+=ws.period*p.variation_weight*float(np.sum((u-(previous if k==0 else tensions[k-1]))**2))

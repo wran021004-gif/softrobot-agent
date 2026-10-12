@@ -129,7 +129,8 @@ class GVSTrajectoryAssembler:
             objective+=h*(p.tracking_weight*ca.sumsqr((tip-target)/tolerance)+p.velocity_weight*ca.sumsqr(velocity_error/p.tip_speed_scale_m_s if tracking else y[n:]))
             if p.holding_tip_speed_weight:
                 speed=ca.mtimes(ca.DM(rotation),local_velocity(y[:n],y[n:]))
-                objective+=h*p.holding_tip_speed_weight*symbols[f'holding/{k+1}']*ca.sumsqr(speed/p.tip_speed_scale_m_s)
+                normalization=p.holding_speed_cost_window_s if p.holding_speed_cost_mode=='window_normalized_v1' else 1.
+                objective+=h*p.holding_tip_speed_weight/normalization*symbols[f'holding/{k+1}']*ca.sumsqr(speed/p.tip_speed_scale_m_s)
         for k,u in enumerate(U):
             objective+=dt*(p.tension_weight*ca.sumsqr(u)+p.variation_weight*ca.sumsqr(u-(previous if k==0 else U[k-1])))
         objective+=p.terminal_weight*ca.sumsqr((tip-target)/tolerance)+p.terminal_velocity_weight*ca.sumsqr(velocity_error/p.tip_speed_scale_m_s if tracking else X[-1][n:])
@@ -184,6 +185,9 @@ class TrajectoryWorkspace:
             if settling is None:raise ValueError('GVS_HOLDING_COST_REQUIRES_SETTLING_CONFIGURATION')
             from .gvs_profile import SampledSettling
             self.holding_start=self.duration-SampledSettling.model_validate(settling).window_s
+            if (self.parameters.holding_speed_cost_mode=='window_normalized_v1' and
+                abs(self.parameters.holding_speed_cost_window_s-SampledSettling.model_validate(settling).window_s)>1e-12):
+                raise ValueError('HOLDING_COST_NORMALIZATION_MUST_MATCH_DECLARED_TASK_WINDOW')
         self.state_scales=np.r_[np.full(self.n,self.parameters.curvature_scale_rad_m),
             np.full(self.n,self.parameters.rate_scale_rad_m_s)]
         self.m=len(nominal_u);self.nominal_x=list(nominal_x);self.nominal_u=list(nominal_u)

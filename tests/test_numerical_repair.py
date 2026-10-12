@@ -11,6 +11,16 @@ from tools import numerical_repair as repair
 
 
 class RepairTests(TestCase):
+    def test_window_cost_is_explicit_and_original_acceptance_is_unchanged(self):
+        from extensions.tendon_family.control_evidence import objective_components
+        p=GVSTrajectoryParameters(holding_tip_speed_weight=.08125,holding_speed_cost_mode='window_normalized_v1')
+        ws=SimpleNamespace(parameters=p,period=.01,n=1,target=np.zeros(3),goal_tolerance=.01,
+            _motion=lambda q,v:(np.zeros(3),np.array([.02,0.,0.])),problem=SimpleNamespace(initial_guess={'holding/1':1.}))
+        values=objective_components(ws,np.zeros((2,2)),np.zeros((1,1)),np.zeros(1))
+        self.assertAlmostEqual(values['holding_tip_speed'],.01*.08125/.05)
+        self.assertEqual(p.holding_speed_cost_window_s,.05);self.assertEqual(p.tip_speed_scale_m_s,.02)
+        self.assertEqual(GVSTrajectoryParameters().holding_speed_cost_mode,'time_integral_v1')
+
     def test_research_regeneration_omits_only_unused_repeated_state_diagnostic(self):
         ws=SimpleNamespace(parameters=GVSTrajectoryParameters(stopping_policy='research_work_v1'),
             _prepare_tail=lambda:0.,state_scales=np.ones(2),
