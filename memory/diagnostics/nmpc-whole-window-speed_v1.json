@@ -1,0 +1,136 @@
+{
+  "schema": "project_diagnostic_procedure_v1",
+  "revision": "1",
+  "kind": "procedure",
+  "bindings": {
+    "study_id": "fc1012",
+    "task_fingerprint": "2b26edb492214c426263441b6adb52d7aafe41a828436d6b48a1171374a1026c",
+    "structure_fingerprint": "e00fd0d4af3afa2324235ccb2a5662e6d82aa196369f4208bc084cd9ae3e9c1c",
+    "controller_recipe": {
+      "basis": {
+        "strategy": "structural_linear"
+      },
+      "constraint_jacobian_mode": "automatic",
+      "curvature_scale_rad_m": 10.0,
+      "evaluation_threads": 1,
+      "feasible_return": {
+        "budget_s": 15.0,
+        "minimum_s": 5.0,
+        "relative_improvement": 0.1
+      },
+      "holding_brake_lead_s": 0.05,
+      "holding_speed_cost_mode": "window_normalized_v1",
+      "holding_speed_cost_window_s": 0.05,
+      "holding_tip_speed_weight": 0.08125,
+      "horizon": 10,
+      "integration_method": "implicit_midpoint",
+      "max_cpu_s": 30.0,
+      "max_iterations": 3,
+      "max_unusable_updates": 3,
+      "position_error_scale_m": null,
+      "rate_scale_rad_m_s": 1000.0,
+      "recover_returned_tensions": true,
+      "regenerate_warm_states": true,
+      "root_tolerance": 1e-08,
+      "seed_position_tolerance_fraction": 0.5,
+      "seed_speed_limit_m_s": 0.02,
+      "stopping_policy": "research_work_v1",
+      "substeps": 16,
+      "tension_weight": 0.0001,
+      "terminal_tip_speed_weight": 0.1,
+      "terminal_velocity_weight": 0.0001,
+      "terminal_weight": 5.0,
+      "tip_speed_scale_m_s": 0.02,
+      "tolerance": 1e-06,
+      "tracking_weight": 1.0,
+      "variation_weight": 0.001,
+      "velocity_weight": 0.0001
+    },
+    "model_science_hashes": {
+      "extensions/optimization/contracts.py": "21a7729881fce05a78356743199353151f581a55c6231b97e8f00b45323816b5",
+      "extensions/optimization/ipopt.py": "eb2672cb3845a17ef703d85f939545fa3e4d0358b6da42c89f83231bb00dbfb2",
+      "extensions/tendon_family/backends.py": "2bea024db70f449bacd5b428f64abc58e5042b08c29f9beac3e237dea8da786f",
+      "extensions/tendon_family/contracts.py": "5cc4c1032b32c3f6e8ae6f1ab8b91bbcdc1f8db2f78bca53b40b1702ef4bb430",
+      "extensions/tendon_family/control_evidence.py": "31b1994df6c55880b3e2bb5adaaebe502badbf36a6b206c7f03b733e44af989a",
+      "extensions/tendon_family/generated_serial.py": "54d406b33d121e544c51793476ae3723223630ef1810b10541c6c4ccabb8d9cf",
+      "extensions/tendon_family/gvs.py": "c0201588c34f90090e14c27302ef5a2bd2888626e06b4beb746b8889a9b9f320",
+      "extensions/tendon_family/gvs_basis.py": "0dd6ae2d26b180f9da588f8732f8a9d0800b633535485f5e7eca4c4b68bf3455",
+      "extensions/tendon_family/gvs_casadi.py": "ae16f44882e4a7850dbdfa76e9942bb607bc92c51cf6b773356455a49d0dcdbd",
+      "extensions/tendon_family/gvs_codesign.py": "2839df0870a063993d26ceefa8376470f59ecc33c5744c451d4a5b9c23f4646f",
+      "extensions/tendon_family/gvs_nmpc.py": "2232494de8ef421e7e84d209af2cf87151173d8e402fe67aa798f165bef089eb",
+      "extensions/tendon_family/gvs_profile.py": "377fe6067f1199006e18f6acc72f7af2657db4f62e54658d83b4777deb01d709",
+      "extensions/tendon_family/gvs_projection.py": "4b17c9389652de3cc5a889384beba0a63dec18a7db0f7f9ed9696b3f794b8df7",
+      "extensions/tendon_family/gvs_trajectory.py": "0c3c090d344c1d60eaecb3643602205d8169b412de3bc51ac51bcea076783b60",
+      "schemas/casadi_feedback.py": "dd19cc8a4087cf690a07213109b4f33fe10c22cccccf07631f4ee7152869c121",
+      "tools/casadi_codesign_worker.py": "ac7fc1893e9e2a2fb8a7759924aa56927e56d46d33e5198344d9011fb75fb5e4",
+      "tools/casadi_feedback_worker.py": "a8c1a2653b65804d6a0cfab4e558590724ee63d118c92ac724ddeeb7228dd05a",
+      "tools/design_optimization.py": "14889d414b300d21cbea4d137fb2f0bde1ed2f48792add8e3bc163b9f07d4e58",
+      "tools/execution_completion.py": "b745b96446f9f7b1e5172a8f8cc8c93d2a053a7df385d6c0e2e7299aa946a069",
+      "tools/fixed_task_milestone.py": "90a2ec78b6670de61cad603881034d2b0a6ec6125d0833ae0710f84f95bf95d8",
+      "tools/numerical_repair.py": "94fbf1aab6ae29e48467dac6eb83d6328a20cbeee1b180868ae2abec871dbd30",
+      "tools/research_core_mechanics.py": "d50f331746f47a7e4c285f0c3f9e708ce486d1bbb27ed10d1e30194a61bbb823",
+      "tools/research_core_mechanics_worker.py": "b461a1de2d79653c4fe0823cccc10adb20f9067eb7eb15f0d823ab8a780c2722",
+      "tools/research_tasks.py": "65a5bb2af256e7a46ce891085f1d63237312e17c860fbdbd1998bb80e6d85bbd"
+    },
+    "evaluation_version": 4,
+    "physical_and_numerical_binding": {
+      "artifact_id": "8209af1d30774832b63a75c12099ff1e92a5f79b6f142c90a6f9e7f242671f98",
+      "media_type": "application/json"
+    }
+  },
+  "status": {
+    "diagnostic_method_supported": true,
+    "repair_effective_in_this_case": false,
+    "original_task_passed": false,
+    "generalization": "unverified"
+  },
+  "applicability": [
+    "Check exact task/model/controller/evaluator fingerprints and absolute timing before adoption.",
+    "Use immutable artifact IDs with original execution/study ownership; do not substitute execution IDs."
+  ],
+  "escalation": "Stop if execution plus fresh same-configuration confirmation, required independent integration and delivery cannot fit both budgets. Retain negative and interrupted attempts.",
+  "known_counterexamples": [
+    "Numerical feasibility and lower objective can coexist with unacceptable holding speed.",
+    "Identical commands across failed repeats do not establish task success."
+  ],
+  "entry_id": "nmpc-whole-window-speed",
+  "failure_type": "holding_overspeed",
+  "trigger": "Holding speed fails although position and final predicted speed pass.",
+  "symptom": "Selected historical MuJoCo holding speed .025813858m/s; accepted prediction at .30s .042022303m/s. The horizon sees hold entry from .20s, but the speed cost previously starts only at .30s.",
+  "evidence": [
+    {
+      "artifact_id": "8209af1d30774832b63a75c12099ff1e92a5f79b6f142c90a6f9e7f242671f98",
+      "media_type": "application/json"
+    },
+    {
+      "artifact_id": "4d127973272e5461ea56d7610521f6f363ff707b6475c2c7b5041d3733f5746c",
+      "media_type": "application/json"
+    },
+    {
+      "artifact_id": "f7741188b261ef658f44ad990fe2007130aa3aac224aef7a1aec49d983e243c7",
+      "media_type": "application/json"
+    }
+  ],
+  "hypotheses": {
+    "supported": [
+      "Accepted plans already contain whole-window overspeed."
+    ],
+    "weakened": [
+      "Only a projection mapping bug can explain remaining overspeed."
+    ],
+    "unresolved": [
+      "Earlier braking cost improves physical task acceptance."
+    ]
+  },
+  "cheapest_check": "Decode delivered absolute-time plans, inclusive holding masks and aligned one-step execution evidence; compare solver progress before a full launch.",
+  "expected_interpretation": "Account for horizon coverage, actual current state, selection and recovery. A late measured state may already be too fast.",
+  "intervention": "Keep3 iterations and midpoint16; start holding speed cost at .25s so braking is visible from .15s. Original physical acceptance remains .30-.35s.",
+  "before_after": {
+    "historical_holding_speed_m_s": 0.025813858195278372,
+    "current_adaptation_validation": "pending"
+  },
+  "stop_conditions": [
+    "Do not report slack-feasible or low terminal-speed plans as whole-window task passes.",
+    "Use aligned prediction-versus-execution vectors if predictions become acceptable but physical speed still fails."
+  ]
+}
