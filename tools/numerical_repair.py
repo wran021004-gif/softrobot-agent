@@ -29,6 +29,17 @@ def history_inputs(host):
         record['resolved_problem_archive']=dict(folder=numerics.HISTORY,reference=ref)
         records[str(index)]=numerics.imported_record(host,candidate['configuration'],record,
             dict(study_id=summary['study_id'],folder=numerics.HISTORY,execution_id=row['execution_id'],update_id=index))
+    diagnosis=core.read(core.ROOT/DIAG/'scientific_summary.json')
+    divergent=diagnosis['physical_validation'][0];div_source=numerics.execution_source(divergent,DIAG)
+    div_observations=numerics.archived(DIAG,div_source['files']['controller_observations.json'])
+    div_record=deepcopy(div_observations[10]['complete_update_record'])
+    definition=div_record['resolved_problem_reference']
+    div_record['resolved_problem_archive']=dict(folder=DIAG,reference=div_source['files'][definition['filename']])
+    div_candidate=numerics.archived(DIAG,div_source['result']['candidate'])
+    records['primary-10']=records['10']
+    records['10']=numerics.imported_record(host,div_candidate['configuration'],div_record,
+        dict(study_id=diagnosis['study_id'],folder=DIAG,execution_id=divergent['execution_id'],update_id=10,
+             reason='Saved first-divergence input: timed iteration 5 versus 4'))
     ref=core.save(host,dict(configuration=candidate['configuration'],observations=observations,samples=samples,
         files=source['files'],source_archive=numerics.HISTORY,source_execution=row['execution_id']), 'repair_source_states')
     core.update(host,repair_history=dict(**info,records=records,states=ref))
@@ -73,7 +84,6 @@ def select_recipe(host,changes,reason):
 def projection_continuation(request):
     """One counted continuation; restore available q/v honestly, never claim full snapshot."""
     import mujoco
-    from tempfile import TemporaryDirectory
     from extensions.tendon_family.gvs_projection import project,discretize,discretization_jacobian
     from extensions.tendon_family.gvs_codesign import Workspace
     p=request['diagnostic_parameters'];source=p['saved_source'];index=p['update_id']
@@ -87,9 +97,9 @@ def projection_continuation(request):
     basis=source['configuration']['policy']['controller']['parameters']['data']['recipe']['basis']
     projected=project(physics,source['configuration']['robot']['structure']['data'],q,v,basis)
     if p['state_kind']=='representable':q,v=discretize(physics,source['configuration']['robot']['structure']['data'],projected['q_gvs'],projected['qdot_gvs'],basis)
-    with TemporaryDirectory(dir=core.ROOT/'runs',prefix='pc-') as folder:
-        path=Path(folder)/'r.xml';path.write_bytes(numerics.archived(archive,files['robot.xml'],raw=True))
-        model=mujoco.MjModel.from_xml_path(str(path));data=mujoco.MjData(model)
+    if True:
+        # Archived meshes are inline. Avoid Windows temporary-directory ACLs.
+        model=mujoco.MjModel.from_xml_string(numerics.archived(archive,files['robot.xml'],raw=True).decode('utf8'));data=mujoco.MjData(model)
         joints=[model.joint(name).id for name in physics['dofs']]
         qi=model.jnt_qposadr[joints];vi=model.jnt_dofadr[joints]
         aids=[model.actuator(t['entity']+'_direct_tension').id for t in physics['tendons']]

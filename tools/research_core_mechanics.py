@@ -58,6 +58,8 @@ def dispatch(host, operation, arguments, key):
     if downstream:
         protection=max(protection,max(0,downstream['passing_executions']-sum(bool((host.store.artifact(r).get('acceptance') or {}).get('accepted')) for r in s['results']))*core.allowance(s))
         future_jobs=max(0,downstream['fixed_verifications']-s.get('fixed_validation_jobs',0))
+        if operation in ('integrate','inspect') and not uses_validation:
+            protection+=future_jobs*s['spec']['mechanics_allowances']['replay_s']
         if counter=='bdf_replays' and s.get(counter,0)+1+max(0,future_jobs-int(uses_validation))>b[counter]:
             raise ValueError('DOWNSTREAM_FIXED_VERIFICATION_JOBS_PROTECTED')
         if operation=='solve':
