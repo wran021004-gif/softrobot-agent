@@ -286,7 +286,7 @@ def execute(host, candidate_ref, operation_key, *, role='development', selected=
     pending=dict(owner=owner,candidate=plain(candidate_ref),configuration=cfg,role=role,
         selected_execution=plain(selected),operation_key=operation_key,started_unix=time.time(),
         profile_identity=s['profile']['identity'],admission=admission)
-    update(host,pending=pending,numerical_reserved_s=allowance(s))
+    update(host,pending=pending,numerical_reserved_s=s['numerical_reserved_s']+allowance(s))
     child=Host(host.store.root,owner,actor=host.actor); child.create(cfg,parent_run_id=host.run_id)
     pending['construction_s']=time.perf_counter()-construction_started
     update(host,pending=pending)
@@ -337,7 +337,7 @@ def finish_execution(host, recovery=False):
     from tools.research_core_feedback import mechanics_context
     detail['mechanics_context']=mechanics_context(host,p['candidate'])
     ref=save(host,detail,'experiment_result'); s=state(host)
-    update(host,results=[*s['results'],ref],pending=None,numerical_reserved_s=0.,numerical_s=s['numerical_s']+actual)
+    update(host,results=[*s['results'],ref],pending=None,numerical_reserved_s=s['numerical_reserved_s']-allowance(s),numerical_s=s['numerical_s']+actual)
     from tools.research_core_feedback import eligibility
     return dict(reference=ref,**compact_result(detail),confirmation=eligibility(host,ref),
         operation_cost=dict(additional_numerical_s=actual,additional_scientific_executions=1,cached_operation_receipt=False))

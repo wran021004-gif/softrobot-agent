@@ -48,6 +48,18 @@ class RepairTests(TestCase):
         values['old']['imported_historical_evidence']=False
         with patch.object(repair.core,'state',return_value=state):self.assertFalse(repair.length_admission(host)['passed'])
 
+    def test_bdf_checks_exact_nodes_without_velocity_sample_interpolation(self):
+        from extensions.tendon_family.gvs_codesign import integrate
+        x=ca.MX.sym('x',2);u=ca.MX.sym('u');d=ca.MX.sym('d');q=ca.MX.sym('q');v=ca.MX.sym('v')
+        functions=SimpleNamespace(_linearization_symbols=(x,u,ca.vertcat(x[1],1000*u)),design_input=d)
+        tip=ca.Function('toy_tip',[q,d],[ca.vertcat(q*q,0,0)])
+        velocity=ca.Function('toy_velocity',[q,v,d],[ca.vertcat(2*q*v,0,0)])
+        times=np.arange(281)*.01/8
+        candidate=dict(d=0.,coordinate_order=['q'],times_s=times,states=np.stack([500*times**2,1000*times],axis=1),tensions_n=[[1.]]*35)
+        result,_=integrate(functions,tip,velocity,candidate,[0.,0.,0.],rtol=1e-11,atol_q=1e-12,atol_v=1e-12)
+        self.assertLess(result['node_max_speed_disagreement_m_s'],1e-5)
+        self.assertIn('exact optimizer-node',result['node_comparison'])
+
 
 if __name__=='__main__':
     import unittest

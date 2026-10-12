@@ -49,7 +49,7 @@ def resolve_gvs_nmpc_control(inp,physics):
             q0=point['q0'],u0=point['u0'],derivation=point),
         projector=description(physics,basis),effective_parameters=p.model_dump(mode='json'),
         stopping=dict(policy=p.stopping_policy,iteration_ceiling=p.max_iterations,numerical_tolerance=p.tolerance,
-            feasible_return=None if p.stopping_policy=='research_work_v1' else p.feasible_return,
+            feasible_return=None if p.stopping_policy=='research_work_v1' or p.feasible_return is None else p.feasible_return.model_dump(mode='json'),
             max_cpu_s=None if p.stopping_policy=='research_work_v1' else p.max_cpu_s,
             external_watchdog='Enclosing execution interruption is incomplete/timeout, never a successful timed command'),
         timing=dict(period_s=inp.task.timing.control_period_s,prediction_interval_s=inp.task.timing.control_period_s,
