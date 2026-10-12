@@ -230,7 +230,7 @@ def guard(host, expensive=False):
         raise ValueError('LAST_FOUR_PROVIDER_REQUESTS_PROTECTED')
 
 
-def bind(host, reason=None):
+def bind(host, reason=None, specification=None):
     from tools.platform_tasks import compile_input
     if subprocess.check_output(['git','status','--porcelain'],cwd=ROOT,text=True).strip():
         raise ValueError('COMMIT_BEFORE_BIND_OR_MIGRATION')
@@ -239,6 +239,17 @@ def bind(host, reason=None):
     with host.store.connect(True) as db:
         if db.execute('SELECT COUNT(*) FROM calls WHERE receipt IS NULL').fetchone()[0]:
             raise ValueError('UNSEALED_RESERVATION_BLOCKS_BIND')
+    if specification is not None and specification!=s['spec']:
+        if not reason:raise ValueError('SPECIFICATION_MIGRATION_REASON_REQUIRED')
+        immutable=('study_id','started_unix','baseline_archive','baseline_execution_id','baseline_offline_execution_id')
+        if any(specification.get(k)!=s['spec'].get(k) for k in immutable):raise ValueError('MIGRATION_CANNOT_RESET_STUDY_OR_SOURCE_IDENTITY')
+        ceilings=('activity_s','numerical_s','provider_requests','protected_provider_requests','local_solves','local_solve_s','offline_nlp','bdf_replays','physical_launches','public_operations')
+        if any(specification['budgets'][k]!=s['spec']['budgets'][k] for k in ceilings):raise ValueError('MIGRATION_CANNOT_CHANGE_AUTHORIZED_CEILINGS')
+        if specification['budgets']['delivery_reserve_s']!=s['spec']['budgets']['delivery_reserve_s']:raise ValueError('MIGRATION_CANNOT_RESET_DELIVERY_CUTOFF')
+        relation=save(host,dict(previous=s['spec'],selected=specification,reason=reason,
+            clocks_and_counters_preserved=True),'specification_migration')
+        update(host,spec=specification,specification_migrations=[*s.get('specification_migrations',[]),relation])
+        s=state(host)
     old=host.store.session(host.run_id)['snapshot']; snapshot=compile_input(old['input'],host.reg)
     commit=subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip()
     profile=deepcopy(s['profile'])
@@ -956,7 +967,7 @@ def main():
     parser.add_argument('--spec',type=Path,default=DEFAULT_SPEC); parser.add_argument('--plan',type=Path)
     parser.add_argument('--request-id'); parser.add_argument('--reason'); args=parser.parse_args()
     spec=read(args.spec); h=prepare(args.spec) if args.command=='prepare' else Host(ROOT/'runs'/spec['study_id'],spec['study_id'],actor='unified-research')
-    if args.command in ('bind','migrate'): bind(h,args.reason if args.command=='migrate' else None)
+    if args.command in ('bind','migrate'): bind(h,args.reason if args.command=='migrate' else None,spec)
     elif args.command=='execute': print(json.dumps(dispatch(h,read(args.plan),args.request_id or 'manual-'+uuid4().hex,origin='engineering'))); return
     elif args.command=='diagnose': print(json.dumps(diagnose(h,state(h)['results']))); return
     elif args.command=='recover': print(json.dumps(recover(h))); return

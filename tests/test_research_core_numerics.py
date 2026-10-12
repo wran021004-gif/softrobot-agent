@@ -26,6 +26,21 @@ class NumericalTests(TestCase):
         import gc
         gc.collect();self.temp.cleanup()
 
+    def test_explicit_specification_migration_preserves_counters_and_clock(self):
+        before=core.state(self.host);spec=deepcopy(before['spec'])
+        spec.update(offline_recipe=dict(substeps=16,interval_substeps=[16]*29+[64,64]+[16]*4))
+        spec['budgets']['delivery_numerical_s']=120
+        core.update(self.host,numerical_s=321.,local_solves=2,bdf_replays=3)
+        with patch.object(core.subprocess,'check_output',side_effect=lambda cmd,**kwargs:'' if cmd[1]=='status' else 'fixture-commit'):
+            core.bind(self.host,'Explicit local mesh selection',spec)
+            current=core.state(self.host)
+            self.assertEqual(current['spec']['offline_recipe'],spec['offline_recipe'])
+            self.assertEqual((current['numerical_s'],current['local_solves'],current['bdf_replays']),(321.,2,3))
+            self.assertEqual(current['started_unix'],before['started_unix'])
+            bad=deepcopy(spec);bad['budgets']['numerical_s']+=1
+            with self.assertRaisesRegex(ValueError,'AUTHORIZED_CEILINGS'):
+                core.bind(self.host,'Must reject budget reset',bad)
+
     def test_zero_model_guard_and_stop_pending_protection(self):
         with patch.object(self.host,'compatibility',return_value={'compatible':True}):
             core.guard(self.host,True)
