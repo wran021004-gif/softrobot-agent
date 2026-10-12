@@ -14,7 +14,7 @@ class Candidate(Contract):
     secondary_coefficient: float = Field(default=0., ge=0., le=.001)
     initialization: Literal['pretension_0_2','ramp_0_2_to_0_4','saved_schedule'] = 'pretension_0_2'
     source_candidate: EvidenceRef | None = None
-    substeps: int = Field(default=1,ge=1,le=8)
+    substeps: int = Field(default=1,ge=1,le=16)
     integration_method: Literal['implicit_euler','implicit_midpoint'] = 'implicit_euler'
 
     @model_validator(mode='after')

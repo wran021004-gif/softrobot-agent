@@ -40,16 +40,37 @@ def inspect_problem(ws,recorded):
 def replay(request):
     started=time.perf_counter(); inp=SessionInput.model_validate(request['configuration'])
     recorded=request['record']; recipe=dict(inp.policy.controller.parameters.data['recipe'])
-    if recorded.get('resolved_problem_archive'):
+    if recorded.get('resolved_problem_archive') and request['mode']!='research_current':
         from tools.research_core_numerics import archived
         recorded=dict(recorded,resolved_problem=archived(**recorded['resolved_problem_archive']))
     recipe['horizon']=recorded['effective_horizon']
-    if request['mode']=='research_policy':
+    if request['mode']=='research_current':recipe.update(request['current_recipe'])
+    recipe['horizon']=recorded['effective_horizon']
+    if request['mode'] in ('research_policy','research_current'):
         recipe.update(stopping_policy='research_work_v1',max_iterations=request['iteration_cap'])
     n=len(recorded['coordinate_order'])
     nominal=recorded.get('nominal_workspace',dict(x=[0.]*(2*n),u=[.2]*len(recorded['tendon_order'])))
     ws=TrajectoryWorkspace(inp.task,inp.robot,recipe,nominal['x'],nominal['u'],
         settling=inp.policy.controller.parameters.data['settling'])
+    if request['mode']=='research_current':
+        # Use the actual solve/warm/tail/recovery path with a transformed saved
+        # warm guess, not the old serialized Euler problem or old state defects.
+        old_s=len(recorded['prediction_timing']['node_times_s'])//recorded['effective_horizon']
+        old_x=np.array([[recorded['initial_guess'][f'x/{k}/{j}']*recorded['state_scales'][j]
+            for j in range(2*n)] for k in range(recorded['effective_horizon']*old_s+1)])
+        times=np.arange(len(old_x))/old_s
+        new_times=np.arange(ws.parameters.horizon*ws.parameters.substeps+1)/ws.parameters.substeps
+        warm=dict(states=np.stack([np.interp(new_times,times,old_x[:,j]) for j in range(2*n)],axis=1).tolist(),
+            tensions=[[recorded['initial_guess'][f'u/{k}/{t}'] for t in recorded['tendon_order']] for k in range(ws.parameters.horizon)])
+        ws.solver.complete_record=True
+        value=ws.solve(recorded['measured_state'],recorded['previous_applied_input_n'],warm=warm,
+            elapsed_s=recorded['prediction_timing']['current_time_s'])
+        check=ws.solver.evaluate_candidate(ws.problem,value['result']['optimum'])
+        command=[value['result']['optimum']['u/0/'+t] for t in recorded['tendon_order']]
+        return dict(mode=request['mode'],result=value['result'],diagnostics=value['diagnostics'],recovery=value['recovery'],
+            verification=check,first_input_n=command,delivered_tension_n=command,actual_workspace_output=value,
+            numerical_s=time.perf_counter()-started,source_saved_input=recorded['initialization_identity'],
+            qualification='Same saved measurement/previous command and control schedule guess; current method regenerates states and constructs a new problem through the actual complete workspace path.')
     ws._set_prediction_time(recorded['prediction_timing']['current_time_s'])
     if 'resolved_problem' in recorded:
         ws.problem=OptimizationProblem.model_validate(recorded['resolved_problem'])

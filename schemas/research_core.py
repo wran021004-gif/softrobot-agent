@@ -36,7 +36,7 @@ class LocalDiagnostic(Contract):
     execution: EvidenceRef
     update_id: int = Field(ge=0,le=34,strict=True)
     repetitions: int = Field(default=2,ge=1,le=2,strict=True)
-    mode: Literal['production', 'fixed_iteration', 'research_policy'] = 'production'
+    mode: Literal['production', 'fixed_iteration', 'research_policy', 'research_current'] = 'production'
     iteration_cap: int = Field(default=8,ge=1,le=120,strict=True)
     reuse_solver: bool = False
     prepare_tail: bool = False

@@ -14,6 +14,11 @@ SPEC=core.ROOT/'examples/numerical_repair/specification.json'
 DIAG='evidence/numerical_diagnosis_20261011'
 
 
+def reference(value):
+    if len(value)==64 and all(c in '0123456789abcdef' for c in value):return dict(artifact_id=value,media_type='application/json')
+    return json.loads(value)
+
+
 def history_inputs(host):
     info=numerics.import_history(host)
     summary=core.read(core.ROOT/numerics.HISTORY/'scientific_summary.json')
@@ -138,20 +143,21 @@ def main():
     parser=argparse.ArgumentParser();parser.add_argument('command',choices=['prepare','import','midpoint','continuation','policy','solve','verify','execute','repeat','gate'])
     parser.add_argument('--substeps',type=int,default=4);parser.add_argument('--update',type=int,default=34)
     parser.add_argument('--kind',default='original');parser.add_argument('--iterations',type=int,default=12)
-    parser.add_argument('--source');parser.add_argument('--key',default='');args=parser.parse_args()
+    parser.add_argument('--source');parser.add_argument('--key',default='');parser.add_argument('--current',action='store_true')
+    parser.add_argument('--repetitions',type=int,default=2);args=parser.parse_args()
     host=core.prepare(SPEC) if args.command=='prepare' else Host(core.ROOT/'runs/nr1012','nr1012',actor='unified-research')
     s=core.state(host);history=s.get('repair_history',{})
     if args.command=='prepare':value=dict(prepared=host.run_id)
     elif args.command=='import':value=history_inputs(host)
     elif args.command=='gate':value=length_admission(host)
     elif args.command=='policy':value=core.local_diagnostic(host,dict(execution=history['records'][str(args.update)],update_id=args.update,
-        mode='research_policy',iteration_cap=args.iterations,repetitions=2,prepare_tail=True),args.key or f'policy-{args.update}-{args.iterations}')
+        mode='research_current' if args.current else 'research_policy',iteration_cap=args.iterations,repetitions=args.repetitions,prepare_tail=True),args.key or f'policy-{args.update}-{args.iterations}')
     elif args.command=='execute':value=core.execute(host,s['reference_candidate'],args.key,role='fixed_validation')
     elif args.command=='repeat':
-        selected=json.loads(args.source);row=host.store.artifact(selected)
+        selected=reference(args.source);row=host.store.artifact(selected)
         value=core.execute(host,row['candidate'],args.key,role='engineering_repetition' if (row.get('acceptance') or {}).get('accepted') else 'diagnostic_repetition',selected=selected)
     else:
-        source=json.loads(args.source) if args.source else history['mechanics']
+        source=reference(args.source) if args.source else history['mechanics']
         if args.command=='solve':
             from schemas.casadi_feedback import Candidate
             d=s['spec']['reference_parameters']['d'];recipe=s['profile']['recipe']

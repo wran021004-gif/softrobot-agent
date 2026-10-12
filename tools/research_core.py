@@ -535,7 +535,7 @@ def local_diagnostic(host, query, key):
             if digest(record['resolved_problem']['objective_function'])!=record['model_identity']:
                 raise ValueError('RESOLVED_PROBLEM_EXPRESSION_IDENTITY_MISMATCH')
     if not record: raise ValueError('ACTUAL_COMPLETE_UPDATE_INPUT_REQUIRED')
-    seconds=150.*(1+int(q.reuse_solver)); reserve=q.repetitions*seconds
+    seconds=s['spec'].get('standalone_watchdog_s',150.)*(1+int(q.reuse_solver)); reserve=q.repetitions*seconds
     solves=q.repetitions*(1+int(q.reuse_solver)); protection=repetition_reserve(s)*allowance(s)
     if (s['local_solves']+solves>b['local_solves'] or s['local_solve_s']+reserve>b['local_solve_s'] or
         s['numerical_s']+s['numerical_reserved_s']+reserve+protection>b['numerical_s'] or
@@ -546,6 +546,7 @@ def local_diagnostic(host, query, key):
         request_id=key+'-local-'+str(index)
         request=dict(configuration=source['configuration'],record=record,mode=q.mode,iteration_cap=q.iteration_cap,
             reuse_solver=q.reuse_solver,prepare_tail=q.prepare_tail)
+        if q.mode=='research_current':request['current_recipe']=s['profile']['recipe']
         old=host.store.lookup(host.run_id,request_id)
         if old:
             if old['request_hash']!=digest(request): raise ValueError('DIAGNOSTIC_OPERATION_COLLISION')

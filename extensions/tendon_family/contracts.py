@@ -1021,7 +1021,7 @@ class GVSTrajectoryParameters(Contract):
     max_cpu_s: FiniteFloat | None = Field(default=None,gt=0)
     basis: GVSBasisSpecification = Field(default_factory=lambda:GVSBasisSpecification(strategy='structural_linear'))
     horizon: int = Field(default=10,ge=1,le=100)
-    substeps: int = Field(default=1,ge=1,le=8)
+    substeps: int = Field(default=1,ge=1,le=16)
     tracking_weight: FiniteFloat = Field(default=1.,gt=0)
     terminal_weight: FiniteFloat = Field(default=10.,gt=0)
     velocity_weight: FiniteFloat = Field(default=1e-5,ge=0)
