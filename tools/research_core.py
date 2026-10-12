@@ -361,6 +361,7 @@ def finish_execution(host, recovery=False):
     stage_wall=sum(r['charged']['wall_s'] for r in receipts.values())
     actual=stage_wall+max(0.,time.perf_counter()-started-(stage_wall-prior_wall))+p.get('construction_s',0.)
     detail=dict(status=result['status'],role=p['role'],candidate=p['candidate'],candidate_id=c['candidate_id'],
+        implementation=s['freeze'],science_hashes=s['profile']['science_hashes'],
         scientific_identity=c['identity'],scientific_configuration=c['scientific_configuration'],profile_identity=p['profile_identity'],
         evaluation_version=c['evaluation_version'],selected_execution=p['selected_execution'],
         acceptance=acceptance,profile=profile,execution=result,numerical_s=actual,
@@ -590,6 +591,8 @@ def local_diagnostic(host, query, key):
             value=dict(status='known_killed_waited_diagnostic_timeout',timeout_s=seconds)
         elapsed=time.perf_counter()-start
         value.update(execution_id=row['execution_id'],charged_numerical_s=elapsed,source_execution=plain(q.execution),
+            implementation=s['freeze'],science_hashes=s['profile']['science_hashes'],
+            original_request=save(host,request,'local_diagnostic_request'),
             historical_input=imported,owning_study=host.run_id,
             source_update_id=q.update_id,origin='engineering' if s['spec'].get('mode')=='engineering_numerical' or key.startswith('engineering') else 'model',
             charged_solve_attempts=1+int(q.reuse_solver))

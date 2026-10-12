@@ -156,6 +156,7 @@ def solve(configuration,args,local_ad,saved_tensions=None,progress=None,executio
         retain_feasible_iterate=True,hessian_approximation='limited-memory',max_cpu_s=570.,max_wall_s=570.,print_level=5)
     if execution:
         options.update(max_cpu_s=execution.get('offline_solver_s',570.),max_wall_s=execution.get('offline_solver_s',570.))
+        if execution.get('stopping_policy')=='research_work_v1':options.update(max_cpu_s=None,max_wall_s=None)
     solver=IpoptSolver(options);solver.diagnostic_trace=True
     order=list(problem.variables);names=[c.name for c in problem.constraints]
     lb,ub,_=solver._bounds(problem,order)

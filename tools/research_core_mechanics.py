@@ -81,6 +81,7 @@ def dispatch(host, operation, arguments, key):
     if operation=='solve':
         request['arguments']=plain(arguments)
         request['offline_solver_s']=s['spec'].get('offline_solver_s',570.)
+        request['offline_stopping_policy']=s['spec'].get('offline_stopping_policy','historical_timed_v1')
         if request['arguments'].get('source_candidate'):
             request['saved_tensions']=source(host,request['arguments']['source_candidate'])['candidate']['tensions_n']
     else:

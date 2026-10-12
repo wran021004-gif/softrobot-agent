@@ -20,7 +20,8 @@ def main():
             value = solve(request['configuration'], request['arguments'], 'reverse',
                 request.get('saved_tensions'), request['progress'],
                 dict(study_id=request['study_id'], request_id=request['request_id'],
-                     implementation=request['implementation'], execution_id=row['execution_id'],offline_solver_s=request.get('offline_solver_s',570.)))
+                     implementation=request['implementation'], execution_id=row['execution_id'],offline_solver_s=request.get('offline_solver_s',570.),
+                     stopping_policy=request.get('offline_stopping_policy','historical_timed_v1')))
         elif request['operation'] == 'recover': value = recover(read(request['progress']))
         elif request['operation'] in ('integrate','inspect'):
             from tools.research_core_numerics import offline_diagnostic
