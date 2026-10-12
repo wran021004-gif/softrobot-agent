@@ -39,9 +39,14 @@ validated resolution unless its own evidence supports a change.
 
 ```powershell
 python -m tools.fixed_task_milestone rollout --substeps 32 --key saved-midpoint32
-python -m tools.fixed_task_milestone solve --key fixed-midpoint32
+python -m tools.fixed_task_milestone verify --rollout-source FIXED32_ROLLOUT_ARTIFACT --key saved-midpoint32-bdf
+# The fixed schedule32 comparison still failed at .2903125s. Selected local grid:
+# intervals29-30 use64 internal substeps, all other physical intervals use16.
+python -m tools.fixed_task_milestone rollout --offline-grid --key saved-local64-corrected
+python -m tools.fixed_task_milestone verify --rollout-source LOCAL64_ROLLOUT_ARTIFACT --key saved-local64-bdf
+python -m tools.fixed_task_milestone solve --key fixed-local64
 # SOURCE is the returned result artifact ID, not the execution ID.
-python -m tools.fixed_task_milestone verify --source SOURCE --key bdf-fixed-midpoint32
+python -m tools.fixed_task_milestone verify --source SOURCE --key bdf-fixed-local64
 ```
 
 After an evidence-supported controller selection, record it with `select_recipe`,
@@ -66,6 +71,12 @@ confirmation, outstanding independent integration and delivery in both numerical
 and activity budgets. Re-estimate again after a configuration change. Do not repeat
 a failed complete run. A second development revision needs a concrete correctable
 failure and enough remaining resources for its own confirmation.
+
+The migration entry applies explicit specification changes while forbidding changes
+to study/source identities, original clocks, authorized ceilings or delivery cutoff.
+An interrupted accidental old-grid diagnostic remains charged as an unsuccessful
+attempt. Its key is not local-refinement evidence. The corrected local-grid request
+declares all35 internal interval counts and preserves every physical boundary.
 
 Inspect `status` and `last_operation.json` before dispatch. Recover pending outcomes
 with `recover`; never rerun an expensive command to redisplay its result. External

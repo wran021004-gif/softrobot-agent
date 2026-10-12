@@ -78,7 +78,8 @@ def main():
     parser.add_argument('command',choices=['prepare','import','local','solve','verify','rollout','estimate','execute','repeat','status','recover'])
     parser.add_argument('--update',type=int,default=29);parser.add_argument('--iterations',type=int,default=3)
     parser.add_argument('--substeps',type=int,default=32);parser.add_argument('--key',default='')
-    parser.add_argument('--source');parser.add_argument('--current',action='store_true');args=parser.parse_args()
+    parser.add_argument('--source');parser.add_argument('--current',action='store_true')
+    parser.add_argument('--offline-grid',action='store_true');parser.add_argument('--rollout-source');args=parser.parse_args()
     h=core.prepare(SPEC) if args.command=='prepare' else host();s=core.state(h)
     if args.command=='prepare':value=dict(prepared=h.run_id)
     elif args.command=='import':value=repair.history_inputs(h,folder=HISTORY,
@@ -104,7 +105,8 @@ def main():
         else:
             payload=dict(source=source);operation='integrate'
             if args.command=='verify':payload.update(method='BDF')
-            else:payload.update(integration_method='implicit_midpoint',substeps=args.substeps)
+            else:payload.update(s['spec']['offline_recipe'] if args.offline_grid else dict(integration_method='implicit_midpoint',substeps=args.substeps))
+            if args.rollout_source:payload['rollout_reference']=repair.reference(args.rollout_source)
         value=numerics.experiment(h,operation,payload,args.key,
             'Repair midpoint all-node consistency with fixed physical task and matched schedule',
             'Offline internal resolution only; NMPC resolution is selected separately',
