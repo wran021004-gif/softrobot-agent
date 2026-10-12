@@ -122,6 +122,13 @@ def offline_diagnostic(request):
         return projection_continuation(request)
     if p.get('investigation')=='current_control_plans':return current_control_plans(request)
     if p.get('investigation')=='closed_loop':return closed_loop_analysis(request)
+    if p.get('rollout_reference'):
+        from tools.platform_store import Store
+        value=Store(request['store_root']).artifact(p['rollout_reference'])
+        if value.get('source_mechanics')!=request['source_mechanics'] or value.get('rollout',{}).get('failure'):
+            raise ValueError('MATCHED_COMPLETE_FIXED_SCHEDULE_ROLLOUT_REQUIRED')
+        saved=dict(saved,states=value['trajectory']['states'],times_s=value['trajectory']['times_s'],
+            substeps=value['substeps'],integration_method=value['method'])
     w=Workspace(request['configuration'],p.get('substeps',saved.get('substeps',1)),integration_method=p.get('integration_method',saved.get('integration_method','implicit_euler')))
     if p.get('fixed_interval'):return fixed_input_comparison(w,p['fixed_interval'])
     if request['operation']=='inspect':

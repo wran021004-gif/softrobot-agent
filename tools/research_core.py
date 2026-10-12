@@ -204,13 +204,15 @@ def capacity(host, requested=1, confirmation=False, *, root_operation=False):
     jobs=max(0,required-s.get('fixed_validation_jobs',0))
     extra=max(0.,jobs*s['spec'].get('mechanics_allowances',{}).get('replay_s',0.)-integration.get('seconds',0.))
     integration_time=jobs*s['spec'].get('mechanics_allowances',{}).get('replay_s',0.)
-    available_time=min(science-extra, s['cutoff_unix']-time.time()-integration_time, remaining['wall_s']-integration_time)
+    delivery_numerical=b.get('delivery_numerical_s',0.)
+    available_time=min(science-extra-delivery_numerical, s['cutoff_unix']-time.time()-integration_time, remaining['wall_s']-integration_time)
     fit=max(0,min(requested,int(remaining['backend_solves'])-protect,math.floor(available_time/a)-protect,
         (int(remaining['tool_calls'])-4*protect-int(root_operation))//3))
     return dict(requested=requested, admitted=fit, internal_launches=fit, numerical_reservation_s=fit*a,
         confirmation_launch_reserve=protect, confirmation_time_reserve_s=protect*a,
         remaining_numerical_s=science, per_execution_s=a,independent_integration_reserve_s=extra,
-        delivery_activity_reserve_s=b['delivery_reserve_s'],remaining_activity_s=s['cutoff_unix']-time.time())
+        delivery_activity_reserve_s=b['delivery_reserve_s'],delivery_numerical_reserve_s=delivery_numerical,
+        remaining_activity_s=s['cutoff_unix']-time.time())
 
 
 def guard(host, expensive=False):
@@ -540,6 +542,7 @@ def local_diagnostic(host, query, key):
     if downstream:
         protection=max(protection,downstream['passing_executions']*allowance(s))
         protection+=max(0,downstream['fixed_verifications']-s.get('fixed_validation_jobs',0))*s['spec']['mechanics_allowances']['replay_s']
+        protection+=b.get('delivery_numerical_s',0.)
     if (s['local_solves']+solves>b['local_solves'] or s['local_solve_s']+reserve>b['local_solve_s'] or
         s['numerical_s']+s['numerical_reserved_s']+reserve+protection>b['numerical_s'] or
         time.time()+reserve+protection>=s['cutoff_unix']):

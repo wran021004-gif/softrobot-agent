@@ -45,7 +45,6 @@ def replay(request):
         recorded=dict(recorded,resolved_problem=archived(**recorded['resolved_problem_archive']))
     recipe['horizon']=recorded['effective_horizon']
     if request['mode']=='research_current':recipe.update(request['current_recipe'])
-    recipe['horizon']=recorded['effective_horizon']
     if request['mode'] in ('research_policy','research_current'):
         recipe.update(stopping_policy='research_work_v1',max_iterations=request['iteration_cap'])
     n=len(recorded['coordinate_order'])
@@ -61,7 +60,7 @@ def replay(request):
         times=np.arange(len(old_x))/old_s
         new_times=np.arange(ws.parameters.horizon*ws.parameters.substeps+1)/ws.parameters.substeps
         warm=dict(states=np.stack([np.interp(new_times,times,old_x[:,j]) for j in range(2*n)],axis=1).tolist(),
-            tensions=[[recorded['initial_guess'][f'u/{k}/{t}'] for t in recorded['tendon_order']] for k in range(ws.parameters.horizon)])
+            tensions=[[recorded['initial_guess'][f'u/{min(k,recorded["effective_horizon"]-1)}/{t}'] for t in recorded['tendon_order']] for k in range(ws.parameters.horizon)])
         ws.solver.complete_record=True
         value=ws.solve(recorded['measured_state'],recorded['previous_applied_input_n'],warm=warm,
             elapsed_s=recorded['prediction_timing']['current_time_s'])

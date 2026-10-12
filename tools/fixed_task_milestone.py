@@ -112,6 +112,9 @@ def main():
             'Require numerical feasibility, independent sampled task and all-node vector consistency separately')
     atomic_json(h.store.root/'last_operation.json',value)
     if args.command in ('solve','verify','rollout'):value={k:v for k,v in value.items() if k not in ('handoff','replay')}
+    if args.command=='local' and value.get('plans'):
+        value['plans']={name:{k:v for k,v in plan.items() if k not in ('times_s','position_error_m','speed_m_s')}
+            for name,plan in value['plans'].items()}
     print(json.dumps(value,ensure_ascii=True))
 
 

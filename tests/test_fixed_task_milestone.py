@@ -44,3 +44,14 @@ class AdmissionTests(TestCase):
                 with patch.object(core,'guard'),patch.object(core,'verify_candidate',return_value=candidate):
                     with self.assertRaisesRegex(ValueError,'REESTIMATE_REQUIRED'):
                         core.execute(self.host,{},'must-not-launch')
+
+
+class FixedScheduleTests(TestCase):
+    def test_diagnostic_rollout_must_have_the_same_source(self):
+        from tools.research_core_numerics import offline_diagnostic
+        request=dict(candidate={},store_root='unused',source_mechanics={'artifact_id':'a'*64},
+            diagnostic_parameters={'rollout_reference':{'artifact_id':'b'*64}})
+        store=SimpleNamespace(artifact=lambda ref:dict(source_mechanics={'artifact_id':'c'*64},rollout=dict(failure=None)))
+        with patch('tools.platform_store.Store',return_value=store):
+            with self.assertRaisesRegex(ValueError,'MATCHED_COMPLETE_FIXED_SCHEDULE'):
+                offline_diagnostic(request)

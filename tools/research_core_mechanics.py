@@ -54,6 +54,7 @@ def dispatch(host, operation, arguments, key):
     if uses_validation:numerical_available+=validation['seconds']
     available = min(numerical_available,s['cutoff_unix']-time.time(),host.store.remaining()['remaining']['wall_s'])
     protection=core.repetition_reserve(s)*core.allowance(s)
+    protection+=b.get('delivery_numerical_s',0.)
     downstream=s['spec'].get('downstream_reserve',{})
     if downstream:
         protection=max(protection,max(0,downstream['passing_executions']-sum(bool((host.store.artifact(r).get('acceptance') or {}).get('accepted')) for r in s['results']))*core.allowance(s))
