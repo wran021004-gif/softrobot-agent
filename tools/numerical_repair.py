@@ -62,7 +62,9 @@ def length_admission(host):
             and row['profile_identity']==s['profile']['identity']
             and abs(host.store.artifact(row['candidate'])['parameters']['d']-fixed)<1e-10):passing.append((ref,row))
     pair=next(([a[0],b[0]] for i,a in enumerate(passing) for b in passing[i+1:]
-        if a[1]['candidate']==b[1]['candidate'] and a[1]['execution_id']!=b[1]['execution_id']),[])
+        if a[1]['candidate']==b[1]['candidate'] and a[1]['execution_id']!=b[1]['execution_id']
+        and a[1]['role']=='fixed_validation' and b[1]['role']=='engineering_repetition'
+        and b[1]['selected_execution']==a[0]),[])
     return dict(passed=bool(offline and pair),new_fixed_offline_validations=offline,matching_passing_executions=pair,
         diagnostic_execution_alone_is_insufficient=True)
 
@@ -133,7 +135,7 @@ def projection_continuation(request):
 
 def main():
     import argparse
-    parser=argparse.ArgumentParser();parser.add_argument('command',choices=['prepare','import','midpoint','continuation','policy','solve','verify','execute','gate'])
+    parser=argparse.ArgumentParser();parser.add_argument('command',choices=['prepare','import','midpoint','continuation','policy','solve','verify','execute','repeat','gate'])
     parser.add_argument('--substeps',type=int,default=4);parser.add_argument('--update',type=int,default=34)
     parser.add_argument('--kind',default='original');parser.add_argument('--iterations',type=int,default=12)
     parser.add_argument('--source');parser.add_argument('--key',default='');args=parser.parse_args()
@@ -144,7 +146,10 @@ def main():
     elif args.command=='gate':value=length_admission(host)
     elif args.command=='policy':value=core.local_diagnostic(host,dict(execution=history['records'][str(args.update)],update_id=args.update,
         mode='research_policy',iteration_cap=args.iterations,repetitions=2,prepare_tail=True),args.key or f'policy-{args.update}-{args.iterations}')
-    elif args.command=='execute':value=core.execute(host,s['reference_candidate'],args.key)
+    elif args.command=='execute':value=core.execute(host,s['reference_candidate'],args.key,role='fixed_validation')
+    elif args.command=='repeat':
+        selected=json.loads(args.source);row=host.store.artifact(selected)
+        value=core.execute(host,row['candidate'],args.key,role='engineering_repetition' if (row.get('acceptance') or {}).get('accepted') else 'diagnostic_repetition',selected=selected)
     else:
         source=json.loads(args.source) if args.source else history['mechanics']
         if args.command=='solve':

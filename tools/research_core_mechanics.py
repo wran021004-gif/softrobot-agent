@@ -67,6 +67,7 @@ def dispatch(host, operation, arguments, key):
             if lo!=hi:
                 from tools.numerical_repair import length_admission
                 if not length_admission(host)['passed']:raise ValueError('LENGTH_DESIGN_REQUIRES_NEW_OFFLINE_AND_TWO_PASSING_EXECUTIONS')
+                if s.get('length_design_started'):raise ValueError('ONE_CONDITIONAL_LENGTH_ATTEMPT_MAXIMUM')
             elif s.get('fixed_offline_attempts',0)>=2:raise ValueError('TWO_FIXED_OFFLINE_ATTEMPTS_MAXIMUM')
     if operation=='solve' and s['spec'].get('mode')=='engineering_numerical':
         verification=s['spec']['mechanics_allowances']['replay_s']
@@ -105,6 +106,7 @@ def dispatch(host, operation, arguments, key):
         if counter:current[counter]=current.get(counter,0)+1
         if downstream and operation=='solve' and request['arguments']['design_bounds'][0]==request['arguments']['design_bounds'][1]:
             current['fixed_offline_attempts']=current.get('fixed_offline_attempts',0)+1
+        elif downstream and operation=='solve':current['length_design_started']=True
         if downstream and uses_validation:
             current['fixed_validation_jobs']=current.get('fixed_validation_jobs',0)+1
         if uses_validation:

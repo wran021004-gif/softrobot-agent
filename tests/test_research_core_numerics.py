@@ -80,6 +80,16 @@ class NumericalTests(TestCase):
         other=deepcopy(s['spec']);other.pop('mode');core.update(self.host,spec=other)
         self.assertEqual(core.capacity(self.host,8)['confirmation_launch_reserve'],2)
 
+    def test_repair_protects_future_verification_before_first_solve(self):
+        s=core.state(self.host);spec=deepcopy(s['spec'])
+        spec['budgets'].update(bdf_replays=12,numerical_s=21600)
+        spec['downstream_reserve']=dict(fixed_verifications=2,passing_executions=2)
+        core.update(self.host,spec=spec,bdf_replays=10)
+        with patch.object(core,'guard'):
+            with self.assertRaisesRegex(ValueError,'DOWNSTREAM_FIXED_VERIFICATION_JOBS_PROTECTED'):
+                mechanics.dispatch(self.host,'integrate',dict(source=self.source),'protect-before-solve')
+        self.assertEqual(core.state(self.host)['bdf_replays'],10)
+
     def test_reserved_validation_does_not_add_fictitious_activity_time(self):
         s=core.state(self.host)
         core.update(self.host,bdf_replays=5,numerical_reserved_s=450,

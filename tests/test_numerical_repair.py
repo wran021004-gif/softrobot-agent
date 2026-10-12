@@ -42,10 +42,17 @@ class RepairTests(TestCase):
             hard_max_normalized_violation=0.,candidate={'d':d}),
             'bdf':dict(operation='integrate',replay={'gates_passed':True},source_mechanics='old'),
             'failed':dict(fresh_execution=True,acceptance={'accepted':False},profile_identity='p')}
-        host=SimpleNamespace(store=SimpleNamespace(artifact=lambda r:values[r]))
+        host=SimpleNamespace(store=SimpleNamespace(artifact=lambda r:values[r['artifact_id'] if isinstance(r,dict) else r]))
         state=dict(spec={'reference_parameters':{'d':d}},mechanics_results=['bdf'],results=['failed'],profile={'identity':'p'})
         with patch.object(repair.core,'state',return_value=state):self.assertFalse(repair.length_admission(host)['passed'])
         values['old']['imported_historical_evidence']=False
+        with patch.object(repair.core,'state',return_value=state):self.assertFalse(repair.length_admission(host)['passed'])
+        values['c']={'parameters':{'d':d}}
+        values['a']=dict(fresh_execution=True,acceptance={'accepted':True},profile_identity='p',candidate={'artifact_id':'c'},execution_id='1',role='fixed_validation')
+        values['b']=dict(values['a'],execution_id='2',role='engineering_repetition',selected_execution='a')
+        state['results']=['a','b']
+        with patch.object(repair.core,'state',return_value=state):self.assertTrue(repair.length_admission(host)['passed'])
+        values['a']['role']='repair_diagnostic'
         with patch.object(repair.core,'state',return_value=state):self.assertFalse(repair.length_admission(host)['passed'])
 
     def test_bdf_checks_exact_nodes_without_velocity_sample_interpolation(self):

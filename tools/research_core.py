@@ -257,11 +257,13 @@ def execute(host, candidate_ref, operation_key, *, role='development', selected=
     construction_started=time.perf_counter()
     guard(host,expensive=True); s=state(host); c=verify_candidate(host,candidate_ref)
     confirmation=role=='confirmation'
-    repetition=role=='diagnostic_repetition'
+    repetition=role in ('diagnostic_repetition','engineering_repetition')
     if repetition:
         if s['spec'].get('mode') != 'engineering_numerical' or plain(selected) not in s['results']:
             raise ValueError('OWNED_DIAGNOSTIC_REPETITION_REQUIRED')
         old=host.store.artifact(selected)
+        if role=='engineering_repetition' and (not (old.get('acceptance') or {}).get('accepted') or old['role'] not in ('fixed_validation','length_validation')):
+            raise ValueError('ENGINEERING_REPETITION_REQUIRES_SELECTED_VALIDATION_PASS')
         if old['candidate'] != plain(candidate_ref) or old['profile_identity'] != s['profile']['identity']:
             raise ValueError('REPETITION_REQUIRES_IDENTICAL_CONFIGURATION')
     if confirmation:
