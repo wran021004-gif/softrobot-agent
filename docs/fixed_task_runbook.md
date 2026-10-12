@@ -1,0 +1,81 @@
+# Fixed structure milestone fc1012
+
+Run from the mechanics-control-mainline worktree with
+`D:\softrobot-agent\.mainline5-env\Scripts\python.exe` as `python`.
+The single ledger is `runs/fc1012`; nr1012 stays sealed. No provider request,
+dependency reinstall, length design, or open-loop success claim is authorized.
+The specification starts from the selected immutable nr1012 candidate and its
+complete recipe, rather than the initial historical specification.
+
+Budgets: 2 offline optimizations, 6 standalone solves / 2400 seconds, 8 independent
+integration configurations, 4 complete execution starts, 28800 charged numerical
+seconds, and 12 activity hours including delivery. Failed starts and interruptions
+count. Internal NMPC updates belong to their full execution. Protect 1800 activity
+seconds for delivery. Preliminary 8500-second simulation reservations conservatively
+scale prior measured work for the possible 3-to-6 iteration change; full dispatch
+requires a fresh same-configuration calibration and a newly recorded estimate.
+
+```powershell
+python -m tools.fixed_task_milestone prepare
+# Commit scoped implementation before the initial binding.
+python -m tools.research_core bind --spec examples/fixed_task_milestone/specification.json
+python -m tools.fixed_task_milestone import
+python -m tools.fixed_task_milestone local --update 29 --iterations 3 --key hold29-work3
+python -m tools.fixed_task_milestone local --update 29 --iterations 6 --key hold29-work6
+```
+
+These arms restore the exact measured state, previous input, initialized vector,
+serialized objective and constraints from selected execution
+`1335ee31ad4f46e8b258de6523d07e68`. They retain plan selection and returned-tension
+recovery. Compare raw, selected, recovered and delivered plans, numerical residuals,
+absolute holding times, position and speed violations, first action and cost.
+Iteration-limited feasibility does not demonstrate convergence or task success.
+
+Offline internal resolution is declared separately in `offline_recipe`. Preserve
+the physical zero state and the 35 zero-order-held commands. Diagnose the saved
+exact-node BDF disagreement across the entire trajectory, then test one supported
+refinement with the same tensions before reoptimization. NMPC stays at its separately
+validated resolution unless its own evidence supports a change.
+
+```powershell
+python -m tools.fixed_task_milestone rollout --substeps 32 --key saved-midpoint32
+python -m tools.fixed_task_milestone solve --key fixed-midpoint32
+# SOURCE is the returned result artifact ID, not the execution ID.
+python -m tools.fixed_task_milestone verify --source SOURCE --key bdf-fixed-midpoint32
+```
+
+After an evidence-supported controller selection, record it with `select_recipe`,
+commit and `research_core migrate --spec ... --reason ...`, retaining all counters
+and the original activity clock. A local current-path check regenerates states from
+the saved measured state and control-schedule guess. Any changed work limit, horizon
+or mesh invalidates the execution estimate. Estimate with that check's comparison
+artifact. The estimate uses its measured work and all 35 historical update costs,
+includes construction/reporting and a 35% margin, and binds recipe and implementation.
+
+```powershell
+python -m tools.fixed_task_milestone local --update 29 --iterations SELECTED --current --key selected-calibration
+python -m tools.fixed_task_milestone estimate --source CALIBRATION_ARTIFACT
+python -m tools.fixed_task_milestone status
+python -m tools.fixed_task_milestone execute --key development
+# Only a passing original-task source can use this fresh confirmation command.
+python -m tools.fixed_task_milestone repeat --source PASSING_ARTIFACT --key confirmation
+```
+
+Before development, admission must fit that execution, one fresh same-configuration
+confirmation, outstanding independent integration and delivery in both numerical
+and activity budgets. Re-estimate again after a configuration change. Do not repeat
+a failed complete run. A second development revision needs a concrete correctable
+failure and enough remaining resources for its own confirmation.
+
+Inspect `status` and `last_operation.json` before dispatch. Recover pending outcomes
+with `recover`; never rerun an expensive command to redisplay its result. External
+watchdog interruption is incomplete. Original sampled acceptance, all-node vector
+consistency, dense diagnostics and MuJoCo feedback acceptance remain separate.
+Curated experience reads identify exact entries, revisions and content hashes;
+dispositions require actual read receipts. Engineering retrieval checks use zero
+provider calls and do not establish LLM reuse or cost savings.
+
+Seal with an engineering STOP citing every new experiment, export with the existing
+archive mechanism, verify member and archive hashes, and split if oversized. Commit
+only scoped code, documentation and non-secret evidence. Push ordinary HTTPS and
+verify the published branch SHA over HTTPS before claiming delivery complete.

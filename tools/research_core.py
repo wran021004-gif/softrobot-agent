@@ -40,7 +40,7 @@ SCIENCE_FILES = ['extensions/tendon_family/gvs_nmpc.py', 'extensions/tendon_fami
     'tools/casadi_feedback_worker.py', 'tools/casadi_codesign_worker.py',
     'tools/research_core_mechanics.py', 'tools/research_core_mechanics_worker.py']
 CORE_FILES = ['tools/research_core.py','tools/research_core_diagnostic.py','schemas/research_core.py',
-              'tools/research_core_feedback.py','tools/research_core_demo.py','tools/research_core_numerics.py','tools/numerical_repair.py','tools/fixed_task_milestone.py']
+              'tools/research_core_feedback.py','tools/research_core_demo.py','tools/research_core_numerics.py','tools/numerical_repair.py','tools/fixed_task_milestone.py','tools/research_core_experience.py']
 
 
 def save(host, value, kind='core_evidence'):
@@ -460,31 +460,8 @@ def run_search(host, query, key):
 
 
 def experience(host, query):
-    q=ExperienceQuery.model_validate(query)
-    paths={'case':'memory/nmpc_feasibility_case_draft.json','procedure':'docs/nmpc_feasibility_procedure.md'}
-    metadata=dict(task='reach_and_hold',structure='two_segments_six_tendons',failure_type='numerical_feasibility',version='draft')
-    matches=all(getattr(q,k) is None or getattr(q,k)==v for k,v in metadata.items())
-    rows=[]
-    for k,name in paths.items():
-        if not matches or q.key is not None and k!=q.key: continue
-        raw=(ROOT/name).read_text(encoding='utf8')
-        original=read(ROOT/name) if name.endswith('.json') else raw
-        refs=[]
-        def walk(v):
-            if isinstance(v,dict):
-                if 'artifact_id' in v: refs.append(v)
-                for child in v.values(): walk(child)
-            elif isinstance(v,list):
-                for child in v: walk(child)
-        walk(original)
-        rows.append(dict(key=k,path=name,**metadata,status='reference_backed_draft',
-            applicability='recommendation only; historical controller/evaluation scope requires checking',
-            metadata_origin='small curated index; source lacks uniform lifecycle metadata',
-            original_evidence_references=refs,missing_metadata=['formal_skill_admission','uniform_evaluation_version'],
-            **(dict(content=original) if q.operation=='read' else {})))
-    record=dict(query=plain(q),results=rows,supplied_startup_context=False)
-    ref=save(host,record,'actual_experience_retrieval'); update(host,retrievals=[*state(host)['retrievals'],ref])
-    return dict(reference=ref,**record)
+    from tools.research_core_experience import retrieve
+    return retrieve(host,query)
 
 
 def diagnose(host, refs):
@@ -698,14 +675,15 @@ def dispatch(host, value, request_id, origin='model'):
     guard(host,plan.action in ('execute','search','confirm','mechanics','replay') or plan.diagnostic is not None)
     s=state(host)
     for r in plan.supporting_evidence: host.store.artifact(r)
-    retrieved={r['artifact_id'] for r in s['retrievals']}
-    if set(plan.experience_disposition)-retrieved: raise ValueError('DISPOSITION_REQUIRES_ACTUAL_RETRIEVAL')
+    from tools.research_core_experience import disposition_bindings
+    experience_bindings=disposition_bindings(host,plan.experience_disposition)
     if plan.action=='stop' and any(r not in [plain(v) for v in plan.supporting_evidence] for r in [*s['results'],*s.get('mechanics_results',[])]):
         raise ValueError('STOP_MUST_CITE_ALL_NEW_EXPERIMENT_RESULTS')
     admission=capacity(host,plan.search.max_evaluations if plan.search else 1,plan.action=='confirm',root_operation=True)
     if plan.action=='execute' and admission['admitted']<1: raise ValueError('CANDIDATE_PLUS_TWO_CONFIRMATIONS_CANNOT_FIT')
     row,_=host.store.reserve(host.run_id,request_id,digest(plain(plan)),host.actor,{**zero(),'tool_calls':1})
-    ref=save(host,dict(origin=origin,request_id=request_id,original_plan=plain(plan),admission=admission),'original_research_plan')
+    ref=save(host,dict(origin=origin,request_id=request_id,original_plan=plain(plan),admission=admission,
+        experience_read_bindings=experience_bindings),'original_research_plan')
     update(host,plans=[*state(host)['plans'],ref])
     try:
         if plan.action=='propose':

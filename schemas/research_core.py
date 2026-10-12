@@ -79,7 +79,9 @@ class Plan(Contract):
 
 class ExperienceQuery(Contract):
     operation: Literal['search', 'read'] = 'search'
-    key: Literal['case', 'procedure'] | None = None
+    key: str | None = Field(default=None,min_length=1)
+    entry_id: str | None = Field(default=None,min_length=1)
+    revision: str | None = Field(default=None,min_length=1)
     task: str | None = None
     structure: str | None = None
     failure_type: str | None = None
