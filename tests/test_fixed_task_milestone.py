@@ -47,6 +47,31 @@ class AdmissionTests(TestCase):
 
 
 class FixedScheduleTests(TestCase):
+    def test_local_mesh_keeps_commands_boundaries_and_transcription_matched(self):
+        import casadi as ca
+        import numpy as np
+        from extensions.tendon_family import gvs_codesign as code
+        q=ca.MX.sym('q');d=ca.MX.sym('d');x=ca.MX.sym('x',2);u=ca.MX.sym('u');acc=ca.MX.sym('acc')
+        expr=SimpleNamespace(coordinate_order=['q'],tendon_order=['u'])
+        functions=SimpleNamespace(q_symbol=q,design_input=d,tip_position_expression=ca.vertcat(q,0,0),
+            implicit_residual=ca.Function('toy_force',[x,u,acc,d],[acc-u]))
+        cfg=dict(task=dict(environment=dict(data=dict(mount=dict(quaternion_wxyz=[1,0,0,0],position_m=[0,0,0]))),
+            goal=dict(data=dict(target_m=[0,0,0]))))
+        counts=[1]*35;counts[29]=4
+        with patch.object(code,'expression',return_value=expr),patch.object(code,'parameterized',return_value=functions):
+            w=code.Workspace(cfg,integration_method='implicit_midpoint',interval_substeps=counts)
+            tensions=np.arange(35)[:,None]/35
+            rollout=w.rollout(tensions,0.)
+            self.assertEqual(len(rollout['states']),39)
+            np.testing.assert_allclose(w.times[np.r_[0,np.cumsum(counts)]],np.arange(36)*.01,atol=1e-15)
+            self.assertAlmostEqual(rollout['states'][-1][1],.01*tensions.sum(),places=12)
+            self.assertEqual(list(w.command_indices[29:33]),[29]*4)
+            problem=w.assemble('A','saved_schedule',saved_tensions=tensions)
+            f=ca.Function.deserialize(problem.objective_function.data['serialized_function'])
+            outputs=f([problem.initial_guess[k] for k in problem.variables])
+            residuals=np.asarray(outputs[1]).ravel()[:w.steps*2]
+            self.assertLess(abs(residuals).max(),1e-7)
+
     def test_diagnostic_rollout_must_have_the_same_source(self):
         from tools.research_core_numerics import offline_diagnostic
         request=dict(candidate={},store_root='unused',source_mechanics={'artifact_id':'a'*64},

@@ -150,7 +150,7 @@ def assess(w, problem, values):
 
 
 def solve(configuration,args,local_ad,saved_tensions=None,progress=None,execution=None):
-    started=time.perf_counter();w=Workspace(configuration,args['substeps'],local_ad,args.get('integration_method','implicit_euler'))
+    started=time.perf_counter();w=Workspace(configuration,args['substeps'],local_ad,args.get('integration_method','implicit_euler'),args.get('interval_substeps'))
     problem=w.assemble('B',args['initialization'],args,saved_tensions)
     options=dict(max_iterations=1000,tolerance=1e-7,acceptable_tolerance=1e-6,constraint_jacobian_mode='automatic',
         retain_feasible_iterate=True,hessian_approximation='limited-memory',max_cpu_s=570.,max_wall_s=570.,print_level=5)
@@ -219,7 +219,7 @@ def recover(checkpoint):
     """Rebuild only the graph and packaging; never construct or invoke IPOPT."""
     started=time.perf_counter()
     if checkpoint['phase']!='solver_returned':raise ValueError('RETURNED_NUMERIC_CHECKPOINT_REQUIRED')
-    w=Workspace(checkpoint['configuration'],checkpoint['arguments']['substeps'],checkpoint['local_ad'],checkpoint['arguments'].get('integration_method','implicit_euler'))
+    w=Workspace(checkpoint['configuration'],checkpoint['arguments']['substeps'],checkpoint['local_ad'],checkpoint['arguments'].get('integration_method','implicit_euler'),checkpoint['arguments'].get('interval_substeps'))
     problem=w.assemble('B',checkpoint['arguments']['initialization'],checkpoint['arguments'],checkpoint.get('saved_tensions'))
     if list(problem.variables)!=checkpoint['variable_order']:raise ValueError('CHECKPOINT_VARIABLE_ORDER_MISMATCH')
     result=package_result(w,problem,checkpoint)

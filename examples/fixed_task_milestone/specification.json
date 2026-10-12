@@ -116,7 +116,44 @@
   "started_unix": 1791807219,
   "study_id": "fc1012",
   "offline_recipe": {
-    "substeps": 32,
+    "substeps": 16,
+    "interval_substeps": [
+      16,
+      16,
+      16,
+      16,
+      16,
+      16,
+      16,
+      16,
+      16,
+      16,
+      16,
+      16,
+      16,
+      16,
+      16,
+      16,
+      16,
+      16,
+      16,
+      16,
+      16,
+      16,
+      16,
+      16,
+      16,
+      16,
+      16,
+      16,
+      16,
+      64,
+      64,
+      16,
+      16,
+      16,
+      16
+    ],
     "integration_method": "implicit_midpoint"
   },
   "baseline_archive": {
@@ -130,5 +167,6 @@
   "baseline_offline_execution_id": "608691a6a16c4143bc0f12d67909bd43",
   "execution_required_integrations": 1,
   "require_configuration_cost_estimate": true,
-  "preliminary_execution_reserve_basis": "Prior 35-update costs scaled conservatively for the proposed 3 to 6 iteration comparison, 8500s; full dispatch also requires fresh matching-configuration calibration."
+  "preliminary_execution_reserve_basis": "Prior 35-update costs scaled conservatively for the proposed 3 to 6 iteration comparison, 8500s; full dispatch also requires fresh matching-configuration calibration.",
+  "offline_refinement_basis": "Fixed schedule global32 BDF still differs .002085m/s at .2903125s; refine only intervals29 and30 to64 internal substeps and retain16 elsewhere, validating all657 nodes. NMPC remains16."
 }

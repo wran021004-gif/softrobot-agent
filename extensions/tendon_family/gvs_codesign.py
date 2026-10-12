@@ -33,7 +33,7 @@ def parameterized(expr):
 
 
 class Workspace:
-    def __init__(self, configuration, substeps=1, local_ad='reverse', integration_method='implicit_euler'):
+    def __init__(self, configuration, substeps=1, local_ad='reverse', integration_method='implicit_euler',interval_substeps=None):
         started = time.perf_counter()
         self.configuration = configuration
         self.expression = expression(configuration)
@@ -43,7 +43,13 @@ class Workspace:
         self.substeps = substeps
         if integration_method not in ('implicit_euler','implicit_midpoint'):raise ValueError('UNKNOWN_INTEGRATION_METHOD')
         self.integration_method=integration_method
-        self.steps = steps = 35*substeps
+        self.interval_substeps=interval_substeps
+        counts=interval_substeps if interval_substeps is not None else [substeps]*35
+        if len(counts)!=35 or any(type(c) is not int or not 1<=c<=64 for c in counts):raise ValueError('35_VALID_INTERNAL_INTERVAL_COUNTS_REQUIRED')
+        self.command_indices=np.repeat(np.arange(35),counts)
+        self.times=np.r_[0.,np.concatenate([k*.01+np.arange(1,c+1)*.01/c for k,c in enumerate(counts)])]
+        self.widths=np.concatenate([np.full(c,.01/c) for c in counts])
+        self.steps = steps = len(self.widths)
         self.h = h = .01/substeps
         self.scales = np.r_[np.full(n, 10.), np.full(n, 1000.)]
         q, v, d = f.q_symbol, ca.MX.sym('v', n), f.design_input
@@ -59,6 +65,12 @@ class Workspace:
         self.local_ad = local_ad
         self.step = ca.Function('codesign_step', [previous, following, u, d], [step],
             {'cse': True, **({'ad_weight': 1.} if local_ad == 'reverse' else {})})
+        if interval_substeps is not None:
+            width=ca.MX.sym('node_width')
+            residual=ca.vertcat((following[:n]-previous[:n]-width*evaluation[n:])/10.,
+                f.implicit_residual(evaluation,u,(following[n:]-previous[n:])/width,d)/.001)
+            self.step_grid=ca.Function('codesign_grid_step',[previous,following,u,d,width],[residual],
+                {'cse':True,**({'ad_weight':1.} if local_ad=='reverse' else {})})
         self.mechanics_construction_s = time.perf_counter()-started
 
     def rollout(self, tension, design, *, abstol=1e-11):
@@ -69,8 +81,9 @@ class Workspace:
             raise ValueError('ROLLOUT_REQUIRES_35_FINITE_COMMANDS')
         y=ca.MX.sym('scaled_following',2*self.n); old=ca.MX.sym('old',2*self.n)
         uu=ca.MX.sym('uu',self.m); dd=ca.MX.sym('rollout_d')
-        root_fn=ca.Function('guess_residual',[y,old,uu,dd],
-            [self.step(old,y*self.scales,uu,dd)])
+        width=ca.MX.sym('rollout_width')
+        residual=self.step(old,y*self.scales,uu,dd) if self.interval_substeps is None else self.step_grid(old,y*self.scales,uu,dd,width)
+        root_fn=ca.Function('guess_residual',[y,old,uu,dd,*([width] if self.interval_substeps is not None else [])],[residual])
         root=ca.rootfinder('coherent_guess','newton',root_fn,
             {'abstol':abstol,'max_iter':50,'error_on_fail':True})
         construction=time.perf_counter()-started
@@ -78,18 +91,21 @@ class Workspace:
         for k in range(self.steps):
             before=time.perf_counter()
             try:
-                following=np.asarray(root(states[-1]/self.scales,states[-1],tension[k//self.substeps],design)).ravel()*self.scales
-                residual=np.asarray(self.step(states[-1],following,tension[k//self.substeps],design)).ravel()
+                command=tension[self.command_indices[k]]
+                following=np.asarray(root(states[-1]/self.scales,states[-1],command,design,
+                    *([self.widths[k]] if self.interval_substeps is not None else []))).ravel()*self.scales
+                residual=np.asarray(self.step(states[-1],following,command,design) if self.interval_substeps is None
+                    else self.step_grid(states[-1],following,command,design,self.widths[k])).ravel()
                 if not np.isfinite(np.r_[following,residual]).all():raise ValueError('NONFINITE_ROOT')
                 states.append(following)
-                residuals.append(dict(step=k,time_s=(k+1)*self.h,
+                residuals.append(dict(step=k,time_s=float(self.times[k+1]),command_interval=int(self.command_indices[k]),
                     max_normalized_residual=float(np.max(np.abs(residual))),
                     kinematic_max_rad_m=float(np.max(np.abs(residual[:self.n]))*10.),
                     force_balance_max_N_m2_rad=float(np.max(np.abs(residual[self.n:]))*.001),
                     elapsed_s=time.perf_counter()-before))
             except Exception as exc:
-                failure=dict(step=k,time_s=(k+1)*self.h,message=str(exc));break
-        return dict(states=np.asarray(states).tolist(),times_s=(np.arange(len(states))*self.h).tolist(),
+                failure=dict(step=k,time_s=float(self.times[k+1]),message=str(exc));break
+        return dict(states=np.asarray(states).tolist(),times_s=self.times[:len(states)].tolist(),
             residuals=residuals,failure=failure,status='failed' if failure else 'completed',
             costs_s=dict(construction=construction,total=time.perf_counter()-started),abstol=abstol)
 
@@ -107,9 +123,10 @@ class Workspace:
         X = [ca.vertcat(*[variable(f'x/{k}/{j}', [0.,0.] if k==0 else [None,None], self.scales[j])
             for j in range(2*n)]) for k in range(steps+1)]
         U = [ca.vertcat(*[variable(f'u/{k}/{j}', [0.,1.], 8.) for j in range(m)]) for k in range(35)]
-        mapped = self.step.map(steps)
+        mapped = (self.step if self.interval_substeps is None else self.step_grid).map(steps)
         residual = mapped(ca.horzcat(*X[:-1]), ca.horzcat(*X[1:]),
-            ca.horzcat(*[U[k//self.substeps] for k in range(steps)]), ca.repmat(d,1,steps))
+            ca.horzcat(*[U[k] for k in self.command_indices]), ca.repmat(d,1,steps),
+            *([ca.DM(self.widths).T] if self.interval_substeps is not None else []))
         constraints, bounds = {}, {}
         for k in range(steps):
             for j in range(2*n):
@@ -118,7 +135,7 @@ class Workspace:
         sp = variable('slack/position',[0.,None]) if research else 0.
         sv = variable('slack/speed',[0.,None]) if research else 0.
         target = ca.DM(self.configuration['task']['goal']['data']['target_m'])
-        for k in range(30*self.substeps, steps+1):
+        for k in np.flatnonzero(self.times>=.30-1e-12):
             constraints[f'holding_position_{k}']=ca.sumsqr((self.tip(X[k][:n],d)-target)/.01)-sp
             constraints[f'holding_speed_{k}']=ca.sumsqr(self.velocity(X[k][:n],X[k][n:],d)/.02)-sv
             bounds[f'holding_position_{k}']=(None,1.)
@@ -164,11 +181,11 @@ class Workspace:
 
     def decode(self, values):
         return dict(d=float(values['design/d']), lengths_m=[.16+.0055*values['design/d'],.11-.0055*values['design/d']],
-            times_s=(np.arange(self.steps+1)*self.h).tolist(),
+            times_s=self.times.tolist(),
             states=[[values[f'x/{k}/{j}']*self.scales[j] for j in range(2*self.n)] for k in range(self.steps+1)],
             tensions_n=[[values[f'u/{k}/{j}']*8. for j in range(self.m)] for k in range(35)],
             coordinate_order=self.expression.coordinate_order, tendon_order=self.expression.tendon_order,
-            substeps=self.substeps,integration_method=self.integration_method)
+            substeps=self.substeps,interval_substeps=self.interval_substeps,integration_method=self.integration_method)
 
     def metrics(self, candidate):
         X=np.asarray(candidate['states']); d=candidate['d']

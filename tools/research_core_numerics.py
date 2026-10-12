@@ -128,11 +128,13 @@ def offline_diagnostic(request):
         if value.get('source_mechanics')!=request['source_mechanics'] or value.get('rollout',{}).get('failure'):
             raise ValueError('MATCHED_COMPLETE_FIXED_SCHEDULE_ROLLOUT_REQUIRED')
         saved=dict(saved,states=value['trajectory']['states'],times_s=value['trajectory']['times_s'],
-            substeps=value['substeps'],integration_method=value['method'])
-    w=Workspace(request['configuration'],p.get('substeps',saved.get('substeps',1)),integration_method=p.get('integration_method',saved.get('integration_method','implicit_euler')))
+            substeps=value['substeps'],interval_substeps=value.get('interval_substeps'),integration_method=value['method'])
+    w=Workspace(request['configuration'],p.get('substeps',saved.get('substeps',1)),integration_method=p.get('integration_method',saved.get('integration_method','implicit_euler')),
+        interval_substeps=p.get('interval_substeps',saved.get('interval_substeps')))
     if p.get('fixed_interval'):return fixed_input_comparison(w,p['fixed_interval'])
     if request['operation']=='inspect':
-        residuals=np.array([np.asarray(w.step(a,b,saved['tensions_n'][k//saved.get('substeps',1)],saved['d'])).ravel()
+        residuals=np.array([np.asarray(w.step(a,b,saved['tensions_n'][w.command_indices[k]],saved['d']) if w.interval_substeps is None
+            else w.step_grid(a,b,saved['tensions_n'][w.command_indices[k]],saved['d'],w.widths[k])).ravel()
             for k,(a,b) in enumerate(zip(saved['states'][:-1],saved['states'][1:]))])
         return dict(status='completed',saved_trajectory=trajectory_outputs(w,saved),metrics=w.metrics(saved),
             residuals=residuals.tolist(),maximum_normalized_residual=float(abs(residuals).max()),
@@ -146,8 +148,8 @@ def offline_diagnostic(request):
             numerical_s=time.perf_counter()-started,forward_integration_jobs=0)
     if p.get('method','implicit')=='implicit':
         rollout=w.rollout(saved['tensions_n'],saved['d'])
-        candidate=dict(saved,states=rollout['states'],times_s=rollout['times_s'],substeps=w.substeps)
-        return dict(status=rollout['status'],method=w.integration_method,substeps=w.substeps,
+        candidate=dict(saved,states=rollout['states'],times_s=rollout['times_s'],substeps=w.substeps,interval_substeps=w.interval_substeps)
+        return dict(status=rollout['status'],method=w.integration_method,substeps=w.substeps,interval_substeps=w.interval_substeps,
             trajectory=trajectory_outputs(w,candidate),rollout=rollout,
             metrics=w.metrics(candidate) if not rollout['failure'] else None,forward_integration_jobs=1)
     result,trajectory=integrate(w.functions,w.tip,w.velocity,saved,
