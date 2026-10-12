@@ -225,7 +225,7 @@ class TrajectoryWorkspace:
             y=ca.MX.sym('scaled_next',2*self.n);old=ca.MX.sym('old',2*self.n);u=ca.MX.sym('u',self.m)
             residual=ca.Function('tail_residual',[y,old,u],
                 [self._tail_residual(old,y*self.state_scales,u)],{'ad_weight':1.})
-            self._tail_solver=ca.rootfinder('tail_step','newton',residual,{'abstol':1e-10,'max_iter':30})
+            self._tail_solver=ca.rootfinder('tail_step','newton',residual,{'abstol':self.parameters.root_tolerance,'max_iter':30,'error_on_fail':True})
         return time.perf_counter()-construction
 
     def _extend_tail(self,state,tension,guess=None):
@@ -335,6 +335,7 @@ class TrajectoryWorkspace:
             diagnostics=self.solver.last_diagnostics,total_s=total,graph_s=self.graph_s,
             recovery=recovery,
             warm_start=dict(executed_intervals=int(source is not None and warm is None),
+                root_settings=dict(abstol=self.parameters.root_tolerance,max_iterations=30,error_on_fail=True),
                 preparation_s=preparation_s,regenerated_all_states=self.parameters.regenerate_warm_states,seed_settled=seed_settled,tail_initialization=tails),
             nominal_operating_state=self.nominal_x,measured_initial_state=list(measured_x),
             previous_tensions_n=list(previous_u),

@@ -4,6 +4,8 @@ import hashlib
 import json
 import tarfile
 import time
+import importlib.metadata
+import platform
 import numpy as np
 from tools import research_core as core
 from tools import numerical_repair as repair
@@ -57,9 +59,11 @@ def build(host):
     gate=repair.length_admission(host)
     fixed_solves=[r for r in mechanics if r['operation']=='solve' and abs(r.get('structure',{}).get('d',10)-s['spec']['reference_parameters']['d'])<1e-10]
     fixed_verified=bool(gate['new_fixed_offline_validations'])
-    policy_ok=any(all(row.get('verification',{}).get('feasible') and row['diagnostics']['options']['feasible_return'] is None
+    selected_policy=s.get('selected_policy_validation')
+    policy_ok=bool(selected_policy) and all(row.get('verification',{}).get('feasible') and row['diagnostics']['options']['feasible_return'] is None
         and row['diagnostics']['options']['max_cpu_s'] is None and row['diagnostics']['options']['max_wall_s'] is None
-        for row in host.store.artifact(ref)['rows']) for ref in s.get('diagnostics',[]))
+        and row['diagnostics']['options']['max_iterations']==s['profile']['recipe']['max_iterations']
+        for row in host.store.artifact(selected_policy)['rows'])
     statuses=dict(research_policy='passed' if policy_ok else 'incomplete',
         model_projection_comparison='passed' if evidence.get('projection_repair_comparison') else 'incomplete',
         fixed_offline='passed' if fixed_verified else 'failed' if any(row.get('trajectory_metrics') for row in fixed_solves) else 'incomplete' if fixed_solves else 'not_attempted',
@@ -77,6 +81,8 @@ def build(host):
             holding_window_s=[.30,.35],position_limit_m=.01,speed_limit_m_s=.02,seed=17,d=s['spec']['reference_parameters']['d']),
         selected_recipe=s['profile']['recipe'],mechanics=mechanics,physical=physical,complete_run_comparisons=comparisons,
         local_diagnostics=s.get('diagnostics',[]),repair_evidence=evidence,length_design_admission=gate,resources=resources,
+        selected_policy_validation=selected_policy,runtime=dict(python=platform.python_version(),interpreter=str(core.PYTHON),
+            packages={name:importlib.metadata.version(name) for name in ('numpy','scipy','casadi','mujoco','strands-agents','strands-harness')}),
         barrier=s.get('remaining_barrier'),limitations=['Sampled task acceptance is not a continuous-time guarantee.',
             'The measured projection/representable dynamics discrepancy remains a tested model limitation.',
             'The fixed-input study restores available state fields; unarchived MuJoCo runtime fields are not claimed.',

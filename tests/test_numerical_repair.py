@@ -35,6 +35,7 @@ class RepairTests(TestCase):
         self.assertEqual(ws.solver.parameters.max_iterations,12);self.assertTrue(ws.solver.parameters.retain_feasible_iterate)
         historical=GVSTrajectoryParameters.model_validate(cfg.policy.controller.parameters.data['recipe'])
         self.assertEqual(historical.stopping_policy,'historical_timed_v1');self.assertIsNotNone(historical.feasible_return)
+        self.assertEqual(historical.root_tolerance,1e-10)
 
     def test_diagnostic_and_historical_success_cannot_open_length_design(self):
         d=-.43979400623619647

@@ -229,6 +229,8 @@ def integrate(functions, tip, velocity, candidate, target, *, dense_period=.0005
         atol_q=atol_q,atol_v=atol_v,dense_period_s=dense_period,
         node_max_tip_disagreement_m=float(np.max(np.linalg.norm(matched_p-op[valid],axis=1))),
         node_max_speed_disagreement_m_s=float(np.max(np.linalg.norm(matched_v-ov[valid],axis=1))),
+        node_max_tip_disagreement_at_s=float(times[valid][np.argmax(np.linalg.norm(matched_p-op[valid],axis=1))]),
+        node_max_speed_disagreement_at_s=float(times[valid][np.argmax(np.linalg.norm(matched_v-ov[valid],axis=1))]),
         dense_max_tip_disagreement_m=float(max(np.linalg.norm(rp-dense_op,axis=1))),
         dense_max_speed_disagreement_m_s=float(max(np.linalg.norm(rv-dense_ov,axis=1))),
         terminal_position_error_m=float(errors[-1]) if not failure else None,
@@ -246,7 +248,11 @@ def integrate(functions, tip, velocity, candidate, target, *, dense_period=.0005
         result['dense_max_tip_disagreement_m']<=.001 and result['dense_max_speed_disagreement_m_s']<=.002 and
         result['terminal_position_error_m']<=.01 and result['holding_max_position_error_m']<=.01 and result['holding_max_speed_m_s']<=.02)
     classify_replay(result)
-    return result, dict(times_s=rt.tolist(),states=rx.tolist(),tip_positions_m=rp.tolist(),tip_velocities_m_s=rv.tolist())
+    return result, dict(times_s=rt.tolist(),states=rx.tolist(),tip_positions_m=rp.tolist(),tip_velocities_m_s=rv.tolist(),
+        optimizer_nodes=dict(times_s=times[valid].tolist(),states=node_states[valid].tolist(),
+            tip_positions_m=matched_p.tolist(),tip_velocities_m_s=matched_v.tolist(),
+            tip_disagreement_m=np.linalg.norm(matched_p-op[valid],axis=1).tolist(),
+            velocity_vector_disagreement_m_s=np.linalg.norm(matched_v-ov[valid],axis=1).tolist()))
 
 
 def classify_replay(result):
