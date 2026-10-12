@@ -142,3 +142,10 @@ Seal with an engineering STOP citing every new experiment, export with the exist
 archive mechanism, verify member and archive hashes, and split if oversized. Commit
 only scoped code, documentation and non-secret evidence. Push ordinary HTTPS and
 verify the published branch SHA over HTTPS before claiming delivery complete.
+
+fc1012 is now sealed. The frozen offline candidate passed all three gates; the
+complete `development-lead05-runtime1` execution failed the unchanged holding
+speed rule, with .0397690870m/s at .34s. No independent confirmation was
+dispatched. See [the completion report](fixed_task_completion.md) and its frozen
+evidence links. This runbook's dispatch examples are historical; STOP blocks
+further scientific work in this ledger.
