@@ -72,3 +72,11 @@ The repeat command creates a new execution owner and controller process with exa
 The selected `fixed-window-normalized` execution (`1335ee31ad4f46e8b258de6523d07e68`, result `b7e369f215151fe31441d11c9a162f8c1096cd6bb8fb10955ca68535af8f981d`) and fresh repeat (`03085a596aa84ec88c9e4b5e10c82642`, result `716a8613f57c91e9813559d26353374b398cbc9d5e16cd9c769bd87ca68717f5`) each complete 35 feasible updates with no solver errors. Both fail the unchanged original holding-speed limit: 0.025813858195278372 > 0.02 m/s. Holding position passes at 0.0073313765443279505 m. Captured accepted first-step predictions already contain holding overspeed, despite a low final predicted speed. These are complete failure-repetition evidence, not two original-task passes.
 
 Both allowed new fixed optimizations pass numerical feasibility and independent sampled-task acceptance, but fail exact optimizer-node velocity consistency. The revised 16-substep candidate's maximum velocity-vector difference is 0.003526347000457393 m/s at 0.290625 s, above 0.002 m/s. No optional length solve is dispatched. The remaining third offline slot is reserved for the conditional length stage and cannot become a third fixed attempt.
+
+The 160247494-byte existing-format evidence archive is transported in four ordered parts of at most 40 MiB, keeping ordinary HTTPS Git delivery below the [GitHub file limit](https://docs.github.com/en/repositories/working-with-files/managing-large-files/about-large-files-on-github). The local full tar.gz is ignored; `archive_parts.json` records part and complete byte hashes, while the unchanged `archive_manifest.json` records every immutable member. On a fresh checkout, restore it before reading this study as archived evidence:
+
+```powershell
+python -m tools.numerical_repair_delivery --restore-archive
+```
+
+Restoration verifies each part, total length and complete archive SHA before replacing the local file. It needs no study ledger and dispatches no scientific work. The delivery additionally reconstructs a separate ignored copy and verifies that it has the same full SHA.

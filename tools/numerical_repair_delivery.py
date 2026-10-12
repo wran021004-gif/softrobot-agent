@@ -13,6 +13,42 @@ from tools.platform_host import Host
 from tools.state_io import atomic_json
 
 
+def split_archive(out):
+    """Byte transport only; the existing tar.gz and member format stay intact."""
+    archive=out/'immutable_artifacts.tar.gz';manifest=core.read(out/'archive_manifest.json')
+    parts=[];joined=hashlib.sha256();total=0
+    with archive.open('rb') as stream:
+        while body:=stream.read(40*1024*1024):
+            name=f'{archive.name}.part{len(parts)+1:03d}'
+            (out/name).write_bytes(body);joined.update(body);total+=len(body)
+            parts.append(dict(filename=name,bytes=len(body),sha256=hashlib.sha256(body).hexdigest()))
+    if joined.hexdigest()!=manifest['archive_sha256']:raise ValueError('ARCHIVE_SPLIT_HASH_MISMATCH')
+    value=dict(schema='archive_byte_parts_v1',archive_file=archive.name,archive_bytes=total,
+        archive_sha256=joined.hexdigest(),parts=parts)
+    atomic_json(out/'archive_parts.json',value)
+    (out/'.gitignore').write_text('immutable_artifacts.tar.gz\n',encoding='utf8')
+    (out/'.gitattributes').write_text('immutable_artifacts.tar.gz.part* -text\n',encoding='utf8')
+    return value
+
+
+def restore_archive(out,destination=None):
+    """Reassemble ordered bytes and verify before replacing the local archive."""
+    index=core.read(out/'archive_parts.json');destination=destination or out/index['archive_file']
+    temporary=destination.with_name(destination.name+'.restoring');joined=hashlib.sha256();total=0
+    with temporary.open('wb') as stream:
+        for part in index['parts']:
+            body=(out/part['filename']).read_bytes()
+            if len(body)!=part['bytes'] or hashlib.sha256(body).hexdigest()!=part['sha256']:
+                raise ValueError('ARCHIVE_PART_HASH_MISMATCH')
+            stream.write(body);joined.update(body);total+=len(body)
+    if total!=index['archive_bytes'] or joined.hexdigest()!=index['archive_sha256']:
+        raise ValueError('REASSEMBLED_ARCHIVE_HASH_MISMATCH')
+    if joined.hexdigest()!=core.read(out/'archive_manifest.json')['archive_sha256']:
+        raise ValueError('REASSEMBLED_ARCHIVE_MANIFEST_MISMATCH')
+    temporary.replace(destination)
+    return dict(parts_verified=len(index['parts']),reassembled_bytes=total,archive_sha256=joined.hexdigest())
+
+
 def build(host):
     s=core.state(host)
     if s['pending'] or s.get('validation_reservation'):raise ValueError('SETTLE_PENDING_AND_VERIFICATION_BEFORE_DELIVERY')
@@ -118,12 +154,17 @@ def build(host):
             'Complete execution agreement does not establish original-task acceptance or broad robustness; diagnostic repetitions cannot satisfy length admission.'])
     atomic_json(out/'scientific_summary.json',summary)
     labels={'passed':'通过','failed':'失败','incomplete':'未完成','not_attempted':'未执行','passed_with_measured_limitation':'比较完成，保留已测局限'}
+    readable_reasons=dict(research_policy='真实控制路径及全部更新均关闭内部计时返回，保留数值停止与可行性选择。',
+        model_projection_comparison='重现原归档区间；完成 A/B/C 比较，保留实测模型差异。',
+        fixed_offline='两次新候选均通过数值可行性和独立原采样任务，但未通过节点速度一致性。',
+        fixed_closed_loop='选定配置两次完整执行均保持超速；重复为失败复现。',
+        optional_length_design='准入门槛未满足；条件长度尝试未使用。')
     lines=['# 数值执行修复 nr1012','',
         '研究评估策略、数值转录与预算准入已接入实际执行链。机器人任务状态以以下独立阶段验收为准。','',
-        '| 阶段 | 结果 | 原因 |','|---|---|---|',*[f'| {k} | {labels[v]} | {reasons[k]} |' for k,v in statuses.items()],'',
-        f"固定结构 d={s['spec']['reference_parameters']['d']}；任务、物理步长、原始零态、六腱界限与 inclusive 0.30–0.35 s 保持窗口冻结。",'',
+        '| 阶段 | 结果 | 原因 |','|---|---|---|',*[f'| {k} | {labels[v]} | {readable_reasons[k]} |' for k,v in statuses.items()],'',
+        f"固定结构 d={s['spec']['reference_parameters']['d']}；目标 [0.29, 0.035, 0.19] m，原始零态、seed 17、六腱 0–8 N，时长 0.35 s、控制周期 0.01 s、物理步长 0.0005 s。原 inclusive 0.30–0.35 s 保持窗口要求位置误差 ≤0.01 m、速度 ≤0.02 m/s。",'',
         '`research_work_v1` 关闭内部 CPU/墙钟/可行返回计时，以数值收敛或已声明迭代上限停止。保留可行方案选择、返回张力重积分和外部 watchdog；中断为未完成。历史 timed 策略独立保留。',
-        '',f"当前配方：{json.dumps(summary['selected_recipe'],ensure_ascii=False)}",'',
+        '',
         '中点法在离线约束、零态暖启动、NMPC 约束、尾扩展与返回张力恢复中一致使用。35 条物理命令未增加；内部节点共享命令。独立 BDF 由精确节点的 dense-output 状态计算世界位置/速度，不再插值采样速度作为节点真值。',
         '', '模型比较恢复原 update 34 的 q/v、时刻和命令，并与归档短区间核对。A–B 末端速度差 0.013031459 m/s，B–C 0.010355492 m/s，A–C 0.022833211 m/s。起点 A–B 差 0.000188673 m/s；初始 GVS 世界位置约差 2.925 mm。虚功映射后的力项仍有差异，未隔离出符号、尺度或顺序错误；没有按单个端点拟合修正。此处是已测模型局限，不声称全部误差精确相加。',
         '', '局部分歧输入在两个 fresh 12 迭代研究策略求解中均可行，交付命令最大差 0 N；这不建立完整闭环重复性。',
@@ -139,22 +180,29 @@ def build(host):
     lines+=['','| 完整执行 | 用途 | 保持误差 m | 保持速度 m/s | 原任务通过 |','|---|---|---:|---:|---|']
     for row in physical:
         m=row['acceptance'].get('metrics',{});lines.append(f"| {row['execution_id']} | {row['role']} | {m.get('holding_max_error_m')} | {m.get('holding_max_speed_m_s')} | {row['acceptance'].get('accepted',False)} |")
-    lines+=['','选定配置的已记录保持首步预测：','']
-    for row in selected_physical:
-        lines.append(f"- `{row['execution_id']}`：{json.dumps(row['recorded_holding_first_step_predictions'],ensure_ascii=False)}")
+    lines+=['','选定配置的已记录保持首步预测（两次相同）：','',
+        '| 预测时刻 s | 速度 m/s |','|---:|---:|']
+    for prediction in selected_physical[0]['recorded_holding_first_step_predictions'] if selected_physical else []:
+        lines.append(f"| {prediction['prediction_time_s']:.2f} | {prediction['predicted_speed_m_s']:.9f} |")
     lines+=['','完整独立重复比较：','']
     for pair in comparisons:
         lines.append(f"- 完整命令最大差 {pair['full_command_max_difference_n']} N；世界位置向量最大差 {pair['world_position_max_vector_difference_m']} m；世界速度向量最大差 {pair['world_velocity_max_vector_difference_m_s']} m/s。只支持本次固定任务/seed 的两次观测，不声明一般鲁棒性或旧晋级协议通过。")
-    lines+=['',f"剩余障碍：{summary['barrier'] or '见机器摘要中的各阶段判定。'}",'',
+    lines+=['','剩余障碍：修订离线候选在 0.290625 s 的节点速度向量差 0.003526347 m/s，超过 0.002 m/s；选定 NMPC 的已接受保持预测仍含超速，且两次实测保持速度均为 0.025813858 m/s，超过 0.02 m/s。两个固定离线尝试已用完；第三个槽位只属于未获准的长度设计。', '',
         f"长度设计准入：{gate['passed']}。排查闭环、旧离线候选和单次通过不能替代新候选三项验证与同一选定配置两次 fresh 原任务通过。",'',
         f"数值成本 {resources['charged_numerical_s']:.3f}/21600 s；独立控制求解 {resources['standalone_controller_solves']}/10、{resources['standalone_controller_s']:.3f}/1500 s；积分配置 {resources['independent_integration_configurations']}/12；离线 {resources['offline_attempts']}/3；完整 MuJoCo {resources['complete_mujoco_launches']}/6；应用模型请求 {resources['application_model_requests']}/0。内部 NMPC 更新 {updates} 次计入所属完整执行，不重复收费。",'',
-        '[规范](../examples/numerical_repair/specification.json) · [可执行运行说明](numerical_repair_runbook.md) · [机器摘要](../evidence/numerical_repair_20261012/scientific_summary.json) · [归档清单](../evidence/numerical_repair_20261012/archive_manifest.json)']
+        '14 项针对性回归检查通过，未运行全库测试。232 个归档成员及完整 SHA 已校验；四个 ≤40 MiB 的字节分片重组为原格式 tar.gz 后，完整 SHA 仍一致。新 checkout 可执行 `python -m tools.numerical_repair_delivery --restore-archive`，无科学调度。', '',
+        '[规范](../examples/numerical_repair/specification.json) · [可执行运行说明](numerical_repair_runbook.md) · [机器摘要](../evidence/numerical_repair_20261012/scientific_summary.json) · [归档清单](../evidence/numerical_repair_20261012/archive_manifest.json) · [分片清单](../evidence/numerical_repair_20261012/archive_parts.json) · [完整性校验](../evidence/numerical_repair_20261012/verification.json)']
     (core.ROOT/'docs/numerical_repair_completion.md').write_text('\n'.join(lines)+'\n',encoding='utf8')
     return summary
 
 
 def main():
     import sys
+    out=core.ROOT/'evidence/numerical_repair_20261012'
+    if '--split-archive' in sys.argv:
+        print(json.dumps(split_archive(out)));return
+    if '--restore-archive' in sys.argv:
+        print(json.dumps(restore_archive(out)));return
     host=Host(core.ROOT/'runs/nr1012','nr1012',actor='unified-research')
     summary=build(host)
     if '--seal' in sys.argv:
@@ -172,6 +220,7 @@ def main():
             for member in archive:
                 if hashlib.sha256(archive.extractfile(member).read()).hexdigest()!=member.name.split('/')[-1].split('.')[0]:raise ValueError('ARCHIVE_MEMBER_HASH_MISMATCH')
         atomic_json(out/'verification.json',dict(archive_members_verified=len(manifest['members']),archive_sha256=manifest['archive_sha256'],focused_checks=14,repository_wide_suites=0))
+        split_archive(out)
     print(json.dumps(dict(stages=summary['stages'],resources=summary['resources'],barrier=summary['barrier']),ensure_ascii=True))
 
 
