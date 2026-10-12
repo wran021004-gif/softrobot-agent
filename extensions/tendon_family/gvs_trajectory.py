@@ -231,7 +231,11 @@ class TrajectoryWorkspace:
     def _extend_tail(self,state,tension,guess=None):
         construction_s=self._prepare_tail()
         start=time.perf_counter()
-        repeated_defect=float(np.max(abs(np.asarray(self._tail_residual(state,state,tension)))))
+        repeated_defect=None
+        # This diagnostic tests a deliberately repeated state, which is never
+        # proposed by full regeneration. Keep actual-root and full-plan checks.
+        if self.parameters.stopping_policy!='research_work_v1' or not self.parameters.regenerate_warm_states:
+            repeated_defect=float(np.max(abs(np.asarray(self._tail_residual(state,state,tension)))))
         following=np.asarray(self._tail_solver(np.asarray(state if guess is None else guess)/self.state_scales,state,tension)).ravel()*self.state_scales
         defect=float(np.max(abs(np.asarray(self._tail_residual(state,following,tension)))))
         if not np.isfinite(following).all() or not np.isfinite(defect) or defect>1e-5:

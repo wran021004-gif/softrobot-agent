@@ -1,7 +1,7 @@
 """Focused policy, integrator and admission checks without scientific launches."""
 from types import SimpleNamespace
 from unittest import TestCase
-from unittest.mock import patch
+from unittest.mock import patch,Mock
 import casadi as ca
 import numpy as np
 from extensions.tendon_family.contracts import GVSTrajectoryParameters
@@ -11,6 +11,16 @@ from tools import numerical_repair as repair
 
 
 class RepairTests(TestCase):
+    def test_research_regeneration_omits_only_unused_repeated_state_diagnostic(self):
+        ws=SimpleNamespace(parameters=GVSTrajectoryParameters(stopping_policy='research_work_v1'),
+            _prepare_tail=lambda:0.,state_scales=np.ones(2),
+            _tail_solver=lambda *args:np.array([.1,.2]),_tail_residual=Mock(return_value=np.zeros(2)))
+        state,detail=TrajectoryWorkspace._extend_tail(ws,np.zeros(2),[.2])
+        self.assertEqual(ws._tail_residual.call_count,1)
+        self.assertIsNone(detail['repeated_terminal_scaled_defect']);self.assertEqual(detail['extended_tail_scaled_defect'],0.)
+        ws._tail_residual=Mock(return_value=np.array([1e-4,0.]))
+        with self.assertRaisesRegex(RuntimeError,'FEASIBILITY'):TrajectoryWorkspace._extend_tail(ws,np.zeros(2),[.2])
+
     def test_midpoint_force_balance_is_second_order_and_shared(self):
         x=ca.MX.sym('x',2);u=ca.MX.sym('u');a=ca.MX.sym('a')
         force=ca.Function('oscillator',[x,u,a],[a+4*x[0]-u])
