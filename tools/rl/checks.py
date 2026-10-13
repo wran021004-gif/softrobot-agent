@@ -42,7 +42,7 @@ def run_episode(model, env, seed, task):
     terminal = samples[-1]["position_error_m"] if complete else None
     hold_error = max((row["position_error_m"] for row in hold), default=None)
     hold_speed = max((row["speed_m_s"] for row in hold), default=None)
-    passed = (complete and coverage and terminal <= acceptance["position_limit_m"]
+    passed = (complete and coverage and terminal <= acceptance.get('terminal_position_limit_m',acceptance['position_limit_m'])
               and hold_error <= acceptance["position_limit_m"] and hold_speed <= acceptance["holding_speed_limit_m_s"])
     return samples, dict(complete=bool(complete), passed=bool(passed), holding_coverage_complete=coverage,
                          terminal_position_error_m=terminal, holding_max_position_error_m=hold_error,
@@ -99,6 +99,7 @@ def evaluate(policy, output, source_root=None):
                 or hashlib.sha256(policy.read_bytes()).hexdigest() != metadata["policy_file_sha256"]):
             raise ValueError("Incomplete or mismatched checkpoint generation")
         config = copy.deepcopy(config)
+        if not config.get('candidate'): config=historical_input(config)
         if source_root:
             raise ValueError('Frozen candidate evaluation cannot change source_root')
         settings = None
@@ -110,9 +111,9 @@ def evaluate(policy, output, source_root=None):
     try:
         if settings is not None:
             saved = settings["environment"]
-            paths = {"source_root", "xml_source", "execution_json", "reference_npz"}
-            current = env.settings()
-            if any(current.get(key) != value for key, value in saved.items() if key not in paths):
+            if (env.mode!=saved['mode'] or env.horizon!=saved['horizon']
+                    or env.control_dt!=saved['control_dt_s'] or float(env.model.opt.timestep)!=saved['physics_dt_s']
+                    or env.tendons!=saved['tendon_order']):
                 raise ValueError("Historical policy conventions differ from this runtime")
         model = PPO.load(policy, env=env, device="cpu")
         if settings is not None and model.pilot_environment != settings["environment"]:
@@ -218,6 +219,11 @@ def historical_input(config):
     xml, _ = load_xml(Path(config['source_root']))
     import xml.etree.ElementTree as ET
     document=ET.fromstring(xml)
+    if config.get('physics'):
+        # Historical policies explicitly recorded edits to a loaded model copy.
+        document.find('option').set('timestep',str(config['physics']['timestep_s']))
+        document.find('option').set('integrator',config['physics']['integrator'])
+        xml=ET.tostring(document,encoding='unicode')
     tendons=config['task']['tendon_order']
     config['candidate']=dict(xml=xml,sha256=hashlib.sha256(xml.encode()).hexdigest(),assets={},
         identity=config['provenance']['xml_id'],task_identity=config['task']['source_physical_execution'])

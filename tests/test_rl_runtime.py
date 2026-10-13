@@ -349,6 +349,25 @@ def selected_fixture():
 
 
 class CandidateTests(unittest.TestCase):
+    def test_real_ppo_receives_overrides_without_sampling(self):
+        torch.set_num_threads(1)
+        cfg=selected_fixture();cfg['ppo']['learning_rate']=.0005
+        env=TensionEnv(cfg);self.addCleanup(env.close)
+        model=train.RuntimePPO('MlpPolicy',env,seed=cfg['seed'],**cfg['ppo'])
+        self.assertEqual((model.n_steps,model.batch_size,model.n_epochs),(32,16,2))
+        self.assertEqual(model.lr_schedule(1),.0005)
+        self.assertEqual(model.num_timesteps,0)
+        self.assertEqual(env.counts['attempted_physics_steps'],0)
+        env.reset()
+        # Synthetic successful transition; no mj_step is executed.
+        import mujoco
+        def advance(model,data):data.time+=model.opt.timestep
+        with patch.object(mujoco,'mj_step',side_effect=advance):
+            _,_,_,_,info=env.step(np.zeros(2))
+        expected=-cfg['reward']['position']*(info['position_error_m']/cfg['observation']['position_scale_m'])**2
+        self.assertAlmostEqual(info['reward_terms']['position'],expected)
+
+
     def test_selected_coordinates_dimensions_timing_limits_and_sign(self):
         cfg=selected_fixture();env=TensionEnv(cfg);self.addCleanup(env.close)
         obs,_=env.reset()

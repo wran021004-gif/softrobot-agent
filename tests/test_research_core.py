@@ -302,3 +302,26 @@ class RLIntegrationTests(TestCase):
             if os.name=='nt':self.assertEqual(environment['SystemRoot'],os.environ['SYSTEMROOT'])
             self.assertEqual(environment['OMP_NUM_THREADS'],'1')
             self.assertNotIn('DEEPSEEK_API_KEY',environment)
+        # Reproduce the formerly failing Torch import through the corrected environment.
+        import subprocess
+        env={k:os.environ[k] for k in ('SystemRoot','WINDIR','PATH','TEMP','TMP','USERPROFILE','APPDATA','LOCALAPPDATA','COMSPEC','PATHEXT') if k in os.environ}
+        env.update(OPENBLAS_NUM_THREADS='1',OMP_NUM_THREADS='1',MKL_NUM_THREADS='1')
+        actual=subprocess.run([str(bridge.run.PYTHON),'-c','import torch, asyncio; torch.set_num_threads(1); print(torch.get_num_threads())'],
+            cwd=core.ROOT,env=env,capture_output=True,text=True)
+        self.assertEqual(actual.returncode,0,actual.stderr)
+        self.assertEqual(actual.stdout.strip(),'1')
+
+    def test_failed_dispatched_evaluation_never_claims_zero_consumption(self):
+        from tools import research_core_rl as bridge
+        s=dict(spec={'mode':'rl_interface'},rl_runs={'r':dict(candidate={'artifact_id':'c'},task={'artifact_id':'t'},configuration={'artifact_id':'f'})},rl_evaluations=[])
+        values={};ref={'artifact_id':'0'*64,'media_type':'application/json'}
+        def save(host,value,kind):values[ref['artifact_id']]=value;return ref
+        host=__import__('types').SimpleNamespace(run_id='study',store=__import__('types').SimpleNamespace(artifact=lambda reference:values[reference['artifact_id']]))
+        with patch.object(core,'state',return_value=s),patch.object(core,'save',side_effect=save),patch.object(core,'update',side_effect=lambda host,**value:s.update(value)):
+            first=bridge.unavailable_evaluation(host,'r','operation','unexpected child exit',uncertain=True)
+            second=bridge.unavailable_evaluation(host,'r','operation','duplicate')
+            self.assertEqual(first,second)
+            self.assertIsNone(first['counts']);self.assertIsNone(first['independent_evaluation_executed'])
+            self.assertTrue(first['consumption_uncertain'])
+            self.assertEqual(len(s['rl_evaluations']),1)
+            self.assertEqual(core.claims(host)['interface_evaluations'],0)

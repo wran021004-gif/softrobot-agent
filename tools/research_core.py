@@ -641,7 +641,7 @@ def local_diagnostic(host, query, key):
 def claims(host):
     if state(host)['spec'].get('mode')=='rl_interface':
         s=state(host)
-        return dict(interface_evaluations=sum(host.store.artifact(r).get('independent_evaluation_executed',False) for r in s.get('rl_evaluations',[])),task_passed=any(host.store.artifact(r)['passed'] for r in s.get('rl_evaluations',[])),
+        return dict(interface_evaluations=sum(bool(host.store.artifact(r).get('independent_evaluation_executed',False)) for r in s.get('rl_evaluations',[])),task_passed=any(host.store.artifact(r)['passed'] for r in s.get('rl_evaluations',[])),
             scope='One short candidate-aware interface trial; no design infeasibility, robustness or root-cause claim',evaluation_attempt_evidence=len(s.get('rl_evaluations',[])))
     s=state(host); current=s['profile']['identity']; rows=[host.store.artifact(r) for r in s['results']]
     reference=host.store.artifact(s['reference_candidate'])['identity']

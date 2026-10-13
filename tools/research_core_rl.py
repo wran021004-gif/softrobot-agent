@@ -41,7 +41,7 @@ def prepare_input(host, request):
     cfg['task']=dict(family=inp.task.family,target_m=scene['target_world_m'],initializer=scene['initial'],
         duration_s=scene['duration_s'],control_period_s=period,command_intervals=round(scene['duration_s']/period),
         tendon_order=cfg['control_object']['tendon_names'],original=task,
-        acceptance=dict(position_limit_m=acceptance['tolerance_m'],
+        acceptance=dict(position_limit_m=settling['position_limit_m'],terminal_position_limit_m=acceptance['tolerance_m'],
             holding_speed_limit_m_s=settling['speed_limit_m_s'],
             holding_steps=[k for k in range(round(scene['duration_s']/period)+1)
                 if k*period>=scene['duration_s']-settling['window_s']-1e-12]))
@@ -103,6 +103,7 @@ def dispatch(host, value, request_id):
         if q.run_id not in s.get('rl_runs',{}): raise ValueError('Owned RL run required')
     cost={**zero(),'tool_calls':1,'backend_solves':int(q.operation=='start')}
     row,_=host.store.reserve(host.run_id,request_id,key,host.actor,cost,kind='rl_operation')
+    evaluation_dispatched=False
     try:
         if q.operation=='start':
             run_id=host.run_id+'-'+row['execution_id'][:8]
@@ -149,6 +150,7 @@ def dispatch(host, value, request_id):
                     st=host.store.session(host.run_id,db)['state']; runs=st['rl_runs']
                     if sum(e[counter] for e in runs.values())>=limit: raise ValueError('Cumulative '+counter+' ceiling exhausted')
                     runs[run_id][counter]+=1;host.store.update_state(db,host.run_id,st)
+            evaluation_dispatched=q.operation=='evaluate'
             result=invoke(q.operation,run_id,*arguments,'--output',output,deadline=s['cutoff_unix'])
             result.update(study=host.run_id,candidate=entry['candidate'],task=entry['task'],run_id=run_id,configuration=entry['configuration'],independent_evaluation_executed=q.operation=='evaluate')
             reference=core.save(host,result,'rl_'+q.operation+'_evidence')
@@ -160,7 +162,7 @@ def dispatch(host, value, request_id):
     except Exception as exc:
         failure=dict(error=str(exc))
         if q.operation=='evaluate':
-            failure=unavailable_evaluation(host,q.run_id,request_id,str(exc))
+            failure=unavailable_evaluation(host,q.run_id,request_id,str(exc),uncertain=evaluation_dispatched)
         host.store.complete(row,dict(request_id=request_id,execution_id=row['execution_id'],caller=host.actor,
             tool_id='research.core_rl',tool_version='1.0.0',execution_status='failed',charged=zero(),error=str(exc)),failure)
         raise
@@ -179,7 +181,7 @@ def packet(host):
 
 
 
-def unavailable_evaluation(host, run_id, operation_key, reason):
+def unavailable_evaluation(host, run_id, operation_key, reason, uncertain=False):
     """Seal actual failed evaluation-attempt evidence without inventing an episode."""
     from tools import research_core as core
     s=core.state(host);entry=s['rl_runs'][run_id]
@@ -191,6 +193,9 @@ def unavailable_evaluation(host, run_id, operation_key, reason):
         counts=dict(attempted_actions=0,completed_actions=0,attempted_physics_steps=0),
         scope='Failed public evaluation request; no saved policy loaded, no fresh simulation episode or trajectory fabricated',
         run_status=entry.get('status'))
+    if uncertain:
+        value.update(independent_evaluation_executed=None,consumption_uncertain=True,evaluation_elapsed_s=None,
+            counts=None,scope='Evaluation subprocess dispatched then failed; its episode allocation remains charged; physical consumption unknown, no zero-cost claim')
     ref=core.save(host,value,'rl_evaluation_unavailable')
     core.update(host,rl_evaluations=[*s.get('rl_evaluations',[]),ref])
     return dict(reference=ref,**value)
