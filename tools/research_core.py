@@ -811,6 +811,7 @@ def dispatch(host, value, request_id, origin='model'):
         raise ValueError('STOP_MUST_CITE_ALL_NEW_EXPERIMENT_RESULTS')
     if enabled(s['spec'],'rl') and plan.action=='stop' and s.get('rl_runs'):
         evaluations=s.get('rl_evaluations',[])
+        if s['spec'].get('rl_evaluation_source') and not evaluations: raise ValueError('RL_STOP_REQUIRES_EVALUATION_AND_NEXT_STEP_DECISION')
         if not plan.next_step: raise ValueError('RL_STOP_REQUIRES_NEXT_STEP_DECISION')
         for entry in s['rl_runs'].values():
             if entry.get('source_study'): continue

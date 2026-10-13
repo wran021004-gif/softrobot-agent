@@ -159,7 +159,7 @@ def training_summary(directory, state=None):
             sources.append(path)
             checkpoint = dict(generation=generation, policy_present=path.with_name('policy.zip').is_file(), **read_json(path))
     metrics = ['train/' + name for name in ('learning_rate', 'approx_kl', 'clip_fraction', 'entropy_loss',
-               'policy_gradient_loss', 'value_loss', 'explained_variance')] + ['rollout/ep_rew_mean']
+               'policy_gradient_loss', 'value_loss', 'explained_variance', 'n_updates')] + ['rollout/ep_rew_mean']
     workers = []
     records = {w['token']: w for w in state.get('workers', [])}
     tokens = list(records)
@@ -204,7 +204,7 @@ def training_summary(directory, state=None):
     candidate = config.get('candidate', {})
     return dict(run_id=directory.name, candidate={k: candidate.get(k) for k in ('identity', 'reference', 'provenance')},
         task_identity=candidate.get('task_identity'), task=config.get('task'), scope='Recorded training evidence; task acceptance requires independent evaluation',
-        mode=config['mode'], ppo=state.get('effective_ppo', config['ppo']), reward=config['reward'], allocation=config['budget'],
+        mode=config['mode'], seed=config.get('seed'), requested_allocation=config.get('requested_allocation'), ppo=state.get('effective_ppo', config['ppo']), reward=config['reward'], allocation=config['budget'],
         status=state['status'], stop_reason=state.get('stop_reason'), error=state.get('error'),
         recorded_failure_stage=state.get('failure_stage'), last_known_stage=state.get('last_known_stage', state.get('failure_stage')),
         consumed=cost, reservation=state.get('reservation', {}), consumption_uncertain=state.get('consumption_uncertain', False),
@@ -213,7 +213,7 @@ def training_summary(directory, state=None):
         checkpoint=checkpoint, workers=workers, failure_index=dict(recorded_files=len(failures), recent=failure_index),
         sources=[str(p.relative_to(directory)) for p in sources], observed_at_unix=time.time(),
         coverage='CSV may lag checkpoint optimizations; worker step ranges can overlap. Missing metrics are not recorded. '
-                 'Physical steps are attempted, not verified completed substeps. Complete episodes are not task passes; '
+                 'Logged nonfinite metrics are null (undefined), not zero. Physical steps are attempted, not verified completed substeps. Complete episodes are not task passes; '
                  'reward is training-only and cannot be compared across different weights. Historical stage labels are preserved.')
 
 
