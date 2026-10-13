@@ -1,0 +1,3261 @@
+{
+  "specification": {
+    "allowed_parameters": {
+      "d": [
+        -1,
+        1
+      ],
+      "holding_tip_speed_weight": [
+        0.025,
+        0.1
+      ],
+      "terminal_tip_speed_weight": [
+        0.025,
+        0.1
+      ]
+    },
+    "authorization": "User attachment 9db27bdf-6dcb-4716-b60c-8e74d5b5986f and explicit scoped nonsecret DeepSeek transmission authorization; bounded new formal study, scoped implementation/evidence, commit and ordinary push feat/rl-control-pilot",
+    "base_commit": "cdd54a7df214df8bfdeb0d12a06f42202398608b",
+    "budgets": {
+      "activity_s": 10800,
+      "bdf_replays": 0,
+      "delivery_reserve_s": 600,
+      "local_solve_s": 60,
+      "local_solves": 1,
+      "numerical_s": 10200,
+      "offline_nlp": 2,
+      "physical_launches": 7,
+      "protected_provider_requests": 4,
+      "provider_requests": 48,
+      "public_operations": 160
+    },
+    "capabilities": [
+      "mathematics",
+      "search",
+      "nmpc",
+      "rl"
+    ],
+    "complete_update_inputs": true,
+    "confirmation": {
+      "configuration": "Two fresh post-selection nominal episodes; original task, identical selected candidate/controller/configuration and exact frozen RL checkpoint. Development evaluation excluded; retain failures; no success-hunting retries.",
+      "fresh_independent_repetitions": 2
+    },
+    "evaluation_version": 1,
+    "evidence_destination": "evidence/training_summary_formal_20261013",
+    "execution_allowances": {
+      "construction_s": 10,
+      "evaluation_s": 30,
+      "profile_s": 60,
+      "simulation_s": 1700
+    },
+    "execution_instructions": "You own a bounded design-and-control study. Use only scoped supplied evidence and public tools.\nRead study specification, frozen original task, declared capabilities, known historical facts and remaining budgets. Supplied history is not rediscovery.\nWhen mathematical optimization is authorized, use supported task_gap or task_gap_with_effort objective. Explain task difficulty, weights, bounds, fixed variables,\nrelaxed requirements and expected relation to original completion. Inspect mathematical evidence and returned candidate. Handoff chooses no controller.\nMathematical feasibility, relaxed dynamics and original MuJoCo task acceptance are distinct. Preliminary ranking is optional. Search uses NMPC only.\nChoose existing NMPC or direct/residual RL and explain using evidence and budget. Inspect nmpc_admission before launching; no matching timing or oversized\ncomplete execution makes that route unavailable within budget, not the design infeasible. No calibration or raised ceilings.\nResidual requires an advertised compatible runnable reference. Direct stays available if incompatible. Train within declared trial/cumulative limits;\nquery real terminal status and explicitly read/cite its training_summary_reference through evidence_read before deciding.\nEvaluate only a usable published checkpoint; otherwise read training/failure evidence and decide without an impossible evaluation or automatic replacement trial.\nAn earlier checkpoint evaluation must identify its actual training step. Choose rollout-aligned actions; adjustments round down, never above ceilings.\nRead independent evaluation evidence explicitly before deciding to adjust control, revise design, switch route, select or stop.\nSelect a passing development result via confirm selected_execution, freezing candidate+task+route+configuration+exact checkpoint. Use the predeclared fresh\npost-selection count. RL confirmation reloads exact weights, fresh simulation, no training or NMPC. Keep failed confirmations; no success-hunting retries.\nSelection remains immutable. Nominal repetitions support no robustness claim. No fresh baseline required; withhold improvement attribution without comparable evidence.\nStop once confirmations pass; ceilings are not targets. Preserve all costs including failures. Last protected requests are evidence/STOP only.\nSTOP cites every new result and follows explicit RL evidence reads and terminal query, with next_step and actual unfinished requirements.\nNever include credentials, environment-file contents, unrelated files or personal data in model messages. No algorithm superiority or numerical root-cause claims.\n\nFor this new formal study, first explicitly read rl.frozen_task and BOTH historical_evidence.references through evidence_read: the short-training summary and numerical-failure evaluation. Inspect the frozen specification, remaining budget and tools. Do not evaluate the unchanged historical checkpoint again or train it to test reporting. It failed QVEL at action23/substep2 around .2205s; valid prefix .22s, endpoint and holding metrics unavailable. Historical status failure_stage was stale checkpoint-publication metadata; it is not an independent numerical root-cause diagnosis.\nActually invoke research_plan mechanics using supported task_gap or task_gap_with_effort. Explain task difficulty, objective and weights, design bounds, variables/fixed conditions and relaxations. Review its evidence before choosing the candidate/controller route. Mathematical trajectories do not demonstrate original MuJoCo acceptance. NMPC search scoring is NMPC only; inspect configuration-bound admission first. Direct RL needs no reference; residual requires an advertised compatible reference. No artificial prerequisite gate.\nAfter EVERY new trial query public research_rl status, explicitly read its training_summary_reference using evidence_read, evaluate only if a usable published checkpoint exists, then explicitly read the evaluation reference and choose the next action with reasons. If no usable checkpoint exists, read the failure summary and decide; do not request impossible evaluation or automatically start a replacement trial. If evaluating an earlier checkpoint identify actual num_timesteps. Allocation actions must be multiples of selected n_steps; if adjusted, round DOWN and cite requested/effective allocation. No changed-reward/learning-rate inheritance; only new trial/config or same-config resume under original remainder.\nCeilings are 48 provider requests including failures/corrections,160 public operations,2 mathematics attempts at600s each,3 RL trials at200000 actions and1200 active seconds each,600000 cumulative actions and2400 cumulative active seconds,5 RL evaluations including2 reserved fresh confirmations,4 NMPC executions including2 reserved fresh confirmations,1800s per NMPC execution,one optional diagnostic within60s and existing one-step/evidence scope,10800s live including600s delivery reserve. Last4 provider requests protected for evidence/STOP. More training is an experiment, not a known QVEL fix; inspect learning/failure evidence first. Do not fill quotas. Freeze all original task, initialization, physics, execution/acceptance semantics; change only authorized design/controller coordinates. A confirmed solution requires candidate+task+controller+passing development result+two fresh post-selection confirmations; preserve failures, no success-hunting retries. If unmet, stop truthfully and cite all new mathematical/controller results and training summaries. Use original model tool requests and evidence citations; no manufactured decisions.\n",
+    "historical_evidence": {
+      "ownership": "Sealed source records; not current experiments or new costs",
+      "prior_cost_reports": [
+        "evidence/design_control_20261013/completion.md",
+        "evidence/rl_evaluation_followup_20261013/summary.json"
+      ],
+      "references": {
+        "numerical_failure": {
+          "artifact_id": "23a6aec72f9ff17c95f9244ee73f2d1f63fbd3ccc126de7d682dc732a5a17d65",
+          "media_type": "application/json"
+        },
+        "training_summary": {
+          "artifact_id": "4aa260f167618d9d205e58c5ea77fc63c82eb53d9fc402b53a57319f3fa2c79a",
+          "media_type": "application/json"
+        }
+      }
+    },
+    "mechanics_allowances": {
+      "inspect_s": 60,
+      "replay_s": 60,
+      "solve_s": 600
+    },
+    "mode": "formal_research",
+    "nmpc_execution_cap_s": 1800,
+    "nmpc_limits": {
+      "executions": 4
+    },
+    "nmpc_timing_evidence": [
+      {
+        "complete_execution_s": 729.8433474299993,
+        "margin": 1.35,
+        "measured_complete_execution_s": 540.6247017999995,
+        "scientific_configuration_identity": "91c7032e7a4690d3e91b61ec34ee00130a51867d6cc06d85caf0da4f31de5c22",
+        "source": {
+          "archive": "evidence/research_core_20261011/immutable_artifacts.tar.gz",
+          "ownership": "historical; existing timing, no new calibration",
+          "result": {
+            "artifact_id": "df0b70c9d13237b203dbb711cd16c861d0c16fa0a85909bbaf64a4a1dc09f0ca",
+            "media_type": "application/json"
+          }
+        }
+      },
+      {
+        "complete_execution_s": 723.8085303149797,
+        "margin": 1.35,
+        "measured_complete_execution_s": 536.154466899985,
+        "scientific_configuration_identity": "91c7032e7a4690d3e91b61ec34ee00130a51867d6cc06d85caf0da4f31de5c22",
+        "source": {
+          "archive": "evidence/research_core_20261011/immutable_artifacts.tar.gz",
+          "ownership": "historical; existing timing, no new calibration",
+          "result": {
+            "artifact_id": "34e75e00627182e5a006804efd9e00b21949643c29020961fc2a9513e1f6dab5",
+            "media_type": "application/json"
+          }
+        }
+      },
+      {
+        "complete_execution_s": 641.2793865299668,
+        "margin": 1.35,
+        "measured_complete_execution_s": 475.02176779997535,
+        "scientific_configuration_identity": "91c7032e7a4690d3e91b61ec34ee00130a51867d6cc06d85caf0da4f31de5c22",
+        "source": {
+          "archive": "evidence/research_core_20261011/immutable_artifacts.tar.gz",
+          "ownership": "historical; existing timing, no new calibration",
+          "result": {
+            "artifact_id": "043ffc3d31382c5d91d27f3ec3ee403978d472322ef6612264794cb5a8ce2d49",
+            "media_type": "application/json"
+          }
+        }
+      },
+      {
+        "complete_execution_s": 662.3072149499785,
+        "margin": 1.35,
+        "measured_complete_execution_s": 490.5979369999841,
+        "scientific_configuration_identity": "91c7032e7a4690d3e91b61ec34ee00130a51867d6cc06d85caf0da4f31de5c22",
+        "source": {
+          "archive": "evidence/research_core_20261011/immutable_artifacts.tar.gz",
+          "ownership": "historical; existing timing, no new calibration",
+          "result": {
+            "artifact_id": "a2904e47bca95913ae96922b50cb525e2dd0fa4570f9ed75869454c2431728ca",
+            "media_type": "application/json"
+          }
+        }
+      },
+      {
+        "complete_execution_s": 761.0898686850823,
+        "margin": 1.35,
+        "measured_complete_execution_s": 563.7702731000609,
+        "scientific_configuration_identity": "91c7032e7a4690d3e91b61ec34ee00130a51867d6cc06d85caf0da4f31de5c22",
+        "source": {
+          "archive": "evidence/research_core_20261011/immutable_artifacts.tar.gz",
+          "ownership": "historical; existing timing, no new calibration",
+          "result": {
+            "artifact_id": "089040ea3e1ca9a8443685afd25fc8c64b4b0a11d4cc52ea27ab1c3580d50f61",
+            "media_type": "application/json"
+          }
+        }
+      },
+      {
+        "complete_execution_s": 767.0489449949179,
+        "margin": 1.35,
+        "measured_complete_execution_s": 568.1844036999391,
+        "scientific_configuration_identity": "84551517c2a6527ca753a1350aa0df2ecec2ac5005e4a7668c252488533ebcdd",
+        "source": {
+          "archive": "evidence/research_core_20261011/immutable_artifacts.tar.gz",
+          "ownership": "historical; existing timing, no new calibration",
+          "result": {
+            "artifact_id": "f3d993ba4333dd5f34ee150f916fdc99a0670c99e7870b97a3f5e7e5f1c24b49",
+            "media_type": "application/json"
+          }
+        }
+      }
+    ],
+    "offline_solver_s": 550,
+    "optional_enhancements": {
+      "legacy_skill_admission": "deferred; read-only drafts available",
+      "offline_schedule_initialization": "deferred until core delivery and sufficient remaining budget"
+    },
+    "ranking": "feasible_then_max_normalized_violation_then_sum_v1",
+    "record_update_ids": [
+      8,
+      29,
+      30
+    ],
+    "reference_parameters": {
+      "d": 0,
+      "holding_tip_speed_weight": 0.1,
+      "terminal_tip_speed_weight": 0.1
+    },
+    "rl_diagnostic_allowance_s": 60,
+    "rl_evaluation_allowance_s": 120,
+    "rl_limits": {
+      "actions_per_trial": 200000,
+      "diagnostic_physics_steps": 1,
+      "diagnostic_replays": 1,
+      "evaluation_episodes": 5,
+      "seconds_per_trial": 1200,
+      "training_actions": 600000,
+      "training_active_seconds": 2400,
+      "training_runs": 3
+    },
+    "started_unix": 0,
+    "study_id": "training-summary-formal-20261013",
+    "tension_execution_mode": "ideal_tension"
+  },
+  "frozen_task": {
+    "actuator_channels": [
+      "actuator_commands"
+    ],
+    "contract_version": "1.0.0",
+    "environment": {
+      "contract": "experiment.assembly",
+      "data": {
+        "environment": {
+          "coordinate_frame": "world_base_x_forward_yz_cross_section",
+          "environment_id": "reach_free",
+          "gravity_m_s2": [
+            0.0,
+            0.0,
+            -9.81
+          ],
+          "gravity_source": "main@245a785 reach_free environment; Human-owned benchmark gravity",
+          "lights": [
+            {
+              "direction": [
+                0.0,
+                0.0,
+                -1.0
+              ],
+              "position_m": [
+                0.0,
+                0.0,
+                2.0
+              ]
+            }
+          ],
+          "objects": [
+            {
+              "conaffinity": 1,
+              "contype": 0,
+              "half_size_m": [
+                2.0,
+                2.0,
+                0.1
+              ],
+              "kind": "plane",
+              "name": "floor",
+              "position_m": [
+                0.0,
+                0.0,
+                -0.02
+              ]
+            }
+          ],
+          "schema_version": "1",
+          "truth_status": "HUMAN_OWNED",
+          "units": "SI"
+        },
+        "external_forces": [],
+        "floor_id": "floor",
+        "mount": {
+          "position_m": [
+            0.0,
+            0.0,
+            0.15
+          ],
+          "quaternion_wxyz": [
+            1.0,
+            0.0,
+            0.0,
+            0.0
+          ]
+        }
+      },
+      "version": "1.0.0"
+    },
+    "evaluator": {
+      "extension_id": "evaluate.reach",
+      "parameters": {
+        "contract": "reference.reach_evaluation",
+        "data": {
+          "tolerance_m": 0.01
+        },
+        "version": "1.0.0"
+      },
+      "version": "1.0.0"
+    },
+    "failure_policy": "retain_invalid_and_constraint_failures",
+    "family": "task.reach",
+    "goal": {
+      "contract": "reference.reach_goal",
+      "data": {
+        "target_m": [
+          0.29,
+          0.035,
+          0.19
+        ]
+      },
+      "version": "1.0.0"
+    },
+    "initializer": {
+      "extension_id": "initialize.family",
+      "parameters": {
+        "contract": "family.initial",
+        "data": {
+          "qpos_rad": {
+            "distal1_cell_0_y": 0.0,
+            "distal1_cell_0_z": 0.0,
+            "distal1_cell_10_y": 0.0,
+            "distal1_cell_10_z": 0.0,
+            "distal1_cell_11_y": 0.0,
+            "distal1_cell_11_z": 0.0,
+            "distal1_cell_1_y": 0.0,
+            "distal1_cell_1_z": 0.0,
+            "distal1_cell_2_y": 0.0,
+            "distal1_cell_2_z": 0.0,
+            "distal1_cell_3_y": 0.0,
+            "distal1_cell_3_z": 0.0,
+            "distal1_cell_4_y": 0.0,
+            "distal1_cell_4_z": 0.0,
+            "distal1_cell_5_y": 0.0,
+            "distal1_cell_5_z": 0.0,
+            "distal1_cell_6_y": 0.0,
+            "distal1_cell_6_z": 0.0,
+            "distal1_cell_7_y": 0.0,
+            "distal1_cell_7_z": 0.0,
+            "distal1_cell_8_y": 0.0,
+            "distal1_cell_8_z": 0.0,
+            "distal1_cell_9_y": 0.0,
+            "distal1_cell_9_z": 0.0,
+            "near_cell_0_y": 0.0,
+            "near_cell_0_z": 0.0,
+            "near_cell_10_y": 0.0,
+            "near_cell_10_z": 0.0,
+            "near_cell_11_y": 0.0,
+            "near_cell_11_z": 0.0,
+            "near_cell_1_y": 0.0,
+            "near_cell_1_z": 0.0,
+            "near_cell_2_y": 0.0,
+            "near_cell_2_z": 0.0,
+            "near_cell_3_y": 0.0,
+            "near_cell_3_z": 0.0,
+            "near_cell_4_y": 0.0,
+            "near_cell_4_z": 0.0,
+            "near_cell_5_y": 0.0,
+            "near_cell_5_z": 0.0,
+            "near_cell_6_y": 0.0,
+            "near_cell_6_z": 0.0,
+            "near_cell_7_y": 0.0,
+            "near_cell_7_z": 0.0,
+            "near_cell_8_y": 0.0,
+            "near_cell_8_z": 0.0,
+            "near_cell_9_y": 0.0,
+            "near_cell_9_z": 0.0
+          },
+          "qvel_rad_s": {
+            "distal1_cell_0_y": 0.0,
+            "distal1_cell_0_z": 0.0,
+            "distal1_cell_10_y": 0.0,
+            "distal1_cell_10_z": 0.0,
+            "distal1_cell_11_y": 0.0,
+            "distal1_cell_11_z": 0.0,
+            "distal1_cell_1_y": 0.0,
+            "distal1_cell_1_z": 0.0,
+            "distal1_cell_2_y": 0.0,
+            "distal1_cell_2_z": 0.0,
+            "distal1_cell_3_y": 0.0,
+            "distal1_cell_3_z": 0.0,
+            "distal1_cell_4_y": 0.0,
+            "distal1_cell_4_z": 0.0,
+            "distal1_cell_5_y": 0.0,
+            "distal1_cell_5_z": 0.0,
+            "distal1_cell_6_y": 0.0,
+            "distal1_cell_6_z": 0.0,
+            "distal1_cell_7_y": 0.0,
+            "distal1_cell_7_z": 0.0,
+            "distal1_cell_8_y": 0.0,
+            "distal1_cell_8_z": 0.0,
+            "distal1_cell_9_y": 0.0,
+            "distal1_cell_9_z": 0.0,
+            "near_cell_0_y": 0.0,
+            "near_cell_0_z": 0.0,
+            "near_cell_10_y": 0.0,
+            "near_cell_10_z": 0.0,
+            "near_cell_11_y": 0.0,
+            "near_cell_11_z": 0.0,
+            "near_cell_1_y": 0.0,
+            "near_cell_1_z": 0.0,
+            "near_cell_2_y": 0.0,
+            "near_cell_2_z": 0.0,
+            "near_cell_3_y": 0.0,
+            "near_cell_3_z": 0.0,
+            "near_cell_4_y": 0.0,
+            "near_cell_4_z": 0.0,
+            "near_cell_5_y": 0.0,
+            "near_cell_5_z": 0.0,
+            "near_cell_6_y": 0.0,
+            "near_cell_6_z": 0.0,
+            "near_cell_7_y": 0.0,
+            "near_cell_7_z": 0.0,
+            "near_cell_8_y": 0.0,
+            "near_cell_8_z": 0.0,
+            "near_cell_9_y": 0.0,
+            "near_cell_9_z": 0.0
+          },
+          "unspecified": "zero"
+        },
+        "version": "1.0.0"
+      },
+      "version": "1.0.0"
+    },
+    "name": "Independent development validation of a serial multi-segment soft arm",
+    "objectives": [
+      {
+        "direction": "minimize",
+        "metric": "position_error",
+        "units": "m",
+        "weight": 1.0
+      }
+    ],
+    "observations": [
+      {
+        "dimension": 3,
+        "entity": "tip",
+        "frame": "world",
+        "missing": "unsupported",
+        "name": "tip_position",
+        "phase": "post_step",
+        "units": "m"
+      }
+    ],
+    "robot_families": [
+      "tendon_robot_family"
+    ],
+    "sampling": {
+      "aggregation": "per_instance",
+      "seeds": [
+        17
+      ],
+      "split": "development",
+      "window_s": [
+        0.0,
+        0.35
+      ]
+    },
+    "source": "Development task with fixed target, tolerance and scoring; historical tasks are unchanged",
+    "status": "development_valid",
+    "task_id": "family-multisegment-dev",
+    "task_version": "1.0.0",
+    "timing": {
+      "control_period_s": 0.01,
+      "duration_s": 0.35,
+      "sample_period_s": 0.01,
+      "termination": [
+        "duration",
+        "numerical_failure"
+      ],
+      "timestep_s": 0.0005
+    }
+  },
+  "reference_candidate": {
+    "artifact_id": "eeb4bd4ddffa3f5ddc13c525661da8e9e45fbacb14ef49cd079ade67710dbded",
+    "media_type": "application/json"
+  },
+  "candidates": [
+    {
+      "artifact_id": "eeb4bd4ddffa3f5ddc13c525661da8e9e45fbacb14ef49cd079ade67710dbded",
+      "media_type": "application/json"
+    }
+  ],
+  "results": [
+    {
+      "reference": {
+        "artifact_id": "4c099449cbc8617d1f72156b56b769bd3130219c9f8f44bae797600d12762b6a",
+        "media_type": "application/json"
+      },
+      "candidate": {
+        "artifact_id": "eeb4bd4ddffa3f5ddc13c525661da8e9e45fbacb14ef49cd079ade67710dbded",
+        "media_type": "application/json"
+      },
+      "task": {
+        "artifact_id": "2b26edb492214c426263441b6adb52d7aafe41a828436d6b48a1171374a1026c",
+        "media_type": "application/json"
+      },
+      "controller_route": "rl",
+      "controller": {
+        "route": "rl",
+        "configuration": {
+          "artifact_id": "ac3b1f9214c6343ade428e3f8cb0b086c3e9e8a42da727d91e30e08e3c330fc4",
+          "media_type": "application/json"
+        },
+        "checkpoint": "step-00043264-f376bb39",
+        "policy_sha256": "7459d48006d8c0bfc18a0d6ed0fe9c864dad33abf8961acfc47f3841a4ce4fb0"
+      },
+      "mathematical_provenance": [],
+      "metrics": [
+        {
+          "complete": true,
+          "counts": {
+            "attempted_actions": 35,
+            "attempted_physics_steps": 700,
+            "complete_episodes": 1,
+            "completed_actions": 35,
+            "failed_episodes": 0
+          },
+          "episode_reward": -6119.148047964336,
+          "holding_coverage_complete": true,
+          "holding_max_position_error_m": 0.17025784632567428,
+          "holding_max_speed_m_s": 0.16180596727341826,
+          "holding_sample_steps": [
+            30,
+            31,
+            32,
+            33,
+            34,
+            35
+          ],
+          "numerical_failure": null,
+          "passed": false,
+          "terminal_position_error_m": 0.16994929767023276,
+          "trajectory_rows": 36
+        }
+      ],
+      "complete": true,
+      "passed": false,
+      "task_performance": "failed",
+      "failure_stage": "task criteria unmet",
+      "costs": {
+        "evaluation_elapsed_s": 0.9346176000544801,
+        "numerical_s": null,
+        "counts": null
+      },
+      "evidence": {
+        "artifact_id": "4c099449cbc8617d1f72156b56b769bd3130219c9f8f44bae797600d12762b6a",
+        "media_type": "application/json"
+      },
+      "role": "development",
+      "selected_execution": null,
+      "solution_identity": {
+        "candidate": {
+          "artifact_id": "eeb4bd4ddffa3f5ddc13c525661da8e9e45fbacb14ef49cd079ade67710dbded",
+          "media_type": "application/json"
+        },
+        "task": {
+          "artifact_id": "2b26edb492214c426263441b6adb52d7aafe41a828436d6b48a1171374a1026c",
+          "media_type": "application/json"
+        },
+        "controller": {
+          "route": "rl",
+          "configuration": {
+            "artifact_id": "ac3b1f9214c6343ade428e3f8cb0b086c3e9e8a42da727d91e30e08e3c330fc4",
+            "media_type": "application/json"
+          },
+          "checkpoint": "step-00043264-f376bb39",
+          "policy_sha256": "7459d48006d8c0bfc18a0d6ed0fe9c864dad33abf8961acfc47f3841a4ce4fb0"
+        }
+      },
+      "confirmation": {
+        "eligible": false,
+        "reasons": [
+          "result did not pass complete original task evaluation",
+          "study sealed after STOP"
+        ],
+        "required_field": "selected_execution",
+        "selected_execution": {
+          "artifact_id": "4c099449cbc8617d1f72156b56b769bd3130219c9f8f44bae797600d12762b6a",
+          "media_type": "application/json"
+        },
+        "owning_study": "training-summary-formal-20261013",
+        "completed_confirmations": 0
+      }
+    },
+    {
+      "reference": {
+        "artifact_id": "e6c5f7c64754536b24b82e2b03003956f57c57ba75215a7e53bff11605f1ddf9",
+        "media_type": "application/json"
+      },
+      "candidate": {
+        "artifact_id": "eeb4bd4ddffa3f5ddc13c525661da8e9e45fbacb14ef49cd079ade67710dbded",
+        "media_type": "application/json"
+      },
+      "task": {
+        "artifact_id": "2b26edb492214c426263441b6adb52d7aafe41a828436d6b48a1171374a1026c",
+        "media_type": "application/json"
+      },
+      "controller_route": "rl",
+      "controller": {
+        "route": "rl",
+        "configuration": {
+          "artifact_id": "ac3b1f9214c6343ade428e3f8cb0b086c3e9e8a42da727d91e30e08e3c330fc4",
+          "media_type": "application/json"
+        },
+        "checkpoint": "step-00051456-a6c191fb",
+        "policy_sha256": "0231f9b946d6c49ed7bfdb2a9d6ccf7878a1f0ff9d7993d87b0dfd5f0b800ad1"
+      },
+      "mathematical_provenance": [],
+      "metrics": [
+        {
+          "complete": true,
+          "counts": {
+            "attempted_actions": 35,
+            "attempted_physics_steps": 700,
+            "complete_episodes": 1,
+            "completed_actions": 35,
+            "failed_episodes": 0
+          },
+          "episode_reward": -3266.242383177195,
+          "holding_coverage_complete": true,
+          "holding_max_position_error_m": 0.1167015963438733,
+          "holding_max_speed_m_s": 0.08337873298480952,
+          "holding_sample_steps": [
+            30,
+            31,
+            32,
+            33,
+            34,
+            35
+          ],
+          "numerical_failure": null,
+          "passed": false,
+          "terminal_position_error_m": 0.1167015963438733,
+          "trajectory_rows": 36
+        }
+      ],
+      "complete": true,
+      "passed": false,
+      "task_performance": "failed",
+      "failure_stage": "task criteria unmet",
+      "costs": {
+        "evaluation_elapsed_s": 0.9021950999740511,
+        "numerical_s": null,
+        "counts": null
+      },
+      "evidence": {
+        "artifact_id": "e6c5f7c64754536b24b82e2b03003956f57c57ba75215a7e53bff11605f1ddf9",
+        "media_type": "application/json"
+      },
+      "role": "development",
+      "selected_execution": null,
+      "solution_identity": {
+        "candidate": {
+          "artifact_id": "eeb4bd4ddffa3f5ddc13c525661da8e9e45fbacb14ef49cd079ade67710dbded",
+          "media_type": "application/json"
+        },
+        "task": {
+          "artifact_id": "2b26edb492214c426263441b6adb52d7aafe41a828436d6b48a1171374a1026c",
+          "media_type": "application/json"
+        },
+        "controller": {
+          "route": "rl",
+          "configuration": {
+            "artifact_id": "ac3b1f9214c6343ade428e3f8cb0b086c3e9e8a42da727d91e30e08e3c330fc4",
+            "media_type": "application/json"
+          },
+          "checkpoint": "step-00051456-a6c191fb",
+          "policy_sha256": "0231f9b946d6c49ed7bfdb2a9d6ccf7878a1f0ff9d7993d87b0dfd5f0b800ad1"
+        }
+      },
+      "confirmation": {
+        "eligible": false,
+        "reasons": [
+          "result did not pass complete original task evaluation",
+          "study sealed after STOP"
+        ],
+        "required_field": "selected_execution",
+        "selected_execution": {
+          "artifact_id": "e6c5f7c64754536b24b82e2b03003956f57c57ba75215a7e53bff11605f1ddf9",
+          "media_type": "application/json"
+        },
+        "owning_study": "training-summary-formal-20261013",
+        "completed_confirmations": 0
+      }
+    }
+  ],
+  "mechanics_results": [
+    {
+      "reference": {
+        "artifact_id": "ad10e4190cead8c06b5c0f623d33e06dd055340e78fbaa66dc79255e7d2d1eda",
+        "media_type": "application/json"
+      },
+      "status": "known_killed_waited_timeout",
+      "operation": "solve",
+      "trajectory_reference": null,
+      "objective_definition": {
+        "design_bounds": [
+          -1.0,
+          1.0
+        ],
+        "design_initial": 0.0,
+        "initialization": "pretension_0_2",
+        "integration_method": "implicit_euler",
+        "interval_substeps": null,
+        "objective_mode": "task_gap_with_effort",
+        "position_weight": 1.0,
+        "secondary_coefficient": 0.001,
+        "source_candidate": null,
+        "speed_weight": 1.0,
+        "substeps": 20
+      },
+      "original_task_feasible": null,
+      "relaxed_nlp_feasible": null,
+      "original_task_gaps": null,
+      "trajectory_metrics": null,
+      "charged_numerical_s": 600.0411395999836
+    },
+    {
+      "reference": {
+        "artifact_id": "58aa1fbc64101f384faeaaed193312781fb51737bf42fff840d2081b865364d2",
+        "media_type": "application/json"
+      },
+      "status": "known_killed_waited_timeout",
+      "operation": "solve",
+      "trajectory_reference": null,
+      "objective_definition": {
+        "design_bounds": [
+          -1.0,
+          1.0
+        ],
+        "design_initial": 0.0,
+        "initialization": "pretension_0_2",
+        "integration_method": "implicit_euler",
+        "interval_substeps": null,
+        "objective_mode": "task_gap_with_effort",
+        "position_weight": 1.0,
+        "secondary_coefficient": 0.001,
+        "source_candidate": null,
+        "speed_weight": 1.0,
+        "substeps": 5
+      },
+      "original_task_feasible": null,
+      "relaxed_nlp_feasible": null,
+      "original_task_gaps": null,
+      "trajectory_metrics": null,
+      "charged_numerical_s": 600.0363323999336
+    }
+  ],
+  "handoffs": [],
+  "rl": {
+    "frozen_task": {
+      "artifact_id": "2b26edb492214c426263441b6adb52d7aafe41a828436d6b48a1171374a1026c",
+      "media_type": "application/json"
+    },
+    "capabilities": {
+      "task": "reach-and-hold",
+      "control": "ideal_tension",
+      "modes": [
+        "direct",
+        "residual"
+      ],
+      "compatible_references": [],
+      "structural_coordinate": "d in [-1,1]: lengths [.16+.0055*d,.11-.0055*d] m",
+      "defaults": {
+        "mode": "direct",
+        "seed": 17,
+        "reference": null,
+        "budget": {
+          "actions": 2048,
+          "active_seconds": 120.0
+        },
+        "stop_at_boundary": null,
+        "observation": {
+          "position_scale_m": 0.01,
+          "speed_scale_m_s": 0.02
+        },
+        "action": {
+          "residual_scale_n": 8.0
+        },
+        "reward": {
+          "position": 1.0,
+          "holding_speed": 1.0,
+          "smoothness": 0.001,
+          "failure_penalty": -10000.0
+        },
+        "ppo": {
+          "learning_rate": 0.0003,
+          "n_steps": 256,
+          "batch_size": 64,
+          "n_epochs": 10,
+          "gamma": 0.99,
+          "gae_lambda": 0.95,
+          "clip_range": 0.2,
+          "clip_range_vf": null,
+          "normalize_advantage": true,
+          "ent_coef": 0.0,
+          "vf_coef": 0.5,
+          "max_grad_norm": 0.5,
+          "use_sde": false,
+          "sde_sample_freq": -1,
+          "target_kl": null,
+          "policy_kwargs": {
+            "net_arch": {
+              "pi": [
+                64,
+                64
+              ],
+              "vf": [
+                64,
+                64
+              ]
+            },
+            "log_std_init": -3.0
+          },
+          "device": "cpu",
+          "verbose": 0
+        }
+      }
+    },
+    "training_summaries": [
+      {
+        "run_id": "training-summary-formal-20261013-9fd0bb09",
+        "reference": {
+          "artifact_id": "1eb62bb0f7643b1d25fa325cf903f92f8da80765ce4578cece4cae8b8dd426d2",
+          "media_type": "application/json"
+        },
+        "evaluations": [
+          {
+            "artifact_id": "4c099449cbc8617d1f72156b56b769bd3130219c9f8f44bae797600d12762b6a",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "e6c5f7c64754536b24b82e2b03003956f57c57ba75215a7e53bff11605f1ddf9",
+            "media_type": "application/json"
+          }
+        ]
+      },
+      {
+        "run_id": "training-summary-formal-20261013-fb54a8b8",
+        "reference": {
+          "artifact_id": "7e10b28e1198e02c4d4af3f2ed0459444cca28127670deb3968621fd051d0521",
+          "media_type": "application/json"
+        },
+        "evaluations": []
+      }
+    ],
+    "runs": {
+      "training-summary-formal-20261013-9fd0bb09": {
+        "active_reservation": null,
+        "allocation": {
+          "actions": 102400,
+          "active_seconds": 600.0
+        },
+        "candidate": {
+          "artifact_id": "eeb4bd4ddffa3f5ddc13c525661da8e9e45fbacb14ef49cd079ade67710dbded",
+          "media_type": "application/json"
+        },
+        "configuration": {
+          "artifact_id": "ac3b1f9214c6343ade428e3f8cb0b086c3e9e8a42da727d91e30e08e3c330fc4",
+          "media_type": "application/json"
+        },
+        "evaluations": 2,
+        "execution_repair": {
+          "implementation": "8c64728143172ab2e8eccff0595ad3e671aac7a7",
+          "original_allocation_preserved": {
+            "actions": 102400,
+            "active_seconds": 600.0
+          },
+          "reference": {
+            "artifact_id": "0c4f5d1eb2fb6fcf89da81a7dfaf29f01895bae1d049bb6dd001e4701906f76e",
+            "media_type": "application/json"
+          },
+          "same_configuration_resume_available": true
+        },
+        "mathematical_handoffs": [],
+        "replays": 0,
+        "request_identity": "a49648fd70b1227911cb36b2ac0aec1f9bbc91cbaaefae703bfbcdb28ef72467",
+        "status": {
+          "active_time_overrun_s": 0,
+          "artifacts": "D:\\softrobot-agent\\.worktrees\\rl-control-pilot\\runs\\rl\\training-summary-formal-20261013-9fd0bb09",
+          "checkpoints": {
+            "current": "step-00051456-a6c191fb",
+            "previous": "step-00051200-5885c253"
+          },
+          "consumed": {
+            "active_seconds": 104.68487159989309,
+            "attempted_actions": 51968,
+            "attempted_physics_steps": 1029961,
+            "complete_episodes": 765,
+            "completed_actions": 50984,
+            "failed_episodes": 984
+          },
+          "consumption_uncertain": false,
+          "effective_ppo": {
+            "batch_size": 64,
+            "clip_range": 0.2,
+            "clip_range_vf": null,
+            "device": "cpu",
+            "ent_coef": 0.0,
+            "gae_lambda": 0.95,
+            "gamma": 0.99,
+            "learning_rate": 0.0003,
+            "max_grad_norm": 0.5,
+            "n_epochs": 10,
+            "n_steps": 256,
+            "normalize_advantage": true,
+            "policy_kwargs": {
+              "log_std_init": -3.0,
+              "net_arch": {
+                "pi": [
+                  64,
+                  64
+                ],
+                "vf": [
+                  64,
+                  64
+                ]
+              }
+            },
+            "sde_sample_freq": -1,
+            "target_kl": null,
+            "use_sde": false,
+            "verbose": 0,
+            "vf_coef": 0.5
+          },
+          "environment": {
+            "action_dimension": 6,
+            "candidate": "83488f115662b2058912ae06828b3a807f8c4dbad41b56fcf0a2cdbae8e55ed9",
+            "control_dt_s": 0.01,
+            "control_object": {
+              "actuator_names": [
+                "near_t0_direct_tension",
+                "near_t1_direct_tension",
+                "near_t2_direct_tension",
+                "far_t0_direct_tension",
+                "far_t1_direct_tension",
+                "far_t2_direct_tension"
+              ],
+              "joint_names": [
+                "near_cell_0_y",
+                "near_cell_0_z",
+                "near_cell_1_y",
+                "near_cell_1_z",
+                "near_cell_2_y",
+                "near_cell_2_z",
+                "near_cell_3_y",
+                "near_cell_3_z",
+                "near_cell_4_y",
+                "near_cell_4_z",
+                "near_cell_5_y",
+                "near_cell_5_z",
+                "near_cell_6_y",
+                "near_cell_6_z",
+                "near_cell_7_y",
+                "near_cell_7_z",
+                "near_cell_8_y",
+                "near_cell_8_z",
+                "near_cell_9_y",
+                "near_cell_9_z",
+                "near_cell_10_y",
+                "near_cell_10_z",
+                "near_cell_11_y",
+                "near_cell_11_z",
+                "distal1_cell_0_y",
+                "distal1_cell_0_z",
+                "distal1_cell_1_y",
+                "distal1_cell_1_z",
+                "distal1_cell_2_y",
+                "distal1_cell_2_z",
+                "distal1_cell_3_y",
+                "distal1_cell_3_z",
+                "distal1_cell_4_y",
+                "distal1_cell_4_z",
+                "distal1_cell_5_y",
+                "distal1_cell_5_z",
+                "distal1_cell_6_y",
+                "distal1_cell_6_z",
+                "distal1_cell_7_y",
+                "distal1_cell_7_z",
+                "distal1_cell_8_y",
+                "distal1_cell_8_z",
+                "distal1_cell_9_y",
+                "distal1_cell_9_z",
+                "distal1_cell_10_y",
+                "distal1_cell_10_z",
+                "distal1_cell_11_y",
+                "distal1_cell_11_z"
+              ],
+              "semantics": "ideal_tension",
+              "tendon_names": [
+                "near_t0",
+                "near_t1",
+                "near_t2",
+                "far_t0",
+                "far_t1",
+                "far_t2"
+              ],
+              "tip_site": "tip_site"
+            },
+            "holding_steps": [
+              30,
+              31,
+              32,
+              33,
+              34,
+              35
+            ],
+            "horizon": 35,
+            "mode": "direct",
+            "observation_dimension": 109,
+            "physics_dt_s": 0.0005,
+            "reference": null,
+            "residual_scale_n": [
+              8.0,
+              8.0,
+              8.0,
+              8.0,
+              8.0,
+              8.0
+            ],
+            "reward": {
+              "failure_penalty": -10000.0,
+              "holding_speed": 1.0,
+              "position": 1.0,
+              "smoothness": 0.001
+            },
+            "substeps": 20,
+            "task": "2b26edb492214c426263441b6adb52d7aafe41a828436d6b48a1171374a1026c",
+            "tension_limits_n": [
+              [
+                0.0,
+                8.0
+              ],
+              [
+                0.0,
+                8.0
+              ],
+              [
+                0.0,
+                8.0
+              ],
+              [
+                0.0,
+                8.0
+              ],
+              [
+                0.0,
+                8.0
+              ],
+              [
+                0.0,
+                8.0
+              ]
+            ]
+          },
+          "error": "PermissionError: [WinError 5] 拒绝访问。: 'D:\\\\softrobot-agent\\\\.worktrees\\\\rl-control-pilot\\\\runs\\\\rl\\\\training-summary-formal-20261013-9fd0bb09\\\\state.json.92743c7911aa4260a82798541faae121.tmp' -> 'D:\\\\softrobot-agent\\\\.worktrees\\\\rl-control-pilot\\\\runs\\\\rl\\\\training-summary-formal-20261013-9fd0bb09\\\\state.json'",
+          "failure_stage": "policy optimization",
+          "inherited": {
+            "num_timesteps": 51456,
+            "optimization_epochs": 2010,
+            "optimizer_sha256": "e714576202402bb42ee6637fa76bb9f54ded6ce6ac5cafd5fda8aa970bcc3575",
+            "optimizer_steps": 8040,
+            "policy_sha256": "287fa6ab5735f346a01511ce6e9f0643851e11c11dc041f521db961f90e9b361",
+            "rollout_optimizations": 201,
+            "schedule": {
+              "clip_range": 0.2,
+              "clip_range_vf": null,
+              "learning_rate": 0.0003,
+              "progress_remaining": 0.49750000000000005,
+              "total_timesteps": 102400
+            }
+          },
+          "last_known_stage": "policy optimization",
+          "latest_checkpoint": "D:\\softrobot-agent\\.worktrees\\rl-control-pilot\\runs\\rl\\training-summary-formal-20261013-9fd0bb09\\checkpoints\\step-00051456-a6c191fb",
+          "recovered_from_generation": "step-00043264-f376bb39",
+          "remaining": {
+            "actions": 50432,
+            "active_seconds": 495.3151284001069
+          },
+          "reservation": {},
+          "run_id": "training-summary-formal-20261013-9fd0bb09",
+          "status": "failed",
+          "stop_reason": "PermissionError: [WinError 5] 拒绝访问。: 'D:\\\\softrobot-agent\\\\.worktrees\\\\rl-control-pilot\\\\runs\\\\rl\\\\training-summary-formal-20261013-9fd0bb09\\\\state.json.92743c7911aa4260a82798541faae121.tmp' -> 'D:\\\\softrobot-agent\\\\.worktrees\\\\rl-control-pilot\\\\runs\\\\rl\\\\training-summary-formal-20261013-9fd0bb09\\\\state.json'",
+          "training_summary": {
+            "allocation": {
+              "actions": 102400,
+              "active_seconds": 600.0
+            },
+            "candidate": {
+              "identity": "83488f115662b2058912ae06828b3a807f8c4dbad41b56fcf0a2cdbae8e55ed9",
+              "provenance": {
+                "historical_result_ownership": "sealed source activity",
+                "origin": "initial_controller_reference"
+              },
+              "reference": {
+                "artifact_id": "eeb4bd4ddffa3f5ddc13c525661da8e9e45fbacb14ef49cd079ade67710dbded",
+                "media_type": "application/json"
+              }
+            },
+            "checkpoint": {
+              "config_sha256": "a475f31136cf7ba2f6b576724949f9aa3287d86d58d78f67027eb0154bca8a48",
+              "consumed": {
+                "active_seconds": 104.23461739998311,
+                "attempted_actions": 51712,
+                "attempted_physics_steps": 1024841,
+                "complete_episodes": 758,
+                "completed_actions": 50728,
+                "failed_episodes": 984
+              },
+              "generation": "step-00051456-a6c191fb",
+              "inherited": {
+                "num_timesteps": 51456,
+                "optimization_epochs": 2010,
+                "optimizer_sha256": "e714576202402bb42ee6637fa76bb9f54ded6ce6ac5cafd5fda8aa970bcc3575",
+                "optimizer_steps": 8040,
+                "policy_sha256": "287fa6ab5735f346a01511ce6e9f0643851e11c11dc041f521db961f90e9b361",
+                "rollout_optimizations": 201,
+                "schedule": {
+                  "clip_range": 0.2,
+                  "clip_range_vf": null,
+                  "learning_rate": 0.0003,
+                  "progress_remaining": 0.49750000000000005,
+                  "total_timesteps": 102400
+                }
+              },
+              "policy_file_sha256": "0231f9b946d6c49ed7bfdb2a9d6ccf7878a1f0ff9d7993d87b0dfd5f0b800ad1",
+              "policy_present": true
+            },
+            "consumed": {
+              "active_seconds": 104.68487159989309,
+              "attempted_actions": 51968,
+              "attempted_physics_steps": 1029961,
+              "complete_episodes": 765,
+              "completed_actions": 50984,
+              "failed_episodes": 984
+            },
+            "consumption_uncertain": false,
+            "coverage": "CSV may lag checkpoint optimizations; worker step ranges can overlap. Missing metrics are not recorded. Physical steps are attempted, not verified completed substeps. Complete episodes are not task passes; reward is training-only and cannot be compared across different weights. Historical stage labels are preserved.",
+            "episode_failure_fraction": {
+              "denominator": 1749,
+              "numerator": 984,
+              "value": 0.5626072041166381
+            },
+            "error": "PermissionError: [WinError 5] 拒绝访问。: 'D:\\\\softrobot-agent\\\\.worktrees\\\\rl-control-pilot\\\\runs\\\\rl\\\\training-summary-formal-20261013-9fd0bb09\\\\state.json.92743c7911aa4260a82798541faae121.tmp' -> 'D:\\\\softrobot-agent\\\\.worktrees\\\\rl-control-pilot\\\\runs\\\\rl\\\\training-summary-formal-20261013-9fd0bb09\\\\state.json'",
+            "failure_index": {
+              "recent": [
+                {
+                  "cumulative_action": 38610,
+                  "episode_action": 34,
+                  "episode_number": 1368,
+                  "failed_substep": 19,
+                  "pre_step_time_s": 0.33900000000000025,
+                  "source": "failures\\bfd8143c34764e199f48e22c7752dcdc\\failure_episode_1368.json",
+                  "warnings": [
+                    "mjWARN_BADQACC",
+                    "engine_time_reset"
+                  ]
+                },
+                {
+                  "cumulative_action": 38714,
+                  "episode_action": 34,
+                  "episode_number": 1371,
+                  "failed_substep": 3,
+                  "pre_step_time_s": 0.33100000000000024,
+                  "source": "failures\\bfd8143c34764e199f48e22c7752dcdc\\failure_episode_1371.json",
+                  "warnings": [
+                    "mjWARN_BADQACC",
+                    "engine_time_reset"
+                  ]
+                },
+                {
+                  "cumulative_action": 38819,
+                  "episode_action": 35,
+                  "episode_number": 1374,
+                  "failed_substep": 18,
+                  "pre_step_time_s": 0.34850000000000025,
+                  "source": "failures\\bfd8143c34764e199f48e22c7752dcdc\\failure_episode_1374.json",
+                  "warnings": [
+                    "mjWARN_BADQACC",
+                    "engine_time_reset"
+                  ]
+                },
+                {
+                  "cumulative_action": 38850,
+                  "episode_action": 31,
+                  "episode_number": 1375,
+                  "failed_substep": 17,
+                  "pre_step_time_s": 0.3080000000000002,
+                  "source": "failures\\bfd8143c34764e199f48e22c7752dcdc\\failure_episode_1375.json",
+                  "warnings": [
+                    "mjWARN_BADQACC",
+                    "engine_time_reset"
+                  ]
+                },
+                {
+                  "cumulative_action": 38953,
+                  "episode_action": 33,
+                  "episode_number": 1378,
+                  "failed_substep": 1,
+                  "pre_step_time_s": 0.32000000000000023,
+                  "source": "failures\\bfd8143c34764e199f48e22c7752dcdc\\failure_episode_1378.json",
+                  "warnings": [
+                    "mjWARN_BADQACC",
+                    "engine_time_reset"
+                  ]
+                }
+              ],
+              "recorded_files": 984
+            },
+            "known_consumption_lower_bound": null,
+            "last_known_stage": "policy optimization",
+            "mode": "direct",
+            "observed_at_unix": 1791901300.9426813,
+            "ppo": {
+              "batch_size": 64,
+              "clip_range": 0.2,
+              "clip_range_vf": null,
+              "device": "cpu",
+              "ent_coef": 0.0,
+              "gae_lambda": 0.95,
+              "gamma": 0.99,
+              "learning_rate": 0.0003,
+              "max_grad_norm": 0.5,
+              "n_epochs": 10,
+              "n_steps": 256,
+              "normalize_advantage": true,
+              "policy_kwargs": {
+                "log_std_init": -3.0,
+                "net_arch": {
+                  "pi": [
+                    64,
+                    64
+                  ],
+                  "vf": [
+                    64,
+                    64
+                  ]
+                }
+              },
+              "sde_sample_freq": -1,
+              "target_kl": null,
+              "use_sde": false,
+              "verbose": 0,
+              "vf_coef": 0.5
+            },
+            "recorded_failure_stage": "policy optimization",
+            "reservation": {},
+            "reward": {
+              "failure_penalty": -10000.0,
+              "holding_speed": 1.0,
+              "position": 1.0,
+              "smoothness": 0.001
+            },
+            "run_id": "training-summary-formal-20261013-9fd0bb09",
+            "scope": "Recorded training evidence; task acceptance requires independent evaluation",
+            "sources": [
+              "state.json",
+              "config.json",
+              "checkpoint.json",
+              "checkpoints\\step-00051456-a6c191fb\\metadata.json",
+              "bfd8143c34764e199f48e22c7752dcdc\\progress.csv",
+              "a87b3acc13ee48d080e401b7b15c9c50\\progress.csv",
+              "failures\\bfd8143c34764e199f48e22c7752dcdc\\failure_episode_1368.json",
+              "failures\\bfd8143c34764e199f48e22c7752dcdc\\failure_episode_1371.json",
+              "failures\\bfd8143c34764e199f48e22c7752dcdc\\failure_episode_1374.json",
+              "failures\\bfd8143c34764e199f48e22c7752dcdc\\failure_episode_1375.json",
+              "failures\\bfd8143c34764e199f48e22c7752dcdc\\failure_episode_1378.json"
+            ],
+            "status": "failed",
+            "stop_reason": "PermissionError: [WinError 5] 拒绝访问。: 'D:\\\\softrobot-agent\\\\.worktrees\\\\rl-control-pilot\\\\runs\\\\rl\\\\training-summary-formal-20261013-9fd0bb09\\\\state.json.92743c7911aa4260a82798541faae121.tmp' -> 'D:\\\\softrobot-agent\\\\.worktrees\\\\rl-control-pilot\\\\runs\\\\rl\\\\training-summary-formal-20261013-9fd0bb09\\\\state.json'",
+            "task": {
+              "acceptance": {
+                "holding_speed_limit_m_s": 0.02,
+                "holding_steps": [
+                  30,
+                  31,
+                  32,
+                  33,
+                  34,
+                  35
+                ],
+                "position_limit_m": 0.01,
+                "terminal_position_limit_m": 0.01
+              },
+              "command_intervals": 35,
+              "control_period_s": 0.01,
+              "duration_s": 0.35,
+              "family": "task.reach",
+              "initializer": {
+                "qpos_rad": {
+                  "distal1_cell_0_y": 0.0,
+                  "distal1_cell_0_z": 0.0,
+                  "distal1_cell_10_y": 0.0,
+                  "distal1_cell_10_z": 0.0,
+                  "distal1_cell_11_y": 0.0,
+                  "distal1_cell_11_z": 0.0,
+                  "distal1_cell_1_y": 0.0,
+                  "distal1_cell_1_z": 0.0,
+                  "distal1_cell_2_y": 0.0,
+                  "distal1_cell_2_z": 0.0,
+                  "distal1_cell_3_y": 0.0,
+                  "distal1_cell_3_z": 0.0,
+                  "distal1_cell_4_y": 0.0,
+                  "distal1_cell_4_z": 0.0,
+                  "distal1_cell_5_y": 0.0,
+                  "distal1_cell_5_z": 0.0,
+                  "distal1_cell_6_y": 0.0,
+                  "distal1_cell_6_z": 0.0,
+                  "distal1_cell_7_y": 0.0,
+                  "distal1_cell_7_z": 0.0,
+                  "distal1_cell_8_y": 0.0,
+                  "distal1_cell_8_z": 0.0,
+                  "distal1_cell_9_y": 0.0,
+                  "distal1_cell_9_z": 0.0,
+                  "near_cell_0_y": 0.0,
+                  "near_cell_0_z": 0.0,
+                  "near_cell_10_y": 0.0,
+                  "near_cell_10_z": 0.0,
+                  "near_cell_11_y": 0.0,
+                  "near_cell_11_z": 0.0,
+                  "near_cell_1_y": 0.0,
+                  "near_cell_1_z": 0.0,
+                  "near_cell_2_y": 0.0,
+                  "near_cell_2_z": 0.0,
+                  "near_cell_3_y": 0.0,
+                  "near_cell_3_z": 0.0,
+                  "near_cell_4_y": 0.0,
+                  "near_cell_4_z": 0.0,
+                  "near_cell_5_y": 0.0,
+                  "near_cell_5_z": 0.0,
+                  "near_cell_6_y": 0.0,
+                  "near_cell_6_z": 0.0,
+                  "near_cell_7_y": 0.0,
+                  "near_cell_7_z": 0.0,
+                  "near_cell_8_y": 0.0,
+                  "near_cell_8_z": 0.0,
+                  "near_cell_9_y": 0.0,
+                  "near_cell_9_z": 0.0
+                },
+                "qvel_rad_s": {
+                  "distal1_cell_0_y": 0.0,
+                  "distal1_cell_0_z": 0.0,
+                  "distal1_cell_10_y": 0.0,
+                  "distal1_cell_10_z": 0.0,
+                  "distal1_cell_11_y": 0.0,
+                  "distal1_cell_11_z": 0.0,
+                  "distal1_cell_1_y": 0.0,
+                  "distal1_cell_1_z": 0.0,
+                  "distal1_cell_2_y": 0.0,
+                  "distal1_cell_2_z": 0.0,
+                  "distal1_cell_3_y": 0.0,
+                  "distal1_cell_3_z": 0.0,
+                  "distal1_cell_4_y": 0.0,
+                  "distal1_cell_4_z": 0.0,
+                  "distal1_cell_5_y": 0.0,
+                  "distal1_cell_5_z": 0.0,
+                  "distal1_cell_6_y": 0.0,
+                  "distal1_cell_6_z": 0.0,
+                  "distal1_cell_7_y": 0.0,
+                  "distal1_cell_7_z": 0.0,
+                  "distal1_cell_8_y": 0.0,
+                  "distal1_cell_8_z": 0.0,
+                  "distal1_cell_9_y": 0.0,
+                  "distal1_cell_9_z": 0.0,
+                  "near_cell_0_y": 0.0,
+                  "near_cell_0_z": 0.0,
+                  "near_cell_10_y": 0.0,
+                  "near_cell_10_z": 0.0,
+                  "near_cell_11_y": 0.0,
+                  "near_cell_11_z": 0.0,
+                  "near_cell_1_y": 0.0,
+                  "near_cell_1_z": 0.0,
+                  "near_cell_2_y": 0.0,
+                  "near_cell_2_z": 0.0,
+                  "near_cell_3_y": 0.0,
+                  "near_cell_3_z": 0.0,
+                  "near_cell_4_y": 0.0,
+                  "near_cell_4_z": 0.0,
+                  "near_cell_5_y": 0.0,
+                  "near_cell_5_z": 0.0,
+                  "near_cell_6_y": 0.0,
+                  "near_cell_6_z": 0.0,
+                  "near_cell_7_y": 0.0,
+                  "near_cell_7_z": 0.0,
+                  "near_cell_8_y": 0.0,
+                  "near_cell_8_z": 0.0,
+                  "near_cell_9_y": 0.0,
+                  "near_cell_9_z": 0.0
+                },
+                "unspecified": "zero"
+              },
+              "original": {
+                "actuator_channels": [
+                  "actuator_commands"
+                ],
+                "contract_version": "1.0.0",
+                "environment": {
+                  "contract": "experiment.assembly",
+                  "data": {
+                    "environment": {
+                      "coordinate_frame": "world_base_x_forward_yz_cross_section",
+                      "environment_id": "reach_free",
+                      "gravity_m_s2": [
+                        0.0,
+                        0.0,
+                        -9.81
+                      ],
+                      "gravity_source": "main@245a785 reach_free environment; Human-owned benchmark gravity",
+                      "lights": [
+                        {
+                          "direction": [
+                            0.0,
+                            0.0,
+                            -1.0
+                          ],
+                          "position_m": [
+                            0.0,
+                            0.0,
+                            2.0
+                          ]
+                        }
+                      ],
+                      "objects": [
+                        {
+                          "conaffinity": 1,
+                          "contype": 0,
+                          "half_size_m": [
+                            2.0,
+                            2.0,
+                            0.1
+                          ],
+                          "kind": "plane",
+                          "name": "floor",
+                          "position_m": [
+                            0.0,
+                            0.0,
+                            -0.02
+                          ]
+                        }
+                      ],
+                      "schema_version": "1",
+                      "truth_status": "HUMAN_OWNED",
+                      "units": "SI"
+                    },
+                    "external_forces": [],
+                    "floor_id": "floor",
+                    "mount": {
+                      "position_m": [
+                        0.0,
+                        0.0,
+                        0.15
+                      ],
+                      "quaternion_wxyz": [
+                        1.0,
+                        0.0,
+                        0.0,
+                        0.0
+                      ]
+                    }
+                  },
+                  "version": "1.0.0"
+                },
+                "evaluator": {
+                  "extension_id": "evaluate.reach",
+                  "parameters": {
+                    "contract": "reference.reach_evaluation",
+                    "data": {
+                      "tolerance_m": 0.01
+                    },
+                    "version": "1.0.0"
+                  },
+                  "version": "1.0.0"
+                },
+                "failure_policy": "retain_invalid_and_constraint_failures",
+                "family": "task.reach",
+                "goal": {
+                  "contract": "reference.reach_goal",
+                  "data": {
+                    "target_m": [
+                      0.29,
+                      0.035,
+                      0.19
+                    ]
+                  },
+                  "version": "1.0.0"
+                },
+                "initializer": {
+                  "extension_id": "initialize.family",
+                  "parameters": {
+                    "contract": "family.initial",
+                    "data": {
+                      "qpos_rad": {
+                        "distal1_cell_0_y": 0.0,
+                        "distal1_cell_0_z": 0.0,
+                        "distal1_cell_10_y": 0.0,
+                        "distal1_cell_10_z": 0.0,
+                        "distal1_cell_11_y": 0.0,
+                        "distal1_cell_11_z": 0.0,
+                        "distal1_cell_1_y": 0.0,
+                        "distal1_cell_1_z": 0.0,
+                        "distal1_cell_2_y": 0.0,
+                        "distal1_cell_2_z": 0.0,
+                        "distal1_cell_3_y": 0.0,
+                        "distal1_cell_3_z": 0.0,
+                        "distal1_cell_4_y": 0.0,
+                        "distal1_cell_4_z": 0.0,
+                        "distal1_cell_5_y": 0.0,
+                        "distal1_cell_5_z": 0.0,
+                        "distal1_cell_6_y": 0.0,
+                        "distal1_cell_6_z": 0.0,
+                        "distal1_cell_7_y": 0.0,
+                        "distal1_cell_7_z": 0.0,
+                        "distal1_cell_8_y": 0.0,
+                        "distal1_cell_8_z": 0.0,
+                        "distal1_cell_9_y": 0.0,
+                        "distal1_cell_9_z": 0.0,
+                        "near_cell_0_y": 0.0,
+                        "near_cell_0_z": 0.0,
+                        "near_cell_10_y": 0.0,
+                        "near_cell_10_z": 0.0,
+                        "near_cell_11_y": 0.0,
+                        "near_cell_11_z": 0.0,
+                        "near_cell_1_y": 0.0,
+                        "near_cell_1_z": 0.0,
+                        "near_cell_2_y": 0.0,
+                        "near_cell_2_z": 0.0,
+                        "near_cell_3_y": 0.0,
+                        "near_cell_3_z": 0.0,
+                        "near_cell_4_y": 0.0,
+                        "near_cell_4_z": 0.0,
+                        "near_cell_5_y": 0.0,
+                        "near_cell_5_z": 0.0,
+                        "near_cell_6_y": 0.0,
+                        "near_cell_6_z": 0.0,
+                        "near_cell_7_y": 0.0,
+                        "near_cell_7_z": 0.0,
+                        "near_cell_8_y": 0.0,
+                        "near_cell_8_z": 0.0,
+                        "near_cell_9_y": 0.0,
+                        "near_cell_9_z": 0.0
+                      },
+                      "qvel_rad_s": {
+                        "distal1_cell_0_y": 0.0,
+                        "distal1_cell_0_z": 0.0,
+                        "distal1_cell_10_y": 0.0,
+                        "distal1_cell_10_z": 0.0,
+                        "distal1_cell_11_y": 0.0,
+                        "distal1_cell_11_z": 0.0,
+                        "distal1_cell_1_y": 0.0,
+                        "distal1_cell_1_z": 0.0,
+                        "distal1_cell_2_y": 0.0,
+                        "distal1_cell_2_z": 0.0,
+                        "distal1_cell_3_y": 0.0,
+                        "distal1_cell_3_z": 0.0,
+                        "distal1_cell_4_y": 0.0,
+                        "distal1_cell_4_z": 0.0,
+                        "distal1_cell_5_y": 0.0,
+                        "distal1_cell_5_z": 0.0,
+                        "distal1_cell_6_y": 0.0,
+                        "distal1_cell_6_z": 0.0,
+                        "distal1_cell_7_y": 0.0,
+                        "distal1_cell_7_z": 0.0,
+                        "distal1_cell_8_y": 0.0,
+                        "distal1_cell_8_z": 0.0,
+                        "distal1_cell_9_y": 0.0,
+                        "distal1_cell_9_z": 0.0,
+                        "near_cell_0_y": 0.0,
+                        "near_cell_0_z": 0.0,
+                        "near_cell_10_y": 0.0,
+                        "near_cell_10_z": 0.0,
+                        "near_cell_11_y": 0.0,
+                        "near_cell_11_z": 0.0,
+                        "near_cell_1_y": 0.0,
+                        "near_cell_1_z": 0.0,
+                        "near_cell_2_y": 0.0,
+                        "near_cell_2_z": 0.0,
+                        "near_cell_3_y": 0.0,
+                        "near_cell_3_z": 0.0,
+                        "near_cell_4_y": 0.0,
+                        "near_cell_4_z": 0.0,
+                        "near_cell_5_y": 0.0,
+                        "near_cell_5_z": 0.0,
+                        "near_cell_6_y": 0.0,
+                        "near_cell_6_z": 0.0,
+                        "near_cell_7_y": 0.0,
+                        "near_cell_7_z": 0.0,
+                        "near_cell_8_y": 0.0,
+                        "near_cell_8_z": 0.0,
+                        "near_cell_9_y": 0.0,
+                        "near_cell_9_z": 0.0
+                      },
+                      "unspecified": "zero"
+                    },
+                    "version": "1.0.0"
+                  },
+                  "version": "1.0.0"
+                },
+                "name": "Independent development validation of a serial multi-segment soft arm",
+                "objectives": [
+                  {
+                    "direction": "minimize",
+                    "metric": "position_error",
+                    "units": "m",
+                    "weight": 1.0
+                  }
+                ],
+                "observations": [
+                  {
+                    "dimension": 3,
+                    "entity": "tip",
+                    "frame": "world",
+                    "missing": "unsupported",
+                    "name": "tip_position",
+                    "phase": "post_step",
+                    "units": "m"
+                  }
+                ],
+                "robot_families": [
+                  "tendon_robot_family"
+                ],
+                "sampling": {
+                  "aggregation": "per_instance",
+                  "seeds": [
+                    17
+                  ],
+                  "split": "development",
+                  "window_s": [
+                    0.0,
+                    0.35
+                  ]
+                },
+                "source": "Development task with fixed target, tolerance and scoring; historical tasks are unchanged",
+                "status": "development_valid",
+                "task_id": "family-multisegment-dev",
+                "task_version": "1.0.0",
+                "timing": {
+                  "control_period_s": 0.01,
+                  "duration_s": 0.35,
+                  "sample_period_s": 0.01,
+                  "termination": [
+                    "duration",
+                    "numerical_failure"
+                  ],
+                  "timestep_s": 0.0005
+                }
+              },
+              "target_m": [
+                0.29,
+                0.035,
+                0.19
+              ],
+              "tendon_order": [
+                "near_t0",
+                "near_t1",
+                "near_t2",
+                "far_t0",
+                "far_t1",
+                "far_t2"
+              ]
+            },
+            "task_identity": "2b26edb492214c426263441b6adb52d7aafe41a828436d6b48a1171374a1026c",
+            "workers": [
+              {
+                "after_step": 43520,
+                "attempted_actions": 43520,
+                "available_rows": 170,
+                "before_step": 0,
+                "current_worker": false,
+                "first": {
+                  "rollout/ep_rew_mean": {
+                    "logged_step": 256.0,
+                    "value": -12800.2616475
+                  },
+                  "train/approx_kl": {
+                    "logged_step": 512.0,
+                    "value": 0.037223443
+                  },
+                  "train/clip_fraction": {
+                    "logged_step": 512.0,
+                    "value": 0.478515625
+                  },
+                  "train/entropy_loss": {
+                    "logged_step": 512.0,
+                    "value": 9.486744785308838
+                  },
+                  "train/explained_variance": {
+                    "logged_step": 512.0,
+                    "value": -2.956390380859375e-05
+                  },
+                  "train/learning_rate": {
+                    "logged_step": 512.0,
+                    "value": 0.0003
+                  },
+                  "train/policy_gradient_loss": {
+                    "logged_step": 512.0,
+                    "value": -0.04072574325837195
+                  },
+                  "train/value_loss": {
+                    "logged_step": 512.0,
+                    "value": 31707986.45
+                  }
+                },
+                "incomplete_tail_rows": 0,
+                "latest": {
+                  "rollout/ep_rew_mean": {
+                    "logged_step": 43520.0,
+                    "value": -6962.580350589999
+                  },
+                  "train/approx_kl": {
+                    "logged_step": 43520.0,
+                    "value": 0.02284829
+                  },
+                  "train/clip_fraction": {
+                    "logged_step": 43520.0,
+                    "value": 0.336328125
+                  },
+                  "train/entropy_loss": {
+                    "logged_step": 43520.0,
+                    "value": 9.556683087348938
+                  },
+                  "train/explained_variance": {
+                    "logged_step": 43520.0,
+                    "value": 3.5762786865234375e-07
+                  },
+                  "train/learning_rate": {
+                    "logged_step": 43520.0,
+                    "value": 0.0003
+                  },
+                  "train/policy_gradient_loss": {
+                    "logged_step": 43520.0,
+                    "value": -0.01019292783457786
+                  },
+                  "train/value_loss": {
+                    "logged_step": 43520.0,
+                    "value": 4824536.2875
+                  }
+                },
+                "not_recorded": [],
+                "recent": [
+                  {
+                    "logged_step": 42496.0,
+                    "metrics": {
+                      "rollout/ep_rew_mean": -8.71373075910904e+17,
+                      "train/approx_kl": 0.108209,
+                      "train/clip_fraction": 0.54765625,
+                      "train/entropy_loss": 9.555646824836732,
+                      "train/explained_variance": 3.5762786865234375e-07,
+                      "train/learning_rate": 0.0003,
+                      "train/policy_gradient_loss": -0.02744552947115153,
+                      "train/value_loss": 5839198.825
+                    }
+                  },
+                  {
+                    "logged_step": 42752.0,
+                    "metrics": {
+                      "rollout/ep_rew_mean": -8.713730759109039e+17,
+                      "train/approx_kl": 0.08900073,
+                      "train/clip_fraction": 0.467578125,
+                      "train/entropy_loss": 9.553757667541504,
+                      "train/explained_variance": 2.384185791015625e-07,
+                      "train/learning_rate": 0.0003,
+                      "train/policy_gradient_loss": -0.025751511612907053,
+                      "train/value_loss": 5875532.775
+                    }
+                  },
+                  {
+                    "logged_step": 43008.0,
+                    "metrics": {
+                      "rollout/ep_rew_mean": -8.713730759109036e+17,
+                      "train/approx_kl": 0.032622628,
+                      "train/clip_fraction": 0.383984375,
+                      "train/entropy_loss": 9.552958607673645,
+                      "train/explained_variance": 1.1920928955078125e-07,
+                      "train/learning_rate": 0.0003,
+                      "train/policy_gradient_loss": -0.024366406025364995,
+                      "train/value_loss": 5512803.0875
+                    }
+                  },
+                  {
+                    "logged_step": 43264.0,
+                    "metrics": {
+                      "rollout/ep_rew_mean": -8.713730759109036e+17,
+                      "train/approx_kl": 0.0431924,
+                      "train/clip_fraction": 0.4609375,
+                      "train/entropy_loss": 9.554537606239318,
+                      "train/explained_variance": 1.7881393432617188e-07,
+                      "train/learning_rate": 0.0003,
+                      "train/policy_gradient_loss": -0.021090700966306032,
+                      "train/value_loss": 4748040.825
+                    }
+                  },
+                  {
+                    "logged_step": 43520.0,
+                    "metrics": {
+                      "rollout/ep_rew_mean": -6962.580350589999,
+                      "train/approx_kl": 0.02284829,
+                      "train/clip_fraction": 0.336328125,
+                      "train/entropy_loss": 9.556683087348938,
+                      "train/explained_variance": 3.5762786865234375e-07,
+                      "train/learning_rate": 0.0003,
+                      "train/policy_gradient_loss": -0.01019292783457786,
+                      "train/value_loss": 4824536.2875
+                    }
+                  }
+                ],
+                "source": "bfd8143c34764e199f48e22c7752dcdc\\progress.csv",
+                "token": "bfd8143c34764e199f48e22c7752dcdc",
+                "unavailable_metrics": {}
+              },
+              {
+                "after_step": 51712,
+                "attempted_actions": 8448,
+                "available_rows": 33,
+                "before_step": 43264,
+                "current_worker": true,
+                "first": {
+                  "rollout/ep_rew_mean": {
+                    "logged_step": 43520.0,
+                    "value": -6960.767159710002
+                  },
+                  "train/approx_kl": {
+                    "logged_step": 43776.0,
+                    "value": 0.09590356
+                  },
+                  "train/clip_fraction": {
+                    "logged_step": 43776.0,
+                    "value": 0.440625
+                  },
+                  "train/entropy_loss": {
+                    "logged_step": 43776.0,
+                    "value": 9.558890128135682
+                  },
+                  "train/explained_variance": {
+                    "logged_step": 43776.0,
+                    "value": 2.980232238769531e-07
+                  },
+                  "train/learning_rate": {
+                    "logged_step": 43776.0,
+                    "value": 0.0003
+                  },
+                  "train/policy_gradient_loss": {
+                    "logged_step": 43776.0,
+                    "value": -0.029106144863180815
+                  },
+                  "train/value_loss": {
+                    "logged_step": 43776.0,
+                    "value": 4992474.975
+                  }
+                },
+                "incomplete_tail_rows": 0,
+                "latest": {
+                  "rollout/ep_rew_mean": {
+                    "logged_step": 51712.0,
+                    "value": -3931.6728912599992
+                  },
+                  "train/approx_kl": {
+                    "logged_step": 51712.0,
+                    "value": 0.045029767
+                  },
+                  "train/clip_fraction": {
+                    "logged_step": 51712.0,
+                    "value": 0.398046875
+                  },
+                  "train/entropy_loss": {
+                    "logged_step": 51712.0,
+                    "value": 9.638390922546387
+                  },
+                  "train/explained_variance": {
+                    "logged_step": 51712.0,
+                    "value": -2.384185791015625e-07
+                  },
+                  "train/learning_rate": {
+                    "logged_step": 51712.0,
+                    "value": 0.0003
+                  },
+                  "train/policy_gradient_loss": {
+                    "logged_step": 51712.0,
+                    "value": -0.019027531682513654
+                  },
+                  "train/value_loss": {
+                    "logged_step": 51712.0,
+                    "value": 1328738.54375
+                  }
+                },
+                "not_recorded": [],
+                "recent": [
+                  {
+                    "logged_step": 50688.0,
+                    "metrics": {
+                      "rollout/ep_rew_mean": -4154.91477662,
+                      "train/approx_kl": 0.036680937,
+                      "train/clip_fraction": 0.339453125,
+                      "train/entropy_loss": 9.625454306602478,
+                      "train/explained_variance": -1.1920928955078125e-07,
+                      "train/learning_rate": 0.0003,
+                      "train/policy_gradient_loss": -0.005372977629303932,
+                      "train/value_loss": 1733868.48125
+                    }
+                  },
+                  {
+                    "logged_step": 50944.0,
+                    "metrics": {
+                      "rollout/ep_rew_mean": -4089.8112713299993,
+                      "train/approx_kl": 0.046992615,
+                      "train/clip_fraction": 0.41953125,
+                      "train/entropy_loss": 9.627247285842895,
+                      "train/explained_variance": -1.1920928955078125e-07,
+                      "train/learning_rate": 0.0003,
+                      "train/policy_gradient_loss": -0.020163758425042033,
+                      "train/value_loss": 1689878.534375
+                    }
+                  },
+                  {
+                    "logged_step": 51200.0,
+                    "metrics": {
+                      "rollout/ep_rew_mean": -4041.7242801400002,
+                      "train/approx_kl": 0.07889501,
+                      "train/clip_fraction": 0.43203125,
+                      "train/entropy_loss": 9.631155967712402,
+                      "train/explained_variance": 0.0,
+                      "train/learning_rate": 0.0003,
+                      "train/policy_gradient_loss": -0.009698843793012201,
+                      "train/value_loss": 1529353.85625
+                    }
+                  },
+                  {
+                    "logged_step": 51456.0,
+                    "metrics": {
+                      "rollout/ep_rew_mean": -4000.043092160001,
+                      "train/approx_kl": 0.04407268,
+                      "train/clip_fraction": 0.403125,
+                      "train/entropy_loss": 9.633301830291748,
+                      "train/explained_variance": -2.384185791015625e-07,
+                      "train/learning_rate": 0.0003,
+                      "train/policy_gradient_loss": -0.019533169036731125,
+                      "train/value_loss": 1410797.04375
+                    }
+                  },
+                  {
+                    "logged_step": 51712.0,
+                    "metrics": {
+                      "rollout/ep_rew_mean": -3931.6728912599992,
+                      "train/approx_kl": 0.045029767,
+                      "train/clip_fraction": 0.398046875,
+                      "train/entropy_loss": 9.638390922546387,
+                      "train/explained_variance": -2.384185791015625e-07,
+                      "train/learning_rate": 0.0003,
+                      "train/policy_gradient_loss": -0.019027531682513654,
+                      "train/value_loss": 1328738.54375
+                    }
+                  }
+                ],
+                "source": "a87b3acc13ee48d080e401b7b15c9c50\\progress.csv",
+                "token": "a87b3acc13ee48d080e401b7b15c9c50",
+                "unavailable_metrics": {}
+              }
+            ]
+          },
+          "worker_alive": false,
+          "worker_token": "a87b3acc13ee48d080e401b7b15c9c50",
+          "workers": [
+            {
+              "active_seconds": 87.42681600002106,
+              "after": {
+                "num_timesteps": 43520,
+                "optimization_epochs": 1700,
+                "optimizer_sha256": "d10d3bbc0467e9ff73727f2465324017561aa2f40835661ed22433b7891a2bb8",
+                "optimizer_steps": 6800,
+                "policy_sha256": "99fa862dbbe1b11aac4ba2926271912ebb5c076981e5b338d229d25afc94c3f8",
+                "rollout_optimizations": 170,
+                "schedule": {
+                  "clip_range": 0.2,
+                  "clip_range_vf": null,
+                  "learning_rate": 0.0003,
+                  "progress_remaining": 0.575,
+                  "total_timesteps": 102400
+                }
+              },
+              "attempted_actions": 43520,
+              "before": {
+                "num_timesteps": 0,
+                "optimization_epochs": 0,
+                "optimizer_sha256": "c35b97ec268c71687bdbd09164ed68609c4365743f2eefc9c31c7b5bdcc3fc96",
+                "optimizer_steps": 0,
+                "policy_sha256": "cd6a23b8154e1f6efd819f8172e09fbd06cc6cdf052e3ffcb97f52edc7e4e773",
+                "rollout_optimizations": 0,
+                "schedule": {
+                  "clip_range": 0.2,
+                  "clip_range_vf": null,
+                  "learning_rate": 0.0003,
+                  "progress_remaining": 1.0,
+                  "total_timesteps": 102400
+                }
+              },
+              "parameter_change_l2": 19.147968292236328,
+              "token": "bfd8143c34764e199f48e22c7752dcdc",
+              "unoptimized_actions": 256
+            },
+            {
+              "active_seconds": 17.257499699946493,
+              "after": {
+                "num_timesteps": 51712,
+                "optimization_epochs": 2020,
+                "optimizer_sha256": "f5f44584c93dc1fcc1169bbb4a53ccfd66cfe1e623829168d9e97c06ec184118",
+                "optimizer_steps": 8080,
+                "policy_sha256": "1893e9f7a110e2d2e1b75ad46f6d85bd5752781ac316b84fb2c61eddc35788c7",
+                "rollout_optimizations": 202,
+                "schedule": {
+                  "clip_range": 0.2,
+                  "clip_range_vf": null,
+                  "learning_rate": 0.0003,
+                  "progress_remaining": 0.495,
+                  "total_timesteps": 102400
+                }
+              },
+              "attempted_actions": 8448,
+              "before": {
+                "num_timesteps": 43264,
+                "optimization_epochs": 1690,
+                "optimizer_sha256": "f7289a38c249231d9f3bb768f8762d3591820fa72e7e7fe75b209976935d8b58",
+                "optimizer_steps": 6760,
+                "policy_sha256": "6a79ba8ee885781b6cf0c07a7365b16f84a1e4c7098dadc30ea90e1278ba16fe",
+                "rollout_optimizations": 169,
+                "schedule": {
+                  "clip_range": 0.2,
+                  "clip_range_vf": null,
+                  "learning_rate": 0.0003,
+                  "progress_remaining": 0.5775,
+                  "total_timesteps": 102400
+                }
+              },
+              "parameter_change_l2": 3.2886829376220703,
+              "token": "a87b3acc13ee48d080e401b7b15c9c50",
+              "unoptimized_actions": 256
+            }
+          ]
+        },
+        "task": {
+          "artifact_id": "2b26edb492214c426263441b6adb52d7aafe41a828436d6b48a1171374a1026c",
+          "media_type": "application/json"
+        },
+        "training_summary": {
+          "artifact_id": "1eb62bb0f7643b1d25fa325cf903f92f8da80765ce4578cece4cae8b8dd426d2",
+          "media_type": "application/json"
+        }
+      },
+      "training-summary-formal-20261013-fb54a8b8": {
+        "active_reservation": null,
+        "allocation": {
+          "actions": 199936,
+          "active_seconds": 1200.0
+        },
+        "candidate": {
+          "artifact_id": "eeb4bd4ddffa3f5ddc13c525661da8e9e45fbacb14ef49cd079ade67710dbded",
+          "media_type": "application/json"
+        },
+        "configuration": {
+          "artifact_id": "e5473027ac34f63fc91c7ea0046b21499b4ddc7c9772c3fc1d180bcc35193549",
+          "media_type": "application/json"
+        },
+        "evaluations": 0,
+        "mathematical_handoffs": [],
+        "replays": 0,
+        "request_identity": "470fce936b4b5f577d01122ae128e103612845d7702478eb3952ce3788a4322b",
+        "status": {
+          "active_time_overrun_s": 0,
+          "artifacts": "D:\\softrobot-agent\\.worktrees\\rl-control-pilot\\runs\\rl\\training-summary-formal-20261013-fb54a8b8",
+          "checkpoints": {
+            "current": "step-00199936-c4de57ba",
+            "previous": "step-00199680-305996bd"
+          },
+          "consumed": {
+            "active_seconds": 363.79782340000384,
+            "attempted_actions": 199936,
+            "attempted_physics_steps": 3989321,
+            "complete_episodes": 4993,
+            "completed_actions": 198952,
+            "failed_episodes": 984
+          },
+          "consumption_uncertain": false,
+          "effective_ppo": {
+            "batch_size": 64,
+            "clip_range": 0.2,
+            "clip_range_vf": null,
+            "device": "cpu",
+            "ent_coef": 0.0,
+            "gae_lambda": 0.95,
+            "gamma": 0.99,
+            "learning_rate": 0.0003,
+            "max_grad_norm": 0.5,
+            "n_epochs": 10,
+            "n_steps": 256,
+            "normalize_advantage": true,
+            "policy_kwargs": {
+              "log_std_init": -3.0,
+              "net_arch": {
+                "pi": [
+                  64,
+                  64
+                ],
+                "vf": [
+                  64,
+                  64
+                ]
+              }
+            },
+            "sde_sample_freq": -1,
+            "target_kl": null,
+            "use_sde": false,
+            "verbose": 0,
+            "vf_coef": 0.5
+          },
+          "environment": {
+            "action_dimension": 6,
+            "candidate": "83488f115662b2058912ae06828b3a807f8c4dbad41b56fcf0a2cdbae8e55ed9",
+            "control_dt_s": 0.01,
+            "control_object": {
+              "actuator_names": [
+                "near_t0_direct_tension",
+                "near_t1_direct_tension",
+                "near_t2_direct_tension",
+                "far_t0_direct_tension",
+                "far_t1_direct_tension",
+                "far_t2_direct_tension"
+              ],
+              "joint_names": [
+                "near_cell_0_y",
+                "near_cell_0_z",
+                "near_cell_1_y",
+                "near_cell_1_z",
+                "near_cell_2_y",
+                "near_cell_2_z",
+                "near_cell_3_y",
+                "near_cell_3_z",
+                "near_cell_4_y",
+                "near_cell_4_z",
+                "near_cell_5_y",
+                "near_cell_5_z",
+                "near_cell_6_y",
+                "near_cell_6_z",
+                "near_cell_7_y",
+                "near_cell_7_z",
+                "near_cell_8_y",
+                "near_cell_8_z",
+                "near_cell_9_y",
+                "near_cell_9_z",
+                "near_cell_10_y",
+                "near_cell_10_z",
+                "near_cell_11_y",
+                "near_cell_11_z",
+                "distal1_cell_0_y",
+                "distal1_cell_0_z",
+                "distal1_cell_1_y",
+                "distal1_cell_1_z",
+                "distal1_cell_2_y",
+                "distal1_cell_2_z",
+                "distal1_cell_3_y",
+                "distal1_cell_3_z",
+                "distal1_cell_4_y",
+                "distal1_cell_4_z",
+                "distal1_cell_5_y",
+                "distal1_cell_5_z",
+                "distal1_cell_6_y",
+                "distal1_cell_6_z",
+                "distal1_cell_7_y",
+                "distal1_cell_7_z",
+                "distal1_cell_8_y",
+                "distal1_cell_8_z",
+                "distal1_cell_9_y",
+                "distal1_cell_9_z",
+                "distal1_cell_10_y",
+                "distal1_cell_10_z",
+                "distal1_cell_11_y",
+                "distal1_cell_11_z"
+              ],
+              "semantics": "ideal_tension",
+              "tendon_names": [
+                "near_t0",
+                "near_t1",
+                "near_t2",
+                "far_t0",
+                "far_t1",
+                "far_t2"
+              ],
+              "tip_site": "tip_site"
+            },
+            "holding_steps": [
+              30,
+              31,
+              32,
+              33,
+              34,
+              35
+            ],
+            "horizon": 35,
+            "mode": "direct",
+            "observation_dimension": 109,
+            "physics_dt_s": 0.0005,
+            "reference": null,
+            "residual_scale_n": [
+              8.0,
+              8.0,
+              8.0,
+              8.0,
+              8.0,
+              8.0
+            ],
+            "reward": {
+              "failure_penalty": -10000.0,
+              "holding_speed": 1.0,
+              "position": 1.0,
+              "smoothness": 0.001
+            },
+            "substeps": 20,
+            "task": "2b26edb492214c426263441b6adb52d7aafe41a828436d6b48a1171374a1026c",
+            "tension_limits_n": [
+              [
+                0.0,
+                8.0
+              ],
+              [
+                0.0,
+                8.0
+              ],
+              [
+                0.0,
+                8.0
+              ],
+              [
+                0.0,
+                8.0
+              ],
+              [
+                0.0,
+                8.0
+              ],
+              [
+                0.0,
+                8.0
+              ]
+            ]
+          },
+          "failure_stage": null,
+          "inherited": {
+            "num_timesteps": 199936,
+            "optimization_epochs": 7810,
+            "optimizer_sha256": "2e8827563eb5bf1a9ee9b35b98e82376773eedc466547c69c9bcd6d6d7ca333f",
+            "optimizer_steps": 31240,
+            "policy_sha256": "8e78943697b45acf923fe7620b33c871fab3a2fcab1f102f85b41baad543e12b",
+            "rollout_optimizations": 781,
+            "schedule": {
+              "clip_range": 0.2,
+              "clip_range_vf": null,
+              "learning_rate": 0.0003,
+              "progress_remaining": 0.0,
+              "total_timesteps": 199936
+            }
+          },
+          "last_known_stage": "checkpoint publication",
+          "latest_checkpoint": "D:\\softrobot-agent\\.worktrees\\rl-control-pilot\\runs\\rl\\training-summary-formal-20261013-fb54a8b8\\checkpoints\\step-00199936-c4de57ba",
+          "remaining": {
+            "actions": 0,
+            "active_seconds": 836.2021765999962
+          },
+          "reservation": {},
+          "run_id": "training-summary-formal-20261013-fb54a8b8",
+          "status": "completed",
+          "stop_reason": "action_budget",
+          "training_summary": {
+            "allocation": {
+              "actions": 199936,
+              "active_seconds": 1200.0
+            },
+            "candidate": {
+              "identity": "83488f115662b2058912ae06828b3a807f8c4dbad41b56fcf0a2cdbae8e55ed9",
+              "provenance": {
+                "historical_result_ownership": "sealed source activity",
+                "origin": "initial_controller_reference"
+              },
+              "reference": {
+                "artifact_id": "eeb4bd4ddffa3f5ddc13c525661da8e9e45fbacb14ef49cd079ade67710dbded",
+                "media_type": "application/json"
+              }
+            },
+            "checkpoint": {
+              "config_sha256": "51d096cb0726aa9bf688f75fa170731a512e1b5f2f55bcb079ddcf46ab69ca5d",
+              "consumed": {
+                "active_seconds": 363.75498860003427,
+                "attempted_actions": 199936,
+                "attempted_physics_steps": 3989321,
+                "complete_episodes": 4993,
+                "completed_actions": 198952,
+                "failed_episodes": 984
+              },
+              "generation": "step-00199936-c4de57ba",
+              "inherited": {
+                "num_timesteps": 199936,
+                "optimization_epochs": 7810,
+                "optimizer_sha256": "2e8827563eb5bf1a9ee9b35b98e82376773eedc466547c69c9bcd6d6d7ca333f",
+                "optimizer_steps": 31240,
+                "policy_sha256": "8e78943697b45acf923fe7620b33c871fab3a2fcab1f102f85b41baad543e12b",
+                "rollout_optimizations": 781,
+                "schedule": {
+                  "clip_range": 0.2,
+                  "clip_range_vf": null,
+                  "learning_rate": 0.0003,
+                  "progress_remaining": 0.0,
+                  "total_timesteps": 199936
+                }
+              },
+              "policy_file_sha256": "8bdcfc66c9ea00d69811c11c1423d8b363737bec0828047d5baba821c9eda9d1",
+              "policy_present": true
+            },
+            "consumed": {
+              "active_seconds": 363.79782340000384,
+              "attempted_actions": 199936,
+              "attempted_physics_steps": 3989321,
+              "complete_episodes": 4993,
+              "completed_actions": 198952,
+              "failed_episodes": 984
+            },
+            "consumption_uncertain": false,
+            "coverage": "CSV may lag checkpoint optimizations; worker step ranges can overlap. Missing metrics are not recorded. Physical steps are attempted, not verified completed substeps. Complete episodes are not task passes; reward is training-only and cannot be compared across different weights. Historical stage labels are preserved.",
+            "episode_failure_fraction": {
+              "denominator": 5977,
+              "numerator": 984,
+              "value": 0.1646310858290112
+            },
+            "error": null,
+            "failure_index": {
+              "recent": [
+                {
+                  "cumulative_action": 38610,
+                  "episode_action": 34,
+                  "episode_number": 1368,
+                  "failed_substep": 19,
+                  "pre_step_time_s": 0.33900000000000025,
+                  "source": "failures\\d3d9d2ad144c495b91c6164b1ff44572\\failure_episode_1368.json",
+                  "warnings": [
+                    "mjWARN_BADQACC",
+                    "engine_time_reset"
+                  ]
+                },
+                {
+                  "cumulative_action": 38714,
+                  "episode_action": 34,
+                  "episode_number": 1371,
+                  "failed_substep": 3,
+                  "pre_step_time_s": 0.33100000000000024,
+                  "source": "failures\\d3d9d2ad144c495b91c6164b1ff44572\\failure_episode_1371.json",
+                  "warnings": [
+                    "mjWARN_BADQACC",
+                    "engine_time_reset"
+                  ]
+                },
+                {
+                  "cumulative_action": 38819,
+                  "episode_action": 35,
+                  "episode_number": 1374,
+                  "failed_substep": 18,
+                  "pre_step_time_s": 0.34850000000000025,
+                  "source": "failures\\d3d9d2ad144c495b91c6164b1ff44572\\failure_episode_1374.json",
+                  "warnings": [
+                    "mjWARN_BADQACC",
+                    "engine_time_reset"
+                  ]
+                },
+                {
+                  "cumulative_action": 38850,
+                  "episode_action": 31,
+                  "episode_number": 1375,
+                  "failed_substep": 17,
+                  "pre_step_time_s": 0.3080000000000002,
+                  "source": "failures\\d3d9d2ad144c495b91c6164b1ff44572\\failure_episode_1375.json",
+                  "warnings": [
+                    "mjWARN_BADQACC",
+                    "engine_time_reset"
+                  ]
+                },
+                {
+                  "cumulative_action": 38953,
+                  "episode_action": 33,
+                  "episode_number": 1378,
+                  "failed_substep": 1,
+                  "pre_step_time_s": 0.32000000000000023,
+                  "source": "failures\\d3d9d2ad144c495b91c6164b1ff44572\\failure_episode_1378.json",
+                  "warnings": [
+                    "mjWARN_BADQACC",
+                    "engine_time_reset"
+                  ]
+                }
+              ],
+              "recorded_files": 984
+            },
+            "known_consumption_lower_bound": null,
+            "last_known_stage": "checkpoint publication",
+            "mode": "direct",
+            "observed_at_unix": 1791901302.2008774,
+            "ppo": {
+              "batch_size": 64,
+              "clip_range": 0.2,
+              "clip_range_vf": null,
+              "device": "cpu",
+              "ent_coef": 0.0,
+              "gae_lambda": 0.95,
+              "gamma": 0.99,
+              "learning_rate": 0.0003,
+              "max_grad_norm": 0.5,
+              "n_epochs": 10,
+              "n_steps": 256,
+              "normalize_advantage": true,
+              "policy_kwargs": {
+                "log_std_init": -3.0,
+                "net_arch": {
+                  "pi": [
+                    64,
+                    64
+                  ],
+                  "vf": [
+                    64,
+                    64
+                  ]
+                }
+              },
+              "sde_sample_freq": -1,
+              "target_kl": null,
+              "use_sde": false,
+              "verbose": 0,
+              "vf_coef": 0.5
+            },
+            "recorded_failure_stage": null,
+            "reservation": {},
+            "reward": {
+              "failure_penalty": -10000.0,
+              "holding_speed": 1.0,
+              "position": 1.0,
+              "smoothness": 0.001
+            },
+            "run_id": "training-summary-formal-20261013-fb54a8b8",
+            "scope": "Recorded training evidence; task acceptance requires independent evaluation",
+            "sources": [
+              "state.json",
+              "config.json",
+              "checkpoint.json",
+              "checkpoints\\step-00199936-c4de57ba\\metadata.json",
+              "d3d9d2ad144c495b91c6164b1ff44572\\progress.csv",
+              "failures\\d3d9d2ad144c495b91c6164b1ff44572\\failure_episode_1368.json",
+              "failures\\d3d9d2ad144c495b91c6164b1ff44572\\failure_episode_1371.json",
+              "failures\\d3d9d2ad144c495b91c6164b1ff44572\\failure_episode_1374.json",
+              "failures\\d3d9d2ad144c495b91c6164b1ff44572\\failure_episode_1375.json",
+              "failures\\d3d9d2ad144c495b91c6164b1ff44572\\failure_episode_1378.json"
+            ],
+            "status": "completed",
+            "stop_reason": "action_budget",
+            "task": {
+              "acceptance": {
+                "holding_speed_limit_m_s": 0.02,
+                "holding_steps": [
+                  30,
+                  31,
+                  32,
+                  33,
+                  34,
+                  35
+                ],
+                "position_limit_m": 0.01,
+                "terminal_position_limit_m": 0.01
+              },
+              "command_intervals": 35,
+              "control_period_s": 0.01,
+              "duration_s": 0.35,
+              "family": "task.reach",
+              "initializer": {
+                "qpos_rad": {
+                  "distal1_cell_0_y": 0.0,
+                  "distal1_cell_0_z": 0.0,
+                  "distal1_cell_10_y": 0.0,
+                  "distal1_cell_10_z": 0.0,
+                  "distal1_cell_11_y": 0.0,
+                  "distal1_cell_11_z": 0.0,
+                  "distal1_cell_1_y": 0.0,
+                  "distal1_cell_1_z": 0.0,
+                  "distal1_cell_2_y": 0.0,
+                  "distal1_cell_2_z": 0.0,
+                  "distal1_cell_3_y": 0.0,
+                  "distal1_cell_3_z": 0.0,
+                  "distal1_cell_4_y": 0.0,
+                  "distal1_cell_4_z": 0.0,
+                  "distal1_cell_5_y": 0.0,
+                  "distal1_cell_5_z": 0.0,
+                  "distal1_cell_6_y": 0.0,
+                  "distal1_cell_6_z": 0.0,
+                  "distal1_cell_7_y": 0.0,
+                  "distal1_cell_7_z": 0.0,
+                  "distal1_cell_8_y": 0.0,
+                  "distal1_cell_8_z": 0.0,
+                  "distal1_cell_9_y": 0.0,
+                  "distal1_cell_9_z": 0.0,
+                  "near_cell_0_y": 0.0,
+                  "near_cell_0_z": 0.0,
+                  "near_cell_10_y": 0.0,
+                  "near_cell_10_z": 0.0,
+                  "near_cell_11_y": 0.0,
+                  "near_cell_11_z": 0.0,
+                  "near_cell_1_y": 0.0,
+                  "near_cell_1_z": 0.0,
+                  "near_cell_2_y": 0.0,
+                  "near_cell_2_z": 0.0,
+                  "near_cell_3_y": 0.0,
+                  "near_cell_3_z": 0.0,
+                  "near_cell_4_y": 0.0,
+                  "near_cell_4_z": 0.0,
+                  "near_cell_5_y": 0.0,
+                  "near_cell_5_z": 0.0,
+                  "near_cell_6_y": 0.0,
+                  "near_cell_6_z": 0.0,
+                  "near_cell_7_y": 0.0,
+                  "near_cell_7_z": 0.0,
+                  "near_cell_8_y": 0.0,
+                  "near_cell_8_z": 0.0,
+                  "near_cell_9_y": 0.0,
+                  "near_cell_9_z": 0.0
+                },
+                "qvel_rad_s": {
+                  "distal1_cell_0_y": 0.0,
+                  "distal1_cell_0_z": 0.0,
+                  "distal1_cell_10_y": 0.0,
+                  "distal1_cell_10_z": 0.0,
+                  "distal1_cell_11_y": 0.0,
+                  "distal1_cell_11_z": 0.0,
+                  "distal1_cell_1_y": 0.0,
+                  "distal1_cell_1_z": 0.0,
+                  "distal1_cell_2_y": 0.0,
+                  "distal1_cell_2_z": 0.0,
+                  "distal1_cell_3_y": 0.0,
+                  "distal1_cell_3_z": 0.0,
+                  "distal1_cell_4_y": 0.0,
+                  "distal1_cell_4_z": 0.0,
+                  "distal1_cell_5_y": 0.0,
+                  "distal1_cell_5_z": 0.0,
+                  "distal1_cell_6_y": 0.0,
+                  "distal1_cell_6_z": 0.0,
+                  "distal1_cell_7_y": 0.0,
+                  "distal1_cell_7_z": 0.0,
+                  "distal1_cell_8_y": 0.0,
+                  "distal1_cell_8_z": 0.0,
+                  "distal1_cell_9_y": 0.0,
+                  "distal1_cell_9_z": 0.0,
+                  "near_cell_0_y": 0.0,
+                  "near_cell_0_z": 0.0,
+                  "near_cell_10_y": 0.0,
+                  "near_cell_10_z": 0.0,
+                  "near_cell_11_y": 0.0,
+                  "near_cell_11_z": 0.0,
+                  "near_cell_1_y": 0.0,
+                  "near_cell_1_z": 0.0,
+                  "near_cell_2_y": 0.0,
+                  "near_cell_2_z": 0.0,
+                  "near_cell_3_y": 0.0,
+                  "near_cell_3_z": 0.0,
+                  "near_cell_4_y": 0.0,
+                  "near_cell_4_z": 0.0,
+                  "near_cell_5_y": 0.0,
+                  "near_cell_5_z": 0.0,
+                  "near_cell_6_y": 0.0,
+                  "near_cell_6_z": 0.0,
+                  "near_cell_7_y": 0.0,
+                  "near_cell_7_z": 0.0,
+                  "near_cell_8_y": 0.0,
+                  "near_cell_8_z": 0.0,
+                  "near_cell_9_y": 0.0,
+                  "near_cell_9_z": 0.0
+                },
+                "unspecified": "zero"
+              },
+              "original": {
+                "actuator_channels": [
+                  "actuator_commands"
+                ],
+                "contract_version": "1.0.0",
+                "environment": {
+                  "contract": "experiment.assembly",
+                  "data": {
+                    "environment": {
+                      "coordinate_frame": "world_base_x_forward_yz_cross_section",
+                      "environment_id": "reach_free",
+                      "gravity_m_s2": [
+                        0.0,
+                        0.0,
+                        -9.81
+                      ],
+                      "gravity_source": "main@245a785 reach_free environment; Human-owned benchmark gravity",
+                      "lights": [
+                        {
+                          "direction": [
+                            0.0,
+                            0.0,
+                            -1.0
+                          ],
+                          "position_m": [
+                            0.0,
+                            0.0,
+                            2.0
+                          ]
+                        }
+                      ],
+                      "objects": [
+                        {
+                          "conaffinity": 1,
+                          "contype": 0,
+                          "half_size_m": [
+                            2.0,
+                            2.0,
+                            0.1
+                          ],
+                          "kind": "plane",
+                          "name": "floor",
+                          "position_m": [
+                            0.0,
+                            0.0,
+                            -0.02
+                          ]
+                        }
+                      ],
+                      "schema_version": "1",
+                      "truth_status": "HUMAN_OWNED",
+                      "units": "SI"
+                    },
+                    "external_forces": [],
+                    "floor_id": "floor",
+                    "mount": {
+                      "position_m": [
+                        0.0,
+                        0.0,
+                        0.15
+                      ],
+                      "quaternion_wxyz": [
+                        1.0,
+                        0.0,
+                        0.0,
+                        0.0
+                      ]
+                    }
+                  },
+                  "version": "1.0.0"
+                },
+                "evaluator": {
+                  "extension_id": "evaluate.reach",
+                  "parameters": {
+                    "contract": "reference.reach_evaluation",
+                    "data": {
+                      "tolerance_m": 0.01
+                    },
+                    "version": "1.0.0"
+                  },
+                  "version": "1.0.0"
+                },
+                "failure_policy": "retain_invalid_and_constraint_failures",
+                "family": "task.reach",
+                "goal": {
+                  "contract": "reference.reach_goal",
+                  "data": {
+                    "target_m": [
+                      0.29,
+                      0.035,
+                      0.19
+                    ]
+                  },
+                  "version": "1.0.0"
+                },
+                "initializer": {
+                  "extension_id": "initialize.family",
+                  "parameters": {
+                    "contract": "family.initial",
+                    "data": {
+                      "qpos_rad": {
+                        "distal1_cell_0_y": 0.0,
+                        "distal1_cell_0_z": 0.0,
+                        "distal1_cell_10_y": 0.0,
+                        "distal1_cell_10_z": 0.0,
+                        "distal1_cell_11_y": 0.0,
+                        "distal1_cell_11_z": 0.0,
+                        "distal1_cell_1_y": 0.0,
+                        "distal1_cell_1_z": 0.0,
+                        "distal1_cell_2_y": 0.0,
+                        "distal1_cell_2_z": 0.0,
+                        "distal1_cell_3_y": 0.0,
+                        "distal1_cell_3_z": 0.0,
+                        "distal1_cell_4_y": 0.0,
+                        "distal1_cell_4_z": 0.0,
+                        "distal1_cell_5_y": 0.0,
+                        "distal1_cell_5_z": 0.0,
+                        "distal1_cell_6_y": 0.0,
+                        "distal1_cell_6_z": 0.0,
+                        "distal1_cell_7_y": 0.0,
+                        "distal1_cell_7_z": 0.0,
+                        "distal1_cell_8_y": 0.0,
+                        "distal1_cell_8_z": 0.0,
+                        "distal1_cell_9_y": 0.0,
+                        "distal1_cell_9_z": 0.0,
+                        "near_cell_0_y": 0.0,
+                        "near_cell_0_z": 0.0,
+                        "near_cell_10_y": 0.0,
+                        "near_cell_10_z": 0.0,
+                        "near_cell_11_y": 0.0,
+                        "near_cell_11_z": 0.0,
+                        "near_cell_1_y": 0.0,
+                        "near_cell_1_z": 0.0,
+                        "near_cell_2_y": 0.0,
+                        "near_cell_2_z": 0.0,
+                        "near_cell_3_y": 0.0,
+                        "near_cell_3_z": 0.0,
+                        "near_cell_4_y": 0.0,
+                        "near_cell_4_z": 0.0,
+                        "near_cell_5_y": 0.0,
+                        "near_cell_5_z": 0.0,
+                        "near_cell_6_y": 0.0,
+                        "near_cell_6_z": 0.0,
+                        "near_cell_7_y": 0.0,
+                        "near_cell_7_z": 0.0,
+                        "near_cell_8_y": 0.0,
+                        "near_cell_8_z": 0.0,
+                        "near_cell_9_y": 0.0,
+                        "near_cell_9_z": 0.0
+                      },
+                      "qvel_rad_s": {
+                        "distal1_cell_0_y": 0.0,
+                        "distal1_cell_0_z": 0.0,
+                        "distal1_cell_10_y": 0.0,
+                        "distal1_cell_10_z": 0.0,
+                        "distal1_cell_11_y": 0.0,
+                        "distal1_cell_11_z": 0.0,
+                        "distal1_cell_1_y": 0.0,
+                        "distal1_cell_1_z": 0.0,
+                        "distal1_cell_2_y": 0.0,
+                        "distal1_cell_2_z": 0.0,
+                        "distal1_cell_3_y": 0.0,
+                        "distal1_cell_3_z": 0.0,
+                        "distal1_cell_4_y": 0.0,
+                        "distal1_cell_4_z": 0.0,
+                        "distal1_cell_5_y": 0.0,
+                        "distal1_cell_5_z": 0.0,
+                        "distal1_cell_6_y": 0.0,
+                        "distal1_cell_6_z": 0.0,
+                        "distal1_cell_7_y": 0.0,
+                        "distal1_cell_7_z": 0.0,
+                        "distal1_cell_8_y": 0.0,
+                        "distal1_cell_8_z": 0.0,
+                        "distal1_cell_9_y": 0.0,
+                        "distal1_cell_9_z": 0.0,
+                        "near_cell_0_y": 0.0,
+                        "near_cell_0_z": 0.0,
+                        "near_cell_10_y": 0.0,
+                        "near_cell_10_z": 0.0,
+                        "near_cell_11_y": 0.0,
+                        "near_cell_11_z": 0.0,
+                        "near_cell_1_y": 0.0,
+                        "near_cell_1_z": 0.0,
+                        "near_cell_2_y": 0.0,
+                        "near_cell_2_z": 0.0,
+                        "near_cell_3_y": 0.0,
+                        "near_cell_3_z": 0.0,
+                        "near_cell_4_y": 0.0,
+                        "near_cell_4_z": 0.0,
+                        "near_cell_5_y": 0.0,
+                        "near_cell_5_z": 0.0,
+                        "near_cell_6_y": 0.0,
+                        "near_cell_6_z": 0.0,
+                        "near_cell_7_y": 0.0,
+                        "near_cell_7_z": 0.0,
+                        "near_cell_8_y": 0.0,
+                        "near_cell_8_z": 0.0,
+                        "near_cell_9_y": 0.0,
+                        "near_cell_9_z": 0.0
+                      },
+                      "unspecified": "zero"
+                    },
+                    "version": "1.0.0"
+                  },
+                  "version": "1.0.0"
+                },
+                "name": "Independent development validation of a serial multi-segment soft arm",
+                "objectives": [
+                  {
+                    "direction": "minimize",
+                    "metric": "position_error",
+                    "units": "m",
+                    "weight": 1.0
+                  }
+                ],
+                "observations": [
+                  {
+                    "dimension": 3,
+                    "entity": "tip",
+                    "frame": "world",
+                    "missing": "unsupported",
+                    "name": "tip_position",
+                    "phase": "post_step",
+                    "units": "m"
+                  }
+                ],
+                "robot_families": [
+                  "tendon_robot_family"
+                ],
+                "sampling": {
+                  "aggregation": "per_instance",
+                  "seeds": [
+                    17
+                  ],
+                  "split": "development",
+                  "window_s": [
+                    0.0,
+                    0.35
+                  ]
+                },
+                "source": "Development task with fixed target, tolerance and scoring; historical tasks are unchanged",
+                "status": "development_valid",
+                "task_id": "family-multisegment-dev",
+                "task_version": "1.0.0",
+                "timing": {
+                  "control_period_s": 0.01,
+                  "duration_s": 0.35,
+                  "sample_period_s": 0.01,
+                  "termination": [
+                    "duration",
+                    "numerical_failure"
+                  ],
+                  "timestep_s": 0.0005
+                }
+              },
+              "target_m": [
+                0.29,
+                0.035,
+                0.19
+              ],
+              "tendon_order": [
+                "near_t0",
+                "near_t1",
+                "near_t2",
+                "far_t0",
+                "far_t1",
+                "far_t2"
+              ]
+            },
+            "task_identity": "2b26edb492214c426263441b6adb52d7aafe41a828436d6b48a1171374a1026c",
+            "workers": [
+              {
+                "after_step": 199936,
+                "attempted_actions": 199936,
+                "available_rows": 781,
+                "before_step": 0,
+                "current_worker": true,
+                "first": {
+                  "rollout/ep_rew_mean": {
+                    "logged_step": 256.0,
+                    "value": -12800.2616475
+                  },
+                  "train/approx_kl": {
+                    "logged_step": 512.0,
+                    "value": 0.037223443
+                  },
+                  "train/clip_fraction": {
+                    "logged_step": 512.0,
+                    "value": 0.478515625
+                  },
+                  "train/entropy_loss": {
+                    "logged_step": 512.0,
+                    "value": 9.486744785308838
+                  },
+                  "train/explained_variance": {
+                    "logged_step": 512.0,
+                    "value": -2.956390380859375e-05
+                  },
+                  "train/learning_rate": {
+                    "logged_step": 512.0,
+                    "value": 0.0003
+                  },
+                  "train/policy_gradient_loss": {
+                    "logged_step": 512.0,
+                    "value": -0.04072574325837195
+                  },
+                  "train/value_loss": {
+                    "logged_step": 512.0,
+                    "value": 31707986.45
+                  }
+                },
+                "incomplete_tail_rows": 0,
+                "latest": {
+                  "rollout/ep_rew_mean": {
+                    "logged_step": 199936.0,
+                    "value": -71.88686582999999
+                  },
+                  "train/approx_kl": {
+                    "logged_step": 199936.0,
+                    "value": 0.25787282
+                  },
+                  "train/clip_fraction": {
+                    "logged_step": 199936.0,
+                    "value": 0.576953125
+                  },
+                  "train/entropy_loss": {
+                    "logged_step": 199936.0,
+                    "value": 12.588108468055726
+                  },
+                  "train/explained_variance": {
+                    "logged_step": 199936.0,
+                    "value": 0.8812779188156128
+                  },
+                  "train/learning_rate": {
+                    "logged_step": 199936.0,
+                    "value": 0.0003
+                  },
+                  "train/policy_gradient_loss": {
+                    "logged_step": 199936.0,
+                    "value": -0.012212436785921455
+                  },
+                  "train/value_loss": {
+                    "logged_step": 199936.0,
+                    "value": 11.298328030109406
+                  }
+                },
+                "not_recorded": [],
+                "recent": [
+                  {
+                    "logged_step": 198912.0,
+                    "metrics": {
+                      "rollout/ep_rew_mean": -73.1423579,
+                      "train/approx_kl": 0.09800088,
+                      "train/clip_fraction": 0.539453125,
+                      "train/entropy_loss": 12.54891083240509,
+                      "train/explained_variance": 0.7714023590087891,
+                      "train/learning_rate": 0.0003,
+                      "train/policy_gradient_loss": -0.0199775667861104,
+                      "train/value_loss": 24.967606902122498
+                    }
+                  },
+                  {
+                    "logged_step": 199168.0,
+                    "metrics": {
+                      "rollout/ep_rew_mean": -72.7996254,
+                      "train/approx_kl": 0.37472418,
+                      "train/clip_fraction": 0.59921875,
+                      "train/entropy_loss": 12.54979031085968,
+                      "train/explained_variance": 0.904024600982666,
+                      "train/learning_rate": 0.0003,
+                      "train/policy_gradient_loss": -0.01690501277334988,
+                      "train/value_loss": 9.002801811695099
+                    }
+                  },
+                  {
+                    "logged_step": 199424.0,
+                    "metrics": {
+                      "rollout/ep_rew_mean": -72.56821039999998,
+                      "train/approx_kl": 0.33953685,
+                      "train/clip_fraction": 0.572265625,
+                      "train/entropy_loss": 12.567294383049012,
+                      "train/explained_variance": 0.8396975994110107,
+                      "train/learning_rate": 0.0003,
+                      "train/policy_gradient_loss": -0.021634139656089246,
+                      "train/value_loss": 15.806861662864685
+                    }
+                  },
+                  {
+                    "logged_step": 199680.0,
+                    "metrics": {
+                      "rollout/ep_rew_mean": -72.35717616999999,
+                      "train/approx_kl": 0.21738513,
+                      "train/clip_fraction": 0.582421875,
+                      "train/entropy_loss": 12.582826828956604,
+                      "train/explained_variance": 0.9429698586463928,
+                      "train/learning_rate": 0.0003,
+                      "train/policy_gradient_loss": -0.03393192607909441,
+                      "train/value_loss": 6.128039085865021
+                    }
+                  },
+                  {
+                    "logged_step": 199936.0,
+                    "metrics": {
+                      "rollout/ep_rew_mean": -71.88686582999999,
+                      "train/approx_kl": 0.25787282,
+                      "train/clip_fraction": 0.576953125,
+                      "train/entropy_loss": 12.588108468055726,
+                      "train/explained_variance": 0.8812779188156128,
+                      "train/learning_rate": 0.0003,
+                      "train/policy_gradient_loss": -0.012212436785921455,
+                      "train/value_loss": 11.298328030109406
+                    }
+                  }
+                ],
+                "source": "d3d9d2ad144c495b91c6164b1ff44572\\progress.csv",
+                "token": "d3d9d2ad144c495b91c6164b1ff44572",
+                "unavailable_metrics": {}
+              }
+            ]
+          },
+          "worker_alive": false,
+          "worker_token": "d3d9d2ad144c495b91c6164b1ff44572",
+          "workers": [
+            {
+              "active_seconds": 363.7973326999927,
+              "after": {
+                "num_timesteps": 199936,
+                "optimization_epochs": 7810,
+                "optimizer_sha256": "2e8827563eb5bf1a9ee9b35b98e82376773eedc466547c69c9bcd6d6d7ca333f",
+                "optimizer_steps": 31240,
+                "policy_sha256": "8e78943697b45acf923fe7620b33c871fab3a2fcab1f102f85b41baad543e12b",
+                "rollout_optimizations": 781,
+                "schedule": {
+                  "clip_range": 0.2,
+                  "clip_range_vf": null,
+                  "learning_rate": 0.0003,
+                  "progress_remaining": 0.0,
+                  "total_timesteps": 199936
+                }
+              },
+              "attempted_actions": 199936,
+              "before": {
+                "num_timesteps": 0,
+                "optimization_epochs": 0,
+                "optimizer_sha256": "c35b97ec268c71687bdbd09164ed68609c4365743f2eefc9c31c7b5bdcc3fc96",
+                "optimizer_steps": 0,
+                "policy_sha256": "cd6a23b8154e1f6efd819f8172e09fbd06cc6cdf052e3ffcb97f52edc7e4e773",
+                "rollout_optimizations": 0,
+                "schedule": {
+                  "clip_range": 0.2,
+                  "clip_range_vf": null,
+                  "learning_rate": 0.0003,
+                  "progress_remaining": 1.0,
+                  "total_timesteps": 199936
+                }
+              },
+              "parameter_change_l2": 45.594512939453125,
+              "token": "d3d9d2ad144c495b91c6164b1ff44572",
+              "unoptimized_actions": 0
+            }
+          ]
+        },
+        "task": {
+          "artifact_id": "2b26edb492214c426263441b6adb52d7aafe41a828436d6b48a1171374a1026c",
+          "media_type": "application/json"
+        },
+        "training_summary": {
+          "artifact_id": "7e10b28e1198e02c4d4af3f2ed0459444cca28127670deb3968621fd051d0521",
+          "media_type": "application/json"
+        }
+      }
+    },
+    "source_summary": null,
+    "evaluations": [
+      {
+        "reference": {
+          "artifact_id": "4c099449cbc8617d1f72156b56b769bd3130219c9f8f44bae797600d12762b6a",
+          "media_type": "application/json"
+        },
+        "acceptance": {
+          "holding_speed_limit_m_s": 0.02,
+          "holding_steps": [
+            30,
+            31,
+            32,
+            33,
+            34,
+            35
+          ],
+          "position_limit_m": 0.01,
+          "terminal_position_limit_m": 0.01
+        },
+        "candidate": {
+          "artifact_id": "eeb4bd4ddffa3f5ddc13c525661da8e9e45fbacb14ef49cd079ade67710dbded",
+          "media_type": "application/json"
+        },
+        "candidate_identity": "83488f115662b2058912ae06828b3a807f8c4dbad41b56fcf0a2cdbae8e55ed9",
+        "checkpoint": "step-00043264-f376bb39",
+        "checkpoint_training_step": 43264,
+        "config_sha256": "a475f31136cf7ba2f6b576724949f9aa3287d86d58d78f67027eb0154bca8a48",
+        "configuration": {
+          "artifact_id": "ac3b1f9214c6343ade428e3f8cb0b086c3e9e8a42da727d91e30e08e3c330fc4",
+          "media_type": "application/json"
+        },
+        "episodes": [
+          {
+            "complete": true,
+            "counts": {
+              "attempted_actions": 35,
+              "attempted_physics_steps": 700,
+              "complete_episodes": 1,
+              "completed_actions": 35,
+              "failed_episodes": 0
+            },
+            "episode_reward": -6119.148047964336,
+            "holding_coverage_complete": true,
+            "holding_max_position_error_m": 0.17025784632567428,
+            "holding_max_speed_m_s": 0.16180596727341826,
+            "holding_sample_steps": [
+              30,
+              31,
+              32,
+              33,
+              34,
+              35
+            ],
+            "numerical_failure": null,
+            "passed": false,
+            "terminal_position_error_m": 0.16994929767023276,
+            "trajectory_rows": 36
+          }
+        ],
+        "evaluation_elapsed_s": 0.9346176000544801,
+        "failure_reason": "task_thresholds_not_met",
+        "failure_stage": "task criteria unmet",
+        "independent_evaluation_executed": true,
+        "last_valid_position_error_m": 0.16994929767023276,
+        "last_valid_speed_m_s": 0.07509265388792484,
+        "mode": "direct",
+        "passed": false,
+        "policy": "D:\\softrobot-agent\\.worktrees\\rl-control-pilot\\runs\\rl\\training-summary-formal-20261013-9fd0bb09\\checkpoints\\step-00043264-f376bb39\\policy.zip",
+        "policy_sha256": "7459d48006d8c0bfc18a0d6ed0fe9c864dad33abf8961acfc47f3841a4ce4fb0",
+        "role": "development",
+        "run_id": "training-summary-formal-20261013-9fd0bb09",
+        "scope": "one deterministic fixed-initial-state episode; no robustness claim",
+        "seed": 17,
+        "selected_execution": null,
+        "study": "training-summary-formal-20261013",
+        "task": {
+          "artifact_id": "2b26edb492214c426263441b6adb52d7aafe41a828436d6b48a1171374a1026c",
+          "media_type": "application/json"
+        },
+        "task_identity": "2b26edb492214c426263441b6adb52d7aafe41a828436d6b48a1171374a1026c",
+        "trajectory": "D:\\softrobot-agent\\.worktrees\\rl-control-pilot\\runs\\rl\\training-summary-formal-20261013-9fd0bb09\\evaluate-e49d2a7a538b4a46a590631cd7e37480\\trajectory.csv"
+      },
+      {
+        "reference": {
+          "artifact_id": "e6c5f7c64754536b24b82e2b03003956f57c57ba75215a7e53bff11605f1ddf9",
+          "media_type": "application/json"
+        },
+        "acceptance": {
+          "holding_speed_limit_m_s": 0.02,
+          "holding_steps": [
+            30,
+            31,
+            32,
+            33,
+            34,
+            35
+          ],
+          "position_limit_m": 0.01,
+          "terminal_position_limit_m": 0.01
+        },
+        "candidate": {
+          "artifact_id": "eeb4bd4ddffa3f5ddc13c525661da8e9e45fbacb14ef49cd079ade67710dbded",
+          "media_type": "application/json"
+        },
+        "candidate_identity": "83488f115662b2058912ae06828b3a807f8c4dbad41b56fcf0a2cdbae8e55ed9",
+        "checkpoint": "step-00051456-a6c191fb",
+        "checkpoint_training_step": 51456,
+        "config_sha256": "a475f31136cf7ba2f6b576724949f9aa3287d86d58d78f67027eb0154bca8a48",
+        "configuration": {
+          "artifact_id": "ac3b1f9214c6343ade428e3f8cb0b086c3e9e8a42da727d91e30e08e3c330fc4",
+          "media_type": "application/json"
+        },
+        "episodes": [
+          {
+            "complete": true,
+            "counts": {
+              "attempted_actions": 35,
+              "attempted_physics_steps": 700,
+              "complete_episodes": 1,
+              "completed_actions": 35,
+              "failed_episodes": 0
+            },
+            "episode_reward": -3266.242383177195,
+            "holding_coverage_complete": true,
+            "holding_max_position_error_m": 0.1167015963438733,
+            "holding_max_speed_m_s": 0.08337873298480952,
+            "holding_sample_steps": [
+              30,
+              31,
+              32,
+              33,
+              34,
+              35
+            ],
+            "numerical_failure": null,
+            "passed": false,
+            "terminal_position_error_m": 0.1167015963438733,
+            "trajectory_rows": 36
+          }
+        ],
+        "evaluation_elapsed_s": 0.9021950999740511,
+        "failure_reason": "task_thresholds_not_met",
+        "failure_stage": "task criteria unmet",
+        "independent_evaluation_executed": true,
+        "last_valid_position_error_m": 0.1167015963438733,
+        "last_valid_speed_m_s": 0.07813835996529686,
+        "mode": "direct",
+        "passed": false,
+        "policy": "D:\\softrobot-agent\\.worktrees\\rl-control-pilot\\runs\\rl\\training-summary-formal-20261013-9fd0bb09\\checkpoints\\step-00051456-a6c191fb\\policy.zip",
+        "policy_sha256": "0231f9b946d6c49ed7bfdb2a9d6ccf7878a1f0ff9d7993d87b0dfd5f0b800ad1",
+        "role": "development",
+        "run_id": "training-summary-formal-20261013-9fd0bb09",
+        "scope": "one deterministic fixed-initial-state episode; no robustness claim",
+        "seed": 17,
+        "selected_execution": null,
+        "study": "training-summary-formal-20261013",
+        "task": {
+          "artifact_id": "2b26edb492214c426263441b6adb52d7aafe41a828436d6b48a1171374a1026c",
+          "media_type": "application/json"
+        },
+        "task_identity": "2b26edb492214c426263441b6adb52d7aafe41a828436d6b48a1171374a1026c",
+        "trajectory": "D:\\softrobot-agent\\.worktrees\\rl-control-pilot\\runs\\rl\\training-summary-formal-20261013-9fd0bb09\\evaluate-4d0d63e002e24dfc8e2b61fb14186eb5\\trajectory.csv"
+      }
+    ],
+    "costs": "RL active time/evaluation costs separate from provider wall time; elapsed study time uses one wall clock",
+    "live_elapsed_s": 2498.496659755707
+  },
+  "nmpc_admission": [
+    {
+      "candidate": {
+        "artifact_id": "eeb4bd4ddffa3f5ddc13c525661da8e9e45fbacb14ef49cd079ade67710dbded",
+        "media_type": "application/json"
+      },
+      "available": false,
+      "complete_execution_s": null,
+      "cap_s": 1800,
+      "reason": "NMPC unavailable within this budget: no matching existing timing evidence",
+      "evidence_sources": [],
+      "design_feasibility": "not assessed by budget admission",
+      "remaining_phase_admission": {
+        "requested": 1,
+        "admitted": 0,
+        "internal_launches": 0,
+        "timing": {
+          "available": false,
+          "complete_execution_s": null,
+          "cap_s": 1800,
+          "reason": "NMPC unavailable within this budget: no matching existing timing evidence",
+          "evidence_sources": [],
+          "design_feasibility": "not assessed by budget admission"
+        }
+      }
+    }
+  ],
+  "resource_use": {
+    "shared_ledger": {
+      "limit": {
+        "backend_solves": 7,
+        "model_calls": 48,
+        "tool_calls": 160,
+        "wall_s": 10800.0,
+        "worker_calls": 0
+      },
+      "used": {
+        "tool_calls": 67,
+        "model_calls": 48,
+        "backend_solves": 2,
+        "worker_calls": 0,
+        "wall_s": 2498.496659755707
+      },
+      "remaining": {
+        "backend_solves": 5,
+        "model_calls": 0,
+        "tool_calls": 93,
+        "wall_s": 8301.503340244293,
+        "worker_calls": 0
+      },
+      "occupied": {}
+    },
+    "numerical_s": 1202.2677317998605,
+    "elapsed_s": 2498.496659755707
+  },
+  "claims": {
+    "selected": null,
+    "independent_confirmation_count": 0,
+    "required_confirmations": 2,
+    "confirmation_failures": 0,
+    "limited_repeat_supported_acceptance": false,
+    "task_passed": false,
+    "parameter_improvement_attribution_permitted": false,
+    "interface_evaluations": 2
+  },
+  "research_status": "stopped"
+}
