@@ -60,6 +60,23 @@ def update(host, **values):
         host.store.update_state(db, host.run_id, s)
 
 
+def readable_results(s):
+    return [*s['results'], *s.get('mechanics_results', []), *s.get('rl_evaluations', []), *s.get('rl_training_summaries', [])]
+
+
+def read_evidence(host, query):
+    q = EvidenceQuery.model_validate(query); s = state(host)
+    value = host.store.artifact(q.reference)
+    if host.store.remaining()['remaining']['model_calls'] <= 4 and plain(q.reference) not in readable_results(s):
+        raise ValueError('PROTECTED_EVIDENCE_READ_REQUIRES_NEW_RESULT_OR_TRAINING_SUMMARY')
+    for part in q.pointer.strip('/').split('/') if q.pointer else []:
+        part = part.replace('~1', '/').replace('~0', '~')
+        value = value[int(part)] if isinstance(value, list) else value[part]
+    if not q.pointer and plain(q.reference) in [*s.get('rl_evaluations', []), *s.get('rl_training_summaries', [])]:
+        update(host, rl_evidence_reads=[*s.get('rl_evidence_reads', []), plain(q.reference)])
+    return value
+
+
 def science_hashes():
     return {name: hashlib.sha256((ROOT/name).read_bytes()).hexdigest() for name in SCIENCE_FILES}
 
@@ -794,7 +811,15 @@ def dispatch(host, value, request_id, origin='model'):
         raise ValueError('STOP_MUST_CITE_ALL_NEW_EXPERIMENT_RESULTS')
     if enabled(s['spec'],'rl') and plan.action=='stop' and s.get('rl_runs'):
         evaluations=s.get('rl_evaluations',[])
-        if not evaluations or not plan.next_step: raise ValueError('RL_STOP_REQUIRES_EVALUATION_AND_NEXT_STEP_DECISION')
+        if not plan.next_step: raise ValueError('RL_STOP_REQUIRES_NEXT_STEP_DECISION')
+        for entry in s['rl_runs'].values():
+            if entry.get('source_study'): continue
+            summary_ref=entry.get('training_summary')
+            if summary_ref not in s.get('rl_evidence_reads',[]) or summary_ref not in [plain(v) for v in plan.supporting_evidence]:
+                raise ValueError('RL_STOP_REQUIRES_PUBLIC_TRAINING_SUMMARY_READ_AND_CITATION')
+            summary=host.store.artifact(summary_ref)
+            if summary.get('checkpoint') and summary['checkpoint']['policy_present'] and not any(host.store.artifact(r).get('run_id')==summary['run_id'] for r in evaluations):
+                raise ValueError('RL_STOP_REQUIRES_USABLE_CHECKPOINT_EVALUATION')
         if any(r not in [plain(v) for v in plan.supporting_evidence] for r in evaluations): raise ValueError('RL_STOP_MUST_CITE_NEW_EVALUATION')
         if any(r not in s.get('rl_evidence_reads',[]) for r in evaluations): raise ValueError('RL_STOP_REQUIRES_PUBLIC_EXPLICIT_EVIDENCE_READ')
         if any(e.get('status',{}).get('worker_alive',True) for e in s['rl_runs'].values()): raise ValueError('RL_STOP_REQUIRES_TERMINAL_STATUS_QUERY')
@@ -903,7 +928,7 @@ Choose direct or residual yourself; no compatible residual reference exists. Dir
 Use research_rl start with candidate, mode, at least one supported PPO training_overrides field and
 one reward_overrides field, allocation and a brief rationale. Choose short rollout-aligned actions allowing at least
 two complete optimization batches, within 2048 cumulative actions and 120 active seconds. One training run only.
-Query real status even if it already finished. When terminal, evaluate a published saved checkpoint once;
+Query real status even if it already finished and explicitly read/cite training_summary_reference. When terminal and a usable checkpoint exists, evaluate it once;
 evaluation reloads policy and initializes a fresh simulation from frozen candidate/task. Training completion is not task success.
 Read immutable evaluation evidence explicitly through evidence_read before deciding. Cite that exact EvidenceRef.
 Use research_plan action stop to close this bounded study, with next_step chosen from adjust_training, revise_design,
@@ -916,7 +941,7 @@ Hard cumulative ceilings include failures/corrections: 24 provider requests,60 p
 900 live study seconds. Last four provider requests are protected for evidence/STOP. No artificial waiting.
 Preserve goal, initialization, duration, inclusive holding-window and thresholds; rewards do not alter task acceptance.
 No robustness, generalization, solved numerical root cause, or complete autonomous research claims.
-STOP must cite new evaluation evidence and follow its explicit public read and terminal status query. If a public evaluation attempt cannot run because no checkpoint exists, read its immutable failure evidence, close the bounded study truthfully and state that independent evaluation/task performance remain unmeasured; do not spend repeated STOP attempts or request another training run."""
+STOP must cite new evaluation evidence and follow its explicit public read and terminal status query. If no usable published checkpoint exists, explicitly read/cite the training/failure summary without requesting evaluation, close the bounded study truthfully and state that independent evaluation/task performance remain unmeasured; do not spend repeated STOP attempts or request another training run."""
 
 
 FORMAL_INSTRUCTIONS = """You own a bounded design-and-control study. Use only scoped supplied evidence and public tools.
@@ -927,7 +952,10 @@ Mathematical feasibility, relaxed dynamics and original MuJoCo task acceptance a
 Choose existing NMPC or direct/residual RL and explain using evidence and budget. Inspect nmpc_admission before launching; no matching timing or oversized
 complete execution makes that route unavailable within budget, not the design infeasible. No calibration or raised ceilings.
 Residual requires an advertised compatible runnable reference. Direct stays available if incompatible. Train within declared trial/cumulative limits;
-query real terminal status and independently evaluate a saved policy. Read exact evidence before deciding to adjust control, revise design, switch route, select or stop.
+query real terminal status and explicitly read/cite its training_summary_reference through evidence_read before deciding.
+Evaluate only a usable published checkpoint; otherwise read training/failure evidence and decide without an impossible evaluation or automatic replacement trial.
+An earlier checkpoint evaluation must identify its actual training step. Choose rollout-aligned actions; adjustments round down, never above ceilings.
+Read independent evaluation evidence explicitly before deciding to adjust control, revise design, switch route, select or stop.
 Select a passing development result via confirm selected_execution, freezing candidate+task+route+configuration+exact checkpoint. Use the predeclared fresh
 post-selection count. RL confirmation reloads exact weights, fresh simulation, no training or NMPC. Keep failed confirmations; no success-hunting retries.
 Selection remains immutable. Nominal repetitions support no robustness claim. No fresh baseline required; withhold improvement attribution without comparable evidence.
@@ -996,15 +1024,7 @@ async def converse(host):
                     else:
                         if kind=='experience': value=experience(host,use['input'])
                         else:
-                            q=EvidenceQuery.model_validate(use['input']); value=host.store.artifact(q.reference)
-                            current_state=state(host)
-                            if host.store.remaining()['remaining']['model_calls']<=4 and plain(q.reference) not in [*current_state['results'],*current_state.get('mechanics_results',[]),*current_state.get('rl_evaluations',[])]:
-                                raise ValueError('PROTECTED_EVIDENCE_READ_REQUIRES_NEW_RESULT')
-                            for part in q.pointer.strip('/').split('/') if q.pointer else []:
-                                part=part.replace('~1','/').replace('~0','~')
-                                value=value[int(part)] if isinstance(value,list) else value[part]
-                            if plain(q.reference) in current_state.get('rl_evaluations',[]):
-                                update(host,rl_evidence_reads=[*current_state.get('rl_evidence_reads',[]),plain(q.reference)])
+                            value=read_evidence(host,use['input'])
                         host.store.complete(row,dict(request_id=key,execution_id=row['execution_id'],caller=host.actor,
                             tool_id='research.core_'+kind,tool_version='1.0.0',execution_status='completed',charged=zero()),value)
                 return dict(toolUseId=use['toolUseId'],status='success',content=[dict(text=json.dumps(value))])
@@ -1064,7 +1084,7 @@ async def converse(host):
             agent.tool_registry.registry.pop('experience_retrieve',None)
             agent.tool_registry.registry.pop('research_rl',None)
             schema=EvidenceQuery.model_json_schema()
-            schema['$defs']['EvidenceRef']['properties']['artifact_id']['enum']=[r['artifact_id'] for r in [*s['results'],*s.get('mechanics_results',[]),*s.get('rl_evaluations',[])]]
+            schema['$defs']['EvidenceRef']['properties']['artifact_id']['enum']=[r['artifact_id'] for r in readable_results(s)]
             native[2].tool_spec={**native[2].tool_spec,'inputSchema':{'json':schema}}
             retrieval=agent.tool_registry.registry.get('retrieve_context')
             if retrieval:

@@ -234,6 +234,32 @@ class CoreTests(TestCase):
         self.assertEqual(record['measured_state'],[0.,0.]);self.assertIsNone(record['initialization'])
 
 
+    def test_summary_public_snapshot_reuse_and_protected_read(self):
+        from tools import research_core_rl as bridge
+        h=self.host;original=deepcopy(core.state(h))
+        summary=dict(run_id='fixture',status='failed',checkpoint=None,consumed={'attempted_actions':0},observed_at_unix=1)
+        entry=dict(status={'worker_alive':False,'consumed':{'attempted_actions':0}},allocation={'actions':512,'active_seconds':10},evaluations=0,replays=0)
+        spec=deepcopy(original['spec']);spec['capabilities']=['rl'];spec['rl_limits']={'evaluation_episodes':5}
+        core.update(h,spec=spec,rl_task=core.save(h,original['base_configuration']['task']),rl_runs={'fixture':entry},rl_training_summaries=[],rl_evidence_reads=[])
+        try:
+            with patch.object(core,'guard'),patch.object(bridge,'reconcile',return_value=dict(entry['status'],training_summary=summary)):
+                a=bridge.dispatch(h,dict(operation='status',run_id='fixture',rationale='read failure'),'summary-a')
+                summary['observed_at_unix']=2
+                b=bridge.dispatch(h,dict(operation='status',run_id='fixture',rationale='read failure'),'summary-b')
+            ref=a['training_summary_reference'];self.assertEqual(ref,b['training_summary_reference'])
+            with patch.object(h.store,'remaining',return_value={'remaining':{'model_calls':4}}):
+                self.assertEqual(core.read_evidence(h,dict(reference=ref))['consumed'],{'attempted_actions':0})
+                with self.assertRaisesRegex(ValueError,'PROTECTED'):core.read_evidence(h,dict(reference=original['reference_candidate']))
+            self.assertIn(ref,core.readable_results(core.state(h)))
+            self.assertIn(ref,core.state(h)['rl_evidence_reads'])
+            self.assertEqual(bridge.packet(h)['training_summaries'][0]['reference'],ref)
+            spec=deepcopy(original['spec']);spec['capabilities']=['rl'];core.update(h,spec=spec)
+            plan=dict(action='stop',next_step='diagnose',supporting_evidence=[ref],**{k:'No checkpoint; failure evidence supports diagnosis' for k in ('hypothesis','expected_observation','weakening_observation','fixed_conditions','stopping_condition','interpretation')})
+            with patch.object(core,'guard'):
+                self.assertTrue(core.dispatch(h,plan,'summary-stop')['result']['accepted_stop'])
+        finally:core.update(h,**original)
+
+
 class RLIntegrationTests(TestCase):
     def test_bridge_reconciliation_is_idempotent(self):
         from tools import research_core_rl as bridge
@@ -406,6 +432,9 @@ class FormalControlTests(TestCase):
             request=dict(operation='start',candidate=s['reference_candidate'],mode='direct',allocation=dict(actions=200192,active_seconds=800),rationale='exceeds authorized per-trial ceiling')
             with patch.object(core,'guard'),patch.object(bridge,'invoke',side_effect=AssertionError('must not launch')):
                 with self.assertRaisesRegex(ValueError,'per-trial'):bridge.dispatch(h,request,'over-cap')
+            aligned,unused=bridge.prepare_input(h,RLRequest(operation='start',candidate=s['reference_candidate'],mode='direct',allocation=dict(actions=200000,active_seconds=800),rationale='round down within ceiling'))
+            self.assertEqual(aligned['budget']['actions'],199936)
+            self.assertEqual(aligned['requested_allocation']['actions'],200000)
             self.assertEqual(core.state(h)['rl_runs'],{})
             import gc;gc.collect()
 
@@ -456,6 +485,7 @@ class FormalControlTests(TestCase):
             binding['policy_sha256']=hashlib.sha256(policy.read_bytes()).hexdigest()
             core.atomic_json(policy.with_name('metadata.json'),dict(config_sha256=binding['config_sha256'],policy_file_sha256=binding['policy_sha256'],inherited={'num_timesteps':512}))
             core.atomic_json(directory/'config.json',cfg);core.atomic_json(directory/'checkpoint.json',dict(current=binding['checkpoint']))
+            core.atomic_json(directory/'state.json',dict(status='completed',consumed={'attempted_actions':512},workers=[]))
             oldentry=dict(candidate=s['reference_candidate'],task=task,configuration=core.save(h,cfg),status=dict(worker_alive=False,status='completed',consumed={'attempted_actions':512}),allocation=cfg['budget'],evaluations=1,replays=0)
             sealed=dict(research_status='stopped',rl_runs={binding['run_id']:oldentry},rl_evaluations=[])
             old=SimpleNamespace(session=lambda _: {'state':sealed},artifact=h.store.artifact)

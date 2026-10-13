@@ -79,7 +79,9 @@ def prepare_input(host, request):
     task_ref=core.state(host)['rl_task']
     if request.task is not None and plain(request.task)!=task_ref: raise ValueError('Owned frozen study task required')
     if task!=host.store.artifact(task_ref): raise ValueError('Candidate changed frozen study task')
-    if cfg['budget']['actions']%cfg['ppo']['n_steps'] or cfg['budget']['actions']<2*cfg['ppo']['n_steps']:
+    cfg['requested_allocation']=plain(request.allocation)
+    cfg['budget']['actions']=(cfg['budget']['actions']//cfg['ppo']['n_steps'])*cfg['ppo']['n_steps']
+    if cfg['budget']['actions']<2*cfg['ppo']['n_steps']:
         raise ValueError('Allocation must align with rollouts and permit at least two complete optimizations')
     return run.resolve_config(cfg),task_ref
 
@@ -176,13 +178,26 @@ def dispatch(host, value, request_id, selected=None):
         if q.operation=='start':
             run_id=host.run_id+'-'+row['execution_id'][:8]
             entry=dict(candidate=plain(q.candidate),task=task_ref,configuration=core.save(host,config,'rl_frozen_input'),
-                allocation=plain(q.allocation),mathematical_handoffs=[r for r in s.get('handoffs',[]) if host.store.artifact(r)['candidate']==plain(q.candidate)],request_identity=key,active_reservation=plain(q.allocation),evaluations=0,replays=0)
+                allocation=config['budget'],mathematical_handoffs=[r for r in s.get('handoffs',[]) if host.store.artifact(r)['candidate']==plain(q.candidate)],request_identity=key,active_reservation=plain(q.allocation),evaluations=0,replays=0)
             runs=core.state(host).get('rl_runs',{}); runs[run_id]=entry; core.update(host,rl_runs=runs)
             path=host.store.root/'rl_inputs'/('config-'+row['execution_id']+'.json');run.write_json(path,config)
             result=invoke('start',run_id,'--config',path,deadline=s['cutoff_unix'])
-            result.update(effective_configuration=entry['configuration'],requested_overrides=config['requested_overrides'])
+            result.update(effective_configuration=entry['configuration'],requested_overrides=config['requested_overrides'],
+                requested_allocation=plain(q.allocation),effective_allocation=config['budget'])
         elif q.operation in ('status','stop','resume'):
-            if q.operation=='status': result=reconcile(host,q.run_id)
+            if q.operation=='status':
+                result=dict(reconcile(host,q.run_id))
+                entry=core.state(host)['rl_runs'][q.run_id]
+                summary=result.get('training_summary') or run.training_summary(run.run_path(q.run_id))
+                summary=dict(summary, source_study=entry.get('source_study',host.run_id),newly_incurred=not bool(entry.get('source_study')))
+                previous=entry.get('training_summary')
+                if previous and {k:v for k,v in host.store.artifact(previous).items() if k!='observed_at_unix'}=={k:v for k,v in summary.items() if k!='observed_at_unix'}:
+                    reference=previous
+                else: reference=core.save(host,summary,'rl_training_summary')
+                runs=core.state(host)['rl_runs'];runs[q.run_id]['training_summary']=reference
+                refs=core.state(host).get('rl_training_summaries',[])
+                core.update(host,rl_runs=runs,rl_training_summaries=refs if reference in refs else [*refs,reference])
+                result.update(training_summary=summary,training_summary_reference=reference)
             else: result=invoke(q.operation,q.run_id,deadline=s['cutoff_unix'])
         elif q.operation=='diagnose' and not q.failure:
             directory=run.run_path(q.run_id)
@@ -225,11 +240,11 @@ def dispatch(host, value, request_id, selected=None):
                     if sum(e[counter] for e in runs.values())>=limit: raise ValueError('Cumulative '+counter+' ceiling exhausted')
                     runs[run_id][counter]+=1;host.store.update_state(db,host.run_id,st)
             evaluation_dispatched=q.operation=='evaluate'
-            result=invoke(q.operation,run_id,*arguments,'--output',output,deadline=s['cutoff_unix'],timeout_s=s['spec'].get('rl_evaluation_allowance_s',150.))
+            result=invoke(q.operation,run_id,*arguments,'--output',output,deadline=s['cutoff_unix'],timeout_s=s['spec'].get('rl_diagnostic_allowance_s',60.) if q.operation=='diagnose' else s['spec'].get('rl_evaluation_allowance_s',150.))
             if source: result.update(source_study=source['study_id'],evaluation_owner=host.run_id)
             result.update(study=host.run_id,candidate=entry['candidate'],task=entry['task'],run_id=run_id,configuration=entry['configuration'],independent_evaluation_executed=q.operation=='evaluate')
             if q.operation=='evaluate':
-                result.update(checkpoint=generation,policy_sha256=policy_sha,role='confirmation' if selected is not None else 'development',selected_execution=plain(selected))
+                result.update(checkpoint=generation,checkpoint_training_step=run.read_json(policy.with_name('metadata.json')).get('inherited',{}).get('num_timesteps'),policy_sha256=policy_sha,role='confirmation' if selected is not None else 'development',selected_execution=plain(selected))
             reference=core.save(host,result,'rl_'+q.operation+'_evidence')
             if q.operation=='evaluate': core.update(host,rl_evaluations=[*core.state(host).get('rl_evaluations',[]),reference])
             result=dict(reference=reference,**result)
@@ -287,6 +302,7 @@ def packet(host):
         modes=['direct','residual'],compatible_references=compatible_references(host),
         structural_coordinate='d in [-1,1]: lengths [.16+.0055*d,.11-.0055*d] m',
         defaults=run.read_json(Path(run.__file__).with_name('config.json'))),
+        training_summaries=[dict(run_id=r,reference=e['training_summary'],evaluations=[v for v in s.get('rl_evaluations',[]) if host.store.artifact(v).get('run_id')==r]) for r,e in s.get('rl_runs',{}).items() if e.get('training_summary')],
         runs=s.get('rl_runs',{}),source_summary=s.get('rl_source_summary'),evaluations=[dict(reference=r,**host.store.artifact(r)) for r in s.get('rl_evaluations',[])],
         costs='RL active time/evaluation costs separate from provider wall time; elapsed study time uses one wall clock',
         live_elapsed_s=max(0,s.get('closed_unix',time.time())-s['started_unix']))

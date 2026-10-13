@@ -75,6 +75,40 @@ class RuntimeTests(unittest.TestCase):
         run.write_json(self.directory / "state.json", value)
         return value
 
+    def test_training_summary_cost_learning_and_lag_are_separate(self):
+        value=self.state();value['consumed'].update(failed_episodes=22,complete_episodes=15)
+        generation=train.publish_checkpoint(self.directory,FakeModel(),self.config,{'active_seconds':9})
+        value['workers']=[{'token':'old','before':{'num_timesteps':0},'after':{'num_timesteps':1024}},
+                          {'token':'dead','before':{'num_timesteps':512},'after':{'num_timesteps':1024}}]
+        for token in ('old','dead'):
+            folder=self.directory/token;folder.mkdir()
+            (folder/'progress.csv').write_text('time/total_timesteps,train/approx_kl\n512,\n896,0.2\n1024,',encoding='utf-8')
+        summary=run.training_summary(self.directory,value)
+        self.assertEqual(summary['consumed'],value['consumed'])
+        self.assertEqual(summary['checkpoint']['generation'],generation)
+        self.assertEqual(summary['checkpoint']['inherited']['rollout_optimizations'],4)
+        self.assertEqual(summary['checkpoint']['consumed']['active_seconds'],9)
+        self.assertEqual(summary['episode_failure_fraction']['denominator'],37)
+        self.assertEqual(summary['episode_failure_fraction']['numerator'],22)
+        self.assertEqual(len(summary['workers']),2)
+        for worker in summary['workers']:
+            self.assertEqual(worker['latest']['train/approx_kl']['logged_step'],896)
+            self.assertEqual(worker['incomplete_tail_rows'],1)
+            self.assertIn('train/value_loss',worker['not_recorded'])
+        self.assertNotIn('passed',summary)
+        (self.directory/'dead'/'progress.csv').write_text('time/total_timesteps,train/approx_kl\n896,broken\n',encoding='utf-8')
+        with self.assertRaises(ValueError):run.training_summary(self.directory,value)
+
+    def test_summary_repeated_status_charges_dead_worker_once(self):
+        value=self.state();value['reservation']={'attempted_actions':128,'active_seconds':2}
+        run.write_json(self.directory/'state.json',value)
+        with patch.object(run,'run_path',return_value=self.directory),patch.object(run,'worker_alive',return_value=False):
+            first=run.status('fixture');second=run.status('fixture')
+        self.assertEqual(first['consumed'],second['consumed'])
+        self.assertEqual(second['training_summary']['consumed']['attempted_actions'],1152)
+        self.assertTrue(second['training_summary']['consumption_uncertain'])
+        self.assertIsNone(second['training_summary']['checkpoint'])
+
     def test_checkpoint_publication_failure_keeps_previous_generation(self):
         model = FakeModel()
         first = train.publish_checkpoint(self.directory, model, self.config, {})

@@ -1,5 +1,7 @@
 """Public RL functions and CLI, without agent runtime or model services."""
 import argparse
+import csv
+from collections import deque
 from contextlib import contextmanager
 import ctypes
 import json
@@ -132,6 +134,80 @@ def reconcile(directory):
     return state
 
 
+def training_summary(directory, state=None):
+    """Read recorded facts only; no policy imports, simulator or cost aggregation."""
+    directory = Path(directory)
+    state = state if state is not None else read_json(directory / 'state.json')
+    config = read_json(directory / 'config.json')
+    sources = [directory / name for name in ('state.json', 'config.json')]
+    checkpoint = None
+    pointer = directory / 'checkpoint.json'
+    if pointer.exists():
+        sources.append(pointer)
+        generation = read_json(pointer).get('current')
+        if generation:
+            if Path(generation).name != generation: raise ValueError('Invalid published generation')
+            path = directory / 'checkpoints' / generation / 'metadata.json'
+            sources.append(path)
+            checkpoint = dict(generation=generation, policy_present=path.with_name('policy.zip').is_file(), **read_json(path))
+    metrics = ['train/' + name for name in ('learning_rate', 'approx_kl', 'clip_fraction', 'entropy_loss',
+               'policy_gradient_loss', 'value_loss', 'explained_variance')] + ['rollout/ep_rew_mean']
+    workers = []
+    records = {w['token']: w for w in state.get('workers', [])}
+    tokens = list(records)
+    if state.get('worker_token') and state['worker_token'] not in tokens: tokens.append(state['worker_token'])
+    for token in tokens:
+        path = directory / token / 'progress.csv'
+        recent, first, latest, rows, incomplete = deque(maxlen=5), {}, {}, 0, 0
+        if path.exists():
+            sources.append(path)
+            lines = path.read_text(encoding='utf-8').splitlines(keepends=True)
+            if lines and not lines[-1].endswith('\n'):
+                lines.pop(); incomplete += 1
+            for row in csv.DictReader(lines, strict=True):
+                if None in row or any(v is None for v in row.values()):
+                    raise ValueError('Malformed progress.csv row: ' + str(path))
+                step = float(row['time/total_timesteps'])
+                if not math.isfinite(step): raise ValueError('Nonfinite logged step')
+                values = {k: float(row[k]) for k in metrics if row.get(k) not in (None, '')}
+                if any(not math.isfinite(v) for v in values.values()): raise ValueError('Nonfinite logged metric')
+                record = dict(logged_step=step, metrics=values)
+                for key, value in values.items():
+                    first.setdefault(key, dict(logged_step=step, value=value))
+                    latest[key] = dict(logged_step=step, value=value)
+                rows += 1; recent.append(record)
+        worker = records.get(token, {})
+        workers.append(dict(token=token, current_worker=token == state.get('worker_token'),
+            before_step=worker.get('before', {}).get('num_timesteps'),
+            after_step=worker.get('after', {}).get('num_timesteps'), attempted_actions=worker.get('attempted_actions'),
+            source=str(path.relative_to(directory)), available_rows=rows, incomplete_tail_rows=incomplete,
+            first=first, latest=latest, recent=list(recent), not_recorded=[k for k in metrics if k not in latest]))
+    failures = sorted((directory / 'failures').glob('**/failure_episode_*.json'), key=lambda p: p.stat().st_mtime)
+    failure_index = []
+    for path in failures[-5:]:
+        sources.append(path)
+        value = read_json(path)
+        failure_index.append(dict(source=str(path.relative_to(directory)),
+            **{k: value.get(k) for k in ('episode_number', 'cumulative_action', 'episode_action', 'failed_substep', 'warnings', 'pre_step_time_s')}))
+    cost = state['consumed']
+    failed, complete = cost.get('failed_episodes'), cost.get('complete_episodes')
+    ended = None if failed is None or complete is None else failed + complete
+    candidate = config.get('candidate', {})
+    return dict(run_id=directory.name, candidate={k: candidate.get(k) for k in ('identity', 'reference', 'provenance')},
+        task_identity=candidate.get('task_identity'), task=config.get('task'), scope='Recorded training evidence; task acceptance requires independent evaluation',
+        mode=config['mode'], ppo=state.get('effective_ppo', config['ppo']), reward=config['reward'], allocation=config['budget'],
+        status=state['status'], stop_reason=state.get('stop_reason'), error=state.get('error'),
+        recorded_failure_stage=state.get('failure_stage'), last_known_stage=state.get('last_known_stage', state.get('failure_stage')),
+        consumed=cost, reservation=state.get('reservation', {}), consumption_uncertain=state.get('consumption_uncertain', False),
+        known_consumption_lower_bound=state.get('known_consumption_lower_bound'),
+        episode_failure_fraction=dict(numerator=failed, denominator=ended, value=failed / ended if ended else None),
+        checkpoint=checkpoint, workers=workers, failure_index=dict(recorded_files=len(failures), recent=failure_index),
+        sources=[str(p.relative_to(directory)) for p in sources], observed_at_unix=time.time(),
+        coverage='CSV may lag checkpoint optimizations; worker step ranges can overlap. Missing metrics are not recorded. '
+                 'Physical steps are attempted, not verified completed substeps. Complete episodes are not task passes; '
+                 'reward is training-only and cannot be compared across different weights. Historical stage labels are preserved.')
+
+
 def status(run_id):
     directory = run_path(run_id)
     with locked(directory):
@@ -140,6 +216,7 @@ def status(run_id):
     result = dict(state, run_id=run_id, artifacts=str(directory), worker_alive=worker_alive(directory))
     result["remaining"] = {"actions": max(0, config["budget"]["actions"] - state["consumed"]["attempted_actions"]),
                            "active_seconds": max(0, config["budget"]["active_seconds"] - state["consumed"]["active_seconds"])}
+    result['training_summary'] = training_summary(directory, state)
     return result
 
 
