@@ -29,6 +29,9 @@ def eligibility(host, reference):
 def facts(host):
     from tools.research_core import state
     s = state(host)
+    if s['spec'].get('mode')=='rl_interface':
+        return dict(owning_study=host.run_id,rl_runs=s.get('rl_runs',{}),rl_evaluations=s.get('rl_evaluations',[]),
+            frozen_task=s.get('rl_task'),closeout='Explicit evaluation evidence read and cited next-step decision; no second trial')
     return dict(owning_study=host.run_id,
         identity_rules=dict(candidate='immutable full configuration; may be shared by identical constructions',
             execution='fresh independent launch with separate execution_id and owner_run_id',

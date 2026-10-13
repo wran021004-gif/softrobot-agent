@@ -231,3 +231,63 @@ class CoreTests(TestCase):
         record=controller.observations[0]['failed_update_input_record']
         self.assertEqual(record['previous_applied_input_n'],[.2]*6)
         self.assertEqual(record['measured_state'],[0.,0.]);self.assertIsNone(record['initialization'])
+
+
+class RLIntegrationTests(TestCase):
+    def test_bridge_reconciliation_is_idempotent(self):
+        from tools import research_core_rl as bridge
+        class Store:
+            def __init__(self):self.state={'rl_runs':{'r':{'allocation':{'actions':64,'active_seconds':10}}}}
+            def transaction(self):
+                from contextlib import nullcontext
+                return nullcontext(None)
+            def session(self,*args):return {'state':self.state}
+            def update_state(self,db,run_id,state):self.state=state
+        store=Store();host=__import__("types").SimpleNamespace(store=store,run_id='study')
+        value=dict(consumed={'attempted_actions':32,'attempted_physics_steps':151,'active_seconds':3},worker_alive=True)
+        with patch.object(bridge.run,'status',return_value=value):
+            bridge.reconcile(host,'r');bridge.reconcile(host,'r')
+        self.assertEqual(store.state['rl_runs']['r']['status']['consumed']['attempted_actions'],32)
+        self.assertIsNotNone(store.state['rl_runs']['r']['active_reservation'])
+
+
+    def test_owned_generated_candidate_frozen_task_overrides_and_duplicate_receipt(self):
+        from schemas.research_core import RLRequest
+        from tools import research_core_rl as bridge
+        from uuid import uuid4
+        with TemporaryDirectory(dir=core.ROOT/'runs',prefix='rl-fixtures-') as folder:
+            spec=read(core.ROOT/'examples/rl_strands/specification.json')
+            spec['study_id']='rl-fixture-'+uuid4().hex[:8]
+            spec['started_unix']=time.time()
+            path=core.Path(folder)/'spec.json';core.atomic_json(path,spec)
+            h=core.prepare(path,core.Path(folder)/'business')
+            ref=core.construct(h,dict(d=.7),dict(origin='fixture'))
+            q=RLRequest(operation='start',candidate=ref,mode='direct',rationale='fixture',
+                training_overrides=dict(n_steps=32,batch_size=16,n_epochs=2),reward_overrides=dict(smoothness=.01),
+                allocation=dict(actions=64,active_seconds=10))
+            cfg,task_ref=bridge.prepare_input(h,q)
+            core.atomic_json(core.Path(folder)/'input.json',cfg)
+            import subprocess,os
+            env=os.environ.copy();env.update(OPENBLAS_NUM_THREADS='1',OMP_NUM_THREADS='1',MKL_NUM_THREADS='1')
+            code="from tools.rl.run import read_json; from tools.rl.env import TensionEnv; import sys; e=TensionEnv(read_json(sys.argv[1])); print(e.settings()['action_dimension']); e.reset(); e.close()"
+            completed=subprocess.run([str(bridge.run.PYTHON),'-c',code,str(core.Path(folder)/'input.json')],cwd=core.ROOT,env=env,capture_output=True,text=True)
+            self.assertEqual(completed.returncode,0,completed.stderr)
+            self.assertEqual(completed.stdout.strip(),'6')
+            self.assertEqual(cfg['candidate']['reference'],ref)
+            self.assertIn('near_cell_0_y',cfg['control_object']['joint_names'])
+            self.assertEqual(cfg['task']['acceptance']['holding_steps'],list(range(30,36)))
+            self.assertEqual(cfg['ppo']['n_steps'],32);self.assertEqual(cfg['reward']['smoothness'],.01)
+            self.assertEqual(h.store.artifact(task_ref),cfg['task']['original'])
+            with patch.object(core,'guard'),patch.object(bridge,'invoke',return_value=dict(status='starting')) as invoke:
+                first=bridge.dispatch(h,q.model_dump(exclude_unset=True),'fixture-start')
+                second=bridge.dispatch(h,q.model_dump(exclude_unset=True),'fixture-start')
+                self.assertEqual(first,second);invoke.assert_called_once()
+                self.assertEqual(h.store.remaining()['used']['backend_solves'],1)
+                q=q.model_copy(update={'training_overrides':q.training_overrides.model_copy(update={'n_epochs':3})})
+                with self.assertRaisesRegex(ValueError,'ceiling'):bridge.dispatch(h,q.model_dump(exclude_unset=True),'different-start')
+            self.assertEqual(len(core.state(h)['rl_runs']),1)
+            core.update(h,rl_evaluations=[core.save(h,{'passed':False})])
+            self.assertFalse(core.claims(h)['task_passed'])
+            self.assertIn('evaluations',core.packet(h)['rl'])
+            import gc
+            gc.collect()

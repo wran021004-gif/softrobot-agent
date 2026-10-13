@@ -92,6 +92,8 @@ def resolve_config(config=None):
     resolved = copy.deepcopy(config) if isinstance(config, dict) else read_json(config or Path(__file__).with_name("config.json"))
     if resolved["mode"] not in ("direct", "residual"):
         raise ValueError("Only direct and residual tension control are supported")
+    if not resolved.get('candidate') or not resolved.get('control_object') or not resolved.get('task'):
+        raise ValueError('Explicit candidate XML/assets, control_object and frozen task required; no historical fallback')
     budget = resolved["budget"]
     if (type(budget["actions"]) is not int or budget["actions"] <= 0
             or not math.isfinite(budget["active_seconds"]) or budget["active_seconds"] <= 0):
@@ -177,9 +179,54 @@ def launch(directory, state, interpreter):
     return dict(run_id=directory.name, status="starting", pid=process.pid, artifacts=str(directory))
 
 
+def merge_overrides(training=None, reward=None):
+    """Single owner for public override validation and default resolution."""
+    import copy
+    defaults=read_json(Path(__file__).with_name('config.json'))
+    training, reward = training or {}, reward or {}
+    supported=set(defaults['ppo'])-{'device','verbose','use_sde','sde_sample_freq'}
+    if set(training)-supported or set(reward)-set(defaults['reward']):
+        raise ValueError('Unknown or unsupported PPO/reward override')
+    result=copy.deepcopy(defaults)
+    result['ppo'].update(training); result['reward'].update(reward)
+    p=result['ppo']
+    for key in ('n_steps','batch_size','n_epochs'):
+        if type(p[key]) is not int or p[key]<1: raise ValueError('Positive integer PPO '+key+' required')
+    if p['n_steps']<2 or p['batch_size']<2 or p['batch_size']>p['n_steps'] or p['n_steps']%p['batch_size']:
+        raise ValueError('PPO minibatches must divide single-environment rollout')
+    for key in ('gamma','gae_lambda'):
+        if not isinstance(p[key],(int,float)) or not math.isfinite(p[key]) or not 0<=p[key]<=1:
+            raise ValueError('PPO '+key+' must be in [0,1]')
+    for key in ('learning_rate','clip_range','clip_range_vf','ent_coef','vf_coef','max_grad_norm','target_kl'):
+        v=p[key]
+        if v is None and key in ('clip_range_vf','target_kl'): continue
+        if isinstance(v,dict) and key in ('learning_rate','clip_range','clip_range_vf'):
+            if set(v)!={'kind','initial','final'} or v['kind']!='linear': raise ValueError('Invalid linear schedule')
+            values=[v['initial'],v['final']]
+        else: values=[v]
+        if any(not isinstance(x,(float,int)) or not math.isfinite(x) or x<0 for x in values):
+            raise ValueError('Invalid PPO '+key)
+    if type(p['normalize_advantage']) is not bool: raise ValueError('normalize_advantage must be boolean')
+    kwargs=p['policy_kwargs']
+    if set(kwargs)-{'net_arch','log_std_init'}: raise ValueError('Unsupported policy_kwargs')
+    arch=kwargs.get('net_arch',{})
+    if set(arch)!={'pi','vf'} or any(not isinstance(v,list) or not v or any(type(n)is not int or not 1<=n<=256 for n in v) for v in arch.values()):
+        raise ValueError('policy net_arch requires bounded pi/vf layer widths')
+    if not math.isfinite(kwargs.get('log_std_init',0)): raise ValueError('Invalid log_std_init')
+    for key,v in result['reward'].items():
+        if not isinstance(v,(int,float)) or not math.isfinite(v) or (v>0 if key=='failure_penalty' else v<0):
+            raise ValueError('Invalid reward weight '+key)
+    result['requested_overrides']=dict(training=training,reward=reward)
+    return result
+
+
 def start(config=None, run_id=None, interpreter=PYTHON):
     resolved = resolve_config(config)
     directory = run_path(run_id or uuid.uuid4().hex)
+    if directory.exists(): raise FileExistsError('Run already exists; use recorded receipt/status')
+    from tools.rl.env import TensionEnv
+    env=TensionEnv(resolved)
+    env.close()  # Compile and validate; zero physical steps, before worker launch.
     directory.mkdir(parents=True, exist_ok=False)
     write_json(directory / "config.json", resolved)
     state = dict(status="stopped", worker_token=None, consumed=dict(attempted_actions=0, completed_actions=0,

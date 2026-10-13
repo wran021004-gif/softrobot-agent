@@ -100,7 +100,7 @@ class LiveBoundary(httpx.AsyncBaseTransport):
             raw_request=store.put(db,wire)
         key='r3-request-'+uuid4().hex
         try:
-            row,_=store.reserve(run,key,digest(wire),CALLER,{**zero(),'model_calls':1,'wall_s':600.},
+            row,_=store.reserve(run,key,digest(wire),CALLER,{**zero(),'model_calls':1,'wall_s':min(600., max(0.,pilot(host)['request_deadline_unix']-time.time()), store.remaining()['remaining']['wall_s']) if pilot(host).get('bounded_request_reservation') else 600.},
                 resources=['provider_request'],inputs=[raw_request],kind='r3_model',guard=guard)
         except ValueError as exc:
             record(host,'r3_send_rejected',dict(request=plain(raw_request),sent=False,reason=str(exc)),status='blocked')

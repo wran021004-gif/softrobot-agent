@@ -44,6 +44,7 @@ class LocalDiagnostic(Contract):
 
 class Plan(Contract):
     action: Literal['propose', 'execute', 'search', 'mechanics', 'replay', 'diagnose', 'confirm', 'stop']
+    next_step: Literal['adjust_training','revise_design','diagnose','stop'] | None = None
     hypothesis: str = Field(min_length=1)
     supporting_evidence: list[EvidenceRef] = Field(default_factory=list)
     expected_observation: str = Field(min_length=1)
@@ -91,3 +92,71 @@ class ExperienceQuery(Contract):
 class EvidenceQuery(Contract):
     reference: EvidenceRef
     pointer: str = ''
+
+
+class PPOOverrides(Contract):
+    learning_rate: FiniteFloat | dict = Field(default=.0003)
+    n_steps: int = Field(default=256,ge=2,le=1024,strict=True)
+    batch_size: int = Field(default=64,ge=2,le=1024,strict=True)
+    n_epochs: int = Field(default=10,ge=1,le=20,strict=True)
+    gamma: FiniteFloat = Field(default=.99,ge=0,le=1)
+    gae_lambda: FiniteFloat = Field(default=.95,ge=0,le=1)
+    clip_range: FiniteFloat | dict = .2
+    clip_range_vf: FiniteFloat | dict | None = None
+    normalize_advantage: bool = True
+    ent_coef: FiniteFloat = Field(default=0,ge=0)
+    vf_coef: FiniteFloat = Field(default=.5,ge=0)
+    max_grad_norm: FiniteFloat = Field(default=.5,gt=0)
+    target_kl: FiniteFloat | None = Field(default=None,gt=0)
+    policy_kwargs: dict = Field(default_factory=dict)
+
+
+class RewardOverrides(Contract):
+    position: FiniteFloat = Field(default=1,ge=0)
+    holding_speed: FiniteFloat = Field(default=1,ge=0)
+    smoothness: FiniteFloat = Field(default=.001,ge=0)
+    failure_penalty: FiniteFloat = Field(default=-10000,le=0)
+
+
+class RLAllocation(Contract):
+    actions: int = Field(ge=1,le=2048,strict=True)
+    active_seconds: FiniteFloat = Field(gt=0,le=120)
+
+
+class RLReference(Contract):
+    path: str
+    sha256: str
+    candidate_identity: str
+    task_identity: str
+    tendon_order: list[str]
+    control_period_s: FiniteFloat = Field(gt=0)
+
+
+class RLRequest(Contract):
+    operation: Literal['start','status','stop','resume','evaluate','diagnose']
+    candidate: EvidenceRef | None = None
+    task: EvidenceRef | None = None
+    mode: Literal['direct','residual'] | None = None
+    reference: RLReference | None = None
+    training_overrides: PPOOverrides = Field(default_factory=PPOOverrides)
+    reward_overrides: RewardOverrides = Field(default_factory=RewardOverrides)
+    allocation: RLAllocation | None = None
+    rationale: str = Field(min_length=1)
+    run_id: str | None = None
+    checkpoint: str | None = None
+    failure: str | None = None
+    replay: bool = False
+
+    @model_validator(mode='after')
+    def operation_contract(self):
+        if self.operation=='start':
+            if self.candidate is None or self.mode is None or self.allocation is None or self.run_id:
+                raise ValueError('START_REQUIRES_CANDIDATE_MODE_ALLOCATION')
+            if (self.mode=='residual')!=(self.reference is not None): raise ValueError('RESIDUAL_REQUIRES_REFERENCE_DIRECT_REQUIRES_NONE')
+        else:
+            if not self.run_id: raise ValueError('RECORDED_RUN_ID_REQUIRED')
+            if self.candidate or self.task or self.mode or self.reference or self.allocation or self.training_overrides.model_fields_set or self.reward_overrides.model_fields_set:
+                raise ValueError('SUBSEQUENT_OPERATIONS_RETAIN_FROZEN_CONFIGURATION')
+        if self.checkpoint and self.operation!='evaluate': raise ValueError('CHECKPOINT_ONLY_FOR_EVALUATE')
+        if (self.failure or self.replay) and self.operation!='diagnose': raise ValueError('FAILURE_REPLAY_ONLY_FOR_DIAGNOSE')
+        return self

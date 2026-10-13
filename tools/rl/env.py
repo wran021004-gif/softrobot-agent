@@ -1,51 +1,13 @@
-"""Fixed fc1012 task: physical observations, direct or residual tension actions."""
-from contextlib import closing
+"""Candidate-selected physical observations and ideal-tension actions."""
 import hashlib
 import json
 from pathlib import Path
-import sqlite3
-import tarfile
 
 import gymnasium as gym
 import mujoco
 import numpy as np
 
 ROOT = Path(__file__).resolve().parents[2]
-DEFAULT_SOURCE_ROOT = Path(r"D:\softrobot-agent\.worktrees\mechanics-control-mainline")
-XML_ID = "60c5e069f76253e05d9b0aa2cd873abda87abecb84b6d0814c30f4e0052a88de"
-EXECUTION_ID = "6380ef76518b4c24a6bf459942f72545"
-TENDONS = ["near_t0", "near_t1", "near_t2", "far_t0", "far_t1", "far_t2"]
-TARGET = np.array([0.29, 0.035, 0.19])
-LENGTHS = [0.15758113296570092, 0.11241886703429908]
-PHYSICS_DT, CONTROL_DT, SUBSTEPS, HORIZON = 0.0005, 0.01, 20, 35
-HOLD_STEPS = list(range(30, 36))
-MAX_TENSION, RESIDUAL_SCALE = 8.0, 8.0
-OBSERVATION_ORDER = ["qpos_rad (XML order)", "qvel_rad_s (XML order)",
-                     "(target-tip)/0.01", "world_tip_velocity/0.02",
-                     "previous_applied_tension/8", "control_step/35"]
-
-
-def load_xml(source_root):
-    """Read exactly one saved artifact; never rebuild or audit the archive."""
-    dbpath = source_root / "runs/fc1012/platform.sqlite"
-    if dbpath.exists():
-        with closing(sqlite3.connect(dbpath.as_uri() + "?mode=ro", uri=True)) as db:
-            row = db.execute("SELECT body FROM artifacts WHERE id=?", (XML_ID,)).fetchone()
-        if row is not None:
-            return row[0].decode("utf-8"), str(dbpath) + "#" + XML_ID
-    member = f"artifacts/{XML_ID}.bin"
-    archives = [source_root / "runs/fc1012/delivery_archive_reassembled.tar.gz",
-                source_root / "evidence/fixed_task_20261012/immutable_artifacts.tar.gz"]
-    for path in archives:
-        if path.exists():
-            with tarfile.open(path, "r|gz") as archive:
-                for entry in archive:
-                    if entry.name == member:
-                        return archive.extractfile(entry).read().decode("utf-8"), str(path) + "#" + member
-    raise FileNotFoundError(
-        f"Missing robot XML: {dbpath} (artifacts.id={XML_ID}); "
-        + "; ".join(f"{path}::{member}" for path in archives))
-
 
 STATE_SPEC = mujoco.mjtState.mjSTATE_INTEGRATION
 WARNINGS = (mujoco.mjtWarning.mjWARN_BADQPOS, mujoco.mjtWarning.mjWARN_BADQVEL,
@@ -65,67 +27,76 @@ class TensionEnv(gym.Env):
         self.mode = mode = config["mode"]
         if mode not in ("residual", "direct"):
             raise ValueError("Only direct and residual modes are supported")
-        self.residual_scale = float(config["action"]["residual_scale_n"])
-        self.source_root = Path(config["source_root"]).resolve()
-        self.saved = config["task"]
-        self.reward = config["reward"]
-        self.position_scale = config["observation"]["position_scale_m"]
-        self.speed_scale = config["observation"]["speed_scale_m_s"]
-        self.failure_penalty = self.reward["failure_penalty"]
-        physics_dt = config["physics"]["timestep_s"]
-        integrator = config["physics"]["integrator"]
-        expected = dict(source_physical_execution=EXECUTION_ID, lengths_m=LENGTHS,
-                        target_m=TARGET.tolist(), tendon_order=TENDONS,
-                        timestep_s=PHYSICS_DT, control_period_s=CONTROL_DT,
-                        command_intervals=HORIZON, duration_s=0.35)
-        if any(self.saved[key] != value for key, value in expected.items()):
-            raise ValueError("Resolved task differs from the supported physical contract")
-        if config["action"]["tendon_order"] != TENDONS or config["action"]["max_tension_n"] != MAX_TENSION:
-            raise ValueError("Unsupported action convention")
-        if config["observation"]["order"] != OBSERVATION_ORDER:
-            raise ValueError("Unsupported observation ordering")
-        if not all(np.isfinite(v) and v > 0 for v in (self.residual_scale, self.position_scale, self.speed_scale)):
-            raise ValueError("Action and observation scales must be positive and finite")
-        self.reference = None
-        if mode == "residual":
-            ref = config.get("reference")
-            if not ref:
-                raise ValueError("Residual requires a complete compatible tension reference")
-            path = Path(ref["path"])
-            if not path.is_absolute():
-                path = ROOT / path
-            if (ref["tendon_order"] != TENDONS or ref["control_period_s"] != CONTROL_DT
-                    or ref["source_physical_execution"] != EXECUTION_ID):
-                raise ValueError("Incompatible reference timing, order or source")
-            if ref.get("sha256") != hashlib.sha256(path.read_bytes()).hexdigest():
-                raise ValueError("Reference changed or lacks a resolved digest")
-            with np.load(path, allow_pickle=False) as refs:
-                self.reference = refs["saved_tensions_n"].copy()
-            if (self.reference.shape != (HORIZON, 6) or not np.isfinite(self.reference).all()
-                    or np.any((self.reference < 0) | (self.reference > MAX_TENSION))):
-                raise ValueError("Invalid complete tension reference")
-        xml, self.xml_source = load_xml(self.source_root)
-        self.model = m = mujoco.MjModel.from_xml_string(xml)
-        self.data = mujoco.MjData(m)
-        self.actuators = [m.actuator(t + "_direct_tension").id for t in TENDONS]
-        tendon_ids = [m.tendon(t).id for t in TENDONS]
-        a = self.actuators
-        if (m.opt.timestep != PHYSICS_DT or m.nu != 6 or m.nq != 48 or m.nv != 48
-                or a != self.saved["actuator_ids"]
-                or not np.all(m.actuator_trntype[a] == mujoco.mjtTrn.mjTRN_TENDON)
-                or m.actuator_trnid[a, 0].tolist() != tendon_ids
-                or not np.all(m.actuator_gainprm[a, 0] == -1)
-                or not np.all(m.actuator_ctrlrange[a] == [0, 8])
-                or not np.all(m.actuator_forcerange[a] == [-8, 0])):
-            raise ValueError("Saved XML actuator mapping, dimensions or timing differs")
-        if not np.isfinite(physics_dt) or physics_dt <= 0:
-            raise ValueError("physics_dt must be positive and finite")
-        self.substeps = round(CONTROL_DT / physics_dt)
-        if physics_dt <= 0 or abs(self.substeps * physics_dt - CONTROL_DT) > 1e-12:
-            raise ValueError("physics_dt must divide the control period")
-        m.opt.timestep = physics_dt  # loaded model copy only
-        m.opt.integrator = getattr(mujoco.mjtIntegrator, "mjINT_" + integrator.upper())
-        self.integrator = integrator
+        self.saved = config['task']
+        if self.saved['family'] != 'task.reach':
+            raise ValueError('Only reach-and-hold tasks are supported')
+        candidate=config.get('candidate')
+        control=config.get('control_object')
+        if not candidate or not control:
+            raise ValueError('Explicit candidate XML/assets and control_object required')
+        if control['semantics'] != 'ideal_tension':
+            raise ValueError('Unsupported length-servo control; ideal_tension required')
+        xml=candidate['xml']
+        if hashlib.sha256(xml.encode()).hexdigest()!=candidate['sha256']:
+            raise ValueError('Frozen candidate XML digest mismatch')
+        self.xml_source=candidate['identity']
+        import base64
+        assets={name:base64.b64decode(body) for name,body in candidate.get('assets',{}).items()}
+        self.model=m=mujoco.MjModel.from_xml_string(xml,assets=assets)
+        self.data=mujoco.MjData(m)
+        joints=[m.joint(name).id for name in control['joint_names']]
+        if not joints or len(set(joints))!=len(joints) or any(m.jnt_type[j]!=mujoco.mjtJoint.mjJNT_HINGE for j in joints):
+            raise ValueError('Only unique selected hinge robot joints are supported')
+        self.qpos_indices=m.jnt_qposadr[joints]
+        self.qvel_indices=m.jnt_dofadr[joints]
+        self.tendons=control['tendon_names']
+        self.actuators=a=[m.actuator(name).id for name in control['actuator_names']]
+        tendon_ids=[m.tendon(name).id for name in self.tendons]
+        self.channels=len(a)
+        if (not a or len(set(a))!=len(a) or len(set(tendon_ids))!=len(a)
+                or not np.all(m.actuator_trntype[a]==mujoco.mjtTrn.mjTRN_TENDON)
+                or m.actuator_trnid[a,0].tolist()!=tendon_ids
+                or not np.all(m.actuator_gaintype[a]==mujoco.mjtGain.mjGAIN_FIXED)
+                or not np.all(m.actuator_biastype[a]==mujoco.mjtBias.mjBIAS_NONE)
+                or not np.all(m.actuator_dyntype[a]==mujoco.mjtDyn.mjDYN_NONE)
+                or not np.all(m.actuator_gainprm[a,0]==-1)
+                or not np.all(m.actuator_gear[a,0]==1)
+                or not np.all(m.actuator_ctrllimited[a]) or not np.all(m.actuator_forcelimited[a])):
+            raise ValueError('Selected actuators do not implement Newton-valued ideal tension with negative force')
+        self.lower,self.upper=m.actuator_ctrlrange[a].T.copy()
+        if (not np.isfinite(m.actuator_ctrlrange[a]).all() or np.any(self.lower<0) or np.any(self.upper<=self.lower)
+                or not np.allclose(m.actuator_forcerange[a],np.stack((-self.upper,-self.lower),axis=1),rtol=0,atol=1e-12)):
+            raise ValueError('Tension control/force limits mismatch')
+        self.target=np.asarray(self.saved['target_m'],dtype=float)
+        self.control_dt=float(self.saved['control_period_s'])
+        self.horizon=int(self.saved['command_intervals'])
+        self.hold_steps=self.saved['acceptance']['holding_steps']
+        self.substeps=round(self.control_dt/m.opt.timestep)
+        if (self.substeps<1 or abs(self.substeps*m.opt.timestep-self.control_dt)>1e-12
+                or abs(self.horizon*self.control_dt-self.saved['duration_s'])>1e-12):
+            raise ValueError('Candidate physics timestep must exactly divide frozen task timing')
+        self.integrator=int(m.opt.integrator)
+        self.reward=config['reward']
+        self.position_scale=config['observation']['position_scale_m']
+        self.speed_scale=config['observation']['speed_scale_m_s']
+        self.failure_penalty=self.reward['failure_penalty']
+        self.residual_scale=np.broadcast_to(np.asarray(config['action']['residual_scale_n'],dtype=float),(self.channels,)).copy()
+        if not all(np.isfinite(v).all() and np.all(np.asarray(v)>0) for v in (self.residual_scale,self.position_scale,self.speed_scale)):
+            raise ValueError('Observation and residual scales must be finite and positive')
+        self.reference=None
+        if mode=='residual':
+            ref=config.get('reference')
+            if (not ref or ref['candidate_identity']!=candidate['identity'] or ref['task_identity']!=candidate['task_identity']
+                    or ref['tendon_order']!=self.tendons or ref['control_period_s']!=self.control_dt):
+                raise ValueError('Residual requires candidate/task/order/timing-compatible tension reference')
+            path=Path(ref['path'])
+            if hashlib.sha256(path.read_bytes()).hexdigest()!=ref['sha256']:
+                raise ValueError('Frozen reference digest mismatch')
+            with np.load(path,allow_pickle=False) as refs:
+                self.reference=refs['saved_tensions_n'].copy()
+            if (self.reference.shape!=(self.horizon,self.channels) or not np.isfinite(self.reference).all()
+                    or np.any(self.reference<self.lower) or np.any(self.reference>self.upper)):
+                raise ValueError('Invalid complete tension reference')
         if failure_mode not in ("raise", "terminal"):
             raise ValueError("failure_mode must be raise or terminal")
         self.failure_mode = failure_mode
@@ -134,30 +105,20 @@ class TensionEnv(gym.Env):
                            complete_episodes=0, failed_episodes=0)
         self.episode = 0
         self.failure = None
-        self.site = m.site("tip_site").id
+        self.site = m.site(control["tip_site"]).id
         self.jacobian = np.zeros((3, m.nv))
-        self.action_space = gym.spaces.Box(-1.0, 1.0, (6,), dtype=np.float32)
+        self.action_space = gym.spaces.Box(-1.0, 1.0, (self.channels,), dtype=np.float32)
         self.observation_space = gym.spaces.Box(
-            -np.inf, np.inf, (m.nq + m.nv + 13,), dtype=np.float32)
-        self.k = HORIZON  # reset is required before step
+            -np.inf, np.inf, (len(joints)*2 + 7 + self.channels,), dtype=np.float32)
+        self.k = self.horizon  # reset is required before step
 
     def settings(self):
-        return dict(
-            mode=self.mode, residual_scale_n=self.residual_scale,
-            target_m=TARGET.tolist(), lengths_m=LENGTHS, tendon_order=TENDONS,
-            physics_dt_s=float(self.model.opt.timestep), control_dt_s=CONTROL_DT, substeps=self.substeps,
-            integrator=self.integrator, numerical_version="pilot-v2-" + self.integrator + "-dt-" + str(self.model.opt.timestep),
-            horizon=HORIZON, holding_steps=HOLD_STEPS, max_tension_n=MAX_TENSION,
-            position_scale_m=self.position_scale, speed_scale_m_s=self.speed_scale,
-            reward={key: self.reward[key] for key in ("position", "holding_speed", "smoothness")},
-            observation=["qpos_rad (XML order)", "qvel_rad_s (XML order)",
-                         "(target-tip)/0.01", "world_tip_velocity/0.02",
-                         "previous_applied_tension/8", "control_step/35"],
-            action="direct: 4*(a+1); residual: clip(reference[k]+residual_scale_n*a,0,8)",
-            termination="terminated at action 35; numerical failure is an explicit absorbing training failure",
-            failure_penalty=self.failure_penalty,
-            source_root=str(self.source_root), xml_source=self.xml_source, xml_id=XML_ID,
-            reference=self.config.get("reference"))
+        return dict(mode=self.mode,candidate=self.config['candidate']['identity'],task=self.config['candidate']['task_identity'],
+            control_object=self.config['control_object'],tension_limits_n=np.stack((self.lower,self.upper),axis=1).tolist(),
+            residual_scale_n=self.residual_scale.tolist(),physics_dt_s=float(self.model.opt.timestep),
+            control_dt_s=self.control_dt,substeps=self.substeps,horizon=self.horizon,holding_steps=self.hold_steps,
+            observation_dimension=self.observation_space.shape[0],action_dimension=self.channels,
+            reward=self.reward,reference=self.config.get('reference'))
 
     def reset(self, *, seed=None, options=None):
         super().reset(seed=seed)
@@ -166,25 +127,27 @@ class TensionEnv(gym.Env):
                 ("qpos_rad", self.model.jnt_qposadr, self.data.qpos),
                 ("qvel_rad_s", self.model.jnt_dofadr, self.data.qvel)):
             for name, value in self.saved["initializer"][field].items():
+                if name not in self.config['control_object']['joint_names']:
+                    raise ValueError('Initializer names must belong to selected robot joints')
                 destination[address[self.model.joint(name).id]] = value
         self.k = 0
         self.needs_reset = False
         self.episode += 1
         self.episode_records = []
         self.failure = None
-        self.previous_tension = np.zeros(6)
-        self.command = np.zeros(6)
-        self.clipped = np.zeros(6, dtype=bool)
+        self.previous_tension = np.zeros(self.channels)
+        self.command = np.zeros(self.channels)
+        self.clipped = np.zeros(self.channels, dtype=bool)
         mujoco.mj_forward(self.model, self.data)
         return self._observe()
 
     def map_action(self, action):
         action = np.asarray(action, dtype=np.float64)
-        if action.shape != (6,) or not np.isfinite(action).all() or np.any(abs(action) > 1):
-            raise ValueError("Expected six finite actions in [-1, 1]")
-        raw = (4 * (action + 1) if self.mode == "direct"
+        if action.shape != (self.channels,) or not np.isfinite(action).all() or np.any(abs(action) > 1):
+            raise ValueError("Expected selected-channel finite actions in [-1, 1]")
+        raw = (self.lower + (self.upper-self.lower)*(action+1)/2 if self.mode == "direct"
                else self.reference[self.k] + self.residual_scale * action)
-        tension = np.clip(raw, 0, MAX_TENSION)
+        tension = np.clip(raw, self.lower, self.upper)
         return tension, raw != tension
 
     def _observe(self):
@@ -192,18 +155,18 @@ class TensionEnv(gym.Env):
         mujoco.mj_jacSite(self.model, self.data, self.jacobian, None, self.site)
         position = self.data.site_xpos[self.site].copy()
         velocity = self.jacobian @ self.data.qvel
-        error = TARGET - position
+        error = self.target - position
         observation = np.concatenate((
-            self.data.qpos, self.data.qvel, error / self.position_scale,
-            velocity / self.speed_scale, self.previous_tension / MAX_TENSION,
-            [self.k / HORIZON])).astype(np.float32)
-        info = dict(control_step=self.k, time_s=self.k * CONTROL_DT,
+            self.data.qpos[self.qpos_indices], self.data.qvel[self.qvel_indices], error / self.position_scale,
+            velocity / self.speed_scale, self.previous_tension / self.upper,
+            [self.k / self.horizon])).astype(np.float32)
+        info = dict(control_step=self.k, time_s=self.k * self.control_dt,
                     engine_time_s=float(self.data.time), tip_m=position,
                     tip_velocity_m_s=velocity, position_error_m=float(np.linalg.norm(error)),
                     speed_m_s=float(np.linalg.norm(velocity)),
                     applied_tension_n=self.previous_tension.copy(),
                     commanded_tension_n=self.command.copy(), clipped=self.clipped.copy(),
-                    saturated=(self.command == 0) | (self.command == MAX_TENSION))
+                    saturated=(self.command == self.lower) | (self.command == self.upper))
         return observation, info
 
     def get_state(self):
@@ -216,7 +179,9 @@ class TensionEnv(gym.Env):
         self.failure = dict(record, failed_substep=substep, warnings=warnings,
                             pre_step_time_s=float(pre_step_state[0]),
                             returned_engine_time_s=float(self.data.time),
-                            state_spec=int(STATE_SPEC), counts=self.counts.copy())
+                            state_spec=int(STATE_SPEC), counts=self.counts.copy(),
+                            config_sha256=hashlib.sha256(json.dumps(self.config,sort_keys=True).encode()).hexdigest(),
+                            candidate_identity=self.config["candidate"]["identity"])
         if self.trace_dir:
             self.trace_dir.mkdir(parents=True, exist_ok=True)
             prefix = self.trace_dir / f"failure_episode_{self.episode}"
@@ -250,7 +215,7 @@ class TensionEnv(gym.Env):
     def step(self, action):
         if self.guard:
             self.guard()
-        if self.k >= HORIZON or self.needs_reset:
+        if self.k >= self.horizon or self.needs_reset:
             raise RuntimeError("Call reset before stepping a new episode")
         self.command, self.clipped = self.map_action(action)
         self.counts["attempted_actions"] += 1
@@ -261,7 +226,7 @@ class TensionEnv(gym.Env):
                       episode_action=self.k + 1, action=np.asarray(action).tolist(),
                       tension_n=self.command.tolist(), delta_tension_n=(self.command-previous).tolist(),
                       clipped=self.clipped.tolist(),
-                      saturated=((self.command == 0) | (self.command == MAX_TENSION)).tolist(),
+                      saturated=((self.command == self.lower) | (self.command == self.upper)).tolist(),
                       start_error_m=before_info["position_error_m"], start_speed_m_s=before_info["speed_m_s"])
         self.episode_records.append(record)
         self.data.ctrl[self.actuators] = self.command
@@ -285,16 +250,16 @@ class TensionEnv(gym.Env):
             return self.fail(record, start_state, pre_step, self.substeps, ["nonfinite_observation"])
         terms = dict(position=-self.reward["position"] * (info["position_error_m"] / self.position_scale) ** 2,
                      holding_speed=(-self.reward["holding_speed"] * (info["speed_m_s"] / self.speed_scale) ** 2
-                                    if self.k in HOLD_STEPS else 0.0),
+                                    if self.k in self.hold_steps else 0.0),
                      smoothness=-self.reward["smoothness"] * float(np.mean(
-                         ((self.previous_tension - previous) / MAX_TENSION) ** 2)))
+                         ((self.previous_tension - previous) / self.upper) ** 2)))
         reward = float(sum(terms.values()))
         record.update(end_error_m=info["position_error_m"], end_speed_m_s=info["speed_m_s"],
                       reward_terms=terms, reward=reward)
         self.counts["completed_actions"] += 1
-        self.counts["complete_episodes"] += int(self.k == HORIZON)
+        self.counts["complete_episodes"] += int(self.k == self.horizon)
         info.update(record, numerical_failure=False, valid_physical_transition=True, counts=self.counts.copy())
-        return observation, reward, self.k == HORIZON, False, info
+        return observation, reward, self.k == self.horizon, False, info
 
     def replay_pre_step(self, state):
         self.reset()

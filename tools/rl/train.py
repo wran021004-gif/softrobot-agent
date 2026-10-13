@@ -176,7 +176,7 @@ class WorkerContext:
         consumed = self.consumed()
         self.state["consumed"] = consumed
         pending = max(0, self.reserved_actions - (self.env.counts["attempted_actions"] if self.env else 0))
-        self.state["reservation"] = dict(attempted_actions=pending, attempted_physics_steps=pending * 20,
+        self.state["reservation"] = dict(attempted_actions=pending, attempted_physics_steps=pending * (self.env.substeps if self.env else 0),
                 active_seconds=max(0, self.config["budget"]["active_seconds"] - consumed["active_seconds"]))
         write_json(self.directory / "state.json", self.state)
 
@@ -260,6 +260,8 @@ def worker(directory, token, started):
         model.runtime_boundary = context.boundary
         model.runtime_before_optimization = context.before_optimization
         model.set_logger(configure(str(directory / token), ["csv"]))
+        context.state["effective_ppo"] = context.config["ppo"]
+        context.state["environment"] = context.env.settings()
         context.flush()
         context.guard()
         # SB3 2.9 adds the loaded num_timesteps when reset_num_timesteps=False.

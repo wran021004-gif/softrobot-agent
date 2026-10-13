@@ -17,7 +17,7 @@ from tools.rl.env import TensionEnv
 
 
 def config():
-    return run.read_json(Path(run.__file__).with_name("config.json"))
+    return checks.historical_input(run.read_json(Path(run.__file__).resolve().parents[2]/'evidence/rl_runtime_20261013/historical_config.json'))
 
 
 class FakeModel:
@@ -321,6 +321,84 @@ class RuntimeTests(unittest.TestCase):
         root = Path(run.__file__).resolve().parents[2]
         selected = checks.replay_config(root / "evidence/rl_pilot_20261013/direct_capture.npz")
         self.assertEqual(selected["physics"], dict(integrator="implicitfast", timestep_s=0.0005))
+
+
+
+def selected_fixture():
+    """Two robot hinges/tendons after an unrelated free scene joint/actuator."""
+    import hashlib
+    cfg=run.merge_overrides({'n_steps':32,'batch_size':16,'n_epochs':2},{'position':2,'smoothness':.02})
+    xml='''<mujoco><option timestep=".002"/><worldbody>
+    <body name="scene"><freejoint name="unrelated"/><geom type="sphere" size=".01" mass="1"/></body>
+    <body name="arm" pos="0 0 .2"><joint name="a" type="hinge" axis="0 1 0"/>
+    <geom type="capsule" fromto="0 0 0 .1 0 0" size=".01" mass=".1"/>
+    <body name="tip" pos=".1 0 0"><joint name="b" type="hinge" axis="0 0 1"/>
+    <geom type="sphere" size=".01" mass=".1"/><site name="tip_site"/></body></body>
+    </worldbody><tendon><fixed name="t1"><joint joint="a" coef="1"/></fixed>
+    <fixed name="t2"><joint joint="b" coef="1"/></fixed></tendon>
+    <actuator><motor name="scene_motor" joint="unrelated"/>
+    <general name="u1" tendon="t1" gainprm="-1" ctrllimited="true" ctrlrange="1 3" forcelimited="true" forcerange="-3 -1"/>
+    <general name="u2" tendon="t2" gainprm="-1" ctrllimited="true" ctrlrange="0 7" forcelimited="true" forcerange="-7 0"/>
+    </actuator></mujoco>'''
+    cfg['candidate']=dict(xml=xml,sha256=hashlib.sha256(xml.encode()).hexdigest(),assets={},identity='fixture',task_identity='fixture-task')
+    cfg['control_object']=dict(joint_names=['b','a'],tendon_names=['t2','t1'],actuator_names=['u2','u1'],tip_site='tip_site',semantics='ideal_tension')
+    cfg['task']=dict(family='task.reach',target_m=[.1,0,.2],duration_s=.1,command_intervals=10,control_period_s=.01,
+        initializer=dict(qpos_rad={'a':.1,'b':.2},qvel_rad_s={'a':.3,'b':.4}),tendon_order=['t2','t1'],
+        acceptance=dict(position_limit_m=.01,holding_speed_limit_m_s=.02,holding_steps=[8,9,10]))
+    return cfg
+
+
+class CandidateTests(unittest.TestCase):
+    def test_selected_coordinates_dimensions_timing_limits_and_sign(self):
+        cfg=selected_fixture();env=TensionEnv(cfg);self.addCleanup(env.close)
+        obs,_=env.reset()
+        self.assertEqual(env.action_space.shape,(2,));self.assertEqual(obs.shape,(13,))
+        np.testing.assert_allclose(obs[:4],[.2,.1,.4,.3])
+        self.assertEqual(env.substeps,5)
+        self.assertEqual(env.actuators,[2,1])
+        tension,_=env.map_action(np.array([1.,-1.]))
+        np.testing.assert_allclose(tension,[7,1])
+        env.data.ctrl[env.actuators]=tension
+        import mujoco
+        mujoco.mj_forward(env.model,env.data)
+        np.testing.assert_allclose(env.data.actuator_force[env.actuators],[-7,-1])
+
+    def test_servo_missing_input_and_incompatible_timing_rejected(self):
+        cfg=selected_fixture();cfg['control_object']['semantics']='actuator_realistic'
+        with self.assertRaisesRegex(ValueError,'length-servo'):TensionEnv(cfg)
+        cfg=selected_fixture();cfg['task']['control_period_s']=.009
+        with self.assertRaisesRegex(ValueError,'exactly divide'):TensionEnv(cfg)
+        with self.assertRaisesRegex(ValueError,'Explicit candidate'):run.resolve_config(run.merge_overrides())
+
+    def test_override_owner_rejects_unknown_and_task_remains_frozen(self):
+        cfg=selected_fixture();self.assertEqual(cfg['ppo']['n_epochs'],2)
+        self.assertEqual(cfg['reward']['position'],2)
+        acceptance=copy.deepcopy(cfg['task']['acceptance'])
+        cfg['reward']['position']=123
+        env=TensionEnv(cfg);self.addCleanup(env.close)
+        self.assertEqual(env.reward['position'],123)
+        self.assertEqual(env.saved['acceptance'],acceptance)
+        for training,reward in [({'bogus':1},{}),({}, {'acceptance':1}),({'batch_size':17},{}),({'device':'cuda'}, {})]:
+            with self.assertRaises(ValueError):run.merge_overrides(training,reward)
+
+    def test_runtime_reservation_uses_actual_substeps(self):
+        with tempfile.TemporaryDirectory() as folder:
+            d=Path(folder);cfg=selected_fixture();run.write_json(d/'config.json',cfg)
+            run.write_json(d/'state.json',dict(worker_token='token',consumed=dict(attempted_actions=0,active_seconds=0,
+                attempted_physics_steps=0,completed_actions=0,complete_episodes=0,failed_episodes=0)))
+            context=train.WorkerContext(d,'token',train.time.perf_counter())
+            context.env=TensionEnv(cfg);self.addCleanup(context.env.close);context.reserved_actions=32;context.flush()
+            self.assertEqual(run.read_json(d/'state.json')['reservation']['attempted_physics_steps'],160)
+
+    def test_capture_resolver_carries_candidate_and_rejects_different_explicit_config(self):
+        with tempfile.TemporaryDirectory() as folder:
+            d=Path(folder);case=d/'runs/rl/case';case.mkdir(parents=True)
+            cfg=selected_fixture();run.write_json(case/'config.json',cfg)
+            with patch.object(checks,'__file__',str(d/'tools/rl/checks.py')):
+                result=checks.replay_config(case/'failures/capture.npz')
+                self.assertEqual(result['candidate'],cfg['candidate'])
+                changed=copy.deepcopy(cfg);changed['candidate']['identity']='other'
+                with self.assertRaisesRegex(ValueError,'differs'):checks.replay_config(case/'failures/capture.npz',changed)
 
 
 if __name__ == "__main__":
