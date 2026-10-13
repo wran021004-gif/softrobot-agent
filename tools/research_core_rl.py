@@ -12,6 +12,37 @@ from tools.state_io import digest
 from tools.rl import run
 
 
+def bind_source(host):
+    """Bind one sealed run for evaluation; copied consumption stays historical."""
+    import hashlib
+    from tools import research_core as core
+    from tools.platform_store import Store
+    source=core.state(host)['spec']['rl_evaluation_source']
+    old=Store(core.ROOT/'runs'/source['study_id']); sealed=old.session(source['study_id'])['state']
+    entry=deepcopy(sealed['rl_runs'][source['run_id']]); directory=run.run_path(source['run_id'])
+    config=run.read_json(directory/'config.json'); generation=source['checkpoint']
+    if Path(generation).name!=generation: raise ValueError('Published checkpoint name required')
+    policy=directory/'checkpoints'/generation/'policy.zip'; metadata=run.read_json(policy.with_name('metadata.json'))
+    if (sealed['research_status']!='stopped' or entry['status']['worker_alive'] or run.worker_alive(directory)
+            or generation not in run.read_json(directory/'checkpoint.json').values()
+            or config!=old.artifact(entry['configuration']) or config['candidate']['reference']!=entry['candidate']
+            or config['task']['original']!=old.artifact(entry['task'])
+            or metadata['config_sha256']!=source['config_sha256']
+            or metadata['policy_file_sha256']!=source['policy_sha256']
+            or hashlib.sha256(policy.read_bytes()).hexdigest()!=source['policy_sha256']):
+        raise ValueError('Pinned sealed evaluation source identity mismatch')
+    for field in ('candidate','task','configuration'):
+        if core.save(host,old.artifact(entry[field]),'linked_source_'+field)!=entry[field]:
+            raise ValueError('Source artifact identity changed')
+    history=dict(study_id=source['study_id'],run_id=source['run_id'],checkpoint=generation,
+        training_status=entry['status']['status'],consumed=entry['status']['consumed'],optimization=metadata['inherited'],
+        previous_evaluations=[old.artifact(r) for r in sealed.get('rl_evaluations',[])],newly_incurred=False)
+    entry.update(source_study=source['study_id'],historical_consumption=entry['status'].pop('consumed'),
+        allocation=dict(actions=0,active_seconds=0),active_reservation=None,evaluations=0,replays=0)
+    core.update(host,rl_runs={source['run_id']:entry},rl_task=entry['task'],
+        rl_source_summary=core.save(host,history,'linked_source_training_summary'))
+
+
 def prepare_input(host, request):
     from tools import research_core as core
     from extensions.tendon_family.backends import physics_for
@@ -53,13 +84,13 @@ def prepare_input(host, request):
     return run.resolve_config(cfg),task_ref
 
 
-def invoke(operation, run_id, *arguments, deadline=float("inf")):
+def invoke(operation, run_id, *arguments, deadline=float("inf"), timeout_s=150.):
     from tools.research_core import ROOT
     import os
     env={k:os.environ[k] for k in ('SystemRoot','WINDIR','PATH','TEMP','TMP','USERPROFILE','APPDATA','LOCALAPPDATA','COMSPEC','PATHEXT') if k in os.environ}
     env.update(OPENBLAS_NUM_THREADS='1',OMP_NUM_THREADS='1',MKL_NUM_THREADS='1')
     result=subprocess.run([str(run.PYTHON),'-m','tools.rl.run',operation,'--run-id',run_id,*map(str,arguments)],
-        cwd=ROOT,env=env,capture_output=True,text=True,timeout=min(150,max(.001,deadline-time.time())),creationflags=getattr(subprocess,'CREATE_NO_WINDOW',0))
+        cwd=ROOT,env=env,capture_output=True,text=True,timeout=min(120. if operation=='evaluate' else timeout_s,timeout_s,max(.001,deadline-time.time())),creationflags=getattr(subprocess,'CREATE_NO_WINDOW',0))
     if result.returncode: raise RuntimeError(result.stderr[-3000:])
     return json.loads(result.stdout)
 
@@ -67,6 +98,10 @@ def invoke(operation, run_id, *arguments, deadline=float("inf")):
 def reconcile(host, run_id):
     """Replace cumulative facts by identity; querying never sums them again."""
     from tools import research_core as core
+    entry=core.state(host)['rl_runs'][run_id]
+    if entry.get('source_study'):
+        if run.worker_alive(run.run_path(run_id)): raise ValueError('Sealed source worker unexpectedly alive')
+        return entry['status']
     value=run.status(run_id)
     with host.store.transaction() as db:
         s=host.store.session(host.run_id,db)['state']; entry=s['rl_runs'][run_id]
@@ -98,6 +133,12 @@ def dispatch(host, value, request_id, selected=None):
     from tools import research_core as core
     q=RLRequest.model_validate(value); s=core.state(host); key=digest(plain(q))
     if not core.enabled(s['spec'],'rl'): raise ValueError('RL capability required')
+    if s['spec'].get('allowed_rl_operations') is not None and q.operation not in s['spec']['allowed_rl_operations']:
+        raise ValueError('RL operation outside declared follow-up scope')
+    source=s['spec'].get('rl_evaluation_source')
+    if source and (q.run_id!=source['run_id'] or q.operation not in ('status','evaluate')
+            or (q.operation=='evaluate' and q.checkpoint!=source['checkpoint'])):
+        raise ValueError('Only status and evaluation of the explicitly pinned source are authorized')
     old=host.store.lookup(host.run_id,request_id)
     if old:
         if old['request_hash']!=key: raise ValueError('RL_OPERATION_ID_COLLISION')
@@ -164,6 +205,8 @@ def dispatch(host, value, request_id, selected=None):
                 policy=directory/'checkpoints'/generation/'policy.zip'
                 import hashlib
                 policy_sha=hashlib.sha256(policy.read_bytes()).hexdigest()
+                if source and (policy_sha!=source['policy_sha256'] or run.read_json(policy.with_name('metadata.json'))['config_sha256']!=source['config_sha256']):
+                    raise ValueError('Pinned source checkpoint identity changed')
                 if selected is not None and (host.store.artifact(selected)['policy_sha256']!=policy_sha or host.store.artifact(selected)['configuration']!=entry['configuration']):
                     raise ValueError('Selected checkpoint/configuration changed')
                 arguments=['--policy',policy]
@@ -175,14 +218,15 @@ def dispatch(host, value, request_id, selected=None):
                 arguments=['--capture',capture]
                 if q.replay: arguments.append('--replay')
             physical=q.operation=='evaluate' or q.replay
-            output=directory/(q.operation+'-'+row['execution_id'])
+            output=(host.store.root/'rl_outputs' if source else directory)/(q.operation+'-'+row['execution_id'])
             if physical:
                 with host.store.transaction() as db:
                     st=host.store.session(host.run_id,db)['state']; runs=st['rl_runs']
                     if sum(e[counter] for e in runs.values())>=limit: raise ValueError('Cumulative '+counter+' ceiling exhausted')
                     runs[run_id][counter]+=1;host.store.update_state(db,host.run_id,st)
             evaluation_dispatched=q.operation=='evaluate'
-            result=invoke(q.operation,run_id,*arguments,'--output',output,deadline=s['cutoff_unix'])
+            result=invoke(q.operation,run_id,*arguments,'--output',output,deadline=s['cutoff_unix'],timeout_s=s['spec'].get('rl_evaluation_allowance_s',150.))
+            if source: result.update(source_study=source['study_id'],evaluation_owner=host.run_id)
             result.update(study=host.run_id,candidate=entry['candidate'],task=entry['task'],run_id=run_id,configuration=entry['configuration'],independent_evaluation_executed=q.operation=='evaluate')
             if q.operation=='evaluate':
                 result.update(checkpoint=generation,policy_sha256=policy_sha,role='confirmation' if selected is not None else 'development',selected_execution=plain(selected))
@@ -243,7 +287,7 @@ def packet(host):
         modes=['direct','residual'],compatible_references=compatible_references(host),
         structural_coordinate='d in [-1,1]: lengths [.16+.0055*d,.11-.0055*d] m',
         defaults=run.read_json(Path(run.__file__).with_name('config.json'))),
-        runs=s.get('rl_runs',{}),evaluations=[dict(reference=r,**host.store.artifact(r)) for r in s.get('rl_evaluations',[])],
+        runs=s.get('rl_runs',{}),source_summary=s.get('rl_source_summary'),evaluations=[dict(reference=r,**host.store.artifact(r)) for r in s.get('rl_evaluations',[])],
         costs='RL active time/evaluation costs separate from provider wall time; elapsed study time uses one wall clock',
         live_elapsed_s=max(0,s.get('closed_unix',time.time())-s['started_unix']))
 

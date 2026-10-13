@@ -439,3 +439,61 @@ class FormalControlTests(TestCase):
             self.assertEqual(core.claims(h)['confirmation_failures'],1);self.assertFalse(core.claims(h)['task_passed'])
             self.assertEqual(core.state(h)['selected'],selected)
             import gc;gc.collect()
+
+
+    def test_followup_source_is_readonly_and_failed_report_is_idempotent(self):
+        from tools import research_core_rl as bridge
+        from schemas.research_core import RLRequest
+        from types import SimpleNamespace
+        import hashlib
+        with TemporaryDirectory(dir=core.ROOT/'runs',prefix='followup-fixture-') as folder:
+            root=core.Path(folder);spec=read(core.ROOT/'examples/research_core/rl_evaluation_followup.json')
+            binding=spec.pop('rl_evaluation_source');spec.update(study_id='followup-fixture',started_unix=time.time())
+            path=root/'spec.json';core.atomic_json(path,spec);h=core.prepare(path,root/'business');s=core.state(h)
+            cfg,task=bridge.prepare_input(h,RLRequest(operation='start',candidate=s['reference_candidate'],mode='direct',allocation=dict(actions=512,active_seconds=10),rationale='fixture only'))
+            directory=root/'runtime'/binding['run_id'];policy=directory/'checkpoints'/binding['checkpoint']/'policy.zip'
+            policy.parent.mkdir(parents=True);policy.write_bytes(b'fixture policy')
+            binding['policy_sha256']=hashlib.sha256(policy.read_bytes()).hexdigest()
+            core.atomic_json(policy.with_name('metadata.json'),dict(config_sha256=binding['config_sha256'],policy_file_sha256=binding['policy_sha256'],inherited={'num_timesteps':512}))
+            core.atomic_json(directory/'config.json',cfg);core.atomic_json(directory/'checkpoint.json',dict(current=binding['checkpoint']))
+            oldentry=dict(candidate=s['reference_candidate'],task=task,configuration=core.save(h,cfg),status=dict(worker_alive=False,status='completed',consumed={'attempted_actions':512}),allocation=cfg['budget'],evaluations=1,replays=0)
+            sealed=dict(research_status='stopped',rl_runs={binding['run_id']:oldentry},rl_evaluations=[])
+            old=SimpleNamespace(session=lambda _: {'state':sealed},artifact=h.store.artifact)
+            original=deepcopy(sealed);spec['rl_evaluation_source']=binding;core.update(h,spec=spec)
+            with patch('tools.platform_store.Store',return_value=old),patch.object(bridge.run,'RUNS',root/'runtime'),patch.object(bridge.run,'worker_alive',return_value=False):
+                bridge.bind_source(h)
+                report=dict(passed=False,episodes=[dict(complete=False,passed=False,numerical_failure={'message':'QVEL'},terminal_position_error_m=None)])
+                q=dict(operation='evaluate',run_id=binding['run_id'],checkpoint=binding['checkpoint'],rationale='fixture')
+                with patch.object(core,'guard'),patch.object(bridge.run,'status',side_effect=AssertionError('no source reconciliation')),patch.object(bridge,'invoke',return_value=report) as invoke:
+                    bridge.dispatch(h,dict(operation='status',run_id=binding['run_id'],rationale='fixture'),'status')
+                    result=bridge.dispatch(h,q,'evaluation');self.assertEqual(bridge.dispatch(h,q,'evaluation'),result)
+                    self.assertEqual(invoke.call_count,1);self.assertEqual(invoke.call_args.args[3],policy)
+                    self.assertTrue(core.Path(invoke.call_args.args[5]).is_relative_to(h.store.root))
+                    self.assertEqual(invoke.call_args.kwargs['timeout_s'],120)
+                    self.assertTrue(result['independent_evaluation_executed']);self.assertFalse(result['episodes'][0]['complete'])
+                    for operation in ('start','resume','stop','diagnose'):
+                        request=dict(operation=operation,run_id=binding['run_id'],rationale='fixture') if operation!='start' else dict(operation=operation,candidate=s['reference_candidate'],mode='direct',allocation={'actions':512,'active_seconds':10},rationale='fixture')
+                        with self.assertRaisesRegex(ValueError,'scope'):bridge.dispatch(h,request,operation)
+                    with self.assertRaisesRegex(ValueError,'pinned'):bridge.dispatch(h,dict(q,checkpoint='other'),'wrong')
+                self.assertEqual(sealed,original);self.assertEqual(core.state(h)['rl_runs'][binding['run_id']]['evaluations'],1)
+                self.assertEqual(core.state(h)['rl_runs'][binding['run_id']]['allocation']['actions'],0)
+                entry=core.state(h)['rl_runs'];entry[binding['run_id']]['evaluations']=0;core.update(h,rl_runs=entry)
+                with patch.object(core,'guard'),patch.object(bridge,'invoke',side_effect=RuntimeError('fixture packaging exception')):
+                    with self.assertRaisesRegex(RuntimeError,'packaging'):bridge.dispatch(h,q,'failed-packaging')
+                row=h.store.lookup(h.run_id,'failed-packaging');self.assertEqual(core.json.loads(row['receipt'])['execution_status'],'failed')
+                failure=h.store.artifact(core.state(h)['rl_evaluations'][-1]);self.assertTrue(failure['consumption_uncertain'])
+                self.assertIsNone(failure['independent_evaluation_executed']);self.assertEqual(failure['episodes'],[])
+            import gc;gc.collect()
+
+    def test_followup_subprocess_timeout_and_public_campaign_removal(self):
+        from tools import research_core_rl as bridge
+        from types import SimpleNamespace
+        import inspect
+        with patch.object(bridge.subprocess,'run',return_value=SimpleNamespace(returncode=0,stdout='{}')) as launch,patch.object(bridge.time,'time',return_value=100):
+            bridge.invoke('evaluate','fixture',deadline=500,timeout_s=150)
+            self.assertEqual(launch.call_args.kwargs['timeout'],120)
+            bridge.invoke('evaluate','fixture',deadline=137,timeout_s=120)
+            self.assertEqual(launch.call_args.kwargs['timeout'],37)
+        self.assertNotIn('phase_A_dependency',inspect.getsource(core.converse));self.assertNotIn('phase_A_evidence',inspect.getsource(core.packet))
+        self.assertNotIn('Phase A',core.FORMAL_INSTRUCTIONS);self.assertNotIn('Phase B',core.FORMAL_INSTRUCTIONS)
+        self.assertEqual(core.confirmation_count({'spec':read(core.ROOT/'examples/design_control/phase_B.json')}),2)

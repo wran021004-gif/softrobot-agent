@@ -154,6 +154,9 @@ def prepare(spec_path=DEFAULT_SPEC, directory=None):
         inp=SessionInput.model_validate(h.store.artifact(candidate)['configuration'])
         if assemble(inp,physics_for(inp))['control']['tension_execution_mode']!='ideal_tension': raise ValueError('EXPLICIT_IDEAL_TENSION_REQUIRED')
         update(h,rl_task=save(h,plain(inp.task),'rl_frozen_task'),rl_runs={},rl_evaluations=[],rl_evidence_reads=[])
+        if spec.get('rl_evaluation_source'):
+            from tools.research_core_rl import bind_source
+            bind_source(h)
     atomic_json(directory/'activity.json',spec)
     return h
 
@@ -722,7 +725,7 @@ def packet(host):
             rl=rl_packet(host) if enabled(s['spec'],'rl') else None,
             nmpc_admission=[dict(candidate=r,**nmpc_timing(host,r),remaining_phase_admission=capacity(host,1,candidate=r)) for r in s['candidates'].values()] if s['spec'].get('nmpc_execution_cap_s') else None,
             resource_use=dict(shared_ledger=host.store.remaining(),numerical_s=s['numerical_s'],elapsed_s=max(0,s.get('closed_unix',time.time())-s['started_unix'])),
-            claims=claims(host),phase_A_evidence=host.store.artifact(s['phase_A_evidence']) if s.get('phase_A_evidence') else None,research_status=s['research_status'])
+            claims=claims(host),research_status=s['research_status'])
     if s['spec'].get('mode')=='rl_interface':
         from tools.research_core_rl import packet as rl_packet
         return dict(specification=s['spec'],candidates=list(s['candidates'].values()),rl=rl_packet(host),
@@ -769,6 +772,8 @@ def dispatch(host, value, request_id, origin='model'):
     """Native plan acceptance and internal batch use the same project Store."""
     if state(host)['spec'].get('mode') == 'engineering_numerical':origin='engineering'
     plan=Plan.model_validate(value)
+    if state(host)['spec'].get('allowed_plan_actions') is not None and plan.action not in state(host)['spec']['allowed_plan_actions']:
+        raise ValueError('Operation outside declared follow-up scope')
     if state(host)['spec'].get('mode')=='rl_interface' and (plan.action not in ('propose','stop') or plan.mechanics_source):
         raise ValueError('RL_INTERFACE_ALLOWS_PROPOSE_AND_BOUNDED_CLOSEOUT_ONLY')
     capability={'execute':'nmpc','search':'search','mechanics':'mathematics','replay':'replay'}.get(plan.action)
@@ -915,11 +920,8 @@ STOP must cite new evaluation evidence and follow its explicit public read and t
 
 
 FORMAL_INSTRUCTIONS = """You own a bounded design-and-control study. Use only scoped supplied evidence and public tools.
-Read phase specification, frozen original task, declared capabilities, known historical facts and remaining budgets. Supplied history is not rediscovery.
-Phase A: reuse d=.5 and historical PPO n_steps=128,batch_size=64,n_epochs=4,learning_rate=.0005,gamma=.99,holding_speed reward=2.
-Launch one new direct run of 1024 actions/90 active seconds, query terminal status, evaluate the saved policy once, explicitly read immutable evaluation evidence,
-and STOP with evidence-based next_step. Complete task failure closes the execution gap; startup failure or missing evaluation does not.
-Phase B: actually invoke mechanics with supported task_gap or task_gap_with_effort objective. Explain task difficulty, weights, bounds, fixed variables,
+Read study specification, frozen original task, declared capabilities, known historical facts and remaining budgets. Supplied history is not rediscovery.
+When mathematical optimization is authorized, use supported task_gap or task_gap_with_effort objective. Explain task difficulty, weights, bounds, fixed variables,
 relaxed requirements and expected relation to original completion. Inspect mathematical evidence and returned candidate. Handoff chooses no controller.
 Mathematical feasibility, relaxed dynamics and original MuJoCo task acceptance are distinct. Preliminary ranking is optional. Search uses NMPC only.
 Choose existing NMPC or direct/residual RL and explain using evidence and budget. Inspect nmpc_admission before launching; no matching timing or oversized
@@ -956,13 +958,6 @@ async def converse(host):
         s=state(host);started=time.time();pilot=deepcopy(s['pilot'])
         pilot.update(request_deadline_unix=started+s['spec']['budgets']['activity_s']-s['spec']['budgets']['delivery_reserve_s'],bounded_request_reservation=True)
         update(host,live_started_unix=started,started_unix=started,cutoff_unix=pilot['request_deadline_unix'],pilot=pilot)
-    dependency=state(host)['spec'].get('phase_A_dependency')
-    if dependency:
-        previous=Host(ROOT/'runs'/dependency['study_id'],dependency['study_id'],actor=host.actor)
-        evaluations=[previous.store.artifact(r) for r in state(previous).get('rl_evaluations',[])]
-        if not any(r.get('independent_evaluation_executed') and r.get('episodes') and all(e['complete'] for e in r['episodes']) for r in evaluations):
-            raise ValueError('Phase A execution gap remains; Phase B prohibited')
-        update(host,phase_A_evidence=save(host,dict(study=dependency['study_id'],evaluations=evaluations,costs=previous.store.remaining()),'phase_A_dependency_evidence'))
     guard(host)
     if pending(host): raise ValueError('UNKNOWN_PROVIDER_OUTCOME_RECOVER_BEFORE_SEND')
     load_credential(Path.home()/'.codex'/'.env')
@@ -1024,7 +1019,7 @@ async def converse(host):
         return run
     rl_mode=enabled(state(host)['spec'],'rl')
     formal=bool(state(host)['spec'].get('capabilities'))
-    instructions=FORMAL_INSTRUCTIONS if formal else RL_INSTRUCTIONS if rl_mode else INSTRUCTIONS
+    instructions=state(host)['spec'].get('execution_instructions') or (FORMAL_INSTRUCTIONS if formal else RL_INSTRUCTIONS if rl_mode else INSTRUCTIONS)
     native=[PythonAgentTool(name,dict(name=name,description=description,inputSchema={'json':schema.model_json_schema()}),handler(kind))
         for name,description,schema,kind in [('research_plan','Propose a candidate; mathematical optimization and handoff; optional NMPC search/execute; evidence diagnosis; exact NMPC/RL confirmation; STOP. Operations require declared phase capabilities.',Plan,'plan'),
             ('experience_retrieve','Read-only case/procedure draft search/read with provenance',ExperienceQuery,'experience'),
@@ -1032,14 +1027,20 @@ async def converse(host):
     if formal or rl_mode:
         actions=['propose','stop','diagnose','confirm'] if formal and state(host)['spec'].get('mode')!='rl_interface' else ['propose','stop']
         if formal and state(host)['spec'].get('mode')!='rl_interface': actions += [a for a,c in [('execute','nmpc'),('search','search'),('mechanics','mathematics'),('replay','replay')] if enabled(state(host)['spec'],c)]
+        actions=state(host)['spec'].get('allowed_plan_actions',actions)
         schema=Plan.model_json_schema();schema['properties']['action']={'type':'string','enum':actions}
         native[0].tool_spec={**native[0].tool_spec,'inputSchema':{'json':schema}}
     if rl_mode:
         native.append(PythonAgentTool('research_rl',dict(name='research_rl',description='Configure/start, query, stop, resume, independently evaluate or inspect/one-step diagnose an owned frozen candidate RL run',
             inputSchema={'json':RLRequest.model_json_schema()}),handler('rl')))
+    if state(host)['spec'].get('rl_evaluation_source'):
+        schema=RLRequest.model_json_schema();schema['properties']['operation']['enum']=state(host)['spec']['allowed_rl_operations']
+        source=state(host)['spec']['rl_evaluation_source']
+        schema['properties']['run_id']['enum']=[source['run_id']];schema['properties']['checkpoint']['enum']=[source['checkpoint']]
+        native[-1].tool_spec={**native[-1].tool_spec,'inputSchema':{'json':schema}}
     if formal: native[1].tool_spec={**native[1].tool_spec,'description':'Unavailable outside scoped milestone evidence'}
     agent=build_harness(host,transport=boundary,api_key=os.environ['DEEPSEEK_API_KEY'],instructions=instructions,
-        model_class=live_model_class(boundary),tool_executor=SequentialToolExecutor(),research_tools=native,
+        model_class=live_model_class(boundary),tool_executor=SequentialToolExecutor(),research_tools=[t for t in native if t is not native[1]] if state(host)['spec'].get('rl_evaluation_source') else native,
         configuration_path=host.store.root/'framework_configuration.json',session_directory=host.store.root/'framework_sessions')
     def before_model(event):
         s=state(host)
@@ -1071,6 +1072,8 @@ async def converse(host):
                 retrieval.tool_spec=spec
             agent.system_prompt+='\nPROTECTED CLOSEOUT: consume supplied results and STOP only.'
     def before_tool(event):
+        if state(host)['spec'].get('rl_evaluation_source') and event.tool_use['name'] not in ('research_plan','research_rl','evidence_read'):
+            event.cancel_tool='Only declared follow-up evaluation, evidence reads and STOP are permitted.'
         if formal and event.tool_use['name']=='experience_retrieve':
             event.cancel_tool='Use only scoped milestone evidence; unrelated workspace retrieval is unauthorized.'
         record(host,'model_original_tool_request',dict(tool_use=event.tool_use))

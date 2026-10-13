@@ -149,3 +149,11 @@ Prepare and commit scoped implementation/specifications, bind the study, then ru
 examples/design_control/phase_A.json`. Its clock starts once at live entry. Use the same prepare/bind/live sequence
 for phase_B.json after Phase A is complete. Runtime stores and checkpoints stay in `runs/`; compact nonsecret
 requests, receipts, evidence reads, original decisions and final accounting are archived for delivery.
+
+
+The campaign order above is an execution instruction, not a public-runtime A/B gate. Removing that gate grants no formal research authorization.
+`examples/research_core/rl_evaluation_followup.json` authorizes only status, one pinned sealed-policy evaluation, evidence reads and STOP.
+Preparation copies exact source artifacts through read-only Store access; terminal status never reconciles the sealed source.
+The new study owns its output, receipts and one episode charge; source training costs stay linked historical facts.
+The actual evaluation subprocess timeout is at most 120 seconds and also bounded by the remaining execution deadline.
+A valid numerical-failure report verifies reporting, while physical completion, original task pass and two post-selection formal confirmations remain separate requirements.
