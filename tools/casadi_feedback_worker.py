@@ -150,8 +150,15 @@ def assess(w, problem, values):
 
 
 def solve(configuration,args,local_ad,saved_tensions=None,progress=None,execution=None):
-    started=time.perf_counter();w=Workspace(configuration,args['substeps'],local_ad,args.get('integration_method','implicit_euler'),args.get('interval_substeps'))
+    started=time.perf_counter()
+    def stage(phase,**values):
+        if progress:atomic_json(progress,dict(phase=phase,unix=time.time(),execution=execution,elapsed_s=time.perf_counter()-started,**values))
+    stage('construction_entered')
+    w=Workspace(configuration,args['substeps'],local_ad,args.get('integration_method','implicit_euler'),args.get('interval_substeps'))
+    stage('construction_returned',mechanics_construction_s=w.mechanics_construction_s)
+    stage('assembly_entered')
     problem=w.assemble('B',args['initialization'],args,saved_tensions)
+    stage('assembly_returned',assembly_s=w.assembly_s)
     options=dict(max_iterations=1000,tolerance=1e-7,acceptable_tolerance=1e-6,constraint_jacobian_mode='automatic',
         retain_feasible_iterate=True,hessian_approximation='limited-memory',max_cpu_s=570.,max_wall_s=570.,print_level=5)
     if execution:
@@ -171,7 +178,7 @@ def solve(configuration,args,local_ad,saved_tensions=None,progress=None,executio
         u=x[controls];effort=float(np.mean(u*u)+.1*np.mean(np.diff(u,axis=0)**2))
         return (hard>1e-5,hard if hard>1e-5 else 0.,max(pg,sg),pg+sg,effort)
     solver.diagnostic_candidate_rank=incumbent_rank
-    if progress:atomic_json(progress,dict(phase='solver_entered',unix=time.time(),execution=execution))
+    stage('solver_entered',options=options,mechanics_construction_s=w.mechanics_construction_s,assembly_s=w.assembly_s)
     result=solver.solve(problem);diagnostics=solver.last_diagnostics
     # Preserve this actual solve before candidate extraction/report packaging.
     # A packaging repair may read it; it must not invoke another NLP.

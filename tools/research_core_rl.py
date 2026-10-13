@@ -31,15 +31,18 @@ def bind_source(host):
             or metadata['policy_file_sha256']!=source['policy_sha256']
             or hashlib.sha256(policy.read_bytes()).hexdigest()!=source['policy_sha256']):
         raise ValueError('Pinned sealed evaluation source identity mismatch')
-    for field in ('candidate','task','configuration'):
+    for field in ('candidate','task','configuration',*(['training_summary'] if entry.get('training_summary') else [])):
         if core.save(host,old.artifact(entry[field]),'linked_source_'+field)!=entry[field]:
             raise ValueError('Source artifact identity changed')
     history=dict(study_id=source['study_id'],run_id=source['run_id'],checkpoint=generation,
         training_status=entry['status']['status'],consumed=entry['status']['consumed'],optimization=metadata['inherited'],
-        previous_evaluations=[old.artifact(r) for r in sealed.get('rl_evaluations',[])],newly_incurred=False)
+        previous_evaluations=[old.artifact(r) for r in sealed.get('rl_evaluations',[])],engineering_closeout=sealed.get('engineering_closeout'),accepted_historical_stop=not bool(sealed.get('engineering_closeout')),newly_incurred=False)
     entry.update(source_study=source['study_id'],historical_consumption=entry['status'].pop('consumed'),
         allocation=dict(actions=0,active_seconds=0),active_reservation=None,evaluations=0,replays=0)
-    core.update(host,rl_runs={source['run_id']:entry},rl_task=entry['task'],
+    candidate=old.artifact(entry['candidate']); candidates=core.state(host)['candidates']
+    candidates[candidate['identity']]=entry['candidate']
+    core.update(host,candidates=candidates,rl_source_candidate=entry['candidate'],
+        rl_runs={source['run_id']:entry},rl_task=entry['task'],rl_training_summaries=[entry['training_summary']] if entry.get('training_summary') else [],
         rl_source_summary=core.save(host,history,'linked_source_training_summary'))
 
 
@@ -97,18 +100,23 @@ def invoke(operation, run_id, *arguments, deadline=float("inf"), timeout_s=150.)
     return json.loads(result.stdout)
 
 
-def reconcile(host, run_id):
+def reconcile(host, run_id, lightweight=False):
     """Replace cumulative facts by identity; querying never sums them again."""
     from tools import research_core as core
     entry=core.state(host)['rl_runs'][run_id]
     if entry.get('source_study'):
         if run.worker_alive(run.run_path(run_id)): raise ValueError('Sealed source worker unexpectedly alive')
         return entry['status']
-    value=run.status(run_id)
+    if lightweight:
+        directory=run.run_path(run_id)
+        with run.locked(directory): value=dict(run.reconcile(directory))
+        value.update(worker_alive=run.worker_alive(directory),run_id=run_id)
+    else: value=run.status(run_id)
     with host.store.transaction() as db:
         s=host.store.session(host.run_id,db)['state']; entry=s['rl_runs'][run_id]
         previous=entry.get('status',{}).get('consumed',{})
         if any(value['consumed'].get(k,0)<v for k,v in previous.items()): raise ValueError('RL consumption cannot decrease')
+        s['numerical_s']=s.get('numerical_s',0.)+max(0.,value['consumed'].get('active_seconds',0)-previous.get('active_seconds',0))
         entry['status']=value
         entry['active_reservation']=entry['allocation'] if value['worker_alive'] else None
         host.store.update_state(db,host.run_id,s)
@@ -120,9 +128,25 @@ def evaluation_capacity(host, requested=1, confirmation=False):
     s=core.state(host); reserve=0 if confirmation else core.confirmation_count(s)
     used=sum(e['evaluations'] for e in s.get('rl_runs',{}).values())
     seconds=s['spec'].get('rl_evaluation_allowance_s',150.)
-    available=min(s['cutoff_unix']-time.time(),host.store.remaining()['remaining']['wall_s'])
+    available=min(core.execution_deadline(host)-time.time(),host.store.remaining()['remaining']['wall_s'],s['spec']['budgets']['numerical_s']-s['numerical_s']-s['numerical_reserved_s'])
     fit=max(0,min(requested,s['spec']['rl_limits']['evaluation_episodes']-used-reserve,int(available//seconds)-reserve))
     return dict(admitted=fit,remaining_episodes=s['spec']['rl_limits']['evaluation_episodes']-used,confirmation_reserve=reserve,per_episode_s=seconds)
+
+
+def training_capacity(host, work):
+    from tools import research_core as core
+    s=core.state(host); b=s['spec']['budgets']; remaining=host.store.remaining()['remaining']
+    confirmations=core.confirmation_count(s)
+    # Start/resume, terminal status+read, evaluation+read, each confirm+read, STOP.
+    operations=6+3*confirmations
+    requests=6+2*confirmations
+    seconds=work['active_seconds']+(1+confirmations)*s['spec'].get('rl_evaluation_allowance_s',150.)
+    if (b['protected_provider_requests']<requests or remaining['model_calls']<=b['protected_provider_requests']
+            or remaining['tool_calls']<operations
+            or evaluation_capacity(host,1)['admitted']<1
+            or seconds>min(s['cutoff_unix']-time.time(),remaining['wall_s'],
+                b['numerical_s']-s['numerical_s']-s['numerical_reserved_s'])):
+        raise ValueError('TRAINING_AND_COMPLETE_CLOSEOUT_RESOURCES_CANNOT_FIT')
 
 
 def confirm(host, selected, request_id):
@@ -146,9 +170,8 @@ def dispatch(host, value, request_id, selected=None):
         if old['request_hash']!=key: raise ValueError('RL_OPERATION_ID_COLLISION')
         if old['receipt']: return host.store.artifact(json.loads(old['receipt'])['output'])
         raise ValueError('Unsealed RL operation: inspect recorded run/output, never repeat side effect')
-    core.guard(host,q.operation not in ('status','diagnose'))
-    if host.store.remaining()['remaining']['model_calls']<=s['spec']['budgets']['protected_provider_requests'] and q.operation!='status':
-        raise ValueError('Protected closeout allows RL status only')
+    core.admit_closeout(host,'research_rl',plain(q))
+    core.guard(host,q.operation in ('start','resume') or q.replay)
     if q.operation=='start':
         if q.reference and not any(r.get('available') and r['candidate']==plain(q.candidate) and r['reference']==plain(q.reference) for r in compatible_references(host)):
             raise ValueError('Owned compatible advertised reference required')
@@ -165,20 +188,19 @@ def dispatch(host, value, request_id, selected=None):
             raise ValueError('Cumulative RL training ceiling exhausted')
     else:
         if q.run_id not in s.get('rl_runs',{}): raise ValueError('Owned RL run required')
-    if q.operation=='start':
-        reserve=core.confirmation_count(s)*s['spec'].get('rl_evaluation_allowance_s',150.)
-        if q.allocation.active_seconds+reserve+s['spec'].get('rl_evaluation_allowance_s',150.)>s['cutoff_unix']-time.time():
-            raise ValueError('Training plus evaluation/confirmation reserve cannot fit shared phase deadline')
+    if q.operation in ('start','resume'):
+        work=config['budget'] if q.operation=='start' else reconcile(host,q.run_id)['remaining']
+        training_capacity(host,work)
     if q.operation=='evaluate' and evaluation_capacity(host,1,confirmation=selected is not None)['admitted']<1:
         raise ValueError('RL evaluation and route confirmation reserve cannot fit')
     cost={**zero(),'tool_calls':1,'backend_solves':int(q.operation=='start')}
     row,_=host.store.reserve(host.run_id,request_id,key,host.actor,cost,kind='rl_operation')
-    evaluation_dispatched=False
+    evaluation_dispatched=False;operation_started=None
     try:
         if q.operation=='start':
             run_id=host.run_id+'-'+row['execution_id'][:8]
             entry=dict(candidate=plain(q.candidate),task=task_ref,configuration=core.save(host,config,'rl_frozen_input'),
-                allocation=config['budget'],mathematical_handoffs=[r for r in s.get('handoffs',[]) if host.store.artifact(r)['candidate']==plain(q.candidate)],request_identity=key,active_reservation=plain(q.allocation),evaluations=0,replays=0)
+                allocation=config['budget'],mathematical_handoffs=[r for r in s.get('handoffs',[]) if host.store.artifact(r)['candidate']==plain(q.candidate)],request_identity=key,requested_allocation=plain(q.allocation),active_reservation=config['budget'],evaluations=0,replays=0)
             runs=core.state(host).get('rl_runs',{}); runs[run_id]=entry; core.update(host,rl_runs=runs)
             path=host.store.root/'rl_inputs'/('config-'+row['execution_id']+'.json');run.write_json(path,config)
             result=invoke('start',run_id,'--config',path,deadline=s['cutoff_unix'])
@@ -198,7 +220,7 @@ def dispatch(host, value, request_id, selected=None):
                 refs=core.state(host).get('rl_training_summaries',[])
                 core.update(host,rl_runs=runs,rl_training_summaries=refs if reference in refs else [*refs,reference])
                 result.update(training_summary=host.store.artifact(reference),training_summary_reference=reference)
-            else: result=invoke(q.operation,q.run_id,deadline=s['cutoff_unix'])
+            else: result=invoke(q.operation,q.run_id,deadline=core.execution_deadline(host))
         elif q.operation=='diagnose' and not q.failure:
             directory=run.run_path(q.run_id)
             result=dict(run_id=q.run_id,replay_requested=q.replay,replay_executed=False,
@@ -240,7 +262,8 @@ def dispatch(host, value, request_id, selected=None):
                     if sum(e[counter] for e in runs.values())>=limit: raise ValueError('Cumulative '+counter+' ceiling exhausted')
                     runs[run_id][counter]+=1;host.store.update_state(db,host.run_id,st)
             evaluation_dispatched=q.operation=='evaluate'
-            result=invoke(q.operation,run_id,*arguments,'--output',output,deadline=s['cutoff_unix'],timeout_s=s['spec'].get('rl_diagnostic_allowance_s',60.) if q.operation=='diagnose' else s['spec'].get('rl_evaluation_allowance_s',150.))
+            operation_started=time.perf_counter()
+            result=invoke(q.operation,run_id,*arguments,'--output',output,deadline=core.execution_deadline(host),timeout_s=s['spec'].get('rl_diagnostic_allowance_s',60.) if q.operation=='diagnose' else s['spec'].get('rl_evaluation_allowance_s',150.))
             if source: result.update(source_study=source['study_id'],evaluation_owner=host.run_id)
             result.update(study=host.run_id,candidate=entry['candidate'],task=entry['task'],run_id=run_id,configuration=entry['configuration'],independent_evaluation_executed=q.operation=='evaluate')
             if q.operation=='evaluate':
@@ -258,6 +281,9 @@ def dispatch(host, value, request_id, selected=None):
         host.store.complete(row,dict(request_id=request_id,execution_id=row['execution_id'],caller=host.actor,
             tool_id='research.core_rl',tool_version='1.0.0',execution_status='failed',charged=zero(),error=str(exc)),failure)
         raise
+    finally:
+        if operation_started is not None:
+            core.update(host,numerical_s=core.state(host)['numerical_s']+time.perf_counter()-operation_started)
 
 
 def compatible_references(host):

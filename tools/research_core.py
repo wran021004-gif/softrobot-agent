@@ -61,13 +61,61 @@ def update(host, **values):
 
 
 def readable_results(s):
-    return [*s['results'], *s.get('mechanics_results', []), *s.get('rl_evaluations', []), *s.get('rl_training_summaries', [])]
+    return [*s['results'], *s.get('mechanics_results', []), *s.get('rl_evaluations', []), *s.get('rl_training_summaries', []),
+        *[s[k] for k in ('rl_task','rl_source_summary','rl_source_candidate') if s.get(k)],
+        *[r for entry in s.get('rl_runs',{}).values() for r in (entry.get('candidate'),entry.get('configuration')) if r]]
+
+
+def protected(host):
+    s=state(host)
+    return (host.store.remaining()['remaining']['model_calls']<=s['spec']['budgets']['protected_provider_requests']
+        or time.time()>=s['cutoff_unix'])
+
+
+def closeout_operations(host):
+    s=state(host)
+    return dict(research_plan=[a for a in ('stop','confirm') if a in s['spec'].get('allowed_plan_actions',('stop','confirm'))],
+        research_rl=[a for a in ('status','stop','evaluate') if s.get('rl_runs') and a in s['spec'].get('allowed_rl_operations',('status','stop','evaluate'))])
+
+
+def admit_closeout(host, name, value):
+    if protected(host) and name in ('research_plan','research_rl'):
+        field='action' if name=='research_plan' else 'operation'
+        if value.get(field) not in closeout_operations(host)[name]:
+            raise ValueError('PROTECTED_CLOSEOUT_REQUIRES_EXISTING_WORK_OR_STOP')
+
+
+def execution_deadline(host):
+    s=state(host)
+    return s['started_unix']+s['spec']['budgets']['activity_s'] if protected(host) else s['cutoff_unix']
+
+
+async def wait_training(host):
+    """No provider turns or summary snapshots while an owned worker is active."""
+    from tools.research_core_rl import reconcile, dispatch as rl_dispatch
+    from tools.rl import run
+    milestones=deepcopy(state(host)['spec'].get('rl_wait_milestones',{}))
+    while True:
+        s=state(host)
+        if s['research_status']=='stopped': return
+        active=False
+        for run_id in s.get('rl_runs',{}):
+            status=reconcile(host,run_id,lightweight=True)
+            if not status['worker_alive']: continue
+            if run_id in milestones:
+                directory=run.run_path(run_id); generation=read(directory/'checkpoint.json').get('current')
+                if generation and read(directory/'checkpoints'/generation/'metadata.json')['inherited']['num_timesteps']>=milestones[run_id]: continue
+            active=True
+            if time.time()>=s['cutoff_unix'] and status['status']!='stopping':
+                rl_dispatch(host,dict(operation='stop',run_id=run_id,rationale='Execution cutoff; retain terminal evidence'),'deadline-stop-'+run_id)
+        if not active or time.time()>=execution_deadline(host): return
+        await asyncio.sleep(min(2.,max(.01,execution_deadline(host)-time.time())))
 
 
 def read_evidence(host, query):
     q = EvidenceQuery.model_validate(query); s = state(host)
     value = host.store.artifact(q.reference)
-    if host.store.remaining()['remaining']['model_calls'] <= 4 and plain(q.reference) not in readable_results(s):
+    if protected(host) and plain(q.reference) not in readable_results(s):
         raise ValueError('PROTECTED_EVIDENCE_READ_REQUIRES_NEW_RESULT_OR_TRAINING_SUMMARY')
     for part in q.pointer.strip('/').split('/') if q.pointer else []:
         part = part.replace('~1', '/').replace('~0', '~')
@@ -157,6 +205,7 @@ def prepare(spec_path=DEFAULT_SPEC, directory=None):
         research_status='ready', selected=None,
         pilot=dict(provider=model,live_model_requests=0,framework_session_id=run_id,
             request_deadline_unix=spec['started_unix']+spec['budgets']['activity_s']-spec['budgets']['delivery_reserve_s']))
+    update(h,scoped_context=[save(h,read(ROOT/path),'supplied_scoped_context') for path in spec.get('supplied_evidence',[])])
     # Compact supplied history is explicitly different from retrieval.
     history = read(ROOT/'evidence/nmpc_settling_20261011/scientific_summary.json')
     ref = save(h, history, 'supplied_historical_context')
@@ -222,6 +271,10 @@ def construct(host, parameters, provenance):
 def verify_candidate(host, reference):
     s = state(host); c = host.store.artifact(reference)
     if s['candidates'].get(c.get('identity')) != plain(reference): raise ValueError('OWNED_RESOLVED_CANDIDATE_REQUIRED')
+    if plain(reference)==s.get('rl_source_candidate'):
+        if c['scientific_configuration']!=full_science(c['configuration']) or plain(c['configuration']['task'])!=host.store.artifact(s['rl_task']):
+            raise ValueError('PINNED_SOURCE_CANDIDATE_TASK_MISMATCH')
+        return c
     if c['profile_identity'] != s['profile']['identity']: raise ValueError('OLD_EVALUATION_PROFILE_CANDIDATE_REQUIRES_NEW_CONSTRUCTION')
     cfg, values = configuration_for(host,c['parameters'],host.run_id)
     if values != c['resolved_parameters'] or full_science(cfg) != c['scientific_configuration']:
@@ -272,7 +325,7 @@ def capacity(host, requested=1, confirmation=False, *, root_operation=False, can
     extra=max(0.,jobs*s['spec'].get('mechanics_allowances',{}).get('replay_s',0.)-integration.get('seconds',0.))
     integration_time=jobs*s['spec'].get('mechanics_allowances',{}).get('replay_s',0.)
     delivery_numerical=b.get('delivery_numerical_s',0.)
-    available_time=min(science-extra-delivery_numerical, s['cutoff_unix']-time.time()-integration_time, remaining['wall_s']-integration_time)
+    available_time=min(science-extra-delivery_numerical, (execution_deadline(host) if confirmation else s['cutoff_unix'])-time.time()-integration_time, remaining['wall_s']-integration_time)
     fit=max(0,min(requested,int(remaining['backend_solves'])-protect,math.floor(available_time/a)-protect,
         (int(remaining['tool_calls'])-4*protect-int(root_operation))//3))
     return dict(requested=requested, admitted=fit, internal_launches=fit, numerical_reservation_s=fit*a,
@@ -289,12 +342,12 @@ def guard(host, expensive=False):
     if 'freeze' not in s: raise ValueError('COMMIT_AND_BIND_BEFORE_RESEARCH')
     if science_hashes()!=s['profile']['science_hashes'] or core_hashes()!=s.get('core_hashes') or not host.compatibility()['compatible']:
         raise ValueError('DEPENDENCIES_CHANGED_COMMIT_AND_MIGRATE_WITHOUT_RESETTING_COSTS')
-    if time.time()>=s['cutoff_unix']: raise ValueError('PROTECTED_DELIVERY_WINDOW')
+    if time.time()>=s['started_unix']+s['spec']['budgets']['activity_s']: raise ValueError('ACTIVITY_DEADLINE_EXHAUSTED')
     if s['spec'].get('mode') == 'engineering_numerical':
         if host.store.remaining()['used']['model_calls'] or s['pilot']['live_model_requests']:
             raise ValueError('NUMERICAL_MODE_MODEL_REQUEST_VIOLATION')
-    elif expensive and host.store.remaining()['remaining']['model_calls']<=s['spec']['budgets']['protected_provider_requests']:
-        raise ValueError('LAST_FOUR_PROVIDER_REQUESTS_PROTECTED')
+    elif expensive and protected(host):
+        raise ValueError('PROTECTED_CLOSEOUT_REQUIRES_EXISTING_WORK_OR_STOP')
 
 
 def bind(host, reason=None, specification=None):
@@ -353,7 +406,7 @@ def bind(host, reason=None, specification=None):
 
 def execute(host, candidate_ref, operation_key, *, role='development', selected=None):
     construction_started=time.perf_counter()
-    guard(host,expensive=True); s=state(host); c=verify_candidate(host,candidate_ref)
+    guard(host,expensive=role!='confirmation'); s=state(host); c=verify_candidate(host,candidate_ref)
     expected_environment=s['spec'].get('numerical_environment',{})
     if any(os.environ.get(key)!=value for key,value in expected_environment.items()):
         raise ValueError('EXECUTION_REQUIRES_CALIBRATED_NUMERICAL_ENVIRONMENT_BEFORE_INTERPRETER_START')
@@ -735,9 +788,9 @@ def packet(host):
     if s['spec'].get('capabilities'):
         from tools.research_core_feedback import result_view, eligibility
         from tools.research_core_rl import packet as rl_packet
-        return dict(specification=s['spec'],frozen_task=plain(s['base_configuration']['task']),reference_candidate=s['reference_candidate'],
+        return dict(specification=s['spec'],scoped_context=s.get('scoped_context',[]),frozen_task=plain(s['base_configuration']['task']),reference_candidate=s['reference_candidate'],
             candidates=list(s['candidates'].values()),results=[dict(reference=r,**result_view(host,r),confirmation=eligibility(host,r)) for r in [*s['results'],*s.get('rl_evaluations',[])]],
-            mechanics_results=[dict(reference=r,**{k:host.store.artifact(r).get(k) for k in ('status','operation','trajectory_reference','objective_definition','original_task_feasible','relaxed_nlp_feasible','original_task_gaps','trajectory_metrics','charged_numerical_s')}) for r in s.get('mechanics_results',[])],
+            mechanics_results=[dict(reference=r,**{k:host.store.artifact(r).get(k) for k in ('status','operation','trajectory_reference','objective_definition','original_task_feasible','relaxed_nlp_feasible','original_task_gaps','trajectory_metrics','charged_numerical_s','checkpoint_reference')}) for r in s.get('mechanics_results',[])],
             handoffs=[dict(reference=r,**host.store.artifact(r)) for r in s.get('handoffs',[])],
             rl=rl_packet(host) if enabled(s['spec'],'rl') else None,
             nmpc_admission=[dict(candidate=r,**nmpc_timing(host,r),remaining_phase_admission=capacity(host,1,candidate=r)) for r in s['candidates'].values()] if s['spec'].get('nmpc_execution_cap_s') else None,
@@ -802,7 +855,8 @@ def dispatch(host, value, request_id, origin='model'):
             from tools.research_core_feedback import cached
             return cached(host.store.artifact(json.loads(old['receipt'])['output']))
         raise ValueError('RECOVER_EXISTING_OPERATION_NO_NEW_EXECUTION')
-    guard(host,plan.action in ('execute','search','confirm','mechanics','replay') or plan.diagnostic is not None)
+    admit_closeout(host,'research_plan',plain(plan))
+    guard(host,plan.action in ('execute','search','mechanics','replay') or plan.diagnostic is not None)
     s=state(host)
     for r in plan.supporting_evidence: host.store.artifact(r)
     from tools.research_core_experience import disposition_bindings
@@ -814,7 +868,6 @@ def dispatch(host, value, request_id, origin='model'):
         if s['spec'].get('rl_evaluation_source') and not evaluations: raise ValueError('RL_STOP_REQUIRES_EVALUATION_AND_NEXT_STEP_DECISION')
         if not plan.next_step: raise ValueError('RL_STOP_REQUIRES_NEXT_STEP_DECISION')
         for entry in s['rl_runs'].values():
-            if entry.get('source_study'): continue
             summary_ref=entry.get('training_summary')
             if summary_ref not in s.get('rl_evidence_reads',[]) or summary_ref not in [plain(v) for v in plan.supporting_evidence]:
                 raise ValueError('RL_STOP_REQUIRES_PUBLIC_TRAINING_SUMMARY_READ_AND_CITATION')
@@ -939,7 +992,7 @@ Diagnosis defaults to evidence inspection; at most one explicit replay of one ph
 No compatible capture means inspection only. Short failed training never proves design infeasibility.
 Hard cumulative ceilings include failures/corrections: 24 provider requests,60 public operations,one training run,
 2048 training actions,120 active training seconds,one evaluation episode,one diagnostic replay/one physical step,
-900 live study seconds. Last four provider requests are protected for evidence/STOP. No artificial waiting.
+900 live study seconds. The configured final provider reserve permits completing existing work and truthful STOP. Training waits for a decision boundary.
 Preserve goal, initialization, duration, inclusive holding-window and thresholds; rewards do not alter task acceptance.
 No robustness, generalization, solved numerical root cause, or complete autonomous research claims.
 STOP must cite new evaluation evidence and follow its explicit public read and terminal status query. If no usable published checkpoint exists, explicitly read/cite the training/failure summary without requesting evaluation, close the bounded study truthfully and state that independent evaluation/task performance remain unmeasured; do not spend repeated STOP attempts or request another training run."""
@@ -960,7 +1013,7 @@ Read independent evaluation evidence explicitly before deciding to adjust contro
 Select a passing development result via confirm selected_execution, freezing candidate+task+route+configuration+exact checkpoint. Use the predeclared fresh
 post-selection count. RL confirmation reloads exact weights, fresh simulation, no training or NMPC. Keep failed confirmations; no success-hunting retries.
 Selection remains immutable. Nominal repetitions support no robustness claim. No fresh baseline required; withhold improvement attribution without comparable evidence.
-Stop once confirmations pass; ceilings are not targets. Preserve all costs including failures. Last protected requests are evidence/STOP only.
+Stop once confirmations pass; ceilings are not targets. Preserve all costs including failures. The configured protected reserve permits existing work, evaluation, confirmation, evidence and STOP.
 STOP cites every new result and follows explicit RL evidence reads and terminal query, with next_step and actual unfinished requirements.
 Never include credentials, environment-file contents, unrelated files or personal data in model messages. No algorithm superiority or numerical root-cause claims.
 """
@@ -996,11 +1049,15 @@ async def converse(host):
             if s['research_status']=='stopped' or s['pending']: raise ValueError('SEALED_STOP_OR_PENDING_WORK_BLOCKS_SEND')
             if not s['pilot'].get('unconsumed_response'):
                 wire=json.loads(request.content)
-                if host.store.remaining()['remaining']['model_calls']<=4:
+                if protected(host):
                     definitions={t['function']['name']:t['function'] for t in wire.get('tools',[])}
                     action=definitions.get('research_plan',{}).get('parameters',{}).get('properties',{}).get('action',{})
-                    if action.get('const')!='stop' or set(definitions)-{'research_plan','evidence_read','retrieve_context'}:
-                        raise ValueError('PROTECTED_SEND_REQUIRES_STOP_ONLY_NATIVE_SCHEMA')
+                    permitted=closeout_operations(host)
+                    if action.get('enum')!=permitted['research_plan'] or set(definitions)-{'research_plan','research_rl','evidence_read','retrieve_context'}:
+                        raise ValueError('PROTECTED_SEND_REQUIRES_CLOSEOUT_NATIVE_SCHEMA')
+                    rl=definitions.get('research_rl')
+                    if rl and rl['parameters']['properties']['operation'].get('enum')!=permitted['research_rl']:
+                        raise ValueError('PROTECTED_RL_SEND_REQUIRES_EXISTING_WORK')
                     retrieval=definitions.get('retrieve_context')
                     if retrieval:
                         advertised=retrieval.get('parameters',{}).get('properties',{}).get('reference',{}).get('enum')
@@ -1065,7 +1122,7 @@ async def converse(host):
         configuration_path=host.store.root/'framework_configuration.json',session_directory=host.store.root/'framework_sessions')
     if state(host)['spec'].get('rl_evaluation_source'):
         agent.tool_registry.registry.pop('retrieve_context',None)
-    def before_model(event):
+    async def before_model(event):
         s=state(host)
         if s['research_status']=='stopped': event.cancel='Accepted native STOP; no additional request'; return
         if s['pilot'].get('unconsumed_response'):
@@ -1073,17 +1130,24 @@ async def converse(host):
             original=host.store.artifact(host.store.artifact(ev['outputs'][0])['request'])
             agent.system_prompt=next(m['content'] for m in original['messages'] if m['role']=='system'); return
         guard(host)
-        if rl_mode and s.get('rl_runs'):
-            from tools.research_core_rl import reconcile
-            for run_id in s['rl_runs']: reconcile(host,run_id)
-            s=state(host)
+        if rl_mode: await wait_training(host)
+        s=state(host)
+        if s['research_status']=='stopped': event.cancel='Study stopped while waiting'; return
+        guard(host)
+        if protected(host):
+            pilot=deepcopy(s['pilot']);pilot['request_deadline_unix']=execution_deadline(host);update(host,pilot=pilot)
         current=packet(host); record(host,'model_decision_packet',current)
         agent.system_prompt=instructions+'\nCURRENT_RESEARCH_PACKET\n'+json.dumps(current)
-        if host.store.remaining()['remaining']['model_calls']<=4:
-            schema=Plan.model_json_schema(); schema['properties']['action']={'const':'stop','type':'string'}
+        if protected(host):
+            permitted=closeout_operations(host)
+            schema=Plan.model_json_schema(); schema['properties']['action']={'enum':permitted['research_plan'],'type':'string'}
             native[0].tool_spec={**native[0].tool_spec,'inputSchema':{'json':schema}}
             agent.tool_registry.registry.pop('experience_retrieve',None)
-            agent.tool_registry.registry.pop('research_rl',None)
+            if rl_mode:
+                schema=deepcopy(native[-1].tool_spec['inputSchema']['json'])
+                schema['properties']['operation']['enum']=permitted['research_rl']
+                schema['properties']['run_id']['enum']=list(s.get('rl_runs',{}))
+                native[-1].tool_spec={**native[-1].tool_spec,'inputSchema':{'json':schema}}
             schema=EvidenceQuery.model_json_schema()
             schema['$defs']['EvidenceRef']['properties']['artifact_id']['enum']=[r['artifact_id'] for r in readable_results(s)]
             native[2].tool_spec={**native[2].tool_spec,'inputSchema':{'json':schema}}
@@ -1093,17 +1157,19 @@ async def converse(host):
                 spec=deepcopy(normalize_tool_spec(retrieval.tool_spec))
                 spec['inputSchema']['json']['properties']['reference']['enum']=feedback_context_references()
                 retrieval.tool_spec=spec
-            agent.system_prompt+='\nPROTECTED CLOSEOUT: consume supplied results and STOP only.'
+            agent.system_prompt+='\nPROTECTED CLOSEOUT: status/stop existing workers, pinned published-policy evaluation, explicit evidence reads, selected passing solution confirmations and truthful STOP. No start/resume/solve/exploration.'
     def before_tool(event):
         if state(host)['spec'].get('rl_evaluation_source') and event.tool_use['name'] not in ('research_plan','research_rl','evidence_read'):
             event.cancel_tool='Only declared follow-up evaluation, evidence reads and STOP are permitted.'
         if formal and event.tool_use['name']=='experience_retrieve':
             event.cancel_tool='Use only scoped milestone evidence; unrelated workspace retrieval is unauthorized.'
         record(host,'model_original_tool_request',dict(tool_use=event.tool_use))
-        if host.store.remaining()['remaining']['model_calls']<=4 and event.tool_use['name'] not in ('research_plan','evidence_read','retrieve_context'):
-            event.cancel_tool='Protected closeout permits evidence and STOP only.'
+        if protected(host) and event.tool_use['name'] not in ('research_plan','research_rl','evidence_read','retrieve_context'):
+            event.cancel_tool='Protected closeout permits only existing work, evidence and STOP.'
+        try: admit_closeout(host,event.tool_use['name'],event.tool_use['input'])
+        except ValueError as exc: event.cancel_tool=str(exc)
         if state(host)['research_status']=='stopped': event.cancel_tool='Accepted STOP seals further workflow work.'
-        if host.store.remaining()['remaining']['model_calls']<=4 and event.tool_use['name']=='retrieve_context' and event.tool_use['input'].get('reference') not in feedback_context_references():
+        if protected(host) and event.tool_use['name']=='retrieve_context' and event.tool_use['input'].get('reference') not in feedback_context_references():
             event.cancel_tool='Protected closeout permits existing execution feedback only.'
     def after_tool(event):
         record(host,'model_original_tool_feedback',dict(tool_use=event.tool_use,result=event.result))

@@ -1,0 +1,211 @@
+{
+  "study_id": "final-checkpoint-20261014",
+  "base_commit": "8f738733fe58073a214bd6eadac2319e65bb0d98",
+  "started_unix": 0,
+  "authorization": "User attachment e03e9551-f29a-4cdf-a641-a5a7cf104932 and explicit scoped DeepSeek transmission authorization, 2026-10-14; two separately bounded studies; scoped commit and ordinary push origin/feat/rl-control-pilot.",
+  "evaluation_version": 1,
+  "reference_parameters": {
+    "d": 0,
+    "holding_tip_speed_weight": 0.1,
+    "terminal_tip_speed_weight": 0.1
+  },
+  "allowed_parameters": {
+    "d": [
+      -1,
+      1
+    ],
+    "holding_tip_speed_weight": [
+      0.025,
+      0.1
+    ],
+    "terminal_tip_speed_weight": [
+      0.025,
+      0.1
+    ]
+  },
+  "ranking": "feasible_then_max_normalized_violation_then_sum_v1",
+  "record_update_ids": [
+    8,
+    29,
+    30
+  ],
+  "complete_update_inputs": true,
+  "budgets": {
+    "provider_requests": 24,
+    "public_operations": 60,
+    "physical_launches": 0,
+    "local_solves": 0,
+    "local_solve_s": 0,
+    "offline_nlp": 0,
+    "bdf_replays": 0,
+    "numerical_s": 1800,
+    "activity_s": 1800,
+    "delivery_reserve_s": 300,
+    "protected_provider_requests": 12
+  },
+  "execution_allowances": {
+    "simulation_s": 1700,
+    "evaluation_s": 30,
+    "profile_s": 60,
+    "construction_s": 10
+  },
+  "confirmation": {
+    "fresh_independent_repetitions": 2,
+    "configuration": "Two fresh post-selection nominal episodes; original task, identical selected candidate/controller/configuration and exact frozen RL checkpoint. Development evaluation excluded; retain failures; no success-hunting retries."
+  },
+  "optional_enhancements": {
+    "offline_schedule_initialization": "deferred until core delivery and sufficient remaining budget",
+    "legacy_skill_admission": "deferred; read-only drafts available"
+  },
+  "mode": "formal_research",
+  "tension_execution_mode": "ideal_tension",
+  "evidence_destination": "evidence/final_checkpoint_20261014",
+  "rl_limits": {
+    "training_runs": 0,
+    "actions_per_trial": 200000,
+    "seconds_per_trial": 1200,
+    "training_actions": 0,
+    "training_active_seconds": 0,
+    "evaluation_episodes": 3,
+    "diagnostic_replays": 0,
+    "diagnostic_physics_steps": 0
+  },
+  "capabilities": [
+    "rl"
+  ],
+  "rl_evaluation_allowance_s": 120,
+  "nmpc_execution_cap_s": 1800,
+  "offline_solver_s": 3300,
+  "mechanics_allowances": {
+    "solve_s": 3300,
+    "replay_s": 300,
+    "inspect_s": 60
+  },
+  "nmpc_limits": {
+    "executions": 0
+  },
+  "nmpc_timing_evidence": [
+    {
+      "scientific_configuration_identity": "91c7032e7a4690d3e91b61ec34ee00130a51867d6cc06d85caf0da4f31de5c22",
+      "complete_execution_s": 729.8433474299993,
+      "measured_complete_execution_s": 540.6247017999995,
+      "margin": 1.35,
+      "source": {
+        "archive": "evidence/research_core_20261011/immutable_artifacts.tar.gz",
+        "result": {
+          "artifact_id": "df0b70c9d13237b203dbb711cd16c861d0c16fa0a85909bbaf64a4a1dc09f0ca",
+          "media_type": "application/json"
+        },
+        "ownership": "historical; existing timing, no new calibration"
+      }
+    },
+    {
+      "scientific_configuration_identity": "91c7032e7a4690d3e91b61ec34ee00130a51867d6cc06d85caf0da4f31de5c22",
+      "complete_execution_s": 723.8085303149797,
+      "measured_complete_execution_s": 536.154466899985,
+      "margin": 1.35,
+      "source": {
+        "archive": "evidence/research_core_20261011/immutable_artifacts.tar.gz",
+        "result": {
+          "artifact_id": "34e75e00627182e5a006804efd9e00b21949643c29020961fc2a9513e1f6dab5",
+          "media_type": "application/json"
+        },
+        "ownership": "historical; existing timing, no new calibration"
+      }
+    },
+    {
+      "scientific_configuration_identity": "91c7032e7a4690d3e91b61ec34ee00130a51867d6cc06d85caf0da4f31de5c22",
+      "complete_execution_s": 641.2793865299668,
+      "measured_complete_execution_s": 475.02176779997535,
+      "margin": 1.35,
+      "source": {
+        "archive": "evidence/research_core_20261011/immutable_artifacts.tar.gz",
+        "result": {
+          "artifact_id": "043ffc3d31382c5d91d27f3ec3ee403978d472322ef6612264794cb5a8ce2d49",
+          "media_type": "application/json"
+        },
+        "ownership": "historical; existing timing, no new calibration"
+      }
+    },
+    {
+      "scientific_configuration_identity": "91c7032e7a4690d3e91b61ec34ee00130a51867d6cc06d85caf0da4f31de5c22",
+      "complete_execution_s": 662.3072149499785,
+      "measured_complete_execution_s": 490.5979369999841,
+      "margin": 1.35,
+      "source": {
+        "archive": "evidence/research_core_20261011/immutable_artifacts.tar.gz",
+        "result": {
+          "artifact_id": "a2904e47bca95913ae96922b50cb525e2dd0fa4570f9ed75869454c2431728ca",
+          "media_type": "application/json"
+        },
+        "ownership": "historical; existing timing, no new calibration"
+      }
+    },
+    {
+      "scientific_configuration_identity": "91c7032e7a4690d3e91b61ec34ee00130a51867d6cc06d85caf0da4f31de5c22",
+      "complete_execution_s": 761.0898686850823,
+      "measured_complete_execution_s": 563.7702731000609,
+      "margin": 1.35,
+      "source": {
+        "archive": "evidence/research_core_20261011/immutable_artifacts.tar.gz",
+        "result": {
+          "artifact_id": "089040ea3e1ca9a8443685afd25fc8c64b4b0a11d4cc52ea27ab1c3580d50f61",
+          "media_type": "application/json"
+        },
+        "ownership": "historical; existing timing, no new calibration"
+      }
+    },
+    {
+      "scientific_configuration_identity": "84551517c2a6527ca753a1350aa0df2ecec2ac5005e4a7668c252488533ebcdd",
+      "complete_execution_s": 767.0489449949179,
+      "measured_complete_execution_s": 568.1844036999391,
+      "margin": 1.35,
+      "source": {
+        "archive": "evidence/research_core_20261011/immutable_artifacts.tar.gz",
+        "result": {
+          "artifact_id": "f3d993ba4333dd5f34ee150f916fdc99a0670c99e7870b97a3f5e7e5f1c24b49",
+          "media_type": "application/json"
+        },
+        "ownership": "historical; existing timing, no new calibration"
+      }
+    }
+  ],
+  "historical_evidence": {
+    "references": {
+      "training_summary": {
+        "artifact_id": "4aa260f167618d9d205e58c5ea77fc63c82eb53d9fc402b53a57319f3fa2c79a",
+        "media_type": "application/json"
+      },
+      "numerical_failure": {
+        "artifact_id": "23a6aec72f9ff17c95f9244ee73f2d1f63fbd3ccc126de7d682dc732a5a17d65",
+        "media_type": "application/json"
+      }
+    },
+    "ownership": "Sealed source records; not current experiments or new costs",
+    "prior_cost_reports": [
+      "evidence/design_control_20261013/completion.md",
+      "evidence/rl_evaluation_followup_20261013/summary.json"
+    ]
+  },
+  "rl_diagnostic_allowance_s": 60,
+  "execution_instructions": "Complete this bounded supplemental policy study only. First evidence_read original task rl.frozen_task, scoped_context historical outcome, and rl.source_summary; read remaining budget/specification. Query research_rl status for the pinned run and explicitly evidence_read its final training_summary_reference. Request exactly one initial independent evaluate for training-summary-formal-20261013-fb54a8b8, step-00199936-c4de57ba, actual training step199936, exact candidate/configuration/policy hashes declared in source; earlier trial/checkpoint results are no substitute. Source is sealed by engineering after exhausted model budget, NOT an accepted historical STOP; preserve it unchanged.\nExplicitly evidence_read new result metrics, completeness and failure evidence. If complete original task passes, select/freeze this exact design/controller via research_plan confirm selected_execution and perform the two declared fresh confirmations through existing logic, explicitly read each. If initial evaluation fails or is incomplete, record actual gaps/failure, give one evidence-based recommendation, and STOP normally with next_step and citations. A failed confirmation remains an unconfirmed solution: retain it, never retry for success. No training, math, diagnostic or NMPC, design change, another checkpoint or repeated development evaluation.\nOriginal frozen task is authoritative: target[.29,.035,.19], zero initializer,.35s,.01s control,.0005s physics,.01m position,.02m/s holding speed,inclusive samples30-35. Reward never establishes acceptance. Budget24 provider,60 public,1800 elapsed including300 delivery,12 final requests reserved; at most1 development evaluation and2 post-pass confirmations. Costs separate from historical and formal study, no transfer or reset. STOP cites terminal training summary and all new evaluations, after their explicit evidence_read, with evidence-based next_step. Send only authorized scoped nonsecret data.",
+  "offline_stopping_policy": "research_work_v1",
+  "supplied_evidence": [
+    "evidence/scheduling_closeout_20261014/historical_context.json"
+  ],
+  "allowed_plan_actions": [
+    "confirm",
+    "stop"
+  ],
+  "allowed_rl_operations": [
+    "status",
+    "evaluate"
+  ],
+  "rl_evaluation_source": {
+    "study_id": "training-summary-formal-20261013",
+    "run_id": "training-summary-formal-20261013-fb54a8b8",
+    "checkpoint": "step-00199936-c4de57ba",
+    "config_sha256": "51d096cb0726aa9bf688f75fa170731a512e1b5f2f55bcb079ddcf46ab69ca5d",
+    "policy_sha256": "8bdcfc66c9ea00d69811c11c1423d8b363737bec0828047d5baba821c9eda9d1"
+  }
+}

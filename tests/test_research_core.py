@@ -279,7 +279,7 @@ class RLIntegrationTests(TestCase):
         with patch.object(bridge.run,'status',return_value=value):
             bridge.reconcile(host,'r');bridge.reconcile(host,'r')
         self.assertEqual(store.state['rl_runs']['r']['status']['consumed']['attempted_actions'],32)
-        self.assertIsNotNone(store.state['rl_runs']['r']['active_reservation'])
+        self.assertIsNotNone(store.state['rl_runs']['r']['active_reservation']);self.assertEqual(store.state['numerical_s'],3)
 
 
     def test_owned_generated_candidate_frozen_task_overrides_and_duplicate_receipt(self):
@@ -481,9 +481,10 @@ class FormalControlTests(TestCase):
         import hashlib
         with TemporaryDirectory(dir=core.ROOT/'runs',prefix='followup-fixture-') as folder:
             root=core.Path(folder);spec=read(core.ROOT/'examples/research_core/rl_evaluation_followup.json')
-            binding=spec.pop('rl_evaluation_source');spec.update(study_id='followup-fixture-'+root.name,started_unix=time.time())
+            binding=spec.pop('rl_evaluation_source');spec.update(study_id='followup-fixture-'+root.name,started_unix=time.time(),mode='formal_research',capabilities=['rl'],allowed_plan_actions=['stop','confirm']);spec['rl_limits']['evaluation_episodes']=3;spec['confirmation']['fresh_independent_repetitions']=2;spec['budgets'].update(numerical_s=1800,activity_s=1800,delivery_reserve_s=300,protected_provider_requests=12)
             path=root/'spec.json';core.atomic_json(path,spec);h=core.prepare(path,root/'business');s=core.state(h)
-            cfg,task=bridge.prepare_input(h,RLRequest(operation='start',candidate=s['reference_candidate'],mode='direct',allocation=dict(actions=512,active_seconds=10),rationale='fixture only'))
+            cfg,task=bridge.prepare_input(h,RLRequest(operation='start',candidate=s['reference_candidate'],mode='direct',allocation=dict(actions=700,active_seconds=10),rationale='fixture only'))
+            self.assertEqual(cfg['requested_allocation']['actions'],700);self.assertEqual(cfg['budget']['actions'],512)
             directory=root/'runtime'/binding['run_id'];policy=directory/'checkpoints'/binding['checkpoint']/'policy.zip'
             policy.parent.mkdir(parents=True);policy.write_bytes(b'fixture policy')
             binding['policy_sha256']=hashlib.sha256(policy.read_bytes()).hexdigest()
@@ -496,7 +497,7 @@ class FormalControlTests(TestCase):
             original=deepcopy(sealed);spec['rl_evaluation_source']=binding;core.update(h,spec=spec)
             with patch('tools.platform_store.Store',return_value=old),patch.object(bridge.run,'RUNS',root/'runtime'),patch.object(bridge.run,'worker_alive',return_value=False):
                 bridge.bind_source(h)
-                report=dict(passed=False,episodes=[dict(complete=False,passed=False,numerical_failure={'message':'QVEL'},terminal_position_error_m=None)])
+                report=dict(passed=True,episodes=[dict(complete=True,passed=True,terminal_position_error_m=.005)])
                 q=dict(operation='evaluate',run_id=binding['run_id'],checkpoint=binding['checkpoint'],rationale='fixture')
                 with patch.object(core,'guard'),patch.object(bridge.run,'status',side_effect=AssertionError('no source reconciliation')),patch.object(bridge,'invoke',return_value=report) as invoke:
                     bridge.dispatch(h,dict(operation='status',run_id=binding['run_id'],rationale='fixture'),'status')
@@ -504,12 +505,21 @@ class FormalControlTests(TestCase):
                     self.assertEqual(invoke.call_count,1);self.assertEqual(invoke.call_args.args[3],policy)
                     self.assertTrue(core.Path(invoke.call_args.args[5]).is_relative_to(h.store.root))
                     self.assertEqual(invoke.call_args.kwargs['timeout_s'],120)
-                    self.assertTrue(result['independent_evaluation_executed']);self.assertFalse(result['episodes'][0]['complete'])
+                    self.assertTrue(result['independent_evaluation_executed']);self.assertTrue(result['episodes'][0]['complete'])
                     for operation in ('start','resume','stop','diagnose'):
                         request=dict(operation=operation,run_id=binding['run_id'],rationale='fixture') if operation!='start' else dict(operation=operation,candidate=s['reference_candidate'],mode='direct',allocation={'actions':512,'active_seconds':10},rationale='fixture')
                         with self.assertRaisesRegex(ValueError,'scope'):bridge.dispatch(h,request,operation)
                     with self.assertRaisesRegex(ValueError,'pinned'):bridge.dispatch(h,dict(q,checkpoint='other'),'wrong')
-                self.assertEqual(sealed,original);self.assertEqual(core.state(h)['rl_runs'][binding['run_id']]['evaluations'],1)
+                self.assertEqual(core.verify_candidate(h,result['candidate'])['identity'],h.store.artifact(oldentry['candidate'])['identity'])
+                core.read_evidence(h,{'reference':result['reference']})
+                plan=dict(action='confirm',selected_execution=result['reference'],**{k:'Exact pinned fixture' for k in ('hypothesis','expected_observation','weakening_observation','fixed_conditions','stopping_condition','interpretation')})
+                with patch.object(core,'guard'),patch.object(bridge,'invoke',return_value=report) as confirmation:
+                    core.dispatch(h,plan,'fresh-1');core.dispatch(h,plan,'fresh-2')
+                    self.assertEqual(confirmation.call_count,2)
+                    for call in confirmation.call_args_list:
+                        self.assertEqual(call.args[3],policy);self.assertTrue(core.Path(call.args[5]).is_relative_to(h.store.root))
+                self.assertEqual(core.claims(h)['independent_confirmation_count'],2)
+                self.assertEqual(sealed,original);self.assertEqual(core.state(h)['rl_runs'][binding['run_id']]['evaluations'],3)
                 self.assertEqual(core.state(h)['rl_runs'][binding['run_id']]['allocation']['actions'],0)
                 entry=core.state(h)['rl_runs'];entry[binding['run_id']]['evaluations']=0;core.update(h,rl_runs=entry)
                 with patch.object(core,'guard'),patch.object(bridge,'invoke',side_effect=RuntimeError('fixture packaging exception')):
@@ -531,3 +541,41 @@ class FormalControlTests(TestCase):
         self.assertNotIn('phase_A_dependency',inspect.getsource(core.converse));self.assertNotIn('phase_A_evidence',inspect.getsource(core.packet))
         self.assertNotIn('Phase A',core.FORMAL_INSTRUCTIONS);self.assertNotIn('Phase B',core.FORMAL_INSTRUCTIONS)
         self.assertEqual(core.confirmation_count({'spec':read(core.ROOT/'examples/design_control/phase_B.json')}),2)
+
+
+class SchedulingCloseoutTests(TestCase):
+    def test_wait_terminal_milestone_deadline_without_provider_or_summaries(self):
+        import asyncio
+        from unittest.mock import AsyncMock
+        from tools import research_core_rl as bridge
+        h=object();s=dict(spec={},research_status='ready',cutoff_unix=time.time()+100,rl_runs={'fixture':{}})
+        with patch.object(core,'state',return_value=s),patch.object(core,'execution_deadline',return_value=time.time()+100),patch.object(bridge,'reconcile',side_effect=[dict(worker_alive=True,status='running'),dict(worker_alive=False,status='failed')]) as status,patch.object(core.asyncio,'sleep',new_callable=AsyncMock) as sleep,patch.object(bridge.run,'training_summary',side_effect=AssertionError('no snapshots')),patch('tools.strands_pilot_r3.LiveBoundary.handle_async_request',side_effect=AssertionError('no provider')):
+            asyncio.run(core.wait_training(h));self.assertEqual(sleep.await_count,1)
+            self.assertEqual(status.call_args.kwargs,{'lightweight':True})
+        s['spec']['rl_wait_milestones']={'fixture':512}
+        with patch.object(core,'state',return_value=s),patch.object(core,'execution_deadline',return_value=time.time()+100),patch.object(bridge,'reconcile',return_value=dict(worker_alive=True,status='running')),patch.object(core,'read',side_effect=[dict(current='published'),dict(inherited={'num_timesteps':512})]),patch.object(core.asyncio,'sleep',new_callable=AsyncMock) as sleep:
+            asyncio.run(core.wait_training(h));sleep.assert_not_awaited()
+        s['spec']={};s['cutoff_unix']=time.time()-1
+        with patch.object(core,'state',return_value=s),patch.object(core,'execution_deadline',return_value=time.time()-1),patch.object(bridge,'reconcile',return_value=dict(worker_alive=True,status='running')),patch.object(bridge,'dispatch') as stop:
+            asyncio.run(core.wait_training(h));self.assertEqual(stop.call_args.args[1]['operation'],'stop')
+
+    def test_configured_protection_and_complete_training_closeout_reserve(self):
+        from types import SimpleNamespace
+        from tools import research_core_rl as bridge
+        s=dict(spec=read(core.ROOT/'examples/research_core/joint_design_control.json'),started_unix=time.time(),cutoff_unix=time.time()+4000,rl_runs={'existing':{}},numerical_s=0,numerical_reserved_s=0)
+        remaining=dict(model_calls=16,tool_calls=160,wall_s=14000)
+        h=SimpleNamespace(store=SimpleNamespace(remaining=lambda: {'remaining':remaining}))
+        with patch.object(core,'state',return_value=s),patch.object(bridge,'evaluation_capacity',return_value={'admitted':1}):
+            self.assertTrue(core.protected(h))
+            for action in ('stop','confirm'):core.admit_closeout(h,'research_plan',{'action':action})
+            for operation in ('status','stop','evaluate'):core.admit_closeout(h,'research_rl',{'operation':operation})
+            for name,field,actions in [('research_plan','action',['mechanics','execute','search']),('research_rl','operation',['start','resume'])]:
+                for action in actions:
+                    with self.assertRaisesRegex(ValueError,'PROTECTED'):core.admit_closeout(h,name,{field:action})
+            with self.assertRaisesRegex(ValueError,'CLOSEOUT'):bridge.training_capacity(h,{'active_seconds':1200})
+            remaining['model_calls']=17;remaining['tool_calls']=11
+            with self.assertRaisesRegex(ValueError,'CLOSEOUT'):bridge.training_capacity(h,{'active_seconds':1200})
+            remaining['tool_calls']=12
+            bridge.training_capacity(h,{'active_seconds':1200})
+            s['spec']['budgets']['protected_provider_requests']=9
+            with self.assertRaisesRegex(ValueError,'CLOSEOUT'):bridge.training_capacity(h,{'active_seconds':1200})

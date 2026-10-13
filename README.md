@@ -338,3 +338,28 @@ See [TaskContract and source map](docs/task_contract.md) and
 ## MATLAB 三维与绳驱家族开发入口
 
 新增串联多段、非圆截面、逐根绳路、共享执行器与结构候选，保留旧入口。使用 `python examples/workbench.py platform tendon-family --help`；完整示例、支持范围及实际验证见 [docs/tendon_family.md](docs/tendon_family.md)。
+
+
+### Bounded checkpoint and joint-design studies
+
+The existing research core waits inside Strands' before-model hook for owned RL
+workers to finish or fail (or a predeclared checkpoint milestone/deadline), with
+lightweight reconciliation and no provider polling or repeated summary snapshots.
+The configured closeout reserve consistently allows existing-run status/stop,
+exact published-policy evaluation, evidence reads, selection and reserved fresh
+confirmations, and truthful STOP; new training/resume, solves and exploratory
+executions are blocked. Admission reserves terminal summary/read, evaluation/read,
+confirmation/read and STOP using the same ledger. Requested actions round down to
+whole single-environment rollouts; cumulative consumption never resets.
+
+Use the existing CLI with --spec examples/research_core/final_checkpoint.json
+or --spec examples/research_core/joint_design_control.json, in order:
+prepare, scoped commit, bind, live, export. Each new study has its own Store
+and ceilings. Pinned-source evaluation imports exact historical candidate/task/
+configuration/checkpoint identities, writes results and charges only to its new
+study, and preserves the source's engineering closure as an unaccepted historical
+STOP. The formal configuration admits one joint length/motion solve at 3300s,
+research_work_v1 (no internal CPU/wall timeout), and the existing 1000 iterations.
+Construction/assembly/solver checkpoints share the existing progress artifact.
+Runtime policies and large worker artifacts remain under ignored runs/;
+compact results and runtime hashes are recorded in the study evidence directories.

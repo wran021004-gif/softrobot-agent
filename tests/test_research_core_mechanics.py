@@ -168,3 +168,36 @@ class MechanicsTests(TestCase):
         core.update(h,results=rows)
         self.assertTrue(core.claims(h)['comparable_control_adaptation_for_structure_comparison'])
         self.assertTrue(core.claims(h)['parameter_improvement_attribution_permitted'])
+
+
+    def test_effective_research_work_allowance_reaches_solver_without_internal_limit(self):
+        from schemas.research_core import Plan
+        from tools import casadi_feedback_worker as feedback
+        s=core.state(self.host);spec=s['spec'];spec.update(offline_solver_s=3300,offline_stopping_policy='research_work_v1')
+        spec['mechanics_allowances']['solve_s']=3300;core.update(self.host,spec=spec)
+        captured=[]
+        def worker(argv,**kwargs):
+            request=core.read(argv[-2]);captured.append(request)
+            self.assertEqual(kwargs['timeout'],3300)
+            core.atomic_json(argv[-1],dict(status='fixture_no_candidate'))
+            return SimpleNamespace(stdout=b'',returncode=0)
+        with patch.object(core,'guard'),patch.object(mechanics.subprocess,'run',side_effect=worker):
+            mechanics.dispatch(self.host,'solve',Plan.model_validate(self.plan('mechanics',mechanics={})).mechanics,'allowance')
+        request=captured[0];self.assertEqual(request['offline_solver_s'],3300);self.assertEqual(request['offline_stopping_policy'],'research_work_v1')
+        problem=SimpleNamespace(variables={'slack/position':{},'slack/speed':{},**{f'u/{k}/0':{} for k in range(35)}},constraints=[])
+        workspace=SimpleNamespace(mechanics_construction_s=1,assembly_s=2,m=1,assemble=lambda *a:problem)
+        class ReachedSolver(Exception):pass
+        class Solver:
+            def __init__(self,options):
+                self.options=options
+                self.last_diagnostics={}
+            def _bounds(self,*args):return [],[],[]
+            def solve(self,*args):
+                self_test.assertEqual(self.options['max_iterations'],1000)
+                self_test.assertIsNone(self.options['max_cpu_s']);self_test.assertIsNone(self.options['max_wall_s'])
+                raise ReachedSolver()
+        self_test=self;progress=Path(self.temp.name)/'effective_progress.json'
+        with patch.object(feedback,'Workspace',return_value=workspace),patch.object(feedback,'IpoptSolver',Solver):
+            with self.assertRaises(ReachedSolver):feedback.solve(request['configuration'],request['arguments'],'reverse',progress=progress,execution={'offline_solver_s':request['offline_solver_s'],'stopping_policy':request['offline_stopping_policy']})
+        self.assertEqual(core.read(progress)['phase'],'solver_entered')
+        self.assertIsNone(core.read(progress)['options']['max_wall_s'])
