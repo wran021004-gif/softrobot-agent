@@ -53,13 +53,13 @@ def prepare_input(host, request):
     return run.resolve_config(cfg),task_ref
 
 
-def invoke(operation, run_id, *arguments):
+def invoke(operation, run_id, *arguments, deadline=float("inf")):
     from tools.research_core import ROOT
     import os
-    env={k:v for k,v in os.environ.items() if k in ('SystemRoot','WINDIR','PATH','TEMP','TMP','USERPROFILE','APPDATA','LOCALAPPDATA','COMSPEC','PATHEXT')}
+    env={k:os.environ[k] for k in ('SystemRoot','WINDIR','PATH','TEMP','TMP','USERPROFILE','APPDATA','LOCALAPPDATA','COMSPEC','PATHEXT') if k in os.environ}
     env.update(OPENBLAS_NUM_THREADS='1',OMP_NUM_THREADS='1',MKL_NUM_THREADS='1')
     result=subprocess.run([str(run.PYTHON),'-m','tools.rl.run',operation,'--run-id',run_id,*map(str,arguments)],
-        cwd=ROOT,env=env,capture_output=True,text=True,timeout=150,creationflags=getattr(subprocess,'CREATE_NO_WINDOW',0))
+        cwd=ROOT,env=env,capture_output=True,text=True,timeout=min(150,max(.001,deadline-time.time())),creationflags=getattr(subprocess,'CREATE_NO_WINDOW',0))
     if result.returncode: raise RuntimeError(result.stderr[-3000:])
     return json.loads(result.stdout)
 
@@ -110,11 +110,17 @@ def dispatch(host, value, request_id):
                 allocation=plain(q.allocation),request_identity=key,active_reservation=plain(q.allocation),evaluations=0,replays=0)
             runs=core.state(host).get('rl_runs',{}); runs[run_id]=entry; core.update(host,rl_runs=runs)
             path=host.store.root/'rl_inputs'/('config-'+row['execution_id']+'.json');run.write_json(path,config)
-            result=invoke('start',run_id,'--config',path)
+            result=invoke('start',run_id,'--config',path,deadline=s['cutoff_unix'])
             result.update(effective_configuration=entry['configuration'],requested_overrides=config['requested_overrides'])
         elif q.operation in ('status','stop','resume'):
             if q.operation=='status': result=reconcile(host,q.run_id)
-            else: result=invoke(q.operation,q.run_id)
+            else: result=invoke(q.operation,q.run_id,deadline=s['cutoff_unix'])
+        elif q.operation=='diagnose' and not q.failure:
+            directory=run.run_path(q.run_id)
+            result=dict(run_id=q.run_id,replay_requested=q.replay,replay_executed=False,
+                scope='Owned run evidence inspection only; no capture selected, zero physical steps',
+                status=reconcile(host,q.run_id),available_captures=[str(p.relative_to(directory)) for p in (directory/'failures').glob('**/*.npz')],
+                root_cause='unresolved',attempted_physics_steps=0)
         else:
             run_id=q.run_id; directory=run.run_path(run_id); entry=core.state(host)['rl_runs'][run_id]
             config=run.read_json(directory/'config.json')
@@ -143,8 +149,8 @@ def dispatch(host, value, request_id):
                     st=host.store.session(host.run_id,db)['state']; runs=st['rl_runs']
                     if sum(e[counter] for e in runs.values())>=limit: raise ValueError('Cumulative '+counter+' ceiling exhausted')
                     runs[run_id][counter]+=1;host.store.update_state(db,host.run_id,st)
-            result=invoke(q.operation,run_id,*arguments,'--output',output)
-            result.update(study=host.run_id,candidate=entry['candidate'],task=entry['task'],run_id=run_id,configuration=entry['configuration'])
+            result=invoke(q.operation,run_id,*arguments,'--output',output,deadline=s['cutoff_unix'])
+            result.update(study=host.run_id,candidate=entry['candidate'],task=entry['task'],run_id=run_id,configuration=entry['configuration'],independent_evaluation_executed=q.operation=='evaluate')
             reference=core.save(host,result,'rl_'+q.operation+'_evidence')
             if q.operation=='evaluate': core.update(host,rl_evaluations=[*core.state(host).get('rl_evaluations',[]),reference])
             result=dict(reference=reference,**result)
@@ -152,8 +158,11 @@ def dispatch(host, value, request_id):
             tool_id='research.core_rl',tool_version='1.0.0',execution_status='completed',charged=zero()),result)
         return result
     except Exception as exc:
+        failure=dict(error=str(exc))
+        if q.operation=='evaluate':
+            failure=unavailable_evaluation(host,q.run_id,request_id,str(exc))
         host.store.complete(row,dict(request_id=request_id,execution_id=row['execution_id'],caller=host.actor,
-            tool_id='research.core_rl',tool_version='1.0.0',execution_status='failed',charged=zero(),error=str(exc)),dict(error=str(exc)))
+            tool_id='research.core_rl',tool_version='1.0.0',execution_status='failed',charged=zero(),error=str(exc)),failure)
         raise
 
 
@@ -167,3 +176,21 @@ def packet(host):
         runs=s.get('rl_runs',{}),evaluations=[dict(reference=r,**host.store.artifact(r)) for r in s.get('rl_evaluations',[])],
         costs='RL active time/evaluation costs separate from provider wall time; elapsed study time uses one wall clock',
         live_elapsed_s=max(0,time.time()-s['started_unix']))
+
+
+
+def unavailable_evaluation(host, run_id, operation_key, reason):
+    """Seal actual failed evaluation-attempt evidence without inventing an episode."""
+    from tools import research_core as core
+    s=core.state(host);entry=s['rl_runs'][run_id]
+    previous=next((r for r in s.get('rl_evaluations',[]) if host.store.artifact(r).get('operation_key')==operation_key),None)
+    if previous:return dict(reference=previous,**host.store.artifact(previous))
+    value=dict(study=host.run_id,candidate=entry['candidate'],task=entry['task'],run_id=run_id,
+        configuration=entry['configuration'],operation_key=operation_key,independent_evaluation_executed=False,
+        passed=False,task_performance='unmeasured',failure_reason=reason,episodes=[],evaluation_elapsed_s=0,
+        counts=dict(attempted_actions=0,completed_actions=0,attempted_physics_steps=0),
+        scope='Failed public evaluation request; no saved policy loaded, no fresh simulation episode or trajectory fabricated',
+        run_status=entry.get('status'))
+    ref=core.save(host,value,'rl_evaluation_unavailable')
+    core.update(host,rl_evaluations=[*s.get('rl_evaluations',[]),ref])
+    return dict(reference=ref,**value)

@@ -291,3 +291,14 @@ class RLIntegrationTests(TestCase):
             self.assertIn('evaluations',core.packet(h)['rl'])
             import gc
             gc.collect()
+
+    def test_numerical_subprocess_preserves_windows_systemroot_case_insensitively(self):
+        from tools import research_core_rl as bridge
+        import os
+        with patch.object(bridge.subprocess,'run') as launch:
+            launch.return_value=__import__('types').SimpleNamespace(returncode=0,stdout='{}')
+            bridge.invoke('status','fixture')
+            environment=launch.call_args.kwargs['env']
+            if os.name=='nt':self.assertEqual(environment['SystemRoot'],os.environ['SYSTEMROOT'])
+            self.assertEqual(environment['OMP_NUM_THREADS'],'1')
+            self.assertNotIn('DEEPSEEK_API_KEY',environment)

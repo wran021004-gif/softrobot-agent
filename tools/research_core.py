@@ -641,8 +641,8 @@ def local_diagnostic(host, query, key):
 def claims(host):
     if state(host)['spec'].get('mode')=='rl_interface':
         s=state(host)
-        return dict(interface_evaluations=len(s.get('rl_evaluations',[])),task_passed=any(host.store.artifact(r)['passed'] for r in s.get('rl_evaluations',[])),
-            scope='One short candidate-aware interface trial; no design infeasibility, robustness or root-cause claim')
+        return dict(interface_evaluations=sum(host.store.artifact(r).get('independent_evaluation_executed',False) for r in s.get('rl_evaluations',[])),task_passed=any(host.store.artifact(r)['passed'] for r in s.get('rl_evaluations',[])),
+            scope='One short candidate-aware interface trial; no design infeasibility, robustness or root-cause claim',evaluation_attempt_evidence=len(s.get('rl_evaluations',[])))
     s=state(host); current=s['profile']['identity']; rows=[host.store.artifact(r) for r in s['results']]
     reference=host.store.artifact(s['reference_candidate'])['identity']
     comparable=[r for r in rows if r['profile_identity']==current and r['scientific_identity']==reference and r['status']=='evaluated']
@@ -859,7 +859,7 @@ Hard cumulative ceilings include failures/corrections: 24 provider requests,60 p
 900 live study seconds. Last four provider requests are protected for evidence/STOP. No artificial waiting.
 Preserve goal, initialization, duration, inclusive holding-window and thresholds; rewards do not alter task acceptance.
 No robustness, generalization, solved numerical root cause, or complete autonomous research claims.
-STOP must cite new evaluation evidence and follow its explicit public read and terminal status query."""
+STOP must cite new evaluation evidence and follow its explicit public read and terminal status query. If a public evaluation attempt cannot run because no checkpoint exists, read its immutable failure evidence, close the bounded study truthfully and state that independent evaluation/task performance remain unmeasured; do not spend repeated STOP attempts or request another training run."""
 
 
 async def converse(host):
