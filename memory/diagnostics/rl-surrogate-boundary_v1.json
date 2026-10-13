@@ -1,0 +1,44 @@
+{
+  "schema": "project_diagnostic_procedure_v1",
+  "entry_id": "rl-surrogate-boundary",
+  "revision": "1",
+  "kind": "procedure",
+  "failure_type": "surrogate_terminal",
+  "trigger": "Exclude explicitly marked surrogate training terminals from physical evaluation and demonstrations.",
+  "procedure": [
+    "Exclude explicitly marked surrogate training terminals from physical evaluation and demonstrations."
+  ],
+  "bindings": {
+    "task": "reach_and_hold",
+    "structure": "two_segments_six_tendons",
+    "physics": "implicitfast dt=0.0005",
+    "xml_id": "60c5e069f76253e05d9b0aa2cd873abda87abecb84b6d0814c30f4e0052a88de",
+    "sb3_version": "2.9.0"
+  },
+  "status": {
+    "diagnostic_method_supported": true,
+    "repair_effective_in_this_case": false,
+    "generalization": "unverified"
+  },
+  "evidence": [
+    {
+      "path": "tools/rl/env.py",
+      "sha256": "206f7314608b1d247f08f4355690685e71f8143c4871670c199315592ef9358f",
+      "hash_convention": "UTF-8 text with LF line endings"
+    },
+    {
+      "path": "tools/rl/checks.py",
+      "sha256": "4856888ad19e7756d18bff840af23d13af6a12ede9ef2ca4ba5b0a255600fdcb",
+      "hash_convention": "UTF-8 text with LF line endings"
+    },
+    {
+      "path": "evidence/rl_runtime_20261013/existing-policy/result.json",
+      "sha256": "3dc7dd872ab41725c83a2d8964da1ea7aae4236b49dda96572199fcc70f83254",
+      "hash_convention": "UTF-8 text with LF line endings"
+    }
+  ],
+  "applicability": [
+    "Saved fc1012 robot/task and tested versions only; numerical root cause remains unresolved."
+  ],
+  "escalation": "Do not grant new budget for failed or interrupted work; report incomplete verification when the shared budget is insufficient."
+}

@@ -1,5 +1,6 @@
 """Fixed fc1012 task: physical observations, direct or residual tension actions."""
 from contextlib import closing
+import hashlib
 import json
 from pathlib import Path
 import sqlite3
@@ -11,7 +12,6 @@ import numpy as np
 
 ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_SOURCE_ROOT = Path(r"D:\softrobot-agent\.worktrees\mechanics-control-mainline")
-EVIDENCE = ROOT / "evidence/fc1012_open_loop_20261013"
 XML_ID = "60c5e069f76253e05d9b0aa2cd873abda87abecb84b6d0814c30f4e0052a88de"
 EXECUTION_ID = "6380ef76518b4c24a6bf459942f72545"
 TENDONS = ["near_t0", "near_t1", "near_t2", "far_t0", "far_t1", "far_t2"]
@@ -20,9 +20,9 @@ LENGTHS = [0.15758113296570092, 0.11241886703429908]
 PHYSICS_DT, CONTROL_DT, SUBSTEPS, HORIZON = 0.0005, 0.01, 20, 35
 HOLD_STEPS = list(range(30, 36))
 MAX_TENSION, RESIDUAL_SCALE = 8.0, 8.0
-POSITION_SCALE, SPEED_SCALE = 0.01, 0.02
-REWARD = dict(position=1.0, holding_speed=1.0, smoothness=0.001)
-FAILURE_PENALTY = -10000.0
+OBSERVATION_ORDER = ["qpos_rad (XML order)", "qvel_rad_s (XML order)",
+                     "(target-tip)/0.01", "world_tip_velocity/0.02",
+                     "previous_applied_tension/8", "control_step/35"]
 
 
 def load_xml(source_root):
@@ -59,27 +59,51 @@ class NumericalFailure(RuntimeError):
 class TensionEnv(gym.Env):
     metadata = {"render_modes": []}
 
-    def __init__(self, mode, source_root=DEFAULT_SOURCE_ROOT, residual_scale=RESIDUAL_SCALE,
-                 physics_dt=PHYSICS_DT, trace_dir=None, integrator="implicitfast", failure_mode="raise"):
-
+    def __init__(self, config, trace_dir=None, failure_mode="raise", guard=None):
+        self.config = config
+        self.guard = guard
+        self.mode = mode = config["mode"]
         if mode not in ("residual", "direct"):
-            raise ValueError("mode must be residual or direct")
-        if not np.isfinite(residual_scale) or residual_scale <= 0:
-            raise ValueError("residual_scale must be positive and finite")
-        self.mode, self.residual_scale = mode, float(residual_scale)
-        self.source_root = Path(source_root).resolve()
-        self.saved = json.loads((EVIDENCE / "execution.json").read_text(encoding="utf-8"))
-        with np.load(EVIDENCE / "references.npz", allow_pickle=False) as refs:
-            self.reference = refs["saved_tensions_n"].copy()
-        if (self.reference.shape != (HORIZON, 6) or not np.isfinite(self.reference).all()
-                or np.any((self.reference < 0) | (self.reference > MAX_TENSION))):
-            raise ValueError(f"Invalid saved_tensions_n in {EVIDENCE / 'references.npz'}")
+            raise ValueError("Only direct and residual modes are supported")
+        self.residual_scale = float(config["action"]["residual_scale_n"])
+        self.source_root = Path(config["source_root"]).resolve()
+        self.saved = config["task"]
+        self.reward = config["reward"]
+        self.position_scale = config["observation"]["position_scale_m"]
+        self.speed_scale = config["observation"]["speed_scale_m_s"]
+        self.failure_penalty = self.reward["failure_penalty"]
+        physics_dt = config["physics"]["timestep_s"]
+        integrator = config["physics"]["integrator"]
         expected = dict(source_physical_execution=EXECUTION_ID, lengths_m=LENGTHS,
                         target_m=TARGET.tolist(), tendon_order=TENDONS,
                         timestep_s=PHYSICS_DT, control_period_s=CONTROL_DT,
                         command_intervals=HORIZON, duration_s=0.35)
         if any(self.saved[key] != value for key, value in expected.items()):
-            raise ValueError("Committed execution metadata differs from the fixed task")
+            raise ValueError("Resolved task differs from the supported physical contract")
+        if config["action"]["tendon_order"] != TENDONS or config["action"]["max_tension_n"] != MAX_TENSION:
+            raise ValueError("Unsupported action convention")
+        if config["observation"]["order"] != OBSERVATION_ORDER:
+            raise ValueError("Unsupported observation ordering")
+        if not all(np.isfinite(v) and v > 0 for v in (self.residual_scale, self.position_scale, self.speed_scale)):
+            raise ValueError("Action and observation scales must be positive and finite")
+        self.reference = None
+        if mode == "residual":
+            ref = config.get("reference")
+            if not ref:
+                raise ValueError("Residual requires a complete compatible tension reference")
+            path = Path(ref["path"])
+            if not path.is_absolute():
+                path = ROOT / path
+            if (ref["tendon_order"] != TENDONS or ref["control_period_s"] != CONTROL_DT
+                    or ref["source_physical_execution"] != EXECUTION_ID):
+                raise ValueError("Incompatible reference timing, order or source")
+            if ref.get("sha256") != hashlib.sha256(path.read_bytes()).hexdigest():
+                raise ValueError("Reference changed or lacks a resolved digest")
+            with np.load(path, allow_pickle=False) as refs:
+                self.reference = refs["saved_tensions_n"].copy()
+            if (self.reference.shape != (HORIZON, 6) or not np.isfinite(self.reference).all()
+                    or np.any((self.reference < 0) | (self.reference > MAX_TENSION))):
+                raise ValueError("Invalid complete tension reference")
         xml, self.xml_source = load_xml(self.source_root)
         self.model = m = mujoco.MjModel.from_xml_string(xml)
         self.data = mujoco.MjData(m)
@@ -124,16 +148,16 @@ class TensionEnv(gym.Env):
             physics_dt_s=float(self.model.opt.timestep), control_dt_s=CONTROL_DT, substeps=self.substeps,
             integrator=self.integrator, numerical_version="pilot-v2-" + self.integrator + "-dt-" + str(self.model.opt.timestep),
             horizon=HORIZON, holding_steps=HOLD_STEPS, max_tension_n=MAX_TENSION,
-            position_scale_m=POSITION_SCALE, speed_scale_m_s=SPEED_SCALE, reward=REWARD,
+            position_scale_m=self.position_scale, speed_scale_m_s=self.speed_scale,
+            reward={key: self.reward[key] for key in ("position", "holding_speed", "smoothness")},
             observation=["qpos_rad (XML order)", "qvel_rad_s (XML order)",
                          "(target-tip)/0.01", "world_tip_velocity/0.02",
                          "previous_applied_tension/8", "control_step/35"],
             action="direct: 4*(a+1); residual: clip(reference[k]+residual_scale_n*a,0,8)",
             termination="terminated at action 35; numerical failure is an explicit absorbing training failure",
-            failure_penalty=FAILURE_PENALTY,
+            failure_penalty=self.failure_penalty,
             source_root=str(self.source_root), xml_source=self.xml_source, xml_id=XML_ID,
-            execution_json=str(EVIDENCE / "execution.json"),
-            reference_npz=str(EVIDENCE / "references.npz"))
+            reference=self.config.get("reference"))
 
     def reset(self, *, seed=None, options=None):
         super().reset(seed=seed)
@@ -170,8 +194,8 @@ class TensionEnv(gym.Env):
         velocity = self.jacobian @ self.data.qvel
         error = TARGET - position
         observation = np.concatenate((
-            self.data.qpos, self.data.qvel, error / POSITION_SCALE,
-            velocity / SPEED_SCALE, self.previous_tension / MAX_TENSION,
+            self.data.qpos, self.data.qvel, error / self.position_scale,
+            velocity / self.speed_scale, self.previous_tension / MAX_TENSION,
             [self.k / HORIZON])).astype(np.float32)
         info = dict(control_step=self.k, time_s=self.k * CONTROL_DT,
                     engine_time_s=float(self.data.time), tip_m=position,
@@ -218,12 +242,14 @@ class TensionEnv(gym.Env):
         self.needs_reset = True
         info.update(record, numerical_failure=True, valid_physical_transition=False,
                     counts=self.counts.copy(), failure=self.failure,
-                    reward=FAILURE_PENALTY,
+                    reward=self.failure_penalty,
                     reward_terms=dict(position=0.0, holding_speed=0.0, smoothness=0.0,
-                                      numerical_failure=FAILURE_PENALTY))
-        return observation, FAILURE_PENALTY, True, False, info
+                                      numerical_failure=self.failure_penalty))
+        return observation, self.failure_penalty, True, False, info
 
     def step(self, action):
+        if self.guard:
+            self.guard()
         if self.k >= HORIZON or self.needs_reset:
             raise RuntimeError("Call reset before stepping a new episode")
         self.command, self.clipped = self.map_action(action)
@@ -257,10 +283,10 @@ class TensionEnv(gym.Env):
         observation, info = self._observe()
         if not np.isfinite(observation).all():
             return self.fail(record, start_state, pre_step, self.substeps, ["nonfinite_observation"])
-        terms = dict(position=-REWARD["position"] * (info["position_error_m"] / POSITION_SCALE) ** 2,
-                     holding_speed=(-REWARD["holding_speed"] * (info["speed_m_s"] / SPEED_SCALE) ** 2
+        terms = dict(position=-self.reward["position"] * (info["position_error_m"] / self.position_scale) ** 2,
+                     holding_speed=(-self.reward["holding_speed"] * (info["speed_m_s"] / self.speed_scale) ** 2
                                     if self.k in HOLD_STEPS else 0.0),
-                     smoothness=-REWARD["smoothness"] * float(np.mean(
+                     smoothness=-self.reward["smoothness"] * float(np.mean(
                          ((self.previous_tension - previous) / MAX_TENSION) ** 2)))
         reward = float(sum(terms.values()))
         record.update(end_error_m=info["position_error_m"], end_speed_m_s=info["speed_m_s"],
@@ -269,3 +295,14 @@ class TensionEnv(gym.Env):
         self.counts["complete_episodes"] += int(self.k == HORIZON)
         info.update(record, numerical_failure=False, valid_physical_transition=True, counts=self.counts.copy())
         return observation, reward, self.k == HORIZON, False, info
+
+    def replay_pre_step(self, state):
+        self.reset()
+        mujoco.mj_setState(self.model, self.data, state, STATE_SPEC)
+        before = float(self.data.time)
+        self.counts["attempted_physics_steps"] += 1
+        mujoco.mj_step(self.model, self.data)
+        warnings = [w.name for w in WARNINGS if self.data.warning[w].number]
+        return dict(before_time_s=before, returned_time_s=float(self.data.time), warnings=warnings,
+                    engine_time_reset=bool(self.data.time <= before), attempted_physics_steps=1,
+                    reproduced=bool(warnings or self.data.time <= before))

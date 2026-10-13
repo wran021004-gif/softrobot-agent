@@ -1,0 +1,44 @@
+{
+  "schema": "project_diagnostic_procedure_v1",
+  "entry_id": "rl-spent-vs-inherited",
+  "revision": "1",
+  "kind": "procedure",
+  "failure_type": "resume_accounting",
+  "trigger": "Separate consumed compute from checkpoint-inherited learning; retain uncertain lost work and original schedule horizon.",
+  "procedure": [
+    "Separate consumed compute from checkpoint-inherited learning; retain uncertain lost work and original schedule horizon."
+  ],
+  "bindings": {
+    "task": "reach_and_hold",
+    "structure": "two_segments_six_tendons",
+    "physics": "implicitfast dt=0.0005",
+    "xml_id": "60c5e069f76253e05d9b0aa2cd873abda87abecb84b6d0814c30f4e0052a88de",
+    "sb3_version": "2.9.0"
+  },
+  "status": {
+    "diagnostic_method_supported": true,
+    "repair_effective_in_this_case": false,
+    "generalization": "unverified"
+  },
+  "evidence": [
+    {
+      "path": "evidence/rl_pilot_20261013/result_summary.json",
+      "sha256": "1595ba49a0b12746d8103049d572ac9e95df9118f670ff0851cee18a4ec818dc",
+      "hash_convention": "UTF-8 text with LF line endings"
+    },
+    {
+      "path": "evidence/rl_runtime_20261013/verification.json",
+      "sha256": "26f8edff8ccf87650b4d4617c3cf34c9b998a45227bb375067b01a45538fe27c",
+      "hash_convention": "UTF-8 text with LF line endings"
+    },
+    {
+      "path": "tools/rl/train.py",
+      "sha256": "6c0bb1ebf8c8a85a7773e8902440d9d5590cffe9aa3a0ba4a6861936e95ab511",
+      "hash_convention": "UTF-8 text with LF line endings"
+    }
+  ],
+  "applicability": [
+    "Saved fc1012 robot/task and tested versions only; numerical root cause remains unresolved."
+  ],
+  "escalation": "Do not grant new budget for failed or interrupted work; report incomplete verification when the shared budget is insufficient."
+}

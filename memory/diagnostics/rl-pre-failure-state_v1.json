@@ -1,0 +1,39 @@
+{
+  "schema": "project_diagnostic_procedure_v1",
+  "entry_id": "rl-pre-failure-state",
+  "revision": "1",
+  "kind": "procedure",
+  "failure_type": "numerical_instability",
+  "trigger": "Capture full pre-failure integration state before attributing instability to PPO or rewards.",
+  "procedure": [
+    "Capture full pre-failure integration state before attributing instability to PPO or rewards."
+  ],
+  "bindings": {
+    "task": "reach_and_hold",
+    "structure": "two_segments_six_tendons",
+    "physics": "implicitfast dt=0.0005",
+    "xml_id": "60c5e069f76253e05d9b0aa2cd873abda87abecb84b6d0814c30f4e0052a88de",
+    "sb3_version": "2.9.0"
+  },
+  "status": {
+    "diagnostic_method_supported": true,
+    "repair_effective_in_this_case": false,
+    "generalization": "unverified"
+  },
+  "evidence": [
+    {
+      "path": "evidence/rl_pilot_20261013/diagnosis.json",
+      "sha256": "469fa7748dc1e90cf744d992ac201a0241d6989b35b6ad27fa61ab237008d026",
+      "hash_convention": "UTF-8 text with LF line endings"
+    },
+    {
+      "path": "evidence/rl_runtime_20261013/existing-failure/result.json",
+      "sha256": "fb22134c1b2aefe9c293fd12227c58123e9740bc943d7997e22d0e3470efce84",
+      "hash_convention": "UTF-8 text with LF line endings"
+    }
+  ],
+  "applicability": [
+    "Saved fc1012 robot/task and tested versions only; numerical root cause remains unresolved."
+  ],
+  "escalation": "Do not grant new budget for failed or interrupted work; report incomplete verification when the shared budget is insufficient."
+}
