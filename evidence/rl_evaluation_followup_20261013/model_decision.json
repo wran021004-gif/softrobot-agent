@@ -1,0 +1,48 @@
+{
+  "admission": {
+    "scope": "RL interface; no numerical launch or confirmation reservation"
+  },
+  "experience_read_bindings": [],
+  "origin": "model",
+  "original_plan": {
+    "action": "stop",
+    "candidate": null,
+    "diagnostic": null,
+    "expected_observation": "An incomplete episode with failure_reason numerical_failure and failure_stage physics sampling: mjWARN_BADQVEL plus engine_time_reset, failed near pre_step_time_s ≈ 0.2205, holding_coverage_complete false, and null holding/terminal error metrics; passed false; selected_execution null. Realized: exactly this (23 attempted actions, 22 completed actions, 442 attempted physics steps, episode_reward −3998.17, no holding samples, last valid position error 0.2176 m and speed 0.9684 m/s).",
+    "experience_disposition": {},
+    "fixed_conditions": "Source pinned and unchanged: run_id rl-validation-A-20261013-723ce58d, checkpoint step-00001024-5c37317d, config_sha256 f77ab0d4e2735c1b68cd7161b2434d93957cfc2ad2be1b179b175432649d4ebd, policy_sha256 a05e33a63ccc64f8bc6b6aaed01c7c36e2a43b42acfd1edc6920419c4f10a63d, candidate_identity 4141e57f2708508e63579c211b52f6d7b7890fcf9f08a476c035ae5008fce2ce, task 2b26edb492214c426263441b6adb52d7aafe41a828436d6b48a1171374a1026c; mode direct; seed 17; one episode; no training/resume/stop of source, no design change, no diagnostic replay, no confirmation.",
+    "hypothesis": "The pinned frozen policy at checkpoint step-00001024-5c37317d (policy_sha256 a05e33a63ccc64f8bc6b6aaed01c7c36e2a43b42acfd1edc6920419c4f10a63d), evaluated on the frozen reach-and-hold direct ideal_tension task in one deterministic fixed-initial-state episode, drives the plant into a QVEL numerical divergence that aborts the episode around t≈0.2205 s — the same failure signature seen in the prior evaluation. Consequently the run yields a valid numerical-failure report but no complete physical episode and no task pass.",
+    "interpretation": "Reporting-only outcome, no confirmations. This follow-up distinguishes four things clearly: (1) REPORTING = satisfied — the packaging/json-import defect is repaired and a valid numerical-failure report was produced; (2) COMPLETE PHYSICAL EPISODE = none — the single episode is incomplete (0 complete, 1 failed, 23 attempted / 22 completed actions, 442 physics steps, aborted at failed_substep 2 with mjWARN_BADQVEL + engine_time_reset near pre_step_time_s 0.2205 s); (3) ORIGINAL UNCHANGED TASK PASS = none — passed false, holding_coverage_complete false; (4) CONFIRMED SOLUTION = none — selected_execution null. Endpoint and holding metrics (holding_max_position_error_m, holding_max_speed_m_s, terminal_position_error_m) are null and remain unavailable; only last-valid values are known (0.2176 m, 0.9684 m/s). Missing metrics must NOT be read as design infeasibility or as a task-accuracy verdict — the abort is a numerical instability, not a demonstrated design limit. Historical costs remain separate from this follow-up: the source's prior training/consumption (1024 attempted actions, 8 rollout optimizations, 32 optimization epochs, 4.337 s active, 15 complete / 22 failed episodes) is inherited history, while this evaluation incurred only its own one-episode cost (evaluation_elapsed_s 0.924). Concrete recommendation (authorizes NO subsequent execution): next authorized step is diagnose — investigate the root cause of the reproducible QVEL divergence at t≈0.2205 s under direct ideal_tension control (physics substep/integrator stability and solver conditioning at the commanded tensions), rather than revise_design (design infeasibility is not inferred) or modify training first. Any such work requires fresh authorization.",
+    "mechanics": null,
+    "mechanics_source": null,
+    "next_step": "diagnose",
+    "parameters": null,
+    "search": null,
+    "selected_execution": null,
+    "stopping_condition": "Reporting follow-up complete: rl.source_summary read, pinned-source status queried read-only, exactly one authorized evaluation dispatched and consumed (not retried), the new immutable result reference read via evidence_read, and this STOP recorded with a next_step. No further execution authorized by this record.",
+    "supporting_evidence": [
+      {
+        "artifact_id": "7ab48efd58defff96dbd463df519e77fc23035c504be970e97f1b409009dfe80",
+        "media_type": "application/json"
+      },
+      {
+        "artifact_id": "4656763ee3a87fd7e28fa04184c34a128cded8ad574b2221e4435798f14fc890",
+        "media_type": "application/json"
+      },
+      {
+        "artifact_id": "4c92437d951123a13693b6d59e6390ee39630d62c9909154c0aaa0beb4be8499",
+        "media_type": "application/json"
+      },
+      {
+        "artifact_id": "569addd5921ce121d24827dd2e4c1349069606fd1e64e8bb2a1170d08b6814e7",
+        "media_type": "application/json"
+      },
+      {
+        "artifact_id": "2b26edb492214c426263441b6adb52d7aafe41a828436d6b48a1171374a1026c",
+        "media_type": "application/json"
+      }
+    ],
+    "weakening_observation": "A completed 35-step episode returning holding/terminal metrics (whether passing or failing on accuracy), or a numerical abort at a materially different time/stage, would weaken the hypothesis that this policy reproducibly triggers the same early QVEL instability."
+  },
+  "request_id": "native-call_00_ranPndhd03YfszpSatAy9158"
+}

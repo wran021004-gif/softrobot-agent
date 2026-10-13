@@ -448,7 +448,7 @@ class FormalControlTests(TestCase):
         import hashlib
         with TemporaryDirectory(dir=core.ROOT/'runs',prefix='followup-fixture-') as folder:
             root=core.Path(folder);spec=read(core.ROOT/'examples/research_core/rl_evaluation_followup.json')
-            binding=spec.pop('rl_evaluation_source');spec.update(study_id='followup-fixture',started_unix=time.time())
+            binding=spec.pop('rl_evaluation_source');spec.update(study_id='followup-fixture-'+root.name,started_unix=time.time())
             path=root/'spec.json';core.atomic_json(path,spec);h=core.prepare(path,root/'business');s=core.state(h)
             cfg,task=bridge.prepare_input(h,RLRequest(operation='start',candidate=s['reference_candidate'],mode='direct',allocation=dict(actions=512,active_seconds=10),rationale='fixture only'))
             directory=root/'runtime'/binding['run_id'];policy=directory/'checkpoints'/binding['checkpoint']/'policy.zip'

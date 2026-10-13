@@ -1042,6 +1042,8 @@ async def converse(host):
     agent=build_harness(host,transport=boundary,api_key=os.environ['DEEPSEEK_API_KEY'],instructions=instructions,
         model_class=live_model_class(boundary),tool_executor=SequentialToolExecutor(),research_tools=[t for t in native if t is not native[1]] if state(host)['spec'].get('rl_evaluation_source') else native,
         configuration_path=host.store.root/'framework_configuration.json',session_directory=host.store.root/'framework_sessions')
+    if state(host)['spec'].get('rl_evaluation_source'):
+        agent.tool_registry.registry.pop('retrieve_context',None)
     def before_model(event):
         s=state(host)
         if s['research_status']=='stopped': event.cancel='Accepted native STOP; no additional request'; return
