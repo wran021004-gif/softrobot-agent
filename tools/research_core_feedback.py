@@ -40,7 +40,7 @@ def eligibility(host, reference):
         required=confirmation_count(s)
         if count>=required: reasons.append('declared confirmations already recorded')
         remaining=required-count
-        fit=evaluation_capacity(host,remaining,confirmation=True) if v['controller_route']=='rl' else capacity(host,remaining,True,root_operation=True)
+        fit=evaluation_capacity(host,remaining,confirmation=True) if v['controller_route']=='rl' else capacity(host,remaining,True,root_operation=True,candidate=r['candidate'])
         if fit['admitted']<remaining: reasons.append('remaining required confirmations do not fit route budget')
     except (ValueError,KeyError) as exc:
         reasons.append(str(exc));count=0

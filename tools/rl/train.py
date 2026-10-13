@@ -298,6 +298,8 @@ def worker(directory, token, started):
             context.model.logger.close() if hasattr(context.model, "_logger") else None
         if context.env:
             context.env.close()
+        last_stage=context.state.get('failure_stage')
+        context.state.update(last_known_stage=last_stage,failure_stage=last_stage if outcome=='failed' else None)
         context.state.update(status=outcome, stop_reason=reason, reservation={})
         context.state.pop("awaiting_stop_at_boundary", None)
         context.state["consumed"] = context.consumed()

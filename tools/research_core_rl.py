@@ -245,7 +245,7 @@ def packet(host):
         defaults=run.read_json(Path(run.__file__).with_name('config.json'))),
         runs=s.get('rl_runs',{}),evaluations=[dict(reference=r,**host.store.artifact(r)) for r in s.get('rl_evaluations',[])],
         costs='RL active time/evaluation costs separate from provider wall time; elapsed study time uses one wall clock',
-        live_elapsed_s=max(0,time.time()-s['started_unix']))
+        live_elapsed_s=max(0,s.get('closed_unix',time.time())-s['started_unix']))
 
 
 

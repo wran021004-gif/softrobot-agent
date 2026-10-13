@@ -1,4 +1,12 @@
-# Current development status - Unified research core, 2026-10-11
+# Current development status - Design/control integration, 2026-10-13
+
+Mathematical candidate handoff and model-selected NMPC/direct/residual RL validation are integrated with route-aware frozen confirmations and existing-evidence NMPC timing admission. The original task and budgets remain authoritative. Sixty-one focused research/runtime checks pass.
+
+The real additional Phase A trained the same d=.5 candidate for 1024 attempted actions, eight rollout optimizations and 32 epochs, publishing a checkpoint. Its one independent evaluation reached physics but failed result packaging due to a missing `json` import, alongside a QVEL instability warning. The import is repaired and tested; the charged failed evaluation remains unchanged. No second training/evaluation was granted.
+
+Phase A's complete evaluation requirement remains unmet, so formal Phase B did not start. No solution was selected or confirmed; task performance remains unmeasured. See the [completion report](../evidence/design_control_20261013/completion.md), [accounting](../evidence/design_control_20261013/summary.json) and [runbook](research_core_runbook.md). Historical studies and costs remain intact.
+
+# Historical development status - Unified research core, 2026-10-11
 
 The [unified core](research_core_runbook.md) now connects direct proposals,
 mathematical search, complete execution/evaluation, diagnosis, exact confirmation

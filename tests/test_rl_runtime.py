@@ -422,3 +422,20 @@ class CandidateTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class EvaluationPackagingTests(unittest.TestCase):
+    def test_frozen_checkpoint_evaluation_packages_existing_metrics_without_training(self):
+        import hashlib
+        with tempfile.TemporaryDirectory(dir=run.ROOT/'runs',prefix='evaluation-packaging-') as folder:
+            root=Path(folder);policy=root/'checkpoints'/'step-exact'/'policy.zip';policy.parent.mkdir(parents=True)
+            policy.write_bytes(b'fixture-policy');cfg=config()
+            run.write_json(root/'config.json',cfg)
+            run.write_json(policy.with_name('metadata.json'),dict(config_sha256=train.config_digest(cfg),policy_file_sha256=hashlib.sha256(policy.read_bytes()).hexdigest(),inherited={'fixture':True}))
+            env=FakeEnv();env.close=lambda:None
+            metrics=dict(complete=False,passed=False,numerical_failure={'message':'fixture physical failure'})
+            with patch.object(checks,'TensionEnv',return_value=env),patch.object(checks.PPO,'load',return_value=object()),patch.object(train,'snapshot',return_value={'fixture':True}),patch.object(checks,'run_episode',return_value=([env.row()],metrics)),patch.object(checks,'write_trajectory'):
+                result=checks.evaluate(policy,root/'evaluation')
+            self.assertEqual(result['episodes'],[metrics]);self.assertEqual(result['checkpoint'],'step-exact')
+            self.assertEqual(result['failure_stage'],'physics sampling')
+            self.assertEqual(run.read_json(root/'evaluation'/'result.json'),result)

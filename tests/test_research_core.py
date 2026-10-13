@@ -408,3 +408,34 @@ class FormalControlTests(TestCase):
                 with self.assertRaisesRegex(ValueError,'per-trial'):bridge.dispatch(h,request,'over-cap')
             self.assertEqual(core.state(h)['rl_runs'],{})
             import gc;gc.collect()
+
+
+    def test_core_rl_confirmation_uses_older_exact_policy_and_keeps_failure(self):
+        import hashlib
+        from uuid import uuid4
+        from tools import research_core_rl as bridge
+        from schemas.research_core import RLRequest
+        with TemporaryDirectory(dir=core.ROOT/'runs',prefix='confirm-fixture-') as folder:
+            root=core.Path(folder);spec=read(core.ROOT/'examples/design_control/phase_B.json')
+            spec.update(study_id='confirm-'+uuid4().hex[:8],started_unix=time.time())
+            path=root/'spec.json';core.atomic_json(path,spec);h=core.prepare(path,root/'business');s=core.state(h)
+            cfg,task=bridge.prepare_input(h,RLRequest(operation='start',candidate=s['reference_candidate'],mode='direct',allocation=dict(actions=2048,active_seconds=20),rationale='fixture'))
+            run_id='owned-fixture';directory=root/'runtime'/run_id;directory.mkdir(parents=True)
+            core.atomic_json(directory/'config.json',cfg);core.atomic_json(directory/'checkpoint.json',dict(current='newest',previous='newer'))
+            policy=directory/'checkpoints'/'selected-old'/'policy.zip';policy.parent.mkdir(parents=True);policy.write_bytes(b'exact selected policy');core.atomic_json(policy.with_name('metadata.json'),{})
+            configref=core.save(h,cfg)
+            entry=dict(candidate=s['reference_candidate'],task=task,configuration=configref,allocation=cfg['budget'],evaluations=1,replays=0)
+            dev=dict(candidate=entry['candidate'],task=task,configuration=configref,run_id=run_id,checkpoint='selected-old',policy_sha256=hashlib.sha256(policy.read_bytes()).hexdigest(),independent_evaluation_executed=True,passed=True,episodes=[dict(complete=True)],role='development')
+            selected=core.save(h,dev);core.update(h,rl_runs={run_id:entry},rl_evaluations=[selected])
+            plan=dict(action='confirm',selected_execution=selected,**{k:'fixture' for k in ('hypothesis','expected_observation','weakening_observation','fixed_conditions','stopping_condition','interpretation')})
+            results=[dict(dev,passed=True),dict(dev,passed=False)]
+            with patch.object(core,'guard'),patch.object(core,'execute',side_effect=AssertionError('RL must never use NMPC')),patch.object(bridge.run,'RUNS',root/'runtime'),patch.object(bridge,'reconcile',return_value={'worker_alive':False}),patch.object(bridge,'invoke',side_effect=results) as invoke:
+                core.dispatch(h,plan,'confirmation-1');core.dispatch(h,plan,'confirmation-2')
+                self.assertEqual(invoke.call_count,2)
+                for call in invoke.call_args_list:
+                    self.assertEqual(call.args[0],'evaluate');self.assertEqual(call.args[3],policy)
+                with self.assertRaisesRegex(ValueError,'already recorded'):core.dispatch(h,plan,'confirmation-3')
+            self.assertEqual(core.claims(h)['independent_confirmation_count'],2)
+            self.assertEqual(core.claims(h)['confirmation_failures'],1);self.assertFalse(core.claims(h)['task_passed'])
+            self.assertEqual(core.state(h)['selected'],selected)
+            import gc;gc.collect()

@@ -1,0 +1,1210 @@
+{
+  "specification": {
+    "allowed_parameters": {
+      "d": [
+        -1,
+        1
+      ],
+      "holding_tip_speed_weight": [
+        0.025,
+        0.1
+      ],
+      "terminal_tip_speed_weight": [
+        0.025,
+        0.1
+      ]
+    },
+    "authorization": "User attachment 8235a412-74ce-43fc-b068-4475a78cf9b0; scoped nonsecret DeepSeek calls; bounded additional Phase A/B; ordinary commit/push feat/rl-control-pilot",
+    "base_commit": "d30bfc268cb503be32d61414e045129aa9ab8c81",
+    "budgets": {
+      "activity_s": 900,
+      "bdf_replays": 0,
+      "delivery_reserve_s": 30,
+      "local_solve_s": 0,
+      "local_solves": 0,
+      "numerical_s": 120,
+      "offline_nlp": 0,
+      "physical_launches": 1,
+      "protected_provider_requests": 4,
+      "provider_requests": 24,
+      "public_operations": 60
+    },
+    "campaign_id": "design-control-20261013",
+    "capabilities": [
+      "rl"
+    ],
+    "complete_update_inputs": true,
+    "confirmation": {
+      "configuration": "One independent RL policy episode; interface acceptance separate from task performance",
+      "fresh_independent_repetitions": 0
+    },
+    "evaluation_version": 1,
+    "evidence_destination": "evidence/design_control_20261013/phase_A",
+    "execution_allowances": {
+      "construction_s": 1
+    },
+    "historical_evidence": {
+      "acceptance_requirements": [
+        {
+          "evidence": [
+            "candidate.json",
+            "effective_configuration.json",
+            "tool_trace.json"
+          ],
+          "limitation": "Candidate/mode/overrides chosen and frozen; worker did not reach PPO/reward execution",
+          "requirement": "Real Strands model selects new candidate and RL configuration",
+          "status": "partial"
+        },
+        {
+          "evidence": [
+            "run_status.json",
+            "worker_failure.txt"
+          ],
+          "limitation": "One launch failed before sampling; zero optimizations and no checkpoint",
+          "requirement": "Start short training with at least two complete PPO batches",
+          "status": "failed"
+        },
+        {
+          "evidence": [
+            "tool_trace.json",
+            "run_status.json"
+          ],
+          "requirement": "Query actual progress and cumulative consumption",
+          "status": "passed"
+        },
+        {
+          "evidence": [
+            "evaluation_unavailable.json"
+          ],
+          "limitation": "No saved checkpoint; zero evaluation episodes; no performance metrics",
+          "requirement": "Independently evaluate saved policy from frozen candidate/task",
+          "status": "failed"
+        },
+        {
+          "evidence": [
+            "evidence_reads.json",
+            "model_decision.json"
+          ],
+          "limitation": "Model read unavailable-evaluation failure evidence and recommended adjust_training; no policy-evaluation result exists",
+          "requirement": "Public evidence read and evidence-based next-step decision",
+          "status": "partial"
+        }
+      ],
+      "actual_training_active_seconds": "unknown; worker failed before timing state publication",
+      "attempted_training_actions": 0,
+      "attempted_training_physics_steps": 0,
+      "ceilings": {
+        "activity_s": 900,
+        "bdf_replays": 0,
+        "delivery_reserve_s": 30,
+        "local_solve_s": 0,
+        "local_solves": 0,
+        "numerical_s": 120,
+        "offline_nlp": 0,
+        "physical_launches": 1,
+        "protected_provider_requests": 4,
+        "provider_requests": 24,
+        "public_operations": 60
+      },
+      "closed_unix": 1791884065.614935,
+      "completed_training_actions": 0,
+      "diagnostic_physics_steps": 0,
+      "diagnostic_replays": 0,
+      "evaluation_physics_steps": 0,
+      "evaluation_public_requests": 3,
+      "focused_checks": {
+        "passed": true,
+        "physical_replays": 0,
+        "research_integration": 4,
+        "rl_runtime": 28,
+        "training_campaigns": 0
+      },
+      "independent_evaluation_episodes": 0,
+      "initial_implementation": "0aa3e2d26013295306f2c89afdf298af1184bdf4",
+      "interface_acceptance": false,
+      "limitations": [
+        "Full five-part interface acceptance failed",
+        "Task performance unmeasured; not a task-threshold failure or design infeasibility finding",
+        "Environment repair verified by import, focused fixture and untrained PPO construction, not a second live training run",
+        "No compatible failure capture, no replay",
+        "Current bridge rejects external XML assets and supports selected hinge/ideal-tension reach-and-hold only",
+        "Original cooperative active-time overrun recording remains; this run retained uncertain startup charge",
+        "Model raw interpretation is preserved; design metadata pretension is not an RL initializer applied tension"
+      ],
+      "live_elapsed_s": 401.10025429725647,
+      "model": "deepseek-flash",
+      "next_step": "adjust_training",
+      "optimization_batches": 0,
+      "optimization_epochs": 0,
+      "provider_requests": 23,
+      "public_operations": 23,
+      "read_evidence": [
+        {
+          "artifact_id": "0a39ef2d78fadedbfe9b816a50db13d499a6fa94d51070d7e39e40a808c5428e",
+          "media_type": "application/json"
+        }
+      ],
+      "real_provider": "https://api.deepseek.com",
+      "repaired_implementation": "3f5b5407d78e244127cccb3c6e4185b096d9480c",
+      "rl_ceilings": {
+        "diagnostic_physics_steps": 1,
+        "diagnostic_replays": 1,
+        "evaluation_episodes": 1,
+        "training_actions": 2048,
+        "training_active_seconds": 120,
+        "training_runs": 1
+      },
+      "started_unix": 1791883664.5146806,
+      "study_id": "rl-strands-20261013",
+      "task_performance": "unmeasured",
+      "training_active_seconds_conservatively_charged": 90.0,
+      "training_active_seconds_durable_lower_bound": 0,
+      "training_allocation": {
+        "actions": 1024,
+        "active_seconds": 90.0
+      },
+      "training_runs": 1,
+      "uncertain_consumption": true
+    },
+    "mode": "rl_interface",
+    "optional_enhancements": {
+      "legacy_skill_admission": "deferred; read-only drafts available",
+      "offline_schedule_initialization": "deferred until core delivery and sufficient remaining budget"
+    },
+    "phase": "A",
+    "ranking": "feasible_then_max_normalized_violation_then_sum_v1",
+    "record_update_ids": [
+      8,
+      29,
+      30
+    ],
+    "reference_parameters": {
+      "d": 0.5,
+      "holding_tip_speed_weight": 0.1,
+      "terminal_tip_speed_weight": 0.1
+    },
+    "rl_evaluation_allowance_s": 150,
+    "rl_limits": {
+      "actions_per_trial": 1024,
+      "diagnostic_physics_steps": 0,
+      "diagnostic_replays": 0,
+      "evaluation_episodes": 1,
+      "seconds_per_trial": 90,
+      "training_actions": 1024,
+      "training_active_seconds": 90,
+      "training_runs": 1
+    },
+    "started_unix": 0,
+    "study_id": "rl-validation-A-20261013",
+    "tension_execution_mode": "ideal_tension"
+  },
+  "frozen_task": {
+    "actuator_channels": [
+      "actuator_commands"
+    ],
+    "contract_version": "1.0.0",
+    "environment": {
+      "contract": "experiment.assembly",
+      "data": {
+        "environment": {
+          "coordinate_frame": "world_base_x_forward_yz_cross_section",
+          "environment_id": "reach_free",
+          "gravity_m_s2": [
+            0.0,
+            0.0,
+            -9.81
+          ],
+          "gravity_source": "main@245a785 reach_free environment; Human-owned benchmark gravity",
+          "lights": [
+            {
+              "direction": [
+                0.0,
+                0.0,
+                -1.0
+              ],
+              "position_m": [
+                0.0,
+                0.0,
+                2.0
+              ]
+            }
+          ],
+          "objects": [
+            {
+              "conaffinity": 1,
+              "contype": 0,
+              "half_size_m": [
+                2.0,
+                2.0,
+                0.1
+              ],
+              "kind": "plane",
+              "name": "floor",
+              "position_m": [
+                0.0,
+                0.0,
+                -0.02
+              ]
+            }
+          ],
+          "schema_version": "1",
+          "truth_status": "HUMAN_OWNED",
+          "units": "SI"
+        },
+        "external_forces": [],
+        "floor_id": "floor",
+        "mount": {
+          "position_m": [
+            0.0,
+            0.0,
+            0.15
+          ],
+          "quaternion_wxyz": [
+            1.0,
+            0.0,
+            0.0,
+            0.0
+          ]
+        }
+      },
+      "version": "1.0.0"
+    },
+    "evaluator": {
+      "extension_id": "evaluate.reach",
+      "parameters": {
+        "contract": "reference.reach_evaluation",
+        "data": {
+          "tolerance_m": 0.01
+        },
+        "version": "1.0.0"
+      },
+      "version": "1.0.0"
+    },
+    "failure_policy": "retain_invalid_and_constraint_failures",
+    "family": "task.reach",
+    "goal": {
+      "contract": "reference.reach_goal",
+      "data": {
+        "target_m": [
+          0.29,
+          0.035,
+          0.19
+        ]
+      },
+      "version": "1.0.0"
+    },
+    "initializer": {
+      "extension_id": "initialize.family",
+      "parameters": {
+        "contract": "family.initial",
+        "data": {
+          "qpos_rad": {
+            "distal1_cell_0_y": 0.0,
+            "distal1_cell_0_z": 0.0,
+            "distal1_cell_10_y": 0.0,
+            "distal1_cell_10_z": 0.0,
+            "distal1_cell_11_y": 0.0,
+            "distal1_cell_11_z": 0.0,
+            "distal1_cell_1_y": 0.0,
+            "distal1_cell_1_z": 0.0,
+            "distal1_cell_2_y": 0.0,
+            "distal1_cell_2_z": 0.0,
+            "distal1_cell_3_y": 0.0,
+            "distal1_cell_3_z": 0.0,
+            "distal1_cell_4_y": 0.0,
+            "distal1_cell_4_z": 0.0,
+            "distal1_cell_5_y": 0.0,
+            "distal1_cell_5_z": 0.0,
+            "distal1_cell_6_y": 0.0,
+            "distal1_cell_6_z": 0.0,
+            "distal1_cell_7_y": 0.0,
+            "distal1_cell_7_z": 0.0,
+            "distal1_cell_8_y": 0.0,
+            "distal1_cell_8_z": 0.0,
+            "distal1_cell_9_y": 0.0,
+            "distal1_cell_9_z": 0.0,
+            "near_cell_0_y": 0.0,
+            "near_cell_0_z": 0.0,
+            "near_cell_10_y": 0.0,
+            "near_cell_10_z": 0.0,
+            "near_cell_11_y": 0.0,
+            "near_cell_11_z": 0.0,
+            "near_cell_1_y": 0.0,
+            "near_cell_1_z": 0.0,
+            "near_cell_2_y": 0.0,
+            "near_cell_2_z": 0.0,
+            "near_cell_3_y": 0.0,
+            "near_cell_3_z": 0.0,
+            "near_cell_4_y": 0.0,
+            "near_cell_4_z": 0.0,
+            "near_cell_5_y": 0.0,
+            "near_cell_5_z": 0.0,
+            "near_cell_6_y": 0.0,
+            "near_cell_6_z": 0.0,
+            "near_cell_7_y": 0.0,
+            "near_cell_7_z": 0.0,
+            "near_cell_8_y": 0.0,
+            "near_cell_8_z": 0.0,
+            "near_cell_9_y": 0.0,
+            "near_cell_9_z": 0.0
+          },
+          "qvel_rad_s": {
+            "distal1_cell_0_y": 0.0,
+            "distal1_cell_0_z": 0.0,
+            "distal1_cell_10_y": 0.0,
+            "distal1_cell_10_z": 0.0,
+            "distal1_cell_11_y": 0.0,
+            "distal1_cell_11_z": 0.0,
+            "distal1_cell_1_y": 0.0,
+            "distal1_cell_1_z": 0.0,
+            "distal1_cell_2_y": 0.0,
+            "distal1_cell_2_z": 0.0,
+            "distal1_cell_3_y": 0.0,
+            "distal1_cell_3_z": 0.0,
+            "distal1_cell_4_y": 0.0,
+            "distal1_cell_4_z": 0.0,
+            "distal1_cell_5_y": 0.0,
+            "distal1_cell_5_z": 0.0,
+            "distal1_cell_6_y": 0.0,
+            "distal1_cell_6_z": 0.0,
+            "distal1_cell_7_y": 0.0,
+            "distal1_cell_7_z": 0.0,
+            "distal1_cell_8_y": 0.0,
+            "distal1_cell_8_z": 0.0,
+            "distal1_cell_9_y": 0.0,
+            "distal1_cell_9_z": 0.0,
+            "near_cell_0_y": 0.0,
+            "near_cell_0_z": 0.0,
+            "near_cell_10_y": 0.0,
+            "near_cell_10_z": 0.0,
+            "near_cell_11_y": 0.0,
+            "near_cell_11_z": 0.0,
+            "near_cell_1_y": 0.0,
+            "near_cell_1_z": 0.0,
+            "near_cell_2_y": 0.0,
+            "near_cell_2_z": 0.0,
+            "near_cell_3_y": 0.0,
+            "near_cell_3_z": 0.0,
+            "near_cell_4_y": 0.0,
+            "near_cell_4_z": 0.0,
+            "near_cell_5_y": 0.0,
+            "near_cell_5_z": 0.0,
+            "near_cell_6_y": 0.0,
+            "near_cell_6_z": 0.0,
+            "near_cell_7_y": 0.0,
+            "near_cell_7_z": 0.0,
+            "near_cell_8_y": 0.0,
+            "near_cell_8_z": 0.0,
+            "near_cell_9_y": 0.0,
+            "near_cell_9_z": 0.0
+          },
+          "unspecified": "zero"
+        },
+        "version": "1.0.0"
+      },
+      "version": "1.0.0"
+    },
+    "name": "Independent development validation of a serial multi-segment soft arm",
+    "objectives": [
+      {
+        "direction": "minimize",
+        "metric": "position_error",
+        "units": "m",
+        "weight": 1.0
+      }
+    ],
+    "observations": [
+      {
+        "dimension": 3,
+        "entity": "tip",
+        "frame": "world",
+        "missing": "unsupported",
+        "name": "tip_position",
+        "phase": "post_step",
+        "units": "m"
+      }
+    ],
+    "robot_families": [
+      "tendon_robot_family"
+    ],
+    "sampling": {
+      "aggregation": "per_instance",
+      "seeds": [
+        17
+      ],
+      "split": "development",
+      "window_s": [
+        0.0,
+        0.35
+      ]
+    },
+    "source": "Development task with fixed target, tolerance and scoring; historical tasks are unchanged",
+    "status": "development_valid",
+    "task_id": "family-multisegment-dev",
+    "task_version": "1.0.0",
+    "timing": {
+      "control_period_s": 0.01,
+      "duration_s": 0.35,
+      "sample_period_s": 0.01,
+      "termination": [
+        "duration",
+        "numerical_failure"
+      ],
+      "timestep_s": 0.0005
+    }
+  },
+  "reference_candidate": {
+    "artifact_id": "4c92437d951123a13693b6d59e6390ee39630d62c9909154c0aaa0beb4be8499",
+    "media_type": "application/json"
+  },
+  "candidates": [
+    {
+      "artifact_id": "4c92437d951123a13693b6d59e6390ee39630d62c9909154c0aaa0beb4be8499",
+      "media_type": "application/json"
+    }
+  ],
+  "results": [
+    {
+      "reference": {
+        "artifact_id": "1981928dbedf7c0d105753460645fb587475f976a3f64e84523abe50ee58159e",
+        "media_type": "application/json"
+      },
+      "candidate": {
+        "artifact_id": "4c92437d951123a13693b6d59e6390ee39630d62c9909154c0aaa0beb4be8499",
+        "media_type": "application/json"
+      },
+      "task": {
+        "artifact_id": "2b26edb492214c426263441b6adb52d7aafe41a828436d6b48a1171374a1026c",
+        "media_type": "application/json"
+      },
+      "controller_route": "rl",
+      "controller": {
+        "route": "rl",
+        "configuration": {
+          "artifact_id": "569addd5921ce121d24827dd2e4c1349069606fd1e64e8bb2a1170d08b6814e7",
+          "media_type": "application/json"
+        },
+        "checkpoint": null,
+        "policy_sha256": null
+      },
+      "mathematical_provenance": [],
+      "metrics": [],
+      "complete": false,
+      "passed": false,
+      "task_performance": "unmeasured",
+      "failure_stage": "independent evaluation",
+      "costs": {
+        "evaluation_elapsed_s": null,
+        "numerical_s": null,
+        "counts": null
+      },
+      "evidence": {
+        "artifact_id": "1981928dbedf7c0d105753460645fb587475f976a3f64e84523abe50ee58159e",
+        "media_type": "application/json"
+      },
+      "role": "development",
+      "selected_execution": null,
+      "solution_identity": {
+        "candidate": {
+          "artifact_id": "4c92437d951123a13693b6d59e6390ee39630d62c9909154c0aaa0beb4be8499",
+          "media_type": "application/json"
+        },
+        "task": {
+          "artifact_id": "2b26edb492214c426263441b6adb52d7aafe41a828436d6b48a1171374a1026c",
+          "media_type": "application/json"
+        },
+        "controller": {
+          "route": "rl",
+          "configuration": {
+            "artifact_id": "569addd5921ce121d24827dd2e4c1349069606fd1e64e8bb2a1170d08b6814e7",
+            "media_type": "application/json"
+          },
+          "checkpoint": null,
+          "policy_sha256": null
+        }
+      },
+      "confirmation": {
+        "eligible": false,
+        "reasons": [
+          "result did not pass complete original task evaluation",
+          "exact evaluated checkpoint identity missing",
+          "declared confirmations already recorded",
+          "study sealed after STOP"
+        ],
+        "required_field": "selected_execution",
+        "selected_execution": {
+          "artifact_id": "1981928dbedf7c0d105753460645fb587475f976a3f64e84523abe50ee58159e",
+          "media_type": "application/json"
+        },
+        "owning_study": "rl-validation-A-20261013",
+        "completed_confirmations": 0
+      }
+    }
+  ],
+  "mechanics_results": [],
+  "handoffs": [],
+  "rl": {
+    "frozen_task": {
+      "artifact_id": "2b26edb492214c426263441b6adb52d7aafe41a828436d6b48a1171374a1026c",
+      "media_type": "application/json"
+    },
+    "capabilities": {
+      "task": "reach-and-hold",
+      "control": "ideal_tension",
+      "modes": [
+        "direct",
+        "residual"
+      ],
+      "compatible_references": [],
+      "structural_coordinate": "d in [-1,1]: lengths [.16+.0055*d,.11-.0055*d] m",
+      "defaults": {
+        "mode": "direct",
+        "seed": 17,
+        "reference": null,
+        "budget": {
+          "actions": 2048,
+          "active_seconds": 120.0
+        },
+        "stop_at_boundary": null,
+        "observation": {
+          "position_scale_m": 0.01,
+          "speed_scale_m_s": 0.02
+        },
+        "action": {
+          "residual_scale_n": 8.0
+        },
+        "reward": {
+          "position": 1.0,
+          "holding_speed": 1.0,
+          "smoothness": 0.001,
+          "failure_penalty": -10000.0
+        },
+        "ppo": {
+          "learning_rate": 0.0003,
+          "n_steps": 256,
+          "batch_size": 64,
+          "n_epochs": 10,
+          "gamma": 0.99,
+          "gae_lambda": 0.95,
+          "clip_range": 0.2,
+          "clip_range_vf": null,
+          "normalize_advantage": true,
+          "ent_coef": 0.0,
+          "vf_coef": 0.5,
+          "max_grad_norm": 0.5,
+          "use_sde": false,
+          "sde_sample_freq": -1,
+          "target_kl": null,
+          "policy_kwargs": {
+            "net_arch": {
+              "pi": [
+                64,
+                64
+              ],
+              "vf": [
+                64,
+                64
+              ]
+            },
+            "log_std_init": -3.0
+          },
+          "device": "cpu",
+          "verbose": 0
+        }
+      }
+    },
+    "runs": {
+      "rl-validation-A-20261013-723ce58d": {
+        "active_reservation": null,
+        "allocation": {
+          "actions": 1024,
+          "active_seconds": 90.0
+        },
+        "candidate": {
+          "artifact_id": "4c92437d951123a13693b6d59e6390ee39630d62c9909154c0aaa0beb4be8499",
+          "media_type": "application/json"
+        },
+        "configuration": {
+          "artifact_id": "569addd5921ce121d24827dd2e4c1349069606fd1e64e8bb2a1170d08b6814e7",
+          "media_type": "application/json"
+        },
+        "evaluations": 1,
+        "mathematical_handoffs": [],
+        "replays": 0,
+        "request_identity": "595e4e29506c7d4c1d4b578b1309341d54c038813fc8bd3dcc5e37480384c12a",
+        "status": {
+          "active_time_overrun_s": 0,
+          "artifacts": "D:\\softrobot-agent\\.worktrees\\rl-control-pilot\\runs\\rl\\rl-validation-A-20261013-723ce58d",
+          "checkpoints": {
+            "current": "step-00001024-5c37317d",
+            "previous": "step-00000896-dd364881"
+          },
+          "consumed": {
+            "active_seconds": 4.337279499974102,
+            "attempted_actions": 1024,
+            "attempted_physics_steps": 20251,
+            "complete_episodes": 15,
+            "completed_actions": 1002,
+            "failed_episodes": 22
+          },
+          "consumption_uncertain": false,
+          "effective_ppo": {
+            "batch_size": 64,
+            "clip_range": 0.2,
+            "clip_range_vf": null,
+            "device": "cpu",
+            "ent_coef": 0.0,
+            "gae_lambda": 0.95,
+            "gamma": 0.99,
+            "learning_rate": 0.0005,
+            "max_grad_norm": 0.5,
+            "n_epochs": 4,
+            "n_steps": 128,
+            "normalize_advantage": true,
+            "policy_kwargs": {
+              "log_std_init": -3.0,
+              "net_arch": {
+                "pi": [
+                  64,
+                  64
+                ],
+                "vf": [
+                  64,
+                  64
+                ]
+              }
+            },
+            "sde_sample_freq": -1,
+            "target_kl": null,
+            "use_sde": false,
+            "verbose": 0,
+            "vf_coef": 0.5
+          },
+          "environment": {
+            "action_dimension": 6,
+            "candidate": "4141e57f2708508e63579c211b52f6d7b7890fcf9f08a476c035ae5008fce2ce",
+            "control_dt_s": 0.01,
+            "control_object": {
+              "actuator_names": [
+                "near_t0_direct_tension",
+                "near_t1_direct_tension",
+                "near_t2_direct_tension",
+                "far_t0_direct_tension",
+                "far_t1_direct_tension",
+                "far_t2_direct_tension"
+              ],
+              "joint_names": [
+                "near_cell_0_y",
+                "near_cell_0_z",
+                "near_cell_1_y",
+                "near_cell_1_z",
+                "near_cell_2_y",
+                "near_cell_2_z",
+                "near_cell_3_y",
+                "near_cell_3_z",
+                "near_cell_4_y",
+                "near_cell_4_z",
+                "near_cell_5_y",
+                "near_cell_5_z",
+                "near_cell_6_y",
+                "near_cell_6_z",
+                "near_cell_7_y",
+                "near_cell_7_z",
+                "near_cell_8_y",
+                "near_cell_8_z",
+                "near_cell_9_y",
+                "near_cell_9_z",
+                "near_cell_10_y",
+                "near_cell_10_z",
+                "near_cell_11_y",
+                "near_cell_11_z",
+                "distal1_cell_0_y",
+                "distal1_cell_0_z",
+                "distal1_cell_1_y",
+                "distal1_cell_1_z",
+                "distal1_cell_2_y",
+                "distal1_cell_2_z",
+                "distal1_cell_3_y",
+                "distal1_cell_3_z",
+                "distal1_cell_4_y",
+                "distal1_cell_4_z",
+                "distal1_cell_5_y",
+                "distal1_cell_5_z",
+                "distal1_cell_6_y",
+                "distal1_cell_6_z",
+                "distal1_cell_7_y",
+                "distal1_cell_7_z",
+                "distal1_cell_8_y",
+                "distal1_cell_8_z",
+                "distal1_cell_9_y",
+                "distal1_cell_9_z",
+                "distal1_cell_10_y",
+                "distal1_cell_10_z",
+                "distal1_cell_11_y",
+                "distal1_cell_11_z"
+              ],
+              "semantics": "ideal_tension",
+              "tendon_names": [
+                "near_t0",
+                "near_t1",
+                "near_t2",
+                "far_t0",
+                "far_t1",
+                "far_t2"
+              ],
+              "tip_site": "tip_site"
+            },
+            "holding_steps": [
+              30,
+              31,
+              32,
+              33,
+              34,
+              35
+            ],
+            "horizon": 35,
+            "mode": "direct",
+            "observation_dimension": 109,
+            "physics_dt_s": 0.0005,
+            "reference": null,
+            "residual_scale_n": [
+              8.0,
+              8.0,
+              8.0,
+              8.0,
+              8.0,
+              8.0
+            ],
+            "reward": {
+              "failure_penalty": -10000.0,
+              "holding_speed": 2.0,
+              "position": 1.0,
+              "smoothness": 0.001
+            },
+            "substeps": 20,
+            "task": "2b26edb492214c426263441b6adb52d7aafe41a828436d6b48a1171374a1026c",
+            "tension_limits_n": [
+              [
+                0.0,
+                8.0
+              ],
+              [
+                0.0,
+                8.0
+              ],
+              [
+                0.0,
+                8.0
+              ],
+              [
+                0.0,
+                8.0
+              ],
+              [
+                0.0,
+                8.0
+              ],
+              [
+                0.0,
+                8.0
+              ]
+            ]
+          },
+          "failure_stage": "checkpoint publication",
+          "inherited": {
+            "num_timesteps": 1024,
+            "optimization_epochs": 32,
+            "optimizer_sha256": "5c52e333e45952c358c7a145944714afdaa7b286a564b490243ae66f6ea117d5",
+            "optimizer_steps": 64,
+            "policy_sha256": "08625abad6e32304ca917b5f0c4d077e154a2fcb156de55859d601b5696dcaea",
+            "rollout_optimizations": 8,
+            "schedule": {
+              "clip_range": 0.2,
+              "clip_range_vf": null,
+              "learning_rate": 0.0005,
+              "progress_remaining": 0.0,
+              "total_timesteps": 1024
+            }
+          },
+          "latest_checkpoint": "D:\\softrobot-agent\\.worktrees\\rl-control-pilot\\runs\\rl\\rl-validation-A-20261013-723ce58d\\checkpoints\\step-00001024-5c37317d",
+          "remaining": {
+            "actions": 0,
+            "active_seconds": 85.6627205000259
+          },
+          "reservation": {},
+          "run_id": "rl-validation-A-20261013-723ce58d",
+          "status": "completed",
+          "stop_reason": "action_budget",
+          "worker_alive": false,
+          "worker_token": "1975747e8c564fe19705b1882e41e5f5",
+          "workers": [
+            {
+              "active_seconds": 4.336953100049868,
+              "after": {
+                "num_timesteps": 1024,
+                "optimization_epochs": 32,
+                "optimizer_sha256": "5c52e333e45952c358c7a145944714afdaa7b286a564b490243ae66f6ea117d5",
+                "optimizer_steps": 64,
+                "policy_sha256": "08625abad6e32304ca917b5f0c4d077e154a2fcb156de55859d601b5696dcaea",
+                "rollout_optimizations": 8,
+                "schedule": {
+                  "clip_range": 0.2,
+                  "clip_range_vf": null,
+                  "learning_rate": 0.0005,
+                  "progress_remaining": 0.0,
+                  "total_timesteps": 1024
+                }
+              },
+              "attempted_actions": 1024,
+              "before": {
+                "num_timesteps": 0,
+                "optimization_epochs": 0,
+                "optimizer_sha256": "305e39fe3b32f5acd34855b6c3f417dcbfaf06782d6295790e7ec0b8f21b65c5",
+                "optimizer_steps": 0,
+                "policy_sha256": "cd6a23b8154e1f6efd819f8172e09fbd06cc6cdf052e3ffcb97f52edc7e4e773",
+                "rollout_optimizations": 0,
+                "schedule": {
+                  "clip_range": 0.2,
+                  "clip_range_vf": null,
+                  "learning_rate": 0.0005,
+                  "progress_remaining": 1.0,
+                  "total_timesteps": 1024
+                }
+              },
+              "parameter_change_l2": 2.1804325580596924,
+              "token": "1975747e8c564fe19705b1882e41e5f5",
+              "unoptimized_actions": 0
+            }
+          ]
+        },
+        "task": {
+          "artifact_id": "2b26edb492214c426263441b6adb52d7aafe41a828436d6b48a1171374a1026c",
+          "media_type": "application/json"
+        }
+      }
+    },
+    "evaluations": [
+      {
+        "reference": {
+          "artifact_id": "1981928dbedf7c0d105753460645fb587475f976a3f64e84523abe50ee58159e",
+          "media_type": "application/json"
+        },
+        "candidate": {
+          "artifact_id": "4c92437d951123a13693b6d59e6390ee39630d62c9909154c0aaa0beb4be8499",
+          "media_type": "application/json"
+        },
+        "configuration": {
+          "artifact_id": "569addd5921ce121d24827dd2e4c1349069606fd1e64e8bb2a1170d08b6814e7",
+          "media_type": "application/json"
+        },
+        "consumption_uncertain": true,
+        "counts": null,
+        "episodes": [],
+        "evaluation_elapsed_s": null,
+        "failure_reason": "WARNING: Nan, Inf or huge value in QVEL at DOF 0. The simulation is unstable. Time = 0.2205.\n\nTraceback (most recent call last):\n  File \"<frozen runpy>\", line 198, in _run_module_as_main\n  File \"<frozen runpy>\", line 88, in _run_code\n  File \"D:\\softrobot-agent\\.worktrees\\rl-control-pilot\\tools\\rl\\run.py\", line 305, in <module>\n    main()\n  File \"D:\\softrobot-agent\\.worktrees\\rl-control-pilot\\tools\\rl\\run.py\", line 298, in main\n    result = evaluate(args.policy, args.output, args.source_root)\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"D:\\softrobot-agent\\.worktrees\\rl-control-pilot\\tools\\rl\\run.py\", line 266, in evaluate\n    return check(Path(policy), Path(output), source_root)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"D:\\softrobot-agent\\.worktrees\\rl-control-pilot\\tools\\rl\\checks.py\", line 130, in evaluate\n    checkpoint=policy.parent.name,config_sha256=hashlib.sha256(json.dumps(config,sort_keys=True).encode()).hexdigest(),\n                                                               ^^^^\nNameError: name 'json' is not defined\n",
+        "failure_stage": "independent evaluation",
+        "independent_evaluation_executed": null,
+        "operation_key": "native-call_00_Hf5ltCPgfC2s9TbBRYWR4079",
+        "passed": false,
+        "role": "development",
+        "run_id": "rl-validation-A-20261013-723ce58d",
+        "run_status": {
+          "active_time_overrun_s": 0,
+          "artifacts": "D:\\softrobot-agent\\.worktrees\\rl-control-pilot\\runs\\rl\\rl-validation-A-20261013-723ce58d",
+          "checkpoints": {
+            "current": "step-00001024-5c37317d",
+            "previous": "step-00000896-dd364881"
+          },
+          "consumed": {
+            "active_seconds": 4.337279499974102,
+            "attempted_actions": 1024,
+            "attempted_physics_steps": 20251,
+            "complete_episodes": 15,
+            "completed_actions": 1002,
+            "failed_episodes": 22
+          },
+          "consumption_uncertain": false,
+          "effective_ppo": {
+            "batch_size": 64,
+            "clip_range": 0.2,
+            "clip_range_vf": null,
+            "device": "cpu",
+            "ent_coef": 0.0,
+            "gae_lambda": 0.95,
+            "gamma": 0.99,
+            "learning_rate": 0.0005,
+            "max_grad_norm": 0.5,
+            "n_epochs": 4,
+            "n_steps": 128,
+            "normalize_advantage": true,
+            "policy_kwargs": {
+              "log_std_init": -3.0,
+              "net_arch": {
+                "pi": [
+                  64,
+                  64
+                ],
+                "vf": [
+                  64,
+                  64
+                ]
+              }
+            },
+            "sde_sample_freq": -1,
+            "target_kl": null,
+            "use_sde": false,
+            "verbose": 0,
+            "vf_coef": 0.5
+          },
+          "environment": {
+            "action_dimension": 6,
+            "candidate": "4141e57f2708508e63579c211b52f6d7b7890fcf9f08a476c035ae5008fce2ce",
+            "control_dt_s": 0.01,
+            "control_object": {
+              "actuator_names": [
+                "near_t0_direct_tension",
+                "near_t1_direct_tension",
+                "near_t2_direct_tension",
+                "far_t0_direct_tension",
+                "far_t1_direct_tension",
+                "far_t2_direct_tension"
+              ],
+              "joint_names": [
+                "near_cell_0_y",
+                "near_cell_0_z",
+                "near_cell_1_y",
+                "near_cell_1_z",
+                "near_cell_2_y",
+                "near_cell_2_z",
+                "near_cell_3_y",
+                "near_cell_3_z",
+                "near_cell_4_y",
+                "near_cell_4_z",
+                "near_cell_5_y",
+                "near_cell_5_z",
+                "near_cell_6_y",
+                "near_cell_6_z",
+                "near_cell_7_y",
+                "near_cell_7_z",
+                "near_cell_8_y",
+                "near_cell_8_z",
+                "near_cell_9_y",
+                "near_cell_9_z",
+                "near_cell_10_y",
+                "near_cell_10_z",
+                "near_cell_11_y",
+                "near_cell_11_z",
+                "distal1_cell_0_y",
+                "distal1_cell_0_z",
+                "distal1_cell_1_y",
+                "distal1_cell_1_z",
+                "distal1_cell_2_y",
+                "distal1_cell_2_z",
+                "distal1_cell_3_y",
+                "distal1_cell_3_z",
+                "distal1_cell_4_y",
+                "distal1_cell_4_z",
+                "distal1_cell_5_y",
+                "distal1_cell_5_z",
+                "distal1_cell_6_y",
+                "distal1_cell_6_z",
+                "distal1_cell_7_y",
+                "distal1_cell_7_z",
+                "distal1_cell_8_y",
+                "distal1_cell_8_z",
+                "distal1_cell_9_y",
+                "distal1_cell_9_z",
+                "distal1_cell_10_y",
+                "distal1_cell_10_z",
+                "distal1_cell_11_y",
+                "distal1_cell_11_z"
+              ],
+              "semantics": "ideal_tension",
+              "tendon_names": [
+                "near_t0",
+                "near_t1",
+                "near_t2",
+                "far_t0",
+                "far_t1",
+                "far_t2"
+              ],
+              "tip_site": "tip_site"
+            },
+            "holding_steps": [
+              30,
+              31,
+              32,
+              33,
+              34,
+              35
+            ],
+            "horizon": 35,
+            "mode": "direct",
+            "observation_dimension": 109,
+            "physics_dt_s": 0.0005,
+            "reference": null,
+            "residual_scale_n": [
+              8.0,
+              8.0,
+              8.0,
+              8.0,
+              8.0,
+              8.0
+            ],
+            "reward": {
+              "failure_penalty": -10000.0,
+              "holding_speed": 2.0,
+              "position": 1.0,
+              "smoothness": 0.001
+            },
+            "substeps": 20,
+            "task": "2b26edb492214c426263441b6adb52d7aafe41a828436d6b48a1171374a1026c",
+            "tension_limits_n": [
+              [
+                0.0,
+                8.0
+              ],
+              [
+                0.0,
+                8.0
+              ],
+              [
+                0.0,
+                8.0
+              ],
+              [
+                0.0,
+                8.0
+              ],
+              [
+                0.0,
+                8.0
+              ],
+              [
+                0.0,
+                8.0
+              ]
+            ]
+          },
+          "failure_stage": "checkpoint publication",
+          "inherited": {
+            "num_timesteps": 1024,
+            "optimization_epochs": 32,
+            "optimizer_sha256": "5c52e333e45952c358c7a145944714afdaa7b286a564b490243ae66f6ea117d5",
+            "optimizer_steps": 64,
+            "policy_sha256": "08625abad6e32304ca917b5f0c4d077e154a2fcb156de55859d601b5696dcaea",
+            "rollout_optimizations": 8,
+            "schedule": {
+              "clip_range": 0.2,
+              "clip_range_vf": null,
+              "learning_rate": 0.0005,
+              "progress_remaining": 0.0,
+              "total_timesteps": 1024
+            }
+          },
+          "latest_checkpoint": "D:\\softrobot-agent\\.worktrees\\rl-control-pilot\\runs\\rl\\rl-validation-A-20261013-723ce58d\\checkpoints\\step-00001024-5c37317d",
+          "remaining": {
+            "actions": 0,
+            "active_seconds": 85.6627205000259
+          },
+          "reservation": {},
+          "run_id": "rl-validation-A-20261013-723ce58d",
+          "status": "completed",
+          "stop_reason": "action_budget",
+          "worker_alive": false,
+          "worker_token": "1975747e8c564fe19705b1882e41e5f5",
+          "workers": [
+            {
+              "active_seconds": 4.336953100049868,
+              "after": {
+                "num_timesteps": 1024,
+                "optimization_epochs": 32,
+                "optimizer_sha256": "5c52e333e45952c358c7a145944714afdaa7b286a564b490243ae66f6ea117d5",
+                "optimizer_steps": 64,
+                "policy_sha256": "08625abad6e32304ca917b5f0c4d077e154a2fcb156de55859d601b5696dcaea",
+                "rollout_optimizations": 8,
+                "schedule": {
+                  "clip_range": 0.2,
+                  "clip_range_vf": null,
+                  "learning_rate": 0.0005,
+                  "progress_remaining": 0.0,
+                  "total_timesteps": 1024
+                }
+              },
+              "attempted_actions": 1024,
+              "before": {
+                "num_timesteps": 0,
+                "optimization_epochs": 0,
+                "optimizer_sha256": "305e39fe3b32f5acd34855b6c3f417dcbfaf06782d6295790e7ec0b8f21b65c5",
+                "optimizer_steps": 0,
+                "policy_sha256": "cd6a23b8154e1f6efd819f8172e09fbd06cc6cdf052e3ffcb97f52edc7e4e773",
+                "rollout_optimizations": 0,
+                "schedule": {
+                  "clip_range": 0.2,
+                  "clip_range_vf": null,
+                  "learning_rate": 0.0005,
+                  "progress_remaining": 1.0,
+                  "total_timesteps": 1024
+                }
+              },
+              "parameter_change_l2": 2.1804325580596924,
+              "token": "1975747e8c564fe19705b1882e41e5f5",
+              "unoptimized_actions": 0
+            }
+          ]
+        },
+        "scope": "Evaluation subprocess dispatched then failed; its episode allocation remains charged; physical consumption unknown, no zero-cost claim",
+        "selected_execution": null,
+        "study": "rl-validation-A-20261013",
+        "task": {
+          "artifact_id": "2b26edb492214c426263441b6adb52d7aafe41a828436d6b48a1171374a1026c",
+          "media_type": "application/json"
+        },
+        "task_performance": "unmeasured"
+      }
+    ],
+    "costs": "RL active time/evaluation costs separate from provider wall time; elapsed study time uses one wall clock",
+    "live_elapsed_s": 501.5190556049347
+  },
+  "nmpc_admission": null,
+  "resource_use": {
+    "shared_ledger": {
+      "limit": {
+        "backend_solves": 1,
+        "model_calls": 24,
+        "tool_calls": 60,
+        "wall_s": 900.0,
+        "worker_calls": 0
+      },
+      "used": {
+        "tool_calls": 9,
+        "model_calls": 8,
+        "backend_solves": 1,
+        "worker_calls": 0,
+        "wall_s": 68.64199999987613
+      },
+      "remaining": {
+        "backend_solves": 0,
+        "model_calls": 16,
+        "tool_calls": 51,
+        "wall_s": 831.3580000001239,
+        "worker_calls": 0
+      },
+      "occupied": {}
+    },
+    "numerical_s": 2.162709000054747,
+    "elapsed_s": 501.5210556983948
+  },
+  "claims": {
+    "selected": null,
+    "independent_confirmation_count": 0,
+    "required_confirmations": 0,
+    "confirmation_failures": 0,
+    "limited_repeat_supported_acceptance": false,
+    "task_passed": false,
+    "parameter_improvement_attribution_permitted": false,
+    "interface_evaluations": 0
+  },
+  "phase_A_evidence": null,
+  "research_status": "stopped"
+}

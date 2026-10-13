@@ -236,10 +236,10 @@ def nmpc_timing(host, candidate=None):
         evidence_sources=[r['source'] for r in matched],design_feasibility='not assessed by budget admission')
 
 
-def capacity(host, requested=1, confirmation=False, *, root_operation=False):
-    """Admit all internal launches, with two full confirmation slots and time."""
+def capacity(host, requested=1, confirmation=False, *, root_operation=False, candidate=None):
+    """Admit internal NMPC launches with configured confirmation slots and time."""
     s=state(host); b=s['spec']['budgets']; a=allowance(s)
-    timing=nmpc_timing(host) if s['spec'].get('nmpc_execution_cap_s') else None
+    timing=nmpc_timing(host,candidate) if s['spec'].get('nmpc_execution_cap_s') else None
     if timing and not timing['available']: return dict(requested=requested,admitted=0,internal_launches=0,timing=timing)
     if timing: a=timing['complete_execution_s']
     remaining=host.store.remaining()['remaining']; protect=0 if confirmation else repetition_reserve(s)
@@ -365,7 +365,7 @@ def execute(host, candidate_ref, operation_key, *, role='development', selected=
         if not old.get('acceptance',{}).get('accepted'): raise ValueError('SELECTED_PASSING_EXECUTION_REQUIRED')
         if sum(host.store.artifact(r)['role']=='confirmation' and host.store.artifact(r).get('selected_execution')==plain(selected) for r in s['results'])>=confirmation_count(s):
             raise ValueError('DECLARED_POST_SELECTION_CONFIRMATIONS_ALREADY_RECORDED')
-    admission=capacity(host,1,confirmation or repetition)
+    admission=capacity(host,1,confirmation or repetition,candidate=candidate_ref)
     if admission['admitted']<1: raise ValueError('EXECUTION_AND_CONFIRMATION_RESERVE_CANNOT_FIT')
     # A unique execution owner is persisted before starting any backend.
     owner=host.run_id+'-exec-'+uuid4().hex[:16]
@@ -720,14 +720,14 @@ def packet(host):
             mechanics_results=[dict(reference=r,**{k:host.store.artifact(r).get(k) for k in ('status','operation','trajectory_reference','objective_definition','original_task_feasible','relaxed_nlp_feasible','original_task_gaps','trajectory_metrics','charged_numerical_s')}) for r in s.get('mechanics_results',[])],
             handoffs=[dict(reference=r,**host.store.artifact(r)) for r in s.get('handoffs',[])],
             rl=rl_packet(host) if enabled(s['spec'],'rl') else None,
-            nmpc_admission=[dict(candidate=r,**nmpc_timing(host,r),remaining_phase_admission=capacity(host,1)) for r in s['candidates'].values()] if s['spec'].get('nmpc_execution_cap_s') else None,
-            resource_use=dict(shared_ledger=host.store.remaining(),numerical_s=s['numerical_s'],elapsed_s=max(0,time.time()-s['started_unix'])),
+            nmpc_admission=[dict(candidate=r,**nmpc_timing(host,r),remaining_phase_admission=capacity(host,1,candidate=r)) for r in s['candidates'].values()] if s['spec'].get('nmpc_execution_cap_s') else None,
+            resource_use=dict(shared_ledger=host.store.remaining(),numerical_s=s['numerical_s'],elapsed_s=max(0,s.get('closed_unix',time.time())-s['started_unix'])),
             claims=claims(host),phase_A_evidence=host.store.artifact(s['phase_A_evidence']) if s.get('phase_A_evidence') else None,research_status=s['research_status'])
     if s['spec'].get('mode')=='rl_interface':
         from tools.research_core_rl import packet as rl_packet
         return dict(specification=s['spec'],candidates=list(s['candidates'].values()),rl=rl_packet(host),
             resource_use=dict(shared_ledger=host.store.remaining(),numerical_s=s['numerical_s'],
-                elapsed_s=max(0,time.time()-s['started_unix'])),research_status=s['research_status'])
+                elapsed_s=max(0,s.get('closed_unix',time.time())-s['started_unix'])),research_status=s['research_status'])
     from tools.research_core_feedback import facts, eligibility, mechanics_context, compact_local
     from tools.research_core_numerics import compact_numerics
     return dict(specification=s['spec'],evaluation_profile=dict(identity=s['profile']['identity'],version=s['profile']['version'],
@@ -830,7 +830,7 @@ def dispatch(host, value, request_id, origin='model'):
             else:
                 result=execute(host,selected['candidate'],request_id,role='confirmation',selected=plain(plan.selected_execution))
         else:
-            update(host,research_status='stopped',final_disposition=ref)
+            update(host,research_status='stopped',final_disposition=ref,closed_unix=time.time())
             result=dict(accepted_stop=True,claims=claims(host))
         output=dict(plan=ref,result=result,resource_use=packet(host)['resource_use'])
         host.store.complete(row,dict(request_id=request_id,execution_id=row['execution_id'],caller=host.actor,
