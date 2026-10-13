@@ -96,6 +96,10 @@ class RuntimeTests(unittest.TestCase):
             self.assertEqual(worker['incomplete_tail_rows'],1)
             self.assertIn('train/value_loss',worker['not_recorded'])
         self.assertNotIn('passed',summary)
+        (self.directory/'dead'/'progress.csv').write_text('time/total_timesteps,train/approx_kl\n896,nan\n',encoding='utf-8')
+        unavailable=run.training_summary(self.directory,value)['workers'][1]
+        self.assertIsNone(unavailable['latest']['train/approx_kl']['value'])
+        self.assertIn('nonfinite',unavailable['unavailable_metrics']['train/approx_kl'])
         (self.directory/'dead'/'progress.csv').write_text('time/total_timesteps,train/approx_kl\n896,broken\n',encoding='utf-8')
         with self.assertRaises(ValueError):run.training_summary(self.directory,value)
 

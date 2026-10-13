@@ -170,7 +170,7 @@ def training_summary(directory, state=None):
                 step = float(row['time/total_timesteps'])
                 if not math.isfinite(step): raise ValueError('Nonfinite logged step')
                 values = {k: float(row[k]) for k in metrics if row.get(k) not in (None, '')}
-                if any(not math.isfinite(v) for v in values.values()): raise ValueError('Nonfinite logged metric')
+                values = {k: v if math.isfinite(v) else None for k, v in values.items()}
                 record = dict(logged_step=step, metrics=values)
                 for key, value in values.items():
                     first.setdefault(key, dict(logged_step=step, value=value))
@@ -181,7 +181,8 @@ def training_summary(directory, state=None):
             before_step=worker.get('before', {}).get('num_timesteps'),
             after_step=worker.get('after', {}).get('num_timesteps'), attempted_actions=worker.get('attempted_actions'),
             source=str(path.relative_to(directory)), available_rows=rows, incomplete_tail_rows=incomplete,
-            first=first, latest=latest, recent=list(recent), not_recorded=[k for k in metrics if k not in latest]))
+            first=first, latest=latest, recent=list(recent), not_recorded=[k for k in metrics if k not in latest],
+            unavailable_metrics={k: 'Logged nonfinite value; undefined, not zero' for k,v in latest.items() if v['value'] is None}))
     failures = sorted((directory / 'failures').glob('**/failure_episode_*.json'), key=lambda p: p.stat().st_mtime)
     failure_index = []
     for path in failures[-5:]:

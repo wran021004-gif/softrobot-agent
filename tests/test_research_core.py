@@ -247,6 +247,7 @@ class CoreTests(TestCase):
                 summary['observed_at_unix']=2
                 b=bridge.dispatch(h,dict(operation='status',run_id='fixture',rationale='read failure'),'summary-b')
             ref=a['training_summary_reference'];self.assertEqual(ref,b['training_summary_reference'])
+            self.assertEqual(b['training_summary'],h.store.artifact(ref))
             with patch.object(h.store,'remaining',return_value={'remaining':{'model_calls':4}}):
                 self.assertEqual(core.read_evidence(h,dict(reference=ref))['consumed'],{'attempted_actions':0})
                 with self.assertRaisesRegex(ValueError,'PROTECTED'):core.read_evidence(h,dict(reference=original['reference_candidate']))

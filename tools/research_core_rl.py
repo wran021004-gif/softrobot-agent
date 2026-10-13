@@ -197,7 +197,7 @@ def dispatch(host, value, request_id, selected=None):
                 runs=core.state(host)['rl_runs'];runs[q.run_id]['training_summary']=reference
                 refs=core.state(host).get('rl_training_summaries',[])
                 core.update(host,rl_runs=runs,rl_training_summaries=refs if reference in refs else [*refs,reference])
-                result.update(training_summary=summary,training_summary_reference=reference)
+                result.update(training_summary=host.store.artifact(reference),training_summary_reference=reference)
             else: result=invoke(q.operation,q.run_id,deadline=s['cutoff_unix'])
         elif q.operation=='diagnose' and not q.failure:
             directory=run.run_path(q.run_id)
