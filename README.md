@@ -363,3 +363,21 @@ research_work_v1 (no internal CPU/wall timeout), and the existing 1000 iteration
 Construction/assembly/solver checkpoints share the existing progress artifact.
 Runtime policies and large worker artifacts remain under ignored runs/;
 compact results and runtime hashes are recorded in the study evidence directories.
+
+
+The 2026-10-14 executions both accepted native STOP. The pinned reference-design
+policy at step199936 passed independent original-task evaluation and one fresh
+confirmation; the model chose the wrong tool for the second confirmation, then
+closed at1/2 despite a legal confirmation still being available. The joint
+task_gap solve converged at d=-0.439794 (lengths .157581/.112419m) in193.273s
+under the effective3300s/research_work_v1/1000-iteration settings. Two residual
+PPO trials each requested200000 actions, used199936, and independently failed
+original holding criteria; no joint-design solution was selected or confirmed.
+Actual provider counters remained unchanged throughout both training waits.
+New costs:26 provider requests,39 public operations,399872 actions/718.534 active
+training seconds,one math solve,four evaluation episodes includingone confirmation.
+See evidence/final_checkpoint_20261014/scientific_summary.json,
+evidence/joint_design_control_20261014/scientific_summary.json and
+evidence/scheduling_closeout_20261014/campaign_summary.json for separate costs,
+unedited decisions, factual qualifications and runtime hashes. No task thresholds,
+historical spending or accepted STOP records were rewritten.

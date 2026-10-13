@@ -60,8 +60,14 @@ def update(host, **values):
         host.store.update_state(db, host.run_id, s)
 
 
-def readable_results(s):
+def readable_results(s, host=None):
+    linked=[]
+    if host:
+        for ref in s.get('mechanics_results',[]):
+            result=host.store.artifact(ref)
+            linked.extend(result[k] for k in ('checkpoint_reference','trajectory_reference','original_request','log_reference') if result.get(k))
     return [*s['results'], *s.get('mechanics_results', []), *s.get('rl_evaluations', []), *s.get('rl_training_summaries', []),
+        *s.get('scoped_context',[]), *linked,
         *[s[k] for k in ('rl_task','rl_source_summary','rl_source_candidate') if s.get(k)],
         *[r for entry in s.get('rl_runs',{}).values() for r in (entry.get('candidate'),entry.get('configuration')) if r]]
 
@@ -115,7 +121,7 @@ async def wait_training(host):
 def read_evidence(host, query):
     q = EvidenceQuery.model_validate(query); s = state(host)
     value = host.store.artifact(q.reference)
-    if protected(host) and plain(q.reference) not in readable_results(s):
+    if protected(host) and plain(q.reference) not in readable_results(s,host):
         raise ValueError('PROTECTED_EVIDENCE_READ_REQUIRES_NEW_RESULT_OR_TRAINING_SUMMARY')
     for part in q.pointer.strip('/').split('/') if q.pointer else []:
         part = part.replace('~1', '/').replace('~0', '~')
@@ -1149,7 +1155,7 @@ async def converse(host):
                 schema['properties']['run_id']['enum']=list(s.get('rl_runs',{}))
                 native[-1].tool_spec={**native[-1].tool_spec,'inputSchema':{'json':schema}}
             schema=EvidenceQuery.model_json_schema()
-            schema['$defs']['EvidenceRef']['properties']['artifact_id']['enum']=[r['artifact_id'] for r in readable_results(s)]
+            schema['$defs']['EvidenceRef']['properties']['artifact_id']['enum']=[r['artifact_id'] for r in readable_results(s,host)]
             native[2].tool_spec={**native[2].tool_spec,'inputSchema':{'json':schema}}
             retrieval=agent.tool_registry.registry.get('retrieve_context')
             if retrieval:

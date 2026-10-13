@@ -1,0 +1,75 @@
+{
+  "admission": {
+    "admitted": 1,
+    "confirmation_launch_reserve": 2,
+    "confirmation_time_reserve_s": 1534.0978899898357,
+    "delivery_activity_reserve_s": 900,
+    "delivery_numerical_reserve_s": 0.0,
+    "independent_integration_reserve_s": 0.0,
+    "internal_launches": 1,
+    "numerical_reservation_s": 767.0489449949179,
+    "per_execution_s": 767.0489449949179,
+    "remaining_activity_s": 12317.72419500351,
+    "remaining_numerical_s": 9880.34824569989,
+    "requested": 1
+  },
+  "experience_read_bindings": [],
+  "origin": "model",
+  "original_plan": {
+    "action": "stop",
+    "candidate": null,
+    "diagnostic": null,
+    "expected_observation": "Stop accepted with a truthful closeout: joint-optimized design d=-0.43979400623619647 recorded from one converged solve, two terminal training summaries and two failed independent development evaluations cited, 0/2 confirmations (never eligible, both candidate references reported ineligible), training 399872/400000 actions and ~718.5/2400 active seconds, 1/1 mechanics solve, 0/4 NMPC executions, 2/5 evaluations, optional 60 s diagnostic unused.",
+    "experience_disposition": {},
+    "fixed_conditions": "Frozen original task and timing only (target [0.29,0.035,0.19] m, zero qpos/qvel initialization, duration 0.35 s, control period 0.01 s, physics timestep 0.0005 s, position tolerance 0.01 m, holding speed limit 0.02 m/s at inclusive samples 30-35, seed 17, reach_free environment, ideal_tension execution, frozen task 2b26edb492214c426263441b6adb52d7aafe41a828436d6b48a1171374a1026c); fixed joint-optimized design d=-0.43979400623619647 (lengths [0.15758113296570092,0.11241886703429908] m); fixed residual mode against the single advertised mathematical reference; no length optimization during training.",
+    "hypothesis": "With 2/2 training trials and the single joint length-and-motion solve consumed, no legal route remains that could turn these residual policies into a complete original-task pass: trial 1 satisfied position (0.0077 m) but not holding speed (0.0533 m/s), and trial 2's speed-weighted retraining improved holding speed to 0.0313 m/s while breaking position (0.0122 m), so the residual route needs a dynamically settled schedule or a direct-mode policy rather than another run of the same design under exhausted ceilings.",
+    "interpretation": "Truthful closeout, all cited evidence read publicly. (1) Single joint length-and-motion solve (no second solve attempted): result bb17ed54da1c3299594d49af9d22c85058c89341224e58622ff656cfb1f9bcb1, operation solve, termination_reason Solve_Succeeded, charged_numerical_s 193.2726503999438 within the 3300 s allowance under research_work_v1/max_iterations 1000; progress checkpoint c2ae2060c2b5c15c3ca4d4fe1bff55d8967fe1eccec16b6af7f8ee5110bf4b3b; handoff 6fbdab4ff3e5c2f072708ef15be6aa8eed260ede3d05abb585c33740a8b24cf4; trajectory 6836cf7ef0f424bce087691bd5eb2f27366ba46871897556f3e8b909c0e8e257; candidate d07fe55cf2ca4db01e1f39e231664d71c9ae5a5e776de63f10d93d8fab058e55 with d=-0.43979400623619647 and lengths [0.15758113296570092,0.11241886703429908] m, objective_mode task_gap, position_weight 1.0, speed_weight 1.0, secondary_coefficient 0.0, design_bounds [-1,1], design_initial 0.0, initialization pretension_0_2, implicit_euler, original 0.35 s/0.01 s grid; reduced-model metrics terminal_position_error_m 0.005199589552994323, holding_max_position_error_m 0.005199589552994323, holding_max_speed_m_s 0.019524742197642015, position/speed slacks -9.595333438951503e-09 (relaxation never subtracted), original_task_feasible true, relaxed_nlp_feasible true. This candidate is joint-optimized and explicitly distinct from the fallback reference d0=0 with lengths .16/.11 m, which carries reference-only provenance. Qualification recorded: the handoff itself states 'controller unselected; mathematical trajectory is evidence, not MuJoCo acceptance', and the reference convention states 'mathematical source, MuJoCo acceptance unproven'. (2) Route choice on actual evidence: NMPC was not admitted (nmpc_admission available:false for both candidates, reason 'NMPC unavailable within this budget: no matching existing timing evidence'), so no calibration, no admission bypass and 0/4 NMPC executions; RL was chosen with mode residual because the advertised compatible reference for this exact candidate was available:true (6836cf7e...npz, sha256 08dd0db2d37658d59df66abdd7206886168b5751d20922b6133b2a6b071cfb99, candidate_identity 3b0ea117427afa74bf661eabc09b3548e884152aff31a2cd1806c82d322e602c, tendon_order [near_t0,near_t1,near_t2,far_t0,far_t1,far_t2], control_period_s 0.01), with honest unproven-MuJoCo provenance. (3) Trial 1 of 2, run joint-design-control-20261014-1c1dfe20: requested 200000 actions/1200 active s, effective 199936 actions (781 x 256 rollouts, round-down recorded; never rounded up and no cost reset); status completed, stop_reason action_budget, 199936/199936 actions, 357.8006314999657 active s, 3998720 attempted physics steps, 5712 complete episodes, 0 failed episodes; terminal training summary 3b24cdd81bfb2f79282df51657b0682f06aba652d7ecbcc8d8dfa002bd8267b4 with usable checkpoint step-00199936-daae11c5 (policy_file_sha256 89df299779eebad61063912d22341e0699409e273822de13b506005b531e1b9b). Its independent development evaluation e9eecdab7c47f4bda65f28babb58f195904dece1e6cfa6cd5e65756197e28aaa (explicitly read) FAILED: failure_reason task_thresholds_not_met, passed false, terminal_position_error_m 0.007681769793289023 (pass), holding_max_position_error_m 0.007768583368161211 (pass), holding_max_speed_m_s 0.05334458227904879 (FAIL, 2.7x the 0.02 m/s limit), last_valid_speed_m_s 0.01634568027310597, numerical_failure null, selected_execution null. (4) Trial 2 of 2, run joint-design-control-20261014-23056445: same candidate, task, reference and allocation (effective 199936 actions), reward_overrides holding_speed 1.0->3.0 and smoothness 0.001->0.01 targeted the violated criterion; status completed, 199936 actions, 360.73290499998257 active s, 5712 complete episodes, 0 failed; terminal training summary 315d4981700dc08fd5f527844ccea4a9731f324ec9233cf35adb5e03c2837f16 with usable checkpoint step-00199936-f70c51c2 (policy_file_sha256 429f4801d47908e3cacc1af43152ae5902f0a78ca6f957c16f5954eb4da211b9). Its independent development evaluation 7618d343692d7a5d14dcbf8e142643dd861017f068dfb52e6f7881be8a939211 (explicitly read) FAILED: terminal/holding_max_position_error_m 0.012233575730969254 (FAIL), holding_max_speed_m_s 0.03133724245734848 (FAIL, improved from 0.05334), last_valid_speed_m_s 0.01160178229277855, numerical_failure null, selected_execution null. Scientific reading: the reduced-model schedule is dynamically feasible but not settled in the accepted plant, and the two ~200k-action residual budgets buy one criterion at a time (position 0.0077 m with speed 0.0533 m/s; then speed 0.0313 m/s with position 0.0122 m) — a genuine scientific failure of the tested combination, not an infrastructure failure (0 failed episodes, no numerical_failure in either trial). (5) Confirmation: 0/2 confirmations were issued, correctly — confirmation eligibility requires a complete original-task pass, both candidate references were reported ineligible ('result did not pass complete original task evaluation'), and no passing development selected_execution ever existed, so research_plan confirm selected_execution was never legal and no failing candidate was frozen or re-confirmed. research_rl evaluate was used only for the two development evaluations (2 of 5 evaluation episodes) and never for confirmation, so the historical wrong-tool defect recorded in scoped_context (an evaluation request used in place of a second legal confirmation, closing that study at 1/2) was not repeated. Budget ledger: training 399872/400000 actions cumulative (2/2 trials), ~718.53/2400 training active seconds, 3998720 + 3998720 attempted training physics steps; mechanics 1 solve, ~193 s of 3300 s (receipt-identical to the pre-existing record, additional execution cost zero); evaluations 2/5; confirmations 0/2; bdf replays 0/1; the optional 60 s/1-step physical diagnostic was deliberately not used because a single 0.0005 s step cannot resolve a samples-30-35 holding window; NMPC 0/4. Historical references 23a6aec72f9ff17c95f9244ee73f2d1f63fbd3ccc126de7d682dc732a5a17d65 and 4aa260f167618d9d205e58c5ea77fc63c82eb53d9fc402b53a57319f3fa2c79a returned EVIDENCE_MISSING_OR_CHANGED and were not used as evidence. No parameter-improvement attribution is permitted or claimed: the joint design never completed an original-task pass and no selected_execution/confirmation exists. next_step revise_design, concrete recommendation: in a new bounded study (a) re-run one joint length-and-motion solve with the holding requirement inside the objective (task_gap_with_effort or a materially higher speed_weight plus a settled-tail requirement) so the optimized tension schedule is dynamically settled in the accepted plant, and (b) train direct-mode PPO at the fixed joint-optimized design with the declared reward under the same 200000 actions/1200 s per-trial ceiling, because the only passing development configuration in the entire evidence base was direct mode (historical reference-d0 policy: terminal error 0.00807 m, holding max speed 0.01076 m/s), whereas residual reweighting demonstrably traded position against holding speed.",
+    "mechanics": null,
+    "mechanics_source": null,
+    "next_step": "revise_design",
+    "parameters": null,
+    "search": null,
+    "selected_execution": null,
+    "stopping_condition": "Stop: both permitted training trials are consumed with their terminal summaries read, both independent development evaluations are read and failed, the single mechanics solve is spent, NMPC is not admitted on timing, and no development selected_execution passed, so no confirmation may be requested and no further start/resume/solve/exploratory execution is authorized.",
+    "supporting_evidence": [
+      {
+        "artifact_id": "bb17ed54da1c3299594d49af9d22c85058c89341224e58622ff656cfb1f9bcb1",
+        "media_type": "application/json"
+      },
+      {
+        "artifact_id": "c2ae2060c2b5c15c3ca4d4fe1bff55d8967fe1eccec16b6af7f8ee5110bf4b3b",
+        "media_type": "application/json"
+      },
+      {
+        "artifact_id": "6836cf7ef0f424bce087691bd5eb2f27366ba46871897556f3e8b909c0e8e257",
+        "media_type": "application/json"
+      },
+      {
+        "artifact_id": "6fbdab4ff3e5c2f072708ef15be6aa8eed260ede3d05abb585c33740a8b24cf4",
+        "media_type": "application/json"
+      },
+      {
+        "artifact_id": "d07fe55cf2ca4db01e1f39e231664d71c9ae5a5e776de63f10d93d8fab058e55",
+        "media_type": "application/json"
+      },
+      {
+        "artifact_id": "3b24cdd81bfb2f79282df51657b0682f06aba652d7ecbcc8d8dfa002bd8267b4",
+        "media_type": "application/json"
+      },
+      {
+        "artifact_id": "e9eecdab7c47f4bda65f28babb58f195904dece1e6cfa6cd5e65756197e28aaa",
+        "media_type": "application/json"
+      },
+      {
+        "artifact_id": "315d4981700dc08fd5f527844ccea4a9731f324ec9233cf35adb5e03c2837f16",
+        "media_type": "application/json"
+      },
+      {
+        "artifact_id": "7618d343692d7a5d14dcbf8e142643dd861017f068dfb52e6f7881be8a939211",
+        "media_type": "application/json"
+      }
+    ],
+    "weakening_observation": "Stopping would be premature if any allowance remained usable — an unused training trial, an unused mechanics solve, admitted NMPC timing evidence, or a passing development selected_execution eligible for confirmation; the read evidence shows none of these and both evaluation references are ineligible for confirmation."
+  },
+  "request_id": "native-call_00_jovWNtwzC3nr5JCaRxrX5548"
+}
