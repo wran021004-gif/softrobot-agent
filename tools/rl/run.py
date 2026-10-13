@@ -29,7 +29,15 @@ def write_json(path, value):
         stream.write("\n")
         stream.flush()
         os.fsync(stream.fileno())
-    os.replace(pending, path)
+    # Windows readers can briefly deny deletion of the replaced file. Retain
+    # atomic publication; retry only these sharing/access errors for <=40 ms.
+    for attempt in range(5):
+        try:
+            os.replace(pending, path)
+            break
+        except PermissionError as error:
+            if getattr(error, 'winerror', None) not in (5, 32) or attempt == 4: raise
+            time.sleep(.01)
 
 
 def process_birth(pid):

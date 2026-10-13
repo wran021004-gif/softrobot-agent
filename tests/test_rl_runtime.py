@@ -113,6 +113,23 @@ class RuntimeTests(unittest.TestCase):
         self.assertTrue(second['training_summary']['consumption_uncertain'])
         self.assertIsNone(second['training_summary']['checkpoint'])
 
+    def test_atomic_publication_bounds_windows_sharing_retry(self):
+        original=run.os.replace
+        error=PermissionError('Synthetic Windows reader conflict');error.winerror=5
+        calls=[]
+        def once(source,target):
+            calls.append(target)
+            if len(calls)==1:raise error
+            original(source,target)
+        with patch.object(run.os,'replace',side_effect=once),patch.object(run.time,'sleep') as pause:
+            run.write_json(self.directory/'state.json',{'complete':True})
+            self.assertEqual(pause.call_args.args,(.01,))
+        self.assertEqual(run.read_json(self.directory/'state.json'),{'complete':True})
+        with patch.object(run.os,'replace',side_effect=error) as replace,patch.object(run.time,'sleep') as pause:
+            with self.assertRaises(PermissionError):run.write_json(self.directory/'state.json',{'complete':False})
+            self.assertEqual(replace.call_count,5);self.assertEqual(pause.call_count,4)
+        self.assertEqual(run.read_json(self.directory/'state.json'),{'complete':True})
+
     def test_checkpoint_publication_failure_keeps_previous_generation(self):
         model = FakeModel()
         first = train.publish_checkpoint(self.directory, model, self.config, {})
