@@ -1,0 +1,198 @@
+{
+  "mode": "residual",
+  "seed": 17,
+  "environment": {
+    "mode": "residual",
+    "residual_scale_n": 8.0,
+    "target_m": [
+      0.29,
+      0.035,
+      0.19
+    ],
+    "lengths_m": [
+      0.15758113296570092,
+      0.11241886703429908
+    ],
+    "tendon_order": [
+      "near_t0",
+      "near_t1",
+      "near_t2",
+      "far_t0",
+      "far_t1",
+      "far_t2"
+    ],
+    "physics_dt_s": 0.0005,
+    "control_dt_s": 0.01,
+    "substeps": 20,
+    "integrator": "implicitfast",
+    "numerical_version": "pilot-v2-implicitfast-dt-0.0005",
+    "horizon": 35,
+    "holding_steps": [
+      30,
+      31,
+      32,
+      33,
+      34,
+      35
+    ],
+    "max_tension_n": 8.0,
+    "position_scale_m": 0.01,
+    "speed_scale_m_s": 0.02,
+    "reward": {
+      "position": 1.0,
+      "holding_speed": 1.0,
+      "smoothness": 0.001
+    },
+    "observation": [
+      "qpos_rad (XML order)",
+      "qvel_rad_s (XML order)",
+      "(target-tip)/0.01",
+      "world_tip_velocity/0.02",
+      "previous_applied_tension/8",
+      "control_step/35"
+    ],
+    "action": "direct: 4*(a+1); residual: clip(reference[k]+residual_scale_n*a,0,8)",
+    "termination": "terminated at action 35; numerical failure is an explicit absorbing training failure",
+    "failure_penalty": -10000.0,
+    "source_root": "D:\\softrobot-agent\\.worktrees\\mechanics-control-mainline",
+    "xml_source": "D:\\softrobot-agent\\.worktrees\\mechanics-control-mainline\\runs\\fc1012\\platform.sqlite#60c5e069f76253e05d9b0aa2cd873abda87abecb84b6d0814c30f4e0052a88de",
+    "xml_id": "60c5e069f76253e05d9b0aa2cd873abda87abecb84b6d0814c30f4e0052a88de",
+    "execution_json": "D:\\softrobot-agent.worktrees\\rl-control-pilot\\evidence\\fc1012_open_loop_20261013\\execution.json",
+    "reference_npz": "D:\\softrobot-agent.worktrees\\rl-control-pilot\\evidence\\fc1012_open_loop_20261013\\references.npz"
+  },
+  "ppo": {
+    "policy": "MlpPolicy",
+    "seed": 17,
+    "learning_rate": 0.0001,
+    "n_steps": 256,
+    "batch_size": 64,
+    "n_epochs": 10,
+    "gamma": 0.99,
+    "gae_lambda": 0.95,
+    "clip_range": 0.2,
+    "clip_range_vf": null,
+    "normalize_advantage": true,
+    "ent_coef": 0.0,
+    "vf_coef": 0.5,
+    "max_grad_norm": 0.5,
+    "use_sde": false,
+    "sde_sample_freq": -1,
+    "target_kl": null,
+    "policy_kwargs": {
+      "net_arch": {
+        "pi": [
+          64,
+          64
+        ],
+        "vf": [
+          64,
+          64
+        ]
+      },
+      "log_std_init": -3.0
+    },
+    "device": "cpu",
+    "verbose": 0
+  },
+  "resume_from": "D:\\softrobot-agent.worktrees\\rl-control-pilot\\runs\\rl_pilot\\diagnosis_20261013\\short_residual_terminal\\policy.zip",
+  "prior_training": {
+    "actual_control_steps": 178581,
+    "actual_physics_steps": 3571620,
+    "attempted_actions": 178581,
+    "completed_actions": 178581,
+    "attempted_physics_steps": 3571620,
+    "complete_episodes": 5102,
+    "failed_episodes": 0,
+    "sampling_batches": 696,
+    "optimization_updates": 696,
+    "optimization_epochs_completed": 6960,
+    "elapsed_s": 366.4133868999779
+  },
+  "additional_cost": {
+    "status": "interrupted_process_absent_no_final_checkpoint",
+    "counts_are": "durably_logged_lower_bounds; unflushed work cannot be recovered",
+    "cost": {
+      "actual_control_steps": 174485,
+      "actual_physics_steps": 3489700,
+      "attempted_actions": 174485,
+      "completed_actions": 174485,
+      "attempted_physics_steps": 3489700,
+      "complete_episodes": 4985,
+      "failed_episodes": 0,
+      "sampling_batches": 681,
+      "optimization_updates": 681,
+      "optimization_epochs_completed": 6810,
+      "elapsed_s": 358.61755189998075
+    },
+    "last_progress": {
+      "rollout/ep_rew_mean": "-127.29782078000002",
+      "time/iterations": "681",
+      "rollout/ep_len_mean": "35.0",
+      "time/time_elapsed": "357",
+      "time/fps": "487",
+      "time/total_timesteps": "174336",
+      "train/learning_rate": "0.0003",
+      "train/policy_gradient_loss": "-0.021932491508778185",
+      "train/clip_range": "0.2",
+      "train/entropy_loss": "13.392952251434327",
+      "train/clip_fraction": "0.727734375",
+      "train/n_updates": "6800",
+      "train/explained_variance": "0.44302910566329956",
+      "train/std": "0.02713923156261444",
+      "train/approx_kl": "0.3517062",
+      "train/value_loss": "297.79745330810545",
+      "train/loss": "109.96935272216797"
+    },
+    "last_complete_csv_row": 174485,
+    "budget_charged": {
+      "control_steps": 200000,
+      "max_seconds": 1800
+    },
+    "recovery_policy": "diagnosis_20261013/short_residual_terminal/policy.zip",
+    "cause": "process was absent after conversation continuation; termination mechanism not established"
+  },
+  "policy_defaults": "SB3 Tanh activation, orthogonal init, Adam; see recorded SB3 version",
+  "torch_threads": 1,
+  "environments": 1,
+  "versions": {
+    "numpy": "2.4.6",
+    "mujoco": "3.13.0",
+    "gymnasium": "1.4.0",
+    "stable-baselines3": "2.9.0",
+    "torch": "2.14.1+cpu"
+  },
+  "requested": {
+    "control_steps": 200000,
+    "max_seconds": 1800.0
+  },
+  "training": {
+    "actual_control_steps": 200000,
+    "actual_physics_steps": 4000000,
+    "attempted_actions": 200000,
+    "completed_actions": 200000,
+    "attempted_physics_steps": 4000000,
+    "complete_episodes": 5714,
+    "failed_episodes": 0,
+    "sampling_batches": 781,
+    "sampling_batches_started": 782,
+    "policy_parameter_change_l2": 16.684627532958984,
+    "optimization_updates": 781,
+    "time_overrun_s": 0.0,
+    "elapsed_s": 312.8432039000327,
+    "stop_reason": "step_budget",
+    "optimization_epochs_completed": 7810,
+    "time_scope": "environment/PPO setup and learning including optimization; excludes export/import"
+  },
+  "cumulative_training": {
+    "actual_control_steps": 378581,
+    "actual_physics_steps": 7571620,
+    "completed_actions": 378581,
+    "attempted_actions": 378581,
+    "complete_episodes": 10816,
+    "failed_episodes": 0,
+    "sampling_batches": 1477,
+    "optimization_updates": 1477,
+    "optimization_epochs_completed": 14770,
+    "elapsed_s": 679.2565908000106
+  }
+}

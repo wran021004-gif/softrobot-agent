@@ -1,0 +1,153 @@
+{
+  "mode": "residual",
+  "policy": "D:\\softrobot-agent.worktrees\\rl-control-pilot\\runs\\rl_pilot\\training_20261013\\round2_residual\\policy.zip",
+  "seed": 17,
+  "training_cost": {
+    "actual_control_steps": 378581,
+    "actual_physics_steps": 7571620,
+    "completed_actions": 378581,
+    "attempted_actions": 378581,
+    "complete_episodes": 10816,
+    "failed_episodes": 0,
+    "sampling_batches": 1477,
+    "optimization_updates": 1477,
+    "optimization_epochs_completed": 14770,
+    "elapsed_s": 679.2565908000106
+  },
+  "latest_round_training": {
+    "actual_control_steps": 200000,
+    "actual_physics_steps": 4000000,
+    "attempted_actions": 200000,
+    "completed_actions": 200000,
+    "attempted_physics_steps": 4000000,
+    "complete_episodes": 5714,
+    "failed_episodes": 0,
+    "sampling_batches": 781,
+    "sampling_batches_started": 782,
+    "policy_parameter_change_l2": 16.684627532958984,
+    "optimization_updates": 781,
+    "time_overrun_s": 0.0,
+    "elapsed_s": 312.8432039000327,
+    "stop_reason": "step_budget",
+    "optimization_epochs_completed": 7810,
+    "time_scope": "environment/PPO setup and learning including optimization; excludes export/import"
+  },
+  "evaluation_elapsed_s": 1.0151023999787867,
+  "input_source": {
+    "mode": "residual",
+    "residual_scale_n": 8.0,
+    "target_m": [
+      0.29,
+      0.035,
+      0.19
+    ],
+    "lengths_m": [
+      0.15758113296570092,
+      0.11241886703429908
+    ],
+    "tendon_order": [
+      "near_t0",
+      "near_t1",
+      "near_t2",
+      "far_t0",
+      "far_t1",
+      "far_t2"
+    ],
+    "physics_dt_s": 0.0005,
+    "control_dt_s": 0.01,
+    "substeps": 20,
+    "integrator": "implicitfast",
+    "numerical_version": "pilot-v2-implicitfast-dt-0.0005",
+    "horizon": 35,
+    "holding_steps": [
+      30,
+      31,
+      32,
+      33,
+      34,
+      35
+    ],
+    "max_tension_n": 8.0,
+    "position_scale_m": 0.01,
+    "speed_scale_m_s": 0.02,
+    "reward": {
+      "position": 1.0,
+      "holding_speed": 1.0,
+      "smoothness": 0.001
+    },
+    "observation": [
+      "qpos_rad (XML order)",
+      "qvel_rad_s (XML order)",
+      "(target-tip)/0.01",
+      "world_tip_velocity/0.02",
+      "previous_applied_tension/8",
+      "control_step/35"
+    ],
+    "action": "direct: 4*(a+1); residual: clip(reference[k]+residual_scale_n*a,0,8)",
+    "termination": "terminated at action 35; numerical failure is an explicit absorbing training failure",
+    "failure_penalty": -10000.0,
+    "source_root": "D:\\softrobot-agent\\.worktrees\\mechanics-control-mainline",
+    "xml_source": "D:\\softrobot-agent\\.worktrees\\mechanics-control-mainline\\runs\\fc1012\\platform.sqlite#60c5e069f76253e05d9b0aa2cd873abda87abecb84b6d0814c30f4e0052a88de",
+    "xml_id": "60c5e069f76253e05d9b0aa2cd873abda87abecb84b6d0814c30f4e0052a88de",
+    "execution_json": "D:\\softrobot-agent.worktrees\\rl-control-pilot\\evidence\\fc1012_open_loop_20261013\\execution.json",
+    "reference_npz": "D:\\softrobot-agent.worktrees\\rl-control-pilot\\evidence\\fc1012_open_loop_20261013\\references.npz"
+  },
+  "episodes": [
+    {
+      "terminal_position_error_m": 0.001234211409873408,
+      "holding_max_position_error_m": 0.001629899181437748,
+      "holding_max_speed_m_s": 0.03174555604861567,
+      "holding_sample_steps": [
+        30,
+        31,
+        32,
+        33,
+        34,
+        35
+      ],
+      "holding_sample_times_s": [
+        0.3,
+        0.31,
+        0.32,
+        0.33,
+        0.34,
+        0.35000000000000003
+      ],
+      "complete": true,
+      "holding_coverage_complete": true,
+      "passed": false,
+      "episode_reward": -62.95729585298725,
+      "numerical_failure": null,
+      "counts": {
+        "attempted_actions": 35,
+        "completed_actions": 35,
+        "attempted_physics_steps": 700,
+        "complete_episodes": 1,
+        "failed_episodes": 0
+      },
+      "reward_terms": {
+        "position": -52.22842911381708,
+        "holding_speed": -10.728295505654783,
+        "smoothness": -0.0005712335154132291
+      },
+      "max_command_applied_gap_n": 0.0,
+      "clipped_channels": 1,
+      "saturated_channels": 1
+    }
+  ],
+  "passed": false,
+  "acceptance": {
+    "position_limit_m": 0.01,
+    "holding_speed_limit_m_s": 0.02,
+    "holding_steps": [
+      30,
+      31,
+      32,
+      33,
+      34,
+      35
+    ]
+  },
+  "tension_timing": "row k>0: tension on interval [(k-1)*0.01,k*0.01]; row 0: zero, no action",
+  "repetition_scope": "identical initial states; nominal confirmation only"
+}

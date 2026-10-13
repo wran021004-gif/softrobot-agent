@@ -22,6 +22,7 @@ HOLD_STEPS = list(range(30, 36))
 MAX_TENSION, RESIDUAL_SCALE = 8.0, 8.0
 POSITION_SCALE, SPEED_SCALE = 0.01, 0.02
 REWARD = dict(position=1.0, holding_speed=1.0, smoothness=0.001)
+FAILURE_PENALTY = -10000.0
 
 
 def load_xml(source_root):
@@ -46,10 +47,21 @@ def load_xml(source_root):
         + "; ".join(f"{path}::{member}" for path in archives))
 
 
+STATE_SPEC = mujoco.mjtState.mjSTATE_INTEGRATION
+WARNINGS = (mujoco.mjtWarning.mjWARN_BADQPOS, mujoco.mjtWarning.mjWARN_BADQVEL,
+            mujoco.mjtWarning.mjWARN_BADQACC)
+
+
+class NumericalFailure(RuntimeError):
+    """A failed physical transition; never returned as a valid PPO sample."""
+
+
 class TensionEnv(gym.Env):
     metadata = {"render_modes": []}
 
-    def __init__(self, mode, source_root=DEFAULT_SOURCE_ROOT, residual_scale=RESIDUAL_SCALE):
+    def __init__(self, mode, source_root=DEFAULT_SOURCE_ROOT, residual_scale=RESIDUAL_SCALE,
+                 physics_dt=PHYSICS_DT, trace_dir=None, integrator="implicitfast", failure_mode="raise"):
+
         if mode not in ("residual", "direct"):
             raise ValueError("mode must be residual or direct")
         if not np.isfinite(residual_scale) or residual_scale <= 0:
@@ -82,6 +94,22 @@ class TensionEnv(gym.Env):
                 or not np.all(m.actuator_ctrlrange[a] == [0, 8])
                 or not np.all(m.actuator_forcerange[a] == [-8, 0])):
             raise ValueError("Saved XML actuator mapping, dimensions or timing differs")
+        if not np.isfinite(physics_dt) or physics_dt <= 0:
+            raise ValueError("physics_dt must be positive and finite")
+        self.substeps = round(CONTROL_DT / physics_dt)
+        if physics_dt <= 0 or abs(self.substeps * physics_dt - CONTROL_DT) > 1e-12:
+            raise ValueError("physics_dt must divide the control period")
+        m.opt.timestep = physics_dt  # loaded model copy only
+        m.opt.integrator = getattr(mujoco.mjtIntegrator, "mjINT_" + integrator.upper())
+        self.integrator = integrator
+        if failure_mode not in ("raise", "terminal"):
+            raise ValueError("failure_mode must be raise or terminal")
+        self.failure_mode = failure_mode
+        self.trace_dir = Path(trace_dir) if trace_dir else None
+        self.counts = dict(attempted_actions=0, completed_actions=0, attempted_physics_steps=0,
+                           complete_episodes=0, failed_episodes=0)
+        self.episode = 0
+        self.failure = None
         self.site = m.site("tip_site").id
         self.jacobian = np.zeros((3, m.nv))
         self.action_space = gym.spaces.Box(-1.0, 1.0, (6,), dtype=np.float32)
@@ -93,14 +121,16 @@ class TensionEnv(gym.Env):
         return dict(
             mode=self.mode, residual_scale_n=self.residual_scale,
             target_m=TARGET.tolist(), lengths_m=LENGTHS, tendon_order=TENDONS,
-            physics_dt_s=PHYSICS_DT, control_dt_s=CONTROL_DT, substeps=SUBSTEPS,
+            physics_dt_s=float(self.model.opt.timestep), control_dt_s=CONTROL_DT, substeps=self.substeps,
+            integrator=self.integrator, numerical_version="pilot-v2-" + self.integrator + "-dt-" + str(self.model.opt.timestep),
             horizon=HORIZON, holding_steps=HOLD_STEPS, max_tension_n=MAX_TENSION,
             position_scale_m=POSITION_SCALE, speed_scale_m_s=SPEED_SCALE, reward=REWARD,
             observation=["qpos_rad (XML order)", "qvel_rad_s (XML order)",
                          "(target-tip)/0.01", "world_tip_velocity/0.02",
                          "previous_applied_tension/8", "control_step/35"],
             action="direct: 4*(a+1); residual: clip(reference[k]+residual_scale_n*a,0,8)",
-            termination="terminated at action 35; never truncated",
+            termination="terminated at action 35; numerical failure is an explicit absorbing training failure",
+            failure_penalty=FAILURE_PENALTY,
             source_root=str(self.source_root), xml_source=self.xml_source, xml_id=XML_ID,
             execution_json=str(EVIDENCE / "execution.json"),
             reference_npz=str(EVIDENCE / "references.npz"))
@@ -114,6 +144,10 @@ class TensionEnv(gym.Env):
             for name, value in self.saved["initializer"][field].items():
                 destination[address[self.model.joint(name).id]] = value
         self.k = 0
+        self.needs_reset = False
+        self.episode += 1
+        self.episode_records = []
+        self.failure = None
         self.previous_tension = np.zeros(6)
         self.command = np.zeros(6)
         self.clipped = np.zeros(6, dtype=bool)
@@ -148,30 +182,90 @@ class TensionEnv(gym.Env):
                     saturated=(self.command == 0) | (self.command == MAX_TENSION))
         return observation, info
 
+    def get_state(self):
+        state = np.empty(mujoco.mj_stateSize(self.model, STATE_SPEC))
+        mujoco.mj_getState(self.model, self.data, state, STATE_SPEC)
+        return state
+
+    def fail(self, record, start_state, pre_step_state, substep, warnings):
+        self.counts["failed_episodes"] += 1
+        self.failure = dict(record, failed_substep=substep, warnings=warnings,
+                            pre_step_time_s=float(pre_step_state[0]),
+                            returned_engine_time_s=float(self.data.time),
+                            state_spec=int(STATE_SPEC), counts=self.counts.copy())
+        if self.trace_dir:
+            self.trace_dir.mkdir(parents=True, exist_ok=True)
+            prefix = self.trace_dir / f"failure_episode_{self.episode}"
+            prefix.with_suffix(".json").write_text(
+                json.dumps(self.failure, indent=2, allow_nan=False), encoding="utf-8")
+            np.savez_compressed(prefix.with_suffix(".npz"),
+                                interval_start_state=start_state, pre_step_state=pre_step_state,
+                                actions=np.array([r["action"] for r in self.episode_records]),
+                                tensions=np.array([r["tension_n"] for r in self.episode_records]))
+            prefix.with_suffix(".jsonl").write_text(
+                "\n".join(json.dumps(r, allow_nan=False) for r in self.episode_records) + "\n",
+                encoding="utf-8")
+        if self.failure_mode == "raise":
+            raise NumericalFailure("MuJoCo numerical failure: " + ", ".join(warnings))
+        # A terminal surrogate at the last valid boundary, never the engine's reset state.
+        mujoco.mj_setState(self.model, self.data, start_state, STATE_SPEC)
+        self.k = record["episode_action"] - 1
+        self.previous_tension = np.array(record["tension_n"]) - np.array(record["delta_tension_n"])
+        mujoco.mj_forward(self.model, self.data)
+        observation, info = self._observe()
+        if not np.isfinite(observation).all():
+            raise NumericalFailure("No valid observation for failure terminal")
+        self.needs_reset = True
+        info.update(record, numerical_failure=True, valid_physical_transition=False,
+                    counts=self.counts.copy(), failure=self.failure,
+                    reward=FAILURE_PENALTY,
+                    reward_terms=dict(position=0.0, holding_speed=0.0, smoothness=0.0,
+                                      numerical_failure=FAILURE_PENALTY))
+        return observation, FAILURE_PENALTY, True, False, info
+
     def step(self, action):
-        if self.k >= HORIZON:
+        if self.k >= HORIZON or self.needs_reset:
             raise RuntimeError("Call reset before stepping a new episode")
         self.command, self.clipped = self.map_action(action)
+        self.counts["attempted_actions"] += 1
         previous = self.previous_tension.copy()
-        self.data.ctrl[self.actuators] = self.command  # positive command already pulls
+        start_state = self.get_state()
+        _, before_info = self._observe()
+        record = dict(episode_number=self.episode, cumulative_action=self.counts["attempted_actions"],
+                      episode_action=self.k + 1, action=np.asarray(action).tolist(),
+                      tension_n=self.command.tolist(), delta_tension_n=(self.command-previous).tolist(),
+                      clipped=self.clipped.tolist(),
+                      saturated=((self.command == 0) | (self.command == MAX_TENSION)).tolist(),
+                      start_error_m=before_info["position_error_m"], start_speed_m_s=before_info["speed_m_s"])
+        self.episode_records.append(record)
+        self.data.ctrl[self.actuators] = self.command
         mujoco.mj_forward(self.model, self.data)
-        for _ in range(SUBSTEPS):
-            before = self.data.time
+        for substep in range(1, self.substeps + 1):
+            pre_step = self.get_state()  # capture BEFORE an engine warning can reset data
+            self.counts["attempted_physics_steps"] += 1
             mujoco.mj_step(self.model, self.data)
-            if self.data.time <= before or any(
-                    self.data.warning[w].number for w in (
-                        mujoco.mjtWarning.mjWARN_BADQPOS, mujoco.mjtWarning.mjWARN_BADQVEL,
-                        mujoco.mjtWarning.mjWARN_BADQACC)):
-                raise RuntimeError("MuJoCo numerical failure")
+            warnings = [w.name for w in WARNINGS if self.data.warning[w].number]
+            if self.data.time <= pre_step[0]:
+                warnings.append("engine_time_reset")
+            if not all(np.isfinite(x).all() for x in (self.data.qpos, self.data.qvel, self.data.qacc)):
+                warnings.append("nonfinite_state")
+            if warnings:
+                return self.fail(record, start_state, pre_step, substep, warnings)
         self.previous_tension = -self.data.actuator_force[self.actuators].copy()
         self.k += 1
         mujoco.mj_forward(self.model, self.data)
         observation, info = self._observe()
         if not np.isfinite(observation).all():
-            raise RuntimeError("Nonfinite MuJoCo observation")
-        reward = -REWARD["position"] * (info["position_error_m"] / POSITION_SCALE) ** 2
-        if self.k in HOLD_STEPS:
-            reward -= REWARD["holding_speed"] * (info["speed_m_s"] / SPEED_SCALE) ** 2
-        reward -= REWARD["smoothness"] * np.mean(
-            ((self.previous_tension - previous) / MAX_TENSION) ** 2)
-        return observation, float(reward), self.k == HORIZON, False, info
+            return self.fail(record, start_state, pre_step, self.substeps, ["nonfinite_observation"])
+        terms = dict(position=-REWARD["position"] * (info["position_error_m"] / POSITION_SCALE) ** 2,
+                     holding_speed=(-REWARD["holding_speed"] * (info["speed_m_s"] / SPEED_SCALE) ** 2
+                                    if self.k in HOLD_STEPS else 0.0),
+                     smoothness=-REWARD["smoothness"] * float(np.mean(
+                         ((self.previous_tension - previous) / MAX_TENSION) ** 2)))
+        reward = float(sum(terms.values()))
+        record.update(end_error_m=info["position_error_m"], end_speed_m_s=info["speed_m_s"],
+                      reward_terms=terms, reward=reward)
+        self.counts["completed_actions"] += 1
+        self.counts["complete_episodes"] += int(self.k == HORIZON)
+        info.update(record, numerical_failure=False, valid_physical_transition=True, counts=self.counts.copy())
+        return observation, reward, self.k == HORIZON, False, info

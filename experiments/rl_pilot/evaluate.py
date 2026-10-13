@@ -9,17 +9,24 @@ import torch
 from stable_baselines3 import PPO
 
 from experiments.rl_pilot.env import (
-    CONTROL_DT, HOLD_STEPS, HORIZON, POSITION_SCALE, SPEED_SCALE, TENDONS, TensionEnv)
+    CONTROL_DT, HOLD_STEPS, HORIZON, POSITION_SCALE, SPEED_SCALE, TENDONS, TensionEnv, NumericalFailure)
 from experiments.rl_pilot.train import write_json
 
 
 def run_episode(model, env, seed):
+    counts_before = env.counts.copy()
     observation, initial = env.reset(seed=seed)
     samples = [initial]
     total_reward = 0.0
+    terminated = truncated = False
+    failure = None
     for _ in range(HORIZON):
-        action, _ = model.predict(observation, deterministic=True)
-        observation, reward, terminated, truncated, info = env.step(action)
+        try:
+            action, _ = model.predict(observation, deterministic=True)
+            observation, reward, terminated, truncated, info = env.step(action)
+        except (NumericalFailure, ValueError, FloatingPointError) as error:
+            failure = env.failure or dict(type=type(error).__name__, message=str(error))
+            break
         samples.append(info)
         total_reward += reward
         if terminated or truncated:
@@ -31,7 +38,7 @@ def run_episode(model, env, seed):
     complete = (indices == list(range(HORIZON + 1)) and terminated and not truncated
                 and all(abs(row["engine_time_s"] - row["control_step"] * CONTROL_DT) < 1e-10
                         for row in samples))
-    terminal_error = samples[-1]["position_error_m"]
+    terminal_error = samples[-1]["position_error_m"] if complete else None
     hold_error = max((row["position_error_m"] for row in hold), default=None)
     hold_speed = max((row["speed_m_s"] for row in hold), default=None)
     passed = (complete and coverage and terminal_error <= POSITION_SCALE
@@ -41,7 +48,13 @@ def run_episode(model, env, seed):
         holding_max_speed_m_s=hold_speed, holding_sample_steps=[row["control_step"] for row in hold],
         holding_sample_times_s=[row["time_s"] for row in hold],
         complete=bool(complete), holding_coverage_complete=coverage, passed=bool(passed),
-        episode_reward=total_reward)
+        episode_reward=total_reward, numerical_failure=failure, counts={key: value-counts_before[key] for key, value in env.counts.items()},
+        reward_terms={key: sum(row["reward_terms"][key] for row in samples[1:])
+                      for key in ("position", "holding_speed", "smoothness")},
+        max_command_applied_gap_n=max((max(abs(a-b) for a, b in zip(
+            row["commanded_tension_n"], row["applied_tension_n"])) for row in samples[1:]), default=0.0),
+        clipped_channels=sum(sum(row["clipped"]) for row in samples[1:]),
+        saturated_channels=sum(sum(row["saturated"]) for row in samples[1:]))
     return samples, metrics
 
 
@@ -57,8 +70,8 @@ def write_trajectory(path, samples):
             writer.writerow([
                 row["control_step"], row["time_s"], row["engine_time_s"],
                 *row["tip_m"], *row["tip_velocity_m_s"], *row["applied_tension_n"],
-                *row["commanded_tension_n"], *row["clipped"].astype(int),
-                *row["saturated"].astype(int)])
+                *row["commanded_tension_n"], *map(int, row["clipped"]),
+                *map(int, row["saturated"])])
 
 
 def main():
@@ -72,7 +85,11 @@ def main():
     settings = json.loads(args.policy.with_name("settings.json").read_text(encoding="utf-8"))
     saved = settings["environment"]
     torch.set_num_threads(settings["torch_threads"])
-    env = TensionEnv(saved["mode"], args.source_root or saved["source_root"], saved["residual_scale_n"])
+    output = (args.output or args.policy.parent / "evaluation").resolve()
+    output.mkdir(parents=True, exist_ok=False)
+    env = TensionEnv(saved["mode"], args.source_root or saved["source_root"], saved["residual_scale_n"],
+                     physics_dt=saved["physics_dt_s"], integrator=saved["integrator"],
+                     trace_dir=output, failure_mode="raise")
     current = env.settings()
     paths = {"source_root", "xml_source", "execution_json", "reference_npz"}
     if any(current[key] != value for key, value in saved.items() if key not in paths):
@@ -80,8 +97,6 @@ def main():
     model = PPO.load(args.policy, env=env, device="cpu")
     if model.pilot_environment != saved:
         raise ValueError("policy.zip and settings.json do not belong together")
-    output = (args.output or args.policy.parent / "evaluation").resolve()
-    output.mkdir(parents=True, exist_ok=False)
     results = []
     for episode in range(1, args.episodes + 1):
         samples, metrics = run_episode(model, env, settings["seed"])
@@ -90,7 +105,8 @@ def main():
     env.close()
     result = dict(
         mode=saved["mode"], policy=str(args.policy.resolve()), seed=settings["seed"],
-        training_cost=settings["training"], evaluation_elapsed_s=time.perf_counter() - started,
+        training_cost=settings.get("cumulative_training", settings["training"]),
+        latest_round_training=settings["training"], evaluation_elapsed_s=time.perf_counter() - started,
         input_source=current, episodes=results, passed=all(item["passed"] for item in results),
         acceptance=dict(position_limit_m=POSITION_SCALE, holding_speed_limit_m_s=SPEED_SCALE,
                         holding_steps=HOLD_STEPS),
