@@ -16,9 +16,10 @@ class CoreTests(TestCase):
     @classmethod
     def setUpClass(cls):
         cls.temp=TemporaryDirectory(dir=core.ROOT/'runs',prefix='core-fixtures-')
-        spec=read(core.DEFAULT_SPEC);spec['study_id']='core-fixture-'+str(int(time.time()))
+        spec=read(core.DEFAULT_SPEC);spec['study_id']='core-fixture-'+str(int(time.time()));spec['started_unix']=time.time()
         cls.spec_path=core.Path(cls.temp.name)/'spec.json';core.atomic_json(cls.spec_path,spec)
         cls.host=core.prepare(cls.spec_path,core.Path(cls.temp.name)/'business')
+        core.update(cls.host,freeze='fixture-implementation')
 
     @classmethod
     def tearDownClass(cls):
@@ -108,13 +109,13 @@ class CoreTests(TestCase):
             core.update(h,results=[ref],selected=None)
             plan=dict(action='confirm',selected_execution=ref,**{k:'fixture' for k in
                 ('hypothesis','expected_observation','weakening_observation','fixed_conditions','stopping_condition','interpretation')})
-            with self.assertRaisesRegex(ValueError,'CONFIRMATION_REQUIRES_SELECTED_COMPLETE'):
+            with self.assertRaisesRegex(ValueError,'selected scientific configuration mismatch'):
                 core.dispatch(h,plan,'fixture-invalid-selection')
             self.assertIsNone(core.state(h)['selected'])
             wrong['scientific_configuration']=c['scientific_configuration'];wrong['acceptance']={'accepted':False}
             failed_ref=core.save(h,wrong);core.update(h,results=[ref,failed_ref])
             plan['selected_execution']=failed_ref
-            with self.assertRaisesRegex(ValueError,'SELECTED_PASSING_EXECUTION_REQUIRED'):
+            with self.assertRaisesRegex(ValueError,'result did not pass complete original task evaluation'):
                 core.dispatch(h,plan,'fixture-nonpassing-selection')
             self.assertIsNone(core.state(h)['selected'])
         self.assertEqual(h.store.remaining()['used']['backend_solves'],initial_launches)
@@ -325,3 +326,85 @@ class RLIntegrationTests(TestCase):
             self.assertTrue(first['consumption_uncertain'])
             self.assertEqual(len(s['rl_evaluations']),1)
             self.assertEqual(core.claims(host)['interface_evaluations'],0)
+
+
+class FormalControlTests(TestCase):
+    def test_allocation_schema_positive_and_phase_caps(self):
+        from schemas.research_core import RLAllocation
+        self.assertEqual(RLAllocation(actions=200000,active_seconds=800).actions,200000)
+        for value in (0,float('inf'),float('nan')):
+            with self.assertRaises(ValueError):RLAllocation(actions=1024,active_seconds=value)
+
+    def test_nmpc_gate_uses_existing_exact_configuration_and_cap(self):
+        from types import SimpleNamespace
+        cfg={'task':'fixed','controller':'selected'}
+        state=dict(spec={'nmpc_execution_cap_s':1800,'nmpc_timing_evidence':[dict(scientific_configuration_identity=core.digest(cfg),complete_execution_s=1900,source='saved-timing')]})
+        with patch.object(core,'state',return_value=state),patch.object(core,'verify_candidate',return_value={'scientific_configuration':cfg}):
+            gate=core.nmpc_timing(SimpleNamespace(),'candidate')
+            self.assertFalse(gate['available']);self.assertIn('exceeds cap',gate['reason'])
+            state['spec']['nmpc_timing_evidence'][0]['complete_execution_s']=600
+            self.assertTrue(core.nmpc_timing(SimpleNamespace(),'candidate')['available'])
+            state['spec']['nmpc_timing_evidence'][0]['scientific_configuration_identity']='different'
+            self.assertFalse(core.nmpc_timing(SimpleNamespace(),'candidate')['available'])
+
+    def test_rl_confirmation_exact_generation_without_training_or_nmpc(self):
+        from tools import research_core_rl as bridge
+        from types import SimpleNamespace
+        selected={'run_id':'owned','checkpoint':'step-exact','policy_sha256':'frozen'}
+        host=SimpleNamespace(store=SimpleNamespace(artifact=lambda ref:selected))
+        with patch.object(bridge,'dispatch',return_value={'passed':True}) as call,patch.object(core,'execute',side_effect=AssertionError('NMPC forbidden')):
+            bridge.confirm(host,{'artifact_id':'selected'},'confirm-1')
+        args=call.call_args.args
+        self.assertEqual(args[1]['operation'],'evaluate');self.assertEqual(args[1]['checkpoint'],'step-exact')
+        self.assertEqual(call.call_args.kwargs['selected'],{'artifact_id':'selected'})
+
+    def test_rl_reserve_reads_confirmation_count_and_deadline(self):
+        from tools import research_core_rl as bridge
+        from types import SimpleNamespace
+        s=dict(spec={'confirmation':{'fresh_independent_repetitions':2},'rl_evaluation_allowance_s':10,'rl_limits':{'evaluation_episodes':5}},rl_runs={'r':{'evaluations':2}},cutoff_unix=time.time()+100)
+        h=SimpleNamespace(store=SimpleNamespace(remaining=lambda:{'remaining':{'wall_s':100}}))
+        with patch.object(core,'state',return_value=s):
+            self.assertEqual(bridge.evaluation_capacity(h,5)['admitted'],1)
+            self.assertEqual(bridge.evaluation_capacity(h,2,True)['admitted'],2)
+            s['spec']['confirmation']['fresh_independent_repetitions']=1
+            self.assertEqual(bridge.evaluation_capacity(h,5)['admitted'],2)
+
+    def test_unavailable_evaluation_is_unmeasured(self):
+        from tools.research_core_feedback import result_view
+        from types import SimpleNamespace
+        r=dict(candidate={'artifact_id':'c'},task={'artifact_id':'t'},run_id='r',configuration={'artifact_id':'cfg'},independent_evaluation_executed=False,passed=False,episodes=[],failure_stage='launch/dependency import')
+        h=SimpleNamespace(store=SimpleNamespace(artifact=lambda ref:r))
+        with patch.object(core,'verify_candidate',return_value={'configuration':{'task':{}}}),patch('tools.research_core_feedback.mechanics_context',return_value=[]):
+            v=result_view(h,'result')
+        self.assertFalse(v['passed']);self.assertEqual(v['task_performance'],'unmeasured');self.assertEqual(v['failure_stage'],'launch/dependency import')
+
+
+    def test_formal_preparation_initializes_rl_without_interface_mode(self):
+        from uuid import uuid4
+        from tools import research_core_rl as bridge
+        with TemporaryDirectory(dir=core.ROOT/'runs',prefix='formal-fixture-') as folder:
+            spec=read(core.ROOT/'examples/design_control/phase_B.json')
+            spec.update(study_id='formal-'+uuid4().hex[:8],started_unix=time.time())
+            path=core.Path(folder)/'spec.json';core.atomic_json(path,spec)
+            h=core.prepare(path,core.Path(folder)/'business');s=core.state(h)
+            self.assertEqual(s['rl_runs'],{});self.assertEqual(h.store.artifact(s['rl_task']),s['base_configuration']['task'])
+            self.assertTrue(core.enabled(spec,'mathematics'));self.assertTrue(core.enabled(spec,'nmpc'));self.assertTrue(core.enabled(spec,'rl'))
+            self.assertEqual(core.confirmation_count(s),2)
+            self.assertEqual(bridge.packet(h)['capabilities']['compatible_references'],[])
+            c=core.verify_candidate(h,s['reference_candidate'])
+            source=core.save(h,dict(operation='solve',candidate=dict(d=0.,tensions_n=[[.2]*6]*35,times_s=[k*.01 for k in range(36)],tendon_order=['near_t0','near_t1','near_t2','far_t0','far_t1','far_t2']),original_request=core.save(h,dict(configuration=c['configuration'])),trajectory_reference=core.save(h,{'fixture':'tensions'})))
+            core.update(h,mechanics_results=[source])
+            from tools import research_core_mechanics as mechanics
+            with patch.object(core,'execute',side_effect=AssertionError('handoff cannot launch')):
+                relation=mechanics.handoff(h,source)
+            refs=bridge.compatible_references(h)
+            self.assertTrue(refs[0]['available']);self.assertEqual(refs[0]['reference']['candidate_identity'],c['identity'])
+            v=h.store.artifact(source);v['candidate']['tendon_order'].reverse()
+            incompatible=core.save(h,v);core.update(h,mechanics_results=[source,incompatible])
+            mechanics.handoff(h,incompatible)
+            self.assertFalse(bridge.compatible_references(h)[1]['available'])
+            request=dict(operation='start',candidate=s['reference_candidate'],mode='direct',allocation=dict(actions=200192,active_seconds=800),rationale='exceeds authorized per-trial ceiling')
+            with patch.object(core,'guard'),patch.object(bridge,'invoke',side_effect=AssertionError('must not launch')):
+                with self.assertRaisesRegex(ValueError,'per-trial'):bridge.dispatch(h,request,'over-cap')
+            self.assertEqual(core.state(h)['rl_runs'],{})
+            import gc;gc.collect()

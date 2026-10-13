@@ -194,6 +194,7 @@ class WorkerContext:
             raise ControlledStop("user_stop; partial rollout was not optimized")
 
     def reserve(self):
+        self.state['failure_stage']='physics sampling'
         self.guard()
         remaining = self.config["budget"]["actions"] - self.consumed()["attempted_actions"]
         self.reserved_actions = self.env.counts["attempted_actions"] + min(self.model.n_steps, remaining)
@@ -202,6 +203,7 @@ class WorkerContext:
     def boundary(self):
         # Do not publish partial optimizer state after an exception in SB3.train.
         self.flush()
+        self.state['failure_stage']='checkpoint publication'
         generation = publish_checkpoint(self.directory, self.model, self.config, self.state["consumed"])
         self.state["checkpoints"] = read_json(self.directory / "checkpoint.json")
         self.state["inherited"] = snapshot(self.model)
@@ -226,6 +228,8 @@ class WorkerContext:
 
 
     def before_optimization(self):
+        self.state['failure_stage']='policy optimization'
+        self.flush()
         if self.consumed()["active_seconds"] >= self.config["budget"]["active_seconds"]:
             raise ControlledStop("active_time_budget; full rollout was not optimized")
 
@@ -237,6 +241,8 @@ def worker(directory, token, started):
         torch.set_num_threads(1)
         context.guard()
         context.state["status"] = "running"
+        context.state['failure_stage']='candidate/environment preparation or reset'
+        context.flush()
         context.env = TensionEnv(context.config, trace_dir=directory / "failures" / token,
                                  failure_mode="terminal", guard=context.guard)
         if (directory / "checkpoint.json").exists():

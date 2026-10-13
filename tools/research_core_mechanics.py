@@ -34,8 +34,9 @@ def handoff(host, reference, parameters=None, provenance=None):
     relation = dict(candidate=candidate, mechanics_attempt=plain(reference),
         offline_trajectory=v['trajectory_reference'], structure=dict(d=d,lengths_m=[.16+.0055*d,.11-.0055*d]),
         original_task_feasible=v.get('original_task_feasible',False), relaxed_nlp_feasible=v.get('relaxed_nlp_feasible',False),
-        evaluation_mode='goal_based_NMPC; offline trajectory retained as evidence',
-        exploratory=not v.get('original_task_feasible',False), provenance=provenance)
+        objective=v.get('objective_definition'), relaxation=v.get('original_task_gaps'),
+        evaluation_mode='controller unselected; mathematical trajectory is evidence, not MuJoCo acceptance',
+        exploratory=True, provenance=provenance)
     ref = save(host,relation,'mechanics_candidate_handoff')
     update(host,handoffs=[*state(host).get('handoffs',[]),ref])
     return dict(reference=ref,**relation)
@@ -54,6 +55,8 @@ def dispatch(host, operation, arguments, key):
     if uses_validation:numerical_available+=validation['seconds']
     available = min(numerical_available,s['cutoff_unix']-time.time(),host.store.remaining()['remaining']['wall_s'])
     protection=core.repetition_reserve(s)*core.allowance(s)
+    if core.enabled(s['spec'],'rl'):
+        protection=core.repetition_reserve(s)*s['spec'].get('rl_evaluation_allowance_s',150.)
     protection+=b.get('delivery_numerical_s',0.)
     downstream=s['spec'].get('downstream_reserve',{})
     if downstream:

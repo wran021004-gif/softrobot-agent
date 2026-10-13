@@ -1,0 +1,305 @@
+{
+  "study_id": "design-control-B-20261013",
+  "base_commit": "d30bfc268cb503be32d61414e045129aa9ab8c81",
+  "started_unix": 0,
+  "authorization": "User attachment 8235a412-74ce-43fc-b068-4475a78cf9b0; scoped nonsecret DeepSeek calls; bounded additional Phase A/B; ordinary commit/push feat/rl-control-pilot",
+  "evaluation_version": 1,
+  "reference_parameters": {
+    "d": 0,
+    "holding_tip_speed_weight": 0.1,
+    "terminal_tip_speed_weight": 0.1
+  },
+  "allowed_parameters": {
+    "d": [
+      -1,
+      1
+    ],
+    "holding_tip_speed_weight": [
+      0.025,
+      0.1
+    ],
+    "terminal_tip_speed_weight": [
+      0.025,
+      0.1
+    ]
+  },
+  "ranking": "feasible_then_max_normalized_violation_then_sum_v1",
+  "record_update_ids": [
+    8,
+    29,
+    30
+  ],
+  "complete_update_inputs": true,
+  "budgets": {
+    "provider_requests": 48,
+    "public_operations": 160,
+    "physical_launches": 7,
+    "local_solves": 1,
+    "local_solve_s": 60,
+    "offline_nlp": 2,
+    "bdf_replays": 0,
+    "numerical_s": 10200,
+    "activity_s": 10800,
+    "delivery_reserve_s": 600,
+    "protected_provider_requests": 4
+  },
+  "execution_allowances": {
+    "simulation_s": 1700,
+    "evaluation_s": 30,
+    "profile_s": 60,
+    "construction_s": 10
+  },
+  "confirmation": {
+    "fresh_independent_repetitions": 2,
+    "configuration": "Two fresh post-selection nominal episodes; original task, identical selected candidate/controller/configuration and exact frozen RL checkpoint. Development evaluation excluded; retain failures; no success-hunting retries."
+  },
+  "optional_enhancements": {
+    "offline_schedule_initialization": "deferred until core delivery and sufficient remaining budget",
+    "legacy_skill_admission": "deferred; read-only drafts available"
+  },
+  "mode": "formal_research",
+  "tension_execution_mode": "ideal_tension",
+  "evidence_destination": "evidence/design_control_20261013/phase_B",
+  "rl_limits": {
+    "training_runs": 3,
+    "actions_per_trial": 200000,
+    "seconds_per_trial": 2400,
+    "training_actions": 600000,
+    "training_active_seconds": 2400,
+    "evaluation_episodes": 5,
+    "diagnostic_replays": 0,
+    "diagnostic_physics_steps": 0
+  },
+  "capabilities": [
+    "mathematics",
+    "search",
+    "nmpc",
+    "rl"
+  ],
+  "campaign_id": "design-control-20261013",
+  "phase": "B",
+  "historical_evidence": {
+    "study_id": "rl-strands-20261013",
+    "real_provider": "https://api.deepseek.com",
+    "model": "deepseek-flash",
+    "initial_implementation": "0aa3e2d26013295306f2c89afdf298af1184bdf4",
+    "repaired_implementation": "3f5b5407d78e244127cccb3c6e4185b096d9480c",
+    "started_unix": 1791883664.5146806,
+    "closed_unix": 1791884065.614935,
+    "live_elapsed_s": 401.10025429725647,
+    "ceilings": {
+      "activity_s": 900,
+      "bdf_replays": 0,
+      "delivery_reserve_s": 30,
+      "local_solve_s": 0,
+      "local_solves": 0,
+      "numerical_s": 120,
+      "offline_nlp": 0,
+      "physical_launches": 1,
+      "protected_provider_requests": 4,
+      "provider_requests": 24,
+      "public_operations": 60
+    },
+    "rl_ceilings": {
+      "diagnostic_physics_steps": 1,
+      "diagnostic_replays": 1,
+      "evaluation_episodes": 1,
+      "training_actions": 2048,
+      "training_active_seconds": 120,
+      "training_runs": 1
+    },
+    "provider_requests": 23,
+    "public_operations": 23,
+    "training_runs": 1,
+    "training_allocation": {
+      "actions": 1024,
+      "active_seconds": 90.0
+    },
+    "attempted_training_actions": 0,
+    "completed_training_actions": 0,
+    "attempted_training_physics_steps": 0,
+    "optimization_batches": 0,
+    "optimization_epochs": 0,
+    "training_active_seconds_conservatively_charged": 90.0,
+    "training_active_seconds_durable_lower_bound": 0,
+    "actual_training_active_seconds": "unknown; worker failed before timing state publication",
+    "uncertain_consumption": true,
+    "independent_evaluation_episodes": 0,
+    "evaluation_public_requests": 3,
+    "evaluation_physics_steps": 0,
+    "diagnostic_replays": 0,
+    "diagnostic_physics_steps": 0,
+    "task_performance": "unmeasured",
+    "interface_acceptance": false,
+    "next_step": "adjust_training",
+    "read_evidence": [
+      {
+        "artifact_id": "0a39ef2d78fadedbfe9b816a50db13d499a6fa94d51070d7e39e40a808c5428e",
+        "media_type": "application/json"
+      }
+    ],
+    "acceptance_requirements": [
+      {
+        "requirement": "Real Strands model selects new candidate and RL configuration",
+        "status": "partial",
+        "evidence": [
+          "candidate.json",
+          "effective_configuration.json",
+          "tool_trace.json"
+        ],
+        "limitation": "Candidate/mode/overrides chosen and frozen; worker did not reach PPO/reward execution"
+      },
+      {
+        "requirement": "Start short training with at least two complete PPO batches",
+        "status": "failed",
+        "evidence": [
+          "run_status.json",
+          "worker_failure.txt"
+        ],
+        "limitation": "One launch failed before sampling; zero optimizations and no checkpoint"
+      },
+      {
+        "requirement": "Query actual progress and cumulative consumption",
+        "status": "passed",
+        "evidence": [
+          "tool_trace.json",
+          "run_status.json"
+        ]
+      },
+      {
+        "requirement": "Independently evaluate saved policy from frozen candidate/task",
+        "status": "failed",
+        "evidence": [
+          "evaluation_unavailable.json"
+        ],
+        "limitation": "No saved checkpoint; zero evaluation episodes; no performance metrics"
+      },
+      {
+        "requirement": "Public evidence read and evidence-based next-step decision",
+        "status": "partial",
+        "evidence": [
+          "evidence_reads.json",
+          "model_decision.json"
+        ],
+        "limitation": "Model read unavailable-evaluation failure evidence and recommended adjust_training; no policy-evaluation result exists"
+      }
+    ],
+    "focused_checks": {
+      "rl_runtime": 28,
+      "research_integration": 4,
+      "passed": true,
+      "training_campaigns": 0,
+      "physical_replays": 0
+    },
+    "limitations": [
+      "Full five-part interface acceptance failed",
+      "Task performance unmeasured; not a task-threshold failure or design infeasibility finding",
+      "Environment repair verified by import, focused fixture and untrained PPO construction, not a second live training run",
+      "No compatible failure capture, no replay",
+      "Current bridge rejects external XML assets and supports selected hinge/ideal-tension reach-and-hold only",
+      "Original cooperative active-time overrun recording remains; this run retained uncertain startup charge",
+      "Model raw interpretation is preserved; design metadata pretension is not an RL initializer applied tension"
+    ]
+  },
+  "rl_evaluation_allowance_s": 150,
+  "nmpc_execution_cap_s": 1800,
+  "offline_solver_s": 550,
+  "mechanics_allowances": {
+    "solve_s": 600,
+    "replay_s": 60,
+    "inspect_s": 60
+  },
+  "nmpc_limits": {
+    "executions": 4
+  },
+  "nmpc_timing_evidence": [
+    {
+      "scientific_configuration_identity": "91c7032e7a4690d3e91b61ec34ee00130a51867d6cc06d85caf0da4f31de5c22",
+      "complete_execution_s": 729.8433474299993,
+      "measured_complete_execution_s": 540.6247017999995,
+      "margin": 1.35,
+      "source": {
+        "archive": "evidence/research_core_20261011/immutable_artifacts.tar.gz",
+        "result": {
+          "artifact_id": "df0b70c9d13237b203dbb711cd16c861d0c16fa0a85909bbaf64a4a1dc09f0ca",
+          "media_type": "application/json"
+        },
+        "ownership": "historical; existing timing, no new calibration"
+      }
+    },
+    {
+      "scientific_configuration_identity": "91c7032e7a4690d3e91b61ec34ee00130a51867d6cc06d85caf0da4f31de5c22",
+      "complete_execution_s": 723.8085303149797,
+      "measured_complete_execution_s": 536.154466899985,
+      "margin": 1.35,
+      "source": {
+        "archive": "evidence/research_core_20261011/immutable_artifacts.tar.gz",
+        "result": {
+          "artifact_id": "34e75e00627182e5a006804efd9e00b21949643c29020961fc2a9513e1f6dab5",
+          "media_type": "application/json"
+        },
+        "ownership": "historical; existing timing, no new calibration"
+      }
+    },
+    {
+      "scientific_configuration_identity": "91c7032e7a4690d3e91b61ec34ee00130a51867d6cc06d85caf0da4f31de5c22",
+      "complete_execution_s": 641.2793865299668,
+      "measured_complete_execution_s": 475.02176779997535,
+      "margin": 1.35,
+      "source": {
+        "archive": "evidence/research_core_20261011/immutable_artifacts.tar.gz",
+        "result": {
+          "artifact_id": "043ffc3d31382c5d91d27f3ec3ee403978d472322ef6612264794cb5a8ce2d49",
+          "media_type": "application/json"
+        },
+        "ownership": "historical; existing timing, no new calibration"
+      }
+    },
+    {
+      "scientific_configuration_identity": "91c7032e7a4690d3e91b61ec34ee00130a51867d6cc06d85caf0da4f31de5c22",
+      "complete_execution_s": 662.3072149499785,
+      "measured_complete_execution_s": 490.5979369999841,
+      "margin": 1.35,
+      "source": {
+        "archive": "evidence/research_core_20261011/immutable_artifacts.tar.gz",
+        "result": {
+          "artifact_id": "a2904e47bca95913ae96922b50cb525e2dd0fa4570f9ed75869454c2431728ca",
+          "media_type": "application/json"
+        },
+        "ownership": "historical; existing timing, no new calibration"
+      }
+    },
+    {
+      "scientific_configuration_identity": "91c7032e7a4690d3e91b61ec34ee00130a51867d6cc06d85caf0da4f31de5c22",
+      "complete_execution_s": 761.0898686850823,
+      "measured_complete_execution_s": 563.7702731000609,
+      "margin": 1.35,
+      "source": {
+        "archive": "evidence/research_core_20261011/immutable_artifacts.tar.gz",
+        "result": {
+          "artifact_id": "089040ea3e1ca9a8443685afd25fc8c64b4b0a11d4cc52ea27ab1c3580d50f61",
+          "media_type": "application/json"
+        },
+        "ownership": "historical; existing timing, no new calibration"
+      }
+    },
+    {
+      "scientific_configuration_identity": "84551517c2a6527ca753a1350aa0df2ecec2ac5005e4a7668c252488533ebcdd",
+      "complete_execution_s": 767.0489449949179,
+      "measured_complete_execution_s": 568.1844036999391,
+      "margin": 1.35,
+      "source": {
+        "archive": "evidence/research_core_20261011/immutable_artifacts.tar.gz",
+        "result": {
+          "artifact_id": "f3d993ba4333dd5f34ee150f916fdc99a0670c99e7870b97a3f5e7e5f1c24b49",
+          "media_type": "application/json"
+        },
+        "ownership": "historical; existing timing, no new calibration"
+      }
+    }
+  ],
+  "phase_A_dependency": {
+    "study_id": "rl-validation-A-20261013",
+    "requirement": "Complete independent saved-policy evaluation after repaired live training, even if task criteria unmet"
+  }
+}

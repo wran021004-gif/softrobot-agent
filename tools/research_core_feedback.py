@@ -2,28 +2,50 @@
 from tools.platform_store import plain
 
 
+def result_view(host, reference):
+    """Organize original evidence once, without recomputing task metrics."""
+    from tools.research_core import verify_candidate
+    r=host.store.artifact(reference); c=verify_candidate(host,r['candidate'])
+    rl='run_id' in r and 'independent_evaluation_executed' in r
+    episodes=r.get('episodes',[]) if rl else []
+    complete=bool(r.get('independent_evaluation_executed') and episodes and all(e['complete'] for e in episodes)) if rl else r.get('status')=='evaluated'
+    passed=bool(complete and r.get('passed')) if rl else bool((r.get('acceptance') or {}).get('accepted'))
+    controller=dict(route='rl',configuration=r['configuration'],checkpoint=r.get('checkpoint'),policy_sha256=r.get('policy_sha256')) if rl else dict(route='nmpc',configuration=c['scientific_configuration']['policy']['controller'])
+    identity=dict(candidate=r['candidate'],task=r.get('task',c['configuration']['task']),controller=controller)
+    metrics=episodes if rl else (r.get('acceptance') or {}).get('metrics')
+    return dict(candidate=r['candidate'],task=identity['task'],controller_route=controller['route'],controller=controller,
+        mathematical_provenance=mechanics_context(host,r['candidate']),metrics=metrics,complete=complete,passed=passed,
+        task_performance='passed' if passed else 'failed' if complete else 'unmeasured',
+        failure_stage=r.get('failure_stage') or ('task criteria unmet' if complete and not passed else r.get('failure_reason')),
+        costs=dict(evaluation_elapsed_s=r.get('evaluation_elapsed_s'),numerical_s=r.get('numerical_s'),counts=r.get('counts')),
+        evidence=plain(reference),role=r.get('role','development'),selected_execution=r.get('selected_execution'),solution_identity=identity)
+
+
 def eligibility(host, reference):
-    from tools.research_core import state, capacity, verify_candidate
-    s = state(host); ref = plain(reference); reasons = []
-    if ref not in s['results']:
-        return dict(eligible=False, reasons=['not a current-study execution result'],
-                    required_field='selected_execution', required_shape={'artifact_id':'passing result hash','media_type':'application/json'})
-    r = host.store.artifact(ref)
-    if not (r.get('acceptance') or {}).get('accepted'): reasons.append('execution did not pass joint task acceptance')
-    if r.get('profile_identity') != s['profile']['identity']: reasons.append('execution uses an earlier evaluation profile')
+    from tools.research_core import state, capacity, verify_candidate, confirmation_count
+    from tools.research_core_rl import evaluation_capacity
+    s=state(host);ref=plain(reference);reasons=[];refs=[*s['results'],*s.get('rl_evaluations',[])]
+    if ref not in refs:
+        return dict(eligible=False,reasons=['not a current-study controller result'],required_field='selected_execution')
+    r=host.store.artifact(ref)
     try:
-        c = verify_candidate(host, r['candidate'])
-        if r['scientific_configuration'] != c['scientific_configuration']: reasons.append('full scientific configuration mismatch')
-    except (ValueError, KeyError) as exc: reasons.append(str(exc))
-    if s.get('selected') and s['selected'] != ref: reasons.append('confirmation selection is already frozen to another execution')
-    count = sum(host.store.artifact(v).get('role') == 'confirmation' and
-                host.store.artifact(v).get('selected_execution') == ref for v in s['results'])
-    if count >= 2: reasons.append('two post-selection confirmations already recorded')
-    if capacity(host, 1, True, root_operation=True)['admitted'] < 1: reasons.append('fresh confirmation allowance does not fit')
-    if s['research_status'] == 'stopped': reasons.append('study is sealed after STOP')
-    return dict(eligible=not reasons, reasons=reasons, required_field='selected_execution',
-                selected_execution=ref, owning_study=host.run_id, completed_confirmations=count,
-                candidate_is_not_execution=True)
+        v=result_view(host,ref)
+        if not v['passed']: reasons.append('result did not pass complete original task evaluation')
+        c=verify_candidate(host,r['candidate'])
+        if v['controller_route']=='nmpc' and (r.get('profile_identity')!=s['profile']['identity'] or r['scientific_configuration']!=c['scientific_configuration']):
+            reasons.append('selected scientific configuration mismatch')
+        if v['controller_route']=='rl' and (not r.get('checkpoint') or not r.get('policy_sha256')): reasons.append('exact evaluated checkpoint identity missing')
+        if s.get('selected') and s['selected']!=ref: reasons.append('confirmation selection already frozen')
+        count=sum(host.store.artifact(t).get('role')=='confirmation' and host.store.artifact(t).get('selected_execution')==ref for t in refs)
+        required=confirmation_count(s)
+        if count>=required: reasons.append('declared confirmations already recorded')
+        remaining=required-count
+        fit=evaluation_capacity(host,remaining,confirmation=True) if v['controller_route']=='rl' else capacity(host,remaining,True,root_operation=True)
+        if fit['admitted']<remaining: reasons.append('remaining required confirmations do not fit route budget')
+    except (ValueError,KeyError) as exc:
+        reasons.append(str(exc));count=0
+    if s['research_status']=='stopped':reasons.append('study sealed after STOP')
+    return dict(eligible=not reasons,reasons=reasons,required_field='selected_execution',selected_execution=ref,owning_study=host.run_id,completed_confirmations=count)
 
 
 def facts(host):
@@ -38,7 +60,7 @@ def facts(host):
             historical='imported evidence has its original ownership and previous cost; no new execution',
             receipt='reusing an operation ID returns a cached receipt; additional execution cost is zero',
             role='origin, role and phase are metadata, not scientific configuration changes'),
-        confirmation_options=[dict(execution_reference=r, **eligibility(host,r)) for r in s['results']],
+        confirmation_options=[dict(execution_reference=r, **eligibility(host,r)) for r in [*s['results'],*s.get('rl_evaluations',[])]],
         confirmation_reference_shape={'selected_execution':{'artifact_id':'exact passing result artifact_id','media_type':'application/json'}})
 
 

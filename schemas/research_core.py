@@ -55,7 +55,7 @@ class Plan(Contract):
     parameters: Parameters | None = None
     search: Search | None = None
     candidate: EvidenceRef | None = None
-    selected_execution: EvidenceRef | None = None
+    selected_execution: EvidenceRef | None = Field(default=None, description='Exact immutable passing NMPC result or independent RL evaluation; freezes the complete solution')
     diagnostic: LocalDiagnostic | None = None
     mechanics: MechanicsChoice | None = None
     mechanics_source: EvidenceRef | None = None
@@ -119,8 +119,8 @@ class RewardOverrides(Contract):
 
 
 class RLAllocation(Contract):
-    actions: int = Field(ge=1,le=2048,strict=True)
-    active_seconds: FiniteFloat = Field(gt=0,le=120)
+    actions: int = Field(ge=1,strict=True)
+    active_seconds: FiniteFloat = Field(gt=0)
 
 
 class RLReference(Contract):

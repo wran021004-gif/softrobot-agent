@@ -130,6 +130,8 @@ def evaluate(policy, output, source_root=None):
                       checkpoint=policy.parent.name,config_sha256=hashlib.sha256(json.dumps(config,sort_keys=True).encode()).hexdigest(),
                       failure_reason=('numerical_failure' if metrics['numerical_failure'] else
                           None if metrics['passed'] else 'incomplete_trajectory' if not metrics['complete'] else 'task_thresholds_not_met'),
+                      policy_sha256=hashlib.sha256(policy.read_bytes()).hexdigest(),
+                      failure_stage='physics sampling' if metrics['numerical_failure'] else 'task criteria unmet' if metrics['complete'] and not metrics['passed'] else None,
                       last_valid_position_error_m=samples[-1]['position_error_m'],last_valid_speed_m_s=samples[-1]['speed_m_s'],
                       trajectory=str(output / "trajectory.csv"), scope="one deterministic fixed-initial-state episode; no robustness claim")
         write_json(output / "result.json", result)

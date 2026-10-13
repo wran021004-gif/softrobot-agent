@@ -285,8 +285,10 @@ def main():
     args = parser.parse_args()
     if args.command == "_worker":
         started = time.perf_counter()  # includes heavy module imports
+        directory=run_path(args.run_id)
+        state=read_json(directory/'state.json');state['failure_stage']='launch/dependency import';write_json(directory/'state.json',state)
         from tools.rl.train import worker
-        worker(run_path(args.run_id), args.token, started)
+        worker(directory, args.token, started)
         return
     if args.command == "start":
         result = start(args.config, args.run_id)

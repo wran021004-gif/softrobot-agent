@@ -79,6 +79,14 @@ def limits(spec):
         backend_solves=b['physical_launches'], worker_calls=0, wall_s=b['activity_s'])
 
 
+def enabled(spec, capability):
+    return capability in spec.get('capabilities', ['rl'] if spec.get('mode')=='rl_interface' else ['mathematics','search','nmpc'])
+
+
+def confirmation_count(s):
+    return s['spec']['confirmation']['fresh_independent_repetitions']
+
+
 def prepare(spec_path=DEFAULT_SPEC, directory=None):
     spec = read(spec_path); run_id = spec['study_id']
     if spec.get('mode')=='rl_interface':
@@ -102,7 +110,7 @@ def prepare(spec_path=DEFAULT_SPEC, directory=None):
         cfg=deepcopy(archived(baseline['folder'],baseline['candidate'])['configuration'])
     else:cfg = baseline_configuration()
     cfg['run_id'] = run_id
-    if spec.get('mode')=='rl_interface':
+    if enabled(spec,'rl'):
         if cfg['policy']['controller']['extension_id']!='controller.gvs_nmpc': raise ValueError('EXPLICIT_IDEAL_TENSION_SOURCE_REQUIRED')
         if spec.get('tension_execution_mode')!='ideal_tension': raise ValueError('RL_STUDY_MUST_DECLARE_IDEAL_TENSION')
     # Recovery-enabled source is complete immutable execution evidence.
@@ -115,7 +123,8 @@ def prepare(spec_path=DEFAULT_SPEC, directory=None):
         authorization_source=spec['authorization'], budget=limits(spec),
         exclusive_resources={'provider_request':1,'backend.family_mujoco':1}))
     h.create(cfg); h.resume()
-    recipe = deepcopy(cfg['policy']['controller']['parameters']['data']['recipe'])
+    from extensions.tendon_family.contracts import GVSTrajectoryParameters
+    recipe = plain(GVSTrajectoryParameters.model_validate(cfg['policy']['controller']['parameters']['data']['recipe']))
     profile = dict(adapter='unified_recovery_profile_v1',version=spec['evaluation_version'],
         configuration=full_science(cfg), recipe=recipe, science_hashes=science_hashes(),
         recording=dict(complete_update_inputs=spec['complete_update_inputs'],update_ids=spec['record_update_ids']),
@@ -139,7 +148,7 @@ def prepare(spec_path=DEFAULT_SPEC, directory=None):
     update(h, supplied_core_history=save(h,latest,'supplied_sealed_core_history'))
     candidate = construct(h, spec['reference_parameters'], dict(origin='initial_controller_reference', historical_result_ownership='sealed source activity'))
     update(h, reference_candidate=candidate, numerical_s=time.perf_counter()-start)
-    if spec.get('mode')=='rl_interface':
+    if enabled(spec,'rl'):
         from extensions.tendon_family.backends import physics_for
         from extensions.tendon_family.scene import assemble
         inp=SessionInput.model_validate(h.store.artifact(candidate)['configuration'])
@@ -162,7 +171,7 @@ def configuration_for(host, parameters, owner):
     fixed.update(lengths_m=[.16+.0055*p.d,.11-.0055*p.d],
         holding_tip_speed_weight=p.holding_tip_speed_weight,terminal_tip_speed_weight=p.terminal_tip_speed_weight)
     cfg = resolved_input(problem, fixed, owner, deepcopy(base['policy']))
-    if s['spec'].get('mode')=='rl_interface':
+    if enabled(s['spec'],'rl'):
         # generated_serial's existing GVS source already declares ideal tension.
         # Keep that verified declaration; no actuator rewriting after construction.
         if s['spec']['tension_execution_mode']!='ideal_tension': raise ValueError('IDEAL_TENSION_STUDY_REQUIRED')
@@ -210,13 +219,32 @@ def allowance(s):
 
 
 def repetition_reserve(s):
-    return s['spec'].get('diagnostic_protocol', {}).get('repetition_launch_reserve', 1) if s['spec'].get('mode') == 'engineering_numerical' else 2
+    return s['spec'].get('diagnostic_protocol', {}).get('repetition_launch_reserve', 1) if s['spec'].get('mode') == 'engineering_numerical' else confirmation_count(s)
+
+
+def nmpc_timing(host, candidate=None):
+    """Admit using existing configuration-bound timing, never a calibration launch."""
+    s=state(host);records=s['spec'].get('nmpc_timing_evidence',[])
+    configuration=verify_candidate(host,candidate)['scientific_configuration'] if candidate else None
+    matched=[r for r in records if r['scientific_configuration_identity']==digest(configuration)] if configuration else records
+    estimate=max((r['complete_execution_s'] for r in matched),default=None)
+    cap=s['spec']['nmpc_execution_cap_s']
+    return dict(available=estimate is not None and estimate<=cap,complete_execution_s=estimate,cap_s=cap,
+        reason='existing matching timing fits cap' if estimate is not None and estimate<=cap else
+        'NMPC unavailable within this budget: no matching existing timing evidence' if estimate is None else
+        'NMPC unavailable within this budget: complete execution exceeds cap',
+        evidence_sources=[r['source'] for r in matched],design_feasibility='not assessed by budget admission')
 
 
 def capacity(host, requested=1, confirmation=False, *, root_operation=False):
     """Admit all internal launches, with two full confirmation slots and time."""
     s=state(host); b=s['spec']['budgets']; a=allowance(s)
+    timing=nmpc_timing(host) if s['spec'].get('nmpc_execution_cap_s') else None
+    if timing and not timing['available']: return dict(requested=requested,admitted=0,internal_launches=0,timing=timing)
+    if timing: a=timing['complete_execution_s']
     remaining=host.store.remaining()['remaining']; protect=0 if confirmation else repetition_reserve(s)
+    if s['spec'].get('nmpc_limits'):
+        remaining=deepcopy(remaining);remaining['backend_solves']=min(remaining['backend_solves'],s['spec']['nmpc_limits']['executions']-s.get('nmpc_launches',0))
     science=b['numerical_s']-s['numerical_s']-s['numerical_reserved_s']
     integration=s.get('validation_reservation',{}) or {}
     required=s['spec'].get('execution_required_integrations',0)
@@ -317,6 +345,9 @@ def execute(host, candidate_ref, operation_key, *, role='development', selected=
             raise ValueError('CURRENT_IMPLEMENTATION_COST_REESTIMATE_REQUIRED')
         if estimate.get('numerical_environment',{})!=expected_environment:
             raise ValueError('CURRENT_RUNTIME_COST_REESTIMATE_REQUIRED')
+    if s['spec'].get('nmpc_execution_cap_s'):
+        timing=nmpc_timing(host,candidate_ref)
+        if not timing['available']: raise ValueError(timing['reason'])
     confirmation=role=='confirmation'
     repetition=role in ('diagnostic_repetition','engineering_repetition')
     if repetition:
@@ -332,8 +363,8 @@ def execute(host, candidate_ref, operation_key, *, role='development', selected=
         if old['candidate']!=plain(candidate_ref) or old['profile_identity']!=s['profile']['identity'] or old['scientific_configuration']!=c['scientific_configuration']:
             raise ValueError('CONFIRMATION_REQUIRES_SELECTED_COMPLETE_PARAMETERS_AND_EVALUATION_CONFIGURATION')
         if not old.get('acceptance',{}).get('accepted'): raise ValueError('SELECTED_PASSING_EXECUTION_REQUIRED')
-        if sum(host.store.artifact(r)['role']=='confirmation' and host.store.artifact(r).get('selected_execution')==plain(selected) for r in s['results'])>=2:
-            raise ValueError('TWO_POST_SELECTION_CONFIRMATIONS_ALREADY_RECORDED')
+        if sum(host.store.artifact(r)['role']=='confirmation' and host.store.artifact(r).get('selected_execution')==plain(selected) for r in s['results'])>=confirmation_count(s):
+            raise ValueError('DECLARED_POST_SELECTION_CONFIRMATIONS_ALREADY_RECORDED')
     admission=capacity(host,1,confirmation or repetition)
     if admission['admitted']<1: raise ValueError('EXECUTION_AND_CONFIRMATION_RESERVE_CANNOT_FIT')
     # A unique execution owner is persisted before starting any backend.
@@ -349,7 +380,7 @@ def execute(host, candidate_ref, operation_key, *, role='development', selected=
     pending=dict(owner=owner,candidate=plain(candidate_ref),configuration=cfg,role=role,
         selected_execution=plain(selected),operation_key=operation_key,started_unix=time.time(),
         profile_identity=s['profile']['identity'],admission=admission)
-    update(host,pending=pending,numerical_reserved_s=s['numerical_reserved_s']+allowance(s))
+    update(host,pending=pending,numerical_reserved_s=s['numerical_reserved_s']+allowance(s),nmpc_launches=s.get('nmpc_launches',0)+1)
     child=Host(host.store.root,owner,actor=host.actor); child.create(cfg,parent_run_id=host.run_id)
     pending['construction_s']=time.perf_counter()-construction_started
     update(host,pending=pending)
@@ -639,6 +670,13 @@ def local_diagnostic(host, query, key):
 
 
 def claims(host):
+    if state(host)['spec'].get('capabilities'):
+        from tools.research_core_feedback import result_view
+        s=state(host);refs=[*s['results'],*s.get('rl_evaluations',[])]
+        chosen=result_view(host,s['selected']) if s.get('selected') else None
+        confirmations=[result_view(host,r) for r in refs if host.store.artifact(r).get('role')=='confirmation' and host.store.artifact(r).get('selected_execution')==s.get('selected')]
+        passed=bool(chosen and chosen['passed'] and len(confirmations)==confirmation_count(s) and all(v['passed'] and v['solution_identity']==chosen['solution_identity'] for v in confirmations))
+        return dict(selected=s.get('selected'),independent_confirmation_count=len(confirmations),required_confirmations=confirmation_count(s),confirmation_failures=sum(not v['passed'] for v in confirmations),limited_repeat_supported_acceptance=passed,task_passed=passed,parameter_improvement_attribution_permitted=False,interface_evaluations=sum(bool(host.store.artifact(r).get('independent_evaluation_executed')) for r in s.get('rl_evaluations',[])))
     if state(host)['spec'].get('mode')=='rl_interface':
         s=state(host)
         return dict(interface_evaluations=sum(bool(host.store.artifact(r).get('independent_evaluation_executed',False)) for r in s.get('rl_evaluations',[])),task_passed=any(host.store.artifact(r)['passed'] for r in s.get('rl_evaluations',[])),
@@ -648,7 +686,7 @@ def claims(host):
     comparable=[r for r in rows if r['profile_identity']==current and r['scientific_identity']==reference and r['status']=='evaluated']
     selected=host.store.artifact(s['selected']) if s.get('selected') else None
     confirmations=[r for r in rows if r['role']=='confirmation' and r['selected_execution']==s.get('selected')]
-    repeat=bool(selected and selected['profile_identity']==current and selected['acceptance']['accepted'] and len(confirmations)==2 and
+    repeat=bool(selected and selected['profile_identity']==current and selected['acceptance']['accepted'] and len(confirmations)==confirmation_count(s) and
         all(r['acceptance'] and r['acceptance']['accepted'] and r['scientific_configuration']==selected['scientific_configuration'] and r['profile_identity']==current for r in confirmations))
     def score(r):
         m=r['acceptance']['metrics']
@@ -674,6 +712,17 @@ def claims(host):
 
 def packet(host):
     s=state(host)
+    if s['spec'].get('capabilities'):
+        from tools.research_core_feedback import result_view, eligibility
+        from tools.research_core_rl import packet as rl_packet
+        return dict(specification=s['spec'],frozen_task=plain(s['base_configuration']['task']),reference_candidate=s['reference_candidate'],
+            candidates=list(s['candidates'].values()),results=[dict(reference=r,**result_view(host,r),confirmation=eligibility(host,r)) for r in [*s['results'],*s.get('rl_evaluations',[])]],
+            mechanics_results=[dict(reference=r,**{k:host.store.artifact(r).get(k) for k in ('status','operation','trajectory_reference','objective_definition','original_task_feasible','relaxed_nlp_feasible','original_task_gaps','trajectory_metrics','charged_numerical_s')}) for r in s.get('mechanics_results',[])],
+            handoffs=[dict(reference=r,**host.store.artifact(r)) for r in s.get('handoffs',[])],
+            rl=rl_packet(host) if enabled(s['spec'],'rl') else None,
+            nmpc_admission=[dict(candidate=r,**nmpc_timing(host,r),remaining_phase_admission=capacity(host,1)) for r in s['candidates'].values()] if s['spec'].get('nmpc_execution_cap_s') else None,
+            resource_use=dict(shared_ledger=host.store.remaining(),numerical_s=s['numerical_s'],elapsed_s=max(0,time.time()-s['started_unix'])),
+            claims=claims(host),phase_A_evidence=host.store.artifact(s['phase_A_evidence']) if s.get('phase_A_evidence') else None,research_status=s['research_status'])
     if s['spec'].get('mode')=='rl_interface':
         from tools.research_core_rl import packet as rl_packet
         return dict(specification=s['spec'],candidates=list(s['candidates'].values()),rl=rl_packet(host),
@@ -722,6 +771,8 @@ def dispatch(host, value, request_id, origin='model'):
     plan=Plan.model_validate(value)
     if state(host)['spec'].get('mode')=='rl_interface' and (plan.action not in ('propose','stop') or plan.mechanics_source):
         raise ValueError('RL_INTERFACE_ALLOWS_PROPOSE_AND_BOUNDED_CLOSEOUT_ONLY')
+    capability={'execute':'nmpc','search':'search','mechanics':'mathematics','replay':'replay'}.get(plan.action)
+    if capability and not enabled(state(host)['spec'],capability): raise ValueError('Undeclared capability: '+capability)
     old=host.store.lookup(host.run_id,request_id)
     if old:
         if old['request_hash']!=digest(plain(plan)): raise ValueError('OPERATION_ID_COLLISION')
@@ -736,14 +787,17 @@ def dispatch(host, value, request_id, origin='model'):
     experience_bindings=disposition_bindings(host,plan.experience_disposition)
     if plan.action=='stop' and any(r not in [plain(v) for v in plan.supporting_evidence] for r in [*s['results'],*s.get('mechanics_results',[]),*s.get('rl_evaluations',[])]):
         raise ValueError('STOP_MUST_CITE_ALL_NEW_EXPERIMENT_RESULTS')
-    if s['spec'].get('mode')=='rl_interface' and plan.action=='stop':
+    if enabled(s['spec'],'rl') and plan.action=='stop' and s.get('rl_runs'):
         evaluations=s.get('rl_evaluations',[])
         if not evaluations or not plan.next_step: raise ValueError('RL_STOP_REQUIRES_EVALUATION_AND_NEXT_STEP_DECISION')
         if any(r not in [plain(v) for v in plan.supporting_evidence] for r in evaluations): raise ValueError('RL_STOP_MUST_CITE_NEW_EVALUATION')
         if any(r not in s.get('rl_evidence_reads',[]) for r in evaluations): raise ValueError('RL_STOP_REQUIRES_PUBLIC_EXPLICIT_EVIDENCE_READ')
         if any(e.get('status',{}).get('worker_alive',True) for e in s['rl_runs'].values()): raise ValueError('RL_STOP_REQUIRES_TERMINAL_STATUS_QUERY')
     admission=dict(scope='RL interface; no numerical launch or confirmation reservation') if s['spec'].get('mode')=='rl_interface' else capacity(host,plan.search.max_evaluations if plan.search else 1,plan.action=='confirm',root_operation=True)
-    if plan.action=='execute' and admission['admitted']<1: raise ValueError('CANDIDATE_PLUS_TWO_CONFIRMATIONS_CANNOT_FIT')
+    if plan.action=='execute' and s['spec'].get('nmpc_execution_cap_s'):
+        timing=nmpc_timing(host,plan.candidate)
+        if not timing['available']: raise ValueError(timing['reason'])
+    if plan.action=='execute' and admission['admitted']<1: raise ValueError('CANDIDATE_PLUS_DECLARED_CONFIRMATIONS_CANNOT_FIT')
     row,_=host.store.reserve(host.run_id,request_id,digest(plain(plan)),host.actor,{**zero(),'tool_calls':1})
     ref=save(host,dict(origin=origin,request_id=request_id,original_plan=plain(plan),admission=admission,
         experience_read_bindings=experience_bindings),'original_research_plan')
@@ -765,18 +819,16 @@ def dispatch(host, value, request_id, origin='model'):
             result=diagnose(host,[plain(r) for r in plan.supporting_evidence])
             if plan.diagnostic: result['local_comparison']=local_diagnostic(host,plan.diagnostic,request_id)
         elif plan.action=='confirm':
-            if plain(plan.selected_execution) not in s['results']: raise ValueError('OWNED_EXECUTION_SELECTION_REQUIRED')
-            selected=host.store.artifact(plan.selected_execution)
-            if s.get('selected') and s['selected']!=plain(plan.selected_execution):
-                raise ValueError('POST_SELECTION_CONFIRMATIONS_CANNOT_CHANGE_SELECTION')
-            candidate=verify_candidate(host,selected['candidate'])
-            if selected['profile_identity']!=s['profile']['identity'] or selected['scientific_configuration']!=candidate['scientific_configuration']:
-                raise ValueError('CONFIRMATION_REQUIRES_SELECTED_COMPLETE_PARAMETERS_AND_EVALUATION_CONFIGURATION')
-            if not (selected.get('acceptance') or {}).get('accepted'):
-                raise ValueError('SELECTED_PASSING_EXECUTION_REQUIRED')
-            if admission['admitted']<1: raise ValueError('EXECUTION_AND_CONFIRMATION_RESERVE_CANNOT_FIT')
+            from tools.research_core_feedback import eligibility, result_view
+            choice=eligibility(host,plan.selected_execution)
+            if not choice['eligible']: raise ValueError('; '.join(choice['reasons']))
+            selected=result_view(host,plan.selected_execution)
             update(host,selected=plain(plan.selected_execution))
-            result=execute(host,selected['candidate'],request_id,role='confirmation',selected=plain(plan.selected_execution))
+            if selected['controller_route']=='rl':
+                from tools.research_core_rl import confirm
+                result=confirm(host,plan.selected_execution,request_id+'-rl-confirm')
+            else:
+                result=execute(host,selected['candidate'],request_id,role='confirmation',selected=plain(plan.selected_execution))
         else:
             update(host,research_status='stopped',final_disposition=ref)
             result=dict(accepted_stop=True,claims=claims(host))
@@ -862,6 +914,26 @@ No robustness, generalization, solved numerical root cause, or complete autonomo
 STOP must cite new evaluation evidence and follow its explicit public read and terminal status query. If a public evaluation attempt cannot run because no checkpoint exists, read its immutable failure evidence, close the bounded study truthfully and state that independent evaluation/task performance remain unmeasured; do not spend repeated STOP attempts or request another training run."""
 
 
+FORMAL_INSTRUCTIONS = """You own a bounded design-and-control study. Use only scoped supplied evidence and public tools.
+Read phase specification, frozen original task, declared capabilities, known historical facts and remaining budgets. Supplied history is not rediscovery.
+Phase A: reuse d=.5 and historical PPO n_steps=128,batch_size=64,n_epochs=4,learning_rate=.0005,gamma=.99,holding_speed reward=2.
+Launch one new direct run of 1024 actions/90 active seconds, query terminal status, evaluate the saved policy once, explicitly read immutable evaluation evidence,
+and STOP with evidence-based next_step. Complete task failure closes the execution gap; startup failure or missing evaluation does not.
+Phase B: actually invoke mechanics with supported task_gap or task_gap_with_effort objective. Explain task difficulty, weights, bounds, fixed variables,
+relaxed requirements and expected relation to original completion. Inspect mathematical evidence and returned candidate. Handoff chooses no controller.
+Mathematical feasibility, relaxed dynamics and original MuJoCo task acceptance are distinct. Preliminary ranking is optional. Search uses NMPC only.
+Choose existing NMPC or direct/residual RL and explain using evidence and budget. Inspect nmpc_admission before launching; no matching timing or oversized
+complete execution makes that route unavailable within budget, not the design infeasible. No calibration or raised ceilings.
+Residual requires an advertised compatible runnable reference. Direct stays available if incompatible. Train within declared trial/cumulative limits;
+query real terminal status and independently evaluate a saved policy. Read exact evidence before deciding to adjust control, revise design, switch route, select or stop.
+Select a passing development result via confirm selected_execution, freezing candidate+task+route+configuration+exact checkpoint. Use the predeclared fresh
+post-selection count. RL confirmation reloads exact weights, fresh simulation, no training or NMPC. Keep failed confirmations; no success-hunting retries.
+Selection remains immutable. Nominal repetitions support no robustness claim. No fresh baseline required; withhold improvement attribution without comparable evidence.
+Stop once confirmations pass; ceilings are not targets. Preserve all costs including failures. Last protected requests are evidence/STOP only.
+STOP cites every new result and follows explicit RL evidence reads and terminal query, with next_step and actual unfinished requirements.
+Never include credentials, environment-file contents, unrelated files or personal data in model messages. No algorithm superiority or numerical root-cause claims.
+"""
+
 async def converse(host):
     if state(host)['spec'].get('mode') == 'engineering_numerical':
         raise ValueError('NUMERICAL_MODE_FORBIDS_APPLICATION_MODEL_ENDPOINTS')
@@ -880,10 +952,17 @@ async def converse(host):
             if value['result']['status']!='success': continue
             refs.extend(use['toolUseId']+'_'+str(i) for i,_ in enumerate(value['result'].get('content',[])))
         return refs
-    if state(host)['spec'].get('mode')=='rl_interface' and not state(host).get('live_started_unix'):
+    if (state(host)['spec'].get('mode')=='rl_interface' or state(host)['spec'].get('capabilities')) and not state(host).get('live_started_unix'):
         s=state(host);started=time.time();pilot=deepcopy(s['pilot'])
         pilot.update(request_deadline_unix=started+s['spec']['budgets']['activity_s']-s['spec']['budgets']['delivery_reserve_s'],bounded_request_reservation=True)
         update(host,live_started_unix=started,started_unix=started,cutoff_unix=pilot['request_deadline_unix'],pilot=pilot)
+    dependency=state(host)['spec'].get('phase_A_dependency')
+    if dependency:
+        previous=Host(ROOT/'runs'/dependency['study_id'],dependency['study_id'],actor=host.actor)
+        evaluations=[previous.store.artifact(r) for r in state(previous).get('rl_evaluations',[])]
+        if not any(r.get('independent_evaluation_executed') and r.get('episodes') and all(e['complete'] for e in r['episodes']) for r in evaluations):
+            raise ValueError('Phase A execution gap remains; Phase B prohibited')
+        update(host,phase_A_evidence=save(host,dict(study=dependency['study_id'],evaluations=evaluations,costs=previous.store.remaining()),'phase_A_dependency_evidence'))
     guard(host)
     if pending(host): raise ValueError('UNKNOWN_PROVIDER_OUTCOME_RECOVER_BEFORE_SEND')
     load_credential(Path.home()/'.codex'/'.env')
@@ -903,7 +982,7 @@ async def converse(host):
                         advertised=retrieval.get('parameters',{}).get('properties',{}).get('reference',{}).get('enum')
                         if advertised is None or not set(advertised)<=set(feedback_context_references()):
                             raise ValueError('PROTECTED_CONTEXT_RETRIEVAL_REQUIRES_EXISTING_FEEDBACK')
-            if state(host)['spec'].get('mode')=='rl_interface':
+            if enabled(state(host)['spec'],'rl'):
                 available=max(.001,state(host)['pilot']['request_deadline_unix']-time.time())
                 request.extensions['timeout']={k:min(v or available,available) for k,v in request.extensions.get('timeout',dict(connect=available,read=available,write=available,pool=available)).items()}
             return await super().handle_async_request(request)
@@ -943,17 +1022,22 @@ async def converse(host):
                 return dict(toolUseId=use['toolUseId'],status='error',content=[dict(text=json.dumps(dict(
                     error=type(exc).__name__,message=str(exc),decision_facts=facts(host))))])
         return run
-    rl_mode=state(host)['spec'].get('mode')=='rl_interface'
-    instructions=RL_INSTRUCTIONS if rl_mode else INSTRUCTIONS
+    rl_mode=enabled(state(host)['spec'],'rl')
+    formal=bool(state(host)['spec'].get('capabilities'))
+    instructions=FORMAL_INSTRUCTIONS if formal else RL_INSTRUCTIONS if rl_mode else INSTRUCTIONS
     native=[PythonAgentTool(name,dict(name=name,description=description,inputSchema={'json':schema.model_json_schema()}),handler(kind))
-        for name,description,schema,kind in [('research_plan','Propose, execute, mechanics, BDF replay, search, diagnose, confirm or STOP',Plan,'plan'),
+        for name,description,schema,kind in [('research_plan','Propose a candidate; mathematical optimization and handoff; optional NMPC search/execute; evidence diagnosis; exact NMPC/RL confirmation; STOP. Operations require declared phase capabilities.',Plan,'plan'),
             ('experience_retrieve','Read-only case/procedure draft search/read with provenance',ExperienceQuery,'experience'),
             ('evidence_read','Read exact immutable evidence and JSON pointer',EvidenceQuery,'evidence')]]
-    if rl_mode:
-        schema=Plan.model_json_schema();schema['properties']['action']={'type':'string','enum':['propose','stop']}
+    if formal or rl_mode:
+        actions=['propose','stop','diagnose','confirm'] if formal and state(host)['spec'].get('mode')!='rl_interface' else ['propose','stop']
+        if formal and state(host)['spec'].get('mode')!='rl_interface': actions += [a for a,c in [('execute','nmpc'),('search','search'),('mechanics','mathematics'),('replay','replay')] if enabled(state(host)['spec'],c)]
+        schema=Plan.model_json_schema();schema['properties']['action']={'type':'string','enum':actions}
         native[0].tool_spec={**native[0].tool_spec,'inputSchema':{'json':schema}}
+    if rl_mode:
         native.append(PythonAgentTool('research_rl',dict(name='research_rl',description='Configure/start, query, stop, resume, independently evaluate or inspect/one-step diagnose an owned frozen candidate RL run',
             inputSchema={'json':RLRequest.model_json_schema()}),handler('rl')))
+    if formal: native[1].tool_spec={**native[1].tool_spec,'description':'Unavailable outside scoped milestone evidence'}
     agent=build_harness(host,transport=boundary,api_key=os.environ['DEEPSEEK_API_KEY'],instructions=instructions,
         model_class=live_model_class(boundary),tool_executor=SequentialToolExecutor(),research_tools=native,
         configuration_path=host.store.root/'framework_configuration.json',session_directory=host.store.root/'framework_sessions')
@@ -987,6 +1071,8 @@ async def converse(host):
                 retrieval.tool_spec=spec
             agent.system_prompt+='\nPROTECTED CLOSEOUT: consume supplied results and STOP only.'
     def before_tool(event):
+        if formal and event.tool_use['name']=='experience_retrieve':
+            event.cancel_tool='Use only scoped milestone evidence; unrelated workspace retrieval is unauthorized.'
         record(host,'model_original_tool_request',dict(tool_use=event.tool_use))
         if host.store.remaining()['remaining']['model_calls']<=4 and event.tool_use['name'] not in ('research_plan','evidence_read','retrieve_context'):
             event.cancel_tool='Protected closeout permits evidence and STOP only.'

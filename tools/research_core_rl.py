@@ -78,10 +78,26 @@ def reconcile(host, run_id):
     return value
 
 
-def dispatch(host, value, request_id):
+def evaluation_capacity(host, requested=1, confirmation=False):
+    from tools import research_core as core
+    s=core.state(host); reserve=0 if confirmation else core.confirmation_count(s)
+    used=sum(e['evaluations'] for e in s.get('rl_runs',{}).values())
+    seconds=s['spec'].get('rl_evaluation_allowance_s',150.)
+    available=min(s['cutoff_unix']-time.time(),host.store.remaining()['remaining']['wall_s'])
+    fit=max(0,min(requested,s['spec']['rl_limits']['evaluation_episodes']-used-reserve,int(available//seconds)-reserve))
+    return dict(admitted=fit,remaining_episodes=s['spec']['rl_limits']['evaluation_episodes']-used,confirmation_reserve=reserve,per_episode_s=seconds)
+
+
+def confirm(host, selected, request_id):
+    from tools import research_core as core
+    r=host.store.artifact(selected)
+    return dispatch(host,dict(operation='evaluate',run_id=r['run_id'],checkpoint=r['checkpoint'],rationale='Frozen selected solution; fresh confirmation; no training'),request_id,selected=selected)
+
+
+def dispatch(host, value, request_id, selected=None):
     from tools import research_core as core
     q=RLRequest.model_validate(value); s=core.state(host); key=digest(plain(q))
-    if s['spec'].get('mode')!='rl_interface': raise ValueError('RL operation requires scoped RL study')
+    if not core.enabled(s['spec'],'rl'): raise ValueError('RL capability required')
     old=host.store.lookup(host.run_id,request_id)
     if old:
         if old['request_hash']!=key: raise ValueError('RL_OPERATION_ID_COLLISION')
@@ -91,16 +107,27 @@ def dispatch(host, value, request_id):
     if host.store.remaining()['remaining']['model_calls']<=s['spec']['budgets']['protected_provider_requests'] and q.operation!='status':
         raise ValueError('Protected closeout allows RL status only')
     if q.operation=='start':
+        if q.reference and not any(r.get('available') and r['candidate']==plain(q.candidate) and r['reference']==plain(q.reference) for r in compatible_references(host)):
+            raise ValueError('Owned compatible advertised reference required')
         config,task_ref=prepare_input(host,q)
         matching=next((r for r,e in s.get('rl_runs',{}).items() if e['request_identity']==key),None)
         if matching:
             return dict(run_id=matching,duplicate_start=True,status=reconcile(host,matching))
         caps=s['spec']['rl_limits']; entries=list(s.get('rl_runs',{}).values())
+        if (q.allocation.actions>caps.get('actions_per_trial',caps['training_actions'])
+                or q.allocation.active_seconds>caps.get('seconds_per_trial',caps['training_active_seconds'])):
+            raise ValueError('Declared per-trial RL ceiling exceeded')
         if (len(entries)>=caps['training_runs'] or sum(e['allocation']['actions'] for e in entries)+q.allocation.actions>caps['training_actions']
                 or sum(e['allocation']['active_seconds'] for e in entries)+q.allocation.active_seconds>caps['training_active_seconds']):
             raise ValueError('Cumulative RL training ceiling exhausted')
     else:
         if q.run_id not in s.get('rl_runs',{}): raise ValueError('Owned RL run required')
+    if q.operation=='start':
+        reserve=core.confirmation_count(s)*s['spec'].get('rl_evaluation_allowance_s',150.)
+        if q.allocation.active_seconds+reserve+s['spec'].get('rl_evaluation_allowance_s',150.)>s['cutoff_unix']-time.time():
+            raise ValueError('Training plus evaluation/confirmation reserve cannot fit shared phase deadline')
+    if q.operation=='evaluate' and evaluation_capacity(host,1,confirmation=selected is not None)['admitted']<1:
+        raise ValueError('RL evaluation and route confirmation reserve cannot fit')
     cost={**zero(),'tool_calls':1,'backend_solves':int(q.operation=='start')}
     row,_=host.store.reserve(host.run_id,request_id,key,host.actor,cost,kind='rl_operation')
     evaluation_dispatched=False
@@ -108,7 +135,7 @@ def dispatch(host, value, request_id):
         if q.operation=='start':
             run_id=host.run_id+'-'+row['execution_id'][:8]
             entry=dict(candidate=plain(q.candidate),task=task_ref,configuration=core.save(host,config,'rl_frozen_input'),
-                allocation=plain(q.allocation),request_identity=key,active_reservation=plain(q.allocation),evaluations=0,replays=0)
+                allocation=plain(q.allocation),mathematical_handoffs=[r for r in s.get('handoffs',[]) if host.store.artifact(r)['candidate']==plain(q.candidate)],request_identity=key,active_reservation=plain(q.allocation),evaluations=0,replays=0)
             runs=core.state(host).get('rl_runs',{}); runs[run_id]=entry; core.update(host,rl_runs=runs)
             path=host.store.root/'rl_inputs'/('config-'+row['execution_id']+'.json');run.write_json(path,config)
             result=invoke('start',run_id,'--config',path,deadline=s['cutoff_unix'])
@@ -131,10 +158,14 @@ def dispatch(host, value, request_id):
                 if status['worker_alive']: raise ValueError('Wait for worker to exit before independent evaluation')
                 current=run.read_json(directory/'checkpoint.json')['current']
                 generation=q.checkpoint or current
-                if not generation or Path(generation).name!=generation or generation not in (current,run.read_json(directory/'checkpoint.json').get('previous')):
+                if not generation or Path(generation).name!=generation or not (directory/'checkpoints'/generation/'metadata.json').is_file():
                     raise ValueError('Explicit published checkpoint required')
                 counter='evaluations';limit=s['spec']['rl_limits']['evaluation_episodes']
                 policy=directory/'checkpoints'/generation/'policy.zip'
+                import hashlib
+                policy_sha=hashlib.sha256(policy.read_bytes()).hexdigest()
+                if selected is not None and (host.store.artifact(selected)['policy_sha256']!=policy_sha or host.store.artifact(selected)['configuration']!=entry['configuration']):
+                    raise ValueError('Selected checkpoint/configuration changed')
                 arguments=['--policy',policy]
             else:
                 capture=directory/q.failure if q.failure else None
@@ -153,6 +184,8 @@ def dispatch(host, value, request_id):
             evaluation_dispatched=q.operation=='evaluate'
             result=invoke(q.operation,run_id,*arguments,'--output',output,deadline=s['cutoff_unix'])
             result.update(study=host.run_id,candidate=entry['candidate'],task=entry['task'],run_id=run_id,configuration=entry['configuration'],independent_evaluation_executed=q.operation=='evaluate')
+            if q.operation=='evaluate':
+                result.update(checkpoint=generation,policy_sha256=policy_sha,role='confirmation' if selected is not None else 'development',selected_execution=plain(selected))
             reference=core.save(host,result,'rl_'+q.operation+'_evidence')
             if q.operation=='evaluate': core.update(host,rl_evaluations=[*core.state(host).get('rl_evaluations',[]),reference])
             result=dict(reference=reference,**result)
@@ -162,17 +195,52 @@ def dispatch(host, value, request_id):
     except Exception as exc:
         failure=dict(error=str(exc))
         if q.operation=='evaluate':
-            failure=unavailable_evaluation(host,q.run_id,request_id,str(exc),uncertain=evaluation_dispatched)
+            failure=unavailable_evaluation(host,q.run_id,request_id,str(exc),uncertain=evaluation_dispatched,selected=selected)
         host.store.complete(row,dict(request_id=request_id,execution_id=row['execution_id'],caller=host.actor,
             tool_id='research.core_rl',tool_version='1.0.0',execution_status='failed',charged=zero(),error=str(exc)),failure)
         raise
+
+
+def compatible_references(host):
+    """Convert only the existing 35-interval, six-channel SI tension schedule."""
+    import numpy as np
+    import hashlib
+    from tools import research_core as core
+    from extensions.tendon_family.backends import physics_for
+    from extensions.tendon_family.scene import assemble
+    rows=[]
+    for ref in core.state(host).get('handoffs',[]):
+        relation=host.store.artifact(ref);v=host.store.artifact(relation['mechanics_attempt'])
+        try:
+            candidate=core.verify_candidate(host,relation['candidate']);trajectory=v['candidate']
+            request=host.store.artifact(v['original_request']);scene=assemble(SessionInput.model_validate(candidate['configuration']),physics_for(SessionInput.model_validate(candidate['configuration'])))
+            u=np.asarray(trajectory['tensions_n']);times=np.asarray(trajectory['times_s'])
+            order=[t['entity'] for t in physics_for(SessionInput.model_validate(candidate['configuration']))['tendons']]
+            if (request['configuration']['task']!=candidate['configuration']['task'] or abs(trajectory['d']-candidate['parameters']['d'])>1e-10
+                    or trajectory['tendon_order']!=order
+                    or order!=['near_t0','near_t1','near_t2','far_t0','far_t1','far_t2']
+                    or scene['control_period_s']!=.01 or scene['duration_s']!=.35
+                    or u.shape!=(35,6) or not np.isfinite(u).all() or np.any(u<0) or np.any(u>8)
+                    or abs(times[0])>1e-12 or abs(times[-1]-.35)>1e-12
+                    or any(not np.any(np.abs(times-k*.01)<1e-12) for k in range(36))):
+                raise ValueError('Candidate/task/channel/interval/timing/bounds incompatibility; no resampling or clipping')
+            folder=host.store.root/'rl_inputs';folder.mkdir(exist_ok=True)
+            path=folder/(relation['offline_trajectory']['artifact_id']+'.npz')
+            if not path.exists(): np.savez(path,saved_tensions_n=u)
+            with np.load(path,allow_pickle=False) as saved:
+                if not np.array_equal(saved['saved_tensions_n'],u): raise ValueError('Saved reference changed')
+            rows.append(dict(candidate=relation['candidate'],handoff=ref,available=True,
+                reference=dict(path=str(path.resolve()),sha256=hashlib.sha256(path.read_bytes()).hexdigest(),candidate_identity=candidate['identity'],task_identity=scene['task_identity'],tendon_order=order,control_period_s=.01),
+                convention='35 zero-order-held interval tensions in N; .35s; mathematical source, MuJoCo acceptance unproven'))
+        except (ValueError,KeyError,IndexError) as exc: rows.append(dict(candidate=relation['candidate'],handoff=ref,available=False,reason=str(exc)))
+    return rows
 
 
 def packet(host):
     from tools import research_core as core
     s=core.state(host)
     return dict(frozen_task=s['rl_task'],capabilities=dict(task='reach-and-hold',control='ideal_tension',
-        modes=['direct','residual'],compatible_reference=None,reference_status='No compatible residual reference exists',
+        modes=['direct','residual'],compatible_references=compatible_references(host),
         structural_coordinate='d in [-1,1]: lengths [.16+.0055*d,.11-.0055*d] m',
         defaults=run.read_json(Path(run.__file__).with_name('config.json'))),
         runs=s.get('rl_runs',{}),evaluations=[dict(reference=r,**host.store.artifact(r)) for r in s.get('rl_evaluations',[])],
@@ -181,14 +249,14 @@ def packet(host):
 
 
 
-def unavailable_evaluation(host, run_id, operation_key, reason, uncertain=False):
+def unavailable_evaluation(host, run_id, operation_key, reason, uncertain=False, selected=None):
     """Seal actual failed evaluation-attempt evidence without inventing an episode."""
     from tools import research_core as core
     s=core.state(host);entry=s['rl_runs'][run_id]
     previous=next((r for r in s.get('rl_evaluations',[]) if host.store.artifact(r).get('operation_key')==operation_key),None)
     if previous:return dict(reference=previous,**host.store.artifact(previous))
     value=dict(study=host.run_id,candidate=entry['candidate'],task=entry['task'],run_id=run_id,
-        configuration=entry['configuration'],operation_key=operation_key,independent_evaluation_executed=False,
+        configuration=entry['configuration'],operation_key=operation_key,role='confirmation' if selected is not None else 'development',selected_execution=plain(selected),failure_stage='independent evaluation',independent_evaluation_executed=False,
         passed=False,task_performance='unmeasured',failure_reason=reason,episodes=[],evaluation_elapsed_s=0,
         counts=dict(attempted_actions=0,completed_actions=0,attempted_physics_steps=0),
         scope='Failed public evaluation request; no saved policy loaded, no fresh simulation episode or trajectory fabricated',

@@ -121,3 +121,31 @@ versioning of scientific source changes to failed-input recording, recovery-root
 evidence and exact mathematical-search initialization. Source changes were
 committed before that reference. No cross-version improvement is attributed.
 The optional offline initialization and legacy skill admission remain deferred.
+
+
+The linked `examples/design_control/campaign.json` declares additional Phase A and B allocations. The sealed
+`rl-strands-20261013` remains historical with all original costs. Phase A reconstructs the same d=.5 physical
+candidate and XML, PPO 128/64/four epochs, learning rate .0005, gamma .99 and holding-speed reward 2; one
+1024-action/90-second live run must yield a complete independent saved-policy evaluation before Phase B.
+
+Capability studies expose mathematical optimization, optional NMPC search, NMPC execution and direct/residual
+RL as separately selected operations. Handoff retains objective/relaxation/trajectory provenance without a
+controller launch. Search continues to evaluate through NMPC. Residual references use the existing NPZ tension
+format only when candidate/task/channel order and the complete 35-interval SI schedule match; no resampling or clipping.
+
+Common result views read measured metrics from original NMPC results or independent RL evaluations. Missing
+or incomplete evaluation is unmeasured. Confirmation count comes from the frozen specification. The selection
+freezes candidate/task/controller/configuration and exact RL checkpoint generation and file digest. RL confirmations
+reload that generation with fresh simulation, without training; NMPC uses its existing execution path. Failures remain
+recorded and selection cannot silently change. Passing development evaluation never counts as confirmation.
+
+Before NMPC launch, matching existing configuration timing must fit the 1800-second execution cap and the
+remaining route confirmation budget. Missing or mismatched timing makes the route unavailable within this
+budget; it does not establish design infeasibility. No new calibration is authorized. RL has separate evaluation
+reserves and cumulative training allocations; both routes share phase deadline and delivery reserve. Four NMPC
+launches include search and confirmations. Training, resume, repeated status and cached receipts never reset costs.
+
+Prepare and commit scoped implementation/specifications, bind the study, then run `research_core live --spec
+examples/design_control/phase_A.json`. Its clock starts once at live entry. Use the same prepare/bind/live sequence
+for phase_B.json after Phase A is complete. Runtime stores and checkpoints stay in `runs/`; compact nonsecret
+requests, receipts, evidence reads, original decisions and final accounting are archived for delivery.

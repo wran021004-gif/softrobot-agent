@@ -73,7 +73,7 @@ class MechanicsTests(TestCase):
         ref=core.save(h,r);core.update(h,results=[ref])
         self.assertTrue(eligibility(h,ref)['eligible']);self.assertEqual(eligibility(h,ref)['selected_execution'],ref)
         r['acceptance']['accepted']=False;failed=core.save(h,r);core.update(h,results=[ref,failed])
-        self.assertIn('execution did not pass joint task acceptance',eligibility(h,failed)['reasons'])
+        self.assertIn('result did not pass complete original task evaluation',eligibility(h,failed)['reasons'])
         core.update(h,research_status='stopped');self.assertFalse(eligibility(h,ref)['eligible'])
 
     def test_mixed_numerical_and_incomplete_diagnosis_does_not_resolve_physics(self):
@@ -108,7 +108,7 @@ class MechanicsTests(TestCase):
         h=self.host;s=core.state(h)
         core.update(h,numerical_s=s['spec']['budgets']['numerical_s']-900.-3800.+1.)
         with patch.object(core,'guard'),patch.object(mechanics.subprocess,'run',side_effect=AssertionError('must not start')):
-            with self.assertRaisesRegex(ValueError,'TWO_CONFIRMATIONS'):mechanics.dispatch(h,'solve',{},'no-fit')
+            with self.assertRaisesRegex(ValueError,'MECHANICS_AND_REPETITION_RESERVE'):mechanics.dispatch(h,'solve',{},'no-fit')
         self.assertEqual(core.state(h)['offline_nlp'],0)
 
     def test_diagnostic_inspection_uses_solver_order_after_sorted_json(self):
