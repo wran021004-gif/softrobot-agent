@@ -72,7 +72,7 @@ def read_evidence(host, query):
     for part in q.pointer.strip('/').split('/') if q.pointer else []:
         part = part.replace('~1', '/').replace('~0', '~')
         value = value[int(part)] if isinstance(value, list) else value[part]
-    if not q.pointer and plain(q.reference) in [*s.get('rl_evaluations', []), *s.get('rl_training_summaries', [])]:
+    if plain(q.reference) in [*s.get('rl_evaluations', []), *s.get('rl_training_summaries', [])]:
         update(host, rl_evidence_reads=[*s.get('rl_evidence_reads', []), plain(q.reference)])
     return value
 
