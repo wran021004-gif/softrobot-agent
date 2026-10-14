@@ -1,6 +1,6 @@
 {
-  "affected_unique_checks": 81,
-  "passed": 79,
+  "affected_unique_checks": 82,
+  "passed": 80,
   "skipped": 2,
   "skipped_reason": "Optional ignored historical source runtime databases absent from isolated worktree; archived nominal bytes and fresh confirmation logic checked independently",
   "initial_failures_retained": true,
@@ -45,5 +45,352 @@
     ],
     "rl_scipy": "absent; not required by current RL worker"
   },
-  "subprocess_environment_fix": "SystemRoot etc preserved; real Windows environment inheritance check passed"
+  "subprocess_environment_fix": "SystemRoot etc preserved; real Windows environment inheritance check passed",
+  "mathematical_preflight": {
+    "candidate": {
+      "artifact_id": "53b5e378d07426b75c84465749183cf4f4f9fb59abc4076c9c7fc6553121e062",
+      "media_type": "application/json"
+    },
+    "parameters": {
+      "distal1_length_m": 0.11,
+      "distal1_material": "stiff",
+      "distal1_routing_scale": 1.0,
+      "distal1_section_scale": 1.02,
+      "holding_tip_speed_weight": 0.1,
+      "near_length_m": 0.162,
+      "near_material": "baseline",
+      "near_routing_scale": 1.01,
+      "near_section_scale": 1.0,
+      "terminal_tip_speed_weight": 0.1
+    },
+    "calculations": [
+      {
+        "reference": {
+          "artifact_id": "652e265dd12995c51d1a9d3231674cbed82525e3f6162efe864dd746c11c3408",
+          "media_type": "application/json"
+        },
+        "status": "unavailable",
+        "proxy_values": {},
+        "task_acceptance": "unmeasured",
+        "charged_numerical_s": 3.3280639000004157,
+        "internal_calculations": [
+          {
+            "solver": "scipy.optimize.least_squares",
+            "purpose": "operating_point_construction",
+            "iterations": null,
+            "function_evaluations": 20,
+            "status": 0
+          }
+        ],
+        "local_model_constraints": {
+          "status": "unmeasured"
+        }
+      },
+      {
+        "reference": {
+          "artifact_id": "f4428d849152b37b32863f0c587033a6ad7469f718f660f9f8a3c21162aa1f3c",
+          "media_type": "application/json"
+        },
+        "status": "computed",
+        "proxy_values": {
+          "target_equilibrium_residual": 4.067030853488829e-09
+        },
+        "task_acceptance": "unmeasured",
+        "charged_numerical_s": 12.194069199962541,
+        "internal_calculations": [
+          {
+            "solver": "scipy.optimize.SLSQP",
+            "purpose": "operating_point_construction",
+            "iterations": 15,
+            "function_evaluations": null,
+            "status": 0
+          }
+        ],
+        "local_model_constraints": {
+          "status": "satisfied",
+          "position_residual_m": 4.067030853488829e-09,
+          "static_residual_inf": 5.2258327873366817e-14,
+          "equilibrium_available": true,
+          "global_infeasibility_proven": false
+        }
+      },
+      {
+        "reference": {
+          "artifact_id": "8fdde60dba471717f38ab8051ab78afc8da8d69aeb0513c4a1ea388017bfad93",
+          "media_type": "application/json"
+        },
+        "status": "unavailable",
+        "proxy_values": {},
+        "task_acceptance": "unmeasured",
+        "charged_numerical_s": 3.3585520000196993,
+        "internal_calculations": [
+          {
+            "solver": "scipy.optimize.least_squares",
+            "purpose": "operating_point_construction",
+            "iterations": null,
+            "function_evaluations": 20,
+            "status": 0
+          }
+        ],
+        "local_model_constraints": {
+          "status": "unmeasured"
+        }
+      },
+      {
+        "reference": {
+          "artifact_id": "c0af0c4cc3e5217aab1937d8adb568c01266394ad8b1133b28f6d2db8a771d42",
+          "media_type": "application/json"
+        },
+        "status": "unavailable",
+        "proxy_values": {},
+        "task_acceptance": "unmeasured",
+        "charged_numerical_s": 3.243817799957469,
+        "internal_calculations": [
+          {
+            "solver": "scipy.optimize.least_squares",
+            "purpose": "operating_point_construction",
+            "iterations": null,
+            "function_evaluations": 20,
+            "status": 0
+          }
+        ],
+        "local_model_constraints": {
+          "status": "unmeasured"
+        }
+      }
+    ],
+    "accounting": [
+      {
+        "internal_calculations": [
+          {
+            "purpose": "unit GVS velocity Jacobian derivative check",
+            "solver": "CasADi AD and centered finite difference"
+          }
+        ],
+        "mathematical_evaluations": 1,
+        "numerical_s": 158.56242249999195,
+        "origin": "engineering_preflight",
+        "reference": {
+          "artifact_id": "de50aabd729b327612b5868dee9ac8c661fbd3f5d0898351541b4e0683663342",
+          "media_type": "application/json"
+        }
+      },
+      {
+        "internal_calculations": [],
+        "mathematical_evaluations": 0,
+        "numerical_s": 0.9030277000274509,
+        "origin": "engineering_preflight",
+        "reference": {
+          "artifact_id": "3c0570fa56ac3ca0a58d24c4338a8aebd7c1879e460162e41eca1da2e7570dd2",
+          "media_type": "application/json"
+        }
+      },
+      {
+        "internal_calculations": [],
+        "mathematical_evaluations": 0,
+        "numerical_s": 33.67699179996271,
+        "origin": "engineering_preflight",
+        "reference": {
+          "artifact_id": "53bf44f3008ffdf4c4281ea6a525125d885c46812689c341b70367ed33728877",
+          "media_type": "application/json"
+        }
+      },
+      {
+        "internal_calculations": [],
+        "mathematical_evaluations": 0,
+        "numerical_s": 5.1954302,
+        "origin": "engineering_preflight",
+        "reference": {
+          "artifact_id": "0fe7af6e039862875140829d9756ce3b1e8507d81249a800bee3b263f8f4d5de",
+          "media_type": "application/json"
+        }
+      },
+      {
+        "internal_calculations": [
+          {
+            "function_evaluations": 20,
+            "iterations": null,
+            "purpose": "operating_point_construction",
+            "solver": "scipy.optimize.least_squares",
+            "status": 0
+          }
+        ],
+        "mathematical_evaluations": 1,
+        "numerical_s": 3.3280639000004157,
+        "origin": "engineering_preflight",
+        "reference": {
+          "artifact_id": "652e265dd12995c51d1a9d3231674cbed82525e3f6162efe864dd746c11c3408",
+          "media_type": "application/json"
+        }
+      },
+      {
+        "internal_calculations": [
+          {
+            "function_evaluations": null,
+            "iterations": 15,
+            "purpose": "operating_point_construction",
+            "solver": "scipy.optimize.SLSQP",
+            "status": 0
+          }
+        ],
+        "mathematical_evaluations": 1,
+        "numerical_s": 12.194069199962541,
+        "origin": "engineering_preflight",
+        "reference": {
+          "artifact_id": "f4428d849152b37b32863f0c587033a6ad7469f718f660f9f8a3c21162aa1f3c",
+          "media_type": "application/json"
+        }
+      },
+      {
+        "internal_calculations": [
+          {
+            "function_evaluations": 20,
+            "iterations": null,
+            "purpose": "operating_point_construction",
+            "solver": "scipy.optimize.least_squares",
+            "status": 0
+          }
+        ],
+        "mathematical_evaluations": 1,
+        "numerical_s": 3.3585520000196993,
+        "origin": "engineering_preflight",
+        "reference": {
+          "artifact_id": "8fdde60dba471717f38ab8051ab78afc8da8d69aeb0513c4a1ea388017bfad93",
+          "media_type": "application/json"
+        }
+      },
+      {
+        "internal_calculations": [
+          {
+            "function_evaluations": 20,
+            "iterations": null,
+            "purpose": "operating_point_construction",
+            "solver": "scipy.optimize.least_squares",
+            "status": 0
+          }
+        ],
+        "mathematical_evaluations": 1,
+        "numerical_s": 3.243817799957469,
+        "origin": "engineering_preflight",
+        "reference": {
+          "artifact_id": "c0af0c4cc3e5217aab1937d8adb568c01266394ad8b1133b28f6d2db8a771d42",
+          "media_type": "application/json"
+        }
+      }
+    ],
+    "numerical_s": 245.9884746998201,
+    "mathematical_evaluations": 8,
+    "initial_point_branch_checks": [
+      {
+        "reference": {
+          "artifact_id": "ba5fb2de7ba232d79123541f5ad1b976f2660b37153ba4d0038affe184f2a80e",
+          "media_type": "application/json"
+        },
+        "status": "computed",
+        "proxy_values": {
+          "held_position_min_eigenvalue": 0.0
+        },
+        "task_acceptance": "unmeasured",
+        "charged_numerical_s": 8.261532999924384,
+        "internal_calculations": [
+          {
+            "purpose": "local_linearization_and_gramian",
+            "solver": "CasADi AD / SciPy scaled Van Loan and ZOH",
+            "windows_s": [
+              0.05,
+              0.1,
+              0.35
+            ]
+          }
+        ],
+        "local_model_constraints": {
+          "status": "unmeasured"
+        }
+      },
+      {
+        "reference": {
+          "artifact_id": "dcb3ad8c12823c58022e9b2ad70e95d95ae389b1d6bbf7ea8cb5d4009d48a220",
+          "media_type": "application/json"
+        },
+        "status": "computed",
+        "proxy_values": {},
+        "task_acceptance": "unmeasured",
+        "charged_numerical_s": 8.359300999902189,
+        "internal_calculations": [
+          {
+            "purpose": "endpoint_witness",
+            "name": "scipy.optimize.SLSQP",
+            "success": true,
+            "status": 0,
+            "message": "Optimization terminated successfully",
+            "iterations": 42,
+            "maximum_iterations": 100
+          },
+          {
+            "purpose": "position_box_residual_certificate",
+            "solver": "scipy.optimize.lsq_linear",
+            "success": true
+          },
+          {
+            "purpose": "tip_speed_box_residual_certificate",
+            "solver": "scipy.optimize.lsq_linear",
+            "success": true
+          }
+        ],
+        "local_model_constraints": {
+          "status": "feasible_in_local_model",
+          "checks": {
+            "finite": true,
+            "lower_bounds": true,
+            "upper_bounds": true,
+            "position": true,
+            "speed": true
+          }
+        }
+      },
+      {
+        "reference": {
+          "artifact_id": "1346fcf65a830dc3a245cd8d38e7d239b156144dbf742c0570ef7c8d71ae3f9d",
+          "media_type": "application/json"
+        },
+        "status": "computed",
+        "proxy_values": {},
+        "task_acceptance": "unmeasured",
+        "charged_numerical_s": 8.60637240007054,
+        "internal_calculations": [
+          {
+            "purpose": "endpoint_witness",
+            "name": "scipy.optimize.SLSQP",
+            "success": false,
+            "status": 9,
+            "message": "Iteration limit reached",
+            "iterations": 100,
+            "maximum_iterations": 100
+          },
+          {
+            "purpose": "position_box_residual_certificate",
+            "solver": "scipy.optimize.lsq_linear",
+            "success": true
+          },
+          {
+            "purpose": "tip_speed_box_residual_certificate",
+            "solver": "scipy.optimize.lsq_linear",
+            "success": true
+          }
+        ],
+        "local_model_constraints": {
+          "status": "feasible_in_local_model",
+          "checks": {
+            "finite": true,
+            "lower_bounds": true,
+            "upper_bounds": true,
+            "position": true,
+            "speed": true
+          }
+        }
+      }
+    ]
+  },
+  "interrupted_analysis_search_recovery_passed": true,
+  "source_relative_domain_preserved_after_shifted_initial": true
 }

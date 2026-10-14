@@ -733,7 +733,7 @@ def claims(host):
         s=state(host);progress=confirmation_progress(host)
         changed=bool(s.get('selected') and host.store.artifact(host.store.artifact(s['selected'])['candidate'])['configuration']['robot']!=s.get('nominal_configuration',{}).get('robot'))
         search_rows=[host.store.artifact(r) for r in s.get('search_results',[])]
-        return dict(selected=s.get('selected'),model_selected_structure_search_evaluations=sum(r.get('structurally_changed_evaluations',0) for r in search_rows),selected_structurally_new=changed,new_design_and_control_confirmed=bool(changed and progress['confirmed']),independent_confirmation_count=progress['required_total']-progress['remaining'],
+        return dict(selected=s.get('selected'),model_selected_structure_search_evaluations=len({row['evidence']['analysis']['artifact_id'] for search in search_rows for row in search['result']['evaluated'] if row['evidence'].get('analysis') and host.store.artifact(row['evidence']['candidate'])['configuration']['robot']!=s.get('nominal_configuration',{}).get('robot')}),selected_structurally_new=changed,new_design_and_control_confirmed=bool(changed and progress['confirmed']),independent_confirmation_count=progress['required_total']-progress['remaining'],
             required_confirmations=progress['required_total'],confirmation_failures=progress['failures'],
             confirmation_progress=progress,limited_repeat_supported_acceptance=progress['confirmed'],task_passed=progress['confirmed'],
             parameter_improvement_attribution_permitted=False,
@@ -1193,7 +1193,7 @@ async def converse(host):
 def recover(host):
     if (state(host).get('pending') or {}).get('kind')=='candidate_analysis':
         from tools.research.analysis import recover as recover_analysis
-        return recover_analysis(host)
+        recover_analysis(host)  # Seal only existing output, then reconcile the owning workflow below.
     if (state(host).get('pending') or {}).get('kind') == 'local_diagnostic':
         from tools.research.numerics import recover_local
         return recover_local(host)

@@ -152,7 +152,8 @@ def search_problem(host,query,count):
         source_configuration=s['nominal_configuration'],evaluation_mode=q.evaluation_mode,
         execution=dict(recipe=s['profile']['recipe'],settling=s['base_configuration']['policy']['controller']['parameters']['data']['settling']),
         variables=variables,lengths=dict(mode=q.length_mode,free=any(k in q.variables for k in names),
-            total_flexible_length_m=q.total_length_m or sum(lengths),baseline_by_count={'2':lengths},bounds_by_count={'2':bounds},
+            total_flexible_length_m=q.total_length_m or sum(lengths),baseline_by_count={'2':lengths},
+            domain_baseline_by_count={'2':list(source_lengths(s['nominal_configuration']).values())},bounds_by_count={'2':bounds},
             aggregate_bounds_m=q.aggregate_length_bounds_m),fixed_tendon_count=6,fixed_actuator_count=6,
         objective=dict(proxy=q.objective if q.evaluation_mode=='mathematical_proxy' else None,
             operating_point=q.operating_point,protocol=plain(q.protocol or s['spec']['analysis_protocol']),accepted_resource_preference='none'),
@@ -165,38 +166,46 @@ def run_search(host,query,key,*,guard,execute,capacity):
     guard(host,True);q=Search.model_validate(query);s=state(host)
     if q.mechanics_source:raise ValueError('SEARCH_REFERENCES_DO_NOT_CHANGE_CANONICAL_CONSTRUCTION')
     fit=admission(host,q.max_evaluations) if q.evaluation_mode=='mathematical_proxy' else capacity(host,q.max_evaluations)
-    if not fit['admitted']:return dict(status='budget_limited',admission=fit,evaluated=[])
-    problem=search_problem(host,q,fit['admitted'])
-    saved=s['searches'].get(key)
-    if saved and plain(problem)!=saved['problem']:raise ValueError('SEARCH_RECOVERY_OBJECTIVE_PROTOCOL_OR_DOMAIN_CHANGED')
+    query_identity=digest(dict(query=plain(q),profile=s['profile']['identity']))
+    owner_key=s.get('search_bindings',{}).get(query_identity,key)
+    saved=s['searches'].get(owner_key)
+    if saved:
+        problem=DesignOptimizationProblem.model_validate(saved['problem'])
+    else:
+        if not fit['admitted']:return dict(status='budget_limited',admission=fit,evaluated=[])
+        problem=search_problem(host,q,fit['admitted'])
+        bindings=s.get('search_bindings',{});bindings[query_identity]=owner_key;update(host,search_bindings=bindings)
     def evaluator(problem,values,proposal_id):
         params={k:values[k] for k in Parameters.model_fields if k in values}
         params.update(near_length_m=values['lengths_m'][0],distal1_length_m=values['lengths_m'][1])
-        ref=construct(host,params,dict(origin='model_design_search',plan_key=key,proposal_id=proposal_id))
+        completed=next((host.store.artifact(r) for r in state(host).get('analysis_results',[])
+            if host.store.artifact(r)['operation_key']==owner_key+':'+proposal_id+'-analysis'),None)
+        ref=completed['candidate'] if completed else construct(host,params,dict(origin='model_design_search',plan_key=owner_key,proposal_id=proposal_id))
         c=verify_candidate(host,ref)
+        if c['parameters']!=params:raise ValueError('SEARCH_RECOVERY_DECODED_CANDIDATE_CHANGED')
         if q.evaluation_mode=='backend_task':
-            old=next((host.store.artifact(r) for r in state(host)['results'] if host.store.artifact(r)['operation_key']==key+':'+proposal_id),None)
+            old=next((host.store.artifact(r) for r in state(host)['results'] if host.store.artifact(r)['operation_key']==owner_key+':'+proposal_id),None)
             if old is None:
-                feedback=execute(host,ref,key+':'+proposal_id,role='search')
+                feedback=execute(host,ref,owner_key+':'+proposal_id,role='search')
                 if feedback['status']!='evaluated':return feedback
                 old=host.store.artifact(feedback['reference'])
             return dict(kind='backend_task',status=old['status'],acceptance=old['acceptance'],evidence=dict(result=old),candidate_id=c['candidate_id'],scientific_identity=c['identity'])
         operation='equilibrium' if q.objective=='target_equilibrium_residual' else 'controllability'
         output=analyze(host,dict(candidate=ref,operation=operation,operating_point=q.operating_point,
-            protocol=plain(q.protocol or s['spec']['analysis_protocol'])),key+':'+proposal_id,guard=guard,origin='model_search')
+            protocol=plain(q.protocol or s['spec']['analysis_protocol'])),owner_key+':'+proposal_id,guard=guard,origin='model_search')
         result=host.store.artifact(output['reference'])
-        score=result.get('proxy_values',{}).get(q.objective)
         return dict(kind='mathematical_proxy',status='evaluated',computation_status=result['status'],
             proxy_values=result.get('proxy_values',{}),local_model_constraints=result.get('local_model_constraints'),
             task_acceptance='unmeasured',objective_identity=digest(plain(problem.objective)),
             candidate_id=c['candidate_id'],scientific_identity=c['identity'],
             evidence=dict(candidate=ref,analysis=output['reference'],model=result.get('model'),limitations=result.get('limitations'),operating_point=result.get('operating_point')))
     def checkpoint(value):
-        searches=state(host)['searches'];searches[key]=deepcopy(value);update(host,searches=searches)
+        searches=state(host)['searches'];searches[owner_key]=deepcopy(value);update(host,searches=searches)
         return save(host,value,'search_checkpoint')
     result=plain(solve(problem,evaluator=evaluator,state=saved,save_state=checkpoint,evaluation_profile=s['profile']))
     changed=[r for r in result['evaluated'] if host.store.artifact(r['evidence']['candidate'])['configuration']['robot']!=s['nominal_configuration']['robot']] if q.evaluation_mode=='mathematical_proxy' else []
     ref=save(host,dict(result=result,structurally_changed_evaluations=len(changed),admission=fit),'design_search_result')
-    update(host,search_results=[*state(host).get('search_results',[]),ref])
+    previous=state(host).get('search_results',[])
+    update(host,search_results=previous if ref in previous else [*previous,ref])
     return dict(reference=ref,result=result,structurally_changed_evaluations=len(changed),
         selection_rule='Incumbent may remain best; never select a worse robot merely to call it new.',admission=fit)

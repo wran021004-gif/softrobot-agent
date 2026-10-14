@@ -199,6 +199,8 @@ class SourceRelativeDesignTests(TestCase):
         from tools.state_io import digest
         independent=Allocation(LengthAllocation(mode='independent',baseline_by_count={'2':[.16,.11]}),2)
         self.assertEqual(set(independent.initial),{'length/0','length/1'})
+        shifted=Allocation(LengthAllocation(mode='independent',baseline_by_count={'2':[.164,.11]},domain_baseline_by_count={'2':[.16,.11]},bounds_by_count={'2':[(.152,.168),(.1045,.1155)]}),2)
+        self.assertAlmostEqual(shifted.decode(shifted.initial)[0],.164)
         values=independent.decode({'length/0':.75,'length/1':.5});self.assertAlmostEqual(values[0],.164);self.assertAlmostEqual(values[1],.11)
         fixed=Allocation(LengthAllocation(mode='fixed_total',baseline_by_count={'2':[.16,.11]}),2)
         self.assertAlmostEqual(sum(fixed.decode({'length/0':.75})),.27)

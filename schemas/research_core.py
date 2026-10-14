@@ -56,7 +56,7 @@ class Search(Contract):
             raise ValueError('SEARCH_BOUNDS_MUST_MATCH_UNIQUE_SELECTED_VARIABLES')
         for name, (a, b) in self.bounds.items():
             if name not in domains or 'bounds' not in domains[name]:raise ValueError('UNKNOWN_NUMERIC_VARIABLE: '+name)
-            lo,hi=domains[name]['bounds']
+            lo,hi=(0.,float('inf')) if name.endswith('_length_m') else domains[name]['bounds']
             if not lo <= a < b <= hi or not a <= getattr(self.fixed, name) <= b:
                 raise ValueError('SEARCH_DOMAIN_OR_INITIAL_OUTSIDE_BOUNDS: ' + name)
         for name,options in self.options.items():

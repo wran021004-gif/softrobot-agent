@@ -42,6 +42,7 @@ class LengthAllocation(Contract):
     # Overrides are explicit topology-local physical length vectors, not latent
     # optimizer coordinates. A caller may provide different positive baselines.
     baseline_by_count: dict[str,list[FiniteFloat]] = Field(default_factory=dict)
+    domain_baseline_by_count: dict[str,list[FiniteFloat]] = Field(default_factory=dict)
     bounds_by_count: dict[str,list[tuple[FiniteFloat,FiniteFloat]]] = Field(default_factory=dict)
     fixed_by_count: dict[str,dict[str,FiniteFloat]] = Field(default_factory=dict)
     constraint_tolerance_m: Literal[1e-12] = 1e-12

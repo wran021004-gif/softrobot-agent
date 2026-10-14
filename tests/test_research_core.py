@@ -817,3 +817,41 @@ class ExecutionBoundaryTests(TestCase):
                 self.assertTrue(result['result']['accepted_stop']);self.assertEqual(launch.call_count,5)
                 self.assertFalse(core.claims(h)['task_passed'])
             __import__('gc').collect()
+
+class CandidateAnalysisRecoveryTests(TestCase):
+    def test_interrupted_mathematical_search_reuses_sealed_analysis_across_requests(self):
+        from uuid import uuid4
+        from tools.research import design,analysis
+        from schemas.research_core import Search as CurrentSearch
+        with TemporaryDirectory(dir=core.ROOT/'runs',prefix='candidate-analysis-fixture-') as folder:
+            path=core.Path(folder);spec=read(core.DEFAULT_SPEC)
+            spec.update(study_id='analysis-fixture-'+uuid4().hex[:10],started_unix=time.time())
+            core.atomic_json(path/'spec.json',spec);h=core.prepare(path/'spec.json',path/'business')
+            core.update(h,freeze='substituted-test-implementation')
+            query=CurrentSearch(variables=['near_length_m'],bounds={'near_length_m':(.152,.168)},
+                operating_point='standardized_initial_pretension',max_evaluations=2)
+            def worker(command,log,timeout):
+                request=read(command[-1])
+                core.atomic_json(core.Path(command[-1]).with_name('result.json'),dict(status='computed',
+                    proxy_values={'held_position_min_eigenvalue':1.},task_acceptance='unmeasured',
+                    internal_calculations=[],substituted_not_scientific_evidence=True))
+                return core.subprocess.CompletedProcess(command,0)
+            def search(key):return design.run_search(h,query,key,guard=lambda *args:None,
+                execute=lambda *args,**kwargs:(_ for _ in ()).throw(AssertionError('proxy cannot launch NMPC')),
+                capacity=core.capacity)
+            with patch('tools.service_execution._run_contained',side_effect=worker) as launched:
+                with patch.object(analysis,'recover',side_effect=RuntimeError('injected interruption after sealed worker output')):
+                    with self.assertRaisesRegex(RuntimeError,'injected interruption'):search('first-model-operation')
+                self.assertEqual(core.state(h)['mathematical_evaluations'],1)
+                core.recover(h);self.assertEqual(core.state(h)['numerical_reserved_s'],0.)
+                result=search('explicit-model-resume')
+                self.assertEqual(core.state(h)['mathematical_evaluations'],2)
+                self.assertEqual(launched.call_count,2)
+                self.assertEqual(len(result['result']['evaluated']),2)
+                before=core.state(h)['numerical_s'];search('read-completed-search')
+                self.assertEqual(core.state(h)['numerical_s'],before);self.assertEqual(launched.call_count,2)
+                self.assertIsNone(result['result']['best_feasible'])
+            import gc;gc.collect()
+
+
+

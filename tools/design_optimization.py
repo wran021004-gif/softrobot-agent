@@ -39,6 +39,8 @@ class Allocation:
         self.mode=spec.mode;self.aggregate=spec.aggregate_bounds_m
         self.total=spec.total_flexible_length_m
         self.base=spec.baseline_by_count[str(count)] if str(count) in spec.baseline_by_count else family.default_lengths(count,self.total)
+        self.domain_base=spec.domain_baseline_by_count.get(str(count),self.base)
+        if len(self.domain_base)!=count or any(v<=0 for v in self.domain_base):raise ValueError('IMMUTABLE_LENGTH_DOMAIN_BASELINE_REQUIRED')
         if len(self.base)!=count or any(l<=0 for l in self.base) or self.mode=='fixed_total' and abs(sum(self.base)-self.total)>1e-12:
             raise ValueError('BASELINE_VECTOR_MUST_MATCH_COUNT_POSITIVE_AND_TOTAL')
         self.bounds=spec.bounds_by_count.get(str(count),[(l*(1-spec.relative_range),l*(1+spec.relative_range)) for l in self.base])
@@ -47,7 +49,7 @@ class Allocation:
         for i,(a,b) in enumerate(self.bounds):
             if not 0<a<=self.base[i]<=b:raise ValueError('BASELINE_OUTSIDE_POSITIVE_LENGTH_BOUNDS')
             # v1 stays conservative around the public topology-local baseline.
-            if a<self.base[i]*.95-1e-12 or b>self.base[i]*1.05+1e-12:raise ValueError('LENGTH_BOUNDS_EXCEED_FIVE_PERCENT')
+            if a<self.domain_base[i]*.95-1e-12 or b>self.domain_base[i]*1.05+1e-12:raise ValueError('LENGTH_BOUNDS_EXCEED_FIVE_PERCENT')
         fixed=spec.fixed_by_count.get(str(count),{})
         for key,value in fixed.items():
             if not key.isdigit() or not 0<=int(key)<count:raise ValueError('INACTIVE_FIXED_LENGTH_INDEX')
