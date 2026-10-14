@@ -1,0 +1,24 @@
+{
+  "action": "diagnose",
+  "hypothesis": "Convergence/iteration stopping may remove first-command variation caused by timed return.",
+  "supporting_evidence": [
+    {
+      "artifact_id": "ef33c5ca5d73c9d886246cfcd73c7992a74d0ea432805122a7860b2c99026c3b",
+      "media_type": "application/json"
+    }
+  ],
+  "expected_observation": "Two fresh exact original-problem solves agree in command, objective and residual.",
+  "weakening_observation": "Fresh identical-input solves differ materially despite identical canonical solver options.",
+  "fixed_conditions": "Serialized expression, variables, bounds, initialization, scaling, previous input, mathematical costs, integration and original recovery unchanged.",
+  "stopping_condition": "Two solves; at most two additional only for an observed discrepancy. Each external watchdog300s; assignment local<=4/1200s.",
+  "interpretation": "Local agreement only; no task pass, unique cause or episode determinism claim.",
+  "diagnostic": {
+    "execution": {
+      "artifact_id": "ef33c5ca5d73c9d886246cfcd73c7992a74d0ea432805122a7860b2c99026c3b",
+      "media_type": "application/json"
+    },
+    "update_id": 0,
+    "repetitions": 2,
+    "mode": "research_policy"
+  }
+}

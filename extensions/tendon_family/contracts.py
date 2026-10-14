@@ -993,6 +993,18 @@ class GVSDescription(Contract):
     )
 
 
+CURRENT_NMPC_STOPPING = dict(stopping_policy='research_work_v1',max_iterations=120,
+    tolerance=1e-6,max_cpu_s=None,feasible_return=None)
+
+
+def current_nmpc_recipe(recipe, overrides=None):
+    """Resolve current research policy without reinterpreting archived recipes."""
+    value={**recipe,**CURRENT_NMPC_STOPPING,**(overrides or {})}
+    if value['stopping_policy']!='research_work_v1' or value['max_cpu_s'] is not None or value['feasible_return'] is not None:
+        raise ValueError('CURRENT_NMPC_REQUIRES_ITERATION_CONVERGENCE_STOPPING')
+    return GVSTrajectoryParameters.model_validate(value).model_dump(mode='json')
+
+
 class GVSTrajectoryParameters(Contract):
     stopping_policy: Literal['historical_timed_v1', 'research_work_v1'] = 'historical_timed_v1'
     integration_method: Literal['implicit_euler', 'implicit_midpoint'] = 'implicit_euler'

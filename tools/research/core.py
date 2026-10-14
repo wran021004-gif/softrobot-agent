@@ -202,6 +202,10 @@ def prepare(spec_path=DEFAULT_SPEC, directory=None):
     # Recovery-enabled source is complete immutable execution evidence.
     cfg['policy']['controller']['parameters']['data']['recipe'].update({k:v for k,v in spec['reference_parameters'].items() if k in ('holding_tip_speed_weight','terminal_tip_speed_weight')})
     cfg['policy']['controller']['parameters']['data']['recipe'].update(spec.get('controller_recipe',{}))
+    if spec.get('nominal_source'):
+        from extensions.tendon_family.contracts import current_nmpc_recipe
+        cfg['policy']['controller']['parameters']['data']['recipe']=current_nmpc_recipe(
+            cfg['policy']['controller']['parameters']['data']['recipe'],spec.get('controller_recipe'))
     model = native_configuration(run_id)['policy']['model']
     cfg['policy'].update(model=model, budget=limits(spec), allowed_tools=['evidence.read'],
         tool_bindings={'evidence.read':'1.0.0'}, operation_allowances={'evidence.read':dict(timeout_s=30.,reserve_s=30.)})
@@ -600,6 +604,10 @@ def diagnose(host, refs):
     s=state(host); reader=ControlEvidence(host.store); records=[]; numerical=[]; incomplete=[]
     for ref in refs:
         r=host.store.artifact(ref)
+        if plain(ref) not in s['results'] and r.get('status')=='evaluated':
+            from tools.research.feedback import result_view
+            numerical.append(dict(reference=plain(ref),historical=True,**result_view(host,ref)))
+            continue
         if plain(ref) in s.get('mechanics_results',[]):
             numerical.append(dict(reference=plain(ref),physical_validation=False,**{k:r.get(k) for k in
                 ('operation','status','execution_id','trajectory_metrics','relaxed_nlp_feasible','original_task_feasible','replay','charged_numerical_s')}))
@@ -645,28 +653,13 @@ def diagnose(host, refs):
 def local_diagnostic(host, query, key):
     guard(host,True)
     from schemas.research_core import LocalDiagnostic
-    from extensions.tendon_family.control_evidence import ControlEvidence
+    from tools.research.numerics import execution_update
     q=LocalDiagnostic.model_validate(query); s=state(host); b=s['spec']['budgets']
-    imported=plain(q.execution) in s.get('historical_diagnostic_sources',[])
-    if imported:
-        source=host.store.artifact(q.execution);record=source['record']
-        if record['update_id']!=q.update_id: raise ValueError('IMPORTED_DIAGNOSTIC_UPDATE_MISMATCH')
-    else:
-        if plain(q.execution) not in s['results']: raise ValueError('OWNED_CURRENT_EXECUTION_REQUIRED')
-        result=host.store.artifact(q.execution)
-        if result['profile_identity']!=s['profile']['identity']: raise ValueError('DIAGNOSTIC_PROFILE_MISMATCH')
-        reader=ControlEvidence(host.store); source=reader.resolve(result['execution_id'])
-        observations=reader.read_file(source,'controller_observations.json',[])
-        record=deepcopy(observations[q.update_id].get('complete_update_record'))
-        if record and record.get('resolved_problem_reference'):
-            definition=record['resolved_problem_reference'];body=host.store.artifact(source['files'][definition['filename']],raw=True)
-            if hashlib.sha256(body).hexdigest()!=definition['sha256']:raise ValueError('RESOLVED_PROBLEM_DEFINITION_HASH_MISMATCH')
-            record['resolved_problem']=json.loads(body)
-            if digest(record['resolved_problem']['objective_function'])!=record['model_identity']:
-                raise ValueError('RESOLVED_PROBLEM_EXPRESSION_IDENTITY_MISMATCH')
+    source=execution_update(host,q.execution,q.update_id);record=source['record']
+    imported=source.get('imported_historical_evidence',False)
     if not record: raise ValueError('ACTUAL_COMPLETE_UPDATE_INPUT_REQUIRED')
-    seconds=s['spec'].get('standalone_watchdog_s',150.)*(1+int(q.reuse_solver)); reserve=q.repetitions*seconds
-    solves=q.repetitions*(1+int(q.reuse_solver)); protection=repetition_reserve(s)*allowance(s)
+    seconds=s['spec'].get('standalone_watchdog_s',300.); reserve=q.repetitions*seconds
+    solves=q.repetitions; protection=repetition_reserve(s)*allowance(s)
     downstream=s['spec'].get('downstream_reserve',{})
     if downstream:
         protection=max(protection,downstream['passing_executions']*allowance(s))
@@ -679,10 +672,9 @@ def local_diagnostic(host, query, key):
     rows=[]
     for index in range(q.repetitions):
         request_id=key+'-local-'+str(index)
-        request=dict(configuration=source['configuration'],record=record,mode=q.mode,iteration_cap=q.iteration_cap,
-            reuse_solver=q.reuse_solver,prepare_tail=q.prepare_tail,
+        request=dict(configuration=source['configuration'],record=record,mode=q.mode,
+            current_recipe=s['profile']['recipe'],external_timeout_s=seconds,
             numerical_environment=dict(OPENBLAS_NUM_THREADS='1',OMP_NUM_THREADS='1',MKL_NUM_THREADS='1'))
-        if q.mode=='research_current':request['current_recipe']=s['profile']['recipe']
         old=host.store.lookup(host.run_id,request_id)
         if old:
             if old['request_hash']!=digest(request): raise ValueError('DIAGNOSTIC_OPERATION_COLLISION')
@@ -690,7 +682,7 @@ def local_diagnostic(host, query, key):
             rows.append(host.store.artifact(json.loads(old['receipt'])['output'])); continue
         def charge(db):
             current=host.store.session(host.run_id,db)['state']
-            count=1+int(q.reuse_solver)
+            count=1
             if current['local_solves']+count>b['local_solves']: raise ValueError('LOCAL_SOLVE_CEILING')
             current['local_solves']+=count;current['numerical_reserved_s']+=seconds
             host.store.update_state(db,host.run_id,current)
@@ -713,7 +705,7 @@ def local_diagnostic(host, query, key):
             original_request=save(host,request,'local_diagnostic_request'),
             historical_input=imported,owning_study=host.run_id,
             source_update_id=q.update_id,origin='engineering' if s['spec'].get('mode')=='engineering_numerical' or key.startswith('engineering') else 'model',
-            charged_solve_attempts=1+int(q.reuse_solver))
+            charged_solve_attempts=1)
         with host.store.transaction() as db:
             current=host.store.session(host.run_id,db)['state']
             current['numerical_s']+=elapsed;current['local_solve_s']+=elapsed;current['numerical_reserved_s']-=seconds;current['pending']=None
@@ -723,7 +715,7 @@ def local_diagnostic(host, query, key):
         rows.append(value)
     difference=max(abs(a-b) for a,b in zip(rows[0]['first_input_n'],rows[1]['first_input_n'])) if len(rows)==2 and all('first_input_n' in r for r in rows) else None
     detail=dict(rows=rows,maximum_first_input_difference_n=difference,mode=q.mode,
-        interpretation='Identical recorded solve inputs; production and fixed-iteration modes are separate. Unique cause remains unassigned.')
+        interpretation='Exact saved problem under declared iteration/convergence policy; local agreement does not establish episode repeatability or unique cause.')
     ref=save(host,detail,'local_diagnostic_comparison');update(host,diagnostics=[*state(host).get('diagnostics',[]),ref])
     return dict(reference=ref,**detail)
 
@@ -825,6 +817,9 @@ def packet(host):
             facts='All210 inputs complete; actual search only d0/~.05 at .10/.10 and both failed speed; current-version reference2 passes/1 failure; zero confirmations; first divergence update1 despite equal input vectors; unique cause unresolved; previous model identity/cost interpretations were unsupported.'),
         claims=claims(host),actual_retrievals=s['retrievals'],plans=s['plans'],status=s['research_status'],
         diagnostic_facts=s.get('diagnostic_facts',[]),local_diagnostic_evidence=s.get('diagnostics',[]),
+        execution_state_sources=[dict(reference=r,provenance=host.store.artifact(r)['provenance']) for r in s.get('historical_diagnostic_sources',[])],
+        analysis_evidence=[dict(reference=r,**{k:host.store.artifact(r).get(k) for k in
+            ('candidate','operation','status','operating_point','endpoint','tension_margins_n','charged_numerical_s')}) for r in s.get('analysis_results',[])],
         local_diagnostic_facts=[dict(reference=r,rows=[compact_local(v)
             for v in host.store.artifact(r).get('rows',[])]) for r in s.get('diagnostics',[])],
         incomplete_execution_evidence=s.get('incomplete_execution_evidence',[]))
@@ -944,7 +939,8 @@ for that handoff), or optionally the existing structural coordinate when justifi
 Engineering-selected integration actions are supplied evidence, not your choices.
 No mandatory traversal. Direct proposals construct parameters without offline NLP.
 Diagnosis may optionally perform bounded identical-recorded-input standalone solves;
-production mode retains elapsed stopping, fixed_iteration is only a diagnostic mode.
+research_policy re-solves the exact serialized problem under the frozen iteration/convergence policy.
+research_current explicitly reconstructs through the current workspace and is not an exact-problem comparison.
 Search fixes unselected variables and uses the same evaluator; several numerical
 proposals may run internally. Inspect actual explored coordinates. Give hypothesis,
 evidence, expected and weakening observations, fixed conditions and stopping rule.
@@ -1124,7 +1120,7 @@ async def converse(host):
         schema=Plan.model_json_schema();schema['properties']['action']={'type':'string','enum':actions}
         native[0].tool_spec={**native[0].tool_spec,'inputSchema':{'json':schema}}
     if state(host)['spec'].get('nominal_source'):
-        native.append(PythonAgentTool('research_analysis',dict(name='research_analysis',description='Candidate-bound equilibrium/margins, linearization/controllability, unilateral finite-time endpoint or terminal braking; task acceptance remains unmeasured. Each actual calculation charged once.',inputSchema={'json':AnalysisRequest.model_json_schema()}),handler('analysis')))
+        native.append(PythonAgentTool('research_analysis',dict(name='research_analysis',description='Candidate-bound mathematics; saved_state or execution plus update_id selects exact projected state at previous applied input with actual remaining task time. Historical candidate binding required. Each calculation charged once; task acceptance unmeasured.',inputSchema={'json':AnalysisRequest.model_json_schema()}),handler('analysis')))
     if rl_mode:
         native.append(PythonAgentTool('research_rl',dict(name='research_rl',description='Configure/start, query, stop, resume, independently evaluate or inspect/one-step diagnose an owned frozen candidate RL run',
             inputSchema={'json':RLRequest.model_json_schema()}),handler('rl')))

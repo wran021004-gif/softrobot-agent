@@ -9,6 +9,7 @@ from tools.state_io import read, atomic_json, digest
 from extensions.tendon_family.gvs_trajectory import TrajectoryWorkspace
 from schemas.platform_math import OptimizationProblem
 from extensions.optimization.ipopt import IpoptSolver
+from extensions.tendon_family.contracts import current_nmpc_recipe
 
 
 def inspect_problem(ws,recorded):
@@ -50,8 +51,10 @@ def replay(request):
             from extensions.tendon_family.gvs_nmpc import deadline_horizon
             recipe['horizon']=deadline_horizon(inp.task.timing.duration_s,recorded['prediction_timing']['current_time_s'],
                 inp.task.timing.control_period_s,recipe['horizon'])
-    if request['mode'] in ('research_policy','research_current'):
-        recipe.update(stopping_policy='research_work_v1',max_iterations=request['iteration_cap'])
+    policy=current_nmpc_recipe(recipe,request['current_recipe'])
+    # Exact-problem mode changes stopping alone. Keep integration, costs and
+    # recovery from the original robot/controller; never reconstruct its NLP.
+    recipe.update({k:policy[k] for k in ('stopping_policy','max_iterations','tolerance','max_cpu_s','feasible_return')})
     n=len(recorded['coordinate_order'])
     nominal=recorded.get('nominal_workspace',dict(x=[0.]*(2*n),u=[.2]*len(recorded['tendon_order'])))
     ws=TrajectoryWorkspace(inp.task,inp.robot,recipe,nominal['x'],nominal['u'],
@@ -84,30 +87,25 @@ def replay(request):
         ws.problem=OptimizationProblem.model_validate(recorded['resolved_problem'])
     ws.problem.variables.clear(); ws.problem.variables.update(recorded['problem_variables'])
     ws.problem.initial_guess.clear(); ws.problem.initial_guess.update(recorded['initial_guess'])
+    if 'resolved_problem' not in recorded:raise ValueError('EXACT_ORIGINAL_PROBLEM_UNAVAILABLE_USE_EXPLICIT_RECONSTRUCTION')
     options=dict(recorded['initialization']['solver_options'])
-    if request['mode']=='research_policy':options=ws.solver.parameters.model_dump(mode='json')
-    if request['mode']=='fixed_iteration':
-        options.update(max_cpu_s=None,max_wall_s=None,max_iterations=request['iteration_cap']+1)
+    options.update(max_cpu_s=None,max_wall_s=None,feasible_return=None,
+        max_iterations=policy['max_iterations'],tolerance=policy['tolerance'])
     ws.solver=IpoptSolver(options)
     inspection=inspect_problem(ws,recorded)
     ws.solver.complete_record=True
     # Original update 1 had tracing disabled. Do not add timed callbacks when
     # reconstructing production-policy behavior.
     ws.solver.diagnostic_trace=recorded.get('diagnostic_trace_enabled','iteration_trace' in recorded['diagnostics'])
-    if request['mode']=='fixed_iteration': ws.solver.diagnostic_work_cap=request['iteration_cap']
-    if request.get('prepare_tail'):ws._prepare_tail()
-    prefix=None
-    if request.get('reuse_solver'):
-        prefix=_solve_record(ws,recorded)
     value=_solve_record(ws,recorded)
-    value.update(mode=request['mode'],production_stopping_policy_unchanged=request['mode']=='production',
+    value.update(mode=request['mode'],effective_stopping_policy=policy['stopping_policy'],
         problem_inspection=inspection,diagnostic_trace_enabled=ws.solver.diagnostic_trace,
-        iteration_cap=request['iteration_cap'] if request['mode'] in ('fixed_iteration','research_policy') else None,
-        stopping_controls=dict(options=options,callback_policy_enabled=request['mode']=='production',
-            fixed_cap_may_stop_early_on_convergence=True,external_timeout_s=150.*(1+int(bool(request.get('reuse_solver'))))),
-        solver_reused=bool(request.get('reuse_solver')),tail_prepared_before_solve=bool(request.get('prepare_tail')),
-        prefix=prefix,numerical_s=time.perf_counter()-started,
-        qualification='Recorded inputs; reuse prefix repeats this same input and does not recreate historical preceding-update/cache/timing history. Fixed work disables solver CPU/wall and feasible-return timers; convergence remains enabled.')
+        iteration_cap=policy['max_iterations'],
+        stopping_controls=dict(options=options,callback_policy_enabled=False,
+            may_stop_early_on_convergence=True,external_timeout_s=request['external_timeout_s']),
+        solver_reused=False,problem_identity=digest(recorded['resolved_problem']),
+        numerical_s=time.perf_counter()-started,
+        qualification='Exact serialized problem, bounds and initialized vector; fresh solver instance. Timed normal returns disabled. Local comparison does not establish whole-episode repeatability.')
     return value
 
 
@@ -118,6 +116,7 @@ def _solve_record(ws,recorded):
     if ws.parameters.recover_returned_tensions and result.status in ('converged','iteration_limit','feasible_early_stop'):
         result,recovery=ws._recover_returned(result,recorded['measured_state'])
     check=ws.solver.evaluate_candidate(ws.problem,result.optimum)
+    usable=check['feasible'] and result.status in ('converged','iteration_limit','feasible_early_stop')
     return dict(
         original_input_identity=recorded['initialization_identity'],
         exact_initialized_vector_equal=ws.solver.last_input_record['initialized_vector']==recorded['initialization']['initialized_vector'],
@@ -128,7 +127,8 @@ def _solve_record(ws,recorded):
         verification=check,first_input_n=[result.optimum['u/0/'+t] for t in recorded['tendon_order']],
         original_applied_action_n=recorded['actual_applied_action_n'],
         accepted_plan=result.optimum,
-        delivered_tension_n=[result.optimum['u/0/'+t] for t in recorded['tendon_order']],
+        delivered_tension_n=[result.optimum['u/0/'+t] for t in recorded['tendon_order']] if usable else None,
+        usable_plan=bool(usable),termination=ws.solver.last_diagnostics['return_status'],
         construction_s=ws.graph_s,task_plans={name:plan_task_metrics(ws,plan,recorded['prediction_timing']['current_time_s'])
             for name,plan in dict(raw=ws.solver.last_returned_optimum,selected=selected,
                 recovered=recovery.get('candidate_optimum'),delivered=result.optimum).items() if plan is not None})

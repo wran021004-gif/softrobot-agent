@@ -1,6 +1,6 @@
 # Current research chain
 
-Run from the isolated repository root with the existing research interpreter; the RL bridge retains its separate `D:/softrobot-agent/.rl-pilot-env/Scripts/python.exe`. No environment rebuild is needed. Preserve the bridge's Windows system environment inheritance.
+Run from the isolated repository root with the existing research interpreter; the RL bridge retains its separate `D:/softrobot-agent/.rl-pilot-env/Scripts/python.exe`. No environment rebuild is needed. Preserve the bridge's Windows system environment inheritance. The new stopping/failure-feedback assignment uses `examples/research_chain/feedback_design_study.json`; the earlier `specification.json` study remains sealed.
 
 ```powershell
 $env:OPENBLAS_NUM_THREADS='1'
@@ -39,3 +39,46 @@ Reading or importing a historical state performs no mathematical solve and incur
 Current single-use study `research-chain-20261014` is stopped after a valid failed confirmation. The model selected six target-equilibrium proxy evaluations over independent lengths and section scales; five candidates had real structural changes. It chose lengths .16/.11m, distal1 section scale1.025, all other structural settings nominal and NMPC weights .10/.10. Development passed (terminal3.409mm, holding3.478mm, speed.007281m/s); the first fresh confirmation failed holding speed(.047412m/s), while holding3.821mm and terminal3.403mm passed. Existing eligibility blocked the second confirmation, and no retry occurred. No new confirmed design was delivered and superiority over the nominal was not established. The original model's region-wide absence claim and its mixed-unit residual comparison are qualified in `evidence/research_chain_20261014/factual_qualifications.json`.
 
 The cumulative assignment used12 provider requests,21 public operations,14 mathematical evaluations (8 engineering/6 model search),2 NMPC episodes and1075.195 numerical seconds, including final engineering verification. No RL training, legacy offline solve or independent integration was selected. Earlier contained-study1933.210 numerical seconds remain historical and were not transferred. Scientific execution was frozen at281918bd; subsequent delivery-only factual/compatibility edits did not launch additional science. Exact archive, counters, original decisions and metrics are in the [machine summary](../evidence/research_chain_20261014/scientific_summary.json); focused checks are in [verification](../evidence/research_chain_20261014/verification.json). Start any future experiment as a separately authorized new study, never by reopening this accepted STOP.
+
+Current mainline NMPC derives its recipe through `current_nmpc_recipe` and the existing `controller_recipe` path. The explicit starting policy is `research_work_v1`, 120 iterations, tolerance 1e-6, `max_cpu_s=null`, `feasible_return=null`. At the IpoptSolver boundary `max_wall_s` is also null; it is not a trajectory-schema field. Normal solves stop on convergence/acceptable convergence or the iteration ceiling. Elapsed-time measurement and the enclosing execution watchdog remain. External timeout is incomplete evidence, never a successful command. Independently feasible iteration-limited plans remain usable and suboptimal, with raw termination and selected iteration retained; recovery remains independently checked.
+
+The nominal archive retains its historical recipe verbatim. New candidates, backend execution, diagnostic stopping, metadata and scientific identity consume the effective policy. Historical artifacts are read under their original candidate/profile, never relabeled as current candidates. The generic timed solver feature remains required by the registered bounded NMPC controller (`gvs_bounded_nmpc.py`), control-comparison/diagnostic tools, and offline CasADi co-design workers. They are not alternative current research routes. The native LocalDiagnostic interface exposes `research_policy` (exact serialized problem) and `research_current` (explicit current-workspace reconstruction), without production timers, caller-chosen iteration caps, solver reuse or tail-preparation switches.
+
+Prepare and commit scoped code/configuration before scientific binding. For this assignment:
+
+```powershell
+$spec='examples/research_chain/feedback_design_study.json'
+& $researchPython -m tools.research.core prepare --spec $spec
+& $researchPython -m tools.research.core bind --spec $spec
+# Write the exact failed execution EvidenceRef to ignored runs/<study_id>/source.json.
+& $researchPython -m tools.research.numerics import --spec $spec `
+  --archive evidence/research_chain_20261014 `
+  --execution runs/feedback-design-20261014/source.json --updates 0 29 30
+& $researchPython -m tools.research.core execute --spec $spec `
+  --plan examples/research_chain/nmpc_repeatability.json --request-id engineering-repeatability
+```
+
+Archive/member hashes, serialized model identity, exact historical candidate and profile are checked. Importing reads evidence only, costs no new solve, and registers the original candidate through the existing historical admission path. New backend admission still requires the current profile. Local comparison uses two new processes with the same single-thread numerical environment and exact original expression, bounds, initialized vector, scaling, previous input and recovery. Only stopping settings change. Each solve has a 300s external watchdog; the cumulative allowance is four attempts and 1200s, including failures. Report raw/selected/delivered plans, first commands, objective, independently checked residual, initialization/problem identities and actual cost. Local agreement supports this saved problem only.
+
+For historical failure-state analysis, the existing native request now accepts:
+
+```json
+{
+  "candidate": {"artifact_id": "exact original candidate hash", "media_type": "application/json"},
+  "execution": {"artifact_id": "exact execution result hash", "media_type": "application/json"},
+  "update_id": 30,
+  "operation": "braking",
+  "operating_point": "saved_state",
+  "protocol": "replace with the complete frozen analysis_protocol object"
+}
+```
+
+The protocol in a real request is an object, not the explanatory placeholder above. Alternatively use the existing `saved_state` reference; the two state-source forms are mutually exclusive. Do not hand-author physical state or provenance. The same resolver handles new executions through ControlEvidence and explicitly imported archived executions. Candidate, physical configuration, coordinate order, tendon order and timestamps must match exactly. Missing original problem/state is an explicit limitation; reconstruction must not be called exact.
+
+The projected interval-start state precedes the new command. Linearization uses the previous applied input in N; the newly computed command is recorded separately. Update29 at t=.29s has .06s remaining and update30 at t=.30s has .05s remaining. Terminal duration is zero, never an invented positive horizon. Recorded backend tip position/velocity are measurements; the calculated endpoint/braking and tension margins describe the GVS model at the projected MuJoCo state. A local terminal braking witness does not prove inclusive holding, and local solver failure does not establish global infeasibility.
+
+Historical reads/imports retain zero additional scientific cost. New analysis on historical inputs charges one mathematical allocation and actual contained-worker time through the existing once-only settlement/recovery path. Preflight and model research use one study ledger; no separate budget transfer/reset is needed. Native feedback includes failed criteria with units/thresholds/times, raw solver outcome counts, execution timing and mathematical references.
+
+After preflight, use `core live --spec $spec` for one fresh model-led study. The packet contains compact historical feedback, diagnostic results and state mathematics; the model selects variables, supported search objectives, backend route and revise/STOP decisions. Preserve capacity for two fresh confirmations. A structural milestone needs actual evaluation of a model-selected structural change; task performance alone cannot establish structural improvement without a comparable nominal evaluation. Existing `revise_selection=true`, failure retention, freshness gates and sealed STOP semantics remain authoritative.
+
+Export with `core export --spec $spec`. The immutable artifact archive/manifest, state, calls, ledger and final packet retain exact evidence and all costs. Commit compact nonsecret summaries and necessary immutable artifacts; leave environments, credentials and transient run directories untracked. Record implementation SHA and effective policy before model dispatch; repairs use committed explicit migration with unchanged budgets and retained evidence.

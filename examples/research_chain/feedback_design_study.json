@@ -1,0 +1,197 @@
+{
+  "study_id": "feedback-design-20261014",
+  "started_unix": 1791977440.9242187,
+  "authorization": "User attachment 879b2770-b530-4750-8796-edcc36e0cc18 and Chinese steering authorize scoped implementation, nonsecret model research, cumulative experiments, commits and ordinary push origin refactor/research-chain.",
+  "evaluation_version": 1,
+  "ranking": "feasible_then_max_normalized_violation_then_sum_v1",
+  "record_update_ids": [
+    0,
+    29,
+    30
+  ],
+  "complete_update_inputs": true,
+  "budgets": {
+    "provider_requests": 120,
+    "public_operations": 300,
+    "physical_launches": 64,
+    "local_solves": 4,
+    "local_solve_s": 1200,
+    "offline_nlp": 0,
+    "bdf_replays": 0,
+    "numerical_s": 24000,
+    "activity_s": 28800,
+    "delivery_reserve_s": 1200,
+    "protected_provider_requests": 20,
+    "mathematical_evaluations": 24
+  },
+  "execution_allowances": {
+    "simulation_s": 3500,
+    "evaluation_s": 30,
+    "profile_s": 60,
+    "construction_s": 10
+  },
+  "confirmation": {
+    "fresh_independent_repetitions": 2,
+    "configuration": "Two fresh post-selection nominal episodes; original task, identical selected candidate/controller/configuration and exact frozen RL checkpoint. Development evaluation excluded; retain failures; no success-hunting retries."
+  },
+  "optional_enhancements": {
+    "offline_schedule_initialization": "deferred until core delivery and sufficient remaining budget",
+    "legacy_skill_admission": "deferred; read-only drafts available"
+  },
+  "mode": "formal_research",
+  "tension_execution_mode": "ideal_tension",
+  "evidence_destination": "evidence/nmpc_feedback_20261014",
+  "rl_limits": {
+    "training_runs": null,
+    "actions_per_trial": 1000000,
+    "seconds_per_trial": 3600,
+    "training_actions": 2000000,
+    "training_active_seconds": 7200,
+    "evaluation_episodes": 24,
+    "diagnostic_replays": 2,
+    "diagnostic_physics_steps": 1
+  },
+  "capabilities": [
+    "analysis",
+    "search",
+    "nmpc",
+    "rl"
+  ],
+  "rl_evaluation_allowance_s": 120,
+  "nmpc_execution_cap_s": 3600,
+  "offline_solver_s": 6600,
+  "mechanics_allowances": {
+    "solve_s": 6600,
+    "replay_s": 600,
+    "inspect_s": 60
+  },
+  "nmpc_limits": {
+    "executions": 8
+  },
+  "rl_diagnostic_allowance_s": 60,
+  "offline_stopping_policy": "research_work_v1",
+  "numerical_environment": {
+    "OPENBLAS_NUM_THREADS": "1",
+    "OMP_NUM_THREADS": "1",
+    "MKL_NUM_THREADS": "1"
+  },
+  "base_commit": "a8c1231b428e7451769451a3a236bd431a86ba05",
+  "nominal_source": "examples/research_chain/nominal.json",
+  "reference_parameters": {
+    "near_length_m": 0.16,
+    "distal1_length_m": 0.11,
+    "near_section_scale": 1.0,
+    "distal1_section_scale": 1.0,
+    "near_routing_scale": 1.0,
+    "distal1_routing_scale": 1.0,
+    "near_material": "baseline",
+    "distal1_material": "baseline",
+    "holding_tip_speed_weight": 0.1,
+    "terminal_tip_speed_weight": 0.1
+  },
+  "allowed_parameters": {
+    "holding_tip_speed_weight": [
+      0.025,
+      0.1
+    ],
+    "terminal_tip_speed_weight": [
+      0.025,
+      0.1
+    ],
+    "near_length_m": [
+      0.152,
+      0.168
+    ],
+    "near_section_scale": [
+      0.95,
+      1.05
+    ],
+    "near_routing_scale": [
+      0.98,
+      1.02
+    ],
+    "near_material": [
+      "baseline",
+      "compliant",
+      "stiff"
+    ],
+    "distal1_length_m": [
+      0.1045,
+      0.1155
+    ],
+    "distal1_section_scale": [
+      0.95,
+      1.05
+    ],
+    "distal1_routing_scale": [
+      0.98,
+      1.02
+    ],
+    "distal1_material": [
+      "baseline",
+      "compliant",
+      "stiff"
+    ]
+  },
+  "analysis_cap_s": 180,
+  "analysis_protocol": {
+    "protocol_id": "task-local-v2",
+    "baseline_lengths_m": {
+      "near": 0.16,
+      "distal1": 0.11
+    },
+    "duration_s": 0.35,
+    "period_s": 0.01,
+    "input_scale_n": 8.0,
+    "output_scale_m": 0.01,
+    "windows_s": [
+      0.05,
+      0.1,
+      0.35
+    ],
+    "samples_s": [
+      0.0,
+      0.1,
+      0.2,
+      0.3,
+      0.34
+    ],
+    "frequency_rad_s": [
+      0.1,
+      1.0,
+      10.0,
+      100.0
+    ],
+    "rank_atol": 1e-12,
+    "rank_rtol": 1e-09,
+    "comparison_atol": 1e-08,
+    "comparison_rtol": 2e-06,
+    "derivative_atol": 2e-05,
+    "derivative_rtol": 0.0002,
+    "derivative_step": 1e-05,
+    "equilibrium_normalized_residual": 1e-05,
+    "static_force_tolerance": 1e-10,
+    "static_max_iterations": 20,
+    "pole_margin_s_inv": 1e-07,
+    "authority_threshold": null,
+    "authority_reason": "No independently justified task-required MIMO gain threshold; usable bandwidth undefined.",
+    "authority_rule": "Smallest singular value >= threshold, connected grid band starting at lowest frequency; no extrapolation.",
+    "candidate_rule": "initial_target_equilibrium_halfway",
+    "endpoint_max_iterations": 100,
+    "construction_max_iterations": 20,
+    "horizon_alignment_atol_s": 1e-12,
+    "endpoint_check_atol": 1e-08
+  },
+  "supplied_evidence": [
+    "examples/research_chain/failure_feedback.json"
+  ],
+  "execution_instructions": "You own one fresh bounded feedback-driven study. Read compact historical failure evidence and the new exact-problem repeatability and projected-state mathematical results supplied in the packet. Explain how the observed holding-speed gap informs each next action. Choose your own legal variables, supported objective, evaluation mode and NMPC/direct RL/compatible residual RL route. You may organize an actual design search, choose analysis-guided candidates, revise or STOP; no prescribed winner or mandatory tool traversal. A new structural milestone requires actual evaluation of a model-selected structural change. Supported mathematical search objectives are held_position_min_eigenvalue and target_equilibrium_residual; braking is evidence, not an optimizer objective. Residuals near 1e-9 m or a larger controllability score alone do not establish dynamic holding improvement. Search results never satisfy backend acceptance or confirmation.\nFrozen task: target[.29,.035,.19]m; mount[0,0,.15]m; gravity[0,0,-9.81]m/s2; named zero physical initial positions and velocities; seed17; duration.35s; control.01s; physics.0005s; inclusive holding.30-.35s; terminal/holding error<=.01m and holding speed<=.02m/s; two segments, six independent ideal tensions0..8N. Keep task, force limits, topology and declared bounds unchanged. Material labels are simulation scenarios.\nCurrent NMPC uses research_work_v1,120 iterations,tolerance1e-6; CPU/wall/feasible-return normal timers disabled. External 3600s complete-execution timeout yields incomplete evidence. Feasible iteration-limit plans are suboptimal, not convergence. Exact-problem diagnostics preserve expression, bounds, initialized vector and original recovery; reconstruction is explicitly different. Two local solves support local observation only.\nresearch_analysis can select the exact historical candidate, execution and update_id using operating_point=saved_state. It linearizes the saved MuJoCo-projected GVS state at the PREVIOUS applied input, with actual remaining duration (.06s at.29s;.05s at.30s). Do not transfer a historical state to a changed robot. These local GVS estimates are distinct from measured MuJoCo motion and do not prove whole-window holding or global structural infeasibility. New mathematics on historical inputs consumes current allocations; reads do not.\nAll preparation, local solves, candidate analysis and search internals already spent remain in this same cumulative ledger: model120/public300/live28800s with1200s closeout/numerical24000s/analyses24/local solves4 total1200s/NMPC8/RL2M actions7200 active seconds, per trial1M3600s/evaluations24. No legacy offline optimization or integration campaign. Ceilings are not quotas. Preserve capacity for two selected-route confirmations. Do not reset costs or lift limits after failure. Windows single-thread numerical environment is frozen.\nFresh passing development freezes exact design/controller/policy, followed by two fresh confirmations. Keep any failed/invalid confirmation; no extra repetitions of failed science. A changed solution needs new passing development and explicit confirm selected_execution with revise_selection=true, preserving selection history and costs. Historical results cannot satisfy fresh gates. Query/read actual RL terminal evidence before evaluating a usable exact checkpoint. A justified STOP is valid and seals study. Cite every new backend and engineering mathematical result; state concrete unfinished requirements and next_step. No comparable nominal run is required unless claiming structural superiority; otherwise report task performance without attribution. No robustness/hardware/real-time/global optimum claim. Send only authorized scoped nonsecret data.",
+  "controller_recipe": {
+    "stopping_policy": "research_work_v1",
+    "max_iterations": 120,
+    "tolerance": 1e-06,
+    "max_cpu_s": null,
+    "feasible_return": null
+  },
+  "standalone_watchdog_s": 300
+}

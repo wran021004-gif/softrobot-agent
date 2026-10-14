@@ -97,12 +97,31 @@ def dispatch(host,query,key,*,guard,origin='model'):
         tension_limits_n=[t['force_limit_n'] for t in design['tendons']],tension_bounds_n=[[0.,t['force_limit_n']] for t in design['tendons']],
         target_m=cfg['task']['goal']['data']['target_m'],source_identity=c['source_identity'])
     point=None
+    if q.execution:
+        from tools.research.numerics import execution_update
+        source=execution_update(host,q.execution,q.update_id);record=source['record'];observation=source.get('observation') or {}
+        if source['provenance'].get('candidate')!=plain(q.candidate) or source['configuration']!=cfg:
+            raise ValueError('EXACT_EXECUTION_STATE_CANDIDATE_MISMATCH')
+        if record['coordinate_order']!=binding['coordinate_order'] or record['tendon_order']!=binding['tendon_order']:
+            raise ValueError('EXECUTION_STATE_COORDINATE_OR_TENDON_ORDER_MISMATCH')
+        t=record['prediction_timing']['current_time_s'];duration=cfg['task']['timing']['duration_s']
+        if not 0<=t<=duration or abs(record['time_s']-t)>1e-12:raise ValueError('EXECUTION_STATE_TIME_MISMATCH')
+        point=dict(name='saved_state',available=True,x=record['measured_state'],u=record['previous_applied_input_n'],
+            phase='interval_start_previous_applied_input',input_units='N',actual_time_s=t,time_s=t,remaining_task_s=max(0.,duration-t),
+            coordinate_order=record['coordinate_order'],tendon_order=record['tendon_order'],
+            imported_historical_evidence=source.get('imported_historical_evidence',False),
+            backend_measurements={k:observation.get(k) for k in ('tip_position_m','tip_velocity_m_s')},
+            construction=dict(method='GVS state projected from recorded MuJoCo interval start; linearizes at previous applied input',
+                provenance=source['provenance'],new_command_n=record['actual_applied_action_n'],
+                interpretation='Backend measurements are observed; endpoint/motion estimates concern the local GVS model.'))
     if q.saved_state:
         point=deepcopy(host.store.artifact(q.saved_state))
         if point.get('candidate')!=plain(q.candidate) or point.get('configuration_identity')!=digest(cfg):raise ValueError('EXACT_SAVED_STATE_CANDIDATE_MISMATCH')
         if len(point['x'])!=2*len(binding['coordinate_order']) or len(point['u'])!=6 or not point.get('phase'):
             raise ValueError('EXACT_SAVED_STATE_ORDER_AND_PHASE_REQUIRED')
         point.update(name='saved_state',available=True,construction=dict(method='exact immutable saved state',state=plain(q.saved_state)))
+    if point and (len(point['x'])!=2*len(binding['coordinate_order']) or len(point['u'])!=len(binding['tendon_order'])):
+        raise ValueError('EXACT_STATE_DIMENSION_MISMATCH')
     reserve=fit['reservation_s']
     def charge(db):
         current=host.store.session(host.run_id,db)['state']

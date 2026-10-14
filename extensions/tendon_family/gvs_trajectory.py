@@ -207,7 +207,7 @@ class TrajectoryWorkspace:
         self.graph_s=time.perf_counter()-start
         research=self.parameters.stopping_policy=='research_work_v1'
         self.solver=IpoptSolver(dict(max_iterations=self.parameters.max_iterations,tolerance=self.parameters.tolerance,
-            max_cpu_s=None if research else self.parameters.max_cpu_s,retain_feasible_iterate=True,
+            max_cpu_s=None if research else self.parameters.max_cpu_s,max_wall_s=None,retain_feasible_iterate=True,
             feasible_return=None if research else self.parameters.feasible_return,
             constraint_jacobian_mode=self.parameters.constraint_jacobian_mode))
         self.robot=robot;self.scene=task.environment;self._tail_solver=None

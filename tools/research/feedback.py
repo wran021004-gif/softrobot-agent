@@ -97,11 +97,23 @@ def result_view(host, reference):
     metrics=episodes if rl else (r.get('acceptance') or {}).get('metrics')
     failed_metrics=[]
     acceptance=r.get('acceptance') or {}
+    if not rl:
+        profile=r.get('profile') or {};motion=host.store.artifact(profile['motion']) if profile.get('motion') else []
+        for name,component in acceptance.get('components',{}).items():
+            if component.get('passed') is not False:continue
+            key={'holding_speed':'tip_speed_m_s','holding_position':'tip_error_m','evaluator:task_bound':'tip_error_m'}.get(name)
+            samples=[v for v in motion if name not in ('holding_speed','holding_position') or v['time_s']>=.30-1e-12]
+            worst=max(samples,key=lambda v:v[key]) if key and samples else {}
+            failed_metrics.append(dict(metric=name,value=component.get('value'),threshold=component.get('limit'),unit=component.get('unit'),
+                time_s=(motion[-1]['time_s'] if name=='evaluator:task_bound' and motion else worst.get('time_s'))))
     for episode in episodes:
         for metric,limit in (('terminal_position_error_m','terminal_position_limit_m'),('holding_max_position_error_m','position_limit_m'),('holding_max_speed_m_s','holding_speed_limit_m_s')):
             if episode.get(metric) is not None and acceptance.get(limit) is not None and episode[metric]>acceptance[limit]:
                 failed_metrics.append(dict(metric=metric,value=episode[metric],threshold=acceptance[limit],time_s='not recorded in evaluation summary'))
-    return dict(failed_metrics=failed_metrics,evaluation_evidence=dict(trajectory=r.get('trajectory'),reference=plain(reference)),candidate=r['candidate'],task=r.get('task',c['configuration']['task']),controller_route=controller['route'],controller=controller,
+    return dict(failed_metrics=failed_metrics,solver_outcome={k:(r.get('profile') or {}).get(k) for k in
+        ('optimization_status_counts','raw_termination_counts','policy_stop_reason_counts','unusable_plans')},
+        execution_timing=acceptance.get('timing'),failure_state_analysis=mathematical_context(host,r['candidate']),
+        evaluation_evidence=dict(trajectory=r.get('trajectory') or (r.get('profile') or {}).get('motion'),reference=plain(reference)),candidate=r['candidate'],task=r.get('task',c['configuration']['task']),controller_route=controller['route'],controller=controller,
         mathematical_provenance=mechanics_context(host,r['candidate']),mathematical_evidence=mathematical_context(host,r['candidate']),metrics=metrics,complete=complete,passed=passed,
         task_performance='passed' if passed else 'failed' if complete else 'unmeasured',
         failure_stage=r.get('failure_stage') or ('task criteria unmet' if complete and not passed else r.get('failure_reason')),
@@ -230,5 +242,8 @@ def compact_local(row):
     recovery=i.get('original_recovery_selection') or {}
     i['original_recovery_selection']={k:recovery.get(k) for k in ('attempted','selected','objective','parent_iteration')}
     result.update(problem_inspection=i,local_iterations=(row.get('diagnostics') or {}).get('iterations'),
+        stopping_controls=row.get('stopping_controls'),verification=row.get('verification'),
+        raw_termination=(row.get('diagnostics') or {}).get('return_status'),
+        selected_iteration=(row.get('diagnostics') or {}).get('selected_feasible_iteration'),
         local_recovery_selection={k:(row.get('recovery') or {}).get(k) for k in ('attempted','selected','objective','parent_iteration')})
     return result

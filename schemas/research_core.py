@@ -74,11 +74,15 @@ class AnalysisRequest(Contract):
     operation: Literal['equilibrium','linearization','controllability','endpoint','braking']
     operating_point: Literal['standardized_initial_pretension','controller_start_input','target_equilibrium','halfway_waypoint','saved_state'] = 'halfway_waypoint'
     saved_state: EvidenceRef | None = None
+    execution: EvidenceRef | None = None
+    update_id: int | None = Field(default=None,ge=0,le=34,strict=True)
     protocol: TaskAnalysisProtocol
 
     @model_validator(mode='after')
     def exact_state(self):
-        if (self.operating_point=='saved_state')!=(self.saved_state is not None):raise ValueError('SAVED_POINT_REQUIRES_EXACT_STATE_REFERENCE')
+        if (self.execution is None)!=(self.update_id is None):raise ValueError('EXECUTION_REQUIRES_UPDATE_ID')
+        sources=int(self.saved_state is not None)+int(self.execution is not None)
+        if sources>1 or (self.operating_point=='saved_state')!=(sources==1):raise ValueError('SAVED_POINT_REQUIRES_UNAMBIGUOUS_STATE_SOURCE')
         return self
 
 
@@ -86,10 +90,7 @@ class LocalDiagnostic(Contract):
     execution: EvidenceRef
     update_id: int = Field(ge=0,le=34,strict=True)
     repetitions: int = Field(default=2,ge=1,le=2,strict=True)
-    mode: Literal['production', 'fixed_iteration', 'research_policy', 'research_current'] = 'production'
-    iteration_cap: int = Field(default=8,ge=1,le=120,strict=True)
-    reuse_solver: bool = False
-    prepare_tail: bool = False
+    mode: Literal['research_policy', 'research_current'] = 'research_policy'
 
 
 class Plan(Contract):

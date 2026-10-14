@@ -51,6 +51,7 @@ def resolve_gvs_nmpc_control(inp,physics):
         stopping=dict(policy=p.stopping_policy,iteration_ceiling=p.max_iterations,numerical_tolerance=p.tolerance,
             feasible_return=None if p.stopping_policy=='research_work_v1' or p.feasible_return is None else p.feasible_return.model_dump(mode='json'),
             max_cpu_s=None if p.stopping_policy=='research_work_v1' else p.max_cpu_s,
+            max_wall_s=None,
             external_watchdog='Enclosing execution interruption is incomplete/timeout, never a successful timed command'),
         timing=dict(period_s=inp.task.timing.control_period_s,prediction_interval_s=inp.task.timing.control_period_s,
             physics_step_s=inp.task.timing.timestep_s,observation='interval_start_pre_step'),
@@ -128,8 +129,11 @@ class GVSNMPCController:
         command,bridge=execute_ideal_tension(self.physics,requested)
         self.previous=np.asarray(command).copy();elapsed=time.perf_counter()-start
         converged=solved is not None and solved['optimization_converged']
-        intentional=solved is not None and solved['result']['status']=='feasible_early_stop'
-        self.last={**bridge,'plan_accepted':success,'solver_failed':not success or (not converged and not intentional),
+        raw_status=None if solved is None else solved['diagnostics']['return_status']
+        outcome=('numerical_error' if error else 'unusable_solve' if not success else
+            'acceptable_convergence' if raw_status=='Solved_To_Acceptable_Level' else
+            'convergence' if converged else 'iteration_limit_feasible' if solved['result']['status']=='iteration_limit' else 'feasible_early_stop')
+        self.last={**bridge,'plan_accepted':success,'solver_failed':not success,'solver_outcome':outcome,
             'optimization_nonconverged':not converged,'failure_response_used':not success and not self.stop_requested,
             'feasible_suboptimal_update':success and not converged,
             'solver_error':error,'optimization_status':None if solved is None else solved['result']['status'],
