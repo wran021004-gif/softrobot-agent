@@ -52,7 +52,8 @@ def integration(host):
     else:
         replay=core.dispatch(host,plan('replay',[result['reference']],mechanics_source=result['reference']),
             'engineering-replay',origin='engineering')
-        d=result['handoff']['structure']['d']
+        structure=result['handoff']['structure']
+        d=structure.get('legacy_d',structure.get('d'))
         search=core.dispatch(host,plan('search',[result['reference'],replay['result']['reference']],search=dict(
             variables=['holding_tip_speed_weight'],bounds={'holding_tip_speed_weight':[.025,.10]},
             fixed=dict(d=d,holding_tip_speed_weight=.10,terminal_tip_speed_weight=.10),

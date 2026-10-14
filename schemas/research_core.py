@@ -4,7 +4,7 @@ from pydantic import Field, FiniteFloat, model_validator
 from schemas.common import Contract
 from schemas.platform import EvidenceRef
 from schemas.casadi_feedback import Candidate as MechanicsChoice
-from extensions.tendon_family.generated_serial import parameter_domains
+from extensions.tendon_family.generated_serial import parameter_domains, SUPPORTED_NUMERIC
 from schemas.platform_analysis import TaskAnalysisProtocol
 
 
@@ -21,8 +21,10 @@ class Parameters(Contract):
     distal1_routing_scale: FiniteFloat = 1.
     near_material: Literal['baseline','compliant','stiff'] = 'baseline'
     distal1_material: Literal['baseline','compliant','stiff'] = 'baseline'
-    holding_tip_speed_weight: FiniteFloat = Field(default=.10, ge=.025, le=.10)
-    terminal_tip_speed_weight: FiniteFloat = Field(default=.10, ge=.025, le=.10)
+    holding_tip_speed_weight: FiniteFloat = Field(default=.10,
+        ge=SUPPORTED_NUMERIC['holding_tip_speed_weight'][0],le=SUPPORTED_NUMERIC['holding_tip_speed_weight'][1])
+    terminal_tip_speed_weight: FiniteFloat = Field(default=.10,
+        ge=SUPPORTED_NUMERIC['terminal_tip_speed_weight'][0],le=SUPPORTED_NUMERIC['terminal_tip_speed_weight'][1])
 
     @model_validator(mode='after')
     def supported(self):

@@ -44,7 +44,7 @@ def result_view(host, reference):
             if episode.get(metric) is not None and acceptance.get(limit) is not None and episode[metric]>acceptance[limit]:
                 failed_metrics.append(dict(metric=metric,value=episode[metric],threshold=acceptance[limit],time_s='not recorded in evaluation summary'))
     return dict(failed_metrics=failed_metrics,evaluation_evidence=dict(trajectory=r.get('trajectory'),reference=plain(reference)),candidate=r['candidate'],task=identity['task'],controller_route=controller['route'],controller=controller,
-        mathematical_provenance=mechanics_context(host,r['candidate']),metrics=metrics,complete=complete,passed=passed,
+        mathematical_provenance=mechanics_context(host,r['candidate']),mathematical_evidence=mathematical_context(host,r['candidate']),metrics=metrics,complete=complete,passed=passed,
         task_performance='passed' if passed else 'failed' if complete else 'unmeasured',
         failure_stage=r.get('failure_stage') or ('task criteria unmet' if complete and not passed else r.get('failure_reason')),
         costs=dict(evaluation_elapsed_s=r.get('evaluation_elapsed_s'),numerical_s=r.get('numerical_s'),counts=r.get('counts')),
@@ -132,6 +132,18 @@ def mechanics_context(host, candidate):
     # Repeated handoffs are provenance relations, not additional NLPs or replays.
     unique={r['mechanics_attempt']['artifact_id']:r for r in rows}
     return list(unique.values())
+
+
+def mathematical_context(host,candidate):
+    """Exact candidate links to calculated evidence; no recomputation or interpretation."""
+    from tools.research.core import state
+    records=[]
+    for ref in state(host).get('analysis_results',[]):
+        value=host.store.artifact(ref)
+        if value['candidate']!=plain(candidate):continue
+        records.append(dict(reference=ref,**{k:value.get(k) for k in
+            ('operation','origin','status','operating_point','proxy_values','local_model_constraints','charged_numerical_s')}))
+    return records
 
 
 def compact_local(row):

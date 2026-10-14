@@ -852,6 +852,3 @@ class CandidateAnalysisRecoveryTests(TestCase):
                 self.assertEqual(core.state(h)['numerical_s'],before);self.assertEqual(launched.call_count,2)
                 self.assertIsNone(result['result']['best_feasible'])
             import gc;gc.collect()
-
-
-

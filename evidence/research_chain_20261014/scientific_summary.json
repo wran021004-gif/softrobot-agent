@@ -1,0 +1,2611 @@
+{
+  "study_id": "research-chain-20261014",
+  "branch": "refactor/research-chain",
+  "source_commit": "a8c1231b428e7451769451a3a236bd431a86ba05",
+  "scientific_implementation": "281918bdc9719a76b42f13904e6fc07d41df9b65",
+  "worktree": "D:\\softrobot-agent\\.worktrees\\research-chain",
+  "nominal_source": {
+    "archive": "evidence/contained_autonomous_study_20261014",
+    "candidate": {
+      "artifact_id": "02eee599912cf23f611d13ec332f920853f79b4f043aee5526e5fcba62ee795d",
+      "media_type": "application/json"
+    },
+    "configuration_sha256": "ba0b4baf56f918af291a131549d9715772651eb9af863951afb4c4af6ef66bab",
+    "ownership": "Current contained research initial nominal; artifact read only, zero new scientific executions",
+    "source_commit": "a8c1231b428e7451769451a3a236bd431a86ba05"
+  },
+  "task_identity": "2b26edb492214c426263441b6adb52d7aafe41a828436d6b48a1171374a1026c",
+  "nominal_lengths_m": [
+    0.16,
+    0.11
+  ],
+  "original_task": {
+    "actuator_channels": [
+      "actuator_commands"
+    ],
+    "contract_version": "1.0.0",
+    "environment": {
+      "contract": "experiment.assembly",
+      "data": {
+        "environment": {
+          "coordinate_frame": "world_base_x_forward_yz_cross_section",
+          "environment_id": "reach_free",
+          "gravity_m_s2": [
+            0.0,
+            0.0,
+            -9.81
+          ],
+          "gravity_source": "main@245a785 reach_free environment; Human-owned benchmark gravity",
+          "lights": [
+            {
+              "direction": [
+                0.0,
+                0.0,
+                -1.0
+              ],
+              "position_m": [
+                0.0,
+                0.0,
+                2.0
+              ]
+            }
+          ],
+          "objects": [
+            {
+              "conaffinity": 1,
+              "contype": 0,
+              "half_size_m": [
+                2.0,
+                2.0,
+                0.1
+              ],
+              "kind": "plane",
+              "name": "floor",
+              "position_m": [
+                0.0,
+                0.0,
+                -0.02
+              ]
+            }
+          ],
+          "schema_version": "1",
+          "truth_status": "HUMAN_OWNED",
+          "units": "SI"
+        },
+        "external_forces": [],
+        "floor_id": "floor",
+        "mount": {
+          "position_m": [
+            0.0,
+            0.0,
+            0.15
+          ],
+          "quaternion_wxyz": [
+            1.0,
+            0.0,
+            0.0,
+            0.0
+          ]
+        }
+      },
+      "version": "1.0.0"
+    },
+    "evaluator": {
+      "extension_id": "evaluate.reach",
+      "parameters": {
+        "contract": "reference.reach_evaluation",
+        "data": {
+          "tolerance_m": 0.01
+        },
+        "version": "1.0.0"
+      },
+      "version": "1.0.0"
+    },
+    "failure_policy": "retain_invalid_and_constraint_failures",
+    "family": "task.reach",
+    "goal": {
+      "contract": "reference.reach_goal",
+      "data": {
+        "target_m": [
+          0.29,
+          0.035,
+          0.19
+        ]
+      },
+      "version": "1.0.0"
+    },
+    "initializer": {
+      "extension_id": "initialize.family",
+      "parameters": {
+        "contract": "family.initial",
+        "data": {
+          "qpos_rad": {
+            "distal1_cell_0_y": 0.0,
+            "distal1_cell_0_z": 0.0,
+            "distal1_cell_10_y": 0.0,
+            "distal1_cell_10_z": 0.0,
+            "distal1_cell_11_y": 0.0,
+            "distal1_cell_11_z": 0.0,
+            "distal1_cell_1_y": 0.0,
+            "distal1_cell_1_z": 0.0,
+            "distal1_cell_2_y": 0.0,
+            "distal1_cell_2_z": 0.0,
+            "distal1_cell_3_y": 0.0,
+            "distal1_cell_3_z": 0.0,
+            "distal1_cell_4_y": 0.0,
+            "distal1_cell_4_z": 0.0,
+            "distal1_cell_5_y": 0.0,
+            "distal1_cell_5_z": 0.0,
+            "distal1_cell_6_y": 0.0,
+            "distal1_cell_6_z": 0.0,
+            "distal1_cell_7_y": 0.0,
+            "distal1_cell_7_z": 0.0,
+            "distal1_cell_8_y": 0.0,
+            "distal1_cell_8_z": 0.0,
+            "distal1_cell_9_y": 0.0,
+            "distal1_cell_9_z": 0.0,
+            "near_cell_0_y": 0.0,
+            "near_cell_0_z": 0.0,
+            "near_cell_10_y": 0.0,
+            "near_cell_10_z": 0.0,
+            "near_cell_11_y": 0.0,
+            "near_cell_11_z": 0.0,
+            "near_cell_1_y": 0.0,
+            "near_cell_1_z": 0.0,
+            "near_cell_2_y": 0.0,
+            "near_cell_2_z": 0.0,
+            "near_cell_3_y": 0.0,
+            "near_cell_3_z": 0.0,
+            "near_cell_4_y": 0.0,
+            "near_cell_4_z": 0.0,
+            "near_cell_5_y": 0.0,
+            "near_cell_5_z": 0.0,
+            "near_cell_6_y": 0.0,
+            "near_cell_6_z": 0.0,
+            "near_cell_7_y": 0.0,
+            "near_cell_7_z": 0.0,
+            "near_cell_8_y": 0.0,
+            "near_cell_8_z": 0.0,
+            "near_cell_9_y": 0.0,
+            "near_cell_9_z": 0.0
+          },
+          "qvel_rad_s": {
+            "distal1_cell_0_y": 0.0,
+            "distal1_cell_0_z": 0.0,
+            "distal1_cell_10_y": 0.0,
+            "distal1_cell_10_z": 0.0,
+            "distal1_cell_11_y": 0.0,
+            "distal1_cell_11_z": 0.0,
+            "distal1_cell_1_y": 0.0,
+            "distal1_cell_1_z": 0.0,
+            "distal1_cell_2_y": 0.0,
+            "distal1_cell_2_z": 0.0,
+            "distal1_cell_3_y": 0.0,
+            "distal1_cell_3_z": 0.0,
+            "distal1_cell_4_y": 0.0,
+            "distal1_cell_4_z": 0.0,
+            "distal1_cell_5_y": 0.0,
+            "distal1_cell_5_z": 0.0,
+            "distal1_cell_6_y": 0.0,
+            "distal1_cell_6_z": 0.0,
+            "distal1_cell_7_y": 0.0,
+            "distal1_cell_7_z": 0.0,
+            "distal1_cell_8_y": 0.0,
+            "distal1_cell_8_z": 0.0,
+            "distal1_cell_9_y": 0.0,
+            "distal1_cell_9_z": 0.0,
+            "near_cell_0_y": 0.0,
+            "near_cell_0_z": 0.0,
+            "near_cell_10_y": 0.0,
+            "near_cell_10_z": 0.0,
+            "near_cell_11_y": 0.0,
+            "near_cell_11_z": 0.0,
+            "near_cell_1_y": 0.0,
+            "near_cell_1_z": 0.0,
+            "near_cell_2_y": 0.0,
+            "near_cell_2_z": 0.0,
+            "near_cell_3_y": 0.0,
+            "near_cell_3_z": 0.0,
+            "near_cell_4_y": 0.0,
+            "near_cell_4_z": 0.0,
+            "near_cell_5_y": 0.0,
+            "near_cell_5_z": 0.0,
+            "near_cell_6_y": 0.0,
+            "near_cell_6_z": 0.0,
+            "near_cell_7_y": 0.0,
+            "near_cell_7_z": 0.0,
+            "near_cell_8_y": 0.0,
+            "near_cell_8_z": 0.0,
+            "near_cell_9_y": 0.0,
+            "near_cell_9_z": 0.0
+          },
+          "unspecified": "zero"
+        },
+        "version": "1.0.0"
+      },
+      "version": "1.0.0"
+    },
+    "name": "Independent development validation of a serial multi-segment soft arm",
+    "objectives": [
+      {
+        "direction": "minimize",
+        "metric": "position_error",
+        "units": "m",
+        "weight": 1.0
+      }
+    ],
+    "observations": [
+      {
+        "dimension": 3,
+        "entity": "tip",
+        "frame": "world",
+        "missing": "unsupported",
+        "name": "tip_position",
+        "phase": "post_step",
+        "units": "m"
+      }
+    ],
+    "robot_families": [
+      "tendon_robot_family"
+    ],
+    "sampling": {
+      "aggregation": "per_instance",
+      "seeds": [
+        17
+      ],
+      "split": "development",
+      "window_s": [
+        0.0,
+        0.35
+      ]
+    },
+    "source": "Development task with fixed target, tolerance and scoring; historical tasks are unchanged",
+    "status": "development_valid",
+    "task_id": "family-multisegment-dev",
+    "task_version": "1.0.0",
+    "timing": {
+      "control_period_s": 0.01,
+      "duration_s": 0.35,
+      "sample_period_s": 0.01,
+      "termination": [
+        "duration",
+        "numerical_failure"
+      ],
+      "timestep_s": 0.0005
+    }
+  },
+  "research_sequence": [
+    {
+      "reference": {
+        "artifact_id": "006c00c9ce0d78893a6bf6a51e3493632cc4366eccd3e128d7138b42a27531a3",
+        "media_type": "application/json"
+      },
+      "admission": {
+        "admitted": 4,
+        "confirmation_launch_reserve": 2,
+        "confirmation_time_reserve_s": 7200,
+        "delivery_activity_reserve_s": 1200,
+        "delivery_numerical_reserve_s": 0.0,
+        "independent_integration_reserve_s": 0.0,
+        "internal_launches": 4,
+        "numerical_reservation_s": 14400,
+        "per_execution_s": 3600,
+        "remaining_activity_s": 27525.34697985649,
+        "remaining_numerical_s": 23733.2313487001,
+        "requested": 6
+      },
+      "experience_read_bindings": [],
+      "origin": "model",
+      "original_plan": {
+        "action": "search",
+        "candidate": null,
+        "diagnostic": null,
+        "expected_observation": "Each evaluated structural candidate constructs a bounded static equilibrium with residual in the ~1e-9..1e-7 m range (all feasible under the 1e-5 normalized-residual rule); no candidate yields a residual materially smaller than the nominal, so the best mathematical candidate remains the nominal starting design.",
+        "experience_disposition": {},
+        "fixed_conditions": "Frozen family-multisegment-dev task (target [.29,.035,.19] m, mount [0,0,.15], gravity -9.81 z, seed 17, 0.35 s, 0.01 s control, 0.0005 s physics, six independent 0..8 N ideal tensions, holding 0.30-0.35 s inclusive); frozen task-local-v2 protocol (input scale 8 N, output scale 0.01 m, 20 static iterations, 1e-5 normalized residual); immutable nominal source 4053cb...; candidates constructed relative to that single source; materials fixed at baseline, routing scales fixed at 1.0, controller/reward settings frozen.",
+        "hypothesis": "A legal structural change to the nominal near/distal1 geometry (segment lengths and section scales, materials fixed at baseline) does not materially reduce the bounded static target-equilibrium position residual below the nominal ~4.07e-9 m, because the nominal already constructs a target equilibrium essentially exactly. The search will actually construct and evaluate several canonical structural candidates to test this.",
+        "interpretation": "Mathematical proxy ranking is not task acceptance and the best mathematical candidate cannot be selected for confirmation. The result indicates whether any legal structural change is worth closed-loop (NMPC) evaluation or whether the nominal must remain the starting design.",
+        "mechanics": null,
+        "mechanics_source": null,
+        "next_step": null,
+        "parameters": null,
+        "search": {
+          "aggregate_length_bounds_m": null,
+          "bounds": {
+            "distal1_length_m": [
+              0.1045,
+              0.1155
+            ],
+            "distal1_section_scale": [
+              0.95,
+              1.05
+            ],
+            "near_length_m": [
+              0.152,
+              0.168
+            ],
+            "near_section_scale": [
+              0.95,
+              1.05
+            ]
+          },
+          "evaluation_mode": "mathematical_proxy",
+          "fixed": {
+            "distal1_length_m": 0.11,
+            "distal1_material": "baseline",
+            "distal1_routing_scale": 1.0,
+            "distal1_section_scale": 1.0,
+            "holding_tip_speed_weight": 0.1,
+            "near_length_m": 0.16,
+            "near_material": "baseline",
+            "near_routing_scale": 1.0,
+            "near_section_scale": 1.0,
+            "terminal_tip_speed_weight": 0.1
+          },
+          "length_mode": "independent",
+          "max_evaluations": 6,
+          "mechanics_source": null,
+          "objective": "target_equilibrium_residual",
+          "operating_point": "target_equilibrium",
+          "options": {},
+          "protocol": null,
+          "ranking": "feasible_then_max_normalized_violation_then_sum_v1",
+          "step": 0.25,
+          "total_length_m": null,
+          "variables": [
+            "near_length_m",
+            "distal1_length_m",
+            "near_section_scale",
+            "distal1_section_scale"
+          ]
+        },
+        "selected_execution": null,
+        "stopping_condition": "The search exhausts its declared evaluation budget (max_evaluations=6) with the nominal retained as best, or a materially better feasible candidate appears; then the structural search branch stops and the honest outcome is recorded.",
+        "supporting_evidence": [
+          {
+            "artifact_id": "4053cb5af5c769175415f40cdfd03c886434b65a36a034810b1f89608b737384",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "f4428d849152b37b32863f0c587033a6ad7469f718f660f9f8a3c21162aa1f3c",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "ba5fb2de7ba232d79123541f5ad1b976f2660b37153ba4d0038affe184f2a80e",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "7f4cec01e0576a79c9b9c1a5409dd2f792251280847afc24db8cddf7c0770a97",
+            "media_type": "application/json"
+          }
+        ],
+        "weakening_observation": "At least one legal structural candidate yields a target-equilibrium position residual materially smaller than the nominal (e.g. below ~1e-9 m), so the claim that the nominal sits at the proxy optimum is not supported."
+      },
+      "request_id": "native-call_00_zLwC3vgrNQZa2o6xnLio3380"
+    },
+    {
+      "reference": {
+        "artifact_id": "6c6a84f55b2c8fb56d668066a47f2579896d35ca57846827592d8263b8d05db9",
+        "media_type": "application/json"
+      },
+      "admission": {
+        "admitted": 1,
+        "confirmation_launch_reserve": 2,
+        "confirmation_time_reserve_s": 7200,
+        "delivery_activity_reserve_s": 1200,
+        "delivery_numerical_reserve_s": 0.0,
+        "independent_integration_reserve_s": 0.0,
+        "internal_launches": 1,
+        "numerical_reservation_s": 3600,
+        "per_execution_s": 3600,
+        "remaining_activity_s": 27366.86977314949,
+        "remaining_numerical_s": 23666.382057200048,
+        "requested": 1
+      },
+      "experience_read_bindings": [],
+      "origin": "model",
+      "original_plan": {
+        "action": "execute",
+        "candidate": {
+          "artifact_id": "f7d903300726c084df09d93792888e4d4028abbe60851190be55c1d4536eafb8",
+          "media_type": "application/json"
+        },
+        "diagnostic": null,
+        "expected_observation": "The NMPC episode completes 0.35 s without solver errors; the inclusive holding window 0.30-0.35 s shows tip position error < 0.01 m and tip speed < 0.02 m/s with all six tensions within 0-8 N, i.e. task accepted (order 1e-3 m and 1e-2 m/s, comparable to historical passing runs).",
+        "experience_disposition": {},
+        "fixed_conditions": "Frozen family-multisegment-dev task (target [.29,.035,.19] m, mount [0,0,.15], gravity -9.81 z, seed 17, 0.35 s duration, 0.01 s control/sample, 0.0005 s physics, six independent 0-8 N ideal tensions) and frozen task-local-v2 protocol; frozen controller/reward settings; candidate fixed as the exact construction distal1_section_scale = 1.025 with lengths [0.16, 0.11] and baseline materials/routing.",
+        "hypothesis": "The model-selected legal structural change (distal1_section_scale = 1.025, lengths [0.16, 0.11], materials baseline, routing 1.0) is goal-based task-feasible under the frozen NMPC controller and the frozen family-multisegment-dev task, matching the nominal's holding position/speed thresholds.",
+        "interpretation": "This converts the saturated mathematical proxy into goal-based closed-loop evidence for a legal structural change. Success yields a passing development (not yet a confirmed design); failure means the structural change is not task-feasible despite being proxy-equal. Neither outcome is a superiority or optimality claim.",
+        "mechanics": null,
+        "mechanics_source": null,
+        "next_step": null,
+        "parameters": null,
+        "search": null,
+        "selected_execution": null,
+        "stopping_condition": "Stop after this single development execution returns. If it is task-accepted, freeze that exact result as the selected execution for two fresh independent confirmations; if it fails, retain the failure without repetition and reconsider the design/control route.",
+        "supporting_evidence": [
+          {
+            "artifact_id": "1c4a9ad67bd63e55b5a6a797ef125a60070b79d96d0b57646169cce1a6a4a77c",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "088d195cf94e64bb6e366830d783aae963f758f97d70a1c257599325aedaa415",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "4053cb5af5c769175415f40cdfd03c886434b65a36a034810b1f89608b737384",
+            "media_type": "application/json"
+          }
+        ],
+        "weakening_observation": "NMPC fails to complete, raises solver errors, or violates the holding position/speed thresholds or tension bounds, so this structural change is not task-feasible and must not be selected for confirmation."
+      },
+      "request_id": "native-call_00_BhmTxW2SgrJXMAnQD2i57568"
+    },
+    {
+      "reference": {
+        "artifact_id": "6ba6e8035892c8a6b28f4894c179183f99f9fac09f37d1dbc40f40cd46ba3519",
+        "media_type": "application/json"
+      },
+      "admission": {
+        "admitted": 1,
+        "confirmation_launch_reserve": 0,
+        "confirmation_time_reserve_s": 0,
+        "delivery_activity_reserve_s": 1200,
+        "delivery_numerical_reserve_s": 0.0,
+        "independent_integration_reserve_s": 0.0,
+        "internal_launches": 1,
+        "numerical_reservation_s": 3600,
+        "per_execution_s": 3600,
+        "remaining_activity_s": 26982.097321748734,
+        "remaining_numerical_s": 23338.848788700045,
+        "requested": 1
+      },
+      "experience_read_bindings": [],
+      "origin": "model",
+      "original_plan": {
+        "action": "confirm",
+        "candidate": null,
+        "diagnostic": null,
+        "expected_observation": "Both fresh confirmations complete the 0.35 s episode with zero solver errors, holding-window (0.30-0.35 s, inclusive) tip position error below 0.01 m and tip speed below 0.02 m/s, and all six tensions within 0-8 N, consistent with the development result (holding max error ~3.4e-3 m, holding max speed ~7.3e-3 m/s).",
+        "experience_disposition": {},
+        "fixed_conditions": "Frozen family-multisegment-dev task (target [.29,.035,.19] m, mount [0,0,.15], gravity -9.81 z, seed 17, 0.35 s, 0.01 s control/sample, 0.0005 s physics, six independent 0-8 N ideal tensions) and frozen task-local-v2 protocol; the exact selected candidate, controller configuration and checkpoint are frozen; no design or controller changes during confirmation.",
+        "hypothesis": "The frozen development-passing solution (candidate core-920577b4 = distal1_section_scale 1.025, lengths [0.16, 0.11], baselining materials/routing; frozen family-multisegment-dev task; frozen NMPC controller and configuration) reproduces its goal-based task acceptance in two fresh independent nominal episodes.",
+        "interpretation": "Two fresh passes convert the passing development into an independently confirmed new structural design within nominal ideal-tension sampled simulation. This is not a claim of structural superiority, global optimality, robustness or hardware validity, and does not change the frozen task thresholds.",
+        "mechanics": null,
+        "mechanics_source": null,
+        "next_step": null,
+        "parameters": null,
+        "search": null,
+        "selected_execution": {
+          "artifact_id": "355698ecb45ab90825c9f6b87bdb8e8d950049fcef8017ca0a4e3bc52817689a",
+          "media_type": "application/json"
+        },
+        "stopping_condition": "Perform exactly two fresh independent confirmations of the frozen solution and no more repetitions; stop once both return, retaining any failure.",
+        "supporting_evidence": [],
+        "weakening_observation": "Either fresh confirmation fails to complete, raises solver errors, or violates a holding position/speed threshold or tension bound; the failure is retained and the design is not a confirmed new design."
+      },
+      "request_id": "native-call_00_vzVic8qCSrBZ2Cdxb5kR1137"
+    },
+    {
+      "reference": {
+        "artifact_id": "921951d3f29bf4af0453047a23c8dcd4797c0deac9f21107889c05bc02b2132b",
+        "media_type": "application/json"
+      },
+      "admission": {
+        "admitted": 1,
+        "confirmation_launch_reserve": 0,
+        "confirmation_time_reserve_s": 0,
+        "delivery_activity_reserve_s": 1200,
+        "delivery_numerical_reserve_s": 0.0,
+        "independent_integration_reserve_s": 0.0,
+        "internal_launches": 1,
+        "numerical_reservation_s": 3600,
+        "per_execution_s": 3600,
+        "remaining_activity_s": 26497.602474212646,
+        "remaining_numerical_s": 22931.314409399965,
+        "requested": 1
+      },
+      "experience_read_bindings": [],
+      "origin": "model",
+      "original_plan": {
+        "action": "confirm",
+        "candidate": null,
+        "diagnostic": null,
+        "expected_observation": "The second fresh confirmation completes the 0.35 s episode with zero solver errors and holding-window tip position below 0.01 m and tip speed below 0.02 m/s, or it reproduces the holding-speed violation; either way it is retained as-is.",
+        "experience_disposition": {},
+        "fixed_conditions": "Frozen family-multisegment-dev task (target [.29,.035,.19] m, mount [0,0,.15], gravity -9.81 z, seed 17, 0.35 s, 0.01 s control/sample, 0.0005 s physics, six independent 0-8 N ideal tensions) and frozen task-local-v2 protocol; the frozen selected execution 355698ec (candidate core-920577b4, distal1_section_scale 1.025, lengths [0.16, 0.11], baseline materials/routing) with its exact NMPC controller configuration; no design, controller or checkpoint changes.",
+        "hypothesis": "The frozen development-passing solution (selected execution 355698ec, candidate core-920577b4 with distal1_section_scale 1.025) will reproduce goal-based task acceptance in the second required fresh independent nominal episode, or reproduce the holding-speed violation; the first confirmation already failed on holding speed (0.0474 m/s > 0.02 m/s), so the design cannot be a confirmed new design regardless.",
+        "interpretation": "This completes the declared pair of fresh independent confirmations of the frozen solution. Because one required confirmation already failed on the holding-speed criterion, the new structural design is not confirmed; the pair is retained for honest reporting and no further repetitions are performed.",
+        "mechanics": null,
+        "mechanics_source": null,
+        "next_step": null,
+        "parameters": null,
+        "search": null,
+        "selected_execution": {
+          "artifact_id": "355698ecb45ab90825c9f6b87bdb8e8d950049fcef8017ca0a4e3bc52817689a",
+          "media_type": "application/json"
+        },
+        "stopping_condition": "Perform exactly this one remaining fresh confirmation (completing the required two) and no more repetitions; stop and report once it returns, retaining any failure.",
+        "supporting_evidence": [],
+        "weakening_observation": "The confirmation fails to complete, raises solver errors, or violates any holding position/speed threshold or tension bound; the outcome is retained and no retry is attempted."
+      },
+      "request_id": "native-call_00_QusgjuNKNd182AdEaxVj2716"
+    },
+    {
+      "reference": {
+        "artifact_id": "59896b81c76ae9e53c7827b291f564d5a5e71fe59a6a6458a478c44fd31587fb",
+        "media_type": "application/json"
+      },
+      "admission": {
+        "admitted": 1,
+        "confirmation_launch_reserve": 2,
+        "confirmation_time_reserve_s": 7200,
+        "delivery_activity_reserve_s": 1200,
+        "delivery_numerical_reserve_s": 0.0,
+        "independent_integration_reserve_s": 0.0,
+        "internal_launches": 1,
+        "numerical_reservation_s": 3600,
+        "per_execution_s": 3600,
+        "remaining_activity_s": 26400.621676683426,
+        "remaining_numerical_s": 22931.314409399965,
+        "requested": 1
+      },
+      "experience_read_bindings": [],
+      "origin": "model",
+      "original_plan": {
+        "action": "stop",
+        "candidate": null,
+        "diagnostic": null,
+        "expected_observation": "A model-selected structural candidate would construct a target equilibrium, pass one NMPC development episode, and then pass two fresh independent confirmations of the frozen solution, establishing a new confirmed design distinct from the start design.",
+        "experience_disposition": {},
+        "fixed_conditions": "Frozen family-multisegment-dev task (target [.29,.035,.19] m, mount [0,0,.15], gravity -9.81 z, seed 17, 0.35 s, 0.01 s control/sample, 0.0005 s physics, six independent 0-8 N ideal tensions, holding 0.30-0.35 s inclusive, position<=0.01 m and speed<=0.02 m/s) and frozen task-local-v2 protocol; single immutable nominal source 4053cb; declared speed weights and NMPC configuration otherwise frozen; ideal-tension sampled simulation only.",
+        "hypothesis": "A legal structural change to the near/distal1 geometry (lengths, section scales) can produce a new design that constructs a target equilibrium and is goal-based task-feasible under the frozen NMPC controller, selected by minimizing the bounded static target-equilibrium position residual at the target_equilibrium operating point.",
+        "interpretation": "Honest summary. (1) Mathematical structural search (problem 130a00a5..., objective target_equilibrium_residual at target_equilibrium, 6 evaluations, 5 structurally changed, termination evaluation_budget_exhausted): the proxy is saturated - nominal 1.5906e-9 m, best candidate 1.4170e-9 m, all feasible candidates 1.4-2.5e-9 m, far below the 1e-5 normalized-residual rule - so it cannot discriminate; near_length 0.164 gave 2.4588e-9 and two changes (near_length 0.156, and distal1 length-shortened variants) broke equilibrium construction (residuals 2.15e-3 and 9.83e-4 m, SLSQP iteration-limit). No material improvement exists in this subregion, so no better new design was established mathematically. (2) Actual structural-change evaluation: the model-selected candidate core-920577b4 (distal1_section_scale 1.025, lengths [0.16,0.11], baseline materials/routing; artifact f7d9033) passed one NMPC development episode (holding error 3.48e-3 m, holding speed 7.28e-3 m/s, terminal error 3.41e-3 m, 0 solver errors). (3) Confirmation: one fresh independent confirmation (ef33c5ca) is a valid failure solely on holding_speed 0.0474 m/s > 0.02 m/s (holding position 3.82e-3 m ok, terminal error 3.40e-3 m ok, force bounds ok, coverage ok, 0 solver errors). Because a required confirmation failed and the system refuses further confirmation (\"confirmation failed or invalid; inspect evidence, no automatic retry\"), the new structural design is NOT confirmed (confirmed=false, 1/2 confirmations, 1 failure) and no retry/success-hunting was performed. (4) RL: no run is recorded (empty training_summaries/runs/source_summary; status requires a recorded run id), so there is no usable published exact checkpoint and RL task acceptance is unmeasured - no impossible evaluation was requested. Limits: local proxies/finite Gramians/Jacobians are not design sensitivities; the passing development is not a confirmed design; nothing here establishes global optimality, structural superiority, robustness, hardware, real-time or material validity; frozen task thresholds and controller settings were not changed; historical/development evaluations do not count toward confirmation. Remaining requirement for a new confirmed design: a legal structural design plus frozen-controller route that holds tip speed <=0.02 m/s across two fresh independent confirmations; that design does not exist in the searched subregion, and the single plausible candidate failed the holding-speed criterion non-reproducibly.",
+        "mechanics": null,
+        "mechanics_source": null,
+        "next_step": "diagnose",
+        "parameters": null,
+        "search": null,
+        "selected_execution": null,
+        "stopping_condition": "Stop now: the declared proxy search is budget-exhausted and shows no better design; the one model-selected legal structural change passed development but failed a required fresh confirmation on holding speed; further confirmation is refused and repetition would be success-hunting; the milestone of a confirmed new design is not met and is reported as such.",
+        "supporting_evidence": [
+          {
+            "artifact_id": "006c00c9ce0d78893a6bf6a51e3493632cc4366eccd3e128d7138b42a27531a3",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "6c6a84f55b2c8fb56d668066a47f2579896d35ca57846827592d8263b8d05db9",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "6ba6e8035892c8a6b28f4894c179183f99f9fac09f37d1dbc40f40cd46ba3519",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "1c4a9ad67bd63e55b5a6a797ef125a60070b79d96d0b57646169cce1a6a4a77c",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "c14a19bcaca927e38994fb3b33f7818d8719588e24ea5d1fca5f211a7e128283",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "355698ecb45ab90825c9f6b87bdb8e8d950049fcef8017ca0a4e3bc52817689a",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "ef33c5ca5d73c9d886246cfcd73c7992a74d0ea432805122a7860b2c99026c3b",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "088d195cf94e64bb6e366830d783aae963f758f97d70a1c257599325aedaa415",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "0ba0eaf7f30661aaf89a84a0bf8579a35ab5c347abb22f56417c3e6a28465392",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "59be849aefe8f88de7db08085402bfbaff6cb4b0d63db46567b8e5f84977fda2",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "0ad883eef7c50a85287090d7132bb2b2295d1aeed3553d22d9ad4eb176687085",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "56ef3e018c78a5133a17aa922bde4026de4b6b6d5eb8afd64389415931e69c3b",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "03b8d69001cd4e67796a7438242ac4009e8e206f99a397e5b4cacc6fff2fee64",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "652e265dd12995c51d1a9d3231674cbed82525e3f6162efe864dd746c11c3408",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "f4428d849152b37b32863f0c587033a6ad7469f718f660f9f8a3c21162aa1f3c",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "8fdde60dba471717f38ab8051ab78afc8da8d69aeb0513c4a1ea388017bfad93",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "c0af0c4cc3e5217aab1937d8adb568c01266394ad8b1133b28f6d2db8a771d42",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "ba5fb2de7ba232d79123541f5ad1b976f2660b37153ba4d0038affe184f2a80e",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "dcb3ad8c12823c58022e9b2ad70e95d95ae389b1d6bbf7ea8cb5d4009d48a220",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "1346fcf65a830dc3a245cd8d38e7d239b156144dbf742c0570ef7c8d71ae3f9d",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "de50aabd729b327612b5868dee9ac8c661fbd3f5d0898351541b4e0683663342",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "3c0570fa56ac3ca0a58d24c4338a8aebd7c1879e460162e41eca1da2e7570dd2",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "53bf44f3008ffdf4c4281ea6a525125d885c46812689c341b70367ed33728877",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "0fe7af6e039862875140829d9756ce3b1e8507d81249a800bee3b263f8f4d5de",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "ab3a196bc7a5e99af36e93a6d5b7ba8bf175dc56cbe6730916f69d88d263c58d",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "f7d903300726c084df09d93792888e4d4028abbe60851190be55c1d4536eafb8",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "4053cb5af5c769175415f40cdfd03c886434b65a36a034810b1f89608b737384",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "76d6a8ef82b60136dae55db3abc90421facf157e3b9b8400eae367a7137fbf06",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "c83c1cb3193fb0fd1d37e708058729921f587b32f81d5787ec79db0d3d8d0244",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "4092ef2164b31b95919599d5a5bbf90c2c553c64e13683b4e438181cc2520452",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "f5537982ce949f892cbe0c269b90ac4a9f17ee66049f125835936d6fda8d41cb",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "7f4cec01e0576a79c9b9c1a5409dd2f792251280847afc24db8cddf7c0770a97",
+            "media_type": "application/json"
+          }
+        ],
+        "weakening_observation": "No legal structural candidate materially improves the saturated target-equilibrium residual proxy (nominal 1.59e-9 m vs best 1.42e-9 m, both far below the 1e-5 rule; two changes break equilibrium construction), and the single model-selected passing development fails a fresh independent confirmation on holding speed (0.0474 m/s > 0.02 m/s)."
+      },
+      "request_id": "native-call_00_WxbAQMaD0GgMI0JYDliL7201"
+    }
+  ],
+  "searches": [
+    {
+      "reference": {
+        "artifact_id": "1c4a9ad67bd63e55b5a6a797ef125a60070b79d96d0b57646169cce1a6a4a77c",
+        "media_type": "application/json"
+      },
+      "admission": {
+        "admitted": 6,
+        "confirmation_reserve_s": 7200,
+        "remaining_numerical_s": 16533.2313487001,
+        "requested": 6,
+        "reservation_s": 180
+      },
+      "result": {
+        "best_feasible": null,
+        "best_mathematical_candidate": {
+          "candidate_id": "core-920577b480f487bf114a0063fc44c0fa26e9afead97e23eb1422544ba1dd4d71",
+          "computation_status": "computed",
+          "constraint_outcomes": {
+            "individual_length_bounds": true,
+            "task_acceptance": "unmeasured"
+          },
+          "evaluation_kind": "mathematical_proxy",
+          "evidence": {
+            "analysis": {
+              "artifact_id": "088d195cf94e64bb6e366830d783aae963f758f97d70a1c257599325aedaa415",
+              "media_type": "application/json"
+            },
+            "candidate": {
+              "artifact_id": "f7d903300726c084df09d93792888e4d4028abbe60851190be55c1d4536eafb8",
+              "media_type": "application/json"
+            },
+            "limitations": [
+              "Local unconstrained frozen Jacobians; finite Gramians do not establish unilateral bounded-input feasibility.",
+              "Open-loop authority does not establish closed-loop stability, settling, or real-time execution.",
+              "Numerical agreement is implementation verification, not physical model validation.",
+              "Saved non-equilibrium frequency curves are frozen-Jacobian resolvents, not measured steady-state responses.",
+              "Local mathematics does not establish nonlinear backend acceptance, holding-window compliance, or design sensitivity."
+            ],
+            "model": null,
+            "operating_point": {
+              "actual_time_s": null,
+              "available": true,
+              "construction": {
+                "achieved_world_point_m": [
+                  0.290000001070587,
+                  0.03500000088060991,
+                  0.19000000029365804
+                ],
+                "computed_tensions_n": [
+                  3.009334257923974,
+                  3.890036732660616,
+                  0.36656598009627384,
+                  1.1779604924710163,
+                  0.25619143029770064,
+                  0.013640499672164809
+                ],
+                "execution_data_used": false,
+                "iterations": 16,
+                "maximum_iterations": 20,
+                "message": "Optimization terminated successfully",
+                "method": "single bounded-tension target-associated static SLSQP attempt; no recovery",
+                "position_limit_m": 0.01,
+                "position_residual_m": 1.4169916694112437e-09,
+                "q_bounds": "unbounded, matching existing GVS inverse-static authorization",
+                "requested_world_point_m": [
+                  0.29,
+                  0.035,
+                  0.19
+                ],
+                "solver": "scipy.optimize.SLSQP",
+                "static_force_tolerance": 1e-10,
+                "static_residual_inf": 3.95143986975377e-14,
+                "status": 0,
+                "success": true,
+                "tension_bounds_n": [
+                  [
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0
+                  ],
+                  [
+                    8.0,
+                    8.0,
+                    8.0,
+                    8.0,
+                    8.0,
+                    8.0
+                  ]
+                ]
+              },
+              "name": "target_equilibrium",
+              "phase": "configuration_target_static_equilibrium",
+              "remaining_task_s": 0.35,
+              "scope": "target-associated static attempt"
+            }
+          },
+          "execution_status": "analysis_only",
+          "feasible": false,
+          "latent_coordinates": {
+            "distal1_section_scale": 0.75,
+            "length/0": 0.5,
+            "length/1": 0.5,
+            "near_section_scale": 0.5
+          },
+          "local_model_constraints": {
+            "equilibrium_available": true,
+            "global_infeasibility_proven": false,
+            "position_residual_m": 1.4169916694112437e-09,
+            "static_residual_inf": 3.95143986975377e-14,
+            "status": "satisfied"
+          },
+          "objective_identity": "e46d9d9c570486ae2de4065dd922bbb85ecebd3f71fec17644b8e97bf4ce8893",
+          "objective_values": {
+            "target_equilibrium_residual": 1.4169916694112437e-09
+          },
+          "phase": "feedback_coordinate",
+          "resolved": {
+            "actuator_count": 6,
+            "parameters": {
+              "distal1_material": "baseline",
+              "distal1_routing_scale": 1.0,
+              "distal1_section_scale": 1.025,
+              "distal_tendons": 3,
+              "holding_tip_speed_weight": 0.1,
+              "lengths_m": [
+                0.16,
+                0.11
+              ],
+              "material": "baseline",
+              "near_material": "baseline",
+              "near_routing_scale": 1.0,
+              "near_section_scale": 1.0,
+              "pretension_n": 0.2,
+              "proximal_tendons": 3,
+              "routing_scale": 1.0,
+              "section_scale": 1.0,
+              "segment_count": 2,
+              "terminal_tip_speed_weight": 0.1
+            },
+            "segment_count": 2,
+            "tendon_count": 6
+          },
+          "scientific_identity": "920577b480f487bf114a0063fc44c0fa26e9afead97e23eb1422544ba1dd4d71",
+          "task_acceptance": "unmeasured",
+          "used_feedback": "core-0ba7d9e78d60acf7473553576c535ec85ef97c028d6f2d9d69821ca3e062fcbc"
+        },
+        "best_observed_infeasible": null,
+        "construction_rejections": [],
+        "contract": "research.design_optimization_result",
+        "evaluated": [
+          {
+            "candidate_id": "core-0ba7d9e78d60acf7473553576c535ec85ef97c028d6f2d9d69821ca3e062fcbc",
+            "computation_status": "computed",
+            "constraint_outcomes": {
+              "individual_length_bounds": true,
+              "task_acceptance": "unmeasured"
+            },
+            "evaluation_kind": "mathematical_proxy",
+            "evidence": {
+              "analysis": {
+                "artifact_id": "0ba0eaf7f30661aaf89a84a0bf8579a35ab5c347abb22f56417c3e6a28465392",
+                "media_type": "application/json"
+              },
+              "candidate": {
+                "artifact_id": "4053cb5af5c769175415f40cdfd03c886434b65a36a034810b1f89608b737384",
+                "media_type": "application/json"
+              },
+              "limitations": [
+                "Local unconstrained frozen Jacobians; finite Gramians do not establish unilateral bounded-input feasibility.",
+                "Open-loop authority does not establish closed-loop stability, settling, or real-time execution.",
+                "Numerical agreement is implementation verification, not physical model validation.",
+                "Saved non-equilibrium frequency curves are frozen-Jacobian resolvents, not measured steady-state responses.",
+                "Local mathematics does not establish nonlinear backend acceptance, holding-window compliance, or design sensitivity."
+              ],
+              "model": null,
+              "operating_point": {
+                "actual_time_s": null,
+                "available": true,
+                "construction": {
+                  "achieved_world_point_m": [
+                    0.29000000158311595,
+                    0.03500000010862158,
+                    0.19000000010994994
+                  ],
+                  "computed_tensions_n": [
+                    3.0466328604504365,
+                    3.9111562199736065,
+                    0.37786877050234313,
+                    1.1107751879749994,
+                    0.23877489176694314,
+                    0.013175562211173622
+                  ],
+                  "execution_data_used": false,
+                  "iterations": 16,
+                  "maximum_iterations": 20,
+                  "message": "Optimization terminated successfully",
+                  "method": "single bounded-tension target-associated static SLSQP attempt; no recovery",
+                  "position_limit_m": 0.01,
+                  "position_residual_m": 1.5906425794490147e-09,
+                  "q_bounds": "unbounded, matching existing GVS inverse-static authorization",
+                  "requested_world_point_m": [
+                    0.29,
+                    0.035,
+                    0.19
+                  ],
+                  "solver": "scipy.optimize.SLSQP",
+                  "static_force_tolerance": 1e-10,
+                  "static_residual_inf": 2.121133130250641e-15,
+                  "status": 0,
+                  "success": true,
+                  "tension_bounds_n": [
+                    [
+                      0.0,
+                      0.0,
+                      0.0,
+                      0.0,
+                      0.0,
+                      0.0
+                    ],
+                    [
+                      8.0,
+                      8.0,
+                      8.0,
+                      8.0,
+                      8.0,
+                      8.0
+                    ]
+                  ]
+                },
+                "name": "target_equilibrium",
+                "phase": "configuration_target_static_equilibrium",
+                "remaining_task_s": 0.35,
+                "scope": "target-associated static attempt"
+              }
+            },
+            "execution_status": "analysis_only",
+            "feasible": false,
+            "latent_coordinates": {
+              "distal1_section_scale": 0.5,
+              "length/0": 0.5,
+              "length/1": 0.5,
+              "near_section_scale": 0.5
+            },
+            "local_model_constraints": {
+              "equilibrium_available": true,
+              "global_infeasibility_proven": false,
+              "position_residual_m": 1.5906425794490147e-09,
+              "static_residual_inf": 2.121133130250641e-15,
+              "status": "satisfied"
+            },
+            "objective_identity": "e46d9d9c570486ae2de4065dd922bbb85ecebd3f71fec17644b8e97bf4ce8893",
+            "objective_values": {
+              "target_equilibrium_residual": 1.5906425794490147e-09
+            },
+            "phase": "structural_initialization",
+            "resolved": {
+              "actuator_count": 6,
+              "parameters": {
+                "distal1_material": "baseline",
+                "distal1_routing_scale": 1.0,
+                "distal1_section_scale": 1.0,
+                "distal_tendons": 3,
+                "holding_tip_speed_weight": 0.1,
+                "lengths_m": [
+                  0.16,
+                  0.11
+                ],
+                "material": "baseline",
+                "near_material": "baseline",
+                "near_routing_scale": 1.0,
+                "near_section_scale": 1.0,
+                "pretension_n": 0.2,
+                "proximal_tendons": 3,
+                "routing_scale": 1.0,
+                "section_scale": 1.0,
+                "segment_count": 2,
+                "terminal_tip_speed_weight": 0.1
+              },
+              "segment_count": 2,
+              "tendon_count": 6
+            },
+            "scientific_identity": "0ba7d9e78d60acf7473553576c535ec85ef97c028d6f2d9d69821ca3e062fcbc",
+            "task_acceptance": "unmeasured",
+            "used_feedback": null
+          },
+          {
+            "candidate_id": "core-2e04ab18a43b3b8463ed3a00956fe6a5225173f8771043f0a4240dfac0324b9c",
+            "computation_status": "computed",
+            "constraint_outcomes": {
+              "individual_length_bounds": true,
+              "task_acceptance": "unmeasured"
+            },
+            "evaluation_kind": "mathematical_proxy",
+            "evidence": {
+              "analysis": {
+                "artifact_id": "59be849aefe8f88de7db08085402bfbaff6cb4b0d63db46567b8e5f84977fda2",
+                "media_type": "application/json"
+              },
+              "candidate": {
+                "artifact_id": "76d6a8ef82b60136dae55db3abc90421facf157e3b9b8400eae367a7137fbf06",
+                "media_type": "application/json"
+              },
+              "limitations": [
+                "Local unconstrained frozen Jacobians; finite Gramians do not establish unilateral bounded-input feasibility.",
+                "Open-loop authority does not establish closed-loop stability, settling, or real-time execution.",
+                "Numerical agreement is implementation verification, not physical model validation.",
+                "Saved non-equilibrium frequency curves are frozen-Jacobian resolvents, not measured steady-state responses.",
+                "Local mathematics does not establish nonlinear backend acceptance, holding-window compliance, or design sensitivity."
+              ],
+              "model": null,
+              "operating_point": {
+                "actual_time_s": null,
+                "available": true,
+                "construction": {
+                  "achieved_world_point_m": [
+                    0.2900000024463898,
+                    0.035000000207482604,
+                    0.19000000013369964
+                  ],
+                  "computed_tensions_n": [
+                    2.747381999660959,
+                    4.70041666032138,
+                    2.0542474931702257,
+                    1.832668511998074,
+                    0.3034609378918554,
+                    0.1520611967889238
+                  ],
+                  "execution_data_used": false,
+                  "iterations": 16,
+                  "maximum_iterations": 20,
+                  "message": "Optimization terminated successfully",
+                  "method": "single bounded-tension target-associated static SLSQP attempt; no recovery",
+                  "position_limit_m": 0.01,
+                  "position_residual_m": 2.458810228290805e-09,
+                  "q_bounds": "unbounded, matching existing GVS inverse-static authorization",
+                  "requested_world_point_m": [
+                    0.29,
+                    0.035,
+                    0.19
+                  ],
+                  "solver": "scipy.optimize.SLSQP",
+                  "static_force_tolerance": 1e-10,
+                  "static_residual_inf": 3.4932993997482953e-16,
+                  "status": 0,
+                  "success": true,
+                  "tension_bounds_n": [
+                    [
+                      0.0,
+                      0.0,
+                      0.0,
+                      0.0,
+                      0.0,
+                      0.0
+                    ],
+                    [
+                      8.0,
+                      8.0,
+                      8.0,
+                      8.0,
+                      8.0,
+                      8.0
+                    ]
+                  ]
+                },
+                "name": "target_equilibrium",
+                "phase": "configuration_target_static_equilibrium",
+                "remaining_task_s": 0.35,
+                "scope": "target-associated static attempt"
+              }
+            },
+            "execution_status": "analysis_only",
+            "feasible": false,
+            "latent_coordinates": {
+              "distal1_section_scale": 0.5,
+              "length/0": 0.75,
+              "length/1": 0.5,
+              "near_section_scale": 0.5
+            },
+            "local_model_constraints": {
+              "equilibrium_available": true,
+              "global_infeasibility_proven": false,
+              "position_residual_m": 2.458810228290805e-09,
+              "static_residual_inf": 3.4932993997482953e-16,
+              "status": "satisfied"
+            },
+            "objective_identity": "e46d9d9c570486ae2de4065dd922bbb85ecebd3f71fec17644b8e97bf4ce8893",
+            "objective_values": {
+              "target_equilibrium_residual": 2.458810228290805e-09
+            },
+            "phase": "feedback_coordinate",
+            "resolved": {
+              "actuator_count": 6,
+              "parameters": {
+                "distal1_material": "baseline",
+                "distal1_routing_scale": 1.0,
+                "distal1_section_scale": 1.0,
+                "distal_tendons": 3,
+                "holding_tip_speed_weight": 0.1,
+                "lengths_m": [
+                  0.164,
+                  0.11
+                ],
+                "material": "baseline",
+                "near_material": "baseline",
+                "near_routing_scale": 1.0,
+                "near_section_scale": 1.0,
+                "pretension_n": 0.2,
+                "proximal_tendons": 3,
+                "routing_scale": 1.0,
+                "section_scale": 1.0,
+                "segment_count": 2,
+                "terminal_tip_speed_weight": 0.1
+              },
+              "segment_count": 2,
+              "tendon_count": 6
+            },
+            "scientific_identity": "2e04ab18a43b3b8463ed3a00956fe6a5225173f8771043f0a4240dfac0324b9c",
+            "task_acceptance": "unmeasured",
+            "used_feedback": "core-0ba7d9e78d60acf7473553576c535ec85ef97c028d6f2d9d69821ca3e062fcbc"
+          },
+          {
+            "candidate_id": "core-e273593c0ce572f678289d4ee4a7c38d3da610b3581a5ecf0c67998fad1a9271",
+            "computation_status": "computed",
+            "constraint_outcomes": {
+              "individual_length_bounds": true,
+              "task_acceptance": "unmeasured"
+            },
+            "evaluation_kind": "mathematical_proxy",
+            "evidence": {
+              "analysis": {
+                "artifact_id": "0ad883eef7c50a85287090d7132bb2b2295d1aeed3553d22d9ad4eb176687085",
+                "media_type": "application/json"
+              },
+              "candidate": {
+                "artifact_id": "4092ef2164b31b95919599d5a5bbf90c2c553c64e13683b4e438181cc2520452",
+                "media_type": "application/json"
+              },
+              "limitations": [
+                "Local unconstrained frozen Jacobians; finite Gramians do not establish unilateral bounded-input feasibility.",
+                "Open-loop authority does not establish closed-loop stability, settling, or real-time execution.",
+                "Numerical agreement is implementation verification, not physical model validation.",
+                "Saved non-equilibrium frequency curves are frozen-Jacobian resolvents, not measured steady-state responses.",
+                "Local mathematics does not establish nonlinear backend acceptance, holding-window compliance, or design sensitivity."
+              ],
+              "model": null,
+              "operating_point": {
+                "construction": {
+                  "achieved_world_point_m": [
+                    0.2878981706467313,
+                    0.03470896572945435,
+                    0.18963390407485203
+                  ],
+                  "computed_tensions_n": [
+                    5.127158335290159,
+                    4.5722757015784845,
+                    0.0,
+                    0.2740546330256895,
+                    0.35782950361656146,
+                    0.031474536061223794
+                  ],
+                  "execution_data_used": false,
+                  "iterations": 20,
+                  "maximum_iterations": 20,
+                  "message": "Iteration limit reached",
+                  "method": "single bounded-tension target-associated static SLSQP attempt; no recovery",
+                  "position_limit_m": 0.01,
+                  "position_residual_m": 0.002153233336938631,
+                  "q_bounds": "unbounded, matching existing GVS inverse-static authorization",
+                  "requested_world_point_m": [
+                    0.29,
+                    0.035,
+                    0.19
+                  ],
+                  "solver": "scipy.optimize.SLSQP",
+                  "static_force_tolerance": 1e-10,
+                  "static_residual_inf": 1.0938924489134602e-07,
+                  "status": 9,
+                  "success": false,
+                  "tension_bounds_n": [
+                    [
+                      0.0,
+                      0.0,
+                      0.0,
+                      0.0,
+                      0.0,
+                      0.0
+                    ],
+                    [
+                      8.0,
+                      8.0,
+                      8.0,
+                      8.0,
+                      8.0,
+                      8.0
+                    ]
+                  ]
+                },
+                "name": "target_equilibrium"
+              }
+            },
+            "execution_status": "analysis_only",
+            "feasible": false,
+            "latent_coordinates": {
+              "distal1_section_scale": 0.5,
+              "length/0": 0.25,
+              "length/1": 0.5,
+              "near_section_scale": 0.5
+            },
+            "local_model_constraints": {
+              "equilibrium_available": false,
+              "global_infeasibility_proven": false,
+              "position_residual_m": 0.002153233336938631,
+              "static_residual_inf": 1.0938924489134602e-07,
+              "status": "unsatisfied_in_this_attempt"
+            },
+            "objective_identity": "e46d9d9c570486ae2de4065dd922bbb85ecebd3f71fec17644b8e97bf4ce8893",
+            "objective_values": {
+              "target_equilibrium_residual": 0.002153233336938631
+            },
+            "phase": "feedback_coordinate",
+            "resolved": {
+              "actuator_count": 6,
+              "parameters": {
+                "distal1_material": "baseline",
+                "distal1_routing_scale": 1.0,
+                "distal1_section_scale": 1.0,
+                "distal_tendons": 3,
+                "holding_tip_speed_weight": 0.1,
+                "lengths_m": [
+                  0.156,
+                  0.11
+                ],
+                "material": "baseline",
+                "near_material": "baseline",
+                "near_routing_scale": 1.0,
+                "near_section_scale": 1.0,
+                "pretension_n": 0.2,
+                "proximal_tendons": 3,
+                "routing_scale": 1.0,
+                "section_scale": 1.0,
+                "segment_count": 2,
+                "terminal_tip_speed_weight": 0.1
+              },
+              "segment_count": 2,
+              "tendon_count": 6
+            },
+            "scientific_identity": "e273593c0ce572f678289d4ee4a7c38d3da610b3581a5ecf0c67998fad1a9271",
+            "task_acceptance": "unmeasured",
+            "used_feedback": "core-0ba7d9e78d60acf7473553576c535ec85ef97c028d6f2d9d69821ca3e062fcbc"
+          },
+          {
+            "candidate_id": "core-9bedebd1914c09bdc0a5baf7062c9b5d7d34a9db377863d808b19e1fab78de42",
+            "computation_status": "computed",
+            "constraint_outcomes": {
+              "individual_length_bounds": true,
+              "task_acceptance": "unmeasured"
+            },
+            "evaluation_kind": "mathematical_proxy",
+            "evidence": {
+              "analysis": {
+                "artifact_id": "56ef3e018c78a5133a17aa922bde4026de4b6b6d5eb8afd64389415931e69c3b",
+                "media_type": "application/json"
+              },
+              "candidate": {
+                "artifact_id": "c83c1cb3193fb0fd1d37e708058729921f587b32f81d5787ec79db0d3d8d0244",
+                "media_type": "application/json"
+              },
+              "limitations": [
+                "Local unconstrained frozen Jacobians; finite Gramians do not establish unilateral bounded-input feasibility.",
+                "Open-loop authority does not establish closed-loop stability, settling, or real-time execution.",
+                "Numerical agreement is implementation verification, not physical model validation.",
+                "Saved non-equilibrium frequency curves are frozen-Jacobian resolvents, not measured steady-state responses.",
+                "Local mathematics does not establish nonlinear backend acceptance, holding-window compliance, or design sensitivity."
+              ],
+              "model": null,
+              "operating_point": {
+                "actual_time_s": null,
+                "available": true,
+                "construction": {
+                  "achieved_world_point_m": [
+                    0.2900000018783802,
+                    0.035000000030771604,
+                    0.19000000032972314
+                  ],
+                  "computed_tensions_n": [
+                    2.740275458492249,
+                    4.42406204357273,
+                    1.5698860042673568,
+                    1.6650114056831096,
+                    0.312651097011514,
+                    0.13384962806012032
+                  ],
+                  "execution_data_used": false,
+                  "iterations": 16,
+                  "maximum_iterations": 20,
+                  "message": "Optimization terminated successfully",
+                  "method": "single bounded-tension target-associated static SLSQP attempt; no recovery",
+                  "position_limit_m": 0.01,
+                  "position_residual_m": 1.907348034348869e-09,
+                  "q_bounds": "unbounded, matching existing GVS inverse-static authorization",
+                  "requested_world_point_m": [
+                    0.29,
+                    0.035,
+                    0.19
+                  ],
+                  "solver": "scipy.optimize.SLSQP",
+                  "static_force_tolerance": 1e-10,
+                  "static_residual_inf": 1.0473392986209973e-16,
+                  "status": 0,
+                  "success": true,
+                  "tension_bounds_n": [
+                    [
+                      0.0,
+                      0.0,
+                      0.0,
+                      0.0,
+                      0.0,
+                      0.0
+                    ],
+                    [
+                      8.0,
+                      8.0,
+                      8.0,
+                      8.0,
+                      8.0,
+                      8.0
+                    ]
+                  ]
+                },
+                "name": "target_equilibrium",
+                "phase": "configuration_target_static_equilibrium",
+                "remaining_task_s": 0.35,
+                "scope": "target-associated static attempt"
+              }
+            },
+            "execution_status": "analysis_only",
+            "feasible": false,
+            "latent_coordinates": {
+              "distal1_section_scale": 0.5,
+              "length/0": 0.5,
+              "length/1": 0.75,
+              "near_section_scale": 0.5
+            },
+            "local_model_constraints": {
+              "equilibrium_available": true,
+              "global_infeasibility_proven": false,
+              "position_residual_m": 1.907348034348869e-09,
+              "static_residual_inf": 1.0473392986209973e-16,
+              "status": "satisfied"
+            },
+            "objective_identity": "e46d9d9c570486ae2de4065dd922bbb85ecebd3f71fec17644b8e97bf4ce8893",
+            "objective_values": {
+              "target_equilibrium_residual": 1.907348034348869e-09
+            },
+            "phase": "feedback_coordinate",
+            "resolved": {
+              "actuator_count": 6,
+              "parameters": {
+                "distal1_material": "baseline",
+                "distal1_routing_scale": 1.0,
+                "distal1_section_scale": 1.0,
+                "distal_tendons": 3,
+                "holding_tip_speed_weight": 0.1,
+                "lengths_m": [
+                  0.16,
+                  0.11275
+                ],
+                "material": "baseline",
+                "near_material": "baseline",
+                "near_routing_scale": 1.0,
+                "near_section_scale": 1.0,
+                "pretension_n": 0.2,
+                "proximal_tendons": 3,
+                "routing_scale": 1.0,
+                "section_scale": 1.0,
+                "segment_count": 2,
+                "terminal_tip_speed_weight": 0.1
+              },
+              "segment_count": 2,
+              "tendon_count": 6
+            },
+            "scientific_identity": "9bedebd1914c09bdc0a5baf7062c9b5d7d34a9db377863d808b19e1fab78de42",
+            "task_acceptance": "unmeasured",
+            "used_feedback": "core-0ba7d9e78d60acf7473553576c535ec85ef97c028d6f2d9d69821ca3e062fcbc"
+          },
+          {
+            "candidate_id": "core-0f3564546aec826e3135c087452d196614fa074a265f15817e591b76d5717c3f",
+            "computation_status": "computed",
+            "constraint_outcomes": {
+              "individual_length_bounds": true,
+              "task_acceptance": "unmeasured"
+            },
+            "evaluation_kind": "mathematical_proxy",
+            "evidence": {
+              "analysis": {
+                "artifact_id": "03b8d69001cd4e67796a7438242ac4009e8e206f99a397e5b4cacc6fff2fee64",
+                "media_type": "application/json"
+              },
+              "candidate": {
+                "artifact_id": "f5537982ce949f892cbe0c269b90ac4a9f17ee66049f125835936d6fda8d41cb",
+                "media_type": "application/json"
+              },
+              "limitations": [
+                "Local unconstrained frozen Jacobians; finite Gramians do not establish unilateral bounded-input feasibility.",
+                "Open-loop authority does not establish closed-loop stability, settling, or real-time execution.",
+                "Numerical agreement is implementation verification, not physical model validation.",
+                "Saved non-equilibrium frequency curves are frozen-Jacobian resolvents, not measured steady-state responses.",
+                "Local mathematics does not establish nonlinear backend acceptance, holding-window compliance, or design sensitivity."
+              ],
+              "model": null,
+              "operating_point": {
+                "construction": {
+                  "achieved_world_point_m": [
+                    0.28904973825020636,
+                    0.034820886500071355,
+                    0.18982535229995115
+                  ],
+                  "computed_tensions_n": [
+                    5.126614107299394,
+                    4.658784136576599,
+                    0.0,
+                    0.20872646176343093,
+                    0.30587415602671386,
+                    0.03305958629535877
+                  ],
+                  "execution_data_used": false,
+                  "iterations": 20,
+                  "maximum_iterations": 20,
+                  "message": "Iteration limit reached",
+                  "method": "single bounded-tension target-associated static SLSQP attempt; no recovery",
+                  "position_limit_m": 0.01,
+                  "position_residual_m": 0.0009826397397367378,
+                  "q_bounds": "unbounded, matching existing GVS inverse-static authorization",
+                  "requested_world_point_m": [
+                    0.29,
+                    0.035,
+                    0.19
+                  ],
+                  "solver": "scipy.optimize.SLSQP",
+                  "static_force_tolerance": 1e-10,
+                  "static_residual_inf": 4.800202840345657e-08,
+                  "status": 9,
+                  "success": false,
+                  "tension_bounds_n": [
+                    [
+                      0.0,
+                      0.0,
+                      0.0,
+                      0.0,
+                      0.0,
+                      0.0
+                    ],
+                    [
+                      8.0,
+                      8.0,
+                      8.0,
+                      8.0,
+                      8.0,
+                      8.0
+                    ]
+                  ]
+                },
+                "name": "target_equilibrium"
+              }
+            },
+            "execution_status": "analysis_only",
+            "feasible": false,
+            "latent_coordinates": {
+              "distal1_section_scale": 0.5,
+              "length/0": 0.5,
+              "length/1": 0.25,
+              "near_section_scale": 0.5
+            },
+            "local_model_constraints": {
+              "equilibrium_available": false,
+              "global_infeasibility_proven": false,
+              "position_residual_m": 0.0009826397397367378,
+              "static_residual_inf": 4.800202840345657e-08,
+              "status": "unsatisfied_in_this_attempt"
+            },
+            "objective_identity": "e46d9d9c570486ae2de4065dd922bbb85ecebd3f71fec17644b8e97bf4ce8893",
+            "objective_values": {
+              "target_equilibrium_residual": 0.0009826397397367378
+            },
+            "phase": "feedback_coordinate",
+            "resolved": {
+              "actuator_count": 6,
+              "parameters": {
+                "distal1_material": "baseline",
+                "distal1_routing_scale": 1.0,
+                "distal1_section_scale": 1.0,
+                "distal_tendons": 3,
+                "holding_tip_speed_weight": 0.1,
+                "lengths_m": [
+                  0.16,
+                  0.10725
+                ],
+                "material": "baseline",
+                "near_material": "baseline",
+                "near_routing_scale": 1.0,
+                "near_section_scale": 1.0,
+                "pretension_n": 0.2,
+                "proximal_tendons": 3,
+                "routing_scale": 1.0,
+                "section_scale": 1.0,
+                "segment_count": 2,
+                "terminal_tip_speed_weight": 0.1
+              },
+              "segment_count": 2,
+              "tendon_count": 6
+            },
+            "scientific_identity": "0f3564546aec826e3135c087452d196614fa074a265f15817e591b76d5717c3f",
+            "task_acceptance": "unmeasured",
+            "used_feedback": "core-0ba7d9e78d60acf7473553576c535ec85ef97c028d6f2d9d69821ca3e062fcbc"
+          },
+          {
+            "candidate_id": "core-920577b480f487bf114a0063fc44c0fa26e9afead97e23eb1422544ba1dd4d71",
+            "computation_status": "computed",
+            "constraint_outcomes": {
+              "individual_length_bounds": true,
+              "task_acceptance": "unmeasured"
+            },
+            "evaluation_kind": "mathematical_proxy",
+            "evidence": {
+              "analysis": {
+                "artifact_id": "088d195cf94e64bb6e366830d783aae963f758f97d70a1c257599325aedaa415",
+                "media_type": "application/json"
+              },
+              "candidate": {
+                "artifact_id": "f7d903300726c084df09d93792888e4d4028abbe60851190be55c1d4536eafb8",
+                "media_type": "application/json"
+              },
+              "limitations": [
+                "Local unconstrained frozen Jacobians; finite Gramians do not establish unilateral bounded-input feasibility.",
+                "Open-loop authority does not establish closed-loop stability, settling, or real-time execution.",
+                "Numerical agreement is implementation verification, not physical model validation.",
+                "Saved non-equilibrium frequency curves are frozen-Jacobian resolvents, not measured steady-state responses.",
+                "Local mathematics does not establish nonlinear backend acceptance, holding-window compliance, or design sensitivity."
+              ],
+              "model": null,
+              "operating_point": {
+                "actual_time_s": null,
+                "available": true,
+                "construction": {
+                  "achieved_world_point_m": [
+                    0.290000001070587,
+                    0.03500000088060991,
+                    0.19000000029365804
+                  ],
+                  "computed_tensions_n": [
+                    3.009334257923974,
+                    3.890036732660616,
+                    0.36656598009627384,
+                    1.1779604924710163,
+                    0.25619143029770064,
+                    0.013640499672164809
+                  ],
+                  "execution_data_used": false,
+                  "iterations": 16,
+                  "maximum_iterations": 20,
+                  "message": "Optimization terminated successfully",
+                  "method": "single bounded-tension target-associated static SLSQP attempt; no recovery",
+                  "position_limit_m": 0.01,
+                  "position_residual_m": 1.4169916694112437e-09,
+                  "q_bounds": "unbounded, matching existing GVS inverse-static authorization",
+                  "requested_world_point_m": [
+                    0.29,
+                    0.035,
+                    0.19
+                  ],
+                  "solver": "scipy.optimize.SLSQP",
+                  "static_force_tolerance": 1e-10,
+                  "static_residual_inf": 3.95143986975377e-14,
+                  "status": 0,
+                  "success": true,
+                  "tension_bounds_n": [
+                    [
+                      0.0,
+                      0.0,
+                      0.0,
+                      0.0,
+                      0.0,
+                      0.0
+                    ],
+                    [
+                      8.0,
+                      8.0,
+                      8.0,
+                      8.0,
+                      8.0,
+                      8.0
+                    ]
+                  ]
+                },
+                "name": "target_equilibrium",
+                "phase": "configuration_target_static_equilibrium",
+                "remaining_task_s": 0.35,
+                "scope": "target-associated static attempt"
+              }
+            },
+            "execution_status": "analysis_only",
+            "feasible": false,
+            "latent_coordinates": {
+              "distal1_section_scale": 0.75,
+              "length/0": 0.5,
+              "length/1": 0.5,
+              "near_section_scale": 0.5
+            },
+            "local_model_constraints": {
+              "equilibrium_available": true,
+              "global_infeasibility_proven": false,
+              "position_residual_m": 1.4169916694112437e-09,
+              "static_residual_inf": 3.95143986975377e-14,
+              "status": "satisfied"
+            },
+            "objective_identity": "e46d9d9c570486ae2de4065dd922bbb85ecebd3f71fec17644b8e97bf4ce8893",
+            "objective_values": {
+              "target_equilibrium_residual": 1.4169916694112437e-09
+            },
+            "phase": "feedback_coordinate",
+            "resolved": {
+              "actuator_count": 6,
+              "parameters": {
+                "distal1_material": "baseline",
+                "distal1_routing_scale": 1.0,
+                "distal1_section_scale": 1.025,
+                "distal_tendons": 3,
+                "holding_tip_speed_weight": 0.1,
+                "lengths_m": [
+                  0.16,
+                  0.11
+                ],
+                "material": "baseline",
+                "near_material": "baseline",
+                "near_routing_scale": 1.0,
+                "near_section_scale": 1.0,
+                "pretension_n": 0.2,
+                "proximal_tendons": 3,
+                "routing_scale": 1.0,
+                "section_scale": 1.0,
+                "segment_count": 2,
+                "terminal_tip_speed_weight": 0.1
+              },
+              "segment_count": 2,
+              "tendon_count": 6
+            },
+            "scientific_identity": "920577b480f487bf114a0063fc44c0fa26e9afead97e23eb1422544ba1dd4d71",
+            "task_acceptance": "unmeasured",
+            "used_feedback": "core-0ba7d9e78d60acf7473553576c535ec85ef97c028d6f2d9d69821ca3e062fcbc"
+          }
+        ],
+        "problem_identity": "130a00a5fb66c3226a9fd418c88bfd9d40a70c58df9b490ed5849c04b6354764",
+        "resource_use": {
+          "elapsed_s": 78.89214777946472,
+          "new_evaluated_designs": 6
+        },
+        "search_state": {
+          "artifact_id": "c14a19bcaca927e38994fb3b33f7818d8719588e24ea5d1fca5f211a7e128283",
+          "media_type": "application/json"
+        },
+        "search_updates": [
+          {
+            "candidate_id": "core-0ba7d9e78d60acf7473553576c535ec85ef97c028d6f2d9d69821ca3e062fcbc",
+            "incumbent_after": "core-0ba7d9e78d60acf7473553576c535ec85ef97c028d6f2d9d69821ca3e062fcbc",
+            "incumbent_before": null,
+            "objective": {
+              "target_equilibrium_residual": 1.5906425794490147e-09
+            },
+            "phase": "structural_initialization",
+            "used_feedback": null
+          },
+          {
+            "candidate_id": "core-2e04ab18a43b3b8463ed3a00956fe6a5225173f8771043f0a4240dfac0324b9c",
+            "incumbent_after": "core-0ba7d9e78d60acf7473553576c535ec85ef97c028d6f2d9d69821ca3e062fcbc",
+            "incumbent_before": "core-0ba7d9e78d60acf7473553576c535ec85ef97c028d6f2d9d69821ca3e062fcbc",
+            "objective": {
+              "target_equilibrium_residual": 2.458810228290805e-09
+            },
+            "phase": "feedback_coordinate",
+            "used_feedback": "core-0ba7d9e78d60acf7473553576c535ec85ef97c028d6f2d9d69821ca3e062fcbc"
+          },
+          {
+            "candidate_id": "core-e273593c0ce572f678289d4ee4a7c38d3da610b3581a5ecf0c67998fad1a9271",
+            "incumbent_after": "core-0ba7d9e78d60acf7473553576c535ec85ef97c028d6f2d9d69821ca3e062fcbc",
+            "incumbent_before": "core-0ba7d9e78d60acf7473553576c535ec85ef97c028d6f2d9d69821ca3e062fcbc",
+            "objective": {
+              "target_equilibrium_residual": 0.002153233336938631
+            },
+            "phase": "feedback_coordinate",
+            "used_feedback": "core-0ba7d9e78d60acf7473553576c535ec85ef97c028d6f2d9d69821ca3e062fcbc"
+          },
+          {
+            "candidate_id": "core-9bedebd1914c09bdc0a5baf7062c9b5d7d34a9db377863d808b19e1fab78de42",
+            "incumbent_after": "core-0ba7d9e78d60acf7473553576c535ec85ef97c028d6f2d9d69821ca3e062fcbc",
+            "incumbent_before": "core-0ba7d9e78d60acf7473553576c535ec85ef97c028d6f2d9d69821ca3e062fcbc",
+            "objective": {
+              "target_equilibrium_residual": 1.907348034348869e-09
+            },
+            "phase": "feedback_coordinate",
+            "used_feedback": "core-0ba7d9e78d60acf7473553576c535ec85ef97c028d6f2d9d69821ca3e062fcbc"
+          },
+          {
+            "candidate_id": "core-0f3564546aec826e3135c087452d196614fa074a265f15817e591b76d5717c3f",
+            "incumbent_after": "core-0ba7d9e78d60acf7473553576c535ec85ef97c028d6f2d9d69821ca3e062fcbc",
+            "incumbent_before": "core-0ba7d9e78d60acf7473553576c535ec85ef97c028d6f2d9d69821ca3e062fcbc",
+            "objective": {
+              "target_equilibrium_residual": 0.0009826397397367378
+            },
+            "phase": "feedback_coordinate",
+            "used_feedback": "core-0ba7d9e78d60acf7473553576c535ec85ef97c028d6f2d9d69821ca3e062fcbc"
+          },
+          {
+            "candidate_id": "core-920577b480f487bf114a0063fc44c0fa26e9afead97e23eb1422544ba1dd4d71",
+            "incumbent_after": "core-920577b480f487bf114a0063fc44c0fa26e9afead97e23eb1422544ba1dd4d71",
+            "incumbent_before": "core-0ba7d9e78d60acf7473553576c535ec85ef97c028d6f2d9d69821ca3e062fcbc",
+            "objective": {
+              "target_equilibrium_residual": 1.4169916694112437e-09
+            },
+            "phase": "feedback_coordinate",
+            "used_feedback": "core-0ba7d9e78d60acf7473553576c535ec85ef97c028d6f2d9d69821ca3e062fcbc"
+          }
+        ],
+        "status": "best_mathematical_candidate",
+        "termination_reason": "evaluation_budget_exhausted",
+        "unsearched_scope": {
+          "global_feasibility_proven": false,
+          "global_optimality_proven": false,
+          "task_acceptance": "unmeasured"
+        },
+        "version": "1.0.0"
+      },
+      "structurally_changed_evaluations": 5
+    }
+  ],
+  "mathematical_results": [
+    {
+      "reference": {
+        "artifact_id": "652e265dd12995c51d1a9d3231674cbed82525e3f6162efe864dd746c11c3408",
+        "media_type": "application/json"
+      },
+      "candidate": {
+        "artifact_id": "53b5e378d07426b75c84465749183cf4f4f9fb59abc4076c9c7fc6553121e062",
+        "media_type": "application/json"
+      },
+      "operation": "controllability",
+      "origin": "engineering_preflight",
+      "status": "unavailable",
+      "proxy_values": {},
+      "local_model_constraints": {
+        "status": "unmeasured"
+      },
+      "charged_numerical_s": 3.3280639000004157,
+      "internal_calculations": [
+        {
+          "function_evaluations": 20,
+          "iterations": null,
+          "purpose": "operating_point_construction",
+          "solver": "scipy.optimize.least_squares",
+          "status": 0
+        }
+      ]
+    },
+    {
+      "reference": {
+        "artifact_id": "f4428d849152b37b32863f0c587033a6ad7469f718f660f9f8a3c21162aa1f3c",
+        "media_type": "application/json"
+      },
+      "candidate": {
+        "artifact_id": "53b5e378d07426b75c84465749183cf4f4f9fb59abc4076c9c7fc6553121e062",
+        "media_type": "application/json"
+      },
+      "operation": "equilibrium",
+      "origin": "engineering_preflight",
+      "status": "computed",
+      "proxy_values": {
+        "target_equilibrium_residual": 4.067030853488829e-09
+      },
+      "local_model_constraints": {
+        "equilibrium_available": true,
+        "global_infeasibility_proven": false,
+        "position_residual_m": 4.067030853488829e-09,
+        "static_residual_inf": 5.2258327873366817e-14,
+        "status": "satisfied"
+      },
+      "charged_numerical_s": 12.194069199962541,
+      "internal_calculations": [
+        {
+          "function_evaluations": null,
+          "iterations": 15,
+          "purpose": "operating_point_construction",
+          "solver": "scipy.optimize.SLSQP",
+          "status": 0
+        }
+      ]
+    },
+    {
+      "reference": {
+        "artifact_id": "8fdde60dba471717f38ab8051ab78afc8da8d69aeb0513c4a1ea388017bfad93",
+        "media_type": "application/json"
+      },
+      "candidate": {
+        "artifact_id": "53b5e378d07426b75c84465749183cf4f4f9fb59abc4076c9c7fc6553121e062",
+        "media_type": "application/json"
+      },
+      "operation": "endpoint",
+      "origin": "engineering_preflight",
+      "status": "unavailable",
+      "proxy_values": {},
+      "local_model_constraints": {
+        "status": "unmeasured"
+      },
+      "charged_numerical_s": 3.3585520000196993,
+      "internal_calculations": [
+        {
+          "function_evaluations": 20,
+          "iterations": null,
+          "purpose": "operating_point_construction",
+          "solver": "scipy.optimize.least_squares",
+          "status": 0
+        }
+      ]
+    },
+    {
+      "reference": {
+        "artifact_id": "c0af0c4cc3e5217aab1937d8adb568c01266394ad8b1133b28f6d2db8a771d42",
+        "media_type": "application/json"
+      },
+      "candidate": {
+        "artifact_id": "53b5e378d07426b75c84465749183cf4f4f9fb59abc4076c9c7fc6553121e062",
+        "media_type": "application/json"
+      },
+      "operation": "braking",
+      "origin": "engineering_preflight",
+      "status": "unavailable",
+      "proxy_values": {},
+      "local_model_constraints": {
+        "status": "unmeasured"
+      },
+      "charged_numerical_s": 3.243817799957469,
+      "internal_calculations": [
+        {
+          "function_evaluations": 20,
+          "iterations": null,
+          "purpose": "operating_point_construction",
+          "solver": "scipy.optimize.least_squares",
+          "status": 0
+        }
+      ]
+    },
+    {
+      "reference": {
+        "artifact_id": "ba5fb2de7ba232d79123541f5ad1b976f2660b37153ba4d0038affe184f2a80e",
+        "media_type": "application/json"
+      },
+      "candidate": {
+        "artifact_id": "53b5e378d07426b75c84465749183cf4f4f9fb59abc4076c9c7fc6553121e062",
+        "media_type": "application/json"
+      },
+      "operation": "controllability",
+      "origin": "engineering_preflight",
+      "status": "computed",
+      "proxy_values": {
+        "held_position_min_eigenvalue": 0.0
+      },
+      "local_model_constraints": {
+        "status": "unmeasured"
+      },
+      "charged_numerical_s": 8.261532999924384,
+      "internal_calculations": [
+        {
+          "purpose": "local_linearization_and_gramian",
+          "solver": "CasADi AD / SciPy scaled Van Loan and ZOH",
+          "windows_s": [
+            0.05,
+            0.1,
+            0.35
+          ]
+        }
+      ]
+    },
+    {
+      "reference": {
+        "artifact_id": "dcb3ad8c12823c58022e9b2ad70e95d95ae389b1d6bbf7ea8cb5d4009d48a220",
+        "media_type": "application/json"
+      },
+      "candidate": {
+        "artifact_id": "53b5e378d07426b75c84465749183cf4f4f9fb59abc4076c9c7fc6553121e062",
+        "media_type": "application/json"
+      },
+      "operation": "endpoint",
+      "origin": "engineering_preflight",
+      "status": "computed",
+      "proxy_values": {},
+      "local_model_constraints": {
+        "checks": {
+          "finite": true,
+          "lower_bounds": true,
+          "position": true,
+          "speed": true,
+          "upper_bounds": true
+        },
+        "status": "feasible_in_local_model"
+      },
+      "charged_numerical_s": 8.359300999902189,
+      "internal_calculations": [
+        {
+          "iterations": 42,
+          "maximum_iterations": 100,
+          "message": "Optimization terminated successfully",
+          "name": "scipy.optimize.SLSQP",
+          "purpose": "endpoint_witness",
+          "status": 0,
+          "success": true
+        },
+        {
+          "purpose": "position_box_residual_certificate",
+          "solver": "scipy.optimize.lsq_linear",
+          "success": true
+        },
+        {
+          "purpose": "tip_speed_box_residual_certificate",
+          "solver": "scipy.optimize.lsq_linear",
+          "success": true
+        }
+      ]
+    },
+    {
+      "reference": {
+        "artifact_id": "1346fcf65a830dc3a245cd8d38e7d239b156144dbf742c0570ef7c8d71ae3f9d",
+        "media_type": "application/json"
+      },
+      "candidate": {
+        "artifact_id": "53b5e378d07426b75c84465749183cf4f4f9fb59abc4076c9c7fc6553121e062",
+        "media_type": "application/json"
+      },
+      "operation": "braking",
+      "origin": "engineering_preflight",
+      "status": "computed",
+      "proxy_values": {},
+      "local_model_constraints": {
+        "checks": {
+          "finite": true,
+          "lower_bounds": true,
+          "position": true,
+          "speed": true,
+          "upper_bounds": true
+        },
+        "status": "feasible_in_local_model"
+      },
+      "charged_numerical_s": 8.60637240007054,
+      "internal_calculations": [
+        {
+          "iterations": 100,
+          "maximum_iterations": 100,
+          "message": "Iteration limit reached",
+          "name": "scipy.optimize.SLSQP",
+          "purpose": "endpoint_witness",
+          "status": 9,
+          "success": false
+        },
+        {
+          "purpose": "position_box_residual_certificate",
+          "solver": "scipy.optimize.lsq_linear",
+          "success": true
+        },
+        {
+          "purpose": "tip_speed_box_residual_certificate",
+          "solver": "scipy.optimize.lsq_linear",
+          "success": true
+        }
+      ]
+    },
+    {
+      "reference": {
+        "artifact_id": "0ba0eaf7f30661aaf89a84a0bf8579a35ab5c347abb22f56417c3e6a28465392",
+        "media_type": "application/json"
+      },
+      "candidate": {
+        "artifact_id": "4053cb5af5c769175415f40cdfd03c886434b65a36a034810b1f89608b737384",
+        "media_type": "application/json"
+      },
+      "operation": "equilibrium",
+      "origin": "model_search",
+      "status": "computed",
+      "proxy_values": {
+        "target_equilibrium_residual": 1.5906425794490147e-09
+      },
+      "local_model_constraints": {
+        "equilibrium_available": true,
+        "global_infeasibility_proven": false,
+        "position_residual_m": 1.5906425794490147e-09,
+        "static_residual_inf": 2.121133130250641e-15,
+        "status": "satisfied"
+      },
+      "charged_numerical_s": 12.567378899897449,
+      "internal_calculations": [
+        {
+          "function_evaluations": null,
+          "iterations": 16,
+          "purpose": "operating_point_construction",
+          "solver": "scipy.optimize.SLSQP",
+          "status": 0
+        }
+      ]
+    },
+    {
+      "reference": {
+        "artifact_id": "59be849aefe8f88de7db08085402bfbaff6cb4b0d63db46567b8e5f84977fda2",
+        "media_type": "application/json"
+      },
+      "candidate": {
+        "artifact_id": "76d6a8ef82b60136dae55db3abc90421facf157e3b9b8400eae367a7137fbf06",
+        "media_type": "application/json"
+      },
+      "operation": "equilibrium",
+      "origin": "model_search",
+      "status": "computed",
+      "proxy_values": {
+        "target_equilibrium_residual": 2.458810228290805e-09
+      },
+      "local_model_constraints": {
+        "equilibrium_available": true,
+        "global_infeasibility_proven": false,
+        "position_residual_m": 2.458810228290805e-09,
+        "static_residual_inf": 3.4932993997482953e-16,
+        "status": "satisfied"
+      },
+      "charged_numerical_s": 12.869132800027728,
+      "internal_calculations": [
+        {
+          "function_evaluations": null,
+          "iterations": 16,
+          "purpose": "operating_point_construction",
+          "solver": "scipy.optimize.SLSQP",
+          "status": 0
+        }
+      ]
+    },
+    {
+      "reference": {
+        "artifact_id": "0ad883eef7c50a85287090d7132bb2b2295d1aeed3553d22d9ad4eb176687085",
+        "media_type": "application/json"
+      },
+      "candidate": {
+        "artifact_id": "4092ef2164b31b95919599d5a5bbf90c2c553c64e13683b4e438181cc2520452",
+        "media_type": "application/json"
+      },
+      "operation": "equilibrium",
+      "origin": "model_search",
+      "status": "computed",
+      "proxy_values": {
+        "target_equilibrium_residual": 0.002153233336938631
+      },
+      "local_model_constraints": {
+        "equilibrium_available": false,
+        "global_infeasibility_proven": false,
+        "position_residual_m": 0.002153233336938631,
+        "static_residual_inf": 1.0938924489134602e-07,
+        "status": "unsatisfied_in_this_attempt"
+      },
+      "charged_numerical_s": 7.7780549000017345,
+      "internal_calculations": [
+        {
+          "function_evaluations": null,
+          "iterations": 20,
+          "purpose": "operating_point_construction",
+          "solver": "scipy.optimize.SLSQP",
+          "status": 9
+        }
+      ]
+    },
+    {
+      "reference": {
+        "artifact_id": "56ef3e018c78a5133a17aa922bde4026de4b6b6d5eb8afd64389415931e69c3b",
+        "media_type": "application/json"
+      },
+      "candidate": {
+        "artifact_id": "c83c1cb3193fb0fd1d37e708058729921f587b32f81d5787ec79db0d3d8d0244",
+        "media_type": "application/json"
+      },
+      "operation": "equilibrium",
+      "origin": "model_search",
+      "status": "computed",
+      "proxy_values": {
+        "target_equilibrium_residual": 1.907348034348869e-09
+      },
+      "local_model_constraints": {
+        "equilibrium_available": true,
+        "global_infeasibility_proven": false,
+        "position_residual_m": 1.907348034348869e-09,
+        "static_residual_inf": 1.0473392986209973e-16,
+        "status": "satisfied"
+      },
+      "charged_numerical_s": 12.852125100092962,
+      "internal_calculations": [
+        {
+          "function_evaluations": null,
+          "iterations": 16,
+          "purpose": "operating_point_construction",
+          "solver": "scipy.optimize.SLSQP",
+          "status": 0
+        }
+      ]
+    },
+    {
+      "reference": {
+        "artifact_id": "03b8d69001cd4e67796a7438242ac4009e8e206f99a397e5b4cacc6fff2fee64",
+        "media_type": "application/json"
+      },
+      "candidate": {
+        "artifact_id": "f5537982ce949f892cbe0c269b90ac4a9f17ee66049f125835936d6fda8d41cb",
+        "media_type": "application/json"
+      },
+      "operation": "equilibrium",
+      "origin": "model_search",
+      "status": "computed",
+      "proxy_values": {
+        "target_equilibrium_residual": 0.0009826397397367378
+      },
+      "local_model_constraints": {
+        "equilibrium_available": false,
+        "global_infeasibility_proven": false,
+        "position_residual_m": 0.0009826397397367378,
+        "static_residual_inf": 4.800202840345657e-08,
+        "status": "unsatisfied_in_this_attempt"
+      },
+      "charged_numerical_s": 7.7334829000756145,
+      "internal_calculations": [
+        {
+          "function_evaluations": null,
+          "iterations": 20,
+          "purpose": "operating_point_construction",
+          "solver": "scipy.optimize.SLSQP",
+          "status": 9
+        }
+      ]
+    },
+    {
+      "reference": {
+        "artifact_id": "088d195cf94e64bb6e366830d783aae963f758f97d70a1c257599325aedaa415",
+        "media_type": "application/json"
+      },
+      "candidate": {
+        "artifact_id": "f7d903300726c084df09d93792888e4d4028abbe60851190be55c1d4536eafb8",
+        "media_type": "application/json"
+      },
+      "operation": "equilibrium",
+      "origin": "model_search",
+      "status": "computed",
+      "proxy_values": {
+        "target_equilibrium_residual": 1.4169916694112437e-09
+      },
+      "local_model_constraints": {
+        "equilibrium_available": true,
+        "global_infeasibility_proven": false,
+        "position_residual_m": 1.4169916694112437e-09,
+        "static_residual_inf": 3.95143986975377e-14,
+        "status": "satisfied"
+      },
+      "charged_numerical_s": 12.583953199908137,
+      "internal_calculations": [
+        {
+          "function_evaluations": null,
+          "iterations": 16,
+          "purpose": "operating_point_construction",
+          "solver": "scipy.optimize.SLSQP",
+          "status": 0
+        }
+      ]
+    }
+  ],
+  "nmpc_results": [
+    {
+      "reference": {
+        "artifact_id": "355698ecb45ab90825c9f6b87bdb8e8d950049fcef8017ca0a4e3bc52817689a",
+        "media_type": "application/json"
+      },
+      "candidate": {
+        "artifact_id": "f7d903300726c084df09d93792888e4d4028abbe60851190be55c1d4536eafb8",
+        "media_type": "application/json"
+      },
+      "candidate_identity": "920577b480f487bf114a0063fc44c0fa26e9afead97e23eb1422544ba1dd4d71",
+      "parameters": {
+        "distal1_length_m": 0.11,
+        "distal1_material": "baseline",
+        "distal1_routing_scale": 1.0,
+        "distal1_section_scale": 1.025,
+        "holding_tip_speed_weight": 0.1,
+        "near_length_m": 0.16,
+        "near_material": "baseline",
+        "near_routing_scale": 1.0,
+        "near_section_scale": 1.0,
+        "terminal_tip_speed_weight": 0.1
+      },
+      "role": "development",
+      "selected_execution": null,
+      "owner_run_id": "research-chain-20261014-exec-55bc93b8a4804751",
+      "execution_id": "f6119fb94a554a01bafa6a24e5b6bb8d",
+      "status": "evaluated",
+      "task_acceptance": true,
+      "metrics": {
+        "holding_max_error_m": 0.003477698902094617,
+        "holding_max_speed_m_s": 0.007281075116519998,
+        "terminal_error_m": 0.003409317980928148
+      },
+      "numerical_s": 327.53326850000303,
+      "profile_identity": "4b68b1d4a876b36b7f71f9f63968b2d3c387bcff7c038a2b1f77cfa92d03e328"
+    },
+    {
+      "reference": {
+        "artifact_id": "ef33c5ca5d73c9d886246cfcd73c7992a74d0ea432805122a7860b2c99026c3b",
+        "media_type": "application/json"
+      },
+      "candidate": {
+        "artifact_id": "f7d903300726c084df09d93792888e4d4028abbe60851190be55c1d4536eafb8",
+        "media_type": "application/json"
+      },
+      "candidate_identity": "920577b480f487bf114a0063fc44c0fa26e9afead97e23eb1422544ba1dd4d71",
+      "parameters": {
+        "distal1_length_m": 0.11,
+        "distal1_material": "baseline",
+        "distal1_routing_scale": 1.0,
+        "distal1_section_scale": 1.025,
+        "holding_tip_speed_weight": 0.1,
+        "near_length_m": 0.16,
+        "near_material": "baseline",
+        "near_routing_scale": 1.0,
+        "near_section_scale": 1.0,
+        "terminal_tip_speed_weight": 0.1
+      },
+      "role": "confirmation",
+      "selected_execution": {
+        "artifact_id": "355698ecb45ab90825c9f6b87bdb8e8d950049fcef8017ca0a4e3bc52817689a",
+        "media_type": "application/json"
+      },
+      "owner_run_id": "research-chain-20261014-exec-86b5126b40ad4c53",
+      "execution_id": "4e7023742cac4d27b550976568a49ff6",
+      "status": "evaluated",
+      "task_acceptance": false,
+      "metrics": {
+        "holding_max_error_m": 0.0038214275746633994,
+        "holding_max_speed_m_s": 0.0474116554909507,
+        "terminal_error_m": 0.0034034131139339344
+      },
+      "numerical_s": 407.5343793000793,
+      "profile_identity": "4b68b1d4a876b36b7f71f9f63968b2d3c387bcff7c038a2b1f77cfa92d03e328"
+    }
+  ],
+  "selected_execution": {
+    "artifact_id": "355698ecb45ab90825c9f6b87bdb8e8d950049fcef8017ca0a4e3bc52817689a",
+    "media_type": "application/json"
+  },
+  "claims": {
+    "selected": {
+      "artifact_id": "355698ecb45ab90825c9f6b87bdb8e8d950049fcef8017ca0a4e3bc52817689a",
+      "media_type": "application/json"
+    },
+    "model_selected_structure_search_evaluations": 5,
+    "selected_structurally_new": true,
+    "new_design_and_control_confirmed": false,
+    "independent_confirmation_count": 1,
+    "required_confirmations": 2,
+    "confirmation_failures": 1,
+    "confirmation_progress": {
+      "required_total": 2,
+      "historical_confirmations": 0,
+      "current_study_confirmations": 1,
+      "remaining": 1,
+      "failures": 1,
+      "invalid_executions": 0,
+      "executions": [
+        {
+          "reference": {
+            "artifact_id": "ef33c5ca5d73c9d886246cfcd73c7992a74d0ea432805122a7860b2c99026c3b",
+            "media_type": "application/json"
+          },
+          "historical": false,
+          "owner": "research-chain-20261014",
+          "complete": true,
+          "passed": false
+        }
+      ],
+      "confirmed": false,
+      "correct_operation": {
+        "tool": "research_plan",
+        "action": "confirm",
+        "selected_execution": {
+          "artifact_id": "355698ecb45ab90825c9f6b87bdb8e8d950049fcef8017ca0a4e3bc52817689a",
+          "media_type": "application/json"
+        }
+      }
+    },
+    "limited_repeat_supported_acceptance": false,
+    "task_passed": false,
+    "parameter_improvement_attribution_permitted": false,
+    "interface_evaluations": 0
+  },
+  "accepted_stop": {
+    "artifact_id": "59896b81c76ae9e53c7827b291f564d5a5e71fe59a6a6458a478c44fd31587fb",
+    "media_type": "application/json"
+  },
+  "consumption": {
+    "provider_requests": 12,
+    "public_operations": 21,
+    "numerical_s": 1075.194806700035,
+    "numerical_reserved_s": 0.0,
+    "mathematical_evaluations": 14,
+    "engineering_preflight": {
+      "numerical_s": 266.38702079981937,
+      "mathematical_evaluations": 8,
+      "cost_records": [
+        {
+          "internal_calculations": [
+            {
+              "purpose": "unit GVS velocity Jacobian derivative check",
+              "solver": "CasADi AD and centered finite difference"
+            }
+          ],
+          "mathematical_evaluations": 1,
+          "numerical_s": 158.56242249999195,
+          "origin": "engineering_preflight",
+          "reference": {
+            "artifact_id": "de50aabd729b327612b5868dee9ac8c661fbd3f5d0898351541b4e0683663342",
+            "media_type": "application/json"
+          }
+        },
+        {
+          "internal_calculations": [],
+          "mathematical_evaluations": 0,
+          "numerical_s": 0.9030277000274509,
+          "origin": "engineering_preflight",
+          "reference": {
+            "artifact_id": "3c0570fa56ac3ca0a58d24c4338a8aebd7c1879e460162e41eca1da2e7570dd2",
+            "media_type": "application/json"
+          }
+        },
+        {
+          "internal_calculations": [],
+          "mathematical_evaluations": 0,
+          "numerical_s": 33.67699179996271,
+          "origin": "engineering_preflight",
+          "reference": {
+            "artifact_id": "53bf44f3008ffdf4c4281ea6a525125d885c46812689c341b70367ed33728877",
+            "media_type": "application/json"
+          }
+        },
+        {
+          "internal_calculations": [],
+          "mathematical_evaluations": 0,
+          "numerical_s": 5.1954302,
+          "origin": "engineering_preflight",
+          "reference": {
+            "artifact_id": "0fe7af6e039862875140829d9756ce3b1e8507d81249a800bee3b263f8f4d5de",
+            "media_type": "application/json"
+          }
+        },
+        {
+          "internal_calculations": [
+            {
+              "function_evaluations": 20,
+              "iterations": null,
+              "purpose": "operating_point_construction",
+              "solver": "scipy.optimize.least_squares",
+              "status": 0
+            }
+          ],
+          "mathematical_evaluations": 1,
+          "numerical_s": 3.3280639000004157,
+          "origin": "engineering_preflight",
+          "reference": {
+            "artifact_id": "652e265dd12995c51d1a9d3231674cbed82525e3f6162efe864dd746c11c3408",
+            "media_type": "application/json"
+          }
+        },
+        {
+          "internal_calculations": [
+            {
+              "function_evaluations": null,
+              "iterations": 15,
+              "purpose": "operating_point_construction",
+              "solver": "scipy.optimize.SLSQP",
+              "status": 0
+            }
+          ],
+          "mathematical_evaluations": 1,
+          "numerical_s": 12.194069199962541,
+          "origin": "engineering_preflight",
+          "reference": {
+            "artifact_id": "f4428d849152b37b32863f0c587033a6ad7469f718f660f9f8a3c21162aa1f3c",
+            "media_type": "application/json"
+          }
+        },
+        {
+          "internal_calculations": [
+            {
+              "function_evaluations": 20,
+              "iterations": null,
+              "purpose": "operating_point_construction",
+              "solver": "scipy.optimize.least_squares",
+              "status": 0
+            }
+          ],
+          "mathematical_evaluations": 1,
+          "numerical_s": 3.3585520000196993,
+          "origin": "engineering_preflight",
+          "reference": {
+            "artifact_id": "8fdde60dba471717f38ab8051ab78afc8da8d69aeb0513c4a1ea388017bfad93",
+            "media_type": "application/json"
+          }
+        },
+        {
+          "internal_calculations": [
+            {
+              "function_evaluations": 20,
+              "iterations": null,
+              "purpose": "operating_point_construction",
+              "solver": "scipy.optimize.least_squares",
+              "status": 0
+            }
+          ],
+          "mathematical_evaluations": 1,
+          "numerical_s": 3.243817799957469,
+          "origin": "engineering_preflight",
+          "reference": {
+            "artifact_id": "c0af0c4cc3e5217aab1937d8adb568c01266394ad8b1133b28f6d2db8a771d42",
+            "media_type": "application/json"
+          }
+        },
+        {
+          "internal_calculations": [
+            {
+              "purpose": "local_linearization_and_gramian",
+              "solver": "CasADi AD / SciPy scaled Van Loan and ZOH",
+              "windows_s": [
+                0.05,
+                0.1,
+                0.35
+              ]
+            }
+          ],
+          "mathematical_evaluations": 1,
+          "numerical_s": 8.261532999924384,
+          "origin": "engineering_preflight",
+          "reference": {
+            "artifact_id": "ba5fb2de7ba232d79123541f5ad1b976f2660b37153ba4d0038affe184f2a80e",
+            "media_type": "application/json"
+          }
+        },
+        {
+          "internal_calculations": [
+            {
+              "iterations": 42,
+              "maximum_iterations": 100,
+              "message": "Optimization terminated successfully",
+              "name": "scipy.optimize.SLSQP",
+              "purpose": "endpoint_witness",
+              "status": 0,
+              "success": true
+            },
+            {
+              "purpose": "position_box_residual_certificate",
+              "solver": "scipy.optimize.lsq_linear",
+              "success": true
+            },
+            {
+              "purpose": "tip_speed_box_residual_certificate",
+              "solver": "scipy.optimize.lsq_linear",
+              "success": true
+            }
+          ],
+          "mathematical_evaluations": 1,
+          "numerical_s": 8.359300999902189,
+          "origin": "engineering_preflight",
+          "reference": {
+            "artifact_id": "dcb3ad8c12823c58022e9b2ad70e95d95ae389b1d6bbf7ea8cb5d4009d48a220",
+            "media_type": "application/json"
+          }
+        },
+        {
+          "internal_calculations": [
+            {
+              "iterations": 100,
+              "maximum_iterations": 100,
+              "message": "Iteration limit reached",
+              "name": "scipy.optimize.SLSQP",
+              "purpose": "endpoint_witness",
+              "status": 9,
+              "success": false
+            },
+            {
+              "purpose": "position_box_residual_certificate",
+              "solver": "scipy.optimize.lsq_linear",
+              "success": true
+            },
+            {
+              "purpose": "tip_speed_box_residual_certificate",
+              "solver": "scipy.optimize.lsq_linear",
+              "success": true
+            }
+          ],
+          "mathematical_evaluations": 1,
+          "numerical_s": 8.60637240007054,
+          "origin": "engineering_preflight",
+          "reference": {
+            "artifact_id": "1346fcf65a830dc3a245cd8d38e7d239b156144dbf742c0570ef7c8d71ae3f9d",
+            "media_type": "application/json"
+          }
+        },
+        {
+          "internal_calculations": [],
+          "mathematical_evaluations": 0,
+          "numerical_s": 20.6974393,
+          "origin": "engineering_preflight",
+          "reference": {
+            "artifact_id": "ab3a196bc7a5e99af36e93a6d5b7ba8bf175dc56cbe6730916f69d88d263c58d",
+            "media_type": "application/json"
+          }
+        }
+      ]
+    },
+    "engineering_closeout": {
+      "numerical_s": 6.5092161,
+      "mathematical_evaluations": 0,
+      "cost_records": [
+        {
+          "internal_calculations": [],
+          "mathematical_evaluations": 0,
+          "numerical_s": 6.5092161,
+          "origin": "engineering_closeout",
+          "reference": {
+            "artifact_id": "14e0d1438dcd132cd2ad20eccef33e0abd3d0c8d81e0d460d6b0efb0bf9e168b",
+            "media_type": "application/json"
+          }
+        }
+      ]
+    },
+    "scientific_mathematics": {
+      "numerical_s": 66.38412780000363,
+      "mathematical_evaluations": 6
+    },
+    "construction_numerical_s": 0.6935953000793234,
+    "nmpc_executions": 2,
+    "rl_training_runs": 0,
+    "rl_evaluations": 0,
+    "legacy_offline_attempts": 0,
+    "independent_integrations": 0,
+    "live_elapsed_s": 1199.6751246452332
+  },
+  "historical_costs": {
+    "latest_contained": {
+      "provider_requests": 16,
+      "public_operations": 43,
+      "charged_starts": 5,
+      "training_trials": 1,
+      "requested_actions": 600000,
+      "allocated_actions": 599808,
+      "allocated_training_active_s": 1800.0,
+      "attempted_training_actions": 599808,
+      "completed_training_actions": 599808,
+      "training_active_s": 1049.2907210999401,
+      "evaluation_episodes": 1,
+      "evaluation_active_s": 0.9482932999962941,
+      "mathematical_attempts": 0,
+      "independent_checks": 0,
+      "nmpc_executions": 3,
+      "diagnostics": 0,
+      "aggregate_numerical_s": 1933.2103482999373,
+      "numerical_reserved_s": 0.0,
+      "live_elapsed_s": 2600.3370192050934,
+      "preparation_to_live_s": 114.78195142745972,
+      "provider_response_s": 410.87499999965075,
+      "provider_usage": {
+        "total_tokens": 1557792,
+        "prompt_tokens": 1484961,
+        "completion_tokens": 72831,
+        "prompt_cache_hit_tokens": 239104,
+        "prompt_cache_miss_tokens": 1245857
+      },
+      "money": null
+    },
+    "earlier_history": {
+      "provider_requests": 134,
+      "public_operations": 190,
+      "training_actions": 1052672,
+      "evaluation_episodes": 11,
+      "training_active_seconds_known": 1909.679287299863,
+      "training_active_seconds_charged": 1999.679287299863
+    },
+    "additional_current_numerical_s": 0,
+    "allowances_transferred": false
+  },
+  "remaining": {
+    "backend_solves": 62,
+    "model_calls": 108,
+    "tool_calls": 279,
+    "wall_s": 27682.749162900145,
+    "worker_calls": 0
+  },
+  "remaining_numerical_s": 22924.805193299966,
+  "accounting": "One cumulative assignment ledger; engineering preflight and nested search calculations retained; artifact reads/cached results zero new scientific charge.",
+  "scope": "Sampled nominal simulation under ideal independent tendon tensions. No structural superiority, global optimality, validated real materials, robustness, hardware or real-time claim."
+}
