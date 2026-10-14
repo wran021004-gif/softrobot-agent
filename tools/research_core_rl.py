@@ -46,6 +46,32 @@ def bind_source(host):
         rl_source_summary=core.save(host,history,'linked_source_training_summary'))
 
 
+    if source.get('selection_study_id'):
+        from tools.research_core_feedback import result_view
+        selection_store=Store(core.ROOT/'runs'/source['selection_study_id'])
+        selection_state=selection_store.session(source['selection_study_id'])['state']
+        selected=source['selected_execution']; confirmations=source['historical_confirmations']
+        if selection_state['research_status']!='stopped' or selection_state['selected']!=selected:
+            raise ValueError('Sealed immutable selection required')
+        if selected not in selection_state['rl_evaluations']:
+            raise ValueError('Original development selection not recorded')
+        for ref in [selected,*confirmations]:
+            if ref not in selection_state['rl_evaluations']: raise ValueError('Original execution not recorded')
+            value=selection_store.artifact(ref)
+            if (value['candidate']!=entry['candidate'] or value['task']!=entry['task']
+                    or value['configuration']!=entry['configuration'] or value['checkpoint']!=generation
+                    or value['policy_sha256']!=source['policy_sha256'] or value['run_id']!=source['run_id']
+                    or value.get('study')!=source['selection_study_id']):
+                raise ValueError('Historical frozen solution identity mismatch')
+            if core.save(host,value,'linked_historical_execution')!=ref: raise ValueError('Historical execution identity changed')
+        if not result_view(host,selected)['passed']: raise ValueError('Passing development selection required')
+        for ref in confirmations:
+            value=host.store.artifact(ref)
+            if value['role']!='confirmation' or value['selected_execution']!=selected or not result_view(host,ref)['complete']:
+                raise ValueError('Genuine historical post-selection confirmation required')
+        core.update(host,selected=selected,linked_selections=[selected],historical_confirmations=list(confirmations))
+
+
 def prepare_input(host, request):
     from tools import research_core as core
     from extensions.tendon_family.backends import physics_for
@@ -125,7 +151,9 @@ def reconcile(host, run_id, lightweight=False):
 
 def evaluation_capacity(host, requested=1, confirmation=False):
     from tools import research_core as core
-    s=core.state(host); reserve=0 if confirmation else core.confirmation_count(s)
+    s=core.state(host)
+    from tools.research_core_feedback import confirmation_progress
+    reserve=0 if confirmation else confirmation_progress(host)['remaining']
     used=sum(e['evaluations'] for e in s.get('rl_runs',{}).values())
     seconds=s['spec'].get('rl_evaluation_allowance_s',150.)
     available=min(core.execution_deadline(host)-time.time(),host.store.remaining()['remaining']['wall_s'],s['spec']['budgets']['numerical_s']-s['numerical_s']-s['numerical_reserved_s'])
@@ -191,6 +219,9 @@ def dispatch(host, value, request_id, selected=None):
     if q.operation in ('start','resume'):
         work=config['budget'] if q.operation=='start' else reconcile(host,q.run_id)['remaining']
         training_capacity(host,work)
+    if q.operation=='evaluate' and selected is None and (s['spec'].get('ordinary_evaluation_limit')==0 or evaluation_capacity(host,1)['admitted']<1):
+        from tools.research_core_feedback import confirmation_progress
+        raise ValueError('Development evaluation rejected; confirmation uses '+json.dumps(confirmation_progress(host)))
     if q.operation=='evaluate' and evaluation_capacity(host,1,confirmation=selected is not None)['admitted']<1:
         raise ValueError('RL evaluation and route confirmation reserve cannot fit')
     cost={**zero(),'tool_calls':1,'backend_solves':int(q.operation=='start')}
@@ -267,7 +298,7 @@ def dispatch(host, value, request_id, selected=None):
             if source: result.update(source_study=source['study_id'],evaluation_owner=host.run_id)
             result.update(study=host.run_id,candidate=entry['candidate'],task=entry['task'],run_id=run_id,configuration=entry['configuration'],independent_evaluation_executed=q.operation=='evaluate')
             if q.operation=='evaluate':
-                result.update(checkpoint=generation,checkpoint_training_step=run.read_json(policy.with_name('metadata.json')).get('inherited',{}).get('num_timesteps'),policy_sha256=policy_sha,role='confirmation' if selected is not None else 'development',selected_execution=plain(selected))
+                result.update(execution_id=row['execution_id'],operation_key=request_id,checkpoint=generation,checkpoint_training_step=run.read_json(policy.with_name('metadata.json')).get('inherited',{}).get('num_timesteps'),policy_sha256=policy_sha,role='confirmation' if selected is not None else 'development',selected_execution=plain(selected))
             reference=core.save(host,result,'rl_'+q.operation+'_evidence')
             if q.operation=='evaluate': core.update(host,rl_evaluations=[*core.state(host).get('rl_evaluations',[]),reference])
             result=dict(reference=reference,**result)

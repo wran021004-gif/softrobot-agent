@@ -1,0 +1,138 @@
+{
+  "study_id": "confirmation-completion-20261014",
+  "base_commit": "d53231a29cd63909c03f54876c69761ec522b4a2",
+  "started_unix": 0,
+  "authorization": "Explicit user authorization 2026-10-14: scoped implementation, both studies, nonsecret DeepSeek submissions, commits and ordinary push feat/rl-control-pilot; no budget transfer.",
+  "evaluation_version": 1,
+  "reference_parameters": {
+    "d": 0,
+    "holding_tip_speed_weight": 0.1,
+    "terminal_tip_speed_weight": 0.1
+  },
+  "allowed_parameters": {
+    "d": [
+      -1,
+      1
+    ],
+    "holding_tip_speed_weight": [
+      0.025,
+      0.1
+    ],
+    "terminal_tip_speed_weight": [
+      0.025,
+      0.1
+    ]
+  },
+  "ranking": "feasible_then_max_normalized_violation_then_sum_v1",
+  "record_update_ids": [
+    8,
+    29,
+    30
+  ],
+  "complete_update_inputs": true,
+  "budgets": {
+    "provider_requests": 16,
+    "public_operations": 40,
+    "physical_launches": 0,
+    "local_solves": 0,
+    "local_solve_s": 0,
+    "offline_nlp": 0,
+    "bdf_replays": 0,
+    "numerical_s": 1200,
+    "activity_s": 1200,
+    "delivery_reserve_s": 300,
+    "protected_provider_requests": 8
+  },
+  "execution_allowances": {
+    "simulation_s": 1700,
+    "evaluation_s": 30,
+    "profile_s": 60,
+    "construction_s": 10
+  },
+  "confirmation": {
+    "fresh_independent_repetitions": 2,
+    "configuration": "Two fresh post-selection nominal episodes; original task, identical selected candidate/controller/configuration and exact frozen RL checkpoint. Development evaluation excluded; retain failures; no success-hunting retries."
+  },
+  "optional_enhancements": {
+    "offline_schedule_initialization": "deferred until core delivery and sufficient remaining budget",
+    "legacy_skill_admission": "deferred; read-only drafts available"
+  },
+  "mode": "formal_research",
+  "tension_execution_mode": "ideal_tension",
+  "evidence_destination": "evidence/confirmation_completion_20261014",
+  "rl_limits": {
+    "training_runs": 0,
+    "actions_per_trial": 200000,
+    "seconds_per_trial": 1200,
+    "training_actions": 0,
+    "training_active_seconds": 0,
+    "evaluation_episodes": 1,
+    "diagnostic_replays": 0,
+    "diagnostic_physics_steps": 0
+  },
+  "capabilities": [
+    "rl"
+  ],
+  "rl_evaluation_allowance_s": 120,
+  "nmpc_execution_cap_s": 1800,
+  "offline_solver_s": 3300,
+  "mechanics_allowances": {
+    "solve_s": 3300,
+    "replay_s": 300,
+    "inspect_s": 60
+  },
+  "nmpc_limits": {
+    "executions": 0
+  },
+  "nmpc_timing_evidence": [],
+  "historical_evidence": {
+    "references": {
+      "training_summary": {
+        "artifact_id": "4aa260f167618d9d205e58c5ea77fc63c82eb53d9fc402b53a57319f3fa2c79a",
+        "media_type": "application/json"
+      },
+      "numerical_failure": {
+        "artifact_id": "23a6aec72f9ff17c95f9244ee73f2d1f63fbd3ccc126de7d682dc732a5a17d65",
+        "media_type": "application/json"
+      }
+    },
+    "ownership": "Sealed source records; not current experiments or new costs",
+    "prior_cost_reports": [
+      "evidence/design_control_20261013/completion.md",
+      "evidence/rl_evaluation_followup_20261013/summary.json"
+    ]
+  },
+  "rl_diagnostic_allowance_s": 60,
+  "execution_instructions": "Complete only the missing historical confirmation. Read the specification/current budgets, original frozen task via rl.frozen_task, rl.source_summary, source candidate and configuration, exact linked selected_execution, historical confirmation, scoped_context and the terminal training summary via evidence_read (query research_rl status for its training_summary_reference). The frozen development selection is historical, never a new evaluation or joint optimization. The original requirement is TWO post-selection confirmations: ONE genuine historical confirmation is linked, and precisely ONE fresh execution is authorized. Read confirmation_progress. Call research_plan action=\"confirm\" with its exact selected_execution ONCE; this both freezes and evaluates the exact pinned policy independently. Never use research_rl evaluate as confirmation; ordinary development evaluations are forbidden. Explicitly evidence_read the returned result, then decide truthful STOP with next_step and citations of the training summary and new confirmation. Passing means 1 historical + 1 current=2; a valid failure stays unconfirmed, with no retries. An invalid loading/provenance/evaluation execution is unmeasured, never a physical failure; report the actual blocker and do not automatically repeat. No training, math, NMPC, diagnostics, policy substitution or design changes. Original backend acceptance stays fixed, nominal repeatability only. Costs remain historically owned; current charges cover only this new execution. Accepted STOP alone is not scientific success. Send only the authorized nonsecret scope.",
+  "offline_stopping_policy": "research_work_v1",
+  "supplied_evidence": [
+    "evidence/final_checkpoint_20261014/scientific_summary.json"
+  ],
+  "allowed_plan_actions": [
+    "confirm",
+    "stop"
+  ],
+  "allowed_rl_operations": [
+    "status",
+    "evaluate"
+  ],
+  "rl_evaluation_source": {
+    "study_id": "training-summary-formal-20261013",
+    "run_id": "training-summary-formal-20261013-fb54a8b8",
+    "checkpoint": "step-00199936-c4de57ba",
+    "config_sha256": "51d096cb0726aa9bf688f75fa170731a512e1b5f2f55bcb079ddcf46ab69ca5d",
+    "policy_sha256": "8bdcfc66c9ea00d69811c11c1423d8b363737bec0828047d5baba821c9eda9d1",
+    "selection_study_id": "final-checkpoint-20261014",
+    "selected_execution": {
+      "artifact_id": "41a7df9facb0ee64ede64912e283f900a84451014e198f9b2f6940ce87f2d1b4",
+      "media_type": "application/json"
+    },
+    "historical_confirmations": [
+      {
+        "artifact_id": "57b19bbc02064b02ed6c15eba782ab93a04f465069b7f69d91c744266bd29e55",
+        "media_type": "application/json"
+      }
+    ]
+  },
+  "ordinary_evaluation_limit": 0
+}

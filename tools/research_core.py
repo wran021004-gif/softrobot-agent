@@ -67,7 +67,7 @@ def readable_results(s, host=None):
             result=host.store.artifact(ref)
             linked.extend(result[k] for k in ('checkpoint_reference','trajectory_reference','original_request','log_reference') if result.get(k))
     return [*s['results'], *s.get('mechanics_results', []), *s.get('rl_evaluations', []), *s.get('rl_training_summaries', []),
-        *s.get('scoped_context',[]), *linked,
+        *s.get('scoped_context',[]), *s.get('linked_selections',[]), *s.get('historical_confirmations',[]), *linked,
         *[s[k] for k in ('rl_task','rl_source_summary','rl_source_candidate') if s.get(k)],
         *[r for entry in s.get('rl_runs',{}).values() for r in (entry.get('candidate'),entry.get('configuration')) if r]]
 
@@ -306,9 +306,14 @@ def nmpc_timing(host, candidate=None):
     s=state(host);records=s['spec'].get('nmpc_timing_evidence',[])
     configuration=verify_candidate(host,candidate)['scientific_configuration'] if candidate else None
     matched=[r for r in records if r['scientific_configuration_identity']==digest(configuration)] if configuration else records
+    for ref in s.get('results',[]):
+        r=host.store.artifact(ref)
+        if configuration==r.get('scientific_configuration') and r.get('status')=='evaluated':
+            matched.append(dict(complete_execution_s=r['numerical_s'],source=ref))
     estimate=max((r['complete_execution_s'] for r in matched),default=None)
     cap=s['spec']['nmpc_execution_cap_s']
     return dict(available=estimate is not None and estimate<=cap,complete_execution_s=estimate,cap_s=cap,
+        first_use_limitation='Synchronous execution cannot enforce an outer hard cap; first-use launch unavailable',
         reason='existing matching timing fits cap' if estimate is not None and estimate<=cap else
         'NMPC unavailable within this budget: no matching existing timing evidence' if estimate is None else
         'NMPC unavailable within this budget: complete execution exceeds cap',
@@ -507,6 +512,7 @@ def finish_execution(host, recovery=False):
         owning_study=host.run_id, fresh_execution=True, cached_operation_receipt=False,
         candidate_artifact_reuse_does_not_reuse_execution=True,
         facts_classification='program-generated; principal interpretation remains in original plan',
+        runtime_observation='complete' if result['status']=='evaluated' else 'censored or incomplete; no complete episode timing',
         failure_categories=[] if acceptance and acceptance['accepted'] else
             ['scientific_task_failure'] if acceptance else ['engineering_or_missing_evidence'])
     from tools.research_core_feedback import mechanics_context
@@ -750,12 +756,13 @@ def local_diagnostic(host, query, key):
 
 def claims(host):
     if state(host)['spec'].get('capabilities'):
-        from tools.research_core_feedback import result_view
-        s=state(host);refs=[*s['results'],*s.get('rl_evaluations',[])]
-        chosen=result_view(host,s['selected']) if s.get('selected') else None
-        confirmations=[result_view(host,r) for r in refs if host.store.artifact(r).get('role')=='confirmation' and host.store.artifact(r).get('selected_execution')==s.get('selected')]
-        passed=bool(chosen and chosen['passed'] and len(confirmations)==confirmation_count(s) and all(v['passed'] and v['solution_identity']==chosen['solution_identity'] for v in confirmations))
-        return dict(selected=s.get('selected'),independent_confirmation_count=len(confirmations),required_confirmations=confirmation_count(s),confirmation_failures=sum(not v['passed'] for v in confirmations),limited_repeat_supported_acceptance=passed,task_passed=passed,parameter_improvement_attribution_permitted=False,interface_evaluations=sum(bool(host.store.artifact(r).get('independent_evaluation_executed')) for r in s.get('rl_evaluations',[])))
+        from tools.research_core_feedback import confirmation_progress
+        s=state(host);progress=confirmation_progress(host)
+        return dict(selected=s.get('selected'),independent_confirmation_count=progress['required_total']-progress['remaining'],
+            required_confirmations=progress['required_total'],confirmation_failures=progress['failures'],
+            confirmation_progress=progress,limited_repeat_supported_acceptance=progress['confirmed'],task_passed=progress['confirmed'],
+            parameter_improvement_attribution_permitted=False,
+            interface_evaluations=sum(bool(host.store.artifact(r).get('independent_evaluation_executed')) for r in s.get('rl_evaluations',[])))
     if state(host)['spec'].get('mode')=='rl_interface':
         s=state(host)
         return dict(interface_evaluations=sum(bool(host.store.artifact(r).get('independent_evaluation_executed',False)) for r in s.get('rl_evaluations',[])),task_passed=any(host.store.artifact(r)['passed'] for r in s.get('rl_evaluations',[])),
@@ -792,9 +799,9 @@ def claims(host):
 def packet(host):
     s=state(host)
     if s['spec'].get('capabilities'):
-        from tools.research_core_feedback import result_view, eligibility
+        from tools.research_core_feedback import result_view, eligibility, facts
         from tools.research_core_rl import packet as rl_packet
-        return dict(specification=s['spec'],scoped_context=s.get('scoped_context',[]),frozen_task=plain(s['base_configuration']['task']),reference_candidate=s['reference_candidate'],
+        return dict(decision_facts=facts(host),specification=s['spec'],scoped_context=s.get('scoped_context',[]),frozen_task=plain(s['base_configuration']['task']),reference_candidate=s['reference_candidate'],
             candidates=list(s['candidates'].values()),results=[dict(reference=r,**result_view(host,r),confirmation=eligibility(host,r)) for r in [*s['results'],*s.get('rl_evaluations',[])]],
             mechanics_results=[dict(reference=r,**{k:host.store.artifact(r).get(k) for k in ('status','operation','trajectory_reference','objective_definition','original_task_feasible','relaxed_nlp_feasible','original_task_gaps','trajectory_metrics','charged_numerical_s','checkpoint_reference')}) for r in s.get('mechanics_results',[])],
             handoffs=[dict(reference=r,**host.store.artifact(r)) for r in s.get('handoffs',[])],
@@ -883,7 +890,7 @@ def dispatch(host, value, request_id, origin='model'):
         if any(r not in [plain(v) for v in plan.supporting_evidence] for r in evaluations): raise ValueError('RL_STOP_MUST_CITE_NEW_EVALUATION')
         if any(r not in s.get('rl_evidence_reads',[]) for r in evaluations): raise ValueError('RL_STOP_REQUIRES_PUBLIC_EXPLICIT_EVIDENCE_READ')
         if any(e.get('status',{}).get('worker_alive',True) for e in s['rl_runs'].values()): raise ValueError('RL_STOP_REQUIRES_TERMINAL_STATUS_QUERY')
-    admission=dict(scope='RL interface; no numerical launch or confirmation reservation') if s['spec'].get('mode')=='rl_interface' else capacity(host,plan.search.max_evaluations if plan.search else 1,plan.action=='confirm',root_operation=True)
+    admission=dict(scope='RL interface; no numerical launch or confirmation reservation') if s['spec'].get('mode')=='rl_interface' else capacity(host,plan.search.max_evaluations if plan.search else 1,plan.action=='confirm',root_operation=True,candidate=plan.candidate)
     if plan.action=='execute' and s['spec'].get('nmpc_execution_cap_s'):
         timing=nmpc_timing(host,plan.candidate)
         if not timing['available']: raise ValueError(timing['reason'])
@@ -1009,15 +1016,16 @@ Read study specification, frozen original task, declared capabilities, known his
 When mathematical optimization is authorized, use supported task_gap or task_gap_with_effort objective. Explain task difficulty, weights, bounds, fixed variables,
 relaxed requirements and expected relation to original completion. Inspect mathematical evidence and returned candidate. Handoff chooses no controller.
 Mathematical feasibility, relaxed dynamics and original MuJoCo task acceptance are distinct. Preliminary ranking is optional. Search uses NMPC only.
-Choose existing NMPC or direct/residual RL and explain using evidence and budget. Inspect nmpc_admission before launching; no matching timing or oversized
-complete execution makes that route unavailable within budget, not the design infeasible. No calibration or raised ceilings.
+Choose mathematical accuracy, reference use, direct/residual RL or admitted NMPC and subsequent actions using evidence and budget. Explain how the chosen integration method and discretization suit the intended use; computation time alone does not justify the coarsest model.
+Solver convergence, numerical feasibility, independent mathematical verification, backend acceptance and confirmation completion are separate. Compatibility is not numerical accuracy; unverified references remain unverified even if used exploratorily.
+Inspect nmpc_admission: configuration-matched complete timing is required. The authorized first-use option is unavailable because this synchronous path cannot enforce an outer hard cap; no calibration, invented timing or automatic retry. Timeout is censored timing.
 Residual requires an advertised compatible runnable reference. Direct stays available if incompatible. Train within declared trial/cumulative limits;
 query real terminal status and explicitly read/cite its training_summary_reference through evidence_read before deciding.
 Evaluate only a usable published checkpoint; otherwise read training/failure evidence and decide without an impossible evaluation or automatic replacement trial.
 An earlier checkpoint evaluation must identify its actual training step. Choose rollout-aligned actions; adjustments round down, never above ceilings.
 Read independent evaluation evidence explicitly before deciding to adjust control, revise design, switch route, select or stop.
 Select a passing development result via confirm selected_execution, freezing candidate+task+route+configuration+exact checkpoint. Use the predeclared fresh
-post-selection count. RL confirmation reloads exact weights, fresh simulation, no training or NMPC. Keep failed confirmations; no success-hunting retries.
+post-selection count from confirmation_progress, retaining historical ownership. Use research_plan action confirm and the exact selected_execution, never ordinary research_rl evaluate for confirmation. RL confirmation reloads exact weights, fresh simulation, no training or NMPC. Keep failed confirmations; no success-hunting retries.
 Selection remains immutable. Nominal repetitions support no robustness claim. No fresh baseline required; withhold improvement attribution without comparable evidence.
 Stop once confirmations pass; ceilings are not targets. Preserve all costs including failures. The configured protected reserve permits existing work, evaluation, confirmation, evidence and STOP.
 STOP cites every new result and follows explicit RL evidence reads and terminal query, with next_step and actual unfinished requirements.

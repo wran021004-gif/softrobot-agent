@@ -2,6 +2,30 @@
 from tools.platform_store import plain
 
 
+def confirmation_progress(host, selected=None):
+    """Count unique actual launches for one frozen solution, retaining ownership."""
+    from tools.research_core import state, confirmation_count
+    s=state(host); selected=plain(selected or s.get('selected')); rows={}
+    chosen=result_view(host,selected) if selected else None
+    for historical, refs in ((True,s.get('historical_confirmations',[])),
+                             (False,[*s.get('results',[]),*s.get('rl_evaluations',[])])):
+        for ref in refs:
+            r=host.store.artifact(ref)
+            if r.get('role')!='confirmation' or r.get('selected_execution')!=selected: continue
+            v=result_view(host,ref)
+            if not chosen or v['solution_identity']!=chosen['solution_identity']: continue
+            execution=r.get('execution_id') or r.get('operation_key') or ref['artifact_id']
+            rows.setdefault(execution,dict(reference=ref,historical=historical,
+                owner=r.get('study',r.get('owning_study')),complete=v['complete'],passed=v['passed']))
+    values=list(rows.values()); required=confirmation_count(s)
+    return dict(required_total=required,historical_confirmations=sum(v['historical'] for v in values),
+        current_study_confirmations=sum(not v['historical'] for v in values),
+        remaining=max(0,required-len(values)),failures=sum(v['complete'] and not v['passed'] for v in values),
+        invalid_executions=sum(not v['complete'] for v in values),executions=values,
+        confirmed=bool(chosen and chosen['passed'] and len(values)==required and all(v['passed'] for v in values)),
+        correct_operation=dict(tool='research_plan',action='confirm',selected_execution=selected))
+
+
 def result_view(host, reference):
     """Organize original evidence once, without recomputing task metrics."""
     from tools.research_core import verify_candidate
@@ -24,7 +48,7 @@ def result_view(host, reference):
 def eligibility(host, reference):
     from tools.research_core import state, capacity, verify_candidate, confirmation_count
     from tools.research_core_rl import evaluation_capacity
-    s=state(host);ref=plain(reference);reasons=[];refs=[*s['results'],*s.get('rl_evaluations',[])]
+    s=state(host);ref=plain(reference);reasons=[];refs=[*s['results'],*s.get('rl_evaluations',[]),*s.get('linked_selections',[])]
     if ref not in refs:
         return dict(eligible=False,reasons=['not a current-study controller result'],required_field='selected_execution')
     r=host.store.artifact(ref)
@@ -36,8 +60,9 @@ def eligibility(host, reference):
             reasons.append('selected scientific configuration mismatch')
         if v['controller_route']=='rl' and (not r.get('checkpoint') or not r.get('policy_sha256')): reasons.append('exact evaluated checkpoint identity missing')
         if s.get('selected') and s['selected']!=ref: reasons.append('confirmation selection already frozen')
-        count=sum(host.store.artifact(t).get('role')=='confirmation' and host.store.artifact(t).get('selected_execution')==ref for t in refs)
-        required=confirmation_count(s)
+        progress=confirmation_progress(host,ref);count=progress['required_total']-progress['remaining']
+        required=progress['required_total']
+        if progress['failures'] or progress['invalid_executions']: reasons.append('confirmation failed or invalid; inspect evidence, no automatic retry')
         if count>=required: reasons.append('declared confirmations already recorded')
         remaining=required-count
         fit=evaluation_capacity(host,remaining,confirmation=True) if v['controller_route']=='rl' else capacity(host,remaining,True,root_operation=True,candidate=r['candidate'])
@@ -45,7 +70,7 @@ def eligibility(host, reference):
     except (ValueError,KeyError) as exc:
         reasons.append(str(exc));count=0
     if s['research_status']=='stopped':reasons.append('study sealed after STOP')
-    return dict(eligible=not reasons,reasons=reasons,required_field='selected_execution',selected_execution=ref,owning_study=host.run_id,completed_confirmations=count)
+    return dict(eligible=not reasons,reasons=reasons,required_field='selected_execution',selected_execution=ref,owning_study=host.run_id,completed_confirmations=count,progress=confirmation_progress(host,ref))
 
 
 def facts(host):
@@ -60,7 +85,8 @@ def facts(host):
             historical='imported evidence has its original ownership and previous cost; no new execution',
             receipt='reusing an operation ID returns a cached receipt; additional execution cost is zero',
             role='origin, role and phase are metadata, not scientific configuration changes'),
-        confirmation_options=[dict(execution_reference=r, **eligibility(host,r)) for r in [*s['results'],*s.get('rl_evaluations',[])]],
+        confirmation_progress=confirmation_progress(host),
+        confirmation_options=[dict(execution_reference=r, **eligibility(host,r)) for r in [*s['results'],*s.get('rl_evaluations',[]),*s.get('linked_selections',[])]],
         confirmation_reference_shape={'selected_execution':{'artifact_id':'exact passing result artifact_id','media_type':'application/json'}})
 
 
@@ -81,6 +107,8 @@ def mechanics_context(host, candidate):
         replays=[dict(reference=r,**{k:host.store.artifact(r).get(k) for k in ('status','replay')})
             for r in s.get('mechanics_results',[]) if host.store.artifact(r).get('source_mechanics')==source]
         rows.append(dict(mechanics_attempt=source,offline_trajectory=relation['offline_trajectory'],
+            solver_status=host.store.artifact(source).get('status'),
+            independent_mathematical_verification='passed' if replays and all((r.get('replay') or {}).get('gates_passed',False) for r in replays) else 'failed' if replays else 'unverified',
             original_offline_task_accepted=relation['original_task_feasible'],relaxed_nlp_feasible=relation['relaxed_nlp_feasible'],
             independent_model_replays=replays,
             exploratory_closed_loop=not relation['original_task_feasible'] or not replays or

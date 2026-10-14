@@ -381,3 +381,19 @@ evidence/joint_design_control_20261014/scientific_summary.json and
 evidence/scheduling_closeout_20261014/campaign_summary.json for separate costs,
 unedited decisions, factual qualifications and runtime hashes. No task thresholds,
 historical spending or accepted STOP records were rewritten.
+
+
+The 2026-10-14 confirmation completion uses `examples/research_core/confirmation_completion.json`:
+16 provider requests, 40 public operations, 1200 elapsed seconds including 300 delivery,
+and exactly one new confirmation. It links the immutable historical selection and one
+actual post-selection confirmation, without replaying or charging source work.
+The separate `autonomous_design_control.json` allows model-selected mathematical accuracy,
+reference use and controller decisions within 80 requests, 200 operations, 21600 elapsed
+and 18000 numerical seconds. Use the existing prepare, commit/bind, live, export workflow.
+Both retain the original task and two-confirmation requirement. Ordinary RL evaluation
+is development; confirmation uses `research_plan` with `action="confirm"` and the exact
+`selected_execution`. Failed confirmations stay unconfirmed; invalid executions remain
+unmeasured. A training failure without a policy returns its actual summary for model choice.
+The optional NMPC first-use launch remains unavailable: synchronous simulation checks time
+between steps and the host seals overruns after return, so an outer hard cap is not enforceable
+without broader execution changes. Matching complete timing remains required.

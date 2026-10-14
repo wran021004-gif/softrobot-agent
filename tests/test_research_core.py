@@ -583,3 +583,63 @@ class SchedulingCloseoutTests(TestCase):
             bridge.training_capacity(h,{'active_seconds':1200})
             s['spec']['budgets']['protected_provider_requests']=9
             with self.assertRaisesRegex(ValueError,'CLOSEOUT'):bridge.training_capacity(h,{'active_seconds':1200})
+
+
+class ConfirmationCompletionTests(TestCase):
+    def test_unique_historical_and_current_counts_identity_and_failure(self):
+        from types import SimpleNamespace
+        from tools import research_core_feedback as feedback
+        ref=lambda n:dict(artifact_id=n,media_type='application/json')
+        selected,historical,new,ordinary=map(ref,('selected','historical','new','ordinary'))
+        identity={'candidate':'c','task':'t','controller':'exact-checkpoint'}
+        records={n:dict(role='confirmation',selected_execution=selected,execution_id=n,study='source' if n=='historical' else 'current') for n in ('historical','new')}
+        records['ordinary']=dict(role='development',execution_id='ordinary')
+        views={n:dict(solution_identity=identity,complete=True,passed=True) for n in ('selected','historical','new','ordinary')}
+        s=dict(spec={'confirmation':{'fresh_independent_repetitions':2}},selected=selected,results=[],historical_confirmations=[historical,historical],rl_evaluations=[ordinary])
+        host=SimpleNamespace(store=SimpleNamespace(artifact=lambda r:records[r['artifact_id']]))
+        with patch.object(core,'state',return_value=s),patch.object(feedback,'result_view',side_effect=lambda h,r:views[r['artifact_id']]):
+            p=feedback.confirmation_progress(host);self.assertEqual((p['historical_confirmations'],p['current_study_confirmations'],p['remaining']),(1,0,1))
+            self.assertFalse(p['confirmed']);s['rl_evaluations']+=[new,new]
+            p=feedback.confirmation_progress(host);self.assertTrue(p['confirmed']);self.assertEqual(p['current_study_confirmations'],1)
+            views['new']['solution_identity']={'controller':'different'}
+            self.assertEqual(feedback.confirmation_progress(host)['remaining'],1)
+            views['new']['solution_identity']=identity;views['new']['passed']=False
+            p=feedback.confirmation_progress(host);self.assertFalse(p['confirmed']);self.assertEqual(p['failures'],1)
+            views['new']['complete']=False
+            p=feedback.confirmation_progress(host);self.assertEqual(p['invalid_executions'],1);self.assertEqual(p['failures'],0)
+
+    def test_completion_binding_readonly_and_one_confirmation_capacity(self):
+        from tools import research_core_rl as bridge
+        with TemporaryDirectory(dir=core.ROOT/'runs',prefix='completion-fixture-') as folder:
+            spec=read(core.ROOT/'examples/research_core/confirmation_completion.json');spec['started_unix']=time.time()
+            path=core.Path(folder)/'spec.json';core.atomic_json(path,spec)
+            h=core.prepare(path,core.Path(folder)/'business');s=core.state(h)
+            self.assertEqual(core.claims(h)['confirmation_progress']['historical_confirmations'],1)
+            self.assertEqual(bridge.evaluation_capacity(h,2,True)['admitted'],1)
+            self.assertEqual(bridge.evaluation_capacity(h,1)['admitted'],0)
+            bridge.bind_source(h)
+            self.assertEqual(core.claims(h)['independent_confirmation_count'],1)
+            q=dict(operation='evaluate',run_id=spec['rl_evaluation_source']['run_id'],checkpoint=spec['rl_evaluation_source']['checkpoint'],rationale='wrong confirmation operation')
+            with patch.object(core,'guard'),patch.object(bridge,'invoke',side_effect=AssertionError('ordinary evaluation must not run')):
+                with self.assertRaisesRegex(ValueError,'research_plan.*confirm.*41a7df9f'):bridge.dispatch(h,q,'wrong')
+            self.assertEqual(s['selected'],spec['rl_evaluation_source']['selected_execution'])
+            import gc;gc.collect()
+
+    def test_unverified_mechanics_remains_unverified(self):
+        from types import SimpleNamespace
+        from tools import research_core_feedback as feedback
+        candidate=dict(artifact_id='c',media_type='application/json');source=dict(artifact_id='math',media_type='application/json')
+        relation=dict(candidate=candidate,mechanics_attempt=source,offline_trajectory='trajectory',original_task_feasible=True,relaxed_nlp_feasible=True)
+        records={'handoff':relation,'math':dict(status='solved')}
+        h=SimpleNamespace(store=SimpleNamespace(artifact=lambda r:records[r['artifact_id']]))
+        with patch.object(core,'state',return_value={'handoffs':[dict(artifact_id='handoff')],'mechanics_results':[]}):
+            view=feedback.mechanics_context(h,candidate)[0]
+            self.assertEqual(view['independent_mathematical_verification'],'unverified');self.assertTrue(view['exploratory_closed_loop'])
+
+    def test_nmpc_first_use_stays_unavailable_without_enforced_cap(self):
+        from types import SimpleNamespace
+        cfg={'task':'fixed'};s=dict(spec={'nmpc_execution_cap_s':1800,'nmpc_budgeted_first_use':True},results=[])
+        with patch.object(core,'state',return_value=s),patch.object(core,'verify_candidate',return_value={'scientific_configuration':cfg}):
+            gate=core.nmpc_timing(SimpleNamespace(),'candidate')
+            self.assertFalse(gate['available']);self.assertIsNone(gate['complete_execution_s'])
+            self.assertIn('cannot enforce',gate['first_use_limitation'])
