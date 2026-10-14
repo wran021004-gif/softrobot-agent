@@ -4,18 +4,46 @@ from pydantic import Field, FiniteFloat, model_validator
 from schemas.common import Contract
 from schemas.platform import EvidenceRef
 from schemas.casadi_feedback import Candidate as MechanicsChoice
+from extensions.tendon_family.generated_serial import parameter_domains
+from schemas.platform_analysis import TaskAnalysisProtocol
+
+
+class LegacyMechanicsChoice(MechanicsChoice):
+    design_candidate: EvidenceRef | None = None
 
 
 class Parameters(Contract):
-    d: FiniteFloat = Field(default=0., ge=-1, le=1)
+    near_length_m: FiniteFloat = Field(default=.16,gt=0)
+    distal1_length_m: FiniteFloat = Field(default=.11,gt=0)
+    near_section_scale: FiniteFloat = 1.
+    distal1_section_scale: FiniteFloat = 1.
+    near_routing_scale: FiniteFloat = 1.
+    distal1_routing_scale: FiniteFloat = 1.
+    near_material: Literal['baseline','compliant','stiff'] = 'baseline'
+    distal1_material: Literal['baseline','compliant','stiff'] = 'baseline'
     holding_tip_speed_weight: FiniteFloat = Field(default=.10, ge=.025, le=.10)
     terminal_tip_speed_weight: FiniteFloat = Field(default=.10, ge=.025, le=.10)
 
+    @model_validator(mode='after')
+    def supported(self):
+        for key,domain in parameter_domains({'near':self.near_length_m,'distal1':self.distal1_length_m}).items():
+            if 'length' not in key and 'bounds' in domain and not domain['bounds'][0]<=getattr(self,key)<=domain['bounds'][1]:
+                raise ValueError('SUPPORTED_PARAMETER_DOMAIN: '+key)
+        return self
+
 
 class Search(Contract):
-    variables: list[Literal['d', 'holding_tip_speed_weight', 'terminal_tip_speed_weight']] = Field(min_length=1)
-    bounds: dict[str, tuple[FiniteFloat, FiniteFloat]]
+    variables: list[str] = Field(min_length=1)
+    bounds: dict[str, tuple[FiniteFloat, FiniteFloat]] = Field(default_factory=dict)
+    options: dict[str,list[Literal['baseline','compliant','stiff']]] = Field(default_factory=dict)
     fixed: Parameters = Field(default_factory=Parameters)
+    length_mode: Literal['independent','fixed_total'] = 'independent'
+    total_length_m: FiniteFloat | None = None
+    aggregate_length_bounds_m: tuple[FiniteFloat,FiniteFloat] | None = None
+    evaluation_mode: Literal['mathematical_proxy','backend_task'] = 'mathematical_proxy'
+    objective: Literal['held_position_min_eigenvalue','target_equilibrium_residual','joint_reach_hold'] = 'held_position_min_eigenvalue'
+    operating_point: Literal['standardized_initial_pretension','controller_start_input','target_equilibrium','halfway_waypoint'] = 'halfway_waypoint'
+    protocol: TaskAnalysisProtocol | None = None
     max_evaluations: int = Field(default=3, ge=1, le=8, strict=True)
     step: FiniteFloat = Field(default=.25, gt=0, le=.5)
     ranking: Literal['feasible_then_max_normalized_violation_then_sum_v1'] = 'feasible_then_max_normalized_violation_then_sum_v1'
@@ -23,12 +51,32 @@ class Search(Contract):
 
     @model_validator(mode='after')
     def domain(self):
-        if len(set(self.variables)) != len(self.variables) or set(self.bounds) != set(self.variables):
+        domains=parameter_domains({'near':self.fixed.near_length_m,'distal1':self.fixed.distal1_length_m})
+        if len(set(self.variables)) != len(self.variables) or set(self.bounds)&set(self.options) or set(self.bounds)|set(self.options)!=set(self.variables):
             raise ValueError('SEARCH_BOUNDS_MUST_MATCH_UNIQUE_SELECTED_VARIABLES')
         for name, (a, b) in self.bounds.items():
-            lo, hi = (-1., 1.) if name == 'd' else (.025, .10)
+            if name not in domains or 'bounds' not in domains[name]:raise ValueError('UNKNOWN_NUMERIC_VARIABLE: '+name)
+            lo,hi=domains[name]['bounds']
             if not lo <= a < b <= hi or not a <= getattr(self.fixed, name) <= b:
                 raise ValueError('SEARCH_DOMAIN_OR_INITIAL_OUTSIDE_BOUNDS: ' + name)
+        for name,options in self.options.items():
+            if name not in domains or not options or len(set(options))!=len(options) or set(options)-set(domains[name].get('options',[])):
+                raise ValueError('UNKNOWN_OR_INVALID_CATEGORICAL_VARIABLE: '+name)
+        if self.length_mode=='fixed_total' and self.total_length_m is None:raise ValueError('EXPLICIT_FIXED_TOTAL_REQUIRED')
+        if (self.evaluation_mode=='backend_task')!=(self.objective=='joint_reach_hold'):raise ValueError('OBJECTIVE_REQUIRES_COMPATIBLE_EVALUATION_MODE')
+        return self
+
+
+class AnalysisRequest(Contract):
+    candidate: EvidenceRef
+    operation: Literal['equilibrium','linearization','controllability','endpoint','braking']
+    operating_point: Literal['standardized_initial_pretension','controller_start_input','target_equilibrium','halfway_waypoint','saved_state'] = 'halfway_waypoint'
+    saved_state: EvidenceRef | None = None
+    protocol: TaskAnalysisProtocol
+
+    @model_validator(mode='after')
+    def exact_state(self):
+        if (self.operating_point=='saved_state')!=(self.saved_state is not None):raise ValueError('SAVED_POINT_REQUIRES_EXACT_STATE_REFERENCE')
         return self
 
 
@@ -57,7 +105,7 @@ class Plan(Contract):
     candidate: EvidenceRef | None = None
     selected_execution: EvidenceRef | None = Field(default=None, description='Exact immutable passing NMPC result or independent RL evaluation; freezes the complete solution')
     diagnostic: LocalDiagnostic | None = None
-    mechanics: MechanicsChoice | None = None
+    mechanics: LegacyMechanicsChoice | None = None
     mechanics_source: EvidenceRef | None = None
     experience_disposition: dict[str, Literal['adopted', 'rejected', 'context_only']] = Field(default_factory=dict)
 

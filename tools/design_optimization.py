@@ -17,12 +17,14 @@ def structures(problem):
         spec=problem.variables[name]
         return [spec.value] if isinstance(spec,Fixed) else list(range(spec.bounds[0],spec.bounds[1]+1)) if isinstance(spec,Integer) else spec.choices
     result=[]
-    for n,p,d,m in product(*(options(k) for k in ('segment_count','proximal_tendons','distal_tendons','material'))):
+    names=[k for k,v in problem.variables.items() if k in ('segment_count','proximal_tendons','distal_tendons','material') or hasattr(v,'choices') or k.endswith('_material')]
+    for selections in product(*(options(k) for k in names)):
+        structure=dict(zip(names,selections));n,p,d=(structure[k] for k in ('segment_count','proximal_tendons','distal_tendons'))
         if any(count is not None and count!=p+d for count in (problem.fixed_tendon_count,problem.fixed_actuator_count)):continue
-        result.append(dict(segment_count=n,proximal_tendons=p,distal_tendons=d,material=m))
+        result.append(structure)
     if not result:raise ValueError('NO_COMPATIBLE_STRUCTURE_FOR_FIXED_COUNTS')
     for s in problem.method.initial_structures:
-        if plain(s) not in result:raise ValueError('INITIAL_STRUCTURE_OUTSIDE_DECLARED_DOMAIN')
+        if s.model_dump(mode='json',exclude_none=True) not in result:raise ValueError('INITIAL_STRUCTURE_OUTSIDE_DECLARED_DOMAIN')
     return result
 
 
@@ -34,9 +36,10 @@ class Allocation:
     Equal/fixed coordinates are absent from the latent vector.
     """
     def __init__(self,spec,count):
+        self.mode=spec.mode;self.aggregate=spec.aggregate_bounds_m
         self.total=spec.total_flexible_length_m
         self.base=spec.baseline_by_count[str(count)] if str(count) in spec.baseline_by_count else family.default_lengths(count,self.total)
-        if len(self.base)!=count or any(l<=0 for l in self.base) or abs(sum(self.base)-self.total)>1e-12:
+        if len(self.base)!=count or any(l<=0 for l in self.base) or self.mode=='fixed_total' and abs(sum(self.base)-self.total)>1e-12:
             raise ValueError('BASELINE_VECTOR_MUST_MATCH_COUNT_POSITIVE_AND_TOTAL')
         self.bounds=spec.bounds_by_count.get(str(count),[(l*(1-spec.relative_range),l*(1+spec.relative_range)) for l in self.base])
         if len(self.bounds)!=count:raise ValueError('TOPOLOGY_LENGTH_BOUNDS_SIZE')
@@ -55,23 +58,24 @@ class Allocation:
             if any(abs(value-self.base[int(key)])>1e-12 for key,value in fixed.items()):
                 raise ValueError('FIXED_VECTOR_CONFLICTS_WITH_FIXED_LENGTH_OVERRIDE')
             self.bounds=[(l,l) for l in self.base]
-        if sum(a for a,b in self.bounds)>self.total+1e-12 or sum(b for a,b in self.bounds)<self.total-1e-12:
+        if self.mode=='fixed_total' and (sum(a for a,b in self.bounds)>self.total+1e-12 or sum(b for a,b in self.bounds)<self.total-1e-12):
             raise ValueError('INFEASIBLE_LENGTH_SUM_AND_BOUNDS')
         self.indices=[i for i,(a,b) in enumerate(self.bounds) if a<b]
-        self.derived=self.indices[-1] if self.indices else None
-        self.active=self.indices[:-1]
+        self.derived=self.indices[-1] if self.indices and self.mode=='fixed_total' else None
+        self.active=self.indices[:-1] if self.mode=='fixed_total' else self.indices
         # Fixed overrides may move the start; choose conditional interval
         # midpoints as a feasible initialization when the baseline is excluded.
         self.initial=self.encode(self.base) if self.valid(self.base) else {f'length/{i}':.5 for i in self.active}
 
     def valid(self,values):
-        return abs(sum(values)-self.total)<=1e-12 and all(a-1e-12<=v<=b+1e-12 for v,(a,b) in zip(values,self.bounds))
+        return (self.mode!='fixed_total' or abs(sum(values)-self.total)<=1e-12) and (self.aggregate is None or self.aggregate[0]-1e-12<=sum(values)<=self.aggregate[1]+1e-12) and all(a-1e-12<=v<=b+1e-12 for v,(a,b) in zip(values,self.bounds))
 
     def interval(self,i,remaining,unassigned):
         a,b=self.bounds[i]
         return max(a,remaining-sum(self.bounds[j][1] for j in unassigned)),min(b,remaining-sum(self.bounds[j][0] for j in unassigned))
 
     def encode(self,values):
+        if self.mode=='independent':return {f'length/{i}':(values[i]-self.bounds[i][0])/(self.bounds[i][1]-self.bounds[i][0]) for i in self.active}
         remaining=self.total-sum(a for a,b in self.bounds if a==b);encoded={}
         for index,i in enumerate(self.active):
             a,b=self.interval(i,remaining,self.indices[index+1:])
@@ -80,6 +84,10 @@ class Allocation:
         return encoded
 
     def decode(self,latent):
+        if self.mode=='independent':
+            values=[a+latent.get(f'length/{i}',0.)*(b-a) for i,(a,b) in enumerate(self.bounds)]
+            if any(not 0<=latent[f'length/{i}']<=1 for i in self.active) or not self.valid(values):raise ValueError('DECODED_INDEPENDENT_LENGTH_BOUNDS_OR_AGGREGATE')
+            return values
         values=[a if a==b else None for a,b in self.bounds]
         remaining=self.total-sum(v for v in values if v is not None)
         for index,i in enumerate(self.active):
@@ -115,6 +123,16 @@ def decode(problem,structure,latent):
 
 
 def resolved_input(problem,values,run_id,policy):
+    if problem.source_configuration:
+        from tools.research.design import resolved_configuration
+        from schemas.research_core import Parameters
+        p={k:values[k] for k in Parameters.model_fields if k in values}
+        p.update(near_length_m=values['lengths_m'][0],distal1_length_m=values['lengths_m'][1])
+        base=deepcopy(problem.source_configuration);base['policy']=deepcopy(policy)
+        base['policy']['controller']=deepcopy(problem.source_configuration['policy']['controller'])
+        base['policy']['controller']['parameters']['data']['recipe']=plain(problem.execution.recipe)
+        base['task']=plain(problem.task)
+        return resolved_configuration(problem.source_configuration,base,plain(Parameters.model_validate(p)),run_id)
     r=family.Recipe.model_validate({k:v for k,v in values.items() if k not in ('holding_tip_speed_weight','terminal_tip_speed_weight')})
     design,mesh,physics=family.generate(r)
     cfg=deepcopy(family.catalog()['scientific_source']);cfg['run_id']=run_id;cfg['seed']=problem.execution.seed
@@ -139,6 +157,9 @@ def validate_problem(problem, evaluation_profile=None):
     topology=structures(problem)
     for structure in topology:
         allocation,initial=continuous_space(problem,structure);decode(problem,structure,initial)
+    if problem.evaluation_mode=='mathematical_proxy':
+        # Analysis consumes the saved candidate; it requires no controller execution.
+        return problem,topology
     # Scientific algorithm inherited, with only the declared two weights free.
     expected=family.catalog()['scientific_source']['policy']['controller']['parameters']['data']['recipe']
     if evaluation_profile is not None:
@@ -157,6 +178,13 @@ def validate_problem(problem, evaluation_profile=None):
 
 
 def rank(row,problem):
+    if problem.evaluation_mode=='mathematical_proxy':
+        if row.get('evaluation_kind')!='mathematical_proxy' or row.get('objective_identity')!=digest(plain(problem.objective)):
+            raise ValueError('INCOMPARABLE_PROXY_OBJECTIVE_OR_PROTOCOL')
+        score=row['objective_values'].get(problem.objective.proxy)
+        valid=row.get('computation_status')=='computed' and score is not None and np.isfinite(score)
+        direction=-1 if problem.objective.proxy=='held_position_min_eigenvalue' else 1
+        return (0,direction*score) if valid else (1,1e100)
     if row['feasible']:
         return (0,row['resolved']['actuator_count'] if problem.objective.accepted_resource_preference=='fewer_actuators' else 0,
                 row['objective_values']['max_normalized_ratio'],row['objective_values']['sum_normalized_ratio'])
@@ -222,6 +250,17 @@ class ReceiptEvaluator:
 def evaluate(problem,structure,latent,candidate_id,phase,evaluator,feedback=None):
     values=decode(problem,structure,latent);result=evaluator(problem,values,candidate_id)
     if result['status']!='evaluated':return result
+    if problem.evaluation_mode=='mathematical_proxy':
+        if result.get('kind')!='mathematical_proxy' or result.get('task_acceptance')!='unmeasured' or result.get('acceptance'):
+            raise ValueError('PROXY_MUST_NOT_FABRICATE_TASK_ACCEPTANCE')
+        allocation,_=continuous_space(problem,structure)
+        return plain(EvaluatedDesign(evaluation_kind='mathematical_proxy',computation_status=result['computation_status'],
+            task_acceptance='unmeasured',objective_identity=result['objective_identity'],
+            local_model_constraints=result.get('local_model_constraints'),candidate_id=result.get('candidate_id',candidate_id),
+            phase=phase,scientific_identity=result.get('scientific_identity',digest(values)),latent_coordinates=latent,
+            resolved=dict(parameters=values,segment_count=values['segment_count'],tendon_count=values['proximal_tendons']+values['distal_tendons'],actuator_count=values['proximal_tendons']+values['distal_tendons']),
+            feasible=False,objective_values=result['proxy_values'],constraint_outcomes=dict(individual_length_bounds=allocation.valid(values['lengths_m']),task_acceptance='unmeasured'),
+            evidence=result['evidence'],execution_status='analysis_only',used_feedback=feedback))
     a=result['acceptance'];m=a['metrics']
     limits=tuple(a.get('components',{}).get(key,{}).get('limit',fallback) for key,fallback in
         [('evaluator:task_bound',.01),('holding_position',problem.execution.settling.position_limit_m),
@@ -233,6 +272,7 @@ def evaluate(problem,structure,latent,candidate_id,phase,evaluator,feedback=None
         tendon_count=values['proximal_tendons']+values['distal_tendons'],actuator_count=values['proximal_tendons']+values['distal_tendons'])
     allocation,_=continuous_space(problem,structure)
     return plain(EvaluatedDesign(candidate_id=result.get('candidate_id',candidate_id),phase=phase,scientific_identity=result.get('scientific_identity',digest(values)),
+        task_acceptance='passed' if a['accepted'] else 'failed',
         latent_coordinates=latent,resolved=resolved,feasible=a['accepted'],objective_values=dict(**m,
             max_normalized_ratio=max(ratios),sum_normalized_ratio=sum(ratios)),
         constraint_outcomes=dict(physical_acceptance=a,length_sum=abs(sum(values['lengths_m'])-problem.lengths.total_flexible_length_m)<=1e-12,
@@ -269,7 +309,7 @@ def solve(problem,host=None,*,evaluator=None,state=None,save_state=None,evaluati
         initialized=[],inner={},pending=None,proposal_count=0,termination=None)
     if state['problem_identity']!=identity:raise ValueError('SEARCH_STATE_PROBLEM_IDENTITY')
     save_state=save_state or (lambda s:None)
-    initial=[plain(s) for s in problem.method.initial_structures] or topology[:min(2,len(topology))]
+    initial=[s.model_dump(mode='json',exclude_none=True) for s in problem.method.initial_structures] or (topology if problem.evaluation_mode=='mathematical_proxy' else topology[:min(2,len(topology))])
     while not state['termination']:
         if state['pending'] is None:
             if len(state['evaluated'])>=problem.budget.max_evaluations:state['termination']='evaluation_budget_exhausted';break
@@ -282,7 +322,7 @@ def solve(problem,host=None,*,evaluator=None,state=None,save_state=None,evaluati
             else:
                 eligible=[r for r in state['evaluated'] if r['latent_coordinates']]
                 if not eligible:state['termination']='all_design_variables_fixed';break
-                incumbent=min(eligible,key=lambda r:rank(r,problem));structure={k:incumbent['resolved']['parameters'][k] for k in ('segment_count','proximal_tendons','distal_tendons','material')}
+                incumbent=min(eligible,key=lambda r:rank(r,problem));structure=next(s for s in topology if all(incumbent['resolved']['parameters'][k]==v for k,v in s.items()))
                 inner=state['inner'].setdefault(digest(structure),dict(iteration=0,step=problem.method.step))
                 if inner['step']<problem.method.minimum_step:state['termination']='minimum_coordinate_step';break
                 names=list(continuous_space(problem,structure)[1]) if problem.method.name=='hierarchical_coordinate_v1_1' else list(incumbent['latent_coordinates'])
@@ -323,6 +363,13 @@ def solve(problem,host=None,*,evaluator=None,state=None,save_state=None,evaluati
         if row['feasible'] and problem.method.stop_on_acceptance:state['termination']='joint_acceptance_found'
     feasible=[r for r in state['evaluated'] if r['feasible']];infeasible=[r for r in state['evaluated'] if not r['feasible']]
     ref=save_state(state)
+    if problem.evaluation_mode=='mathematical_proxy':
+        computed=[r for r in state['evaluated'] if rank(r,problem)[0]==0]
+        return DesignOptimizationResult(problem_identity=identity,status='best_mathematical_candidate' if computed else 'no_computable_proxy',
+            best_mathematical_candidate=min(computed,key=lambda r:rank(r,problem)) if computed else None,
+            evaluated=state['evaluated'],construction_rejections=state['rejections'],search_updates=state['updates'],
+            termination_reason=state['termination'],search_state=ref,resource_use=dict(new_evaluated_designs=len(state['evaluated']),elapsed_s=time.time()-state['started']),
+            unsearched_scope=dict(task_acceptance='unmeasured',global_feasibility_proven=False,global_optimality_proven=False))
     return DesignOptimizationResult(problem_identity=identity,status='best_feasible_found' if feasible else 'bounded_search_without_feasible',
         best_feasible=min(feasible,key=lambda r:rank(r,problem)) if feasible else None,
         best_observed_infeasible=min(infeasible,key=lambda r:rank(r,problem)) if infeasible else None,

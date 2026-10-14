@@ -6,6 +6,7 @@ from schemas.common import Contract
 from schemas.platform import TaskDefinition, EvidenceRef
 from extensions.tendon_family.contracts import GVSTrajectoryParameters
 from extensions.tendon_family.gvs_profile import SampledSettling
+from extensions.tendon_family.generated_serial import SUPPORTED_NUMERIC, MATERIAL_MULTIPLIERS, parameter_domains
 
 
 class Fixed(Contract):
@@ -33,6 +34,8 @@ Variable = Annotated[Fixed | Integer | Categorical | Continuous,Field(discrimina
 
 
 class LengthAllocation(Contract):
+    mode: Literal['fixed_total','independent'] = 'fixed_total'
+    aggregate_bounds_m: tuple[FiniteFloat,FiniteFloat] | None = None
     free: bool = True
     total_flexible_length_m: FiniteFloat = Field(default=.27,gt=0)
     relative_range: FiniteFloat = Field(default=.05,ge=0,le=.05)
@@ -54,6 +57,8 @@ class Structure(Contract):
     proximal_tendons: int = Field(ge=3,le=4,strict=True)
     distal_tendons: int = Field(ge=3,le=4,strict=True)
     material: Literal['baseline','compliant','stiff'] = 'baseline'
+    near_material: Literal['baseline','compliant','stiff'] | None = None
+    distal1_material: Literal['baseline','compliant','stiff'] | None = None
 
 
 class Method(Contract):
@@ -66,6 +71,9 @@ class Method(Contract):
 
 
 class Objective(Contract):
+    proxy: Literal['held_position_min_eigenvalue','target_equilibrium_residual'] | None = None
+    operating_point: str = 'halfway_waypoint'
+    protocol: dict | None = None
     feasibility: Literal['joint_reach_hold_v1'] = 'joint_reach_hold_v1'
     ranking: Literal['feasible_then_max_normalized_violation_then_sum_v1'] = 'feasible_then_max_normalized_violation_then_sum_v1'
     accepted_resource_preference: Literal['fewer_actuators','none'] = 'fewer_actuators'
@@ -89,6 +97,8 @@ class DesignOptimizationProblem(Contract):
     generator: Literal['serial_two_group_v1'] = 'serial_two_group_v1'
     task: TaskDefinition
     execution: FrozenExecution
+    evaluation_mode: Literal['backend_task','mathematical_proxy'] = 'backend_task'
+    source_configuration: dict | None = None
     variables: dict[str,Variable]
     lengths: LengthAllocation = Field(default_factory=LengthAllocation)
     # Counts are derived under one independent actuator per tendon. Fixed totals
@@ -101,17 +111,21 @@ class DesignOptimizationProblem(Contract):
 
     @model_validator(mode='after')
     def domain(self):
-        legal={'segment_count':(2,4),'proximal_tendons':(3,4),'distal_tendons':(3,4),
-            'section_scale':(.95,1.05),'routing_scale':(.98,1.02),
-            'holding_tip_speed_weight':(.025,.1),'terminal_tip_speed_weight':(.025,.1),'pretension_n':(0.,8.)}
+        legal={'segment_count':(2,4),'proximal_tendons':(3,4),'distal_tendons':(3,4),**SUPPORTED_NUMERIC,'pretension_n':(0.,8.)}
         required=set(legal)-{'pretension_n'} | {'material'}
-        if not required <= set(self.variables) or set(self.variables)-set(legal)-{'material'}:
+        materials={'material'}
+        if self.source_configuration:
+            segments={c['id']:c['length_m'] for c in self.source_configuration['robot']['structure']['data']['components'] if c['kind']=='flexible_segment'}
+            for key,domain in parameter_domains(segments).items():
+                if 'material' in key:materials.add(key)
+                elif 'length_m' not in key:legal[key]=tuple(domain['bounds'])
+        if not required <= set(self.variables) or set(self.variables)-set(legal)-materials:
             raise ValueError('DESIGN_VARIABLE_KEYS: required '+str(sorted(required)))
         for key,var in list(self.variables.items()):
             count=key in ('segment_count','proximal_tendons','distal_tendons')
-            if key=='material':
+            if key in materials:
                 values=[var.value] if isinstance(var,Fixed) else var.choices if isinstance(var,Categorical) else []
-                if not values or set(values)-{'baseline','compliant','stiff'}:raise ValueError('MATERIAL_CATEGORICAL_DOMAIN')
+                if not values or len(set(values))!=len(values) or set(values)-set(MATERIAL_MULTIPLIERS):raise ValueError('MATERIAL_CATEGORICAL_DOMAIN')
                 continue
             lo,hi=legal[key]
             if isinstance(var,Fixed):
@@ -130,16 +144,23 @@ class DesignOptimizationProblem(Contract):
         if (self.fixed_tendon_count is not None and self.fixed_actuator_count is not None and
                 self.fixed_tendon_count!=self.fixed_actuator_count):raise ValueError('ONE_TO_ONE_ACTUATOR_TENDON_COUNTS_CONFLICT')
         if self.method.minimum_step>self.method.step:raise ValueError('MINIMUM_STEP_EXCEEDS_INITIAL_STEP')
+        if (self.evaluation_mode=='mathematical_proxy')!=(self.objective.proxy is not None):raise ValueError('TYPED_OBJECTIVE_EVALUATION_MODE_REQUIRED')
+        if self.evaluation_mode=='mathematical_proxy' and self.objective.protocol is None:raise ValueError('PROXY_PROTOCOL_REQUIRED')
         return self
 
 
 class EvaluatedDesign(Contract):
+    evaluation_kind: Literal['backend_task','mathematical_proxy'] = 'backend_task'
+    computation_status: str = 'computed'
+    task_acceptance: Literal['passed','failed','unmeasured'] = 'unmeasured'
+    objective_identity: str | None = None
+    local_model_constraints: dict | None = None
     candidate_id: str
     phase: Literal['structural_initialization','feedback_coordinate','confirmation']
     scientific_identity: str
     latent_coordinates: dict[str,FiniteFloat]
     resolved: dict
-    feasible: bool
+    feasible: bool = False
     objective_values: dict
     constraint_outcomes: dict
     evidence: dict
@@ -151,7 +172,8 @@ class DesignOptimizationResult(Contract):
     contract: Literal['research.design_optimization_result'] = 'research.design_optimization_result'
     version: Literal['1.0.0'] = '1.0.0'
     problem_identity: str
-    status: Literal['best_feasible_found','bounded_search_without_feasible','pending_execution']
+    status: Literal['best_feasible_found','bounded_search_without_feasible','pending_execution','best_mathematical_candidate','no_computable_proxy']
+    best_mathematical_candidate: EvaluatedDesign | None = None
     best_feasible: EvaluatedDesign | None = None
     best_observed_infeasible: EvaluatedDesign | None = None
     evaluated: list[EvaluatedDesign]

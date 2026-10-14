@@ -15,6 +15,21 @@ GENERATOR = 'serial_two_group_v1'
 CONTROLLER_VERSION = '11.0.0'
 BUILDER_VERSION = '3.0.0'
 
+# Shared capability domains. Study grants may narrow these but cannot widen them.
+MATERIAL_MULTIPLIERS = dict(baseline=1., compliant=.9, stiff=1.1)
+SUPPORTED_NUMERIC = dict(section_scale=(.95,1.05), routing_scale=(.98,1.02),
+    holding_tip_speed_weight=(.025,.10), terminal_tip_speed_weight=(.025,.10))
+
+
+def parameter_domains(lengths):
+    result={k:dict(bounds=list(v),units='1') for k,v in SUPPORTED_NUMERIC.items() if 'weight' in k}
+    for segment,length in lengths.items():
+        result[segment+'_length_m']=dict(bounds=[.95*length,1.05*length],units='m')
+        for field in ('section_scale','routing_scale'):
+            result[segment+'_'+field]=dict(bounds=list(SUPPORTED_NUMERIC[field]),units='1',owner=segment)
+        result[segment+'_material']=dict(options=list(MATERIAL_MULTIPLIERS),units='simulation scenario',owner=segment)
+    return result
+
 
 class Recipe(Contract):
     family: Literal['serial_two_group_v1'] = GENERATOR
@@ -26,11 +41,26 @@ class Recipe(Contract):
     routing_scale: FiniteFloat = Field(default=1., ge=.98, le=1.02)
     material: Literal['baseline', 'compliant', 'stiff'] = 'baseline'
     pretension_n: FiniteFloat = Field(default=.2, ge=0., le=8.)
+    segment_section_scales: dict[str,FiniteFloat] = Field(default_factory=dict)
+    segment_routing_scales: dict[str,FiniteFloat] = Field(default_factory=dict)
+    segment_materials: dict[str,Literal['baseline','compliant','stiff']] = Field(default_factory=dict)
+    source_design: dict | None = None
+    source_mesh: dict | None = None
 
     @model_validator(mode='after')
     def lengths(self):
         if len(self.lengths_m) != self.segment_count or any(l <= 0 for l in self.lengths_m):
             raise ValueError('ACTIVE_POSITIVE_LENGTH_VECTOR_REQUIRED')
+        names={'near',*[f'distal{i+1}' for i in range(self.segment_count-1)]}
+        for field,domain in [('segment_section_scales',SUPPORTED_NUMERIC['section_scale']),
+                             ('segment_routing_scales',SUPPORTED_NUMERIC['routing_scale'])]:
+            values=getattr(self,field)
+            if set(values)-names or any(not domain[0]<=v<=domain[1] for v in values.values()):
+                raise ValueError('SEGMENT_SCALE_OWNER_OR_DOMAIN: '+field)
+        if set(self.segment_materials)-names: raise ValueError('SEGMENT_MATERIAL_OWNER')
+        if (self.source_design is None)!=(self.source_mesh is None):raise ValueError('COMPLETE_IMMUTABLE_SOURCE_REQUIRED')
+        if self.source_design is not None and (self.section_scale!=1 or self.routing_scale!=1 or self.material!='baseline'):
+            raise ValueError('SOURCE_RELATIVE_SETTINGS_REQUIRE_SEGMENT_FIELDS')
         return self
 
 
@@ -58,6 +88,22 @@ def attachment(part, s=0., position=None):
 
 def generate(value):
     r=Recipe.model_validate(value)
+    if r.source_design is not None:
+        design=deepcopy(r.source_design); mesh=deepcopy(r.source_mesh)
+        segments=[c for c in design['components'] if c['kind']=='flexible_segment']
+        names=[c['id'] for c in segments]
+        if names!=['near','distal1'] or r.segment_count!=2 or len(design['tendons'])!=6 or (r.proximal_tendons,r.distal_tendons)!=(3,3):
+            raise ValueError('IMMUTABLE_SOURCE_TWO_SEGMENT_SIX_TENDON_SCOPE')
+        if any(t['pretension_n']!=r.pretension_n for t in design['tendons']):
+            raise ValueError('SOURCE_PRETENSION_IS_FIXED')
+        for part,length in zip(segments,r.lengths_m):part['length_m']=length
+        apply_segment_settings(design,r)
+        if design!=r.source_design:
+            design['id']='generated_'+digest(plain(r))[:16]
+            design['metadata'].update(generator=GENERATOR,recipe=recipe_data(r),
+                immutable_source_identity=digest(r.source_design),
+                routing_ownership='routing_radius.locations: rigid holes owned by upstream flexible segment; shared holes transformed once; transverse offsets only')
+        return compile_generated(design,mesh)
     source=catalog()['templates']['T0']['design']
     parts={c['id']:deepcopy(c) for c in source['components']}
     near=parts['near'];far=parts['far'];mid=parts['mid_guide']
@@ -122,13 +168,36 @@ def generate(value):
             actuator=deepcopy(source['actuators'][0]);actuator['id']=f'{group}_motor{j}'
             actuator['transmission']=[dict(tendon=t['id'],ratio=1.)];actuators.append(actuator)
     tip=deepcopy(source['tip'])
-    design=dict(version='tendon_family_v1',id='generated_'+digest(plain(r))[:16],components=components,
+    design=dict(version='tendon_family_v1',id='generated_'+digest(recipe_data(r))[:16],components=components,
         tendons=tendons,actuators=actuators,tip=tip,metadata=dict(generator=GENERATOR,recipe=plain(r),
             source_recipe='Archived executed-radius T0 profiles; T1 four-group layouts; physical distal positions',
             numerical_initialization=dict(source='initial_state_pretension',per_tendon_n=r.pretension_n,
                 construction='Ordered candidate tendon pretensions, bounded by 0..8 N; projected zero state; all warm states regenerated'),
             physical_initialization='Every generated backend joint position and velocity is zero'))
     mesh=plain(Discretization(cells={names[0]:12,**{name:12//(r.segment_count-1) for name in names[1:]}}))
+    apply_segment_settings(design,r)
+    design['metadata']['recipe']=recipe_data(r)
+    return compile_generated(design,mesh)
+
+
+def recipe_data(r):
+    # Archived shared fields keep their original interpretation and serialization.
+    return {k:v for k,v in plain(r).items() if k not in ('source_design','source_mesh') or v is not None
+        if k not in ('segment_section_scales','segment_routing_scales','segment_materials') or v}
+
+
+def apply_segment_settings(design,r):
+    for part in design['components']:
+        if part['kind']!='flexible_segment':continue
+        scale=r.segment_section_scales.get(part['id'],1.)
+        for station in part['sections']:
+            station['section']['parameters']={k:v*scale for k,v in station['section']['parameters'].items()}
+        part['physics']['young_pa']*=MATERIAL_MULTIPLIERS[r.segment_materials.get(part['id'],'baseline')]
+    from .routing_radius import transform
+    if r.segment_routing_scales:transform(design,deepcopy(design),r.segment_routing_scales)
+
+
+def compile_generated(design,mesh):
     design=plain(Design.model_validate(design))
     # Check pairwise guide clearance independently of compiler route ownership.
     for c in design['components']:
@@ -140,7 +209,7 @@ def generate(value):
             raise ValueError('GENERATED_GUIDE_ENVELOPE')
     from .compiler import resolve
     physics=resolve(design,mesh)
-    if not np.allclose(physics['transmission'],np.eye(len(tendons))):
+    if not np.allclose(physics['transmission'],np.eye(len(design['tendons']))):
         raise ValueError('GENERATED_ONE_TO_ONE_TRANSMISSION')
     return design,mesh,physics
 
