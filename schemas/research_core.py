@@ -106,6 +106,7 @@ class Plan(Contract):
     search: Search | None = None
     candidate: EvidenceRef | None = None
     selected_execution: EvidenceRef | None = Field(default=None, description='Exact immutable passing NMPC result or independent RL evaluation; freezes the complete solution')
+    revise_selection: bool = Field(default=False, description='Explicitly replace a failed selection with a scientifically changed, freshly passing development solution; retain all confirmation records and cumulative costs')
     diagnostic: LocalDiagnostic | None = None
     mechanics: LegacyMechanicsChoice | None = None
     mechanics_source: EvidenceRef | None = None
@@ -113,6 +114,8 @@ class Plan(Contract):
 
     @model_validator(mode='after')
     def required(self):
+        if self.revise_selection and self.action!='confirm':
+            raise ValueError('REVISE_SELECTION_REQUIRES_CONFIRM_ACTION')
         required = {'propose': 'parameters', 'execute': 'candidate', 'search': 'search', 'confirm': 'selected_execution',
                     'mechanics': 'mechanics', 'replay': 'mechanics_source'}
         active = required.get(self.action)

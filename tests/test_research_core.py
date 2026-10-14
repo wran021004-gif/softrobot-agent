@@ -280,7 +280,7 @@ class CoreTests(TestCase):
             self.assertIn(ref,core.state(h)['rl_evidence_reads'])
             self.assertEqual(bridge.packet(h)['training_summaries'][0]['reference'],ref)
             spec=deepcopy(original['spec']);spec['capabilities']=['rl'];spec['rl_limits']={'evaluation_episodes':5,'training_actions':2048,'training_active_seconds':120};core.update(h,spec=spec,mechanics_results=[])
-            plan=dict(action='stop',next_step='diagnose',supporting_evidence=[ref],**{k:'No checkpoint; failure evidence supports diagnosis' for k in ('hypothesis','expected_observation','weakening_observation','fixed_conditions','stopping_condition','interpretation')})
+            plan=dict(action='stop',next_step='diagnose',supporting_evidence=[ref,*core.state(h)['results']],**{k:'No checkpoint; failure evidence supports diagnosis' for k in ('hypothesis','expected_observation','weakening_observation','fixed_conditions','stopping_condition','interpretation')})
             with patch.object(core,'guard'):
                 self.assertTrue(core.dispatch(h,plan,'summary-stop')['result']['accepted_stop'])
         finally:core.update(h,**original)
@@ -423,13 +423,20 @@ class FormalControlTests(TestCase):
             self.assertEqual(bridge.evaluation_capacity(h,2,True)['admitted'],2)
             s['spec']['confirmation']['fresh_independent_repetitions']=1
             self.assertEqual(bridge.evaluation_capacity(h,5)['admitted'],2)
+            s['spec']['confirmation']['fresh_independent_repetitions']=2;s['rl_runs']['r']['evaluations']=3
+            with patch('tools.research.feedback.confirmation_progress',return_value={'remaining':1,'failures':1,'invalid_executions':0}):
+                self.assertEqual(bridge.evaluation_capacity(h,1)['admitted'],0)
+                self.assertEqual(bridge.evaluation_capacity(h,2,True)['admitted'],2)
 
     def test_unavailable_evaluation_is_unmeasured(self):
         from tools.research.feedback import result_view
         from types import SimpleNamespace
         r=dict(candidate={'artifact_id':'c'},task={'artifact_id':'t'},run_id='r',configuration={'artifact_id':'cfg'},independent_evaluation_executed=False,passed=False,episodes=[],failure_stage='launch/dependency import')
-        h=SimpleNamespace(store=SimpleNamespace(artifact=lambda ref:r))
-        with patch.object(core,'verify_candidate',return_value={'configuration':{'task':{}}}),patch('tools.research.feedback.mechanics_context',return_value=[]):
+        cfg=read(core.ROOT/'examples/research_chain/nominal.json')['configuration']
+        candidate=dict(configuration=cfg,scientific_configuration=core.full_science(cfg))
+        records={'result':r,'c':candidate}
+        h=SimpleNamespace(run_id='current',store=SimpleNamespace(artifact=lambda ref:records[ref if isinstance(ref,str) else ref['artifact_id']]))
+        with patch.object(core,'state',return_value={}),patch('tools.research.feedback.solution_identity',return_value={}),patch('tools.research.feedback.mechanics_context',return_value=[]):
             v=result_view(h,'result')
         self.assertFalse(v['passed']);self.assertEqual(v['task_performance'],'unmeasured');self.assertEqual(v['failure_stage'],'launch/dependency import')
 
@@ -483,7 +490,7 @@ class FormalControlTests(TestCase):
             policy=directory/'checkpoints'/'selected-old'/'policy.zip';policy.parent.mkdir(parents=True);policy.write_bytes(b'exact selected policy');core.atomic_json(policy.with_name('metadata.json'),{})
             configref=core.save(h,cfg)
             entry=dict(candidate=s['reference_candidate'],task=task,configuration=configref,allocation=cfg['budget'],evaluations=1,replays=0)
-            dev=dict(candidate=entry['candidate'],task=task,configuration=configref,run_id=run_id,checkpoint='selected-old',policy_sha256=hashlib.sha256(policy.read_bytes()).hexdigest(),independent_evaluation_executed=True,passed=True,episodes=[dict(complete=True)],role='development')
+            dev=dict(study=h.run_id,candidate=entry['candidate'],task=task,configuration=configref,run_id=run_id,checkpoint='selected-old',policy_sha256=hashlib.sha256(policy.read_bytes()).hexdigest(),independent_evaluation_executed=True,passed=True,episodes=[dict(complete=True)],role='development')
             selected=core.save(h,dev);core.update(h,rl_runs={run_id:entry},rl_evaluations=[selected])
             plan=dict(action='confirm',selected_execution=selected,**{k:'fixture' for k in ('hypothesis','expected_observation','weakening_observation','fixed_conditions','stopping_condition','interpretation')})
             results=[dict(dev,passed=True),dict(dev,passed=False)]
@@ -615,15 +622,15 @@ class ConfirmationCompletionTests(TestCase):
         identity={'candidate':'c','task':'t','controller':'exact-checkpoint'}
         records={n:dict(role='confirmation',selected_execution=selected,execution_id=n,study='source' if n=='historical' else 'current') for n in ('historical','new')}
         records['ordinary']=dict(role='development',execution_id='ordinary')
-        views={n:dict(solution_identity=identity,complete=True,passed=True) for n in ('selected','historical','new','ordinary')}
+        views={n:dict(solution_identity=identity,complete=True,passed=True,fresh_current_study=n!='historical') for n in ('selected','historical','new','ordinary')}
         s=dict(spec={'confirmation':{'fresh_independent_repetitions':2}},selected=selected,results=[],historical_confirmations=[historical,historical],rl_evaluations=[ordinary])
         host=SimpleNamespace(store=SimpleNamespace(artifact=lambda r:records[r['artifact_id']]))
         with patch.object(core,'state',return_value=s),patch.object(feedback,'result_view',side_effect=lambda h,r:views[r['artifact_id']]):
-            p=feedback.confirmation_progress(host);self.assertEqual((p['historical_confirmations'],p['current_study_confirmations'],p['remaining']),(1,0,1))
+            p=feedback.confirmation_progress(host);self.assertEqual((p['historical_confirmations'],p['current_study_confirmations'],p['remaining']),(1,0,2))
             self.assertFalse(p['confirmed']);s['rl_evaluations']+=[new,new]
-            p=feedback.confirmation_progress(host);self.assertTrue(p['confirmed']);self.assertEqual(p['current_study_confirmations'],1)
+            p=feedback.confirmation_progress(host);self.assertFalse(p['confirmed']);self.assertEqual(p['current_study_confirmations'],1)
             views['new']['solution_identity']={'controller':'different'}
-            self.assertEqual(feedback.confirmation_progress(host)['remaining'],1)
+            self.assertEqual(feedback.confirmation_progress(host)['remaining'],2)
             views['new']['solution_identity']=identity;views['new']['passed']=False
             p=feedback.confirmation_progress(host);self.assertFalse(p['confirmed']);self.assertEqual(p['failures'],1)
             views['new']['complete']=False
@@ -631,29 +638,29 @@ class ConfirmationCompletionTests(TestCase):
 
     def test_completion_binding_readonly_and_one_confirmation_capacity(self):
         from tools.research import rl as bridge
+        from tools.research.feedback import confirmation_progress,eligibility
         with TemporaryDirectory(dir=core.ROOT/'runs',prefix='completion-fixture-') as folder:
             spec=read(core.ROOT/'examples/research_core/confirmation_completion.json');spec.update(study_id='completion-fixture-'+core.Path(folder).name,started_unix=time.time())
             if not (core.ROOT/'runs'/spec['rl_evaluation_source']['study_id']/'platform.sqlite').exists():self.skipTest('Optional ignored historical source runtime is absent in isolated worktree; fresh confirmation logic is tested separately')
             path=core.Path(folder)/'spec.json';core.atomic_json(path,spec)
             h=core.prepare(path,core.Path(folder)/'business');s=core.state(h)
-            self.assertEqual(core.claims(h)['confirmation_progress']['historical_confirmations'],1)
+            selected=spec['rl_evaluation_source']['selected_execution']
+            self.assertEqual(confirmation_progress(h,selected)['historical_confirmations'],1)
+            self.assertFalse(eligibility(h,selected)['eligible'])
             self.assertEqual(bridge.evaluation_capacity(h,2,True)['admitted'],1)
             self.assertEqual(bridge.evaluation_capacity(h,1)['admitted'],0)
             bridge.bind_source(h)
-            self.assertEqual(core.claims(h)['independent_confirmation_count'],1)
+            self.assertEqual(core.claims(h)['independent_confirmation_count'],0)
             q=dict(operation='evaluate',run_id=spec['rl_evaluation_source']['run_id'],checkpoint=spec['rl_evaluation_source']['checkpoint'],rationale='wrong confirmation operation')
             with patch.object(core,'guard'),patch.object(bridge,'invoke',side_effect=AssertionError('ordinary evaluation must not run')):
-                with self.assertRaisesRegex(ValueError,'research_plan.*confirm.*41a7df9f'):bridge.dispatch(h,q,'wrong')
-            spec['ordinary_evaluation_limit']=1;core.update(h,spec=spec)
-            with patch.object(core,'guard'),patch.object(bridge,'evaluation_capacity',return_value={'admitted':1}),patch.object(bridge,'invoke',side_effect=AssertionError('frozen ordinary evaluation forbidden')):
-                with self.assertRaisesRegex(ValueError,'research_plan.*confirm'):bridge.dispatch(h,q,'wrong-after-freeze')
+                with self.assertRaisesRegex(ValueError,'research_plan.*confirm'):bridge.dispatch(h,q,'wrong')
             formal=read(core.ROOT/'examples/research_core/autonomous_design_control.json')
             formal.update(study_id='linked-history-fixture-'+core.Path(folder).name,started_unix=time.time())
             formal_path=core.Path(folder)/'formal.json';core.atomic_json(formal_path,formal)
             linked=core.prepare(formal_path,core.Path(folder)/'linked')
             for ref in formal['historical_evidence']['references'].values():
                 self.assertIn(ref,core.state(linked)['scoped_context']);linked.store.artifact(ref)
-            self.assertEqual(s['selected'],spec['rl_evaluation_source']['selected_execution'])
+            self.assertIsNone(s['selected'])
             import gc;gc.collect()
 
     def test_unverified_mechanics_remains_unverified(self):
@@ -686,6 +693,138 @@ class ConfirmationCompletionTests(TestCase):
         with patch.object(core,'state',return_value=state),patch.object(core,'guard'),patch.object(core,'admit_closeout'),patch.object(bridge,'prepare_input',return_value=({},{})),patch.object(bridge,'invoke',side_effect=AssertionError('must not start')),patch.object(bridge,'evaluation_capacity',return_value={}):
             with self.assertRaisesRegex(ValueError,'remaining.*trials.*1.*allocated_active_seconds.*1200.*no training started'):
                 bridge.dispatch(h,q,'over-allocation')
+
+
+class SolutionIdentityTests(TestCase):
+    """Real ledger/artifacts; backend outputs are substitutes, not scientific evidence."""
+    def setUp(self):
+        from uuid import uuid4
+        self.temp=TemporaryDirectory(dir=core.ROOT/'runs',prefix='solution-fixture-')
+        path=core.Path(self.temp.name);spec=read(core.DEFAULT_SPEC)
+        spec.update(study_id='solution-fixture-'+uuid4().hex[:10],started_unix=time.time())
+        core.atomic_json(path/'spec.json',spec)
+        self.host=core.prepare(path/'spec.json',path/'business')
+        core.update(self.host,freeze='substituted-test-implementation')
+
+    def tearDown(self):
+        import gc
+        gc.collect();self.temp.cleanup()
+
+    def result(self,candidate=None,**overrides):
+        from uuid import uuid4
+        h=self.host;s=core.state(h);candidate=candidate or s['reference_candidate'];c=h.store.artifact(candidate)
+        value=dict(candidate=candidate,scientific_configuration=c['scientific_configuration'],
+            profile_identity=c['profile_identity'],status='evaluated',acceptance={'accepted':True},
+            role='development',owning_study=h.run_id,execution_id=uuid4().hex,numerical_s=0.)
+        value.update(overrides);ref=core.save(h,value)
+        core.update(h,results=[*s['results'],ref]);return ref
+
+    def failed_selection(self):
+        selected=self.result();core.update(self.host,selected=selected)
+        failure=self.result(role='confirmation',selected_execution=selected,acceptance={'accepted':False})
+        return selected,failure
+
+    def test_references_metadata_and_duplicate_execution_cannot_erase_failure(self):
+        from tools.research import feedback
+        h=self.host;selected,failure=self.failed_selection();c=deepcopy(h.store.artifact(core.state(h)['reference_candidate']))
+        c['provenance']={'label':'renamed','operation_id':'another'};alias=core.save(h,c)
+        candidates=core.state(h)['candidates'];candidates[c['identity']]=alias;core.update(h,candidates=candidates)
+        renamed=self.result(alias)
+        self.assertEqual(feedback.result_view(h,selected)['solution_identity'],feedback.result_view(h,renamed)['solution_identity'])
+        duplicated=dict(h.store.artifact(failure),selected_execution=renamed,acceptance={'accepted':True})
+        duplicate=self.result(**duplicated)
+        progress=feedback.confirmation_progress(h,renamed)
+        self.assertEqual((progress['current_study_confirmations'],progress['failures']),(1,1))
+        self.assertFalse(feedback.eligibility(h,renamed,revise_selection=True)['eligible'])
+        self.assertIn(duplicate,core.state(h)['results'])
+
+    def test_historical_results_never_satisfy_fresh_gates_but_keep_failures(self):
+        from tools.research import feedback
+        h=self.host;selected=self.result();old=self.result(owning_study='historical-study')
+        core.update(h,linked_selections=[old],selected=selected)
+        for passed in (True,True):
+            ref=self.result(owning_study='historical-study',role='confirmation',selected_execution=old)
+            core.update(h,historical_confirmations=[*core.state(h).get('historical_confirmations',[]),ref])
+        progress=feedback.confirmation_progress(h)
+        self.assertEqual((progress['historical_confirmations'],progress['remaining']),(2,2))
+        self.assertFalse(progress['confirmed']);self.assertFalse(feedback.eligibility(h,old)['eligible'])
+        self.result(role='confirmation',selected_execution=selected,imported_historical_evidence=True,acceptance={'accepted':False})
+        progress=feedback.confirmation_progress(h)
+        self.assertEqual((progress['historical_confirmations'],progress['failures'],progress['remaining']),(3,1,2))
+        self.assertFalse(feedback.eligibility(h,selected)['eligible'])
+        incomplete=self.result(status='execution_incomplete',acceptance={'accepted':True})
+        self.assertFalse(feedback.result_view(h,incomplete)['passed'])
+
+    def test_rl_policy_content_survives_new_paths_and_training_bookkeeping(self):
+        from tools.research import feedback
+        h=self.host;s=core.state(h);candidate=s['reference_candidate']
+        cfg=dict(mode='direct',seed=17,observation={},action={},control_object={},task={},
+            candidate={'xml':'fixture only','assets':{},'reference':candidate},reference=None,budget={'actions':1})
+        def evaluation(configuration,**overrides):
+            value=dict(run_id='fixture-rl',configuration=core.save(h,configuration),
+                independent_evaluation_executed=True,episodes=[{'complete':True}],passed=True,
+                policy_sha256='same-policy-content',checkpoint='old-path')
+            value.update(overrides);return self.result(**value)
+        selected=evaluation(cfg);core.update(h,selected=selected)
+        failure=evaluation(cfg,role='confirmation',selected_execution=selected,passed=False)
+        changed=deepcopy(cfg);changed.update(budget={'actions':100},requested_overrides={'label':'renamed'})
+        changed['candidate']['reference']={'artifact_id':'renamed'}
+        renamed=evaluation(changed,checkpoint='copied-path')
+        self.assertEqual(feedback.result_view(h,renamed)['solution_identity'],feedback.result_view(h,selected)['solution_identity'])
+        self.assertEqual(feedback.confirmation_progress(h,renamed)['failures'],1)
+        self.assertFalse(feedback.eligibility(h,renamed,revise_selection=True)['eligible'])
+        invalid=self.result(run_id='fixture-rl',configuration=core.save(h,cfg),
+            independent_evaluation_executed=False,episodes=[],passed=False,role='confirmation',selected_execution=selected)
+        self.assertEqual(feedback.confirmation_progress(h,renamed)['invalid_executions'],1)
+        other=evaluation(cfg,policy_sha256='changed-policy-content')
+        self.assertNotEqual(feedback.result_view(h,other)['solution_identity'],feedback.result_view(h,selected)['solution_identity'])
+        self.assertTrue(feedback.eligibility(h,other,revise_selection=True)['eligible'])
+
+    def test_revision_requires_two_slots_and_keeps_all_counters_and_records(self):
+        from tools.research import feedback
+        h=self.host;selected,failure=self.failed_selection();s=core.state(h)
+        parameters=dict(s['spec']['reference_parameters'],near_length_m=.161)
+        revised=self.result(core.construct(h,parameters,{'origin':'fixture'}));before=core.state(h)
+        self.assertFalse(feedback.eligibility(h,revised)['eligible'])
+        with patch.object(core,'capacity',return_value={'admitted':1}):
+            self.assertFalse(feedback.eligibility(h,revised,revise_selection=True)['eligible'])
+        plan=dict(action='confirm',selected_execution=revised,revise_selection=True,
+            **{k:'fixture only' for k in ('hypothesis','expected_observation','weakening_observation','fixed_conditions','stopping_condition','interpretation')})
+        with patch.object(core,'guard'),patch.object(core,'execute',return_value={'fixture':'no execution'}):
+            core.dispatch(h,plan,'explicit-revision')
+        after=core.state(h)
+        self.assertEqual(after['selected'],revised)
+        self.assertEqual(after['selection_history'][0]['previous_selection'],selected)
+        self.assertEqual(after['selection_history'][0]['confirmation_reservation']['admitted'],2)
+        for key in ('numerical_s','numerical_reserved_s','mathematical_evaluations','nmpc_launches','local_solves','local_solve_s'):
+            self.assertEqual(after.get(key),before.get(key))
+        self.assertIn(failure,after['results']);self.assertEqual(feedback.confirmation_progress(h)['remaining'],2)
+        self.assertEqual(feedback.confirmation_progress(h,selected)['failures'],1)
+        # Successful revised confirmations seal the study; no new admission follows.
+        revised_candidate=h.store.artifact(revised)['candidate']
+        self.result(revised_candidate,role='confirmation',selected_execution=revised)
+        plan['revise_selection']=False
+        def confirm(*args,**kwargs):return {'reference':self.result(revised_candidate,role='confirmation',selected_execution=revised)}
+        with patch.object(core,'guard'),patch.object(core,'execute',side_effect=confirm):core.dispatch(h,plan,'second-confirmation')
+        self.assertTrue(feedback.confirmation_progress(h)['confirmed'])
+        self.assertEqual(core.state(h)['research_status'],'stopped')
+        with self.assertRaisesRegex(ValueError,'ACCEPTED_STOP_SEALED'):core.guard(h,True)
+
+    def test_selection_stays_frozen_until_failure_and_effective_policy_ignores_unused_timers(self):
+        from tools.research import feedback
+        h=self.host;selected=self.result();core.update(h,selected=selected);s=core.state(h)
+        revised=self.result(core.construct(h,dict(s['spec']['reference_parameters'],near_length_m=.161),{'origin':'fixture'}))
+        self.assertFalse(feedback.eligibility(h,revised,revise_selection=True)['eligible'])
+        parameters=dict(action='stop',revise_selection=True,
+            **{k:'fixture' for k in ('hypothesis','expected_observation','weakening_observation','fixed_conditions','stopping_condition','interpretation')})
+        with self.assertRaisesRegex(ValueError,'REVISE_SELECTION_REQUIRES_CONFIRM_ACTION'):Plan(**parameters)
+        c=deepcopy(h.store.artifact(s['reference_candidate']))
+        c['scientific_configuration']['policy']['controller']['parameters']['data']['recipe']['stopping_policy']='research_work_v1'
+        a=feedback.solution_identity(h,{},c)
+        c['scientific_configuration']['policy']['controller']['parameters']['data']['recipe']['max_cpu_s']=999.
+        c['scientific_configuration']['robot']['structure']['data']['metadata']={'label':'new bookkeeping'}
+        c['scientific_configuration']['robot']['structure']['data']['id']='renamed'
+        self.assertEqual(a,feedback.solution_identity(h,{},c))
 
 
 class ExecutionBoundaryTests(TestCase):
@@ -819,6 +958,46 @@ class ExecutionBoundaryTests(TestCase):
             __import__('gc').collect()
 
 class CandidateAnalysisRecoveryTests(TestCase):
+    def test_new_analysis_of_historical_state_charged_once_reads_and_recovery_free(self):
+        from tools.research import analysis
+        from extensions.tendon_family.gvs_basis import resolve_basis
+        from uuid import uuid4
+        with TemporaryDirectory(dir=core.ROOT/'runs',prefix='historical-analysis-fixture-') as folder:
+            path=core.Path(folder);spec=read(core.DEFAULT_SPEC)
+            spec.update(study_id='historical-analysis-'+uuid4().hex[:8],started_unix=time.time())
+            core.atomic_json(path/'spec.json',spec);h=core.prepare(path/'spec.json',path/'business')
+            core.update(h,freeze='substituted-test-implementation');s=core.state(h);candidate=s['reference_candidate']
+            cfg=h.store.artifact(candidate)['configuration'];basis=cfg['policy']['controller']['parameters']['data']['recipe']['basis']
+            n=len(resolve_basis(cfg['robot']['structure']['data'],basis).coordinate_order)
+            saved=core.save(h,dict(candidate=candidate,configuration_identity=core.digest(cfg),
+                x=[0.]*(2*n),u=[.2]*6,phase='interval_start_previous_applied_input',
+                imported_historical_evidence=True,remaining_task_s=.05,time_s=.30))
+            query=dict(candidate=candidate,operation='braking',operating_point='saved_state',saved_state=saved,protocol=spec['analysis_protocol'])
+            def worker(command,log,timeout):
+                request=read(command[-1]);self.assertTrue(request['exact_point']['imported_historical_evidence'])
+                core.atomic_json(core.Path(command[-1]).with_name('result.json'),dict(status='computed',
+                    task_acceptance='unmeasured',internal_calculations=[],substituted_not_scientific_evidence=True))
+                return core.subprocess.CompletedProcess(command,0)
+            before=core.state(h)
+            for _ in range(2):core.read_evidence(h,dict(reference=saved))
+            self.assertEqual(core.state(h)['numerical_s'],before['numerical_s'])
+            with patch('tools.service_execution._run_contained',side_effect=worker) as launched:
+                with patch.object(analysis,'recover',side_effect=RuntimeError('fixture interruption before settlement')):
+                    with self.assertRaisesRegex(RuntimeError,'fixture interruption'):
+                        analysis.dispatch(h,query,'historical-state',guard=lambda *args:None,origin='engineering_preflight')
+                self.assertEqual(core.state(h)['mathematical_evaluations'],1)
+                boundary=read(core.Path(core.state(h)['pending']['folder'])/'boundary.json')
+                output=analysis.recover(h);settled=core.state(h)
+                self.assertAlmostEqual(settled['numerical_s']-before['numerical_s'],boundary['elapsed_s'])
+                self.assertEqual(settled['numerical_reserved_s'],0.)
+                self.assertEqual(len(settled['analysis_costs']),1)
+                again=analysis.dispatch(h,query,'historical-state',guard=lambda *args:None)
+                core.read_evidence(h,dict(reference=output['reference']));core.recover(h)
+                self.assertEqual(again['operation_reuse']['additional_analysis_evaluations'],0)
+                self.assertEqual(core.state(h)['numerical_s'],settled['numerical_s'])
+                self.assertEqual(core.state(h)['mathematical_evaluations'],1);self.assertEqual(launched.call_count,1)
+            import gc;gc.collect()
+
     def test_interrupted_mathematical_search_reuses_sealed_analysis_across_requests(self):
         from uuid import uuid4
         from tools.research import design,analysis

@@ -439,8 +439,9 @@ def execute(host, candidate_ref, operation_key, *, role='development', selected=
         if old['candidate']!=plain(candidate_ref) or old['profile_identity']!=s['profile']['identity'] or old['scientific_configuration']!=c['scientific_configuration']:
             raise ValueError('CONFIRMATION_REQUIRES_SELECTED_COMPLETE_PARAMETERS_AND_EVALUATION_CONFIGURATION')
         if not old.get('acceptance',{}).get('accepted'): raise ValueError('SELECTED_PASSING_EXECUTION_REQUIRED')
-        if sum(host.store.artifact(r)['role']=='confirmation' and host.store.artifact(r).get('selected_execution')==plain(selected) for r in s['results'])>=confirmation_count(s):
-            raise ValueError('DECLARED_POST_SELECTION_CONFIRMATIONS_ALREADY_RECORDED')
+        from tools.research.feedback import eligibility
+        choice=eligibility(host,selected)
+        if not choice['eligible']: raise ValueError('; '.join(choice['reasons']))
     admission=capacity(host,1,confirmation or repetition,candidate=candidate_ref)
     if admission['admitted']<1: raise ValueError('EXECUTION_AND_CONFIRMATION_RESERVE_CANNOT_FIT')
     # A unique execution owner is persisted before starting any backend.
@@ -898,16 +899,23 @@ def dispatch(host, value, request_id, origin='model'):
             result=diagnose(host,[plain(r) for r in plan.supporting_evidence])
             if plan.diagnostic: result['local_comparison']=local_diagnostic(host,plan.diagnostic,request_id)
         elif plan.action=='confirm':
-            from tools.research.feedback import eligibility, result_view
-            choice=eligibility(host,plan.selected_execution)
+            from tools.research.feedback import eligibility, result_view, confirmation_progress
+            choice=eligibility(host,plan.selected_execution,revise_selection=plan.revise_selection)
             if not choice['eligible']: raise ValueError('; '.join(choice['reasons']))
             selected=result_view(host,plan.selected_execution)
-            update(host,selected=plain(plan.selected_execution))
+            if plan.revise_selection:
+                transition=dict(previous_selection=s['selected'],selected_execution=plain(plan.selected_execution),
+                    previous_progress=confirmation_progress(host),solution_identity=selected['solution_identity'],
+                    plan=ref,confirmation_reservation=choice['confirmation_reservation'])
+                update(host,selection_history=[*s.get('selection_history',[]),transition],selected=plain(plan.selected_execution))
+            else: update(host,selected=plain(plan.selected_execution))
             if selected['controller_route']=='rl':
                 from tools.research.rl import confirm
                 result=confirm(host,plan.selected_execution,request_id+'-rl-confirm')
             else:
                 result=execute(host,selected['candidate'],request_id,role='confirmation',selected=plain(plan.selected_execution))
+            if confirmation_progress(host)['confirmed']:
+                update(host,research_status='stopped',final_disposition=ref,closed_unix=time.time())
         else:
             update(host,research_status='stopped',final_disposition=ref,closed_unix=time.time())
             result=dict(accepted_stop=True,claims=claims(host))
@@ -951,6 +959,11 @@ owned by this study. Cached operation receipts incur zero additional execution
 cost; previous result costs remain visible. Imported history is not owned passing
 execution evidence. Failed submissions return usable facts without choosing for you.
 Run confirmations twice with identical full science.
+Historical results never satisfy fresh development or confirmation requirements.
+After a failed or invalid confirmation, a genuinely changed solution needs fresh
+passing development and two confirmations. Use confirm with revise_selection=true
+to explicitly replace that failed selection; failures and all costs remain recorded.
+Changing labels, result references or checkpoint paths never erases a failure.
 Numerical feasibility, early stopping, selection/recovery, prediction disagreement,
 input limits, task acceptance and missing data are distinct. No weight direction
 is prescribed. Compare fixed task metrics, never objectives with different weights.
@@ -1008,7 +1021,10 @@ An earlier checkpoint evaluation must identify its actual training step. Choose 
 Read independent evaluation evidence explicitly before deciding to adjust control, revise design, switch route, select or stop.
 Select a passing development result via confirm selected_execution, freezing candidate+task+route+configuration+exact checkpoint. Use the predeclared fresh
 post-selection count from confirmation_progress, retaining historical ownership. Use research_plan action confirm and the exact selected_execution, never ordinary research_rl evaluate for confirmation. RL confirmation reloads exact weights, fresh simulation, no training or NMPC. Keep failed confirmations; no success-hunting retries.
-Selection remains immutable. Nominal repetitions support no robustness claim. No fresh baseline required; withhold improvement attribution without comparable evidence.
+Selection remains immutable during its confirmation attempt. After failure, inspect evidence and develop a scientifically changed solution.
+Use confirm with revise_selection=true to explicitly select its fresh passing development result, reserving two confirmations without resetting any costs.
+Historical results do not count as fresh development or confirmations. Relabeling and checkpoint paths cannot erase solution failures.
+Nominal repetitions support no robustness claim. No fresh baseline required; withhold improvement attribution without comparable evidence.
 Stop once confirmations pass; ceilings are not targets. Preserve all costs including failures. The configured protected reserve permits existing work, evaluation, confirmation, evidence and STOP.
 STOP cites every new result and follows explicit RL evidence reads and terminal query, with next_step and actual unfinished requirements.
 Never include credentials, environment-file contents, unrelated files or personal data in model messages. No algorithm superiority or numerical root-cause claims.
@@ -1098,7 +1114,7 @@ async def converse(host):
     formal=bool(state(host)['spec'].get('capabilities'))
     instructions=state(host)['spec'].get('execution_instructions') or (FORMAL_INSTRUCTIONS if formal else RL_INSTRUCTIONS if rl_mode else INSTRUCTIONS)
     native=[PythonAgentTool(name,dict(name=name,description=description,inputSchema={'json':schema.model_json_schema()}),handler(kind))
-        for name,description,schema,kind in [('research_plan','Propose a candidate; mathematical optimization and handoff; optional NMPC search/execute; evidence diagnosis; exact NMPC/RL confirmation; STOP. Operations require declared phase capabilities.',Plan,'plan'),
+        for name,description,schema,kind in [('research_plan','Propose/search/execute/diagnose; confirm a fresh passing development result; explicitly revise a failed selection with confirm revise_selection=true only for changed science and capacity for two fresh confirmations. History never satisfies fresh gates; failures/counters persist. STOP seals study.',Plan,'plan'),
             ('experience_retrieve','Read-only case/procedure draft search/read with provenance',ExperienceQuery,'experience'),
             ('evidence_read','Read exact immutable evidence and JSON pointer',EvidenceQuery,'evidence')]]
     if formal or rl_mode:

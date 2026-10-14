@@ -102,7 +102,7 @@ def dispatch(host,query,key,*,guard,origin='model'):
         if point.get('candidate')!=plain(q.candidate) or point.get('configuration_identity')!=digest(cfg):raise ValueError('EXACT_SAVED_STATE_CANDIDATE_MISMATCH')
         if len(point['x'])!=2*len(binding['coordinate_order']) or len(point['u'])!=6 or not point.get('phase'):
             raise ValueError('EXACT_SAVED_STATE_ORDER_AND_PHASE_REQUIRED')
-        point.update(name='saved_state',available=True,construction=dict(method='exact immutable saved state',state=q.saved_state))
+        point.update(name='saved_state',available=True,construction=dict(method='exact immutable saved state',state=plain(q.saved_state)))
     reserve=fit['reservation_s']
     def charge(db):
         current=host.store.session(host.run_id,db)['state']
@@ -144,6 +144,8 @@ def recover(host):
     ref=save(host,value,'candidate_analysis_result');row=host.store.lookup(host.run_id,p['worker_request_id'])
     with host.store.transaction() as db:
         current=host.store.session(host.run_id,db)['state']
+        if not current.get('pending') or current['pending'].get('worker_request_id')!=p['worker_request_id']:
+            raise ValueError('ANALYSIS_ALREADY_SETTLED; NO_RECOMPUTATION_OR_DOUBLE_CHARGE')
         current['numerical_s']+=elapsed;current['numerical_reserved_s']-=p['reserved_s'];current['pending']=None
         current.setdefault('analysis_results',[]).append(ref)
         current.setdefault('analysis_costs',[]).append(dict(reference=ref,origin=p['origin'],numerical_s=elapsed,

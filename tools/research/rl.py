@@ -69,7 +69,8 @@ def bind_source(host):
             value=host.store.artifact(ref)
             if value['role']!='confirmation' or value['selected_execution']!=selected or not result_view(host,ref)['complete']:
                 raise ValueError('Genuine historical post-selection confirmation required')
-        core.update(host,selected=selected,linked_selections=[selected],historical_confirmations=list(confirmations))
+        # This is provenance from a sealed study, not this study's fresh selection.
+        core.update(host,linked_selections=[selected],historical_confirmations=list(confirmations))
 
 
 def prepare_input(host, request):
@@ -153,7 +154,10 @@ def evaluation_capacity(host, requested=1, confirmation=False):
     from tools.research import core as core
     s=core.state(host)
     from tools.research.feedback import confirmation_progress
-    reserve=0 if confirmation else confirmation_progress(host)['remaining']
+    progress=confirmation_progress(host)
+    # A failed selection releases no capacity belonging to a future revised solution.
+    reserve=core.confirmation_count(s) if progress['failures'] or progress['invalid_executions'] else progress['remaining']
+    if confirmation: reserve=0
     used=sum(e['evaluations'] for e in s.get('rl_runs',{}).values())
     seconds=s['spec'].get('rl_evaluation_allowance_s',150.)
     available=min(core.execution_deadline(host)-time.time(),host.store.remaining()['remaining']['wall_s'],s['spec']['budgets']['numerical_s']-s['numerical_s']-s['numerical_reserved_s'])
@@ -222,8 +226,14 @@ def dispatch(host, value, request_id, selected=None):
     if q.operation in ('start','resume'):
         work=config['budget'] if q.operation=='start' else reconcile(host,q.run_id)['remaining']
         training_capacity(host,work)
-    if q.operation=='evaluate' and selected is None and (s.get('selected') or s['spec'].get('ordinary_evaluation_limit')==0 or evaluation_capacity(host,1)['admitted']<1):
-        from tools.research.feedback import confirmation_progress
+    from tools.research.feedback import confirmation_progress
+    progress=confirmation_progress(host)
+    frozen=bool(s.get('selected') and not (progress['failures'] or progress['invalid_executions']))
+    if q.operation=='evaluate' and selected is not None:
+        from tools.research.feedback import eligibility
+        choice=eligibility(host,selected)
+        if not choice['eligible']: raise ValueError('; '.join(choice['reasons']))
+    if q.operation=='evaluate' and selected is None and (frozen or s['spec'].get('ordinary_evaluation_limit')==0 or evaluation_capacity(host,1)['admitted']<1):
         raise ValueError('Development evaluation rejected; confirmation uses '+json.dumps(confirmation_progress(host)))
     if q.operation=='evaluate' and evaluation_capacity(host,1,confirmation=selected is not None)['admitted']<1:
         raise ValueError('RL evaluation and route confirmation reserve cannot fit')
