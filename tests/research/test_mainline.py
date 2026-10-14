@@ -113,7 +113,7 @@ class MainlineTests(unittest.TestCase):
         from tools.research_tasks import task_adapter
         self.assertEqual(task_adapter(self.cfg).task['family'],'task.reach')
         from tools.platform_registry import dependency_closure
-        self.assertEqual(len(dependency_closure(registered.extensions.values(),registered)),15)
+        self.assertEqual(len(dependency_closure(registered.extensions.values(),registered)),16)
         import sys
         self.assertFalse(any(p[:-3].replace('/','.') in sys.modules for p in banned))
 

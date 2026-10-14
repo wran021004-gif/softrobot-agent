@@ -313,6 +313,9 @@ def finish_execution(host, recovery=False):
         # Package only when every stage already has a sealed receipt. No missing-stage launch.
         if len(receipts)==len(STAGES): result=complete_execution(child,p['configuration'],c['candidate_id'])
         else: result=dict(status='execution_incomplete',receipts=receipts,failure_reason='worker returned without result',task_performance='unmeasured')
+    if boundary.get('worker_started') is False:
+        result.update(failure_reason='prelaunch engineering failure; no numerical worker started',boundary=boundary,
+            task_performance='unmeasured')
     if result['status']=='execution_unresolved':
         save(host,dict(pending=p,partial_result=result),'unresolved_execution'); return result
     acceptance=None; profile=None

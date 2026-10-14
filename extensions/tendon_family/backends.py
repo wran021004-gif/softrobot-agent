@@ -69,8 +69,7 @@ class SerialBackend:
             if any(getattr(parameters,k)!=getattr(defaults,k) for k in ('max_step_s','rtol','atol','contact_stiffness_n_m','contact_damping_n_s_m')):
                 raise ValueError('MATLAB_ONLY_SOLVER_PARAMETERS: MuJoCo uses scene timestep and its recorded XML contact settings')
         if inp.task.initializer.extension_id!='initialize.family': raise ValueError('NAMED_FAMILY_INITIALIZER_REQUIRED')
-        controllers=['controller.family']
-        if cls.model=='mujoco_serial_bending_v1': controllers.extend(['controller.gvs_lqr','controller.gvs_sampled_lqr','controller.gvs_nmpc'])
+        controllers=['controller.gvs_nmpc']
         if inp.policy.controller.extension_id not in controllers: raise ValueError('FAMILY_CONTROLLER_REQUIRED')
         from tools.platform_registry import registry
         resolve_execution(inp,registry())
@@ -122,7 +121,7 @@ class SerialBackend:
             if execution_mode=='ideal_tension' else
             'Ideal length servos, tension only, slack gives zero tension; no motor inertia.')
         self.result=BackendResult(solver_status='completed' if complete else 'failed',backend_id=self.backend_id,model_id=self.execution['implementation_model_id'],
-            signals=export(rows,self.physics,self.scene['control']['mode'] in ('tension_reference','gvs_lqr','gvs_sampled_lqr','gvs_nmpc'),
+            signals=export(rows,self.physics,self.scene['control']['mode'] in ('gvs_nmpc',),
                 self.scene['control'].get('tension_execution_mode','actuator_realistic')),
             data=Payload(contract='family.backend_data',data=data.model_dump(mode='json')),
             limitations=[self.physics['applicability']['collision'],execution_limitation,
@@ -190,7 +189,7 @@ class MujocoBackend(SerialBackend):
             if time.perf_counter()-start>timeout_s: complete=False; reason='MUJOCO_SOLVER_TIMEOUT'; break
             update_start=time.perf_counter()
             t=step*dt; g=current()
-            if s['control']['mode'] in ('gvs_lqr','gvs_sampled_lqr','gvs_nmpc'):
+            if s['control']['mode'] in ('gvs_nmpc',):
                 from .gvs_projection import project, PROJECTOR_ID
                 projection=project(p,self.controller.resolved_basis,data.qpos[qi],data.qvel[vi],
                     convention=getattr(self.controller,'projector_id',PROJECTOR_ID))

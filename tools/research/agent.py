@@ -391,4 +391,7 @@ def decision_packet(host):
     result=packet(host);spec=result.pop('specification');result['configuration_identity']=spec['resolved_identity']
     result['study']={k:spec[k] for k in ('study_id','capabilities','allowed_parameters','reference_parameters','analysis_protocol','scoring_window_s','budgets','rl_limits','confirmation','budget_semantics')}
     result['available_actions']=spec['allowed_plan_actions']
+    s=state(host)
+    result['implementation']=dict(commit=s['freeze'],repairs=s.get('core_repairs',[]),
+        counters_preserved=True,prelaunch_failure_rule='A recorded failure before durable launch intent proves no worker started; its charged attempt remains spent. An explicit implementation repair is not a retry of already-executed unchanged science.')
     return result
