@@ -246,6 +246,18 @@ def execute(host, candidate_ref, operation_key, *, role='development', selected=
 
 def finish_execution(host, recovery=False):
     """Only sealed receipts continue. Reporting failure cannot trigger simulation."""
+    s=state(host);p=s['pending']
+    if recovery and p and not p.get('launch_intent'):
+        # Launch intent is durably committed before any subprocess send. Its
+        # absence proves that this failed dispatch never started a worker.
+        from datetime import datetime
+        failures=[e for e in host.store.events(host.run_id) if e['kind']=='pending_operation_failure'
+            and host.store.artifact(e['outputs'][0]).get('pending',{}).get('owner')==p['owner']]
+        if not failures:raise ValueError('PRELAUNCH_RECOVERY_REQUIRES_RECORDED_FAILURE')
+        last=failures[-1];folder=host.store.root/'executions'/p['owner'];folder.mkdir(parents=True,exist_ok=True)
+        atomic_json(folder/'boundary.json',dict(termination_confirmed=True,timed_out=False,
+            worker_started=False,prelaunch_failure=last['outputs'][0],
+            elapsed_s=max(0.,datetime.fromisoformat(last['timestamp']).timestamp()-p['started_unix'])))
     from tools.execution_completion import complete_execution, STAGES
     from tools.service_execution import _run_contained
     from tools.research_tasks import assemble_acceptance

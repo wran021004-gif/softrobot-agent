@@ -17,7 +17,6 @@ def effective_input(configuration):
 
 
 @dataclass(frozen=True)
-@dataclass(frozen=True)
 class ResearchTaskAdapter:
     configuration: dict
 
