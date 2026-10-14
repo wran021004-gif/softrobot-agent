@@ -611,7 +611,7 @@ class ConfirmationCompletionTests(TestCase):
     def test_completion_binding_readonly_and_one_confirmation_capacity(self):
         from tools import research_core_rl as bridge
         with TemporaryDirectory(dir=core.ROOT/'runs',prefix='completion-fixture-') as folder:
-            spec=read(core.ROOT/'examples/research_core/confirmation_completion.json');spec['started_unix']=time.time()
+            spec=read(core.ROOT/'examples/research_core/confirmation_completion.json');spec.update(study_id='completion-fixture-'+core.Path(folder).name,started_unix=time.time())
             path=core.Path(folder)/'spec.json';core.atomic_json(path,spec)
             h=core.prepare(path,core.Path(folder)/'business');s=core.state(h)
             self.assertEqual(core.claims(h)['confirmation_progress']['historical_confirmations'],1)
