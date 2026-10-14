@@ -439,3 +439,15 @@ handoff and failed independent consistency evidence are copied by reference and
 registered in existing lookups. Availability is checked without a new solve or
 physical episode; the original source identity/costs remain historical. Recorded
 holding samples are in `evidence/contained_autonomous_study_20261014/`.
+
+
+The sealed contained study completed through real Strands/DeepSeek decisions on
+implementation `d113d062`. One residual PPO trial (599808 effective actions)
+failed the original holding-speed criterion; the model then selected the exact
+historical joint candidate for contained NMPC without a new solve. Development
+and both fresh confirmations passed the original task (holding error <=3.747 mm,
+holding speed <=0.013911 m/s). The original confirmed baseline is preserved as
+history. This is fixed-initial-state sampled simulation acceptance; real-time
+control, robustness and offline trajectory consistency are not demonstrated.
+Separate allocations, actual costs, zero active reservations and historical
+accounting are in `evidence/contained_autonomous_study_20261014/scientific_summary.json`.
