@@ -153,7 +153,7 @@ def reach_assessment(inp):
 
 def reach_numerical(inp):
     """Target-independent guesses only, not a claimed new equilibrium solution."""
-    control=checked_reach(inp);p=control.recipe;baseline=load_profile()
+    control=checked_reach(inp);p=control.recipe;baseline=load_profile() if control.numerical_source=='bundled_guess' else None
     if inp.policy.controller.version in ('4.0.0','6.0.0','7.0.0','8.0.0','9.0.0','10.0.0','11.0.0'):
         return candidate_numerical(inp,control,baseline)
     from copy import deepcopy
@@ -188,7 +188,7 @@ def reach_numerical(inp):
     return numerical
 
 
-def candidate_numerical(inp,control,baseline):
+def candidate_numerical(inp,control,baseline=None):
     """Candidate-owned dimensions/initial metadata; historical inputs are guesses only.
 
     No dynamics solves here: the execution-local workspace regenerates all states
@@ -206,8 +206,9 @@ def candidate_numerical(inp,control,baseline):
     tendon_order=[t['entity'] for t in physics['tendons']]
     limits=np.array([t['force_limit_n'] for t in physics['tendons']])
     previous=np.clip([t['pretension_n'] for t in physics['tendons']],0,limits)
-    old=baseline['numerical'];seed=old['warm_guess']
-    compatible=(old['tendon_order']==tendon_order and old['units']['tension']=='N'
+    old=baseline['numerical'] if baseline is not None else None
+    seed=old['warm_guess'] if old else None
+    compatible=bool(old) and (old['tendon_order']==tendon_order and old['units']['tension']=='N'
         and np.asarray(seed['tensions']).shape[1:]==(len(tendon_order),))
     reused=control.numerical_source=='bundled_guess' and compatible
     if reused:

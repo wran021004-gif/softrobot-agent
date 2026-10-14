@@ -5,7 +5,7 @@ import math
 from pathlib import Path
 import subprocess
 import time
-from schemas.research_core import AnalysisRequest
+from tools.research.contracts import AnalysisRequest
 from schemas.platform import SessionInput
 from schemas.platform_analysis import TaskAnalysisProtocol, EndpointLinearizedModel, EndpointTarget
 from tools.platform_store import plain, zero

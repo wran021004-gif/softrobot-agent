@@ -1,0 +1,252 @@
+{
+  "evaluation_version": 1,
+  "ranking": "feasible_then_max_normalized_violation_then_sum_v1",
+  "record_update_ids": [
+    0,
+    29,
+    30
+  ],
+  "complete_update_inputs": true,
+  "execution_allowances": {
+    "simulation_s": 3500,
+    "evaluation_s": 30,
+    "profile_s": 60,
+    "construction_s": 10
+  },
+  "reference_parameters": {
+    "holding_tip_speed_weight": 0.1,
+    "terminal_tip_speed_weight": 0.1,
+    "segments": {
+      "near": {
+        "length_m": 0.16,
+        "young_pa": 7200000.0,
+        "sections": {
+          "0": {
+            "semi_y_m": 0.0095,
+            "semi_z_m": 0.0076
+          }
+        }
+      },
+      "distal1": {
+        "length_m": 0.11,
+        "young_pa": 5400000.0,
+        "sections": {
+          "0": {
+            "height_z_m": 0.0095,
+            "width_y_m": 0.0133
+          },
+          "1": {
+            "height_z_m": 0.008549999999999999,
+            "width_y_m": 0.0114
+          }
+        }
+      }
+    }
+  },
+  "allowed_parameters": {
+    "holding_tip_speed_weight": [
+      0.025,
+      0.1
+    ],
+    "terminal_tip_speed_weight": [
+      0.025,
+      0.1
+    ],
+    "segments.near.length_m": [
+      0.152,
+      0.168
+    ],
+    "segments.near.young_pa": [
+      6120000.0,
+      8279999.999999999
+    ],
+    "segments.near.sections.0.semi_y_m": [
+      0.009025,
+      0.009975
+    ],
+    "segments.near.sections.0.semi_z_m": [
+      0.00722,
+      0.007980000000000001
+    ],
+    "segments.distal1.length_m": [
+      0.1045,
+      0.1155
+    ],
+    "segments.distal1.young_pa": [
+      4590000.0,
+      6209999.999999999
+    ],
+    "segments.distal1.sections.0.height_z_m": [
+      0.009025,
+      0.009975
+    ],
+    "segments.distal1.sections.0.width_y_m": [
+      0.012634999999999999,
+      0.013965
+    ],
+    "segments.distal1.sections.1.height_z_m": [
+      0.008122499999999998,
+      0.0089775
+    ],
+    "segments.distal1.sections.1.width_y_m": [
+      0.01083,
+      0.011970000000000001
+    ]
+  },
+  "analysis_cap_s": 180,
+  "analysis_protocol": {
+    "protocol_id": "task-local-v2",
+    "input_scale_n": 8.0,
+    "output_scale_m": 0.01,
+    "windows_s": [
+      0.05,
+      0.1,
+      0.35
+    ],
+    "samples_s": [
+      0.0,
+      0.1,
+      0.2,
+      0.3,
+      0.34
+    ],
+    "frequency_rad_s": [
+      0.1,
+      1.0,
+      10.0,
+      100.0
+    ],
+    "rank_atol": 1e-12,
+    "rank_rtol": 1e-09,
+    "comparison_atol": 1e-08,
+    "comparison_rtol": 2e-06,
+    "derivative_atol": 2e-05,
+    "derivative_rtol": 0.0002,
+    "derivative_step": 1e-05,
+    "equilibrium_normalized_residual": 1e-05,
+    "static_force_tolerance": 1e-10,
+    "static_max_iterations": 20,
+    "pole_margin_s_inv": 1e-07,
+    "authority_threshold": null,
+    "authority_reason": "No independently justified task-required MIMO gain threshold; usable bandwidth undefined.",
+    "authority_rule": "Smallest singular value >= threshold, connected grid band starting at lowest frequency; no extrapolation.",
+    "candidate_rule": "initial_target_equilibrium_halfway",
+    "endpoint_max_iterations": 100,
+    "construction_max_iterations": 20,
+    "horizon_alignment_atol_s": 1e-12,
+    "endpoint_check_atol": 1e-08
+  },
+  "standalone_watchdog_s": 300,
+  "study_id": "research-mainline-20261015",
+  "authorization": "User attachment 9bb09b04-f277-4676-9a8a-6ed04a701b53 and current steering: research-mainline implementation, bounded new science, nonsecret commits and ordinary push.",
+  "base_commit": "5cf08f8ef9323e4309dbc7206366c728ee59b3fd",
+  "robot": "robot.json",
+  "task": "../../tasks/reach_hold.json",
+  "runtime": "runtime.json",
+  "mode": "formal_research",
+  "tension_execution_mode": "ideal_tension",
+  "evidence_destination": "evidence/research_mainline_20261015",
+  "capabilities": [
+    "analysis",
+    "search",
+    "nmpc",
+    "rl"
+  ],
+  "topology_scope": {
+    "flexible_segments": 2,
+    "independent_ideal_tensions": 6
+  },
+  "budgets": {
+    "provider_requests": 24,
+    "protected_provider_requests": 4,
+    "public_operations": 60,
+    "physical_launches": 4,
+    "local_solves": 2,
+    "local_solve_s": 600,
+    "offline_nlp": 0,
+    "bdf_replays": 0,
+    "mathematical_evaluations": 12,
+    "numerical_s": 10800,
+    "activity_s": 14400,
+    "delivery_reserve_s": 600
+  },
+  "nmpc_execution_cap_s": 3600,
+  "nmpc_limits": {
+    "executions": 2
+  },
+  "confirmation": {
+    "fresh_independent_repetitions": 0,
+    "configuration": "Select exact fresh completed passing backend evaluation after public read. No extra repetitions; repeatability unassessed."
+  },
+  "rl_limits": {
+    "training_runs": 1,
+    "actions_per_trial": 1000000,
+    "seconds_per_trial": 1200,
+    "training_actions": 1000000,
+    "training_active_seconds": 1200,
+    "evaluation_episodes": 2,
+    "diagnostic_replays": 0,
+    "diagnostic_physics_steps": 0
+  },
+  "supplied_evidence": [
+    "evidence/nmpc_feedback_20261014/scientific_summary.json",
+    "examples/research_chain/failure_feedback.json"
+  ],
+  "controller_defaults": {
+    "extension_id": "controller.gvs_nmpc",
+    "parameters": {
+      "contract": "family.gvs_reach_control",
+      "data": {
+        "numerical_source": "initial_state_pretension",
+        "recipe": {
+          "basis": {
+            "strategy": "structural_linear"
+          },
+          "constraint_jacobian_mode": "reverse",
+          "curvature_scale_rad_m": 10.0,
+          "evaluation_threads": 1,
+          "feasible_return": null,
+          "holding_brake_lead_s": 0.0,
+          "holding_speed_cost_mode": "time_integral_v1",
+          "holding_speed_cost_window_s": 0.05,
+          "horizon": 10,
+          "integration_method": "implicit_euler",
+          "max_cpu_s": null,
+          "max_iterations": 120,
+          "max_unusable_updates": 3,
+          "position_error_scale_m": null,
+          "rate_scale_rad_m_s": 1000.0,
+          "recover_returned_tensions": true,
+          "regenerate_warm_states": true,
+          "root_tolerance": 1e-10,
+          "seed_position_tolerance_fraction": 0.5,
+          "seed_speed_limit_m_s": 0.02,
+          "stopping_policy": "research_work_v1",
+          "substeps": 1,
+          "tension_weight": 0.0001,
+          "terminal_velocity_weight": 0.0001,
+          "terminal_weight": 5.0,
+          "tip_speed_scale_m_s": 0.02,
+          "tolerance": 1e-06,
+          "tracking_weight": 1.0,
+          "variation_weight": 0.001,
+          "velocity_weight": 0.0001
+        }
+      },
+      "version": "1.0.0"
+    },
+    "version": "11.0.0"
+  },
+  "allowed_plan_actions": [
+    "propose",
+    "execute",
+    "search",
+    "diagnose",
+    "select",
+    "confirm",
+    "stop"
+  ],
+  "scoring_window_s": 0.35,
+  "execution_instructions": "You own one bounded research study. Read supplied known passing and failed historical evidence. Choose your own supported parameter subset, mathematical protocol, search, NMPC/direct RL/compatible residual RL, revision or STOP. No mandatory traversal or novelty. Identify each batch hypothesis, evidence, variables, fixed conditions, objective/constraints, method/budget, observations and stopping rule. Historical passing solution used distal1 Young modulus 4.86e6 Pa and speed weights .10/.10; three complete episodes passed, but this was a predefined compliant scenario, not continuous optimization. No current nominal comparison establishes improvement.\nFrozen task and controller follow resolved configuration. NMPC research_work_v1 uses120 iterations,tolerance1e-6, CPU/wall/feasible-return normal timers disabled. External watchdog timeout means incomplete. Usable feasible/recovered iteration-limit plans are not convergence. Local held-position Gramian is output controllability with input held per interval, not damping or task holding. Equilibrium residual is a bounded local attempt, not global feasibility. Saved-state analysis binds exact source robot and previous input with actual remaining time; never transfer it to changed robots.\nBudgets are cumulative:24 provider sends INCLUDING4 protected;60 public operations;12 mathematical candidates INCLUDING engineering preflight/search internals;2 NMPC attempts each3600s;RL1 training run up to1M actions/1200 active seconds,2 independent evaluation episodes each120s hard cap;2 local solves300s each;total numerical10800s;live14400s INCLUDING600s closeout. No implicit extra allowances. Ceilings are not targets. Retain failures and costs; revise only on evidence, never unchanged science retries.\nAfter one fresh complete passing evaluation, explicitly evidence_read its reference, then research_plan action=select with selected_execution exact reference. Extra confirmations=0: freeze and seal immediately, no extra execution/training/request. Zero repetitions means not_required, reproducibility_assessed=false. Historical evidence/proxy/training reward/cached receipts cannot satisfy selection. RL still needs terminal query, training summary read and independent evaluation of exact usable checkpoint. STOP cites every new numerical result, explains unfinished conditions and seals. No structural superiority, robustness, hardware, real-time, global optimum or repeatability claim without evidence. Multiple sequential tool calls per response allowed. Send scoped nonsecret data only.",
+  "range_status": "Editable conservative study choices, not universal physical validity limits. Density, viscosity, routes, station locations and angles fixed."
+}

@@ -11,7 +11,7 @@ from tools.platform_store import plain, zero
 
 
 def source(host, reference):
-    from tools.research.core import state
+    from tools.research.state import state
     if plain(reference) not in [*state(host).get('mechanics_results', []), *state(host).get('imported_mechanics_sources', [])]:
         raise ValueError('OWNED_CURRENT_STUDY_MECHANICS_RESULT_REQUIRED')
     value = host.store.artifact(reference)
@@ -275,7 +275,7 @@ def legacy_compatible(configuration,nominal):
 # Explicit historical co-design adapter contracts; current native design never uses d.
 from pydantic import Field, FiniteFloat, model_validator
 from schemas.common import Contract
-from schemas.research_core import Plan as CurrentPlan
+from tools.research.contracts import Plan as CurrentPlan
 from schemas.platform import EvidenceRef
 from extensions.tendon_family.generated_serial import SUPPORTED_NUMERIC
 

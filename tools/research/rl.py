@@ -5,7 +5,7 @@ from pathlib import Path
 import subprocess
 import time
 
-from schemas.research_core import RLRequest
+from tools.research.contracts import RLRequest
 from schemas.platform import SessionInput
 from tools.platform_store import plain, zero
 from tools.state_io import digest

@@ -1,0 +1,100 @@
+{
+  "research_python": "D:/softrobot-agent/.mainline5-env/Scripts/python.exe",
+  "rl_python": "D:/softrobot-agent/.rl-pilot-env/Scripts/python.exe",
+  "provider": {
+    "adapter": "deepseek",
+    "adapter_version": "8.0.0",
+    "base_url": "https://api.deepseek.com",
+    "context_bytes": 4194304,
+    "context_guard": {
+      "context_limit_tokens": 1000000,
+      "estimate": "one token per serialized UTF-8 byte plus framing; conservative estimate, not tokenization",
+      "framing_headroom_tokens": 8192,
+      "source": "https://api-docs.deepseek.com/quick_start/pricing/",
+      "verified_date": "2026-10-03"
+    },
+    "investigation_max_tokens": 32768,
+    "max_no_progress": 3,
+    "max_repairs": 10,
+    "max_tokens": 32768,
+    "max_turns": 40,
+    "model": "deepseek-flash",
+    "parameters": {
+      "investigation_contract": "selected_reports_v4"
+    },
+    "protocol_recovery": {
+      "max_consecutive": 40,
+      "max_total": 40
+    },
+    "reasoning_effort": "high",
+    "strategy": "strategy.tool",
+    "strategy_version": "1.0.0",
+    "supports_images": false,
+    "supports_text": true,
+    "supports_tools": true,
+    "thinking": "enabled",
+    "timeout_s": 600.0
+  },
+  "threads": {
+    "OPENBLAS_NUM_THREADS": "1",
+    "OMP_NUM_THREADS": "1",
+    "MKL_NUM_THREADS": "1"
+  },
+  "rl_defaults": {
+    "mode": "direct",
+    "seed": 17,
+    "reference": null,
+    "budget": {
+      "actions": 2048,
+      "active_seconds": 120.0
+    },
+    "stop_at_boundary": null,
+    "observation": {
+      "position_scale_m": 0.01,
+      "speed_scale_m_s": 0.02
+    },
+    "action": {
+      "residual_scale_n": 8.0
+    },
+    "reward": {
+      "position": 1.0,
+      "holding_speed": 1.0,
+      "smoothness": 0.001,
+      "failure_penalty": -10000.0
+    },
+    "ppo": {
+      "learning_rate": 0.0003,
+      "n_steps": 256,
+      "batch_size": 64,
+      "n_epochs": 10,
+      "gamma": 0.99,
+      "gae_lambda": 0.95,
+      "clip_range": 0.2,
+      "clip_range_vf": null,
+      "normalize_advantage": true,
+      "ent_coef": 0.0,
+      "vf_coef": 0.5,
+      "max_grad_norm": 0.5,
+      "use_sde": false,
+      "sde_sample_freq": -1,
+      "target_kl": null,
+      "policy_kwargs": {
+        "net_arch": {
+          "pi": [
+            64,
+            64
+          ],
+          "vf": [
+            64,
+            64
+          ]
+        },
+        "log_std_init": -3.0
+      },
+      "device": "cpu",
+      "verbose": 0
+    }
+  },
+  "rl_evaluation_hard_cap_s": 120.0,
+  "rl_diagnostic_hard_cap_s": 60.0
+}

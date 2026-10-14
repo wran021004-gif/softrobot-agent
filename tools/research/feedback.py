@@ -42,7 +42,7 @@ def solution_identity(host, result, candidate):
 
 def confirmation_progress(host, selected=None):
     """Retain all solution failures; only current-study launches satisfy fresh repetitions."""
-    from tools.research.core import state, confirmation_count
+    from tools.research.state import state, confirmation_count
     s=state(host); selected=plain(selected or s.get('selected')); rows={}
     chosen=result_view(host,selected) if selected else None
     for historical, refs in ((True,[*s.get('historical_confirmations',[]), *s.get('linked_selections',[]), *s.get('scoped_context',[])]),
@@ -77,7 +77,7 @@ def confirmation_progress(host, selected=None):
 
 def result_view(host, reference):
     """Organize original evidence once, without recomputing task metrics."""
-    from tools.research.core import state
+    from tools.research.state import state
     from tools.research.design import full_science
     r=host.store.artifact(reference); c=host.store.artifact(r['candidate'])
     # Historical reads stay valid after the active profile/selection changes.
@@ -164,7 +164,7 @@ def eligibility(host, reference, *, revise_selection=False):
 
 
 def facts(host):
-    from tools.research.core import state
+    from tools.research.state import state
     s = state(host)
     if s['spec'].get('mode')=='rl_interface':
         return dict(owning_study=host.run_id,rl_runs=s.get('rl_runs',{}),rl_evaluations=s.get('rl_evaluations',[]),
@@ -193,7 +193,7 @@ def cached(output):
 
 
 def mechanics_context(host, candidate):
-    from tools.research.core import state
+    from tools.research.state import state
     s=state(host); relations=[host.store.artifact(r) for r in s.get('handoffs',[])
         if host.store.artifact(r)['candidate']==plain(candidate)]
     rows=[]
@@ -225,7 +225,7 @@ def mechanics_context(host, candidate):
 
 def mathematical_context(host,candidate):
     """Exact candidate links to calculated evidence; no recomputation or interpretation."""
-    from tools.research.core import state
+    from tools.research.state import state
     records=[]
     for ref in state(host).get('analysis_results',[]):
         value=host.store.artifact(ref)

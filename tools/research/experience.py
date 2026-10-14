@@ -1,6 +1,6 @@
 """A small curated index; receipts bind exact read entries to dispositions."""
 import hashlib
-from schemas.research_core import ExperienceQuery
+from tools.research.contracts import ExperienceQuery
 from tools.platform_store import plain
 
 

@@ -164,7 +164,7 @@ class Registry:
 def registry():
     result = Registry()
     # Each trusted package owns its declarations; deterministic names and conflicts.
-    for manifest in sorted((ROOT / 'extensions').glob('*/manifest.py')):
+    for manifest in [ROOT/'extensions/tendon_family/manifest.py']:
         package = import_module('extensions.' + manifest.parent.name + '.manifest')
         for name, version, schema in package.CONTRACTS:
             result.add_contract(name, version, schema)

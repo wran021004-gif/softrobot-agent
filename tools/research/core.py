@@ -1,3 +1,4 @@
+from tools.research.state import *
 """Reusable reach-and-hold research with immutable candidates and one shared ledger.
 
 Numerical business services remain the established complete-execution and mixed
@@ -18,106 +19,18 @@ import time
 from uuid import uuid4
 
 from schemas.platform import ProjectConfig, SessionInput
-from schemas.research_core import Parameters, Search, Plan, ExperienceQuery, EvidenceQuery, RLRequest, AnalysisRequest
+from tools.research.contracts import Parameters, Search, Plan, ExperienceQuery, EvidenceQuery, RLRequest, AnalysisRequest
 from tools.platform_host import Host
 from tools.platform_store import plain, zero
 from tools.state_io import atomic_json, read, digest
 
 ROOT = Path(__file__).resolve().parents[2]
-DEFAULT_SPEC = ROOT/'examples/research_chain/specification.json'
+DEFAULT_SPEC = ROOT/'configs/research/study.json'
 PYTHON = Path('D:/softrobot-agent/.mainline5-env/Scripts/python.exe')
-SCIENCE_FILES = ['extensions/tendon_family/gvs_nmpc.py', 'extensions/tendon_family/gvs_trajectory.py',
-    'extensions/tendon_family/gvs_projection.py','extensions/tendon_family/contracts.py',
-    'extensions/optimization/contracts.py','schemas/casadi_feedback.py',
-    'tools/numerical_repair.py','tools/fixed_task_milestone.py',
-    'extensions/tendon_family/control_evidence.py',
-    'extensions/tendon_family/backends.py',
-    'extensions/optimization/ipopt.py', 'extensions/tendon_family/generated_serial.py',
-    'extensions/tendon_family/gvs_profile.py', 'tools/design_optimization.py',
-    'tools/execution_completion.py', 'tools/research_tasks.py',
-    'extensions/tendon_family/gvs_codesign.py', 'extensions/tendon_family/gvs_casadi.py',
-    'extensions/tendon_family/gvs.py', 'extensions/tendon_family/gvs_basis.py',
-    'tools/casadi_feedback_worker.py', 'tools/casadi_codesign_worker.py',
-    'tools/research/mechanics.py', 'tools/research/mechanics_worker.py']
-SCIENCE_FILES += ['tools/research/design.py','tools/research/analysis.py','extensions/tendon_family/math_analysis.py','extensions/math_analysis/tools.py','extensions/math_analysis/kernels.py','schemas/platform_analysis.py','schemas/design_optimization.py']
-CORE_FILES = ['tools/research/execution_worker.py','tools/service_execution.py','tools/research/rl.py','tools/rl/env.py','tools/rl/run.py','tools/rl/train.py','tools/rl/checks.py','tools/rl/config.json','tools/research/core.py','tools/research/diagnostic.py','schemas/research_core.py',
-              'tools/research/feedback.py','tools/research_core_demo.py','tools/research/numerics.py','tools/numerical_repair.py','tools/fixed_task_milestone.py','tools/research/experience.py']
-
-
-def save(host, value, kind='core_evidence'):
-    with host.store.transaction() as db:
-        ref = host.store.put(db, value)
-        host.store.event(db, host.run_id, kind, 'saved', outputs=[ref])
-        return plain(ref)
-
-
-def state(host):
-    return host.store.session(host.run_id)['state']
-
-
-def update(host, **values):
-    with host.store.transaction() as db:
-        s = host.store.session(host.run_id, db)['state']; s.update(values)
-        host.store.update_state(db, host.run_id, s)
-
-
-def readable_results(s, host=None):
-    linked=list(s.get('analysis_results',[]))+list(s.get('search_results',[]))
-    if host:
-        for ref in s.get('mechanics_results',[]):
-            result=host.store.artifact(ref)
-            linked.extend(result[k] for k in ('checkpoint_reference','trajectory_reference','original_request','log_reference') if result.get(k))
-    return [*s['results'], *s.get('mechanics_results', []), *s.get('rl_evaluations', []), *s.get('rl_training_summaries', []),
-        *s.get('scoped_context',[]), *s.get('imported_mechanics_sources',[]), *s.get('imported_mechanics_results',[]), *s.get('linked_selections',[]), *s.get('historical_confirmations',[]), *linked,
-        *[s[k] for k in ('rl_task','rl_source_summary','rl_source_candidate') if s.get(k)],
-        *[r for entry in s.get('rl_runs',{}).values() for r in (entry.get('candidate'),entry.get('configuration')) if r]]
-
-
-def protected(host):
-    s=state(host)
-    if s['spec'].get('mode')=='engineering_numerical':return False
-    return (host.store.remaining()['remaining']['model_calls']<=s['spec']['budgets']['protected_provider_requests']
-        or time.time()>=s['cutoff_unix'])
-
-
-def closeout_operations(host):
-    s=state(host)
-    return dict(research_plan=[a for a in ('stop','confirm') if a in s['spec'].get('allowed_plan_actions',('stop','confirm'))],
-        research_rl=[a for a in ('status','stop','evaluate') if s.get('rl_runs') and a in s['spec'].get('allowed_rl_operations',('status','stop','evaluate'))])
-
-
-def admit_closeout(host, name, value):
-    if protected(host) and name in ('research_plan','research_rl'):
-        field='action' if name=='research_plan' else 'operation'
-        if value.get(field) not in closeout_operations(host)[name]:
-            raise ValueError('PROTECTED_CLOSEOUT_REQUIRES_EXISTING_WORK_OR_STOP')
-
-
-def execution_deadline(host):
-    s=state(host)
-    return s['started_unix']+s['spec']['budgets']['activity_s'] if protected(host) else s['cutoff_unix']
-
-
-async def wait_training(host):
-    """No provider turns or summary snapshots while an owned worker is active."""
-    from tools.research.rl import reconcile, dispatch as rl_dispatch
-    from tools.rl import run
-    milestones=deepcopy(state(host)['spec'].get('rl_wait_milestones',{}))
-    while True:
-        s=state(host)
-        if s['research_status']=='stopped': return
-        active=False
-        for run_id in s.get('rl_runs',{}):
-            status=reconcile(host,run_id,lightweight=True)
-            if not status['worker_alive']: continue
-            if run_id in milestones:
-                directory=run.run_path(run_id); generation=read(directory/'checkpoint.json').get('current')
-                if generation and read(directory/'checkpoints'/generation/'metadata.json')['inherited']['num_timesteps']>=milestones[run_id]: continue
-            active=True
-            if time.time()>=s['cutoff_unix'] and status['status']!='stopping':
-                rl_dispatch(host,dict(operation='stop',run_id=run_id,rationale='Execution cutoff; retain terminal evidence'),'deadline-stop-'+run_id)
-        if not active or time.time()>=execution_deadline(host): return
-        await asyncio.sleep(min(2.,max(.01,execution_deadline(host)-time.time())))
+SCIENCE_FILES = ['extensions/tendon_family/'+n+'.py' for n in ('gvs_nmpc','gvs_trajectory','gvs_projection','contracts','control_evidence','backends','generated_serial','gvs_profile','gvs_codesign','gvs_casadi','gvs','gvs_basis','math_analysis','compiler','sections','geometry','manifest')]
+SCIENCE_FILES += ['extensions/optimization/contracts.py','extensions/optimization/ipopt.py','extensions/math_analysis/tools.py','extensions/math_analysis/kernels.py','schemas/platform_analysis.py','tools/execution_completion.py','tools/research_tasks.py']
+CORE_FILES = ['tools/research/'+p.name for p in (ROOT/'tools/research').glob('*.py')]
+CORE_FILES += ['tools/service_execution.py','tools/rl/env.py','tools/rl/run.py','tools/rl/train.py','tools/rl/checks.py','tools/rl/config.json']
 
 
 def read_evidence(host, query):
@@ -147,32 +60,16 @@ def limits(spec):
         backend_solves=b['physical_launches'], worker_calls=0, wall_s=b['activity_s'])
 
 
-def charge_start(s):
-    """Shared charged starts, including unsuccessful starts; never recycled."""
-    limit=s['spec'].get('shared_start_limit')
-    if limit is not None:
-        if s.get('charged_starts',0)>=limit: raise ValueError('SHARED_CHARGED_START_CEILING')
-        s['charged_starts']=s.get('charged_starts',0)+1
 
 
-def enabled(spec, capability):
-    return capability in spec.get('capabilities', ['rl'] if spec.get('mode')=='rl_interface' else ['mathematics','search','nmpc'])
 
 
-def confirmation_count(s):
-    return s['spec']['confirmation']['fresh_independent_repetitions']
 
 
 def prepare(spec_path=DEFAULT_SPEC, directory=None):
-    spec = read(spec_path); run_id = spec['study_id']
-    if spec.get('mode')=='rl_interface':
-        hard=dict(provider_requests=24,public_operations=60,physical_launches=1,activity_s=900)
-        rl_hard=dict(training_runs=1,training_actions=2048,training_active_seconds=120,evaluation_episodes=1,diagnostic_replays=1,diagnostic_physics_steps=1)
-        if any(spec['budgets'][k]>v for k,v in hard.items()) or any(spec['rl_limits'][k]>v for k,v in rl_hard.items()):
-            raise ValueError('RL_INTERFACE_HARD_CEILINGS_CANNOT_INCREASE')
-    if spec.get('mode') == 'engineering_numerical' and (spec['budgets']['provider_requests'] != 0 or spec['budgets']['protected_provider_requests'] != 0):
-        raise ValueError('NUMERICAL_MODE_REQUIRES_ZERO_MODEL_REQUESTS')
-    directory = Path(directory or ROOT/'runs'/run_id)
+    from tools.research.config import resolve
+    spec = resolve(spec_path); run_id = spec['study_id']
+    directory = Path(directory or ROOT/'runs/research'/run_id)
     h = Host(directory, run_id, actor='unified-research')
     if h.store.db.exists() and h.store.connect(True).execute('SELECT COUNT(*) FROM sessions WHERE run_id=?',(run_id,)).fetchone()[0]:
         if state(h)['spec'] != spec: raise ValueError('STUDY_SPEC_CHANGED_USE_EXPLICIT_MIGRATION')
@@ -184,21 +81,7 @@ def prepare(spec_path=DEFAULT_SPEC, directory=None):
                 update(h,rl_task=save(h,h.store.artifact(candidate)['configuration']['task'],'rl_frozen_task'),rl_runs={},rl_evaluations=[],rl_evidence_reads=[])
         return h
     start = time.perf_counter()
-    from tools.nmpc_settling import baseline_configuration
-    from tools.research_v2 import native_configuration
-    if spec.get('baseline_archive'):
-        from tools.research.numerics import archived
-        baseline=spec['baseline_archive']
-        cfg=deepcopy(archived(baseline['folder'],baseline['candidate'])['configuration'])
-    elif spec.get('nominal_source'):
-        nominal=read(ROOT/spec['nominal_source'])
-        if digest(nominal['configuration'])!=nominal['provenance']['configuration_sha256']:raise ValueError('NOMINAL_SOURCE_IDENTITY_CHANGED')
-        cfg=deepcopy(nominal['configuration'])
-    else:cfg = baseline_configuration()
-    cfg['run_id'] = run_id
-    if enabled(spec,'rl'):
-        if cfg['policy']['controller']['extension_id']!='controller.gvs_nmpc': raise ValueError('EXPLICIT_IDEAL_TENSION_SOURCE_REQUIRED')
-        if spec.get('tension_execution_mode')!='ideal_tension': raise ValueError('RL_STUDY_MUST_DECLARE_IDEAL_TENSION')
+    cfg=deepcopy(spec['configuration']); nominal=dict(configuration=deepcopy(cfg),provenance=spec['source_provenance'])
     # Recovery-enabled source is complete immutable execution evidence.
     cfg['policy']['controller']['parameters']['data']['recipe'].update({k:v for k,v in spec['reference_parameters'].items() if k in ('holding_tip_speed_weight','terminal_tip_speed_weight')})
     cfg['policy']['controller']['parameters']['data']['recipe'].update(spec.get('controller_recipe',{}))
@@ -206,7 +89,7 @@ def prepare(spec_path=DEFAULT_SPEC, directory=None):
         from extensions.tendon_family.contracts import current_nmpc_recipe
         cfg['policy']['controller']['parameters']['data']['recipe']=current_nmpc_recipe(
             cfg['policy']['controller']['parameters']['data']['recipe'],spec.get('controller_recipe'))
-    model = native_configuration(run_id)['policy']['model']
+    model = deepcopy(spec['runtime']['provider'])
     cfg['policy'].update(model=model, budget=limits(spec), allowed_tools=['evidence.read'],
         tool_bindings={'evidence.read':'1.0.0'}, operation_allowances={'evidence.read':dict(timeout_s=30.,reserve_s=30.)})
     if not h.store.db.exists():
@@ -224,13 +107,13 @@ def prepare(spec_path=DEFAULT_SPEC, directory=None):
     profile['execution_environment']=deepcopy(spec.get('numerical_environment',{}))
     profile['identity'] = digest(profile)
     update(h, spec=spec, base_configuration=cfg, profile=profile, profile_history=[profile],
-        started_unix=spec['started_unix'], cutoff_unix=spec['started_unix']+spec['budgets']['activity_s']-spec['budgets']['delivery_reserve_s'],
+        started_unix=time.time(), cutoff_unix=time.time()+spec['budgets']['activity_s']-spec['budgets']['delivery_reserve_s'],
         numerical_s=0., numerical_reserved_s=0., local_solves=0, local_solve_s=0.,
         results=[], candidates={}, plans=[], retrievals=[], searches={}, pending=None,
         offline_nlp=0, bdf_replays=0, mechanics_results=[], handoffs=[], historical_diagnostic_sources=[],
         research_status='ready', selected=None,
         pilot=dict(provider=model,live_model_requests=0,framework_session_id=run_id,
-            request_deadline_unix=spec['started_unix']+spec['budgets']['activity_s']-spec['budgets']['delivery_reserve_s']))
+            request_deadline_unix=time.time()+spec['budgets']['activity_s']-spec['budgets']['delivery_reserve_s']))
     if spec.get('nominal_source'):
         update(h,nominal_configuration=nominal['configuration'],nominal_provenance=nominal['provenance'],mathematical_evaluations=0,analysis_results=[],analysis_costs=[],search_results=[],assignment_started_unix=time.time(),accounting_scope='Cumulative assignment includes engineering preflight; never reset at live start')
     update(h,scoped_context=[save(h,read(ROOT/path),'supplied_scoped_context') for path in spec.get('supplied_evidence',[])])
@@ -262,12 +145,6 @@ def prepare(spec_path=DEFAULT_SPEC, directory=None):
             imported_candidates=historical_candidates,imported_candidate_profile=source_store.session(history_spec['source_study_id'])['state']['profile'],
             imported_mechanics_sources=registered.get('mechanics_sources',[]),
             imported_mechanics_results=registered.get('verification',[]),handoffs=registered.get('handoffs',[]))
-    # Compact supplied history is explicitly different from retrieval.
-    history = read(ROOT/'evidence/nmpc_settling_20261011/scientific_summary.json')
-    ref = save(h, history, 'supplied_historical_context')
-    update(h, historical_context=ref)
-    latest=read(ROOT/'evidence/research_core_20261011/scientific_summary.json')
-    update(h, supplied_core_history=save(h,latest,'supplied_sealed_core_history'))
     candidate = construct(h, spec['reference_parameters'], dict(origin='initial_controller_reference', historical_result_ownership='sealed source activity'))
     update(h, reference_candidate=candidate, numerical_s=max(state(h)['numerical_s'],time.perf_counter()-start))
     if enabled(spec,'rl'):
@@ -279,6 +156,7 @@ def prepare(spec_path=DEFAULT_SPEC, directory=None):
         if spec.get('rl_evaluation_source'):
             from tools.research.rl import bind_source
             bind_source(h)
+    atomic_json(directory/'resolved_configuration.json',spec)
     atomic_json(directory/'activity.json',spec)
     return h
 
@@ -580,19 +458,13 @@ def compact_result(r):
     return result
 
 
-def search_problem(host, query, count):
-    if not state(host)["spec"].get("nominal_source"):
-        from tools.research.mechanics import legacy_search_problem
-        return legacy_search_problem(host,query,count)
-    from tools.research.design import search_problem as build
+def search_problem(host,query,count):
+    from tools.research.search import search_problem as build
     return build(host,query,count)
 
 
-def run_search(host, query, key):
-    if not state(host)["spec"].get("nominal_source"):
-        from tools.research.mechanics import legacy_run_search
-        return legacy_run_search(host,query,key)
-    from tools.research.design import run_search as search
+def run_search(host,query,key):
+    from tools.research.search import run_search as search
     return search(host,query,key,guard=guard,execute=execute,capacity=capacity)
 
 
@@ -654,7 +526,7 @@ def diagnose(host, refs):
 
 def local_diagnostic(host, query, key):
     guard(host,True)
-    from schemas.research_core import LocalDiagnostic
+    from tools.research.contracts import LocalDiagnostic
     from tools.research.numerics import execution_update
     q=LocalDiagnostic.model_validate(query); s=state(host); b=s['spec']['budgets']
     source=execution_update(host,q.execution,q.update_id);record=source['record']
@@ -830,11 +702,7 @@ def packet(host):
 def dispatch(host, value, request_id, origin='model'):
     """Native plan acceptance and internal batch use the same project Store."""
     if state(host)['spec'].get('mode') == 'engineering_numerical':origin='engineering'
-    contract=Plan
-    if not state(host)["spec"].get("nominal_source"):
-        from tools.research.mechanics import LegacyPlan
-        contract=LegacyPlan
-    plan=contract.model_validate(value)
+    plan=Plan.model_validate(value)
     if state(host)['spec'].get('allowed_plan_actions') is not None and plan.action not in state(host)['spec']['allowed_plan_actions']:
         raise ValueError('Operation outside declared follow-up scope')
     if state(host)['spec'].get('mode')=='rl_interface' and (plan.action not in ('propose','stop') or plan.mechanics_source):
@@ -929,279 +797,14 @@ def dispatch(host, value, request_id, origin='model'):
         raise
 
 
-INSTRUCTIONS = '''You are the sole research principal for the existing reach-and-hold task.
-Choose freely among propose, execute, mathematical search, read-only diagnosis,
-fresh post-selection confirmation, experience retrieval, evidence read and STOP.
-Mechanics optimizes existing d, full states and tensions offline, with separate
-offline objective weights and relaxed task slacks; replay independently integrates
-its returned schedule with BDF. BDF is not physical validation. A handoff retains
-trajectory and failure flags; goal-based runtime NMPC holds structure and weights
-fixed. Search adapts selected weights at fixed structure (cite mechanics_source
-for that handoff), or optionally the existing structural coordinate when justified.
-Engineering-selected integration actions are supplied evidence, not your choices.
-No mandatory traversal. Direct proposals construct parameters without offline NLP.
-Diagnosis may optionally perform bounded identical-recorded-input standalone solves;
-research_policy re-solves the exact serialized problem under the frozen iteration/convergence policy.
-research_current explicitly reconstructs through the current workspace and is not an exact-problem comparison.
-Search fixes unselected variables and uses the same evaluator; several numerical
-proposals may run internally. Inspect actual explored coordinates. Give hypothesis,
-evidence, expected and weakening observations, fixed conditions and stopping rule.
-The program supplies facts; retain your interpretations separately. Experience
-drafts are recommendations, not validated skills; record adoption/rejection.
-Freeze all other task, physics, controller, solver and initialization settings.
-Candidate identity includes all resolved fixed/search parameters and evaluation
-profile; each independent execution has its own identity. Confirmations must cite
-the exact result EvidenceRef in confirmation_options, not candidate/hash/receipt.
-Identical candidate artifacts legitimately yield fresh positive-cost executions
-owned by this study. Cached operation receipts incur zero additional execution
-cost; previous result costs remain visible. Imported history is not owned passing
-execution evidence. Failed submissions return usable facts without choosing for you.
-Run confirmations twice with identical full science.
-Historical results never satisfy fresh development or confirmation requirements.
-After a failed or invalid confirmation, a genuinely changed solution needs fresh
-passing development and two confirmations. Use confirm with revise_selection=true
-to explicitly replace that failed selection; failures and all costs remain recorded.
-Changing labels, result references or checkpoint paths never erases a failure.
-Numerical feasibility, early stopping, selection/recovery, prediction disagreement,
-input limits, task acceptance and missing data are distinct. No weight direction
-is prescribed. Compare fixed task metrics, never objectives with different weights.
-Historical development .10/.10 passed but same-configuration confirmation failed;
-unique cause unresolved. Earlier complete warm plans were not saved. Wall overruns
-did not skip synchronous simulated-time commands. Archived free weight declarations
-did not demonstrate exploration. Old offline schedule is not the feedback reference.
-A material repair versions the evaluation profile and retains all costs/results.
-Without a new comparable reference under the current profile report performance
-only, withhold parameter improvement attribution. Reserve two confirmations before
-every development/search and obey the shared ledger including all internal launches.
-Last four provider requests are for results/STOP only. You may stop on scientific
-failure or sufficient evidence; do not force success or fill quotas. STOP must cite
-every new experiment result. Accepted STOP ends sends, with no narrative polish.
-No robustness, global optimum, continuous-time, hardware, generalization or LLM
-superiority claims. Current facts refresh at model boundaries; Strands owns history.'''
 
 
-RL_INSTRUCTIONS = """You are the sole research principal for one bounded candidate-aware RL interface study.
-Read the frozen task with evidence_read and available capabilities. Propose a NEW candidate using research_plan action propose,
-changing d structurally so its lengths differ from historical [.15758113296570092,.11241886703429908] m.
-No NMPC/BDF/MATLAB, design search, historical policy training, or second trial is permitted.
-Choose direct or residual yourself; no compatible residual reference exists. Direct needs none.
-Use research_rl start with candidate, mode, at least one supported PPO training_overrides field and
-one reward_overrides field, allocation and a brief rationale. Choose short rollout-aligned actions allowing at least
-two complete optimization batches, within 2048 cumulative actions and 120 active seconds. One training run only.
-Query real status even if it already finished and explicitly read/cite training_summary_reference. When terminal and a usable checkpoint exists, evaluate it once;
-evaluation reloads policy and initializes a fresh simulation from frozen candidate/task. Training completion is not task success.
-Read immutable evaluation evidence explicitly through evidence_read before deciding. Cite that exact EvidenceRef.
-Use research_plan action stop to close this bounded study, with next_step chosen from adjust_training, revise_design,
-diagnose or stop. Explain the next step in interpretation with concrete evidence. Recommending future work does
-not authorize executing it now or mean scientific research stops forever. Do not force a successful task result.
-Diagnosis defaults to evidence inspection; at most one explicit replay of one physical step using its own capture.
-No compatible capture means inspection only. Short failed training never proves design infeasibility.
-Hard cumulative ceilings include failures/corrections: 24 provider requests,60 public operations,one training run,
-2048 training actions,120 active training seconds,one evaluation episode,one diagnostic replay/one physical step,
-900 live study seconds. The configured final provider reserve permits completing existing work and truthful STOP. Training waits for a decision boundary.
-Preserve goal, initialization, duration, inclusive holding-window and thresholds; rewards do not alter task acceptance.
-No robustness, generalization, solved numerical root cause, or complete autonomous research claims.
-STOP must cite new evaluation evidence and follow its explicit public read and terminal status query. If no usable published checkpoint exists, explicitly read/cite the training/failure summary without requesting evaluation, close the bounded study truthfully and state that independent evaluation/task performance remain unmeasured; do not spend repeated STOP attempts or request another training run."""
 
 
-FORMAL_INSTRUCTIONS = """You own a bounded design-and-control study. Use only scoped supplied evidence and public tools.
-Read study specification, frozen original task, declared capabilities, known historical facts and remaining budgets. Supplied history is not rediscovery.
-When mathematical optimization is authorized, use supported task_gap or task_gap_with_effort objective. Explain task difficulty, weights, bounds, fixed variables,
-relaxed requirements and expected relation to original completion. Inspect mathematical evidence and returned candidate. Handoff chooses no controller.
-Mathematical feasibility, relaxed dynamics and original MuJoCo task acceptance are distinct. Preliminary ranking is optional. Search uses NMPC only.
-Choose mathematical accuracy, reference use, direct/residual RL or admitted NMPC and subsequent actions using evidence and budget. Explain how the chosen integration method and discretization suit the intended use; computation time alone does not justify the coarsest model.
-Solver convergence, numerical feasibility, independent mathematical verification, backend acceptance and confirmation completion are separate. Compatibility is not numerical accuracy; unverified references remain unverified even if used exploratorily.
-Inspect nmpc_admission: a complete contained execution reserves its hard cap and confirmation capacity. Matching historical timing is an estimate only; first-use candidates are eligible without calibration. Timeout is incomplete evidence, task performance unmeasured; no automatic retry.
-Residual requires an advertised compatible runnable reference. Direct stays available if incompatible. Train within declared trial/cumulative limits;
-query real terminal status and explicitly read/cite its training_summary_reference through evidence_read before deciding.
-Evaluate only a usable published checkpoint; otherwise read training/failure evidence and decide without an impossible evaluation or automatic replacement trial.
-An earlier checkpoint evaluation must identify its actual training step. Choose rollout-aligned actions; adjustments round down, never above ceilings.
-Read independent evaluation evidence explicitly before deciding to adjust control, revise design, switch route, select or stop.
-Select a passing development result via confirm selected_execution, freezing candidate+task+route+configuration+exact checkpoint. Use the predeclared fresh
-post-selection count from confirmation_progress, retaining historical ownership. Use research_plan action confirm and the exact selected_execution, never ordinary research_rl evaluate for confirmation. RL confirmation reloads exact weights, fresh simulation, no training or NMPC. Keep failed confirmations; no success-hunting retries.
-Selection remains immutable during its confirmation attempt. After failure, inspect evidence and develop a scientifically changed solution.
-Use confirm with revise_selection=true to explicitly select its fresh passing development result, reserving two confirmations without resetting any costs.
-Historical results do not count as fresh development or confirmations. Relabeling and checkpoint paths cannot erase solution failures.
-Nominal repetitions support no robustness claim. No fresh baseline required; withhold improvement attribution without comparable evidence.
-Stop once confirmations pass; ceilings are not targets. Preserve all costs including failures. The configured protected reserve permits existing work, evaluation, confirmation, evidence and STOP.
-STOP cites every new result and follows explicit RL evidence reads and terminal query, with next_step and actual unfinished requirements.
-Never include credentials, environment-file contents, unrelated files or personal data in model messages. No algorithm superiority or numerical root-cause claims.
-"""
 
-async def converse(host):
-    if state(host)['spec'].get('mode') == 'engineering_numerical':
-        raise ValueError('NUMERICAL_MODE_FORBIDS_APPLICATION_MODEL_ENDPOINTS')
-    from strands.tools.tools import PythonAgentTool
-    from strands.tools.executors import SequentialToolExecutor
-    from strands.hooks.events import BeforeModelCallEvent, BeforeToolCallEvent, AfterToolCallEvent
-    from tools.strands_pilot import build_harness
-    from tools.strands_pilot_r3 import LiveBoundary, live_model_class, record, pending
-    from examples.gvs_nmpc_route_experiment import load_credential
-    def feedback_context_references():
-        refs=[]
-        for event in host.store.events(host.run_id):
-            if event['kind']!='model_original_tool_feedback': continue
-            value=host.store.artifact(event['outputs'][0]);use=value['tool_use']
-            if use['name'] not in ('research_plan','research_rl','research_analysis') or (use['name']=='research_plan' and use['input'].get('action') in ('stop',None)): continue
-            if value['result']['status']!='success': continue
-            refs.extend(use['toolUseId']+'_'+str(i) for i,_ in enumerate(value['result'].get('content',[])))
-        return refs
-    if (state(host)['spec'].get('mode')=='rl_interface' or state(host)['spec'].get('capabilities')) and not state(host).get('live_started_unix'):
-        s=state(host);started=time.time();pilot=deepcopy(s['pilot'])
-        pilot.update(request_deadline_unix=started+s['spec']['budgets']['activity_s']-s['spec']['budgets']['delivery_reserve_s'],bounded_request_reservation=True)
-        update(host,live_started_unix=started,started_unix=started,cutoff_unix=pilot['request_deadline_unix'],pilot=pilot)
-    guard(host)
-    if pending(host): raise ValueError('UNKNOWN_PROVIDER_OUTCOME_RECOVER_BEFORE_SEND')
-    load_credential(Path.home()/'.codex'/'.env')
-    class Boundary(LiveBoundary):
-        async def handle_async_request(self,request):
-            s=state(host)
-            if s['research_status']=='stopped' or s['pending']: raise ValueError('SEALED_STOP_OR_PENDING_WORK_BLOCKS_SEND')
-            if not s['pilot'].get('unconsumed_response'):
-                wire=json.loads(request.content)
-                if protected(host):
-                    definitions={t['function']['name']:t['function'] for t in wire.get('tools',[])}
-                    action=definitions.get('research_plan',{}).get('parameters',{}).get('properties',{}).get('action',{})
-                    permitted=closeout_operations(host)
-                    if action.get('enum')!=permitted['research_plan'] or set(definitions)-{'research_plan','research_rl','evidence_read','retrieve_context'}:
-                        raise ValueError('PROTECTED_SEND_REQUIRES_CLOSEOUT_NATIVE_SCHEMA')
-                    rl=definitions.get('research_rl')
-                    if rl and rl['parameters']['properties']['operation'].get('enum')!=permitted['research_rl']:
-                        raise ValueError('PROTECTED_RL_SEND_REQUIRES_EXISTING_WORK')
-                    retrieval=definitions.get('retrieve_context')
-                    if retrieval:
-                        advertised=retrieval.get('parameters',{}).get('properties',{}).get('reference',{}).get('enum')
-                        if advertised is None or not set(advertised)<=set(feedback_context_references()):
-                            raise ValueError('PROTECTED_CONTEXT_RETRIEVAL_REQUIRES_EXISTING_FEEDBACK')
-            if enabled(state(host)['spec'],'rl'):
-                available=max(.001,state(host)['pilot']['request_deadline_unix']-time.time())
-                request.extensions['timeout']={k:min(v or available,available) for k,v in request.extensions.get('timeout',dict(connect=available,read=available,write=available,pool=available)).items()}
-            return await super().handle_async_request(request)
-    boundary=Boundary(host,allow_truncated_response=True)
-    def handler(kind):
-        def run(use,**kwargs):
-            try:
-                if kind=='plan': value=dispatch(host,use['input'],'native-'+use['toolUseId'])
-                elif kind=='analysis':
-                    from tools.research.analysis import dispatch as analysis_dispatch
-                    value=analysis_dispatch(host,use['input'],'native-'+use['toolUseId'],guard=guard)
-                elif kind=='rl':
-                    from tools.research.rl import dispatch as rl_dispatch
-                    value=rl_dispatch(host,use['input'],'native-'+use['toolUseId'])
-                else:
-                    key='native-'+use['toolUseId']
-                    row,fresh=host.store.reserve(host.run_id,key,digest(use['input']),host.actor,{**zero(),'tool_calls':1})
-                    if not fresh and row['receipt']: value=host.store.artifact(json.loads(row['receipt'])['output'])
-                    else:
-                        if kind=='experience': value=experience(host,use['input'])
-                        else:
-                            value=read_evidence(host,use['input'])
-                        host.store.complete(row,dict(request_id=key,execution_id=row['execution_id'],caller=host.actor,
-                            tool_id='research.core_'+kind,tool_version='1.0.0',execution_status='completed',charged=zero()),value)
-                return dict(toolUseId=use['toolUseId'],status='success',content=[dict(text=json.dumps(value))])
-            except Exception as exc:
-                key='native-'+use['toolUseId'];reserved=host.store.lookup(host.run_id,key)
-                if reserved and not reserved['receipt']:
-                    host.store.complete(reserved,dict(request_id=key,execution_id=reserved['execution_id'],caller=host.actor,
-                        tool_id='research.core_'+kind,tool_version='1.0.0',execution_status='failed',error=str(exc),charged=zero()),dict(error=str(exc)))
-                from tools.research.feedback import facts
-                return dict(toolUseId=use['toolUseId'],status='error',content=[dict(text=json.dumps(dict(
-                    error=type(exc).__name__,message=str(exc),decision_facts=facts(host))))])
-        return run
-    rl_mode=enabled(state(host)['spec'],'rl')
-    formal=bool(state(host)['spec'].get('capabilities'))
-    instructions=state(host)['spec'].get('execution_instructions') or (FORMAL_INSTRUCTIONS if formal else RL_INSTRUCTIONS if rl_mode else INSTRUCTIONS)
-    native=[PythonAgentTool(name,dict(name=name,description=description,inputSchema={'json':schema.model_json_schema()}),handler(kind))
-        for name,description,schema,kind in [('research_plan','Propose/search/execute/diagnose; confirm a fresh passing development result; explicitly revise a failed selection with confirm revise_selection=true only for changed science and capacity for two fresh confirmations. History never satisfies fresh gates; failures/counters persist. STOP seals study.',Plan,'plan'),
-            ('experience_retrieve','Read-only case/procedure draft search/read with provenance',ExperienceQuery,'experience'),
-            ('evidence_read','Read exact immutable evidence and JSON pointer',EvidenceQuery,'evidence')]]
-    if formal or rl_mode:
-        actions=['propose','stop','diagnose','confirm'] if formal and state(host)['spec'].get('mode')!='rl_interface' else ['propose','stop']
-        if formal and state(host)['spec'].get('mode')!='rl_interface': actions += [a for a,c in [('execute','nmpc'),('search','search'),('mechanics','mathematics'),('replay','replay')] if enabled(state(host)['spec'],c)]
-        actions=state(host)['spec'].get('allowed_plan_actions',actions)
-        schema=Plan.model_json_schema();schema['properties']['action']={'type':'string','enum':actions}
-        native[0].tool_spec={**native[0].tool_spec,'inputSchema':{'json':schema}}
-    if state(host)['spec'].get('nominal_source'):
-        native.append(PythonAgentTool('research_analysis',dict(name='research_analysis',description='Candidate-bound mathematics; saved_state or execution plus update_id selects exact projected state at previous applied input with actual remaining task time. Historical candidate binding required. Each calculation charged once; task acceptance unmeasured.',inputSchema={'json':AnalysisRequest.model_json_schema()}),handler('analysis')))
-    if rl_mode:
-        native.append(PythonAgentTool('research_rl',dict(name='research_rl',description='Configure/start, query, stop, resume, independently evaluate or inspect/one-step diagnose an owned frozen candidate RL run',
-            inputSchema={'json':RLRequest.model_json_schema()}),handler('rl')))
-    if state(host)['spec'].get('rl_evaluation_source'):
-        schema=RLRequest.model_json_schema();schema['properties']['operation']['enum']=state(host)['spec']['allowed_rl_operations']
-        source=state(host)['spec']['rl_evaluation_source']
-        schema['properties']['run_id']['enum']=[source['run_id']];schema['properties']['checkpoint']['enum']=[source['checkpoint']]
-        native[-1].tool_spec={**native[-1].tool_spec,'inputSchema':{'json':schema}}
-    if formal: native[1].tool_spec={**native[1].tool_spec,'description':'Unavailable outside scoped milestone evidence'}
-    agent=build_harness(host,transport=boundary,api_key=os.environ['DEEPSEEK_API_KEY'],instructions=instructions,
-        model_class=live_model_class(boundary),tool_executor=SequentialToolExecutor(),research_tools=[t for t in native if t is not native[1]] if state(host)['spec'].get('rl_evaluation_source') else native,
-        configuration_path=host.store.root/'framework_configuration.json',session_directory=host.store.root/'framework_sessions')
-    if state(host)['spec'].get('rl_evaluation_source'):
-        agent.tool_registry.registry.pop('retrieve_context',None)
-    async def before_model(event):
-        s=state(host)
-        if s['research_status']=='stopped': event.cancel='Accepted native STOP; no additional request'; return
-        if s['pilot'].get('unconsumed_response'):
-            saved=s['pilot']['unconsumed_response']; ev=next(e for e in host.store.events(host.run_id) if e['kind']=='r3_request' and e['request_id']==saved)
-            original=host.store.artifact(host.store.artifact(ev['outputs'][0])['request'])
-            agent.system_prompt=next(m['content'] for m in original['messages'] if m['role']=='system'); return
-        guard(host)
-        if rl_mode: await wait_training(host)
-        s=state(host)
-        if s['research_status']=='stopped': event.cancel='Study stopped while waiting'; return
-        guard(host)
-        if protected(host):
-            pilot=deepcopy(s['pilot']);pilot['request_deadline_unix']=execution_deadline(host);update(host,pilot=pilot)
-        current=packet(host); record(host,'model_decision_packet',current)
-        agent.system_prompt=instructions+'\nCURRENT_RESEARCH_PACKET\n'+json.dumps(current)
-        if protected(host):
-            permitted=closeout_operations(host)
-            schema=Plan.model_json_schema(); schema['properties']['action']={'enum':permitted['research_plan'],'type':'string'}
-            native[0].tool_spec={**native[0].tool_spec,'inputSchema':{'json':schema}}
-            agent.tool_registry.registry.pop('experience_retrieve',None)
-            agent.tool_registry.registry.pop('research_analysis',None)
-            if rl_mode:
-                schema=deepcopy(native[-1].tool_spec['inputSchema']['json'])
-                schema['properties']['operation']['enum']=permitted['research_rl']
-                schema['properties']['run_id']['enum']=list(s.get('rl_runs',{}))
-                native[-1].tool_spec={**native[-1].tool_spec,'inputSchema':{'json':schema}}
-            schema=EvidenceQuery.model_json_schema()
-            schema['$defs']['EvidenceRef']['properties']['artifact_id']['enum']=[r['artifact_id'] for r in readable_results(s,host)]
-            native[2].tool_spec={**native[2].tool_spec,'inputSchema':{'json':schema}}
-            retrieval=agent.tool_registry.registry.get('retrieve_context')
-            if retrieval:
-                from strands.tools.tools import normalize_tool_spec
-                spec=deepcopy(normalize_tool_spec(retrieval.tool_spec))
-                spec['inputSchema']['json']['properties']['reference']['enum']=feedback_context_references()
-                retrieval.tool_spec=spec
-            agent.system_prompt+='\nPROTECTED CLOSEOUT: status/stop existing workers, pinned published-policy evaluation, explicit evidence reads, selected passing solution confirmations and truthful STOP. No start/resume/solve/exploration.'
-    def before_tool(event):
-        if state(host)['spec'].get('rl_evaluation_source') and event.tool_use['name'] not in ('research_plan','research_rl','evidence_read'):
-            event.cancel_tool='Only declared follow-up evaluation, evidence reads and STOP are permitted.'
-        if formal and event.tool_use['name']=='experience_retrieve':
-            event.cancel_tool='Use only scoped milestone evidence; unrelated workspace retrieval is unauthorized.'
-        record(host,'model_original_tool_request',dict(tool_use=event.tool_use))
-        if protected(host) and event.tool_use['name'] not in ('research_plan','research_rl','evidence_read','retrieve_context'):
-            event.cancel_tool='Protected closeout permits only existing work, evidence and STOP.'
-        try: admit_closeout(host,event.tool_use['name'],event.tool_use['input'])
-        except ValueError as exc: event.cancel_tool=str(exc)
-        if state(host)['research_status']=='stopped': event.cancel_tool='Accepted STOP seals further workflow work.'
-        if protected(host) and event.tool_use['name']=='retrieve_context' and event.tool_use['input'].get('reference') not in feedback_context_references():
-            event.cancel_tool='Protected closeout permits existing execution feedback only.'
-    def after_tool(event):
-        record(host,'model_original_tool_feedback',dict(tool_use=event.tool_use,result=event.result))
-        key='native-'+event.tool_use['toolUseId']
-        if host.store.lookup(host.run_id,key) is None:
-            row,_=host.store.reserve(host.run_id,key,digest(event.tool_use),host.actor,{**zero(),'tool_calls':1})
-            host.store.complete(row,dict(request_id=key,execution_id=row['execution_id'],caller=host.actor,
-                tool_id=event.tool_use['name'],tool_version='1.0.0',execution_status='completed',charged=zero()),event.result)
-    agent.hooks.add_callback(BeforeModelCallEvent,before_model)
-    agent.hooks.add_callback(BeforeToolCallEvent,before_tool); agent.hooks.add_callback(AfterToolCallEvent,after_tool)
-    try:
-        while state(host)['research_status']!='stopped':
-            result=await agent.invoke_async('Use actual saved evidence, choose your next research action or STOP, then consume feedback and decide freely.')
-            record(host,'model_original_turn',dict(result=str(result)))
-            if state(host)['pending'] or pending(host): raise ValueError('PENDING_OUTCOME_REQUIRES_LOCAL_RECOVERY')
-    finally: await boundary.aclose()
+
+
+
 
 
 def recover(host):
@@ -1225,10 +828,7 @@ def recover(host):
     for ref in s['plans']:
         original=host.store.artifact(ref);key=original['request_id'];row=host.store.lookup(host.run_id,key)
         if not row or row['receipt']: continue
-        if s['spec'].get('nominal_source'):plan=Plan.model_validate(original['original_plan'])
-        else:
-            from tools.research.mechanics import LegacyPlan
-            plan=LegacyPlan.model_validate(original['original_plan'])
+        plan=Plan.model_validate(original['original_plan'])
         if plan.action=='search':
             result=dict(status='search_execution_incomplete',saved_checkpoint=s['searches'].get(key),
                 attempted_executions=[r for r in s['results'] if host.store.artifact(r)['operation_key'].startswith(key+':')],
@@ -1269,18 +869,6 @@ def export(host, destination=None):
     return dict(destination=str(out),results=len(state(host)['results']),claims=claims(host),resources=current['resource_use'])
 
 
-def main():
-    parser=argparse.ArgumentParser(); parser.add_argument('command',choices=['prepare','bind','migrate','execute','diagnose','live','recover','status','export'])
-    parser.add_argument('--spec',type=Path,default=DEFAULT_SPEC); parser.add_argument('--plan',type=Path)
-    parser.add_argument('--request-id'); parser.add_argument('--reason'); args=parser.parse_args()
-    spec=read(args.spec); h=prepare(args.spec) if args.command=='prepare' else Host(ROOT/'runs'/spec['study_id'],spec['study_id'],actor='unified-research')
-    if args.command in ('bind','migrate'): bind(h,args.reason if args.command=='migrate' else None,spec)
-    elif args.command=='execute': print(json.dumps(dispatch(h,read(args.plan),args.request_id or 'manual-'+uuid4().hex,origin='engineering'))); return
-    elif args.command=='diagnose': print(json.dumps(diagnose(h,state(h)['results']))); return
-    elif args.command=='recover': print(json.dumps(recover(h))); return
-    elif args.command=='live': asyncio.run(converse(h))
-    elif args.command=='export': print(json.dumps(export(h))); return
-    print(json.dumps(packet(h)))
 
 
-if __name__=='__main__': main()
+
