@@ -24,7 +24,7 @@ def main():
                      stopping_policy=request.get('offline_stopping_policy','historical_timed_v1')))
         elif request['operation'] == 'recover': value = recover(read(request['progress']))
         elif request['operation'] in ('integrate','inspect'):
-            from tools.research_core_numerics import offline_diagnostic
+            from tools.research.numerics import offline_diagnostic
             value=offline_diagnostic(request)
         else:
             from tools.casadi_codesign_worker import replay

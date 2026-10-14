@@ -6,8 +6,8 @@ import time
 from types import SimpleNamespace
 from unittest import TestCase
 from unittest.mock import patch
-from tools import research_core as core
-from tools import research_core_mechanics as mechanics
+from tools.research import core as core
+from tools.research import mechanics as mechanics
 
 
 class NumericalTests(TestCase):

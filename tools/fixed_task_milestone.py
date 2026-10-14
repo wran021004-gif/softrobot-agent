@@ -4,9 +4,9 @@ from copy import deepcopy
 import json
 import math
 import time
-from tools import research_core as core
+from tools.research import core as core
 from tools import numerical_repair as repair
-from tools import research_core_numerics as numerics
+from tools.research import numerics as numerics
 from tools.platform_host import Host
 from tools.state_io import atomic_json,digest
 

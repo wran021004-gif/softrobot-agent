@@ -23,7 +23,7 @@ from tools.platform_host import Host
 from tools.platform_store import plain, zero
 from tools.state_io import atomic_json, read, digest
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_SPEC = ROOT/'examples/research_core/specification.json'
 PYTHON = Path('D:/softrobot-agent/.mainline5-env/Scripts/python.exe')
 SCIENCE_FILES = ['extensions/tendon_family/gvs_nmpc.py', 'extensions/tendon_family/gvs_trajectory.py',
@@ -38,9 +38,9 @@ SCIENCE_FILES = ['extensions/tendon_family/gvs_nmpc.py', 'extensions/tendon_fami
     'extensions/tendon_family/gvs_codesign.py', 'extensions/tendon_family/gvs_casadi.py',
     'extensions/tendon_family/gvs.py', 'extensions/tendon_family/gvs_basis.py',
     'tools/casadi_feedback_worker.py', 'tools/casadi_codesign_worker.py',
-    'tools/research_core_mechanics.py', 'tools/research_core_mechanics_worker.py']
-CORE_FILES = ['tools/research_core_execution_worker.py','tools/service_execution.py','tools/research_core_rl.py','tools/rl/env.py','tools/rl/run.py','tools/rl/train.py','tools/rl/checks.py','tools/rl/config.json','tools/research_core.py','tools/research_core_diagnostic.py','schemas/research_core.py',
-              'tools/research_core_feedback.py','tools/research_core_demo.py','tools/research_core_numerics.py','tools/numerical_repair.py','tools/fixed_task_milestone.py','tools/research_core_experience.py']
+    'tools/research/mechanics.py', 'tools/research/mechanics_worker.py']
+CORE_FILES = ['tools/research/execution_worker.py','tools/service_execution.py','tools/research/rl.py','tools/rl/env.py','tools/rl/run.py','tools/rl/train.py','tools/rl/checks.py','tools/rl/config.json','tools/research/core.py','tools/research/diagnostic.py','schemas/research_core.py',
+              'tools/research/feedback.py','tools/research_core_demo.py','tools/research/numerics.py','tools/numerical_repair.py','tools/fixed_task_milestone.py','tools/research/experience.py']
 
 
 def save(host, value, kind='core_evidence'):
@@ -98,7 +98,7 @@ def execution_deadline(host):
 
 async def wait_training(host):
     """No provider turns or summary snapshots while an owned worker is active."""
-    from tools.research_core_rl import reconcile, dispatch as rl_dispatch
+    from tools.research.rl import reconcile, dispatch as rl_dispatch
     from tools.rl import run
     milestones=deepcopy(state(host)['spec'].get('rl_wait_milestones',{}))
     while True:
@@ -184,7 +184,7 @@ def prepare(spec_path=DEFAULT_SPEC, directory=None):
     from tools.nmpc_settling import baseline_configuration
     from tools.research_v2 import native_configuration
     if spec.get('baseline_archive'):
-        from tools.research_core_numerics import archived
+        from tools.research.numerics import archived
         baseline=spec['baseline_archive']
         cfg=deepcopy(archived(baseline['folder'],baseline['candidate'])['configuration'])
     else:cfg = baseline_configuration()
@@ -263,7 +263,7 @@ def prepare(spec_path=DEFAULT_SPEC, directory=None):
         if assemble(inp,physics_for(inp))['control']['tension_execution_mode']!='ideal_tension': raise ValueError('EXPLICIT_IDEAL_TENSION_REQUIRED')
         update(h,rl_task=save(h,plain(inp.task),'rl_frozen_task'),rl_runs={},rl_evaluations=[],rl_evidence_reads=[])
         if spec.get('rl_evaluation_source'):
-            from tools.research_core_rl import bind_source
+            from tools.research.rl import bind_source
             bind_source(h)
     atomic_json(directory/'activity.json',spec)
     return h
@@ -530,7 +530,7 @@ def finish_execution(host, recovery=False):
         update(host,pending=dict(p,launch_intent=True))
         try:
             with (folder/'worker.log').open('w',encoding='utf8') as log:
-                done=_run_contained([str(PYTHON),'-m','tools.research_core_execution_worker',str(request)],log,
+                done=_run_contained([str(PYTHON),'-m','tools.research.execution_worker',str(request)],log,
                     min(p['reserved_s'],max(.001,execution_deadline(host)-time.time())))
             boundary=dict(termination_confirmed=True,timed_out=False,returncode=done.returncode)
         except subprocess.TimeoutExpired as exc:
@@ -593,7 +593,7 @@ def finish_execution(host, recovery=False):
         runtime_observation='complete' if result['status']=='evaluated' else 'censored or incomplete; no complete episode timing',
         failure_categories=[] if acceptance and acceptance['accepted'] else
             ['scientific_task_failure'] if acceptance else ['engineering_or_missing_evidence'])
-    from tools.research_core_feedback import mechanics_context
+    from tools.research.feedback import mechanics_context
     detail['mechanics_context']=mechanics_context(host,p['candidate'])
     ref=save(host,detail,'experiment_result'); s=state(host)
     with host.store.transaction() as db:
@@ -602,7 +602,7 @@ def finish_execution(host, recovery=False):
         current.update(results=[*current['results'],ref],pending=None,
             numerical_reserved_s=current['numerical_reserved_s']-p['reserved_s'],numerical_s=current['numerical_s']+actual)
         host.store.update_state(db,host.run_id,current)
-    from tools.research_core_feedback import eligibility
+    from tools.research.feedback import eligibility
     return dict(reference=ref,**compact_result(detail),confirmation=eligibility(host,ref),
         operation_cost=dict(additional_numerical_s=actual,additional_scientific_executions=1,cached_operation_receipt=False))
 
@@ -652,7 +652,7 @@ def run_search(host, query, key):
     from tools.design_optimization import solve, continuous_space, structures
     guard(host,True); q=Search.model_validate(query); admission=capacity(host,q.max_evaluations)
     if q.mechanics_source:
-        from tools.research_core_mechanics import handoff
+        from tools.research.mechanics import handoff
         if 'd' in q.variables: raise ValueError('MECHANICS_CONTROL_SEARCH_REQUIRES_FIXED_STRUCTURE')
         handoff(host,q.mechanics_source,plain(q.fixed),dict(operation_key=key,origin='control_search'))
     if not admission['admitted']: return dict(status='budget_limited',admission=admission,evaluated=[])
@@ -700,7 +700,7 @@ def run_search(host, query, key):
 
 
 def experience(host, query):
-    from tools.research_core_experience import retrieve
+    from tools.research.experience import retrieve
     return retrieve(host,query)
 
 
@@ -811,7 +811,7 @@ def local_diagnostic(host, query, key):
             started_unix=time.time(),origin='engineering' if s['spec'].get('mode')=='engineering_numerical' or key.startswith('engineering') else 'model'))
         start=time.perf_counter();env=os.environ.copy();env.update(OPENBLAS_NUM_THREADS='1',OMP_NUM_THREADS='1',MKL_NUM_THREADS='1')
         try:
-            process=subprocess.run([str(PYTHON),'-m','tools.research_core_diagnostic',str(inp),str(out)],cwd=ROOT,
+            process=subprocess.run([str(PYTHON),'-m','tools.research.diagnostic',str(inp),str(out)],cwd=ROOT,
                 env=env,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,timeout=seconds)
             value=read(out) if out.exists() else dict(status='diagnostic_no_output',returncode=process.returncode)
         except subprocess.TimeoutExpired:
@@ -839,7 +839,7 @@ def local_diagnostic(host, query, key):
 
 def claims(host):
     if state(host)['spec'].get('capabilities'):
-        from tools.research_core_feedback import confirmation_progress
+        from tools.research.feedback import confirmation_progress
         s=state(host);progress=confirmation_progress(host)
         return dict(selected=s.get('selected'),independent_confirmation_count=progress['required_total']-progress['remaining'],
             required_confirmations=progress['required_total'],confirmation_failures=progress['failures'],
@@ -882,8 +882,8 @@ def claims(host):
 def packet(host):
     s=state(host)
     if s['spec'].get('capabilities'):
-        from tools.research_core_feedback import result_view, eligibility, facts
-        from tools.research_core_rl import packet as rl_packet
+        from tools.research.feedback import result_view, eligibility, facts
+        from tools.research.rl import packet as rl_packet
         return dict(decision_facts=facts(host),specification=s['spec'],scoped_context=s.get('scoped_context',[]),frozen_task=plain(s['base_configuration']['task']),reference_candidate=s['reference_candidate'],
             candidates=list(s['candidates'].values()),results=[dict(reference=r,**result_view(host,r),confirmation=eligibility(host,r)) for r in [*s['results'],*s.get('rl_evaluations',[])]],
             mechanics_results=[dict(reference=r,**{k:host.store.artifact(r).get(k) for k in ('status','operation','trajectory_reference','objective_definition','original_task_feasible','relaxed_nlp_feasible','original_task_gaps','trajectory_metrics','charged_numerical_s','checkpoint_reference')}) for r in s.get('mechanics_results',[])],
@@ -893,12 +893,12 @@ def packet(host):
             resource_use=dict(shared_ledger=host.store.remaining(),numerical_s=s['numerical_s'],numerical_reserved_s=s['numerical_reserved_s'],remaining_numerical_s=s['spec']['budgets']['numerical_s']-s['numerical_s']-s['numerical_reserved_s'],charged_starts=s.get('charged_starts',0),shared_start_limit=s['spec'].get('shared_start_limit'),elapsed_s=max(0,s.get('closed_unix',time.time())-s['started_unix'])),
             claims=claims(host),research_status=s['research_status'])
     if s['spec'].get('mode')=='rl_interface':
-        from tools.research_core_rl import packet as rl_packet
+        from tools.research.rl import packet as rl_packet
         return dict(specification=s['spec'],candidates=list(s['candidates'].values()),rl=rl_packet(host),
             resource_use=dict(shared_ledger=host.store.remaining(),numerical_s=s['numerical_s'],
                 elapsed_s=max(0,s.get('closed_unix',time.time())-s['started_unix'])),research_status=s['research_status'])
-    from tools.research_core_feedback import facts, eligibility, mechanics_context, compact_local
-    from tools.research_core_numerics import compact_numerics
+    from tools.research.feedback import facts, eligibility, mechanics_context, compact_local
+    from tools.research.numerics import compact_numerics
     return dict(specification=s['spec'],evaluation_profile=dict(identity=s['profile']['identity'],version=s['profile']['version'],
         recipe=s['profile']['recipe'],recording=s['profile']['recording'],acceptance=s['profile']['acceptance']),
         reference_candidate=s['reference_candidate'],candidates=[r for r in s['candidates'].values() if host.store.artifact(r)['profile_identity']==s['profile']['identity']],
@@ -948,14 +948,14 @@ def dispatch(host, value, request_id, origin='model'):
     if old:
         if old['request_hash']!=digest(plain(plan)): raise ValueError('OPERATION_ID_COLLISION')
         if old['receipt']:
-            from tools.research_core_feedback import cached
+            from tools.research.feedback import cached
             return cached(host.store.artifact(json.loads(old['receipt'])['output']))
         raise ValueError('RECOVER_EXISTING_OPERATION_NO_NEW_EXECUTION')
     admit_closeout(host,'research_plan',plain(plan))
     guard(host,plan.action in ('execute','search','mechanics','replay') or plan.diagnostic is not None)
     s=state(host)
     for r in plan.supporting_evidence: host.store.artifact(r)
-    from tools.research_core_experience import disposition_bindings
+    from tools.research.experience import disposition_bindings
     experience_bindings=disposition_bindings(host,plan.experience_disposition)
     if plan.action=='stop' and any(r not in [plain(v) for v in plan.supporting_evidence] for r in [*s['results'],*s.get('mechanics_results',[]),*s.get('rl_evaluations',[])]):
         raise ValueError('STOP_MUST_CITE_ALL_NEW_EXPERIMENT_RESULTS')
@@ -985,27 +985,27 @@ def dispatch(host, value, request_id, origin='model'):
     try:
         if plan.action=='propose':
             if plan.mechanics_source:
-                from tools.research_core_mechanics import handoff
+                from tools.research.mechanics import handoff
                 relation=handoff(host,plan.mechanics_source,plain(plan.parameters),dict(origin=origin,plan=ref))
                 result=dict(candidate=relation['candidate'],handoff=relation)
             else: result=dict(candidate=construct(host,plan.parameters,dict(origin=origin,plan=ref)))
         elif plan.action=='execute': result=execute(host,plain(plan.candidate),request_id)
         elif plan.action=='search': result=run_search(host,plan.search,request_id)
         elif plan.action in ('mechanics','replay'):
-            from tools.research_core_mechanics import dispatch as mechanics_dispatch
+            from tools.research.mechanics import dispatch as mechanics_dispatch
             result=mechanics_dispatch(host,'solve' if plan.action=='mechanics' else 'replay',
                 plan.mechanics if plan.action=='mechanics' else plan.mechanics_source,request_id)
         elif plan.action=='diagnose':
             result=diagnose(host,[plain(r) for r in plan.supporting_evidence])
             if plan.diagnostic: result['local_comparison']=local_diagnostic(host,plan.diagnostic,request_id)
         elif plan.action=='confirm':
-            from tools.research_core_feedback import eligibility, result_view
+            from tools.research.feedback import eligibility, result_view
             choice=eligibility(host,plan.selected_execution)
             if not choice['eligible']: raise ValueError('; '.join(choice['reasons']))
             selected=result_view(host,plan.selected_execution)
             update(host,selected=plain(plan.selected_execution))
             if selected['controller_route']=='rl':
-                from tools.research_core_rl import confirm
+                from tools.research.rl import confirm
                 result=confirm(host,plan.selected_execution,request_id+'-rl-confirm')
             else:
                 result=execute(host,selected['candidate'],request_id,role='confirmation',selected=plain(plan.selected_execution))
@@ -1170,7 +1170,7 @@ async def converse(host):
             try:
                 if kind=='plan': value=dispatch(host,use['input'],'native-'+use['toolUseId'])
                 elif kind=='rl':
-                    from tools.research_core_rl import dispatch as rl_dispatch
+                    from tools.research.rl import dispatch as rl_dispatch
                     value=rl_dispatch(host,use['input'],'native-'+use['toolUseId'])
                 else:
                     key='native-'+use['toolUseId']
@@ -1188,7 +1188,7 @@ async def converse(host):
                 if reserved and not reserved['receipt']:
                     host.store.complete(reserved,dict(request_id=key,execution_id=reserved['execution_id'],caller=host.actor,
                         tool_id='research.core_'+kind,tool_version='1.0.0',execution_status='failed',error=str(exc),charged=zero()),dict(error=str(exc)))
-                from tools.research_core_feedback import facts
+                from tools.research.feedback import facts
                 return dict(toolUseId=use['toolUseId'],status='error',content=[dict(text=json.dumps(dict(
                     error=type(exc).__name__,message=str(exc),decision_facts=facts(host))))])
         return run
@@ -1287,7 +1287,7 @@ async def converse(host):
 
 def recover(host):
     if (state(host).get('pending') or {}).get('kind') == 'local_diagnostic':
-        from tools.research_core_numerics import recover_local
+        from tools.research.numerics import recover_local
         return recover_local(host)
     from tools.strands_pilot_r3 import pending as provider_pending, received, settle
     for row in provider_pending(host):
@@ -1296,7 +1296,7 @@ def recover(host):
         else: raise ValueError('UNKNOWN_PROVIDER_SEND_INSPECT_BEFORE_REPEAT')
     p=state(host)['pending']
     if p and p.get('kind')=='mechanics':
-        from tools.research_core_mechanics import recover as mechanics_recover
+        from tools.research.mechanics import recover as mechanics_recover
         recovered=mechanics_recover(host)
     else: recovered=finish_execution(host,recovery=True) if p else None
     s=state(host); completed=[]

@@ -3,7 +3,7 @@ from copy import deepcopy
 from types import SimpleNamespace
 from unittest import TestCase
 from unittest.mock import patch
-from tools import research_core as core
+from tools.research import core as core
 from tools.state_io import digest
 
 
@@ -56,7 +56,7 @@ class AdmissionTests(TestCase):
 class FixedScheduleTests(TestCase):
     def test_current_replay_applies_inherited_deadline_horizon(self):
         from extensions.tendon_family.gvs_profile import reach_input
-        from tools import research_core_diagnostic as diagnostic
+        from tools.research import diagnostic as diagnostic
         cfg=reach_input('deadline-replay',timing=dict(duration_s=.35,control_period_s=.01))
         cfg['policy']['controller']['version']='11.0.0'
         record=dict(effective_horizon=6,coordinate_order=['q'],tendon_order=['u'],
@@ -97,7 +97,7 @@ class FixedScheduleTests(TestCase):
             self.assertLess(abs(residuals).max(),1e-7)
 
     def test_diagnostic_rollout_must_have_the_same_source(self):
-        from tools.research_core_numerics import offline_diagnostic
+        from tools.research.numerics import offline_diagnostic
         request=dict(candidate={},store_root='unused',source_mechanics={'artifact_id':'a'*64},
             diagnostic_parameters={'rollout_reference':{'artifact_id':'b'*64}})
         store=SimpleNamespace(artifact=lambda ref:dict(source_mechanics={'artifact_id':'c'*64},rollout=dict(failure=None)))

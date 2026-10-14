@@ -6,9 +6,9 @@ import time
 from types import SimpleNamespace
 from unittest import TestCase
 from unittest.mock import patch
-from tools import research_core as core
-from tools import research_core_mechanics as mechanics
-from tools.research_core_feedback import eligibility
+from tools.research import core as core
+from tools.research import mechanics as mechanics
+from tools.research.feedback import eligibility
 from schemas.research_core import Plan, Search
 
 
@@ -112,7 +112,7 @@ class MechanicsTests(TestCase):
         self.assertEqual(core.state(h)['offline_nlp'],0)
 
     def test_diagnostic_inspection_uses_solver_order_after_sorted_json(self):
-        from tools.research_core_diagnostic import inspect_problem
+        from tools.research.diagnostic import inspect_problem
         seen=[]
         def evaluate(problem,values):
             seen.append(values)

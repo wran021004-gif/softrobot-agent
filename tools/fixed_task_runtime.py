@@ -14,8 +14,8 @@ from pathlib import Path
 import sys
 import time
 
-from tools import research_core as core
-from tools import research_core_numerics as numerics
+from tools.research import core as core
+from tools.research import numerics as numerics
 from tools.fixed_task_milestone import HISTORY, host
 from tools.state_io import digest
 

@@ -11,7 +11,7 @@ from tools.platform_store import plain, zero
 
 
 def source(host, reference):
-    from tools.research_core import state
+    from tools.research.core import state
     if plain(reference) not in [*state(host).get('mechanics_results', []), *state(host).get('imported_mechanics_sources', [])]:
         raise ValueError('OWNED_CURRENT_STUDY_MECHANICS_RESULT_REQUIRED')
     value = host.store.artifact(reference)
@@ -21,7 +21,7 @@ def source(host, reference):
 
 
 def handoff(host, reference, parameters=None, provenance=None):
-    from tools.research_core import construct, state, update, save
+    from tools.research.core import construct, state, update, save
     v = source(host, reference); c = v['candidate']; d = c['d']
     if not math.isfinite(d) or not -1.-1e-8 <= d <= 1.+1e-8:
         raise ValueError('RETURNED_STRUCTURE_OUTSIDE_AUTHORIZED_DOMAIN')
@@ -43,7 +43,7 @@ def handoff(host, reference, parameters=None, provenance=None):
 
 
 def dispatch(host, operation, arguments, key):
-    from tools import research_core as core
+    from tools.research import core as core
     core.guard(host,True); s = core.state(host); b = s['spec']['budgets']
     reserve = s['spec']['mechanics_allowances'][operation+'_s']; counter = 'offline_nlp' if operation=='solve' else None if operation=='inspect' else 'bdf_replays'
     validation=s.get('validation_reservation')
@@ -134,13 +134,13 @@ def dispatch(host, operation, arguments, key):
 
 
 def run_and_settle(host,row,request,pending,recovery=False):
-    from tools import research_core as core
+    from tools.research import core as core
     reserve=pending['reserved_s']; started=time.perf_counter()
     env=os.environ.copy();env.update(OPENBLAS_NUM_THREADS='1',OMP_NUM_THREADS='1',MKL_NUM_THREADS='1')
     log=b''; out=Path(pending['output']); progress=Path(pending['progress'])
     def worker(req,seconds):
         inp=Path(pending['input']); atomic_json(inp,req)
-        return subprocess.run([str(core.PYTHON),'-m','tools.research_core_mechanics_worker',str(inp),str(out)],
+        return subprocess.run([str(core.PYTHON),'-m','tools.research.mechanics_worker',str(inp),str(out)],
             cwd=core.ROOT,env=env,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,timeout=seconds)
     if recovery:
         if out.exists(): value=read(out)
@@ -189,7 +189,7 @@ def run_and_settle(host,row,request,pending,recovery=False):
     result=dict(reference=ref,**{k:value.get(k) for k in ('status','operation','execution_id','owning_study','termination_reason',
         'trajectory_reference','checkpoint_reference','relaxed_nlp_feasible','original_task_feasible','hard_max_normalized_violation',
         'trajectory_metrics','original_task_gaps','charged_numerical_s','costs_s','replay','physical_validation')})
-    from tools.research_core_numerics import compact_numerics
+    from tools.research.numerics import compact_numerics
     result['numerical_diagnostics']=compact_numerics(value)
     if value.get('candidate'):
         try:result['handoff']=handoff(host,ref)
@@ -198,6 +198,6 @@ def run_and_settle(host,row,request,pending,recovery=False):
 
 
 def recover(host):
-    from tools import research_core as core
+    from tools.research import core as core
     p=core.state(host)['pending'];row=host.store.lookup(host.run_id,p['worker_request_id'])
     return run_and_settle(host,row,p['original_request'],p,recovery=True)

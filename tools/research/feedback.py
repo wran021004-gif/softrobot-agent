@@ -4,7 +4,7 @@ from tools.platform_store import plain
 
 def confirmation_progress(host, selected=None):
     """Count unique actual launches for one frozen solution, retaining ownership."""
-    from tools.research_core import state, confirmation_count
+    from tools.research.core import state, confirmation_count
     s=state(host); selected=plain(selected or s.get('selected')); rows={}
     chosen=result_view(host,selected) if selected else None
     for historical, refs in ((True,s.get('historical_confirmations',[])),
@@ -28,7 +28,7 @@ def confirmation_progress(host, selected=None):
 
 def result_view(host, reference):
     """Organize original evidence once, without recomputing task metrics."""
-    from tools.research_core import verify_candidate
+    from tools.research.core import verify_candidate
     r=host.store.artifact(reference); c=verify_candidate(host,r['candidate'])
     rl='run_id' in r and 'independent_evaluation_executed' in r
     episodes=r.get('episodes',[]) if rl else []
@@ -52,8 +52,8 @@ def result_view(host, reference):
 
 
 def eligibility(host, reference):
-    from tools.research_core import state, capacity, verify_candidate, confirmation_count
-    from tools.research_core_rl import evaluation_capacity
+    from tools.research.core import state, capacity, verify_candidate, confirmation_count
+    from tools.research.rl import evaluation_capacity
     s=state(host);ref=plain(reference);reasons=[];refs=[*s['results'],*s.get('rl_evaluations',[]),*s.get('linked_selections',[])]
     if ref not in refs:
         return dict(eligible=False,reasons=['not a current-study controller result'],required_field='selected_execution')
@@ -80,7 +80,7 @@ def eligibility(host, reference):
 
 
 def facts(host):
-    from tools.research_core import state
+    from tools.research.core import state
     s = state(host)
     if s['spec'].get('mode')=='rl_interface':
         return dict(owning_study=host.run_id,rl_runs=s.get('rl_runs',{}),rl_evaluations=s.get('rl_evaluations',[]),
@@ -104,7 +104,7 @@ def cached(output):
 
 
 def mechanics_context(host, candidate):
-    from tools.research_core import state
+    from tools.research.core import state
     s=state(host); relations=[host.store.artifact(r) for r in s.get('handoffs',[])
         if host.store.artifact(r)['candidate']==plain(candidate)]
     rows=[]

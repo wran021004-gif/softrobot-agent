@@ -9,8 +9,8 @@ import subprocess
 import tarfile
 import time
 import numpy as np
-from tools import research_core as core
-from tools.research_core_numerics import archived, compact_numerics
+from tools.research import core as core
+from tools.research.numerics import archived, compact_numerics
 from tools.platform_host import Host
 from extensions.tendon_family.control_evidence import ControlEvidence
 from extensions.tendon_family.gvs_codesign import classify_replay

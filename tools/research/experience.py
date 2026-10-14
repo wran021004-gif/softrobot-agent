@@ -5,7 +5,7 @@ from tools.platform_store import plain
 
 
 def retrieve(host,query):
-    from tools import research_core as core
+    from tools.research import core as core
     q=ExperienceQuery.model_validate(query);rows=[]
     for entry in core.read(core.ROOT/'memory/diagnostic_index.json')['entries']:
         canonical=entry['entry_id']+'@'+entry['revision']
@@ -36,7 +36,7 @@ def retrieve(host,query):
 
 
 def disposition_bindings(host,dispositions):
-    from tools import research_core as core
+    from tools.research import core as core
     reads={}
     for ref in core.state(host)['retrievals']:
         receipt=host.store.artifact(ref)

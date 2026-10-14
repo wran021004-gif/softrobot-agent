@@ -13,20 +13,20 @@ do not recreate the environment. Historical stopped studies remain sealed.
 ```powershell
 Set-Location 'D:\softrobot-agent\.worktrees\unified-research-core'
 $studyPython = 'D:\softrobot-agent\.mainline5-env\Scripts\python.exe'
-& $studyPython -m tools.research_core prepare
+& $studyPython -m tools.research.core prepare
 & $studyPython -m unittest tests.test_research_core
 # Commit implementation and specification before numerical work.
-& $studyPython -m tools.research_core bind
+& $studyPython -m tools.research.core bind
 # Execute a typed plan JSON, with a new request ID only for an intentional new experiment.
 # The original reference plans are indexed in the delivery scientific_summary.json.
 $planPath = 'runs/unified-research-20261011/reference_1.json'
-& $studyPython -m tools.research_core execute --plan $planPath --request-id engineering-reference-1
-& $studyPython -m tools.research_core diagnose
-& $studyPython -m tools.research_core live
-& $studyPython -m tools.research_core status
-& $studyPython -m tools.research_core export
+& $studyPython -m tools.research.core execute --plan $planPath --request-id engineering-reference-1
+& $studyPython -m tools.research.core diagnose
+& $studyPython -m tools.research.core live
+& $studyPython -m tools.research.core status
+& $studyPython -m tools.research.core export
 # After accepted STOP, write the completion report and canonical archive without new experiments.
-& $studyPython -m tools.research_core_delivery
+& $studyPython -m tools.research.core_delivery
 ```
 
 `--spec` chooses a study specification. Its study ID, start clock, task/profile,

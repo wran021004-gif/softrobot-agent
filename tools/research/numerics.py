@@ -6,7 +6,7 @@ from pathlib import Path
 import tarfile
 import time
 import numpy as np
-from tools import research_core as core
+from tools.research import core as core
 
 
 def archived(folder, reference, raw=False):
@@ -231,7 +231,7 @@ def compact_numerics(value):
 
 
 def experiment(host,operation,arguments,key,question,changed,fixed,discriminator):
-    from tools.research_core_mechanics import dispatch
+    from tools.research.mechanics import dispatch
     core.guard(host,True)
     core.save(host,dict(operation=operation,operation_key=key,question=question,changed_factor=changed,
         fixed_conditions=fixed,expected_discriminating_observation=discriminator,

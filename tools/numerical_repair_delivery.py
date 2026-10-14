@@ -7,7 +7,7 @@ import time
 import importlib.metadata
 import platform
 import numpy as np
-from tools import research_core as core
+from tools.research import core as core
 from tools import numerical_repair as repair
 from tools.platform_host import Host
 from tools.state_io import atomic_json

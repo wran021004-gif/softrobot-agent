@@ -418,7 +418,7 @@ separate historical/new costs, original traces and runtime manifests.
 
 The contained autonomous study (`examples/research_core/contained_autonomous_study.json`)
 moves the whole NMPC completion pipeline, including child-session construction,
-into `tools/research_core_execution_worker.py`. Its persisted hard-cap reservation
+into `tools/research/execution_worker.py`. Its persisted hard-cap reservation
 is used for admission and settlement. Verified timeout seals the active stage with
 a failed receipt through Store.complete, retains earlier completed receipts/costs,
 and reports incomplete, unmeasured task performance. Before stage creation the

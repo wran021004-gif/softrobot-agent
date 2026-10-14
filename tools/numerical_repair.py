@@ -5,8 +5,8 @@ import json
 from pathlib import Path
 import time
 import numpy as np
-from tools import research_core as core
-from tools import research_core_numerics as numerics
+from tools.research import core as core
+from tools.research import numerics as numerics
 from tools.platform_host import Host
 from tools.state_io import digest, atomic_json
 

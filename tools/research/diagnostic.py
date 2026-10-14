@@ -41,7 +41,7 @@ def replay(request):
     started=time.perf_counter(); inp=SessionInput.model_validate(request['configuration'])
     recorded=request['record']; recipe=dict(inp.policy.controller.parameters.data['recipe'])
     if recorded.get('resolved_problem_archive') and request['mode']!='research_current':
-        from tools.research_core_numerics import archived
+        from tools.research.numerics import archived
         recorded=dict(recorded,resolved_problem=archived(**recorded['resolved_problem_archive']))
     recipe['horizon']=recorded['effective_horizon']
     if request['mode']=='research_current':

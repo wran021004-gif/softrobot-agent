@@ -15,7 +15,7 @@ from tools.rl import run
 def bind_source(host):
     """Bind one sealed run for evaluation; copied consumption stays historical."""
     import hashlib
-    from tools import research_core as core
+    from tools.research import core as core
     from tools.platform_store import Store
     source=core.state(host)['spec']['rl_evaluation_source']
     old=Store(core.ROOT/'runs'/source['study_id']); sealed=old.session(source['study_id'])['state']
@@ -47,7 +47,7 @@ def bind_source(host):
 
 
     if source.get('selection_study_id'):
-        from tools.research_core_feedback import result_view
+        from tools.research.feedback import result_view
         selection_store=Store(core.ROOT/'runs'/source['selection_study_id'])
         selection_state=selection_store.session(source['selection_study_id'])['state']
         selected=source['selected_execution']; confirmations=source['historical_confirmations']
@@ -73,7 +73,7 @@ def bind_source(host):
 
 
 def prepare_input(host, request):
-    from tools import research_core as core
+    from tools.research import core as core
     from extensions.tendon_family.backends import physics_for
     from extensions.tendon_family.scene import assemble
     from extensions.tendon_family.mjcf import compile_xml
@@ -116,7 +116,7 @@ def prepare_input(host, request):
 
 
 def invoke(operation, run_id, *arguments, deadline=float("inf"), timeout_s=150.):
-    from tools.research_core import ROOT
+    from tools.research.core import ROOT
     import os
     env={k:os.environ[k] for k in ('SystemRoot','WINDIR','PATH','TEMP','TMP','USERPROFILE','APPDATA','LOCALAPPDATA','COMSPEC','PATHEXT') if k in os.environ}
     env.update(OPENBLAS_NUM_THREADS='1',OMP_NUM_THREADS='1',MKL_NUM_THREADS='1')
@@ -128,7 +128,7 @@ def invoke(operation, run_id, *arguments, deadline=float("inf"), timeout_s=150.)
 
 def reconcile(host, run_id, lightweight=False):
     """Replace cumulative facts by identity; querying never sums them again."""
-    from tools import research_core as core
+    from tools.research import core as core
     entry=core.state(host)['rl_runs'][run_id]
     if entry.get('source_study'):
         if run.worker_alive(run.run_path(run_id)): raise ValueError('Sealed source worker unexpectedly alive')
@@ -150,9 +150,9 @@ def reconcile(host, run_id, lightweight=False):
 
 
 def evaluation_capacity(host, requested=1, confirmation=False):
-    from tools import research_core as core
+    from tools.research import core as core
     s=core.state(host)
-    from tools.research_core_feedback import confirmation_progress
+    from tools.research.feedback import confirmation_progress
     reserve=0 if confirmation else confirmation_progress(host)['remaining']
     used=sum(e['evaluations'] for e in s.get('rl_runs',{}).values())
     seconds=s['spec'].get('rl_evaluation_allowance_s',150.)
@@ -163,7 +163,7 @@ def evaluation_capacity(host, requested=1, confirmation=False):
 
 
 def training_capacity(host, work):
-    from tools import research_core as core
+    from tools.research import core as core
     s=core.state(host); b=s['spec']['budgets']; remaining=host.store.remaining()['remaining']
     confirmations=core.confirmation_count(s)
     # Start/resume, terminal status+read, evaluation+read, each confirm+read, STOP.
@@ -180,13 +180,13 @@ def training_capacity(host, work):
 
 
 def confirm(host, selected, request_id):
-    from tools import research_core as core
+    from tools.research import core as core
     r=host.store.artifact(selected)
     return dispatch(host,dict(operation='evaluate',run_id=r['run_id'],checkpoint=r['checkpoint'],rationale='Frozen selected solution; fresh confirmation; no training'),request_id,selected=selected)
 
 
 def dispatch(host, value, request_id, selected=None):
-    from tools import research_core as core
+    from tools.research import core as core
     q=RLRequest.model_validate(value); s=core.state(host); key=digest(plain(q))
     if not core.enabled(s['spec'],'rl'): raise ValueError('RL capability required')
     if s['spec'].get('allowed_rl_operations') is not None and q.operation not in s['spec']['allowed_rl_operations']:
@@ -223,7 +223,7 @@ def dispatch(host, value, request_id, selected=None):
         work=config['budget'] if q.operation=='start' else reconcile(host,q.run_id)['remaining']
         training_capacity(host,work)
     if q.operation=='evaluate' and selected is None and (s.get('selected') or s['spec'].get('ordinary_evaluation_limit')==0 or evaluation_capacity(host,1)['admitted']<1):
-        from tools.research_core_feedback import confirmation_progress
+        from tools.research.feedback import confirmation_progress
         raise ValueError('Development evaluation rejected; confirmation uses '+json.dumps(confirmation_progress(host)))
     if q.operation=='evaluate' and evaluation_capacity(host,1,confirmation=selected is not None)['admitted']<1:
         raise ValueError('RL evaluation and route confirmation reserve cannot fit')
@@ -329,7 +329,7 @@ def compatible_references(host):
     """Convert only the existing 35-interval, six-channel SI tension schedule."""
     import numpy as np
     import hashlib
-    from tools import research_core as core
+    from tools.research import core as core
     from extensions.tendon_family.backends import physics_for
     from extensions.tendon_family.scene import assemble
     rows=[]
@@ -361,7 +361,7 @@ def compatible_references(host):
 
 
 def allocation_feedback(host):
-    from tools import research_core as core
+    from tools.research import core as core
     s=core.state(host); caps=s['spec']['rl_limits']; entries=list(s.get('rl_runs',{}).values())
     actions=sum(e['allocation']['actions'] for e in entries)
     seconds=sum(e['allocation']['active_seconds'] for e in entries)
@@ -376,7 +376,7 @@ def allocation_feedback(host):
 
 
 def packet(host):
-    from tools import research_core as core
+    from tools.research import core as core
     s=core.state(host)
     return dict(allocation_feedback=allocation_feedback(host),frozen_task=s['rl_task'],capabilities=dict(task='reach-and-hold',control='ideal_tension',
         modes=['direct','residual'],compatible_references=compatible_references(host),
@@ -391,7 +391,7 @@ def packet(host):
 
 def unavailable_evaluation(host, run_id, operation_key, reason, uncertain=False, selected=None):
     """Seal actual failed evaluation-attempt evidence without inventing an episode."""
-    from tools import research_core as core
+    from tools.research import core as core
     s=core.state(host);entry=s['rl_runs'][run_id]
     previous=next((r for r in s.get('rl_evaluations',[]) if host.store.artifact(r).get('operation_key')==operation_key),None)
     if previous:return dict(reference=previous,**host.store.artifact(previous))

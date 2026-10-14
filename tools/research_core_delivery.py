@@ -6,7 +6,7 @@ from pathlib import Path
 import json
 import tarfile
 import time
-from tools import research_core as core
+from tools.research import core as core
 from extensions.tendon_family.control_evidence import ControlEvidence
 
 
@@ -101,7 +101,7 @@ def deliver(host):
         public_operations=host.store.remaining()['used']['tool_calls'],standalone_local_solves=s['local_solves'],offline_joint_nlp=0,bdf_replays=0))
     summary=dict(schema='unified_research_core_delivery_v1',study_id=host.run_id,source_commit=s['spec']['base_commit'],
         implementation_freeze=s['freeze'],status=s['research_status'],
-        core=dict(status='implemented',entry='tools.research_core',task='existing reach_and_hold',
+        core=dict(status='implemented',entry='tools.research.core',task='existing reach_and_hold',
             engineering='frozen candidate/evaluation identity, shared receipt accounting, native tools, complete control inputs, diagnosis, export',
             search='existing bounded coordinate method with explicit recovery profile; actual exercised paths recorded in plans'),
         enhancements=dict(offline_schedule_initialization='deferred; core does not require offline NLP',

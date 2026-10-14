@@ -6,7 +6,7 @@ from unittest import TestCase
 from unittest.mock import patch
 from schemas.research_core import Search, Plan, RLRequest
 from schemas.platform import SessionInput
-from tools import research_core as core
+from tools.research import core as core
 from tools.design_optimization import solve, validate_problem, continuous_space
 from tools.state_io import read
 from tools.platform_store import plain
@@ -136,7 +136,7 @@ class CoreTests(TestCase):
                 tool_id='simulation.run',tool_version='1.0.0',execution_status='failed',charged=core.zero()),dict(substituted=True))
             return dict(status='execution_incomplete',execution_id=row['execution_id'],receipts={'simulation':receipt})
         def boundary(command,log,seconds):
-            from tools.research_core_execution_worker import execute
+            from tools.research.execution_worker import execute
             request=read(command[-1]);core.atomic_json(core.Path(command[-1]).with_name('result.json'),execute(request))
             return core.subprocess.CompletedProcess(command,0)
         with patch.object(core,'guard'),patch('tools.service_execution._run_contained',side_effect=boundary),patch('tools.execution_completion.complete_execution',side_effect=completed):
@@ -252,7 +252,7 @@ class CoreTests(TestCase):
 
 
     def test_summary_public_snapshot_reuse_and_protected_read(self):
-        from tools import research_core_rl as bridge
+        from tools.research import rl as bridge
         h=self.host;original=deepcopy(core.state(h))
         summary=dict(run_id='fixture',status='failed',checkpoint=None,consumed={'attempted_actions':0},observed_at_unix=1)
         entry=dict(status={'worker_alive':False,'consumed':{'attempted_actions':0}},allocation={'actions':512,'active_seconds':10},evaluations=0,replays=0)
@@ -287,7 +287,7 @@ class CoreTests(TestCase):
 
 class RLIntegrationTests(TestCase):
     def test_bridge_reconciliation_is_idempotent(self):
-        from tools import research_core_rl as bridge
+        from tools.research import rl as bridge
         class Store:
             def __init__(self):self.state={'rl_runs':{'r':{'allocation':{'actions':64,'active_seconds':10}}}}
             def transaction(self):
@@ -305,7 +305,7 @@ class RLIntegrationTests(TestCase):
 
     def test_owned_generated_candidate_frozen_task_overrides_and_duplicate_receipt(self):
         from schemas.research_core import RLRequest
-        from tools import research_core_rl as bridge
+        from tools.research import rl as bridge
         from uuid import uuid4
         with TemporaryDirectory(dir=core.ROOT/'runs',prefix='rl-fixtures-') as folder:
             spec=read(core.ROOT/'examples/rl_strands/specification.json')
@@ -345,7 +345,7 @@ class RLIntegrationTests(TestCase):
             gc.collect()
 
     def test_numerical_subprocess_preserves_windows_systemroot_case_insensitively(self):
-        from tools import research_core_rl as bridge
+        from tools.research import rl as bridge
         import os
         with patch.object(bridge.subprocess,'run') as launch:
             launch.return_value=__import__('types').SimpleNamespace(returncode=0,stdout='{}')
@@ -364,7 +364,7 @@ class RLIntegrationTests(TestCase):
         self.assertEqual(actual.stdout.strip(),'1')
 
     def test_failed_dispatched_evaluation_never_claims_zero_consumption(self):
-        from tools import research_core_rl as bridge
+        from tools.research import rl as bridge
         s=dict(spec={'mode':'rl_interface'},rl_runs={'r':dict(candidate={'artifact_id':'c'},task={'artifact_id':'t'},configuration={'artifact_id':'f'})},rl_evaluations=[])
         values={};ref={'artifact_id':'0'*64,'media_type':'application/json'}
         def save(host,value,kind):values[ref['artifact_id']]=value;return ref
@@ -399,7 +399,7 @@ class FormalControlTests(TestCase):
             self.assertTrue(core.nmpc_timing(SimpleNamespace(),'candidate')['available'])
 
     def test_rl_confirmation_exact_generation_without_training_or_nmpc(self):
-        from tools import research_core_rl as bridge
+        from tools.research import rl as bridge
         from types import SimpleNamespace
         selected={'run_id':'owned','checkpoint':'step-exact','policy_sha256':'frozen'}
         host=SimpleNamespace(store=SimpleNamespace(artifact=lambda ref:selected))
@@ -410,7 +410,7 @@ class FormalControlTests(TestCase):
         self.assertEqual(call.call_args.kwargs['selected'],{'artifact_id':'selected'})
 
     def test_rl_reserve_reads_confirmation_count_and_deadline(self):
-        from tools import research_core_rl as bridge
+        from tools.research import rl as bridge
         from types import SimpleNamespace
         s=dict(spec={'confirmation':{'fresh_independent_repetitions':2},'rl_evaluation_allowance_s':10,'rl_limits':{'evaluation_episodes':5},'budgets':{'numerical_s':1000,'protected_provider_requests':0}},rl_runs={'r':{'evaluations':2}},cutoff_unix=time.time()+100,numerical_s=0,numerical_reserved_s=0)
         h=SimpleNamespace(store=SimpleNamespace(remaining=lambda:{'remaining':{'wall_s':100,'model_calls':100}}))
@@ -421,18 +421,18 @@ class FormalControlTests(TestCase):
             self.assertEqual(bridge.evaluation_capacity(h,5)['admitted'],2)
 
     def test_unavailable_evaluation_is_unmeasured(self):
-        from tools.research_core_feedback import result_view
+        from tools.research.feedback import result_view
         from types import SimpleNamespace
         r=dict(candidate={'artifact_id':'c'},task={'artifact_id':'t'},run_id='r',configuration={'artifact_id':'cfg'},independent_evaluation_executed=False,passed=False,episodes=[],failure_stage='launch/dependency import')
         h=SimpleNamespace(store=SimpleNamespace(artifact=lambda ref:r))
-        with patch.object(core,'verify_candidate',return_value={'configuration':{'task':{}}}),patch('tools.research_core_feedback.mechanics_context',return_value=[]):
+        with patch.object(core,'verify_candidate',return_value={'configuration':{'task':{}}}),patch('tools.research.feedback.mechanics_context',return_value=[]):
             v=result_view(h,'result')
         self.assertFalse(v['passed']);self.assertEqual(v['task_performance'],'unmeasured');self.assertEqual(v['failure_stage'],'launch/dependency import')
 
 
     def test_formal_preparation_initializes_rl_without_interface_mode(self):
         from uuid import uuid4
-        from tools import research_core_rl as bridge
+        from tools.research import rl as bridge
         with TemporaryDirectory(dir=core.ROOT/'runs',prefix='formal-fixture-') as folder:
             spec=read(core.ROOT/'examples/design_control/phase_B.json')
             spec.update(study_id='formal-'+uuid4().hex[:8],started_unix=time.time())
@@ -445,7 +445,7 @@ class FormalControlTests(TestCase):
             c=core.verify_candidate(h,s['reference_candidate'])
             source=core.save(h,dict(operation='solve',candidate=dict(d=0.,tensions_n=[[.2]*6]*35,times_s=[k*.01 for k in range(36)],tendon_order=['near_t0','near_t1','near_t2','far_t0','far_t1','far_t2']),original_request=core.save(h,dict(configuration=c['configuration'])),trajectory_reference=core.save(h,{'fixture':'tensions'})))
             core.update(h,mechanics_results=[source])
-            from tools import research_core_mechanics as mechanics
+            from tools.research import mechanics as mechanics
             with patch.object(core,'execute',side_effect=AssertionError('handoff cannot launch')):
                 relation=mechanics.handoff(h,source)
             refs=bridge.compatible_references(h)
@@ -467,7 +467,7 @@ class FormalControlTests(TestCase):
     def test_core_rl_confirmation_uses_older_exact_policy_and_keeps_failure(self):
         import hashlib
         from uuid import uuid4
-        from tools import research_core_rl as bridge
+        from tools.research import rl as bridge
         from schemas.research_core import RLRequest
         with TemporaryDirectory(dir=core.ROOT/'runs',prefix='confirm-fixture-') as folder:
             root=core.Path(folder);spec=read(core.ROOT/'examples/design_control/phase_B.json')
@@ -496,7 +496,7 @@ class FormalControlTests(TestCase):
 
 
     def test_followup_source_is_readonly_and_failed_report_is_idempotent(self):
-        from tools import research_core_rl as bridge
+        from tools.research import rl as bridge
         from schemas.research_core import RLRequest
         from types import SimpleNamespace
         import hashlib
@@ -551,7 +551,7 @@ class FormalControlTests(TestCase):
             import gc;gc.collect()
 
     def test_followup_subprocess_timeout_and_public_campaign_removal(self):
-        from tools import research_core_rl as bridge
+        from tools.research import rl as bridge
         from types import SimpleNamespace
         import inspect
         with patch.object(bridge.subprocess,'run',return_value=SimpleNamespace(returncode=0,stdout='{}')) as launch,patch.object(bridge.time,'time',return_value=100):
@@ -568,7 +568,7 @@ class SchedulingCloseoutTests(TestCase):
     def test_wait_terminal_milestone_deadline_without_provider_or_summaries(self):
         import asyncio
         from unittest.mock import AsyncMock
-        from tools import research_core_rl as bridge
+        from tools.research import rl as bridge
         h=object();s=dict(spec={},research_status='ready',cutoff_unix=time.time()+100,rl_runs={'fixture':{}})
         with patch.object(core,'state',return_value=s),patch.object(core,'execution_deadline',return_value=time.time()+100),patch.object(bridge,'reconcile',side_effect=[dict(worker_alive=True,status='running'),dict(worker_alive=False,status='failed')]) as status,patch.object(core.asyncio,'sleep',new_callable=AsyncMock) as sleep,patch.object(bridge.run,'training_summary',side_effect=AssertionError('no snapshots')),patch('tools.strands_pilot_r3.LiveBoundary.handle_async_request',side_effect=AssertionError('no provider')):
             asyncio.run(core.wait_training(h));self.assertEqual(sleep.await_count,1)
@@ -582,7 +582,7 @@ class SchedulingCloseoutTests(TestCase):
 
     def test_configured_protection_and_complete_training_closeout_reserve(self):
         from types import SimpleNamespace
-        from tools import research_core_rl as bridge
+        from tools.research import rl as bridge
         s=dict(spec=read(core.ROOT/'examples/research_core/joint_design_control.json'),started_unix=time.time(),cutoff_unix=time.time()+4000,rl_runs={'existing':{}},numerical_s=0,numerical_reserved_s=0)
         remaining=dict(model_calls=16,tool_calls=160,wall_s=14000)
         h=SimpleNamespace(store=SimpleNamespace(remaining=lambda: {'remaining':remaining}))
@@ -605,7 +605,7 @@ class SchedulingCloseoutTests(TestCase):
 class ConfirmationCompletionTests(TestCase):
     def test_unique_historical_and_current_counts_identity_and_failure(self):
         from types import SimpleNamespace
-        from tools import research_core_feedback as feedback
+        from tools.research import feedback as feedback
         ref=lambda n:dict(artifact_id=n,media_type='application/json')
         selected,historical,new,ordinary=map(ref,('selected','historical','new','ordinary'))
         identity={'candidate':'c','task':'t','controller':'exact-checkpoint'}
@@ -626,7 +626,7 @@ class ConfirmationCompletionTests(TestCase):
             p=feedback.confirmation_progress(host);self.assertEqual(p['invalid_executions'],1);self.assertEqual(p['failures'],0)
 
     def test_completion_binding_readonly_and_one_confirmation_capacity(self):
-        from tools import research_core_rl as bridge
+        from tools.research import rl as bridge
         with TemporaryDirectory(dir=core.ROOT/'runs',prefix='completion-fixture-') as folder:
             spec=read(core.ROOT/'examples/research_core/confirmation_completion.json');spec.update(study_id='completion-fixture-'+core.Path(folder).name,started_unix=time.time())
             path=core.Path(folder)/'spec.json';core.atomic_json(path,spec)
@@ -653,7 +653,7 @@ class ConfirmationCompletionTests(TestCase):
 
     def test_unverified_mechanics_remains_unverified(self):
         from types import SimpleNamespace
-        from tools import research_core_feedback as feedback
+        from tools.research import feedback as feedback
         candidate=dict(artifact_id='c',media_type='application/json');source=dict(artifact_id='math',media_type='application/json')
         relation=dict(candidate=candidate,mechanics_attempt=source,offline_trajectory='trajectory',original_task_feasible=True,relaxed_nlp_feasible=True)
         records={'handoff':relation,'math':dict(status='solved')}
@@ -672,7 +672,7 @@ class ConfirmationCompletionTests(TestCase):
 
     def test_rejected_allocation_returns_actual_remaining_capacity(self):
         from types import SimpleNamespace
-        from tools import research_core_rl as bridge
+        from tools.research import rl as bridge
         spec=read(core.ROOT/'examples/research_core/autonomous_design_control.json')
         entries={str(n):dict(request_identity='fixture',allocation={'actions':199936,'active_seconds':1200}) for n in range(2)}
         h=SimpleNamespace(run_id='fixture',store=SimpleNamespace(lookup=lambda *a:None))
@@ -715,7 +715,7 @@ class ExecutionBoundaryTests(TestCase):
 
     def test_timeout_failure_receipt_and_no_replay_exact_reservation(self):
         import json
-        from tools import research_core_execution_worker as worker
+        from tools.research import execution_worker as worker
         for stage in ('simulation','evaluation',None,'uncertain'):
             with self.subTest(stage=stage),TemporaryDirectory(dir=core.ROOT/'runs',prefix='timeout-fixture-') as folder:
                 path=core.Path(folder);spec=read(core.DEFAULT_SPEC)
@@ -753,7 +753,7 @@ class ExecutionBoundaryTests(TestCase):
                 __import__('gc').collect()
 
     def test_exact_historical_import_is_publicly_usable_without_experiment(self):
-        from tools import research_core_mechanics as mechanics,research_core_rl as bridge
+        from tools.research import mechanics as mechanics,rl as bridge
         with TemporaryDirectory(dir=core.ROOT/'runs',prefix='import-fixture-') as folder:
             path=core.Path(folder);spec=read(core.ROOT/'examples/research_core/contained_autonomous_study.json')
             spec.update(study_id='import-'+path.name,started_unix=time.time());core.atomic_json(path/'spec.json',spec)
@@ -762,7 +762,7 @@ class ExecutionBoundaryTests(TestCase):
                 self.assertEqual(core.verify_candidate(h,source['joint_candidate'])['parameters']['d'],-.2394244339763736)
                 self.assertEqual(mechanics.source(h,source['mathematical_source'])['operation'],'solve')
                 self.assertTrue(bridge.compatible_references(h)[0]['available'])
-                context=__import__('tools.research_core_feedback',fromlist=['mechanics_context']).mechanics_context(h,source['joint_candidate'])[0]
+                context=__import__('tools.research.feedback',fromlist=['mechanics_context']).mechanics_context(h,source['joint_candidate'])[0]
                 self.assertEqual(context['independent_mathematical_verification'],'failed')
                 self.assertEqual(context['failed_verification_metrics'][0]['time_s'],.2925)
                 self.assertEqual(h.store.remaining()['used']['backend_solves'],0)
@@ -771,7 +771,7 @@ class ExecutionBoundaryTests(TestCase):
             __import__('gc').collect()
 
     def test_optional_trial_cap_remaining_and_explicit_smaller_request(self):
-        from tools import research_core_rl as bridge
+        from tools.research import rl as bridge
         with TemporaryDirectory(dir=core.ROOT/'runs',prefix='allocation-fixture-') as folder:
             path=core.Path(folder);spec=read(core.ROOT/'examples/research_core/contained_autonomous_study.json')
             spec.pop('historical_evidence');spec.update(supplied_evidence=[],study_id='allocation-'+path.name,started_unix=time.time())

@@ -11,7 +11,7 @@ import tarfile
 import gzip
 import io
 import os
-from tools import research_core as core
+from tools.research import core as core
 from tools.platform_host import Host
 from extensions.tendon_family.control_evidence import ControlEvidence
 

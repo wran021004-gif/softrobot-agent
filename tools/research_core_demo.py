@@ -6,7 +6,7 @@ import io
 import json
 from pathlib import Path
 import tarfile
-from tools import research_core as core
+from tools.research import core as core
 from tools.platform_host import Host
 
 

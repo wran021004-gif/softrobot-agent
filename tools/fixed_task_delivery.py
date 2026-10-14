@@ -4,7 +4,7 @@ import json
 import tarfile
 import time
 import numpy as np
-from tools import research_core as core
+from tools.research import core as core
 from tools.fixed_task_milestone import host
 from tools.numerical_repair_delivery import split_archive
 from extensions.tendon_family.control_evidence import ControlEvidence

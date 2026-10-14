@@ -1,8 +1,8 @@
 from unittest import TestCase
 from unittest.mock import patch
 from types import SimpleNamespace
-from tools import research_core as core
-from tools.research_core_experience import disposition_bindings
+from tools.research import core as core
+from tools.research.experience import disposition_bindings
 from tools.state_io import digest
 
 
