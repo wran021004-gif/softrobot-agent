@@ -28,7 +28,7 @@ def parameterized(expr):
     segments = _topology(expr.design)[3]
     if len(segments) != 2:
         raise ValueError('CODESIGN_REQUIRES_TWO_SEGMENTS')
-    lengths = {segments[0].id: .16+.0055*d, segments[1].id: .11-.0055*d}
+    lengths = {segment.id: segment.length_m for segment in segments}
     return GVSCasadiFunctions(expr, lengths=lengths, design_input=d)
 
 
@@ -117,7 +117,7 @@ class Workspace:
             variables[name] = dict(type='number', bounds=bounds, physical_scale=scale)
             symbols[name] = ca.MX.sym('w_'+str(len(symbols)))
             return symbols[name]*scale
-        domain = research['design_bounds'] if research else ([0., 0.] if case=='A' else [-1., 1.])
+        domain = [0.,0.]
         design_guess = research['design_initial'] if research else 0.
         d = variable('design/d', domain)
         X = [ca.vertcat(*[variable(f'x/{k}/{j}', [0.,0.] if k==0 else [None,None], self.scales[j])
@@ -180,7 +180,7 @@ class Workspace:
         return problem
 
     def decode(self, values):
-        return dict(d=float(values['design/d']), lengths_m=[.16+.0055*values['design/d'],.11-.0055*values['design/d']],
+        return dict(d=float(values['design/d']), lengths_m=[p.length_m for p in _topology(self.expression.design)[3]],
             times_s=self.times.tolist(),
             states=[[values[f'x/{k}/{j}']*self.scales[j] for j in range(2*self.n)] for k in range(self.steps+1)],
             tensions_n=[[values[f'u/{k}/{j}']*8. for j in range(self.m)] for k in range(35)],

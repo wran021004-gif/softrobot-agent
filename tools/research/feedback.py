@@ -70,7 +70,7 @@ def confirmation_progress(host, selected=None):
         current_study_confirmations=sum(not v['historical'] for v in values),
         remaining=max(0,required-len(fresh)),failures=sum(v['complete'] and not v['passed'] for v in values),
         invalid_executions=sum(not v['complete'] for v in values),executions=values,
-        confirmed=bool(chosen and chosen['fresh_current_study'] and chosen['passed'] and len(fresh)==required
+        confirmed=bool(required>0 and chosen and chosen['fresh_current_study'] and chosen['passed'] and len(fresh)==required
             and all(v['complete'] and v['passed'] for v in values)),
         correct_operation=dict(tool='research_plan',action='confirm',selected_execution=selected))
 
@@ -122,15 +122,17 @@ def result_view(host, reference):
         fresh_current_study=fresh,solution_identity=identity,solution_identity_sha256=digest(identity))
 
 
-def eligibility(host, reference, *, revise_selection=False):
-    from tools.research.core import state, capacity, verify_candidate
+def eligibility(host, reference, *, revise_selection=False, selection=None):
+    from tools.research.state import state,capacity
+    from tools.research.design import verify_candidate
     from tools.research.rl import evaluation_capacity
-    s=state(host);ref=plain(reference);reasons=[];refs=[*s['results'],*s.get('rl_evaluations',[]),*s.get('linked_selections',[])]
+    s=state(host);selection=(s['spec']['confirmation']['fresh_independent_repetitions']==0) if selection is None else selection;ref=plain(reference);reasons=[];refs=[*s['results'],*s.get('rl_evaluations',[]),*s.get('linked_selections',[])]
     if ref not in refs:
         return dict(eligible=False,reasons=['not a current-study controller result'],required_field='selected_execution')
     r=host.store.artifact(ref);count=0;progress=None;fit=None
     try:
         v=result_view(host,ref)
+        if ref not in s.get('evaluation_reads',[]):reasons.append('explicit evidence_read of this completed evaluation required before selection or confirmation')
         if not v['fresh_current_study']: reasons.append('historical or imported result is not fresh development evidence')
         if r.get('role','development')=='confirmation': reasons.append('selection requires a passing development evaluation')
         if not v['passed']: reasons.append('result did not pass complete original task evaluation')
@@ -149,10 +151,11 @@ def eligibility(host, reference, *, revise_selection=False):
         progress=confirmation_progress(host,ref);count=progress['required_total']-progress['remaining']
         required=progress['required_total']
         if progress['failures'] or progress['invalid_executions']: reasons.append('confirmation failed or invalid for this scientific solution; inspect evidence, no automatic retry')
-        if count>=required: reasons.append('declared confirmations already recorded')
+        if not selection and count>=required: reasons.append('declared confirmations already recorded')
         if revise_selection and count: reasons.append('revised solution already has a confirmation attempt; allowance cannot restart')
         remaining=required if revise_selection else required-count
-        fit=evaluation_capacity(host,remaining,confirmation=True) if v['controller_route']=='rl' else capacity(host,remaining,True,root_operation=True,candidate=r['candidate'])
+        fit=dict(admitted=remaining,selection_without_execution=True) if selection else evaluation_capacity(host,remaining,confirmation=True) if v['controller_route']=='rl' else capacity(host,remaining,True,root_operation=True,candidate=r['candidate'])
+        if selection and required==0 and progress['current_study_confirmations']:reasons.append('unexpected extra confirmations in zero-repetition study')
         if fit['admitted']<remaining: reasons.append('remaining required confirmations do not fit route budget')
     except (ValueError,KeyError) as exc:
         reasons.append(str(exc));count=0
@@ -192,35 +195,10 @@ def cached(output):
         prior_result_costs='retained in saved result numerical_s; not newly incurred by receipt retrieval'))
 
 
-def mechanics_context(host, candidate):
+def mechanics_context(host,candidate):
     from tools.research.state import state
-    s=state(host); relations=[host.store.artifact(r) for r in s.get('handoffs',[])
-        if host.store.artifact(r)['candidate']==plain(candidate)]
-    rows=[]
-    for relation in relations:
-        source=relation['mechanics_attempt']
-        replays=[dict(reference=r,**{k:host.store.artifact(r).get(k) for k in ('status','replay','original_request','log_reference')})
-            for r in [*s.get('mechanics_results',[]),*s.get('imported_mechanics_results',[])] if host.store.artifact(r).get('source_mechanics')==source]
-        verification='not performed' if not replays else 'passed' if all((r.get('replay') or {}).get('gates_passed',False) for r in replays) else 'failed' if any((r.get('replay') or {}).get('status')=='completed' and not (r.get('replay') or {}).get('gates_passed',False) for r in replays) else 'inconclusive'
-        failed=[]
-        for r in replays:
-            replay=r.get('replay') or {}; check=replay.get('integration_consistency') or {}
-            for metric,threshold,time_key in (('node_max_tip_disagreement_m','tip_limit_m','node_max_tip_disagreement_at_s'),('node_max_speed_disagreement_m_s','velocity_vector_limit_m_s','node_max_speed_disagreement_at_s')):
-                if replay.get(metric) is not None and check.get(threshold) is not None and replay[metric]>check[threshold]:
-                    failed.append(dict(metric=metric,value=replay[metric],threshold=check[threshold],time_s=replay.get(time_key),reference=r['reference']))
-        mathematical=host.store.artifact(source)
-        rows.append(dict(mechanics_attempt=source,offline_trajectory=relation['offline_trajectory'],
-            original_request=mathematical.get('original_request'),relaxed_conditions=relation.get('relaxation'),failed_verification_metrics=failed,
-            solver_status=host.store.artifact(source).get('status'),
-            independent_mathematical_verification=verification,
-            original_offline_task_accepted=relation['original_task_feasible'],relaxed_nlp_feasible=relation['relaxed_nlp_feasible'],
-            independent_model_replays=replays,
-            exploratory_closed_loop=not relation['original_task_feasible'] or not replays or
-                any(not (r.get('replay') or {}).get('gates_passed',False) for r in replays),
-            qualification='Offline task, independent model replay, and MuJoCo acceptance are separate gates.'))
-    # Repeated handoffs are provenance relations, not additional NLPs or replays.
-    unique={r['mechanics_attempt']['artifact_id']:r for r in rows}
-    return list(unique.values())
+    return [dict(reference=ref,operation=value.get('operation'),task_acceptance='unmeasured',physical_validation=value.get('physical_validation'))
+        for ref in state(host).get('mechanics_results',[]) if (value:=host.store.artifact(ref)).get('design_candidate')==plain(candidate)]
 
 
 def mathematical_context(host,candidate):

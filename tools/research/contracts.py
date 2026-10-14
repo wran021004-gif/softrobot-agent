@@ -82,6 +82,16 @@ class LocalDiagnostic(Contract):
     mode: Literal['research_policy', 'research_current'] = 'research_policy'
 
 
+class MechanicsRequest(Contract):
+    candidate: EvidenceRef
+    substeps: int = Field(default=1,ge=1,le=4,strict=True)
+    initialization: Literal['constant_0_2','ramp_0_2_to_0_4'] = 'constant_0_2'
+    objective_mode: Literal['task_gap','task_gap_with_effort'] = 'task_gap'
+    position_weight: FiniteFloat = Field(default=1,gt=0)
+    speed_weight: FiniteFloat = Field(default=1,gt=0)
+    secondary_coefficient: FiniteFloat = Field(default=.001,ge=0)
+
+
 class Plan(Contract):
     action: Literal['propose', 'execute', 'search', 'mechanics', 'replay', 'diagnose', 'confirm', 'select', 'stop']
     next_step: Literal['adjust_training','revise_design','diagnose','stop'] | None = None
@@ -98,7 +108,7 @@ class Plan(Contract):
     selected_execution: EvidenceRef | None = Field(default=None, description='Exact immutable passing NMPC result or independent RL evaluation; freezes the complete solution')
     revise_selection: bool = Field(default=False, description='Explicitly replace a failed selection with a scientifically changed, freshly passing development solution; retain all confirmation records and cumulative costs')
     diagnostic: LocalDiagnostic | None = None
-    mechanics: dict | None = None
+    mechanics: MechanicsRequest | None = None
     mechanics_source: EvidenceRef | None = None
     experience_disposition: dict[str, Literal['adopted', 'rejected', 'context_only']] = Field(default_factory=dict)
 

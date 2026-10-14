@@ -9,12 +9,13 @@ import math
 import os
 from pathlib import Path
 import subprocess
+import sys
 import time
 import uuid
 
 ROOT = Path(__file__).resolve().parents[2]
-RUNS = ROOT / "runs/rl"
-PYTHON = Path(r"D:\softrobot-agent\.rl-pilot-env\Scripts\python.exe")
+RUNS = Path(os.environ.get("SOFTROBOT_RL_RUNS",str(ROOT / "runs/rl")))
+PYTHON = Path(sys.executable)
 
 
 def read_json(path):
@@ -265,10 +266,10 @@ def launch(directory, state, interpreter):
     return dict(run_id=directory.name, status="starting", pid=process.pid, artifacts=str(directory))
 
 
-def merge_overrides(training=None, reward=None):
+def merge_overrides(training=None, reward=None, *, defaults=None):
     """Single owner for public override validation and default resolution."""
     import copy
-    defaults=read_json(Path(__file__).with_name('config.json'))
+    defaults=defaults if defaults is not None else read_json(Path(__file__).with_name('config.json'))
     training, reward = training or {}, reward or {}
     supported=set(defaults['ppo'])-{'device','verbose','use_sde','sde_sample_freq'}
     if set(training)-supported or set(reward)-set(defaults['reward']):

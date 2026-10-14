@@ -1,3 +1,4 @@
+from tools.research.design import verify_candidate
 """Owned candidate preparation and dispatch to the existing bounded RL runtime."""
 from copy import deepcopy
 import json
@@ -12,73 +13,14 @@ from tools.state_io import digest
 from tools.rl import run
 
 
-def bind_source(host):
-    """Bind one sealed run for evaluation; copied consumption stays historical."""
-    import hashlib
-    from tools.research import core as core
-    from tools.platform_store import Store
-    source=core.state(host)['spec']['rl_evaluation_source']
-    old=Store(core.ROOT/'runs'/source['study_id']); sealed=old.session(source['study_id'])['state']
-    entry=deepcopy(sealed['rl_runs'][source['run_id']]); directory=run.run_path(source['run_id'])
-    config=run.read_json(directory/'config.json'); generation=source['checkpoint']
-    if Path(generation).name!=generation: raise ValueError('Published checkpoint name required')
-    policy=directory/'checkpoints'/generation/'policy.zip'; metadata=run.read_json(policy.with_name('metadata.json'))
-    if (sealed['research_status']!='stopped' or entry['status']['worker_alive'] or run.worker_alive(directory)
-            or generation not in run.read_json(directory/'checkpoint.json').values()
-            or config!=old.artifact(entry['configuration']) or config['candidate']['reference']!=entry['candidate']
-            or config['task']['original']!=old.artifact(entry['task'])
-            or metadata['config_sha256']!=source['config_sha256']
-            or metadata['policy_file_sha256']!=source['policy_sha256']
-            or hashlib.sha256(policy.read_bytes()).hexdigest()!=source['policy_sha256']):
-        raise ValueError('Pinned sealed evaluation source identity mismatch')
-    for field in ('candidate','task','configuration',*(['training_summary'] if entry.get('training_summary') else [])):
-        if core.save(host,old.artifact(entry[field]),'linked_source_'+field)!=entry[field]:
-            raise ValueError('Source artifact identity changed')
-    history=dict(study_id=source['study_id'],run_id=source['run_id'],checkpoint=generation,
-        training_status=entry['status']['status'],consumed=entry['status']['consumed'],optimization=metadata['inherited'],
-        previous_evaluations=[old.artifact(r) for r in sealed.get('rl_evaluations',[])],engineering_closeout=sealed.get('engineering_closeout'),accepted_historical_stop=not bool(sealed.get('engineering_closeout')),newly_incurred=False)
-    entry.update(source_study=source['study_id'],historical_consumption=entry['status'].pop('consumed'),
-        allocation=dict(actions=0,active_seconds=0),active_reservation=None,evaluations=0,replays=0)
-    candidate=old.artifact(entry['candidate']); candidates=core.state(host)['candidates']
-    candidates[candidate['identity']]=entry['candidate']
-    core.update(host,candidates=candidates,rl_source_candidate=entry['candidate'],
-        rl_runs={source['run_id']:entry},rl_task=entry['task'],rl_training_summaries=[entry['training_summary']] if entry.get('training_summary') else [],
-        rl_source_summary=core.save(host,history,'linked_source_training_summary'))
-
-
-    if source.get('selection_study_id'):
-        from tools.research.feedback import result_view
-        selection_store=Store(core.ROOT/'runs'/source['selection_study_id'])
-        selection_state=selection_store.session(source['selection_study_id'])['state']
-        selected=source['selected_execution']; confirmations=source['historical_confirmations']
-        if selection_state['research_status']!='stopped' or selection_state['selected']!=selected:
-            raise ValueError('Sealed immutable selection required')
-        if selected not in selection_state['rl_evaluations']:
-            raise ValueError('Original development selection not recorded')
-        for ref in [selected,*confirmations]:
-            if ref not in selection_state['rl_evaluations']: raise ValueError('Original execution not recorded')
-            value=selection_store.artifact(ref)
-            if (value['candidate']!=entry['candidate'] or value['task']!=entry['task']
-                    or value['configuration']!=entry['configuration'] or value['checkpoint']!=generation
-                    or value['policy_sha256']!=source['policy_sha256'] or value['run_id']!=source['run_id']
-                    or value.get('study')!=source['selection_study_id']):
-                raise ValueError('Historical frozen solution identity mismatch')
-            if core.save(host,value,'linked_historical_execution')!=ref: raise ValueError('Historical execution identity changed')
-        if not result_view(host,selected)['passed']: raise ValueError('Passing development selection required')
-        for ref in confirmations:
-            value=host.store.artifact(ref)
-            if value['role']!='confirmation' or value['selected_execution']!=selected or not result_view(host,ref)['complete']:
-                raise ValueError('Genuine historical post-selection confirmation required')
-        # This is provenance from a sealed study, not this study's fresh selection.
-        core.update(host,linked_selections=[selected],historical_confirmations=list(confirmations))
 
 
 def prepare_input(host, request):
-    from tools.research import core as core
+    from tools.research import state as core
     from extensions.tendon_family.backends import physics_for
     from extensions.tendon_family.scene import assemble
     from extensions.tendon_family.mjcf import compile_xml
-    c=core.verify_candidate(host,request.candidate)
+    c=verify_candidate(host,request.candidate)
     inp=SessionInput.model_validate(c['configuration'])
     p=physics_for(inp); scene=assemble(inp,p)
     if scene['control']['tension_execution_mode']!='ideal_tension':
@@ -91,7 +33,7 @@ def prepare_input(host, request):
     import xml.etree.ElementTree as ET
     if any(e.get('file') for e in ET.fromstring(xml).iter()):
         raise ValueError('External XML assets require explicit snapshot support')
-    cfg=run.merge_overrides(request.training_overrides.model_dump(exclude_unset=True),request.reward_overrides.model_dump(exclude_unset=True))
+    cfg=run.merge_overrides(request.training_overrides.model_dump(exclude_unset=True),request.reward_overrides.model_dump(exclude_unset=True),defaults=core.state(host)['spec']['runtime']['rl_defaults'])
     cfg.update(mode=request.mode,reference=plain(request.reference),budget=plain(request.allocation))
     cfg['candidate']=dict(xml=xml,sha256=__import__('hashlib').sha256(xml.encode()).hexdigest(),assets={},
         identity=c['identity'],reference=plain(request.candidate),task_identity=scene['task_identity'],provenance=c['provenance'])
@@ -116,12 +58,13 @@ def prepare_input(host, request):
     return run.resolve_config(cfg),task_ref
 
 
-def invoke(operation, run_id, *arguments, deadline=float("inf"), timeout_s=150.):
-    from tools.research.core import ROOT
+def invoke(host,operation, run_id, *arguments, deadline=float("inf"), timeout_s=150.,interpreter=None):
+    from tools.research.state import ROOT,state
+    interpreter=state(host)['spec']['runtime']['rl_python']
     import os
     env={k:os.environ[k] for k in ('SystemRoot','WINDIR','PATH','TEMP','TMP','USERPROFILE','APPDATA','LOCALAPPDATA','COMSPEC','PATHEXT') if k in os.environ}
-    env.update(OPENBLAS_NUM_THREADS='1',OMP_NUM_THREADS='1',MKL_NUM_THREADS='1')
-    result=subprocess.run([str(run.PYTHON),'-m','tools.rl.run',operation,'--run-id',run_id,*map(str,arguments)],
+    env.update(OPENBLAS_NUM_THREADS='1',OMP_NUM_THREADS='1',MKL_NUM_THREADS='1',SOFTROBOT_RL_RUNS=str(run.RUNS))
+    result=subprocess.run([str(interpreter or run.PYTHON),'-m','tools.rl.run',operation,'--run-id',run_id,*map(str,arguments)],
         cwd=ROOT,env=env,capture_output=True,text=True,timeout=min(120. if operation=='evaluate' else timeout_s,timeout_s,max(.001,deadline-time.time())),creationflags=getattr(subprocess,'CREATE_NO_WINDOW',0))
     if result.returncode: raise RuntimeError(result.stderr[-3000:])
     return json.loads(result.stdout)
@@ -129,7 +72,8 @@ def invoke(operation, run_id, *arguments, deadline=float("inf"), timeout_s=150.)
 
 def reconcile(host, run_id, lightweight=False):
     """Replace cumulative facts by identity; querying never sums them again."""
-    from tools.research import core as core
+    from tools.research import state as core
+    run.RUNS=host.store.root/'rl'
     entry=core.state(host)['rl_runs'][run_id]
     if entry.get('source_study'):
         if run.worker_alive(run.run_path(run_id)): raise ValueError('Sealed source worker unexpectedly alive')
@@ -151,7 +95,7 @@ def reconcile(host, run_id, lightweight=False):
 
 
 def evaluation_capacity(host, requested=1, confirmation=False):
-    from tools.research import core as core
+    from tools.research import state as core
     s=core.state(host)
     from tools.research.feedback import confirmation_progress
     progress=confirmation_progress(host)
@@ -167,12 +111,12 @@ def evaluation_capacity(host, requested=1, confirmation=False):
 
 
 def training_capacity(host, work):
-    from tools.research import core as core
+    from tools.research import state as core
     s=core.state(host); b=s['spec']['budgets']; remaining=host.store.remaining()['remaining']
     confirmations=core.confirmation_count(s)
     # Start/resume, terminal status+read, evaluation+read, each confirm+read, STOP.
     operations=6+3*confirmations
-    requests=6+2*confirmations
+    requests=4+2*confirmations
     seconds=work['active_seconds']+(1+confirmations)*s['spec'].get('rl_evaluation_allowance_s',150.)
     if (s['spec'].get('shared_start_limit',float('inf'))-s.get('charged_starts',0)<2+confirmations
             or b['protected_provider_requests']<requests or remaining['model_calls']<=b['protected_provider_requests']
@@ -184,17 +128,18 @@ def training_capacity(host, work):
 
 
 def confirm(host, selected, request_id):
-    from tools.research import core as core
+    from tools.research import state as core
     r=host.store.artifact(selected)
     return dispatch(host,dict(operation='evaluate',run_id=r['run_id'],checkpoint=r['checkpoint'],rationale='Frozen selected solution; fresh confirmation; no training'),request_id,selected=selected)
 
 
 def dispatch(host, value, request_id, selected=None):
-    from tools.research import core as core
+    from tools.research import state as core
     q=RLRequest.model_validate(value); s=core.state(host); key=digest(plain(q))
     if not core.enabled(s['spec'],'rl'): raise ValueError('RL capability required')
     if s['spec'].get('allowed_rl_operations') is not None and q.operation not in s['spec']['allowed_rl_operations']:
         raise ValueError('RL operation outside declared follow-up scope')
+    run.RUNS=host.store.root/'rl'
     source=s['spec'].get('rl_evaluation_source')
     if source and (q.run_id!=source['run_id'] or q.operation not in ('status','evaluate')
             or (q.operation=='evaluate' and q.checkpoint!=source['checkpoint'])):
@@ -251,7 +196,7 @@ def dispatch(host, value, request_id, selected=None):
                 allocation=config['budget'],mathematical_handoffs=[r for r in s.get('handoffs',[]) if host.store.artifact(r)['candidate']==plain(q.candidate)],request_identity=key,requested_allocation=plain(q.allocation),active_reservation=config['budget'],evaluations=0,replays=0)
             runs=core.state(host).get('rl_runs',{}); runs[run_id]=entry; core.update(host,rl_runs=runs)
             path=host.store.root/'rl_inputs'/('config-'+row['execution_id']+'.json');run.write_json(path,config)
-            result=invoke('start',run_id,'--config',path,deadline=s['cutoff_unix'])
+            result=invoke(host,'start',run_id,'--config',path,deadline=s['cutoff_unix'])
             result.update(effective_configuration=entry['configuration'],requested_overrides=config['requested_overrides'],
                 requested_allocation=plain(q.allocation),effective_allocation=config['budget'])
         elif q.operation in ('status','stop','resume'):
@@ -269,7 +214,7 @@ def dispatch(host, value, request_id, selected=None):
                 core.update(host,rl_runs=runs,rl_training_summaries=refs if reference in refs else [*refs,reference])
                 result.update(training_summary=host.store.artifact(reference),training_summary_reference=reference,
                     task_performance='unmeasured',next_operations=['evaluate'] if summary.get('checkpoint') and summary['checkpoint'].get('policy_present') else ['choose another authorized action','stop'])
-            else: result=invoke(q.operation,q.run_id,deadline=core.execution_deadline(host))
+            else: result=invoke(host,q.operation,q.run_id,deadline=core.execution_deadline(host))
         elif q.operation=='diagnose' and not q.failure:
             directory=run.run_path(q.run_id)
             result=dict(run_id=q.run_id,replay_requested=q.replay,replay_executed=False,
@@ -312,7 +257,7 @@ def dispatch(host, value, request_id, selected=None):
                     runs[run_id][counter]+=1;host.store.update_state(db,host.run_id,st)
             evaluation_dispatched=q.operation=='evaluate'
             operation_started=time.perf_counter()
-            result=invoke(q.operation,run_id,*arguments,'--output',output,deadline=core.execution_deadline(host),timeout_s=s['spec'].get('rl_diagnostic_allowance_s',60.) if q.operation=='diagnose' else s['spec'].get('rl_evaluation_allowance_s',150.))
+            result=invoke(host,q.operation,run_id,*arguments,'--output',output,deadline=core.execution_deadline(host),timeout_s=min(s['spec']['rl_diagnostic_allowance_s'] if q.operation=='diagnose' else s['spec']['rl_evaluation_allowance_s'], s['spec']['budgets']['numerical_s']-core.state(host)['numerical_s']-core.state(host)['numerical_reserved_s']),interpreter=s['spec']['runtime']['rl_python'])
             if source: result.update(source_study=source['study_id'],evaluation_owner=host.run_id)
             result.update(study=host.run_id,candidate=entry['candidate'],task=entry['task'],run_id=run_id,configuration=entry['configuration'],independent_evaluation_executed=q.operation=='evaluate')
             if q.operation=='evaluate':
@@ -339,18 +284,18 @@ def compatible_references(host):
     """Convert only the existing 35-interval, six-channel SI tension schedule."""
     import numpy as np
     import hashlib
-    from tools.research import core as core
+    from tools.research import state as core
     from extensions.tendon_family.backends import physics_for
     from extensions.tendon_family.scene import assemble
     rows=[]
     for ref in core.state(host).get('handoffs',[]):
         relation=host.store.artifact(ref);v=host.store.artifact(relation['mechanics_attempt'])
         try:
-            candidate=core.verify_candidate(host,relation['candidate']);trajectory=v['candidate']
+            candidate=verify_candidate(host,relation['candidate']);trajectory=v['candidate']
             request=host.store.artifact(v['original_request']);scene=assemble(SessionInput.model_validate(candidate['configuration']),physics_for(SessionInput.model_validate(candidate['configuration'])))
             u=np.asarray(trajectory['tensions_n']);times=np.asarray(trajectory['times_s'])
             order=[t['entity'] for t in physics_for(SessionInput.model_validate(candidate['configuration']))['tendons']]
-            exact_structure=(v.get('solved_configuration')==candidate.get('configuration_reference')) if core.state(host)['spec'].get('nominal_source') else abs(trajectory['d']-candidate['parameters']['d'])<=1e-10
+            exact_structure=v.get('design_candidate')==relation['candidate']
             if (request['configuration']['task']!=candidate['configuration']['task'] or not exact_structure
                     or trajectory['tendon_order']!=order
                     or order!=['near_t0','near_t1','near_t2','far_t0','far_t1','far_t2']
@@ -372,7 +317,7 @@ def compatible_references(host):
 
 
 def allocation_feedback(host):
-    from tools.research import core as core
+    from tools.research import state as core
     s=core.state(host); caps=s['spec']['rl_limits']; entries=list(s.get('rl_runs',{}).values())
     actions=sum(e['allocation']['actions'] for e in entries)
     seconds=sum(e['allocation']['active_seconds'] for e in entries)
@@ -387,12 +332,12 @@ def allocation_feedback(host):
 
 
 def packet(host):
-    from tools.research import core as core
+    from tools.research import state as core
     s=core.state(host)
     return dict(allocation_feedback=allocation_feedback(host),frozen_task=s['rl_task'],capabilities=dict(task='reach-and-hold',control='ideal_tension',
         modes=['direct','residual'],compatible_references=compatible_references(host),
         structural_domain=s['spec']['allowed_parameters'],
-        defaults=run.read_json(Path(run.__file__).with_name('config.json'))),
+        defaults=s['spec']['runtime']['rl_defaults']),
         training_summaries=[dict(run_id=r,reference=e['training_summary'],evaluations=[v for v in s.get('rl_evaluations',[]) if host.store.artifact(v).get('run_id')==r]) for r,e in s.get('rl_runs',{}).items() if e.get('training_summary')],
         runs=s.get('rl_runs',{}),source_summary=s.get('rl_source_summary'),evaluations=[dict(reference=r,**host.store.artifact(r)) for r in s.get('rl_evaluations',[])],
         costs='RL active time/evaluation costs separate from provider wall time; elapsed study time uses one wall clock',
@@ -402,7 +347,7 @@ def packet(host):
 
 def unavailable_evaluation(host, run_id, operation_key, reason, uncertain=False, selected=None):
     """Seal actual failed evaluation-attempt evidence without inventing an episode."""
-    from tools.research import core as core
+    from tools.research import state as core
     s=core.state(host);entry=s['rl_runs'][run_id]
     previous=next((r for r in s.get('rl_evaluations',[]) if host.store.artifact(r).get('operation_key')==operation_key),None)
     if previous:return dict(reference=previous,**host.store.artifact(previous))

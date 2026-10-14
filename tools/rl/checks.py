@@ -66,26 +66,6 @@ def write_trajectory(path, samples, tendons):
                              *row["commanded_tension_n"], *map(int, row["clipped"]), *map(int, row["saturated"])])
 
 
-def legacy_config(settings, source_root=None):
-    """Translate the historical policy's conventions once, without rewriting it."""
-    config = read_json(Path(__file__).resolve().parents[2] / "evidence/rl_runtime_20261013/historical_config.json")
-    saved = settings["environment"]
-    config["mode"], config["seed"] = saved["mode"], settings["seed"]
-    config["source_root"] = str(source_root or saved["source_root"])
-    config["physics"] = dict(timestep_s=saved["physics_dt_s"], integrator=saved.get("integrator", "implicitfast"))
-    config["action"]["residual_scale_n"] = saved["residual_scale_n"]
-    config["reward"].update(saved["reward"], failure_penalty=saved["failure_penalty"])
-    for key in ("position_scale_m", "speed_scale_m_s"):
-        config["observation"][key] = saved[key]
-    if saved["mode"] == "residual":
-        path = Path(__file__).resolve().parents[2] / "evidence/fc1012_open_loop_20261013/references.npz"
-        config["reference"] = dict(path=str(path), tendon_order=saved["tendon_order"], control_period_s=saved["control_dt_s"],
-                                   source_physical_execution=config["task"]["source_physical_execution"],
-                                   sha256=hashlib.sha256(path.read_bytes()).hexdigest(), validation="failed MuJoCo task acceptance")
-    config=historical_input(config)
-    if config.get('reference'):
-        config['reference'].update(candidate_identity=config['candidate']['identity'],task_identity=config['candidate']['task_identity'])
-    return config
 
 
 def evaluate(policy, output, source_root=None):
@@ -100,13 +80,12 @@ def evaluate(policy, output, source_root=None):
                 or hashlib.sha256(policy.read_bytes()).hexdigest() != metadata["policy_file_sha256"]):
             raise ValueError("Incomplete or mismatched checkpoint generation")
         config = copy.deepcopy(config)
-        if not config.get('candidate'): config=historical_input(config)
+        if not config.get('candidate'):raise ValueError('EXPLICIT_CHECKPOINT_CANDIDATE_REQUIRED')
         if source_root:
             raise ValueError('Frozen candidate evaluation cannot change source_root')
         settings = None
     else:
-        settings = read_json(policy.with_name("settings.json"))
-        config = legacy_config(settings, source_root)
+        raise ValueError('EXACT_PUBLISHED_CHECKPOINT_METADATA_REQUIRED')
     output.mkdir(parents=True, exist_ok=False)
     env = TensionEnv(config, trace_dir=output, failure_mode="raise")
     try:
@@ -146,19 +125,12 @@ def replay_config(capture, explicit=None):
     # Runtime captures remain bound to their own immutable run configuration.
     root = Path(__file__).resolve().parents[2]
     for ancestor in capture.resolve().parents:
-        if not ancestor.is_relative_to(root / "runs/rl"):
+        if not ancestor.is_relative_to(root / "runs"):
             break
         if (ancestor / "config.json").exists():
             recorded=read_json(ancestor / 'config.json')
             if selected is not None and selected!=recorded: raise ValueError('Diagnosis config differs from capture run')
             return recorded
-    archive = capture.parent / "diagnosis.json"
-    if archive.exists():
-        record = read_json(archive).get(capture.stem)
-        if record and "environment" in record:
-            saved = record["environment"]
-            saved = dict(saved, integrator=saved.get("integrator", "implicitfast"), failure_penalty=saved.get("failure_penalty", -10000.0))
-            return legacy_config(dict(seed=record["seed"], environment=saved))
     raise ValueError("Replay needs a recorded run configuration or explicit --config; numerical settings are unknown")
 
 
@@ -190,48 +162,3 @@ def diagnose(capture, output=None, replay=False, config=None):
         env.close()
 
 
-def historical_input(config):
-    """Explicit archive compatibility only; never called for new candidates."""
-    from tools.rl.env import ROOT
-    from contextlib import closing
-    import sqlite3
-    import tarfile
-    XML_ID = config['provenance']['xml_id']
-    def load_xml(source_root):
-        """Read exactly one saved artifact; never rebuild or audit the archive."""
-        dbpath = source_root / "runs/fc1012/platform.sqlite"
-        if dbpath.exists():
-            with closing(sqlite3.connect(dbpath.as_uri() + "?mode=ro", uri=True)) as db:
-                row = db.execute("SELECT body FROM artifacts WHERE id=?", (XML_ID,)).fetchone()
-            if row is not None:
-                return row[0].decode("utf-8"), str(dbpath) + "#" + XML_ID
-        member = f"artifacts/{XML_ID}.bin"
-        archives = [source_root / "runs/fc1012/delivery_archive_reassembled.tar.gz",
-                    source_root / "evidence/fixed_task_20261012/immutable_artifacts.tar.gz"]
-        for path in archives:
-            if path.exists():
-                with tarfile.open(path, "r|gz") as archive:
-                    for entry in archive:
-                        if entry.name == member:
-                            return archive.extractfile(entry).read().decode("utf-8"), str(path) + "#" + member
-        raise FileNotFoundError(
-            f"Missing robot XML: {dbpath} (artifacts.id={XML_ID}); "
-            + "; ".join(f"{path}::{member}" for path in archives))
-
-
-    xml, _ = load_xml(Path(config['source_root']))
-    import xml.etree.ElementTree as ET
-    document=ET.fromstring(xml)
-    if config.get('physics'):
-        # Historical policies explicitly recorded edits to a loaded model copy.
-        document.find('option').set('timestep',str(config['physics']['timestep_s']))
-        document.find('option').set('integrator',config['physics']['integrator'])
-        xml=ET.tostring(document,encoding='unicode')
-    tendons=config['task']['tendon_order']
-    config['candidate']=dict(xml=xml,sha256=hashlib.sha256(xml.encode()).hexdigest(),assets={},
-        identity=config['provenance']['xml_id'],task_identity=config['task']['source_physical_execution'])
-    config['control_object']=dict(joint_names=[j.get('name') for j in document.findall('.//worldbody//joint')],
-        tendon_names=tendons,actuator_names=[t+'_direct_tension' for t in tendons],
-        tip_site='tip_site',semantics='ideal_tension')
-    config['task']['family']='task.reach'
-    return config

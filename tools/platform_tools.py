@@ -7,15 +7,7 @@ from schemas import platform_operations as c
 
 
 def simulation_preflight(inp, arguments, reg):
-    route=inp.policy.route.data if inp.policy.route else {}
-    if route.get('multi_category_coverage_required') and 'route.advance' in inp.policy.tool_bindings:
-        raise ValueError('COVERED_EXPERIMENT_REQUIRES_ROUTE_RUN')
     candidate = _candidate(inp, arguments.changes, reg)
-    if route.get('multi_category_coverage_required'):
-        from extensions.tendon_family.candidate import candidate_facts,experiment_coverage
-        facts=candidate_facts(inp,plain(candidate),dict(artifact_id=digest(plain(candidate))),arguments.candidate_id)
-        if not experiment_coverage(facts)['eligible']:
-            raise ValueError('MULTI_CATEGORY_COVERAGE_REQUIRED')
     backend, parameters = reg.bind(candidate.policy.backend, 'backend')
     _, control = reg.bind(candidate.policy.controller, 'controller')
     backend.resolve().check(candidate, parameters, control)
@@ -215,18 +207,7 @@ def bounded_evidence_page(value, args, *, envelope_bytes=6000):
 def read_evidence(ctx, args):
     if 'gzip' in args.reference.media_type:
         raise ValueError('COMPRESSED_MOTION_REQUIRES_DERIVED_QUERY: use diagnosis.inspect_evidence(view="motion"); this raw JSON access failure does not mean motion evidence is unavailable')
-    try:
-        value = ctx.artifact(args.reference)
-    except ValueError:
-        # The existing Host has already checked the evidence.read grant. Resolve
-        # offloaded working sources only through the same role's durable allowlist.
-        from tools.context_assembly import role_evidence_archive
-        archive=role_evidence_archive(ctx.store,ctx.run_id)
-        value=archive.load(plain(args.reference))
-    except UnicodeDecodeError:
-        if ctx.store.artifact(args.reference,raw=True).startswith(b'\x1f\x8b'):
-            raise ValueError('COMPRESSED_MOTION_REQUIRES_DERIVED_QUERY: use diagnosis.inspect_evidence(view="motion"); failed raw access does not invalidate the retained motion capability') from None
-        raise
+    value=ctx.artifact(args.reference)
     # Only identities carried by the original document, never the current candidate.
     attribution={k:value[k] for k in ('candidate_id','owner_run_id','run_id','execution_id','source_execution_id','configuration')
                  if isinstance(value,dict) and k in value}
@@ -243,89 +224,23 @@ def read_evidence(ctx, args):
     return result
 
 
-def diagnose(ctx, args):
-    result = BackendResult.model_validate(ctx.artifact(args.result))
-    matches = [s for s in result.signals if s.spec.name == args.signal]
-    if len(matches) > 1:
-        raise ValueError('SIGNAL_SELECTION_REQUIRED: bind diagnostics.sample_exceeds@1.1.0 in policy.tool_bindings; pass the original result with entity and phase')
-    signal = matches[0] if matches else None
-    if signal is None:
-        status, indices = 'missing_data', []
-    elif signal.spec.units != args.units or signal.spec.dimension != 1:
-        status, indices = 'not_applicable', []
-    else:
-        indices = [i for i, row in enumerate(signal.values) if row[0] > args.threshold]
-        status = 'events_found' if indices else 'no_event'
-    output = c.DiagnosticResult(status=status, source=args.result, signal=args.signal, sample_indices=indices,
-                               observed=[signal.values[i] for i in indices] if signal else [])
-    ctx.record('diagnosis', status, inputs=[args.result])
-    return output
 
 
-def memory_search(ctx, args):
-    return c.MemoryResults(entries=ctx.store.memories(plain(args)))
 
 
-def memory_save(ctx, args):
-    entry = args.entry
-    if ctx.host.actor == 'model' and entry.kind not in ('model_note', 'hypothesis'):
-        raise ValueError('MODEL_MEMORY_MUST_REMAIN_NOTE_OR_HYPOTHESIS')
-    # A model cannot turn prose into a verified scientific conclusion.
-    if entry.kind == 'verified_record':
-        for ref in entry.sources:
-            EvaluationResult.model_validate(ctx.artifact(ref))
-        if ctx.host.actor != 'local-human':
-            raise ValueError('VERIFIED_RECORD_REQUIRES_TRUSTED_HOST_CHECK')
-    if entry.task_family != ctx.input.task.family or entry.task_version != ctx.input.task.task_version:
-        raise ValueError('MEMORY_APPLICABILITY_MISMATCH')
-    return c.SavedMemory(entry=ctx.store.save_memory(ctx.run_id, entry))
 
 
-def stop(ctx, args):
-    with ctx.store.transaction() as db:
-        state = ctx.store.session(ctx.run_id, db)['state']
-        state['stop_reason'] = args.reason
-        ctx.store.update_state(db, ctx.run_id, state, args.status)
-    return c.Stopped(status=args.status, reason=args.reason)
 
 
-def skills_search(ctx, args):
-    from tools.platform_skills import applicable
-    return c.SkillRecords(skills=applicable(ctx.host, args.reference))
 
 
-def skills_propose(ctx, args):
-    from tools.platform_skills import library
-    skill = library(ctx.host).propose(args.skill)
-    return c.SkillRecords(skills=[skill.model_dump(mode='json')])
 
 
-def skills_validate(ctx, args):
-    from tools.platform_skills import library
-    record = args.record
-    if ctx.host.actor != 'local-human':
-        raise ValueError('SKILL_VALIDATION_REQUIRES_TRUSTED_HOST_EVIDENCE_CHECK')
-    if record.validated_by != 'harness':
-        raise ValueError('HOST_VALIDATOR_IDENTITY_REQUIRED')
-    skill = library(ctx.host).record_validation(args.reference, record)
-    return c.SkillRecords(skills=[skill.model_dump(mode='json')])
 
 
-def worker_submit(ctx, args):
-    from tools.platform_workers import Coordinator
-    return Coordinator(ctx.host).submit(args.order, parent=ctx.row['parent_id'])
 
 
-def worker_status(ctx, args):
-    from tools.platform_workers import Coordinator
-    return Coordinator(ctx.host).status(args.work_id)
 
 
-def worker_cancel(ctx, args):
-    from tools.platform_workers import Coordinator
-    return Coordinator(ctx.host).cancel(args.work_id)
 
 
-def worker_accept(ctx, args):
-    from tools.platform_workers import Coordinator
-    return Coordinator(ctx.host).accept(args.work_id)

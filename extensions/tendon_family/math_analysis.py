@@ -16,34 +16,6 @@ from .pcc import quaternion_wxyz_to_rotation
 from extensions.math_analysis.kernels import LIMITATIONS
 
 
-def saved_points(case,p):
-    observations=case['saved'].get('controller_observations.json',[])
-    commands=case['saved'].get('actual_commands.json',[])
-    points=[]
-    for requested in p.samples_s:
-        found=[(i,r) for i,r in enumerate(observations) if abs(r['time_s']-requested)<1e-9]
-        if len(found)!=1:
-            points.append(dict(requested_time_s=requested,available=False,reason='Exact saved state missing or ambiguous')); continue
-        i,r=found[0]; t=r['time_s']
-        following=[(j,c) for j,c in enumerate(commands) if abs(c['time_s']-t)<1e-9]
-        prior=[(j,c) for j,c in enumerate(commands) if c['time_s']<t-1e-9]
-        if r['phase']!='current_state_before_integration' or len(following)!=1:
-            points.append(dict(requested_time_s=requested,available=False,reason='Unsupported phase or missing applied interval command')); continue
-        j,c=following[0]
-        # In these saved ideal-tension executions, actual_tension_n is the applied
-        # next-interval value; verify against the backend actual_commands artifact.
-        u=r.get('actual_tension_n')
-        if u is None or not np.allclose(u,c['desired_tension_n'],rtol=0,atol=1e-12):
-            points.append(dict(requested_time_s=requested,available=False,reason='Applied tension unavailable or inconsistent')); continue
-        x=r['gvs_q']+r['gvs_qdot']
-        if not np.allclose(x,r['measured_initial_state'],rtol=0,atol=1e-12): raise ValueError('SAVED_STATE_INCONSISTENT')
-        points.append(dict(requested_time_s=requested,actual_time_s=t,phase=r['phase'],available=True,x=x,u=u,
-            observation_index=i,command_index=j,command_interval_s=[t,min(t+p.period_s,p.duration_s)],
-            input_interpretation='actual applied input for interval starting at this pre-step state',
-            preceding_input_n=None if not prior else prior[-1][1]['desired_tension_n'],
-            preceding_input_reason='initial condition; no preceding interval' if not prior else 'input producing the current observation',
-            remaining_task_s=max(0.,p.duration_s-t)))
-    return points
 
 
 def make_graph_from_input(inp,point):
@@ -62,8 +34,6 @@ def make_graph_from_input(inp,point):
     return inp,system,f,output
 
 
-def make_graph(case,point):
-    return make_graph_from_input(case['effective'],point)
 
 
 def linear_model(case,point,p,case_ref,graph):
@@ -119,36 +89,6 @@ def derivative_check(model,graph,p):
         tip_velocity=compare(fvelocity,avelocity,velocity.scales))
 
 
-def linearize_saved(ctx,args):
-    case=ctx.artifact(args.case)
-    protocol_type=TaskAnalysisProtocol if ctx.request.tool_version=='2.0.0' else AnalysisProtocol
-    p=protocol_type.model_validate(ctx.artifact(args.protocol)); points=saved_points(case,p)
-    good=[r for r in points if r['available']]
-    if not good: return AnalysisResult(kind='linearization',protocol=args.protocol,bindings=[case['binding']],records=points,evidence=[args.case],limitations=LIMITATIONS)
-    graph=make_graph(case,good[0]); records=[]
-    for point in points:
-        if not point['available']: records.append(point); continue
-        model=linear_model(case,point,p,args.case,graph)
-        ref=ctx.save_artifact(model)
-        records.append(dict(point=model.operating_point,model=plain(ref),derivative_check=derivative_check(model,graph,p) if point is good[0] else None))
-    if not getattr(args,'include_static_equilibrium',True):
-        return AnalysisResult(kind='linearization',protocol=args.protocol,bindings=[case['binding']],records=records,
-            evidence=[args.case],limitations=LIMITATIONS)
-    inp,system,f,_=graph
-    # Exactly one bounded existing damped Newton solve. <= 262 residual calls:
-    # 21 main evaluations + 20*12 line searches + final residual. No recovery.
-    eq=gvs_equilibrium_tool(SimpleNamespace(input=inp,reg=ctx.reg),GVSEquilibriumRequestV2(
-        basis=f.parameters.basis,initial_q=good[0]['x'][:len(system.x0)//2],
-        tendon_tensions_n=dict(zip(f.expression.tendon_order,good[0]['u'])),
-        tolerance=p.static_force_tolerance,max_iterations=p.static_max_iterations))
-    equilibrium=dict(attempts=1,result=plain(eq),max_residual_evaluations=13*p.static_max_iterations+2,
-        initialization='first requested saved measured q; first actually applied tension',force_tolerance=p.static_force_tolerance)
-    if eq.converged:
-        point=dict(x=eq.q_equilibrium+[0.]*len(eq.q_equilibrium),u=good[0]['u'],phase='computed_static_equilibrium',
-            actual_time_s=None,remaining_task_s=None,available=True,equilibrium=equilibrium)
-        model=linear_model(case,point,p,args.case,graph); records.append(dict(point=model.operating_point,model=plain(ctx.save_artifact(model))))
-    else: records.append(dict(equilibrium=equilibrium,available=False,reason='Bounded static solve unsuccessful'))
-    return AnalysisResult(kind='linearization',protocol=args.protocol,bindings=[case['binding']],records=records,evidence=[args.case],limitations=LIMITATIONS)
 
 
 def _configuration_boundary(inp,binding):
@@ -319,96 +259,7 @@ def calculate_candidate_configuration(inp,binding,p,protocol_ref,*,registry=None
 
 
 
-def linearize_candidate_configuration(ctx,inp,binding,p,protocol_ref):
-    result=calculate_candidate_configuration(inp,binding,p,protocol_ref,registry=ctx.reg)
-    for record in result.records:
-        if record.get('model'):record['model']=plain(ctx.save_artifact(record['model']))
-    return result
 
 
-def linearize_candidate(ctx,args):
-    from .candidate_analysis import resolve_candidate
-    inp,binding=resolve_candidate(ctx,args.source_node)
-    p=TaskAnalysisProtocol.model_validate(ctx.artifact(args.protocol))
-    return linearize_candidate_configuration(ctx,inp,binding,p,args.protocol)
 
 
-def saved_case(ctx,args):
-    from collections import Counter
-    from schemas.platform_diagnostics import DiagnosticFact
-    c=ctx.artifact(args.case)
-    protocol_type=TaskAnalysisProtocol if ctx.request.tool_version=='2.0.0' else AnalysisProtocol
-    p=protocol_type.model_validate(ctx.artifact(args.protocol))
-    rows=c['saved'].get('controller_observations.json',[])
-    commands=c['saved'].get('actual_commands.json',[])
-    trajectory=c['saved'].get('trajectory.json.gz',[])
-    target=np.asarray(SessionInput.model_validate(c['effective']).task.goal.data['target_m'],dtype=float)
-    selected=[]
-    requested=set(round(float(t),12) for t in p.samples_s)
-    graph=None
-    for i,row in enumerate(rows):
-        t=float(row['time_s'])
-        if round(t,12) not in requested: continue
-        command_matches=[(j,item) for j,item in enumerate(commands) if abs(item['time_s']-t)<1e-9]
-        command_index=command_matches[0][0] if len(command_matches)==1 else None
-        previous=commands[command_index-1] if command_index is not None and command_index>0 else None
-        following=next((item for item in rows if abs(item['time_s']-(t+p.period_s))<1e-9),None)
-        prediction=row.get('one_step_prediction')
-        discrepancy=None
-        if prediction and following:
-            difference=np.asarray(following['tip_position_m'])-np.asarray(prediction['tip_position_m'])
-            discrepancy=dict(actual_sample_time_s=following['time_s'],predicted_time_s=prediction['time_s'],
-                actual_minus_prediction_m=difference.tolist(),norm_m=float(np.linalg.norm(difference)))
-        backend_velocity=[]
-        tr_index=next((j for j,item in enumerate(trajectory) if abs(item['time_s']-t)<1e-9),None)
-        if tr_index is not None:
-            for a,b,label in ((tr_index-1,tr_index,'backward_interval_average'),(tr_index,tr_index+1,'forward_interval_average')):
-                if a>=0 and b<len(trajectory):
-                    ta,tb=trajectory[a]['time_s'],trajectory[b]['time_s']
-                    value=(np.asarray(trajectory[b]['tip_m'])-np.asarray(trajectory[a]['tip_m']))/(tb-ta)
-                    backend_velocity.append(dict(kind=label,value_m_s=value.tolist(),interval_s=[ta,tb],
-                        frame='world',source='saved backend tip positions; finite difference, not instantaneous'))
-        if graph is None:
-            point=dict(x=row['gvs_q']+row['gvs_qdot'],u=row['actual_tension_n'])
-            graph=make_graph(c,point)
-        x=row['gvs_q']+row['gvs_qdot']; gvs_velocity=np.asarray(graph[3](x,row['actual_tension_n'])[3]).reshape(-1)
-        current=np.asarray(row['actual_tension_n'],dtype=float)
-        prior=None if previous is None else np.asarray(previous['desired_tension_n'],dtype=float)
-        selected.append(dict(candidate_id=c['binding']['candidate_id'],observation_index=i,command_index=command_index,
-            timestamp_s=t,phase=row.get('phase'),evidence=[plain(args.case)],
-            projected_state=dict(q_rad_m=row['gvs_q'],qdot_rad_m_s=row['gvs_qdot'],
-                measured_initial_state=row['measured_initial_state'],projection_residual_max_rad_m=row.get('gvs_projection_residual_max_rad_m')),
-            world_tip_position_m=row['tip_position_m'],tip_minus_target_m=(np.asarray(row['tip_position_m'])-target).tolist(),
-            target_error_norm_m=float(np.linalg.norm(np.asarray(row['tip_position_m'])-target)),
-            previous_applied_input_n=None if prior is None else prior.tolist(),next_interval_applied_input_n=current.tolist(),
-            next_interval_s=[t,min(t+p.period_s,p.duration_s)],
-            tension_change_from_previous_n=None if prior is None else (current-prior).tolist(),
-            selected_iteration=row.get('optimization_selected_iteration'),selection_kind='optimized_noninitialization'
-                if (row.get('optimization_selected_iteration') or 0)>0 else 'initialization',
-            solver_status=dict(status=row.get('optimization_status'),raw_status=row.get('optimization_raw_status'),
-                failed=row.get('solver_failed'),nonconverged=row.get('optimization_nonconverged'),error=row.get('solver_error')),
-            recovery_status=row.get('feasibility_recovery'),validation_status=dict(plan_accepted=row.get('plan_accepted'),
-                constraint_violation=row.get('optimization_constraint_violation'),returned_violation=row.get('optimization_returned_violation'),
-                plan_source=row.get('plan_source'),policy_stop_reason=row.get('policy_stop_reason')),
-            one_step_prediction=prediction,one_step_discrepancy=discrepancy,
-            backend_tip_velocity_estimates=backend_velocity,
-            gvs_derived_instantaneous_tip_velocity=dict(value_m_s=gvs_velocity.tolist(),frame='world',
-                source='J_tip(q) * projected GVS qdot; distinct from backend finite differences'),
-            update_cost_breakdown_s={k:row.get(k) for k in ('graph_construction_s','solver_construction_s','state_preparation_s',
-                'warm_preparation_s','optimization_solve_s','plan_validation_s','recovery_integration_s','recovery_validation_s',
-                'recovery_wall_s','controller_boundary_wall_s','update_wall_s')}))
-    positive=[row for row in rows if (row.get('optimization_selected_iteration') or 0)>0]
-    command_changes=[]
-    for i,(before,after) in enumerate(zip(commands,commands[1:]),start=1):
-        delta=np.asarray(after['desired_tension_n'])-np.asarray(before['desired_tension_n'])
-        if np.any(np.abs(delta)>1e-12): command_changes.append(dict(command_index=i,time_s=after['time_s'],delta_n=delta.tolist()))
-    fact=DiagnosticFact(fact_id='saved-terminal-error',statement=f"Saved evaluator terminal error {c['factual_result']['terminal_error_m']} m; task accepted {c['factual_result']['task_accepted']}.",evidence=[args.case])
-    return AnalysisResult(kind='saved_case',protocol=args.protocol,bindings=[c['binding']],
-        records=[dict(factual_result=c['factual_result'],samples=saved_points(c,p),observation_count=len(rows),
-            plan_sources=dict(Counter(r.get('plan_source','missing') for r in rows)),
-            selected_iterations=dict(Counter(str(r.get('optimization_selected_iteration')) for r in rows)),
-            first_positive_noninitialization_time_s=None if not positive else positive[0]['time_s'],
-            initialization_selected_all_updates=not positive,command_changes=command_changes,
-            diagnostic_samples=selected,
-            saved_tension_bound_usage=dict(count=len(rows),saturated_entries=sum(sum(r.get('force_limit_saturated',[])) for r in rows)))],
-        evidence=[args.case],facts=[fact],limitations=LIMITATIONS+['Observations do not establish causal attribution.'])

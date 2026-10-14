@@ -11,7 +11,7 @@ from pathlib import Path
 import sqlite3
 from uuid import uuid4
 from schemas.platform import Budget, EvidenceRef, ProjectConfig, Event, VERSION
-from tools.spec_tools import ROOT
+from tools.paths import ROOT
 from tools.state_io import digest
 
 

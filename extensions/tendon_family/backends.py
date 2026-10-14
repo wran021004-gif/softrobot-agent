@@ -44,9 +44,6 @@ def physics_for(inp):
     if inp.robot.structure.contract=='family.design':
         discretization = inp.policy.discretization.data if inp.policy.discretization is not None else None
         return resolve(inp.robot.structure.data,discretization)
-    if inp.robot.structure.contract=='domain.rod_design':
-        from .legacy import resolve_legacy
-        return resolve_legacy(inp.robot.structure.data)
     raise ValueError('UNSUPPORTED_FAMILY_DESIGN_CONTRACT')
 
 
@@ -58,8 +55,8 @@ def _mujoco_state_failed(data, previous_time):
         or not all(np.isfinite(v).all() for v in (data.qpos,data.qvel,data.qacc)))
 
 
-class MatlabBackend:
-    backend_id='backend.matlab_spatial'
+class SerialBackend:
+    backend_id='backend.serial_base'
     model='matlab_serial_bending_v1'
     tension_execution_modes=('actuator_realistic',)
 
@@ -139,38 +136,13 @@ class MatlabBackend:
         c['command_vector']=[commands.get(a['id'],0.) for a in self.physics['actuators']]
         return dict(physics=self.physics,scene=self.scene,config=self.config.model_dump(mode='json'),control=c,timeout_s=timeout_s)
 
-    def solve(self,timeout_s):
-        from tools.matlab_tools import MatlabTools
-        shared=self.shared_input(timeout_s); atomic_json(self.folder/'matlab_input.json',shared)
-        start=time.perf_counter(); executor=MatlabTools(); self.timings['engine_start']=time.perf_counter()-start
-        try:
-            static=json.loads(executor.eng.tf_static(json.dumps(shared),nargout=1))
-            atomic_json(self.folder/'matlab_static.json',static)
-            raw=self.folder/'matlab_raw.json'
-            future=executor.eng.tf_run(json.dumps(shared),str(raw.resolve()),nargout=0,background=True)
-            try: future.result(timeout=timeout_s+30)
-            except Exception:
-                future.cancel(); raise
-            out=json.loads(raw.read_text(encoding='utf8')); self.timings['solve']=out['solve_s']
-            # MATLAB jsonencode represents a length-one numeric vector as scalar.
-            vector_fields=('qpos_rad','qvel_rad_s','actuator_command','command_m','tendon_length_m','target_lengths_m',
-                'requested_tension_n','desired_tension_n','predicted_tension_n','tension_tracking_error_n',
-                'solver_tendon_length_m','tension_n','solver_qfrc_actuator_nm','solver_qfrc_passive_nm','external_torque_nm','contact_normal_approx_n')
-            for row in out['trajectory']+out['observations']:
-                for key in vector_fields:
-                    if key in row and isinstance(row[key],(int,float)): row[key]=[row[key]]
-                if 'body_positions_m' in row and len(self.physics['parts'])==1:
-                    row['body_positions_m']=[row['body_positions_m']]
-                    row['body_rotations']=[row['body_rotations']]
-            return out['trajectory'],out['observations'],out['complete'],out['reason'] or None,out['numerical_steps']
-        finally: executor.close()
 
     def export(self): return self.result
 
     def close(self): pass
 
 
-class MujocoBackend(MatlabBackend):
+class MujocoBackend(SerialBackend):
     backend_id='backend.family_mujoco'
     model='mujoco_serial_bending_v1'
     tension_execution_modes=('ideal_tension','actuator_realistic')

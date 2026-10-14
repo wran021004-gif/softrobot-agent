@@ -20,28 +20,8 @@ def workspace_key(task,robot,parameters):
 
 
 def resolve_gvs_nmpc_control(inp,physics):
-    if inp.policy.controller.version=='5.0.0':
-        from .tracking import checked_tracking
-        from .gvs_profile import candidate_numerical, load_profile
-        control=checked_tracking(inp);p=control.recipe
-        numerical=candidate_numerical(inp,control,load_profile());point=numerical['nominal']
-    elif inp.policy.controller.version in ('3.0.0','4.0.0','6.0.0','7.0.0','8.0.0','9.0.0','10.0.0','11.0.0'):
-        from .gvs_profile import checked_reach, reach_numerical
-        p=checked_reach(inp).recipe
-        numerical=reach_numerical(inp)
-        point=numerical['nominal']
-    elif inp.policy.controller.version == '2.0.0':
-        from .gvs_profile import checked_profile
-        profile=checked_profile(inp)
-        p=GVSTrajectoryParameters.model_validate(profile['parameters'])
-        point=profile['numerical']['nominal']
-    else:
-        p=GVSTrajectoryParameters.model_validate(inp.policy.controller.parameters.data)
-        from .gvs_lqr import _candidate_operating_point
-        nominal_parameters=inp.policy.controller.parameters.model_copy(update={'data':{'basis':p.basis.model_dump(mode='json')}})
-        nominal_controller=inp.policy.controller.model_copy(update={'parameters':nominal_parameters})
-        nominal=inp.model_copy(update={'policy':inp.policy.model_copy(update={'controller':nominal_controller})})
-        point=_candidate_operating_point(nominal)
+    from .gvs_profile import checked_reach,reach_numerical
+    p=checked_reach(inp).recipe;numerical=reach_numerical(inp);point=numerical['nominal']
     basis=resolve_basis(inp.robot.structure.data,p.basis)
     plan=dict(mode='gvs_nmpc',tension_execution_mode='ideal_tension',
         robot=inp.robot.model_dump(mode='json'),task=inp.task.model_dump(mode='json'),
@@ -195,13 +175,6 @@ class GVSNMPCController:
         return command
 
 
-class ProfileNMPCController(GVSNMPCController):
-    """Explicit v2 identity: declarative preparation and execution-local workspace."""
-    def __init__(self,parameters,period_s):
-        from .gvs_profile import ProfileControl, load_profile
-        ProfileControl.model_validate(parameters)
-        self.profile=load_profile()
-        super().__init__(self.profile['parameters'],period_s)
 
 
 class ReachNMPCController(GVSNMPCController):
@@ -219,11 +192,6 @@ class ReachNMPCController(GVSNMPCController):
         super().configure(physics,plan)
 
 
-class TrackingNMPCController(ReachNMPCController):
-    def __init__(self,parameters,period_s):
-        from .tracking import TrackingControl
-        self.control=TrackingControl.model_validate(parameters)
-        GVSNMPCController.__init__(self,self.control.recipe,period_s)
 
 
 def deadline_horizon(duration_s, time_s, period_s, maximum):

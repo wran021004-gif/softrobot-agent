@@ -155,3 +155,21 @@ if __name__=='__main__':
     try: value=replay(request)
     except Exception as exc:value=dict(status='diagnostic_error',error=type(exc).__name__,message=str(exc))
     atomic_json(out,value)
+
+from tools.research.state import state,save,update
+from tools.platform_store import zero
+def recover_local(host):
+    s=state(host);p=s['pending'];out=Path(p['output'])
+    if not out.exists():raise ValueError('UNKNOWN_LOCAL_SOLVE_RETAINS_RESERVATION_NO_REPEAT')
+    value=read(out);row=host.store.lookup(host.run_id,p['worker_request_id']);charged=p['reserved_s']
+    value.update(execution_id=row['execution_id'],charged_numerical_s=charged,
+        source_execution=p['source_execution'],source_update_id=p['source_update_id'],owning_study=host.run_id,
+        origin=p['origin'],historical_input=p['historical_input'],recovered_output_without_solve=True)
+    with host.store.transaction() as db:
+        current=host.store.session(host.run_id,db)['state'];current.update(pending=None,
+            numerical_s=current['numerical_s']+charged,local_solve_s=current['local_solve_s']+charged,
+            numerical_reserved_s=current['numerical_reserved_s']-charged)
+        host.store.update_state(db,host.run_id,current)
+        host.store.complete(row,dict(request_id=row['request_id'],execution_id=row['execution_id'],caller=host.actor,
+            tool_id='research.core_local_solve',tool_version='1.0.0',execution_status='completed',charged=zero()),value,elapsed=charged,db=db)
+    return value

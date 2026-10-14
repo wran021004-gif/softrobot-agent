@@ -11,7 +11,7 @@ from typing import Literal
 from schemas.common import Contract
 from schemas.platform import Payload, Binding, VERSION
 from schemas.platform_math import MathematicalModel, ModelRequirement
-from tools.spec_tools import ROOT
+from tools.paths import ROOT
 from tools.state_io import digest
 from tools.artifact_tools import file_hash
 

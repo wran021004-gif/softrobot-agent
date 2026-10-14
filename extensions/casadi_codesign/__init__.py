@@ -1,1 +1,0 @@
-"""Bounded CasADi mathematical pilot."""

@@ -74,8 +74,8 @@ class LiveBoundary(httpx.AsyncBaseTransport):
         wire=json.loads(request.content)
         expected=pilot(host)['provider']
         if (str(request.url)!=expected['base_url'].rstrip('/')+'/chat/completions'
-            or wire.get('model')!='deepseek-flash' or wire.get('thinking')!={'type':'enabled'}
-            or wire.get('reasoning_effort')!='high' or wire.get('max_tokens')!=32768
+            or wire.get('model')!=expected['model'] or wire.get('thinking')!={'type':expected['thinking']}
+            or wire.get('reasoning_effort')!=expected['reasoning_effort'] or wire.get('max_tokens')!=expected['max_tokens']
             or wire.get('stream') is not False or wire.get('tool_choice','auto')!='auto'):
             raise ValueError('R3_PROVIDER_CONFIGURATION_MISMATCH')
         saved=pilot(host).get('unconsumed_response')
@@ -294,11 +294,11 @@ async def converse(host):
     formal=bool(state(host)['spec'].get('capabilities'))
     instructions=state(host)['spec']['execution_instructions']
     native=[PythonAgentTool(name,dict(name=name,description=description,inputSchema={'json':schema.model_json_schema()}),handler(kind))
-        for name,description,schema,kind in [('research_plan','Propose/search/execute/diagnose; confirm a fresh passing development result; explicitly revise a failed selection with confirm revise_selection=true only for changed science and capacity for two fresh confirmations. History never satisfies fresh gates; failures/counters persist. STOP seals study.',Plan,'plan'),
+        for name,description,schema,kind in [('research_plan','Propose/search/execute/diagnose; Select an exact publicly read fresh complete passing evaluation and freeze it; zero configured extra repetitions seals immediately. Positive configured confirmations preserve failures and identity. History never satisfies fresh gates; failures/counters persist. STOP seals study.',Plan,'plan'),
             ('experience_retrieve','Read-only case/procedure draft search/read with provenance',ExperienceQuery,'experience'),
             ('evidence_read','Read exact immutable evidence and JSON pointer',EvidenceQuery,'evidence')]]
     if formal or rl_mode:
-        actions=['propose','stop','diagnose','confirm'] if formal and state(host)['spec'].get('mode')!='rl_interface' else ['propose','stop']
+        actions=['propose','stop','diagnose','select','confirm'] if formal and state(host)['spec'].get('mode')!='rl_interface' else ['propose','stop']
         if formal and state(host)['spec'].get('mode')!='rl_interface': actions += [a for a,c in [('execute','nmpc'),('search','search'),('mechanics','mathematics'),('replay','replay')] if enabled(state(host)['spec'],c)]
         actions=state(host)['spec'].get('allowed_plan_actions',actions)
         schema=Plan.model_json_schema();schema['properties']['action']={'type':'string','enum':actions}
@@ -333,7 +333,7 @@ async def converse(host):
         guard(host)
         if protected(host):
             pilot=deepcopy(s['pilot']);pilot['request_deadline_unix']=execution_deadline(host);update(host,pilot=pilot)
-        current=packet(host); record(host,'model_decision_packet',current)
+        current=decision_packet(host); record(host,'model_decision_packet',current)
         agent.system_prompt=instructions+'\nCURRENT_RESEARCH_PACKET\n'+json.dumps(current)
         if protected(host):
             permitted=closeout_operations(host)
@@ -384,3 +384,11 @@ async def converse(host):
             record(host,'model_original_turn',dict(result=str(result)))
             if state(host)['pending'] or pending(host): raise ValueError('PENDING_OUTCOME_REQUIRES_LOCAL_RECOVERY')
     finally: await boundary.aclose()
+
+
+def decision_packet(host):
+    from tools.research.core import packet
+    result=packet(host);spec=result.pop('specification');result['configuration_identity']=spec['resolved_identity']
+    result['study']={k:spec[k] for k in ('study_id','capabilities','allowed_parameters','reference_parameters','analysis_protocol','scoring_window_s','budgets','rl_limits','confirmation','budget_semantics')}
+    result['available_actions']=spec['allowed_plan_actions']
+    return result

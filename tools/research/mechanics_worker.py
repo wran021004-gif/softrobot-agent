@@ -1,39 +1,31 @@
-"""Current-study reservation gate around the established numerical operations."""
-import sys
-import time
-import traceback
-from tools.state_io import read, atomic_json
-from tools.platform_store import Store
+"""Contained fixed-candidate mathematical worker, independent of retired workflows."""
+import sys,time,traceback
+from pathlib import Path
+from tools.state_io import read,atomic_json
+from tools.platform_store import plain
+from tools.service_execution import contain_worker_children
 
+def calculate(request):
+    from extensions.tendon_family.gvs_codesign import Workspace,integrate
+    from extensions.optimization.ipopt import IpoptSolver
+    cfg=request['configuration']
+    if request['operation']=='replay':
+        w=Workspace(cfg)
+        replay=integrate(w.functions,w.tip,w.velocity,request['trajectory'],cfg['task']['goal']['data']['target_m'])
+        return dict(status='computed',replay=replay,physical_validation='not_run; model integration only')
+    a=request['arguments'];w=Workspace(cfg,a['substeps'])
+    settings=dict(design_bounds=[0.,0.],design_initial=0.,position_weight=a['position_weight'],speed_weight=a['speed_weight'],secondary_coefficient=a['secondary_coefficient'],objective_mode=a['objective_mode'],initialization=a['initialization'])
+    problem=w.assemble('A',a['initialization'],settings)
+    solver=IpoptSolver(dict(max_iterations=120,tolerance=1e-6,max_cpu_s=None,max_wall_s=None,retain_feasible_iterate=True))
+    result=solver.solve(problem);trajectory=w.decode(result.optimum)
+    return dict(status=result.status,optimization_result=plain(result),diagnostics=solver.last_diagnostics,trajectory=trajectory,trajectory_metrics=w.metrics(trajectory),objective_definition=settings,physical_validation='not_run')
 
 def main():
-    request = read(sys.argv[1]); store = Store(request['store_root'])
-    s = store.session(request['study_id'])['state']; pending = s.get('pending') or {}
-    row = store.lookup(request['study_id'], request['request_id'])
-    if (not row or row['receipt'] or pending.get('kind') != 'mechanics' or
-        pending.get('worker_request_id') != request['request_id'] or pending.get('input') != sys.argv[1]):
-        raise ValueError('CURRENT_STUDY_ACTIVE_NUMERICAL_RESERVATION_REQUIRED')
-    started = time.perf_counter()
-    from tools.casadi_feedback_worker import solve, recover, clean
-    try:
-        if request['operation'] == 'solve':
-            value = solve(request['configuration'], request['arguments'], 'reverse',
-                request.get('saved_tensions'), request['progress'],
-                dict(study_id=request['study_id'], request_id=request['request_id'],
-                     implementation=request['implementation'], execution_id=row['execution_id'],offline_solver_s=request.get('offline_solver_s',570.),
-                     stopping_policy=request.get('offline_stopping_policy','historical_timed_v1')))
-        elif request['operation'] == 'recover': value = recover(read(request['progress']))
-        elif request['operation'] in ('integrate','inspect'):
-            from tools.research.numerics import offline_diagnostic
-            value=offline_diagnostic(request)
-        else:
-            from tools.casadi_codesign_worker import replay
-            value = replay(request['configuration'], request['candidate'])
-    except Exception as exc:
-        value = dict(status='engineering_error', exception_type=type(exc).__name__,
-                     termination_reason=str(exc), traceback=traceback.format_exc(),
-                     costs_s=dict(total=time.perf_counter()-started))
-    atomic_json(sys.argv[2], clean(value))
+    request=read(sys.argv[1]);started=time.perf_counter()
+    contain_worker_children()
+    try:value=calculate(request)
+    except Exception as exc:value=dict(status='engineering_error',reason=str(exc),traceback=traceback.format_exc())
+    value['elapsed_s']=time.perf_counter()-started
+    atomic_json(Path(sys.argv[1]).with_name('result.json'),value)
 
-
-if __name__ == '__main__': main()
+if __name__=='__main__':main()
