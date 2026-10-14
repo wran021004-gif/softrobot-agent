@@ -213,13 +213,15 @@ def dispatch(host, value, request_id, selected=None):
             raise ValueError('Declared per-trial RL ceiling exceeded')
         if (len(entries)>=caps['training_runs'] or sum(e['allocation']['actions'] for e in entries)+q.allocation.actions>caps['training_actions']
                 or sum(e['allocation']['active_seconds'] for e in entries)+q.allocation.active_seconds>caps['training_active_seconds']):
-            raise ValueError('Cumulative RL training ceiling exhausted')
+            raise ValueError('Requested allocation exceeds cumulative RL ceiling; remaining '+json.dumps(dict(
+                trials=caps['training_runs']-len(entries),actions=caps['training_actions']-sum(e['allocation']['actions'] for e in entries),
+                allocated_active_seconds=caps['training_active_seconds']-sum(e['allocation']['active_seconds'] for e in entries)))+'; model may choose a fitting allocation or STOP; no training started')
     else:
         if q.run_id not in s.get('rl_runs',{}): raise ValueError('Owned RL run required')
     if q.operation in ('start','resume'):
         work=config['budget'] if q.operation=='start' else reconcile(host,q.run_id)['remaining']
         training_capacity(host,work)
-    if q.operation=='evaluate' and selected is None and (s['spec'].get('ordinary_evaluation_limit')==0 or evaluation_capacity(host,1)['admitted']<1):
+    if q.operation=='evaluate' and selected is None and (s.get('selected') or s['spec'].get('ordinary_evaluation_limit')==0 or evaluation_capacity(host,1)['admitted']<1):
         from tools.research_core_feedback import confirmation_progress
         raise ValueError('Development evaluation rejected; confirmation uses '+json.dumps(confirmation_progress(host)))
     if q.operation=='evaluate' and evaluation_capacity(host,1,confirmation=selected is not None)['admitted']<1:

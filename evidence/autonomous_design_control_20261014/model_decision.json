@@ -1,0 +1,71 @@
+{
+  "reference": {
+    "artifact_id": "6333d196f9a6dc8e865a95a004602657ecfb9323029199508e932889db7dc65d",
+    "media_type": "application/json"
+  },
+  "admission": {
+    "admitted": 1,
+    "confirmation_launch_reserve": 2,
+    "confirmation_time_reserve_s": 1534.0978899898357,
+    "delivery_activity_reserve_s": 900,
+    "delivery_numerical_reserve_s": 0.0,
+    "independent_integration_reserve_s": 0.0,
+    "internal_launches": 1,
+    "numerical_reservation_s": 767.0489449949179,
+    "per_execution_s": 767.0489449949179,
+    "remaining_activity_s": 16417.085846424103,
+    "remaining_numerical_s": 14349.070664200117,
+    "requested": 1
+  },
+  "experience_read_bindings": [],
+  "origin": "model",
+  "original_plan": {
+    "action": "stop",
+    "candidate": null,
+    "diagnostic": null,
+    "expected_observation": "At least one accepted control route (direct RL, or residual RL on the advertised compatible reference) returning a passing independent evaluation of a published checkpoint, which could then be frozen with research_plan confirm and reproduced in two fresh post-selection episodes.",
+    "experience_disposition": {},
+    "fixed_conditions": "Frozen task 2b26edb4 (target [.29,.035,.19] m, zero initialization, 0.35 s, 0.01 s control, 0.0005 s MuJoCo, acceptance <=0.01 m terminal/holding and <=0.02 m/s holding on inclusive samples 30-35), seed 17, reach_free gravity; acceptance cannot be altered by reward or mathematics; NMPC inadmissible (no matched complete-timing evidence and the synchronous path cannot enforce the authorized hard outer cap); residual requires an advertised compatible runnable reference; no missing-policy or substitute-checkpoint evaluation; all failures retained; mathematical integration and MuJoCo acceptance kept as separate evidence.",
+    "hypothesis": "That a joint length-and-motion optimization of the two-segment 0.27 m tendon arm, followed by a learned controller on the returned design (direct, or residual on the advertised compatible mathematical reference), would yield an original-task-accepted execution confirmable twice.",
+    "interpretation": "The hypothesis is refuted within the authorized routes and budget. Joint optimization: both supported solves converged (Solve_Succeeded) with relaxed-NLP and reduced-model task feasibility, but their optima sit on the acceptance boundary — task_gap gave d=-0.2394 (lengths [0.15868,0.11132], pos 0.00745 m, speed 0.01976 m/s, slacks about -1e-8) and task_gap_with_effort drove d to -0.99998 (lengths [0.15450,0.11550], pos 0.0099998 m, speed 0.0199994 m/s, both essentially on the limits), so the effort-aware objective did NOT buy holding-speed margin. Independent integration (replay 93eb8edc): the .01 s sampled original task is reproduced (pos 0.007449 m, speed 0.018626 m/s) but the integration-consistency gate FAILS (node speed disagreement 0.015009 m/s vs a 0.002 m/s tolerance at t=0.2925 s), so the mathematical reference is NOT independently verified and reduced-model feasibility is not integration-robust in the holding window. Control: direct PPO on candidate ab14d206 (run de294ae0, 199936 actions, training summary fbfd8b7c) failed acceptance with terminal/holding position error 0.0737 m and holding speed 0.0748 m/s (explicitly read result 034b4c19) — a reaching failure; residual PPO on the same candidate with its advertised compatible reference (run 20d4fb90, 199936 actions, training summary 591c1099) reached well (0.00110 m / 0.00126 m) but failed holding speed at 0.0591 m/s (explicitly read result 1056fad5). A third training trial (direct, softened failure penalty -100 and ent_coef 0.01, 400000 actions) was rejected at admission: cumulative RL training ceiling exhausted. Therefore no eligible passing execution exists, NMPC is inadmissible, and the two required confirmations could not be started (0/2, no failures, no invalid executions). Consumption this turn: numerical about 3651 s, elapsed about 4198 s, 2 solves, 2 completed training runs each with 199936 effective actions, 2 development evaluations, 1 replay, 1 rejected third trial. Reported position/speed values are reduced-model or single deterministic-episode values, not robustness or generalization claims; no superiority, global-optimum or root-cause claim is made.",
+    "mechanics": null,
+    "mechanics_source": null,
+    "next_step": "revise_design",
+    "parameters": null,
+    "search": null,
+    "selected_execution": null,
+    "stopping_condition": "Stop once no authorized route remains to a passing, confirmable execution: NMPC inadmissible, both learned policies failed the frozen thresholds on the selected design, the cumulative RL training ceiling was exhausted (third trial rejected), and at most two solves are used; no further solves, trials, replays or evaluations are attempted.",
+    "supporting_evidence": [
+      {
+        "artifact_id": "a4e5b3184910c7140af2c1ee987c69a84569625b0787ef9084d1357a8c68c978",
+        "media_type": "application/json"
+      },
+      {
+        "artifact_id": "6fe85a2b77aec389ea1ab82514d443006394abbfecd4b9e2a139ac1a9c1e7885",
+        "media_type": "application/json"
+      },
+      {
+        "artifact_id": "93eb8edcdfbe245d2e8b3d32e011b3f9a6cfa652dcc3c878858a639a71b18a96",
+        "media_type": "application/json"
+      },
+      {
+        "artifact_id": "fbfd8b7c2fe5d7222119c0de4e1252941ab491871318a99ba23789547554b782",
+        "media_type": "application/json"
+      },
+      {
+        "artifact_id": "591c1099996cb18e350e7b0a4f350feda398b0eeb60809cffac52744cc6340ea",
+        "media_type": "application/json"
+      },
+      {
+        "artifact_id": "034b4c1943763ddd3bec1d9d09af18db2172b1eecd0291d7b64dadd9aa3c50a7",
+        "media_type": "application/json"
+      },
+      {
+        "artifact_id": "1056fad5c7a463b9ebbbd7062ed582dc4fe822c66cefc543c33fe757bbfc1913",
+        "media_type": "application/json"
+      }
+    ],
+    "weakening_observation": "Both learned controllers failing the frozen thresholds on the selected joint design, the independent integration-consistency gate failing, and the cumulative RL training ceiling being exhausted before any passing checkpoint exists — so no eligible execution can be frozen and no confirmation attempted."
+  },
+  "request_id": "native-call_00_YG5CLJXRUutyFL5aAyGH9282"
+}

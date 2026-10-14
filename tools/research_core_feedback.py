@@ -70,7 +70,7 @@ def eligibility(host, reference):
     except (ValueError,KeyError) as exc:
         reasons.append(str(exc));count=0
     if s['research_status']=='stopped':reasons.append('study sealed after STOP')
-    return dict(eligible=not reasons,reasons=reasons,required_field='selected_execution',selected_execution=ref,owning_study=host.run_id,completed_confirmations=count,progress=confirmation_progress(host,ref))
+    return dict(eligible=not reasons,reasons=reasons,required_field='selected_execution',selected_execution=ref,owning_study=r.get('study',r.get('owning_study',host.run_id)),historical_input=ref in s.get('linked_selections',[]),completed_confirmations=count,progress=confirmation_progress(host,ref))
 
 
 def facts(host):

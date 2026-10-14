@@ -397,3 +397,20 @@ unmeasured. A training failure without a policy returns its actual summary for m
 The optional NMPC first-use launch remains unavailable: synchronous simulation checks time
 between steps and the host seals overruns after return, so an outer hard cap is not enforceable
 without broader execution changes. Matching complete timing remains required.
+
+
+The completion study passed its one new confirmation: one historical plus one new
+satisfies the unchanged two-confirmation requirement (8.070 mm error, 0.010760 m/s speed).
+The new formal model chose implicit midpoint/four substeps for two joint solves,
+then direct and residual PPO on d=-0.239424. Both backend policies failed; residual
+reached within 1.258 mm but exceeded speed at 0.059066 m/s. BDF reproduced the sampled
+mathematical task but failed the velocity-consistency gate, leaving the reference
+unverified. The model elected STOP with zero formal confirmations. Its third trial's
+1800-second request was rejected; a smaller 1200-second allocation remained within
+ceilings and was not requested. Original decisions are preserved with factual
+qualifications; no study was restarted. Preparation now links declared historical
+artifacts, and rejection feedback reports actual remaining allocation.
+See `evidence/confirmation_completion_20261014/scientific_summary.json`,
+`evidence/autonomous_design_control_20261014/scientific_summary.json` and
+`evidence/autonomous_study_closeout_20261014/campaign_summary.json` for outcomes,
+separate historical/new costs, original traces and runtime manifests.

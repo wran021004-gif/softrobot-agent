@@ -525,7 +525,7 @@ class FormalControlTests(TestCase):
                 self.assertEqual(core.claims(h)['independent_confirmation_count'],2)
                 self.assertEqual(sealed,original);self.assertEqual(core.state(h)['rl_runs'][binding['run_id']]['evaluations'],3)
                 self.assertEqual(core.state(h)['rl_runs'][binding['run_id']]['allocation']['actions'],0)
-                entry=core.state(h)['rl_runs'];entry[binding['run_id']]['evaluations']=0;core.update(h,rl_runs=entry)
+                entry=core.state(h)['rl_runs'];entry[binding['run_id']]['evaluations']=0;core.update(h,rl_runs=entry,selected=None)
                 with patch.object(core,'guard'),patch.object(bridge,'invoke',side_effect=RuntimeError('fixture packaging exception')):
                     with self.assertRaisesRegex(RuntimeError,'packaging'):bridge.dispatch(h,q,'failed-packaging')
                 row=h.store.lookup(h.run_id,'failed-packaging');self.assertEqual(core.json.loads(row['receipt'])['execution_status'],'failed')
@@ -622,6 +622,15 @@ class ConfirmationCompletionTests(TestCase):
             q=dict(operation='evaluate',run_id=spec['rl_evaluation_source']['run_id'],checkpoint=spec['rl_evaluation_source']['checkpoint'],rationale='wrong confirmation operation')
             with patch.object(core,'guard'),patch.object(bridge,'invoke',side_effect=AssertionError('ordinary evaluation must not run')):
                 with self.assertRaisesRegex(ValueError,'research_plan.*confirm.*41a7df9f'):bridge.dispatch(h,q,'wrong')
+            spec['ordinary_evaluation_limit']=1;core.update(h,spec=spec)
+            with patch.object(core,'guard'),patch.object(bridge,'evaluation_capacity',return_value={'admitted':1}),patch.object(bridge,'invoke',side_effect=AssertionError('frozen ordinary evaluation forbidden')):
+                with self.assertRaisesRegex(ValueError,'research_plan.*confirm'):bridge.dispatch(h,q,'wrong-after-freeze')
+            formal=read(core.ROOT/'examples/research_core/autonomous_design_control.json')
+            formal.update(study_id='linked-history-fixture-'+core.Path(folder).name,started_unix=time.time())
+            formal_path=core.Path(folder)/'formal.json';core.atomic_json(formal_path,formal)
+            linked=core.prepare(formal_path,core.Path(folder)/'linked')
+            for ref in formal['historical_evidence']['references'].values():
+                self.assertIn(ref,core.state(linked)['scoped_context']);linked.store.artifact(ref)
             self.assertEqual(s['selected'],spec['rl_evaluation_source']['selected_execution'])
             import gc;gc.collect()
 
@@ -643,3 +652,15 @@ class ConfirmationCompletionTests(TestCase):
             gate=core.nmpc_timing(SimpleNamespace(),'candidate')
             self.assertFalse(gate['available']);self.assertIsNone(gate['complete_execution_s'])
             self.assertIn('cannot enforce',gate['first_use_limitation'])
+
+    def test_rejected_allocation_returns_actual_remaining_capacity(self):
+        from types import SimpleNamespace
+        from tools import research_core_rl as bridge
+        spec=read(core.ROOT/'examples/research_core/autonomous_design_control.json')
+        entries={str(n):dict(request_identity='fixture',allocation={'actions':199936,'active_seconds':1200}) for n in range(2)}
+        h=SimpleNamespace(run_id='fixture',store=SimpleNamespace(lookup=lambda *a:None))
+        state=dict(spec=spec,rl_runs=entries)
+        q=dict(operation='start',candidate={'artifact_id':'c'*64},mode='direct',allocation={'actions':400000,'active_seconds':1800},rationale='over allocated seconds')
+        with patch.object(core,'state',return_value=state),patch.object(core,'guard'),patch.object(core,'admit_closeout'),patch.object(bridge,'prepare_input',return_value=({},{})),patch.object(bridge,'invoke',side_effect=AssertionError('must not start')):
+            with self.assertRaisesRegex(ValueError,'remaining.*trials.*1.*allocated_active_seconds.*1200.*no training started'):
+                bridge.dispatch(h,q,'over-allocation')

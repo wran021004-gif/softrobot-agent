@@ -212,6 +212,14 @@ def prepare(spec_path=DEFAULT_SPEC, directory=None):
         pilot=dict(provider=model,live_model_requests=0,framework_session_id=run_id,
             request_deadline_unix=spec['started_unix']+spec['budgets']['activity_s']-spec['budgets']['delivery_reserve_s']))
     update(h,scoped_context=[save(h,read(ROOT/path),'supplied_scoped_context') for path in spec.get('supplied_evidence',[])])
+    history_spec=spec.get('historical_evidence',{})
+    if history_spec.get('source_study_id'):
+        from tools.platform_store import Store
+        source_store=Store(ROOT/'runs'/history_spec['source_study_id']);refs=list(history_spec['references'].values())
+        for ref in refs:
+            if save(h,source_store.artifact(ref),'linked_advertised_historical_evidence')!=ref:
+                raise ValueError('Historical evidence identity changed')
+        update(h,scoped_context=[*state(h)['scoped_context'],*refs])
     # Compact supplied history is explicitly different from retrieval.
     history = read(ROOT/'evidence/nmpc_settling_20261011/scientific_summary.json')
     ref = save(h, history, 'supplied_historical_context')
