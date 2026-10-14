@@ -11,7 +11,7 @@ from tools.research.config import resolve,ROOT
 from tools.research.design import full_science
 from tools.research.state import state,update,save
 from tools.research import core,feedback,analysis,rl
-from tools.research.contracts import Search
+from tools.research.contracts import Search,AnalysisRequest
 
 
 class MainlineTests(unittest.TestCase):
@@ -83,6 +83,26 @@ class MainlineTests(unittest.TestCase):
         self.assertEqual(self.host.store.remaining()['used'],used)
         self.assertEqual(reused['operation_reuse']['additional_scientific_executions'],0)
 
+    def test_analysis_recovery_and_receipt_prevent_duplicate_charge_or_worker(self):
+        from tools.state_io import atomic_json
+        from tools.service_execution import _run_contained
+        q=plain(AnalysisRequest(candidate=self.candidate,operation='controllability',operating_point='target_equilibrium',
+            protocol=self.spec['analysis_protocol'],scoring_window_s=.35))
+        key='recovery-fixture-analysis';cap=self.spec['analysis_cap_s']
+        self.host.store.reserve(self.host.run_id,key,digest(q),self.host.actor,{**zero(),'wall_s':cap})
+        folder=Path(self.tmp.name)/'analysis';folder.mkdir()
+        atomic_json(folder/'boundary.json',dict(termination_confirmed=True,elapsed_s=.4,returncode=0))
+        atomic_json(folder/'result.json',dict(status='computed',proxy_values={'held_position_min_eigenvalue':1.},internal_calculations=[]))
+        (folder/'worker.log').write_text('fixture, no solve')
+        update(self.host,pending=dict(folder=str(folder),worker_request_id=key,request=q,origin='fixture',implementation='fixture',reserved_s=cap),
+            numerical_reserved_s=cap,mathematical_evaluations=1)
+        first=analysis.recover(self.host);used=self.host.store.remaining()['used'];spent=state(self.host)['numerical_s']
+        with patch('tools.service_execution._run_contained') as worker,patch.object(core,'guard') as guarded:
+            second=analysis.dispatch(self.host,q,'recovery-fixture',guard=guarded)
+            worker.assert_not_called();guarded.assert_not_called()
+        self.assertEqual(second['reference'],first['reference']);self.assertEqual(state(self.host)['numerical_s'],spent)
+        self.assertEqual(self.host.store.remaining()['used'],used);self.assertEqual(state(self.host)['mathematical_evaluations'],1)
+
     def test_explicit_score_window_and_mixed_control_capability(self):
         p=self.spec['reference_parameters'];q=dict(variables=['segments.near.length_m'],bounds={'segments.near.length_m':[.152,.168]},
             fixed=p,objective='held_position_min_eigenvalue',operating_point='target_equilibrium',protocol=self.spec['analysis_protocol'],scoring_window_s=.35,max_evaluations=2)
@@ -102,6 +122,53 @@ class MainlineTests(unittest.TestCase):
         self.assertEqual(args.args[0][0],runtime['rl_python']);self.assertLessEqual(args.kwargs['timeout'],17)
         self.assertEqual(args.kwargs['env']['OPENBLAS_NUM_THREADS'],'1')
         self.assertIn('SOFTROBOT_RL_RUNS',args.kwargs['env'])
+
+    def test_owned_rl_worker_inherits_run_directory(self):
+        from tools.rl import run
+        directory=Path(self.tmp.name)/'owned'/'worker';directory.mkdir(parents=True)
+        run.write_json(directory/'config.json',dict(budget=dict(active_seconds=10)))
+        worker_state=dict(consumed=dict(active_seconds=0))
+        with patch.object(run.subprocess,'Popen',return_value=SimpleNamespace(pid=1234)) as started,patch.object(run,'process_birth',return_value=1):
+            run.launch(directory,worker_state,self.spec['runtime']['rl_python'])
+        env=started.call_args.kwargs['env']
+        self.assertEqual(env['SOFTROBOT_RL_RUNS'],str(directory.parent))
+        self.assertEqual(env['OMP_NUM_THREADS'],'1')
+
+    def test_physical_reference_and_rl_seed_have_single_input_owner(self):
+        raw=json.loads((ROOT/'configs/research/study.json').read_text())
+        runtime=json.loads((ROOT/'configs/research/runtime.json').read_text())
+        self.assertNotIn('segments',raw['reference_parameters']);self.assertNotIn('seed',runtime['rl_defaults'])
+        robot=json.loads((ROOT/'configs/research/robot.json').read_text())['robot']['structure']['data']
+        for part in robot['components']:
+            if part['kind']=='flexible_segment':
+                self.assertEqual(self.spec['reference_parameters']['segments'][part['id']]['length_m'],part['length_m'])
+        self.assertEqual(self.spec['runtime']['rl_defaults']['seed'],self.cfg['seed'])
+
+    def test_fixed_total_search_and_static_or_saved_horizon_contracts(self):
+        from tools.research.search import coordinate_layout
+        q=Search(variables=['segments.near.length_m','segments.distal1.length_m'],
+            bounds={'segments.near.length_m':[.152,.168],'segments.distal1.length_m':[.1045,.1155]},
+            fixed=self.spec['reference_parameters'],objective='held_position_min_eigenvalue',operating_point='target_equilibrium',
+            protocol=self.spec['analysis_protocol'],scoring_window_s=.35,max_evaluations=2)
+        layout=coordinate_layout(q,dict(fixed_total_m=.27))
+        self.assertEqual(len(layout['names']),1);self.assertIsNotNone(layout['dependent_length'])
+        braking=AnalysisRequest(candidate=self.candidate,execution=self.result,update_id=34,operation='braking',operating_point='saved_state',protocol=self.spec['analysis_protocol'])
+        self.assertIsNone(braking.scoring_window_s)
+        with self.assertRaisesRegex(ValueError,'EXPLICIT_SCORE_WINDOW_REQUIRED'):
+            AnalysisRequest(candidate=self.candidate,operation='controllability',protocol=self.spec['analysis_protocol'])
+
+    def test_native_residual_reference_requires_exact_channel_order(self):
+        from extensions.tendon_family import backends,scene
+        order=[t['id'] for t in self.cfg['robot']['structure']['data']['tendons']]
+        trajectory=dict(tendon_order=order,tensions_n=[[.2]*len(order)]*35,times_s=[k*.01 for k in range(36)])
+        request=save(self.host,dict(configuration=self.cfg))
+        value=dict(operation='solve',design_candidate=self.candidate,trajectory=trajectory,original_request=request)
+        ref=save(self.host,value);update(self.host,mechanics_results=[ref])
+        with patch.object(backends,'physics_for',return_value=dict(tendons=[dict(entity=t) for t in order])),patch.object(scene,'assemble',return_value=dict(task_identity=digest(self.cfg['task']))):
+            self.assertTrue(rl.compatible_references(self.host)[0]['available'])
+            value['trajectory']['tendon_order']=list(reversed(order))
+            update(self.host,mechanics_results=[save(self.host,value)])
+            self.assertFalse(rl.compatible_references(self.host)[0]['available'])
 
     def test_tracked_file_inventory_and_import_closure(self):
         files=subprocess.check_output(['git','ls-files'],cwd=ROOT,text=True).splitlines()

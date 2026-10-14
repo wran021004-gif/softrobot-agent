@@ -9,7 +9,7 @@ from openai import AsyncOpenAI
 from strands.models.openai import OpenAIModel
 from strands_harness import create_harness
 from tools.platform_store import plain,zero,encode
-from tools.state_io import atomic_json,digest
+from tools.state_io import atomic_json,digest,read
 from tools.research.state import *
 CALLER='research-provider'
 class DeepSeekModel(OpenAIModel):

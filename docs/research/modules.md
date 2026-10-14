@@ -24,6 +24,8 @@ The implementation starts from research-chain `5cf08f8ef9323e4309dbc7206366c728e
 
 The existing Host/Store, execution completion, task acceptance, containment, RL machinery, physical Design/contracts/compiler/sections/geometry/routing, GVS/projection/NMPC/MuJoCo and mathematical kernels remain shared. `file_lock.py` extracts the required OS owner lock; `paths.py` extracts the shared root constant. The unused old optimizer and schema are removed; `search.py` retains its bounded coordinate proposal, pending-proposal checkpoint and evaluator accounting logic for the current fixed topology. The full old topology enumeration is retired.
 
+Physical reference lengths, dimensions and moduli derive from `robot.json`; the study stores explicit nonzero `reference_edits` when needed, rather than a second editable physical baseline. RL seed derives from the task. The shared optimizer interface retains only the coordinate kernel actually called here.
+
 `configs/research/study.json` owns topology scope, editable grants, variable/fixed choice, controller defaults, score window, budgets, confirmation policy and explicit history. `robot.json` owns physical source and discretization. `tasks/reach_hold.json` owns task/acceptance/seed. `runtime.json` owns provider, interpreter, threads, process caps and RL defaults. Derived protocol timing/lengths and controller acceptance payloads are resolved once. Controller cost scales/weights remain separate from task acceptance thresholds. The original historical controller recipe is data, not an active default.
 
 ## First-stage design space
@@ -36,6 +38,8 @@ Continuous `young_pa` requires material authority; named baseline/compliant/stif
 
 Only hierarchical coordinate search is exposed. Conservative bounds are editable study choices, not universal family physics restrictions. Candidate construction validates positive physical values, identities, actual physical compiler/routing checks and named zero initialization. The fixed-candidate mathematical solve/replay route has no numerical allocation in this assignment; its output is never task acceptance.
 
+Fixed-total search removes one dependent length coordinate and derives it from the declared total; both length bounds remain enforced. A single selected length under a fixed total returns a clear limitation. Explicit scoring requests select declared windows. Saved-state scores cannot extend beyond actual remaining task time; endpoint/braking requests need no invented positive scoring window at terminal time. Equilibrium residuals have a static construction horizon.
+
 ## Evidence and lifecycle
 
 Held-position minimum Gramian eigenvalue is a local finite-horizon position-output controllability score under declared normalization. Input is held over each control interval; it does not mean the task holding window passed. Signed incremental Gramian authority does not fully represent unilateral bounded-tension feasibility. It is not damping, decay, global feasibility or structural improvement. The score window is explicit in the request/protocol and objective identity. Equilibrium residuals describe a bounded local construction. Saved-state analysis retains exact robot/execution/update/projection and previous applied input, using actual remaining time; no transfer to changed robots is supported. GVS estimates and measured MuJoCo motion remain distinct.
@@ -47,5 +51,7 @@ Four protected sends are inside the total 24; 600 closeout seconds are inside th
 ## Migration inventory and next boundary
 
 The exhaustive [module inventory](../../evidence/research_mainline_20261015/module_inventory.json) records each affected script's previous/new paths, keep/split/merge/delete/add/modify decision, public interfaces, incoming/outgoing dependencies, before/after physical lines, substantive additions/deletions and exact detected relocated definitions. The [deletion audit](../../evidence/research_mainline_20261015/deletion_audit.json) records exact removed paths and their preserved source-branch Git blobs. Acceptance inspects the Git-controlled file inventory, not just entrypoint imports.
+
+The [bounded result](results.md) is a sealed model STOP without selection. The live bound implementation is recorded separately from later delivery repairs. Saved-data verification exposed a genuine holding-speed failure (0.023210 m/s against 0.020 m/s) after the originally failed profile packaging. Required report-helper restoration, owned RL run-root propagation, archive cache declarations, single-source defaults and remaining unused adapters were repaired without reopening the study. Bootstrap/recovery/reference tests use fixtures; repaired RL training and independent evaluation were not rerun in this scientific study. Original failures, receipts, model interpretations and the conservative RL charge remain intact.
 
 Next: variable tendon count with explicit start/guide/anchor routes across segment identities, validating guide ownership and channel order for every candidate. Then: variable segment count and conditional continuous optimization. Neither is currently connected by the research interface.

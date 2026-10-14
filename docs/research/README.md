@@ -20,3 +20,12 @@ $researchPython='D:/softrobot-agent/.mainline5-env/Scripts/python.exe'
 Study IDs are single use. Never reopen sealed studies or reset counters. Repairs require a commit and explicit `migrate --reason '...'`. Read historical evidence with its original identity; old artifact bytes/hashes remain intact. A timeout is incomplete execution. Provider credentials are loaded only into the process from the existing credential file and never exported.
 
 The 24 provider requests include four protected requests. The 14,400 live seconds include 600 closeout seconds. Independent RL evaluations keep the configured 120-second process cap and also consume the remaining cumulative numerical/activity budgets. Extra confirmations are zero; one independent RL evaluation is still required after training.
+
+The checked-in study is sealed; `status` and `export` read its outcome. Do not run it again. See [the actual bounded result](results.md). The model selected STOP without a solution. The saved complete nominal simulation failed holding speed; the original profile-packaging failure and unusable RL trial remain recorded even after delivery repairs. Start a future authorized study with a new ID; copying or reopening the old ledger does not create new budget.
+
+```powershell
+& $researchPython -m unittest discover -s tests/research -v
+git ls-files
+```
+
+Inspect [the exact controlled-file inventory](../../evidence/research_mainline_20261015/tracked_files.json) and [caller/deletion audit](../../evidence/research_mainline_20261015/deletion_audit.json) as part of acceptance. All scientific preflight, failed attempts and postseal saved-data verification costs stay in the same exported ledger; fixture tests launch no real scientific work.

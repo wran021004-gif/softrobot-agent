@@ -28,7 +28,7 @@ def dispatch(host,operation,arguments,key):
         old=source(host,arguments);candidate=old['design_candidate'];cfg=verify_candidate(host,candidate)['configuration'];trajectory=old['trajectory']
     available=min(s['spec']['budgets']['numerical_s']-s['numerical_s']-s['numerical_reserved_s'],s['cutoff_unix']-time.time(),host.store.remaining()['remaining']['wall_s'])
     if available<grant:raise ValueError('MATHEMATICAL_NUMERICAL_BUDGET_EXHAUSTED')
-    request=dict(operation=operation,configuration=cfg,design_candidate=candidate,arguments=plain(arguments) if operation=='solve' else None,trajectory=trajectory)
+    request=dict(operation=operation,configuration=cfg,design_candidate=candidate,arguments=plain(arguments) if operation=='solve' else None,trajectory=trajectory,study_id=host.run_id,store_root=str(host.store.root),request_id=key+'-mechanics')
     worker_key=key+'-mechanics';old=host.store.lookup(host.run_id,worker_key)
     if old:
         if old['request_hash']!=digest(request):raise ValueError('MATHEMATICAL_OPERATION_COLLISION')

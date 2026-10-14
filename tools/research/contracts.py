@@ -65,10 +65,12 @@ class AnalysisRequest(Contract):
     execution: EvidenceRef | None = None
     update_id: int | None = Field(default=None,ge=0,le=34,strict=True)
     protocol: TaskAnalysisProtocol
-    scoring_window_s: FiniteFloat = Field(gt=0)
+    scoring_window_s: FiniteFloat | None = Field(default=None,gt=0)
 
     @model_validator(mode='after')
     def exact_state(self):
+        if self.operation in ('linearization','controllability') and self.scoring_window_s is None:
+            raise ValueError('EXPLICIT_SCORE_WINDOW_REQUIRED')
         if (self.execution is None)!=(self.update_id is None):raise ValueError('EXECUTION_REQUIRES_UPDATE_ID')
         sources=int(self.saved_state is not None)+int(self.execution is not None)
         if sources>1 or (self.operating_point=='saved_state')!=(sources==1):raise ValueError('SAVED_POINT_REQUIRES_UNAMBIGUOUS_STATE_SOURCE')

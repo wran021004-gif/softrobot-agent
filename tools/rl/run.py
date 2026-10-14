@@ -240,7 +240,8 @@ def launch(directory, state, interpreter):
     # service environment variables are inspected or forwarded explicitly.
     env = {key: os.environ[key] for key in ("SystemRoot", "WINDIR", "PATH", "TEMP", "TMP", "USERPROFILE",
            "APPDATA", "LOCALAPPDATA", "COMSPEC", "PATHEXT") if key in os.environ}
-    env.update(OPENBLAS_NUM_THREADS="1", OMP_NUM_THREADS="1", MKL_NUM_THREADS="1")
+    env.update(OPENBLAS_NUM_THREADS="1", OMP_NUM_THREADS="1", MKL_NUM_THREADS="1",
+               SOFTROBOT_RL_RUNS=str(directory.parent))
     process = None
     try:
         with (directory / "worker.log").open("a", encoding="utf-8") as log:

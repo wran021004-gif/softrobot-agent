@@ -12962,8 +12962,7 @@
         "extensions.tendon_family.gvs",
         "extensions.tendon_family.manifest",
         "extensions.tendon_family.model_applicability",
-        "extensions.tendon_family.scene",
-        "extensions.tendon_family.scientific_optimization"
+        "extensions.tendon_family.scene"
       ],
       "outgoing": [
         "schemas.common",
@@ -13352,10 +13351,8 @@
       ],
       "incoming": [
         "extensions.tendon_family.gvs_codesign",
-        "extensions.tendon_family.gvs_lqr",
         "extensions.tendon_family.gvs_trajectory",
         "extensions.tendon_family.manifest",
-        "extensions.tendon_family.scientific_optimization",
         "tools.research.diagnostic",
         "tools.research.mechanics_worker"
       ],
@@ -13460,8 +13457,7 @@
       ],
       "incoming": [
         "extensions.reference.implementation",
-        "extensions.tendon_family.manifest",
-        "extensions.tendon_family.tracking"
+        "extensions.tendon_family.manifest"
       ],
       "outgoing": [
         "schemas.common",
@@ -13484,37 +13480,28 @@
     {
       "previous_path": "extensions/reference/implementation.py",
       "new_path": "extensions/reference/implementation.py",
-      "decision": "keep",
+      "decision": "modify",
       "responsibility": "Required shared numerical/physical/execution contract or kernel",
       "important_callables": [
-        "initialize",
-        "initialize_legacy",
         "reach_task",
-        "hold_task",
-        "LengthController",
-        "ReferenceBackend",
         "evaluate_signals",
-        "evaluate_reach",
-        "evaluate_hold",
-        "ScalarSequenceSearch",
-        "vector_norm"
+        "evaluate_reach"
       ],
       "incoming": [
         "extensions.tendon_family.manifest"
       ],
       "outgoing": [
         "extensions.reference.contracts",
-        "schemas.platform",
-        "tools.state_io"
+        "schemas.platform"
       ],
       "before_lines": 213,
-      "after_lines": 213,
-      "physical_additions": 0,
-      "physical_deletions": 0,
+      "after_lines": 57,
+      "physical_additions": 5,
+      "physical_deletions": 161,
       "exact_relocations": [],
       "relocated_lines": 0,
-      "substantive_deletions": 0,
-      "substantive_additions": 0,
+      "substantive_deletions": 161,
+      "substantive_additions": 5,
       "source_git_blob": "8fdd7223f6d68cc60f6e4d8cadb54f58b6c0b3f2"
     },
     {
@@ -13899,13 +13886,13 @@
         "tools.state_io"
       ],
       "before_lines": 292,
-      "after_lines": 264,
-      "physical_additions": 3,
-      "physical_deletions": 31,
+      "after_lines": 263,
+      "physical_additions": 6,
+      "physical_deletions": 35,
       "exact_relocations": [],
       "relocated_lines": 0,
-      "substantive_deletions": 31,
-      "substantive_additions": 3,
+      "substantive_deletions": 35,
+      "substantive_additions": 6,
       "source_git_blob": "674901d1a8617dbdc8bd605924cea96fbbc63bec"
     },
     {
@@ -14148,14 +14135,12 @@
       "incoming": [
         "extensions.tendon_family.backends",
         "extensions.tendon_family.compiler",
-        "extensions.tendon_family.control",
         "extensions.tendon_family.execution",
         "extensions.tendon_family.generated_serial",
         "extensions.tendon_family.gvs",
         "extensions.tendon_family.gvs_basis",
         "extensions.tendon_family.gvs_casadi",
         "extensions.tendon_family.gvs_codesign",
-        "extensions.tendon_family.gvs_lqr",
         "extensions.tendon_family.gvs_nmpc",
         "extensions.tendon_family.gvs_profile",
         "extensions.tendon_family.gvs_projection",
@@ -14167,10 +14152,8 @@
         "extensions.tendon_family.model_applicability",
         "extensions.tendon_family.pcc",
         "extensions.tendon_family.scene",
-        "extensions.tendon_family.scientific_optimization",
         "extensions.tendon_family.sections",
         "extensions.tendon_family.signals",
-        "extensions.tendon_family.tracking",
         "tools.research.core",
         "tools.research.diagnostic",
         "tools.research.feedback"
@@ -14197,31 +14180,23 @@
     {
       "previous_path": "extensions/tendon_family/control.py",
       "new_path": "extensions/tendon_family/control.py",
-      "decision": "keep",
+      "decision": "modify",
       "responsibility": "Required shared numerical/physical/execution contract or kernel",
       "important_callables": [
-        "execute_tension_reference",
-        "execute_ideal_tension",
-        "resolve_control",
-        "Controller"
+        "execute_ideal_tension"
       ],
       "incoming": [
-        "extensions.tendon_family.gvs_lqr",
-        "extensions.tendon_family.gvs_nmpc",
-        "extensions.tendon_family.scene"
+        "extensions.tendon_family.gvs_nmpc"
       ],
-      "outgoing": [
-        "extensions.tendon_family.contracts",
-        "tools.state_io"
-      ],
+      "outgoing": [],
       "before_lines": 171,
-      "after_lines": 171,
-      "physical_additions": 0,
-      "physical_deletions": 0,
+      "after_lines": 11,
+      "physical_additions": 1,
+      "physical_deletions": 161,
       "exact_relocations": [],
       "relocated_lines": 0,
-      "substantive_deletions": 0,
-      "substantive_additions": 0,
+      "substantive_deletions": 161,
+      "substantive_additions": 1,
       "source_git_blob": "d180451687b2b67a886816022e2c88927dfe9ed7"
     },
     {
@@ -14615,11 +14590,9 @@
       "incoming": [
         "extensions.tendon_family.gvs_casadi",
         "extensions.tendon_family.gvs_codesign",
-        "extensions.tendon_family.gvs_lqr",
         "extensions.tendon_family.gvs_trajectory",
         "extensions.tendon_family.manifest",
-        "extensions.tendon_family.math_analysis",
-        "extensions.tendon_family.scientific_optimization"
+        "extensions.tendon_family.math_analysis"
       ],
       "outgoing": [
         "extensions.experiment_dynamics.contracts",
@@ -14731,11 +14704,8 @@
       ],
       "incoming": [
         "extensions.tendon_family.gvs_codesign",
-        "extensions.tendon_family.gvs_lqr",
-        "extensions.tendon_family.gvs_sampled",
         "extensions.tendon_family.gvs_trajectory",
-        "extensions.tendon_family.math_analysis",
-        "extensions.tendon_family.scientific_optimization"
+        "extensions.tendon_family.math_analysis"
       ],
       "outgoing": [
         "extensions.tendon_family.contracts",
@@ -14792,42 +14762,24 @@
     },
     {
       "previous_path": "extensions/tendon_family/gvs_lqr.py",
-      "new_path": "extensions/tendon_family/gvs_lqr.py",
-      "decision": "keep",
-      "responsibility": "Required shared numerical/physical/execution contract or kernel",
+      "new_path": null,
+      "decision": "delete",
+      "responsibility": "Retired executable/workflow or legacy-only test; preserved source Git blob",
       "important_callables": [
         "_nominal_environment",
         "_candidate_operating_point",
         "resolve_gvs_lqr_control",
         "GVSLQRController"
       ],
-      "incoming": [
-        "extensions.tendon_family.gvs_sampled",
-        "extensions.tendon_family.scene"
-      ],
-      "outgoing": [
-        "extensions.optimization.ipopt",
-        "extensions.tendon_family.contracts",
-        "extensions.tendon_family.control",
-        "extensions.tendon_family.gvs",
-        "extensions.tendon_family.gvs_casadi",
-        "extensions.tendon_family.gvs_projection",
-        "extensions.tendon_family.gvs_sampled",
-        "extensions.tendon_family.pcc",
-        "extensions.tendon_family.scientific_optimization",
-        "schemas.platform",
-        "schemas.platform_math",
-        "tools.platform_optimization",
-        "tools.platform_registry",
-        "tools.state_io"
-      ],
+      "incoming": [],
+      "outgoing": [],
       "before_lines": 233,
-      "after_lines": 233,
+      "after_lines": 0,
       "physical_additions": 0,
-      "physical_deletions": 0,
+      "physical_deletions": 233,
       "exact_relocations": [],
       "relocated_lines": 0,
-      "substantive_deletions": 0,
+      "substantive_deletions": 233,
       "substantive_additions": 0,
       "source_git_blob": "f83bc7fbd95d570d858548770bd99fab2911b8d1"
     },
@@ -14861,13 +14813,13 @@
         "tools.state_io"
       ],
       "before_lines": 263,
-      "after_lines": 231,
-      "physical_additions": 2,
-      "physical_deletions": 34,
+      "after_lines": 226,
+      "physical_additions": 7,
+      "physical_deletions": 44,
       "exact_relocations": [],
       "relocated_lines": 0,
-      "substantive_deletions": 34,
-      "substantive_additions": 2,
+      "substantive_deletions": 44,
+      "substantive_additions": 7,
       "source_git_blob": "9fbff5a2d46444c89eeec7ecbd8a89f19be8eb19"
     },
     {
@@ -14897,7 +14849,6 @@
         "extensions.tendon_family.gvs_trajectory",
         "extensions.tendon_family.manifest",
         "extensions.tendon_family.math_analysis",
-        "extensions.tendon_family.tracking",
         "tools.acceptance_definitions",
         "tools.execution_completion",
         "tools.research_tasks"
@@ -14939,7 +14890,6 @@
       ],
       "incoming": [
         "extensions.tendon_family.backends",
-        "extensions.tendon_family.gvs_lqr",
         "extensions.tendon_family.gvs_nmpc",
         "extensions.tendon_family.gvs_profile",
         "extensions.tendon_family.gvs_reporting"
@@ -14969,6 +14919,7 @@
         "summarize",
         "aligned_predictions",
         "reconstruct_motion",
+        "report_configuration",
         "report"
       ],
       "incoming": [
@@ -14982,43 +14933,38 @@
         "extensions.tendon_family.gvs_projection",
         "schemas.platform",
         "tools.execution_completion",
-        "tools.platform_store"
+        "tools.platform_store",
+        "tools.state_io"
       ],
       "before_lines": 305,
-      "after_lines": 180,
-      "physical_additions": 44,
-      "physical_deletions": 169,
+      "after_lines": 190,
+      "physical_additions": 46,
+      "physical_deletions": 161,
       "exact_relocations": [],
       "relocated_lines": 0,
-      "substantive_deletions": 169,
-      "substantive_additions": 44,
+      "substantive_deletions": 161,
+      "substantive_additions": 46,
       "source_git_blob": "4e4ddc3f494c58cf98a99722a2fe3cf6c00bb4c5"
     },
     {
       "previous_path": "extensions/tendon_family/gvs_sampled.py",
-      "new_path": "extensions/tendon_family/gvs_sampled.py",
-      "decision": "keep",
-      "responsibility": "Required shared numerical/physical/execution contract or kernel",
+      "new_path": null,
+      "decision": "delete",
+      "responsibility": "Retired executable/workflow or legacy-only test; preserved source Git blob",
       "important_callables": [
         "zero_order_hold",
         "DiscreteLQRController",
         "GVSSampledLQRController"
       ],
-      "incoming": [
-        "extensions.tendon_family.gvs_lqr"
-      ],
-      "outgoing": [
-        "extensions.tendon_family.gvs_casadi",
-        "extensions.tendon_family.gvs_lqr",
-        "schemas.platform_math"
-      ],
+      "incoming": [],
+      "outgoing": [],
       "before_lines": 49,
-      "after_lines": 49,
+      "after_lines": 0,
       "physical_additions": 0,
-      "physical_deletions": 0,
+      "physical_deletions": 49,
       "exact_relocations": [],
       "relocated_lines": 0,
-      "substantive_deletions": 0,
+      "substantive_deletions": 49,
       "substantive_additions": 0,
       "source_git_blob": "fa7b814e5e35708543b29e790b1090db19d8a1e6"
     },
@@ -15049,19 +14995,19 @@
     {
       "previous_path": "extensions/tendon_family/gvs_trajectory.py",
       "new_path": "extensions/tendon_family/gvs_trajectory.py",
-      "decision": "keep",
+      "decision": "modify",
       "responsibility": "Required shared numerical/physical/execution contract or kernel",
       "important_callables": [
         "use_trajectory_functions",
         "trajectory_functions",
         "implicit_step_residual",
         "trajectory_authorization",
-        "tracking_authorization",
         "GVSTrajectoryAssembler",
         "TrajectoryWorkspace"
       ],
       "incoming": [
         "extensions.tendon_family.gvs_nmpc",
+        "extensions.tendon_family.manifest",
         "tools.research.diagnostic"
       ],
       "outgoing": [
@@ -15071,7 +15017,6 @@
         "extensions.tendon_family.gvs_casadi",
         "extensions.tendon_family.gvs_profile",
         "extensions.tendon_family.pcc",
-        "extensions.tendon_family.tracking",
         "schemas.platform",
         "schemas.platform_math",
         "tools.platform_optimization",
@@ -15079,13 +15024,13 @@
         "tools.state_io"
       ],
       "before_lines": 468,
-      "after_lines": 468,
-      "physical_additions": 0,
-      "physical_deletions": 0,
+      "after_lines": 386,
+      "physical_additions": 292,
+      "physical_deletions": 374,
       "exact_relocations": [],
       "relocated_lines": 0,
-      "substantive_deletions": 0,
-      "substantive_additions": 0,
+      "substantive_deletions": 374,
+      "substantive_additions": 292,
       "source_git_blob": "e2d7e4ddd867d757199f10ef470ec5ff5c4e7f73"
     },
     {
@@ -15195,24 +15140,26 @@
         "extensions.tendon_family.gvs_nmpc",
         "extensions.tendon_family.gvs_profile",
         "extensions.tendon_family.gvs_reporting",
+        "extensions.tendon_family.gvs_trajectory",
         "extensions.tendon_family.scene",
         "extensions.tendon_family.signals",
         "schemas.common",
         "schemas.platform",
         "schemas.platform_math",
         "schemas.platform_operations",
+        "tools",
         "tools.platform_registry",
         "tools.platform_tools",
         "tools.research.agent"
       ],
       "before_lines": 772,
-      "after_lines": 43,
-      "physical_additions": 42,
-      "physical_deletions": 771,
+      "after_lines": 47,
+      "physical_additions": 45,
+      "physical_deletions": 770,
       "exact_relocations": [],
       "relocated_lines": 0,
-      "substantive_deletions": 771,
-      "substantive_additions": 42,
+      "substantive_deletions": 770,
+      "substantive_additions": 45,
       "source_git_blob": "601cc411fe2639b6057deac6560fcc66989364e6"
     },
     {
@@ -15832,10 +15779,8 @@
         "extensions.tendon_family.gvs",
         "extensions.tendon_family.gvs_casadi",
         "extensions.tendon_family.gvs_codesign",
-        "extensions.tendon_family.gvs_lqr",
         "extensions.tendon_family.gvs_trajectory",
-        "extensions.tendon_family.math_analysis",
-        "extensions.tendon_family.scientific_optimization"
+        "extensions.tendon_family.math_analysis"
       ],
       "outgoing": [
         "extensions.tendon_family.contracts",
@@ -16007,7 +15952,7 @@
     {
       "previous_path": "extensions/tendon_family/scene.py",
       "new_path": "extensions/tendon_family/scene.py",
-      "decision": "keep",
+      "decision": "modify",
       "responsibility": "Required shared numerical/physical/execution contract or kernel",
       "important_callables": [
         "initialize",
@@ -16023,29 +15968,27 @@
         "extensions.experiment_dynamics.contracts",
         "extensions.tendon_family.compiler",
         "extensions.tendon_family.contracts",
-        "extensions.tendon_family.control",
         "extensions.tendon_family.execution",
-        "extensions.tendon_family.gvs_lqr",
         "extensions.tendon_family.gvs_nmpc",
         "schemas.platform",
         "tools.platform_registry",
         "tools.state_io"
       ],
       "before_lines": 68,
-      "after_lines": 68,
-      "physical_additions": 0,
-      "physical_deletions": 0,
+      "after_lines": 62,
+      "physical_additions": 3,
+      "physical_deletions": 9,
       "exact_relocations": [],
       "relocated_lines": 0,
-      "substantive_deletions": 0,
-      "substantive_additions": 0,
+      "substantive_deletions": 9,
+      "substantive_additions": 3,
       "source_git_blob": "10244d3a338fdc4f7566370a8cdee76010a6b95e"
     },
     {
       "previous_path": "extensions/tendon_family/scientific_optimization.py",
-      "new_path": "extensions/tendon_family/scientific_optimization.py",
-      "decision": "keep",
-      "responsibility": "Required shared numerical/physical/execution contract or kernel",
+      "new_path": null,
+      "decision": "delete",
+      "responsibility": "Retired executable/workflow or legacy-only test; preserved source Git blob",
       "important_callables": [
         "_design",
         "_assembly",
@@ -16057,26 +16000,15 @@
         "gvs_authorization",
         "GVSInverseAssembler"
       ],
-      "incoming": [
-        "extensions.tendon_family.gvs_lqr"
-      ],
-      "outgoing": [
-        "extensions.experiment_dynamics.contracts",
-        "extensions.optimization.ipopt",
-        "extensions.tendon_family.contracts",
-        "extensions.tendon_family.gvs",
-        "extensions.tendon_family.gvs_casadi",
-        "extensions.tendon_family.pcc",
-        "schemas.platform",
-        "schemas.platform_math"
-      ],
+      "incoming": [],
+      "outgoing": [],
       "before_lines": 280,
-      "after_lines": 280,
+      "after_lines": 0,
       "physical_additions": 0,
-      "physical_deletions": 0,
+      "physical_deletions": 280,
       "exact_relocations": [],
       "relocated_lines": 0,
-      "substantive_deletions": 0,
+      "substantive_deletions": 280,
       "substantive_additions": 0,
       "source_git_blob": "8b59ccf549cc5b85d938a579c93b26bb27755541"
     },
@@ -16163,9 +16095,9 @@
     },
     {
       "previous_path": "extensions/tendon_family/tracking.py",
-      "new_path": "extensions/tendon_family/tracking.py",
-      "decision": "keep",
-      "responsibility": "Required shared numerical/physical/execution contract or kernel",
+      "new_path": null,
+      "decision": "delete",
+      "responsibility": "Retired executable/workflow or legacy-only test; preserved source Git blob",
       "important_callables": [
         "CartesianReference",
         "ReferenceKnot",
@@ -16178,25 +16110,15 @@
         "checked_tracking",
         "assessment"
       ],
-      "incoming": [
-        "extensions.tendon_family.gvs_trajectory"
-      ],
-      "outgoing": [
-        "extensions.reference.contracts",
-        "extensions.tendon_family.contracts",
-        "extensions.tendon_family.gvs_profile",
-        "schemas.common",
-        "schemas.platform",
-        "tools.platform_registry",
-        "tools.platform_store"
-      ],
+      "incoming": [],
+      "outgoing": [],
       "before_lines": 180,
-      "after_lines": 180,
+      "after_lines": 0,
       "physical_additions": 0,
-      "physical_deletions": 0,
+      "physical_deletions": 180,
       "exact_relocations": [],
       "relocated_lines": 0,
-      "substantive_deletions": 0,
+      "substantive_deletions": 180,
       "substantive_additions": 0,
       "source_git_blob": "51cb2dae276bdb44905540948792d7f25f004d61"
     },
@@ -17995,20 +17917,16 @@
         "extensions.tendon_family.generated_serial",
         "extensions.tendon_family.gvs_profile",
         "extensions.tendon_family.manifest",
-        "extensions.tendon_family.tracking",
         "schemas.design_spec",
         "schemas.environment_spec",
         "schemas.evidence",
         "schemas.exploration",
-        "schemas.framework",
-        "schemas.parameter_domains",
         "schemas.platform",
         "schemas.platform_analysis",
         "schemas.platform_diagnostics",
         "schemas.platform_learning",
         "schemas.platform_math",
         "schemas.platform_operations",
-        "schemas.public_tools",
         "schemas.robot_ir",
         "schemas.settings",
         "schemas.skill",
@@ -18364,9 +18282,9 @@
     },
     {
       "previous_path": "schemas/framework.py",
-      "new_path": "schemas/framework.py",
-      "decision": "keep",
-      "responsibility": "Required shared numerical/physical/execution contract or kernel",
+      "new_path": null,
+      "decision": "delete",
+      "responsibility": "Retired executable/workflow or legacy-only test; preserved source Git blob",
       "important_callables": [
         "PCCCondition",
         "RuleQuery",
@@ -18375,20 +18293,15 @@
         "PCCConditionResult",
         "SignalRuleResult"
       ],
-      "incoming": [
-        "tools.optimization_interfaces"
-      ],
-      "outgoing": [
-        "schemas.common",
-        "schemas.public_tools"
-      ],
+      "incoming": [],
+      "outgoing": [],
       "before_lines": 62,
-      "after_lines": 62,
+      "after_lines": 0,
       "physical_additions": 0,
-      "physical_deletions": 0,
+      "physical_deletions": 62,
       "exact_relocations": [],
       "relocated_lines": 0,
-      "substantive_deletions": 0,
+      "substantive_deletions": 62,
       "substantive_additions": 0,
       "source_git_blob": "5631a2c8adca8f1d02b7f6ab39741300bfae108e"
     },
@@ -18437,27 +18350,23 @@
     },
     {
       "previous_path": "schemas/parameter_domains.py",
-      "new_path": "schemas/parameter_domains.py",
-      "decision": "keep",
-      "responsibility": "Required shared numerical/physical/execution contract or kernel",
+      "new_path": null,
+      "decision": "delete",
+      "responsibility": "Retired executable/workflow or legacy-only test; preserved source Git blob",
       "important_callables": [
         "ContinuousDomain",
         "DiscreteDomain",
         "domain"
       ],
-      "incoming": [
-        "tools.optimization_interfaces"
-      ],
-      "outgoing": [
-        "schemas.common"
-      ],
+      "incoming": [],
+      "outgoing": [],
       "before_lines": 36,
-      "after_lines": 36,
+      "after_lines": 0,
       "physical_additions": 0,
-      "physical_deletions": 0,
+      "physical_deletions": 36,
       "exact_relocations": [],
       "relocated_lines": 0,
-      "substantive_deletions": 0,
+      "substantive_deletions": 36,
       "substantive_additions": 0,
       "source_git_blob": "5530f36aaa9c49f89f9e2713ac65e03b855b134c"
     },
@@ -18540,7 +18449,6 @@
         "extensions.tendon_family.gvs",
         "extensions.tendon_family.gvs_casadi",
         "extensions.tendon_family.gvs_codesign",
-        "extensions.tendon_family.gvs_lqr",
         "extensions.tendon_family.gvs_nmpc",
         "extensions.tendon_family.gvs_profile",
         "extensions.tendon_family.gvs_reporting",
@@ -18550,9 +18458,7 @@
         "extensions.tendon_family.model_applicability",
         "extensions.tendon_family.pcc",
         "extensions.tendon_family.scene",
-        "extensions.tendon_family.scientific_optimization",
         "extensions.tendon_family.signals",
-        "extensions.tendon_family.tracking",
         "schemas.platform_analysis",
         "schemas.platform_diagnostics",
         "schemas.platform_learning",
@@ -18773,13 +18679,10 @@
         "extensions.tendon_family.gvs",
         "extensions.tendon_family.gvs_casadi",
         "extensions.tendon_family.gvs_codesign",
-        "extensions.tendon_family.gvs_lqr",
-        "extensions.tendon_family.gvs_sampled",
         "extensions.tendon_family.gvs_trajectory",
         "extensions.tendon_family.manifest",
         "extensions.tendon_family.math_analysis",
         "extensions.tendon_family.model_applicability",
-        "extensions.tendon_family.scientific_optimization",
         "schemas.platform_analysis",
         "schemas.platform_protocols",
         "tools.platform_optimization",
@@ -18893,9 +18796,9 @@
     },
     {
       "previous_path": "schemas/public_tools.py",
-      "new_path": "schemas/public_tools.py",
-      "decision": "keep",
-      "responsibility": "Required shared numerical/physical/execution contract or kernel",
+      "new_path": null,
+      "decision": "delete",
+      "responsibility": "Retired executable/workflow or legacy-only test; preserved source Git blob",
       "important_callables": [
         "ToolCall",
         "Caller",
@@ -18906,19 +18809,15 @@
         "ServiceConfig",
         "SavedDiagnosis"
       ],
-      "incoming": [
-        "schemas.framework"
-      ],
-      "outgoing": [
-        "schemas.common"
-      ],
+      "incoming": [],
+      "outgoing": [],
       "before_lines": 91,
-      "after_lines": 91,
+      "after_lines": 0,
       "physical_additions": 0,
-      "physical_deletions": 0,
+      "physical_deletions": 91,
       "exact_relocations": [],
       "relocated_lines": 0,
-      "substantive_deletions": 0,
+      "substantive_deletions": 91,
       "substantive_additions": 0,
       "source_git_blob": "c7a9a4d652c2b4ed07f6b9ccc15df6dddf0c245c"
     },
@@ -19372,13 +19271,13 @@
       "incoming": [],
       "outgoing": [],
       "before_lines": 0,
-      "after_lines": 117,
-      "physical_additions": 117,
+      "after_lines": 191,
+      "physical_additions": 191,
       "physical_deletions": 0,
       "exact_relocations": [],
       "relocated_lines": 0,
       "substantive_deletions": 0,
-      "substantive_additions": 117,
+      "substantive_additions": 191,
       "source_git_blob": null
     },
     {
@@ -22885,12 +22784,12 @@
       ],
       "outgoing": [],
       "before_lines": 119,
-      "after_lines": 4,
+      "after_lines": 5,
       "physical_additions": 1,
-      "physical_deletions": 116,
+      "physical_deletions": 115,
       "exact_relocations": [],
       "relocated_lines": 0,
-      "substantive_deletions": 116,
+      "substantive_deletions": 115,
       "substantive_additions": 1,
       "source_git_blob": "afb0ce6d09f542f548ae1ad4c6be89ba9e874a84"
     },
@@ -25021,32 +24920,23 @@
     {
       "previous_path": "tools/optimization_interfaces.py",
       "new_path": "tools/optimization_interfaces.py",
-      "decision": "keep",
+      "decision": "modify",
       "responsibility": "Required shared numerical/physical/execution contract or kernel",
       "important_callables": [
-        "Evaluator",
-        "ParameterSpace",
-        "coordinate_proposal",
-        "MatlabCoordinateProposal",
-        "evaluation_from_result",
-        "CampaignEvaluator"
+        "coordinate_proposal"
       ],
       "incoming": [
         "tools.research.search"
       ],
-      "outgoing": [
-        "schemas.framework",
-        "schemas.parameter_domains",
-        "tools.state_io"
-      ],
+      "outgoing": [],
       "before_lines": 95,
-      "after_lines": 95,
-      "physical_additions": 0,
-      "physical_deletions": 0,
+      "after_lines": 6,
+      "physical_additions": 1,
+      "physical_deletions": 90,
       "exact_relocations": [],
       "relocated_lines": 0,
-      "substantive_deletions": 0,
-      "substantive_additions": 0,
+      "substantive_deletions": 90,
+      "substantive_additions": 1,
       "source_git_blob": "a42f4eb3306b0058cf00bd435072f0d7d01c79d3"
     },
     {
@@ -25366,7 +25256,6 @@
       ],
       "incoming": [
         "extensions.optimization.ipopt",
-        "extensions.tendon_family.gvs_lqr",
         "extensions.tendon_family.gvs_trajectory",
         "schemas.platform_protocols"
       ],
@@ -25423,12 +25312,10 @@
       ],
       "incoming": [
         "extensions.tendon_family.backends",
-        "extensions.tendon_family.gvs_lqr",
         "extensions.tendon_family.gvs_trajectory",
         "extensions.tendon_family.manifest",
         "extensions.tendon_family.model_applicability",
         "extensions.tendon_family.scene",
-        "extensions.tendon_family.tracking",
         "tools.execution_completion",
         "tools.platform_host",
         "tools.platform_optimization",
@@ -25537,7 +25424,6 @@
         "extensions.tendon_family.gvs_profile",
         "extensions.tendon_family.gvs_reporting",
         "extensions.tendon_family.math_analysis",
-        "extensions.tendon_family.tracking",
         "tools.acceptance_definitions",
         "tools.execution_completion",
         "tools.platform_host",
@@ -25976,13 +25862,13 @@
         "tools.state_io"
       ],
       "before_lines": 0,
-      "after_lines": 394,
-      "physical_additions": 394,
+      "after_lines": 397,
+      "physical_additions": 397,
       "physical_deletions": 0,
       "exact_relocations": [],
       "relocated_lines": 0,
       "substantive_deletions": 0,
-      "substantive_additions": 394,
+      "substantive_additions": 397,
       "source_git_blob": null
     },
     {
@@ -26020,13 +25906,13 @@
         "tools.state_io"
       ],
       "before_lines": 177,
-      "after_lines": 200,
-      "physical_additions": 28,
+      "after_lines": 211,
+      "physical_additions": 39,
       "physical_deletions": 5,
       "exact_relocations": [],
       "relocated_lines": 0,
       "substantive_deletions": 5,
-      "substantive_additions": 28,
+      "substantive_additions": 39,
       "source_git_blob": "2e923074c74bdbd08dd90a38110c44d7e678fccf"
     },
     {
@@ -26047,13 +25933,13 @@
         "tools.state_io"
       ],
       "before_lines": 0,
-      "after_lines": 71,
-      "physical_additions": 71,
+      "after_lines": 86,
+      "physical_additions": 86,
       "physical_deletions": 0,
       "exact_relocations": [],
       "relocated_lines": 0,
       "substantive_deletions": 0,
-      "substantive_additions": 71,
+      "substantive_additions": 86,
       "source_git_blob": null
     },
     {
@@ -26093,13 +25979,13 @@
         "tools.research.design"
       ],
       "before_lines": 0,
-      "after_lines": 215,
-      "physical_additions": 215,
+      "after_lines": 217,
+      "physical_additions": 217,
       "physical_deletions": 0,
       "exact_relocations": [],
       "relocated_lines": 0,
       "substantive_deletions": 0,
-      "substantive_additions": 215,
+      "substantive_additions": 217,
       "source_git_blob": null
     },
     {
@@ -26158,8 +26044,8 @@
         "tools.state_io"
       ],
       "before_lines": 1286,
-      "after_lines": 699,
-      "physical_additions": 46,
+      "after_lines": 714,
+      "physical_additions": 61,
       "physical_deletions": 633,
       "exact_relocations": [
         {
@@ -26255,7 +26141,7 @@
       ],
       "relocated_lines": 119,
       "substantive_deletions": 514,
-      "substantive_additions": 46,
+      "substantive_additions": 61,
       "source_git_blob": "f2e8c2e60a5c1833a7e98babad130d44019e1b6b"
     },
     {
@@ -26436,12 +26322,12 @@
       ],
       "before_lines": 249,
       "after_lines": 227,
-      "physical_additions": 17,
-      "physical_deletions": 39,
+      "physical_additions": 18,
+      "physical_deletions": 40,
       "exact_relocations": [],
       "relocated_lines": 0,
-      "substantive_deletions": 39,
-      "substantive_additions": 17,
+      "substantive_deletions": 40,
+      "substantive_additions": 18,
       "source_git_blob": "b7b30a097039222378d9e3d8d2b4e5e37c4fb0f8"
     },
     {
@@ -26496,13 +26382,13 @@
         "tools.state_io"
       ],
       "before_lines": 39,
-      "after_lines": 31,
-      "physical_additions": 27,
+      "after_lines": 38,
+      "physical_additions": 34,
       "physical_deletions": 35,
       "exact_relocations": [],
       "relocated_lines": 0,
       "substantive_deletions": 35,
-      "substantive_additions": 27,
+      "substantive_additions": 34,
       "source_git_blob": "185544fca5170e38e4669ce5d7cc54dc0c553fd3"
     },
     {
@@ -26530,13 +26416,13 @@
         "tools.state_io"
       ],
       "before_lines": 417,
-      "after_lines": 120,
-      "physical_additions": 24,
+      "after_lines": 122,
+      "physical_additions": 26,
       "physical_deletions": 321,
       "exact_relocations": [],
       "relocated_lines": 0,
       "substantive_deletions": 321,
-      "substantive_additions": 24,
+      "substantive_additions": 26,
       "source_git_blob": "00e795fbbe45ab284add5933ba6697d6b826835c"
     },
     {
@@ -26578,13 +26464,13 @@
         "tools.state_io"
       ],
       "before_lines": 420,
-      "after_lines": 365,
-      "physical_additions": 28,
-      "physical_deletions": 83,
+      "after_lines": 363,
+      "physical_additions": 50,
+      "physical_deletions": 107,
       "exact_relocations": [],
       "relocated_lines": 0,
-      "substantive_deletions": 83,
-      "substantive_additions": 28,
+      "substantive_deletions": 107,
+      "substantive_additions": 50,
       "source_git_blob": "5766f869be163a1c3c839f62d072d9a71877d704"
     },
     {
@@ -26594,6 +26480,7 @@
       "responsibility": "Active research module",
       "important_callables": [
         "search_problem",
+        "coordinate_layout",
         "rank",
         "run_search"
       ],
@@ -26610,13 +26497,13 @@
         "tools.state_io"
       ],
       "before_lines": 0,
-      "after_lines": 109,
-      "physical_additions": 109,
+      "after_lines": 128,
+      "physical_additions": 128,
       "physical_deletions": 0,
       "exact_relocations": [],
       "relocated_lines": 0,
       "substantive_deletions": 0,
-      "substantive_additions": 109,
+      "substantive_additions": 128,
       "source_git_blob": null
     },
     {
@@ -27467,13 +27354,13 @@
         "tools.state_io"
       ],
       "before_lines": 513,
-      "after_lines": 452,
-      "physical_additions": 44,
+      "after_lines": 451,
+      "physical_additions": 43,
       "physical_deletions": 105,
       "exact_relocations": [],
       "relocated_lines": 0,
       "substantive_deletions": 105,
-      "substantive_additions": 44,
+      "substantive_additions": 43,
       "source_git_blob": "8baee83cca393e3440c177734bcdd3fb6671124a"
     },
     {
@@ -27907,13 +27794,13 @@
         "tools.rl.train"
       ],
       "before_lines": 391,
-      "after_lines": 392,
-      "physical_additions": 5,
-      "physical_deletions": 4,
+      "after_lines": 393,
+      "physical_additions": 7,
+      "physical_deletions": 5,
       "exact_relocations": [],
       "relocated_lines": 0,
-      "substantive_deletions": 4,
-      "substantive_additions": 5,
+      "substantive_deletions": 5,
+      "substantive_additions": 7,
       "source_git_blob": "107e5d8835e1116b327b1840af6cd7923abe94cf"
     },
     {
@@ -28426,23 +28313,20 @@
         "atomic_json"
       ],
       "incoming": [
-        "extensions.reference.implementation",
         "extensions.tendon_family.backends",
         "extensions.tendon_family.candidate",
         "extensions.tendon_family.compiler",
-        "extensions.tendon_family.control",
         "extensions.tendon_family.control_evidence",
         "extensions.tendon_family.diagnostic_evidence",
         "extensions.tendon_family.execution",
-        "extensions.tendon_family.gvs_lqr",
         "extensions.tendon_family.gvs_nmpc",
         "extensions.tendon_family.gvs_profile",
+        "extensions.tendon_family.gvs_reporting",
         "extensions.tendon_family.gvs_trajectory",
         "extensions.tendon_family.math_analysis",
         "extensions.tendon_family.model_applicability",
         "extensions.tendon_family.scene",
         "tools.execution_completion",
-        "tools.optimization_interfaces",
         "tools.platform_host",
         "tools.platform_registry",
         "tools.platform_store",

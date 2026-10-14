@@ -37,16 +37,11 @@ def resolve_gvs_nmpc_control(inp,physics):
             physics_step_s=inp.task.timing.timestep_s,observation='interval_start_pre_step'),
         plan_acceptance='Independently feasible converged, iteration-limited or intentional early-stop plans. Early stops are suboptimal, not convergence or solver errors; raw termination is retained.',
         failure_response='Hold last bounded tension on an unusable solve (clipped nominal initially); stop after max_unusable_updates consecutive unusable updates. Every applied hold is recorded.')
-    if inp.policy.controller.version == '2.0.0':
-        plan['profile_id']=profile['profile_id']
-        plan['numerical_reference']=profile['numerical_reference']
-    elif inp.policy.controller.version in ('3.0.0','4.0.0','5.0.0','6.0.0','7.0.0','8.0.0','9.0.0','10.0.0','11.0.0'):
-        plan['reference']['kind']='numerical_guess_metadata_not_current_target_equilibrium'
-        plan['reference'].pop('target_world_m')
-        plan['reference']['provenance']=numerical['provenance']
-        plan['numerical_reference']=dict(artifact_id=digest(numerical),media_type='application/json')
-        if inp.policy.controller.version!='5.0.0':plan['settling']=checked_reach(inp).settling.model_dump(mode='json')
-        else:plan['time_reference']=inp.task.goal.model_dump(mode='json')
+    plan['reference']['kind']='numerical_guess_metadata_not_current_target_equilibrium'
+    plan['reference'].pop('target_world_m')
+    plan['reference']['provenance']=numerical['provenance']
+    plan['numerical_reference']=dict(artifact_id=digest(numerical),media_type='application/json')
+    plan['settling']=checked_reach(inp).settling.model_dump(mode='json')
     plan['identity']=digest(plan)
     return plan
 

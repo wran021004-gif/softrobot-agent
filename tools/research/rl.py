@@ -34,7 +34,7 @@ def prepare_input(host, request):
     if any(e.get('file') for e in ET.fromstring(xml).iter()):
         raise ValueError('External XML assets require explicit snapshot support')
     cfg=run.merge_overrides(request.training_overrides.model_dump(exclude_unset=True),request.reward_overrides.model_dump(exclude_unset=True),defaults=core.state(host)['spec']['runtime']['rl_defaults'])
-    cfg.update(mode=request.mode,reference=plain(request.reference),budget=plain(request.allocation))
+    cfg.update(mode=request.mode,reference=plain(request.reference),budget=plain(request.allocation),seed=inp.seed)
     cfg['candidate']=dict(xml=xml,sha256=__import__('hashlib').sha256(xml.encode()).hexdigest(),assets={},
         identity=c['identity'],reference=plain(request.candidate),task_identity=scene['task_identity'],provenance=c['provenance'])
     cfg['control_object']=dict(joint_names=list(p['dofs']),tendon_names=[t['entity'] for t in p['tendons']],
@@ -281,38 +281,36 @@ def dispatch(host, value, request_id, selected=None):
 
 
 def compatible_references(host):
-    """Convert only the existing 35-interval, six-channel SI tension schedule."""
-    import numpy as np
-    import hashlib
-    from tools.research import state as core
+    """Advertise only exact candidate-bound native mathematical SI schedules."""
+    import numpy as np,hashlib
+    from tools.research.state import state
     from extensions.tendon_family.backends import physics_for
     from extensions.tendon_family.scene import assemble
     rows=[]
-    for ref in core.state(host).get('handoffs',[]):
-        relation=host.store.artifact(ref);v=host.store.artifact(relation['mechanics_attempt'])
+    for ref in state(host).get('mechanics_results',[]):
+        value=host.store.artifact(ref)
+        if value.get('operation')!='solve' or not value.get('trajectory'):continue
+        candidate_ref=value['design_candidate']
         try:
-            candidate=verify_candidate(host,relation['candidate']);trajectory=v['candidate']
-            request=host.store.artifact(v['original_request']);scene=assemble(SessionInput.model_validate(candidate['configuration']),physics_for(SessionInput.model_validate(candidate['configuration'])))
+            candidate=verify_candidate(host,candidate_ref);cfg=candidate['configuration'];inp=SessionInput.model_validate(cfg)
+            physics=physics_for(inp);scene=assemble(inp,physics);trajectory=value['trajectory']
+            request=host.store.artifact(value['original_request'])
+            order=[t['entity'] for t in physics['tendons']];limits=np.asarray([t['force_limit_n'] for t in cfg['robot']['structure']['data']['tendons']])
+            period=cfg['task']['timing']['control_period_s'];duration=cfg['task']['timing']['duration_s'];steps=round(duration/period)
             u=np.asarray(trajectory['tensions_n']);times=np.asarray(trajectory['times_s'])
-            order=[t['entity'] for t in physics_for(SessionInput.model_validate(candidate['configuration']))['tendons']]
-            exact_structure=v.get('design_candidate')==relation['candidate']
-            if (request['configuration']['task']!=candidate['configuration']['task'] or not exact_structure
-                    or trajectory['tendon_order']!=order
-                    or order!=['near_t0','near_t1','near_t2','far_t0','far_t1','far_t2']
-                    or scene['control_period_s']!=.01 or scene['duration_s']!=.35
-                    or u.shape!=(35,6) or not np.isfinite(u).all() or np.any(u<0) or np.any(u>8)
-                    or abs(times[0])>1e-12 or abs(times[-1]-.35)>1e-12
-                    or any(not np.any(np.abs(times-k*.01)<1e-12) for k in range(36))):
-                raise ValueError('Candidate/task/channel/interval/timing/bounds incompatibility; no resampling or clipping')
-            folder=host.store.root/'rl_inputs';folder.mkdir(exist_ok=True)
-            path=folder/(relation['offline_trajectory']['artifact_id']+'.npz')
-            if not path.exists(): np.savez(path,saved_tensions_n=u)
+            if (request['configuration']!=cfg or trajectory['tendon_order']!=order or u.shape!=(steps,len(order))
+                or not np.isfinite(u).all() or np.any(u<0) or np.any(u>limits)
+                or abs(times[0])>1e-12 or abs(times[-1]-duration)>1e-12
+                or any(not np.any(np.abs(times-k*period)<1e-12) for k in range(steps+1))):
+                raise ValueError('Exact candidate/task/order/grid/bounds required; no mapping, resampling or clipping')
+            folder=host.store.root/'rl_inputs';folder.mkdir(exist_ok=True);path=folder/(ref['artifact_id']+'.npz')
+            if not path.exists():np.savez(path,saved_tensions_n=u)
             with np.load(path,allow_pickle=False) as saved:
-                if not np.array_equal(saved['saved_tensions_n'],u): raise ValueError('Saved reference changed')
-            rows.append(dict(candidate=relation['candidate'],handoff=ref,available=True,
-                reference=dict(path=str(path.resolve()),sha256=hashlib.sha256(path.read_bytes()).hexdigest(),candidate_identity=candidate['identity'],task_identity=scene['task_identity'],tendon_order=order,control_period_s=.01),
-                convention='35 zero-order-held interval tensions in N; .35s; mathematical source, MuJoCo acceptance unproven'))
-        except (ValueError,KeyError,IndexError) as exc: rows.append(dict(candidate=relation['candidate'],handoff=ref,available=False,reason=str(exc)))
+                if not np.array_equal(saved['saved_tensions_n'],u):raise ValueError('Saved reference changed')
+            rows.append(dict(candidate=candidate_ref,mathematical_source=ref,available=True,
+                reference=dict(path=str(path.resolve()),sha256=hashlib.sha256(path.read_bytes()).hexdigest(),candidate_identity=candidate['identity'],task_identity=scene['task_identity'],tendon_order=order,control_period_s=period),
+                convention='SI interval tensions from exact native mathematical candidate; backend acceptance unproven'))
+        except (ValueError,KeyError,IndexError) as exc:rows.append(dict(candidate=candidate_ref,mathematical_source=ref,available=False,reason=str(exc)))
     return rows
 
 

@@ -14,9 +14,25 @@ def search_problem(host,query,count):
     for key,(lo,hi) in q.bounds.items():
         grant=s['spec']['allowed_parameters'].get(key)
         if not grant or not grant[0]<=lo<hi<=grant[1]:raise ValueError('SEARCH_BOUNDS_OUTSIDE_STUDY_GRANT: '+key)
-    if plain(q.protocol)!=s['spec']['analysis_protocol'] or q.scoring_window_s!=s['spec']['scoring_window_s']:
+    if plain(q.protocol)!=s['spec']['analysis_protocol'] or q.scoring_window_s not in s['spec']['analysis_protocol']['windows_s']:
         raise ValueError('SEARCH_REQUIRES_FROZEN_PROTOCOL_AND_SCORE_WINDOW')
-    return dict(query=plain(q),max_evaluations=count,profile=s['profile']['identity'])
+    layout=coordinate_layout(q,s['spec'].get('length_constraint',{}))
+    return dict(query=plain(q),max_evaluations=count,profile=s['profile']['identity'],configuration_identity=s['spec']['resolved_identity'],layout=layout)
+
+
+def coordinate_layout(query,constraint):
+    names=sorted(query.variables);bounds=deepcopy(query.bounds);dependent=None;total=constraint.get('fixed_total_m')
+    lengths=[k for k in names if k.startswith('segments.') and k.endswith('.length_m')]
+    if total is not None and lengths:
+        if len(lengths)!=2:raise ValueError('FIXED_TOTAL_LENGTH_SEARCH_REQUIRES_BOTH_SEGMENT_LENGTHS')
+        first,dependent=lengths;names.remove(dependent)
+        fixed=plain(query.fixed);other=sum(p['length_m'] for name,p in fixed['segments'].items() if 'segments.'+name+'.length_m' not in lengths)
+        remaining=total-other;lo,hi=bounds[first];a,b=bounds[dependent]
+        bounds[first]=[max(lo,remaining-b),min(hi,remaining-a)]
+        if bounds[first][0]>=bounds[first][1] or abs(sum(p['length_m'] for p in fixed['segments'].values())-total)>1e-12:
+            raise ValueError('FIXED_TOTAL_SEARCH_INITIAL_OR_INTERVAL_INVALID')
+        bounds.pop(dependent)
+    return dict(names=names,bounds=bounds,dependent_length=dependent,fixed_total_m=total)
 
 
 def rank(row,query):
@@ -33,7 +49,7 @@ def run_search(host,query,key,*,guard,execute,capacity):
     from tools.research.analysis import admission,dispatch as analyze
     guard(host,True);q=Search.model_validate(query);s=state(host)
     fit=admission(host,q.max_evaluations) if q.evaluation_mode=='mathematical_proxy' else capacity(host,q.max_evaluations)
-    identity=digest(dict(query=plain(q),profile=s['profile']['identity']))
+    identity=digest(dict(query=plain(q),profile=s['profile']['identity'],configuration_identity=s['spec']['resolved_identity']))
     owner=s.get('search_bindings',{}).get(identity,key)
     checkpoint=s['searches'].get(owner)
     if checkpoint is None:
@@ -43,7 +59,7 @@ def run_search(host,query,key,*,guard,execute,capacity):
             iteration=0,step=q.step,pending=None,termination=None,proposal_count=0)
         update(host,search_bindings={**s.get('search_bindings',{}),identity:owner})
     if checkpoint['problem_identity']!=identity:raise ValueError('SEARCH_RECOVERY_IDENTITY_MISMATCH')
-    names=sorted(q.variables)
+    layout=checkpoint['problem']['layout'];names=layout['names'];bounds=layout['bounds']
     def persist():
         update(host,searches={**state(host)['searches'],owner:deepcopy(checkpoint)})
         return save(host,checkpoint,'search_checkpoint')
@@ -56,7 +72,7 @@ def run_search(host,query,key,*,guard,execute,capacity):
                 checkpoint['termination']='minimum_coordinate_step';break
             fixed=plain(q.fixed)
             if not rows:
-                latent=[(parameter_value(fixed,k)-q.bounds[k][0])/(q.bounds[k][1]-q.bounds[k][0]) for k in names]
+                latent=[(parameter_value(fixed,k)-bounds[k][0])/(bounds[k][1]-bounds[k][0]) for k in names]
                 parent=None
             else:
                 best=min(rows,key=lambda row:rank(row,q));parent=best['candidate_id']
@@ -65,7 +81,10 @@ def run_search(host,query,key,*,guard,execute,capacity):
                 if checkpoint['iteration']%(2*len(names))==0:checkpoint['step']/=2
             params=deepcopy(fixed)
             for k,x in zip(names,latent):
-                lo,hi=q.bounds[k];set_parameter(params,k,lo+x*(hi-lo))
+                lo,hi=bounds[k];set_parameter(params,k,lo+x*(hi-lo))
+            if layout['dependent_length']:
+                dependent=layout['dependent_length'];other=sum(v['length_m'] for name,v in params['segments'].items() if 'segments.'+name+'.length_m'!=dependent)
+                set_parameter(params,dependent,layout['fixed_total_m']-other)
             checkpoint['proposal_count']+=1
             if any(digest(row['parameters'])==digest(params) for row in rows):
                 if checkpoint['proposal_count']>128:checkpoint['termination']='duplicate_proposal_limit'

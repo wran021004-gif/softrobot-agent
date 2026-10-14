@@ -14,6 +14,21 @@ def resolve(path):
     robot=read(path.parent/study.pop('robot'))
     task=read(path.parent/study.pop('task'))
     runtime=read(path.parent/study.pop('runtime'))
+    if 'segments' in study['reference_parameters']:
+        raise ValueError('PHYSICAL_REFERENCE_VALUES_OWNED_BY_ROBOT_SOURCE_USE_EXPLICIT_REFERENCE_EDITS')
+    segments={p['id']:dict(length_m=p['length_m'],young_pa=p['physics']['young_pa'],
+        sections={str(i):deepcopy(station['section']['parameters']) for i,station in enumerate(p['sections'])})
+        for p in robot['robot']['structure']['data']['components'] if p['kind']=='flexible_segment'}
+    study['reference_parameters']['segments']=segments
+    for key,value in study.pop('reference_edits',{}).items():
+        if key not in study['allowed_parameters']:raise ValueError('UNDECLARED_REFERENCE_EDIT: '+key)
+        current=study['reference_parameters'];parts=key.split('.')
+        try:
+            for part in parts[:-1]:current=current[part]
+            if parts[-1] not in current:raise KeyError(parts[-1])
+        except KeyError:raise ValueError('INVALID_REFERENCE_EDIT_PATH: '+key) from None
+        current[parts[-1]]=value
+    runtime['rl_defaults']['seed']=task['seed']
     b=study['budgets']
     hard=dict(provider_requests=24,public_operations=60,mathematical_evaluations=12,
         local_solves=2,local_solve_s=600,numerical_s=10800,activity_s=14400)

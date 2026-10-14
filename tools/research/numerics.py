@@ -9,6 +9,8 @@ from tools.state_io import read,digest
 from tools.platform_store import plain
 ROOT=Path(__file__).resolve().parents[2]
 HISTORY='evidence/research_chain_20261014'
+_verified=set()
+_manifests={}
 def archived(folder, reference, raw=False):
     folder=ROOT/folder
     manifest=read(folder/'archive_manifest.json')

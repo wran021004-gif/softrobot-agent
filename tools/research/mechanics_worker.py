@@ -22,6 +22,13 @@ def calculate(request):
 
 def main():
     request=read(sys.argv[1]);started=time.perf_counter()
+    from tools.platform_store import Store
+    from tools.state_io import digest
+    store=Store(request['store_root']);current=store.session(request['study_id'])['state']
+    row=store.lookup(request['study_id'],request['request_id']);pending=current.get('pending') or {}
+    if (not row or row['receipt'] or row['request_hash']!=digest(request) or pending.get('kind')!='mechanics'
+        or pending.get('worker_request_id')!=request['request_id'] or Path(pending['folder']).resolve()!=Path(sys.argv[1]).resolve().parent):
+        raise ValueError('OWNED_ACTIVE_MATHEMATICAL_RESERVATION_REQUIRED')
     contain_worker_children()
     try:value=calculate(request)
     except Exception as exc:value=dict(status='engineering_error',reason=str(exc),traceback=traceback.format_exc())

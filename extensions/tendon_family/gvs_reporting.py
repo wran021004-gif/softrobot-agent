@@ -126,6 +126,16 @@ def reconstruct_motion(files, rows, target):
 
 
 
+def report_configuration(candidate, baseline):
+    """Report the receipt-owned executed geometry, retaining baseline ownership."""
+    from schemas.platform import CandidateInput
+    from tools.state_io import digest
+    owned=CandidateInput.model_validate(candidate)
+    if owned.baseline_identity!=digest(plain(baseline)) or owned.content_identity!=digest(plain(owned.effective)):
+        raise ValueError('REPORT_CANDIDATE_SCOPE_MISMATCH')
+    checked_control(owned.effective)
+    return owned.effective
+
 def report(ctx,args):
     from .gvs_profile import ProfileOutput
     checked_control(ctx.input)
