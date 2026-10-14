@@ -72,7 +72,7 @@ def confirmation_progress(host, selected=None):
         invalid_executions=sum(not v['complete'] for v in values),executions=values,
         confirmed=bool(required>0 and chosen and chosen['fresh_current_study'] and chosen['passed'] and len(fresh)==required
             and all(v['complete'] and v['passed'] for v in values)),
-        correct_operation=dict(tool='research_plan',action='confirm',selected_execution=selected))
+        correct_operation=dict(tool='research_plan',action='select' if required==0 else 'confirm',selected_execution=selected))
 
 
 def result_view(host, reference):

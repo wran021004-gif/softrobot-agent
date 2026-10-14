@@ -55,6 +55,7 @@ class MainlineTests(unittest.TestCase):
         self.assertTrue(out['result']['task_passed']);self.assertEqual(state(self.host)['research_status'],'stopped')
         self.assertEqual(out['result']['confirmation_status'],'not_required')
         self.assertFalse(feedback.confirmation_progress(self.host)['confirmed'])
+        self.assertEqual(feedback.confirmation_progress(self.host)['correct_operation']['action'],'select')
         self.assertFalse(core.claims(self.host)['reproducibility_assessed'])
 
     def test_historical_incomplete_cached_proxy_cannot_select(self):
@@ -114,6 +115,8 @@ class MainlineTests(unittest.TestCase):
         self.assertEqual(task_adapter(self.cfg).task['family'],'task.reach')
         from tools.platform_registry import dependency_closure
         self.assertEqual(len(dependency_closure(registered.extensions.values(),registered)),16)
+        from extensions.tendon_family.contracts import Data
+        self.assertIs(registered.contracts[('family.backend_data','1.0.0')],Data)
         import sys
         self.assertFalse(any(p[:-3].replace('/','.') in sys.modules for p in banned))
 
