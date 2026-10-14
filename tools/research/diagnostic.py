@@ -135,6 +135,7 @@ def _solve_record(ws,recorded):
 
 
 def plan_task_metrics(ws,plan,time_s):
+    ws._prepare_tail()  # Build output functions after solving; saved solve inputs remain untouched.
     times=time_s+np.arange(ws.parameters.horizon*ws.parameters.substeps+1)*ws.period/ws.parameters.substeps
     states=np.array([[plan[f'x/{k}/{j}']*ws.state_scales[j] for j in range(2*ws.n)] for k in range(len(times))])
     motion=[ws._motion(x[:ws.n],x[ws.n:]) for x in states]

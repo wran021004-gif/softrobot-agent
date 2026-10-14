@@ -50,6 +50,15 @@ class StoppingStateTests(TestCase):
         self.assertEqual(LocalDiagnostic(execution=ref,update_id=0).mode,'research_policy')
         with self.assertRaises(ValueError):LocalDiagnostic(execution=ref,update_id=0,mode='production')
 
+    def test_saved_plan_metrics_initializes_output_functions_without_solving(self):
+        import numpy as np
+        ws=SimpleNamespace(parameters=SimpleNamespace(horizon=1,substeps=1),period=.01,n=1,
+            state_scales=np.ones(2),holding_start=.30,duration=.35,target=[0.,0.,0.],tendons=['a'])
+        def prepare():ws._motion=lambda q,v:(np.zeros(3),np.zeros(3))
+        ws._prepare_tail=prepare
+        values={**{f'x/{k}/{j}':0. for k in range(2) for j in range(2)},'u/0/a':.2}
+        self.assertEqual(diagnostic.plan_task_metrics(ws,values,.34)['holding_node_count'],2)
+
     def test_historical_and_current_state_phase_horizon_and_candidate_binding(self):
         h=self.host;s=core.state(h);summary=core.read(core.ROOT/'evidence/research_chain_20261014/scientific_summary.json')
         ref=summary['nmpc_results'][1]['reference']
