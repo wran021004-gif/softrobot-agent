@@ -414,6 +414,8 @@ def bind(host, reason=None, specification=None):
 
 def execute(host, candidate_ref, operation_key, *, role='development', selected=None):
     guard(host,expensive=role!='confirmation'); s=state(host); c=verify_candidate(host,candidate_ref)
+    if c['profile_identity']!=s['profile']['identity']:
+        raise ValueError('FRESH_EXECUTION_REQUIRES_CURRENT_PROFILE; HISTORICAL_CANDIDATE_IS_READ_ANALYSIS_ONLY')
     expected_environment=s['spec'].get('numerical_environment',{})
     if any(os.environ.get(key)!=value for key,value in expected_environment.items()):
         raise ValueError('EXECUTION_REQUIRES_CALIBRATED_NUMERICAL_ENVIRONMENT_BEFORE_INTERPRETER_START')

@@ -63,6 +63,10 @@ class StoppingStateTests(TestCase):
         h=self.host;s=core.state(h);summary=core.read(core.ROOT/'evidence/research_chain_20261014/scientific_summary.json')
         ref=summary['nmpc_results'][1]['reference']
         with patch.object(core,'guard'):info=numerics.import_execution(h,'evidence/research_chain_20261014',ref,[29,30])
+        with patch.object(core,'guard'):
+            with self.assertRaisesRegex(ValueError,'FRESH_EXECUTION_REQUIRES_CURRENT_PROFILE'):
+                core.execute(h,info['candidate'],'historical-backend-rejected')
+        self.assertEqual(h.store.remaining()['used']['backend_solves'],0)
         before=core.state(h);self.assertEqual(before['mathematical_evaluations'],0)
         def worker(command,log,timeout):
             req=core.read(command[-1]);point=req['exact_point'];record=numerics.execution_update(h,ref,30)['record']
