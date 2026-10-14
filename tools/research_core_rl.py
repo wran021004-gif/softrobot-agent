@@ -144,7 +144,7 @@ def reconcile(host, run_id, lightweight=False):
         if any(value['consumed'].get(k,0)<v for k,v in previous.items()): raise ValueError('RL consumption cannot decrease')
         s['numerical_s']=s.get('numerical_s',0.)+max(0.,value['consumed'].get('active_seconds',0)-previous.get('active_seconds',0))
         entry['status']=value
-        entry['active_reservation']=entry['allocation'] if value['worker_alive'] else None
+        entry['active_reservation']=entry['allocation'] if value['worker_alive'] or value.get('consumption_uncertain') else None
         host.store.update_state(db,host.run_id,s)
     return value
 
@@ -157,7 +157,8 @@ def evaluation_capacity(host, requested=1, confirmation=False):
     used=sum(e['evaluations'] for e in s.get('rl_runs',{}).values())
     seconds=s['spec'].get('rl_evaluation_allowance_s',150.)
     available=min(core.execution_deadline(host)-time.time(),host.store.remaining()['remaining']['wall_s'],s['spec']['budgets']['numerical_s']-s['numerical_s']-s['numerical_reserved_s'])
-    fit=max(0,min(requested,s['spec']['rl_limits']['evaluation_episodes']-used-reserve,int(available//seconds)-reserve))
+    starts=s['spec'].get('shared_start_limit',float('inf'))-s.get('charged_starts',0)
+    fit=max(0,min(requested,s['spec']['rl_limits']['evaluation_episodes']-used-reserve,starts-reserve,int(available//seconds)-reserve))
     return dict(admitted=fit,remaining_episodes=s['spec']['rl_limits']['evaluation_episodes']-used,confirmation_reserve=reserve,per_episode_s=seconds)
 
 
@@ -169,7 +170,8 @@ def training_capacity(host, work):
     operations=6+3*confirmations
     requests=6+2*confirmations
     seconds=work['active_seconds']+(1+confirmations)*s['spec'].get('rl_evaluation_allowance_s',150.)
-    if (b['protected_provider_requests']<requests or remaining['model_calls']<=b['protected_provider_requests']
+    if (s['spec'].get('shared_start_limit',float('inf'))-s.get('charged_starts',0)<2+confirmations
+            or b['protected_provider_requests']<requests or remaining['model_calls']<=b['protected_provider_requests']
             or remaining['tool_calls']<operations
             or evaluation_capacity(host,1)['admitted']<1
             or seconds>min(s['cutoff_unix']-time.time(),remaining['wall_s'],
@@ -211,11 +213,10 @@ def dispatch(host, value, request_id, selected=None):
         if (q.allocation.actions>caps.get('actions_per_trial',caps['training_actions'])
                 or q.allocation.active_seconds>caps.get('seconds_per_trial',caps['training_active_seconds'])):
             raise ValueError('Declared per-trial RL ceiling exceeded')
-        if (len(entries)>=caps['training_runs'] or sum(e['allocation']['actions'] for e in entries)+q.allocation.actions>caps['training_actions']
+        if ((caps.get('training_runs') is not None and len(entries)>=caps['training_runs']) or sum(e['allocation']['actions'] for e in entries)+q.allocation.actions>caps['training_actions']
                 or sum(e['allocation']['active_seconds'] for e in entries)+q.allocation.active_seconds>caps['training_active_seconds']):
             raise ValueError('Requested allocation exceeds cumulative RL ceiling; remaining '+json.dumps(dict(
-                trials=caps['training_runs']-len(entries),actions=caps['training_actions']-sum(e['allocation']['actions'] for e in entries),
-                allocated_active_seconds=caps['training_active_seconds']-sum(e['allocation']['active_seconds'] for e in entries)))+'; model may choose a fitting allocation or STOP; no training started')
+                **allocation_feedback(host)['remaining_allocatable']))+'; model may choose a fitting allocation or STOP; no training started')
     else:
         if q.run_id not in s.get('rl_runs',{}): raise ValueError('Owned RL run required')
     if q.operation in ('start','resume'):
@@ -227,7 +228,11 @@ def dispatch(host, value, request_id, selected=None):
     if q.operation=='evaluate' and evaluation_capacity(host,1,confirmation=selected is not None)['admitted']<1:
         raise ValueError('RL evaluation and route confirmation reserve cannot fit')
     cost={**zero(),'tool_calls':1,'backend_solves':int(q.operation=='start')}
-    row,_=host.store.reserve(host.run_id,request_id,key,host.actor,cost,kind='rl_operation')
+    def charge(db):
+        if q.operation in ('start','resume','evaluate') or q.replay:
+            current=host.store.session(host.run_id,db)['state'];core.charge_start(current)
+            host.store.update_state(db,host.run_id,current)
+    row,_=host.store.reserve(host.run_id,request_id,key,host.actor,cost,kind='rl_operation',guard=charge)
     evaluation_dispatched=False;operation_started=None
     try:
         if q.operation=='start':
@@ -252,7 +257,8 @@ def dispatch(host, value, request_id, selected=None):
                 runs=core.state(host)['rl_runs'];runs[q.run_id]['training_summary']=reference
                 refs=core.state(host).get('rl_training_summaries',[])
                 core.update(host,rl_runs=runs,rl_training_summaries=refs if reference in refs else [*refs,reference])
-                result.update(training_summary=host.store.artifact(reference),training_summary_reference=reference)
+                result.update(training_summary=host.store.artifact(reference),training_summary_reference=reference,
+                    task_performance='unmeasured',next_operations=['evaluate'] if summary.get('checkpoint') and summary['checkpoint'].get('policy_present') else ['choose another authorized action','stop'])
             else: result=invoke(q.operation,q.run_id,deadline=core.execution_deadline(host))
         elif q.operation=='diagnose' and not q.failure:
             directory=run.run_path(q.run_id)
@@ -354,10 +360,25 @@ def compatible_references(host):
     return rows
 
 
+def allocation_feedback(host):
+    from tools import research_core as core
+    s=core.state(host); caps=s['spec']['rl_limits']; entries=list(s.get('rl_runs',{}).values())
+    actions=sum(e['allocation']['actions'] for e in entries)
+    seconds=sum(e['allocation']['active_seconds'] for e in entries)
+    return dict(authorized_limits=caps,cumulative_allocated=dict(actions=actions,active_seconds=seconds),
+        actual_consumption=dict(actions=sum(e.get('status',{}).get('consumed',{}).get('attempted_actions',0) for e in entries),
+            active_seconds=sum(e.get('status',{}).get('consumed',{}).get('active_seconds',0) for e in entries)),
+        active_or_uncertain_reservations=[dict(run_id=r,allocation=e['active_reservation']) for r,e in s.get('rl_runs',{}).items() if e.get('active_reservation')],
+        remaining_allocatable=dict(trials=None if caps.get('training_runs') is None else max(0,caps['training_runs']-len(entries)),
+            actions=max(0,caps['training_actions']-actions),allocated_active_seconds=max(0,caps['training_active_seconds']-seconds)),
+        per_trial=dict(actions=caps.get('actions_per_trial',caps['training_actions']),active_seconds=caps.get('seconds_per_trial',caps['training_active_seconds'])),
+        evaluation_capacity=evaluation_capacity(host),allocation_recycling=False)
+
+
 def packet(host):
     from tools import research_core as core
     s=core.state(host)
-    return dict(frozen_task=s['rl_task'],capabilities=dict(task='reach-and-hold',control='ideal_tension',
+    return dict(allocation_feedback=allocation_feedback(host),frozen_task=s['rl_task'],capabilities=dict(task='reach-and-hold',control='ideal_tension',
         modes=['direct','residual'],compatible_references=compatible_references(host),
         structural_coordinate='d in [-1,1]: lengths [.16+.0055*d,.11-.0055*d] m',
         defaults=run.read_json(Path(run.__file__).with_name('config.json'))),

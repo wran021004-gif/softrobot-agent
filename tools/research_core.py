@@ -39,7 +39,7 @@ SCIENCE_FILES = ['extensions/tendon_family/gvs_nmpc.py', 'extensions/tendon_fami
     'extensions/tendon_family/gvs.py', 'extensions/tendon_family/gvs_basis.py',
     'tools/casadi_feedback_worker.py', 'tools/casadi_codesign_worker.py',
     'tools/research_core_mechanics.py', 'tools/research_core_mechanics_worker.py']
-CORE_FILES = ['tools/research_core_rl.py','tools/rl/env.py','tools/rl/run.py','tools/rl/train.py','tools/rl/checks.py','tools/rl/config.json','tools/research_core.py','tools/research_core_diagnostic.py','schemas/research_core.py',
+CORE_FILES = ['tools/research_core_execution_worker.py','tools/service_execution.py','tools/research_core_rl.py','tools/rl/env.py','tools/rl/run.py','tools/rl/train.py','tools/rl/checks.py','tools/rl/config.json','tools/research_core.py','tools/research_core_diagnostic.py','schemas/research_core.py',
               'tools/research_core_feedback.py','tools/research_core_demo.py','tools/research_core_numerics.py','tools/numerical_repair.py','tools/fixed_task_milestone.py','tools/research_core_experience.py']
 
 
@@ -67,7 +67,7 @@ def readable_results(s, host=None):
             result=host.store.artifact(ref)
             linked.extend(result[k] for k in ('checkpoint_reference','trajectory_reference','original_request','log_reference') if result.get(k))
     return [*s['results'], *s.get('mechanics_results', []), *s.get('rl_evaluations', []), *s.get('rl_training_summaries', []),
-        *s.get('scoped_context',[]), *s.get('linked_selections',[]), *s.get('historical_confirmations',[]), *linked,
+        *s.get('scoped_context',[]), *s.get('imported_mechanics_sources',[]), *s.get('imported_mechanics_results',[]), *s.get('linked_selections',[]), *s.get('historical_confirmations',[]), *linked,
         *[s[k] for k in ('rl_task','rl_source_summary','rl_source_candidate') if s.get(k)],
         *[r for entry in s.get('rl_runs',{}).values() for r in (entry.get('candidate'),entry.get('configuration')) if r]]
 
@@ -150,6 +150,14 @@ def limits(spec):
         backend_solves=b['physical_launches'], worker_calls=0, wall_s=b['activity_s'])
 
 
+def charge_start(s):
+    """Shared charged starts, including unsuccessful starts; never recycled."""
+    limit=s['spec'].get('shared_start_limit')
+    if limit is not None:
+        if s.get('charged_starts',0)>=limit: raise ValueError('SHARED_CHARGED_START_CEILING')
+        s['charged_starts']=s.get('charged_starts',0)+1
+
+
 def enabled(spec, capability):
     return capability in spec.get('capabilities', ['rl'] if spec.get('mode')=='rl_interface' else ['mathematics','search','nmpc'])
 
@@ -216,10 +224,30 @@ def prepare(spec_path=DEFAULT_SPEC, directory=None):
     if history_spec.get('source_study_id'):
         from tools.platform_store import Store
         source_store=Store(ROOT/'runs'/history_spec['source_study_id']);refs=list(history_spec['references'].values())
-        for ref in refs:
-            if save(h,source_store.artifact(ref),'linked_advertised_historical_evidence')!=ref:
-                raise ValueError('Historical evidence identity changed')
-        update(h,scoped_context=[*state(h)['scoped_context'],*refs])
+        def import_reference(ref):
+            if ref in imported: return
+            value=source_store.artifact(ref)
+            if save(h,value,'linked_advertised_historical_evidence')!=ref: raise ValueError('Historical evidence identity changed')
+            imported.append(ref)
+            def links(value):
+                if isinstance(value,dict):
+                    if set(value)=={'artifact_id','media_type'}: import_reference(value)
+                    else:
+                        for part in value.values(): links(part)
+                elif isinstance(value,list):
+                    for part in value: links(part)
+            links(value)
+        imported=[]
+        for ref in refs: import_reference(ref)
+        registered=history_spec.get('register',{})
+        historical_candidates=registered.get('candidates',[])
+        candidates=dict(state(h)['candidates'])
+        for ref in historical_candidates:
+            c=h.store.artifact(ref);candidates[c['identity']]=ref
+        update(h,scoped_context=[*state(h)['scoped_context'],*imported],candidates=candidates,
+            imported_candidates=historical_candidates,imported_candidate_profile=source_store.session(history_spec['source_study_id'])['state']['profile'],
+            imported_mechanics_sources=registered.get('mechanics_sources',[]),
+            imported_mechanics_results=registered.get('verification',[]),handoffs=registered.get('handoffs',[]))
     # Compact supplied history is explicitly different from retrieval.
     history = read(ROOT/'evidence/nmpc_settling_20261011/scientific_summary.json')
     ref = save(h, history, 'supplied_historical_context')
@@ -289,16 +317,20 @@ def verify_candidate(host, reference):
         if c['scientific_configuration']!=full_science(c['configuration']) or plain(c['configuration']['task'])!=host.store.artifact(s['rl_task']):
             raise ValueError('PINNED_SOURCE_CANDIDATE_TASK_MISMATCH')
         return c
-    if c['profile_identity'] != s['profile']['identity']: raise ValueError('OLD_EVALUATION_PROFILE_CANDIDATE_REQUIRES_NEW_CONSTRUCTION')
+    historical=plain(reference) in s.get('imported_candidates',[])
+    profile=s['imported_candidate_profile'] if historical else s['profile']
+    if c['profile_identity'] != profile['identity']: raise ValueError('OLD_EVALUATION_PROFILE_CANDIDATE_REQUIRES_NEW_CONSTRUCTION')
+    if c['scientific_configuration']!=full_science(c['configuration']): raise ValueError('IMPORTED_CONFIGURATION_IDENTITY_MISMATCH')
     cfg, values = configuration_for(host,c['parameters'],host.run_id)
     if values != c['resolved_parameters'] or full_science(cfg) != c['scientific_configuration']:
         raise ValueError('FULL_FIXED_AND_SEARCH_PARAMETER_IDENTITY_MISMATCH')
-    expected = digest(dict(parameters=values,configuration=full_science(cfg),evaluation_profile=s['profile']))
+    expected = digest(dict(parameters=values,configuration=full_science(cfg),evaluation_profile=profile))
     if expected != c['identity']: raise ValueError('CANDIDATE_IDENTITY_MISMATCH')
     return c
 
 
 def allowance(s):
+    if s['spec'].get('nmpc_execution_cap_s'): return s['spec']['nmpc_execution_cap_s']
     estimate=s.get('execution_cost_estimate')
     if estimate and estimate['recipe_identity']==digest(s['profile']['recipe']):
         return estimate['total_watchdog_s']
@@ -310,7 +342,7 @@ def repetition_reserve(s):
 
 
 def nmpc_timing(host, candidate=None):
-    """Admit using existing configuration-bound timing, never a calibration launch."""
+    """Historical estimates inform decisions; the persisted hard cap bounds launches."""
     s=state(host);records=s['spec'].get('nmpc_timing_evidence',[])
     configuration=verify_candidate(host,candidate)['scientific_configuration'] if candidate else None
     matched=[r for r in records if r['scientific_configuration_identity']==digest(configuration)] if configuration else records
@@ -320,11 +352,9 @@ def nmpc_timing(host, candidate=None):
             matched.append(dict(complete_execution_s=r['numerical_s'],source=ref))
     estimate=max((r['complete_execution_s'] for r in matched),default=None)
     cap=s['spec']['nmpc_execution_cap_s']
-    return dict(available=estimate is not None and estimate<=cap,complete_execution_s=estimate,cap_s=cap,
-        first_use_limitation='Synchronous execution cannot enforce an outer hard cap; first-use launch unavailable',
-        reason='existing matching timing fits cap' if estimate is not None and estimate<=cap else
-        'NMPC unavailable within this budget: no matching existing timing evidence' if estimate is None else
-        'NMPC unavailable within this budget: complete execution exceeds cap',
+    return dict(available=cap>0,complete_execution_s=estimate,cap_s=cap,
+        reservation_s=cap,first_use_available=True,
+        reason='Contained full execution under hard cap; matching timing is an estimate only',
         evidence_sources=[r['source'] for r in matched],design_feasibility='not assessed by budget admission')
 
 
@@ -333,8 +363,10 @@ def capacity(host, requested=1, confirmation=False, *, root_operation=False, can
     s=state(host); b=s['spec']['budgets']; a=allowance(s)
     timing=nmpc_timing(host,candidate) if s['spec'].get('nmpc_execution_cap_s') else None
     if timing and not timing['available']: return dict(requested=requested,admitted=0,internal_launches=0,timing=timing)
-    if timing: a=timing['complete_execution_s']
+    if timing: a=timing['reservation_s']
     remaining=host.store.remaining()['remaining']; protect=0 if confirmation else repetition_reserve(s)
+    if s['spec'].get('shared_start_limit') is not None:
+        remaining=deepcopy(remaining);remaining['backend_solves']=min(remaining['backend_solves'],s['spec']['shared_start_limit']-s.get('charged_starts',0))
     if s['spec'].get('nmpc_limits'):
         remaining=deepcopy(remaining);remaining['backend_solves']=min(remaining['backend_solves'],s['spec']['nmpc_limits']['executions']-s.get('nmpc_launches',0))
     science=b['numerical_s']-s['numerical_s']-s['numerical_reserved_s']
@@ -424,7 +456,6 @@ def bind(host, reason=None, specification=None):
 
 
 def execute(host, candidate_ref, operation_key, *, role='development', selected=None):
-    construction_started=time.perf_counter()
     guard(host,expensive=role!='confirmation'); s=state(host); c=verify_candidate(host,candidate_ref)
     expected_environment=s['spec'].get('numerical_environment',{})
     if any(os.environ.get(key)!=value for key,value in expected_environment.items()):
@@ -471,31 +502,71 @@ def execute(host, candidate_ref, operation_key, *, role='development', selected=
     if full_science(cfg)!=c['scientific_configuration']: raise ValueError('EXECUTION_CHANGED_FROZEN_SCIENCE')
     pending=dict(owner=owner,candidate=plain(candidate_ref),configuration=cfg,role=role,
         selected_execution=plain(selected),operation_key=operation_key,started_unix=time.time(),
-        profile_identity=s['profile']['identity'],admission=admission)
-    update(host,pending=pending,numerical_reserved_s=s['numerical_reserved_s']+allowance(s),nmpc_launches=s.get('nmpc_launches',0)+1)
-    child=Host(host.store.root,owner,actor=host.actor); child.create(cfg,parent_run_id=host.run_id)
-    pending['construction_s']=time.perf_counter()-construction_started
-    update(host,pending=pending)
+        profile_identity=s['profile']['identity'],admission=admission,reserved_s=admission['per_execution_s'])
+    with host.store.transaction() as db:
+        current=host.store.session(host.run_id,db)['state'];charge_start(current)
+        current.update(pending=pending,numerical_reserved_s=current['numerical_reserved_s']+pending['reserved_s'],nmpc_launches=current.get('nmpc_launches',0)+1)
+        host.store.update_state(db,host.run_id,current)
     return finish_execution(host)
 
 
 def finish_execution(host, recovery=False):
     """Only sealed receipts continue. Reporting failure cannot trigger simulation."""
-    from tools.execution_completion import complete_execution
+    from tools.execution_completion import complete_execution, STAGES
+    from tools.service_execution import _run_contained
     from tools.research_tasks import assemble_acceptance
-    from extensions.tendon_family.control_evidence import RECORD_UPDATE_IDS, COMPLETE_UPDATE_INPUTS
     s=state(host); p=s['pending']
     if not p: raise ValueError('NO_PENDING_EXECUTION')
     child=Host(host.store.root,p['owner'],actor=host.actor)
-    if recovery and child.store.lookup(p['owner'],'complete-simulation') is None:
-        raise ValueError('RECOVERY_HAS_NO_LAUNCH_RECEIPT_INSPECT_BEFORE_START')
     c=host.store.artifact(p['candidate']); started=time.perf_counter()
-    prior_wall=sum(json.loads(row['receipt'])['charged']['wall_s'] for stage in ('simulation','evaluation','profile')
-        if (row:=child.store.lookup(p['owner'],'complete-'+stage)) and row['receipt'])
-    trace=RECORD_UPDATE_IDS.set(tuple(s['profile']['recording']['update_ids']))
-    capture=COMPLETE_UPDATE_INPUTS.set(s['profile']['recording']['complete_update_inputs'])
-    try: result=complete_execution(child,p['configuration'],c['candidate_id'])
-    finally: RECORD_UPDATE_IDS.reset(trace); COMPLETE_UPDATE_INPUTS.reset(capture)
+    folder=host.store.root/'executions'/p['owner']; folder.mkdir(parents=True,exist_ok=True)
+    outcome=folder/'boundary.json'; output=folder/'result.json'
+    if not recovery:
+        if p.get('launch_intent'): raise ValueError('LAUNCH_ALREADY_REQUESTED_RECOVERY_ONLY_NO_RELAUNCH')
+        request=folder/'request.json'
+        atomic_json(request,dict(root=str(host.store.root),study=host.run_id,owner=p['owner'],actor=host.actor,
+            configuration=p['configuration'],candidate_id=c['candidate_id'],recording=s['profile']['recording']))
+        # Persist launch intent first. A crash thereafter is uncertain, never replayable.
+        update(host,pending=dict(p,launch_intent=True))
+        try:
+            with (folder/'worker.log').open('w',encoding='utf8') as log:
+                done=_run_contained([str(PYTHON),'-m','tools.research_core_execution_worker',str(request)],log,
+                    min(p['reserved_s'],max(.001,execution_deadline(host)-time.time())))
+            boundary=dict(termination_confirmed=True,timed_out=False,returncode=done.returncode)
+        except subprocess.TimeoutExpired as exc:
+            boundary=dict(termination_confirmed=getattr(exc,'termination_confirmed',False),timed_out=True)
+        except Exception as exc:
+            boundary=dict(termination_confirmed=False,timed_out=False,error=str(exc))
+        boundary['elapsed_s']=time.perf_counter()-started
+        atomic_json(outcome,boundary)
+    elif not outcome.exists():
+        raise ValueError('UNKNOWN_WORKER_TERMINATION_RETAINS_PENDING_RESERVATION; NO_RELAUNCH')
+    boundary=read(outcome)
+    if not boundary['termination_confirmed']:
+        return dict(status='execution_unresolved',reason='Worker tree termination uncertain; reservation retained; no replay',pending=p)
+    receipts={}; unfinished=None
+    for stage,tool in STAGES:
+        row=child.store.lookup(p['owner'],'complete-'+stage)
+        if row and row['receipt']: receipts[stage]=json.loads(row['receipt'])
+        elif row:
+            unfinished=(stage,tool,row);break
+    if unfinished:
+        stage,tool,row=unfinished
+        # Use the existing settlement API: failed receipt, exact prior costs retained.
+        elapsed=max(0.,boundary['elapsed_s']-sum(r['charged']['wall_s'] for r in receipts.values()))
+        receipts[stage]=child.store.complete(row,dict(request_id=row['request_id'],execution_id=row['execution_id'],
+            caller=row['caller'],tool_id=tool,tool_version='1.0.0',execution_status='failed',charged=zero(),
+            error='TIMEOUT' if boundary['timed_out'] else 'WORKER_EXIT_WITH_UNFINISHED_STAGE'),
+            dict(status='execution_incomplete',task_performance='unmeasured',boundary=boundary),elapsed=elapsed)
+    if boundary['timed_out'] or unfinished:
+        result=dict(status='execution_incomplete',timed_out=boundary['timed_out'],receipts=receipts,
+            stage=unfinished[0] if unfinished else 'execution',failure_reason='timeout' if boundary['timed_out'] else 'worker exit',
+            task_performance='unmeasured',boundary=boundary,retained_evidence=[r for e in host.store.events(p['owner']) for r in e['outputs']])
+    elif output.exists(): result=read(output)
+    else:
+        # Package only when every stage already has a sealed receipt. No missing-stage launch.
+        if len(receipts)==len(STAGES): result=complete_execution(child,p['configuration'],c['candidate_id'])
+        else: result=dict(status='execution_incomplete',receipts=receipts,failure_reason='worker returned without result',task_performance='unmeasured')
     if result['status']=='execution_unresolved':
         save(host,dict(pending=p,partial_result=result),'unresolved_execution'); return result
     acceptance=None; profile=None
@@ -507,8 +578,7 @@ def finish_execution(host, recovery=False):
     receipts=result.get('receipts',{})
     # Sealed stage costs plus construction/analysis; never charge enclosing
     # simulation and its internal updates twice, including on recovery.
-    stage_wall=sum(r['charged']['wall_s'] for r in receipts.values())
-    actual=stage_wall+max(0.,time.perf_counter()-started-(stage_wall-prior_wall))+p.get('construction_s',0.)
+    actual=max(boundary['elapsed_s'],sum(r['charged']['wall_s'] for r in receipts.values()))+(time.perf_counter()-started if recovery else 0.)
     detail=dict(status=result['status'],role=p['role'],candidate=p['candidate'],candidate_id=c['candidate_id'],
         implementation=s['freeze'],science_hashes=s['profile']['science_hashes'],
         numerical_environment={key:os.environ.get(key) for key in s['spec'].get('numerical_environment',{})},
@@ -526,7 +596,12 @@ def finish_execution(host, recovery=False):
     from tools.research_core_feedback import mechanics_context
     detail['mechanics_context']=mechanics_context(host,p['candidate'])
     ref=save(host,detail,'experiment_result'); s=state(host)
-    update(host,results=[*s['results'],ref],pending=None,numerical_reserved_s=s['numerical_reserved_s']-allowance(s),numerical_s=s['numerical_s']+actual)
+    with host.store.transaction() as db:
+        current=host.store.session(host.run_id,db)['state']
+        if not current.get('pending') or current['pending']['owner']!=p['owner']: raise ValueError('EXECUTION_ALREADY_SETTLED')
+        current.update(results=[*current['results'],ref],pending=None,
+            numerical_reserved_s=current['numerical_reserved_s']-p['reserved_s'],numerical_s=current['numerical_s']+actual)
+        host.store.update_state(db,host.run_id,current)
     from tools.research_core_feedback import eligibility
     return dict(reference=ref,**compact_result(detail),confirmation=eligibility(host,ref),
         operation_cost=dict(additional_numerical_s=actual,additional_scientific_executions=1,cached_operation_receipt=False))
@@ -815,7 +890,7 @@ def packet(host):
             handoffs=[dict(reference=r,**host.store.artifact(r)) for r in s.get('handoffs',[])],
             rl=rl_packet(host) if enabled(s['spec'],'rl') else None,
             nmpc_admission=[dict(candidate=r,**nmpc_timing(host,r),remaining_phase_admission=capacity(host,1,candidate=r)) for r in s['candidates'].values()] if s['spec'].get('nmpc_execution_cap_s') else None,
-            resource_use=dict(shared_ledger=host.store.remaining(),numerical_s=s['numerical_s'],elapsed_s=max(0,s.get('closed_unix',time.time())-s['started_unix'])),
+            resource_use=dict(shared_ledger=host.store.remaining(),numerical_s=s['numerical_s'],numerical_reserved_s=s['numerical_reserved_s'],remaining_numerical_s=s['spec']['budgets']['numerical_s']-s['numerical_s']-s['numerical_reserved_s'],charged_starts=s.get('charged_starts',0),shared_start_limit=s['spec'].get('shared_start_limit'),elapsed_s=max(0,s.get('closed_unix',time.time())-s['started_unix'])),
             claims=claims(host),research_status=s['research_status'])
     if s['spec'].get('mode')=='rl_interface':
         from tools.research_core_rl import packet as rl_packet
@@ -1026,7 +1101,7 @@ relaxed requirements and expected relation to original completion. Inspect mathe
 Mathematical feasibility, relaxed dynamics and original MuJoCo task acceptance are distinct. Preliminary ranking is optional. Search uses NMPC only.
 Choose mathematical accuracy, reference use, direct/residual RL or admitted NMPC and subsequent actions using evidence and budget. Explain how the chosen integration method and discretization suit the intended use; computation time alone does not justify the coarsest model.
 Solver convergence, numerical feasibility, independent mathematical verification, backend acceptance and confirmation completion are separate. Compatibility is not numerical accuracy; unverified references remain unverified even if used exploratorily.
-Inspect nmpc_admission: configuration-matched complete timing is required. The authorized first-use option is unavailable because this synchronous path cannot enforce an outer hard cap; no calibration, invented timing or automatic retry. Timeout is censored timing.
+Inspect nmpc_admission: a complete contained execution reserves its hard cap and confirmation capacity. Matching historical timing is an estimate only; first-use candidates are eligible without calibration. Timeout is incomplete evidence, task performance unmeasured; no automatic retry.
 Residual requires an advertised compatible runnable reference. Direct stays available if incompatible. Train within declared trial/cumulative limits;
 query real terminal status and explicitly read/cite its training_summary_reference through evidence_read before deciding.
 Evaluate only a usable published checkpoint; otherwise read training/failure evidence and decide without an impossible evaluation or automatic replacement trial.
@@ -1229,7 +1304,10 @@ def recover(host):
         original=host.store.artifact(ref);key=original['request_id'];row=host.store.lookup(host.run_id,key)
         if not row or row['receipt']: continue
         plan=Plan.model_validate(original['original_plan'])
-        if plan.action=='search': result=run_search(host,plan.search,key)
+        if plan.action=='search':
+            result=dict(status='search_execution_incomplete',saved_checkpoint=s['searches'].get(key),
+                attempted_executions=[r for r in s['results'] if host.store.artifact(r)['operation_key'].startswith(key+':')],
+                reason='Recovery packages existing evidence only; further proposals require a new model-requested search')
         elif plan.action in ('execute','confirm'):
             matches=[r for r in state(host)['results'] if host.store.artifact(r)['operation_key']==key]
             if len(matches)!=1: raise ValueError('RECOVERY_REQUIRES_UNIQUE_SEALED_RESULT_NO_NEW_LAUNCH')

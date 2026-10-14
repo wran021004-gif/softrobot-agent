@@ -414,3 +414,28 @@ See `evidence/confirmation_completion_20261014/scientific_summary.json`,
 `evidence/autonomous_design_control_20261014/scientific_summary.json` and
 `evidence/autonomous_study_closeout_20261014/campaign_summary.json` for outcomes,
 separate historical/new costs, original traces and runtime manifests.
+
+
+The contained autonomous study (`examples/research_core/contained_autonomous_study.json`)
+moves the whole NMPC completion pipeline, including child-session construction,
+into `tools/research_core_execution_worker.py`. Its persisted hard-cap reservation
+is used for admission and settlement. Verified timeout seals the active stage with
+a failed receipt through Store.complete, retains earlier completed receipts/costs,
+and reports incomplete, unmeasured task performance. Before stage creation the
+terminal timeout is execution-level evidence. Uncertain termination retains pending
+state and reservation; recovery never launches a missing stage or another worker.
+Windows containment shares a named job between launcher and actual Python worker,
+terminates that job and checks zero active processes before claiming termination.
+
+RL training_runs is an optional ceiling (omitted/null means none); action/time,
+evaluation, confirmation and shared charged-start ceilings still apply. Status
+separates conservative allocations, actual consumption and active/uncertain
+reservations; unused historical allocations are not recycled. Terminal training
+without a usable checkpoint requires an explicit failure-summary read, with task
+performance unmeasured and another authorized action or STOP left to the model.
+
+The historical joint candidate and its exact mathematical source/request/trajectory,
+handoff and failed independent consistency evidence are copied by reference and
+registered in existing lookups. Availability is checked without a new solve or
+physical episode; the original source identity/costs remain historical. Recorded
+holding samples are in `evidence/contained_autonomous_study_20261014/`.

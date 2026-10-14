@@ -107,7 +107,7 @@ def dispatch(host, operation, arguments, key):
             operation_reuse=dict(additional_numerical_s=0.,additional_scientific_executions=0),
             original_charged_numerical_s=value['charged_numerical_s'])
     def charge(db):
-        current=host.store.session(host.run_id,db)['state']
+        current=host.store.session(host.run_id,db)['state'];core.charge_start(current)
         if counter:current[counter]=current.get(counter,0)+1
         if downstream and operation=='solve' and request['arguments']['design_bounds'][0]==request['arguments']['design_bounds'][1]:
             current['fixed_offline_attempts']=current.get('fixed_offline_attempts',0)+1

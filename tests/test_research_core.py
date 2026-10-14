@@ -135,13 +135,30 @@ class CoreTests(TestCase):
             receipt=h.store.complete(row,dict(request_id=row['request_id'],execution_id=row['execution_id'],caller=h.actor,
                 tool_id='simulation.run',tool_version='1.0.0',execution_status='failed',charged=core.zero()),dict(substituted=True))
             return dict(status='execution_incomplete',execution_id=row['execution_id'],receipts={'simulation':receipt})
-        with patch.object(core,'guard'),patch('tools.execution_completion.complete_execution',side_effect=completed):
+        def boundary(command,log,seconds):
+            from tools.research_core_execution_worker import execute
+            request=read(command[-1]);core.atomic_json(core.Path(command[-1]).with_name('result.json'),execute(request))
+            return core.subprocess.CompletedProcess(command,0)
+        with patch.object(core,'guard'),patch('tools.service_execution._run_contained',side_effect=boundary),patch('tools.execution_completion.complete_execution',side_effect=completed):
             a=core.execute(h,previous['reference_candidate'],'fixture-fresh-1')
             b=core.execute(h,previous['reference_candidate'],'fixture-fresh-2')
         self.assertEqual(a['candidate_id'],b['candidate_id'])
         self.assertNotEqual(a['execution_id'],b['execution_id']);self.assertNotEqual(a['owner_run_id'],b['owner_run_id'])
         self.assertEqual(h.store.remaining()['used']['backend_solves'],start_usage+2)
         core.update(h,**previous)
+
+    def test_search_recovery_packages_evidence_without_next_launch(self):
+        h=self.host;previous=deepcopy(core.state(h))
+        plan=dict(action='search',search=dict(variables=['d'],bounds={'d':[-1,1]},max_evaluations=1),**{k:'fixture' for k in
+            ('hypothesis','expected_observation','weakening_observation','fixed_conditions','stopping_condition','interpretation')})
+        original=core.save(h,dict(request_id='search-recovery',original_plan=plan))
+        h.store.reserve(h.run_id,'search-recovery','fixture',h.actor,core.zero())
+        core.update(h,plans=[original],results=[],pending=None)
+        try:
+            with patch.object(core,'run_search',side_effect=AssertionError('No new solve or rollout')):
+                value=core.recover(h)
+            self.assertEqual(value['sealed_workflows'],['search-recovery'])
+        finally:core.update(h,**previous)
 
     def test_material_migration_keeps_costs_and_requires_new_reference(self):
         h=self.host;previous=deepcopy(core.state(h))
@@ -375,11 +392,11 @@ class FormalControlTests(TestCase):
         state=dict(spec={'nmpc_execution_cap_s':1800,'nmpc_timing_evidence':[dict(scientific_configuration_identity=core.digest(cfg),complete_execution_s=1900,source='saved-timing')]})
         with patch.object(core,'state',return_value=state),patch.object(core,'verify_candidate',return_value={'scientific_configuration':cfg}):
             gate=core.nmpc_timing(SimpleNamespace(),'candidate')
-            self.assertFalse(gate['available']);self.assertIn('exceeds cap',gate['reason'])
+            self.assertTrue(gate['available']);self.assertEqual(gate['reservation_s'],1800)
             state['spec']['nmpc_timing_evidence'][0]['complete_execution_s']=600
             self.assertTrue(core.nmpc_timing(SimpleNamespace(),'candidate')['available'])
             state['spec']['nmpc_timing_evidence'][0]['scientific_configuration_identity']='different'
-            self.assertFalse(core.nmpc_timing(SimpleNamespace(),'candidate')['available'])
+            self.assertTrue(core.nmpc_timing(SimpleNamespace(),'candidate')['available'])
 
     def test_rl_confirmation_exact_generation_without_training_or_nmpc(self):
         from tools import research_core_rl as bridge
@@ -395,8 +412,8 @@ class FormalControlTests(TestCase):
     def test_rl_reserve_reads_confirmation_count_and_deadline(self):
         from tools import research_core_rl as bridge
         from types import SimpleNamespace
-        s=dict(spec={'confirmation':{'fresh_independent_repetitions':2},'rl_evaluation_allowance_s':10,'rl_limits':{'evaluation_episodes':5}},rl_runs={'r':{'evaluations':2}},cutoff_unix=time.time()+100)
-        h=SimpleNamespace(store=SimpleNamespace(remaining=lambda:{'remaining':{'wall_s':100}}))
+        s=dict(spec={'confirmation':{'fresh_independent_repetitions':2},'rl_evaluation_allowance_s':10,'rl_limits':{'evaluation_episodes':5},'budgets':{'numerical_s':1000,'protected_provider_requests':0}},rl_runs={'r':{'evaluations':2}},cutoff_unix=time.time()+100,numerical_s=0,numerical_reserved_s=0)
+        h=SimpleNamespace(store=SimpleNamespace(remaining=lambda:{'remaining':{'wall_s':100,'model_calls':100}}))
         with patch.object(core,'state',return_value=s):
             self.assertEqual(bridge.evaluation_capacity(h,5)['admitted'],1)
             self.assertEqual(bridge.evaluation_capacity(h,2,True)['admitted'],2)
@@ -643,15 +660,15 @@ class ConfirmationCompletionTests(TestCase):
         h=SimpleNamespace(store=SimpleNamespace(artifact=lambda r:records[r['artifact_id']]))
         with patch.object(core,'state',return_value={'handoffs':[dict(artifact_id='handoff')],'mechanics_results':[]}):
             view=feedback.mechanics_context(h,candidate)[0]
-            self.assertEqual(view['independent_mathematical_verification'],'unverified');self.assertTrue(view['exploratory_closed_loop'])
+            self.assertEqual(view['independent_mathematical_verification'],'not performed');self.assertTrue(view['exploratory_closed_loop'])
 
-    def test_nmpc_first_use_stays_unavailable_without_enforced_cap(self):
+    def test_nmpc_first_use_admitted_under_enforced_cap(self):
         from types import SimpleNamespace
         cfg={'task':'fixed'};s=dict(spec={'nmpc_execution_cap_s':1800,'nmpc_budgeted_first_use':True},results=[])
         with patch.object(core,'state',return_value=s),patch.object(core,'verify_candidate',return_value={'scientific_configuration':cfg}):
             gate=core.nmpc_timing(SimpleNamespace(),'candidate')
-            self.assertFalse(gate['available']);self.assertIsNone(gate['complete_execution_s'])
-            self.assertIn('cannot enforce',gate['first_use_limitation'])
+            self.assertTrue(gate['available']);self.assertIsNone(gate['complete_execution_s'])
+            self.assertEqual(gate['reservation_s'],1800)
 
     def test_rejected_allocation_returns_actual_remaining_capacity(self):
         from types import SimpleNamespace
@@ -661,6 +678,135 @@ class ConfirmationCompletionTests(TestCase):
         h=SimpleNamespace(run_id='fixture',store=SimpleNamespace(lookup=lambda *a:None))
         state=dict(spec=spec,rl_runs=entries)
         q=dict(operation='start',candidate={'artifact_id':'c'*64},mode='direct',allocation={'actions':400000,'active_seconds':1800},rationale='over allocated seconds')
-        with patch.object(core,'state',return_value=state),patch.object(core,'guard'),patch.object(core,'admit_closeout'),patch.object(bridge,'prepare_input',return_value=({},{})),patch.object(bridge,'invoke',side_effect=AssertionError('must not start')):
+        with patch.object(core,'state',return_value=state),patch.object(core,'guard'),patch.object(core,'admit_closeout'),patch.object(bridge,'prepare_input',return_value=({},{})),patch.object(bridge,'invoke',side_effect=AssertionError('must not start')),patch.object(bridge,'evaluation_capacity',return_value={}):
             with self.assertRaisesRegex(ValueError,'remaining.*trials.*1.*allocated_active_seconds.*1200.*no training started'):
                 bridge.dispatch(h,q,'over-allocation')
+
+
+class ExecutionBoundaryTests(TestCase):
+    def test_real_contained_normal_and_child_timeout(self):
+        import subprocess, os
+        from tools.service_execution import _run_contained
+        with TemporaryDirectory(dir=core.ROOT/'runs',prefix='tree-fixture-') as folder:
+            path=core.Path(folder);pids=path/'pids.json'
+            with (path/'worker.log').open('w') as log:
+                done=_run_contained([str(core.PYTHON),'-c','from tools.service_execution import contain_worker_children; job=contain_worker_children()'],log,10)
+                self.assertEqual(done.returncode,0)
+                code="import os,sys,time,subprocess,json; from tools.service_execution import contain_worker_children; job=contain_worker_children(); child=subprocess.Popen([sys.executable,'-c','import time; time.sleep(60)']); open(sys.argv[1],'w').write(json.dumps([os.getpid(),child.pid])); time.sleep(60)"
+                with self.assertRaises(subprocess.TimeoutExpired) as caught:
+                    _run_contained([str(core.PYTHON),'-c',code,str(pids)],log,3)
+            self.assertTrue(caught.exception.termination_confirmed)
+            self.assertTrue(pids.exists(),(path/'worker.log').read_text())
+            for pid in read(pids):
+                if os.name=='nt':
+                    import ctypes as c
+                    from ctypes import wintypes as w
+                    kernel=c.WinDLL('kernel32',use_last_error=True)
+                    kernel.OpenProcess.argtypes=[w.DWORD,w.BOOL,w.DWORD];kernel.OpenProcess.restype=w.HANDLE
+                    kernel.WaitForSingleObject.argtypes=[w.HANDLE,w.DWORD];kernel.CloseHandle.argtypes=[w.HANDLE]
+                    handle=kernel.OpenProcess(0x100000,False,pid)
+                    if handle:
+                        try:self.assertEqual(kernel.WaitForSingleObject(handle,0),0)
+                        finally:kernel.CloseHandle(handle)
+                else:
+                    try:os.kill(pid,0)
+                    except ProcessLookupError:pass
+                    else:self.fail('Owned process still alive')
+
+    def test_timeout_failure_receipt_and_no_replay_exact_reservation(self):
+        import json
+        from tools import research_core_execution_worker as worker
+        for stage in ('simulation','evaluation',None,'uncertain'):
+            with self.subTest(stage=stage),TemporaryDirectory(dir=core.ROOT/'runs',prefix='timeout-fixture-') as folder:
+                path=core.Path(folder);spec=read(core.DEFAULT_SPEC)
+                spec.update(study_id='timeout-'+path.name,started_unix=time.time(),nmpc_execution_cap_s=12)
+                core.atomic_json(path/'spec.json',spec);h=core.prepare(path/'spec.json',path/'store')
+                core.update(h,freeze='fixture',numerical_reserved_s=5.)
+                before=core.state(h);saved=[]
+                def launch(command,log,timeout):
+                    self.assertEqual(core.state(h)['pending']['reserved_s'],12)
+                    request=read(command[-1]);child=core.Host(h.store.root,request['owner'],actor=h.actor)
+                    if stage is not None:
+                        child.create(request['configuration'],parent_run_id=h.run_id)
+                        if stage=='evaluation':
+                            row,_=h.store.reserve(child.run_id,'complete-simulation','fixture-sim',h.actor,{**core.zero(),'backend_solves':1})
+                            saved.append(h.store.complete(row,dict(request_id=row['request_id'],execution_id=row['execution_id'],caller=h.actor,tool_id='simulation.run',tool_version='1.0.0',execution_status='completed',charged=core.zero()),{'fixture':True},elapsed=.01))
+                        name='evaluation' if stage=='evaluation' else 'simulation'
+                        h.store.reserve(child.run_id,'complete-'+name,'fixture-'+name,h.actor,{**core.zero(),'wall_s':10})
+                    exc=core.subprocess.TimeoutExpired(command,timeout);exc.termination_confirmed=stage!='uncertain';raise exc
+                with patch.object(core,'guard'),patch('tools.service_execution._run_contained',side_effect=launch) as launched,patch.object(worker,'execute',side_effect=AssertionError('no physical execution')):
+                    result=core.execute(h,before['reference_candidate'],'timeout')
+                    if stage=='uncertain':
+                        self.assertEqual(result['status'],'execution_unresolved');self.assertEqual(core.state(h)['numerical_reserved_s'],17)
+                        again=core.finish_execution(h,recovery=True);self.assertEqual(again['status'],'execution_unresolved')
+                    else:
+                        self.assertEqual(result['status'],'execution_incomplete');self.assertIsNone(result['acceptance'])
+                        self.assertEqual(core.state(h)['numerical_reserved_s'],5.)
+                        detail=h.store.artifact(result['reference']);self.assertEqual(detail['execution']['task_performance'],'unmeasured')
+                        if stage:
+                            receipt=json.loads(h.store.lookup(result['owner_run_id'],'complete-'+stage)['receipt'])
+                            self.assertEqual(receipt['execution_status'],'failed');self.assertEqual(receipt['error'],'TIMEOUT')
+                        else:self.assertEqual(detail['execution']['stage'],'execution')
+                        if saved:self.assertEqual(json.loads(h.store.lookup(result['owner_run_id'],'complete-simulation')['receipt']),saved[0])
+                        with self.assertRaisesRegex(ValueError,'NO_PENDING'):core.finish_execution(h,recovery=True)
+                    launched.assert_called_once()
+                __import__('gc').collect()
+
+    def test_exact_historical_import_is_publicly_usable_without_experiment(self):
+        from tools import research_core_mechanics as mechanics,research_core_rl as bridge
+        with TemporaryDirectory(dir=core.ROOT/'runs',prefix='import-fixture-') as folder:
+            path=core.Path(folder);spec=read(core.ROOT/'examples/research_core/contained_autonomous_study.json')
+            spec.update(study_id='import-'+path.name,started_unix=time.time());core.atomic_json(path/'spec.json',spec)
+            with patch('tools.execution_completion.complete_execution',side_effect=AssertionError('no rollout')),patch.object(mechanics,'dispatch',side_effect=AssertionError('no solve')):
+                h=core.prepare(path/'spec.json',path/'store');source=spec['historical_evidence']['references']
+                self.assertEqual(core.verify_candidate(h,source['joint_candidate'])['parameters']['d'],-.2394244339763736)
+                self.assertEqual(mechanics.source(h,source['mathematical_source'])['operation'],'solve')
+                self.assertTrue(bridge.compatible_references(h)[0]['available'])
+                context=__import__('tools.research_core_feedback',fromlist=['mechanics_context']).mechanics_context(h,source['joint_candidate'])[0]
+                self.assertEqual(context['independent_mathematical_verification'],'failed')
+                self.assertEqual(context['failed_verification_metrics'][0]['time_s'],.2925)
+                self.assertEqual(h.store.remaining()['used']['backend_solves'],0)
+                self.assertEqual(core.state(h)['offline_nlp'],0)
+                for ref in spec['historical_evidence']['references'].values(): core.read_evidence(h,{'reference':ref})
+            __import__('gc').collect()
+
+    def test_optional_trial_cap_remaining_and_explicit_smaller_request(self):
+        from tools import research_core_rl as bridge
+        with TemporaryDirectory(dir=core.ROOT/'runs',prefix='allocation-fixture-') as folder:
+            path=core.Path(folder);spec=read(core.ROOT/'examples/research_core/contained_autonomous_study.json')
+            spec.pop('historical_evidence');spec.update(supplied_evidence=[],study_id='allocation-'+path.name,started_unix=time.time())
+            spec['rl_limits'].update(training_actions=1024,training_active_seconds=100)
+            core.atomic_json(path/'spec.json',spec);h=core.prepare(path/'spec.json',path/'store');candidate=core.state(h)['reference_candidate']
+            q=dict(operation='start',candidate=candidate,mode='direct',training_overrides=dict(n_steps=32,batch_size=16,n_epochs=2),allocation=dict(actions=64,active_seconds=10),rationale='fixture')
+            with patch.object(core,'guard'),patch.object(bridge,'invoke',return_value={'status':'starting'}) as launch:
+                for i in range(4):
+                    if i==1: spec['rl_limits'].pop('training_runs');core.update(h,spec=spec)
+                    q['rationale']='explicit trial '+str(i);bridge.dispatch(h,q,'trial-'+str(i))
+                feedback=bridge.allocation_feedback(h);self.assertIsNone(feedback['remaining_allocatable']['trials'])
+                self.assertEqual(feedback['cumulative_allocated'],dict(actions=256,active_seconds=40))
+                q['allocation']['active_seconds']=70
+                with self.assertRaisesRegex(ValueError,'allocated_active_seconds.*60'):bridge.dispatch(h,q,'oversized')
+                self.assertEqual(launch.call_count,4)
+                q['allocation']['active_seconds']=60;bridge.dispatch(h,q,'fitting')
+                self.assertEqual(launch.call_count,5);self.assertEqual(bridge.allocation_feedback(h)['remaining_allocatable']['allocated_active_seconds'],0)
+                spec['rl_limits']['training_runs']=5;core.update(h,spec=spec)
+                q['allocation']['active_seconds']=1
+                with self.assertRaisesRegex(ValueError,'ceiling'):bridge.dispatch(h,q,'finite-cap')
+                self.assertEqual(len(core.state(h)['rl_runs']),5)
+                self.assertEqual(core.state(h)['charged_starts'],5)
+                spec['shared_start_limit']=6;core.update(h,spec=spec)
+                self.assertEqual(bridge.evaluation_capacity(h)['admitted'],0)
+                self.assertEqual(core.capacity(h)['admitted'],0)
+                # Terminal failure with no policy can STOP after explicit reads;
+                # no impossible evaluation or replacement training is invoked.
+                runs=core.state(h)['rl_runs'];summaries=[]
+                for run_id,entry in runs.items():
+                    ref=core.save(h,dict(run_id=run_id,status='failed',checkpoint=None,task_performance='unmeasured'))
+                    entry.update(training_summary=ref,status=dict(worker_alive=False));summaries.append(ref)
+                core.update(h,rl_runs=runs,rl_training_summaries=summaries)
+                for ref in summaries:core.read_evidence(h,dict(reference=ref))
+                plan=dict(action='stop',next_step='stop',supporting_evidence=summaries,**{k:'Terminal failure, task performance unmeasured' for k in ('hypothesis','expected_observation','weakening_observation','fixed_conditions','stopping_condition','interpretation')})
+                result=core.dispatch(h,plan,'failure-stop')
+                self.assertTrue(result['result']['accepted_stop']);self.assertEqual(launch.call_count,5)
+                self.assertFalse(core.claims(h)['task_passed'])
+            __import__('gc').collect()

@@ -1,0 +1,249 @@
+{
+  "study_id": "contained-autonomous-study-20261014",
+  "base_commit": "3571e494aaa2c8f1179941a7771aca5a05d599e7",
+  "started_unix": 1791951433.3441641,
+  "authorization": "User attachment 5db8c75c-2fb6-4762-a8f7-efe62b329b8c and 2026-10-14 steering: scoped implementation, scientific/model requests, nonsecret task schemas/configurations/source/evidence/budget to configured DeepSeek, commit and ordinary push feat/rl-control-pilot. No credentials, env-file contents, unrelated or confidential material.",
+  "evaluation_version": 1,
+  "reference_parameters": {
+    "d": 0,
+    "holding_tip_speed_weight": 0.1,
+    "terminal_tip_speed_weight": 0.1
+  },
+  "allowed_parameters": {
+    "d": [
+      -1,
+      1
+    ],
+    "holding_tip_speed_weight": [
+      0.025,
+      0.1
+    ],
+    "terminal_tip_speed_weight": [
+      0.025,
+      0.1
+    ]
+  },
+  "ranking": "feasible_then_max_normalized_violation_then_sum_v1",
+  "record_update_ids": [
+    8,
+    29,
+    30
+  ],
+  "complete_update_inputs": true,
+  "budgets": {
+    "provider_requests": 120,
+    "public_operations": 300,
+    "physical_launches": 64,
+    "local_solves": 0,
+    "local_solve_s": 0,
+    "offline_nlp": 4,
+    "bdf_replays": 4,
+    "numerical_s": 24000,
+    "activity_s": 28800,
+    "delivery_reserve_s": 1200,
+    "protected_provider_requests": 20
+  },
+  "execution_allowances": {
+    "simulation_s": 3500,
+    "evaluation_s": 30,
+    "profile_s": 60,
+    "construction_s": 10
+  },
+  "confirmation": {
+    "fresh_independent_repetitions": 2,
+    "configuration": "Two fresh post-selection nominal episodes; original task, identical selected candidate/controller/configuration and exact frozen RL checkpoint. Development evaluation excluded; retain failures; no success-hunting retries."
+  },
+  "optional_enhancements": {
+    "offline_schedule_initialization": "deferred until core delivery and sufficient remaining budget",
+    "legacy_skill_admission": "deferred; read-only drafts available"
+  },
+  "mode": "formal_research",
+  "tension_execution_mode": "ideal_tension",
+  "evidence_destination": "evidence/contained_autonomous_study_20261014",
+  "rl_limits": {
+    "training_runs": null,
+    "actions_per_trial": 1000000,
+    "seconds_per_trial": 3600,
+    "training_actions": 2000000,
+    "training_active_seconds": 7200,
+    "evaluation_episodes": 24,
+    "diagnostic_replays": 2,
+    "diagnostic_physics_steps": 1
+  },
+  "capabilities": [
+    "mathematics",
+    "replay",
+    "search",
+    "nmpc",
+    "rl"
+  ],
+  "rl_evaluation_allowance_s": 120,
+  "nmpc_execution_cap_s": 3600,
+  "offline_solver_s": 6600,
+  "mechanics_allowances": {
+    "solve_s": 6600,
+    "replay_s": 600,
+    "inspect_s": 60
+  },
+  "nmpc_limits": {
+    "executions": 8
+  },
+  "nmpc_timing_evidence": [
+    {
+      "scientific_configuration_identity": "91c7032e7a4690d3e91b61ec34ee00130a51867d6cc06d85caf0da4f31de5c22",
+      "complete_execution_s": 729.8433474299993,
+      "measured_complete_execution_s": 540.6247017999995,
+      "margin": 1.35,
+      "source": {
+        "archive": "evidence/research_core_20261011/immutable_artifacts.tar.gz",
+        "result": {
+          "artifact_id": "df0b70c9d13237b203dbb711cd16c861d0c16fa0a85909bbaf64a4a1dc09f0ca",
+          "media_type": "application/json"
+        },
+        "ownership": "historical; existing timing, no new calibration"
+      }
+    },
+    {
+      "scientific_configuration_identity": "91c7032e7a4690d3e91b61ec34ee00130a51867d6cc06d85caf0da4f31de5c22",
+      "complete_execution_s": 723.8085303149797,
+      "measured_complete_execution_s": 536.154466899985,
+      "margin": 1.35,
+      "source": {
+        "archive": "evidence/research_core_20261011/immutable_artifacts.tar.gz",
+        "result": {
+          "artifact_id": "34e75e00627182e5a006804efd9e00b21949643c29020961fc2a9513e1f6dab5",
+          "media_type": "application/json"
+        },
+        "ownership": "historical; existing timing, no new calibration"
+      }
+    },
+    {
+      "scientific_configuration_identity": "91c7032e7a4690d3e91b61ec34ee00130a51867d6cc06d85caf0da4f31de5c22",
+      "complete_execution_s": 641.2793865299668,
+      "measured_complete_execution_s": 475.02176779997535,
+      "margin": 1.35,
+      "source": {
+        "archive": "evidence/research_core_20261011/immutable_artifacts.tar.gz",
+        "result": {
+          "artifact_id": "043ffc3d31382c5d91d27f3ec3ee403978d472322ef6612264794cb5a8ce2d49",
+          "media_type": "application/json"
+        },
+        "ownership": "historical; existing timing, no new calibration"
+      }
+    },
+    {
+      "scientific_configuration_identity": "91c7032e7a4690d3e91b61ec34ee00130a51867d6cc06d85caf0da4f31de5c22",
+      "complete_execution_s": 662.3072149499785,
+      "measured_complete_execution_s": 490.5979369999841,
+      "margin": 1.35,
+      "source": {
+        "archive": "evidence/research_core_20261011/immutable_artifacts.tar.gz",
+        "result": {
+          "artifact_id": "a2904e47bca95913ae96922b50cb525e2dd0fa4570f9ed75869454c2431728ca",
+          "media_type": "application/json"
+        },
+        "ownership": "historical; existing timing, no new calibration"
+      }
+    },
+    {
+      "scientific_configuration_identity": "91c7032e7a4690d3e91b61ec34ee00130a51867d6cc06d85caf0da4f31de5c22",
+      "complete_execution_s": 761.0898686850823,
+      "measured_complete_execution_s": 563.7702731000609,
+      "margin": 1.35,
+      "source": {
+        "archive": "evidence/research_core_20261011/immutable_artifacts.tar.gz",
+        "result": {
+          "artifact_id": "089040ea3e1ca9a8443685afd25fc8c64b4b0a11d4cc52ea27ab1c3580d50f61",
+          "media_type": "application/json"
+        },
+        "ownership": "historical; existing timing, no new calibration"
+      }
+    },
+    {
+      "scientific_configuration_identity": "84551517c2a6527ca753a1350aa0df2ecec2ac5005e4a7668c252488533ebcdd",
+      "complete_execution_s": 767.0489449949179,
+      "measured_complete_execution_s": 568.1844036999391,
+      "margin": 1.35,
+      "source": {
+        "archive": "evidence/research_core_20261011/immutable_artifacts.tar.gz",
+        "result": {
+          "artifact_id": "f3d993ba4333dd5f34ee150f916fdc99a0670c99e7870b97a3f5e7e5f1c24b49",
+          "media_type": "application/json"
+        },
+        "ownership": "historical; existing timing, no new calibration"
+      }
+    }
+  ],
+  "historical_evidence": {
+    "source_study_id": "autonomous-design-control-20261014",
+    "references": {
+      "joint_candidate": {
+        "artifact_id": "ab14d2064efd7cf1ac2466120c20542b669a9cc0e849d7beff2a8fa51d46aad9",
+        "media_type": "application/json"
+      },
+      "mathematical_source": {
+        "artifact_id": "a4e5b3184910c7140af2c1ee987c69a84569625b0787ef9084d1357a8c68c978",
+        "media_type": "application/json"
+      },
+      "handoff": {
+        "artifact_id": "8ce83a7f60049433699efc58382b863393c0998263a5145b7552145f0fffe6f3",
+        "media_type": "application/json"
+      },
+      "verification": {
+        "artifact_id": "93eb8edcdfbe245d2e8b3d32e011b3f9a6cfa652dcc3c878858a639a71b18a96",
+        "media_type": "application/json"
+      },
+      "direct_evaluation": {
+        "artifact_id": "034b4c1943763ddd3bec1d9d09af18db2172b1eecd0291d7b64dadd9aa3c50a7",
+        "media_type": "application/json"
+      },
+      "residual_evaluation": {
+        "artifact_id": "1056fad5c7a463b9ebbbd7062ed582dc4fe822c66cefc543c33fe757bbfc1913",
+        "media_type": "application/json"
+      }
+    },
+    "register": {
+      "candidates": [
+        {
+          "artifact_id": "ab14d2064efd7cf1ac2466120c20542b669a9cc0e849d7beff2a8fa51d46aad9",
+          "media_type": "application/json"
+        }
+      ],
+      "mechanics_sources": [
+        {
+          "artifact_id": "a4e5b3184910c7140af2c1ee987c69a84569625b0787ef9084d1357a8c68c978",
+          "media_type": "application/json"
+        }
+      ],
+      "handoffs": [
+        {
+          "artifact_id": "8ce83a7f60049433699efc58382b863393c0998263a5145b7552145f0fffe6f3",
+          "media_type": "application/json"
+        }
+      ],
+      "verification": [
+        {
+          "artifact_id": "93eb8edcdfbe245d2e8b3d32e011b3f9a6cfa652dcc3c878858a639a71b18a96",
+          "media_type": "application/json"
+        }
+      ]
+    },
+    "ownership": "Sealed historical source. Exact references and original costs retained; no current credit or result claim."
+  },
+  "rl_diagnostic_allowance_s": 60,
+  "execution_instructions": "Read the frozen original task, specification/budget and scoped evidence explicitly. The original reference direct policy already passed 2/2 confirmations; preserve it as the confirmed baseline and do not reevaluate it. The exact historical joint candidate d=-0.2394244339763736, mathematical source, original request, trajectory and verification are imported and registered in existing candidate/reference lookup. Read the handoff and mathematical context; the velocity consistency check failed at .2925 s (before holding) although independent sampled model task passed. Both complete historical MuJoCo direct and residual evaluations failed holding metrics; residual terminal speed is not holding maximum. No established causal diagnosis or design infeasibility. Read the compact recorded .25-.35 s holding sample summary, retaining not-recorded fields. Historical costs remain separate.\nChoose another control experiment on that candidate, supported direct/residual PPO parameters/rewards with a fitting explicit allocation, optional mathematical verification/reference investigation, NMPC, design revision, bounded diagnosis or STOP. Give an evidence-based reason; no prescribed route, trial count, integration method or mandatory new solve. Advertised compatible references may be exploratory with their failed/unverified numerical status visible. A full mathematical optimization is optional. Explain any accuracy choice relative to its intended reference/design use.\nNMPC has an enforced outer subprocess cap covering child construction, simulation, evaluation and reporting. Each admitted execution reserves its entire hard cap plus confirmation capacity; matching historical timing is only an estimate. First-use candidates can execute without a timing calibration. Timeouts are incomplete execution evidence with task performance unmeasured, never infeasibility; known termination seals failure receipts, unknown termination retains pending/reservation. Recovery only inspects/packages existing evidence, never relaunches. No automatic replacement experiment.\nRL trial count has no separate ceiling. Total allocation 2000000 actions/7200 active seconds, each trial at most1000000 actions/3600s; rollouts round DOWN and requested/effective allocations remain distinct. Allocations are conservative and never recycled. Oversized requests expose remaining fitting range; choose a fitting explicit request, another action or STOP. Program waits outside model turns. Query actual terminal status and explicitly read/cite training_summary_reference. Only when a usable published checkpoint exists independently evaluate its exact name, read/cite the result and decide. If none exists, read the terminal failure summary, explicitly report task performance UNMEASURED and choose another authorized action or STOP; no impossible evaluation or automatic replacement run. Resume retains original configuration/endpoint; learning-rate changes or extending completed training are unsupported.\nCeilings: activity28800s including1200s delivery; shared numerical24000s; provider120 including failures/corrections,20 protected; public operations300; shared charged starts64 across routes, explicitly enforced by shared ledger; RL evaluations24 including confirmations; at most4 mathematical solves6600s each, research_work_v1/1000 iterations; optional independent checks4 at600s; NMPC executions8 including confirmations,3600s each; physical diagnostics2 at60s with existing declared one-step limit. Shared time and full closeout/evaluation/confirmation reserves take priority; ceilings are not targets. No old allowance transferred.\nFrozen task target[.29,.035,.19]m, zero initialization,.35s duration,.01s control,.0005s MuJoCo; terminal/holding position .01m, holding speed .02m/s, inclusive steps30-35. Rewards and discretization cannot alter these. Freeze a passing new development result through research_plan confirm selected_execution, retaining candidate/task/controller/exact checkpoint. Two fresh confirmations of SAME selection, read each; retain failures, no success-hunting retry. Confirmed baseline is not a new achievement. STOP cites all new results and terminal summaries after public evidence reads, describes unfinished requirements and next_step. Honest budget-bounded scientific failure can STOP. Preserve exact model choices and outcomes, with no unsupported superiority, robustness or causal claims. Send only authorized task-relevant nonsecret data.",
+  "offline_stopping_policy": "research_work_v1",
+  "supplied_evidence": [
+    "evidence/confirmation_completion_20261014/scientific_summary.json",
+    "evidence/autonomous_design_control_20261014/scientific_summary.json",
+    "evidence/autonomous_design_control_20261014/factual_corrections.json",
+    "evidence/autonomous_study_closeout_20261014/campaign_summary.json",
+    "evidence/contained_autonomous_study_20261014/historical_holding_samples.json"
+  ],
+  "numerical_environment": {
+    "OPENBLAS_NUM_THREADS": "1",
+    "OMP_NUM_THREADS": "1",
+    "MKL_NUM_THREADS": "1"
+  },
+  "shared_start_limit": 64
+}

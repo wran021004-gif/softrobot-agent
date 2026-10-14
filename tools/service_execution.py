@@ -53,20 +53,57 @@ def execute(definition, root, registry, arguments, folder):
 def _run_contained(command, log, timeout_s):
     """Kill the owned worker tree; no shell or unrelated-process enumeration."""
     import signal
+    from uuid import uuid4
+    job_name='Local\\softrobot-worker-'+uuid4().hex
+    environment=os.environ.copy();environment['SOFTROBOT_WORKER_JOB_NAME']=job_name
     process=subprocess.Popen(command,cwd=ROOT,stdout=log,stderr=subprocess.STDOUT,
-        creationflags=getattr(subprocess,'CREATE_NO_WINDOW',0),start_new_session=os.name!='nt')
+        creationflags=getattr(subprocess,'CREATE_NO_WINDOW',0),start_new_session=os.name!='nt',env=environment)
     try:
         code=process.wait(timeout=timeout_s)
         return subprocess.CompletedProcess(command,code)
-    except subprocess.TimeoutExpired:
-        if os.name=='nt':process.kill()  # Worker job handle closes, killing its descendants.
-        else:os.killpg(process.pid,signal.SIGKILL)
+    except subprocess.TimeoutExpired as exc:
+        exc.termination_confirmed=False
+        if os.name=='nt':
+            _terminate_worker_job(process,job_name)
+        else:
+            os.killpg(process.pid,signal.SIGKILL)
         process.wait(timeout=5)
+        exc.termination_confirmed=True
         raise
     finally:
         if os.name!='nt':
             try:os.killpg(process.pid,signal.SIGKILL)
             except ProcessLookupError:pass
+
+
+def _terminate_worker_job(process,job_name):
+    import ctypes as c
+    from ctypes import wintypes as w
+    import time
+    class Accounting(c.Structure):
+        _fields_=[('user',c.c_longlong),('kernel',c.c_longlong),('period_user',c.c_longlong),
+            ('period_kernel',c.c_longlong),('faults',w.DWORD),('total',w.DWORD),('active',w.DWORD),('terminated',w.DWORD)]
+    kernel=c.WinDLL('kernel32',use_last_error=True)
+    kernel.OpenJobObjectW.argtypes=[w.DWORD,w.BOOL,w.LPCWSTR];kernel.OpenJobObjectW.restype=w.HANDLE
+    kernel.TerminateJobObject.argtypes=[w.HANDLE,w.UINT]
+    kernel.QueryInformationJobObject.argtypes=[w.HANDLE,c.c_int,c.c_void_p,w.DWORD,c.c_void_p]
+    kernel.CloseHandle.argtypes=[w.HANDLE]
+    job=kernel.OpenJobObjectW(0x0004|0x0008,False,job_name)
+    if not job:
+        # Containment is installed before any child creation. The leader can be
+        # killed here, but without a job query the boundary remains uncertain.
+        process.kill();process.wait(timeout=5)
+        raise RuntimeError('WORKER_JOB_UNAVAILABLE: termination cannot be verified')
+    try:
+        if not kernel.TerminateJobObject(job,1): raise OSError(c.get_last_error())
+        limit=time.monotonic()+5
+        while True:
+            info=Accounting()
+            if not kernel.QueryInformationJobObject(job,1,c.byref(info),c.sizeof(info),None): raise OSError(c.get_last_error())
+            if info.active==0: return
+            if time.monotonic()>=limit: raise RuntimeError('WORKER_JOB_TERMINATION_UNCERTAIN')
+            time.sleep(.01)
+    finally: kernel.CloseHandle(job)
 
 
 def contain_worker_children():
@@ -92,7 +129,7 @@ def contain_worker_children():
     kernel.AssignProcessToJobObject.argtypes=[w.HANDLE,w.HANDLE]
     kernel.GetCurrentProcess.restype=w.HANDLE
     kernel.CloseHandle.argtypes=[w.HANDLE]
-    job=kernel.CreateJobObjectW(None,None)
+    job=kernel.CreateJobObjectW(None,os.environ.get('SOFTROBOT_WORKER_JOB_NAME','Local\\softrobot-worker-'+str(os.getpid())))
     if not job:raise OSError('PROCESS_CONTAINMENT_UNAVAILABLE: '+str(c.get_last_error()))
     limits=Extended();limits.basic.flags=0x2000  # JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE
     if not kernel.SetInformationJobObject(job,9,c.byref(limits),c.sizeof(limits)) or not kernel.AssignProcessToJobObject(job,kernel.GetCurrentProcess()):

@@ -37,7 +37,13 @@ def result_view(host, reference):
     controller=dict(route='rl',configuration=r['configuration'],checkpoint=r.get('checkpoint'),policy_sha256=r.get('policy_sha256')) if rl else dict(route='nmpc',configuration=c['scientific_configuration']['policy']['controller'])
     identity=dict(candidate=r['candidate'],task=r.get('task',c['configuration']['task']),controller=controller)
     metrics=episodes if rl else (r.get('acceptance') or {}).get('metrics')
-    return dict(candidate=r['candidate'],task=identity['task'],controller_route=controller['route'],controller=controller,
+    failed_metrics=[]
+    acceptance=r.get('acceptance') or {}
+    for episode in episodes:
+        for metric,limit in (('terminal_position_error_m','terminal_position_limit_m'),('holding_max_position_error_m','position_limit_m'),('holding_max_speed_m_s','holding_speed_limit_m_s')):
+            if episode.get(metric) is not None and acceptance.get(limit) is not None and episode[metric]>acceptance[limit]:
+                failed_metrics.append(dict(metric=metric,value=episode[metric],threshold=acceptance[limit],time_s='not recorded in evaluation summary'))
+    return dict(failed_metrics=failed_metrics,evaluation_evidence=dict(trajectory=r.get('trajectory'),reference=plain(reference)),candidate=r['candidate'],task=identity['task'],controller_route=controller['route'],controller=controller,
         mathematical_provenance=mechanics_context(host,r['candidate']),metrics=metrics,complete=complete,passed=passed,
         task_performance='passed' if passed else 'failed' if complete else 'unmeasured',
         failure_stage=r.get('failure_stage') or ('task criteria unmet' if complete and not passed else r.get('failure_reason')),
@@ -104,11 +110,20 @@ def mechanics_context(host, candidate):
     rows=[]
     for relation in relations:
         source=relation['mechanics_attempt']
-        replays=[dict(reference=r,**{k:host.store.artifact(r).get(k) for k in ('status','replay')})
-            for r in s.get('mechanics_results',[]) if host.store.artifact(r).get('source_mechanics')==source]
+        replays=[dict(reference=r,**{k:host.store.artifact(r).get(k) for k in ('status','replay','original_request','log_reference')})
+            for r in [*s.get('mechanics_results',[]),*s.get('imported_mechanics_results',[])] if host.store.artifact(r).get('source_mechanics')==source]
+        verification='not performed' if not replays else 'passed' if all((r.get('replay') or {}).get('gates_passed',False) for r in replays) else 'failed' if any((r.get('replay') or {}).get('status')=='completed' and not (r.get('replay') or {}).get('gates_passed',False) for r in replays) else 'inconclusive'
+        failed=[]
+        for r in replays:
+            replay=r.get('replay') or {}; check=replay.get('integration_consistency') or {}
+            for metric,threshold,time_key in (('node_max_tip_disagreement_m','tip_limit_m','node_max_tip_disagreement_at_s'),('node_max_speed_disagreement_m_s','velocity_vector_limit_m_s','node_max_speed_disagreement_at_s')):
+                if replay.get(metric) is not None and check.get(threshold) is not None and replay[metric]>check[threshold]:
+                    failed.append(dict(metric=metric,value=replay[metric],threshold=check[threshold],time_s=replay.get(time_key),reference=r['reference']))
+        mathematical=host.store.artifact(source)
         rows.append(dict(mechanics_attempt=source,offline_trajectory=relation['offline_trajectory'],
+            original_request=mathematical.get('original_request'),relaxed_conditions=relation.get('relaxation'),failed_verification_metrics=failed,
             solver_status=host.store.artifact(source).get('status'),
-            independent_mathematical_verification='passed' if replays and all((r.get('replay') or {}).get('gates_passed',False) for r in replays) else 'failed' if replays else 'unverified',
+            independent_mathematical_verification=verification,
             original_offline_task_accepted=relation['original_task_feasible'],relaxed_nlp_feasible=relation['relaxed_nlp_feasible'],
             independent_model_replays=replays,
             exploratory_closed_loop=not relation['original_task_feasible'] or not replays or
