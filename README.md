@@ -4,6 +4,9 @@
 
 ## 当前开发入口
 
+Current autonomous design/control entry: `D:/softrobot-agent/.mainline5-env/Scripts/python.exe -m tools.research.core prepare|bind|live|status|recover|export --spec examples/research_chain/specification.json`. RL workers retain their independent `.rl-pilot-env`. See the [current research runbook](docs/research_core_runbook.md) for the exact nominal source, per-segment domain, mathematical-proxy versus backend acceptance, cumulative engineering-preflight accounting and recovery. Structural exploration, an improved design, and a new design passing two fresh confirmations are reported separately.
+
+
 当前串联绳驱家族开发从 [机器人、离散、任务与共同实验装配](docs/tendon_family.md) 开始。推荐入口是 `python examples/workbench.py platform tendon-family ...`：`prepare` 生成可编辑来源，`build` 构建并检查候选和共同场景，`run` 才启动 MATLAB 或 MuJoCo 求解。候选加载与装配实现位于 `extensions/tendon_family/preparation.py`，example 只提供配置样例和命令入口。
 本轮步骤 0、1、2 的实际改动与两次短求解见 [基础分层结果](docs/foundations_0_1_2_result.md)。
 

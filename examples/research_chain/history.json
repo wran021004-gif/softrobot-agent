@@ -1,0 +1,519 @@
+{
+  "source": "evidence/contained_autonomous_study_20261014/scientific_summary.json",
+  "ownership": "Historical, no present confirmation credit or new-cost allocation",
+  "candidate": {
+    "d": -0.2394244339763736,
+    "lengths_m": [
+      0.15868316561312995,
+      0.11131683438687005
+    ]
+  },
+  "controller": "NMPC after one residual PPO599808-actions trial failed holding speed; development+two fresh confirmations passed on inherited design, no new mathematical search.",
+  "qualification": "Historical offline schedule passed sampled independent task criteria but failed velocity consistency; closed-loop success did not validate offline trajectory.",
+  "costs": {
+    "provider_requests": 16,
+    "public_operations": 43,
+    "charged_starts": 5,
+    "training_trials": 1,
+    "requested_actions": 600000,
+    "allocated_actions": 599808,
+    "allocated_training_active_s": 1800.0,
+    "attempted_training_actions": 599808,
+    "completed_training_actions": 599808,
+    "training_active_s": 1049.2907210999401,
+    "evaluation_episodes": 1,
+    "evaluation_active_s": 0.9482932999962941,
+    "mathematical_attempts": 0,
+    "independent_checks": 0,
+    "nmpc_executions": 3,
+    "diagnostics": 0,
+    "aggregate_numerical_s": 1933.2103482999373,
+    "numerical_reserved_s": 0.0,
+    "live_elapsed_s": 2600.3370192050934,
+    "preparation_to_live_s": 114.78195142745972,
+    "provider_response_s": 410.87499999965075,
+    "provider_usage": {
+      "total_tokens": 1557792,
+      "prompt_tokens": 1484961,
+      "completion_tokens": 72831,
+      "prompt_cache_hit_tokens": 239104,
+      "prompt_cache_miss_tokens": 1245857
+    },
+    "money": null
+  },
+  "results": [
+    {
+      "reference": {
+        "artifact_id": "6ae50bf343a4fa58b2ca6c63dfd4d96187081e98940142bb01cb16d9bf6cadd8",
+        "media_type": "application/json"
+      },
+      "status": "evaluated",
+      "role": "development",
+      "candidate": {
+        "artifact_id": "ab14d2064efd7cf1ac2466120c20542b669a9cc0e849d7beff2a8fa51d46aad9",
+        "media_type": "application/json"
+      },
+      "acceptance": {
+        "accepted": true,
+        "components": {
+          "evaluation_validity": {
+            "limit": null,
+            "passed": true,
+            "reason": null,
+            "unit": null,
+            "value": "valid"
+          },
+          "evaluator:task_bound": {
+            "limit": 0.01,
+            "passed": true,
+            "reason": null,
+            "unit": "m",
+            "value": 0.003680882925305575
+          },
+          "execution_complete": {
+            "limit": null,
+            "passed": true,
+            "reason": null,
+            "unit": null,
+            "value": true
+          },
+          "force_bounds": {
+            "limit": 1e-08,
+            "passed": true,
+            "reason": null,
+            "unit": "N",
+            "value": 0.0
+          },
+          "holding_coverage": {
+            "limit": 6,
+            "passed": true,
+            "reason": null,
+            "unit": "inclusive uniform samples",
+            "value": true
+          },
+          "holding_position": {
+            "limit": 0.01,
+            "passed": true,
+            "reason": null,
+            "unit": "m",
+            "value": 0.003746808505498269
+          },
+          "holding_speed": {
+            "limit": 0.02,
+            "passed": true,
+            "reason": null,
+            "unit": "m/s",
+            "value": 0.013910630741889718
+          },
+          "solver_errors": {
+            "limit": 0,
+            "passed": true,
+            "reason": null,
+            "unit": "count",
+            "value": 0
+          },
+          "task_evaluator": {
+            "limit": null,
+            "passed": true,
+            "reason": null,
+            "unit": null,
+            "value": true
+          }
+        },
+        "continuous_time_guarantee": false,
+        "contract": "research.task_acceptance",
+        "evaluator_tension_channels": null,
+        "evidence_binding": {
+          "evaluation": {
+            "artifact_id": "cc1c8abf52d06048350123b91776d6775bc9208f08408a38e5b4269066e5aba3",
+            "media_type": "application/json"
+          },
+          "evaluation_binding": {
+            "original_execution_id": "9c409e4dad1b41b49efe5f20057c6682",
+            "source": {
+              "artifact_id": "4d1265d90fb411f559885ff0645bd16099f760803d9bf859a03c3b7ddd73f2d7",
+              "media_type": "application/json"
+            },
+            "source_execution_id": "9c409e4dad1b41b49efe5f20057c6682"
+          },
+          "profile": {
+            "artifact_id": "80b57d3df6c937195be16d5c847fa4776b49f677561c98c07f4372c591e40e28",
+            "media_type": "application/json"
+          },
+          "profile_binding": {
+            "evaluation": {
+              "artifact_id": "cc1c8abf52d06048350123b91776d6775bc9208f08408a38e5b4269066e5aba3",
+              "media_type": "application/json"
+            },
+            "execution_id": "9c409e4dad1b41b49efe5f20057c6682",
+            "simulation": {
+              "artifact_id": "4d1265d90fb411f559885ff0645bd16099f760803d9bf859a03c3b7ddd73f2d7",
+              "media_type": "application/json"
+            }
+          },
+          "simulation": {
+            "artifact_id": "4d1265d90fb411f559885ff0645bd16099f760803d9bf859a03c3b7ddd73f2d7",
+            "media_type": "application/json"
+          }
+        },
+        "execution_id": "9c409e4dad1b41b49efe5f20057c6682",
+        "issues": [],
+        "metrics": {
+          "holding_max_error_m": 0.003746808505498269,
+          "holding_max_speed_m_s": 0.013910630741889718,
+          "terminal_error_m": 0.003680882925305575
+        },
+        "missing": [],
+        "protocol_id": "offline_reach_hold_v1",
+        "sources": {
+          "evaluation": {
+            "artifact_id": "cc1c8abf52d06048350123b91776d6775bc9208f08408a38e5b4269066e5aba3",
+            "media_type": "application/json"
+          },
+          "profile": {
+            "artifact_id": "80b57d3df6c937195be16d5c847fa4776b49f677561c98c07f4372c591e40e28",
+            "media_type": "application/json"
+          }
+        },
+        "status": "accepted",
+        "task_family": "task.reach",
+        "task_identity": "2b26edb492214c426263441b6adb52d7aafe41a828436d6b48a1171374a1026c",
+        "timing": {
+          "control_period_s": 0.01,
+          "deadline_misses": 35,
+          "duration_s": 0.35,
+          "mean_update_s": 7.932651662849821,
+          "real_time_demonstrated": false,
+          "real_time_required": false,
+          "sample_period_s": 0.01,
+          "simulation_wall_s": 287.844000000041,
+          "termination": [
+            "duration",
+            "numerical_failure"
+          ],
+          "timestep_s": 0.0005
+        },
+        "version": "1.0.0"
+      },
+      "numerical_s": 293.4225577999605
+    },
+    {
+      "reference": {
+        "artifact_id": "d2be64700d06bdccfc17ca5c736345b49a9e3da8586d5d45870379b942a0c2fe",
+        "media_type": "application/json"
+      },
+      "status": "evaluated",
+      "role": "confirmation",
+      "candidate": {
+        "artifact_id": "ab14d2064efd7cf1ac2466120c20542b669a9cc0e849d7beff2a8fa51d46aad9",
+        "media_type": "application/json"
+      },
+      "acceptance": {
+        "accepted": true,
+        "components": {
+          "evaluation_validity": {
+            "limit": null,
+            "passed": true,
+            "reason": null,
+            "unit": null,
+            "value": "valid"
+          },
+          "evaluator:task_bound": {
+            "limit": 0.01,
+            "passed": true,
+            "reason": null,
+            "unit": "m",
+            "value": 0.003680882925305575
+          },
+          "execution_complete": {
+            "limit": null,
+            "passed": true,
+            "reason": null,
+            "unit": null,
+            "value": true
+          },
+          "force_bounds": {
+            "limit": 1e-08,
+            "passed": true,
+            "reason": null,
+            "unit": "N",
+            "value": 0.0
+          },
+          "holding_coverage": {
+            "limit": 6,
+            "passed": true,
+            "reason": null,
+            "unit": "inclusive uniform samples",
+            "value": true
+          },
+          "holding_position": {
+            "limit": 0.01,
+            "passed": true,
+            "reason": null,
+            "unit": "m",
+            "value": 0.003746808505498269
+          },
+          "holding_speed": {
+            "limit": 0.02,
+            "passed": true,
+            "reason": null,
+            "unit": "m/s",
+            "value": 0.013910630741889718
+          },
+          "solver_errors": {
+            "limit": 0,
+            "passed": true,
+            "reason": null,
+            "unit": "count",
+            "value": 0
+          },
+          "task_evaluator": {
+            "limit": null,
+            "passed": true,
+            "reason": null,
+            "unit": null,
+            "value": true
+          }
+        },
+        "continuous_time_guarantee": false,
+        "contract": "research.task_acceptance",
+        "evaluator_tension_channels": null,
+        "evidence_binding": {
+          "evaluation": {
+            "artifact_id": "324155fc772ac37295fe9bd0900aa547662242d05039f52a2dd631234674685a",
+            "media_type": "application/json"
+          },
+          "evaluation_binding": {
+            "original_execution_id": "7be3519c3bf4494189721698f09bf321",
+            "source": {
+              "artifact_id": "2804f452bec20cd0f0aaddf8d9367b29f794b5a8de6abdc501899fe2cd88c7c3",
+              "media_type": "application/json"
+            },
+            "source_execution_id": "7be3519c3bf4494189721698f09bf321"
+          },
+          "profile": {
+            "artifact_id": "c65bba94d1d14a3bb2ce17a8b9c322b6f3b28698f0eecfb46198503c12df24f3",
+            "media_type": "application/json"
+          },
+          "profile_binding": {
+            "evaluation": {
+              "artifact_id": "324155fc772ac37295fe9bd0900aa547662242d05039f52a2dd631234674685a",
+              "media_type": "application/json"
+            },
+            "execution_id": "7be3519c3bf4494189721698f09bf321",
+            "simulation": {
+              "artifact_id": "2804f452bec20cd0f0aaddf8d9367b29f794b5a8de6abdc501899fe2cd88c7c3",
+              "media_type": "application/json"
+            }
+          },
+          "simulation": {
+            "artifact_id": "2804f452bec20cd0f0aaddf8d9367b29f794b5a8de6abdc501899fe2cd88c7c3",
+            "media_type": "application/json"
+          }
+        },
+        "execution_id": "7be3519c3bf4494189721698f09bf321",
+        "issues": [],
+        "metrics": {
+          "holding_max_error_m": 0.003746808505498269,
+          "holding_max_speed_m_s": 0.013910630741889718,
+          "terminal_error_m": 0.003680882925305575
+        },
+        "missing": [],
+        "protocol_id": "offline_reach_hold_v1",
+        "sources": {
+          "evaluation": {
+            "artifact_id": "324155fc772ac37295fe9bd0900aa547662242d05039f52a2dd631234674685a",
+            "media_type": "application/json"
+          },
+          "profile": {
+            "artifact_id": "c65bba94d1d14a3bb2ce17a8b9c322b6f3b28698f0eecfb46198503c12df24f3",
+            "media_type": "application/json"
+          }
+        },
+        "status": "accepted",
+        "task_family": "task.reach",
+        "task_identity": "2b26edb492214c426263441b6adb52d7aafe41a828436d6b48a1171374a1026c",
+        "timing": {
+          "control_period_s": 0.01,
+          "deadline_misses": 35,
+          "duration_s": 0.35,
+          "mean_update_s": 7.932865465725107,
+          "real_time_demonstrated": false,
+          "real_time_required": false,
+          "sample_period_s": 0.01,
+          "simulation_wall_s": 287.51500000001397,
+          "termination": [
+            "duration",
+            "numerical_failure"
+          ],
+          "timestep_s": 0.0005
+        },
+        "version": "1.0.0"
+      },
+      "numerical_s": 293.1357791000046
+    },
+    {
+      "reference": {
+        "artifact_id": "2c57d1d1cfb9e2b50a00e94ea2dd3c75e7e388643e63ff70f8191ff9d6a8a48c",
+        "media_type": "application/json"
+      },
+      "status": "evaluated",
+      "role": "confirmation",
+      "candidate": {
+        "artifact_id": "ab14d2064efd7cf1ac2466120c20542b669a9cc0e849d7beff2a8fa51d46aad9",
+        "media_type": "application/json"
+      },
+      "acceptance": {
+        "accepted": true,
+        "components": {
+          "evaluation_validity": {
+            "limit": null,
+            "passed": true,
+            "reason": null,
+            "unit": null,
+            "value": "valid"
+          },
+          "evaluator:task_bound": {
+            "limit": 0.01,
+            "passed": true,
+            "reason": null,
+            "unit": "m",
+            "value": 0.0033853103974214715
+          },
+          "execution_complete": {
+            "limit": null,
+            "passed": true,
+            "reason": null,
+            "unit": null,
+            "value": true
+          },
+          "force_bounds": {
+            "limit": 1e-08,
+            "passed": true,
+            "reason": null,
+            "unit": "N",
+            "value": 0.0
+          },
+          "holding_coverage": {
+            "limit": 6,
+            "passed": true,
+            "reason": null,
+            "unit": "inclusive uniform samples",
+            "value": true
+          },
+          "holding_position": {
+            "limit": 0.01,
+            "passed": true,
+            "reason": null,
+            "unit": "m",
+            "value": 0.0034046553570313606
+          },
+          "holding_speed": {
+            "limit": 0.02,
+            "passed": true,
+            "reason": null,
+            "unit": "m/s",
+            "value": 0.01379189562977822
+          },
+          "solver_errors": {
+            "limit": 0,
+            "passed": true,
+            "reason": null,
+            "unit": "count",
+            "value": 0
+          },
+          "task_evaluator": {
+            "limit": null,
+            "passed": true,
+            "reason": null,
+            "unit": null,
+            "value": true
+          }
+        },
+        "continuous_time_guarantee": false,
+        "contract": "research.task_acceptance",
+        "evaluator_tension_channels": null,
+        "evidence_binding": {
+          "evaluation": {
+            "artifact_id": "58e7db4264921fc0479a106fb456a80ca5623f9ef6d3b11e7bf4929f217a449d",
+            "media_type": "application/json"
+          },
+          "evaluation_binding": {
+            "original_execution_id": "aaa32ad4bc094b85bc2ee2caf775e228",
+            "source": {
+              "artifact_id": "17615177b8900b75cd15688c6eba2be917856c76f47791d49f1a813605d25bb4",
+              "media_type": "application/json"
+            },
+            "source_execution_id": "aaa32ad4bc094b85bc2ee2caf775e228"
+          },
+          "profile": {
+            "artifact_id": "205d4516a3d4d8a7822c93c52b5d99573f7b68f5960d93fe27ae00367ea6e8d4",
+            "media_type": "application/json"
+          },
+          "profile_binding": {
+            "evaluation": {
+              "artifact_id": "58e7db4264921fc0479a106fb456a80ca5623f9ef6d3b11e7bf4929f217a449d",
+              "media_type": "application/json"
+            },
+            "execution_id": "aaa32ad4bc094b85bc2ee2caf775e228",
+            "simulation": {
+              "artifact_id": "17615177b8900b75cd15688c6eba2be917856c76f47791d49f1a813605d25bb4",
+              "media_type": "application/json"
+            }
+          },
+          "simulation": {
+            "artifact_id": "17615177b8900b75cd15688c6eba2be917856c76f47791d49f1a813605d25bb4",
+            "media_type": "application/json"
+          }
+        },
+        "execution_id": "aaa32ad4bc094b85bc2ee2caf775e228",
+        "issues": [],
+        "metrics": {
+          "holding_max_error_m": 0.0034046553570313606,
+          "holding_max_speed_m_s": 0.01379189562977822,
+          "terminal_error_m": 0.0033853103974214715
+        },
+        "missing": [],
+        "protocol_id": "offline_reach_hold_v1",
+        "sources": {
+          "evaluation": {
+            "artifact_id": "58e7db4264921fc0479a106fb456a80ca5623f9ef6d3b11e7bf4929f217a449d",
+            "media_type": "application/json"
+          },
+          "profile": {
+            "artifact_id": "205d4516a3d4d8a7822c93c52b5d99573f7b68f5960d93fe27ae00367ea6e8d4",
+            "media_type": "application/json"
+          }
+        },
+        "status": "accepted",
+        "task_family": "task.reach",
+        "task_identity": "2b26edb492214c426263441b6adb52d7aafe41a828436d6b48a1171374a1026c",
+        "timing": {
+          "control_period_s": 0.01,
+          "deadline_misses": 35,
+          "duration_s": 0.35,
+          "mean_update_s": 7.888937534268813,
+          "real_time_demonstrated": false,
+          "real_time_required": false,
+          "sample_period_s": 0.01,
+          "simulation_wall_s": 286.14100000006147,
+          "termination": [
+            "duration",
+            "numerical_failure"
+          ],
+          "timestep_s": 0.0005
+        },
+        "version": "1.0.0"
+      },
+      "numerical_s": 292.00809179991484
+    }
+  ],
+  "prior_historical_costs": {
+    "provider_requests": 134,
+    "public_operations": 190,
+    "training_actions": 1052672,
+    "evaluation_episodes": 11,
+    "training_active_seconds_known": 1909.679287299863,
+    "training_active_seconds_charged": 1999.679287299863
+  }
+}

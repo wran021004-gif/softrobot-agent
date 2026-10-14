@@ -9,7 +9,8 @@ from unittest.mock import patch
 from tools.research import core as core
 from tools.research import mechanics as mechanics
 from tools.research.feedback import eligibility
-from schemas.research_core import Plan, Search
+from schemas.research_core import Plan
+from tools.research.mechanics import LegacySearch as Search
 
 
 class MechanicsTests(TestCase):

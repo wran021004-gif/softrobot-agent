@@ -26,13 +26,24 @@ def handoff(host, reference, parameters=None, provenance=None):
     if not math.isfinite(d) or not -1.-1e-8 <= d <= 1.+1e-8:
         raise ValueError('RETURNED_STRUCTURE_OUTSIDE_AUTHORIZED_DOMAIN')
     d = min(1., max(-1., d))
-    p = dict(parameters or state(host)['spec']['reference_parameters'])
-    if parameters is not None and abs(p['d']-d) > 1e-10:
+    current=state(host)
+    if current['spec'].get('nominal_source'):
+        if not v.get('solved_candidate'):raise ValueError('EXACT_SOLVED_CONFIGURATION_BINDING_REQUIRED')
+        solved=host.store.artifact(v['solved_candidate']);p=deepcopy(solved['parameters'])
+        if parameters is not None:
+            parameters=plain(parameters)
+            for name,value in parameters.items():
+                if name not in ('holding_tip_speed_weight','terminal_tip_speed_weight') and value!=p[name]:
+                    raise ValueError('HANDOFF_STRUCTURE_MUST_MATCH_MECHANICS_SOURCE')
+            p.update(parameters)
+    else:p = dict(parameters or current['spec']['reference_parameters'])
+    if not current['spec'].get('nominal_source') and parameters is not None and abs(p['d']-d) > 1e-10:
         raise ValueError('HANDOFF_STRUCTURE_MUST_MATCH_MECHANICS_SOURCE')
-    p['d'] = d
+    if not current['spec'].get('nominal_source'):p['d'] = d
     candidate = construct(host, p, dict(origin='mechanics_handoff', mechanics_attempt=plain(reference)))
     relation = dict(candidate=candidate, mechanics_attempt=plain(reference),
-        offline_trajectory=v['trajectory_reference'], structure=dict(d=d,lengths_m=[.16+.0055*d,.11-.0055*d]),
+        offline_trajectory=v['trajectory_reference'], structure=dict(legacy_d=d,lengths_m=[.16+.0055*d,.11-.0055*d]),
+        solved_configuration=v.get('solved_configuration'),
         original_task_feasible=v.get('original_task_feasible',False), relaxed_nlp_feasible=v.get('relaxed_nlp_feasible',False),
         objective=v.get('objective_definition'), relaxation=v.get('original_task_gaps'),
         evaluation_mode='controller unselected; mathematical trajectory is evidence, not MuJoCo acceptance',
@@ -78,11 +89,22 @@ def dispatch(host, operation, arguments, key):
         if s.get('bdf_replays',0)+1>b['bdf_replays'] or available < reserve+verification+protection:
             raise ValueError('REFINEMENT_AND_INDEPENDENT_INTEGRATION_RESERVE_CANNOT_FIT')
     if available < reserve+protection: raise ValueError('MECHANICS_AND_REPETITION_RESERVE_CANNOT_FIT')
-    cfg,_ = core.configuration_for(host,s['spec']['reference_parameters'],host.run_id)
+    selected_candidate=None
+    if s['spec'].get('nominal_source'):
+        selected_candidate=plain(arguments).get('design_candidate') if operation=='solve' else source(host,source_ref).get('solved_candidate')
+        if not selected_candidate:raise ValueError('LEGACY_MECHANICS_REQUIRES_EXACT_DESIGN_CANDIDATE')
+        cfg=deepcopy(core.verify_candidate(host,selected_candidate)['configuration'])
+        legacy_compatible(cfg,s['nominal_configuration'])
+        if operation=='solve':
+            a=plain(arguments);length=next(c['length_m'] for c in cfg['robot']['structure']['data']['components'] if c['id']=='near')
+            if abs(length-(.16+.0055*a['design_initial']))>1e-10:raise ValueError('LEGACY_INITIAL_MUST_MATCH_REQUESTED_CANDIDATE')
+    else:cfg,_ = core.configuration_for(host,s['spec']['reference_parameters'],host.run_id)
     request = dict(study_id=host.run_id,store_root=str(host.store.root),request_id=key+'-mechanics',
         operation=operation,configuration=cfg,implementation=s['freeze'],science_hashes=s['profile']['science_hashes'])
     if operation=='solve':
         request['arguments']=plain(arguments)
+        request['arguments'].pop('design_candidate',None)
+        request['design_candidate']=selected_candidate
         request['offline_solver_s']=s['spec'].get('offline_solver_s',570.)
         request['offline_stopping_policy']=s['spec'].get('offline_stopping_policy','historical_timed_v1')
         if request['arguments'].get('source_candidate'):
@@ -167,6 +189,11 @@ def run_and_settle(host,row,request,pending,recovery=False):
     # plus measured packaging time; counters and clocks are never reset.
     charged=elapsed+(reserve if recovery else 0.)
     trajectory=core.save(host,value['candidate'],'offline_state_tension_trajectory') if value.get('candidate') else None
+    if value.get('candidate') and core.state(host)['spec'].get('nominal_source'):
+        original=host.store.artifact(request['design_candidate']);params=deepcopy(original['parameters']);d=value['candidate']['d']
+        params.update(near_length_m=.16+.0055*d,distal1_length_m=.11-.0055*d)
+        solved=core.construct(host,params,dict(origin='legacy_offline_solved_configuration',request_id=row['request_id']))
+        value.update(solved_candidate=solved,solved_configuration=host.store.artifact(solved)['configuration_reference'])
     value.update(operation=request['operation'],execution_id=row['execution_id'],owning_study=host.run_id,
         original_request=core.save(host,request,'mechanics_original_request'),source_mechanics=request.get('source_mechanics'),
         checkpoint_reference=checkpoint_ref,trajectory_reference=trajectory,
@@ -201,3 +228,164 @@ def recover(host):
     from tools.research import core as core
     p=core.state(host)['pending'];row=host.store.lookup(host.run_id,p['worker_request_id'])
     return run_and_settle(host,row,p['original_request'],p,recovery=True)
+
+
+def legacy_configuration_for(host, parameters, owner):
+    from tools.design_optimization import resolved_input
+    from schemas.design_optimization import DesignOptimizationProblem
+    from tools.research.core import state, ROOT, enabled
+    from types import SimpleNamespace
+    s = state(host); p = SimpleNamespace(**{**dict(d=0.,holding_tip_speed_weight=.1,terminal_tip_speed_weight=.1),**plain(parameters)}); base = s['base_configuration']
+    problem = DesignOptimizationProblem.model_validate(read(ROOT/'examples/casadi_codesign/case_A.json')['physical_source'])
+    data = plain(problem); data['task'] = deepcopy(base['task'])
+    data['execution']['recipe'] = deepcopy(s['profile']['recipe'])
+    data['execution']['settling'] = deepcopy(base['policy']['controller']['parameters']['data']['settling'])
+    problem = DesignOptimizationProblem.model_validate(data)
+    fixed = deepcopy(base['robot']['structure']['data']['metadata']['recipe'])
+    fixed.update(lengths_m=[.16+.0055*p.d,.11-.0055*p.d],
+        holding_tip_speed_weight=p.holding_tip_speed_weight,terminal_tip_speed_weight=p.terminal_tip_speed_weight)
+    cfg = resolved_input(problem, fixed, owner, deepcopy(base['policy']))
+    if enabled(s['spec'],'rl'):
+        # generated_serial's existing GVS source already declares ideal tension.
+        # Keep that verified declaration; no actuator rewriting after construction.
+        if s['spec']['tension_execution_mode']!='ideal_tension': raise ValueError('IDEAL_TENSION_STUDY_REQUIRED')
+    # Freeze every binding not regenerated by the declared length coordinate.
+    for k in ('backend','dynamics_model'): cfg['policy'][k] = deepcopy(base['policy'][k])
+    return cfg, fixed
+
+
+def legacy_compatible(configuration,nominal):
+    """The legacy symbolic coordinate represents only its .27m length family."""
+    def physical(cfg):
+        robot=deepcopy(cfg['robot']['structure']['data']);robot.pop('metadata',None);robot.pop('id',None)
+        parts=[c for c in robot['components'] if c['kind']=='flexible_segment']
+        if [c['id'] for c in parts]!=['near','distal1']:raise ValueError('LEGACY_SEGMENT_IDENTITIES_UNSUPPORTED')
+        lengths=[c['length_m'] for c in parts]
+        for part,length in zip(parts,[.16,.11]):part['length_m']=length
+        return robot,lengths
+    robot,lengths=physical(configuration);base,_=physical(nominal)
+    d=(lengths[0]-.16)/.0055
+    if robot!=base or not -1.-1e-10<=d<=1.+1e-10 or abs(lengths[1]-(.11-.0055*d))>1e-10:
+        raise ValueError('LEGACY_CODESIGN_UNAVAILABLE_FOR_THIS_CONFIGURATION; retain exact candidate for analysis, direct RL or NMPC')
+    return d
+
+
+
+
+# Explicit historical co-design adapter contracts; current native design never uses d.
+from pydantic import Field, FiniteFloat, model_validator
+from schemas.common import Contract
+from schemas.research_core import Plan as CurrentPlan
+from schemas.platform import EvidenceRef
+from extensions.tendon_family.generated_serial import SUPPORTED_NUMERIC
+
+
+class LegacyParameters(Contract):
+    d: FiniteFloat = Field(default=0.,ge=-1,le=1)
+    holding_tip_speed_weight: FiniteFloat = Field(default=.1,ge=SUPPORTED_NUMERIC['holding_tip_speed_weight'][0],le=SUPPORTED_NUMERIC['holding_tip_speed_weight'][1])
+    terminal_tip_speed_weight: FiniteFloat = Field(default=.1,ge=SUPPORTED_NUMERIC['terminal_tip_speed_weight'][0],le=SUPPORTED_NUMERIC['terminal_tip_speed_weight'][1])
+
+
+class LegacySearch(Contract):
+    variables: list[str] = Field(min_length=1)
+    bounds: dict[str,tuple[FiniteFloat,FiniteFloat]]
+    fixed: LegacyParameters = Field(default_factory=LegacyParameters)
+    max_evaluations: int = Field(default=3,ge=1,le=8,strict=True)
+    step: FiniteFloat = Field(default=.25,gt=0,le=.5)
+    ranking: str = 'feasible_then_max_normalized_violation_then_sum_v1'
+    mechanics_source: EvidenceRef | None = None
+
+    @model_validator(mode='after')
+    def domain(self):
+        if len(set(self.variables))!=len(self.variables) or set(self.bounds)!=set(self.variables):raise ValueError('LEGACY_SEARCH_BOUNDS')
+        for name,(a,b) in self.bounds.items():
+            domain=(-1.,1.) if name=='d' else SUPPORTED_NUMERIC.get(name)
+            if domain is None or not domain[0]<=a<b<=domain[1] or not a<=getattr(self.fixed,name)<=b:raise ValueError('LEGACY_SEARCH_DOMAIN')
+        return self
+
+
+class LegacyPlan(CurrentPlan):
+    parameters: LegacyParameters | None = None
+    search: LegacySearch | None = None
+
+
+def legacy_search_problem(host, search, admitted):
+    from tools.research import core
+    ROOT=core.ROOT
+    from schemas.design_optimization import DesignOptimizationProblem
+    s=core.state(host); base=s['base_configuration']; q=LegacySearch.model_validate(search)
+    p=read(ROOT/'examples/casadi_codesign/case_A.json')['physical_source']
+    p['study_id']=host.run_id; p['task']=deepcopy(base['task'])
+    p['execution']['recipe']=deepcopy(s['profile']['recipe'])
+    p['execution']['settling']=deepcopy(base['policy']['controller']['parameters']['data']['settling'])
+    fixed=deepcopy(base['robot']['structure']['data']['metadata']['recipe'])
+    fixed.pop('lengths_m'); fixed.pop('family',None); fixed.update({k:v for k,v in plain(q.fixed).items() if k!='d'})
+    p['variables']={k:dict(kind='fixed',value=v) for k,v in fixed.items()}
+    for k in q.variables:
+        if k!='d': p['variables'][k]=dict(kind='continuous',bounds=list(q.bounds[k]),initial=getattr(q.fixed,k))
+    free='d' in q.variables
+    # The public +/-5% bound refers to the physical nominal design, not the
+    # optimizer's chosen initial point. Use the closest nominal feasible point
+    # for allocation validation; pass the requested initialization separately.
+    baseline_d=min(max(0.,q.bounds['d'][0]),q.bounds['d'][1]) if free else q.fixed.d
+    lengths=[.16+.0055*baseline_d,.11-.0055*baseline_d]
+    bounds=[[.16+.0055*q.bounds['d'][0],.16+.0055*q.bounds['d'][1]],
+        [.11-.0055*q.bounds['d'][1],.11-.0055*q.bounds['d'][0]]] if free else [[v,v] for v in lengths]
+    p['lengths']=dict(free=free,total_flexible_length_m=.27,baseline_by_count={'2':lengths},bounds_by_count={'2':bounds})
+    p['fixed_tendon_count']=6; p['fixed_actuator_count']=6
+    p['budget']=dict(max_evaluations=admitted,wall_s=admitted*core.allowance(s))
+    p['objective']=dict(ranking=q.ranking,accepted_resource_preference='none')
+    p['method']=dict(name='hierarchical_coordinate_v1_1',step=q.step,initial_structures=[],stop_on_acceptance=False)
+    return DesignOptimizationProblem.model_validate(p)
+
+
+def legacy_run_search(host, query, key):
+    from tools.research import core
+    from tools.design_optimization import solve, continuous_space, structures
+    core.guard(host,True); q=LegacySearch.model_validate(query); admission=core.capacity(host,q.max_evaluations)
+    if q.mechanics_source:
+        from tools.research.mechanics import handoff
+        if 'd' in q.variables: raise ValueError('MECHANICS_CONTROL_SEARCH_REQUIRES_FIXED_STRUCTURE')
+        handoff(host,q.mechanics_source,plain(q.fixed),dict(operation_key=key,origin='control_search'))
+    if not admission['admitted']: return dict(status='budget_limited',admission=admission,evaluated=[])
+    problem=legacy_search_problem(host,q,admission['admitted']); s=core.state(host)
+    if s['searches'].get(key):
+        from schemas.design_optimization import DesignOptimizationProblem
+        problem=DesignOptimizationProblem.model_validate(s['searches'][key]['problem'])
+    def evaluator(problem,values,proposal_id):
+        if core.capacity(host,1)['admitted']<1: return dict(status='shared_budget_exhausted',evidence={})
+        params=dict(d=(values['lengths_m'][0]-.16)/.0055,**{k:values[k] for k in ('holding_tip_speed_weight','terminal_tip_speed_weight')})
+        ref=core.construct(host,params,dict(origin='mathematical_search',plan_key=key,proposal_id=proposal_id))
+        if q.mechanics_source:
+            handoff(host,q.mechanics_source,params,dict(operation_key=key,proposal_id=proposal_id))
+        c=core.verify_candidate(host,ref)
+        completed=[host.store.artifact(r) for r in core.state(host)['results']]
+        old=next((r for r in completed if r['operation_key']==key+':'+proposal_id),None)
+        if old is None:
+            feedback=core.execute(host,ref,key+':'+proposal_id,role='search')
+            if feedback['status']!='evaluated': return dict(status=feedback['status'],evidence=feedback)
+            old=host.store.artifact(feedback['reference'])
+        execution_ref=next(r for r in core.state(host)['results'] if host.store.artifact(r)['operation_key']==key+':'+proposal_id)
+        return dict(status=old['status'],acceptance=old['acceptance'],evidence=dict(result=execution_ref,execution_id=old['execution_id']),
+            configuration=c['configuration'],candidate_id=c['candidate_id'],scientific_identity=c['identity'])
+    def checkpoint(value):
+        searches=core.state(host)['searches']; searches[key]=deepcopy(value); core.update(host,searches=searches)
+        return core.save(host,value,'search_checkpoint')
+    initial_latents=None
+    if 'd' in q.variables:
+        structure=structures(problem)[0];allocation,latent=continuous_space(problem,structure)
+        latent.update(allocation.encode([.16+.0055*q.fixed.d,.11-.0055*q.fixed.d]))
+        initial_latents={digest(structure):latent}
+    result=plain(solve(problem,evaluator=evaluator,state=s['searches'].get(key),save_state=checkpoint,
+        evaluation_profile=s['profile'],initial_latents=initial_latents))
+    explored={k:sorted({r['resolved']['parameters'][k] for r in result['evaluated']}) for k in q.variables if k!='d'}
+    if 'd' in q.variables: explored['d']=sorted({(r['resolved']['parameters']['lengths_m'][0]-.16)/.0055 for r in result['evaluated']})
+    attempted=[dict(reference=r,parameters=host.store.artifact(host.store.artifact(r)['candidate'])['parameters'],
+        **core.compact_result(host.store.artifact(r))) for r in core.state(host)['results']
+        if host.store.artifact(r)['operation_key'].startswith(key+':')]
+    return dict(result=result,admission=admission,actually_explored=explored,attempted_executions=attempted,
+        failed_or_incomplete_executions=[r['reference'] for r in attempted if r['status']!='evaluated' or not (r['acceptance'] or {}).get('accepted')],
+        requested_variables=q.variables, fixed_parameters=plain(q.fixed), mechanics_source=plain(q.mechanics_source),
+        distinct_configurations=len({r['scientific_identity'] for r in result['evaluated']}),
+        not_explored=[k for k,v in explored.items() if len(v)<2],
+        batch_shrunk=admission['admitted']<q.max_evaluations)

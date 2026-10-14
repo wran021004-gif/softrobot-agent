@@ -158,7 +158,7 @@ def _configuration_boundary(inp,binding):
     coordinate_order=binding.get('coordinate_order')
     if coordinate_order is None:
         coordinate_order=list(resolve_basis(inp.robot.structure.data,binding['basis']).coordinate_order)
-    return dict(study_candidate_id=binding['candidate_id'],build_node=binding['source_node'],
+    return dict(study_candidate_id=binding['candidate_id'],build_node=binding.get('source_node'),
         robot=plain(inp.robot),task=plain(inp.task),initializer=plain(inp.task.initializer),
         model=dict(extension_id='model.gvs',version='1.0.0',basis=binding['basis']),
         controller_recipe=inp.policy.controller.parameters.data['recipe'],
@@ -178,7 +178,7 @@ def _configuration_boundary(inp,binding):
         execution_data_used=False)
 
 
-def _candidate_points(inp,graph,p):
+def _candidate_points(inp,graph,p,requested=None):
     """Configuration-only standardized and controller-declared operating points."""
     from scipy.optimize import least_squares, minimize
     _,system,f,output=graph; n=len(system.x0)//2
@@ -213,6 +213,10 @@ def _candidate_points(inp,graph,p):
                 numerical_source=inp.policy.controller.parameters.data.get('numerical_source'),
                 preparation_provenance=numerical['provenance'],execution_trajectory_used=False))]
 
+    requested=set(requested or ['standardized_initial_pretension','controller_start_input','target_equilibrium','halfway_waypoint'])
+    points=[point for point in points if point['name'] in requested]
+    if not requested & {'target_equilibrium','halfway_waypoint'}:return points
+
     qsym,usym=f.q_symbol,f.u_symbol
     mount=inp.task.environment.data['mount']
     world=ca.DM(quaternion_wxyz_to_rotation(mount['quaternion_wxyz']))@f.tip_position_expression+ca.DM(mount['position_m'])
@@ -231,24 +235,28 @@ def _candidate_points(inp,graph,p):
         return gradient
     def equality(z): return static_values(z)[1]
     def equality_jac(z): return static_values(z)[3]
-    solved=minimize(objective,z0,jac=objective_jac,bounds=[(None,None)]*n+list(zip(np.zeros(len(limits)),limits)),
-        constraints=[dict(type='eq',fun=equality,jac=equality_jac)],method='SLSQP',
-        options=dict(maxiter=p.construction_max_iterations,ftol=1e-12,disp=False))
-    h,r,_,_=static_values(solved.x); pos_res=float(np.linalg.norm(h-target)); force_res=float(np.linalg.norm(r,np.inf))
-    available=bool(solved.success and pos_res<=tolerance+p.endpoint_check_atol and force_res<=p.static_force_tolerance)
-    target_record=dict(name='target_equilibrium',available=available,scope='target-associated static attempt',
-        construction=dict(method='single bounded-tension target-associated static SLSQP attempt; no recovery',
-            solver='scipy.optimize.SLSQP',success=bool(solved.success),status=int(solved.status),message=str(solved.message),
-            iterations=int(solved.nit),maximum_iterations=p.construction_max_iterations,
-            requested_world_point_m=target.tolist(),achieved_world_point_m=h.tolist(),
-            position_residual_m=pos_res,position_limit_m=tolerance,static_residual_inf=force_res,
-            static_force_tolerance=p.static_force_tolerance,tension_bounds_n=[np.zeros(len(limits)).tolist(),limits.tolist()],
-            q_bounds='unbounded, matching existing GVS inverse-static authorization',execution_data_used=False))
-    if available:
-        target_record.update(x=np.r_[solved.x[:n],np.zeros(n)].tolist(),u=solved.x[n:].tolist(),
-            phase='configuration_target_static_equilibrium',remaining_task_s=p.duration_s,actual_time_s=None)
-    else: target_record['reason']='Target-associated equilibrium unavailable within the frozen single-attempt limits.'
-    points.append(target_record)
+    if 'target_equilibrium' in requested:
+        solved=minimize(objective,z0,jac=objective_jac,bounds=[(None,None)]*n+list(zip(np.zeros(len(limits)),limits)),
+            constraints=[dict(type='eq',fun=equality,jac=equality_jac)],method='SLSQP',
+            options=dict(maxiter=p.construction_max_iterations,ftol=1e-12,disp=False))
+        h,r,_,_=static_values(solved.x); pos_res=float(np.linalg.norm(h-target)); force_res=float(np.linalg.norm(r,np.inf))
+        available=bool(solved.success and pos_res<=tolerance+p.endpoint_check_atol and force_res<=p.static_force_tolerance)
+        target_record=dict(name='target_equilibrium',available=available,scope='target-associated static attempt',
+            construction=dict(method='single bounded-tension target-associated static SLSQP attempt; no recovery',
+                solver='scipy.optimize.SLSQP',success=bool(solved.success),status=int(solved.status),message=str(solved.message),
+                iterations=int(solved.nit),maximum_iterations=p.construction_max_iterations,
+                computed_tensions_n=solved.x[n:].tolist(),
+                requested_world_point_m=target.tolist(),achieved_world_point_m=h.tolist(),
+                position_residual_m=pos_res,position_limit_m=tolerance,static_residual_inf=force_res,
+                static_force_tolerance=p.static_force_tolerance,tension_bounds_n=[np.zeros(len(limits)).tolist(),limits.tolist()],
+                q_bounds='unbounded, matching existing GVS inverse-static authorization',execution_data_used=False))
+        if available:
+            target_record.update(x=np.r_[solved.x[:n],np.zeros(n)].tolist(),u=solved.x[n:].tolist(),
+                phase='configuration_target_static_equilibrium',remaining_task_s=p.duration_s,actual_time_s=None)
+        else: target_record['reason']='Target-associated equilibrium unavailable within the frozen single-attempt limits.'
+        points.append(target_record)
+
+    if 'halfway_waypoint' not in requested:return points
 
     halfway=(initial_tip+target)/2
     def halfway_residual(q): return (np.asarray(output(np.r_[q,np.zeros(n)],pretension)[0]).reshape(-1)-halfway)/p.output_scale_m
@@ -279,7 +287,7 @@ def _validate_task_protocol(inp,p):
         raise ValueError('ANALYSIS_PROTOCOL_CONTROL_PERIOD_MISMATCH')
 
 
-def linearize_candidate_configuration(ctx,inp,binding,p,protocol_ref):
+def calculate_candidate_configuration(inp,binding,p,protocol_ref,*,registry=None,operating_points=None,exact_point=None):
     from .model_applicability import assess_model_uses
     _validate_task_protocol(inp,p)
     binding={**binding,'analysis_protocol_identity':digest(plain(p))}
@@ -288,27 +296,34 @@ def linearize_candidate_configuration(ctx,inp,binding,p,protocol_ref):
         raise ValueError('CONFIGURATION_ONLY_BOUNDARY_VIOLATION')
     n=len(binding['coordinate_order']); limits=[row['force_limit_n'] for row in inp.robot.structure.data['tendons']]
     seed=dict(x=[0.]*(2*n),u=[row['pretension_n'] for row in inp.robot.structure.data['tendons']])
-    graph=make_graph_from_input(inp,seed); points=_candidate_points(inp,graph,p); records=[]
+    graph=make_graph_from_input(inp,seed); points=[exact_point] if exact_point is not None else _candidate_points(inp,graph,p,operating_points); records=[]
     for point in points:
         if not point['available']:
             records.append(point); continue
         case=dict(effective=plain(inp),binding={**binding,'target_m':inp.task.goal.data['target_m'],
             'tension_limits_n':limits,'configuration_only_identity':digest(boundary)})
         model=linear_model(case,point,p,binding['configuration'],graph)
-        records.append(dict(point=model.operating_point,model=plain(ctx.save_artifact(model)),
+        records.append(dict(point=model.operating_point,model=plain(model),
             derivative_check=derivative_check(model,graph,p) if point['name']=='halfway_waypoint' else None,
             construction=point['construction']))
     model_binding=Binding(extension_id='model.gvs',version='1.0.0',parameters=Payload(
         contract='family.gvs_model',data=dict(basis=inp.policy.controller.parameters.data['recipe']['basis'])))
     applicability=assess_model_uses(inp.robot,inp.task,model_binding,
-        ['reachability','static_equilibrium','linearization','local_model_control'],registry=ctx.reg)
+        ['reachability','static_equilibrium','linearization','local_model_control'],registry=registry)
     records.insert(0,dict(configuration_only_input=boundary,configuration_only_identity=digest(boundary),
         applicability=plain(applicability),operating_point_rule=p.candidate_rule,
         requested_operating_points=len(points),analysis_binding=boundary['analysis_binding']))
     return AnalysisResult(kind='candidate_linearization',protocol=protocol_ref,bindings=[binding],records=records,
         evidence=[binding['configuration']],limitations=LIMITATIONS+[
-            'Retrospective emulation of information available before execution; candidates and outcomes already existed.',
             'Intermediate waypoint is geometric and is not asserted to be a static equilibrium.'])
+
+
+
+def linearize_candidate_configuration(ctx,inp,binding,p,protocol_ref):
+    result=calculate_candidate_configuration(inp,binding,p,protocol_ref,registry=ctx.reg)
+    for record in result.records:
+        if record.get('model'):record['model']=plain(ctx.save_artifact(record['model']))
+    return result
 
 
 def linearize_candidate(ctx,args):

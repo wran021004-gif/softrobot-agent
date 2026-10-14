@@ -49,19 +49,21 @@ class MathAnalysisTests(unittest.TestCase):
         budget=dict(tool_calls=3,model_calls=0,backend_solves=0,worker_calls=0,wall_s=60.)
         config['budget']=budget;store.create(config)
         inp=reference_input('fixture');inp['policy'].update(budget=budget,timeout_s=20.,
-            tool_bindings={'analysis.control_metrics':'1.0.0','evidence.read':'1.0.0'},allowed_tools=[])
+            tool_bindings={'analysis.control_metrics':'2.0.0','evidence.read':'1.0.0'},allowed_tools=[])
         host=Host(root,'fixture');host.create(inp)
         s=SignalSpec(name='position',entity='fixture',dimension=1,units='m',frame='world',phase='continuous')
         with store.transaction() as db:
             source=store.put(db,dict(kind='analytic fixture, no robot execution'))
-            pref=store.put(db,self.p)
+            from schemas.platform_analysis import TaskAnalysisProtocol
+            protocol=TaskAnalysisProtocol.model_validate({**plain(self.p),'protocol_id':'task-local-v2'})
+            pref=store.put(db,protocol)
             model=OutputLinearizedModel(state_definition=[s],input_definition=[s],output_definition=[s],
                 x0=[0.],u0=[0.],y0=[0.],A=[[-1.]],B=[[1.]],C=[[1.]],D=[[0.]],drift=[0.],time_domain='continuous',
                 binding=dict(tension_limits_n=[8.],target_m=[1.],source='analytic fixture'),operating_point={},
                 state_scales=[1.],input_scales=[1.],output_scales=[1.],normalization_derivation='identity fixture',
-                protocol_identity=digest(plain(self.p)),evidence=[source])
+                protocol_identity=digest(plain(protocol)),evidence=[source])
             mref=store.put(db,model)
-        receipt=host.invoke(dict(request_id='metrics',tool_id='analysis.control_metrics',tool_version='1.0.0',
+        receipt=host.invoke(dict(request_id='metrics',tool_id='analysis.control_metrics',tool_version='2.0.0',
             arguments=dict(models=[plain(mref)],protocol=plain(pref),implementation='scipy'),reason='Analytic public interface verification'))
         self.assertEqual(receipt['execution_status'],'completed',receipt)
         result=store.artifact(receipt['output'])

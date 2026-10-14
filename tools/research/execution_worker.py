@@ -21,7 +21,11 @@ def execute(request):
 def main():
     job=contain_worker_children()  # Retain the handle throughout the worker lifetime.
     path=Path(sys.argv[1]); request=read(path)
-    try: value=execute(request)
+    try:
+        if request.get('kind')=='candidate_analysis':
+            from tools.research.analysis import calculate
+            value=calculate(request['configuration'],request['binding'],request['query'],request.get('exact_point'))
+        else:value=execute(request)
     except Exception as exc:
         value=dict(status='execution_incomplete',error=type(exc).__name__,reason=str(exc))
     atomic_json(path.with_name('result.json'),value)

@@ -340,7 +340,8 @@ def compatible_references(host):
             request=host.store.artifact(v['original_request']);scene=assemble(SessionInput.model_validate(candidate['configuration']),physics_for(SessionInput.model_validate(candidate['configuration'])))
             u=np.asarray(trajectory['tensions_n']);times=np.asarray(trajectory['times_s'])
             order=[t['entity'] for t in physics_for(SessionInput.model_validate(candidate['configuration']))['tendons']]
-            if (request['configuration']['task']!=candidate['configuration']['task'] or abs(trajectory['d']-candidate['parameters']['d'])>1e-10
+            exact_structure=(v.get('solved_configuration')==candidate.get('configuration_reference')) if core.state(host)['spec'].get('nominal_source') else abs(trajectory['d']-candidate['parameters']['d'])<=1e-10
+            if (request['configuration']['task']!=candidate['configuration']['task'] or not exact_structure
                     or trajectory['tendon_order']!=order
                     or order!=['near_t0','near_t1','near_t2','far_t0','far_t1','far_t2']
                     or scene['control_period_s']!=.01 or scene['duration_s']!=.35
@@ -380,7 +381,7 @@ def packet(host):
     s=core.state(host)
     return dict(allocation_feedback=allocation_feedback(host),frozen_task=s['rl_task'],capabilities=dict(task='reach-and-hold',control='ideal_tension',
         modes=['direct','residual'],compatible_references=compatible_references(host),
-        structural_coordinate='d in [-1,1]: lengths [.16+.0055*d,.11-.0055*d] m',
+        structural_domain=s['spec']['allowed_parameters'],
         defaults=run.read_json(Path(run.__file__).with_name('config.json'))),
         training_summaries=[dict(run_id=r,reference=e['training_summary'],evaluations=[v for v in s.get('rl_evaluations',[]) if host.store.artifact(v).get('run_id')==r]) for r,e in s.get('rl_runs',{}).items() if e.get('training_summary')],
         runs=s.get('rl_runs',{}),source_summary=s.get('rl_source_summary'),evaluations=[dict(reference=r,**host.store.artifact(r)) for r in s.get('rl_evaluations',[])],

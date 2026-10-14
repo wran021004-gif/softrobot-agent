@@ -112,7 +112,7 @@ def decode(problem,structure,latent):
     allocation,initial=continuous_space(problem,structure)
     if set(latent)!=set(initial):raise ValueError('INACTIVE_OR_MISSING_LATENT_COORDINATES')
     values={k:v.value for k,v in problem.variables.items() if isinstance(v,Fixed)}
-    values.update(structure)
+    values.update({k:v for k,v in structure.items() if v is not None})
     for k,v in problem.variables.items():
         if isinstance(v,Continuous):
             x=latent[k]
@@ -168,6 +168,8 @@ def validate_problem(problem, evaluation_profile=None):
         expected=deepcopy(evaluation_profile['recipe'])
         if not expected.get('recover_returned_tensions'):
             raise ValueError('UNIFIED_PROFILE_REQUIRES_RECOVERY')
+    from extensions.tendon_family.contracts import GVSTrajectoryParameters
+    expected=plain(GVSTrajectoryParameters.model_validate(expected))
     actual=plain(problem.execution.recipe)
     for name in ('holding_tip_speed_weight','terminal_tip_speed_weight'):
         actual.pop(name);expected=deepcopy(expected);expected.pop(name,None)

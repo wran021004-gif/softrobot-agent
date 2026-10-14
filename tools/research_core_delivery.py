@@ -210,7 +210,7 @@ def deliver(host):
 
 
 if __name__=='__main__':
-    parser=argparse.ArgumentParser();parser.add_argument('--spec',type=Path,default=core.DEFAULT_SPEC)
+    parser=argparse.ArgumentParser();parser.add_argument('--spec',type=Path,default=core.ROOT/'examples/research_core/specification.json')
     spec=core.read(parser.parse_args().spec)
     host=core.Host(core.ROOT/'runs'/spec['study_id'],spec['study_id'],actor='unified-research')
     result=deliver(host)

@@ -44,6 +44,12 @@ def _model_references(ctx,references):
     return unique
 
 
+
+def calculate_control_metrics(model,protocol):
+    """Calculation boundary shared by public tools and current candidate analysis."""
+    A,B,C,D=normalized(model); drift=np.asarray(model.drift)/model.state_scales
+    return summarize(model,protocol,raw_scipy(A,B,C,D,drift,protocol),dict(name='scipy',versions=versions(),matlab=None))
+
 def control_metrics(ctx,args):
     p=_protocol(ctx,args)
     model_refs=_model_references(ctx,args.models)
@@ -53,6 +59,7 @@ def control_metrics(ctx,args):
     if any(m.protocol_identity!=digest(plain(p)) for m in models): raise ValueError('MODEL_PROTOCOL_MISMATCH')
     records=[]
     def calculate(m,backend=None):
+        if backend is None:return calculate_control_metrics(m,p)
         A,B,C,D=normalized(m); drift=np.asarray(m.drift)/m.state_scales
         raw=raw_scipy(A,B,C,D,drift,p) if backend is None else backend.calculate(A,B,C,D,drift,p)
         return summarize(m,p,raw,dict(name=args.implementation,versions=versions(),

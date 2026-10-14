@@ -18,13 +18,13 @@ import time
 from uuid import uuid4
 
 from schemas.platform import ProjectConfig, SessionInput
-from schemas.research_core import Parameters, Search, Plan, ExperienceQuery, EvidenceQuery, RLRequest
+from schemas.research_core import Parameters, Search, Plan, ExperienceQuery, EvidenceQuery, RLRequest, AnalysisRequest
 from tools.platform_host import Host
 from tools.platform_store import plain, zero
 from tools.state_io import atomic_json, read, digest
 
 ROOT = Path(__file__).resolve().parents[2]
-DEFAULT_SPEC = ROOT/'examples/research_core/specification.json'
+DEFAULT_SPEC = ROOT/'examples/research_chain/specification.json'
 PYTHON = Path('D:/softrobot-agent/.mainline5-env/Scripts/python.exe')
 SCIENCE_FILES = ['extensions/tendon_family/gvs_nmpc.py', 'extensions/tendon_family/gvs_trajectory.py',
     'extensions/tendon_family/gvs_projection.py','extensions/tendon_family/contracts.py',
@@ -39,6 +39,7 @@ SCIENCE_FILES = ['extensions/tendon_family/gvs_nmpc.py', 'extensions/tendon_fami
     'extensions/tendon_family/gvs.py', 'extensions/tendon_family/gvs_basis.py',
     'tools/casadi_feedback_worker.py', 'tools/casadi_codesign_worker.py',
     'tools/research/mechanics.py', 'tools/research/mechanics_worker.py']
+SCIENCE_FILES += ['tools/research/design.py','tools/research/analysis.py','extensions/tendon_family/math_analysis.py','extensions/math_analysis/tools.py','extensions/math_analysis/kernels.py','schemas/platform_analysis.py','schemas/design_optimization.py']
 CORE_FILES = ['tools/research/execution_worker.py','tools/service_execution.py','tools/research/rl.py','tools/rl/env.py','tools/rl/run.py','tools/rl/train.py','tools/rl/checks.py','tools/rl/config.json','tools/research/core.py','tools/research/diagnostic.py','schemas/research_core.py',
               'tools/research/feedback.py','tools/research_core_demo.py','tools/research/numerics.py','tools/numerical_repair.py','tools/fixed_task_milestone.py','tools/research/experience.py']
 
@@ -61,7 +62,7 @@ def update(host, **values):
 
 
 def readable_results(s, host=None):
-    linked=[]
+    linked=list(s.get('analysis_results',[]))+list(s.get('search_results',[]))
     if host:
         for ref in s.get('mechanics_results',[]):
             result=host.store.artifact(ref)
@@ -74,6 +75,7 @@ def readable_results(s, host=None):
 
 def protected(host):
     s=state(host)
+    if s['spec'].get('mode')=='engineering_numerical':return False
     return (host.store.remaining()['remaining']['model_calls']<=s['spec']['budgets']['protected_provider_requests']
         or time.time()>=s['cutoff_unix'])
 
@@ -139,11 +141,6 @@ def core_hashes():
     return {name: hashlib.sha256((ROOT/name).read_bytes()).hexdigest() for name in CORE_FILES}
 
 
-def full_science(cfg):
-    return dict(robot=deepcopy(cfg['robot']), task=deepcopy(cfg['task']), seed=cfg['seed'],
-        policy={k:deepcopy(cfg['policy'][k]) for k in ('controller','backend','dynamics_model','discretization','candidate_builder')})
-
-
 def limits(spec):
     b = spec['budgets']
     return dict(model_calls=b['provider_requests'], tool_calls=b['public_operations'],
@@ -177,8 +174,14 @@ def prepare(spec_path=DEFAULT_SPEC, directory=None):
         raise ValueError('NUMERICAL_MODE_REQUIRES_ZERO_MODEL_REQUESTS')
     directory = Path(directory or ROOT/'runs'/run_id)
     h = Host(directory, run_id, actor='unified-research')
-    if h.store.db.exists():
+    if h.store.db.exists() and h.store.connect(True).execute('SELECT COUNT(*) FROM sessions WHERE run_id=?',(run_id,)).fetchone()[0]:
         if state(h)['spec'] != spec: raise ValueError('STUDY_SPEC_CHANGED_USE_EXPLICIT_MIGRATION')
+        if not state(h).get('reference_candidate'):
+            started=time.perf_counter()
+            candidate=construct(h,spec['reference_parameters'],dict(origin='initialization_recovery_no_scientific_dispatch'))
+            update(h,reference_candidate=candidate,numerical_s=state(h)['numerical_s']+time.perf_counter()-started)
+            if enabled(spec,'rl'):
+                update(h,rl_task=save(h,h.store.artifact(candidate)['configuration']['task'],'rl_frozen_task'),rl_runs={},rl_evaluations=[],rl_evidence_reads=[])
         return h
     start = time.perf_counter()
     from tools.nmpc_settling import baseline_configuration
@@ -187,20 +190,25 @@ def prepare(spec_path=DEFAULT_SPEC, directory=None):
         from tools.research.numerics import archived
         baseline=spec['baseline_archive']
         cfg=deepcopy(archived(baseline['folder'],baseline['candidate'])['configuration'])
+    elif spec.get('nominal_source'):
+        nominal=read(ROOT/spec['nominal_source'])
+        if digest(nominal['configuration'])!=nominal['provenance']['configuration_sha256']:raise ValueError('NOMINAL_SOURCE_IDENTITY_CHANGED')
+        cfg=deepcopy(nominal['configuration'])
     else:cfg = baseline_configuration()
     cfg['run_id'] = run_id
     if enabled(spec,'rl'):
         if cfg['policy']['controller']['extension_id']!='controller.gvs_nmpc': raise ValueError('EXPLICIT_IDEAL_TENSION_SOURCE_REQUIRED')
         if spec.get('tension_execution_mode')!='ideal_tension': raise ValueError('RL_STUDY_MUST_DECLARE_IDEAL_TENSION')
     # Recovery-enabled source is complete immutable execution evidence.
-    cfg['policy']['controller']['parameters']['data']['recipe'].update({k:v for k,v in spec['reference_parameters'].items() if k != 'd'})
+    cfg['policy']['controller']['parameters']['data']['recipe'].update({k:v for k,v in spec['reference_parameters'].items() if k in ('holding_tip_speed_weight','terminal_tip_speed_weight')})
     cfg['policy']['controller']['parameters']['data']['recipe'].update(spec.get('controller_recipe',{}))
     model = native_configuration(run_id)['policy']['model']
     cfg['policy'].update(model=model, budget=limits(spec), allowed_tools=['evidence.read'],
         tool_bindings={'evidence.read':'1.0.0'}, operation_allowances={'evidence.read':dict(timeout_s=30.,reserve_s=30.)})
-    h.store.create(ProjectConfig(project_id=run_id, grant_id=run_id+'-authorized',
-        authorization_source=spec['authorization'], budget=limits(spec),
-        exclusive_resources={'provider_request':1,'backend.family_mujoco':1}))
+    if not h.store.db.exists():
+        h.store.create(ProjectConfig(project_id=run_id, grant_id=run_id+'-authorized',
+            authorization_source=spec['authorization'], budget=limits(spec),
+            exclusive_resources={'provider_request':1,'backend.family_mujoco':1}))
     h.create(cfg); h.resume()
     from extensions.tendon_family.contracts import GVSTrajectoryParameters
     recipe = plain(GVSTrajectoryParameters.model_validate(cfg['policy']['controller']['parameters']['data']['recipe']))
@@ -219,6 +227,8 @@ def prepare(spec_path=DEFAULT_SPEC, directory=None):
         research_status='ready', selected=None,
         pilot=dict(provider=model,live_model_requests=0,framework_session_id=run_id,
             request_deadline_unix=spec['started_unix']+spec['budgets']['activity_s']-spec['budgets']['delivery_reserve_s']))
+    if spec.get('nominal_source'):
+        update(h,nominal_configuration=nominal['configuration'],nominal_provenance=nominal['provenance'],mathematical_evaluations=0,analysis_results=[],analysis_costs=[],search_results=[],assignment_started_unix=time.time(),accounting_scope='Cumulative assignment includes engineering preflight; never reset at live start')
     update(h,scoped_context=[save(h,read(ROOT/path),'supplied_scoped_context') for path in spec.get('supplied_evidence',[])])
     history_spec=spec.get('historical_evidence',{})
     if history_spec.get('source_study_id'):
@@ -255,7 +265,7 @@ def prepare(spec_path=DEFAULT_SPEC, directory=None):
     latest=read(ROOT/'evidence/research_core_20261011/scientific_summary.json')
     update(h, supplied_core_history=save(h,latest,'supplied_sealed_core_history'))
     candidate = construct(h, spec['reference_parameters'], dict(origin='initial_controller_reference', historical_result_ownership='sealed source activity'))
-    update(h, reference_candidate=candidate, numerical_s=time.perf_counter()-start)
+    update(h, reference_candidate=candidate, numerical_s=max(state(h)['numerical_s'],time.perf_counter()-start))
     if enabled(spec,'rl'):
         from extensions.tendon_family.backends import physics_for
         from extensions.tendon_family.scene import assemble
@@ -269,64 +279,7 @@ def prepare(spec_path=DEFAULT_SPEC, directory=None):
     return h
 
 
-def configuration_for(host, parameters, owner):
-    from tools.design_optimization import resolved_input
-    from schemas.design_optimization import DesignOptimizationProblem
-    s = state(host); p = Parameters.model_validate(parameters); base = s['base_configuration']
-    problem = DesignOptimizationProblem.model_validate(read(ROOT/'examples/casadi_codesign/case_A.json')['physical_source'])
-    data = plain(problem); data['task'] = deepcopy(base['task'])
-    data['execution']['recipe'] = deepcopy(s['profile']['recipe'])
-    data['execution']['settling'] = deepcopy(base['policy']['controller']['parameters']['data']['settling'])
-    problem = DesignOptimizationProblem.model_validate(data)
-    fixed = deepcopy(base['robot']['structure']['data']['metadata']['recipe'])
-    fixed.update(lengths_m=[.16+.0055*p.d,.11-.0055*p.d],
-        holding_tip_speed_weight=p.holding_tip_speed_weight,terminal_tip_speed_weight=p.terminal_tip_speed_weight)
-    cfg = resolved_input(problem, fixed, owner, deepcopy(base['policy']))
-    if enabled(s['spec'],'rl'):
-        # generated_serial's existing GVS source already declares ideal tension.
-        # Keep that verified declaration; no actuator rewriting after construction.
-        if s['spec']['tension_execution_mode']!='ideal_tension': raise ValueError('IDEAL_TENSION_STUDY_REQUIRED')
-    # Freeze every binding not regenerated by the declared length coordinate.
-    for k in ('backend','dynamics_model'): cfg['policy'][k] = deepcopy(base['policy'][k])
-    return cfg, fixed
-
-
-def construct(host, parameters, provenance):
-    s = state(host); p = plain(Parameters.model_validate(parameters))
-    cfg, resolved = configuration_for(host,p,host.run_id)
-    scientific = full_science(cfg)
-    identity = digest(dict(parameters=resolved, configuration=scientific, evaluation_profile=s['profile']))
-    old = s['candidates'].get(identity)
-    if old:
-        save(host,dict(candidate=old,provenance=provenance,immutable_candidate_reused=True,
-            additional_scientific_executions=0),'candidate_construction_relation')
-        return old
-    candidate = dict(candidate_id='core-'+identity,identity=identity, parameters=p,
-        resolved_parameters=resolved, configuration=cfg, scientific_configuration=scientific,
-        profile_identity=s['profile']['identity'], evaluation_version=s['profile']['version'],
-        provenance=provenance,offline_trajectory=None)
-    ref = save(host,candidate,'candidate_constructed')
-    candidates = state(host)['candidates']; candidates[identity] = ref; update(host,candidates=candidates)
-    return ref
-
-
-def verify_candidate(host, reference):
-    s = state(host); c = host.store.artifact(reference)
-    if s['candidates'].get(c.get('identity')) != plain(reference): raise ValueError('OWNED_RESOLVED_CANDIDATE_REQUIRED')
-    if plain(reference)==s.get('rl_source_candidate'):
-        if c['scientific_configuration']!=full_science(c['configuration']) or plain(c['configuration']['task'])!=host.store.artifact(s['rl_task']):
-            raise ValueError('PINNED_SOURCE_CANDIDATE_TASK_MISMATCH')
-        return c
-    historical=plain(reference) in s.get('imported_candidates',[])
-    profile=s['imported_candidate_profile'] if historical else s['profile']
-    if c['profile_identity'] != profile['identity']: raise ValueError('OLD_EVALUATION_PROFILE_CANDIDATE_REQUIRES_NEW_CONSTRUCTION')
-    if c['scientific_configuration']!=full_science(c['configuration']): raise ValueError('IMPORTED_CONFIGURATION_IDENTITY_MISMATCH')
-    cfg, values = configuration_for(host,c['parameters'],host.run_id)
-    if values != c['resolved_parameters'] or full_science(cfg) != c['scientific_configuration']:
-        raise ValueError('FULL_FIXED_AND_SEARCH_PARAMETER_IDENTITY_MISMATCH')
-    expected = digest(dict(parameters=values,configuration=full_science(cfg),evaluation_profile=profile))
-    if expected != c['identity']: raise ValueError('CANDIDATE_IDENTITY_MISMATCH')
-    return c
+from tools.research.design import configuration_for, construct, verify_candidate, full_science
 
 
 def allowance(s):
@@ -414,8 +367,8 @@ def bind(host, reason=None, specification=None):
         if not reason:raise ValueError('SPECIFICATION_MIGRATION_REASON_REQUIRED')
         immutable=('study_id','started_unix','baseline_archive','baseline_execution_id','baseline_offline_execution_id')
         if any(specification.get(k)!=s['spec'].get(k) for k in immutable):raise ValueError('MIGRATION_CANNOT_RESET_STUDY_OR_SOURCE_IDENTITY')
-        ceilings=('activity_s','numerical_s','provider_requests','protected_provider_requests','local_solves','local_solve_s','offline_nlp','bdf_replays','physical_launches','public_operations')
-        if any(specification['budgets'][k]!=s['spec']['budgets'][k] for k in ceilings):raise ValueError('MIGRATION_CANNOT_CHANGE_AUTHORIZED_CEILINGS')
+        ceilings=('activity_s','numerical_s','provider_requests','protected_provider_requests','local_solves','local_solve_s','offline_nlp','bdf_replays','physical_launches','public_operations','mathematical_evaluations')
+        if any(specification['budgets'].get(k)!=s['spec']['budgets'].get(k) for k in ceilings):raise ValueError('MIGRATION_CANNOT_CHANGE_AUTHORIZED_CEILINGS')
         if specification['budgets']['delivery_reserve_s']!=s['spec']['budgets']['delivery_reserve_s']:raise ValueError('MIGRATION_CANNOT_RESET_DELIVERY_CUTOFF')
         relation=save(host,dict(previous=s['spec'],selected=specification,reason=reason,
             clocks_and_counters_preserved=True),'specification_migration')
@@ -620,83 +573,20 @@ def compact_result(r):
     return result
 
 
-def search_problem(host, search, admitted):
-    from schemas.design_optimization import DesignOptimizationProblem
-    s=state(host); base=s['base_configuration']; q=Search.model_validate(search)
-    p=read(ROOT/'examples/casadi_codesign/case_A.json')['physical_source']
-    p['study_id']=host.run_id; p['task']=deepcopy(base['task'])
-    p['execution']['recipe']=deepcopy(s['profile']['recipe'])
-    p['execution']['settling']=deepcopy(base['policy']['controller']['parameters']['data']['settling'])
-    fixed=deepcopy(base['robot']['structure']['data']['metadata']['recipe'])
-    fixed.pop('lengths_m'); fixed.pop('family',None); fixed.update({k:v for k,v in plain(q.fixed).items() if k!='d'})
-    p['variables']={k:dict(kind='fixed',value=v) for k,v in fixed.items()}
-    for k in q.variables:
-        if k!='d': p['variables'][k]=dict(kind='continuous',bounds=list(q.bounds[k]),initial=getattr(q.fixed,k))
-    free='d' in q.variables
-    # The public +/-5% bound refers to the physical nominal design, not the
-    # optimizer's chosen initial point. Use the closest nominal feasible point
-    # for allocation validation; pass the requested initialization separately.
-    baseline_d=min(max(0.,q.bounds['d'][0]),q.bounds['d'][1]) if free else q.fixed.d
-    lengths=[.16+.0055*baseline_d,.11-.0055*baseline_d]
-    bounds=[[.16+.0055*q.bounds['d'][0],.16+.0055*q.bounds['d'][1]],
-        [.11-.0055*q.bounds['d'][1],.11-.0055*q.bounds['d'][0]]] if free else [[v,v] for v in lengths]
-    p['lengths']=dict(free=free,total_flexible_length_m=.27,baseline_by_count={'2':lengths},bounds_by_count={'2':bounds})
-    p['fixed_tendon_count']=6; p['fixed_actuator_count']=6
-    p['budget']=dict(max_evaluations=admitted,wall_s=admitted*allowance(s))
-    p['objective']=dict(ranking=q.ranking,accepted_resource_preference='none')
-    p['method']=dict(name='hierarchical_coordinate_v1_1',step=q.step,initial_structures=[],stop_on_acceptance=False)
-    return DesignOptimizationProblem.model_validate(p)
+def search_problem(host, query, count):
+    if not state(host)["spec"].get("nominal_source"):
+        from tools.research.mechanics import legacy_search_problem
+        return legacy_search_problem(host,query,count)
+    from tools.research.design import search_problem as build
+    return build(host,query,count)
 
 
 def run_search(host, query, key):
-    from tools.design_optimization import solve, continuous_space, structures
-    guard(host,True); q=Search.model_validate(query); admission=capacity(host,q.max_evaluations)
-    if q.mechanics_source:
-        from tools.research.mechanics import handoff
-        if 'd' in q.variables: raise ValueError('MECHANICS_CONTROL_SEARCH_REQUIRES_FIXED_STRUCTURE')
-        handoff(host,q.mechanics_source,plain(q.fixed),dict(operation_key=key,origin='control_search'))
-    if not admission['admitted']: return dict(status='budget_limited',admission=admission,evaluated=[])
-    problem=search_problem(host,q,admission['admitted']); s=state(host)
-    if s['searches'].get(key):
-        from schemas.design_optimization import DesignOptimizationProblem
-        problem=DesignOptimizationProblem.model_validate(s['searches'][key]['problem'])
-    def evaluator(problem,values,proposal_id):
-        if capacity(host,1)['admitted']<1: return dict(status='shared_budget_exhausted',evidence={})
-        params=dict(d=(values['lengths_m'][0]-.16)/.0055,**{k:values[k] for k in ('holding_tip_speed_weight','terminal_tip_speed_weight')})
-        ref=construct(host,params,dict(origin='mathematical_search',plan_key=key,proposal_id=proposal_id))
-        if q.mechanics_source:
-            handoff(host,q.mechanics_source,params,dict(operation_key=key,proposal_id=proposal_id))
-        c=verify_candidate(host,ref)
-        completed=[host.store.artifact(r) for r in state(host)['results']]
-        old=next((r for r in completed if r['operation_key']==key+':'+proposal_id),None)
-        if old is None:
-            feedback=execute(host,ref,key+':'+proposal_id,role='search')
-            if feedback['status']!='evaluated': return dict(status=feedback['status'],evidence=feedback)
-            old=host.store.artifact(feedback['reference'])
-        execution_ref=next(r for r in state(host)['results'] if host.store.artifact(r)['operation_key']==key+':'+proposal_id)
-        return dict(status=old['status'],acceptance=old['acceptance'],evidence=dict(result=execution_ref,execution_id=old['execution_id']),
-            configuration=c['configuration'],candidate_id=c['candidate_id'],scientific_identity=c['identity'])
-    def checkpoint(value):
-        searches=state(host)['searches']; searches[key]=deepcopy(value); update(host,searches=searches)
-        return save(host,value,'search_checkpoint')
-    initial_latents=None
-    if 'd' in q.variables:
-        structure=structures(problem)[0];allocation,latent=continuous_space(problem,structure)
-        latent.update(allocation.encode([.16+.0055*q.fixed.d,.11-.0055*q.fixed.d]))
-        initial_latents={digest(structure):latent}
-    result=plain(solve(problem,evaluator=evaluator,state=s['searches'].get(key),save_state=checkpoint,
-        evaluation_profile=s['profile'],initial_latents=initial_latents))
-    explored={k:sorted({r['resolved']['parameters'][k] for r in result['evaluated']}) for k in q.variables if k!='d'}
-    if 'd' in q.variables: explored['d']=sorted({(r['resolved']['parameters']['lengths_m'][0]-.16)/.0055 for r in result['evaluated']})
-    attempted=[dict(reference=r,parameters=host.store.artifact(host.store.artifact(r)['candidate'])['parameters'],
-        **compact_result(host.store.artifact(r))) for r in state(host)['results']
-        if host.store.artifact(r)['operation_key'].startswith(key+':')]
-    return dict(result=result,admission=admission,actually_explored=explored,attempted_executions=attempted,
-        failed_or_incomplete_executions=[r['reference'] for r in attempted if r['status']!='evaluated' or not (r['acceptance'] or {}).get('accepted')],
-        requested_variables=q.variables, fixed_parameters=plain(q.fixed), mechanics_source=plain(q.mechanics_source),
-        distinct_configurations=len({r['scientific_identity'] for r in result['evaluated']}),
-        not_explored=[k for k,v in explored.items() if len(v)<2],
-        batch_shrunk=admission['admitted']<q.max_evaluations)
+    if not state(host)["spec"].get("nominal_source"):
+        from tools.research.mechanics import legacy_run_search
+        return legacy_run_search(host,query,key)
+    from tools.research.design import run_search as search
+    return search(host,query,key,guard=guard,execute=execute,capacity=capacity)
 
 
 def experience(host, query):
@@ -841,7 +731,9 @@ def claims(host):
     if state(host)['spec'].get('capabilities'):
         from tools.research.feedback import confirmation_progress
         s=state(host);progress=confirmation_progress(host)
-        return dict(selected=s.get('selected'),independent_confirmation_count=progress['required_total']-progress['remaining'],
+        changed=bool(s.get('selected') and host.store.artifact(host.store.artifact(s['selected'])['candidate'])['configuration']['robot']!=s.get('nominal_configuration',{}).get('robot'))
+        search_rows=[host.store.artifact(r) for r in s.get('search_results',[])]
+        return dict(selected=s.get('selected'),model_selected_structure_search_evaluations=sum(r.get('structurally_changed_evaluations',0) for r in search_rows),selected_structurally_new=changed,new_design_and_control_confirmed=bool(changed and progress['confirmed']),independent_confirmation_count=progress['required_total']-progress['remaining'],
             required_confirmations=progress['required_total'],confirmation_failures=progress['failures'],
             confirmation_progress=progress,limited_repeat_supported_acceptance=progress['confirmed'],task_passed=progress['confirmed'],
             parameter_improvement_attribution_permitted=False,
@@ -885,16 +777,19 @@ def packet(host):
         from tools.research.feedback import result_view, eligibility, facts
         from tools.research.rl import packet as rl_packet
         return dict(decision_facts=facts(host),specification=s['spec'],scoped_context=s.get('scoped_context',[]),frozen_task=plain(s['base_configuration']['task']),reference_candidate=s['reference_candidate'],
-            candidates=list(s['candidates'].values()),results=[dict(reference=r,**result_view(host,r),confirmation=eligibility(host,r)) for r in [*s['results'],*s.get('rl_evaluations',[])]],
+            candidates=[r for r in s['candidates'].values() if host.store.artifact(r)['profile_identity']==s['profile']['identity']],results=[dict(reference=r,**result_view(host,r),confirmation=eligibility(host,r)) for r in [*s['results'],*s.get('rl_evaluations',[])]],
+            analysis_results=[dict(reference=r,**{k:host.store.artifact(r).get(k) for k in ('status','candidate','operation','proxy_values','origin','charged_numerical_s','local_model_constraints','internal_calculations')}) for r in s.get('analysis_results',[])],
+            search_results=s.get('search_results',[]),
+            mathematical_accounting=dict(evaluations=s.get('mathematical_evaluations',0),costs=s.get('analysis_costs',[]),engineering_preflight_s=sum(c['numerical_s'] for c in s.get('analysis_costs',[]) if c['origin']=='engineering_preflight'),cumulative_costs_preserved=True),
             mechanics_results=[dict(reference=r,**{k:host.store.artifact(r).get(k) for k in ('status','operation','trajectory_reference','objective_definition','original_task_feasible','relaxed_nlp_feasible','original_task_gaps','trajectory_metrics','charged_numerical_s','checkpoint_reference')}) for r in s.get('mechanics_results',[])],
             handoffs=[dict(reference=r,**host.store.artifact(r)) for r in s.get('handoffs',[])],
             rl=rl_packet(host) if enabled(s['spec'],'rl') else None,
-            nmpc_admission=[dict(candidate=r,**nmpc_timing(host,r),remaining_phase_admission=capacity(host,1,candidate=r)) for r in s['candidates'].values()] if s['spec'].get('nmpc_execution_cap_s') else None,
+            nmpc_admission=[dict(candidate=r,**nmpc_timing(host,r),remaining_phase_admission=capacity(host,1,candidate=r)) for r in s['candidates'].values() if host.store.artifact(r)['profile_identity']==s['profile']['identity']] if s['spec'].get('nmpc_execution_cap_s') else None,
             resource_use=dict(shared_ledger=host.store.remaining(),numerical_s=s['numerical_s'],numerical_reserved_s=s['numerical_reserved_s'],remaining_numerical_s=s['spec']['budgets']['numerical_s']-s['numerical_s']-s['numerical_reserved_s'],charged_starts=s.get('charged_starts',0),shared_start_limit=s['spec'].get('shared_start_limit'),elapsed_s=max(0,s.get('closed_unix',time.time())-s['started_unix'])),
             claims=claims(host),research_status=s['research_status'])
     if s['spec'].get('mode')=='rl_interface':
         from tools.research.rl import packet as rl_packet
-        return dict(specification=s['spec'],candidates=list(s['candidates'].values()),rl=rl_packet(host),
+        return dict(specification=s['spec'],candidates=[r for r in s['candidates'].values() if host.store.artifact(r)['profile_identity']==s['profile']['identity']],rl=rl_packet(host),
             resource_use=dict(shared_ledger=host.store.remaining(),numerical_s=s['numerical_s'],
                 elapsed_s=max(0,s.get('closed_unix',time.time())-s['started_unix'])),research_status=s['research_status'])
     from tools.research.feedback import facts, eligibility, mechanics_context, compact_local
@@ -937,7 +832,11 @@ def packet(host):
 def dispatch(host, value, request_id, origin='model'):
     """Native plan acceptance and internal batch use the same project Store."""
     if state(host)['spec'].get('mode') == 'engineering_numerical':origin='engineering'
-    plan=Plan.model_validate(value)
+    contract=Plan
+    if not state(host)["spec"].get("nominal_source"):
+        from tools.research.mechanics import LegacyPlan
+        contract=LegacyPlan
+    plan=contract.model_validate(value)
     if state(host)['spec'].get('allowed_plan_actions') is not None and plan.action not in state(host)['spec']['allowed_plan_actions']:
         raise ValueError('Operation outside declared follow-up scope')
     if state(host)['spec'].get('mode')=='rl_interface' and (plan.action not in ('propose','stop') or plan.mechanics_source):
@@ -957,7 +856,7 @@ def dispatch(host, value, request_id, origin='model'):
     for r in plan.supporting_evidence: host.store.artifact(r)
     from tools.research.experience import disposition_bindings
     experience_bindings=disposition_bindings(host,plan.experience_disposition)
-    if plan.action=='stop' and any(r not in [plain(v) for v in plan.supporting_evidence] for r in [*s['results'],*s.get('mechanics_results',[]),*s.get('rl_evaluations',[])]):
+    if plan.action=='stop' and any(r not in [plain(v) for v in plan.supporting_evidence] for r in [*s['results'],*s.get('mechanics_results',[]),*s.get('rl_evaluations',[]),*s.get('analysis_results',[])]):
         raise ValueError('STOP_MUST_CITE_ALL_NEW_EXPERIMENT_RESULTS')
     if enabled(s['spec'],'rl') and plan.action=='stop' and s.get('rl_runs'):
         evaluations=s.get('rl_evaluations',[])
@@ -1129,7 +1028,7 @@ async def converse(host):
         for event in host.store.events(host.run_id):
             if event['kind']!='model_original_tool_feedback': continue
             value=host.store.artifact(event['outputs'][0]);use=value['tool_use']
-            if use['name'] not in ('research_plan','research_rl') or (use['name']=='research_plan' and use['input'].get('action') in ('stop',None)): continue
+            if use['name'] not in ('research_plan','research_rl','research_analysis') or (use['name']=='research_plan' and use['input'].get('action') in ('stop',None)): continue
             if value['result']['status']!='success': continue
             refs.extend(use['toolUseId']+'_'+str(i) for i,_ in enumerate(value['result'].get('content',[])))
         return refs
@@ -1169,6 +1068,9 @@ async def converse(host):
         def run(use,**kwargs):
             try:
                 if kind=='plan': value=dispatch(host,use['input'],'native-'+use['toolUseId'])
+                elif kind=='analysis':
+                    from tools.research.analysis import dispatch as analysis_dispatch
+                    value=analysis_dispatch(host,use['input'],'native-'+use['toolUseId'],guard=guard)
                 elif kind=='rl':
                     from tools.research.rl import dispatch as rl_dispatch
                     value=rl_dispatch(host,use['input'],'native-'+use['toolUseId'])
@@ -1205,6 +1107,8 @@ async def converse(host):
         actions=state(host)['spec'].get('allowed_plan_actions',actions)
         schema=Plan.model_json_schema();schema['properties']['action']={'type':'string','enum':actions}
         native[0].tool_spec={**native[0].tool_spec,'inputSchema':{'json':schema}}
+    if state(host)['spec'].get('nominal_source'):
+        native.append(PythonAgentTool('research_analysis',dict(name='research_analysis',description='Candidate-bound equilibrium/margins, linearization/controllability, unilateral finite-time endpoint or terminal braking; task acceptance remains unmeasured. Each actual calculation charged once.',inputSchema={'json':AnalysisRequest.model_json_schema()}),handler('analysis')))
     if rl_mode:
         native.append(PythonAgentTool('research_rl',dict(name='research_rl',description='Configure/start, query, stop, resume, independently evaluate or inspect/one-step diagnose an owned frozen candidate RL run',
             inputSchema={'json':RLRequest.model_json_schema()}),handler('rl')))
@@ -1240,6 +1144,7 @@ async def converse(host):
             schema=Plan.model_json_schema(); schema['properties']['action']={'enum':permitted['research_plan'],'type':'string'}
             native[0].tool_spec={**native[0].tool_spec,'inputSchema':{'json':schema}}
             agent.tool_registry.registry.pop('experience_retrieve',None)
+            agent.tool_registry.registry.pop('research_analysis',None)
             if rl_mode:
                 schema=deepcopy(native[-1].tool_spec['inputSchema']['json'])
                 schema['properties']['operation']['enum']=permitted['research_rl']
@@ -1286,6 +1191,9 @@ async def converse(host):
 
 
 def recover(host):
+    if (state(host).get('pending') or {}).get('kind')=='candidate_analysis':
+        from tools.research.analysis import recover as recover_analysis
+        return recover_analysis(host)
     if (state(host).get('pending') or {}).get('kind') == 'local_diagnostic':
         from tools.research.numerics import recover_local
         return recover_local(host)
@@ -1303,7 +1211,10 @@ def recover(host):
     for ref in s['plans']:
         original=host.store.artifact(ref);key=original['request_id'];row=host.store.lookup(host.run_id,key)
         if not row or row['receipt']: continue
-        plan=Plan.model_validate(original['original_plan'])
+        if s['spec'].get('nominal_source'):plan=Plan.model_validate(original['original_plan'])
+        else:
+            from tools.research.mechanics import LegacyPlan
+            plan=LegacyPlan.model_validate(original['original_plan'])
         if plan.action=='search':
             result=dict(status='search_execution_incomplete',saved_checkpoint=s['searches'].get(key),
                 attempted_executions=[r for r in s['results'] if host.store.artifact(r)['operation_key'].startswith(key+':')],

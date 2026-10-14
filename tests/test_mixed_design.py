@@ -167,3 +167,49 @@ class MixedDesignTests(TestCase):
             self.assertEqual(len(launches),1);self.assertEqual(result['evaluated'],recovered['evaluated'])
             self.assertEqual(result['evaluated'][0]['execution_status'],'valid_failure')
             self.assertEqual(result['evaluated'][0]['resolved']['tendon_count'],7)
+
+
+class SourceRelativeDesignTests(TestCase):
+    def source(self):
+        from tools.state_io import read
+        return read(Path(__file__).resolve().parents[1]/'examples/research_chain/nominal.json')['configuration']
+
+    def test_source_preserved_and_owned_changes_rebuild_physics_once(self):
+        source=self.source();robot=source['robot']['structure']['data'];mesh=source['policy']['discretization']['data']
+        baseline,baseline_mesh,physics=generate(Recipe(source_design=robot,source_mesh=mesh))
+        self.assertEqual(baseline,robot);self.assertEqual(baseline_mesh,mesh)
+        recipe=Recipe(source_design=robot,source_mesh=mesh,lengths_m=[.162,.11],segment_section_scales={'distal1':1.02},segment_materials={'distal1':'stiff'},segment_routing_scales={'near':1.01})
+        candidate,_,rebuilt=generate(recipe);again,_,_=generate(recipe)
+        self.assertEqual(candidate,again)
+        parts={c['id']:c for c in candidate['components']};original={c['id']:c for c in robot['components']}
+        self.assertEqual(parts['near']['length_m'],.162)
+        self.assertEqual(parts['near']['sections'],original['near']['sections'])
+        self.assertEqual(parts['distal1']['physics']['young_pa'],original['distal1']['physics']['young_pa']*1.1)
+        for key,point in original['mid_guide']['guide_holes'].items():
+            np.testing.assert_allclose(parts['mid_guide']['guide_holes'][key],[point[0],point[1]*1.01,point[2]*1.01],rtol=0,atol=1e-15)
+        self.assertGreater(sum(p['mass_kg'] for p in rebuilt['parts']),sum(p['mass_kg'] for p in physics['parts']))
+        self.assertNotEqual(rebuilt['section_quantities']['distal1'],physics['section_quantities']['distal1'])
+        self.assertEqual(check_robot(candidate,mesh),rebuilt)
+        from tools.research.mechanics import legacy_compatible
+        cfg=deepcopy(source);cfg['robot']['structure']['data']=candidate
+        with self.assertRaisesRegex(ValueError,'LEGACY_CODESIGN_UNAVAILABLE'):legacy_compatible(cfg,source)
+
+    def test_independent_and_fixed_total_lengths_and_proxy_protocol_isolation(self):
+        from schemas.design_optimization import LengthAllocation
+        from tools.state_io import digest
+        independent=Allocation(LengthAllocation(mode='independent',baseline_by_count={'2':[.16,.11]}),2)
+        self.assertEqual(set(independent.initial),{'length/0','length/1'})
+        values=independent.decode({'length/0':.75,'length/1':.5});self.assertAlmostEqual(values[0],.164);self.assertAlmostEqual(values[1],.11)
+        fixed=Allocation(LengthAllocation(mode='fixed_total',baseline_by_count={'2':[.16,.11]}),2)
+        self.assertAlmostEqual(sum(fixed.decode({'length/0':.75})),.27)
+        problem=example();problem['evaluation_mode']='mathematical_proxy';problem['objective']=dict(proxy='held_position_min_eigenvalue',protocol={'fixture':'same'})
+        problem=DesignOptimizationProblem.model_validate(problem);seen=[];checkpoint=[]
+        def evaluate(p,parameters,name):
+            seen.append(name)
+            return dict(kind='mathematical_proxy',status='evaluated',computation_status='computed',task_acceptance='unmeasured',objective_identity=digest(plain(p.objective)),proxy_values={'held_position_min_eigenvalue':1.},evidence={})
+        result=solve(problem,evaluator=evaluate,save_state=lambda value:checkpoint.append(deepcopy(value)))
+        self.assertIsNone(result.best_feasible);self.assertIsNotNone(result.best_mathematical_candidate)
+        self.assertTrue(all(not r.feasible and r.task_acceptance=='unmeasured' for r in result.evaluated))
+        count=len(seen);solve(problem,evaluator=evaluate,state=checkpoint[-1]);self.assertEqual(len(seen),count)
+        changed=problem.model_copy(update={'objective':problem.objective.model_copy(update={'operating_point':'different'})})
+        with self.assertRaisesRegex(ValueError,'SEARCH_STATE_PROBLEM_IDENTITY'):solve(changed,evaluator=evaluate,state=checkpoint[-1])

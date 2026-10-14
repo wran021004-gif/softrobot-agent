@@ -115,6 +115,15 @@ def verify_candidate(host,reference):
         if c['profile_identity']!=s['imported_candidate_profile']['identity']:raise ValueError('HISTORICAL_PROFILE_MISMATCH')
         return c
     if c['profile_identity']!=s['profile']['identity']:raise ValueError('OLD_EVALUATION_PROFILE_CANDIDATE_REQUIRES_NEW_CONSTRUCTION')
+    if s['spec'].get('nominal_source'):
+        if host.store.artifact(c['configuration_reference'])!=c['configuration'] or c['source_identity']!=digest(s['nominal_configuration']):
+            raise ValueError('SAVED_CANONICAL_CONFIGURATION_OR_SOURCE_MISMATCH')
+        if c['parameters']!=c['resolved_parameters'] or c['task_identity']!=digest(c['configuration']['task']):
+            raise ValueError('SAVED_PARAMETER_TASK_IDENTITY_MISMATCH')
+        expected=digest(dict(parameters=c['resolved_parameters'],configuration=c['scientific_configuration'],evaluation_profile=s['profile']))
+        if expected!=c['identity']:raise ValueError('CANDIDATE_IDENTITY_MISMATCH')
+        # Artifact reads and verification do not regenerate physics or incur a new calculation.
+        return c
     cfg,values=configuration_for(host,c['parameters'],host.run_id)
     if values!=c['resolved_parameters'] or full_science(cfg)!=c['scientific_configuration']:
         raise ValueError('FULL_FIXED_AND_SEARCH_PARAMETER_IDENTITY_MISMATCH')
