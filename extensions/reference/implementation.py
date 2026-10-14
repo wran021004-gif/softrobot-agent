@@ -1,6 +1,7 @@
 """Registered reach task semantics and fixed sampled position evaluator."""
 import math
 from schemas.platform import SignalSpec,EvaluationResult,Metric,ConstraintResult
+from extensions.reference.contracts import Empty
 def reach_task(task, reg):
     from extensions.reference.contracts import ReachGoal, ReachEvaluation
     if type(reg.parse(task.goal)) is not ReachGoal or type(reg.parse(task.evaluator.parameters)) is not ReachEvaluation:
