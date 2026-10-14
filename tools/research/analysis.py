@@ -10,7 +10,8 @@ from schemas.platform import SessionInput
 from schemas.platform_analysis import TaskAnalysisProtocol, EndpointLinearizedModel, EndpointTarget
 from tools.platform_store import plain, zero
 from tools.state_io import digest, atomic_json, read
-from tools.research.design import state, update, save, verify_candidate, source_lengths
+from tools.research.design import verify_candidate, source_lengths
+from tools.research.state import state,update,save
 
 
 def calculate(configuration,binding,query,exact_point=None):
@@ -23,6 +24,7 @@ def calculate(configuration,binding,query,exact_point=None):
     if q.operation=='equilibrium' and q.operating_point!='target_equilibrium':raise ValueError('EQUILIBRIUM_REQUIRES_TARGET_POINT')
     envelope=plain(calculate_candidate_configuration(inp,binding,p,binding['configuration'],
         operating_points=[q.operating_point],exact_point=exact_point))
+    if q.scoring_window_s not in p.windows_s:raise ValueError('SCORING_WINDOW_NOT_IN_PROTOCOL')
     rows=envelope['records'][1:];row=rows[0];construction=row.get('construction') or {}
     internal=[]
     if construction.get('solver'):internal.append(dict(solver=construction['solver'],purpose='operating_point_construction',
@@ -32,6 +34,7 @@ def calculate(configuration,binding,query,exact_point=None):
         construction=construction,local_model_constraints=dict(status='unmeasured'),
         task_acceptance='unmeasured',proxy_values={},raw=envelope,internal_calculations=internal,
         limitations=LIMITATIONS+['Local mathematics does not establish nonlinear backend acceptance, holding-window compliance, or design sensitivity.'])
+    result['score_semantics']=score_semantics(q,binding,p,row)
     if q.operation=='equilibrium':
         result['proxy_values']['target_equilibrium_residual']=construction.get('position_residual_m')
         result['local_model_constraints']=dict(status='satisfied' if row.get('model') else 'unsatisfied_in_this_attempt',
@@ -50,7 +53,8 @@ def calculate(configuration,binding,query,exact_point=None):
     result['operating_point']=model.operating_point
     if q.operation in ('linearization','controllability'):
         metrics=calculate_control_metrics(model,p);result['metrics']=metrics
-        score=metrics['windows'][-1]['held']['output']['eigenvalues'][0]
+        window=next(w for w in metrics['windows'] if w['window_s']==q.scoring_window_s)
+        score=window['held']['output']['eigenvalues'][0]
         result['proxy_values']['held_position_min_eigenvalue']=float(score)
         result['units']=metrics['units'];internal.append(dict(purpose='local_linearization_and_gramian',solver='CasADi AD / SciPy scaled Van Loan and ZOH',windows_s=p.windows_s))
     else:
@@ -85,7 +89,7 @@ def dispatch(host,query,key,*,guard,origin='model'):
         return dict(reference=ref,operation_reuse=dict(additional_numerical_s=0,additional_analysis_evaluations=0))
     guard(host,origin!='engineering_preflight');c=verify_candidate(host,q.candidate);s=state(host)
     protocol=plain(q.protocol)
-    if protocol!=s['spec']['analysis_protocol']:raise ValueError('ANALYSIS_REQUIRES_DECLARED_FROZEN_PROTOCOL')
+    if protocol!=s['spec']['analysis_protocol'] or q.scoring_window_s!=s['spec']['scoring_window_s']:raise ValueError('ANALYSIS_REQUIRES_DECLARED_FROZEN_PROTOCOL')
     fit=admission(host,engineering=origin=='engineering_preflight')
     if not fit['admitted']:raise ValueError('ANALYSIS_AND_CONFIRMATION_BUDGET_CANNOT_FIT')
     cfg=c['configuration'];design=cfg['robot']['structure']['data']
@@ -174,4 +178,23 @@ def recover(host):
             tool_id='research.candidate_analysis',tool_version='1.0.0',execution_status='completed',charged=zero()),value,elapsed=elapsed,db=db)
     return dict(reference=ref,status=value['status'],proxy_values=value.get('proxy_values',{}),
         task_acceptance='unmeasured',charged_numerical_s=elapsed,internal_calculations=value.get('internal_calculations',[]),
-        local_model_constraints=value.get('local_model_constraints'))
+        local_model_constraints=value.get('local_model_constraints'),score_semantics=value.get('score_semantics'))
+
+
+def score_semantics(query,binding,protocol,row):
+    common=dict(candidate_identity=binding['candidate_id'],model_identity=row.get('model',{}).get('identity'),
+        operating_point=dict(name=row.get('name'),construction=row.get('construction'),source=row.get('point')),
+        scoring_window_s=query.scoring_window_s,
+        comparison_conditions='Same protocol, window, normalization, input treatment, operating-point construction, task and model implementation. Changed candidates use their own compiled model.',
+        unsupported_conclusions=['backend task acceptance','whole holding-window compliance','damping margin or decay rate','global feasibility/infeasibility','structural improvement attribution','manufacturable material validation'])
+    return dict(held_position_min_eigenvalue=dict(**common,
+        definition='Minimum eigenvalue of local finite-horizon position-output controllability Gramian for input held over each control interval',
+        preference='larger',units='dimensionless under declared input/output normalization',
+        normalization=dict(input_scale_n=protocol.input_scale_n,output_scale_m=protocol.output_scale_m),
+        input_treatment='Unconstrained signed incremental input held per control interval; physical unilateral bounded tensions are reported separately and not fully represented by this scalar',
+        represented_constraints='Local linear model and held-input sampling only',
+        supported_interpretation='Local normalized position-output authority; held means held input, not task holding success'),
+        target_equilibrium_residual=dict(**common,definition='Euclidean target position residual from bounded local equilibrium construction',
+            preference='smaller',units='m',normalization='none for scalar position residual',
+            input_treatment='Attempt tensions bounded by actual candidate limits',represented_constraints='Bounded local static solve and independently checked residuals',
+            supported_interpretation='Quality of this local construction; failure is not proof of global infeasibility'))

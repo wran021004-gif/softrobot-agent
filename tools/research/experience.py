@@ -1,3 +1,7 @@
+from pathlib import Path
+from tools.research.state import save,update,state
+from tools.state_io import read
+ROOT=Path(__file__).resolve().parents[2]
 """A small curated index; receipts bind exact read entries to dispositions."""
 import hashlib
 from tools.research.contracts import ExperienceQuery
@@ -5,17 +9,16 @@ from tools.platform_store import plain
 
 
 def retrieve(host,query):
-    from tools.research import core as core
     q=ExperienceQuery.model_validate(query);rows=[]
-    for entry in core.read(core.ROOT/'memory/diagnostic_index.json')['entries']:
+    for entry in read(ROOT/'memory/diagnostic_index.json')['entries']:
         canonical=entry['entry_id']+'@'+entry['revision']
         if q.key is not None and q.key not in (entry.get('legacy_key'),entry['entry_id'],canonical):continue
         if q.entry_id is not None and q.entry_id!=entry['entry_id']:continue
         if q.revision is not None and q.revision!=entry['revision']:continue
         if any(getattr(q,name) is not None and getattr(q,name)!=entry[name]
             for name in ('task','structure','failure_type','version')):continue
-        body=(core.ROOT/entry['path']).read_bytes()
-        content=core.read(core.ROOT/entry['path']) if entry['path'].endswith('.json') else body.decode('utf8')
+        body=(ROOT/entry['path']).read_bytes()
+        content=read(ROOT/entry['path']) if entry['path'].endswith('.json') else body.decode('utf8')
         refs=[]
         def walk(value):
             if isinstance(value,dict):
@@ -30,15 +33,14 @@ def retrieve(host,query):
             **(dict(content=content) if q.operation=='read' else {})))
     if q.operation=='read' and len(rows)!=1:raise ValueError('EXACT_EXPERIENCE_READ_REQUIRES_ONE_ENTRY_AND_REVISION')
     record=dict(query=plain(q),results=rows,supplied_startup_context=False)
-    ref=core.save(host,record,'actual_experience_retrieval')
-    core.update(host,retrievals=[*core.state(host)['retrievals'],ref])
+    ref=save(host,record,'actual_experience_retrieval')
+    update(host,retrievals=[*state(host)['retrievals'],ref])
     return dict(reference=ref,**record)
 
 
 def disposition_bindings(host,dispositions):
-    from tools.research import core as core
     reads={}
-    for ref in core.state(host)['retrievals']:
+    for ref in state(host)['retrievals']:
         receipt=host.store.artifact(ref)
         if receipt['query']['operation']!='read' or len(receipt['results'])!=1:continue
         row=receipt['results'][0]
