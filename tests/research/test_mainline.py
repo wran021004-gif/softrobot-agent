@@ -110,6 +110,8 @@ class MainlineTests(unittest.TestCase):
         from tools.research import agent
         from tools.platform_registry import registry
         registered=registry();self.assertIsNotNone(registered.get('controller.gvs_nmpc','11.0.0'))
+        from tools.platform_registry import dependency_closure
+        self.assertEqual(len(dependency_closure(registered.extensions.values(),registered)),15)
         import sys
         self.assertFalse(any(p[:-3].replace('/','.') in sys.modules for p in banned))
 
