@@ -182,8 +182,9 @@ def recover(host):
 
 
 def score_semantics(query,binding,protocol,row):
-    common=dict(candidate_identity=binding['candidate_id'],model_identity=row.get('model',{}).get('identity'),
-        operating_point=dict(name=row.get('name'),construction=row.get('construction'),source=row.get('point')),
+    common=dict(candidate_identity=binding['candidate_id'],model_identity=digest(row.get('model') or dict(
+            candidate=binding['candidate_id'],configuration=binding.get('effective_configuration_identity'),availability='no_local_model_constructed')),
+        operating_point=dict(name=(row.get('point') or {}).get('name',getattr(query,'operating_point',None)),construction=row.get('construction'),source=row.get('point')),
         scoring_window_s=query.scoring_window_s,
         comparison_conditions='Same protocol, window, normalization, input treatment, operating-point construction, task and model implementation. Changed candidates use their own compiled model.',
         unsupported_conclusions=['backend task acceptance','whole holding-window compliance','damping margin or decay rate','global feasibility/infeasibility','structural improvement attribution','manufacturable material validation'])
