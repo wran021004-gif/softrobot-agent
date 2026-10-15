@@ -1,0 +1,72 @@
+{
+  "milestone": "M3-C1",
+  "implementation_commit": "8c393ae28b44cb1f7f109496588ebff1fab9b6dd",
+  "base_commit": "1e2b3b6fb0767130e9971bd50eac30f9aa394207",
+  "status": "complete within the documented C1 materialization boundary",
+  "environment": {
+    "python": "D:/softrobot-agent/.mainline5-env/Scripts/python.exe",
+    "OPENBLAS_NUM_THREADS": "1",
+    "OMP_NUM_THREADS": "1",
+    "MKL_NUM_THREADS": "1"
+  },
+  "final_focused_test_run": {
+    "passed": 21,
+    "failed": 0,
+    "elapsed_s": 27.160,
+    "runner": "python -m unittest -v <selectors below>; PYTHONPATH includes repository root and tests/research",
+    "selectors": [
+      "tests.research.test_family_space",
+      "tests.research.test_variable_tendons.VariableTendonTests.test_old_identity_compilation_and_new_source_provenance",
+      "tests.research.test_variable_tendons.VariableTendonTests.test_proposal_identity_order_control_and_fixed_topology_search_contract",
+      "tests.research.test_variable_tendons.VariableTendonTests.test_reject_unauthorized_and_invalid_topology",
+      "tests.research.test_variable_tendons.VariableTendonTests.test_real_candidate_saved_inputs_reject_six_channel_states",
+      "tests.research.test_variable_tendons.VariableTendonTests.test_empty_capabilities_engineering_export",
+      "tests.research.test_variable_tendons.M3BStudyTests",
+      "tests.research.test_mainline.MainlineTests.test_zero_selection_requires_read_and_seals_without_execution",
+      "tests.research.test_mainline.MainlineTests.test_historical_incomplete_cached_proxy_cannot_select",
+      "tests.research.test_mainline.MainlineTests.test_positive_confirmation_retains_failure_and_identity",
+      "tests.research.test_mainline.MainlineTests.test_selection_receipt_reuse_adds_no_execution_or_charge",
+      "tests.research.test_mainline.MainlineTests.test_analysis_recovery_and_receipt_prevent_duplicate_charge_or_worker",
+      "tests.research.test_count_continuation.CountContinuationTests.test_configured_solver_iterations_survive_resolution_and_preparation",
+      "tests.research.test_task_analysis_contract.TaskAnalysisTests.test_old_contracts_and_acceptance_unchanged"
+    ]
+  },
+  "real_committed_path": "bound_validation.json and bound_export/: no guard patch, mocks, provider requests or numerical workers",
+  "final_model_checks": {
+    "gvs_builds": 3,
+    "jacobian_shapes": [[1,12],[5,14],[7,12]],
+    "linearized_input_matrix_shape": [24,1],
+    "mujoco_xml_compiles": 3,
+    "physics_steps": 0,
+    "state_dimensions": [24,28,24]
+  },
+  "development_checks": {
+    "gvs_builds_including_failed_and_repeated_development_checks": 17,
+    "explanation": "Initial focused run: 2 builds before dense-layout failure; diagnostic run: 3; simpler-layout diagnosis: 3; subsequent focused runs: 3 each across three runs. Repeated checks followed concrete serialization, protocol, identity and clearance changes. Final passing-run evidence is construction.json.",
+    "retained_failure": "numerical_limitation.json",
+    "initial_test_loader_failure": "One legacy module imports test_mainline by short name; adding tests/research to PYTHONPATH resolved it without code changes. Final consolidated run passed."
+  },
+  "side_effects": {
+    "provider_requests": 0,
+    "complete_nmpc_executions": 0,
+    "rl_training": 0,
+    "full_task_evaluations": 0,
+    "physical_simulation_steps": 0,
+    "new_packages_installed": 0,
+    "credential_files_accessed": 0,
+    "new_numerical_workers_launched": 0
+  },
+  "historical_compatibility": {
+    "study_configuration_sha256": "31af3e097ad29fef1ffd74c5178a6267fc5ffe35889c63e98f531dd42c0df69e",
+    "source_relative_generator_versions": ["3.0.0","4.0.0"],
+    "historical_task_identity_and_plan_serialization": "preserved",
+    "sealed_experiments": "unchanged"
+  },
+  "limits": [
+    "1-9 segments are declarative; only two segments materialize",
+    "1-12 tendons are declarative; current executable materialization envelope is 1-7 subject to physical constraints",
+    "Dense station layouts are not universally numerically validated; retain the observed 22-coordinate CasADi failure",
+    "The Host still uses the explicitly labeled historical robot scaffold; assembly components reuse frozen physical prototypes, while routes and actuator definitions are generated independently",
+    "Compilation and model construction do not establish controllability or task feasibility"
+  ]
+}
