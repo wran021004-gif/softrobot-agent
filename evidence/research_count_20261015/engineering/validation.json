@@ -1,0 +1,732 @@
+{
+  "engineering_chain_passed": true,
+  "task_passed": false,
+  "study_id": "engineering-count-20261015",
+  "implementation": "6c955813589dae7c6c19e0d5918ce2c204c9e546",
+  "stages": [
+    {
+      "run_id": "engineering-count-20261015-bdb98173",
+      "configuration": {
+        "artifact_id": "de7849daaa498d5ff8e3ab089c1d891e48404a218a5a17d5e58964785d05c476",
+        "media_type": "application/json"
+      },
+      "candidate": {
+        "artifact_id": "27d1909e083aae3f5608a93c60bb987b65d2ddd68b39ddb5131462ae94194b08",
+        "media_type": "application/json"
+      },
+      "ppo": {
+        "batch_size": 64,
+        "clip_range": 0.2,
+        "clip_range_vf": null,
+        "device": "cpu",
+        "ent_coef": 0.0,
+        "gae_lambda": 0.95,
+        "gamma": 0.99,
+        "learning_rate": 3e-05,
+        "max_grad_norm": 0.5,
+        "n_epochs": 4,
+        "n_steps": 256,
+        "normalize_advantage": true,
+        "policy_kwargs": {
+          "log_std_init": -5.0,
+          "net_arch": {
+            "pi": [
+              64,
+              64
+            ],
+            "vf": [
+              64,
+              64
+            ]
+          }
+        },
+        "sde_sample_freq": -1,
+        "target_kl": null,
+        "use_sde": false,
+        "verbose": 0,
+        "vf_coef": 0.5
+      },
+      "reward": {
+        "failure_penalty": -10000.0,
+        "holding_speed": 1.0,
+        "position": 1.0,
+        "smoothness": 0.001
+      },
+      "requested_allocation": {
+        "actions": 4096,
+        "active_seconds": null
+      },
+      "effective_allocation": {
+        "actions": 4096,
+        "active_seconds": null
+      },
+      "lineage": null,
+      "consumed": {
+        "active_seconds": 8.744732899940573,
+        "attempted_actions": 4096,
+        "attempted_physics_steps": 81920,
+        "complete_episodes": 117,
+        "completed_actions": 4096,
+        "failed_episodes": 0
+      },
+      "checkpoint": {
+        "config_sha256": "bd3e1278d9336124ca928b207600ca01c46b321624fee11dbe25e4d722a1c028",
+        "consumed": {
+          "active_seconds": 8.701994400005788,
+          "attempted_actions": 4096,
+          "attempted_physics_steps": 81920,
+          "complete_episodes": 117,
+          "completed_actions": 4096,
+          "failed_episodes": 0
+        },
+        "generation": "step-00004096-b96777b4",
+        "inherited": {
+          "lifetime_timesteps": 4096,
+          "num_timesteps": 4096,
+          "optimization_epochs": 64,
+          "optimizer_sha256": "b041bf05bd8beee669a94afa3a660943ecc153ec03fcb0c6bff01796383b8eec",
+          "optimizer_steps": 256,
+          "policy_sha256": "e9f2ee85f262cefa18cbc96f1bad3c4ed5b4f36bff647b82628e6b6f287ac0b1",
+          "rollout_optimizations": 16,
+          "schedule": {
+            "clip_range": 0.2,
+            "clip_range_vf": null,
+            "learning_rate": 3e-05,
+            "progress_remaining": 0.0,
+            "total_timesteps": 4096
+          }
+        },
+        "policy_file_sha256": "c51f3da24b7103497435521b0433db4ef5fc05545ee66b4ebf7deeaa44f6e4e8",
+        "policy_present": true
+      },
+      "workers": [
+        {
+          "after_step": 4096,
+          "attempted_actions": 4096,
+          "available_rows": 16,
+          "before_step": 0,
+          "current_worker": true,
+          "first": {
+            "rollout/ep_rew_mean": {
+              "logged_step": 256.0,
+              "value": -11944.103370285715
+            },
+            "train/approx_kl": {
+              "logged_step": 512.0,
+              "value": 0.038951106
+            },
+            "train/clip_fraction": {
+              "logged_step": 512.0,
+              "value": 0.4208984375
+            },
+            "train/entropy_loss": {
+              "logged_step": 512.0,
+              "value": 21.48638117313385
+            },
+            "train/explained_variance": {
+              "logged_step": 512.0,
+              "value": -0.00015437602996826172
+            },
+            "train/learning_rate": {
+              "logged_step": 512.0,
+              "value": 3e-05
+            },
+            "train/n_updates": {
+              "logged_step": 512.0,
+              "value": 4.0
+            },
+            "train/policy_gradient_loss": {
+              "logged_step": 512.0,
+              "value": -0.001896696980111301
+            },
+            "train/value_loss": {
+              "logged_step": 512.0,
+              "value": 19781080.125
+            }
+          },
+          "incomplete_tail_rows": 0,
+          "latest": {
+            "rollout/ep_rew_mean": {
+              "logged_step": 4096.0,
+              "value": -12010.984699060002
+            },
+            "train/approx_kl": {
+              "logged_step": 4096.0,
+              "value": 0.043256517
+            },
+            "train/clip_fraction": {
+              "logged_step": 4096.0,
+              "value": 0.24609375
+            },
+            "train/entropy_loss": {
+              "logged_step": 4096.0,
+              "value": 21.48675787448883
+            },
+            "train/explained_variance": {
+              "logged_step": 4096.0,
+              "value": 0.0003147125244140625
+            },
+            "train/learning_rate": {
+              "logged_step": 4096.0,
+              "value": 3e-05
+            },
+            "train/n_updates": {
+              "logged_step": 4096.0,
+              "value": 60.0
+            },
+            "train/policy_gradient_loss": {
+              "logged_step": 4096.0,
+              "value": -0.00921309704426676
+            },
+            "train/value_loss": {
+              "logged_step": 4096.0,
+              "value": 19599974.625
+            }
+          },
+          "not_recorded": [],
+          "recent": [
+            {
+              "logged_step": 3072.0,
+              "metrics": {
+                "rollout/ep_rew_mean": -11996.957851735633,
+                "train/approx_kl": 0.036317017,
+                "train/clip_fraction": 0.3603515625,
+                "train/entropy_loss": 21.486701726913452,
+                "train/explained_variance": 0.00016111135482788086,
+                "train/learning_rate": 3e-05,
+                "train/n_updates": 44.0,
+                "train/policy_gradient_loss": -0.024245474603958428,
+                "train/value_loss": 19491679.125
+              }
+            },
+            {
+              "logged_step": 3328.0,
+              "metrics": {
+                "rollout/ep_rew_mean": -11996.378962926317,
+                "train/approx_kl": 0.02091295,
+                "train/clip_fraction": 0.294921875,
+                "train/entropy_loss": 21.486787796020508,
+                "train/explained_variance": 0.00023883581161499023,
+                "train/learning_rate": 3e-05,
+                "train/n_updates": 48.0,
+                "train/policy_gradient_loss": -0.014453878160566092,
+                "train/value_loss": 19319311.625
+              }
+            },
+            {
+              "logged_step": 3584.0,
+              "metrics": {
+                "rollout/ep_rew_mean": -12005.833982910002,
+                "train/approx_kl": 0.01668631,
+                "train/clip_fraction": 0.1650390625,
+                "train/entropy_loss": 21.486835956573486,
+                "train/explained_variance": 0.00037091970443725586,
+                "train/learning_rate": 3e-05,
+                "train/n_updates": 52.0,
+                "train/policy_gradient_loss": -0.006349144328851253,
+                "train/value_loss": 20370844.375
+              }
+            },
+            {
+              "logged_step": 3840.0,
+              "metrics": {
+                "rollout/ep_rew_mean": -12010.00455605,
+                "train/approx_kl": 0.04036952,
+                "train/clip_fraction": 0.27734375,
+                "train/entropy_loss": 21.486791849136353,
+                "train/explained_variance": 0.0002429485321044922,
+                "train/learning_rate": 3e-05,
+                "train/n_updates": 56.0,
+                "train/policy_gradient_loss": -0.016240829369053245,
+                "train/value_loss": 20186626.375
+              }
+            },
+            {
+              "logged_step": 4096.0,
+              "metrics": {
+                "rollout/ep_rew_mean": -12010.984699060002,
+                "train/approx_kl": 0.043256517,
+                "train/clip_fraction": 0.24609375,
+                "train/entropy_loss": 21.48675787448883,
+                "train/explained_variance": 0.0003147125244140625,
+                "train/learning_rate": 3e-05,
+                "train/n_updates": 60.0,
+                "train/policy_gradient_loss": -0.00921309704426676,
+                "train/value_loss": 19599974.625
+              }
+            }
+          ],
+          "source": "a5b200e3037446bdb7c7c16c9df2536f\\progress.csv",
+          "token": "a5b200e3037446bdb7c7c16c9df2536f",
+          "unavailable_metrics": {}
+        }
+      ]
+    },
+    {
+      "run_id": "engineering-count-20261015-70b8a00e",
+      "configuration": {
+        "artifact_id": "e4acb526df279c2a9f35fb6a7852edda4e02603bffd35977dec5199724235ba1",
+        "media_type": "application/json"
+      },
+      "candidate": {
+        "artifact_id": "27d1909e083aae3f5608a93c60bb987b65d2ddd68b39ddb5131462ae94194b08",
+        "media_type": "application/json"
+      },
+      "ppo": {
+        "batch_size": 128,
+        "clip_range": 0.2,
+        "clip_range_vf": null,
+        "device": "cpu",
+        "ent_coef": 0.0,
+        "gae_lambda": 0.95,
+        "gamma": 0.99,
+        "learning_rate": {
+          "final": 5e-06,
+          "initial": 1e-05,
+          "kind": "linear"
+        },
+        "max_grad_norm": 0.5,
+        "n_epochs": 4,
+        "n_steps": 512,
+        "normalize_advantage": true,
+        "policy_kwargs": {
+          "log_std_init": -5.0,
+          "net_arch": {
+            "pi": [
+              64,
+              64
+            ],
+            "vf": [
+              64,
+              64
+            ]
+          }
+        },
+        "sde_sample_freq": -1,
+        "target_kl": null,
+        "use_sde": false,
+        "verbose": 0,
+        "vf_coef": 0.5
+      },
+      "reward": {
+        "failure_penalty": -10000.0,
+        "holding_speed": 1.25,
+        "position": 1.0,
+        "smoothness": 0.001
+      },
+      "requested_allocation": {
+        "actions": 4096,
+        "active_seconds": null
+      },
+      "effective_allocation": {
+        "actions": 4096,
+        "active_seconds": null
+      },
+      "lineage": {
+        "checkpoint": "step-00004096-b96777b4",
+        "config_sha256": "bd3e1278d9336124ca928b207600ca01c46b321624fee11dbe25e4d722a1c028",
+        "configuration": {
+          "artifact_id": "de7849daaa498d5ff8e3ab089c1d891e48404a218a5a17d5e58964785d05c476",
+          "media_type": "application/json"
+        },
+        "directory": "D:\\softrobot-agent\\.worktrees\\research-mainline\\runs\\research\\engineering-count-20261015\\rl\\engineering-count-20261015-bdb98173",
+        "history": [
+          {
+            "checkpoint": "step-00004096-b96777b4",
+            "run_id": "engineering-count-20261015-bdb98173"
+          }
+        ],
+        "optimizer": "preserve",
+        "parent_run_id": "engineering-count-20261015-bdb98173",
+        "policy_sha256": "c51f3da24b7103497435521b0433db4ef5fc05545ee66b4ebf7deeaa44f6e4e8",
+        "source_lifetime_timesteps": 4096,
+        "stage_schedule": "new declared schedule from stage-local progress 1"
+      },
+      "consumed": {
+        "active_seconds": 8.301862200023606,
+        "attempted_actions": 4096,
+        "attempted_physics_steps": 81920,
+        "complete_episodes": 117,
+        "completed_actions": 4096,
+        "failed_episodes": 0
+      },
+      "checkpoint": {
+        "config_sha256": "4ad646e0dfebf86cbd93c59a0ae5da1a28377529568e6288474bbc3a8c6828a9",
+        "consumed": {
+          "active_seconds": 8.25698880001437,
+          "attempted_actions": 4096,
+          "attempted_physics_steps": 81920,
+          "complete_episodes": 117,
+          "completed_actions": 4096,
+          "failed_episodes": 0
+        },
+        "generation": "step-00004096-c3e32350",
+        "inherited": {
+          "lifetime_timesteps": 8192,
+          "num_timesteps": 4096,
+          "optimization_epochs": 96,
+          "optimizer_sha256": "cc48ba8b77b5b1fd541dbd2007e287b1c2d25fe68824ab09e861169531aeb616",
+          "optimizer_steps": 384,
+          "policy_sha256": "4ced02d5ed9c5c45f2cd7e6af0398339daf4011d294f1f32c5287e81dd26a40a",
+          "rollout_optimizations": 24,
+          "schedule": {
+            "clip_range": 0.2,
+            "clip_range_vf": null,
+            "learning_rate": 5e-06,
+            "progress_remaining": 0.0,
+            "total_timesteps": 4096
+          }
+        },
+        "policy_file_sha256": "01ebbdd6a87fbe628426a0a23d86ca7405211ff1327a5ecd14bba72a3cb8a631",
+        "policy_present": true
+      },
+      "workers": [
+        {
+          "after_step": 4096,
+          "attempted_actions": 4096,
+          "available_rows": 8,
+          "before_step": 0,
+          "current_worker": true,
+          "first": {
+            "rollout/ep_rew_mean": {
+              "logged_step": 512.0,
+              "value": -12119.312475570001
+            },
+            "train/approx_kl": {
+              "logged_step": 1024.0,
+              "value": 0.010650012
+            },
+            "train/clip_fraction": {
+              "logged_step": 1024.0,
+              "value": 0.05078125
+            },
+            "train/entropy_loss": {
+              "logged_step": 1024.0,
+              "value": 21.48687469959259
+            },
+            "train/explained_variance": {
+              "logged_step": 1024.0,
+              "value": 0.0003412961959838867
+            },
+            "train/learning_rate": {
+              "logged_step": 1024.0,
+              "value": 9.375000000000001e-06
+            },
+            "train/n_updates": {
+              "logged_step": 1024.0,
+              "value": 68.0
+            },
+            "train/policy_gradient_loss": {
+              "logged_step": 1024.0,
+              "value": -0.010798363742651418
+            },
+            "train/value_loss": {
+              "logged_step": 1024.0,
+              "value": 23196550.625
+            }
+          },
+          "incomplete_tail_rows": 0,
+          "latest": {
+            "rollout/ep_rew_mean": {
+              "logged_step": 4096.0,
+              "value": -12827.383697210002
+            },
+            "train/approx_kl": {
+              "logged_step": 4096.0,
+              "value": 0.006071227
+            },
+            "train/clip_fraction": {
+              "logged_step": 4096.0,
+              "value": 0.021484375
+            },
+            "train/entropy_loss": {
+              "logged_step": 4096.0,
+              "value": 21.486870527267456
+            },
+            "train/explained_variance": {
+              "logged_step": 4096.0,
+              "value": 0.00039374828338623047
+            },
+            "train/learning_rate": {
+              "logged_step": 4096.0,
+              "value": 5.625e-06
+            },
+            "train/n_updates": {
+              "logged_step": 4096.0,
+              "value": 92.0
+            },
+            "train/policy_gradient_loss": {
+              "logged_step": 4096.0,
+              "value": -0.007065292389597744
+            },
+            "train/value_loss": {
+              "logged_step": 4096.0,
+              "value": 23508676.25
+            }
+          },
+          "not_recorded": [],
+          "recent": [
+            {
+              "logged_step": 2048.0,
+              "metrics": {
+                "rollout/ep_rew_mean": -12479.93917061,
+                "train/approx_kl": 0.010565072,
+                "train/clip_fraction": 0.05517578125,
+                "train/entropy_loss": 21.486866116523743,
+                "train/explained_variance": 0.0004588961601257324,
+                "train/learning_rate": 8.125000000000001e-06,
+                "train/n_updates": 76.0,
+                "train/policy_gradient_loss": -0.006309785647317767,
+                "train/value_loss": 23573019.75
+              }
+            },
+            {
+              "logged_step": 2560.0,
+              "metrics": {
+                "rollout/ep_rew_mean": -12607.7470425,
+                "train/approx_kl": 0.011006847,
+                "train/clip_fraction": 0.060546875,
+                "train/entropy_loss": 21.486860156059265,
+                "train/explained_variance": 0.0003643631935119629,
+                "train/learning_rate": 7.500000000000001e-06,
+                "train/n_updates": 80.0,
+                "train/policy_gradient_loss": -0.010692458774428815,
+                "train/value_loss": 23531260.25
+              }
+            },
+            {
+              "logged_step": 3072.0,
+              "metrics": {
+                "rollout/ep_rew_mean": -12720.841535620002,
+                "train/approx_kl": 0.009885295,
+                "train/clip_fraction": 0.05908203125,
+                "train/entropy_loss": 21.486860394477844,
+                "train/explained_variance": 0.00048476457595825195,
+                "train/learning_rate": 6.875000000000001e-06,
+                "train/n_updates": 84.0,
+                "train/policy_gradient_loss": -0.007743357971776277,
+                "train/value_loss": 24097262.375
+              }
+            },
+            {
+              "logged_step": 3584.0,
+              "metrics": {
+                "rollout/ep_rew_mean": -12831.11804202,
+                "train/approx_kl": 0.010280611,
+                "train/clip_fraction": 0.044921875,
+                "train/entropy_loss": 21.486865282058716,
+                "train/explained_variance": 0.00041919946670532227,
+                "train/learning_rate": 6.25e-06,
+                "train/n_updates": 88.0,
+                "train/policy_gradient_loss": -0.010009724064730108,
+                "train/value_loss": 23375612.625
+              }
+            },
+            {
+              "logged_step": 4096.0,
+              "metrics": {
+                "rollout/ep_rew_mean": -12827.383697210002,
+                "train/approx_kl": 0.006071227,
+                "train/clip_fraction": 0.021484375,
+                "train/entropy_loss": 21.486870527267456,
+                "train/explained_variance": 0.00039374828338623047,
+                "train/learning_rate": 5.625e-06,
+                "train/n_updates": 92.0,
+                "train/policy_gradient_loss": -0.007065292389597744,
+                "train/value_loss": 23508676.25
+              }
+            }
+          ],
+          "source": "6c02e218640c4c24a96cdc10d2ed61eb\\progress.csv",
+          "token": "6c02e218640c4c24a96cdc10d2ed61eb",
+          "unavailable_metrics": {}
+        }
+      ]
+    }
+  ],
+  "continuation": {
+    "parent": {
+      "parent_run_id": "engineering-count-20261015-bdb98173",
+      "directory": "D:\\softrobot-agent\\.worktrees\\research-mainline\\runs\\research\\engineering-count-20261015\\rl\\engineering-count-20261015-bdb98173",
+      "checkpoint": "step-00004096-b96777b4",
+      "configuration": {
+        "artifact_id": "de7849daaa498d5ff8e3ab089c1d891e48404a218a5a17d5e58964785d05c476",
+        "media_type": "application/json"
+      },
+      "config_sha256": "bd3e1278d9336124ca928b207600ca01c46b321624fee11dbe25e4d722a1c028",
+      "policy_sha256": "c51f3da24b7103497435521b0433db4ef5fc05545ee66b4ebf7deeaa44f6e4e8",
+      "source_lifetime_timesteps": 4096,
+      "optimizer": "preserve",
+      "stage_schedule": "new declared schedule from stage-local progress 1",
+      "history": [
+        {
+          "run_id": "engineering-count-20261015-bdb98173",
+          "checkpoint": "step-00004096-b96777b4"
+        }
+      ]
+    },
+    "source_snapshot": {
+      "policy_sha256": "e9f2ee85f262cefa18cbc96f1bad3c4ed5b4f36bff647b82628e6b6f287ac0b1",
+      "optimizer_sha256": "b041bf05bd8beee669a94afa3a660943ecc153ec03fcb0c6bff01796383b8eec",
+      "num_timesteps": 4096,
+      "lifetime_timesteps": 4096,
+      "optimization_epochs": 64,
+      "rollout_optimizations": 16,
+      "optimizer_steps": 256,
+      "schedule": {
+        "total_timesteps": 4096,
+        "progress_remaining": 0.0,
+        "learning_rate": 3e-05,
+        "clip_range": 0.2,
+        "clip_range_vf": null
+      }
+    },
+    "stage_initial_snapshot": {
+      "policy_sha256": "e9f2ee85f262cefa18cbc96f1bad3c4ed5b4f36bff647b82628e6b6f287ac0b1",
+      "optimizer_sha256": "92705a2f5f4d2c7e43f50e1caea70341be19b244a6ad7b575be84ee534c1d36b",
+      "num_timesteps": 0,
+      "lifetime_timesteps": 4096,
+      "optimization_epochs": 64,
+      "rollout_optimizations": 16,
+      "optimizer_steps": 256,
+      "schedule": {
+        "total_timesteps": 4096,
+        "progress_remaining": 1.0,
+        "learning_rate": 1e-05,
+        "clip_range": 0.2,
+        "clip_range_vf": null
+      }
+    },
+    "policy_preserved": true,
+    "optimizer_moments_preserved": true,
+    "optimizer_steps_preserved": true,
+    "optimizer_reset": false,
+    "stage_schedule": {
+      "kind": "linear",
+      "initial": 1e-05,
+      "final": 5e-06
+    },
+    "optimizer_learning_rates": [
+      1e-05
+    ],
+    "rollout_buffer_size": 512,
+    "schedule_semantics": "stage-local num_timesteps/progress; lifetime offset and optimizer/epoch counters retained"
+  },
+  "evaluation": {
+    "reference": {
+      "artifact_id": "b6b5f770be29baa5ceeb0a79ab0ac8f845248fa9ce6007ac7a091af836b6338f",
+      "media_type": "application/json"
+    },
+    "acceptance": {
+      "holding_speed_limit_m_s": 0.02,
+      "holding_steps": [
+        30,
+        31,
+        32,
+        33,
+        34,
+        35
+      ],
+      "position_limit_m": 0.01,
+      "terminal_position_limit_m": 0.01
+    },
+    "candidate": {
+      "artifact_id": "27d1909e083aae3f5608a93c60bb987b65d2ddd68b39ddb5131462ae94194b08",
+      "media_type": "application/json"
+    },
+    "candidate_identity": "db89c9aa5cbaec1a10780e08f30b4b6597f2f29d5dfda882842e4ee41622a457",
+    "checkpoint": "step-00004096-c3e32350",
+    "checkpoint_training_step": 4096,
+    "config_sha256": "4ad646e0dfebf86cbd93c59a0ae5da1a28377529568e6288474bbc3a8c6828a9",
+    "configuration": {
+      "artifact_id": "e4acb526df279c2a9f35fb6a7852edda4e02603bffd35977dec5199724235ba1",
+      "media_type": "application/json"
+    },
+    "episodes": [
+      {
+        "complete": true,
+        "counts": {
+          "attempted_actions": 35,
+          "attempted_physics_steps": 700,
+          "complete_episodes": 1,
+          "completed_actions": 35,
+          "failed_episodes": 0
+        },
+        "episode_reward": -12725.735276423631,
+        "holding_coverage_complete": true,
+        "holding_max_position_error_m": 0.19060104981891726,
+        "holding_max_speed_m_s": 0.5859997480672576,
+        "holding_sample_steps": [
+          30,
+          31,
+          32,
+          33,
+          34,
+          35
+        ],
+        "numerical_failure": null,
+        "passed": false,
+        "terminal_position_error_m": 0.16793862201154255,
+        "trajectory_rows": 36
+      }
+    ],
+    "evaluation_elapsed_s": 0.9691569999558851,
+    "execution_id": "7644234bdee64247a45f0ee62f1b58fb",
+    "failure_reason": "task_thresholds_not_met",
+    "failure_stage": "task criteria unmet",
+    "independent_evaluation_executed": true,
+    "last_valid_position_error_m": 0.16793862201154255,
+    "last_valid_speed_m_s": 0.5859997480672576,
+    "mode": "direct",
+    "operation_key": "engineering-extension-evaluate",
+    "passed": false,
+    "policy": "D:\\softrobot-agent\\.worktrees\\research-mainline\\runs\\research\\engineering-count-20261015\\rl\\engineering-count-20261015-70b8a00e\\checkpoints\\step-00004096-c3e32350\\policy.zip",
+    "policy_sha256": "01ebbdd6a87fbe628426a0a23d86ca7405211ff1327a5ecd14bba72a3cb8a631",
+    "role": "development",
+    "run_id": "engineering-count-20261015-70b8a00e",
+    "scope": "one deterministic fixed-initial-state episode; no robustness claim",
+    "seed": 17,
+    "selected_execution": null,
+    "study": "engineering-count-20261015",
+    "task": {
+      "artifact_id": "2b26edb492214c426263441b6adb52d7aafe41a828436d6b48a1171374a1026c",
+      "media_type": "application/json"
+    },
+    "task_identity": "2b26edb492214c426263441b6adb52d7aafe41a828436d6b48a1171374a1026c",
+    "trajectory": "D:\\softrobot-agent\\.worktrees\\research-mainline\\runs\\research\\engineering-count-20261015\\rl\\engineering-count-20261015-70b8a00e\\evaluate-7644234bdee64247a45f0ee62f1b58fb\\trajectory.csv"
+  },
+  "counts": {
+    "limit": {
+      "backend_solves": 6,
+      "model_calls": 0,
+      "tool_calls": 40,
+      "wall_s": null,
+      "worker_calls": 0
+    },
+    "used": {
+      "tool_calls": 10,
+      "model_calls": 0,
+      "backend_solves": 6,
+      "worker_calls": 0,
+      "wall_s": 6.454283900326118
+    },
+    "remaining": {
+      "backend_solves": 0,
+      "model_calls": 0,
+      "tool_calls": 30,
+      "wall_s": null,
+      "worker_calls": 0
+    },
+    "occupied": {}
+  },
+  "elapsed_s": 25.297424099990167,
+  "original_resume": "Contract/count/publication fixtures only; no live interrupted-stage recovery in this two-stage chain",
+  "original_failed_attempts_retained": 2,
+  "authorization_addenda": [
+    {
+      "artifact_id": "1fbcc08ebf7f02b58a3602adafd43107b43072ea89872380675b1215c491c6ac",
+      "media_type": "application/json"
+    }
+  ],
+  "workers_remaining": 0
+}

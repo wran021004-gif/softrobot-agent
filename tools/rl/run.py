@@ -216,6 +216,7 @@ def training_summary(directory, state=None):
         task_identity=candidate.get('task_identity'), task=config.get('task'), scope='Recorded training evidence; task acceptance requires independent evaluation',
         mode=config['mode'], seed=config.get('seed'), requested_allocation=config.get('requested_allocation'), ppo=state.get('effective_ppo', config['ppo']), reward=config['reward'], allocation=config['budget'],
         status=state['status'], stop_reason=state.get('stop_reason'), error=state.get('error'),
+        policy_initialization=state.get('policy_initialization'),
         recorded_failure_stage=state.get('failure_stage'), last_known_stage=state.get('last_known_stage', state.get('failure_stage')),
         consumed=cost, reservation=state.get('reservation', {}), consumption_uncertain=state.get('consumption_uncertain', False),
         known_consumption_lower_bound=state.get('known_consumption_lower_bound'),

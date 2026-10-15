@@ -352,6 +352,10 @@ def dispatch(host, value, request_id, selected=None):
                     arguments.append('--replay')
             physical=q.operation=='evaluate' or q.replay
             output=(host.store.root/'rl_outputs' if source else directory)/(q.operation+'-'+row['execution_id'])
+            experiment=state_api.save(host,dict(effective_configuration=config,source_configuration=entry['configuration'],
+                requested_changes=plain(q),rationale=q.rationale,candidate=entry['candidate'],task=entry['task'],
+                implementation=s['freeze'],science_hashes=s['profile']['science_hashes'],
+                checkpoint=generation if q.operation=='evaluate' else None), 'rl_frozen_evaluation_input')
             if physical:
                 with host.store.transaction() as db:
                     st=host.store.session(host.run_id,db)['state']
@@ -365,7 +369,9 @@ def dispatch(host, value, request_id, selected=None):
             result=invoke(host,q.operation,run_id,*arguments,'--output',output,timeout_s=None,interpreter=s['spec']['runtime']['rl_python'])
             if source:
                 result.update(source_study=source['study_id'],evaluation_owner=host.run_id)
-            result.update(study=host.run_id,candidate=entry['candidate'],task=entry['task'],run_id=run_id,configuration=entry['configuration'],independent_evaluation_executed=q.operation=='evaluate')
+            result.update(study=host.run_id,candidate=entry['candidate'],task=entry['task'],run_id=run_id,
+                configuration=entry['configuration'],experiment_configuration=experiment,implementation=s['freeze'],
+                independent_evaluation_executed=q.operation=='evaluate')
             if q.operation=='evaluate':
                 result.update(execution_id=row['execution_id'],operation_key=request_id,checkpoint=generation,checkpoint_training_step=run.read_json(policy.with_name('metadata.json')).get('inherited',{}).get('num_timesteps'),policy_sha256=policy_sha,role='confirmation' if selected is not None else 'development',selected_execution=plain(selected))
             reference=state_api.save(host,result,'rl_'+q.operation+'_evidence')

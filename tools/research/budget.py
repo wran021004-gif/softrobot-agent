@@ -11,7 +11,30 @@ def protected(host):
     b = s['spec']['budgets']
     return bool(s.get('success_gate') or s.get('count_closeout') or
         remaining['model_calls'] <= b['protected_provider_requests'] or
-        remaining['tool_calls'] <= b.get('protected_public_operations', 0))
+        remaining['tool_calls'] <= b.get('protected_public_operations', 0) or
+        (s['spec'].get('budget_semantics',{}).get('mode')=='count' and not science_fits(host)))
+
+
+def science_fits(host):
+    """Route counts, rather than the clock, decide when only closeout remains."""
+    from tools.research.state import state
+    s=state(host)
+    spec=s['spec']
+    capabilities=set(spec.get('capabilities',[]))
+    b=spec['budgets']
+    remaining=host.store.remaining()['remaining']
+    backend=remaining['backend_solves']
+    runs=s.get('rl_runs',{})
+    limits=spec['rl_limits']
+    evaluations=limits['evaluation_episodes']-sum(e['evaluations'] for e in runs.values())
+    return bool(
+        ('analysis' in capabilities and s.get('mathematical_evaluations',0)<b['mathematical_evaluations']) or
+        ('nmpc' in capabilities and backend>=1 and s.get('nmpc_launches',0)<spec['nmpc_limits']['executions']) or
+        ('rl' in capabilities and evaluations>0 and ((backend>=2 and
+            s.get('admitted_training_stages',len(runs))<limits['training_stages']) or (backend>=1 and runs))) or
+        (s.get('local_solves',0)<b['local_solves'] and any(host.store.artifact(r).get('status')=='evaluated' for r in s.get('results',[]))) or
+        ('mathematics' in capabilities and s.get('offline_nlp',0)<b['offline_nlp']) or
+        ('replay' in capabilities and s.get('bdf_replays',0)<b['bdf_replays']))
 
 
 def closeout_operations(host):

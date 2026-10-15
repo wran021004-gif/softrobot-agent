@@ -302,6 +302,15 @@ class CountContinuationTests(fixtures.MainlineTests):
         with self.assertRaisesRegex(ValueError,'INITIALIZATION_REQUIRES_NEW_START'):
             RLRequest(operation='continue',run_id='parent',checkpoint='published',allocation={'actions':4096},initial_tension_n=.2,rationale='fixture')
 
+    def test_route_count_exhaustion_protects_closeout_without_elapsed_limit(self):
+        spec=deepcopy(self.spec)
+        spec['budgets'].update(mathematical_evaluations=0,local_solves=0)
+        spec['nmpc_limits']['executions']=0
+        spec['rl_limits'].update(training_stages=0,evaluation_episodes=0)
+        update(self.host,spec=spec)
+        self.assertTrue(protected(self.host))
+        self.assertIsNone(self.host.store.remaining()['remaining']['wall_s'])
+
 
 # Inheritance shares setup only; avoid discovering the mainline suite twice.
 for name in list(vars(fixtures.MainlineTests)):

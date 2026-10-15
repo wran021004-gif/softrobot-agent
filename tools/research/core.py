@@ -398,6 +398,7 @@ def recover(host):
 
 
 def export(host, destination=None):
+    """Archive original evidence once; count-mode exports avoid parallel full reports."""
     out=Path(destination or ROOT/state(host)['spec']['evidence_destination'])
     out.mkdir(parents=True,exist_ok=True)
     members=[]
@@ -409,8 +410,27 @@ def export(host, destination=None):
             archive.addfile(info,io.BytesIO(row['body']))
             members.append(dict(name=name,sha256=row['id'],bytes=info.size,media=row['media']))
         calls=[dict(r) for r in db.execute('SELECT * FROM calls ORDER BY rowid')]
+        if state(host)['spec'].get('budget_semantics',{}).get('mode')=='count':
+            snapshot=dict(session=host.store.session(host.run_id),events=host.store.events(host.run_id),calls=calls,
+                ledger=host.store.remaining())
+            body=json.dumps(snapshot,sort_keys=True,ensure_ascii=False,allow_nan=False).encode('utf8')
+            identity=hashlib.sha256(body).hexdigest()
+            name='snapshot/'+identity+'.json'
+            info=tarfile.TarInfo(name)
+            info.size=len(body)
+            archive.addfile(info,io.BytesIO(body))
+            members.append(dict(name=name,sha256=identity,bytes=info.size,media='application/json'))
     current=packet(host)
-    for name,value in [('state',state(host)),('events',host.store.events(host.run_id)),('calls',calls),('final_packet',current),('ledger',host.store.remaining())]:
+    s=state(host)
+    if s['spec'].get('budget_semantics',{}).get('mode')=='count':
+        disposition={key:s.get(key) for key in ('research_status','freeze','selected','selected_solution','success_gate','final_disposition','validation_extensions','closed_unix')}
+        disposition.update(study_id=host.run_id,claims=claims(host),resource_use=current['resource_use'],
+            stage_usage=(current.get('rl') or {}).get('allocation_feedback'),
+            evidence=dict(results=s['results'],rl_evaluations=s.get('rl_evaluations',[]),analyses=s.get('analysis_results',[])))
+        values=[('configuration',s['spec']),('disposition',disposition),('calls',calls),('ledger',host.store.remaining())]
+    else:
+        values=[('state',s),('events',host.store.events(host.run_id)),('calls',calls),('final_packet',current),('ledger',host.store.remaining())]
+    for name,value in values:
         atomic_json(out/(name+'.json'),value)
     atomic_json(out/'archive_manifest.json',dict(members=members,archive_sha256=hashlib.sha256((out/'immutable_artifacts.tar.gz').read_bytes()).hexdigest()))
     return dict(destination=str(out),results=len(state(host)['results']),claims=claims(host),resources=current['resource_use'])

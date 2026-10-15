@@ -1,0 +1,101 @@
+{
+  "scope": "Supplied scoped evidence, never a current-study task pass. Cite this context artifact for historical statements; original archive references are provenance only.",
+  "historical_compliant_success": {
+    "source": "evidence/nmpc_feedback_20261014/scientific_summary.json",
+    "study_id": "feedback-design-20261014",
+    "selected_parameters": {
+      "distal1_length_m": 0.11,
+      "distal1_material": "compliant",
+      "distal1_routing_scale": 1.0,
+      "distal1_section_scale": 1.0,
+      "holding_tip_speed_weight": 0.1,
+      "near_length_m": 0.16,
+      "near_material": "baseline",
+      "near_routing_scale": 1.0,
+      "near_section_scale": 1.0,
+      "terminal_tip_speed_weight": 0.1
+    },
+    "actual_distal1_young_pa": 4860000.0,
+    "selected_execution": {
+      "artifact_id": "769c56bcf359e7a2c8ae1531d4d5ea430caa8681b83fd370628f14e3673eae12",
+      "media_type": "application/json"
+    },
+    "selected_metrics": {
+      "holding_max_error_m": 0.0030807318535089404,
+      "holding_max_speed_m_s": 0.01734502552206159,
+      "terminal_error_m": 0.0030807318535089404
+    },
+    "complete_passing_episodes": 3,
+    "limitations": [
+      "A predefined compliant material scenario, not continuous structural optimization",
+      "No paired fresh nominal comparison establishes superiority",
+      "Original task, controller, model and numerical scope only; not hardware, robustness, global optimality or real-time proof"
+    ]
+  },
+  "sealed_mainline": {
+    "study_id": "research-mainline-20261015",
+    "implementation": "1519c20220d5b4c3da17a1b00270a730f87b7927",
+    "disposition": "Model STOP without selection",
+    "saved_nominal_metrics": {
+      "terminal_error_m": 0.0031197439682656434,
+      "holding_max_error_m": 0.0031390226975834858,
+      "holding_max_speed_m_s": 0.02320985264576029
+    },
+    "holding_speed_limit_m_s": 0.02,
+    "outcome": "Complete saved motion fails joint holding-speed condition, independently of report-packaging failure",
+    "rl_failure": "Worker failed to locate owned state before usable training/checkpoint publication; engineering boot failure, not trained policy failure",
+    "historical_conservative_charge_s": 1200,
+    "history_preserved": true
+  },
+  "current_engineering": {
+    "study_id": "engineering-count-20261015",
+    "implementation": "6c955813589dae7c6c19e0d5918ce2c204c9e546",
+    "chain_passed": true,
+    "task_passed": false,
+    "provider_requests": 0,
+    "admitted_stages_total": 4,
+    "independent_evaluation_attempts_total": 2,
+    "actual_training_actions": 16384,
+    "complete_evaluation": {
+      "complete": true,
+      "counts": {
+        "attempted_actions": 35,
+        "attempted_physics_steps": 700,
+        "complete_episodes": 1,
+        "completed_actions": 35,
+        "failed_episodes": 0
+      },
+      "episode_reward": -12725.735276423631,
+      "holding_coverage_complete": true,
+      "holding_max_position_error_m": 0.19060104981891726,
+      "holding_max_speed_m_s": 0.5859997480672576,
+      "holding_sample_steps": [
+        30,
+        31,
+        32,
+        33,
+        34,
+        35
+      ],
+      "numerical_failure": null,
+      "passed": false,
+      "terminal_position_error_m": 0.16793862201154255,
+      "trajectory_rows": 36
+    },
+    "continuation": {
+      "policy_preserved": true,
+      "optimizer_moments_preserved": true,
+      "optimizer_steps_preserved": true,
+      "new_optimizer_learning_rates": [
+        1e-05
+      ],
+      "new_rollout_buffer_size": 512
+    },
+    "original_attempt": "Both original stages trained; independent evaluation numerically failed at 0.21 s. All costs retained. User expressly authorized two additional stages and one evaluation in the SAME engineering ledger.",
+    "new_initialization": "Direct policy mean 0.2 N, log_std_init=-5 and small learning rate, explicitly engineering-selected; successful continuation/evaluation plumbing, poor task performance. Scientific defaults remain unchanged unless you select supported overrides.",
+    "original_resume": "Fixtures only; live exact interrupted-stage recovery not exercised",
+    "workers_remaining": 0,
+    "evidence": "evidence/research_count_20261015/engineering/validation.json"
+  },
+  "new_study": "Choose any supported route from the frozen packet. You are not required to run NMPC first, repeat failed nominal science, consume all training stages, or demonstrate novelty. New direct RL initialization may declare initial_tension_n; it is not a continuation override. Complete failed NMPC references can support residual RL for their exact candidate only. Reward never changes task acceptance. Read exact outcome evidence, then select a fresh pass or issue justified STOP. Counts/closeout protection are supplied by the current packet; no scientific elapsed-time limits or extra confirmations."
+}
