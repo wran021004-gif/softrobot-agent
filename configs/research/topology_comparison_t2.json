@@ -1,0 +1,161 @@
+{
+  "extends": "study.json",
+  "study_id": "m3b2-t2-20261015",
+  "authorization": "User attachment b555900c-aec2-4177-bf55-24308a8ce71a: predeclared M3-B2 T0/T2 pair, one complete fresh NMPC/MuJoCo attempt per candidate, separate engineering ownership to retain success protection; zero providers/RL/repetition.",
+  "base_commit": "e60e32f4b66793f7f7e51c9b87c3fb5f04dcb6ac",
+  "mode": "engineering_numerical",
+  "capabilities": [
+    "nmpc"
+  ],
+  "allowed_plan_actions": [
+    "propose",
+    "execute",
+    "select",
+    "stop"
+  ],
+  "evidence_destination": "evidence/topology_control_20261015/b2/T2",
+  "supplied_evidence": [],
+  "budgets": {
+    "provider_requests": 0,
+    "protected_provider_requests": 0,
+    "public_operations": 12,
+    "protected_public_operations": 0,
+    "physical_launches": 1,
+    "local_solves": 0,
+    "mathematical_evaluations": 0
+  },
+  "nmpc_limits": {
+    "executions": 1
+  },
+  "execution_instructions": "M3-B2 predeclared paired comparison. This independent engineering scope owns exactly one complete attempt of T2. Preserve task/source/seed/controller and route declared in b2/protocol.json. Stop after the sole recorded attempt; read and select if passing, otherwise truthful STOP. No further science or retries.",
+  "range_status": "All segment/material/control values fixed at the source reference; only predeclared T2 near_t0 route differs from T0.",
+  "topology_authorization": {
+    "version": "tendon_topology_grant_v1",
+    "tendon_count_bounds": [
+      1,
+      7
+    ],
+    "tendon_bounds": {
+      "diameter_m": [
+        0.001,
+        0.001
+      ],
+      "force_limit_n": [
+        8.0,
+        8.0
+      ],
+      "pretension_n": [
+        0.0,
+        0.2
+      ],
+      "length_servo_gain_n_m": [
+        900.0,
+        900.0
+      ]
+    },
+    "attachment_bounds_m": {
+      "fixed_base": [
+        [
+          0.0,
+          -0.025,
+          -0.025
+        ],
+        [
+          0.0,
+          0.025,
+          0.025
+        ]
+      ],
+      "near": [
+        [
+          0.0,
+          -0.025,
+          -0.025
+        ],
+        [
+          0.0,
+          0.025,
+          0.025
+        ]
+      ],
+      "mid_guide": [
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ]
+      ],
+      "distal1": [
+        [
+          0.0,
+          -0.025,
+          -0.025
+        ],
+        [
+          0.0,
+          0.025,
+          0.025
+        ]
+      ]
+    },
+    "editable_guides": [
+      "mid_guide"
+    ],
+    "actuator_rule": "copy_source_independent_displacement_v1"
+  },
+  "allowed_parameters": {
+    "holding_tip_speed_weight": [
+      0.1,
+      0.1
+    ],
+    "terminal_tip_speed_weight": [
+      0.1,
+      0.1
+    ],
+    "segments.near.length_m": [
+      0.16,
+      0.16
+    ],
+    "segments.near.young_pa": [
+      7200000.0,
+      7200000.0
+    ],
+    "segments.near.sections.0.semi_y_m": [
+      0.0095,
+      0.0095
+    ],
+    "segments.near.sections.0.semi_z_m": [
+      0.0076,
+      0.0076
+    ],
+    "segments.distal1.length_m": [
+      0.11,
+      0.11
+    ],
+    "segments.distal1.young_pa": [
+      5400000.0,
+      5400000.0
+    ],
+    "segments.distal1.sections.0.height_z_m": [
+      0.0095,
+      0.0095
+    ],
+    "segments.distal1.sections.0.width_y_m": [
+      0.0133,
+      0.0133
+    ],
+    "segments.distal1.sections.1.height_z_m": [
+      0.008549999999999999,
+      0.008549999999999999
+    ],
+    "segments.distal1.sections.1.width_y_m": [
+      0.0114,
+      0.0114
+    ]
+  }
+}
