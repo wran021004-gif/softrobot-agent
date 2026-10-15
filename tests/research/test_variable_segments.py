@@ -131,6 +131,19 @@ class VariableSegmentTests(unittest.TestCase):
         self.assertEqual(len(protocol['baseline_lengths_m']),9)
         self.assertEqual(protocol['baseline_lengths_m']['segment_8'],.14)
 
+    def test_family_composition_matches_bound_physical_definition(self):
+        frozen=read(ROOT/'evidence/m3c2_variable_segments/control/configuration.json')['family_space']
+        self.assertEqual(self.spec['family_space'],frozen)
+        source=read(ROOT/'configs/research/family_space_v2.json')
+        self.assertEqual(source['base_space'],'family_space_v1.json')
+        self.assertNotIn('components',source['assembly'])
+        from tools.research import config
+        target=(ROOT/'configs/research/family_space_v2.json').resolve()
+        invalid={**source,'base_space':'family_space_v2.json'}
+        with patch.object(config,'read',side_effect=lambda p:deepcopy(invalid) if p==target else read(p)):
+            with self.assertRaisesRegex(ValueError,'SINGLE_FAMILY_BASE'):
+                resolve(ROOT/'configs/research/study_variable_segments_dev.json')
+
     def test_v1_physical_identities_and_legacy_study(self):
         from extensions.tendon_family.generated_serial import generate_family
         from extensions.tendon_family.family_space import FamilyBuild

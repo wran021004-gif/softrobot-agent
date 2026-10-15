@@ -71,7 +71,19 @@ def resolve(path, profile=None):
         if source.parent!=path.parent or 'extends' in original or 'defaults' in original:
             raise ValueError('SAME_DIRECTORY_SINGLE_FAMILY_DEFAULTS_REQUIRED')
         family_source=(path.parent/study.pop('family_space')).resolve()
-        family_space=plain(parse_space(read(family_source)))
+        family_definition=read(family_source)
+        if 'base_space' in family_definition:
+            base_source=(family_source.parent/family_definition.pop('base_space')).resolve()
+            if base_source.parent!=family_source.parent:
+                raise ValueError('SAME_DIRECTORY_SINGLE_FAMILY_BASE_REQUIRED')
+            base_definition=read(base_source)
+            if (base_definition.get('version')!='serial_family_space_v1'
+                    or 'base_space' in base_definition or 'extends' in base_definition):
+                raise ValueError('SAME_DIRECTORY_SINGLE_FAMILY_BASE_REQUIRED')
+            family_definition['assembly']={**base_definition['assembly'],**family_definition.get('assembly',{})}
+            family_definition={**base_definition,**family_definition}
+            provenance['references']['family_space_base']=dict(path=str(base_source),sha256=digest(base_definition))
+        family_space=plain(parse_space(family_definition))
         initialization=study.pop('candidate_initialization')
         if initialization!='all_candidate_dofs_zero_v1':
             raise ValueError('EXPLICIT_CANDIDATE_ZERO_INITIALIZATION_REQUIRED')
