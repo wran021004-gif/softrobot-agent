@@ -27,7 +27,7 @@ def readable_results(s, host=None):
             linked.extend(result[k] for k in ('checkpoint_reference','trajectory_reference','original_request','log_reference') if result.get(k))
     return [*s['results'], *s.get('mechanics_results', []), *s.get('rl_evaluations', []), *s.get('rl_training_summaries', []),
         *s.get('scoped_context',[]), *s.get('imported_mechanics_sources',[]), *s.get('imported_mechanics_results',[]), *s.get('linked_selections',[]), *s.get('historical_confirmations',[]), *linked,
-        *[s[k] for k in ('rl_task','rl_source_summary','rl_source_candidate') if s.get(k)],
+        *[s[k] for k in ('rl_task','rl_source_summary','rl_source_candidate','family_space_reference') if s.get(k)],
         *[r for entry in s.get('rl_runs',{}).values() for r in (entry.get('candidate'),entry.get('configuration')) if r]]
 
 from tools.research.budget import (protected, closeout_operations, admit_closeout,

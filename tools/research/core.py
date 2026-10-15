@@ -87,6 +87,7 @@ def prepare(spec_path=DEFAULT_SPEC, directory=None, profile=None):
     update(h,scoped_context=[save(h,read(ROOT/path),'supplied_scoped_context') for path in spec.get('supplied_evidence',[])])
     if spec.get('start_mode')=='family_space':
         update(h,reference_candidate=None,mathematical_evaluations=0,analysis_results=[],analysis_costs=[],search_results=[],
+            family_space_reference=save(h,spec['family_space'],'frozen_family_space'),
             compatibility_preparation_s=time.perf_counter()-start)
         atomic_json(directory/'resolved_configuration.json',spec)
         atomic_json(directory/'activity.json',spec)
@@ -189,6 +190,8 @@ def claims(host):
         from tools.research.feedback import confirmation_progress
         s=state(host)
         progress=confirmation_progress(host)
+        if s['spec'].get('start_mode') == 'family_space':
+            return family_claims(host, s, progress)
         changed=bool(s.get('selected') and host.store.artifact(host.store.artifact(s['selected'])['candidate'])['configuration']['robot']!=s.get('nominal_configuration',{}).get('robot'))
         search_rows=[host.store.artifact(r) for r in s.get('search_results',[])]
         return dict(selected=s.get('selected'),model_selected_structure_search_evaluations=len({row['evidence']['analysis']['artifact_id'] for search in search_rows for row in search['result']['evaluated'] if row['evidence'].get('analysis') and host.store.artifact(row['evidence']['candidate'])['configuration']['robot']!=s.get('nominal_configuration',{}).get('robot')}),selected_structurally_new=changed,new_design_and_control_confirmed=bool(changed and progress['confirmed']),independent_confirmation_count=progress['required_total']-progress['remaining'],
@@ -196,6 +199,31 @@ def claims(host):
             confirmation_progress=progress,limited_repeat_supported_acceptance=progress['confirmed'],task_passed=bool(s.get('selected') and __import__('tools.research.feedback',fromlist=['result_view']).result_view(host,s['selected'])['passed']),required_extra_confirmations=progress['required_total'],executed_extra_confirmations=progress['current_study_confirmations'],confirmation_status='not_required' if progress['required_total']==0 else 'passed' if progress['confirmed'] else 'pending',reproducibility_assessed=progress['confirmed'],
             parameter_improvement_attribution_permitted=False,
             interface_evaluations=sum(bool(host.store.artifact(r).get('independent_evaluation_executed')) for r in s.get('rl_evaluations',[])))
+
+
+def family_claims(host, s, progress):
+    """No reference-based improvement can be attributed in family-only studies."""
+    from tools.research.feedback import result_view
+    candidates = [(ref,host.store.artifact(ref)) for ref in s['candidates'].values()]
+    designs = {}
+    for ref, candidate in candidates:
+        designs.setdefault(digest(candidate['configuration']['robot']['structure']),ref)
+    refs = list(designs.values())
+    selected = host.store.artifact(s['selected']) if s.get('selected') else None
+    return dict(claim_version='family_space_claims_v1',selected=s.get('selected'),
+        selected_candidate=selected['candidate'] if selected else None,
+        candidate_generated_from_family_space=bool(candidates),
+        physically_constructed_and_validated_candidates=[ref for ref,c in candidates if c.get('physical_validation')=='compiled'],
+        design_changes_between_candidates=[dict(before=a,after=b) for a,b in zip(refs,refs[1:])],
+        distinct_generated_designs=len(designs),
+        structure_control_search_performed=any(host.store.artifact(r)['result'].get('evaluated') for r in s.get('search_results',[])),
+        selected_structurally_new=None,model_selected_structure_search_evaluations=None,
+        new_design_and_control_confirmed=None,reference_comparison='not_applicable_no_reference_design',
+        task_passed=bool(s.get('selected') and result_view(host,s['selected'])['passed']),
+        independent_task_acceptance=result_view(host,s['selected']) if selected else None,
+        confirmation_progress=progress,limited_repeat_supported_acceptance=progress['confirmed'],
+        confirmation_status='not_required' if progress['required_total']==0 else 'passed' if progress['confirmed'] else 'pending',
+        reproducibility_assessed=progress['confirmed'],parameter_improvement_attribution_permitted=False)
 
 
 def packet(host):

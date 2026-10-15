@@ -96,7 +96,9 @@ def resolve(path, profile=None):
         study.update(topology_authorization=grant,source_study_identity=digest(original),source_study_id=original['study_id'])
         provenance['references']['source_study']=dict(path=str(source),sha256=digest(original))
     inputs = {}
-    for key in ('robot', 'task', 'control', 'runtime'):
+    if family_mode:
+        study.pop('robot', None)  # Historical compositions may name it; never read it.
+    for key in (('task', 'control', 'runtime') if family_mode else ('robot', 'task', 'control', 'runtime')):
         source = (path.parent / study.pop(key)).resolve()
         inputs[key] = read(source)
         provenance['references'][key] = dict(path=str(source), sha256=digest(inputs[key]))
@@ -110,7 +112,11 @@ def resolve(path, profile=None):
     if profile:
         study = patch(study, study['validation_profiles'][profile])
         study['selected_validation_profile'] = profile
-    robot, task, control, runtime = (inputs[k] for k in ('robot', 'task', 'control', 'runtime'))
+    task, control, runtime = (inputs[k] for k in ('task', 'control', 'runtime'))
+    if family_mode:
+        robot, bootstrap = family_bootstrap(family_space, study.pop('family_execution'))
+    else:
+        robot = inputs['robot']
     control['rl_defaults']['seed'] = task['seed']
     control['rl_defaults'] = rl_configuration(control['rl_defaults'])
     if 'segments' in study['reference_parameters']:
@@ -175,6 +181,13 @@ def resolve(path, profile=None):
         builder['version']='4.0.0';builder['parameters']['contract']='family.topology_space'
         builder['parameters']['data'].update(authorization=study['topology_authorization'],topology=dict(
             version='tendon_topology_patch_v1',remove_tendons=[],upsert_tendons=[],guide_holes={}))
+    if family_mode:
+        source_initial = cfg['task']['initializer']['parameters']['data']
+        if source_initial['unspecified'] != 'zero' or any(
+                v != 0 for key in ('qpos_rad','qvel_rad_s') for v in source_initial[key].values()):
+            raise ValueError('FAMILY_ZERO_RULE_REQUIRES_AUTHORIZED_ZERO_SOURCE_TASK')
+        cfg['policy']['candidate_builder'] = bootstrap['builder']
+        cfg['task']['initializer']['parameters']['data'] = bootstrap['initializer']
     cfg = plain(SessionInput.model_validate(cfg))
     from extensions.tendon_family.gvs_profile import ReachControl
     from extensions.tendon_family.contracts import current_nmpc_recipe, MujocoParameters
@@ -212,6 +225,29 @@ def resolve(path, profile=None):
                 executable_segment_counts=family_space['executable_segment_counts'],
                 executable_tendon_counts=family_space['executable_tendon_count_bounds']),
             implementation_scaffold=dict(purpose='Host SessionInput compatibility only; not an Agent candidate',
-                source=provenance['references']['robot'],scientific_candidate=False))
+                source=dict(family_space_identity=study['family_space_identity'],request=bootstrap['request']),
+                reason='Host.create and compile_input require concrete robot signals and backend checks',
+                scientific_candidate=False, candidate_pool_member=False))
     study['resolved_identity'] = digest(study)
     return study
+
+
+def family_bootstrap(space, execution):
+    """A family-derived Host input, never a scientific reference or candidate."""
+    from extensions.tendon_family.family_space import FamilyBuild
+    from extensions.tendon_family.generated_serial import generate_family
+    build = FamilyBuild(space=space, request=dict(family_space_identity=digest(space),
+        segment_count=min(space['executable_segment_counts']),
+        tendon_count=space['executable_tendon_count_bounds'][0]))
+    design, mesh, physics = generate_family(build)
+    robot = dict(family='tendon_robot_family',channels=['actuator_commands'],units='SI',
+        frame='world_base_x_forward_yz_cross_section',sources=['frozen family assembly'],
+        assumptions=space['assumptions'],unsupported=space['unsupported'],
+        structure=dict(contract='family.design',version='1.0.0',data=design))
+    initial = {k:{j:0. for j in physics['dofs']} for k in ('qpos_rad','qvel_rad_s')}
+    initial['unspecified'] = 'zero'
+    return dict(robot=robot,discretization=dict(contract='family.discretization',version='1.0.0',data=mesh),
+        **execution, provenance=dict(source='frozen family assembly',scientific_candidate=False)), dict(
+        builder=dict(extension_id='candidate.family',version='5.0.0',parameters=dict(
+            contract='family.serial_space_build',version='1.0.0',data=plain(build))),
+        initializer=initial,request=plain(build.request))

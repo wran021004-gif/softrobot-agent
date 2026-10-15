@@ -38,10 +38,10 @@ class FamilySpaceTests(unittest.TestCase):
         cls.addClassCleanup(cleanup)
         cls.folder.mkdir(parents=True)
         # Isolated editable sources let this test prove freezing with real JSON edits.
-        defaults=read(ROOT/'configs/research/study.json')
-        for key in ('robot','task','control','runtime'):
+        defaults=read(ROOT/'configs/research/family_study_defaults.json')
+        for key in ('task','control','runtime'):
             defaults[key]=str((ROOT/'configs/research'/defaults[key]).resolve())
-        atomic_json(cls.folder/'study.json',defaults)
+        atomic_json(cls.folder/'family_study_defaults.json',defaults)
         cls.family_source=cls.folder/'family_space_v1.json'
         atomic_json(cls.family_source,read(ROOT/'configs/research/family_space_v1.json'))
         atomic_json(cls.folder/'study_family_space_dev.json',read(ROOT/'configs/research/study_family_space_dev.json'))
@@ -223,3 +223,64 @@ class FamilySpaceTests(unittest.TestCase):
         legacy=plan(self.request(tendon_count=1));legacy.pop('generation');legacy.update(action='propose',parameters=old['reference_parameters'])
         self.assertNotIn('generation',plain(Plan.model_validate(legacy)))
         self.assertEqual(set(self.spec['analysis_protocol']['baseline_lengths_m']),{'segment_0','segment_1'})
+
+    def test_no_legacy_robot_reads_or_bootstrap_candidate(self):
+        from tools.research import config
+        def checked_read(path):
+            if path.name == 'robot.json':
+                raise AssertionError('Family preparation must not read historical robot')
+            return read(path)
+        with patch.object(config, 'read', side_effect=checked_read):
+            spec = resolve(self.study_source)
+            recovered = core.prepare(self.study_source, self.folder)
+        self.assertEqual(spec, self.spec)
+        self.assertFalse((self.folder/'robot.json').exists())
+        self.assertIsNone(state(recovered)['reference_candidate'])
+        self.assertFalse(spec['implementation_scaffold']['scientific_candidate'])
+        self.assertNotIn('robot', spec['configuration_provenance']['references'])
+        self.assertEqual(len(spec['configuration']['robot']['structure']['data']['tendons']),1)
+
+    def test_compact_summary_exact_evidence_and_claims(self):
+        import json
+        from tools.research.agent import decision_packet
+        from tools.research.state import readable_results
+        packet = decision_packet(self.host)
+        summary = packet['study']['family_space']
+        self.assertNotIn('assembly',summary)
+        self.assertLess(len(json.dumps(summary)),len(json.dumps(self.spec['family_space']))*.6)
+        ref=summary['full_specification']
+        self.assertIn(ref,readable_results(state(self.host),self.host))
+        self.assertEqual(core.read_evidence(self.host,dict(reference=ref)),self.spec['family_space'])
+        core.recover(self.host)
+        self.assertEqual(core.read_evidence(self.host,dict(reference=ref)),self.spec['family_space'])
+        self.assertEqual(summary['segment_count_bounds'],self.spec['family_space']['segment_count_bounds'])
+        facts=core.claims(self.host)
+        self.assertTrue(facts['candidate_generated_from_family_space'])
+        self.assertIsNone(facts['selected_structurally_new'])
+        self.assertFalse(facts['task_passed'])
+        self.assertGreater(len(facts['design_changes_between_candidates']),0)
+
+
+class FamilyClaimFixtures(unittest.TestCase):
+    """Synthetic claim fixtures; never scientific execution evidence."""
+    def test_zero_one_two_and_selected(self):
+        from types import SimpleNamespace
+        objects={}
+        host=SimpleNamespace(store=SimpleNamespace(artifact=lambda ref:objects[ref]))
+        s=dict(candidates={},spec={},search_results=[],selected=None)
+        progress=dict(confirmed=False,required_total=0)
+        self.assertFalse(core.family_claims(host,s,progress)['candidate_generated_from_family_space'])
+        for i in range(2):
+            ref='synthetic-'+str(i)
+            objects[ref]=dict(configuration=dict(robot=dict(structure=dict(geometry=i))),physical_validation='compiled')
+            s['candidates'][ref]=ref
+            facts=core.family_claims(host,s,progress)
+            self.assertEqual(len(facts['design_changes_between_candidates']),i)
+            self.assertIsNone(facts['new_design_and_control_confirmed'])
+        objects['fixture-result']=dict(candidate='synthetic-1')
+        s['selected']='fixture-result'
+        with patch('tools.research.feedback.result_view',return_value=dict(passed=True,label='synthetic fixture')):
+            facts=core.family_claims(host,s,progress)
+        self.assertEqual(facts['selected_candidate'],'synthetic-1')
+        self.assertTrue(facts['task_passed'])
+        self.assertFalse(facts['reproducibility_assessed'])

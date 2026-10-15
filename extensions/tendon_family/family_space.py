@@ -172,3 +172,35 @@ def validate_request(space, request):
             if key not in domains:
                 raise ValueError('UNDECLARED_FAMILY_PARAMETER: '+key)
             domains[key].check(value, key)
+
+
+def decision_summary(value, evidence, operations):
+    """Exact frozen domains without repeating component meshes and inertias."""
+    from tools.platform_store import plain
+    space = FamilySpace.model_validate(value)
+    frozen = plain(space)
+    result = {k:frozen[k] for k in (
+        'version','family_id','assumptions','segment_count_bounds','executable_segment_counts',
+        'tendon_count_bounds','executable_tendon_count_bounds','segment_domain','segment_domains',
+        'tendon_domains','routing_domains','control_domains','actuator_defaults','conditional_rules','unsupported')}
+    result['segment_domains'] = {i:{k:v for k,v in domain.items() if v != frozen['segment_domain'][k]}
+        for i,domain in frozen['segment_domains'].items()}
+    def compact(value):
+        if isinstance(value,dict):
+            if set(value)=={'minimum','maximum','default'}:
+                return [value['minimum'],value['maximum'],value['default']]
+            return {k:compact(v) for k,v in value.items()}
+        return value
+    result = compact(result)
+    result['domain_encoding'] = '[minimum, maximum, default]; indexed segment fields override generic domain'
+    result.update(full_specification=evidence, available_operations=operations,
+        routing_strategy='polar_consecutive_spans_v1',
+        span_semantics='first_segment <= last_segment < selected segment_count; counts sum to tendon_count',
+        conditional_parameters='Segment and route overrides must exist in selected topology; per-span offsets match count',
+        attachment_constraints=dict(local_frame='segment YZ plane; normalized station s',
+            order='unique increasing stations; guides precede anchor; anchor on last selected segment',
+            clearance='section envelope + tendon radius; pairwise tendon diameters; one owned hole per tendon',
+            guides=[dict(envelope_halfsize_m=c.envelope_halfsize_m,hole_radius_m=c.hole_radius_m)
+                for c in space.assembly.components if isinstance(c,Rigid) and c.kind=='guide']),
+        numerical_support='Candidate-specific validation required; physical generation does not certify dynamics, control or task success')
+    return result

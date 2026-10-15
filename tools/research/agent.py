@@ -439,7 +439,10 @@ def decision_packet(host):
     if 'topology_authorization' in spec:
         result['study']['topology_authorization']=spec['topology_authorization']
     if spec.get('start_mode')=='family_space':
-        result['study'].update(start_mode='family_space',family_space=spec['family_space'],
+        from extensions.tendon_family.family_space import decision_summary
+        result['study'].update(start_mode='family_space',family_space=decision_summary(
+            spec['family_space'],state(host)['family_space_reference'],
+            dict(actions=spec['allowed_plan_actions'],capabilities=spec['capabilities'])),
             family_space_identity=spec['family_space_identity'],candidate_initialization=spec['candidate_initialization'],
             canonical_task_identity=spec['canonical_task_identity'])
     result['available_actions']=spec['allowed_plan_actions']
