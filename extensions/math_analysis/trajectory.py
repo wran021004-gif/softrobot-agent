@@ -3,6 +3,7 @@
 No task names, candidate construction, persistence, or physical acceptance live here.
 All arrays use physical coordinates. Outputs at a boundary use the preceding hold.
 """
+import time
 import numpy as np
 from scipy.optimize import Bounds, minimize
 from extensions.math_analysis.kernels import zoh, _minimum_residual_certificate
@@ -70,6 +71,20 @@ def _margins(c, residual):
         return np.array([c.radius-value]), value
     margins = np.concatenate((residual-np.asarray(c.lower), np.asarray(c.upper)-residual))
     return margins, residual.tolist()
+
+
+def _margin_jacobian(c, residual, matrix, atol):
+    """Derivative of the existing scaled margin; zero is a norm supergradient.
+
+    At zero residual the negative norm is concave and admits the zero
+    supergradient (the norm's zero subgradient), with no division by zero.
+    """
+    if c.kind == 'norm_bound':
+        norm = float(np.linalg.norm(residual))
+        direction = residual/norm if norm > 0 else np.zeros_like(residual)
+        return -(direction@matrix)[None, :]/max(c.radius, atol)
+    scale = max(np.max(np.abs(c.lower)), np.max(np.abs(c.upper)), atol)
+    return np.concatenate((matrix, -matrix), axis=0)/scale
 
 
 def verify_witness(model, dynamics, initial, delta, rows, scope, atol):
@@ -205,19 +220,29 @@ def trajectory_feasibility(model, requirements, protocol, *, initial_delta=None)
         if scale.shape != lower.shape or np.any(scale <= 0) or not np.all(np.isfinite(scale)):
             raise ValueError('INVALID_INPUT_SCALES')
         def objective(z): return float(protocol.period_s*np.sum((z/scale)**2))
+        evaluations = dict(constraint=0, constraint_jacobian=0)
         def margins(z):
+            evaluations['constraint'] += 1
             return np.concatenate([_margins(c,base+matrix@z-ref)[0]/max(
                 c.radius if c.kind == 'norm_bound' else max(np.max(np.abs(c.lower)),np.max(np.abs(c.upper))),atol)
                 for c,_,_,ref,_,base,matrix in rows])
+        def margin_jacobian(z):
+            evaluations['constraint_jacobian'] += 1
+            return np.concatenate([_margin_jacobian(c,base+matrix@z-ref,matrix,atol)
+                for c,_,_,ref,_,base,matrix in rows], axis=0)
         z = np.clip(np.zeros(steps*nu), lower, upper)
         result['status'] = 'inconclusive'
         if steps:
+            started = time.perf_counter()
             solved = minimize(objective,z,jac=lambda v: 2*protocol.period_s*v/scale**2,
-                bounds=Bounds(lower,upper),constraints=[dict(type='ineq',fun=margins)],method='SLSQP',
+                bounds=Bounds(lower,upper),constraints=[dict(type='ineq',fun=margins,jac=margin_jacobian)],method='SLSQP',
                 options=dict(maxiter=protocol.endpoint_max_iterations,ftol=1e-12,disp=False))
+            elapsed = time.perf_counter()-started
             z = np.asarray(solved.x)
             result['solver'] = dict(name='scipy.optimize.SLSQP', success=bool(solved.success), status=int(solved.status),
                 message=str(solved.message), iterations=int(solved.nit), maximum_iterations=protocol.endpoint_max_iterations,
+                optimization_elapsed_s=elapsed, objective_evaluations=getattr(solved,'nfev',None),
+                constraint_evaluations=evaluations['constraint'], constraint_jacobian_evaluations=evaluations['constraint_jacobian'],
                 constraint_scaling='radius or maximum absolute component bound, floored by check atol; physical residuals replayed')
         else:
             result['solver'] = dict(name='zero_horizon_direct_check', iterations=0)

@@ -225,3 +225,35 @@ module exercises the three independent verification layers and both required
 interface repairs. M3 remains responsible for variable tendon/topology generation.
 Five/seven-channel M2 fixtures only validate the numerical and saved-state
 interfaces. They add no variable-count robot generator or new physical model.
+
+### M2 numerical closeout: controlled analytic constraint Jacobian
+
+`analytic_jacobian_ab.json` in the same evidence directory records one new pair,
+with a shared freshly constructed GVS model (arrays exactly equal to the saved
+M2 model), frozen requirements, zero initial delta sequence, bounds, 100 iterations,
+1e-12 SLSQP ftol and 1e-8 physical replay tolerance. Both use the existing
+single-thread environment. The optional `controlled_real_gvs_ab()` helper in
+the M2 test module refuses to overwrite this record and is not a discovered test.
+The analytic Jacobian differentiates the original normalized norm/interval
+margins, in the same row order. At zero norm it uses the zero supergradient of
+the concave margin. Central difference checks away from zero pass.
+
+| Measurement | Numerical differences | Analytic |
+|---|---:|---:|
+| Optimization seconds | 1.5607669999590144 | 0.32040670001879334 |
+| SLSQP iterations | 100 | 100 |
+| Objective evaluations | 101 | 101 |
+| Constraint evaluations | 21413 | 102 |
+| Constraint Jacobian evaluations (including numerical construction) | 101 | 101 |
+| Maximum physical violation (m/s) | 9.19619888416906e-6 | 9.547179930784189e-6 |
+
+Both worst rows are `holding_max_speed_m_s`, sample 34, 0.34 s. Both independent
+replays fail and neither yields an exclusion certificate: **inconclusive**.
+The slightly larger analytic residual is retained honestly; feasibility did not
+improve. The analytic implementation is retained for its measured 4.87x reduction
+in optimization time and constraint calls, with unchanged verification semantics.
+There is one production solver path; the numerical comparison uses test-only
+instrumentation of SciPy's original differentiation. No further tuning was run.
+The evidence contains measured construction/linearization and kernel times,
+environment, identities, both proposed sequences and all replay records. It
+references the immutable old GVS artifact rather than duplicating its model.

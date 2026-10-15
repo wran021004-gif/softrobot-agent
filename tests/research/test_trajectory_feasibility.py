@@ -24,6 +24,22 @@ def fixture(nu=1, nominal=.4, start=0., duration=3., sample=1., feedthrough=0.):
 
 
 class NumericalTests(unittest.TestCase):
+    def test_scaled_margin_derivatives_and_zero_norm_convention(self):
+        from extensions.math_analysis.trajectory import _margins, _margin_jacobian
+        from scipy.optimize._numdiff import approx_derivative
+        _,req,p=fixture()
+        matrix=np.array([[.3,-.2,.7],[-.1,.5,.2]])
+        base=np.array([.4,-.2]); z=np.array([.1,.3,-.2])
+        norm=req.constraints[0].model_copy(update=dict(radius=.08))
+        interval=norm.model_copy(update=dict(kind='component_interval',radius=None,lower=[-.2,-.5],upper=[.3,.7]))
+        for c in (norm,interval):
+            scale=max(c.radius if c.kind=='norm_bound' else max(np.max(np.abs(c.lower)),np.max(np.abs(c.upper))),p.endpoint_check_atol)
+            fd=approx_derivative(lambda v:_margins(c,base+matrix@v)[0]/scale,z,method='3-point')
+            np.testing.assert_allclose(_margin_jacobian(c,base+matrix@z,matrix,p.endpoint_check_atol),np.atleast_2d(fd),rtol=1e-8,atol=1e-8)
+        np.testing.assert_array_equal(_margin_jacobian(norm,np.zeros(2),matrix,p.endpoint_check_atol),np.zeros((1,3)))
+        # Concavity inequality for the zero supergradient of radius - ||r||.
+        self.assertLessEqual(_margins(norm,base)[0][0],_margins(norm,np.zeros(2))[0][0])
+
     def test_known_shared_witness_moving_reference_and_total_bounds(self):
         model,req,p = fixture()
         out = trajectory_feasibility(model,req,p)
@@ -351,6 +367,79 @@ class ResearchIntegrationTests(unittest.TestCase):
         path='extensions/math_analysis/trajectory.py'
         self.assertIn(path,NMPC_SOURCES)
         self.assertIn(path,science_hashes())
+
+
+def controlled_real_gvs_ab():
+    """Explicit opt-in comparison, never run by test discovery; exactly two solves."""
+    import os, time, sys, platform
+    import scipy
+    from pathlib import Path
+    from tools.state_io import read, digest, atomic_json
+    from tools.platform_store import plain
+    from tools.research.config import ROOT, resolve
+    from schemas.platform_analysis import EndpointLinearizedModel, TaskAnalysisProtocol
+    from schemas.platform import SessionInput
+    from extensions.tendon_family.math_analysis import calculate_candidate_configuration
+    from extensions.math_analysis import trajectory
+    folder=ROOT/'evidence/task_feasibility_20261015'
+    destination=folder/'analytic_jacobian_ab.json'
+    if destination.exists():
+        raise ValueError('CONTROLLED_PAIR_ALREADY_RECORDED; DO_NOT_RELAUNCH')
+    original=read(folder/'real_gvs.json')['original_result']
+    cfg=resolve(ROOT/'configs/research/study.json')['configuration']
+    assert digest(cfg)==original['binding']['effective_configuration_identity']
+    p=TaskAnalysisProtocol.model_validate(original['protocol'])
+    req=TaskAnalysisRequirement.model_validate(original['task_analysis'])
+    assert p.endpoint_max_iterations==100
+    threads={k:os.environ.get(k) for k in ('OPENBLAS_NUM_THREADS','OMP_NUM_THREADS','MKL_NUM_THREADS')}
+    assert set(threads.values())=={'1'}
+    started=time.perf_counter()
+    envelope=plain(calculate_candidate_configuration(SessionInput.model_validate(cfg),original['binding'],p,original['binding']['configuration'],
+        operating_points=['controller_start_input']))
+    construction_s=time.perf_counter()-started
+    m=envelope['records'][1]['model']
+    m['operating_point']['actual_time_s']=0.
+    model=EndpointLinearizedModel.model_validate(m)
+    for key in ('A','B','drift','x0','u0','endpoint_outputs'):
+        assert plain(model)[key]==original['model'][key], key
+    solve=trajectory.minimize
+    outcomes={}
+    for mode in ('numerical_difference','analytic'):
+        counts=dict(jacobian=0)
+        def optimizer(*args,**kwargs):
+            if mode=='numerical_difference':
+                constraint=kwargs['constraints'][0]
+                constraint.pop('jac')
+                # Observe SciPy's existing differentiation, without supplying a
+                # replacement Jacobian or changing its bounds/steps.
+                from scipy.optimize import _slsqp_py
+                differentiate=_slsqp_py.approx_derivative
+                def measured(*a,**kw):
+                    counts['jacobian']+=1
+                    return differentiate(*a,**kw)
+                with patch.object(_slsqp_py,'approx_derivative',side_effect=measured):
+                    return solve(*args,**kwargs)
+            return solve(*args,**kwargs)
+        started=time.perf_counter()
+        with patch.object(trajectory,'minimize',side_effect=optimizer):
+            result=trajectory.trajectory_feasibility(model,req,p)
+        total_s=time.perf_counter()-started
+        replay=result.get('replay',{})
+        outcomes[mode]=dict(solver=result['solver'],total_kernel_elapsed_s=total_s,
+            measured_constraint_jacobian_calls=counts['jacobian'] if mode=='numerical_difference' else result['solver']['constraint_jacobian_evaluations'],
+            conclusion=result['status'],certificate=result.get('certificate'),replay=replay,
+            applied_input_n=result.get('applied_input_n'),result_identity=digest(result))
+        print(mode,dict(solver=result['solver'],conclusion=result['status'],worst=replay.get('worst_violation')),flush=True)
+    record=dict(label='One controlled offline real-GVS pair; no task acceptance or NMPC execution',
+        original_evidence=dict(path='evidence/task_feasibility_20261015/real_gvs.json',pointer='/original_result',
+            artifact_id=digest(original)),configuration_identity=digest(cfg),model_identity=digest(plain(model)),
+        original_model_identity=digest(original['model']),requirement_identity=digest(plain(req)),protocol=plain(p),
+        dimensions=dict(state=len(model.x0),input=len(model.u0),intervals=35,variables=210,constraint_samples=13),
+        construction_and_linearization_elapsed_s=construction_s,shared_model=True,identical_initial_delta_input='all zeros',
+        environment=dict(python=sys.version,numpy=np.__version__,scipy=scipy.__version__,platform=platform.platform(),threads=threads),
+        methods=outcomes,source_identity=__import__('tools.research.state',fromlist=['science_hashes']).science_hashes())
+    atomic_json(destination,record)
+    return record
 
 
 if __name__ == '__main__': unittest.main()
