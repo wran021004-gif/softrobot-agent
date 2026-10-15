@@ -61,7 +61,11 @@ def prepare_input(host, request):
     task_ref=state_api.state(host)['rl_task']
     if request.task is not None and plain(request.task)!=task_ref:
         raise ValueError('Owned frozen study task required')
-    if task!=host.store.artifact(task_ref):
+    compared_task=deepcopy(task)
+    if state_api.state(host)['spec'].get('start_mode')=='family_space':
+        compared_task['initializer']['parameters']['data']=dict(
+            rule=state_api.state(host)['spec']['candidate_initialization'])
+    if compared_task!=host.store.artifact(task_ref):
         raise ValueError('Candidate changed frozen study task')
     cfg['requested_allocation']=plain(request.allocation)
     cfg['budget']['actions']=align_steps(cfg['budget']['actions'],cfg['ppo']['n_steps'])

@@ -73,7 +73,7 @@ class FamilySpace(Contract):
                 raise ValueError('POSITIVE_ORDERED_TOPOLOGY_BOUNDS_REQUIRED')
         if self.version == 'serial_family_space_v1' and self.executable_segment_counts != [2]:
             raise ValueError('C1_EXECUTES_ONLY_TWO_SEGMENTS')
-        if not self.segment_count_bounds[0] <= 2 <= self.segment_count_bounds[1] or not (
+        if (self.version=='serial_family_space_v1' and not self.segment_count_bounds[0] <= 2 <= self.segment_count_bounds[1]) or not (
                 self.tendon_count_bounds[0] <= self.executable_tendon_count_bounds[0] <=
                 self.executable_tendon_count_bounds[1] <= self.tendon_count_bounds[1]):
             raise ValueError('EXECUTABLE_DOMAIN_MUST_BE_DECLARED')
@@ -184,6 +184,9 @@ class FamilySpaceV2(FamilySpace):
                 raise ValueError('NAMED_SERIAL_PROTOTYPE_REQUIRED: '+name)
         if parts[rule.root_segment].connection.part!='fixed_base' or self.assembly.tip.part!=rule.payload:
             raise ValueError('SERIAL_ROOT_AND_PAYLOAD_TIP_REQUIRED')
+        if (parts[rule.guide].connection.s!=1 or parts[rule.connector].connection.s!=0 or
+                parts[rule.repeated_segment].connection.s!=0 or parts[rule.payload].connection.s!=1):
+            raise ValueError('SERIAL_BOUNDARY_CONNECTION_STATIONS_REQUIRED')
         return self
 
 

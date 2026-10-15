@@ -89,6 +89,9 @@ def prepare(spec_path=DEFAULT_SPEC, directory=None, profile=None):
         update(h,reference_candidate=None,mathematical_evaluations=0,analysis_results=[],analysis_costs=[],search_results=[],
             family_space_reference=save(h,spec['family_space'],'frozen_family_space'),
             compatibility_preparation_s=time.perf_counter()-start)
+        if enabled(spec,'rl'):
+            update(h,rl_task=save(h,spec['canonical_task'],'rl_frozen_task'),
+                rl_runs={},rl_evaluations=[],rl_evidence_reads=[])
         atomic_json(directory/'resolved_configuration.json',spec)
         atomic_json(directory/'activity.json',spec)
         return h
