@@ -1,0 +1,1278 @@
+{
+  "study_id": "first-feasible-mirror-20261015",
+  "implementation_binding": "0ef83507d3134b0d68697b0b50180799d0ab15e1",
+  "resolved_configuration_identity": "100f22f7e01351607a41fec5afeebb383dc71619c6f28d799c718aec34041e2c",
+  "frozen_task": {
+    "actuator_channels": [
+      "actuator_commands"
+    ],
+    "contract_version": "1.0.0",
+    "environment": {
+      "contract": "experiment.assembly",
+      "data": {
+        "environment": {
+          "coordinate_frame": "world_base_x_forward_yz_cross_section",
+          "environment_id": "reach_free",
+          "gravity_m_s2": [
+            0.0,
+            0.0,
+            -9.81
+          ],
+          "gravity_source": "main@245a785 reach_free environment; Human-owned benchmark gravity",
+          "lights": [
+            {
+              "direction": [
+                0.0,
+                0.0,
+                -1.0
+              ],
+              "position_m": [
+                0.0,
+                0.0,
+                2.0
+              ]
+            }
+          ],
+          "objects": [
+            {
+              "conaffinity": 1,
+              "contype": 0,
+              "half_size_m": [
+                2.0,
+                2.0,
+                0.1
+              ],
+              "kind": "plane",
+              "name": "floor",
+              "position_m": [
+                0.0,
+                0.0,
+                -0.02
+              ]
+            }
+          ],
+          "schema_version": "1",
+          "truth_status": "HUMAN_OWNED",
+          "units": "SI"
+        },
+        "external_forces": [],
+        "floor_id": "floor",
+        "mount": {
+          "position_m": [
+            0.0,
+            0.0,
+            0.15
+          ],
+          "quaternion_wxyz": [
+            1.0,
+            0.0,
+            0.0,
+            0.0
+          ]
+        }
+      },
+      "version": "1.0.0"
+    },
+    "evaluator": {
+      "extension_id": "evaluate.reach",
+      "parameters": {
+        "contract": "reference.reach_evaluation",
+        "data": {
+          "tolerance_m": 0.01
+        },
+        "version": "1.0.0"
+      },
+      "version": "1.0.0"
+    },
+    "failure_policy": "retain_invalid_and_constraint_failures",
+    "family": "task.reach",
+    "goal": {
+      "contract": "reference.reach_goal",
+      "data": {
+        "target_m": [
+          0.29,
+          -0.035,
+          0.19
+        ]
+      },
+      "version": "1.0.0"
+    },
+    "initializer": {
+      "extension_id": "initialize.family",
+      "parameters": {
+        "contract": "family.initial",
+        "data": {
+          "qpos_rad": {
+            "distal1_cell_0_y": 0.0,
+            "distal1_cell_0_z": 0.0,
+            "distal1_cell_10_y": 0.0,
+            "distal1_cell_10_z": 0.0,
+            "distal1_cell_11_y": 0.0,
+            "distal1_cell_11_z": 0.0,
+            "distal1_cell_1_y": 0.0,
+            "distal1_cell_1_z": 0.0,
+            "distal1_cell_2_y": 0.0,
+            "distal1_cell_2_z": 0.0,
+            "distal1_cell_3_y": 0.0,
+            "distal1_cell_3_z": 0.0,
+            "distal1_cell_4_y": 0.0,
+            "distal1_cell_4_z": 0.0,
+            "distal1_cell_5_y": 0.0,
+            "distal1_cell_5_z": 0.0,
+            "distal1_cell_6_y": 0.0,
+            "distal1_cell_6_z": 0.0,
+            "distal1_cell_7_y": 0.0,
+            "distal1_cell_7_z": 0.0,
+            "distal1_cell_8_y": 0.0,
+            "distal1_cell_8_z": 0.0,
+            "distal1_cell_9_y": 0.0,
+            "distal1_cell_9_z": 0.0,
+            "near_cell_0_y": 0.0,
+            "near_cell_0_z": 0.0,
+            "near_cell_10_y": 0.0,
+            "near_cell_10_z": 0.0,
+            "near_cell_11_y": 0.0,
+            "near_cell_11_z": 0.0,
+            "near_cell_1_y": 0.0,
+            "near_cell_1_z": 0.0,
+            "near_cell_2_y": 0.0,
+            "near_cell_2_z": 0.0,
+            "near_cell_3_y": 0.0,
+            "near_cell_3_z": 0.0,
+            "near_cell_4_y": 0.0,
+            "near_cell_4_z": 0.0,
+            "near_cell_5_y": 0.0,
+            "near_cell_5_z": 0.0,
+            "near_cell_6_y": 0.0,
+            "near_cell_6_z": 0.0,
+            "near_cell_7_y": 0.0,
+            "near_cell_7_z": 0.0,
+            "near_cell_8_y": 0.0,
+            "near_cell_8_z": 0.0,
+            "near_cell_9_y": 0.0,
+            "near_cell_9_z": 0.0
+          },
+          "qvel_rad_s": {
+            "distal1_cell_0_y": 0.0,
+            "distal1_cell_0_z": 0.0,
+            "distal1_cell_10_y": 0.0,
+            "distal1_cell_10_z": 0.0,
+            "distal1_cell_11_y": 0.0,
+            "distal1_cell_11_z": 0.0,
+            "distal1_cell_1_y": 0.0,
+            "distal1_cell_1_z": 0.0,
+            "distal1_cell_2_y": 0.0,
+            "distal1_cell_2_z": 0.0,
+            "distal1_cell_3_y": 0.0,
+            "distal1_cell_3_z": 0.0,
+            "distal1_cell_4_y": 0.0,
+            "distal1_cell_4_z": 0.0,
+            "distal1_cell_5_y": 0.0,
+            "distal1_cell_5_z": 0.0,
+            "distal1_cell_6_y": 0.0,
+            "distal1_cell_6_z": 0.0,
+            "distal1_cell_7_y": 0.0,
+            "distal1_cell_7_z": 0.0,
+            "distal1_cell_8_y": 0.0,
+            "distal1_cell_8_z": 0.0,
+            "distal1_cell_9_y": 0.0,
+            "distal1_cell_9_z": 0.0,
+            "near_cell_0_y": 0.0,
+            "near_cell_0_z": 0.0,
+            "near_cell_10_y": 0.0,
+            "near_cell_10_z": 0.0,
+            "near_cell_11_y": 0.0,
+            "near_cell_11_z": 0.0,
+            "near_cell_1_y": 0.0,
+            "near_cell_1_z": 0.0,
+            "near_cell_2_y": 0.0,
+            "near_cell_2_z": 0.0,
+            "near_cell_3_y": 0.0,
+            "near_cell_3_z": 0.0,
+            "near_cell_4_y": 0.0,
+            "near_cell_4_z": 0.0,
+            "near_cell_5_y": 0.0,
+            "near_cell_5_z": 0.0,
+            "near_cell_6_y": 0.0,
+            "near_cell_6_z": 0.0,
+            "near_cell_7_y": 0.0,
+            "near_cell_7_z": 0.0,
+            "near_cell_8_y": 0.0,
+            "near_cell_8_z": 0.0,
+            "near_cell_9_y": 0.0,
+            "near_cell_9_z": 0.0
+          },
+          "unspecified": "zero"
+        },
+        "version": "1.0.0"
+      },
+      "version": "1.0.0"
+    },
+    "name": "New negative-y reach-and-hold feasibility study",
+    "objectives": [
+      {
+        "direction": "minimize",
+        "metric": "position_error",
+        "units": "m",
+        "weight": 1.0
+      }
+    ],
+    "observations": [
+      {
+        "dimension": 3,
+        "entity": "tip",
+        "frame": "world",
+        "missing": "unsupported",
+        "name": "tip_position",
+        "phase": "post_step",
+        "units": "m"
+      }
+    ],
+    "robot_families": [
+      "tendon_robot_family"
+    ],
+    "sampling": {
+      "aggregation": "per_instance",
+      "seeds": [
+        17
+      ],
+      "split": "development",
+      "window_s": [
+        0.0,
+        0.35
+      ]
+    },
+    "source": "User-authorized M3-B first-feasible scope b555900c; target frozen before its physical outcomes. Reuses reach_hold.json evaluator, initializer, timing, holding and sampling unchanged.",
+    "status": "development_valid",
+    "task_id": "family-multisegment-mirror-dev",
+    "task_version": "1.0.0",
+    "timing": {
+      "control_period_s": 0.01,
+      "duration_s": 0.35,
+      "sample_period_s": 0.01,
+      "termination": [
+        "duration",
+        "numerical_failure"
+      ],
+      "timestep_s": 0.0005
+    }
+  },
+  "task_identity": "7d4e6bf6bb30eab21cdafbe90f1dc30e201b167d90031b05fe7e44a0eea25c1b",
+  "initial_context": [
+    {
+      "artifact_id": "85b8e1082e11426513d34842a591123211654444173f19c8e60fccafa58a2196",
+      "media_type": "application/json"
+    }
+  ],
+  "prelaunch": {
+    "study_id": "first-feasible-mirror-20261015",
+    "implementation": "0ef83507d3134b0d68697b0b50180799d0ab15e1",
+    "resolved_identity": "100f22f7e01351607a41fec5afeebb383dc71619c6f28d799c718aec34041e2c",
+    "task_identity": "7d4e6bf6bb30eab21cdafbe90f1dc30e201b167d90031b05fe7e44a0eea25c1b",
+    "reference_candidate": {
+      "artifact_id": "4aba484eb56e7e092a2994db379cb161b861b1ec3a9522a7e00613dcef962d97",
+      "media_type": "application/json"
+    },
+    "candidate_identity": "3a1a35b9b87180b2a42851172b062a6dcd8de808751b09932b8ddcafd100dbd2",
+    "profile_identity": "6956585b3444abd271c48a6b8109d602df074a55e43a36fc5f1606884b2e9cc6",
+    "source_provenance": {
+      "references": {
+        "control": {
+          "path": "D:\\softrobot-agent\\.worktrees\\topology-control-feasibility\\configs\\research\\control.json",
+          "sha256": "d51b0d1418bbd9856cb12261442fa5947a9408f000f648ce3926e6e5b064f14f"
+        },
+        "robot": {
+          "path": "D:\\softrobot-agent\\.worktrees\\topology-control-feasibility\\configs\\research\\robot.json",
+          "sha256": "6a2674549dbe0e6aaeee767403633d12f7ee6ae7280a10bd7eaab1fff54a10f4"
+        },
+        "runtime": {
+          "path": "D:\\softrobot-agent\\.worktrees\\topology-control-feasibility\\configs\\research\\runtime.json",
+          "sha256": "1ba59441df32484316462de0f14eed9fd0e3903cc7d7b89dfccd134ba86f0c5a"
+        },
+        "source_study": {
+          "path": "D:\\softrobot-agent\\.worktrees\\topology-control-feasibility\\configs\\research\\study.json",
+          "sha256": "6be9c8df821b828d0e43650b014c4c7450d11aab3fef7852f0bb05a024c1ace6"
+        },
+        "task": {
+          "path": "D:\\softrobot-agent\\.worktrees\\topology-control-feasibility\\tasks\\reach_hold_mirror_v1.json",
+          "sha256": "dbe20b020609d53560638ed5f3cf1a4c44e0ba47b1c71f281b87e60dadf8344a"
+        },
+        "task_base": {
+          "path": "D:\\softrobot-agent\\.worktrees\\topology-control-feasibility\\tasks\\reach_hold.json",
+          "sha256": "b6d2f7746fa6ae756b2a3d2c02149840948532e54bf3fe032aafde60bc2b9d61"
+        }
+      },
+      "root": {
+        "path": "D:\\softrobot-agent\\.worktrees\\topology-control-feasibility\\configs\\research\\first_feasible_mirror.json",
+        "sha256": "7100bf44791a316698adc6d4186a272441a7291533174d5319ce850a0b5610b7"
+      }
+    },
+    "allowed_plan_actions": [
+      "propose",
+      "execute",
+      "search",
+      "diagnose",
+      "select",
+      "stop"
+    ],
+    "expected_callable_tools": [
+      "research_plan",
+      "research_analysis",
+      "evidence_read",
+      "retrieve_context"
+    ],
+    "unavailable_tool": "experience_retrieve is registered with formal-mode cancellation; research_rl absent",
+    "numerical_environment": {
+      "MKL_NUM_THREADS": "1",
+      "OMP_NUM_THREADS": "1",
+      "OPENBLAS_NUM_THREADS": "1"
+    },
+    "packages": {
+      "numpy": "2.4.6",
+      "casadi": "3.7.2",
+      "mujoco": "3.13.0",
+      "strands-agents": "1.59.0",
+      "strands-harness": "0.2.0"
+    },
+    "budget_remaining": {
+      "limit": {
+        "backend_solves": 3,
+        "model_calls": 12,
+        "tool_calls": 60,
+        "wall_s": null,
+        "worker_calls": 0
+      },
+      "used": {
+        "tool_calls": 0,
+        "model_calls": 0,
+        "backend_solves": 0,
+        "worker_calls": 0,
+        "wall_s": 0.0
+      },
+      "remaining": {
+        "backend_solves": 3,
+        "model_calls": 12,
+        "tool_calls": 60,
+        "wall_s": null,
+        "worker_calls": 0
+      },
+      "occupied": {}
+    },
+    "admission": {
+      "requested": 3,
+      "admitted": 3,
+      "internal_launches": 3,
+      "numerical_reservation_s": 0.0,
+      "confirmation_launch_reserve": 0,
+      "per_execution_s": null,
+      "remaining_numerical_s": null,
+      "remaining_activity_s": null
+    },
+    "source_hashes": {
+      "science": {
+        "extensions/tendon_family/gvs_nmpc.py": "ddb3207c293c8ba2584c8cb4eea9753cbafa42da85ee83e18df1eec2c955d77b",
+        "extensions/tendon_family/gvs_trajectory.py": "aa7ac451d2c1e3bec3ed9b771b2eed9a557f749f0758ce5606e136181810462e",
+        "extensions/tendon_family/gvs_projection.py": "4b17c9389652de3cc5a889384beba0a63dec18a7db0f7f9ed9696b3f794b8df7",
+        "extensions/tendon_family/contracts.py": "377929d221932bc4a802b13d5fb356ab93bd35c3efe1ed044ad8e94c8f013243",
+        "extensions/tendon_family/control_evidence.py": "31b1994df6c55880b3e2bb5adaaebe502badbf36a6b206c7f03b733e44af989a",
+        "extensions/tendon_family/backends.py": "70a19e629c559c902c657963c46736e3854c5f3b84886655c4b99a809edfac0e",
+        "extensions/tendon_family/generated_serial.py": "1c6e1eb0299ecc4f725f7654741626c65b867d90e4145764103e82daf53a9d52",
+        "extensions/tendon_family/gvs_profile.py": "2b3ece84dc409dfde88cfc4ef067d6248ab463b675db858177843bb672175895",
+        "extensions/tendon_family/gvs_codesign.py": "bdfee2a1fba8a79094e5084b09c90601cf8ead6ef872ce4d745c223e0680f147",
+        "extensions/tendon_family/gvs_casadi.py": "ae16f44882e4a7850dbdfa76e9942bb607bc92c51cf6b773356455a49d0dcdbd",
+        "extensions/tendon_family/gvs.py": "c0201588c34f90090e14c27302ef5a2bd2888626e06b4beb746b8889a9b9f320",
+        "extensions/tendon_family/gvs_basis.py": "0dd6ae2d26b180f9da588f8732f8a9d0800b633535485f5e7eca4c4b68bf3455",
+        "extensions/tendon_family/math_analysis.py": "838ba1b1ae9b399ea6e53f1e60f9e68af4cb2b9547173cf53041a3a438cd5f15",
+        "extensions/tendon_family/compiler.py": "29c338b0d343f20b6b9a7bd56dfbd1cc576d7342c65afe81cd17c0806bdb64e6",
+        "extensions/tendon_family/sections.py": "d7b5918c7f140e59f97ad1342f85f72fe7a3d1276af6c029e5b607fad016bd07",
+        "extensions/tendon_family/geometry.py": "6227f9b712f94e4853e734d7fd65373ff314bff02497b4c6bcc6d0dec4bb1e1b",
+        "extensions/tendon_family/manifest.py": "45850591451951a2e61f322b3ad033d7ff76fde8e508dfc5e9b58ed35f409e05",
+        "extensions/optimization/contracts.py": "21a7729881fce05a78356743199353151f581a55c6231b97e8f00b45323816b5",
+        "extensions/optimization/ipopt.py": "eb2672cb3845a17ef703d85f939545fa3e4d0358b6da42c89f83231bb00dbfb2",
+        "extensions/math_analysis/tools.py": "991ab623f27cdf852aa422dcee2cf618e17ecd7c445b49093f0b80a9c8b4c9e9",
+        "extensions/math_analysis/kernels.py": "b767e335fde15e575d76868544b31f339d84711f8708cd78bee48a965eaace0e",
+        "schemas/platform_analysis.py": "12f049478c25a5d6d791b91cae1826fc4181d99c049d53c6ee189c0092a84f95",
+        "tools/execution_completion.py": "b745b96446f9f7b1e5172a8f8cc8c93d2a053a7df385d6c0e2e7299aa946a069",
+        "tools/research_tasks.py": "cde37e55f1bf5a2d66543ad8b2fcbf1543f04fedcdbb460cb2ac644787cf594d",
+        "extensions/math_analysis/trajectory.py": "dc08d9c239c71bcf49a0c9f325fb11960769a8e141534d45a4048e8521f6fc1b",
+        "tools/rl/env.py": "d1d90e066852f385e25268a5eea20102e03397568a462159ad8ec24943492cf0",
+        "tools/rl/train.py": "9d7cee245ca67e3eda05dc2a3f34d500727dbe7695ed45450aa3368a5911b7cb",
+        "tools/rl/checks.py": "b965d96b73ba7e5d4e4248044be32dcf9b11f6502914cf173b8349457ceed5f4",
+        "tools/rl/continuation.py": "d4b6a0c231c3822e0dfea0b886b6e2273394450ceda9a6ff90ea3f06722c5e56"
+      },
+      "core": {
+        "tools/research/agent.py": "a0df76397a84425f26cc269298fc08d2b3e7482791475c82d367e7b738e175a0",
+        "tools/research/analysis.py": "dd252a71eedec1e17072d3dd6d44b2d2752864f1cc1a9f886fcc4a10a3ffbc08",
+        "tools/research/budget.py": "d73c678692997a6af26d9533b7cc1a325ae666e46e253233f69283606551bd5c",
+        "tools/research/config.py": "f95490ff40fd9929edd9df08b17cf8570c8893d3e3aa668efb7a3e34c7c0778c",
+        "tools/research/contracts.py": "d8e1c7d95e6d00b3f378a80a059fa5713aaff5665f673eb5b750d1a9e3d49016",
+        "tools/research/core.py": "93741e325169ad4511baa2fd73d43332ac9f0787b2590c1a48b71ea2a4f30699",
+        "tools/research/design.py": "3c74c80b22f95b9c54f83dbf2e8801c2f70df750d15aee87a1f14b3a4af63815",
+        "tools/research/diagnostic.py": "78ca53f9af275561d7f35edeb1f5b575a29f508264f7cd5c0a60d60bfb025faf",
+        "tools/research/execution.py": "973d329b5d790262099885a27851605edb9fc0634b2b740b487863958a2d8638",
+        "tools/research/execution_worker.py": "68a8f16ee3e859a37ccc334a884cc8b490a7ed8e11bbaed7377be553d8a52ae3",
+        "tools/research/experience.py": "08137de1f77870f18738b845d6417f49a56d94d9d95809ec92c7cd6aee18f2fa",
+        "tools/research/feedback.py": "2588e2573ab20b53f0a0910a868f8ba37c19b23029a0752ed860b46c9e3424ba",
+        "tools/research/mechanics.py": "ea618cf1991f882737db830ef3116eb7150271c5e278bdbd35a06a47a7b03dbd",
+        "tools/research/mechanics_worker.py": "0d139af160313fa210472814b7fd1929576de72ca8a54bce6caa48f5b4e5575f",
+        "tools/research/numerics.py": "a4f08d5984534d8e5b63b3b3f85b1e13aa25a614caf3b3855a65d0b290c0bad6",
+        "tools/research/rl.py": "23ad9604351225a2fd3549f03d69b926187082ad41169776f92d2b9c272b3d1a",
+        "tools/research/search.py": "c3b521cadafc57977e9771ec003ae092eeeeafac01de6b3828ec6208f7ecc9c9",
+        "tools/research/state.py": "2f15a5294dbc757176fa66940d408052f832ea97feb27b24d96e31972031d639",
+        "tools/research/task_constraints.py": "0a9b54c6e8b53edca7fea643bc4099d951b3efd6f559cb43a43b096cc2628a33",
+        "tools/research/__init__.py": "7eb70257593da06f682a3ddda54a9d260d4fc514f645237f5ca74b08f8da61a6",
+        "tools/research/__main__.py": "5c15f01744c59dd0efc9495c82d1fa5e83607dd68742569491544d3f560b3049",
+        "tools/service_execution.py": "e93d938e0af49c7f36c1a8cf1d1d9304f71fff8d7670029e2f0da00ca3f5f423",
+        "tools/rl/env.py": "d1d90e066852f385e25268a5eea20102e03397568a462159ad8ec24943492cf0",
+        "tools/rl/run.py": "f4542552eb165157bc0782ed12f44cc0237e74241e77c451571711e150d4ebd9",
+        "tools/rl/train.py": "9d7cee245ca67e3eda05dc2a3f34d500727dbe7695ed45450aa3368a5911b7cb",
+        "tools/rl/checks.py": "b965d96b73ba7e5d4e4248044be32dcf9b11f6502914cf173b8349457ceed5f4",
+        "tools/rl/continuation.py": "d4b6a0c231c3822e0dfea0b886b6e2273394450ceda9a6ff90ea3f06722c5e56"
+      }
+    },
+    "supplied_context": [
+      {
+        "artifact_id": "85b8e1082e11426513d34842a591123211654444173f19c8e60fccafa58a2196",
+        "media_type": "application/json"
+      }
+    ],
+    "provider": "deepseek-flash",
+    "credentials_checked": "Existing runtime reference exists; no credential value read or logged by this check.",
+    "focused_prelaunch_passed": true,
+    "live_provider_requests_so_far": 0,
+    "scientific_evaluations_so_far": 0
+  },
+  "novelty": "Fresh first feasible delivery on a new negative-y task instance relative to the eight prior branch archives; no claim of first-ever robot design, new topology invention or worldwide novelty.",
+  "sealed": true,
+  "selected": {
+    "artifact_id": "627250d36a48d8b2f91e48da5af28ec72c253a43e235423080bddcfdff9c6eed",
+    "media_type": "application/json"
+  },
+  "selected_solution": {
+    "artifact_id": "7b7313260344e80bacf7697d0a7800a8c46f640307ffc396c70500a0bc6aee4b",
+    "media_type": "application/json"
+  },
+  "candidate": {
+    "artifact_id": "4aba484eb56e7e092a2994db379cb161b861b1ec3a9522a7e00613dcef962d97",
+    "media_type": "application/json"
+  },
+  "candidate_id": "core-3a1a35b9b87180b2a42851172b062a6dcd8de808751b09932b8ddcafd100dbd2",
+  "parameters": {
+    "holding_tip_speed_weight": 0.1,
+    "segments": {
+      "distal1": {
+        "length_m": 0.11,
+        "material_scenario": null,
+        "sections": {
+          "0": {
+            "height_z_m": 0.0095,
+            "width_y_m": 0.0133
+          },
+          "1": {
+            "height_z_m": 0.008549999999999999,
+            "width_y_m": 0.0114
+          }
+        },
+        "young_pa": 5400000.0
+      },
+      "near": {
+        "length_m": 0.16,
+        "material_scenario": null,
+        "sections": {
+          "0": {
+            "semi_y_m": 0.0095,
+            "semi_z_m": 0.0076
+          }
+        },
+        "young_pa": 7200000.0
+      }
+    },
+    "terminal_tip_speed_weight": 0.1
+  },
+  "configuration_identity": "1156b9dfd5b0d5fabbf3591fe0c65d45f13374796397f91f9f49a03f13d3aee8",
+  "source_identity": "c9779c4fab817e1f33498426d056e1bd3a5ab4469043f2c163944f6c4a1a2b1f",
+  "profile_identity": "6956585b3444abd271c48a6b8109d602df074a55e43a36fc5f1606884b2e9cc6",
+  "controller_identity": "c1ed0c7e82f653a11b09f20ee47751671d6dc3d5cac5ffbd12e82869568c4bc1",
+  "physics_identity": "ff8127ff7de43b039544d8c5c2f4534bee17057b3a81fb6efe78eda9f12a19f5",
+  "execution_id": "7b1c8fdb049e4746ac4bed419b0bffbb",
+  "owner_run_id": "first-feasible-mirror-20261015-exec-2163557b50bf4241",
+  "acceptance": {
+    "accepted": true,
+    "components": {
+      "evaluation_validity": {
+        "limit": null,
+        "passed": true,
+        "reason": null,
+        "unit": null,
+        "value": "valid"
+      },
+      "evaluator:task_bound": {
+        "limit": 0.01,
+        "passed": true,
+        "reason": null,
+        "unit": "m",
+        "value": 0.0029565409454573983
+      },
+      "execution_complete": {
+        "limit": null,
+        "passed": true,
+        "reason": null,
+        "unit": null,
+        "value": true
+      },
+      "force_bounds": {
+        "limit": 1e-08,
+        "passed": true,
+        "reason": null,
+        "unit": "N",
+        "value": 0.0
+      },
+      "holding_coverage": {
+        "limit": 6,
+        "passed": true,
+        "reason": null,
+        "unit": "inclusive uniform samples",
+        "value": true
+      },
+      "holding_position": {
+        "limit": 0.01,
+        "passed": true,
+        "reason": null,
+        "unit": "m",
+        "value": 0.0030275861719793644
+      },
+      "holding_speed": {
+        "limit": 0.02,
+        "passed": true,
+        "reason": null,
+        "unit": "m/s",
+        "value": 0.014796119579108341
+      },
+      "solver_errors": {
+        "limit": 0,
+        "passed": true,
+        "reason": null,
+        "unit": "count",
+        "value": 0
+      },
+      "task_evaluator": {
+        "limit": null,
+        "passed": true,
+        "reason": null,
+        "unit": null,
+        "value": true
+      }
+    },
+    "continuous_time_guarantee": false,
+    "contract": "research.task_acceptance",
+    "evaluator_tension_channels": null,
+    "evidence_binding": {
+      "evaluation": {
+        "artifact_id": "32574f36f6d7aefd55e57ff6f3d41f787c0e4215eaa2d2dc9fbc901f3a69cf24",
+        "media_type": "application/json"
+      },
+      "evaluation_binding": {
+        "original_execution_id": "7b1c8fdb049e4746ac4bed419b0bffbb",
+        "source": {
+          "artifact_id": "84991b6d634d9d1784133b541dcf125f4b7eb98cab7bf03d1cc5d3040db353d0",
+          "media_type": "application/json"
+        },
+        "source_execution_id": "7b1c8fdb049e4746ac4bed419b0bffbb"
+      },
+      "profile": {
+        "artifact_id": "7407bd6eed8ed7a891d591a454fb3cbee8f5ea8280d97c9b5e8db244fbe52c70",
+        "media_type": "application/json"
+      },
+      "profile_binding": {
+        "evaluation": {
+          "artifact_id": "32574f36f6d7aefd55e57ff6f3d41f787c0e4215eaa2d2dc9fbc901f3a69cf24",
+          "media_type": "application/json"
+        },
+        "execution_id": "7b1c8fdb049e4746ac4bed419b0bffbb",
+        "simulation": {
+          "artifact_id": "84991b6d634d9d1784133b541dcf125f4b7eb98cab7bf03d1cc5d3040db353d0",
+          "media_type": "application/json"
+        }
+      },
+      "simulation": {
+        "artifact_id": "84991b6d634d9d1784133b541dcf125f4b7eb98cab7bf03d1cc5d3040db353d0",
+        "media_type": "application/json"
+      }
+    },
+    "execution_id": "7b1c8fdb049e4746ac4bed419b0bffbb",
+    "issues": [],
+    "metrics": {
+      "holding_max_error_m": 0.0030275861719793644,
+      "holding_max_speed_m_s": 0.014796119579108341,
+      "terminal_error_m": 0.0029565409454573983
+    },
+    "missing": [],
+    "protocol_id": "offline_reach_hold_v1",
+    "sources": {
+      "evaluation": {
+        "artifact_id": "32574f36f6d7aefd55e57ff6f3d41f787c0e4215eaa2d2dc9fbc901f3a69cf24",
+        "media_type": "application/json"
+      },
+      "profile": {
+        "artifact_id": "7407bd6eed8ed7a891d591a454fb3cbee8f5ea8280d97c9b5e8db244fbe52c70",
+        "media_type": "application/json"
+      }
+    },
+    "status": "accepted",
+    "task_family": "task.reach",
+    "task_identity": "7d4e6bf6bb30eab21cdafbe90f1dc30e201b167d90031b05fe7e44a0eea25c1b",
+    "timing": {
+      "control_period_s": 0.01,
+      "deadline_misses": 35,
+      "duration_s": 0.35,
+      "mean_update_s": 97.81408860856733,
+      "real_time_demonstrated": false,
+      "real_time_required": false,
+      "sample_period_s": 0.01,
+      "simulation_wall_s": 3432.0779999999795,
+      "termination": [
+        "duration",
+        "numerical_failure"
+      ],
+      "timestep_s": 0.0005
+    },
+    "version": "1.0.0"
+  },
+  "controller_facts": {
+    "complete": true,
+    "updates": 35,
+    "applied_control_updates": 35,
+    "accepted_plans": 35,
+    "unusable_plans": 0,
+    "raw_termination_counts": {
+      "Maximum_Iterations_Exceeded": 35
+    },
+    "converged_updates": 0,
+    "hold_last_responses": 0,
+    "solver_error_count": 0,
+    "tension_range_n": [
+      2.4595155631956423e-06,
+      6.874148642839243
+    ],
+    "drive_utilization": [
+      {
+        "limit_n": 8.0,
+        "maximum_n": 4.138856090995037,
+        "minimum_n": 0.8577792730689715,
+        "near_upper_fraction": 0.0,
+        "near_zero_fraction": 0.0,
+        "tendon": "near_t0",
+        "tendon_index": 0
+      },
+      {
+        "limit_n": 8.0,
+        "maximum_n": 6.874148642839243,
+        "minimum_n": 2.722223176983225,
+        "near_upper_fraction": 0.0,
+        "near_zero_fraction": 0.0,
+        "tendon": "near_t1",
+        "tendon_index": 1
+      },
+      {
+        "limit_n": 8.0,
+        "maximum_n": 3.283850312703691,
+        "minimum_n": 0.09303276485852419,
+        "near_upper_fraction": 0.0,
+        "near_zero_fraction": 0.0,
+        "tendon": "near_t2",
+        "tendon_index": 2
+      },
+      {
+        "limit_n": 8.0,
+        "maximum_n": 4.02305035458482,
+        "minimum_n": 2.7513880970747864,
+        "near_upper_fraction": 0.0,
+        "near_zero_fraction": 0.0,
+        "tendon": "far_t0",
+        "tendon_index": 3
+      },
+      {
+        "limit_n": 8.0,
+        "maximum_n": 6.616838880803159,
+        "minimum_n": 2.496063204023982,
+        "near_upper_fraction": 0.0,
+        "near_zero_fraction": 0.0,
+        "tendon": "far_t1",
+        "tendon_index": 4
+      },
+      {
+        "limit_n": 8.0,
+        "maximum_n": 3.5539463083051417,
+        "minimum_n": 2.4595155631956423e-06,
+        "near_upper_fraction": 0.0,
+        "near_zero_fraction": 0.0,
+        "tendon": "far_t2",
+        "tendon_index": 5
+      }
+    ],
+    "per_update_delivery_s": [
+      120.57307709997986,
+      110.06237929989584,
+      114.41917660005856,
+      111.82806379999965,
+      111.39817329996731,
+      109.23926729999948,
+      107.92503389995545,
+      108.76735550002195,
+      110.9275886999676,
+      104.46742540004198,
+      109.55795889999717,
+      110.23166579997633,
+      113.46558030007873,
+      115.76852629997302,
+      105.06050390005112,
+      112.1342870000517,
+      111.89370699995197,
+      116.64727260009386,
+      118.06493570003659,
+      110.54871699993964,
+      110.45998699998017,
+      111.46312460000627,
+      120.85846080002375,
+      111.78452869993635,
+      114.12219800008461,
+      111.5032081999816,
+      103.61391369998455,
+      90.90720539994072,
+      77.64759319997393,
+      66.98167509993073,
+      56.88549219991546,
+      44.122997500002384,
+      34.00100729998667,
+      22.85353480000049,
+      13.307479400071315
+    ],
+    "one_step_prediction_summary": {
+      "aligned_count": 35,
+      "frame": "world",
+      "maximum_speed_magnitude_difference_m_s": 0.1045074521917504,
+      "maximum_tip_difference_m": 0.0039650328338382244,
+      "maximum_velocity_vector_difference_m_s": 0.10664777485525048,
+      "mean_tip_difference_m": 0.0029018570800999114,
+      "missing": [],
+      "scope": "Only accepted first-step predictions matched to next execution timestamp; no future-plan replay comparison",
+      "velocity_matched_count": 35,
+      "velocity_missing": []
+    },
+    "backend_timings_s": {
+      "backend_call": 3429.0731346000684,
+      "engine_compile": 0.023710599984042346,
+      "prepare_compile": 0.09196600003633648,
+      "solve": 3428.768617899972
+    }
+  },
+  "physics_steps": 700,
+  "raw_exports": {
+    "actual_commands.json": {
+      "artifact_id": "d7f965f5e8db01ab88c088b5d4bbc761df7989cd4c915aa32723aac003fefe7f",
+      "media_type": "application/octet-stream"
+    },
+    "compiled_physics.json": {
+      "artifact_id": "3de397e148f1f46423a7e415db602eedc964fb286089f267aa56e0933ab7c575",
+      "media_type": "application/octet-stream"
+    },
+    "control_snapshots.json": {
+      "artifact_id": "d830a908e1c13ca485b566413ce22808cd139c44464a0b9b95c5bf6b8122e271",
+      "media_type": "application/octet-stream"
+    },
+    "control_spec.json": {
+      "artifact_id": "81ae1ed16b6049f0f9db93bbf0033e098f080374f007a4800c7fc0e815e6d254",
+      "media_type": "application/octet-stream"
+    },
+    "controller_observations.json": {
+      "artifact_id": "441f03cf7b432d5db9c3dad771849de82f255d5d8c30ca36a858da3b1e5312cc",
+      "media_type": "application/octet-stream"
+    },
+    "dynamics_execution.json": {
+      "artifact_id": "cc1a84dd1af99bacb73da26503126fd6466ba47a98b3914ea1845d4744ff18d6",
+      "media_type": "application/octet-stream"
+    },
+    "experiment_scene.json": {
+      "artifact_id": "7edd93ff9001ff3c2f36a419965001a96c3ffd648a73f26ef098fdfa0e9f4549",
+      "media_type": "application/octet-stream"
+    },
+    "experiment_spec.json": {
+      "artifact_id": "4981fc39bfc6d641265b9a28b8ce9b747d29590dabb2c1d7e38e2afb1379551c",
+      "media_type": "application/octet-stream"
+    },
+    "model_discretization.json": {
+      "artifact_id": "3991ec1b9ed1bd5cf783862b91bf7eafd0358ad6c2b516d8994d5fafa6e4e87a",
+      "media_type": "application/octet-stream"
+    },
+    "nmpc_updates.json": {
+      "artifact_id": "fe7d352471cfbd7c286a3d7de80944d7cc8eba22067c9283eb3631b6211c0903",
+      "media_type": "application/octet-stream"
+    },
+    "p_145068b029.json": {
+      "artifact_id": "437507012dbbb5b473ecb8290f8af79f0824401caf9e9d6d9d36e1e8d13eda28",
+      "media_type": "application/octet-stream"
+    },
+    "p_37f1d1e024.json": {
+      "artifact_id": "05873aadf9804778dc2d64c28d112dc02e7d25a8909163389a11925de3e7aa7d",
+      "media_type": "application/octet-stream"
+    },
+    "p_4343015926.json": {
+      "artifact_id": "b832019c0057b5885dd61a6e667a5725138d5a754405a5dd4e66d3693b2a6bc1",
+      "media_type": "application/octet-stream"
+    },
+    "p_732c3e8021.json": {
+      "artifact_id": "f82ad29203d0ad8e81c43f5869d00280b3c5635af9537b4e602dad424f5fb861",
+      "media_type": "application/octet-stream"
+    },
+    "p_83b479a521.json": {
+      "artifact_id": "26226acef22a97af01656b6ef987f0832bc951acbfdf65808d260eb10585552c",
+      "media_type": "application/octet-stream"
+    },
+    "p_853b1d206f.json": {
+      "artifact_id": "46fb2bba0333256e7dcc9a785681b2aa2d5ed52e79a689908ca480812d4d7532",
+      "media_type": "application/octet-stream"
+    },
+    "p_9adbf2ceff.json": {
+      "artifact_id": "03e52d68b9fdcdf3adc532c4054236f883d5196f9df6b554f2996b30ab4cd900",
+      "media_type": "application/octet-stream"
+    },
+    "p_a88299681c.json": {
+      "artifact_id": "1bf2d83997308038c4330838fe8bd9fbd5c6d2b362c9469d3159cbbc2c7aaf51",
+      "media_type": "application/octet-stream"
+    },
+    "p_cefb44ec17.json": {
+      "artifact_id": "ac5f43c12286bfd4fbfe4d136bc22420e552e4a15b8a4a8dde995db9c338bfbb",
+      "media_type": "application/octet-stream"
+    },
+    "p_d25a9fed44.json": {
+      "artifact_id": "552db43fd93adba1b70470ec808356b0d29256417ce5755baaf5884fc206ae35",
+      "media_type": "application/octet-stream"
+    },
+    "resolved_physics.json": {
+      "artifact_id": "9d7994a14149395e9fa7cf1318c9bab4f7cb6cc5f03336345751ad922e551302",
+      "media_type": "application/octet-stream"
+    },
+    "result.json": {
+      "artifact_id": "43735b88788676a31784f7f18b8d7f8abcd92014373d8e06e9c8ae184d13aba7",
+      "media_type": "application/octet-stream"
+    },
+    "robot.xml": {
+      "artifact_id": "24d42b720eca0b521d9a81d4c359c825423451db50255b04afee70555a0d669a",
+      "media_type": "application/octet-stream"
+    },
+    "robot_description.json": {
+      "artifact_id": "ef5faafd3fd03e33af74b28c9d37a7ffe9e4198f2e51256f129e599e40dfacc6",
+      "media_type": "application/octet-stream"
+    },
+    "solver_configuration.json": {
+      "artifact_id": "c7a9f804d5e3f799d274c47a74131d868aee6f20221e9b545283d2fc054f9737",
+      "media_type": "application/octet-stream"
+    },
+    "trajectory.json.gz": {
+      "artifact_id": "cba1403c090a41624ce6cbca8ac0ec29a9191624da775838e9cb4048a30b87d0",
+      "media_type": "application/octet-stream"
+    }
+  },
+  "motion_reference": {
+    "artifact_id": "0ddbe87befa6c9253d30674e1704a4448a8cfef0995f507216b94d43278aa536",
+    "media_type": "application/json"
+  },
+  "actual_model_tool_requests": [
+    {
+      "event_id": "94340e4924e64638ae699e4bebcf7110",
+      "reference": {
+        "artifact_id": "a974dd487b2a1ae0baa511d39d7be507eab4d029ae2117d583e37b74bd281525",
+        "media_type": "application/json"
+      },
+      "tool_use": {
+        "input": {
+          "reference": {
+            "artifact_id": "4aba484eb56e7e092a2994db379cb161b861b1ec3a9522a7e00613dcef962d97",
+            "media_type": "application/json"
+          }
+        },
+        "name": "evidence_read",
+        "toolUseId": "call_00_JLRBtfuKHTQvsdctxZsV9551"
+      }
+    },
+    {
+      "event_id": "5e681ab412e044368042781158339c2d",
+      "reference": {
+        "artifact_id": "1cc469fcc49cd0e7dca08795d4360da5bedcd5817c71b2e963767c46c5e986e5",
+        "media_type": "application/json"
+      },
+      "tool_use": {
+        "input": {
+          "reference": {
+            "artifact_id": "85b8e1082e11426513d34842a591123211654444173f19c8e60fccafa58a2196",
+            "media_type": "application/json"
+          }
+        },
+        "name": "evidence_read",
+        "toolUseId": "call_01_XXbZnZpjNzGIGsZ5nlnA7135"
+      }
+    },
+    {
+      "event_id": "2c66ff249817429da9668efbcff0f517",
+      "reference": {
+        "artifact_id": "1708ceb621cda22c40b0c25c7527f7c643a41c5eccc215b24f511880d5b59778",
+        "media_type": "application/json"
+      },
+      "tool_use": {
+        "input": {
+          "context_lines": 3,
+          "pattern": "\"topology\"|\"upsert_tendons\"|\"remove_tendons\"|\"guide_holes\"|\"points\"|\"role\"|\"part\"",
+          "reference": "call_00_JLRBtfuKHTQvsdctxZsV9551_0"
+        },
+        "name": "retrieve_context",
+        "toolUseId": "call_00_Kkwzap9ECKrjDKtATCRS9644"
+      }
+    },
+    {
+      "event_id": "60b5fd1f72a54f528550bdfb8fd6855f",
+      "reference": {
+        "artifact_id": "1187e6cf8815ed419cf246749bcd252bb504853b02575b3a64480a27708afb68",
+        "media_type": "application/json"
+      },
+      "tool_use": {
+        "input": {
+          "action": "execute",
+          "candidate": {
+            "artifact_id": "4aba484eb56e7e092a2994db379cb161b861b1ec3a9522a7e00613dcef962d97",
+            "media_type": "application/json"
+          },
+          "expected_observation": "A fresh independent backend launch completes all 35 updates within 0.35 s with 0 solver errors; the registered evaluator reports terminal position error <= 0.01 m and holding-vs-target error <= 0.01 m together with holding_max_speed_m_s <= 0.020, giving accepted=true and a single fresh complete pass.",
+          "fixed_conditions": "Frozen task family-multisegment-mirror-dev v1.0.0 unchanged: target_m [0.29,-0.035,0.19], 35 updates, duration 0.35 s, timestep 0.0005 s, control/sample period 0.01 s, position tolerance 0.01 m, inclusive last-0.05 s holding window, tip speed limit 0.020 m/s, seed 17, gravity/floor/mount and zero initial qpos/qvel unchanged.",
+          "hypothesis": "The frozen reference candidate (serial_two_group_v1: 3 near-group tendons routed through mid_guide holes near_h0/h1/h2 and 3 far-group tendons routed through far_h0/h1/h2 to distal1 anchors, pretension 0.2 N) has enough non-symmetric lateral (y) authority that the 35-update GVS-NMPC drives the tip into the 10 mm ball around the mirrored goal [0.29,-0.035,0.19] m and holds it with tip speed <= 0.020 m/s over the last 0.05 s, i.e. the parameter set accepted on the historical positive-y target transfers to the negative-y mirror.",
+          "interpretation": "An accepted result is fresh evidence that the two-group routing has sufficient mirrored lateral authority and closed-loop holding on this task; a rejected result bounds the transfer of the positive-y design and points to whether position authority or holding-speed damping is the binding constraint.",
+          "next_step": "diagnose",
+          "stopping_condition": "Stop as soon as the exact acceptance of this single fresh launch is read; if accepted, select this execution with no extra confirmations (zero configured extra repetitions seals it); if not accepted, stop and inspect the exact physical feedback before any candidate or routing change.",
+          "weakening_observation": "Holding speed above 0.020 m/s or holding / terminal position error above 0.01 m (as in the historical +y T0 failure at 0.0232 m/s holding speed), non-zero solver_error count, or numerical termination before 0.35 s; any of these would show the positive-y-validated routing does not transfer to the negative-y target as-is."
+        },
+        "name": "research_plan",
+        "toolUseId": "call_00_cVkTkEjWLW3XeY9qy7KK0491"
+      }
+    },
+    {
+      "event_id": "dd569034fdd340b6944c049bac252fba",
+      "reference": {
+        "artifact_id": "73912853ad1ae1c79a60d8d63c2adeb7acf8f004ec9b3522f94d75c3abeef9a1",
+        "media_type": "application/json"
+      },
+      "tool_use": {
+        "input": {
+          "pointer": "/acceptance",
+          "reference": {
+            "artifact_id": "627250d36a48d8b2f91e48da5af28ec72c253a43e235423080bddcfdff9c6eed",
+            "media_type": "application/json"
+          }
+        },
+        "name": "evidence_read",
+        "toolUseId": "call_00_qPGIqbWbRaWfx0g7u83A2811"
+      }
+    },
+    {
+      "event_id": "fda331b0adbc44c581f9f8c1378b0274",
+      "reference": {
+        "artifact_id": "c6104ad3a836c5506b5367c9b83f4fe52934004761af32bb6b5e92c0d1b47c84",
+        "media_type": "application/json"
+      },
+      "tool_use": {
+        "input": {
+          "action": "select",
+          "expected_observation": "The selection records execution_id 7b1c8fdb049e4746ac4bed419b0bffbb / artifact 627250d36a48d8b2f91e48da5af28ec72c253a43e235423080bddcfdff9c6eed as the frozen selected solution for task_identity 7d4e6bf6bb30eab21cdafbe90f1dc30e201b167d90031b05fe7e44a0eea25c1b, with required confirmations already satisfied (required_total 0) and no further exploration permitted.",
+          "fixed_conditions": "Frozen task family-multisegment-mirror-dev v1.0.0 (target [0.29,-0.035,0.19] m, 35 updates, 0.35 s, dt 0.0005 s, 0.01 m tolerance, inclusive last-0.05 s window, 0.020 m/s speed limit, seed 17) and frozen reference candidate core-3a1a35b9… / artifact 4aba484e… held unchanged.",
+          "hypothesis": "The single fresh, independently launched NMPC/MuJoCo execution of the frozen reference candidate on the frozen negative-y mirror task is a complete, valid, passing evaluation: the tip reaches within 10 mm of [0.29,-0.035,0.19] m (terminal 0.00296 m, holding 0.00303 m) and holds with tip speed 0.01480 m/s < 0.020 m/s over the inclusive last-0.05 s window, with 0 solver errors, so it is the exact passing reference to be selected and frozen.",
+          "interpretation": "A single fresh complete pass is delivery evidence that this two-group tendon routing and parameter set has sufficient mirrored lateral authority and closed-loop holding on the negative-y target; it is not evidence of repeatability, robustness, real-time capability, or optimality.",
+          "selected_execution": {
+            "artifact_id": "627250d36a48d8b2f91e48da5af28ec72c253a43e235423080bddcfdff9c6eed",
+            "media_type": "application/json"
+          },
+          "stopping_condition": "Stop immediately upon recording the selection; zero additional confirmations, no further executions, no candidate or routing edits.",
+          "weakening_observation": "Any mismatch between the selected artifact and the read acceptance (different execution_id, task_identity, or a component not passed), or a demand for additional repetitions, which would mean the pass is not exact/sealed."
+        },
+        "name": "research_plan",
+        "toolUseId": "call_00_TmUnJ0u9ZzIeJ5Ki3XiA0581"
+      }
+    }
+  ],
+  "tool_feedback": [
+    {
+      "reference": {
+        "artifact_id": "063b396a78f0d9e25b318a14c5713db7b58f6708e4395438bdc350c337b84dfc",
+        "media_type": "application/json"
+      },
+      "tool": "evidence_read",
+      "status": "success"
+    },
+    {
+      "reference": {
+        "artifact_id": "bfb1e8b8a2abdddee04bc43853a32a1364fbf45c1ab963cb6697b62977a5e658",
+        "media_type": "application/json"
+      },
+      "tool": "evidence_read",
+      "status": "success"
+    },
+    {
+      "reference": {
+        "artifact_id": "45a5e890d8e9ac3f790af2fa500a0867064e0acd885c6d1ad6c17e72d391d39b",
+        "media_type": "application/json"
+      },
+      "tool": "retrieve_context",
+      "status": "success"
+    },
+    {
+      "reference": {
+        "artifact_id": "49444ced778212932c82caa3919073cdb2aab15e313103b61de83f937b8ebb1e",
+        "media_type": "application/json"
+      },
+      "tool": "research_plan",
+      "status": "success"
+    },
+    {
+      "reference": {
+        "artifact_id": "598af6835e80ec4daa3621540532abd1e1c6557c1a1afe69cb357e5c480fe604",
+        "media_type": "application/json"
+      },
+      "tool": "evidence_read",
+      "status": "success"
+    },
+    {
+      "reference": {
+        "artifact_id": "5319ada1bfeb4c918d4aace93ec184cf8ce2fabdc223cfc682b232863d39fbd5",
+        "media_type": "application/json"
+      },
+      "tool": "research_plan",
+      "status": "success"
+    }
+  ],
+  "actual_research_plans": [
+    {
+      "reference": {
+        "artifact_id": "19ddda0f4cc47baad8ee1c97917e38a1d19b0d44644dff9ab34da1062026652f",
+        "media_type": "application/json"
+      },
+      "admission": {
+        "admitted": 1,
+        "confirmation_launch_reserve": 0,
+        "internal_launches": 1,
+        "numerical_reservation_s": 0.0,
+        "per_execution_s": null,
+        "remaining_activity_s": null,
+        "remaining_numerical_s": null,
+        "requested": 1
+      },
+      "experience_read_bindings": [],
+      "origin": "model",
+      "original_plan": {
+        "action": "execute",
+        "candidate": {
+          "artifact_id": "4aba484eb56e7e092a2994db379cb161b861b1ec3a9522a7e00613dcef962d97",
+          "media_type": "application/json"
+        },
+        "diagnostic": null,
+        "expected_observation": "A fresh independent backend launch completes all 35 updates within 0.35 s with 0 solver errors; the registered evaluator reports terminal position error <= 0.01 m and holding-vs-target error <= 0.01 m together with holding_max_speed_m_s <= 0.020, giving accepted=true and a single fresh complete pass.",
+        "experience_disposition": {},
+        "fixed_conditions": "Frozen task family-multisegment-mirror-dev v1.0.0 unchanged: target_m [0.29,-0.035,0.19], 35 updates, duration 0.35 s, timestep 0.0005 s, control/sample period 0.01 s, position tolerance 0.01 m, inclusive last-0.05 s holding window, tip speed limit 0.020 m/s, seed 17, gravity/floor/mount and zero initial qpos/qvel unchanged.",
+        "hypothesis": "The frozen reference candidate (serial_two_group_v1: 3 near-group tendons routed through mid_guide holes near_h0/h1/h2 and 3 far-group tendons routed through far_h0/h1/h2 to distal1 anchors, pretension 0.2 N) has enough non-symmetric lateral (y) authority that the 35-update GVS-NMPC drives the tip into the 10 mm ball around the mirrored goal [0.29,-0.035,0.19] m and holds it with tip speed <= 0.020 m/s over the last 0.05 s, i.e. the parameter set accepted on the historical positive-y target transfers to the negative-y mirror.",
+        "interpretation": "An accepted result is fresh evidence that the two-group routing has sufficient mirrored lateral authority and closed-loop holding on this task; a rejected result bounds the transfer of the positive-y design and points to whether position authority or holding-speed damping is the binding constraint.",
+        "mechanics": null,
+        "mechanics_source": null,
+        "next_step": "diagnose",
+        "parameters": null,
+        "revise_selection": false,
+        "search": null,
+        "selected_execution": null,
+        "stopping_condition": "Stop as soon as the exact acceptance of this single fresh launch is read; if accepted, select this execution with no extra confirmations (zero configured extra repetitions seals it); if not accepted, stop and inspect the exact physical feedback before any candidate or routing change.",
+        "supporting_evidence": [],
+        "weakening_observation": "Holding speed above 0.020 m/s or holding / terminal position error above 0.01 m (as in the historical +y T0 failure at 0.0232 m/s holding speed), non-zero solver_error count, or numerical termination before 0.35 s; any of these would show the positive-y-validated routing does not transfer to the negative-y target as-is."
+      },
+      "request_id": "native-call_00_cVkTkEjWLW3XeY9qy7KK0491"
+    },
+    {
+      "reference": {
+        "artifact_id": "ba27e7d02d6496260868bb784b8033b4bcaf1a740b9b217fb26220729f238369",
+        "media_type": "application/json"
+      },
+      "admission": {
+        "scope": "selection without execution or numerical reservation"
+      },
+      "experience_read_bindings": [],
+      "origin": "model",
+      "original_plan": {
+        "action": "select",
+        "candidate": null,
+        "diagnostic": null,
+        "expected_observation": "The selection records execution_id 7b1c8fdb049e4746ac4bed419b0bffbb / artifact 627250d36a48d8b2f91e48da5af28ec72c253a43e235423080bddcfdff9c6eed as the frozen selected solution for task_identity 7d4e6bf6bb30eab21cdafbe90f1dc30e201b167d90031b05fe7e44a0eea25c1b, with required confirmations already satisfied (required_total 0) and no further exploration permitted.",
+        "experience_disposition": {},
+        "fixed_conditions": "Frozen task family-multisegment-mirror-dev v1.0.0 (target [0.29,-0.035,0.19] m, 35 updates, 0.35 s, dt 0.0005 s, 0.01 m tolerance, inclusive last-0.05 s window, 0.020 m/s speed limit, seed 17) and frozen reference candidate core-3a1a35b9… / artifact 4aba484e… held unchanged.",
+        "hypothesis": "The single fresh, independently launched NMPC/MuJoCo execution of the frozen reference candidate on the frozen negative-y mirror task is a complete, valid, passing evaluation: the tip reaches within 10 mm of [0.29,-0.035,0.19] m (terminal 0.00296 m, holding 0.00303 m) and holds with tip speed 0.01480 m/s < 0.020 m/s over the inclusive last-0.05 s window, with 0 solver errors, so it is the exact passing reference to be selected and frozen.",
+        "interpretation": "A single fresh complete pass is delivery evidence that this two-group tendon routing and parameter set has sufficient mirrored lateral authority and closed-loop holding on the negative-y target; it is not evidence of repeatability, robustness, real-time capability, or optimality.",
+        "mechanics": null,
+        "mechanics_source": null,
+        "next_step": null,
+        "parameters": null,
+        "revise_selection": false,
+        "search": null,
+        "selected_execution": {
+          "artifact_id": "627250d36a48d8b2f91e48da5af28ec72c253a43e235423080bddcfdff9c6eed",
+          "media_type": "application/json"
+        },
+        "stopping_condition": "Stop immediately upon recording the selection; zero additional confirmations, no further executions, no candidate or routing edits.",
+        "supporting_evidence": [],
+        "weakening_observation": "Any mismatch between the selected artifact and the read acceptance (different execution_id, task_identity, or a component not passed), or a demand for additional repetitions, which would mean the pass is not exact/sealed."
+      },
+      "request_id": "native-call_00_TmUnJ0u9ZzIeJ5Ki3XiA0581"
+    }
+  ],
+  "decision_packets": [
+    {
+      "artifact_id": "de8c707513810d9d344665eb3638768ad39231448d87c740787bab8933c55602",
+      "media_type": "application/json"
+    },
+    {
+      "artifact_id": "3faa0e9de7be585bf1f04c544289cf0b0aeecb6f72702997abdfca8d41a789a0",
+      "media_type": "application/json"
+    },
+    {
+      "artifact_id": "00e15cc162d1438a2bd373b95cb60f35116f25527b79731b8b46143e3547da14",
+      "media_type": "application/json"
+    },
+    {
+      "artifact_id": "2c4558e13fa67ca3278362fd037342db3e69591717763596cfe6e00ed1d0e195",
+      "media_type": "application/json"
+    },
+    {
+      "artifact_id": "8a0f2334d1608d07fe9e4688265e2800eeeb60a1e250a775058ad6e1fa0e667d",
+      "media_type": "application/json"
+    }
+  ],
+  "research_behavior": {
+    "read_frozen_candidate": true,
+    "read_historical_scoped_context": true,
+    "testable_hypothesis": true,
+    "freely_selected_real_action": true,
+    "executed_actual_reference_candidate": true,
+    "consumed_fresh_physical_evidence": true,
+    "selected_exact_read_execution": true,
+    "proposed_new_candidates": 0,
+    "structure_modified": false,
+    "control_modified": false,
+    "topology_tendon_count": 6,
+    "note": "Model chose to test the unchanged starting structure/control first and selected the first pass. This demonstrates delivery and evidence-based closeout, not multi-round feedback adaptation or structural optimization.",
+    "historical_wording_limit": "The initial model hypothesis described transfer from an accepted positive-y parameter set. Exact unchanged T0 had failed the positive-y holding-speed test; prior passing cases changed routing or modulus. Original model wording is preserved as a hypothesis, not adopted as a verified historical fact."
+  },
+  "final_counts": {
+    "provider_requests": 5,
+    "public_operations": 9,
+    "mathematical_evaluations": 0,
+    "full_backend_launches": 1,
+    "rl_training_stages": 0,
+    "local_solves": 0,
+    "offline_nlp": 0,
+    "bdf_replays": 0,
+    "extra_confirmations": 0
+  },
+  "remaining": {
+    "backend_solves": 2,
+    "model_calls": 7,
+    "tool_calls": 51,
+    "wall_s": null,
+    "worker_calls": 0
+  },
+  "ledger": {
+    "limit": {
+      "backend_solves": 3,
+      "model_calls": 12,
+      "tool_calls": 60,
+      "wall_s": null,
+      "worker_calls": 0
+    },
+    "used": {
+      "tool_calls": 9,
+      "model_calls": 5,
+      "backend_solves": 1,
+      "worker_calls": 0,
+      "wall_s": 3481.2500000001164
+    },
+    "remaining": {
+      "backend_solves": 2,
+      "model_calls": 7,
+      "tool_calls": 51,
+      "wall_s": null,
+      "worker_calls": 0
+    },
+    "occupied": {}
+  },
+  "observed_prepare_to_close_s": 3528.797148704529,
+  "numerical_s": 3434.7410393998725,
+  "execution_numerical_s": 3434.1202697999543,
+  "provider_usage": {
+    "prompt_tokens": 184190,
+    "completion_tokens": 6067,
+    "total_tokens": 190257
+  },
+  "success_gate": {
+    "candidate": {
+      "artifact_id": "4aba484eb56e7e092a2994db379cb161b861b1ec3a9522a7e00613dcef962d97",
+      "media_type": "application/json"
+    },
+    "engineering": false,
+    "evidence": {
+      "artifact_id": "627250d36a48d8b2f91e48da5af28ec72c253a43e235423080bddcfdff9c6eed",
+      "media_type": "application/json"
+    },
+    "model_selection_complete": true,
+    "observed_task_pass": true
+  },
+  "final_disposition": {
+    "artifact_id": "ba27e7d02d6496260868bb784b8033b4bcaf1a740b9b217fb26220729f238369",
+    "media_type": "application/json"
+  },
+  "claims": {
+    "selected": {
+      "artifact_id": "627250d36a48d8b2f91e48da5af28ec72c253a43e235423080bddcfdff9c6eed",
+      "media_type": "application/json"
+    },
+    "model_selected_structure_search_evaluations": 0,
+    "selected_structurally_new": false,
+    "new_design_and_control_confirmed": false,
+    "independent_confirmation_count": 0,
+    "required_confirmations": 0,
+    "confirmation_failures": 0,
+    "confirmation_progress": {
+      "required_total": 0,
+      "historical_confirmations": 0,
+      "current_study_confirmations": 0,
+      "remaining": 0,
+      "failures": 0,
+      "invalid_executions": 0,
+      "executions": [],
+      "confirmed": false,
+      "correct_operation": {
+        "tool": "research_plan",
+        "action": "select",
+        "selected_execution": {
+          "artifact_id": "627250d36a48d8b2f91e48da5af28ec72c253a43e235423080bddcfdff9c6eed",
+          "media_type": "application/json"
+        }
+      }
+    },
+    "limited_repeat_supported_acceptance": false,
+    "task_passed": true,
+    "required_extra_confirmations": 0,
+    "executed_extra_confirmations": 0,
+    "confirmation_status": "not_required",
+    "reproducibility_assessed": false,
+    "parameter_improvement_attribution_permitted": false,
+    "interface_evaluations": 0
+  },
+  "unsealed_calls": 0,
+  "owned_active_workers": 0,
+  "limitations": [
+    "Single complete evaluation, one seed, ideal bounded tensions and simulated physics.",
+    "No repeatability, robustness, hardware, real-time, global optimum or Agent-versus-optimization efficiency evidence.",
+    "Mathematical tools and structural/control changes were available but not needed/chosen before the first pass.",
+    "No new segment count or incompatible policy/state transfer capability implemented."
+  ]
+}

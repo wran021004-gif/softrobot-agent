@@ -119,3 +119,54 @@ not statistical superiority, repeatability, robustness or global optimality.
 [Protocol and exact comparison](../../evidence/topology_control_20261015/b2/comparison.json),
 [T0 full evidence](../../evidence/topology_control_20261015/b2/T0/scientific_summary.json),
 [T2 full evidence](../../evidence/topology_control_20261015/b2/T2/scientific_summary.json).
+
+# New-task first-feasible live research (2026-10-15)
+
+`first-feasible-mirror-20261015` was prepared and bound to committed implementation
+`0ef83507d3134b0d68697b0b50180799d0ab15e1` before any provider request. Frozen
+configuration identity is `100f22f7e01351607a41fec5afeebb383dc71619c6f28d799c718aec34041e2c`.
+The new `family-multisegment-mirror-dev@1.0.0` target is `[0.29,-0.035,0.19]` m;
+all eight prior branch archives exposed only the positive-y goal. This is a new
+task instance relative to available evidence, not a first-ever feasible robot.
+Task/evaluator/holding semantics were unchanged throughout the live study.
+
+The actual Strands/DeepSeek model publicly read the frozen candidate and labeled
+historical context, retrieved routing details, and hypothesized sufficient
+non-symmetric lateral authority. It freely chose to execute the unchanged starting
+six-tendon structure and control first, without a mathematical call or new proposal.
+Both speed-cost weights stayed 0.1; segment/material/section/routing values stayed
+at the reference. The returned complete pass triggered the existing success gate.
+The model publicly read its exact acceptance and selected it; no further science
+or confirmation repetition occurred. Its initial wording about transfer from an
+accepted positive-y parameter set was imprecise: exact unchanged T0 had failed
+positive-y holding speed; the historical passing cases changed routing or modulus.
+That wording remains an original hypothesis, not an adopted historical fact.
+
+| Frozen acceptance metric | Fresh observation | Limit |
+|---|---:|---:|
+| Terminal error | 0.00295654094546 m | 0.010 m |
+| Holding maximum error | 0.00302758617198 m | 0.010 m |
+| Holding maximum speed | 0.0147961195791 m/s | 0.020 m/s |
+
+**Fresh complete task pass read, selected and sealed.** All 35 updates / 700
+physics steps completed, all 35 iteration-limited plans were independently
+accepted, and no solver error, unusable plan or bounded fallback occurred. The
+execution artifact is `627250d36a48d8b2f91e48da5af28ec72c253a43e235423080bddcfdff9c6eed`;
+selected solution is `7b7313260344e80bacf7697d0a7800a8c46f640307ffc396c70500a0bc6aee4b`.
+
+Actual counts: 5/12 provider requests, 9/60 public operations, 1/3 complete backend
+launches, 0/10 mathematical evaluations, zero RL/local/offline NLP/BDF/extra
+confirmations. Provider usage reported 184190 prompt and 6067 completion tokens.
+Observed preparation-to-close time was 3528.797 s; cumulative numerical work was
+3434.741 s, including a 3434.120 s complete execution. The ledger reports
+3481.250 elapsed-cost seconds; these overlapping observations are not additive
+limits. Seven provider requests and two backend launches were deliberately unused.
+No unsealed call, pending result or owned worker remains.
+
+This demonstrates autonomous action selection and exact evidence-based closeout
+after a first-attempt new-task delivery. It does not demonstrate multi-round
+feedback adaptation, newly optimized structure/control, Agent efficiency superiority,
+repeatability, robustness, hardware operation or real-time control. Variable segment
+count and incompatible policy/state transfer remain outside this milestone.
+[Original decisions, evidence references, metrics and counts](../../evidence/topology_control_20261015/live/scientific_summary.json),
+[sealed disposition](../../evidence/topology_control_20261015/live/disposition.json).
