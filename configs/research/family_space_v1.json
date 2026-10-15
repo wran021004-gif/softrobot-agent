@@ -1,0 +1,582 @@
+{
+  "version": "serial_family_space_v1",
+  "family_id": "serial_external_tendons_v1",
+  "assumptions": [
+    "SI; serial bending only; external frictionless straight tendon spans",
+    "One independent ideal tension per tendon; guide holes have fixed supplied inertia",
+    "Task environment owns mount and forces; assembly prototypes own connector, guide and payload",
+    "Clearance checks cover route stations and guide holes; swept self-collision is not validated"
+  ],
+  "segment_count_bounds": [
+    1,
+    9
+  ],
+  "tendon_count_bounds": [
+    1,
+    12
+  ],
+  "executable_segment_counts": [
+    2
+  ],
+  "executable_tendon_count_bounds": [
+    1,
+    7
+  ],
+  "segment_domain": {
+    "length_m": {
+      "minimum": 0.06,
+      "maximum": 0.24,
+      "default": 0.14
+    },
+    "young_pa": {
+      "minimum": 2000000.0,
+      "maximum": 15000000.0,
+      "default": 7000000.0
+    },
+    "section_dimensions_m": {
+      "circle": {
+        "radius_m": {
+          "minimum": 0.003,
+          "maximum": 0.012,
+          "default": 0.008
+        }
+      },
+      "tube": {
+        "outer_radius_m": {
+          "minimum": 0.005,
+          "maximum": 0.012,
+          "default": 0.009
+        },
+        "inner_radius_m": {
+          "minimum": 0.001,
+          "maximum": 0.004,
+          "default": 0.003
+        }
+      },
+      "ellipse": {
+        "semi_y_m": {
+          "minimum": 0.003,
+          "maximum": 0.012,
+          "default": 0.0095
+        },
+        "semi_z_m": {
+          "minimum": 0.003,
+          "maximum": 0.012,
+          "default": 0.0076
+        }
+      },
+      "rectangle": {
+        "width_y_m": {
+          "minimum": 0.006,
+          "maximum": 0.018,
+          "default": 0.0133
+        },
+        "height_z_m": {
+          "minimum": 0.006,
+          "maximum": 0.018,
+          "default": 0.0095
+        }
+      }
+    }
+  },
+  "segment_domains": {
+    "0": {
+      "length_m": {
+        "minimum": 0.08,
+        "maximum": 0.24,
+        "default": 0.16
+      },
+      "young_pa": {
+        "minimum": 2000000.0,
+        "maximum": 15000000.0,
+        "default": 7200000.0
+      },
+      "section_dimensions_m": {
+        "circle": {
+          "radius_m": {
+            "minimum": 0.003,
+            "maximum": 0.012,
+            "default": 0.008
+          }
+        },
+        "tube": {
+          "outer_radius_m": {
+            "minimum": 0.005,
+            "maximum": 0.012,
+            "default": 0.009
+          },
+          "inner_radius_m": {
+            "minimum": 0.001,
+            "maximum": 0.004,
+            "default": 0.003
+          }
+        },
+        "ellipse": {
+          "semi_y_m": {
+            "minimum": 0.003,
+            "maximum": 0.012,
+            "default": 0.0095
+          },
+          "semi_z_m": {
+            "minimum": 0.003,
+            "maximum": 0.012,
+            "default": 0.0076
+          }
+        },
+        "rectangle": {
+          "width_y_m": {
+            "minimum": 0.006,
+            "maximum": 0.018,
+            "default": 0.0133
+          },
+          "height_z_m": {
+            "minimum": 0.006,
+            "maximum": 0.018,
+            "default": 0.0095
+          }
+        }
+      }
+    },
+    "1": {
+      "length_m": {
+        "minimum": 0.06,
+        "maximum": 0.2,
+        "default": 0.11
+      },
+      "young_pa": {
+        "minimum": 2000000.0,
+        "maximum": 15000000.0,
+        "default": 5400000.0
+      },
+      "section_dimensions_m": {
+        "circle": {
+          "radius_m": {
+            "minimum": 0.003,
+            "maximum": 0.012,
+            "default": 0.008
+          }
+        },
+        "tube": {
+          "outer_radius_m": {
+            "minimum": 0.005,
+            "maximum": 0.012,
+            "default": 0.009
+          },
+          "inner_radius_m": {
+            "minimum": 0.001,
+            "maximum": 0.004,
+            "default": 0.003
+          }
+        },
+        "ellipse": {
+          "semi_y_m": {
+            "minimum": 0.003,
+            "maximum": 0.012,
+            "default": 0.0095
+          },
+          "semi_z_m": {
+            "minimum": 0.003,
+            "maximum": 0.012,
+            "default": 0.0076
+          }
+        },
+        "rectangle": {
+          "width_y_m": {
+            "minimum": 0.006,
+            "maximum": 0.018,
+            "default": 0.0133
+          },
+          "height_z_m": {
+            "minimum": 0.006,
+            "maximum": 0.018,
+            "default": 0.0095
+          }
+        }
+      }
+    }
+  },
+  "tendon_domains": {
+    "diameter_m": {
+      "minimum": 0.0005,
+      "maximum": 0.0012,
+      "default": 0.001
+    },
+    "force_limit_n": {
+      "minimum": 1.0,
+      "maximum": 8.0,
+      "default": 8.0
+    },
+    "pretension_n": {
+      "minimum": 0.0,
+      "maximum": 1.0,
+      "default": 0.2
+    },
+    "length_servo_gain_n_m": {
+      "minimum": 300.0,
+      "maximum": 1500.0,
+      "default": 900.0
+    }
+  },
+  "routing_domains": {
+    "radius_m": {
+      "minimum": 0.014,
+      "maximum": 0.023,
+      "default": 0.018
+    },
+    "guide_s": {
+      "minimum": 0.15,
+      "maximum": 0.75,
+      "default": 0.5
+    },
+    "anchor_s": {
+      "minimum": 0.8,
+      "maximum": 1.0,
+      "default": 1.0
+    },
+    "phase_rad": {
+      "minimum": -6.283185307179586,
+      "maximum": 6.283185307179586,
+      "default": 0.0
+    },
+    "angular_offset_rad": {
+      "minimum": -3.141592653589793,
+      "maximum": 3.141592653589793,
+      "default": 0.0
+    }
+  },
+  "control_domains": {
+    "holding_tip_speed_weight": {
+      "minimum": 0.0,
+      "maximum": 1.0,
+      "default": 0.1
+    },
+    "terminal_tip_speed_weight": {
+      "minimum": 0.0,
+      "maximum": 1.0,
+      "default": 0.1
+    }
+  },
+  "assembly": {
+    "components": [
+      {
+        "connection": {
+          "part": "fixed_base",
+          "position_m": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "quaternion_wxyz": [
+            1.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "s": 0.0
+        },
+        "id": "segment_0",
+        "interpolation": "step",
+        "kind": "flexible_segment",
+        "length_m": 0.16,
+        "natural_curvature_rad_m": [
+          0.0,
+          0.0
+        ],
+        "physics": {
+          "bending_ei_nm2": null,
+          "bending_viscosity_nm2_s": [
+            0.0005,
+            0.0007
+          ],
+          "density_kg_m3": 1100.0,
+          "line_density_kg_m": null,
+          "mode": "material",
+          "young_pa": 7200000.0
+        },
+        "sections": [
+          {
+            "s": 0.0,
+            "section": {
+              "angle_rad": 0.35,
+              "holes_yz_m": [],
+              "kind": "ellipse",
+              "outer_yz_m": [],
+              "parameters": {
+                "semi_y_m": 0.0095,
+                "semi_z_m": 0.0076
+              }
+            }
+          }
+        ]
+      },
+      {
+        "com_local_m": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "connection": {
+          "part": "segment_0",
+          "position_m": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "quaternion_wxyz": [
+            1.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "s": 1.0
+        },
+        "envelope_halfsize_m": [
+          0.002,
+          0.025,
+          0.025
+        ],
+        "guide_holes": {},
+        "hole_radius_m": 0.0015,
+        "id": "mid_guide",
+        "inertia_com_local_kg_m2": [
+          [
+            4e-07,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            2e-07,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            2e-07
+          ]
+        ],
+        "kind": "guide",
+        "mass_kg": 0.002
+      },
+      {
+        "com_local_m": [
+          0.006,
+          0.0,
+          0.0
+        ],
+        "connection": {
+          "part": "mid_guide",
+          "position_m": [
+            0.002,
+            0.0,
+            0.0
+          ],
+          "quaternion_wxyz": [
+            1.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "s": 0.0
+        },
+        "envelope_halfsize_m": [
+          0.006,
+          0.006,
+          0.006
+        ],
+        "guide_holes": {},
+        "hole_radius_m": 0.0,
+        "id": "connector",
+        "inertia_com_local_kg_m2": [
+          [
+            5e-08,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            7e-08,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            7e-08
+          ]
+        ],
+        "kind": "rigid_connector",
+        "mass_kg": 0.003
+      },
+      {
+        "connection": {
+          "part": "connector",
+          "position_m": [
+            0.012,
+            0.0,
+            0.0
+          ],
+          "quaternion_wxyz": [
+            1.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "s": 0.0
+        },
+        "id": "segment_1",
+        "interpolation": "linear",
+        "kind": "flexible_segment",
+        "length_m": 0.11,
+        "natural_curvature_rad_m": [
+          0.0,
+          0.0
+        ],
+        "physics": {
+          "bending_ei_nm2": null,
+          "bending_viscosity_nm2_s": [
+            0.0003,
+            0.0004
+          ],
+          "density_kg_m3": 1050.0,
+          "line_density_kg_m": null,
+          "mode": "material",
+          "young_pa": 5400000.0
+        },
+        "sections": [
+          {
+            "s": 0.0,
+            "section": {
+              "angle_rad": -0.25,
+              "holes_yz_m": [],
+              "kind": "rectangle",
+              "outer_yz_m": [],
+              "parameters": {
+                "height_z_m": 0.0095,
+                "width_y_m": 0.0133
+              }
+            }
+          },
+          {
+            "s": 1.0,
+            "section": {
+              "angle_rad": 0.15000000000000002,
+              "holes_yz_m": [],
+              "kind": "rectangle",
+              "outer_yz_m": [],
+              "parameters": {
+                "height_z_m": 0.008549999999999999,
+                "width_y_m": 0.0114
+              }
+            }
+          }
+        ]
+      },
+      {
+        "com_local_m": [
+          0.007,
+          0.001,
+          -0.002
+        ],
+        "connection": {
+          "part": "segment_1",
+          "position_m": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "quaternion_wxyz": [
+            1.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "s": 1.0
+        },
+        "envelope_halfsize_m": [
+          0.009,
+          0.009,
+          0.008
+        ],
+        "guide_holes": {},
+        "hole_radius_m": 0.0,
+        "id": "payload",
+        "inertia_com_local_kg_m2": [
+          [
+            6e-07,
+            1e-07,
+            0.0
+          ],
+          [
+            1e-07,
+            8e-07,
+            1e-07
+          ],
+          [
+            0.0,
+            1e-07,
+            9e-07
+          ]
+        ],
+        "kind": "payload",
+        "mass_kg": 0.01
+      }
+    ],
+    "tip": {
+      "part": "payload",
+      "position_m": [
+        0.014,
+        0.0,
+        0.0
+      ],
+      "quaternion_wxyz": [
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "s": 0.0
+    },
+    "mesh": {
+      "cells": {
+        "segment_0": 12,
+        "segment_1": 12
+      },
+      "coordinates": "two_principal_bending_angles_per_cell",
+      "model": "serial_bending_cells_v1",
+      "version": "serial_bending_discretization_v1"
+    },
+    "provenance": {
+      "source": "configs/research/robot.json",
+      "source_provenance": {
+        "source_commit": "a8c1231b428e7451769451a3a236bd431a86ba05",
+        "archive": "evidence/contained_autonomous_study_20261014",
+        "candidate": {
+          "artifact_id": "02eee599912cf23f611d13ec332f920853f79b4f043aee5526e5fcba62ee795d",
+          "media_type": "application/json"
+        },
+        "configuration_sha256": "ba0b4baf56f918af291a131549d9715772651eb9af863951afb4c4af6ef66bab",
+        "ownership": "Current contained research initial nominal; artifact read only, zero new scientific executions"
+      },
+      "reuse": "Physical segment, connector, guide, payload prototypes only; source routes/actuators excluded; indexed segment IDs"
+    }
+  },
+  "actuator_defaults": {
+    "rule": "independent_displacement_ideal_tension_v1",
+    "limits_m": [
+      -0.015,
+      0.015
+    ],
+    "velocity_limit_m_s": 0.025
+  },
+  "unsupported": [
+    "segment counts other than two (M3-C2)",
+    "8-12 tendons: declared, not execution validated",
+    "polygon section domain not granted in this example",
+    "Dense structural-node layouts require separate numerical checks; a 22-coordinate zero-state CasADi dynamics solve failed despite a full-rank mass matrix",
+    "axial extension",
+    "shear",
+    "twist",
+    "friction",
+    "swept self-collision"
+  ]
+}

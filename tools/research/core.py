@@ -49,7 +49,7 @@ def prepare(spec_path=DEFAULT_SPEC, directory=None, profile=None):
     if h.store.db.exists() and h.store.connect(True).execute('SELECT COUNT(*) FROM sessions WHERE run_id=?',(run_id,)).fetchone()[0]:
         if state(h)['spec'] != spec:
             raise ValueError('STUDY_SPEC_CHANGED_USE_EXPLICIT_MIGRATION')
-        if not state(h).get('reference_candidate'):
+        if not state(h).get('reference_candidate') and spec.get('start_mode')!='family_space':
             started=time.perf_counter()
             candidate=construct(h,spec['reference_parameters'],dict(origin='initialization_recovery_no_scientific_dispatch'))
             update(h,reference_candidate=candidate,numerical_s=state(h)['numerical_s']+time.perf_counter()-started)
@@ -85,6 +85,12 @@ def prepare(spec_path=DEFAULT_SPEC, directory=None, profile=None):
     if spec.get('nominal_source'):
         update(h,nominal_configuration=nominal['configuration'],nominal_provenance=nominal['provenance'],mathematical_evaluations=0,analysis_results=[],analysis_costs=[],search_results=[],assignment_started_unix=time.time(),accounting_scope='Cumulative assignment includes engineering preflight; never reset at live start')
     update(h,scoped_context=[save(h,read(ROOT/path),'supplied_scoped_context') for path in spec.get('supplied_evidence',[])])
+    if spec.get('start_mode')=='family_space':
+        update(h,reference_candidate=None,mathematical_evaluations=0,analysis_results=[],analysis_costs=[],search_results=[],
+            compatibility_preparation_s=time.perf_counter()-start)
+        atomic_json(directory/'resolved_configuration.json',spec)
+        atomic_json(directory/'activity.json',spec)
+        return h
     candidate = construct(h, spec['reference_parameters'], dict(origin='initial_controller_reference', historical_result_ownership='sealed source activity'))
     update(h, reference_candidate=candidate, numerical_s=max(state(h)['numerical_s'],time.perf_counter()-start))
     if enabled(spec,'rl'):
@@ -150,7 +156,7 @@ def bind(host, reason=None, specification=None):
                 old_results_and_costs_retained=True,improvement_requires_new_comparable_reference=changed))
         host.store.update_state(db,host.run_id,current)
         host.store.event(db,host.run_id,'implementation_binding','committed',outputs=[ref])
-    if changed:
+    if changed and s['spec'].get('start_mode')!='family_space':
         ref=construct(host,s['spec']['reference_parameters'],dict(origin='new_version_reference_required'))
         update(host,reference_candidate=ref,selected=None)
     atomic_json(host.store.root/'implementation_freeze.json',dict(commit=commit,profile=profile))
@@ -198,7 +204,7 @@ def packet(host):
     if s['spec'].get('capabilities'):
         from tools.research.feedback import result_view, eligibility, facts
         from tools.research.rl import packet as rl_packet
-        return dict(decision_facts=facts(host),specification=s['spec'],scoped_context=s.get('scoped_context',[]),frozen_task=plain(s['base_configuration']['task']),reference_candidate=s['reference_candidate'],
+        return dict(decision_facts=facts(host),specification=s['spec'],scoped_context=s.get('scoped_context',[]),frozen_task=plain(s['spec'].get('canonical_task',s['base_configuration']['task'])),reference_candidate=s.get('reference_candidate'),
             candidates=[r for r in s['candidates'].values() if host.store.artifact(r)['profile_identity']==s['profile']['identity']],results=[dict(reference=r,**result_view(host,r),confirmation=eligibility(host,r)) for r in [*s['results'],*s.get('rl_evaluations',[])]],
             analysis_results=[decision_result(host.store.artifact(r),r) for r in s.get('analysis_results',[])],
             search_results=s.get('search_results',[]),
@@ -230,7 +236,7 @@ def dispatch(host, value, request_id, origin='model'):
             return cached(host.store.artifact(json.loads(old['receipt'])['output']))
         raise ValueError('RECOVER_EXISTING_OPERATION_NO_NEW_EXECUTION')
     admit_closeout(host,'research_plan',plain(plan))
-    guard(host,plan.action in ('propose','execute','search','mechanics','replay') or plan.diagnostic is not None)
+    guard(host,plan.action in ('generate','propose','execute','search','mechanics','replay') or plan.diagnostic is not None)
     s=state(host)
     for r in plan.supporting_evidence:
         host.store.artifact(r)
@@ -269,7 +275,10 @@ def dispatch(host, value, request_id, origin='model'):
         experience_read_bindings=experience_bindings),'original_research_plan')
     update(host,plans=[*state(host)['plans'],ref])
     try:
-        if plan.action=='propose':
+        if plan.action=='generate':
+            from tools.research.design import generate_candidate
+            result=generate_candidate(host,plan.generation,dict(origin=origin,plan=ref))
+        elif plan.action=='propose':
             if plan.mechanics_source:
                 from tools.research.mechanics import handoff
                 relation=handoff(host,plan.mechanics_source,plain(plan.parameters),dict(origin=origin,plan=ref))

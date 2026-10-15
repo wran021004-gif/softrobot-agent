@@ -63,6 +63,26 @@ def resolve(path, profile=None):
     path = Path(path).resolve()
     study = read(path)
     provenance = dict(root=dict(path=str(path), sha256=digest(study)), references={})
+    family_mode=study.get('start_mode')=='family_space'
+    if family_mode:
+        from extensions.tendon_family.family_space import FamilySpace
+        source=(path.parent/study.pop('defaults')).resolve()
+        original=read(source)
+        if source.parent!=path.parent or 'extends' in original or 'defaults' in original:
+            raise ValueError('SAME_DIRECTORY_SINGLE_FAMILY_DEFAULTS_REQUIRED')
+        family_source=(path.parent/study.pop('family_space')).resolve()
+        family_space=plain(FamilySpace.model_validate(read(family_source)))
+        initialization=study.pop('candidate_initialization')
+        if initialization!='all_candidate_dofs_zero_v1':
+            raise ValueError('EXPLICIT_CANDIDATE_ZERO_INITIALIZATION_REQUIRED')
+        study.pop('start_mode')
+        study=patch(original,study)
+        study.update(start_mode='family_space',family_space=family_space,
+            family_space_identity=digest(family_space),candidate_initialization=initialization)
+        provenance['references'].update(defaults=dict(path=str(source),sha256=digest(original)),
+            family_space=dict(path=str(family_source),sha256=digest(family_space)))
+    elif study.get('start_mode', 'reference_candidate')!='reference_candidate':
+        raise ValueError('UNKNOWN_RESEARCH_START_MODE')
     if 'extends' in study:
         source=(path.parent/study.pop('extends')).resolve()
         original=read(source)
@@ -131,7 +151,7 @@ def resolve(path, profile=None):
         raise ValueError('DECLARED_TRAINING_STAGE_LIMIT_REQUIRED')
     if any(study['rl_limits'][k] is not None for k in ('training_actions', 'training_active_seconds', 'actions_per_trial', 'seconds_per_trial')):
         raise ValueError('NO_AGGREGATE_OR_HIDDEN_PER_STAGE_CEILING_IN_COUNT_MODE')
-    if study['topology_scope'] != dict(flexible_segments=2, independent_ideal_tensions=6):
+    if not family_mode and study['topology_scope'] != dict(flexible_segments=2, independent_ideal_tensions=6):
         raise ValueError('CURRENT_TWO_SEGMENT_SIX_TENSION_SCOPE')
     if set(runtime['threads']) != {'OPENBLAS_NUM_THREADS', 'OMP_NUM_THREADS', 'MKL_NUM_THREADS'} or set(runtime['threads'].values()) != {'1'}:
         raise ValueError('SINGLE_THREAD_NUMERICS_REQUIRED')
@@ -165,6 +185,9 @@ def resolve(path, profile=None):
         cfg['policy']['backend']['parameters']['data']).model_dump(mode='json')
     study['analysis_protocol'].update(baseline_lengths_m={k:v['length_m'] for k,v in segments.items()},
         duration_s=task['task']['timing']['duration_s'], period_s=task['task']['timing']['control_period_s'])
+    if family_mode:
+        study['analysis_protocol']['baseline_lengths_m']={f'segment_{i}':
+            family_space['segment_domains'].get(str(i),family_space['segment_domain'])['length_m']['default'] for i in range(2)}
     from schemas.platform_analysis import TaskAnalysisProtocol
     TaskAnalysisProtocol.model_validate(study['analysis_protocol'])
     if study['scoring_window_s'] not in study['analysis_protocol']['windows_s']:
@@ -176,5 +199,19 @@ def resolve(path, profile=None):
             training='initialization and continuation share admitted stage count; exact recovery retains stage',
             steps='ceil requested positive steps to a complete rollout before admission; no cumulative step ceiling',
             protection='requests and operations reserved within totals for evaluation, evidence and closeout'))
+    if family_mode:
+        initial=cfg['task']['initializer']['parameters']['data']
+        if initial['unspecified']!='zero' or any(v!=0 for key in ('qpos_rad','qvel_rad_s') for v in initial[key].values()):
+            raise ValueError('FAMILY_ZERO_RULE_REQUIRES_AUTHORIZED_ZERO_SOURCE_TASK')
+        canonical_task=deepcopy(cfg['task'])
+        canonical_task['initializer']['parameters']['data']=dict(rule=study['candidate_initialization'])
+        study.update(canonical_task=canonical_task,canonical_task_identity=digest(canonical_task),
+            nominal_source=None,reference_parameters={},allowed_parameters={},
+            topology_scope=dict(declarative_segment_counts=family_space['segment_count_bounds'],
+                declarative_tendon_counts=family_space['tendon_count_bounds'],
+                executable_segment_counts=family_space['executable_segment_counts'],
+                executable_tendon_counts=family_space['executable_tendon_count_bounds']),
+            implementation_scaffold=dict(purpose='Host SessionInput compatibility only; not an Agent candidate',
+                source=provenance['references']['robot'],scientific_candidate=False))
     study['resolved_identity'] = digest(study)
     return study

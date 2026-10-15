@@ -148,3 +148,11 @@ EXTENSIONS.append(replace(_source_builder,version='4.0.0',input_schema=m5.Topolo
     description='Explicitly authorized source-relative tendon topology with stable independent input order',
     capabilities={**_source_builder.capabilities,
         'parameter_declarations':'extensions.tendon_family.generated_serial:topology_declarations'}))
+
+from .family_space import FamilyBuild
+CONTRACTS.append(('family.serial_space_build','1.0.0',FamilyBuild))
+EXTENSIONS.append(replace(_source_builder,version='5.0.0',input_schema=FamilyBuild,
+    description='Independent two-segment construction from a frozen declarative serial family space',
+    capabilities={**_source_builder.capabilities,
+        'parameter_declarations':'extensions.tendon_family.generated_serial:family_declarations'},
+    sources=_source_builder.sources+('extensions/tendon_family/family_space.py',)))

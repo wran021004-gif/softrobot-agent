@@ -323,7 +323,7 @@ async def converse(host):
         schema=Plan.model_json_schema()
         schema['properties']['action']={'type':'string','enum':actions}
         native[0].tool_spec={**native[0].tool_spec,'inputSchema':{'json':schema}}
-    if state(host)['spec'].get('nominal_source'):
+    if state(host)['spec'].get('nominal_source') or state(host)['spec'].get('start_mode')=='family_space':
         native.append(PythonAgentTool('research_analysis',dict(name='research_analysis',description='Candidate-bound mathematics; saved_state or execution plus update_id selects exact projected state at previous applied input with actual remaining task time. Historical candidate binding required. Each calculation charged once; task acceptance unmeasured.',inputSchema={'json':AnalysisRequest.model_json_schema()}),handler('analysis')))
     if rl_mode:
         native.append(PythonAgentTool('research_rl',dict(name='research_rl',description='start initializes; resume recovers original stage; continue creates a new stage from exact parent run_id/checkpoint with supported sparse training/reward changes and additional finite allocation. Query, stop, independently evaluate or diagnose an owned frozen candidate RL run',
@@ -438,6 +438,10 @@ def decision_packet(host):
     result['study']={k:spec[k] for k in ('study_id','capabilities','allowed_parameters','reference_parameters','analysis_protocol','scoring_window_s','budgets','rl_limits','confirmation','budget_semantics')}
     if 'topology_authorization' in spec:
         result['study']['topology_authorization']=spec['topology_authorization']
+    if spec.get('start_mode')=='family_space':
+        result['study'].update(start_mode='family_space',family_space=spec['family_space'],
+            family_space_identity=spec['family_space_identity'],candidate_initialization=spec['candidate_initialization'],
+            canonical_task_identity=spec['canonical_task_identity'])
     result['available_actions']=spec['allowed_plan_actions']
     s=state(host)
     result['implementation']=dict(commit=s['freeze'],repairs=s.get('core_repairs',[]),

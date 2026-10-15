@@ -152,7 +152,8 @@ def authorize(inp,space,changes):
     if changes:raise ValueError('SOURCE_CANDIDATE_ALREADY_RESOLVED')
     builder=inp.policy.candidate_builder
     topology=(builder.version,builder.parameters.contract,builder.parameters.version)==('4.0.0','family.topology_space','1.0.0')
-    design,mesh,_=(generate_topology if topology else generate)(space)
+    family_space=builder.version=='5.0.0' and builder.parameters.contract=='family.serial_space_build'
+    design,mesh,_=(generate_family if family_space else generate_topology if topology else generate)(space)
     if design!=inp.robot.structure.data or mesh!=inp.policy.discretization.data:raise ValueError('SOURCE_CANDIDATE_BINDING_MISMATCH')
 
 
@@ -194,3 +195,112 @@ def topology_declarations():
         ordering='source survivors in order; replacements keep index; additions in patch order; corresponding independent actuators',
         assumptions='one tendon per named guide hole; fixed explicit offsets; straight frictionless spans; ideal tension',
         future=['nonlinear closed-loop comparisons','variable segment count'])
+
+
+def generate_family(value):
+    """Expand independent polar routes over the two-segment assembly prototypes."""
+    from .family_space import FamilyBuild, Span, validate_request
+    from .sections import properties
+    build=FamilyBuild.model_validate(value);space=build.space;r=build.request
+    validate_request(space,r)
+    components=plain(space.assembly)['components']
+    segments=[c for c in components if c['kind']=='flexible_segment']
+    if [c['id'] for c in segments]!=['segment_0','segment_1']:
+        raise ValueError('INDEXED_TWO_SEGMENT_ASSEMBLY_REQUIRED')
+    guides=[c for c in components if c['kind']=='guide']
+    if len(guides)!=1 or guides[0]['connection']['part']!='segment_0':
+        raise ValueError('C1_REQUIRES_ONE_INTERSEGMENT_GUIDE')
+    guide=guides[0];guide['guide_holes']={}
+    for i,part in enumerate(segments):
+        domain=space.segment_domains.get(i,space.segment_domain);choice=r.segments.get(i)
+        for key in ('length_m','young_pa'):
+            d=getattr(domain,key);v=getattr(choice,key) if choice else None
+            v=d.check(d.default if v is None else v,key)
+            (part['physics'] if key=='young_pa' else part)[key]=v
+        if choice and choice.sections is not None:
+            if len(choice.sections)!=len(part['sections']):raise ValueError('EXACT_SECTION_STATIONS_REQUIRED')
+            for station,section in zip(part['sections'],choice.sections):station['section']=plain(section)
+        for station in part['sections']:
+            section=station['section'];dims=domain.section_dimensions_m.get(section['kind'])
+            if dims is None or set(dims)!=set(section['parameters']):raise ValueError('SECTION_OUTSIDE_FAMILY_DOMAIN')
+            for key,v in section['parameters'].items():dims[key].check(v,key)
+            properties(section)
+    tendon_values={k:r.tendon_parameters.get(k,d.default) for k,d in space.tendon_domains.items()}
+    if tendon_values['pretension_n']>tendon_values['force_limit_n']:raise ValueError('PRETENSION_EXCEEDS_PHYSICAL_FORCE_LIMIT')
+    tendons=[];actuators=[];attachments={}
+    def point(part,s,position,role,hole=None):
+        return dict(attachment=dict(part=part,s=s,position_m=position),role=role,hole=hole)
+    def yz(radius,angle):return [0.,radius*float(np.cos(angle)),radius*float(np.sin(angle))]
+    spans=r.spans or [Span(last_segment=1,count=r.tendon_count)]
+    for span in spans:
+        bounds=space.routing_domains
+        radius=bounds['radius_m'].check(span.radius_m if span.radius_m is not None else bounds['radius_m'].default,'radius_m')
+        anchor=bounds['anchor_s'].check(span.anchor_s if span.anchor_s is not None else bounds['anchor_s'].default,'anchor_s')
+        stations=span.guide_s if span.guide_s is not None else [bounds['guide_s'].default]
+        if stations!=sorted(set(stations)):raise ValueError('ORDERED_UNIQUE_GUIDE_STATIONS_REQUIRED')
+        for s in stations:bounds['guide_s'].check(s,'guide_s')
+        if stations and max(stations)>=anchor:raise ValueError('GUIDES_MUST_PRECEDE_ANCHOR')
+        bounds['phase_rad'].check(span.phase_rad,'phase_rad')
+        for a in [*span.angular_offsets_rad,span.guide_angle_offset_rad,span.anchor_angle_offset_rad]:
+            bounds['angular_offset_rad'].check(a,'angular_offset_rad')
+        for j in range(span.count):
+            index=len(tendons);name='tendon_'+str(index)
+            angle=span.phase_rad+2*np.pi*j/span.count+(span.angular_offsets_rad[j] if span.angular_offsets_rad else 0.)
+            route=[]
+            if span.first_segment==0:route.append(point('fixed_base',0.,yz(radius,angle),'start'))
+            for i in range(span.first_segment,span.last_segment+1):
+                if i==1:
+                    hole=name+'_hole';guide['guide_holes'][hole]=yz(radius,angle+span.guide_angle_offset_rad)
+                    route.append(point(guide['id'],0.,[0.,0.,0.],'start' if span.first_segment==1 else 'guide',hole))
+                for s in stations:route.append(point(segments[i]['id'],s,yz(radius,angle+span.guide_angle_offset_rad),'guide'))
+            route.append(point(segments[span.last_segment]['id'],anchor,yz(radius,angle+span.anchor_angle_offset_rad),'anchor'))
+            if index in r.route_overrides:route=[plain(p) for p in r.route_overrides[index]]
+            # Explicit overrides retain span ownership, local radial and station bounds.
+            order=[]
+            for p in route:
+                a=p['attachment'];part=a['part']
+                if part.startswith('segment_'):
+                    i=next((k for k,c in enumerate(segments) if c['id']==part),-1)
+                    if not span.first_segment<=i<=span.last_segment:raise ValueError('ROUTE_OUTSIDE_SELECTED_SPAN')
+                    if p.get('hole') or a['position_m'][0]!=0:raise ValueError('LOCAL_SECTION_PLANE_REQUIRED')
+                    bounds['anchor_s' if p['role']=='anchor' else 'guide_s'].check(a['s'],'route_station')
+                    distance=np.linalg.norm(a['position_m'][1:]);bounds['radius_m'].check(distance,'route_radius_m')
+                    envelope=max(np.linalg.norm(properties(st['section'])['outer_yz_m'],axis=1).max() for st in segments[i]['sections'])
+                    if distance<envelope+tendon_values['diameter_m']/2:raise ValueError('SECTION_ROUTE_CLEARANCE')
+                    order.append(i+a['s'])
+                elif part==guide['id']:
+                    if p.get('hole')!=name+'_hole' or p['role'] not in ('start','guide'):
+                        raise ValueError('NAMED_OWNED_GUIDE_HOLE_REQUIRED')
+                    order.append(1.)
+                elif part=='fixed_base' and span.first_segment==0 and p['role']=='start':
+                    if a['s'] or a['position_m'][0]!=0:raise ValueError('BASE_SECTION_PLANE_REQUIRED')
+                    bounds['radius_m'].check(np.linalg.norm(a['position_m'][1:]),'base_radius_m');order.append(0.)
+                else:raise ValueError('ROUTE_ATTACHMENT_OUTSIDE_FAMILY')
+            if order!=sorted(set(order)) or route[0]['attachment']['part']!=('fixed_base' if span.first_segment==0 else guide['id']) or route[-1]['attachment']['part']!=segments[span.last_segment]['id']:
+                raise ValueError('ORDERED_SELECTED_SPAN_REQUIRED')
+            for p in route:
+                a=p['attachment']
+                position=guide['guide_holes'][p['hole']] if p.get('hole') else a['position_m']
+                station=(a['part'],a['s']);previous=attachments.setdefault(station,[])
+                if any(np.linalg.norm(np.asarray(position)-old)<tendon_values['diameter_m'] for old in previous):
+                    raise ValueError('TENDON_ATTACHMENT_CLEARANCE')
+                previous.append(position)
+            tendons.append(dict(id=name,points=route,**tendon_values))
+            actuators.append(dict(id='actuator_'+str(index),command_type='displacement',units='m',
+                limits=space.actuator_defaults.limits_m,velocity_limit=space.actuator_defaults.velocity_limit_m_s,
+                transmission=[dict(tendon=name,ratio=1.)]))
+    used={p['hole'] for t in tendons for p in t['points'] if p.get('hole')}
+    guide['guide_holes']={k:v for k,v in guide['guide_holes'].items() if k in used}
+    design=dict(id='serial_family_candidate',components=components,tendons=tendons,actuators=actuators,tip=plain(space.assembly.tip))
+    values={c['id']:dict(length_m=c['length_m'],young_pa=c['physics']['young_pa'],
+        sections={str(i):st['section']['parameters'] for i,st in enumerate(c['sections'])}) for c in segments}
+    result=_generate(GeneratorSpace(source_design=design,source_mesh=plain(space.assembly.mesh),segments=values),design)
+    from .geometry import geometry
+    geometry(result[2],[0.]*len(result[2]['dofs']))  # Reject zero-length resolved spans.
+    return result
+
+
+def family_declarations():
+    return dict(contract='serial_family_space_v1',execution='two segments; bounded independent tendon counts',
+        routing='polar consecutive spans with explicit local stations and optional typed route overrides',
+        future=['variable segment construction and numerical compatibility (M3-C2)'])

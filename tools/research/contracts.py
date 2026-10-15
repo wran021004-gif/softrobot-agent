@@ -1,10 +1,11 @@
 """Native business fields for the bounded reach-and-hold research entry."""
 from typing import Literal
-from pydantic import Field, FiniteFloat, model_validator
+from pydantic import Field, FiniteFloat, model_validator, model_serializer
 from schemas.common import Contract
 from schemas.platform import EvidenceRef
 from schemas.platform_analysis import TaskAnalysisProtocol
 from extensions.tendon_family.generated_serial import TopologyPatch
+from extensions.tendon_family.family_space import GenerationRequest
 
 
 class SegmentParameters(Contract):
@@ -104,7 +105,7 @@ class MechanicsRequest(Contract):
 
 
 class Plan(Contract):
-    action: Literal['propose', 'execute', 'search', 'mechanics', 'replay', 'diagnose', 'confirm', 'select', 'stop']
+    action: Literal['generate', 'propose', 'execute', 'search', 'mechanics', 'replay', 'diagnose', 'confirm', 'select', 'stop']
     next_step: Literal['adjust_training','revise_design','diagnose','stop'] | None = None
     hypothesis: str = Field(min_length=1)
     supporting_evidence: list[EvidenceRef] = Field(default_factory=list)
@@ -114,6 +115,7 @@ class Plan(Contract):
     stopping_condition: str = Field(min_length=1)
     interpretation: str = Field(min_length=1)
     parameters: Parameters | TopologyParameters | None = None
+    generation: GenerationRequest | None = None
     search: Search | None = None
     candidate: EvidenceRef | None = None
     selected_execution: EvidenceRef | None = Field(default=None, description='Exact immutable passing NMPC result or independent RL evaluation; freezes the complete solution')
@@ -123,14 +125,21 @@ class Plan(Contract):
     mechanics_source: EvidenceRef | None = None
     experience_disposition: dict[str, Literal['adopted', 'rejected', 'context_only']] = Field(default_factory=dict)
 
+    @model_serializer(mode='wrap')
+    def preserve_legacy_plan(self, handler):
+        result=handler(self)
+        if self.generation is None:
+            result.pop('generation',None)
+        return result
+
     @model_validator(mode='after')
     def required(self):
         if self.revise_selection and self.action not in ('confirm','select'):
             raise ValueError('REVISE_SELECTION_REQUIRES_CONFIRM_ACTION')
-        required = {'propose': 'parameters', 'execute': 'candidate', 'search': 'search', 'confirm': 'selected_execution', 'select': 'selected_execution',
+        required = {'generate': 'generation', 'propose': 'parameters', 'execute': 'candidate', 'search': 'search', 'confirm': 'selected_execution', 'select': 'selected_execution',
                     'mechanics': 'mechanics', 'replay': 'mechanics_source'}
         active = required.get(self.action)
-        for field in ('parameters', 'search', 'candidate', 'selected_execution', 'mechanics'):
+        for field in ('generation', 'parameters', 'search', 'candidate', 'selected_execution', 'mechanics'):
             if (getattr(self, field) is not None) != (field == active):
                 raise ValueError('ACTION_REQUIRES_ONLY_' + str(active))
         if self.action=='replay' and self.mechanics_source is None:

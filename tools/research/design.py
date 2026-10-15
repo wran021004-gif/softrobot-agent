@@ -36,6 +36,8 @@ def set_parameter(parameters,path,value):
 def configuration_for(host,parameters,owner):
     started=time.perf_counter()
     s=state(host)
+    if s['spec'].get('start_mode')=='family_space':
+        raise ValueError('FAMILY_SPACE_REQUIRES_GENERATE_ACTION')
     raw=plain(parameters)
     kind=TopologyParameters if raw.get('version')=='research_topology_parameters_v1' else Parameters
     p=plain(kind.model_validate(raw))
@@ -132,6 +134,14 @@ def verify_candidate(host,reference):
         return c
     if c['profile_identity']!=s['profile']['identity']:
         raise ValueError('OLD_EVALUATION_PROFILE_CANDIDATE_REQUIRES_NEW_CONSTRUCTION')
+    if c.get('generation_version')=='serial_family_generation_v1':
+        if (host.store.artifact(c['configuration_reference'])!=c['configuration'] or
+                c['family_space_identity']!=s['spec']['family_space_identity'] or
+                c['task_identity']!=s['spec']['canonical_task_identity'] or
+                c['effective_task_identity']!=digest(c['configuration']['task']) or
+                c['identity']!=family_candidate_identity(c['configuration'],s)):
+            raise ValueError('FAMILY_CANDIDATE_IDENTITY_MISMATCH')
+        return c
     if s['spec'].get('nominal_source'):
         if host.store.artifact(c['configuration_reference'])!=c['configuration'] or c['source_identity']!=digest(s['nominal_configuration']):
             raise ValueError('SAVED_CANONICAL_CONFIGURATION_OR_SOURCE_MISMATCH')
@@ -148,5 +158,73 @@ def verify_candidate(host,reference):
     if digest(dict(parameters=values,configuration=full_science(cfg),evaluation_profile=s['profile']))!=c['identity']:
         raise ValueError('CANDIDATE_IDENTITY_MISMATCH')
     return c
+
+
+def family_candidate_identity(cfg,s):
+    science=full_science(cfg)
+    science['policy'].pop('candidate_builder')  # Request spelling is provenance, not physical identity.
+    return digest(dict(configuration=science,family_space_identity=s['spec']['family_space_identity'],
+        canonical_task_identity=s['spec']['canonical_task_identity'],evaluation_profile=s['profile']))
+
+
+def generate_candidate(host,request,provenance):
+    """Materialize a frozen family request and persist through the existing Store."""
+    from extensions.tendon_family.family_space import FamilyBuild, UnsupportedGeneration
+    from extensions.tendon_family.gvs_profile import reach_numerical
+    from tools.platform_tasks import compile_input
+    s=state(host);spec=s['spec']
+    if spec.get('start_mode')!='family_space':raise ValueError('FROZEN_FAMILY_SPACE_REQUIRED')
+    started=time.perf_counter()
+    try:
+        build=FamilyBuild(space=spec['family_space'],request=request)
+        robot,mesh,physics=family.generate_family(build)
+        cfg=deepcopy(s['base_configuration']);cfg['run_id']=host.run_id
+        cfg['robot'].update(sources=['frozen family-space assembly prototypes'])
+        cfg['robot']['structure']['data']=robot
+        cfg['policy']['discretization']['data']=mesh
+        cfg['policy']['candidate_builder']=dict(extension_id='candidate.family',version='5.0.0',
+            parameters=dict(contract='family.serial_space_build',version='1.0.0',data=plain(build)))
+        for key,d in build.space.control_domains.items():
+            cfg['policy']['controller']['parameters']['data']['recipe'][key]=build.request.control_weights.get(key,d.default)
+        initial={f:{j:0. for j in physics['dofs']} for f in ('qpos_rad','qvel_rad_s')};initial['unspecified']='zero'
+        cfg['task']['initializer']['parameters']['data']=initial
+        cfg=plain(SessionInput.model_validate(cfg))
+        compile_input(cfg,host.reg)
+        numerical=reach_numerical(SessionInput.model_validate(cfg))
+        identity=family_candidate_identity(cfg,s)
+        dimensions=dict(physical_dofs=len(physics['dofs']),gvs_coordinates=len(numerical['coordinate_order']),
+            state=len(numerical['measured_initial_state']),inputs=len(numerical['tendon_order']))
+        resolved=dict(segments=[c for c in robot['components'] if c['kind']=='flexible_segment'],
+            tendons=robot['tendons'],actuators=robot['actuators'],discretization=mesh,
+            tendon_order=numerical['tendon_order'],actuator_order=[a['id'] for a in robot['actuators']],
+            force_limits_n=numerical['force_limits_n'],dimensions=dimensions,
+            controller_preparation=dict(status='candidate_initial_projection_and_pretension_ready',
+                coordinate_order=numerical['coordinate_order'],warm_input_shape=[len(numerical['warm_guess']['tensions']),dimensions['inputs']],
+                model_constructed=False,rollout_executed=False))
+        if identity in s['candidates']:
+            ref=s['candidates'][identity]
+            save(host,dict(candidate=ref,request=plain(request),provenance=provenance),'candidate_reused')
+        else:
+            candidate=dict(candidate_id='core-'+identity,identity=identity,parameters=plain(request),resolved_parameters=resolved,
+                configuration_reference=save(host,cfg,'resolved_candidate_configuration'),configuration=cfg,
+                scientific_configuration=full_science(cfg),task_identity=spec['canonical_task_identity'],
+                effective_task_identity=digest(cfg['task']),initialization_provenance=dict(
+                    rule=spec['candidate_initialization'],effective=initial,canonical_task_identity=spec['canonical_task_identity']),
+                family_space_identity=spec['family_space_identity'],generation_version=build.request.version,
+                source_identity=spec['family_space_identity'],source_provenance=plain(build.space.assembly)['provenance'],
+                profile_identity=s['profile']['identity'],evaluation_version=s['profile']['version'],
+                physical_validation='compiled',unchecked=['controllability','task feasibility',*build.space.unsupported],
+                provenance=provenance,offline_trajectory=None)
+            ref=save(host,candidate,'candidate_constructed')
+            update(host,candidates={**state(host)['candidates'],identity:ref})
+        return dict(status='generated',candidate=ref,resolved=resolved,task_success=None)
+    except UnsupportedGeneration as exc:
+        return dict(status='not_yet_supported',unsupported_capability=str(exc),candidate=None,task_success=None)
+    except ValueError as exc:
+        return dict(status='invalid',reason=str(exc),candidate=None,task_success=None)
+    finally:
+        elapsed=time.perf_counter()-started;current=state(host)
+        update(host,numerical_s=current['numerical_s']+elapsed,
+            construction_numerical_s=current.get('construction_numerical_s',0.)+elapsed)
 
 

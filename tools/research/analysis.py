@@ -226,6 +226,8 @@ def dispatch(host,query,key,*,guard,origin='model'):
         tension_limits_n=[t['force_limit_n'] for t in design['tendons']],tension_bounds_n=[[0.,t['force_limit_n']] for t in design['tendons']],
         target_m=cfg['task']['goal']['data']['target_m'],source_identity=c['source_identity'],
         evaluation_profile_identity=c['profile_identity'])
+    if c.get('generation_version'):
+        binding.update(canonical_task_identity=c['task_identity'],initialization_provenance=c['initialization_provenance'])
     point=None
     if q.execution:
         from tools.research.numerics import execution_update
