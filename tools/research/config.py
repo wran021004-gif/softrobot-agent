@@ -200,6 +200,11 @@ def resolve(path, profile=None):
         duration_s=task['task']['timing']['duration_s'], period_s=task['task']['timing']['control_period_s'])
     if family_mode:
         study['analysis_protocol']['baseline_lengths_m']={k:v['length_m'] for k,v in segments.items()}
+        if family_space['version']=='serial_family_space_v2':
+            study['analysis_protocol']['baseline_lengths_m']={f'segment_{i}':
+                family_space['segment_domains'].get(str(i),family_space['segment_domain'])['length_m']['default']
+                for i in range(family_space['segment_count_bounds'][1])}
+            study['analysis_length_scale_source']='frozen_family_domain_defaults_v1'
     from schemas.platform_analysis import TaskAnalysisProtocol
     TaskAnalysisProtocol.model_validate(study['analysis_protocol'])
     if study['scoring_window_s'] not in study['analysis_protocol']['windows_s']:

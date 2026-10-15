@@ -120,6 +120,17 @@ class VariableSegmentTests(unittest.TestCase):
             GenerationRequestV2.model_validate(dict(family_space_identity='fixture',segment_count=3,tendon_count=1,
                 spans=[dict(first_segment=2,last_segment=3,count=1)]))
 
+    def test_optional_analysis_scales_cover_candidate_coordinate_entities(self):
+        protocol=self.spec['analysis_protocol']
+        self.assertEqual(self.spec['analysis_length_scale_source'],'frozen_family_domain_defaults_v1')
+        for n,result in self.results.items():
+            order=result['resolved']['controller_preparation']['coordinate_order']
+            for name in order:
+                entity=name.split('.',1)[0]
+                self.assertGreater(1/protocol['baseline_lengths_m'][entity],0)
+        self.assertEqual(len(protocol['baseline_lengths_m']),9)
+        self.assertEqual(protocol['baseline_lengths_m']['segment_8'],.14)
+
     def test_v1_physical_identities_and_legacy_study(self):
         from extensions.tendon_family.generated_serial import generate_family
         from extensions.tendon_family.family_space import FamilyBuild
