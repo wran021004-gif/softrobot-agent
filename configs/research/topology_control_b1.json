@@ -1,0 +1,107 @@
+{
+  "extends": "study.json",
+  "study_id": "m3b1-control-20261015",
+  "authorization": "User attachment b555900c-aec2-4177-bf55-24308a8ce71a: M3-B1 five single real NMPC updates, one per T0/T1/T2/T3/S1; two segments, one to seven tendons; no full task evaluation or provider calls.",
+  "base_commit": "e60e32f4b66793f7f7e51c9b87c3fb5f04dcb6ac",
+  "mode": "engineering_numerical",
+  "capabilities": [],
+  "allowed_plan_actions": [
+    "propose",
+    "stop"
+  ],
+  "evidence_destination": "evidence/topology_control_20261015/b1",
+  "supplied_evidence": [],
+  "budgets": {
+    "provider_requests": 0,
+    "protected_provider_requests": 0,
+    "public_operations": 10,
+    "protected_public_operations": 0,
+    "physical_launches": 5,
+    "local_solves": 0,
+    "mathematical_evaluations": 0
+  },
+  "nmpc_limits": {
+    "executions": 0
+  },
+  "execution_instructions": "Single-use engineering diagnostic only. Registered controller/preparation and actual backend, stop before second solve. Frozen official 0.35 s task is unchanged; no evaluation or task acceptance. Each diagnostic costs one ledger backend slot, distinct from complete-task launches.",
+  "range_status": "New one-to-seven grant; historical grants unchanged. Two source segments fixed. S1 retains near_t0 and explicitly removes the other five tendons.",
+  "topology_authorization": {
+    "version": "tendon_topology_grant_v1",
+    "tendon_count_bounds": [
+      1,
+      7
+    ],
+    "tendon_bounds": {
+      "diameter_m": [
+        0.001,
+        0.001
+      ],
+      "force_limit_n": [
+        8.0,
+        8.0
+      ],
+      "pretension_n": [
+        0.0,
+        0.2
+      ],
+      "length_servo_gain_n_m": [
+        900.0,
+        900.0
+      ]
+    },
+    "attachment_bounds_m": {
+      "fixed_base": [
+        [
+          0.0,
+          -0.025,
+          -0.025
+        ],
+        [
+          0.0,
+          0.025,
+          0.025
+        ]
+      ],
+      "near": [
+        [
+          0.0,
+          -0.025,
+          -0.025
+        ],
+        [
+          0.0,
+          0.025,
+          0.025
+        ]
+      ],
+      "mid_guide": [
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ]
+      ],
+      "distal1": [
+        [
+          0.0,
+          -0.025,
+          -0.025
+        ],
+        [
+          0.0,
+          0.025,
+          0.025
+        ]
+      ]
+    },
+    "editable_guides": [
+      "mid_guide"
+    ],
+    "actuator_rule": "copy_source_independent_displacement_v1"
+  }
+}

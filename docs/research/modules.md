@@ -47,3 +47,9 @@ Historical evidence retains original content and bindings, including the sealed 
 Final configuration ownership removes the former `CURRENT_NMPC_STOPPING` override constant: `config.resolve` freezes normalized `ReachControl` and `MujocoParameters`; `core.prepare` uses that configuration directly, and the diagnostic helper validates an explicit patch to the recorded/frozen recipe. Solver iteration and tolerance edits therefore survive preparation. This post-closure validation correction leaves the studied default numerical settings unchanged and does not alter the scientific binding. Stage feedback separately reports verified lower/conservative upper action counts when terminal consumption is uncertain.
 
 M3-A now implements explicitly granted variable tendon start/guide/anchor routes and candidate-specific ownership/channel-order validation. Existing physical/compiler/GVS/XML/control kernels derive dimensions from the candidate; only the control compatibility description needed its fixed-six wording removed. The two added lines in `agent.decision_packet` expose the grant that its prior fixed study-field projection would otherwise hide. Next boundaries are M3-B common-condition physical comparisons, then variable segment count and conditional optimization. Current continuation cannot transfer incompatible weights, residual references or states across topology changes.
+
+M3-B1 reuses the registered preparation/controller/backend unchanged. The opt-in
+`RealVariableTendonControl` fixture stops the existing backend before its second
+command, saves one genuine update and physical interval per case, and never calls
+the task evaluator. `core.export` now accepts an engineering scope with no research
+decision packet, exporting its actual ledger. No controller/backend was added.

@@ -1,7 +1,7 @@
-"""Offline M3-A physical candidates; no provider, NLP, policy or task experiment."""
+"""Offline topology contracts and explicitly enabled, single-use M3-B1 control checks."""
 from copy import deepcopy
-from types import SimpleNamespace as NS, ModuleType
-import os, subprocess, time, unittest
+from types import SimpleNamespace as NS
+import os, time, unittest
 from unittest.mock import patch
 import numpy as np
 from schemas.platform import SessionInput,ProjectConfig
@@ -81,12 +81,10 @@ class VariableTendonTests(unittest.TestCase):
         self.assertNotIn('topology_authorization',self.old)
         self.assertEqual(self.spec['source_study_id'],self.old['study_id'])
         self.assertEqual(self.spec['source_study_identity'],digest(read(ROOT/'configs/research/study.json')))
-        historical=ModuleType('extensions.tendon_family._historical_compiler')
-        historical.__package__='extensions.tendon_family'
-        source=subprocess.check_output(['git','show','8b69568f0ed45b36ff55c18ef03878e9ae27c071:extensions/tendon_family/compiler.py'],cwd=ROOT)
-        exec(compile(source,'historical compiler 8b69568f','exec'),historical.__dict__)
-        mesh=cfg['policy']['discretization']['data'];old_physics=historical.resolve(self.source,mesh)
-        self.assertEqual(compile_physics(self.source,mesh),old_physics)
+        historical=read(ROOT/'evidence/topology_20261015/physical_diagnostics.json')
+        mesh=cfg['policy']['discretization']['data'];old_physics=compile_physics(self.source,mesh)
+        self.assertEqual(old_physics['identity'],historical['cases']['T0']['physics_identity'])
+        self.assertEqual(digest(cfg),historical['source_configuration_identity'])
         for name,c in self.candidates.items():
             inp=self.configuration(name);physics=compile_physics(inp.robot.structure.data,mesh)
             self.assertEqual(c['source_identity'],digest(self.spec['configuration']))
@@ -203,6 +201,17 @@ class VariableTendonTests(unittest.TestCase):
                             analysis.dispatch(self.host,q,'bad-saved-'+name,guard=lambda *a:None)
                         worker.assert_not_called()
 
+    def test_empty_capabilities_engineering_export(self):
+        original=state(self.host)['spec'];empty=deepcopy(original);empty['capabilities']=[]
+        try:
+            update(self.host,spec=empty)
+            before=self.host.store.remaining()['used']
+            result=core.export(self.host,self.folder/'diagnostic-export')
+            self.assertEqual(result['resources']['shared_ledger']['used'],before)
+            self.assertEqual(self.host.store.remaining()['used'],before)
+            self.assertIsNone(result['claims'])
+        finally:update(self.host,spec=original)
+
     def test_physical_gvs_geometry_and_three_step_mujoco_smokes(self):
         import mujoco
         from schemas.platform_math import SystemContext
@@ -281,6 +290,110 @@ class VariableTendonTests(unittest.TestCase):
             cases={k:dict(J=v['jacobian_shape'],derivative_error=v['derivative_max_abs_error'],smoke=v['mujoco']) for k,v in diagnostics.items()}))
         if os.environ.get('M3A_EVIDENCE'):
             atomic_json(ROOT/'evidence/topology_20261015/physical_diagnostics.json',report)
+
+
+@unittest.skipUnless(os.environ.get('SOFTROBOT_M3B1_CONTROL')=='1',
+    'set SOFTROBOT_M3B1_CONTROL=1 for five authorized single-update diagnostics')
+class RealVariableTendonControl(unittest.TestCase):
+    def test_single_use_registered_control_updates(self):
+        import mujoco
+        from tools.platform_registry import registry
+        from tools.platform_store import zero
+        from tools.research.state import science_hashes,core_hashes
+        from extensions.tendon_family.gvs_casadi import functions_for,expression_from_system
+        from extensions.tendon_family.gvs import GVSModel
+        from extensions.tendon_family.control_evidence import COMPLETE_UPDATE_INPUTS
+        from schemas.platform_math import SystemContext
+        h=core.prepare(ROOT/'configs/research/topology_control_b1.json')
+        spec=state(h)['spec'];source=spec['configuration']['robot']['structure']['data']
+        cases=topology_cases(source)
+        cases['S1']=dict(remove_tendons=[t['id'] for t in source['tendons'][1:]])
+        self.assertFalse(any(e['kind']=='m3b1_started' for e in h.store.events(h.run_id)),
+            'Single-use engineering scope: recover/read existing results; do not rerun solves')
+        save(h,dict(cases=cases,scope='incomplete diagnostics; no task evaluator',
+            source_hashes=dict(science=science_hashes(),core=core_hashes())), 'm3b1_started')
+        reg=registry();reports={};started=time.perf_counter()
+        class DiagnosticComplete(Exception):pass
+        for name,topology in cases.items():
+            values=deepcopy(spec['reference_parameters'])
+            if topology:values.update(version='research_topology_parameters_v1',topology=topology)
+            ref=design.construct(h,values,dict(origin='authorized_M3B1_single_update',case=name))
+            c=h.store.artifact(ref);inp=SessionInput.model_validate(c['configuration'])
+            backend_def,_=reg.bind(inp.policy.backend,'backend')
+            controller_def,p=reg.bind(inp.policy.controller,'controller')
+            controller=controller_def.resolve()(p,inp.task.timing.control_period_s)
+            backend=backend_def.resolve()();folder=h.store.root/name;folder.mkdir(exist_ok=True)
+            row,_=h.store.reserve(h.run_id,'diagnostic-'+name,digest(c),h.actor,
+                {**zero(),'tool_calls':1,'backend_solves':1})
+            case_start=time.perf_counter()
+            try:
+                ctx=NS(save_artifact=lambda value,kind:save(h,value,kind))
+                controller_def.hook('prepare_execution')(ctx,controller,inp)
+                backend.compile(inp,reg)
+                initializer,ip=reg.bind(inp.task.initializer,'initializer')
+                backend.initialize(initializer.resolve()(ip,inp.seed),controller)
+                backend.folder=folder
+                warm=deepcopy(controller.seed);previous=controller.previous.tolist()
+                nu=len(controller.limits);n=controller.workspace.n
+                modelp=GVSModelParameters(basis=controller.parameters.basis)
+                system=GVSModel(modelp).build_system(inp.robot,modelp,None,
+                    SystemContext(x0=controller.profile['numerical']['measured_initial_state'],u0=previous,scene=inp.task.environment))
+                evaluated=functions_for(expression_from_system(system)).evaluate(
+                    controller.profile['numerical']['measured_initial_state'],previous)
+                self.assertEqual(evaluated['tendon_length_jacobian'].shape,(nu,n))
+                self.assertEqual(evaluated['tendon_length_jacobian'].T.shape,(n,nu))
+                B=np.vstack([np.zeros((n,nu)),np.linalg.solve(evaluated['mass_matrix'],-evaluated['tendon_length_jacobian'].T)])
+                self.assertEqual(B.shape,(2*n,nu))
+                original_command=controller.command;original_step=mujoco.mj_step;physical={}
+                def command(*args):
+                    if controller.observations:
+                        physical.update(tip_m=args[1]['tip'].tolist(),tip_sample_phase='post_interval_mj_forward')
+                        raise DiagnosticComplete()
+                    return original_command(*args)
+                def step(model,data,*args,**kwargs):
+                    original_step(model,data,*args,**kwargs)
+                    physical.update(time_s=float(data.time),qpos=data.qpos.tolist(),qvel=data.qvel.tolist(),
+                        applied_tension_n=(-data.actuator_force).tolist(),tip_m=data.site_xpos[model.site('tip_site').id].tolist(),
+                        nu=model.nu,actuator_tendon_indices=model.actuator_trnid[:,0].tolist())
+                token=COMPLETE_UPDATE_INPUTS.set(True)
+                try:
+                    with patch.object(controller,'command',side_effect=command),patch.object(mujoco,'mj_step',side_effect=step):
+                        with self.assertRaises(DiagnosticComplete):backend.solve(None)
+                finally:COMPLETE_UPDATE_INPUTS.reset(token)
+                self.assertEqual(len(controller.observations),1)
+                self.assertEqual(physical['nu'],nu)
+                self.assertEqual(physical['actuator_tendon_indices'],list(range(nu)))
+                applied=np.asarray(physical['applied_tension_n'])
+                self.assertTrue(np.isfinite(physical['qpos']).all() and np.isfinite(physical['qvel']).all())
+                self.assertTrue(((applied>=-1e-12)&(applied<=controller.limits+1e-12)).all())
+                reports[name]=dict(candidate=ref,configuration_identity=digest(c['configuration']),
+                    physics_identity=backend.physics['identity'],control_identity=backend.scene['control']['identity'],
+                    preparation=controller.preparation,numerical=controller.profile['numerical'],
+                    tendon_order=controller.workspace.tendons,gvs_coordinates=n,gvs_states=2*n,
+                    length_jacobian=evaluated['tendon_length_jacobian'].tolist(),input_matrix=B.tolist(),input_matrix_shape=list(B.shape),
+                    optimization_variables=len(controller.workspace.problem.variables),inputs=nu,
+                    warm_shapes=dict(states=list(np.asarray(warm['states']).shape),tensions=list(np.asarray(warm['tensions']).shape)),
+                    previous_applied_tension_n=previous,observations=controller.observations,physical=physical,
+                    preparation_graph_s=controller.workspace.graph_s,elapsed_s=time.perf_counter()-case_start,
+                    complete_task=False,task_acceptance='not_assessed',scope='one real control update and one physical control interval')
+                with h.store.transaction() as db:
+                    reports[name]['raw_exports']=[dict(filename=p.name,
+                        reference=plain(h.store.put(db,p.read_bytes(),'application/octet-stream')))
+                        for p in sorted(folder.iterdir()) if p.is_file()]
+                save(h,reports[name],'m3b1_case')
+                h.store.complete(row,dict(request_id=row['request_id'],execution_id=row['execution_id'],
+                    caller=h.actor,tool_id='engineering.m3b1',tool_version='1.0.0',execution_status='completed',charged=zero()),
+                    reports[name],elapsed=reports[name]['elapsed_s'])
+                print('M3B1',name,dict(outcome=controller.last['solver_outcome'],status=controller.last['optimization_raw_status'],
+                    applied=applied.tolist(),elapsed_s=reports[name]['elapsed_s']),flush=True)
+            finally:backend.close()
+        update(h,numerical_s=state(h)['numerical_s']+sum(r['elapsed_s'] for r in reports.values()))
+        report=dict(scope='M3-B1 engineering only; five real solves; zero complete task evaluations/provider requests',
+            configuration=spec,cases=reports,elapsed_s=time.perf_counter()-started,ledger=h.store.remaining())
+        atomic_json(ROOT/'evidence/topology_control_20261015/b1/control_diagnostics.json',report)
+        ref=save(h,report,'m3b1_complete')
+        update(h,research_status='stopped',closed_unix=time.time(),final_disposition=ref)
+        core.export(h)
 
 
 if __name__=='__main__':unittest.main()

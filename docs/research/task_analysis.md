@@ -415,3 +415,20 @@ physical conditions. M3-B still needs a declared comparison protocol, appropriat
 nonlinear/controller checks and independently evaluated execution. No six-tendon
 RL policy or incompatible warm state was transferred, and no NMPC campaign,
 provider call, RL training or large candidate search was performed.
+
+### M3-B1 actual control boundary
+
+The independent `topology_control_b1.json` grant permits one through seven tendons
+on the unchanged two-segment source. S1 retains `near_t0` and explicitly removes
+the other five tendons and their independent actuators. Its GVS length Jacobian
+is 1 x 10, force-to-state input matrix is 20 x 1, warm input guess is 10 x 1,
+and MuJoCo has exactly one correctly indexed ideal-tension channel, bounded 0–8 N.
+The registered controller prepared and actually solved all T0/T1/T2/T3/S1 models.
+Each applied one command for 20 physics steps (0.01 s). This is an incomplete
+engineering diagnostic; neither underactuation nor optimizer convergence establishes
+full-task feasibility. Exact states, solver records and raw model exports are in
+the [B1 evidence](../../evidence/topology_control_20261015/b1/control_diagnostics.json)
+and its immutable archive. No historical M3-A grant or task threshold changed.
+S1 has 10 structural-linear coordinates / 20 states: removing far-tendon routes
+also removes a tendon-defined structural knot. The original two flexible segments
+and physical mesh remain; no state from a 24-state candidate was transferred.

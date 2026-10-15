@@ -50,3 +50,35 @@ Actual scientific counts: 7/100 provider requests, 14/600 public operations, 1/1
 This supports one fresh offline development-task pass. Its deterministic metrics equal the supplied historical compliant-case metrics; historical evidence was not substituted for the new execution. There was no fresh paired nominal experiment, so stiffness causality, superiority, continuous/global optimality, robustness and repeatability remain unassessed. All 35 updates missed the physical 0.01 s control period (mean 98.694 s/update); real-time operation was not demonstrated. Fixed two-segment/six-tension topology and existing routing remain; policy/reference transfer across candidates is unsupported.
 
 A focused post-closure repair removed a helper's hidden overwrite of configured solver iterations/tolerance, materialized typed controller/backend settings at the sole resolver, distinguished finite measured costs from disabled limits, and clarified uncertain action accounting and initialization-only continuation rejection. The two new and four affected boundary checks passed after correcting a fixture to use its own grant ID. Existing effective default settings were compared with the actual frozen scientific configuration and are identical. This changes neither the sealed binding nor any result; no second scientific study or successful engineering chain was run.
+
+# M3-B1 actual variable-input control (2026-10-15)
+
+Five genuine registered NMPC updates executed under a new, independent engineering
+grant, using candidate-owned initialization and measured-state warm regeneration.
+Every command was applied through the original MuJoCo backend for 20 physics steps.
+The official 0.35 s task was unchanged and never evaluated in this diagnostic.
+
+| Case | Inputs | NLP variables | IPOPT termination | Independently accepted plan | Total case seconds |
+|---|---:|---:|---|---|---:|
+| T0 | 6 | 340 | Maximum_Iterations_Exceeded | yes, nonconverged | 120.022 |
+| T1 | 5 | 329 | Maximum_Iterations_Exceeded | yes, nonconverged | 119.484 |
+| T2 | 6 | 340 | Maximum_Iterations_Exceeded | yes, nonconverged | 122.183 |
+| T3 | 7 | 351 | Maximum_Iterations_Exceeded | yes, nonconverged | 122.077 |
+| S1 | 1 | 241 | Solve_Succeeded | yes, converged | 22.314 |
+
+No bounded fallback was needed. All applied inputs were within 0–8 N; S1 applied
+5.1430477516 N. T0–T3 retained 12 GVS coordinates / 24 states; S1 correctly used
+10 coordinates / 20 states after a tendon-defined knot disappeared. Total case
+cost was 506.081 s; five cases together took 506.820 s excluding outer setup.
+The shared ledger contains exactly five short diagnostic backend slots, no complete
+tasks and no provider/RL work. These observations prove control-path compatibility,
+not full-task acceptance, global controllability or structural superiority.
+
+All five numerical/physical assertions completed before the integration fixture
+encountered an export-only error: an empty-capability engineering scope has no
+research decision packet. A one-line exporter repair uses the real ledger in that
+case. The original report and failure remain; existing Store records/raw files were
+packaged without repeating a solve or physical step. A focused regression verifies
+this repair. [Original diagnostics](../../evidence/topology_control_20261015/b1/control_diagnostics.json),
+[recovery/provenance](../../evidence/topology_control_20261015/b1/recovery_supplement.json),
+[38 focused checks and invocation details](../../evidence/topology_control_20261015/b1/validation.json).

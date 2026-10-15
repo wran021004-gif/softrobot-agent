@@ -412,7 +412,7 @@ def export(host, destination=None):
             info.size=len(body)
             archive.addfile(info,io.BytesIO(body))
             members.append(dict(name=name,sha256=identity,bytes=info.size,media='application/json'))
-    current=packet(host)
+    current=packet(host) or dict(resource_use=dict(shared_ledger=host.store.remaining()))
     s=state(host)
     if s['spec'].get('budget_semantics',{}).get('mode')=='count':
         disposition={key:s.get(key) for key in ('research_status','freeze','selected','selected_solution','success_gate','final_disposition','validation_extensions','closed_unix')}
