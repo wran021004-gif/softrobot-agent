@@ -1,0 +1,1259 @@
+{
+  "label": "Offline physical/model consistency diagnostics; no task acceptance, topology ranking or live Agent",
+  "source_configuration_identity": "31af3e097ad29fef1ffd74c5178a6267fc5ffe35889c63e98f531dd42c0df69e",
+  "source_design_identity": "2dfc7f678654ae12e65eb8850b9a06928ec1b05ed5de5b5f6c366bf8f8a54dcb",
+  "study_identity": "207ca0eed4658b6240ac537195843c6bc9efc1217e1368f27eda220e7d1b6579",
+  "source_study_identity": "6be9c8df821b828d0e43650b014c4c7450d11aab3fef7852f0bb05a024c1ace6",
+  "topology_authorization": {
+    "actuator_rule": "copy_source_independent_displacement_v1",
+    "attachment_bounds_m": {
+      "distal1": [
+        [
+          0.0,
+          -0.025,
+          -0.025
+        ],
+        [
+          0.0,
+          0.025,
+          0.025
+        ]
+      ],
+      "fixed_base": [
+        [
+          0.0,
+          -0.025,
+          -0.025
+        ],
+        [
+          0.0,
+          0.025,
+          0.025
+        ]
+      ],
+      "mid_guide": [
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ]
+      ],
+      "near": [
+        [
+          0.0,
+          -0.025,
+          -0.025
+        ],
+        [
+          0.0,
+          0.025,
+          0.025
+        ]
+      ]
+    },
+    "editable_guides": [
+      "mid_guide"
+    ],
+    "tendon_bounds": {
+      "diameter_m": [
+        0.001,
+        0.001
+      ],
+      "force_limit_n": [
+        8.0,
+        8.0
+      ],
+      "length_servo_gain_n_m": [
+        900.0,
+        900.0
+      ],
+      "pretension_n": [
+        0.0,
+        0.2
+      ]
+    },
+    "tendon_count_bounds": [
+      5,
+      7
+    ],
+    "version": "tendon_topology_grant_v1"
+  },
+  "common_pose": {
+    "q": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "units": "rad/m",
+    "frame": "segment_local"
+  },
+  "sign_convention": "tau_tendon = -J_length.T @ total_tension",
+  "jacobian_units": "m/(rad/m)",
+  "changed_route": {
+    "tendon_id": "near_t0",
+    "input_index": 0,
+    "jacobian_row_delta": [
+      3.318838268497607e-05,
+      0.000132410856511922,
+      3.318838268497599e-05,
+      -3.451172515816451e-05,
+      -0.00013903903158094108,
+      -3.451172515816429e-05,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "input_direction_delta": [
+      -3.318838268497607e-05,
+      -0.000132410856511922,
+      -3.318838268497599e-05,
+      3.451172515816451e-05,
+      0.00013903903158094108,
+      3.451172515816429e-05,
+      -0.0,
+      -0.0,
+      -0.0,
+      -0.0,
+      -0.0,
+      -0.0
+    ],
+    "norm": 0.00020359160852663087
+  },
+  "cases": {
+    "T0": {
+      "candidate_id": "core-04f642ee5eef9789ea1b19bb8c1ac839db2ddf82664d901fcb08bf17eb08c275",
+      "candidate_artifact": {
+        "artifact_id": "d8cf833b7078b3f6df78b3075426171a39ab13ab6c93a658a3ffc4a5615a6507",
+        "media_type": "application/json"
+      },
+      "configuration_identity": "ee86d1bb5cb2c7b74ee6b03cfaabe41cd3b663a33ebb42af3ed0cc12fb347252",
+      "source_identity": "95e1c4edad29889310252d21e01e6716b81f229bd7a0b91ee4f198dbd1db3bcd",
+      "profile_identity": "ef43a889ab4d47e0e48f15f7b6c4faaec3449383756a11a4e61f1d549bf05e8b",
+      "design_identity": "2dfc7f678654ae12e65eb8850b9a06928ec1b05ed5de5b5f6c366bf8f8a54dcb",
+      "physics_identity": "ff8127ff7de43b039544d8c5c2f4534bee17057b3a81fb6efe78eda9f12a19f5",
+      "model_identity": "42f50c6ff37ab86f514368d7fb155536f2721252d333ad50fe2347a788b64e37",
+      "patch": {
+        "version": "tendon_topology_patch_v1",
+        "remove_tendons": [],
+        "upsert_tendons": [],
+        "guide_holes": {}
+      },
+      "tendon_order": [
+        "near_t0",
+        "near_t1",
+        "near_t2",
+        "far_t0",
+        "far_t1",
+        "far_t2"
+      ],
+      "actuator_order": [
+        "near_motor0",
+        "near_motor1",
+        "near_motor2",
+        "far_motor0",
+        "far_motor1",
+        "far_motor2"
+      ],
+      "coordinate_order": [
+        "near.kappa_y_node_0",
+        "near.kappa_y_node_1",
+        "near.kappa_y_node_2",
+        "near.kappa_z_node_0",
+        "near.kappa_z_node_1",
+        "near.kappa_z_node_2",
+        "distal1.kappa_y_node_0",
+        "distal1.kappa_y_node_1",
+        "distal1.kappa_y_node_2",
+        "distal1.kappa_z_node_0",
+        "distal1.kappa_z_node_1",
+        "distal1.kappa_z_node_2"
+      ],
+      "bounds_n": [
+        [
+          0.0,
+          8.0
+        ],
+        [
+          0.0,
+          8.0
+        ],
+        [
+          0.0,
+          8.0
+        ],
+        [
+          0.0,
+          8.0
+        ],
+        [
+          0.0,
+          8.0
+        ],
+        [
+          0.0,
+          8.0
+        ]
+      ],
+      "pretension_n": [
+        0.2,
+        0.2,
+        0.2,
+        0.2,
+        0.2,
+        0.2
+      ],
+      "jacobian_shape": [
+        6,
+        12
+      ],
+      "jacobian": [
+        [
+          0.00014301927397183503,
+          0.00028316923347866045,
+          0.000143019273971835,
+          -0.0007198394779758219,
+          -0.001453833728594298,
+          -0.0007198394779758218,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0005820252588578802,
+          0.0011523736755121652,
+          0.0005820252588578801,
+          0.00043224240741520135,
+          0.0008729843389474743,
+          0.00043224240741520124,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          -0.0006850450302173888,
+          -0.0013563463910691172,
+          -0.0006850450302173887,
+          0.00022572990212294845,
+          0.00045589850973643713,
+          0.0002257299021229484,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0005668153155292785,
+          0.001122258937309381,
+          0.0005668153155292783,
+          -0.0006865894225697073,
+          -0.0013866797956605692,
+          -0.000686589422569707,
+          0.00035290444685061746,
+          0.0006260849493733317,
+          0.0002827827563675526,
+          -0.00041898292204457945,
+          -0.0007433142423609337,
+          -0.00033573151776364557
+        ],
+        [
+          0.0002947395232865311,
+          0.0005835658549165122,
+          0.00029473952328653105,
+          0.0008458214041628766,
+          0.0017082748631637049,
+          0.0008458214041628767,
+          0.0001835075474862943,
+          0.0003255592685297437,
+          0.00014704481781265224,
+          0.0005161523201415643,
+          0.0009157016923664577,
+          0.0004135934729576322
+        ],
+        [
+          -0.0008764760239624666,
+          -0.0017353678072561903,
+          -0.0008764760239624664,
+          -7.854676103631329e-05,
+          -0.00015863804912109067,
+          -7.854676103631326e-05,
+          -0.0005457020619237759,
+          -0.0009681256523159964,
+          -0.00043727171647565824,
+          -4.793221447100088e-05,
+          -8.503615734581883e-05,
+          -3.84081409227689e-05
+        ]
+      ],
+      "tendon_force": [
+        8.913380351964384e-05,
+        0.00017647936616337203,
+        8.913380351964384e-05,
+        -7.446123542879506e-05,
+        -0.0001503866609866862,
+        -7.446123542879517e-05,
+        3.8359677923560404e-05,
+        6.80535970149326e-05,
+        3.073765591054631e-05,
+        -2.764369604569899e-05,
+        -4.904245949212795e-05,
+        -2.2150926784151684e-05
+      ],
+      "test_tensions_n": [
+        0.1,
+        0.14,
+        0.18,
+        0.21999999999999997,
+        0.26,
+        0.3
+      ],
+      "finite_difference_direction": [
+        0.5403023058681398,
+        -0.4161468365471424,
+        -0.9899924966004454,
+        -0.6536436208636119,
+        0.28366218546322625,
+        0.960170286650366,
+        0.7539022543433046,
+        -0.14550003380861354,
+        -0.9111302618846769,
+        -0.8390715290764524,
+        0.004425697988050785,
+        0.8438539587324921
+      ],
+      "derivative_max_abs_error": 3.498248132144388e-12,
+      "gvs_construction_s": 1.3859340999042615,
+      "linearization": null,
+      "mujoco": {
+        "actuators": 6,
+        "tendons": 6,
+        "xml_identity": "b3095ad3c908f8f7cf80cdae86aa0e6a0913aa33b57bfdc5158544794c7f0a60",
+        "steps": 3,
+        "physical_time_s": 0.0015,
+        "physics_elapsed_s": 0.004883399931713939,
+        "finite": true
+      }
+    },
+    "T1": {
+      "candidate_id": "core-adbd748ae40074db063caa779e7b12e26c1a3708257c90099597becd84767038",
+      "candidate_artifact": {
+        "artifact_id": "90d0ee0b0a5f8c11c7e50622cacaceb935e19f9f58793279d3716554b159bf10",
+        "media_type": "application/json"
+      },
+      "configuration_identity": "2de6417eb78831f37ecbc5057860941bd2342bcf3072a49aeba86b8e4f5ccc79",
+      "source_identity": "95e1c4edad29889310252d21e01e6716b81f229bd7a0b91ee4f198dbd1db3bcd",
+      "profile_identity": "ef43a889ab4d47e0e48f15f7b6c4faaec3449383756a11a4e61f1d549bf05e8b",
+      "design_identity": "015426b276bb595fd0697bb04a7007088c0836b82963b2f7a30cbe1d45ce92fb",
+      "physics_identity": "f36526aa6e9e90ccb984b6a231f8f7980a2319ac59ce6e502b1d01007db9a8a2",
+      "model_identity": "708c9b0d1c46e3fcdc60bd6494375452e246e8c1f7e6bccd4d94ac4c757205bb",
+      "patch": {
+        "version": "tendon_topology_patch_v1",
+        "remove_tendons": [
+          "far_t2"
+        ],
+        "upsert_tendons": [],
+        "guide_holes": {}
+      },
+      "tendon_order": [
+        "near_t0",
+        "near_t1",
+        "near_t2",
+        "far_t0",
+        "far_t1"
+      ],
+      "actuator_order": [
+        "near_motor0",
+        "near_motor1",
+        "near_motor2",
+        "far_motor0",
+        "far_motor1"
+      ],
+      "coordinate_order": [
+        "near.kappa_y_node_0",
+        "near.kappa_y_node_1",
+        "near.kappa_y_node_2",
+        "near.kappa_z_node_0",
+        "near.kappa_z_node_1",
+        "near.kappa_z_node_2",
+        "distal1.kappa_y_node_0",
+        "distal1.kappa_y_node_1",
+        "distal1.kappa_y_node_2",
+        "distal1.kappa_z_node_0",
+        "distal1.kappa_z_node_1",
+        "distal1.kappa_z_node_2"
+      ],
+      "bounds_n": [
+        [
+          0.0,
+          8.0
+        ],
+        [
+          0.0,
+          8.0
+        ],
+        [
+          0.0,
+          8.0
+        ],
+        [
+          0.0,
+          8.0
+        ],
+        [
+          0.0,
+          8.0
+        ]
+      ],
+      "pretension_n": [
+        0.2,
+        0.2,
+        0.2,
+        0.2,
+        0.2
+      ],
+      "jacobian_shape": [
+        5,
+        12
+      ],
+      "jacobian": [
+        [
+          0.00014301927397183505,
+          0.00028316923347866034,
+          0.00014301927397183503,
+          -0.0007198394779758219,
+          -0.0014538337285942976,
+          -0.0007198394779758217,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0005820252588578803,
+          0.001152373675512165,
+          0.0005820252588578801,
+          0.00043224240741520135,
+          0.0008729843389474745,
+          0.00043224240741520135,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          -0.0006850450302173888,
+          -0.0013563463910691172,
+          -0.0006850450302173887,
+          0.00022572990212294843,
+          0.000455898509736437,
+          0.00022572990212294843,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0005668153155292785,
+          0.001122258937309381,
+          0.0005668153155292782,
+          -0.0006865894225697073,
+          -0.0013866797956605687,
+          -0.0006865894225697071,
+          0.00035290444685061746,
+          0.0006260849493733315,
+          0.00028278275636755255,
+          -0.00041898292204457945,
+          -0.0007433142423609334,
+          -0.0003357315177636455
+        ],
+        [
+          0.00029473952328653094,
+          0.0005835658549165122,
+          0.000294739523286531,
+          0.0008458214041628767,
+          0.001708274863163705,
+          0.0008458214041628766,
+          0.00018350754748629444,
+          0.00032555926852974386,
+          0.00014704481781265222,
+          0.0005161523201415645,
+          0.0009157016923664579,
+          0.0004135934729576322
+        ]
+      ],
+      "tendon_force": [
+        -0.0001947223960506667,
+        -0.0003855381872631663,
+        -0.0001947223960506666,
+        -0.00012009745934572386,
+        -0.0002425564899639482,
+        -0.00012009745934572395,
+        -0.0001432783759585427,
+        -0.00025418901790225605,
+        -0.00011480913443568381,
+        -5.0099965531324485e-05,
+        -8.8881947119704e-05,
+        -4.014516244637828e-05
+      ],
+      "test_tensions_n": [
+        0.1,
+        0.15,
+        0.2,
+        0.25,
+        0.3
+      ],
+      "finite_difference_direction": [
+        0.5403023058681398,
+        -0.4161468365471424,
+        -0.9899924966004454,
+        -0.6536436208636119,
+        0.28366218546322625,
+        0.960170286650366,
+        0.7539022543433046,
+        -0.14550003380861354,
+        -0.9111302618846769,
+        -0.8390715290764524,
+        0.004425697988050785,
+        0.8438539587324921
+      ],
+      "derivative_max_abs_error": 1.720619252545269e-12,
+      "gvs_construction_s": 1.4161933000432327,
+      "linearization": null,
+      "mujoco": {
+        "actuators": 5,
+        "tendons": 5,
+        "xml_identity": "b537fce608b6f063d81e595c09bb5103393fdc18d1a289bd42d51f609a98e9cf",
+        "steps": 3,
+        "physical_time_s": 0.0015,
+        "physics_elapsed_s": 0.004645099979825318,
+        "finite": true
+      }
+    },
+    "T2": {
+      "candidate_id": "core-c08563ed0c59f2658deb963add4c4878044a4d95d57d104a3c65b4dae40cd287",
+      "candidate_artifact": {
+        "artifact_id": "563e696c39043221b1b8d4ebad12c10b7a0177c9feb94432139f9df59f992315",
+        "media_type": "application/json"
+      },
+      "configuration_identity": "01ac33d75415b77fd9b6062981b140e42db43ed217993c21401d1503f26f283d",
+      "source_identity": "95e1c4edad29889310252d21e01e6716b81f229bd7a0b91ee4f198dbd1db3bcd",
+      "profile_identity": "ef43a889ab4d47e0e48f15f7b6c4faaec3449383756a11a4e61f1d549bf05e8b",
+      "design_identity": "0dc1da3205c01603627b154dc707d00e87588742c0fc40bba02dcbc0cfea37f4",
+      "physics_identity": "092eb8c29e1bd01993b89bfefa053d4ebf8fcc4d628572b3e4c7dc47fafb73a4",
+      "model_identity": "f9ad133e237b8b7cb448c3a5e1966e5ba751c0e594fc7dec8153270670d591ed",
+      "patch": {
+        "version": "tendon_topology_patch_v1",
+        "remove_tendons": [],
+        "upsert_tendons": [
+          {
+            "id": "near_t0",
+            "points": [
+              {
+                "attachment": {
+                  "part": "fixed_base",
+                  "s": 0.0,
+                  "position_m": [
+                    0.0,
+                    0.01781761038515377,
+                    0.0036118084338542127
+                  ],
+                  "quaternion_wxyz": [
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0
+                  ]
+                },
+                "hole": null,
+                "role": "start"
+              },
+              {
+                "attachment": {
+                  "part": "near",
+                  "s": 0.5,
+                  "position_m": [
+                    0.0,
+                    0.021,
+                    0.006
+                  ],
+                  "quaternion_wxyz": [
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0
+                  ]
+                },
+                "hole": null,
+                "role": "guide"
+              },
+              {
+                "attachment": {
+                  "part": "mid_guide",
+                  "s": 0.0,
+                  "position_m": [
+                    0.0,
+                    0.0,
+                    0.0
+                  ],
+                  "quaternion_wxyz": [
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0
+                  ]
+                },
+                "hole": "near_h0",
+                "role": "anchor"
+              }
+            ],
+            "diameter_m": 0.001,
+            "model": "straight_frictionless",
+            "length_servo_gain_n_m": 900.0,
+            "pretension_n": 0.2,
+            "force_limit_n": 8.0
+          }
+        ],
+        "guide_holes": {}
+      },
+      "tendon_order": [
+        "near_t0",
+        "near_t1",
+        "near_t2",
+        "far_t0",
+        "far_t1",
+        "far_t2"
+      ],
+      "actuator_order": [
+        "near_motor0",
+        "near_motor1",
+        "near_motor2",
+        "far_motor0",
+        "far_motor1",
+        "far_motor2"
+      ],
+      "coordinate_order": [
+        "near.kappa_y_node_0",
+        "near.kappa_y_node_1",
+        "near.kappa_y_node_2",
+        "near.kappa_z_node_0",
+        "near.kappa_z_node_1",
+        "near.kappa_z_node_2",
+        "distal1.kappa_y_node_0",
+        "distal1.kappa_y_node_1",
+        "distal1.kappa_y_node_2",
+        "distal1.kappa_z_node_0",
+        "distal1.kappa_z_node_1",
+        "distal1.kappa_z_node_2"
+      ],
+      "bounds_n": [
+        [
+          0.0,
+          8.0
+        ],
+        [
+          0.0,
+          8.0
+        ],
+        [
+          0.0,
+          8.0
+        ],
+        [
+          0.0,
+          8.0
+        ],
+        [
+          0.0,
+          8.0
+        ],
+        [
+          0.0,
+          8.0
+        ]
+      ],
+      "pretension_n": [
+        0.2,
+        0.2,
+        0.2,
+        0.2,
+        0.2,
+        0.2
+      ],
+      "jacobian_shape": [
+        6,
+        12
+      ],
+      "jacobian": [
+        [
+          0.0001762076566568111,
+          0.00041558008999058245,
+          0.000176207656656811,
+          -0.0007543512031339864,
+          -0.0015928727601752391,
+          -0.0007543512031339861,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0005820252588578802,
+          0.0011523736755121652,
+          0.0005820252588578801,
+          0.00043224240741520135,
+          0.0008729843389474743,
+          0.00043224240741520124,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          -0.0006850450302173888,
+          -0.0013563463910691172,
+          -0.0006850450302173887,
+          0.00022572990212294845,
+          0.00045589850973643713,
+          0.0002257299021229484,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0005668153155292785,
+          0.001122258937309381,
+          0.0005668153155292783,
+          -0.0006865894225697073,
+          -0.0013866797956605692,
+          -0.000686589422569707,
+          0.00035290444685061746,
+          0.0006260849493733317,
+          0.0002827827563675526,
+          -0.00041898292204457945,
+          -0.0007433142423609337,
+          -0.00033573151776364557
+        ],
+        [
+          0.0002947395232865311,
+          0.0005835658549165122,
+          0.00029473952328653105,
+          0.0008458214041628766,
+          0.0017082748631637049,
+          0.0008458214041628767,
+          0.0001835075474862943,
+          0.0003255592685297437,
+          0.00014704481781265224,
+          0.0005161523201415643,
+          0.0009157016923664577,
+          0.0004135934729576322
+        ],
+        [
+          -0.0008764760239624666,
+          -0.0017353678072561903,
+          -0.0008764760239624664,
+          -7.854676103631329e-05,
+          -0.00015863804912109067,
+          -7.854676103631326e-05,
+          -0.0005457020619237759,
+          -0.0009681256523159964,
+          -0.00043727171647565824,
+          -4.793221447100088e-05,
+          -8.503615734581883e-05,
+          -3.84081409227689e-05
+        ]
+      ],
+      "tendon_force": [
+        8.581496525114624e-05,
+        0.0001632382805121798,
+        8.581496525114624e-05,
+        -7.101006291297862e-05,
+        -0.0001364827578285921,
+        -7.101006291297871e-05,
+        3.8359677923560404e-05,
+        6.80535970149326e-05,
+        3.073765591054631e-05,
+        -2.764369604569899e-05,
+        -4.904245949212795e-05,
+        -2.2150926784151684e-05
+      ],
+      "test_tensions_n": [
+        0.1,
+        0.14,
+        0.18,
+        0.21999999999999997,
+        0.26,
+        0.3
+      ],
+      "finite_difference_direction": [
+        0.5403023058681398,
+        -0.4161468365471424,
+        -0.9899924966004454,
+        -0.6536436208636119,
+        0.28366218546322625,
+        0.960170286650366,
+        0.7539022543433046,
+        -0.14550003380861354,
+        -0.9111302618846769,
+        -0.8390715290764524,
+        0.004425697988050785,
+        0.8438539587324921
+      ],
+      "derivative_max_abs_error": 3.498248132144388e-12,
+      "gvs_construction_s": 1.3793710001045838,
+      "linearization": null,
+      "mujoco": {
+        "actuators": 6,
+        "tendons": 6,
+        "xml_identity": "184ba7a5a17c42afe6a4007a38759f02cc0d3eb0786a2acca232bd5572ae8372",
+        "steps": 3,
+        "physical_time_s": 0.0015,
+        "physics_elapsed_s": 0.005365899996832013,
+        "finite": true
+      }
+    },
+    "T3": {
+      "candidate_id": "core-afa151215cdd339fc45ec4bea0994be90e9d92e9d658aaf702ad2befdf0e7b4d",
+      "candidate_artifact": {
+        "artifact_id": "5346ebf46c374828ac54da04484bdc7b58c8710150862d348419a3119c87fa32",
+        "media_type": "application/json"
+      },
+      "configuration_identity": "0c9ba903c8e5c54c2f33967e96335e7cc345c2ed0c8def8617f784486b525539",
+      "source_identity": "95e1c4edad29889310252d21e01e6716b81f229bd7a0b91ee4f198dbd1db3bcd",
+      "profile_identity": "ef43a889ab4d47e0e48f15f7b6c4faaec3449383756a11a4e61f1d549bf05e8b",
+      "design_identity": "a8281350f24d74d3f397e8d2f0c09f85d11857be8221384929cccbe706b0ac09",
+      "physics_identity": "18de6b06cd36b7d1a8e14341be61ee85a6881e565d45d9a8d3746d2d0533c69f",
+      "model_identity": "3709b6a33817e21afe71a7c3eaaad22e996f90c5da2947d439704a9b37a56b60",
+      "patch": {
+        "version": "tendon_topology_patch_v1",
+        "remove_tendons": [],
+        "upsert_tendons": [
+          {
+            "id": "near_t3",
+            "points": [
+              {
+                "attachment": {
+                  "part": "fixed_base",
+                  "s": 0.0,
+                  "position_m": [
+                    0.0,
+                    0.0,
+                    0.018
+                  ],
+                  "quaternion_wxyz": [
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0
+                  ]
+                },
+                "hole": null,
+                "role": "start"
+              },
+              {
+                "attachment": {
+                  "part": "near",
+                  "s": 0.5,
+                  "position_m": [
+                    0.0,
+                    0.0,
+                    0.018
+                  ],
+                  "quaternion_wxyz": [
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0
+                  ]
+                },
+                "hole": null,
+                "role": "guide"
+              },
+              {
+                "attachment": {
+                  "part": "mid_guide",
+                  "s": 0.0,
+                  "position_m": [
+                    0.0,
+                    0.0,
+                    0.0
+                  ],
+                  "quaternion_wxyz": [
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0
+                  ]
+                },
+                "hole": "near_h3",
+                "role": "anchor"
+              }
+            ],
+            "diameter_m": 0.001,
+            "model": "straight_frictionless",
+            "length_servo_gain_n_m": 900.0,
+            "pretension_n": 0.2,
+            "force_limit_n": 8.0
+          }
+        ],
+        "guide_holes": {
+          "mid_guide": {
+            "near_h3": [
+              0.0,
+              0.0,
+              0.018
+            ]
+          }
+        }
+      },
+      "tendon_order": [
+        "near_t0",
+        "near_t1",
+        "near_t2",
+        "far_t0",
+        "far_t1",
+        "far_t2",
+        "near_t3"
+      ],
+      "actuator_order": [
+        "near_motor0",
+        "near_motor1",
+        "near_motor2",
+        "far_motor0",
+        "far_motor1",
+        "far_motor2",
+        "near_t3_motor"
+      ],
+      "coordinate_order": [
+        "near.kappa_y_node_0",
+        "near.kappa_y_node_1",
+        "near.kappa_y_node_2",
+        "near.kappa_z_node_0",
+        "near.kappa_z_node_1",
+        "near.kappa_z_node_2",
+        "distal1.kappa_y_node_0",
+        "distal1.kappa_y_node_1",
+        "distal1.kappa_y_node_2",
+        "distal1.kappa_z_node_0",
+        "distal1.kappa_z_node_1",
+        "distal1.kappa_z_node_2"
+      ],
+      "bounds_n": [
+        [
+          0.0,
+          8.0
+        ],
+        [
+          0.0,
+          8.0
+        ],
+        [
+          0.0,
+          8.0
+        ],
+        [
+          0.0,
+          8.0
+        ],
+        [
+          0.0,
+          8.0
+        ],
+        [
+          0.0,
+          8.0
+        ],
+        [
+          0.0,
+          8.0
+        ]
+      ],
+      "pretension_n": [
+        0.2,
+        0.2,
+        0.2,
+        0.2,
+        0.2,
+        0.2,
+        0.2
+      ],
+      "jacobian_shape": [
+        7,
+        12
+      ],
+      "jacobian": [
+        [
+          0.00014301927397183503,
+          0.00028316923347866045,
+          0.000143019273971835,
+          -0.0007198394779758219,
+          -0.001453833728594298,
+          -0.0007198394779758218,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0005820252588578802,
+          0.0011523736755121652,
+          0.0005820252588578801,
+          0.00043224240741520135,
+          0.0008729843389474743,
+          0.00043224240741520124,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          -0.0006850450302173888,
+          -0.0013563463910691172,
+          -0.0006850450302173887,
+          0.00022572990212294845,
+          0.00045589850973643713,
+          0.0002257299021229484,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0005668153155292785,
+          0.001122258937309381,
+          0.0005668153155292783,
+          -0.0006865894225697073,
+          -0.0013866797956605692,
+          -0.000686589422569707,
+          0.00035290444685061746,
+          0.0006260849493733317,
+          0.0002827827563675526,
+          -0.00041898292204457945,
+          -0.0007433142423609337,
+          -0.00033573151776364557
+        ],
+        [
+          0.0002947395232865311,
+          0.0005835658549165122,
+          0.00029473952328653105,
+          0.0008458214041628766,
+          0.0017082748631637049,
+          0.0008458214041628767,
+          0.0001835075474862943,
+          0.0003255592685297437,
+          0.00014704481781265224,
+          0.0005161523201415643,
+          0.0009157016923664577,
+          0.0004135934729576322
+        ],
+        [
+          -0.0008764760239624666,
+          -0.0017353678072561903,
+          -0.0008764760239624664,
+          -7.854676103631329e-05,
+          -0.00015863804912109067,
+          -7.854676103631326e-05,
+          -0.0005457020619237759,
+          -0.0009681256523159964,
+          -0.00043727171647565824,
+          -4.793221447100088e-05,
+          -8.503615734581883e-05,
+          -3.84081409227689e-05
+        ],
+        [
+          0.0007199999999999999,
+          0.0014399999999999999,
+          0.0007199999999999998,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      ],
+      "tendon_force": [
+        -0.00014213980235805787,
+        -0.0002857614199120468,
+        -0.00014213980235805784,
+        -6.236466372598226e-05,
+        -0.0001259556531300994,
+        -6.236466372598235e-05,
+        3.212123272941473e-05,
+        5.698602141932581e-05,
+        2.5738782297046156e-05,
+        -2.385703309851553e-05,
+        -4.2324571121101695e-05,
+        -1.9116669224646688e-05
+      ],
+      "test_tensions_n": [
+        0.1,
+        0.13333333333333333,
+        0.16666666666666669,
+        0.2,
+        0.23333333333333334,
+        0.26666666666666666,
+        0.3
+      ],
+      "finite_difference_direction": [
+        0.5403023058681398,
+        -0.4161468365471424,
+        -0.9899924966004454,
+        -0.6536436208636119,
+        0.28366218546322625,
+        0.960170286650366,
+        0.7539022543433046,
+        -0.14550003380861354,
+        -0.9111302618846769,
+        -0.8390715290764524,
+        0.004425697988050785,
+        0.8438539587324921
+      ],
+      "derivative_max_abs_error": 3.498248132144388e-12,
+      "gvs_construction_s": 1.3759216000325978,
+      "linearization": {
+        "elapsed_s": 5.119289500056766,
+        "A_shape": [
+          24,
+          24
+        ],
+        "B_shape": [
+          24,
+          7
+        ]
+      },
+      "mujoco": {
+        "actuators": 7,
+        "tendons": 7,
+        "xml_identity": "ca1c1be8658c09eb159b6e853f99d359eecc694ecb061a036ad50a410130b5da",
+        "steps": 3,
+        "physical_time_s": 0.0015,
+        "physics_elapsed_s": 0.005299299955368042,
+        "finite": true
+      }
+    }
+  },
+  "total_geometry_elapsed_s": 11.279801800032146,
+  "candidate_construction_elapsed_s": 0.8261304000625387,
+  "resources": {
+    "gvs_graphs": 4,
+    "new_topology_linearizations": 1,
+    "mujoco_physics_steps": 12,
+    "provider_calls": 0,
+    "nmpc_solves": 0,
+    "rl_training": 0
+  },
+  "unsupported": [
+    "manufacturability",
+    "global controllability",
+    "task feasibility",
+    "structural superiority"
+  ],
+  "source_hashes": {
+    "science": {
+      "extensions/tendon_family/gvs_nmpc.py": "ddb3207c293c8ba2584c8cb4eea9753cbafa42da85ee83e18df1eec2c955d77b",
+      "extensions/tendon_family/gvs_trajectory.py": "aa7ac451d2c1e3bec3ed9b771b2eed9a557f749f0758ce5606e136181810462e",
+      "extensions/tendon_family/gvs_projection.py": "4b17c9389652de3cc5a889384beba0a63dec18a7db0f7f9ed9696b3f794b8df7",
+      "extensions/tendon_family/contracts.py": "377929d221932bc4a802b13d5fb356ab93bd35c3efe1ed044ad8e94c8f013243",
+      "extensions/tendon_family/control_evidence.py": "31b1994df6c55880b3e2bb5adaaebe502badbf36a6b206c7f03b733e44af989a",
+      "extensions/tendon_family/backends.py": "70a19e629c559c902c657963c46736e3854c5f3b84886655c4b99a809edfac0e",
+      "extensions/tendon_family/generated_serial.py": "1c6e1eb0299ecc4f725f7654741626c65b867d90e4145764103e82daf53a9d52",
+      "extensions/tendon_family/gvs_profile.py": "2b3ece84dc409dfde88cfc4ef067d6248ab463b675db858177843bb672175895",
+      "extensions/tendon_family/gvs_codesign.py": "bdfee2a1fba8a79094e5084b09c90601cf8ead6ef872ce4d745c223e0680f147",
+      "extensions/tendon_family/gvs_casadi.py": "ae16f44882e4a7850dbdfa76e9942bb607bc92c51cf6b773356455a49d0dcdbd",
+      "extensions/tendon_family/gvs.py": "c0201588c34f90090e14c27302ef5a2bd2888626e06b4beb746b8889a9b9f320",
+      "extensions/tendon_family/gvs_basis.py": "0dd6ae2d26b180f9da588f8732f8a9d0800b633535485f5e7eca4c4b68bf3455",
+      "extensions/tendon_family/math_analysis.py": "838ba1b1ae9b399ea6e53f1e60f9e68af4cb2b9547173cf53041a3a438cd5f15",
+      "extensions/tendon_family/compiler.py": "29c338b0d343f20b6b9a7bd56dfbd1cc576d7342c65afe81cd17c0806bdb64e6",
+      "extensions/tendon_family/sections.py": "d7b5918c7f140e59f97ad1342f85f72fe7a3d1276af6c029e5b607fad016bd07",
+      "extensions/tendon_family/geometry.py": "6227f9b712f94e4853e734d7fd65373ff314bff02497b4c6bcc6d0dec4bb1e1b",
+      "extensions/tendon_family/manifest.py": "45850591451951a2e61f322b3ad033d7ff76fde8e508dfc5e9b58ed35f409e05",
+      "extensions/optimization/contracts.py": "21a7729881fce05a78356743199353151f581a55c6231b97e8f00b45323816b5",
+      "extensions/optimization/ipopt.py": "eb2672cb3845a17ef703d85f939545fa3e4d0358b6da42c89f83231bb00dbfb2",
+      "extensions/math_analysis/tools.py": "991ab623f27cdf852aa422dcee2cf618e17ecd7c445b49093f0b80a9c8b4c9e9",
+      "extensions/math_analysis/kernels.py": "b767e335fde15e575d76868544b31f339d84711f8708cd78bee48a965eaace0e",
+      "schemas/platform_analysis.py": "12f049478c25a5d6d791b91cae1826fc4181d99c049d53c6ee189c0092a84f95",
+      "tools/execution_completion.py": "b745b96446f9f7b1e5172a8f8cc8c93d2a053a7df385d6c0e2e7299aa946a069",
+      "tools/research_tasks.py": "cde37e55f1bf5a2d66543ad8b2fcbf1543f04fedcdbb460cb2ac644787cf594d",
+      "extensions/math_analysis/trajectory.py": "dc08d9c239c71bcf49a0c9f325fb11960769a8e141534d45a4048e8521f6fc1b",
+      "tools/rl/env.py": "d1d90e066852f385e25268a5eea20102e03397568a462159ad8ec24943492cf0",
+      "tools/rl/train.py": "9d7cee245ca67e3eda05dc2a3f34d500727dbe7695ed45450aa3368a5911b7cb",
+      "tools/rl/checks.py": "b965d96b73ba7e5d4e4248044be32dcf9b11f6502914cf173b8349457ceed5f4",
+      "tools/rl/continuation.py": "d4b6a0c231c3822e0dfea0b886b6e2273394450ceda9a6ff90ea3f06722c5e56"
+    },
+    "core": {
+      "tools/research/agent.py": "a0df76397a84425f26cc269298fc08d2b3e7482791475c82d367e7b738e175a0",
+      "tools/research/analysis.py": "dd252a71eedec1e17072d3dd6d44b2d2752864f1cc1a9f886fcc4a10a3ffbc08",
+      "tools/research/budget.py": "d73c678692997a6af26d9533b7cc1a325ae666e46e253233f69283606551bd5c",
+      "tools/research/config.py": "3deb3912774e36e28d5da654387d42544ab0ecc64f6f73aea325ee55f123c999",
+      "tools/research/contracts.py": "d8e1c7d95e6d00b3f378a80a059fa5713aaff5665f673eb5b750d1a9e3d49016",
+      "tools/research/core.py": "019f63b22bfe537614ee56d51306921d1447ed98f07625457277ee84f91335ba",
+      "tools/research/design.py": "3c74c80b22f95b9c54f83dbf2e8801c2f70df750d15aee87a1f14b3a4af63815",
+      "tools/research/diagnostic.py": "78ca53f9af275561d7f35edeb1f5b575a29f508264f7cd5c0a60d60bfb025faf",
+      "tools/research/execution.py": "973d329b5d790262099885a27851605edb9fc0634b2b740b487863958a2d8638",
+      "tools/research/execution_worker.py": "68a8f16ee3e859a37ccc334a884cc8b490a7ed8e11bbaed7377be553d8a52ae3",
+      "tools/research/experience.py": "08137de1f77870f18738b845d6417f49a56d94d9d95809ec92c7cd6aee18f2fa",
+      "tools/research/feedback.py": "2588e2573ab20b53f0a0910a868f8ba37c19b23029a0752ed860b46c9e3424ba",
+      "tools/research/mechanics.py": "ea618cf1991f882737db830ef3116eb7150271c5e278bdbd35a06a47a7b03dbd",
+      "tools/research/mechanics_worker.py": "0d139af160313fa210472814b7fd1929576de72ca8a54bce6caa48f5b4e5575f",
+      "tools/research/numerics.py": "a4f08d5984534d8e5b63b3b3f85b1e13aa25a614caf3b3855a65d0b290c0bad6",
+      "tools/research/rl.py": "23ad9604351225a2fd3549f03d69b926187082ad41169776f92d2b9c272b3d1a",
+      "tools/research/search.py": "c3b521cadafc57977e9771ec003ae092eeeeafac01de6b3828ec6208f7ecc9c9",
+      "tools/research/state.py": "2f15a5294dbc757176fa66940d408052f832ea97feb27b24d96e31972031d639",
+      "tools/research/task_constraints.py": "0a9b54c6e8b53edca7fea643bc4099d951b3efd6f559cb43a43b096cc2628a33",
+      "tools/research/__init__.py": "7eb70257593da06f682a3ddda54a9d260d4fc514f645237f5ca74b08f8da61a6",
+      "tools/research/__main__.py": "5c15f01744c59dd0efc9495c82d1fa5e83607dd68742569491544d3f560b3049",
+      "tools/service_execution.py": "e93d938e0af49c7f36c1a8cf1d1d9304f71fff8d7670029e2f0da00ca3f5f423",
+      "tools/rl/env.py": "d1d90e066852f385e25268a5eea20102e03397568a462159ad8ec24943492cf0",
+      "tools/rl/run.py": "f4542552eb165157bc0782ed12f44cc0237e74241e77c451571711e150d4ebd9",
+      "tools/rl/train.py": "9d7cee245ca67e3eda05dc2a3f34d500727dbe7695ed45450aa3368a5911b7cb",
+      "tools/rl/checks.py": "b965d96b73ba7e5d4e4248044be32dcf9b11f6502914cf173b8349457ceed5f4",
+      "tools/rl/continuation.py": "d4b6a0c231c3822e0dfea0b886b6e2273394450ceda9a6ff90ea3f06722c5e56"
+    }
+  }
+}

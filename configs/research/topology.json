@@ -1,0 +1,41 @@
+{
+  "extends": "study.json",
+  "study_id": "topology-interface-20261015",
+  "authorization": "User task attachment 37f23c9d-df42-44dd-a26f-a118a521163b: M3-A offline source-relative topology implementation and focused validation only; no provider, RL training or full NMPC campaign.",
+  "base_commit": "8b69568f0ed45b36ff55c18ef03878e9ae27c071",
+  "mode": "engineering_numerical",
+  "capabilities": ["analysis"],
+  "allowed_plan_actions": ["propose", "stop"],
+  "evidence_destination": "evidence/topology_20261015",
+  "supplied_evidence": [],
+  "budgets": {
+    "provider_requests": 0,
+    "protected_provider_requests": 0,
+    "public_operations": 40,
+    "protected_public_operations": 0,
+    "physical_launches": 0,
+    "local_solves": 0,
+    "mathematical_evaluations": 4
+  },
+  "nmpc_limits": {"executions": 0},
+  "execution_instructions": "M3-A offline topology interface. Propose explicit source-relative tendon patches under the frozen topology_authorization. No provider calls, RL training, closed-loop NMPC, design ranking or task-performance claims. Topology-local continuous changes retain their existing bounds. A local Jacobian diagnostic is not global controllability or task acceptance.",
+  "range_status": "The inherited topology_scope describes the unchanged six-tendon source. topology_authorization alone grants candidate count/routing changes. Explicit offsets remain fixed under continuous geometry changes. Abstract segment offset attachments do not establish manufacturability.",
+  "topology_authorization": {
+    "version": "tendon_topology_grant_v1",
+    "tendon_count_bounds": [5, 7],
+    "tendon_bounds": {
+      "diameter_m": [0.001, 0.001],
+      "force_limit_n": [8.0, 8.0],
+      "pretension_n": [0.0, 0.2],
+      "length_servo_gain_n_m": [900.0, 900.0]
+    },
+    "attachment_bounds_m": {
+      "fixed_base": [[0.0, -0.025, -0.025], [0.0, 0.025, 0.025]],
+      "near": [[0.0, -0.025, -0.025], [0.0, 0.025, 0.025]],
+      "mid_guide": [[0.0, 0.0, 0.0], [0.0, 0.0, 0.0]],
+      "distal1": [[0.0, -0.025, -0.025], [0.0, 0.025, 0.025]]
+    },
+    "editable_guides": ["mid_guide"],
+    "actuator_rule": "copy_source_independent_displacement_v1"
+  }
+}

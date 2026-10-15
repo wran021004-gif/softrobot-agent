@@ -4,6 +4,7 @@ from pydantic import Field, FiniteFloat, model_validator
 from schemas.common import Contract
 from schemas.platform import EvidenceRef
 from schemas.platform_analysis import TaskAnalysisProtocol
+from extensions.tendon_family.generated_serial import TopologyPatch
 
 
 class SegmentParameters(Contract):
@@ -27,10 +28,15 @@ class Parameters(Contract):
     terminal_tip_speed_weight: FiniteFloat = Field(ge=0)
 
 
+class TopologyParameters(Parameters):
+    version: Literal['research_topology_parameters_v1']
+    topology: TopologyPatch
+
+
 class Search(Contract):
     variables: list[str] = Field(min_length=1)
     bounds: dict[str,tuple[FiniteFloat,FiniteFloat]]
-    fixed: Parameters
+    fixed: Parameters | TopologyParameters
     method: Literal['hierarchical_coordinate_v1_1'] = 'hierarchical_coordinate_v1_1'
     evaluation_mode: Literal['mathematical_proxy','backend_task'] = 'mathematical_proxy'
     objective: Literal['held_position_min_eigenvalue','target_equilibrium_residual','joint_reach_hold']
@@ -107,7 +113,7 @@ class Plan(Contract):
     fixed_conditions: str = Field(min_length=1)
     stopping_condition: str = Field(min_length=1)
     interpretation: str = Field(min_length=1)
-    parameters: Parameters | None = None
+    parameters: Parameters | TopologyParameters | None = None
     search: Search | None = None
     candidate: EvidenceRef | None = None
     selected_execution: EvidenceRef | None = Field(default=None, description='Exact immutable passing NMPC result or independent RL evaluation; freezes the complete solution')

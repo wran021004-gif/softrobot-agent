@@ -293,3 +293,125 @@ pages retrieved all 13 original replay records exactly; original artifact identi
 was unchanged. Existing M2 integration exercises full/partial witnesses,
 exclusion, inconclusive and not-applicable results through Store and packet with
 receipt reuse. Strands offload, retrieval and provider integration were not changed.
+
+## M3-A: explicitly authorized tendon topology
+
+`configs/research/topology.json` is a small, single-level extension of the existing
+study. It references its original raw study hash/ID and the same robot, task,
+control and runtime sources. Preparation freezes these values once. The original
+`study.json` is unchanged and gains no topology permission. The example grants
+five through seven independent ideal tensions, explicit attachment-position boxes,
+editable guide ownership, and tendon diameter/force/pretension/servo bounds.
+Its provider, NMPC and backend-launch allowances are zero. The inherited
+`topology_scope` still describes the six-tendon physical source; the separate,
+versioned `topology_authorization` alone permits candidate modifications.
+
+The additive builder is `candidate.family@4.0.0`, with
+`family.topology_space@1.0.0`. It reuses the old continuous segment generation and
+the existing physical `Tendon`, `RoutePoint`, `Actuator` and compiler contracts.
+The old `candidate.family@3.0.0` / `family.generator_space@1.0.0` payload and old
+proposal serialization are unchanged. A topology proposal uses the existing
+`research_plan` action `propose`, with its usual hypothesis/evidence/stop fields:
+
+```python
+parameters = {
+    **frozen_reference_parameters,  # existing continuous physical/control fields
+    "version": "research_topology_parameters_v1",
+    "topology": {
+        "version": "tendon_topology_patch_v1",
+        "remove_tendons": ["far_t2"],
+        "upsert_tendons": [],      # complete existing Tendon definitions
+        "guide_holes": {},         # guide ID -> named hole -> explicit local xyz
+    },
+}
+```
+
+Without the new parameter version, the old continuous proposal contract applies.
+Without the frozen topology grant, a versioned topology proposal is rejected.
+Complete upserts replace an existing tendon at its source index or append a new
+tendon in patch order; removals also remove their independent actuator. The
+explicit grant rule `copy_source_independent_displacement_v1` copies the first
+source actuator's physical parameters for a new tendon, names it
+`<tendon_id>_motor` and sets its sole transmission to that tendon at ratio one.
+Existing actuators remain unchanged, in the resolved tendon order. There is no
+implicit actuator tuning, route-coordinate scaling or unknown-field patching.
+Continuous coordinate search can retain a fixed typed topology in `Search.fixed`;
+it is not a mixed-integer search or a cross-topology ranking mechanism.
+
+Guide holes must fit the unchanged guide envelope, remain separated by more than
+two hole radii, and accept the actual tendon diameter. M3-A uses one tendon per
+named guide hole and requires named-hole references on guides. Supported segment
+attachments remain explicit normalized stations and fixed local offsets inside
+the grant's position boxes; these are ideal model attachments, not newly modeled
+physical guide hardware. The compiler checks role order, attachment ownership,
+zero spans, unique entities and transmission ownership. Missing checks added here
+reject pretension above the physical force limit and explicit rigid attachment
+points outside the rigid envelope. No geometry/transmission check was weakened.
+
+Effective candidate configurations retain the frozen six-tendon source design,
+mesh, explicit grant/patch, resolved physical tendon/actuator order, force bounds,
+control recipe, GVS basis, named zero initializer and exact evaluation profile.
+The owning Store study retains the original study ID/hash. Same-count route
+changes produce different scientific candidate IDs; labels and evidence references
+do not replace the physical configuration in the identity. Historical source
+fingerprints and sealed results remain untouched. New implementations require a
+new binding or explicit migration under the existing guards, without budget reset.
+
+### Verified physical/model boundary
+
+The single `test_variable_tendons.py` module exercises real candidate construction
+through typed native proposal dispatch and Store receipts, without a provider.
+`evidence/topology_20261015/physical_diagnostics.json` retains exact candidate,
+configuration, source, profile, physical and GVS model identities, patches,
+ordered bounds, Jacobians, force sign checks and actual measured costs. Candidate
+artifact references identify temporary offline fixture Stores; the export retains
+the explicit patches and frozen source identities needed to reconstruct them.
+
+| Case | Physical change | GVS length Jacobian | MuJoCo inputs |
+|---|---|---|---:|
+| T0 | Unchanged six-tendon reference | 6 x 12 | 6 |
+| T1 | Remove `far_t2` and its motor | 5 x 12 | 5 |
+| T2 | Explicitly move `near_t0`'s midpoint offset to `[0, .021, .006]` m | 6 x 12 | 6 |
+| T3 | Add `near_t3`, with start/midpoint `[0, 0, .018]` m and a fitting new `near_h3` hole | 7 x 12 | 7 |
+
+Every candidate keeps the same two flexible segments, 12 structural-linear GVS
+coordinates and source mesh. T0's complete compiled physics equals the original
+compiler at `8b69568f`; its effective old configuration hash remains
+`31af3e097ad29fef1ffd74c5178a6267fc5ffe35889c63e98f531dd42c0df69e`.
+Its GVS expression identity also exactly matches the saved M2 expression
+`42f50c6ff37ab86f514368d7fb155536f2721252d333ad50fe2347a788b64e37`.
+
+At the common declared zero-curvature pose, T2 changes only `near_t0`'s Jacobian
+row (norm of the row difference `2.0359160852663087e-4` m/(rad/m)). The actual
+model returns `tau_tendon = -J_length.T @ total_tension`; directional central
+differences using the independent numerical GVS kinematics agree within
+`3.498248132144388e-12` absolute error across all four candidates. T3's one local
+linearization has A shape 24 x 24 and B shape 24 x 7. Model/input order, physical
+bounds and candidate-owned initializer/warm-guess dimensions agree. Real five/seven
+candidate saved-state boundary tests reject six-channel states before any worker;
+the deliberate valid-boundary worker-failure fixtures remain `incomplete`.
+
+All four XML files compile in MuJoCo 3.13.0. Tendon/actuator indices, negative
+actuator force for positive tension, generalized-force sign and physical length
+agree with compiled geometry. Each model executes exactly three physical steps
+(0.0015 s), with finite states and no bad-state warnings: 12 steps total. No
+controller command, optimization rollout or task acceptance was evaluated.
+
+The recorded geometry validation took 11.279801800032146 s: four GVS graph builds
+took 1.3859340999042615, 1.4161933000432327, 1.3793710001045838 and
+1.3759216000325978 s; the seven-input linearization took 5.119289500056766 s.
+The four three-step physics loops took approximately 0.00465–0.00537 s each.
+The final lightweight regression ran **43 tests, all passed**, in
+12.921046599978581 s, excluding the already completed expensive GVS integrations.
+Together with the separate physical diagnostic test, all five topology tests
+passed. `validation.json` records the exact tests, exclusions and fixture fixes.
+No live study counters were reset; test grants are independent offline fixtures.
+
+M3-A establishes model consistency under the declared ideal physical assumptions.
+It establishes no manufacturability, global controllability, task improvement,
+full-task feasibility or design superiority. Individual limits are 8 N; total
+box capacities are 40/48/56 N, so cross-topology comparisons need explicit common
+physical conditions. M3-B still needs a declared comparison protocol, appropriate
+nonlinear/controller checks and independently evaluated execution. No six-tendon
+RL policy or incompatible warm state was transferred, and no NMPC campaign,
+provider call, RL training or large candidate search was performed.

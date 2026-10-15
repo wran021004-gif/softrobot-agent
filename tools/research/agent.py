@@ -436,6 +436,8 @@ def decision_packet(host):
     spec=result.pop('specification')
     result['configuration_identity']=spec['resolved_identity']
     result['study']={k:spec[k] for k in ('study_id','capabilities','allowed_parameters','reference_parameters','analysis_protocol','scoring_window_s','budgets','rl_limits','confirmation','budget_semantics')}
+    if 'topology_authorization' in spec:
+        result['study']['topology_authorization']=spec['topology_authorization']
     result['available_actions']=spec['allowed_plan_actions']
     s=state(host)
     result['implementation']=dict(commit=s['freeze'],repairs=s.get('core_repairs',[]),

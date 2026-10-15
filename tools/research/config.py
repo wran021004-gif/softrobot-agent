@@ -63,6 +63,18 @@ def resolve(path, profile=None):
     path = Path(path).resolve()
     study = read(path)
     provenance = dict(root=dict(path=str(path), sha256=digest(study)), references={})
+    if 'extends' in study:
+        source=(path.parent/study.pop('extends')).resolve()
+        original=read(source)
+        if source.parent!=path.parent or 'extends' in original:
+            raise ValueError('SAME_DIRECTORY_SINGLE_STUDY_EXTENSION_REQUIRED')
+        from extensions.tendon_family.generated_serial import TopologyAuthorization
+        grant=plain(TopologyAuthorization.model_validate(study.pop('topology_authorization')))
+        study=patch(original,study)
+        if study['study_id']==original['study_id'] or study['authorization']==original['authorization']:
+            raise ValueError('NEW_STUDY_AND_EXPLICIT_TOPOLOGY_AUTHORIZATION_REQUIRED')
+        study.update(topology_authorization=grant,source_study_identity=digest(original),source_study_id=original['study_id'])
+        provenance['references']['source_study']=dict(path=str(source),sha256=digest(original))
     inputs = {}
     for key in ('robot', 'task', 'control', 'runtime'):
         source = (path.parent / study.pop(key)).resolve()
@@ -130,6 +142,11 @@ def resolve(path, profile=None):
         model=provider, policy_id='research-mainline', allowed_tools=['evidence.read'], tool_bindings={'evidence.read': '1.0.0'},
         operation_allowances={'evidence.read': dict(timeout_s=None, reserve_s=None)}, editable={},
         budget=dict(model_calls=b['provider_requests'], tool_calls=b['public_operations'], backend_solves=b['physical_launches'], worker_calls=0, wall_s=None), timeout_s=None)
+    if 'topology_authorization' in study:
+        builder=cfg['policy']['candidate_builder']
+        builder['version']='4.0.0';builder['parameters']['contract']='family.topology_space'
+        builder['parameters']['data'].update(authorization=study['topology_authorization'],topology=dict(
+            version='tendon_topology_patch_v1',remove_tendons=[],upsert_tendons=[],guide_holes={}))
     cfg = plain(SessionInput.model_validate(cfg))
     from extensions.tendon_family.gvs_profile import ReachControl
     from extensions.tendon_family.contracts import current_nmpc_recipe, MujocoParameters

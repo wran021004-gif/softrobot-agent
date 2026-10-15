@@ -3,7 +3,7 @@ from tools.research.state import state,update,save
 from copy import deepcopy
 import time
 from schemas.platform import SessionInput
-from tools.research.contracts import Parameters
+from tools.research.contracts import Parameters,TopologyParameters
 from tools.platform_store import plain
 from tools.state_io import read, digest
 from extensions.tendon_family import generated_serial as family
@@ -36,7 +36,12 @@ def set_parameter(parameters,path,value):
 def configuration_for(host,parameters,owner):
     started=time.perf_counter()
     s=state(host)
-    p=plain(Parameters.model_validate(parameters))
+    raw=plain(parameters)
+    kind=TopologyParameters if raw.get('version')=='research_topology_parameters_v1' else Parameters
+    p=plain(kind.model_validate(raw))
+    grant=s['spec'].get('topology_authorization')
+    if 'topology' in p and not grant:
+        raise ValueError('TOPOLOGY_REQUIRES_EXPLICIT_FROZEN_STUDY_GRANT')
     source=s['nominal_configuration']
     if set(p['segments'])!=set(source_lengths(source)):
         raise ValueError('DECLARED_SEGMENT_IDENTITIES_REQUIRED')
@@ -56,23 +61,28 @@ def configuration_for(host,parameters,owner):
         raise ValueError('CANDIDATE_FIXED_TOTAL_LENGTH')
     if constraint.get('aggregate_bounds_m') and not constraint['aggregate_bounds_m'][0]<=total<=constraint['aggregate_bounds_m'][1]:
         raise ValueError('CANDIDATE_AGGREGATE_LENGTH_CONSTRAINT')
-    cfg=resolved_configuration(source,s['base_configuration'],p,owner)
+    cfg=resolved_configuration(source,s['base_configuration'],p,owner,topology_grant=grant)
     elapsed=time.perf_counter()-started
     current=state(host)
     update(host,numerical_s=current['numerical_s']+elapsed,construction_numerical_s=current.get('construction_numerical_s',0.)+elapsed)
     return cfg,p
 
 
-def resolved_configuration(source,base,p,owner):
-    space=family.GeneratorSpace(source_design=source['robot']['structure']['data'],
-        source_mesh=source['policy']['discretization']['data'],segments=p['segments'])
-    robot,mesh,physics=family.generate(space)
+def resolved_configuration(source,base,p,owner,*,topology_grant=None):
+    values=dict(source_design=source['robot']['structure']['data'],source_mesh=source['policy']['discretization']['data'],segments=p['segments'])
+    if topology_grant:
+        space=family.TopologyGeneratorSpace(**values,authorization=topology_grant,topology=p.get('topology',{}))
+        robot,mesh,physics=family.generate_topology(space)
+    else:
+        if 'topology' in p:raise ValueError('TOPOLOGY_REQUIRES_EXPLICIT_FROZEN_STUDY_GRANT')
+        space=family.GeneratorSpace(**values)
+        robot,mesh,physics=family.generate(space)
     cfg=deepcopy(base)
     cfg['run_id']=owner
     cfg['robot']['structure']['data']=robot
     cfg['policy']['discretization']['data']=mesh
-    cfg['policy']['candidate_builder']=dict(extension_id='candidate.family',version='3.0.0',
-        parameters=dict(contract='family.generator_space',version='1.0.0',data=plain(space)))
+    cfg['policy']['candidate_builder']=dict(extension_id='candidate.family',version='4.0.0' if topology_grant else '3.0.0',
+        parameters=dict(contract='family.topology_space' if topology_grant else 'family.generator_space',version='1.0.0',data=plain(space)))
     for key in ('holding_tip_speed_weight','terminal_tip_speed_weight'):
         cfg['policy']['controller']['parameters']['data']['recipe'][key]=p[key]
     expected={field:{j:0. for j in physics['dofs']} for field in ('qpos_rad','qvel_rad_s')}

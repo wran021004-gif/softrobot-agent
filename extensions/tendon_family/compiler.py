@@ -149,6 +149,8 @@ def resolve(design, discretization=None):
         raise Unsupported('BRANCHING_FLEXIBLE_CHAINS_NOT_IMPLEMENTED')
     routes = []
     for tendon in d.tendons:
+        if tendon.pretension_n > tendon.force_limit_n:
+            raise ValueError('PRETENSION_EXCEEDS_PHYSICAL_FORCE_LIMIT')
         if tendon.points[0].role != 'start' or tendon.points[-1].role != 'anchor' or any(p.role != 'guide' for p in tendon.points[1:-1]):
             raise ValueError('ORDERED_START_GUIDES_ANCHOR_REQUIRED')
         points = []
@@ -160,6 +162,9 @@ def resolve(design, discretization=None):
                 if a.s or any(a.position_m): raise ValueError('HOLE_AND_POINT_OFFSET_ARE_EXCLUSIVE')
                 if tendon.diameter_m >= 2*guide.hole_radius_m: raise ValueError('TENDON_TOO_LARGE_FOR_HOLE')
                 a = a.model_copy(update={'position_m':guide.guide_holes[point.hole]})
+            elif isinstance(physical.get(a.part),Rigid) and np.any(
+                    np.abs(a.position_m)>np.asarray(physical[a.part].envelope_halfsize_m)+1e-12):
+                raise ValueError('RIGID_ROUTE_POINT_OUTSIDE_ENVELOPE')
             b,pos,_ = attach(a)
             points.append(dict(body=b,position_m=pos.tolist(),role=point.role,physical_binding=point.model_dump(mode='json')))
         routes.append(dict(entity=tendon.id,points=points,kp_n_m=tendon.length_servo_gain_n_m,
