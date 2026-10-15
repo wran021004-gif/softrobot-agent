@@ -59,23 +59,14 @@ def prepare(spec_path=DEFAULT_SPEC, directory=None, profile=None):
     start = time.perf_counter()
     cfg=deepcopy(spec['configuration'])
     nominal=dict(configuration=deepcopy(cfg),provenance=spec['source_provenance'])
-    # Recovery-enabled source is complete immutable execution evidence.
-    cfg['policy']['controller']['parameters']['data']['recipe'].update({k:v for k,v in spec['reference_parameters'].items() if k in ('holding_tip_speed_weight','terminal_tip_speed_weight')})
-    if spec.get('nominal_source'):
-        from extensions.tendon_family.contracts import current_nmpc_recipe
-        cfg['policy']['controller']['parameters']['data']['recipe']=current_nmpc_recipe(
-            cfg['policy']['controller']['parameters']['data']['recipe'],spec.get('controller_recipe'))
-    model = deepcopy(spec['runtime']['provider'])
-    cfg['policy'].update(model=model, budget=limits(spec), allowed_tools=['evidence.read'],
-        tool_bindings={'evidence.read':'1.0.0'}, operation_allowances={'evidence.read':dict(timeout_s=None,reserve_s=None)})
+    model = deepcopy(cfg['policy']['model'])
     if not h.store.db.exists():
         h.store.create(ProjectConfig(project_id=run_id, grant_id=run_id+'-authorized',
             authorization_source=spec['authorization'], budget=limits(spec),
             exclusive_resources={'provider_request':1,'backend.family_mujoco':1}))
     h.create(cfg)
     h.resume()
-    from extensions.tendon_family.contracts import GVSTrajectoryParameters
-    recipe = plain(GVSTrajectoryParameters.model_validate(cfg['policy']['controller']['parameters']['data']['recipe']))
+    recipe = deepcopy(cfg['policy']['controller']['parameters']['data']['recipe'])
     profile = dict(adapter='unified_recovery_profile_v1',version=spec['evaluation_version'],
         configuration=full_science(cfg), recipe=recipe, science_hashes=science_hashes(),
         recording=dict(complete_update_inputs=spec['complete_update_inputs'],update_ids=spec['record_update_ids']),

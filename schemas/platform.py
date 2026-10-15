@@ -3,7 +3,7 @@
 Identifiers and policy are host-owned; extension payloads carry no import paths.
 """
 from typing import Literal
-from pydantic import Field, model_validator, model_serializer
+from pydantic import Field, FiniteFloat, model_validator, model_serializer
 from schemas.common import Contract
 from schemas.evidence import Identifier
 
@@ -152,6 +152,11 @@ class Budget(Contract):
     backend_solves: int = Field(ge=0)
     worker_calls: int = Field(ge=0)
     wall_s: float | None = Field(ge=0)
+
+
+class MeasuredCost(Budget):
+    """Receipts and events measure numeric cost; only limits may be disabled."""
+    wall_s: FiniteFloat = Field(ge=0)
 
 
 class ModelLengthRecovery(Contract):
@@ -347,7 +352,7 @@ class ToolReceipt(Contract):
     error: str | None = None
     cache_hit: bool = False
     original_execution_id: str | None = None
-    charged: Budget
+    charged: MeasuredCost
 
 
 class Event(Contract):
@@ -367,7 +372,7 @@ class Event(Contract):
     inputs: list[EvidenceRef] = Field(default_factory=list)
     outputs: list[EvidenceRef] = Field(default_factory=list)
     implementation_version: str
-    cost: Budget
+    cost: MeasuredCost
 
 
 class MemoryEntry(Contract):

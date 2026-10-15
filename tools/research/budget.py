@@ -97,9 +97,15 @@ def admit_stage(s):
 
 def stage_usage(s):
     entries = list(s.get('rl_runs', {}).values())
+    statuses = [e.get('status', {}) for e in entries]
+    upper = sum(e.get('consumed', {}).get('attempted_actions', 0) for e in statuses)
+    uncertain = any(e.get('consumption_uncertain') for e in statuses)
+    lower = sum((e.get('known_consumption_lower_bound') or {}).get('attempted_actions', 0)
+        if e.get('consumption_uncertain') else e.get('consumed', {}).get('attempted_actions', 0) for e in statuses)
     return dict(admitted=s.get('admitted_training_stages', len(entries)),
         limit=s['spec']['rl_limits'].get('training_stages', s['spec']['rl_limits'].get('training_runs')),
-        actual_actions=sum(e.get('status', {}).get('consumed', {}).get('attempted_actions', 0) for e in entries),
+        actual_actions=None if uncertain else upper,
+        verified_actions_lower_bound=lower, accounted_actions_upper_bound=upper,
         actual_active_seconds=sum(e.get('status', {}).get('consumed', {}).get('active_seconds', 0) for e in entries),
         outstanding=[dict(run_id=k, reservation=e['active_reservation']) for k,e in s.get('rl_runs', {}).items() if e.get('active_reservation')])
 

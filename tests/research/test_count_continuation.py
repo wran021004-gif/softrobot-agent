@@ -68,6 +68,11 @@ class CountContinuationTests(fixtures.MainlineTests):
         self.assertEqual(first['consumed']['attempted_actions'],356)
         self.assertEqual(first,second)
         self.assertTrue(first['consumption_uncertain'])
+        from tools.research.budget import stage_usage
+        usage=stage_usage(dict(spec=self.spec,rl_runs={'uncertain':dict(status=first)}))
+        self.assertIsNone(usage['actual_actions'])
+        self.assertEqual(usage['verified_actions_lower_bound'],100)
+        self.assertEqual(usage['accounted_actions_upper_bound'],356)
 
     def test_verified_unused_allocation_released_without_erasing_actual(self):
         stage='terminal-fixture'
@@ -107,9 +112,46 @@ class CountContinuationTests(fixtures.MainlineTests):
         changed=deepcopy(source)
         changed['ppo'].update(learning_rate={'kind':'linear','initial':.001,'final':.0001},n_steps=512,batch_size=128,n_epochs=2,ent_coef=.01)
         validate_compatibility(source,changed)
+        initialized=deepcopy(changed)
+        initialized['initial_tension_n']=.2
+        with self.assertRaisesRegex(ValueError,'INITIALIZATION_ONLY'):
+            validate_compatibility(source,initialized)
         changed['ppo']['policy_kwargs']['net_arch']['pi']=[16]
         with self.assertRaisesRegex(ValueError,'INITIALIZATION_ONLY'):
             validate_compatibility(source,changed)
+
+    def test_configured_solver_iterations_survive_resolution_and_preparation(self):
+        from tools.state_io import read, atomic_json
+        folder=Path(self.tmp.name)/'source'
+        folder.mkdir()
+        spec=read(ROOT/'configs/research/study.json')
+        spec['study_id']=Path(self.tmp.name).name+'-iterations'
+        control=read(ROOT/'configs/research/control.json')
+        control['controller_defaults']['parameters']['data']['recipe'].update(max_iterations=37,tolerance=2e-6)
+        atomic_json(folder/'control.json',control)
+        for key in ('robot','task','runtime'):
+            spec[key]=str((ROOT/'configs/research'/spec[key]).resolve())
+        spec['control']='control.json'
+        spec['capabilities']=[c for c in spec['capabilities'] if c!='rl']
+        atomic_json(folder/'study.json',spec)
+        with patch.object(core,'construct',return_value={'artifact_id':'0'*64,'media_type':'application/json'}):
+            host=core.prepare(folder/'study.json',directory=folder/'study')
+        current=state(host)
+        configured=current['spec']['configuration']['policy']['controller']['parameters']['data']['recipe']
+        self.assertEqual(configured['max_iterations'],37)
+        self.assertEqual(configured['tolerance'],2e-6)
+        self.assertEqual(current['base_configuration'],current['spec']['configuration'])
+        self.assertEqual(current['profile']['recipe'],configured)
+        from extensions.tendon_family.contracts import current_nmpc_recipe
+        self.assertEqual(current_nmpc_recipe(configured),configured)
+
+    def test_disabled_limit_is_distinct_from_measured_cost(self):
+        from schemas.platform import Budget, MeasuredCost
+        self.assertIsNone(Budget.model_validate({**zero(),'wall_s':None}).wall_s)
+        for invalid in (None,float('inf'),float('nan')):
+            with self.assertRaises(ValueError):
+                MeasuredCost.model_validate({**zero(),'wall_s':invalid})
+        self.assertEqual(MeasuredCost.model_validate({**zero(),'wall_s':123.5}).wall_s,123.5)
 
     def test_fresh_pass_blocks_queued_science_and_search(self):
         value=self.host.store.artifact(self.result)

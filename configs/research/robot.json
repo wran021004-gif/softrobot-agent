@@ -1001,7 +1001,16 @@
     "extension_id": "backend.family_mujoco",
     "parameters": {
       "contract": "family.mujoco_parameters",
-      "data": {},
+      "data": {
+        "integrator": "implicitfast",
+        "timestep_source": "task.timing.timestep_s",
+        "contact_model": "mujoco_convex_native",
+        "friction": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
       "version": "1.0.0"
     },
     "version": "1.1.0"

@@ -38,6 +38,8 @@ def validate_compatibility(source, selected):
     stable = ('candidate', 'control_object', 'task', 'mode', 'reference', 'observation', 'action', 'seed')
     if any(source[k] != selected[k] for k in stable):
         raise ValueError('CONTINUATION_REQUIRES_IDENTICAL_CANDIDATE_TASK_ACTION_OBSERVATION_NORMALIZATION_REFERENCE')
+    if source.get('initial_tension_n') != selected.get('initial_tension_n'):
+        raise ValueError('CONTINUATION_REJECTS_INITIALIZATION_ONLY_TENSION_CHANGE')
     allowed = {'learning_rate', 'n_steps', 'batch_size', 'n_epochs', 'ent_coef'}
     if any(source['ppo'][k] != selected['ppo'][k] for k in source['ppo'] if k not in allowed):
         raise ValueError('CONTINUATION_REJECTS_INITIALIZATION_ONLY_OR_UNSUPPORTED_PPO_CHANGES')

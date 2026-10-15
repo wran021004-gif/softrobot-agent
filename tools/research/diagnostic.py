@@ -53,7 +53,10 @@ def replay(request):
             from extensions.tendon_family.gvs_nmpc import deadline_horizon
             recipe['horizon']=deadline_horizon(inp.task.timing.duration_s,recorded['prediction_timing']['current_time_s'],
                 inp.task.timing.control_period_s,recipe['horizon'])
-    policy=current_nmpc_recipe(recipe,request['current_recipe'])
+    from extensions.tendon_family.contracts import GVSTrajectoryParameters
+    from tools.research.config import patch
+    normalized=GVSTrajectoryParameters.model_validate(recipe).model_dump(mode='json')
+    policy=current_nmpc_recipe(patch(normalized,request['current_recipe']))
     # Exact-problem mode changes stopping alone. Keep integration, costs and
     # recovery from the original robot/controller; never reconstruct its NLP.
     recipe.update({k:policy[k] for k in ('stopping_policy','max_iterations','tolerance','max_cpu_s','feasible_return')})

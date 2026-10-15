@@ -132,10 +132,12 @@ def resolve(path, profile=None):
         budget=dict(model_calls=b['provider_requests'], tool_calls=b['public_operations'], backend_solves=b['physical_launches'], worker_calls=0, wall_s=None), timeout_s=None)
     cfg = plain(SessionInput.model_validate(cfg))
     from extensions.tendon_family.gvs_profile import ReachControl
-    ReachControl.model_validate(cfg['policy']['controller']['parameters']['data'])
-    recipe = controller['parameters']['data']['recipe']
-    if recipe['max_cpu_s'] is not None or recipe['feasible_return'] is not None:
-        raise ValueError('NMPC_COMPUTATIONAL_TIMERS_MUST_BE_DISABLED')
+    from extensions.tendon_family.contracts import current_nmpc_recipe, MujocoParameters
+    data = ReachControl.model_validate(cfg['policy']['controller']['parameters']['data']).model_dump(mode='json')
+    data['recipe'] = current_nmpc_recipe(data['recipe'])
+    cfg['policy']['controller']['parameters']['data'] = data
+    cfg['policy']['backend']['parameters']['data'] = MujocoParameters.model_validate(
+        cfg['policy']['backend']['parameters']['data']).model_dump(mode='json')
     study['analysis_protocol'].update(baseline_lengths_m={k:v['length_m'] for k,v in segments.items()},
         duration_s=task['task']['timing']['duration_s'], period_s=task['task']['timing']['control_period_s'])
     from schemas.platform_analysis import TaskAnalysisProtocol

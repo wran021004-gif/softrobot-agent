@@ -10,7 +10,7 @@ import json
 from pathlib import Path
 import sqlite3
 from uuid import uuid4
-from schemas.platform import Budget, EvidenceRef, ProjectConfig, Event, VERSION
+from schemas.platform import MeasuredCost, EvidenceRef, ProjectConfig, Event, VERSION
 from tools.paths import ROOT
 from tools.state_io import digest
 
@@ -278,9 +278,7 @@ class Store:
                     reservations='Running/unknown calls are charged at reservation until sealed; included once in ledger usage.')
 
     def reserve(self, run_id, request_id, request_hash, caller, cost, resources=(), cache_key=None, parent=None, inputs=(), kind='tool', version=VERSION, guard=None):
-        Budget.model_validate(cost)
-        if any(value is None for value in cost.values()):
-            raise ValueError('RESERVATIONS_REQUIRE_NUMERIC_COSTS; NULL_IS_A_LIMIT_ONLY')
+        MeasuredCost.model_validate(cost)
         with self.transaction() as db:
             old = self.lookup(run_id, request_id, db)
             if old:
@@ -314,7 +312,7 @@ class Store:
                 return json.loads(current['receipt'])
             charged = json.loads(current['reserved'])
             if actual_cost is not None:
-                actual_cost = plain(Budget.model_validate(actual_cost))
+                actual_cost = plain(MeasuredCost.model_validate(actual_cost))
                 if any(actual_cost[k] > charged[k] for k in charged if k != 'wall_s'):
                     raise ValueError('SETTLEMENT_EXCEEDS_RESERVED_RESOURCE_COUNT')
                 charged = actual_cost
