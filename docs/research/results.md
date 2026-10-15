@@ -82,3 +82,40 @@ packaged without repeating a solve or physical step. A focused regression verifi
 this repair. [Original diagnostics](../../evidence/topology_control_20261015/b1/control_diagnostics.json),
 [recovery/provenance](../../evidence/topology_control_20261015/b1/recovery_supplement.json),
 [38 focused checks and invocation details](../../evidence/topology_control_20261015/b1/validation.json).
+
+# M3-B2 predeclared full NMPC routing pair (2026-10-15)
+
+Protocol commit `a80243c40328b43ee3634fed2ae55c78b9cb7052` preceded both complete
+launches. Independent engineering studies `m3b2-t0-20261015` and
+`m3b2-t2-20261015` each admitted exactly one execution. A field-by-field prelaunch
+check confirmed that the sole physical difference was the original declared T2
+`near_t0` route replacement. Geometry/material, two segments, six input channels,
+8 N per-channel bounds, target/zero initializer/seed17, controller settings,
+physics/control grids, evaluator and holding requirements were identical.
+
+| Complete-task metric | T0 | T2 | Frozen limit |
+|---|---:|---:|---:|
+| Terminal error (m) | 0.0031197439683 | 0.0029195207771 | 0.010 |
+| Holding maximum error (m) | 0.0031390226976 | 0.0030004844761 | 0.010 |
+| Holding maximum speed (m/s) | 0.0232098526458 | 0.0129147784968 | 0.020 |
+| Independent acceptance | valid failure | accepted | all components |
+| Observed numerical cost (s) | 3573.104 | 3596.550 | measured, no time limit |
+
+Both executed all 35 updates / 700 physics steps with six inclusive holding
+samples. All 35 plans per run were independently feasible but iteration-limited;
+neither used a fallback or reported a solver error. Applied tension ranges were
+0.131801–8.0 N (T0) and 3.2218e-8–7.964760 N (T2). Raw tension histories and
+channel saturation fractions are archived. All 35 first-step predictions were
+aligned to execution; maximum tip discrepancies were 3.968 mm and 3.806 mm.
+All updates missed the 0.01 s period; real-time operation remains unproved.
+
+T0's exact failure was publicly read and stopped; T2's exact pass was publicly
+read, selected and sealed without another execution. Total: two fresh complete
+backend launches, zero provider/math/RL/confirmation calls. These engineering
+results are separate from B1 and the later live study. The runs used concurrent
+single-thread processes; per-run numerical costs must not be summed as pair wall
+duration. One paired observation shows a routing effect on this controller/task,
+not statistical superiority, repeatability, robustness or global optimality.
+[Protocol and exact comparison](../../evidence/topology_control_20261015/b2/comparison.json),
+[T0 full evidence](../../evidence/topology_control_20261015/b2/T0/scientific_summary.json),
+[T2 full evidence](../../evidence/topology_control_20261015/b2/T2/scientific_summary.json).

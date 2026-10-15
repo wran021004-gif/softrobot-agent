@@ -1,0 +1,587 @@
+{
+  "study_id": "m3b2-t2-20261015",
+  "result_reference": {
+    "artifact_id": "e702e2b44a5ef3db287a0ba23ae2370cdb07b162474333ce64632fd541d7a3b6",
+    "media_type": "application/json"
+  },
+  "candidate": {
+    "artifact_id": "812b8b07f68d2cb32fdd9b8fb23d9f7e075848f4598268e827a3ab0f4842df65",
+    "media_type": "application/json"
+  },
+  "candidate_id": "core-9b53150657123b1ed8b3fd1c090e678a0f4f849470845bbd8d6402a219eb3cf5",
+  "candidate_parameters": {
+    "holding_tip_speed_weight": 0.1,
+    "segments": {
+      "distal1": {
+        "length_m": 0.11,
+        "material_scenario": null,
+        "sections": {
+          "0": {
+            "height_z_m": 0.0095,
+            "width_y_m": 0.0133
+          },
+          "1": {
+            "height_z_m": 0.008549999999999999,
+            "width_y_m": 0.0114
+          }
+        },
+        "young_pa": 5400000.0
+      },
+      "near": {
+        "length_m": 0.16,
+        "material_scenario": null,
+        "sections": {
+          "0": {
+            "semi_y_m": 0.0095,
+            "semi_z_m": 0.0076
+          }
+        },
+        "young_pa": 7200000.0
+      }
+    },
+    "terminal_tip_speed_weight": 0.1,
+    "topology": {
+      "guide_holes": {},
+      "remove_tendons": [],
+      "upsert_tendons": [
+        {
+          "diameter_m": 0.001,
+          "force_limit_n": 8.0,
+          "id": "near_t0",
+          "length_servo_gain_n_m": 900.0,
+          "model": "straight_frictionless",
+          "points": [
+            {
+              "attachment": {
+                "part": "fixed_base",
+                "position_m": [
+                  0.0,
+                  0.01781761038515377,
+                  0.0036118084338542127
+                ],
+                "quaternion_wxyz": [
+                  1.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                "s": 0.0
+              },
+              "hole": null,
+              "role": "start"
+            },
+            {
+              "attachment": {
+                "part": "near",
+                "position_m": [
+                  0.0,
+                  0.021,
+                  0.006
+                ],
+                "quaternion_wxyz": [
+                  1.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                "s": 0.5
+              },
+              "hole": null,
+              "role": "guide"
+            },
+            {
+              "attachment": {
+                "part": "mid_guide",
+                "position_m": [
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                "quaternion_wxyz": [
+                  1.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                "s": 0.0
+              },
+              "hole": "near_h0",
+              "role": "anchor"
+            }
+          ],
+          "pretension_n": 0.2
+        }
+      ],
+      "version": "tendon_topology_patch_v1"
+    },
+    "version": "research_topology_parameters_v1"
+  },
+  "implementation": "a80243c40328b43ee3634fed2ae55c78b9cb7052",
+  "profile_identity": "2b4476a14f13ee400a9aa12d52f3002a8b40a3e49179bcfb91e4b81859599938",
+  "scientific_identity": "9b53150657123b1ed8b3fd1c090e678a0f4f849470845bbd8d6402a219eb3cf5",
+  "source_identity": "d9de7350c7d9cc5ee1a7af5ba55e7b8c86fd7cb16933b8d8fa862c2ed8666759",
+  "task_identity": "2b26edb492214c426263441b6adb52d7aafe41a828436d6b48a1171374a1026c",
+  "configuration_identity": "4bb509ed68aac8022509334a1e2d2f373266a99ee339f2cfe154ee619400ee04",
+  "physics_identity": "092eb8c29e1bd01993b89bfefa053d4ebf8fcc4d628572b3e4c7dc47fafb73a4",
+  "control_identity": "3d2037093f7ef9c56262e19b1c5c6fa74d89facd784f559be52889eb86cc842a",
+  "evaluation_version": 1,
+  "evaluation_data": {
+    "candidate_id": "core-9b53150657123b1ed8b3fd1c090e678a0f4f849470845bbd8d6402a219eb3cf5",
+    "comparison_identity": "22a180aaefafa0fca76c491ae15ecfd74f4a18ed65c5dcf04c5f31115af4163c",
+    "constraints": [
+      {
+        "limit": 0.01,
+        "name": "task_bound",
+        "observed": 0.0029195207770687363,
+        "satisfied": true,
+        "units": "m"
+      }
+    ],
+    "contract_version": "1.2.0",
+    "evaluator": "evaluate.reach",
+    "evaluator_version": "1.0.0",
+    "metrics": [
+      {
+        "name": "position_error",
+        "units": "m",
+        "value": 0.0029195207770687363
+      }
+    ],
+    "original_execution_id": "7ed633f27b97424499e1ecc236b79aa4",
+    "reason": null,
+    "source": {
+      "artifact_id": "3df2eca2eac3d014cf90fa7ef09baa4cc32a320d23c20e897cd083e72482bbe1",
+      "media_type": "application/json"
+    },
+    "source_execution_id": "7ed633f27b97424499e1ecc236b79aa4",
+    "task_success": true,
+    "validity": "valid"
+  },
+  "status": "evaluated",
+  "acceptance": {
+    "accepted": true,
+    "components": {
+      "evaluation_validity": {
+        "limit": null,
+        "passed": true,
+        "reason": null,
+        "unit": null,
+        "value": "valid"
+      },
+      "evaluator:task_bound": {
+        "limit": 0.01,
+        "passed": true,
+        "reason": null,
+        "unit": "m",
+        "value": 0.0029195207770687363
+      },
+      "execution_complete": {
+        "limit": null,
+        "passed": true,
+        "reason": null,
+        "unit": null,
+        "value": true
+      },
+      "force_bounds": {
+        "limit": 1e-08,
+        "passed": true,
+        "reason": null,
+        "unit": "N",
+        "value": 0.0
+      },
+      "holding_coverage": {
+        "limit": 6,
+        "passed": true,
+        "reason": null,
+        "unit": "inclusive uniform samples",
+        "value": true
+      },
+      "holding_position": {
+        "limit": 0.01,
+        "passed": true,
+        "reason": null,
+        "unit": "m",
+        "value": 0.003000484476109495
+      },
+      "holding_speed": {
+        "limit": 0.02,
+        "passed": true,
+        "reason": null,
+        "unit": "m/s",
+        "value": 0.01291477849683033
+      },
+      "solver_errors": {
+        "limit": 0,
+        "passed": true,
+        "reason": null,
+        "unit": "count",
+        "value": 0
+      },
+      "task_evaluator": {
+        "limit": null,
+        "passed": true,
+        "reason": null,
+        "unit": null,
+        "value": true
+      }
+    },
+    "continuous_time_guarantee": false,
+    "contract": "research.task_acceptance",
+    "evaluator_tension_channels": null,
+    "evidence_binding": {
+      "evaluation": {
+        "artifact_id": "95e7b47c4b8bab87de38dda4bbc13f1deaf0fdda96777318035c22a44d99257d",
+        "media_type": "application/json"
+      },
+      "evaluation_binding": {
+        "original_execution_id": "7ed633f27b97424499e1ecc236b79aa4",
+        "source": {
+          "artifact_id": "3df2eca2eac3d014cf90fa7ef09baa4cc32a320d23c20e897cd083e72482bbe1",
+          "media_type": "application/json"
+        },
+        "source_execution_id": "7ed633f27b97424499e1ecc236b79aa4"
+      },
+      "profile": {
+        "artifact_id": "587aa8691f6c532180da76f2ed1076ea516ea056ebc815fdfb4340e29066a19a",
+        "media_type": "application/json"
+      },
+      "profile_binding": {
+        "evaluation": {
+          "artifact_id": "95e7b47c4b8bab87de38dda4bbc13f1deaf0fdda96777318035c22a44d99257d",
+          "media_type": "application/json"
+        },
+        "execution_id": "7ed633f27b97424499e1ecc236b79aa4",
+        "simulation": {
+          "artifact_id": "3df2eca2eac3d014cf90fa7ef09baa4cc32a320d23c20e897cd083e72482bbe1",
+          "media_type": "application/json"
+        }
+      },
+      "simulation": {
+        "artifact_id": "3df2eca2eac3d014cf90fa7ef09baa4cc32a320d23c20e897cd083e72482bbe1",
+        "media_type": "application/json"
+      }
+    },
+    "execution_id": "7ed633f27b97424499e1ecc236b79aa4",
+    "issues": [],
+    "metrics": {
+      "holding_max_error_m": 0.003000484476109495,
+      "holding_max_speed_m_s": 0.01291477849683033,
+      "terminal_error_m": 0.0029195207770687363
+    },
+    "missing": [],
+    "protocol_id": "offline_reach_hold_v1",
+    "sources": {
+      "evaluation": {
+        "artifact_id": "95e7b47c4b8bab87de38dda4bbc13f1deaf0fdda96777318035c22a44d99257d",
+        "media_type": "application/json"
+      },
+      "profile": {
+        "artifact_id": "587aa8691f6c532180da76f2ed1076ea516ea056ebc815fdfb4340e29066a19a",
+        "media_type": "application/json"
+      }
+    },
+    "status": "accepted",
+    "task_family": "task.reach",
+    "task_identity": "2b26edb492214c426263441b6adb52d7aafe41a828436d6b48a1171374a1026c",
+    "timing": {
+      "control_period_s": 0.01,
+      "deadline_misses": 35,
+      "duration_s": 0.35,
+      "mean_update_s": 102.44796910286948,
+      "real_time_demonstrated": false,
+      "real_time_required": false,
+      "sample_period_s": 0.01,
+      "simulation_wall_s": 3594.3910000000615,
+      "termination": [
+        "duration",
+        "numerical_failure"
+      ],
+      "timestep_s": 0.0005
+    },
+    "version": "1.0.0"
+  },
+  "complete": true,
+  "updates": 35,
+  "physics_steps": 700,
+  "accepted_plans": 35,
+  "unusable_plans": 0,
+  "fallback": 0,
+  "raw_termination_counts": {
+    "Maximum_Iterations_Exceeded": 35
+  },
+  "converged_updates": 0,
+  "applied_tension_range_n": [
+    3.221811211450947e-08,
+    7.964760483762112
+  ],
+  "drive_utilization": [
+    {
+      "limit_n": 8.0,
+      "maximum_n": 6.576045708285256,
+      "minimum_n": 1.6877174134983648,
+      "near_upper_fraction": 0.0,
+      "near_zero_fraction": 0.0,
+      "tendon": "near_t0",
+      "tendon_index": 0
+    },
+    {
+      "limit_n": 8.0,
+      "maximum_n": 5.0222027210658835,
+      "minimum_n": 4.115669267672347,
+      "near_upper_fraction": 0.0,
+      "near_zero_fraction": 0.0,
+      "tendon": "near_t1",
+      "tendon_index": 1
+    },
+    {
+      "limit_n": 8.0,
+      "maximum_n": 2.7318587270397083,
+      "minimum_n": 3.221811211450947e-08,
+      "near_upper_fraction": 0.0,
+      "near_zero_fraction": 0.02857142857142857,
+      "tendon": "near_t2",
+      "tendon_index": 2
+    },
+    {
+      "limit_n": 8.0,
+      "maximum_n": 7.964760483762112,
+      "minimum_n": 2.7953330750787995,
+      "near_upper_fraction": 0.02857142857142857,
+      "near_zero_fraction": 0.0,
+      "tendon": "far_t0",
+      "tendon_index": 3
+    },
+    {
+      "limit_n": 8.0,
+      "maximum_n": 3.7415499124824247,
+      "minimum_n": 0.9640059430297855,
+      "near_upper_fraction": 0.0,
+      "near_zero_fraction": 0.0,
+      "tendon": "far_t1",
+      "tendon_index": 4
+    },
+    {
+      "limit_n": 8.0,
+      "maximum_n": 3.8395318642668177,
+      "minimum_n": 0.0001363811077128886,
+      "near_upper_fraction": 0.0,
+      "near_zero_fraction": 0.0,
+      "tendon": "far_t2",
+      "tendon_index": 5
+    }
+  ],
+  "one_step_prediction_summary": {
+    "aligned_count": 35,
+    "frame": "world",
+    "maximum_speed_magnitude_difference_m_s": 0.1356851732867046,
+    "maximum_tip_difference_m": 0.003805726331270093,
+    "maximum_velocity_vector_difference_m_s": 0.13913684906876184,
+    "mean_tip_difference_m": 0.002872108675842271,
+    "missing": [],
+    "scope": "Only accepted first-step predictions matched to next execution timestamp; no future-plan replay comparison",
+    "velocity_matched_count": 35,
+    "velocity_missing": []
+  },
+  "update_times_s": [
+    144.09663419995923,
+    109.84614649997093,
+    115.71675839996897,
+    116.97446200007107,
+    114.57338870002422,
+    118.59387169999536,
+    116.06449909997173,
+    135.57014600001276,
+    109.00474110001232,
+    118.92406420002226,
+    117.73852379992604,
+    116.56491020007525,
+    114.52727229997981,
+    117.75602660002187,
+    117.83305340004154,
+    114.73933930008207,
+    115.92324480006937,
+    118.09606030001305,
+    115.46520990005229,
+    115.89468679996207,
+    117.6611375999637,
+    115.55101860000286,
+    113.97157559997868,
+    117.05007019999903,
+    111.6204225999536,
+    112.89966729993466,
+    108.84648880001623,
+    93.35835150000639,
+    78.56840240000747,
+    71.06749380007386,
+    59.503097900073044,
+    48.074365800013766,
+    36.36044449999463,
+    24.04111030010972,
+    13.202232400071807
+  ],
+  "backend_timings_s": {
+    "backend_call": 3591.3914610999636,
+    "engine_compile": 0.02385670004878193,
+    "prepare_compile": 0.08987989998422563,
+    "solve": 3591.095425699954
+  },
+  "numerical_s": 3596.550243100035,
+  "preparation_to_close_s": 3711.734219312668,
+  "selected": {
+    "artifact_id": "e702e2b44a5ef3db287a0ba23ae2370cdb07b162474333ce64632fd541d7a3b6",
+    "media_type": "application/json"
+  },
+  "success_gate": {
+    "candidate": {
+      "artifact_id": "812b8b07f68d2cb32fdd9b8fb23d9f7e075848f4598268e827a3ab0f4842df65",
+      "media_type": "application/json"
+    },
+    "engineering": true,
+    "evidence": {
+      "artifact_id": "e702e2b44a5ef3db287a0ba23ae2370cdb07b162474333ce64632fd541d7a3b6",
+      "media_type": "application/json"
+    },
+    "model_selection_complete": true,
+    "observed_task_pass": true
+  },
+  "final_disposition": {
+    "artifact_id": "bbd61c142b4cfe0555058b980d6a8d5f7bfb15b1b9218893595d14925ba66eb4",
+    "media_type": "application/json"
+  },
+  "raw_exports": {
+    "actual_commands.json": {
+      "artifact_id": "f787f37c1acb38ed6288e03ab1f1b270644caba6981963a412ebf62b2f52403b",
+      "media_type": "application/octet-stream"
+    },
+    "compiled_physics.json": {
+      "artifact_id": "d3ca09ca982319e37d0fd166bafd0f1abf162760835f7912c5766f0ce3039f0b",
+      "media_type": "application/octet-stream"
+    },
+    "control_snapshots.json": {
+      "artifact_id": "d9b1dcd6e217316c122b01da8b7910a8a936af4e5d9a58ca64b41001c0d319f7",
+      "media_type": "application/octet-stream"
+    },
+    "control_spec.json": {
+      "artifact_id": "25405bb13cba6199ca3439c14195f616e91c6813695de057494ee158b5556dc7",
+      "media_type": "application/octet-stream"
+    },
+    "controller_observations.json": {
+      "artifact_id": "831546d152b9419b16456bc8ef1ab19fcf23f0da3920962d649f64c149fbad94",
+      "media_type": "application/octet-stream"
+    },
+    "dynamics_execution.json": {
+      "artifact_id": "cc1a84dd1af99bacb73da26503126fd6466ba47a98b3914ea1845d4744ff18d6",
+      "media_type": "application/octet-stream"
+    },
+    "experiment_scene.json": {
+      "artifact_id": "c9f4297b4766276f0b1678bef5a0373aa586c293bac861472760f91868652cfe",
+      "media_type": "application/octet-stream"
+    },
+    "experiment_spec.json": {
+      "artifact_id": "845ad563b0a038374c837e55a0040c8f73cedebab4ddaf029786d571d0a24819",
+      "media_type": "application/octet-stream"
+    },
+    "model_discretization.json": {
+      "artifact_id": "3991ec1b9ed1bd5cf783862b91bf7eafd0358ad6c2b516d8994d5fafa6e4e87a",
+      "media_type": "application/octet-stream"
+    },
+    "nmpc_updates.json": {
+      "artifact_id": "249964f54021ceae490f35580021f7d172101a1df04cf357e91feaac5337fcd6",
+      "media_type": "application/octet-stream"
+    },
+    "p_0787eba74b.json": {
+      "artifact_id": "79bcc96257ce95dab94760ab7ec339e2f9d1271505154067f6cbd3e4c54699f9",
+      "media_type": "application/octet-stream"
+    },
+    "p_09ca6fbb75.json": {
+      "artifact_id": "1a482952758742251133a5c2a230f88fdc1ceb746a2ffae8efd6c73b2d459de2",
+      "media_type": "application/octet-stream"
+    },
+    "p_22835107ed.json": {
+      "artifact_id": "d21eed81a2d8bf67e1a5006fce2d9a2c4db84087463b3c497ad74daac9c74ff4",
+      "media_type": "application/octet-stream"
+    },
+    "p_56951d50b5.json": {
+      "artifact_id": "0b43ff4ce70e808db3629a2fc2bc0b565f21849e3b1df06b99b628d17c8090be",
+      "media_type": "application/octet-stream"
+    },
+    "p_7e7133d57b.json": {
+      "artifact_id": "2e94236e41df467a5796e5ec5b32786935d63172e7debd408ee288f56a0a90f5",
+      "media_type": "application/octet-stream"
+    },
+    "p_9b1cb56c5a.json": {
+      "artifact_id": "4f62e5e2ee94f7d2ce55a0367ce81c8b16f75a772b44e2650f380f4fd11e2f41",
+      "media_type": "application/octet-stream"
+    },
+    "p_9c912c7ec7.json": {
+      "artifact_id": "ecad9f96e4e7a885eccf7f332e099a8d3700a1b30924f2a5b5cbe7cef9de634e",
+      "media_type": "application/octet-stream"
+    },
+    "p_a0bc05dd30.json": {
+      "artifact_id": "636b21e1428e1a212112e1971f8559fce84cc28f288ae3e59ffd39867a76f5ff",
+      "media_type": "application/octet-stream"
+    },
+    "p_bdfb335efe.json": {
+      "artifact_id": "284d5afd78d3640c29c56540f0b63aa20cf167fa238fb663d1ea56dda6152603",
+      "media_type": "application/octet-stream"
+    },
+    "p_ed6e7cef88.json": {
+      "artifact_id": "6879636408f460f9079c884970b269d1f440533aeb1198555f38113b3fa2550b",
+      "media_type": "application/octet-stream"
+    },
+    "resolved_physics.json": {
+      "artifact_id": "9e4657c7c8d699238fad0ad1568c5ab2a420fe5c4210ca790b9bb11bc9976300",
+      "media_type": "application/octet-stream"
+    },
+    "result.json": {
+      "artifact_id": "f84188bd6cddbf55af794968d85ee2f0edacd656deb413e98835b131fec2de2c",
+      "media_type": "application/octet-stream"
+    },
+    "robot.xml": {
+      "artifact_id": "5bc34a52c8bce5cafddc1d2cfb652744d814be0d41a5531849b2b40a294bda0c",
+      "media_type": "application/octet-stream"
+    },
+    "robot_description.json": {
+      "artifact_id": "a83888650ac93cfdd09d82bcf64c69810a609d96f14dcb2e016b3b32769d8a98",
+      "media_type": "application/octet-stream"
+    },
+    "solver_configuration.json": {
+      "artifact_id": "c7a9f804d5e3f799d274c47a74131d868aee6f20221e9b545283d2fc054f9737",
+      "media_type": "application/octet-stream"
+    },
+    "trajectory.json.gz": {
+      "artifact_id": "fdd40d796ff28ef698914472ea428ce5a8dd0dfac7e2cee8be66f3d8d45673dc",
+      "media_type": "application/octet-stream"
+    }
+  },
+  "motion_reference": {
+    "artifact_id": "535a977f65413dbf50f355584647d71606d15e3b8a756679b9c0c043893c31a8",
+    "media_type": "application/json"
+  },
+  "ledger": {
+    "limit": {
+      "backend_solves": 1,
+      "model_calls": 0,
+      "tool_calls": 12,
+      "wall_s": null,
+      "worker_calls": 0
+    },
+    "used": {
+      "tool_calls": 7,
+      "model_calls": 0,
+      "backend_solves": 1,
+      "worker_calls": 0,
+      "wall_s": 3595.094000000041
+    },
+    "remaining": {
+      "backend_solves": 0,
+      "model_calls": 0,
+      "tool_calls": 5,
+      "wall_s": null,
+      "worker_calls": 0
+    },
+    "occupied": {}
+  },
+  "launches": 1,
+  "provider_requests": 0
+}
