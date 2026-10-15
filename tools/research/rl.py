@@ -38,6 +38,11 @@ def prepare_input(host, request):
     cfg=run.merge_overrides(request.training_overrides.model_dump(exclude_unset=True),request.reward_overrides.model_dump(exclude_unset=True),defaults=state_api.state(host)['spec']['control']['rl_defaults'])
     cfg.update(mode=request.mode or cfg['mode'],reference=plain(request.reference),
         budget=plain(request.allocation) if request.allocation else deepcopy(cfg['budget']),seed=inp.seed)
+    if 'initial_tension_n' in request.model_fields_set:
+        cfg['initial_tension_n']=request.initial_tension_n
+    initial=cfg.get('initial_tension_n')
+    if initial is not None and (cfg['mode']!='direct' or any(initial>t['force_limit_n'] for t in c['configuration']['robot']['structure']['data']['tendons'])):
+        raise ValueError('INITIAL_POLICY_TENSION_REQUIRES_DIRECT_MODE_AND_ACTUAL_CHANNEL_BOUNDS')
     cfg['candidate']=dict(xml=xml,sha256=__import__('hashlib').sha256(xml.encode()).hexdigest(),assets={},
         identity=c['identity'],reference=plain(request.candidate),task_identity=scene['task_identity'],provenance=c['provenance'])
     cfg['control_object']=dict(joint_names=list(p['dofs']),tendon_names=[t['entity'] for t in p['tendons']],

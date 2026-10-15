@@ -285,6 +285,23 @@ class CountContinuationTests(fixtures.MainlineTests):
                 service_execution._run_contained(['fixture'],io.StringIO(),None)
             terminate.assert_called_once()
 
+    def test_engineering_addendum_never_extends_scientific_study(self):
+        from tools.research.config import extend_engineering_counts
+        changes=dict(training_stages=4,evaluation_episodes=2,physical_launches=6)
+        with self.assertRaisesRegex(ValueError,'EXPLICIT_ENGINEERING'):
+            extend_engineering_counts(self.spec,changes,'fixture approval')
+        engineering=deepcopy(self.spec)
+        engineering.update(mode='engineering_numerical')
+        engineering['rl_limits'].update(training_stages=2,evaluation_episodes=1)
+        engineering['budgets']['physical_launches']=4
+        result=extend_engineering_counts(engineering,changes,'fixture explicit approval')
+        self.assertEqual(result['rl_limits']['training_stages'],4)
+        self.assertEqual(result['configuration']['policy']['budget']['backend_solves'],6)
+        self.assertEqual(engineering['rl_limits']['training_stages'],2)
+        from tools.research.contracts import RLRequest
+        with self.assertRaisesRegex(ValueError,'INITIALIZATION_REQUIRES_NEW_START'):
+            RLRequest(operation='continue',run_id='parent',checkpoint='published',allocation={'actions':4096},initial_tension_n=.2,rationale='fixture')
+
 
 # Inheritance shares setup only; avoid discovering the mainline suite twice.
 for name in list(vars(fixtures.MainlineTests)):

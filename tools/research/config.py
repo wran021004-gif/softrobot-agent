@@ -34,6 +34,31 @@ def rl_configuration(defaults, training=None, reward=None):
     return result
 
 
+def extend_engineering_counts(spec, changes, authorization):
+    """Explicit human-authorized addendum; never exposed to model tools."""
+    if spec['mode']!='engineering_numerical' or not authorization:
+        raise ValueError('EXPLICIT_ENGINEERING_AUTHORIZATION_REQUIRED')
+    if set(changes)!={'training_stages','evaluation_episodes','physical_launches'}:
+        raise ValueError('ONLY_DECLARED_VALIDATION_COUNT_EXTENSION_SUPPORTED')
+    if any(type(v) is not int or v<0 for v in changes.values()):
+        raise ValueError('FINITE_COUNT_REQUIRED')
+    result=deepcopy(spec)
+    previous=result.pop('resolved_identity')
+    for key in ('training_stages','evaluation_episodes'):
+        if changes[key]<spec['rl_limits'][key]:
+            raise ValueError('EXTENSION_CANNOT_ERASE_CONSUMED_ALLOWANCE')
+        result['rl_limits'][key]=changes[key]
+    if changes['physical_launches']<spec['budgets']['physical_launches']:
+        raise ValueError('EXTENSION_CANNOT_ERASE_CONSUMED_ALLOWANCE')
+    result['budgets']['physical_launches']=changes['physical_launches']
+    result['configuration']['policy']['budget']['backend_solves']=changes['physical_launches']
+    SessionInput.model_validate(result['configuration'])
+    result.setdefault('authorization_addenda',[]).append(dict(previous_resolved_identity=previous,
+        counts=changes,authorization=authorization,original_failures_and_consumption_preserved=True))
+    result['resolved_identity']=digest(result)
+    return result
+
+
 def resolve(path, profile=None):
     path = Path(path).resolve()
     study = read(path)

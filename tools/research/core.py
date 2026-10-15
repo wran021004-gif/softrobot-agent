@@ -148,6 +148,7 @@ def bind(host, reason=None, specification=None):
         db.execute('UPDATE sessions SET snapshot=? WHERE run_id=?',(ref.artifact_id,host.run_id))
         current=host.store.session(host.run_id,db)['state']
         current.update(freeze=commit,profile=profile,core_hashes=core_hashes(),
+            validation_extension_pending_binding=False,
             scientific_dependencies={k:v for k,v in snapshot['dependencies'].items() if k.startswith(science_prefixes)})
         if changed:
             current['profile_history'].append(profile)

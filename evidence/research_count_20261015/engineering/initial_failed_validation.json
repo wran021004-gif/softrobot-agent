@@ -1,0 +1,1753 @@
+{
+  "engineering_chain_passed": false,
+  "reason": "Independent evaluation incomplete: MuJoCo BADQACC/engine reset at action 22, simulated time 0.21 s",
+  "study_id": "engineering-count-20261015",
+  "implementation": "035eadf098afea6198a4109516e931e40e832c84",
+  "training_stages": 2,
+  "requested_and_actual_actions": 8192,
+  "training_summaries": [
+    {
+      "reference": {
+        "artifact_id": "9ab3b04c27895adb2ab541e843a6689c8ae2eb2b00672a809415b5859dafb19f",
+        "media_type": "application/json"
+      },
+      "allocation": {
+        "actions": 4096,
+        "active_seconds": null
+      },
+      "candidate": {
+        "identity": "c4fb4a466f41768e539cf3b2cf89990fb6b2999e3aa3e980e93b680b0edd6eac",
+        "provenance": {
+          "origin": "new_version_reference_required"
+        },
+        "reference": {
+          "artifact_id": "73f15c9f4b7543ecdb752f731922736a31b97d8ebe81bd6879e94550c2d3bc30",
+          "media_type": "application/json"
+        }
+      },
+      "checkpoint": {
+        "config_sha256": "39d20bbf82fed09a9d6211c5678ff6d5bfab2db6ea056ffb334e1c5d5e4d8681",
+        "consumed": {
+          "active_seconds": 11.271852200035937,
+          "attempted_actions": 4096,
+          "attempted_physics_steps": 80992,
+          "complete_episodes": 59,
+          "completed_actions": 4003,
+          "failed_episodes": 93
+        },
+        "generation": "step-00004096-ff723eb5",
+        "inherited": {
+          "lifetime_timesteps": 4096,
+          "num_timesteps": 4096,
+          "optimization_epochs": 160,
+          "optimizer_sha256": "b0924ef39a90910a6b3cc1c182e6ce05c7fc05437a8cc4a5c2742c2699b4d228",
+          "optimizer_steps": 640,
+          "policy_sha256": "ff2315957403544bf7f66ab6d83cf79c4d22bc2ee7d8d77398233dee9e731637",
+          "rollout_optimizations": 16,
+          "schedule": {
+            "clip_range": 0.2,
+            "clip_range_vf": null,
+            "learning_rate": 0.0003,
+            "progress_remaining": 0.0,
+            "total_timesteps": 4096
+          }
+        },
+        "policy_file_sha256": "fb0cd7a87bdfd30d336b1d5d16ddfe158e7475e1d75a99be93b1bcb73f755ac9",
+        "policy_present": true
+      },
+      "consumed": {
+        "active_seconds": 11.315627200063318,
+        "attempted_actions": 4096,
+        "attempted_physics_steps": 80992,
+        "complete_episodes": 59,
+        "completed_actions": 4003,
+        "failed_episodes": 93
+      },
+      "consumption_uncertain": false,
+      "coverage": "CSV may lag checkpoint optimizations; worker step ranges can overlap. Missing metrics are not recorded. Logged nonfinite metrics are null (undefined), not zero. Physical steps are attempted, not verified completed substeps. Complete episodes are not task passes; reward is training-only and cannot be compared across different weights. Historical stage labels are preserved.",
+      "episode_failure_fraction": {
+        "denominator": 152,
+        "numerator": 93,
+        "value": 0.6118421052631579
+      },
+      "error": null,
+      "failure_index": {
+        "recent": [
+          {
+            "cumulative_action": 3948,
+            "episode_action": 22,
+            "episode_number": 147,
+            "failed_substep": 10,
+            "pre_step_time_s": 0.21450000000000016,
+            "source": "failures\\e6b0c1bc1238497783540a07c13aa31b\\failure_episode_147.json",
+            "warnings": [
+              "mjWARN_BADQVEL",
+              "engine_time_reset"
+            ]
+          },
+          {
+            "cumulative_action": 3974,
+            "episode_action": 26,
+            "episode_number": 148,
+            "failed_substep": 6,
+            "pre_step_time_s": 0.25250000000000017,
+            "source": "failures\\e6b0c1bc1238497783540a07c13aa31b\\failure_episode_148.json",
+            "warnings": [
+              "mjWARN_BADQPOS",
+              "engine_time_reset"
+            ]
+          },
+          {
+            "cumulative_action": 3997,
+            "episode_action": 23,
+            "episode_number": 149,
+            "failed_substep": 11,
+            "pre_step_time_s": 0.22500000000000017,
+            "source": "failures\\e6b0c1bc1238497783540a07c13aa31b\\failure_episode_149.json",
+            "warnings": [
+              "mjWARN_BADQVEL",
+              "engine_time_reset"
+            ]
+          },
+          {
+            "cumulative_action": 4019,
+            "episode_action": 22,
+            "episode_number": 150,
+            "failed_substep": 14,
+            "pre_step_time_s": 0.21650000000000016,
+            "source": "failures\\e6b0c1bc1238497783540a07c13aa31b\\failure_episode_150.json",
+            "warnings": [
+              "mjWARN_BADQVEL",
+              "engine_time_reset"
+            ]
+          },
+          {
+            "cumulative_action": 4076,
+            "episode_action": 22,
+            "episode_number": 152,
+            "failed_substep": 9,
+            "pre_step_time_s": 0.21400000000000016,
+            "source": "failures\\e6b0c1bc1238497783540a07c13aa31b\\failure_episode_152.json",
+            "warnings": [
+              "mjWARN_BADQVEL",
+              "engine_time_reset"
+            ]
+          }
+        ],
+        "recorded_files": 93
+      },
+      "known_consumption_lower_bound": null,
+      "last_known_stage": "checkpoint publication",
+      "mode": "direct",
+      "newly_incurred": true,
+      "observed_at_unix": 1792033247.6106055,
+      "ppo": {
+        "batch_size": 64,
+        "clip_range": 0.2,
+        "clip_range_vf": null,
+        "device": "cpu",
+        "ent_coef": 0.0,
+        "gae_lambda": 0.95,
+        "gamma": 0.99,
+        "learning_rate": 0.0003,
+        "max_grad_norm": 0.5,
+        "n_epochs": 10,
+        "n_steps": 256,
+        "normalize_advantage": true,
+        "policy_kwargs": {
+          "log_std_init": -3.0,
+          "net_arch": {
+            "pi": [
+              64,
+              64
+            ],
+            "vf": [
+              64,
+              64
+            ]
+          }
+        },
+        "sde_sample_freq": -1,
+        "target_kl": null,
+        "use_sde": false,
+        "verbose": 0,
+        "vf_coef": 0.5
+      },
+      "recorded_failure_stage": null,
+      "requested_allocation": {
+        "actions": 4096,
+        "active_seconds": null
+      },
+      "reservation": {},
+      "reward": {
+        "failure_penalty": -10000.0,
+        "holding_speed": 1.0,
+        "position": 1.0,
+        "smoothness": 0.001
+      },
+      "run_id": "engineering-count-20261015-e5dab1dc",
+      "scope": "Recorded training evidence; task acceptance requires independent evaluation",
+      "seed": 17,
+      "source_study": "engineering-count-20261015",
+      "sources": [
+        "state.json",
+        "config.json",
+        "checkpoint.json",
+        "checkpoints\\step-00004096-ff723eb5\\metadata.json",
+        "e6b0c1bc1238497783540a07c13aa31b\\progress.csv",
+        "failures\\e6b0c1bc1238497783540a07c13aa31b\\failure_episode_147.json",
+        "failures\\e6b0c1bc1238497783540a07c13aa31b\\failure_episode_148.json",
+        "failures\\e6b0c1bc1238497783540a07c13aa31b\\failure_episode_149.json",
+        "failures\\e6b0c1bc1238497783540a07c13aa31b\\failure_episode_150.json",
+        "failures\\e6b0c1bc1238497783540a07c13aa31b\\failure_episode_152.json"
+      ],
+      "status": "completed",
+      "stop_reason": "action_budget",
+      "task": {
+        "acceptance": {
+          "holding_speed_limit_m_s": 0.02,
+          "holding_steps": [
+            30,
+            31,
+            32,
+            33,
+            34,
+            35
+          ],
+          "position_limit_m": 0.01,
+          "terminal_position_limit_m": 0.01
+        },
+        "command_intervals": 35,
+        "control_period_s": 0.01,
+        "duration_s": 0.35,
+        "family": "task.reach",
+        "initializer": {
+          "qpos_rad": {
+            "distal1_cell_0_y": 0.0,
+            "distal1_cell_0_z": 0.0,
+            "distal1_cell_10_y": 0.0,
+            "distal1_cell_10_z": 0.0,
+            "distal1_cell_11_y": 0.0,
+            "distal1_cell_11_z": 0.0,
+            "distal1_cell_1_y": 0.0,
+            "distal1_cell_1_z": 0.0,
+            "distal1_cell_2_y": 0.0,
+            "distal1_cell_2_z": 0.0,
+            "distal1_cell_3_y": 0.0,
+            "distal1_cell_3_z": 0.0,
+            "distal1_cell_4_y": 0.0,
+            "distal1_cell_4_z": 0.0,
+            "distal1_cell_5_y": 0.0,
+            "distal1_cell_5_z": 0.0,
+            "distal1_cell_6_y": 0.0,
+            "distal1_cell_6_z": 0.0,
+            "distal1_cell_7_y": 0.0,
+            "distal1_cell_7_z": 0.0,
+            "distal1_cell_8_y": 0.0,
+            "distal1_cell_8_z": 0.0,
+            "distal1_cell_9_y": 0.0,
+            "distal1_cell_9_z": 0.0,
+            "near_cell_0_y": 0.0,
+            "near_cell_0_z": 0.0,
+            "near_cell_10_y": 0.0,
+            "near_cell_10_z": 0.0,
+            "near_cell_11_y": 0.0,
+            "near_cell_11_z": 0.0,
+            "near_cell_1_y": 0.0,
+            "near_cell_1_z": 0.0,
+            "near_cell_2_y": 0.0,
+            "near_cell_2_z": 0.0,
+            "near_cell_3_y": 0.0,
+            "near_cell_3_z": 0.0,
+            "near_cell_4_y": 0.0,
+            "near_cell_4_z": 0.0,
+            "near_cell_5_y": 0.0,
+            "near_cell_5_z": 0.0,
+            "near_cell_6_y": 0.0,
+            "near_cell_6_z": 0.0,
+            "near_cell_7_y": 0.0,
+            "near_cell_7_z": 0.0,
+            "near_cell_8_y": 0.0,
+            "near_cell_8_z": 0.0,
+            "near_cell_9_y": 0.0,
+            "near_cell_9_z": 0.0
+          },
+          "qvel_rad_s": {
+            "distal1_cell_0_y": 0.0,
+            "distal1_cell_0_z": 0.0,
+            "distal1_cell_10_y": 0.0,
+            "distal1_cell_10_z": 0.0,
+            "distal1_cell_11_y": 0.0,
+            "distal1_cell_11_z": 0.0,
+            "distal1_cell_1_y": 0.0,
+            "distal1_cell_1_z": 0.0,
+            "distal1_cell_2_y": 0.0,
+            "distal1_cell_2_z": 0.0,
+            "distal1_cell_3_y": 0.0,
+            "distal1_cell_3_z": 0.0,
+            "distal1_cell_4_y": 0.0,
+            "distal1_cell_4_z": 0.0,
+            "distal1_cell_5_y": 0.0,
+            "distal1_cell_5_z": 0.0,
+            "distal1_cell_6_y": 0.0,
+            "distal1_cell_6_z": 0.0,
+            "distal1_cell_7_y": 0.0,
+            "distal1_cell_7_z": 0.0,
+            "distal1_cell_8_y": 0.0,
+            "distal1_cell_8_z": 0.0,
+            "distal1_cell_9_y": 0.0,
+            "distal1_cell_9_z": 0.0,
+            "near_cell_0_y": 0.0,
+            "near_cell_0_z": 0.0,
+            "near_cell_10_y": 0.0,
+            "near_cell_10_z": 0.0,
+            "near_cell_11_y": 0.0,
+            "near_cell_11_z": 0.0,
+            "near_cell_1_y": 0.0,
+            "near_cell_1_z": 0.0,
+            "near_cell_2_y": 0.0,
+            "near_cell_2_z": 0.0,
+            "near_cell_3_y": 0.0,
+            "near_cell_3_z": 0.0,
+            "near_cell_4_y": 0.0,
+            "near_cell_4_z": 0.0,
+            "near_cell_5_y": 0.0,
+            "near_cell_5_z": 0.0,
+            "near_cell_6_y": 0.0,
+            "near_cell_6_z": 0.0,
+            "near_cell_7_y": 0.0,
+            "near_cell_7_z": 0.0,
+            "near_cell_8_y": 0.0,
+            "near_cell_8_z": 0.0,
+            "near_cell_9_y": 0.0,
+            "near_cell_9_z": 0.0
+          },
+          "unspecified": "zero"
+        },
+        "original": {
+          "actuator_channels": [
+            "actuator_commands"
+          ],
+          "contract_version": "1.0.0",
+          "environment": {
+            "contract": "experiment.assembly",
+            "data": {
+              "environment": {
+                "coordinate_frame": "world_base_x_forward_yz_cross_section",
+                "environment_id": "reach_free",
+                "gravity_m_s2": [
+                  0.0,
+                  0.0,
+                  -9.81
+                ],
+                "gravity_source": "main@245a785 reach_free environment; Human-owned benchmark gravity",
+                "lights": [
+                  {
+                    "direction": [
+                      0.0,
+                      0.0,
+                      -1.0
+                    ],
+                    "position_m": [
+                      0.0,
+                      0.0,
+                      2.0
+                    ]
+                  }
+                ],
+                "objects": [
+                  {
+                    "conaffinity": 1,
+                    "contype": 0,
+                    "half_size_m": [
+                      2.0,
+                      2.0,
+                      0.1
+                    ],
+                    "kind": "plane",
+                    "name": "floor",
+                    "position_m": [
+                      0.0,
+                      0.0,
+                      -0.02
+                    ]
+                  }
+                ],
+                "schema_version": "1",
+                "truth_status": "HUMAN_OWNED",
+                "units": "SI"
+              },
+              "external_forces": [],
+              "floor_id": "floor",
+              "mount": {
+                "position_m": [
+                  0.0,
+                  0.0,
+                  0.15
+                ],
+                "quaternion_wxyz": [
+                  1.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              }
+            },
+            "version": "1.0.0"
+          },
+          "evaluator": {
+            "extension_id": "evaluate.reach",
+            "parameters": {
+              "contract": "reference.reach_evaluation",
+              "data": {
+                "tolerance_m": 0.01
+              },
+              "version": "1.0.0"
+            },
+            "version": "1.0.0"
+          },
+          "failure_policy": "retain_invalid_and_constraint_failures",
+          "family": "task.reach",
+          "goal": {
+            "contract": "reference.reach_goal",
+            "data": {
+              "target_m": [
+                0.29,
+                0.035,
+                0.19
+              ]
+            },
+            "version": "1.0.0"
+          },
+          "initializer": {
+            "extension_id": "initialize.family",
+            "parameters": {
+              "contract": "family.initial",
+              "data": {
+                "qpos_rad": {
+                  "distal1_cell_0_y": 0.0,
+                  "distal1_cell_0_z": 0.0,
+                  "distal1_cell_10_y": 0.0,
+                  "distal1_cell_10_z": 0.0,
+                  "distal1_cell_11_y": 0.0,
+                  "distal1_cell_11_z": 0.0,
+                  "distal1_cell_1_y": 0.0,
+                  "distal1_cell_1_z": 0.0,
+                  "distal1_cell_2_y": 0.0,
+                  "distal1_cell_2_z": 0.0,
+                  "distal1_cell_3_y": 0.0,
+                  "distal1_cell_3_z": 0.0,
+                  "distal1_cell_4_y": 0.0,
+                  "distal1_cell_4_z": 0.0,
+                  "distal1_cell_5_y": 0.0,
+                  "distal1_cell_5_z": 0.0,
+                  "distal1_cell_6_y": 0.0,
+                  "distal1_cell_6_z": 0.0,
+                  "distal1_cell_7_y": 0.0,
+                  "distal1_cell_7_z": 0.0,
+                  "distal1_cell_8_y": 0.0,
+                  "distal1_cell_8_z": 0.0,
+                  "distal1_cell_9_y": 0.0,
+                  "distal1_cell_9_z": 0.0,
+                  "near_cell_0_y": 0.0,
+                  "near_cell_0_z": 0.0,
+                  "near_cell_10_y": 0.0,
+                  "near_cell_10_z": 0.0,
+                  "near_cell_11_y": 0.0,
+                  "near_cell_11_z": 0.0,
+                  "near_cell_1_y": 0.0,
+                  "near_cell_1_z": 0.0,
+                  "near_cell_2_y": 0.0,
+                  "near_cell_2_z": 0.0,
+                  "near_cell_3_y": 0.0,
+                  "near_cell_3_z": 0.0,
+                  "near_cell_4_y": 0.0,
+                  "near_cell_4_z": 0.0,
+                  "near_cell_5_y": 0.0,
+                  "near_cell_5_z": 0.0,
+                  "near_cell_6_y": 0.0,
+                  "near_cell_6_z": 0.0,
+                  "near_cell_7_y": 0.0,
+                  "near_cell_7_z": 0.0,
+                  "near_cell_8_y": 0.0,
+                  "near_cell_8_z": 0.0,
+                  "near_cell_9_y": 0.0,
+                  "near_cell_9_z": 0.0
+                },
+                "qvel_rad_s": {
+                  "distal1_cell_0_y": 0.0,
+                  "distal1_cell_0_z": 0.0,
+                  "distal1_cell_10_y": 0.0,
+                  "distal1_cell_10_z": 0.0,
+                  "distal1_cell_11_y": 0.0,
+                  "distal1_cell_11_z": 0.0,
+                  "distal1_cell_1_y": 0.0,
+                  "distal1_cell_1_z": 0.0,
+                  "distal1_cell_2_y": 0.0,
+                  "distal1_cell_2_z": 0.0,
+                  "distal1_cell_3_y": 0.0,
+                  "distal1_cell_3_z": 0.0,
+                  "distal1_cell_4_y": 0.0,
+                  "distal1_cell_4_z": 0.0,
+                  "distal1_cell_5_y": 0.0,
+                  "distal1_cell_5_z": 0.0,
+                  "distal1_cell_6_y": 0.0,
+                  "distal1_cell_6_z": 0.0,
+                  "distal1_cell_7_y": 0.0,
+                  "distal1_cell_7_z": 0.0,
+                  "distal1_cell_8_y": 0.0,
+                  "distal1_cell_8_z": 0.0,
+                  "distal1_cell_9_y": 0.0,
+                  "distal1_cell_9_z": 0.0,
+                  "near_cell_0_y": 0.0,
+                  "near_cell_0_z": 0.0,
+                  "near_cell_10_y": 0.0,
+                  "near_cell_10_z": 0.0,
+                  "near_cell_11_y": 0.0,
+                  "near_cell_11_z": 0.0,
+                  "near_cell_1_y": 0.0,
+                  "near_cell_1_z": 0.0,
+                  "near_cell_2_y": 0.0,
+                  "near_cell_2_z": 0.0,
+                  "near_cell_3_y": 0.0,
+                  "near_cell_3_z": 0.0,
+                  "near_cell_4_y": 0.0,
+                  "near_cell_4_z": 0.0,
+                  "near_cell_5_y": 0.0,
+                  "near_cell_5_z": 0.0,
+                  "near_cell_6_y": 0.0,
+                  "near_cell_6_z": 0.0,
+                  "near_cell_7_y": 0.0,
+                  "near_cell_7_z": 0.0,
+                  "near_cell_8_y": 0.0,
+                  "near_cell_8_z": 0.0,
+                  "near_cell_9_y": 0.0,
+                  "near_cell_9_z": 0.0
+                },
+                "unspecified": "zero"
+              },
+              "version": "1.0.0"
+            },
+            "version": "1.0.0"
+          },
+          "name": "Independent development validation of a serial multi-segment soft arm",
+          "objectives": [
+            {
+              "direction": "minimize",
+              "metric": "position_error",
+              "units": "m",
+              "weight": 1.0
+            }
+          ],
+          "observations": [
+            {
+              "dimension": 3,
+              "entity": "tip",
+              "frame": "world",
+              "missing": "unsupported",
+              "name": "tip_position",
+              "phase": "post_step",
+              "units": "m"
+            }
+          ],
+          "robot_families": [
+            "tendon_robot_family"
+          ],
+          "sampling": {
+            "aggregation": "per_instance",
+            "seeds": [
+              17
+            ],
+            "split": "development",
+            "window_s": [
+              0.0,
+              0.35
+            ]
+          },
+          "source": "Development task with fixed target, tolerance and scoring; historical tasks are unchanged",
+          "status": "development_valid",
+          "task_id": "family-multisegment-dev",
+          "task_version": "1.0.0",
+          "timing": {
+            "control_period_s": 0.01,
+            "duration_s": 0.35,
+            "sample_period_s": 0.01,
+            "termination": [
+              "duration",
+              "numerical_failure"
+            ],
+            "timestep_s": 0.0005
+          }
+        },
+        "target_m": [
+          0.29,
+          0.035,
+          0.19
+        ],
+        "tendon_order": [
+          "near_t0",
+          "near_t1",
+          "near_t2",
+          "far_t0",
+          "far_t1",
+          "far_t2"
+        ]
+      },
+      "task_identity": "2b26edb492214c426263441b6adb52d7aafe41a828436d6b48a1171374a1026c",
+      "workers": [
+        {
+          "after_step": 4096,
+          "attempted_actions": 4096,
+          "available_rows": 16,
+          "before_step": 0,
+          "current_worker": true,
+          "first": {
+            "rollout/ep_rew_mean": {
+              "logged_step": 256.0,
+              "value": -12800.2616475
+            },
+            "train/approx_kl": {
+              "logged_step": 512.0,
+              "value": 0.037223443
+            },
+            "train/clip_fraction": {
+              "logged_step": 512.0,
+              "value": 0.478515625
+            },
+            "train/entropy_loss": {
+              "logged_step": 512.0,
+              "value": 9.486744785308838
+            },
+            "train/explained_variance": {
+              "logged_step": 512.0,
+              "value": -2.956390380859375e-05
+            },
+            "train/learning_rate": {
+              "logged_step": 512.0,
+              "value": 0.0003
+            },
+            "train/n_updates": {
+              "logged_step": 512.0,
+              "value": 10.0
+            },
+            "train/policy_gradient_loss": {
+              "logged_step": 512.0,
+              "value": -0.04072574325837195
+            },
+            "train/value_loss": {
+              "logged_step": 512.0,
+              "value": 31707986.45
+            }
+          },
+          "incomplete_tail_rows": 0,
+          "latest": {
+            "rollout/ep_rew_mean": {
+              "logged_step": 4096.0,
+              "value": -16487.28821532
+            },
+            "train/approx_kl": {
+              "logged_step": 4096.0,
+              "value": 0.06546482
+            },
+            "train/clip_fraction": {
+              "logged_step": 4096.0,
+              "value": 0.40703125
+            },
+            "train/entropy_loss": {
+              "logged_step": 4096.0,
+              "value": 9.496557021141053
+            },
+            "train/explained_variance": {
+              "logged_step": 4096.0,
+              "value": 2.205371856689453e-05
+            },
+            "train/learning_rate": {
+              "logged_step": 4096.0,
+              "value": 0.0003
+            },
+            "train/n_updates": {
+              "logged_step": 4096.0,
+              "value": 150.0
+            },
+            "train/policy_gradient_loss": {
+              "logged_step": 4096.0,
+              "value": -0.03877951807808131
+            },
+            "train/value_loss": {
+              "logged_step": 4096.0,
+              "value": 29990237.85
+            }
+          },
+          "not_recorded": [],
+          "recent": [
+            {
+              "logged_step": 3072.0,
+              "metrics": {
+                "rollout/ep_rew_mean": -16348.16960424,
+                "train/approx_kl": 0.021227919,
+                "train/clip_fraction": 0.178515625,
+                "train/entropy_loss": 9.497022533416748,
+                "train/explained_variance": -5.1021575927734375e-05,
+                "train/learning_rate": 0.0003,
+                "train/n_updates": 110.0,
+                "train/policy_gradient_loss": -0.01764463512226939,
+                "train/value_loss": 4502537272.0
+              }
+            },
+            {
+              "logged_step": 3328.0,
+              "metrics": {
+                "rollout/ep_rew_mean": -16434.89807885,
+                "train/approx_kl": 0.027950807,
+                "train/clip_fraction": 0.348828125,
+                "train/entropy_loss": 9.49760947227478,
+                "train/explained_variance": 3.314018249511719e-05,
+                "train/learning_rate": 0.0003,
+                "train/n_updates": 120.0,
+                "train/policy_gradient_loss": -0.0346336075803265,
+                "train/value_loss": 39100956.35
+              }
+            },
+            {
+              "logged_step": 3584.0,
+              "metrics": {
+                "rollout/ep_rew_mean": -16453.302628999998,
+                "train/approx_kl": 0.0355105,
+                "train/clip_fraction": 0.31328125,
+                "train/entropy_loss": 9.49859585762024,
+                "train/explained_variance": 3.0279159545898438e-05,
+                "train/learning_rate": 0.0003,
+                "train/n_updates": 130.0,
+                "train/policy_gradient_loss": -0.03598425365053117,
+                "train/value_loss": 42225127.3
+              }
+            },
+            {
+              "logged_step": 3840.0,
+              "metrics": {
+                "rollout/ep_rew_mean": -16433.715037539998,
+                "train/approx_kl": 0.02861541,
+                "train/clip_fraction": 0.40546875,
+                "train/entropy_loss": 9.498299908638,
+                "train/explained_variance": -0.0001627206802368164,
+                "train/learning_rate": 0.0003,
+                "train/n_updates": 140.0,
+                "train/policy_gradient_loss": -0.03833299132529646,
+                "train/value_loss": 39977120.4
+              }
+            },
+            {
+              "logged_step": 4096.0,
+              "metrics": {
+                "rollout/ep_rew_mean": -16487.28821532,
+                "train/approx_kl": 0.06546482,
+                "train/clip_fraction": 0.40703125,
+                "train/entropy_loss": 9.496557021141053,
+                "train/explained_variance": 2.205371856689453e-05,
+                "train/learning_rate": 0.0003,
+                "train/n_updates": 150.0,
+                "train/policy_gradient_loss": -0.03877951807808131,
+                "train/value_loss": 29990237.85
+              }
+            }
+          ],
+          "source": "e6b0c1bc1238497783540a07c13aa31b\\progress.csv",
+          "token": "e6b0c1bc1238497783540a07c13aa31b",
+          "unavailable_metrics": {}
+        }
+      ]
+    },
+    {
+      "reference": {
+        "artifact_id": "360321c479f7a071263e6cb4f52434725262050dae0f685916f5a087aec69acb",
+        "media_type": "application/json"
+      },
+      "allocation": {
+        "actions": 4096,
+        "active_seconds": null
+      },
+      "candidate": {
+        "identity": "c4fb4a466f41768e539cf3b2cf89990fb6b2999e3aa3e980e93b680b0edd6eac",
+        "provenance": {
+          "origin": "new_version_reference_required"
+        },
+        "reference": {
+          "artifact_id": "73f15c9f4b7543ecdb752f731922736a31b97d8ebe81bd6879e94550c2d3bc30",
+          "media_type": "application/json"
+        }
+      },
+      "checkpoint": {
+        "config_sha256": "7aadefdb347863b7294ce09ec514c3c0335ad88f686146a6ff0dca6698cea5e6",
+        "consumed": {
+          "active_seconds": 9.262247100006789,
+          "attempted_actions": 4096,
+          "attempted_physics_steps": 80882,
+          "complete_episodes": 55,
+          "completed_actions": 3997,
+          "failed_episodes": 99
+        },
+        "generation": "step-00004096-f2a73c94",
+        "inherited": {
+          "lifetime_timesteps": 8192,
+          "num_timesteps": 4096,
+          "optimization_epochs": 192,
+          "optimizer_sha256": "253376b0ce90ae92c52a350233f61a5bef0f45d86ecc79abebd40572b1511ef1",
+          "optimizer_steps": 768,
+          "policy_sha256": "8ad1f56b74bb13efbd5e3a2f2d561c0f630e584ba7c8dd12bbac4e6318813eaf",
+          "rollout_optimizations": 24,
+          "schedule": {
+            "clip_range": 0.2,
+            "clip_range_vf": null,
+            "learning_rate": 5e-05,
+            "progress_remaining": 0.0,
+            "total_timesteps": 4096
+          }
+        },
+        "policy_file_sha256": "05a7d81a53fc8ee2f67c461d1a747d4d2643e93cabb05db84f49854dee9928d8",
+        "policy_present": true
+      },
+      "consumed": {
+        "active_seconds": 9.308080499991775,
+        "attempted_actions": 4096,
+        "attempted_physics_steps": 80882,
+        "complete_episodes": 55,
+        "completed_actions": 3997,
+        "failed_episodes": 99
+      },
+      "consumption_uncertain": false,
+      "coverage": "CSV may lag checkpoint optimizations; worker step ranges can overlap. Missing metrics are not recorded. Logged nonfinite metrics are null (undefined), not zero. Physical steps are attempted, not verified completed substeps. Complete episodes are not task passes; reward is training-only and cannot be compared across different weights. Historical stage labels are preserved.",
+      "episode_failure_fraction": {
+        "denominator": 154,
+        "numerator": 99,
+        "value": 0.6428571428571429
+      },
+      "error": null,
+      "failure_index": {
+        "recent": [
+          {
+            "cumulative_action": 3893,
+            "episode_action": 21,
+            "episode_number": 147,
+            "failed_substep": 5,
+            "pre_step_time_s": 0.20200000000000015,
+            "source": "failures\\3338f59490db455c82c1bce96824d124\\failure_episode_147.json",
+            "warnings": [
+              "mjWARN_BADQVEL",
+              "engine_time_reset"
+            ]
+          },
+          {
+            "cumulative_action": 3949,
+            "episode_action": 21,
+            "episode_number": 149,
+            "failed_substep": 13,
+            "pre_step_time_s": 0.20600000000000016,
+            "source": "failures\\3338f59490db455c82c1bce96824d124\\failure_episode_149.json",
+            "warnings": [
+              "mjWARN_BADQVEL",
+              "engine_time_reset"
+            ]
+          },
+          {
+            "cumulative_action": 3970,
+            "episode_action": 21,
+            "episode_number": 150,
+            "failed_substep": 3,
+            "pre_step_time_s": 0.20100000000000015,
+            "source": "failures\\3338f59490db455c82c1bce96824d124\\failure_episode_150.json",
+            "warnings": [
+              "mjWARN_BADQVEL",
+              "engine_time_reset"
+            ]
+          },
+          {
+            "cumulative_action": 4026,
+            "episode_action": 21,
+            "episode_number": 152,
+            "failed_substep": 14,
+            "pre_step_time_s": 0.20650000000000016,
+            "source": "failures\\3338f59490db455c82c1bce96824d124\\failure_episode_152.json",
+            "warnings": [
+              "mjWARN_BADQVEL",
+              "engine_time_reset"
+            ]
+          },
+          {
+            "cumulative_action": 4082,
+            "episode_action": 21,
+            "episode_number": 154,
+            "failed_substep": 3,
+            "pre_step_time_s": 0.20100000000000015,
+            "source": "failures\\3338f59490db455c82c1bce96824d124\\failure_episode_154.json",
+            "warnings": [
+              "mjWARN_BADQVEL",
+              "engine_time_reset"
+            ]
+          }
+        ],
+        "recorded_files": 99
+      },
+      "known_consumption_lower_bound": null,
+      "last_known_stage": "checkpoint publication",
+      "mode": "direct",
+      "newly_incurred": true,
+      "observed_at_unix": 1792033258.4530027,
+      "ppo": {
+        "batch_size": 128,
+        "clip_range": 0.2,
+        "clip_range_vf": null,
+        "device": "cpu",
+        "ent_coef": 0.001,
+        "gae_lambda": 0.95,
+        "gamma": 0.99,
+        "learning_rate": {
+          "final": 5e-05,
+          "initial": 0.0001,
+          "kind": "linear"
+        },
+        "max_grad_norm": 0.5,
+        "n_epochs": 4,
+        "n_steps": 512,
+        "normalize_advantage": true,
+        "policy_kwargs": {
+          "log_std_init": -3.0,
+          "net_arch": {
+            "pi": [
+              64,
+              64
+            ],
+            "vf": [
+              64,
+              64
+            ]
+          }
+        },
+        "sde_sample_freq": -1,
+        "target_kl": null,
+        "use_sde": false,
+        "verbose": 0,
+        "vf_coef": 0.5
+      },
+      "recorded_failure_stage": null,
+      "requested_allocation": {
+        "actions": 4096,
+        "active_seconds": null
+      },
+      "reservation": {},
+      "reward": {
+        "failure_penalty": -10000.0,
+        "holding_speed": 1.25,
+        "position": 1.0,
+        "smoothness": 0.001
+      },
+      "run_id": "engineering-count-20261015-be13d735",
+      "scope": "Recorded training evidence; task acceptance requires independent evaluation",
+      "seed": 17,
+      "source_study": "engineering-count-20261015",
+      "sources": [
+        "state.json",
+        "config.json",
+        "checkpoint.json",
+        "checkpoints\\step-00004096-f2a73c94\\metadata.json",
+        "3338f59490db455c82c1bce96824d124\\progress.csv",
+        "failures\\3338f59490db455c82c1bce96824d124\\failure_episode_147.json",
+        "failures\\3338f59490db455c82c1bce96824d124\\failure_episode_149.json",
+        "failures\\3338f59490db455c82c1bce96824d124\\failure_episode_150.json",
+        "failures\\3338f59490db455c82c1bce96824d124\\failure_episode_152.json",
+        "failures\\3338f59490db455c82c1bce96824d124\\failure_episode_154.json"
+      ],
+      "status": "completed",
+      "stop_reason": "action_budget",
+      "task": {
+        "acceptance": {
+          "holding_speed_limit_m_s": 0.02,
+          "holding_steps": [
+            30,
+            31,
+            32,
+            33,
+            34,
+            35
+          ],
+          "position_limit_m": 0.01,
+          "terminal_position_limit_m": 0.01
+        },
+        "command_intervals": 35,
+        "control_period_s": 0.01,
+        "duration_s": 0.35,
+        "family": "task.reach",
+        "initializer": {
+          "qpos_rad": {
+            "distal1_cell_0_y": 0.0,
+            "distal1_cell_0_z": 0.0,
+            "distal1_cell_10_y": 0.0,
+            "distal1_cell_10_z": 0.0,
+            "distal1_cell_11_y": 0.0,
+            "distal1_cell_11_z": 0.0,
+            "distal1_cell_1_y": 0.0,
+            "distal1_cell_1_z": 0.0,
+            "distal1_cell_2_y": 0.0,
+            "distal1_cell_2_z": 0.0,
+            "distal1_cell_3_y": 0.0,
+            "distal1_cell_3_z": 0.0,
+            "distal1_cell_4_y": 0.0,
+            "distal1_cell_4_z": 0.0,
+            "distal1_cell_5_y": 0.0,
+            "distal1_cell_5_z": 0.0,
+            "distal1_cell_6_y": 0.0,
+            "distal1_cell_6_z": 0.0,
+            "distal1_cell_7_y": 0.0,
+            "distal1_cell_7_z": 0.0,
+            "distal1_cell_8_y": 0.0,
+            "distal1_cell_8_z": 0.0,
+            "distal1_cell_9_y": 0.0,
+            "distal1_cell_9_z": 0.0,
+            "near_cell_0_y": 0.0,
+            "near_cell_0_z": 0.0,
+            "near_cell_10_y": 0.0,
+            "near_cell_10_z": 0.0,
+            "near_cell_11_y": 0.0,
+            "near_cell_11_z": 0.0,
+            "near_cell_1_y": 0.0,
+            "near_cell_1_z": 0.0,
+            "near_cell_2_y": 0.0,
+            "near_cell_2_z": 0.0,
+            "near_cell_3_y": 0.0,
+            "near_cell_3_z": 0.0,
+            "near_cell_4_y": 0.0,
+            "near_cell_4_z": 0.0,
+            "near_cell_5_y": 0.0,
+            "near_cell_5_z": 0.0,
+            "near_cell_6_y": 0.0,
+            "near_cell_6_z": 0.0,
+            "near_cell_7_y": 0.0,
+            "near_cell_7_z": 0.0,
+            "near_cell_8_y": 0.0,
+            "near_cell_8_z": 0.0,
+            "near_cell_9_y": 0.0,
+            "near_cell_9_z": 0.0
+          },
+          "qvel_rad_s": {
+            "distal1_cell_0_y": 0.0,
+            "distal1_cell_0_z": 0.0,
+            "distal1_cell_10_y": 0.0,
+            "distal1_cell_10_z": 0.0,
+            "distal1_cell_11_y": 0.0,
+            "distal1_cell_11_z": 0.0,
+            "distal1_cell_1_y": 0.0,
+            "distal1_cell_1_z": 0.0,
+            "distal1_cell_2_y": 0.0,
+            "distal1_cell_2_z": 0.0,
+            "distal1_cell_3_y": 0.0,
+            "distal1_cell_3_z": 0.0,
+            "distal1_cell_4_y": 0.0,
+            "distal1_cell_4_z": 0.0,
+            "distal1_cell_5_y": 0.0,
+            "distal1_cell_5_z": 0.0,
+            "distal1_cell_6_y": 0.0,
+            "distal1_cell_6_z": 0.0,
+            "distal1_cell_7_y": 0.0,
+            "distal1_cell_7_z": 0.0,
+            "distal1_cell_8_y": 0.0,
+            "distal1_cell_8_z": 0.0,
+            "distal1_cell_9_y": 0.0,
+            "distal1_cell_9_z": 0.0,
+            "near_cell_0_y": 0.0,
+            "near_cell_0_z": 0.0,
+            "near_cell_10_y": 0.0,
+            "near_cell_10_z": 0.0,
+            "near_cell_11_y": 0.0,
+            "near_cell_11_z": 0.0,
+            "near_cell_1_y": 0.0,
+            "near_cell_1_z": 0.0,
+            "near_cell_2_y": 0.0,
+            "near_cell_2_z": 0.0,
+            "near_cell_3_y": 0.0,
+            "near_cell_3_z": 0.0,
+            "near_cell_4_y": 0.0,
+            "near_cell_4_z": 0.0,
+            "near_cell_5_y": 0.0,
+            "near_cell_5_z": 0.0,
+            "near_cell_6_y": 0.0,
+            "near_cell_6_z": 0.0,
+            "near_cell_7_y": 0.0,
+            "near_cell_7_z": 0.0,
+            "near_cell_8_y": 0.0,
+            "near_cell_8_z": 0.0,
+            "near_cell_9_y": 0.0,
+            "near_cell_9_z": 0.0
+          },
+          "unspecified": "zero"
+        },
+        "original": {
+          "actuator_channels": [
+            "actuator_commands"
+          ],
+          "contract_version": "1.0.0",
+          "environment": {
+            "contract": "experiment.assembly",
+            "data": {
+              "environment": {
+                "coordinate_frame": "world_base_x_forward_yz_cross_section",
+                "environment_id": "reach_free",
+                "gravity_m_s2": [
+                  0.0,
+                  0.0,
+                  -9.81
+                ],
+                "gravity_source": "main@245a785 reach_free environment; Human-owned benchmark gravity",
+                "lights": [
+                  {
+                    "direction": [
+                      0.0,
+                      0.0,
+                      -1.0
+                    ],
+                    "position_m": [
+                      0.0,
+                      0.0,
+                      2.0
+                    ]
+                  }
+                ],
+                "objects": [
+                  {
+                    "conaffinity": 1,
+                    "contype": 0,
+                    "half_size_m": [
+                      2.0,
+                      2.0,
+                      0.1
+                    ],
+                    "kind": "plane",
+                    "name": "floor",
+                    "position_m": [
+                      0.0,
+                      0.0,
+                      -0.02
+                    ]
+                  }
+                ],
+                "schema_version": "1",
+                "truth_status": "HUMAN_OWNED",
+                "units": "SI"
+              },
+              "external_forces": [],
+              "floor_id": "floor",
+              "mount": {
+                "position_m": [
+                  0.0,
+                  0.0,
+                  0.15
+                ],
+                "quaternion_wxyz": [
+                  1.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              }
+            },
+            "version": "1.0.0"
+          },
+          "evaluator": {
+            "extension_id": "evaluate.reach",
+            "parameters": {
+              "contract": "reference.reach_evaluation",
+              "data": {
+                "tolerance_m": 0.01
+              },
+              "version": "1.0.0"
+            },
+            "version": "1.0.0"
+          },
+          "failure_policy": "retain_invalid_and_constraint_failures",
+          "family": "task.reach",
+          "goal": {
+            "contract": "reference.reach_goal",
+            "data": {
+              "target_m": [
+                0.29,
+                0.035,
+                0.19
+              ]
+            },
+            "version": "1.0.0"
+          },
+          "initializer": {
+            "extension_id": "initialize.family",
+            "parameters": {
+              "contract": "family.initial",
+              "data": {
+                "qpos_rad": {
+                  "distal1_cell_0_y": 0.0,
+                  "distal1_cell_0_z": 0.0,
+                  "distal1_cell_10_y": 0.0,
+                  "distal1_cell_10_z": 0.0,
+                  "distal1_cell_11_y": 0.0,
+                  "distal1_cell_11_z": 0.0,
+                  "distal1_cell_1_y": 0.0,
+                  "distal1_cell_1_z": 0.0,
+                  "distal1_cell_2_y": 0.0,
+                  "distal1_cell_2_z": 0.0,
+                  "distal1_cell_3_y": 0.0,
+                  "distal1_cell_3_z": 0.0,
+                  "distal1_cell_4_y": 0.0,
+                  "distal1_cell_4_z": 0.0,
+                  "distal1_cell_5_y": 0.0,
+                  "distal1_cell_5_z": 0.0,
+                  "distal1_cell_6_y": 0.0,
+                  "distal1_cell_6_z": 0.0,
+                  "distal1_cell_7_y": 0.0,
+                  "distal1_cell_7_z": 0.0,
+                  "distal1_cell_8_y": 0.0,
+                  "distal1_cell_8_z": 0.0,
+                  "distal1_cell_9_y": 0.0,
+                  "distal1_cell_9_z": 0.0,
+                  "near_cell_0_y": 0.0,
+                  "near_cell_0_z": 0.0,
+                  "near_cell_10_y": 0.0,
+                  "near_cell_10_z": 0.0,
+                  "near_cell_11_y": 0.0,
+                  "near_cell_11_z": 0.0,
+                  "near_cell_1_y": 0.0,
+                  "near_cell_1_z": 0.0,
+                  "near_cell_2_y": 0.0,
+                  "near_cell_2_z": 0.0,
+                  "near_cell_3_y": 0.0,
+                  "near_cell_3_z": 0.0,
+                  "near_cell_4_y": 0.0,
+                  "near_cell_4_z": 0.0,
+                  "near_cell_5_y": 0.0,
+                  "near_cell_5_z": 0.0,
+                  "near_cell_6_y": 0.0,
+                  "near_cell_6_z": 0.0,
+                  "near_cell_7_y": 0.0,
+                  "near_cell_7_z": 0.0,
+                  "near_cell_8_y": 0.0,
+                  "near_cell_8_z": 0.0,
+                  "near_cell_9_y": 0.0,
+                  "near_cell_9_z": 0.0
+                },
+                "qvel_rad_s": {
+                  "distal1_cell_0_y": 0.0,
+                  "distal1_cell_0_z": 0.0,
+                  "distal1_cell_10_y": 0.0,
+                  "distal1_cell_10_z": 0.0,
+                  "distal1_cell_11_y": 0.0,
+                  "distal1_cell_11_z": 0.0,
+                  "distal1_cell_1_y": 0.0,
+                  "distal1_cell_1_z": 0.0,
+                  "distal1_cell_2_y": 0.0,
+                  "distal1_cell_2_z": 0.0,
+                  "distal1_cell_3_y": 0.0,
+                  "distal1_cell_3_z": 0.0,
+                  "distal1_cell_4_y": 0.0,
+                  "distal1_cell_4_z": 0.0,
+                  "distal1_cell_5_y": 0.0,
+                  "distal1_cell_5_z": 0.0,
+                  "distal1_cell_6_y": 0.0,
+                  "distal1_cell_6_z": 0.0,
+                  "distal1_cell_7_y": 0.0,
+                  "distal1_cell_7_z": 0.0,
+                  "distal1_cell_8_y": 0.0,
+                  "distal1_cell_8_z": 0.0,
+                  "distal1_cell_9_y": 0.0,
+                  "distal1_cell_9_z": 0.0,
+                  "near_cell_0_y": 0.0,
+                  "near_cell_0_z": 0.0,
+                  "near_cell_10_y": 0.0,
+                  "near_cell_10_z": 0.0,
+                  "near_cell_11_y": 0.0,
+                  "near_cell_11_z": 0.0,
+                  "near_cell_1_y": 0.0,
+                  "near_cell_1_z": 0.0,
+                  "near_cell_2_y": 0.0,
+                  "near_cell_2_z": 0.0,
+                  "near_cell_3_y": 0.0,
+                  "near_cell_3_z": 0.0,
+                  "near_cell_4_y": 0.0,
+                  "near_cell_4_z": 0.0,
+                  "near_cell_5_y": 0.0,
+                  "near_cell_5_z": 0.0,
+                  "near_cell_6_y": 0.0,
+                  "near_cell_6_z": 0.0,
+                  "near_cell_7_y": 0.0,
+                  "near_cell_7_z": 0.0,
+                  "near_cell_8_y": 0.0,
+                  "near_cell_8_z": 0.0,
+                  "near_cell_9_y": 0.0,
+                  "near_cell_9_z": 0.0
+                },
+                "unspecified": "zero"
+              },
+              "version": "1.0.0"
+            },
+            "version": "1.0.0"
+          },
+          "name": "Independent development validation of a serial multi-segment soft arm",
+          "objectives": [
+            {
+              "direction": "minimize",
+              "metric": "position_error",
+              "units": "m",
+              "weight": 1.0
+            }
+          ],
+          "observations": [
+            {
+              "dimension": 3,
+              "entity": "tip",
+              "frame": "world",
+              "missing": "unsupported",
+              "name": "tip_position",
+              "phase": "post_step",
+              "units": "m"
+            }
+          ],
+          "robot_families": [
+            "tendon_robot_family"
+          ],
+          "sampling": {
+            "aggregation": "per_instance",
+            "seeds": [
+              17
+            ],
+            "split": "development",
+            "window_s": [
+              0.0,
+              0.35
+            ]
+          },
+          "source": "Development task with fixed target, tolerance and scoring; historical tasks are unchanged",
+          "status": "development_valid",
+          "task_id": "family-multisegment-dev",
+          "task_version": "1.0.0",
+          "timing": {
+            "control_period_s": 0.01,
+            "duration_s": 0.35,
+            "sample_period_s": 0.01,
+            "termination": [
+              "duration",
+              "numerical_failure"
+            ],
+            "timestep_s": 0.0005
+          }
+        },
+        "target_m": [
+          0.29,
+          0.035,
+          0.19
+        ],
+        "tendon_order": [
+          "near_t0",
+          "near_t1",
+          "near_t2",
+          "far_t0",
+          "far_t1",
+          "far_t2"
+        ]
+      },
+      "task_identity": "2b26edb492214c426263441b6adb52d7aafe41a828436d6b48a1171374a1026c",
+      "workers": [
+        {
+          "after_step": 4096,
+          "attempted_actions": 4096,
+          "available_rows": 8,
+          "before_step": 0,
+          "current_worker": true,
+          "first": {
+            "rollout/ep_rew_mean": {
+              "logged_step": 512.0,
+              "value": -16552.26530047
+            },
+            "train/approx_kl": {
+              "logged_step": 1024.0,
+              "value": 0.008670859
+            },
+            "train/clip_fraction": {
+              "logged_step": 1024.0,
+              "value": 0.0400390625
+            },
+            "train/entropy_loss": {
+              "logged_step": 1024.0,
+              "value": 9.494137942790985
+            },
+            "train/explained_variance": {
+              "logged_step": 1024.0,
+              "value": 1.8417835235595703e-05
+            },
+            "train/learning_rate": {
+              "logged_step": 1024.0,
+              "value": 9.375e-05
+            },
+            "train/n_updates": {
+              "logged_step": 1024.0,
+              "value": 164.0
+            },
+            "train/policy_gradient_loss": {
+              "logged_step": 1024.0,
+              "value": -0.006842845119535923
+            },
+            "train/value_loss": {
+              "logged_step": 1024.0,
+              "value": 41023560.25
+            }
+          },
+          "incomplete_tail_rows": 0,
+          "latest": {
+            "rollout/ep_rew_mean": {
+              "logged_step": 4096.0,
+              "value": -13294.010646460001
+            },
+            "train/approx_kl": {
+              "logged_step": 4096.0,
+              "value": 0.0067074974
+            },
+            "train/clip_fraction": {
+              "logged_step": 4096.0,
+              "value": 0.02490234375
+            },
+            "train/entropy_loss": {
+              "logged_step": 4096.0,
+              "value": 9.494296193122864
+            },
+            "train/explained_variance": {
+              "logged_step": 4096.0,
+              "value": -2.193450927734375e-05
+            },
+            "train/learning_rate": {
+              "logged_step": 4096.0,
+              "value": 5.6250000000000005e-05
+            },
+            "train/n_updates": {
+              "logged_step": 4096.0,
+              "value": 188.0
+            },
+            "train/policy_gradient_loss": {
+              "logged_step": 4096.0,
+              "value": -0.005811385984998196
+            },
+            "train/value_loss": {
+              "logged_step": 4096.0,
+              "value": 42030988.75
+            }
+          },
+          "not_recorded": [],
+          "recent": [
+            {
+              "logged_step": 2048.0,
+              "metrics": {
+                "rollout/ep_rew_mean": -12996.65389316,
+                "train/approx_kl": 0.011034999,
+                "train/clip_fraction": 0.05615234375,
+                "train/entropy_loss": 9.494052708148956,
+                "train/explained_variance": -0.0003050565719604492,
+                "train/learning_rate": 8.125e-05,
+                "train/n_updates": 172.0,
+                "train/policy_gradient_loss": -0.008443006634479389,
+                "train/value_loss": 46237716.25
+              }
+            },
+            {
+              "logged_step": 2560.0,
+              "metrics": {
+                "rollout/ep_rew_mean": -13024.493534649997,
+                "train/approx_kl": 0.013060181,
+                "train/clip_fraction": 0.0634765625,
+                "train/entropy_loss": 9.49407947063446,
+                "train/explained_variance": 1.6748905181884766e-05,
+                "train/learning_rate": 7.500000000000001e-05,
+                "train/n_updates": 176.0,
+                "train/policy_gradient_loss": -0.008779783616773784,
+                "train/value_loss": 35263637.625
+              }
+            },
+            {
+              "logged_step": 3072.0,
+              "metrics": {
+                "rollout/ep_rew_mean": -13316.024977310002,
+                "train/approx_kl": 0.0103098955,
+                "train/clip_fraction": 0.044921875,
+                "train/entropy_loss": 9.494222164154053,
+                "train/explained_variance": 1.5437602996826172e-05,
+                "train/learning_rate": 6.875e-05,
+                "train/n_updates": 180.0,
+                "train/policy_gradient_loss": -0.009712359751574695,
+                "train/value_loss": 34685735.25
+              }
+            },
+            {
+              "logged_step": 3584.0,
+              "metrics": {
+                "rollout/ep_rew_mean": -13296.706738240002,
+                "train/approx_kl": 0.004434609,
+                "train/clip_fraction": 0.01171875,
+                "train/entropy_loss": 9.49434244632721,
+                "train/explained_variance": -0.0015506744384765625,
+                "train/learning_rate": 6.25e-05,
+                "train/n_updates": 184.0,
+                "train/policy_gradient_loss": -0.00656670774333179,
+                "train/value_loss": 68784323.25
+              }
+            },
+            {
+              "logged_step": 4096.0,
+              "metrics": {
+                "rollout/ep_rew_mean": -13294.010646460001,
+                "train/approx_kl": 0.0067074974,
+                "train/clip_fraction": 0.02490234375,
+                "train/entropy_loss": 9.494296193122864,
+                "train/explained_variance": -2.193450927734375e-05,
+                "train/learning_rate": 5.6250000000000005e-05,
+                "train/n_updates": 188.0,
+                "train/policy_gradient_loss": -0.005811385984998196,
+                "train/value_loss": 42030988.75
+              }
+            }
+          ],
+          "source": "3338f59490db455c82c1bce96824d124\\progress.csv",
+          "token": "3338f59490db455c82c1bce96824d124",
+          "unavailable_metrics": {}
+        }
+      ]
+    }
+  ],
+  "evaluations": [
+    {
+      "reference": {
+        "artifact_id": "97c668dedb6f7315c4db085c8385dfe23dff5daa71324bcdad26306a8ee7e61f",
+        "media_type": "application/json"
+      },
+      "acceptance": {
+        "holding_speed_limit_m_s": 0.02,
+        "holding_steps": [
+          30,
+          31,
+          32,
+          33,
+          34,
+          35
+        ],
+        "position_limit_m": 0.01,
+        "terminal_position_limit_m": 0.01
+      },
+      "candidate": {
+        "artifact_id": "73f15c9f4b7543ecdb752f731922736a31b97d8ebe81bd6879e94550c2d3bc30",
+        "media_type": "application/json"
+      },
+      "candidate_identity": "c4fb4a466f41768e539cf3b2cf89990fb6b2999e3aa3e980e93b680b0edd6eac",
+      "checkpoint": "step-00004096-f2a73c94",
+      "checkpoint_training_step": 4096,
+      "config_sha256": "7aadefdb347863b7294ce09ec514c3c0335ad88f686146a6ff0dca6698cea5e6",
+      "configuration": {
+        "artifact_id": "005038a7c59a117fecadc6344ec72c071547437de9d938c923d743d78f4dc79a",
+        "media_type": "application/json"
+      },
+      "episodes": [
+        {
+          "complete": false,
+          "counts": {
+            "attempted_actions": 22,
+            "attempted_physics_steps": 421,
+            "complete_episodes": 0,
+            "completed_actions": 21,
+            "failed_episodes": 1
+          },
+          "episode_reward": -4420.723830553385,
+          "holding_coverage_complete": false,
+          "holding_max_position_error_m": null,
+          "holding_max_speed_m_s": null,
+          "holding_sample_steps": [],
+          "numerical_failure": {
+            "action": [
+              -0.005767306312918663,
+              -0.03904351219534874,
+              -0.005700031761080027,
+              0.015452919527888298,
+              -0.01968037337064743,
+              -0.047543566673994064
+            ],
+            "candidate_identity": "c4fb4a466f41768e539cf3b2cf89990fb6b2999e3aa3e980e93b680b0edd6eac",
+            "clipped": [
+              false,
+              false,
+              false,
+              false,
+              false,
+              false
+            ],
+            "config_sha256": "7aadefdb347863b7294ce09ec514c3c0335ad88f686146a6ff0dca6698cea5e6",
+            "counts": {
+              "attempted_actions": 22,
+              "attempted_physics_steps": 421,
+              "complete_episodes": 0,
+              "completed_actions": 21,
+              "failed_episodes": 1
+            },
+            "cumulative_action": 22,
+            "delta_tension_n": [
+              0.012787874788045883,
+              0.3422217518091202,
+              0.10013558529317379,
+              0.1991872861981392,
+              0.12274004518985748,
+              0.06261976063251495
+            ],
+            "episode_action": 22,
+            "episode_number": 1,
+            "failed_substep": 1,
+            "pre_step_time_s": 0.21000000000000016,
+            "returned_engine_time_s": 0.0005,
+            "saturated": [
+              false,
+              false,
+              false,
+              false,
+              false,
+              false
+            ],
+            "start_error_m": 0.32091307055293766,
+            "start_speed_m_s": 422623990.05913043,
+            "state_spec": 16383,
+            "tension_n": [
+              3.9769307747483253,
+              3.843825951218605,
+              3.97719987295568,
+              4.061811678111553,
+              3.9212785065174103,
+              3.8098257333040237
+            ],
+            "warnings": [
+              "mjWARN_BADQACC",
+              "engine_time_reset"
+            ]
+          },
+          "passed": false,
+          "terminal_position_error_m": null,
+          "trajectory_rows": 22
+        }
+      ],
+      "evaluation_elapsed_s": 0.9763932999921963,
+      "execution_id": "f9e6d790025d4e159ad73e0faf88db0c",
+      "failure_reason": "numerical_failure",
+      "failure_stage": "physics sampling",
+      "independent_evaluation_executed": true,
+      "last_valid_position_error_m": 0.32091307055293766,
+      "last_valid_speed_m_s": 422623990.05913043,
+      "mode": "direct",
+      "operation_key": "engineering-evaluate",
+      "passed": false,
+      "policy": "D:\\softrobot-agent\\.worktrees\\research-mainline\\runs\\research\\engineering-count-20261015\\rl\\engineering-count-20261015-be13d735\\checkpoints\\step-00004096-f2a73c94\\policy.zip",
+      "policy_sha256": "05a7d81a53fc8ee2f67c461d1a747d4d2643e93cabb05db84f49854dee9928d8",
+      "role": "development",
+      "run_id": "engineering-count-20261015-be13d735",
+      "scope": "one deterministic fixed-initial-state episode; no robustness claim",
+      "seed": 17,
+      "selected_execution": null,
+      "study": "engineering-count-20261015",
+      "task": {
+        "artifact_id": "2b26edb492214c426263441b6adb52d7aafe41a828436d6b48a1171374a1026c",
+        "media_type": "application/json"
+      },
+      "task_identity": "2b26edb492214c426263441b6adb52d7aafe41a828436d6b48a1171374a1026c",
+      "trajectory": "D:\\softrobot-agent\\.worktrees\\research-mainline\\runs\\research\\engineering-count-20261015\\rl\\engineering-count-20261015-be13d735\\evaluate-f9e6d790025d4e159ad73e0faf88db0c\\trajectory.csv"
+    }
+  ],
+  "continuation": [
+    {
+      "parent": {
+        "parent_run_id": "engineering-count-20261015-e5dab1dc",
+        "directory": "D:\\softrobot-agent\\.worktrees\\research-mainline\\runs\\research\\engineering-count-20261015\\rl\\engineering-count-20261015-e5dab1dc",
+        "checkpoint": "step-00004096-ff723eb5",
+        "configuration": {
+          "artifact_id": "8c39b9fe08d944cb31bf2980e30c8c26b29901808a94a0c9afba94275f2d118d",
+          "media_type": "application/json"
+        },
+        "config_sha256": "39d20bbf82fed09a9d6211c5678ff6d5bfab2db6ea056ffb334e1c5d5e4d8681",
+        "policy_sha256": "fb0cd7a87bdfd30d336b1d5d16ddfe158e7475e1d75a99be93b1bcb73f755ac9",
+        "source_lifetime_timesteps": 4096,
+        "optimizer": "preserve",
+        "stage_schedule": "new declared schedule from stage-local progress 1",
+        "history": [
+          {
+            "run_id": "engineering-count-20261015-e5dab1dc",
+            "checkpoint": "step-00004096-ff723eb5"
+          }
+        ]
+      },
+      "source_snapshot": {
+        "policy_sha256": "ff2315957403544bf7f66ab6d83cf79c4d22bc2ee7d8d77398233dee9e731637",
+        "optimizer_sha256": "b0924ef39a90910a6b3cc1c182e6ce05c7fc05437a8cc4a5c2742c2699b4d228",
+        "num_timesteps": 4096,
+        "lifetime_timesteps": 4096,
+        "optimization_epochs": 160,
+        "rollout_optimizations": 16,
+        "optimizer_steps": 640,
+        "schedule": {
+          "total_timesteps": 4096,
+          "progress_remaining": 0.0,
+          "learning_rate": 0.0003,
+          "clip_range": 0.2,
+          "clip_range_vf": null
+        }
+      },
+      "stage_initial_snapshot": {
+        "policy_sha256": "ff2315957403544bf7f66ab6d83cf79c4d22bc2ee7d8d77398233dee9e731637",
+        "optimizer_sha256": "cb912de9607d0f0115a71b64f52e6f8a0491f010a6f7880d4611e04f1642cd87",
+        "num_timesteps": 0,
+        "lifetime_timesteps": 4096,
+        "optimization_epochs": 160,
+        "rollout_optimizations": 16,
+        "optimizer_steps": 640,
+        "schedule": {
+          "total_timesteps": 4096,
+          "progress_remaining": 1.0,
+          "learning_rate": 0.0001,
+          "clip_range": 0.2,
+          "clip_range_vf": null
+        }
+      },
+      "policy_preserved": true,
+      "optimizer_moments_preserved": true,
+      "optimizer_steps_preserved": true,
+      "optimizer_reset": false,
+      "stage_schedule": {
+        "kind": "linear",
+        "initial": 0.0001,
+        "final": 5e-05
+      },
+      "optimizer_learning_rates": [
+        0.0001
+      ],
+      "rollout_buffer_size": 512,
+      "schedule_semantics": "stage-local num_timesteps/progress; lifetime offset and optimizer/epoch counters retained"
+    }
+  ],
+  "ledger": {
+    "limit": {
+      "backend_solves": 4,
+      "model_calls": 0,
+      "tool_calls": 40,
+      "wall_s": null,
+      "worker_calls": 0
+    },
+    "used": {
+      "tool_calls": 5,
+      "model_calls": 0,
+      "backend_solves": 3,
+      "worker_calls": 0,
+      "wall_s": 3.243878900189884
+    },
+    "remaining": {
+      "backend_solves": 1,
+      "model_calls": 0,
+      "tool_calls": 35,
+      "wall_s": null,
+      "worker_calls": 0
+    },
+    "occupied": {}
+  },
+  "workers_remaining": 0,
+  "policy_performance": "Incomplete numerical execution; no task score or passing chain claimed"
+}

@@ -206,6 +206,7 @@ class RLRequest(Contract):
     failure: str | None = None
     replay: bool = False
     force: bool = False
+    initial_tension_n: FiniteFloat | None = Field(default=None,ge=0,description='Initialization only, direct RL: set the initial policy mean to this physical tension; continuation/resume retain parent weights')
 
     @model_validator(mode='after')
     def operation_contract(self):
@@ -232,4 +233,6 @@ class RLRequest(Contract):
             raise ValueError('FAILURE_REPLAY_ONLY_FOR_DIAGNOSE')
         if self.force and self.operation!='stop':
             raise ValueError('FORCE_ONLY_FOR_OWNED_PROCESS_STOP')
+        if 'initial_tension_n' in self.model_fields_set and self.operation!='start':
+            raise ValueError('POLICY_MEAN_INITIALIZATION_REQUIRES_NEW_START')
         return self

@@ -42,6 +42,7 @@ def confirmation_count(s):
 
 SCIENCE_FILES = ['extensions/tendon_family/'+n+'.py' for n in ('gvs_nmpc','gvs_trajectory','gvs_projection','contracts','control_evidence','backends','generated_serial','gvs_profile','gvs_codesign','gvs_casadi','gvs','gvs_basis','math_analysis','compiler','sections','geometry','manifest')]
 SCIENCE_FILES += ['extensions/optimization/contracts.py','extensions/optimization/ipopt.py','extensions/math_analysis/tools.py','extensions/math_analysis/kernels.py','schemas/platform_analysis.py','tools/execution_completion.py','tools/research_tasks.py']
+SCIENCE_FILES += ['tools/rl/'+name+'.py' for name in ('env','train','checks','continuation')]
 CORE_FILES = ['tools/research/'+p.name for p in (ROOT/'tools/research').glob('*.py')]
 CORE_FILES += ['tools/service_execution.py','tools/rl/env.py','tools/rl/run.py','tools/rl/train.py','tools/rl/checks.py','tools/rl/continuation.py']
 
@@ -67,6 +68,8 @@ def guard(host, expensive=False):
         raise ValueError('PENDING_EXECUTION_RECOVER_WITHOUT_NEW_LAUNCH')
     if 'freeze' not in s:
         raise ValueError('COMMIT_AND_BIND_BEFORE_RESEARCH')
+    if s.get('validation_extension_pending_binding'):
+        raise ValueError('AUTHORIZED_EXTENSION_REQUIRES_COMMITTED_EXPLICIT_MIGRATION')
     if science_hashes()!=s['profile']['science_hashes'] or core_hashes()!=s.get('core_hashes') or not host.compatibility()['compatible']:
         raise ValueError('DEPENDENCIES_CHANGED_COMMIT_AND_MIGRATE_WITHOUT_RESETTING_COSTS')
     if s['spec'].get('mode') == 'engineering_numerical':

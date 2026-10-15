@@ -250,6 +250,16 @@ def worker(directory, token, started):
             for key in ("learning_rate", "clip_range", "clip_range_vf"):
                 settings[key] = schedule_setting(settings[key])
             context.model = RuntimePPO("MlpPolicy", context.env, seed=context.config["seed"], **settings)
+            initial=context.config.get('initial_tension_n')
+            if initial is not None:
+                if context.env.mode!='direct' or not (context.env.lower<=initial).all() or not (initial<=context.env.upper).all():
+                    raise ValueError('Initial policy tension outside direct-action contract')
+                mean=2*(initial-context.env.lower)/(context.env.upper-context.env.lower)-1
+                with torch.no_grad():
+                    context.model.policy.action_net.weight.zero_()
+                    context.model.policy.action_net.bias.copy_(torch.as_tensor(mean,dtype=context.model.policy.action_net.bias.dtype))
+                context.state['policy_initialization']=dict(initial_mean_tension_n=initial,normalized_action_mean=mean.tolist(),
+                    scope='New initialization only; physical action mapping and bounds unchanged')
             context.model._total_timesteps = context.config["budget"]["actions"]
         model = context.model
         context.before = snapshot(model)
