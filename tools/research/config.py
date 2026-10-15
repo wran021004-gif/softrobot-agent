@@ -65,13 +65,13 @@ def resolve(path, profile=None):
     provenance = dict(root=dict(path=str(path), sha256=digest(study)), references={})
     family_mode=study.get('start_mode')=='family_space'
     if family_mode:
-        from extensions.tendon_family.family_space import FamilySpace
+        from extensions.tendon_family.family_space import parse_space
         source=(path.parent/study.pop('defaults')).resolve()
         original=read(source)
         if source.parent!=path.parent or 'extends' in original or 'defaults' in original:
             raise ValueError('SAME_DIRECTORY_SINGLE_FAMILY_DEFAULTS_REQUIRED')
         family_source=(path.parent/study.pop('family_space')).resolve()
-        family_space=plain(FamilySpace.model_validate(read(family_source)))
+        family_space=plain(parse_space(read(family_source)))
         initialization=study.pop('candidate_initialization')
         if initialization!='all_candidate_dofs_zero_v1':
             raise ValueError('EXPLICIT_CANDIDATE_ZERO_INITIALIZATION_REQUIRED')
@@ -199,8 +199,7 @@ def resolve(path, profile=None):
     study['analysis_protocol'].update(baseline_lengths_m={k:v['length_m'] for k,v in segments.items()},
         duration_s=task['task']['timing']['duration_s'], period_s=task['task']['timing']['control_period_s'])
     if family_mode:
-        study['analysis_protocol']['baseline_lengths_m']={f'segment_{i}':
-            family_space['segment_domains'].get(str(i),family_space['segment_domain'])['length_m']['default'] for i in range(2)}
+        study['analysis_protocol']['baseline_lengths_m']={k:v['length_m'] for k,v in segments.items()}
     from schemas.platform_analysis import TaskAnalysisProtocol
     TaskAnalysisProtocol.model_validate(study['analysis_protocol'])
     if study['scoring_window_s'] not in study['analysis_protocol']['windows_s']:
@@ -234,11 +233,11 @@ def resolve(path, profile=None):
 
 def family_bootstrap(space, execution):
     """A family-derived Host input, never a scientific reference or candidate."""
-    from extensions.tendon_family.family_space import FamilyBuild
+    from extensions.tendon_family.family_space import parse_build
     from extensions.tendon_family.generated_serial import generate_family
-    build = FamilyBuild(space=space, request=dict(family_space_identity=digest(space),
+    build = parse_build(dict(space=space, request=dict(family_space_identity=digest(space),
         segment_count=min(space['executable_segment_counts']),
-        tendon_count=space['executable_tendon_count_bounds'][0]))
+        tendon_count=space['executable_tendon_count_bounds'][0])))
     design, mesh, physics = generate_family(build)
     robot = dict(family='tendon_robot_family',channels=['actuator_commands'],units='SI',
         frame='world_base_x_forward_yz_cross_section',sources=['frozen family assembly'],
@@ -248,6 +247,6 @@ def family_bootstrap(space, execution):
     initial['unspecified'] = 'zero'
     return dict(robot=robot,discretization=dict(contract='family.discretization',version='1.0.0',data=mesh),
         **execution, provenance=dict(source='frozen family assembly',scientific_candidate=False)), dict(
-        builder=dict(extension_id='candidate.family',version='5.0.0',parameters=dict(
-            contract='family.serial_space_build',version='1.0.0',data=plain(build))),
+        builder=dict(extension_id='candidate.family',version='6.0.0' if space['version']=='serial_family_space_v2' else '5.0.0',parameters=dict(
+            contract='family.serial_space_build_v2' if space['version']=='serial_family_space_v2' else 'family.serial_space_build',version='1.0.0',data=plain(build))),
         initializer=initial,request=plain(build.request))

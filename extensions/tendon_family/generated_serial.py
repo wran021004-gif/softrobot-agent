@@ -117,10 +117,10 @@ def generate(value):
     return _generate(space,deepcopy(space.source_design))
 
 
-def _generate(space,design):
+def _generate(space,design,*,serial=False):
     mesh=plain(Discretization.model_validate(space.source_mesh))
     parts={p['id']:p for p in design['components'] if p['kind']=='flexible_segment'}
-    if len(parts)!=2 or set(parts)!=set(space.segments):
+    if (not serial and len(parts)!=2) or set(parts)!=set(space.segments):
         raise ValueError('TWO_DECLARED_FLEXIBLE_SEGMENTS_REQUIRED')
     for name,values in space.segments.items():
         part=parts[name];part['length_m']=values['length_m']
@@ -152,7 +152,8 @@ def authorize(inp,space,changes):
     if changes:raise ValueError('SOURCE_CANDIDATE_ALREADY_RESOLVED')
     builder=inp.policy.candidate_builder
     topology=(builder.version,builder.parameters.contract,builder.parameters.version)==('4.0.0','family.topology_space','1.0.0')
-    family_space=builder.version=='5.0.0' and builder.parameters.contract=='family.serial_space_build'
+    family_space=(builder.version,builder.parameters.contract) in (
+        ('5.0.0','family.serial_space_build'),('6.0.0','family.serial_space_build_v2'))
     design,mesh,_=(generate_family if family_space else generate_topology if topology else generate)(space)
     if design!=inp.robot.structure.data or mesh!=inp.policy.discretization.data:raise ValueError('SOURCE_CANDIDATE_BINDING_MISMATCH')
 
@@ -198,19 +199,26 @@ def topology_declarations():
 
 
 def generate_family(value):
-    """Expand independent polar routes over the two-segment assembly prototypes."""
-    from .family_space import FamilyBuild, Span, validate_request
+    """Expand polar spans; v1 preserves its assembly, v2 expands named prototypes."""
+    from .family_space import parse_build, Span, validate_request, FamilyBuildV2
     from .sections import properties
-    build=FamilyBuild.model_validate(value);space=build.space;r=build.request
+    build=parse_build(value);space=build.space;r=build.request
     validate_request(space,r)
-    components=plain(space.assembly)['components']
+    serial=isinstance(build,FamilyBuildV2)
+    if serial:
+        components,mesh,tip=serial_components(space,r)
+    else:
+        components=plain(space.assembly)['components']
+        mesh=plain(space.assembly.mesh);tip=plain(space.assembly.tip)
     segments=[c for c in components if c['kind']=='flexible_segment']
-    if [c['id'] for c in segments]!=['segment_0','segment_1']:
+    if not serial and [c['id'] for c in segments]!=['segment_0','segment_1']:
         raise ValueError('INDEXED_TWO_SEGMENT_ASSEMBLY_REQUIRED')
     guides=[c for c in components if c['kind']=='guide']
-    if len(guides)!=1 or guides[0]['connection']['part']!='segment_0':
+    if not serial and (len(guides)!=1 or guides[0]['connection']['part']!='segment_0'):
         raise ValueError('C1_REQUIRES_ONE_INTERSEGMENT_GUIDE')
-    guide=guides[0];guide['guide_holes']={}
+    guides_by_segment={i:guides[i-1] for i in range(1,len(segments))}
+    guides_by_id={g['id']:g for g in guides}
+    for guide in guides:guide['guide_holes']={}
     for i,part in enumerate(segments):
         domain=space.segment_domains.get(i,space.segment_domain);choice=r.segments.get(i)
         for key in ('length_m','young_pa'):
@@ -231,7 +239,7 @@ def generate_family(value):
     def point(part,s,position,role,hole=None):
         return dict(attachment=dict(part=part,s=s,position_m=position),role=role,hole=hole)
     def yz(radius,angle):return [0.,radius*float(np.cos(angle)),radius*float(np.sin(angle))]
-    spans=r.spans or [Span(last_segment=1,count=r.tendon_count)]
+    spans=r.spans or [Span(last_segment=len(segments)-1,count=r.tendon_count)]
     for span in spans:
         bounds=space.routing_domains
         radius=bounds['radius_m'].check(span.radius_m if span.radius_m is not None else bounds['radius_m'].default,'radius_m')
@@ -249,9 +257,10 @@ def generate_family(value):
             route=[]
             if span.first_segment==0:route.append(point('fixed_base',0.,yz(radius,angle),'start'))
             for i in range(span.first_segment,span.last_segment+1):
-                if i==1:
+                if i>0:
+                    guide=guides_by_segment[i]
                     hole=name+'_hole';guide['guide_holes'][hole]=yz(radius,angle+span.guide_angle_offset_rad)
-                    route.append(point(guide['id'],0.,[0.,0.,0.],'start' if span.first_segment==1 else 'guide',hole))
+                    route.append(point(guide['id'],0.,[0.,0.,0.],'start' if span.first_segment==i else 'guide',hole))
                 for s in stations:route.append(point(segments[i]['id'],s,yz(radius,angle+span.guide_angle_offset_rad),'guide'))
             route.append(point(segments[span.last_segment]['id'],anchor,yz(radius,angle+span.anchor_angle_offset_rad),'anchor'))
             if index in r.route_overrides:route=[plain(p) for p in r.route_overrides[index]]
@@ -268,19 +277,22 @@ def generate_family(value):
                     envelope=max(np.linalg.norm(properties(st['section'])['outer_yz_m'],axis=1).max() for st in segments[i]['sections'])
                     if distance<envelope+tendon_values['diameter_m']/2:raise ValueError('SECTION_ROUTE_CLEARANCE')
                     order.append(i+a['s'])
-                elif part==guide['id']:
+                elif part in guides_by_id:
+                    i=next(k for k,g in guides_by_segment.items() if g['id']==part)
+                    if not max(1,span.first_segment)<=i<=span.last_segment:
+                        raise ValueError('GUIDE_OUTSIDE_SELECTED_SPAN')
                     if p.get('hole')!=name+'_hole' or p['role'] not in ('start','guide'):
                         raise ValueError('NAMED_OWNED_GUIDE_HOLE_REQUIRED')
-                    order.append(1.)
+                    order.append(float(i))
                 elif part=='fixed_base' and span.first_segment==0 and p['role']=='start':
                     if a['s'] or a['position_m'][0]!=0:raise ValueError('BASE_SECTION_PLANE_REQUIRED')
                     bounds['radius_m'].check(np.linalg.norm(a['position_m'][1:]),'base_radius_m');order.append(0.)
                 else:raise ValueError('ROUTE_ATTACHMENT_OUTSIDE_FAMILY')
-            if order!=sorted(set(order)) or route[0]['attachment']['part']!=('fixed_base' if span.first_segment==0 else guide['id']) or route[-1]['attachment']['part']!=segments[span.last_segment]['id']:
+            if order!=sorted(set(order)) or route[0]['attachment']['part']!=('fixed_base' if span.first_segment==0 else guides_by_segment[span.first_segment]['id']) or route[-1]['attachment']['part']!=segments[span.last_segment]['id']:
                 raise ValueError('ORDERED_SELECTED_SPAN_REQUIRED')
             for p in route:
                 a=p['attachment']
-                position=guide['guide_holes'][p['hole']] if p.get('hole') else a['position_m']
+                position=guides_by_id[a['part']]['guide_holes'][p['hole']] if p.get('hole') else a['position_m']
                 station=(a['part'],a['s']);previous=attachments.setdefault(station,[])
                 if any(np.linalg.norm(np.asarray(position)-old)<tendon_values['diameter_m'] for old in previous):
                     raise ValueError('TENDON_ATTACHMENT_CLEARANCE')
@@ -290,17 +302,51 @@ def generate_family(value):
                 limits=space.actuator_defaults.limits_m,velocity_limit=space.actuator_defaults.velocity_limit_m_s,
                 transmission=[dict(tendon=name,ratio=1.)]))
     used={p['hole'] for t in tendons for p in t['points'] if p.get('hole')}
-    guide['guide_holes']={k:v for k,v in guide['guide_holes'].items() if k in used}
-    design=dict(id='serial_family_candidate',components=components,tendons=tendons,actuators=actuators,tip=plain(space.assembly.tip))
+    for guide in guides:guide['guide_holes']={k:v for k,v in guide['guide_holes'].items() if k in used}
+    design=dict(id='serial_family_candidate',components=components,tendons=tendons,actuators=actuators,tip=tip)
     values={c['id']:dict(length_m=c['length_m'],young_pa=c['physics']['young_pa'],
         sections={str(i):st['section']['parameters'] for i,st in enumerate(c['sections'])}) for c in segments}
-    result=_generate(GeneratorSpace(source_design=design,source_mesh=plain(space.assembly.mesh),segments=values),design)
+    result=_generate(GeneratorSpace(source_design=design,source_mesh=mesh,segments=values),design,serial=serial)
     from .geometry import geometry
     geometry(result[2],[0.]*len(result[2]['dofs']))  # Reject zero-length resolved spans.
     return result
+
+
+def serial_components(space,request):
+    """One chain from explicit frozen prototype roles; IDs belong to the candidate."""
+    rule=space.serial_assembly
+    prototypes={c['id']:c for c in plain(space.assembly)['components']}
+    components=[];cells={}
+    for i in range(request.segment_count):
+        part=deepcopy(prototypes[rule.root_segment if i==0 else rule.repeated_segment])
+        part['id']='segment_'+str(i)
+        if i:
+            guide=deepcopy(prototypes[rule.guide]);guide['id']='guide_'+str(i)
+            guide['connection']['part']='segment_'+str(i-1)
+            connector=deepcopy(prototypes[rule.connector]);connector['id']='connector_'+str(i)
+            connector['connection']['part']=guide['id']
+            part['connection']['part']=connector['id']
+            components.extend([guide,connector])
+        choice=request.segments.get(i)
+        count=choice.cells if choice and choice.cells is not None else rule.default_cells
+        if not rule.cell_count_bounds[0]<=count<=rule.cell_count_bounds[1]:
+            raise ValueError('CELLS_OUTSIDE_FAMILY_DOMAIN')
+        cells[part['id']]=count
+        components.append(part)
+    payload=deepcopy(prototypes[rule.payload])
+    payload['connection']['part']='segment_'+str(request.segment_count-1)
+    components.append(payload)
+    mesh=plain(space.assembly.mesh);mesh['cells']=cells
+    return components,mesh,plain(space.assembly.tip)
 
 
 def family_declarations():
     return dict(contract='serial_family_space_v1',execution='two segments; bounded independent tendon counts',
         routing='polar consecutive spans with explicit local stations and optional typed route overrides',
         future=['variable segment construction and numerical compatibility (M3-C2)'])
+
+
+def serial_declarations():
+    return dict(contract='serial_family_space_v2',execution='declared serial segment and tendon domains subject to physical checks',
+        routing='consecutive spans; independent angular offsets and typed route overrides',
+        numerical='candidate-specific compatibility; no task-feasibility claim')

@@ -134,7 +134,7 @@ def verify_candidate(host,reference):
         return c
     if c['profile_identity']!=s['profile']['identity']:
         raise ValueError('OLD_EVALUATION_PROFILE_CANDIDATE_REQUIRES_NEW_CONSTRUCTION')
-    if c.get('generation_version')=='serial_family_generation_v1':
+    if c.get('generation_version') in ('serial_family_generation_v1','serial_family_generation_v2'):
         if (host.store.artifact(c['configuration_reference'])!=c['configuration'] or
                 c['family_space_identity']!=s['spec']['family_space_identity'] or
                 c['task_identity']!=s['spec']['canonical_task_identity'] or
@@ -169,21 +169,22 @@ def family_candidate_identity(cfg,s):
 
 def generate_candidate(host,request,provenance):
     """Materialize a frozen family request and persist through the existing Store."""
-    from extensions.tendon_family.family_space import FamilyBuild, UnsupportedGeneration
+    from extensions.tendon_family.family_space import parse_build, UnsupportedGeneration
     from extensions.tendon_family.gvs_profile import reach_numerical
     from tools.platform_tasks import compile_input
     s=state(host);spec=s['spec']
     if spec.get('start_mode')!='family_space':raise ValueError('FROZEN_FAMILY_SPACE_REQUIRED')
     started=time.perf_counter()
     try:
-        build=FamilyBuild(space=spec['family_space'],request=request)
+        build=parse_build(dict(space=spec['family_space'],request=plain(request)))
         robot,mesh,physics=family.generate_family(build)
         cfg=deepcopy(s['base_configuration']);cfg['run_id']=host.run_id
         cfg['robot'].update(sources=['frozen family-space assembly prototypes'])
         cfg['robot']['structure']['data']=robot
         cfg['policy']['discretization']['data']=mesh
-        cfg['policy']['candidate_builder']=dict(extension_id='candidate.family',version='5.0.0',
-            parameters=dict(contract='family.serial_space_build',version='1.0.0',data=plain(build)))
+        serial=build.request.version=='serial_family_generation_v2'
+        cfg['policy']['candidate_builder']=dict(extension_id='candidate.family',version='6.0.0' if serial else '5.0.0',
+            parameters=dict(contract='family.serial_space_build_v2' if serial else 'family.serial_space_build',version='1.0.0',data=plain(build)))
         for key,d in build.space.control_domains.items():
             cfg['policy']['controller']['parameters']['data']['recipe'][key]=build.request.control_weights.get(key,d.default)
         initial={f:{j:0. for j in physics['dofs']} for f in ('qpos_rad','qvel_rad_s')};initial['unspecified']='zero'
@@ -201,6 +202,9 @@ def generate_candidate(host,request,provenance):
             controller_preparation=dict(status='candidate_initial_projection_and_pretension_ready',
                 coordinate_order=numerical['coordinate_order'],warm_input_shape=[len(numerical['warm_guess']['tensions']),dimensions['inputs']],
                 model_constructed=False,rollout_executed=False))
+        resolved['capabilities']=dict(declarative=True,materialized=True,physically_compiled=True,
+            gvs_basis_resolved=True,gvs_model_built=False,gvs_dynamics_evaluated=False,
+            controller_update_tested=False,complete_task_evaluated=False)
         if identity in s['candidates']:
             ref=s['candidates'][identity]
             save(host,dict(candidate=ref,request=plain(request),provenance=provenance),'candidate_reused')

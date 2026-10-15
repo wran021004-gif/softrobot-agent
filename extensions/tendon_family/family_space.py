@@ -71,7 +71,7 @@ class FamilySpace(Contract):
         for bounds in (self.segment_count_bounds, self.tendon_count_bounds, self.executable_tendon_count_bounds):
             if not 1 <= bounds[0] <= bounds[1]:
                 raise ValueError('POSITIVE_ORDERED_TOPOLOGY_BOUNDS_REQUIRED')
-        if self.executable_segment_counts != [2]:
+        if self.version == 'serial_family_space_v1' and self.executable_segment_counts != [2]:
             raise ValueError('C1_EXECUTES_ONLY_TWO_SEGMENTS')
         if not self.segment_count_bounds[0] <= 2 <= self.segment_count_bounds[1] or not (
                 self.tendon_count_bounds[0] <= self.executable_tendon_count_bounds[0] <=
@@ -150,6 +150,67 @@ class FamilyBuild(Contract):
     request: GenerationRequest
 
 
+class SerialAssemblyRule(Contract):
+    version: Literal['repeat_serial_prototypes_v1'] = 'repeat_serial_prototypes_v1'
+    root_segment: str
+    repeated_segment: str
+    guide: str
+    connector: str
+    payload: str
+    cell_count_bounds: tuple[int,int]
+    default_cells: int
+
+    @model_validator(mode='after')
+    def cells(self):
+        if not 1 <= self.cell_count_bounds[0] <= self.default_cells <= self.cell_count_bounds[1]:
+            raise ValueError('POSITIVE_ORDERED_CELL_DOMAIN_REQUIRED')
+        return self
+
+
+class FamilySpaceV2(FamilySpace):
+    version: Literal['serial_family_space_v2'] = 'serial_family_space_v2'
+    serial_assembly: SerialAssemblyRule
+
+    @model_validator(mode='after')
+    def serial(self):
+        if not self.executable_segment_counts or self.executable_segment_counts != sorted(set(self.executable_segment_counts)) or any(
+                not self.segment_count_bounds[0] <= i <= self.segment_count_bounds[1] for i in self.executable_segment_counts):
+            raise ValueError('EXECUTABLE_SEGMENT_COUNTS_MUST_BE_DECLARED')
+        parts={c.id:c for c in self.assembly.components}
+        rule=self.serial_assembly
+        for name,kind in ((rule.root_segment,'flexible_segment'),(rule.repeated_segment,'flexible_segment'),
+                          (rule.guide,'guide'),(rule.connector,'rigid_connector'),(rule.payload,'payload')):
+            if name not in parts or parts[name].kind!=kind:
+                raise ValueError('NAMED_SERIAL_PROTOTYPE_REQUIRED: '+name)
+        if parts[rule.root_segment].connection.part!='fixed_base' or self.assembly.tip.part!=rule.payload:
+            raise ValueError('SERIAL_ROOT_AND_PAYLOAD_TIP_REQUIRED')
+        return self
+
+
+class SegmentChoiceV2(SegmentChoice):
+    cells: int | None = Field(default=None,ge=1,strict=True)
+
+
+class GenerationRequestV2(GenerationRequest):
+    version: Literal['serial_family_generation_v2'] = 'serial_family_generation_v2'
+    segments: dict[int,SegmentChoiceV2] = Field(default_factory=dict)
+
+
+class FamilyBuildV2(Contract):
+    space: FamilySpaceV2
+    request: GenerationRequestV2
+
+
+def parse_space(value):
+    return (FamilySpaceV2 if value.get('version')=='serial_family_space_v2' else FamilySpace).model_validate(value)
+
+
+def parse_build(value):
+    from tools.platform_store import plain
+    value=plain(value)
+    return (FamilyBuildV2 if value['space'].get('version')=='serial_family_space_v2' else FamilyBuild).model_validate(value)
+
+
 class UnsupportedGeneration(ValueError):
     """Declared domain whose physical implementation belongs to a later milestone."""
 
@@ -177,7 +238,7 @@ def validate_request(space, request):
 def decision_summary(value, evidence, operations):
     """Exact frozen domains without repeating component meshes and inertias."""
     from tools.platform_store import plain
-    space = FamilySpace.model_validate(value)
+    space = parse_space(value)
     frozen = plain(space)
     result = {k:frozen[k] for k in (
         'version','family_id','assumptions','segment_count_bounds','executable_segment_counts',
@@ -193,6 +254,11 @@ def decision_summary(value, evidence, operations):
         return value
     result = compact(result)
     result['domain_encoding'] = '[minimum, maximum, default]; indexed segment fields override generic domain'
+    if isinstance(space,FamilySpaceV2):
+        result['serial_assembly']=plain(space.serial_assembly)
+        result['generation_version']='serial_family_generation_v2'
+    else:
+        result['generation_version']='serial_family_generation_v1'
     result.update(full_specification=evidence, available_operations=operations,
         routing_strategy='polar_consecutive_spans_v1',
         span_semantics='first_segment <= last_segment < selected segment_count; counts sum to tendon_count',

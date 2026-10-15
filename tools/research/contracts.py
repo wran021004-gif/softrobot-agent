@@ -5,7 +5,7 @@ from schemas.common import Contract
 from schemas.platform import EvidenceRef
 from schemas.platform_analysis import TaskAnalysisProtocol
 from extensions.tendon_family.generated_serial import TopologyPatch
-from extensions.tendon_family.family_space import GenerationRequest
+from extensions.tendon_family.family_space import GenerationRequest, GenerationRequestV2
 
 
 class SegmentParameters(Contract):
@@ -115,7 +115,7 @@ class Plan(Contract):
     stopping_condition: str = Field(min_length=1)
     interpretation: str = Field(min_length=1)
     parameters: Parameters | TopologyParameters | None = None
-    generation: GenerationRequest | None = None
+    generation: GenerationRequest | GenerationRequestV2 | None = None
     search: Search | None = None
     candidate: EvidenceRef | None = None
     selected_execution: EvidenceRef | None = Field(default=None, description='Exact immutable passing NMPC result or independent RL evaluation; freezes the complete solution')

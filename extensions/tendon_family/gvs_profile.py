@@ -99,7 +99,7 @@ def reach_numerical(inp):
 def reach_assessment(inp):
     inp=SessionInput.model_validate(inp)
     checked_reach(inp)
-    return dict(technical_compatibility=dict(status='supported',reason=f'Explicit frozen source with candidate-owned dimensions and pretension; two segments, {len(inp.robot.structure.data["tendons"])} ideal tensions'),
+    return dict(technical_compatibility=dict(status='supported',reason=f'Explicit frozen source with candidate-owned dimensions and pretension; {sum(c["kind"]=="flexible_segment" for c in inp.robot.structure.data["components"])} segments, {len(inp.robot.structure.data["tendons"])} ideal tensions'),
         historical_evidence=dict(status='not_transferred',exact_execution_scope_match=False,reason='Only fresh evaluation measures this candidate'),
         execution_preparation=dict(status='pending_execution_hook',source='initial_state_pretension'))
 

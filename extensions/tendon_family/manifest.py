@@ -156,3 +156,11 @@ EXTENSIONS.append(replace(_source_builder,version='5.0.0',input_schema=FamilyBui
     capabilities={**_source_builder.capabilities,
         'parameter_declarations':'extensions.tendon_family.generated_serial:family_declarations'},
     sources=_source_builder.sources+('extensions/tendon_family/family_space.py',)))
+
+from .family_space import FamilyBuildV2
+CONTRACTS.append(('family.serial_space_build_v2','1.0.0',FamilyBuildV2))
+EXTENSIONS.append(replace(_source_builder,version='6.0.0',input_schema=FamilyBuildV2,
+    description='Frozen serial family with one to nine independently parameterized flexible segments',
+    capabilities={**_source_builder.capabilities,
+        'parameter_declarations':'extensions.tendon_family.generated_serial:serial_declarations'},
+    sources=_source_builder.sources+('extensions/tendon_family/family_space.py',)))

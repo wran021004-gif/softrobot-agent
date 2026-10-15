@@ -1,0 +1,48 @@
+{
+  "defaults": "family_study_defaults.json",
+  "start_mode": "family_space",
+  "family_space": "family_space_v2.json",
+  "candidate_initialization": "all_candidate_dofs_zero_v1",
+  "study_id": "m3c2-short-control",
+  "authorization": "M3-C2 user attachment: at most three single-update registered NMPC/MuJoCo engineering cases, one per 1/2/3 segments, 20 steps at dt=0.0005 each; no provider/RL/full-task evaluator",
+  "mode": "engineering_numerical",
+  "capabilities": [
+    "analysis",
+    "nmpc"
+  ],
+  "allowed_plan_actions": [
+    "generate",
+    "stop"
+  ],
+  "budgets": {
+    "provider_requests": 0,
+    "protected_provider_requests": 0,
+    "public_operations": 40,
+    "protected_public_operations": 4,
+    "physical_launches": 3,
+    "local_solves": 0,
+    "local_solve_s": null,
+    "offline_nlp": 0,
+    "bdf_replays": 0,
+    "mathematical_evaluations": 0,
+    "numerical_s": null,
+    "activity_s": null,
+    "delivery_reserve_s": null
+  },
+  "rl_limits": {
+    "training_stages": 0,
+    "actions_per_trial": null,
+    "seconds_per_trial": null,
+    "training_actions": null,
+    "training_active_seconds": null,
+    "evaluation_episodes": 0,
+    "diagnostic_replays": 0,
+    "diagnostic_physics_steps": 0
+  },
+  "nmpc_limits": {
+    "executions": 3
+  },
+  "supplied_evidence": [],
+  "evidence_destination": "evidence/m3c2_variable_segments/control",
+  "execution_instructions": "Single-use opt-in engineering fixture; generation uses native research_plan. Reserve at most three incomplete control cases in the original Store; stop before a second command. No task evaluator is authorized."
+}

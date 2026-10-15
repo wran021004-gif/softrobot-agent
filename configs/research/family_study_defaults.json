@@ -62,66 +62,58 @@
     "endpoint_check_atol": 1e-08
   },
   "standalone_watchdog_s": null,
-  "study_id": "research-count-20261015",
-  "authorization": "User attachment 87a57390-0e70-4f32-9f5c-d641231fa2f7: implementation, real engineering validation, one model-led count-based study, commits and ordinary push to refactor/research-mainline.",
-  "base_commit": "5cf08f8ef9323e4309dbc7206366c728ee59b3fd",
+  "study_id": "family-study-unconfigured",
+  "authorization": "Common family-only defaults; a leaf study must declare its authorization and counts",
+  "base_commit": "bafad737824f7ff09741dbbc9273a2dba34bf882",
   "task": "../../tasks/reach_hold.json",
   "runtime": "runtime.json",
-  "mode": "formal_research",
+  "mode": "engineering_numerical",
   "tension_execution_mode": "ideal_tension",
-  "evidence_destination": "evidence/research_count_20261015/science",
+  "evidence_destination": "evidence/family-study-unconfigured",
   "capabilities": [
-    "analysis",
-    "search",
-    "nmpc",
-    "rl"
+    "analysis"
   ],
   "topology_scope": {},
   "budgets": {
-    "provider_requests": 100,
-    "protected_provider_requests": 8,
-    "public_operations": 600,
-    "protected_public_operations": 24,
-    "physical_launches": 40,
-    "local_solves": 20,
+    "provider_requests": 0,
+    "protected_provider_requests": 0,
+    "public_operations": 40,
+    "protected_public_operations": 4,
+    "physical_launches": 0,
+    "local_solves": 0,
     "local_solve_s": null,
     "offline_nlp": 0,
     "bdf_replays": 0,
-    "mathematical_evaluations": 40,
+    "mathematical_evaluations": 0,
     "numerical_s": null,
     "activity_s": null,
     "delivery_reserve_s": null
   },
   "nmpc_execution_cap_s": null,
   "nmpc_limits": {
-    "executions": 10
+    "executions": 0
   },
   "confirmation": {
     "fresh_independent_repetitions": 0,
     "configuration": "Select exact fresh completed passing backend evaluation after public read. No extra repetitions; repeatability unassessed."
   },
   "rl_limits": {
-    "training_stages": 10,
+    "training_stages": 0,
     "actions_per_trial": null,
     "seconds_per_trial": null,
     "training_actions": null,
     "training_active_seconds": null,
-    "evaluation_episodes": 20,
+    "evaluation_episodes": 0,
     "diagnostic_replays": 0,
     "diagnostic_physics_steps": 0
   },
   "supplied_evidence": [],
   "allowed_plan_actions": [
-    "propose",
-    "execute",
-    "search",
-    "diagnose",
-    "select",
-    "confirm",
+    "generate",
     "stop"
   ],
   "scoring_window_s": 0.35,
-  "execution_instructions": "Own one research study and choose the route freely: NMPC, direct RL, compatible residual RL, supported structure/material/control changes, candidate mathematics, saved-state diagnosis, continuation, or justified STOP. Do not force a nominal repeat or an NMPC-first path. The current packet gives the frozen task, explicit defaults, permitted fields, finite counts and protected closeout capacities. Ceilings are not targets. All scientific wall-time limits are disabled; simulation time, finite PPO steps and solver iterations remain meaningful. Read scoped historical facts and engineering evidence before choosing science. Historical compliant scenario successes do not establish a fresh result or continuous structural optimization. A local held-input Gramian measures normalized local authority, not damping or task acceptance. Failed or incomplete attempts retain their counts. start initializes a new stage; resume recovers the same interrupted stage under its original configuration and remaining steps; continue creates a new stage from the exact complete published source checkpoint and applies declared stage schedule/settings. New and continued stages share the training-stage limit. Never change task acceptance through reward tuning. After each real worker exits: query status, evidence_read its training summary, independently evaluate its exact checkpoint, evidence_read the evaluation, then decide. A fresh complete task pass blocks further scientific work immediately. Read the exact passing evidence and use research_plan action=select selected_execution=<exact reference>; zero extra confirmations seals immediately. Otherwise STOP must cite all new numerical results and publicly read training summaries/evaluations, explain unfinished conditions and next_step. No unsupported claims of hardware performance, real-time control, robustness, repeatability, structural superiority or global optimum. Multiple sequential tool calls per response are allowed.",
+  "execution_instructions": "Begin from the frozen canonical task and family definition. Generate candidate-owned structures; read exact Store evidence as needed. Numerical support and task acceptance are separate. No initial scientific candidate exists. Mathematical analysis is optional.",
   "control": "control.json",
   "family_execution": {
     "backend": {
