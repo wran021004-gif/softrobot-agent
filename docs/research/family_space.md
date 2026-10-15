@@ -1,6 +1,132 @@
-# M3-C1 family-space-first candidates
+# Serial family-space research: M3-C1 and M3-C2
 
-`configs/research/study_family_space_dev.json` composes the existing study defaults,
+## M3-C2 current interface
+
+`study_variable_segments_dev.json` composes `family_study_defaults.json`, the
+independent task/control/runtime sources, and `family_space_v2.json`. No family
+preparation reads `robot.json`. Reference-candidate studies keep the old resolver
+and effective configuration hash. Existing studies use their frozen Store state.
+V2 uses one same-directory `base_space` composition over the v1 family declaration
+to share its physical prototypes and unchanged domains. The sole resolver freezes
+the complete validated definition and fingerprints both sources; nested family
+bases are rejected. Runtime candidate generation reads only the frozen definition.
+
+The Host requires a concrete SessionInput to validate backend signals and physical
+compatibility. Its deterministic bootstrap is generated from the frozen family,
+using its minimum executable segment/tendon counts. It has no candidate reference,
+is absent from the candidate pool, and never establishes a scientific design,
+comparison baseline, or task acceptance. The frozen study records the exact
+bootstrap request and the reason it exists. Every candidate replaces the entire
+physical structure, discretization and builder and derives its named initializer.
+
+The optional analysis normalization map uses length defaults from the frozen
+family domains for every declared segment index (`frozen_family_domain_defaults_v1`).
+These are declared scales, not a reference robot or an initial scientific design.
+
+The new contracts are `serial_family_space_v2`, `serial_family_generation_v2`,
+`family.serial_space_build_v2@1`, and registered `candidate.family@6.0.0`.
+The v5 two-segment generator and source-relative v3/v4 remain available. V2 uses
+one assembly loop: the frozen rule names root/repeated flexible prototypes and
+guide/connector/payload prototypes. Index 0 uses the root, every later segment
+uses the explicitly named repeated prototype with its indexed or generic domain.
+Each boundary owns a guide and connector. The terminal segment owns the payload.
+Density, viscosity, station locations/angles and rigid inertia remain fixed.
+
+All selected segments admit independent length, Young modulus, granted section
+dimensions and an explicit integer `cells` override (1–32; default 12).
+Spans support any `0 <= first_segment <= last_segment < segment_count`.
+Routes and independent actuator channels are generated in span/group order.
+Physical checks retain ordered stations, owned named holes, section envelopes,
+pairwise clearances, nonzero spans, force limits and pretension constraints.
+Unsupported declared tendon counts (8–12) remain distinct from invalid geometry.
+
+Example action payload, embedded in the existing research_plan fields:
+
+```json
+{
+  "action": "generate",
+  "generation": {
+    "version": "serial_family_generation_v2",
+    "family_space_identity": "<exact frozen identity from packet>",
+    "segment_count": 5,
+    "tendon_count": 3,
+    "segments": {"4": {"length_m": 0.12, "young_pa": 8000000, "cells": 4}},
+    "spans": [
+      {"first_segment": 0, "last_segment": 0, "count": 1},
+      {"first_segment": 0, "last_segment": 2, "count": 1, "phase_rad": 0.8},
+      {"first_segment": 1, "last_segment": 4, "count": 1, "phase_rad": 1.6}
+    ]
+  }
+}
+```
+
+The Agent receives a deterministic summary with exact bounds encoded as
+`[minimum, maximum, default]`; indexed segment fields override the generic domain.
+It includes executable/declarative topology, routing and attachment constraints,
+control domains, granted operations and numerical limitations. Component meshes
+and inertia tensors are omitted. `study.family_space.full_specification` is the
+exact immutable EvidenceRef for `research evidence_read` / normal Store paging.
+That reference remains readable after recovery. No second design-space store exists.
+
+`family_space_claims_v1` separately reports generated/physically validated
+candidates, distinct designs and pairs of identified different candidates,
+evaluated search operations, selected candidate, independent task acceptance and
+confirmation. Reference-comparison fields are null with an explicit
+`not_applicable_no_reference_design` reason. Generation is never an improvement
+over the bootstrap. Historical reference-study claim values are unchanged.
+RL input preparation, when independently authorized, compares the canonical task
+rule while retaining the candidate-specific physical initializer; no training was
+used to validate that input path.
+
+### Measured compatibility and boundaries
+
+The [physical table](../../evidence/m3c2_variable_segments/physical_generation.json)
+uses explicit four-cell segments and three tendons, not a silent change of mesh:
+
+| Segments | Physical DOFs | GVS coordinates / state | Materialized + MuJoCo XML loaded | GVS recipe/basis built | Zero-state dynamics | One real update |
+|---|---:|---:|---|---|---|---|
+| 1 | 8 | 6 / 12 | Yes | Yes | Tested separately at 12 cells | See short evidence |
+| 2 | 16 | 12 / 24 | Yes | Yes | Tested separately at 12 cells | See short evidence |
+| 3 | 24 | 18 / 36 | Yes | Yes | Tested separately at 12 cells | See short evidence |
+| 4 | 32 | 24 / 48 | Yes | Yes | Not tested | Not tested |
+| 5 | 40 | 30 / 60 | Yes | Yes | Not tested | Not tested |
+| 6 | 48 | 36 / 72 | Yes | Yes | Not tested | Not tested |
+| 7 | 56 | 42 / 84 | Yes | Yes | Not tested | Not tested |
+| 8 | 64 | 48 / 96 | Yes | Yes | Not tested | Not tested |
+| 9 | 72 | 54 / 108 | Yes | Yes | Not tested | Not tested |
+
+The default 12-cell mesh hit a native Windows main-thread stack overflow loading
+six segments (144 physical DOFs). Counts 1–5 loaded before that boundary; 7–9 were
+not attempted at that mesh. Preserve the [native failure](../../evidence/m3c2_variable_segments/windows_xml_limitation.json).
+This is an unresolved XML-loading resource limit, not structural infeasibility.
+
+The exact C1 dense 22-coordinate failure was reproduced. All implicit terms were
+finite; NumPy, CSparse and LAPACK solved the same mass/RHS, while default CasADi QR
+failed. Its absolute R-entry singularity cutoff is 1e-12 in CasADi 3.7.2. Dividing
+both mass and RHS by the mass Frobenius norm removes this unit-dependent rejection
+without regularizing the model or changing forces. Rechecked 12/14/22-coordinate
+dynamics pass, with residuals and NumPy agreement recorded in the
+[diagnostic](../../evidence/m3c2_variable_segments/gvs_dense_diagnostic.json).
+The historical controls differ in routing/tendon layout, not dimension alone.
+No representation-only basis comparison is supported by the existing
+structural-station semantics. The [original failure](../../evidence/m3c2_variable_segments/gvs_dense_original.json)
+is retained. No universal dense-layout or high-segment control claim follows.
+
+The opt-in `SOFTROBOT_M3C2_CONTROL=1` verification uses the existing registered
+controller/backend and original Store, binds a committed implementation, admits
+at most three cases, and stops before a second command. Each case permits one
+0.01-second interval (20 steps at dt=0.0005). Exact numerical/control outcomes,
+costs, states, bounds and failures are in [short_control.json](../../evidence/m3c2_variable_segments/short_control.json)
+and its [Store export](../../evidence/m3c2_variable_segments/control/).
+That study is single-use: read/recover it rather than rerun the fixture. No full
+task evaluator, provider call or RL training is authorized by this entry.
+
+M3-C3 still owns mixed discrete/continuous search and a non-Agent baseline; M3-D
+owns mathematical decision utility; M4 owns frozen multi-task benchmarking.
+
+## Retained M3-C1 contract
+
+`configs/research/study_family_space_dev.json` now composes family-only study defaults,
 task, control and runtime with `family_space_v1.json`. It explicitly grants only
 offline generation and STOP: provider requests, backend executions, mathematical
 worker evaluations and RL stages are zero. `research_analysis` remains registered;
@@ -12,9 +138,8 @@ reference candidate. Status, decision packets, export, recovery and re-preparati
 accept `reference_candidate: null`. The Agent sees the family declaration and
 `generate` action. No mathematical analysis is required before generation.
 
-The Host still needs a concrete SessionInput for interface checks. `robot.json`
-supplies that explicitly labeled implementation scaffold. It is never added to
-the candidate pool or exposed as an Agent proposal. Its physical segment, guide,
+The original C1 delivery used a robot-derived Host scaffold. Current family-only
+preparation uses the family-derived bootstrap described above. Its segment, guide,
 connector and payload prototypes are separately frozen in the family declaration,
 with segment IDs `segment_0` and `segment_1`; source routes and source actuator
 objects are excluded. Density, viscosity, section stations, guide envelope/hole
@@ -102,7 +227,7 @@ station layouts remain unchecked for control compatibility; C1 does not change
 GVS/NMPC kernels to resolve it. Station checks do not certify swept self-collision,
 manufacturability, controllability or task feasibility.
 
-M3-C2 owns variable-segment assembly and progressive numerical compatibility;
+The historical C1 delivery deferred variable-segment assembly to M3-C2;
 8–12-tendon execution and dense-node numerical compatibility also require explicit
 validation. No provider request, full NMPC rollout, RL training or full-task
 evaluation was performed for this delivery. Historical outcomes remain sealed.

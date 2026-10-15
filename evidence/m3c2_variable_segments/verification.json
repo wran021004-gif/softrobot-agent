@@ -1,0 +1,172 @@
+{
+  "milestone": "M3-C2",
+  "status": "partially_complete_with_explicit_numerical_boundaries",
+  "branch": "feat/m3c2-variable-segments",
+  "base_commit": "bafad737824f7ff09741dbbc9273a2dba34bf882",
+  "control_implementation_commit": "6b95df3e49b8e7f5f9af599fcbfd45d386989606",
+  "completed": [
+    "Exact dense failure reproduction and localized equivalent repair",
+    "Family-only preparation without historical robot read",
+    "Mode-aware claims and compact exact evidence access",
+    "Versioned serial physical generation and XML load for all 1-9 counts at explicit four-cell mesh",
+    "Zero-state GVS and three registered one-update NMPC/MuJoCo cases for 1/2/3 segments"
+  ],
+  "limitations": [
+    "Default Windows main-thread MuJoCo XML load overflows stack at six segments x 12 cells; 7-9 at that mesh not attempted",
+    "4-9 segment GVS dynamics and control are untested; only recipe/basis/model construction established",
+    "8-12 tendons remain declarative, outside executable grant",
+    "No complete frozen task success, convergence optimum, robust performance or real-time control established"
+  ],
+  "final_focused_regression": {
+    "passed": 27,
+    "failed": 0,
+    "elapsed_s": 23.973,
+    "description": "27-case consolidated regression, four affected normalization checks, then five affected family-source/legacy checks. No repeated control run.",
+    "log": "runs/m3c2_final_regression.txt"
+  },
+  "numerical_control_verification": {
+    "tests": 1,
+    "passed": 1,
+    "elapsed_s": 443.604,
+    "entry": "SOFTROBOT_M3C2_CONTROL=1 python -m unittest -v tests.research.test_variable_segments.RealVariableSegmentControl",
+    "rerun": "Single-use study; read or recover instead"
+  },
+  "c1_gvs_and_xml_regression": {
+    "passed": true,
+    "real_model_cases": 3,
+    "states": [
+      24,
+      28,
+      24
+    ],
+    "jacobians": [
+      [
+        1,
+        12
+      ],
+      [
+        5,
+        14
+      ],
+      [
+        7,
+        12
+      ]
+    ],
+    "physics_steps": 0
+  },
+  "development_failures": {
+    "native_xml_process_terminations": 2,
+    "corrected_test_fixture_failures": [
+      "Nested Pydantic summary serialization",
+      "Summary exceeded intended 60 percent size; compact exact domain encoding added",
+      "Raw family JSON digest differed from validated normalized contract; identity fixture corrected"
+    ]
+  },
+  "compact_agent": {
+    "summary_bytes": 3678,
+    "full_family_bytes": 7737,
+    "full_reference": {
+      "artifact_id": "120f23ddcf625a2fe4c0c0bfad3ad8d7a0fa25d42654e22261f2757ba539c987",
+      "media_type": "application/json"
+    },
+    "retrieval_after_recovery": "passed"
+  },
+  "historical_compatibility": {
+    "reference_configuration_sha256": "31af3e097ad29fef1ffd74c5178a6267fc5ffe35889c63e98f531dd42c0df69e",
+    "v5_physics_identities": "Exact recorded C1 1/mixed/7 cases matched",
+    "v3_v4": "Targeted source-relative identity/compile/topology/warm-state tests passed",
+    "sealed_evidence_files_changed": 0
+  },
+  "resources": {
+    "provider_requests": 0,
+    "rl_training_stages": 0,
+    "complete_task_evaluations": 0,
+    "short_real_cases": 3,
+    "physical_steps": 60,
+    "physical_time_s": 0.03,
+    "packages_installed": 0,
+    "credential_files_read": 0,
+    "short_case_elapsed_s": {
+      "1": 35.7371060999576,
+      "2": 112.39464359998237,
+      "3": 285.9935305999825
+    },
+    "short_case_elapsed_sum_s": 434.12528029992245,
+    "focused_diagnostic_graphs": 10,
+    "c1_regression_symbolic_cases_across_two_runs": 6,
+    "short_case_symbolic_cases": 3,
+    "timing_caveat": "Original and final diagnostic timings are per-case; intermediate three-case development recheck was counted but its wall timings were overwritten before consolidation and cannot be reconstructed. Regression wall times include fixture/setup/cleanup, not scientific cost."
+  },
+  "closure": {
+    "research_status": "stopped",
+    "pending": null,
+    "unsealed_calls": 0,
+    "occupied": {},
+    "export_archive_verified": true,
+    "owned_workers_remaining": 0
+  },
+  "evidence": {
+    "dense_diagnostic": "gvs_dense_diagnostic.json",
+    "original_failure": "gvs_dense_original.json",
+    "qr_cutoff": "qr_boundary.json",
+    "physical": "physical_generation.json",
+    "short_control": "short_control.json",
+    "store_export": "control/immutable_artifacts.tar.gz"
+  },
+  "future_m3c3": [
+    "Mixed discrete/continuous count and routing selection",
+    "Conditional continuous search",
+    "Traditional non-Agent search baseline"
+  ],
+  "final_source_commit": "cc98b5c40d75d39af712996bc086a5b4d378fad1",
+  "post_control_correction": {
+    "commit": "fcdd2853",
+    "reason": "Optional analysis scale map must cover all candidate coordinate entities, independent of one-segment bootstrap",
+    "source": "frozen_family_domain_defaults_v1",
+    "tests_passed": 4,
+    "elapsed_s": 9.756,
+    "real_control_repeated": false,
+    "original_run_binding_and_ledger_unchanged": true
+  },
+  "source_change_totals": {
+    "configuration": {
+      "before_loc": 47,
+      "after_loc": 334,
+      "added": 288,
+      "deleted": 1
+    },
+    "documentation": {
+      "before_loc": 169,
+      "after_loc": 450,
+      "added": 288,
+      "deleted": 7
+    },
+    "production": {
+      "before_loc": 3755,
+      "after_loc": 4008,
+      "added": 295,
+      "deleted": 42
+    },
+    "tests": {
+      "before_loc": 225,
+      "after_loc": 584,
+      "added": 362,
+      "deleted": 3
+    },
+    "engineering_diagnostic": {
+      "before_loc": 0,
+      "after_loc": 105,
+      "added": 105,
+      "deleted": 0
+    }
+  },
+  "post_control_composition": {
+    "commit": "cc98b5c40d75d39af712996bc086a5b4d378fad1",
+    "tests_passed": 5,
+    "elapsed_s": 9.76,
+    "resolved_family_equals_bound_study": true,
+    "physical_values_changed": false,
+    "real_control_repeated": false
+  }
+}

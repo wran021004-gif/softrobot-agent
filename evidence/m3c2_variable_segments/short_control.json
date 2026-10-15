@@ -1,0 +1,4254 @@
+{
+  "models": {
+    "1": {
+      "candidate": {
+        "artifact_id": "0ecce875a2cd09f9d961c6edda42a1c8dc084fc396c43a186ee05a043d883bcb",
+        "media_type": "application/json"
+      },
+      "candidate_identity": "5bb6c5c042030be4b3bb0963e15b50560c1fa285c10ff3024978406b96e60751",
+      "dimensions": {
+        "physical_dofs": 24,
+        "gvs_coordinates": 6,
+        "state": 12,
+        "inputs": 3
+      },
+      "gvs_model_built": true,
+      "gvs_dynamics_evaluated": true,
+      "controller_update_tested": true,
+      "complete_task_evaluated": false,
+      "coordinate_order": [
+        "segment_0.kappa_y_node_0",
+        "segment_0.kappa_y_node_1",
+        "segment_0.kappa_y_node_2",
+        "segment_0.kappa_z_node_0",
+        "segment_0.kappa_z_node_1",
+        "segment_0.kappa_z_node_2"
+      ],
+      "tendon_order": [
+        "tendon_0",
+        "tendon_1",
+        "tendon_2"
+      ],
+      "resolved_basis": {
+        "representation_id": "gvs_bending_basis_v1",
+        "specification": {
+          "strategy": "structural_linear"
+        },
+        "coordinate_order": [
+          "segment_0.kappa_y_node_0",
+          "segment_0.kappa_y_node_1",
+          "segment_0.kappa_y_node_2",
+          "segment_0.kappa_z_node_0",
+          "segment_0.kappa_z_node_1",
+          "segment_0.kappa_z_node_2"
+        ],
+        "segments": [
+          {
+            "segment": "segment_0",
+            "start": 0,
+            "length_m": 0.16,
+            "knots": [
+              0.0,
+              0.5,
+              1.0
+            ],
+            "locations": [
+              {
+                "s": 0.0,
+                "kinds": [
+                  "segment_boundary"
+                ]
+              },
+              {
+                "s": 0.5,
+                "kinds": [
+                  "tendon_guide"
+                ]
+              },
+              {
+                "s": 1.0,
+                "kinds": [
+                  "component_attachment",
+                  "rigid_attachment",
+                  "segment_boundary",
+                  "tendon_anchor"
+                ]
+              }
+            ]
+          }
+        ],
+        "dimension": 6,
+        "axes": [
+          "y",
+          "z"
+        ]
+      },
+      "model_identity": "6324e3441ff32b8b9131e8b5cab47084a543e33e1f550a331e2ba32e06c5e6be",
+      "model_build_s": 0.0007751999655738473,
+      "jacobian_shape": [
+        3,
+        6
+      ],
+      "force_mapping_shape": [
+        6,
+        3
+      ],
+      "mass_rank": 6,
+      "mass_singular_values": [
+        1.4222598291050687e-06,
+        1.4203665635551974e-06,
+        1.8539267756475666e-08,
+        1.8267475089753083e-08,
+        1.0656950846009673e-09,
+        1.0022422699546525e-09
+      ],
+      "mass_condition": 1419.077873426173,
+      "numerical_terms": {
+        "xdot": {
+          "shape": [
+            12,
+            1
+          ],
+          "finite": true,
+          "norm": 15845.753226249224
+        },
+        "qdd": {
+          "shape": [
+            6,
+            1
+          ],
+          "finite": true,
+          "norm": 15845.753226249224
+        },
+        "mass_matrix": {
+          "shape": [
+            6,
+            6
+          ],
+          "finite": true,
+          "norm": 2.010209875023566e-06
+        },
+        "elastic_force": {
+          "shape": [
+            6,
+            1
+          ],
+          "finite": true,
+          "norm": 0.0
+        },
+        "damping_force": {
+          "shape": [
+            6,
+            1
+          ],
+          "finite": true,
+          "norm": 0.0
+        },
+        "gravity_force": {
+          "shape": [
+            6,
+            1
+          ],
+          "finite": true,
+          "norm": 0.002024822466593853
+        },
+        "tendon_generalized_force": {
+          "shape": [
+            6,
+            1
+          ],
+          "finite": true,
+          "norm": 1.5920614604846627e-19
+        },
+        "tendon_lengths_m": {
+          "shape": [
+            3,
+            1
+          ],
+          "finite": true,
+          "norm": 0.27712812921102026
+        },
+        "tendon_length_jacobian": {
+          "shape": [
+            3,
+            6
+          ],
+          "finite": true,
+          "norm": 0.003054701294725885
+        },
+        "velocity_bias": {
+          "shape": [
+            6,
+            1
+          ],
+          "finite": true,
+          "norm": 0.0
+        }
+      },
+      "numerical_graph_and_evaluation_s": 0.3325047999387607
+    },
+    "2": {
+      "candidate": {
+        "artifact_id": "34f199ef2829262ba360b6cefefc16a8af3c42566361df672b18ea8ebc5942c6",
+        "media_type": "application/json"
+      },
+      "candidate_identity": "da1e3f3ac46562a1c1da5952438ca45e6b4f5343541adc341bc826a1bd6d4bc6",
+      "dimensions": {
+        "physical_dofs": 48,
+        "gvs_coordinates": 12,
+        "state": 24,
+        "inputs": 3
+      },
+      "gvs_model_built": true,
+      "gvs_dynamics_evaluated": true,
+      "controller_update_tested": true,
+      "complete_task_evaluated": false,
+      "coordinate_order": [
+        "segment_0.kappa_y_node_0",
+        "segment_0.kappa_y_node_1",
+        "segment_0.kappa_y_node_2",
+        "segment_0.kappa_z_node_0",
+        "segment_0.kappa_z_node_1",
+        "segment_0.kappa_z_node_2",
+        "segment_1.kappa_y_node_0",
+        "segment_1.kappa_y_node_1",
+        "segment_1.kappa_y_node_2",
+        "segment_1.kappa_z_node_0",
+        "segment_1.kappa_z_node_1",
+        "segment_1.kappa_z_node_2"
+      ],
+      "tendon_order": [
+        "tendon_0",
+        "tendon_1",
+        "tendon_2"
+      ],
+      "resolved_basis": {
+        "representation_id": "gvs_bending_basis_v1",
+        "specification": {
+          "strategy": "structural_linear"
+        },
+        "coordinate_order": [
+          "segment_0.kappa_y_node_0",
+          "segment_0.kappa_y_node_1",
+          "segment_0.kappa_y_node_2",
+          "segment_0.kappa_z_node_0",
+          "segment_0.kappa_z_node_1",
+          "segment_0.kappa_z_node_2",
+          "segment_1.kappa_y_node_0",
+          "segment_1.kappa_y_node_1",
+          "segment_1.kappa_y_node_2",
+          "segment_1.kappa_z_node_0",
+          "segment_1.kappa_z_node_1",
+          "segment_1.kappa_z_node_2"
+        ],
+        "segments": [
+          {
+            "segment": "segment_0",
+            "start": 0,
+            "length_m": 0.16,
+            "knots": [
+              0.0,
+              0.5,
+              1.0
+            ],
+            "locations": [
+              {
+                "s": 0.0,
+                "kinds": [
+                  "segment_boundary"
+                ]
+              },
+              {
+                "s": 0.5,
+                "kinds": [
+                  "tendon_guide"
+                ]
+              },
+              {
+                "s": 1.0,
+                "kinds": [
+                  "component_attachment",
+                  "rigid_attachment",
+                  "segment_boundary",
+                  "tendon_guide"
+                ]
+              }
+            ]
+          },
+          {
+            "segment": "segment_1",
+            "start": 6,
+            "length_m": 0.11,
+            "knots": [
+              0.0,
+              0.5,
+              1.0
+            ],
+            "locations": [
+              {
+                "s": 0.0,
+                "kinds": [
+                  "segment_boundary"
+                ]
+              },
+              {
+                "s": 0.5,
+                "kinds": [
+                  "tendon_guide"
+                ]
+              },
+              {
+                "s": 1.0,
+                "kinds": [
+                  "component_attachment",
+                  "rigid_attachment",
+                  "segment_boundary",
+                  "tendon_anchor"
+                ]
+              }
+            ]
+          }
+        ],
+        "dimension": 12,
+        "axes": [
+          "y",
+          "z"
+        ]
+      },
+      "model_identity": "8ac8a333db9a5d492502a2ff9954db318d8e4c6a77a3f7f46a99dbfb9d611bce",
+      "model_build_s": 0.0012953999685123563,
+      "jacobian_shape": [
+        3,
+        12
+      ],
+      "force_mapping_shape": [
+        12,
+        3
+      ],
+      "mass_rank": 12,
+      "mass_singular_values": [
+        8.381602107273099e-06,
+        8.378511551688401e-06,
+        1.2566490075215397e-07,
+        1.2514064273836925e-07,
+        1.610402987170772e-08,
+        1.5893434311327084e-08,
+        2.323135538981271e-09,
+        2.2824362060798274e-09,
+        5.335374485402926e-10,
+        5.008249303618717e-10,
+        9.73906358273425e-11,
+        8.937054291098222e-11
+      ],
+      "mass_condition": 93784.84044369763,
+      "numerical_terms": {
+        "xdot": {
+          "shape": [
+            24,
+            1
+          ],
+          "finite": true,
+          "norm": 17556.916363064334
+        },
+        "qdd": {
+          "shape": [
+            12,
+            1
+          ],
+          "finite": true,
+          "norm": 17556.916363064334
+        },
+        "mass_matrix": {
+          "shape": [
+            12,
+            12
+          ],
+          "finite": true,
+          "norm": 1.1852539164863906e-05
+        },
+        "elastic_force": {
+          "shape": [
+            12,
+            1
+          ],
+          "finite": true,
+          "norm": 0.0
+        },
+        "damping_force": {
+          "shape": [
+            12,
+            1
+          ],
+          "finite": true,
+          "norm": 0.0
+        },
+        "gravity_force": {
+          "shape": [
+            12,
+            1
+          ],
+          "finite": true,
+          "norm": 0.005454676436485713
+        },
+        "tendon_generalized_force": {
+          "shape": [
+            12,
+            1
+          ],
+          "finite": true,
+          "norm": 1.7670333526483595e-19
+        },
+        "tendon_lengths_m": {
+          "shape": [
+            3,
+            1
+          ],
+          "finite": true,
+          "norm": 0.491902429349561
+        },
+        "tendon_length_jacobian": {
+          "shape": [
+            3,
+            12
+          ],
+          "finite": true,
+          "norm": 0.003706973158791414
+        },
+        "velocity_bias": {
+          "shape": [
+            12,
+            1
+          ],
+          "finite": true,
+          "norm": 0.0
+        }
+      },
+      "numerical_graph_and_evaluation_s": 1.4296437000157312
+    },
+    "3": {
+      "candidate": {
+        "artifact_id": "a0c48a1432ac780348c2250d889ffec5f3e235cb49ea7e7c45ce7fabdbb4e9e5",
+        "media_type": "application/json"
+      },
+      "candidate_identity": "393f1511c8e611678ebf92237500a76aa7f4f3f5de3511d54291d448933ddc02",
+      "dimensions": {
+        "physical_dofs": 72,
+        "gvs_coordinates": 18,
+        "state": 36,
+        "inputs": 3
+      },
+      "gvs_model_built": true,
+      "gvs_dynamics_evaluated": true,
+      "controller_update_tested": true,
+      "complete_task_evaluated": false,
+      "coordinate_order": [
+        "segment_0.kappa_y_node_0",
+        "segment_0.kappa_y_node_1",
+        "segment_0.kappa_y_node_2",
+        "segment_0.kappa_z_node_0",
+        "segment_0.kappa_z_node_1",
+        "segment_0.kappa_z_node_2",
+        "segment_1.kappa_y_node_0",
+        "segment_1.kappa_y_node_1",
+        "segment_1.kappa_y_node_2",
+        "segment_1.kappa_z_node_0",
+        "segment_1.kappa_z_node_1",
+        "segment_1.kappa_z_node_2",
+        "segment_2.kappa_y_node_0",
+        "segment_2.kappa_y_node_1",
+        "segment_2.kappa_y_node_2",
+        "segment_2.kappa_z_node_0",
+        "segment_2.kappa_z_node_1",
+        "segment_2.kappa_z_node_2"
+      ],
+      "tendon_order": [
+        "tendon_0",
+        "tendon_1",
+        "tendon_2"
+      ],
+      "resolved_basis": {
+        "representation_id": "gvs_bending_basis_v1",
+        "specification": {
+          "strategy": "structural_linear"
+        },
+        "coordinate_order": [
+          "segment_0.kappa_y_node_0",
+          "segment_0.kappa_y_node_1",
+          "segment_0.kappa_y_node_2",
+          "segment_0.kappa_z_node_0",
+          "segment_0.kappa_z_node_1",
+          "segment_0.kappa_z_node_2",
+          "segment_1.kappa_y_node_0",
+          "segment_1.kappa_y_node_1",
+          "segment_1.kappa_y_node_2",
+          "segment_1.kappa_z_node_0",
+          "segment_1.kappa_z_node_1",
+          "segment_1.kappa_z_node_2",
+          "segment_2.kappa_y_node_0",
+          "segment_2.kappa_y_node_1",
+          "segment_2.kappa_y_node_2",
+          "segment_2.kappa_z_node_0",
+          "segment_2.kappa_z_node_1",
+          "segment_2.kappa_z_node_2"
+        ],
+        "segments": [
+          {
+            "segment": "segment_0",
+            "start": 0,
+            "length_m": 0.16,
+            "knots": [
+              0.0,
+              0.5,
+              1.0
+            ],
+            "locations": [
+              {
+                "s": 0.0,
+                "kinds": [
+                  "segment_boundary"
+                ]
+              },
+              {
+                "s": 0.5,
+                "kinds": [
+                  "tendon_guide"
+                ]
+              },
+              {
+                "s": 1.0,
+                "kinds": [
+                  "component_attachment",
+                  "rigid_attachment",
+                  "segment_boundary",
+                  "tendon_guide"
+                ]
+              }
+            ]
+          },
+          {
+            "segment": "segment_1",
+            "start": 6,
+            "length_m": 0.11,
+            "knots": [
+              0.0,
+              0.5,
+              1.0
+            ],
+            "locations": [
+              {
+                "s": 0.0,
+                "kinds": [
+                  "segment_boundary"
+                ]
+              },
+              {
+                "s": 0.5,
+                "kinds": [
+                  "tendon_guide"
+                ]
+              },
+              {
+                "s": 1.0,
+                "kinds": [
+                  "component_attachment",
+                  "rigid_attachment",
+                  "segment_boundary",
+                  "tendon_guide"
+                ]
+              }
+            ]
+          },
+          {
+            "segment": "segment_2",
+            "start": 12,
+            "length_m": 0.14,
+            "knots": [
+              0.0,
+              0.5,
+              1.0
+            ],
+            "locations": [
+              {
+                "s": 0.0,
+                "kinds": [
+                  "segment_boundary"
+                ]
+              },
+              {
+                "s": 0.5,
+                "kinds": [
+                  "tendon_guide"
+                ]
+              },
+              {
+                "s": 1.0,
+                "kinds": [
+                  "component_attachment",
+                  "rigid_attachment",
+                  "segment_boundary",
+                  "tendon_anchor"
+                ]
+              }
+            ]
+          }
+        ],
+        "dimension": 18,
+        "axes": [
+          "y",
+          "z"
+        ]
+      },
+      "model_identity": "2c019c2290b174df4957f040f348a58eaac6339dfe62bab26488c94885b40923",
+      "model_build_s": 0.0023867000127211213,
+      "jacobian_shape": [
+        3,
+        18
+      ],
+      "force_mapping_shape": [
+        18,
+        3
+      ],
+      "mass_rank": 18,
+      "mass_singular_values": [
+        3.582772179246904e-05,
+        3.582272660308464e-05,
+        6.439917524600148e-07,
+        6.428809633173259e-07,
+        8.143950084910302e-08,
+        8.102599900512179e-08,
+        2.103444234803375e-08,
+        2.0890182726382294e-08,
+        3.915518983106029e-09,
+        3.865460148553701e-09,
+        1.6715369184424858e-09,
+        1.6339847741352758e-09,
+        6.206738718490584e-10,
+        5.997775547940675e-10,
+        2.334943637730174e-10,
+        2.1919179633362365e-10,
+        9.097678968285952e-11,
+        8.920253991855264e-11
+      ],
+      "mass_condition": 401644.63730721053,
+      "numerical_terms": {
+        "xdot": {
+          "shape": [
+            36,
+            1
+          ],
+          "finite": true,
+          "norm": 17531.879492901655
+        },
+        "qdd": {
+          "shape": [
+            18,
+            1
+          ],
+          "finite": true,
+          "norm": 17531.879492901655
+        },
+        "mass_matrix": {
+          "shape": [
+            18,
+            18
+          ],
+          "finite": true,
+          "norm": 5.06728282660563e-05
+        },
+        "elastic_force": {
+          "shape": [
+            18,
+            1
+          ],
+          "finite": true,
+          "norm": 0.0
+        },
+        "damping_force": {
+          "shape": [
+            18,
+            1
+          ],
+          "finite": true,
+          "norm": 0.0
+        },
+        "gravity_force": {
+          "shape": [
+            18,
+            1
+          ],
+          "finite": true,
+          "norm": 0.012849690945867024
+        },
+        "tendon_generalized_force": {
+          "shape": [
+            18,
+            1
+          ],
+          "finite": true,
+          "norm": 2.218644314456089e-19
+        },
+        "tendon_lengths_m": {
+          "shape": [
+            3,
+            1
+          ],
+          "finite": true,
+          "norm": 0.758638253715168
+        },
+        "tendon_length_jacobian": {
+          "shape": [
+            3,
+            18
+          ],
+          "finite": true,
+          "norm": 0.004570103937548904
+        },
+        "velocity_bias": {
+          "shape": [
+            18,
+            1
+          ],
+          "finite": true,
+          "norm": 0.0
+        }
+      },
+      "numerical_graph_and_evaluation_s": 3.72124820004683
+    },
+    "4": {
+      "candidate": {
+        "artifact_id": "13cb831a68fbfd89d7babd039315f63851db568b2e013763eb62109dab2947a7",
+        "media_type": "application/json"
+      },
+      "candidate_identity": "b115ad576eaf00205d47cf0270762637273615512841d9a5112704ff30bad857",
+      "dimensions": {
+        "physical_dofs": 32,
+        "gvs_coordinates": 24,
+        "state": 48,
+        "inputs": 3
+      },
+      "gvs_model_built": true,
+      "gvs_dynamics_evaluated": false,
+      "controller_update_tested": false,
+      "complete_task_evaluated": false,
+      "coordinate_order": [
+        "segment_0.kappa_y_node_0",
+        "segment_0.kappa_y_node_1",
+        "segment_0.kappa_y_node_2",
+        "segment_0.kappa_z_node_0",
+        "segment_0.kappa_z_node_1",
+        "segment_0.kappa_z_node_2",
+        "segment_1.kappa_y_node_0",
+        "segment_1.kappa_y_node_1",
+        "segment_1.kappa_y_node_2",
+        "segment_1.kappa_z_node_0",
+        "segment_1.kappa_z_node_1",
+        "segment_1.kappa_z_node_2",
+        "segment_2.kappa_y_node_0",
+        "segment_2.kappa_y_node_1",
+        "segment_2.kappa_y_node_2",
+        "segment_2.kappa_z_node_0",
+        "segment_2.kappa_z_node_1",
+        "segment_2.kappa_z_node_2",
+        "segment_3.kappa_y_node_0",
+        "segment_3.kappa_y_node_1",
+        "segment_3.kappa_y_node_2",
+        "segment_3.kappa_z_node_0",
+        "segment_3.kappa_z_node_1",
+        "segment_3.kappa_z_node_2"
+      ],
+      "tendon_order": [
+        "tendon_0",
+        "tendon_1",
+        "tendon_2"
+      ],
+      "resolved_basis": {
+        "representation_id": "gvs_bending_basis_v1",
+        "specification": {
+          "strategy": "structural_linear"
+        },
+        "coordinate_order": [
+          "segment_0.kappa_y_node_0",
+          "segment_0.kappa_y_node_1",
+          "segment_0.kappa_y_node_2",
+          "segment_0.kappa_z_node_0",
+          "segment_0.kappa_z_node_1",
+          "segment_0.kappa_z_node_2",
+          "segment_1.kappa_y_node_0",
+          "segment_1.kappa_y_node_1",
+          "segment_1.kappa_y_node_2",
+          "segment_1.kappa_z_node_0",
+          "segment_1.kappa_z_node_1",
+          "segment_1.kappa_z_node_2",
+          "segment_2.kappa_y_node_0",
+          "segment_2.kappa_y_node_1",
+          "segment_2.kappa_y_node_2",
+          "segment_2.kappa_z_node_0",
+          "segment_2.kappa_z_node_1",
+          "segment_2.kappa_z_node_2",
+          "segment_3.kappa_y_node_0",
+          "segment_3.kappa_y_node_1",
+          "segment_3.kappa_y_node_2",
+          "segment_3.kappa_z_node_0",
+          "segment_3.kappa_z_node_1",
+          "segment_3.kappa_z_node_2"
+        ],
+        "segments": [
+          {
+            "segment": "segment_0",
+            "start": 0,
+            "length_m": 0.16,
+            "knots": [
+              0.0,
+              0.5,
+              1.0
+            ],
+            "locations": [
+              {
+                "s": 0.0,
+                "kinds": [
+                  "segment_boundary"
+                ]
+              },
+              {
+                "s": 0.5,
+                "kinds": [
+                  "tendon_guide"
+                ]
+              },
+              {
+                "s": 1.0,
+                "kinds": [
+                  "component_attachment",
+                  "rigid_attachment",
+                  "segment_boundary",
+                  "tendon_guide"
+                ]
+              }
+            ]
+          },
+          {
+            "segment": "segment_1",
+            "start": 6,
+            "length_m": 0.11,
+            "knots": [
+              0.0,
+              0.5,
+              1.0
+            ],
+            "locations": [
+              {
+                "s": 0.0,
+                "kinds": [
+                  "segment_boundary"
+                ]
+              },
+              {
+                "s": 0.5,
+                "kinds": [
+                  "tendon_guide"
+                ]
+              },
+              {
+                "s": 1.0,
+                "kinds": [
+                  "component_attachment",
+                  "rigid_attachment",
+                  "segment_boundary",
+                  "tendon_guide"
+                ]
+              }
+            ]
+          },
+          {
+            "segment": "segment_2",
+            "start": 12,
+            "length_m": 0.14,
+            "knots": [
+              0.0,
+              0.5,
+              1.0
+            ],
+            "locations": [
+              {
+                "s": 0.0,
+                "kinds": [
+                  "segment_boundary"
+                ]
+              },
+              {
+                "s": 0.5,
+                "kinds": [
+                  "tendon_guide"
+                ]
+              },
+              {
+                "s": 1.0,
+                "kinds": [
+                  "component_attachment",
+                  "rigid_attachment",
+                  "segment_boundary",
+                  "tendon_guide"
+                ]
+              }
+            ]
+          },
+          {
+            "segment": "segment_3",
+            "start": 18,
+            "length_m": 0.14,
+            "knots": [
+              0.0,
+              0.5,
+              1.0
+            ],
+            "locations": [
+              {
+                "s": 0.0,
+                "kinds": [
+                  "segment_boundary"
+                ]
+              },
+              {
+                "s": 0.5,
+                "kinds": [
+                  "tendon_guide"
+                ]
+              },
+              {
+                "s": 1.0,
+                "kinds": [
+                  "component_attachment",
+                  "rigid_attachment",
+                  "segment_boundary",
+                  "tendon_anchor"
+                ]
+              }
+            ]
+          }
+        ],
+        "dimension": 24,
+        "axes": [
+          "y",
+          "z"
+        ]
+      },
+      "model_identity": "4c200d1078bbbfd3e2c891f881f2eefa5db81ee4b44c43bb37a9d44b261c899f",
+      "model_build_s": 0.001623000018298626,
+      "numerical_boundary": "Recipe/basis construction only; no symbolic dynamics graph or control solve"
+    },
+    "5": {
+      "candidate": {
+        "artifact_id": "56704d880d76750cdf7cd7353724c83db3da2d51844975193687d8bf1f7a795d",
+        "media_type": "application/json"
+      },
+      "candidate_identity": "595268da28b73228948bb74de2fde4bc83ea1976c0c753f3cac76634193a17e1",
+      "dimensions": {
+        "physical_dofs": 40,
+        "gvs_coordinates": 30,
+        "state": 60,
+        "inputs": 3
+      },
+      "gvs_model_built": true,
+      "gvs_dynamics_evaluated": false,
+      "controller_update_tested": false,
+      "complete_task_evaluated": false,
+      "coordinate_order": [
+        "segment_0.kappa_y_node_0",
+        "segment_0.kappa_y_node_1",
+        "segment_0.kappa_y_node_2",
+        "segment_0.kappa_z_node_0",
+        "segment_0.kappa_z_node_1",
+        "segment_0.kappa_z_node_2",
+        "segment_1.kappa_y_node_0",
+        "segment_1.kappa_y_node_1",
+        "segment_1.kappa_y_node_2",
+        "segment_1.kappa_z_node_0",
+        "segment_1.kappa_z_node_1",
+        "segment_1.kappa_z_node_2",
+        "segment_2.kappa_y_node_0",
+        "segment_2.kappa_y_node_1",
+        "segment_2.kappa_y_node_2",
+        "segment_2.kappa_z_node_0",
+        "segment_2.kappa_z_node_1",
+        "segment_2.kappa_z_node_2",
+        "segment_3.kappa_y_node_0",
+        "segment_3.kappa_y_node_1",
+        "segment_3.kappa_y_node_2",
+        "segment_3.kappa_z_node_0",
+        "segment_3.kappa_z_node_1",
+        "segment_3.kappa_z_node_2",
+        "segment_4.kappa_y_node_0",
+        "segment_4.kappa_y_node_1",
+        "segment_4.kappa_y_node_2",
+        "segment_4.kappa_z_node_0",
+        "segment_4.kappa_z_node_1",
+        "segment_4.kappa_z_node_2"
+      ],
+      "tendon_order": [
+        "tendon_0",
+        "tendon_1",
+        "tendon_2"
+      ],
+      "resolved_basis": {
+        "representation_id": "gvs_bending_basis_v1",
+        "specification": {
+          "strategy": "structural_linear"
+        },
+        "coordinate_order": [
+          "segment_0.kappa_y_node_0",
+          "segment_0.kappa_y_node_1",
+          "segment_0.kappa_y_node_2",
+          "segment_0.kappa_z_node_0",
+          "segment_0.kappa_z_node_1",
+          "segment_0.kappa_z_node_2",
+          "segment_1.kappa_y_node_0",
+          "segment_1.kappa_y_node_1",
+          "segment_1.kappa_y_node_2",
+          "segment_1.kappa_z_node_0",
+          "segment_1.kappa_z_node_1",
+          "segment_1.kappa_z_node_2",
+          "segment_2.kappa_y_node_0",
+          "segment_2.kappa_y_node_1",
+          "segment_2.kappa_y_node_2",
+          "segment_2.kappa_z_node_0",
+          "segment_2.kappa_z_node_1",
+          "segment_2.kappa_z_node_2",
+          "segment_3.kappa_y_node_0",
+          "segment_3.kappa_y_node_1",
+          "segment_3.kappa_y_node_2",
+          "segment_3.kappa_z_node_0",
+          "segment_3.kappa_z_node_1",
+          "segment_3.kappa_z_node_2",
+          "segment_4.kappa_y_node_0",
+          "segment_4.kappa_y_node_1",
+          "segment_4.kappa_y_node_2",
+          "segment_4.kappa_z_node_0",
+          "segment_4.kappa_z_node_1",
+          "segment_4.kappa_z_node_2"
+        ],
+        "segments": [
+          {
+            "segment": "segment_0",
+            "start": 0,
+            "length_m": 0.16,
+            "knots": [
+              0.0,
+              0.5,
+              1.0
+            ],
+            "locations": [
+              {
+                "s": 0.0,
+                "kinds": [
+                  "segment_boundary"
+                ]
+              },
+              {
+                "s": 0.5,
+                "kinds": [
+                  "tendon_guide"
+                ]
+              },
+              {
+                "s": 1.0,
+                "kinds": [
+                  "component_attachment",
+                  "rigid_attachment",
+                  "segment_boundary",
+                  "tendon_guide"
+                ]
+              }
+            ]
+          },
+          {
+            "segment": "segment_1",
+            "start": 6,
+            "length_m": 0.11,
+            "knots": [
+              0.0,
+              0.5,
+              1.0
+            ],
+            "locations": [
+              {
+                "s": 0.0,
+                "kinds": [
+                  "segment_boundary"
+                ]
+              },
+              {
+                "s": 0.5,
+                "kinds": [
+                  "tendon_guide"
+                ]
+              },
+              {
+                "s": 1.0,
+                "kinds": [
+                  "component_attachment",
+                  "rigid_attachment",
+                  "segment_boundary",
+                  "tendon_guide"
+                ]
+              }
+            ]
+          },
+          {
+            "segment": "segment_2",
+            "start": 12,
+            "length_m": 0.14,
+            "knots": [
+              0.0,
+              0.5,
+              1.0
+            ],
+            "locations": [
+              {
+                "s": 0.0,
+                "kinds": [
+                  "segment_boundary"
+                ]
+              },
+              {
+                "s": 0.5,
+                "kinds": [
+                  "tendon_guide"
+                ]
+              },
+              {
+                "s": 1.0,
+                "kinds": [
+                  "component_attachment",
+                  "rigid_attachment",
+                  "segment_boundary",
+                  "tendon_guide"
+                ]
+              }
+            ]
+          },
+          {
+            "segment": "segment_3",
+            "start": 18,
+            "length_m": 0.14,
+            "knots": [
+              0.0,
+              0.5,
+              1.0
+            ],
+            "locations": [
+              {
+                "s": 0.0,
+                "kinds": [
+                  "segment_boundary"
+                ]
+              },
+              {
+                "s": 0.5,
+                "kinds": [
+                  "tendon_guide"
+                ]
+              },
+              {
+                "s": 1.0,
+                "kinds": [
+                  "component_attachment",
+                  "rigid_attachment",
+                  "segment_boundary",
+                  "tendon_guide"
+                ]
+              }
+            ]
+          },
+          {
+            "segment": "segment_4",
+            "start": 24,
+            "length_m": 0.14,
+            "knots": [
+              0.0,
+              0.5,
+              1.0
+            ],
+            "locations": [
+              {
+                "s": 0.0,
+                "kinds": [
+                  "segment_boundary"
+                ]
+              },
+              {
+                "s": 0.5,
+                "kinds": [
+                  "tendon_guide"
+                ]
+              },
+              {
+                "s": 1.0,
+                "kinds": [
+                  "component_attachment",
+                  "rigid_attachment",
+                  "segment_boundary",
+                  "tendon_anchor"
+                ]
+              }
+            ]
+          }
+        ],
+        "dimension": 30,
+        "axes": [
+          "y",
+          "z"
+        ]
+      },
+      "model_identity": "9581662128d95f84ef5e07def9626e9d26aa53166d994bdf43e10fb812fb01fd",
+      "model_build_s": 0.0019989999709650874,
+      "numerical_boundary": "Recipe/basis construction only; no symbolic dynamics graph or control solve"
+    },
+    "6": {
+      "candidate": {
+        "artifact_id": "5a54ab36614b25eae9ac9d484942ac7287ed45fd9a84d20be744cc2637c0efc5",
+        "media_type": "application/json"
+      },
+      "candidate_identity": "91349b82950f6cac71503f3d8074a577b032ff03fbb9581d8fb131fcf8a4cfd2",
+      "dimensions": {
+        "physical_dofs": 48,
+        "gvs_coordinates": 36,
+        "state": 72,
+        "inputs": 3
+      },
+      "gvs_model_built": true,
+      "gvs_dynamics_evaluated": false,
+      "controller_update_tested": false,
+      "complete_task_evaluated": false,
+      "coordinate_order": [
+        "segment_0.kappa_y_node_0",
+        "segment_0.kappa_y_node_1",
+        "segment_0.kappa_y_node_2",
+        "segment_0.kappa_z_node_0",
+        "segment_0.kappa_z_node_1",
+        "segment_0.kappa_z_node_2",
+        "segment_1.kappa_y_node_0",
+        "segment_1.kappa_y_node_1",
+        "segment_1.kappa_y_node_2",
+        "segment_1.kappa_z_node_0",
+        "segment_1.kappa_z_node_1",
+        "segment_1.kappa_z_node_2",
+        "segment_2.kappa_y_node_0",
+        "segment_2.kappa_y_node_1",
+        "segment_2.kappa_y_node_2",
+        "segment_2.kappa_z_node_0",
+        "segment_2.kappa_z_node_1",
+        "segment_2.kappa_z_node_2",
+        "segment_3.kappa_y_node_0",
+        "segment_3.kappa_y_node_1",
+        "segment_3.kappa_y_node_2",
+        "segment_3.kappa_z_node_0",
+        "segment_3.kappa_z_node_1",
+        "segment_3.kappa_z_node_2",
+        "segment_4.kappa_y_node_0",
+        "segment_4.kappa_y_node_1",
+        "segment_4.kappa_y_node_2",
+        "segment_4.kappa_z_node_0",
+        "segment_4.kappa_z_node_1",
+        "segment_4.kappa_z_node_2",
+        "segment_5.kappa_y_node_0",
+        "segment_5.kappa_y_node_1",
+        "segment_5.kappa_y_node_2",
+        "segment_5.kappa_z_node_0",
+        "segment_5.kappa_z_node_1",
+        "segment_5.kappa_z_node_2"
+      ],
+      "tendon_order": [
+        "tendon_0",
+        "tendon_1",
+        "tendon_2"
+      ],
+      "resolved_basis": {
+        "representation_id": "gvs_bending_basis_v1",
+        "specification": {
+          "strategy": "structural_linear"
+        },
+        "coordinate_order": [
+          "segment_0.kappa_y_node_0",
+          "segment_0.kappa_y_node_1",
+          "segment_0.kappa_y_node_2",
+          "segment_0.kappa_z_node_0",
+          "segment_0.kappa_z_node_1",
+          "segment_0.kappa_z_node_2",
+          "segment_1.kappa_y_node_0",
+          "segment_1.kappa_y_node_1",
+          "segment_1.kappa_y_node_2",
+          "segment_1.kappa_z_node_0",
+          "segment_1.kappa_z_node_1",
+          "segment_1.kappa_z_node_2",
+          "segment_2.kappa_y_node_0",
+          "segment_2.kappa_y_node_1",
+          "segment_2.kappa_y_node_2",
+          "segment_2.kappa_z_node_0",
+          "segment_2.kappa_z_node_1",
+          "segment_2.kappa_z_node_2",
+          "segment_3.kappa_y_node_0",
+          "segment_3.kappa_y_node_1",
+          "segment_3.kappa_y_node_2",
+          "segment_3.kappa_z_node_0",
+          "segment_3.kappa_z_node_1",
+          "segment_3.kappa_z_node_2",
+          "segment_4.kappa_y_node_0",
+          "segment_4.kappa_y_node_1",
+          "segment_4.kappa_y_node_2",
+          "segment_4.kappa_z_node_0",
+          "segment_4.kappa_z_node_1",
+          "segment_4.kappa_z_node_2",
+          "segment_5.kappa_y_node_0",
+          "segment_5.kappa_y_node_1",
+          "segment_5.kappa_y_node_2",
+          "segment_5.kappa_z_node_0",
+          "segment_5.kappa_z_node_1",
+          "segment_5.kappa_z_node_2"
+        ],
+        "segments": [
+          {
+            "segment": "segment_0",
+            "start": 0,
+            "length_m": 0.16,
+            "knots": [
+              0.0,
+              0.5,
+              1.0
+            ],
+            "locations": [
+              {
+                "s": 0.0,
+                "kinds": [
+                  "segment_boundary"
+                ]
+              },
+              {
+                "s": 0.5,
+                "kinds": [
+                  "tendon_guide"
+                ]
+              },
+              {
+                "s": 1.0,
+                "kinds": [
+                  "component_attachment",
+                  "rigid_attachment",
+                  "segment_boundary",
+                  "tendon_guide"
+                ]
+              }
+            ]
+          },
+          {
+            "segment": "segment_1",
+            "start": 6,
+            "length_m": 0.11,
+            "knots": [
+              0.0,
+              0.5,
+              1.0
+            ],
+            "locations": [
+              {
+                "s": 0.0,
+                "kinds": [
+                  "segment_boundary"
+                ]
+              },
+              {
+                "s": 0.5,
+                "kinds": [
+                  "tendon_guide"
+                ]
+              },
+              {
+                "s": 1.0,
+                "kinds": [
+                  "component_attachment",
+                  "rigid_attachment",
+                  "segment_boundary",
+                  "tendon_guide"
+                ]
+              }
+            ]
+          },
+          {
+            "segment": "segment_2",
+            "start": 12,
+            "length_m": 0.14,
+            "knots": [
+              0.0,
+              0.5,
+              1.0
+            ],
+            "locations": [
+              {
+                "s": 0.0,
+                "kinds": [
+                  "segment_boundary"
+                ]
+              },
+              {
+                "s": 0.5,
+                "kinds": [
+                  "tendon_guide"
+                ]
+              },
+              {
+                "s": 1.0,
+                "kinds": [
+                  "component_attachment",
+                  "rigid_attachment",
+                  "segment_boundary",
+                  "tendon_guide"
+                ]
+              }
+            ]
+          },
+          {
+            "segment": "segment_3",
+            "start": 18,
+            "length_m": 0.14,
+            "knots": [
+              0.0,
+              0.5,
+              1.0
+            ],
+            "locations": [
+              {
+                "s": 0.0,
+                "kinds": [
+                  "segment_boundary"
+                ]
+              },
+              {
+                "s": 0.5,
+                "kinds": [
+                  "tendon_guide"
+                ]
+              },
+              {
+                "s": 1.0,
+                "kinds": [
+                  "component_attachment",
+                  "rigid_attachment",
+                  "segment_boundary",
+                  "tendon_guide"
+                ]
+              }
+            ]
+          },
+          {
+            "segment": "segment_4",
+            "start": 24,
+            "length_m": 0.14,
+            "knots": [
+              0.0,
+              0.5,
+              1.0
+            ],
+            "locations": [
+              {
+                "s": 0.0,
+                "kinds": [
+                  "segment_boundary"
+                ]
+              },
+              {
+                "s": 0.5,
+                "kinds": [
+                  "tendon_guide"
+                ]
+              },
+              {
+                "s": 1.0,
+                "kinds": [
+                  "component_attachment",
+                  "rigid_attachment",
+                  "segment_boundary",
+                  "tendon_guide"
+                ]
+              }
+            ]
+          },
+          {
+            "segment": "segment_5",
+            "start": 30,
+            "length_m": 0.14,
+            "knots": [
+              0.0,
+              0.5,
+              1.0
+            ],
+            "locations": [
+              {
+                "s": 0.0,
+                "kinds": [
+                  "segment_boundary"
+                ]
+              },
+              {
+                "s": 0.5,
+                "kinds": [
+                  "tendon_guide"
+                ]
+              },
+              {
+                "s": 1.0,
+                "kinds": [
+                  "component_attachment",
+                  "rigid_attachment",
+                  "segment_boundary",
+                  "tendon_anchor"
+                ]
+              }
+            ]
+          }
+        ],
+        "dimension": 36,
+        "axes": [
+          "y",
+          "z"
+        ]
+      },
+      "model_identity": "a996459c1f2a4d83a16ab7345d1ae561cc515c3be2f27022ff1461d87446a7fb",
+      "model_build_s": 0.0031328999903053045,
+      "numerical_boundary": "Recipe/basis construction only; no symbolic dynamics graph or control solve"
+    },
+    "7": {
+      "candidate": {
+        "artifact_id": "d07bbaedc10a49c3ff637cd00f3b2897c3f6a759438d0c6aee5d3c8a599c4cd4",
+        "media_type": "application/json"
+      },
+      "candidate_identity": "250800412db94d90a6b8fc71ccd3a697703d58b259ee903d719e0b60f17965f7",
+      "dimensions": {
+        "physical_dofs": 56,
+        "gvs_coordinates": 42,
+        "state": 84,
+        "inputs": 3
+      },
+      "gvs_model_built": true,
+      "gvs_dynamics_evaluated": false,
+      "controller_update_tested": false,
+      "complete_task_evaluated": false,
+      "coordinate_order": [
+        "segment_0.kappa_y_node_0",
+        "segment_0.kappa_y_node_1",
+        "segment_0.kappa_y_node_2",
+        "segment_0.kappa_z_node_0",
+        "segment_0.kappa_z_node_1",
+        "segment_0.kappa_z_node_2",
+        "segment_1.kappa_y_node_0",
+        "segment_1.kappa_y_node_1",
+        "segment_1.kappa_y_node_2",
+        "segment_1.kappa_z_node_0",
+        "segment_1.kappa_z_node_1",
+        "segment_1.kappa_z_node_2",
+        "segment_2.kappa_y_node_0",
+        "segment_2.kappa_y_node_1",
+        "segment_2.kappa_y_node_2",
+        "segment_2.kappa_z_node_0",
+        "segment_2.kappa_z_node_1",
+        "segment_2.kappa_z_node_2",
+        "segment_3.kappa_y_node_0",
+        "segment_3.kappa_y_node_1",
+        "segment_3.kappa_y_node_2",
+        "segment_3.kappa_z_node_0",
+        "segment_3.kappa_z_node_1",
+        "segment_3.kappa_z_node_2",
+        "segment_4.kappa_y_node_0",
+        "segment_4.kappa_y_node_1",
+        "segment_4.kappa_y_node_2",
+        "segment_4.kappa_z_node_0",
+        "segment_4.kappa_z_node_1",
+        "segment_4.kappa_z_node_2",
+        "segment_5.kappa_y_node_0",
+        "segment_5.kappa_y_node_1",
+        "segment_5.kappa_y_node_2",
+        "segment_5.kappa_z_node_0",
+        "segment_5.kappa_z_node_1",
+        "segment_5.kappa_z_node_2",
+        "segment_6.kappa_y_node_0",
+        "segment_6.kappa_y_node_1",
+        "segment_6.kappa_y_node_2",
+        "segment_6.kappa_z_node_0",
+        "segment_6.kappa_z_node_1",
+        "segment_6.kappa_z_node_2"
+      ],
+      "tendon_order": [
+        "tendon_0",
+        "tendon_1",
+        "tendon_2"
+      ],
+      "resolved_basis": {
+        "representation_id": "gvs_bending_basis_v1",
+        "specification": {
+          "strategy": "structural_linear"
+        },
+        "coordinate_order": [
+          "segment_0.kappa_y_node_0",
+          "segment_0.kappa_y_node_1",
+          "segment_0.kappa_y_node_2",
+          "segment_0.kappa_z_node_0",
+          "segment_0.kappa_z_node_1",
+          "segment_0.kappa_z_node_2",
+          "segment_1.kappa_y_node_0",
+          "segment_1.kappa_y_node_1",
+          "segment_1.kappa_y_node_2",
+          "segment_1.kappa_z_node_0",
+          "segment_1.kappa_z_node_1",
+          "segment_1.kappa_z_node_2",
+          "segment_2.kappa_y_node_0",
+          "segment_2.kappa_y_node_1",
+          "segment_2.kappa_y_node_2",
+          "segment_2.kappa_z_node_0",
+          "segment_2.kappa_z_node_1",
+          "segment_2.kappa_z_node_2",
+          "segment_3.kappa_y_node_0",
+          "segment_3.kappa_y_node_1",
+          "segment_3.kappa_y_node_2",
+          "segment_3.kappa_z_node_0",
+          "segment_3.kappa_z_node_1",
+          "segment_3.kappa_z_node_2",
+          "segment_4.kappa_y_node_0",
+          "segment_4.kappa_y_node_1",
+          "segment_4.kappa_y_node_2",
+          "segment_4.kappa_z_node_0",
+          "segment_4.kappa_z_node_1",
+          "segment_4.kappa_z_node_2",
+          "segment_5.kappa_y_node_0",
+          "segment_5.kappa_y_node_1",
+          "segment_5.kappa_y_node_2",
+          "segment_5.kappa_z_node_0",
+          "segment_5.kappa_z_node_1",
+          "segment_5.kappa_z_node_2",
+          "segment_6.kappa_y_node_0",
+          "segment_6.kappa_y_node_1",
+          "segment_6.kappa_y_node_2",
+          "segment_6.kappa_z_node_0",
+          "segment_6.kappa_z_node_1",
+          "segment_6.kappa_z_node_2"
+        ],
+        "segments": [
+          {
+            "segment": "segment_0",
+            "start": 0,
+            "length_m": 0.16,
+            "knots": [
+              0.0,
+              0.5,
+              1.0
+            ],
+            "locations": [
+              {
+                "s": 0.0,
+                "kinds": [
+                  "segment_boundary"
+                ]
+              },
+              {
+                "s": 0.5,
+                "kinds": [
+                  "tendon_guide"
+                ]
+              },
+              {
+                "s": 1.0,
+                "kinds": [
+                  "component_attachment",
+                  "rigid_attachment",
+                  "segment_boundary",
+                  "tendon_guide"
+                ]
+              }
+            ]
+          },
+          {
+            "segment": "segment_1",
+            "start": 6,
+            "length_m": 0.11,
+            "knots": [
+              0.0,
+              0.5,
+              1.0
+            ],
+            "locations": [
+              {
+                "s": 0.0,
+                "kinds": [
+                  "segment_boundary"
+                ]
+              },
+              {
+                "s": 0.5,
+                "kinds": [
+                  "tendon_guide"
+                ]
+              },
+              {
+                "s": 1.0,
+                "kinds": [
+                  "component_attachment",
+                  "rigid_attachment",
+                  "segment_boundary",
+                  "tendon_guide"
+                ]
+              }
+            ]
+          },
+          {
+            "segment": "segment_2",
+            "start": 12,
+            "length_m": 0.14,
+            "knots": [
+              0.0,
+              0.5,
+              1.0
+            ],
+            "locations": [
+              {
+                "s": 0.0,
+                "kinds": [
+                  "segment_boundary"
+                ]
+              },
+              {
+                "s": 0.5,
+                "kinds": [
+                  "tendon_guide"
+                ]
+              },
+              {
+                "s": 1.0,
+                "kinds": [
+                  "component_attachment",
+                  "rigid_attachment",
+                  "segment_boundary",
+                  "tendon_guide"
+                ]
+              }
+            ]
+          },
+          {
+            "segment": "segment_3",
+            "start": 18,
+            "length_m": 0.14,
+            "knots": [
+              0.0,
+              0.5,
+              1.0
+            ],
+            "locations": [
+              {
+                "s": 0.0,
+                "kinds": [
+                  "segment_boundary"
+                ]
+              },
+              {
+                "s": 0.5,
+                "kinds": [
+                  "tendon_guide"
+                ]
+              },
+              {
+                "s": 1.0,
+                "kinds": [
+                  "component_attachment",
+                  "rigid_attachment",
+                  "segment_boundary",
+                  "tendon_guide"
+                ]
+              }
+            ]
+          },
+          {
+            "segment": "segment_4",
+            "start": 24,
+            "length_m": 0.14,
+            "knots": [
+              0.0,
+              0.5,
+              1.0
+            ],
+            "locations": [
+              {
+                "s": 0.0,
+                "kinds": [
+                  "segment_boundary"
+                ]
+              },
+              {
+                "s": 0.5,
+                "kinds": [
+                  "tendon_guide"
+                ]
+              },
+              {
+                "s": 1.0,
+                "kinds": [
+                  "component_attachment",
+                  "rigid_attachment",
+                  "segment_boundary",
+                  "tendon_guide"
+                ]
+              }
+            ]
+          },
+          {
+            "segment": "segment_5",
+            "start": 30,
+            "length_m": 0.14,
+            "knots": [
+              0.0,
+              0.5,
+              1.0
+            ],
+            "locations": [
+              {
+                "s": 0.0,
+                "kinds": [
+                  "segment_boundary"
+                ]
+              },
+              {
+                "s": 0.5,
+                "kinds": [
+                  "tendon_guide"
+                ]
+              },
+              {
+                "s": 1.0,
+                "kinds": [
+                  "component_attachment",
+                  "rigid_attachment",
+                  "segment_boundary",
+                  "tendon_guide"
+                ]
+              }
+            ]
+          },
+          {
+            "segment": "segment_6",
+            "start": 36,
+            "length_m": 0.14,
+            "knots": [
+              0.0,
+              0.5,
+              1.0
+            ],
+            "locations": [
+              {
+                "s": 0.0,
+                "kinds": [
+                  "segment_boundary"
+                ]
+              },
+              {
+                "s": 0.5,
+                "kinds": [
+                  "tendon_guide"
+                ]
+              },
+              {
+                "s": 1.0,
+                "kinds": [
+                  "component_attachment",
+                  "rigid_attachment",
+                  "segment_boundary",
+                  "tendon_anchor"
+                ]
+              }
+            ]
+          }
+        ],
+        "dimension": 42,
+        "axes": [
+          "y",
+          "z"
+        ]
+      },
+      "model_identity": "237750111f269c08a4e615771066d7f937bc0c543c22892df5346df521d1cad6",
+      "model_build_s": 0.002989899949170649,
+      "numerical_boundary": "Recipe/basis construction only; no symbolic dynamics graph or control solve"
+    },
+    "8": {
+      "candidate": {
+        "artifact_id": "d5d5999b188ab302ac18662b2f82d22813124578963ec653e729e0413b905c04",
+        "media_type": "application/json"
+      },
+      "candidate_identity": "25c98429e9194224f60b7204408871b3397d161c6963c54db97b5972542e9d3f",
+      "dimensions": {
+        "physical_dofs": 64,
+        "gvs_coordinates": 48,
+        "state": 96,
+        "inputs": 3
+      },
+      "gvs_model_built": true,
+      "gvs_dynamics_evaluated": false,
+      "controller_update_tested": false,
+      "complete_task_evaluated": false,
+      "coordinate_order": [
+        "segment_0.kappa_y_node_0",
+        "segment_0.kappa_y_node_1",
+        "segment_0.kappa_y_node_2",
+        "segment_0.kappa_z_node_0",
+        "segment_0.kappa_z_node_1",
+        "segment_0.kappa_z_node_2",
+        "segment_1.kappa_y_node_0",
+        "segment_1.kappa_y_node_1",
+        "segment_1.kappa_y_node_2",
+        "segment_1.kappa_z_node_0",
+        "segment_1.kappa_z_node_1",
+        "segment_1.kappa_z_node_2",
+        "segment_2.kappa_y_node_0",
+        "segment_2.kappa_y_node_1",
+        "segment_2.kappa_y_node_2",
+        "segment_2.kappa_z_node_0",
+        "segment_2.kappa_z_node_1",
+        "segment_2.kappa_z_node_2",
+        "segment_3.kappa_y_node_0",
+        "segment_3.kappa_y_node_1",
+        "segment_3.kappa_y_node_2",
+        "segment_3.kappa_z_node_0",
+        "segment_3.kappa_z_node_1",
+        "segment_3.kappa_z_node_2",
+        "segment_4.kappa_y_node_0",
+        "segment_4.kappa_y_node_1",
+        "segment_4.kappa_y_node_2",
+        "segment_4.kappa_z_node_0",
+        "segment_4.kappa_z_node_1",
+        "segment_4.kappa_z_node_2",
+        "segment_5.kappa_y_node_0",
+        "segment_5.kappa_y_node_1",
+        "segment_5.kappa_y_node_2",
+        "segment_5.kappa_z_node_0",
+        "segment_5.kappa_z_node_1",
+        "segment_5.kappa_z_node_2",
+        "segment_6.kappa_y_node_0",
+        "segment_6.kappa_y_node_1",
+        "segment_6.kappa_y_node_2",
+        "segment_6.kappa_z_node_0",
+        "segment_6.kappa_z_node_1",
+        "segment_6.kappa_z_node_2",
+        "segment_7.kappa_y_node_0",
+        "segment_7.kappa_y_node_1",
+        "segment_7.kappa_y_node_2",
+        "segment_7.kappa_z_node_0",
+        "segment_7.kappa_z_node_1",
+        "segment_7.kappa_z_node_2"
+      ],
+      "tendon_order": [
+        "tendon_0",
+        "tendon_1",
+        "tendon_2"
+      ],
+      "resolved_basis": {
+        "representation_id": "gvs_bending_basis_v1",
+        "specification": {
+          "strategy": "structural_linear"
+        },
+        "coordinate_order": [
+          "segment_0.kappa_y_node_0",
+          "segment_0.kappa_y_node_1",
+          "segment_0.kappa_y_node_2",
+          "segment_0.kappa_z_node_0",
+          "segment_0.kappa_z_node_1",
+          "segment_0.kappa_z_node_2",
+          "segment_1.kappa_y_node_0",
+          "segment_1.kappa_y_node_1",
+          "segment_1.kappa_y_node_2",
+          "segment_1.kappa_z_node_0",
+          "segment_1.kappa_z_node_1",
+          "segment_1.kappa_z_node_2",
+          "segment_2.kappa_y_node_0",
+          "segment_2.kappa_y_node_1",
+          "segment_2.kappa_y_node_2",
+          "segment_2.kappa_z_node_0",
+          "segment_2.kappa_z_node_1",
+          "segment_2.kappa_z_node_2",
+          "segment_3.kappa_y_node_0",
+          "segment_3.kappa_y_node_1",
+          "segment_3.kappa_y_node_2",
+          "segment_3.kappa_z_node_0",
+          "segment_3.kappa_z_node_1",
+          "segment_3.kappa_z_node_2",
+          "segment_4.kappa_y_node_0",
+          "segment_4.kappa_y_node_1",
+          "segment_4.kappa_y_node_2",
+          "segment_4.kappa_z_node_0",
+          "segment_4.kappa_z_node_1",
+          "segment_4.kappa_z_node_2",
+          "segment_5.kappa_y_node_0",
+          "segment_5.kappa_y_node_1",
+          "segment_5.kappa_y_node_2",
+          "segment_5.kappa_z_node_0",
+          "segment_5.kappa_z_node_1",
+          "segment_5.kappa_z_node_2",
+          "segment_6.kappa_y_node_0",
+          "segment_6.kappa_y_node_1",
+          "segment_6.kappa_y_node_2",
+          "segment_6.kappa_z_node_0",
+          "segment_6.kappa_z_node_1",
+          "segment_6.kappa_z_node_2",
+          "segment_7.kappa_y_node_0",
+          "segment_7.kappa_y_node_1",
+          "segment_7.kappa_y_node_2",
+          "segment_7.kappa_z_node_0",
+          "segment_7.kappa_z_node_1",
+          "segment_7.kappa_z_node_2"
+        ],
+        "segments": [
+          {
+            "segment": "segment_0",
+            "start": 0,
+            "length_m": 0.16,
+            "knots": [
+              0.0,
+              0.5,
+              1.0
+            ],
+            "locations": [
+              {
+                "s": 0.0,
+                "kinds": [
+                  "segment_boundary"
+                ]
+              },
+              {
+                "s": 0.5,
+                "kinds": [
+                  "tendon_guide"
+                ]
+              },
+              {
+                "s": 1.0,
+                "kinds": [
+                  "component_attachment",
+                  "rigid_attachment",
+                  "segment_boundary",
+                  "tendon_guide"
+                ]
+              }
+            ]
+          },
+          {
+            "segment": "segment_1",
+            "start": 6,
+            "length_m": 0.11,
+            "knots": [
+              0.0,
+              0.5,
+              1.0
+            ],
+            "locations": [
+              {
+                "s": 0.0,
+                "kinds": [
+                  "segment_boundary"
+                ]
+              },
+              {
+                "s": 0.5,
+                "kinds": [
+                  "tendon_guide"
+                ]
+              },
+              {
+                "s": 1.0,
+                "kinds": [
+                  "component_attachment",
+                  "rigid_attachment",
+                  "segment_boundary",
+                  "tendon_guide"
+                ]
+              }
+            ]
+          },
+          {
+            "segment": "segment_2",
+            "start": 12,
+            "length_m": 0.14,
+            "knots": [
+              0.0,
+              0.5,
+              1.0
+            ],
+            "locations": [
+              {
+                "s": 0.0,
+                "kinds": [
+                  "segment_boundary"
+                ]
+              },
+              {
+                "s": 0.5,
+                "kinds": [
+                  "tendon_guide"
+                ]
+              },
+              {
+                "s": 1.0,
+                "kinds": [
+                  "component_attachment",
+                  "rigid_attachment",
+                  "segment_boundary",
+                  "tendon_guide"
+                ]
+              }
+            ]
+          },
+          {
+            "segment": "segment_3",
+            "start": 18,
+            "length_m": 0.14,
+            "knots": [
+              0.0,
+              0.5,
+              1.0
+            ],
+            "locations": [
+              {
+                "s": 0.0,
+                "kinds": [
+                  "segment_boundary"
+                ]
+              },
+              {
+                "s": 0.5,
+                "kinds": [
+                  "tendon_guide"
+                ]
+              },
+              {
+                "s": 1.0,
+                "kinds": [
+                  "component_attachment",
+                  "rigid_attachment",
+                  "segment_boundary",
+                  "tendon_guide"
+                ]
+              }
+            ]
+          },
+          {
+            "segment": "segment_4",
+            "start": 24,
+            "length_m": 0.14,
+            "knots": [
+              0.0,
+              0.5,
+              1.0
+            ],
+            "locations": [
+              {
+                "s": 0.0,
+                "kinds": [
+                  "segment_boundary"
+                ]
+              },
+              {
+                "s": 0.5,
+                "kinds": [
+                  "tendon_guide"
+                ]
+              },
+              {
+                "s": 1.0,
+                "kinds": [
+                  "component_attachment",
+                  "rigid_attachment",
+                  "segment_boundary",
+                  "tendon_guide"
+                ]
+              }
+            ]
+          },
+          {
+            "segment": "segment_5",
+            "start": 30,
+            "length_m": 0.14,
+            "knots": [
+              0.0,
+              0.5,
+              1.0
+            ],
+            "locations": [
+              {
+                "s": 0.0,
+                "kinds": [
+                  "segment_boundary"
+                ]
+              },
+              {
+                "s": 0.5,
+                "kinds": [
+                  "tendon_guide"
+                ]
+              },
+              {
+                "s": 1.0,
+                "kinds": [
+                  "component_attachment",
+                  "rigid_attachment",
+                  "segment_boundary",
+                  "tendon_guide"
+                ]
+              }
+            ]
+          },
+          {
+            "segment": "segment_6",
+            "start": 36,
+            "length_m": 0.14,
+            "knots": [
+              0.0,
+              0.5,
+              1.0
+            ],
+            "locations": [
+              {
+                "s": 0.0,
+                "kinds": [
+                  "segment_boundary"
+                ]
+              },
+              {
+                "s": 0.5,
+                "kinds": [
+                  "tendon_guide"
+                ]
+              },
+              {
+                "s": 1.0,
+                "kinds": [
+                  "component_attachment",
+                  "rigid_attachment",
+                  "segment_boundary",
+                  "tendon_guide"
+                ]
+              }
+            ]
+          },
+          {
+            "segment": "segment_7",
+            "start": 42,
+            "length_m": 0.14,
+            "knots": [
+              0.0,
+              0.5,
+              1.0
+            ],
+            "locations": [
+              {
+                "s": 0.0,
+                "kinds": [
+                  "segment_boundary"
+                ]
+              },
+              {
+                "s": 0.5,
+                "kinds": [
+                  "tendon_guide"
+                ]
+              },
+              {
+                "s": 1.0,
+                "kinds": [
+                  "component_attachment",
+                  "rigid_attachment",
+                  "segment_boundary",
+                  "tendon_anchor"
+                ]
+              }
+            ]
+          }
+        ],
+        "dimension": 48,
+        "axes": [
+          "y",
+          "z"
+        ]
+      },
+      "model_identity": "1935801db0ac8d53553522e64478367d140af52db2c77b395a3f168181968a3c",
+      "model_build_s": 0.0029550999170169234,
+      "numerical_boundary": "Recipe/basis construction only; no symbolic dynamics graph or control solve"
+    },
+    "9": {
+      "candidate": {
+        "artifact_id": "8eaea040bad906d2caa6463ad472b3f3f88ebfe2bbcaf07dd6de651b6200a1c6",
+        "media_type": "application/json"
+      },
+      "candidate_identity": "8b26111d04d42751a4b8e7c03e017e27b2fbf0247ad042473aeec847cc48566e",
+      "dimensions": {
+        "physical_dofs": 72,
+        "gvs_coordinates": 54,
+        "state": 108,
+        "inputs": 3
+      },
+      "gvs_model_built": true,
+      "gvs_dynamics_evaluated": false,
+      "controller_update_tested": false,
+      "complete_task_evaluated": false,
+      "coordinate_order": [
+        "segment_0.kappa_y_node_0",
+        "segment_0.kappa_y_node_1",
+        "segment_0.kappa_y_node_2",
+        "segment_0.kappa_z_node_0",
+        "segment_0.kappa_z_node_1",
+        "segment_0.kappa_z_node_2",
+        "segment_1.kappa_y_node_0",
+        "segment_1.kappa_y_node_1",
+        "segment_1.kappa_y_node_2",
+        "segment_1.kappa_z_node_0",
+        "segment_1.kappa_z_node_1",
+        "segment_1.kappa_z_node_2",
+        "segment_2.kappa_y_node_0",
+        "segment_2.kappa_y_node_1",
+        "segment_2.kappa_y_node_2",
+        "segment_2.kappa_z_node_0",
+        "segment_2.kappa_z_node_1",
+        "segment_2.kappa_z_node_2",
+        "segment_3.kappa_y_node_0",
+        "segment_3.kappa_y_node_1",
+        "segment_3.kappa_y_node_2",
+        "segment_3.kappa_z_node_0",
+        "segment_3.kappa_z_node_1",
+        "segment_3.kappa_z_node_2",
+        "segment_4.kappa_y_node_0",
+        "segment_4.kappa_y_node_1",
+        "segment_4.kappa_y_node_2",
+        "segment_4.kappa_z_node_0",
+        "segment_4.kappa_z_node_1",
+        "segment_4.kappa_z_node_2",
+        "segment_5.kappa_y_node_0",
+        "segment_5.kappa_y_node_1",
+        "segment_5.kappa_y_node_2",
+        "segment_5.kappa_z_node_0",
+        "segment_5.kappa_z_node_1",
+        "segment_5.kappa_z_node_2",
+        "segment_6.kappa_y_node_0",
+        "segment_6.kappa_y_node_1",
+        "segment_6.kappa_y_node_2",
+        "segment_6.kappa_z_node_0",
+        "segment_6.kappa_z_node_1",
+        "segment_6.kappa_z_node_2",
+        "segment_7.kappa_y_node_0",
+        "segment_7.kappa_y_node_1",
+        "segment_7.kappa_y_node_2",
+        "segment_7.kappa_z_node_0",
+        "segment_7.kappa_z_node_1",
+        "segment_7.kappa_z_node_2",
+        "segment_8.kappa_y_node_0",
+        "segment_8.kappa_y_node_1",
+        "segment_8.kappa_y_node_2",
+        "segment_8.kappa_z_node_0",
+        "segment_8.kappa_z_node_1",
+        "segment_8.kappa_z_node_2"
+      ],
+      "tendon_order": [
+        "tendon_0",
+        "tendon_1",
+        "tendon_2"
+      ],
+      "resolved_basis": {
+        "representation_id": "gvs_bending_basis_v1",
+        "specification": {
+          "strategy": "structural_linear"
+        },
+        "coordinate_order": [
+          "segment_0.kappa_y_node_0",
+          "segment_0.kappa_y_node_1",
+          "segment_0.kappa_y_node_2",
+          "segment_0.kappa_z_node_0",
+          "segment_0.kappa_z_node_1",
+          "segment_0.kappa_z_node_2",
+          "segment_1.kappa_y_node_0",
+          "segment_1.kappa_y_node_1",
+          "segment_1.kappa_y_node_2",
+          "segment_1.kappa_z_node_0",
+          "segment_1.kappa_z_node_1",
+          "segment_1.kappa_z_node_2",
+          "segment_2.kappa_y_node_0",
+          "segment_2.kappa_y_node_1",
+          "segment_2.kappa_y_node_2",
+          "segment_2.kappa_z_node_0",
+          "segment_2.kappa_z_node_1",
+          "segment_2.kappa_z_node_2",
+          "segment_3.kappa_y_node_0",
+          "segment_3.kappa_y_node_1",
+          "segment_3.kappa_y_node_2",
+          "segment_3.kappa_z_node_0",
+          "segment_3.kappa_z_node_1",
+          "segment_3.kappa_z_node_2",
+          "segment_4.kappa_y_node_0",
+          "segment_4.kappa_y_node_1",
+          "segment_4.kappa_y_node_2",
+          "segment_4.kappa_z_node_0",
+          "segment_4.kappa_z_node_1",
+          "segment_4.kappa_z_node_2",
+          "segment_5.kappa_y_node_0",
+          "segment_5.kappa_y_node_1",
+          "segment_5.kappa_y_node_2",
+          "segment_5.kappa_z_node_0",
+          "segment_5.kappa_z_node_1",
+          "segment_5.kappa_z_node_2",
+          "segment_6.kappa_y_node_0",
+          "segment_6.kappa_y_node_1",
+          "segment_6.kappa_y_node_2",
+          "segment_6.kappa_z_node_0",
+          "segment_6.kappa_z_node_1",
+          "segment_6.kappa_z_node_2",
+          "segment_7.kappa_y_node_0",
+          "segment_7.kappa_y_node_1",
+          "segment_7.kappa_y_node_2",
+          "segment_7.kappa_z_node_0",
+          "segment_7.kappa_z_node_1",
+          "segment_7.kappa_z_node_2",
+          "segment_8.kappa_y_node_0",
+          "segment_8.kappa_y_node_1",
+          "segment_8.kappa_y_node_2",
+          "segment_8.kappa_z_node_0",
+          "segment_8.kappa_z_node_1",
+          "segment_8.kappa_z_node_2"
+        ],
+        "segments": [
+          {
+            "segment": "segment_0",
+            "start": 0,
+            "length_m": 0.16,
+            "knots": [
+              0.0,
+              0.5,
+              1.0
+            ],
+            "locations": [
+              {
+                "s": 0.0,
+                "kinds": [
+                  "segment_boundary"
+                ]
+              },
+              {
+                "s": 0.5,
+                "kinds": [
+                  "tendon_guide"
+                ]
+              },
+              {
+                "s": 1.0,
+                "kinds": [
+                  "component_attachment",
+                  "rigid_attachment",
+                  "segment_boundary",
+                  "tendon_guide"
+                ]
+              }
+            ]
+          },
+          {
+            "segment": "segment_1",
+            "start": 6,
+            "length_m": 0.11,
+            "knots": [
+              0.0,
+              0.5,
+              1.0
+            ],
+            "locations": [
+              {
+                "s": 0.0,
+                "kinds": [
+                  "segment_boundary"
+                ]
+              },
+              {
+                "s": 0.5,
+                "kinds": [
+                  "tendon_guide"
+                ]
+              },
+              {
+                "s": 1.0,
+                "kinds": [
+                  "component_attachment",
+                  "rigid_attachment",
+                  "segment_boundary",
+                  "tendon_guide"
+                ]
+              }
+            ]
+          },
+          {
+            "segment": "segment_2",
+            "start": 12,
+            "length_m": 0.14,
+            "knots": [
+              0.0,
+              0.5,
+              1.0
+            ],
+            "locations": [
+              {
+                "s": 0.0,
+                "kinds": [
+                  "segment_boundary"
+                ]
+              },
+              {
+                "s": 0.5,
+                "kinds": [
+                  "tendon_guide"
+                ]
+              },
+              {
+                "s": 1.0,
+                "kinds": [
+                  "component_attachment",
+                  "rigid_attachment",
+                  "segment_boundary",
+                  "tendon_guide"
+                ]
+              }
+            ]
+          },
+          {
+            "segment": "segment_3",
+            "start": 18,
+            "length_m": 0.14,
+            "knots": [
+              0.0,
+              0.5,
+              1.0
+            ],
+            "locations": [
+              {
+                "s": 0.0,
+                "kinds": [
+                  "segment_boundary"
+                ]
+              },
+              {
+                "s": 0.5,
+                "kinds": [
+                  "tendon_guide"
+                ]
+              },
+              {
+                "s": 1.0,
+                "kinds": [
+                  "component_attachment",
+                  "rigid_attachment",
+                  "segment_boundary",
+                  "tendon_guide"
+                ]
+              }
+            ]
+          },
+          {
+            "segment": "segment_4",
+            "start": 24,
+            "length_m": 0.14,
+            "knots": [
+              0.0,
+              0.5,
+              1.0
+            ],
+            "locations": [
+              {
+                "s": 0.0,
+                "kinds": [
+                  "segment_boundary"
+                ]
+              },
+              {
+                "s": 0.5,
+                "kinds": [
+                  "tendon_guide"
+                ]
+              },
+              {
+                "s": 1.0,
+                "kinds": [
+                  "component_attachment",
+                  "rigid_attachment",
+                  "segment_boundary",
+                  "tendon_guide"
+                ]
+              }
+            ]
+          },
+          {
+            "segment": "segment_5",
+            "start": 30,
+            "length_m": 0.14,
+            "knots": [
+              0.0,
+              0.5,
+              1.0
+            ],
+            "locations": [
+              {
+                "s": 0.0,
+                "kinds": [
+                  "segment_boundary"
+                ]
+              },
+              {
+                "s": 0.5,
+                "kinds": [
+                  "tendon_guide"
+                ]
+              },
+              {
+                "s": 1.0,
+                "kinds": [
+                  "component_attachment",
+                  "rigid_attachment",
+                  "segment_boundary",
+                  "tendon_guide"
+                ]
+              }
+            ]
+          },
+          {
+            "segment": "segment_6",
+            "start": 36,
+            "length_m": 0.14,
+            "knots": [
+              0.0,
+              0.5,
+              1.0
+            ],
+            "locations": [
+              {
+                "s": 0.0,
+                "kinds": [
+                  "segment_boundary"
+                ]
+              },
+              {
+                "s": 0.5,
+                "kinds": [
+                  "tendon_guide"
+                ]
+              },
+              {
+                "s": 1.0,
+                "kinds": [
+                  "component_attachment",
+                  "rigid_attachment",
+                  "segment_boundary",
+                  "tendon_guide"
+                ]
+              }
+            ]
+          },
+          {
+            "segment": "segment_7",
+            "start": 42,
+            "length_m": 0.14,
+            "knots": [
+              0.0,
+              0.5,
+              1.0
+            ],
+            "locations": [
+              {
+                "s": 0.0,
+                "kinds": [
+                  "segment_boundary"
+                ]
+              },
+              {
+                "s": 0.5,
+                "kinds": [
+                  "tendon_guide"
+                ]
+              },
+              {
+                "s": 1.0,
+                "kinds": [
+                  "component_attachment",
+                  "rigid_attachment",
+                  "segment_boundary",
+                  "tendon_guide"
+                ]
+              }
+            ]
+          },
+          {
+            "segment": "segment_8",
+            "start": 48,
+            "length_m": 0.14,
+            "knots": [
+              0.0,
+              0.5,
+              1.0
+            ],
+            "locations": [
+              {
+                "s": 0.0,
+                "kinds": [
+                  "segment_boundary"
+                ]
+              },
+              {
+                "s": 0.5,
+                "kinds": [
+                  "tendon_guide"
+                ]
+              },
+              {
+                "s": 1.0,
+                "kinds": [
+                  "component_attachment",
+                  "rigid_attachment",
+                  "segment_boundary",
+                  "tendon_anchor"
+                ]
+              }
+            ]
+          }
+        ],
+        "dimension": 54,
+        "axes": [
+          "y",
+          "z"
+        ]
+      },
+      "model_identity": "4b892f2d2973c6044aad4007799128171d867657b6b4cfd194801e045f416150",
+      "model_build_s": 0.003127099946141243,
+      "numerical_boundary": "Recipe/basis construction only; no symbolic dynamics graph or control solve"
+    }
+  },
+  "cases": {
+    "1": {
+      "status": "completed_single_interval",
+      "candidate": {
+        "artifact_id": "0ecce875a2cd09f9d961c6edda42a1c8dc084fc396c43a186ee05a043d883bcb",
+        "media_type": "application/json"
+      },
+      "controller_binding": {
+        "extension_id": "controller.gvs_nmpc",
+        "version": "11.0.0",
+        "parameters": {
+          "contract": "family.gvs_reach_control",
+          "version": "1.0.0",
+          "data": {
+            "numerical_source": "initial_state_pretension",
+            "recipe": {
+              "basis": {
+                "strategy": "structural_linear"
+              },
+              "constraint_jacobian_mode": "reverse",
+              "curvature_scale_rad_m": 10.0,
+              "evaluation_threads": 1,
+              "feasible_return": null,
+              "holding_brake_lead_s": 0.0,
+              "holding_speed_cost_mode": "time_integral_v1",
+              "holding_speed_cost_window_s": 0.05,
+              "holding_tip_speed_weight": 0.1,
+              "horizon": 10,
+              "integration_method": "implicit_euler",
+              "max_cpu_s": null,
+              "max_iterations": 120,
+              "max_unusable_updates": 3,
+              "position_error_scale_m": null,
+              "rate_scale_rad_m_s": 1000.0,
+              "recover_returned_tensions": true,
+              "regenerate_warm_states": true,
+              "root_tolerance": 1e-10,
+              "seed_position_tolerance_fraction": 0.5,
+              "seed_speed_limit_m_s": 0.02,
+              "stopping_policy": "research_work_v1",
+              "substeps": 1,
+              "tension_weight": 0.0001,
+              "terminal_tip_speed_weight": 0.1,
+              "terminal_velocity_weight": 0.0001,
+              "terminal_weight": 5.0,
+              "tip_speed_scale_m_s": 0.02,
+              "tolerance": 1e-06,
+              "tracking_weight": 1.0,
+              "variation_weight": 0.001,
+              "velocity_weight": 0.0001
+            },
+            "settling": {
+              "position_limit_m": 0.01,
+              "speed_limit_m_s": 0.02,
+              "window_s": 0.05
+            }
+          }
+        }
+      },
+      "physics_identity": "39b93f438845d647e9102c0563b94f37d3c5b3f4d8d761a4859ab2b88a4c8395",
+      "last": {
+        "requested_tension_n": [
+          5.442036252988548,
+          2.219668882157633,
+          3.5003417143019697
+        ],
+        "desired_tension_n": [
+          5.442036252988548,
+          2.219668882157633,
+          3.5003417143019697
+        ],
+        "predicted_tension_n": [
+          5.442036252988548,
+          2.219668882157633,
+          3.5003417143019697
+        ],
+        "tension_tracking_error_n": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "force_limit_saturated": [
+          false,
+          false,
+          false
+        ],
+        "plan_accepted": true,
+        "solver_failed": false,
+        "solver_outcome": "iteration_limit_feasible",
+        "optimization_nonconverged": true,
+        "failure_response_used": false,
+        "feasible_suboptimal_update": true,
+        "solver_error": null,
+        "optimization_status": "iteration_limit",
+        "optimization_constraint_violation": 6.165033761273975e-11,
+        "optimization_selected_iteration": null,
+        "plan_source": "reintegrated_returned_iterate",
+        "feasibility_recovery": {
+          "enabled": true,
+          "attempted": true,
+          "selected": true,
+          "wall_s": 0.4636213999474421,
+          "source": "returned_ipopt_tensions_reintegrated_from_current_measurement",
+          "parent_iteration": 120,
+          "selected_before_objective": 756.0579854423966,
+          "initial_objective": 931.3790321197405,
+          "error": null,
+          "integration_s": 0.44898210000246763,
+          "partial_regenerated_states": [
+            [
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            [
+              0.08416696448919637,
+              0.1546552480978101,
+              0.34071735818915794,
+              -0.059495769161305834,
+              0.23516982704714154,
+              0.5081896744517828,
+              8.416696448919636,
+              15.465524809781009,
+              34.07173581891579,
+              -5.949576916130583,
+              23.516982704714152,
+              50.818967445178274
+            ],
+            [
+              0.38881500881159925,
+              0.32212221591397805,
+              0.4356086349579422,
+              0.13854306268786792,
+              0.2164430936538,
+              0.26438667288764983,
+              30.46480443224028,
+              16.74669678161679,
+              9.48912767687843,
+              19.803883184917375,
+              -1.872673339334154,
+              -24.380300156413295
+            ],
+            [
+              0.9095707279747728,
+              0.2544334813454051,
+              -0.09054826855076283,
+              0.2856400699644288,
+              0.12821486916603567,
+              0.004650611606783768,
+              52.07557191631735,
+              -6.768873456857295,
+              -52.6156903508705,
+              14.70970072765609,
+              -8.822822448776433,
+              -25.973606128086605
+            ],
+            [
+              1.3861683549845172,
+              -0.08476869716464454,
+              -1.0317263648288055,
+              0.32905081065935615,
+              0.12851820378014656,
+              0.0010632221113336144,
+              47.659762700974454,
+              -33.92021785100496,
+              -94.11780962780428,
+              4.341074069492738,
+              0.030333461411089137,
+              -0.35873894954501534
+            ],
+            [
+              1.6048531942309694,
+              -0.6188063242783725,
+              -2.1011537031016045,
+              0.3619256760683138,
+              0.26749186311387896,
+              0.2406781065504966,
+              21.868483924645194,
+              -53.40376271137278,
+              -106.94273382727992,
+              3.287486540895764,
+              13.89736593337324,
+              23.961488443916295
+            ],
+            [
+              1.4973417995101679,
+              -1.3019908033877523,
+              -3.1991316553079447,
+              0.47019337826047053,
+              0.5880714409089935,
+              0.7373818488243434,
+              -10.751139472080167,
+              -68.31844791093799,
+              -109.79779522063399,
+              10.826770219215678,
+              32.057957779511455,
+              49.67037422738469
+            ],
+            [
+              1.0142290985964444,
+              -1.998471985365551,
+              -4.026813193496295,
+              0.772195140625549,
+              0.9192616994014645,
+              1.0742404613448375,
+              -48.31127009137233,
+              -69.64811819777987,
+              -82.76815381883502,
+              30.20017623650784,
+              33.11902584924709,
+              33.68586125204941
+            ],
+            [
+              0.08349723271313789,
+              -2.29148938739332,
+              -3.715382643677281,
+              1.1268355516073854,
+              1.3151242013453868,
+              1.517700874593676,
+              -93.07318658833064,
+              -29.30174020277689,
+              31.1430549819014,
+              35.46404109818364,
+              39.58625019439224,
+              44.34604132488384
+            ],
+            [
+              -1.0227932135616935,
+              -1.65750526397773,
+              -1.6211573517687425,
+              1.626727650124088,
+              1.085342952609677,
+              0.6499510265277906,
+              -110.62904462748311,
+              63.398412341559,
+              209.42252919085385,
+              49.989209851670246,
+              -22.978124873570984,
+              -86.77498480658853
+            ],
+            [
+              -1.0467059628405138,
+              -1.591614325981019,
+              -1.7694012268180759,
+              1.6374818522352774,
+              1.0667606115413102,
+              0.6764384111952271,
+              -2.3912749278820282,
+              6.589093799671089,
+              -14.824387504933332,
+              1.0754202111189501,
+              -1.8582341068366701,
+              2.6487384667436493
+            ]
+          ],
+          "root_trace": [
+            {
+              "node": 1,
+              "construction_s": 2.00001522898674e-07,
+              "integration_s": 0.045595599920488894,
+              "repeated_terminal_scaled_defect": null,
+              "extended_tail_scaled_defect": 3.5778671692021646e-14
+            },
+            {
+              "node": 2,
+              "construction_s": 2.00001522898674e-07,
+              "integration_s": 0.04405499994754791,
+              "repeated_terminal_scaled_defect": null,
+              "extended_tail_scaled_defect": 5.833007687972014e-14
+            },
+            {
+              "node": 3,
+              "construction_s": 3.00002284348011e-07,
+              "integration_s": 0.043697700020857155,
+              "repeated_terminal_scaled_defect": null,
+              "extended_tail_scaled_defect": 2.443856748912676e-11
+            },
+            {
+              "node": 4,
+              "construction_s": 2.00001522898674e-07,
+              "integration_s": 0.04641990002710372,
+              "repeated_terminal_scaled_defect": null,
+              "extended_tail_scaled_defect": 1.4232972439520708e-11
+            },
+            {
+              "node": 5,
+              "construction_s": 2.00001522898674e-07,
+              "integration_s": 0.044382399995811284,
+              "repeated_terminal_scaled_defect": null,
+              "extended_tail_scaled_defect": 2.5340840537069198e-11
+            },
+            {
+              "node": 6,
+              "construction_s": 2.00001522898674e-07,
+              "integration_s": 0.044244599994271994,
+              "repeated_terminal_scaled_defect": null,
+              "extended_tail_scaled_defect": 4.778252446491216e-11
+            },
+            {
+              "node": 7,
+              "construction_s": 2.00001522898674e-07,
+              "integration_s": 0.044831000035628676,
+              "repeated_terminal_scaled_defect": null,
+              "extended_tail_scaled_defect": 5.85720708046189e-11
+            },
+            {
+              "node": 8,
+              "construction_s": 2.00001522898674e-07,
+              "integration_s": 0.044457699987106025,
+              "repeated_terminal_scaled_defect": null,
+              "extended_tail_scaled_defect": 5.879465751063018e-11
+            },
+            {
+              "node": 9,
+              "construction_s": 3.00002284348011e-07,
+              "integration_s": 0.04512619995512068,
+              "repeated_terminal_scaled_defect": null,
+              "extended_tail_scaled_defect": 6.165033761273975e-11
+            },
+            {
+              "node": 10,
+              "construction_s": 1.00000761449337e-07,
+              "integration_s": 0.04582340002525598,
+              "repeated_terminal_scaled_defect": null,
+              "extended_tail_scaled_defect": 3.673417906663312e-11
+            }
+          ],
+          "root_solve_attempts": 10,
+          "objective": 756.0523039785754,
+          "scaled_violation": 6.165033761273975e-11,
+          "named_residuals": {
+            "initial_state_consistency": {
+              "max_scaled_residual": 0.0,
+              "violations_over_1e_5": 0,
+              "worst": {
+                "name": "x/0/0",
+                "scaled_residual": 0.0
+              }
+            },
+            "dynamics_equalities": {
+              "max_scaled_residual": 6.165033761273975e-11,
+              "violations_over_1e_5": 0,
+              "worst": {
+                "name": "dynamics_8_9",
+                "scaled_residual": 6.165033761273975e-11
+              }
+            },
+            "variable_bounds": {
+              "max_scaled_residual": 0.0,
+              "violations_over_1e_5": 0,
+              "worst": {
+                "name": "x/0/0",
+                "scaled_residual": 0.0
+              }
+            }
+          },
+          "feasible": true,
+          "validation_s": 0.014605100033804774,
+          "candidate_optimum": {
+            "x/0/0": 0.0,
+            "x/0/1": 0.0,
+            "x/0/2": 0.0,
+            "x/0/3": 0.0,
+            "x/0/4": 0.0,
+            "x/0/5": 0.0,
+            "x/0/6": 0.0,
+            "x/0/7": 0.0,
+            "x/0/8": 0.0,
+            "x/0/9": 0.0,
+            "x/0/10": 0.0,
+            "x/0/11": 0.0,
+            "x/1/0": 0.008416696448919637,
+            "x/1/1": 0.01546552480978101,
+            "x/1/2": 0.034071735818915795,
+            "x/1/3": -0.0059495769161305835,
+            "x/1/4": 0.023516982704714154,
+            "x/1/5": 0.050818967445178276,
+            "x/1/6": 0.008416696448919635,
+            "x/1/7": 0.01546552480978101,
+            "x/1/8": 0.03407173581891579,
+            "x/1/9": -0.0059495769161305835,
+            "x/1/10": 0.023516982704714154,
+            "x/1/11": 0.050818967445178276,
+            "x/2/0": 0.03888150088115992,
+            "x/2/1": 0.032212221591397805,
+            "x/2/2": 0.04356086349579422,
+            "x/2/3": 0.013854306268786792,
+            "x/2/4": 0.021644309365379998,
+            "x/2/5": 0.026438667288764983,
+            "x/2/6": 0.03046480443224028,
+            "x/2/7": 0.01674669678161679,
+            "x/2/8": 0.00948912767687843,
+            "x/2/9": 0.019803883184917374,
+            "x/2/10": -0.001872673339334154,
+            "x/2/11": -0.024380300156413296,
+            "x/3/0": 0.09095707279747728,
+            "x/3/1": 0.02544334813454051,
+            "x/3/2": -0.009054826855076283,
+            "x/3/3": 0.028564006996442882,
+            "x/3/4": 0.012821486916603567,
+            "x/3/5": 0.0004650611606783768,
+            "x/3/6": 0.05207557191631735,
+            "x/3/7": -0.006768873456857295,
+            "x/3/8": -0.0526156903508705,
+            "x/3/9": 0.014709700727656089,
+            "x/3/10": -0.008822822448776434,
+            "x/3/11": -0.025973606128086604,
+            "x/4/0": 0.13861683549845172,
+            "x/4/1": -0.008476869716464453,
+            "x/4/2": -0.10317263648288055,
+            "x/4/3": 0.032905081065935614,
+            "x/4/4": 0.012851820378014656,
+            "x/4/5": 0.00010632221113336143,
+            "x/4/6": 0.04765976270097445,
+            "x/4/7": -0.03392021785100496,
+            "x/4/8": -0.09411780962780428,
+            "x/4/9": 0.004341074069492737,
+            "x/4/10": 3.033346141108914e-05,
+            "x/4/11": -0.00035873894954501536,
+            "x/5/0": 0.16048531942309693,
+            "x/5/1": -0.06188063242783724,
+            "x/5/2": -0.21011537031016045,
+            "x/5/3": 0.03619256760683138,
+            "x/5/4": 0.026749186311387896,
+            "x/5/5": 0.02406781065504966,
+            "x/5/6": 0.021868483924645195,
+            "x/5/7": -0.05340376271137278,
+            "x/5/8": -0.10694273382727992,
+            "x/5/9": 0.003287486540895764,
+            "x/5/10": 0.01389736593337324,
+            "x/5/11": 0.023961488443916296,
+            "x/6/0": 0.1497341799510168,
+            "x/6/1": -0.13019908033877522,
+            "x/6/2": -0.31991316553079446,
+            "x/6/3": 0.04701933782604705,
+            "x/6/4": 0.058807144090899356,
+            "x/6/5": 0.07373818488243435,
+            "x/6/6": -0.010751139472080166,
+            "x/6/7": -0.068318447910938,
+            "x/6/8": -0.10979779522063399,
+            "x/6/9": 0.010826770219215678,
+            "x/6/10": 0.03205795777951145,
+            "x/6/11": 0.04967037422738469,
+            "x/7/0": 0.10142290985964444,
+            "x/7/1": -0.1998471985365551,
+            "x/7/2": -0.40268131934962953,
+            "x/7/3": 0.0772195140625549,
+            "x/7/4": 0.09192616994014645,
+            "x/7/5": 0.10742404613448375,
+            "x/7/6": -0.04831127009137233,
+            "x/7/7": -0.06964811819777987,
+            "x/7/8": -0.08276815381883501,
+            "x/7/9": 0.03020017623650784,
+            "x/7/10": 0.033119025849247086,
+            "x/7/11": 0.033685861252049414,
+            "x/8/0": 0.008349723271313789,
+            "x/8/1": -0.229148938739332,
+            "x/8/2": -0.37153826436772813,
+            "x/8/3": 0.11268355516073854,
+            "x/8/4": 0.13151242013453868,
+            "x/8/5": 0.1517700874593676,
+            "x/8/6": -0.09307318658833064,
+            "x/8/7": -0.029301740202776892,
+            "x/8/8": 0.0311430549819014,
+            "x/8/9": 0.035464041098183643,
+            "x/8/10": 0.03958625019439224,
+            "x/8/11": 0.044346041324883845,
+            "x/9/0": -0.10227932135616935,
+            "x/9/1": -0.165750526397773,
+            "x/9/2": -0.16211573517687425,
+            "x/9/3": 0.1626727650124088,
+            "x/9/4": 0.1085342952609677,
+            "x/9/5": 0.06499510265277905,
+            "x/9/6": -0.11062904462748312,
+            "x/9/7": 0.063398412341559,
+            "x/9/8": 0.20942252919085386,
+            "x/9/9": 0.04998920985167025,
+            "x/9/10": -0.022978124873570985,
+            "x/9/11": -0.08677498480658853,
+            "x/10/0": -0.10467059628405137,
+            "x/10/1": -0.1591614325981019,
+            "x/10/2": -0.1769401226818076,
+            "x/10/3": 0.16374818522352774,
+            "x/10/4": 0.10667606115413102,
+            "x/10/5": 0.06764384111952271,
+            "x/10/6": -0.0023912749278820282,
+            "x/10/7": 0.00658909379967109,
+            "x/10/8": -0.014824387504933333,
+            "x/10/9": 0.0010754202111189501,
+            "x/10/10": -0.0018582341068366702,
+            "x/10/11": 0.0026487384667436492,
+            "u/0/tendon_0": 5.442036252988548,
+            "u/0/tendon_1": 2.219668882157633,
+            "u/0/tendon_2": 3.5003417143019697,
+            "u/1/tendon_0": 3.309722427360017,
+            "u/1/tendon_1": 3.5416850300007785,
+            "u/1/tendon_2": 4.4360054220879155,
+            "u/2/tendon_0": 2.551623947159495,
+            "u/2/tendon_1": 4.214209665746384,
+            "u/2/tendon_2": 2.4095983340084945,
+            "u/3/tendon_0": 2.8732580029192643,
+            "u/3/tendon_1": 4.572402766780361,
+            "u/3/tendon_2": 0.004220589189781084,
+            "u/4/tendon_0": 5.353742926188926,
+            "u/4/tendon_1": 6.342709652707041,
+            "u/4/tendon_2": 0.0006590275150502783,
+            "u/5/tendon_0": 7.992186350927067,
+            "u/5/tendon_1": 7.6719674555754835,
+            "u/5/tendon_2": 0.00043365302743131307,
+            "u/6/tendon_0": 7.999721269898208,
+            "u/6/tendon_1": 7.7110709070371435,
+            "u/6/tendon_2": 0.00032329751121466793,
+            "u/7/tendon_0": 7.026575233697581,
+            "u/7/tendon_1": 4.118461609027436,
+            "u/7/tendon_2": 0.0003461300311787025,
+            "u/8/tendon_0": 0.15947700706529414,
+            "u/8/tendon_1": 0.1594560423219195,
+            "u/8/tendon_2": 5.220433394169685,
+            "u/9/tendon_0": 3.5079257867604845,
+            "u/9/tendon_1": 3.338701084008623,
+            "u/9/tendon_2": 0.00033402052921579746,
+            "previous_u/tendon_0": 0.2,
+            "previous_u/tendon_1": 0.2,
+            "previous_u/tendon_2": 0.2,
+            "holding/1": 0.0,
+            "holding/2": 0.0,
+            "holding/3": 0.0,
+            "holding/4": 0.0,
+            "holding/5": 0.0,
+            "holding/6": 0.0,
+            "holding/7": 0.0,
+            "holding/8": 0.0,
+            "holding/9": 0.0,
+            "holding/10": 0.0
+          },
+          "first_command_change_n": 0.6439307210107352
+        },
+        "feedback": {
+          "initial_objective": 931.3790321197405,
+          "delivered_objective": 756.0523039785754,
+          "first_command_change_from_initialization_n": 5.242036252988548,
+          "initial_terminal": {
+            "error_m": 0.1350412273254043,
+            "speed_m_s": 0.09415374471836822,
+            "velocity_error_m_s": null
+          },
+          "delivered_terminal": {
+            "error_m": 0.12166047236942754,
+            "speed_m_s": 0.01178085594209577,
+            "velocity_error_m_s": null
+          }
+        },
+        "prediction_timing": {
+          "current_time_s": 0.0,
+          "node_times_s": [
+            0.01,
+            0.02,
+            0.03,
+            0.04,
+            0.05,
+            0.06,
+            0.07,
+            0.08,
+            0.09,
+            0.1
+          ],
+          "holding_active": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "task_endpoint_s": 0.35,
+          "holding_start_s": 0.3,
+          "braking_start_s": 0.3,
+          "holding_brake_lead_s": 0.0,
+          "beyond_task": "Holding continues beyond the task endpoint inside the prediction only; execution duration is unchanged."
+        },
+        "recovery_wall_s": 0.4636213999474421,
+        "recovery_integration_s": 0.44898210000246763,
+        "recovery_validation_s": 0.014605100033804774,
+        "optimization_returned_violation": 0.0002559538936864822,
+        "update_wall_s": 34.94171169993933,
+        "deadline_missed": true,
+        "solver_construction_s": 1.324595500016585,
+        "optimization_solve_s": 31.20210280001629,
+        "policy_stop_reason": null,
+        "plan_validation_s": 0.06184380000922829,
+        "warm_preparation_s": 1.8767171000363305,
+        "optimization_raw_status": "Maximum_Iterations_Exceeded",
+        "unusable_updates": 0,
+        "stop_requested": false,
+        "gvs_projection_residual_max_rad_m": 0.0,
+        "one_step_prediction": {
+          "time_s": 0.01,
+          "state": [
+            0.08416696448919637,
+            0.1546552480978101,
+            0.34071735818915794,
+            -0.059495769161305834,
+            0.23516982704714154,
+            0.5081896744517828,
+            8.416696448919636,
+            15.465524809781009,
+            34.07173581891579,
+            -5.949576916130583,
+            23.516982704714152,
+            50.818967445178274
+          ],
+          "tip_position_m": [
+            0.17394944265504664,
+            0.002246191013640179,
+            0.14778627930835342
+          ],
+          "tip_velocity_m_s": [
+            -0.010110147853802098,
+            0.22453602202882075,
+            -0.22127317722945516
+          ],
+          "frame": "world",
+          "prediction_source": "accepted_plan",
+          "applied_tension_n": [
+            5.442036252988548,
+            2.219668882157633,
+            3.5003417143019697
+          ],
+          "integration": "implicit_euler",
+          "substeps": 1
+        },
+        "effective_horizon": 10,
+        "deadline_horizon_preparation_s": 6.600050255656242e-06,
+        "controller_boundary_wall_s": 34.94079260004219,
+        "state_preparation_s": 0.0008822999661788344
+      },
+      "physical": {
+        "steps": 20,
+        "time_s": 0.010000000000000005,
+        "qpos": [
+          0.0006158468588519016,
+          0.0019067460873928123,
+          0.0002634339386962641,
+          0.001162285182139635,
+          -0.00018461620247522332,
+          0.00042483844444270294,
+          -0.0007190312879003678,
+          -0.0002978914579973566,
+          -0.0013265970543882037,
+          -0.000997926675814102,
+          -0.001989740295821039,
+          -0.0016666173770357058,
+          -0.002686184792749844,
+          -0.0022942853766617696,
+          -0.003636579706439209,
+          -0.003017164854062236,
+          -0.004558761173162907,
+          -0.0036746554958712687,
+          -0.005412674508433584,
+          -0.0042512381335502196,
+          -0.006153187652010811,
+          -0.00472966987797009,
+          -0.006730301082564404,
+          -0.005090869378706393
+        ],
+        "qvel": [
+          -0.06681218659182322,
+          0.11188954757239025,
+          -0.10534439979812535,
+          0.04660389604666687,
+          -0.1510054986537646,
+          -0.019148284630979027,
+          -0.20129186177026107,
+          -0.08321697334401142,
+          -0.2530522881736338,
+          -0.14333777508957068,
+          -0.3026504869602327,
+          -0.19723207547516675,
+          -0.34615352555899015,
+          -0.24270653572801756,
+          -0.4343301720155895,
+          -0.30745121530269043,
+          -0.5078075392668988,
+          -0.35976148669689745,
+          -0.5622243305007457,
+          -0.3978910194154544,
+          -0.5938384201772214,
+          -0.42058390205251023,
+          -0.5996951907668814,
+          -0.42710075616095694
+        ],
+        "applied_tension_n": [
+          5.442036252988548,
+          2.219668882157633,
+          3.5003417143019697
+        ],
+        "nu": 3,
+        "actuator_tendon_indices": [
+          0,
+          1,
+          2
+        ]
+      },
+      "workspace_graph_s": 0.050329399993643165,
+      "complete_task": false,
+      "task_acceptance": "not_assessed",
+      "elapsed_s": 35.7371060999576,
+      "full_case_reference": {
+        "artifact_id": "70badc669411a4dcfeadceda139f4eac2b71c94dc7bea8866bd8e9ab0cbca57a",
+        "media_type": "application/json"
+      },
+      "complete_update_pointer": "/observations/0/complete_update_record",
+      "preparation_pointer": "/preparation",
+      "numerical_pointer": "/numerical",
+      "observation_pointer": "/observations/0"
+    },
+    "2": {
+      "status": "completed_single_interval",
+      "candidate": {
+        "artifact_id": "34f199ef2829262ba360b6cefefc16a8af3c42566361df672b18ea8ebc5942c6",
+        "media_type": "application/json"
+      },
+      "controller_binding": {
+        "extension_id": "controller.gvs_nmpc",
+        "version": "11.0.0",
+        "parameters": {
+          "contract": "family.gvs_reach_control",
+          "version": "1.0.0",
+          "data": {
+            "numerical_source": "initial_state_pretension",
+            "recipe": {
+              "basis": {
+                "strategy": "structural_linear"
+              },
+              "constraint_jacobian_mode": "reverse",
+              "curvature_scale_rad_m": 10.0,
+              "evaluation_threads": 1,
+              "feasible_return": null,
+              "holding_brake_lead_s": 0.0,
+              "holding_speed_cost_mode": "time_integral_v1",
+              "holding_speed_cost_window_s": 0.05,
+              "holding_tip_speed_weight": 0.1,
+              "horizon": 10,
+              "integration_method": "implicit_euler",
+              "max_cpu_s": null,
+              "max_iterations": 120,
+              "max_unusable_updates": 3,
+              "position_error_scale_m": null,
+              "rate_scale_rad_m_s": 1000.0,
+              "recover_returned_tensions": true,
+              "regenerate_warm_states": true,
+              "root_tolerance": 1e-10,
+              "seed_position_tolerance_fraction": 0.5,
+              "seed_speed_limit_m_s": 0.02,
+              "stopping_policy": "research_work_v1",
+              "substeps": 1,
+              "tension_weight": 0.0001,
+              "terminal_tip_speed_weight": 0.1,
+              "terminal_velocity_weight": 0.0001,
+              "terminal_weight": 5.0,
+              "tip_speed_scale_m_s": 0.02,
+              "tolerance": 1e-06,
+              "tracking_weight": 1.0,
+              "variation_weight": 0.001,
+              "velocity_weight": 0.0001
+            },
+            "settling": {
+              "position_limit_m": 0.01,
+              "speed_limit_m_s": 0.02,
+              "window_s": 0.05
+            }
+          }
+        }
+      },
+      "physics_identity": "b1c04767b94e5c6bb9b1ece436c1ba79e6848e24b3bc4c4a9740f6d089bb06ce",
+      "last": {
+        "requested_tension_n": [
+          7.999998701584416,
+          5.229356334537366,
+          5.139720080188083e-07
+        ],
+        "desired_tension_n": [
+          7.999998701584416,
+          5.229356334537366,
+          5.139720080188083e-07
+        ],
+        "predicted_tension_n": [
+          7.999998701584416,
+          5.229356334537366,
+          5.139720080188083e-07
+        ],
+        "tension_tracking_error_n": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "force_limit_saturated": [
+          false,
+          false,
+          false
+        ],
+        "plan_accepted": true,
+        "solver_failed": false,
+        "solver_outcome": "iteration_limit_feasible",
+        "optimization_nonconverged": true,
+        "failure_response_used": false,
+        "feasible_suboptimal_update": true,
+        "solver_error": null,
+        "optimization_status": "iteration_limit",
+        "optimization_constraint_violation": 2.4206136210042084e-06,
+        "optimization_selected_iteration": 120,
+        "plan_source": "ipopt_selected",
+        "feasibility_recovery": {
+          "enabled": true,
+          "attempted": false,
+          "selected": false,
+          "wall_s": 0.0,
+          "source": "returned_ipopt_tensions_reintegrated_from_current_measurement",
+          "parent_iteration": 120,
+          "selected_before_objective": 4.557588662875188,
+          "initial_objective": 706.3255604892779,
+          "error": null
+        },
+        "feedback": {
+          "initial_objective": 706.3255604892779,
+          "delivered_objective": 4.557588662875188,
+          "first_command_change_from_initialization_n": 7.799998701584416,
+          "initial_terminal": {
+            "error_m": 0.10129083344543577,
+            "speed_m_s": 0.8659484929865144,
+            "velocity_error_m_s": null
+          },
+          "delivered_terminal": {
+            "error_m": 0.007663025445575436,
+            "speed_m_s": 0.03223694519444016,
+            "velocity_error_m_s": null
+          }
+        },
+        "prediction_timing": {
+          "current_time_s": 0.0,
+          "node_times_s": [
+            0.01,
+            0.02,
+            0.03,
+            0.04,
+            0.05,
+            0.06,
+            0.07,
+            0.08,
+            0.09,
+            0.1
+          ],
+          "holding_active": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "task_endpoint_s": 0.35,
+          "holding_start_s": 0.3,
+          "braking_start_s": 0.3,
+          "holding_brake_lead_s": 0.0,
+          "beyond_task": "Holding continues beyond the task endpoint inside the prediction only; execution duration is unchanged."
+        },
+        "recovery_wall_s": 0.0,
+        "recovery_integration_s": 0.0,
+        "recovery_validation_s": 0.0,
+        "optimization_returned_violation": 2.4206136210042084e-06,
+        "update_wall_s": 110.53540349996183,
+        "deadline_missed": true,
+        "solver_construction_s": 4.439997100038454,
+        "optimization_solve_s": 96.4656053999206,
+        "policy_stop_reason": null,
+        "plan_validation_s": 0.08695099991746247,
+        "warm_preparation_s": 9.473592099966481,
+        "optimization_raw_status": "Maximum_Iterations_Exceeded",
+        "unusable_updates": 0,
+        "stop_requested": false,
+        "gvs_projection_residual_max_rad_m": 0.0,
+        "one_step_prediction": {
+          "time_s": 0.01,
+          "state": [
+            0.3596441192322335,
+            0.10112933110811408,
+            -0.1279380346937013,
+            -0.21411942685458418,
+            -0.06988451150999862,
+            0.16307397983830335,
+            -0.749466919632462,
+            -1.5075306232936314,
+            -2.4199039639128146,
+            0.7045010877774178,
+            1.3253645697138081,
+            2.0669964838944104,
+            35.96441192322365,
+            10.112933110812165,
+            -12.793803469371404,
+            -21.41194268545767,
+            -6.9884511510005805,
+            16.30739798383037,
+            -74.94669196324658,
+            -150.75306232936404,
+            -241.9903963912819,
+            70.45010877774172,
+            132.53645697138083,
+            206.699648389441
+          ],
+          "tip_position_m": [
+            0.29711810924435356,
+            0.006413256641987088,
+            0.1551991765199294
+          ],
+          "tip_velocity_m_s": [
+            -0.17593210665693765,
+            0.6339856201979363,
+            0.5135659611140252
+          ],
+          "frame": "world",
+          "prediction_source": "accepted_plan",
+          "applied_tension_n": [
+            7.999998701584416,
+            5.229356334537366,
+            5.139720080188083e-07
+          ],
+          "integration": "implicit_euler",
+          "substeps": 1
+        },
+        "effective_horizon": 10,
+        "deadline_horizon_preparation_s": 7.3999399319291115e-06,
+        "controller_boundary_wall_s": 110.53380299999844,
+        "state_preparation_s": 0.0015659999335184693
+      },
+      "physical": {
+        "steps": 20,
+        "time_s": 0.010000000000000005,
+        "qpos": [
+          -0.0020040613266779483,
+          0.0026855328799719634,
+          -0.0017071761632344404,
+          0.0025987695405580145,
+          -0.0014723223380025095,
+          0.002509152042349205,
+          -0.001292009925111727,
+          0.0024028612862576526,
+          -0.0011532678520212198,
+          0.002261581657458893,
+          -0.0010386781654494125,
+          0.0020637561973475037,
+          -0.0009275195425278432,
+          0.001785953580680869,
+          -0.0008984868860959834,
+          0.0015473276560679266,
+          -0.0008254842649267945,
+          0.0011809962859334342,
+          -0.0006841460534869852,
+          0.0006653728726182051,
+          -0.0004518131453186679,
+          -1.706992316623097e-05,
+          -0.00010870722268797357,
+          -0.0008785045169051674,
+          0.004464610026113505,
+          -0.003182029281222262,
+          0.006024525489348644,
+          -0.004288858299997322,
+          0.007535049705628025,
+          -0.00549158904049898,
+          0.008960696534383234,
+          -0.00677451335291508,
+          0.010263915056604974,
+          -0.008116511354490081,
+          0.011406170674875402,
+          -0.00949071315703936,
+          0.012349247945728462,
+          -0.010864330566846448,
+          -0.014204986044456918,
+          0.01301465317380551,
+          0.015710645457297747,
+          -0.0151367583769052,
+          0.016822839746628813,
+          -0.017168950169155525,
+          0.01750705796929968,
+          -0.019045384273699235,
+          0.017737961978770814,
+          -0.02069499028424164
+        ],
+        "qvel": [
+          -0.42937609851750025,
+          0.6783427863013898,
+          -0.3725797659935364,
+          0.5939280018730564,
+          -0.3160557955841324,
+          0.5041243148260064,
+          -0.2598215766663831,
+          0.4085808370839887,
+          -0.2034172075108043,
+          0.3068454288764694,
+          -0.1460579470189055,
+          0.19853179765817536,
+          -0.08681370223550751,
+          0.08349437964835471,
+          -0.046331705910673246,
+          -0.01310878798715875,
+          -0.002111138790622507,
+          -0.1156485874537609,
+          0.04647801211188138,
+          -0.2230191228771763,
+          0.09946067592411964,
+          -0.3332658462857276,
+          0.15618059695252898,
+          -0.44359584952818043,
+          1.0590822291343231,
+          -0.646855590163466,
+          1.218061844597236,
+          -0.7729592089091566,
+          1.350904307255549,
+          -0.8979585610890396,
+          1.4525046010500637,
+          -1.0174346583176588,
+          1.5182019203122226,
+          -1.126382512058216,
+          1.5439919762445626,
+          -1.2192802185633385,
+          1.5267471405138606,
+          -1.2901919795259853,
+          -1.7276188936546346,
+          1.515053005723141,
+          1.8632012178487622,
+          -1.7174909689420543,
+          1.930158419326558,
+          -1.8880820802291658,
+          1.927071289399848,
+          -2.017520291307739,
+          1.854673441242236,
+          -2.0967006484225985
+        ],
+        "applied_tension_n": [
+          7.999998701584416,
+          5.229356334537366,
+          5.139720080188083e-07
+        ],
+        "nu": 3,
+        "actuator_tendon_indices": [
+          0,
+          1,
+          2
+        ]
+      },
+      "workspace_graph_s": 0.13120790000539273,
+      "complete_task": false,
+      "task_acceptance": "not_assessed",
+      "elapsed_s": 112.39464359998237,
+      "full_case_reference": {
+        "artifact_id": "f0740478d8906c73da1c6870cbd54706a75ee897e57a88d5695129ac7ba970c5",
+        "media_type": "application/json"
+      },
+      "complete_update_pointer": "/observations/0/complete_update_record",
+      "preparation_pointer": "/preparation",
+      "numerical_pointer": "/numerical",
+      "observation_pointer": "/observations/0"
+    },
+    "3": {
+      "status": "completed_single_interval",
+      "candidate": {
+        "artifact_id": "a0c48a1432ac780348c2250d889ffec5f3e235cb49ea7e7c45ce7fabdbb4e9e5",
+        "media_type": "application/json"
+      },
+      "controller_binding": {
+        "extension_id": "controller.gvs_nmpc",
+        "version": "11.0.0",
+        "parameters": {
+          "contract": "family.gvs_reach_control",
+          "version": "1.0.0",
+          "data": {
+            "numerical_source": "initial_state_pretension",
+            "recipe": {
+              "basis": {
+                "strategy": "structural_linear"
+              },
+              "constraint_jacobian_mode": "reverse",
+              "curvature_scale_rad_m": 10.0,
+              "evaluation_threads": 1,
+              "feasible_return": null,
+              "holding_brake_lead_s": 0.0,
+              "holding_speed_cost_mode": "time_integral_v1",
+              "holding_speed_cost_window_s": 0.05,
+              "holding_tip_speed_weight": 0.1,
+              "horizon": 10,
+              "integration_method": "implicit_euler",
+              "max_cpu_s": null,
+              "max_iterations": 120,
+              "max_unusable_updates": 3,
+              "position_error_scale_m": null,
+              "rate_scale_rad_m_s": 1000.0,
+              "recover_returned_tensions": true,
+              "regenerate_warm_states": true,
+              "root_tolerance": 1e-10,
+              "seed_position_tolerance_fraction": 0.5,
+              "seed_speed_limit_m_s": 0.02,
+              "stopping_policy": "research_work_v1",
+              "substeps": 1,
+              "tension_weight": 0.0001,
+              "terminal_tip_speed_weight": 0.1,
+              "terminal_velocity_weight": 0.0001,
+              "terminal_weight": 5.0,
+              "tip_speed_scale_m_s": 0.02,
+              "tolerance": 1e-06,
+              "tracking_weight": 1.0,
+              "variation_weight": 0.001,
+              "velocity_weight": 0.0001
+            },
+            "settling": {
+              "position_limit_m": 0.01,
+              "speed_limit_m_s": 0.02,
+              "window_s": 0.05
+            }
+          }
+        }
+      },
+      "physics_identity": "830b474bc4cacd934e5592f8248d486a92acd8b755b47d8c3b3af17e5f7c359b",
+      "last": {
+        "requested_tension_n": [
+          8.000000077617312,
+          8.00000007843245,
+          -8.61766834692231e-09
+        ],
+        "desired_tension_n": [
+          8.0,
+          8.0,
+          0.0
+        ],
+        "predicted_tension_n": [
+          8.0,
+          8.0,
+          -0.0
+        ],
+        "tension_tracking_error_n": [
+          0.0,
+          0.0,
+          -0.0
+        ],
+        "force_limit_saturated": [
+          true,
+          true,
+          true
+        ],
+        "plan_accepted": true,
+        "solver_failed": false,
+        "solver_outcome": "iteration_limit_feasible",
+        "optimization_nonconverged": true,
+        "failure_response_used": false,
+        "feasible_suboptimal_update": true,
+        "solver_error": null,
+        "optimization_status": "iteration_limit",
+        "optimization_constraint_violation": 5.116279065339735e-06,
+        "optimization_selected_iteration": 115,
+        "plan_source": "ipopt_selected",
+        "feasibility_recovery": {
+          "enabled": true,
+          "attempted": false,
+          "selected": false,
+          "wall_s": 0.0,
+          "source": "returned_ipopt_tensions_reintegrated_from_current_measurement",
+          "parent_iteration": 120,
+          "selected_before_objective": 39.969884217875574,
+          "initial_objective": 2229.6068712090364,
+          "error": null
+        },
+        "feedback": {
+          "initial_objective": 2229.6068712090364,
+          "delivered_objective": 39.969884217875574,
+          "first_command_change_from_initialization_n": 7.80000007843245,
+          "initial_terminal": {
+            "error_m": 0.19126753902450358,
+            "speed_m_s": 1.2143337708761508,
+            "velocity_error_m_s": null
+          },
+          "delivered_terminal": {
+            "error_m": 0.01394742993257905,
+            "speed_m_s": 0.12191144072014755,
+            "velocity_error_m_s": null
+          }
+        },
+        "prediction_timing": {
+          "current_time_s": 0.0,
+          "node_times_s": [
+            0.01,
+            0.02,
+            0.03,
+            0.04,
+            0.05,
+            0.06,
+            0.07,
+            0.08,
+            0.09,
+            0.1
+          ],
+          "holding_active": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "task_endpoint_s": 0.35,
+          "holding_start_s": 0.3,
+          "braking_start_s": 0.3,
+          "holding_brake_lead_s": 0.0,
+          "beyond_task": "Holding continues beyond the task endpoint inside the prediction only; execution duration is unchanged."
+        },
+        "recovery_wall_s": 0.0,
+        "recovery_integration_s": 0.0,
+        "recovery_validation_s": 0.0,
+        "optimization_returned_violation": 0.00033330741584097767,
+        "update_wall_s": 281.3720831000246,
+        "deadline_missed": true,
+        "solver_construction_s": 12.45874570007436,
+        "optimization_solve_s": 239.95151109993458,
+        "policy_stop_reason": null,
+        "plan_validation_s": 0.26244590000715107,
+        "warm_preparation_s": 28.561459599994123,
+        "optimization_raw_status": "Maximum_Iterations_Exceeded",
+        "unusable_updates": 0,
+        "stop_requested": false,
+        "gvs_projection_residual_max_rad_m": 0.0,
+        "one_step_prediction": {
+          "time_s": 0.01,
+          "state": [
+            0.1648093121206651,
+            0.06676226038211286,
+            0.08753831164547901,
+            -0.015175334764611073,
+            -0.04788599947316601,
+            -0.053894646824806935,
+            0.2628916495920115,
+            0.14934509827103035,
+            -0.11219617755052771,
+            -0.14780540993973254,
+            -0.038182965364661786,
+            0.12934344418850352,
+            -0.48748750030717536,
+            -1.833055496523235,
+            -3.956309173743013,
+            0.3140382943904913,
+            0.8290001846311721,
+            1.4714855480790585,
+            16.480931212067855,
+            6.676226038212307,
+            8.753831164548926,
+            -1.5175334764621082,
+            -4.788599947317691,
+            -5.389464682480651,
+            26.289164959201543,
+            14.934509827104193,
+            -11.21961775505288,
+            -14.780540993972666,
+            -3.8182965364664536,
+            12.934344418850166,
+            -48.74875003071739,
+            -183.3055496523227,
+            -395.63091737430125,
+            31.403829439049105,
+            82.90001846311668,
+            147.14855480790573
+          ],
+          "tip_position_m": [
+            0.4503675504365195,
+            0.004947891332129727,
+            0.15904343000653642
+          ],
+          "tip_velocity_m_s": [
+            -0.32503207218721464,
+            0.4832380252443061,
+            0.8835969738579128
+          ],
+          "frame": "world",
+          "prediction_source": "accepted_plan",
+          "applied_tension_n": [
+            8.0,
+            8.0,
+            0.0
+          ],
+          "integration": "implicit_euler",
+          "substeps": 1
+        },
+        "effective_horizon": 10,
+        "deadline_horizon_preparation_s": 6.6999346017837524e-06,
+        "controller_boundary_wall_s": 281.3701038999716,
+        "state_preparation_s": 0.0019502999493852258
+      },
+      "physical": {
+        "steps": 20,
+        "time_s": 0.010000000000000005,
+        "qpos": [
+          -0.0012241668046152347,
+          1.6720575015918164e-05,
+          -0.0008174920062820148,
+          1.4298751335067815e-05,
+          -0.00048038406416581707,
+          3.327595502227985e-05,
+          -0.00021906429887755952,
+          7.460809022489498e-05,
+          -3.67903141083845e-05,
+          0.000138516045139763,
+          6.611281061954816e-05,
+          0.00022421796751180578,
+          9.222243536939218e-05,
+          0.00032967278592575106,
+          6.797162381017019e-05,
+          0.00046138931263197265,
+          -1.9734235530027378e-05,
+          0.0006041242056976235,
+          -0.00016005577823752026,
+          0.0007507749380098558,
+          -0.00033909695327558726,
+          0.0008921761441129482,
+          -0.000539872343049137,
+          0.0010170462366684437,
+          -0.0022676207475043333,
+          0.0008525805477439607,
+          -0.0024537694045592483,
+          0.0009033153566733176,
+          -0.002583903051816024,
+          0.000943071830709521,
+          -0.002648401399784369,
+          0.0009657583524395352,
+          -0.0026381073645598677,
+          0.0009642558495641542,
+          -0.0025447696550927666,
+          0.0009305213665603499,
+          -0.0023615113175135855,
+          0.0008557535230028796,
+          0.002376499685546333,
+          -0.0008286975490008051,
+          -0.0022824661354175933,
+          0.0007557831929185843,
+          -0.0020747958962456167,
+          0.0006258674854708801,
+          -0.0017523890407985356,
+          0.00042809179979237617,
+          -0.0013175576217934791,
+          0.00015217350661217676,
+          0.0016208918824757595,
+          -0.0011752445749415054,
+          0.0040111502011377954,
+          -0.0018995397450306643,
+          0.0066603784974557986,
+          -0.0027969128975185893,
+          0.009489741060241542,
+          -0.003869789435815333,
+          0.012398360074601199,
+          -0.005108834575598085,
+          0.015264676998788172,
+          -0.006490352357994854,
+          0.017949359959772548,
+          -0.00797401240914693,
+          -0.023615487285394508,
+          0.010674440195253142,
+          0.028654999475638033,
+          -0.013503502636002198,
+          0.032809333344172964,
+          -0.016325087015941857,
+          0.03585296044800635,
+          -0.018987178138880352,
+          0.03757627804575241,
+          -0.021312921795491394
+        ],
+        "qvel": [
+          -0.11779179985143302,
+          -0.013863102508342657,
+          -0.10035262674577443,
+          0.007965871069629114,
+          -0.08635344819759042,
+          0.03135683141610417,
+          -0.0771635286733538,
+          0.055921075285203924,
+          -0.07366587483335924,
+          0.08103584132386935,
+          -0.0761719559766908,
+          0.1058399558033317,
+          -0.08436807353352996,
+          0.12923894472394712,
+          -0.09963352670376095,
+          0.15733310663184977,
+          -0.11814240916255178,
+          0.18118843226913783,
+          -0.13780101704492104,
+          0.19912573817294416,
+          -0.15595729805797173,
+          0.20934716487487165,
+          -0.16950345456501958,
+          0.20999952975704675,
+          -0.4231836679120728,
+          0.12912627391976889,
+          -0.4186360995557305,
+          0.12903584934198709,
+          -0.3994069469328893,
+          0.12403654724023862,
+          -0.3647485920457054,
+          0.11304126556952153,
+          -0.31427442871718075,
+          0.09494891307831163,
+          -0.24801655666745964,
+          0.06868818682331951,
+          -0.16647774876459676,
+          0.03326936617557145,
+          0.1336659244719398,
+          -0.007075147051031639,
+          -0.08564859423823659,
+          -0.02677441450770203,
+          -0.023114494067823385,
+          -0.06915433751805795,
+          0.052465549072474874,
+          -0.12063568047747938,
+          0.1390163062066298,
+          -0.18147323614756952,
+          0.8463805177480991,
+          -0.2953756385107438,
+          1.1840096924653378,
+          -0.40353322049065005,
+          1.5095916178701492,
+          -0.5221624676092176,
+          1.8039511946571978,
+          -0.6461487395518357,
+          2.0463794630344263,
+          -0.7683158385363013,
+          2.215518850916918,
+          -0.8793552573365282,
+          2.290471141490755,
+          -0.9678986407699055,
+          -3.028352919696686,
+          1.2872812819049313,
+          3.603115564562408,
+          -1.593913721231966,
+          3.9736390675006192,
+          -1.8608571610780966,
+          4.113202786138344,
+          -2.0621745431996286,
+          4.00367254330793,
+          -2.171100159457021
+        ],
+        "applied_tension_n": [
+          8.0,
+          8.0,
+          -0.0
+        ],
+        "nu": 3,
+        "actuator_tendon_indices": [
+          0,
+          1,
+          2
+        ]
+      },
+      "workspace_graph_s": 0.25743670004885644,
+      "complete_task": false,
+      "task_acceptance": "not_assessed",
+      "elapsed_s": 285.9935305999825,
+      "full_case_reference": {
+        "artifact_id": "722bd8b349fe7ec580ac1c28e2f2697a1e8f9dc845a373ded9056c875e68cd3c",
+        "media_type": "application/json"
+      },
+      "complete_update_pointer": "/observations/0/complete_update_record",
+      "preparation_pointer": "/preparation",
+      "numerical_pointer": "/numerical",
+      "observation_pointer": "/observations/0"
+    }
+  },
+  "elapsed_s": 440.7926225999836,
+  "implementation_commit": "6b95df3e49b8e7f5f9af599fcbfd45d386989606",
+  "ledger": {
+    "limit": {
+      "backend_solves": 3,
+      "model_calls": 0,
+      "tool_calls": 40,
+      "wall_s": null,
+      "worker_calls": 0
+    },
+    "used": {
+      "tool_calls": 12,
+      "model_calls": 0,
+      "backend_solves": 3,
+      "worker_calls": 0,
+      "wall_s": 434.12528029992245
+    },
+    "remaining": {
+      "backend_solves": 0,
+      "model_calls": 0,
+      "tool_calls": 28,
+      "wall_s": null,
+      "worker_calls": 0
+    },
+    "occupied": {}
+  },
+  "resources": {
+    "provider_requests": 0,
+    "rl_training_stages": 0,
+    "complete_task_evaluations": 0,
+    "short_cases": 3,
+    "physical_steps": 60
+  },
+  "full_store_summary_reference": {
+    "artifact_id": "60afdc20657571db57740416cba7f42240270a356a65420a8faab99be97a3e69",
+    "media_type": "application/json"
+  },
+  "raw_evidence_archive": "control/immutable_artifacts.tar.gz",
+  "evidence_layout": "Summary only; full original inputs, plans, observations and physical state retained in immutable Store artifacts, addressable by exact references and JSON Pointers."
+}
