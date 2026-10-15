@@ -43,15 +43,19 @@ def solution_identity(host, result, candidate):
 def confirmation_progress(host, selected=None):
     """Retain all solution failures; only current-study launches satisfy fresh repetitions."""
     from tools.research.state import state, confirmation_count
-    s=state(host); selected=plain(selected or s.get('selected')); rows={}
+    s=state(host)
+    selected=plain(selected or s.get('selected'))
+    rows={}
     chosen=result_view(host,selected) if selected else None
     for historical, refs in ((True,[*s.get('historical_confirmations',[]), *s.get('linked_selections',[]), *s.get('scoped_context',[])]),
                              (False,[*s.get('results',[]),*s.get('rl_evaluations',[])])):
         for ref in refs:
             r=host.store.artifact(ref)
-            if not isinstance(r,dict) or r.get('role')!='confirmation': continue
+            if not isinstance(r,dict) or r.get('role')!='confirmation':
+                continue
             v=result_view(host,ref)
-            if not chosen or v['solution_identity']!=chosen['solution_identity']: continue
+            if not chosen or v['solution_identity']!=chosen['solution_identity']:
+                continue
             owner=r.get('evaluation_owner') or r.get('study') or r.get('owning_study')
             is_historical=historical or not v['fresh_current_study']
             execution=(owner, r.get('execution_id') or r.get('operation_key') or ref['artifact_id'])
@@ -64,7 +68,8 @@ def confirmation_progress(host, selected=None):
             else:
                 rows[execution]=dict(reference=ref,historical=is_historical,
                     owner=owner,complete=v['complete'],passed=v['passed'])
-    values=list(rows.values()); required=confirmation_count(s)
+    values=list(rows.values())
+    required=confirmation_count(s)
     fresh=[v for v in values if not v['historical']]
     return dict(required_total=required,historical_confirmations=sum(v['historical'] for v in values),
         current_study_confirmations=sum(not v['historical'] for v in values),
@@ -79,7 +84,8 @@ def result_view(host, reference):
     """Organize original evidence once, without recomputing task metrics."""
     from tools.research.state import state
     from tools.research.design import full_science
-    r=host.store.artifact(reference); c=host.store.artifact(r['candidate'])
+    r=host.store.artifact(reference)
+    c=host.store.artifact(r['candidate'])
     # Historical reads stay valid after the active profile/selection changes.
     if c['scientific_configuration']!=full_science(c['configuration']):
         raise ValueError('IMPORTED_CONFIGURATION_IDENTITY_MISMATCH')
@@ -90,7 +96,8 @@ def result_view(host, reference):
     controller=dict(route='rl',configuration=r['configuration'],checkpoint=r.get('checkpoint'),policy_sha256=r.get('policy_sha256')) if rl else dict(route='nmpc',configuration=c['scientific_configuration']['policy']['controller'])
     identity=solution_identity(host,r,c)
     owner=r.get('evaluation_owner') or r.get('study') or r.get('owning_study')
-    s=state(host);current_refs=[*s.get('results',[]),*s.get('rl_evaluations',[])]
+    s=state(host)
+    current_refs=[*s.get('results',[]),*s.get('rl_evaluations',[])]
     fresh=bool(plain(reference) in current_refs and plain(reference) not in s.get('historical_confirmations',[])
         and plain(reference) not in s.get('linked_selections',[]) and owner==host.run_id and not r.get('imported_historical_evidence')
         and r.get('fresh_execution',True) and not r.get('cached_operation_receipt'))
@@ -98,11 +105,13 @@ def result_view(host, reference):
     failed_metrics=[]
     acceptance=r.get('acceptance') or {}
     if not rl:
-        profile=r.get('profile') or {};motion=host.store.artifact(profile['motion']) if profile.get('motion') else []
+        profile=r.get('profile') or {}
+        motion=host.store.artifact(profile['motion']) if profile.get('motion') else []
         for name,component in acceptance.get('components',{}).items():
-            if component.get('passed') is not False:continue
+            if component.get('passed') is not False:
+                continue
             key={'holding_speed':'tip_speed_m_s','holding_position':'tip_error_m','evaluator:task_bound':'tip_error_m'}.get(name)
-            samples=[v for v in motion if name not in ('holding_speed','holding_position') or v['time_s']>=.30-1e-12]
+            samples=[v for v in motion if name not in ('holding_speed','holding_position') or v['time_s']>=__import__('tools.research_tasks',fromlist=['task_adapter']).task_adapter(c['configuration']).holding_start_s()-1e-12]
             worst=max(samples,key=lambda v:v[key]) if key and samples else {}
             failed_metrics.append(dict(metric=name,value=component.get('value'),threshold=component.get('limit'),unit=component.get('unit'),
                 time_s=(motion[-1]['time_s'] if name=='evaluator:task_bound' and motion else worst.get('time_s'))))
@@ -126,41 +135,64 @@ def eligibility(host, reference, *, revise_selection=False, selection=None):
     from tools.research.state import state,capacity
     from tools.research.design import verify_candidate
     from tools.research.rl import evaluation_capacity
-    s=state(host);selection=(s['spec']['confirmation']['fresh_independent_repetitions']==0) if selection is None else selection;ref=plain(reference);reasons=[];refs=[*s['results'],*s.get('rl_evaluations',[]),*s.get('linked_selections',[])]
+    s=state(host)
+    selection=(s['spec']['confirmation']['fresh_independent_repetitions']==0) if selection is None else selection
+    ref=plain(reference)
+    reasons=[]
+    refs=[*s['results'],*s.get('rl_evaluations',[]),*s.get('linked_selections',[])]
     if ref not in refs:
         return dict(eligible=False,reasons=['not a current-study controller result'],required_field='selected_execution')
-    r=host.store.artifact(ref);count=0;progress=None;fit=None
+    r=host.store.artifact(ref)
+    count=0
+    progress=None
+    fit=None
     try:
         v=result_view(host,ref)
-        if ref not in s.get('evaluation_reads',[]):reasons.append('explicit evidence_read of this completed evaluation required before selection or confirmation')
-        if not v['fresh_current_study']: reasons.append('historical or imported result is not fresh development evidence')
-        if r.get('role','development')=='confirmation': reasons.append('selection requires a passing development evaluation')
-        if not v['passed']: reasons.append('result did not pass complete original task evaluation')
+        if ref not in s.get('evaluation_reads',[]):
+            reasons.append('explicit evidence_read of this completed evaluation required before selection or confirmation')
+        if not v['fresh_current_study']:
+            reasons.append('historical or imported result is not fresh development evidence')
+        if r.get('role','development')=='confirmation':
+            reasons.append('selection requires a passing development evaluation')
+        if not v['passed']:
+            reasons.append('result did not pass complete original task evaluation')
         c=verify_candidate(host,r['candidate'])
         if v['controller_route']=='nmpc' and (r.get('profile_identity')!=s['profile']['identity'] or r['scientific_configuration']!=c['scientific_configuration']):
             reasons.append('selected scientific configuration mismatch')
-        if v['controller_route']=='rl' and (not r.get('checkpoint') or not r.get('policy_sha256')): reasons.append('exact evaluated checkpoint identity missing')
+        if v['controller_route']=='rl' and (not r.get('checkpoint') or not r.get('policy_sha256')):
+            reasons.append('exact evaluated checkpoint identity missing')
         if s.get('selected') and s['selected']!=ref:
             old=confirmation_progress(host,s['selected'])
-            if not revise_selection: reasons.append('confirmation selection already frozen; explicit revise_selection required')
-            if not (old['failures'] or old['invalid_executions']): reasons.append('selection remains immutable during its confirmation attempt')
+            if not revise_selection:
+                reasons.append('confirmation selection already frozen; explicit revise_selection required')
+            if not (old['failures'] or old['invalid_executions']):
+                reasons.append('selection remains immutable during its confirmation attempt')
             if result_view(host,s['selected'])['solution_identity']==v['solution_identity']:
                 reasons.append('revision requires a scientifically changed solution; relabeling cannot erase failure')
         elif revise_selection:
             reasons.append('revision requires a different failed selection')
-        progress=confirmation_progress(host,ref);count=progress['required_total']-progress['remaining']
+        progress=confirmation_progress(host,ref)
+        count=progress['required_total']-progress['remaining']
         required=progress['required_total']
-        if progress['failures'] or progress['invalid_executions']: reasons.append('confirmation failed or invalid for this scientific solution; inspect evidence, no automatic retry')
-        if not selection and count>=required: reasons.append('declared confirmations already recorded')
-        if revise_selection and count: reasons.append('revised solution already has a confirmation attempt; allowance cannot restart')
+        if progress['failures'] or progress['invalid_executions']:
+            reasons.append('confirmation failed or invalid for this scientific solution; inspect evidence, no automatic retry')
+        if not selection and count>=required:
+            reasons.append('declared confirmations already recorded')
+        if revise_selection and count:
+            reasons.append('revised solution already has a confirmation attempt; allowance cannot restart')
         remaining=required if revise_selection else required-count
         fit=dict(admitted=remaining,selection_without_execution=True) if selection else evaluation_capacity(host,remaining,confirmation=True) if v['controller_route']=='rl' else capacity(host,remaining,True,root_operation=True,candidate=r['candidate'])
-        if selection and required==0 and progress['current_study_confirmations']:reasons.append('unexpected extra confirmations in zero-repetition study')
-        if fit['admitted']<remaining: reasons.append('remaining required confirmations do not fit route budget')
+        if selection and required==0 and progress['current_study_confirmations']:
+            reasons.append('unexpected extra confirmations in zero-repetition study')
+        if fit['admitted']<remaining:
+            reasons.append('remaining required confirmations do not fit route budget')
     except (ValueError,KeyError) as exc:
-        reasons.append(str(exc));count=0
-    if s['research_status']=='stopped':reasons.append('study sealed after STOP')
-    if s.get('selected') and confirmation_progress(host)['confirmed']: reasons.append('solution confirmed; close study')
+        reasons.append(str(exc))
+        count=0
+    if s['research_status']=='stopped':
+        reasons.append('study sealed after STOP')
+    if s.get('selected') and confirmation_progress(host)['confirmed']:
+        reasons.append('solution confirmed; close study')
     return dict(eligible=not reasons,reasons=reasons,required_field='selected_execution',selected_execution=ref,
         owning_study=r.get('study',r.get('owning_study')),historical_input=ref in s.get('linked_selections',[]),
         completed_confirmations=count,progress=progress,confirmation_reservation=fit)
@@ -207,7 +239,8 @@ def mathematical_context(host,candidate):
     records=[]
     for ref in state(host).get('analysis_results',[]):
         value=host.store.artifact(ref)
-        if value['candidate']!=plain(candidate):continue
+        if value['candidate']!=plain(candidate):
+            continue
         records.append(dict(reference=ref,**{k:value.get(k) for k in
             ('operation','origin','status','operating_point','proxy_values','local_model_constraints','charged_numerical_s')}))
     return records
@@ -216,7 +249,8 @@ def mathematical_context(host,candidate):
 def compact_local(row):
     keys=('execution_id','historical_input','source_update_id','first_input_n','original_applied_action_n',
           'exact_initialized_vector_equal','exact_bounds_equal','charged_numerical_s','diagnostic_trace_enabled')
-    result={k:row.get(k) for k in keys};i=dict(row.get('problem_inspection') or {})
+    result={k:row.get(k) for k in keys}
+    i=dict(row.get('problem_inspection') or {})
     recovery=i.get('original_recovery_selection') or {}
     i['original_recovery_selection']={k:recovery.get(k) for k in ('attempted','selected','objective','parent_iteration')}
     result.update(problem_inspection=i,local_iterations=(row.get('diagnostics') or {}).get('iterations'),

@@ -39,8 +39,10 @@ def inspect_problem(ws,recorded):
 
 
 def replay(request):
-    started=time.perf_counter(); inp=SessionInput.model_validate(request['configuration'])
-    recorded=request['record']; recipe=dict(inp.policy.controller.parameters.data['recipe'])
+    started=time.perf_counter()
+    inp=SessionInput.model_validate(request['configuration'])
+    recorded=request['record']
+    recipe=dict(inp.policy.controller.parameters.data['recipe'])
     if recorded.get('resolved_problem_archive') and request['mode']!='research_current':
         from tools.research.numerics import archived
         recorded=dict(recorded,resolved_problem=archived(**recorded['resolved_problem_archive']))
@@ -59,6 +61,8 @@ def replay(request):
     nominal=recorded.get('nominal_workspace',dict(x=[0.]*(2*n),u=[.2]*len(recorded['tendon_order'])))
     ws=TrajectoryWorkspace(inp.task,inp.robot,recipe,nominal['x'],nominal['u'],
         settling=inp.policy.controller.parameters.data['settling'])
+    ws.research_position_limit_m = inp.policy.controller.parameters.data['settling']['position_limit_m']
+    ws.research_speed_limit_m_s = inp.policy.controller.parameters.data['settling']['speed_limit_m_s']
     if request['mode']=='research_current':
         # Use the actual solve/warm/tail/recovery path with a transformed saved
         # warm guess, not the old serialized Euler problem or old state defects.
@@ -85,9 +89,12 @@ def replay(request):
     ws._set_prediction_time(recorded['prediction_timing']['current_time_s'])
     if 'resolved_problem' in recorded:
         ws.problem=OptimizationProblem.model_validate(recorded['resolved_problem'])
-    ws.problem.variables.clear(); ws.problem.variables.update(recorded['problem_variables'])
-    ws.problem.initial_guess.clear(); ws.problem.initial_guess.update(recorded['initial_guess'])
-    if 'resolved_problem' not in recorded:raise ValueError('EXACT_ORIGINAL_PROBLEM_UNAVAILABLE_USE_EXPLICIT_RECONSTRUCTION')
+    ws.problem.variables.clear()
+    ws.problem.variables.update(recorded['problem_variables'])
+    ws.problem.initial_guess.clear()
+    ws.problem.initial_guess.update(recorded['initial_guess'])
+    if 'resolved_problem' not in recorded:
+        raise ValueError('EXACT_ORIGINAL_PROBLEM_UNAVAILABLE_USE_EXPLICIT_RECONSTRUCTION')
     options=dict(recorded['initialization']['solver_options'])
     options.update(max_cpu_s=None,max_wall_s=None,feasible_return=None,
         max_iterations=policy['max_iterations'],tolerance=policy['tolerance'])
@@ -139,37 +146,193 @@ def plan_task_metrics(ws,plan,time_s):
     times=time_s+np.arange(ws.parameters.horizon*ws.parameters.substeps+1)*ws.period/ws.parameters.substeps
     states=np.array([[plan[f'x/{k}/{j}']*ws.state_scales[j] for j in range(2*ws.n)] for k in range(len(times))])
     motion=[ws._motion(x[:ws.n],x[ws.n:]) for x in states]
-    positions=np.array([np.asarray(p).ravel() for p,v in motion]);velocities=np.array([np.asarray(v).ravel() for p,v in motion])
+    positions=np.array([np.asarray(p).ravel() for p,v in motion])
+    velocities=np.array([np.asarray(v).ravel() for p,v in motion])
     hold=(times>=ws.holding_start-1e-12)&(times<=ws.duration+1e-12)
-    errors=np.linalg.norm(positions-np.asarray(ws.target),axis=1);speeds=np.linalg.norm(velocities,axis=1)
+    errors=np.linalg.norm(positions-np.asarray(ws.target),axis=1)
+    speeds=np.linalg.norm(velocities,axis=1)
     return dict(times_s=times.tolist(),position_error_m=errors.tolist(),speed_m_s=speeds.tolist(),
         holding_node_count=int(hold.sum()),holding_max_position_error_m=float(errors[hold].max()) if any(hold) else None,
         holding_max_speed_m_s=float(speeds[hold].max()) if any(hold) else None,
-        holding_position_violation_m=float(max(0,errors[hold].max()-.01)) if any(hold) else None,
-        holding_speed_violation_m_s=float(max(0,speeds[hold].max()-.02)) if any(hold) else None,
+        holding_position_violation_m=float(max(0,errors[hold].max()-ws.research_position_limit_m)) if any(hold) else None,
+        holding_speed_violation_m_s=float(max(0,speeds[hold].max()-ws.research_speed_limit_m_s)) if any(hold) else None,
         first_action_n=[plan['u/0/'+t] for t in ws.tendons],scope='Actual plan states; sampled prediction diagnostics, independent feasibility reported separately')
 
 
 if __name__=='__main__':
-    request=read(sys.argv[1]); out=Path(sys.argv[2])
-    try: value=replay(request)
-    except Exception as exc:value=dict(status='diagnostic_error',error=type(exc).__name__,message=str(exc))
+    request=read(sys.argv[1])
+    out=Path(sys.argv[2])
+    try:
+        value=replay(request)
+    except Exception as exc:
+        value=dict(status='diagnostic_error',error=type(exc).__name__,message=str(exc))
     atomic_json(out,value)
 
 from tools.research.state import state,save,update
 from tools.platform_store import zero
 def recover_local(host):
-    s=state(host);p=s['pending'];out=Path(p['output'])
-    if not out.exists():raise ValueError('UNKNOWN_LOCAL_SOLVE_RETAINS_RESERVATION_NO_REPEAT')
-    value=read(out);row=host.store.lookup(host.run_id,p['worker_request_id']);charged=p['reserved_s']
+    s=state(host)
+    p=s['pending']
+    out=Path(p['output'])
+    if not out.exists():
+        raise ValueError('UNKNOWN_LOCAL_SOLVE_RETAINS_RESERVATION_NO_REPEAT')
+    value=read(out)
+    row=host.store.lookup(host.run_id,p['worker_request_id'])
+    charged=p['reserved_s']
     value.update(execution_id=row['execution_id'],charged_numerical_s=charged,
         source_execution=p['source_execution'],source_update_id=p['source_update_id'],owning_study=host.run_id,
         origin=p['origin'],historical_input=p['historical_input'],recovered_output_without_solve=True)
     with host.store.transaction() as db:
-        current=host.store.session(host.run_id,db)['state'];current.update(pending=None,
+        current=host.store.session(host.run_id,db)['state']
+        current.update(pending=None,
             numerical_s=current['numerical_s']+charged,local_solve_s=current['local_solve_s']+charged,
             numerical_reserved_s=current['numerical_reserved_s']-charged)
         host.store.update_state(db,host.run_id,current)
         host.store.complete(row,dict(request_id=row['request_id'],execution_id=row['execution_id'],caller=host.actor,
             tool_id='research.core_local_solve',tool_version='1.0.0',execution_status='completed',charged=zero()),value,elapsed=charged,db=db)
     return value
+
+
+from tools.research.state import (ROOT, state, update, save, guard)
+from tools.platform_store import plain, zero
+import os, subprocess
+
+def diagnose(host, refs):
+    from extensions.tendon_family.control_evidence import ControlEvidence
+    s=state(host)
+    reader=ControlEvidence(host.store)
+    records=[]
+    numerical=[]
+    incomplete=[]
+    for ref in refs:
+        r=host.store.artifact(ref)
+        if plain(ref) not in s['results'] and r.get('status')=='evaluated':
+            from tools.research.feedback import result_view
+            numerical.append(dict(reference=plain(ref),historical=True,**result_view(host,ref)))
+            continue
+        if plain(ref) in s.get('mechanics_results',[]):
+            numerical.append(dict(reference=plain(ref),physical_validation=False,**{k:r.get(k) for k in
+                ('operation','status','execution_id','trajectory_metrics','relaxed_nlp_feasible','original_task_feasible','replay','charged_numerical_s')}))
+            continue
+        if plain(ref) in s['results'] and r.get('status')!='evaluated':
+            incomplete.append(dict(reference=plain(ref),**compact_result(r),acceptance_available=False,
+                archived_partial_evidence=s.get('incomplete_execution_evidence',[])))
+            continue
+        if not r.get('execution_id') or r.get('status')!='evaluated':
+            continue
+        source=reader.resolve(r['execution_id'])
+        obs=reader.read_file(source,'controller_observations.json',[])
+        records.append(dict(execution_id=r['execution_id'],observations=obs,source=source,
+            scientific_configuration=r.get('scientific_configuration'),profile_identity=r.get('profile_identity')))
+    comparison=[]
+    if len(records)>=2:
+        a,b=records[-2:]
+        left=a['observations']
+        right=b['observations']
+        for index,(x,y) in enumerate(zip(left,right)):
+            if x['actual_tension_n']!=y['actual_tension_n']:
+                rx=x.get('complete_update_record',{})
+                ry=y.get('complete_update_record',{})
+                comparison.append(dict(update_id=index,time_s=x['time_s'],
+                    scientific_configuration_equal=a['scientific_configuration']==b['scientific_configuration'],
+                    evaluation_profile_equal=a['profile_identity']==b['profile_identity'],
+                    maximum_action_difference_n=max(abs(i-j) for i,j in zip(x['actual_tension_n'],y['actual_tension_n'])),
+                    measured_state_equal=x['measured_initial_state']==y['measured_initial_state'],
+                    previous_input_equal=rx.get('previous_applied_input_n')==ry.get('previous_applied_input_n'),
+                    warm_source_equal=rx.get('warm')==ry.get('warm'),
+                    initialized_vector_equal=rx.get('initialization',{}).get('initialized_vector')==ry.get('initialization',{}).get('initialized_vector'),
+                    selection=[rx.get('selection'),ry.get('selection')],iterations=[x.get('optimization_selected_iteration'),y.get('optimization_selected_iteration')]))
+    value=dict(status='read_only_diagnosis',sources=refs,
+        numerical_evidence=numerical,incomplete_executions=incomplete,
+        execution_evidence=[dict(execution_id=r['execution_id'],source=r['source'],updates=len(r['observations']),
+            complete_records=sum('complete_update_record' in o for o in r['observations']),
+            capture_s=sum(o.get('complete_record_capture_s',0.)+o.get('complete_update_record',{}).get('record_capture_s',0.)+o.get('snapshot_capture_wall_s',0.) for o in r['observations'])) for r in records],
+        first_action_divergence=comparison[0] if comparison else None,action_divergences=comparison,
+        unique_cause='unresolved; equality and differences are recorded, no causal rule imposed')
+    ref=save(host,value,'diagnosis')
+    update(host,diagnostic_facts=[*state(host).get('diagnostic_facts',[]),dict(reference=ref,
+        status=value['status'],first_action_divergence=value['first_action_divergence'],
+        numerical_evidence=numerical,incomplete_executions=incomplete,
+        unique_cause=value['unique_cause'],execution_evidence=[{k:r[k] for k in ('execution_id','updates','complete_records','capture_s')} for r in value['execution_evidence']])])
+    return dict(reference=ref,**value)
+
+
+def local_diagnostic(host, query, key):
+    guard(host,True)
+    from tools.research.contracts import LocalDiagnostic
+    from tools.research.numerics import execution_update
+    q=LocalDiagnostic.model_validate(query)
+    s=state(host)
+    b=s['spec']['budgets']
+    source=execution_update(host,q.execution,q.update_id)
+    record=source['record']
+    imported=source.get('imported_historical_evidence',False)
+    if not record:
+        raise ValueError('ACTUAL_COMPLETE_UPDATE_INPUT_REQUIRED')
+    seconds=s['spec']['standalone_watchdog_s']
+    reserve=0.
+    solves=q.repetitions
+    if s['local_solves']+solves>b['local_solves']:
+        raise ValueError('LOCAL_DIAGNOSTIC_COUNT_EXHAUSTED')
+    rows=[]
+    for index in range(q.repetitions):
+        request_id=key+'-local-'+str(index)
+        request=dict(configuration=source['configuration'],record=record,mode=q.mode,
+            current_recipe=s['profile']['recipe'],external_timeout_s=seconds,
+            numerical_environment=dict(OPENBLAS_NUM_THREADS='1',OMP_NUM_THREADS='1',MKL_NUM_THREADS='1'))
+        old=host.store.lookup(host.run_id,request_id)
+        if old:
+            if old['request_hash']!=digest(request):
+                raise ValueError('DIAGNOSTIC_OPERATION_COLLISION')
+            if not old['receipt']:
+                raise ValueError('UNKNOWN_LOCAL_SOLVE_RECONCILE_OUTPUT_NO_REPEAT')
+            rows.append(host.store.artifact(json.loads(old['receipt'])['output']))
+            continue
+        def charge(db):
+            current=host.store.session(host.run_id,db)['state']
+            count=1
+            if current['local_solves']+count>b['local_solves']:
+                raise ValueError('LOCAL_SOLVE_CEILING')
+            current['local_solves']+=count
+            current['numerical_reserved_s']+=reserve
+            host.store.update_state(db,host.run_id,current)
+        row,_=host.store.reserve(host.run_id,request_id,digest(request),host.actor,{**zero(),'wall_s':reserve},kind='local_diagnostic',guard=charge)
+        folder=host.store.root/'local_diagnostics'/row['execution_id']
+        folder.mkdir(parents=True,exist_ok=True)
+        inp,out=folder/'input.json',folder/'output.json'
+        atomic_json(inp,request)
+        update(host,pending=dict(kind='local_diagnostic',worker_request_id=request_id,input=str(inp),output=str(out),
+            reserved_s=reserve,source_execution=plain(q.execution),source_update_id=q.update_id,historical_input=imported,
+            started_unix=time.time(),origin='engineering' if s['spec'].get('mode')=='engineering_numerical' or key.startswith('engineering') else 'model'))
+        start=time.perf_counter()
+        env=os.environ.copy()
+        env.update(OPENBLAS_NUM_THREADS='1',OMP_NUM_THREADS='1',MKL_NUM_THREADS='1')
+        try:
+            process=subprocess.run([str(s['spec']['runtime']['research_python']),'-m','tools.research.diagnostic',str(inp),str(out)],cwd=ROOT,
+                env=env,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,timeout=seconds)
+            value=read(out) if out.exists() else dict(status='diagnostic_no_output',returncode=process.returncode)
+        except subprocess.TimeoutExpired:
+            value=dict(status='known_killed_waited_diagnostic_timeout',timeout_s=seconds)
+        elapsed=time.perf_counter()-start
+        value.update(execution_id=row['execution_id'],charged_numerical_s=elapsed,source_execution=plain(q.execution),
+            implementation=s['freeze'],science_hashes=s['profile']['science_hashes'],
+            original_request=save(host,request,'local_diagnostic_request'),
+            historical_input=imported,owning_study=host.run_id,
+            source_update_id=q.update_id,origin='engineering' if s['spec'].get('mode')=='engineering_numerical' or key.startswith('engineering') else 'model',
+            charged_solve_attempts=1)
+        with host.store.transaction() as db:
+            current=host.store.session(host.run_id,db)['state']
+            current['numerical_s']+=elapsed
+            current['local_solve_s']+=elapsed
+            current['numerical_reserved_s']-=reserve
+            current['pending']=None
+            host.store.update_state(db,host.run_id,current)
+            host.store.complete(row,dict(request_id=request_id,execution_id=row['execution_id'],caller=host.actor,
+                tool_id='research.core_local_solve',tool_version='1.0.0',execution_status='completed',charged=zero()),value,elapsed=elapsed,db=db)
+        rows.append(value)
+    difference=max(abs(a-b) for a,b in zip(rows[0]['first_input_n'],rows[1]['first_input_n'])) if len(rows)==2 and all('first_input_n' in r for r in rows) else None
+    detail=dict(rows=rows,maximum_first_input_difference_n=difference,mode=q.mode,
+        interpretation='Exact saved problem under declared iteration/convergence policy; local agreement does not establish episode repeatability or unique cause.')
+    ref=save(host,detail,'local_diagnostic_comparison')
+    update(host,diagnostics=[*state(host).get('diagnostics',[]),ref])
+    return dict(reference=ref,**detail)

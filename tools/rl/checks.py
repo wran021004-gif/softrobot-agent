@@ -74,6 +74,8 @@ def evaluate(policy, output, source_root=None):
     metadata_path = policy.with_name("metadata.json")
     if metadata_path.exists():
         from tools.rl.train import config_digest, snapshot
+        from tools.rl.continuation import published_checkpoint
+        published_checkpoint(policy.parents[2],read_json(policy.parents[2]/"config.json"),policy.parent.name)
         metadata = read_json(metadata_path)
         config = read_json(policy.parents[2] / "config.json")
         if (config_digest(config) != metadata["config_sha256"]
@@ -83,22 +85,13 @@ def evaluate(policy, output, source_root=None):
         if not config.get('candidate'):raise ValueError('EXPLICIT_CHECKPOINT_CANDIDATE_REQUIRED')
         if source_root:
             raise ValueError('Frozen candidate evaluation cannot change source_root')
-        settings = None
     else:
         raise ValueError('EXACT_PUBLISHED_CHECKPOINT_METADATA_REQUIRED')
     output.mkdir(parents=True, exist_ok=False)
     env = TensionEnv(config, trace_dir=output, failure_mode="raise")
     try:
-        if settings is not None:
-            saved = settings["environment"]
-            if (env.mode!=saved['mode'] or env.horizon!=saved['horizon']
-                    or env.control_dt!=saved['control_dt_s'] or float(env.model.opt.timestep)!=saved['physics_dt_s']
-                    or env.tendons!=saved['tendon_order']):
-                raise ValueError("Historical policy conventions differ from this runtime")
         model = PPO.load(policy, env=env, device="cpu")
-        if settings is not None and model.pilot_environment != settings["environment"]:
-            raise ValueError("Historical policy/settings mismatch")
-        if settings is None and snapshot(model) != metadata["inherited"]:
+        if snapshot(model) != metadata["inherited"]:
             raise ValueError("Policy/optimizer/counters/schedule metadata mismatch")
         task = copy.deepcopy(config["task"])
         samples, metrics = run_episode(model, env, config["seed"], task)
@@ -106,7 +99,7 @@ def evaluate(policy, output, source_root=None):
         result = dict(policy=str(policy.resolve()), mode=config["mode"], seed=config["seed"], acceptance=task["acceptance"],
                       episodes=[metrics], passed=metrics["passed"], evaluation_elapsed_s=time.perf_counter() - started,
                       candidate_identity=config['candidate']['identity'],task_identity=config['candidate']['task_identity'],
-                      run_id=policy.parents[2].name if settings is None else 'historical',
+                      run_id=policy.parents[2].name,
                       checkpoint=policy.parent.name,config_sha256=hashlib.sha256(json.dumps(config,sort_keys=True).encode()).hexdigest(),
                       failure_reason=('numerical_failure' if metrics['numerical_failure'] else
                           None if metrics['passed'] else 'incomplete_trajectory' if not metrics['complete'] else 'task_thresholds_not_met'),

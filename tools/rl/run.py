@@ -37,7 +37,8 @@ def write_json(path, value):
             os.replace(pending, path)
             break
         except PermissionError as error:
-            if getattr(error, 'winerror', None) not in (5, 32) or attempt == 4: raise
+            if getattr(error, 'winerror', None) not in (5, 32) or attempt == 4:
+                raise
             time.sleep(.01)
 
 
@@ -100,15 +101,18 @@ def run_path(run_id):
 
 def resolve_config(config=None):
     import copy
-    resolved = copy.deepcopy(config) if isinstance(config, dict) else read_json(config or Path(__file__).with_name("config.json"))
+    resolved = copy.deepcopy(config) if isinstance(config, dict) else read_json(config) if config is not None else _missing_config()
     if resolved["mode"] not in ("direct", "residual"):
         raise ValueError("Only direct and residual tension control are supported")
     if not resolved.get('candidate') or not resolved.get('control_object') or not resolved.get('task'):
         raise ValueError('Explicit candidate XML/assets, control_object and frozen task required; no historical fallback')
     budget = resolved["budget"]
     if (type(budget["actions"]) is not int or budget["actions"] <= 0
-            or not math.isfinite(budget["active_seconds"]) or budget["active_seconds"] <= 0):
+            or (budget["active_seconds"] is not None and (not math.isfinite(budget["active_seconds"]) or budget["active_seconds"] <= 0))):
         raise ValueError("Budget must be positive, finite; actions must be an integer")
+    validate_settings(resolved)
+    if budget["actions"] % resolved["ppo"]["n_steps"]:
+        raise ValueError("Effective action allocation must align with rollout size")
     boundary = resolved.get("stop_at_boundary")
     if boundary is not None and (not 0 < boundary < budget["actions"] or boundary % resolved["ppo"]["n_steps"]):
         raise ValueError("stop_at_boundary must be an interior rollout boundary")
@@ -137,7 +141,7 @@ def reconcile(directory):
         for key, amount in reservation.items():
             state["consumed"][key] = state["consumed"].get(key, 0) + amount
         state["reservation"] = {}
-        state["consumption_uncertain"] = bool(reservation) or state.get("consumption_uncertain", False)
+        state["consumption_uncertain"] = any(amount>0 for amount in reservation.values()) or state.get("consumption_uncertain", False)
         state.update(status="interrupted", stop_reason="worker_missing; outstanding reservation conservatively charged")
         write_json(directory / "state.json", state)
     return state
@@ -155,7 +159,8 @@ def training_summary(directory, state=None):
         sources.append(pointer)
         generation = read_json(pointer).get('current')
         if generation:
-            if Path(generation).name != generation: raise ValueError('Invalid published generation')
+            if Path(generation).name != generation:
+                raise ValueError('Invalid published generation')
             path = directory / 'checkpoints' / generation / 'metadata.json'
             sources.append(path)
             checkpoint = dict(generation=generation, policy_present=path.with_name('policy.zip').is_file(), **read_json(path))
@@ -164,7 +169,8 @@ def training_summary(directory, state=None):
     workers = []
     records = {w['token']: w for w in state.get('workers', [])}
     tokens = list(records)
-    if state.get('worker_token') and state['worker_token'] not in tokens: tokens.append(state['worker_token'])
+    if state.get('worker_token') and state['worker_token'] not in tokens:
+        tokens.append(state['worker_token'])
     for token in tokens:
         path = directory / token / 'progress.csv'
         recent, first, latest, rows, incomplete = deque(maxlen=5), {}, {}, 0, 0
@@ -172,19 +178,22 @@ def training_summary(directory, state=None):
             sources.append(path)
             lines = path.read_text(encoding='utf-8').splitlines(keepends=True)
             if lines and not lines[-1].endswith('\n'):
-                lines.pop(); incomplete += 1
+                lines.pop()
+                incomplete += 1
             for row in csv.DictReader(lines, strict=True):
                 if None in row or any(v is None for v in row.values()):
                     raise ValueError('Malformed progress.csv row: ' + str(path))
                 step = float(row['time/total_timesteps'])
-                if not math.isfinite(step): raise ValueError('Nonfinite logged step')
+                if not math.isfinite(step):
+                    raise ValueError('Nonfinite logged step')
                 values = {k: float(row[k]) for k in metrics if row.get(k) not in (None, '')}
                 values = {k: v if math.isfinite(v) else None for k, v in values.items()}
                 record = dict(logged_step=step, metrics=values)
                 for key, value in values.items():
                     first.setdefault(key, dict(logged_step=step, value=value))
                     latest[key] = dict(logged_step=step, value=value)
-                rows += 1; recent.append(record)
+                rows += 1
+                recent.append(record)
         worker = records.get(token, {})
         workers.append(dict(token=token, current_worker=token == state.get('worker_token'),
             before_step=worker.get('before', {}).get('num_timesteps'),
@@ -225,15 +234,16 @@ def status(run_id):
     config = read_json(directory / "config.json")
     result = dict(state, run_id=run_id, artifacts=str(directory), worker_alive=worker_alive(directory))
     result["remaining"] = {"actions": max(0, config["budget"]["actions"] - state["consumed"]["attempted_actions"]),
-                           "active_seconds": max(0, config["budget"]["active_seconds"] - state["consumed"]["active_seconds"])}
+                           "active_seconds": None if config["budget"]["active_seconds"] is None else max(0, config["budget"]["active_seconds"] - state["consumed"]["active_seconds"])}
     result['training_summary'] = training_summary(directory, state)
     return result
 
 
 def launch(directory, state, interpreter):
     token = uuid.uuid4().hex
-    state.update(status="starting", worker_token=token, reservation={
-        "active_seconds": max(0, read_json(directory / "config.json")["budget"]["active_seconds"] - state["consumed"]["active_seconds"])})
+    state.update(status="starting", worker_token=token, reservation={})
+    state['failure_stage']='worker launch'
+    state['physical_worker_launches'] = state.get('physical_worker_launches', 0) + 1
     write_json(directory / "state.json", state)
     (directory / "stop.json").unlink(missing_ok=True)
     # Read only OS paths needed by Python/DLL loading. No credential or model
@@ -267,19 +277,23 @@ def launch(directory, state, interpreter):
     return dict(run_id=directory.name, status="starting", pid=process.pid, artifacts=str(directory))
 
 
+def _missing_config():
+    raise ValueError('Complete frozen research configuration required')
+
+
 def merge_overrides(training=None, reward=None, *, defaults=None):
-    """Single owner for public override validation and default resolution."""
-    import copy
-    defaults=defaults if defaults is not None else read_json(Path(__file__).with_name('config.json'))
-    training, reward = training or {}, reward or {}
-    supported=set(defaults['ppo'])-{'device','verbose','use_sde','sde_sample_freq'}
-    if set(training)-supported or set(reward)-set(defaults['reward']):
-        raise ValueError('Unknown or unsupported PPO/reward override')
-    result=copy.deepcopy(defaults)
-    result['ppo'].update(training); result['reward'].update(reward)
+    from tools.research.config import rl_configuration
+    if defaults is None:
+        return _missing_config()
+    return rl_configuration(defaults, training, reward)
+
+
+def validate_settings(result):
+    """Algorithm validation only; never loads or composes default files."""
     p=result['ppo']
     for key in ('n_steps','batch_size','n_epochs'):
-        if type(p[key]) is not int or p[key]<1: raise ValueError('Positive integer PPO '+key+' required')
+        if type(p[key]) is not int or p[key]<1:
+            raise ValueError('Positive integer PPO '+key+' required')
     if p['n_steps']<2 or p['batch_size']<2 or p['batch_size']>p['n_steps'] or p['n_steps']%p['batch_size']:
         raise ValueError('PPO minibatches must divide single-environment rollout')
     for key in ('gamma','gae_lambda'):
@@ -287,34 +301,40 @@ def merge_overrides(training=None, reward=None, *, defaults=None):
             raise ValueError('PPO '+key+' must be in [0,1]')
     for key in ('learning_rate','clip_range','clip_range_vf','ent_coef','vf_coef','max_grad_norm','target_kl'):
         v=p[key]
-        if v is None and key in ('clip_range_vf','target_kl'): continue
+        if v is None and key in ('clip_range_vf','target_kl'):
+            continue
         if isinstance(v,dict) and key in ('learning_rate','clip_range','clip_range_vf'):
-            if set(v)!={'kind','initial','final'} or v['kind']!='linear': raise ValueError('Invalid linear schedule')
+            if set(v)!={'kind','initial','final'} or v['kind']!='linear':
+                raise ValueError('Invalid linear schedule')
             values=[v['initial'],v['final']]
-        else: values=[v]
+        else:
+            values=[v]
         if any(not isinstance(x,(float,int)) or not math.isfinite(x) or x<0 for x in values):
             raise ValueError('Invalid PPO '+key)
-    if type(p['normalize_advantage']) is not bool: raise ValueError('normalize_advantage must be boolean')
+    if type(p['normalize_advantage']) is not bool:
+        raise ValueError('normalize_advantage must be boolean')
     kwargs=p['policy_kwargs']
-    if set(kwargs)-{'net_arch','log_std_init'}: raise ValueError('Unsupported policy_kwargs')
+    if set(kwargs)-{'net_arch','log_std_init'}:
+        raise ValueError('Unsupported policy_kwargs')
     arch=kwargs.get('net_arch',{})
     if set(arch)!={'pi','vf'} or any(not isinstance(v,list) or not v or any(type(n)is not int or not 1<=n<=256 for n in v) for v in arch.values()):
         raise ValueError('policy net_arch requires bounded pi/vf layer widths')
-    if not math.isfinite(kwargs.get('log_std_init',0)): raise ValueError('Invalid log_std_init')
+    if not math.isfinite(kwargs.get('log_std_init',0)):
+        raise ValueError('Invalid log_std_init')
     for key,v in result['reward'].items():
         if not isinstance(v,(int,float)) or not math.isfinite(v) or (v>0 if key=='failure_penalty' else v<0):
             raise ValueError('Invalid reward weight '+key)
-    result['requested_overrides']=dict(training=training,reward=reward)
+    for group in ('observation', 'action'):
+        if any(not isinstance(v, (int, float)) or not math.isfinite(v) or v <= 0 for v in result[group].values()):
+            raise ValueError('Positive finite normalization/action scales required')
     return result
 
 
 def start(config=None, run_id=None, interpreter=PYTHON):
     resolved = resolve_config(config)
     directory = run_path(run_id or uuid.uuid4().hex)
-    if directory.exists(): raise FileExistsError('Run already exists; use recorded receipt/status')
-    from tools.rl.env import TensionEnv
-    env=TensionEnv(resolved)
-    env.close()  # Compile and validate; zero physical steps, before worker launch.
+    if directory.exists():
+        raise FileExistsError('Run already exists; use recorded receipt/status')
     directory.mkdir(parents=True, exist_ok=False)
     write_json(directory / "config.json", resolved)
     state = dict(status="stopped", worker_token=None, consumed=dict(attempted_actions=0, completed_actions=0,
@@ -324,11 +344,36 @@ def start(config=None, run_id=None, interpreter=PYTHON):
         return launch(directory, state, interpreter)
 
 
-def stop(run_id):
+def continue_stage(config, run_id, interpreter=PYTHON):
+    from tools.rl.continuation import published_checkpoint, validate_compatibility
+    resolved = resolve_config(config)
+    lineage = resolved['lineage']
+    parent = Path(lineage['directory'])
+    if worker_alive(parent):
+        raise ValueError('PARENT_WORKER_MUST_HAVE_EXITED')
+    source = read_json(parent/'config.json')
+    published_checkpoint(parent, source, lineage['checkpoint'])
+    validate_compatibility(source, resolved)
+    return start(resolved, run_id, interpreter)
+
+
+def stop(run_id, force=False):
     directory = run_path(run_id)
     state = status(run_id)
     if not state["worker_alive"]:
         raise RuntimeError("No live worker to stop")
+    if force:
+        identity=read_json(directory/'launch.json')
+        if process_birth(identity['pid'])!=identity['birth']:
+            raise RuntimeError('Owned process identity changed; termination rejected')
+        # The worker's kill-on-close job also contains any children. Never match names.
+        if os.name == 'nt':
+            subprocess.run(['taskkill','/PID',str(identity['pid']),'/T','/F'],check=True,
+                capture_output=True,creationflags=getattr(subprocess,'CREATE_NO_WINDOW',0))
+        else:
+            import signal
+            os.kill(identity['pid'],signal.SIGKILL)
+        return dict(run_id=run_id,status='termination_requested',owned_pid=identity['pid'])
     write_json(directory / "stop.json", dict(token=state["worker_token"], reason="user_stop"))
     return dict(run_id=run_id, status="stopping", stop_request=str(directory / "stop.json"))
 
@@ -341,7 +386,7 @@ def resume(run_id, interpreter=PYTHON):
             raise RuntimeError("Duplicate worker rejected: previous worker has not exited")
         config = read_json(directory / "config.json")
         if (state["consumed"]["attempted_actions"] >= config["budget"]["actions"]
-                or state["consumed"]["active_seconds"] >= config["budget"]["active_seconds"]):
+                or (config["budget"]["active_seconds"] is not None and state["consumed"]["active_seconds"] >= config["budget"]["active_seconds"])):
             raise RuntimeError("Original shared campaign budget exhausted; verification may be incomplete" +
                                ("; unflushed consumption remains uncertain" if state["consumption_uncertain"] else ""))
         from tools.rl.train import valid_checkpoint
@@ -361,7 +406,7 @@ def diagnose(capture, output=None, replay=False, config=None):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("command", choices=["start", "status", "stop", "resume", "evaluate", "diagnose", "_worker"])
+    parser.add_argument("command", choices=["start", "continue", "status", "stop", "resume", "evaluate", "diagnose", "_worker"])
     parser.add_argument("--run-id")
     parser.add_argument("--config", type=Path)
     parser.add_argument("--policy", type=Path)
@@ -369,18 +414,35 @@ def main():
     parser.add_argument("--output", type=Path)
     parser.add_argument("--source-root", type=Path)
     parser.add_argument("--replay", action="store_true")
+    parser.add_argument("--force", action="store_true")
     parser.add_argument("--token")
     args = parser.parse_args()
     if args.command == "_worker":
         started = time.perf_counter()  # includes heavy module imports
         directory=run_path(args.run_id)
-        state=read_json(directory/'state.json');state['failure_stage']='launch/dependency import';write_json(directory/'state.json',state)
-        from tools.rl.train import worker
-        worker(directory, args.token, started)
+        state=read_json(directory/'state.json')
+        state['failure_stage']='launch/dependency import'
+        write_json(directory/'state.json',state)
+        try:
+            from tools.service_execution import contain_worker_children
+            contain_worker_children()
+            from tools.rl.train import worker
+            worker(directory, args.token, started)
+        except BaseException as error:
+            state = read_json(directory/'state.json')
+            state.update(status='failed', error=f'{type(error).__name__}: {error}',
+                stop_reason='worker_boot_failed', reservation={})
+            state['consumed']['active_seconds'] += time.perf_counter()-started
+            write_json(directory/'state.json', state)
+            raise
         return
     if args.command == "start":
         result = start(args.config, args.run_id)
-    elif args.command in ("status", "stop", "resume"):
+    elif args.command == "continue":
+        result = continue_stage(args.config, args.run_id)
+    elif args.command == 'stop':
+        result = stop(args.run_id,force=args.force)
+    elif args.command in ("status", "resume"):
         result = globals()[args.command](args.run_id)
     elif args.command == "evaluate":
         result = evaluate(args.policy, args.output, args.source_root)

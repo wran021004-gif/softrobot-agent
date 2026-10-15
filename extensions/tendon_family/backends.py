@@ -186,7 +186,10 @@ class MujocoBackend(SerialBackend):
             return dict(tip=data.site_xpos[model.site('tip_site').id].copy(),Jtip=J[:,vi],lengths=data.ten_length[tids].copy(),Jlength=jac[tids][:,vi])
         complete=True; reason=None
         for step in range(round(s['duration_s']/dt)):
-            if time.perf_counter()-start>timeout_s: complete=False; reason='MUJOCO_SOLVER_TIMEOUT'; break
+            if timeout_s is not None and time.perf_counter()-start>timeout_s:
+                complete=False
+                reason='MUJOCO_SOLVER_TIMEOUT'
+                break
             update_start=time.perf_counter()
             t=step*dt; g=current()
             if s['control']['mode'] in ('gvs_nmpc',):

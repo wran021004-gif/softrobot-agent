@@ -226,7 +226,7 @@ class Store:
         for row in db.execute("SELECT resources FROM calls WHERE status IN ('running','unknown')"):
             for name in json.loads(row[0]):
                 occupied[name] = occupied.get(name, 0) + 1
-        return dict(limit=limit, used=used, remaining={k: max(0, limit[k] - used[k]) for k in limit}, occupied=occupied)
+        return dict(limit=limit, used=used, remaining={k: None if limit[k] is None else max(0, limit[k] - used[k]) for k in limit}, occupied=occupied)
 
     def phase_remaining(self, run_id, db=None):
         """Opt-in phase ceilings and downstream reservations, in the shared ledger."""
@@ -273,12 +273,14 @@ class Store:
         parent = session['snapshot'].get('parent_run_id')
         for scope in ([None, run_id, parent] if parent else [None, run_id]):
             limits.append(('project' if scope is None else 'session', self.remaining(scope, db)['remaining']))
-        return dict(remaining={k:max(0,min(values[k] for _,values in limits)) for k in zero()},
+        return dict(remaining={k: min((values[k] for _,values in limits if values[k] is not None), default=None) for k in zero()},
                     constraints=[dict(scope=name,remaining=values) for name,values in limits],
                     reservations='Running/unknown calls are charged at reservation until sealed; included once in ledger usage.')
 
     def reserve(self, run_id, request_id, request_hash, caller, cost, resources=(), cache_key=None, parent=None, inputs=(), kind='tool', version=VERSION, guard=None):
         Budget.model_validate(cost)
+        if any(value is None for value in cost.values()):
+            raise ValueError('RESERVATIONS_REQUIRE_NUMERIC_COSTS; NULL_IS_A_LIMIT_ONLY')
         with self.transaction() as db:
             old = self.lookup(run_id, request_id, db)
             if old:
@@ -289,7 +291,7 @@ class Store:
                 guard(db)  # Scope/count validation and state update share this reservation transaction.
             parent_run = self.session(run_id, db)['snapshot'].get('parent_run_id')
             for constraint in self.spendable(run_id, db)['constraints']:
-                if any(cost[k] > constraint['remaining'][k] + 1e-9 for k in cost):
+                if any(constraint['remaining'][k] is not None and cost[k] > constraint['remaining'][k] + 1e-9 for k in cost):
                     raise ValueError('BUDGET_EXHAUSTED: ' + constraint['scope'])
             available = self.config(db)['exclusive_resources']
             occupied = self.remaining(None, db)['occupied']

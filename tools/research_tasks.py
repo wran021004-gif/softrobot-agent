@@ -24,6 +24,15 @@ class ResearchTaskAdapter:
     def task(self):
         return self.configuration['task']
 
+    def holding_start_s(self):
+        settling=self.configuration['policy']['controller']['parameters']['data']['settling']
+        return self.task['timing']['duration_s']-settling['window_s']
+
+    def ranking_limits(self):
+        settling=self.configuration['policy']['controller']['parameters']['data']['settling']
+        return dict(terminal_error_m=self.task['evaluator']['parameters']['data']['tolerance_m'],
+            holding_max_error_m=settling['position_limit_m'],holding_max_speed_m_s=settling['speed_limit_m_s'])
+
     def reference_at(self, times):
         """Use existing timed-reference semantics; a reach target is constant."""
         import numpy as np
@@ -246,7 +255,8 @@ def aggregate_acceptance(records, scheduled, *, schedule=None, evidence_policy=N
         raise ValueError('DECLARED_FRESHNESS_POLICY_REQUIRED')
     if any('fresh_required' in s and type(s['fresh_required']) is not bool for s in (schedule or [])):
         raise ValueError('DECLARED_SLOT_FRESHNESS_REQUIRED')
-    def slot_key(row):return (row.get('case_id'),row.get('seed'),row.get('repetition'))
+    def slot_key(row):
+        return (row.get('case_id'),row.get('seed'),row.get('repetition'))
     if schedule is not None and len({slot_key(s) for s in schedule}) != scheduled:
         raise ValueError('DUPLICATE_SCHEDULE_SLOT')
     results = [r['acceptance'] for r in records if r.get('acceptance')]
@@ -280,7 +290,8 @@ def aggregate_acceptance(records, scheduled, *, schedule=None, evidence_policy=N
         source_issues=[]
         for kind in ('evaluation','profile'):
             expected=((result or {}).get('sources') or {}).get(kind)
-            if record.get(kind) and record[kind]!=expected:source_issues.append(kind)
+            if record.get(kind) and record[kind]!=expected:
+                source_issues.append(kind)
         declaration=next((s for s in (schedule or []) if slot==slot_key(s)), {})
         fresh_required=declaration.get('fresh_required', policy.get('require_fresh_repetitions', True))
         # Reuse is protocol evidence, never a fresh repetition. An explicit
@@ -327,14 +338,16 @@ def comparison_prerequisites(candidate, incumbent):
     differ. Historical aggregates remain readable, but raw receipts are needed
     to re-establish executable comparison prerequisites.
     """
-    issues=[]; seen=set()
+    issues=[]
+    seen=set()
     if candidate.get('comparison_scope') != incumbent.get('comparison_scope'):
         issues.append(dict(reason='INCOMPATIBLE_COMPARISON_SCOPE'))
     if candidate.get('evidence_policy') != incumbent.get('evidence_policy'):
         issues.append(dict(reason='INCOMPATIBLE_EVIDENCE_POLICY'))
     indexed=[]
     for role, group in [('candidate',candidate),('incumbent',incumbent)]:
-        schedule=group.get('schedule'); entries=group.get('entries',[])
+        schedule=group.get('schedule')
+        entries=group.get('entries',[])
         key=lambda r:(r.get('case_id'),r.get('seed'),r.get('repetition'))
         required={key(r) for r in (schedule or [])}
         actual={key(r) for r in entries}
@@ -346,32 +359,42 @@ def comparison_prerequisites(candidate, incumbent):
             issues.append(dict(role=role,reason='DUPLICATE_OR_UNDECLARED_SLOT'))
         counted=0
         for entry in entries:
-            slot=key(entry); result=entry.get('acceptance') or {};receipt=entry.get('receipt') or {}
+            slot=key(entry)
+            result=entry.get('acceptance') or {}
+            receipt=entry.get('receipt') or {}
             eid=receipt.get('execution_id')
             fresh=bool(not entry.get('historical_reuse') and eid and eid not in seen and receipt.get('cache_hit') is False and
                 receipt.get('charged',{}).get('backend_solves')==1 and receipt.get('tool_id')=='simulation.run' and
                 receipt.get('original_execution_id') in (None,eid))
-            if eid:seen.add(eid)
+            if eid:
+                seen.add(eid)
             declaration=next((s for s in (schedule or []) if key(s)==slot), {})
             policy=group.get('evidence_policy') or {}
             fresh_required=declaration.get('fresh_required',policy.get('require_fresh_repetitions',True))
             reuse=bool(not fresh_required and policy.get('allow_historical_reuse') and entry.get('historical_reuse'))
             reason=None
-            if not eid or eid!=result.get('execution_id') or receipt.get('tool_id')!='simulation.run':reason='EXECUTION_RECEIPT_BINDING_MISMATCH'
-            elif entry.get('source_binding_issues'):reason='ACCEPTANCE_SOURCE_BINDING_MISMATCH'
-            elif receipt.get('execution_status')!='completed':reason='EXECUTION_NOT_COMPLETE'
-            elif not fresh and not reuse:reason='REQUIRED_FRESH_REPETITION_ABSENT'
+            if not eid or eid!=result.get('execution_id') or receipt.get('tool_id')!='simulation.run':
+                reason='EXECUTION_RECEIPT_BINDING_MISMATCH'
+            elif entry.get('source_binding_issues'):
+                reason='ACCEPTANCE_SOURCE_BINDING_MISMATCH'
+            elif receipt.get('execution_status')!='completed':
+                reason='EXECUTION_NOT_COMPLETE'
+            elif not fresh and not reuse:
+                reason='REQUIRED_FRESH_REPETITION_ABSENT'
             elif result.get('status') not in ('accepted','valid_failure') or result.get('accepted') is not (result.get('status')=='accepted'):
                 reason='OUTCOME_NOT_INTERPRETABLE'
             elif result.get('task_family')!=group['task_family'] or result.get('protocol_id')!=group['protocol_id']:
                 reason='TASK_PROTOCOL_MISMATCH'
-            elif _outcome_issue(result):reason=_outcome_issue(result)
+            elif _outcome_issue(result):
+                reason=_outcome_issue(result)
             elif _source_issue(result, entry.get('source_evidence')):
                 reason=_source_issue(result, entry.get('source_evidence'))
             elif any(not _number(result['metrics'].get(n)) for n in group.get('metrics',{})):
                 reason='METRIC_MISSING_OR_UNINTERPRETABLE'
-            if reason:issues.append(dict(role=role,slot=list(slot),reason=reason))
-            else:counted+=result['accepted'] is True
+            if reason:
+                issues.append(dict(role=role,slot=list(slot),reason=reason))
+            else:
+                counted+=result['accepted'] is True
         if counted!=group['accepted'] or group['joint_acceptance_fraction']!=group['accepted']/group['scheduled']:
             issues.append(dict(role=role,reason='AGGREGATE_COUNT_MISMATCH'))
         indexed.append({key(e):e.get('acceptance') or {} for e in entries})
@@ -437,7 +460,8 @@ def stop_interpretation(result, reason, *, budget_exhausted=False, remaining_wor
              reason in ('predeclared_policy','voluntary_stop','limited_value','engineering_blocker'))
     checked=[]
     for assertion in assertions:
-        resource=assertion.get('resource');field=assertion.get('field')
+        resource=assertion.get('resource')
+        field=assertion.get('field')
         values=(operational or {}).get(field) if field in (
             'executable_capacity','plan_shortfall','actual_shortfall') else None
         observed=values.get(resource) if isinstance(values,dict) else None

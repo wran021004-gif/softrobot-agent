@@ -13,22 +13,27 @@ def execute(request):
     child.create(request['configuration'],parent_run_id=request['study'])
     trace=RECORD_UPDATE_IDS.set(tuple(request['recording']['update_ids']))
     capture=COMPLETE_UPDATE_INPUTS.set(request['recording']['complete_update_inputs'])
-    try: return complete_execution(child,request['configuration'],request['candidate_id'])
+    try:
+        return complete_execution(child,request['configuration'],request['candidate_id'])
     finally:
-        RECORD_UPDATE_IDS.reset(trace); COMPLETE_UPDATE_INPUTS.reset(capture)
+        RECORD_UPDATE_IDS.reset(trace)
+        COMPLETE_UPDATE_INPUTS.reset(capture)
 
 
 def main():
     job=contain_worker_children()  # Retain the handle throughout the worker lifetime.
-    path=Path(sys.argv[1]); request=read(path)
+    path=Path(sys.argv[1])
+    request=read(path)
     try:
         if request.get('kind')=='candidate_analysis':
             from tools.research.analysis import calculate
             value=calculate(request['configuration'],request['binding'],request['query'],request.get('exact_point'))
-        else:value=execute(request)
+        else:
+            value=execute(request)
     except Exception as exc:
         value=dict(status='execution_incomplete',error=type(exc).__name__,reason=str(exc))
     atomic_json(path.with_name('result.json'),value)
 
 
-if __name__=='__main__': main()
+if __name__=='__main__':
+    main()

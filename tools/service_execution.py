@@ -21,6 +21,15 @@ def _run_contained(command, log, timeout_s):
         process.wait(timeout=5)
         exc.termination_confirmed=True
         raise
+    except BaseException:
+        # Manual interruption cancels the exact owned tree even without a timer.
+        if os.name=='nt':
+            _terminate_worker_job(process,job_name)
+            process.wait(timeout=5)
+        else:
+            os.killpg(process.pid,signal.SIGKILL)
+            process.wait(timeout=5)
+        raise
     finally:
         if os.name!='nt':
             try:os.killpg(process.pid,signal.SIGKILL)

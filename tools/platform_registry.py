@@ -13,7 +13,10 @@ from schemas.platform import Payload, Binding, VERSION
 from schemas.platform_math import MathematicalModel, ModelRequirement
 from tools.paths import ROOT
 from tools.state_io import digest
-from tools.artifact_tools import file_hash
+import hashlib
+
+def file_hash(path):
+    return hashlib.sha256(Path(path).read_bytes()).hexdigest()
 
 
 # A single registry and routing namespace: mathematical models retain the
@@ -41,7 +44,6 @@ class Extension:
     cache: bool = False
     side_effects: str = 'none'
     capabilities: dict = field(default_factory=dict)
-    legacy_service: object | None = None
 
     def hook(self, name):
         """Resolve an optional trusted capability binding (never request input)."""
@@ -178,9 +180,6 @@ def dependency_identity(definition):
     if definition.binding:
         paths.add(definition.binding.split(':')[0].replace('.', '/') + '.py')
     paths.update(('schemas/platform.py', 'schemas/platform_math.py', 'schemas/common.py', 'tools/platform_registry.py', 'tools/platform_host.py', 'tools/platform_store.py', 'tools/platform_validation.py'))
-    if definition.legacy_service is not None:
-        paths.update(('tools/tool_registry.py', 'tools/service_execution.py', 'tools/service_worker.py',
-                      'schemas/public_tools.py', 'extensions/services/manifest.py'))
     # Legacy declarations are bounded to their owning module, never the workspace.
     conservative = not definition.sources
     versions = {}

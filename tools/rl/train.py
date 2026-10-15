@@ -42,8 +42,7 @@ def digest(value):
     return result.hexdigest()
 
 
-def config_digest(config):
-    return hashlib.sha256(json.dumps(config, sort_keys=True).encode()).hexdigest()
+from tools.rl.continuation import config_digest, published_checkpoint
 
 
 def optimizer_steps(model):
@@ -53,7 +52,7 @@ def optimizer_steps(model):
 def snapshot(model):
     progress = model._current_progress_remaining
     return dict(policy_sha256=digest(model.policy.state_dict()), optimizer_sha256=digest(model.policy.optimizer.state_dict()),
-                num_timesteps=model.num_timesteps, optimization_epochs=model._n_updates,
+                num_timesteps=model.num_timesteps, lifetime_timesteps=model.num_timesteps+getattr(model,"runtime_lifetime_offset",0), optimization_epochs=model._n_updates,
                 rollout_optimizations=getattr(model, "runtime_rollouts", 0), optimizer_steps=optimizer_steps(model),
                 schedule=dict(total_timesteps=model._total_timesteps, progress_remaining=progress,
                               learning_rate=float(model.lr_schedule(progress)), clip_range=float(model.clip_range(progress)),
@@ -78,18 +77,7 @@ def valid_checkpoint(directory, config):
         if not generation:
             continue
         try:
-            path = directory / "checkpoints" / generation
-            metadata = read_json(path / "metadata.json")
-            if metadata["config_sha256"] != config_digest(config):
-                raise ValueError("immutable configuration mismatch")
-            if metadata["policy_file_sha256"] != hashlib.sha256((path / "policy.zip").read_bytes()).hexdigest():
-                raise ValueError("policy file digest mismatch")
-            inherited = metadata["inherited"]
-            schedule = inherited["schedule"]
-            horizon = config["budget"]["actions"]
-            if (schedule["total_timesteps"] != horizon or inherited["num_timesteps"] > horizon
-                    or not math.isclose(schedule["progress_remaining"], 1 - inherited["num_timesteps"] / horizon, abs_tol=1e-12)):
-                raise ValueError("original schedule horizon/progress mismatch")
+            path, metadata = published_checkpoint(directory, config, generation)
             return path, metadata
         except (OSError, KeyError, ValueError) as error:
             errors.append(f"{generation}: {error}")
@@ -177,7 +165,7 @@ class WorkerContext:
         self.state["consumed"] = consumed
         pending = max(0, self.reserved_actions - (self.env.counts["attempted_actions"] if self.env else 0))
         self.state["reservation"] = dict(attempted_actions=pending, attempted_physics_steps=pending * (self.env.substeps if self.env else 0),
-                active_seconds=max(0, self.config["budget"]["active_seconds"] - consumed["active_seconds"]))
+                active_seconds=0.)
         write_json(self.directory / "state.json", self.state)
 
     def stop_requested(self):
@@ -188,7 +176,7 @@ class WorkerContext:
         cost = self.consumed()
         if cost["attempted_actions"] >= self.config["budget"]["actions"]:
             raise ControlledStop("action_budget; partial rollout was not optimized")
-        if cost["active_seconds"] >= self.config["budget"]["active_seconds"]:
+        if self.config["budget"]["active_seconds"] is not None and cost["active_seconds"] >= self.config["budget"]["active_seconds"]:
             raise ControlledStop("active_time_budget")
         if self.stop_requested():
             raise ControlledStop("user_stop; partial rollout was not optimized")
@@ -212,7 +200,7 @@ class WorkerContext:
         cost = self.consumed()
         if cost["attempted_actions"] >= self.config["budget"]["actions"]:
             raise ControlledStop("action_budget")
-        if cost["active_seconds"] >= self.config["budget"]["active_seconds"]:
+        if self.config["budget"]["active_seconds"] is not None and cost["active_seconds"] >= self.config["budget"]["active_seconds"]:
             raise ControlledStop("active_time_budget")
         if self.stop_requested():
             raise ControlledStop("user_stop")
@@ -230,7 +218,7 @@ class WorkerContext:
     def before_optimization(self):
         self.state['failure_stage']='policy optimization'
         self.flush()
-        if self.consumed()["active_seconds"] >= self.config["budget"]["active_seconds"]:
+        if self.config["budget"]["active_seconds"] is not None and self.consumed()["active_seconds"] >= self.config["budget"]["active_seconds"]:
             raise ControlledStop("active_time_budget; full rollout was not optimized")
 
 
@@ -254,6 +242,9 @@ def worker(directory, token, started):
             context.state["inherited"] = context.restored
             context.state["latest_checkpoint"] = str(path)
             context.state["recovered_from_generation"] = path.name
+        elif context.config.get('lineage'):
+            from tools.rl.continuation import initialize
+            context.model = initialize(RuntimePPO, context.env, context.config, directory)
         else:
             settings = context.config["ppo"].copy()
             for key in ("learning_rate", "clip_range", "clip_range_vf"):
@@ -288,7 +279,7 @@ def worker(directory, token, started):
         if context.model is not None:
             after = snapshot(context.model)
             record = dict(token=token, before=context.before, after=after,
-                          attempted_actions=context.env.counts["attempted_actions"],
+                          attempted_actions=context.env.counts["attempted_actions"] if context.env else 0,
                           active_seconds=time.perf_counter() - started,
                           parameter_change_l2=float(torch.linalg.vector_norm(
                               torch.nn.utils.parameters_to_vector(context.model.policy.parameters()).detach() - context.initial_parameters))
@@ -303,6 +294,6 @@ def worker(directory, token, started):
         context.state.update(status=outcome, stop_reason=reason, reservation={})
         context.state.pop("awaiting_stop_at_boundary", None)
         context.state["consumed"] = context.consumed()
-        context.state["active_time_overrun_s"] = max(0, context.state["consumed"]["active_seconds"] - context.config["budget"]["active_seconds"])
+        context.state["active_time_overrun_s"] = None if context.config["budget"]["active_seconds"] is None else max(0, context.state["consumed"]["active_seconds"] - context.config["budget"]["active_seconds"])
         write_json(directory / "state.json", context.state)
         print(json.dumps(dict(status=outcome, stop_reason=reason, consumed=context.state["consumed"])))

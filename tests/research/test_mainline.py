@@ -16,7 +16,18 @@ from tools.research.contracts import Search,AnalysisRequest
 
 class MainlineTests(unittest.TestCase):
     def setUp(self):
-        self.tmp=tempfile.TemporaryDirectory(dir=ROOT/'runs')
+        # Python's Windows 0700 temporary-directory ACL excludes sandbox readers.
+        # A normal workspace directory inherits the workspace access contract.
+        from uuid import uuid4
+        import shutil
+        folder=ROOT/'runs'/('fixture-'+uuid4().hex)
+        folder.mkdir()
+        def cleanup():
+            resolved=folder.resolve()
+            if resolved.parent!=(ROOT/'runs').resolve():
+                raise ValueError('Fixture cleanup must stay inside workspace runs')
+            shutil.rmtree(resolved)
+        self.tmp=SimpleNamespace(name=str(folder),cleanup=cleanup)
         self.spec=resolve(ROOT/'configs/research/study.json');self.cfg=deepcopy(self.spec['configuration'])
         self.host=SimpleNamespace(store=Store(Path(self.tmp.name)),run_id=self.cfg['run_id'],actor='fixture')
         fixture_id=Path(self.tmp.name).name
@@ -88,7 +99,7 @@ class MainlineTests(unittest.TestCase):
         from tools.service_execution import _run_contained
         q=plain(AnalysisRequest(candidate=self.candidate,operation='controllability',operating_point='target_equilibrium',
             protocol=self.spec['analysis_protocol'],scoring_window_s=.35))
-        key='recovery-fixture-analysis';cap=self.spec['analysis_cap_s']
+        key='recovery-fixture-analysis';cap=0.
         self.host.store.reserve(self.host.run_id,key,digest(q),self.host.actor,{**zero(),'wall_s':cap})
         folder=Path(self.tmp.name)/'analysis';folder.mkdir()
         atomic_json(folder/'boundary.json',dict(termination_confirmed=True,elapsed_s=.4,returncode=0))
@@ -113,13 +124,15 @@ class MainlineTests(unittest.TestCase):
         self.assertIn('held input',metadata['held_position_min_eigenvalue']['supported_interpretation'])
         self.assertIn('damping margin or decay rate',metadata['held_position_min_eigenvalue']['unsupported_conclusions'])
 
-    def test_rl_hard_cap_remaining_time_and_environment(self):
-        runtime=self.spec['runtime'];update(self.host,rl_runs={},spec=self.spec,numerical_s=self.spec['budgets']['numerical_s']-119)
-        self.assertEqual(rl.evaluation_capacity(self.host)['admitted'],0)
+    def test_disabled_time_and_environment(self):
+        runtime=self.spec['runtime']
+        update(self.host,rl_runs={},spec=self.spec,numerical_s=1e12)
+        self.assertEqual(rl.evaluation_capacity(self.host)['admitted'],1)
         with patch.object(rl.subprocess,'run',return_value=SimpleNamespace(returncode=0,stdout='{}')) as invoked:
-            rl.invoke(self.host,'evaluate','fixture',deadline=time.time()+1000,timeout_s=17)
+            rl.invoke(self.host,'evaluate','fixture')
         args=invoked.call_args
-        self.assertEqual(args.args[0][0],runtime['rl_python']);self.assertLessEqual(args.kwargs['timeout'],17)
+        self.assertEqual(args.args[0][0],runtime['rl_python'])
+        self.assertIsNone(args.kwargs['timeout'])
         self.assertEqual(args.kwargs['env']['OPENBLAS_NUM_THREADS'],'1')
         self.assertIn('SOFTROBOT_RL_RUNS',args.kwargs['env'])
 
@@ -137,12 +150,12 @@ class MainlineTests(unittest.TestCase):
     def test_physical_reference_and_rl_seed_have_single_input_owner(self):
         raw=json.loads((ROOT/'configs/research/study.json').read_text())
         runtime=json.loads((ROOT/'configs/research/runtime.json').read_text())
-        self.assertNotIn('segments',raw['reference_parameters']);self.assertNotIn('seed',runtime['rl_defaults'])
+        self.assertNotIn('segments',raw['reference_parameters']);self.assertNotIn('rl_defaults',runtime)
         robot=json.loads((ROOT/'configs/research/robot.json').read_text())['robot']['structure']['data']
         for part in robot['components']:
             if part['kind']=='flexible_segment':
                 self.assertEqual(self.spec['reference_parameters']['segments'][part['id']]['length_m'],part['length_m'])
-        self.assertEqual(self.spec['runtime']['rl_defaults']['seed'],self.cfg['seed'])
+        self.assertEqual(self.spec['control']['rl_defaults']['seed'],self.cfg['seed'])
 
     def test_fixed_total_search_and_static_or_saved_horizon_contracts(self):
         from tools.research.search import coordinate_layout
@@ -181,7 +194,9 @@ class MainlineTests(unittest.TestCase):
         from tools.research_tasks import task_adapter
         self.assertEqual(task_adapter(self.cfg).task['family'],'task.reach')
         from tools.platform_registry import dependency_closure
-        self.assertEqual(len(dependency_closure(registered.extensions.values(),registered)),16)
+        closure=dependency_closure(registered.extensions.values(),registered)
+        self.assertTrue({'controller.gvs_nmpc@11.0.0','backend.family_mujoco@1.1.0','optimization_assembler.gvs_trajectory@1.0.0'}<=set(closure))
+        self.assertTrue(all(v['sources'] for v in closure.values()))
         from extensions.tendon_family.contracts import Data
         self.assertIs(registered.contracts[('family.backend_data','1.0.0')],Data)
         import sys

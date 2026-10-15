@@ -37,7 +37,7 @@ class Search(Contract):
     operating_point: Literal['standardized_initial_pretension','controller_start_input','target_equilibrium','halfway_waypoint']
     scoring_window_s: FiniteFloat = Field(gt=0)
     protocol: TaskAnalysisProtocol
-    max_evaluations: int = Field(ge=1,le=12,strict=True)
+    max_evaluations: int = Field(ge=1,strict=True)
     step: FiniteFloat = Field(default=.25,gt=0,le=.5)
     minimum_step: FiniteFloat = Field(default=.03125,gt=0,le=.5)
 
@@ -53,7 +53,8 @@ class Search(Contract):
             raise ValueError('OBJECTIVE_EVALUATOR_MISMATCH')
         if self.evaluation_mode=='mathematical_proxy' and any('speed_weight' in k for k in self.variables):
             raise ValueError('CONTROL_VARIABLES_REQUIRE_BACKEND_TASK_EVALUATOR')
-        if self.scoring_window_s not in self.protocol.windows_s:raise ValueError('EXPLICIT_DECLARED_SCORE_WINDOW_REQUIRED')
+        if self.scoring_window_s not in self.protocol.windows_s:
+            raise ValueError('EXPLICIT_DECLARED_SCORE_WINDOW_REQUIRED')
         return self
 
 
@@ -63,7 +64,7 @@ class AnalysisRequest(Contract):
     operating_point: Literal['standardized_initial_pretension','controller_start_input','target_equilibrium','halfway_waypoint','saved_state'] = 'halfway_waypoint'
     saved_state: EvidenceRef | None = None
     execution: EvidenceRef | None = None
-    update_id: int | None = Field(default=None,ge=0,le=34,strict=True)
+    update_id: int | None = Field(default=None,ge=0,strict=True)
     protocol: TaskAnalysisProtocol
     scoring_window_s: FiniteFloat | None = Field(default=None,gt=0)
 
@@ -71,15 +72,17 @@ class AnalysisRequest(Contract):
     def exact_state(self):
         if self.operation in ('linearization','controllability') and self.scoring_window_s is None:
             raise ValueError('EXPLICIT_SCORE_WINDOW_REQUIRED')
-        if (self.execution is None)!=(self.update_id is None):raise ValueError('EXECUTION_REQUIRES_UPDATE_ID')
+        if (self.execution is None)!=(self.update_id is None):
+            raise ValueError('EXECUTION_REQUIRES_UPDATE_ID')
         sources=int(self.saved_state is not None)+int(self.execution is not None)
-        if sources>1 or (self.operating_point=='saved_state')!=(sources==1):raise ValueError('SAVED_POINT_REQUIRES_UNAMBIGUOUS_STATE_SOURCE')
+        if sources>1 or (self.operating_point=='saved_state')!=(sources==1):
+            raise ValueError('SAVED_POINT_REQUIRES_UNAMBIGUOUS_STATE_SOURCE')
         return self
 
 
 class LocalDiagnostic(Contract):
     execution: EvidenceRef
-    update_id: int = Field(ge=0,le=34,strict=True)
+    update_id: int = Field(ge=0,strict=True)
     repetitions: int = Field(default=2,ge=1,le=2,strict=True)
     mode: Literal['research_policy', 'research_current'] = 'research_policy'
 
@@ -150,32 +153,33 @@ class EvidenceQuery(Contract):
 
 
 class PPOOverrides(Contract):
-    learning_rate: FiniteFloat | dict = Field(default=.0003)
-    n_steps: int = Field(default=256,ge=2,le=1024,strict=True)
-    batch_size: int = Field(default=64,ge=2,le=1024,strict=True)
-    n_epochs: int = Field(default=10,ge=1,le=20,strict=True)
-    gamma: FiniteFloat = Field(default=.99,ge=0,le=1)
-    gae_lambda: FiniteFloat = Field(default=.95,ge=0,le=1)
-    clip_range: FiniteFloat | dict = .2
+    """Sparse changes. Effective numeric defaults belong to control.json."""
+    learning_rate: FiniteFloat | dict | None = None
+    n_steps: int | None = Field(default=None,ge=2,strict=True)
+    batch_size: int | None = Field(default=None,ge=2,strict=True)
+    n_epochs: int | None = Field(default=None,ge=1,strict=True)
+    gamma: FiniteFloat | None = Field(default=None,ge=0,le=1)
+    gae_lambda: FiniteFloat | None = Field(default=None,ge=0,le=1)
+    clip_range: FiniteFloat | dict | None = None
     clip_range_vf: FiniteFloat | dict | None = None
-    normalize_advantage: bool = True
-    ent_coef: FiniteFloat = Field(default=0,ge=0)
-    vf_coef: FiniteFloat = Field(default=.5,ge=0)
-    max_grad_norm: FiniteFloat = Field(default=.5,gt=0)
+    normalize_advantage: bool | None = None
+    ent_coef: FiniteFloat | None = Field(default=None,ge=0)
+    vf_coef: FiniteFloat | None = Field(default=None,ge=0)
+    max_grad_norm: FiniteFloat | None = Field(default=None,gt=0)
     target_kl: FiniteFloat | None = Field(default=None,gt=0)
-    policy_kwargs: dict = Field(default_factory=dict)
+    policy_kwargs: dict | None = None
 
 
 class RewardOverrides(Contract):
-    position: FiniteFloat = Field(default=1,ge=0)
-    holding_speed: FiniteFloat = Field(default=1,ge=0)
-    smoothness: FiniteFloat = Field(default=.001,ge=0)
-    failure_penalty: FiniteFloat = Field(default=-10000,le=0)
+    position: FiniteFloat | None = Field(default=None,ge=0)
+    holding_speed: FiniteFloat | None = Field(default=None,ge=0)
+    smoothness: FiniteFloat | None = Field(default=None,ge=0)
+    failure_penalty: FiniteFloat | None = Field(default=None,le=0)
 
 
 class RLAllocation(Contract):
     actions: int = Field(ge=1,strict=True)
-    active_seconds: FiniteFloat = Field(gt=0)
+    active_seconds: FiniteFloat | None = Field(default=None,gt=0)
 
 
 class RLReference(Contract):
@@ -188,7 +192,7 @@ class RLReference(Contract):
 
 
 class RLRequest(Contract):
-    operation: Literal['start','status','stop','resume','evaluate','diagnose']
+    operation: Literal['start','continue','status','stop','resume','evaluate','diagnose']
     candidate: EvidenceRef | None = None
     task: EvidenceRef | None = None
     mode: Literal['direct','residual'] | None = None
@@ -201,17 +205,31 @@ class RLRequest(Contract):
     checkpoint: str | None = None
     failure: str | None = None
     replay: bool = False
+    force: bool = False
 
     @model_validator(mode='after')
     def operation_contract(self):
         if self.operation=='start':
-            if self.candidate is None or self.mode is None or self.allocation is None or self.run_id:
-                raise ValueError('START_REQUIRES_CANDIDATE_MODE_ALLOCATION')
-            if (self.mode=='residual')!=(self.reference is not None): raise ValueError('RESIDUAL_REQUIRES_REFERENCE_DIRECT_REQUIRES_NONE')
+            if self.candidate is None or self.run_id:
+                raise ValueError('START_REQUIRES_CANDIDATE; OMITTED_MODE_AND_ALLOCATION_INHERIT_CONFIGURED_DEFAULTS')
+            if any(k in self.model_fields_set and getattr(self,k) is None for k in ('mode','allocation')):
+                raise ValueError('EXPLICIT_NULL_CANNOT_CLEAR_MODE_OR_STEP_ALLOCATION')
+            if (self.mode=='residual')!=(self.reference is not None):
+                raise ValueError('RESIDUAL_REQUIRES_REFERENCE_DIRECT_REQUIRES_NONE')
+        elif self.operation=='continue':
+            if not self.run_id or not self.checkpoint or not self.allocation:
+                raise ValueError('CONTINUE_REQUIRES_EXACT_PARENT_RUN_CHECKPOINT_AND_ADDITIONAL_STEPS')
+            if self.candidate or self.task or self.mode or self.reference:
+                raise ValueError('CONTINUATION_RETAINS_CANDIDATE_TASK_AND_CONTROL_MEANINGS')
         else:
-            if not self.run_id: raise ValueError('RECORDED_RUN_ID_REQUIRED')
+            if not self.run_id:
+                raise ValueError('RECORDED_RUN_ID_REQUIRED')
             if self.candidate or self.task or self.mode or self.reference or self.allocation or self.training_overrides.model_fields_set or self.reward_overrides.model_fields_set:
                 raise ValueError('SUBSEQUENT_OPERATIONS_RETAIN_FROZEN_CONFIGURATION')
-        if self.checkpoint and self.operation!='evaluate': raise ValueError('CHECKPOINT_ONLY_FOR_EVALUATE')
-        if (self.failure or self.replay) and self.operation!='diagnose': raise ValueError('FAILURE_REPLAY_ONLY_FOR_DIAGNOSE')
+        if self.checkpoint and self.operation not in ('evaluate','continue'):
+            raise ValueError('CHECKPOINT_ONLY_FOR_EVALUATE_OR_CONTINUE')
+        if (self.failure or self.replay) and self.operation!='diagnose':
+            raise ValueError('FAILURE_REPLAY_ONLY_FOR_DIAGNOSE')
+        if self.force and self.operation!='stop':
+            raise ValueError('FORCE_ONLY_FOR_OWNED_PROCESS_STOP')
         return self

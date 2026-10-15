@@ -151,7 +151,7 @@ class Budget(Contract):
     model_calls: int = Field(ge=0)
     backend_solves: int = Field(ge=0)
     worker_calls: int = Field(ge=0)
-    wall_s: float = Field(ge=0)
+    wall_s: float | None = Field(ge=0)
 
 
 class ModelLengthRecovery(Contract):
@@ -208,8 +208,8 @@ class ModelConfig(Contract):
 
 
 class OperationAllowance(Contract):
-    timeout_s: float = Field(gt=0)
-    reserve_s: float = Field(gt=0)
+    timeout_s: float | None = Field(gt=0)
+    reserve_s: float | None = Field(gt=0)
 
 
 class ExperimentPolicy(Contract):
@@ -230,7 +230,7 @@ class ExperimentPolicy(Contract):
     allowed_tools: list[Identifier] = Field(default_factory=list)
     tool_bindings: dict[Identifier, str] = Field(default_factory=dict)
     budget: Budget
-    timeout_s: float = Field(gt=0)
+    timeout_s: float | None = Field(gt=0)
     operation_allowances: dict[Identifier, OperationAllowance] = Field(default_factory=dict)
     allow_development_skills: bool = False
     recovery: Literal['sealed_or_unknown_no_replay'] = 'sealed_or_unknown_no_replay'
