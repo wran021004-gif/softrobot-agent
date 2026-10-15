@@ -432,3 +432,24 @@ and its immutable archive. No historical M3-A grant or task threshold changed.
 S1 has 10 structural-linear coordinates / 20 states: removing far-tendon routes
 also removes a tendon-defined structural knot. The original two flexible segments
 and physical mesh remain; no state from a 24-state candidate was transferred.
+
+### Frozen new task instance
+
+`tasks/reach_hold_mirror_v1.json` composes `reach_hold.json` with a distinct
+`family-multisegment-mirror-dev@1.0.0` identity and target `[0.29,-0.035,0.19]` m.
+Evaluator semantics, 10 mm tolerance, 0.35 s duration, 0.05 s inclusive holding
+window, 0.020 m/s speed limit, zero initializer and all sampling phases/grids
+are inherited unchanged. Its task identity is
+`7d4e6bf6bb30eab21cdafbe90f1dc30e201b167d90031b05fe7e44a0eea25c1b`.
+Eight prior immutable archives and ordinary evidence records expose only the
+positive-y target; novelty is limited to the evidence available on this branch.
+Geometric plausibility does not establish unilateral-tension or holding feasibility.
+
+`configs/research/first_feasible_mirror.json` freezes a single new study with
+12 provider requests (3 protected), 60 public operations (10 protected), three
+complete backend launches and ten mathematical evaluations. RL, local replays,
+offline NLP/BDF and extra confirmations are disabled. The Agent may choose
+authorized tendon count/routing, continuous structure and existing control weights,
+mathematics, execution, diagnosis or STOP. No fixed scientific decision sequence
+or mandatory mathematical action is supplied. B1/B2 and older successes are
+explicitly historical context, never fresh acceptance or shared study consumption.

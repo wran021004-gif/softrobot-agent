@@ -80,6 +80,13 @@ def resolve(path, profile=None):
         source = (path.parent / study.pop(key)).resolve()
         inputs[key] = read(source)
         provenance['references'][key] = dict(path=str(source), sha256=digest(inputs[key]))
+        if key=='task' and 'extends' in inputs[key]:
+            base=(source.parent/inputs[key].pop('extends')).resolve()
+            original=read(base)
+            if base.parent!=source.parent or 'extends' in original:
+                raise ValueError('SAME_DIRECTORY_SINGLE_TASK_EXTENSION_REQUIRED')
+            inputs[key]=patch(original,inputs[key])
+            provenance['references']['task_base']=dict(path=str(base),sha256=digest(original))
     if profile:
         study = patch(study, study['validation_profiles'][profile])
         study['selected_validation_profile'] = profile
@@ -119,7 +126,8 @@ def resolve(path, profile=None):
         raise ValueError('COUNT_MODE_REQUIRES_EXPLICIT_DISABLED_SCIENTIFIC_TIMING')
     if study['confirmation']['fresh_independent_repetitions'] != 0:
         raise ValueError('COUNT_MODE_USES_ZERO_EXTRA_CONFIRMATIONS')
-    if (type(study['rl_limits']['training_stages']) is not int or not 1<=study['rl_limits']['training_stages']<=10 or (not profile and study['rl_limits']['training_stages']!=10)):
+    stages=study['rl_limits']['training_stages'];rl='rl' in study['capabilities']
+    if type(stages) is not int or not (1 if rl else 0)<=stages<=10 or (rl and not profile and stages!=10):
         raise ValueError('DECLARED_TRAINING_STAGE_LIMIT_REQUIRED')
     if any(study['rl_limits'][k] is not None for k in ('training_actions', 'training_active_seconds', 'actions_per_trial', 'seconds_per_trial')):
         raise ValueError('NO_AGGREGATE_OR_HIDDEN_PER_STAGE_CEILING_IN_COUNT_MODE')

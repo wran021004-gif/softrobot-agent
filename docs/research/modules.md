@@ -53,3 +53,8 @@ M3-B1 reuses the registered preparation/controller/backend unchanged. The opt-in
 command, saves one genuine update and physical interval per case, and never calls
 the task evaluator. `core.export` now accepts an engineering scope with no research
 decision packet, exporting its actual ledger. No controller/backend was added.
+
+For the new study, `config.resolve` composes one same-directory, single-level task
+source patch and freezes both source fingerprints. Historical sources remain
+unchanged. A study without the RL capability may explicitly declare zero training
+stages; the existing RL-enabled study's stage validation remains in force.

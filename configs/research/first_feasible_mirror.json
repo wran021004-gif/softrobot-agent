@@ -1,0 +1,128 @@
+{
+  "extends": "study.json",
+  "study_id": "first-feasible-mirror-20261015",
+  "authorization": "User attachment b555900c-aec2-4177-bf55-24308a8ce71a: exactly one new model-led first-feasible study; two segments and one to seven independently bounded ideal tendons; <=12 provider requests including3 protected, <=60 public operations including10 protected, <=3 full backend launches and <=10 mathematical evaluations. No RL, confirmations, offline NLP/BDF, budget increases or task retuning.",
+  "base_commit": "e60e32f4b66793f7f7e51c9b87c3fb5f04dcb6ac",
+  "mode": "formal_research",
+  "capabilities": [
+    "analysis",
+    "search",
+    "nmpc"
+  ],
+  "allowed_plan_actions": [
+    "propose",
+    "execute",
+    "search",
+    "diagnose",
+    "select",
+    "stop"
+  ],
+  "evidence_destination": "evidence/topology_control_20261015/live",
+  "supplied_evidence": [
+    "evidence/topology_control_20261015/live/initial_context.json"
+  ],
+  "budgets": {
+    "provider_requests": 12,
+    "protected_provider_requests": 3,
+    "public_operations": 60,
+    "protected_public_operations": 10,
+    "physical_launches": 3,
+    "local_solves": 0,
+    "mathematical_evaluations": 10
+  },
+  "nmpc_limits": {
+    "executions": 3
+  },
+  "execution_instructions": "You own one bounded research study seeking the first independently accepted complete solution for a NEW frozen task: task.reach target [0.29,-0.035,0.19] m. This target was selected before any execution on it; all available archived targets reviewed were [0.29,+0.035,0.19]. Novelty is relative to available evidence, not a first-ever global discovery. Read the frozen task, reference candidate and relevant supplied evidence; state a testable hypothesis and choose your own permitted actions. You may change one or more authorized structure/control groups sequentially or jointly, add/remove tendons or explicitly edit routing under topology_authorization, ask candidate-bound mathematics, execute real NMPC, retrieve evidence, diagnose, select or justify STOP. No fixed decision sequence and no mandatory mathematical demonstration. Local witnesses/exclusions have limited model scope; numerical failure does not prove physical infeasibility. Do not infer tendon-count changes solely from an affine infeasibility certificate. Existing speed weights are penalties, never acceptance thresholds. Current state/input dimensions and ordered bounds come from each compiled candidate; do not transfer incompatible warm states. Initial historical/B1/B2 facts retain their old task/engineering ownership and cannot count as fresh research. Use physically interpretable margins and exact evidence references when relevant. Budgets are ceilings, not targets: total12 provider calls (3 protected),60 public operations (10 protected),3 complete backend launches,10 mathematical evaluations,0 local diagnostics/offline NLP/BDF/RL/extra confirmations. Batch sequential calls in a response when useful to conserve provider requests. Keep the official35-update,0.35 s task,10 mm position tolerance,last0.05 s inclusive holding window and0.020 m/s speed limit unchanged. No wall-clock acceptance threshold. A fresh complete pass immediately blocks all further scientific exploration: evidence_read the exact result/acceptance and research_plan select selected_execution=<exact passing reference>; zero extra confirmations seals it. First-attempt success proves delivery, not feedback adaptation. If failure occurs, inspect exact physical/mathematical feedback before deciding the next hypothesis; do not blindly repeat an unchanged candidate. Stop conservatively within budget if no supported action is justified; STOP cites all new numerical evidence and states remaining uncertainties and next_step. No hardware/real-time/robustness/repeatability/superiority/global-optimum claims. Use only existing typed research tools and scoped evidence. No experiment retries or reset of consumed counts.",
+  "range_status": "Source-relative two-segment family, one through seven tendons; additions/removals/explicit route patches under the new grant, existing continuous segment/material/section and two control-speed weights. Task/acceptance, mesh, density/viscosity, station locations/angles and execution protocol fixed. Fixed-topology continuous search only; no sensitivity/region exclusion/variable-segment framework.",
+  "topology_authorization": {
+    "version": "tendon_topology_grant_v1",
+    "tendon_count_bounds": [
+      1,
+      7
+    ],
+    "tendon_bounds": {
+      "diameter_m": [
+        0.001,
+        0.001
+      ],
+      "force_limit_n": [
+        8.0,
+        8.0
+      ],
+      "pretension_n": [
+        0.0,
+        0.2
+      ],
+      "length_servo_gain_n_m": [
+        900.0,
+        900.0
+      ]
+    },
+    "attachment_bounds_m": {
+      "fixed_base": [
+        [
+          0.0,
+          -0.025,
+          -0.025
+        ],
+        [
+          0.0,
+          0.025,
+          0.025
+        ]
+      ],
+      "near": [
+        [
+          0.0,
+          -0.025,
+          -0.025
+        ],
+        [
+          0.0,
+          0.025,
+          0.025
+        ]
+      ],
+      "mid_guide": [
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ]
+      ],
+      "distal1": [
+        [
+          0.0,
+          -0.025,
+          -0.025
+        ],
+        [
+          0.0,
+          0.025,
+          0.025
+        ]
+      ]
+    },
+    "editable_guides": [
+      "mid_guide"
+    ],
+    "actuator_rule": "copy_source_independent_displacement_v1"
+  },
+  "task": "../../tasks/reach_hold_mirror_v1.json",
+  "rl_limits": {
+    "training_stages": 0,
+    "evaluation_episodes": 0,
+    "diagnostic_replays": 0,
+    "diagnostic_physics_steps": 0,
+    "actions_per_trial": null,
+    "seconds_per_trial": null,
+    "training_actions": null,
+    "training_active_seconds": null
+  }
+}

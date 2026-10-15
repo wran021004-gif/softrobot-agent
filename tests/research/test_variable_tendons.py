@@ -292,6 +292,44 @@ class VariableTendonTests(unittest.TestCase):
             atomic_json(ROOT/'evidence/topology_20261015/physical_diagnostics.json',report)
 
 
+class M3BStudyTests(unittest.TestCase):
+    def test_new_task_source_and_explicit_counts_preserve_historical_semantics(self):
+        spec=resolve(ROOT/'configs/research/first_feasible_mirror.json')
+        old=read(ROOT/'tasks/reach_hold.json');expected=deepcopy(old['task'])
+        changes=read(ROOT/'tasks/reach_hold_mirror_v1.json')['task']
+        from tools.research.config import patch as merge
+        expected=merge(expected,changes)
+        self.assertEqual(spec['configuration']['task'],expected)
+        for key in ('evaluator','initializer','timing','sampling'):
+            self.assertEqual(expected[key],old['task'][key])
+        self.assertEqual(spec['configuration']['policy']['controller']['parameters']['data']['settling'],old['settling'])
+        self.assertEqual(spec['configuration_provenance']['references']['task_base']['sha256'],digest(old))
+        self.assertEqual(spec['topology_authorization']['tendon_count_bounds'],[1,7])
+        self.assertEqual(spec['nmpc_limits']['executions'],spec['budgets']['physical_launches'])
+        self.assertEqual(spec['budgets']['provider_requests'],12)
+        self.assertEqual(spec['rl_limits']['training_stages'],0);self.assertNotIn('rl',spec['capabilities'])
+        self.assertEqual(digest(resolve(ROOT/'configs/research/study.json')['configuration']),
+            '31af3e097ad29fef1ffd74c5178a6267fc5ffe35889c63e98f531dd42c0df69e')
+
+    def test_task_source_rejects_nested_escape_and_unknown_patch(self):
+        from tools.research import config
+        target=(ROOT/'tasks/reach_hold_mirror_v1.json').resolve();original=read(target)
+        for replacement,pattern in ((dict(extends='../configs/research/robot.json'),'SINGLE_TASK_EXTENSION'),
+            (dict(extends='reach_hold_mirror_v1.json'),'SINGLE_TASK_EXTENSION'),
+            ({**original,'unknown_field':1},'UNKNOWN_CONFIGURATION_FIELD')):
+            def source(path):return deepcopy(replacement) if path==target else read(path)
+            with self.subTest(replacement=replacement),patch.object(config,'read',side_effect=source):
+                with self.assertRaisesRegex(ValueError,pattern):config.resolve(ROOT/'configs/research/first_feasible_mirror.json')
+
+    def test_zero_training_allowance_cannot_enable_rl(self):
+        from tools.research import config
+        target=(ROOT/'configs/research/first_feasible_mirror.json').resolve();bad=read(target)
+        bad['capabilities'].append('rl')
+        def source(path):return deepcopy(bad) if path==target else read(path)
+        with patch.object(config,'read',side_effect=source):
+            with self.assertRaisesRegex(ValueError,'TRAINING_STAGE_LIMIT'):config.resolve(target)
+
+
 @unittest.skipUnless(os.environ.get('SOFTROBOT_M3B1_CONTROL')=='1',
     'set SOFTROBOT_M3B1_CONTROL=1 for five authorized single-update diagnostics')
 class RealVariableTendonControl(unittest.TestCase):
