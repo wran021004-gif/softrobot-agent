@@ -241,17 +241,40 @@ class ResearchIntegrationTests(unittest.TestCase):
             out=analysis.calculate(cfg,self.binding,self.query); build.assert_not_called()
         self.assertEqual(out['scoped_claim']['conclusion'],'not_applicable')
 
+    def test_decision_failure_without_valid_sequence_has_no_margins(self):
+        from tools.research.analysis import decision_result
+        with patch('extensions.math_analysis.trajectory.minimize',return_value=NS(
+                x=np.full(210,np.nan),success=False,status=9,message='fixture invalid',nit=1)):
+            raw=self.compute()
+        entry=decision_result(raw,self.case.candidate)
+        self.assertEqual(entry['margins'],[])
+        self.assertEqual(entry['conclusion'],'inconclusive')
+        self.assertIsNone(entry['certificate_verified'])
+        entry=decision_result(dict(status='incomplete',boundary=dict(returncode=1)),self.case.candidate)
+        self.assertEqual(entry['status'],'incomplete')
+        self.assertEqual(entry['failure_pointer'],'')
+
     def check_surfaces(self,first,query,key):
         from tools.research import analysis, core
         from tools.research.state import state
         host=self.case.host; raw=host.store.artifact(first['reference'])
         packet=core.packet(host)['analysis_results'][-1]
-        for k in ('reference','scoped_claim','analysis_applicability','charged_numerical_s','charged_analysis_evaluations','trajectory_evidence'):
-            self.assertEqual(first[k],packet[k],k)
+        self.assertEqual(packet,analysis.decision_result(raw,first['reference']))
+        self.assertEqual(packet['conclusion'],first['scoped_claim']['conclusion'])
+        self.assertEqual(packet['numerical_s'],first['charged_numerical_s'])
+        self.assertEqual(packet['evaluations'],first['charged_analysis_evaluations'])
         value=core.read_evidence(host,dict(reference=first['reference'],pointer=first['numerical_evidence']['pointer']))
         self.assertEqual(value,raw['trajectory'] if 'trajectory' in raw else raw['analysis_applicability'])
         self.assertNotIn('applied_input_n',packet)
-        self.assertNotIn('matrix',str(packet['trajectory_evidence']))
+        self.assertNotIn('matrix',str(packet))
+        self.assertIn('unsupported_inferences',packet['decision_relevance'])
+        for margin in packet['margins']:
+            record=core.read_evidence(host,dict(reference=first['reference'],pointer=margin['source_pointer']))
+            self.assertEqual(margin['violation'],record['violation'])
+        if packet['conclusion']=='model_infeasibility_certificate':
+            self.assertIsNotNone(packet['certificate_verified'])
+        if variant_coverage:=raw.get('analysis_applicability'):
+            self.assertEqual(packet['coverage']=='full',variant_coverage['full_task_supported'])
         cost=state(host)['numerical_s']; count=state(host)['mathematical_evaluations']
         with patch('tools.service_execution._run_contained') as worker:
             reused=analysis.dispatch(host,query,key,guard=lambda *args:None); worker.assert_not_called()
@@ -261,6 +284,50 @@ class ResearchIntegrationTests(unittest.TestCase):
         self.assertEqual(state(host)['mathematical_evaluations'],count)
         self.assertEqual(reused['operation_reuse']['additional_analysis_evaluations'],0)
         return raw
+
+    def test_saved_m2_decision_boundary_and_paged_retrieval(self):
+        from tools.research import analysis,core
+        from tools.research.config import ROOT
+        from tools.research.state import save,update
+        from tools.state_io import read,digest,atomic_json
+        from tools.platform_store import encode
+        from tools.platform_tools import bounded_evidence_page
+        from schemas.platform_operations import ReadEvidence
+        from tools.research.agent import decision_packet
+        raw=read(ROOT/'evidence/task_feasibility_20261015/real_gvs.json')['original_result']
+        identity=digest(raw);ref=save(self.case.host,raw)
+        self.assertEqual(ref['artifact_id'],identity)
+        update(self.case.host,analysis_results=[ref])
+        packet=decision_packet(self.case.host);entry=packet['analysis_results'][0]
+        old=analysis.compact_result(raw,ref)
+        old_packet={**packet,'analysis_results':[old]}
+        size=lambda v:len(encode(v).encode('utf8'))
+        self.assertLess(size(entry),size(old)/5)
+        self.assertEqual(entry['candidate'],raw['candidate'])
+        self.assertEqual(entry['task_identity'],raw['binding']['task_identity'])
+        self.assertEqual(entry['conclusion'],'inconclusive')
+        self.assertEqual(entry['coverage'],'full')
+        self.assertEqual(entry['numerical_s'],raw['charged_numerical_s'])
+        margin=entry['margins'][0]
+        self.assertEqual((margin['constraint_id'],margin['absolute_time_s']),('holding_max_speed_m_s',.34))
+        self.assertEqual(margin['violation'],raw['trajectory']['replay']['worst_violation']['violation'])
+        pointer='/trajectory/replay/records';records=[];offset=0;pages=0
+        while True:
+            args=ReadEvidence(reference=ref,pointer=pointer,offset=offset,limit=2,byte_limit=3000)
+            page=bounded_evidence_page(self.case.host.store.artifact(ref),args)
+            self.assertEqual(page.kind,'content');records.extend(page.content);pages+=1
+            if page.next_offset is None:break
+            offset=page.next_offset
+        self.assertEqual(records,raw['trajectory']['replay']['records'])
+        self.assertEqual(core.read_evidence(self.case.host,dict(reference=ref,pointer=entry['scope_pointer'])),raw['scoped_claim'])
+        self.assertEqual(digest(self.case.host.store.artifact(ref)),identity)
+        measured=dict(original_artifact=ref,old_entry_bytes=size(old),decision_entry_bytes=size(entry),
+            old_packet_bytes=size(old_packet),new_packet_bytes=size(packet),records_retrieved=len(records),pages=pages,
+            original_identity_after=digest(self.case.host.store.artifact(ref)),provider_calls=0)
+        print('M2_DECISION_PACKET',measured)
+        import os
+        if os.environ.get('M2_CONTEXT_EVIDENCE'):
+            atomic_json(ROOT/'evidence/task_feasibility_20261015/decision_packet.json',measured)
 
     def test_store_packet_evidence_read_and_reuse_for_all_conclusions(self):
         from tools.research import analysis

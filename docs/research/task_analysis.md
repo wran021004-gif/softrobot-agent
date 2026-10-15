@@ -163,9 +163,10 @@ The existing dispatch, worker, recovery, immutable Store and cumulative ledger
 remain the only execution path. One admitted attempt is charged once, including
 failed or unsupported computations under existing rules. Reusing its operation
 key reads the original artifact and returns zero additional work; recovery does
-not relaunch. `compact_result` gives both tool responses and `core.packet()` the
-same scoped claim, applicability/coverage, worst violation, certificate margin,
-cost and exact raw JSON Pointer. `/trajectory`, `/trajectory/replay` and
+not relaunch. `compact_result` preserves the public tool response. `core.packet()`
+uses the smaller deterministic `decision_result`, retaining identity, conclusion,
+coverage, decisive sampled margin, certificate status, cost and exact pointers.
+`/trajectory`, `/trajectory/replay` and
 `/trajectory/certificate` are readable through the existing `evidence_read`.
 Raw trajectories/matrices stay in the artifact. The saved-state interface now
 checks input length against candidate `tendon_order`, alongside exact ownership,
@@ -257,3 +258,38 @@ instrumentation of SciPy's original differentiation. No further tuning was run.
 The evidence contains measured construction/linearization and kernel times,
 environment, identities, both proposed sequences and all replay records. It
 references the immutable old GVS artifact rather than duplicating its model.
+
+### Agent decision context and interpretable feedback
+
+The complete Store artifact and compatible public tool response remain unchanged.
+Only the repeated `CURRENT_RESEARCH_PACKET` mathematical entry changes. It uses
+the same evidence reference, candidate, task, operation and conclusion; scope is
+retrieved at `/scoped_claim` (including model/protocol identities). Coverage is
+`full`, `partial` or `unchecked`; reasons and every omitted constraint remain
+available at `/analysis_applicability`. One decisive row is selected from existing
+`trajectory.replay.records`, preferring the kernel's worst normalized violation,
+otherwise a tight physical margin. Values are copied, not recalculated. The row
+identifies signal, time, residual norm or component residual, bound, margin,
+violation, units and its exact original pointer. Norm values refer to the declared
+reference, not an absolute position norm. Full output/reference vectors remain in
+that record. No valid sequence means no invented margin.
+
+An attempted-sequence violation is never a lower bound on achievable error.
+Satisfied samples describe remaining sampled margin only. Certificate status is
+reported separately from attempted margins. Deterministic `decision_relevance`
+distinguishes local witnesses, verified model/input-box exclusions, inconclusive
+attempts, unsupported operations and diagnostics. It states supported facts,
+unresolved questions, possible distinguishing checks and unsupported global or
+physical/structural inferences. Partial witnesses refer only to checked samples;
+the Agent chooses any next action within its frozen grant.
+
+Offline verification loaded the unchanged M2 artifact
+`69ed5164545847b17eabc484818decc69b1421b6787c20746283344dea6fda27`, exercised
+`agent.decision_packet` without a provider, and measured canonical UTF-8 JSON:
+**29,318 → 1,304 bytes per entry (95.55% reduction)**. With all other packet fields
+identical, the actual decision boundary measured **77,435 → 49,421 bytes**.
+`decision_packet.json` records sizes and identity checks. Seven existing bounded
+pages retrieved all 13 original replay records exactly; original artifact identity
+was unchanged. Existing M2 integration exercises full/partial witnesses,
+exclusion, inconclusive and not-applicable results through Store and packet with
+receipt reuse. Strands offload, retrieval and provider integration were not changed.

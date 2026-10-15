@@ -342,7 +342,7 @@ def recover(host):
 
 
 def compact_result(value, reference):
-    """Shared tool/decision-packet projection, with exact pointers into raw evidence."""
+    """Compatible public tool response, with exact pointers into raw evidence."""
     summary=dict(reference=reference,**{k:value.get(k) for k in (
         'status','candidate','operation','proxy_values','origin','charged_numerical_s','charged_analysis_evaluations',
         'local_model_constraints','internal_calculations','score_semantics','scoped_claim','analysis_applicability')})
@@ -355,6 +355,52 @@ def compact_result(value, reference):
             certificate_pointer='/trajectory/certificate' if cert else None,
             certificate={k:cert.get(k) for k in ('constraint_id','sample_index','kind','margin')} if cert else None))
     return summary
+
+
+def decision_result(value, reference):
+    """Small deterministic Agent view; the immutable scientific result is untouched."""
+    claim=value.get('scoped_claim') or {}
+    trajectory=value.get('trajectory') or {}
+    replay=trajectory.get('replay') or {}
+    constraints={c['constraint_id']:c for c in (value.get('task_analysis') or {}).get('constraints',[])}
+    rows=[]
+    for i,r in enumerate(replay.get('records',[])):
+        c=constraints.get(r['constraint_id'])
+        if not c: continue
+        rows.append(dict(constraint_id=r['constraint_id'],signal=r['signal'],absolute_time_s=r['absolute_time_s'],
+            observed_value=r['value'],bound=c['radius'] if c['kind']=='norm_bound' else dict(lower=c['lower'],upper=c['upper']),
+            margin=r['margins'],violation=r['violation'],units=r['units'],
+            status='satisfied_sample' if r['passed'] else 'attempted_sequence_violation',
+            source_pointer=f'/trajectory/replay/records/{i}'))
+    # Prefer the kernel's worst normalized violation; otherwise retain a tight
+    # sampled margin. Ranking only selects records, never recomputes their values.
+    records=replay.get('records',[])
+    rows.sort(key=lambda r:(-records[int(r['source_pointer'].rsplit('/',1)[1])]['normalized_violation'],min(r['margin'])))
+    conclusion=claim.get('conclusion','inconclusive')
+    meanings={
+        'feasible_witness':('Bounded local-model witness for checked samples.',
+            'Controller/nonlinear/backend realization unresolved.', 'Compare compatible execution or solver diagnosis.'),
+        'model_infeasibility_certificate':('Verified necessary-constraint exclusion in this model/input box.',
+            'Other structures, models and nonlinear paths unresolved.', 'Inspect assumptions or compare actuation geometry.'),
+        'inconclusive':('No verified witness or exclusion certificate.',
+            'Task expressibility does not resolve feasibility.', 'Inspect solver, operating point or another design hypothesis.'),
+        'not_applicable':('Requested model/operation cannot represent declared requirements.',
+            'Robot-task feasibility unresolved.', 'Select an applicable model or specialized tool.'),
+        'diagnostic':('Local model diagnostic only.',
+            'Bounded task feasibility unresolved.', 'Check task constraints with an applicable operation.')}
+    fact,unresolved,check=meanings[conclusion]
+    applicability=value.get('analysis_applicability') or {}
+    coverage='full' if applicability.get('full_task_supported') else 'partial' if any(
+        c.get('analyzed_indices') for c in applicability.get('constraint_coverage',[])) else 'unchecked'
+    return dict(reference=reference,candidate=value.get('candidate'),task_identity=(value.get('binding') or {}).get('task_identity'),
+        operation=value.get('operation'),status=value.get('status'),conclusion=conclusion,
+        scope_pointer='/scoped_claim',coverage=coverage,
+        margins=rows[:1],certificate_verified=claim.get('verification_status') if conclusion=='model_infeasibility_certificate' else None,
+        numerical_s=value.get('charged_numerical_s'),evaluations=value.get('charged_analysis_evaluations'),
+        detail_pointer=claim.get('numerical_result_pointer',''),
+        decision_relevance=dict(supported_facts=[fact],unresolved_questions=[unresolved],potential_discriminating_checks=[check],
+            unsupported_inferences=['Global/physical feasibility, structural necessity or surrounding-region exclusion.']),
+        failure_pointer='' if value.get('status') not in ('computed','not_applicable') else None)
 
 
 def score_semantics(query,binding,protocol,row):

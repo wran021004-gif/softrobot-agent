@@ -22,6 +22,9 @@
 | `feedback.py` | Evidence/solution identity, exact read/selection, task-derived holding window, truthful confirmation and result facts. |
 | `diagnostic.py` | Existing exact-problem replay plus core's read-only/contained diagnostic orchestration; task-derived thresholds and finite solve counts/iterations. |
 | `analysis.py`, `mechanics.py`, their workers | Candidate-bound mathematical protocols and optional solve/replay routes, with finite allowances and disabled time plumbing. Mathematical evidence never grants task success. |
+| `task_constraints.py`, `schemas/platform_analysis.py` (M1) | Frozen task requirements, signal/grid/input semantics, actual model applicability and explicit checked/unchecked coverage. Task adapters own task meaning; analysis binds scoped claims to exact candidate/model/protocol identities. |
+| `extensions/math_analysis/trajectory.py` (M2) | Shared sampled affine sequence with exact ZOH, physical total-tension box, analytic normalized-margin Jacobian, independent recurrence witness checks and rechecked necessary-constraint exclusion. Solver failure stays inconclusive. |
+| `analysis.decision_result`, `core.packet` | Deterministic small Agent entries, copied decisive replay margins and limited evidence relevance. `compact_result` retains compatible public responses; full original evidence remains in Store at exact pointers. Existing evidence paging and Strands offload own retrieval. |
 | `numerics.py` / `experience.py` | Retained exact historical artifact/state imports and evidence-backed experience. Reads do not repeat computation. |
 | `tools/research_tasks.py` | Shared task acceptance meaning, holding-window bounds and ranking normalization. |
 | `tools/platform_host.py` / `platform_store.py` | Transactional receipts and actual numeric costs; null limits disable elapsed-time rejection while count checks remain. |
