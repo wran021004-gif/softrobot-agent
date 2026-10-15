@@ -7,11 +7,12 @@ import subprocess
 import time
 from tools.research.contracts import AnalysisRequest
 from schemas.platform import SessionInput
-from schemas.platform_analysis import TaskAnalysisProtocol, EndpointLinearizedModel, EndpointTarget
+from schemas.platform_analysis import TaskAnalysisProtocol, EndpointLinearizedModel, EndpointTarget, ScopedMathematicalClaim, TaskAnalysisRequirement
 from tools.platform_store import plain, zero
 from tools.state_io import digest, atomic_json, read
 from tools.research.design import verify_candidate, source_lengths
 from tools.research.state import state,update,save
+from tools.research.task_constraints import describe_analysis_requirements, model_assessment, check_analysis_applicability
 
 
 def calculate(configuration,binding,query,exact_point=None):
@@ -25,6 +26,13 @@ def calculate(configuration,binding,query,exact_point=None):
     inp=SessionInput.model_validate(configuration)
     if q.operation=='equilibrium' and q.operating_point!='target_equilibrium':
         raise ValueError('EQUILIBRIUM_REQUIRES_TARGET_POINT')
+    requirements=describe_analysis_requirements(inp,binding)
+    assessment=model_assessment(inp,requirements,q.operation)
+    applicability=check_analysis_applicability(requirements,q,assessment,exact_point=exact_point)
+    if applicability['status']=='not_applicable':
+        return scoped_result(dict(status='not_applicable',operation=q.operation,binding=binding,protocol=plain(p),
+            operating_point=exact_point or dict(name=q.operating_point),task_acceptance='unmeasured',
+            proxy_values={},internal_calculations=[],limitations=LIMITATIONS),requirements,applicability,q)
     envelope=plain(calculate_candidate_configuration(inp,binding,p,binding['configuration'],
         operating_points=[q.operating_point],exact_point=exact_point))
     if q.scoring_window_s is not None and q.scoring_window_s not in p.windows_s:
@@ -42,6 +50,13 @@ def calculate(configuration,binding,query,exact_point=None):
         task_acceptance='unmeasured',proxy_values={},raw=envelope,internal_calculations=internal,
         limitations=LIMITATIONS+['Local mathematics does not establish nonlinear backend acceptance, holding-window compliance, or design sensitivity.'])
     result['score_semantics']=score_semantics(q,binding,p,row)
+    if row.get('model'):
+        model=EndpointLinearizedModel.model_validate(row['model'])
+        result.update(model=plain(model),operating_point=model.operating_point)
+        applicability=check_analysis_applicability(requirements,q,assessment,model=model)
+        if applicability['status']=='not_applicable':
+            result['status']='not_applicable'
+            return scoped_result(result,requirements,applicability,q)
     if q.operation=='equilibrium':
         result['proxy_values']['target_equilibrium_residual']=construction.get('position_residual_m')
         result['local_model_constraints']=dict(status='satisfied' if row.get('model') else 'unsatisfied_in_this_attempt',
@@ -53,13 +68,10 @@ def calculate(configuration,binding,query,exact_point=None):
             limits=binding['tension_limits_n']
             result['tension_margins_n']=dict(lower=tensions,upper=[a-b for a,b in zip(limits,tensions)],
                 interpretation='Computed attempt tensions; equilibrium validity remains separately reported')
-        return result
+        return scoped_result(result,requirements,applicability,q)
     if not row.get('model'):
         result.update(status='unavailable',unavailable_reason=row.get('reason','Operating point unavailable'))
-        return result
-    model=EndpointLinearizedModel.model_validate(row['model'])
-    result['model']=plain(model)
-    result['operating_point']=model.operating_point
+        return scoped_result(result,requirements,applicability,q)
     if q.operation in ('linearization','controllability'):
         remaining=model.operating_point.get('remaining_task_s')
         if q.operating_point=='saved_state' and remaining is not None:
@@ -85,6 +97,48 @@ def calculate(configuration,binding,query,exact_point=None):
                 internal.append(dict(purpose=purpose+'_box_residual_certificate',solver=certificate['solver'],success=certificate['solver_success']))
         result['units']=dict(position='m',speed='m/s',tension='N')
     result['tension_margins_n']=dict(lower=model.u0,upper=(np.asarray(binding['tension_limits_n'])-model.u0).tolist())
+    return scoped_result(result,requirements,applicability,q)
+
+
+def scoped_result(result, requirements, applicability, query):
+    """Classify trusted kernel verification fields; solver success is not a proof."""
+    conclusion, verification = 'inconclusive', 'insufficient'
+    interpretation = 'No verified witness or certificate is available for this attempt.'
+    endpoint = result.get('endpoint') or {}
+    checks = endpoint.get('checks') or {}
+    certificate = endpoint.get('infeasibility_certificate') or {}
+    separation = certificate.get('separating_direction') or {}
+    pointer = '/endpoint' if endpoint else '/raw' if 'raw' in result else ''
+    if applicability['status'] == 'not_applicable':
+        conclusion, verification, pointer = 'not_applicable', 'not_performed', '/analysis_applicability'
+        interpretation = '; '.join(applicability['reasons'])
+    elif result['status'] == 'computed':
+        if endpoint.get('status') == 'feasible_in_local_model' and endpoint.get('applied_input_n') and all(
+                checks.get(k) is True for k in ('finite','lower_bounds','upper_bounds','position','speed')):
+            conclusion, verification = 'feasible_witness', 'kernel_independent_checks_passed'
+            interpretation = 'Verified bounded input for the covered terminal constraints of this frozen local affine model only.'
+        elif (endpoint.get('status') == 'infeasible_in_local_model' and certificate.get('certified_infeasible') is True
+                and math.isfinite(separation.get('margin_over_limit', float('nan')))
+                and separation['margin_over_limit'] > 0):
+            conclusion, verification = 'model_infeasibility_certificate', 'kernel_separating_lower_bound_verified'
+            interpretation = 'Verified separating lower bound excludes the covered endpoint problem within this model and input box only.'
+        elif query.operation in ('linearization','controllability') and result.get('metrics'):
+            conclusion, verification, pointer = 'diagnostic', 'not_a_constraint_certificate', '/metrics'
+            interpretation = 'Local normalized Gramian/output authority; physical bounded-input task feasibility is unverified.'
+        elif query.operation == 'equilibrium' and result.get('local_model_constraints',{}).get('equilibrium_available'):
+            conclusion, verification = 'diagnostic', 'static_construction_only'
+            interpretation = 'Local static construction residuals only; sampled holding and execution remain unverified.'
+    result['task_analysis'] = plain(requirements)
+    result['analysis_applicability'] = applicability
+    result['scoped_claim'] = plain(ScopedMathematicalClaim(conclusion=conclusion, binding=requirements.binding,
+        requirement_identity=digest(plain(requirements)), model_identity=digest(result['model']) if result.get('model') else None,
+        model_declaration={k:applicability['model_assessment'][k] for k in ('model_id','model_version','representation_id','relevant_assumptions')},
+        protocol_identity=digest(plain(query.protocol)), operating_point=result.get('operating_point') or dict(name=query.operating_point),
+        horizon=applicability['horizon'], physical_inputs=requirements.physical_inputs,
+        constraint_coverage=applicability['constraint_coverage'], numerical_result_pointer=pointer,
+        computation_status=result['status'], verification_status=verification, supported_interpretation=interpretation,
+        unsupported_conclusions=['task acceptance', 'whole holding-window compliance', 'global nonlinear feasibility or infeasibility',
+            'hardware performance', 'robustness', 'repeatability', 'equilibrium validity at a non-equilibrium point']))
     return result
 
 
@@ -123,7 +177,8 @@ def dispatch(host,query,key,*,guard,origin='model'):
         effective_configuration_identity=digest(cfg),task_identity=digest(cfg['task']),basis=basis,
         coordinate_order=list(resolve_basis(design,basis).coordinate_order),tendon_order=[t['id'] for t in design['tendons']],
         tension_limits_n=[t['force_limit_n'] for t in design['tendons']],tension_bounds_n=[[0.,t['force_limit_n']] for t in design['tendons']],
-        target_m=cfg['task']['goal']['data']['target_m'],source_identity=c['source_identity'])
+        target_m=cfg['task']['goal']['data']['target_m'],source_identity=c['source_identity'],
+        evaluation_profile_identity=c['profile_identity'])
     point=None
     if q.execution:
         from tools.research.numerics import execution_update
@@ -162,6 +217,10 @@ def dispatch(host,query,key,*,guard,origin='model'):
         point['remaining_task_s']=max(0.,cfg['task']['timing']['duration_s']-actual)
         if q.operation in ('linearization','controllability') and q.scoring_window_s>point['remaining_task_s']+q.protocol.horizon_alignment_atol_s:
             raise ValueError('SCORE_WINDOW_EXCEEDS_ACTUAL_REMAINING_TASK_TIME')
+    inp=SessionInput.model_validate(cfg)
+    requirements=describe_analysis_requirements(inp,binding)
+    applicability=check_analysis_applicability(requirements,q,
+        model_assessment(inp,requirements,q.operation),exact_point=point)
     reserve=fit['reservation_s']
     def charge(db):
         current=host.store.session(host.run_id,db)['state']
@@ -173,7 +232,8 @@ def dispatch(host,query,key,*,guard,origin='model'):
     row,_=host.store.reserve(host.run_id,request_id,identity,host.actor,{**zero(),'wall_s':reserve},kind='candidate_analysis',guard=charge)
     folder=host.store.root/'analyses'/row['execution_id']
     folder.mkdir(parents=True,exist_ok=True)
-    request=dict(implementation=s['freeze'],rationale=query.get('rationale','Model-requested '+q.operation) if isinstance(query,dict) else q.operation,kind='candidate_analysis',configuration=cfg,binding=binding,query=plain(q),exact_point=point)
+    request=dict(implementation=s['freeze'],rationale=query.get('rationale','Model-requested '+q.operation) if isinstance(query,dict) else q.operation,kind='candidate_analysis',configuration=cfg,binding=binding,query=plain(q),exact_point=point,
+        task_analysis=plain(requirements),analysis_applicability=applicability)
     atomic_json(folder/'request.json',request)
     pending=dict(kind='candidate_analysis',worker_request_id=request_id,reserved_s=reserve,folder=str(folder),
         request=plain(q),origin=origin,implementation=s['freeze'],started_unix=time.time())
@@ -203,10 +263,16 @@ def recover(host):
     boundary=read(folder/'boundary.json')
     elapsed=boundary['elapsed_s']
     value=read(folder/'result.json') if (folder/'result.json').exists() else dict(status='incomplete',task_acceptance='unmeasured',boundary=boundary)
+    # New failed workers still carry scope; old receipts are never reinterpreted.
+    if 'scoped_claim' not in value and (folder/'request.json').exists():
+        request=read(folder/'request.json')
+        if 'task_analysis' in request:
+            value=scoped_result(value,TaskAnalysisRequirement.model_validate(request['task_analysis']),
+                request['analysis_applicability'],AnalysisRequest.model_validate(request['query']))
     value.update(candidate=p['request']['candidate'],requested_operation=p['request'],operation_key=p['worker_request_id'],
         owning_study=host.run_id,origin=p['origin'],implementation=p['implementation'],charged_numerical_s=elapsed,
         charged_analysis_evaluations=1,boundary=boundary,worker_log=save(host,dict(text=(folder/'worker.log').read_text(encoding='utf8',errors='replace')),'analysis_worker_log'))
-    if value['status'] not in ('computed','unavailable'):
+    if value['status'] not in ('computed','unavailable','not_applicable'):
         value['internal_calculations']=dict(status='partial_or_unavailable',reason='Worker failed before complete calculation records were published; reservation and analysis attempt remain charged')
     ref=save(host,value,'candidate_analysis_result')
     row=host.store.lookup(host.run_id,p['worker_request_id'])
@@ -225,7 +291,8 @@ def recover(host):
             tool_id='research.candidate_analysis',tool_version='1.0.0',execution_status='completed',charged=zero()),value,elapsed=elapsed,db=db)
     return dict(reference=ref,status=value['status'],proxy_values=value.get('proxy_values',{}),
         task_acceptance='unmeasured',charged_numerical_s=elapsed,internal_calculations=value.get('internal_calculations',[]),
-        local_model_constraints=value.get('local_model_constraints'),score_semantics=value.get('score_semantics'))
+        local_model_constraints=value.get('local_model_constraints'),score_semantics=value.get('score_semantics'),
+        analysis_applicability=value.get('analysis_applicability'),scoped_claim=value.get('scoped_claim'))
 
 
 def score_semantics(query,binding,protocol,row):

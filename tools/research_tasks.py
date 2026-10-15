@@ -40,6 +40,40 @@ class ResearchTaskAdapter:
         target = self.task['goal']['data']['target_m']
         return (np.broadcast_to(target, times.shape + (3,)).copy(), np.zeros(times.shape + (3,)))
 
+    def analysis_requirements(self, binding):
+        """Translate frozen reach acceptance facts; no tracking reference is invented."""
+        from schemas.platform_analysis import TaskAnalysisRequirement
+        from extensions.math_analysis.kernels import aligned_steps
+        task, cfg = self.task, self.configuration
+        duration, period = task['timing']['duration_s'], task['timing']['sample_period_s']
+        last, _ = aligned_steps(duration, period)
+        signal = next(s for s in task['observations'] if s['name'] == 'tip_position')
+        if task['family'] != 'task.reach':
+            constraints = [dict(constraint_id='unsupported_task', signal=signal, indices=[last],
+                kind='unsupported', reference=[[0.]*signal['dimension']], provenance=['/task'],
+                unsupported_requirement=task)]
+        else:
+            count, _ = aligned_steps(cfg['policy']['controller']['parameters']['data']['settling']['window_s'], period)
+            holding = list(range(last-count, last+1))
+            limits = self.ranking_limits()
+            goal = task['goal']['data']['target_m']
+            constraints = []
+            for name, indices, output, unit, reference, source in (
+                    ('terminal_error_m', [last], 'tip_position', 'm', goal, '/task/evaluator/parameters/data/tolerance_m'),
+                    ('holding_max_error_m', holding, 'tip_position', 'm', goal, '/policy/controller/parameters/data/settling/position_limit_m'),
+                    ('holding_max_speed_m_s', holding, 'tip_velocity', 'm/s', [0.]*3, '/policy/controller/parameters/data/settling/speed_limit_m_s')):
+                constraints.append(dict(constraint_id=name, signal={**signal, 'name':output, 'units':unit}, indices=indices,
+                    kind='norm_bound', reference=[reference for _ in indices], radius=limits[name],
+                    provenance=[source, '/task/timing', '/task/goal', '/policy/controller/parameters/data/settling/window_s']))
+        tendons = cfg['robot']['structure']['data']['tendons']
+        return TaskAnalysisRequirement(binding={**binding, 'task_identity':digest(task),
+            'effective_configuration_identity':digest(cfg), 'task_id':task['task_id'], 'task_version':task['task_version']},
+            duration_s=duration, sample_period_s=period, time_grid_s=[i*period for i in range(last+1)], constraints=constraints,
+            physical_inputs=dict(signal='tendon_tension', units='N', frame='tendon_path', phase='pre_step',
+                control_period_s=task['timing']['control_period_s'], tendon_order=[t['id'] for t in tendons],
+                lower=[0.]*len(tendons), upper=[t['force_limit_n'] for t in tendons],
+                provenance=['/robot/structure/data/tendons', '/task/timing/control_period_s']))
+
     def operating_point(self, time_s=0.0):
         position, velocity = self.reference_at(time_s)
         return dict(time_s=time_s, reference_position_m=position.tolist(), reference_velocity_m_s=velocity.tolist(), frame='world', state_source='Named task initializer; subsequent measured backend state', reference_is_equilibrium=False)

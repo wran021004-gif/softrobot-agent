@@ -1,8 +1,8 @@
 """Versioned output-aware local analysis; old LinearizedModel is unchanged."""
 from typing import Literal
-from pydantic import Field, PositiveFloat, model_validator
+from pydantic import Field, PositiveFloat, StrictInt, model_validator
 from schemas.common import Contract
-from schemas.platform import EvidenceRef
+from schemas.platform import EvidenceRef, SignalSpec
 from schemas.platform_math import LinearizedModel
 from schemas.platform_diagnostics import DiagnosticFact
 
@@ -262,3 +262,77 @@ class AnalysisResult(Contract):
 class CompareRequest(Contract):
     results: list[EvidenceRef] = Field(min_length=1)
     protocol: EvidenceRef
+
+
+class TaskAnalysisConstraint(Contract):
+    """Sampled convex descriptions; unsupported requirements retain their payload."""
+    constraint_id: str
+    signal: SignalSpec
+    indices: list[StrictInt] = Field(min_length=1)
+    kind: Literal['norm_bound', 'component_interval', 'unsupported']
+    reference: list[list[float]]
+    radius: float | None = Field(default=None, ge=0)
+    lower: list[float] | None = None
+    upper: list[float] | None = None
+    provenance: list[str] = Field(min_length=1)
+    unsupported_requirement: dict | None = None
+
+    @model_validator(mode='after')
+    def sampled_values(self):
+        if any(i < 0 for i in self.indices) or self.indices != sorted(set(self.indices)):
+            raise ValueError('ORDERED_UNIQUE_NONNEGATIVE_SAMPLE_INDICES_REQUIRED')
+        if len(self.reference) != len(self.indices) or any(len(v) != self.signal.dimension for v in self.reference):
+            raise ValueError('ONE_REFERENCE_VECTOR_PER_SAMPLE_REQUIRED')
+        if self.kind == 'norm_bound' and (self.radius is None or self.lower is not None or self.upper is not None):
+            raise ValueError('NORM_BOUND_REQUIRES_ONLY_RADIUS')
+        if self.kind == 'component_interval':
+            if (self.radius is not None or self.lower is None or self.upper is None
+                    or len(self.lower) != self.signal.dimension or len(self.upper) != self.signal.dimension
+                    or any(lo > hi for lo, hi in zip(self.lower, self.upper))):
+                raise ValueError('ORDERED_COMPONENT_BOUNDS_REQUIRED')
+        if (self.kind == 'unsupported') != (self.unsupported_requirement is not None):
+            raise ValueError('UNSUPPORTED_REQUIREMENT_PAYLOAD_REQUIRED')
+        return self
+
+
+class TaskAnalysisRequirement(Contract):
+    """Frozen context, absolute task sample grid, and physical input semantics."""
+    contract: Literal['task-analysis-v1'] = 'task-analysis-v1'
+    binding: dict
+    duration_s: PositiveFloat
+    sample_period_s: PositiveFloat
+    time_grid_s: list[float] = Field(min_length=2)
+    constraints: list[TaskAnalysisConstraint] = Field(min_length=1)
+    physical_inputs: dict
+    required_physics: list[str] = Field(default_factory=list)
+    horizon_semantics: Literal['absolute_task_time_inclusive_samples'] = 'absolute_task_time_inclusive_samples'
+
+    @model_validator(mode='after')
+    def exact_grid(self):
+        if (any(abs(t-i*self.sample_period_s) > 1e-12 for i,t in enumerate(self.time_grid_s))
+                or abs(self.time_grid_s[-1]-self.duration_s) > 1e-12):
+            raise ValueError('INCLUSIVE_UNIFORM_TASK_GRID_REQUIRED')
+        if len({c.constraint_id for c in self.constraints}) != len(self.constraints):
+            raise ValueError('UNIQUE_CONSTRAINT_IDENTITIES_REQUIRED')
+        if any(c.indices[-1] >= len(self.time_grid_s) for c in self.constraints):
+            raise ValueError('CONSTRAINT_INDEX_OUTSIDE_TASK_HORIZON')
+        return self
+
+
+class ScopedMathematicalClaim(Contract):
+    contract: Literal['scoped-mathematical-claim-v1'] = 'scoped-mathematical-claim-v1'
+    conclusion: Literal['feasible_witness', 'model_infeasibility_certificate', 'diagnostic', 'inconclusive', 'not_applicable']
+    binding: dict
+    requirement_identity: str
+    model_identity: str | None
+    model_declaration: dict
+    protocol_identity: str
+    operating_point: dict
+    horizon: dict
+    physical_inputs: dict
+    constraint_coverage: list[dict]
+    numerical_result_pointer: str
+    computation_status: str
+    verification_status: str
+    supported_interpretation: str
+    unsupported_conclusions: list[str]
