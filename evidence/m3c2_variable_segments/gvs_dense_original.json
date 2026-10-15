@@ -1,0 +1,1172 @@
+{
+  "original_failure": {
+    "label": "Observed development diagnostic; numerical failure is not structural infeasibility",
+    "request_parameters": {
+      "segment_count": 2,
+      "tendon_count": 5,
+      "spans": [
+        {
+          "last_segment": 0,
+          "count": 2,
+          "phase_rad": 0.3,
+          "anchor_s": 0.9
+        },
+        {
+          "last_segment": 1,
+          "count": 3,
+          "phase_rad": 0.8,
+          "angular_offsets_rad": [
+            0,
+            0.13,
+            -0.08
+          ],
+          "radius_m": 0.021,
+          "guide_s": [
+            0.35,
+            0.65
+          ],
+          "guide_angle_offset_rad": 0.06,
+          "anchor_angle_offset_rad": -0.09,
+          "anchor_s": 0.92
+        }
+      ]
+    },
+    "physical_compilation": "passed",
+    "gvs_coordinates": 22,
+    "mass_matrix_rank_at_zero": 22,
+    "mass_matrix_minimum_eigenvalue": 8.524523232987222e-13,
+    "implicit_force_finite": true,
+    "zero_state_dynamics_evaluation": "failed",
+    "error": "CasADi gvs_dynamics MXFunction: Evaluation failed",
+    "provenance": "Transcribed from the actual local development diagnostic output; assembly and routing parameters match the delivered family example. No solver modification attempted.",
+    "conclusion": "Dense structural-node layouts need separate numerical compatibility work. Physical compilation and a finite full-rank mass matrix do not establish successful numerical dynamics evaluation or task feasibility.",
+    "task_evaluation": null,
+    "provider_requests": 0,
+    "full_nmpc": 0,
+    "rl_training": 0
+  },
+  "implementation_base": "bafad737824f7ff09741dbbc9273a2dba34bf882",
+  "environment": {
+    "python": "3.11.16",
+    "casadi": "3.7.2",
+    "numpy": "2.4.6",
+    "threads": {
+      "OPENBLAS_NUM_THREADS": "1",
+      "OMP_NUM_THREADS": "1",
+      "MKL_NUM_THREADS": "1"
+    }
+  },
+  "physical_pose": "Candidate-owned zero curvature and velocity; bounded candidate pretensions",
+  "comparison_caveat": "Historical controls differ in tendon/routing geometry, not dimension alone. No basis-only override supported by structural-node semantics.",
+  "cases": {
+    "dense": {
+      "physical_identity": "5c94dbc33ee8b4f478e73e133a68a7c10a5e3ecdb57f217bf1cacf49541488c1",
+      "request": {
+        "segment_count": 2,
+        "tendon_count": 5,
+        "spans": [
+          {
+            "last_segment": 0,
+            "count": 2,
+            "phase_rad": 0.3,
+            "anchor_s": 0.9
+          },
+          {
+            "last_segment": 1,
+            "count": 3,
+            "phase_rad": 0.8,
+            "angular_offsets_rad": [
+              0,
+              0.13,
+              -0.08
+            ],
+            "radius_m": 0.021,
+            "guide_s": [
+              0.35,
+              0.65
+            ],
+            "guide_angle_offset_rad": 0.06,
+            "anchor_angle_offset_rad": -0.09,
+            "anchor_s": 0.92
+          }
+        ]
+      },
+      "physical_design_identity": "73d066306e72382f53e60d79c197e078b926ca6efbbc358918e81f0f9693a9a4",
+      "coordinate_order": [
+        "segment_0.kappa_y_node_0",
+        "segment_0.kappa_y_node_1",
+        "segment_0.kappa_y_node_2",
+        "segment_0.kappa_y_node_3",
+        "segment_0.kappa_y_node_4",
+        "segment_0.kappa_y_node_5",
+        "segment_0.kappa_z_node_0",
+        "segment_0.kappa_z_node_1",
+        "segment_0.kappa_z_node_2",
+        "segment_0.kappa_z_node_3",
+        "segment_0.kappa_z_node_4",
+        "segment_0.kappa_z_node_5",
+        "segment_1.kappa_y_node_0",
+        "segment_1.kappa_y_node_1",
+        "segment_1.kappa_y_node_2",
+        "segment_1.kappa_y_node_3",
+        "segment_1.kappa_y_node_4",
+        "segment_1.kappa_z_node_0",
+        "segment_1.kappa_z_node_1",
+        "segment_1.kappa_z_node_2",
+        "segment_1.kappa_z_node_3",
+        "segment_1.kappa_z_node_4"
+      ],
+      "tendon_order": [
+        "tendon_0",
+        "tendon_1",
+        "tendon_2",
+        "tendon_3",
+        "tendon_4"
+      ],
+      "tensions_n": [
+        0.2,
+        0.2,
+        0.2,
+        0.2,
+        0.2
+      ],
+      "resolved_basis": {
+        "representation_id": "gvs_bending_basis_v1",
+        "specification": {
+          "strategy": "structural_linear"
+        },
+        "coordinate_order": [
+          "segment_0.kappa_y_node_0",
+          "segment_0.kappa_y_node_1",
+          "segment_0.kappa_y_node_2",
+          "segment_0.kappa_y_node_3",
+          "segment_0.kappa_y_node_4",
+          "segment_0.kappa_y_node_5",
+          "segment_0.kappa_z_node_0",
+          "segment_0.kappa_z_node_1",
+          "segment_0.kappa_z_node_2",
+          "segment_0.kappa_z_node_3",
+          "segment_0.kappa_z_node_4",
+          "segment_0.kappa_z_node_5",
+          "segment_1.kappa_y_node_0",
+          "segment_1.kappa_y_node_1",
+          "segment_1.kappa_y_node_2",
+          "segment_1.kappa_y_node_3",
+          "segment_1.kappa_y_node_4",
+          "segment_1.kappa_z_node_0",
+          "segment_1.kappa_z_node_1",
+          "segment_1.kappa_z_node_2",
+          "segment_1.kappa_z_node_3",
+          "segment_1.kappa_z_node_4"
+        ],
+        "segments": [
+          {
+            "segment": "segment_0",
+            "start": 0,
+            "length_m": 0.16,
+            "knots": [
+              0.0,
+              0.35,
+              0.5,
+              0.65,
+              0.9,
+              1.0
+            ],
+            "locations": [
+              {
+                "s": 0.0,
+                "kinds": [
+                  "segment_boundary"
+                ]
+              },
+              {
+                "s": 0.35,
+                "kinds": [
+                  "tendon_guide"
+                ]
+              },
+              {
+                "s": 0.5,
+                "kinds": [
+                  "tendon_guide"
+                ]
+              },
+              {
+                "s": 0.65,
+                "kinds": [
+                  "tendon_guide"
+                ]
+              },
+              {
+                "s": 0.9,
+                "kinds": [
+                  "tendon_anchor"
+                ]
+              },
+              {
+                "s": 1.0,
+                "kinds": [
+                  "component_attachment",
+                  "rigid_attachment",
+                  "segment_boundary",
+                  "tendon_guide"
+                ]
+              }
+            ]
+          },
+          {
+            "segment": "segment_1",
+            "start": 12,
+            "length_m": 0.11,
+            "knots": [
+              0.0,
+              0.35,
+              0.65,
+              0.92,
+              1.0
+            ],
+            "locations": [
+              {
+                "s": 0.0,
+                "kinds": [
+                  "segment_boundary"
+                ]
+              },
+              {
+                "s": 0.35,
+                "kinds": [
+                  "tendon_guide"
+                ]
+              },
+              {
+                "s": 0.65,
+                "kinds": [
+                  "tendon_guide"
+                ]
+              },
+              {
+                "s": 0.92,
+                "kinds": [
+                  "tendon_anchor"
+                ]
+              },
+              {
+                "s": 1.0,
+                "kinds": [
+                  "component_attachment",
+                  "rigid_attachment",
+                  "segment_boundary"
+                ]
+              }
+            ]
+          }
+        ],
+        "dimension": 22,
+        "axes": [
+          "y",
+          "z"
+        ]
+      },
+      "parameters": {
+        "model_id": "gvs_variable_strain_bending_v1",
+        "basis": {
+          "strategy": "structural_linear"
+        },
+        "integration_steps_per_segment": 24,
+        "quadrature_points_per_segment": 5,
+        "finite_difference_step": 1e-06
+      },
+      "gravity_robot_base_m_s2": [
+        0.0,
+        0.0,
+        -9.81
+      ],
+      "scene": {
+        "contract": "experiment.assembly",
+        "version": "1.0.0",
+        "data": {
+          "environment": {
+            "coordinate_frame": "world_base_x_forward_yz_cross_section",
+            "environment_id": "reach_free",
+            "gravity_m_s2": [
+              0.0,
+              0.0,
+              -9.81
+            ],
+            "gravity_source": "main@245a785 reach_free environment; Human-owned benchmark gravity",
+            "lights": [
+              {
+                "direction": [
+                  0.0,
+                  0.0,
+                  -1.0
+                ],
+                "position_m": [
+                  0.0,
+                  0.0,
+                  2.0
+                ]
+              }
+            ],
+            "objects": [
+              {
+                "conaffinity": 1,
+                "contype": 0,
+                "half_size_m": [
+                  2.0,
+                  2.0,
+                  0.1
+                ],
+                "kind": "plane",
+                "name": "floor",
+                "position_m": [
+                  0.0,
+                  0.0,
+                  -0.02
+                ]
+              }
+            ],
+            "schema_version": "1",
+            "truth_status": "HUMAN_OWNED",
+            "units": "SI"
+          },
+          "external_forces": [],
+          "floor_id": "floor",
+          "mount": {
+            "position_m": [
+              0.0,
+              0.0,
+              0.15
+            ],
+            "quaternion_wxyz": [
+              1.0,
+              0.0,
+              0.0,
+              0.0
+            ]
+          }
+        }
+      },
+      "model_construction": "passed",
+      "coordinates": 22,
+      "terms": {
+        "damping_force": {
+          "shape": [
+            22,
+            1
+          ],
+          "finite": true,
+          "norm": 0.0
+        },
+        "elastic_force": {
+          "shape": [
+            22,
+            1
+          ],
+          "finite": true,
+          "norm": 0.0
+        },
+        "gravity_force": {
+          "shape": [
+            22,
+            1
+          ],
+          "finite": true,
+          "norm": 0.004164583693772699
+        },
+        "mass_matrix": {
+          "shape": [
+            22,
+            22
+          ],
+          "finite": true,
+          "norm": 6.61085158358848e-06
+        },
+        "tendon_generalized_force": {
+          "shape": [
+            22,
+            1
+          ],
+          "finite": true,
+          "norm": 6.550894180537457e-05
+        },
+        "tendon_length_jacobian": {
+          "shape": [
+            5,
+            22
+          ],
+          "finite": true,
+          "norm": 0.0036038632363836957
+        },
+        "tendon_lengths_m": {
+          "shape": [
+            5,
+            1
+          ],
+          "finite": true,
+          "norm": 0.5186281458351518
+        },
+        "velocity_bias": {
+          "shape": [
+            22,
+            1
+          ],
+          "finite": true,
+          "norm": 0.0
+        }
+      },
+      "mass_shape": [
+        22,
+        22
+      ],
+      "rank": 22,
+      "singular_values": [
+        4.6741207025501434e-06,
+        4.672526523957734e-06,
+        1.0778390619010294e-07,
+        1.0742038323883143e-07,
+        1.1950653450917588e-08,
+        1.181660212352681e-08,
+        2.239596297455736e-09,
+        2.2100858691129946e-09,
+        7.687696505025427e-10,
+        7.388080062770285e-10,
+        3.0387023175220676e-10,
+        2.973446990937215e-10,
+        9.495323435580997e-11,
+        9.012349853772287e-11,
+        5.475153088614563e-11,
+        5.274009082086442e-11,
+        2.1703451047535684e-11,
+        2.048161344218209e-11,
+        6.874948564413234e-12,
+        6.506972384767936e-12,
+        9.281954996788952e-13,
+        8.524523232986934e-13
+      ],
+      "condition": 5483146.182842138,
+      "symmetry_residual": 0.0,
+      "minimum_eigenvalue": 8.524523232987222e-13,
+      "eigenvalue_caveat": "Generalized mass entries depend on curvature-coordinate units and basis scaling.",
+      "rhs_finite": true,
+      "rhs_norm": 0.0042099541688428,
+      "numpy_solve": {
+        "finite": true,
+        "relative_residual": 1.8260423831336903e-15
+      },
+      "implicit_terms_finite": true,
+      "xdot": {
+        "status": "failed",
+        "exception": "Error in Function::call for 'gvs_dynamics' [MXFunction] at .../casadi/core/function.cpp:1466:\nError in Function::call for 'gvs_dynamics' [MXFunction] at .../casadi/core/function.cpp:362:\n.../casadi/core/function_internal.hpp:1700: Evaluation failed"
+      },
+      "isolated_solvers": {
+        "qr": {
+          "status": "failed",
+          "exception": "Error in Function::call for 'isolated_qr' [MXFunction] at .../casadi/core/function.cpp:362:\n.../casadi/core/function_internal.hpp:1700: Evaluation failed"
+        },
+        "csparse": {
+          "status": "passed",
+          "finite": true,
+          "relative_residual": 5.972744670318662e-15
+        },
+        "lapacklu": {
+          "status": "passed",
+          "finite": true,
+          "relative_residual": 3.443743456663168e-15
+        }
+      },
+      "elapsed_s": 5.311665699933656
+    },
+    "control12": {
+      "physical_identity": "3b6d43ab842d3fe7fc689e4b11d532afb3a3f5baec1fa20070b8638ce4f8657b",
+      "request": {
+        "tendon_count": 1
+      },
+      "physical_design_identity": "eb5e17e41b7c05d64780638d21580d9c3d52424a624a2b2fba207b9614c45d87",
+      "coordinate_order": [
+        "segment_0.kappa_y_node_0",
+        "segment_0.kappa_y_node_1",
+        "segment_0.kappa_y_node_2",
+        "segment_0.kappa_z_node_0",
+        "segment_0.kappa_z_node_1",
+        "segment_0.kappa_z_node_2",
+        "segment_1.kappa_y_node_0",
+        "segment_1.kappa_y_node_1",
+        "segment_1.kappa_y_node_2",
+        "segment_1.kappa_z_node_0",
+        "segment_1.kappa_z_node_1",
+        "segment_1.kappa_z_node_2"
+      ],
+      "tendon_order": [
+        "tendon_0"
+      ],
+      "tensions_n": [
+        0.2
+      ],
+      "resolved_basis": {
+        "representation_id": "gvs_bending_basis_v1",
+        "specification": {
+          "strategy": "structural_linear"
+        },
+        "coordinate_order": [
+          "segment_0.kappa_y_node_0",
+          "segment_0.kappa_y_node_1",
+          "segment_0.kappa_y_node_2",
+          "segment_0.kappa_z_node_0",
+          "segment_0.kappa_z_node_1",
+          "segment_0.kappa_z_node_2",
+          "segment_1.kappa_y_node_0",
+          "segment_1.kappa_y_node_1",
+          "segment_1.kappa_y_node_2",
+          "segment_1.kappa_z_node_0",
+          "segment_1.kappa_z_node_1",
+          "segment_1.kappa_z_node_2"
+        ],
+        "segments": [
+          {
+            "segment": "segment_0",
+            "start": 0,
+            "length_m": 0.16,
+            "knots": [
+              0.0,
+              0.5,
+              1.0
+            ],
+            "locations": [
+              {
+                "s": 0.0,
+                "kinds": [
+                  "segment_boundary"
+                ]
+              },
+              {
+                "s": 0.5,
+                "kinds": [
+                  "tendon_guide"
+                ]
+              },
+              {
+                "s": 1.0,
+                "kinds": [
+                  "component_attachment",
+                  "rigid_attachment",
+                  "segment_boundary",
+                  "tendon_guide"
+                ]
+              }
+            ]
+          },
+          {
+            "segment": "segment_1",
+            "start": 6,
+            "length_m": 0.11,
+            "knots": [
+              0.0,
+              0.5,
+              1.0
+            ],
+            "locations": [
+              {
+                "s": 0.0,
+                "kinds": [
+                  "segment_boundary"
+                ]
+              },
+              {
+                "s": 0.5,
+                "kinds": [
+                  "tendon_guide"
+                ]
+              },
+              {
+                "s": 1.0,
+                "kinds": [
+                  "component_attachment",
+                  "rigid_attachment",
+                  "segment_boundary",
+                  "tendon_anchor"
+                ]
+              }
+            ]
+          }
+        ],
+        "dimension": 12,
+        "axes": [
+          "y",
+          "z"
+        ]
+      },
+      "parameters": {
+        "model_id": "gvs_variable_strain_bending_v1",
+        "basis": {
+          "strategy": "structural_linear"
+        },
+        "integration_steps_per_segment": 24,
+        "quadrature_points_per_segment": 5,
+        "finite_difference_step": 1e-06
+      },
+      "gravity_robot_base_m_s2": [
+        0.0,
+        0.0,
+        -9.81
+      ],
+      "scene": {
+        "contract": "experiment.assembly",
+        "version": "1.0.0",
+        "data": {
+          "environment": {
+            "coordinate_frame": "world_base_x_forward_yz_cross_section",
+            "environment_id": "reach_free",
+            "gravity_m_s2": [
+              0.0,
+              0.0,
+              -9.81
+            ],
+            "gravity_source": "main@245a785 reach_free environment; Human-owned benchmark gravity",
+            "lights": [
+              {
+                "direction": [
+                  0.0,
+                  0.0,
+                  -1.0
+                ],
+                "position_m": [
+                  0.0,
+                  0.0,
+                  2.0
+                ]
+              }
+            ],
+            "objects": [
+              {
+                "conaffinity": 1,
+                "contype": 0,
+                "half_size_m": [
+                  2.0,
+                  2.0,
+                  0.1
+                ],
+                "kind": "plane",
+                "name": "floor",
+                "position_m": [
+                  0.0,
+                  0.0,
+                  -0.02
+                ]
+              }
+            ],
+            "schema_version": "1",
+            "truth_status": "HUMAN_OWNED",
+            "units": "SI"
+          },
+          "external_forces": [],
+          "floor_id": "floor",
+          "mount": {
+            "position_m": [
+              0.0,
+              0.0,
+              0.15
+            ],
+            "quaternion_wxyz": [
+              1.0,
+              0.0,
+              0.0,
+              0.0
+            ]
+          }
+        }
+      },
+      "model_construction": "passed",
+      "coordinates": 12,
+      "terms": {
+        "damping_force": {
+          "shape": [
+            12,
+            1
+          ],
+          "finite": true,
+          "norm": 0.0
+        },
+        "elastic_force": {
+          "shape": [
+            12,
+            1
+          ],
+          "finite": true,
+          "norm": 0.0
+        },
+        "gravity_force": {
+          "shape": [
+            12,
+            1
+          ],
+          "finite": true,
+          "norm": 0.005454676436485713
+        },
+        "mass_matrix": {
+          "shape": [
+            12,
+            12
+          ],
+          "finite": true,
+          "norm": 1.1852539164863906e-05
+        },
+        "tendon_generalized_force": {
+          "shape": [
+            12,
+            1
+          ],
+          "finite": true,
+          "norm": 0.0004280443902213881
+        },
+        "tendon_length_jacobian": {
+          "shape": [
+            1,
+            12
+          ],
+          "finite": true,
+          "norm": 0.0021402219511069405
+        },
+        "tendon_lengths_m": {
+          "shape": [
+            1,
+            1
+          ],
+          "finite": true,
+          "norm": 0.2839999999999999
+        },
+        "velocity_bias": {
+          "shape": [
+            12,
+            1
+          ],
+          "finite": true,
+          "norm": 0.0
+        }
+      },
+      "mass_shape": [
+        12,
+        12
+      ],
+      "rank": 12,
+      "singular_values": [
+        8.381602107273099e-06,
+        8.378511551688401e-06,
+        1.2566490075215397e-07,
+        1.2514064273836925e-07,
+        1.610402987170772e-08,
+        1.5893434311327084e-08,
+        2.323135538981271e-09,
+        2.2824362060798274e-09,
+        5.335374485402926e-10,
+        5.008249303618717e-10,
+        9.73906358273425e-11,
+        8.937054291098222e-11
+      ],
+      "condition": 93784.84044369763,
+      "symmetry_residual": 0.0,
+      "minimum_eigenvalue": 8.937054291098728e-11,
+      "eigenvalue_caveat": "Generalized mass entries depend on curvature-coordinate units and basis scaling.",
+      "rhs_finite": true,
+      "rhs_norm": 0.0054714456066703695,
+      "numpy_solve": {
+        "finite": true,
+        "relative_residual": 2.0116767395816018e-15
+      },
+      "implicit_terms_finite": true,
+      "xdot": {
+        "status": "passed",
+        "finite": true
+      },
+      "isolated_solvers": {
+        "qr": {
+          "status": "passed",
+          "finite": true,
+          "relative_residual": 4.655948302575167e-15
+        },
+        "csparse": {
+          "status": "passed",
+          "finite": true,
+          "relative_residual": 2.7591627459092083e-15
+        },
+        "lapacklu": {
+          "status": "passed",
+          "finite": true,
+          "relative_residual": 2.422557428772472e-15
+        }
+      },
+      "elapsed_s": 2.3602256999583915
+    },
+    "control14": {
+      "physical_identity": "aab2835fa786cdaa06e424c72a1838737773180ca86b5747a54c5adc70863bb7",
+      "request": {
+        "tendon_count": 5,
+        "spans": [
+          {
+            "last_segment": 0,
+            "count": 2,
+            "phase_rad": 0.3
+          },
+          {
+            "last_segment": 1,
+            "count": 3,
+            "phase_rad": 0.8,
+            "angular_offsets_rad": [
+              0.0,
+              0.13,
+              -0.08
+            ],
+            "radius_m": 0.021,
+            "guide_s": [
+              0.4
+            ],
+            "guide_angle_offset_rad": 0.06,
+            "anchor_angle_offset_rad": -0.09
+          }
+        ]
+      },
+      "physical_design_identity": "06f0ed2af16ee914269fd9997f075bbe51e6ffe2fa5f7ba92514a9a3670dcf99",
+      "coordinate_order": [
+        "segment_0.kappa_y_node_0",
+        "segment_0.kappa_y_node_1",
+        "segment_0.kappa_y_node_2",
+        "segment_0.kappa_y_node_3",
+        "segment_0.kappa_z_node_0",
+        "segment_0.kappa_z_node_1",
+        "segment_0.kappa_z_node_2",
+        "segment_0.kappa_z_node_3",
+        "segment_1.kappa_y_node_0",
+        "segment_1.kappa_y_node_1",
+        "segment_1.kappa_y_node_2",
+        "segment_1.kappa_z_node_0",
+        "segment_1.kappa_z_node_1",
+        "segment_1.kappa_z_node_2"
+      ],
+      "tendon_order": [
+        "tendon_0",
+        "tendon_1",
+        "tendon_2",
+        "tendon_3",
+        "tendon_4"
+      ],
+      "tensions_n": [
+        0.2,
+        0.2,
+        0.2,
+        0.2,
+        0.2
+      ],
+      "resolved_basis": {
+        "representation_id": "gvs_bending_basis_v1",
+        "specification": {
+          "strategy": "structural_linear"
+        },
+        "coordinate_order": [
+          "segment_0.kappa_y_node_0",
+          "segment_0.kappa_y_node_1",
+          "segment_0.kappa_y_node_2",
+          "segment_0.kappa_y_node_3",
+          "segment_0.kappa_z_node_0",
+          "segment_0.kappa_z_node_1",
+          "segment_0.kappa_z_node_2",
+          "segment_0.kappa_z_node_3",
+          "segment_1.kappa_y_node_0",
+          "segment_1.kappa_y_node_1",
+          "segment_1.kappa_y_node_2",
+          "segment_1.kappa_z_node_0",
+          "segment_1.kappa_z_node_1",
+          "segment_1.kappa_z_node_2"
+        ],
+        "segments": [
+          {
+            "segment": "segment_0",
+            "start": 0,
+            "length_m": 0.16,
+            "knots": [
+              0.0,
+              0.4,
+              0.5,
+              1.0
+            ],
+            "locations": [
+              {
+                "s": 0.0,
+                "kinds": [
+                  "segment_boundary"
+                ]
+              },
+              {
+                "s": 0.4,
+                "kinds": [
+                  "tendon_guide"
+                ]
+              },
+              {
+                "s": 0.5,
+                "kinds": [
+                  "tendon_guide"
+                ]
+              },
+              {
+                "s": 1.0,
+                "kinds": [
+                  "component_attachment",
+                  "rigid_attachment",
+                  "segment_boundary",
+                  "tendon_anchor",
+                  "tendon_guide"
+                ]
+              }
+            ]
+          },
+          {
+            "segment": "segment_1",
+            "start": 8,
+            "length_m": 0.11,
+            "knots": [
+              0.0,
+              0.4,
+              1.0
+            ],
+            "locations": [
+              {
+                "s": 0.0,
+                "kinds": [
+                  "segment_boundary"
+                ]
+              },
+              {
+                "s": 0.4,
+                "kinds": [
+                  "tendon_guide"
+                ]
+              },
+              {
+                "s": 1.0,
+                "kinds": [
+                  "component_attachment",
+                  "rigid_attachment",
+                  "segment_boundary",
+                  "tendon_anchor"
+                ]
+              }
+            ]
+          }
+        ],
+        "dimension": 14,
+        "axes": [
+          "y",
+          "z"
+        ]
+      },
+      "parameters": {
+        "model_id": "gvs_variable_strain_bending_v1",
+        "basis": {
+          "strategy": "structural_linear"
+        },
+        "integration_steps_per_segment": 24,
+        "quadrature_points_per_segment": 5,
+        "finite_difference_step": 1e-06
+      },
+      "gravity_robot_base_m_s2": [
+        0.0,
+        0.0,
+        -9.81
+      ],
+      "scene": {
+        "contract": "experiment.assembly",
+        "version": "1.0.0",
+        "data": {
+          "environment": {
+            "coordinate_frame": "world_base_x_forward_yz_cross_section",
+            "environment_id": "reach_free",
+            "gravity_m_s2": [
+              0.0,
+              0.0,
+              -9.81
+            ],
+            "gravity_source": "main@245a785 reach_free environment; Human-owned benchmark gravity",
+            "lights": [
+              {
+                "direction": [
+                  0.0,
+                  0.0,
+                  -1.0
+                ],
+                "position_m": [
+                  0.0,
+                  0.0,
+                  2.0
+                ]
+              }
+            ],
+            "objects": [
+              {
+                "conaffinity": 1,
+                "contype": 0,
+                "half_size_m": [
+                  2.0,
+                  2.0,
+                  0.1
+                ],
+                "kind": "plane",
+                "name": "floor",
+                "position_m": [
+                  0.0,
+                  0.0,
+                  -0.02
+                ]
+              }
+            ],
+            "schema_version": "1",
+            "truth_status": "HUMAN_OWNED",
+            "units": "SI"
+          },
+          "external_forces": [],
+          "floor_id": "floor",
+          "mount": {
+            "position_m": [
+              0.0,
+              0.0,
+              0.15
+            ],
+            "quaternion_wxyz": [
+              1.0,
+              0.0,
+              0.0,
+              0.0
+            ]
+          }
+        }
+      },
+      "model_construction": "passed",
+      "coordinates": 14,
+      "terms": {
+        "damping_force": {
+          "shape": [
+            14,
+            1
+          ],
+          "finite": true,
+          "norm": 0.0
+        },
+        "elastic_force": {
+          "shape": [
+            14,
+            1
+          ],
+          "finite": true,
+          "norm": 0.0
+        },
+        "gravity_force": {
+          "shape": [
+            14,
+            1
+          ],
+          "finite": true,
+          "norm": 0.004514985602479559
+        },
+        "mass_matrix": {
+          "shape": [
+            14,
+            14
+          ],
+          "finite": true,
+          "norm": 8.022655018640002e-06
+        },
+        "tendon_generalized_force": {
+          "shape": [
+            14,
+            1
+          ],
+          "finite": true,
+          "norm": 7.880948930534213e-05
+        },
+        "tendon_length_jacobian": {
+          "shape": [
+            5,
+            14
+          ],
+          "finite": true,
+          "norm": 0.004349230173282769
+        },
+        "tendon_lengths_m": {
+          "shape": [
+            5,
+            1
+          ],
+          "finite": true,
+          "norm": 0.5415874142961377
+        },
+        "velocity_bias": {
+          "shape": [
+            14,
+            1
+          ],
+          "finite": true,
+          "norm": 0.0
+        }
+      },
+      "mass_shape": [
+        14,
+        14
+      ],
+      "rank": 14,
+      "singular_values": [
+        5.672167003939762e-06,
+        5.669999087165693e-06,
+        1.4182160064879382e-07,
+        1.4129751123194525e-07,
+        1.6494428327664213e-08,
+        1.625127867755662e-08,
+        2.2398613498345206e-09,
+        2.2060070104279452e-09,
+        6.556936597305198e-10,
+        6.224038407469671e-10,
+        2.713164965993063e-10,
+        2.634038233610328e-10,
+        7.953738144633922e-11,
+        7.526268494440448e-11
+      ],
+      "condition": 75364.93028556867,
+      "symmetry_residual": 0.0,
+      "minimum_eigenvalue": 7.526268494434932e-11,
+      "eigenvalue_caveat": "Generalized mass entries depend on curvature-coordinate units and basis scaling.",
+      "rhs_finite": true,
+      "rhs_norm": 0.004568081777487534,
+      "numpy_solve": {
+        "finite": true,
+        "relative_residual": 1.789199069901423e-15
+      },
+      "implicit_terms_finite": true,
+      "xdot": {
+        "status": "passed",
+        "finite": true
+      },
+      "isolated_solvers": {
+        "qr": {
+          "status": "passed",
+          "finite": true,
+          "relative_residual": 3.160792724950711e-15
+        },
+        "csparse": {
+          "status": "passed",
+          "finite": true,
+          "relative_residual": 3.75515239631612e-15
+        },
+        "lapacklu": {
+          "status": "passed",
+          "finite": true,
+          "relative_residual": 2.5356036343625643e-15
+        }
+      },
+      "elapsed_s": 2.1363261999795213
+    }
+  },
+  "resources": {
+    "provider_requests": 0,
+    "physics_steps": 0,
+    "rl_training": 0,
+    "complete_task_evaluations": 0
+  }
+}

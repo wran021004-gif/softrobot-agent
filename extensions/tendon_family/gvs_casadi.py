@@ -328,9 +328,13 @@ class GVSCasadiFunctions:
         tendon_jacobian = ca.jacobian(tendon_lengths, q)
         tendon_force = -ca.mtimes(tendon_jacobian.T, u)
 
+        # QR's absolute R-entry cutoff (1e-12) rejects valid curvature mass
+        # matrices in SI units. Scale both sides identically; no mass, force,
+        # rank or physical-model regularization is introduced.
+        mass_scale = ca.norm_fro(mass)
         qdd = ca.solve(
-            mass,
-            tendon_force + gravity - bias - elastic - damping,
+            mass / mass_scale,
+            (tendon_force + gravity - bias - elastic - damping) / mass_scale,
         )
         x = ca.vertcat(q, qdot)
         xdot = ca.vertcat(qdot, qdd)
