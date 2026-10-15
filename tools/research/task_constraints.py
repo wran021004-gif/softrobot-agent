@@ -45,9 +45,20 @@ def check_analysis_applicability(requirements, query, assessment, model=None, ex
     if abs(p.period_s-requirements.physical_inputs['control_period_s']) > p.horizon_alignment_atol_s:
         reasons.append('Protocol period differs from the frozen physical input grid.')
     point = model.operating_point if model is not None else exact_point or {}
+    trajectory = query.operation == 'trajectory_feasibility'
+    sampled = None
+    if trajectory:
+        from extensions.math_analysis.trajectory import time_scope
+        start = point.get('actual_time_s', point.get('time_s'))
+        if start is None and query.operating_point in ('standardized_initial_pretension','controller_start_input'):
+            start = 0.
+        try:
+            sampled = time_scope(requirements, p, start)
+        except ValueError as exc:
+            reasons.append(str(exc))
     remaining = point.get('remaining_task_s', requirements.duration_s)
     horizon = query.scoring_window_s if query.operation in ('linearization','controllability') else remaining
-    if query.operation != 'equilibrium' and (horizon is None or horizon <= 0 or horizon > remaining+p.horizon_alignment_atol_s
+    if query.operation != 'equilibrium' and not trajectory and (horizon is None or horizon <= 0 or horizon > remaining+p.horizon_alignment_atol_s
             or abs(round(horizon/p.period_s)*p.period_s-horizon) > p.horizon_alignment_atol_s):
         reasons.append('Positive aligned horizon within actual remaining task time is required.')
     if model is not None:
@@ -71,6 +82,11 @@ def check_analysis_applicability(requirements, query, assessment, model=None, ex
         elif query.operation in ('linearization','controllability','equilibrium'):
             if c.signal.name == 'tip_position' and c.kind == 'norm_bound':
                 status, reason = 'diagnostic', 'Local position authority/static construction only; no sampled constraint verification.'
+        elif trajectory and c.kind in ('norm_bound','component_interval') and sampled is not None:
+            indices = [i for i in c.indices if i in sampled['sample_steps']]
+            if indices:
+                status = 'applicable' if indices == c.indices else 'partial'
+                reason = 'Shared held-input trajectory; past samples require separate evidence.'
         elif c.kind == 'norm_bound':
             if c.signal.name == 'tip_position' and c.indices == [last]:
                 status, indices, reason = 'applicable', [last], 'Terminal position only under bounded local affine dynamics.'
@@ -78,16 +94,23 @@ def check_analysis_applicability(requirements, query, assessment, model=None, ex
                 status, indices, reason = 'partial', [last], 'Terminal speed only; other holding samples are not checked.'
         coverage.append(dict(constraint_id=c.constraint_id, expressible=c.kind != 'unsupported',
             status=status, analyzed_indices=indices, reason=reason))
+        if trajectory:
+            coverage[-1]['unchecked_indices'] = [i for i in c.indices if i not in indices]
     available = any(c['status'] != 'not_applicable' for c in coverage)
     if not available:
         reasons.append('No constraint has a compatible operation; no unrelated calculation will run.')
     if reasons:
         coverage = [{**c, 'status':'not_applicable', 'analyzed_indices':[],
                      'reason':'; '.join(reasons)+' '+c['reason']} for c in coverage]
+        if trajectory:
+            for c, source in zip(coverage, requirements.constraints):
+                c['unchecked_indices'] = source.indices
     return dict(status='not_applicable' if reasons else 'applicable', reasons=reasons,
-        constraint_coverage=coverage, full_task_supported=False, execution_support='not_assessed',
+        constraint_coverage=coverage, full_task_supported=bool(trajectory and not reasons and sampled['start_time_s'] == 0.
+            and all(c['status'] == 'applicable' for c in coverage)), execution_support='not_assessed',
         model_assessment=assessment, horizon=dict(task_duration_s=requirements.duration_s,
             remaining_task_s=remaining, analysis_horizon_s=None if query.operation == 'equilibrium' else horizon,
             period_s=p.period_s, origin=point.get('actual_time_s'),
             interpretation='static construction' if query.operation == 'equilibrium' else
-                'Actual saved-state remaining horizon, or nominal horizon from the declared configuration operating point.'))
+                'Actual saved-state remaining horizon, or nominal horizon from the declared configuration operating point.',
+            **({'trajectory_grid':sampled} if trajectory else {})))

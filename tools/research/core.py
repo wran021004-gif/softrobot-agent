@@ -193,13 +193,14 @@ def claims(host):
 
 
 def packet(host):
+    from tools.research.analysis import compact_result
     s=state(host)
     if s['spec'].get('capabilities'):
         from tools.research.feedback import result_view, eligibility, facts
         from tools.research.rl import packet as rl_packet
         return dict(decision_facts=facts(host),specification=s['spec'],scoped_context=s.get('scoped_context',[]),frozen_task=plain(s['base_configuration']['task']),reference_candidate=s['reference_candidate'],
             candidates=[r for r in s['candidates'].values() if host.store.artifact(r)['profile_identity']==s['profile']['identity']],results=[dict(reference=r,**result_view(host,r),confirmation=eligibility(host,r)) for r in [*s['results'],*s.get('rl_evaluations',[])]],
-            analysis_results=[dict(reference=r,**{k:host.store.artifact(r).get(k) for k in ('status','candidate','operation','proxy_values','origin','charged_numerical_s','local_model_constraints','internal_calculations','score_semantics')}) for r in s.get('analysis_results',[])],
+            analysis_results=[compact_result(host.store.artifact(r),r) for r in s.get('analysis_results',[])],
             search_results=s.get('search_results',[]),
             mathematical_accounting=dict(evaluations=s.get('mathematical_evaluations',0),costs=s.get('analysis_costs',[]),engineering_preflight_s=sum(c['numerical_s'] for c in s.get('analysis_costs',[]) if c['origin']=='engineering_preflight'),cumulative_costs_preserved=True),
             mechanics_results=[dict(reference=r,**{k:host.store.artifact(r).get(k) for k in ('status','operation','trajectory_reference','objective_definition','original_task_feasible','relaxed_nlp_feasible','original_task_gaps','trajectory_metrics','charged_numerical_s','checkpoint_reference')}) for r in s.get('mechanics_results',[])],

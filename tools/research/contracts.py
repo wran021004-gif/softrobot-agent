@@ -60,7 +60,7 @@ class Search(Contract):
 
 class AnalysisRequest(Contract):
     candidate: EvidenceRef
-    operation: Literal['equilibrium','linearization','controllability','endpoint','braking']
+    operation: Literal['equilibrium','linearization','controllability','endpoint','braking','trajectory_feasibility']
     operating_point: Literal['standardized_initial_pretension','controller_start_input','target_equilibrium','halfway_waypoint','saved_state'] = 'halfway_waypoint'
     saved_state: EvidenceRef | None = None
     execution: EvidenceRef | None = None

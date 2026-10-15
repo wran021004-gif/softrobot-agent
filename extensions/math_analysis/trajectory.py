@@ -83,11 +83,15 @@ def verify_witness(model, dynamics, initial, delta, rows, scope, atol):
     x = np.asarray(initial, dtype=float); states = [x.copy()]
     for du in z:
         x = Ad@x+Bd@du+cd; states.append(x.copy())
+        if not np.all(np.isfinite(x)):
+            return dict(passed=False, finite=False, reason='NONFINITE_REPLAY_STATE')
     previous = model.operating_point.get('previous_applied_input_n')
     records = []; prediction_error = 0.
     for c, index, k, reference, output, base, matrix in rows:
         direct = z[k-1] if k else np.zeros(nu) if previous is None else np.asarray(previous)-u0
         y = np.asarray(output.value0)+np.asarray(output.C)@states[k]+np.asarray(output.D)@direct
+        if not np.all(np.isfinite(y)):
+            return dict(passed=False, finite=False, reason='NONFINITE_REPLAY_OUTPUT', constraint_id=c.constraint_id, sample_index=index)
         residual = y-reference; margins, value = _margins(c, residual)
         scale = max(c.radius if c.kind == 'norm_bound' else max(np.max(np.abs(c.lower)), np.max(np.abs(c.upper))), atol)
         violation = max(0., -float(np.min(margins)))
@@ -148,21 +152,29 @@ def _certificate(c, index, base, matrix, reference, lower, upper, atol):
 def trajectory_feasibility(model, requirements, protocol, *, initial_delta=None):
     """One convex bounded sequence; only replay or a checked separation decides."""
     result = dict(solver_scope=SCOPE, status='not_applicable', coverage=[], certificate=None,
+        all_requested_checked=False,
         model_scope='Frozen local affine dynamics, exact ZOH; sampled constraints only, no nonlinear/physical acceptance.')
     try:
         scope = time_scope(requirements, protocol, model.operating_point.get('actual_time_s'))
         result['horizon'] = scope
+        remaining = model.operating_point.get('remaining_task_s')
+        if remaining is None or abs(remaining-scope['remaining_task_s']) > protocol.horizon_alignment_atol_s:
+            raise ValueError('MODEL_REMAINING_TIME_DISAGREES_WITH_ABSOLUTE_GRID')
         steps = scope['step_count']; u0 = np.asarray(model.u0, dtype=float); nu = len(u0)
         limits = np.asarray(model.binding['tension_limits_n'], dtype=float)
         if (limits.shape != u0.shape or not np.all(np.isfinite(limits)) or not np.all(np.isfinite(u0))
                 or np.any(limits <= 0) or np.any(u0 < 0) or np.any(u0 > limits)):
             raise ValueError('INVALID_PHYSICAL_INPUT_BOX_OR_NOMINAL_INPUT')
+        if (requirements.physical_inputs.get('lower') != [0.]*nu
+                or requirements.physical_inputs.get('upper') != limits.tolist()):
+            raise ValueError('REQUIREMENT_AND_MODEL_PHYSICAL_INPUT_BOX_MISMATCH')
         previous = model.operating_point.get('previous_applied_input_n')
         if previous is not None:
             previous = np.asarray(previous, dtype=float)
             if previous.shape != u0.shape or not np.all(np.isfinite(previous)) or np.any(previous < 0) or np.any(previous > limits):
                 raise ValueError('INVALID_PREVIOUS_PHYSICAL_INPUT')
         dynamics, states = sampled_maps(model, steps, protocol.period_s, initial_delta)
+        result['discrete_dynamics'] = dict(zip(('A_d','B_d','drift_d'), (v.tolist() for v in dynamics)))
         initial = states[0][0]; outputs = {o.name:o for o in model.endpoint_outputs}; rows = []
         for c in requirements.constraints:
             output = outputs.get(c.signal.name); indices = []; reasons = []
@@ -209,8 +221,12 @@ def trajectory_feasibility(model, requirements, protocol, *, initial_delta=None)
                 constraint_scaling='radius or maximum absolute component bound, floored by check atol; physical residuals replayed')
         else:
             result['solver'] = dict(name='zero_horizon_direct_check', iterations=0)
+        if z.shape != lower.shape or not np.all(np.isfinite(z)):
+            result['reason'] = 'NONFINITE_OR_INCOMPATIBLE_SOLVER_SEQUENCE'
+            return result
         replay = verify_witness(model,dynamics,initial,z.reshape(steps,nu),rows,scope,atol)
         result.update(replay=replay, delta_input_n=z.reshape(steps,nu).tolist(), applied_input_n=(z.reshape(steps,nu)+u0).tolist())
+        result['all_requested_checked'] = result['full_requested_coverage'] and len(replay.get('records',[])) == len(rows)
         if replay['passed']:
             result['status'] = 'feasible_witness'
         else:
@@ -218,7 +234,8 @@ def trajectory_feasibility(model, requirements, protocol, *, initial_delta=None)
             for c,index,_,ref,_,base,matrix in rows:
                 certificate = _certificate(c,index,base,matrix,ref,lower,upper,atol)
                 if certificate:
-                    result.update(status='model_infeasibility_certificate', certificate=certificate); break
+                    result.update(status='model_infeasibility_certificate', certificate=certificate,
+                        reason='Verified necessary sampled constraint exclusion under the complete physical input box.'); break
         return result
     except (ValueError, FloatingPointError, np.linalg.LinAlgError) as exc:
         result['reason'] = str(exc)

@@ -52,6 +52,14 @@ def calculate(configuration,binding,query,exact_point=None):
     result['score_semantics']=score_semantics(q,binding,p,row)
     if row.get('model'):
         model=EndpointLinearizedModel.model_validate(row['model'])
+        if q.operation == 'trajectory_feasibility':
+            point = dict(model.operating_point)
+            if q.operating_point in ('standardized_initial_pretension','controller_start_input'):
+                point.update(actual_time_s=0., time_origin='frozen initializer via existing controller preparation')
+            if exact_point is not None:
+                point.update(actual_time_s=exact_point.get('actual_time_s',exact_point.get('time_s')),
+                    previous_applied_input_n=exact_point['u'])
+            model=model.model_copy(update=dict(operating_point=point))
         result.update(model=plain(model),operating_point=model.operating_point)
         applicability=check_analysis_applicability(requirements,q,assessment,model=model)
         if applicability['status']=='not_applicable':
@@ -85,6 +93,33 @@ def calculate(configuration,binding,query,exact_point=None):
         result['proxy_values']['held_position_min_eigenvalue']=float(score)
         result['units']=metrics['units']
         internal.append(dict(purpose='local_linearization_and_gramian',solver='CasADi AD / SciPy scaled Van Loan and ZOH',windows_s=p.windows_s))
+    elif q.operation == 'trajectory_feasibility':
+        from extensions.math_analysis.trajectory import trajectory_feasibility
+        trajectory=trajectory_feasibility(model,requirements,p)
+        result['trajectory']=trajectory
+        records=trajectory.get('replay',{}).get('records',[])
+        for coverage in applicability['constraint_coverage']:
+            actual=next((c for c in trajectory['coverage'] if c['constraint_id']==coverage['constraint_id']),None)
+            if actual:
+                coverage.update(actual)
+                coverage['status']='applicable' if not actual['unchecked_indices'] else 'partial' if actual['analyzed_indices'] else 'not_applicable'
+            checked=[r for r in records if r['constraint_id']==coverage['constraint_id']]
+            coverage.update(checked_indices=[r['sample_index'] for r in checked],
+                satisfied_indices=[r['sample_index'] for r in checked if r['passed']])
+        applicability['full_task_supported'] &= trajectory.get('full_requested_coverage',False)
+        if trajectory['status']=='not_applicable':
+            result['status']='not_applicable'
+            applicability.update(status='not_applicable',reasons=[trajectory.get('reason','Unsupported trajectory scope.')])
+        replay=trajectory.get('replay',{})
+        result['local_model_constraints']=dict(status=trajectory['status'],
+            max_absolute_violation=replay.get('max_absolute_violation'),
+            max_normalized_violation=replay.get('max_normalized_violation'),
+            worst_violation=replay.get('worst_violation'),minimum_tension_margin_n=replay.get('minimum_tension_margin_n'))
+        internal.append(dict(purpose='sampled_trajectory',solver=trajectory.get('solver'),
+            certificate=trajectory.get('certificate',{}).get('kind') if trajectory.get('certificate') else None))
+        result['units']=dict(position='m',speed='m/s',tension='N')
+        result['limitations']=[s for s in result['limitations'] if 'holding-window compliance' not in s]+[
+            'Only explicitly replay-verified samples in the frozen local affine model; no continuous-time, nonlinear, or backend acceptance.']
     else:
         target=EndpointTarget(position_m=inp.task.goal.data['target_m'],position_tolerance_m=inp.task.evaluator.parameters.data['tolerance_m'],
             position_scale_m=p.output_scale_m,tip_speed_limit_m_s=inp.policy.controller.parameters.data['settling']['speed_limit_m_s'])
@@ -109,11 +144,22 @@ def scoped_result(result, requirements, applicability, query):
     certificate = endpoint.get('infeasibility_certificate') or {}
     separation = certificate.get('separating_direction') or {}
     pointer = '/endpoint' if endpoint else '/raw' if 'raw' in result else ''
+    trajectory = result.get('trajectory') or {}
     if applicability['status'] == 'not_applicable':
         conclusion, verification, pointer = 'not_applicable', 'not_performed', '/analysis_applicability'
         interpretation = '; '.join(applicability['reasons'])
     elif result['status'] == 'computed':
-        if endpoint.get('status') == 'feasible_in_local_model' and endpoint.get('applied_input_n') and all(
+        if trajectory:
+            pointer='/trajectory'
+            if trajectory['status']=='feasible_witness' and trajectory.get('replay',{}).get('passed') is True:
+                conclusion,verification='feasible_witness','independent_discrete_replay_passed'
+                interpretation=('All declared sampled constraints verified' if applicability['full_task_supported'] else
+                    'Only the explicitly covered sampled constraints verified; incomplete frozen-task coverage')+' in the specified local affine model only.'
+            elif (trajectory['status']=='model_infeasibility_certificate' and trajectory.get('certificate',{}).get('verified') is True
+                    and math.isfinite(trajectory['certificate'].get('margin',float('nan'))) and trajectory['certificate']['margin']>0):
+                conclusion,verification='model_infeasibility_certificate','necessary_constraint_box_exclusion_verified'
+                interpretation='The identified necessary sampled constraint excludes the joint local-model task under the complete declared input box; other constraints need not be analyzed.'
+        elif endpoint.get('status') == 'feasible_in_local_model' and endpoint.get('applied_input_n') and all(
                 checks.get(k) is True for k in ('finite','lower_bounds','upper_bounds','position','speed')):
             conclusion, verification = 'feasible_witness', 'kernel_independent_checks_passed'
             interpretation = 'Verified bounded input for the covered terminal constraints of this frozen local affine model only.'
@@ -137,7 +183,7 @@ def scoped_result(result, requirements, applicability, query):
         horizon=applicability['horizon'], physical_inputs=requirements.physical_inputs,
         constraint_coverage=applicability['constraint_coverage'], numerical_result_pointer=pointer,
         computation_status=result['status'], verification_status=verification, supported_interpretation=interpretation,
-        unsupported_conclusions=['task acceptance', 'whole holding-window compliance', 'global nonlinear feasibility or infeasibility',
+        unsupported_conclusions=['task acceptance', 'continuous-time holding-window compliance' if trajectory else 'whole holding-window compliance', 'global nonlinear feasibility or infeasibility',
             'hardware performance', 'robustness', 'repeatability', 'equilibrium validity at a non-equilibrium point']))
     return result
 
@@ -159,7 +205,8 @@ def dispatch(host,query,key,*,guard,origin='model'):
         if not old['receipt']:
             raise ValueError('PENDING_ANALYSIS_RECOVER_WITHOUT_RECOMPUTATION')
         ref=json.loads(old['receipt'])['output']
-        return dict(reference=ref,operation_reuse=dict(additional_numerical_s=0,additional_analysis_evaluations=0))
+        return dict(**compact_result(host.store.artifact(ref),ref),
+            operation_reuse=dict(additional_numerical_s=0,additional_analysis_evaluations=0))
     guard(host,origin!='engineering_preflight')
     c=verify_candidate(host,q.candidate)
     s=state(host)
@@ -205,7 +252,9 @@ def dispatch(host,query,key,*,guard,origin='model'):
         point=deepcopy(host.store.artifact(q.saved_state))
         if point.get('candidate')!=plain(q.candidate) or point.get('configuration_identity')!=digest(cfg):
             raise ValueError('EXACT_SAVED_STATE_CANDIDATE_MISMATCH')
-        if len(point['x'])!=2*len(binding['coordinate_order']) or len(point['u'])!=6 or not point.get('phase'):
+        if (len(point['x'])!=2*len(binding['coordinate_order']) or len(point['u'])!=len(binding['tendon_order'])
+                or point.get('coordinate_order')!=binding['coordinate_order'] or point.get('tendon_order')!=binding['tendon_order']
+                or point.get('phase')!='interval_start_previous_applied_input' or point.get('input_units')!='N'):
             raise ValueError('EXACT_SAVED_STATE_ORDER_AND_PHASE_REQUIRED')
         point.update(name='saved_state',available=True,construction=dict(method='exact immutable saved state',state=plain(q.saved_state)))
     if point and (len(point['x'])!=2*len(binding['coordinate_order']) or len(point['u'])!=len(binding['tendon_order'])):
@@ -289,10 +338,23 @@ def recover(host):
         host.store.update_state(db,host.run_id,current)
         host.store.complete(row,dict(request_id=row['request_id'],execution_id=row['execution_id'],caller=host.actor,
             tool_id='research.candidate_analysis',tool_version='1.0.0',execution_status='completed',charged=zero()),value,elapsed=elapsed,db=db)
-    return dict(reference=ref,status=value['status'],proxy_values=value.get('proxy_values',{}),
-        task_acceptance='unmeasured',charged_numerical_s=elapsed,internal_calculations=value.get('internal_calculations',[]),
-        local_model_constraints=value.get('local_model_constraints'),score_semantics=value.get('score_semantics'),
-        analysis_applicability=value.get('analysis_applicability'),scoped_claim=value.get('scoped_claim'))
+    return compact_result(value,ref)
+
+
+def compact_result(value, reference):
+    """Shared tool/decision-packet projection, with exact pointers into raw evidence."""
+    summary=dict(reference=reference,**{k:value.get(k) for k in (
+        'status','candidate','operation','proxy_values','origin','charged_numerical_s','charged_analysis_evaluations',
+        'local_model_constraints','internal_calculations','score_semantics','scoped_claim','analysis_applicability')})
+    trajectory=value.get('trajectory') or {}
+    cert=trajectory.get('certificate') or {}
+    summary.update(task_acceptance='unmeasured',numerical_evidence=dict(reference=reference,
+        pointer=(value.get('scoped_claim') or {}).get('numerical_result_pointer','')),
+        trajectory_evidence=dict(solver_scope=trajectory.get('solver_scope'),
+            witness_pointer='/trajectory/replay' if trajectory.get('replay',{}).get('passed') else None,
+            certificate_pointer='/trajectory/certificate' if cert else None,
+            certificate={k:cert.get(k) for k in ('constraint_id','sample_index','kind','margin')} if cert else None))
+    return summary
 
 
 def score_semantics(query,binding,protocol,row):
