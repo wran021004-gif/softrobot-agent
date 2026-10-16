@@ -1,0 +1,239 @@
+{
+  "stage": "S5-T",
+  "candidate": {
+    "artifact_id": "33dc1c1de2579ba0cb3a3cf266e557f099898ef0fd71c70b4cdd4c32dc9637d9",
+    "media_type": "application/json"
+  },
+  "source_optimality": {
+    "artifact_id": "3363444785ce27751703cdad895e17490ecf079e73724bd93ce6aec35fab58f3",
+    "media_type": "application/json"
+  },
+  "mathematical_model_identity": "8f8eceb5f74d4b171c87f333db4db0f353aad051b375ff26aca795f7ac1fbaf2",
+  "task_identity": "882b3493037dcc8f8da294b3473e1223f0465e92c35bc3064bfc42d467bf212e",
+  "task_constraints": [
+    {
+      "constraint_id": "terminal_error_m",
+      "indices": [
+        35
+      ],
+      "kind": "norm_bound",
+      "lower": null,
+      "provenance": [
+        "/task/evaluator/parameters/data/tolerance_m",
+        "/task/timing",
+        "/task/goal",
+        "/policy/controller/parameters/data/settling/window_s"
+      ],
+      "radius": 0.01,
+      "reference": [
+        [
+          0.29,
+          0.035,
+          0.19
+        ]
+      ],
+      "signal": {
+        "dimension": 3,
+        "entity": "tip",
+        "frame": "world",
+        "missing": "unsupported",
+        "name": "tip_position",
+        "phase": "post_step",
+        "units": "m"
+      },
+      "unsupported_requirement": null,
+      "upper": null
+    },
+    {
+      "constraint_id": "holding_max_error_m",
+      "indices": [
+        30,
+        31,
+        32,
+        33,
+        34,
+        35
+      ],
+      "kind": "norm_bound",
+      "lower": null,
+      "provenance": [
+        "/policy/controller/parameters/data/settling/position_limit_m",
+        "/task/timing",
+        "/task/goal",
+        "/policy/controller/parameters/data/settling/window_s"
+      ],
+      "radius": 0.01,
+      "reference": [
+        [
+          0.29,
+          0.035,
+          0.19
+        ],
+        [
+          0.29,
+          0.035,
+          0.19
+        ],
+        [
+          0.29,
+          0.035,
+          0.19
+        ],
+        [
+          0.29,
+          0.035,
+          0.19
+        ],
+        [
+          0.29,
+          0.035,
+          0.19
+        ],
+        [
+          0.29,
+          0.035,
+          0.19
+        ]
+      ],
+      "signal": {
+        "dimension": 3,
+        "entity": "tip",
+        "frame": "world",
+        "missing": "unsupported",
+        "name": "tip_position",
+        "phase": "post_step",
+        "units": "m"
+      },
+      "unsupported_requirement": null,
+      "upper": null
+    },
+    {
+      "constraint_id": "holding_max_speed_m_s",
+      "indices": [
+        30,
+        31,
+        32,
+        33,
+        34,
+        35
+      ],
+      "kind": "norm_bound",
+      "lower": null,
+      "provenance": [
+        "/policy/controller/parameters/data/settling/speed_limit_m_s",
+        "/task/timing",
+        "/task/goal",
+        "/policy/controller/parameters/data/settling/window_s"
+      ],
+      "radius": 0.02,
+      "reference": [
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ]
+      ],
+      "signal": {
+        "dimension": 3,
+        "entity": "tip",
+        "frame": "world",
+        "missing": "unsupported",
+        "name": "tip_velocity",
+        "phase": "post_step",
+        "units": "m/s"
+      },
+      "unsupported_requirement": null,
+      "upper": null
+    }
+  ],
+  "task_capability": {
+    "definition": "minimum over legal U and complete dynamics of maximum squared-normalized original sampled task excess",
+    "epigraph": "unrestricted rho in new task_capability mode; negative values represent strict sampled feasibility",
+    "derivative_preflight": {
+      "artifact_id": "c0145a8528a7982b6526f2addb968104a3659ea8185467ae1a0d82b6c9585573",
+      "media_type": "application/json"
+    },
+    "full_optimization_attempts": 0
+  },
+  "kkt": {
+    "reliability": "solver_unresolved",
+    "source_converged": false,
+    "source_full_nlp_multipliers": "not_saved_in_historical_solve",
+    "new_extractor": "sr_codesign raw fmincon multipliers, complete-NLP stationarity/primal/dual/complementarity for future solves",
+    "envelope_gradient": "unavailable",
+    "reason": "No converged and validated base full-NLP KKT point; no perturbation reoptimizations admitted"
+  },
+  "fixed_input_mathematical_secant": {
+    "source_A": {
+      "artifact_id": "3d87789c63ec036677280b7e1bce1333036a25a33c236cd68b3305004bfaad78",
+      "media_type": "application/json"
+    },
+    "source_B": {
+      "artifact_id": "bba31be623a570c1137e6f58245bc4804bcaca68b406cdad3bfd4ce73efa5f8c",
+      "media_type": "application/json"
+    },
+    "physical_tensions": "same historical U_A",
+    "proximal_length_difference_m": -0.0050000000000000044,
+    "metrics": {
+      "terminal_error_m": {
+        "design_A": 0.009614039615036624,
+        "design_B": 0.0144632430443042,
+        "difference": 0.004849203429267576,
+        "quotient_per_m": -0.9698406858535144
+      },
+      "holding_max_error_m": {
+        "design_A": 0.010003816047737294,
+        "design_B": 0.014687187903027851,
+        "difference": 0.0046833718552905575,
+        "quotient_per_m": -0.9366743710581107
+      },
+      "holding_max_speed_m_s": {
+        "design_A": 0.028184903428883544,
+        "design_B": 0.16003098484538442,
+        "difference": 0.13184608141650087,
+        "quotient_per_m": -26.36921628330015
+      }
+    },
+    "reliability": "controlled_two_design_secant_not_local_derivative"
+  },
+  "physical_closed_loop_sensitivity": "unmeasured_no_paired_structural_MuJoCo_experiment",
+  "gradient_error_bound": null,
+  "gradient_lipschitz_bound": null,
+  "descent_certificate": "unavailable",
+  "physical_acceptance": "separately measured S5-A/S5-B failures",
+  "costs": {
+    "mathematical_evaluations": 1,
+    "full_reoptimizations": 0,
+    "physical_launches": 0,
+    "numerical_s": 49.257330500055104
+  },
+  "stage_summary_reference": {
+    "artifact_id": "0147c9fd75209569ebedc0bb6d5cd8cbfdb267f86f0f316f6c9767ad3f9b7e23",
+    "media_type": "application/json"
+  }
+}

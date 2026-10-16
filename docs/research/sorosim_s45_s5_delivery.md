@@ -218,6 +218,38 @@ controller on the original terminal or holding position metrics, and all
 three still failed the task. This single fixed-budget comparison does not
 establish general controller superiority.
 
-S5-T sensitivity and the integrated Agent pilot remain unexecuted at this
-boundary. They must retain distinct source, candidate, task, backend and
-budget identities.
+## S5-T task capability and sensitivity reliability
+
+The optional `task_capability` mode now expresses the maximum of the frozen
+sampled squared-normalized task excesses through an unrestricted signed
+epigraph. It preserves full dynamics and physical input bounds. Future full
+`fmincon` solves retain raw task, dynamics and bound multipliers, and calculate
+stationarity, primal, dual and complementarity residuals on the raw iterate
+before any projection or tension recovery. An envelope derivative would still
+need the explicit design dependence of dynamics, initialization and structural
+constraints; no partial task-only derivative is reported as that result.
+
+The dedicated [S5-T study](../../evidence/sorosim_s5t/study/archive_manifest.json)
+ran one 1,006-variable, 864-equality, 13-inequality check-only directional
+derivative preflight for Design B. Relative objective and constraint errors
+were 2.238e-8 and 1.727e-10. It made **zero** new full reoptimization
+attempts and zero physical launches, recording 49.257 s numerical time.
+The [structured classification](../../evidence/sorosim_s5t/summary.json)
+is `solver_unresolved`: the sealed S4.5 base solve stopped at its iteration
+limit, and that historical run did not retain full-NLP multipliers. The new
+multiplier extraction branch was not exercised by a full solve in this stage.
+Consequently the reoptimized optimal-value gradient, gradient error bound,
+Lipschitz bound, and certified descent condition are unavailable. No global
+optimality or physical sensitivity is claimed.
+
+The study also joined the historical A with U_A replay and the completed B
+with the **same U_A** cross replay. Across the 0.005 m proximal-length change,
+the fixed-command mathematical terminal-error difference was +0.004849203 m,
+holding-position difference +0.004683372 m, and holding-speed difference
++0.131846081 m/s in B minus A order. This is a two-design secant with exact
+common physical commands and separate initial states, not a local derivative
+of reoptimized task capability. The missing A with U_B cell still prevents a
+complete morphology-control interaction contrast.
+
+The integrated Agent feedback pilot remains unexecuted at this boundary. It
+must retain distinct source, candidate, task, backend and budget identities.
