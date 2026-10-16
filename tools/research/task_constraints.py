@@ -15,6 +15,9 @@ def model_assessment(configuration, requirements, operation):
     use = 'static_equilibrium' if operation == 'equilibrium' else 'linearization'
     model = Binding(extension_id='model.gvs', version='1.0.0', parameters=Payload(
         contract='family.gvs_model', data=dict(basis=configuration.policy.controller.parameters.data['recipe']['basis'])))
+    if configuration.policy.controller.extension_id == 'controller.sorosim_matlab_nmpc':
+        model = Binding(extension_id='model.sorosim_gvs',version='1.0.0',parameters=Payload(
+            contract='family.sorosim_model',data=dict(basis=configuration.policy.controller.parameters.data['recipe']['basis'])))
     reg = registry()
     declaration = reg.mathematical_model(model)
     assessment = plain(assess_model_uses(configuration.robot, configuration.task, model, [use],

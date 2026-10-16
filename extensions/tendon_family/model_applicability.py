@@ -33,7 +33,7 @@ def _topology_issue(design, model_id):
             raise ValueError('UNKNOWN_TIP_ANCESTOR: ' + current)
         current = component.connection.part
     outside = set(components) - ancestry
-    if model_id in ('model.pcc', 'model.gvs') and outside:
+    if model_id in ('model.pcc', 'model.gvs', 'model.sorosim_gvs') and outside:
         return 'Model requires one serial tip chain; components outside it: ' + ', '.join(sorted(outside))
     flexible_outside = sorted(name for name in outside if isinstance(components[name], Segment))
     if flexible_outside:
@@ -42,6 +42,10 @@ def _topology_issue(design, model_id):
 
 
 def _base_verdict(model_id, use):
+    if model_id == 'model.sorosim_gvs':
+        if use in ('reachability','shape_prediction','reduced_dynamics','local_model_control'):
+            return 'WARN', ['SoRoSim local bending computation is supported; physical agreement outside measured operating points is unvalidated.']
+        return 'REJECT', ['SoRoSim S4 analysis and co-design operations are not implemented; no CasADi substitution is allowed.']
     if model_id == 'model.pcc':
         if use == 'reachability':
             return 'ALLOW', ['Constant-curvature kinematics supports geometric reachability screening.']
@@ -109,7 +113,7 @@ def assess_model_uses(robot: RobotDescription, task: TaskDefinition, model: Bind
     reg = registry if registry is not None else default_registry()
     definition, parameters = reg.bind(model, 'dynamics_model')
     model_id = definition.extension_id
-    if model_id not in ('model.pcc', 'model.gvs', 'model.serial_bending_cells'):
+    if model_id not in ('model.pcc', 'model.gvs', 'model.sorosim_gvs', 'model.serial_bending_cells'):
         raise ValueError('TENDON_FAMILY_MODEL_REQUIRED: ' + model_id)
     declaration = reg.mathematical_model(model)
     issue = _topology_issue(design, model_id)
@@ -117,7 +121,7 @@ def assess_model_uses(robot: RobotDescription, task: TaskDefinition, model: Bind
     representation_id = representation_kind = representation_strategy = None
     coordinate_dimension = state_dimension = None
     missing_locations = []
-    if issue is None and model_id == 'model.gvs':
+    if issue is None and model_id in ('model.gvs','model.sorosim_gvs'):
         expected = resolve_basis(design, parameters.basis)
         if resolved_basis is not None:
             resolved_basis = ResolvedGVSBasis.model_validate(resolved_basis)
@@ -158,7 +162,7 @@ def assess_model_uses(robot: RobotDescription, task: TaskDefinition, model: Bind
             requested.add('contact_response')
         omitted = requested.intersection(declaration.unsupported_physics)
         unsupported.update(omitted)
-        force_omitted = (model_id in ('model.pcc', 'model.gvs') and
+        force_omitted = (model_id in ('model.pcc', 'model.gvs', 'model.sorosim_gvs') and
                          bool(assembly.external_forces) and use in FORCE_SENSITIVE)
         if force_omitted:
             unsupported.add('external_applied_forces')

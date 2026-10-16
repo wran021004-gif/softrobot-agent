@@ -61,3 +61,31 @@ preserved as `s1_attempt01.json`.
 Unsupported external forces, off-chain components, interior component connections
 and eccentric distributed sections are rejected explicitly. This bounded adapter
 does not claim arbitrary-robot coverage, contact or S4 analysis support.
+
+## S2
+
+The complete convention is `M*qdd+c+elastic+viscous-gravity-B*u=0`.
+`DAEJacobians` supplies recursive inverse dynamics, mass and analytical passive
+state/rate derivatives. The custom chord state derivative and tip-velocity/q
+derivative use declared MATLAB-local centered differences, not analytical claims.
+Acceleration and input derivatives are exactly M and -B. The model is built once;
+adjacent derivative outputs share the same recursive evaluation and routing data.
+Full force decomposition additionally uses the validated upstream Equilibrium
+recursion for gravity. The pinned `GeneralizedExternalForce` is stale: it references
+the nonexistent `SorosimLink.lp` field. No upstream file was patched. Optimizer
+callbacks omit the optional force decomposition pass.
+
+Six operating points cover zero state, curvature, velocity, acceleration, tension
+and their combination. The initial 96-step reference passed force/residual checks
+but failed the independently declared forward-acceleration absolute bound:
+546.950 rad/(m*s^2), relative 0.000525, with mass condition 173759. The failed
+comparison is preserved. A term-isolation refinement using existing NumPy kernels
+localized the discrepancy to geometry/mass integration; its partial substitutions
+are explicitly diagnostic, not acceptance evidence. The complete matched CasADi
+comparison was rerun at the supported 200-step resolution, keeping every physical
+quantity, basis, quadrature and tolerance unchanged. Final results are in
+`evidence/sorosim_control/s2.json`; earlier attempts remain available.
+
+S4 static-analysis/linearization requests now identify the SoRoSim predictor and
+return unsupported instead of silently executing the old CasADi analysis. MuJoCo
+continues to declare its original serial-cell execution model.

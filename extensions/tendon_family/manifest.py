@@ -179,6 +179,8 @@ SOROSIM_SOURCES = PLATFORM_SOURCES + PHYSICAL_SOURCES + (
     'matlab/sorosim_control/sr_model.m',
     'matlab/sorosim_control/sr_routing.m',
     'matlab/sorosim_control/sr_checks.m',
+    'matlab/sorosim_control/sr_dynamics.m',
+    'matlab/sorosim_control/sr_derivatives.m',
     'configs/research/control.json',
     'configs/research/control_sorosim.json',
     'configs/research/sorosim_dependency.json',
@@ -187,8 +189,8 @@ CONTRACTS += [('family.sorosim_model','1.0.0',m3.SorosimModelParameters),
               ('family.sorosim_reach_control','1.0.0',SorosimReachControl)]
 _gvs_model = next(e for e in EXTENSIONS if e.extension_id=='model.gvs')
 _sr_math = {**_gvs_model.capabilities['mathematical_model'],
-    'capabilities':dict(kinematics=True,statics=False,dynamics=False,linearization=False,gradients=True),
-    'representations':[], 'intended_uses':['reachability','shape_prediction']}
+    'capabilities':dict(kinematics=True,statics=False,dynamics=True,linearization=False,gradients=True),
+    'representations':[], 'intended_uses':['reachability','shape_prediction','reduced_dynamics','local_model_control']}
 EXTENSIONS.append(Extension(extension_id='model.sorosim_gvs',kind='dynamics_model',version='1.0.0',
     input_schema=m3.SorosimModelParameters,output_schema=m6.Payload,
     binding='extensions.tendon_family.sorosim_spec:SorosimModel',
@@ -196,7 +198,8 @@ EXTENSIONS.append(Extension(extension_id='model.sorosim_gvs',kind='dynamics_mode
     dependencies=('numpy','scipy','matlab.engine'), sources=SOROSIM_SOURCES,
     capabilities=dict(category='mathematical_model',role='adapter',mathematical_model=_sr_math,
         upstream='GVSRobotics/SoRoSim@24d573a3e864ffda87c42ee462a6ed620133cc7b',
-        operations=['routing'], unsupported_operations=['S4 analysis','co-design'], validation='S1 local geometry and routing')))
+        operations=['routing','dynamics','derivatives'], unsupported_operations=['S4 analysis','co-design'],
+        validation='S1/S2 matched local geometry, dynamics and mixed derivatives')))
 _sr_controller = next(e for e in EXTENSIONS if e.extension_id=='controller.gvs_nmpc' and e.version=='11.0.0')
 EXTENSIONS.append(replace(_sr_controller,extension_id='controller.sorosim_matlab_nmpc',version='1.0.0',
     input_schema=SorosimReachControl,binding='extensions.tendon_family.sorosim_control:SorosimNMPCController',

@@ -17,6 +17,9 @@ from extensions.tendon_family.gvs import forward_kinematics, tendon_kinematics
 # Declared before numerical execution. SI units, absolute AND relative checks.
 LIMITS = dict(length_m=2e-6,pose_m=2e-6,force_map_m2=2e-6,relative=2e-3,
     fd_routing_m2=2e-8,fd_tip_m2=2e-8,fd_force_nm3=2e-8)
+DYNAMIC_LIMITS=dict(mass_matrix=1e-9,velocity_bias=1e-7,elastic_force=1e-10,viscous_force=1e-10,
+    gravity_force=2e-6,tendon_generalized_force=2e-7,residual=2e-6,tip_velocity=2e-6,
+    relative=5e-3,derivative_absolute=2e-7,derivative_relative=2e-4)
 
 
 def error(a,b):
@@ -102,7 +105,102 @@ def verify_s1(evidence):
         assert max(v['absolute'] for v in row['errors'].values())<=1e-10,row['errors']
 
 
+def run_s2(destination):
+    import casadi as ca
+    from extensions.tendon_family.contracts import GVSContinuousDynamicsExpression
+    from extensions.tendon_family.gvs_casadi import GVSCasadiFunctions
+    destination=Path(destination)
+    if destination.exists(): raise ValueError('PRESERVE_EXISTING_EVIDENCE')
+    inp,source=final_candidate();s=specification(inp.robot.structure.data,inp.policy.discretization.data,
+        inp.task.environment.data,basis=inp.policy.controller.parameters.data['recipe']['basis'])
+    p=GVSModelParameters(basis=s['resolved_basis']['specification'],integration_steps_per_segment=200,
+        quadrature_points_per_segment=5)
+    started=time.perf_counter()
+    functions=GVSCasadiFunctions(GVSContinuousDynamicsExpression(design=inp.robot.structure.data,parameters=p,
+        gravity_robot_base_m_s2=s['gravity'],coordinate_order=s['coordinate_order'],tendon_order=s['tendon_order'],
+        tendon_force_limits_n=[t['force_limit_n'] for t in s['routes']]))
+    x=ca.MX.sym('x',24);u=ca.MX.sym('u',4);a=ca.MX.sym('a',12)
+    res=functions.implicit_residual(x,u,a)
+    derivative=ca.Function('matched_residual_derivative',[x,u,a],[ca.jacobian(res,x),ca.jacobian(res,a),ca.jacobian(res,u)])
+    tip=functions.tip_position_expression;J=ca.jacobian(tip,functions.q_symbol)
+    motion=ca.Function('matched_tip_jacobian',[functions.q_symbol],[J])
+    graph_s=time.perf_counter()-started
+    q=np.array([1.2,.8,-.7,.4,-.5,.3,-.9,.6,1.1,-.5,.2,-.3]);v=np.linspace(-.2,.3,12);acc=np.linspace(-10,20,12)
+    zero=np.zeros(12);tensions=np.array([.3,.1,.2,.1]);rows=[]
+    points=[('zero',zero,zero,zero,np.zeros(4)),('curvature',q,zero,zero,np.zeros(4)),
+        ('velocity',q,v,zero,np.zeros(4)),('acceleration',q,zero,acc,np.zeros(4)),
+        ('tension',q,zero,zero,tensions),('combined',q,v,acc,tensions)]
+    try:
+        with SorosimSession() as session:
+            construction=session.construct(s)
+            for name,q,v,acc,u in points:
+                payload=dict(q=q.tolist(),qd=v.tolist(),qdd=acc.tolist(),u=u.tolist())
+                raw=session.evaluate('dynamics',payload)
+                baseline=functions.evaluate(np.r_[q,v],u)
+                baseline['residual']=np.asarray(functions.implicit_residual(np.r_[q,v],u,acc)).ravel()
+                baseline['tip_velocity']=np.asarray(motion(q))@v
+                pairs={'mass_matrix':'mass_matrix','velocity_bias':'velocity_bias','elastic_force':'elastic_force',
+                    'viscous_force':'viscous_force','gravity_force':'gravity_force','tendon_generalized_force':'tendon_force',
+                    'residual':'residual','tip_velocity':'tip_velocity'}
+                errors={key:error(np.asarray(raw[actual]).reshape(baseline[key if key!='viscous_force' else 'damping_force'].shape),
+                    baseline[key if key!='viscous_force' else 'damping_force']) for key,actual in pairs.items()}
+                rows.append(dict(name=name,point=payload,raw=raw,
+                    baseline={k:np.asarray(v).tolist() for k,v in baseline.items()},errors=errors))
+            independent=session.evaluate('checks',payload)
+            jq,ja,ju=derivative(np.r_[q,v],u,acc)
+            errors={name:error(independent['base'][name],expected) for name,expected in
+                [('Rq',np.asarray(jq)[:,:12]),('Rqd',np.asarray(jq)[:,12:]),('Rqdd',ja),('Ru',ju)]}
+    except BaseException as exc:
+        atomic_json(destination,dict(stage='S2',status='execution_failed',error=str(exc),probes=rows,
+            limits=DYNAMIC_LIMITS,reference_graph_s=graph_s))
+        raise
+    atomic_json(destination,dict(stage='S2',source=source,specification_identity=s['identity'],construction=construction,
+        reference_graph_s=graph_s,reference_settings=p.model_dump(mode='json'),limits=DYNAMIC_LIMITS,
+        probes=rows,independent=independent,cross_derivatives=errors,timings=session.timings,
+        forward_error=error(independent['forward']['qdd'],np.asarray(rows[-1]['baseline']['qdd']).ravel()),
+        forward_limits=dict(absolute_rad_m_s2=100.,relative=.005,mass_condition_max=1e8,tip_velocity_derivative_absolute=2e-8),
+        scope='Local matched bending dynamics and derivatives; no physical task acceptance'))
+    return read(destination)
+
+
+def verify_s2(e):
+    assert e['limits']==DYNAMIC_LIMITS
+    for row in e['probes']:
+        assert row['raw']['valid']
+        M=np.array(row['raw']['mass_matrix']);assert np.linalg.eigvalsh(M).min()>0
+        for key,value in row['errors'].items():
+            reference_key='damping_force' if key=='viscous_force' else key
+            actual_key='tendon_force' if key=='tendon_generalized_force' else key
+            recomputed=error(np.asarray(row['raw'][actual_key]).ravel(),np.asarray(row['baseline'][reference_key]).ravel())
+            assert abs(recomputed['absolute']-value['absolute'])<1e-14
+            assert value['absolute']<=DYNAMIC_LIMITS[key],(row['name'],key,value)
+            # Zero quantities use the declared absolute numerical floor.
+            if np.max(np.abs(row['baseline'].get(key,[])),initial=0)>1e-10:
+                assert value['relative']<=DYNAMIC_LIMITS['relative'],(row['name'],key,value)
+        raw=row['raw'];n=len(raw['q'])
+        balance=M@raw['qdd']+np.asarray(raw['velocity_bias'])+np.asarray(raw['elastic_force'])+np.asarray(raw['viscous_force'])-np.asarray(raw['gravity_force'])-np.asarray(raw['tendon_force'])
+        assert np.max(np.abs(balance-raw['residual']))<1e-10
+    for key,value in e['independent']['errors'].items():
+        assert value['absolute']<=DYNAMIC_LIMITS['derivative_absolute'],(key,value)
+        assert value['relative']<=DYNAMIC_LIMITS['derivative_relative'],(key,value)
+    for key,value in e['cross_derivatives'].items():
+        assert value['absolute']<=2e-6 and value['relative']<=5e-3,(key,value)
+    if 'forward_error' in e:
+        assert e['forward_error']['absolute']<=100 and e['forward_error']['relative']<=.005
+        assert max(e['independent']['tip_velocity_errors'].values())<=2e-8
+
+
 class PhysicsTests(unittest.TestCase):
+    def test_s2_evidence(self):
+        path=ROOT/'evidence/sorosim_control/s2.json'
+        if not path.exists(): self.skipTest('Real S2 evidence not yet recorded')
+        verify_s2(read(path))
+
+    def test_corrupted_dynamic_balance_is_rejected(self):
+        path=ROOT/'evidence/sorosim_control/s2.json'
+        if not path.exists(): self.skipTest('Real S2 evidence not yet recorded')
+        e=read(path);e['probes'][-1]['raw']['residual'][0]+=.001
+        with self.assertRaises(AssertionError):verify_s2(e)
     def test_s1_evidence(self):
         path=ROOT/'evidence/sorosim_control/s1.json'
         if not path.exists(): self.skipTest('Real S1 evidence not yet recorded')
@@ -128,4 +226,6 @@ class PhysicsTests(unittest.TestCase):
 if __name__=='__main__':
     path=os.environ.get('SOROSIM_S1_EVIDENCE')
     if path: verify_s1(run_s1(path))
+    path=os.environ.get('SOROSIM_S2_EVIDENCE')
+    if path: verify_s2(run_s2(path))
     unittest.main()
