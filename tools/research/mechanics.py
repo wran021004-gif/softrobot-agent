@@ -1,6 +1,6 @@
 """Native candidate-bound full-horizon solve/replay; separate from backend acceptance."""
 from pathlib import Path
-import json,subprocess,time
+import base64,hashlib,json,subprocess,time
 from tools.research.state import state,update,save,guard
 from tools.research.design import verify_candidate
 from tools.platform_store import plain,zero
@@ -97,10 +97,13 @@ def recover(host):
     checkpoints={name:read(folder/(name+'.json')) for name in ('environment','optimizer_iterate','matlab_result')
         if (folder/(name+'.json')).exists()}
     if checkpoints:value['checkpoint_reference']=save(host,checkpoints,'mathematical_checkpoints')
+    log_bytes=(folder/'worker.log').read_bytes()
+    log=dict(text=log_bytes.decode('utf8',errors='replace'),
+        raw_base64=base64.b64encode(log_bytes).decode('ascii'),raw_sha256=hashlib.sha256(log_bytes).hexdigest())
     value.update(operation=request['operation'],design_candidate=request['design_candidate'],
         source_reference=request.get('source_reference'),
         original_request=save(host,request,'mathematical_request'),charged_numerical_s=boundary['elapsed_s'],implementation=p['implementation'],
-        boundary=boundary,task_acceptance='unmeasured',log_reference=save(host,dict(text=(folder/'worker.log').read_text(encoding='utf8')),'mathematical_log'))
+        boundary=boundary,task_acceptance='unmeasured',log_reference=save(host,log,'mathematical_log'))
     ref=save(host,value,'mathematical_result')
     row=host.store.lookup(host.run_id,p['worker_request_id'])
     with host.store.transaction() as db:

@@ -5,6 +5,7 @@ prepared=sr_nmpc(model,request);c=prepared.context;c.export_output_jacobians=tru
 [~,~,inspect]=sr_nmpc_callbacks(model,c);nv=numel(prepared.initial_vector);
 assert(c.elapsed==0,'CODESIGN_REQUIRES_FROZEN_INITIAL_STATE');
 requirements=r.requirements.constraints;
+feasibility=strcmp(r.arguments.objective_mode,'maximum_original_violation');
 nodes=[];groups=[];radii=[];references=[];labels={};
 for j=1:numel(requirements)
     t=requirements(j);
@@ -50,7 +51,6 @@ if ismember(r.operation,{'replay','cross_replay'})
         'roots',{prepared.roots},'total_s',toc(started));return;
 end
 initial=prepared.initial_vector;gaps=task_values(prepared.initial);
-feasibility=strcmp(r.arguments.objective_mode,'maximum_original_violation');
 if feasibility
     slacks=[max([0;gaps])+1e-4;0];
     lower=[c.lower;0;0];upper=[c.upper;inf;0];
