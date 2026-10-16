@@ -1,0 +1,75 @@
+{
+  "implementation": "7940e83b636152fa4ccdc5e3ac673c292e9d4388",
+  "original_failure_preserved": true,
+  "default_stack_repeats": 0,
+  "observations": [
+    {
+      "xml_sha256": "2f53a0dadae471cde5f2618a2a473275d19e16d55ebfccc826290ec0bc26c969",
+      "environment": {
+        "python": "D:\\softrobot-agent\\.mainline5-env\\Scripts\\python.exe",
+        "python_version": "3.11.16",
+        "python_sha256": "dc622409a52ea87e59eee9029d8331327a56315594bca38e371bbe5deca687b9",
+        "native_libraries": {
+          "_callbacks.cp311-win_amd64.pyd": "1ea99af4716d7bcc599a57260ed7dc087b7ed8fda8b9482dd3d99c520988177f",
+          "_constants.cp311-win_amd64.pyd": "857cf79e9491f36f0883e19debe58e47628d6356a1d2733639b5bf8ba5673153",
+          "_enums.cp311-win_amd64.pyd": "d6478cdb119daae6cfdc551bec4eb0e65ba13ae70efe4924123f718a0b575b24",
+          "_errors.cp311-win_amd64.pyd": "70d50a069caea77f1b9c52af56aebb99ec165184adcc108d543f52c2bc806db6",
+          "_functions.cp311-win_amd64.pyd": "24b5447a4982bd83c2c1ceac0b3cfe71b9b44c29cf31e8ebb49d5e4d9cd8cfa5",
+          "_render.cp311-win_amd64.pyd": "51023d7f924ca37e3d1bae261107da5783734d8579129eaff5d87a9b4d487c49",
+          "_rollout.cp311-win_amd64.pyd": "2603ece08da394ea69a0306e934194e78289ffe157fc678e8a7b560c560f416f",
+          "_simulate.cp311-win_amd64.pyd": "243bf8eb8b3d9116dc1a9e6ac64ea3a1540c4b7144f249dd3b951f4df15803f9",
+          "_specs.cp311-win_amd64.pyd": "11380093ba2f5052920fff409cb33a6534d5bcce9e83a36827f0043d5f91093a",
+          "_structs.cp311-win_amd64.pyd": "84036db8469bf4fc744a1417e3876cdf4829f9700ba32e7635f60fb97642f2d4",
+          "mujoco.dll": "5a4bcda24e9ada75e6f787e810e163fb25739ec1c5e62083af96286d26cfcb48"
+        },
+        "platform": "Windows-10-10.0.19044-SP0",
+        "machine": "AMD64",
+        "mujoco": "3.13.0",
+        "loader": "MjModel.from_xml_path/main_thread",
+        "threads": {
+          "OPENBLAS_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1",
+          "MKL_NUM_THREADS": "1"
+        }
+      },
+      "backend": {
+        "extension_id": "backend.family_mujoco",
+        "version": "1.1.0",
+        "parameters": {
+          "contract": "family.mujoco_parameters",
+          "version": "1.0.0",
+          "data": {
+            "integrator": "implicitfast",
+            "timestep_source": "task.timing.timestep_s",
+            "contact_model": "mujoco_convex_native",
+            "friction": [
+              0.0,
+              0.0,
+              0.0
+            ]
+          }
+        }
+      },
+      "native_exit_code": -1073741571,
+      "source_evidence": "evidence/m3c2_variable_segments/windows_xml_limitation.json",
+      "environment_provenance": "Original retained XML and same specified Python/MuJoCo installation; current identity inspected, no new default-stack execution",
+      "failed_boundary": "MjModel.from_xml_path/default Windows main-thread stack"
+    }
+  ],
+  "alternative_loader_check": {
+    "verified": true,
+    "stack_bytes": 16777216,
+    "boundary": {
+      "returncode": 0,
+      "termination_confirmed": true,
+      "elapsed_s": 0.28349790000356734
+    },
+    "worker_log": "{'nv': 144, 'nu': 3}\n",
+    "scope": "XML load only on an explicitly enlarged thread stack; no controller or full execution validation",
+    "enabled_in_final_runtime": false,
+    "native_loads": 1,
+    "physics_steps": 0
+  },
+  "task_success": null,
+  "physical_infeasibility_proven": false
+}
