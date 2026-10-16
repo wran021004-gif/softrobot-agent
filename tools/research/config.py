@@ -193,10 +193,18 @@ def resolve(path, profile=None, *, backend_profile=None):
     if study['confirmation']['fresh_independent_repetitions'] != 0:
         raise ValueError('COUNT_MODE_USES_ZERO_EXTRA_CONFIRMATIONS')
     stages=study['rl_limits']['training_stages'];rl='rl' in study['capabilities']
-    if type(stages) is not int or not (1 if rl else 0)<=stages<=10 or (rl and not profile and stages!=10):
+    if type(stages) is not int or not (1 if rl else 0)<=stages<=10 or (rl and study['mode']!='engineering_numerical' and not profile and stages!=10):
         raise ValueError('DECLARED_TRAINING_STAGE_LIMIT_REQUIRED')
-    if any(study['rl_limits'][k] is not None for k in ('training_actions', 'training_active_seconds', 'actions_per_trial', 'seconds_per_trial')):
-        raise ValueError('NO_AGGREGATE_OR_HIDDEN_PER_STAGE_CEILING_IN_COUNT_MODE')
+    limits=study['rl_limits']
+    if any(limits[k] is not None for k in ('training_active_seconds','seconds_per_trial')):
+        raise ValueError('COUNT_MODE_DISALLOWS_SCIENTIFIC_TIME_LIMITS')
+    if study['mode']=='engineering_numerical':
+        for name in ('training_actions','actions_per_trial'):
+            value=limits[name]
+            if value is not None and (type(value) is not int or value<1):
+                raise ValueError('POSITIVE_FINITE_RL_ACTION_COUNT_REQUIRED')
+    elif any(limits[k] is not None for k in ('training_actions','actions_per_trial')):
+        raise ValueError('DECLARED_ENGINEERING_ACTION_GRANT_REQUIRED')
     if not family_mode and study['topology_scope'] != dict(flexible_segments=2, independent_ideal_tensions=6):
         raise ValueError('CURRENT_TWO_SEGMENT_SIX_TENSION_SCOPE')
     if set(runtime['threads']) != {'OPENBLAS_NUM_THREADS', 'OMP_NUM_THREADS', 'MKL_NUM_THREADS'} or set(runtime['threads'].values()) != {'1'}:

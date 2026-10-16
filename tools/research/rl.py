@@ -188,6 +188,11 @@ def training_capacity(host, work):
     stages=s.get('admitted_training_stages',len(s.get('rl_runs',{})))
     if stages>=s['spec']['rl_limits']['training_stages']:
         raise ValueError('TRAINING_STAGE_LIMIT_EXHAUSTED')
+    caps=s['spec']['rl_limits']
+    allocated=sum(entry['allocation']['actions'] for entry in s.get('rl_runs',{}).values())
+    if ((caps['actions_per_trial'] is not None and work['actions']>caps['actions_per_trial']) or
+            (caps['training_actions'] is not None and allocated+work['actions']>caps['training_actions'])):
+        raise ValueError('RL_ACTION_COUNT_GRANT_EXHAUSTED')
     if (protected(host) or remaining['tool_calls']<6+s['spec']['budgets']['protected_public_operations']
         or (not engineering and remaining['model_calls']<4+s['spec']['budgets']['protected_provider_requests'])
         or remaining['backend_solves']<2 or evaluation_capacity(host)['admitted']<1):
@@ -414,6 +419,13 @@ def compatible_references(host, *, publish=True):
     from tools.research.design import full_science
     sources=[]
     rows=[]
+    for relation in state(host).get('imported_mathematical_references',[]):
+        ref=relation['source'];candidate_ref=relation['candidate']
+        value=host.store.artifact(ref)
+        candidate=verify_candidate(host,candidate_ref)
+        from tools.research.physical_replay import binding
+        binding(candidate['configuration'],value['trajectory'])
+        sources.append((ref,candidate_ref,value['trajectory'],candidate['configuration'],'mathematics'))
     for ref in state(host).get('mechanics_results',[]):
         value=host.store.artifact(ref)
         if value.get('operation')=='solve' and value.get('trajectory'):
@@ -473,6 +485,27 @@ def compatible_references(host, *, publish=True):
             rows.append(dict(candidate=candidate_ref,source=ref,source_kind=kind,available=False,reason=str(exc)))
     update(host,compatible_residual_references=rows)
     return rows
+
+
+def import_mathematical_reference(host, candidate_ref, source_ref):
+    """Admit a sealed, exact-candidate complete mathematical SI command grid."""
+    from tools.research.state import state,update
+    from tools.research.physical_replay import binding
+    candidate_ref=plain(candidate_ref);source_ref=plain(source_ref)
+    candidate=verify_candidate(host,candidate_ref)
+    source=host.store.artifact(source_ref)
+    if (source.get('source_kind')!='verified_mathematical_trajectory' or
+            not source.get('posthoc_verification',{}).get('checks',{}).get('repaired_verification_passed')):
+        raise ValueError('VERIFIED_MATHEMATICAL_TRAJECTORY_REQUIRED')
+    binding(candidate['configuration'],source['trajectory'])
+    relation=dict(candidate=candidate_ref,source=source_ref,
+        mathematical_model_identity=source['trajectory']['model_identity'],
+        task_identity=source['trajectory']['task_identity'],
+        scope='Complete compatible tension reference; physical acceptance is separate')
+    existing=state(host).get('imported_mathematical_references',[])
+    if relation not in existing:
+        update(host,imported_mathematical_references=[*existing,relation])
+    return relation
 
 
 def allocation_feedback(host):
