@@ -140,6 +140,42 @@ divergent states and are labeled accordingly. No incompatible state vectors
 were subtracted. The S5-A ledger charged one physical launch, three public
 operations, zero provider requests, and 1.417 s recorded numerical time.
 
-S5-B complete NMPC, S5-RL, S5-T sensitivity, and the integrated Agent pilot
-remain unexecuted at this boundary. They must retain distinct source,
-candidate, task, backend and budget identities.
+## S5-B complete SoRoSim feedback
+
+The separately frozen `sorosim-s5b-nmpc-20261016` study generated the same
+Design B physical geometry. Its one MuJoCo execution completed all 35 original
+control updates. The controller ran actual MATLAB SQP against each projected
+MuJoCo measurement; 34 noninitialization plans were accepted, and one update
+used the declared fallback after a solver error. The
+[Store archive](../../evidence/sorosim_s5b/study/archive_manifest.json)
+retains the controller observations, solver outcomes, raw update inputs,
+physical trajectory, independent evaluation, profile, and receipts. Its
+[compact result](../../evidence/sorosim_s5b/summary.json) links the exact
+candidate and evaluated execution.
+
+| Same Design B physical task | Fixed S5-A open loop | S5-B SoRoSim feedback |
+|---|---:|---:|
+| Terminal error (m) | 0.024960134 | 0.006099499 |
+| Holding maximum position error (m) | 0.024960134 | 0.006634832 |
+| Holding maximum speed (m/s) | 0.895355122 | 0.042351326 |
+| Original task acceptance | `valid_failure` | `valid_failure` |
+
+Feedback reduced all three observed summary metrics on this one paired
+candidate, but it did not satisfy the 0.020 m/s holding-speed requirement.
+The registered acceptance also marked the solver-errors component failed:
+there was one solver error and one unusable plan. All 35 updates missed the
+0.01 s real-time deadline. Study numerical time was 1,768.212 s, with one
+physical launch, six public operations, and zero provider requests.
+
+The profile aligned 34 accepted one-step mathematical predictions with the
+actual next MuJoCo outputs. The maximum world tip position innovation was
+0.005938145 m; the maximum velocity-vector innovation was 0.168852444 m/s.
+One prediction was unavailable for the fallback update at 0.34 s. These are
+matched feedback-step discrepancies, unlike S5-A's accumulated open-loop
+drift. The measured improvement does not isolate model mismatch, projection,
+solver quality, or control weights as a single cause, and it is not evidence
+of real-time NMPC.
+
+S5-RL, S5-T sensitivity, and the integrated Agent pilot remain unexecuted at
+this boundary. They must retain distinct source, candidate, task, backend and
+budget identities.
