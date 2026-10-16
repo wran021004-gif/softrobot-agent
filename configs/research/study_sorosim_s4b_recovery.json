@@ -1,5 +1,16 @@
 {
-  "defaults": "study_sorosim_s4b.json",
+  "defaults": "family_study_defaults.json",
+  "start_mode": "family_space",
+  "family_space": "family_space_v2.json",
+  "candidate_initialization": "all_candidate_dofs_zero_v1",
+  "base_commit": "eb3907c5fb4710137be2af0f874e67eadbdf2f9e",
+  "mode": "engineering_numerical",
+  "control": "control_sorosim.json",
+  "capabilities": ["analysis", "mathematics", "replay"],
+  "allowed_plan_actions": ["generate", "mechanics", "replay", "stop"],
+  "budgets": {"provider_requests": 0, "protected_provider_requests": 0, "public_operations": 12,
+    "protected_public_operations": 2, "physical_launches": 0, "mathematical_evaluations": 0,
+    "offline_nlp": 2, "bdf_replays": 2},
   "study_id": "sorosim-s4b-recovery-validation-20261016",
   "authorization": "Same user-authorized S4-B allowance: at most four complete nonlinear solves cumulatively. Original study sorosim-s4b-bounded-codesign-20261016 already consumed two solves and two replays; immutable evidence remains evidence/sorosim_s4b/pilot. This supplementary implementation validation permits exactly two further solves and two replays on the SAME two physical designs after restoring existing returned-tension recovery semantics. Aggregate maximum four solves, two unique pilot designs. No budget or historical result is reset. Zero physical execution, provider calls and RL training.",
   "evidence_destination": "evidence/sorosim_s4b/recovered_pilot"
