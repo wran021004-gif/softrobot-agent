@@ -19,8 +19,17 @@ for j=1:numel(requirements)
         references(:,end+1)=t.reference(k,:)';labels{end+1}=t.constraint_id;
     end
 end
-if strcmp(r.operation,'replay')
-    given=r.trajectory;X=given.states';U=given.tensions_n';
+if ismember(r.operation,{'replay','cross_replay'})
+    given=r.trajectory;U=given.tensions_n';
+    if strcmp(r.operation,'cross_replay')
+        % Transfer only physical commands. The destination model supplies every state.
+        X=prepared.initial.states;
+        gap=task_values(prepared.initial);
+        given.slacks=struct('position',max([0;gap(groups==1)]), ...
+            'speed',max([0;gap(groups==2)]));
+    else
+        X=given.states';
+    end
     assert(isequal(size(X),[2*c.n,c.steps+1]) && isequal(size(U),[c.m,c.horizon]),'REPLAY_DIMENSION_MISMATCH');
     assert(norm(X(:,1)-c.measured,inf)<1e-12,'REPLAY_INITIAL_STATE_MISMATCH');
     z=[reshape(X./c.state_scale,[],1);reshape(U./c.input_scale,[],1);given.slacks.position;given.slacks.speed];
@@ -36,12 +45,20 @@ if strcmp(r.operation,'replay')
         'independent_scaled_violation',violation,'reintegrated_scaled_state_error',difference, ...
         'force_residual_max_nm2',max(abs(physical(c.n+1:end,:)),[],'all')*.001, ...
         'task',task_report(e),'objective',objective(z),'full_task_horizon_s',r.requirements.duration_s, ...
+        'trajectory',struct('states',X','tensions_n',U','times_s',(0:c.steps)*c.h), ...
         'method','fresh implicit roots from actual initial state plus separate sr_dynamics force balance', ...
         'roots',{prepared.roots},'total_s',toc(started));return;
 end
 initial=prepared.initial_vector;gaps=task_values(prepared.initial);
-slacks=[max([0;gaps(groups==1)]);max([0;gaps(groups==2)])]+1e-4;
-z0=[initial;slacks];lower=[c.lower;0;0];upper=[c.upper;inf;inf];
+feasibility=strcmp(r.arguments.objective_mode,'maximum_original_violation');
+if feasibility
+    slacks=[max([0;gaps])+1e-4;0];
+    lower=[c.lower;0;0];upper=[c.upper;inf;0];
+else
+    slacks=[max([0;gaps(groups==1)]);max([0;gaps(groups==2)])]+1e-4;
+    lower=[c.lower;0;0];upper=[c.upper;inf;inf];
+end
+z0=[initial;slacks];
 opt=optimoptions('fmincon','Algorithm','sqp','Display','off','SpecifyObjectiveGradient',true, ...
     'SpecifyConstraintGradient',true,'MaxIterations',c.recipe.max_iterations,'MaxFunctionEvaluations',100000, ...
     'OptimalityTolerance',model.spec.solver.optimality_tolerance,'ConstraintTolerance',model.spec.solver.constraint_tolerance, ...
@@ -75,7 +92,11 @@ if c.recipe.recover_returned_tensions && flag>=0
     try
         request.initial_tensions=e.tensions';fresh=sr_nmpc(model,request);
         gap=task_values(fresh.initial);
-        repaired=[fresh.initial_vector;max([0;gap(groups==1)]);max([0;gap(groups==2)])];
+        if feasibility
+            repaired=[fresh.initial_vector;max([0;gap]);0];
+        else
+            repaired=[fresh.initial_vector;max([0;gap(groups==1)]);max([0;gap(groups==2)])];
+        end
         [ri,re]=constraints(repaired);rv=max([abs(re);ri;lower-repaired;repaired-upper]);
         recovery.objective=objective(repaired);recovery.scaled_violation=rv;
         if rv<=1e-5 && (violation>1e-5 || recovery.objective<f)
@@ -91,12 +112,16 @@ out=struct('status','returned','exitflag',flag,'converged',flag>0,'iterations',i
     'scaled_violation',violation,'relaxed_feasible',all(isfinite(z)) && violation<=1e-5, ...
     'trajectory',struct('states',e.states','tensions_n',e.tensions','times_s',(0:c.steps)*c.h, ...
         'slacks',struct('position',z(end-1),'speed',z(end))), ...
-    'task',task_report(e),'raw_returned',raw,'recovery',recovery, ...
+    'task',task_report(e),'original_feasible',all(task_values(e)<=0) && violation<=1e-5, ...
+    'raw_returned',raw,'recovery',recovery, ...
     'initial_task',task_report(prepared.initial),'optimization_s',solve_s, ...
     'preparation_s',prepared.warm_preparation_s,'total_s',toc(started),'initial_roots',{prepared.roots}, ...
     'objective_definition',r.arguments,'model_identity',model.spec.identity,'physical_task_acceptance','unmeasured');
 
     function [f,g]=objective(z)
+        if feasibility
+            g=zeros(nv+2,1);g(end-1)=1;f=z(end-1);return;
+        end
         g=zeros(nv+2,1);f=r.arguments.position_weight*z(end-1)+r.arguments.speed_weight*z(end);
         g(end-1:end)=[r.arguments.position_weight;r.arguments.speed_weight];
         if strcmp(r.arguments.objective_mode,'task_gap_with_effort')
@@ -114,19 +139,25 @@ out=struct('status','returned','exitflag',flag,'converged',flag>0,'iterations',i
         end
     end
     function [ci,ce,gi,ge]=constraints(z)
-        e=inspect(z(1:nv));ci=task_values(e)-z(nv+groups(:));ce=e.constraints;
+        e=inspect(z(1:nv));
+        if feasibility,slackIndices=ones(size(groups));else,slackIndices=groups;end
+        ci=task_values(e)-z(nv+slackIndices(:));ce=e.constraints;
         if nargout>2
             gi=zeros(nv+2,numel(nodes));ge=[e.jacobian';zeros(2,numel(ce))];
             for k=1:numel(nodes)
                 node=nodes(k);indices=node*2*c.n+(1:2*c.n);
                 if groups(k)==1,value=e.tip_positions(:,node);J=[e.position_jacobians(:,:,node),zeros(3,c.n)];
                 else,value=e.tip_velocities(:,node);J=e.velocity_jacobians(:,:,node);end
-                gi(indices,k)=2*(J'*(value-references(:,k))).*c.state_scale/radii(k)^2;gi(nv+groups(k),k)=-1;
+                gi(indices,k)=2*(J'*(value-references(:,k))).*c.state_scale/radii(k)^2;gi(nv+slackIndices(k),k)=-1;
             end
         end
     end
     function result=task_report(e)
-        gap=task_values(e);result=struct('squared_normalized_excess',gap,'constraint_ids',{labels}, ...
+        gap=task_values(e);values=radii(:).*sqrt(max(0,1+gap));
+        margins=radii(:)-values;
+        result=struct('squared_normalized_excess',gap,'actual_norm',values, ...
+            'signed_margin',margins,'normalized_signed_margin',margins./radii(:), ...
+            'maximum_original_violation',max([0;-margins]),'constraint_ids',{labels}, ...
             'times_s',nodes*c.h,'original_sampled_requirements_satisfied',all(gap<=0), ...
             'required_slacks',struct('position',max([0;gap(groups==1)]),'speed',max([0;gap(groups==2)])), ...
             'scope','Declared sampled rod-model task requirements; physical MuJoCo acceptance unmeasured');

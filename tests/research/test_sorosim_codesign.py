@@ -81,6 +81,25 @@ def pilot(directory,destination=None,study=None):
 
 
 class CodesignTests(unittest.TestCase):
+    def test_cross_replay_rejects_identity_and_incomplete_controls(self):
+        import tarfile,json
+        from extensions.tendon_family.sorosim_codesign import calculate
+        summary=read(ROOT/'evidence/sorosim_s4b/recovered_pilot/summary.json')
+        rows=summary['rows']
+        with tarfile.open(ROOT/'evidence/sorosim_s4b/recovered_pilot/immutable_artifacts.tar.gz') as archive:
+            candidate=json.load(archive.extractfile('artifacts/'+rows[1]['candidate']['artifact_id']+'.json'))
+        request=dict(configuration=candidate['configuration'],design_candidate=rows[1]['candidate'],
+            operation='cross_replay',trajectory=deepcopy(rows[0]['solve']['trajectory']))
+        wrong=deepcopy(request);wrong['trajectory']['tendon_order'].reverse()
+        with self.assertRaisesRegex(ValueError,'tendon_order'):
+            calculate(wrong)
+        short=deepcopy(request);short['trajectory']['tensions_n'].pop()
+        with self.assertRaisesRegex(ValueError,'INCOMPLETE_TENSION_SEQUENCE'):
+            calculate(short)
+        same=deepcopy(request);same['trajectory']=rows[1]['solve']['trajectory']
+        with self.assertRaisesRegex(ValueError,'DISTINCT_DESIGNS'):
+            calculate(same)
+
     def test_topology_uses_existing_candidate_route(self):
         from tempfile import TemporaryDirectory
         import gc

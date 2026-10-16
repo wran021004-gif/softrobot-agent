@@ -32,12 +32,29 @@ def dispatch(host,operation,arguments,key):
         candidate=plain(arguments.candidate)
         cfg=verify_candidate(host,candidate)['configuration']
         trajectory=None
+        warm_trajectory=None
+        if arguments.warm_source:
+            warm=host.store.artifact(arguments.warm_source)
+            if warm.get('source_kind')!='historical_mathematical_trajectory':
+                raise ValueError('IMMUTABLE_HISTORICAL_TRAJECTORY_SOURCE_REQUIRED')
+            warm_trajectory=warm['trajectory']
+    elif operation=='cross_replay':
+        candidate=plain(arguments.candidate)
+        cfg=verify_candidate(host,candidate)['configuration']
+        source_row=host.store.artifact(arguments.source)
+        if source_row.get('source_kind')!='historical_mathematical_trajectory':
+            raise ValueError('IMMUTABLE_HISTORICAL_TRAJECTORY_SOURCE_REQUIRED')
+        trajectory=source_row['trajectory']
+        warm_trajectory=None
     else:
         old=source(host,arguments)
         candidate=old['design_candidate']
         cfg=verify_candidate(host,candidate)['configuration']
         trajectory=old['trajectory']
-    request=dict(implementation=s['freeze'],operation=operation,configuration=cfg,design_candidate=candidate,arguments=plain(arguments) if operation=='solve' else None,trajectory=trajectory,study_id=host.run_id,store_root=str(host.store.root),request_id=key+'-mechanics')
+        warm_trajectory=None
+    request=dict(implementation=s['freeze'],operation=operation,configuration=cfg,design_candidate=candidate,arguments=plain(arguments) if operation=='solve' else None,trajectory=trajectory,
+        warm_trajectory=warm_trajectory,source_reference=plain(arguments.source) if operation=='cross_replay' else None,
+        study_id=host.run_id,store_root=str(host.store.root),request_id=key+'-mechanics')
     worker_key=key+'-mechanics'
     old=host.store.lookup(host.run_id,worker_key)
     if old:
@@ -81,6 +98,7 @@ def recover(host):
         if (folder/(name+'.json')).exists()}
     if checkpoints:value['checkpoint_reference']=save(host,checkpoints,'mathematical_checkpoints')
     value.update(operation=request['operation'],design_candidate=request['design_candidate'],
+        source_reference=request.get('source_reference'),
         original_request=save(host,request,'mathematical_request'),charged_numerical_s=boundary['elapsed_s'],implementation=p['implementation'],
         boundary=boundary,task_acceptance='unmeasured',log_reference=save(host,dict(text=(folder/'worker.log').read_text(encoding='utf8')),'mathematical_log'))
     ref=save(host,value,'mathematical_result')

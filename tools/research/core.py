@@ -258,7 +258,7 @@ def dispatch(host, value, request_id, origin='model'):
     plan=Plan.model_validate(value)
     if state(host)['spec'].get('allowed_plan_actions') is not None and plan.action not in state(host)['spec']['allowed_plan_actions']:
         raise ValueError('Operation outside declared follow-up scope')
-    capability={'execute':'nmpc','search':'search','mechanics':'mathematics','replay':'replay'}.get(plan.action)
+    capability={'execute':'nmpc','search':'search','mechanics':'mathematics','replay':'replay','cross_replay':'replay'}.get(plan.action)
     if capability and not enabled(state(host)['spec'],capability):
         raise ValueError('Undeclared capability: '+capability)
     old=host.store.lookup(host.run_id,request_id)
@@ -270,7 +270,7 @@ def dispatch(host, value, request_id, origin='model'):
             return cached(host.store.artifact(json.loads(old['receipt'])['output']))
         raise ValueError('RECOVER_EXISTING_OPERATION_NO_NEW_EXECUTION')
     admit_closeout(host,'research_plan',plain(plan))
-    guard(host,plan.action in ('generate','propose','execute','search','mechanics','replay') or plan.diagnostic is not None)
+    guard(host,plan.action in ('generate','propose','execute','search','mechanics','replay','cross_replay') or plan.diagnostic is not None)
     s=state(host)
     for r in plan.supporting_evidence:
         host.store.artifact(r)
@@ -323,10 +323,10 @@ def dispatch(host, value, request_id, origin='model'):
             result=execute(host,plain(plan.candidate),request_id)
         elif plan.action=='search':
             result=run_search(host,plan.search,request_id)
-        elif plan.action in ('mechanics','replay'):
+        elif plan.action in ('mechanics','replay','cross_replay'):
             from tools.research.mechanics import dispatch as mechanics_dispatch
-            result=mechanics_dispatch(host,'solve' if plan.action=='mechanics' else 'replay',
-                plan.mechanics if plan.action=='mechanics' else plan.mechanics_source,request_id)
+            result=mechanics_dispatch(host,{'mechanics':'solve','replay':'replay','cross_replay':'cross_replay'}[plan.action],
+                {'mechanics':plan.mechanics,'replay':plan.mechanics_source,'cross_replay':plan.cross_replay}[plan.action],request_id)
         elif plan.action=='diagnose':
             result=diagnose(host,[plain(r) for r in plan.supporting_evidence])
             if plan.diagnostic:
@@ -413,7 +413,7 @@ def recover(host):
             if len(matches)!=1:
                 raise ValueError('RECOVERY_REQUIRES_UNIQUE_SEALED_RESULT_NO_NEW_LAUNCH')
             result=dict(reference=matches[0],**compact_result(host.store.artifact(matches[0])))
-        elif plan.action in ('mechanics','replay'):
+        elif plan.action in ('mechanics','replay','cross_replay'):
             result=recovered
             if not result:
                 worker=host.store.lookup(host.run_id,key+'-mechanics')

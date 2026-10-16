@@ -1,0 +1,17 @@
+{
+  "defaults": "family_study_defaults.json",
+  "start_mode": "family_space",
+  "family_space": "family_space_v2.json",
+  "candidate_initialization": "all_candidate_dofs_zero_v1",
+  "base_commit": "0a4a692975c3c840a4a0bea612f07f3ae8dc0d4e",
+  "mode": "engineering_numerical",
+  "control": "control_sorosim.json",
+  "capabilities": ["analysis", "mathematics", "replay"],
+  "allowed_plan_actions": ["generate", "cross_replay", "mechanics", "replay", "stop"],
+  "budgets": {"provider_requests": 0, "protected_provider_requests": 0,
+    "public_operations": 12, "protected_public_operations": 1, "physical_launches": 0,
+    "mathematical_evaluations": 0, "offline_nlp": 2, "bdf_replays": 4},
+  "study_id": "sorosim-s45-original-feasibility-20261016",
+  "authorization": "User-authorized S4.5: exactly two historical-control cross-design integrations, at most two original-constraint mathematical optimizations and necessary independent replays. Original 35-interval reach-and-hold task and 0-8 N tendon limits frozen. No physical launch, RL training, or provider request.",
+  "evidence_destination": "evidence/sorosim_s45"
+}

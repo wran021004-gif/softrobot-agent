@@ -169,15 +169,27 @@ class LocalDiagnostic(Contract):
 class MechanicsRequest(Contract):
     candidate: EvidenceRef
     substeps: int = Field(default=1,ge=1,le=4,strict=True)
-    initialization: Literal['constant_0_2','ramp_0_2_to_0_4'] = 'constant_0_2'
-    objective_mode: Literal['task_gap','task_gap_with_effort'] = 'task_gap'
+    initialization: Literal['constant_0_2','ramp_0_2_to_0_4','saved_candidate_trajectory'] = 'constant_0_2'
+    warm_source: EvidenceRef | None = None
+    objective_mode: Literal['task_gap','task_gap_with_effort','maximum_original_violation'] = 'task_gap'
     position_weight: FiniteFloat = Field(default=1,gt=0)
     speed_weight: FiniteFloat = Field(default=1,gt=0)
     secondary_coefficient: FiniteFloat = Field(default=.001,ge=0)
 
+    @model_validator(mode='after')
+    def warm_binding(self):
+        if (self.warm_source is not None)!=(self.initialization=='saved_candidate_trajectory'):
+            raise ValueError('SAVED_CANDIDATE_INITIALIZATION_REQUIRES_WARM_SOURCE')
+        return self
+
+
+class CrossReplayRequest(Contract):
+    candidate: EvidenceRef
+    source: EvidenceRef
+
 
 class Plan(Contract):
-    action: Literal['generate', 'propose', 'execute', 'search', 'mechanics', 'replay', 'diagnose', 'confirm', 'select', 'stop']
+    action: Literal['generate', 'propose', 'execute', 'search', 'mechanics', 'replay', 'cross_replay', 'diagnose', 'confirm', 'select', 'stop']
     next_step: Literal['adjust_training','revise_design','diagnose','stop'] | None = None
     hypothesis: str = Field(min_length=1)
     supporting_evidence: list[EvidenceRef] = Field(default_factory=list)
@@ -194,6 +206,7 @@ class Plan(Contract):
     revise_selection: bool = Field(default=False, description='Explicitly replace a failed selection with a scientifically changed, freshly passing development solution; retain all confirmation records and cumulative costs')
     diagnostic: LocalDiagnostic | None = None
     mechanics: MechanicsRequest | None = None
+    cross_replay: CrossReplayRequest | None = None
     mechanics_source: EvidenceRef | None = None
     experience_disposition: dict[str, Literal['adopted', 'rejected', 'context_only']] = Field(default_factory=dict)
 
@@ -209,9 +222,9 @@ class Plan(Contract):
         if self.revise_selection and self.action not in ('confirm','select'):
             raise ValueError('REVISE_SELECTION_REQUIRES_CONFIRM_ACTION')
         required = {'generate': 'generation', 'propose': 'parameters', 'execute': 'candidate', 'search': 'search', 'confirm': 'selected_execution', 'select': 'selected_execution',
-                    'mechanics': 'mechanics', 'replay': 'mechanics_source'}
+                    'mechanics': 'mechanics', 'replay': 'mechanics_source', 'cross_replay':'cross_replay'}
         active = required.get(self.action)
-        for field in ('generation', 'parameters', 'search', 'candidate', 'selected_execution', 'mechanics'):
+        for field in ('generation', 'parameters', 'search', 'candidate', 'selected_execution', 'mechanics', 'cross_replay'):
             if (getattr(self, field) is not None) != (field == active):
                 raise ValueError('ACTION_REQUIRES_ONLY_' + str(active))
         if self.action=='replay' and self.mechanics_source is None:
