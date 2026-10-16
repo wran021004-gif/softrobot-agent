@@ -37,7 +37,8 @@ def import_history(host):
         original=json.load(archive.extractfile('artifacts/'+old_ref['artifact_id']+'.json'))
         if digest(original)!=old_ref['artifact_id']:
             raise ValueError('S45_SEALED_CANDIDATE_HASH_MISMATCH')
-        generated=core.dispatch(host,plan('generate',generation=original['parameters']),f's45-generate-{i}')['result']
+        generated=core.dispatch(host,plan('generate',generation=original['parameters']),
+            f"s45-generate-v{state(host)['profile']['version']}-{i}")['result']
         candidate=verify_candidate(host,generated['candidate'])
         physical=numerical_binding(candidate['configuration'],state(host)['spec'])['physical_design_identity']
         if physical!=row['physical_design_identity']:
@@ -129,10 +130,16 @@ def run(directory):
     rows=import_history(host)
     results=[]
     for target,source,label in ((0,1,'A_with_U_B'),(1,0,'B_with_U_A')):
-        result=core.dispatch(host,plan('cross_replay',cross_replay=dict(
-            candidate=rows[target]['candidate'],source=rows[source]['source']),
-            supporting_evidence=[rows[source]['source']]),'s45-cross-'+label)['result']
-        results.append(dict(label=label,target=rows[target]['candidate'],source=rows[source]['source'],result=result))
+        key='s45-cross-'+label
+        prior=host.store.lookup(host.run_id,key)
+        if prior and prior['receipt']:
+            result=host.store.artifact(json.loads(prior['receipt'])['output'])['result']
+        else:
+            result=core.dispatch(host,plan('cross_replay',cross_replay=dict(
+                candidate=rows[target]['candidate'],source=rows[source]['source']),
+                supporting_evidence=[rows[source]['source']]),key)['result']
+        results.append(dict(label=label,target=result.get('design_candidate',rows[target]['candidate']),
+            source=result.get('source_reference',rows[source]['source']),result=result))
         print(label,result.get('replay',{}).get('task',{}).get('original_sampled_requirements_satisfied'),flush=True)
     optimize=core.dispatch(host,plan('mechanics',mechanics=dict(candidate=rows[1]['candidate'],
         warm_source=rows[1]['source'],initialization='saved_candidate_trajectory',substeps=1,
