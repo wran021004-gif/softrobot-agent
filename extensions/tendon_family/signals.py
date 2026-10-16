@@ -36,11 +36,13 @@ def expanded(p,tension_reference=False,execution_mode='actuator_realistic'):
 def observation_specs(inp,reg):
     from .backends import physics_for
     from .contracts import Control
-    tension=(inp.policy.controller.extension_id in ('controller.gvs_lqr','controller.gvs_sampled_lqr','controller.gvs_nmpc') or
+    direct=inp.policy.controller.extension_id in ('controller.gvs_lqr','controller.gvs_sampled_lqr',
+        'controller.gvs_nmpc','controller.sorosim_matlab_nmpc')
+    tension=(direct or
         Control.model_validate(inp.policy.controller.parameters.data).mode=='tension_reference')
     parameters=inp.policy.controller.parameters.data
     execution_mode=(parameters.get('development_execution_mode') or 'ideal_tension'
-        if inp.policy.controller.extension_id in ('controller.gvs_lqr','controller.gvs_sampled_lqr','controller.gvs_nmpc')
+        if direct
         else parameters.get('tension_execution_mode','actuator_realistic'))
     return [s for _,_,s in expanded(physics_for(inp),tension,execution_mode)]
 

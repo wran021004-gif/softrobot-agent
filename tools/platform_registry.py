@@ -3,7 +3,7 @@
 Only developers install Python packages. Config/model values cannot name modules.
 """
 from dataclasses import dataclass, field
-from importlib import import_module, util, metadata
+from importlib import import_module, util, metadata, machinery
 from pathlib import Path
 import ast
 import sys
@@ -139,7 +139,12 @@ class Registry:
                 try:
                     metadata.distribution('matlabengine')
                 except metadata.PackageNotFoundError:
-                    missing.append(dep)
+                    # MATLAB's installed Engine source can be supplied by PYTHONPATH.
+                    # Inspect its child spec without importing or starting the Engine.
+                    parent=util.find_spec('matlab')
+                    if not parent or not parent.submodule_search_locations or not machinery.PathFinder.find_spec(
+                            'matlab.engine',parent.submodule_search_locations):
+                        missing.append(dep)
             elif util.find_spec(dep.split('.')[0]) is None:
                 missing.append(dep)
         if missing:

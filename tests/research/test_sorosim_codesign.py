@@ -81,6 +81,14 @@ def pilot(directory,destination=None):
 
 
 class CodesignTests(unittest.TestCase):
+    def test_frozen_harness_configuration_compiles(self):
+        from tools.research.config import resolve
+        from tools.platform_tasks import compile_input
+        from tools.platform_registry import registry
+        spec=resolve(ROOT/'configs/research/study_sorosim_s4b.json')
+        snapshot=compile_input(spec['configuration'],registry())
+        self.assertIn('controller.sorosim_matlab_nmpc@1.0.0',snapshot['dependencies'])
+
     def test_full_problem_derivatives(self):
         out=read(ROOT/'evidence/sorosim_s4b/check01/derivative_checks.json')
         self.assertEqual(out['variables'],1006);self.assertEqual(out['equalities'],864)
