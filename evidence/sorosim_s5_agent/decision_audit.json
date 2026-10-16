@@ -1,0 +1,83 @@
+{
+  "status": "retrospective_engineering_identity_audit",
+  "pilot_candidate": {
+    "artifact_id": "47cb1f9ece26104d21d836c8068bdc4852b764cb186e5b53b7ea53f7f2793b3d",
+    "media_type": "application/json"
+  },
+  "comparisons": {
+    "s5a": {
+      "prior_candidate": {
+        "artifact_id": "358b8cb05c530c763f96157d67f76a6f4cbc4ea83884d288203f552f7f58ec6f",
+        "media_type": "application/json"
+      },
+      "same_parameters": true,
+      "same_robot": true,
+      "same_task": true,
+      "same_seed": true,
+      "same_backend": true,
+      "same_controller": true,
+      "differing_policy_keys": [
+        "budget"
+      ],
+      "prior_archive_sha256": "7e4612ae8aa76c43e05333aa618c41aa13ee852f4a11f15d2bc0f845e2234b13"
+    },
+    "s5b": {
+      "prior_candidate": {
+        "artifact_id": "ee00ff67661d3f0340bb9165189a8f88653d121c81ac5a72bef2ead31b33733b",
+        "media_type": "application/json"
+      },
+      "same_parameters": true,
+      "same_robot": true,
+      "same_task": true,
+      "same_seed": true,
+      "same_backend": true,
+      "same_controller": true,
+      "differing_policy_keys": [
+        "budget"
+      ],
+      "prior_archive_sha256": "913a45190863cd1c32ffc4b5ca2dbbcb9a63eaccf41ada457a565b2e3cc9ace6"
+    }
+  },
+  "nmpc": {
+    "result": {
+      "artifact_id": "6b09e908b8a18e1419060bafc73516d2f80f9131c6f3083b64b235247e174a25",
+      "media_type": "application/json"
+    },
+    "execution_id": "0101afc6c25c444c9fc2446e43d59946",
+    "fresh_measurements": {
+      "status": "valid_failure",
+      "accepted": false,
+      "metrics": {
+        "holding_max_error_m": 0.006634831636737157,
+        "holding_max_speed_m_s": 0.04235132598107169,
+        "terminal_error_m": 0.006099499288325333
+      },
+      "solver_errors": 1
+    },
+    "same_acceptance_metrics_as_s5b": true,
+    "same_solver_error_count_as_s5b": true
+  },
+  "physical_replay": {
+    "result": {
+      "artifact_id": "30d7c488021b653d7e10dc8d9e3335108ba48bcd38c6408ffacacfa7c58ecf09",
+      "media_type": "application/json"
+    },
+    "source": {
+      "artifact_id": "45815dc9cbf9266b3406a91657d1f9d7a163ac96557a5a4dce750d41f16780f9",
+      "media_type": "application/json"
+    },
+    "same_source_as_s5a": true,
+    "fresh_measurements": {
+      "status": "valid_failure",
+      "accepted": false,
+      "metrics": {
+        "holding_max_error_m": 0.024960134186728454,
+        "holding_max_speed_m_s": 0.8953551219580574,
+        "terminal_error_m": 0.024960134186728454
+      },
+      "solver_errors": 0
+    },
+    "same_acceptance_metrics_as_s5a": true
+  },
+  "scope": "Artifact and metric equality establish repetition of physical configurations and observed results in these executions. They do not prove general determinism or identify a unique cause of task failure."
+}

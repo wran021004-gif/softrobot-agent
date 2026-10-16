@@ -251,10 +251,7 @@ common physical commands and separate initial states, not a local derivative
 of reoptimized task capability. The missing A with U_B cell still prevents a
 complete morphology-control interaction contrast.
 
-The integrated Agent feedback pilot remains unexecuted at this boundary. It
-must retain distinct source, candidate, task, backend and budget identities.
-
-## Integrated Agent preflight and external-call boundary
+## Integrated Agent feedback pilot
 
 The local S5-Agent preflight froze the `formal_research` study, materialized
 the exact Design B candidate, imported the verified mathematical tension
@@ -263,18 +260,56 @@ in the same research Store. Its [decision packet](../../evidence/sorosim_s5_agen
 shows one candidate, a valid compatible residual reference, 12 remaining
 provider requests, 39 remaining public operations and two backend launch
 slots. The [preflight Store archive](../../evidence/sorosim_s5_agent/preflight_study/archive_manifest.json)
-preserves source ownership. This demonstrates local tool and evidence
-availability, **not** an Agent-generated feedback decision.
+preserves source ownership. That preparation was an engineering action.
 
-Automatic approval review rejected the outbound live call to the configured
-`https://api.deepseek.com/chat/completions` endpoint. Its reason was that the
-user authorization for the bounded pilot did not clearly name the destination
-for repository-derived task, candidate and experiment evidence. No provider
-request was sent, no model decision was generated, and no P6 scientific
-execution was launched. The [egress review](../../evidence/sorosim_s5_agent/egress_review.json)
-names the endpoint, proposed payload categories, exact local packet hash,
-request ceiling and the explicit approval still needed. The blocked send was
-not retried indirectly.
+Automatic approval review initially rejected the outbound live call to
+`https://api.deepseek.com/chat/completions` because the destination was not
+explicit in the authorization. The [egress review](../../evidence/sorosim_s5_agent/egress_review.json)
+records that earlier boundary. The user then explicitly approved one bounded
+send to this endpoint, including repository-derived task, candidate and P1–P5
+evidence and subsequent tool outputs, with at most 12 provider requests. The
+live pilot used the existing credential loader and [frozen study](../../configs/research/study_sorosim_s5_agent_feedback.json).
+
+The model made 10 provider requests and 16 original tool requests. It first
+read the imported P1–P5 evidence, then chose one 35-update SoRoSim NMPC
+execution and one fixed-tension physical replay. One initial evidence read
+failed on a bad reference; the model corrected the read. Its first replay
+proposal failed plan validation; a corrected proposal launched. After both
+physical failures, the model read the exact new result artifacts. The STOP
+gate rejected three incomplete proposals until the model supplied the exact
+reads and cited both fresh results. The accepted disposition stopped with no
+selected solution. Original requests, feedback, rejected calls, evaluations
+and final disposition are in the [live Store archive](../../evidence/sorosim_s5_agent/study/archive_manifest.json)
+and [pilot summary](../../evidence/sorosim_s5_agent/summary.json).
+
+| Pilot action | Terminal error (m) | Holding position (m) | Holding speed (m/s) | Solver errors | Original acceptance |
+|---|---:|---:|---:|---:|---|
+| Model-selected SoRoSim NMPC, 35 updates | 0.006099499 | 0.006634832 | 0.042351326 | 1 | valid failure |
+| Model-selected fixed mathematical tensions, 35 commands | 0.024960134 | 0.024960134 | 0.895355122 | 0 | valid failure |
+
+The pilot's NMPC metrics exactly reproduce S5-B; its fixed-tension metrics
+exactly reproduce S5-A. The candidate artifact IDs differ across studies,
+but the [identity audit](../../evidence/sorosim_s5_agent/decision_audit.json)
+finds equal candidate parameters, compiled robot, task, seed, backend and
+controller. S5-A and the pilot replay also use the same source
+tension artifact (`45815dc9...`). These are new execution IDs of the same
+physical configurations, not new morphologies or a discriminating controller
+comparison. The model's stated reason that S5-A/S5-B used different physical
+candidates is false at this level. Repeated metrics support reproducibility
+of these two outcomes; they do not establish deterministic behavior in
+general. The measured prediction discrepancies make model mismatch a plausible
+contributor, but neither these runs nor the pilot isolate it from controller
+settings, solver behavior or other causes. The model's categorical causal and
+no-remaining-route claims are hypotheses, not established findings. The
+original task thresholds remain frozen.
+
+The pilot consumed two of two backend launch slots, 20 of 40 public
+operations, and 10 of 12 provider requests; no fresh NLP, BDF replay, PPO
+training or RL evaluation ran. The shared ledger reports 2,047.227 s charged
+wall time, 1,826.329 s numerical time, and 2,576.858 s study elapsed time.
+There is no accepted physical solution or demonstrated Agent performance
+advantage. The observable Agent milestone is an evidence-conditioned STOP
+after actual feedback, with the duplicate-experiment reasoning flaw above.
 
 ## Implementation, source freezes and costs
 
@@ -293,7 +328,7 @@ delivery commit and verified remote SHA are reported with the final handoff.
 | S5-B | `0ea922a8dede13ce7027a3f6ab9033e71043c7c5fdb5e38f902dbd2cd1eec4ac` |
 | S5-RL | `7b1b29a48ef31511d3729f282673ae70e160f711420d14435f7b97c66d81586d` |
 | S5-T | `4f2a9ad5dc1f131f132bacd8a09ee7e0a88c11c9676962ce02d904de8ed8afc8` |
-| S5-Agent preflight | `545b63f7382db8023f6fb83aaf912aa26cdb9b36860144557bb9546362dcf886` |
+| S5-Agent preflight and live pilot | `545b63f7382db8023f6fb83aaf912aa26cdb9b36860144557bb9546362dcf886` |
 
 | Production owner | Change and reason | Approx. lines changed |
 |---|---|---:|
@@ -320,6 +355,7 @@ above are navigation aids, not replacements for their raw results.
 | S5-RL | 0 | 0 | 4, two starts/two evaluations | 65,536 | 0 |
 | S5-T | 0 | 0; one derivative preflight | 0 | 0 | 0 |
 | S5-Agent local preflight | 0 | 0 | 0 | 0 | 0 |
+| S5-Agent live pilot | 0 | 0 | 2, NMPC and fixed replay | 0 | 10 |
 
 The scope of P1 is limited by the missing A with U_B cross outcome; the S4.5
 feasible witness is nonconverged and its sealed replay retained the original
@@ -327,8 +363,8 @@ false flag alongside the post-hoc verifier audit. S5-A, S5-B, and both PPO
 checkpoint evaluations are complete original-task physical failures. The
 observed NMPC speed improvement does not establish a unique causal mechanism
 or a real-time controller. S5-T has no validated KKT point or certified
-gradient. The live Agent feedback decision remains blocked at the external
-send boundary.
+gradient. The live Agent made a genuine feedback-conditioned STOP decision,
+but repeated two earlier physical configurations and found no accepted result.
 
 For read-only reproduction, set `PYTHONPATH` to the worktree and
 `tests/research`, use the configured research interpreter and the three
@@ -339,10 +375,11 @@ source and artifact SHA-256 values from each stage's `archive_manifest.json`
 and compact index. The stage scripts above show the original contained
 experiment calls and frozen grants; sealed scientific executions must not be
 repeated under their existing study identities. Local Agent packet preparation
-uses `python tests/research/sorosim_s5_agent_pilot.py
-runs/research/sorosim-s5-agent-feedback-20261016 --prepare-only`. A live call
-requires explicit approval of the DeepSeek destination and payload scope in
-the egress review.
+used `python tests/research/sorosim_s5_agent_pilot.py
+runs/research/sorosim-s5-agent-feedback-20261016 --prepare-only` and the
+approved live run used the same command without `--prepare-only`. Both are
+sealed; neither should be rerun under this study identity. The Store archive
+contains all provider requests and tool outcomes.
 
 The final focused Python regression ran 45 selected tests successfully,
 including SoRoSim contracts, cross-replay binding, Agent feedback, count
@@ -356,4 +393,7 @@ Follow-up work for S6 includes a justified matched-state physical/model
 diagnostic, converged KKT base point before envelope-gradient testing, a
 controller or morphology candidate that actually passes independent physical
 acceptance, real-time performance work, and multi-seed/cross-task controller
-and Agent comparisons. None follows from the single trials here.
+and Agent comparisons. Add a prelaunch duplicate-science check using physical
+and controller identities, since a changed candidate artifact ID alone did
+not distinguish the pilot's two choices. None of these outcomes follows from
+the single pilot here.

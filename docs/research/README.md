@@ -7,9 +7,12 @@ S4.5, open-loop MuJoCo, full feedback NMPC, direct/residual PPO, and S5-T
 immutable Store exports. All observed physical evaluations failed the original
 task; mathematical feasibility and optimizer convergence are reported
 separately. The local [Agent preflight](../../evidence/sorosim_s5_agent/preflight.json)
-imports those stages into one research packet without a provider send. The
-[egress review](../../evidence/sorosim_s5_agent/egress_review.json) records why
-the bounded live provider pilot has not run.
+imports those stages into one research packet. After explicit approval of the
+DeepSeek destination, the [bounded live pilot](../../evidence/sorosim_s5_agent/summary.json)
+read the evidence, repeated the S5-B NMPC and S5-A fixed-tension physical
+configurations, observed two original-task failures, and chose STOP. The
+[delivery report](sorosim_s45_s5_delivery.md) audits its unsupported claim
+that different artifact IDs meant different physical candidates.
 
 The historical root study described below still has ten training-stage
 allowances and no aggregate action ceiling. New sparse stage configurations
