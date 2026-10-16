@@ -34,9 +34,12 @@ def dispatch(host,operation,arguments,key):
         trajectory=None
         warm_trajectory=None
         if arguments.warm_source:
-            warm=host.store.artifact(arguments.warm_source)
-            if warm.get('source_kind')!='historical_mathematical_trajectory':
-                raise ValueError('IMMUTABLE_HISTORICAL_TRAJECTORY_SOURCE_REQUIRED')
+            if plain(arguments.warm_source) in s.get('mechanics_results',[]):
+                warm=source(host,arguments.warm_source)
+            else:
+                warm=host.store.artifact(arguments.warm_source)
+                if warm.get('source_kind')!='historical_mathematical_trajectory':
+                    raise ValueError('IMMUTABLE_MATHEMATICAL_TRAJECTORY_SOURCE_REQUIRED')
             warm_trajectory=warm['trajectory']
     elif operation=='cross_replay':
         candidate=plain(arguments.candidate)

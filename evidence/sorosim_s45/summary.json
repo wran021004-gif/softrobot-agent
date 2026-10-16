@@ -1,0 +1,169 @@
+{
+  "stage": "S4.5",
+  "historical_source": "evidence\\sorosim_s4b\\recovered_pilot",
+  "historical_margins": {
+    "artifact_id": "6bb3b2056667a3b7bd63b4be8e8a58ba2ab35c575e0c4df691aa5b912e0002ff",
+    "media_type": "application/json"
+  },
+  "cross_replays": [
+    {
+      "label": "A_with_U_B",
+      "target": {
+        "artifact_id": "55ac3a7c28a364319d64dae8057a01f779361bfc60a9080c912b356cc736ccdd",
+        "media_type": "application/json"
+      },
+      "source": {
+        "artifact_id": "697cc41ccf2a74047adb601983d11f3bad4adc9d23d283bff4be16e4b4ab53dc",
+        "media_type": "application/json"
+      },
+      "result_reference": {
+        "artifact_id": "707375d6780a33ef0e2bb3873cd3ad7260b12317ff39b314823b874b9c665860",
+        "media_type": "application/json"
+      },
+      "status": "engineering_error",
+      "original_task_passed": null,
+      "maximum_original_violation": null
+    },
+    {
+      "label": "B_with_U_A",
+      "target": {
+        "artifact_id": "44767b9d59bed3b09b25a5686ff13ecf54d1e08fa558e5cec8c1995715ec5c50",
+        "media_type": "application/json"
+      },
+      "source": {
+        "artifact_id": "998ba1aea2a02b5274714b3711df8c8150e2daaa00356f3ff0cf088d0a7e1f38",
+        "media_type": "application/json"
+      },
+      "result_reference": {
+        "artifact_id": "bba31be623a570c1137e6f58245bc4804bcaca68b406cdad3bfd4ce73efa5f8c",
+        "media_type": "application/json"
+      },
+      "status": "computed",
+      "original_task_passed": false,
+      "maximum_original_violation": 0.14003098484538443
+    }
+  ],
+  "feasibility_solve": {
+    "reference": {
+      "artifact_id": "f8b3cbfcf3e6e50f1e0438dda6fe63cac72004d2678f874408c83c1769bd0b9e",
+      "media_type": "application/json"
+    },
+    "status": "computed",
+    "objective": 9.728330677154913e-25,
+    "converged": true,
+    "original_feasible": false
+  },
+  "independent_replay": {
+    "reference": {
+      "artifact_id": "8d24cf80ae1a8e851fd2af6d95e5b73b22683945ae2bdc6be7c1a6306fb3c0aa",
+      "media_type": "application/json"
+    },
+    "passed": true,
+    "task": {
+      "squared_normalized_excess": [
+        -0.6725672246492659,
+        -0.6777475871318013,
+        -0.6650690367327547,
+        -0.6458454221985943,
+        -0.6516694613303187,
+        -0.6528400176687765,
+        -0.6725672246492659,
+        1.5787371410169726e-12,
+        -0.34241974012045273,
+        -0.005828336016897917,
+        -0.2291348802871499,
+        -0.9619196611506875,
+        5.2068793721105067e-11
+      ],
+      "actual_norm": [
+        0.0057221741964985145,
+        0.005676728044113077,
+        0.005787322034129821,
+        0.005951088789468745,
+        0.005901953394171131,
+        0.00589202836323132,
+        0.0057221741964985145,
+        0.020000000000015786,
+        0.016218264517260127,
+        0.019941631467691925,
+        0.01755978496124426,
+        0.0039028368579438473,
+        0.020000000000520685
+      ],
+      "signed_margin": [
+        0.004277825803501486,
+        0.0043232719558869235,
+        0.00421267796587018,
+        0.004048911210531255,
+        0.004098046605828869,
+        0.0041079716367686805,
+        0.004277825803501486,
+        -1.5785983631388945e-14,
+        0.0037817354827398737,
+        5.8368532308075705e-05,
+        0.0024402150387557407,
+        0.016097163142056153,
+        -5.206841902083426e-13
+      ],
+      "normalized_signed_margin": [
+        0.42778258035014854,
+        0.4323271955886923,
+        0.42126779658701796,
+        0.4048911210531255,
+        0.4098046605828869,
+        0.410797163676868,
+        0.42778258035014854,
+        -7.892991815694472e-13,
+        0.18908677413699368,
+        0.0029184266154037852,
+        0.12201075193778703,
+        0.8048581571028076,
+        -2.6034209510417128e-11
+      ],
+      "maximum_original_violation": 5.206841902083426e-13,
+      "constraint_ids": [
+        "terminal_error_m",
+        "holding_max_error_m",
+        "holding_max_error_m",
+        "holding_max_error_m",
+        "holding_max_error_m",
+        "holding_max_error_m",
+        "holding_max_error_m",
+        "holding_max_speed_m_s",
+        "holding_max_speed_m_s",
+        "holding_max_speed_m_s",
+        "holding_max_speed_m_s",
+        "holding_max_speed_m_s",
+        "holding_max_speed_m_s"
+      ],
+      "times_s": [
+        0.35000000000000003,
+        0.3,
+        0.31,
+        0.32,
+        0.33,
+        0.34,
+        0.35000000000000003,
+        0.3,
+        0.31,
+        0.32,
+        0.33,
+        0.34,
+        0.35000000000000003
+      ],
+      "original_sampled_requirements_satisfied": false,
+      "required_slacks": {
+        "position": 0,
+        "speed": 5.2068793721105067e-11
+      },
+      "scope": "Declared sampled rod-model task requirements; physical MuJoCo acceptance unmeasured"
+    }
+  },
+  "counts": {
+    "offline_nlp": 1,
+    "bdf_replays": 3,
+    "numerical_s": 105.79607349995058
+  },
+  "original_mathematical_feasibility": "feasibility_unresolved",
+  "physical_acceptance": "unmeasured"
+}

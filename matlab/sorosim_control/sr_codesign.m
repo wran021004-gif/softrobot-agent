@@ -5,7 +5,8 @@ prepared=sr_nmpc(model,request);c=prepared.context;c.export_output_jacobians=tru
 [~,~,inspect]=sr_nmpc_callbacks(model,c);nv=numel(prepared.initial_vector);
 assert(c.elapsed==0,'CODESIGN_REQUIRES_FROZEN_INITIAL_STATE');
 requirements=r.requirements.constraints;
-feasibility=strcmp(r.arguments.objective_mode,'maximum_original_violation');
+feasibility=ismember(r.arguments.objective_mode,{'maximum_original_violation','minimum_signed_task_excess'});
+interior=strcmp(r.arguments.objective_mode,'minimum_signed_task_excess');
 nodes=[];groups=[];radii=[];references=[];labels={};
 for j=1:numel(requirements)
     t=requirements(j);
@@ -52,8 +53,10 @@ if ismember(r.operation,{'replay','cross_replay'})
 end
 initial=prepared.initial_vector;gaps=task_values(prepared.initial);
 if feasibility
-    slacks=[max([0;gaps])+1e-4;0];
-    lower=[c.lower;0;0];upper=[c.upper;inf;0];
+    slacks=[max(gaps)+1e-4;0];
+    if ~interior,slacks(1)=max(0,slacks(1));end
+    if interior,minimum=-1;else,minimum=0;end
+    lower=[c.lower;minimum;0];upper=[c.upper;inf;0];
 else
     slacks=[max([0;gaps(groups==1)]);max([0;gaps(groups==2)])]+1e-4;
     lower=[c.lower;0;0];upper=[c.upper;inf;inf];
@@ -93,7 +96,7 @@ if c.recipe.recover_returned_tensions && flag>=0
         request.initial_tensions=e.tensions';fresh=sr_nmpc(model,request);
         gap=task_values(fresh.initial);
         if feasibility
-            repaired=[fresh.initial_vector;max([0;gap]);0];
+            repaired=[fresh.initial_vector;max([minimum;gap]);0];
         else
             repaired=[fresh.initial_vector;max([0;gap(groups==1)]);max([0;gap(groups==2)])];
         end

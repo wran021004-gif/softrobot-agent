@@ -9,7 +9,7 @@ from tools.platform_store import plain
 from tools.research import core
 from tools.research.design import verify_candidate, numerical_binding
 from tools.research.state import save, state
-from tools.state_io import atomic_json, digest
+from tools.state_io import atomic_json, digest, read
 
 ROOT = Path(__file__).resolve().parents[2]
 SOURCE = ROOT/'evidence/sorosim_s4b/recovered_pilot'
@@ -104,21 +104,78 @@ def historical_margins():
         reports=reports)
 
 
-def check_derivatives():
+def check_derivatives(interior=False):
     from extensions.tendon_family.sorosim_codesign import calculate
     summary=json.loads((SOURCE/'summary.json').read_bytes())
     row=summary['rows'][1]
     with tarfile.open(SOURCE/'immutable_artifacts.tar.gz') as archive:
         candidate=json.load(archive.extractfile('artifacts/'+row['candidate']['artifact_id']+'.json'))
+    warm=row['solve']['trajectory']
+    if interior:
+        first=read(ROOT/'evidence/sorosim_s45/summary.json')
+        ref=first['feasibility_solve']['reference']
+        with tarfile.open(ROOT/'evidence/sorosim_s45/attempt01/immutable_artifacts.tar.gz') as archive:
+            warm=json.load(archive.extractfile('artifacts/'+ref['artifact_id']+'.json'))['trajectory']
+    mode='minimum_signed_task_excess' if interior else 'maximum_original_violation'
     request=dict(configuration=candidate['configuration'],design_candidate=row['candidate'],operation='solve',
-        warm_trajectory=row['solve']['trajectory'],check_only=True,
+        warm_trajectory=warm,check_only=True,
         arguments=dict(substeps=1,initialization='saved_candidate_trajectory',
-            objective_mode='maximum_original_violation',position_weight=1.,speed_weight=1.,secondary_coefficient=0.))
+            objective_mode=mode,position_weight=1.,speed_weight=1.,secondary_coefficient=0.))
     result=calculate(request)
     if result['objective_relative_error']>=2e-4 or result['constraint_relative_error']>=2e-4:
         raise ValueError('S45_FEASIBILITY_DERIVATIVE_CHECK_FAILED')
-    atomic_json(ROOT/'evidence/sorosim_s45/derivative_checks.json',result)
+    atomic_json(ROOT/('evidence/sorosim_s45/interior_derivative_checks.json' if interior else
+        'evidence/sorosim_s45/derivative_checks.json'),result)
     return result
+
+
+def continue_interior(directory):
+    host=core.prepare(STUDY,directory)
+    first=read(ROOT/'evidence/sorosim_s45/summary.json')
+    old_ref=first['feasibility_solve']['reference']
+    old=host.store.artifact(old_ref)
+    old['reference']=old_ref
+    if old['operation']!='solve' or old['mathematical_facts']['original_feasible']:
+        raise ValueError('S45_INTERIOR_ATTEMPT_REQUIRES_UNRESOLVED_FIRST_SOLVE')
+    with tarfile.open(SOURCE/'immutable_artifacts.tar.gz') as archive:
+        row=read(SOURCE/'summary.json')['rows'][1]
+        source_candidate=json.load(archive.extractfile('artifacts/'+row['candidate']['artifact_id']+'.json'))
+    generated=core.dispatch(host,plan('generate',generation=source_candidate['parameters']),
+        f"s45-generate-interior-v{state(host)['profile']['version']}")['result']
+    candidate=verify_candidate(host,generated['candidate'])
+    physical=numerical_binding(candidate['configuration'],state(host)['spec'])['physical_design_identity']
+    if physical!=row['physical_design_identity']:
+        raise ValueError('S45_INTERIOR_DESIGN_DIFFERS_FROM_SEALED_S4')
+    optimized=core.dispatch(host,plan('mechanics',mechanics=dict(candidate=generated['candidate'],
+        warm_source=old['reference'],initialization='saved_candidate_trajectory',substeps=1,
+        objective_mode='minimum_signed_task_excess',position_weight=1.,speed_weight=1.,secondary_coefficient=0.),
+        supporting_evidence=[old['reference']]),'s45-interior-B')['result']
+    replay=None
+    if optimized.get('trajectory'):
+        replay=core.dispatch(host,plan('replay',mechanics_source=optimized['reference'],
+            supporting_evidence=[optimized['reference']]),'s45-interior-B-replay')['result']
+    feasible=bool(replay and replay.get('replay',{}).get('passed') and
+        replay['replay']['task']['original_sampled_requirements_satisfied'])
+    summary=dict(stage='S4.5',source_attempt='evidence/sorosim_s45/attempt01',
+        second_method='minimum_signed_task_excess; epigraph lower bound -1 from squared norm nonnegativity',
+        solve=optimized,independent_replay=replay,
+        classification='verified_mathematical_feasible' if feasible else 'feasibility_unresolved',
+        physical_acceptance='unmeasured',
+        counts={k:state(host).get(k,0) for k in ('offline_nlp','bdf_replays','numerical_s')})
+    summary_ref=save(host,summary,'s45_stage_summary')
+    citations=list(state(host)['mechanics_results'])+[summary_ref]
+    core.dispatch(host,plan('stop',supporting_evidence=citations),'s45-stop')
+    export=core.export(host,ROOT/'evidence/sorosim_s45/final_study')
+    atomic_json(ROOT/'evidence/sorosim_s45/interior_summary.json',dict(
+        stage=summary['stage'],source_attempt=summary['source_attempt'],method=summary['second_method'],
+        solve=dict(reference=optimized['reference'],status=optimized['status'],
+            objective=optimized.get('mathematical_facts',{}).get('objective'),
+            converged=optimized.get('mathematical_facts',{}).get('converged')),
+        independent_replay=dict(reference=replay['reference'],passed=replay['replay']['passed'],
+            task=replay['replay']['task']) if replay else None,
+        classification=summary['classification'],physical_acceptance=summary['physical_acceptance'],
+        counts=summary['counts'],stage_summary_reference=summary_ref))
+    return export
 
 
 def run(directory):
@@ -161,10 +218,26 @@ def run(directory):
         citations=[r['result']['reference'] for r in results]+[optimize['reference'],replay['reference']]
         core.dispatch(host,plan('stop',supporting_evidence=citations+[summary_ref]),'s45-stop')
     export=core.export(host,ROOT/'evidence/sorosim_s45/attempt01')
-    atomic_json(ROOT/'evidence/sorosim_s45/summary.json',summary)
+    atomic_json(ROOT/'evidence/sorosim_s45/summary.json',dict(stage=summary['stage'],
+        historical_source=summary['historical_source'],historical_margins=margin_ref,
+        cross_replays=[dict(label=x['label'],target=x['target'],source=x['source'],
+            result_reference=x['result']['reference'],status=x['result']['status'],
+            original_task_passed=x['result'].get('replay',{}).get('task',{}).get('original_sampled_requirements_satisfied'),
+            maximum_original_violation=x['result'].get('replay',{}).get('task',{}).get('maximum_original_violation'))
+            for x in results],
+        feasibility_solve=dict(reference=optimize['reference'],status=optimize['status'],
+            objective=optimize.get('mathematical_facts',{}).get('objective'),
+            converged=optimize.get('mathematical_facts',{}).get('converged'),
+            original_feasible=optimize.get('mathematical_facts',{}).get('original_feasible')),
+        independent_replay=dict(reference=replay['reference'],passed=replay['replay']['passed'],
+            task=replay['replay']['task']) if replay else None,
+        counts=summary['counts'],original_mathematical_feasibility=summary['original_mathematical_feasibility'],
+        physical_acceptance=summary['physical_acceptance'],stage_summary_reference=summary_ref))
     return export
 
 
 if __name__=='__main__':
     import sys
-    print(check_derivatives() if sys.argv[1]=='--check' else run(Path(sys.argv[1])))
+    print(check_derivatives() if sys.argv[1]=='--check' else
+        check_derivatives(interior=True) if sys.argv[1]=='--check-interior' else
+        continue_interior(Path(sys.argv[2])) if sys.argv[1]=='--interior' else run(Path(sys.argv[1])))
