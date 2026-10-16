@@ -125,6 +125,9 @@ class CodesignTests(unittest.TestCase):
 
     def test_real_design_control_and_replay(self):
         result=read(ROOT/'evidence/sorosim_s4b/recovered_pilot/summary.json');rows=result['rows']
+        original=read(ROOT/'evidence/sorosim_s4b/pilot/summary.json')
+        self.assertEqual(original['counts']['offline_nlp']+result['counts']['offline_nlp'],4)
+        self.assertTrue(all(not row['replay']['replay']['passed'] for row in original['rows']))
         self.assertNotEqual(rows[0]['physical_design_identity'],rows[1]['physical_design_identity'])
         self.assertGreater(result['control_change_norm_n'],1e-4)
         self.assertEqual(result['counts']['offline_nlp'],2);self.assertEqual(result['counts']['bdf_replays'],2)
@@ -134,6 +137,8 @@ class CodesignTests(unittest.TestCase):
             self.assertAlmostEqual(row['solve']['trajectory']['times_s'][-1],.35)
             self.assertEqual(row['solve']['task_acceptance'],'unmeasured')
             self.assertTrue(row['solve']['mathematical_facts']['relaxed_feasible'])
+            self.assertEqual(row['replay']['verified_conclusions'][0]['conclusion'],'feasible_witness')
+            self.assertEqual(row['solve']['objective_definition'],rows[0]['solve']['objective_definition'])
 
 
 if __name__=='__main__':

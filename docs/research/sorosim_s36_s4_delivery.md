@@ -12,7 +12,7 @@ acceptance thresholds, default controller and RL route are unchanged.
 | S3.6 | Three matched static states, 50 frames each, separated forces, additive link inertia/gravity, controlled geometry substitutions, immediate replay persistence | Passed within bounded diagnostic scope | `3f45b849` (normally pushed) |
 | S4-A | Candidate-bound operating points, MATLAB statics/linearization/IFT, existing shared feasibility/Gramian kernels and scoped evidence | Passed in measured local scope | `8f4c642b` (normally pushed) |
 | Performance | Shared kinematic traversal, matched old/new derivative and full-NLP evaluation | Passed for measured kernel/callback speedup | `bb7b947f` (normally pushed) |
-| S4-B | Pending | Not complete | Pending |
+| S4-B | Two actual physical designs, full-task control optimization, recipe-consistent recovery and separate mathematical replay through Harness | Passed for bounded co-design and verified relaxed trajectories; optimizer convergence and original task satisfaction not achieved | `602c66f3` numerical source; earlier failures retained |
 
 ## S3.6 evidence and findings
 
@@ -231,6 +231,116 @@ directional objective/constraint checks pass the unchanged 2e-4 bound. Nine
 focused saved-evidence/analysis/NMPC tests pass. No mathematical or physical task
 acceptance threshold changed.
 
+## S4-B implementation, failures and verification
+
+The existing `research_plan` generate/mechanics/replay/stop actions execute a
+bounded sensitivity-directed outer step and candidate-local full-task inner SQP.
+The changed variable is `segments.0.length_m`: **.200 to .195 m**, within the
+original family interval **[.080, .240] m**. The .005 m proposal uses the sign of
+the already verified S4-A static squared-position-error derivative. This is a
+proposal, not a certificate of full-task improvement. All other physical choices
+and control-objective settings remain identical. Both candidates are generated,
+compiled, identified and owned by the existing Store; each Engine constructs its
+own mathematical model. The two physical design hashes are:
+
+- .200 m: `e6baadb5c508345a5a0bbd6df4da9794290e976d4f56ec40ac2e4b540f3dd828`
+- .195 m: `10035885ded80b7afbf2faa28988c6275a18ac04f3232c5d0972acced81af9ad`
+
+Each full problem has 36 state nodes, 35 held four-tension commands, 24 states,
+two nonnegative slacks, 1,006 variables, 864 equalities and 13 sampled task
+inequalities. The frozen task translator supplies terminal/holding position and
+holding speed requirements at their original world-frame post-step times. For
+each sample, `||y-reference||^2/radius^2 - 1 <= slack_group`. The objective is
+`position_slack + speed_slack + .001*(mean((u/8)^2) + .1*mean(diff(u/8)^2))`.
+Initial conditions, implicit Euler at .01 s, .35 s duration, physical 0--8 N
+bounds, original SQP tolerances and 120-iteration limit are unchanged. No slack
+is treated as original task satisfaction. Independent initialized full-problem
+derivative errors are 3.706e-7 (objective) and 1.930e-10 (constraints), below the
+unchanged 2e-4 threshold.
+
+The first implementation/source freeze was `5403348e`, following integration
+commit `f6fe2eac`. Both genuine solves reached their iteration limits. Their low
+raw objectives (.000323258 and .000308880) were **not valid ranking evidence**:
+constraint violations were .993236653 and .037512614, and both independent
+replays failed. The first study consumed two nonlinear solves and two replays,
+425.165471 s of recorded numerical work, and is sealed at
+`evidence/sorosim_s4b/pilot/`. Raw optimizer vectors, outputs, worker boundaries,
+logs, candidate configuration, scope claims and costs remain in its immutable
+archive. The original results were never replaced with corrected numbers.
+
+The omission was the existing frozen recipe's `recover_returned_tensions=true`
+behavior in the new offline adapter. The correction uses the original NMPC
+preparation/root solver to reintegrate the returned bounded tensions from the
+actual initial state, then recomputes the **same** epigraph slacks on that
+trajectory. It retains the raw optimizer result and reports recovery separately.
+It changes neither solver convergence nor the unrelaxed task definition.
+Independent replay starts another Engine/model and recomputes implicit roots and
+separate `sr_dynamics` force balance. Acceptance still requires scaled violations
+and reintegrated state mismatch at most 1e-5.
+
+The supplementary study is explicitly linked to the first authorization and
+limited to the remaining two complete solves, on the same two physical designs.
+Its frozen source is `602c66f3` (numerical recovery implemented in `dbcd057b`).
+The two Store ledgers remain separate and cumulative assignment use is four
+complete solves and four mathematical replays; no counter was reset. This is
+implementation validation after a diagnosed omission, not repeated timing trials.
+
+Harness preflight failures are preserved in `preflight_failures.json`: the
+observation resolver did not recognize the existing SoRoSim controller, and
+registry availability required package metadata even though the installed Engine
+imports through PYTHONPATH. The fixes reuse existing signal and registry owners.
+The supplemental config initially tried nested defaults, which the existing
+loader rejects; `602c66f3` uses its supported single-level contract. These failures
+occurred before numerical reservations. A topology test initially collided with
+the production grant and subsequently hit Windows SQLite cleanup locking; both
+logs remain. The final isolated test uses the repository's existing test-grant
+pattern and closes connection cycles before cleanup.
+
+Actual one- and three-segment candidates also pass the existing generation,
+physical compilation and SoRoSim model-specification route, with distinct
+dimensions and identities. They perform no mathematical solves or physical steps;
+this checks dimension rebuilding, not dynamic validity of untested topologies.
+There are two unique optimized physical designs plus two unique topology-test
+designs in S4-B. No live provider call, RL training or MuJoCo step is involved.
+
+Final evidence is `evidence/sorosim_s4b/recovered_pilot/`, with cumulative cost
+and compact comparison in `evidence/sorosim_s4b/aggregate.json`. Both independent
+replays pass. Both optimizers still report exit flag 0 after 120 iterations
+(335 and 345 function evaluations); neither is claimed to have converged.
+
+| Root length (m) | Verified relaxed objective | Position slack | Speed slack | Independent scaled violation | Solve worker / replay worker (s) |
+|---:|---:|---:|---:|---:|---:|
+| .200 | .987058566 | .000763355 | .985971953 | 1.24553e-12 | 193.571 / 23.336 |
+| .195 | .037970658 | 0 | .037661778 | 4.38018e-13 | 196.247 / 24.038 |
+
+Reintegrated scaled state error is zero in both cases. Separately recomputed
+force residual maxima are 1.246e-15 and 4.380e-16 N m². The objective decreases
+by **96.1532%** between the two verified evaluated candidates; the Frobenius
+norm of the 35-by-4 tension-sequence change is **12.6430 N**. The full original
+and changed control trajectories, states, times and exact channel order are in
+`summary.json` at `rows[i].solve.trajectory`. Representative commands in that
+same order are:
+
+| Root length (m) | First held command (N) | Last held command (N) |
+|---:|---|---|
+| .200 | [0, 0, 6.33849, 5.44277] | [3.40024, 3.05345, 3.24681, 3.33379] |
+| .195 | [0, 0, 6.91971, 3.49380] | [2.13053, 1.20616, 2.30784, 2.93987] |
+
+These improvements rank only the two evaluated relaxed trajectories. Both fail
+the original unrelaxed sampled requirements: the changed robot still exceeds
+the .02 m/s holding speed bound. Positive slack, incomplete optimizer convergence,
+single-step design exploration and the separately quantified rod/cell mismatch
+preclude global optimality or MuJoCo task-success claims.
+
+The corrected validation study records 437.794620 s numerical work; including
+the preserved first study gives **862.960091 s**, four complete nonlinear solves,
+four mathematical replays and 14 public plan operations. Kernel checks, prior
+S4-A investigations and cheap topology compilation are separately reported and
+are not presented as physical trials. Two final saved-evidence/derivative tests
+pass, as do the earlier 21 integration checks, 28 targeted regression checks and
+the final topology compilation check. Both immutable archive SHA-256 checks pass.
+Synthetic failure fixtures and software-only checks remain labeled as such.
+
 ## Reproduction
 
 ```powershell
@@ -243,6 +353,8 @@ $env:OPENBLAS_NUM_THREADS='1'; $env:OMP_NUM_THREADS='1'; $env:MKL_NUM_THREADS='1
 & $p -m unittest test_sorosim_s36 test_sorosim_s35 -v
 # Verify clean pinned upstream and hash source/binaries.
 & $p -c "import os; from extensions.tendon_family.sorosim_session import dependency_identity; print(dependency_identity(os.environ['SOROSIM_ROOT'])['commit'])"
+# Compare every pinned upstream MATLAB/MEX hash, without starting MATLAB.
+& $p -c "import os,json; from extensions.tendon_family.sorosim_session import dependency_identity; e=json.load(open('evidence/sorosim_s4b/check01/environment.json')); assert dependency_identity(os.environ['SOROSIM_ROOT'])==e['dependency']; print(e['environment']['version'],e['environment']['optimization'])"
 # New bounded static calculations; new destination required, normal machine access.
 $out='runs/sorosim-s36-'+[guid]::NewGuid().ToString('N')
 & $p tests/research/sorosim_s36_probe.py $out
@@ -261,6 +373,12 @@ $analysis='runs/sorosim-s4a-'+[guid]::NewGuid().ToString('N')
 $perf='runs/sorosim-performance-'+[guid]::NewGuid().ToString('N')
 & $p tests/research/test_sorosim_performance.py --run $perf
 & $p tests/research/test_sorosim_performance.py --verify $perf
+# Cheap: real saved co-design outcomes, no Engine startup or nonlinear solves.
+& $p -m unittest test_sorosim_codesign.CodesignTests.test_full_problem_derivatives test_sorosim_codesign.CodesignTests.test_real_design_control_and_replay -v
+# Expensive: fresh authorized workspace only; two full .35 s mathematical solves.
+# On the already-used workspace, inspect existing evidence instead of copying grants.
+& $p tests/research/test_sorosim_codesign.py --pilot runs/sorosim-s4b-recovery-20261016 --study configs/research/study_sorosim_s4b_recovery.json
+# Export defaults to that run's new export/ directory, preserving committed evidence.
 ```
 
 ## Remaining milestones
@@ -284,9 +402,9 @@ additional implementations.
 | `extensions/tendon_family/model_applicability.py` | M | 215 | Qualify supported local SoRoSim statics/linearization; retain shared assessment. |
 | `extensions/tendon_family/signals.py` | M | 53 | Recognize SoRoSim's existing direct-tension observation channel; reuse signal expansion. |
 | `extensions/tendon_family/sorosim_analysis.py` | N | 130 | Bind MATLAB work points and IFT to existing initializer, compiler, model contract and applicability. |
-| `extensions/tendon_family/sorosim_codesign.py` | N | 69 | Candidate-local MATLAB solve/replay adapter; reuse task translation, compiler and Session. |
+| `extensions/tendon_family/sorosim_codesign.py` | N | 81 | Candidate-local MATLAB solve/replay adapter and compact diagnostics; reuse task translation, compiler and Session. |
 | `matlab/sorosim_control/sr_analysis.m` | N | 167 | MATLAB residual statics, work points, dynamic linearization and static IFT; reuse routing/dynamics/derivatives. |
-| `matlab/sorosim_control/sr_codesign.m` | N | 112 | Full-task epigraph objective and sampled task constraints; reuse NMPC initialization and complete dynamics callbacks. |
+| `matlab/sorosim_control/sr_codesign.m` | N | 134 | Full-task epigraph objective and sampled task constraints; reuse NMPC initialization/recovery and complete dynamics callbacks. |
 | `matlab/sorosim_control/sr_diagnose.m` | M | 120 | Geometry/mechanics decomposition and warmed kernel instrumentation in existing diagnostic gateway. |
 | `matlab/sorosim_control/sr_gateway.m` | M | 66 | Dispatch two numerical operations; existing model ownership and error handling. |
 | `matlab/sorosim_control/sr_nmpc.m` | M | 175 | Expose full-task preparation to offline mathematics; reuse exact implicit roots and context. |
@@ -295,7 +413,7 @@ additional implementations.
 | `tests/research/sorosim_s35_probe.py` | M | 373 | Persist each expensive successful result immediately; existing experiment and calculation unchanged. |
 | `tests/research/sorosim_s36_probe.py` | N | 198 | Matched saved-state rod/cell probes and controlled substitutions; reuse S3.5 mappings, actual compiler and GVS. |
 | `tests/research/test_sorosim_analysis.py` | N | 199 | Bounded real analysis driver, saved-result checks and preserved-result recovery; existing shared kernels. |
-| `tests/research/test_sorosim_codesign.py` | N | pending | Bounded genuine Harness driver, derivative/evidence and discrete topology compilation checks. |
+| `tests/research/test_sorosim_codesign.py` | N | 150 | Bounded genuine Harness driver, derivative/evidence and discrete topology compilation checks. |
 | `tests/research/test_sorosim_contract.py` | M | 134 | Update locally supported analysis assertion; retain controller/default/scientific identity tests. |
 | `tests/research/test_sorosim_performance.py` | N | 88 | Matched warmed old/new kernels and full callbacks in one Engine; no benchmarking framework. |
 | `tests/research/test_sorosim_s35.py` | M | 112 | Compare historical source hashes to their frozen Git revision. |
@@ -319,3 +437,15 @@ intentional repetition is the analytical evaluation/checking of residuals in
 independent verification and the pinned upstream kinematic recurrence in the
 private optimized traversal. No second robot family, Store, Agent, or optimizer
 framework was introduced.
+
+The only new configuration files are `study_sorosim_s4b.json` and
+`study_sorosim_s4b_recovery.json`. Both use the existing single-level family
+defaults, existing family definition and sparse `control_sorosim.json` override;
+neither contains a second robot definition. They separately retain the first
+attempt's budget and the authorized remaining validation allowance.
+
+The listed authoritative compiler, MJCF, GVS basis/projection/dynamics/CasADi/
+trajectory/co-design files, shared mathematical kernels, search/budget/state,
+task and control configurations and RL route have zero Git diff from the
+starting revision. The narrow observation/registry preflight fixes above are
+the only additional platform changes outside the proposed file list.
