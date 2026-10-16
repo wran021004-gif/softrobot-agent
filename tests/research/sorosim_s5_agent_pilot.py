@@ -6,7 +6,7 @@ from pathlib import Path
 import tarfile
 
 from tools.research import core,rl
-from tools.research.agent import converse,pending as provider_pending
+from tools.research.agent import converse,decision_packet,pending as provider_pending
 from tools.research.budget import engineering_closeout
 from tools.research.design import numerical_binding,verify_candidate
 from tools.research.state import state,save,update
@@ -44,7 +44,7 @@ def import_context(host,stage,path,brief):
         source_sha256=hashlib.sha256(raw).hexdigest())
 
 
-def run(directory):
+def run(directory, *, live=True):
     host=core.prepare(STUDY,directory)
     if 'freeze' not in state(host):core.bind(host)
     old=read(ROOT/'evidence/sorosim_s4b/recovered_pilot/summary.json')['rows'][1]
@@ -93,6 +93,17 @@ def run(directory):
             full_reoptimizations=0))]
     update(host,stage_context=context,preseeded_candidate=candidate,
         preseeded_mathematical_reference=relation)
+    if not live:
+        packet=decision_packet(host)
+        preflight=dict(stage='S5-Agent',status='prepared_without_provider_send',candidate=candidate,
+            mathematical_source=source_ref,reference_relation=relation,context=context,
+            model_request_count=state(host)['pilot']['live_model_requests'],decision_packet=packet)
+        preflight_ref=save(host,preflight,'s5_agent_local_preflight')
+        exported=core.export(host,ROOT/'evidence/sorosim_s5_agent/preflight_study')
+        atomic_json(ROOT/'evidence/sorosim_s5_agent/preflight.json',dict(preflight,
+            preflight_reference=preflight_ref,export=exported['destination']))
+        return dict(status='prepared_without_provider_send',preflight_reference=preflight_ref,
+            export=exported['destination'])
     blocker=None
     try:
         asyncio.run(converse(host))
@@ -122,4 +133,4 @@ def run(directory):
 
 if __name__=='__main__':
     import sys
-    print(run(Path(sys.argv[1])))
+    print(run(Path(sys.argv[1]),live='--prepare-only' not in sys.argv[2:]))
