@@ -24,6 +24,42 @@
     "fd_tendon_jacobian_max_abs": 0.000002,
     "fd_equilibrium_tip_sensitivity_m_n": 0.00002
   },
+  "v2": {
+    "schema": "sorosim_validation_v2",
+    "starting_sha": "c3bcbc2c00566c25de1d5f57950c07a795474ce3",
+    "physics": "V1 finest discretization; endpoint chords; R=elastic-gravity-B*u; fixed q_g for design partials; local static branch only",
+    "baseline_tensions_n": [[0.3, 0.1, 0.2, 0.1], [0.6, 0.2, 0.4, 0.2]],
+    "tension_bounds_n": [0, 5],
+    "chord_tangent_step_rad_m": 0.00001,
+    "input_steps_n": [0.001, 0.0003, 0.0001],
+    "design_parameters": [
+      {"key": "lengths_m", "index": 0, "unit": "m", "kind": "geometry"},
+      {"key": "young_pa", "index": -1, "unit": "Pa", "kind": "material"},
+      {"key": "radii_m", "index": 0, "unit": "m", "kind": "geometry"}
+    ],
+    "partial_relative_steps": [0.0001, 0.001],
+    "prediction_relative_steps": [0.001, 0.01],
+    "repeated_calls": 5,
+    "units": {"q": "rad/m", "p": "m", "R": "N*m^2", "Rq": "N*m^3", "Ru": "m^2", "J": "m^2", "dqdu": "rad/(m*N)", "dpdu": "m/N", "Rd": "N*m^2/parameter_unit", "pd": "m/parameter_unit", "dqdd": "rad/m/parameter_unit", "dpdd": "m/parameter_unit"},
+    "tolerances": {
+      "residual_nm2": 1e-10,
+      "condition_max": 100000000,
+      "tangent_abs_nm3": 0.0000002,
+      "tangent_relative": 0.0002,
+      "symmetry_relative": 0.00001,
+      "linear_solve_relative": 1e-10,
+      "input_tip_abs_m_n": 0.00002,
+      "sensitivity_relative": 0.005,
+      "prediction_abs_m": 0.000002,
+      "prediction_relative": 0.08,
+      "direction_floor_m": 0.00000001,
+      "branch_relative_q": 0.25,
+      "cross_tip_m": 0.00002,
+      "cross_q_rad_m": 0.002,
+      "cross_tangent_abs_nm3": 0.000002,
+      "cross_sensitivity_relative": 0.005
+    }
+  },
   "cases": [
     {
       "id": "one_segment",

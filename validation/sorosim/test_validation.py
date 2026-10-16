@@ -8,10 +8,11 @@ import unittest
 
 import numpy as np
 
-from compare import differences
+from compare import differences, v2_checks
 
 HERE = Path(__file__).resolve().parent
 EVIDENCE = HERE/'evidence/run_20261016_01'
+V2_EVIDENCE = None
 
 
 class ValidationTests(unittest.TestCase):
@@ -77,9 +78,73 @@ class ValidationTests(unittest.TestCase):
             differences(original,changed)
 
 
+class V2Tests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        if V2_EVIDENCE is None: raise unittest.SkipTest('V2 evidence not requested')
+        cls.cfg = json.loads((HERE/'cases.json').read_text(encoding='utf-8'))
+        cls.data = [json.loads((V2_EVIDENCE/f'{name}_{case}.json').read_text(encoding='utf-8'))
+                    for case in ('one_segment','two_segment') for name in ('gvs','matlab')]
+
+    def rejected(self, changed):
+        self.assertFalse(v2_checks(changed,self.cfg)['passed'])
+
+    def test_recompute_all_v2_gates_from_raw_evidence(self):
+        for data in self.data:
+            result = v2_checks(data,self.cfg)
+            self.assertTrue(result['passed'],result['failures'])
+
+    def test_omitted_tendon_state_derivative_is_rejected(self):
+        for data in self.data:
+            changed = copy.deepcopy(data); row = changed['baselines'][0]
+            row['terms']['Rq'] = row['terms']['A0']
+            self.rejected(changed)
+
+    def test_tension_sign_and_length_coordinate_corruption_rejected(self):
+        for data in self.data:
+            for key in ('Rq','Ru'):
+                changed = copy.deepcopy(data); t = changed['baselines'][0]['terms']
+                t[key] = (-np.asarray(t[key])).tolist(); self.rejected(changed)
+            changed = copy.deepcopy(data); L = changed['model']['lengths_m'][0]
+            part = changed['designs'][0]['partials'][0]
+            part['Rd'] = (np.asarray(part['Rd'])/L).tolist(); self.rejected(changed)
+
+    def test_explicit_length_tip_partial_cannot_be_omitted(self):
+        for data in self.data:
+            changed = copy.deepcopy(data); part = changed['designs'][0]['partials'][0]
+            self.assertGreater(np.linalg.norm(part['pd']),0.1)
+            part['pd'] = np.zeros_like(part['pd']).tolist(); self.rejected(changed)
+
+    def test_false_prediction_and_failed_perturbation_cannot_pass(self):
+        for data in self.data:
+            changed = copy.deepcopy(data); pred = changed['designs'][0]['predictions'][0]
+            pred['predicted'] = (-np.asarray(pred['predicted'])).tolist(); self.rejected(changed)
+            changed = copy.deepcopy(data)
+            changed['baselines'][0]['input_fd'][0]['solves'][0]['success'] = False
+            self.rejected(changed)
+
+    def test_dimensions_units_and_nonfinite_evidence_rejected(self):
+        for data in self.data:
+            for key,value in [('Rq',[[1]]),('Ru',[[float('nan')]*4]*len(data['baselines'][0]['equilibrium']['q']))]:
+                changed = copy.deepcopy(data); changed['baselines'][0]['terms'][key] = value
+                with self.assertRaises(ValueError): v2_checks(changed,self.cfg)
+            changed = copy.deepcopy(data); changed['units']['Rq'] = 'N*m'
+            with self.assertRaisesRegex(ValueError,'units'): v2_checks(changed,self.cfg)
+
+    def test_frozen_tolerances_and_cross_implementation_gates(self):
+        snapshot = json.loads((V2_EVIDENCE/'cases_snapshot.json').read_text(encoding='utf-8'))
+        self.assertEqual(snapshot,self.cfg)
+        for case in ('one_segment','two_segment'):
+            comparison = json.loads((V2_EVIDENCE/f'comparison_{case}.json').read_text(encoding='utf-8'))
+            self.assertTrue(comparison['passed'])
+            self.assertEqual(comparison['tolerances'],self.cfg['v2']['tolerances'])
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--evidence',type=Path,default=EVIDENCE)
+    parser.add_argument('--v2',action='store_true')
     args, extra = parser.parse_known_args()
-    EVIDENCE = args.evidence
+    if args.v2: V2_EVIDENCE = args.evidence
+    else: EVIDENCE = args.evidence
     unittest.main(argv=['test_validation.py',*extra])

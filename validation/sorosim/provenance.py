@@ -45,7 +45,7 @@ if __name__ == '__main__':
     evidence = {p.name:hashlib.sha256(p.read_bytes()).hexdigest()
                 for p in args.output.iterdir() if p.suffix in ('.json','.log') and p.name!='provenance.json'}
     result = dict(
-        source_sha=cfg['source_sha'],upstream_sha=cfg['upstream_sha'],
+        source_sha=cfg['source_sha'],validation_source_sha=git(REPO,'rev-parse','HEAD'),upstream_sha=cfg['upstream_sha'],
         upstream_remote=git(args.reference,'remote','get-url','origin'),
         upstream_clean=True,upstream_submodules=submodules,
         license_named_files=licenses,

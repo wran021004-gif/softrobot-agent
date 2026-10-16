@@ -1,6 +1,7 @@
 """Read-only adapter to the pinned repository kernels for this validation only."""
 
 import argparse
+import copy
 import hashlib
 import json
 from pathlib import Path
@@ -64,7 +65,7 @@ def make_design(cfg, model):
     ))
 
 
-def build(cfg, model, level):
+def build(cfg, model, level, v2=False):
     design = make_design(cfg, model)
     params = GVSModelParameters(integration_steps_per_segment=level['gvs_steps'],
                                 quadrature_points_per_segment=level['gauss'])
@@ -75,6 +76,19 @@ def build(cfg, model, level):
     )
     native = GVSStaticCasadiExpressions(recipe)
     q, u = native.q_symbol, native.u_symbol
+    if v2:
+        r = -native.static_residual_expression
+        a = ca.jacobian(r, q)
+        ru = ca.jacobian(r, u)
+        p = native.tip_position_expression
+        function = ca.Function('v2_terms', [q,u],
+            [r,a,ru,p,ca.jacobian(p,q),ca.substitute(a,u,ca.DM.zeros(u.numel()))],
+            ['q','u'], ['R','Rq','Ru','p','J','A0'])
+        static = ca.Function('v2_static', [q,u], [r,a], ['q','u'], ['R','Rq'])
+        def terms(v, tension):
+            return {k: np.asarray(x) for k,x in function(q=v,u=tension).items()}
+        terms.static = lambda v,tension: {k: np.asarray(x) for k,x in static(q=v,u=tension).items()}
+        return design, params, terms
     state = _SymbolicKinematics(_topology(design), q, level['gvs_steps'], recipe.resolved_basis)
     pose = state.attachment_pose(design.tip)
     J = ca.vertcat(_angular_jacobian(pose[:3, :3], q), ca.jacobian(pose[:3, 3], q))
@@ -212,14 +226,109 @@ def provenance(cfg):
                 numpy=np.__version__, scipy=scipy.__version__,casadi=ca.__version__,kernel_sha256_lf=hashes)
 
 
+def v2_solve(terms, cfg, initial, u):
+    start = perf_counter()
+    sol = root(lambda q: terms.static(q,u)['R'].ravel(), initial,
+               jac=lambda q: terms.static(q,u)['Rq'], method='hybr',
+               options=dict(xtol=1e-10, maxfev=500))
+    seconds = perf_counter()-start
+    t = terms(sol.x,u)
+    return dict(q=sol.x, p=t['p'].ravel(), R=t['R'].ravel(),
+                residual_norm=maxabs(t['R']), status=int(sol.status), success=bool(sol.success),
+                message=str(sol.message), function_evaluations=sol.nfev, seconds=seconds,
+                condition=float(np.linalg.cond(t['Rq'])))
+
+
+def run_v2(cfg, model):
+    """Bounded local IFT experiment; all design partials hold physical q_g fixed."""
+    v = cfg['v2']; level = model['levels'][-1]; start_all = perf_counter()
+    start = perf_counter(); _,_,terms = build(cfg,model,level,v2=True)
+    result = dict(schema=v['schema'], case_id=model['id'], setting=level,
+                  model=model, units=v['units'], build_seconds=perf_counter()-start,
+                  derivative_method='CasADi AD Rq/Ru/J; rebuilt centered FD design partials',
+                  baselines=[], designs=[])
+    n = 4*len(model['lengths_m'])
+    for tension in v['baseline_tensions_n']:
+        u = np.asarray(tension); eq = v2_solve(terms,cfg,np.zeros(n),u)
+        row = dict(u=u, equilibrium=eq, tangent_fd=[], input_fd=[])
+        result['baselines'].append(row)
+        if not eq['success'] or eq['residual_norm'] >= v['tolerances']['residual_nm2']:
+            continue
+        q = eq['q']; t = terms(q,u); row['terms'] = t
+        row['tendon_tangent'] = t['Rq']-t['A0']
+        row['static_call_seconds'] = []
+        for _ in range(v['repeated_calls']):
+            start = perf_counter(); terms.static(q,u)
+            row['static_call_seconds'].append(perf_counter()-start)
+        for h in cfg['fd_steps_rad_m']:
+            start = perf_counter(); matrix = fd(lambda x: terms.static(x,u)['R'],q,h)
+            row['tangent_fd'].append(dict(step=h, Rq=matrix, seconds=perf_counter()-start))
+        start = perf_counter(); dqdu = -np.linalg.solve(t['Rq'],t['Ru'])
+        row['dqdu'] = dqdu; row['dpdu'] = t['J']@dqdu
+        row['omitted_dpdu'] = -t['J']@np.linalg.solve(t['A0'],t['Ru'])
+        row['input_ift_seconds'] = perf_counter()-start
+        row['linear_solve_relative'] = maxabs(t['Rq']@dqdu+t['Ru'])/maxabs(t['Ru'])
+        for h in v['input_steps_n']:
+            qs = []; ps = []; solves = []
+            for a in range(len(u)):
+                pair = []
+                for sign in (-1,1):
+                    up = u.copy(); up[a] += sign*h
+                    sol = v2_solve(terms,cfg,q,up); sol['u'] = up; solves.append(sol); pair.append(sol)
+                qs.append((pair[1]['q']-pair[0]['q'])/(2*h))
+                ps.append((pair[1]['p']-pair[0]['p'])/(2*h))
+            row['input_fd'].append(dict(step_n=h,dqdu=np.array(qs).T,dpdu=np.array(ps).T,solves=solves,
+                Ru=fd(lambda up: terms.static(q,up)['R'],u,h)))
+    base = result['baselines'][0]
+    if 'terms' not in base:
+        return result
+    q = base['equilibrium']['q']; p = base['equilibrium']['p']; u = base['u']; t = base['terms']
+    for param in v['design_parameters']:
+        key,ix = param['key'],param['index']
+        value = cfg[key] if ix < 0 else model[key][ix]
+        row = dict(parameter=param,value=value,partials=[],predictions=[])
+        for fraction in sorted(set(v['partial_relative_steps']+v['prediction_relative_steps'])):
+            delta = fraction*value; pair = []; partial_terms = []; build_times = []; partial_times = []
+            for sign in (-1,1):
+                c,m = copy.deepcopy(cfg),copy.deepcopy(model)
+                if ix < 0: c[key] = value+sign*delta
+                else: m[key][ix] = value+sign*delta
+                start = perf_counter(); _,_,changed = build(c,m,level,v2=True)
+                build_times.append(perf_counter()-start)
+                start = perf_counter(); partial_terms.append(changed(q,u)); partial_times.append(perf_counter()-start)
+                if fraction in v['prediction_relative_steps']:
+                    pair.append(v2_solve(changed,c,q,u))
+            if fraction in v['partial_relative_steps']:
+                start = perf_counter()
+                rd = (partial_terms[1]['R']-partial_terms[0]['R'])/(2*delta)
+                pd = (partial_terms[1]['p']-partial_terms[0]['p'])/(2*delta)
+                dq = -np.linalg.solve(t['Rq'],rd); dp = pd+t['J']@dq
+                row['partials'].append(dict(fraction=fraction,Rd=rd,pd=pd,dqdd=dq,dpdd=dp,
+                                            ift_seconds=perf_counter()-start,build_seconds=build_times,
+                                            evaluation_seconds=partial_times))
+            if pair:
+                dp = np.ravel(row['partials'][0]['dpdd'])
+                for sign,sol in zip((-1,1),pair):
+                    row['predictions'].append(dict(fraction=fraction,delta=sign*delta,
+                        predicted=sign*delta*dp,actual=sol['p']-p,solve=sol,build_seconds=build_times))
+        result['designs'].append(row)
+    result['elapsed_seconds'] = perf_counter()-start_all
+    return result
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--case', required=True, choices=['one_segment','two_segment'])
     parser.add_argument('--output', required=True, type=Path)
+    parser.add_argument('--v2', action='store_true')
     args = parser.parse_args()
     cfg = json.loads((HERE/'cases.json').read_text())
     model = next(c for c in cfg['cases'] if c['id']==args.case)
     args.output.mkdir(parents=True, exist_ok=True)
     prov = provenance(cfg)
-    result = run(cfg,model); result['environment'] = prov
-    write_json(args.output/f'gvs_{args.case}.json', result)
+    target = args.output/f'gvs_{args.case}.json'
+    if target.exists():
+        raise FileExistsError(f'Preserve evidence: {target}')
+    result = (run_v2 if args.v2 else run)(cfg,model); result['environment'] = prov
+    result['source_sha'] = subprocess.check_output(['git','rev-parse','HEAD'],cwd=REPO,text=True).strip()
+    write_json(target, result)

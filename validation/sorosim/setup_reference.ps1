@@ -31,6 +31,4 @@ $remote = & git -C $reference remote get-url origin
 if ($remote -ne 'https://github.com/GVSRobotics/SoRoSim.git') { throw 'Unexpected reference remote.' }
 $dirty = & git -C $reference status --porcelain
 if ($dirty) { throw 'Reference checkout is dirty; preserve it and select a clean external checkout.' }
-& git -C $reference checkout --detach $cfg.upstream_sha
-if ($LASTEXITCODE -ne 0) { throw 'Could not detach the pinned reference.' }
 Write-Output $reference

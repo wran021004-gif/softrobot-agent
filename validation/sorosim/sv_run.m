@@ -1,11 +1,17 @@
-function sv_run(referenceRoot, outputDir, caseId)
+function sv_run(referenceRoot, outputDir, caseId, validationVersion)
 % Run one bounded validation case; Python comparison gates the next case.
 here = fileparts(mfilename('fullpath'));
 cfg = jsondecode(fileread(fullfile(here,'cases.json')));
 model = cfg.cases(strcmp({cfg.cases.id},caseId));
 assert(numel(model)==1, 'Unknown validation case');
 if ~isfolder(outputDir), mkdir(outputDir); end
-env = sv_environment(referenceRoot);
+assert(~isfile(fullfile(outputDir,['matlab_' caseId '.json'])),'Preserve existing evidence');
+entryUnix = posixtime(datetime('now','TimeZone','UTC')); envStart = tic;
+env = sv_environment(referenceRoot); env.setup_seconds = toc(envStart); env.entry_unix_s = entryUnix;
+if nargin >= 4 && validationVersion == 2
+    result = sv_v2(cfg,model); result.environment = env;
+    save_result(result,outputDir,caseId); return
+end
 result.environment = env;
 result.case_id = caseId;
 result.coordinate_convention = 'q_g rad/m; r_g N*m^2; tip J=[world angular;world linear]';
@@ -78,6 +84,13 @@ for level = 1:numel(model.levels)
     clear row sample eq;
 end
 result.elapsed_seconds = toc(allStart);
+save_result(result,outputDir,caseId);
+end
+
+function save_result(result,outputDir,caseId)
+here = fileparts(mfilename('fullpath'));
+[status,sha] = system(['git -C "' fileparts(fileparts(here)) '" rev-parse HEAD']);
+assert(status==0,'Cannot capture repository identity'); result.source_sha = strtrim(sha);
 [~,mexFiles] = inmem('-completenames');
 result.loaded_mex = mexFiles;
 fid = fopen(fullfile(outputDir,['matlab_' caseId '.json']),'w','n','UTF-8');

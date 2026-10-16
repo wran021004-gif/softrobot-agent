@@ -101,3 +101,62 @@ Keep SoRoSim as an offline mathematical reference first. Its analytical recursiv
 If pursued, the minimal interface should be an optional offline MATLAB batch request/result pair, outside active Harness execution. Request: exact source revisions, supported-physics flags, SI section/material/length data, normalized basis and coefficient order, base transforms, gravity, `q`, and explicit endpoint spans/tensions. Result: unsupported reasons or `T_tip`, body `J_qs`, `R`, `R_q`, `R_u`, coordinate transform `D`, solver status/residual, discretization, and timings. Consumers must transform forces and Jacobians through D and reject unsupported cable/contact/strain semantics. Start with a cached static residual/tangent and pose/Jacobian call, then independently validate any scalar task or design gradient before candidate search uses it. No such integration is included here.
 
 No project-wide redistribution grant was found in the pinned tree/README. Generated C headers, including `Basic_functions/codegen/mex/compute_dSTdqFC_Z4/compute_dSTdqFC_Z4.h`, carry MathWorks Academic License restrictions tied to degree-granting institutions and excluding commercial, government, and other organizational use. Citation requests do not establish permission, and this validation does not determine the user's license eligibility. Upstream source and MEX binaries remain external. Clarify upstream and generated-code permissions before any implementation reuse or broader deployment. This branch contains only validation glue, original tests, documentation, and numerical evidence.
+
+## V2: nonzero-tension and physical-design sensitivities
+
+V2 preserves all V1 evidence and uses only its finest `(192,20)` settings.
+The physical model, channel order, units and frames are exactly those above.
+Two positive tensile baselines are `[0.3,0.1,0.2,0.1]` and
+`[0.6,0.2,0.4,0.2]` N. Each base equilibrium starts from the same zero physical
+curvature; each nearby input/design equilibrium starts from its own backend's
+converged base. No global uniqueness or branch certification is asserted.
+
+V2 deliberately reverses the V1 residual sign in **both** implementations:
+`R=elastic-gravity-B(q)u`, `B=-dl/dq'`, `Ru=-B`.
+Thus `Rq=A_passive-sum(u_i*dB_i/dq)`, `dqdu=-solve(Rq,Ru)`,
+and `dpdu=J*dqdu`. The passive-only tangent is retained exclusively as an
+incorrect-tangent diagnostic. GVS uses the existing native static CasADi graph
+and AD. SoRoSim uses its upstream analytical passive tangent and tip Jacobian,
+plus centered differences of the endpoint virtual-work force map at
+`1e-5 rad/m`. This mixed derivative is **not fully analytical**.
+Independent total-residual differences use `1e-4,1e-5,1e-6 rad/m` without
+calling the numerical chord tangent. Input checks use centered, independently
+resolved equilibria at `h=1e-3,3e-4,1e-4 N`, all within `[0,5] N`.
+
+Design variables are first-segment length (m), homogeneous Young modulus (Pa,
+all segments), and first-segment circular radius (m). Routing offsets stay
+fixed in metres. Every changed physical design constructs a fresh linkage or
+native GVS graph: stiffness, mass, quadrature, kinematics and `D(d)` are updated.
+Existing `sv_model.m` already rebuilds all these quantities; it needs no new
+design abstraction. Centered partials hold `q_g,u` fixed, with relative steps
+`1e-4,1e-3`. Thus the numerical derivative includes the length dependence in
+`D(d)'*r_s(D(d)*q_g,d)`. The tip derivative includes its explicit geometry term:
+`Rd=partial R/partial d`, `pd=partial p/partial d`,
+`dqdd=-solve(Rq,Rd)`, `dpdd=pd+J*dqdd`.
+Both backends' design sensitivities are semi-analytical IFT calculations with
+numerical physical-design partials. Predictions use that `1e-4` partial and
+actual newly solved designs at both signs of `0.1%` and `1%` changes.
+
+The authoritative V2 configuration and **pre-execution** bounds are in
+`cases.json:v2`. Tangent FD requires both max error `2e-7 N*m^3` and relative
+max error `2e-4`. Input/design centered derivative relative bounds are `0.005`;
+input tip absolute bound is `2e-5 m/N`. Prediction errors must be below
+`2e-6 m + 0.08*max(abs(actual displacement))`, with correct component signs
+above `1e-8 m`. Local regularity requires successful solves, residual below
+`1e-10 N*m^2`, condition below `1e8`, and linear-system relative residual below
+`1e-10`. A relative q displacement guard of `0.25` rejects distant warm-start
+solutions; passing it alone does not prove that no branch change occurred.
+
+Run only V2 numerical experiments, followed by V1 evidence tests and V2 tests:
+
+```powershell
+./validation/sorosim/run.ps1 -V2 `
+  -Python D:\softrobot-agent\.pilot-env\Scripts\python.exe `
+  -Matlab 'C:\Program Files\MATLAB\R2024a\bin\matlab.exe'
+```
+
+The wrapper refuses an existing output directory, snapshots the frozen config,
+gates the one-segment case before the two-segment case, and retains failures.
+Repeated timing requests return only residual and total tangent, excluding
+pose/sensitivity outputs. Full experimental time also includes independent
+checks and model rebuilding; it must not be called a production benchmark.

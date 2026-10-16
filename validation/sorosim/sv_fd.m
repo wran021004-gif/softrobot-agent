@@ -1,5 +1,5 @@
 function J = sv_fd(fn, q, h)
-% Centered difference in curvature coordinates, absolute step in rad/m.
+% Centered difference; caller supplies the absolute step in its input units.
 q = q(:); J = zeros(numel(fn(q)), numel(q));
 for k = 1:numel(q)
     e = zeros(size(q)); e(k) = h;
