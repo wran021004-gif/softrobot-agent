@@ -102,9 +102,44 @@ The shared S4.5 ledger records two complete NLP attempts, four new replay slots
 operations, 440.051 s recorded numerical time, zero physical launches, zero PPO
 actions, and zero provider requests. The study is closed; counts were not reset.
 
-## S5 stage status
+## S5-A open-loop physical playback
 
-S5-A open-loop MuJoCo, S5-B complete NMPC, S5-RL, S5-T sensitivity, and the
-integrated Agent pilot have not yet been executed. No physical, RL, multiplier,
-or Agent outcome follows from the S4.5 mathematical witness. Subsequent stage
-records will retain distinct source, candidate, task, backend, and budget IDs.
+The committed S5-A study `sorosim-s5a-open-loop-20261016` generated the same
+Design B physical geometry and bound it to the sealed S4.5 mathematical
+trajectory. The saved mathematical states were converted to world tip outputs
+without a new mathematical integration. One fixed 35-command, four-tendon
+sequence was then applied directly to the independent MuJoCo candidate. The
+physical backend completed all 700 physics steps and saved 36 inclusive samples.
+The observed actuator tension equaled every requested physical input to the
+recorded precision; the force-bound component passed.
+
+| S5-A metric | Mathematical saved-state output | MuJoCo physical result |
+|---|---:|---:|
+| Terminal position error | 0.000056381 m | 0.024960134 m |
+| Holding maximum position error | 0.000056429 m | 0.024960134 m |
+| Holding maximum speed | 0.000113989 m/s | 0.895355122 m/s |
+| Original task acceptance | Mathematical post-hoc feasible witness | `valid_failure` |
+
+The independent registered reach evaluator found a terminal error above the
+0.010 m bound. The inclusive holding samples also exceeded both the position
+and 0.020 m/s speed limits. The complete acceptance, candidate, source and
+receipt are in the [S5-A Store archive](../../evidence/sorosim_s5a/study/archive_manifest.json),
+with a compact [summary](../../evidence/sorosim_s5a/summary.json). The
+[per-sample join](../../evidence/sorosim_s5a/comparison_detail.json) includes
+world position and velocity vectors, speed magnitudes, expected and actual
+tensions, and both models' original holding margins. Maximum accumulated
+position and velocity discrepancies were 0.056479582 m and 1.299509910 m/s.
+The initial tip position offset was 1.67e-16 m. This demonstrates substantial
+trajectory mismatch under the same open-loop inputs; it does not establish a
+unique physical cause.
+
+A matched-initial-state one-step discrepancy is unavailable in this S5-A study:
+it did not perform a declared MuJoCo-to-SoRoSim state projection and fresh
+one-step mathematical integrations. The joined interval increments begin from
+divergent states and are labeled accordingly. No incompatible state vectors
+were subtracted. The S5-A ledger charged one physical launch, three public
+operations, zero provider requests, and 1.417 s recorded numerical time.
+
+S5-B complete NMPC, S5-RL, S5-T sensitivity, and the integrated Agent pilot
+remain unexecuted at this boundary. They must retain distinct source,
+candidate, task, backend and budget identities.
