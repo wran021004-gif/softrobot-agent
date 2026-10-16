@@ -192,6 +192,17 @@ def final_fidelity_matches(spec, candidate):
         candidate['task_identity']==spec['canonical_task_identity'])
 
 
+def final_generation_request(spec, candidate):
+    """Copy exact physical choices to the frozen final mesh; never dispatch work."""
+    if not spec.get('fidelity_policy') or candidate.get('generation_version')!='serial_family_generation_v2':
+        return None
+    request=deepcopy(candidate['parameters'])
+    cells=spec['fidelity_policy']['final_evaluation']['cells_per_segment']
+    for i in range(request['segment_count']):
+        request.setdefault('segments',{}).setdefault(str(i),{})['cells']=cells
+    return request
+
+
 def generate_candidate(host,request,provenance,*,screening_fidelity=None):
     """Materialize a frozen family request and persist through the existing Store."""
     from extensions.tendon_family.family_space import parse_build, UnsupportedGeneration

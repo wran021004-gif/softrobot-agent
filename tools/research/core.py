@@ -235,16 +235,13 @@ def packet(host):
     from tools.research.analysis import decision_result
     s=state(host)
     if s['spec'].get('capabilities'):
-        from tools.research.feedback import result_view, eligibility, facts
+        from tools.research.feedback import result_view, eligibility, facts, search_feedback
         from tools.research.rl import packet as rl_packet
         return dict(decision_facts=facts(host),specification=s['spec'],scoped_context=s.get('scoped_context',[]),frozen_task=plain(s['spec'].get('canonical_task',s['base_configuration']['task'])),reference_candidate=s.get('reference_candidate'),
             candidates=[r for r in s['candidates'].values() if host.store.artifact(r)['profile_identity']==s['profile']['identity']],results=[dict(reference=r,**result_view(host,r),confirmation=eligibility(host,r)) for r in [*s['results'],*s.get('rl_evaluations',[])]],
             analysis_results=[decision_result(host.store.artifact(r),r) for r in s.get('analysis_results',[])],
             search_results=s.get('search_results',[]),
-            search_feedback=[dict(reference=r,status=host.store.artifact(r)['result']['status'],
-                best_candidate=(host.store.artifact(r)['result'].get('best_mathematical_candidate') or {}).get('evidence',{}).get('candidate'),
-                proxy_values=(host.store.artifact(r)['result'].get('best_mathematical_candidate') or {}).get('proxy_values'),
-                lineage_pointer='/result/evaluated',task_acceptance='unmeasured') for r in s.get('search_results',[])],
+            search_feedback=[search_feedback(host,r) for r in s.get('search_results',[])],
             mathematical_accounting=dict(evaluations=s.get('mathematical_evaluations',0),costs=s.get('analysis_costs',[]),engineering_preflight_s=sum(c['numerical_s'] for c in s.get('analysis_costs',[]) if c['origin']=='engineering_preflight'),cumulative_costs_preserved=True),
             mechanics_results=[dict(reference=r,**{k:host.store.artifact(r).get(k) for k in ('status','operation','trajectory_reference','objective_definition','original_task_feasible','relaxed_nlp_feasible','original_task_gaps','trajectory_metrics','charged_numerical_s','checkpoint_reference')}) for r in s.get('mechanics_results',[])],
             handoffs=[dict(reference=r,**host.store.artifact(r)) for r in s.get('handoffs',[])],

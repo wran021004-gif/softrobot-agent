@@ -225,6 +225,7 @@ def finish_execution(host, recovery=False):
 
 
 def compact_result(r):
+    from tools.research.feedback import execution_evidence
     profile=r.get('profile') or {}
     result={k:r.get(k) for k in ('status','role','candidate','candidate_id','scientific_identity','profile_identity','evaluation_version',
         'selected_execution','acceptance','execution_id','owner_run_id','owning_study','fresh_execution',
@@ -234,6 +235,6 @@ def compact_result(r):
     if not result['execution_id']:
         result['execution_id']=r.get('execution',{}).get('receipts',{}).get('simulation',{}).get('execution_id')
         result['execution_identity_source']='sealed failed simulation receipt; no completed acceptance implied'
-    return result
+    return dict(result,**execution_evidence(r))
 
 

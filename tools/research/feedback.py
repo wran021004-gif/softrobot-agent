@@ -4,6 +4,47 @@ from tools.platform_store import plain
 from tools.state_io import digest
 
 
+def execution_evidence(result):
+    """Expose recorded numerical validity separately from physical task outcome."""
+    acceptance=result.get('acceptance') or {}
+    profile=result.get('profile') or {}
+    execution=result.get('execution') or {}
+    return dict(numerical_validity=dict(acceptance_status=acceptance.get('status'),
+        execution_status=result.get('status'),failure_stage=execution.get('stage'),
+        failure_reason=execution.get('failure_reason') or profile.get('execution_failure_reason'),
+        components={k:v for k,v in acceptance.get('components',{}).items() if k in
+            ('evaluation_validity','execution_complete','holding_coverage','solver_errors','force_bounds')},
+        missing=acceptance.get('missing'),issues=acceptance.get('issues'),
+        evaluation_validity=profile.get('evaluation_validity'),
+        valid_complete_execution=profile.get('valid_complete_execution'),
+        last_valid_time_s=profile.get('last_valid_time_s'),boundary=execution.get('boundary'),
+        source_pointers=['/acceptance','/profile','/execution']),
+        solver_outcome={k:profile.get(k) for k in ('solver_status','execution_failure_reason',
+            'optimization_status_counts','raw_termination_counts','policy_stop_reason_counts',
+            'solver_error_count','solver_failure_flags','unusable_plans','maximum_plan_violation')})
+
+
+def search_feedback(host, reference):
+    """Exact evidence links and a generate recipe, without new scientific work."""
+    from tools.research.state import state
+    from tools.research.design import final_generation_request
+    result=host.store.artifact(reference)['result']
+    best=result.get('best_mathematical_candidate') or {}
+    candidate=best.get('evidence',{}).get('candidate')
+    materialization=None
+    if candidate:
+        value=host.store.artifact(candidate)
+        request=final_generation_request(state(host)['spec'],value)
+        if request:
+            materialization=dict(action='generate',generation=request,
+                supporting_evidence=[reference,candidate],source_candidate=candidate,
+                physical_design_identity=value.get('physical_design_identity'),
+                note='Copy exact physical choices; cite source search/candidate and evidence actually used in the new plan. Screening evidence is not transferred to the new candidate.')
+    return dict(reference=reference,status=result['status'],best_candidate=candidate,
+        proxy_values=best.get('proxy_values'),final_materialization=materialization,
+        lineage_pointer='/result/evaluated',task_acceptance='unmeasured')
+
+
 def solution_identity(host, result, candidate):
     """Identify effective science and policy bytes, independent of artifact locations."""
     science = deepcopy(result.get('scientific_configuration', candidate['scientific_configuration']))
@@ -110,22 +151,31 @@ def result_view(host, reference):
     failed_metrics=[]
     acceptance=r.get('acceptance') or {}
     if not rl:
+        from tools.research_tasks import task_adapter
         profile=r.get('profile') or {}
         motion=host.store.artifact(profile['motion']) if profile.get('motion') else []
+        duration=c['configuration']['task']['timing']['duration_s']
+        holding_start=(task_adapter(c['configuration']).holding_start_s() if
+            {'holding_position','holding_speed'} & acceptance.get('components',{}).keys() else None)
         for name,component in acceptance.get('components',{}).items():
             if component.get('passed') is not False:
                 continue
             key={'holding_speed':'tip_speed_m_s','holding_position':'tip_error_m','evaluator:task_bound':'tip_error_m'}.get(name)
-            samples=[v for v in motion if name not in ('holding_speed','holding_position') or v['time_s']>=__import__('tools.research_tasks',fromlist=['task_adapter']).task_adapter(c['configuration']).holding_start_s()-1e-12]
-            worst=max(samples,key=lambda v:v[key]) if key and samples else {}
+            samples=[(i,v) for i,v in enumerate(motion) if key and key in v and
+                (name not in ('holding_speed','holding_position') or
+                 holding_start-1e-12<=v['time_s']<=duration+1e-12)]
+            if name=='evaluator:task_bound':
+                samples=[(i,v) for i,v in samples if abs(v['time_s']-duration)<=1e-8]
+            index,worst=max(samples,key=lambda item:item[1][key]) if samples else (None,{})
             failed_metrics.append(dict(metric=name,value=component.get('value'),threshold=component.get('limit'),unit=component.get('unit'),
-                time_s=(motion[-1]['time_s'] if name=='evaluator:task_bound' and motion else worst.get('time_s'))))
+                time_s=worst.get('time_s'),sample_value=worst.get(key),
+                component_pointer='/acceptance/components/'+name,
+                sample_evidence=profile.get('motion'),sample_pointer=None if index is None else '/'+str(index)))
     for episode in episodes:
         for metric,limit in (('terminal_position_error_m','terminal_position_limit_m'),('holding_max_position_error_m','position_limit_m'),('holding_max_speed_m_s','holding_speed_limit_m_s')):
             if episode.get(metric) is not None and acceptance.get(limit) is not None and episode[metric]>acceptance[limit]:
                 failed_metrics.append(dict(metric=metric,value=episode[metric],threshold=acceptance[limit],time_s='not recorded in evaluation summary'))
-    return dict(failed_metrics=failed_metrics,solver_outcome={k:(r.get('profile') or {}).get(k) for k in
-        ('optimization_status_counts','raw_termination_counts','policy_stop_reason_counts','unusable_plans')},
+    return dict(failed_metrics=failed_metrics,**execution_evidence(r),
         execution_timing=acceptance.get('timing'),failure_state_analysis=mathematical_context(host,r['candidate']),
         evaluation_evidence=dict(trajectory=r.get('trajectory') or (r.get('profile') or {}).get('motion'),reference=plain(reference)),candidate=r['candidate'],task=r.get('task',c['configuration']['task']),controller_route=controller['route'],controller=controller,
         mathematical_provenance=mechanics_context(host,r['candidate']),mathematical_evidence=mathematical_context(host,r['candidate']),metrics=metrics,complete=complete,passed=passed,

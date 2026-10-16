@@ -1,0 +1,42 @@
+{
+  "defaults": "family_study_defaults.json",
+  "start_mode": "family_space",
+  "family_space": "family_space_v2.json",
+  "candidate_initialization": "all_candidate_dofs_zero_v1",
+  "study_id": "m3d-agent-feedback-pilot",
+  "authorization": "PROPOSED M3-D experiment and budget; live launch requires separate explicit user authorization. Current authorization covers offline integration and prelaunch checks only.",
+  "base_commit": "eddbcb26a393c8919ac88886c0c1f7d280c374f9",
+  "mode": "formal_research",
+  "capabilities": ["analysis", "search", "nmpc"],
+  "allowed_plan_actions": ["generate", "search", "execute", "diagnose", "select", "stop"],
+  "budgets": {
+    "provider_requests": 16,
+    "protected_provider_requests": 3,
+    "public_operations": 64,
+    "protected_public_operations": 6,
+    "physical_launches": 2,
+    "mathematical_evaluations": 10
+  },
+  "nmpc_limits": {"executions": 2},
+  "fidelity_policy": {
+    "version": "numerical_fidelity_v1",
+    "screening": {
+      "coarse": {"cells_per_segment": 4, "backend": "backend.family_mujoco@1.1.0"},
+      "standard": {"cells_per_segment": 12, "backend": "backend.family_mujoco@1.1.0"}
+    },
+    "final_evaluation": {"cells_per_segment": 12, "backend": "backend.family_mujoco@1.1.0"},
+    "require_exact_fidelity": true,
+    "alternative_runtimes": [],
+    "runtime_preflight_limit": 2
+  },
+  "family_search": {
+    "method": "bounded_mixed_coordinate_v1",
+    "variable_groups": ["segment_count", "tendon_count", "spans", "lengths", "materials", "sections", "routing"],
+    "segment_counts": [1, 2],
+    "tendon_counts": [3, 4],
+    "max_proposals": 16,
+    "max_evaluations": 8
+  },
+  "evidence_destination": "evidence/m3d_agent_feedback/pilot",
+  "execution_instructions": "Begin with the frozen canonical task and family space, with no scientific reference candidate. Mathematics and design changes are optional. If you choose mathematical search, use research_plan.search family_mixed_search_v1 within the frozen grant and finite caps. Read exact search/candidate/analysis evidence with evidence_read. A static equilibrium residual is a local diagnostic, never task success. search_feedback.final_materialization gives exact physical choices on the frozen final mesh for research_plan.generate; cite the source search, candidate and evidence actually used in supporting_evidence. Controller speed weights may also be chosen through generation within the same frozen joint reach/hold objective; static and Gramian proxies do not score them. Use only candidate-bound analysis, preparation and execution evidence; evidence for a screening model does not establish control or task performance for its final materialization. A failed execution permits a freely chosen next action: inspect evidence, analyze, change control or structure through generation, search, or stop. Cite actual failure/analysis evidence in each dependent plan and explain the changed hypothesis. Task acceptance requires the independent registered evaluator plus frozen terminal position, holding position/speed, coverage, numerical validity, solver and force-bound components. The first fresh complete final-fidelity pass immediately blocks further science: read that result and select its exact execution, or truthfully stop. No required mathematics or design modification after success; zero additional confirmations. Preserve all failures, costs and causal references. This is one bounded exploratory pilot, with no repeatability or Agent-efficiency claim. RL is disabled. Do not launch until the user separately authorizes this exact frozen experiment and budget."
+}
