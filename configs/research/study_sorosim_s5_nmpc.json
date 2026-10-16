@@ -1,0 +1,18 @@
+{
+  "defaults": "family_study_defaults.json",
+  "start_mode": "family_space",
+  "family_space": "family_space_v2.json",
+  "candidate_initialization": "all_candidate_dofs_zero_v1",
+  "base_commit": "933d47c6",
+  "mode": "engineering_numerical",
+  "control": "control_sorosim.json",
+  "capabilities": ["nmpc"],
+  "allowed_plan_actions": ["generate", "execute", "stop"],
+  "budgets": {"provider_requests": 0, "protected_provider_requests": 0,
+    "public_operations": 7, "protected_public_operations": 1, "physical_launches": 1,
+    "mathematical_evaluations": 0, "offline_nlp": 0, "bdf_replays": 0},
+  "nmpc_limits": {"executions": 1},
+  "study_id": "sorosim-s5b-nmpc-20261016",
+  "authorization": "User-authorized S5-B: one complete original-task SoRoSim MATLAB SQP feedback rollout on the exact Design B candidate in independent MuJoCo, with registered acceptance, per-update evidence, and no provider or RL calls.",
+  "evidence_destination": "evidence/sorosim_s5b"
+}
