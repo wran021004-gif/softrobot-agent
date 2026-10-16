@@ -1,5 +1,14 @@
 # Serial family-space research: M3-C1 and M3-C2
 
+M3-C3 adds `research_plan(action="search")` with `family_mixed_search_v1`.
+The existing search lifecycle computes concrete topology, span, material, section,
+route and length parameters without a fixed robot. The study selects authorized
+screening fidelity separately from its immutable final evaluation fidelity.
+Physical identity excludes mesh; full scientific candidate identity is unchanged.
+Static and Gramian proxies reject controller-weight optimization because these
+scores do not measure controller weights. See the [delivery and exact evidence](m3c3_delivery.md).
+The family declaration remains 1–9 segments; the development search grant is 1–3.
+
 ## M3-C2 current interface
 
 `study_variable_segments_dev.json` composes `family_study_defaults.json`, the
