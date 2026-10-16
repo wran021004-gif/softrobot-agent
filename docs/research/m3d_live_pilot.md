@@ -215,8 +215,8 @@ archive/member hash verification, credential scan and `git diff --check`.
 No production changes or new tests were needed. A read-only report extraction
 encountered missing selected-iteration fields; the report records known sums
 and missing counts separately. No scientific work or production code was changed.
-Configuration diff: +2/-2 lines; new report 237 lines; production/test
-diff 0/0. Evidence adds 132959 text lines plus two original archives;
+Configuration diff: +2/-2 lines; new report 240 lines; production/test
+diff 0/0. Evidence adds 132984 text lines plus two original archives;
 the exact per-file Git diff is retained by the delivery commit.
 No scientific implementation or provider blocker occurred. The initial Git
 metadata write required sandbox escalation; the authorized ordinary commit
@@ -224,14 +224,17 @@ proceeded. [delivery_verification.json](../../evidence/m3d_agent_feedback/pilot/
 records all 489 original archive member checks, zero credential matches, unchanged
 bound source/configuration and zero unresolved work.
 
-Publication is blocked by automatic approval review; no push executed. The
+Publication was initially blocked by automatic approval review. The
 reviewer initially rejected unverified `origin`, then accepted destination
 verification (connected user `wran021004-gif` owns the public repository and has
 push permission), but still rejected publication of the full research/provider
 payload. The attachment explicitly authorized non-secret evidence delivery;
-the reviewer did not accept it as exact public-payload permission. An explicit
-chat approval for the two original archives and derived records is required.
-Remote branch SHA verified through GitHub:
+the reviewer did not accept it as exact public-payload permission. The user then
+explicitly approved this public evidence push in chat on 2026-10-16: ??????.
+Before publication, the remote branch SHA verified through GitHub was:
 `5dd325eb2c179c01d13aba50074b15db64a0cfdb`.
 [publication_block.json](../../evidence/m3d_agent_feedback/pilot/publication_block.json)
-records the concrete payload and rejection. The pilot remains sealed.
+records the original payload and rejection;
+[publication_authorization.json](../../evidence/m3d_agent_feedback/pilot/publication_authorization.json)
+records the subsequent explicit approval and unchanged archive hashes. The final
+local/remote SHA verification is reported in the delivery handoff. The pilot remains sealed.
