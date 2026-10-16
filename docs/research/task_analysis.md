@@ -1,5 +1,24 @@
 # Task-aware mathematical evidence (M1 and M2)
 
+## S5-T task capability scope
+
+The SoRoSim `task_capability` full-horizon mode minimizes a signed epigraph of
+the frozen sampled squared-normalized task excesses while retaining implicit
+dynamics and legal tensions. A negative value represents a mathematical
+sampled feasible margin. Full-solve output now retains raw task, dynamics and
+bound multipliers and computes stationarity, primal, dual and complementarity
+residuals before any projection or tension recovery. This is a diagnostic of
+the complete transcription. A structural envelope derivative would also need
+the explicit dependence of dynamics, initial conditions and constraints on
+the structural parameter, plus a validated optimality point.
+
+The [S5-T evidence](../../evidence/sorosim_s5t/summary.json) checks objective
+and constraint directional derivatives but classifies the requested envelope
+gradient `solver_unresolved`: the saved base solve did not converge and has no
+full-NLP multipliers. Its fixed-command A/B replay difference is a two-design
+mathematical secant, not an optimal-value derivative, MuJoCo sensitivity, or
+certified descent bound. No S5-T full reoptimization was launched.
+
 M1 adds deterministic descriptions and evidence scope to `research_analysis`.
 The M1 baseline documented below does not implement a trajectory feasibility solver.
 M2 adds the explicitly selected sampled solver described in the final section.

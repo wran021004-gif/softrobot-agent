@@ -1,0 +1,1041 @@
+{
+  "stage": "S5-Agent",
+  "status": "prepared_without_provider_send",
+  "candidate": {
+    "artifact_id": "47cb1f9ece26104d21d836c8068bdc4852b764cb186e5b53b7ea53f7f2793b3d",
+    "media_type": "application/json"
+  },
+  "mathematical_source": {
+    "artifact_id": "45815dc9cbf9266b3406a91657d1f9d7a163ac96557a5a4dce750d41f16780f9",
+    "media_type": "application/json"
+  },
+  "reference_relation": {
+    "candidate": {
+      "artifact_id": "47cb1f9ece26104d21d836c8068bdc4852b764cb186e5b53b7ea53f7f2793b3d",
+      "media_type": "application/json"
+    },
+    "source": {
+      "artifact_id": "45815dc9cbf9266b3406a91657d1f9d7a163ac96557a5a4dce750d41f16780f9",
+      "media_type": "application/json"
+    },
+    "mathematical_model_identity": "8f8eceb5f74d4b171c87f333db4db0f353aad051b375ff26aca795f7ac1fbaf2",
+    "task_identity": "882b3493037dcc8f8da294b3473e1223f0465e92c35bc3064bfc42d467bf212e",
+    "scope": "Complete compatible tension reference; physical acceptance is separate"
+  },
+  "context": [
+    {
+      "stage": "S4.5",
+      "reference": {
+        "artifact_id": "5ddfe0d24d83ef70d9bb5272231b4d3dab1b26ddb2fbf808945db31aacfed3b4",
+        "media_type": "application/json"
+      },
+      "summary": {
+        "mathematical_classification": "verified_feasible_witness_after_posthoc_verifier_correction",
+        "optimizer_converged": false,
+        "source": {
+          "artifact_id": "e38af82e52b91d3c9757c23dcfc0e9106a78f8891b551746682973066f6b66ea",
+          "media_type": "application/json"
+        },
+        "cross_A_with_U_B": "engineering_error_unavailable",
+        "cross_B_with_U_A": "complete_original_task_failure"
+      },
+      "source_sha256": "8e1789565f0a4076d531e02167a18b99b7aca68608bead4bc06e261a2cb74e5f"
+    },
+    {
+      "stage": "S5-A",
+      "reference": {
+        "artifact_id": "2629d645b6b20744c46b55ad6353657135ddda619ca1d363b32b8b4764db821d",
+        "media_type": "application/json"
+      },
+      "summary": {
+        "accepted": false,
+        "terminal_error_m": 0.024960134186728454,
+        "holding_max_speed_m_s": 0.8953551219580574,
+        "maximum_position_discrepancy_m": 0.05647958172870581
+      },
+      "source_sha256": "4736ed1c5f62b4b92f489d9d0ec842aca34388d30ed9e31467c10537ed4cc534"
+    },
+    {
+      "stage": "S5-B",
+      "reference": {
+        "artifact_id": "b5d1a55249419a505e398299402e45269beb026fd01937edc4c8e45a638a2e1e",
+        "media_type": "application/json"
+      },
+      "summary": {
+        "accepted": false,
+        "terminal_error_m": 0.006099499288325333,
+        "holding_max_speed_m_s": 0.04235132598107169,
+        "updates": 35,
+        "solver_errors": 1
+      },
+      "source_sha256": "a67f70ad1e24e047861dad9d46e5b7d102054ea411f44a63aa03a361b73492a5"
+    },
+    {
+      "stage": "S5-RL",
+      "reference": {
+        "artifact_id": "429b7ba69d6fb1c4194c12b238e6ab800e8f1b1109afa015d8ea3b05beafeeb0",
+        "media_type": "application/json"
+      },
+      "summary": {
+        "training_actions": 65536,
+        "independently_evaluated_modes": [
+          {
+            "mode": "direct",
+            "passed": false,
+            "terminal_error_m": 0.18972286198848873,
+            "holding_max_speed_m_s": 0.3555311665993437
+          },
+          {
+            "mode": "residual",
+            "passed": false,
+            "terminal_error_m": 0.041048733637669324,
+            "holding_max_speed_m_s": 0.2929650289381693
+          }
+        ]
+      },
+      "source_sha256": "3e1dae06a7516c7b31c963324d874bae7d14ddc048d1954f7b2a870bc0cda977"
+    },
+    {
+      "stage": "S5-T",
+      "reference": {
+        "artifact_id": "634599e31b7ebc35531ffcdee87966d90b39bd463dc61587c0c21f41d469fa6f",
+        "media_type": "application/json"
+      },
+      "summary": {
+        "reliability": "solver_unresolved",
+        "envelope_gradient": "unavailable",
+        "full_reoptimizations": 0
+      },
+      "source_sha256": "c1bc938b75a1cac30e29e8408ca8be9cd358f1fdbd8da4f454291c37e3bc814f"
+    }
+  ],
+  "model_request_count": 0,
+  "decision_packet": {
+    "decision_facts": {
+      "owning_study": "sorosim-s5-agent-feedback-20261016",
+      "physical_replays": [],
+      "identity_rules": {
+        "candidate": "immutable full configuration; may be shared by identical constructions",
+        "execution": "fresh independent launch with separate execution_id and owner_run_id",
+        "historical": "imported evidence has its original ownership and previous cost; no new execution",
+        "receipt": "reusing an operation ID returns a cached receipt; additional execution cost is zero",
+        "role": "origin, role and phase are metadata, not scientific configuration changes",
+        "solution": "effective scientific configuration and policy content; artifact labels and checkpoint paths excluded"
+      },
+      "confirmation_progress": {
+        "required_total": 0,
+        "historical_confirmations": 0,
+        "current_study_confirmations": 0,
+        "remaining": 0,
+        "failures": 0,
+        "invalid_executions": 0,
+        "executions": [],
+        "confirmed": false,
+        "correct_operation": {
+          "tool": "research_plan",
+          "action": "select",
+          "selected_execution": null
+        }
+      },
+      "selection_history": [],
+      "confirmation_options": [],
+      "revision_options": [],
+      "confirmation_reference_shape": {
+        "selected_execution": {
+          "artifact_id": "exact passing result artifact_id",
+          "media_type": "application/json"
+        }
+      }
+    },
+    "scoped_context": [],
+    "stage_context": [
+      {
+        "reference": {
+          "artifact_id": "5ddfe0d24d83ef70d9bb5272231b4d3dab1b26ddb2fbf808945db31aacfed3b4",
+          "media_type": "application/json"
+        },
+        "source_sha256": "8e1789565f0a4076d531e02167a18b99b7aca68608bead4bc06e261a2cb74e5f",
+        "stage": "S4.5",
+        "summary": {
+          "cross_A_with_U_B": "engineering_error_unavailable",
+          "cross_B_with_U_A": "complete_original_task_failure",
+          "mathematical_classification": "verified_feasible_witness_after_posthoc_verifier_correction",
+          "optimizer_converged": false,
+          "source": {
+            "artifact_id": "e38af82e52b91d3c9757c23dcfc0e9106a78f8891b551746682973066f6b66ea",
+            "media_type": "application/json"
+          }
+        }
+      },
+      {
+        "reference": {
+          "artifact_id": "2629d645b6b20744c46b55ad6353657135ddda619ca1d363b32b8b4764db821d",
+          "media_type": "application/json"
+        },
+        "source_sha256": "4736ed1c5f62b4b92f489d9d0ec842aca34388d30ed9e31467c10537ed4cc534",
+        "stage": "S5-A",
+        "summary": {
+          "accepted": false,
+          "holding_max_speed_m_s": 0.8953551219580574,
+          "maximum_position_discrepancy_m": 0.05647958172870581,
+          "terminal_error_m": 0.024960134186728454
+        }
+      },
+      {
+        "reference": {
+          "artifact_id": "b5d1a55249419a505e398299402e45269beb026fd01937edc4c8e45a638a2e1e",
+          "media_type": "application/json"
+        },
+        "source_sha256": "a67f70ad1e24e047861dad9d46e5b7d102054ea411f44a63aa03a361b73492a5",
+        "stage": "S5-B",
+        "summary": {
+          "accepted": false,
+          "holding_max_speed_m_s": 0.04235132598107169,
+          "solver_errors": 1,
+          "terminal_error_m": 0.006099499288325333,
+          "updates": 35
+        }
+      },
+      {
+        "reference": {
+          "artifact_id": "429b7ba69d6fb1c4194c12b238e6ab800e8f1b1109afa015d8ea3b05beafeeb0",
+          "media_type": "application/json"
+        },
+        "source_sha256": "3e1dae06a7516c7b31c963324d874bae7d14ddc048d1954f7b2a870bc0cda977",
+        "stage": "S5-RL",
+        "summary": {
+          "independently_evaluated_modes": [
+            {
+              "holding_max_speed_m_s": 0.3555311665993437,
+              "mode": "direct",
+              "passed": false,
+              "terminal_error_m": 0.18972286198848873
+            },
+            {
+              "holding_max_speed_m_s": 0.2929650289381693,
+              "mode": "residual",
+              "passed": false,
+              "terminal_error_m": 0.041048733637669324
+            }
+          ],
+          "training_actions": 65536
+        }
+      },
+      {
+        "reference": {
+          "artifact_id": "634599e31b7ebc35531ffcdee87966d90b39bd463dc61587c0c21f41d469fa6f",
+          "media_type": "application/json"
+        },
+        "source_sha256": "c1bc938b75a1cac30e29e8408ca8be9cd358f1fdbd8da4f454291c37e3bc814f",
+        "stage": "S5-T",
+        "summary": {
+          "envelope_gradient": "unavailable",
+          "full_reoptimizations": 0,
+          "reliability": "solver_unresolved"
+        }
+      }
+    ],
+    "frozen_task": {
+      "actuator_channels": [
+        "actuator_commands"
+      ],
+      "contract_version": "1.0.0",
+      "environment": {
+        "contract": "experiment.assembly",
+        "data": {
+          "environment": {
+            "coordinate_frame": "world_base_x_forward_yz_cross_section",
+            "environment_id": "reach_free",
+            "gravity_m_s2": [
+              0.0,
+              0.0,
+              -9.81
+            ],
+            "gravity_source": "main@245a785 reach_free environment; Human-owned benchmark gravity",
+            "lights": [
+              {
+                "direction": [
+                  0.0,
+                  0.0,
+                  -1.0
+                ],
+                "position_m": [
+                  0.0,
+                  0.0,
+                  2.0
+                ]
+              }
+            ],
+            "objects": [
+              {
+                "conaffinity": 1,
+                "contype": 0,
+                "half_size_m": [
+                  2.0,
+                  2.0,
+                  0.1
+                ],
+                "kind": "plane",
+                "name": "floor",
+                "position_m": [
+                  0.0,
+                  0.0,
+                  -0.02
+                ]
+              }
+            ],
+            "schema_version": "1",
+            "truth_status": "HUMAN_OWNED",
+            "units": "SI"
+          },
+          "external_forces": [],
+          "floor_id": "floor",
+          "mount": {
+            "position_m": [
+              0.0,
+              0.0,
+              0.15
+            ],
+            "quaternion_wxyz": [
+              1.0,
+              0.0,
+              0.0,
+              0.0
+            ]
+          }
+        },
+        "version": "1.0.0"
+      },
+      "evaluator": {
+        "extension_id": "evaluate.reach",
+        "parameters": {
+          "contract": "reference.reach_evaluation",
+          "data": {
+            "tolerance_m": 0.01
+          },
+          "version": "1.0.0"
+        },
+        "version": "1.0.0"
+      },
+      "failure_policy": "retain_invalid_and_constraint_failures",
+      "family": "task.reach",
+      "goal": {
+        "contract": "reference.reach_goal",
+        "data": {
+          "target_m": [
+            0.29,
+            0.035,
+            0.19
+          ]
+        },
+        "version": "1.0.0"
+      },
+      "initializer": {
+        "extension_id": "initialize.family",
+        "parameters": {
+          "contract": "family.initial",
+          "data": {
+            "rule": "all_candidate_dofs_zero_v1"
+          },
+          "version": "1.0.0"
+        },
+        "version": "1.0.0"
+      },
+      "name": "Independent development validation of a serial multi-segment soft arm",
+      "objectives": [
+        {
+          "direction": "minimize",
+          "metric": "position_error",
+          "units": "m",
+          "weight": 1.0
+        }
+      ],
+      "observations": [
+        {
+          "dimension": 3,
+          "entity": "tip",
+          "frame": "world",
+          "missing": "unsupported",
+          "name": "tip_position",
+          "phase": "post_step",
+          "units": "m"
+        }
+      ],
+      "robot_families": [
+        "tendon_robot_family"
+      ],
+      "sampling": {
+        "aggregation": "per_instance",
+        "seeds": [
+          17
+        ],
+        "split": "development",
+        "window_s": [
+          0.0,
+          0.35
+        ]
+      },
+      "source": "Development task with fixed target, tolerance and scoring; historical tasks are unchanged",
+      "status": "development_valid",
+      "task_id": "family-multisegment-dev",
+      "task_version": "1.0.0",
+      "timing": {
+        "control_period_s": 0.01,
+        "duration_s": 0.35,
+        "sample_period_s": 0.01,
+        "termination": [
+          "duration",
+          "numerical_failure"
+        ],
+        "timestep_s": 0.0005
+      }
+    },
+    "reference_candidate": null,
+    "candidates": [
+      {
+        "artifact_id": "47cb1f9ece26104d21d836c8068bdc4852b764cb186e5b53b7ea53f7f2793b3d",
+        "media_type": "application/json"
+      }
+    ],
+    "results": [],
+    "analysis_results": [],
+    "search_results": [],
+    "search_feedback": [],
+    "mathematical_accounting": {
+      "evaluations": 0,
+      "costs": [],
+      "engineering_preflight_s": 0,
+      "cumulative_costs_preserved": true
+    },
+    "mechanics_results": [],
+    "physical_replays": [],
+    "handoffs": [],
+    "rl": {
+      "allocation_feedback": {
+        "authorized_limits": {
+          "actions_per_trial": 32768,
+          "diagnostic_physics_steps": 0,
+          "diagnostic_replays": 0,
+          "evaluation_episodes": 1,
+          "seconds_per_trial": null,
+          "training_actions": 32768,
+          "training_active_seconds": null,
+          "training_stages": 1
+        },
+        "stages": {
+          "admitted": 0,
+          "limit": 1,
+          "actual_actions": 0,
+          "verified_actions_lower_bound": 0,
+          "accounted_actions_upper_bound": 0,
+          "actual_active_seconds": 0,
+          "outstanding": []
+        },
+        "remaining_stages": 1,
+        "aggregate_action_limit": 32768,
+        "remaining_allocatable_actions": 32768,
+        "aggregate_training_time_limit": null,
+        "historical_requested_allocations": "Frozen admitted allocations count against the engineering action cap; actual attempted actions are reported separately",
+        "evaluation_capacity": {
+          "admitted": 1,
+          "remaining_episodes": 1,
+          "confirmation_reserve": 0,
+          "per_episode_s": null
+        }
+      },
+      "frozen_task": {
+        "artifact_id": "fe7b95c3c1ba12659b59c1983544b6454c9d90ac42c4dec528e9736d99fd3a6b",
+        "media_type": "application/json"
+      },
+      "capabilities": {
+        "task": "reach-and-hold",
+        "control": "ideal_tension",
+        "modes": [
+          "direct",
+          "residual"
+        ],
+        "compatible_references": [
+          {
+            "available": true,
+            "candidate": {
+              "artifact_id": "47cb1f9ece26104d21d836c8068bdc4852b764cb186e5b53b7ea53f7f2793b3d",
+              "media_type": "application/json"
+            },
+            "convention": "Exact candidate/task/channel SI interval tensions; reference completeness does not imply task acceptance",
+            "reference": {
+              "candidate_identity": "3fd485b13b4f5490e7a018ef9ac8fbdc0a8fd73d25157cc1ea2e9577064afdcc",
+              "control_period_s": 0.01,
+              "path": "D:\\softrobot-agent\\.worktrees\\sorosim-matlab-nmpc\\runs\\research\\sorosim-s5-agent-feedback-20261016\\rl_inputs\\45815dc9cbf9266b3406a91657d1f9d7a163ac96557a5a4dce750d41f16780f9.npz",
+              "sha256": "fd5b259665200ad4aef6616be3b44944ea98449dcb6d57ada79c80f927ba3fe2",
+              "task_identity": "882b3493037dcc8f8da294b3473e1223f0465e92c35bc3064bfc42d467bf212e",
+              "tendon_order": [
+                "tendon_0",
+                "tendon_1",
+                "tendon_2",
+                "tendon_3"
+              ]
+            },
+            "source": {
+              "artifact_id": "45815dc9cbf9266b3406a91657d1f9d7a163ac96557a5a4dce750d41f16780f9",
+              "media_type": "application/json"
+            },
+            "source_kind": "mathematics"
+          }
+        ],
+        "structural_domain": {},
+        "defaults": {
+          "action": {
+            "residual_scale_n": 8.0
+          },
+          "budget": {
+            "actions": 2048,
+            "active_seconds": null
+          },
+          "initial_tension_n": null,
+          "mode": "direct",
+          "observation": {
+            "position_scale_m": 0.01,
+            "speed_scale_m_s": 0.02
+          },
+          "ppo": {
+            "batch_size": 64,
+            "clip_range": 0.2,
+            "clip_range_vf": null,
+            "device": "cpu",
+            "ent_coef": 0.0,
+            "gae_lambda": 0.95,
+            "gamma": 0.99,
+            "learning_rate": 0.0003,
+            "max_grad_norm": 0.5,
+            "n_epochs": 10,
+            "n_steps": 256,
+            "normalize_advantage": true,
+            "policy_kwargs": {
+              "log_std_init": -3.0,
+              "net_arch": {
+                "pi": [
+                  64,
+                  64
+                ],
+                "vf": [
+                  64,
+                  64
+                ]
+              }
+            },
+            "sde_sample_freq": -1,
+            "target_kl": null,
+            "use_sde": false,
+            "verbose": 0,
+            "vf_coef": 0.5
+          },
+          "reference": null,
+          "requested_overrides": {
+            "reward": {},
+            "training": {}
+          },
+          "reward": {
+            "failure_penalty": -10000.0,
+            "holding_speed": 1.0,
+            "position": 1.0,
+            "smoothness": 0.001
+          },
+          "seed": 17,
+          "stop_at_boundary": null
+        }
+      },
+      "training_summaries": [],
+      "runs": {},
+      "source_summary": null,
+      "evaluations": [],
+      "costs": "RL active time/evaluation costs separate from provider wall time; elapsed study time uses one wall clock",
+      "live_elapsed_s": 1.365466833114624
+    },
+    "nmpc_admission": [
+      {
+        "candidate": {
+          "artifact_id": "47cb1f9ece26104d21d836c8068bdc4852b764cb186e5b53b7ea53f7f2793b3d",
+          "media_type": "application/json"
+        },
+        "available": true,
+        "cap_s": null,
+        "reservation_s": null,
+        "complete_execution_s": null,
+        "first_use_available": true,
+        "evidence_sources": [],
+        "reason": "Finite execution count and physical horizon; elapsed time is measured only",
+        "design_feasibility": "not assessed by admission",
+        "remaining_phase_admission": {
+          "requested": 1,
+          "admitted": 1,
+          "internal_launches": 1,
+          "numerical_reservation_s": 0.0,
+          "confirmation_launch_reserve": 0,
+          "per_execution_s": null,
+          "remaining_numerical_s": null,
+          "remaining_activity_s": null
+        }
+      }
+    ],
+    "resource_use": {
+      "shared_ledger": {
+        "limit": {
+          "backend_solves": 2,
+          "model_calls": 12,
+          "tool_calls": 40,
+          "wall_s": null,
+          "worker_calls": 0
+        },
+        "used": {
+          "tool_calls": 1,
+          "model_calls": 0,
+          "backend_solves": 0,
+          "worker_calls": 0,
+          "wall_s": 0.0
+        },
+        "remaining": {
+          "backend_solves": 2,
+          "model_calls": 12,
+          "tool_calls": 39,
+          "wall_s": null,
+          "worker_calls": 0
+        },
+        "occupied": {}
+      },
+      "numerical_s": 0.33329420001246035,
+      "numerical_reserved_s": 0.0,
+      "remaining_numerical_s": null,
+      "charged_starts": 0,
+      "shared_start_limit": null,
+      "elapsed_s": 1.3724665641784668
+    },
+    "claims": {
+      "claim_version": "family_space_claims_v1",
+      "selected": null,
+      "selected_candidate": null,
+      "candidate_generated_from_family_space": true,
+      "physically_constructed_and_validated_candidates": [
+        {
+          "artifact_id": "47cb1f9ece26104d21d836c8068bdc4852b764cb186e5b53b7ea53f7f2793b3d",
+          "media_type": "application/json"
+        }
+      ],
+      "design_changes_between_candidates": [],
+      "distinct_generated_designs": 1,
+      "structure_control_search_performed": false,
+      "optimizer_feedback_decisions": [],
+      "selected_structurally_new": null,
+      "model_selected_structure_search_evaluations": null,
+      "new_design_and_control_confirmed": null,
+      "reference_comparison": "not_applicable_no_reference_design",
+      "task_passed": false,
+      "independent_task_acceptance": null,
+      "confirmation_progress": {
+        "required_total": 0,
+        "historical_confirmations": 0,
+        "current_study_confirmations": 0,
+        "remaining": 0,
+        "failures": 0,
+        "invalid_executions": 0,
+        "executions": [],
+        "confirmed": false,
+        "correct_operation": {
+          "tool": "research_plan",
+          "action": "select",
+          "selected_execution": null
+        }
+      },
+      "limited_repeat_supported_acceptance": false,
+      "confirmation_status": "not_required",
+      "reproducibility_assessed": false,
+      "parameter_improvement_attribution_permitted": false
+    },
+    "research_status": "ready",
+    "configuration_identity": "545b63f7382db8023f6fb83aaf912aa26cdb9b36860144557bb9546362dcf886",
+    "study": {
+      "study_id": "sorosim-s5-agent-feedback-20261016",
+      "capabilities": [
+        "analysis",
+        "mathematics",
+        "replay",
+        "physical_replay",
+        "nmpc",
+        "rl"
+      ],
+      "allowed_parameters": {},
+      "reference_parameters": {},
+      "analysis_protocol": {
+        "authority_reason": "No independently justified task-required MIMO gain threshold; usable bandwidth undefined.",
+        "authority_rule": "Smallest singular value >= threshold, connected grid band starting at lowest frequency; no extrapolation.",
+        "authority_threshold": null,
+        "baseline_lengths_m": {
+          "segment_0": 0.16,
+          "segment_1": 0.11,
+          "segment_2": 0.14,
+          "segment_3": 0.14,
+          "segment_4": 0.14,
+          "segment_5": 0.14,
+          "segment_6": 0.14,
+          "segment_7": 0.14,
+          "segment_8": 0.14
+        },
+        "candidate_rule": "initial_target_equilibrium_halfway",
+        "comparison_atol": 1e-08,
+        "comparison_rtol": 2e-06,
+        "construction_max_iterations": 20,
+        "derivative_atol": 2e-05,
+        "derivative_rtol": 0.0002,
+        "derivative_step": 1e-05,
+        "duration_s": 0.35,
+        "endpoint_check_atol": 1e-08,
+        "endpoint_max_iterations": 100,
+        "equilibrium_normalized_residual": 1e-05,
+        "frequency_rad_s": [
+          0.1,
+          1.0,
+          10.0,
+          100.0
+        ],
+        "horizon_alignment_atol_s": 1e-12,
+        "input_scale_n": 8.0,
+        "output_scale_m": 0.01,
+        "period_s": 0.01,
+        "pole_margin_s_inv": 1e-07,
+        "protocol_id": "task-local-v2",
+        "rank_atol": 1e-12,
+        "rank_rtol": 1e-09,
+        "samples_s": [
+          0.0,
+          0.1,
+          0.2,
+          0.3,
+          0.34
+        ],
+        "static_force_tolerance": 1e-10,
+        "static_max_iterations": 20,
+        "windows_s": [
+          0.05,
+          0.1,
+          0.35
+        ]
+      },
+      "scoring_window_s": 0.35,
+      "budgets": {
+        "activity_s": null,
+        "bdf_replays": 1,
+        "delivery_reserve_s": null,
+        "local_solve_s": null,
+        "local_solves": 0,
+        "mathematical_evaluations": 2,
+        "numerical_s": null,
+        "offline_nlp": 1,
+        "physical_launches": 2,
+        "protected_provider_requests": 2,
+        "protected_public_operations": 4,
+        "provider_requests": 12,
+        "public_operations": 40
+      },
+      "rl_limits": {
+        "actions_per_trial": 32768,
+        "diagnostic_physics_steps": 0,
+        "diagnostic_replays": 0,
+        "evaluation_episodes": 1,
+        "seconds_per_trial": null,
+        "training_actions": 32768,
+        "training_active_seconds": null,
+        "training_stages": 1
+      },
+      "confirmation": {
+        "configuration": "Select exact fresh completed passing backend evaluation after public read. No extra repetitions; repeatability unassessed.",
+        "fresh_independent_repetitions": 0
+      },
+      "budget_semantics": {
+        "elapsed_time": "measured only",
+        "mode": "count",
+        "protection": "requests and operations reserved within totals for evaluation, evidence and closeout",
+        "scientific_time_limits": null,
+        "steps": "ceil requested positive steps to a complete rollout before admission; declared action ceilings apply when present",
+        "training": "initialization and continuation share admitted stage count; exact recovery retains stage"
+      },
+      "start_mode": "family_space",
+      "family_space": {
+        "version": "serial_family_space_v2",
+        "family_id": "serial_external_tendons_v2",
+        "assumptions": [
+          "SI; serial bending only; external frictionless straight tendon spans",
+          "One independent ideal tension per tendon; guide holes have fixed supplied inertia",
+          "Task environment owns mount and forces; assembly prototypes own connector, guide and payload",
+          "Clearance checks cover route stations and guide holes; swept self-collision is not validated"
+        ],
+        "segment_count_bounds": [
+          1,
+          9
+        ],
+        "executable_segment_counts": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "tendon_count_bounds": [
+          1,
+          12
+        ],
+        "executable_tendon_count_bounds": [
+          1,
+          7
+        ],
+        "segment_domain": {
+          "length_m": [
+            0.06,
+            0.24,
+            0.14
+          ],
+          "young_pa": [
+            2000000.0,
+            15000000.0,
+            7000000.0
+          ],
+          "section_dimensions_m": {
+            "circle": {
+              "radius_m": [
+                0.003,
+                0.012,
+                0.008
+              ]
+            },
+            "ellipse": {
+              "semi_y_m": [
+                0.003,
+                0.012,
+                0.0095
+              ],
+              "semi_z_m": [
+                0.003,
+                0.012,
+                0.0076
+              ]
+            },
+            "rectangle": {
+              "height_z_m": [
+                0.006,
+                0.018,
+                0.0095
+              ],
+              "width_y_m": [
+                0.006,
+                0.018,
+                0.0133
+              ]
+            },
+            "tube": {
+              "inner_radius_m": [
+                0.001,
+                0.004,
+                0.003
+              ],
+              "outer_radius_m": [
+                0.005,
+                0.012,
+                0.009
+              ]
+            }
+          }
+        },
+        "segment_domains": {
+          "0": {
+            "length_m": [
+              0.08,
+              0.24,
+              0.16
+            ],
+            "young_pa": [
+              2000000.0,
+              15000000.0,
+              7200000.0
+            ]
+          },
+          "1": {
+            "length_m": [
+              0.06,
+              0.2,
+              0.11
+            ],
+            "young_pa": [
+              2000000.0,
+              15000000.0,
+              5400000.0
+            ]
+          }
+        },
+        "tendon_domains": {
+          "diameter_m": [
+            0.0005,
+            0.0012,
+            0.001
+          ],
+          "force_limit_n": [
+            1.0,
+            8.0,
+            8.0
+          ],
+          "length_servo_gain_n_m": [
+            300.0,
+            1500.0,
+            900.0
+          ],
+          "pretension_n": [
+            0.0,
+            1.0,
+            0.2
+          ]
+        },
+        "routing_domains": {
+          "anchor_s": [
+            0.8,
+            1.0,
+            1.0
+          ],
+          "angular_offset_rad": [
+            -3.141592653589793,
+            3.141592653589793,
+            0.0
+          ],
+          "guide_s": [
+            0.15,
+            0.75,
+            0.5
+          ],
+          "phase_rad": [
+            -6.283185307179586,
+            6.283185307179586,
+            0.0
+          ],
+          "radius_m": [
+            0.014,
+            0.023,
+            0.018
+          ]
+        },
+        "control_domains": {
+          "holding_tip_speed_weight": [
+            0.0,
+            1.0,
+            0.1
+          ],
+          "terminal_tip_speed_weight": [
+            0.0,
+            1.0,
+            0.1
+          ]
+        },
+        "actuator_defaults": {
+          "rule": "independent_displacement_ideal_tension_v1",
+          "limits_m": [
+            -0.015,
+            0.015
+          ],
+          "velocity_limit_m_s": 0.025
+        },
+        "conditional_rules": "selected_segments_and_consecutive_spans_v1",
+        "unsupported": [
+          "8-12 tendons: declared, not execution validated",
+          "polygon section domain not granted in this example",
+          "axial extension",
+          "shear",
+          "twist",
+          "friction",
+          "swept self-collision",
+          "High segment-count dynamics and controller compatibility require candidate-specific validation"
+        ],
+        "domain_encoding": "[minimum, maximum, default]; indexed segment fields override generic domain",
+        "serial_assembly": {
+          "version": "repeat_serial_prototypes_v1",
+          "root_segment": "segment_0",
+          "repeated_segment": "segment_1",
+          "guide": "mid_guide",
+          "connector": "connector",
+          "payload": "payload",
+          "cell_count_bounds": [
+            1,
+            32
+          ],
+          "default_cells": 12
+        },
+        "generation_version": "serial_family_generation_v2",
+        "full_specification": {
+          "artifact_id": "120f23ddcf625a2fe4c0c0bfad3ad8d7a0fa25d42654e22261f2757ba539c987",
+          "media_type": "application/json"
+        },
+        "available_operations": {
+          "actions": [
+            "generate",
+            "execute",
+            "mechanics",
+            "replay",
+            "physical_replay",
+            "diagnose",
+            "select",
+            "stop"
+          ],
+          "capabilities": [
+            "analysis",
+            "mathematics",
+            "replay",
+            "physical_replay",
+            "nmpc",
+            "rl"
+          ]
+        },
+        "routing_strategy": "polar_consecutive_spans_v1",
+        "span_semantics": "first_segment <= last_segment < selected segment_count; counts sum to tendon_count",
+        "conditional_parameters": "Segment and route overrides must exist in selected topology; per-span offsets match count",
+        "attachment_constraints": {
+          "local_frame": "segment YZ plane; normalized station s",
+          "order": "unique increasing stations; guides precede anchor; anchor on last selected segment",
+          "clearance": "section envelope + tendon radius; pairwise tendon diameters; one owned hole per tendon",
+          "guides": [
+            {
+              "envelope_halfsize_m": [
+                0.002,
+                0.025,
+                0.025
+              ],
+              "hole_radius_m": 0.0015
+            }
+          ]
+        },
+        "numerical_support": "Candidate-specific validation required; physical generation does not certify dynamics, control or task success"
+      },
+      "family_space_identity": "120f23ddcf625a2fe4c0c0bfad3ad8d7a0fa25d42654e22261f2757ba539c987",
+      "candidate_initialization": "all_candidate_dofs_zero_v1",
+      "canonical_task_identity": "fe7b95c3c1ba12659b59c1983544b6454c9d90ac42c4dec528e9736d99fd3a6b"
+    },
+    "available_actions": [
+      "generate",
+      "execute",
+      "mechanics",
+      "replay",
+      "physical_replay",
+      "diagnose",
+      "select",
+      "stop"
+    ],
+    "implementation": {
+      "commit": "bbed3a91122bc14cda9b56d2e14208883b2aaf59",
+      "repairs": [],
+      "counters_preserved": true,
+      "prelaunch_failure_rule": "A recorded failure before durable launch intent proves no worker started; its charged attempt remains spent. An explicit implementation repair is not a retry of already-executed unchanged science."
+    }
+  },
+  "preflight_reference": {
+    "artifact_id": "58acdf974800fe97ce91ead6ef6d424c3a3a16d06b62f4da5f427abfcc150c14",
+    "media_type": "application/json"
+  },
+  "export": "D:\\softrobot-agent\\.worktrees\\sorosim-matlab-nmpc\\evidence\\sorosim_s5_agent\\preflight_study"
+}

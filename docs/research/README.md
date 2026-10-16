@@ -1,5 +1,21 @@
 # Research mainline
 
+## SoRoSim S4.5–S5 studies
+
+The [stage delivery report](sorosim_s45_s5_delivery.md) links the separate
+S4.5, open-loop MuJoCo, full feedback NMPC, direct/residual PPO, and S5-T
+immutable Store exports. All observed physical evaluations failed the original
+task; mathematical feasibility and optimizer convergence are reported
+separately. The local [Agent preflight](../../evidence/sorosim_s5_agent/preflight.json)
+imports those stages into one research packet without a provider send. The
+[egress review](../../evidence/sorosim_s5_agent/egress_review.json) records why
+the bounded live provider pilot has not run.
+
+The historical root study described below still has ten training-stage
+allowances and no aggregate action ceiling. New sparse stage configurations
+may declare smaller explicit stage and cumulative action counts; the S5-RL
+study enforced two 32,768-action stages and two independent evaluations.
+
 The public entry is `python -m tools.research`. Edit `configs/research/study.json`; its references own robot physics (`robot.json`), task/acceptance (`tasks/reach_hold.json`), control/training defaults (`control.json`) and interpreters/provider/threads/credential reference (`runtime.json`). `tools/research/config.py` is the sole resolver. It recursively merges sparse objects, replaces lists, validates complete effective settings and freezes provenance plus identity in the owned Store and `resolved_configuration.json`.
 
 Omitted training/reward settings inherit configured values. `policy_kwargs.log_std_init` preserves the declared architecture. Explicit null disables scientific/aggregate time limits and is supported for absent references/boundaries and optional PPO `clip_range_vf`/`target_kl`; null cannot clear required numeric settings, mode or step allocation. Reward and observation scaling never change frozen task acceptance. Existing-study commands and workers use saved configurations, without resolving editable files. Status/export do not import Torch, SB3 or construct an environment, and do not require an RL interpreter. Source JSON can be edited or absent without changing a prepared study.

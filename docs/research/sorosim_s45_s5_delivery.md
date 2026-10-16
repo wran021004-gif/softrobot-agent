@@ -253,3 +253,107 @@ complete morphology-control interaction contrast.
 
 The integrated Agent feedback pilot remains unexecuted at this boundary. It
 must retain distinct source, candidate, task, backend and budget identities.
+
+## Integrated Agent preflight and external-call boundary
+
+The local S5-Agent preflight froze the `formal_research` study, materialized
+the exact Design B candidate, imported the verified mathematical tension
+reference, and exposed five P1–P5 summaries with original artifact pointers
+in the same research Store. Its [decision packet](../../evidence/sorosim_s5_agent/preflight.json)
+shows one candidate, a valid compatible residual reference, 12 remaining
+provider requests, 39 remaining public operations and two backend launch
+slots. The [preflight Store archive](../../evidence/sorosim_s5_agent/preflight_study/archive_manifest.json)
+preserves source ownership. This demonstrates local tool and evidence
+availability, **not** an Agent-generated feedback decision.
+
+Automatic approval review rejected the outbound live call to the configured
+`https://api.deepseek.com/chat/completions` endpoint. Its reason was that the
+user authorization for the bounded pilot did not clearly name the destination
+for repository-derived task, candidate and experiment evidence. No provider
+request was sent, no model decision was generated, and no P6 scientific
+execution was launched. The [egress review](../../evidence/sorosim_s5_agent/egress_review.json)
+names the endpoint, proposed payload categories, exact local packet hash,
+request ceiling and the explicit approval still needed. The blocked send was
+not retried indirectly.
+
+## Implementation, source freezes and costs
+
+The development branch is `feat/sorosim-matlab-nmpc`; the verified starting
+remote SHA was `0a4a692975c3c840a4a0bea612f07f3ae8dc0d4e`. Stage evidence
+bound to committed implementations: S4.5 through `4931904a`, S5-A through
+`933d47c6`, S5-B through `1bfbadde`, S5-RL through `ada51d26`, S5-T through
+`a3c5b046`, and local Agent preflight through `bbed3a91`. Every stage used a
+separate sparse study configuration and immutable Store export. The final
+delivery commit and verified remote SHA are reported with the final handoff.
+
+| Frozen study | Resolved configuration identity |
+|---|---|
+| S4.5 final | `194da2a7b5c653834922b7a7e438c31f4f72a8181f0467a27f4244f7d0b6e6f3` |
+| S5-A | `8cbb7c2f0f33365c9f0734b2ea241fb73428f1c52ed70d44480b7e3a2154d362` |
+| S5-B | `0ea922a8dede13ce7027a3f6ab9033e71043c7c5fdb5e38f902dbd2cd1eec4ac` |
+| S5-RL | `7b1b29a48ef31511d3729f282673ae70e160f711420d14435f7b97c66d81586d` |
+| S5-T | `4f2a9ad5dc1f131f132bacd8a09ee7e0a88c11c9676962ce02d904de8ed8afc8` |
+| S5-Agent preflight | `545b63f7382db8023f6fb83aaf912aa26cdb9b36860144557bb9546362dcf886` |
+
+| Production owner | Change and reason | Approx. lines changed |
+|---|---|---:|
+| `sr_codesign.m`, SoRoSim Python bridge | Original-task feasibility, cross replay, signed epigraph, raw multiplier/KKT diagnostics | 160 |
+| `sr_trajectory_outputs.m`, gateway, manifest | Saved-state world tip outputs with source identity, no dynamics reintegration | 23 |
+| family `backends.py` | Candidate-compiled fixed SI MuJoCo tension playback with 36 samples and actual force checks | 67 |
+| `physical_replay.py`, execution worker | Typed one-launch reservation, contained execution, registered acceptance and comparison | 199 |
+| research contracts/core/state/feedback | Typed actions, recovery, packet and imported evidence visibility | 81 |
+| research config/RL | Explicit action counts and exact mathematical residual-reference admission | 53 |
+
+Stage scripts and sparse grants are under `tests/research/sorosim_s45_pilot.py`,
+`sorosim_s5a_pilot.py`, `sorosim_s5b_pilot.py`, `sorosim_s5rl_pilot.py`,
+`sorosim_s5t_pilot.py`, `sorosim_s5_agent_pilot.py`, and matching
+`configs/research/study_sorosim_*.json`. They call the original research
+Store, controller, backend, RL and evaluator owners. The stage-specific
+evidence archives preserve counts and full source identities; compact tables
+above are navigation aids, not replacements for their raw results.
+
+| Stage | Fresh full NLP | Mathematical replay slots | Backend launch slots | PPO actions | Provider sends |
+|---|---:|---:|---:|---:|---:|
+| S4.5 | 2 | 4, including one failed cross | 0 | 0 | 0 |
+| S5-A | 0 | 0 | 1 | 0 | 0 |
+| S5-B | 0 | 0 | 1 | 0 | 0 |
+| S5-RL | 0 | 0 | 4, two starts/two evaluations | 65,536 | 0 |
+| S5-T | 0 | 0; one derivative preflight | 0 | 0 | 0 |
+| S5-Agent local preflight | 0 | 0 | 0 | 0 | 0 |
+
+The scope of P1 is limited by the missing A with U_B cross outcome; the S4.5
+feasible witness is nonconverged and its sealed replay retained the original
+false flag alongside the post-hoc verifier audit. S5-A, S5-B, and both PPO
+checkpoint evaluations are complete original-task physical failures. The
+observed NMPC speed improvement does not establish a unique causal mechanism
+or a real-time controller. S5-T has no validated KKT point or certified
+gradient. The live Agent feedback decision remains blocked at the external
+send boundary.
+
+For read-only reproduction, set `PYTHONPATH` to the worktree and
+`tests/research`, use the configured research interpreter and the three
+single-thread variables from `configs/research/runtime.json`, then run
+`python -m unittest test_sorosim_contract test_agent_feedback
+test_count_continuation -q` from the `tests/research` module path. Recompute
+source and artifact SHA-256 values from each stage's `archive_manifest.json`
+and compact index. The stage scripts above show the original contained
+experiment calls and frozen grants; sealed scientific executions must not be
+repeated under their existing study identities. Local Agent packet preparation
+uses `python tests/research/sorosim_s5_agent_pilot.py
+runs/research/sorosim-s5-agent-feedback-20261016 --prepare-only`. A live call
+requires explicit approval of the DeepSeek destination and payload scope in
+the egress review.
+
+The final focused Python regression ran 45 selected tests successfully,
+including SoRoSim contracts, cross-replay binding, Agent feedback, count
+continuation and task-analysis contracts. A broader 48-test selection had one
+unrelated Windows sandbox setup error when a topology fixture could not open
+its temporary SQLite database under `runs/`; the focused rerun excluded that
+fixture and passed. The real S5-A/S5-B/PPO/S5-T outcomes above are separate
+from fixture tests. `git diff --check` passed before stage commits.
+
+Follow-up work for S6 includes a justified matched-state physical/model
+diagnostic, converged KKT base point before envelope-gradient testing, a
+controller or morphology candidate that actually passes independent physical
+acceptance, real-time performance work, and multi-seed/cross-task controller
+and Agent comparisons. None follows from the single trials here.

@@ -1,5 +1,28 @@
 # Runtime and module ownership
 
+## SoRoSim S4.5–S5 additions (2026-10-16)
+
+`matlab/sorosim_control/sr_codesign.m` now owns the original sampled task
+violation epigraph, exact cross-design replay, and raw full-NLP multiplier/KKT
+diagnostics. `sr_trajectory_outputs.m` converts saved mathematical states to
+world tip position/velocity without dynamics reintegration. The existing
+`sorosim_codesign.calculate` and `mechanics.dispatch` retain MATLAB Session,
+candidate binding, complete-solve and replay settlement.
+
+`extensions/tendon_family/backends.playback_tensions` applies an exact fixed
+SI tension schedule in the existing candidate MuJoCo compiler. The narrow
+`tools/research/physical_replay.py` reserves one backend launch, validates
+candidate/model/task/order/grid, settles the raw 36 samples, and calls the
+registered reach evaluator plus shared acceptance assembler. `core.packet` and
+`state.readable_results` expose the result through the original Store.
+
+`tools/research/rl.py` admits a sealed same-candidate mathematical tension
+sequence as an existing residual PPO reference. Its configured action caps
+are enforced at stage admission. `core.packet.stage_context` presents compact
+P1–P5 source summaries and Store pointers for the live Agent; no second Agent
+or evidence system was added. The stage outcomes and limitations are in
+[S4.5–S5 delivery](sorosim_s45_s5_delivery.md).
+
 `CLI prepare → config.resolve → Store frozen study → bind → agent/typed dispatch → candidate → contained backend or owned RL worker → settlement → immutable evidence read → exact selection / STOP → export`.
 
 | Module | Final responsibility and important calls |
