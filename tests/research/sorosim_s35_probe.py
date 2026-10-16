@@ -32,7 +32,7 @@ def norm(a, b):
     return float(np.linalg.norm(np.asarray(a)-np.asarray(b)))
 
 
-def physical_probes(updates, rows, spec, remaining_only=False):
+def physical_probes(updates, rows, spec, remaining_only=False, folder=None):
     """Three paired replays, or just the final intervention on failed-batch resume."""
     import mujoco as mj
     model = mj.MjModel.from_xml_path(str(RAW/'robot.xml'))
@@ -87,7 +87,11 @@ def physical_probes(updates, rows, spec, remaining_only=False):
         assert norm(actual_next['actual_tension'],u)<1e-12
         # At zero the reconstructed state equals the original; reuse archived next.
         represented_next=actual_next if i==0 else (advance(represented) if i==2 or not remaining_only else None)
+        if folder is not None and represented_next is not None:
+            save(folder,f'replay_{i}_represented',represented_next)
         control=advance(original) if i==1 and not remaining_only else None
+        if folder is not None and control is not None:
+            save(folder,f'replay_{i}_original',control)
         probes.append(dict(index=i,projection=projection,x=x,u=u,original=initial,
             reconstructed=reconstructed,actual_next=actual_next,reconstructed_next=represented_next,
             original_replay=control,original_replay_error=None if control is None else dict(
@@ -167,7 +171,7 @@ def run(destination, full_update=False, remaining_only=False):
         budget=dict(full_updates=int(full_update),mujoco_replays=1 if remaining_only else 3,
             prior_failed_batch_replays=2 if remaining_only else 0,rl_training=0,provider_requests=0),
         units=dict(position='m',velocity='m/s',q='rad/m',qd='rad/(m*s)',residual='N*m^2')))
-    physical=physical_probes(updates,rows,spec,remaining_only);save(folder,'physical',physical)
+    physical=physical_probes(updates,rows,spec,remaining_only,folder);save(folder,'physical',physical)
     print('Physical projections and bounded replays complete',flush=True)
     # Long graph build is local CPU work, outside MATLAB session timing.
     reference=casadi_reference(spec,physical['probes']);save(folder,'casadi',reference)
@@ -322,8 +326,9 @@ def refine(folder):
     with SorosimSession() as session:
         session.construct(spec)
         for i,p in enumerate(physical['probes']):
-            results.append(session.evaluate('diagnose',dict(kind='integrate',x=p['x'],u=p['u'],
-                a=[0]*12,period_s=.01,refinements=[32,64])))
+            result=session.evaluate('diagnose',dict(kind='integrate',x=p['x'],u=p['u'],
+                a=[0]*12,period_s=.01,refinements=[32,64]))
+            save(folder,f'refinement_{i}',result);results.append(result)
             print(f'Checkpoint {i}: final integration refinement complete',flush=True)
     save(folder,'refinement',dict(probes=results,timings=session.timings,environment=session.environment))
 
@@ -339,7 +344,9 @@ def calibrate(folder):
         session.construct(read(RAW/'control_spec.json')['specification'])
         args=dict(x=p['x'],u=p['u'],a=np.linspace(-10,20,12).tolist())
         kernels=session.evaluate('diagnose',dict(args,kind='kernels'))
+        save(folder,'calibration_kernels',kernels)
         serialization=session.evaluate('diagnose',dict(args,kind='serialization',sample=sample))
+        save(folder,'calibration_serialization',serialization)
     save(folder,'calibration',dict(kernels=kernels,serialization=serialization,python_encode_decode_s=times,
         timings=session.timings,scope='Serialization microbenchmark of same returned data; live dispatch remains aggregated.'))
 

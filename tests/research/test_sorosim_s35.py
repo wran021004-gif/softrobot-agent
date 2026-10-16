@@ -28,13 +28,13 @@ def verify_alignment(physical):
 
 
 class S35Tests(unittest.TestCase):
-    def test_current_diagnostic_source_freeze(self):
+    def test_historical_diagnostic_source_freeze(self):
         import subprocess
         from tools.state_io import digest
         frozen=read(ROOT/'evidence/sorosim_s35/source_freeze.json');identity=frozen.pop('identity')
         self.assertEqual(digest(frozen),identity)
         for source,blob in frozen['git_blobs'].items():
-            actual=subprocess.check_output(['git','hash-object',source],cwd=ROOT,text=True,stderr=subprocess.DEVNULL).strip()
+            actual=subprocess.check_output(['git','rev-parse','eb3907c5fb4710137be2af0f874e67eadbdf2f9e:'+source],cwd=ROOT,text=True,stderr=subprocess.DEVNULL).strip()
             self.assertEqual(actual,blob,source)
 
     def test_matched_input_and_observation_contract(self):

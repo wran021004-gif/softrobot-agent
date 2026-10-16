@@ -3,6 +3,28 @@ function out=sr_diagnose(model,r)
 assert(model.S.ndof==12,'S35_PROBE_REQUIRES_ARCHIVED_12_COORDINATE_CANDIDATE');
 q=r.x(1:12);v=r.x(13:24);u=r.u;a=r.a;
 switch r.kind
+    case 'geometry_mechanics'
+        out.routing=sr_routing(model,q,u,false,[],r.samples);
+        out.dynamics=sr_dynamics(model,q,v,u,zeros(12,1));
+        % Additive kinetic-energy restriction, using existing upstream samples.
+        J=model.S.Jacobian(model.T*q)*model.T; terms=cell(model.S.N,1);
+        for k=1:model.S.N
+            c=model.spec.links{k}; M=zeros(12); G=zeros(12,1);
+            g=model.S.FwdKinematics(model.T*q);
+            for j=1:numel(model.node_indices{k})
+                ix=model.node_indices{k}(j); B=J((ix-1)*6+(1:6),:);
+                R=g((ix-1)*4+(1:3),1:3);
+                if strcmp(c.kind,'flexible_segment')
+                    W=squeeze(c.mass(j,:,:))*c.weights(j);
+                else
+                    W=blkdiag(c.inertia,c.mass_kg*eye(3));
+                end
+                M=M+B'*W*B;
+                G=G+B(4:6,:)'*W(4:6,4:6)*R'*model.spec.gravity(:);
+            end
+            terms{k}=struct('link',c.id,'kind',c.kind,'mass',M,'gravity',G);
+        end
+        out.link_terms=terms;
     case 'kernels'
         t=tic;first=sr_derivatives(model,q,v,u,a);out.first_s=toc(t);
         times=zeros(3,4);

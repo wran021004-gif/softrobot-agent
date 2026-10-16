@@ -1,4 +1,4 @@
-function out=sr_routing(model,q,u,tangent,qd)
+function out=sr_routing(model,q,u,tangent,qd,samples)
 % Physical attachment Jacobians and straight, frictionless chord virtual work.
 if nargin<4, tangent=false; end
 started=tic; q=q(:);u=u(:); S=model.S;
@@ -26,6 +26,14 @@ out=struct('lengths',ell,'length_jacobian',dl,'force_map',-dl', ...
     'tendon_force',-dl'*u,'tip_pose',tip,'tip_jacobian',Jtip, ...
     'routing_positions', {positions},'coordinate_order',{model.spec.coordinate_order}, ...
     'tendon_order',{model.spec.tendon_order},'model_identity',model.spec.identity);
+if nargin>=6
+    frames=cell(numel(samples),1);
+    for k=1:numel(samples)
+        [pose,jac]=attachment(model,samples(k),g,J);
+        frames{k}=struct('pose',pose,'jacobian',jac);
+    end
+    out.sample_frames=frames;
+end
 if tangent
     h=model.spec.solver.routing_difference_step; D=zeros(S.ndof);
     if nargin<5, qd=zeros(S.ndof,1); end
