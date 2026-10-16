@@ -173,6 +173,9 @@ def validate_initializer(before,after):
 def checked_reach(inp):
     from .gvs_profile import ReachControl
     inp=SessionInput.model_validate(inp)
+    if inp.policy.controller.extension_id == 'controller.sorosim_matlab_nmpc':
+        from .sorosim_control import SorosimReachControl
+        ReachControl = SorosimReachControl
     authorize(inp,inp.policy.candidate_builder.parameters.data,{})
     control=ReachControl.model_validate(inp.policy.controller.parameters.data)
     if control.numerical_source!='initial_state_pretension' or not control.recipe.regenerate_warm_states:

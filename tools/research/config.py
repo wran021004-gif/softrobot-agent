@@ -130,6 +130,13 @@ def resolve(path, profile=None):
         source = (path.parent / study.pop(key)).resolve()
         inputs[key] = read(source)
         provenance['references'][key] = dict(path=str(source), sha256=digest(inputs[key]))
+        if key == 'control' and 'extends' in inputs[key]:
+            base = (source.parent / inputs[key].pop('extends')).resolve()
+            original = read(base)
+            if base.parent != source.parent or 'extends' in original:
+                raise ValueError('SAME_DIRECTORY_SINGLE_CONTROL_EXTENSION_REQUIRED')
+            inputs[key] = patch(original, inputs[key])
+            provenance['references']['control_base'] = dict(path=str(base), sha256=digest(original))
         if key=='task' and 'extends' in inputs[key]:
             base=(source.parent/inputs[key].pop('extends')).resolve()
             original=read(base)
@@ -223,6 +230,9 @@ def resolve(path, profile=None):
         if any(level['backend']!=backend_name for level in [*policy['screening'].values(),policy['final_evaluation']]):
             raise ValueError('FIDELITY_REQUIRES_FROZEN_BACKEND')
     from extensions.tendon_family.gvs_profile import ReachControl
+    if cfg['policy']['controller']['extension_id'] == 'controller.sorosim_matlab_nmpc':
+        from extensions.tendon_family.sorosim_control import SorosimReachControl
+        ReachControl = SorosimReachControl
     from extensions.tendon_family.contracts import current_nmpc_recipe, MujocoParameters
     data = ReachControl.model_validate(cfg['policy']['controller']['parameters']['data']).model_dump(mode='json')
     data['recipe'] = current_nmpc_recipe(data['recipe'])

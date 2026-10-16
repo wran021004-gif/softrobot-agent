@@ -164,3 +164,49 @@ EXTENSIONS.append(replace(_source_builder,version='6.0.0',input_schema=FamilyBui
     capabilities={**_source_builder.capabilities,
         'parameter_declarations':'extensions.tendon_family.generated_serial:serial_declarations'},
     sources=_source_builder.sources+('extensions/tendon_family/family_space.py',)))
+
+# The predictor is separate from policy.dynamics_model (MuJoCo's cell model).
+from .sorosim_control import SorosimReachControl
+SOROSIM_SOURCES = PLATFORM_SOURCES + PHYSICAL_SOURCES + (
+    'extensions/tendon_family/sorosim_spec.py',
+    'extensions/tendon_family/sorosim_session.py',
+    'extensions/tendon_family/sorosim_control.py',
+    'extensions/tendon_family/gvs_basis.py',
+    'extensions/tendon_family/gvs_projection.py',
+    'extensions/tendon_family/gvs_profile.py',
+    'matlab/sorosim_control/sr_gateway.m',
+    'configs/research/control.json',
+    'configs/research/control_sorosim.json',
+    'configs/research/sorosim_dependency.json',
+)
+CONTRACTS += [('family.sorosim_model','1.0.0',m3.SorosimModelParameters),
+              ('family.sorosim_reach_control','1.0.0',SorosimReachControl)]
+_gvs_model = next(e for e in EXTENSIONS if e.extension_id=='model.gvs')
+_sr_math = {**_gvs_model.capabilities['mathematical_model'],
+    'capabilities':dict(kinematics=False,statics=False,dynamics=False,linearization=False,gradients=False),
+    'representations':[], 'intended_uses':[]}
+EXTENSIONS.append(Extension(extension_id='model.sorosim_gvs',kind='dynamics_model',version='1.0.0',
+    input_schema=m3.SorosimModelParameters,output_schema=m6.Payload,
+    binding='extensions.tendon_family.sorosim_spec:SorosimModel',
+    description='Pinned SoRoSim mathematical predictor; capabilities gated by numerical evidence',
+    dependencies=('numpy','scipy','matlab.engine'), sources=SOROSIM_SOURCES,
+    capabilities=dict(category='mathematical_model',role='adapter',mathematical_model=_sr_math,
+        upstream='GVSRobotics/SoRoSim@24d573a3e864ffda87c42ee462a6ed620133cc7b',
+        operations=[], unsupported_operations=['S4 analysis','co-design'], validation='S0 dependency only')))
+_sr_controller = next(e for e in EXTENSIONS if e.extension_id=='controller.gvs_nmpc' and e.version=='11.0.0')
+EXTENSIONS.append(replace(_sr_controller,extension_id='controller.sorosim_matlab_nmpc',version='1.0.0',
+    input_schema=SorosimReachControl,binding='extensions.tendon_family.sorosim_control:SorosimNMPCController',
+    description='SoRoSim predictor with MATLAB fmincon SQP and independent MuJoCo execution',
+    dependencies=('numpy','scipy','matlab.engine'),extension_dependencies=(('model.sorosim_gvs','1.0.0'),),
+    sources=SOROSIM_SOURCES,capabilities={**_sr_controller.capabilities,
+        'predictor':'model.sorosim_gvs','profile_id':'sorosim_candidate_reach_v1',
+        'route_applicability':'extensions.tendon_family.sorosim_control:checked_control'}))
+for _i,_entry in enumerate(EXTENSIONS):
+    if _entry.extension_id == 'backend.family_mujoco':
+        EXTENSIONS[_i] = replace(_entry,capabilities={**_entry.capabilities,
+            'controllers':[*_entry.capabilities['controllers'],'controller.sorosim_matlab_nmpc']})
+    if _entry.kind == 'candidate_builder':
+        _support = _entry.capabilities.get('parameter_support')
+        if _support:
+            EXTENSIONS[_i] = replace(_entry,capabilities={**_entry.capabilities,'parameter_support':{
+                **_support,'controller':[*_support['controller'],'controller.sorosim_matlab_nmpc@1.0.0']}})

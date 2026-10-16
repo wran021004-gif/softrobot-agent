@@ -1044,3 +1044,18 @@ class GVSTrajectoryParameters(Contract):
     tolerance: FiniteFloat = Field(default=1e-6,gt=0)
     evaluation_threads: int = Field(default=1,ge=1,le=8)
 
+
+class SorosimSolver(Contract):
+    algorithm: Literal['sqp'] = 'sqp'
+    optimality_tolerance: FiniteFloat = Field(default=1e-6, gt=0)
+    step_tolerance: FiniteFloat = Field(default=1e-10, gt=0)
+    constraint_tolerance: FiniteFloat = Field(default=1e-8, gt=0)
+    gauss_per_interval: int = Field(default=5, ge=2, le=20)
+    routing_difference_step: FiniteFloat = Field(default=1e-5, gt=0, le=1e-3)
+    engine_options: Literal['-nodesktop -nosplash'] = '-nodesktop -nosplash'
+
+
+class SorosimModelParameters(Contract):
+    basis: GVSBasisSpecification = Field(default_factory=lambda: GVSBasisSpecification(strategy='structural_linear'))
+    gauss_per_interval: int = Field(default=5, ge=2, le=20)
+
