@@ -29,3 +29,35 @@ succeeded. No shared desktop was attached and no upstream startup.m ran.
 
 Authoritative physical inputs, evaluators, budgets and historical records are
 unchanged. No live Agent, provider, RL or full task campaign has been launched.
+
+## S1
+
+The full regenerated M3-D model has five links, including the guide, connector
+and payload with their actual COMs and full inertia tensors. Custom SoRoSim
+section matrices preserve the ellipse/rectangle axes and interpolated orientation.
+The custom structural nodal basis has rank 12. `q_s=T*q_g` uses six coefficients
+per segment here, derived from the resolved basis. Actual geometric curvature is
+independent of natural curvature; natural curvature contributes an elastic load.
+The gateway caches the constructed candidate. Native actuation is disabled.
+
+The frozen one/two-segment V1/V2 scripts and cases are selectively imported without
+modification; `validation/sorosim/source.json` preserves their commit and hashes.
+Only fixed loaded probes ran, not the historical 248 equilibrium solves.
+Production has no dependency on these validation files.
+
+Real results in `evidence/sorosim_control/s1.json` pass the predeclared bounds:
+M3-D max length error `5.949e-8 m`, tip-position component error `1.243e-7 m`,
+force-map error `4.630e-8 m^2`. Independent MATLAB differences give routing
+Jacobian error `2.252e-10 m^2`, tip Jacobian error `5.965e-9 m^2`, and nonzero-input
+routing-tangent error `4.570e-13 N*m^3`. Frozen reference force maps agree to
+`1.302e-18 m^2` and loaded tangents to `1.566e-13 N*m^3`.
+GVS uses 192 midpoint steps; both sides use Gauss integration per structural
+interval. All original probes, matrices, tolerance definitions and times remain
+in evidence. Five focused contract/physics tests pass. An initial test assertion
+compared tuple/list containers for equal inertias; array comparison corrected
+that test without changing mathematics or thresholds. Its numerical attempt is
+preserved as `s1_attempt01.json`.
+
+Unsupported external forces, off-chain components, interior component connections
+and eccentric distributed sections are rejected explicitly. This bounded adapter
+does not claim arbitrary-robot coverage, contact or S4 analysis support.
