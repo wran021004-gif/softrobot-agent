@@ -12,7 +12,7 @@ acceptance thresholds, default controller and RL route are unchanged.
 | S3.6 | Three matched static states, 50 frames each, separated forces, additive link inertia/gravity, controlled geometry substitutions, immediate replay persistence | Passed within bounded diagnostic scope | `3f45b849` (normally pushed) |
 | S4-A | Candidate-bound operating points, MATLAB statics/linearization/IFT, existing shared feasibility/Gramian kernels and scoped evidence | Passed in measured local scope | `8f4c642b` (normally pushed) |
 | Performance | Shared kinematic traversal, matched old/new derivative and full-NLP evaluation | Passed for measured kernel/callback speedup | `bb7b947f` (normally pushed) |
-| S4-B | Two actual physical designs, full-task control optimization, recipe-consistent recovery and separate mathematical replay through Harness | Passed for bounded co-design and verified relaxed trajectories; optimizer convergence and original task satisfaction not achieved | `602c66f3` numerical source; earlier failures retained |
+| S4-B | Two actual physical designs, full-task control optimization, recipe-consistent recovery and separate mathematical replay through Harness | Passed for bounded co-design and verified relaxed trajectories; optimizer convergence and original task satisfaction not achieved | `602c66f3` numerical source; `a5347183` final validated evidence |
 
 ## S3.6 evidence and findings
 
@@ -449,3 +449,26 @@ trajectory/co-design files, shared mathematical kernels, search/budget/state,
 task and control configurations and RL route have zero Git diff from the
 starting revision. The narrow observation/registry preflight fixes above are
 the only additional platform changes outside the proposed file list.
+
+## Final Git delivery receipt
+
+Starting SHA: `eb3907c5fb4710137be2af0f874e67eadbdf2f9e`.
+Stage commits, in order: S3.6 `3f45b849`, S4-A `8f4c642b`, performance
+`bb7b947f`, S4-B integration `f6fe2eac`, Harness fixes `5403348e`, preserved
+failed study and recovery `dbcd057b`, runnable recovery study `602c66f3`, and
+final validated evidence/report `a5347183`.
+
+Final code, tests and numerical evidence SHA:
+`a53471830b70d59ddde6eecb4732f2486cb329e9`.
+Normal push succeeded, and `git ls-remote origin
+refs/heads/feat/sorosim-matlab-nmpc` returned that exact SHA. `git status
+--porcelain` was empty. This receipt is a subsequent documentation-only commit;
+the final checkout/receipt SHA is obtained with `git rev-parse HEAD` and is also
+reported in the delivery message, avoiding a self-referential commit hash.
+
+All relevant source, tests, raw successful/failed numerical evidence and archives
+are published. Ignored `runs/` directories retain local Store working databases
+and temporary test artifacts; all scientific outcomes and costs are already
+exported in committed immutable archives. No scientific artifact remains
+unpublished. S5/S6, unrelaxed task success, optimizer convergence, global
+optimality and closed-loop physical validation remain unclaimed as specified.
