@@ -1,0 +1,347 @@
+{
+  "version": "m3d1_prelaunch_protocol_v1",
+  "client_date": "2026-10-16",
+  "branch": "feat/m3d-agent-feedback",
+  "initial_head": "5dd325eb2c179c01d13aba50074b15db64a0cfdb",
+  "resolved_identity": "6259446ce6dea8523f0f4762007ff9dde9249896192be171e40ad8f1413ad057",
+  "family_space_identity": "120f23ddcf625a2fe4c0c0bfad3ad8d7a0fa25d42654e22261f2757ba539c987",
+  "final_evaluation_identity": "defa9f6c914af60644a246516ecf5efba75218cfd1c46a6c9b0796afb72486a2",
+  "budgets": {
+    "provider_requests": 16,
+    "protected_provider_requests": 3,
+    "public_operations": 64,
+    "protected_public_operations": 6,
+    "physical_launches": 2,
+    "local_solves": 0,
+    "local_solve_s": null,
+    "offline_nlp": 0,
+    "bdf_replays": 0,
+    "mathematical_evaluations": 10,
+    "numerical_s": null,
+    "activity_s": null,
+    "delivery_reserve_s": null
+  },
+  "nmpc_limits": {
+    "executions": 2
+  },
+  "rl_limits": {
+    "training_stages": 0,
+    "actions_per_trial": null,
+    "seconds_per_trial": null,
+    "training_actions": null,
+    "training_active_seconds": null,
+    "evaluation_episodes": 0,
+    "diagnostic_replays": 0,
+    "diagnostic_physics_steps": 0
+  },
+  "confirmation": {
+    "fresh_independent_repetitions": 0,
+    "configuration": "Select exact fresh completed passing backend evaluation after public read. No extra repetitions; repeatability unassessed."
+  },
+  "fidelity_policy": {
+    "version": "numerical_fidelity_v1",
+    "screening": {
+      "coarse": {
+        "cells_per_segment": 4,
+        "backend": "backend.family_mujoco@1.1.0"
+      },
+      "standard": {
+        "cells_per_segment": 12,
+        "backend": "backend.family_mujoco@1.1.0"
+      }
+    },
+    "final_evaluation": {
+      "cells_per_segment": 12,
+      "backend": "backend.family_mujoco@1.1.0"
+    },
+    "require_exact_fidelity": true,
+    "alternative_runtimes": [],
+    "runtime_preflight_limit": 2
+  },
+  "family_search": {
+    "method": "bounded_mixed_coordinate_v1",
+    "variable_groups": [
+      "segment_count",
+      "tendon_count",
+      "spans",
+      "lengths",
+      "materials",
+      "sections",
+      "routing"
+    ],
+    "segment_counts": [
+      1,
+      2
+    ],
+    "tendon_counts": [
+      3,
+      4
+    ],
+    "max_proposals": 16,
+    "max_evaluations": 8
+  },
+  "canonical_task": {
+    "contract_version": "1.0.0",
+    "task_id": "family-multisegment-dev",
+    "task_version": "1.0.0",
+    "name": "Independent development validation of a serial multi-segment soft arm",
+    "status": "development_valid",
+    "source": "Development task with fixed target, tolerance and scoring; historical tasks are unchanged",
+    "family": "task.reach",
+    "goal": {
+      "contract": "reference.reach_goal",
+      "version": "1.0.0",
+      "data": {
+        "target_m": [
+          0.29,
+          0.035,
+          0.19
+        ]
+      }
+    },
+    "environment": {
+      "contract": "experiment.assembly",
+      "version": "1.0.0",
+      "data": {
+        "environment": {
+          "coordinate_frame": "world_base_x_forward_yz_cross_section",
+          "environment_id": "reach_free",
+          "gravity_m_s2": [
+            0.0,
+            0.0,
+            -9.81
+          ],
+          "gravity_source": "main@245a785 reach_free environment; Human-owned benchmark gravity",
+          "lights": [
+            {
+              "direction": [
+                0.0,
+                0.0,
+                -1.0
+              ],
+              "position_m": [
+                0.0,
+                0.0,
+                2.0
+              ]
+            }
+          ],
+          "objects": [
+            {
+              "conaffinity": 1,
+              "contype": 0,
+              "half_size_m": [
+                2.0,
+                2.0,
+                0.1
+              ],
+              "kind": "plane",
+              "name": "floor",
+              "position_m": [
+                0.0,
+                0.0,
+                -0.02
+              ]
+            }
+          ],
+          "schema_version": "1",
+          "truth_status": "HUMAN_OWNED",
+          "units": "SI"
+        },
+        "external_forces": [],
+        "floor_id": "floor",
+        "mount": {
+          "position_m": [
+            0.0,
+            0.0,
+            0.15
+          ],
+          "quaternion_wxyz": [
+            1.0,
+            0.0,
+            0.0,
+            0.0
+          ]
+        }
+      }
+    },
+    "robot_families": [
+      "tendon_robot_family"
+    ],
+    "actuator_channels": [
+      "actuator_commands"
+    ],
+    "initializer": {
+      "extension_id": "initialize.family",
+      "version": "1.0.0",
+      "parameters": {
+        "contract": "family.initial",
+        "version": "1.0.0",
+        "data": {
+          "rule": "all_candidate_dofs_zero_v1"
+        }
+      }
+    },
+    "timing": {
+      "timestep_s": 0.0005,
+      "control_period_s": 0.01,
+      "sample_period_s": 0.01,
+      "duration_s": 0.35,
+      "termination": [
+        "duration",
+        "numerical_failure"
+      ]
+    },
+    "evaluator": {
+      "extension_id": "evaluate.reach",
+      "version": "1.0.0",
+      "parameters": {
+        "contract": "reference.reach_evaluation",
+        "version": "1.0.0",
+        "data": {
+          "tolerance_m": 0.01
+        }
+      }
+    },
+    "objectives": [
+      {
+        "metric": "position_error",
+        "direction": "minimize",
+        "units": "m",
+        "weight": 1.0
+      }
+    ],
+    "failure_policy": "retain_invalid_and_constraint_failures",
+    "observations": [
+      {
+        "name": "tip_position",
+        "entity": "tip",
+        "dimension": 3,
+        "units": "m",
+        "frame": "world",
+        "phase": "post_step",
+        "missing": "unsupported"
+      }
+    ],
+    "sampling": {
+      "split": "development",
+      "seeds": [
+        17
+      ],
+      "aggregation": "per_instance",
+      "window_s": [
+        0.0,
+        0.35
+      ]
+    }
+  },
+  "science_hashes": {
+    "extensions/tendon_family/gvs_nmpc.py": "ddb3207c293c8ba2584c8cb4eea9753cbafa42da85ee83e18df1eec2c955d77b",
+    "extensions/tendon_family/gvs_trajectory.py": "aa7ac451d2c1e3bec3ed9b771b2eed9a557f749f0758ce5606e136181810462e",
+    "extensions/tendon_family/gvs_projection.py": "4b17c9389652de3cc5a889384beba0a63dec18a7db0f7f9ed9696b3f794b8df7",
+    "extensions/tendon_family/contracts.py": "377929d221932bc4a802b13d5fb356ab93bd35c3efe1ed044ad8e94c8f013243",
+    "extensions/tendon_family/control_evidence.py": "31b1994df6c55880b3e2bb5adaaebe502badbf36a6b206c7f03b733e44af989a",
+    "extensions/tendon_family/backends.py": "70a19e629c559c902c657963c46736e3854c5f3b84886655c4b99a809edfac0e",
+    "extensions/tendon_family/generated_serial.py": "d63ecf72e56d68b428d740e1a861ed4f70bc76e9325920974689f1d6341314df",
+    "extensions/tendon_family/gvs_profile.py": "08d8077d703b473ddb785f392db902b084a4e0ebc3ed378cc84266d45517781a",
+    "extensions/tendon_family/gvs_codesign.py": "bdfee2a1fba8a79094e5084b09c90601cf8ead6ef872ce4d745c223e0680f147",
+    "extensions/tendon_family/gvs_casadi.py": "cc31bd152a2552ad88640b0b6ee3d849c6ddea3601be9030d975e3cace4e2b25",
+    "extensions/tendon_family/gvs.py": "c0201588c34f90090e14c27302ef5a2bd2888626e06b4beb746b8889a9b9f320",
+    "extensions/tendon_family/gvs_basis.py": "0dd6ae2d26b180f9da588f8732f8a9d0800b633535485f5e7eca4c4b68bf3455",
+    "extensions/tendon_family/math_analysis.py": "838ba1b1ae9b399ea6e53f1e60f9e68af4cb2b9547173cf53041a3a438cd5f15",
+    "extensions/tendon_family/compiler.py": "29c338b0d343f20b6b9a7bd56dfbd1cc576d7342c65afe81cd17c0806bdb64e6",
+    "extensions/tendon_family/sections.py": "d7b5918c7f140e59f97ad1342f85f72fe7a3d1276af6c029e5b607fad016bd07",
+    "extensions/tendon_family/geometry.py": "6227f9b712f94e4853e734d7fd65373ff314bff02497b4c6bcc6d0dec4bb1e1b",
+    "extensions/tendon_family/manifest.py": "a2f2e24afefdd3e523320afa4000d5ce2fd6adfcfcd2db303fe91626316ea574",
+    "extensions/optimization/contracts.py": "21a7729881fce05a78356743199353151f581a55c6231b97e8f00b45323816b5",
+    "extensions/optimization/ipopt.py": "eb2672cb3845a17ef703d85f939545fa3e4d0358b6da42c89f83231bb00dbfb2",
+    "extensions/math_analysis/tools.py": "991ab623f27cdf852aa422dcee2cf618e17ecd7c445b49093f0b80a9c8b4c9e9",
+    "extensions/math_analysis/kernels.py": "b767e335fde15e575d76868544b31f339d84711f8708cd78bee48a965eaace0e",
+    "schemas/platform_analysis.py": "12f049478c25a5d6d791b91cae1826fc4181d99c049d53c6ee189c0092a84f95",
+    "tools/execution_completion.py": "b745b96446f9f7b1e5172a8f8cc8c93d2a053a7df385d6c0e2e7299aa946a069",
+    "tools/research_tasks.py": "cde37e55f1bf5a2d66543ad8b2fcbf1543f04fedcdbb460cb2ac644787cf594d",
+    "extensions/math_analysis/trajectory.py": "dc08d9c239c71bcf49a0c9f325fb11960769a8e141534d45a4048e8521f6fc1b",
+    "extensions/tendon_family/family_space.py": "9abf082ae5ea29a06489819727ac0243456c217d1c7f35629f698fd8d7b5cea0",
+    "tools/rl/env.py": "d1d90e066852f385e25268a5eea20102e03397568a462159ad8ec24943492cf0",
+    "tools/rl/train.py": "9d7cee245ca67e3eda05dc2a3f34d500727dbe7695ed45450aa3368a5911b7cb",
+    "tools/rl/checks.py": "b965d96b73ba7e5d4e4248044be32dcf9b11f6502914cf173b8349457ceed5f4",
+    "tools/rl/continuation.py": "d4b6a0c231c3822e0dfea0b886b6e2273394450ceda9a6ff90ea3f06722c5e56"
+  },
+  "core_hashes": {
+    "tools/research/agent.py": "29a3a7e589b5cf6b6e6604062eca5d6b4bf656662d352949faddceecf8cfb580",
+    "tools/research/analysis.py": "b718418b586146511b07958308c19c45c7afaea3b40c3b9d01c7a72eb9ebcc60",
+    "tools/research/budget.py": "22e4909a4326f1b8983d5cd89bd29a92552a72c8aa3892fa4d1ebcb9fa69f2dd",
+    "tools/research/config.py": "1d2d3d35b57597297c1f8709960b39132be6d3f1b5778f0286852724a443d1da",
+    "tools/research/contracts.py": "db1f09753f3e8c68ea565b3cdb6c9571ae8f03025b5d2987ec15a80f41fc99db",
+    "tools/research/core.py": "ebc814e29bd9d8f672a2196ba45a728c8d9230b47b8010c8f7fb22c50d01d33a",
+    "tools/research/design.py": "30c318c401b44c5897cd537819a82067c326782d66fe8a37af0aae8635c2c69c",
+    "tools/research/diagnostic.py": "78ca53f9af275561d7f35edeb1f5b575a29f508264f7cd5c0a60d60bfb025faf",
+    "tools/research/execution.py": "13f807c0d40d85dfc094be7e8a9467a2361a64ac700da8d5147e344a6876317e",
+    "tools/research/execution_worker.py": "68a8f16ee3e859a37ccc334a884cc8b490a7ed8e11bbaed7377be553d8a52ae3",
+    "tools/research/experience.py": "08137de1f77870f18738b845d6417f49a56d94d9d95809ec92c7cd6aee18f2fa",
+    "tools/research/feedback.py": "f08e3314517f6c96aeda58d95c7d9f38885e046a3794845170c7eae257025a62",
+    "tools/research/mechanics.py": "ea618cf1991f882737db830ef3116eb7150271c5e278bdbd35a06a47a7b03dbd",
+    "tools/research/mechanics_worker.py": "0d139af160313fa210472814b7fd1929576de72ca8a54bce6caa48f5b4e5575f",
+    "tools/research/mixed_moves.py": "6b718d036cb305e45036ea55098fb30703df167e6d1c640bc250fdead722ed74",
+    "tools/research/numerics.py": "a4f08d5984534d8e5b63b3b3f85b1e13aa25a614caf3b3855a65d0b290c0bad6",
+    "tools/research/rl.py": "c3057d532c86d7c8e53abf32db3991aa60ab780c57c4038035497b4d3e5dfb50",
+    "tools/research/runtime_capability.py": "7a2b00a69595b34b323869210b6013e0184f7eba82a042d869c4e10626eafe97",
+    "tools/research/search.py": "75299c3c30a0861ea1f6a234dd9b7861a045edbde38fc3361985ab98e2dea864",
+    "tools/research/state.py": "afb7b90134fa19e45901f9a712c47166bf8950f852bb11c20122d3b624020dd8",
+    "tools/research/task_constraints.py": "0a9b54c6e8b53edca7fea643bc4099d951b3efd6f559cb43a43b096cc2628a33",
+    "tools/research/__init__.py": "7eb70257593da06f682a3ddda54a9d260d4fc514f645237f5ca74b08f8da61a6",
+    "tools/research/__main__.py": "5c15f01744c59dd0efc9495c82d1fa5e83607dd68742569491544d3f560b3049",
+    "tools/service_execution.py": "e93d938e0af49c7f36c1a8cf1d1d9304f71fff8d7670029e2f0da00ca3f5f423",
+    "tools/rl/env.py": "d1d90e066852f385e25268a5eea20102e03397568a462159ad8ec24943492cf0",
+    "tools/rl/run.py": "f4542552eb165157bc0782ed12f44cc0237e74241e77c451571711e150d4ebd9",
+    "tools/rl/train.py": "9d7cee245ca67e3eda05dc2a3f34d500727dbe7695ed45450aa3368a5911b7cb",
+    "tools/rl/checks.py": "b965d96b73ba7e5d4e4248044be32dcf9b11f6502914cf173b8349457ceed5f4",
+    "tools/rl/continuation.py": "d4b6a0c231c3822e0dfea0b886b6e2273394450ceda9a6ff90ea3f06722c5e56"
+  },
+  "provider_credential_available": true,
+  "provider_contacted": false,
+  "existing_same_identity_session": false,
+  "registered_tools": [
+    "research_plan",
+    "research_analysis",
+    "evidence_read",
+    "experience_retrieve (formal mode blocks unrelated retrieval)",
+    "retrieve_context (existing Harness offload)"
+  ],
+  "critical_checks": "configuration assertions and existing registration/admission/ownership/success/STOP/recovery source inspection passed",
+  "reused_tests": {
+    "count": 33,
+    "source": "docs/research/m3d_readiness.md",
+    "rerun": false
+  },
+  "reused_physical_preparation": "evidence/m3d_agent_feedback/prelaunch_verification.json",
+  "new_resource_use": {
+    "provider_requests": 0,
+    "public_operations": 0,
+    "mathematical_evaluations": 0,
+    "complete_executions": 0,
+    "native_xml_probes": 0,
+    "controller_updates": 0,
+    "physics_steps": 0,
+    "rl_training_stages": 0
+  },
+  "historical_exposure": {
+    "operator_readiness": [
+      "M3-C3 delivery and prelaunch evidence",
+      "user disclosure of prior M3-B2 six-tendon T2 +Y pass"
+    ],
+    "agent_supplied_evidence": [],
+    "agent_historical_candidates_imported": false,
+    "agent_historical_searches_imported": false,
+    "agent_initial_scientific_reference": false,
+    "agent_information": "Frozen task/family, existing instructions/tool schemas only; no M3-B2 design or M3-C3 candidate/result supplied"
+  },
+  "stop_rules": [
+    "first fresh complete final-fidelity pass: no further science; exact read and selection or truthful STOP",
+    "two execution ceiling",
+    "Agent STOP or engineering/provider closure preserves original evidence",
+    "no unchanged automatic execution retry, new study, or budget reset"
+  ],
+  "scope_note": "Full family generation domain retained as prepared; mixed search specifically restricted to 1/2 segments and 3/4 tendons. No proxy control optimization.",
+  "binding": "Record committed implementation SHA separately after commit and CLI bind; do not modify this prelaunch record."
+}
