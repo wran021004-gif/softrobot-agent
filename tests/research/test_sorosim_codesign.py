@@ -29,12 +29,12 @@ def check(folder):
     assert result['objective_relative_error']<2e-4 and result['constraint_relative_error']<2e-4
 
 
-def pilot(directory,destination=None):
+def pilot(directory,destination=None,study=None):
     from tools.research import core
     from tools.research.state import state,save as persist
     from tools.research.design import verify_candidate,numerical_binding
     from test_sorosim_analysis import inputs
-    directory=Path(directory);host=core.prepare(ROOT/'configs/research/study_sorosim_s4b.json',directory)
+    directory=Path(directory);host=core.prepare(study or ROOT/'configs/research/study_sorosim_s4b.json',directory)
     if 'freeze' not in state(host):core.bind(host)
     inp,_,_,_=inputs();parameters=deepcopy(inp.policy.candidate_builder.parameters.data['request'])
     sensitivity=read(ROOT/'evidence/sorosim_s4a/attempt01/design_sensitivity.json')
@@ -81,6 +81,33 @@ def pilot(directory,destination=None):
 
 
 class CodesignTests(unittest.TestCase):
+    def test_topology_uses_existing_candidate_route(self):
+        from tempfile import TemporaryDirectory
+        import gc
+        from tools.research import core,design
+        from tools.research.state import state
+        from extensions.tendon_family.sorosim_spec import SorosimModel
+        from unittest.mock import patch
+        from schemas.platform import ProjectConfig
+        dimensions=[];identities=[]
+        with TemporaryDirectory(dir=ROOT/'runs',prefix='s4b-topology-') as folder:
+            fixture=lambda **v:ProjectConfig(**{**v,'project_id':Path(folder).name,'grant_id':Path(folder).name})
+            with patch.object(core,'ProjectConfig',side_effect=fixture):
+                host=core.prepare(ROOT/'configs/research/study_sorosim_s4b.json',folder)
+            for count in (1,3):
+                out=design.generate_candidate(host,dict(version='serial_family_generation_v2',
+                    family_space_identity=state(host)['spec']['family_space_identity'],
+                    segment_count=count,tendon_count=4),dict(origin='topology compilation test; no solves'))
+                self.assertEqual(out['status'],'generated')
+                candidate=design.verify_candidate(host,out['candidate']);cfg=candidate['configuration']
+                control=cfg['policy']['controller']['parameters']['data']
+                spec=SorosimModel(dict(basis=control['recipe']['basis'])).convert(
+                    cfg['robot']['structure']['data'],cfg['policy']['discretization']['data'],cfg['task']['environment']['data'])
+                dimensions.append(len(spec['coordinate_order']));identities.append(spec['identity'])
+            self.assertEqual(state(host)['offline_nlp'],0)
+            gc.collect()  # Close SQLite connection cycles before Windows removes fixture.
+        self.assertNotEqual(*dimensions);self.assertNotEqual(*identities)
+
     def test_frozen_harness_configuration_compiles(self):
         from tools.research.config import resolve
         from tools.platform_tasks import compile_input
@@ -97,7 +124,7 @@ class CodesignTests(unittest.TestCase):
         self.assertLess(out['constraint_relative_error'],2e-4)
 
     def test_real_design_control_and_replay(self):
-        result=read(ROOT/'evidence/sorosim_s4b/pilot/summary.json');rows=result['rows']
+        result=read(ROOT/'evidence/sorosim_s4b/recovered_pilot/summary.json');rows=result['rows']
         self.assertNotEqual(rows[0]['physical_design_identity'],rows[1]['physical_design_identity'])
         self.assertGreater(result['control_change_norm_n'],1e-4)
         self.assertEqual(result['counts']['offline_nlp'],2);self.assertEqual(result['counts']['bdf_replays'],2)
@@ -112,7 +139,7 @@ class CodesignTests(unittest.TestCase):
 if __name__=='__main__':
     import argparse
     p=argparse.ArgumentParser();p.add_argument('--check',type=Path);p.add_argument('--pilot',type=Path)
-    p.add_argument('--destination',type=Path);a=p.parse_args()
+    p.add_argument('--destination',type=Path);p.add_argument('--study',type=Path);a=p.parse_args()
     if a.check:check(a.check)
-    elif a.pilot:pilot(a.pilot,a.destination)
+    elif a.pilot:pilot(a.pilot,a.destination,a.study)
     else:unittest.main(argv=['test_sorosim_codesign'])

@@ -51,6 +51,18 @@ def calculate(request,checkpoint=None):
                 task_identity=digest(plain(inp.task)),coordinate_order=spec['coordinate_order'],tendon_order=spec['tendon_order'],
                 objective_definition=arguments,substeps=substeps,design_candidate=request['design_candidate'])
         verified=request['operation']=='replay' and out['passed']
+        failed=('REPLAY_MISMATCH' if not out['passed'] else None) if request['operation']=='replay' else (
+            'RETURNED_TRAJECTORY_INFEASIBLE' if not out['relaxed_feasible'] else
+            'OPTIMIZER_NOT_CONVERGED' if not out['converged'] else None)
+        diagnostic=dict(stage='S4-B',operation=request['operation'],candidate=request['design_candidate'],
+            model_identity=spec['identity'],operating_point=dict(x=numerical['measured_initial_state'],
+                u=numerical['nominal']['u0'],time_s=0.),numerical_method='full-task SQP / implicit Euler',
+            status=out['status'],failure_code=failed,first_failed_check=failed,
+            dimensions=dict(state=len(numerical['measured_initial_state']),inputs=len(spec['routes']),intervals=steps),
+            units=spec['units'],numerical_work={k:out[k] for k in ('iterations','function_evaluations') if k in out},
+            timing={k:v for k,v in out.items() if k.endswith('_s')},evidence_pointer='/mathematical_facts',
+            raw_error=out.get('message'),supported_conclusions='Relaxed feasibility requires separate replay; optimizer convergence reported separately.',
+            unsupported_conclusions=['physical task acceptance','global optimality'])
         claim=ScopedMathematicalClaim(conclusion='feasible_witness' if verified else 'inconclusive',binding=binding,
             requirement_identity=digest(requirements),model_identity=spec['identity'],
             model_declaration=dict(provider='model.sorosim_gvs@1.0.0',protocol='sorosim_full_task_gap_v1'),
@@ -62,7 +74,7 @@ def calculate(request,checkpoint=None):
             supported_interpretation='Full-task relaxed rod-model trajectory verified with explicitly reported task slacks.' if verified else
                 'Returned mathematical optimization; solver status alone is not feasibility evidence.',
             unsupported_conclusions=['physical task success','original unrelaxed constraints when slacks are nonzero','global optimality','dynamic model equivalence to MuJoCo'])
-        return dict(status='computed',mathematical_facts=out,trajectory=out.get('trajectory'),
+        return dict(status='computed',mathematical_facts=out,diagnostic=diagnostic,trajectory=out.get('trajectory'),
             replay=out if request['operation']=='replay' else None,task_requirements=requirements,
             objective_definition=arguments,verified_conclusions=[plain(claim)],research_interpretations=[],
             numerical_environment=dict(environment=session.environment,timings=session.timings),

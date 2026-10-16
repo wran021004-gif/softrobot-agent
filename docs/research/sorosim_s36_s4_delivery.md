@@ -11,7 +11,7 @@ acceptance thresholds, default controller and RL route are unchanged.
 |---|---|---|---|
 | S3.6 | Three matched static states, 50 frames each, separated forces, additive link inertia/gravity, controlled geometry substitutions, immediate replay persistence | Passed within bounded diagnostic scope | `3f45b849` (normally pushed) |
 | S4-A | Candidate-bound operating points, MATLAB statics/linearization/IFT, existing shared feasibility/Gramian kernels and scoped evidence | Passed in measured local scope | `8f4c642b` (normally pushed) |
-| Performance | Shared kinematic traversal, matched old/new derivative and full-NLP evaluation | Passed for measured kernel/callback speedup | Recorded after stage commit |
+| Performance | Shared kinematic traversal, matched old/new derivative and full-NLP evaluation | Passed for measured kernel/callback speedup | `bb7b947f` (normally pushed) |
 | S4-B | Pending | Not complete | Pending |
 
 ## S3.6 evidence and findings
@@ -267,4 +267,55 @@ $perf='runs/sorosim-performance-'+[guid]::NewGuid().ToString('N')
 
 S5 complete MuJoCo closed-loop physical task evaluation and S6 formal backend /
 Agent control-method comparison are not authorized and are **not completed**.
-S4 and the final inventory/Git verification will be recorded as work proceeds.
+Neither physical completion nor an Agent/backend comparison follows from the
+mathematical experiments in this delivery.
+
+## Source inventory and reuse
+
+Counts include blank/comment lines in the delivered files; they are total file
+lengths, not added lines. The comparison base is `eb3907c5`. N means new, M means
+modified. Numerical JSON, immutable archives and test logs are evidence, not
+additional implementations.
+
+| Script | N/M | LOC | Responsibility, reason and existing reuse |
+|---|---|---:|---|
+| `extensions/tendon_family/manifest.py` | M | 238 | Register implemented operations and source dependencies in the existing registry. |
+| `extensions/tendon_family/math_analysis.py` | M | 266 | Lazy legacy CasADi imports and provider-specific boundary identity; legacy equations retained. |
+| `extensions/tendon_family/model_applicability.py` | M | 215 | Qualify supported local SoRoSim statics/linearization; retain shared assessment. |
+| `extensions/tendon_family/signals.py` | M | 53 | Recognize SoRoSim's existing direct-tension observation channel; reuse signal expansion. |
+| `extensions/tendon_family/sorosim_analysis.py` | N | 130 | Bind MATLAB work points and IFT to existing initializer, compiler, model contract and applicability. |
+| `extensions/tendon_family/sorosim_codesign.py` | N | 69 | Candidate-local MATLAB solve/replay adapter; reuse task translation, compiler and Session. |
+| `matlab/sorosim_control/sr_analysis.m` | N | 167 | MATLAB residual statics, work points, dynamic linearization and static IFT; reuse routing/dynamics/derivatives. |
+| `matlab/sorosim_control/sr_codesign.m` | N | 112 | Full-task epigraph objective and sampled task constraints; reuse NMPC initialization and complete dynamics callbacks. |
+| `matlab/sorosim_control/sr_diagnose.m` | M | 120 | Geometry/mechanics decomposition and warmed kernel instrumentation in existing diagnostic gateway. |
+| `matlab/sorosim_control/sr_gateway.m` | M | 66 | Dispatch two numerical operations; existing model ownership and error handling. |
+| `matlab/sorosim_control/sr_nmpc.m` | M | 175 | Expose full-task preparation to offline mathematics; reuse exact implicit roots and context. |
+| `matlab/sorosim_control/sr_nmpc_callbacks.m` | M | 101 | Optionally expose already computed endpoint derivatives for explicit offline constraints. |
+| `matlab/sorosim_control/sr_routing.m` | M | 111 | Shared transforms/Jacobians and diagnostic sample frames; same pinned recurrence, tendon chords and FD derivatives. |
+| `tests/research/sorosim_s35_probe.py` | M | 373 | Persist each expensive successful result immediately; existing experiment and calculation unchanged. |
+| `tests/research/sorosim_s36_probe.py` | N | 198 | Matched saved-state rod/cell probes and controlled substitutions; reuse S3.5 mappings, actual compiler and GVS. |
+| `tests/research/test_sorosim_analysis.py` | N | 199 | Bounded real analysis driver, saved-result checks and preserved-result recovery; existing shared kernels. |
+| `tests/research/test_sorosim_codesign.py` | N | pending | Bounded genuine Harness driver, derivative/evidence and discrete topology compilation checks. |
+| `tests/research/test_sorosim_contract.py` | M | 134 | Update locally supported analysis assertion; retain controller/default/scientific identity tests. |
+| `tests/research/test_sorosim_performance.py` | N | 88 | Matched warmed old/new kernels and full callbacks in one Engine; no benchmarking framework. |
+| `tests/research/test_sorosim_s35.py` | M | 112 | Compare historical source hashes to their frozen Git revision. |
+| `tests/research/test_sorosim_s36.py` | N | 73 | Real geometry/force checks and synthetic interruption persistence test. |
+| `tools/platform_registry.py` | M | 236 | Detect the installed MATLAB Engine on PYTHONPATH without import/startup when distribution metadata is absent. |
+| `tools/research/analysis.py` | M | 447 | Provider dispatch and sensitivity evidence within existing typed analysis service. |
+| `tools/research/contracts.py` | M | 325 | Versioned paired-candidate static sensitivity request; preserve legacy serialization. |
+| `tools/research/execution_worker.py` | M | 44 | Atomically save successful numerical analysis returns before packaging. |
+| `tools/research/mechanics.py` | M | 100 | Admit SoRoSim through existing reservations; export raw worker checkpoints through Store artifacts. |
+| `tools/research/mechanics_worker.py` | M | 54 | Select actual provider before legacy imports; retain one worker/ledger/lifecycle. |
+| `tools/research/task_constraints.py` | M | 121 | Static sensitivity applicability; preserve original task translator and constraint semantics. |
+| `evidence/sorosim_performance/attempt01/reference/sr_routing.m` | N | 73 | Exact frozen baseline for reproducible comparisons; deliberately retained evidence copy, never a production owner. |
+
+The proposed size ranges were guidance. Smaller adapters reuse existing contracts,
+initialization, task translation, workers and persistence rather than restating
+them. `sr_derivatives.m` needed no change: the measured saving occurs inside its
+existing routing dependency. The two co-design files are justified because the
+offline epigraph objective and hard sampled task inequalities differ from the
+online NMPC soft cost; the dynamics and root solver are not duplicated. Remaining
+intentional repetition is the analytical evaluation/checking of residuals in
+independent verification and the pinned upstream kinematic recurrence in the
+private optimized traversal. No second robot family, Store, Agent, or optimizer
+framework was introduced.

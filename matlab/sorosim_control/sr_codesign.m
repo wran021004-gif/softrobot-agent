@@ -65,12 +65,34 @@ end
 z=min(max(z,lower),upper);f=objective(z);
 e=inspect(z(1:nv));[ci,ce]=constraints(z);
 violation=max([abs(ce);ci;lower-z;z-upper]);
+raw=struct('objective',f,'scaled_violation',violation,'task',task_report(e), ...
+    'slacks',struct('position',z(end-1),'speed',z(end)));
+recovery=struct('attempted',false,'selected',false,'error',[],'wall_s',0);
+% Honor the existing recipe: recover returned tensions through the same roots.
+% Task slacks must be reevaluated on that trajectory, never copied from the NLP.
+if c.recipe.recover_returned_tensions && flag>=0
+    recovery.attempted=true;t=tic;
+    try
+        request.initial_tensions=e.tensions';fresh=sr_nmpc(model,request);
+        gap=task_values(fresh.initial);
+        repaired=[fresh.initial_vector;max([0;gap(groups==1)]);max([0;gap(groups==2)])];
+        [ri,re]=constraints(repaired);rv=max([abs(re);ri;lower-repaired;repaired-upper]);
+        recovery.objective=objective(repaired);recovery.scaled_violation=rv;
+        if rv<=1e-5 && (violation>1e-5 || recovery.objective<f)
+            z=repaired;f=recovery.objective;violation=rv;e=inspect(z(1:nv));recovery.selected=true;
+        end
+    catch failure
+        recovery.error=failure.message;
+    end
+    recovery.wall_s=toc(t);
+end
 out=struct('status','returned','exitflag',flag,'converged',flag>0,'iterations',info.iterations, ...
     'function_evaluations',info.funcCount,'message',info.message,'objective',f,'initial_objective',objective(z0), ...
     'scaled_violation',violation,'relaxed_feasible',all(isfinite(z)) && violation<=1e-5, ...
     'trajectory',struct('states',e.states','tensions_n',e.tensions','times_s',(0:c.steps)*c.h, ...
         'slacks',struct('position',z(end-1),'speed',z(end))), ...
-    'task',task_report(e),'initial_task',task_report(prepared.initial),'optimization_s',solve_s, ...
+    'task',task_report(e),'raw_returned',raw,'recovery',recovery, ...
+    'initial_task',task_report(prepared.initial),'optimization_s',solve_s, ...
     'preparation_s',prepared.warm_preparation_s,'total_s',toc(started),'initial_roots',{prepared.roots}, ...
     'objective_definition',r.arguments,'model_identity',model.spec.identity,'physical_task_acceptance','unmeasured');
 
