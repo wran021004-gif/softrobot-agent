@@ -169,10 +169,14 @@ EXTENSIONS.append(replace(_source_builder,version='6.0.0',input_schema=FamilyBui
 from .sorosim_control import SorosimReachControl
 SOROSIM_SOURCES = PLATFORM_SOURCES + PHYSICAL_SOURCES + (
     'extensions/tendon_family/sorosim_analysis.py',
+    'extensions/tendon_family/sorosim_codesign.py',
+    'tools/research/mechanics.py',
+    'tools/research/mechanics_worker.py',
     'extensions/tendon_family/math_analysis.py',
     'tools/research/analysis.py',
     'tools/research/execution_worker.py',
     'matlab/sorosim_control/sr_analysis.m',
+    'matlab/sorosim_control/sr_codesign.m',
     'extensions/tendon_family/sorosim_spec.py',
     'extensions/tendon_family/sorosim_session.py',
     'extensions/tendon_family/sorosim_control.py',
@@ -212,7 +216,7 @@ EXTENSIONS.append(Extension(extension_id='model.sorosim_gvs',kind='dynamics_mode
     dependencies=('numpy','scipy','matlab.engine'), sources=SOROSIM_SOURCES,
     capabilities=dict(category='mathematical_model',role='adapter',mathematical_model=_sr_math,
         upstream='GVSRobotics/SoRoSim@24d573a3e864ffda87c42ee462a6ed620133cc7b',
-        operations=['routing','dynamics','derivatives','analysis'], unsupported_operations=['co-design'],
+        operations=['routing','dynamics','derivatives','analysis','codesign'], unsupported_operations=['topology derivatives'],
         validation='S1/S2 local mechanics; S4 analysis requires per-result derivative and residual checks')))
 _sr_controller = next(e for e in EXTENSIONS if e.extension_id=='controller.gvs_nmpc' and e.version=='11.0.0')
 EXTENSIONS.append(replace(_sr_controller,extension_id='controller.sorosim_matlab_nmpc',version='1.0.0',

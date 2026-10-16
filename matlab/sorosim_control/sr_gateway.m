@@ -55,6 +55,8 @@ switch operation
                 out = sr_diagnose(model,request);
             case 'analysis'
                 out = sr_analysis(model,request);
+            case 'codesign'
+                out = sr_codesign(model,request);
             otherwise
                 error('SOROSIM_UNSUPPORTED_OPERATION: %s',operation);
         end

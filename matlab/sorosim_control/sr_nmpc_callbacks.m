@@ -38,6 +38,8 @@ objective=@obj;constraint=@con;inspect=@inspection;step=@defect;profile=@snapsho
         ce=zeros(nx*(N+1),1);A=sparse(nx*(N+1),nv);
         ce(1:nx)=(X(:,1)-c.measured)./c.state_scale;A(1:nx,1:nx)=eye(nx);
         motion=zeros(3,N);velocity=zeros(3,N);
+        exportMotion=isfield(c,'export_output_jacobians') && c.export_output_jacobians;
+        if exportMotion,positionJ=zeros(3,n,N);velocityJ=zeros(3,nx,N);end
         for k=1:N
             control=ceil(k/c.recipe.substeps);x=X(:,k);y=X(:,k+1);u=U(:,control);
             d=sr_derivatives(model,y(1:n),y(n+1:end),u,(y(n+1:end)-x(n+1:end))/c.h);
@@ -54,6 +56,7 @@ objective=@obj;constraint=@con;inspect=@inspection;step=@defect;profile=@snapsho
             v=model.spec.mount_rotation*d.tip_velocity;
             jp=model.spec.mount_rotation*d.tip_position_q;
             jv=model.spec.mount_rotation*[d.tip_velocity_q,d.tip_velocity_qd];
+            if exportMotion,positionJ(:,:,k)=jp;velocityJ(:,:,k)=jv;end
             position_error=(p-c.target)/c.position_scale;
             f=f+c.h*(c.recipe.tracking_weight*(position_error'*position_error)+c.recipe.velocity_weight*sum(y(n+1:end).^2));
             gx(1:n,k+1)=gx(1:n,k+1)+2*c.h*c.recipe.tracking_weight*jp'*position_error/c.position_scale;
@@ -81,6 +84,7 @@ objective=@obj;constraint=@con;inspect=@inspection;step=@defect;profile=@snapsho
         gradient=[reshape(gx.*c.state_scale,[],1);reshape(gu.*c.input_scale,[],1)];
         e=struct('objective',f,'gradient',gradient,'constraints',ce,'jacobian',A, ...
             'states',X,'tensions',U,'tip_positions',motion,'tip_velocities',velocity);
+        if exportMotion,e.position_jacobians=positionJ;e.velocity_jacobians=velocityJ;end
         last=z;cached=e;
         if enabled
             elapsed=toc(timer);stats.evaluation_s=stats.evaluation_s+elapsed;

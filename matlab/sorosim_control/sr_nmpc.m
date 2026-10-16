@@ -4,7 +4,10 @@ started=tic;c=context(model,r);
 c.profile=isfield(r,'profile') && r.profile;
 [objective,constraint,inspect,step,callbackProfile]=sr_nmpc_callbacks(model,c);history=[];
 warmStart=tic;
-if isfield(r,'warm') && ~isempty(r.warm)
+if isfield(r,'initial_tensions')
+    assert(isfield(r,'full_task') && r.full_task,'OFFLINE_INITIALIZATION_REQUIRES_FULL_TASK');
+    U=r.initial_tensions';assert(isequal(size(U),[c.m,c.horizon]),'OFFLINE_INPUT_DIMENSION');
+elseif isfield(r,'warm') && ~isempty(r.warm)
     U=r.warm.tensions';U=[U(:,2:end),U(:,end)];
     U=U(:,min(1:c.horizon,size(U,2)));
 else
@@ -13,6 +16,12 @@ end
 U=min(max(U,0),c.input_scale);
 [initial,roots]=regenerate(c,U,step);warm_s=toc(warmStart);
 initialEvaluation=inspect(initial);
+if isfield(r,'prepare_only') && r.prepare_only
+    assert(isfield(r,'full_task') && r.full_task,'OFFLINE_PREPARATION_REQUIRES_FULL_TASK');
+    initialEvaluation.jacobian=[];
+    out=struct('context',c,'initial_vector',initial,'initial',initialEvaluation,'roots',{roots},'warm_preparation_s',warm_s);
+    return;
+end
 if isfield(r,'check_only') && r.check_only
     out=check_callbacks(initial,c,objective,constraint);
     initialEvaluation.jacobian=[];
@@ -96,7 +105,9 @@ assert(strcmp(c.recipe.stopping_policy,'research_work_v1'),'RESEARCH_STOPPING_PO
 c.elapsed=r.elapsed_s;c.period=r.period_s;
 remaining=(r.duration_s-r.elapsed_s)/r.period_s;
 assert(abs(remaining-round(remaining))<1e-7 && remaining>=1,'CONTROL_TIME_GRID_REQUIRED');
-c.horizon=min(c.recipe.horizon,round(remaining));c.steps=c.horizon*c.recipe.substeps;c.h=c.period/c.recipe.substeps;
+c.horizon=min(c.recipe.horizon,round(remaining));
+if isfield(r,'full_task') && r.full_task,c.horizon=round(remaining);end
+c.steps=c.horizon*c.recipe.substeps;c.h=c.period/c.recipe.substeps;
 c.measured=r.measured_state(:);c.previous=r.previous_input(:);c.target=r.target(:);
 c.state_scale=[repmat(c.recipe.curvature_scale_rad_m,c.n,1);repmat(c.recipe.rate_scale_rad_m_s,c.n,1)];
 c.input_scale=[model.spec.routes.force_limit_n]';

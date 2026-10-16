@@ -6,6 +6,14 @@ from tools.platform_store import plain
 from tools.service_execution import contain_worker_children
 
 def calculate(request):
+    if request['configuration']['policy']['controller']['extension_id']=='controller.sorosim_matlab_nmpc':
+        from extensions.tendon_family.sorosim_codesign import calculate as sorosim_calculate
+        folder=Path(sys.argv[1]).resolve().parent
+        def checkpoint(name,value):
+            path=folder/(name+'.json')
+            if path.exists():raise ValueError('PRESERVE_MECHANICS_CHECKPOINT')
+            atomic_json(path,value)
+        return sorosim_calculate(dict(request,checkpoint_path=str(folder/'optimizer_iterate.json')),checkpoint)
     from extensions.tendon_family.gvs_codesign import Workspace,integrate
     from extensions.optimization.ipopt import IpoptSolver
     cfg=request['configuration']

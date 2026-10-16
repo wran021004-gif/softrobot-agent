@@ -1,0 +1,18 @@
+{
+  "defaults": "family_study_defaults.json",
+  "start_mode": "family_space",
+  "family_space": "family_space_v2.json",
+  "candidate_initialization": "all_candidate_dofs_zero_v1",
+  "study_id": "sorosim-s4b-bounded-codesign-20261016",
+  "authorization": "User attachment explicitly authorizes S4-B bounded mathematical design/control optimization, source commits and normal pushes. This pilot permits two generated designs, two full nonlinear trajectory solves, two independent mathematical replays, zero physical executions, zero provider requests and zero RL training. Uses existing family domains, canonical task and Store reservations. S5 and S6 are not authorized.",
+  "base_commit": "eb3907c5fb4710137be2af0f874e67eadbdf2f9e",
+  "mode": "engineering_numerical",
+  "control": "control_sorosim.json",
+  "capabilities": ["analysis", "mathematics", "replay"],
+  "allowed_plan_actions": ["generate", "mechanics", "replay", "stop"],
+  "budgets": {"provider_requests": 0, "protected_provider_requests": 0, "public_operations": 12,
+    "protected_public_operations": 2, "physical_launches": 0, "mathematical_evaluations": 0,
+    "offline_nlp": 2, "bdf_replays": 2},
+  "evidence_destination": "evidence/sorosim_s4b/pilot",
+  "execution_instructions": "Bounded deterministic nested coordinate pilot through existing research_plan: materialize the saved M3-D family request, reuse verified local length sensitivity, propose one segment_0 length change within frozen family bounds, optimize full-task control for both candidates under identical explicit task-gap-with-effort objective and sampled slacks, and independently replay each. Record all work and failures. Do not launch MuJoCo task execution, RL, or any live provider request. Two candidates only; no extra solves to chase improvement. Mathematical task slacks do not establish physical task acceptance."
+}
