@@ -51,6 +51,8 @@ switch operation
                 out = sr_nmpc(model,request);
             case 'checks'
                 out = sr_checks(model,request);
+            case 'diagnose'
+                out = sr_diagnose(model,request);
             otherwise
                 error('SOROSIM_UNSUPPORTED_OPERATION: %s',operation);
         end

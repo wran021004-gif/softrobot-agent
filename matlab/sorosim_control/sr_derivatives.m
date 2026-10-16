@@ -4,6 +4,7 @@ function out=sr_derivatives(model,q,qd,u,qdd)
 started=tic;
 routing=sr_routing(model,q,u,true,qd);
 out=sr_dynamics(model,q,qd,u,qdd,routing,false);
+out.routing_s=routing.routing_s;
 out.Rq=out.passive_q-routing.force_state_derivative;
 out.Rqd=out.passive_qd;
 out.Rqdd=out.mass_matrix;out.Ru=-routing.force_map;

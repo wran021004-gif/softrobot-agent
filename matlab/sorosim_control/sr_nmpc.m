@@ -1,7 +1,8 @@
 function out=sr_nmpc(model,r)
 % Full scaled multiple shooting. No wall/CPU early-return policy.
 started=tic;c=context(model,r);
-[objective,constraint,inspect,step]=sr_nmpc_callbacks(model,c);
+c.profile=isfield(r,'profile') && r.profile;
+[objective,constraint,inspect,step,callbackProfile]=sr_nmpc_callbacks(model,c);history=[];
 warmStart=tic;
 if isfield(r,'warm') && ~isempty(r.warm)
     U=r.warm.tensions';U=[U(:,2:end),U(:,end)];
@@ -71,9 +72,13 @@ out=struct('accepted',accepted,'optimization_converged',flag>0,'exitflag',flag, 
     'update_s',toc(started),'model_identity',model.spec.identity,'horizon',c.horizon, ...
     'solver','MATLAB fmincon SQP','roots',{roots},'state_scale',c.state_scale,'input_scale',c.input_scale, ...
     'initial_state',c.measured,'previous_input',c.previous,'elapsed_s',c.elapsed);
+if c.profile,out.callback_profile=callbackProfile();out.iteration_trace=history;end
 
     function stop=observe(z,values,state)
         stop=false;
+        if c.profile
+            history(end+1,:)= [values.iteration,values.funccount,values.fval,values.constrviolation,values.firstorderopt];
+        end
         if strcmp(state,'iter') && values.iteration>0
             e=inspect(z);
             violation=max([abs(e.constraints);c.lower-z;z-c.upper]);

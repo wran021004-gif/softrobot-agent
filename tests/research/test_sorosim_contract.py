@@ -59,7 +59,10 @@ class ContractTests(unittest.TestCase):
         frozen=read(path);identity=frozen.pop('identity')
         self.assertEqual(digest(frozen),identity)
         for source,blob in frozen['git_blobs'].items():
-            actual=subprocess.check_output(['git','hash-object',source],cwd=ROOT,text=True,stderr=subprocess.DEVNULL).strip()
+            # Historical S3 evidence stays bound to its completion tree. S3.5
+            # instrumentation has a separate current-source freeze and test.
+            actual=subprocess.check_output(['git','rev-parse',
+                'cdb2f8d196af7f7d04c14efda3b960b88c20a782:'+source],cwd=ROOT,text=True,stderr=subprocess.DEVNULL).strip()
             self.assertEqual(actual,blob,source)
         self.assertEqual(frozen['external_dependency_identity'],digest(read(ROOT/'evidence/sorosim_control/s0.json')['dependency']))
 
