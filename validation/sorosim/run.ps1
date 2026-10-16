@@ -17,7 +17,8 @@ $output = [IO.Path]::GetFullPath($OutputDir)
 if (Test-Path -LiteralPath $output) { throw 'Choose a new output directory to preserve prior evidence.' }
 New-Item -ItemType Directory -Path $output | Out-Null
 $started = Get-Date
-$versionArgs = if ($V2) { @('--v2') } else { @() }
+$versionArgs = @()
+if ($V2) { $versionArgs = @('--v2') }
 Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'cases.json') -Destination (Join-Path $output 'cases_snapshot.json')
 Push-Location ([IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..\..')))
 try {
