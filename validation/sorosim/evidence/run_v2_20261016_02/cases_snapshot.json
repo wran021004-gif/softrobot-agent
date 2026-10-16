@@ -1,0 +1,79 @@
+{
+  "schema": "sorosim_validation_v1",
+  "source_sha": "eddbcb26a393c8919ac88886c0c1f7d280c374f9",
+  "upstream_sha": "24d573a3e864ffda87c42ee462a6ed620133cc7b",
+  "young_pa": 1000000.0,
+  "density_kg_m3": 1000.0,
+  "poisson_ratio": 0.49,
+  "gravity_m_s2": [0.0, 0.0, -9.81],
+  "tendon_offsets_m": [[0.0, 0.007, 0.0], [0.0, -0.007, 0.0], [0.0, 0.0, 0.007], [0.0, 0.0, -0.007]],
+  "probe_tensions_n": [0.3, 0.1, 0.2, 0.1],
+  "fd_steps_rad_m": [0.0001, 0.00001, 0.000001],
+  "sensitivity_forward_steps_n": [0.001, 0.0001],
+  "solver_residual_tolerance_nm2": 1e-10,
+  "tolerances": {
+    "pose_position_m": 0.00002,
+    "pose_rotation_fro": 0.0002,
+    "tip_jacobian_max_abs": 0.00002,
+    "generalized_force_nm2": 0.000002,
+    "residual_jacobian_max_abs": 0.000002,
+    "equilibrium_curvature_rad_m": 0.002,
+    "stiffness_max_abs": 1e-12,
+    "fd_tip_jacobian_max_abs": 0.000002,
+    "fd_residual_jacobian_max_abs": 0.0000002,
+    "fd_tendon_jacobian_max_abs": 0.000002,
+    "fd_equilibrium_tip_sensitivity_m_n": 0.00002
+  },
+  "v2": {
+    "schema": "sorosim_validation_v2",
+    "starting_sha": "c3bcbc2c00566c25de1d5f57950c07a795474ce3",
+    "physics": "V1 finest discretization; endpoint chords; R=elastic-gravity-B*u; fixed q_g for design partials; local static branch only",
+    "baseline_tensions_n": [[0.3, 0.1, 0.2, 0.1], [0.6, 0.2, 0.4, 0.2]],
+    "tension_bounds_n": [0, 5],
+    "chord_tangent_step_rad_m": 0.00001,
+    "input_steps_n": [0.001, 0.0003, 0.0001],
+    "design_parameters": [
+      {"key": "lengths_m", "index": 0, "unit": "m", "kind": "geometry"},
+      {"key": "young_pa", "index": -1, "unit": "Pa", "kind": "material"},
+      {"key": "radii_m", "index": 0, "unit": "m", "kind": "geometry"}
+    ],
+    "partial_relative_steps": [0.0001, 0.001],
+    "prediction_relative_steps": [0.001, 0.01],
+    "repeated_calls": 5,
+    "units": {"q": "rad/m", "p": "m", "R": "N*m^2", "Rq": "N*m^3", "Ru": "m^2", "J": "m^2", "dqdu": "rad/(m*N)", "dpdu": "m/N", "Rd": "N*m^2/parameter_unit", "pd": "m/parameter_unit", "dqdd": "rad/m/parameter_unit", "dpdd": "m/parameter_unit"},
+    "tolerances": {
+      "residual_nm2": 1e-10,
+      "condition_max": 100000000,
+      "tangent_abs_nm3": 0.0000002,
+      "tangent_relative": 0.0002,
+      "symmetry_relative": 0.00001,
+      "linear_solve_relative": 1e-10,
+      "input_tip_abs_m_n": 0.00002,
+      "sensitivity_relative": 0.005,
+      "prediction_abs_m": 0.000002,
+      "prediction_relative": 0.08,
+      "direction_floor_m": 0.00000001,
+      "branch_relative_q": 0.25,
+      "cross_tip_m": 0.00002,
+      "cross_q_rad_m": 0.002,
+      "cross_tangent_abs_nm3": 0.000002,
+      "cross_sensitivity_relative": 0.005
+    }
+  },
+  "cases": [
+    {
+      "id": "one_segment",
+      "lengths_m": [0.2],
+      "radii_m": [0.01],
+      "probes_rad_m": [[0, 0, 0, 0], [1.2, 0, -0.7, 0], [1.2, 0.8, -0.7, 0.4]],
+      "levels": [{"gvs_steps": 24, "gauss": 5}, {"gvs_steps": 96, "gauss": 10}, {"gvs_steps": 192, "gauss": 20}]
+    },
+    {
+      "id": "two_segment",
+      "lengths_m": [0.12, 0.1],
+      "radii_m": [0.01, 0.008],
+      "probes_rad_m": [[0, 0, 0, 0, 0, 0, 0, 0], [1.2, 0.8, -0.7, 0.4, -0.9, 0.6, 1.1, -0.5]],
+      "levels": [{"gvs_steps": 96, "gauss": 10}, {"gvs_steps": 192, "gauss": 20}]
+    }
+  ]
+}

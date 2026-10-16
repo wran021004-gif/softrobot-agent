@@ -1,0 +1,43 @@
+{
+  "timezone": "Asia/Shanghai",
+  "branch": "research/sorosim-validation",
+  "starting_sha": "c3bcbc2c00566c25de1d5f57950c07a795474ce3",
+  "numerical_source_sha": "930be983153f1170f52e57dd0ea14357e29dc660",
+  "upstream_sha": "24d573a3e864ffda87c42ee462a6ed620133cc7b",
+  "kernel_source_sha": "eddbcb26a393c8919ac88886c0c1f7d280c374f9",
+  "execution": "run.ps1 -V2 -Python D:/softrobot-agent/.pilot-env/Scripts/python.exe -Matlab C:/Program Files/MATLAB/R2024a/bin/matlab.exe -OutputDir validation/sorosim/evidence/run_v2_20261016_02",
+  "math_sources_identical_to_numerical_sha": [
+    "run_gvs.py",
+    "sv_terms.m",
+    "sv_v2.m",
+    "sv_run.m",
+    "sv_model.m",
+    "sv_fd.m",
+    "compare.py",
+    "cases.json"
+  ],
+  "v1_evidence_unchanged": true,
+  "tests": {
+    "total": 13,
+    "v1": 6,
+    "v2": 7,
+    "passed": true,
+    "seconds": 0.276
+  },
+  "retained_failures": [
+    {
+      "directory": "../run_v2_20261016_01",
+      "source_sha": "feb125f1",
+      "kind": "launcher_argument_expansion",
+      "numerical_execution_started": false,
+      "reason": "PowerShell unrolled the one-element version argument array into a string and splatted --v2 as individual characters."
+    }
+  ],
+  "post_calculation_changes": [
+    "Test reader obtains the authoritative length from cases.json because MATLAB serializes a one-element numeric vector as a scalar. This test-only adjustment was present when all 13 wrapper tests passed.",
+    "README results, summary, LOC and delivery manifest added after successful calculation.",
+    "Static-potential eigenvalue classification was computed from saved total tangent matrices; no solver, physical data, finite-difference step or tolerance was changed."
+  ],
+  "classification": "All declared mathematical gates pass. Two-segment doubled-tension zero-start equilibrium is a regular saddle, not a stable hold; design tests use the primary positive-tension equilibrium.",
+  "recommendation": "C: existing GVS/CasADi full static IFT plus rebuilt physical-design partials; no permanent MATLAB runtime dependency."
+}

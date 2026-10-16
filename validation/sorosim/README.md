@@ -160,3 +160,154 @@ gates the one-segment case before the two-segment case, and retains failures.
 Repeated timing requests return only residual and total tangent, excluding
 pose/sensitivity outputs. Full experimental time also includes independent
 checks and model rebuilding; it must not be called a production benchmark.
+
+V2 execution and observed results (2026-10-16, Asia/Shanghai):
+
+[Run 02 evidence](evidence/run_v2_20261016_02), including
+[summary](evidence/run_v2_20261016_02/summary.json), raw backend matrices,
+both comparison reports, process timings and source/MEX provenance, passes all
+frozen mathematical gates. Numerical source: `930be983153f1170f52e57dd0ea14357e29dc660`,
+continuing branch starting SHA `c3bcbc2c00566c25de1d5f57950c07a795474ce3`.
+The original GVS kernel identity remains `eddbcb26a393c8919ac88886c0c1f7d280c374f9`.
+MATLAB is `24.1.0.2537033 (R2024a)`, Optimization Toolbox 24.1; Python is
+3.11.16 at the specified `.pilot-env` executable, NumPy 2.4.6, SciPy 1.17.1,
+CasADi 3.7.2. Upstream remains clean at the exact V1 pinned SHA; the same
+external MEX route is used, with 198 upstream source/binary hashes retained.
+
+All **248 solves** succeeded: eight base equilibria, 192 input perturbations,
+and 48 physical-design perturbations across the two backends and structures.
+The largest residual is `1.781e-11 N*m^2`; conditions range from 2.043 to 11.821.
+No nonfinite result, failed numerical solve, tension-bound violation or local
+q-displacement guard failure occurred. This does not prove global uniqueness.
+The initial [Run 01 launcher failure](evidence/run_v2_20261016_01/run_status.json)
+is preserved: PowerShell expanded a single `--v2` string as characters; no
+numerical experiment ran. The corrected launcher used the fresh Run 02 folder.
+Thirteen tests passed: all six V1 evidence tests plus seven V2 tests, including
+deliberate sign, dimension, unit, nonfinite, omitted-term and failed-solve corruption.
+
+Here `u1` is the original positive probe; `u2=2*u1`. Tips are SoRoSim results;
+the last column is the norm of the GVS/SoRoSim tip difference.
+
+| Structure/input | Tip [x,y,z], m | Base condition | Cross tip error, µm |
+|---|---|---:|---:|
+| One/u1 | [0.177443375, 0.004353518, -0.084024566] | 2.646 | 0.985 |
+| One/u2 | [0.159904487, 0.012808944, -0.106532848] | 2.044 | 0.720 |
+| Two/u1 | [0.175195504, 0.011749723, -0.113189823] | 11.431 | 0.692 |
+| Two/u2 | [0.208809726, -0.019196154, 0.006139391] | 5.603 | 3.892 |
+
+**Regularity is not stability.** At Two/u2 both zero-start solvers select a
+saddle: the symmetrized conservative static-potential Hessian has two negative
+eigenvalues, approximately `[-1.214e-4,-1.182e-4] N*m^3`. Its local IFT and
+warm-start perturbations are valid mathematical checks, not evidence of stable
+holding. No continuation connection between u1 and u2 is asserted. The other
+three operating points have positive Hessians in this reduced subspace; all
+design checks use u1. This is not a full-physics dynamic stability certificate.
+
+Worst total-tangent FD errors, including every declared step and both inputs:
+GVS one/two `1.139e-11 / 1.620e-11 N*m^3`; mixed SoRoSim one/two
+`1.027e-11 / 1.868e-11 N*m^3`. Maximum relative error is `3.41e-8`.
+SoRoSim symmetry defect is at most `5.57e-8` relative; AD defects are below
+`1.34e-15`. Omitting the tendon state derivative produces **25.5–95.8%**
+relative tangent error and **24.8–136.3%** tip/input-sensitivity error.
+The diagnostic is rejected by the tests and is never used for design predictions.
+
+`Rq` is 4×4 / 8×8, `Ru` and `dqdu` are 4×4 / 8×4, `J` is 3×4 / 3×8,
+and `dpdu` is 3×4. Each design derivative has n×1 state and 3×1 tip dimensions.
+Centered input re-solves agree within `2.04e-8 / 2.02e-6 m/N` for one/two;
+maximum relative state/tip errors are `9.74e-6 / 8.76e-6`. Direct Ru FD error
+is below `1.23e-12` relative; IFT linear-system residual is below `4.32e-16`.
+
+The following SoRoSim tip design derivatives include the explicit geometry
+partial. GVS agrees within `1.48e-5` relative. `dqdd`, `Rd`, `pd`, and all
+actual perturbed q/p/status/cost values are retained in the raw evidence.
+
+| Variable | Unit of derivative | One dp/dd [x,y,z] | Two dp/dd [x,y,z] |
+|---|---|---|---|
+| First length | m/m | [0.238661, 0.0414241, -1.53280] | [-0.376349, 0.0880330, -1.74060] |
+| Common E | m/Pa | [4.64890e-8, -4.70784e-9, 7.93573e-8] | [1.35591e-7, -2.00049e-8, 1.28080e-7] |
+| First radius | m/m | [11.4256, -2.10487, 19.3149] | [28.1217, -2.55905, 30.3962] |
+
+Design-partial step sensitivity is at most `1.63e-6` relative. Centered,
+independently re-solved design derivatives agree within `7.52e-4` relative,
+including the 1% checks. All 48 design predictions have the correct signs
+for meaningful components. At 0.1%, maximum error is `1.024 µm` (0.337% of
+displacement); at 1%, `104.474 µm` (3.404%). Errors decrease with perturbation
+size. Illustrative **+1%** changes below use u1; both negative changes and both
+sizes are in the evidence. Each vector is [x,y,z] displacement in **µm**.
+
+| Structure/variable | Predicted | Actually re-solved |
+|---|---|---|
+| One/length | [477.3, 82.8, -3065.6] | [439.6, 82.6, -3089.1] |
+| One/E | [464.9, -47.1, 793.6] | [458.3, -46.6, 787.4] |
+| One/radius | [1142.6, -210.5, 1931.5] | [1103.5, -203.8, 1896.1] |
+| Two/length | [-451.6, 105.6, -2088.7] | [-472.7, 104.8, -2091.2] |
+| Two/E | [1355.9, -200.0, 1280.8] | [1328.2, -197.6, 1273.3] |
+| Two/radius | [2812.2, -255.9, 3039.6] | [2712.3, -251.8, 3007.3] |
+
+At the **same u1 pose**, endpoint-chord versus native-guided force maps differ
+by `2.154e-3 / 2.563e-3 m^2` for one/two. Their different path assumptions
+explain this diagnostic; it is not a matched-model error. The IFT equations
+apply to either smooth residual, but each needs its own complete tangent.
+V2 does not validate guided-cable equilibrium sensitivities, routing-offset
+gradients, contact, internal routing optimization or cable active-set derivatives.
+
+Actual timings below are seconds; repeated residual/tangent calls return
+equivalent requested outputs (median of ten calls across two base poses).
+
+| Measured operation | GVS one | SoRoSim one | GVS two | SoRoSim two |
+|---|---:|---:|---:|---:|
+| Initial model/graph construction | 1.881 | 0.154 | 11.896 | 0.168 |
+| Repeated residual + full tangent | 0.09608 | 0.00485 | 0.39667 | 0.01413 |
+| u1 equilibrium solve, including cold solver effects | 1.267 | 0.247 | 6.038 | 0.358 |
+| u2 equilibrium solve | 1.383 | 0.0357 | 6.065 | 0.0989 |
+| Input IFT + omission diagnostic, warm u2 | 0.000056 | 0.000088 | 0.000070 | 0.000156 |
+| Design fixed-q partial evaluations (12 calls) | 2.057 | 0.0569 | 8.260 | 0.180 |
+| Design partial differences + IFT (six calculations) | 0.00643 | 0.00224 | 0.00031 | 0.00232 |
+| 18 changed-design model/graph builds | 38.113 | 0.109 | 275.980 | 0.148 |
+| 48 input-perturbation equilibrium solves | 43.210 | 0.649 | 166.144 | 1.933 |
+| 12 design-perturbation equilibrium solves | 10.690 | 0.176 | 44.756 | 0.510 |
+| Entire mathematical verification batch | 121.026 | 2.158 | 629.746 | 5.206 |
+
+MATLAB process launch to function entry costs `6.837 / 6.596 s`; environment
+setup `1.515 / 1.460 s`; serialization/shutdown and remaining wrapper overhead
+`2.549 / 2.530 s`; complete MATLAB processes `13.059 / 15.791 s`.
+These are single-workstation observations, with no host isolation, differing
+integration algorithms, AD versus mixed tangents, MATLAB cold JIT and separate
+SciPy residual/Jacobian callbacks. They establish neither general MATLAB
+superiority nor guaranteed search speedup. The larger verification totals
+include deliberately redundant independent checks, not just the requested derivative.
+
+Changed file responsibilities and source line counts, relative to the initial
+`c3bcbc2c` tree (numerical evidence excluded):
+
+| File | Before → after LOC | Responsibility |
+|---|---:|---|
+| cases.json | 43 → 79 | Frozen physical cases, steps, units and acceptance limits |
+| run_gvs.py | 225 → 334 | Existing static AD graph, loaded solves, design/input IFT probes |
+| sv_terms.m | 43 → 64 | Common residual sign, endpoint force and mixed total tangent |
+| sv_v2.m | 0 → 108 | Bounded MATLAB solves, rebuilt design partials and timings |
+| sv_run.m | 115 → 128 | Existing entrypoint, version dispatch, environment/source identity |
+| sv_fd.m | 8 → 8 | Reused centered-difference helper, explicit caller units |
+| compare.py | 129 → 253 | Recomputed mathematical, prediction and corruption gates |
+| test_validation.py | 85 → 151 | V1 compatibility and seven focused V2 tests |
+| run.ps1 | 49 → 61 | One launch path, config snapshot, timings, retained failure status |
+| setup_reference.ps1 | 36 → 34 | Verify existing pinned checkout without rewriting it |
+| provenance.py | 57 → 57 | Kernel and validation source identities plus file/binary hashes |
+| README.md | 103 → 313 | Preserved V1 report plus V2 methods, findings and costs |
+
+V2 is **complete for the declared local static scope**, including the explicitly
+classified saddle. No new numerical kernel, Harness/controller integration,
+optimizer, NMPC experiment, RL training, provider request, package installation
+or upstream source modification was performed. No upstream code/binaries were
+vendored; the V1 licensing restrictions and unresolved redistribution/enterprise
+eligibility remain unchanged. Successful local execution establishes no license grant.
+
+**Recommendation C:** reproduce the validated complete static IFT calculation
+and rebuilt physical-design partials using the existing GVS/CasADi toolchain,
+without a permanent MATLAB runtime dependency. The derivatives predict real
+local parameter changes and GVS already supplies the required AD tangent.
+SoRoSim's measured static cost is attractive, but these examples establish no
+unique missing design-derivative capability; licensing and runtime deployment
+remain unresolved. Future structure/control search can use these sensitivities
+for bounded local screening only with conditioning and equilibrium-class checks,
+followed by actual changed-design evaluation. No integration or merge is made here.

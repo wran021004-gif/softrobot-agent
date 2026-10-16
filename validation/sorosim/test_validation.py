@@ -105,7 +105,8 @@ class V2Tests(unittest.TestCase):
             for key in ('Rq','Ru'):
                 changed = copy.deepcopy(data); t = changed['baselines'][0]['terms']
                 t[key] = (-np.asarray(t[key])).tolist(); self.rejected(changed)
-            changed = copy.deepcopy(data); L = changed['model']['lengths_m'][0]
+            changed = copy.deepcopy(data)
+            L = next(c for c in self.cfg['cases'] if c['id']==data['case_id'])['lengths_m'][0]
             part = changed['designs'][0]['partials'][0]
             part['Rd'] = (np.asarray(part['Rd'])/L).tolist(); self.rejected(changed)
 
