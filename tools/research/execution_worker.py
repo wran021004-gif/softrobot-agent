@@ -27,7 +27,12 @@ def main():
     try:
         if request.get('kind')=='candidate_analysis':
             from tools.research.analysis import calculate
-            value=calculate(request['configuration'],request['binding'],request['query'],request.get('exact_point'))
+            def checkpoint(name,value):
+                destination=path.with_name('numerical_'+name+'.json')
+                if destination.exists():raise ValueError('PRESERVE_NUMERICAL_CHECKPOINT')
+                atomic_json(destination,value)
+            value=calculate(request['configuration'],request['binding'],request['query'],request.get('exact_point'),checkpoint=checkpoint,
+                design_context=request.get('design_context'))
         else:
             value=execute(request)
     except Exception as exc:

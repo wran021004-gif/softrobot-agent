@@ -168,6 +168,11 @@ EXTENSIONS.append(replace(_source_builder,version='6.0.0',input_schema=FamilyBui
 # The predictor is separate from policy.dynamics_model (MuJoCo's cell model).
 from .sorosim_control import SorosimReachControl
 SOROSIM_SOURCES = PLATFORM_SOURCES + PHYSICAL_SOURCES + (
+    'extensions/tendon_family/sorosim_analysis.py',
+    'extensions/tendon_family/math_analysis.py',
+    'tools/research/analysis.py',
+    'tools/research/execution_worker.py',
+    'matlab/sorosim_control/sr_analysis.m',
     'extensions/tendon_family/sorosim_spec.py',
     'extensions/tendon_family/sorosim_session.py',
     'extensions/tendon_family/sorosim_control.py',
@@ -198,8 +203,8 @@ CONTRACTS += [('family.sorosim_model','1.0.0',m3.SorosimModelParameters),
               ('family.sorosim_reach_control','1.0.0',SorosimReachControl)]
 _gvs_model = next(e for e in EXTENSIONS if e.extension_id=='model.gvs')
 _sr_math = {**_gvs_model.capabilities['mathematical_model'],
-    'capabilities':dict(kinematics=True,statics=False,dynamics=True,linearization=False,gradients=True),
-    'representations':[], 'intended_uses':['reachability','shape_prediction','reduced_dynamics','local_model_control']}
+    'capabilities':dict(kinematics=True,statics=True,dynamics=True,linearization=True,gradients=True),
+    'representations':['linearized_model'], 'intended_uses':['reachability','shape_prediction','static_equilibrium','linearization','reduced_dynamics','local_model_control']}
 EXTENSIONS.append(Extension(extension_id='model.sorosim_gvs',kind='dynamics_model',version='1.0.0',
     input_schema=m3.SorosimModelParameters,output_schema=m6.Payload,
     binding='extensions.tendon_family.sorosim_spec:SorosimModel',
@@ -207,8 +212,8 @@ EXTENSIONS.append(Extension(extension_id='model.sorosim_gvs',kind='dynamics_mode
     dependencies=('numpy','scipy','matlab.engine'), sources=SOROSIM_SOURCES,
     capabilities=dict(category='mathematical_model',role='adapter',mathematical_model=_sr_math,
         upstream='GVSRobotics/SoRoSim@24d573a3e864ffda87c42ee462a6ed620133cc7b',
-        operations=['routing','dynamics','derivatives'], unsupported_operations=['S4 analysis','co-design'],
-        validation='S1/S2 matched local geometry, dynamics and mixed derivatives')))
+        operations=['routing','dynamics','derivatives','analysis'], unsupported_operations=['co-design'],
+        validation='S1/S2 local mechanics; S4 analysis requires per-result derivative and residual checks')))
 _sr_controller = next(e for e in EXTENSIONS if e.extension_id=='controller.gvs_nmpc' and e.version=='11.0.0')
 EXTENSIONS.append(replace(_sr_controller,extension_id='controller.sorosim_matlab_nmpc',version='1.0.0',
     input_schema=SorosimReachControl,binding='extensions.tendon_family.sorosim_control:SorosimNMPCController',

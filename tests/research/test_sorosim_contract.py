@@ -79,14 +79,14 @@ class ContractTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,'UNSUPPORTED_MATHEMATICAL_BACKEND_PROFILE'):
             resolve(source,backend_profile='unknown')
 
-    def test_s4_is_explicitly_unsupported(self):
+    def test_s4_local_analysis_is_qualified(self):
         from extensions.tendon_family.model_applicability import assess_model_uses
         from schemas.platform import Binding,Payload
         inp,_=final_candidate()
         model=Binding(extension_id='model.sorosim_gvs',version='1.0.0',parameters=Payload(
             contract='family.sorosim_model',data=dict(basis=inp.policy.controller.parameters.data['recipe']['basis'])))
         verdict=assess_model_uses(inp.robot,inp.task,model,['static_equilibrium','linearization'])
-        self.assertTrue(all(v.status=='REJECT' for v in verdict.uses.values()))
+        self.assertTrue(all(v.status=='WARN' for v in verdict.uses.values()))
 
     def test_session_cleanup_is_idempotent_software_fixture(self):
         from extensions.tendon_family.sorosim_session import SorosimSession

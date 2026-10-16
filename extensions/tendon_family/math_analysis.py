@@ -1,7 +1,6 @@
 """Candidate-bound world-tip outputs and phase-aware saved operating points."""
 from types import SimpleNamespace
 import numpy as np
-import casadi as ca
 from schemas.platform import SessionInput, SignalSpec
 from schemas.platform import Binding, Payload
 from schemas.platform_math import SystemContext
@@ -11,7 +10,6 @@ from tools.platform_store import plain
 from tools.state_io import digest
 from .gvs import GVSModel
 from .contracts import GVSModelParameters, GVSEquilibriumRequestV2
-from .gvs_casadi import functions_for, expression_from_system, gvs_equilibrium_tool
 from .pcc import quaternion_wxyz_to_rotation
 from extensions.math_analysis.kernels import LIMITATIONS
 
@@ -19,6 +17,8 @@ from extensions.math_analysis.kernels import LIMITATIONS
 
 
 def make_graph_from_input(inp,point):
+    import casadi as ca
+    from .gvs_casadi import functions_for, expression_from_system
     inp=SessionInput.model_validate(inp)
     params=GVSModelParameters(basis=inp.policy.controller.parameters.data['recipe']['basis'])
     system=GVSModel(params).build_system(inp.robot,params,None,SystemContext(x0=point['x'],u0=point['u'],scene=inp.task.environment))
@@ -91,7 +91,7 @@ def derivative_check(model,graph,p):
 
 
 
-def _configuration_boundary(inp,binding):
+def _configuration_boundary(inp,binding,model_id='model.gvs'):
     """Explicit execution-before-screening information boundary."""
     from .gvs_basis import resolve_basis
     tendons=inp.robot.structure.data['tendons']; control=inp.policy.controller.parameters.data
@@ -100,7 +100,7 @@ def _configuration_boundary(inp,binding):
         coordinate_order=list(resolve_basis(inp.robot.structure.data,binding['basis']).coordinate_order)
     return dict(study_candidate_id=binding['candidate_id'],build_node=binding.get('source_node'),
         robot=plain(inp.robot),task=plain(inp.task),initializer=plain(inp.task.initializer),
-        model=dict(extension_id='model.gvs',version='1.0.0',basis=binding['basis']),
+        model=dict(extension_id=model_id,version='1.0.0',basis=binding['basis']),
         controller_recipe=inp.policy.controller.parameters.data['recipe'],
         analysis_binding=dict(candidate_id=binding['candidate_id'],configuration=binding.get('configuration'),
             effective_configuration_identity=binding.get('effective_configuration_identity',digest(plain(inp))),
@@ -121,6 +121,7 @@ def _configuration_boundary(inp,binding):
 def _candidate_points(inp,graph,p,requested=None):
     """Configuration-only standardized and controller-declared operating points."""
     from scipy.optimize import least_squares, minimize
+    import casadi as ca
     _,system,f,output=graph; n=len(system.x0)//2
     design=inp.robot.structure.data
     limits=np.asarray([row['force_limit_n'] for row in design['tendons']],dtype=float)

@@ -43,9 +43,9 @@ def _topology_issue(design, model_id):
 
 def _base_verdict(model_id, use):
     if model_id == 'model.sorosim_gvs':
-        if use in ('reachability','shape_prediction','reduced_dynamics','local_model_control'):
+        if use in ('reachability','shape_prediction','static_equilibrium','linearization','control_trend','reduced_dynamics','local_model_control'):
             return 'WARN', ['SoRoSim local bending computation is supported; physical agreement outside measured operating points is unvalidated.']
-        return 'REJECT', ['SoRoSim S4 analysis and co-design operations are not implemented; no CasADi substitution is allowed.']
+        return 'REJECT', ['This use is outside SoRoSim serial bending mechanics and locally verified analysis.']
     if model_id == 'model.pcc':
         if use == 'reachability':
             return 'ALLOW', ['Constant-curvature kinematics supports geometric reachability screening.']

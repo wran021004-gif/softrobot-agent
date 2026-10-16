@@ -118,10 +118,19 @@ class FamilyMixedSearch(Contract):
         return self
 
 
+class StaticDesignSensitivity(Contract):
+    version: Literal['sorosim_static_ift_v1'] = 'sorosim_static_ift_v1'
+    variable: str
+    step: FiniteFloat = Field(gt=0)
+    minus_candidate: EvidenceRef
+    plus_candidate: EvidenceRef
+
+
 class AnalysisRequest(Contract):
     candidate: EvidenceRef
-    operation: Literal['equilibrium','linearization','controllability','endpoint','braking','trajectory_feasibility']
-    operating_point: Literal['standardized_initial_pretension','controller_start_input','target_equilibrium','halfway_waypoint','saved_state'] = 'halfway_waypoint'
+    operation: Literal['equilibrium','linearization','controllability','endpoint','braking','trajectory_feasibility','input_sensitivity','design_sensitivity']
+    operating_point: Literal['standardized_initial_pretension','controller_start_input','target_equilibrium','halfway_waypoint','saved_state','fixed_input_equilibrium'] = 'halfway_waypoint'
+    design_sensitivity: StaticDesignSensitivity | None = None
     saved_state: EvidenceRef | None = None
     execution: EvidenceRef | None = None
     update_id: int | None = Field(default=None,ge=0,strict=True)
@@ -130,6 +139,10 @@ class AnalysisRequest(Contract):
 
     @model_validator(mode='after')
     def exact_state(self):
+        if (self.operation=='design_sensitivity')!=(self.design_sensitivity is not None):
+            raise ValueError('DESIGN_SENSITIVITY_REQUIRES_PAIRED_CANDIDATES')
+        if self.operation in ('input_sensitivity','design_sensitivity') and self.operating_point!='fixed_input_equilibrium':
+            raise ValueError('STATIC_SENSITIVITY_REQUIRES_FIXED_INPUT_EQUILIBRIUM')
         if self.operation in ('linearization','controllability') and self.scoring_window_s is None:
             raise ValueError('EXPLICIT_SCORE_WINDOW_REQUIRED')
         if (self.execution is None)!=(self.update_id is None):
@@ -138,6 +151,12 @@ class AnalysisRequest(Contract):
         if sources>1 or (self.operating_point=='saved_state')!=(sources==1):
             raise ValueError('SAVED_POINT_REQUIRES_UNAMBIGUOUS_STATE_SOURCE')
         return self
+
+    @model_serializer(mode='wrap')
+    def unchanged_legacy_serialization(self,handler):
+        value=handler(self)
+        if self.design_sensitivity is None:value.pop('design_sensitivity',None)
+        return value
 
 
 class LocalDiagnostic(Contract):

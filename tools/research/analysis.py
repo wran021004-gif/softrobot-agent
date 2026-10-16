@@ -15,15 +15,19 @@ from tools.research.state import state,update,save
 from tools.research.task_constraints import describe_analysis_requirements, model_assessment, check_analysis_applicability
 
 
-def calculate(configuration,binding,query,exact_point=None):
+def calculate(configuration,binding,query,exact_point=None,*,checkpoint=None,design_context=None):
     """No Host, Route, session, persistence or cost ownership at this boundary."""
-    from extensions.tendon_family.math_analysis import calculate_candidate_configuration
     from extensions.math_analysis.tools import calculate_control_metrics
     from extensions.math_analysis.kernels import bounded_endpoint, LIMITATIONS
     import numpy as np
     q=AnalysisRequest.model_validate(query)
     p=q.protocol
     inp=SessionInput.model_validate(configuration)
+    sorosim=inp.policy.controller.extension_id=='controller.sorosim_matlab_nmpc'
+    if sorosim:
+        from extensions.tendon_family.sorosim_analysis import calculate_candidate_configuration
+    else:
+        from extensions.tendon_family.math_analysis import calculate_candidate_configuration
     if q.operation=='equilibrium' and q.operating_point!='target_equilibrium':
         raise ValueError('EQUILIBRIUM_REQUIRES_TARGET_POINT')
     requirements=describe_analysis_requirements(inp,binding)
@@ -34,7 +38,7 @@ def calculate(configuration,binding,query,exact_point=None):
             operating_point=exact_point or dict(name=q.operating_point),task_acceptance='unmeasured',
             proxy_values={},internal_calculations=[],limitations=LIMITATIONS),requirements,applicability,q)
     envelope=plain(calculate_candidate_configuration(inp,binding,p,binding['configuration'],
-        operating_points=[q.operating_point],exact_point=exact_point))
+        operating_points=[q.operating_point],exact_point=exact_point,**({'checkpoint':checkpoint,'design_context':design_context} if sorosim else {})))
     if q.scoring_window_s is not None and q.scoring_window_s not in p.windows_s:
         raise ValueError('SCORING_WINDOW_NOT_IN_PROTOCOL')
     rows=envelope['records'][1:]
@@ -50,6 +54,15 @@ def calculate(configuration,binding,query,exact_point=None):
         task_acceptance='unmeasured',proxy_values={},raw=envelope,internal_calculations=internal,
         limitations=LIMITATIONS+['Local mathematics does not establish nonlinear backend acceptance, holding-window compliance, or design sensitivity.'])
     result['score_semantics']=score_semantics(q,binding,p,row)
+    if q.operation in ('input_sensitivity','design_sensitivity'):
+        raw=row.get('raw_facts',{});sensitivity=raw.get(q.operation)
+        result.update(raw_facts=raw,research_interpretations=[],sensitivity=sensitivity,
+            sensitivity_protocol='sorosim_static_ift_v1')
+        if row.get('model'):result['model']=row['model']
+        if not sensitivity or not sensitivity.get('verification',{}).get('passed'):
+            result.update(status='unavailable',unavailable_reason=row.get('reason',raw.get('sensitivity_status','SENSITIVITY_VERIFICATION_FAILED')))
+        result['units']=dict(residual='N*m^2',q='rad/m',position='m',input='N',design_variable='SI unit of declared parameter')
+        return scoped_result(result,requirements,applicability,q)
     if row.get('model'):
         model=EndpointLinearizedModel.model_validate(row['model'])
         if q.operation == 'trajectory_feasibility':
@@ -92,7 +105,7 @@ def calculate(configuration,binding,query,exact_point=None):
         score=window['held']['output']['eigenvalues'][0]
         result['proxy_values']['held_position_min_eigenvalue']=float(score)
         result['units']=metrics['units']
-        internal.append(dict(purpose='local_linearization_and_gramian',solver='CasADi AD / SciPy scaled Van Loan and ZOH',windows_s=p.windows_s))
+        internal.append(dict(purpose='local_linearization_and_gramian',solver=('SoRoSim MATLAB residual derivatives' if sorosim else 'CasADi AD')+' / SciPy scaled Van Loan and ZOH',windows_s=p.windows_s))
     elif q.operation == 'trajectory_feasibility':
         from extensions.math_analysis.trajectory import trajectory_feasibility
         trajectory=trajectory_feasibility(model,requirements,p)
@@ -149,7 +162,10 @@ def scoped_result(result, requirements, applicability, query):
         conclusion, verification, pointer = 'not_applicable', 'not_performed', '/analysis_applicability'
         interpretation = '; '.join(applicability['reasons'])
     elif result['status'] == 'computed':
-        if trajectory:
+        if result.get('sensitivity',{}).get('verification',{}).get('passed'):
+            conclusion,verification,pointer='diagnostic','perturbed_equilibria_checked','/sensitivity'
+            interpretation='Local implicit-function sensitivity in the fixed-topology physical model; not a globally improving direction or task feasibility.'
+        elif trajectory:
             pointer='/trajectory'
             if trajectory['status']=='feasible_witness' and trajectory.get('replay',{}).get('passed') is True:
                 conclusion,verification='feasible_witness','independent_discrete_replay_passed'
@@ -209,6 +225,11 @@ def dispatch(host,query,key,*,guard,origin='model'):
             operation_reuse=dict(additional_numerical_s=0,additional_analysis_evaluations=0))
     guard(host,origin!='engineering_preflight')
     c=verify_candidate(host,q.candidate)
+    sensitivity_context=None
+    if q.design_sensitivity:
+        from extensions.tendon_family.sorosim_analysis import design_context
+        sensitivity_context=design_context(c,verify_candidate(host,q.design_sensitivity.minus_candidate),
+            verify_candidate(host,q.design_sensitivity.plus_candidate),q.design_sensitivity,q.protocol)
     s=state(host)
     protocol=plain(q.protocol)
     if protocol!=s['spec']['analysis_protocol'] or (q.scoring_window_s is not None and q.scoring_window_s not in protocol['windows_s']):
@@ -285,6 +306,7 @@ def dispatch(host,query,key,*,guard,origin='model'):
     folder.mkdir(parents=True,exist_ok=True)
     request=dict(implementation=s['freeze'],rationale=query.get('rationale','Model-requested '+q.operation) if isinstance(query,dict) else q.operation,kind='candidate_analysis',configuration=cfg,binding=binding,query=plain(q),exact_point=point,
         task_analysis=plain(requirements),analysis_applicability=applicability)
+    if sensitivity_context:request['design_context']=sensitivity_context
     atomic_json(folder/'request.json',request)
     pending=dict(kind='candidate_analysis',worker_request_id=request_id,reserved_s=reserve,folder=str(folder),
         request=plain(q),origin=origin,implementation=s['freeze'],started_unix=time.time())

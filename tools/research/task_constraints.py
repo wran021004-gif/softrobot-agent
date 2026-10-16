@@ -12,7 +12,7 @@ def model_assessment(configuration, requirements, operation):
     """Use the same GVS model binding as the candidate linearization builder."""
     from extensions.tendon_family.model_applicability import assess_model_uses
     from tools.platform_registry import registry
-    use = 'static_equilibrium' if operation == 'equilibrium' else 'linearization'
+    use = 'static_equilibrium' if operation in ('equilibrium','input_sensitivity','design_sensitivity') else 'linearization'
     model = Binding(extension_id='model.gvs', version='1.0.0', parameters=Payload(
         contract='family.gvs_model', data=dict(basis=configuration.policy.controller.parameters.data['recipe']['basis'])))
     if configuration.policy.controller.extension_id == 'controller.sorosim_matlab_nmpc':
@@ -39,6 +39,8 @@ def check_analysis_applicability(requirements, query, assessment, model=None, ex
     """
     reasons = [reason for verdict in assessment['uses'].values() if verdict['status'] == 'REJECT'
                for reason in verdict['reasons']]
+    if (query.operation in ('input_sensitivity','design_sensitivity') or query.operating_point=='fixed_input_equilibrium') and assessment['model_id']!='model.sorosim_gvs':
+        reasons.append('Static IFT v1 is implemented only by the SoRoSim provider.')
     outputs = {'tip_position':('m', 'world', 3), 'tip_velocity':('m/s', 'world', 3)}
     if model is not None:
         outputs = {o.name:(o.units, o.frame, o.dimension) for o in model.endpoint_outputs}
@@ -82,7 +84,7 @@ def check_analysis_applicability(requirements, query, assessment, model=None, ex
             reason = 'Unsupported requirement retained verbatim; no compatible mathematical tool.'
         elif outputs.get(c.signal.name) != signature or c.signal.phase != 'post_step':
             reason = 'Output identity, units, frame, dimension, or sampling phase is not exposed by this analysis.'
-        elif query.operation in ('linearization','controllability','equilibrium'):
+        elif query.operation in ('linearization','controllability','equilibrium','input_sensitivity','design_sensitivity'):
             if c.signal.name == 'tip_position' and c.kind == 'norm_bound':
                 status, reason = 'diagnostic', 'Local position authority/static construction only; no sampled constraint verification.'
         elif trajectory and c.kind in ('norm_bound','component_interval') and sampled is not None:

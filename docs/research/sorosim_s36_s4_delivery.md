@@ -9,8 +9,8 @@ acceptance thresholds, default controller and RL route are unchanged.
 
 | Stage | Implemented and executed | Acceptance | Source commit |
 |---|---|---|---|
-| S3.6 | Three matched static states, 50 frames each, separated forces, additive link inertia/gravity, controlled geometry substitutions, immediate replay persistence | Passed within bounded diagnostic scope | Recorded after stage commit |
-| S4-A | Pending | Not complete | Pending |
+| S3.6 | Three matched static states, 50 frames each, separated forces, additive link inertia/gravity, controlled geometry substitutions, immediate replay persistence | Passed within bounded diagnostic scope | `3f45b849` (normally pushed) |
+| S4-A | Candidate-bound operating points, MATLAB statics/linearization/IFT, existing shared feasibility/Gramian kernels and scoped evidence | Passed in measured local scope | Recorded after stage commit |
 | Performance | Pending | Not complete | Pending |
 | S4-B | Pending | Not complete | Pending |
 
@@ -102,6 +102,88 @@ Of 27 focused checks, 26 passed in the sandbox. The persistence fixture was
 blocked by sandbox temporary-directory ACLs and passed separately with normal
 machine access. Both logs are retained; no numerical failure was hidden.
 
+## S4-A implementation and measured results
+
+`sr_analysis.m` owns MATLAB statics, constrained target construction, geometric
+waypoint construction, residual-based dynamic derivatives, conservative tangent
+classification and input/design sensitivity. `sorosim_analysis.py` binds the
+existing candidate initializer, compiler and protocol to `EndpointLinearizedModel`.
+`tools/research/analysis.py` selects the actual provider before importing legacy
+CasADi code. Existing SciPy kernels and `ScopedMathematicalClaim` classification
+remain authoritative. Only lazy imports and an optional model identifier changed
+in the original mathematical adapter; its calculations are unchanged.
+
+Seven candidate-bound MATLAB investigations ran, including two perturbed-design
+models inside the seventh operation's length investigation (nine if each physical
+design evaluation is counted separately). Finite-difference equilibrium checks
+are included in these investigations, not hidden as a separate campaign. All
+remain within the twelve-evaluation allowance. No physical execution occurred.
+Evidence is `evidence/sorosim_s4a/attempt01/`. The exact canonical configuration,
+protocol, model specification, dependency hashes and every successful raw return
+are saved. The final stage source freeze records delivered source identities;
+after numerical execution a local MATLAB variable was renamed and Python compact
+diagnostics/contract tests were added without changing the measured equations.
+
+The existing standardized initial pretension and controller-start work points
+both use the existing initializer projection and declared preparation input.
+Their agreement here is expected: both have four .2 N tensions. Neither is a
+static equilibrium. The target equilibrium uses the frozen goal and actual force
+bounds; MATLAB SQP converged in 14 iterations / 40 function evaluations, with
+3.79595e-9 m position residual and 1.18395e-16 N m² static residual. Its tensions
+are approximately `[2.44102, 1.60782, 3.04774, 3.17983] N`. The geometric halfway
+point converged in 11 evaluations; it is explicitly **not** an equilibrium.
+The saved-state calculation uses the archived .02 s represented state and input,
+retains its .33 s remaining task horizon, and is a frozen nonequilibrium model.
+
+All exported models have 24 states, four physical tension inputs, and world-frame
+position and velocity outputs. Acceleration Jacobians solve the complete residual
+mass equation at the returned acceleration. Independently perturbed MATLAB-local
+states/inputs pass the original protocol's normalized checks. Dynamic derivative
+relative errors at the initial/target/halfway points are 2.08e-11, 2.23e-9 and
+1.89e-8; raw absolute errors are retained because acceleration is stiff and scaled.
+
+A fixed-input .2 N equilibrium converged in four iterations, residual 4.505e-17
+N m². Its total loaded static tangent includes tendon-load state derivatives.
+All symmetric tangent eigenvalues are positive (minimum 5.945e-5), with relative
+asymmetry 1.16e-9: this supports a strict local conservative potential minimum,
+not a closed-loop stability claim. The independently re-solved input perturbation
+agrees with implicit position sensitivity to relative 1.253e-7.
+
+`sorosim_static_ift_v1` extends the existing typed research analysis request with
+input/design sensitivity and `fixed_input_equilibrium`. Design sensitivity requires
+two existing, verified study candidates differing in exactly one supported
+continuous parameter. The existing family generator and domains own admission.
+Topology and nonsmooth derivative requests are rejected explicitly. For segment
+0 length, the pair is .2 ± .00002 m. All physical terms and the length-dependent
+coordinate transformation are rebuilt. The direct geometric partial is
+`[.839758,.115823,-.578250] m/m`; total equilibrium position sensitivity is
+`[.727085,.184639,-.913305] m/m`. Independent perturbed equilibria agree to relative
+1.98e-9. These are local derivatives, not evidence of an improving global design.
+
+Existing shared Gramian/spectrum kernels execute on these models. The bounded
+target-equilibrium endpoint has a verified local affine feasible witness. At the
+standardized initial point, the sampled affine calculation produces a verified
+necessary-constraint box exclusion certificate. This excludes only that frozen
+local affine problem. The .02 s saved-state trajectory attempt is **inconclusive**:
+SLSQP returned status 8 and its replay failed; it was not relabeled infeasible.
+All task acceptance fields remain unmeasured. Exact solver outputs, margins,
+replay records, assumptions and unsupported conclusions are retained.
+
+Raw facts, scoped verified claims, and separate research interpretations are
+available through the existing evidence reader. The length-sensitivity result
+contains a `diagnostic` scoped claim and an empty interpretation list; no LLM
+was called. A missing tension-limit key in the engineering test binding caused
+saved-state final packaging to fail. The raw MATLAB result had already persisted;
+recovery reused it without a new MATLAB evaluation. The failure and recovery
+are explicitly recorded. The production worker now also atomically checkpoints
+successful numerical returns before later packaging can fail.
+
+**34 focused tests pass**, including the real original GVS initial linearization,
+legacy acceptance semantics, S0–S3/S3.5 evidence, no-CasADi shared analysis dispatch,
+real S4 derivatives/sensitivities, unsupported topology sensitivity, and injected
+solver failure remaining inconclusive. Synthetic interface checks are not physical
+validation. The historical source-freeze tests read their original Git trees.
+
 ## Reproduction
 
 ```powershell
@@ -119,6 +201,13 @@ $out='runs/sorosim-s36-'+[guid]::NewGuid().ToString('N')
 & $p tests/research/sorosim_s36_probe.py $out
 & $p tests/research/sorosim_s36_probe.py $out --isolate
 # MATLAB release, toolbox, binaries and actual startup recorded in $out/environment.json.
+# Cheap S4 saved-result and original-contract checks.
+& $p -m unittest test_sorosim_analysis test_task_analysis_contract -v
+# Fresh S4 batch: five initial investigations plus saved-state/design investigation.
+$analysis='runs/sorosim-s4a-'+[guid]::NewGuid().ToString('N')
+& $p tests/research/test_sorosim_analysis.py --run $analysis
+& $p tests/research/test_sorosim_analysis.py --extend $analysis
+& $p tests/research/test_sorosim_analysis.py --shared $analysis
 ```
 
 ## Remaining milestones
