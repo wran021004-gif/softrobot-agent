@@ -1,0 +1,37 @@
+{
+  "stage": "S3_one_update",
+  "status": "execution_error",
+  "error": "\n  File $REPO\\matlab\\sorosim_control\\sr_gateway.m, line 58, in sr_gateway\n此赋值需要标量结构体。\n",
+  "limits": {
+    "objective_absolute": 0.1,
+    "objective_relative": 0.0002,
+    "constraint_absolute": 0.002,
+    "constraint_relative": 0.0002,
+    "solution_scaled_violation": 1e-05
+  },
+  "timings": {
+    "startup_s": 6.543457999941893,
+    "shutdown_s": 0.0,
+    "calls": [
+      {
+        "operation": "environment",
+        "wall_s": 0.9539137999527156,
+        "matlab_s": 0.9354543,
+        "transfer_and_dispatch_s": 0.018459499952715674
+      },
+      {
+        "operation": "construct",
+        "wall_s": 0.19080640003085136,
+        "matlab_s": 0.1856262,
+        "transfer_and_dispatch_s": 0.005180200030851373
+      },
+      {
+        "operation": "nmpc",
+        "wall_s": 48.12852590007242,
+        "matlab_s": null,
+        "transfer_and_dispatch_s": null,
+        "status": "error"
+      }
+    ]
+  }
+}

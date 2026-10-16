@@ -38,6 +38,8 @@ def dispatch(host,operation,arguments,key):
         cfg=verify_candidate(host,candidate)['configuration']
         trajectory=old['trajectory']
     request=dict(implementation=s['freeze'],operation=operation,configuration=cfg,design_candidate=candidate,arguments=plain(arguments) if operation=='solve' else None,trajectory=trajectory,study_id=host.run_id,store_root=str(host.store.root),request_id=key+'-mechanics')
+    if cfg['policy']['controller']['extension_id']=='controller.sorosim_matlab_nmpc':
+        raise ValueError('SOROSIM_S4_OFFLINE_ANALYSIS_UNSUPPORTED')
     worker_key=key+'-mechanics'
     old=host.store.lookup(host.run_id,worker_key)
     if old:

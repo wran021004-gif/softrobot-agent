@@ -30,9 +30,14 @@ def assemble(inp,p):
             raise ValueError('FORCE_WINDOW_MUST_BE_ON_CONTROL_GRID')
         forces.append(dict(body=[b['entity'] for b in p['parts']].index(f.entity),**f.model_dump(mode='json')))
     task_identity=digest(inp.task.model_dump(mode='json'))
-    if inp.policy.controller.extension_id!='controller.gvs_nmpc':raise ValueError('ACTIVE_RESEARCH_CONTROLLER_REQUIRED')
-    from .gvs_nmpc import resolve_gvs_nmpc_control
-    control=resolve_gvs_nmpc_control(inp,p)
+    from tools.platform_registry import registry
+    definition=registry().get(inp.policy.controller.extension_id,inp.policy.controller.version,'controller')
+    resolver=definition.hook('resolve_control')
+    if resolver is None:
+        if inp.policy.controller.extension_id!='controller.gvs_nmpc':raise ValueError('ACTIVE_RESEARCH_CONTROLLER_REQUIRED')
+        from .gvs_nmpc import resolve_gvs_nmpc_control
+        resolver=resolve_gvs_nmpc_control
+    control=resolver(inp,p)
     scene=dict(physics_identity=p['identity'],assembly=a,initial=initial.model_dump(mode='json'),
         qpos_rad=[initial.qpos_rad.get(j,0.) for j in p['dofs']],qvel_rad_s=[initial.qvel_rad_s.get(j,0.) for j in p['dofs']],
         mount_rotation=quat(assembly.mount.quaternion_wxyz).tolist(),mount_position=list(assembly.mount.position_m),

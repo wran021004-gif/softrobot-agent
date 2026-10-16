@@ -105,3 +105,15 @@ def specification(design, discretization, assembly, *, basis=None, solver=None):
 class SorosimModel:
     def __init__(self, parameters):
         self.parameters = SorosimModelParameters.model_validate(parameters)
+
+    def convert(self, design, discretization, assembly, *, solver=None):
+        from .contracts import SorosimSolver
+        settings=SorosimSolver.model_validate(solver or {})
+        if solver is not None and settings.gauss_per_interval!=self.parameters.gauss_per_interval:
+            raise ValueError('SOROSIM_INTEGRATION_CONFIGURATION_CONFLICT')
+        settings=settings.model_copy(update=dict(gauss_per_interval=self.parameters.gauss_per_interval))
+        return specification(design,discretization,assembly,basis=self.parameters.basis,solver=settings)
+
+    def evaluate(self, session, q, qd, u, qdd=None, *, derivatives=False):
+        return session.evaluate('derivatives' if derivatives else 'dynamics',dict(q=list(q),qd=list(qd),
+            u=list(u),qdd=[] if qdd is None else list(qdd)))

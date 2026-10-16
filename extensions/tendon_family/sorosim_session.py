@@ -55,7 +55,12 @@ class SorosimSession:
             raise RuntimeError('MATLAB_SESSION_CLOSED')
         started = time.perf_counter()
         encoded = json.dumps(payload or {}, allow_nan=False)
-        result = json.loads(self.engine.sr_gateway(operation, encoded, nargout=1))
+        try:
+            result = json.loads(self.engine.sr_gateway(operation, encoded, nargout=1))
+        except Exception:
+            self.timings['calls'].append(dict(operation=operation,wall_s=time.perf_counter()-started,
+                matlab_s=None,transfer_and_dispatch_s=None,status='error'))
+            raise
         elapsed = time.perf_counter() - started
         self.timings['calls'].append(dict(operation=operation, wall_s=elapsed,
             matlab_s=result.get('gateway_s'), transfer_and_dispatch_s=max(0., elapsed-result.get('gateway_s', 0.))))

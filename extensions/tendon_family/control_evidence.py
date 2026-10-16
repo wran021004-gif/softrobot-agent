@@ -201,6 +201,15 @@ class ControlEvidence:
                 item['residual_definitions']=snap['residual_definitions']
                 item['first_command_change_from_initialization_n']=float(np.max(np.abs(
                     np.asarray(snap['plans'].get('delivered',snap['plans']['selected'])['metrics']['first_input_n'])-snap['plans']['initial']['metrics']['first_input_n'])))
+            elif row.get('mathematical_facts') is not None:
+                facts=row['mathematical_facts']
+                item['mathematical_facts']={k:facts.get(k) for k in (
+                    'solver','model_identity','exitflag','iterations','objective','constraint_violation',
+                    'states','tensions','initial_state','previous_input','horizon','independent_validation')}
+                item['verified_conclusions']=row.get('verified_conclusions',[])
+                item['research_interpretations']=row.get('research_interpretations',[])
+                item['residual_definitions']='Physical force balance / 0.001 N*m^2; position defects / 10 rad/m'
+                item['plan_scope']='Returned/delivered plan only; no IPOPT iteration checkpoints or complete warm-input replay'
             else:missing.append(f'update:{index}:complete_warm_and_plans')
             records.append(item)
         observations=dict(updates=records,total_updates=len(updates),initialization_selected=sum(
@@ -225,7 +234,8 @@ class ControlEvidence:
         return EvidenceSummary(ownership=dict(execution_id=query.execution_id,owner_run_id=s['owner'],candidate_id=s['metadata']['candidate']),
             identities=dict(execution_scope=execution_scope(cfg),configuration=s['metadata']['candidate_input']),
             observations=observations,references=dict(manifest=s['manifest'],files=s['files']),
-            capabilities=dict(available=['saved_execution','selected_update','aligned_one_step']+(['complete_plans'] if snapshots else []),
+            capabilities=dict(available=['saved_execution','selected_update','aligned_one_step']+(['complete_plans'] if snapshots else [])+
+                (['solver_neutral_mathematical_facts'] if any(r.get('mathematical_facts') is not None for r in updates) else []),
                 missing=missing,unsupported=['causal_identification','historical_unrecorded_horizons']),
             comparability=dict(frame='world',prediction='same update, next sample, same actually executed input only',
                 deadline_s=task['timing']['duration_s'],full_state='Projected GVS state; endpoint and projection residuals are separate'))

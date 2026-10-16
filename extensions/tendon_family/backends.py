@@ -69,7 +69,7 @@ class SerialBackend:
             if any(getattr(parameters,k)!=getattr(defaults,k) for k in ('max_step_s','rtol','atol','contact_stiffness_n_m','contact_damping_n_s_m')):
                 raise ValueError('MATLAB_ONLY_SOLVER_PARAMETERS: MuJoCo uses scene timestep and its recorded XML contact settings')
         if inp.task.initializer.extension_id!='initialize.family': raise ValueError('NAMED_FAMILY_INITIALIZER_REQUIRED')
-        controllers=['controller.gvs_nmpc']
+        controllers=['controller.gvs_nmpc','controller.sorosim_matlab_nmpc']
         if inp.policy.controller.extension_id not in controllers: raise ValueError('FAMILY_CONTROLLER_REQUIRED')
         from tools.platform_registry import registry
         resolve_execution(inp,registry())
@@ -121,7 +121,7 @@ class SerialBackend:
             if execution_mode=='ideal_tension' else
             'Ideal length servos, tension only, slack gives zero tension; no motor inertia.')
         self.result=BackendResult(solver_status='completed' if complete else 'failed',backend_id=self.backend_id,model_id=self.execution['implementation_model_id'],
-            signals=export(rows,self.physics,self.scene['control']['mode'] in ('gvs_nmpc',),
+            signals=export(rows,self.physics,self.scene['control']['mode'] in ('gvs_nmpc','sorosim_nmpc'),
                 self.scene['control'].get('tension_execution_mode','actuator_realistic')),
             data=Payload(contract='family.backend_data',data=data.model_dump(mode='json')),
             limitations=[self.physics['applicability']['collision'],execution_limitation,
@@ -138,7 +138,9 @@ class SerialBackend:
 
     def export(self): return self.result
 
-    def close(self): pass
+    def close(self):
+        close=getattr(getattr(self,'controller',None),'close',None)
+        if close is not None: close()
 
 
 class MujocoBackend(SerialBackend):
@@ -186,20 +188,25 @@ class MujocoBackend(SerialBackend):
             return dict(tip=data.site_xpos[model.site('tip_site').id].copy(),Jtip=J[:,vi],lengths=data.ten_length[tids].copy(),Jlength=jac[tids][:,vi])
         complete=True; reason=None
         for step in range(round(s['duration_s']/dt)):
+            limit=getattr(self,'engineering_control_update_limit',None)
+            if limit is not None:
+                if type(limit) is not int or not 1<=limit<=5:raise ValueError('BOUNDED_ENGINEERING_UPDATES_REQUIRED')
+                if step>=limit:
+                    complete=False;reason='ENGINEERING_CONTROL_UPDATE_LIMIT';break
             if timeout_s is not None and time.perf_counter()-start>timeout_s:
                 complete=False
                 reason='MUJOCO_SOLVER_TIMEOUT'
                 break
             update_start=time.perf_counter()
             t=step*dt; g=current()
-            if s['control']['mode'] in ('gvs_nmpc',):
+            if s['control']['mode'] in ('gvs_nmpc','sorosim_nmpc'):
                 from .gvs_projection import project, PROJECTOR_ID
                 projection=project(p,self.controller.resolved_basis,data.qpos[qi],data.qvel[vi],
                     convention=getattr(self.controller,'projector_id',PROJECTOR_ID))
                 g['gvs_projection']=projection
                 state_preparation_s=time.perf_counter()-update_start
                 command=self.controller.command(t,g,np.asarray(projection['q_gvs']),np.asarray(projection['qdot_gvs']))
-                if s['control']['mode']=='gvs_nmpc':
+                if s['control']['mode'] in ('gvs_nmpc','sorosim_nmpc'):
                     elapsed=time.perf_counter()-update_start
                     timing=dict(controller_boundary_wall_s=self.controller.last['update_wall_s'],
                         state_preparation_s=state_preparation_s,update_wall_s=elapsed,

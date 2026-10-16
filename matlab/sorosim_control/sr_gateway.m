@@ -15,6 +15,7 @@ switch operation
         assert(strcmp(out.release,'2024a'),'MATLAB_R2024A_REQUIRED');
         assert(license('test','Optimization_Toolbox'),'OPTIMIZATION_TOOLBOX_REQUIRED');
         out.optimization = ver('optim'); out.architecture = computer;
+        out.process_id = feature('getpid');
         names = {'variable_expmap_g_mex','variable_expmap_gTg_mex', ...
             'variable_expmap_gTgTgd_mex','RigidJointKinematics_mex', ...
             'compute_dSTdqFC_Z4_mex'};

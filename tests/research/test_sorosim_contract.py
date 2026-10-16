@@ -3,7 +3,6 @@ from copy import deepcopy
 import json
 import os
 from pathlib import Path
-import tempfile
 import unittest
 
 from schemas.platform import SessionInput
@@ -53,23 +52,47 @@ class ContractTests(unittest.TestCase):
         cfg = resolve(ROOT/'configs/research/study_m3d_agent_feedback.json')
         self.assertEqual(cfg['configuration']['policy']['controller']['extension_id'],'controller.gvs_nmpc')
 
+    def test_backend_specific_source_freeze(self):
+        import subprocess
+        path=ROOT/'evidence/sorosim_control/source_freeze.json'
+        if not path.exists():self.skipTest('Delivery source identity not recorded')
+        frozen=read(path);identity=frozen.pop('identity')
+        self.assertEqual(digest(frozen),identity)
+        for source,blob in frozen['git_blobs'].items():
+            actual=subprocess.check_output(['git','hash-object',source],cwd=ROOT,text=True,stderr=subprocess.DEVNULL).strip()
+            self.assertEqual(actual,blob,source)
+        self.assertEqual(frozen['external_dependency_identity'],digest(read(ROOT/'evidence/sorosim_control/s0.json')['dependency']))
+
     def test_sparse_configuration_preserves_science(self):
         source = ROOT/'configs/research/study_m3d_agent_feedback.json'
         original = resolve(source)
-        document = read(source)
-        document['control'] = 'control_sorosim.json'
-        with tempfile.NamedTemporaryFile(mode='w',suffix='.json',dir=source.parent,delete=False,encoding='utf8') as f:
-            json.dump(document,f); path=Path(f.name)
-        try:
-            selected = resolve(path)
-        finally:
-            path.unlink()
+        selected = resolve(source,backend_profile='sorosim_matlab_v1')
         a = original['configuration']; b = selected['configuration']
         self.assertEqual(a['task'],b['task'])
         self.assertEqual(a['robot'],b['robot'])
         self.assertEqual(a['policy']['controller']['parameters']['data']['recipe'],b['policy']['controller']['parameters']['data']['recipe'])
         self.assertIn('solver',b['policy']['controller']['parameters']['data'])
         self.assertEqual(a['policy']['dynamics_model'],b['policy']['dynamics_model'])
+        with self.assertRaisesRegex(ValueError,'UNSUPPORTED_MATHEMATICAL_BACKEND_PROFILE'):
+            resolve(source,backend_profile='unknown')
+
+    def test_s4_is_explicitly_unsupported(self):
+        from extensions.tendon_family.model_applicability import assess_model_uses
+        from schemas.platform import Binding,Payload
+        inp,_=final_candidate()
+        model=Binding(extension_id='model.sorosim_gvs',version='1.0.0',parameters=Payload(
+            contract='family.sorosim_model',data=dict(basis=inp.policy.controller.parameters.data['recipe']['basis'])))
+        verdict=assess_model_uses(inp.robot,inp.task,model,['static_equilibrium','linearization'])
+        self.assertTrue(all(v.status=='REJECT' for v in verdict.uses.values()))
+
+    def test_session_cleanup_is_idempotent_software_fixture(self):
+        from extensions.tendon_family.sorosim_session import SorosimSession
+        from types import SimpleNamespace
+        closed=[];s=SorosimSession(root='unused_software_fixture')
+        s.engine=SimpleNamespace(quit=lambda:closed.append(True));s.model_identity='software_fixture'
+        s.close();s.close()
+        self.assertEqual(closed,[True]);self.assertIsNone(s.model_identity)
+        with self.assertRaisesRegex(RuntimeError,'MATLAB_SESSION_CLOSED'):s.call('environment')
 
     def test_actual_candidate_and_unsupported_method(self):
         from extensions.tendon_family.sorosim_control import checked_control

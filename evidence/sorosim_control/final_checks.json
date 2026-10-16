@@ -1,0 +1,32 @@
+{
+  "status": "passed",
+  "tests": 21,
+  "elapsed_s": 16.994,
+  "suites": [
+    "test_sorosim_contract",
+    "test_sorosim_physics",
+    "test_sorosim_nmpc",
+    "test_sorosim_integration",
+    "test_agent_feedback",
+    "test_task_analysis_contract.TaskAnalysisTests.test_old_contracts_and_acceptance_unchanged"
+  ],
+  "environment": {
+    "python": "existing .mainline5-env Python 3.11.16",
+    "OPENBLAS_NUM_THREADS": "1",
+    "OMP_NUM_THREADS": "1",
+    "MKL_NUM_THREADS": "1"
+  },
+  "scope": "Final evidence rechecks and software/baseline regression; no new numerical experiments in this suite",
+  "numerical_gates": {
+    "S0": "passed",
+    "S1": "passed",
+    "S2": "passed_refined_reference",
+    "S3": "passed_local_NMPC_and_three_updates"
+  },
+  "task_success": null,
+  "remaining": [
+    "S4 analysis and co-design migration",
+    "S5 original 35-update task",
+    "S6 formal comparison and live Agent integration"
+  ]
+}

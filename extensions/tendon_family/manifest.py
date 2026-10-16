@@ -171,6 +171,12 @@ SOROSIM_SOURCES = PLATFORM_SOURCES + PHYSICAL_SOURCES + (
     'extensions/tendon_family/sorosim_spec.py',
     'extensions/tendon_family/sorosim_session.py',
     'extensions/tendon_family/sorosim_control.py',
+    'extensions/tendon_family/control_evidence.py',
+    'extensions/tendon_family/gvs_reporting.py',
+    'schemas/platform_analysis.py',
+    'tools/research/config.py',
+    'tools/research/task_constraints.py',
+    'tools/research_tasks.py',
     'extensions/tendon_family/gvs_basis.py',
     'extensions/tendon_family/gvs_projection.py',
     'extensions/tendon_family/gvs_profile.py',
@@ -181,6 +187,8 @@ SOROSIM_SOURCES = PLATFORM_SOURCES + PHYSICAL_SOURCES + (
     'matlab/sorosim_control/sr_checks.m',
     'matlab/sorosim_control/sr_dynamics.m',
     'matlab/sorosim_control/sr_derivatives.m',
+    'matlab/sorosim_control/sr_nmpc.m',
+    'matlab/sorosim_control/sr_nmpc_callbacks.m',
     'configs/research/control.json',
     'configs/research/control_sorosim.json',
     'configs/research/sorosim_dependency.json',
@@ -207,6 +215,7 @@ EXTENSIONS.append(replace(_sr_controller,extension_id='controller.sorosim_matlab
     dependencies=('numpy','scipy','matlab.engine'),extension_dependencies=(('model.sorosim_gvs','1.0.0'),),
     sources=SOROSIM_SOURCES,capabilities={**_sr_controller.capabilities,
         'predictor':'model.sorosim_gvs','profile_id':'sorosim_candidate_reach_v1',
+        'resolve_control':'extensions.tendon_family.sorosim_control:resolve_control',
         'route_applicability':'extensions.tendon_family.sorosim_control:checked_control'}))
 for _i,_entry in enumerate(EXTENSIONS):
     if _entry.extension_id == 'backend.family_mujoco':

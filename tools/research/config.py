@@ -59,7 +59,7 @@ def extend_engineering_counts(spec, changes, authorization):
     return result
 
 
-def resolve(path, profile=None):
+def resolve(path, profile=None, *, backend_profile=None):
     path = Path(path).resolve()
     study = read(path)
     provenance = dict(root=dict(path=str(path), sha256=digest(study)), references={})
@@ -123,6 +123,11 @@ def resolve(path, profile=None):
             raise ValueError('NEW_STUDY_AND_EXPLICIT_TOPOLOGY_AUTHORIZATION_REQUIRED')
         study.update(topology_authorization=grant,source_study_identity=digest(original),source_study_id=original['study_id'])
         provenance['references']['source_study']=dict(path=str(source),sha256=digest(original))
+    if backend_profile is not None:
+        if backend_profile != 'sorosim_matlab_v1':
+            raise ValueError('UNSUPPORTED_MATHEMATICAL_BACKEND_PROFILE: '+str(backend_profile))
+        study['control']='control_sorosim.json'
+        study['mathematical_backend_profile']=backend_profile
     inputs = {}
     if family_mode:
         study.pop('robot', None)  # Historical compositions may name it; never read it.
