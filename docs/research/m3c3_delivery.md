@@ -10,8 +10,8 @@ Branch: `feat/m3c3-mixed-family-search`; worktree:
 Starting commit: `4c4a491747ae0a674cbdc3a82c65b25de64a17f8`.
 Implementation checkpoint: `7940e83b636152fa4ccdc5e3ac673c292e9d4388`.
 Exact real-search binding: `e702fe9cd7eaeb0ee3db49e2b49bf9d48be9af77`.
-Final production/test source: `72a9e60bdc488307892e4545e9083cb8e1dbb403`.
-Later delivery changes contain documentation/evidence only. The final reply gives
+Final behavioral production/test source: `72a9e60bdc488307892e4545e9083cb8e1dbb403`.
+Later delivery changes contain documentation, evidence and fixture whitespace only. The final reply gives
 the exact delivery HEAD and verified remote SHA. Other worktrees were untouched.
 
 ## Runtime diagnosis and admission

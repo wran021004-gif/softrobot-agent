@@ -275,4 +275,3 @@ class MixedSearchTests(unittest.TestCase):
         self.assertIn('segments.0.section_kind',paths)
         self.assertIn('angular_offsets_rad.0',paths)
         self.assertIn('radii_m.0',paths)
-
