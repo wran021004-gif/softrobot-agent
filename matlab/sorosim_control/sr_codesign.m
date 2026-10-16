@@ -5,8 +5,9 @@ prepared=sr_nmpc(model,request);c=prepared.context;c.export_output_jacobians=tru
 [~,~,inspect]=sr_nmpc_callbacks(model,c);nv=numel(prepared.initial_vector);
 assert(c.elapsed==0,'CODESIGN_REQUIRES_FROZEN_INITIAL_STATE');
 requirements=r.requirements.constraints;
-feasibility=ismember(r.arguments.objective_mode,{'maximum_original_violation','minimum_signed_task_excess'});
-interior=strcmp(r.arguments.objective_mode,'minimum_signed_task_excess');
+feasibility=ismember(r.arguments.objective_mode,{'maximum_original_violation','minimum_signed_task_excess','task_capability'});
+interior=ismember(r.arguments.objective_mode,{'minimum_signed_task_excess','task_capability'});
+freeEpigraph=strcmp(r.arguments.objective_mode,'task_capability');
 nodes=[];groups=[];radii=[];references=[];labels={};
 for j=1:numel(requirements)
     t=requirements(j);
@@ -43,7 +44,12 @@ if ismember(r.operation,{'replay','cross_replay'})
     end
     difference=max(abs((X-prepared.initial.states)./c.state_scale),[],'all');
     if interior
-        slackLower=[-1;0];slackUpper=[inf;0];
+        if freeEpigraph
+            slackLower=[-inf;0];
+        else
+            slackLower=[-1;0];
+        end
+        slackUpper=[inf;0];
     elseif feasibility
         slackLower=[0;0];slackUpper=[inf;0];
     else
@@ -63,7 +69,13 @@ initial=prepared.initial_vector;gaps=task_values(prepared.initial);
 if feasibility
     slacks=[max(gaps)+1e-4;0];
     if ~interior,slacks(1)=max(0,slacks(1));end
-    if interior,minimum=-1;else,minimum=0;end
+    if freeEpigraph
+        minimum=-inf;
+    elseif interior
+        minimum=-1;
+    else
+        minimum=0;
+    end
     lower=[c.lower;minimum;0];upper=[c.upper;inf;0];
 else
     slacks=[max([0;gaps(groups==1)]);max([0;gaps(groups==2)])]+1e-4;
@@ -82,15 +94,17 @@ if isfield(r,'check_only') && r.check_only
         'constraint_relative_error',norm(cd-[gi,ge]'*v,inf)/max(1e-12,norm(cd,inf)), ...
         'variables',numel(z0),'equalities',numel(ce),'inequalities',numel(ci),'total_s',toc(started));return;
 end
-t=tic;[z,f,flag,info]=fmincon(@objective,z0,[],[],[],[],lower,upper,@constraints,opt);solve_s=toc(t);
+t=tic;[z,f,flag,info,lambda,gradient]=fmincon(@objective,z0,[],[],[],[],lower,upper,@constraints,opt);solve_s=toc(t);
 % Preserve the expensive raw returned iterate before further validation can fail.
 if isfield(r,'checkpoint_path')
     assert(~isfile(r.checkpoint_path),'PRESERVE_OPTIMIZER_CHECKPOINT');
     temporary=[r.checkpoint_path '.tmp'];fid=fopen(temporary,'w');assert(fid>=0,'CHECKPOINT_OPEN_FAILED');
-    fprintf(fid,'%s',jsonencode(struct('z',z,'objective',f,'exitflag',flag,'output',info,'solve_s',solve_s)));
+    fprintf(fid,'%s',jsonencode(struct('z',z,'objective',f,'exitflag',flag,'output',info, ...
+        'lambda',lambda,'objective_gradient',gradient,'solve_s',solve_s)));
     fclose(fid);movefile(temporary,r.checkpoint_path);
 end
-z=min(max(z,lower),upper);f=objective(z);
+kkt=kkt_report(z,lambda,flag);rawZ=z;
+z=min(max(z,lower),upper);projectionMax=max(abs(z-rawZ));f=objective(z);
 e=inspect(z(1:nv));[ci,ce]=constraints(z);
 violation=max([abs(ce);ci;lower-z;z-upper]);
 raw=struct('objective',f,'scaled_violation',violation,'task',task_report(e), ...
@@ -125,9 +139,12 @@ out=struct('status','returned','exitflag',flag,'converged',flag>0,'iterations',i
         'slacks',struct('position',z(end-1),'speed',z(end))), ...
     'task',task_report(e),'original_feasible',all(task_values(e)<=0) && violation<=1e-5, ...
     'raw_returned',raw,'recovery',recovery, ...
+    'kkt',kkt, ...
     'initial_task',task_report(prepared.initial),'optimization_s',solve_s, ...
     'preparation_s',prepared.warm_preparation_s,'total_s',toc(started),'initial_roots',{prepared.roots}, ...
     'objective_definition',r.arguments,'model_identity',model.spec.identity,'physical_task_acceptance','unmeasured');
+out.kkt.same_as_selected_trajectory=~recovery.selected && projectionMax<=1e-12;
+out.kkt.bound_projection_max=projectionMax;
 
     function [f,g]=objective(z)
         if feasibility
@@ -162,6 +179,30 @@ out=struct('status','returned','exitflag',flag,'converged',flag>0,'iterations',i
                 gi(indices,k)=2*(J'*(value-references(:,k))).*c.state_scale/radii(k)^2;gi(nv+slackIndices(k),k)=-1;
             end
         end
+    end
+    function audit=kkt_report(z,lambda,flag)
+        [~,g]=objective(z);[ci,ce,gi,ge]=constraints(z);
+        stationarity=g+gi*lambda.ineqnonlin+ge*lambda.eqnonlin-lambda.lower+lambda.upper;
+        lo=isfinite(lower);hi=isfinite(upper);
+        primal=max([0;abs(ce);ci;lower-z;z-upper]);
+        dual=max([0;-lambda.ineqnonlin;-lambda.lower;-lambda.upper]);
+        complementarity=max([0;abs(lambda.ineqnonlin.*ci); ...
+            abs(lambda.lower(lo).*(z(lo)-lower(lo))); ...
+            abs(lambda.upper(hi).*(upper(hi)-z(hi)))]);
+        active=struct('constraint_id',{},'time_s',{},'multiplier',{},'residual',{});
+        for a=find(ci>=-1e-5)'
+            active(end+1)=struct('constraint_id',labels{a},'time_s',nodes(a)*c.h, ...
+                'multiplier',lambda.ineqnonlin(a),'residual',ci(a));
+        end
+        audit=struct('iterate','raw_fmincon_returned_before_projection_or_recovery', ...
+            'objective_mode',r.arguments.objective_mode,'solver_exitflag',flag, ...
+            'primal_inf',primal,'stationarity_inf',max(abs(stationarity)), ...
+            'dual_violation',dual,'complementarity_inf',complementarity, ...
+            'active_task_constraints',active,'multipliers',lambda, ...
+            'gradient_source','fresh complete NLP objective and nonlinear constraint Jacobians', ...
+            'design_lagrangian_derivative','not_computed; explicit dynamics and initial-condition design terms required', ...
+            'conditioning','not_measured', ...
+            'global_optimality','unclaimed');
     end
     function result=task_report(e)
         gap=task_values(e);values=radii(:).*sqrt(max(0,1+gap));

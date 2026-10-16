@@ -171,7 +171,7 @@ class MechanicsRequest(Contract):
     substeps: int = Field(default=1,ge=1,le=4,strict=True)
     initialization: Literal['constant_0_2','ramp_0_2_to_0_4','saved_candidate_trajectory'] = 'constant_0_2'
     warm_source: EvidenceRef | None = None
-    objective_mode: Literal['task_gap','task_gap_with_effort','maximum_original_violation','minimum_signed_task_excess'] = 'task_gap'
+    objective_mode: Literal['task_gap','task_gap_with_effort','maximum_original_violation','minimum_signed_task_excess','task_capability'] = 'task_gap'
     position_weight: FiniteFloat = Field(default=1,gt=0)
     speed_weight: FiniteFloat = Field(default=1,gt=0)
     secondary_coefficient: FiniteFloat = Field(default=.001,ge=0)
