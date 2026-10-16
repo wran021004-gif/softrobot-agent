@@ -21,6 +21,7 @@ def update(host, **values):
 
 def readable_results(s, host=None):
     linked=list(s.get('analysis_results',[]))+list(s.get('search_results',[]))
+    linked += [entry['reference'] for entry in s.get('stage_context',[])]
     linked += list(s.get('runtime_capabilities',{}).values())
     if host:
         for ref in s.get('mechanics_results',[]):

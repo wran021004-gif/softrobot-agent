@@ -1,0 +1,22 @@
+{
+  "defaults": "family_study_defaults.json",
+  "start_mode": "family_space",
+  "family_space": "family_space_v2.json",
+  "candidate_initialization": "all_candidate_dofs_zero_v1",
+  "base_commit": "a3c5b046",
+  "mode": "formal_research",
+  "control": "control_sorosim.json",
+  "capabilities": ["analysis", "mathematics", "replay", "physical_replay", "nmpc", "rl"],
+  "allowed_plan_actions": ["generate", "execute", "mechanics", "replay", "physical_replay", "diagnose", "select", "stop"],
+  "budgets": {"provider_requests": 12, "protected_provider_requests": 2,
+    "public_operations": 40, "protected_public_operations": 4, "physical_launches": 2,
+    "mathematical_evaluations": 2, "offline_nlp": 1, "bdf_replays": 1},
+  "nmpc_limits": {"executions": 1},
+  "rl_limits": {"training_stages": 1, "actions_per_trial": 32768,
+    "training_actions": 32768, "evaluation_episodes": 1,
+    "diagnostic_replays": 0, "diagnostic_physics_steps": 0},
+  "study_id": "sorosim-s5-agent-feedback-20261016",
+  "authorization": "User-authorized one bounded live Strands research pilot after P1-P5: at most 12 provider requests, 40 public operations, two backend launch slots, one 32768-action PPO stage with one independent evaluation, one NMPC execution, one full mathematical NLP and one replay. Prior stage results are read-only context and are not fresh success evidence.",
+  "evidence_destination": "evidence/sorosim_s5_agent",
+  "execution_instructions": "You are conducting one bounded research pilot on the frozen reach-and-hold task. A Design B candidate and exact residual tension reference were materialized from sealed P1-P5 sources before your first call; this was engineering preparation, not an Agent decision. The current packet lists stage_context summaries and exact imported evidence references. First use evidence_read on at least one relevant imported result. Then choose your own next action within the grant: mathematical diagnostic, generated structural change, full SoRoSim NMPC, physical open-loop replay, direct/residual PPO, or truthful STOP. Make a testable hypothesis with supporting observations, a distinguishing expected observation, a weakening observation and exact evidence references. Existing P1 mathematics is a feasible witness but its optimizer did not converge. P2 open loop, P3 NMPC, and both P4 PPO evaluations failed the original physical task; P5 KKT sensitivity is solver_unresolved. A past failure is neither a fresh success nor proof of global impossibility. One backend launch slot is needed for NMPC or physical replay; PPO training plus independent evaluation needs both slots. Keep the original task, exact candidate and tension semantics. Do not invent probabilities, a gradient certificate or physical success. If a fresh accepted solution appears, read it and select its exact execution or STOP. Preserve costs and stop with an evidence-conditioned next-step explanation before the budget closes."
+}

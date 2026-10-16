@@ -237,7 +237,8 @@ def packet(host):
     if s['spec'].get('capabilities'):
         from tools.research.feedback import result_view, eligibility, facts, search_feedback
         from tools.research.rl import packet as rl_packet
-        return dict(decision_facts=facts(host),specification=s['spec'],scoped_context=s.get('scoped_context',[]),frozen_task=plain(s['spec'].get('canonical_task',s['base_configuration']['task'])),reference_candidate=s.get('reference_candidate'),
+        return dict(decision_facts=facts(host),specification=s['spec'],scoped_context=s.get('scoped_context',[]),
+            stage_context=s.get('stage_context',[]),frozen_task=plain(s['spec'].get('canonical_task',s['base_configuration']['task'])),reference_candidate=s.get('reference_candidate'),
             candidates=[r for r in s['candidates'].values() if host.store.artifact(r)['profile_identity']==s['profile']['identity']],results=[dict(reference=r,**result_view(host,r),confirmation=eligibility(host,r)) for r in [*s['results'],*s.get('rl_evaluations',[])]],
             analysis_results=[decision_result(host.store.artifact(r),r) for r in s.get('analysis_results',[])],
             search_results=s.get('search_results',[]),
