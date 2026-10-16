@@ -1,0 +1,43 @@
+{
+  "schema": "sorosim_validation_v1",
+  "source_sha": "eddbcb26a393c8919ac88886c0c1f7d280c374f9",
+  "upstream_sha": "24d573a3e864ffda87c42ee462a6ed620133cc7b",
+  "young_pa": 1000000.0,
+  "density_kg_m3": 1000.0,
+  "poisson_ratio": 0.49,
+  "gravity_m_s2": [0.0, 0.0, -9.81],
+  "tendon_offsets_m": [[0.0, 0.007, 0.0], [0.0, -0.007, 0.0], [0.0, 0.0, 0.007], [0.0, 0.0, -0.007]],
+  "probe_tensions_n": [0.3, 0.1, 0.2, 0.1],
+  "fd_steps_rad_m": [0.0001, 0.00001, 0.000001],
+  "sensitivity_forward_steps_n": [0.001, 0.0001],
+  "solver_residual_tolerance_nm2": 1e-10,
+  "tolerances": {
+    "pose_position_m": 0.00002,
+    "pose_rotation_fro": 0.0002,
+    "tip_jacobian_max_abs": 0.00002,
+    "generalized_force_nm2": 0.000002,
+    "residual_jacobian_max_abs": 0.000002,
+    "equilibrium_curvature_rad_m": 0.002,
+    "stiffness_max_abs": 1e-12,
+    "fd_tip_jacobian_max_abs": 0.000002,
+    "fd_residual_jacobian_max_abs": 0.0000002,
+    "fd_tendon_jacobian_max_abs": 0.000002,
+    "fd_equilibrium_tip_sensitivity_m_n": 0.00002
+  },
+  "cases": [
+    {
+      "id": "one_segment",
+      "lengths_m": [0.2],
+      "radii_m": [0.01],
+      "probes_rad_m": [[0, 0, 0, 0], [1.2, 0, -0.7, 0], [1.2, 0.8, -0.7, 0.4]],
+      "levels": [{"gvs_steps": 24, "gauss": 5}, {"gvs_steps": 96, "gauss": 10}, {"gvs_steps": 192, "gauss": 20}]
+    },
+    {
+      "id": "two_segment",
+      "lengths_m": [0.12, 0.1],
+      "radii_m": [0.01, 0.008],
+      "probes_rad_m": [[0, 0, 0, 0, 0, 0, 0, 0], [1.2, 0.8, -0.7, 0.4, -0.9, 0.6, 1.1, -0.5]],
+      "levels": [{"gvs_steps": 96, "gauss": 10}, {"gvs_steps": 192, "gauss": 20}]
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "date_local": "2026-10-16",
+  "timezone": "Asia/Shanghai",
+  "execution": "Interactive development session using the same per-case entry points now composed by run.ps1; the full wrapper was not rerun to duplicate already passing scientific calculations.",
+  "source_sha": "eddbcb26a393c8919ac88886c0c1f7d280c374f9",
+  "upstream_sha": "24d573a3e864ffda87c42ee462a6ed620133cc7b",
+  "ordered_scientific_steps": [
+    "run_gvs.py --case one_segment --output validation/sorosim/evidence/run_20261016_01",
+    "MATLAB -batch sv_run(referenceRoot, outputDir, 'one_segment')",
+    "compare.py --case one_segment --output validation/sorosim/evidence/run_20261016_01: correspondence and derivatives passed",
+    "run_gvs.py --case two_segment --output validation/sorosim/evidence/run_20261016_01 and MATLAB -batch sv_run(referenceRoot, outputDir, 'two_segment') launched after the one-segment gate",
+    "compare.py --case two_segment --output validation/sorosim/evidence/run_20261016_01: correspondence and derivatives passed",
+    "test_validation.py --evidence validation/sorosim/evidence/run_20261016_01: six tests passed, including final nonfinite-evidence rejection"
+  ],
+  "scope": "Fixed-physics one/two-segment mathematical validation only; no provider calls, RL, NMPC task evaluations, Harness integration, or exhaustive sweep.",
+  "development_changes_after_numerical_runs": [
+    "sv_run.m explicitly selects UTF-8 output; its numerical computation is unchanged from the executed version.",
+    "compare.py now exits nonzero for failed derivative gates as well as failed correspondence gates; neither gate failed in this run.",
+    "The final evidence reader rejects nonfinite arrays and unequal dimensions; passing numerical discrepancies are unchanged.",
+    "provenance hashes describe the final reviewable scripts and raw evidence; session notes distinguish execution from packaging changes."
+  ]
+}

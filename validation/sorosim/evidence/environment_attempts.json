@@ -1,0 +1,48 @@
+{
+  "date_local": "2026-10-16",
+  "timezone": "Asia/Shanghai",
+  "attempts": [
+    {
+      "action": "MATLAB R2024a -batch environment inventory inside sandbox",
+      "status": "failed_before_MATLAB_script",
+      "exit_code": 1,
+      "diagnostic": "failed to load settings errors_warnings plugin",
+      "resolution": "Ordinary machine access allowed the identical environment probe and later validation batches to complete."
+    },
+    {
+      "action": "Reference clone with inherited HTTPS route",
+      "status": "connection_failed_or_stalled",
+      "diagnostic": "Sandbox proxy connection failed; a normal-access clone stalled and was interrupted. Its partial external temporary directory was preserved.",
+      "resolution": "Per-command Git OpenSSL HTTPS and empty proxy succeeded in a separate external directory. No global settings were changed."
+    },
+    {
+      "action": "First no-GUI fixture preflight",
+      "status": "fixture_construction_failed",
+      "exit_code": 1,
+      "diagnostic": "SorosimLinkage.set.CVRods invoked Update against an incomplete rod list.",
+      "log": "preflight_matlab.log",
+      "resolution": "Set Z_order empty during construction, matching the upstream setter's explicit deferral mechanism."
+    },
+    {
+      "action": "Second no-GUI fixture preflight",
+      "status": "fixture_construction_failed",
+      "exit_code": 1,
+      "diagnostic": "Assignment of SorosimLink into an initially double-valued VLinks property failed.",
+      "log": "preflight_retry_matlab.log",
+      "resolution": "Initialize VLinks with SorosimLink.empty before indexed assignment. No upstream source or physical values were modified."
+    },
+    {
+      "action": "First one-segment comparison read",
+      "status": "evidence_reader_failed",
+      "diagnostic": "Windows default GBK decoding failed on a UTF-8 MATLAB solver message.",
+      "resolution": "Use explicit UTF-8 JSON reading and writing. Numerical evidence was retained unchanged."
+    },
+    {
+      "action": "Premature two-segment comparison invocation",
+      "status": "missing_evidence_reader_failed",
+      "diagnostic": "GVS two-segment computation was still running; its output did not yet exist.",
+      "resolution": "Waited for the computation to finish, then compared successfully. The reproducible wrapper executes dependent steps sequentially."
+    }
+  ],
+  "raw_log_note": "MATLAB console logs contain Windows console encoding artifacts in localized stack labels; the diagnostics above and UTF-8 numerical JSON preserve their meaning."
+}
