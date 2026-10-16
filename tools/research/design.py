@@ -141,6 +141,8 @@ def verify_candidate(host,reference):
                 c['effective_task_identity']!=digest(c['configuration']['task']) or
                 c['identity']!=family_candidate_identity(c['configuration'],s)):
             raise ValueError('FAMILY_CANDIDATE_IDENTITY_MISMATCH')
+        if s['spec'].get('fidelity_policy') and any(c.get(k)!=v for k,v in numerical_binding(c['configuration'],s['spec']).items()):
+            raise ValueError('CANDIDATE_FIDELITY_BINDING_MISMATCH')
         return c
     if s['spec'].get('nominal_source'):
         if host.store.artifact(c['configuration_reference'])!=c['configuration'] or c['source_identity']!=digest(s['nominal_configuration']):
@@ -167,7 +169,30 @@ def family_candidate_identity(cfg,s):
         canonical_task_identity=s['spec']['canonical_task_identity'],evaluation_profile=s['profile']))
 
 
-def generate_candidate(host,request,provenance):
+def numerical_binding(cfg, spec):
+    physical=digest(cfg['robot']['structure']['data'])
+    model=digest(dict(physical_design_identity=physical,policy={k:cfg['policy'][k] for k in
+        ('discretization','dynamics_model','backend')},basis=cfg['policy']['controller']['parameters']['data']['recipe']['basis']))
+    return dict(physical_design_identity=physical,numerical_model_identity=model,
+        effective_discretization=cfg['policy']['discretization'],
+        fidelity_policy_identity=digest(spec['fidelity_policy']) if spec.get('fidelity_policy') else None,
+        final_evaluation_identity=spec.get('final_evaluation_identity'))
+
+
+def final_fidelity_matches(spec, candidate):
+    """Legacy studies retain their original frozen execution semantics."""
+    policy=spec.get('fidelity_policy')
+    if not policy:
+        return True
+    cfg=candidate['configuration'];final=policy['final_evaluation']
+    return (candidate.get('fidelity_policy_identity')==digest(policy) and
+        candidate.get('final_evaluation_identity')==spec['final_evaluation_identity'] and
+        cfg['policy']['backend']==spec['configuration']['policy']['backend'] and
+        set(cfg['policy']['discretization']['data']['cells'].values())=={final['cells_per_segment']} and
+        candidate['task_identity']==spec['canonical_task_identity'])
+
+
+def generate_candidate(host,request,provenance,*,screening_fidelity=None):
     """Materialize a frozen family request and persist through the existing Store."""
     from extensions.tendon_family.family_space import parse_build, UnsupportedGeneration
     from extensions.tendon_family.gvs_profile import reach_numerical
@@ -176,6 +201,16 @@ def generate_candidate(host,request,provenance):
     if spec.get('start_mode')!='family_space':raise ValueError('FROZEN_FAMILY_SPACE_REQUIRED')
     started=time.perf_counter()
     try:
+        request=deepcopy(plain(request))
+        if screening_fidelity is not None:
+            level=spec.get('fidelity_policy',{}).get('screening',{}).get(screening_fidelity)
+            if level is None:
+                raise ValueError('UNAUTHORIZED_SCREENING_FIDELITY')
+            for i in range(request['segment_count']):
+                segment=request.setdefault('segments',{}).setdefault(str(i),{})
+                if segment.get('cells',level['cells_per_segment'])!=level['cells_per_segment']:
+                    raise ValueError('SCREENING_MESH_CONFLICT')
+                segment['cells']=level['cells_per_segment']
         build=parse_build(dict(space=spec['family_space'],request=plain(request)))
         robot,mesh,physics=family.generate_family(build)
         cfg=deepcopy(s['base_configuration']);cfg['run_id']=host.run_id
@@ -219,6 +254,8 @@ def generate_candidate(host,request,provenance):
                 profile_identity=s['profile']['identity'],evaluation_version=s['profile']['version'],
                 physical_validation='compiled',unchecked=['controllability','task feasibility',*build.space.unsupported],
                 provenance=provenance,offline_trajectory=None)
+            if spec.get('fidelity_policy'):
+                candidate.update(numerical_binding(cfg,spec),screening_fidelity=screening_fidelity)
             ref=save(host,candidate,'candidate_constructed')
             update(host,candidates={**state(host)['candidates'],identity:ref})
         return dict(status='generated',candidate=ref,resolved=resolved,task_success=None)

@@ -64,6 +64,7 @@ def resolve(path, profile=None):
     study = read(path)
     provenance = dict(root=dict(path=str(path), sha256=digest(study)), references={})
     family_mode=study.get('start_mode')=='family_space'
+    additions={key:study.pop(key) for key in ('fidelity_policy','family_search') if key in study}
     if family_mode:
         from extensions.tendon_family.family_space import parse_space
         source=(path.parent/study.pop('defaults')).resolve()
@@ -95,6 +96,21 @@ def resolve(path, profile=None):
             family_space=dict(path=str(family_source),sha256=digest(family_space)))
     elif study.get('start_mode', 'reference_candidate')!='reference_candidate':
         raise ValueError('UNKNOWN_RESEARCH_START_MODE')
+    if additions:
+        if not family_mode:
+            raise ValueError('NEW_FIDELITY_SEARCH_POLICY_REQUIRES_FAMILY_STUDY')
+        from tools.research.contracts import FidelityPolicy
+        policy=plain(FidelityPolicy.model_validate(additions['fidelity_policy']))
+        cells=family_space['serial_assembly']['cell_count_bounds']
+        if any(not cells[0]<=level['cells_per_segment']<=cells[1] for level in [*policy['screening'].values(),policy['final_evaluation']]):
+            raise ValueError('FIDELITY_OUTSIDE_FROZEN_MESH_DOMAIN')
+        grant=additions.get('family_search')
+        if grant and (grant['method']!='bounded_mixed_coordinate_v1' or
+                not set(grant['segment_counts'])<=set(family_space['executable_segment_counts']) or
+                any(not family_space['executable_tendon_count_bounds'][0]<=v<=family_space['executable_tendon_count_bounds'][1] for v in grant['tendon_counts']) or
+                not all(type(grant[k]) is int and 1<=grant[k]<=128 for k in ('max_proposals','max_evaluations'))):
+            raise ValueError('BOUNDED_EXECUTABLE_FAMILY_SEARCH_GRANT_REQUIRED')
+        study.update(additions,fidelity_policy=policy)
     if 'extends' in study:
         source=(path.parent/study.pop('extends')).resolve()
         original=read(source)
@@ -201,6 +217,11 @@ def resolve(path, profile=None):
         cfg['policy']['candidate_builder'] = bootstrap['builder']
         cfg['task']['initializer']['parameters']['data'] = bootstrap['initializer']
     cfg = plain(SessionInput.model_validate(cfg))
+    if additions:
+        backend=cfg['policy']['backend']
+        backend_name=backend['extension_id']+'@'+backend['version']
+        if any(level['backend']!=backend_name for level in [*policy['screening'].values(),policy['final_evaluation']]):
+            raise ValueError('FIDELITY_REQUIRES_FROZEN_BACKEND')
     from extensions.tendon_family.gvs_profile import ReachControl
     from extensions.tendon_family.contracts import current_nmpc_recipe, MujocoParameters
     data = ReachControl.model_validate(cfg['policy']['controller']['parameters']['data']).model_dump(mode='json')
@@ -244,6 +265,9 @@ def resolve(path, profile=None):
                 source=dict(family_space_identity=study['family_space_identity'],request=bootstrap['request']),
                 reason='Host.create and compile_input require concrete robot signals and backend checks',
                 scientific_candidate=False, candidate_pool_member=False))
+    if additions:
+        study['final_evaluation_identity']=digest(dict(policy=policy,backend=cfg['policy']['backend'],
+            task=study['canonical_task'],controller=cfg['policy']['controller'],model=cfg['policy']['dynamics_model']))
     study['resolved_identity'] = digest(study)
     return study
 

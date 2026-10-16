@@ -115,6 +115,10 @@ def observe_pass(host, reference):
     from tools.research.state import state, update
     from tools.research.feedback import result_view
     s = state(host)
+    from tools.research.design import final_fidelity_matches
+    result=host.store.artifact(reference)
+    if not final_fidelity_matches(s['spec'],host.store.artifact(result['candidate'])):
+        return
     view = result_view(host, reference)
     if view['fresh_current_study'] and view['complete'] and view['passed']:
         import math

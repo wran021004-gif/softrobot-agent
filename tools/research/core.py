@@ -210,7 +210,7 @@ def family_claims(host, s, progress):
     candidates = [(ref,host.store.artifact(ref)) for ref in s['candidates'].values()]
     designs = {}
     for ref, candidate in candidates:
-        designs.setdefault(digest(candidate['configuration']['robot']['structure']),ref)
+        designs.setdefault(candidate.get('physical_design_identity',digest(candidate['configuration']['robot']['structure'])),ref)
     refs = list(designs.values())
     selected = host.store.artifact(s['selected']) if s.get('selected') else None
     return dict(claim_version='family_space_claims_v1',selected=s.get('selected'),
@@ -220,6 +220,8 @@ def family_claims(host, s, progress):
         design_changes_between_candidates=[dict(before=a,after=b) for a,b in zip(refs,refs[1:])],
         distinct_generated_designs=len(designs),
         structure_control_search_performed=any(host.store.artifact(r)['result'].get('evaluated') for r in s.get('search_results',[])),
+        optimizer_feedback_decisions=[row['lineage'] for r in s.get('search_results',[]) for row in host.store.artifact(r)['result'].get('evaluated',[])
+            if row.get('lineage',{}).get('previous_candidate_ref') and row['lineage'].get('evidence_used')],
         selected_structurally_new=None,model_selected_structure_search_evaluations=None,
         new_design_and_control_confirmed=None,reference_comparison='not_applicable_no_reference_design',
         task_passed=bool(s.get('selected') and result_view(host,s['selected'])['passed']),
@@ -239,6 +241,10 @@ def packet(host):
             candidates=[r for r in s['candidates'].values() if host.store.artifact(r)['profile_identity']==s['profile']['identity']],results=[dict(reference=r,**result_view(host,r),confirmation=eligibility(host,r)) for r in [*s['results'],*s.get('rl_evaluations',[])]],
             analysis_results=[decision_result(host.store.artifact(r),r) for r in s.get('analysis_results',[])],
             search_results=s.get('search_results',[]),
+            search_feedback=[dict(reference=r,status=host.store.artifact(r)['result']['status'],
+                best_candidate=(host.store.artifact(r)['result'].get('best_mathematical_candidate') or {}).get('evidence',{}).get('candidate'),
+                proxy_values=(host.store.artifact(r)['result'].get('best_mathematical_candidate') or {}).get('proxy_values'),
+                lineage_pointer='/result/evaluated',task_acceptance='unmeasured') for r in s.get('search_results',[])],
             mathematical_accounting=dict(evaluations=s.get('mathematical_evaluations',0),costs=s.get('analysis_costs',[]),engineering_preflight_s=sum(c['numerical_s'] for c in s.get('analysis_costs',[]) if c['origin']=='engineering_preflight'),cumulative_costs_preserved=True),
             mechanics_results=[dict(reference=r,**{k:host.store.artifact(r).get(k) for k in ('status','operation','trajectory_reference','objective_definition','original_task_feasible','relaxed_nlp_feasible','original_task_gaps','trajectory_metrics','charged_numerical_s','checkpoint_reference')}) for r in s.get('mechanics_results',[])],
             handoffs=[dict(reference=r,**host.store.artifact(r)) for r in s.get('handoffs',[])],

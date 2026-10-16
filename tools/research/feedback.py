@@ -98,6 +98,11 @@ def result_view(host, reference):
     owner=r.get('evaluation_owner') or r.get('study') or r.get('owning_study')
     s=state(host)
     current_refs=[*s.get('results',[]),*s.get('rl_evaluations',[])]
+    from tools.research.design import final_fidelity_matches
+    fidelity_ok=final_fidelity_matches(s['spec'],c)
+    if s['spec'].get('fidelity_policy') and not rl:
+        fidelity_ok &= r.get('scientific_configuration')==c['scientific_configuration'] and r.get('profile_identity')==s['profile']['identity']
+    passed &= fidelity_ok
     fresh=bool(plain(reference) in current_refs and plain(reference) not in s.get('historical_confirmations',[])
         and plain(reference) not in s.get('linked_selections',[]) and owner==host.run_id and not r.get('imported_historical_evidence')
         and r.get('fresh_execution',True) and not r.get('cached_operation_receipt'))
@@ -124,7 +129,7 @@ def result_view(host, reference):
         execution_timing=acceptance.get('timing'),failure_state_analysis=mathematical_context(host,r['candidate']),
         evaluation_evidence=dict(trajectory=r.get('trajectory') or (r.get('profile') or {}).get('motion'),reference=plain(reference)),candidate=r['candidate'],task=r.get('task',c['configuration']['task']),controller_route=controller['route'],controller=controller,
         mathematical_provenance=mechanics_context(host,r['candidate']),mathematical_evidence=mathematical_context(host,r['candidate']),metrics=metrics,complete=complete,passed=passed,
-        task_performance='passed' if passed else 'failed' if complete else 'unmeasured',
+        task_performance='provisional' if complete and not fidelity_ok else 'passed' if passed else 'failed' if complete else 'unmeasured',
         failure_stage=r.get('failure_stage') or ('task criteria unmet' if complete and not passed else r.get('failure_reason')),
         costs=dict(evaluation_elapsed_s=r.get('evaluation_elapsed_s'),numerical_s=r.get('numerical_s'),counts=r.get('counts')),
         evidence=plain(reference),role=r.get('role','development'),selected_execution=r.get('selected_execution'),

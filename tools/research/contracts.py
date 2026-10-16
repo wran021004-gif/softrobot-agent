@@ -65,6 +65,59 @@ class Search(Contract):
         return self
 
 
+class FidelityLevel(Contract):
+    cells_per_segment: int = Field(ge=1, le=32, strict=True)
+    backend: str = Field(min_length=1)
+
+
+class FidelityPolicy(Contract):
+    version: Literal['numerical_fidelity_v1'] = 'numerical_fidelity_v1'
+    screening: dict[str, FidelityLevel] = Field(min_length=1)
+    final_evaluation: FidelityLevel
+    require_exact_fidelity: Literal[True] = True
+    alternative_runtimes: list[str] = Field(default_factory=list)
+    runtime_preflight_limit: int = Field(default=2, ge=0, le=8, strict=True)
+
+
+class FamilyMixedSearch(Contract):
+    version: Literal['family_mixed_search_v1']
+    family_space_identity: str = Field(min_length=1)
+    method: Literal['bounded_mixed_coordinate_v1'] = 'bounded_mixed_coordinate_v1'
+    variable_groups: list[Literal['segment_count','tendon_count','spans','lengths','materials','sections','routing','control']] = Field(min_length=1)
+    segment_counts: list[int] = Field(min_length=1)
+    tendon_counts: list[int] = Field(min_length=1)
+    span_strategies: list[Literal['whole_chain','distributed_consecutive','distal']] = Field(default_factory=lambda:['whole_chain'])
+    section_types: list[Literal['circle','tube','rectangle','ellipse']] = Field(default_factory=list)
+    bounds: dict[str, tuple[FiniteFloat, FiniteFloat]] = Field(default_factory=dict)
+    screening_fidelity: str = Field(min_length=1)
+    objective: Literal['target_equilibrium_residual','held_position_min_eigenvalue']
+    operating_point: Literal['standardized_initial_pretension','controller_start_input','target_equilibrium']
+    max_proposals: int = Field(ge=1, le=128, strict=True)
+    max_evaluations: int = Field(ge=1, le=128, strict=True)
+    previous_candidate_ref: EvidenceRef | None = None
+    evidence_used: list[EvidenceRef] = Field(default_factory=list)
+    step: FiniteFloat = Field(default=.25, gt=0, le=.5)
+    minimum_step: FiniteFloat = Field(default=.03125, gt=0, le=.5)
+    stop_score: FiniteFloat | None = None
+
+    @model_validator(mode='after')
+    def selected_coordinates(self):
+        for values in (self.variable_groups,self.segment_counts,self.tendon_counts,self.span_strategies,self.section_types):
+            if len(values)!=len(set(values)):
+                raise ValueError('UNIQUE_SEARCH_CHOICES_REQUIRED')
+        if not self.span_strategies or any(type(v) is not int or v<1 for v in [*self.segment_counts,*self.tendon_counts]):
+            raise ValueError('POSITIVE_TOPOLOGY_AND_SPAN_CHOICES_REQUIRED')
+        if any(not lo<hi for lo,hi in self.bounds.values()):
+            raise ValueError('ORDERED_SEARCH_BOUNDS_REQUIRED')
+        if 'control' in self.variable_groups:
+            raise ValueError('CONTROL_VARIABLES_REQUIRE_CONTROL_DEPENDENT_EVALUATOR; STATIC_AND_GRAMIAN_PROXIES_DO_NOT_SCORE_WEIGHTS')
+        if len(self.section_types)>1 and 'sections' not in self.variable_groups:
+            raise ValueError('SECTION_CHOICES_REQUIRE_SELECTED_SECTIONS_GROUP')
+        if (self.objective=='target_equilibrium_residual')!=(self.operating_point=='target_equilibrium'):
+            raise ValueError('OBJECTIVE_OPERATING_POINT_MISMATCH')
+        return self
+
+
 class AnalysisRequest(Contract):
     candidate: EvidenceRef
     operation: Literal['equilibrium','linearization','controllability','endpoint','braking','trajectory_feasibility']
@@ -116,7 +169,7 @@ class Plan(Contract):
     interpretation: str = Field(min_length=1)
     parameters: Parameters | TopologyParameters | None = None
     generation: GenerationRequest | GenerationRequestV2 | None = None
-    search: Search | None = None
+    search: Search | FamilyMixedSearch | None = None
     candidate: EvidenceRef | None = None
     selected_execution: EvidenceRef | None = Field(default=None, description='Exact immutable passing NMPC result or independent RL evaluation; freezes the complete solution')
     revise_selection: bool = Field(default=False, description='Explicitly replace a failed selection with a scientifically changed, freshly passing development solution; retain all confirmation records and cumulative costs')

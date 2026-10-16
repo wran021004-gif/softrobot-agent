@@ -438,6 +438,10 @@ def decision_packet(host):
     result['study']={k:spec[k] for k in ('study_id','capabilities','allowed_parameters','reference_parameters','analysis_protocol','scoring_window_s','budgets','rl_limits','confirmation','budget_semantics')}
     if 'topology_authorization' in spec:
         result['study']['topology_authorization']=spec['topology_authorization']
+    if spec.get('fidelity_policy'):
+        result['study'].update(fidelity_policy=spec['fidelity_policy'],final_evaluation_identity=spec['final_evaluation_identity'],
+            family_search=spec.get('family_search'),search_contract='family_mixed_search_v1',
+            search_usage='research_plan(action=search): select groups, counts, objective, screening_fidelity and finite caps; no fixed robot. Mathematical evidence cannot satisfy final task acceptance.')
     if spec.get('start_mode')=='family_space':
         from extensions.tendon_family.family_space import decision_summary
         result['study'].update(start_mode='family_space',family_space=decision_summary(

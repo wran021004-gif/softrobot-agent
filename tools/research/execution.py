@@ -1,7 +1,7 @@
 """Owned NMPC dispatch, completion and immutable evidence packaging."""
 from copy import deepcopy
 from pathlib import Path
-import json, os, subprocess, time
+import json, os, subprocess, sys, time
 from uuid import uuid4
 from tools.platform_host import Host
 from tools.platform_store import plain, zero
@@ -54,6 +54,17 @@ def execute(host, candidate_ref, operation_key, *, role='development', selected=
     admission=capacity(host,1,confirmation or repetition,candidate=candidate_ref)
     if admission['admitted']<1:
         raise ValueError('EXECUTION_AND_CONFIRMATION_RESERVE_CANNOT_FIT')
+    if s['spec'].get('fidelity_policy'):
+        if Path(s['spec']['runtime']['research_python']).resolve()!=Path(sys.executable).resolve():
+            raise ValueError('CAPABILITY_REQUIRES_EXACT_EXECUTION_INTERPRETER')
+        from tools.research.design import final_fidelity_matches
+        if not final_fidelity_matches(s['spec'],c):
+            return dict(status='final_fidelity_required',candidate=plain(candidate_ref),task_success=None,
+                final_evaluation_identity=s['spec']['final_evaluation_identity'])
+        from tools.research.runtime_capability import capability
+        support=capability(host,plain(candidate_ref))
+        if support['status']!='runtime_available':
+            return dict(status=support['status'],candidate=plain(candidate_ref),task_success=None,capability=support)
     # A unique execution owner is persisted before starting any backend.
     owner=host.run_id+'-exec-'+uuid4().hex[:16]
     cfg=deepcopy(c['configuration'])

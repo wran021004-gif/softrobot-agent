@@ -273,3 +273,37 @@ def decision_summary(value, evidence, operations):
                 for c in space.assembly.components if isinstance(c,Rigid) and c.kind=='guide']),
         numerical_support='Candidate-specific validation required; physical generation does not certify dynamics, control or task success')
     return result
+
+
+def search_domains(space, query, grant):
+    """Authorize the small mixed-search subspace; mesh is deliberately absent."""
+    from tools.state_io import digest
+    if query.family_space_identity!=digest(space):
+        raise ValueError('FROZEN_FAMILY_SPACE_IDENTITY_MISMATCH')
+    if query.method!=grant['method'] or not set(query.variable_groups)<=set(grant['variable_groups']):
+        raise ValueError('UNAUTHORIZED_FAMILY_SEARCH_METHOD_OR_GROUP')
+    if (not set(query.segment_counts)<=set(grant['segment_counts']) or
+            not set(query.tendon_counts)<=set(grant['tendon_counts']) or
+            query.max_proposals>grant['max_proposals'] or query.max_evaluations>grant['max_evaluations']):
+        raise ValueError('SEARCH_OUTSIDE_FROZEN_NUMERICAL_SCOPE_OR_COUNT_CAP')
+    for group,choices in (('segment_count',query.segment_counts),('tendon_count',query.tendon_counts),('spans',query.span_strategies)):
+        if len(choices)>1 and group not in query.variable_groups:
+            raise ValueError('MULTIPLE_CHOICES_REQUIRE_SELECTED_GROUP: '+group)
+    domains={}
+    for i in range(max(query.segment_counts)):
+        d=space['segment_domains'].get(str(i),space['segment_domain'])
+        for k in ('length_m','young_pa'):
+            domains.setdefault(k,[]).append(d[k])
+        kinds=query.section_types or [space['assembly']['components'][0]['sections'][0]['section']['kind']]
+        for kind in kinds:
+            if kind not in d['section_dimensions_m']:
+                raise ValueError('SECTION_TYPE_OUTSIDE_FAMILY_DOMAIN')
+            for k,v in d['section_dimensions_m'][kind].items():
+                domains.setdefault('section.'+kind+'.'+k,[]).append(v)
+    domains.update({'routing.'+k:[v] for k,v in space['routing_domains'].items()})
+    groups=dict(length_m='lengths',young_pa='materials',section='sections',routing='routing')
+    for key,(lo,hi) in query.bounds.items():
+        if key not in domains or groups[key.split('.')[0]] not in query.variable_groups or any(
+                not d['minimum']<=lo<hi<=d['maximum'] for d in domains[key]):
+            raise ValueError('SEARCH_BOUND_OUTSIDE_SELECTED_PHYSICAL_DOMAIN: '+key)
+    return {k:[max(d['minimum'] for d in values),min(d['maximum'] for d in values)] for k,values in domains.items()}
