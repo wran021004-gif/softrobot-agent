@@ -27,7 +27,9 @@ def search_problem(host,query,count):
             raise ValueError('FROZEN_MIXED_SEARCH_AND_SCREENING_GRANT_REQUIRED')
         domains=search_domains(s['spec']['family_space'],q,grant)
         if q.previous_candidate_ref:
-            verify_candidate(host,q.previous_candidate_ref)
+            previous=verify_candidate(host,q.previous_candidate_ref)
+            if previous.get('generation_version')!='serial_family_generation_v2' or previous['family_space_identity']!=q.family_space_identity:
+                raise ValueError('PREVIOUS_CANDIDATE_REQUIRES_EXACT_SERIAL_FAMILY')
         from tools.research.state import readable_results
         for ref in q.evidence_used:
             if plain(ref) not in readable_results(s,host):
@@ -98,7 +100,8 @@ def run_search(host,query,key,*,guard,execute,capacity):
     checkpoint=s['searches'].get(owner)
     if checkpoint and checkpoint.get('result_reference'):
         ref=checkpoint['result_reference']
-        return dict(reference=ref,**host.store.artifact(ref),reused=True)
+        return dict(reference=ref,**host.store.artifact(ref),reused=True,
+            operation_reuse=dict(additional_mathematical_evaluations=0,additional_numerical_s=0.))
     if checkpoint is None:
         if not fit['admitted']:
             return dict(status='budget_limited',admission=fit,evaluated=[])

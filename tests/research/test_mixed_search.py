@@ -54,7 +54,7 @@ class MixedSearchTests(unittest.TestCase):
         c=design.verify_candidate(host,query['candidate'])
         p=c['parameters']
         # Explicit synthetic preference for two segments, extra tendon and shorter root.
-        score=abs(p['segment_count']-2)+1/p['tendon_count']+p['segments']['0']['length_m']
+        score=abs(p['segment_count']-2)+1/p['tendon_count']+c['resolved_parameters']['segments'][0]['length_m']
         value=dict(status='computed',proxy_values={'target_equilibrium_residual':score},
             candidate=query['candidate'],requested_operation=plain(AnalysisRequest.model_validate(query)),
             charged_numerical_s=0.,charged_analysis_evaluations=1,fixture=True)
@@ -91,6 +91,8 @@ class MixedSearchTests(unittest.TestCase):
             with self.assertRaises(ValueError):search.search_problem(self.host,q.model_copy(update=dict(bounds=bounds)),1)
         with self.assertRaises(ValueError):FamilyMixedSearch.model_validate({**request(self.spec),'variable_groups':['control']})
         with self.assertRaises(ValueError):search.search_problem(self.host,q.model_copy(update=dict(segment_counts=[4])),1)
+        search.search_problem(self.host,q.model_copy(update=dict(variable_groups=[*q.variable_groups,'sections'],
+            bounds={'section.rectangle.width_y_m':(.007,.016)})),1)
         old=resolve(ROOT/'configs/research/study.json')
         self.assertEqual(digest(old['configuration']),'31af3e097ad29fef1ffd74c5178a6267fc5ffe35889c63e98f531dd42c0df69e')
         self.assertEqual(search.coordinate_proposal(dict(best=[.5],iteration=1,step=.25))['x'],[.25])
@@ -147,7 +149,7 @@ class MixedSearchTests(unittest.TestCase):
         generated=self.generate(screening_fidelity='coarse');ref=generated['candidate']
         c=design.verify_candidate(self.host,ref)
         result=dict(candidate=ref,status='evaluated',owning_study=self.host.run_id,fresh_execution=True,
-            acceptance=dict(accepted=True,metrics=dict(terminal_position_error_m=0.,holding_max_position_error_m=0.,holding_max_speed_m_s=0.)),
+            acceptance=dict(accepted=True,metrics=dict(terminal_error_m=0.,holding_max_error_m=0.,holding_max_speed_m_s=0.)),
             scientific_configuration=c['scientific_configuration'],profile_identity=c['profile_identity'],fixture=True)
         r=save(self.host,result,'synthetic_backend_fixture');update(self.host,results=[r],evaluation_reads=[r])
         observe_pass(self.host,r)
@@ -160,6 +162,14 @@ class MixedSearchTests(unittest.TestCase):
         self.assertEqual(blocked['status'],'final_fidelity_required')
         self.assertIsNone(blocked['task_success'])
         self.assertEqual(state(self.host).get('nmpc_launches',0),0)
+        final=self.generate(screening_fidelity='standard')['candidate']
+        cc=design.verify_candidate(self.host,final)
+        passing=save(self.host,{**result,'candidate':final,'scientific_configuration':cc['scientific_configuration']},'synthetic_final_fixture')
+        update(self.host,results=[r,passing])
+        observe_pass(self.host,passing)
+        self.assertEqual(state(self.host)['success_gate']['candidate'],final)
+        with self.assertRaisesRegex(ValueError,'IMMEDIATE_CLOSEOUT'):
+            core.guard(self.host,True)
 
     def test_runtime_native_failure_containment_exact_cache_and_no_substitution(self):
         from tools.research.runtime_capability import capability
@@ -201,4 +211,48 @@ class MixedSearchTests(unittest.TestCase):
         self.assertEqual(state(self.host)['mathematical_evaluations'],2)
         self.assertGreater(state(self.host)['construction_numerical_s'],0.)
         self.assertFalse(state(self.host).get('success_gate'))
+
+    def test_recorded_exact_six_segment_failure_never_reprobes(self):
+        from tools.research.runtime_capability import capability
+        ref=design.generate_candidate(self.host,dict(version='serial_family_generation_v2',
+            family_space_identity=self.spec['family_space_identity'],segment_count=6,tendon_count=3),
+            dict(origin='recorded_failure_binding_test'),screening_fidelity='standard')['candidate']
+        with patch('tools.service_execution._run_contained',side_effect=AssertionError('Do not repeat recorded native failure')):
+            support=capability(self.host,ref)
+        self.assertEqual(support['status'],'runtime_unavailable')
+        self.assertEqual(support['native_status_hex'],'0xC00000FD')
+        self.assertTrue(support['boundary']['reused_recorded_failure'])
+        self.assertEqual(state(self.host).get('runtime_probe_launches',0),0)
+
+    def test_revised_search_can_cite_owned_previous_evidence(self):
+        ref=self.generate(screening_fidelity='coarse')['candidate']
+        query=dict(candidate=ref,operation='equilibrium',operating_point='target_equilibrium',
+            protocol=self.spec['analysis_protocol'],scoring_window_s=self.spec['scoring_window_s'])
+        evidence=self.scored(self.host,query,'context')['reference']
+        q=request(self.spec);q.update(previous_candidate_ref=ref,evidence_used=[evidence],max_proposals=1,max_evaluations=1)
+        row=self.run_scored(q)['result']['result']['evaluated'][0]
+        self.assertEqual(row['lineage']['previous_candidate_ref'],ref)
+        self.assertEqual(row['lineage']['evidence_used'],[evidence])
+        unrelated=save(self.host,dict(fixture=True),'unowned_context_fixture')
+        q['evidence_used']=[unrelated]
+        with self.assertRaisesRegex(ValueError,'OWNED_SEARCH_EVIDENCE'):
+            search.search_problem(self.host,q,1)
+
+    def test_individual_routes_and_section_moves_stay_conditional(self):
+        from tools.research.mixed_moves import initial,next_move,generation
+        q=request(self.spec);q.update(variable_groups=['segment_count','sections','routing'],
+            tendon_counts=[3],span_strategies=['whole_chain'],section_types=['circle','tube'])
+        q=FamilyMixedSearch.model_validate(q);p=initial(self.spec['family_space'],q);paths=[]
+        for cursor in range(32):
+            move,path,_=next_move(self.spec['family_space'],q,p,cursor,.25)
+            paths+=path
+            self.assertEqual(len(move['angular_offsets_rad']),move['tendon_count'])
+            self.assertEqual(len(move['radii_m']),move['tendon_count'])
+            self.assertEqual(len(move['segments']),move['segment_count'])
+            if path==['radii_m.0']:
+                generated=generation(self.spec['family_space'],q,move)
+                self.assertNotEqual(generated['spans'][0]['radius_m'],generated['spans'][1]['radius_m'])
+        self.assertIn('segments.0.section_kind',paths)
+        self.assertIn('angular_offsets_rad.0',paths)
+        self.assertIn('radii_m.0',paths)
 

@@ -290,11 +290,13 @@ def search_domains(space, query, grant):
         if len(choices)>1 and group not in query.variable_groups:
             raise ValueError('MULTIPLE_CHOICES_REQUIRE_SELECTED_GROUP: '+group)
     domains={}
+    prototypes={c['id']:c for c in space['assembly']['components']}
     for i in range(max(query.segment_counts)):
         d=space['segment_domains'].get(str(i),space['segment_domain'])
         for k in ('length_m','young_pa'):
             domains.setdefault(k,[]).append(d[k])
-        kinds=query.section_types or [space['assembly']['components'][0]['sections'][0]['section']['kind']]
+        proto=prototypes[space['serial_assembly']['root_segment' if i==0 else 'repeated_segment']]
+        kinds=query.section_types or sorted({st['section']['kind'] for st in proto['sections']})
         for kind in kinds:
             if kind not in d['section_dimensions_m']:
                 raise ValueError('SECTION_TYPE_OUTSIDE_FAMILY_DOMAIN')
