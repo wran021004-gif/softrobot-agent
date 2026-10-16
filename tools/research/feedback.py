@@ -262,6 +262,8 @@ def facts(host):
     progress=confirmation_progress(host)
     options=[*s['results'],*s.get('rl_evaluations',[]),*s.get('linked_selections',[])]
     return dict(owning_study=host.run_id,
+        physical_replays=[dict(reference=r,candidate=host.store.artifact(r).get('candidate'),
+            acceptance=host.store.artifact(r).get('acceptance')) for r in s.get('physical_replays',[])],
         identity_rules=dict(candidate='immutable full configuration; may be shared by identical constructions',
             execution='fresh independent launch with separate execution_id and owner_run_id',
             historical='imported evidence has its original ownership and previous cost; no new execution',

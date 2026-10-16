@@ -3,6 +3,7 @@ import gzip
 import hashlib
 import json
 import time
+from pathlib import Path
 import numpy as np
 from schemas.platform import BackendResult
 from tools.state_io import atomic_json
@@ -53,6 +54,72 @@ def _mujoco_state_failed(data, previous_time):
     warnings=(mujoco.mjtWarning.mjWARN_BADQPOS,mujoco.mjtWarning.mjWARN_BADQVEL,mujoco.mjtWarning.mjWARN_BADQACC)
     return (data.time<=previous_time or any(data.warning[k].number for k in warnings)
         or not all(np.isfinite(v).all() for v in (data.qpos,data.qvel,data.qacc)))
+
+
+def playback_tensions(inp, physics, scene, commands, folder):
+    """Run a fixed SI tension sequence through the existing candidate MuJoCo scene."""
+    import mujoco
+    from .mjcf import compile_xml
+    from tools.platform_registry import registry
+
+    if scene['control']['tension_execution_mode']!='ideal_tension' or scene['forces']:
+        raise ValueError('PHYSICAL_PLAYBACK_REQUIRES_IDEAL_TENSION_AND_NO_EXTERNAL_FORCE')
+    folder=Path(folder);folder.mkdir(parents=True,exist_ok=True)
+    xml=compile_xml(physics,scene,registry().parse(inp.policy.backend.parameters),folder/'robot.xml')
+    model=mujoco.MjModel.from_xml_path(str(xml));data=mujoco.MjData(model)
+    joints=[model.joint(name).id for name in physics['dofs']]
+    qi=model.jnt_qposadr[joints];vi=model.jnt_dofadr[joints]
+    names=[t['entity'] for t in physics['tendons']]
+    aids=[model.actuator(name+'_direct_tension').id for name in names]
+    tids=[model.tendon(name).id for name in names]
+    if (model.actuator_trnid[aids,0].tolist()!=tids or
+        not np.all(model.actuator_trntype[aids]==mujoco.mjtTrn.mjTRN_TENDON) or
+        not np.all(model.actuator_gainprm[aids,0]==-1) or
+        not np.all(model.actuator_gear[aids,0]==1) or
+        not np.all(model.actuator_dyntype[aids]==mujoco.mjtDyn.mjDYN_NONE)):
+        raise ValueError('PHYSICAL_PLAYBACK_REQUIRES_IDEAL_DIRECT_TENSION')
+    limits=model.actuator_ctrlrange[aids]
+    u=np.asarray(commands,dtype=float)
+    intervals=round(scene['duration_s']/scene['control_period_s'])
+    substeps=round(scene['control_period_s']/model.opt.timestep)
+    if (u.shape!=(intervals,len(aids)) or not np.isfinite(u).all() or
+        np.any(u<limits[:,0]) or np.any(u>limits[:,1]) or
+        substeps!=20 or abs(substeps*model.opt.timestep-scene['control_period_s'])>1e-12):
+        raise ValueError('PHYSICAL_PLAYBACK_GRID_OR_TENSION_MISMATCH')
+    mujoco.mj_resetData(model,data)
+    data.qpos[qi]=scene['qpos_rad'];data.qvel[vi]=scene['qvel_rad_s']
+    tip=model.site('tip_site').id
+    jac=np.zeros((3,model.nv))
+    def sample(k,requested,actual):
+        mujoco.mj_forward(model,data)
+        mujoco.mj_jacSite(model,data,jac,None,tip)
+        position=data.site_xpos[tip].copy();velocity=jac@data.qvel
+        return dict(control_step=k,time_s=k*scene['control_period_s'],engine_time_s=float(data.time),
+            tip_m=position.tolist(),tip_velocity_m_s=velocity.tolist(),
+            position_error_m=float(np.linalg.norm(position-np.asarray(scene['target_world_m']))),
+            speed_m_s=float(np.linalg.norm(velocity)),qpos_rad=data.qpos[qi].tolist(),qvel_rad_s=data.qvel[vi].tolist(),
+            requested_tension_n=None if requested is None else requested.tolist(),actual_tension_n=actual.tolist())
+    rows=[sample(0,None,np.zeros(len(aids)))];atomic_json(folder/'samples.json',rows)
+    steps=0;failure=None
+    for k,command in enumerate(u):
+        data.ctrl[aids]=command
+        mujoco.mj_forward(model,data)
+        actual=-data.actuator_force[aids].copy()
+        if not np.allclose(actual,command,rtol=0,atol=1e-9):
+            failure=dict(interval=k,reason='DIRECT_TENSION_NOT_APPLIED',requested=command.tolist(),actual=actual.tolist());break
+        for j in range(substeps):
+            previous=float(data.time);mujoco.mj_step(model,data);steps+=1
+            if _mujoco_state_failed(data,previous):
+                failure=dict(interval=k,substep=j+1,reason='MUJOCO_NUMERICAL_FAILURE',time_s=float(data.time));break
+        if failure:break
+        rows.append(sample(k+1,command,-data.actuator_force[aids].copy()))
+        atomic_json(folder/'samples.json',rows)
+    return dict(status='completed' if failure is None and len(rows)==intervals+1 else 'incomplete',
+        failure=failure,samples=rows,physics_steps=steps,command_intervals=len(rows)-1,
+        model_identity=physics['identity'],scene_identity=scene['identity'],
+        xml_sha256=hashlib.sha256(xml.read_bytes()).hexdigest(),tendon_order=names,
+        physics_timestep_s=float(model.opt.timestep),integrator=int(model.opt.integrator),
+        physical_backend='backend.family_mujoco',tension_execution_mode='ideal_tension')
 
 
 class SerialBackend:

@@ -33,6 +33,9 @@ def main():
                 atomic_json(destination,value)
             value=calculate(request['configuration'],request['binding'],request['query'],request.get('exact_point'),checkpoint=checkpoint,
                 design_context=request.get('design_context'))
+        elif request.get('kind')=='physical_replay':
+            from tools.research.physical_replay import calculate
+            value=calculate(request,path.parent)
         else:
             value=execute(request)
     except Exception as exc:

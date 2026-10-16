@@ -188,8 +188,13 @@ class CrossReplayRequest(Contract):
     source: EvidenceRef
 
 
+class PhysicalReplayRequest(Contract):
+    candidate: EvidenceRef
+    source: EvidenceRef
+
+
 class Plan(Contract):
-    action: Literal['generate', 'propose', 'execute', 'search', 'mechanics', 'replay', 'cross_replay', 'diagnose', 'confirm', 'select', 'stop']
+    action: Literal['generate', 'propose', 'execute', 'search', 'mechanics', 'replay', 'cross_replay', 'physical_replay', 'diagnose', 'confirm', 'select', 'stop']
     next_step: Literal['adjust_training','revise_design','diagnose','stop'] | None = None
     hypothesis: str = Field(min_length=1)
     supporting_evidence: list[EvidenceRef] = Field(default_factory=list)
@@ -207,6 +212,7 @@ class Plan(Contract):
     diagnostic: LocalDiagnostic | None = None
     mechanics: MechanicsRequest | None = None
     cross_replay: CrossReplayRequest | None = None
+    physical_replay: PhysicalReplayRequest | None = None
     mechanics_source: EvidenceRef | None = None
     experience_disposition: dict[str, Literal['adopted', 'rejected', 'context_only']] = Field(default_factory=dict)
 
@@ -222,9 +228,10 @@ class Plan(Contract):
         if self.revise_selection and self.action not in ('confirm','select'):
             raise ValueError('REVISE_SELECTION_REQUIRES_CONFIRM_ACTION')
         required = {'generate': 'generation', 'propose': 'parameters', 'execute': 'candidate', 'search': 'search', 'confirm': 'selected_execution', 'select': 'selected_execution',
-                    'mechanics': 'mechanics', 'replay': 'mechanics_source', 'cross_replay':'cross_replay'}
+                    'mechanics': 'mechanics', 'replay': 'mechanics_source', 'cross_replay':'cross_replay',
+                    'physical_replay':'physical_replay'}
         active = required.get(self.action)
-        for field in ('generation', 'parameters', 'search', 'candidate', 'selected_execution', 'mechanics', 'cross_replay'):
+        for field in ('generation', 'parameters', 'search', 'candidate', 'selected_execution', 'mechanics', 'cross_replay','physical_replay'):
             if (getattr(self, field) is not None) != (field == active):
                 raise ValueError('ACTION_REQUIRES_ONLY_' + str(active))
         if self.action=='replay' and self.mechanics_source is None:

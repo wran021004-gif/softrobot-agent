@@ -191,6 +191,7 @@ SOROSIM_SOURCES = PLATFORM_SOURCES + PHYSICAL_SOURCES + (
     'extensions/tendon_family/gvs_profile.py',
     'extensions/tendon_family/gvs.py',
     'matlab/sorosim_control/sr_gateway.m',
+    'matlab/sorosim_control/sr_trajectory_outputs.m',
     'matlab/sorosim_control/sr_model.m',
     'matlab/sorosim_control/sr_routing.m',
     'matlab/sorosim_control/sr_checks.m',
