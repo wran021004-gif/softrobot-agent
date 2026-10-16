@@ -42,7 +42,15 @@ if ismember(r.operation,{'replay','cross_replay'})
         physical(:,k)=[(b(1:c.n)-a(1:c.n)-c.h*b(c.n+1:end))/10;d.residual/.001];
     end
     difference=max(abs((X-prepared.initial.states)./c.state_scale),[],'all');
-    violation=max([abs(ce);ci;c.lower-z(1:nv);z(1:nv)-c.upper;-z(end-1:end);abs(physical(:))]);
+    if interior
+        slackLower=[-1;0];slackUpper=[inf;0];
+    elseif feasibility
+        slackLower=[0;0];slackUpper=[inf;0];
+    else
+        slackLower=[0;0];slackUpper=[inf;inf];
+    end
+    violation=max([abs(ce);ci;c.lower-z(1:nv);z(1:nv)-c.upper; ...
+        slackLower-z(end-1:end);z(end-1:end)-slackUpper;abs(physical(:))]);
     out=struct('status','computed','passed',violation<=1e-5 && difference<=1e-5, ...
         'independent_scaled_violation',violation,'reintegrated_scaled_state_error',difference, ...
         'force_residual_max_nm2',max(abs(physical(c.n+1:end,:)),[],'all')*.001, ...
