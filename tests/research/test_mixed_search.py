@@ -56,6 +56,7 @@ class MixedSearchTests(unittest.TestCase):
         # Explicit synthetic preference for two segments, extra tendon and shorter root.
         score=abs(p['segment_count']-2)+1/p['tendon_count']+c['resolved_parameters']['segments'][0]['length_m']
         value=dict(status='computed',proxy_values={'target_equilibrium_residual':score},
+            operation_key=key+'-analysis',
             candidate=query['candidate'],requested_operation=plain(AnalysisRequest.model_validate(query)),
             charged_numerical_s=0.,charged_analysis_evaluations=1,fixture=True)
         ref=save(host,value,'synthetic_analysis_fixture')
@@ -128,7 +129,7 @@ class MixedSearchTests(unittest.TestCase):
         self.assertNotEqual(after_good,after_bad)
 
     def test_pending_checkpoint_recovery_reuses_sealed_analysis(self):
-        q=request(self.spec)
+        q=request(self.spec);q.update(max_evaluations=2)
         original=self.scored;calls=[]
         def interrupted(*args,**kwargs):
             result=original(*args,**kwargs);calls.append(result)
@@ -140,8 +141,10 @@ class MixedSearchTests(unittest.TestCase):
         with patch.object(analysis,'dispatch',side_effect=original):
             output=search.run_search(self.host,q,'recovery',guard=lambda *a:None,execute=None,capacity=None)
         self.assertEqual(output['result']['evaluated'][0]['evidence']['analysis'],calls[0]['reference'])
-        self.assertEqual(output['result']['evaluated'][0]['actual_mathematical_evaluations'],0)
-        self.assertLessEqual(state(self.host)['mathematical_evaluations'],8)
+        self.assertEqual(output['result']['evaluated'][0]['actual_mathematical_evaluations'],1)
+        self.assertEqual(output['result']['evaluated'][0]['lineage']['cost']['additional_evaluations'],0)
+        self.assertEqual(state(self.host)['mathematical_evaluations'],2)
+        self.assertEqual(output['result']['resource_use']['actual_mathematical_evaluations'],2)
 
     def test_screening_synthetic_pass_cannot_close_or_select(self):
         from tools.research.budget import observe_pass
@@ -223,6 +226,23 @@ class MixedSearchTests(unittest.TestCase):
         self.assertEqual(support['native_status_hex'],'0xC00000FD')
         self.assertTrue(support['boundary']['reused_recorded_failure'])
         self.assertEqual(state(self.host).get('runtime_probe_launches',0),0)
+
+    def test_invalid_search_proposal_retains_cost_and_spends_no_math(self):
+        generate=design.generate_candidate;attempts=[]
+        def invalid_first(host,request,provenance,**kwargs):
+            raw=deepcopy(request)
+            if not attempts:raw['segments']['0']['length_m']=2.
+            attempts.append(raw)
+            return generate(host,raw,provenance,**kwargs)
+        q=request(self.spec);q.update(max_proposals=2,max_evaluations=1)
+        with patch.object(design,'generate_candidate',side_effect=invalid_first):
+            output=self.run_scored(q)['result']['result']
+        first=output['evaluated'][0]
+        self.assertEqual(first['computation_status'],'invalid')
+        self.assertEqual(first['actual_mathematical_evaluations'],0)
+        self.assertIsNone(first['lineage']['new_candidate_ref'])
+        self.assertGreater(first['lineage']['cost']['construction_numerical_s'],0.)
+        self.assertEqual(state(self.host)['mathematical_evaluations'],1)
 
     def test_revised_search_can_cite_owned_previous_evidence(self):
         ref=self.generate(screening_fidelity='coarse')['candidate']

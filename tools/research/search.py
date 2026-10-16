@@ -204,10 +204,14 @@ def run_search(host,query,key,*,guard,execute,capacity):
         if not proposal.get('candidate'):
             if mixed:
                 from tools.research.design import generate_candidate
+                before=state(host).get('construction_numerical_s',0.)
                 generated=generate_candidate(host,proposal['parameters'],dict(lineage=proposal['lineage'],plan_key=owner),screening_fidelity=q.screening_fidelity)
+                proposal['construction_numerical_s']=state(host).get('construction_numerical_s',0.)-before
                 if not generated.get('candidate'):
                     rows.append(dict(point=proposal['point'],parameters=proposal['parameters'],candidate_id=None,
-                        computation_status=generated['status'],construction=generated,lineage=proposal['lineage'],
+                        computation_status=generated['status'],construction=generated,
+                        lineage={**proposal['lineage'],'new_candidate_ref':None,'actual_mathematical_evaluation_ref':None,
+                            'observed_result':generated,'cost':dict(additional_evaluations=0,construction_numerical_s=proposal['construction_numerical_s'])},
                         actual_mathematical_evaluations=0,evidence={}))
                     checkpoint['pending']=None
                     persist()
@@ -237,11 +241,15 @@ def run_search(host,query,key,*,guard,execute,capacity):
         row.update(candidate_id=c['candidate_id'],scientific_identity=c['identity'],parameters=proposal['parameters'],
             latent_coordinates=proposal['latent'],objective_identity=digest(checkpoint['problem']),used_feedback=proposal['feedback'])
         if mixed:
+            attributed=not reused or r.get('operation_key')==op+'-analysis'
             row.update(point=proposal['point'],resolved_parameters=c['resolved_parameters'],
                 physical_design_identity=c['physical_design_identity'],numerical_model_identity=c['numerical_model_identity'],
-                actual_mathematical_evaluations=0 if reused else 1,
+                actual_mathematical_evaluations=int(attributed),
+                mathematical_numerical_s=r.get('charged_numerical_s',0.) if attributed else 0.,
                 lineage={**proposal['lineage'],'new_candidate_ref':ref,'actual_mathematical_evaluation_ref':output['reference'],
                     'observed_result':r.get('proxy_values',{}),'cost':dict(additional_evaluations=0 if reused else 1,
+                        attributed_evaluations=int(attributed),
+                        construction_numerical_s=proposal.get('construction_numerical_s',0.),
                         numerical_s=0 if reused else r.get('charged_numerical_s'))})
         rows.append(row)
         checkpoint['pending']=None
