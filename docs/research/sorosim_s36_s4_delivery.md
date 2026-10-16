@@ -10,8 +10,8 @@ acceptance thresholds, default controller and RL route are unchanged.
 | Stage | Implemented and executed | Acceptance | Source commit |
 |---|---|---|---|
 | S3.6 | Three matched static states, 50 frames each, separated forces, additive link inertia/gravity, controlled geometry substitutions, immediate replay persistence | Passed within bounded diagnostic scope | `3f45b849` (normally pushed) |
-| S4-A | Candidate-bound operating points, MATLAB statics/linearization/IFT, existing shared feasibility/Gramian kernels and scoped evidence | Passed in measured local scope | Recorded after stage commit |
-| Performance | Pending | Not complete | Pending |
+| S4-A | Candidate-bound operating points, MATLAB statics/linearization/IFT, existing shared feasibility/Gramian kernels and scoped evidence | Passed in measured local scope | `8f4c642b` (normally pushed) |
+| Performance | Shared kinematic traversal, matched old/new derivative and full-NLP evaluation | Passed for measured kernel/callback speedup | Recorded after stage commit |
 | S4-B | Pending | Not complete | Pending |
 
 ## S3.6 evidence and findings
@@ -184,6 +184,53 @@ real S4 derivatives/sensitivities, unsupported topology sensitivity, and injecte
 solver failure remaining inconclusive. Synthetic interface checks are not physical
 validation. The historical source-freeze tests read their original Git trees.
 
+## Performance implementation and verification
+
+The optimization is a private fused kinematic traversal in the existing routing
+owner. It shares transforms and body Jacobians using the pinned upstream Zanna-4
+recurrence and already installed expmap MEX. It supports exactly the adapter's
+fixed-joint serial chain, one flexible division per segment, real rigid COMs and
+all existing attachment/guide nodes. It does not change the rod basis, quadrature,
+chord routing, finite-difference step, integration, objective, bounds or tolerances.
+No new cache or optimizer was introduced. The upstream repository is unchanged.
+
+For each endpoint chord, with delta = p2-p1, length l, unit direction e and
+Jacobian difference D, dl/dq = e' D and the tendon force is -D' e u.
+The Hessian is D'(I-ee')D/l plus the contraction of endpoint position Hessian
+difference with e. Cross-segment/rigid-offset attachment derivatives belong in
+that second term. This change retains the verified centered derivative of the
+complete chord force map; it does not substitute a continuously guided-cable
+Hessian. The saved computation is the duplicated geometry traversal underneath
+each perturbation. An analytical second-derivative replacement remains optional.
+
+`evidence/sorosim_performance/attempt01/` contains the exact baseline routing source
+from `8f4c642b`, source hashes, matched cases, every timing sample and complete
+objective/constraint arrays and Jacobians. One Engine/model alternates baseline
+and optimized order across three archived selected trajectories and the original
+initialized full-horizon trajectory. Each case warms four times and records nine
+samples. No full solver was run and no horizon was shortened.
+
+| Case | Routing before/after (ms) | Derivatives before/after (ms) | Unique full trajectory before/after (ms) | Full callback speedup |
+|---|---:|---:|---:|---:|
+| Saved 0 | 19.467 / 15.958 | 24.025 / 19.775 | 253.124 / 213.771 | 1.1841 |
+| Saved 1 | 19.613 / 16.134 | 25.244 / 20.356 | 245.159 / 207.232 | 1.1830 |
+| Saved 2 | 19.675 / 16.757 | 23.843 / 20.193 | 240.339 / 206.596 | 1.1633 |
+| Initial | 19.766 / 15.970 | 23.891 / 20.442 | 247.528 / 217.173 | 1.1398 |
+
+The consistent median reductions exceed typical within-batch median absolute
+deviations: routing .40–.68 ms and callbacks 2.80–12.56 ms. Occasional scheduling
+outliers overlap raw timing ranges; all samples remain visible. This is a measured
+kernel/callback gain, **not a complete NMPC solver-level speedup** or real-time
+control result. Historical S3/S3.5 timings remain historical measurements.
+
+Maximum full constraint-Jacobian component difference is 2.334e-7 in scaled NLP
+units, with relative norm at most 7.95e-11; centered finite differences amplify
+roundoff. Objective, gradient, constraints, tendon lengths/forces/tangents,
+tip-velocity derivatives and dynamics pass matched tolerances. Independent
+directional objective/constraint checks pass the unchanged 2e-4 bound. Nine
+focused saved-evidence/analysis/NMPC tests pass. No mathematical or physical task
+acceptance threshold changed.
+
 ## Reproduction
 
 ```powershell
@@ -208,6 +255,12 @@ $analysis='runs/sorosim-s4a-'+[guid]::NewGuid().ToString('N')
 & $p tests/research/test_sorosim_analysis.py --run $analysis
 & $p tests/research/test_sorosim_analysis.py --extend $analysis
 & $p tests/research/test_sorosim_analysis.py --shared $analysis
+# Cheap performance evidence verification.
+& $p -m unittest test_sorosim_performance -v
+# Fresh matched warmed kernels; no full optimizer solve.
+$perf='runs/sorosim-performance-'+[guid]::NewGuid().ToString('N')
+& $p tests/research/test_sorosim_performance.py --run $perf
+& $p tests/research/test_sorosim_performance.py --verify $perf
 ```
 
 ## Remaining milestones

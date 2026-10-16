@@ -4,7 +4,7 @@ if nargin<4, tangent=false; end
 started=tic; q=q(:);u=u(:); S=model.S;
 assert(numel(q)==S.ndof && all(isfinite(q)),'INVALID_CONFIGURATION');
 assert(numel(u)==numel(model.spec.routes) && all(isfinite(u)),'INVALID_TENSIONS');
-g=S.FwdKinematics(model.T*q); J=S.Jacobian(model.T*q)*model.T;
+[g,J]=kinematics(model,q);
 [tip,Jtip]=attachment(model,model.spec.tip,g,J);
 m=numel(model.spec.routes); ell=zeros(m,1); dl=zeros(m,S.ndof); positions=cell(m,1);
 for i=1:m
@@ -22,6 +22,7 @@ for i=1:m
     end
     positions{i}=p';
 end
+
 out=struct('lengths',ell,'length_jacobian',dl,'force_map',-dl', ...
     'tendon_force',-dl'*u,'tip_pose',tip,'tip_jacobian',Jtip, ...
     'routing_positions', {positions},'coordinate_order',{model.spec.coordinate_order}, ...
@@ -70,4 +71,41 @@ R=base(1:3,1:3);
 pose=base;pose(1:3,4)=base(1:3,4)+R*offset;
 pose(1:3,1:3)=R*a.rotation;
 jac=[R*local(1:3,:); R*(local(4:6,:)-dinamico_tilde(offset)*local(1:3,:))];
+end
+
+function [g,J]=kinematics(model,q)
+% One Zanna-4 traversal shares transforms with body Jacobians. The adapter
+% constructs only fixed joints and one flexible division per segment.
+% Same pinned upstream recurrence, using its already verified expmap MEX.
+S=model.S;n=S.ndof;qs=model.T*q;
+g=zeros(4*S.nsig,4);J=zeros(6*S.nsig,n);ends=cell(S.N,1);tails=cell(S.N,1);
+for k=1:S.N
+    c=model.spec.links{k};parent=c.parent;
+    if parent==0,pose=c.connection;B=zeros(6,n);
+    else,pose=ends{parent}*c.connection;B=dinamico_Adjoint(ginv(c.connection))*tails{parent};end
+    indices=model.node_indices{k};joint=indices(1)-1;
+    g((joint-1)*4+(1:4),:)=pose;J((joint-1)*6+(1:6),:)=B;
+    if strcmp(c.kind,'flexible_segment')
+        rod=S.CVRods{k}(2);ix=c.start+(1:rod.dof);local=qs(ix);
+        for j=1:rod.nip
+            if j>1
+                rows=(j-2)*6+(1:6);P1=rod.Phi_Z1(rows,:);P2=rod.Phi_Z2(rows,:);
+                xi1=P1*local+rod.xi_star(rows,2);xi2=P2*local+rod.xi_star(rows,3);
+                h=(rod.Xs(j)-rod.Xs(j-1))*c.length;ad1=dinamico_adj(xi1);
+                omega=h/2*(xi1+xi2)+sqrt(3)*h^2/12*ad1*xi2;
+                Z=h/2*(P1+P2)+sqrt(3)*h^2/12*(ad1*P2-dinamico_adj(xi2)*P1);
+                [step,Tg]=variable_expmap_gTg_mex(omega);
+                B(:,ix)=B(:,ix)+Tg*Z;
+                B=dinamico_Adjoint(ginv(step))*B;pose=pose*step;
+            end
+            index=indices(j);g((index-1)*4+(1:4),:)=pose;J((index-1)*6+(1:6),:)=B;
+        end
+    else
+        shift=eye(4);shift(1:3,4)=c.com(:);
+        index=indices(1);g((index-1)*4+(1:4),:)=pose*shift;
+        J((index-1)*6+(1:6),:)=dinamico_Adjoint(ginv(shift))*B;
+    end
+    ends{k}=pose;tails{k}=B;
+end
+J=J*model.T;
 end

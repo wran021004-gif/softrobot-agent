@@ -3,6 +3,27 @@ function out=sr_diagnose(model,r)
 assert(model.S.ndof==12,'S35_PROBE_REQUIRES_ARCHIVED_12_COORDINATE_CANDIDATE');
 q=r.x(1:12);v=r.x(13:24);u=r.u;a=r.a;
 switch r.kind
+    case 'performance'
+        c=r.context;c.profile=false;z=r.z(:);
+        [~,~,inspect]=sr_nmpc_callbacks(model,c);
+        % Warm both unique-vector callback evaluations and local derivative paths.
+        for j=1:4
+            sr_routing(model,q,u,true,v);sr_derivatives(model,q,v,u,a);inspect(z+j*1e-9);
+        end
+        times=zeros(9,3);
+        for j=1:9
+            t=tic;route=sr_routing(model,q,u,true,v);times(j,1)=toc(t);
+            t=tic;d=sr_derivatives(model,q,v,u,a);times(j,2)=toc(t);
+            t=tic;e=inspect(z+j*1e-9);times(j,3)=toc(t);
+        end
+        out.warmed_s=times;out.routing=route;out.derivatives=d;
+        e=inspect(z);e.jacobian=full(e.jacobian);out.evaluation=e;
+        direction=sin((1:numel(z))');direction=direction/norm(direction);h=1e-5;
+        ep=inspect(z+h*direction);em=inspect(z-h*direction);
+        out.directional_absolute=[abs((ep.objective-em.objective)/(2*h)-e.gradient'*direction), ...
+            norm((ep.constraints-em.constraints)/(2*h)-e.jacobian*direction,inf)];
+        out.directional_relative=out.directional_absolute./max(1e-12, ...
+            [abs((ep.objective-em.objective)/(2*h)),norm((ep.constraints-em.constraints)/(2*h),inf)]);
     case 'geometry_mechanics'
         out.routing=sr_routing(model,q,u,false,[],r.samples);
         out.dynamics=sr_dynamics(model,q,v,u,zeros(12,1));
