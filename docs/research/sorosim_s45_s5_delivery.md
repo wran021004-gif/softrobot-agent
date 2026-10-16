@@ -176,6 +176,48 @@ drift. The measured improvement does not isolate model mismatch, projection,
 solver quality, or control weights as a single cause, and it is not evidence
 of real-time NMPC.
 
-S5-RL, S5-T sensitivity, and the integrated Agent pilot remain unexecuted at
-this boundary. They must retain distinct source, candidate, task, backend and
+## S5-RL direct and residual PPO
+
+The `sorosim-s5rl-design-b-20261016` study regenerated the same four-tendon
+Design B and admitted the exact complete S4.5 mathematical tension sequence
+as a residual reference. Admission checked the model, task, candidate,
+tendon order, 35-command grid and force bounds. Its reference source was the
+sealed S5-A mathematical-source artifact, whose open-loop MuJoCo outcome was
+a physical failure. Reference admission did not transfer a success claim.
+
+Two real PPO workers each completed 32,768 attempted actions and 128 rollout
+optimizations. The direct worker recorded 782 complete and 260 failed training
+episodes; the residual worker recorded 936 complete and zero failed training
+episodes. Both published checkpoints. Each checkpoint then received one fresh
+35-action, 700-physics-step MuJoCo task evaluation.
+
+| Independently evaluated route | Direct PPO | Residual PPO |
+|---|---:|---:|
+| Terminal error (m) | 0.189722862 | 0.041048734 |
+| Holding maximum position error (m) | 0.198931568 | 0.047028312 |
+| Holding maximum speed (m/s) | 0.355531167 | 0.292965029 |
+| Complete evaluation | Yes | Yes |
+| Original task passed | No | No |
+
+The [S5-RL Store archive](../../evidence/sorosim_s5rl/study/archive_manifest.json)
+retains the source bridge, frozen candidate and task, training summaries,
+checkpoint identities, evaluation trajectories, and ledger. The
+[stage summary](../../evidence/sorosim_s5rl/summary.json) links both routes.
+Combined attempted training actions were exactly 65,536, with two admitted
+training stages and two independent evaluations. The ledger charged four
+physical launch slots (two starts and two evaluations), eight public
+operations, zero provider requests, and 127.851 s numerical time. Training
+reward and failed-episode fractions were not used as task acceptance.
+
+The exported S5-RL summary has a legacy `aggregate_action_limit: null` display
+field despite its frozen `authorized_limits.training_actions: 65536` and the
+enforced 32,768-action per-stage grant. The feedback display was corrected
+after this sealed result; the original summary and actual action counts remain
+unchanged. None of the direct/residual results outperformed the S5-B feedback
+controller on the original terminal or holding position metrics, and all
+three still failed the task. This single fixed-budget comparison does not
+establish general controller superiority.
+
+S5-T sensitivity and the integrated Agent pilot remain unexecuted at this
+boundary. They must retain distinct source, candidate, task, backend and
 budget identities.

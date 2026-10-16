@@ -1,0 +1,310 @@
+{
+  "stage": "S5-RL",
+  "candidate": {
+    "artifact_id": "7c2cd599edc16837f26765b006f25ffc9aff84c123e2342a3174c126fb4b7e4c",
+    "media_type": "application/json"
+  },
+  "source": {
+    "artifact_id": "45815dc9cbf9266b3406a91657d1f9d7a163ac96557a5a4dce750d41f16780f9",
+    "media_type": "application/json"
+  },
+  "reference_relation": {
+    "candidate": {
+      "artifact_id": "7c2cd599edc16837f26765b006f25ffc9aff84c123e2342a3174c126fb4b7e4c",
+      "media_type": "application/json"
+    },
+    "source": {
+      "artifact_id": "45815dc9cbf9266b3406a91657d1f9d7a163ac96557a5a4dce750d41f16780f9",
+      "media_type": "application/json"
+    },
+    "mathematical_model_identity": "8f8eceb5f74d4b171c87f333db4db0f353aad051b375ff26aca795f7ac1fbaf2",
+    "task_identity": "882b3493037dcc8f8da294b3473e1223f0465e92c35bc3064bfc42d467bf212e",
+    "scope": "Complete compatible tension reference; physical acceptance is separate"
+  },
+  "reference": {
+    "candidate": {
+      "artifact_id": "7c2cd599edc16837f26765b006f25ffc9aff84c123e2342a3174c126fb4b7e4c",
+      "media_type": "application/json"
+    },
+    "source": {
+      "artifact_id": "45815dc9cbf9266b3406a91657d1f9d7a163ac96557a5a4dce750d41f16780f9",
+      "media_type": "application/json"
+    },
+    "source_kind": "mathematics",
+    "available": true,
+    "reference": {
+      "path": "D:\\softrobot-agent\\.worktrees\\sorosim-matlab-nmpc\\runs\\research\\sorosim-s5rl-design-b-20261016\\rl_inputs\\45815dc9cbf9266b3406a91657d1f9d7a163ac96557a5a4dce750d41f16780f9.npz",
+      "sha256": "fd5b259665200ad4aef6616be3b44944ea98449dcb6d57ada79c80f927ba3fe2",
+      "candidate_identity": "3fd485b13b4f5490e7a018ef9ac8fbdc0a8fd73d25157cc1ea2e9577064afdcc",
+      "task_identity": "882b3493037dcc8f8da294b3473e1223f0465e92c35bc3064bfc42d467bf212e",
+      "tendon_order": [
+        "tendon_0",
+        "tendon_1",
+        "tendon_2",
+        "tendon_3"
+      ],
+      "control_period_s": 0.01
+    },
+    "convention": "Exact candidate/task/channel SI interval tensions; reference completeness does not imply task acceptance"
+  },
+  "routes": [
+    {
+      "mode": "direct",
+      "run_id": "sorosim-s5rl-design-b-20261016-ffdd9fc4",
+      "training_summary": {
+        "artifact_id": "bdf1ea5e2a052d20c8c49358dd717059d95f6f796dbcebf7fce85cfce64f4edc",
+        "media_type": "application/json"
+      },
+      "actual_actions": 32768,
+      "status": "completed",
+      "evaluation": {
+        "artifact_id": "1c9c2d3fcc0595360f6271d68324c36e2e41ad7161dd3299ddc01025c27a00cf",
+        "media_type": "application/json"
+      },
+      "evaluation_facts": {
+        "acceptance": {
+          "holding_speed_limit_m_s": 0.02,
+          "holding_steps": [
+            30,
+            31,
+            32,
+            33,
+            34,
+            35
+          ],
+          "position_limit_m": 0.01,
+          "terminal_position_limit_m": 0.01
+        },
+        "candidate": {
+          "artifact_id": "7c2cd599edc16837f26765b006f25ffc9aff84c123e2342a3174c126fb4b7e4c",
+          "media_type": "application/json"
+        },
+        "candidate_identity": "3fd485b13b4f5490e7a018ef9ac8fbdc0a8fd73d25157cc1ea2e9577064afdcc",
+        "checkpoint": "step-00032768-ac94bd1b",
+        "checkpoint_training_step": 32768,
+        "config_sha256": "1c632a87fcffbfb503b87bb27e220dc756978a584133da68037e873f8bca78af",
+        "configuration": {
+          "artifact_id": "8f73dda4c010c5339c97ed649af1b49947509f2a4442c4392a64ee2ee6bc0b1d",
+          "media_type": "application/json"
+        },
+        "episodes": [
+          {
+            "complete": true,
+            "counts": {
+              "attempted_actions": 35,
+              "attempted_physics_steps": 700,
+              "complete_episodes": 1,
+              "completed_actions": 35,
+              "failed_episodes": 0
+            },
+            "episode_reward": -11661.713711041963,
+            "holding_coverage_complete": true,
+            "holding_max_position_error_m": 0.19893156837298007,
+            "holding_max_speed_m_s": 0.3555311665993437,
+            "holding_sample_steps": [
+              30,
+              31,
+              32,
+              33,
+              34,
+              35
+            ],
+            "numerical_failure": null,
+            "passed": false,
+            "terminal_position_error_m": 0.18972286198848873,
+            "trajectory_rows": 36
+          }
+        ],
+        "evaluation_elapsed_s": 1.0649036999093369,
+        "execution_id": "97a29ed429f54030a2b0caa04ca21e01",
+        "experiment_configuration": {
+          "artifact_id": "c93fe9f4aa2d2a26e062032e25b6f7a59a2911b71667e89aa58daa6350bb59ff",
+          "media_type": "application/json"
+        },
+        "failure_reason": "task_thresholds_not_met",
+        "failure_stage": "task criteria unmet",
+        "implementation": "7dad1faa559273ddcff36d57cbf77637eeb58cae",
+        "independent_evaluation_executed": true,
+        "last_valid_position_error_m": 0.18972286198848873,
+        "last_valid_speed_m_s": 0.3555311665993437,
+        "mode": "direct",
+        "operation_key": "s5rl-direct-evaluate",
+        "passed": false,
+        "policy": "D:\\softrobot-agent\\.worktrees\\sorosim-matlab-nmpc\\runs\\research\\sorosim-s5rl-design-b-20261016\\rl\\sorosim-s5rl-design-b-20261016-ffdd9fc4\\checkpoints\\step-00032768-ac94bd1b\\policy.zip",
+        "policy_sha256": "5b51b6203b2cbafa911be0a5c2ebc75f955b1ad1d05af3c90fbb8330bc2d8f41",
+        "role": "development",
+        "run_id": "sorosim-s5rl-design-b-20261016-ffdd9fc4",
+        "scope": "one deterministic fixed-initial-state episode; no robustness claim",
+        "seed": 17,
+        "selected_execution": null,
+        "study": "sorosim-s5rl-design-b-20261016",
+        "task": {
+          "artifact_id": "fe7b95c3c1ba12659b59c1983544b6454c9d90ac42c4dec528e9736d99fd3a6b",
+          "media_type": "application/json"
+        },
+        "task_identity": "882b3493037dcc8f8da294b3473e1223f0465e92c35bc3064bfc42d467bf212e",
+        "trajectory": "D:\\softrobot-agent\\.worktrees\\sorosim-matlab-nmpc\\runs\\research\\sorosim-s5rl-design-b-20261016\\rl\\sorosim-s5rl-design-b-20261016-ffdd9fc4\\evaluate-97a29ed429f54030a2b0caa04ca21e01\\trajectory.csv"
+      }
+    },
+    {
+      "mode": "residual",
+      "run_id": "sorosim-s5rl-design-b-20261016-b452bcd3",
+      "training_summary": {
+        "artifact_id": "f1e504b652cef8e87e366a05b95b621d1c0a308fcaa50748f71874d156f4a24c",
+        "media_type": "application/json"
+      },
+      "actual_actions": 32768,
+      "status": "completed",
+      "evaluation": {
+        "artifact_id": "5c9fa07c579b2ba18e09d7b0bbb43d38328b97c129d3ccc881398a126a509f94",
+        "media_type": "application/json"
+      },
+      "evaluation_facts": {
+        "acceptance": {
+          "holding_speed_limit_m_s": 0.02,
+          "holding_steps": [
+            30,
+            31,
+            32,
+            33,
+            34,
+            35
+          ],
+          "position_limit_m": 0.01,
+          "terminal_position_limit_m": 0.01
+        },
+        "candidate": {
+          "artifact_id": "7c2cd599edc16837f26765b006f25ffc9aff84c123e2342a3174c126fb4b7e4c",
+          "media_type": "application/json"
+        },
+        "candidate_identity": "3fd485b13b4f5490e7a018ef9ac8fbdc0a8fd73d25157cc1ea2e9577064afdcc",
+        "checkpoint": "step-00032768-f344743d",
+        "checkpoint_training_step": 32768,
+        "config_sha256": "04eb30b3c589a76482e862750e4cb1b9024528a69d23e2df0f18bc1eb66c1cad",
+        "configuration": {
+          "artifact_id": "b6e620b9d80f0f9d3fed5e00316c096a8b2afb1490163f344e856068ec12b10e",
+          "media_type": "application/json"
+        },
+        "episodes": [
+          {
+            "complete": true,
+            "counts": {
+              "attempted_actions": 35,
+              "attempted_physics_steps": 700,
+              "complete_episodes": 1,
+              "completed_actions": 35,
+              "failed_episodes": 0
+            },
+            "episode_reward": -2280.3619928117964,
+            "holding_coverage_complete": true,
+            "holding_max_position_error_m": 0.047028312020943465,
+            "holding_max_speed_m_s": 0.2929650289381693,
+            "holding_sample_steps": [
+              30,
+              31,
+              32,
+              33,
+              34,
+              35
+            ],
+            "numerical_failure": null,
+            "passed": false,
+            "terminal_position_error_m": 0.041048733637669324,
+            "trajectory_rows": 36
+          }
+        ],
+        "evaluation_elapsed_s": 1.038018999970518,
+        "execution_id": "510a0fb2477b4bc6a3e02b61f0d5a5ed",
+        "experiment_configuration": {
+          "artifact_id": "9b4e02cad96efea994e8f0b80baf810b1f62d1fbd8ed51e7913a34d58b0966e1",
+          "media_type": "application/json"
+        },
+        "failure_reason": "task_thresholds_not_met",
+        "failure_stage": "task criteria unmet",
+        "implementation": "7dad1faa559273ddcff36d57cbf77637eeb58cae",
+        "independent_evaluation_executed": true,
+        "last_valid_position_error_m": 0.041048733637669324,
+        "last_valid_speed_m_s": 0.2929650289381693,
+        "mode": "residual",
+        "operation_key": "s5rl-residual-evaluate",
+        "passed": false,
+        "policy": "D:\\softrobot-agent\\.worktrees\\sorosim-matlab-nmpc\\runs\\research\\sorosim-s5rl-design-b-20261016\\rl\\sorosim-s5rl-design-b-20261016-b452bcd3\\checkpoints\\step-00032768-f344743d\\policy.zip",
+        "policy_sha256": "7c3ed0ff2ff85ab46c5c40e859c3a811af204431e08b56317c6703c2266e3bf3",
+        "role": "development",
+        "run_id": "sorosim-s5rl-design-b-20261016-b452bcd3",
+        "scope": "one deterministic fixed-initial-state episode; no robustness claim",
+        "seed": 17,
+        "selected_execution": null,
+        "study": "sorosim-s5rl-design-b-20261016",
+        "task": {
+          "artifact_id": "fe7b95c3c1ba12659b59c1983544b6454c9d90ac42c4dec528e9736d99fd3a6b",
+          "media_type": "application/json"
+        },
+        "task_identity": "882b3493037dcc8f8da294b3473e1223f0465e92c35bc3064bfc42d467bf212e",
+        "trajectory": "D:\\softrobot-agent\\.worktrees\\sorosim-matlab-nmpc\\runs\\research\\sorosim-s5rl-design-b-20261016\\rl\\sorosim-s5rl-design-b-20261016-b452bcd3\\evaluate-510a0fb2477b4bc6a3e02b61f0d5a5ed\\trajectory.csv"
+      }
+    }
+  ],
+  "allocation_actions_per_route": 32768,
+  "provider_requests": 0,
+  "physical_launches": 4,
+  "ledger": {
+    "limit": {
+      "backend_solves": 4,
+      "model_calls": 0,
+      "tool_calls": 20,
+      "wall_s": null,
+      "worker_calls": 0
+    },
+    "used": {
+      "tool_calls": 7,
+      "model_calls": 0,
+      "backend_solves": 4,
+      "worker_calls": 0,
+      "wall_s": 6.352507199975662
+    },
+    "remaining": {
+      "backend_solves": 0,
+      "model_calls": 0,
+      "tool_calls": 13,
+      "wall_s": null,
+      "worker_calls": 0
+    },
+    "occupied": {}
+  },
+  "stage_usage": {
+    "authorized_limits": {
+      "actions_per_trial": 32768,
+      "diagnostic_physics_steps": 0,
+      "diagnostic_replays": 0,
+      "evaluation_episodes": 2,
+      "seconds_per_trial": null,
+      "training_actions": 65536,
+      "training_active_seconds": null,
+      "training_stages": 2
+    },
+    "stages": {
+      "admitted": 2,
+      "limit": 2,
+      "actual_actions": 65536,
+      "verified_actions_lower_bound": 65536,
+      "accounted_actions_upper_bound": 65536,
+      "actual_active_seconds": 121.68745570001192,
+      "outstanding": []
+    },
+    "remaining_stages": 0,
+    "aggregate_action_limit": null,
+    "aggregate_training_time_limit": null,
+    "historical_requested_allocations": "audit only, never cumulative admission consumption",
+    "evaluation_capacity": {
+      "admitted": 0,
+      "remaining_episodes": 0,
+      "confirmation_reserve": 0,
+      "per_episode_s": null
+    }
+  },
+  "stage_summary_reference": {
+    "artifact_id": "cfd8ddb4866795d06bbb785daeea06b755e41fddfa48a169a70bb527f824dab2",
+    "media_type": "application/json"
+  }
+}

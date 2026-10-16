@@ -513,10 +513,13 @@ def allocation_feedback(host):
     from tools.research.budget import stage_usage
     s=state(host)
     usage=stage_usage(s)
+    cap=s['spec']['rl_limits']['training_actions']
+    allocated=sum(entry['allocation']['actions'] for entry in s.get('rl_runs',{}).values())
     return dict(authorized_limits=s['spec']['rl_limits'],stages=usage,
         remaining_stages=max(0,usage['limit']-usage['admitted']) if usage['limit'] is not None else None,
-        aggregate_action_limit=None,aggregate_training_time_limit=None,
-        historical_requested_allocations='audit only, never cumulative admission consumption',
+        aggregate_action_limit=cap,remaining_allocatable_actions=None if cap is None else max(0,cap-allocated),
+        aggregate_training_time_limit=None,
+        historical_requested_allocations='Frozen admitted allocations count against the engineering action cap; actual attempted actions are reported separately',
         evaluation_capacity=evaluation_capacity(host))
 
 
