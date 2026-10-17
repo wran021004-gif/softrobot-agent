@@ -118,7 +118,7 @@ public study operation grant was exhausted by candidate version rebinding,
 so the optional 16-substep follow-up was not launched. The frozen S4.5
 one-substep feasibility claim remains valid for that discrete model.
 
-## P2 preparation: archived-state projection only
+## P2: archived-state projection and matched intervals
 
 The [read-only S5-A state audit](../../evidence/sorosim_s55/p2_projection_audit.json)
 uses its exact saved XML and 48 joint positions/rates at 0, 0.15 and 0.29 s.
@@ -137,20 +137,46 @@ are not yet SoRoSim-versus-MuJoCo matched-state errors. The archived samples
 record time, joint positions and rates, but omit the 48-value MuJoCo
 `qacc_warmstart`. The next interval's four control values and zero applied
 external forces are known. The model has no activation, plugin, mocap, history,
-or equality state. A contained replay is required to restore the exact
-internal warmstart for dynamic checkpoints before a same-state one-step claim.
-No P2 `mj_step` probe or SoRoSim one-step integration has run; `e_projection`,
-`e_one_step`, and `e_increment` remain unavailable.
+or equality state. The contained P2 prefix playback reconstructed that
+warmstart and matched every archived saved joint state and tip output through
+0.30 s. It used 540 MuJoCo steps to reach the three checkpoints and 60
+steps for the three measured following intervals. The 0.29 s state uses
+command index 29 over `[0.29, 0.30]` s. Every actual applied tension matched
+the recorded command. No new complete 35-interval task rollout occurred.
+
+The [P2 matched-state evidence](../../evidence/sorosim_s55/p2_matched_state.json)
+links the [sealed P2 study](../../evidence/sorosim_s55/matched_state_study/archive_manifest.json)
+and reports full signed world-frame position and velocity vectors for
+`e_projection`, `e_one_step` and `e_increment`. Each checkpoint was projected
+through the existing GVS map and integrated for one 0.01 s interval with the
+same physical tension at four and eight SoRoSim substeps. All six mathematical
+intervals completed with maximum full implicit root residual below 1.5e-12.
+
+| Saved start time | 8-substep initial projection, position / velocity | 8-substep one-step, position / velocity | 8-substep increment, position / velocity | 4-to-8 predicted end difference, position / velocity |
+|---|---:|---:|---:|---:|
+| 0.00 s | 0 m / 0 m/s | 0.000302 m / 0.008835 m/s | 0.000302 m / 0.008835 m/s | 0.000312 m / 0.022599 m/s |
+| 0.15 s | 0.014843 m / 0.232082 m/s | 0.016844 m / 0.434798 m/s | 0.003908 m / 0.244622 m/s | 0.000341 m / 0.018762 m/s |
+| 0.29 s | 0.003864 m / 0.125358 m/s | 0.002954 m / 0.066699 m/s | 0.001203 m / 0.183600 m/s | 0.000834 m / 0.045487 m/s |
+
+The initial projection and the change-over-interval are separate vector
+quantities; their norms do not add. The 0.15 s SoRoSim initial position gap
+is larger than the 0.006075 m MuJoCo-only projection reconstruction gap, so
+the cross-model initial difference includes kinematic model differences.
+The nonzero incremental differences at 0.15 and 0.29 s support distinct
+responses to the same physical tension after projection. The remaining
+four-to-eight differences prevent a converged numerical bound on intrinsic
+dynamics disagreement.
 
 | Hypothesis | Current supporting observation | Distinguishing observation still needed | Current finding |
 |---|---|---|---|
 | H1: coarse SoRoSim integration causes easy braking | One-substep speed nearly vanishes at 0.30 s, while complete four/eight-substep integrations violate holding speed with the same commands | A later resolution would test numerical convergence of the refined models | Strong support for material discretization error; exact continuous-time contribution unresolved |
-| H2: reduced-state projection contributes | Reconstructing the saved 0.15 s MuJoCo state from projected GVS coordinates shifts its kinematic tip position 0.006075 m and velocity 0.119152 m/s | Measure SoRoSim initial output at each projected checkpoint and compare to saved MuJoCo output | Projection loss is measurable inside MuJoCo; cross-model output effect unresolved |
-| H3: intrinsic dynamics disagree after alignment | Historical trajectories disagree even though initial tip positions agree closely | Compare same-state, same-tension one-interval increments at stable refinement resolutions | Unresolved; no same-state dynamic probe |
-| H4: historical gap accumulates over intervals | Open-loop position and velocity diverge from early intervals and differ strongly by braking | Compare one-step differences at 0, 0.15 and 0.29 s against the accumulated trajectory gap | Plausible, but the accumulated share is unmeasured |
+| H2: reduced-state projection contributes | MuJoCo-only reconstruction shifts the 0.15 s tip by 0.006075 m and 0.119152 m/s; projected SoRoSim starts 0.014843 m and 0.232082 m/s from the exact saved MuJoCo output | A higher-fidelity mapping or matched reduced-coordinate perturbation would isolate representational loss from cross-model kinematics | Supported contribution, not a unique quantitative share |
+| H3: intrinsic dynamics disagree after alignment | Eight-substep same-command velocity increments differ by 0.244622 m/s at 0.15 s and 0.183600 m/s at 0.29 s | Converged mathematical integration and projection-sensitivity bounds would isolate dynamics | Supported response disagreement, with numerical/projection confounders |
+| H4: historical gap accumulates over intervals | At 0.30 s the historical open-loop velocity gap is 0.872552 m/s, while the 0.29 s matched one-step gap is 0.066699 m/s | Further controlled state resets would measure history effects across intervals | Strong evidence of a history contribution, no unique additive share |
 
-All four mechanisms can coexist. The unreconstructed MuJoCo warmstart and
-missing matched-state probes prevent a causal decomposition now.
+All four mechanisms can coexist. Their independent quantitative shares
+remain unresolved because the reduced projection is not isometric and the
+four/eight-substep SoRoSim outputs have not converged.
 
 ## P3 preparation: raw S4.5 SQP point and full warm start
 
@@ -188,9 +214,9 @@ the complete initial-state/dynamics residual, physical bounds, epigraph
 inequalities and original sampled task before using that point as the SQP
 initial vector. A failure stops before optimization. It keeps the raw
 optimizer checkpoint and computes KKT residuals on that point, before any
-recovery. This path has passed Python boundary tests, but no new MATLAB
-check-only call or full P3 solve has run because the pinned SoRoSim checkout
-is unavailable. The S5-T derivative preflight from the previous study
+recovery. This path has passed Python boundary tests and MATLAB static code
+checks; a new MATLAB check-only call and full P3 solve have not yet run. The
+S5-T derivative preflight from the previous study
 covered 1,006 variables, 864 equalities and 13 original task inequalities;
 its relative objective/constraint directional errors were 2.238e-8 and
 1.727e-10. It does not establish Jacobian rank, multiplier reliability,
@@ -232,21 +258,22 @@ metrics, root count, source/control hashes, and compact raw KKT residual
 fields when present, alongside the P0 scientific equivalence preflight and
 direct/residual PPO failure summaries. Unavailable numerical results remain
 null; an Agent must not describe the archived repeated S5-Agent configuration
-as a new physical candidate. The next discriminating action is a bounded
-matched-state one-interval comparison at the original S5-A checkpoints.
-Only after numerical fidelity is characterized should a base
-`task_capability` KKT attempt use the verified full-trajectory warm
+as a new physical candidate. The next mathematical action is a bounded
+`task_capability` KKT attempt using the verified full-trajectory warm
 start. More PPO training or a new full NMPC campaign is not supported by
 these findings.
 
 ## Operations, costs and reproduction status
 
-New scientific costs through P1: three SoRoSim fixed-sequence attempts,
+New scientific costs through P2: three P1 SoRoSim fixed-sequence attempts,
 two complete and one saved partial, totaling 119.706879 s charged worker
-time. There have been zero MuJoCo `mj_step` probes, full NLP optimizations,
-PPO actions and provider requests. The P2 preparation used three
-`mj_forward` saved-state kinematic reconstructions; P0 read 260 prior PPO
-failure captures and reconstructed their saved starts without stepping.
+time; three P2 MuJoCo interval probes after a contained 540-step checkpoint
+reconstruction; and six P2 SoRoSim one-interval integrations. P2 charged
+20.696515 s and 600 total MuJoCo steps, of which 60 belong to measured
+intervals. There have been zero full NLP optimizations, PPO actions and
+provider requests. The earlier P2 preparation used three `mj_forward`
+saved-state kinematic reconstructions; P0 read 260 prior PPO failure
+captures and reconstructed their saved starts without stepping.
 The P1 study spent three of four mathematical refinement slots and all six
 public operations (three candidate materializations and three refinements).
 The extra materializations bound the exact same Design B science to
