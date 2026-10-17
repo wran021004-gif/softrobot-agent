@@ -6,13 +6,23 @@ import tarfile
 
 import numpy as np
 from extensions.tendon_family.sorosim_codesign import compare_refinements
-from tests.research.sorosim_s5t_pilot import sealed, plan
+from tests.research.sorosim_s5t_pilot import sealed
 from tools.research import core
 from tools.research.design import numerical_binding, verify_candidate
 from tools.research.state import state, save
 from tools.state_io import atomic_json, read
 
 ROOT=Path(__file__).resolve().parents[2]
+
+
+def plan(action,**data):
+    return dict(action=action,
+        hypothesis='Improved numerical fidelity and candidate-bound controls may improve the frozen task.',
+        expected_observation='Exact source identity, complete numerical or physical evidence and original predicates.',
+        weakening_observation='Numerical failure, unresolved fidelity, task violation or incompatible source.',
+        fixed_conditions='Frozen task, physical force bounds, topology and exact candidate binding.',
+        stopping_condition='The owning prospective stage count grant; no repetitions or provider requests.',
+        interpretation='Numerical validity, local optimality and independent physical acceptance are distinct.',**data)
 
 
 def initialize(stage):
@@ -36,7 +46,7 @@ def finish(host,summary,destination):
     s=state(host)
     citations=[ref,*s['mechanics_results'],*s['results'],*s.get('physical_replays',[]),
         *s.get('analysis_results',[]),*s.get('rl_evaluations',[]),*s.get('rl_training_summaries',[])]
-    core.dispatch(host,plan('stop',supporting_evidence=citations),'stage-stop')
+    core.dispatch(host,plan('stop',next_step='stop',supporting_evidence=citations),'stage-stop')
     core.export(host,ROOT/destination/'study')
     atomic_json(ROOT/destination/'summary.json',dict(summary,stage_summary_reference=ref))
 

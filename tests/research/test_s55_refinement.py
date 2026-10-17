@@ -121,5 +121,15 @@ class RefinementBoundaries(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,'WARM_IDENTITY_MISMATCH'):
             calculate(changed)
 
+    def test_physical_intervention_changes_one_controller_factor(self):
+        from tools.research.config import resolve
+        old=resolve(ROOT/'configs/research/study_sorosim_s5_nmpc.json')['configuration']
+        new=resolve(ROOT/'configs/research/study_sorosim_s56_physics.json')['configuration']
+        self.assertEqual(old['task'],new['task'])
+        a=old['policy']['controller']['parameters']['data']['recipe']
+        b=new['policy']['controller']['parameters']['data']['recipe']
+        self.assertEqual([k for k in a if a[k]!=b[k]],['holding_brake_lead_s'])
+        self.assertEqual(b['holding_brake_lead_s'],.02)
+
 
 if __name__=='__main__':unittest.main()
