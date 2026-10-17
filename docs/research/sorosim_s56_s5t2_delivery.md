@@ -262,3 +262,71 @@ Latest residual approximate KL .252 and PPO likelihood-ratio clip fraction .641
 suggest testing a smaller continuation learning rate or declared KL limit before
 simply increasing training. PPO likelihood clipping and physical tension
 clipping are different metrics; neither establishes convergence or superiority.
+
+## P5: actual KKT diagnostics, secondary solve and structural sensitivity
+
+The two preserved multiplier-bearing SQP points are evaluated at their exact
+raw normalized vectors, before projection/recovery. After removing the fixed
+auxiliary variable, the equality matrices have 864 rows / 1005 columns, numerical
+rank 864 at relative cutoff 1e-9 and row-scaled condition estimates 506.0. Active
+constraint matrices also have full measured row rank at activity thresholds
+1e-5, 1e-7 and 1e-9 (scaled conditions about 674--2096). These are finite-tolerance
+gradient-rank observations at approximately feasible points, not rigorous LICQ
+proofs at an exact optimum. Fixed lower/upper bound pairs do not identify unique
+individual multipliers; only their difference is meaningful.
+
+Raw stationarity maxima .008296 and .011707 remain in internal state variables,
+while control components are only 2.39e-5 / 1.58e-5. Unrestricted least-squares
+multiplier refits still have nonzero residuals and sometimes negative active
+inequality weights. This neither proves multiplier nonexistence nor supplies
+valid KKT multipliers. Removing a duplicate or declaring rank failure cannot
+explain the complete obstruction. Primal and stationarity gates fail; MFCQ,
+constant-rank qualifications and second-order sufficiency remain unestablished.
+
+One new full four-step `task_feasible_effort` solve starts from P2's rematerialized
+controls. Its distinct objective is mean((U/limits)^2) + .1*mean(diff(U/limits)^2)
+over 35 commands and 34 differences, subject to all original task constraints,
+complete dynamics and unchanged physical bounds. It reaches its 60-iteration
+ceiling, 592 function evaluations, in 1957.010 solver seconds. The raw point has
+scaled violation .000454 and reported first-order optimality .345331, so its
+multipliers do not describe a validated local optimum.
+
+Root recovery selects a different trajectory: objective .317735 initially to
+.266580, scaled violation 8.38e-13 and all original sampled four-step predicates
+satisfied. A separate Engine/model replay verifies this selected trajectory.
+This is a useful feasible secondary-control result for the declared discrete
+model, not optimizer convergence, high-resolution feasibility, or a gradient.
+Raw multipliers remain explicitly separate from the recovered trajectory.
+
+The attempted large sparse-QR diagnostic exposes a JSON boundary error: MATLAB
+cannot encode its sparse diagonal vector. That failed attempt remains charged
+and archived. A bounded read-only serialization recovery is delivered separately;
+no full NLP is repeated. The large problem uses sparse QR estimates rather than
+silently claiming an SVD spectrum or certified LICQ.
+
+With no regular local optimum branch, zero design-perturbation NLPs are admitted.
+The useful lower-level calculation rebuilds Design B at proximal length
+.195 +/- .00002 m with fixed [.2,.2,.2,.2] N. Its static implicit position
+sensitivity is `[.746435, .178244, -.879912] m/m`; independently re-solved
+perturbed equilibria agree to relative 1.90e-9. Both perturbed static residuals
+are below 8e-17. This is a fixed-input local equilibrium sensitivity, not a
+dynamic optimal-value, physical closed-loop or topology derivative.
+
+The complete-Lagrangian implementation retains objective, initial-state,
+every dynamics equality, task and physical-bound terms at fixed normalized
+variables/multipliers while rebuilding perturbed models. Its numerical envelope
+derivative is gated on a verified regular branch; no such derivative is reported.
+For a differentiable local value branch, valid gradient-error bound delta_s and
+regional gradient Lipschitz bound L along the proposed segment,
+`W(d+Delta)-W(d) <= s_hat^T Delta + delta_s*||Delta|| + (L/2)*||Delta||^2`.
+A strictly negative right side implies descent for that local mathematical
+branch. Neither bound is established here; finite differences do not supply
+rigorous regional bounds. Status remains `solver_unresolved` for the optimal
+value and `locally_checked_not_certified` for the verified static sensitivity.
+
+[Original P5 evidence](../../evidence/sorosim_s5t2/summary.json) uses one full base
+NLP, one independent selected-trajectory replay and four diagnostic/analysis
+evaluations (including the sparse serialization failure), 2171.210 recorded
+numerical seconds, zero physical/PPO/provider work. The static operation includes
+rebuilt base/minus/plus candidate models and independently solved equilibria;
+these are not hidden full-horizon NLP attempts.
