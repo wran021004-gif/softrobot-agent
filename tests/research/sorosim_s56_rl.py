@@ -26,7 +26,15 @@ def preserve_files(host,directory,paths):
 
 def evaluate_route(host,request,key):
     started=rl.dispatch(host,request,key+'-start');run_id=started['run_id']
-    while rl.reconcile(host,run_id,lightweight=True)['worker_alive']:time.sleep(5)
+    while True:
+        for attempt in range(3):
+            try:
+                status=rl.reconcile(host,run_id,lightweight=True);break
+            except PermissionError:
+                if attempt==2:raise
+                time.sleep(.05)  # Windows can briefly deny reads during atomic state replacement.
+        if not status['worker_alive']:break
+        time.sleep(5)
     terminal=rl.dispatch(host,dict(operation='status',run_id=run_id,rationale='Read actual actions, failures, optimizer updates and checkpoint'),key+'-status')
     summary=core.read_evidence(host,dict(reference=terminal['training_summary_reference']))
     result=dict(mode=request.get('mode','residual'),run_id=run_id,training_summary=terminal['training_summary_reference'],
