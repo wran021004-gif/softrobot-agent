@@ -1,0 +1,43 @@
+﻿import hashlib,subprocess,time
+from pathlib import Path
+from tools.platform_host import Host
+from tools.platform_store import plain
+from tools.research import core
+from tools.research.state import state,save,update
+from tools.state_io import read,atomic_json
+from extensions.tendon_family.sorosim_codesign import integrated_control_source
+root=Path.cwd();started=time.perf_counter();name='sorosim-s56-codesign-20261017';h=Host(root/'runs/research'/name,name)
+index=read(root/'evidence/sorosim_s56/codesign/summary.json');before=state(h)
+solved=h.store.artifact(index['optimization']);checked=h.store.artifact(index['validation'])
+legacy=h.store.artifact(index['physical_source']);canonical=integrated_control_source(solved,checked)
+canonical.update(source_solve=index['optimization'],source_replay=index['validation'],configuration=legacy['configuration'])
+assert canonical['trajectory']['tensions_n']==legacy['trajectory']['tensions_n']
+assert canonical['mathematical_outputs']==legacy['mathematical_outputs']
+new=save(h,canonical,'versioned_numerical_control_annotation')
+rl=read(root/'evidence/sorosim_s56/rl/summary.json');residual=next(r for r in rl['routes'] if r['mode']=='residual')
+cfg=read(root/'runs/research/sorosim-s56-rl-20261017/rl'/residual['run_id']/'config.json');reference=cfg['reference'];body=Path(reference['path']).read_bytes()
+assert hashlib.sha256(body).hexdigest()==reference['sha256']
+with h.store.transaction() as db:blob=plain(h.store.put(db,body,media='application/octet-stream'))
+ref=save(h,dict(contract=reference,raw_bytes=blob,source_run=residual['run_id'],purpose='Preserve the exact compatible residual reference; no change to checkpoint/configuration or physical success classification'),'residual_reference_preservation')
+fixture=save(h,read(root/'runs/s56_grid_boundary_check.json'),'interface_arithmetic_fixture_only')
+packet=save(h,read(root/'evidence/sorosim_s56/agent_feedback_packet.json'),'versioned_s56_agent_feedback')
+erratum=dict(schema='sorosim_s56_source_erratum_v1',legacy_source=index['physical_source'],canonical_source=new,
+    original_task_satisfied=False,numerical_integration_complete=True,
+    reason='Legacy handoff used historical verified-trajectory naming and a completeness flag while original task failed; it also copied coarse slacks/objective into high-resolution sampled states. New kind separates numerical completeness and original-task verification and omits coarse epigraph fields.',
+    original_records_preserved=True,actual_controls_and_mathematical_outputs_identical=True,
+    impact='Actual P3 playback consumed only unchanged physical commands; P5 initialization consumed only controls/initial state and rematerialized its own nodes. No original task evaluator or numerical outcome changed; no experiment repeated.',
+    interface_fix=dict(reason='round the already grid-validated remaining interval count before lower-bound comparison',validation=fixture,physical_reexecution=False),
+    residual_reference=ref,feedback=packet,postprocessing_commit=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip(),
+    scientific_cost=dict(full_nlp=0,physical_steps=0,ppo_actions=0,provider_requests=0))
+err=save(h,erratum,'explicit_scientific_metadata_erratum')
+update(h,scoped_context=[*before.get('scoped_context',[]),packet,err])
+after=state(h)
+for k in ('offline_nlp','bdf_replays','mathematical_evaluations','numerical_s','research_status','closed_unix'):
+    assert before.get(k)==after.get(k),(k,before.get(k),after.get(k))
+export=core.export(h,root/'evidence/sorosim_s56/annotations/study')
+summary=dict(schema='sorosim_s56_postprocessing_v1',canonical_control_source=new,legacy_control_source=index['physical_source'],
+    erratum=err,residual_reference=ref,interface_fixture=fixture,agent_feedback=packet,
+    original_stage_source='evidence/sorosim_s56/codesign/study',append_only=True,
+    scientific_counters_unchanged=True,postprocessing_elapsed_s=time.perf_counter()-started)
+atomic_json(root/'evidence/sorosim_s56/annotations/summary.json',summary)
+print(summary)

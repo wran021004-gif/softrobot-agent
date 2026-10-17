@@ -17,6 +17,26 @@ from tools.state_io import read, digest, atomic_json
 from tools.platform_store import plain
 
 
+class SavedS56FeedbackTests(unittest.TestCase):
+    def test_packet_preserves_failure_scope_and_no_gradient_certificate(self):
+        packet=read(ROOT/'evidence/sorosim_s56/agent_feedback_packet.json')
+        self.assertFalse(packet['task']['physical_success'])
+        self.assertEqual(packet['provider_requests'],0)
+        self.assertEqual(packet['scientific_resources']['rl_training_actions'],131072)
+        self.assertEqual({r['mode'] for r in packet['rl']['routes']},{'direct','residual'})
+        self.assertFalse(packet['control_optimization']['secondary']['raw_kkt']['same_as_selected_trajectory'])
+        self.assertIsNone(packet['mathematical_reliability']['gradient_error_bound'])
+        self.assertEqual(packet['mathematical_reliability']['descent_certificate'],'unavailable')
+        self.assertTrue(packet['mathematical_reliability']['fixed_input_static_sensitivity']['verification']['passed'])
+
+    def test_both_feedback_versions_are_readable_without_a_live_agent(self):
+        from tools.research.sorosim_s55_feedback import scoped_feedback
+        packets=[read(ROOT/'evidence/sorosim_s55/agent_feedback_packet.json'),
+            read(ROOT/'evidence/sorosim_s56/agent_feedback_packet.json')]
+        host=SimpleNamespace(store=SimpleNamespace(artifact=lambda reference:packets[reference]))
+        self.assertEqual(len(scoped_feedback(host,[0,1])),2)
+
+
 class AgentFeedbackTests(unittest.TestCase):
     def setUp(self):
         self.folder=ROOT/'runs'/('m3d-fixture-'+uuid4().hex)

@@ -215,5 +215,103 @@ def build():
     write("agent_feedback_packet", packet)
 
 
+def build_s56():
+    """Read sealed S5.6 stages; leave every S5.5 packet and outcome untouched."""
+    from tools.state_io import atomic_json
+    evidence=ROOT.parent
+    def load(relative):
+        return json.loads((evidence/relative).read_text(encoding='utf-8'))
+    def artifact(relative,reference):
+        with tarfile.open(evidence/relative) as archive:
+            body=archive.extractfile('artifacts/'+reference['artifact_id']+'.json').read()
+        if hashlib.sha256(body).hexdigest()!=reference['artifact_id']:
+            raise ValueError('SEALED_S56_ARTIFACT_HASH_MISMATCH')
+        return json.loads(body)
+    paths=dict(refinement='sorosim_s56/refinement/summary.json',
+        codesign='sorosim_s56/codesign/summary.json',physics='sorosim_s56/physics/summary.json',
+        rl='sorosim_s56/rl/summary.json',optimality='sorosim_s5t2/summary.json',
+        diagnostic_recovery='sorosim_s5t2/diagnostic_recovery/summary.json')
+    stages={k:load(v) for k,v in paths.items()};p=stages['physics'];rl=stages['rl'];o=stages['optimality']
+    historical=[]
+    for row in o['historical']:
+        raw=artifact('sorosim_s5t2/study/immutable_artifacts.tar.gz',row['diagnostic'])
+        historical.append(dict(reference=row['diagnostic'],qualification=row['qualification'],
+            equality_rank=raw['equality_spectrum']['rank_at_rtol_1e_9'],
+            equality_rows=raw['equalities'],scaled_equality_condition=raw['equality_spectrum']['row_scaled_condition'],
+            stationarity_blocks=raw['stationarity_blocks']))
+    sensitivity=artifact('sorosim_s5t2/study/immutable_artifacts.tar.gz',o['static_sensitivity'])
+    routes=[]
+    for row in rl['routes']:
+        routes.append(dict(mode=row['mode'],run_id=row['run_id'],consumed=row['consumed'],
+            checkpoint=row['checkpoint']['generation'],lifetime_actions=row['checkpoint']['inherited']['lifetime_timesteps'],
+            checkpoint_policy_sha256=row['checkpoint']['policy_file_sha256'],
+            evaluation=row['evaluation'],episodes=row['evaluation_facts']['episodes'],
+            warnings=row['numerical_failures']['warnings'],raw_files=row['raw_files'],
+            continuation=row.get('continuation')))
+    kkt=o['secondary_base']['facts']['kkt']
+    selected_replay=artifact('sorosim_s5t2/study/immutable_artifacts.tar.gz',o['secondary_base']['replay'])
+    nlp_budget=load('sorosim_s56/codesign/study/configuration.json')['budgets']
+    packet=dict(schema='sorosim_s56_s5t2_feedback_v1',provider_requests=0,
+        task=dict(unchanged=True,acceptance='original registered evaluator; 35 commands, 36 samples',
+            physical_success=bool(p['open_loop_facts']['acceptance']['accepted'] or
+                p['nmpc_facts']['acceptance']['accepted'] or any(r['evaluation_facts']['passed'] for r in rl['routes'])),
+            continuous_time_certificate=False),
+        numerical_fidelity=dict(results=stages['refinement']['results'],
+            last_observed_gap={k:stages['refinement']['comparisons']['32_to_64'][k]
+                for k in ('maximum_position_m','maximum_velocity_m_s')},
+            reliability='observed_refinement_only_not_certified; optimized sequence has no 64-step check'),
+        control_optimization=dict(reference=stages['codesign']['optimization'],
+            high_resolution_check=stages['codesign']['validation'],
+            original_task_passed=stages['codesign']['high_resolution_original_task_satisfied'],
+            metrics={k:stages['codesign'][k] for k in ('terminal_position_error_m','holding_max_position_error_m','holding_max_speed_m_s')},
+            secondary=dict(reference=o['secondary_base']['result'],
+                selected_trajectory_replay=o['secondary_base']['replay'],
+                selected_discrete_feasible=bool(o['secondary_base']['facts']['original_feasible'] and selected_replay['mathematical_facts']['passed']),
+                raw_kkt={k:kkt[k] for k in ('primal_inf','stationarity_inf','complementarity_inf','same_as_selected_trajectory')},
+                envelope_gradient='unavailable')),
+        physical=dict(candidate=p['candidate'],open_loop=p['open_loop'],
+            open_loop_acceptance=p['open_loop_facts']['acceptance'],nmpc=p['nmpc'],
+            nmpc_acceptance=p['nmpc_facts']['acceptance'],controller_facts=p['nmpc_facts']['controller_facts'],
+            novelty='new complete commands; separately changed .02 s braking lead; first command divergence at .18 s',
+            real_time_demonstrated=False),
+        rl=dict(routes=routes,binding_and_reward=load('sorosim_s56/rl/binding_and_reward_audit.json'),
+            force_metrics=load('sorosim_s56/rl/evaluation_force_metrics.json'),
+            comparison_limitations=rl['limitations']),
+        mathematical_reliability=dict(historical=historical,
+            recovered_diagnostic=stages['diagnostic_recovery']['diagnostic'],
+            qualification=stages['diagnostic_recovery']['qualification'],
+            fixed_input_static_sensitivity=dict(reference=o['static_sensitivity'],
+                dp_dd=sensitivity['sensitivity']['dp_dd'],verification=sensitivity['sensitivity']['verification'],
+                classification='locally_checked_not_certified_static_equilibrium_only'),
+            gradient_error_bound=None,regional_lipschitz_bound=None,descent_certificate='unavailable'),
+        evidence_annotations='sorosim_s56/annotations/summary.json',
+        scientific_resources=dict(used_full_nlp=stages['codesign']['counts']['offline_nlp']+o['costs']['full_nlp'],
+            used_refinements=stages['refinement']['costs']['integrations']+stages['codesign']['counts']['integrations'],
+            used_same_grid_mathematical_replays=o['costs']['independent_replays'],
+            complete_physical_evaluations=p['physical_launches'],rl_training_actions=rl['costs']['stages']['actual_actions'],
+            rl_stages=rl['costs']['stages']['admitted'],rl_evaluations=len(rl['routes']),
+            s5t2_diagnostic_analysis_evaluations=stages['diagnostic_recovery']['costs']['cumulative_phase_diagnostics'],
+            unused_ceilings=dict(p2_full_nlp=nlp_budget['offline_nlp']-stages['codesign']['counts']['offline_nlp'],
+                p2_high_resolution_checks=nlp_budget['bdf_replays']-stages['codesign']['counts']['integrations'],p3_full_physics=0,
+                rl_actions=rl['costs']['remaining_allocatable_actions'],rl_stages=rl['costs']['remaining_stages'],
+                rl_evaluations=rl['costs']['evaluation_capacity']['remaining_episodes'],
+                p5_base_nlp=2-o['costs']['full_nlp'],p5_conditional_perturbation_nlp=2-o['perturbation_reoptimizations']),
+            admission='all completed sessions sealed; unused ceilings are not a reset or automatically executable grant'),
+        next_distinguishing_experiment=dict(hypothesis='coarse one-step NMPC integration contributes to prediction error',
+            intervention='reintegrate the exact archived initial state and first NMPC tension at declared finer resolutions; compare to the already archived .01 s physical output',
+            scope='bounded one-interval mathematics; zero new physical steps; no new full NLP',
+            supporting='vector prediction error decreases with mathematical refinement',
+            weakening='consecutive fine grids agree while physical discrepancy remains',
+            decision='qualify numerical prediction before another expensive full feedback run or structural change'),
+        unsupported_claims=['continuous-time convergence','physical task success','RL convergence or generalization',
+            'certified optimal-value gradient','global optimality','real-time achievement','unique mismatch decomposition'],
+        sources={k:dict(path=v,sha256=hashlib.sha256((evidence/v).read_bytes()).hexdigest()) for k,v in paths.items()})
+    atomic_json(evidence/'sorosim_s56/agent_feedback_packet.json',packet)
+    return packet
+
+
 if __name__ == "__main__":
-    build()
+    import argparse
+    parser=argparse.ArgumentParser();parser.add_argument('--s56',action='store_true')
+    if parser.parse_args().s56:build_s56()
+    else:build()
