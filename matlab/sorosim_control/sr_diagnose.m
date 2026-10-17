@@ -115,7 +115,8 @@ switch r.kind
         position=zeros(N+1,3);velocity=zeros(N+1,3);roots=zeros(N*count,6);
         [position(1,:),velocity(1,:)]=tip_output(x,U(1,:)');
         failure=struct('interval',[],'substep',[],'previous',[],'returned',[], ...
-            'residual_inf',[],'exitflag',[]);completed=0;force_max=0;t=tic;
+            'residual_inf',[],'exitflag',[]);completed=0;force_max=0;
+        residual_verified_nonpositive_flags=0;t=tic;
         for interval=1:N
             u=U(interval,:)';
             for substep=1:count
@@ -130,12 +131,13 @@ switch r.kind
                 end
                 roots((interval-1)*count+substep,:)=[interval,substep,residual,flag,info.iterations,info.funcCount];
                 if all(isfinite(res)),force_max=max(force_max,norm(res(n+1:end),inf)*.001);end
-                if ~(residual<1e-9 && all(isfinite(x)) && flag>0)
+                if ~(residual<1e-9 && all(isfinite(x)))
                     failure.interval=interval;failure.substep=substep;
                     failure.previous=previous';failure.returned=x';
                     failure.residual_inf=residual;failure.exitflag=flag;
                     break;
                 end
+                if flag<=0,residual_verified_nonpositive_flags=residual_verified_nonpositive_flags+1;end
             end
             if ~isempty(failure.interval),break;end
             completed=interval;X(interval+1,:)=x';
@@ -144,7 +146,10 @@ switch r.kind
         out=struct('status','completed','complete',true,'substeps',count, ...
             'initial_state',r.x(:)','tensions_n',U,'times_s',times', ...
             'states',X,'tip_positions_m',position,'tip_velocities_m_s',velocity, ...
-            'roots',roots,'maximum_force_residual_nm2',force_max,'wall_s',toc(t));
+            'roots',roots,'maximum_force_residual_nm2',force_max, ...
+            'residual_verified_nonpositive_exitflags',residual_verified_nonpositive_flags, ...
+            'root_acceptance','finite state and full implicit residual infinity norm below 1e-9; exitflag separately recorded', ...
+            'wall_s',toc(t));
         if completed<N
             out.status='root_failed';out.complete=false;out.completed_intervals=completed;
             out.failed_root=failure;out.states=X(1:completed+1,:);
