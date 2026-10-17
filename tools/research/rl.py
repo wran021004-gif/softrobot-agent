@@ -261,6 +261,21 @@ def dispatch(host, value, request_id, selected=None):
         raise ValueError('Development evaluation rejected; confirmation uses '+json.dumps(confirmation_progress(host)))
     if q.operation=='evaluate' and evaluation_capacity(host,1,confirmation=selected is not None)['admitted']<1:
         raise ValueError('RL evaluation and route confirmation reserve cannot fit')
+    scientific_preflight=None
+    if q.operation=='evaluate':
+        from tools.rl.continuation import published_checkpoint
+        from tools.research.feedback import experiment_preflight
+        entry=s['rl_runs'][q.run_id]
+        directory=run.run_path(q.run_id)
+        config=host.store.artifact(entry['configuration'])
+        generation=q.checkpoint or run.read_json(directory/'checkpoint.json')['current']
+        _,metadata=published_checkpoint(directory,config,generation)
+        scientific_preflight=experiment_preflight(host,entry['candidate'],'rl',
+            rl_configuration=config,policy_sha=metadata['policy_file_sha256'],
+            repeat=selected is not None)
+        if not scientific_preflight['admitted']:
+            raise ValueError('EQUIVALENT_SCIENTIFIC_EXPERIMENT_REQUIRES_EXPLICIT_REPLICATION_GRANT: '
+                +json.dumps(scientific_preflight,sort_keys=True))
     stage_id=None
     stage_entry=None
     if q.operation in ('start','continue'):
@@ -376,6 +391,8 @@ def dispatch(host, value, request_id, selected=None):
             evaluation_dispatched=q.operation=='evaluate'
             operation_started=time.perf_counter()
             result=invoke(host,q.operation,run_id,*arguments,'--output',output,timeout_s=None,interpreter=s['spec']['runtime']['rl_python'])
+            if scientific_preflight is not None:
+                result['scientific_preflight']=scientific_preflight
             if source:
                 result.update(source_study=source['study_id'],evaluation_owner=host.run_id)
             result.update(study=host.run_id,candidate=entry['candidate'],task=entry['task'],run_id=run_id,
@@ -526,7 +543,11 @@ def allocation_feedback(host):
 def packet(host):
     from tools.research import state as state_api
     s=state_api.state(host)
-    return dict(allocation_feedback=allocation_feedback(host),frozen_task=s['rl_task'],capabilities=dict(task='reach-and-hold',control='ideal_tension',
+    failure_categories={run_id:run.failure_diagnosis(host.store.root/'rl'/run_id)
+        for run_id in s.get('rl_runs',{}) if (host.store.root/'rl'/run_id).exists()}
+    return dict(allocation_feedback=allocation_feedback(host),frozen_task=s['rl_task'],
+        numerical_failure_categories=failure_categories,
+        capabilities=dict(task='reach-and-hold',control='ideal_tension',
         modes=['direct','residual'],compatible_references=compatible_references(host,publish=False),
         structural_domain=s['spec']['allowed_parameters'],
         defaults=(s['spec'].get('control') or {'rl_defaults':s['spec']['runtime'].get('rl_defaults')})['rl_defaults']),

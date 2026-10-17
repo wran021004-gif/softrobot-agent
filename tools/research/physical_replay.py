@@ -72,6 +72,11 @@ def dispatch(host,arguments,key):
             not source['posthoc_verification']['checks']['repaired_verification_passed']):
         raise ValueError('VERIFIED_OR_EXPLICIT_DIAGNOSTIC_MATHEMATICAL_SOURCE_REQUIRED')
     binding(cfg,source['trajectory'])
+    from tools.research.feedback import experiment_preflight
+    novelty=experiment_preflight(host,candidate,'fixed_tension',source_ref=source_ref)
+    if not novelty['admitted']:
+        raise ValueError('EQUIVALENT_SCIENTIFIC_EXPERIMENT_REQUIRES_EXPLICIT_REPLICATION_GRANT: '
+            +json.dumps(novelty,sort_keys=True))
     outputs=source['mathematical_outputs']
     if (outputs['model_identity']!=source['trajectory']['model_identity'] or
             outputs['times_s']!=source['trajectory']['times_s'] or outputs['samples']!=36):

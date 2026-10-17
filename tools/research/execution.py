@@ -51,6 +51,11 @@ def execute(host, candidate_ref, operation_key, *, role='development', selected=
         choice=eligibility(host,selected)
         if not choice['eligible']:
             raise ValueError('; '.join(choice['reasons']))
+    from tools.research.feedback import experiment_preflight
+    novelty=experiment_preflight(host,candidate_ref,'nmpc',repeat=confirmation or repetition)
+    if not novelty['admitted']:
+        raise ValueError('EQUIVALENT_SCIENTIFIC_EXPERIMENT_REQUIRES_EXPLICIT_REPLICATION_GRANT: '
+            +json.dumps(novelty,sort_keys=True))
     admission=capacity(host,1,confirmation or repetition,candidate=candidate_ref)
     if admission['admitted']<1:
         raise ValueError('EXECUTION_AND_CONFIRMATION_RESERVE_CANNOT_FIT')

@@ -1,5 +1,7 @@
 """Program facts about evidence identity, ownership, cost and legal references."""
 from copy import deepcopy
+import json
+import tarfile
 from tools.platform_store import plain
 from tools.state_io import digest
 
@@ -79,6 +81,175 @@ def solution_identity(host, result, candidate):
         controller_configuration['parameters']['data']['recipe'] = recipe
         controller = dict(route='nmpc', configuration=controller_configuration)
     return dict(scientific_configuration=science, controller=controller)
+
+
+def experiment_identity(candidate, route, *, source=None, result=None, environment=None,
+                        rl_configuration=None, policy_sha=None):
+    """Effective experiment fields, excluding Store references and study labels."""
+    from schemas.platform import SessionInput
+    from extensions.tendon_family.backends import physics_for
+    from extensions.tendon_family.scene import assemble
+    science=deepcopy(candidate['scientific_configuration'])
+    design=science['robot']['structure']['data']
+    design.pop('id',None)
+    design.pop('metadata',None)
+    policy=science['policy']
+    inp=SessionInput.model_validate(candidate['configuration'])
+    scene=assemble(inp,physics_for(inp))
+    physical=dict(robot=science['robot'],backend=policy['backend'],
+        discretization=policy['discretization'],compiled_physics_identity=scene['physics_identity'],
+        compiled_scene_identity=scene['identity'])
+    task=dict(task=science['task'],seed=science['seed'])
+    if route=='rl':
+        config=rl_configuration or {}
+        required=('mode','seed','observation','action','control_object','task','reward','reference','candidate')
+        missing=['rl_configuration.'+key for key in required if key not in config]
+        reference=config.get('reference')
+        action=dict(mode=config.get('mode'),observation=config.get('observation'),
+            action=config.get('action'),control_object=config.get('control_object'),
+            task=config.get('task'),reward=config.get('reward'),
+            reference={k:reference.get(k) for k in
+                ('sha256','candidate_identity','task_identity','tendon_order','control_period_s')} if reference else None,
+            compiled_candidate_sha256=(config.get('candidate') or {}).get('sha256'),
+            policy_sha256=policy_sha or (result or {}).get('policy_sha256'),
+            evaluation=dict(deterministic=True,episodes=1))
+        if not action['policy_sha256']:
+            missing.append('action.policy_sha256')
+        controller=dict(route=route,mode=config.get('mode'))
+        runtime=dict(profile_identity=candidate.get('profile_identity'),
+            inference_device=(config.get('ppo') or {}).get('device'))
+    elif route=='fixed_tension':
+        trajectory=(source or {}).get('trajectory') or {}
+        required=('tensions_n','times_s','tendon_order','model_identity','design_identity','task_identity')
+        action={key:trajectory[key] for key in required if key in trajectory}
+        missing=[key for key in required if key not in trajectory]
+        controller=dict(route=route,command_semantics='ideal_tension',
+            mathematical_model=policy['dynamics_model'])
+        runtime=dict(profile_identity=candidate.get('profile_identity'))
+    else:
+        action=None
+        missing=[]
+        controller=dict(route=route,parameters=policy['controller'],
+            mathematical_model=policy['dynamics_model'])
+        runtime=dict(profile_identity=candidate.get('profile_identity'),
+            numerical_environment=environment if environment is not None else (result or {}).get('numerical_environment'))
+        if runtime['numerical_environment'] is None:
+            missing.append('runtime.numerical_environment')
+    if runtime['profile_identity'] is None:
+        missing.append('runtime.profile_identity')
+    return dict(physical=physical,task=task,controller=controller,action=action,
+        runtime=runtime,missing_effective_fields=missing)
+
+
+def compare_experiments(proposed, previous):
+    fields=('physical','task','controller','action','runtime')
+    equal=[key for key in fields if proposed[key]==previous[key]]
+    different=[key for key in fields if key not in equal]
+    def paths(a,b,prefix):
+        if a==b:
+            return []
+        if isinstance(a,dict) and isinstance(b,dict):
+            return [path for key in sorted(a.keys()|b.keys())
+                for path in paths(a.get(key),b.get(key),prefix+'.'+key)]
+        if isinstance(a,list) and isinstance(b,list) and len(a)==len(b):
+            return [path for i,(left,right) in enumerate(zip(a,b))
+                for path in paths(left,right,prefix+'['+str(i)+']')]
+        return [prefix]
+    different_paths=[path for key in different
+        for path in paths(proposed[key],previous[key],key)]
+    missing=sorted(set(proposed['missing_effective_fields']+previous['missing_effective_fields']))
+    if missing and not any(key in different for key in ('physical','task','controller','action')):
+        relation='unresolved_comparison'
+    elif not different:
+        relation='equivalent_repeat'
+    elif proposed['physical']==previous['physical'] and proposed['task']==previous['task']:
+        relation='same_robot_different_control'
+    elif proposed['controller']==previous['controller'] and proposed['task']==previous['task']:
+        relation='same_controller_different_robot'
+    elif proposed['task']['seed']!=previous['task']['seed'] and proposed['task']['task']==previous['task']['task']:
+        relation='different_seed'
+    else:
+        relation='different_intervention'
+    return dict(relation=relation,equal_fields=equal,different_fields=different,
+        different_paths=different_paths,
+        missing_effective_fields=missing)
+
+
+def experiment_preflight(host, candidate_ref, route, *, source_ref=None, repeat=False,
+                         rl_configuration=None, policy_sha=None):
+    """Compare current proposal with sealed studies before any reservation."""
+    from tools.research.state import ROOT, state
+    candidate=host.store.artifact(candidate_ref)
+    source=host.store.artifact(source_ref) if source_ref else None
+    s=state(host)
+    proposed=experiment_identity(candidate,route,source=source,
+        environment=s['spec'].get('numerical_environment') if route=='nmpc' else None,
+        rl_configuration=rl_configuration,policy_sha=policy_sha)
+    matches=[]
+    def consider(previous, ref, outcome, study):
+        comparison=compare_experiments(proposed,previous)
+        if comparison['relation'] in ('equivalent_repeat','unresolved_comparison'):
+            matches.append(dict(study=study,reference=ref,previous_identity_sha256=digest(previous),
+                outcome=outcome,**comparison))
+    for ref in [*s.get('results',[]),*s.get('physical_replays',[]),*s.get('rl_evaluations',[])]:
+        row=host.store.artifact(ref)
+        prior_route='rl' if row.get('independent_evaluation_executed') is not None else 'fixed_tension' if row.get('source_reference') else 'nmpc'
+        if prior_route!=route:
+            continue
+        prior_candidate=host.store.artifact(row['candidate'])
+        prior_source=host.store.artifact(row['source_reference']) if prior_route=='fixed_tension' else None
+        prior_config=host.store.artifact(row['configuration']) if route=='rl' else None
+        previous=experiment_identity(prior_candidate,route,source=prior_source,result=row,
+            rl_configuration=prior_config)
+        consider(previous,ref,(row.get('acceptance') or {}).get('status'),host.run_id)
+    for summary_path in (ROOT/'evidence').glob('*/summary.json'):
+        archive=summary_path.parent/'study/immutable_artifacts.tar.gz'
+        if not archive.exists():
+            continue
+        summary=json.loads(summary_path.read_text(encoding='utf-8'))
+        if route=='rl' and isinstance(summary.get('routes'),list) and isinstance(summary.get('candidate'),dict):
+            try:
+                with tarfile.open(archive,'r:gz') as bundle:
+                    def artifact(ref):
+                        return json.load(bundle.extractfile('artifacts/'+ref['artifact_id']+'.json'))
+                    prior_candidate=artifact(summary['candidate'])
+                    for item in summary['routes']:
+                        row=item.get('evaluation_facts') or {}
+                        if not row.get('independent_evaluation_executed') or not row.get('configuration'):
+                            continue
+                        previous=experiment_identity(prior_candidate,'rl',result=row,
+                            rl_configuration=artifact(row['configuration']))
+                        consider(previous,item['evaluation'],row.get('failure_reason'),summary_path.parent.name)
+            except (KeyError,TypeError,tarfile.TarError):
+                pass
+            continue
+        if route=='rl':
+            continue
+        if not isinstance(summary.get('candidate'),dict) or not isinstance(summary.get('result'),dict):
+            continue
+        stage_route='fixed_tension' if summary.get('source') else 'nmpc'
+        if stage_route!=route:
+            continue
+        try:
+            with tarfile.open(archive,'r:gz') as bundle:
+                def artifact(ref):
+                    return json.load(bundle.extractfile('artifacts/'+ref['artifact_id']+'.json'))
+                prior_candidate=artifact(summary['candidate'])
+                row=artifact(summary['result'])
+                if route=='fixed_tension' and row.get('physical_launches')!=1:
+                    continue
+                if route=='nmpc' and 'execution' not in row:
+                    continue
+                prior_source=artifact(row['source_reference']) if route=='fixed_tension' else None
+        except (KeyError,TypeError,tarfile.TarError):
+            continue
+        previous=experiment_identity(prior_candidate,route,source=prior_source,result=row)
+        consider(previous,summary['result'],(row.get('acceptance') or {}).get('status'),summary_path.parent.name)
+    repeats=[m for m in matches if m['relation'] in ('equivalent_repeat','unresolved_comparison')]
+    return dict(proposed_identity=proposed,proposed_identity_sha256=digest(proposed),
+        matches=matches,new_evidence_expected=not bool(repeats),
+        authorized_as_repeat=bool(repeat),
+        admitted=bool(repeat or not repeats))
 
 
 def confirmation_progress(host, selected=None):
@@ -257,7 +428,11 @@ def facts(host):
     from tools.research.state import state
     s = state(host)
     if s['spec'].get('mode')=='rl_interface':
+        from tools.rl.run import failure_diagnosis
         return dict(owning_study=host.run_id,rl_runs=s.get('rl_runs',{}),rl_evaluations=s.get('rl_evaluations',[]),
+            numerical_failure_categories={run_id:failure_diagnosis(host.store.root/'rl'/run_id)
+                for run_id in s.get('rl_runs',{}) if (host.store.root/'rl'/run_id).exists()},
+            available_controller_routes=['direct','residual'],
             frozen_task=s.get('rl_task'),closeout='Explicit evaluation evidence read and cited next-step decision; no second trial')
     progress=confirmation_progress(host)
     options=[*s['results'],*s.get('rl_evaluations',[]),*s.get('linked_selections',[])]

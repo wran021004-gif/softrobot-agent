@@ -1,7 +1,7 @@
 """Public RL functions and CLI, without agent runtime or model services."""
 import argparse
 import csv
-from collections import deque
+from collections import Counter, deque
 from contextlib import contextmanager
 import ctypes
 import json
@@ -145,6 +145,71 @@ def reconcile(directory):
         state.update(status="interrupted", stop_reason="worker_missing; outstanding reservation conservatively charged")
         write_json(directory / "state.json", state)
     return state
+
+
+def failure_diagnosis(directory):
+    """Summarize recorded invalid transitions; no physics or policy is run."""
+    paths = sorted((Path(directory) / 'failures').glob('**/failure_episode_*.json'))
+    warnings = Counter()
+    substeps = Counter()
+    actions = Counter()
+    training_quarters = Counter()
+    saturated = clipped = 0
+    max_tension = [float('-inf')] * 4
+    min_tension = [float('inf')] * 4
+    max_delta = [0.] * 4
+    speeds = []
+    errors = []
+    rewards = []
+    cumulative = []
+    resets = nonfinite = 0
+    for path in paths:
+        row = read_json(path)
+        warnings.update(row['warnings'])
+        substeps[row['failed_substep']] += 1
+        actions[row['episode_action']] += 1
+        step = row['cumulative_action']
+        cumulative.append(step)
+        training_quarters[min(4, (step - 1) // 8192 + 1)] += 1
+        resets += 'engine_time_reset' in row['warnings']
+        nonfinite += any(w.startswith('nonfinite') for w in row['warnings'])
+        saturated += any(row['saturated'])
+        clipped += any(row['clipped'])
+        speeds.append(row['start_speed_m_s'])
+        errors.append(row['start_error_m'])
+        for i, value in enumerate(row['tension_n']):
+            min_tension[i] = min(min_tension[i], value)
+            max_tension[i] = max(max_tension[i], value)
+            max_delta[i] = max(max_delta[i], abs(row['delta_tension_n'][i]))
+        trace = path.with_suffix('.jsonl')
+        if trace.exists():
+            last = None
+            with trace.open(encoding='utf-8') as stream:
+                for line in stream:
+                    record = json.loads(line)
+                    if record.get('reward') is not None:
+                        last = record
+            if last and last.get('reward') is not None:
+                rewards.append(last['reward'])
+    def quartiles(values):
+        ordered = sorted(values)
+        return [ordered[round((len(ordered)-1)*q)] for q in (0,.25,.5,.75,1)] if ordered else None
+    return dict(recorded_failures=len(paths),warnings=dict(warnings),
+        engine_time_resets=resets,nonfinite_failures=nonfinite,
+        failed_substeps=dict(sorted(substeps.items())),
+        episode_actions=dict(sorted(actions.items())),
+        training_action_quarters=dict(sorted(training_quarters.items())),
+        cumulative_action_range=[min(cumulative),max(cumulative)] if cumulative else None,
+        any_saturation=saturated,any_clipping=clipped,
+        tension_min_n=min_tension if paths else None,tension_max_n=max_tension if paths else None,
+        max_absolute_tension_change_n=max_delta if paths else None,
+        start_speed_range_m_s=[min(speeds),max(speeds)] if speeds else None,
+        start_speed_five_number_m_s=quartiles(speeds),
+        start_position_error_range_m=[min(errors),max(errors)] if errors else None,
+        start_position_error_five_number_m=quartiles(errors),
+        last_valid_action_reward_five_number=quartiles(rewards),
+        captured_last_valid_rewards=len(rewards),
+        source='failures/*/failure_episode_*.json and matching .jsonl; each failed episode has one capture')
 
 
 def training_summary(directory, state=None):

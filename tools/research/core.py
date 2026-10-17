@@ -300,6 +300,18 @@ def dispatch(host, value, request_id, origin='model'):
             raise ValueError('RL_STOP_REQUIRES_PUBLIC_EXPLICIT_EVIDENCE_READ')
         if any(e.get('status',{}).get('worker_alive',True) for e in s['rl_runs'].values()):
             raise ValueError('RL_STOP_REQUIRES_TERMINAL_STATUS_QUERY')
+    scientific_preflight=None
+    if plan.action in ('execute','physical_replay'):
+        from tools.research.feedback import experiment_preflight
+        from tools.research.design import verify_candidate
+        candidate=plan.candidate if plan.action=='execute' else plan.physical_replay.candidate
+        verify_candidate(host,candidate)
+        scientific_preflight=experiment_preflight(host,candidate,
+            'nmpc' if plan.action=='execute' else 'fixed_tension',
+            source_ref=plan.physical_replay.source if plan.action=='physical_replay' else None)
+        if not scientific_preflight['admitted']:
+            raise ValueError('EQUIVALENT_SCIENTIFIC_EXPERIMENT_REQUIRES_EXPLICIT_REPLICATION_GRANT: '
+                +json.dumps(scientific_preflight,sort_keys=True))
     admission=dict(scope='selection without execution or numerical reservation') if plan.action=='select' else capacity(host,plan.search.max_evaluations if plan.search else 1,plan.action=='confirm',root_operation=True,candidate=plan.candidate)
     if plan.action=='execute' and s['spec'].get('nmpc_execution_cap_s'):
         timing=nmpc_timing(host,plan.candidate)
@@ -309,6 +321,7 @@ def dispatch(host, value, request_id, origin='model'):
         raise ValueError('CANDIDATE_PLUS_DECLARED_CONFIRMATIONS_CANNOT_FIT')
     row,_=host.store.reserve(host.run_id,request_id,digest(plain(plan)),host.actor,{**zero(),'tool_calls':1})
     ref=save(host,dict(origin=origin,request_id=request_id,original_plan=plain(plan),admission=admission,
+        scientific_preflight=scientific_preflight,
         experience_read_bindings=experience_bindings),'original_research_plan')
     update(host,plans=[*state(host)['plans'],ref])
     try:
@@ -367,7 +380,8 @@ def dispatch(host, value, request_id, origin='model'):
         else:
             update(host,research_status='stopped',final_disposition=ref,closed_unix=time.time())
             result=dict(accepted_stop=True,claims=claims(host))
-        output=dict(plan=ref,result=result,resource_use=packet(host)['resource_use'])
+        output=dict(plan=ref,result=result,scientific_preflight=scientific_preflight,
+            resource_use=packet(host)['resource_use'])
         host.store.complete(row,dict(request_id=request_id,execution_id=row['execution_id'],caller=host.actor,
             tool_id='research.core_plan',tool_version='1.0.0',execution_status='completed',charged=zero()),output)
         return output
