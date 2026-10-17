@@ -1,0 +1,742 @@
+{
+  "schema": "sorosim_s55_s5t_feedback_v1",
+  "scope": "Future Agent decision evidence; saved diagnostics, no live model pilot",
+  "frozen_task": {
+    "binding": {
+      "candidate": {
+        "artifact_id": "4c94b237578d13bbb1706f7858b7bbbce48d36e5048456638e4925c4aec93ec1",
+        "media_type": "application/json"
+      },
+      "configuration_identity": "539ed8d62c88c36fab23b060d56618d15af0d34fa86c9b5444fe6d62251b08ce",
+      "design_identity": "10035885ded80b7afbf2faa28988c6275a18ac04f3232c5d0972acced81af9ad",
+      "effective_configuration_identity": "539ed8d62c88c36fab23b060d56618d15af0d34fa86c9b5444fe6d62251b08ce",
+      "physics_identity": "bd0371aad5cdc49b4e074ac130fb27ed12d86b8b6bfcbc2ee9450ab6857d798f",
+      "task_id": "family-multisegment-dev",
+      "task_identity": "882b3493037dcc8f8da294b3473e1223f0465e92c35bc3064bfc42d467bf212e",
+      "task_version": "1.0.0"
+    },
+    "constraints": [
+      {
+        "constraint_id": "terminal_error_m",
+        "indices": [
+          35
+        ],
+        "kind": "norm_bound",
+        "lower": null,
+        "provenance": [
+          "/task/evaluator/parameters/data/tolerance_m",
+          "/task/timing",
+          "/task/goal",
+          "/policy/controller/parameters/data/settling/window_s"
+        ],
+        "radius": 0.01,
+        "reference": [
+          [
+            0.29,
+            0.035,
+            0.19
+          ]
+        ],
+        "signal": {
+          "dimension": 3,
+          "entity": "tip",
+          "frame": "world",
+          "missing": "unsupported",
+          "name": "tip_position",
+          "phase": "post_step",
+          "units": "m"
+        },
+        "unsupported_requirement": null,
+        "upper": null
+      },
+      {
+        "constraint_id": "holding_max_error_m",
+        "indices": [
+          30,
+          31,
+          32,
+          33,
+          34,
+          35
+        ],
+        "kind": "norm_bound",
+        "lower": null,
+        "provenance": [
+          "/policy/controller/parameters/data/settling/position_limit_m",
+          "/task/timing",
+          "/task/goal",
+          "/policy/controller/parameters/data/settling/window_s"
+        ],
+        "radius": 0.01,
+        "reference": [
+          [
+            0.29,
+            0.035,
+            0.19
+          ],
+          [
+            0.29,
+            0.035,
+            0.19
+          ],
+          [
+            0.29,
+            0.035,
+            0.19
+          ],
+          [
+            0.29,
+            0.035,
+            0.19
+          ],
+          [
+            0.29,
+            0.035,
+            0.19
+          ],
+          [
+            0.29,
+            0.035,
+            0.19
+          ]
+        ],
+        "signal": {
+          "dimension": 3,
+          "entity": "tip",
+          "frame": "world",
+          "missing": "unsupported",
+          "name": "tip_position",
+          "phase": "post_step",
+          "units": "m"
+        },
+        "unsupported_requirement": null,
+        "upper": null
+      },
+      {
+        "constraint_id": "holding_max_speed_m_s",
+        "indices": [
+          30,
+          31,
+          32,
+          33,
+          34,
+          35
+        ],
+        "kind": "norm_bound",
+        "lower": null,
+        "provenance": [
+          "/policy/controller/parameters/data/settling/speed_limit_m_s",
+          "/task/timing",
+          "/task/goal",
+          "/policy/controller/parameters/data/settling/window_s"
+        ],
+        "radius": 0.02,
+        "reference": [
+          [
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            0.0
+          ]
+        ],
+        "signal": {
+          "dimension": 3,
+          "entity": "tip",
+          "frame": "world",
+          "missing": "unsupported",
+          "name": "tip_velocity",
+          "phase": "post_step",
+          "units": "m/s"
+        },
+        "unsupported_requirement": null,
+        "upper": null
+      }
+    ],
+    "sample_times_s": [
+      0.0,
+      0.01,
+      0.02,
+      0.03,
+      0.04,
+      0.05,
+      0.06,
+      0.07,
+      0.08,
+      0.09,
+      0.1,
+      0.11,
+      0.12,
+      0.13,
+      0.14,
+      0.15,
+      0.16,
+      0.17,
+      0.18,
+      0.19,
+      0.2,
+      0.21,
+      0.22,
+      0.23,
+      0.24,
+      0.25,
+      0.26,
+      0.27,
+      0.28,
+      0.29,
+      0.3,
+      0.31,
+      0.32,
+      0.33,
+      0.34,
+      0.35
+    ],
+    "world_target_m": [
+      0.29,
+      0.035,
+      0.19
+    ]
+  },
+  "model_and_candidate": {
+    "model_identity": "8f8eceb5f74d4b171c87f333db4db0f353aad051b375ff26aca795f7ac1fbaf2",
+    "design_identity": "10035885ded80b7afbf2faa28988c6275a18ac04f3232c5d0972acced81af9ad",
+    "candidate_artifact_id": {
+      "artifact_id": "4c94b237578d13bbb1706f7858b7bbbce48d36e5048456638e4925c4aec93ec1",
+      "media_type": "application/json"
+    },
+    "physical_scene_identity": "2af845d0fa8af3b0cb5f9323e877ea77bd00483b2a4ff851b975125e68198f92",
+    "physical_physics_identity": "bd0371aad5cdc49b4e074ac130fb27ed12d86b8b6bfcbc2ee9450ab6857d798f",
+    "pinned_sorosim_commit": "24d573a3e864ffda87c42ee462a6ed620133cc7b"
+  },
+  "evaluated_signatures": {
+    "s5_agent_vs_s5b": {
+      "sha256": "e0c051fac9c6a0cce7c135dca2b02f59b6034b7d45c73127a012ab71478a92f2",
+      "equivalent_historical": [
+        {
+          "study": "sorosim-s5-agent-feedback-20261016",
+          "reference": {
+            "artifact_id": "6b09e908b8a18e1419060bafc73516d2f80f9131c6f3083b64b235247e174a25",
+            "media_type": "application/json"
+          },
+          "outcome": "valid_failure"
+        },
+        {
+          "study": "sorosim_s5b",
+          "reference": {
+            "artifact_id": "bb8506acc88494094afe1bdd8c5559f0c9709d4ec9b958ddfcff8f2d2413fb81",
+            "media_type": "application/json"
+          },
+          "outcome": "valid_failure"
+        }
+      ],
+      "admitted": false
+    },
+    "s5_agent_vs_s5a": {
+      "sha256": "4b58c1f16cf97f8a86f6399b5b0414612a5616063c0c98e7e73050bdbf51432d",
+      "equivalent_historical": [
+        {
+          "study": "sorosim-s5-agent-feedback-20261016",
+          "reference": {
+            "artifact_id": "30d7c488021b653d7e10dc8d9e3335108ba48bcd38c6408ffacacfa7c58ecf09",
+            "media_type": "application/json"
+          },
+          "outcome": "valid_failure"
+        },
+        {
+          "study": "sorosim_s5a",
+          "reference": {
+            "artifact_id": "e4d212379075da3f0be79f8aab3b5c32cee19dabe87e93ba8fdcc7f02c71d60e",
+            "media_type": "application/json"
+          },
+          "outcome": "valid_failure"
+        }
+      ],
+      "admitted": false
+    },
+    "s5rl_direct": {
+      "sha256": "b392f3006016275030098070bcfccb178e6b4062dd70d571a35515617c15a20a",
+      "equivalent_historical": [
+        {
+          "study": "sorosim-s5rl-design-b-20261016",
+          "reference": {
+            "artifact_id": "1c9c2d3fcc0595360f6271d68324c36e2e41ad7161dd3299ddc01025c27a00cf",
+            "media_type": "application/json"
+          },
+          "outcome": null
+        },
+        {
+          "study": "sorosim_s5rl",
+          "reference": {
+            "artifact_id": "1c9c2d3fcc0595360f6271d68324c36e2e41ad7161dd3299ddc01025c27a00cf",
+            "media_type": "application/json"
+          },
+          "outcome": "task_thresholds_not_met"
+        }
+      ],
+      "admitted": false
+    },
+    "s5rl_residual": {
+      "sha256": "5f7e84807932601574c5bcf8d64665e501975e40392df48bc0c6bc812192f2ab",
+      "equivalent_historical": [
+        {
+          "study": "sorosim-s5rl-design-b-20261016",
+          "reference": {
+            "artifact_id": "5c9fa07c579b2ba18e09d7b0bbb43d38328b97c129d3ccc881398a126a509f94",
+            "media_type": "application/json"
+          },
+          "outcome": null
+        },
+        {
+          "study": "sorosim_s5rl",
+          "reference": {
+            "artifact_id": "5c9fa07c579b2ba18e09d7b0bbb43d38328b97c129d3ccc881398a126a509f94",
+            "media_type": "application/json"
+          },
+          "outcome": "task_thresholds_not_met"
+        }
+      ],
+      "admitted": false
+    }
+  },
+  "controller_routes": {
+    "fixed_tension": "available for bounded replays",
+    "nmpc": "historical S5-B valid failure; equivalent repeat withheld",
+    "ppo_direct": "available; original training numerically unstable",
+    "ppo_residual": "available; zero saved training numerical failures"
+  },
+  "integration_refinement": {
+    "1": {
+      "reference": {
+        "artifact_id": "45815dc9cbf9266b3406a91657d1f9d7a163ac96557a5a4dce750d41f16780f9",
+        "media_type": "application/json"
+      },
+      "status": "historical_verified_discrete_witness",
+      "complete": true,
+      "original_task_satisfied": true,
+      "root_count": 35,
+      "holding_max_speed_m_s": 0.00011398889790096886,
+      "holding_max_position_error_m": 5.642867763096399e-05,
+      "terminal_position_error_m": 5.638084370980055e-05
+    },
+    "2": {
+      "reference": {
+        "artifact_id": "0d5ee9281037595f3cdfc225b8638e373daf6fc7697f9fed5010b35897a79527",
+        "media_type": "application/json"
+      },
+      "status": "root_failed",
+      "complete": false,
+      "original_task_satisfied": false,
+      "root_count": 14,
+      "holding_max_speed_m_s": null,
+      "holding_max_position_error_m": null,
+      "terminal_position_error_m": null
+    },
+    "4": {
+      "reference": {
+        "artifact_id": "98652528c8dd47c0aee7ffb0fdb5fd9233c4585cb9605bf0591abb44d7cd1352",
+        "media_type": "application/json"
+      },
+      "status": "completed",
+      "complete": true,
+      "original_task_satisfied": false,
+      "root_count": 140,
+      "holding_max_speed_m_s": 0.5934568478516942,
+      "holding_max_position_error_m": 0.019056955755732564,
+      "terminal_position_error_m": 0.007868659432472638
+    },
+    "8": {
+      "reference": {
+        "artifact_id": "77c4e0919cf3e105710f62c10b20869cf2864f4d8b0321305eca67d0070dda77",
+        "media_type": "application/json"
+      },
+      "status": "completed",
+      "complete": true,
+      "original_task_satisfied": false,
+      "root_count": 280,
+      "holding_max_speed_m_s": 0.7233867653644765,
+      "holding_max_position_error_m": 0.02276747387122722,
+      "terminal_position_error_m": 0.009712681409834925
+    }
+  },
+  "matched_state": [
+    {
+      "time_s": 0.0,
+      "following_command_index": 0,
+      "projection_curvature_residual_max_rad_m": 0.0,
+      "eight_substep": {
+        "position": {
+          "e_increment": [
+            -4.303256926868615e-05,
+            0.000268410295131318,
+            0.0001313961034663247
+          ],
+          "e_one_step": [
+            -4.3032569268519616e-05,
+            0.000268410295131318,
+            0.0001313961034663247
+          ],
+          "e_projection": [
+            1.6653345369377348e-16,
+            0.0,
+            0.0
+          ],
+          "increment_norm": 0.0003019285090157579,
+          "one_step_norm": 0.00030192850901573416,
+          "projection_norm": 1.6653345369377348e-16
+        },
+        "velocity": {
+          "e_increment": [
+            -0.005699178395206256,
+            -0.006728203075719863,
+            -0.0005535068019200673
+          ],
+          "e_one_step": [
+            -0.005699178395206256,
+            -0.006728203075719863,
+            -0.0005535068019200673
+          ],
+          "e_projection": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "increment_norm": 0.008834914871592355,
+          "one_step_norm": 0.008834914871592355,
+          "projection_norm": 0.0
+        }
+      },
+      "four_to_eight": {
+        "position_vector_m": [
+          3.123163118468053e-05,
+          -0.00029274364525464554,
+          -0.00010207434014433692
+        ],
+        "velocity_vector_m_s": [
+          0.00034843194874914496,
+          0.02009649294191751,
+          0.01033054813813733
+        ],
+        "position_norm_m": 0.00031159818282418695,
+        "velocity_norm_m_s": 0.02259890834137397
+      },
+      "historical_open_loop_gap": {
+        "position_vector_m": [
+          -0.00020775843326781285,
+          0.002010857764971523,
+          0.0006737298350857901
+        ],
+        "velocity_vector_m_s": [
+          0.0034013749322557296,
+          -0.12714350431736454,
+          -0.06323693627169752
+        ],
+        "position_norm_m": 0.0021308740948786467,
+        "velocity_norm_m_s": 0.14204207176241906
+      }
+    },
+    {
+      "time_s": 0.15,
+      "following_command_index": 15,
+      "projection_curvature_residual_max_rad_m": 24.65047903971478,
+      "eight_substep": {
+        "position": {
+          "e_increment": [
+            0.000721775927144841,
+            0.0021542347272791793,
+            0.0031792102047964454
+          ],
+          "e_one_step": [
+            0.014673937713298585,
+            0.0012908707151483498,
+            0.008169826998581237
+          ],
+          "e_projection": [
+            0.013952161786153744,
+            -0.0008633640121308295,
+            0.004990616793784791
+          ],
+          "increment_norm": 0.0039075651338785445,
+          "one_step_norm": 0.016844490743377818,
+          "projection_norm": 0.014842994034454715
+        },
+        "velocity": {
+          "e_increment": [
+            0.11382790078675509,
+            0.04647541341147576,
+            0.21147838355268045
+          ],
+          "e_one_step": [
+            0.08987947834377352,
+            0.21928012366301863,
+            0.3645367984154807
+          ],
+          "e_projection": [
+            -0.023948422442981565,
+            0.17280471025154287,
+            0.15305841486280025
+          ],
+          "increment_norm": 0.24462187506300734,
+          "one_step_norm": 0.4347978503397026,
+          "projection_norm": 0.23208160888562512
+        }
+      },
+      "four_to_eight": {
+        "position_vector_m": [
+          -0.0003008083615710644,
+          -2.3441292165839178e-05,
+          -0.00015869893323833262
+        ],
+        "velocity_vector_m_s": [
+          0.015019855375650981,
+          0.006946411286776311,
+          0.00884089311908276
+        ],
+        "position_norm_m": 0.00034091130221871083,
+        "velocity_norm_m_s": 0.01876193157469587
+      },
+      "historical_open_loop_gap": {
+        "position_vector_m": [
+          0.04842979244175624,
+          0.007524982207904943,
+          0.028069075493658197
+        ],
+        "velocity_vector_m_s": [
+          0.2607238462671403,
+          0.10039255498629696,
+          0.7533315485614999
+        ],
+        "position_norm_m": 0.05647958172870581,
+        "velocity_norm_m_s": 0.803469981497178
+      }
+    },
+    {
+      "time_s": 0.29,
+      "following_command_index": 29,
+      "projection_curvature_residual_max_rad_m": 15.299266008054094,
+      "eight_substep": {
+        "position": {
+          "e_increment": [
+            -0.0008497115555797241,
+            0.00023077837317313915,
+            0.0008196519046697881
+          ],
+          "e_one_step": [
+            0.0029067438531316103,
+            0.0005269313700969475,
+            -3.767339389568192e-05
+          ],
+          "e_projection": [
+            0.0037564554087113344,
+            0.0002961529969238083,
+            -0.00085732529856547
+          ],
+          "increment_norm": 0.0012029537106800772,
+          "one_step_norm": 0.0029543587766414333,
+          "projection_norm": 0.0038644107575132283
+        },
+        "velocity": {
+          "e_increment": [
+            0.18229497249602605,
+            -0.003834187255604582,
+            -0.02151021238401085
+          ],
+          "e_one_step": [
+            0.06370663129689719,
+            0.01128919294589259,
+            0.016208880620851795
+          ],
+          "e_projection": [
+            -0.11858834119912887,
+            0.015123380201497172,
+            0.03771909300486265
+          ],
+          "increment_norm": 0.18359969288112435,
+          "one_step_norm": 0.06669863986281442,
+          "projection_norm": 0.12535805229098576
+        }
+      },
+      "four_to_eight": {
+        "position_vector_m": [
+          0.000708686195923014,
+          7.211278375274244e-07,
+          -0.00043952245330433626
+        ],
+        "velocity_vector_m_s": [
+          -0.038500392727800925,
+          0.011897601248377465,
+          0.021100265895404813
+        ],
+        "position_norm_m": 0.0008339164414231518,
+        "velocity_norm_m_s": 0.04548685938287104
+      },
+      "historical_open_loop_gap": {
+        "position_vector_m": [
+          -0.0025561811365925613,
+          0.0032163769704351905,
+          0.017537624225073184
+        ],
+        "velocity_vector_m_s": [
+          0.47220028724475904,
+          -0.43689820017610886,
+          -0.5894857461273011
+        ],
+        "position_norm_m": 0.018012423664762366,
+        "velocity_norm_m_s": 0.8725517712310354
+      }
+    }
+  ],
+  "mechanisms": {
+    "H1": "Strong discretization sensitivity; continuous-time convergence unresolved",
+    "H2": "Reduced-state projection and cross-model initial output differences",
+    "H3": "Same-state response disagreement with numerical and projection confounders",
+    "H4": "Historical open-loop gap exceeds matched one-step gap; history contributes",
+    "unique_cause": "unresolved"
+  },
+  "ppo_numerical_failure_categories": {
+    "direct": {
+      "recorded_failures": 260,
+      "warnings": {
+        "mjWARN_BADQVEL": 207,
+        "engine_time_reset": 260,
+        "mjWARN_BADQACC": 52,
+        "mjWARN_BADQPOS": 1
+      },
+      "engine_time_resets": 260,
+      "nonfinite_failures": 0,
+      "episode_actions": {
+        "18": 5,
+        "19": 43,
+        "20": 65,
+        "21": 91,
+        "22": 45,
+        "23": 7,
+        "24": 1,
+        "25": 1,
+        "26": 1,
+        "27": 1
+      },
+      "training_action_quarters": {
+        "1": 104,
+        "2": 88,
+        "3": 29,
+        "4": 39
+      }
+    },
+    "residual": {
+      "recorded_failures": 0,
+      "warnings": {},
+      "engine_time_resets": 0,
+      "nonfinite_failures": 0
+    }
+  },
+  "optimality": {
+    "base_kkt_verified": false,
+    "attempts": [
+      {
+        "solver_exitflag": -2,
+        "raw_scaled_primal_violation": 8.890660777027826e-08,
+        "raw_stationarity_inf": 0.008295595467308597,
+        "raw_dual_violation": 0,
+        "raw_complementarity_inf": 3.0234732945196456e-10,
+        "source_artifact_id": "32af0d4b524ff9c703e8f67e9e3c97d471d65b8651cb859ef58bcf34b789db7b"
+      },
+      {
+        "solver_exitflag": -2,
+        "raw_scaled_primal_violation": 6.770568741071292e-08,
+        "raw_stationarity_inf": 0.011707405540762564,
+        "raw_dual_violation": 0,
+        "raw_complementarity_inf": 7.920184600139666e-10,
+        "source_artifact_id": "af0f3168bc4fc94efcffcff55ce26e7b8241f99a3912a93b7d07ef56d6795bbf"
+      }
+    ],
+    "multiplier_reliability": "Full NLP arrays saved; primal and stationarity tolerances fail",
+    "structural_sensitivity": "unavailable; fixed-command A/B secant is not reoptimized sensitivity",
+    "conditional_descent": "theorem under stated assumptions; no numerical certificate"
+  },
+  "budget": {
+    "p1_refinement_study": {
+      "new_integrations": 3,
+      "completed": 2,
+      "partial": 1,
+      "remaining_public_operations": 0
+    },
+    "p2_matched_study": {
+      "physical_steps": 600,
+      "checkpoint_reconstruction_steps": 540,
+      "physical_probe_steps": 60,
+      "physical_probe_count": 3,
+      "mathematical_one_interval_integrations": 6,
+      "new_full_nlp": 0,
+      "new_ppo_actions": 0,
+      "new_provider_requests": 0,
+      "charged_numerical_s": 20.696515100076795
+    },
+    "p3_optimality_study": {
+      "full_nlp": 2,
+      "mathematical_replays": 2,
+      "remaining_public_operations": 0,
+      "remaining_full_nlp": 0,
+      "remaining_replays": 0,
+      "charged_numerical_s": 1709.6493694999954
+    },
+    "p4_perturbations_used": 0,
+    "new_ppo_training_actions": 0,
+    "live_provider_requests": 0
+  },
+  "agent_guidance": {
+    "permitted_next_decisions": [
+      "improve numerical integration",
+      "revise model fidelity",
+      "inspect state projection",
+      "diagnose controller performance",
+      "change structural parameters",
+      "continue NMPC research",
+      "continue direct PPO",
+      "continue residual PPO",
+      "request discriminating experiment",
+      "stop"
+    ],
+    "proposal_fields": [
+      "hypothesis",
+      "difference_from_existing_evidence",
+      "supporting_and_weakening_observations",
+      "decision_impact",
+      "expected_scope_and_cost"
+    ],
+    "novelty_gate": "Harness verifies resolved scientific identity and executability; equivalent S5-Agent configurations are not unexplored physical candidates",
+    "interpretation": "Agent explanation is a hypothesis, not proof; no invented probabilities or information gain"
+  },
+  "source_evidence": {
+    "p0_equivalence": "p0_equivalence.json",
+    "p0_ppo_diagnosis": "p0_ppo_diagnosis.json",
+    "p1_refinement": "p1_refinement.json",
+    "p2_projection_audit": "p2_projection_audit.json",
+    "p2_matched_state": "p2_matched_state.json",
+    "p3_p4_saved_audit": "p3_p4_saved_audit.json",
+    "p3_warm_derivative_preflight": "p3_warm_derivative_preflight.json",
+    "p3_p4_optimality": "p3_p4_optimality.json"
+  }
+}

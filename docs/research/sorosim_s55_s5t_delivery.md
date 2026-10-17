@@ -178,7 +178,7 @@ All four mechanisms can coexist. Their independent quantitative shares
 remain unresolved because the reduced projection is not isometric and the
 four/eight-substep SoRoSim outputs have not converged.
 
-## P3 preparation: raw S4.5 SQP point and full warm start
+## P3: raw S4.5 SQP point, full warm start, and bounded base solves
 
 The [saved-point audit](../../evidence/sorosim_s55/p3_p4_saved_audit.json)
 extracts the raw optimizer checkpoint from the sealed S4.5 archive. The raw
@@ -223,12 +223,59 @@ optimization inequalities after deduplicating the equal terminal/final
 holding position row; there are 864 dynamics/initial-state equalities.
 Directional objective and complete-constraint derivative relative errors
 were 3.144e-10 and 1.127e-9. This check used 25.278 s and launched no
-optimizer. A full P3 solve has not yet run. The previous S5-T derivative
-preflight used 13 optimization inequalities and had relative errors
-2.238e-8 and 1.727e-10. Neither check establishes Jacobian rank,
-multiplier reliability, second-order sufficiency or local regularity.
+optimizer. The previous S5-T derivative preflight used 13 optimization
+inequalities and had relative errors 2.238e-8 and 1.727e-10. Neither check
+establishes Jacobian rank, multiplier reliability, second-order sufficiency
+or local regularity.
+
+The [sealed P3 study](../../evidence/sorosim_s55/optimality_study/archive_manifest.json)
+contains the complete returned raw SQP checkpoints, all 864 equality and
+12 task-inequality multipliers, both independent mathematical replays,
+and the verified intermediate warm source. The compact
+[P3/P4 result](../../evidence/sorosim_s55/p3_p4_optimality.json) gives the
+artifact IDs and raw KKT residuals. Each solve used the original
+`task_capability` objective and the full 1,006-variable trajectory. The
+second started from the first solve's `bestfeasible.x`, decoded with the
+exact state/input scales and independently replayed before optimization.
+
+| Base attempt | Initial point | SQP exit / iterations / evaluations | Objective | Raw scaled primal violation | Raw stationarity inf | Independent replay |
+|---|---|---:|---:|---:|---:|---|
+| 1 | Recovered S4.5 feasible witness | -2 / 75 / 1,481 | -0.999968689 | 8.891e-8 | 0.008296 | Passed; scaled state difference 2.960e-10 |
+| 2 | Attempt 1's independently checked `bestfeasible.x` | -2 / 44 / 876 | -0.999968652 | 6.771e-8 | 0.011707 | Passed; scaled state difference 2.208e-10 |
+
+For both attempts, the raw point is the reported selected trajectory and
+satisfies the original sampled task. Replay confirms a trajectory under the
+one-substep discrete model; it does not repair stationarity. SQP stopped
+because the step fell below `StepTolerance=1e-10` while its constraint
+violation exceeded `ConstraintTolerance=1e-8`. Raw dual violation was zero;
+complementarity infinity norms were 3.02e-10 and 7.92e-10. The complete
+multiplier arrays have 864 nonlinear equality, 12 nonlinear inequality, and
+1,006 lower plus 1,006 upper entries. These are raw solver estimates, not
+validated sensitivity weights. The intermediate `bestfeasible.x` was itself
+replayed with scaled violation 8.361e-9 and state difference 8.221e-12, but
+its reported first-order optimality was still 0.005709. Two different
+feasible warm starts thus reached step collapse with stationarity around
+1e-2; the evidence does not isolate whether objective flatness, active-set
+conditioning, or another factor dominates. No base KKT point was verified.
+The P3 allocation of two full solves and two owned replays is exhausted.
 
 ## P4: conditional descent and unavailable certificate
+
+For a regular local optimum with fixed normalized NLP variables `z`, write
+the complete Lagrangian as
+`L = f + lambda^T h + mu^T g + nu_lower^T(lower(d)-z) + nu_upper^T(z-upper(d))`.
+Its envelope derivative on a continued local optimum branch is
+`partial_d L` at the base variables and multipliers. Here `h` includes the
+initial-state and every discrete dynamics equation; `g` includes task
+outputs and constraints. Perturbed model geometry, tendon routing, force
+maps, coordinate transformations, physical limits and any
+morphology-dependent bounds must all enter this derivative. A centered
+difference would have to rebuild both perturbed models while holding the
+base normalized variables and full multiplier set fixed. Continuous length,
+modulus and angle derivatives need declared physical scaling; a topology
+change has no ordinary local envelope derivative. The two base SQP points
+do not meet the KKT gate, so evaluating this expression with their raw
+multipliers would be an unvalidated number. No such gradient is reported.
 
 For a fixed supported task and a differentiable **local** value branch
 `W_tau`, let a design step `Delta d` stay in a declared region. Assume a
@@ -248,44 +295,77 @@ bounds the integrated variation by
 If this right-hand side is strictly negative, the stated local mathematical
 branch strictly decreases. This theorem says nothing about the global
 nonconvex optimum or MuJoCo performance. Here `s_hat` is unavailable:
-there is no verified base KKT point, complete full-Lagrangian structural
-derivative, or plus/minus reoptimization. Neither a justified `delta_s` nor
-a regional `L` has been established, so the descent predicate is
+the two actual base solves did not verify KKT conditions, so no complete
+full-Lagrangian structural derivative or plus/minus reoptimization was
+admitted. Neither a justified `delta_s` nor a regional `L` has been
+established, so the descent predicate is
 **unavailable**. The earlier A/B common-tension secant is fixed-control
 evidence only. Its B-minus-A terminal-error, holding-error and holding-speed
 changes are +0.004849203 m, +0.004683372 m and +0.131846081 m/s over a
 -0.005 m proximal-length change. It is not the reoptimized value derivative.
 No P4 perturbation solve is admitted without validated base KKT conditions.
+The existing sampled affine trajectory tool verifies witnesses or necessary
+constraint exclusions but retains no regular optimal-value branch or
+multipliers for this task. It is therefore not a suitable supported fallback
+instance for a multiplier sensitivity demonstration. Creating a new optimizer
+framework solely for that fallback is outside this bounded stage.
 
 ## Agent feedback and current decision
 
-The research packet now exposes refinement completeness, resolution, task
-metrics, root count, source/control hashes, and compact raw KKT residual
-fields when present, alongside the P0 scientific equivalence preflight and
-direct/residual PPO failure summaries. Unavailable numerical results remain
-null; an Agent must not describe the archived repeated S5-Agent configuration
-as a new physical candidate. The next mathematical action is a bounded
-`task_capability` KKT attempt using the verified full-trajectory warm
-start. More PPO training or a new full NMPC campaign is not supported by
-these findings.
+The [P5 decision packet](../../evidence/sorosim_s55/agent_feedback_packet.json)
+contains the frozen task identity and 13 sampled constraints, Design B and
+model identities, four evaluated scientific signatures with equivalent
+historical artifacts, P1 resolution metrics, P2 projection and matched
+one-step vectors, the four nonexclusive mechanisms, direct/residual PPO
+warning categories, both raw KKT residual sets, and remaining study budgets.
+It identifies conditional descent and structural sensitivity as unavailable.
+The existing `research_packet` now exposes this versioned feedback when a
+future study explicitly lists that file in `supplied_evidence`; its immutable
+Store reference remains alongside the readable evidence. The packet permits
+specific future decision classes, requires a proposed experiment to state
+hypothesis, novelty, discriminating observations, decision impact and cost,
+and leaves scientific identity/executability admission with the Harness.
+Agent explanations remain hypotheses. No live provider request was made.
+
+The next supported research decision is to improve numerical convergence
+and model alignment before using morphology sensitivity to rank designs.
+The archived repeated S5-Agent NMPC and fixed-tension configurations remain
+known physical failures; they are not unexplored
+physical candidates. Direct and residual PPO remain distinct available
+routes, but the direct route's saved numerical failures warrant diagnosis
+before more training. No new NMPC campaign or PPO training was launched.
 
 ## Operations, costs and reproduction status
 
-New scientific costs through the P3 preflight: three P1 SoRoSim fixed-sequence attempts,
-two complete and one saved partial, totaling 119.706879 s charged worker
-time; three P2 MuJoCo interval probes after a contained 540-step checkpoint
-reconstruction; and six P2 SoRoSim one-interval integrations. P2 charged
-20.696515 s and 600 total MuJoCo steps, of which 60 belong to measured
-intervals. There have been zero full NLP optimizations, PPO actions and
-provider requests. The P3 check-only derivative/feasibility evaluation
-used another 25.278 s of MATLAB time without an NLP solve. The earlier
-P2 preparation used three `mj_forward`
-saved-state kinematic reconstructions; P0 read 260 prior PPO failure
-captures and reconstructed their saved starts without stepping.
-The P1 study spent three of four mathematical refinement slots and all six
-public operations (three candidate materializations and three refinements).
-The extra materializations bound the exact same Design B science to
-committed numerical implementation versions; they did not launch physical
-or mathematical repeats. The earlier sealed S4.5 and S5-T numerical costs
-remain attributed to their original studies. The pinned upstream checkout
-is verified at commit `24d573a3e864ffda87c42ee462a6ed620133cc7b`.
+P1 charged three new fixed-sequence mathematical integrations: two complete
+and one partial, 119.707 s total. P2 charged three measured MuJoCo following
+intervals and six SoRoSim one-interval integrations, 20.697 s. The contained
+MuJoCo checkpoint reconstruction used 540 steps and the measured intervals
+used another 60. The P3 check-only preflight cost 25.278 s. The two P3
+full NLP solves cost 1,040.028 and 622.912 s; their owned mathematical
+replays cost 23.631 and 22.764 s. A separate read-only reconstruction and
+replay of `bestfeasible.x` cost 21.832 s. The sealed P3 study ledger reports
+1,709.649 s of numerical work and all six public operations used. The
+P1, P2 and P3 study allocations have no remaining public operations. No P4
+perturbation, new PPO action, live provider request, or new full physical
+task rollout occurred.
+
+The pinned SoRoSim upstream checkout is commit
+`24d573a3e864ffda87c42ee462a6ed620133cc7b`. MATLAB R2024a was used for
+numerical work; the Python environment was `.mainline5-env`. The raw immutable
+P2 and P3 archives, compact summaries and source-study identities above
+make the result independently inspectable. To regenerate the P3/P5 compact
+views from the sealed P3 archive and committed P0/P1/P2 evidence, run:
+
+```powershell
+& 'D:/softrobot-agent/.mainline5-env/Scripts/python.exe' tools/research/build_sorosim_s55_packet.py
+```
+
+The original one-substep witness is valid only for that discrete
+transcription. Complete four- and eight-substep fixed-control replays fail
+the sampled holding task, but have not converged against each other. The
+matched-state tests measure projection and response differences without
+uniquely allocating the historical gap. The full NLP retains feasible
+sampled trajectories and raw multipliers, yet lacks verified stationarity.
+Consequently no reoptimized structural gradient, numerical descent bound,
+physical acceptance, or continuous-time feasibility conclusion is claimed.
