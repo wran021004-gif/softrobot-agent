@@ -38,8 +38,12 @@ def dispatch(host,operation,arguments,key):
                 warm=source(host,arguments.warm_source)
             else:
                 warm=host.store.artifact(arguments.warm_source)
-                if warm.get('source_kind')!='historical_mathematical_trajectory':
-                    raise ValueError('IMMUTABLE_MATHEMATICAL_TRAJECTORY_SOURCE_REQUIRED')
+                verified=(warm.get('source_kind')=='verified_mathematical_trajectory' and
+                    warm.get('posthoc_verification',{}).get('checks',{}).get('repaired_verification_passed'))
+                historical=(warm.get('source_kind')=='historical_mathematical_trajectory' and
+                    arguments.objective_mode!='task_capability')
+                if not (verified or historical):
+                    raise ValueError('VERIFIED_MATHEMATICAL_WARM_SOURCE_REQUIRED')
             warm_trajectory=warm['trajectory']
     elif operation=='refine':
         candidate=plain(arguments.candidate)

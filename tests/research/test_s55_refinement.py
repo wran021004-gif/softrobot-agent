@@ -6,7 +6,7 @@ from unittest.mock import patch
 
 from tools.platform_host import Host
 from tools.research.contracts import Plan
-from extensions.tendon_family.sorosim_codesign import refine_fixed_sequence
+from extensions.tendon_family.sorosim_codesign import refine_fixed_sequence, calculate
 
 
 ROOT=Path(__file__).resolve().parents[2]
@@ -59,6 +59,32 @@ class RefinementBoundaries(unittest.TestCase):
         self.assertFalse(result['complete'])
         self.assertFalse(result['original_task_satisfied'])
         self.assertEqual(result['raw']['failed_root']['interval'],1)
+
+    def test_full_warm_trajectory_is_candidate_bound(self):
+        captured=[]
+        class Session:
+            environment={}
+            dependency={}
+            timings={}
+            def __enter__(self):return self
+            def __exit__(self,*args):pass
+            def construct(self,spec):pass
+            def evaluate(self,operation,request):
+                captured.append(request)
+                return dict(status='check_only')
+        warm=deepcopy(self.source['trajectory'])
+        request=dict(configuration=self.configuration,design_candidate=CANDIDATE,
+            operation='solve',check_only=True,warm_trajectory=warm,
+            arguments=dict(substeps=1,initialization='saved_candidate_trajectory',
+                objective_mode='task_capability',position_weight=1.,speed_weight=1.,
+                secondary_coefficient=0.))
+        with patch('extensions.tendon_family.sorosim_codesign.SorosimSession',Session):
+            calculate(request)
+        self.assertEqual(captured[0]['warm_trajectory']['states'],warm['states'])
+        self.assertEqual(captured[0]['warm_trajectory']['slacks'],warm['slacks'])
+        wrong=deepcopy(request);wrong['warm_trajectory']['model_identity']='different'
+        with self.assertRaisesRegex(ValueError,'CODESIGN_WARM_IDENTITY_MISMATCH'):
+            calculate(wrong)
 
 
 if __name__=='__main__':unittest.main()

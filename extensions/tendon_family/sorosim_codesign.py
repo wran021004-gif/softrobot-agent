@@ -93,15 +93,26 @@ def calculate(request,checkpoint=None):
         if arguments['initialization']=='ramp_0_2_to_0_4':tensions[:]=np.linspace(.2,.4,steps)[:,None]
         if arguments['initialization']=='saved_candidate_trajectory':
             warm=request['warm_trajectory']
-            for key,value in [('design_identity',spec['design_identity']),('task_identity',digest(plain(inp.task))),
-                ('tendon_order',spec['tendon_order'])]:
+            for key,value in [('model_identity',spec['identity']),('design_identity',spec['design_identity']),
+                ('task_identity',digest(plain(inp.task))),('coordinate_order',spec['coordinate_order']),
+                ('tendon_order',spec['tendon_order']),('substeps',substeps)]:
                 if warm[key]!=value:raise ValueError('CODESIGN_WARM_IDENTITY_MISMATCH: '+key)
-            if len(warm['tensions_n'])!=steps or any(len(u)!=len(spec['routes']) for u in warm['tensions_n']):
-                raise ValueError('CODESIGN_WARM_SEQUENCE_INCOMPLETE')
-            tensions=np.array(warm['tensions_n'])
+            if (len(warm['times_s'])!=steps*substeps+1 or
+                    any(abs(t-i*timing.control_period_s/substeps)>1e-12 for i,t in enumerate(warm['times_s']))):
+                raise ValueError('CODESIGN_WARM_TIME_GRID_MISMATCH')
+            states=np.asarray(warm['states'],dtype=float)
+            tensions=np.asarray(warm['tensions_n'],dtype=float)
             limits=np.asarray(requirements['physical_inputs']['upper'])
-            if not np.isfinite(tensions).all() or np.any(tensions<0) or np.any(tensions>limits):
+            if (states.shape!=(steps*substeps+1,len(numerical['measured_initial_state'])) or
+                    not np.isfinite(states).all() or not np.allclose(states[0],numerical['measured_initial_state'],atol=1e-12,rtol=0)):
+                raise ValueError('CODESIGN_WARM_FULL_STATE_OR_INITIAL_MISMATCH')
+            if (tensions.shape!=(steps,len(spec['routes'])) or not np.isfinite(tensions).all() or
+                    np.any(tensions<0) or np.any(tensions>limits)):
                 raise ValueError('CODESIGN_WARM_TENSION_OUT_OF_BOUNDS')
+            slacks=warm.get('slacks',{})
+            if (not all(k in slacks and np.isfinite(slacks[k]) for k in ('position','speed')) or
+                    slacks['speed']!=0):
+                raise ValueError('CODESIGN_WARM_EPIGRAPH_MISSING')
     else:
         trajectory=request['trajectory'];arguments=trajectory['objective_definition'];substeps=trajectory['substeps']
         shared=[('task_identity',digest(plain(inp.task))),('tendon_order',spec['tendon_order'])]
@@ -130,6 +141,8 @@ def calculate(request,checkpoint=None):
         target=inp.task.goal.data['target_m'],position_tolerance_m=inp.task.evaluator.parameters.data['tolerance_m'],
         settling=plain(control.settling),initial_tensions=tensions.tolist())
     payload=dict(operation=request['operation'],control=nmpc,requirements=requirements,arguments=arguments)
+    if request.get('warm_trajectory') is not None:
+        payload['warm_trajectory']=request['warm_trajectory']
     if request.get('check_only'):payload['check_only']=True
     if request.get('checkpoint_path'):payload['checkpoint_path']=request['checkpoint_path']
     if request['operation'] in ('replay','cross_replay'):payload['trajectory']=trajectory

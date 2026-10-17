@@ -244,7 +244,17 @@ def packet(host):
             search_results=s.get('search_results',[]),
             search_feedback=[search_feedback(host,r) for r in s.get('search_results',[])],
             mathematical_accounting=dict(evaluations=s.get('mathematical_evaluations',0),costs=s.get('analysis_costs',[]),engineering_preflight_s=sum(c['numerical_s'] for c in s.get('analysis_costs',[]) if c['origin']=='engineering_preflight'),cumulative_costs_preserved=True),
-            mechanics_results=[dict(reference=r,**{k:host.store.artifact(r).get(k) for k in ('status','operation','trajectory_reference','objective_definition','original_task_feasible','relaxed_nlp_feasible','original_task_gaps','trajectory_metrics','charged_numerical_s','checkpoint_reference')}) for r in s.get('mechanics_results',[])],
+            mechanics_results=[dict(reference=r,**{k:host.store.artifact(r).get(k) for k in (
+                'status','operation','trajectory_reference','objective_definition','original_task_feasible',
+                'relaxed_nlp_feasible','original_task_gaps','trajectory_metrics','charged_numerical_s',
+                'checkpoint_reference','source_reference','substeps','complete','original_task_satisfied',
+                'terminal_position_error_m','holding_max_position_error_m','holding_max_speed_m_s',
+                'time_localized_task_violations','root_count','reason','source_identity',
+                'tension_sequence_sha256')},
+                kkt={key:((host.store.artifact(r).get('mathematical_facts') or {}).get('kkt') or {}).get(key)
+                    for key in ('solver_exitflag','primal_inf','stationarity_inf','dual_violation',
+                        'complementarity_inf','same_as_selected_trajectory','conditioning')})
+                for r in s.get('mechanics_results',[])],
             physical_replays=[dict(reference=r,**{k:host.store.artifact(r).get(k) for k in ('status','candidate','source_reference','acceptance','comparison','charged_numerical_s')}) for r in s.get('physical_replays',[])],
             handoffs=[dict(reference=r,**host.store.artifact(r)) for r in s.get('handoffs',[])],
             rl=rl_packet(host) if enabled(s['spec'],'rl') else None,

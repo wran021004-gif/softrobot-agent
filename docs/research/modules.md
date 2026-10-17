@@ -1,5 +1,18 @@
 # Runtime and module ownership
 
+## S5.5 and S5-T preparation (2026-10-17)
+
+`feedback.py` compares effective experiment configurations before expensive
+reservations and exposes saved direct/residual PPO numerical-failure facts.
+`sr_diagnose.m` and `sorosim_codesign.refine_fixed_sequence` own the bounded
+fixed-input implicit integration route; `mechanics.py` settles it through the
+existing Store and mathematical replay allowance. `sr_codesign.m` now accepts
+verified full-state warm starts for `task_capability` and removes exact
+duplicate optimization inequalities while retaining all original predicates
+in independent task reporting. `core.packet` exposes compact refinement and
+raw KKT fields. See [S5.5 and S5-T delivery](sorosim_s55_s5t_delivery.md)
+for actual execution status and limitations.
+
 ## SoRoSim S4.5–S5 additions (2026-10-16)
 
 `matlab/sorosim_control/sr_codesign.m` now owns the original sampled task

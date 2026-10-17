@@ -1,0 +1,55 @@
+{
+  "scope": "Read-only extraction of sealed S4.5 solve and raw fmincon checkpoint; zero new optimization attempts",
+  "sources": {
+    "archive": "evidence/sorosim_s45/final_study/immutable_artifacts.tar.gz",
+    "solve_artifact_id": "e38af82e52b91d3c9757c23dcfc0e9106a78f8891b551746682973066f6b66ea",
+    "raw_checkpoint_artifact_id": "d0623c2c7a8a6bf9640cda4a7624449691101593a4843b127f2e4e6f3e94b702",
+    "prior_s5t_summary": "evidence/sorosim_s5t/summary.json"
+  },
+  "raw_fmincon": {
+    "algorithm": "sqp",
+    "exitflag": 0,
+    "stopping_reason": "maximum 120 SQP iterations",
+    "iterations": 120,
+    "function_evaluations": 501,
+    "raw_iterate_variables": 1006,
+    "objective": -0.9999681970835552,
+    "reported_constraint_violation": 3.5438908960183646e-05,
+    "reported_first_order_optimality": 0.025136654998338205,
+    "reported_step_size": 0.02824280011941579,
+    "reported_line_search_step_length": 0.48999999999999994,
+    "raw_scaled_violation": 3.5438908960183646e-05,
+    "raw_original_sampled_task_satisfied": true,
+    "raw_multiplier_fields_saved": false
+  },
+  "recovery_selected": {
+    "selected": true,
+    "objective": -0.9999675163278883,
+    "scaled_violation": 6.435824095873954e-13,
+    "original_sampled_task_satisfied": true,
+    "recovery_wall_s": 8.5033695,
+    "same_as_raw_iterate": false
+  },
+  "optimizer_bestfeasible_field": {
+    "constrviolation": 3.228754069661832e-13,
+    "firstorderopt": 1,
+    "fval": 0.00010000005206879373
+  },
+  "not_saved": [
+    "iteration-by-iteration objective and KKT trace",
+    "search direction",
+    "complete raw fmincon multipliers for the historical solve",
+    "raw equality-Jacobian rank and KKT conditioning"
+  ],
+  "interpretation": "The historical raw SQP iterate stopped at the iteration cap and fails its scaled transcription check; recovery changed the point to a sampled mathematical feasible witness. The saved first-order optimality measure is nonzero. No validated local KKT point or reoptimized design gradient follows.",
+  "duplicate_original_predicates": "Terminal position at t=0.35 s and final holding position at t=0.35 s have equal saved squared-normalized excess; independent task acceptance retains both.",
+  "new_full_nlp_solves": 0,
+  "new_physics_steps": 0,
+  "sensitivity": {
+    "reoptimized_value_gradient": null,
+    "gradient_error_bound_delta_s": null,
+    "regional_gradient_lipschitz_L": null,
+    "strict_descent_certificate": null,
+    "classification": "numerically_unresolved"
+  }
+}
