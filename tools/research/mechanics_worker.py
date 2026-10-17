@@ -7,7 +7,10 @@ from tools.service_execution import contain_worker_children
 
 def calculate(request):
     if request['configuration']['policy']['controller']['extension_id']=='controller.sorosim_matlab_nmpc':
-        from extensions.tendon_family.sorosim_codesign import calculate as sorosim_calculate
+        from extensions.tendon_family.sorosim_codesign import calculate as sorosim_calculate, refine_fixed_sequence
+        if request['operation']=='refine':
+            return refine_fixed_sequence(request['configuration'],request['design_candidate'],
+                dict(trajectory=request['trajectory']),request['arguments']['substeps'])
         folder=Path(sys.argv[1]).resolve().parent
         def checkpoint(name,value):
             path=folder/(name+'.json')

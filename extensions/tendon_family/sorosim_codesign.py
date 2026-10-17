@@ -11,6 +11,72 @@ from .sorosim_session import SorosimSession
 from .gvs_profile import candidate_numerical
 
 
+def refine_fixed_sequence(configuration, candidate_ref, source, substeps):
+    """Reintegrate one archived physical input grid with production implicit roots."""
+    inp=SessionInput.model_validate(configuration);control=checked_control(inp)
+    numerical=candidate_numerical(inp,control);timing=inp.task.timing
+    spec=SorosimModel(dict(basis=control.recipe.basis,
+        gauss_per_interval=control.solver.gauss_per_interval)).convert(
+        inp.robot.structure.data,inp.policy.discretization.data,inp.task.environment.data,solver=control.solver)
+    trajectory=source['trajectory'];times=trajectory['times_s'];u=trajectory['tensions_n']
+    N=round(timing.duration_s/timing.control_period_s)
+    for key,expected in (('model_identity',spec['identity']),('design_identity',spec['design_identity']),
+                         ('task_identity',digest(plain(inp.task))),('tendon_order',spec['tendon_order']),
+                         ('coordinate_order',spec['coordinate_order'])):
+        if trajectory[key]!=expected:
+            raise ValueError('REFINEMENT_SOURCE_IDENTITY_MISMATCH: '+key)
+    if (substeps not in (2,4,8,16) or len(u)!=N or len(times)!=N+1 or
+            any(abs(t-i*timing.control_period_s)>1e-12 for i,t in enumerate(times)) or
+            not np.allclose(trajectory['states'][0],numerical['measured_initial_state'],atol=1e-12,rtol=0)):
+        raise ValueError('REFINEMENT_GRID_OR_INITIAL_STATE_MISMATCH')
+    tensions=np.asarray(u,dtype=float)
+    configured_limits={t['id']:t['force_limit_n'] for t in
+        configuration['robot']['structure']['data']['tendons']}
+    limits=np.asarray([configured_limits[name] for name in spec['tendon_order']])
+    if (tensions.shape!=(N,len(spec['routes'])) or not np.isfinite(tensions).all() or
+            np.any(tensions<0) or np.any(tensions>limits)):
+        raise ValueError('REFINEMENT_TENSION_OR_FORCE_LIMIT_MISMATCH')
+    request=dict(kind='fixed_sequence',x=trajectory['states'][0],u=u[0],
+        a=[0.]*len(spec['coordinate_order']),tensions_n=u,times_s=times,
+        period_s=timing.control_period_s,substeps=substeps)
+    with SorosimSession() as session:
+        session.construct(spec)
+        out=session.evaluate('diagnose',request)
+        environment=dict(environment=session.environment,dependency=session.dependency,
+            timings=session.timings)
+    result=dict(status=out['status'],complete=out['complete'],candidate=candidate_ref,
+        model_identity=spec['identity'],source_identity=digest(trajectory),
+        tension_sequence_sha256=digest(dict(tensions_n=u,times_s=times,tendon_order=spec['tendon_order'])),
+        state_trajectory_sha256=digest(out['states']),substeps=substeps,
+        initial_state=out['initial_state'],raw=out,numerical_environment=environment,
+        task_acceptance='unmeasured')
+    if not out['complete']:
+        result.update(original_task_satisfied=False,reason='INCOMPLETE_INTEGRATION')
+        return result
+    binding=dict(candidate=candidate_ref,configuration_identity=digest(plain(inp)),
+        design_identity=spec['design_identity'],physics_identity=spec['physics_identity'])
+    requirements=plain(describe_analysis_requirements(inp,binding))
+    positions=np.asarray(out['tip_positions_m']);velocities=np.asarray(out['tip_velocities_m_s'])
+    violations=[]
+    for constraint in requirements['constraints']:
+        values=velocities if constraint['signal']['name']=='tip_velocity' else positions
+        for index,reference in zip(constraint['indices'],constraint['reference']):
+            norm=float(np.linalg.norm(values[index]-reference))
+            if norm>constraint['radius']:
+                violations.append(dict(constraint_id=constraint['constraint_id'],sample_index=index,
+                    time_s=times[index],value=norm,limit=constraint['radius'],excess=norm-constraint['radius']))
+    start=timing.duration_s-control.settling.window_s
+    hold=[i for i,t in enumerate(times) if t>=start-1e-12]
+    target=np.asarray(inp.task.goal.data['target_m'])
+    errors=np.linalg.norm(positions-target,axis=1)
+    result.update(terminal_position_error_m=float(errors[-1]),
+        holding_max_position_error_m=float(max(errors[hold])),
+        holding_max_speed_m_s=float(max(np.linalg.norm(velocities[hold],axis=1))),
+        time_localized_task_violations=violations,original_task_satisfied=not violations,
+        root_count=N*substeps)
+    return result
+
+
 def calculate(request,checkpoint=None):
     inp=SessionInput.model_validate(request['configuration']);control=checked_control(inp)
     numerical=candidate_numerical(inp,control);timing=inp.task.timing

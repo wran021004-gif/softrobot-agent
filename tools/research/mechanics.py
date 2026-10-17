@@ -41,6 +41,25 @@ def dispatch(host,operation,arguments,key):
                 if warm.get('source_kind')!='historical_mathematical_trajectory':
                     raise ValueError('IMMUTABLE_MATHEMATICAL_TRAJECTORY_SOURCE_REQUIRED')
             warm_trajectory=warm['trajectory']
+    elif operation=='refine':
+        candidate=plain(arguments.candidate)
+        cfg=verify_candidate(host,candidate)['configuration']
+        source_row=host.store.artifact(arguments.source)
+        if (source_row.get('source_kind')!='verified_mathematical_trajectory' or
+                not source_row['posthoc_verification']['checks']['repaired_verification_passed']):
+            raise ValueError('REFINEMENT_REQUIRES_VERIFIED_FROZEN_MATHEMATICAL_SOURCE')
+        trajectory=source_row['trajectory']
+        warm_trajectory=None
+        if any((row:=host.store.artifact(ref)).get('operation')=='refine'
+                and row.get('source_reference')==plain(arguments.source)
+                and row.get('design_candidate')==candidate
+                and row.get('substeps')==arguments.substeps
+                for ref in s.get('mechanics_results',[])):
+            raise ValueError('EQUIVALENT_REFINEMENT_ALREADY_EXECUTED')
+        prior=[host.store.artifact(ref)['substeps'] for ref in s.get('mechanics_results',[])
+            if host.store.artifact(ref).get('operation')=='refine']
+        if arguments.substeps!=[2,4,8,16][len(prior)]:
+            raise ValueError('REFINEMENT_REQUIRES_ORDERED_2_4_8_THEN_OPTIONAL_16')
     elif operation=='cross_replay':
         candidate=plain(arguments.candidate)
         cfg=verify_candidate(host,candidate)['configuration']
@@ -55,8 +74,9 @@ def dispatch(host,operation,arguments,key):
         cfg=verify_candidate(host,candidate)['configuration']
         trajectory=old['trajectory']
         warm_trajectory=None
-    request=dict(implementation=s['freeze'],operation=operation,configuration=cfg,design_candidate=candidate,arguments=plain(arguments) if operation=='solve' else None,trajectory=trajectory,
-        warm_trajectory=warm_trajectory,source_reference=plain(arguments.source) if operation=='cross_replay' else None,
+    request=dict(implementation=s['freeze'],operation=operation,configuration=cfg,design_candidate=candidate,
+        arguments=plain(arguments) if operation in ('solve','refine') else None,trajectory=trajectory,
+        warm_trajectory=warm_trajectory,source_reference=plain(arguments.source) if operation in ('cross_replay','refine') else None,
         study_id=host.run_id,store_root=str(host.store.root),request_id=key+'-mechanics')
     worker_key=key+'-mechanics'
     old=host.store.lookup(host.run_id,worker_key)

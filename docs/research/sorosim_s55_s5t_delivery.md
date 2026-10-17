@@ -67,3 +67,29 @@ further training is not supported by this audit alone.
 P0 incurred zero new model requests, mathematical integrations, physical
 rollouts, and PPO actions. The only numerical work was read-only identity
 construction and saved-state kinematic reconstruction.
+
+## P1: fixed-sequence integration refinement
+
+The candidate-bound `refine` action now reserves one mathematical replay slot
+per resolution in the original research ledger. Its typed request accepts the
+archived verified Design B trajectory and a declared substep count. The worker
+checks model, design, task, coordinate, channel, initial-state, force-bound and
+35-command/36-time identities before constructing SoRoSim. `sr_diagnose` uses
+the existing implicit-Euler residual and root Jacobian for each substep, records
+every root outcome, and samples outputs only on the original task clock. A root
+failure preserves the last completed sample, failing state and residual, and
+cannot be reported as task success. A complete result includes every sampled
+state and world tip output, original-constraint violations, root count, force
+residual, wall time, and exact trajectory/control hashes. The sparse study grant
+allocates at most four refinements and zero physical, PPO, full-NLP or provider
+work.
+
+**Execution status:** no P1 mathematical integration has been launched. The
+configured `SOROSIM_ROOT` environment variable is absent and the pinned
+`GVSRobotics/SoRoSim@24d573a3e864ffda87c42ee462a6ed620133cc7b`
+checkout has not been located. The MATLAB Engine Python source is present in
+the installed R2024a tree and can be imported through its existing `build/lib`
+path, but a standalone `matlab -batch` syntax check failed at startup with
+`failed to load settings errors_warnings plugin`. This is an environment
+obstruction, not a numerical result. The historical one-substep S4.5 discrete
+feasible witness remains intact; integration robustness is unresolved.

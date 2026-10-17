@@ -101,6 +101,58 @@ switch r.kind
                 'final_force_residual_nm2',norm(res(13:24),inf)*.001);
         end
         out.refinements=rows;
+    case 'fixed_sequence'
+        U=r.tensions_n;times=r.times_s(:);count=r.substeps;
+        N=size(U,1);n=model.S.ndof;m=numel(model.spec.routes);
+        assert(isequal(size(U),[N,m]) && numel(times)==N+1 && ...
+            isequal(size(r.x(:)),[2*n,1]) && count>=1 && count==floor(count), ...
+            'FIXED_SEQUENCE_DIMENSION_MISMATCH');
+        assert(all(abs(diff(times)-r.period_s)<1e-12),'FIXED_SEQUENCE_TIME_GRID_MISMATCH');
+        opts=optimoptions('fsolve','Display','off','SpecifyObjectiveGradient',true, ...
+            'FunctionTolerance',1e-20,'StepTolerance',1e-12,'OptimalityTolerance',1e-12, ...
+            'MaxIterations',60,'MaxFunctionEvaluations',200);
+        h=r.period_s/count;x=r.x(:);X=zeros(N+1,2*n);X(1,:)=x';
+        position=zeros(N+1,3);velocity=zeros(N+1,3);roots=zeros(N*count,6);
+        [position(1,:),velocity(1,:)]=tip_output(x,U(1,:)');
+        failure=struct('interval',[],'substep',[],'previous',[],'returned',[], ...
+            'residual_inf',[],'exitflag',[]);completed=0;force_max=0;t=tic;
+        for interval=1:N
+            u=U(interval,:)';
+            for substep=1:count
+                previous=x;
+                try
+                    [x,res,flag,info]=fsolve(@equation,previous,opts);
+                    residual=norm(res,inf);
+                catch cause
+                    flag=-999;residual=NaN;res=NaN(2*n,1);
+                    info=struct('iterations',0,'funcCount',0);
+                    failure.message=cause.message;x=previous;
+                end
+                roots((interval-1)*count+substep,:)=[interval,substep,residual,flag,info.iterations,info.funcCount];
+                if all(isfinite(res)),force_max=max(force_max,norm(res(n+1:end),inf)*.001);end
+                if ~(residual<1e-9 && all(isfinite(x)) && flag>0)
+                    failure.interval=interval;failure.substep=substep;
+                    failure.previous=previous';failure.returned=x';
+                    failure.residual_inf=residual;failure.exitflag=flag;
+                    break;
+                end
+            end
+            if ~isempty(failure.interval),break;end
+            completed=interval;X(interval+1,:)=x';
+            [position(interval+1,:),velocity(interval+1,:)]=tip_output(x,u);
+        end
+        out=struct('status','completed','complete',true,'substeps',count, ...
+            'initial_state',r.x(:)','tensions_n',U,'times_s',times', ...
+            'states',X,'tip_positions_m',position,'tip_velocities_m_s',velocity, ...
+            'roots',roots,'maximum_force_residual_nm2',force_max,'wall_s',toc(t));
+        if completed<N
+            out.status='root_failed';out.complete=false;out.completed_intervals=completed;
+            out.failed_root=failure;out.states=X(1:completed+1,:);
+            out.tip_positions_m=position(1:completed+1,:);
+            out.tip_velocities_m_s=velocity(1:completed+1,:);
+            out.times_s=times(1:completed+1)';
+            out.roots=roots(1:(interval-1)*count+substep,:);
+        end
     case 'serialization'
         timings=zeros(3,2);
         for j=1:3
@@ -116,5 +168,10 @@ end
         d=sr_derivatives(model,next(1:12),next(13:24),u,(next(13:24)-previous(13:24))/h);
         res=[(next(1:12)-previous(1:12)-h*next(13:24))/10;d.residual/.001];
         J=[eye(12)/10,-h*eye(12)/10;d.Rq/.001,(d.Rqd+d.Rqdd/h)/.001];
+    end
+    function [p,vout]=tip_output(state,command)
+        route=sr_routing(model,state(1:12),command,false);
+        p=(model.spec.mount_rotation*route.tip_pose(1:3,4)+model.spec.mount_position(:))';
+        vout=(model.spec.mount_rotation*route.tip_jacobian(4:6,:)*state(13:24))';
     end
 end
