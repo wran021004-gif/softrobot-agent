@@ -196,7 +196,7 @@ class PhysicalReplayRequest(Contract):
 class FixedSequenceRefinement(Contract):
     candidate: EvidenceRef
     source: EvidenceRef
-    substeps: Literal[2,4,8,16]
+    substeps: Literal[2,4,8,16,32,64]
 
 
 class MatchedStateProbe(Contract):

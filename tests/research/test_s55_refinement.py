@@ -6,7 +6,7 @@ from unittest.mock import patch
 
 from tools.platform_host import Host
 from tools.research.contracts import Plan
-from extensions.tendon_family.sorosim_codesign import refine_fixed_sequence, calculate
+from extensions.tendon_family.sorosim_codesign import refine_fixed_sequence, calculate, compare_refinements
 
 
 ROOT=Path(__file__).resolve().parents[2]
@@ -30,6 +30,9 @@ class RefinementBoundaries(unittest.TestCase):
             weakening_observation='root failure',fixed_conditions='same 35 inputs',
             stopping_condition='one bounded attempt',interpretation='test only')
         self.assertEqual(Plan.model_validate(plan).refinement.substeps,4)
+        for count in (16,32,64):
+            plan['refinement']['substeps']=count
+            self.assertEqual(Plan.model_validate(plan).refinement.substeps,count)
         plan['refinement']['substeps']=3
         with self.assertRaises(ValueError):Plan.model_validate(plan)
         self.assertEqual(len(self.source['trajectory']['tensions_n']),35)
@@ -59,6 +62,15 @@ class RefinementBoundaries(unittest.TestCase):
         self.assertFalse(result['complete'])
         self.assertFalse(result['original_task_satisfied'])
         self.assertEqual(result['raw']['failed_root']['interval'],1)
+
+    def test_comparison_uses_velocity_vectors_and_exact_times(self):
+        row=dict(complete=True,times_s=[0.,.01,.14,.16,.25,.29,.30,.35],
+            tip_positions_m=[[0.,0.,0.]]*8,tip_velocities_m_s=[[1.,0.,0.]]*8)
+        other=deepcopy(row);other['tip_velocities_m_s']=[[0.,1.,0.]]*8
+        self.assertAlmostEqual(compare_refinements(row,other)['maximum_velocity_m_s'],2**.5)
+        other['times_s'][-1]+=.0001
+        with self.assertRaisesRegex(ValueError,'IDENTICAL_OUTPUT_GRIDS'):
+            compare_refinements(row,other)
 
     def test_full_warm_trajectory_is_candidate_bound(self):
         captured=[]

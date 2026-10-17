@@ -60,10 +60,19 @@ def dispatch(host,operation,arguments,key):
                 and row.get('substeps')==arguments.substeps
                 for ref in s.get('mechanics_results',[])):
             raise ValueError('EQUIVALENT_REFINEMENT_ALREADY_EXECUTED')
-        prior=[host.store.artifact(ref)['substeps'] for ref in s.get('mechanics_results',[])
-            if host.store.artifact(ref).get('operation')=='refine']
-        if arguments.substeps!=[2,4,8,16][len(prior)]:
-            raise ValueError('REFINEMENT_REQUIRES_ORDERED_2_4_8_THEN_OPTIONAL_16')
+        prior=[host.store.artifact(ref) for ref in s.get('mechanics_results',[])
+            if host.store.artifact(ref).get('operation')=='refine'
+            and host.store.artifact(ref).get('source_reference')==plain(arguments.source)]
+        if prior and arguments.substeps<=max(row['substeps'] for row in prior):
+            raise ValueError('REFINEMENT_REQUIRES_INCREASING_RESOLUTION')
+        if arguments.substeps==64:
+            from extensions.tendon_family.sorosim_codesign import compare_refinements
+            grids={row['substeps']:row for row in prior}
+            if not all(grids.get(k,{}).get('complete') for k in (16,32)):
+                raise ValueError('OPTIONAL_64_REQUIRES_COMPLETE_16_AND_32')
+            gap=compare_refinements(grids[16]['raw'],grids[32]['raw'])
+            if gap['maximum_position_m']<=.01 and gap['maximum_velocity_m_s']<=.02:
+                raise ValueError('OPTIONAL_64_NOT_JUSTIFIED_BY_MATERIAL_DISCREPANCY')
     elif operation=='cross_replay':
         candidate=plain(arguments.candidate)
         cfg=verify_candidate(host,candidate)['configuration']

@@ -11,6 +11,29 @@ from .sorosim_session import SorosimSession
 from .gvs_profile import candidate_numerical
 
 
+def compare_refinements(coarse, fine):
+    """Observed aligned vector differences; these are not continuous-time bounds."""
+    times=np.asarray(coarse['times_s'])
+    if (not coarse['complete'] or not fine['complete'] or
+            not np.array_equal(times,np.asarray(fine['times_s']))):
+        raise ValueError('COMPLETE_IDENTICAL_OUTPUT_GRIDS_REQUIRED')
+    dp=np.asarray(fine['tip_positions_m'])-coarse['tip_positions_m']
+    dv=np.asarray(fine['tip_velocities_m_s'])-coarse['tip_velocities_m_s']
+    pn=np.linalg.norm(dp,axis=1);vn=np.linalg.norm(dv,axis=1)
+    windows=[]
+    for lo,hi in ((0.,.01),(.14,.16),(.25,.29),(.29,.30),(.30,.35)):
+        mask=(times>=lo-1e-12)&(times<=hi+1e-12)
+        windows.append(dict(interval_s=[lo,hi],maximum_position_m=float(max(pn[mask])),
+            maximum_velocity_m_s=float(max(vn[mask]))))
+    return dict(times_s=times.tolist(),position_difference_m=dp.tolist(),
+        velocity_difference_m_s=dv.tolist(),position_norm_m=pn.tolist(),velocity_norm_m_s=vn.tolist(),
+        maximum_position_m=float(max(pn)),maximum_velocity_m_s=float(max(vn)),
+        position_tolerance_fraction=float(max(pn)/.01),speed_tolerance_fraction=float(max(vn)/.02),
+        largest_position_time_s=float(times[np.argmax(pn)]),
+        largest_velocity_time_s=float(times[np.argmax(vn)]),windows=windows,
+        interpretation='observed numerical differences, no rigorous error bound')
+
+
 def refine_fixed_sequence(configuration, candidate_ref, source, substeps):
     """Reintegrate one archived physical input grid with production implicit roots."""
     inp=SessionInput.model_validate(configuration);control=checked_control(inp)
@@ -25,7 +48,7 @@ def refine_fixed_sequence(configuration, candidate_ref, source, substeps):
                          ('coordinate_order',spec['coordinate_order'])):
         if trajectory[key]!=expected:
             raise ValueError('REFINEMENT_SOURCE_IDENTITY_MISMATCH: '+key)
-    if (substeps not in (2,4,8,16) or len(u)!=N or len(times)!=N+1 or
+    if (substeps not in (2,4,8,16,32,64) or len(u)!=N or len(times)!=N+1 or
             any(abs(t-i*timing.control_period_s)>1e-12 for i,t in enumerate(times)) or
             not np.allclose(trajectory['states'][0],numerical['measured_initial_state'],atol=1e-12,rtol=0)):
         raise ValueError('REFINEMENT_GRID_OR_INITIAL_STATE_MISMATCH')
