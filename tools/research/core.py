@@ -77,7 +77,8 @@ def prepare(spec_path=DEFAULT_SPEC, directory=None, profile=None):
     update(h, spec=spec, base_configuration=cfg, profile=profile, profile_history=[profile],
         started_unix=time.time(), cutoff_unix=None,
         numerical_s=0., numerical_reserved_s=0., local_solves=0, local_solve_s=0.,
-        results=[], physical_replays=[], candidates={}, plans=[], retrievals=[], searches={}, pending=None,
+        results=[], physical_replays=[], matched_state_results=[], matched_state_probes=0,
+        candidates={}, plans=[], retrievals=[], searches={}, pending=None,
         offline_nlp=0, bdf_replays=0, mechanics_results=[], handoffs=[], historical_diagnostic_sources=[],
         research_status='ready', selected=None,
         pilot=dict(provider=model,live_model_requests=0,framework_session_id=run_id,
@@ -255,6 +256,14 @@ def packet(host):
                     for key in ('solver_exitflag','primal_inf','stationarity_inf','dual_violation',
                         'complementarity_inf','same_as_selected_trajectory','conditioning')})
                 for r in s.get('mechanics_results',[])],
+            matched_state_results=[dict(reference=r,status=(v:=host.store.artifact(r)).get('status'),
+                checkpoint_indices=v.get('checkpoint_indices'),physical_steps=v.get('physical_steps'),
+                physical_probe_count=v.get('physical_probe_count'),
+                comparisons=[dict(time_s=row['time_s'],following_command_index=row['following_command_index'],
+                    resolutions={k:{field:record.get(field) for field in ('status','complete','position','velocity')}
+                        for k,record in row['sorosim'].items()}) for row in v.get('checkpoints',[])],
+                charged_numerical_s=v.get('charged_numerical_s'))
+                for r in s.get('matched_state_results',[])],
             physical_replays=[dict(reference=r,**{k:host.store.artifact(r).get(k) for k in ('status','candidate','source_reference','acceptance','comparison','charged_numerical_s')}) for r in s.get('physical_replays',[])],
             handoffs=[dict(reference=r,**host.store.artifact(r)) for r in s.get('handoffs',[])],
             rl=rl_packet(host) if enabled(s['spec'],'rl') else None,
@@ -271,7 +280,7 @@ def dispatch(host, value, request_id, origin='model'):
     if state(host)['spec'].get('allowed_plan_actions') is not None and plan.action not in state(host)['spec']['allowed_plan_actions']:
         raise ValueError('Operation outside declared follow-up scope')
     capability={'execute':'nmpc','search':'search','mechanics':'mathematics','replay':'replay','cross_replay':'replay','refine':'replay',
-        'physical_replay':'physical_replay'}.get(plan.action)
+        'physical_replay':'physical_replay','matched_state':'physical_replay'}.get(plan.action)
     if capability and not enabled(state(host)['spec'],capability):
         raise ValueError('Undeclared capability: '+capability)
     old=host.store.lookup(host.run_id,request_id)
@@ -283,13 +292,13 @@ def dispatch(host, value, request_id, origin='model'):
             return cached(host.store.artifact(json.loads(old['receipt'])['output']))
         raise ValueError('RECOVER_EXISTING_OPERATION_NO_NEW_EXECUTION')
     admit_closeout(host,'research_plan',plain(plan))
-    guard(host,plan.action in ('generate','propose','execute','search','mechanics','replay','cross_replay','refine','physical_replay') or plan.diagnostic is not None)
+    guard(host,plan.action in ('generate','propose','execute','search','mechanics','replay','cross_replay','refine','physical_replay','matched_state') or plan.diagnostic is not None)
     s=state(host)
     for r in plan.supporting_evidence:
         host.store.artifact(r)
     from tools.research.experience import disposition_bindings
     experience_bindings=disposition_bindings(host,plan.experience_disposition)
-    if plan.action=='stop' and any(r not in [plain(v) for v in plan.supporting_evidence] for r in [*s['results'],*s.get('mechanics_results',[]),*s.get('physical_replays',[]),*s.get('rl_evaluations',[]),*s.get('analysis_results',[])]):
+    if plan.action=='stop' and any(r not in [plain(v) for v in plan.supporting_evidence] for r in [*s['results'],*s.get('mechanics_results',[]),*s.get('physical_replays',[]),*s.get('matched_state_results',[]),*s.get('rl_evaluations',[]),*s.get('analysis_results',[])]):
         raise ValueError('STOP_MUST_CITE_ALL_NEW_EXPERIMENT_RESULTS')
     if enabled(s['spec'],'rl') and plan.action=='stop' and s.get('rl_runs'):
         evaluations=s.get('rl_evaluations',[])
@@ -357,6 +366,9 @@ def dispatch(host, value, request_id, origin='model'):
         elif plan.action=='physical_replay':
             from tools.research.physical_replay import dispatch as physical_dispatch
             result=physical_dispatch(host,plan.physical_replay,request_id)
+        elif plan.action=='matched_state':
+            from tools.research.matched_state import dispatch as matched_dispatch
+            result=matched_dispatch(host,plan.matched_state,request_id)
         elif plan.action=='diagnose':
             result=diagnose(host,[plain(r) for r in plan.supporting_evidence])
             if plan.diagnostic:
@@ -421,7 +433,10 @@ def recover(host):
         else:
             raise ValueError('UNKNOWN_PROVIDER_SEND_INSPECT_BEFORE_REPEAT')
     p=state(host)['pending']
-    if p and p.get('kind')=='physical_replay':
+    if p and p.get('kind')=='matched_state':
+        from tools.research.matched_state import recover as matched_recover
+        recovered=matched_recover(host)
+    elif p and p.get('kind')=='physical_replay':
         from tools.research.physical_replay import recover as physical_recover
         recovered=physical_recover(host)
     elif p and p.get('kind')=='mechanics':
@@ -471,6 +486,19 @@ def recover(host):
                 value=host.store.artifact(matches[0])
                 result=dict(reference=matches[0],status=value['status'],
                     recovered_without_repeating_completed_outputs=True)
+        elif plan.action=='matched_state':
+            result=recovered
+            if not result:
+                worker=host.store.lookup(host.run_id,key+'-matched')
+                if not worker or not worker['receipt']:
+                    raise ValueError('RECOVER_MATCHED_STATE_NO_RELAUNCH')
+                matches=[r for r in state(host).get('matched_state_results',[])
+                    if host.store.artifact(r).get('source_reference')==plain(plan.matched_state.source)
+                    and host.store.artifact(r).get('candidate')==plain(plan.matched_state.candidate)]
+                if len(matches)!=1:
+                    raise ValueError('RECOVER_REQUIRES_UNIQUE_MATCHED_STATE_RESULT')
+                result=dict(reference=matches[0],status=host.store.artifact(matches[0])['status'],
+                    recovered_without_repeating_completed_outputs=True)
         else:
             raise ValueError('INSPECT_UNSEALED_NONEXECUTION_OPERATION')
         output=dict(plan=ref,result=result,resource_use=packet(host)['resource_use'],recovered_without_repeating_completed_outputs=True)
@@ -510,6 +538,7 @@ def export(host, destination=None):
         disposition.update(study_id=host.run_id,claims=claims(host),resource_use=current['resource_use'],
             stage_usage=(current.get('rl') or {}).get('allocation_feedback'),
             evidence=dict(results=s['results'],physical_replays=s.get('physical_replays',[]),
+                matched_state_results=s.get('matched_state_results',[]),
                 rl_evaluations=s.get('rl_evaluations',[]),analyses=s.get('analysis_results',[])))
         values=[('configuration',s['spec']),('disposition',disposition),('calls',calls),('ledger',host.store.remaining())]
     else:

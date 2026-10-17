@@ -13,6 +13,14 @@ in independent task reporting. `core.packet` exposes compact refinement and
 raw KKT fields. See [S5.5 and S5-T delivery](sorosim_s55_s5t_delivery.md)
 for actual execution status and limitations.
 
+`tools/research/matched_state.py` owns the three bounded S5-A checkpoint
+reconstructions and same-input, single-interval comparisons. It verifies
+every reconstructed MuJoCo sample against the original archive, recovers
+warmstart through the original prefix playback, projects through the existing
+GVS map, and calls the existing SoRoSim fixed-sequence diagnostic at two
+resolutions. The usual Host Store and research packet own its budget,
+receipt, recovery and Agent evidence pointer.
+
 ## SoRoSim S4.5–S5 additions (2026-10-16)
 
 `matlab/sorosim_control/sr_codesign.m` now owns the original sampled task

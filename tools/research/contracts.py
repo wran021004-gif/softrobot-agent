@@ -199,8 +199,16 @@ class FixedSequenceRefinement(Contract):
     substeps: Literal[2,4,8,16]
 
 
+class MatchedStateProbe(Contract):
+    candidate: EvidenceRef
+    source: EvidenceRef
+    physical_source: EvidenceRef
+    indices: tuple[Literal[0],Literal[15],Literal[29]] = (0,15,29)
+    resolutions: tuple[Literal[4],Literal[8]] = (4,8)
+
+
 class Plan(Contract):
-    action: Literal['generate', 'propose', 'execute', 'search', 'mechanics', 'replay', 'cross_replay', 'physical_replay', 'refine', 'diagnose', 'confirm', 'select', 'stop']
+    action: Literal['generate', 'propose', 'execute', 'search', 'mechanics', 'replay', 'cross_replay', 'physical_replay', 'refine', 'matched_state', 'diagnose', 'confirm', 'select', 'stop']
     next_step: Literal['adjust_training','revise_design','diagnose','stop'] | None = None
     hypothesis: str = Field(min_length=1)
     supporting_evidence: list[EvidenceRef] = Field(default_factory=list)
@@ -220,6 +228,7 @@ class Plan(Contract):
     cross_replay: CrossReplayRequest | None = None
     physical_replay: PhysicalReplayRequest | None = None
     refinement: FixedSequenceRefinement | None = None
+    matched_state: MatchedStateProbe | None = None
     mechanics_source: EvidenceRef | None = None
     experience_disposition: dict[str, Literal['adopted', 'rejected', 'context_only']] = Field(default_factory=dict)
 
@@ -236,9 +245,9 @@ class Plan(Contract):
             raise ValueError('REVISE_SELECTION_REQUIRES_CONFIRM_ACTION')
         required = {'generate': 'generation', 'propose': 'parameters', 'execute': 'candidate', 'search': 'search', 'confirm': 'selected_execution', 'select': 'selected_execution',
                     'mechanics': 'mechanics', 'replay': 'mechanics_source', 'cross_replay':'cross_replay',
-                    'physical_replay':'physical_replay','refine':'refinement'}
+                    'physical_replay':'physical_replay','refine':'refinement','matched_state':'matched_state'}
         active = required.get(self.action)
-        for field in ('generation', 'parameters', 'search', 'candidate', 'selected_execution', 'mechanics', 'cross_replay','physical_replay','refinement'):
+        for field in ('generation', 'parameters', 'search', 'candidate', 'selected_execution', 'mechanics', 'cross_replay','physical_replay','refinement','matched_state'):
             if (getattr(self, field) is not None) != (field == active):
                 raise ValueError('ACTION_REQUIRES_ONLY_' + str(active))
         if self.action=='replay' and self.mechanics_source is None:
