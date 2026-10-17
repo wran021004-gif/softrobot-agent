@@ -29,7 +29,7 @@ def diagnose(host,candidate,warm,point,trajectory,key):
     return result['reference'],host.store.artifact(result['reference'])
 
 
-def run():
+def run(diagnostics_only=False):
     host,candidate,warm=initialize('s5t2');historical=[]
     index=read(ROOT/'evidence/sorosim_s55/p3_p4_optimality.json')
     with tarfile.open(ROOT/'evidence/sorosim_s55/optimality_study/immutable_artifacts.tar.gz') as archive:
@@ -42,6 +42,9 @@ def run():
             qualification=analysis.kkt_reliability(result.get('kkt',{}),result,replay['mathematical_facts'])
             historical.append(dict(source=index['raw_artifact_ids'][f'solve_{number}'],
                 diagnostic=ref,qualification=qualification))
+    atomic_json(host.store.root/'historical_diagnostics.json',historical)
+    if diagnostics_only:
+        print(json.dumps(historical),flush=True);return
     # The feasibility value is flat at zero. Test a different, explicitly named value.
     codesign=read(ROOT/'evidence/sorosim_s56/codesign/summary.json')
     with tarfile.open(ROOT/'evidence/sorosim_s56/codesign/study/immutable_artifacts.tar.gz') as archive:
@@ -85,4 +88,7 @@ def run():
     print(json.dumps(dict(costs=summary['costs'],historical=historical,base=base_row.get('qualification'))),flush=True)
 
 
-if __name__=='__main__':run()
+if __name__=='__main__':
+    import argparse
+    parser=argparse.ArgumentParser();parser.add_argument('--diagnostics-only',action='store_true')
+    run(parser.parse_args().diagnostics_only)
