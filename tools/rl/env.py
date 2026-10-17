@@ -104,6 +104,7 @@ class TensionEnv(gym.Env):
         self.counts = dict(attempted_actions=0, completed_actions=0, attempted_physics_steps=0,
                            complete_episodes=0, failed_episodes=0)
         self.episode = 0
+        self.stable_captures = 0
         self.failure = None
         self.site = m.site(control["tip_site"]).id
         self.jacobian = np.zeros((3, m.nv))
@@ -134,6 +135,7 @@ class TensionEnv(gym.Env):
         self.needs_reset = False
         self.episode += 1
         self.episode_records = []
+        self.phase_states = []
         self.failure = None
         self.previous_tension = np.zeros(self.channels)
         self.command = np.zeros(self.channels)
@@ -229,6 +231,8 @@ class TensionEnv(gym.Env):
                       saturated=((self.command == self.lower) | (self.command == self.upper)).tolist(),
                       start_error_m=before_info["position_error_m"], start_speed_m_s=before_info["speed_m_s"])
         self.episode_records.append(record)
+        if self.trace_dir and self.stable_captures<3 and 18<=self.k+1<=22:
+            self.phase_states.append((self.k+1,start_state,self.command.copy()))
         self.data.ctrl[self.actuators] = self.command
         mujoco.mj_forward(self.model, self.data)
         for substep in range(1, self.substeps + 1):
@@ -258,6 +262,13 @@ class TensionEnv(gym.Env):
                       reward_terms=terms, reward=reward)
         self.counts["completed_actions"] += 1
         self.counts["complete_episodes"] += int(self.k == self.horizon)
+        if self.k==self.horizon and self.trace_dir and self.phase_states and self.stable_captures<3:
+            self.trace_dir.mkdir(parents=True,exist_ok=True)
+            np.savez_compressed(self.trace_dir/f'stable_episode_{self.episode}.npz',
+                episode_actions=np.array([v[0] for v in self.phase_states]),
+                states=np.array([v[1] for v in self.phase_states]),
+                tensions_n=np.array([v[2] for v in self.phase_states]))
+            self.stable_captures+=1
         info.update(record, numerical_failure=False, valid_physical_transition=True, counts=self.counts.copy())
         return observation, reward, self.k == self.horizon, False, info
 

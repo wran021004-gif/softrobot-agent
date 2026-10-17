@@ -14,6 +14,21 @@ from tools.rl.env import NumericalFailure, TensionEnv
 from tools.rl.run import read_json, write_json
 
 
+def stable_phase_diagnostics(directory):
+    """Saved complete-episode states only; reconstruct kinematics without mj_step."""
+    import mujoco
+    from tools.rl.env import STATE_SPEC
+    directory=Path(directory);env=TensionEnv(read_json(directory/'config.json'));rows=[]
+    for path in (directory/'failures').rglob('stable_episode_*.npz'):
+        with np.load(path,allow_pickle=False) as values:
+            for action,x,u in zip(values['episode_actions'],values['states'],values['tensions_n']):
+                mujoco.mj_setState(env.model,env.data,x,STATE_SPEC);mujoco.mj_forward(env.model,env.data)
+                rows.append(dict(episode_action=int(action),max_abs_qpos_rad=float(max(abs(env.data.qpos))),
+                    max_abs_qvel_rad_s=float(max(abs(env.data.qvel))),tension_n=u.tolist()))
+    return dict(stable_direct_phase_states=rows,physical_steps=0,
+        scope='observational saved-state comparison; no unique causal failure attribution')
+
+
 def run_episode(model, env, seed, task):
     """Only valid physical transitions can enter the exported trajectory."""
     before = env.counts.copy()

@@ -91,7 +91,12 @@ def reconcile(host, run_id, lightweight=False):
     """Replace cumulative facts by identity; querying never sums them again."""
     from tools.research import state as state_api
     run.RUNS=host.store.root/'rl'
-    entry=state_api.state(host)['rl_runs'][run_id]
+    s=state_api.state(host)
+    entry=s['rl_runs'].get(run_id) or s.get('rl_parent_sources',{})[run_id]
+    if entry.get('source_directory'):
+        if run.worker_alive(Path(entry['source_directory'])):
+            raise ValueError('SEALED_CONTINUATION_PARENT_WORKER_ALIVE')
+        return entry['status']
     if not run.run_path(run_id).exists() and entry.get('launch_failure'):
         summary=dict(run_id=run_id,status='failed',stop_reason='launch_failed_before_owned_run_creation',
             recorded_failure_stage='launcher validation/boot',checkpoint=None,consumed=dict(attempted_actions=0,active_seconds=0.),
@@ -140,8 +145,9 @@ def prepare_continuation(host, request):
     from tools.research.state import state
     from tools.research.config import rl_configuration
     from tools.rl.continuation import config_digest, published_checkpoint, validate_compatibility
-    entry=state(host)['rl_runs'][request.run_id]
-    directory=run.run_path(request.run_id)
+    s=state(host)
+    entry=s['rl_runs'].get(request.run_id) or s.get('rl_parent_sources',{})[request.run_id]
+    directory=Path(entry.get('source_directory') or run.run_path(request.run_id))
     status=reconcile(host,request.run_id)
     if status['worker_alive'] or status.get('consumption_uncertain'):
         raise ValueError('CONTINUE_REQUIRES_EXITED_PARENT_AND_RECONCILED_CONSUMPTION')
@@ -168,6 +174,38 @@ def prepare_continuation(host, request):
         history=[*source.get('lineage',{}).get('history',[]),dict(run_id=request.run_id,checkpoint=request.checkpoint)])
     validate_compatibility(source,config)
     return run.resolve_config(config),entry['task']
+
+
+def import_continuation_source(host, parent, run_id):
+    """Link a sealed parent without copying weights, old actions or old grants."""
+    from tools.research.state import state,save,update
+    from tools.rl.continuation import published_checkpoint
+    s=state(parent);entry=s['rl_runs'][run_id]
+    directory=parent.store.root/'rl'/run_id
+    if s['research_status']!='stopped' or run.worker_alive(directory):
+        raise ValueError('SEALED_EXITED_CONTINUATION_SOURCE_REQUIRED')
+    config=parent.store.artifact(entry['configuration'])
+    if config!=run.read_json(directory/'config.json'):
+        raise ValueError('SEALED_PARENT_CONFIGURATION_CHANGED')
+    generation=run.read_json(directory/'checkpoint.json')['current']
+    published_checkpoint(directory,config,generation)
+    current=state(host);candidate=parent.store.artifact(entry['candidate'])
+    if candidate['effective_task_identity']!=digest(candidate['configuration']['task']):
+        raise ValueError('PARENT_TASK_BINDING_CHANGED')
+    compared=deepcopy(candidate['configuration']['task'])
+    compared['initializer']['parameters']['data']=dict(rule=current['spec']['candidate_initialization'])
+    if compared!=host.store.artifact(current['rl_task']):
+        raise ValueError('PARENT_CONTINUATION_TASK_MISMATCH')
+    for ref in (entry['configuration'],entry['candidate'],entry['task']):
+        save(host,parent.store.artifact(ref),'sealed_continuation_source')
+    sources=current.get('rl_parent_sources',{})
+    sources[run_id]=dict(entry,source_directory=str(directory.resolve()),source_study=parent.run_id,
+        status=dict(entry['status'],worker_alive=False),active_reservation=None)
+    candidates=current['candidates'];candidates[candidate['identity']]=entry['candidate']
+    update(host,rl_parent_sources=sources,candidates=candidates,rl_source_candidate=entry['candidate'])
+    return dict(run_id=run_id,checkpoint=generation,source_study=parent.run_id,
+        historical_actions=config['budget']['actions'],new_actions=0,
+        accounting='parent is outside new rl_runs and consumes no new stage allocation')
 
 
 def evaluation_capacity(host, requested=1, confirmation=False):
@@ -236,7 +274,7 @@ def dispatch(host, value, request_id, selected=None):
         if matching:
             return dict(run_id=matching,duplicate_start=True,status=reconcile(host,matching))
     else:
-        if q.run_id not in s.get('rl_runs',{}):
+        if q.run_id not in s.get('rl_runs',{}) and not (q.operation=='continue' and q.run_id in s.get('rl_parent_sources',{})):
             raise ValueError('Owned RL run required')
         if q.operation=='continue':
             config,task_ref=prepare_continuation(host,q)
@@ -282,7 +320,7 @@ def dispatch(host, value, request_id, selected=None):
         from uuid import uuid4
         stage_id=host.run_id+'-'+uuid4().hex[:8]
         config['stage_identity']=dict(run_id=stage_id,study=host.run_id,implementation=s['freeze'],
-            candidate=plain(q.candidate) if q.operation=='start' else s['rl_runs'][q.run_id]['candidate'],
+            candidate=plain(q.candidate) if q.operation=='start' else (s['rl_runs'].get(q.run_id) or s['rl_parent_sources'][q.run_id])['candidate'],
             task=task_ref,rationale=q.rationale,requested_changes=plain(q))
         stage_entry=dict(candidate=config['stage_identity']['candidate'],task=task_ref,
             configuration=state_api.save(host,config,'rl_frozen_stage_input'),

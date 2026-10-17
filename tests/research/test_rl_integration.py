@@ -9,6 +9,30 @@ import unittest
 from tools.research.config import ROOT
 
 
+class SealedParentAccounting(unittest.TestCase):
+    def test_foreign_parent_does_not_consume_new_stage_or_actions(self):
+        from types import SimpleNamespace
+        from unittest.mock import patch
+        from tools.platform_host import Host
+        from tools.research.state import state
+        from tools.research.rl import import_continuation_source
+        from tools.research.budget import stage_usage
+        name='sorosim-s5rl-design-b-20261016'
+        parent=Host(ROOT/'runs/research'/name,name);old=state(parent)
+        run_id='sorosim-s5rl-design-b-20261016-b452bcd3'
+        current=dict(rl_runs={},rl_task=old['rl_task'],candidates={},
+            spec=dict(candidate_initialization='all_candidate_dofs_zero_v1',rl_limits=dict(training_stages=4)))
+        host=SimpleNamespace(store=parent.store)
+        with patch('tools.research.state.state',side_effect=lambda h:old if h is parent else current), \
+                patch('tools.research.state.save'), \
+                patch('tools.research.state.update',side_effect=lambda h,**v:current.update(v)):
+            result=import_continuation_source(host,parent,run_id)
+        self.assertEqual(result['new_actions'],0)
+        self.assertIn(run_id,current['rl_parent_sources'])
+        self.assertEqual(stage_usage(current)['actual_actions'],0)
+        self.assertEqual(stage_usage(current)['admitted'],0)
+
+
 @unittest.skipUnless(os.environ.get('SOFTROBOT_REAL_RL_TEST')=='1','set SOFTROBOT_REAL_RL_TEST=1 for the single declared real chain')
 class RealRLChain(unittest.TestCase):
     def test_training_continuation_independent_evaluation(self):
