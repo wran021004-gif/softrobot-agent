@@ -84,25 +84,39 @@ residual, wall time, and exact trajectory/control hashes. The sparse study grant
 allocates at most four refinements and zero physical, PPO, full-NLP or provider
 work.
 
-**Execution status:** no P1 mathematical integration has been launched. The
-configured `SOROSIM_ROOT` environment variable is absent and the pinned
-`GVSRobotics/SoRoSim@24d573a3e864ffda87c42ee462a6ed620133cc7b`
-checkout has not been located. The MATLAB Engine Python source is present in
-the installed R2024a tree and can be imported through its existing `build/lib`
-path, but a standalone `matlab -batch` syntax check failed at startup with
-`failed to load settings errors_warnings plugin`. This is an environment
-obstruction, not a numerical result. The historical one-substep S4.5 discrete
-feasible witness remains intact; integration robustness is unresolved.
+The pinned upstream commit was fetched into an ignored local checkout and
+verified exactly. MATLAB R2024a starts outside the filesystem sandbox; its
+static code check accepted the changed solver and diagnostic files. The
+[P1 result](../../evidence/sorosim_s55/p1_refinement.json) preserves all
+three newly charged integrations and the historical one-substep outputs.
 
 | Same 35 commands and 36 original sample times | One substep | Two | Four | Eight | Optional 16 |
 |---|---:|---:|---:|---:|---:|
-| Root-complete integration | Historical yes | Unrun | Unrun | Unrun | Unrun |
-| Original sampled mathematical task | Historical feasible witness | Unknown | Unknown | Unknown | Unknown |
-| Maximum holding speed (m/s) | 0.000113989 | Unknown | Unknown | Unknown | Unknown |
+| Root-complete integration | Historical yes | No: stopped at interval 7, substep 2 | Yes: 140 roots | Yes: 280 roots | Unrun |
+| Original sampled mathematical task | Feasible witness | Unavailable beyond 0.06 s | Failed | Failed | Unknown |
+| Maximum holding speed (m/s) | 0.000113989 | Unavailable | 0.593457 | 0.723387 | Unknown |
+| Maximum holding position error (m) | 0.000056429 | Unavailable | 0.019057 | 0.022767 | Unknown |
 
-There is no measured 0.25–0.29 s, 0.29–0.30 s, or 0.30–0.35 s convergence
-trend. The historical one-substep braking prediction cannot currently be
-classified as persistent, sensitive, or unstable under refinement.
+The first two-substep attempt stopped because `fsolve` returned exit flag
+-3 at interval 7, substep 2 despite a finite state and full residual
+1.7694e-13. That is a diagnostic gate error, not evidence of a failed
+implicit equation. The corrected gate accepts finite roots with full
+residual below 1e-9 and retains every solver flag. The first partial attempt
+remains charged and was not rerun. The four- and eight-substep attempts used
+the committed correction and completed with maximum full root residuals
+1.003e-12 and 1.464e-12; both have zero nonpositive exit flags.
+
+At 0.29–0.30 s the one-to-four-substep maximum tip velocity vector
+difference is 0.593381 m/s. Four-to-eight still differs by 0.132965 m/s
+in that window and 0.004036 m in tip position over 0.25–0.29 s. The
+original striking one-substep brake does **not** persist at either complete
+refinement. Both finer models violate the original holding speed and
+position bounds with unchanged controls. The four-to-eight gap remains
+material, so the sequence is classified as **strongly sensitive, not yet
+converged**; it does not prove any continuous-time task infeasibility. The
+public study operation grant was exhausted by candidate version rebinding,
+so the optional 16-substep follow-up was not launched. The frozen S4.5
+one-substep feasibility claim remains valid for that discrete model.
 
 ## P2 preparation: archived-state projection only
 
@@ -130,13 +144,13 @@ No P2 `mj_step` probe or SoRoSim one-step integration has run; `e_projection`,
 
 | Hypothesis | Current supporting observation | Distinguishing observation still needed | Current finding |
 |---|---|---|---|
-| H1: coarse SoRoSim integration causes easy braking | Historical one-substep speed falls from 1.842719 m/s at 0.29 s to 0.000114 m/s at 0.30 s while MuJoCo reaches 0.872629 m/s | Same fixed commands converge or fail to converge under 2/4/8 substeps; compare braking samples | Unresolved; no refined sample either supports or weakens H1 |
+| H1: coarse SoRoSim integration causes easy braking | One-substep speed nearly vanishes at 0.30 s, while complete four/eight-substep integrations violate holding speed with the same commands | A later resolution would test numerical convergence of the refined models | Strong support for material discretization error; exact continuous-time contribution unresolved |
 | H2: reduced-state projection contributes | Reconstructing the saved 0.15 s MuJoCo state from projected GVS coordinates shifts its kinematic tip position 0.006075 m and velocity 0.119152 m/s | Measure SoRoSim initial output at each projected checkpoint and compare to saved MuJoCo output | Projection loss is measurable inside MuJoCo; cross-model output effect unresolved |
 | H3: intrinsic dynamics disagree after alignment | Historical trajectories disagree even though initial tip positions agree closely | Compare same-state, same-tension one-interval increments at stable refinement resolutions | Unresolved; no same-state dynamic probe |
 | H4: historical gap accumulates over intervals | Open-loop position and velocity diverge from early intervals and differ strongly by braking | Compare one-step differences at 0, 0.15 and 0.29 s against the accumulated trajectory gap | Plausible, but the accumulated share is unmeasured |
 
-All four mechanisms can coexist. The missing SoRoSim evaluation and the
-unreconstructed MuJoCo warmstart prevent a causal decomposition now.
+All four mechanisms can coexist. The unreconstructed MuJoCo warmstart and
+missing matched-state probes prevent a causal decomposition now.
 
 ## P3 preparation: raw S4.5 SQP point and full warm start
 
@@ -218,23 +232,25 @@ metrics, root count, source/control hashes, and compact raw KKT residual
 fields when present, alongside the P0 scientific equivalence preflight and
 direct/residual PPO failure summaries. Unavailable numerical results remain
 null; an Agent must not describe the archived repeated S5-Agent configuration
-as a new physical candidate. The next discriminating action is the already
-prepared Design B fixed-sequence SoRoSim refinement at 2, 4 and 8 substeps,
-followed by bounded matched-state one-interval probes if roots complete.
-Only after numerical fidelity and the SoRoSim dependency are restored should
-a base `task_capability` KKT attempt use the verified full-trajectory warm
+as a new physical candidate. The next discriminating action is a bounded
+matched-state one-interval comparison at the original S5-A checkpoints.
+Only after numerical fidelity is characterized should a base
+`task_capability` KKT attempt use the verified full-trajectory warm
 start. More PPO training or a new full NMPC campaign is not supported by
 these findings.
 
 ## Operations, costs and reproduction status
 
-New scientific costs in this worktree: zero SoRoSim integrations, zero
-MuJoCo `mj_step` probes, zero full NLP optimizations, zero PPO actions, zero
-provider requests. The P2 audit used three `mj_forward` saved-state
-kinematic reconstructions; P0 read 260 prior PPO failure captures and
-reconstructed their saved starts without stepping. The prepared P1 study
-`sorosim-s55-fixed-refinement-20261017` has one candidate materialization,
-one imported verified trajectory, and no reserved mathematical worker.
-The earlier sealed S4.5 and S5-T numerical costs remain attributed to their
-original studies. The configured checkout path must first resolve to the
-pinned `GVSRobotics/SoRoSim@24d573a3e864ffda87c42ee462a6ed620133cc7b`.
+New scientific costs through P1: three SoRoSim fixed-sequence attempts,
+two complete and one saved partial, totaling 119.706879 s charged worker
+time. There have been zero MuJoCo `mj_step` probes, full NLP optimizations,
+PPO actions and provider requests. The P2 preparation used three
+`mj_forward` saved-state kinematic reconstructions; P0 read 260 prior PPO
+failure captures and reconstructed their saved starts without stepping.
+The P1 study spent three of four mathematical refinement slots and all six
+public operations (three candidate materializations and three refinements).
+The extra materializations bound the exact same Design B science to
+committed numerical implementation versions; they did not launch physical
+or mathematical repeats. The earlier sealed S4.5 and S5-T numerical costs
+remain attributed to their original studies. The pinned upstream checkout
+is verified at commit `24d573a3e864ffda87c42ee462a6ed620133cc7b`.
