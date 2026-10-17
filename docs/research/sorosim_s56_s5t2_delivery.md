@@ -103,11 +103,13 @@ slacks and explicit original task constraints; it is not substituted for the
 feasibility value function or its sensitivity. The near-flat feasibility value
 motivates testing this secondary objective in the separately budgeted P5 study.
 
-Raw evidence and the exact candidate-bound physical handoff are in
-[the P2 summary](../../evidence/sorosim_s56/codesign/summary.json). The handoff
-states use 36 original samples, retain the 32-step integration identity and link
-the full internal NLP trajectory and independent replay. It certifies complete
-numerical integration, **not** original task success.
+Raw evidence and the original candidate-bound handoff are in
+[the P2 summary](../../evidence/sorosim_s56/codesign/summary.json). An append-only
+erratum and the canonical versioned control source are in
+[the annotations](../../evidence/sorosim_s56/annotations/summary.json). The
+original handoff label overstated verification and copied a coarse epigraph;
+the canonical source separates complete integration from task acceptance and
+removes those coarse optimization fields. Details appear below.
 
 ## P3: new physical control and a controlled NMPC intervention
 
@@ -330,3 +332,148 @@ evaluations (including the sparse serialization failure), 2171.210 recorded
 numerical seconds, zero physical/PPO/provider work. The static operation includes
 rebuilt base/minus/plus candidate models and independently solved equilibria;
 these are not hidden full-horizon NLP attempts.
+
+The [serialization recovery](../../evidence/sorosim_s5t2/diagnostic_recovery/summary.json)
+uses repair `56483d6d`, converts only the sparse QR diagonal to a full JSON
+vector, and re-evaluates the exact preserved raw point. It adds one diagnostic
+and 42.390 numerical seconds, zero full NLPs or physical/PPO/provider work.
+Combined original/recovery diagnostic-analysis use is five of the original
+eight slots; the new session exposes only that one unused slot. The failed
+attempt is retained, charged and linked. The recovered diagnostic still fails
+primal, stationarity, complementarity and raw/selected replay correspondence
+gates; activity-dependent QR rank estimates do not certify LICQ. No multiplier
+or optimal-value sensitivity claim is upgraded by this engineering repair.
+
+## P6: source semantics, feedback, accounting and delivery checks
+
+The append-only [annotation export](../../evidence/sorosim_s56/annotations/summary.json)
+preserves historical control-source artifact `c5abd818...` unchanged and supplies
+canonical `e9e7aff8...` with `source_kind=independently_integrated_control_v1`.
+Its 35 commands, initial state, 36 independently integrated samples and model
+identities are identical to the actual P2 outputs. It carries complete-root
+verification and separate **false** original-task acceptance. Coarse NLP
+slacks/objective fields are absent. The original exported source used
+`verified_mathematical_trajectory` and copied coarse epigraph fields into a
+high-resolution sampled source; that label/field error is explicitly corrected,
+not silently rewritten. P3 and P5 imported only commands/initial state and
+regenerated their own nodes, so neither computation depended on the copied
+epigraph. No experiment was repeated for the metadata correction.
+
+The common source-admission predicate retains legacy semantics, refuses a
+legacy source with explicit failed posthoc task verification, and accepts the
+new completeness-only schema under its explicit meaning. Both physical and
+residual-reference imports use that same predicate. Scientific identity checks
+treat canonical/legacy equal commands as equivalent rather than new science.
+Runtime/profile-only edits with identical task, robot, controls and controller
+remain unresolved/withheld; changing runtime metadata cannot bypass novelty.
+Both direct and residual PPO remain supported, and reference compatibility
+requires exact task/candidate/observation/action bindings. A reference that
+fails the task may guide residual learning; its failure remains visible.
+
+The saved MATLAB interface fixture tests all 35 valid clock positions, the
+four-step final interval and full horizon, and invalid fractional/exhausted
+intervals. The corrected integer-grid check passes before any dynamics root,
+SQP or physical step. The original final NMPC setup failure stays in P3;
+this interface test does not establish the outcome of a repaired full rollout.
+
+The [versioned Agent packet](../../evidence/sorosim_s56/agent_feedback_packet.json)
+is readable through the existing scoped-feedback mechanism alongside S5.5.
+It binds experiment novelty, raw outcomes, task acceptance, numerical-model
+limits, KKT/static sensitivity, direct/residual outcomes and remaining ceilings.
+The append-only scoped-context artifact is `97a71f72...`; existing
+`python -m tools.research status --run-id sorosim-s56-codesign-20261017` returns
+the new feedback without launching an Agent/provider request. The final
+postprocessor's exact file hashes and source are preserved in the annotation
+folder: feedback assembly was pending commit during metadata append, while
+all numerical study launches used their separately clean committed sources.
+Counters and closed-stage status were asserted unchanged by postprocessing.
+The original residual-reference NPZ is also preserved as a blob with its
+frozen contract hash; continuation therefore remains auditable after delivery.
+
+| Actual stage | Full NLP | Mathematical integrations/replays | Diagnostic/analysis calls | Recorded numerical worker seconds |
+|---|---:|---:|---:|---:|
+| P1 refinement | 0 | 3 | 0 | 487.289 |
+| P2 control | 1 | 1 | 1 | 395.260 |
+| P3 independent physics/NMPC | 0 | 0 | 0 | 1838.603 |
+| P4 direct/residual PPO | 0 | 0 | 0 | 234.552 |
+| P5 base/sensitivity | 1 | 1 | 4, including failed serialization | 2171.210 |
+| P5 read-only recovery | 0 | 0 | 1 | 42.390 |
+| Total | 2 | 5 | 6 | 5169.303 |
+
+These are sums of measured worker durations across partially concurrent stages,
+**not** elapsed session wall time. P1's Store `numerical_s` includes overhead;
+its three integration workers alone total 486.991 s. The separately recorded
+old-RL read-only audit is 2.761 s and metadata append .521 s, outside that
+5169.303 s sum. Full-NLP solver time is 135.672 + 1957.010 s, a subset of the
+stage totals. Physical work is two P3 episodes / 1400 steps, plus two independent
+RL evaluations / 1400 steps and 2,621,440 training steps. New PPO actions total
+131,072. Live provider requests and hardware executions are zero.
+
+Unused ceilings remain two P2 NLPs/two high-resolution checks, three P3 local
+probes, two RL stages/131,072 actions/two evaluations, one P5 base NLP and two
+conditional perturbation NLPs. P3's complete-episode ceiling is exhausted.
+No regular base branch exists to admit perturbation NLPs. Completed sessions
+are stopped/sealed; these unused ceilings do not reset grants or imply another
+experiment has run. Fixed-input lower-level sensitivity is not charged as a
+hidden design-perturbation full-horizon optimization.
+
+| Numerical study | Exact frozen implementation |
+|---|---|
+| P1 | `36d35a359fd655f15ec1e99373d61192f1d0aa8f` |
+| P2 | `08b823d2ad720e7d84ec3796f45058077562c6a3` |
+| P3 | `288a8d66a5b6b64c94afb7dd990a9fae310a02ac` |
+| P4 and original P5 | `ab03e8a3f57fd4c4f70731cceb421d6f8aa27692` |
+| Read-only recovery/interface repairs | `56483d6dddef355d9b8adf323eb6d1e44d548a38` |
+| Final versioned feedback/append-only annotations | `7b2d55eb6c5658d72d8d88bf33e9511c75508b5c` |
+
+P4 monitor repair `8c6408d5` changes only bounded state-file read retries;
+its reused operation IDs do not restart training. Final feedback/report commits
+follow the numerical freezes and do not relabel earlier source identities.
+
+The [delivery audit](../../evidence/sorosim_s56/delivery_audit.json) verifies all
+seven archive hashes and all 315 member hashes, stopped sessions with no pending
+or unsealed calls, zero provider calls, policy ZIP and reference-blob hashes,
+the unchanged historical evidence tree and clean pinned upstream checkout.
+Its source is retained beside the JSON. Twenty focused Python checks passed,
+covering source admission, identity/novelty, sealed continuation accounting,
+raw-versus-recovered KKT qualification and both feedback schemas. A separately
+gated actual MATLAB time-grid interface test passed. Changed Python files
+compile, MATLAB static checks report no syntax errors, and `git diff --check`
+passes. Ordinary discovery does not launch expensive experiments. Archive JSON
+secret scanning found no key patterns; staged source/config/documentation is
+checked separately before commit.
+
+The [production source change inventory](../../evidence/sorosim_s56/source_changes.json)
+has 15 Python/MATLAB files, 471 added / 35 removed lines, net 436. Tests, explicit
+experiment drivers, configurations, docs and evidence are separate. Existing
+Host/Store/CLI, optimizer callbacks, implicit dynamics, physical backend, task
+evaluator, PPO algorithm and ledger retain their responsibilities. The only new
+focused production module is `sr_optimality.m`; there is no second candidate
+generator, integration framework, SQP/PPO algorithm, evaluator or Agent system.
+Shared source admission removes duplicated interpretation rather than adding
+an alternate path. A constant/ramp legal initialization still does not require
+a previously successful trajectory.
+
+## Scientific boundary and next research decision
+
+The implementation supports this tendon family and frozen norm-bound terminal/
+holding task with original sampled acceptance. It returns explicit unsupported
+results outside the implemented mathematical task family; it supplies no broad
+STL/contact/collision proof, hardware claim or topology gradient. No physical
+route passes the task. No continuous-time error bound, verified regular optimum,
+regional sensitivity bound, numerical descent certificate, global optimality,
+real-time achievement, RL convergence/generalization or unique model-mismatch
+decomposition is established. The conditional local-branch descent statement
+above remains a theorem with unverified numerical prerequisites here.
+
+The most useful next experiment is a bounded **one-interval mathematical**
+comparison: reintegrate the archived initial NMPC projected state and exact
+first applied tension at declared finer grids, then compare full tip vectors
+with the already archived .01 s physical output. It needs zero new physics and
+no full NLP. Decreasing vector prediction error with refinement supports a
+discretization contribution; agreement between consecutive fine grids with a
+remaining physical discrepancy points toward projection/model identification.
+Qualify this prediction before another expensive full feedback rollout or
+morphology change. Separate later PPO work may test a smaller continuation
+learning rate/KL limit with unchanged reference and independent evaluation;
+current single-seed results cannot choose a generally superior controller.

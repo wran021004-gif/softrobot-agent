@@ -1,0 +1,51 @@
+﻿import hashlib,json,re,subprocess,tarfile,time
+from pathlib import Path
+from tools.platform_host import Host
+from tools.research.state import state
+from tools.state_io import read,atomic_json
+root=Path.cwd();started=time.perf_counter();archives=[];members=0;secret_findings=[]
+pattern=re.compile(rb'(?:sk-[A-Za-z0-9_-]{24,}|-----BEGIN [A-Z ]*PRIVATE KEY-----)')
+for folder in [root/'evidence/sorosim_s56',root/'evidence/sorosim_s5t2']:
+    for path in sorted(folder.rglob('archive_manifest.json')):
+        manifest=read(path);archive=path.parent/'immutable_artifacts.tar.gz'
+        assert hashlib.sha256(archive.read_bytes()).hexdigest()==manifest['archive_sha256']
+        with tarfile.open(archive) as tar:
+            for entry in manifest['members']:
+                body=tar.extractfile(entry['name']).read();assert hashlib.sha256(body).hexdigest()==entry['sha256'];members+=1
+                if entry['media']=='application/json' and pattern.search(body):secret_findings.append(str(path.parent/entry['name']))
+        archives.append(dict(path=str(archive.relative_to(root)),sha256=manifest['archive_sha256'],members=len(manifest['members'])))
+assert not secret_findings,secret_findings
+studies={}
+for suffix in ('s56-refinement','s56-codesign','s56-physics','s56-rl','s5t2','s5t2-diagnostic-recovery'):
+    name='sorosim-'+suffix+'-20261017';host=Host(root/'runs/research'/name,name);s=state(host)
+    assert s['research_status']=='stopped' and s['pending'] is None
+    ledger=host.store.remaining();assert ledger['used']['model_calls']==0 and s['pilot']['live_model_requests']==0
+    with host.store.connect(True) as db:assert not db.execute('SELECT 1 FROM calls WHERE receipt IS NULL').fetchone()
+    studies[name]=dict(source_freeze=s['freeze'],offline_nlp=s['offline_nlp'],mathematical_replays=s['bdf_replays'],
+        mathematical_evaluations=s.get('mathematical_evaluations',0),numerical_s=s['numerical_s'],ledger=ledger)
+assert sum(s['offline_nlp'] for s in studies.values())==2
+assert studies['sorosim-s56-refinement-20261017']['mathematical_replays']==3
+assert studies['sorosim-s56-codesign-20261017']['mathematical_replays']==1
+assert studies['sorosim-s5t2-20261017']['mathematical_replays']==1
+rl=read(root/'evidence/sorosim_s56/rl/summary.json');assert sum(r['consumed']['attempted_actions'] for r in rl['routes'])==131072
+for route in rl['routes']:
+    assert route['consumed']['attempted_actions']==65536
+    assert route['evaluation_facts']['episodes'][0]['counts']['attempted_physics_steps']==700
+    name='sorosim-s56-rl-20261017';host=Host(root/'runs/research'/name,name)
+    files=host.store.artifact(route['raw_files'])
+    policy=next(r for r in files if r['path'].replace('\\','/').endswith('/policy.zip'))
+    assert policy['reference']['artifact_id']==route['checkpoint']['policy_file_sha256']
+annotations=read(root/'evidence/sorosim_s56/annotations/summary.json');h=Host(root/'runs/research/sorosim-s56-codesign-20261017','sorosim-s56-codesign-20261017')
+reference=h.store.artifact(annotations['residual_reference']);assert reference['raw_bytes']['artifact_id']==reference['contract']['sha256']
+legacy=['evidence/sorosim_s45','evidence/sorosim_s5a','evidence/sorosim_s5b','evidence/sorosim_s5rl','evidence/sorosim_s5t','evidence/sorosim_s55']
+changed=subprocess.check_output(['git','diff','--name-only','963b86c242ba4226c716fedd53c6b26ffe627deb','--',*legacy],text=True).strip();assert not changed,changed
+pin=subprocess.check_output(['git','-C','runs/SoRoSim-pinned','rev-parse','HEAD'],text=True).strip();assert pin=='24d573a3e864ffda87c42ee462a6ed620133cc7b'
+assert not subprocess.check_output(['git','-C','runs/SoRoSim-pinned','status','--porcelain'],text=True).strip()
+source_changes=read(root/'runs/s56_loc.json');atomic_json(root/'evidence/sorosim_s56/source_changes.json',source_changes)
+result=dict(status='passed',archives=archives,verified_members=members,studies=studies,
+    historical_evidence_unchanged=True,pinned_upstream=pin,provider_requests=0,secret_scan_findings=secret_findings,
+    policy_and_reference_blob_hashes_verified=True,full_nlp=2,rl_new_actions=131072,
+    measured_numerical_worker_seconds=sum(s['numerical_s'] for s in studies.values()),
+    elapsed_s=time.perf_counter()-started,scope='archive integrity and actual counters; sums of overlapping worker durations are not total elapsed session time')
+atomic_json(root/'evidence/sorosim_s56/delivery_audit.json',result)
+print(json.dumps({k:v for k,v in result.items() if k not in ('studies','archives')},indent=2))
