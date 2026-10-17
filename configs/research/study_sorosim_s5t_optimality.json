@@ -1,0 +1,17 @@
+{
+  "defaults": "family_study_defaults.json",
+  "start_mode": "family_space",
+  "family_space": "family_space_v2.json",
+  "candidate_initialization": "all_candidate_dofs_zero_v1",
+  "base_commit": "3c0781ba",
+  "mode": "engineering_numerical",
+  "control": "control_sorosim.json",
+  "capabilities": ["mathematics", "replay"],
+  "allowed_plan_actions": ["generate", "mechanics", "replay", "stop"],
+  "budgets": {"provider_requests": 0, "protected_provider_requests": 0,
+    "public_operations": 6, "protected_public_operations": 1, "physical_launches": 0,
+    "mathematical_evaluations": 0, "offline_nlp": 2, "bdf_replays": 2},
+  "study_id": "sorosim-s5t-optimality-20261017",
+  "authorization": "User-authorized S5-T: at most two complete base task-capability SQP attempts from the exact verified Design B trajectory, with bounded independent mathematical replay; no physical, PPO or provider work.",
+  "evidence_destination": "evidence/sorosim_s55/optimality_study"
+}

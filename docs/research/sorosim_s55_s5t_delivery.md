@@ -215,12 +215,18 @@ inequalities and original sampled task before using that point as the SQP
 initial vector. A failure stops before optimization. It keeps the raw
 optimizer checkpoint and computes KKT residuals on that point, before any
 recovery. This path has passed Python boundary tests and MATLAB static code
-checks; a new MATLAB check-only call and full P3 solve have not yet run. The
-S5-T derivative preflight from the previous study
-covered 1,006 variables, 864 equalities and 13 original task inequalities;
-its relative objective/constraint directional errors were 2.238e-8 and
-1.727e-10. It does not establish Jacobian rank, multiplier reliability,
-second-order sufficiency or regularity of the changed transcription.
+checks. A [new check-only MATLAB preflight](../../evidence/sorosim_s55/p3_warm_derivative_preflight.json)
+used the exact recovered witness as its full 1,006-variable initial vector.
+Its scaled equality, inequality and bound violation was 6.436e-13. The
+transcription retains all 13 original predicates for reporting, with 12
+optimization inequalities after deduplicating the equal terminal/final
+holding position row; there are 864 dynamics/initial-state equalities.
+Directional objective and complete-constraint derivative relative errors
+were 3.144e-10 and 1.127e-9. This check used 25.278 s and launched no
+optimizer. A full P3 solve has not yet run. The previous S5-T derivative
+preflight used 13 optimization inequalities and had relative errors
+2.238e-8 and 1.727e-10. Neither check establishes Jacobian rank,
+multiplier reliability, second-order sufficiency or local regularity.
 
 ## P4: conditional descent and unavailable certificate
 
@@ -265,13 +271,15 @@ these findings.
 
 ## Operations, costs and reproduction status
 
-New scientific costs through P2: three P1 SoRoSim fixed-sequence attempts,
+New scientific costs through the P3 preflight: three P1 SoRoSim fixed-sequence attempts,
 two complete and one saved partial, totaling 119.706879 s charged worker
 time; three P2 MuJoCo interval probes after a contained 540-step checkpoint
 reconstruction; and six P2 SoRoSim one-interval integrations. P2 charged
 20.696515 s and 600 total MuJoCo steps, of which 60 belong to measured
 intervals. There have been zero full NLP optimizations, PPO actions and
-provider requests. The earlier P2 preparation used three `mj_forward`
+provider requests. The P3 check-only derivative/feasibility evaluation
+used another 25.278 s of MATLAB time without an NLP solve. The earlier
+P2 preparation used three `mj_forward`
 saved-state kinematic reconstructions; P0 read 260 prior PPO failure
 captures and reconstructed their saved starts without stepping.
 The P1 study spent three of four mathematical refinement slots and all six
