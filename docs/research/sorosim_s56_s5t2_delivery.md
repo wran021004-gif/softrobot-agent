@@ -109,6 +109,82 @@ states use 36 original samples, retain the 32-step integration identity and link
 the full internal NLP trajectory and independent replay. It certifies complete
 numerical integration, **not** original task success.
 
+## P3: new physical control and a controlled NMPC intervention
+
+Execution source `288a8d66`; source commands differ from the historical grid by
+5.14351 N in full-sequence Euclidean norm. The existing scientific-equivalence
+preflight admitted the changed complete grid before reservation. One new
+open-loop evaluation completed all 35 commands, 700 original MuJoCo steps and
+36 samples, with zero force-bound violation and valid original task evaluation.
+
+| MuJoCo open loop | Historical S5-A | New P2 sequence |
+|---|---:|---:|
+| Terminal error (m) | .024960 | .016857 |
+| Holding maximum error (m) | .024960 | .016857 |
+| Holding maximum speed (m/s) | .895355 | .498798 |
+| Original acceptance | Valid failure | Valid failure |
+
+Thus mathematical improvement transferred partially to physical measurements,
+but did not establish physical task success. The new independent 32-step model
+predicts holding speed .202355 m/s versus measured .498798 m/s; complete aligned
+position/velocity differences are retained with the physical result. Worker
+execution cost was 1.294 s. No local physical probes were needed or launched.
+
+The single changed NMPC factor is `holding_brake_lead_s: 0 -> .02`. The earlier
+cost window addresses the observed sharp late brake; all other controller
+weights, horizon, solver settings, physical parameters and task criteria remain
+fixed. Its one-substep predictor remains explicitly numerically limited. The
+archived/current prefix through .17 s has identical requested commands and
+physical tip positions. The first command change occurs at .18 s, when the
+changed cost window enters the horizon, and grows to .433 N in vector norm at
+.19 s. This verifies a real controlled intervention rather than a new artifact
+label for the old experiment.
+
+| Complete offline feedback | Historical S5-B | Earlier braking |
+|---|---:|---:|
+| Terminal error (m) | .006099 | .006121 |
+| Holding maximum error (m) | .006635 | .006927 |
+| Holding maximum speed (m/s) | .042351 | .041814 |
+| Unusable controller updates | 1 | 1 |
+| Original acceptance | Valid failure | Valid failure |
+
+Both position criteria pass; speed and the original zero-controller-error
+criterion fail. Earlier braking alone yields little improvement and is not a
+validated controller solution. All 35 measured/projected states, projection
+residuals, requested/applied controls, recovery/fallback decisions, optimization
+statuses and timings are preserved. Thirty-four accepted predictions align to
+the next actual output; their maximum position and full velocity-vector errors
+are .005947 m and .168852 m/s. Maximum reconstruction residual is 6.975 rad/m.
+Nineteen SQP calls reach their iteration limit, fifteen converge, and the final
+update fails during setup before any SQP call.
+
+The final .34 s error is exactly `CONTROL_TIME_GRID_REQUIRED`: binary floating
+arithmetic makes `(.35-.34)/.01` slightly less than one, so the old raw
+`remaining>=1` check rejects a valid last interval. It is a separate interface
+boundary defect, not evidence of task infeasibility or SQP stagnation. Its fix
+and zero-dynamics boundary verification are recorded with the final repairs;
+the two full physical results and their original failures remain immutable, and
+no third full launch is admitted.
+
+The stage uses two complete physical executions and zero local physical probes.
+Actual stage numerical time is 1838.603 s; the feedback simulation worker uses
+1835.390 s. Mean update computation is 52.154 s (range .024--69.236 s), with 35
+deadline misses. The .01 s period is not a real-time achievement. Parallel PPO
+and later mathematical diagnostics make these observed costs, not a timing
+benchmark against the historical machine run.
+
+The [matched-fidelity alignment audit](../../evidence/sorosim_s56/physics/alignment_audit.json)
+compares both physical open loops with their own 32-step mathematical sequence.
+Whole-trajectory maximum position/velocity-vector differences change from
+.067150 m / 1.206194 m/s to .066005 m / 1.110139 m/s. Holding velocity mismatch
+increases from .306384 to .330439 m/s. Thus better task metrics do not establish
+global model calibration. Different state/input histories prevent unique causal
+decomposition; the optimized sequence has no separate 64-step convergence check.
+
+[P3 evidence](../../evidence/sorosim_s56/physics/summary.json) and the
+[complete NMPC comparison](../../evidence/sorosim_s56/physics/nmpc_comparison.json)
+retain the original evaluator and per-update evidence bindings.
+
 ## P4: actual direct and residual PPO studies
 
 Implementation `5003578e` preserves cross-study parent/checkpoint references
@@ -173,3 +249,16 @@ Actual active training time was 226.786 s; stage numerical time including
 evaluation/postprocessing was 234.552 s, plus 2.761 s for the separately recorded
 pre-training read-only audit. Two stages, two evaluation episodes and 131,072
 actions remain unused under the original ceiling; they are not new authorization.
+
+The [binding/reward audit](../../evidence/sorosim_s56/rl/binding_and_reward_audit.json)
+confirms byte-identical compiled physical XML, task, action and observation
+definitions for each old/new route; residual reference metadata is identical.
+Mean logged training rewards improve from -14015 to -4973 (direct) and -2819 to
+-2140 (residual). Decomposing the already saved independent trajectories gives
+position/holding-speed/smoothness reward totals of -4451.527/-37.357/-0.000014
+and -1384.531/-541.792/-0.001744; their sums match the original recorded episode
+rewards within 7e-13. This is saved-sample arithmetic, not another evaluation.
+Latest residual approximate KL .252 and PPO likelihood-ratio clip fraction .641
+suggest testing a smaller continuation learning rate or declared KL limit before
+simply increasing training. PPO likelihood clipping and physical tension
+clipping are different metrics; neither establishes convergence or superiority.
