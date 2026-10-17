@@ -4,7 +4,6 @@ from pathlib import Path
 import time
 import subprocess
 
-import numpy as np
 from tests.research.sorosim_s56_refinement import initialize,finish
 from tools.platform_host import Host
 from tools.platform_store import plain

@@ -23,6 +23,8 @@ def kkt_reliability(kkt,regularity,replay):
         if not math.isfinite(kkt.get(key,float('inf'))) or kkt[key]>tolerance:
             failures.append(key)
     if not replay.get('passed'):failures.append('independent_replay')
+    if kkt.get('same_as_selected_trajectory') is not True:
+        failures.append('replay_iterate_correspondence')
     activity=regularity.get('activity_diagnostics',[])
     if not activity or not all(row['numerical_LICQ'] for row in activity):
         failures.append('activity_dependent_numerical_LICQ')

@@ -131,5 +131,32 @@ class RefinementBoundaries(unittest.TestCase):
         self.assertEqual([k for k in a if a[k]!=b[k]],['holding_brake_lead_s'])
         self.assertEqual(b['holding_brake_lead_s'],.02)
 
+    def test_integrated_control_handoff_does_not_inherit_coarse_slacks(self):
+        import tarfile
+        from tests.research.sorosim_s5t_pilot import sealed
+        from tools.state_io import read
+        from extensions.tendon_family.sorosim_codesign import integrated_control_source
+        from tools.research.physical_replay import numerically_verified_source
+        index=read(ROOT/'evidence/sorosim_s56/codesign/summary.json')
+        with tarfile.open(ROOT/'evidence/sorosim_s56/codesign/study/immutable_artifacts.tar.gz') as archive:
+            solved=sealed(archive,index['optimization']);checked=sealed(archive,index['validation'])
+            legacy=sealed(archive,index['physical_source']);candidate=sealed(archive,index['candidate'])
+        source=integrated_control_source(solved,checked)
+        self.assertEqual(source['source_kind'],'independently_integrated_control_v1')
+        self.assertTrue(numerically_verified_source(source))
+        self.assertFalse(source['task_verification']['original_task_satisfied'])
+        self.assertFalse(numerically_verified_source(legacy))
+        from tools.research.feedback import compare_experiments,experiment_identity
+        comparison=compare_experiments(experiment_identity(candidate,'fixed_tension',source=legacy),
+            experiment_identity(candidate,'fixed_tension',source=source))
+        self.assertEqual(comparison['relation'],'equivalent_repeat')
+        self.assertNotIn('slacks',source['trajectory'])
+        self.assertNotIn('objective_definition',source['trajectory'])
+        self.assertEqual(len(source['trajectory']['tensions_n']),35)
+        self.assertEqual(len(source['trajectory']['times_s']),36)
+        wrong=deepcopy(checked);wrong['source_identity']='different raw source'
+        with self.assertRaisesRegex(ValueError,'INTEGRATION_SOURCE_IDENTITY'):
+            integrated_control_source(solved,wrong)
+
 
 if __name__=='__main__':unittest.main()

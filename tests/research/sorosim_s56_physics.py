@@ -10,6 +10,7 @@ from tools.research import core
 from tools.research.feedback import experiment_preflight
 from tools.research.state import state,save
 from tools.state_io import atomic_json,read
+from extensions.tendon_family.sorosim_codesign import integrated_control_source
 
 ROOT=Path(__file__).resolve().parents[2]
 
@@ -21,7 +22,7 @@ def run():
         codesign_summary='evidence/sorosim_s56/codesign/summary.json',open_loop=None,nmpc=None)
     if codesign.get('physical_source'):
         with tarfile.open(ROOT/'evidence/sorosim_s56/codesign/study/immutable_artifacts.tar.gz') as archive:
-            source=sealed(archive,codesign['physical_source'])
+            source=integrated_control_source(sealed(archive,codesign['optimization']),sealed(archive,codesign['validation']))
         old=host.store.artifact(old_source)
         change=float(np.linalg.norm(np.asarray(source['trajectory']['tensions_n'])-old['trajectory']['tensions_n']))
         reference=save(host,source,'new_independent_mathematical_source')

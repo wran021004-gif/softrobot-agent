@@ -549,8 +549,8 @@ def import_mathematical_reference(host, candidate_ref, source_ref):
     candidate_ref=plain(candidate_ref);source_ref=plain(source_ref)
     candidate=verify_candidate(host,candidate_ref)
     source=host.store.artifact(source_ref)
-    if (source.get('source_kind')!='verified_mathematical_trajectory' or
-            not source.get('posthoc_verification',{}).get('checks',{}).get('repaired_verification_passed')):
+    from tools.research.physical_replay import numerically_verified_source
+    if not numerically_verified_source(source):
         raise ValueError('VERIFIED_MATHEMATICAL_TRAJECTORY_REQUIRED')
     binding(candidate['configuration'],source['trajectory'])
     relation=dict(candidate=candidate_ref,source=source_ref,

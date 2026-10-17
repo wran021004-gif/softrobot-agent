@@ -160,6 +160,8 @@ def compare_experiments(proposed, previous):
     missing=sorted(set(proposed['missing_effective_fields']+previous['missing_effective_fields']))
     if missing and not any(key in different for key in ('physical','task','controller','action')):
         relation='unresolved_comparison'
+    elif all(key in equal for key in ('physical','task','controller','action')) and 'runtime' in different:
+        relation='unresolved_comparison'
     elif not different:
         relation='equivalent_repeat'
     elif proposed['physical']==previous['physical'] and proposed['task']==previous['task']:

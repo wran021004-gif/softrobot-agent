@@ -1,6 +1,7 @@
 function out=sr_nmpc(model,r)
 % Full scaled multiple shooting. No wall/CPU early-return policy.
 started=tic;c=context(model,r);
+if isfield(r,'context_only') && r.context_only,out=c;return;end
 c.profile=isfield(r,'profile') && r.profile;
 [objective,constraint,inspect,step,callbackProfile]=sr_nmpc_callbacks(model,c);history=[];
 warmStart=tic;
@@ -104,7 +105,8 @@ assert(strcmp(c.recipe.integration_method,'implicit_euler'),'UNSUPPORTED_INTEGRA
 assert(strcmp(c.recipe.stopping_policy,'research_work_v1'),'RESEARCH_STOPPING_POLICY_REQUIRED');
 c.elapsed=r.elapsed_s;c.period=r.period_s;
 remaining=(r.duration_s-r.elapsed_s)/r.period_s;
-assert(abs(remaining-round(remaining))<1e-7 && remaining>=1,'CONTROL_TIME_GRID_REQUIRED');
+assert(abs(remaining-round(remaining))<1e-7 && round(remaining)>=1,'CONTROL_TIME_GRID_REQUIRED');
+remaining=round(remaining);
 c.horizon=min(c.recipe.horizon,round(remaining));
 if isfield(r,'full_task') && r.full_task,c.horizon=round(remaining);end
 c.steps=c.horizon*c.recipe.substeps;c.h=c.period/c.recipe.substeps;

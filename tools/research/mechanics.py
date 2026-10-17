@@ -38,8 +38,10 @@ def dispatch(host,operation,arguments,key):
                 warm=source(host,arguments.warm_source)
             else:
                 warm=host.store.artifact(arguments.warm_source)
-                verified=(warm.get('source_kind')=='verified_mathematical_trajectory' and
-                    warm.get('posthoc_verification',{}).get('checks',{}).get('repaired_verification_passed'))
+                from tools.research.physical_replay import numerically_verified_source
+                verified=(numerically_verified_source(warm) and
+                    (warm.get('source_kind')=='verified_mathematical_trajectory' or
+                        arguments.initialization=='saved_candidate_controls'))
                 historical=(warm.get('source_kind')=='historical_mathematical_trajectory' and
                     (arguments.initialization=='saved_candidate_controls' or arguments.objective_mode!='task_capability'))
                 if not (verified or historical):
@@ -52,8 +54,8 @@ def dispatch(host,operation,arguments,key):
         owned_solve=(plain(arguments.source) in s.get('mechanics_results',[]) and
             source_row.get('operation')=='solve' and source_row.get('trajectory') and
             source_row['design_candidate']==candidate)
-        if not owned_solve and (source_row.get('source_kind')!='verified_mathematical_trajectory' or
-                not source_row['posthoc_verification']['checks']['repaired_verification_passed']):
+        from tools.research.physical_replay import numerically_verified_source
+        if not owned_solve and not numerically_verified_source(source_row):
             raise ValueError('REFINEMENT_REQUIRES_VERIFIED_FROZEN_MATHEMATICAL_SOURCE')
         trajectory=source_row['trajectory']
         warm_trajectory=None

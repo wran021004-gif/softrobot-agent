@@ -139,6 +139,45 @@ class NMPCTests(unittest.TestCase):
         c.close()
 
 
+@unittest.skipUnless(os.environ.get('SOFTROBOT_S56_GRID_TEST')=='1',
+    'explicit MATLAB interface fixture; no dynamics or physical stepping')
+class TimeGridBoundary(unittest.TestCase):
+    def test_all_35_updates_and_last_interval(self):
+        import hashlib,json,time
+        import matlab.engine
+        from tools.research.config import resolve
+        cfg=resolve(ROOT/'configs/research/study_sorosim_s56_physics.json')['configuration']
+        parameters=cfg['policy']['controller']['parameters']['data'];timing=cfg['task']['timing']
+        # Dimension/input fixture only. No SoRoSim model or equations are constructed.
+        model=dict(S=dict(ndof=12),spec=dict(routes=[dict(force_limit_n=8.) for _ in range(4)]))
+        request=dict(recipe=parameters['recipe'],elapsed_s=0.,period_s=timing['control_period_s'],
+            duration_s=timing['duration_s'],measured_state=[0.]*24,previous_input=[.2]*4,
+            target=cfg['task']['goal']['data']['target_m'],position_tolerance_m=.01,
+            settling=parameters['settling'],context_only=True)
+        engine=matlab.engine.start_matlab('-nodesktop -nosplash');started=time.perf_counter();rows=[]
+        try:
+            engine.addpath(str(ROOT/'matlab/sorosim_control'),nargout=0)
+            def inspect():
+                engine.workspace['grid_fixture']=json.dumps(dict(model=model,request=request))
+                engine.eval('fixture=jsondecode(grid_fixture); context_out=sr_nmpc(fixture.model,fixture.request);',nargout=0)
+                return json.loads(engine.eval("jsonencode(struct('horizon',context_out.horizon,'steps',context_out.steps,'h',context_out.h))"))
+            for k in range(35):
+                request['elapsed_s']=k*timing['control_period_s'];row=inspect()
+                self.assertEqual(row['horizon'],min(10,35-k));rows.append(row)
+            request['recipe']=dict(request['recipe'],substeps=4)
+            self.assertEqual(inspect()['steps'],4)  # last held command, four internal steps
+            request.update(elapsed_s=0.,full_task=True)
+            full=inspect();self.assertEqual(full['horizon'],35);self.assertEqual(full['steps'],140)
+            for invalid in (.345,.35):
+                request['elapsed_s']=invalid
+                with self.assertRaisesRegex(matlab.engine.MatlabExecutionError,'CONTROL_TIME_GRID_REQUIRED'):inspect()
+            atomic_json(ROOT/'runs/s56_grid_boundary_check.json',dict(fixture=True,contexts=rows,
+                full_four_step_context=full,invalid_times_s=[.345,.35],physical_steps=0,implicit_roots=0,
+                sqp_calls=0,elapsed_s=time.perf_counter()-started,
+                implementation_sha256=hashlib.sha256((ROOT/'matlab/sorosim_control/sr_nmpc.m').read_bytes()).hexdigest()))
+        finally:engine.quit()
+
+
 if __name__=='__main__':
     path=os.environ.get('SOROSIM_S3_CALLBACKS')
     if path:verify_callbacks(run_update(path,True))

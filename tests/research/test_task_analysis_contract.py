@@ -219,6 +219,14 @@ class TaskAnalysisTests(unittest.TestCase):
 
 
 class KKTQualification(unittest.TestCase):
+    def test_recovery_replay_cannot_validate_another_raw_iterates_multipliers(self):
+        from tools.research.analysis import kkt_reliability
+        raw=dict(primal_inf=0.,stationarity_inf=0.,dual_violation=0.,complementarity_inf=0.,same_as_selected_trajectory=False)
+        q=kkt_reliability(raw,dict(activity_diagnostics=[dict(numerical_LICQ=True)],
+            second_order_sufficiency='independently_verified'),dict(passed=True))
+        self.assertFalse(q['regular_local_branch_verified'])
+        self.assertIn('replay_iterate_correspondence',q['obstructions'])
+
     def test_missing_regularity_cannot_become_an_envelope_gradient(self):
         from tools.research.analysis import kkt_reliability,complete_lagrangian_sensitivity
         residuals=dict(primal_inf=0.,stationarity_inf=.01,dual_violation=0.,complementarity_inf=0.)

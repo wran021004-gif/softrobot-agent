@@ -67,6 +67,12 @@ class ScientificIdentityTests(unittest.TestCase):
         self.assertEqual(residual['diagnosis']['recorded_failures'],0)
         self.assertEqual(residual['consumed']['failed_episodes'],0)
 
+    def test_profile_metadata_alone_does_not_admit_repeated_physics(self):
+        original=experiment_identity(self.candidate,'fixed_tension',source=self.source)
+        changed=deepcopy(original);changed['runtime']['profile_identity']='new packaging only'
+        result=compare_experiments(original,changed)
+        self.assertEqual(result['relation'],'unresolved_comparison')
+
     def test_rl_checkpoint_and_mode_identity(self):
         study='sorosim-s5rl-design-b-20261016'
         host=Host(ROOT/'runs/research'/study,study)

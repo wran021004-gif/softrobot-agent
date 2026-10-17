@@ -15,6 +15,18 @@ from tools.research.state import state, update, save, guard
 from tools.research.design import verify_candidate
 
 
+def numerically_verified_source(value):
+    """Keep legacy witness meaning; explicitly version complete failing controls."""
+    if value.get('source_kind')=='independently_integrated_control_v1':
+        proof=value['integration_verification'];trajectory=value['trajectory']
+        return (proof['complete'] and proof['maximum_root_residual_inf']<1e-9 and
+            proof['root_count']==len(trajectory['tensions_n'])*trajectory['integration_substeps'])
+    proof=value.get('posthoc_verification',{})
+    return (value.get('source_kind')=='verified_mathematical_trajectory' and
+        proof.get('checks',{}).get('repaired_verification_passed',False) and
+        proof.get('original_task_satisfied') is not False)
+
+
 def binding(configuration, trajectory):
     from extensions.tendon_family.sorosim_control import checked_control
     from extensions.tendon_family.sorosim_spec import SorosimModel
@@ -68,8 +80,7 @@ def dispatch(host,arguments,key):
     cfg=verify_candidate(host,candidate)['configuration']
     source_ref=plain(arguments.source)
     source=host.store.artifact(source_ref)
-    if (source.get('source_kind')!='verified_mathematical_trajectory' or
-            not source['posthoc_verification']['checks']['repaired_verification_passed']):
+    if not numerically_verified_source(source):
         raise ValueError('VERIFIED_OR_EXPLICIT_DIAGNOSTIC_MATHEMATICAL_SOURCE_REQUIRED')
     binding(cfg,source['trajectory'])
     from tools.research.feedback import experiment_preflight

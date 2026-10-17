@@ -11,6 +11,32 @@ from .sorosim_session import SorosimSession
 from .gvs_profile import candidate_numerical
 
 
+def integrated_control_source(solved, checked):
+    """Versioned control handoff; sampled integration is not an NLP witness."""
+    trajectory=solved['trajectory'];raw=checked['raw']
+    if (checked['source_identity']!=digest(trajectory) or
+            checked['model_identity']!=trajectory['model_identity']):
+        raise ValueError('INTEGRATION_SOURCE_IDENTITY_MISMATCH')
+    roots=np.asarray(raw['roots'],dtype=float)
+    complete=(checked['complete'] and len(roots)==len(trajectory['tensions_n'])*checked['substeps']
+        and np.isfinite(roots[:,2]).all() and np.max(roots[:,2])<1e-9)
+    if not complete:raise ValueError('COMPLETE_NUMERICAL_CONTROL_REQUIRED')
+    sampled={k:trajectory[k] for k in ('model_identity','design_identity','task_identity',
+        'coordinate_order','tendon_order','tensions_n')}
+    sampled.update(states=raw['states'],times_s=raw['times_s'],
+        integration_substeps=checked['substeps'],state_sampling='original_control_clock')
+    return dict(source_kind='independently_integrated_control_v1',trajectory=sampled,
+        integration_verification=dict(complete=True,root_count=len(roots),
+            maximum_root_residual_inf=float(np.max(roots[:,2])),
+            source_trajectory_identity=checked['source_identity']),
+        task_verification=dict(original_task_satisfied=checked['original_task_satisfied'],
+            violations=checked['time_localized_task_violations']),
+        mathematical_outputs=dict(model_identity=checked['model_identity'],times_s=raw['times_s'],
+            samples=len(raw['times_s']),tip_positions_m=raw['tip_positions_m'],
+            tip_velocities_m_s=raw['tip_velocities_m_s']),
+        scope='Complete fixed-command numerical integration only; no copied coarse epigraph or original-task feasibility claim')
+
+
 def compare_refinements(coarse, fine):
     """Observed aligned vector differences; these are not continuous-time bounds."""
     times=np.asarray(coarse['times_s'])

@@ -6,6 +6,7 @@ from tests.research.sorosim_s56_refinement import initialize,finish,plan
 from tools.research import core
 from tools.research.state import state,save
 from tools.state_io import atomic_json,read
+from extensions.tendon_family.sorosim_codesign import integrated_control_source
 
 ROOT=Path(__file__).resolve().parents[2]
 
@@ -40,16 +41,8 @@ def run():
             optimization_facts=value['mathematical_facts'])
         if checked.get('complete'):
             # A separate physical handoff uses the original sample clock, not internal NLP nodes.
-            trajectory=dict(value['trajectory'],states=checked['raw']['states'],
-                times_s=checked['raw']['times_s'],substeps=32,state_grid='original_control_samples')
-            outputs=dict(model_identity=checked['model_identity'],times_s=checked['raw']['times_s'],
-                samples=len(checked['raw']['times_s']),tip_positions_m=checked['raw']['tip_positions_m'],
-                tip_velocities_m_s=checked['raw']['tip_velocities_m_s'])
-            handoff=dict(source_kind='verified_mathematical_trajectory',trajectory=trajectory,
-                mathematical_outputs=outputs,source_solve=result['reference'],source_replay=replay['reference'],
-                posthoc_verification=dict(checks=dict(repaired_verification_passed=True),
-                    meaning='complete independent roots, bounded commands, original task satisfaction separate',
-                    original_task_satisfied=checked['original_task_satisfied']),
+            handoff=integrated_control_source(value,checked)
+            handoff.update(source_solve=result['reference'],source_replay=replay['reference'],
                 configuration=host.store.artifact(value['original_request'])['configuration'])
             summary['physical_source']=save(host,handoff,'independently_integrated_control_source')
     summary['counts']=dict(offline_nlp=state(host)['offline_nlp'],integrations=state(host)['bdf_replays'])
