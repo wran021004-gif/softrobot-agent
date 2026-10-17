@@ -52,3 +52,59 @@ Further refinement is stopped at this ceiling. Use 32 steps as an exploratory
 independent validation grid with its measured 32/64 uncertainty; use four steps
 only as a cost-controlled intermediate optimization transcription. A task pass
 on that intermediate grid alone cannot establish higher-fidelity feasibility.
+
+The successive maximum position differences are 2.136, 1.101 and .559 mm;
+velocity-vector differences are .070636, .036349 and .018424 m/s, each largest
+at the critical .30 s braking sample for velocity. Both decrease pointwise at
+every original sample (1e-10 comparison allowance). The final observed velocity
+gap is still 92% of the task speed tolerance. Small root residuals and consistent
+roughly first-order refinement support discretization sensitivity rather than a
+failed root solve; nonunique roots and continuous-time error remain unbounded.
+
+## P2: one actual control solve and independent validation
+
+Execution source: `08b823d2`. The new `saved_candidate_controls` initialization
+checks candidate/model/task/order/input/initial-state identities, imports only
+35 physical commands and regenerates all 141 state nodes through the existing
+implicit root preparation. The stricter saved-full-trajectory path remains.
+Legal constant/ramp starts remain supported without a feasible historical task.
+The check-only request uses the same mechanics reservation/receipt lifecycle
+and charges a mathematical evaluation, never a full NLP attempt.
+
+The measured four-step problem has 3,526 variables, 3,384 equalities, 72,264
+nonzero dynamics Jacobian entries and 12 distinct task inequalities. All 13
+original predicates remain in reports. Dense SQP Hessian storage alone is about
+99.5 MB; actual observed MATLAB process memory reached about 4.8 GB, including
+runtime and solver workspaces. A full callback took 2.836 s. Objective and
+constraint directional relative errors were 8.30e-7 and 9.07e-11; rematerialized
+initial dynamics violation was 1.00e-12.
+
+One genuine feasibility-first SQP solve (`maximum_original_violation`, rho>=0)
+used a 60-iteration ceiling and returned flag 1 after 21 iterations / 43 function
+evaluations in 135.672 solver seconds. Raw scaled primal violation was 5.50e-13.
+Its exact strict predicate flag remains **false**: a holding speed exceeds .020
+by approximately 4.36e-15 m/s after bounded export. This is a numerical boundary
+point, not an exact original-task pass; no threshold was relaxed. Recovery and
+the multiplier-bearing raw optimizer checkpoint are preserved separately.
+
+| Independent 32-step replay | Old commands | New commands |
+|---|---:|---:|
+| Terminal error (m) | .011242 | .010069 |
+| Maximum holding error (m) | .025697 | .015030 |
+| Maximum holding speed (m/s) | .827020 | .202355 |
+
+The new sequence is numerically complete and improves these measured metrics,
+but fails original higher-fidelity task acceptance. One solve, one derivative
+preflight and one independent replay consumed 395.260 recorded numerical seconds
+including initialization. No physical launch occurred in P2. The remaining P2
+ceiling is two NLPs and two validations; no additional attempt is represented as
+performed. A separate `task_feasible_effort` objective is implemented with zero
+slacks and explicit original task constraints; it is not substituted for the
+feasibility value function or its sensitivity. The near-flat feasibility value
+motivates testing this secondary objective in the separately budgeted P5 study.
+
+Raw evidence and the exact candidate-bound physical handoff are in
+[the P2 summary](../../evidence/sorosim_s56/codesign/summary.json). The handoff
+states use 36 original samples, retain the 32-step integration identity and link
+the full internal NLP trajectory and independent replay. It certifies complete
+numerical integration, **not** original task success.
