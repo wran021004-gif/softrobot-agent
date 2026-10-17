@@ -98,5 +98,28 @@ class RefinementBoundaries(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,'CODESIGN_WARM_IDENTITY_MISMATCH'):
             calculate(wrong)
 
+    def test_saved_controls_rematerialize_without_copying_coarse_states(self):
+        captured=[]
+        class Session:
+            environment={};dependency={};timings={}
+            def __enter__(self):return self
+            def __exit__(self,*args):pass
+            def construct(self,spec):pass
+            def evaluate(self,operation,request):
+                captured.append(request);return dict(status='check_only')
+        request=dict(configuration=self.configuration,design_candidate=CANDIDATE,
+            operation='solve',check_only=True,warm_trajectory=self.source['trajectory'],
+            arguments=dict(substeps=4,initialization='saved_candidate_controls',
+                objective_mode='maximum_original_violation',position_weight=1.,speed_weight=1.,
+                secondary_coefficient=0.,max_iterations=60))
+        with patch('extensions.tendon_family.sorosim_codesign.SorosimSession',Session):calculate(request)
+        self.assertNotIn('warm_trajectory',captured[0])
+        self.assertEqual(captured[0]['control']['initial_tensions'],self.source['trajectory']['tensions_n'])
+        self.assertEqual(captured[0]['control']['recipe']['substeps'],4)
+        self.assertEqual(len(captured[0]['control']['initial_tensions']),35)
+        changed=deepcopy(request);changed['warm_trajectory']['tendon_order'].reverse()
+        with self.assertRaisesRegex(ValueError,'WARM_IDENTITY_MISMATCH'):
+            calculate(changed)
+
 
 if __name__=='__main__':unittest.main()

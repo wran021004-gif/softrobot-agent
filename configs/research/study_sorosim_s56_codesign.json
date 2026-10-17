@@ -1,0 +1,32 @@
+{
+  "defaults": "family_study_defaults.json",
+  "start_mode": "family_space",
+  "family_space": "family_space_v2.json",
+  "candidate_initialization": "all_candidate_dofs_zero_v1",
+  "base_commit": "963b86c242ba4226c716fedd53c6b26ffe627deb",
+  "mode": "engineering_numerical",
+  "control": "control_sorosim.json",
+  "study_id": "sorosim-s56-codesign-20261017",
+  "capabilities": [
+    "mathematics",
+    "replay"
+  ],
+  "allowed_plan_actions": [
+    "generate",
+    "mechanics",
+    "refine",
+    "stop"
+  ],
+  "budgets": {
+    "provider_requests": 0,
+    "protected_provider_requests": 0,
+    "public_operations": 16,
+    "protected_public_operations": 1,
+    "physical_launches": 0,
+    "mathematical_evaluations": 1,
+    "offline_nlp": 3,
+    "bdf_replays": 3
+  },
+  "authorization": "Explicit S5.6 P2: at most three fixed-design full NLP attempts and three independent high-resolution replays; one derivative/cost preflight. No physical, RL or provider calls.",
+  "evidence_destination": "evidence/sorosim_s56/codesign/study"
+}

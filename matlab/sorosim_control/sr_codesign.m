@@ -8,6 +8,7 @@ requirements=r.requirements.constraints;
 feasibility=ismember(r.arguments.objective_mode,{'maximum_original_violation','minimum_signed_task_excess','task_capability'});
 interior=ismember(r.arguments.objective_mode,{'minimum_signed_task_excess','task_capability'});
 freeEpigraph=strcmp(r.arguments.objective_mode,'task_capability');
+performance=strcmp(r.arguments.objective_mode,'task_feasible_effort');
 nodes=[];groups=[];radii=[];references=[];labels={};
 for j=1:numel(requirements)
     t=requirements(j);
@@ -23,7 +24,7 @@ for j=1:numel(requirements)
     end
 end
 optimizedIndices=1:numel(nodes);originalForOptimized=num2cell(optimizedIndices);
-if freeEpigraph
+if feasibility || performance
     optimizedIndices=[];originalForOptimized={};
     for k=1:numel(nodes)
         match=find(arrayfun(@(j) nodes(j)==nodes(k) && groups(j)==groups(k) && ...
@@ -56,7 +57,9 @@ if ismember(r.operation,{'replay','cross_replay'})
         physical(:,k)=[(b(1:c.n)-a(1:c.n)-c.h*b(c.n+1:end))/10;d.residual/.001];
     end
     difference=max(abs((X-prepared.initial.states)./c.state_scale),[],'all');
-    if interior
+    if performance
+        slackLower=[0;0];slackUpper=[0;0];
+    elseif interior
         if freeEpigraph
             slackLower=[-inf;0];
         else
@@ -95,6 +98,10 @@ else
     lower=[c.lower;0;0];upper=[c.upper;inf;inf];
 end
 z0=[initial;slacks];
+if performance
+    lower(end-1:end)=0;upper(end-1:end)=0;z0(end-1:end)=0;
+    assert(all(gaps<=0),'PERFORMANCE_REQUIRES_TASK_FEASIBLE_REMATERIALIZED_START');
+end
 warm_report=struct('used',false);
 if isfield(r,'warm_trajectory')
     assert(strcmp(r.operation,'solve') && strcmp(r.arguments.initialization,'saved_candidate_trajectory'), ...
@@ -126,7 +133,12 @@ if isfield(r,'check_only') && r.check_only
         'constraint_relative_error',norm(cd-[gi,ge]'*v,inf)/max(1e-12,norm(cd,inf)), ...
         'variables',numel(z0),'equalities',numel(ce),'inequalities',numel(ci), ...
         'warm_start',warm_report,'optimized_task_inequalities',numel(optimizedIndices), ...
-        'original_task_predicates',numel(nodes),'total_s',toc(started));return;
+        'original_task_predicates',numel(nodes),'dynamics_jacobian_nnz',nnz(ge), ...
+        'dense_sqp_hessian_bytes_estimate',8*numel(z0)^2, ...
+        'physical_control_commands',c.horizon,'internal_state_nodes',c.steps+1, ...
+        'initial_root_count',numel(prepared.roots),'initial_maximum_task_excess',max(gaps), ...
+        'initial_dynamics_violation',norm(ce,inf),'initialization',r.arguments.initialization, ...
+        'one_callback_s',callback_cost(z0),'total_s',toc(started));return;
 end
 t=tic;[z,f,flag,info,lambda,gradient]=fmincon(@objective,z0,[],[],[],[],lower,upper,@constraints,opt);solve_s=toc(t);
 % Preserve the expensive raw returned iterate before further validation can fail.
@@ -182,17 +194,22 @@ out=struct('status','returned','exitflag',flag,'converged',flag>0,'iterations',i
 out.kkt.same_as_selected_trajectory=~recovery.selected && projectionMax<=1e-12;
 out.kkt.bound_projection_max=projectionMax;
 
+    function wall=callback_cost(z)
+        t=tic;constraints(z+1e-9);wall=toc(t);
+    end
     function [f,g]=objective(z)
         if feasibility
             g=zeros(nv+2,1);g(end-1)=1;f=z(end-1);return;
         end
         g=zeros(nv+2,1);f=r.arguments.position_weight*z(end-1)+r.arguments.speed_weight*z(end);
         g(end-1:end)=[r.arguments.position_weight;r.arguments.speed_weight];
-        if strcmp(r.arguments.objective_mode,'task_gap_with_effort')
+        if performance,f=0;g(:)=0;end
+        if performance || strcmp(r.arguments.objective_mode,'task_gap_with_effort')
             ix=2*c.n*(c.steps+1)+(1:c.m*c.horizon);U=reshape(z(ix),c.m,c.horizon);delta=diff(U,1,2);
             effort=sum(U.^2,'all')/numel(U)+.1*sum(delta.^2,'all')/numel(delta);
             G=2*U/numel(U);G(:,2:end)=G(:,2:end)+.2*delta/numel(delta);G(:,1:end-1)=G(:,1:end-1)-.2*delta/numel(delta);
-            f=f+r.arguments.secondary_coefficient*effort;g(ix)=r.arguments.secondary_coefficient*G(:);
+            coefficient=r.arguments.secondary_coefficient;if performance,coefficient=1;end
+            f=f+coefficient*effort;g(ix)=coefficient*G(:);
         end
     end
     function gap=task_values(e)

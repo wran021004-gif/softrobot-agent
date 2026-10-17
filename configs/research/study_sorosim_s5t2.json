@@ -1,0 +1,33 @@
+{
+  "defaults": "family_study_defaults.json",
+  "start_mode": "family_space",
+  "family_space": "family_space_v2.json",
+  "candidate_initialization": "all_candidate_dofs_zero_v1",
+  "base_commit": "963b86c242ba4226c716fedd53c6b26ffe627deb",
+  "mode": "engineering_numerical",
+  "control": "control_sorosim.json",
+  "study_id": "sorosim-s5t2-20261017",
+  "capabilities": [
+    "mathematics",
+    "analysis",
+    "replay"
+  ],
+  "allowed_plan_actions": [
+    "generate",
+    "mechanics",
+    "replay",
+    "stop"
+  ],
+  "budgets": {
+    "provider_requests": 0,
+    "protected_provider_requests": 0,
+    "public_operations": 20,
+    "protected_public_operations": 1,
+    "physical_launches": 0,
+    "mathematical_evaluations": 8,
+    "offline_nlp": 4,
+    "bdf_replays": 4
+  },
+  "authorization": "Explicit S5-T2: at most two base NLP solves and two conditional design perturbation NLP solves after reliable KKT; read-only rank/multiplier diagnostics and bounded supported continuous-parameter sensitivity. No physics, PPO or provider requests.",
+  "evidence_destination": "evidence/sorosim_s5t2/study"
+}

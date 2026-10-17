@@ -169,16 +169,18 @@ class LocalDiagnostic(Contract):
 class MechanicsRequest(Contract):
     candidate: EvidenceRef
     substeps: int = Field(default=1,ge=1,le=4,strict=True)
-    initialization: Literal['constant_0_2','ramp_0_2_to_0_4','saved_candidate_trajectory'] = 'constant_0_2'
+    initialization: Literal['constant_0_2','ramp_0_2_to_0_4','saved_candidate_trajectory','saved_candidate_controls'] = 'constant_0_2'
     warm_source: EvidenceRef | None = None
-    objective_mode: Literal['task_gap','task_gap_with_effort','maximum_original_violation','minimum_signed_task_excess','task_capability'] = 'task_gap'
+    objective_mode: Literal['task_gap','task_gap_with_effort','maximum_original_violation','minimum_signed_task_excess','task_capability','task_feasible_effort'] = 'task_gap'
+    check_only: bool = False
+    max_iterations: int = Field(default=120,ge=1,le=120,strict=True)
     position_weight: FiniteFloat = Field(default=1,gt=0)
     speed_weight: FiniteFloat = Field(default=1,gt=0)
     secondary_coefficient: FiniteFloat = Field(default=.001,ge=0)
 
     @model_validator(mode='after')
     def warm_binding(self):
-        if (self.warm_source is not None)!=(self.initialization=='saved_candidate_trajectory'):
+        if (self.warm_source is not None)!=(self.initialization in ('saved_candidate_trajectory','saved_candidate_controls')):
             raise ValueError('SAVED_CANDIDATE_INITIALIZATION_REQUIRES_WARM_SOURCE')
         return self
 

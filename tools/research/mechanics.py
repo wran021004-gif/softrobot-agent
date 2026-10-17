@@ -24,7 +24,7 @@ def handoff(host,reference,parameters=None,provenance=None):
 def dispatch(host,operation,arguments,key):
     guard(host,True)
     s=state(host)
-    counter='offline_nlp' if operation=='solve' else 'bdf_replays'
+    counter=('mathematical_evaluations' if arguments.check_only else 'offline_nlp') if operation=='solve' else 'bdf_replays'
     if s.get(counter,0)>=s['spec']['budgets'][counter]:
         raise ValueError('CAPABILITY_NOT_ALLOCATED_IN_THIS_STUDY: '+operation)
     grant=0.
@@ -41,7 +41,7 @@ def dispatch(host,operation,arguments,key):
                 verified=(warm.get('source_kind')=='verified_mathematical_trajectory' and
                     warm.get('posthoc_verification',{}).get('checks',{}).get('repaired_verification_passed'))
                 historical=(warm.get('source_kind')=='historical_mathematical_trajectory' and
-                    arguments.objective_mode!='task_capability')
+                    (arguments.initialization=='saved_candidate_controls' or arguments.objective_mode!='task_capability'))
                 if not (verified or historical):
                     raise ValueError('VERIFIED_MATHEMATICAL_WARM_SOURCE_REQUIRED')
             warm_trajectory=warm['trajectory']
@@ -49,7 +49,10 @@ def dispatch(host,operation,arguments,key):
         candidate=plain(arguments.candidate)
         cfg=verify_candidate(host,candidate)['configuration']
         source_row=host.store.artifact(arguments.source)
-        if (source_row.get('source_kind')!='verified_mathematical_trajectory' or
+        owned_solve=(plain(arguments.source) in s.get('mechanics_results',[]) and
+            source_row.get('operation')=='solve' and source_row.get('trajectory') and
+            source_row['design_candidate']==candidate)
+        if not owned_solve and (source_row.get('source_kind')!='verified_mathematical_trajectory' or
                 not source_row['posthoc_verification']['checks']['repaired_verification_passed']):
             raise ValueError('REFINEMENT_REQUIRES_VERIFIED_FROZEN_MATHEMATICAL_SOURCE')
         trajectory=source_row['trajectory']
@@ -91,6 +94,7 @@ def dispatch(host,operation,arguments,key):
         arguments=plain(arguments) if operation in ('solve','refine') else None,trajectory=trajectory,
         warm_trajectory=warm_trajectory,source_reference=plain(arguments.source) if operation in ('cross_replay','refine') else None,
         study_id=host.run_id,store_root=str(host.store.root),request_id=key+'-mechanics')
+    if operation=='solve' and arguments.check_only:request['check_only']=True
     worker_key=key+'-mechanics'
     old=host.store.lookup(host.run_id,worker_key)
     if old:

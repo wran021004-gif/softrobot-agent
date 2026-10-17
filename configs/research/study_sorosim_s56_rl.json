@@ -1,0 +1,37 @@
+{
+  "defaults": "family_study_defaults.json",
+  "start_mode": "family_space",
+  "family_space": "family_space_v2.json",
+  "candidate_initialization": "all_candidate_dofs_zero_v1",
+  "base_commit": "963b86c242ba4226c716fedd53c6b26ffe627deb",
+  "mode": "engineering_numerical",
+  "control": "control_sorosim.json",
+  "study_id": "sorosim-s56-rl-20261017",
+  "capabilities": [
+    "rl"
+  ],
+  "allowed_plan_actions": [
+    "generate",
+    "stop"
+  ],
+  "budgets": {
+    "provider_requests": 0,
+    "protected_provider_requests": 0,
+    "public_operations": 30,
+    "protected_public_operations": 2,
+    "physical_launches": 8,
+    "mathematical_evaluations": 0,
+    "offline_nlp": 0,
+    "bdf_replays": 0
+  },
+  "rl_limits": {
+    "training_stages": 4,
+    "actions_per_trial": 65536,
+    "training_actions": 262144,
+    "evaluation_episodes": 4,
+    "diagnostic_replays": 0,
+    "diagnostic_physics_steps": 0
+  },
+  "authorization": "Explicit S5.6 P4: separate direct/residual PPO, initial 65536 actions per route, at most four stages and 262144 combined new actions, 131072 per route enforced by driver, four independent evaluations. Historical budgets/checkpoints immutable. Zero provider requests.",
+  "evidence_destination": "evidence/sorosim_s56/rl/study"
+}

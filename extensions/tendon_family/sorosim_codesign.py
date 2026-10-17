@@ -41,15 +41,19 @@ def refine_fixed_sequence(configuration, candidate_ref, source, substeps):
     spec=SorosimModel(dict(basis=control.recipe.basis,
         gauss_per_interval=control.solver.gauss_per_interval)).convert(
         inp.robot.structure.data,inp.policy.discretization.data,inp.task.environment.data,solver=control.solver)
-    trajectory=source['trajectory'];times=trajectory['times_s'];u=trajectory['tensions_n']
+    trajectory=source['trajectory'];source_times=trajectory['times_s'];u=trajectory['tensions_n']
     N=round(timing.duration_s/timing.control_period_s)
+    times=[i*timing.control_period_s for i in range(N+1)]
     for key,expected in (('model_identity',spec['identity']),('design_identity',spec['design_identity']),
                          ('task_identity',digest(plain(inp.task))),('tendon_order',spec['tendon_order']),
                          ('coordinate_order',spec['coordinate_order'])):
         if trajectory[key]!=expected:
             raise ValueError('REFINEMENT_SOURCE_IDENTITY_MISMATCH: '+key)
-    if (substeps not in (2,4,8,16,32,64) or len(u)!=N or len(times)!=N+1 or
-            any(abs(t-i*timing.control_period_s)>1e-12 for i,t in enumerate(times)) or
+    if (substeps not in (2,4,8,16,32,64) or len(u)!=N or
+            len(source_times)!=len(trajectory['states']) or
+            any(not any(abs(t-s)<1e-12 for s in source_times) for t in times) or
+            any(b<=a for a,b in zip(source_times,source_times[1:])) or
+            abs(source_times[0])>1e-12 or abs(source_times[-1]-timing.duration_s)>1e-12 or
             not np.allclose(trajectory['states'][0],numerical['measured_initial_state'],atol=1e-12,rtol=0)):
         raise ValueError('REFINEMENT_GRID_OR_INITIAL_STATE_MISMATCH')
     tensions=np.asarray(u,dtype=float)
@@ -114,6 +118,19 @@ def calculate(request,checkpoint=None):
         arguments={k:v for k,v in request['arguments'].items() if k!='candidate'};substeps=arguments['substeps']
         tensions=np.full((steps,len(spec['routes'])),.2)
         if arguments['initialization']=='ramp_0_2_to_0_4':tensions[:]=np.linspace(.2,.4,steps)[:,None]
+        if arguments['initialization']=='saved_candidate_controls':
+            warm=request['warm_trajectory']
+            for key,value in [('model_identity',spec['identity']),('design_identity',spec['design_identity']),
+                    ('task_identity',digest(plain(inp.task))),('coordinate_order',spec['coordinate_order']),
+                    ('tendon_order',spec['tendon_order'])]:
+                if warm[key]!=value:raise ValueError('CODESIGN_WARM_IDENTITY_MISMATCH: '+key)
+            tensions=np.asarray(warm['tensions_n'],dtype=float)
+            limits=np.asarray(requirements['physical_inputs']['upper'])
+            if (tensions.shape!=(steps,len(spec['routes'])) or not np.isfinite(tensions).all() or
+                    np.any(tensions<0) or np.any(tensions>limits) or
+                    any(not any(abs(t-s)<1e-12 for s in warm['times_s']) for t in requirements['time_grid_s']) or
+                    not np.allclose(warm['states'][0],numerical['measured_initial_state'],atol=1e-12,rtol=0)):
+                raise ValueError('CODESIGN_WARM_CONTROL_GRID_OR_INITIAL_MISMATCH')
         if arguments['initialization']=='saved_candidate_trajectory':
             warm=request['warm_trajectory']
             for key,value in [('model_identity',spec['identity']),('design_identity',spec['design_identity']),
@@ -159,12 +176,13 @@ def calculate(request,checkpoint=None):
             if not np.isfinite(tensions).all() or np.any(tensions<0) or np.any(tensions>limits):
                 raise ValueError('CROSS_REPLAY_TENSION_OUT_OF_BOUNDS')
     recipe=plain(control.recipe);recipe['substeps']=substeps
+    recipe['max_iterations']=arguments.get('max_iterations',recipe['max_iterations'])
     nmpc=dict(recipe=recipe,elapsed_s=0.,measured_state=numerical['measured_initial_state'],
         previous_input=numerical['nominal']['u0'],warm=None,period_s=timing.control_period_s,duration_s=timing.duration_s,
         target=inp.task.goal.data['target_m'],position_tolerance_m=inp.task.evaluator.parameters.data['tolerance_m'],
         settling=plain(control.settling),initial_tensions=tensions.tolist())
     payload=dict(operation=request['operation'],control=nmpc,requirements=requirements,arguments=arguments)
-    if request.get('warm_trajectory') is not None:
+    if request.get('warm_trajectory') is not None and arguments.get('initialization')!='saved_candidate_controls':
         payload['warm_trajectory']=request['warm_trajectory']
     if request.get('check_only'):payload['check_only']=True
     if request.get('checkpoint_path'):payload['checkpoint_path']=request['checkpoint_path']
