@@ -108,3 +108,68 @@ Raw evidence and the exact candidate-bound physical handoff are in
 states use 36 original samples, retain the 32-step integration identity and link
 the full internal NLP trajectory and independent replay. It certifies complete
 numerical integration, **not** original task success.
+
+## P4: actual direct and residual PPO studies
+
+Implementation `5003578e` preserves cross-study parent/checkpoint references
+outside the new-stage allocation table. Weights, Adam moments/steps, observation,
+action and reference semantics remain identical for continuation. The direct
+intervention uses the existing .2 N initial-mean option and a new seed-17 policy
+lineage; variance, architecture, reward, timestep and evaluator remain fixed.
+It is not a continuation of the old direct weights. Both modes remain callable.
+
+The read-only audit reconstructs all 260 old direct failures with zero new
+physics steps. Median maximum joint rate grows from 1.15 rad/s at interval start
+to 2.09e10 rad/s immediately before the recorded engine warning. Adjacent-cell
+rate differences also become extreme. Original stable episodes lack archived
+joint states; the independent stable evaluation supplies only output/tension
+phase comparisons. These observations establish recorded numerical blow-up,
+not its unique cause. Three new complete episodes preserve joint integration
+states at actions 18--22 (15 states) for a scoped observational comparison.
+
+| Measured fact | New direct | Residual continuation |
+|---|---:|---:|
+| New training actions | 65,536 | 65,536 |
+| Lifetime policy actions | 65,536 | 98,304 |
+| Complete training episodes | 1,872 | 1,872 |
+| Numerical-failure episodes / captured warnings | 0 / 0 | 0 / 0 |
+| New complete PPO rollout optimizations | 256 | 256 |
+| Terminal position error (m) | .133172 | .021602 |
+| Holding maximum position error (m) | .135179 | .025761 |
+| Holding maximum speed (m/s) | .052935 | .312143 |
+| Independent original task | Complete failure | Complete failure |
+
+Each independent evaluation contains 35 valid actions, 700 physics steps and
+all 36 samples. Direct evaluation has 23 saturated channel samples out of 140
+(zero clipping); residual has 15 clipped/saturated samples. Applied tension
+ranges are [0,1.525] N and [0,8] N. Failure-only diagnostics cannot establish
+whole-training clipping/saturation rates. No failure terminal surrogate enters
+the physical evaluation trajectory. Residual continuation has an immutable proof
+of preserved weights/Adam state, a fresh stage schedule and 384 lifetime PPO
+rollout optimizations. Its original compatible, physically failing reference is
+retained to isolate continuation; changing reference would change lineage.
+
+Direct improves the previously measured position/speed but has a changed
+initialization and training length. Residual improves position over its old
+checkpoint while holding speed worsens (.292965 to .312143 m/s). These single
+seed/fixed-initial-state observations establish neither formal route superiority
+nor robustness, and do not establish that PPO is ineffective.
+
+A Windows atomic state-file read briefly returned `PermissionError` while the
+residual worker continued. Driver repair `8c6408d5` adds only three bounded
+read retries. Reusing the same operation IDs recovered the completed 65,536-action
+worker, performed its still-unrun independent evaluation, and sealed evidence;
+no training grant was reset or repeated. The original monitoring exception is
+retained in the delivery history. MATLAB static checking found no diagnostics
+in `sr_optimality.m`; existing optimizer warnings concern shared loop variables,
+growing small task arrays and an unused derivative-check temporary, with no
+syntax errors.
+
+[P4 evidence](../../evidence/sorosim_s56/rl/summary.json) preserves final policy
+ZIPs, checkpoint metadata, evaluation CSVs and stable-state NPZs as immutable
+Store blobs. The stage used 131,072 new actions, 2,621,440 training physics steps,
+1,400 evaluation physics steps, two training stages and two independent episodes.
+Actual active training time was 226.786 s; stage numerical time including
+evaluation/postprocessing was 234.552 s, plus 2.761 s for the separately recorded
+pre-training read-only audit. Two stages, two evaluation episodes and 131,072
+actions remain unused under the original ceiling; they are not new authorization.
