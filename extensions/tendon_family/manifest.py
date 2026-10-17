@@ -196,6 +196,7 @@ SOROSIM_SOURCES = PLATFORM_SOURCES + PHYSICAL_SOURCES + (
     'matlab/sorosim_control/sr_routing.m',
     'matlab/sorosim_control/sr_checks.m',
     'matlab/sorosim_control/sr_diagnose.m',
+    'matlab/sorosim_control/sr_optimality.m',
     'matlab/sorosim_control/sr_dynamics.m',
     'matlab/sorosim_control/sr_derivatives.m',
     'matlab/sorosim_control/sr_nmpc.m',

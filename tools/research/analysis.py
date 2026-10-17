@@ -15,6 +15,43 @@ from tools.research.state import state,update,save
 from tools.research.task_constraints import describe_analysis_requirements, model_assessment, check_analysis_applicability
 
 
+def kkt_reliability(kkt,regularity,replay):
+    """Numerical residual checks do not establish a regular optimal-value branch."""
+    failures=[]
+    for key,tolerance in (('primal_inf',1e-8),('stationarity_inf',1e-6),
+            ('dual_violation',1e-8),('complementarity_inf',1e-8)):
+        if not math.isfinite(kkt.get(key,float('inf'))) or kkt[key]>tolerance:
+            failures.append(key)
+    if not replay.get('passed'):failures.append('independent_replay')
+    activity=regularity.get('activity_diagnostics',[])
+    if not activity or not all(row['numerical_LICQ'] for row in activity):
+        failures.append('activity_dependent_numerical_LICQ')
+    stationary=not failures
+    second_order=regularity.get('second_order_sufficiency')=='independently_verified'
+    return dict(numerical_KKT_checks_passed=stationary,obstructions=failures,
+        regular_local_branch_verified=stationary and second_order,
+        reliability='locally_checked_not_certified' if stationary else 'solver_unresolved',
+        envelope_gradient_available=stationary and second_order,
+        second_order=regularity.get('second_order_sufficiency','not_established'),
+        gradient_error_bound=None,regional_lipschitz_bound=None,descent_certificate='unavailable',
+        interpretation='Residual/rank diagnostics use finite tolerances; no rigorous regional bounds are inferred')
+
+
+def complete_lagrangian_sensitivity(minus,plus,step,*,variable,qualification):
+    """Paired rebuilt-model partials at identical normalized z and multipliers."""
+    if not qualification.get('regular_local_branch_verified'):
+        raise ValueError('ENVELOPE_GRADIENT_UNAVAILABLE_WITHOUT_REGULAR_BASE')
+    if not (variable.startswith('segments.') and variable.endswith('.length_m') and step>0):
+        raise ValueError('SUPPORTED_CONTINUOUS_LENGTH_PARAMETER_REQUIRED')
+    terms={key:(plus['lagrangian_terms'][key]-value)/(2*step)
+        for key,value in minus['lagrangian_terms'].items()}
+    if set(terms)!={'objective','initial_state','complete_dynamics','task','lower_bounds','upper_bounds'}:
+        raise ValueError('COMPLETE_LAGRANGIAN_TERMS_REQUIRED')
+    return dict(variable=variable,step_m=step,terms=terms,derivative_per_m=sum(terms.values()),
+        reliability='locally_checked_not_certified',descent_certificate='unavailable',
+        assumptions='same differentiable local solution branch and valid local KKT multipliers; finite differences supply no regional error bound')
+
+
 def calculate(configuration,binding,query,exact_point=None,*,checkpoint=None,design_context=None):
     """No Host, Route, session, persistence or cost ownership at this boundary."""
     from extensions.math_analysis.tools import calculate_control_metrics

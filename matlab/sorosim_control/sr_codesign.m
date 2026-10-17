@@ -100,7 +100,8 @@ end
 z0=[initial;slacks];
 if performance
     lower(end-1:end)=0;upper(end-1:end)=0;z0(end-1:end)=0;
-    assert(all(gaps<=0),'PERFORMANCE_REQUIRES_TASK_FEASIBLE_REMATERIALIZED_START');
+    assert(all(gaps<=model.spec.solver.constraint_tolerance), ...
+        'PERFORMANCE_REQUIRES_NUMERICALLY_TASK_FEASIBLE_REMATERIALIZED_START');
 end
 warm_report=struct('used',false);
 if isfield(r,'warm_trajectory')
@@ -126,6 +127,29 @@ opt=optimoptions('fmincon','Algorithm','sqp','Display','off','SpecifyObjectiveGr
     'OptimalityTolerance',model.spec.solver.optimality_tolerance,'ConstraintTolerance',model.spec.solver.constraint_tolerance, ...
     'StepTolerance',model.spec.solver.step_tolerance);
 if isfield(r,'check_only') && r.check_only
+    if isfield(r,'raw_point')
+        raw=r.raw_point;point=raw.z(:);assert(numel(point)==nv+2,'RAW_NLP_POINT_DIMENSION_MISMATCH');
+        [f,g]=objective(point);[ci,ce,gi,ge]=constraints(point);lambda=raw.lambda;
+        for field={'eqnonlin','ineqnonlin','lower','upper'}
+            name=field{1};lambda.(name)=reshape(lambda.(name),[],1);
+        end
+        assert(numel(lambda.eqnonlin)==numel(ce) && numel(lambda.ineqnonlin)==numel(ci), ...
+            'RAW_MULTIPLIER_CONSTRAINT_CORRESPONDENCE_MISMATCH');
+        if strcmp(r.diagnostic_mode,'regularity')
+            out=sr_optimality(point,g,ci,ce,gi,ge,lower,upper,lambda,c);
+            out.kkt=kkt_report(point,lambda,raw.exitflag);
+        else
+            lo=isfinite(lower);hi=isfinite(upper);nx=2*c.n;
+            terms=struct('objective',f,'initial_state',lambda.eqnonlin(1:nx)'*ce(1:nx), ...
+                'complete_dynamics',lambda.eqnonlin(nx+1:end)'*ce(nx+1:end), ...
+                'task',lambda.ineqnonlin'*ci,'lower_bounds',lambda.lower(lo)'*(lower(lo)-point(lo)), ...
+                'upper_bounds',lambda.upper(hi)'*(point(hi)-upper(hi)));
+            out=struct('lagrangian_terms',terms,'lagrangian',sum(structfun(@(x)x,terms)), ...
+                'semantics','fixed normalized raw variables and exact full multipliers; rebuilt candidate model', ...
+                'envelope_gradient','requires paired structural partials and regular branch qualification');
+        end
+        out.status='computed';out.total_s=toc(started);return;
+    end
     [f,g]=objective(z0);[ci,ce,gi,ge]=constraints(z0);v=sin((1:numel(z0))');v=v/norm(v);h=1e-5;
     [ip,ep]=constraints(z0+h*v);[im,em]=constraints(z0-h*v);
     fd=(objective(z0+h*v)-objective(z0-h*v))/(2*h);cd=([ip;ep]-[im;em])/(2*h);

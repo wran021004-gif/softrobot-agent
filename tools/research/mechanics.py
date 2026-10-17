@@ -95,6 +95,11 @@ def dispatch(host,operation,arguments,key):
         warm_trajectory=warm_trajectory,source_reference=plain(arguments.source) if operation in ('cross_replay','refine') else None,
         study_id=host.run_id,store_root=str(host.store.root),request_id=key+'-mechanics')
     if operation=='solve' and arguments.check_only:request['check_only']=True
+    if operation=='solve' and arguments.diagnostic_source:
+        point=host.store.artifact(arguments.diagnostic_source)
+        if point.get('source_kind')!='raw_nlp_point':
+            raise ValueError('EXACT_RAW_NLP_CHECKPOINT_REQUIRED')
+        request['diagnostic_point']=point
     worker_key=key+'-mechanics'
     old=host.store.lookup(host.run_id,worker_key)
     if old:

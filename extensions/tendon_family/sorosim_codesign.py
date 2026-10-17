@@ -185,6 +185,21 @@ def calculate(request,checkpoint=None):
     if request.get('warm_trajectory') is not None and arguments.get('initialization')!='saved_candidate_controls':
         payload['warm_trajectory']=request['warm_trajectory']
     if request.get('check_only'):payload['check_only']=True
+    if request.get('diagnostic_point'):
+        point=request['diagnostic_point'];base=point['trajectory']
+        for key,value in [('model_identity',spec['identity']),('design_identity',spec['design_identity']),
+                ('task_identity',digest(plain(inp.task))),('coordinate_order',spec['coordinate_order']),
+                ('tendon_order',spec['tendon_order']),('substeps',substeps)]:
+            # Structural partials rebuild the model; topology/order/task/grid stay fixed.
+            if arguments['diagnostic_mode']=='lagrangian' and key in ('model_identity','design_identity'):continue
+            if base[key]!=value:raise ValueError('RAW_POINT_IDENTITY_MISMATCH: '+key)
+        for key in ('objective_mode','position_weight','speed_weight','secondary_coefficient'):
+            if arguments[key]!=base['objective_definition'][key]:
+                raise ValueError('RAW_POINT_OBJECTIVE_MISMATCH: '+key)
+        if arguments['diagnostic_mode']=='lagrangian' and not point.get('regular_local_branch_verified'):
+            raise ValueError('COMPLETE_LAGRANGIAN_SENSITIVITY_REQUIRES_VERIFIED_REGULAR_BASE')
+        payload['raw_point']=point['optimizer_iterate']
+        payload['diagnostic_mode']=arguments['diagnostic_mode']
     if request.get('checkpoint_path'):payload['checkpoint_path']=request['checkpoint_path']
     if request['operation'] in ('replay','cross_replay'):payload['trajectory']=trajectory
     with SorosimSession() as session:

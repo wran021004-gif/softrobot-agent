@@ -173,6 +173,8 @@ class MechanicsRequest(Contract):
     warm_source: EvidenceRef | None = None
     objective_mode: Literal['task_gap','task_gap_with_effort','maximum_original_violation','minimum_signed_task_excess','task_capability','task_feasible_effort'] = 'task_gap'
     check_only: bool = False
+    diagnostic_source: EvidenceRef | None = None
+    diagnostic_mode: Literal['regularity','lagrangian'] | None = None
     max_iterations: int = Field(default=120,ge=1,le=120,strict=True)
     position_weight: FiniteFloat = Field(default=1,gt=0)
     speed_weight: FiniteFloat = Field(default=1,gt=0)
@@ -180,6 +182,8 @@ class MechanicsRequest(Contract):
 
     @model_validator(mode='after')
     def warm_binding(self):
+        if (self.diagnostic_source is None)!=(self.diagnostic_mode is None) or (self.diagnostic_mode and not self.check_only):
+            raise ValueError('RAW_POINT_DIAGNOSTIC_REQUIRES_CHECK_ONLY_AND_EXACT_SOURCE')
         if (self.warm_source is not None)!=(self.initialization in ('saved_candidate_trajectory','saved_candidate_controls')):
             raise ValueError('SAVED_CANDIDATE_INITIALIZATION_REQUIRES_WARM_SOURCE')
         return self

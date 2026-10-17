@@ -218,4 +218,25 @@ class TaskAnalysisTests(unittest.TestCase):
         self.assertFalse(assemble_acceptance(self.cfg,ev,profile)['accepted'])
 
 
+class KKTQualification(unittest.TestCase):
+    def test_missing_regularity_cannot_become_an_envelope_gradient(self):
+        from tools.research.analysis import kkt_reliability,complete_lagrangian_sensitivity
+        residuals=dict(primal_inf=0.,stationarity_inf=.01,dual_violation=0.,complementarity_inf=0.)
+        q=kkt_reliability(residuals,dict(activity_diagnostics=[dict(numerical_LICQ=True)]),dict(passed=True))
+        self.assertEqual(q['reliability'],'solver_unresolved')
+        self.assertFalse(q['envelope_gradient_available'])
+        with self.assertRaisesRegex(ValueError,'WITHOUT_REGULAR_BASE'):
+            complete_lagrangian_sensitivity({}, {}, .001,variable='segments.0.length_m',qualification=q)
+
+    def test_complete_lagrangian_includes_initial_dynamics_and_bounds(self):
+        from tools.research.analysis import complete_lagrangian_sensitivity
+        # Algebra fixture only. In a real call each value comes from a rebuilt model.
+        terms=dict(objective=1.,initial_state=2.,complete_dynamics=3.,task=4.,lower_bounds=5.,upper_bounds=6.)
+        minus=dict(lagrangian_terms={k:0. for k in terms});plus=dict(lagrangian_terms=terms)
+        result=complete_lagrangian_sensitivity(minus,plus,.5,variable='segments.0.length_m',
+            qualification=dict(regular_local_branch_verified=True))
+        self.assertEqual(result['derivative_per_m'],21.)
+        self.assertEqual(result['descent_certificate'],'unavailable')
+
+
 if __name__ == '__main__': unittest.main()
