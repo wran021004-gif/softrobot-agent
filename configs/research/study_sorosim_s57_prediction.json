@@ -6,12 +6,25 @@
   "base_commit": "fdf0ae0c0aacd69ea4d10749eade70c27c13fa95",
   "mode": "engineering_numerical",
   "control": "control_sorosim_s56_braking.json",
-  "capabilities": ["prediction_diagnostic"],
-  "allowed_plan_actions": ["generate", "nmpc_prediction_diagnostic", "stop"],
-  "budgets": {"provider_requests": 0, "protected_provider_requests": 0,
-    "public_operations": 20, "protected_public_operations": 1, "physical_launches": 0,
-    "mathematical_evaluations": 15, "offline_nlp": 0, "bdf_replays": 0},
-  "study_id": "sorosim-s57-prediction-20261018",
-  "authorization": "Explicit S5.7: exactly three archived S5.6 NMPC checkpoints 0/19/29 at 1/4/8/16/32 substeps, at most 15 one-interval integrations. Zero new physics, task rollouts, full NLP, RL, providers or hardware. Historical studies remain sealed.",
+  "capabilities": [
+    "prediction_diagnostic"
+  ],
+  "allowed_plan_actions": [
+    "generate",
+    "nmpc_prediction_diagnostic",
+    "stop"
+  ],
+  "budgets": {
+    "provider_requests": 0,
+    "protected_provider_requests": 0,
+    "public_operations": 20,
+    "protected_public_operations": 1,
+    "physical_launches": 0,
+    "mathematical_evaluations": 15,
+    "offline_nlp": 0,
+    "bdf_replays": 0
+  },
+  "study_id": "sorosim-s57-prediction-recovery-20261018",
+  "authorization": "S5.7 explicitly authorizes at most 20 actual one-interval integrations. The sealed initial stage consumed 15 admission slots but executed zero MATLAB calls/roots/integrations due only to tuple/list equality. This repair stage allocates 15 previously unexecuted checkpoint-resolution calculations; original 15 charges and 9.791010900167748 seconds remain sealed at evidence/sorosim_s57/admission_failure. No repeated integration, reset historical grant, physics, full NLP, RL or provider call.",
   "evidence_destination": "evidence/sorosim_s57/study"
 }

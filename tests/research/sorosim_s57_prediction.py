@@ -28,6 +28,7 @@ def run():
             result=core.dispatch(host,plan('nmpc_prediction_diagnostic',nmpc_prediction_diagnostic=dict(
                 candidate=candidate,source=source,update_index=k,substeps=n)),f's57-k{k}-n{n}')['result']
             value=host.store.artifact(result['reference']);raw=value.get('raw')
+            if raw is None:raise RuntimeError('Saved pre-integration failure; stop further admissions: '+str(result['reference']))
             rows[str(n)]=dict(reference=result['reference'],**{key:value.get(key) for key in
                 ('status','complete','comparison','root_count','maximum_root_residual_inf','charged_numerical_s')})
             print(json.dumps(dict(update_index=k,substeps=n,**rows[str(n)])),flush=True)
@@ -58,7 +59,7 @@ def run():
         actual_integrations=sum(bool(host.store.artifact(row['reference']).get('raw')) for c in cases for row in c['resolutions'].values()),
         actual_roots=sum(row['root_count'] or 0 for c in cases for row in c['resolutions'].values()),
         numerical_s=s['numerical_s'],physics_steps=0,full_nlp=0,ppo_actions=0,provider_requests=0)
-    summary=dict(stage='S5.7',source_freeze=s['freeze'],candidate=candidate,source_index=source,
+    summary=dict(stage='S5.7',study_id=host.run_id,source_freeze=s['freeze'],candidate=candidate,source_index=source,
         original_index=original,cases=cases,costs=costs,task_acceptance='no new physical evaluation',
         screen=dict(position_m=.001,velocity_m_s=.002,meaning='engineering screen, not continuous-time error bound'))
     atomic_json(ROOT/'evidence/sorosim_s57/summary.json',summary)
@@ -68,7 +69,7 @@ def run():
 
 def close(packet):
     from tools.platform_host import Host
-    name='sorosim-s57-prediction-20261018';host=Host(ROOT/'runs/research'/name,name,actor='unified-research')
+    name=read(ROOT/'evidence/sorosim_s57/summary.json')['study_id'];host=Host(ROOT/'runs/research'/name,name,actor='unified-research')
     ref=save(host,packet,'s57_scientific_feedback')
     update(host,scoped_context=[*state(host)['scoped_context'],ref])
     summary=read(ROOT/'evidence/sorosim_s57/summary.json');summary['feedback_reference']=ref

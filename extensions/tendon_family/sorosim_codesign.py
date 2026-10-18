@@ -136,7 +136,7 @@ def predict_archived_interval(configuration, index, case, substeps):
     spec=SorosimModel(dict(basis=control.recipe.basis,
         gauss_per_interval=control.solver.gauss_per_interval)).convert(
         inp.robot.structure.data,inp.policy.discretization.data,inp.task.environment.data,solver=control.solver)
-    if spec!=index['specification'] or digest(plain(inp.task))!=index['task_identity']:
+    if digest(spec)!=digest(index['specification']) or digest(plain(inp.task))!=index['task_identity']:
         raise ValueError('ARCHIVED_INTERVAL_MODEL_OR_TASK_MISMATCH')
     with SorosimSession(options=control.solver.engine_options) as session:
         session.construct(spec)

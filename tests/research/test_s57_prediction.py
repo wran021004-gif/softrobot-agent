@@ -97,6 +97,24 @@ class ArchivedPredictionTests(unittest.TestCase):
         host=SimpleNamespace(store=SimpleNamespace(artifact=lambda ref:packet))
         self.assertEqual(scoped_feedback(host,[REF])[0]['evidence'],packet)
 
+    def test_json_roundtrip_spec_admits_exact_one_interval_gateway_request(self):
+        from extensions.tendon_family.sorosim_codesign import predict_archived_interval
+        candidate=diagnostic.archived(FOLDER,self.index['candidate'])
+        c=self.index['cases'][1];p=c['accepted_prediction']
+        # Fabricated gateway outcome: tests payload construction, never numerical evidence.
+        raw=dict(status='fixture',complete=True,substeps=1,roots=[1,1,0,1,0,0],
+            states=[c['initial_state'],p['state']],tip_positions_m=[c['before']['tip_position_m'],p['tip_position_m']],
+            tip_velocities_m_s=[c['before']['tip_velocity_m_s'],p['tip_velocity_m_s']])
+        with patch('extensions.tendon_family.sorosim_codesign.SorosimSession') as session:
+            engine=session.return_value.__enter__.return_value
+            engine.environment={};engine.dependency={};engine.timings={};engine.evaluate.return_value=raw
+            out=predict_archived_interval(candidate['configuration'],self.index,c,1)
+            request=engine.evaluate.call_args.args[1]
+            self.assertEqual(request['x'],c['initial_state'])
+            self.assertEqual(request['tensions_n'],[c['applied_tension_n']])
+            self.assertEqual(request['times_s'],[.19,.2])
+            self.assertEqual(out['root_count'],1)
+
     def test_count_receipt_failure_deduplication_and_recovery(self):
         directory=ROOT/'runs'/('s57-fixture-'+uuid4().hex)
         directory.mkdir()
