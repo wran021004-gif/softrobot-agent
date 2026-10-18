@@ -4,6 +4,7 @@ from pathlib import Path
 from types import SimpleNamespace
 import gc
 import shutil
+import subprocess
 from uuid import uuid4
 import unittest
 from unittest.mock import patch
@@ -143,6 +144,19 @@ class ArchivedPredictionTests(unittest.TestCase):
                 mechanics.dispatch(host,'nmpc_prediction_diagnostic',query,'different-id')
             self.assertEqual(state(host)['mathematical_evaluations'],1)
             self.assertEqual(host.store.artifact(result['reference'])['substeps'],1)
+            uncertain=subprocess.TimeoutExpired('fabricated worker',1)
+            uncertain.termination_confirmed=False
+            query=query.model_copy(update=dict(substeps=4))
+            with patch('tools.service_execution._run_contained',side_effect=uncertain),self.assertRaisesRegex(ValueError,'UNKNOWN_MATHEMATICAL_OUTCOME'):
+                mechanics.dispatch(host,'nmpc_prediction_diagnostic',query,'uncertain-fixture')
+            self.assertEqual(state(host)['mathematical_evaluations'],2)
+            pending=state(host)['pending'];self.assertIsNotNone(pending)
+            folder=Path(pending['folder'])
+            atomic_json(folder/'boundary.json',dict(termination_confirmed=True,returncode=1,elapsed_s=.1))
+            recovered=mechanics.recover(host)
+            self.assertEqual(recovered['status'],'incomplete')
+            self.assertEqual(state(host)['mathematical_evaluations'],2)
+            self.assertIsNone(state(host)['pending'])
 
 
 if __name__=='__main__':unittest.main()
