@@ -1,0 +1,215 @@
+{
+  "A": {
+    "source": "historical_diagnostic.json",
+    "scope": "Saved sample behavior only; not fresh evaluation or continuous-time/modal/causal inference"
+  },
+  "B": {
+    "source": {
+      "artifact_id": "8a0502b42a3c8439104c27837e71ca167263ab34547bf41290707daa47fef6f6",
+      "media_type": "application/json"
+    },
+    "operating_point": {
+      "actual_time_s": 0.29,
+      "available": true,
+      "candidate": {
+        "artifact_id": "9b162aa76f10c6cf76dd12ca03bec8fbf7ac03235207d9354af3b54f11314ffa",
+        "media_type": "application/json"
+      },
+      "configuration_identity": "4e615c9c9ce0f20ad61b5b63d868655cf2c2c4f683d774e85a6f002212cbfb30",
+      "construction": {
+        "method": "provided candidate operating point",
+        "state": {
+          "artifact_id": "f61c2e39fbbf823dd67b6c4a9a0ab95c21897363403dbbb3ae899289d73a44ea",
+          "media_type": "application/json"
+        },
+        "static_equilibrium": false
+      },
+      "coordinate_order": [
+        "segment_0.kappa_y_node_0",
+        "segment_0.kappa_y_node_1",
+        "segment_0.kappa_y_node_2",
+        "segment_0.kappa_z_node_0",
+        "segment_0.kappa_z_node_1",
+        "segment_0.kappa_z_node_2",
+        "segment_1.kappa_y_node_0",
+        "segment_1.kappa_y_node_1",
+        "segment_1.kappa_y_node_2",
+        "segment_1.kappa_z_node_0",
+        "segment_1.kappa_z_node_1",
+        "segment_1.kappa_z_node_2"
+      ],
+      "equilibrium": false,
+      "input_units": "N",
+      "linearization_scope": "frozen nonequilibrium local affine model",
+      "meaning": "Exact archived projected GVS state; not a complete or exact MuJoCo integration snapshot.",
+      "name": "saved_state",
+      "original_execution": {
+        "artifact_id": "96615db5434bdf07196a3150afc909e4b68a2ddc397c6cf36c08bdd52a4016ea",
+        "media_type": "application/json"
+      },
+      "original_state_pointer": "/controller_observations/29",
+      "phase": "interval_start_previous_applied_input",
+      "remaining_task_s": 0.06,
+      "tendon_order": [
+        "tendon_0",
+        "tendon_1",
+        "tendon_2",
+        "tendon_3"
+      ]
+    },
+    "current_v_dot_a": -0.9581676385000679,
+    "minimum_v_dot_a": -40.202746488205754,
+    "optimal_tension_n": [
+      8.0,
+      8.0,
+      0.0,
+      0.0
+    ],
+    "passive_v_dot_a": -14.286180371748872,
+    "numerical_verification": {
+      "cases": [
+        {
+          "actual_m_s2": [
+            35.42637811361251,
+            15.939936692282226,
+            -0.09020750354306879
+          ],
+          "input_n": [
+            1.9664216107984063,
+            1.2638166261684605,
+            2.6581647867434754,
+            3.0415450358157448
+          ],
+          "predicted_m_s2": [
+            35.426378118033504,
+            15.939936761844168,
+            -0.09020743590599072
+          ],
+          "step_s": 8.470229649744016e-10,
+          "verification": {
+            "absolute_norm": 9.712457627741919e-08,
+            "max_normalized_error": 8.521337804268114e-07,
+            "max_tolerance_ratio": 0.0034378670293308948,
+            "passed": true,
+            "relative_norm": 2.5001584860093303e-09
+          }
+        },
+        {
+          "actual_m_s2": [
+            180.02566105984718,
+            -75.56879200325011,
+            -21.308598712399082
+          ],
+          "input_n": [
+            6.033578389201594,
+            6.7361833738315395,
+            5.341835213256525,
+            4.958454964184256
+          ],
+          "predicted_m_s2": [
+            180.0256609892825,
+            -75.56879227685616,
+            -21.308598710674417
+          ],
+          "step_s": 8.626430196340802e-11,
+          "verification": {
+            "absolute_norm": 2.825643612120948e-07,
+            "max_normalized_error": 3.351674081386591e-06,
+            "max_tolerance_ratio": 1.810115566956734e-05,
+            "passed": true,
+            "relative_norm": 1.4387005169912966e-09
+          }
+        }
+      ],
+      "nonzero_velocity": true,
+      "passed": true,
+      "scope": "Pointwise numerical consistency; no regional or global error bound."
+    },
+    "meaning": "Instantaneous local-model deceleration exists at this exact projected GVS state; no physical or finite-time guarantee. MuJoCo full snapshot unavailable.",
+    "unsupported": [
+      "Regional error bound",
+      "Structural/task infeasibility from a nonnegative minimum",
+      "Position holding from speed derivative alone"
+    ]
+  },
+  "C": [
+    {
+      "source": {
+        "artifact_id": "d4eeec73cb2e97dbeb90e992062201434dbdb7b6091b41adeb62fa1b9042c8b2",
+        "media_type": "application/json"
+      },
+      "variable": {
+        "authorization": "existing candidate verification and frozen family domains",
+        "baseline": 0.195,
+        "minus_candidate": {
+          "artifact_id": "0d551db4c818a2fbaa69aff1f9d839c679cec1a28f9196dba140442de9f71f1b",
+          "media_type": "application/json"
+        },
+        "path": "segments.0.length_m",
+        "plus_candidate": {
+          "artifact_id": "77ce37fe5b905a439c01714c9b2456f7bed73511fa3e9d9f526ce05a639d64ef",
+          "media_type": "application/json"
+        },
+        "version": "sorosim_static_ift_v1"
+      },
+      "position_derivative": [
+        0.7464339094730209,
+        0.17824384504125151,
+        -0.8799128369056739
+      ],
+      "numerical_verification": {
+        "absolute_norm": 5.774524482120133e-06,
+        "max_normalized_error": 0.0005663677587932625,
+        "max_tolerance_ratio": 0.037887480860520545,
+        "passed": true,
+        "relative_norm": 4.945851965622633e-06
+      },
+      "scope": "Fixed-input static IFT with rebuilt candidate identities and plus/minus equilibrium verification; adapted-control and closed-loop speed responses are unknown.",
+      "candidate_ranking_for_holding_speed": "unknown"
+    },
+    {
+      "source": {
+        "artifact_id": "3d32d8858de05abc41be80900eb9ade43bb3c4b033db1f594a9e13ccaf9e2bf7",
+        "media_type": "application/json"
+      },
+      "variable": {
+        "authorization": "existing candidate verification and frozen family domains",
+        "baseline": 10450000.0,
+        "minus_candidate": {
+          "artifact_id": "6ecd2d92287afe02d4f2129d6a4e5f0c4c0a60207db04995628605a5ebcc1527",
+          "media_type": "application/json"
+        },
+        "path": "segments.0.young_pa",
+        "plus_candidate": {
+          "artifact_id": "14f89f3f30988eaf287f6171190d0b2d34718693c1986c4a950271f1c9c798e6",
+          "media_type": "application/json"
+        },
+        "version": "sorosim_static_ift_v1"
+      },
+      "position_derivative": [
+        2.164057015387415e-09,
+        -1.3003459180037086e-09,
+        6.40158509792206e-09
+      ],
+      "numerical_verification": {
+        "absolute_norm": 6.281568573446239e-17,
+        "max_normalized_error": 5.037890978241706e-15,
+        "max_tolerance_ratio": 2.518929363980173e-10,
+        "passed": true,
+        "relative_norm": 9.128264899463075e-09
+      },
+      "scope": "Fixed-input static IFT with rebuilt candidate identities and plus/minus equilibrium verification; adapted-control and closed-loop speed responses are unknown.",
+      "candidate_ranking_for_holding_speed": "unknown"
+    }
+  ],
+  "accounting": {
+    "charged_candidate_state_units": 14,
+    "confirmed_precomputation_failed_units": 7,
+    "computed_units": 7,
+    "successful_equilibrium_solves": 6,
+    "instantaneous_state_linearizations": 1,
+    "full_nlp_during_preparation": 0,
+    "trajectory_replays_during_preparation": 0,
+    "physical_steps_during_preparation": 0
+  }
+}
