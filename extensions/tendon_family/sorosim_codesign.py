@@ -130,6 +130,31 @@ def refine_fixed_sequence(configuration, candidate_ref, source, substeps):
     return result
 
 
+def predict_archived_interval(configuration, index, case, substeps):
+    """One held physical action, using the existing production diagnostic roots."""
+    inp=SessionInput.model_validate(configuration);control=checked_control(inp)
+    spec=SorosimModel(dict(basis=control.recipe.basis,
+        gauss_per_interval=control.solver.gauss_per_interval)).convert(
+        inp.robot.structure.data,inp.policy.discretization.data,inp.task.environment.data,solver=control.solver)
+    if spec!=index['specification'] or digest(plain(inp.task))!=index['task_identity']:
+        raise ValueError('ARCHIVED_INTERVAL_MODEL_OR_TASK_MISMATCH')
+    with SorosimSession(options=control.solver.engine_options) as session:
+        session.construct(spec)
+        raw=session.evaluate('diagnose',dict(kind='fixed_sequence',x=case['initial_state'],
+            u=case['applied_tension_n'],a=[0.]*len(spec['coordinate_order']),
+            tensions_n=[case['applied_tension_n']],times_s=[case['time_s'],case['end_time_s']],
+            period_s=index['period_s'],substeps=substeps))
+        environment=dict(dependency=session.dependency,environment=session.environment,timings=session.timings)
+    from tools.research.nmpc_prediction_diagnostic import compare_outputs, interval_identity
+    roots=np.asarray(raw['roots']).reshape(-1,6)
+    return dict(status=raw['status'],complete=raw['complete'],raw=raw,substeps=substeps,
+        model_identity=spec['identity'],source_identity=interval_identity(index,case),
+        source_execution=index['source_execution'],update_index=case['update_index'],
+        root_count=len(roots),maximum_root_residual_inf=float(np.max(roots[:,2])) if np.isfinite(roots[:,2]).all() else None,
+        comparison=compare_outputs(raw,case),numerical_environment=environment,
+        physical_steps=0,mathematical_one_interval_integrations=1,physical_validation='archived observations only')
+
+
 def calculate(request,checkpoint=None):
     inp=SessionInput.model_validate(request['configuration']);control=checked_control(inp)
     numerical=candidate_numerical(inp,control);timing=inp.task.timing

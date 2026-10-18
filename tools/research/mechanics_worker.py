@@ -7,6 +7,10 @@ from tools.service_execution import contain_worker_children
 
 def calculate(request):
     if request['configuration']['policy']['controller']['extension_id']=='controller.sorosim_matlab_nmpc':
+        if request['operation']=='nmpc_prediction_diagnostic':
+            from extensions.tendon_family.sorosim_codesign import predict_archived_interval
+            return predict_archived_interval(request['configuration'],request['prediction_index'],
+                request['prediction_case'],request['arguments']['substeps'])
         from extensions.tendon_family.sorosim_codesign import calculate as sorosim_calculate, refine_fixed_sequence
         if request['operation']=='refine':
             return refine_fixed_sequence(request['configuration'],request['design_candidate'],

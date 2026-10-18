@@ -213,8 +213,15 @@ class MatchedStateProbe(Contract):
     resolutions: tuple[Literal[4],Literal[8]] = (4,8)
 
 
+class NMPCPredictionDiagnostic(Contract):
+    candidate: EvidenceRef
+    source: EvidenceRef
+    update_index: Literal[0,19,29]
+    substeps: Literal[1,4,8,16,32]
+
+
 class Plan(Contract):
-    action: Literal['generate', 'propose', 'execute', 'search', 'mechanics', 'replay', 'cross_replay', 'physical_replay', 'refine', 'matched_state', 'diagnose', 'confirm', 'select', 'stop']
+    action: Literal['generate', 'propose', 'execute', 'search', 'mechanics', 'replay', 'cross_replay', 'physical_replay', 'refine', 'matched_state', 'nmpc_prediction_diagnostic', 'diagnose', 'confirm', 'select', 'stop']
     next_step: Literal['adjust_training','revise_design','diagnose','stop'] | None = None
     hypothesis: str = Field(min_length=1)
     supporting_evidence: list[EvidenceRef] = Field(default_factory=list)
@@ -235,6 +242,7 @@ class Plan(Contract):
     physical_replay: PhysicalReplayRequest | None = None
     refinement: FixedSequenceRefinement | None = None
     matched_state: MatchedStateProbe | None = None
+    nmpc_prediction_diagnostic: NMPCPredictionDiagnostic | None = None
     mechanics_source: EvidenceRef | None = None
     experience_disposition: dict[str, Literal['adopted', 'rejected', 'context_only']] = Field(default_factory=dict)
 
@@ -251,9 +259,10 @@ class Plan(Contract):
             raise ValueError('REVISE_SELECTION_REQUIRES_CONFIRM_ACTION')
         required = {'generate': 'generation', 'propose': 'parameters', 'execute': 'candidate', 'search': 'search', 'confirm': 'selected_execution', 'select': 'selected_execution',
                     'mechanics': 'mechanics', 'replay': 'mechanics_source', 'cross_replay':'cross_replay',
-                    'physical_replay':'physical_replay','refine':'refinement','matched_state':'matched_state'}
+                    'physical_replay':'physical_replay','refine':'refinement','matched_state':'matched_state',
+                    'nmpc_prediction_diagnostic':'nmpc_prediction_diagnostic'}
         active = required.get(self.action)
-        for field in ('generation', 'parameters', 'search', 'candidate', 'selected_execution', 'mechanics', 'cross_replay','physical_replay','refinement','matched_state'):
+        for field in ('generation', 'parameters', 'search', 'candidate', 'selected_execution', 'mechanics', 'cross_replay','physical_replay','refinement','matched_state','nmpc_prediction_diagnostic'):
             if (getattr(self, field) is not None) != (field == active):
                 raise ValueError('ACTION_REQUIRES_ONLY_' + str(active))
         if self.action=='replay' and self.mechanics_source is None:

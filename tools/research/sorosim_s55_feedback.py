@@ -9,6 +9,6 @@ def scoped_feedback(host, references):
     for reference in references:
         value = host.store.artifact(reference)
         if isinstance(value, dict) and value.get("schema") in (
-                "sorosim_s55_s5t_feedback_v1", "sorosim_s56_s5t2_feedback_v1"):
+                "sorosim_s55_s5t_feedback_v1", "sorosim_s56_s5t2_feedback_v1", "sorosim_s57_prediction_feedback_v1"):
             packets.append(dict(reference=reference, evidence=value))
     return packets

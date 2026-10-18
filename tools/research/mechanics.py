@@ -24,11 +24,21 @@ def handoff(host,reference,parameters=None,provenance=None):
 def dispatch(host,operation,arguments,key):
     guard(host,True)
     s=state(host)
-    counter=('mathematical_evaluations' if arguments.check_only else 'offline_nlp') if operation=='solve' else 'bdf_replays'
+    counter=('mathematical_evaluations' if operation=='nmpc_prediction_diagnostic' else
+        ('mathematical_evaluations' if arguments.check_only else 'offline_nlp') if operation=='solve' else 'bdf_replays')
     if s.get(counter,0)>=s['spec']['budgets'][counter]:
         raise ValueError('CAPABILITY_NOT_ALLOCATED_IN_THIS_STUDY: '+operation)
     grant=0.
-    if operation=='solve':
+    if operation=='nmpc_prediction_diagnostic':
+        from tools.research.nmpc_prediction_diagnostic import admitted_case, interval_identity
+        candidate=plain(arguments.candidate);cfg=verify_candidate(host,candidate)['configuration']
+        index,case=admitted_case(host,arguments,cfg)
+        trajectory=None;warm_trajectory=None
+        if any((r:=host.store.artifact(ref)).get('operation')==operation
+                and r.get('source_identity')==interval_identity(index,case)
+                and r.get('substeps')==arguments.substeps for ref in s.get('mechanics_results',[])):
+            raise ValueError('EQUIVALENT_ARCHIVED_INTERVAL_ALREADY_EXECUTED')
+    elif operation=='solve':
         candidate=plain(arguments.candidate)
         cfg=verify_candidate(host,candidate)['configuration']
         trajectory=None
@@ -93,10 +103,11 @@ def dispatch(host,operation,arguments,key):
         trajectory=old['trajectory']
         warm_trajectory=None
     request=dict(implementation=s['freeze'],operation=operation,configuration=cfg,design_candidate=candidate,
-        arguments=plain(arguments) if operation in ('solve','refine') else None,trajectory=trajectory,
-        warm_trajectory=warm_trajectory,source_reference=plain(arguments.source) if operation in ('cross_replay','refine') else None,
+        arguments=plain(arguments) if operation in ('solve','refine','nmpc_prediction_diagnostic') else None,trajectory=trajectory,
+        warm_trajectory=warm_trajectory,source_reference=plain(arguments.source) if operation in ('cross_replay','refine','nmpc_prediction_diagnostic') else None,
         study_id=host.run_id,store_root=str(host.store.root),request_id=key+'-mechanics')
     if operation=='solve' and arguments.check_only:request['check_only']=True
+    if operation=='nmpc_prediction_diagnostic':request.update(prediction_index=index,prediction_case=case)
     if operation=='solve' and arguments.diagnostic_source:
         point=host.store.artifact(arguments.diagnostic_source)
         if point.get('source_kind')!='raw_nlp_point':
@@ -141,13 +152,18 @@ def recover(host):
         raise ValueError('UNKNOWN_MATHEMATICAL_OUTCOME_RETAINS_RESERVATION')
     value=read(folder/'result.json') if (folder/'result.json').exists() else dict(status='incomplete')
     request=read(folder/'request.json')
+    if request['operation']=='nmpc_prediction_diagnostic':
+        from tools.research.nmpc_prediction_diagnostic import interval_identity
+        value.update(source_identity=interval_identity(request['prediction_index'],request['prediction_case']),
+            substeps=request['arguments']['substeps'],update_index=request['arguments']['update_index'])
     checkpoints={name:read(folder/(name+'.json')) for name in ('environment','optimizer_iterate','matlab_result')
         if (folder/(name+'.json')).exists()}
     if checkpoints:value['checkpoint_reference']=save(host,checkpoints,'mathematical_checkpoints')
     log_bytes=(folder/'worker.log').read_bytes()
     log=dict(text=log_bytes.decode('utf8',errors='replace'),
         raw_base64=base64.b64encode(log_bytes).decode('ascii'),raw_sha256=hashlib.sha256(log_bytes).hexdigest())
-    value.update(operation=request['operation'],design_candidate=request['design_candidate'],
+    value.update(execution_id=host.store.lookup(host.run_id,p['worker_request_id'])['execution_id'],
+        operation=request['operation'],design_candidate=request['design_candidate'],
         source_reference=request.get('source_reference'),
         original_request=save(host,request,'mathematical_request'),charged_numerical_s=boundary['elapsed_s'],implementation=p['implementation'],
         boundary=boundary,task_acceptance='unmeasured',log_reference=save(host,log,'mathematical_log'))
