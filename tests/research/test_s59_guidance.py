@@ -138,6 +138,18 @@ class GuidanceIntegrationTests(unittest.TestCase):
         self.assertEqual(spec['confirmation']['fresh_independent_repetitions'],0)
         self.assertEqual(spec['configuration']['task']['timing']['timestep_s'],.0005)
 
+    def test_engineering_analysis_public_call_charged_once_even_on_worker_failure(self):
+        candidate=self.generate()
+        before=self.host.store.remaining()['used']['tool_calls']
+        q=dict(candidate=candidate,operation='endpoint',operating_point='controller_start_input',protocol=self.spec['analysis_protocol'])
+        with patch('tools.service_execution._run_contained',return_value=NS(returncode=1)) as worker:
+            first=analysis.dispatch(self.host,q,'fixture-engineering-public',guard=lambda *a:None,origin='engineering_preflight')
+            second=analysis.dispatch(self.host,q,'fixture-engineering-public',guard=lambda *a:None,origin='engineering_preflight')
+        self.assertEqual(worker.call_count,1)
+        self.assertEqual(first['reference'],second['reference'])
+        self.assertEqual(self.host.store.remaining()['used']['tool_calls']-before,1)
+        self.assertEqual(state(self.host)['mathematical_evaluations'],1)
+
 
 class HoldingHistoryTests(unittest.TestCase):
     def test_simultaneous_peak_state_and_signed_reversal(self):

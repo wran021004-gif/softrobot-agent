@@ -355,7 +355,8 @@ def dispatch(host,query,key,*,guard,origin='model'):
         current['mathematical_evaluations']=current.get('mathematical_evaluations',0)+count
         current['numerical_reserved_s']+=reserve
         host.store.update_state(db,host.run_id,current)
-    row,_=host.store.reserve(host.run_id,request_id,identity,host.actor,{**zero(),'wall_s':reserve},kind='candidate_analysis',guard=charge)
+    row,_=host.store.reserve(host.run_id,request_id,identity,host.actor,
+        {**zero(),'wall_s':reserve,'tool_calls':int(origin=='engineering_preflight')},kind='candidate_analysis',guard=charge)
     folder=host.store.root/'analyses'/row['execution_id']
     folder.mkdir(parents=True,exist_ok=True)
     request=dict(implementation=s['freeze'],rationale=query.get('rationale','Model-requested '+q.operation) if isinstance(query,dict) else q.operation,kind='candidate_analysis',configuration=cfg,binding=binding,query=plain(q),exact_point=point,
