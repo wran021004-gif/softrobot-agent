@@ -110,6 +110,26 @@ def mathematics(host):
     atomic_json(DEST/'initial_research_packet.json',decision_packet(host))
 
 
+def startup_correction(host):
+    """Explicit confirmed pre-computation startup correction; all costs persist."""
+    if state(host).get('s59_startup_corrected'):return
+    refs=[]
+    for i in range(3):
+        old=read(DEST/f'math_{i}.json')
+        if old['result'].get('error')!='UnicodeDecodeError' or old['result']['status']!='execution_incomplete':
+            raise ValueError('ONLY_CONFIRMED_PRECOMPUTATION_STARTUP_FAILURE_CORRECTION')
+        result=analysis.dispatch(host,old['request'],f's59-confirmed-startup-correction-{i}',guard=guard,origin='engineering_preflight')
+        value=host.store.artifact(result['reference']);view=analysis.decision_result(value,result['reference'])
+        if value.get('sensitivity'):view['sensitivity']=value['sensitivity']
+        refs.append(save(host,view,'s59_corrected_task_math_summary'))
+        atomic_json(DEST/f'math_startup_correction_{i}.json',dict(request=old['request'],result=value,summary=view,
+            previous_failed_result=old['summary']['reference'],reason='Confirmed MATLAB startup failed inside sandbox before numerical evaluation; elevated environment-only startup succeeded.'))
+    update(host,task_math_references=[*state(host)['task_math_references'],*refs],s59_startup_corrected=True,
+        scoped_context=[*state(host)['scoped_context'],*refs],
+        stage_context=[*state(host)['stage_context'],*[dict(stage='S5.9 corrected task mathematics',reference=r) for r in refs]])
+    atomic_json(DEST/'corrected_initial_research_packet.json',decision_packet(host))
+
+
 def export(host, blocker=None):
     if (DEST/'study/archive_manifest.json').exists():return
     s=state(host);actions=[];reads=[];usage=[]
@@ -136,12 +156,13 @@ def export(host, blocker=None):
 
 
 def main():
-    parser=argparse.ArgumentParser();parser.add_argument('phase',choices=['history','prepare','math','live','export']);args=parser.parse_args()
+    parser=argparse.ArgumentParser();parser.add_argument('phase',choices=['history','prepare','math','startup-correction','live','export']);args=parser.parse_args()
     if args.phase=='history':history();return
     if args.phase=='export':
         name=read(SPEC)['study_id'];export(Host(ROOT/'runs/research'/name,name,actor='unified-research'));return
     host=prepare()
     if args.phase=='prepare':return
+    if args.phase=='startup-correction':startup_correction(host);return
     mathematics(host)
     if args.phase=='math':return
     if state(host)['research_status']=='stopped':export(host);return

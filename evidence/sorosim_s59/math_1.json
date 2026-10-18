@@ -1,0 +1,974 @@
+{
+  "request": {
+    "candidate": {
+      "artifact_id": "9b162aa76f10c6cf76dd12ca03bec8fbf7ac03235207d9354af3b54f11314ffa",
+      "media_type": "application/json"
+    },
+    "operation": "design_sensitivity",
+    "operating_point": "fixed_input_equilibrium",
+    "protocol": {
+      "authority_reason": "No independently justified task-required MIMO gain threshold; usable bandwidth undefined.",
+      "authority_rule": "Smallest singular value >= threshold, connected grid band starting at lowest frequency; no extrapolation.",
+      "authority_threshold": null,
+      "baseline_lengths_m": {
+        "segment_0": 0.16,
+        "segment_1": 0.11,
+        "segment_2": 0.14,
+        "segment_3": 0.14,
+        "segment_4": 0.14,
+        "segment_5": 0.14,
+        "segment_6": 0.14,
+        "segment_7": 0.14,
+        "segment_8": 0.14
+      },
+      "candidate_rule": "initial_target_equilibrium_halfway",
+      "comparison_atol": 1e-08,
+      "comparison_rtol": 2e-06,
+      "construction_max_iterations": 20,
+      "derivative_atol": 2e-05,
+      "derivative_rtol": 0.0002,
+      "derivative_step": 1e-05,
+      "duration_s": 0.35,
+      "endpoint_check_atol": 1e-08,
+      "endpoint_max_iterations": 100,
+      "equilibrium_normalized_residual": 1e-05,
+      "frequency_rad_s": [
+        0.1,
+        1.0,
+        10.0,
+        100.0
+      ],
+      "horizon_alignment_atol_s": 1e-12,
+      "input_scale_n": 8.0,
+      "output_scale_m": 0.01,
+      "period_s": 0.01,
+      "pole_margin_s_inv": 1e-07,
+      "protocol_id": "task-local-v2",
+      "rank_atol": 1e-12,
+      "rank_rtol": 1e-09,
+      "samples_s": [
+        0.0,
+        0.1,
+        0.2,
+        0.3,
+        0.34
+      ],
+      "static_force_tolerance": 1e-10,
+      "static_max_iterations": 20,
+      "windows_s": [
+        0.05,
+        0.1,
+        0.35
+      ]
+    },
+    "design_sensitivity": {
+      "variable": "segments.0.length_m",
+      "step": 0.001,
+      "minus_candidate": {
+        "artifact_id": "0d551db4c818a2fbaa69aff1f9d839c679cec1a28f9196dba140442de9f71f1b",
+        "media_type": "application/json"
+      },
+      "plus_candidate": {
+        "artifact_id": "77ce37fe5b905a439c01714c9b2456f7bed73511fa3e9d9f526ce05a639d64ef",
+        "media_type": "application/json"
+      }
+    }
+  },
+  "result": {
+    "analysis_applicability": {
+      "constraint_coverage": [
+        {
+          "analyzed_indices": [],
+          "constraint_id": "terminal_error_m",
+          "expressible": true,
+          "reason": "Local position authority/static construction only; no sampled constraint verification.",
+          "status": "diagnostic"
+        },
+        {
+          "analyzed_indices": [],
+          "constraint_id": "holding_max_error_m",
+          "expressible": true,
+          "reason": "Local position authority/static construction only; no sampled constraint verification.",
+          "status": "diagnostic"
+        },
+        {
+          "analyzed_indices": [],
+          "constraint_id": "holding_max_speed_m_s",
+          "expressible": true,
+          "reason": "Existing tools do not enforce this constraint kind or sampled window.",
+          "status": "not_applicable"
+        }
+      ],
+      "execution_support": "not_assessed",
+      "full_task_supported": false,
+      "horizon": {
+        "analysis_horizon_s": 0.35,
+        "interpretation": "Actual saved-state remaining horizon, or nominal horizon from the declared configuration operating point.",
+        "origin": null,
+        "period_s": 0.01,
+        "remaining_task_s": 0.35,
+        "task_duration_s": 0.35
+      },
+      "model_assessment": {
+        "design_id": "serial_family_candidate",
+        "design_identity": "10035885ded80b7afbf2faa28988c6275a18ac04f3232c5d0972acced81af9ad",
+        "generalized_coordinate_dimension": 12,
+        "model_id": "model.sorosim_gvs",
+        "model_version": "1.0.0",
+        "relevant_assumptions": [
+          "supported serial tendon-driven continuum topology",
+          "selected strain basis spans deformation relevant to the use",
+          "inextensible centerline",
+          "no shear",
+          "no torsion",
+          "straight frictionless tendon spans"
+        ],
+        "representation_id": "63aab968b8f0732f13dc73454e2628ee015c67b6b92aa47639d9f8b55d928f0e",
+        "representation_kind": "gvs_bending_basis_v1",
+        "representation_strategy": "structural_linear",
+        "state_dimension": 24,
+        "unsupported_requested_physics": [],
+        "uses": {
+          "static_equilibrium": {
+            "evidence": [],
+            "reasons": [
+              "SoRoSim local bending computation is supported; physical agreement outside measured operating points is unvalidated."
+            ],
+            "status": "WARN",
+            "validation": "unavailable"
+          }
+        }
+      },
+      "reasons": [],
+      "status": "applicable"
+    },
+    "boundary": {
+      "elapsed_s": 1.1027056998573244,
+      "returncode": 0,
+      "termination_confirmed": true,
+      "timed_out": false
+    },
+    "candidate": {
+      "artifact_id": "9b162aa76f10c6cf76dd12ca03bec8fbf7ac03235207d9354af3b54f11314ffa",
+      "media_type": "application/json"
+    },
+    "charged_analysis_evaluations": 3,
+    "charged_numerical_s": 1.1027056998573244,
+    "error": "UnicodeDecodeError",
+    "implementation": "bb26d3624e1ee4ad1c624540ebea3a13fdd37769",
+    "internal_calculations": {
+      "reason": "Worker failed before complete calculation records were published; reservation and analysis attempt remain charged",
+      "status": "partial_or_unavailable"
+    },
+    "operation_key": "s59-preparation-math-1-analysis",
+    "origin": "engineering_preflight",
+    "owning_study": "sorosim-s59-agent-20261018",
+    "reason": "'utf-8' codec can't decode byte 0xbe in position 129: invalid start byte",
+    "requested_operation": {
+      "candidate": {
+        "artifact_id": "9b162aa76f10c6cf76dd12ca03bec8fbf7ac03235207d9354af3b54f11314ffa",
+        "media_type": "application/json"
+      },
+      "design_sensitivity": {
+        "minus_candidate": {
+          "artifact_id": "0d551db4c818a2fbaa69aff1f9d839c679cec1a28f9196dba140442de9f71f1b",
+          "media_type": "application/json"
+        },
+        "plus_candidate": {
+          "artifact_id": "77ce37fe5b905a439c01714c9b2456f7bed73511fa3e9d9f526ce05a639d64ef",
+          "media_type": "application/json"
+        },
+        "step": 0.001,
+        "variable": "segments.0.length_m",
+        "version": "sorosim_static_ift_v1"
+      },
+      "execution": null,
+      "operating_point": "fixed_input_equilibrium",
+      "operation": "design_sensitivity",
+      "protocol": {
+        "authority_reason": "No independently justified task-required MIMO gain threshold; usable bandwidth undefined.",
+        "authority_rule": "Smallest singular value >= threshold, connected grid band starting at lowest frequency; no extrapolation.",
+        "authority_threshold": null,
+        "baseline_lengths_m": {
+          "segment_0": 0.16,
+          "segment_1": 0.11,
+          "segment_2": 0.14,
+          "segment_3": 0.14,
+          "segment_4": 0.14,
+          "segment_5": 0.14,
+          "segment_6": 0.14,
+          "segment_7": 0.14,
+          "segment_8": 0.14
+        },
+        "candidate_rule": "initial_target_equilibrium_halfway",
+        "comparison_atol": 1e-08,
+        "comparison_rtol": 2e-06,
+        "construction_max_iterations": 20,
+        "derivative_atol": 2e-05,
+        "derivative_rtol": 0.0002,
+        "derivative_step": 1e-05,
+        "duration_s": 0.35,
+        "endpoint_check_atol": 1e-08,
+        "endpoint_max_iterations": 100,
+        "equilibrium_normalized_residual": 1e-05,
+        "frequency_rad_s": [
+          0.1,
+          1.0,
+          10.0,
+          100.0
+        ],
+        "horizon_alignment_atol_s": 1e-12,
+        "input_scale_n": 8.0,
+        "output_scale_m": 0.01,
+        "period_s": 0.01,
+        "pole_margin_s_inv": 1e-07,
+        "protocol_id": "task-local-v2",
+        "rank_atol": 1e-12,
+        "rank_rtol": 1e-09,
+        "samples_s": [
+          0.0,
+          0.1,
+          0.2,
+          0.3,
+          0.34
+        ],
+        "static_force_tolerance": 1e-10,
+        "static_max_iterations": 20,
+        "windows_s": [
+          0.05,
+          0.1,
+          0.35
+        ]
+      },
+      "saved_state": null,
+      "scoring_window_s": null,
+      "update_id": null
+    },
+    "scoped_claim": {
+      "binding": {
+        "basis": {
+          "strategy": "structural_linear"
+        },
+        "candidate": {
+          "artifact_id": "9b162aa76f10c6cf76dd12ca03bec8fbf7ac03235207d9354af3b54f11314ffa",
+          "media_type": "application/json"
+        },
+        "candidate_id": "core-1524501a5c16bc9fea5809747846cdbbb95bccec3d099e2077ddcdb7a3147573",
+        "canonical_task_identity": "fe7b95c3c1ba12659b59c1983544b6454c9d90ac42c4dec528e9736d99fd3a6b",
+        "configuration": {
+          "artifact_id": "4e615c9c9ce0f20ad61b5b63d868655cf2c2c4f683d774e85a6f002212cbfb30",
+          "media_type": "application/json"
+        },
+        "coordinate_order": [
+          "segment_0.kappa_y_node_0",
+          "segment_0.kappa_y_node_1",
+          "segment_0.kappa_y_node_2",
+          "segment_0.kappa_z_node_0",
+          "segment_0.kappa_z_node_1",
+          "segment_0.kappa_z_node_2",
+          "segment_1.kappa_y_node_0",
+          "segment_1.kappa_y_node_1",
+          "segment_1.kappa_y_node_2",
+          "segment_1.kappa_z_node_0",
+          "segment_1.kappa_z_node_1",
+          "segment_1.kappa_z_node_2"
+        ],
+        "effective_configuration_identity": "4e615c9c9ce0f20ad61b5b63d868655cf2c2c4f683d774e85a6f002212cbfb30",
+        "evaluation_profile_identity": "63a6eb603809edea83d45141f75c96e8e72f969378f419bcb1b3dbc3cd6d7dca",
+        "initialization_provenance": {
+          "canonical_task_identity": "fe7b95c3c1ba12659b59c1983544b6454c9d90ac42c4dec528e9736d99fd3a6b",
+          "effective": {
+            "qpos_rad": {
+              "segment_0_cell_0_y": 0.0,
+              "segment_0_cell_0_z": 0.0,
+              "segment_0_cell_10_y": 0.0,
+              "segment_0_cell_10_z": 0.0,
+              "segment_0_cell_11_y": 0.0,
+              "segment_0_cell_11_z": 0.0,
+              "segment_0_cell_1_y": 0.0,
+              "segment_0_cell_1_z": 0.0,
+              "segment_0_cell_2_y": 0.0,
+              "segment_0_cell_2_z": 0.0,
+              "segment_0_cell_3_y": 0.0,
+              "segment_0_cell_3_z": 0.0,
+              "segment_0_cell_4_y": 0.0,
+              "segment_0_cell_4_z": 0.0,
+              "segment_0_cell_5_y": 0.0,
+              "segment_0_cell_5_z": 0.0,
+              "segment_0_cell_6_y": 0.0,
+              "segment_0_cell_6_z": 0.0,
+              "segment_0_cell_7_y": 0.0,
+              "segment_0_cell_7_z": 0.0,
+              "segment_0_cell_8_y": 0.0,
+              "segment_0_cell_8_z": 0.0,
+              "segment_0_cell_9_y": 0.0,
+              "segment_0_cell_9_z": 0.0,
+              "segment_1_cell_0_y": 0.0,
+              "segment_1_cell_0_z": 0.0,
+              "segment_1_cell_10_y": 0.0,
+              "segment_1_cell_10_z": 0.0,
+              "segment_1_cell_11_y": 0.0,
+              "segment_1_cell_11_z": 0.0,
+              "segment_1_cell_1_y": 0.0,
+              "segment_1_cell_1_z": 0.0,
+              "segment_1_cell_2_y": 0.0,
+              "segment_1_cell_2_z": 0.0,
+              "segment_1_cell_3_y": 0.0,
+              "segment_1_cell_3_z": 0.0,
+              "segment_1_cell_4_y": 0.0,
+              "segment_1_cell_4_z": 0.0,
+              "segment_1_cell_5_y": 0.0,
+              "segment_1_cell_5_z": 0.0,
+              "segment_1_cell_6_y": 0.0,
+              "segment_1_cell_6_z": 0.0,
+              "segment_1_cell_7_y": 0.0,
+              "segment_1_cell_7_z": 0.0,
+              "segment_1_cell_8_y": 0.0,
+              "segment_1_cell_8_z": 0.0,
+              "segment_1_cell_9_y": 0.0,
+              "segment_1_cell_9_z": 0.0
+            },
+            "qvel_rad_s": {
+              "segment_0_cell_0_y": 0.0,
+              "segment_0_cell_0_z": 0.0,
+              "segment_0_cell_10_y": 0.0,
+              "segment_0_cell_10_z": 0.0,
+              "segment_0_cell_11_y": 0.0,
+              "segment_0_cell_11_z": 0.0,
+              "segment_0_cell_1_y": 0.0,
+              "segment_0_cell_1_z": 0.0,
+              "segment_0_cell_2_y": 0.0,
+              "segment_0_cell_2_z": 0.0,
+              "segment_0_cell_3_y": 0.0,
+              "segment_0_cell_3_z": 0.0,
+              "segment_0_cell_4_y": 0.0,
+              "segment_0_cell_4_z": 0.0,
+              "segment_0_cell_5_y": 0.0,
+              "segment_0_cell_5_z": 0.0,
+              "segment_0_cell_6_y": 0.0,
+              "segment_0_cell_6_z": 0.0,
+              "segment_0_cell_7_y": 0.0,
+              "segment_0_cell_7_z": 0.0,
+              "segment_0_cell_8_y": 0.0,
+              "segment_0_cell_8_z": 0.0,
+              "segment_0_cell_9_y": 0.0,
+              "segment_0_cell_9_z": 0.0,
+              "segment_1_cell_0_y": 0.0,
+              "segment_1_cell_0_z": 0.0,
+              "segment_1_cell_10_y": 0.0,
+              "segment_1_cell_10_z": 0.0,
+              "segment_1_cell_11_y": 0.0,
+              "segment_1_cell_11_z": 0.0,
+              "segment_1_cell_1_y": 0.0,
+              "segment_1_cell_1_z": 0.0,
+              "segment_1_cell_2_y": 0.0,
+              "segment_1_cell_2_z": 0.0,
+              "segment_1_cell_3_y": 0.0,
+              "segment_1_cell_3_z": 0.0,
+              "segment_1_cell_4_y": 0.0,
+              "segment_1_cell_4_z": 0.0,
+              "segment_1_cell_5_y": 0.0,
+              "segment_1_cell_5_z": 0.0,
+              "segment_1_cell_6_y": 0.0,
+              "segment_1_cell_6_z": 0.0,
+              "segment_1_cell_7_y": 0.0,
+              "segment_1_cell_7_z": 0.0,
+              "segment_1_cell_8_y": 0.0,
+              "segment_1_cell_8_z": 0.0,
+              "segment_1_cell_9_y": 0.0,
+              "segment_1_cell_9_z": 0.0
+            },
+            "unspecified": "zero"
+          },
+          "rule": "all_candidate_dofs_zero_v1"
+        },
+        "source_identity": "6f36c2b7cc870ca0298f56c9c940103f8b7ef19ee542c6b5fefd710abc58af90",
+        "target_m": [
+          0.29,
+          0.035,
+          0.19
+        ],
+        "task_id": "family-multisegment-dev",
+        "task_identity": "882b3493037dcc8f8da294b3473e1223f0465e92c35bc3064bfc42d467bf212e",
+        "task_version": "1.0.0",
+        "tendon_order": [
+          "tendon_0",
+          "tendon_1",
+          "tendon_2",
+          "tendon_3"
+        ],
+        "tension_bounds_n": [
+          [
+            0.0,
+            8.0
+          ],
+          [
+            0.0,
+            8.0
+          ],
+          [
+            0.0,
+            8.0
+          ],
+          [
+            0.0,
+            8.0
+          ]
+        ],
+        "tension_limits_n": [
+          8.0,
+          8.0,
+          8.0,
+          8.0
+        ]
+      },
+      "computation_status": "execution_incomplete",
+      "conclusion": "inconclusive",
+      "constraint_coverage": [
+        {
+          "analyzed_indices": [],
+          "constraint_id": "terminal_error_m",
+          "expressible": true,
+          "reason": "Local position authority/static construction only; no sampled constraint verification.",
+          "status": "diagnostic"
+        },
+        {
+          "analyzed_indices": [],
+          "constraint_id": "holding_max_error_m",
+          "expressible": true,
+          "reason": "Local position authority/static construction only; no sampled constraint verification.",
+          "status": "diagnostic"
+        },
+        {
+          "analyzed_indices": [],
+          "constraint_id": "holding_max_speed_m_s",
+          "expressible": true,
+          "reason": "Existing tools do not enforce this constraint kind or sampled window.",
+          "status": "not_applicable"
+        }
+      ],
+      "contract": "scoped-mathematical-claim-v1",
+      "horizon": {
+        "analysis_horizon_s": 0.35,
+        "interpretation": "Actual saved-state remaining horizon, or nominal horizon from the declared configuration operating point.",
+        "origin": null,
+        "period_s": 0.01,
+        "remaining_task_s": 0.35,
+        "task_duration_s": 0.35
+      },
+      "model_declaration": {
+        "model_id": "model.sorosim_gvs",
+        "model_version": "1.0.0",
+        "relevant_assumptions": [
+          "supported serial tendon-driven continuum topology",
+          "selected strain basis spans deformation relevant to the use",
+          "inextensible centerline",
+          "no shear",
+          "no torsion",
+          "straight frictionless tendon spans"
+        ],
+        "representation_id": "63aab968b8f0732f13dc73454e2628ee015c67b6b92aa47639d9f8b55d928f0e"
+      },
+      "model_identity": null,
+      "numerical_result_pointer": "",
+      "operating_point": {
+        "name": "fixed_input_equilibrium"
+      },
+      "physical_inputs": {
+        "control_period_s": 0.01,
+        "frame": "tendon_path",
+        "lower": [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "phase": "pre_step",
+        "provenance": [
+          "/robot/structure/data/tendons",
+          "/task/timing/control_period_s"
+        ],
+        "signal": "tendon_tension",
+        "tendon_order": [
+          "tendon_0",
+          "tendon_1",
+          "tendon_2",
+          "tendon_3"
+        ],
+        "units": "N",
+        "upper": [
+          8.0,
+          8.0,
+          8.0,
+          8.0
+        ]
+      },
+      "protocol_identity": "7ee044c26f91b5a7cbb53bfc95322dd6dbe8d298f196f1a6ca121305d13082d9",
+      "requirement_identity": "13a0713f1f4dcb3fc97cf1951c1374a5715bbf8923c956cbfb86c6205fe58282",
+      "supported_interpretation": "No verified witness or certificate is available for this attempt.",
+      "unsupported_conclusions": [
+        "task acceptance",
+        "whole holding-window compliance",
+        "global nonlinear feasibility or infeasibility",
+        "hardware performance",
+        "robustness",
+        "repeatability",
+        "equilibrium validity at a non-equilibrium point"
+      ],
+      "verification_status": "insufficient"
+    },
+    "status": "execution_incomplete",
+    "task_analysis": {
+      "binding": {
+        "basis": {
+          "strategy": "structural_linear"
+        },
+        "candidate": {
+          "artifact_id": "9b162aa76f10c6cf76dd12ca03bec8fbf7ac03235207d9354af3b54f11314ffa",
+          "media_type": "application/json"
+        },
+        "candidate_id": "core-1524501a5c16bc9fea5809747846cdbbb95bccec3d099e2077ddcdb7a3147573",
+        "canonical_task_identity": "fe7b95c3c1ba12659b59c1983544b6454c9d90ac42c4dec528e9736d99fd3a6b",
+        "configuration": {
+          "artifact_id": "4e615c9c9ce0f20ad61b5b63d868655cf2c2c4f683d774e85a6f002212cbfb30",
+          "media_type": "application/json"
+        },
+        "coordinate_order": [
+          "segment_0.kappa_y_node_0",
+          "segment_0.kappa_y_node_1",
+          "segment_0.kappa_y_node_2",
+          "segment_0.kappa_z_node_0",
+          "segment_0.kappa_z_node_1",
+          "segment_0.kappa_z_node_2",
+          "segment_1.kappa_y_node_0",
+          "segment_1.kappa_y_node_1",
+          "segment_1.kappa_y_node_2",
+          "segment_1.kappa_z_node_0",
+          "segment_1.kappa_z_node_1",
+          "segment_1.kappa_z_node_2"
+        ],
+        "effective_configuration_identity": "4e615c9c9ce0f20ad61b5b63d868655cf2c2c4f683d774e85a6f002212cbfb30",
+        "evaluation_profile_identity": "63a6eb603809edea83d45141f75c96e8e72f969378f419bcb1b3dbc3cd6d7dca",
+        "initialization_provenance": {
+          "canonical_task_identity": "fe7b95c3c1ba12659b59c1983544b6454c9d90ac42c4dec528e9736d99fd3a6b",
+          "effective": {
+            "qpos_rad": {
+              "segment_0_cell_0_y": 0.0,
+              "segment_0_cell_0_z": 0.0,
+              "segment_0_cell_10_y": 0.0,
+              "segment_0_cell_10_z": 0.0,
+              "segment_0_cell_11_y": 0.0,
+              "segment_0_cell_11_z": 0.0,
+              "segment_0_cell_1_y": 0.0,
+              "segment_0_cell_1_z": 0.0,
+              "segment_0_cell_2_y": 0.0,
+              "segment_0_cell_2_z": 0.0,
+              "segment_0_cell_3_y": 0.0,
+              "segment_0_cell_3_z": 0.0,
+              "segment_0_cell_4_y": 0.0,
+              "segment_0_cell_4_z": 0.0,
+              "segment_0_cell_5_y": 0.0,
+              "segment_0_cell_5_z": 0.0,
+              "segment_0_cell_6_y": 0.0,
+              "segment_0_cell_6_z": 0.0,
+              "segment_0_cell_7_y": 0.0,
+              "segment_0_cell_7_z": 0.0,
+              "segment_0_cell_8_y": 0.0,
+              "segment_0_cell_8_z": 0.0,
+              "segment_0_cell_9_y": 0.0,
+              "segment_0_cell_9_z": 0.0,
+              "segment_1_cell_0_y": 0.0,
+              "segment_1_cell_0_z": 0.0,
+              "segment_1_cell_10_y": 0.0,
+              "segment_1_cell_10_z": 0.0,
+              "segment_1_cell_11_y": 0.0,
+              "segment_1_cell_11_z": 0.0,
+              "segment_1_cell_1_y": 0.0,
+              "segment_1_cell_1_z": 0.0,
+              "segment_1_cell_2_y": 0.0,
+              "segment_1_cell_2_z": 0.0,
+              "segment_1_cell_3_y": 0.0,
+              "segment_1_cell_3_z": 0.0,
+              "segment_1_cell_4_y": 0.0,
+              "segment_1_cell_4_z": 0.0,
+              "segment_1_cell_5_y": 0.0,
+              "segment_1_cell_5_z": 0.0,
+              "segment_1_cell_6_y": 0.0,
+              "segment_1_cell_6_z": 0.0,
+              "segment_1_cell_7_y": 0.0,
+              "segment_1_cell_7_z": 0.0,
+              "segment_1_cell_8_y": 0.0,
+              "segment_1_cell_8_z": 0.0,
+              "segment_1_cell_9_y": 0.0,
+              "segment_1_cell_9_z": 0.0
+            },
+            "qvel_rad_s": {
+              "segment_0_cell_0_y": 0.0,
+              "segment_0_cell_0_z": 0.0,
+              "segment_0_cell_10_y": 0.0,
+              "segment_0_cell_10_z": 0.0,
+              "segment_0_cell_11_y": 0.0,
+              "segment_0_cell_11_z": 0.0,
+              "segment_0_cell_1_y": 0.0,
+              "segment_0_cell_1_z": 0.0,
+              "segment_0_cell_2_y": 0.0,
+              "segment_0_cell_2_z": 0.0,
+              "segment_0_cell_3_y": 0.0,
+              "segment_0_cell_3_z": 0.0,
+              "segment_0_cell_4_y": 0.0,
+              "segment_0_cell_4_z": 0.0,
+              "segment_0_cell_5_y": 0.0,
+              "segment_0_cell_5_z": 0.0,
+              "segment_0_cell_6_y": 0.0,
+              "segment_0_cell_6_z": 0.0,
+              "segment_0_cell_7_y": 0.0,
+              "segment_0_cell_7_z": 0.0,
+              "segment_0_cell_8_y": 0.0,
+              "segment_0_cell_8_z": 0.0,
+              "segment_0_cell_9_y": 0.0,
+              "segment_0_cell_9_z": 0.0,
+              "segment_1_cell_0_y": 0.0,
+              "segment_1_cell_0_z": 0.0,
+              "segment_1_cell_10_y": 0.0,
+              "segment_1_cell_10_z": 0.0,
+              "segment_1_cell_11_y": 0.0,
+              "segment_1_cell_11_z": 0.0,
+              "segment_1_cell_1_y": 0.0,
+              "segment_1_cell_1_z": 0.0,
+              "segment_1_cell_2_y": 0.0,
+              "segment_1_cell_2_z": 0.0,
+              "segment_1_cell_3_y": 0.0,
+              "segment_1_cell_3_z": 0.0,
+              "segment_1_cell_4_y": 0.0,
+              "segment_1_cell_4_z": 0.0,
+              "segment_1_cell_5_y": 0.0,
+              "segment_1_cell_5_z": 0.0,
+              "segment_1_cell_6_y": 0.0,
+              "segment_1_cell_6_z": 0.0,
+              "segment_1_cell_7_y": 0.0,
+              "segment_1_cell_7_z": 0.0,
+              "segment_1_cell_8_y": 0.0,
+              "segment_1_cell_8_z": 0.0,
+              "segment_1_cell_9_y": 0.0,
+              "segment_1_cell_9_z": 0.0
+            },
+            "unspecified": "zero"
+          },
+          "rule": "all_candidate_dofs_zero_v1"
+        },
+        "source_identity": "6f36c2b7cc870ca0298f56c9c940103f8b7ef19ee542c6b5fefd710abc58af90",
+        "target_m": [
+          0.29,
+          0.035,
+          0.19
+        ],
+        "task_id": "family-multisegment-dev",
+        "task_identity": "882b3493037dcc8f8da294b3473e1223f0465e92c35bc3064bfc42d467bf212e",
+        "task_version": "1.0.0",
+        "tendon_order": [
+          "tendon_0",
+          "tendon_1",
+          "tendon_2",
+          "tendon_3"
+        ],
+        "tension_bounds_n": [
+          [
+            0.0,
+            8.0
+          ],
+          [
+            0.0,
+            8.0
+          ],
+          [
+            0.0,
+            8.0
+          ],
+          [
+            0.0,
+            8.0
+          ]
+        ],
+        "tension_limits_n": [
+          8.0,
+          8.0,
+          8.0,
+          8.0
+        ]
+      },
+      "constraints": [
+        {
+          "constraint_id": "terminal_error_m",
+          "indices": [
+            35
+          ],
+          "kind": "norm_bound",
+          "lower": null,
+          "provenance": [
+            "/task/evaluator/parameters/data/tolerance_m",
+            "/task/timing",
+            "/task/goal",
+            "/policy/controller/parameters/data/settling/window_s"
+          ],
+          "radius": 0.01,
+          "reference": [
+            [
+              0.29,
+              0.035,
+              0.19
+            ]
+          ],
+          "signal": {
+            "dimension": 3,
+            "entity": "tip",
+            "frame": "world",
+            "missing": "unsupported",
+            "name": "tip_position",
+            "phase": "post_step",
+            "units": "m"
+          },
+          "unsupported_requirement": null,
+          "upper": null
+        },
+        {
+          "constraint_id": "holding_max_error_m",
+          "indices": [
+            30,
+            31,
+            32,
+            33,
+            34,
+            35
+          ],
+          "kind": "norm_bound",
+          "lower": null,
+          "provenance": [
+            "/policy/controller/parameters/data/settling/position_limit_m",
+            "/task/timing",
+            "/task/goal",
+            "/policy/controller/parameters/data/settling/window_s"
+          ],
+          "radius": 0.01,
+          "reference": [
+            [
+              0.29,
+              0.035,
+              0.19
+            ],
+            [
+              0.29,
+              0.035,
+              0.19
+            ],
+            [
+              0.29,
+              0.035,
+              0.19
+            ],
+            [
+              0.29,
+              0.035,
+              0.19
+            ],
+            [
+              0.29,
+              0.035,
+              0.19
+            ],
+            [
+              0.29,
+              0.035,
+              0.19
+            ]
+          ],
+          "signal": {
+            "dimension": 3,
+            "entity": "tip",
+            "frame": "world",
+            "missing": "unsupported",
+            "name": "tip_position",
+            "phase": "post_step",
+            "units": "m"
+          },
+          "unsupported_requirement": null,
+          "upper": null
+        },
+        {
+          "constraint_id": "holding_max_speed_m_s",
+          "indices": [
+            30,
+            31,
+            32,
+            33,
+            34,
+            35
+          ],
+          "kind": "norm_bound",
+          "lower": null,
+          "provenance": [
+            "/policy/controller/parameters/data/settling/speed_limit_m_s",
+            "/task/timing",
+            "/task/goal",
+            "/policy/controller/parameters/data/settling/window_s"
+          ],
+          "radius": 0.02,
+          "reference": [
+            [
+              0.0,
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              0.0,
+              0.0
+            ]
+          ],
+          "signal": {
+            "dimension": 3,
+            "entity": "tip",
+            "frame": "world",
+            "missing": "unsupported",
+            "name": "tip_velocity",
+            "phase": "post_step",
+            "units": "m/s"
+          },
+          "unsupported_requirement": null,
+          "upper": null
+        }
+      ],
+      "contract": "task-analysis-v1",
+      "duration_s": 0.35,
+      "horizon_semantics": "absolute_task_time_inclusive_samples",
+      "physical_inputs": {
+        "control_period_s": 0.01,
+        "frame": "tendon_path",
+        "lower": [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "phase": "pre_step",
+        "provenance": [
+          "/robot/structure/data/tendons",
+          "/task/timing/control_period_s"
+        ],
+        "signal": "tendon_tension",
+        "tendon_order": [
+          "tendon_0",
+          "tendon_1",
+          "tendon_2",
+          "tendon_3"
+        ],
+        "units": "N",
+        "upper": [
+          8.0,
+          8.0,
+          8.0,
+          8.0
+        ]
+      },
+      "required_physics": [],
+      "sample_period_s": 0.01,
+      "time_grid_s": [
+        0.0,
+        0.01,
+        0.02,
+        0.03,
+        0.04,
+        0.05,
+        0.06,
+        0.07,
+        0.08,
+        0.09,
+        0.1,
+        0.11,
+        0.12,
+        0.13,
+        0.14,
+        0.15,
+        0.16,
+        0.17,
+        0.18,
+        0.19,
+        0.2,
+        0.21,
+        0.22,
+        0.23,
+        0.24,
+        0.25,
+        0.26,
+        0.27,
+        0.28,
+        0.29,
+        0.3,
+        0.31,
+        0.32,
+        0.33,
+        0.34,
+        0.35000000000000003
+      ]
+    },
+    "worker_log": {
+      "artifact_id": "63be7e41e020bc00ee1c7926929730c6f0a0b9c0c3d83427c76eb5acfba8dc67",
+      "media_type": "application/json"
+    }
+  },
+  "summary": {
+    "reference": {
+      "artifact_id": "880bd35ed70b6bfd4c03f928fcfaa7bf85aa2f0aca58e345c6108e56bd2e39d7",
+      "media_type": "application/json"
+    },
+    "candidate": {
+      "artifact_id": "9b162aa76f10c6cf76dd12ca03bec8fbf7ac03235207d9354af3b54f11314ffa",
+      "media_type": "application/json"
+    },
+    "task_identity": null,
+    "operation": null,
+    "status": "execution_incomplete",
+    "conclusion": "inconclusive",
+    "scope_pointer": "/scoped_claim",
+    "coverage": "unchecked",
+    "margins": [],
+    "certificate_verified": null,
+    "numerical_s": 1.1027056998573244,
+    "evaluations": 3,
+    "detail_pointer": "",
+    "decision_relevance": {
+      "supported_facts": [
+        "No verified witness or exclusion certificate."
+      ],
+      "unresolved_questions": [
+        "Task expressibility does not resolve feasibility."
+      ],
+      "potential_discriminating_checks": [
+        "Inspect solver, operating point or another design hypothesis."
+      ],
+      "unsupported_inferences": [
+        "Global/physical feasibility, structural necessity or surrounding-region exclusion."
+      ]
+    },
+    "failure_pointer": ""
+  }
+}
