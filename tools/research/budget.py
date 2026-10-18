@@ -30,6 +30,8 @@ def science_fits(host):
     return bool(
         ('analysis' in capabilities and s.get('mathematical_evaluations',0)<b['mathematical_evaluations']) or
         ('nmpc' in capabilities and backend>=1 and s.get('nmpc_launches',0)<spec['nmpc_limits']['executions']) or
+        ('physical_replay' in capabilities and backend>=1 and s.get('physical_replay_launches',0)<
+            (spec.get('physical_replay_limit') if spec.get('physical_replay_limit') is not None else b['physical_launches'])) or
         ('rl' in capabilities and evaluations>0 and ((backend>=2 and
             s.get('admitted_training_stages',len(runs))<limits['training_stages']) or (backend>=1 and runs))) or
         (s.get('local_solves',0)<b['local_solves'] and any(host.store.artifact(r).get('status')=='evaluated' for r in s.get('results',[]))) or
@@ -125,7 +127,7 @@ def observe_pass(host, reference):
         from tools.research_tasks import task_adapter
         limits = task_adapter(host.store.artifact(view['candidate'])['configuration']).ranking_limits()
         result = host.store.artifact(reference)
-        if view['controller_route'] == 'nmpc':
+        if view['controller_route'] in ('nmpc','fixed_tension'):
             metrics = (result.get('acceptance') or {}).get('metrics', {})
             if any(not isinstance(metrics.get(k), (float, int)) or not math.isfinite(metrics[k]) or metrics[k] > limit for k, limit in limits.items()):
                 return

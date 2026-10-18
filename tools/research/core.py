@@ -33,7 +33,7 @@ def read_evidence(host, query):
     for part in q.pointer.strip('/').split('/') if q.pointer else []:
         part = part.replace('~1', '/').replace('~0', '~')
         value = value[int(part)] if isinstance(value, list) else value[part]
-    if plain(q.reference) in [*s.get('results', []),*s.get('rl_evaluations', []), *s.get('rl_training_summaries', [])]:
+    if plain(q.reference) in [*s.get('results', []),*s.get('physical_replays', []),*s.get('rl_evaluations', []), *s.get('rl_training_summaries', [])]:
         if q.pointer in ('','/acceptance','/episodes'):
             update(host,evaluation_reads=[*s.get('evaluation_reads',[]),plain(q.reference)])
         update(host, rl_evidence_reads=[*s.get('rl_evidence_reads', []), plain(q.reference)])
@@ -266,7 +266,7 @@ def packet(host):
                         for k,record in row['sorosim'].items()}) for row in v.get('checkpoints',[])],
                 charged_numerical_s=v.get('charged_numerical_s'))
                 for r in s.get('matched_state_results',[])],
-            physical_replays=[dict(reference=r,**{k:host.store.artifact(r).get(k) for k in ('status','candidate','source_reference','acceptance','comparison','charged_numerical_s')}) for r in s.get('physical_replays',[])],
+            physical_replays=[dict(reference=r,**result_view(host,r),confirmation=eligibility(host,r)) for r in s.get('physical_replays',[])],
             handoffs=[dict(reference=r,**host.store.artifact(r)) for r in s.get('handoffs',[])],
             rl=rl_packet(host) if enabled(s['spec'],'rl') else None,
             nmpc_admission=[dict(candidate=r,**nmpc_timing(host,r),remaining_phase_admission=capacity(host,1,candidate=r)) for r in s['candidates'].values() if host.store.artifact(r)['profile_identity']==s['profile']['identity']] if enabled(s['spec'],'nmpc') else None,

@@ -26,6 +26,30 @@ def execution_evidence(result):
             'solver_error_count','solver_failure_flags','unusable_plans','maximum_plan_violation')})
 
 
+def task_gap(result):
+    """Rank recorded physical metrics only; original acceptance owns validity."""
+    acceptance=result.get('acceptance') or {}
+    if 'independent_evaluation_executed' in result:
+        episodes=result.get('episodes',[])
+        pairs=(('terminal_position_error_m','terminal_position_limit_m'),
+            ('holding_max_position_error_m','position_limit_m'),('holding_max_speed_m_s','holding_speed_limit_m_s'))
+        gaps={key:max(0.,max(e[key] for e in episodes)/acceptance[limit]-1)
+            for key,limit in pairs if episodes and all(e.get(key) is not None for e in episodes) and acceptance.get(limit,0)>0}
+        return dict(normalized_gap=max(gaps.values()) if len(gaps)==3 else None,components=gaps,
+            valid_complete=bool(result['independent_evaluation_executed'] and episodes and all(
+                e['complete'] and e.get('holding_coverage_complete') and not e.get('numerical_failure') for e in episodes)),
+            accepted=bool(result.get('passed')),interpretation='Research ranking only; original independent acceptance unchanged')
+    components=acceptance.get('components',{})
+    ratios={name:max(0.,row['value']/row['limit']-1) for name,row in components.items()
+        if name in ('evaluator:task_bound','holding_position','holding_speed')
+        and isinstance(row.get('value'),(float,int)) and row.get('limit',0)>0}
+    valid=bool(result.get('status')=='evaluated' and all(components.get(k,{}).get('passed') is True
+        for k in ('evaluation_validity','execution_complete','holding_coverage','solver_errors','force_bounds')))
+    return dict(normalized_gap=max(ratios.values()) if len(ratios)==3 else None,
+        components=ratios,valid_complete=valid,accepted=bool(acceptance.get('accepted')),
+        interpretation='Research ranking only; invalid executions remain invalid regardless of gap')
+
+
 def search_feedback(host, reference):
     """Exact evidence links and a generate recipe, without new scientific work."""
     from tools.research.state import state
@@ -71,6 +95,12 @@ def solution_identity(host, result, candidate):
         if not policy_sha and result.get('role') == 'confirmation' and result.get('selected_execution'):
             policy_sha = host.store.artifact(result['selected_execution']).get('policy_sha256')
         controller = dict(route='rl', configuration=effective, policy_sha256=policy_sha)
+    elif result.get('source_reference'):
+        source=host.store.artifact(result['source_reference'])
+        from tools.research.physical_replay import binding
+        binding(candidate['configuration'],source['trajectory'])
+        controller=dict(route='fixed_tension',source=result['source_reference'],
+            sequence=source['trajectory'])
     else:
         from extensions.tendon_family.contracts import GVSTrajectoryParameters
         controller_configuration = science['policy']['controller']
@@ -193,6 +223,10 @@ def experiment_preflight(host, candidate_ref, route, *, source_ref=None, repeat=
         if comparison['relation'] in ('equivalent_repeat','unresolved_comparison'):
             matches.append(dict(study=study,reference=ref,previous_identity_sha256=digest(previous),
                 outcome=outcome,**comparison))
+    for ref in s.get('historical_experiments',[]):
+        imported=host.store.artifact(ref)
+        if imported['route']==route:
+            consider(imported['identity'],imported['evaluation'],imported['outcome'],imported['study'])
     for ref in [*s.get('results',[]),*s.get('physical_replays',[]),*s.get('rl_evaluations',[])]:
         row=host.store.artifact(ref)
         prior_route='rl' if row.get('independent_evaluation_executed') is not None else 'fixed_tension' if row.get('source_reference') else 'nmpc'
@@ -254,6 +288,30 @@ def experiment_preflight(host, candidate_ref, route, *, source_ref=None, repeat=
         admitted=bool(repeat or not repeats))
 
 
+def import_experiment(host, folder, reference, route):
+    """Register verified sealed science once; never add a fresh evaluation."""
+    from tools.research.numerics import archived
+    from tools.research.state import save, state, update
+    row=archived(folder,reference)
+    candidate=archived(folder,row['candidate'])
+    source=archived(folder,row['source_reference']) if route=='fixed_tension' else None
+    configuration=archived(folder,row['configuration']) if route=='rl' else None
+    for ref,value in ((row['candidate'],candidate),(reference,row)):
+        if save(host,value,'historical_experiment_bytes')!=ref:
+            raise ValueError('HISTORICAL_EXPERIMENT_IDENTITY_MISMATCH')
+    identity=experiment_identity(candidate,route,source=source,result=row,rl_configuration=configuration)
+    imported=save(host,dict(route=route,identity=identity,evaluation=plain(reference),
+        study=row.get('owning_study') or row.get('study') or row.get('evaluation_owner'),
+        outcome=row.get('acceptance') or dict(passed=row.get('passed')),
+        source_folder=str(folder),imported_historical_evidence=True,
+        ownership='sealed historical evidence; no fresh execution or charged allocation'),
+        'historical_experiment_identity')
+    current=state(host)
+    update(host,historical_experiments=list({r['artifact_id']:r for r in
+        [*current.get('historical_experiments',[]),imported]}.values()))
+    return imported
+
+
 def confirmation_progress(host, selected=None):
     """Retain all solution failures; only current-study launches satisfy fresh repetitions."""
     from tools.research.state import state, confirmation_count
@@ -307,11 +365,11 @@ def result_view(host, reference):
     episodes=r.get('episodes',[]) if rl else []
     complete=bool(r.get('independent_evaluation_executed') and episodes and all(e['complete'] for e in episodes)) if rl else r.get('status')=='evaluated'
     passed=bool(complete and (r.get('passed') if rl else (r.get('acceptance') or {}).get('accepted')))
-    controller=dict(route='rl',configuration=r['configuration'],checkpoint=r.get('checkpoint'),policy_sha256=r.get('policy_sha256')) if rl else dict(route='nmpc',configuration=c['scientific_configuration']['policy']['controller'])
+    controller=dict(route='rl',configuration=r['configuration'],checkpoint=r.get('checkpoint'),policy_sha256=r.get('policy_sha256')) if rl else dict(route='fixed_tension' if r.get('source_reference') else 'nmpc',configuration=c['scientific_configuration']['policy']['controller'])
     identity=solution_identity(host,r,c)
     owner=r.get('evaluation_owner') or r.get('study') or r.get('owning_study')
     s=state(host)
-    current_refs=[*s.get('results',[]),*s.get('rl_evaluations',[])]
+    current_refs=[*s.get('results',[]),*s.get('rl_evaluations',[]),*s.get('physical_replays',[])]
     from tools.research.design import final_fidelity_matches
     fidelity_ok=final_fidelity_matches(s['spec'],c)
     if s['spec'].get('fidelity_policy') and not rl:
@@ -348,7 +406,7 @@ def result_view(host, reference):
         for metric,limit in (('terminal_position_error_m','terminal_position_limit_m'),('holding_max_position_error_m','position_limit_m'),('holding_max_speed_m_s','holding_speed_limit_m_s')):
             if episode.get(metric) is not None and acceptance.get(limit) is not None and episode[metric]>acceptance[limit]:
                 failed_metrics.append(dict(metric=metric,value=episode[metric],threshold=acceptance[limit],time_s='not recorded in evaluation summary'))
-    return dict(failed_metrics=failed_metrics,**execution_evidence(r),
+    return dict(failed_metrics=failed_metrics,task_gap=task_gap(r),**execution_evidence(r),
         execution_timing=acceptance.get('timing'),failure_state_analysis=mathematical_context(host,r['candidate']),
         evaluation_evidence=dict(trajectory=r.get('trajectory') or (r.get('profile') or {}).get('motion'),reference=plain(reference)),candidate=r['candidate'],task=r.get('task',c['configuration']['task']),controller_route=controller['route'],controller=controller,
         mathematical_provenance=mechanics_context(host,r['candidate']),mathematical_evidence=mathematical_context(host,r['candidate']),metrics=metrics,complete=complete,passed=passed,
@@ -367,7 +425,7 @@ def eligibility(host, reference, *, revise_selection=False, selection=None):
     selection=(s['spec']['confirmation']['fresh_independent_repetitions']==0) if selection is None else selection
     ref=plain(reference)
     reasons=[]
-    refs=[*s['results'],*s.get('rl_evaluations',[]),*s.get('linked_selections',[])]
+    refs=[*s['results'],*s.get('rl_evaluations',[]),*s.get('physical_replays',[]),*s.get('linked_selections',[])]
     if ref not in refs:
         return dict(eligible=False,reasons=['not a current-study controller result'],required_field='selected_execution')
     r=host.store.artifact(ref)
@@ -437,7 +495,7 @@ def facts(host):
             available_controller_routes=['direct','residual'],
             frozen_task=s.get('rl_task'),closeout='Explicit evaluation evidence read and cited next-step decision; no second trial')
     progress=confirmation_progress(host)
-    options=[*s['results'],*s.get('rl_evaluations',[]),*s.get('linked_selections',[])]
+    options=[*s['results'],*s.get('rl_evaluations',[]),*s.get('physical_replays',[]),*s.get('linked_selections',[])]
     return dict(owning_study=host.run_id,
         physical_replays=[dict(reference=r,candidate=host.store.artifact(r).get('candidate'),
             acceptance=host.store.artifact(r).get('acceptance')) for r in s.get('physical_replays',[])],

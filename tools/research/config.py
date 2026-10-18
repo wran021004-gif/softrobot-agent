@@ -89,7 +89,12 @@ def resolve(path, profile=None, *, backend_profile=None):
         if initialization!='all_candidate_dofs_zero_v1':
             raise ValueError('EXPLICIT_CANDIDATE_ZERO_INITIALIZATION_REQUIRED')
         study.pop('start_mode')
+        scope=study.pop('topology_scope',{})
         study=patch(original,study)
+        if scope:
+            if set(scope)!={'segment_counts','tendon_counts'} or scope['segment_counts']!=[2] or scope['tendon_counts']!=[4]:
+                raise ValueError('VALIDATED_TWO_SEGMENT_FOUR_TENDON_SCOPE_REQUIRED')
+            family_space.update(executable_segment_counts=[2],executable_tendon_count_bounds=[4,4])
         study.update(start_mode='family_space',family_space=family_space,
             family_space_identity=digest(family_space),candidate_initialization=initialization)
         provenance['references'].update(defaults=dict(path=str(source),sha256=digest(original)),
@@ -176,6 +181,9 @@ def resolve(path, profile=None, *, backend_profile=None):
             raise ValueError('INVALID_REFERENCE_EDIT: ' + key)
         current[parts[-1]] = value
     b = study['budgets']
+    replay_limit=study.get('physical_replay_limit')
+    if replay_limit is not None and (type(replay_limit) is not int or not 0<=replay_limit<=b['physical_launches']):
+        raise ValueError('PHYSICAL_REPLAY_LIMIT_MUST_SHARE_BACKEND_CEILING')
     count_keys = ('provider_requests', 'protected_provider_requests', 'public_operations',
         'protected_public_operations', 'physical_launches', 'local_solves', 'offline_nlp',
         'bdf_replays', 'mathematical_evaluations')

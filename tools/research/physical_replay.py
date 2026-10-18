@@ -74,7 +74,8 @@ def calculate(request,folder):
 def dispatch(host,arguments,key):
     guard(host,True)
     s=state(host)
-    if s.get('physical_replay_launches',0)>=s['spec']['budgets']['physical_launches']:
+    replay_limit=s['spec'].get('physical_replay_limit')
+    if s.get('physical_replay_launches',0)>=(s['spec']['budgets']['physical_launches'] if replay_limit is None else replay_limit):
         raise ValueError('PHYSICAL_REPLAY_LAUNCH_BUDGET_EXHAUSTED')
     candidate=plain(arguments.candidate)
     cfg=verify_candidate(host,candidate)['configuration']
@@ -193,6 +194,7 @@ def recover(host):
         raw_sha256=hashlib.sha256(log_bytes).hexdigest(),text=log_bytes.decode('utf8',errors='replace')),
         'physical_playback_log')
     final=dict(status='evaluated' if complete else 'execution_incomplete',candidate=p['candidate'],
+        owning_study=host.run_id,execution_id=p['worker_request_id'],
         source_reference=p['source_reference'],raw_reference=raw_ref,evaluation_reference=evaluation_ref,
         acceptance=acceptance,comparison=comparison,profile=profile,boundary=boundary,
         charged_numerical_s=boundary['elapsed_s'],implementation=p['implementation'],log_reference=log_ref,
@@ -209,4 +211,6 @@ def recover(host):
         host.store.complete(row,dict(request_id=row['request_id'],execution_id=row['execution_id'],
             caller=host.actor,tool_id='research.physical_replay',tool_version='1.0.0',
             execution_status='completed',charged=zero()),final,elapsed=boundary['elapsed_s'],db=db)
+    from tools.research.budget import observe_pass
+    observe_pass(host,ref)
     return dict(reference=ref,**final)
