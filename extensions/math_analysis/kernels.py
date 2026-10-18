@@ -273,5 +273,48 @@ def bounded_endpoint(model,p,target, *, braking=False, warm_start=None):
         output_contract=dict(position=position.model_dump(mode='json'),tip_velocity=velocity.model_dump(mode='json')))
 
 
+def instantaneous_braking(model, *, speed_epsilon=1e-9):
+    """Box minimum of d(|v|^2/2)/dt at one fixed continuous state.
+
+    drift=f(x0,u0), B=df/du, Cv=d(J(q)qdot)/dx. Thus Cv*drift
+    includes Jdot*qdot; the absolute-input intercept subtracts Bv*u0.
+    This is an instantaneous diagnostic, never a finite-horizon certificate.
+    """
+    output=next(o for o in model.endpoint_outputs if o.name=='tip_velocity')
+    if (model.time_domain!='continuous' or output.frame!='world' or output.units!='m/s'
+            or np.any(np.asarray(output.D)!=0)
+            or any((s.name,s.units,s.frame)!=('tendon_tension','N','tendon_path') for s in model.input_definition)):
+        raise ValueError('CONTINUOUS_WORLD_VELOCITY_AND_DIRECT_TENSION_REQUIRED')
+    v=np.asarray(output.value0,dtype=float)
+    Cv=np.asarray(output.C,dtype=float);B=np.asarray(model.B,dtype=float)
+    f=np.asarray(model.drift,dtype=float);u0=np.asarray(model.u0,dtype=float)
+    lower=np.zeros_like(u0);upper=np.asarray(model.binding['tension_limits_n'],dtype=float)
+    if (upper.shape!=u0.shape or np.any(upper<=0) or np.any(u0<lower) or np.any(u0>upper)):
+        raise ValueError('LEGAL_OPERATING_TENSIONS_REQUIRED')
+    Bv=Cv@B;av=Cv@f-Bv@u0;coeff=v@Bv
+    # A zero coefficient retains the working input rather than inventing a change.
+    best=np.where(coeff>0,lower,np.where(coeff<0,upper,u0))
+    current_acc=av+Bv@u0;best_acc=av+Bv@best
+    passive=float(v@av);current=float(v@current_acc);minimum=float(v@best_acc)
+    allowance=float(32*np.finfo(float).eps*(1+abs(passive)+np.sum(np.abs(coeff*best))))
+    near_zero=bool(np.linalg.norm(v)<=speed_epsilon)
+    return dict(version='instantaneous_braking_v1',frame='world',
+        formula='vdot=av+Bv*u; av=Cv*drift-Bv*u0; Bv=Cv*B',
+        derivative_semantics='Cv includes derivative of J(q)*qdot with respect to q and qdot; drift is f(x0,u0)',
+        velocity_m_s=v.tolist(),speed_m_s=float(np.linalg.norm(v)),
+        passive_acceleration_m_s2=av.tolist(),input_acceleration_matrix_m_s2_per_n=Bv.tolist(),
+        passive_v_dot_a_m2_s3=passive,input_objective_coefficients=coeff.tolist(),
+        current_tension_n=u0.tolist(),optimal_tension_n=best.tolist(),
+        lower_n=lower.tolist(),upper_n=upper.tolist(),
+        current_acceleration_m_s2=current_acc.tolist(),optimal_acceleration_m_s2=best_acc.tolist(),
+        current_input_contribution_m2_s3=float(coeff@u0),optimal_input_contribution_m2_s3=float(coeff@best),
+        current_v_dot_a_m2_s3=current,minimum_v_dot_a_m2_s3=minimum,
+        current_speed_squared_derivative_m2_s3=2*current,optimal_speed_squared_derivative_m2_s3=2*minimum,
+        numerical_roundoff_allowance=allowance,near_zero_velocity=near_zero,
+        locally_decelerating_direction=bool(minimum < -allowance) if not near_zero else None,
+        scope='Fixed state and local model only. Nonnegative minimum does not establish structural/task infeasibility. Near zero speed this first derivative may be uninformative. Position, internal motion and finite-time holding require independent checks.',
+        regional_error_bound=None,task_acceptance='unmeasured')
+
+
 def versions():
     return dict(python=platform.python_version(),numpy=np.__version__,scipy=scipy.__version__)

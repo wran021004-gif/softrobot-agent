@@ -279,6 +279,8 @@ def dispatch(host, value, request_id, selected=None):
         if q.operation=='continue':
             config,task_ref=prepare_continuation(host,q)
     if q.operation in ('start','continue'):
+        from tools.research.budget import require_guidance
+        require_guidance(host,q.rationale)
         if config['budget']['active_seconds'] is not None:
             raise ValueError('SCIENTIFIC_TIMING_DISABLED')
         training_capacity(host,config['budget'])
@@ -330,9 +332,14 @@ def dispatch(host, value, request_id, selected=None):
     cost={**zero(),'tool_calls':1,'backend_solves':int(q.operation in ('start','continue','resume','evaluate') or q.replay)}
     def charge(db):
         current=host.store.session(host.run_id,db)['state']
+        if current['spec'].get('reserve_rl_evaluation') and q.operation in ('start','continue','resume','evaluate'):
+            from tools.research.budget import reserve_evaluation
+            reserve_evaluation(host,current,db,training=q.operation in ('start','continue'),
+                evaluation_run=q.run_id if q.operation=='evaluate' else None)
         if q.operation in ('start','continue'):
             from tools.research.budget import admit_stage
             admit_stage(current)
+            if current['spec'].get('reserve_rl_evaluation'):stage_entry['evaluation_reserved']=True
             current.setdefault('rl_runs',{})[stage_id]=stage_entry
         if q.operation in ('start','continue','resume','evaluate') or q.replay:
             state_api.charge_start(current)

@@ -2,6 +2,35 @@
 from tools.platform_store import plain
 
 
+def backend_capacity(host, db=None, *, evaluation_run=None):
+    """Protect each newly admitted PPO stage's evaluation in the shared ledger."""
+    s=host.store.session(host.run_id,db)['state']
+    held=sum(bool(e.get('evaluation_reserved')) for name,e in s.get('rl_runs',{}).items() if name!=evaluation_run)
+    return max(0,host.store.remaining(db=db)['remaining']['backend_solves']-held)
+
+
+def reserve_evaluation(host, current, db, *, training=False, evaluation_run=None):
+    """Invoked inside the existing operation reservation transaction."""
+    if not current['spec'].get('reserve_rl_evaluation'):return
+    needed=2 if training else 1
+    if backend_capacity(host,db,evaluation_run=evaluation_run)<needed:
+        raise ValueError('TRAINING_AND_RESERVED_EVALUATION_MUST_FIT_ATOMICALLY')
+    entries=current.get('rl_runs',{}).values()
+    if training and sum(e['evaluations']+bool(e.get('evaluation_reserved')) for e in entries)>=current['spec']['rl_limits']['evaluation_episodes']:
+        raise ValueError('ALL_RL_EVALUATION_CAPACITY_USED_OR_RESERVED')
+    if evaluation_run:current['rl_runs'][evaluation_run]['evaluation_reserved']=False
+
+
+def require_guidance(host, hypothesis):
+    from tools.research.state import state
+    s=state(host)
+    if not s['spec'].get('require_task_guidance') or s.get('charged_starts',0):return
+    reads=s.get('guidance_reads',[])
+    if (not hypothesis.strip() or s.get('holding_diagnostic_reference') not in reads
+            or not any(r in reads for r in s.get('task_math_references',[]))):
+        raise ValueError('FIRST_EXPERIMENT_REQUIRES_PUBLIC_HISTORY_AND_TASK_MATH_READS_AND_FALSIFIABLE_HYPOTHESIS')
+
+
 def protected(host):
     from tools.research.state import state
     s = state(host)
@@ -23,7 +52,7 @@ def science_fits(host):
     capabilities=set(spec.get('capabilities',[]))
     b=spec['budgets']
     remaining=host.store.remaining()['remaining']
-    backend=remaining['backend_solves']
+    backend=backend_capacity(host)
     runs=s.get('rl_runs',{})
     limits=spec['rl_limits']
     evaluations=limits['evaluation_episodes']-sum(e['evaluations'] for e in runs.values())
@@ -83,7 +112,7 @@ def capacity(host, requested=1, confirmation=False, *, root_operation=False, can
     reserve = 0 if confirmation else repetition_reserve(s)
     slots = s['spec']['nmpc_limits']['executions'] - s.get('nmpc_launches', 0)
     operations = max(0, remaining['tool_calls'] - (0 if confirmation else s['spec']['budgets'].get('protected_public_operations', 0)))
-    fit = max(0, min(requested, slots-reserve, remaining['backend_solves']-reserve, (operations-int(root_operation))//3))
+    fit = max(0, min(requested, slots-reserve, backend_capacity(host)-reserve, (operations-int(root_operation))//3))
     return dict(requested=requested, admitted=fit, internal_launches=fit,
         numerical_reservation_s=0., confirmation_launch_reserve=reserve,
         per_execution_s=allowance(s), remaining_numerical_s=None, remaining_activity_s=None)

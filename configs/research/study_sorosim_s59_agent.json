@@ -1,0 +1,64 @@
+{
+  "defaults": "family_study_defaults.json",
+  "start_mode": "family_space",
+  "family_space": "family_space_v2.json",
+  "candidate_initialization": "all_candidate_dofs_zero_v1",
+  "base_commit": "3d54df32fe0f9e66f4dd162ccede13643b3fb295",
+  "mode": "formal_research",
+  "control": "control_sorosim_s56_braking.json",
+  "topology_scope": {
+    "segment_counts": [
+      2
+    ],
+    "tendon_counts": [
+      4
+    ]
+  },
+  "capabilities": [
+    "analysis",
+    "mathematics",
+    "replay",
+    "physical_replay",
+    "nmpc",
+    "rl"
+  ],
+  "allowed_plan_actions": [
+    "generate",
+    "execute",
+    "mechanics",
+    "replay",
+    "physical_replay",
+    "refine",
+    "diagnose",
+    "select",
+    "stop"
+  ],
+  "budgets": {
+    "provider_requests": 48,
+    "protected_provider_requests": 6,
+    "public_operations": 120,
+    "protected_public_operations": 12,
+    "physical_launches": 8,
+    "mathematical_evaluations": 20,
+    "offline_nlp": 2,
+    "bdf_replays": 3
+  },
+  "nmpc_limits": {
+    "executions": 8
+  },
+  "physical_replay_limit": 8,
+  "rl_limits": {
+    "training_stages": 2,
+    "actions_per_trial": 65536,
+    "training_actions": 131072,
+    "evaluation_episodes": 2,
+    "diagnostic_replays": 0,
+    "diagnostic_physics_steps": 0
+  },
+  "study_id": "sorosim-s59-agent-20261018",
+  "authorization": "User-authorized S5.9 cumulative assignment: 48 provider sends (6 closeout), 120 public operations (12 closeout), 20 candidate/state mathematics, 2 full mathematical NLP, 3 mathematical trajectory replays; 8 shared complete backend starts across NMPC/fixed replay/PPO/evaluation; 2 PPO stages, 65536 actions/stage, 131072 aggregate actions, 2 independent evaluations. One separate paired probe at most 80 physics steps, unavailable without a complete snapshot. Include preparation/failures; never reset. No push, hardware, unknown retries or old-study reopening.",
+  "evidence_destination": "evidence/sorosim_s59/study",
+  "execution_instructions": "Find a feasible robot/control for the ORIGINAL frozen 0.35 s MuJoCo task with 35 updates, .0005 s physics, inclusive .30-.35 holding, <=.010 m terminal/holding error and <=.020 m/s holding speed, four [0,8] N tendons. Follow evidence freely using the existing tools; choose structure, effective weights, bounded mathematics, NMPC, direct/residual PPO or justified STOP. No preset route. Counts are ceilings, not a checklist; do not pursue exhaustion. S5.8 four fresh physical evaluations all passed positions and failed speed; both NMPC completed 35 valid plans. It closed by engineering provider budget, model_stop=false, with zero mathematical analysis. Do not claim mathematics failed. Ideal tension bypasses length-servo gain, motor stroke and motor speed. Before FIRST expensive experiment, use evidence_read on the S5.9 historical holding diagnostic and at least one S5.9 task-mathematics summary in stage_context. State a brief falsifiable hypothesis, supporting/counter observations and effective change in the Plan or RL rationale. Prepared Design B is not your choice. Preparation math is charged: one projected saved-state instantaneous braking calculation and two fixed-input static IFT comparisons (length and Young modulus), each with baseline and +/- equilibrium solves. Inspect their actual status and scope. instantaneous_braking_v1 minimizes v dot acceleration at ONE state, includes passive drift and Jdot*qdot, and is not old finite-horizon braking, finite-time holding, a physical rank guarantee, or structural infeasibility. Projected GVS state is not exact MuJoCo integration state. The short probe could not restore full snapshot; it performed ZERO steps and must not be retried with a prefix. Historical signed velocity reversals and displacement do not identify a causal mode or frequency. Static fixed-input geometry sensitivities are not adapted control or a recommendation to soften; insufficient directional evidence means unknown. Rebind changed candidates to their own analyses and adapt their reference/control. At most two structural variables in this study: segment_0 length_m and young_pa; keep other geometry fixed to prepared Design B. Routing would require discrete candidates, not an analytic derivative, and is outside these two selected variables. Holding and terminal speed weights in [0,1] are effective. Copy exact candidate parameters and CURRENT family_space_identity. Existing S5.8 stage-one best PPO checkpoint is an optional continuation source, not a required route; preserve robot/reference/reward/initialization to test optimizer changes, document learning rate/KL and continuation cost. Do not change reward/structure/steps simultaneously then claim single-factor effects. Read sealed historical experiment index; labels/inactive fields are not novelty. Training must reserve its independent evaluation atomically; all routes share 8 backend starts, NMPC has no separate two-run limit. No wall-clock forcing of solver return; finite iterations/actions/steps remain. Unknown requests are not resent, sealed STOP is never reopened. After ANY fresh complete passing independent physical result, read and select its EXACT reference and STOP immediately with zero confirmation. If no solution, a reasoned STOP is valid; strict STOP requires exact supporting_evidence for ALL fresh experiment AND preparation analysis results, plus training summary/public evaluation reads where applicable. Use the exact missing references returned on rejection. Report numerical validity, Agent contribution and physical success separately, no global certificate, hardware, repeatability, real-time or non-LLM superiority claims.",
+  "reserve_rl_evaluation": true,
+  "require_task_guidance": true
+}

@@ -77,7 +77,8 @@ def calculate(configuration,binding,query,exact_point=None,*,checkpoint=None,des
             operating_point=exact_point or dict(name=q.operating_point),task_acceptance='unmeasured',
             proxy_values={},internal_calculations=[],limitations=LIMITATIONS),requirements,applicability,q)
     envelope=plain(calculate_candidate_configuration(inp,binding,p,binding['configuration'],
-        operating_points=[q.operating_point],exact_point=exact_point,**({'checkpoint':checkpoint,'design_context':design_context} if sorosim else {})))
+        operating_points=[q.operating_point],exact_point=exact_point,**({'checkpoint':checkpoint,'design_context':design_context,
+            'check_instantaneous_braking':q.operation=='instantaneous_braking_v1'} if sorosim else {})))
     if q.scoring_window_s is not None and q.scoring_window_s not in p.windows_s:
         raise ValueError('SCORING_WINDOW_NOT_IN_PROTOCOL')
     rows=envelope['records'][1:]
@@ -95,6 +96,8 @@ def calculate(configuration,binding,query,exact_point=None,*,checkpoint=None,des
     result['score_semantics']=score_semantics(q,binding,p,row)
     if q.operation in ('input_sensitivity','design_sensitivity'):
         raw=row.get('raw_facts',{});sensitivity=raw.get(q.operation)
+        for i,solve in enumerate((sensitivity or {}).get('perturbed_equilibria',[])):
+            internal.append(dict(purpose='perturbed_equilibrium_verification',perturbation_index=i,**solve))
         result.update(raw_facts=raw,research_interpretations=[],sensitivity=sensitivity,
             sensitivity_protocol='sorosim_static_ift_v1')
         if row.get('model'):result['model']=row['model']
@@ -132,7 +135,15 @@ def calculate(configuration,binding,query,exact_point=None,*,checkpoint=None,des
     if not row.get('model'):
         result.update(status='unavailable',unavailable_reason=row.get('reason','Operating point unavailable'))
         return scoped_result(result,requirements,applicability,q)
-    if q.operation in ('linearization','controllability'):
+    if q.operation=='instantaneous_braking_v1':
+        from extensions.math_analysis.kernels import instantaneous_braking
+        result['instantaneous_braking']=instantaneous_braking(model)
+        result['instantaneous_braking']['numerical_check']=row.get('raw_facts',{}).get('acceleration_check')
+        if sorosim and not (result['instantaneous_braking']['numerical_check'] or {}).get('passed'):
+            result.update(status='unavailable',unavailable_reason='INSTANTANEOUS_ACCELERATION_NUMERICAL_CHECK_FAILED')
+        result['units']=dict(velocity='m/s',acceleration='m/s^2',tension='N',objective='m^2/s^3')
+        internal.append(dict(purpose='fixed_state_box_minimum_and_acceleration_semantics',solver='componentwise box minimum; MATLAB centered velocity directional differences at working and bounded test input',nonlinear_dynamics_evaluations=6))
+    elif q.operation in ('linearization','controllability'):
         remaining=model.operating_point.get('remaining_task_s')
         if q.operating_point=='saved_state' and remaining is not None:
             if q.scoring_window_s>remaining+p.horizon_alignment_atol_s:
@@ -201,7 +212,10 @@ def scoped_result(result, requirements, applicability, query):
         conclusion, verification, pointer = 'not_applicable', 'not_performed', '/analysis_applicability'
         interpretation = '; '.join(applicability['reasons'])
     elif result['status'] == 'computed':
-        if result.get('sensitivity',{}).get('verification',{}).get('passed'):
+        if result.get('instantaneous_braking'):
+            conclusion,verification,pointer='diagnostic','fixed_state_box_minimum','/instantaneous_braking'
+            interpretation=result['instantaneous_braking']['scope']
+        elif result.get('sensitivity',{}).get('verification',{}).get('passed'):
             conclusion,verification,pointer='diagnostic','perturbed_equilibria_checked','/sensitivity'
             interpretation='Local implicit-function sensitivity in the fixed-topology physical model; not a globally improving direction or task feasibility.'
         elif trajectory:
@@ -273,8 +287,9 @@ def dispatch(host,query,key,*,guard,origin='model'):
     protocol=plain(q.protocol)
     if protocol!=s['spec']['analysis_protocol'] or (q.scoring_window_s is not None and q.scoring_window_s not in protocol['windows_s']):
         raise ValueError('ANALYSIS_REQUIRES_DECLARED_FROZEN_PROTOCOL')
-    fit=admission(host,engineering=origin=='engineering_preflight')
-    if not fit['admitted']:
+    count=3 if q.operation=='design_sensitivity' else 1
+    fit=admission(host,requested=count,engineering=origin=='engineering_preflight')
+    if fit['admitted']<count:
         raise ValueError('ANALYSIS_AND_CONFIRMATION_BUDGET_CANNOT_FIT')
     cfg=c['configuration']
     design=cfg['robot']['structure']['data']
@@ -335,9 +350,9 @@ def dispatch(host,query,key,*,guard,origin='model'):
     reserve=fit['reservation_s']
     def charge(db):
         current=host.store.session(host.run_id,db)['state']
-        if current.get('success_gate') or current.get('mathematical_evaluations',0)>=current['spec']['budgets']['mathematical_evaluations']:
+        if current.get('success_gate') or current.get('mathematical_evaluations',0)+count>current['spec']['budgets']['mathematical_evaluations']:
             raise ValueError('MATHEMATICAL_COUNT_OR_SUCCESS_GATE')
-        current['mathematical_evaluations']=current.get('mathematical_evaluations',0)+1
+        current['mathematical_evaluations']=current.get('mathematical_evaluations',0)+count
         current['numerical_reserved_s']+=reserve
         host.store.update_state(db,host.run_id,current)
     row,_=host.store.reserve(host.run_id,request_id,identity,host.actor,{**zero(),'wall_s':reserve},kind='candidate_analysis',guard=charge)
@@ -348,7 +363,7 @@ def dispatch(host,query,key,*,guard,origin='model'):
     if sensitivity_context:request['design_context']=sensitivity_context
     atomic_json(folder/'request.json',request)
     pending=dict(kind='candidate_analysis',worker_request_id=request_id,reserved_s=reserve,folder=str(folder),
-        request=plain(q),origin=origin,implementation=s['freeze'],started_unix=time.time())
+        request=plain(q),origin=origin,implementation=s['freeze'],started_unix=time.time(),analysis_evaluations=count)
     update(host,pending=pending)
     from tools.service_execution import _run_contained
     from sys import executable
@@ -383,7 +398,7 @@ def recover(host):
                 request['analysis_applicability'],AnalysisRequest.model_validate(request['query']))
     value.update(candidate=p['request']['candidate'],requested_operation=p['request'],operation_key=p['worker_request_id'],
         owning_study=host.run_id,origin=p['origin'],implementation=p['implementation'],charged_numerical_s=elapsed,
-        charged_analysis_evaluations=1,boundary=boundary,worker_log=save(host,dict(text=(folder/'worker.log').read_text(encoding='utf8',errors='replace')),'analysis_worker_log'))
+        charged_analysis_evaluations=p.get('analysis_evaluations',1),boundary=boundary,worker_log=save(host,dict(text=(folder/'worker.log').read_text(encoding='utf8',errors='replace')),'analysis_worker_log'))
     if value['status'] not in ('computed','unavailable','not_applicable'):
         value['internal_calculations']=dict(status='partial_or_unavailable',reason='Worker failed before complete calculation records were published; reservation and analysis attempt remain charged')
     ref=save(host,value,'candidate_analysis_result')
@@ -397,7 +412,7 @@ def recover(host):
         current['pending']=None
         current.setdefault('analysis_results',[]).append(ref)
         current.setdefault('analysis_costs',[]).append(dict(reference=ref,origin=p['origin'],numerical_s=elapsed,
-            mathematical_evaluations=1,internal_calculations=value.get('internal_calculations',[])))
+            mathematical_evaluations=p.get('analysis_evaluations',1),internal_calculations=value.get('internal_calculations',[])))
         host.store.update_state(db,host.run_id,current)
         host.store.complete(row,dict(request_id=row['request_id'],execution_id=row['execution_id'],caller=host.actor,
             tool_id='research.candidate_analysis',tool_version='1.0.0',execution_status='completed',charged=zero()),value,elapsed=elapsed,db=db)
@@ -417,6 +432,7 @@ def compact_result(value, reference):
             witness_pointer='/trajectory/replay' if trajectory.get('replay',{}).get('passed') else None,
             certificate_pointer='/trajectory/certificate' if cert else None,
             certificate={k:cert.get(k) for k in ('constraint_id','sample_index','kind','margin')} if cert else None))
+    if value.get('instantaneous_braking'):summary['instantaneous_braking']=value['instantaneous_braking']
     return summary
 
 
@@ -455,7 +471,7 @@ def decision_result(value, reference):
     applicability=value.get('analysis_applicability') or {}
     coverage='full' if applicability.get('full_task_supported') else 'partial' if any(
         c.get('analyzed_indices') for c in applicability.get('constraint_coverage',[])) else 'unchecked'
-    return dict(reference=reference,candidate=value.get('candidate'),task_identity=(value.get('binding') or {}).get('task_identity'),
+    result=dict(reference=reference,candidate=value.get('candidate'),task_identity=(value.get('binding') or {}).get('task_identity'),
         operation=value.get('operation'),status=value.get('status'),conclusion=conclusion,
         scope_pointer='/scoped_claim',coverage=coverage,
         margins=rows[:1],certificate_verified=claim.get('verification_status') if conclusion=='model_infeasibility_certificate' else None,
@@ -464,6 +480,8 @@ def decision_result(value, reference):
         decision_relevance=dict(supported_facts=[fact],unresolved_questions=[unresolved],potential_discriminating_checks=[check],
             unsupported_inferences=['Global/physical feasibility, structural necessity or surrounding-region exclusion.']),
         failure_pointer='' if value.get('status') not in ('computed','not_applicable') else None)
+    if value.get('instantaneous_braking'):result['instantaneous_braking']=value['instantaneous_braking']
+    return result
 
 
 def score_semantics(query,binding,protocol,row):

@@ -49,7 +49,7 @@ def linear_model(inp,binding,p,point,raw,spec,scales):
 
 
 def calculate_candidate_configuration(inp,binding,p,protocol_ref,*,registry=None,operating_points=None,
-                                      exact_point=None,session=None,checkpoint=None,design_context=None):
+                                      exact_point=None,session=None,checkpoint=None,design_context=None,check_instantaneous_braking=False):
     from .model_applicability import assess_model_uses
     spec,numerical,scales=prepare(inp,p)
     boundary=_configuration_boundary(inp,binding,'model.sorosim_gvs')
@@ -78,6 +78,7 @@ def calculate_candidate_configuration(inp,binding,p,protocol_ref,*,registry=None
                 target=(start+target)/2
             payload=dict(operation=operation,x=x,u=u,protocol=plain(p),state_scales=scales,target=target.tolist(),
                 position_tolerance_m=inp.task.evaluator.parameters.data['tolerance_m'])
+            if check_instantaneous_braking:payload['check_instantaneous_braking']=True
             if design_context:
                 payload.update(design_context)
             raw=engine.evaluate('analysis',payload)

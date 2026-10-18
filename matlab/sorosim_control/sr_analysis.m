@@ -58,6 +58,26 @@ out.B=[zeros(n,m);-d.mass_matrix\d.Ru];out.drift=[x(n+1:end);d.qdd];
 out.position=world(d.tip_position);out.velocity=R*d.tip_velocity;
 out.C=[R*d.tip_position_q,zeros(3,n)];out.D=zeros(3,m);
 out.Cv=[R*d.tip_velocity_q,R*d.tip_velocity_qd];out.Dv=zeros(3,m);
+% Independent directional velocity derivative along full passive+input flow.
+% Both halves of Cv participate, including Jdot(q)*qdot at nonzero velocity.
+if isfield(r,'check_instantaneous_braking') && r.check_instantaneous_braking
+    checks=cell(2,1);test_inputs=[u,limits-u];
+    for j=1:2
+        ut=test_inputs(:,j);
+        flow=sr_dynamics(model,x(1:n),x(n+1:end),ut,[],[],false);
+        f=[x(n+1:end);flow.qdd];h=p.derivative_step/max(1,norm(f./r.state_scales(:),inf));
+        xp=x+h*f;xm=x-h*f;
+        vp=sr_dynamics(model,xp(1:n),xp(n+1:end),ut,[],[],false);
+        vm=sr_dynamics(model,xm(1:n),xm(n+1:end),ut,[],[],false);
+        actual=R*(vp.tip_velocity-vm.tip_velocity)/(2*h);
+        predicted=out.Cv*out.drift+out.Cv*out.B*(ut-u);
+        checks{j}=struct('input_n',ut,'actual_m_s2',actual,'predicted_m_s2',predicted, ...
+            'step_s',h,'verification',compare(actual,predicted,repmat(p.output_scale_m/p.duration_s^2,3,1)));
+    end
+    out.acceleration_check=struct('cases',{checks},'nonzero_velocity',norm(out.velocity)>1e-9, ...
+        'passed',checks{1}.verification.passed && checks{2}.verification.passed, ...
+        'scope','Pointwise numerical consistency; no regional or global error bound.');
+end
 out.derivative_check=check_derivative(x,u,out);
 if ~out.derivative_check.passed,out.status='unavailable';out.failure_code='DERIVATIVE_CHECK_FAILED';end
 st=sr_derivatives(model,x(1:n),zeros(n,1),u,zeros(n,1));

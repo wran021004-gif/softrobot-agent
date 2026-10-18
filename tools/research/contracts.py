@@ -128,7 +128,7 @@ class StaticDesignSensitivity(Contract):
 
 class AnalysisRequest(Contract):
     candidate: EvidenceRef
-    operation: Literal['equilibrium','linearization','controllability','endpoint','braking','trajectory_feasibility','input_sensitivity','design_sensitivity']
+    operation: Literal['equilibrium','linearization','controllability','endpoint','braking','instantaneous_braking_v1','trajectory_feasibility','input_sensitivity','design_sensitivity']
     operating_point: Literal['standardized_initial_pretension','controller_start_input','target_equilibrium','halfway_waypoint','saved_state','fixed_input_equilibrium'] = 'halfway_waypoint'
     design_sensitivity: StaticDesignSensitivity | None = None
     saved_state: EvidenceRef | None = None
@@ -139,6 +139,8 @@ class AnalysisRequest(Contract):
 
     @model_validator(mode='after')
     def exact_state(self):
+        if self.operation=='instantaneous_braking_v1' and self.operating_point!='saved_state':
+            raise ValueError('INSTANTANEOUS_BRAKING_REQUIRES_EXACT_SAVED_STATE')
         if (self.operation=='design_sensitivity')!=(self.design_sensitivity is not None):
             raise ValueError('DESIGN_SENSITIVITY_REQUIRES_PAIRED_CANDIDATES')
         if self.operation in ('input_sensitivity','design_sensitivity') and self.operating_point!='fixed_input_equilibrium':

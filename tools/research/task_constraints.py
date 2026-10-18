@@ -63,7 +63,9 @@ def check_analysis_applicability(requirements, query, assessment, model=None, ex
             reasons.append(str(exc))
     remaining = point.get('remaining_task_s', requirements.duration_s)
     horizon = query.scoring_window_s if query.operation in ('linearization','controllability') else remaining
-    if query.operation != 'equilibrium' and not trajectory and (horizon is None or horizon <= 0 or horizon > remaining+p.horizon_alignment_atol_s
+    instantaneous=query.operation=='instantaneous_braking_v1'
+    if instantaneous:horizon=0.
+    if query.operation != 'equilibrium' and not trajectory and not instantaneous and (horizon is None or horizon <= 0 or horizon > remaining+p.horizon_alignment_atol_s
             or abs(round(horizon/p.period_s)*p.period_s-horizon) > p.horizon_alignment_atol_s):
         reasons.append('Positive aligned horizon within actual remaining task time is required.')
     if model is not None:
@@ -84,6 +86,8 @@ def check_analysis_applicability(requirements, query, assessment, model=None, ex
             reason = 'Unsupported requirement retained verbatim; no compatible mathematical tool.'
         elif outputs.get(c.signal.name) != signature or c.signal.phase != 'post_step':
             reason = 'Output identity, units, frame, dimension, or sampling phase is not exposed by this analysis.'
+        elif instantaneous:
+            status,reason='diagnostic','Instantaneous speed derivative only; no frozen task samples verified.'
         elif query.operation in ('linearization','controllability','equilibrium','input_sensitivity','design_sensitivity'):
             if c.signal.name == 'tip_position' and c.kind == 'norm_bound':
                 status, reason = 'diagnostic', 'Local position authority/static construction only; no sampled constraint verification.'

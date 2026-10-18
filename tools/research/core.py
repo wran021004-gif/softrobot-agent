@@ -33,6 +33,8 @@ def read_evidence(host, query):
     for part in q.pointer.strip('/').split('/') if q.pointer else []:
         part = part.replace('~1', '/').replace('~0', '~')
         value = value[int(part)] if isinstance(value, list) else value[part]
+    if not q.pointer and plain(q.reference) in [s.get('holding_diagnostic_reference'),*s.get('task_math_references',[])]:
+        update(host,guidance_reads=[*s.get('guidance_reads',[]),plain(q.reference)])
     if plain(q.reference) in [*s.get('results', []),*s.get('physical_replays', []),*s.get('rl_evaluations', []), *s.get('rl_training_summaries', [])]:
         if q.pointer in ('','/acceptance','/episodes'):
             update(host,evaluation_reads=[*s.get('evaluation_reads',[]),plain(q.reference)])
@@ -324,7 +326,12 @@ def dispatch(host, value, request_id, origin='model'):
         if any(e.get('status',{}).get('worker_alive',True) for e in s['rl_runs'].values()):
             raise ValueError('RL_STOP_REQUIRES_TERMINAL_STATUS_QUERY')
     scientific_preflight=None
+    if plan.action in ('mechanics','replay','refine'):
+        from tools.research.budget import require_guidance
+        require_guidance(host,plan.hypothesis)
     if plan.action in ('execute','physical_replay'):
+        from tools.research.budget import require_guidance
+        require_guidance(host,plan.hypothesis)
         from tools.research.feedback import experiment_preflight
         from tools.research.design import verify_candidate
         candidate=plan.candidate if plan.action=='execute' else plan.physical_replay.candidate

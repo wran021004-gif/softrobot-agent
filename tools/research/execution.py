@@ -87,6 +87,8 @@ def execute(host, candidate_ref, operation_key, *, role='development', selected=
         profile_identity=s['profile']['identity'],admission=admission,reserved_s=admission['numerical_reservation_s'],timeout_s=admission['per_execution_s'])
     with host.store.transaction() as db:
         current=host.store.session(host.run_id,db)['state']
+        from tools.research.budget import backend_capacity
+        if backend_capacity(host,db)<1:raise ValueError('BACKEND_CAPACITY_PROTECTS_RESERVED_RL_EVALUATIONS')
         charge_start(current)
         current.update(pending=pending,numerical_reserved_s=current['numerical_reserved_s']+pending['reserved_s'],nmpc_launches=current.get('nmpc_launches',0)+1)
         host.store.update_state(db,host.run_id,current)
