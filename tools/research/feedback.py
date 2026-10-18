@@ -116,6 +116,13 @@ def solution_identity(host, result, candidate):
 def experiment_identity(candidate, route, *, source=None, result=None, environment=None,
                         rl_configuration=None, policy_sha=None):
     """Effective experiment fields, excluding Store references and study labels."""
+    def canonical(value):
+        # Fingerprints only: discard machine-roundoff packaging, never alter
+        # candidate bytes, solver inputs, ordered commands or task acceptance.
+        if isinstance(value,float):return float(format(value,'.12g')) or 0.0
+        if isinstance(value,dict):return {key:canonical(item) for key,item in value.items()}
+        if isinstance(value,list):return [canonical(item) for item in value]
+        return value
     from schemas.platform import SessionInput
     from extensions.tendon_family.backends import physics_for
     from extensions.tendon_family.scene import assemble
@@ -127,7 +134,10 @@ def experiment_identity(candidate, route, *, source=None, result=None, environme
     inp=SessionInput.model_validate(candidate['configuration'])
     physics=physics_for(inp)
     scene=assemble(inp,physics)
-    effective=deepcopy(physics)
+    # Compile canonical source numbers for the fingerprint, so cancellation in
+    # derived inertia tensors cannot turn one-ULP input aliases into new science.
+    # The actual scene above still validates the exact original binding.
+    effective=physics_for(SessionInput.model_validate(canonical(candidate['configuration'])))
     for key in ('identity','source_identity','design_identity'):
         effective.pop(key,None)
     if scene['control']['tension_execution_mode']=='ideal_tension':
@@ -144,8 +154,8 @@ def experiment_identity(candidate, route, *, source=None, result=None, environme
         'duration_s','timestep_s','control_period_s','sample_period_s','observation_phase')}
     physical_scene['tension_execution_mode']=scene['control']['tension_execution_mode']
     physical=dict(robot=science['robot'],backend=policy['backend'],
-        discretization=policy['discretization'],compiled_physics_identity=digest(effective),
-        compiled_scene_identity=digest(physical_scene))
+        discretization=policy['discretization'],compiled_physics_identity=digest(canonical(effective)),
+        compiled_scene_identity=digest(canonical(physical_scene)))
     task=dict(task=science['task'],seed=science['seed'])
     if route=='rl':
         config=rl_configuration or {}
@@ -184,8 +194,9 @@ def experiment_identity(candidate, route, *, source=None, result=None, environme
             missing.append('runtime.numerical_environment')
     if runtime['profile_identity'] is None:
         missing.append('runtime.profile_identity')
-    return dict(identity_version='effective_experiment_v2',physical=physical,task=task,controller=controller,action=action,
-        runtime=runtime,missing_effective_fields=missing)
+    return canonical(dict(identity_version='effective_experiment_v3',identity_precision_significant_digits=12,
+        physical=physical,task=task,controller=controller,action=action,
+        runtime=runtime,missing_effective_fields=missing))
 
 
 def compare_experiments(proposed, previous):

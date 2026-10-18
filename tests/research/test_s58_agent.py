@@ -65,6 +65,18 @@ class S58AdmissionTests(unittest.TestCase):
         self.assertEqual(feedback.compare_experiments(first,old)['relation'],'unresolved_comparison')
         self.assertEqual(self.host.store.remaining()['used']['backend_solves'],0)
 
+    def test_generated_section_angle_roundoff_is_not_new_morphology(self):
+        import math
+        request=dict(version='serial_family_generation_v2',family_space_identity=self.spec['family_space_identity'],segment_count=2,tendon_count=4)
+        original=self.generate(request);c=self.host.store.artifact(original)
+        part=next(p for p in c['configuration']['robot']['structure']['data']['components'] if p['id']=='segment_1')
+        sections=[deepcopy(v['section']) for v in part['sections']]
+        sections[-1]['angle_rad']=math.nextafter(sections[-1]['angle_rad'],float('inf'))
+        request['segments']={'1':{'sections':sections}}
+        changed=self.generate(request)
+        identify=lambda ref:feedback.experiment_identity(self.host.store.artifact(ref),'nmpc',environment=self.spec['numerical_environment'])
+        self.assertEqual(feedback.compare_experiments(identify(original),identify(changed))['relation'],'equivalent_repeat')
+
     def test_stop_error_names_exact_missing_evidence_without_supplying_it(self):
         candidate=self.generate();ref=self.result(candidate)
         with patch.object(core,'guard'),self.assertRaisesRegex(ValueError,ref['artifact_id']):
