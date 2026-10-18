@@ -125,10 +125,27 @@ def experiment_identity(candidate, route, *, source=None, result=None, environme
     design.pop('metadata',None)
     policy=science['policy']
     inp=SessionInput.model_validate(candidate['configuration'])
-    scene=assemble(inp,physics_for(inp))
+    physics=physics_for(inp)
+    scene=assemble(inp,physics)
+    effective=deepcopy(physics)
+    for key in ('identity','source_identity','design_identity'):
+        effective.pop(key,None)
+    if scene['control']['tension_execution_mode']=='ideal_tension':
+        # Direct tendon forces bypass motor kinematics and the length servo.
+        design.pop('actuators',None)
+        for tendon in design['tendons']:
+            tendon.pop('length_servo_gain_n_m',None)
+        for key in ('actuators','transmission'):
+            effective.pop(key,None)
+        for tendon in effective['tendons']:
+            tendon.pop('kp_n_m',None)
+    physical_scene={key:scene[key] for key in ('initial','qpos_rad','qvel_rad_s',
+        'mount_rotation','mount_position','gravity','floor_z_m','floor_id','forces',
+        'duration_s','timestep_s','control_period_s','sample_period_s','observation_phase')}
+    physical_scene['tension_execution_mode']=scene['control']['tension_execution_mode']
     physical=dict(robot=science['robot'],backend=policy['backend'],
-        discretization=policy['discretization'],compiled_physics_identity=scene['physics_identity'],
-        compiled_scene_identity=scene['identity'])
+        discretization=policy['discretization'],compiled_physics_identity=digest(effective),
+        compiled_scene_identity=digest(physical_scene))
     task=dict(task=science['task'],seed=science['seed'])
     if route=='rl':
         config=rl_configuration or {}
@@ -151,11 +168,11 @@ def experiment_identity(candidate, route, *, source=None, result=None, environme
     elif route=='fixed_tension':
         trajectory=(source or {}).get('trajectory') or {}
         required=('tensions_n','times_s','tendon_order','model_identity','design_identity','task_identity')
-        action={key:trajectory[key] for key in required if key in trajectory}
+        action={key:trajectory[key] for key in ('tensions_n','times_s','tendon_order') if key in trajectory}
         missing=[key for key in required if key not in trajectory]
-        controller=dict(route=route,command_semantics='ideal_tension',
-            mathematical_model=policy['dynamics_model'])
-        runtime=dict(profile_identity=candidate.get('profile_identity'))
+        controller=dict(route=route,command_semantics='ideal_tension')
+        runtime=dict(profile_identity=candidate.get('profile_identity'),
+            source_provenance={key:trajectory.get(key) for key in ('model_identity','design_identity','task_identity')})
     else:
         action=None
         missing=[]
@@ -167,7 +184,7 @@ def experiment_identity(candidate, route, *, source=None, result=None, environme
             missing.append('runtime.numerical_environment')
     if runtime['profile_identity'] is None:
         missing.append('runtime.profile_identity')
-    return dict(physical=physical,task=task,controller=controller,action=action,
+    return dict(identity_version='effective_experiment_v2',physical=physical,task=task,controller=controller,action=action,
         runtime=runtime,missing_effective_fields=missing)
 
 
@@ -188,7 +205,10 @@ def compare_experiments(proposed, previous):
     different_paths=[path for key in different
         for path in paths(proposed[key],previous[key],key)]
     missing=sorted(set(proposed['missing_effective_fields']+previous['missing_effective_fields']))
-    if missing and not any(key in different for key in ('physical','task','controller','action')):
+    if proposed.get('identity_version','legacy_v1')!=previous.get('identity_version','legacy_v1'):
+        missing.append('identity_version')
+        relation='unresolved_comparison'
+    elif missing and not any(key in different for key in ('physical','task','controller','action')):
         relation='unresolved_comparison'
     elif all(key in equal for key in ('physical','task','controller','action')) and 'runtime' in different:
         relation='unresolved_comparison'

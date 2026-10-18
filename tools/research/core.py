@@ -300,8 +300,10 @@ def dispatch(host, value, request_id, origin='model'):
         host.store.artifact(r)
     from tools.research.experience import disposition_bindings
     experience_bindings=disposition_bindings(host,plan.experience_disposition)
-    if plan.action=='stop' and any(r not in [plain(v) for v in plan.supporting_evidence] for r in [*s['results'],*s.get('mechanics_results',[]),*s.get('physical_replays',[]),*s.get('matched_state_results',[]),*s.get('rl_evaluations',[]),*s.get('analysis_results',[])]):
-        raise ValueError('STOP_MUST_CITE_ALL_NEW_EXPERIMENT_RESULTS')
+    if plan.action=='stop':
+        missing=[r for r in [*s['results'],*s.get('mechanics_results',[]),*s.get('physical_replays',[]),*s.get('matched_state_results',[]),*s.get('rl_evaluations',[]),*s.get('analysis_results',[])] if r not in [plain(v) for v in plan.supporting_evidence]]
+        if missing:
+            raise ValueError('STOP_MUST_CITE_ALL_NEW_EXPERIMENT_RESULTS: missing_supporting_evidence='+json.dumps(missing,sort_keys=True))
     if enabled(s['spec'],'rl') and plan.action=='stop' and s.get('rl_runs'):
         evaluations=s.get('rl_evaluations',[])
         if s['spec'].get('rl_evaluation_source') and not evaluations:

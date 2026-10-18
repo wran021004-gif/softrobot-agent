@@ -590,7 +590,7 @@ def packet(host):
         structural_domain=s['spec']['allowed_parameters'],
         defaults=(s['spec'].get('control') or {'rl_defaults':s['spec']['runtime'].get('rl_defaults')})['rl_defaults']),
         training_summaries=[dict(run_id=r,reference=e['training_summary'],evaluations=[v for v in s.get('rl_evaluations',[]) if host.store.artifact(v).get('run_id')==r]) for r,e in s.get('rl_runs',{}).items() if e.get('training_summary')],
-        runs=s.get('rl_runs',{}),source_summary=s.get('rl_source_summary'),evaluations=[dict(reference=r,**host.store.artifact(r)) for r in s.get('rl_evaluations',[])],
+        runs=s.get('rl_runs',{}),continuation_sources=s.get('rl_parent_sources',{}),source_summary=s.get('rl_source_summary'),evaluations=[dict(reference=r,**host.store.artifact(r)) for r in s.get('rl_evaluations',[])],
         costs='RL active time/evaluation costs separate from provider wall time; elapsed study time uses one wall clock',
         live_elapsed_s=max(0,s.get('closed_unix',time.time())-s['started_unix']))
 

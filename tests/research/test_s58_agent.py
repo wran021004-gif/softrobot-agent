@@ -7,7 +7,7 @@ from tests.research import test_agent_feedback as fixtures
 from tools.research import core, feedback
 from tools.research.config import resolve
 from tools.research.state import ROOT, state, update, save
-from tools.state_io import read
+from tools.state_io import read, atomic_json
 
 
 class S58AdmissionTests(unittest.TestCase):
@@ -49,6 +49,37 @@ class S58AdmissionTests(unittest.TestCase):
         self.assertEqual(gap['normalized_gap'],0)
         self.assertFalse(gap['valid_complete'])
         self.assertFalse(gap['accepted'])
+
+    def test_inactive_gain_is_repeat_but_effective_weight_change_is_new(self):
+        request=dict(version='serial_family_generation_v2',family_space_identity=self.spec['family_space_identity'],segment_count=2,tendon_count=4)
+        original=self.generate(request)
+        changed=deepcopy(request);changed['tendon_parameters']={'length_servo_gain_n_m':1500.}
+        gain=self.generate(changed)
+        identify=lambda ref:feedback.experiment_identity(self.host.store.artifact(ref),'nmpc',environment=self.spec['numerical_environment'])
+        first=identify(original)
+        self.assertEqual(feedback.compare_experiments(first,identify(gain))['relation'],'equivalent_repeat')
+        changed=deepcopy(request);changed['control_weights']={'holding_tip_speed_weight':.2}
+        weighted=identify(self.generate(changed))
+        self.assertEqual(feedback.compare_experiments(first,weighted)['relation'],'same_robot_different_control')
+        old=deepcopy(first);old.pop('identity_version')
+        self.assertEqual(feedback.compare_experiments(first,old)['relation'],'unresolved_comparison')
+        self.assertEqual(self.host.store.remaining()['used']['backend_solves'],0)
+
+    def test_stop_error_names_exact_missing_evidence_without_supplying_it(self):
+        candidate=self.generate();ref=self.result(candidate)
+        with patch.object(core,'guard'),self.assertRaisesRegex(ValueError,ref['artifact_id']):
+            core.dispatch(self.host,self.plan('stop',next_step='stop'),'s58-missing-citation-fixture')
+        self.assertNotEqual(state(self.host)['research_status'],'stopped')
+
+    def test_sealed_driver_export_recovers_without_rewriting_archive(self):
+        from tests.research import sorosim_s58_agent_pilot as pilot
+        destination=self.folder/'sealed_export_fixture';(destination/'study').mkdir(parents=True)
+        atomic_json(destination/'summary.json',{'research_status':'stopped','fixture':True})
+        atomic_json(destination/'study/archive_manifest.json',{'fixture':True})
+        before=(destination/'study/archive_manifest.json').read_bytes()
+        with patch.object(pilot,'DEST',destination),patch.object(pilot,'save',side_effect=AssertionError('No mutation')):
+            pilot.export(self.host)
+        self.assertEqual((destination/'study/archive_manifest.json').read_bytes(),before)
 
     def test_fresh_fixed_sequence_selection_requires_read_and_pass(self):
         candidate=self.generate()

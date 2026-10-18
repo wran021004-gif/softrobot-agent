@@ -119,6 +119,12 @@ def prepare():
     parent=Host(ROOT/'runs/research'/parent_id,parent_id)
     for row in read(ROOT/'evidence/sorosim_s56/rl/summary.json')['routes']:
         parents.append(rl.import_continuation_source(host,parent,row['run_id']))
+    projection=save(host,dict(original=read(DEST/'projection_preflight.json'),
+        ownership='Engineering kinematic preflight; no fresh physical execution',
+        ideal_tension_semantics='Direct bounded tendon force bypasses motor displacement/rate and length-servo gain'),
+        's58_projection_and_input_semantics')
+    context.append(dict(stage='P0 and ideal-tension interface',reference=projection,
+        summary='Projection/inverse and archived outputs passed; remaining approximation loss is normal. Ideal-tension execution bypasses length-servo gain and actuator kinematic limits.'))
     update(host,stage_context=context,scoped_context=[*s.get('scoped_context',[]),*[v['reference'] for v in context],*history],
         preseeded_candidate=candidate,preseeded_mathematical_reference=relation)
     from extensions.tendon_family.sorosim_control import resolve_control
@@ -147,6 +153,9 @@ def prepare():
 
 
 def export(host, blocker=None):
+    if (DEST/'study/archive_manifest.json').exists() and read(DEST/'summary.json')['research_status']=='stopped':
+        print(json.dumps(dict(status='recovered_sealed_evidence',additional_provider_requests=0,additional_backend_launches=0)),flush=True)
+        return
     s=state(host);events=host.store.events(host.run_id)
     actions=[];reads=[]
     for event in events:
@@ -185,6 +194,8 @@ def main():
         name=read(SPEC)['study_id'];export(Host(ROOT/'runs/research'/name,name,actor='unified-research'));return
     host=prepare()
     if args.phase=='prepare':return
+    if state(host)['research_status']=='stopped':
+        export(host);return
     if subprocess.check_output(['git','status','--porcelain'],cwd=ROOT,text=True).strip():
         raise ValueError('CLEAN_COMMITTED_SOURCE_REQUIRED_BEFORE_LIVE')
     blocker=None
