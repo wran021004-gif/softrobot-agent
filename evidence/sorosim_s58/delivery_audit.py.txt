@@ -1,0 +1,169 @@
+"""Read-only post-campaign audit and reporting; no scientific dispatch or send."""
+from collections import Counter
+from copy import deepcopy
+import csv
+import hashlib
+from io import BytesIO
+import json
+from pathlib import Path
+import subprocess
+import tarfile
+import zipfile
+
+from tools.platform_host import Host
+from tools.research.agent import load_credential, pending
+from tools.research.design import full_science
+from tools.research.feedback import experiment_identity, compare_experiments, task_gap
+from tools.research.state import state, science_hashes
+from tools.state_io import read, atomic_json
+
+ROOT=Path.cwd();DEST=ROOT/'evidence/sorosim_s58'
+host=Host(ROOT/'runs/research/sorosim-s58-agent-20261018','sorosim-s58-agent-20261018')
+s=state(host);events=host.store.events(host.run_id)
+assert s['research_status']=='stopped' and s['pilot']['live_model_requests']==26 and not pending(host) and not s['pending']
+original_summary=read(DEST/('scientific_summary.json' if (DEST/'scientific_summary.json').exists() else 'summary.json'))
+original_audit=read(DEST/('raw_decision_audit.json' if (DEST/'raw_decision_audit.json').exists() else 'decision_audit.json'))
+if not (DEST/'scientific_summary.json').exists():
+    (DEST/'scientific_summary.json').write_bytes((DEST/'summary.json').read_bytes())
+    (DEST/'raw_decision_audit.json').write_bytes((DEST/'decision_audit.json').read_bytes())
+
+provider={};actions=[];last_packet=None;last_send=None;reads=[];retrievals=[];errors=[]
+for event in events:
+    kind=event['kind']
+    if kind=='model_decision_packet':last_packet=event['outputs'][0]
+    elif kind=='r3_request':last_send=event['request_id']
+    elif kind=='r3_response' and event['status']=='metadata_saved':
+        provider[event['request_id']]=dict(request_id=event['request_id'],**host.store.artifact(event['outputs'][0]))
+    elif kind=='model_original_tool_request':
+        use=host.store.artifact(event['outputs'][0])['tool_use']
+        actions.append(dict(tool_use=use,provider_request_id=last_send,decision_packet=last_packet,
+            prior_successful_public_reads=deepcopy(reads),prior_successful_context_retrievals=deepcopy(retrievals),
+            ownership='Agent-selected original native request'))
+    elif kind=='model_original_tool_feedback':
+        value=host.store.artifact(event['outputs'][0]);result=value['result'];use=value['tool_use']
+        row=next(a for a in reversed(actions) if a['tool_use']['toolUseId']==use['toolUseId'])
+        row['feedback_reference']=event['outputs'][0];row['feedback_status']=result['status']
+        if result['status']=='success' and use['name']=='evidence_read':reads.append(use['input'])
+        if result['status']=='success' and use['name']=='retrieve_context':retrievals.append(use['input'])
+        if result['status']=='error':
+            body=json.loads(result['content'][0]['text'])
+            errors.append(dict(tool=use['name'],operation=use['input'].get('action') or use['input'].get('operation'),
+                message=body.get('message'),request=use['toolUseId'],provider_request_id=last_send))
+assert len(provider)==26 and all(row['http_status']==200 for row in provider.values())
+token_fields=Counter()
+for row in provider.values():
+    token_fields.update({key:value for key,value in (row.get('usage') or {}).items() if type(value) is int})
+tool_counts=Counter(a['tool_use']['name'] for a in actions)
+operation_counts=Counter(a['tool_use']['name']+':'+str(a['tool_use']['input'].get('action') or a['tool_use']['input'].get('operation') or 'read') for a in actions)
+
+physical=[]
+for ref in [*s['results'],*s['rl_evaluations']]:
+    r=host.store.artifact(ref);c=host.store.artifact(r['candidate']);is_rl='episodes' in r
+    metrics=r['episodes'][0] if is_rl else r['acceptance']['metrics']
+    bounds={t['id']:t['force_limit_n'] for t in c['configuration']['robot']['structure']['data']['tendons']}
+    force=dict(channel_bounds_n={name:[0,limit] for name,limit in bounds.items()})
+    if is_rl:
+        with Path(r['trajectory']).open(newline='',encoding='utf-8') as stream:trajectory=list(csv.DictReader(stream))
+        values=[float(row[name+'_applied_n']) for row in trajectory for name in bounds]
+        assert len(trajectory)==36 and all(0<=float(row[name+'_applied_n'])<=limit for row in trajectory for name,limit in bounds.items())
+        force.update(recorded_min_n=min(values),recorded_max_n=max(values),recorded_force_bound_violation_n=0.)
+    else:force['registered_force_bound_violation_n']=r['acceptance']['components']['force_bounds']['value']
+    physical.append(dict(reference=ref,candidate=r['candidate'],route=r.get('mode','nmpc'),
+        terminal_error_m=metrics['terminal_position_error_m' if is_rl else 'terminal_error_m'],
+        holding_max_error_m=metrics['holding_max_position_error_m' if is_rl else 'holding_max_error_m'],
+        holding_max_speed_m_s=metrics['holding_max_speed_m_s'],gap=task_gap(r),
+        numerical_s=r.get('evaluation_elapsed_s') if is_rl else r['numerical_s'],
+        original_acceptance=r.get('acceptance'),episode=metrics if is_rl else None,force_bounds=force,
+        effective_parameters=c['parameters'],policy_sha256=r.get('policy_sha256'),checkpoint=r.get('checkpoint'),
+        owning_study=r.get('study') or r.get('owning_study'),execution_id=r['execution_id']))
+best=min((r for r in physical if r['gap']['valid_complete']),key=lambda r:r['gap']['normalized_gap'])
+assert all(not r['gap']['accepted'] for r in physical) and len(physical)==4
+
+# Reconstruct only effective identities under the repaired comparator. No dynamics.
+base=host.store.artifact(s['preseeded_candidate']);gain=deepcopy(base)
+from extensions.tendon_family.family_space import parse_build
+from extensions.tendon_family.generated_serial import generate_family
+build=gain['configuration']['policy']['candidate_builder']['parameters']['data']
+build['request'].setdefault('tendon_parameters',{})['length_servo_gain_n_m']=1500.
+robot,mesh,_=generate_family(parse_build(build));gain['configuration']['robot']['structure']['data']=robot
+gain['configuration']['policy']['discretization']['data']=mesh;gain['scientific_configuration']=full_science(gain['configuration'])
+identify=lambda c:experiment_identity(c,'nmpc',environment=s['spec']['numerical_environment'])
+baseline=identify(base)
+repaired=dict(source_commit=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip(),
+    semantics='effective_experiment_v3; 12 significant decimal digits for fingerprints only; post-campaign comparison, not a repaired physical execution',
+    gain_only=compare_experiments(baseline,identify(gain)),
+    actual_radius_intervention=compare_experiments(baseline,identify(host.store.artifact(physical[0]['candidate']))),
+    actual_weight_intervention=compare_experiments(baseline,identify(host.store.artifact(physical[1]['candidate']))),
+    original_xml_witness=read(host.store.root/'s58_identity_engineering_audit.json'))
+assert repaired['gain_only']['relation']=='equivalent_repeat'
+assert repaired['actual_weight_intervention']['relation']=='same_robot_different_control'
+assert repaired['actual_radius_intervention']['relation']=='same_controller_different_robot'
+assert science_hashes()==s['profile']['science_hashes']
+atomic_json(DEST/'identity_repair.json',repaired)
+
+continuations=[]
+for run_id in s['rl_runs']:
+    folder=host.store.root/'rl'/run_id
+    if (folder/'continuation.json').exists():
+        proof=read(folder/'continuation.json')
+        assert proof['policy_preserved'] and proof['optimizer_moments_preserved'] and proof['optimizer_steps_preserved'] and not proof['optimizer_reset']
+        continuations.append(dict(run_id=run_id,proof=proof))
+
+# Verify original archive bytes/member hashes and inspect actual credential matches
+# without printing, hashing for publication, or saving the credential itself.
+load_credential(Path(s['spec']['runtime']['credentials_reference']).expanduser())
+import os
+secret=os.environ['DEEPSEEK_API_KEY'].encode();archives=[]
+for folder in (DEST/'study',DEST/'checkpoints/study'):
+    manifest=read(folder/'archive_manifest.json');path=folder/'immutable_artifacts.tar.gz'
+    assert hashlib.file_digest(path.open('rb'),'sha256').hexdigest()==manifest['archive_sha256']
+    expected={r['name']:r['sha256'] for r in manifest['members']};members=0
+    with tarfile.open(path) as archive:
+        for item in archive:
+            if not item.isfile():continue
+            body=archive.extractfile(item).read();assert hashlib.sha256(body).hexdigest()==expected[item.name]
+            assert secret not in body,'Credential found in artifact'
+            if body.startswith(b'PK'):
+                with zipfile.ZipFile(BytesIO(body)) as nested:
+                    assert all(secret not in nested.read(name) for name in nested.namelist()),'Credential found in checkpoint'
+            members+=1
+    assert members==len(expected)
+    archives.append(dict(path=str(path.relative_to(ROOT)),sha256=manifest['archive_sha256'],members=members,bytes=path.stat().st_size,member_hashes_verified=True,credential_matches=0))
+assert read(DEST/'checkpoints/summary.json')['primary_archive_sha256']==archives[0]['sha256']
+
+audit=dict(version='s58_delivery_audit_v2',scientific_source_freeze=s['freeze'],
+    post_campaign_repair_commit=repaired['source_commit'],original_audit_reference=next(e['outputs'][0] for e in events if e['kind']=='s58_decision_audit'),
+    agent_actions=actions,tool_counts=dict(tool_counts),operation_counts=dict(operation_counts),errors=errors,
+    engineering_actions=original_audit['engineering_actions']+[
+        'P0/ideal-tension interface context supplied during first NMPC, before its result',
+        'Already-imported PPO continuation sources made visible during first NMPC',
+        'XML-only inactive-gain identity witness; no registered candidate or solver',
+        'Post-closeout archival of all 256 PPO checkpoints and raw files',
+        'Post-campaign identity/STOP feedback repair; no new scientific execution'],
+    provider_attempts=list(provider.values()),provider_usage_sum=dict(token_fields),
+    provider_elapsed_s=sum(p['elapsed_s'] for p in provider.values()),billing_money='unknown: provider receipts supply no invoice amount',
+    physical_results=physical,best_failed_fresh_evaluation=best['reference'],
+    historical_evidence=s['historical_experiments'],historical_results_are_fresh=False,
+    closure=dict(disposition=s['final_disposition'],record=host.store.artifact(s['final_disposition']),
+        rejected_model_stops=sum(e['operation']=='stop' for e in errors),accepted_native_model_stop=False),
+    feedback_conditioned_change=dict(supported=True,evidence='Original weight-change Plan cites result 15cce211; residual start uses its exact reference; continuation rationale quotes first RL evaluation and changes reward after reading it'),
+    model_narrative_corrections=[
+        'Both fresh NMPC cases were genuine effective interventions, not re-executions caused by candidate reuse.',
+        'Historical S5.6 solver error remains invalid for complete task acceptance; it is not one of the four fresh valid evaluations.',
+        'Ideal-tension execution bypasses servo gain/rate; the model authority and compliant-servo explanations are unsupported.',
+        'No modal frequency, unique sway mechanism, static equilibrium, global impossibility or generalization was established.',
+        'Stage-two gamma .999 was rejected; executed continuation kept gamma .995 and changed holding-speed reward only.'],
+    continuation_proofs=continuations,archives=archives,original_task_evaluator_modified=False,
+    no_new_postrepair_physical_evaluation=True,kernel_hashes_unchanged=True,
+    focused_tests=dict(run=70,skipped=1,failures=0,errors=0),ledger=host.store.remaining(),
+    numerical_s=s['numerical_s'],study_elapsed_s=s['closed_unix']-s['started_unix'])
+atomic_json(DEST/'decision_audit.json',audit)
+summary=deepcopy(original_summary)
+summary.pop('results',None)  # Full original result views remain in scientific_summary and Store.
+summary.update(delivery_audit_version=audit['version'],physical_results=physical,best_failed_fresh_evaluation=best['reference'],
+    best_valid_gap=best['gap'],accepted_native_model_stop=False,closure=audit['closure'],
+    provider_usage_sum=dict(token_fields),provider_elapsed_s=audit['provider_elapsed_s'],
+    live_tool_counts=dict(tool_counts),live_operation_counts=dict(operation_counts),archives=archives,
+    post_campaign_repair_commit=repaired['source_commit'],fresh_complete_task_passes=0,selected_solution=None)
+atomic_json(DEST/'summary.json',summary)
+print(json.dumps(dict(provider_requests=26,tool_counts=dict(tool_counts),operation_counts=dict(operation_counts),errors=len(errors),usage=dict(token_fields),best_gap=best['gap'],archives=archives,numerical_s=s['numerical_s'],provider_s=audit['provider_elapsed_s'],elapsed_s=audit['study_elapsed_s'])))

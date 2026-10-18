@@ -1,0 +1,118 @@
+{
+  "source_commit": "a1a9b8dae0bab0e36212ba614e6b8a5914d78176",
+  "semantics": "effective_experiment_v3; 12 significant decimal digits for fingerprints only; post-campaign comparison, not a repaired physical execution",
+  "gain_only": {
+    "relation": "equivalent_repeat",
+    "equal_fields": [
+      "physical",
+      "task",
+      "controller",
+      "action",
+      "runtime"
+    ],
+    "different_fields": [],
+    "different_paths": [],
+    "missing_effective_fields": []
+  },
+  "actual_radius_intervention": {
+    "relation": "same_controller_different_robot",
+    "equal_fields": [
+      "task",
+      "controller",
+      "action",
+      "runtime"
+    ],
+    "different_fields": [
+      "physical"
+    ],
+    "different_paths": [
+      "physical.compiled_physics_identity",
+      "physical.robot.structure.data.components[1].guide_holes.tendon_0_hole[1]",
+      "physical.robot.structure.data.components[1].guide_holes.tendon_0_hole[2]",
+      "physical.robot.structure.data.components[1].guide_holes.tendon_1_hole[1]",
+      "physical.robot.structure.data.components[1].guide_holes.tendon_1_hole[2]",
+      "physical.robot.structure.data.components[1].guide_holes.tendon_2_hole[1]",
+      "physical.robot.structure.data.components[1].guide_holes.tendon_3_hole[1]",
+      "physical.robot.structure.data.components[1].guide_holes.tendon_3_hole[2]",
+      "physical.robot.structure.data.tendons[0].points[0].attachment.position_m[1]",
+      "physical.robot.structure.data.tendons[0].points[0].attachment.position_m[2]",
+      "physical.robot.structure.data.tendons[0].points[1].attachment.position_m[1]",
+      "physical.robot.structure.data.tendons[0].points[1].attachment.position_m[2]",
+      "physical.robot.structure.data.tendons[0].points[3].attachment.position_m[1]",
+      "physical.robot.structure.data.tendons[0].points[3].attachment.position_m[2]",
+      "physical.robot.structure.data.tendons[0].points[4].attachment.position_m[1]",
+      "physical.robot.structure.data.tendons[0].points[4].attachment.position_m[2]",
+      "physical.robot.structure.data.tendons[1].points[0].attachment.position_m[1]",
+      "physical.robot.structure.data.tendons[1].points[0].attachment.position_m[2]",
+      "physical.robot.structure.data.tendons[1].points[1].attachment.position_m[1]",
+      "physical.robot.structure.data.tendons[1].points[1].attachment.position_m[2]",
+      "physical.robot.structure.data.tendons[1].points[3].attachment.position_m[1]",
+      "physical.robot.structure.data.tendons[1].points[3].attachment.position_m[2]",
+      "physical.robot.structure.data.tendons[1].points[4].attachment.position_m[1]",
+      "physical.robot.structure.data.tendons[1].points[4].attachment.position_m[2]",
+      "physical.robot.structure.data.tendons[2].points[0].attachment.position_m[1]",
+      "physical.robot.structure.data.tendons[2].points[1].attachment.position_m[1]",
+      "physical.robot.structure.data.tendons[2].points[3].attachment.position_m[1]",
+      "physical.robot.structure.data.tendons[2].points[4].attachment.position_m[1]",
+      "physical.robot.structure.data.tendons[3].points[0].attachment.position_m[1]",
+      "physical.robot.structure.data.tendons[3].points[0].attachment.position_m[2]",
+      "physical.robot.structure.data.tendons[3].points[1].attachment.position_m[1]",
+      "physical.robot.structure.data.tendons[3].points[1].attachment.position_m[2]",
+      "physical.robot.structure.data.tendons[3].points[3].attachment.position_m[1]",
+      "physical.robot.structure.data.tendons[3].points[3].attachment.position_m[2]",
+      "physical.robot.structure.data.tendons[3].points[4].attachment.position_m[1]",
+      "physical.robot.structure.data.tendons[3].points[4].attachment.position_m[2]"
+    ],
+    "missing_effective_fields": []
+  },
+  "actual_weight_intervention": {
+    "relation": "same_robot_different_control",
+    "equal_fields": [
+      "physical",
+      "task",
+      "action",
+      "runtime"
+    ],
+    "different_fields": [
+      "controller"
+    ],
+    "different_paths": [
+      "controller.parameters.parameters.data.recipe.holding_tip_speed_weight",
+      "controller.parameters.parameters.data.recipe.terminal_tip_speed_weight"
+    ],
+    "missing_effective_fields": []
+  },
+  "original_xml_witness": {
+    "scope": "Engineering XML-only identity check, no registered candidate, stepping or numerical solver",
+    "changed_field": "length_servo_gain_n_m only, 900 to 1500",
+    "xml_sha256": [
+      "60dda8936754787dcdcdc999bd2b2c7914301fd536cbdf7865ff578a38f95873",
+      "60dda8936754787dcdcdc999bd2b2c7914301fd536cbdf7865ff578a38f95873"
+    ],
+    "same_physical_xml": true,
+    "comparison": {
+      "relation": "same_controller_different_robot",
+      "equal_fields": [
+        "task",
+        "controller",
+        "action",
+        "runtime"
+      ],
+      "different_fields": [
+        "physical"
+      ],
+      "different_paths": [
+        "physical.compiled_physics_identity",
+        "physical.compiled_scene_identity",
+        "physical.robot.structure.data.tendons[0].length_servo_gain_n_m",
+        "physical.robot.structure.data.tendons[1].length_servo_gain_n_m",
+        "physical.robot.structure.data.tendons[2].length_servo_gain_n_m",
+        "physical.robot.structure.data.tendons[3].length_servo_gain_n_m"
+      ],
+      "missing_effective_fields": []
+    },
+    "actual_live_intervention_has_changed_routing_radius": true,
+    "physics_steps": 0,
+    "provider_requests": 0
+  }
+}

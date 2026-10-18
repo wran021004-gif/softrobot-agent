@@ -1,0 +1,1234 @@
+{
+  "study_id": "sorosim-s58-agent-20261018",
+  "source_freeze": "e8df3565231f1ad1807650a4ef45ea4ff1adcba7",
+  "research_status": "stopped",
+  "selected": null,
+  "selected_solution": null,
+  "final_disposition": {
+    "artifact_id": "07cf1eb663a27f72f8baf22fb593cd0bc528c9962013dfa376129d06e1e82670",
+    "media_type": "application/json"
+  },
+  "provider_requests": 26,
+  "live_tool_counts": {
+    "evidence_read": 11,
+    "retrieve_context": 2,
+    "research_plan": 12,
+    "research_rl": 7
+  },
+  "resource_use": {
+    "limit": {
+      "backend_solves": 8,
+      "model_calls": 26,
+      "tool_calls": 90,
+      "wall_s": null,
+      "worker_calls": 0
+    },
+    "used": {
+      "tool_calls": 39,
+      "model_calls": 26,
+      "backend_solves": 6,
+      "worker_calls": 0,
+      "wall_s": 4228.036769499769
+    },
+    "remaining": {
+      "backend_solves": 2,
+      "model_calls": 0,
+      "tool_calls": 51,
+      "wall_s": null,
+      "worker_calls": 0
+    },
+    "occupied": {}
+  },
+  "numerical_s": 3991.171938800486,
+  "nmpc_launches": 2,
+  "physical_replay_launches": 0,
+  "offline_nlp": 0,
+  "mathematical_replays": 0,
+  "mathematical_analyses": 0,
+  "rl": {
+    "authorized_limits": {
+      "actions_per_trial": 65536,
+      "diagnostic_physics_steps": 0,
+      "diagnostic_replays": 0,
+      "evaluation_episodes": 2,
+      "seconds_per_trial": null,
+      "training_actions": 131072,
+      "training_active_seconds": null,
+      "training_stages": 2
+    },
+    "stages": {
+      "admitted": 2,
+      "limit": 2,
+      "actual_actions": 131072,
+      "verified_actions_lower_bound": 131072,
+      "accounted_actions_upper_bound": 131072,
+      "actual_active_seconds": 223.8827841002494,
+      "outstanding": []
+    },
+    "remaining_stages": 0,
+    "aggregate_action_limit": 131072,
+    "remaining_allocatable_actions": 0,
+    "aggregate_training_time_limit": null,
+    "historical_requested_allocations": "Frozen admitted allocations count against the engineering action cap; actual attempted actions are reported separately",
+    "evaluation_capacity": {
+      "admitted": 0,
+      "remaining_episodes": 0,
+      "confirmation_reserve": 0,
+      "per_episode_s": null
+    }
+  },
+  "blocker": null,
+  "pending_science": null,
+  "pending_provider": [],
+  "delivery_audit_version": "s58_delivery_audit_v2",
+  "physical_results": [
+    {
+      "reference": {
+        "artifact_id": "15cce2112131c38030ce36174f7931a99db4cd9e447029c0f3dc655410edad0b",
+        "media_type": "application/json"
+      },
+      "candidate": {
+        "artifact_id": "85b9126ceac7625f5b727729ee3d0eb36a27487e43e871e0430c441c2f3277d3",
+        "media_type": "application/json"
+      },
+      "route": "nmpc",
+      "terminal_error_m": 0.005726664823226438,
+      "holding_max_error_m": 0.006938187305445629,
+      "holding_max_speed_m_s": 0.10497666652219012,
+      "gap": {
+        "normalized_gap": 4.248833326109506,
+        "components": {
+          "evaluator:task_bound": 0.0,
+          "holding_position": 0.0,
+          "holding_speed": 4.248833326109506
+        },
+        "valid_complete": true,
+        "accepted": false,
+        "interpretation": "Research ranking only; invalid executions remain invalid regardless of gap"
+      },
+      "numerical_s": 1718.8383697001263,
+      "original_acceptance": {
+        "accepted": false,
+        "components": {
+          "evaluation_validity": {
+            "limit": null,
+            "passed": true,
+            "reason": null,
+            "unit": null,
+            "value": "valid"
+          },
+          "evaluator:task_bound": {
+            "limit": 0.01,
+            "passed": true,
+            "reason": null,
+            "unit": "m",
+            "value": 0.005726664823226438
+          },
+          "execution_complete": {
+            "limit": null,
+            "passed": true,
+            "reason": null,
+            "unit": null,
+            "value": true
+          },
+          "force_bounds": {
+            "limit": 1e-08,
+            "passed": true,
+            "reason": null,
+            "unit": "N",
+            "value": 0.0
+          },
+          "holding_coverage": {
+            "limit": 6,
+            "passed": true,
+            "reason": null,
+            "unit": "inclusive uniform samples",
+            "value": true
+          },
+          "holding_position": {
+            "limit": 0.01,
+            "passed": true,
+            "reason": null,
+            "unit": "m",
+            "value": 0.006938187305445629
+          },
+          "holding_speed": {
+            "limit": 0.02,
+            "passed": false,
+            "reason": null,
+            "unit": "m/s",
+            "value": 0.10497666652219012
+          },
+          "solver_errors": {
+            "limit": 0,
+            "passed": true,
+            "reason": null,
+            "unit": "count",
+            "value": 0
+          },
+          "task_evaluator": {
+            "limit": null,
+            "passed": true,
+            "reason": null,
+            "unit": null,
+            "value": true
+          }
+        },
+        "continuous_time_guarantee": false,
+        "contract": "research.task_acceptance",
+        "evaluator_tension_channels": null,
+        "evidence_binding": {
+          "evaluation": {
+            "artifact_id": "af4dfbc67fd8bb1fe268ab4e5d3c2690ff8feac7b3f2ed8b48ecde5eeebe19f4",
+            "media_type": "application/json"
+          },
+          "evaluation_binding": {
+            "original_execution_id": "8d9eaafd1c3246728fff9dc5677389ae",
+            "source": {
+              "artifact_id": "20183d2b6d51b657fdcb31b98f77c5f8f06ecad5baac7334ea145cfc5966f550",
+              "media_type": "application/json"
+            },
+            "source_execution_id": "8d9eaafd1c3246728fff9dc5677389ae"
+          },
+          "profile": {
+            "artifact_id": "b8285bff13418c50b84748cf5fad901f89627cef3d8554555426dbf35ead44b5",
+            "media_type": "application/json"
+          },
+          "profile_binding": {
+            "evaluation": {
+              "artifact_id": "af4dfbc67fd8bb1fe268ab4e5d3c2690ff8feac7b3f2ed8b48ecde5eeebe19f4",
+              "media_type": "application/json"
+            },
+            "execution_id": "8d9eaafd1c3246728fff9dc5677389ae",
+            "simulation": {
+              "artifact_id": "20183d2b6d51b657fdcb31b98f77c5f8f06ecad5baac7334ea145cfc5966f550",
+              "media_type": "application/json"
+            }
+          },
+          "simulation": {
+            "artifact_id": "20183d2b6d51b657fdcb31b98f77c5f8f06ecad5baac7334ea145cfc5966f550",
+            "media_type": "application/json"
+          }
+        },
+        "execution_id": "8d9eaafd1c3246728fff9dc5677389ae",
+        "issues": [],
+        "metrics": {
+          "holding_max_error_m": 0.006938187305445629,
+          "holding_max_speed_m_s": 0.10497666652219012,
+          "terminal_error_m": 0.005726664823226438
+        },
+        "missing": [],
+        "protocol_id": "offline_reach_hold_v1",
+        "sources": {
+          "evaluation": {
+            "artifact_id": "af4dfbc67fd8bb1fe268ab4e5d3c2690ff8feac7b3f2ed8b48ecde5eeebe19f4",
+            "media_type": "application/json"
+          },
+          "profile": {
+            "artifact_id": "b8285bff13418c50b84748cf5fad901f89627cef3d8554555426dbf35ead44b5",
+            "media_type": "application/json"
+          }
+        },
+        "status": "valid_failure",
+        "task_family": "task.reach",
+        "task_identity": "882b3493037dcc8f8da294b3473e1223f0465e92c35bc3064bfc42d467bf212e",
+        "timing": {
+          "control_period_s": 0.01,
+          "deadline_misses": 35,
+          "duration_s": 0.35,
+          "mean_update_s": 48.686985777138865,
+          "real_time_demonstrated": false,
+          "real_time_required": false,
+          "sample_period_s": 0.01,
+          "simulation_wall_s": 1717.125,
+          "termination": [
+            "duration",
+            "numerical_failure"
+          ],
+          "timestep_s": 0.0005
+        },
+        "version": "1.0.0"
+      },
+      "episode": null,
+      "force_bounds": {
+        "channel_bounds_n": {
+          "tendon_0": [
+            0,
+            8.0
+          ],
+          "tendon_1": [
+            0,
+            8.0
+          ],
+          "tendon_2": [
+            0,
+            8.0
+          ],
+          "tendon_3": [
+            0,
+            8.0
+          ]
+        },
+        "registered_force_bound_violation_n": 0.0
+      },
+      "effective_parameters": {
+        "control_weights": {
+          "holding_tip_speed_weight": 0.1,
+          "terminal_tip_speed_weight": 0.1
+        },
+        "family_space_identity": "6f36c2b7cc870ca0298f56c9c940103f8b7ef19ee542c6b5fefd710abc58af90",
+        "route_overrides": {},
+        "segment_count": 2,
+        "segments": {
+          "0": {
+            "cells": 12,
+            "length_m": 0.195,
+            "sections": [
+              {
+                "angle_rad": 0.35,
+                "holes_yz_m": [],
+                "kind": "ellipse",
+                "outer_yz_m": [],
+                "parameters": {
+                  "semi_y_m": 0.01175,
+                  "semi_z_m": 0.0076
+                }
+              }
+            ],
+            "young_pa": 10450000.0
+          },
+          "1": {
+            "cells": 12,
+            "length_m": 0.11,
+            "sections": [
+              {
+                "angle_rad": -0.25,
+                "holes_yz_m": [],
+                "kind": "rectangle",
+                "outer_yz_m": [],
+                "parameters": {
+                  "height_z_m": 0.0095,
+                  "width_y_m": 0.0133
+                }
+              },
+              {
+                "angle_rad": 0.15,
+                "holes_yz_m": [],
+                "kind": "rectangle",
+                "outer_yz_m": [],
+                "parameters": {
+                  "height_z_m": 0.0095,
+                  "width_y_m": 0.0133
+                }
+              }
+            ],
+            "young_pa": 5400000.0
+          }
+        },
+        "spans": [
+          {
+            "anchor_angle_offset_rad": 0.0,
+            "anchor_s": 1.0,
+            "angular_offsets_rad": [
+              0.0
+            ],
+            "count": 1,
+            "first_segment": 0,
+            "guide_angle_offset_rad": 0.0,
+            "guide_s": [
+              0.5
+            ],
+            "last_segment": 1,
+            "phase_rad": 3.141592653589793,
+            "radius_m": 0.023
+          },
+          {
+            "anchor_angle_offset_rad": 0.0,
+            "anchor_s": 1.0,
+            "angular_offsets_rad": [
+              0.0
+            ],
+            "count": 1,
+            "first_segment": 0,
+            "guide_angle_offset_rad": 0.0,
+            "guide_s": [
+              0.5
+            ],
+            "last_segment": 1,
+            "phase_rad": 4.71238898038469,
+            "radius_m": 0.023
+          },
+          {
+            "anchor_angle_offset_rad": 0.0,
+            "anchor_s": 1.0,
+            "angular_offsets_rad": [
+              0.0
+            ],
+            "count": 1,
+            "first_segment": 0,
+            "guide_angle_offset_rad": 0.0,
+            "guide_s": [
+              0.5
+            ],
+            "last_segment": 1,
+            "phase_rad": 0.0,
+            "radius_m": 0.023
+          },
+          {
+            "anchor_angle_offset_rad": 0.0,
+            "anchor_s": 1.0,
+            "angular_offsets_rad": [
+              0.0
+            ],
+            "count": 1,
+            "first_segment": 0,
+            "guide_angle_offset_rad": 0.0,
+            "guide_s": [
+              0.5
+            ],
+            "last_segment": 1,
+            "phase_rad": 1.5707963267948966,
+            "radius_m": 0.023
+          }
+        ],
+        "strategy": "polar_consecutive_spans_v1",
+        "tendon_count": 4,
+        "tendon_parameters": {
+          "length_servo_gain_n_m": 1500.0
+        },
+        "version": "serial_family_generation_v2"
+      },
+      "policy_sha256": null,
+      "checkpoint": null,
+      "owning_study": "sorosim-s58-agent-20261018",
+      "execution_id": "8d9eaafd1c3246728fff9dc5677389ae"
+    },
+    {
+      "reference": {
+        "artifact_id": "ad716d412cb283a8fe3c1cc28cd36c179164c8f0b76a5e5dd29b9c7472af6c63",
+        "media_type": "application/json"
+      },
+      "candidate": {
+        "artifact_id": "07cb3487ee765c9e8ef722aea87cc4fdde83796e166a211b3c64c0c7c41d701b",
+        "media_type": "application/json"
+      },
+      "route": "nmpc",
+      "terminal_error_m": 0.005483582238313944,
+      "holding_max_error_m": 0.007462180617138917,
+      "holding_max_speed_m_s": 0.33611860911111524,
+      "gap": {
+        "normalized_gap": 15.80593045555576,
+        "components": {
+          "evaluator:task_bound": 0.0,
+          "holding_position": 0.0,
+          "holding_speed": 15.80593045555576
+        },
+        "valid_complete": true,
+        "accepted": false,
+        "interpretation": "Research ranking only; invalid executions remain invalid regardless of gap"
+      },
+      "numerical_s": 2041.117836800171,
+      "original_acceptance": {
+        "accepted": false,
+        "components": {
+          "evaluation_validity": {
+            "limit": null,
+            "passed": true,
+            "reason": null,
+            "unit": null,
+            "value": "valid"
+          },
+          "evaluator:task_bound": {
+            "limit": 0.01,
+            "passed": true,
+            "reason": null,
+            "unit": "m",
+            "value": 0.005483582238313944
+          },
+          "execution_complete": {
+            "limit": null,
+            "passed": true,
+            "reason": null,
+            "unit": null,
+            "value": true
+          },
+          "force_bounds": {
+            "limit": 1e-08,
+            "passed": true,
+            "reason": null,
+            "unit": "N",
+            "value": 0.0
+          },
+          "holding_coverage": {
+            "limit": 6,
+            "passed": true,
+            "reason": null,
+            "unit": "inclusive uniform samples",
+            "value": true
+          },
+          "holding_position": {
+            "limit": 0.01,
+            "passed": true,
+            "reason": null,
+            "unit": "m",
+            "value": 0.007462180617138917
+          },
+          "holding_speed": {
+            "limit": 0.02,
+            "passed": false,
+            "reason": null,
+            "unit": "m/s",
+            "value": 0.33611860911111524
+          },
+          "solver_errors": {
+            "limit": 0,
+            "passed": true,
+            "reason": null,
+            "unit": "count",
+            "value": 0
+          },
+          "task_evaluator": {
+            "limit": null,
+            "passed": true,
+            "reason": null,
+            "unit": null,
+            "value": true
+          }
+        },
+        "continuous_time_guarantee": false,
+        "contract": "research.task_acceptance",
+        "evaluator_tension_channels": null,
+        "evidence_binding": {
+          "evaluation": {
+            "artifact_id": "b4679c4d00702a746dcdf4e4f1307c072c4ca89a7937a73af615678188400c5b",
+            "media_type": "application/json"
+          },
+          "evaluation_binding": {
+            "original_execution_id": "a1ecf19cbc2e45e3ba8013aa7d4bc506",
+            "source": {
+              "artifact_id": "bd9fcdcef06d0d948599eb401323743409c90fb33eaa51e9fb2ecbce82ea0d18",
+              "media_type": "application/json"
+            },
+            "source_execution_id": "a1ecf19cbc2e45e3ba8013aa7d4bc506"
+          },
+          "profile": {
+            "artifact_id": "1267dfb647039af472764d2734e67523741225ce4138d3087aa396516d644f80",
+            "media_type": "application/json"
+          },
+          "profile_binding": {
+            "evaluation": {
+              "artifact_id": "b4679c4d00702a746dcdf4e4f1307c072c4ca89a7937a73af615678188400c5b",
+              "media_type": "application/json"
+            },
+            "execution_id": "a1ecf19cbc2e45e3ba8013aa7d4bc506",
+            "simulation": {
+              "artifact_id": "bd9fcdcef06d0d948599eb401323743409c90fb33eaa51e9fb2ecbce82ea0d18",
+              "media_type": "application/json"
+            }
+          },
+          "simulation": {
+            "artifact_id": "bd9fcdcef06d0d948599eb401323743409c90fb33eaa51e9fb2ecbce82ea0d18",
+            "media_type": "application/json"
+          }
+        },
+        "execution_id": "a1ecf19cbc2e45e3ba8013aa7d4bc506",
+        "issues": [],
+        "metrics": {
+          "holding_max_error_m": 0.007462180617138917,
+          "holding_max_speed_m_s": 0.33611860911111524,
+          "terminal_error_m": 0.005483582238313944
+        },
+        "missing": [],
+        "protocol_id": "offline_reach_hold_v1",
+        "sources": {
+          "evaluation": {
+            "artifact_id": "b4679c4d00702a746dcdf4e4f1307c072c4ca89a7937a73af615678188400c5b",
+            "media_type": "application/json"
+          },
+          "profile": {
+            "artifact_id": "1267dfb647039af472764d2734e67523741225ce4138d3087aa396516d644f80",
+            "media_type": "application/json"
+          }
+        },
+        "status": "valid_failure",
+        "task_family": "task.reach",
+        "task_identity": "882b3493037dcc8f8da294b3473e1223f0465e92c35bc3064bfc42d467bf212e",
+        "timing": {
+          "control_period_s": 0.01,
+          "deadline_misses": 35,
+          "duration_s": 0.35,
+          "mean_update_s": 57.9510332200011,
+          "real_time_demonstrated": false,
+          "real_time_required": false,
+          "sample_period_s": 0.01,
+          "simulation_wall_s": 2039.3899999998976,
+          "termination": [
+            "duration",
+            "numerical_failure"
+          ],
+          "timestep_s": 0.0005
+        },
+        "version": "1.0.0"
+      },
+      "episode": null,
+      "force_bounds": {
+        "channel_bounds_n": {
+          "tendon_0": [
+            0,
+            8.0
+          ],
+          "tendon_1": [
+            0,
+            8.0
+          ],
+          "tendon_2": [
+            0,
+            8.0
+          ],
+          "tendon_3": [
+            0,
+            8.0
+          ]
+        },
+        "registered_force_bound_violation_n": 0.0
+      },
+      "effective_parameters": {
+        "control_weights": {
+          "holding_tip_speed_weight": 1.0,
+          "terminal_tip_speed_weight": 1.0
+        },
+        "family_space_identity": "6f36c2b7cc870ca0298f56c9c940103f8b7ef19ee542c6b5fefd710abc58af90",
+        "route_overrides": {},
+        "segment_count": 2,
+        "segments": {
+          "0": {
+            "cells": 12,
+            "length_m": 0.195,
+            "sections": [
+              {
+                "angle_rad": 0.35,
+                "holes_yz_m": [],
+                "kind": "ellipse",
+                "outer_yz_m": [],
+                "parameters": {
+                  "semi_y_m": 0.01175,
+                  "semi_z_m": 0.0076
+                }
+              }
+            ],
+            "young_pa": 10450000.0
+          },
+          "1": {
+            "cells": 12,
+            "length_m": 0.11,
+            "sections": [
+              {
+                "angle_rad": -0.25,
+                "holes_yz_m": [],
+                "kind": "rectangle",
+                "outer_yz_m": [],
+                "parameters": {
+                  "height_z_m": 0.0095,
+                  "width_y_m": 0.0133
+                }
+              },
+              {
+                "angle_rad": 0.15,
+                "holes_yz_m": [],
+                "kind": "rectangle",
+                "outer_yz_m": [],
+                "parameters": {
+                  "height_z_m": 0.0095,
+                  "width_y_m": 0.0133
+                }
+              }
+            ],
+            "young_pa": 5400000.0
+          }
+        },
+        "spans": [
+          {
+            "anchor_angle_offset_rad": 0.0,
+            "anchor_s": 1.0,
+            "angular_offsets_rad": [
+              0.0
+            ],
+            "count": 1,
+            "first_segment": 0,
+            "guide_angle_offset_rad": 0.0,
+            "guide_s": [
+              0.5
+            ],
+            "last_segment": 1,
+            "phase_rad": 3.141592653589793,
+            "radius_m": 0.018
+          },
+          {
+            "anchor_angle_offset_rad": 0.0,
+            "anchor_s": 1.0,
+            "angular_offsets_rad": [
+              0.0
+            ],
+            "count": 1,
+            "first_segment": 0,
+            "guide_angle_offset_rad": 0.0,
+            "guide_s": [
+              0.5
+            ],
+            "last_segment": 1,
+            "phase_rad": 4.71238898038469,
+            "radius_m": 0.018
+          },
+          {
+            "anchor_angle_offset_rad": 0.0,
+            "anchor_s": 1.0,
+            "angular_offsets_rad": [
+              0.0
+            ],
+            "count": 1,
+            "first_segment": 0,
+            "guide_angle_offset_rad": 0.0,
+            "guide_s": [
+              0.5
+            ],
+            "last_segment": 1,
+            "phase_rad": 0.0,
+            "radius_m": 0.018
+          },
+          {
+            "anchor_angle_offset_rad": 0.0,
+            "anchor_s": 1.0,
+            "angular_offsets_rad": [
+              0.0
+            ],
+            "count": 1,
+            "first_segment": 0,
+            "guide_angle_offset_rad": 0.0,
+            "guide_s": [
+              0.5
+            ],
+            "last_segment": 1,
+            "phase_rad": 1.5707963267948966,
+            "radius_m": 0.018
+          }
+        ],
+        "strategy": "polar_consecutive_spans_v1",
+        "tendon_count": 4,
+        "tendon_parameters": {},
+        "version": "serial_family_generation_v2"
+      },
+      "policy_sha256": null,
+      "checkpoint": null,
+      "owning_study": "sorosim-s58-agent-20261018",
+      "execution_id": "a1ecf19cbc2e45e3ba8013aa7d4bc506"
+    },
+    {
+      "reference": {
+        "artifact_id": "a323c9375b4666e6d31952b11b8ea39de5486a51361ec3a0a1fc534243140b06",
+        "media_type": "application/json"
+      },
+      "candidate": {
+        "artifact_id": "85b9126ceac7625f5b727729ee3d0eb36a27487e43e871e0430c441c2f3277d3",
+        "media_type": "application/json"
+      },
+      "route": "residual",
+      "terminal_error_m": 0.005917143773777798,
+      "holding_max_error_m": 0.006618027540341892,
+      "holding_max_speed_m_s": 0.06961280995452018,
+      "gap": {
+        "normalized_gap": 2.480640497726009,
+        "components": {
+          "terminal_position_error_m": 0.0,
+          "holding_max_position_error_m": 0.0,
+          "holding_max_speed_m_s": 2.480640497726009
+        },
+        "valid_complete": true,
+        "accepted": false,
+        "interpretation": "Research ranking only; original independent acceptance unchanged"
+      },
+      "numerical_s": 1.0282592000439763,
+      "original_acceptance": {
+        "holding_speed_limit_m_s": 0.02,
+        "holding_steps": [
+          30,
+          31,
+          32,
+          33,
+          34,
+          35
+        ],
+        "position_limit_m": 0.01,
+        "terminal_position_limit_m": 0.01
+      },
+      "episode": {
+        "complete": true,
+        "counts": {
+          "attempted_actions": 35,
+          "attempted_physics_steps": 700,
+          "complete_episodes": 1,
+          "completed_actions": 35,
+          "failed_episodes": 0
+        },
+        "episode_reward": -152.51043053989255,
+        "holding_coverage_complete": true,
+        "holding_max_position_error_m": 0.006618027540341892,
+        "holding_max_speed_m_s": 0.06961280995452018,
+        "holding_sample_steps": [
+          30,
+          31,
+          32,
+          33,
+          34,
+          35
+        ],
+        "numerical_failure": null,
+        "passed": false,
+        "terminal_position_error_m": 0.005917143773777798,
+        "trajectory_rows": 36
+      },
+      "force_bounds": {
+        "channel_bounds_n": {
+          "tendon_0": [
+            0,
+            8.0
+          ],
+          "tendon_1": [
+            0,
+            8.0
+          ],
+          "tendon_2": [
+            0,
+            8.0
+          ],
+          "tendon_3": [
+            0,
+            8.0
+          ]
+        },
+        "recorded_min_n": 0.0,
+        "recorded_max_n": 8.0,
+        "recorded_force_bound_violation_n": 0.0
+      },
+      "effective_parameters": {
+        "control_weights": {
+          "holding_tip_speed_weight": 0.1,
+          "terminal_tip_speed_weight": 0.1
+        },
+        "family_space_identity": "6f36c2b7cc870ca0298f56c9c940103f8b7ef19ee542c6b5fefd710abc58af90",
+        "route_overrides": {},
+        "segment_count": 2,
+        "segments": {
+          "0": {
+            "cells": 12,
+            "length_m": 0.195,
+            "sections": [
+              {
+                "angle_rad": 0.35,
+                "holes_yz_m": [],
+                "kind": "ellipse",
+                "outer_yz_m": [],
+                "parameters": {
+                  "semi_y_m": 0.01175,
+                  "semi_z_m": 0.0076
+                }
+              }
+            ],
+            "young_pa": 10450000.0
+          },
+          "1": {
+            "cells": 12,
+            "length_m": 0.11,
+            "sections": [
+              {
+                "angle_rad": -0.25,
+                "holes_yz_m": [],
+                "kind": "rectangle",
+                "outer_yz_m": [],
+                "parameters": {
+                  "height_z_m": 0.0095,
+                  "width_y_m": 0.0133
+                }
+              },
+              {
+                "angle_rad": 0.15,
+                "holes_yz_m": [],
+                "kind": "rectangle",
+                "outer_yz_m": [],
+                "parameters": {
+                  "height_z_m": 0.0095,
+                  "width_y_m": 0.0133
+                }
+              }
+            ],
+            "young_pa": 5400000.0
+          }
+        },
+        "spans": [
+          {
+            "anchor_angle_offset_rad": 0.0,
+            "anchor_s": 1.0,
+            "angular_offsets_rad": [
+              0.0
+            ],
+            "count": 1,
+            "first_segment": 0,
+            "guide_angle_offset_rad": 0.0,
+            "guide_s": [
+              0.5
+            ],
+            "last_segment": 1,
+            "phase_rad": 3.141592653589793,
+            "radius_m": 0.023
+          },
+          {
+            "anchor_angle_offset_rad": 0.0,
+            "anchor_s": 1.0,
+            "angular_offsets_rad": [
+              0.0
+            ],
+            "count": 1,
+            "first_segment": 0,
+            "guide_angle_offset_rad": 0.0,
+            "guide_s": [
+              0.5
+            ],
+            "last_segment": 1,
+            "phase_rad": 4.71238898038469,
+            "radius_m": 0.023
+          },
+          {
+            "anchor_angle_offset_rad": 0.0,
+            "anchor_s": 1.0,
+            "angular_offsets_rad": [
+              0.0
+            ],
+            "count": 1,
+            "first_segment": 0,
+            "guide_angle_offset_rad": 0.0,
+            "guide_s": [
+              0.5
+            ],
+            "last_segment": 1,
+            "phase_rad": 0.0,
+            "radius_m": 0.023
+          },
+          {
+            "anchor_angle_offset_rad": 0.0,
+            "anchor_s": 1.0,
+            "angular_offsets_rad": [
+              0.0
+            ],
+            "count": 1,
+            "first_segment": 0,
+            "guide_angle_offset_rad": 0.0,
+            "guide_s": [
+              0.5
+            ],
+            "last_segment": 1,
+            "phase_rad": 1.5707963267948966,
+            "radius_m": 0.023
+          }
+        ],
+        "strategy": "polar_consecutive_spans_v1",
+        "tendon_count": 4,
+        "tendon_parameters": {
+          "length_servo_gain_n_m": 1500.0
+        },
+        "version": "serial_family_generation_v2"
+      },
+      "policy_sha256": "c6fd77f1f9670600f2e19e8b4f7becaa161d056531f033a679abfa39c915764a",
+      "checkpoint": "step-00065536-c803423f",
+      "owning_study": "sorosim-s58-agent-20261018",
+      "execution_id": "1f1797b504b0418c81a78297f25ce624"
+    },
+    {
+      "reference": {
+        "artifact_id": "88a9368baf2732e3d3a982ac72048c74daa89707082ed7286f31012ee2e837f2",
+        "media_type": "application/json"
+      },
+      "candidate": {
+        "artifact_id": "85b9126ceac7625f5b727729ee3d0eb36a27487e43e871e0430c441c2f3277d3",
+        "media_type": "application/json"
+      },
+      "route": "residual",
+      "terminal_error_m": 0.006589359769563762,
+      "holding_max_error_m": 0.007297399673075514,
+      "holding_max_speed_m_s": 0.10957821259656152,
+      "gap": {
+        "normalized_gap": 4.478910629828076,
+        "components": {
+          "terminal_position_error_m": 0.0,
+          "holding_max_position_error_m": 0.0,
+          "holding_max_speed_m_s": 4.478910629828076
+        },
+        "valid_complete": true,
+        "accepted": false,
+        "interpretation": "Research ranking only; original independent acceptance unchanged"
+      },
+      "numerical_s": 1.028575399890542,
+      "original_acceptance": {
+        "holding_speed_limit_m_s": 0.02,
+        "holding_steps": [
+          30,
+          31,
+          32,
+          33,
+          34,
+          35
+        ],
+        "position_limit_m": 0.01,
+        "terminal_position_limit_m": 0.01
+      },
+      "episode": {
+        "complete": true,
+        "counts": {
+          "attempted_actions": 35,
+          "attempted_physics_steps": 700,
+          "complete_episodes": 1,
+          "completed_actions": 35,
+          "failed_episodes": 0
+        },
+        "episode_reward": -806.6972295332123,
+        "holding_coverage_complete": true,
+        "holding_max_position_error_m": 0.007297399673075514,
+        "holding_max_speed_m_s": 0.10957821259656152,
+        "holding_sample_steps": [
+          30,
+          31,
+          32,
+          33,
+          34,
+          35
+        ],
+        "numerical_failure": null,
+        "passed": false,
+        "terminal_position_error_m": 0.006589359769563762,
+        "trajectory_rows": 36
+      },
+      "force_bounds": {
+        "channel_bounds_n": {
+          "tendon_0": [
+            0,
+            8.0
+          ],
+          "tendon_1": [
+            0,
+            8.0
+          ],
+          "tendon_2": [
+            0,
+            8.0
+          ],
+          "tendon_3": [
+            0,
+            8.0
+          ]
+        },
+        "recorded_min_n": 0.0,
+        "recorded_max_n": 8.0,
+        "recorded_force_bound_violation_n": 0.0
+      },
+      "effective_parameters": {
+        "control_weights": {
+          "holding_tip_speed_weight": 0.1,
+          "terminal_tip_speed_weight": 0.1
+        },
+        "family_space_identity": "6f36c2b7cc870ca0298f56c9c940103f8b7ef19ee542c6b5fefd710abc58af90",
+        "route_overrides": {},
+        "segment_count": 2,
+        "segments": {
+          "0": {
+            "cells": 12,
+            "length_m": 0.195,
+            "sections": [
+              {
+                "angle_rad": 0.35,
+                "holes_yz_m": [],
+                "kind": "ellipse",
+                "outer_yz_m": [],
+                "parameters": {
+                  "semi_y_m": 0.01175,
+                  "semi_z_m": 0.0076
+                }
+              }
+            ],
+            "young_pa": 10450000.0
+          },
+          "1": {
+            "cells": 12,
+            "length_m": 0.11,
+            "sections": [
+              {
+                "angle_rad": -0.25,
+                "holes_yz_m": [],
+                "kind": "rectangle",
+                "outer_yz_m": [],
+                "parameters": {
+                  "height_z_m": 0.0095,
+                  "width_y_m": 0.0133
+                }
+              },
+              {
+                "angle_rad": 0.15,
+                "holes_yz_m": [],
+                "kind": "rectangle",
+                "outer_yz_m": [],
+                "parameters": {
+                  "height_z_m": 0.0095,
+                  "width_y_m": 0.0133
+                }
+              }
+            ],
+            "young_pa": 5400000.0
+          }
+        },
+        "spans": [
+          {
+            "anchor_angle_offset_rad": 0.0,
+            "anchor_s": 1.0,
+            "angular_offsets_rad": [
+              0.0
+            ],
+            "count": 1,
+            "first_segment": 0,
+            "guide_angle_offset_rad": 0.0,
+            "guide_s": [
+              0.5
+            ],
+            "last_segment": 1,
+            "phase_rad": 3.141592653589793,
+            "radius_m": 0.023
+          },
+          {
+            "anchor_angle_offset_rad": 0.0,
+            "anchor_s": 1.0,
+            "angular_offsets_rad": [
+              0.0
+            ],
+            "count": 1,
+            "first_segment": 0,
+            "guide_angle_offset_rad": 0.0,
+            "guide_s": [
+              0.5
+            ],
+            "last_segment": 1,
+            "phase_rad": 4.71238898038469,
+            "radius_m": 0.023
+          },
+          {
+            "anchor_angle_offset_rad": 0.0,
+            "anchor_s": 1.0,
+            "angular_offsets_rad": [
+              0.0
+            ],
+            "count": 1,
+            "first_segment": 0,
+            "guide_angle_offset_rad": 0.0,
+            "guide_s": [
+              0.5
+            ],
+            "last_segment": 1,
+            "phase_rad": 0.0,
+            "radius_m": 0.023
+          },
+          {
+            "anchor_angle_offset_rad": 0.0,
+            "anchor_s": 1.0,
+            "angular_offsets_rad": [
+              0.0
+            ],
+            "count": 1,
+            "first_segment": 0,
+            "guide_angle_offset_rad": 0.0,
+            "guide_s": [
+              0.5
+            ],
+            "last_segment": 1,
+            "phase_rad": 1.5707963267948966,
+            "radius_m": 0.023
+          }
+        ],
+        "strategy": "polar_consecutive_spans_v1",
+        "tendon_count": 4,
+        "tendon_parameters": {
+          "length_servo_gain_n_m": 1500.0
+        },
+        "version": "serial_family_generation_v2"
+      },
+      "policy_sha256": "92cc1ea3600e78e8a1a3e91944774024bdf74572d15ea4a2328bfd12f028cbed",
+      "checkpoint": "step-00065536-49839429",
+      "owning_study": "sorosim-s58-agent-20261018",
+      "execution_id": "4ab21cf7aa434fdf802ee95feaffd198"
+    }
+  ],
+  "best_failed_fresh_evaluation": {
+    "artifact_id": "a323c9375b4666e6d31952b11b8ea39de5486a51361ec3a0a1fc534243140b06",
+    "media_type": "application/json"
+  },
+  "best_valid_gap": {
+    "normalized_gap": 2.480640497726009,
+    "components": {
+      "terminal_position_error_m": 0.0,
+      "holding_max_position_error_m": 0.0,
+      "holding_max_speed_m_s": 2.480640497726009
+    },
+    "valid_complete": true,
+    "accepted": false,
+    "interpretation": "Research ranking only; original independent acceptance unchanged"
+  },
+  "accepted_native_model_stop": false,
+  "closure": {
+    "disposition": {
+      "artifact_id": "07cf1eb663a27f72f8baf22fb593cd0bc528c9962013dfa376129d06e1e82670",
+      "media_type": "application/json"
+    },
+    "record": {
+      "kind": "engineering_count_budget_closure",
+      "model_stop": false,
+      "observed_pass": null,
+      "reason": "No remaining provider/public-operation capacity for model closeout",
+      "selected": null
+    },
+    "rejected_model_stops": 4,
+    "accepted_native_model_stop": false
+  },
+  "provider_usage_sum": {
+    "completion_tokens": 79783,
+    "prompt_cache_hit_tokens": 1389696,
+    "prompt_cache_miss_tokens": 3562438,
+    "prompt_tokens": 4952134,
+    "total_tokens": 5031917
+  },
+  "provider_elapsed_s": 463.86000000010245,
+  "live_operation_counts": {
+    "evidence_read:read": 11,
+    "retrieve_context:read": 2,
+    "research_plan:generate": 4,
+    "research_plan:execute": 4,
+    "research_rl:start": 1,
+    "research_rl:status": 2,
+    "research_rl:evaluate": 2,
+    "research_rl:continue": 2,
+    "research_plan:stop": 4
+  },
+  "archives": [
+    {
+      "path": "evidence\\sorosim_s58\\study\\immutable_artifacts.tar.gz",
+      "sha256": "fa6d14c5c97eae02a99b68fe8adde61e8fe970d1ed2b016731a72a900d48c3ae",
+      "members": 434,
+      "bytes": 6523256,
+      "member_hashes_verified": true,
+      "credential_matches": 0
+    },
+    {
+      "path": "evidence\\sorosim_s58\\checkpoints\\study\\immutable_artifacts.tar.gz",
+      "sha256": "3aecd45d5eda3ad2b25026ff03a50f377ead416b1da5e7cd8a17beb2a15cc80a",
+      "members": 978,
+      "bytes": 75122164,
+      "member_hashes_verified": true,
+      "credential_matches": 0
+    }
+  ],
+  "post_campaign_repair_commit": "a1a9b8dae0bab0e36212ba614e6b8a5914d78176",
+  "fresh_complete_task_passes": 0
+}
