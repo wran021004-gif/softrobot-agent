@@ -64,8 +64,10 @@ def dispatch(host,operation,arguments,key):
         owned_solve=(plain(arguments.source) in s.get('mechanics_results',[]) and
             source_row.get('operation')=='solve' and source_row.get('trajectory') and
             source_row['design_candidate']==candidate)
-        from tools.research.physical_replay import numerically_verified_source
-        if not owned_solve and not numerically_verified_source(source_row):
+        from tools.research.physical_replay import numerically_verified_source, explicit_control_source
+        if explicit_control_source(source_row) and 'control_correction' not in s['spec']['capabilities']:
+            raise ValueError('EXPLICIT_CONTROL_SCHEDULE_CAPABILITY_REQUIRED')
+        if not owned_solve and not (numerically_verified_source(source_row) or explicit_control_source(source_row)):
             raise ValueError('REFINEMENT_REQUIRES_VERIFIED_FROZEN_MATHEMATICAL_SOURCE')
         trajectory=source_row['trajectory']
         warm_trajectory=None

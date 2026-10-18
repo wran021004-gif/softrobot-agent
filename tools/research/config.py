@@ -63,6 +63,7 @@ def resolve(path, profile=None, *, backend_profile=None):
     path = Path(path).resolve()
     study = read(path)
     provenance = dict(root=dict(path=str(path), sha256=digest(study)), references={})
+    correction=study.pop('correction_search',None)
     family_mode=study.get('start_mode')=='family_space'
     additions={key:study.pop(key) for key in ('fidelity_policy','family_search') if key in study}
     if family_mode:
@@ -293,6 +294,13 @@ def resolve(path, profile=None, *, backend_profile=None):
                 source=dict(family_space_identity=study['family_space_identity'],request=bootstrap['request']),
                 reason='Host.create and compile_input require concrete robot signals and backend checks',
                 scientific_candidate=False, candidate_pool_member=False))
+    if correction is not None:
+        from tools.research.contracts import ControlCorrectionSettings
+        correction=plain(ControlCorrectionSettings.model_validate(correction))
+        if ('control_correction' not in study['capabilities'] or
+                correction['knots_s'][-1]>cfg['task']['timing']['duration_s']):
+            raise ValueError('DECLARED_CORRECTION_CAPABILITY_AND_TASK_KNOTS_REQUIRED')
+        study['correction_search']=correction
     if additions:
         study['final_evaluation_identity']=digest(dict(policy=policy,backend=cfg['policy']['backend'],
             task=study['canonical_task'],controller=cfg['policy']['controller'],model=cfg['policy']['dynamics_model']))

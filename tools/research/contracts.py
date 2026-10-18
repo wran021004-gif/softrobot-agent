@@ -201,6 +201,23 @@ class PhysicalReplayRequest(Contract):
     source: EvidenceRef
 
 
+class ControlCorrectionSettings(Contract):
+    knots_s: list[FiniteFloat] = Field(min_length=2,max_length=4)
+    coefficient_limit_n: FiniteFloat = Field(gt=0)
+    model_difference_step_n: FiniteFloat = Field(gt=0)
+    simulation_difference_step_n: FiniteFloat = Field(gt=0)
+    guided_step_limit_n: FiniteFloat = Field(gt=0)
+    optimizer_iterations: int = Field(ge=1,le=32,strict=True)
+
+    @model_validator(mode='after')
+    def ordered_domain(self):
+        if self.knots_s[0]!=0 or any(b<=a for a,b in zip(self.knots_s,self.knots_s[1:])):
+            raise ValueError('ORDERED_CORRECTION_KNOTS_STARTING_AT_ZERO_REQUIRED')
+        if max(self.guided_step_limit_n,self.simulation_difference_step_n,self.model_difference_step_n)>self.coefficient_limit_n:
+            raise ValueError('CORRECTION_STEPS_MUST_FIT_COEFFICIENT_DOMAIN')
+        return self
+
+
 class FixedSequenceRefinement(Contract):
     candidate: EvidenceRef
     source: EvidenceRef

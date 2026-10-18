@@ -1,0 +1,21 @@
+{
+  "defaults": "family_study_defaults.json",
+  "start_mode": "family_space",
+  "family_space": "family_space_v2.json",
+  "candidate_initialization": "all_candidate_dofs_zero_v1",
+  "base_commit": "fb85f104",
+  "control": "control_sorosim_s56_braking.json",
+  "topology_scope": {"segment_counts": [2], "tendon_counts": [4]},
+  "study_id": "sorosim-s510-correction-20261018",
+  "evidence_destination": "evidence/sorosim_s510",
+  "capabilities": ["replay", "physical_replay", "control_correction"],
+  "allowed_plan_actions": ["generate", "refine", "physical_replay", "select", "stop"],
+  "budgets": {"public_operations": 240, "protected_public_operations": 4,
+    "physical_launches": 192, "bdf_replays": 18},
+  "physical_replay_limit": 192,
+  "authorization": "User explicitly requested independent validation of the saved S5.9 reference, one mathematical-guidance low-dimensional MuJoCo correction search, original-task passing design/control or ranked failures and structure follow-up, and investigation of valid discrepancy bounds. This distinct finite study permits at most 192 full original-task fixed-tension simulations and 18 fixed-sequence mathematical integrations; no provider sends, full NLPs, NMPC or RL. Includes engineering failures. Stop at the first complete passing registered evaluation; no extra confirmations. Sealed prior studies remain immutable.",
+  "execution_instructions": "Reuse exact Design B and original task. Three correction knots [0,.18,.30] s times four tendon channels, each coefficient in [-2,2] N; clip physical tensions to [0,8] N explicitly. Validate saved reference at four and 32 substeps. Build a one-sided finite-difference four-substep local response at step .02 N and anchor its outputs to the 32-substep reference. Test a bounded model-recommended correction, then finite-count MuJoCo least-squares correction with registered max-normalized task violation incumbent ranking. Independently integrate the recommended and final best controls at 32 substeps within the shared 18 limit. Error inequalities on returned sampled arrays are a posteriori; no prospective certified regional bound without independent dynamics/numerical bounds. Do not infer infeasibility from failure.",
+  "correction_search": {"knots_s": [0.0, 0.18, 0.30], "coefficient_limit_n": 2.0,
+    "model_difference_step_n": 0.02, "simulation_difference_step_n": 0.01,
+    "guided_step_limit_n": 0.1, "optimizer_iterations": 16}
+}

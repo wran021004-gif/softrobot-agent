@@ -27,6 +27,13 @@ def numerically_verified_source(value):
         proof.get('original_task_satisfied') is not False)
 
 
+def explicit_control_source(value):
+    """An executable schedule carries no mathematical feasibility assertion."""
+    return (value.get('source_kind')=='explicit_control_schedule_v1'
+        and value.get('task_acceptance')=='unmeasured'
+        and bool(value.get('provenance')))
+
+
 def binding(configuration, trajectory):
     from extensions.tendon_family.sorosim_control import checked_control
     from extensions.tendon_family.sorosim_spec import SorosimModel
@@ -81,7 +88,9 @@ def dispatch(host,arguments,key):
     cfg=verify_candidate(host,candidate)['configuration']
     source_ref=plain(arguments.source)
     source=host.store.artifact(source_ref)
-    if not numerically_verified_source(source):
+    if explicit_control_source(source) and 'control_correction' not in s['spec']['capabilities']:
+        raise ValueError('EXPLICIT_CONTROL_SCHEDULE_CAPABILITY_REQUIRED')
+    if not (numerically_verified_source(source) or explicit_control_source(source)):
         raise ValueError('VERIFIED_OR_EXPLICIT_DIAGNOSTIC_MATHEMATICAL_SOURCE_REQUIRED')
     binding(cfg,source['trajectory'])
     from tools.research.feedback import experiment_preflight
@@ -89,8 +98,8 @@ def dispatch(host,arguments,key):
     if not novelty['admitted']:
         raise ValueError('EQUIVALENT_SCIENTIFIC_EXPERIMENT_REQUIRES_EXPLICIT_REPLICATION_GRANT: '
             +json.dumps(novelty,sort_keys=True))
-    outputs=source['mathematical_outputs']
-    if (outputs['model_identity']!=source['trajectory']['model_identity'] or
+    outputs=source.get('mathematical_outputs')
+    if outputs is not None and (outputs['model_identity']!=source['trajectory']['model_identity'] or
             outputs['times_s']!=source['trajectory']['times_s'] or outputs['samples']!=36):
         raise ValueError('MATHEMATICAL_OUTPUT_BINDING_MISMATCH')
     request=dict(kind='physical_replay',implementation=s['freeze'],study_id=host.run_id,
@@ -179,8 +188,9 @@ def recover(host):
             passed=bool(covered and max_error<=limits['holding_max_error_m'] and max_speed<=limits['holding_max_speed_m_s'])))
     acceptance=assemble_acceptance(cfg,evaluation,profile,evaluation_reference=evaluation_ref,
         profile_reference=None,motion=[dict(time_s=v['time_s']) for v in samples])
-    predicted=source['mathematical_outputs']
-    aligned=all(abs(v['time_s']-t)<1e-12 for v,t in zip(samples,predicted['times_s']))
+    predicted=source.get('mathematical_outputs')
+    aligned=bool(predicted and len(samples)==len(predicted['times_s']) and
+        all(abs(v['time_s']-t)<1e-12 for v,t in zip(samples,predicted['times_s'])))
     differences=[dict(time_s=v['time_s'],position_m=(np.asarray(v['tip_m'])-predicted['tip_positions_m'][i]).tolist(),
         position_norm_m=float(np.linalg.norm(np.asarray(v['tip_m'])-predicted['tip_positions_m'][i])),
         velocity_m_s=(np.asarray(v['tip_velocity_m_s'])-predicted['tip_velocities_m_s'][i]).tolist(),
