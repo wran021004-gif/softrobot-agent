@@ -64,6 +64,10 @@ class S7IntakeTests(unittest.TestCase):
         self.assertFalse(next(r for r in rows if r['parameter_id']=='tendon_parameters.length_servo_gain_n_m')['effective_in_current_execution'])
         actual=read_tool_evidence(self.host,dict(reference=self.entry['candidate'],view='capabilities'))
         self.assertTrue(any(r['parameter_id']=='segments.1.physical_parameters.density_kg_m3' for r in actual))
+        density=next(r for r in actual if r['parameter_id']=='segments.1.physical_parameters.density_kg_m3')
+        self.assertEqual(density['default'],1050.)
+        viscosity=next(r for r in actual if r['parameter_id']=='segments.0.physical_parameters.viscosity_y_nm2_s')
+        self.assertEqual(viscosity['default'],.0005)
         with self.assertRaisesRegex(ValueError,'WHOLE_CANDIDATE'):
             core.read_evidence(self.host,dict(reference=self.entry['candidate'],pointer='/parameters',view='capabilities'))
 

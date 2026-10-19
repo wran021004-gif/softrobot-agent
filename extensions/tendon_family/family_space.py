@@ -311,6 +311,7 @@ def decision_summary(value, evidence, operations):
             'actuator velocity/length limits: bypassed by ideal tension'],
         controller_only=['holding_tip_speed_weight','terminal_tip_speed_weight'],
         parameter_view='parameter_capabilities(space, selected generation request) resolves conditional fields; full_specification holds authoritative domains')
+    result['physical_default_rule']='Omitted physical_parameters inherit assembly prototype values; physical_domains default is a proposal value, not an applied override. Candidate capability view reports actual inherited defaults.'
     return result
 
 
@@ -328,13 +329,20 @@ def parameter_capabilities(value, request):
     add('tendon_count','topology','integer','count',choices=list(range(space.executable_tendon_count_bounds[0],space.executable_tendon_count_bounds[1]+1)))
     for i in range(r.segment_count):
         d=space.segment_domains.get(i,space.segment_domain);root=f'segments.{i}.'
+        parts=[p for p in space.assembly.components if isinstance(p,Segment)]
+        prototype=parts[min(i,len(parts)-1)];choice=r.segments.get(i)
+        sections=choice.sections if choice and choice.sections is not None else [s.section for s in prototype.sections]
+        inherited=dict(density_kg_m3=prototype.physics.density_kg_m3,
+            viscosity_y_nm2_s=prototype.physics.bending_viscosity_nm2_s[0],viscosity_z_nm2_s=prototype.physics.bending_viscosity_nm2_s[1],
+            curvature_y_rad_m=prototype.natural_curvature_rad_m[0],curvature_z_rad_m=prototype.natural_curvature_rad_m[1],
+            section_angle_rad=prototype.sections[0].section.angle_rad)
         for k,unit in [('length_m','m'),('young_pa','Pa')]:add(root+k,'segment','number',unit,getattr(d,k))
         for k,domain in d.physical_domains.items():
             unit='kg/m^3' if k=='density_kg_m3' else 'N*m^2*s' if k.startswith('viscosity') else 'rad/m' if k.startswith('curvature') else 'rad'
-            add(root+'physical_parameters.'+k,'material_geometry','number',unit,domain)
-        parts=[p for p in space.assembly.components if isinstance(p,Segment)]
-        choice=r.segments.get(i)
-        sections=choice.sections if choice and choice.sections is not None else [s.section for s in parts[min(i,len(parts)-1)].sections]
+            add(root+'physical_parameters.'+k,'material_geometry','number',unit,domain,
+                effective=k!='section_angle_rad' or any(s.kind not in ('circle','tube') for s in sections))
+            rows[-1].update(domain_proposal_default=domain.default,default=inherited[k],
+                current_value=getattr(choice,'physical_parameters',{}).get(k,inherited[k]),default_source='assembly prototype')
         for j,section in enumerate(sections):
             add(root+f'sections.{j}.kind','geometry','enum','none',choices=list(d.section_dimensions_m))
             for k,domain in d.section_dimensions_m[section.kind].items():
