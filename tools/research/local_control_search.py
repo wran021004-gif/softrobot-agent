@@ -51,6 +51,7 @@ def search(starts,evaluate,settings):
         source=deepcopy(start['schedule']);tr=source['trajectory']
         tr['tensions_n']=corrected_tensions(tr['tensions_n'],tr['times_s'][:-1],cfg.knots_s,x,start['limits'],cfg.correction_window_s).tolist()
         meta=dict(algorithm=cfg.method,start=start['id'],coefficients_n=x.tolist(),label=label,
+            safety_margin_fraction=cfg.safety_margin_fraction,
             sequence_hash=digest(tr['tensions_n']),prediction_base=base['reference'] if base else None,
             predicted_improvement=predicted,trust_radius_n=radius,prospective_guarantee=False,
             applicability='Local sampled response at the stated candidate only; no regional error bound',
@@ -101,7 +102,7 @@ def search(starts,evaluate,settings):
                 if not valid:radii[start['id']]*=.5;continue
                 tr=start['schedule']['trajectory'];basis=correction_basis(tr['times_s'][:-1],cfg.knots_s,channels,cfg.correction_window_s)
                 solved=constrained_response_step(y,np.stack(columns,axis=-1),x,tr['tensions_n'],basis,
-                    start['limits'],radius,cfg.coefficient_limit_n)
+                    start['limits'],radius,cfg.coefficient_limit_n,safety_margin_fraction=cfg.safety_margin_fraction)
                 if not solved['success']:raise SearchStopped('numerical_failure: '+solved['numerical_status'])
                 predicted=center['task_gap']['normalized_gap']-solved['predicted_gap']
                 row=attempt(start,x+solved['delta'],'local_response_proposal',base=center,predicted=predicted,radius=radius)

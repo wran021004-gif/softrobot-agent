@@ -221,6 +221,7 @@ class ControlCorrectionSettings(Contract):
 class LocalControlSearchSettings(Contract):
     version: Literal['local_control_search_v1','local_control_search_v2'] = 'local_control_search_v1'
     correction_window_s: tuple[FiniteFloat,FiniteFloat] | None = None
+    safety_margin_fraction: FiniteFloat = Field(default=0.,ge=0,lt=.5,description='Optional v2 local model target margin inside every original norm bound; original physical acceptance is unchanged. Zero preserves boundary-seeking legacy behavior.')
     method: Literal['response','pattern'] = 'response'
     knots_s: list[FiniteFloat] = Field(default_factory=lambda:[0.,.18,.30],min_length=2,max_length=4)
     coefficient_limit_n: FiniteFloat = Field(default=2.,gt=0)
@@ -232,6 +233,10 @@ class LocalControlSearchSettings(Contract):
 
     @model_validator(mode='after')
     def domain(self):
+        if self.version=='local_control_search_v1' and self.safety_margin_fraction!=0:
+            raise ValueError('SAFETY_MARGIN_REQUIRES_V2_SEARCH')
+        if self.method=='pattern' and self.safety_margin_fraction!=0:
+            raise ValueError('SAFETY_MARGIN_REQUIRES_RESPONSE_METHOD')
         if (self.version=='local_control_search_v1' and self.knots_s[0]!=0) or any(b<=a for a,b in zip(self.knots_s,self.knots_s[1:])):
             raise ValueError('ORDERED_KNOTS_STARTING_AT_ZERO_REQUIRED')
         if self.correction_window_s is not None:

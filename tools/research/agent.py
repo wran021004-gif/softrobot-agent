@@ -305,6 +305,10 @@ async def converse(host):
                     host.store.complete(reserved,dict(request_id=key,execution_id=reserved['execution_id'],caller=host.actor,
                         tool_id='research.core_'+kind,tool_version='1.0.0',execution_status='failed',error=str(exc),charged=zero()),dict(error=str(exc)))
                 from tools.research.feedback import facts
+                if state(host)['spec'].get('research_decisions'):
+                    from tools.research.research_context import context
+                    return dict(toolUseId=use['toolUseId'],status='error',content=[dict(text=json.dumps(dict(
+                        error=type(exc).__name__,message=str(exc),research_context=context(host))))])
                 return dict(toolUseId=use['toolUseId'],status='error',content=[dict(text=json.dumps(dict(
                     error=type(exc).__name__,message=str(exc),decision_facts=facts(host))))])
         return run

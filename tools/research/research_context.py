@@ -87,7 +87,8 @@ def context(host):
         observations=[{k:r[k] for k in ('reference','candidate','task_identity','historical_only','task_gap')} for r in rows],
         evidence=evidence,unresolved_hypotheses=hypothesis_catalog(),history=s.get('research_history',[]),
         control_search_starts=[dict(candidate=e['candidate'],source=e['source'],historical_observation=e['reference'],
-            ownership='Current executable candidate; observation retains sealed historical ownership') for e in s.get('research_history',[])],
+            ownership='Current executable candidate; observation retains sealed historical ownership') for e in sorted(
+                s.get('research_history',[]),key=lambda e:ranking_key(dict(task_gap=task_gap(host.store.artifact(e['reference'])))))],
         actions=closeout_operations(host)['research_plan'] if protected(host) else spec['allowed_plan_actions'],
         budget=host.store.remaining(),completed_decisions=s.get('plans',[]),
         control_search_usage='action=control_search, control_search={candidate,source,settings,adaptation_from?}; decision fields required. v2 dimensions come from schedule. Optional correction_window_s masks all changes outside the window. Full original task always evaluated.')

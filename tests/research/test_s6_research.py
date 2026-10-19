@@ -72,6 +72,27 @@ class ContractTests(unittest.TestCase):
         vectors=constraint_vectors(outputs,[0,0,0],.1,.02,.02,terminal_position_limit=.005)
         np.testing.assert_array_equal(vectors[:,0],[2.,.5,0.])
 
+    def test_margin_is_versioned_and_method_specific(self):
+        for options in [dict(safety_margin_fraction=.05),dict(version='local_control_search_v2',method='pattern',safety_margin_fraction=.05)]:
+            with self.assertRaises(ValueError):LocalControlSearchSettings(**options)
+
+    def test_model_margin_survives_small_curvature_without_relaxing_acceptance(self):
+        s=start();s['limits']=[8.];tr=s['schedule']['trajectory']
+        tr.update(tensions_n=[[4.],[4.]],times_s=[0.,.1,.2],tendon_order=['a'])
+        s['task_options'].update(holding_start=.1)
+        def evaluate(s,source,metadata):
+            delta=source['trajectory']['tensions_n'][-1][0]-4.;speed=.021+.1*delta+.05*delta**2
+            gap=max(0.,speed/.02-1)
+            return dict(reference='synthetic-curved-fixture',task_gap=dict(valid_complete=True,accepted=speed<=.02,
+                normalized_gap=gap,components={'speed':gap}),outputs=dict(times_s=[0.,.1,.2],
+                tip_positions_m=[[0,0,0]]*3,tip_velocities_m_s=[[speed,0,0]]*3))
+        settings=dict(version='local_control_search_v2',knots_s=[0.,.1],evaluation_requests=4)
+        boundary=search([s],evaluate,settings);margin=search([s],evaluate,dict(settings,safety_margin_fraction=.05))
+        self.assertFalse(boundary['best']['task_gap']['accepted'])
+        self.assertTrue(margin['best']['task_gap']['accepted'])
+        self.assertEqual(margin['stop_reason'],'first_original_task_pass')
+        self.assertEqual(s['task_options']['speed_limit'],.02)
+
     def test_new_structure_initialization_is_explicit_and_unmeasured(self):
         source=start()['schedule'];before=deepcopy(source)
         model=(SimpleNamespace(task={'id':'new-task'}),dict(tendons=[dict(entity=k) for k in ['a','b','c','d']]),{},dict(identity='new-model',design_identity='new-design'))

@@ -142,11 +142,11 @@ def correction_basis(times, knots, channels, window=None):
 
 
 def constrained_response_step(vectors, response, coefficients, reference, basis, limits,
-                              radius, coefficient_limit, regularization=.01):
+                              radius, coefficient_limit, regularization=.01, safety_margin_fraction=0.):
     """Numerical SLSQP epigraph step; no global proof or physical acceptance."""
     from scipy.optimize import minimize
     y=np.asarray(vectors);jac=np.asarray(response);x=np.asarray(coefficients)
-    if (y.ndim!=2 or y.shape[1]!=3 or jac.shape!=(*y.shape,len(x)) or
+    if (not 0<=safety_margin_fraction<.5 or y.ndim!=2 or y.shape[1]!=3 or jac.shape!=(*y.shape,len(x)) or
             not all(np.isfinite(a).all() for a in (y,jac,x,reference,basis,limits))):
         raise ValueError('FINITE_ALIGNED_LOCAL_RESPONSE_REQUIRED')
     low=np.maximum(-radius,-coefficient_limit-x);high=np.minimum(radius,coefficient_limit-x)
@@ -160,8 +160,9 @@ def constrained_response_step(vectors, response, coefficients, reference, basis,
     solved=minimize(lambda z:z[-1]+regularization*(z[:-1]@z[:-1]),
         np.r_[np.zeros(len(x)),max(0.,max(np.linalg.norm(y,axis=1))-1)],
         jac=lambda z:np.r_[2*regularization*z[:-1],1.],method='SLSQP',
-        bounds=[*zip(low,high),(0,None)],constraints=[dict(type='ineq',fun=constraints,jac=derivatives)],
+        bounds=[*zip(low,high),(-safety_margin_fraction,None)],constraints=[dict(type='ineq',fun=constraints,jac=derivatives)],
         options=dict(maxiter=100,ftol=1e-10))
     valid=bool(solved.success and np.isfinite(solved.x).all() and min(constraints(solved.x))>=-1e-8)
     return dict(success=valid,delta=solved.x[:-1],predicted_gap=float(max(0.,max(norms(solved.x))-1)),
+        predicted_signed_excess=float(max(norms(solved.x))-1),target_margin_fraction=safety_margin_fraction,
         numerical_status=str(solved.message),iterations=int(solved.nit),global_optimality_proved=False)
