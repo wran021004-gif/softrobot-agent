@@ -169,6 +169,8 @@ class HistoryTests(unittest.TestCase):
             source=host.store.artifact(current['history'][0]['source'])
             self.assertEqual(np.asarray(source['trajectory']['tensions_n']).shape,(35,4))
             self.assertEqual(source,read(ROOT/'evidence/control_search_p1/best_control.json')['schedule'])
+            citation=plan(decision=decision(),supporting_evidence=[current['history'][0]['source'],best['raw_reference']])
+            self.assertEqual(len(admit_decision(host,citation)['resolved_evidence']),2)
             entry=current['history'][0]
             request=plan('control_search',decision=decision('CONTROL_SEARCH',selected_candidate=entry['candidate'],requested_budget=1),
                 supporting_evidence=[entry['reference']],control_search=dict(candidate=entry['candidate'],source=entry['source'],

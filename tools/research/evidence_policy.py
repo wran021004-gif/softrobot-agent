@@ -177,6 +177,12 @@ def admit_decision(host,plan):
     known=[*s.get('results',[]),*s.get('physical_replays',[]),*s.get('analysis_results',[]),
         *s.get('mechanics_results',[]),*s.get('rl_evaluations',[]),*s.get('scoped_context',[]),
         *s.get('control_search_results',[]),*s.get('research_mathematics',[]),*[e['reference'] for e in s.get('research_history',[])]]
+    known += list(s.get('candidates',{}).values())
+    for entry in s.get('research_history',[]):
+        known += [entry[k] for k in ('source','candidate','historical_candidate')]
+    for ref in [*s.get('physical_replays',[]),*[e['reference'] for e in s.get('research_history',[])]]:
+        result=host.store.artifact(ref)
+        known += [result[k] for k in ('source_reference','raw_reference') if result.get(k)]
     summaries=[]
     for ref in plan.supporting_evidence:
         if plain(ref) not in known:raise ValueError('UNREGISTERED_RESEARCH_EVIDENCE')
