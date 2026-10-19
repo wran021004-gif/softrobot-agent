@@ -220,13 +220,20 @@ def family_claims(host, s, progress):
         designs.setdefault(candidate.get('physical_design_identity',digest(candidate['configuration']['robot']['structure'])),ref)
     refs = list(designs.values())
     selected = host.store.artifact(s['selected']) if s.get('selected') else None
-    return dict(claim_version='family_space_claims_v1',selected=s.get('selected'),
+    adaptations=[]
+    if s['spec'].get('research_decisions'):
+        for ref in s.get('control_search_results',[]):
+            row=host.store.artifact(ref);parent=row.get('adaptation_from')
+            if parent and any(not r['cache_hit'] for r in row['candidates']) and host.store.artifact(row['candidate'])['configuration']['robot']!=host.store.artifact(parent)['configuration']['robot']:
+                adaptations.append(ref)
+    extra=dict(explicit_structure_control_adaptations=adaptations,local_control_search_results=s.get('control_search_results',[])) if s['spec'].get('research_decisions') else {}
+    return dict(claim_version='bounded_research_claims_v1' if s['spec'].get('research_decisions') else 'family_space_claims_v1',selected=s.get('selected'),
         selected_candidate=selected['candidate'] if selected else None,
         candidate_generated_from_family_space=bool(candidates),
         physically_constructed_and_validated_candidates=[ref for ref,c in candidates if c.get('physical_validation')=='compiled'],
         design_changes_between_candidates=[dict(before=a,after=b) for a,b in zip(refs,refs[1:])],
         distinct_generated_designs=len(designs),
-        structure_control_search_performed=any(host.store.artifact(r)['result'].get('evaluated') for r in s.get('search_results',[])),
+        structure_control_search_performed=bool(adaptations) or any(host.store.artifact(r)['result'].get('evaluated') for r in s.get('search_results',[])),
         optimizer_feedback_decisions=[row['lineage'] for r in s.get('search_results',[]) for row in host.store.artifact(r)['result'].get('evaluated',[])
             if row.get('lineage',{}).get('previous_candidate_ref') and row['lineage'].get('evidence_used')],
         selected_structurally_new=None,model_selected_structure_search_evaluations=None,
@@ -235,7 +242,7 @@ def family_claims(host, s, progress):
         independent_task_acceptance=result_view(host,s['selected']) if selected else None,
         confirmation_progress=progress,limited_repeat_supported_acceptance=progress['confirmed'],
         confirmation_status='not_required' if progress['required_total']==0 else 'passed' if progress['confirmed'] else 'pending',
-        reproducibility_assessed=progress['confirmed'],parameter_improvement_attribution_permitted=False)
+        reproducibility_assessed=progress['confirmed'],parameter_improvement_attribution_permitted=False,**extra)
 
 
 def resource_use(host):
