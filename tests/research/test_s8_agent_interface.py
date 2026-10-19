@@ -32,5 +32,21 @@ class AgentInterfaceTests(unittest.TestCase):
         self.assertEqual(s['allOf'][0]['then']['required'],['control_seed'])
         self.assertNotIn('generation',s['properties'])
 
+    def test_pointer_rejection_includes_actual_children(self):
+        host=Mock();host.store.artifact.return_value={'best':{},'candidates':[]}
+        with patch('tools.research.agent.state',return_value={}),patch('tools.research.agent.record',return_value={}):
+            r=error_feedback(host,{'input':{'reference':{'artifact_id':'a'*64},'pointer':'/proposals'}},KeyError('proposals'),{})
+        self.assertIn('best, candidates',r['expected'])
+
+    def test_search_facts_precede_large_preview(self):
+        from tools.research.research_context import compact_evidence
+        v={'best':{'reference':'fixture','source':'source','task_gap':{'accepted':False,'normalized_gap':1.}},
+            'candidates':[{'reference':str(i),'outputs':{'large':'x'*20000},'task_gap':{}} for i in range(30)],
+            'stop_reason':'iteration_limit','search_dimension':1,'finite_difference_evaluations':10}
+        r=compact_evidence(v,{'artifact_id':'a'*64})
+        prefix=json.dumps(r)[:1800]
+        self.assertIn('available_keys',prefix);self.assertIn('normalized_gap',prefix)
+        self.assertIn('/best',prefix);self.assertLess(len(json.dumps(r)),5000)
+
 
 if __name__=='__main__':unittest.main()

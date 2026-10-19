@@ -249,7 +249,22 @@ def error_feedback(host, use, exc, before):
         field='action';expected=message[message.index('ACTION_REQUIRES_ONLY_'):].split('\n')[0][:160]
     if isinstance(exc,(KeyError,IndexError)):
         code='INVALID_EVIDENCE_POINTER';field='pointer';expected='Read the parent pointer with view=summary to obtain actual child keys'
-        if use['input'].get('reference'):refs=[use['input']['reference']]
+        if use['input'].get('reference'):
+            refs=[use['input']['reference']]
+            try:
+                value=host.store.artifact(refs[0]);parent=''
+                for part in use['input'].get('pointer','').strip('/').split('/') if use['input'].get('pointer') else []:
+                    key=part.replace('~1','/').replace('~0','~')
+                    if isinstance(value,dict) and key not in value:break
+                    if isinstance(value,list) and (not key.isdigit() or int(key)>=len(value)):break
+                    value=value[int(key)] if isinstance(value,list) else value[key];parent+='/'+part
+                if isinstance(value,dict):expected='Available children at '+(parent or '/')+': '+', '.join(value)
+                if use['input'].get('view')=='fields':field='fields'
+            except (ValueError,KeyError,IndexError,TypeError):pass
+    if 'EVIDENCE_RANGE_REQUIRES_LIST_POINTER' in message:
+        field='pointer';expected='Use the actual list pointer, e.g. /trajectory/tensions_n on a control source or /samples on its raw_reference'
+    if 'PROTECTED_EVIDENCE_READ_REQUIRES' in message:
+        field='reference';expected='Only current result references are readable during closeout; use all_fresh_results and select a fresh pass or STOP'
     return dict(status='rejected' if counts(before)==counts(s) else 'execution_failed',error_code=code[:100],field=field,
         expected=expected,scientific_execution_started=counts(before)!=counts(s),relevant_references=refs,full_error_reference=full)
 

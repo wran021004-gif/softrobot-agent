@@ -120,8 +120,13 @@ def compact_evidence(value, reference, pointer=''):
     """Deterministic bounded preview; the exact Store artifact remains authoritative."""
     def preview(v,depth=0,path=pointer):
         if isinstance(v,list):
-            items=[preview(x,depth+1,path+'/'+str(i)) for i,x in enumerate(v[:3])]
-            return dict(total=len(v),preview=items) if len(v)>3 else items
+            items=[]
+            for i,x in enumerate(v[:3]):
+                if len(v)>3 and isinstance(x,dict):
+                    fields=('reference','candidate','source','task_gap','label','time_s','tip_m','speed_m_s','position_error_m')
+                    x={k:x[k] for k in fields if k in x} or dict(keys=list(x),read_pointer=path+'/'+str(i))
+                items.append(preview(x,depth+1,path+'/'+str(i)))
+            return dict(total=len(v),read_pointer=path,item_keys=list(v[0]) if isinstance(v[0],dict) else None,preview=items) if len(v)>3 else items
         if isinstance(v,dict):
             if depth>5:return dict(keys=list(v))
             return {k:(dict(available=True,read_pointer=path+'/'+k) if k in (
@@ -131,7 +136,15 @@ def compact_evidence(value, reference, pointer=''):
     # Acceptance contains all original thresholds and validity components, never truncate it.
     result=preview(value)
     if isinstance(value,dict) and 'acceptance' in value:result['acceptance']=value['acceptance']
-    return dict(reference=reference,pointer=pointer,view='deterministic_summary',value=result,
+    summary={}
+    if isinstance(value,dict) and 'best' in value and 'candidates' in value:
+        best=value.get('best') or {}
+        summary=dict(stop_reason=value.get('stop_reason'),search_dimension=value.get('search_dimension'),
+            finite_difference_evaluations=value.get('finite_difference_evaluations'),
+            best={k:best.get(k) for k in ('reference','candidate','source','task_gap','coefficients_n')},
+            small_query=dict(pointer=pointer+'/best',view='fields',fields=['reference','candidate','source','task_gap','coefficients_n']))
+    return dict(reference=reference,pointer=pointer,view='deterministic_summary',
+        available_keys=list(value) if isinstance(value,dict) else None,summary=summary,value=result,
         retrieval='evidence_read(view=full,pointer=...) or fields/range; no acceptance transfer')
 
 
