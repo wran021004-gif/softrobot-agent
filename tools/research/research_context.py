@@ -44,6 +44,19 @@ def import_history(host):
             if save(host,candidate,'declared_historical_math_candidate')!=value['candidate']:raise ValueError('HISTORY_MATH_CANDIDATE_MISMATCH')
         if save(host,value,'declared_historical_mathematics')!=item['reference']:raise ValueError('HISTORY_MATH_IDENTITY_MISMATCH')
         mathematics.append(item['reference'])
+    for item in s['spec']['research_decisions'].get('control_seeds',[]):
+        # Transfer design/inputs only: the old result is never an observation of this task.
+        from tools.research.physical_replay import seed_control
+        from tools.research.contracts import ControlSeedRequest
+        old=archived(item['folder'],item['candidate'])
+        source=archived(item['folder'],item['source'])
+        binding(old['configuration'],source['trajectory'])
+        parent=save(host,old,'declared_control_parent')
+        source_ref=save(host,source,'declared_control_source')
+        parameters=deepcopy(old['parameters']);parameters['family_space_identity']=s['spec']['family_space_identity']
+        generated=generate_candidate(host,parameters,dict(origin='engineering_control_seed',source=item))
+        if generated['status']!='generated':raise ValueError('CONTROL_SEED_DESIGN_NOT_EXECUTABLE: '+str(generated))
+        seed_control(host,ControlSeedRequest(candidate=generated['candidate'],parent=parent,source=source_ref))
     update(host,research_history=entries,research_mathematics=mathematics,research_history_imported=True)
 
 
@@ -58,7 +71,7 @@ def observation(host,ref,historical=False):
         raw_reference=raw_ref,evidence=summarize_evidence(result,ref))
 
 
-def context(host):
+def legacy_context(host):
     from tools.research.candidate_portfolio import ranking_key
     from tools.research_tasks import task_adapter
     from tools.research.budget import protected, closeout_operations, stage_usage
@@ -100,3 +113,53 @@ def context(host):
             ('nmpc',spec['nmpc_limits']['executions'],s.get('nmpc_launches',0)),('rl_stages',spec['rl_limits']['training_stages'],s.get('admitted_training_stages',0)))},
         rl_accounting=stage_usage(s),
         control_search_usage='action=control_search, control_search={candidate,source,settings,adaptation_from?}; decision fields required. v2 dimensions come from schedule. Optional correction_window_s masks all changes outside the window. Current optimizer supports registered reach-hold norm constraints only; other tasks return unsupported. Full original task always evaluated.')
+
+
+def compact_evidence(value, reference, pointer=''):
+    """Deterministic bounded preview; the exact Store artifact remains authoritative."""
+    def preview(v,depth=0,path=pointer):
+        if isinstance(v,list):
+            items=[preview(x,depth+1,path+'/'+str(i)) for i,x in enumerate(v[:3])]
+            return dict(total=len(v),preview=items) if len(v)>3 else items
+        if isinstance(v,dict):
+            if depth>5:return dict(keys=list(v))
+            return {k:(dict(available=True,read_pointer=path+'/'+k) if k in (
+                'configuration','scientific_configuration','resolved','trajectory','outputs','samples','request','original_result')
+                else preview(x,depth+1,path+'/'+k.replace('~','~0').replace('/','~1'))) for k,x in v.items()}
+        return v
+    # Acceptance contains all original thresholds and validity components, never truncate it.
+    result=preview(value)
+    if isinstance(value,dict) and 'acceptance' in value:result['acceptance']=value['acceptance']
+    return dict(reference=reference,pointer=pointer,view='deterministic_summary',value=result,
+        retrieval='evidence_read(view=full,pointer=...) or fields/range; no acceptance transfer')
+
+
+def context(host):
+    s=state(host);settings=s['spec'].get('research_decisions',{}).get('context_limits')
+    current=legacy_context(host)
+    if settings is None:return current
+    return bounded_context(current,settings,s.get('control_initializations',[]))
+
+
+def bounded_context(current,settings,initializations=()):
+    """Pure projection also used for exact saved-decision offline comparisons."""
+    current=deepcopy(current)
+    n=lambda key,default:settings.get(key,default)
+    best=current['best_valid']
+    if best:
+        best=deepcopy(best)
+        samples=best['violations'].get('samples',[])
+        best['violations'].update(total=len(samples),samples=sorted(samples,key=lambda r:r['normalized_excess'],reverse=True)[:n('samples',6)])
+        best['evidence']={k:v for k,v in best['evidence'].items() if k in (
+            'claim_kind','verification_status','supported_inferences','unsupported_inferences','evidence_reference','prospective_guarantee')}
+    all_rows=current['observations']
+    fresh=[r for r in all_rows if not r['historical_only']]
+    current.update(version='research_context_v2',best_valid=best,
+        observations=all_rows[-n('recent',4):],all_fresh_results=[r['reference'] for r in fresh],
+        observation_count=len(all_rows),pareto_candidates=current['pareto_candidates'][:n('pareto',3)],
+        evidence=current['evidence'][-n('evidence',3):],history_count=len(current.pop('history')),
+        control_search_starts=[*initializations,*current['control_search_starts']][:n('candidates',3)],
+        completed_decision_count=len(current['completed_decisions']),
+        recent_decisions=current.pop('completed_decisions')[-n('recent',4):],
+        evidence_access='Full artifacts remain in Store. all_fresh_results is the complete STOP citation index; observations is a bounded recent view.')
+    return current

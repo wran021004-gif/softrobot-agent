@@ -186,6 +186,32 @@ def load_credential(path):
     if not os.environ.get('DEEPSEEK_API_KEY'):
         raise ValueError('MODEL_KEY_MISSING')
 
+
+def plan_schema(actions):
+    """Advertise only executable action payloads and their reachable definitions."""
+    from tools.research.contracts import Plan
+    schema=Plan.model_json_schema()
+    payloads=dict(initialize_control='control_seed',generate='generation',propose='parameters',execute='candidate',
+        search='search',control_search='control_search',mechanics='mechanics',replay='mechanics_source',
+        cross_replay='cross_replay',physical_replay='physical_replay',refine='refinement',matched_state='matched_state',
+        nmpc_prediction_diagnostic='nmpc_prediction_diagnostic',diagnose='diagnostic',confirm='selected_execution',select='selected_execution')
+    allowed={payloads[a] for a in actions if a in payloads}
+    for field in set(payloads.values())-allowed:schema['properties'].pop(field,None)
+    schema['properties']['action']={'type':'string','enum':actions}
+    needed=set()
+    def visit(v):
+        if isinstance(v,dict):
+            if '$ref' in v:
+                name=v['$ref'].rsplit('/',1)[-1]
+                if name not in needed:
+                    needed.add(name);visit(schema['$defs'][name])
+            for x in v.values():visit(x)
+        elif isinstance(v,list):
+            for x in v:visit(x)
+    visit(schema['properties'])
+    schema['$defs']={k:v for k,v in schema['$defs'].items() if k in needed}
+    return schema
+
 def build_harness(host,*,transport,api_key,instructions,model_class,tool_executor,research_tools,configuration_path,session_directory):
     from strands.experimental.context_manager import Offload
     s=state(host)
@@ -197,14 +223,18 @@ def build_harness(host,*,transport,api_key,instructions,model_class,tool_executo
         params=dict(max_tokens=provider['max_tokens'],reasoning_effort=provider['reasoning_effort'],
             extra_body=dict(thinking=dict(type=provider['thinking']))),client=client)
     # Public offload stores originals for retrieval; no auxiliary model requests.
-    context=dict(strategies=[Offload.truncate('tool_results',{'preview_tokens':1024}).when(threshold=4096)])
+    compact=bool(s['spec'].get('research_decisions',{}).get('context_limits'))
+    context=dict(strategies=[Offload.truncate('tool_results',{'preview_tokens':500 if compact else 1024}).when(threshold=1500 if compact else 4096)])
     agent=create_harness(model=model,tools=research_tools,instructions=instructions,
         builtin_tools=[],builtin_plugins=[],background_tasks=False,memory=False,skills=False,
         context_manager=context,session=dict(id=s['pilot']['framework_session_id'],dir=str(session_directory)),
         retry_strategy=None,callback_handler=None,caching=False,tool_executor=tool_executor)
     atomic_json(configuration_path,dict(harness='strands-harness==0.2.0',sdk='strands-agents==1.59.0',
         provider=provider,registered_tools=sorted(agent.tool_names),session_id=s['pilot']['framework_session_id'],
-        retry_controllers=0,context='public tool-result offload and retrieval',transport='accounted live boundary'))
+        retry_controllers=0,context='public tool-result offload and retrieval',offload_threshold=1500 if compact else 4096,
+        offload_preview_tokens=500 if compact else 1024,
+        dynamic_context='bounded packet in stable system prefix; installed BeforeModelCallEvent exposes cancellation only',
+        transport='accounted live boundary'))
     return agent
 
 async def wait_training(host):
@@ -294,10 +324,17 @@ async def converse(host):
                         if kind=='experience':
                             value=experience(host,use['input'])
                         else:
-                            value=read_evidence(host,use['input'])
+                            query=use['input']
+                            if state(host)['spec'].get('research_decisions',{}).get('context_limits'):
+                                query=dict(view='summary',**query)
+                            value=read_evidence(host,query)
                         host.store.complete(row,dict(request_id=key,execution_id=row['execution_id'],caller=host.actor,
                             tool_id='research.core_'+kind,tool_version='1.0.0',execution_status='completed',charged=zero()),value)
-                return dict(toolUseId=use['toolUseId'],status='success',content=[dict(text=json.dumps(value))])
+                if kind!='evidence' and state(host)['spec'].get('research_decisions',{}).get('context_limits'):
+                    from tools.research.research_context import compact_evidence
+                    ref=record(host,'complete_tool_output',value)
+                    value=compact_evidence(value,ref)
+                return dict(toolUseId=use['toolUseId'],status='success',content=[dict(text=json.dumps(value,separators=(',',':')))])
             except Exception as exc:
                 key='native-'+use['toolUseId']
                 reserved=host.store.lookup(host.run_id,key)
@@ -324,8 +361,7 @@ async def converse(host):
         if formal and state(host)['spec'].get('mode')!='rl_interface':
             actions += [a for a,c in [('execute','nmpc'),('search','search'),('mechanics','mathematics'),('replay','replay')] if enabled(state(host)['spec'],c)]
         actions=state(host)['spec'].get('allowed_plan_actions',actions)
-        schema=Plan.model_json_schema()
-        schema['properties']['action']={'type':'string','enum':actions}
+        schema=plan_schema(actions)
         native[0].tool_spec={**native[0].tool_spec,'inputSchema':{'json':schema}}
     if state(host)['spec'].get('nominal_source') or state(host)['spec'].get('start_mode')=='family_space':
         native.append(PythonAgentTool('research_analysis',dict(name='research_analysis',description='Candidate-bound mathematics; saved_state or execution plus update_id selects exact projected state at previous applied input with actual remaining task time. Historical candidate binding required. Each calculation charged once; task acceptance unmeasured.',inputSchema={'json':AnalysisRequest.model_json_schema()}),handler('analysis')))
@@ -356,6 +392,14 @@ async def converse(host):
             ev=next(e for e in host.store.events(host.run_id) if e['kind']=='r3_request' and e['request_id']==saved)
             original=host.store.artifact(host.store.artifact(ev['outputs'][0])['request'])
             agent.system_prompt=next(m['content'] for m in original['messages'] if m['role']=='system')
+            definitions={t['function']['name']:t['function'] for t in original.get('tools',[])}
+            registry=agent.tool_registry.registry
+            if set(definitions)-set(registry):raise ValueError('SAVED_REQUEST_TOOL_IMPLEMENTATION_UNAVAILABLE')
+            for name in list(registry):
+                if name not in definitions:registry.pop(name)
+            for name,definition in definitions.items():
+                registry[name].tool_spec=dict(name=name,description=definition.get('description',''),
+                    inputSchema={'json':definition['parameters']})
             return
         remaining=host.store.remaining()['remaining']
         if remaining['model_calls']<1 or remaining['tool_calls']<2:
@@ -372,11 +416,10 @@ async def converse(host):
         guard(host)
         current=decision_packet(host)
         record(host,'model_decision_packet',current)
-        agent.system_prompt=instructions+'\nCURRENT_RESEARCH_PACKET\n'+json.dumps(current)
+        agent.system_prompt=instructions+'\nCURRENT_RESEARCH_PACKET\n'+json.dumps(current,separators=(',',':'))
         if protected(host):
             permitted=closeout_operations(host)
-            schema=Plan.model_json_schema()
-            schema['properties']['action']={'enum':permitted['research_plan'],'type':'string'}
+            schema=plan_schema(permitted['research_plan'])
             native[0].tool_spec={**native[0].tool_spec,'inputSchema':{'json':schema}}
             agent.tool_registry.registry.pop('experience_retrieve',None)
             agent.tool_registry.registry.pop('research_analysis',None)
@@ -441,7 +484,10 @@ def decision_packet(host):
         from extensions.tendon_family.family_space import decision_summary
         s=state(host);spec=s['spec']
         return dict(research=context(host),implementation=s['freeze'],study_id=host.run_id,
-            candidates=[r for r in s['candidates'].values() if host.store.artifact(r)['profile_identity']==s['profile']['identity']],family_space=decision_summary(spec['family_space'],s['family_space_reference'],
+            controller_capabilities=dict(recipe_defaults=spec['configuration']['policy']['controller']['parameters']['data']['recipe'],
+                solver_defaults=spec['configuration']['policy']['controller']['parameters']['data'].get('solver'),
+                patch='Generation v2 controller_recipe/controller_solver sparse patches use registered owner validation; settling remains task-owned'),
+            candidates=[r for r in s['candidates'].values() if host.store.artifact(r)['profile_identity']==s['profile']['identity']][-spec.get('research_decisions',{}).get('context_limits',{}).get('candidates',100000):],family_space=decision_summary(spec['family_space'],s['family_space_reference'],
                 dict(actions=spec['allowed_plan_actions'],capabilities=spec['capabilities'])),analysis_protocol=spec['analysis_protocol'],
             guidance='Use exact evidence refs and a typed decision in every research_plan. Source references contain complete trajectory; evidence_read is available. New designs need explicit control adaptation. Do not infer global feasibility/infeasibility. Stop at first complete pass; publicly read and select it. STOP must cite every new result.')
     result=packet(host)

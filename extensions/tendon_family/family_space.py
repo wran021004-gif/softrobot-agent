@@ -1,6 +1,6 @@
 """Frozen SI serial-family domains and compact requests, independent of source tendons."""
 from typing import Literal
-from pydantic import Field, FiniteFloat, model_validator
+from pydantic import Field, FiniteFloat, model_validator, model_serializer
 from schemas.common import Contract
 from .contracts import Discretization, RoutePoint, Section, Segment, Rigid, Attachment
 
@@ -26,6 +26,22 @@ class SegmentDomain(Contract):
     length_m: Domain
     young_pa: Domain
     section_dimensions_m: dict[str, dict[str, Domain]]
+    physical_domains: dict[str, Domain] = Field(default_factory=dict)
+
+    @model_serializer(mode='wrap')
+    def legacy_domains(self, handler):
+        result=handler(self)
+        if not self.physical_domains:result.pop('physical_domains',None)
+        return result
+
+    @model_validator(mode='after')
+    def supported_physics(self):
+        allowed={'density_kg_m3','viscosity_y_nm2_s','viscosity_z_nm2_s','curvature_y_rad_m','curvature_z_rad_m','section_angle_rad'}
+        if set(self.physical_domains)-allowed:raise ValueError('UNSUPPORTED_SEGMENT_PHYSICAL_DOMAIN')
+        for key,d in self.physical_domains.items():
+            if key=='density_kg_m3' and d.minimum<=0 or key.startswith('viscosity_') and d.minimum<0:
+                raise ValueError('POSITIVE_DENSITY_NONNEGATIVE_VISCOSITY_REQUIRED')
+        return self
 
 
 class Assembly(Contract):
@@ -192,11 +208,27 @@ class FamilySpaceV2(FamilySpace):
 
 class SegmentChoiceV2(SegmentChoice):
     cells: int | None = Field(default=None,ge=1,strict=True)
+    physical_parameters: dict[str,FiniteFloat] = Field(default_factory=dict)
+
+    @model_serializer(mode='wrap')
+    def legacy_choice(self,handler):
+        result=handler(self)
+        if not self.physical_parameters:result.pop('physical_parameters',None)
+        return result
 
 
 class GenerationRequestV2(GenerationRequest):
     version: Literal['serial_family_generation_v2'] = 'serial_family_generation_v2'
     segments: dict[int,SegmentChoiceV2] = Field(default_factory=dict)
+    controller_recipe: dict = Field(default_factory=dict)
+    controller_solver: dict = Field(default_factory=dict)
+
+    @model_serializer(mode='wrap')
+    def legacy_generation(self,handler):
+        result=handler(self)
+        for key in ('controller_recipe','controller_solver'):
+            if not getattr(self,key):result.pop(key,None)
+        return result
 
 
 class FamilyBuildV2(Contract):
@@ -272,7 +304,50 @@ def decision_summary(value, evidence, operations):
             guides=[dict(envelope_halfsize_m=c.envelope_halfsize_m,hole_radius_m=c.hole_radius_m)
                 for c in space.assembly.components if isinstance(c,Rigid) and c.kind=='guide']),
         numerical_support='Candidate-specific validation required; physical generation does not certify dynamics, control or task success')
+    result['execution_effects']=dict(mode='ideal_tension',
+        effective=['segment topology','tendon count/spans','length','material','section geometry/rotation','mesh cells',
+            'tendon diameter/clearance','force bounds','pretension initialization','polar and explicit routes'],
+        inactive=['length_servo_gain_n_m: length servo bypassed by ideal tension',
+            'actuator velocity/length limits: bypassed by ideal tension'],
+        controller_only=['holding_tip_speed_weight','terminal_tip_speed_weight'],
+        parameter_view='parameter_capabilities(space, selected generation request) resolves conditional fields; full_specification holds authoritative domains')
     return result
+
+
+def parameter_capabilities(value, request):
+    """Discover conditional executable paths from the existing domains and request."""
+    space=parse_space(value)
+    r=(GenerationRequestV2 if isinstance(space,FamilySpaceV2) else GenerationRequest).model_validate(request)
+    validate_request(space,r);rows=[]
+    def add(path,category,kind,unit,domain=None,choices=None,effective=True):
+        rows.append(dict(parameter_id=path,category=category,data_type=kind,unit=unit,
+            **(dict(minimum=domain.minimum,maximum=domain.maximum,default=domain.default) if domain else {}),
+            choices=choices,conditional_dependencies=dict(segment_count=r.segment_count,tendon_count=r.tendon_count),
+            effective_in_current_execution=effective,supported_methods=['generate'],validation_status='candidate_specific_compilation_required'))
+    add('segment_count','topology','integer','count',choices=space.executable_segment_counts)
+    add('tendon_count','topology','integer','count',choices=list(range(space.executable_tendon_count_bounds[0],space.executable_tendon_count_bounds[1]+1)))
+    for i in range(r.segment_count):
+        d=space.segment_domains.get(i,space.segment_domain);root=f'segments.{i}.'
+        for k,unit in [('length_m','m'),('young_pa','Pa')]:add(root+k,'segment','number',unit,getattr(d,k))
+        for k,domain in d.physical_domains.items():
+            unit='kg/m^3' if k=='density_kg_m3' else 'N*m^2*s' if k.startswith('viscosity') else 'rad/m' if k.startswith('curvature') else 'rad'
+            add(root+'physical_parameters.'+k,'material_geometry','number',unit,domain)
+        parts=[p for p in space.assembly.components if isinstance(p,Segment)]
+        choice=r.segments.get(i)
+        sections=choice.sections if choice and choice.sections is not None else [s.section for s in parts[min(i,len(parts)-1)].sections]
+        for j,section in enumerate(sections):
+            add(root+f'sections.{j}.kind','geometry','enum','none',choices=list(d.section_dimensions_m))
+            for k,domain in d.section_dimensions_m[section.kind].items():
+                add(root+f'sections.{j}.parameters.'+k,'geometry','number','m',domain)
+                rows[-1]['conditional_dependencies']['section_kind']=section.kind
+        if isinstance(space,FamilySpaceV2):
+            lo,hi=space.serial_assembly.cell_count_bounds
+            add(root+'cells','discretization','integer','count',Domain(minimum=lo,maximum=hi,default=space.serial_assembly.default_cells))
+    for k,d in space.tendon_domains.items():add('tendon_parameters.'+k,'tendon','number','m' if k=='diameter_m' else 'N/m' if 'gain' in k else 'N',d,effective=k!='length_servo_gain_n_m')
+    for k,d in space.routing_domains.items():add('spans.*.'+k,'routing','number','rad' if 'rad' in k else 'm' if k=='radius_m' else 'normalized_station',d)
+    for i in range(r.tendon_count):add(f'route_overrides.{i}','routing','route_points','SI')
+    for k,d in space.control_domains.items():add('control_weights.'+k,'controller','number','controller_weight',d,effective=False)
+    return rows
 
 
 def search_domains(space, query, grant):

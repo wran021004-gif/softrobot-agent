@@ -224,6 +224,15 @@ def generate_family(value):
     for guide in guides:guide['guide_holes']={}
     for i,part in enumerate(segments):
         domain=space.segment_domains.get(i,space.segment_domain);choice=r.segments.get(i)
+        edits=getattr(choice,'physical_parameters',{}) if choice else {}
+        for key,v in edits.items():
+            if key not in domain.physical_domains:raise ValueError('UNDECLARED_SEGMENT_PHYSICS: '+key)
+            domain.physical_domains[key].check(v,key)
+            if key=='density_kg_m3':part['physics'][key]=v
+            elif key.startswith('viscosity_') or key.startswith('curvature_'):
+                field='bending_viscosity_nm2_s' if key.startswith('viscosity_') else 'natural_curvature_rad_m'
+                target=part['physics'] if key.startswith('viscosity_') else part
+                values=list(target[field]);values[0 if '_y_' in key else 1]=v;target[field]=values
         for key in ('length_m','young_pa'):
             d=getattr(domain,key);v=getattr(choice,key) if choice else None
             v=d.check(d.default if v is None else v,key)
@@ -232,7 +241,10 @@ def generate_family(value):
             if len(choice.sections)!=len(part['sections']):raise ValueError('EXACT_SECTION_STATIONS_REQUIRED')
             for station,section in zip(part['sections'],choice.sections):station['section']=plain(section)
         for station in part['sections']:
+            if 'section_angle_rad' in edits:station['section']['angle_rad']=edits['section_angle_rad']
             section=station['section'];dims=domain.section_dimensions_m.get(section['kind'])
+            if 'section_angle_rad' in domain.physical_domains:
+                domain.physical_domains['section_angle_rad'].check(section['angle_rad'],'section_angle_rad')
             if dims is None or set(dims)!=set(section['parameters']):raise ValueError('SECTION_OUTSIDE_FAMILY_DOMAIN')
             for key,v in section['parameters'].items():dims[key].check(v,key)
             properties(section)

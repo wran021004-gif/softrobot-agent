@@ -163,13 +163,14 @@ def admit_decision(host,plan):
     if d is None:raise ValueError('VERSIONED_RESEARCH_DECISION_REQUIRED')
     if plan.action=='stop' and s.get('success_gate') and not s.get('selected'):
         raise ValueError('FRESH_PASS_REQUIRES_EXACT_SELECTION_BEFORE_STOP')
-    intents={'generate':'DESIGN_MODIFICATION','propose':'DESIGN_MODIFICATION','execute':'NMPC_EXECUTION',
+    intents={'initialize_control':'CONTROL_SEARCH','generate':'DESIGN_MODIFICATION','propose':'DESIGN_MODIFICATION','execute':'NMPC_EXECUTION',
         'control_search':'CONTROL_SEARCH','physical_replay':'PHYSICAL_VALIDATION','select':'SELECT','stop':'STOP',
         'diagnose':'DIAGNOSE','search':'MATHEMATICAL_ANALYSIS','mechanics':'MATHEMATICAL_ANALYSIS',
         'replay':'MATHEMATICAL_ANALYSIS','refine':'MATHEMATICAL_ANALYSIS','cross_replay':'MATHEMATICAL_ANALYSIS',
         'matched_state':'DIAGNOSE','nmpc_prediction_diagnostic':'DIAGNOSE','confirm':'PHYSICAL_VALIDATION'}
     if d.research_intent!=intents[plan.action]:raise ValueError('RESEARCH_INTENT_ACTION_MISMATCH')
     actual=plan.candidate
+    if plan.control_seed:actual=plan.control_seed.candidate
     if plan.control_search:actual=plan.control_search.candidate
     if plan.physical_replay:actual=plan.physical_replay.candidate
     if actual is not None and plain(d.selected_candidate)!=plain(actual):raise ValueError('DECISION_CANDIDATE_MISMATCH')
@@ -180,6 +181,7 @@ def admit_decision(host,plan):
         *s.get('mechanics_results',[]),*s.get('rl_evaluations',[]),*s.get('scoped_context',[]),
         *s.get('control_search_results',[]),*s.get('research_mathematics',[]),*[e['reference'] for e in s.get('research_history',[])]]
     known += list(s.get('candidates',{}).values())
+    known += [e[k] for e in s.get('control_initializations',[]) for k in ('candidate','source')]
     for entry in s.get('research_history',[]):
         known += [entry[k] for k in ('source','candidate','historical_candidate')]
     for ref in [*s.get('physical_replays',[]),*[e['reference'] for e in s.get('research_history',[])]]:

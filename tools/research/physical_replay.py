@@ -92,6 +92,58 @@ def initialize_schedule(configuration, source, parent):
             inherited_acceptance=False,source_provenance=source['provenance']))
 
 
+def seed_control(host, request, operation_key=None):
+    """Candidate-owned bounded inputs; explicit ZOH time/channel transfer or pretension."""
+    started=time.perf_counter()
+    try:
+        return _seed_control(host,request,operation_key)
+    finally:
+        elapsed=time.perf_counter()-started;s=state(host)
+        update(host,numerical_s=s['numerical_s']+elapsed,
+            control_initialization_s=s.get('control_initialization_s',0.)+elapsed)
+
+
+def _seed_control(host,request,operation_key):
+    cfg=verify_candidate(host,request.candidate)['configuration']
+    inp,physics,scene,spec=model_context(cfg)
+    period=inp.task.timing.control_period_s
+    count=round(inp.task.timing.duration_s/period)
+    order=[t['entity'] for t in physics['tendons']]
+    tendons={t['id']:t for t in cfg['robot']['structure']['data']['tendons']}
+    inputs=np.tile([tendons[t]['pretension_n'] for t in order],(count,1))
+    provenance=dict(control_initialization='bounded_candidate_control_v1',inherited_acceptance=False,
+        parent=plain(request.parent),source=plain(request.source),channel_map=request.channel_map,operation_key=operation_key,
+        time_rule='zero-order hold; hold last input beyond source horizon; new channels use candidate pretension')
+    if request.source:
+        parent=host.store.artifact(request.parent)
+        source=host.store.artifact(request.source)
+        binding(parent['configuration'],source['trajectory'])
+        old=source['trajectory'];old_order=old['tendon_order']
+        mapping=request.channel_map
+        if mapping is None:
+            # Unequal topology gets a new baseline, never an implicit channel copy.
+            mapping=dict(zip(order,old_order)) if order==old_order else {}
+        if set(mapping)-set(order) or set(mapping.values())-set(old_order):
+            raise ValueError('CONTROL_CHANNEL_MAP_OUTSIDE_CANDIDATES')
+        indices=np.clip(np.searchsorted(old['times_s'],np.arange(count)*period+1e-12,side='right')-1,
+            0,len(old['tensions_n'])-1)
+        for name,original in mapping.items():
+            inputs[:,order.index(name)]=np.asarray(old['tensions_n'])[indices,old_order.index(original)]
+        provenance['effective_channel_map']=mapping
+    elif request.tensions_n is not None:
+        inputs=np.asarray(request.tensions_n,dtype=float)
+        if inputs.shape==(1,len(order)):inputs=np.repeat(inputs,count,axis=0)
+    trajectory=dict(times_s=[i*period for i in range(count+1)],tensions_n=inputs.tolist(),
+        tendon_order=order,model_identity=spec['identity'],design_identity=spec['design_identity'],
+        task_identity=digest(plain(inp.task)))
+    binding(cfg,trajectory)  # Reject bounds, dimensions and ineffective execution modes.
+    source=save(host,dict(source_kind='explicit_control_schedule_v1',task_acceptance='unmeasured',
+        trajectory=trajectory,provenance=provenance),'candidate_control_initialization')
+    entry=dict(candidate=plain(request.candidate),source=source,task_acceptance='unmeasured')
+    update(host,control_initializations=[*state(host).get('control_initializations',[]),entry])
+    return entry
+
+
 def binding(configuration, trajectory):
     inp,physics,scene,spec=model_context(configuration)
     timing=inp.task.timing;count=round(timing.duration_s/timing.control_period_s)

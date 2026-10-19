@@ -304,6 +304,24 @@ class ControlSearchRequest(Contract):
     adaptation_from: EvidenceRef | None = None
 
 
+class ControlSeedRequest(Contract):
+    candidate: EvidenceRef
+    source: EvidenceRef | None = None
+    parent: EvidenceRef | None = None
+    channel_map: dict[str, str] | None = None
+    tensions_n: list[list[FiniteFloat]] | None = None
+
+    @model_validator(mode='after')
+    def paired_source(self):
+        if (self.source is None) != (self.parent is None):
+            raise ValueError('CONTROL_SOURCE_REQUIRES_EXACT_PARENT')
+        if self.channel_map is not None and self.source is None:
+            raise ValueError('CHANNEL_MAP_REQUIRES_SOURCE')
+        if self.tensions_n is not None and self.source is not None:
+            raise ValueError('CHOOSE_EXPLICIT_INPUTS_OR_SOURCE')
+        return self
+
+
 class ResearchDecision(Contract):
     version: Literal['research_decision_v1'] = 'research_decision_v1'
     hypothesis_id: str = Field(min_length=1)
@@ -316,7 +334,8 @@ class ResearchDecision(Contract):
 
 
 class Plan(Contract):
-    action: Literal['generate', 'propose', 'execute', 'search', 'control_search', 'mechanics', 'replay', 'cross_replay', 'physical_replay', 'refine', 'matched_state', 'nmpc_prediction_diagnostic', 'diagnose', 'confirm', 'select', 'stop']
+    action: Literal['initialize_control', 'generate', 'propose', 'execute', 'search', 'control_search', 'mechanics', 'replay', 'cross_replay', 'physical_replay', 'refine', 'matched_state', 'nmpc_prediction_diagnostic', 'diagnose', 'confirm', 'select', 'stop']
+    control_seed: ControlSeedRequest | None = None
     decision: ResearchDecision | None = None
     control_search: ControlSearchRequest | None = None
     next_step: Literal['adjust_training','revise_design','diagnose','stop'] | None = None
@@ -348,7 +367,7 @@ class Plan(Contract):
         result=handler(self)
         if self.generation is None:
             result.pop('generation',None)
-        for key in ('decision','control_search'):
+        for key in ('decision','control_search','control_seed'):
             if getattr(self,key) is None:result.pop(key,None)
         return result
 
@@ -356,12 +375,12 @@ class Plan(Contract):
     def required(self):
         if self.revise_selection and self.action not in ('confirm','select'):
             raise ValueError('REVISE_SELECTION_REQUIRES_CONFIRM_ACTION')
-        required = {'control_search':'control_search','generate': 'generation', 'propose': 'parameters', 'execute': 'candidate', 'search': 'search', 'confirm': 'selected_execution', 'select': 'selected_execution',
+        required = {'initialize_control':'control_seed','control_search':'control_search','generate': 'generation', 'propose': 'parameters', 'execute': 'candidate', 'search': 'search', 'confirm': 'selected_execution', 'select': 'selected_execution',
                     'mechanics': 'mechanics', 'replay': 'mechanics_source', 'cross_replay':'cross_replay',
                     'physical_replay':'physical_replay','refine':'refinement','matched_state':'matched_state',
                     'nmpc_prediction_diagnostic':'nmpc_prediction_diagnostic'}
         active = required.get(self.action)
-        for field in ('control_search','generation', 'parameters', 'search', 'candidate', 'selected_execution', 'mechanics', 'cross_replay','physical_replay','refinement','matched_state','nmpc_prediction_diagnostic'):
+        for field in ('control_seed','control_search','generation', 'parameters', 'search', 'candidate', 'selected_execution', 'mechanics', 'cross_replay','physical_replay','refinement','matched_state','nmpc_prediction_diagnostic'):
             if (getattr(self, field) is not None) != (field == active):
                 raise ValueError('ACTION_REQUIRES_ONLY_' + str(active))
         if self.action=='replay' and self.mechanics_source is None:
@@ -387,6 +406,10 @@ class ExperienceQuery(Contract):
 class EvidenceQuery(Contract):
     reference: EvidenceRef
     pointer: str = ''
+    view: Literal['full','summary','fields','range'] = 'full'
+    fields: list[str] = Field(default_factory=list, max_length=32)
+    start: int = Field(default=0, ge=0, strict=True)
+    count: int = Field(default=20, ge=1, le=100, strict=True)
 
 
 class PPOOverrides(Contract):

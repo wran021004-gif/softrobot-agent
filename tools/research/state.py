@@ -24,6 +24,7 @@ def readable_results(s, host=None):
     linked += [entry['reference'] for entry in s.get('stage_context',[])]
     linked += list(s.get('runtime_capabilities',{}).values())
     linked += list(s.get('control_search_results',[]))
+    linked += [e[k] for e in s.get('control_initializations',[]) for k in ('candidate','source')]
     linked += list(s.get('research_mathematics',[]))
     linked += [e[k] for e in s.get('research_history',[]) for k in ('reference','source','candidate','historical_candidate')]
     if host:

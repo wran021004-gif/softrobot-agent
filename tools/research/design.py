@@ -233,6 +233,11 @@ def generate_candidate(host,request,provenance,*,screening_fidelity=None):
             parameters=dict(contract='family.serial_space_build_v2' if serial else 'family.serial_space_build',version='1.0.0',data=plain(build)))
         for key,d in build.space.control_domains.items():
             cfg['policy']['controller']['parameters']['data']['recipe'][key]=build.request.control_weights.get(key,d.default)
+        if serial:
+            from tools.research.config import patch
+            control=cfg['policy']['controller']['parameters']['data']
+            for field,edits in (('recipe',build.request.controller_recipe),('solver',build.request.controller_solver)):
+                if edits:control[field]=patch(control[field],edits)
         initial={f:{j:0. for j in physics['dofs']} for f in ('qpos_rad','qvel_rad_s')};initial['unspecified']='zero'
         cfg['task']['initializer']['parameters']['data']=initial
         cfg=plain(SessionInput.model_validate(cfg))

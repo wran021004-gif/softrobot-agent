@@ -33,10 +33,18 @@ def read_evidence(host, query):
     for part in q.pointer.strip('/').split('/') if q.pointer else []:
         part = part.replace('~1', '/').replace('~0', '~')
         value = value[int(part)] if isinstance(value, list) else value[part]
+    if q.view=='summary':
+        from tools.research.research_context import compact_evidence
+        value=compact_evidence(value,plain(q.reference),q.pointer)
+    elif q.view=='fields':
+        value={key:value[key] for key in q.fields}
+    elif q.view=='range':
+        if not isinstance(value,list):raise ValueError('EVIDENCE_RANGE_REQUIRES_LIST_POINTER')
+        value=dict(total=len(value),start=q.start,items=value[q.start:q.start+q.count])
     if not q.pointer and plain(q.reference) in [s.get('holding_diagnostic_reference'),*s.get('task_math_references',[])]:
         update(host,guidance_reads=[*s.get('guidance_reads',[]),plain(q.reference)])
     if plain(q.reference) in [*s.get('results', []),*s.get('physical_replays', []),*s.get('rl_evaluations', []), *s.get('rl_training_summaries', [])]:
-        if q.pointer in ('','/acceptance','/episodes'):
+        if q.pointer in ('','/acceptance','/episodes') and q.view in ('full','summary'):
             update(host,evaluation_reads=[*s.get('evaluation_reads',[]),plain(q.reference)])
         update(host, rl_evidence_reads=[*s.get('rl_evidence_reads', []), plain(q.reference)])
     return value
@@ -305,7 +313,7 @@ def dispatch(host, value, request_id, origin='model'):
     plan=Plan.model_validate(value)
     if state(host)['spec'].get('allowed_plan_actions') is not None and plan.action not in state(host)['spec']['allowed_plan_actions']:
         raise ValueError('Operation outside declared follow-up scope')
-    capability={'control_search':'control_search','execute':'nmpc','search':'search','mechanics':'mathematics','replay':'replay','cross_replay':'replay','refine':'replay',
+    capability={'initialize_control':'control_correction','control_search':'control_search','execute':'nmpc','search':'search','mechanics':'mathematics','replay':'replay','cross_replay':'replay','refine':'replay',
         'physical_replay':'physical_replay','matched_state':'physical_replay','nmpc_prediction_diagnostic':'prediction_diagnostic'}.get(plan.action)
     if capability and not enabled(state(host)['spec'],capability):
         raise ValueError('Undeclared capability: '+capability)
@@ -325,7 +333,7 @@ def dispatch(host, value, request_id, origin='model'):
             'research_decision_rejected')
         raise
     admit_closeout(host,'research_plan',plain(plan))
-    guard(host,plan.action in ('control_search','generate','propose','execute','search','mechanics','replay','cross_replay','refine','nmpc_prediction_diagnostic','physical_replay','matched_state') or plan.diagnostic is not None)
+    guard(host,plan.action in ('initialize_control','control_search','generate','propose','execute','search','mechanics','replay','cross_replay','refine','nmpc_prediction_diagnostic','physical_replay','matched_state') or plan.diagnostic is not None)
     s=state(host)
     for r in plan.supporting_evidence:
         host.store.artifact(r)
@@ -385,7 +393,10 @@ def dispatch(host, value, request_id, origin='model'):
         experience_read_bindings=experience_bindings),'original_research_plan')
     update(host,plans=[*state(host)['plans'],ref])
     try:
-        if plan.action=='generate':
+        if plan.action=='initialize_control':
+            from tools.research.physical_replay import seed_control
+            result=seed_control(host,plan.control_seed,request_id)
+        elif plan.action=='generate':
             from tools.research.design import generate_candidate
             result=generate_candidate(host,plan.generation,dict(origin=origin,plan=ref))
         elif plan.action=='propose':
@@ -497,7 +508,11 @@ def recover(host):
         if not row or row['receipt']:
             continue
         plan=Plan.model_validate(original['original_plan'])
-        if plan.action=='control_search':
+        if plan.action=='initialize_control':
+            matches=[e for e in s.get('control_initializations',[]) if host.store.artifact(e['source'])['provenance'].get('operation_key')==key]
+            if len(matches)!=1:raise ValueError('RECOVER_REQUIRES_UNIQUE_CONTROL_INITIALIZATION')
+            result=matches[0]
+        elif plan.action=='control_search':
             refs=[r for r in s.get('physical_replays',[]) if host.store.artifact(
                 host.store.artifact(r)['source_reference']).get('provenance',{}).get('batch_request')==key]
             result=dict(status='interrupted_control_search',saved_results=refs,
@@ -600,6 +615,28 @@ def export(host, destination=None):
     for name,value in values:
         atomic_json(out/(name+'.json'),value)
     atomic_json(out/'archive_manifest.json',dict(members=members,archive_sha256=hashlib.sha256((out/'immutable_artifacts.tar.gz').read_bytes()).hexdigest()))
+    if s['spec'].get('research_decisions',{}).get('context_limits'):
+        from tools.research.feedback import task_gap
+        from tools.research.candidate_portfolio import ranking_key
+        rows=[dict(reference=r,**host.store.artifact(r),task_gap=task_gap(host.store.artifact(r)))
+            for r in [*s['results'],*s.get('physical_replays',[]),*s.get('rl_evaluations',[])]]
+        valid=[r for r in rows if r['task_gap']['valid_complete']]
+        best=next((r for r in valid if r['reference']==s.get('selected')),min(valid,key=ranking_key) if valid else None)
+        package=dict(version='robot_design_delivery_v1',study_id=host.run_id,implementation=s.get('freeze'),
+            frozen_study_identity=s['spec']['resolved_identity'],canonical_task=s['spec'].get('canonical_task'),
+            accepted=bool(best and best['reference']==s.get('selected') and best['task_gap']['accepted']),
+            status='accepted_solution' if best and best['reference']==s.get('selected') and best['task_gap']['accepted'] else 'best_valid_candidate' if best else 'no_valid_candidate',
+            ledger=host.store.remaining(),stop=s.get('final_disposition'),
+            archive_manifest='archive_manifest.json',scope='Frozen nominal sampled task only; optimality, robustness, hardware and repeatability unassessed')
+        if best:
+            candidate=host.store.artifact(best['candidate'])
+            package.update(candidate=best['candidate'],design_parameters=candidate['parameters'],
+                configuration=candidate['configuration'],acceptance=best.get('acceptance'),
+                evaluation=best['reference'],raw_reference=best.get('raw_reference'),
+                control=host.store.artifact(best['source_reference']) if best.get('source_reference') else None,
+                original_result=best,solution_identity=(s.get('success_gate') or {}).get('solution_identity'))
+        package['content_identity']=digest(package)
+        atomic_json(out/'design_package.json',package)
     return dict(destination=str(out),results=len(state(host)['results']),claims=claims(host),resources=current['resource_use'])
 
 

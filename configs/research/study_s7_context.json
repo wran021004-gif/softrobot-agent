@@ -1,0 +1,57 @@
+{
+  "defaults": "family_study_defaults.json",
+  "start_mode": "family_space",
+  "family_space": "family_space_s7.json",
+  "candidate_initialization": "all_candidate_dofs_zero_v1",
+  "base_commit": "6629b37f976ad7fc63521171082f6a8f1cb7e4e5",
+  "mode": "formal_research",
+  "control": "control_sorosim_s56_braking.json",
+  "study_id": "s7-context-connect-20261019",
+  "evidence_destination": "evidence/s7_context/study",
+  "capabilities": [
+    "physical_replay",
+    "control_correction",
+    "control_search"
+  ],
+  "allowed_plan_actions": [
+    "diagnose",
+    "select",
+    "stop"
+  ],
+  "budgets": {
+    "provider_requests": 2,
+    "protected_provider_requests": 1,
+    "public_operations": 8,
+    "protected_public_operations": 3,
+    "physical_launches": 0,
+    "mathematical_evaluations": 0,
+    "offline_nlp": 0,
+    "bdf_replays": 0
+  },
+  "nmpc_limits": {
+    "executions": 0
+  },
+  "rl_limits": {
+    "training_stages": 0,
+    "actions_per_trial": 65536,
+    "training_actions": 65536,
+    "evaluation_episodes": 0
+  },
+  "reserve_rl_evaluation": true,
+  "research_decisions": {
+    "version": "research_decision_v1",
+    "history": [],
+    "mathematics": [],
+    "control_seeds": [],
+    "context_limits": {
+      "candidates": 3,
+      "recent": 4,
+      "pareto": 3,
+      "samples": 6,
+      "evidence": 3
+    }
+  },
+  "authorization": "User S7.0 connection validation: <=2 real provider sends and zero physical/math/NMPC/PPO launches. Independent engineering-only connection study, never a scientific task outcome.",
+  "execution_instructions": "You are the task-driven robot structure and control research Agent. Frozen task, family domains, registered tools, independent acceptance and shared budgets are authoritative. Choose hypotheses, methods, structural variables, control variables and finite allocations freely from evidence; no mandatory method order or required design change. Numerical failures do not prove infeasibility. Historical controls are only unmeasured initializations for this task. No inherited acceptance. All executable domains are available, subject to candidate-specific compilation. Every research_plan requires decision={version:research_decision_v1,hypothesis_id,claimed_inference:empirical_search for exploration,research_intent,selected_method,selected_variables,selected_candidate,requested_budget}. Intent must match action: generate=DESIGN_MODIFICATION, initialize_control/control_search=CONTROL_SEARCH, physical_replay=PHYSICAL_VALIDATION, execute=NMPC_EXECUTION, mechanics/replay/refine=MATHEMATICAL_ANALYSIS, diagnose=DIAGNOSE, select=SELECT, stop=STOP. For generate use generation with CURRENT family_space_identity; read candidate /parameters with view=full before adapting it, or generate any legal structure from declared domains. Generation v2 supports segments[i].physical_parameters from physical_domains and controller_recipe/controller_solver sparse patches validated by the registered contracts; task settling/thresholds are immutable. Controller weights affect NMPC, not a fixed tension replay. Length-servo gain is inactive under ideal tension. initialize_control uses control_seed={candidate,source?,parent?,channel_map?,tensions_n?}: no source gives current pretension; a single tensions_n row is a bounded constant; a full array must match current intervals/channels. Source requires exact parent candidate; explicit new->old channel_map is available; different channel counts without mapping use pretension. Source time transfer uses zero-order hold and holds last input, never transfers states or acceptance. Returned source is unmeasured. control_search uses control_search={candidate,source,settings:{version:local_control_search_v2,method:response or pattern,knots_s,correction_window_s?,coefficient_limit_n,difference_step_n,initial_radius_n,minimum_radius_n,evaluation_requests,iterations,safety_margin_fraction?},adaptation_from?}. requested_budget equals evaluation_requests including baseline/probes; optional safety_margin_fraction is response-only and affects local subproblem, never task thresholds. Dimensions and time horizon come from this task/candidate. Direct physical_replay uses physical_replay={candidate,source}. Same-task new-design adaptation_from permits same channels/grid; otherwise explicitly initialize_control first. All results are independent MuJoCo observations; mathematics is scoped diagnostic evidence. Tool replies are deterministic previews with exact full Store references. evidence_read supports view=summary/full/fields/range, pointer, fields, start,count; raw traces are under result raw_reference, not result /samples. After failure read feedback and freely revise your hypothesis. At first fresh complete pass stop all exploration, evidence_read its /acceptance, then select selected_execution=that exact result with intent SELECT. STOP cites every all_fresh_results reference in current context; references truncated in preview can be read by view=full. Protected budget is only for evidence, selection and truthful STOP. At exhaustion retain best valid candidate, every failure, unresolved hypotheses and the stopping reason. Do not claim global optimality, structural infeasibility, robustness, hardware performance or repeatability. No calls beyond frozen budgets.",
+  "task": "../../tasks/reach_hold_mirror_v1.json"
+}

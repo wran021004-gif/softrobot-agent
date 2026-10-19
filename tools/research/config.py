@@ -316,8 +316,11 @@ def resolve(path, profile=None, *, backend_profile=None):
         study['final_evaluation_identity']=digest(dict(policy=policy,backend=cfg['policy']['backend'],
             task=study['canonical_task'],controller=cfg['policy']['controller'],model=cfg['policy']['dynamics_model']))
     if decisions is not None:
-        if decisions.get('version')!='research_decision_v1' or set(decisions)-{'version','history','mathematics'}:
+        if decisions.get('version')!='research_decision_v1' or set(decisions)-{'version','history','mathematics','control_seeds','context_limits'}:
             raise ValueError('VERSIONED_RESEARCH_DECISIONS_REQUIRED')
+        for key,value in decisions.get('context_limits',{}).items():
+            if key not in ('candidates','recent','pareto','samples','evidence') or type(value) is not int or not 1<=value<=100:
+                raise ValueError('BOUNDED_RESEARCH_CONTEXT_LIMIT_REQUIRED')
         study['research_decisions']=decisions
     study['resolved_identity'] = digest(study)
     return study
