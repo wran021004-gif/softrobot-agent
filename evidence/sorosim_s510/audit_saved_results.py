@@ -16,14 +16,18 @@ DEST=Path(__file__).resolve().parent
 def main():
     summary=read(DEST/'summary.json');mathematics=read(DEST/'mathematics.json')
     progress=read(DEST/'progress.json')['candidates'];folder='evidence/sorosim_s510/study'
-    physics_steps=roots=0;identities=set();direction=[];base=progress[0]['measure']
+    physics_steps=roots=0;identities=set();direction=[];steps=[];incumbent=None
+    base=progress[0]['measure'];xml=None;initial=None
     for row in progress:
         assert row['sequence_identity'] not in identities;identities.add(row['sequence_identity'])
         result=archived(folder,row['reference']);source=archived(folder,row['source'])
         raw=archived(folder,result['raw_reference']);u=np.asarray(source['trajectory']['tensions_n'])
         assert u.shape==(35,4) and np.isfinite(u).all() and np.all((u>=0)&(u<=8))
-        assert np.max(abs(row['coefficients_n']))<=2.
+        assert np.max(np.abs(row['coefficients_n']))<=2.
         assert raw['physics_timestep_s']==.0005
+        current_initial={k:raw['samples'][0][k] for k in ('qpos_rad','qvel_rad_s')}
+        if xml is None:xml=raw['xml_sha256'];initial=current_initial
+        assert raw['xml_sha256']==xml and current_initial==initial
         physics_steps+=raw['physics_steps']
         if row['valid']:
             assert raw['physics_steps']==700 and len(raw['samples'])==36
@@ -40,11 +44,26 @@ def main():
             direction.append(dict(reference=row['reference'],label=row['label'],
                 prediction_was_available_before_execution=True,predicted_improvement=p,
                 observed_improvement=a,direction_agrees=bool(p*a>0) if p and a else None,
-                within_original_guided_step_domain=bool(np.max(abs(row['coefficients_n']))<=.1),
+                within_original_guided_step_domain=bool(np.max(np.abs(row['coefficients_n']))<=.1),
                 scope='Local affine heuristic; outside .1 N is explicit extrapolation, not a guaranteed direction'))
+            previous_prediction=incumbent.get('predicted_measure') if incumbent else None
+            if incumbent is progress[0]:previous_prediction=mathematics['reference-32']['measure']
+            if incumbent and previous_prediction:
+                pi=previous_prediction['normalized_gap']-predicted['normalized_gap']
+                ai=incumbent['measure']['normalized_gap']-row['measure']['normalized_gap']
+                steps.append(dict(reference=row['reference'],incumbent_before=incumbent['reference'],
+                    label=row['label'],predicted_incremental_improvement=pi,observed_incremental_improvement=ai,
+                    direction_agrees=bool(pi*ai>0) if pi and ai else None,
+                    predicted_to_improve=pi>0,actually_improved=ai>0))
+        if row['valid'] and (incumbent is None or
+                (row['measure']['normalized_gap'],row['measure']['sum_normalized_excess'])<
+                (incumbent['measure']['normalized_gap'],incumbent['measure']['sum_normalized_excess'])):
+            incumbent=row
     for value in mathematics.values():
         result=archived(folder,value['reference'])
         assert result['complete'] and result['root_count']==35*value['substeps']
+        residuals=np.asarray(result['raw']['roots'],dtype=float)[:,2]
+        assert np.isfinite(residuals).all() and max(residuals)<1e-9
         roots+=result['root_count']
     calls=read(DEST/'study/calls.json');ledger=read(DEST/'study/ledger.json')
     assert ledger['used']['backend_solves']==len(progress)<=192
@@ -53,18 +72,44 @@ def main():
     assert all(row['receipt'] for row in calls)
     ranking=sorted((r for r in progress if r['valid']),key=lambda r:(not r['accepted'],r['measure']['normalized_gap'],r['measure']['sum_normalized_excess']))
     assert [r['reference'] for r in ranking]==[r['reference'] for r in summary['ranked_candidates']]
+    if ranking:
+        best=ranking[0];source=archived(folder,best['source'])['trajectory']
+        result=archived(folder,best['reference']);raw=archived(folder,result['raw_reference'])
+        candidate=archived(folder,summary['candidate']);cfg=candidate['configuration']
+        atomic_json(DEST/'best_control.json',dict(version='s510_review_control_v1',
+            original_task_passed=best['accepted'],evaluation=best['reference'],candidate=summary['candidate'],
+            candidate_parameters=candidate['parameters'],robot=cfg['robot'],task=cfg['task'],
+            discretization=cfg['policy']['discretization'],backend=cfg['policy']['backend'],
+            control_times_s=source['times_s'][:-1],tendon_order=source['tendon_order'],
+            requested_tensions_n=source['tensions_n'],actual_tensions_n=[v['actual_tension_n'] for v in raw['samples'][1:]],
+            execution_mode='ideal_tension',correction_coefficients_n=best['coefficients_n'],
+            measure=best['measure'],registered_acceptance=result['acceptance'],
+            numerical_implementation=result['implementation'],scope='Exact evaluated schedule for this frozen initial task; no hardware or repeatability claim'))
     if summary['original_task_passed']:
         assert progress[-1]['accepted'] and not any(r['accepted'] for r in progress[:-1])
     audit=dict(unique_complete_or_failed_evaluations=len(progress),physics_steps=physics_steps,
         mathematical_integrations=len(mathematics),implicit_roots=roots,provider_requests=0,
         ranked_results_consistent=True,all_receipts_terminal=True,
-        first_pass_immediate_stop_checked=summary['original_task_passed'],
-        prospective_regional_bound_established=False,new_numerical_operations=0)
+        first_pass_immediate_stop_check=True if summary['original_task_passed'] else 'not_applicable_no_pass',
+        prospective_regional_bound_established=False,new_dynamics_integrations=0,
+        new_physics_steps=0,new_optimizer_calls=0,
+        final_resource_use=ledger['used'],summary_resource_use_before_final_closeout=summary['used'],
+        failed_public_receipts=[dict(request_id=r['request_id'],error=json.loads(r['receipt']).get('error'))
+            for r in calls if json.loads(r['receipt']).get('execution_status')=='failed'])
     atomic_json(DEST/'direction_validation.json',dict(comparisons=direction,
         agreement_count=sum(v['direction_agrees'] is True for v in direction),
         disagreement_count=sum(v['direction_agrees'] is False for v in direction),
+        incumbent_step_comparisons=steps,
+        incremental_agreement_count=sum(v['direction_agrees'] is True for v in steps),
+        incremental_disagreement_count=sum(v['direction_agrees'] is False for v in steps),
+        scope='One explicit mathematical recommendation; later points are simulator-driven trials/probes with logged affine predictions, not independent mathematical recommendations.',
         exact_32_substep_comparisons=summary['exact_paired_direction_checks']))
     paired=summary['paired_error_budgets'];bounds=[]
+    for value in paired.values():
+        model=archived(folder,value['mathematical']);physical=archived(folder,value['physical'])
+        a=archived(folder,model['source_reference'])['trajectory']
+        b=archived(folder,physical['source_reference'])['trajectory']
+        assert all(a[k]==b[k] for k in ('model_identity','design_identity','task_identity','tendon_order','times_s','tensions_n'))
     if 'reference-32' in paired:
         a=paired['reference-32'];ma=a['model_measure'];sa=a['simulation_measure']
         reference_bias=sa['normalized_gap']-ma['normalized_gap']
@@ -93,7 +138,7 @@ def main():
             discrepancy_variation_checks=bounds,
             prospective_alternative='If |D(z_new)-D(z_base)| <= L_D*norm(z_new-z_base) is independently valid on the region, predicted improvement greater than that term guarantees sampled simulation improvement, where D=G_sim-G_math.',
             missing_proof='No verified regional derivative/interval enclosure for D; sampled secants cannot supply an upper Lipschitz bound. No integration bound to exact rod solutions or hardware.',
-            new_scientific_computations=0))
+            new_model_evaluations=0,new_physics_steps=0,new_optimizer_calls=0))
     atomic_json(DEST/'delivery_audit.json',audit)
     print(json.dumps(audit,indent=2))
 

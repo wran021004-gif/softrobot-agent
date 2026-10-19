@@ -1,0 +1,38 @@
+{
+  "baseline_absolute_error_bound": 23.961115660276107,
+  "largest_possible_absolute_bound_lower_bound": -12.818676294116063,
+  "interpretation": "Since G_math(new)>=0 and epsilon_new>=0, a negative value rules out this particular symmetric sufficient test from this baseline, not task feasibility.",
+  "discrepancy_variation_checks": [
+    {
+      "candidate": "recommended-32",
+      "reference_scalar_bias": 17.99613506236765,
+      "candidate_scalar_bias": 18.405351778676177,
+      "discrepancy_change_interval": [
+        0.40921671630846385,
+        0.4092167163086025
+      ],
+      "observed_absolute_bias_change_upper": 0.4092167163086025,
+      "paired_variation_improvement_lower_bound": 4.360968331706009,
+      "condition_met": true,
+      "prospective_certified": false
+    },
+    {
+      "candidate": "best-32",
+      "reference_scalar_bias": 17.99613506236765,
+      "candidate_scalar_bias": -16.65997578512627,
+      "discrepancy_change_interval": [
+        -34.656110847493984,
+        -34.65611084749384
+      ],
+      "observed_absolute_bias_change_upper": 34.656110847493984,
+      "paired_variation_improvement_lower_bound": -44.382596503471575,
+      "condition_met": false,
+      "prospective_certified": false
+    }
+  ],
+  "prospective_alternative": "If |D(z_new)-D(z_base)| <= L_D*norm(z_new-z_base) is independently valid on the region, predicted improvement greater than that term guarantees sampled simulation improvement, where D=G_sim-G_math.",
+  "missing_proof": "No verified regional derivative/interval enclosure for D; sampled secants cannot supply an upper Lipschitz bound. No integration bound to exact rod solutions or hardware.",
+  "new_model_evaluations": 0,
+  "new_physics_steps": 0,
+  "new_optimizer_calls": 0
+}

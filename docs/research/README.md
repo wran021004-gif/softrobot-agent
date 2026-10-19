@@ -1,5 +1,14 @@
 # Research mainline
 
+## S5.10 reference validation and control correction (2026-10-19)
+
+The [delivery](sorosim_s510_delivery.md) records 192 unique complete MuJoCo
+evaluations, 16 mathematical integrations and no original-task pass. It includes
+the exact best failing controls, full ranking, mathematical direction checks,
+scoped discrepancy bounds and the next controlled structure comparisons.
+The [protocol](sorosim_s510_correction.md) documents the small code changes,
+original task, cumulative budgets and preserved engineering recovery boundaries.
+
 ## SoRoSim S4.5–S5 studies
 
 The [stage delivery report](sorosim_s45_s5_delivery.md) links the separate

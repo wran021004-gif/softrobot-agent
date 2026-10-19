@@ -39,6 +39,30 @@ use needs independently valid discrepancy envelopes and integration/roundoff
 bounds, which this implementation does not invent. Empirical maxima, finite-grid
 agreement and local finite differences do not establish those regional bounds.
 
+A potentially tighter prospective condition uses discrepancy variation. Let
+`D(z)=G_sim(z)-G_math(z)` for a specific structure/control combination. Then
+`actual_improvement = predicted_improvement - (D(new)-D(base))` exactly. If an
+independently valid regional bound `|D(new)-D(base)| <= L_D*||new-base||` exists,
+predicted improvement greater than that term is sufficient even with a large
+constant model bias. Two evaluated endpoints can bound their observed discrepancy
+change with outward rounding; observed secants supply no regional upper bound.
+
+One route to a genuine regional envelope is a common discrete state/output
+representation with verified initial error and bounds
+`e[k+1] <= L[k]*e[k] + delta[k]`. Verified output-map errors then convert the
+propagated state enclosure into position/velocity budgets at every task sample.
+This requires reachable-state enclosures, valid response/model-mismatch bounds,
+projection/output-map bounds and implicit integration error control. Root residuals
+alone require additional inverse-Jacobian/regularity information to bound state
+error. The present finite differences and four/32-grid differences establish none
+of these regional prerequisites, so the prospective bound remains unestablished.
+
+For a future feasibility certificate, use the signed maximum normalized excess
+`J=max(ratio-1)` before clipping: `J_math+epsilon<=0` is sufficient for the sampled
+metric constraints if that epsilon is independently valid. Full execution and
+force validity remain separate registered requirements. Current feasibility is
+always decided by the original independent evaluator.
+
 Implementation ownership:
 
 - `tools/research/control_correction.py`: pure controls, task violations, fitting
