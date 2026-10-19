@@ -4,7 +4,7 @@ from tools.platform_store import plain
 from tools.state_io import digest
 from tools.research.state import state, save, update
 from tools.research.feedback import task_gap
-from tools.research.evidence_policy import summarize_evidence, hypothesis_catalog
+from tools.research.evidence_policy import summarize_evidence, hypothesis_catalog, comparable_task
 
 
 def import_history(host):
@@ -18,10 +18,7 @@ def import_history(host):
     for item in s['spec']['research_decisions'].get('history',[]):
         folder=item['folder'];ref=item['reference'];result=archived(folder,ref)
         old=archived(folder,result['candidate']);cfg=old['configuration']
-        if cfg['task']!=s['base_configuration']['task']:
-            # Family initializers are candidate-specific; compare canonical zero rule.
-            task=deepcopy(cfg['task']);task['initializer']['parameters']['data']=dict(rule=s['spec']['candidate_initialization'])
-            if task!=s['spec']['canonical_task']:raise ValueError('HISTORY_TASK_IDENTITY_MISMATCH')
+        if comparable_task(s['spec'],cfg['task'])!=s['spec']['canonical_task']:raise ValueError('HISTORY_TASK_IDENTITY_MISMATCH')
         source=archived(folder,result['source_reference'])
         binding(cfg,source['trajectory'])
         parameters=deepcopy(old['parameters']);parameters['family_space_identity']=s['spec']['family_space_identity']
@@ -43,6 +40,7 @@ def import_history(host):
         value=archived(item['folder'],item['reference'])
         if value.get('candidate'):
             candidate=archived(item['folder'],value['candidate'])
+            if comparable_task(s['spec'],candidate['configuration']['task'])!=s['spec']['canonical_task']:raise ValueError('HISTORY_MATH_TASK_IDENTITY_MISMATCH')
             if save(host,candidate,'declared_historical_math_candidate')!=value['candidate']:raise ValueError('HISTORY_MATH_CANDIDATE_MISMATCH')
         if save(host,value,'declared_historical_mathematics')!=item['reference']:raise ValueError('HISTORY_MATH_IDENTITY_MISMATCH')
         mathematics.append(item['reference'])

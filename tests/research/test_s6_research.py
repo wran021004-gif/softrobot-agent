@@ -12,7 +12,7 @@ from tools.research import core
 from tools.research.contracts import Plan, LocalControlSearchSettings
 from tools.research.control_correction import corrected_tensions, correction_basis, constraint_vectors
 from tools.research.local_control_search import search
-from tools.research.evidence_policy import admit_decision
+from tools.research.evidence_policy import admit_decision, comparable_task
 from tools.research.research_context import import_history, context
 from tools.research.state import state
 from tools.research.physical_replay import initialize_schedule
@@ -84,6 +84,17 @@ class ContractTests(unittest.TestCase):
         with patch('tools.research.physical_replay.model_context',return_value=model):
             with self.assertRaisesRegex(ValueError,'UNSUPPORTED_CROSS_TOPOLOGY'):initialize_schedule({},source,{})
 
+    def test_public_search_rejects_unsupported_task_without_fallback(self):
+        from tools.research.local_control_search import dispatch
+        ref=dict(artifact_id='a'*64)
+        p=plan('control_search',control_search=dict(candidate=ref,source=ref,settings=dict(version='local_control_search_v2')))
+        cfg=dict(task=dict(family='task.tracking'))
+        with patch('tools.research.state.guard'),patch('tools.research.state.state',return_value=dict(spec=dict(capabilities=['control_search'],budgets={'physical_launches':48}))),patch(
+                'tools.research.design.verify_candidate',return_value={'configuration':cfg}),patch('tools.research_tasks.task_adapter'),patch(
+                'tools.research.physical_replay.model_context') as backend:
+            with self.assertRaisesRegex(ValueError,'UNSUPPORTED_CONTROL_SEARCH_TASK'):dispatch(SimpleNamespace(),p,'fixture')
+        backend.assert_not_called()
+
 
 class AdmissionTests(unittest.TestCase):
     def setUp(self):
@@ -108,6 +119,13 @@ class AdmissionTests(unittest.TestCase):
 
     def test_wrong_intent_rejected(self):
         with self.assertRaisesRegex(ValueError,'INTENT_ACTION'):admit_decision(self.host,plan(decision=decision('CONTROL_SEARCH')))
+
+    def test_zero_rule_cannot_hide_nonzero_initial_state(self):
+        spec=dict(start_mode='family_space',candidate_initialization='all_candidate_dofs_zero_v1')
+        task=dict(initializer=dict(parameters=dict(data=dict(unspecified='zero',qpos_rad={'j':0.},qvel_rad_s={'j':0.}))))
+        self.assertEqual(comparable_task(spec,task)['initializer']['parameters']['data'],dict(rule=spec['candidate_initialization']))
+        task['initializer']['parameters']['data']['qvel_rad_s']['j']=.1
+        with self.assertRaisesRegex(ValueError,'INITIAL_STATE_MISMATCH'):comparable_task(spec,task)
 
     def test_cross_task_evidence_rejected(self):
         self.s['results']=[self.ref]

@@ -141,6 +141,17 @@ def check_inference(summary,inference,*,target=None,legal_candidate=False):
     return dict(allowed=allowed,reason=reason)
 
 
+def comparable_task(spec,task):
+    """Canonical family zero initialization never erases a measured nonzero state."""
+    task=deepcopy(task)
+    if spec.get('start_mode')=='family_space':
+        initial=task['initializer']['parameters']['data']
+        if (initial.get('unspecified')!='zero' or any(v!=0 for key in ('qpos_rad','qvel_rad_s') for v in initial.get(key,{}).values())):
+            raise ValueError('EVIDENCE_TASK_INITIAL_STATE_MISMATCH')
+        task['initializer']['parameters']['data']=dict(rule=spec['candidate_initialization'])
+    return task
+
+
 def admit_decision(host,plan):
     """Public Plan boundary resolves references, never accepts model-made summaries."""
     from tools.research.state import state
@@ -173,11 +184,8 @@ def admit_decision(host,plan):
         source_candidate=value.get('candidate')
         if source_candidate:
             source_cfg=host.store.artifact(source_candidate)['configuration']
-            task=deepcopy(source_cfg['task'])
-            if s['spec'].get('start_mode')=='family_space':
-                task['initializer']['parameters']['data']=dict(rule=s['spec']['candidate_initialization'])
-                expected=s['spec']['canonical_task']
-            else:expected=s['base_configuration']['task']
+            task=comparable_task(s['spec'],source_cfg['task'])
+            expected=s['spec'].get('canonical_task',s['base_configuration']['task'])
             if task!=expected:raise ValueError('EVIDENCE_TASK_IDENTITY_MISMATCH')
             if d.claimed_inference!='empirical_search' and cfg and source_cfg['robot']!=cfg['robot']:
                 raise ValueError('EVIDENCE_DESIGN_IDENTITY_MISMATCH')
