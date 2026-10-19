@@ -1,0 +1,428 @@
+{
+  "study_id": "s6-1-live-20261019",
+  "freeze": "5285c3c4a5b45765efc65de341d416238c027e93",
+  "status": "ready",
+  "original_task_passed": false,
+  "selected": null,
+  "native_model_stop": false,
+  "engineering_closeout": null,
+  "pending": null,
+  "ledger": {
+    "limit": {
+      "backend_solves": 2,
+      "model_calls": 4,
+      "tool_calls": 14,
+      "wall_s": null,
+      "worker_calls": 0
+    },
+    "used": {
+      "tool_calls": 0,
+      "model_calls": 0,
+      "backend_solves": 0,
+      "worker_calls": 0,
+      "wall_s": 0.0
+    },
+    "remaining": {
+      "backend_solves": 2,
+      "model_calls": 4,
+      "tool_calls": 14,
+      "wall_s": null,
+      "worker_calls": 0
+    },
+    "occupied": {}
+  },
+  "provider_requests": 0,
+  "provider_usage": [],
+  "mathematical_evaluations": 0,
+  "nmpc": 0,
+  "ppo_stages": 0,
+  "physical_replays": 0,
+  "numerical_s": 0.3052791999652982,
+  "control_search_results": [],
+  "results": [],
+  "best": null,
+  "inherited_best": {
+    "reference": {
+      "artifact_id": "df28c38f59726d06bc59573eb93fc22294d38089a13565774c77a2801c2ff352",
+      "media_type": "application/json"
+    },
+    "candidate": {
+      "artifact_id": "c5f8ed0f59611a9dd1e5f71a3be8b14378321c2a873debcde9e57b8261196969",
+      "media_type": "application/json"
+    },
+    "source": {
+      "artifact_id": "1b5bbfbd01efd170d4362f078625dca4ef8a38b61373598c2a2ce0f73c3e86bd",
+      "media_type": "application/json"
+    },
+    "task_identity": "882b3493037dcc8f8da294b3473e1223f0465e92c35bc3064bfc42d467bf212e",
+    "historical_only": true,
+    "task_gap": {
+      "normalized_gap": 0.05450203924159114,
+      "components": {
+        "evaluator:task_bound": 0.0,
+        "holding_position": 0.0,
+        "holding_speed": 0.05450203924159114
+      },
+      "valid_complete": true,
+      "accepted": false,
+      "interpretation": "Research ranking only; invalid executions remain invalid regardless of gap"
+    },
+    "constraints": {
+      "evaluation_validity": {
+        "limit": null,
+        "passed": true,
+        "reason": null,
+        "unit": null,
+        "value": "valid"
+      },
+      "evaluator:task_bound": {
+        "limit": 0.01,
+        "passed": true,
+        "reason": null,
+        "unit": "m",
+        "value": 0.005193064009374885
+      },
+      "execution_complete": {
+        "limit": null,
+        "passed": true,
+        "reason": null,
+        "unit": null,
+        "value": true
+      },
+      "force_bounds": {
+        "limit": 1e-08,
+        "passed": true,
+        "reason": null,
+        "unit": "N",
+        "value": 0.0
+      },
+      "holding_coverage": {
+        "limit": 6,
+        "passed": true,
+        "reason": null,
+        "unit": "inclusive uniform samples",
+        "value": true
+      },
+      "holding_position": {
+        "limit": 0.01,
+        "passed": true,
+        "reason": null,
+        "unit": "m",
+        "value": 0.005193909968382813
+      },
+      "holding_speed": {
+        "limit": 0.02,
+        "passed": false,
+        "reason": null,
+        "unit": "m/s",
+        "value": 0.021090040784831825
+      },
+      "solver_errors": {
+        "limit": 0,
+        "passed": true,
+        "reason": null,
+        "unit": "count",
+        "value": 0
+      },
+      "task_evaluator": {
+        "limit": null,
+        "passed": true,
+        "reason": null,
+        "unit": null,
+        "value": true
+      }
+    },
+    "violations": {
+      "status": "sampled_diagnostic",
+      "samples": [
+        {
+          "constraint": "holding_max_speed_m_s",
+          "time_s": 0.3,
+          "value": 0.020259590321844906,
+          "limit": 0.02,
+          "normalized_excess": 0.012979516092245236,
+          "raw_pointer": "/samples/30/speed_m_s"
+        },
+        {
+          "constraint": "holding_max_speed_m_s",
+          "time_s": 0.33,
+          "value": 0.021090040784831825,
+          "limit": 0.02,
+          "normalized_excess": 0.05450203924159114,
+          "raw_pointer": "/samples/33/speed_m_s"
+        }
+      ]
+    },
+    "raw_reference": {
+      "artifact_id": "db7a79f193e2113c55f753c9b6dde1cb126db5c2887d9095350773e387e99711",
+      "media_type": "application/json"
+    },
+    "evidence": {
+      "version": "evidence_policy_v1",
+      "claim_kind": "PHYSICAL_OBSERVATION",
+      "verification_status": "complete_registered_execution",
+      "model_identity": null,
+      "candidate_identity": {
+        "artifact_id": "c5f8ed0f59611a9dd1e5f71a3be8b14378321c2a873debcde9e57b8261196969",
+        "media_type": "application/json"
+      },
+      "design_identity": null,
+      "task_identity": "882b3493037dcc8f8da294b3473e1223f0465e92c35bc3064bfc42d467bf212e",
+      "operating_point": {},
+      "covered_samples": {
+        "timing": {
+          "control_period_s": 0.01,
+          "deadline_misses": null,
+          "duration_s": 0.35,
+          "mean_update_s": null,
+          "real_time_demonstrated": null,
+          "real_time_required": false,
+          "sample_period_s": 0.01,
+          "simulation_wall_s": null,
+          "termination": [
+            "duration",
+            "numerical_failure"
+          ],
+          "timestep_s": 0.0005
+        },
+        "components": {
+          "evaluation_validity": {
+            "limit": null,
+            "passed": true,
+            "reason": null,
+            "unit": null,
+            "value": "valid"
+          },
+          "evaluator:task_bound": {
+            "limit": 0.01,
+            "passed": true,
+            "reason": null,
+            "unit": "m",
+            "value": 0.005193064009374885
+          },
+          "execution_complete": {
+            "limit": null,
+            "passed": true,
+            "reason": null,
+            "unit": null,
+            "value": true
+          },
+          "force_bounds": {
+            "limit": 1e-08,
+            "passed": true,
+            "reason": null,
+            "unit": "N",
+            "value": 0.0
+          },
+          "holding_coverage": {
+            "limit": 6,
+            "passed": true,
+            "reason": null,
+            "unit": "inclusive uniform samples",
+            "value": true
+          },
+          "holding_position": {
+            "limit": 0.01,
+            "passed": true,
+            "reason": null,
+            "unit": "m",
+            "value": 0.005193909968382813
+          },
+          "holding_speed": {
+            "limit": 0.02,
+            "passed": false,
+            "reason": null,
+            "unit": "m/s",
+            "value": 0.021090040784831825
+          },
+          "solver_errors": {
+            "limit": 0,
+            "passed": true,
+            "reason": null,
+            "unit": "count",
+            "value": 0
+          },
+          "task_evaluator": {
+            "limit": null,
+            "passed": true,
+            "reason": null,
+            "unit": null,
+            "value": true
+          }
+        },
+        "episodes": null,
+        "execution_id": "schedule-44cf9a5a9ef16443bff62b05417bb3f404f98905ed820cb3699b4c9bb2d7a5d6-physical",
+        "scope": "Only this completed independent execution"
+      },
+      "assumptions": {
+        "model": {},
+        "physical_inputs": {},
+        "legacy_applicability": {},
+        "source": "Trusted resolved tool artifact; not arbitrary LLM assertions"
+      },
+      "supported_inferences": [
+        "observed_task_outcome"
+      ],
+      "unsupported_inferences": [
+        "global_nonlinear_feasibility",
+        "global_nonlinear_infeasibility",
+        "structural_infeasibility",
+        "whole_horizon_from_instantaneous_braking",
+        "adapted_dynamic_improvement_from_static_sensitivity",
+        "unvisited_simulation_descent_guarantee",
+        "continuous_time_compliance",
+        "hardware_performance",
+        "robustness",
+        "repeatability",
+        "observed_task_pass"
+      ],
+      "evidence_reference": {
+        "artifact_id": "df28c38f59726d06bc59573eb93fc22294d38089a13565774c77a2801c2ff352",
+        "media_type": "application/json"
+      },
+      "numerical_evidence_pointer": "/acceptance",
+      "prospective_guarantee": false,
+      "unresolved": [],
+      "next_checks": [
+        "independent_legal_physical_evaluation",
+        "matched_input_refinement",
+        "paired_local_response_check"
+      ]
+    },
+    "executable_candidate": {
+      "artifact_id": "3eefa7654510657705bf022418bda8edadf40ad95bc296a7fba8085fe4ce64be",
+      "media_type": "application/json"
+    }
+  },
+  "remaining_hypotheses": {
+    "CONTROL_SEARCH_INCOMPLETE": {
+      "claim_kind": "UNVERIFIED_HYPOTHESIS",
+      "acceptable_evidence": [
+        "PHYSICAL_OBSERVATION",
+        "NUMERICAL_DIAGNOSTIC"
+      ],
+      "discriminating_experiments": [
+        "additional_bounded_starts",
+        "paired_control_search"
+      ],
+      "forbidden_inferences": [
+        "global_nonlinear_feasibility",
+        "global_nonlinear_infeasibility",
+        "structural_infeasibility",
+        "whole_horizon_from_instantaneous_braking",
+        "adapted_dynamic_improvement_from_static_sensitivity",
+        "unvisited_simulation_descent_guarantee",
+        "continuous_time_compliance",
+        "hardware_performance",
+        "robustness",
+        "repeatability",
+        "identified_root_cause"
+      ],
+      "scope": "Only searched starts, controls and budgets.",
+      "probability": null
+    },
+    "MODEL_PREDICTION_UNRELIABLE": {
+      "claim_kind": "UNVERIFIED_HYPOTHESIS",
+      "acceptable_evidence": [
+        "EMPIRICAL_COMPARISON",
+        "NUMERICAL_DIAGNOSTIC"
+      ],
+      "discriminating_experiments": [
+        "aligned_model_physics_pairs",
+        "fixed_input_grid_refinement"
+      ],
+      "forbidden_inferences": [
+        "global_nonlinear_feasibility",
+        "global_nonlinear_infeasibility",
+        "structural_infeasibility",
+        "whole_horizon_from_instantaneous_braking",
+        "adapted_dynamic_improvement_from_static_sensitivity",
+        "unvisited_simulation_descent_guarantee",
+        "continuous_time_compliance",
+        "hardware_performance",
+        "robustness",
+        "repeatability",
+        "identified_root_cause"
+      ],
+      "scope": "Only checked operating points and input sequences.",
+      "probability": null
+    },
+    "CONTROL_PARAMETERIZATION_LIMITED": {
+      "claim_kind": "UNVERIFIED_HYPOTHESIS",
+      "acceptable_evidence": [
+        "PHYSICAL_OBSERVATION",
+        "EMPIRICAL_COMPARISON"
+      ],
+      "discriminating_experiments": [
+        "paired_basis_comparison_with_equal_budget"
+      ],
+      "forbidden_inferences": [
+        "global_nonlinear_feasibility",
+        "global_nonlinear_infeasibility",
+        "structural_infeasibility",
+        "whole_horizon_from_instantaneous_braking",
+        "adapted_dynamic_improvement_from_static_sensitivity",
+        "unvisited_simulation_descent_guarantee",
+        "continuous_time_compliance",
+        "hardware_performance",
+        "robustness",
+        "repeatability",
+        "identified_root_cause"
+      ],
+      "scope": "Only declared bases and coefficient domains.",
+      "probability": null
+    },
+    "DESIGN_LIMITATION_POSSIBLE": {
+      "claim_kind": "UNVERIFIED_HYPOTHESIS",
+      "acceptable_evidence": [
+        "MODEL_EXCLUSION",
+        "EMPIRICAL_COMPARISON"
+      ],
+      "discriminating_experiments": [
+        "paired_designs_with_equal_control_adaptation"
+      ],
+      "forbidden_inferences": [
+        "global_nonlinear_feasibility",
+        "global_nonlinear_infeasibility",
+        "structural_infeasibility",
+        "whole_horizon_from_instantaneous_braking",
+        "adapted_dynamic_improvement_from_static_sensitivity",
+        "unvisited_simulation_descent_guarantee",
+        "continuous_time_compliance",
+        "hardware_performance",
+        "robustness",
+        "repeatability",
+        "identified_root_cause"
+      ],
+      "scope": "Only tested designs; a local model exclusion is not physical exclusion.",
+      "probability": null
+    },
+    "SOLVER_OR_NUMERICAL_ISSUE": {
+      "claim_kind": "UNVERIFIED_HYPOTHESIS",
+      "acceptable_evidence": [
+        "NUMERICAL_DIAGNOSTIC"
+      ],
+      "discriminating_experiments": [
+        "derivative_checks",
+        "same_input_refinement",
+        "alternative_initialization"
+      ],
+      "forbidden_inferences": [
+        "global_nonlinear_feasibility",
+        "global_nonlinear_infeasibility",
+        "structural_infeasibility",
+        "whole_horizon_from_instantaneous_braking",
+        "adapted_dynamic_improvement_from_static_sensitivity",
+        "unvisited_simulation_descent_guarantee",
+        "continuous_time_compliance",
+        "hardware_performance",
+        "robustness",
+        "repeatability",
+        "identified_root_cause"
+      ],
+      "scope": "Only measured solver/model/grid conditions.",
+      "probability": null
+    }
+  },
+  "interpretation": "Only original registered acceptance establishes physical success. Finite search failure does not establish structural infeasibility; no method superiority, robustness or hardware claim."
+}
