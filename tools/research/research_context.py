@@ -138,8 +138,27 @@ def compact_evidence(value, reference, pointer=''):
 def context(host):
     s=state(host);settings=s['spec'].get('research_decisions',{}).get('context_limits')
     current=legacy_context(host)
-    if settings is None:return current
-    return bounded_context(current,settings,s.get('control_initializations',[]))
+    if settings is not None:current=bounded_context(current,settings,s.get('control_initializations',[]))
+    if s['spec'].get('tool_readiness') or s.get('tool_failures'):
+        from tools.research.tool_readiness import availability, MATLAB_ACTIONS
+        status=availability(host)
+        current['tool_readiness']={k:status.get(k) for k in ('status','checked_unix','failed_stage','reason','failure_reference','log_reference')}
+        if status['status']!='ready':current['actions']=[a for a in current['actions'] if a not in MATLAB_ACTIONS]
+    # New valid observations are executable starts, with exact same-task bindings.
+    starts=[dict(candidate=host.store.artifact(r)['candidate'],source=host.store.artifact(r)['source_reference'],
+        observation=r) for r in reversed(s.get('physical_replays',[])) if task_gap(host.store.artifact(r))['valid_complete']]
+    starts += list(reversed(s.get('control_initializations',[])))+current['control_search_starts']
+    seen=set();unique=[]
+    for entry in starts:
+        key=(entry['candidate']['artifact_id'],entry['source']['artifact_id'])
+        if key not in seen:unique.append(entry);seen.add(key)
+    current['control_search_starts']=unique[:(settings or {}).get('candidates',3)]
+    current['control_search_domain']=dict(coefficient_order='knot_index * tendon_count + tendon_index',
+        active_coefficients='Optional unique flat indices; inactive coefficients remain zero relative to each start',
+        response_cost='baseline per start + active coefficient count probes + one proposal per local response iteration; all share one cap',
+        time_constraint='0 <= window_start <= knots[0] < knots[-1] <= window_end <= task duration',
+        multi_start='additional_starts=[{candidate,source,adaptation_from?}]; same task, tendon order and time grid required')
+    return current
 
 
 def bounded_context(current,settings,initializations=()):

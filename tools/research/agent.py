@@ -206,6 +206,9 @@ def plan_schema(actions):
     allowed={payloads[a] for a in actions if a in payloads}
     for field in set(payloads.values())-allowed:schema['properties'].pop(field,None)
     schema['properties']['action']={'type':'string','enum':actions}
+    schema['allOf']=[
+        {'if':{'properties':{'action':{'const':a}}},'then':{'required':[payloads[a]],
+            'properties':{payloads[a]:{'not':{'type':'null'}}}}} for a in actions if a in payloads and a!='diagnose']
     needed=set()
     def visit(v):
         if isinstance(v,dict):
@@ -219,6 +222,36 @@ def plan_schema(actions):
     visit(schema['properties'])
     schema['$defs']={k:v for k,v in schema['$defs'].items() if k in needed}
     return schema
+
+
+def error_feedback(host, use, exc, before):
+    """Small correction response; exact rejected payload and traceback stay in Store."""
+    import traceback
+    s=state(host)
+    full=record(host,'tool_request_error',dict(tool_use=use,error=type(exc).__name__,message=str(exc),traceback=traceback.format_exc()))
+    counts=lambda v:tuple(v.get(k,0) for k in ('physical_replay_launches','nmpc_launches','mathematical_evaluations','offline_nlp','bdf_replays','admitted_training_stages'))
+    message=str(exc);code=message.split(':',1)[0].split('\n',1)[0]
+    field=None;expected=message[:300];refs=[]
+    if hasattr(exc,'errors'):
+        errors=exc.errors(include_url=False,include_context=False,include_input=False)
+        field='.'.join(map(str,errors[0]['loc'])) or None
+        expected='; '.join(e['msg'] for e in errors[:3])[:400]
+        code=errors[0]['type']
+    hints={
+        'ORDERED_V2_CORRECTION_WINDOW_REQUIRED':('control_search.settings.correction_window_s','0 <= window[0] <= knots[0] < knots[-1] <= window[1] <= task duration'),
+        'DECISION_CANDIDATE_MISMATCH':('decision.selected_candidate','Use the exact candidate in this action payload'),
+        'PHYSICAL_REPLAY_CANDIDATE_TASK_MODEL_OR_SEQUENCE_MISMATCH':('source','Use a candidate-bound source; initialize_control explicitly rebinds inherited controls'),
+        'UNREGISTERED_RESEARCH_EVIDENCE':('supporting_evidence','Cite registered result, candidate or source references from current packet'),
+        'ENGINEERING_TOOL_UNAVAILABLE':('action','Choose an available operation from current packet; engine failure is not scientific infeasibility')}
+    for marker,(f,hint) in hints.items():
+        if marker in message:code=marker;field=field or f;expected=hint
+    if 'ACTION_REQUIRES_ONLY_' in message:
+        field='action';expected=message[message.index('ACTION_REQUIRES_ONLY_'):].split('\n')[0][:160]
+    if isinstance(exc,(KeyError,IndexError)):
+        code='INVALID_EVIDENCE_POINTER';field='pointer';expected='Read the parent pointer with view=summary to obtain actual child keys'
+        if use['input'].get('reference'):refs=[use['input']['reference']]
+    return dict(status='rejected' if counts(before)==counts(s) else 'execution_failed',error_code=code[:100],field=field,
+        expected=expected,scientific_execution_started=counts(before)!=counts(s),relevant_references=refs,full_error_reference=full)
 
 def build_harness(host,*,transport,api_key,instructions,model_class,tool_executor,research_tools,configuration_path,session_directory):
     from strands.experimental.context_manager import Offload
@@ -314,6 +347,7 @@ async def converse(host):
     boundary=Boundary(host,allow_truncated_response=True)
     def handler(kind):
         def run(use,**kwargs):
+            before=state(host)
             try:
                 if kind=='plan':
                     value=dispatch(host,use['input'],'native-'+use['toolUseId'])
@@ -348,9 +382,7 @@ async def converse(host):
                         tool_id='research.core_'+kind,tool_version='1.0.0',execution_status='failed',error=str(exc),charged=zero()),dict(error=str(exc)))
                 from tools.research.feedback import facts
                 if state(host)['spec'].get('research_decisions'):
-                    from tools.research.research_context import context
-                    return dict(toolUseId=use['toolUseId'],status='error',content=[dict(text=json.dumps(dict(
-                        error=type(exc).__name__,message=str(exc),research_context=context(host))))])
+                    return dict(toolUseId=use['toolUseId'],status='error',content=[dict(text=json.dumps(error_feedback(host,use,exc,before)))])
                 return dict(toolUseId=use['toolUseId'],status='error',content=[dict(text=json.dumps(dict(
                     error=type(exc).__name__,message=str(exc),decision_facts=facts(host))))])
         return run
@@ -420,6 +452,10 @@ async def converse(host):
             return
         guard(host)
         current=decision_packet(host)
+        if s['spec'].get('tool_readiness') or s.get('tool_failures'):
+            native[0].tool_spec={**native[0].tool_spec,'inputSchema':{'json':plan_schema(current['research']['actions'])}}
+            from tools.research.tool_readiness import availability
+            if (availability(host) or {}).get('status')!='ready':agent.tool_registry.registry.pop('research_analysis',None)
         record(host,'model_decision_packet',current)
         agent.system_prompt=instructions+'\nCURRENT_RESEARCH_PACKET\n'+json.dumps(current,separators=(',',':'))
         if protected(host):

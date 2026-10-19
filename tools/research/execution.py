@@ -223,6 +223,8 @@ def finish_execution(host, recovery=False):
             numerical_reserved_s=current['numerical_reserved_s']-p['reserved_s'],numerical_s=current['numerical_s']+actual)
         host.store.update_state(db,host.run_id,current)
     from tools.research.budget import observe_pass
+    from tools.research.tool_readiness import observe_failure
+    observe_failure(host,detail,ref)
     observe_pass(host,ref)
     from tools.research.rl import compatible_references
     compatible_references(host)

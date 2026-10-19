@@ -9,7 +9,7 @@ from tools.state_io import read
 
 def main():
     parser=argparse.ArgumentParser()
-    parser.add_argument('command',choices=['run','prepare','bind','migrate','execute','rl','diagnose','recover','status','export'])
+    parser.add_argument('command',choices=['readiness','run','prepare','bind','migrate','execute','rl','diagnose','recover','status','export'])
     parser.add_argument('--spec',type=Path,default=DEFAULT_SPEC)
     parser.add_argument('--plan',type=Path)
     parser.add_argument('--run-id')
@@ -17,7 +17,7 @@ def main():
     parser.add_argument('--request-id')
     parser.add_argument('--reason')
     args=parser.parse_args()
-    if args.command=='prepare':
+    if args.command in ('prepare','readiness'):
         h=prepare(args.spec,profile=args.profile)
     else:
         if not args.run_id:
@@ -25,6 +25,10 @@ def main():
         h=Host(ROOT/'runs/research'/args.run_id,args.run_id,actor='unified-research')
         state(h)  # Require an existing frozen session, without source resolution.
     spec=state(h)['spec']
+    if args.command=='readiness':
+        from tools.research.tool_readiness import check
+        print(json.dumps(check(h)))
+        return
     if args.command in ('bind','migrate'):
         bind(h,args.reason if args.command=='migrate' else None,spec)
     elif args.command=='rl':

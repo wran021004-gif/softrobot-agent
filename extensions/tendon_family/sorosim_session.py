@@ -34,17 +34,22 @@ class SorosimSession:
         self.options = options
         self.engine = None
         self.model_identity = None
+        self.startup_stage = 'not_started'
         self.timings = dict(startup_s=0., shutdown_s=0., calls=[])
 
     def __enter__(self):
+        self.startup_stage = 'dependency'
         self.dependency = dependency_identity(self.root)
         import matlab.engine
         started = time.perf_counter()
+        self.startup_stage = 'engine_start'
         self.engine = matlab.engine.start_matlab(self.options)
         self.timings['startup_s'] = time.perf_counter() - started
         try:
+            self.startup_stage = 'gateway'
             self.engine.addpath(str(ROOT / 'matlab/sorosim_control'), nargout=0)
             self.environment = self.call('environment', dict(root=str(Path(self.root).resolve())))
+            self.startup_stage = 'ready'
         except BaseException:
             self.close()
             raise

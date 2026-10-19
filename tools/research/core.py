@@ -321,6 +321,8 @@ def dispatch(host, value, request_id, origin='model'):
         'physical_replay':'physical_replay','matched_state':'physical_replay','nmpc_prediction_diagnostic':'prediction_diagnostic'}.get(plan.action)
     if capability and not enabled(state(host)['spec'],capability):
         raise ValueError('Undeclared capability: '+capability)
+    from tools.research.tool_readiness import require
+    require(host,plan.action)
     old=host.store.lookup(host.run_id,request_id)
     if old:
         if old['request_hash']!=digest(plain(plan)):

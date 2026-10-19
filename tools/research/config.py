@@ -63,6 +63,7 @@ def resolve(path, profile=None, *, backend_profile=None):
     path = Path(path).resolve()
     study = read(path)
     decisions=study.pop('research_decisions',None)
+    readiness=study.pop('tool_readiness',None)
     provenance = dict(root=dict(path=str(path), sha256=digest(study)), references={})
     correction=study.pop('correction_search',None)
     local_search=study.pop('local_control_search',None)
@@ -322,6 +323,11 @@ def resolve(path, profile=None, *, backend_profile=None):
             if key not in ('candidates','recent','pareto','samples','evidence') or type(value) is not int or not 1<=value<=100:
                 raise ValueError('BOUNDED_RESEARCH_CONTEXT_LIMIT_REQUIRED')
         study['research_decisions']=decisions
+    if readiness is not None:
+        report=read((path.parent/readiness).resolve())
+        if report.get('scientific_evidence') is not False or report.get('status') not in ('ready','dependency_unavailable','engine_start_failed','gateway_failed','timeout'):
+            raise ValueError('EXPLICIT_ENGINEERING_READINESS_REPORT_REQUIRED')
+        study['tool_readiness']=dict(sorosim_matlab=report)
     study['resolved_identity'] = digest(study)
     return study
 

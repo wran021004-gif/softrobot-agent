@@ -182,5 +182,7 @@ def recover(host):
         host.store.update_state(db,host.run_id,current)
         host.store.complete(row,dict(request_id=row['request_id'],execution_id=row['execution_id'],caller=host.actor,tool_id='research.mechanics',tool_version='1.0.0',execution_status='completed',charged=zero()),value,elapsed=boundary['elapsed_s'],db=db)
     from tools.research.rl import compatible_references
+    from tools.research.tool_readiness import observe_failure
+    observe_failure(host,value,ref)
     compatible_references(host)
     return dict(reference=ref,**value)
