@@ -51,6 +51,20 @@ Implementation ownership:
   the existing core/Store; writes rankings, guidance checks and exact-pair bounds.
 - One sparse study JSON and focused fabricated-fixture tests complete the change.
 
+After 44 completed physics evaluations, repeated full-history assembly in the
+core response became the dominant cost (the owned worker itself took about 1.1 s).
+At a verified boundary with no active numerical worker, the two owned driver
+processes were stopped. Existing `core.recover` sealed the unfinished metadata
+receipt without launching physics. The original source freeze, counters, calls
+and artifacts are in `pre_serialization_repair/`; the boundary/recovery JSONs
+retain exact counts. `core.resource_use` now owns the unchanged ledger projection,
+shared by full packets, plan receipts, recovery and count-mode export. Numerical
+kernels are unchanged. A committed explicit migration preserves cumulative costs;
+the exact prior candidate/profile is retained through the existing imported-candidate
+contract. Restart reconstructs the deterministic optimizer from cached function
+evaluations; it does not claim continuation of an in-memory optimizer checkpoint.
+No completed numerical trajectory is replayed during this repair.
+
 Launch through the existing research interpreter with MATLAB Engine on PYTHONPATH,
 the pinned SOROSIM_ROOT and configured single-thread numerical environment:
 `python -m tests.research.sorosim_s510_correction`.

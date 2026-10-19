@@ -234,6 +234,16 @@ def family_claims(host, s, progress):
         reproducibility_assessed=progress['confirmed'],parameter_improvement_attribution_permitted=False)
 
 
+def resource_use(host):
+    """Ledger-only reporting; never rebuild candidate or evaluation history."""
+    s=state(host);cap=s['spec']['budgets']['numerical_s']
+    return dict(shared_ledger=host.store.remaining(),numerical_s=s['numerical_s'],
+        numerical_reserved_s=s['numerical_reserved_s'],
+        remaining_numerical_s=None if cap is None else cap-s['numerical_s']-s['numerical_reserved_s'],
+        charged_starts=s.get('charged_starts',0),shared_start_limit=s['spec'].get('shared_start_limit'),
+        elapsed_s=max(0,s.get('closed_unix',time.time())-s['started_unix']))
+
+
 def packet(host):
     from tools.research.analysis import decision_result
     from tools.research.sorosim_s55_feedback import scoped_feedback
@@ -272,7 +282,7 @@ def packet(host):
             handoffs=[dict(reference=r,**host.store.artifact(r)) for r in s.get('handoffs',[])],
             rl=rl_packet(host) if enabled(s['spec'],'rl') else None,
             nmpc_admission=[dict(candidate=r,**nmpc_timing(host,r),remaining_phase_admission=capacity(host,1,candidate=r)) for r in s['candidates'].values() if host.store.artifact(r)['profile_identity']==s['profile']['identity']] if enabled(s['spec'],'nmpc') else None,
-            resource_use=dict(shared_ledger=host.store.remaining(),numerical_s=s['numerical_s'],numerical_reserved_s=s['numerical_reserved_s'],remaining_numerical_s=None if s['spec']['budgets']['numerical_s'] is None else s['spec']['budgets']['numerical_s']-s['numerical_s']-s['numerical_reserved_s'],charged_starts=s.get('charged_starts',0),shared_start_limit=s['spec'].get('shared_start_limit'),elapsed_s=max(0,s.get('closed_unix',time.time())-s['started_unix'])),
+            resource_use=resource_use(host),
             claims=claims(host),research_status=s['research_status'])
 
 
@@ -415,7 +425,7 @@ def dispatch(host, value, request_id, origin='model'):
             update(host,research_status='stopped',final_disposition=ref,closed_unix=time.time())
             result=dict(accepted_stop=True,claims=claims(host))
         output=dict(plan=ref,result=result,scientific_preflight=scientific_preflight,
-            resource_use=packet(host)['resource_use'])
+            resource_use=resource_use(host))
         host.store.complete(row,dict(request_id=request_id,execution_id=row['execution_id'],caller=host.actor,
             tool_id='research.core_plan',tool_version='1.0.0',execution_status='completed',charged=zero()),output)
         return output
@@ -512,7 +522,7 @@ def recover(host):
                     recovered_without_repeating_completed_outputs=True)
         else:
             raise ValueError('INSPECT_UNSEALED_NONEXECUTION_OPERATION')
-        output=dict(plan=ref,result=result,resource_use=packet(host)['resource_use'],recovered_without_repeating_completed_outputs=True)
+        output=dict(plan=ref,result=result,resource_use=resource_use(host),recovered_without_repeating_completed_outputs=True)
         host.store.complete(row,dict(request_id=key,execution_id=row['execution_id'],caller=host.actor,
             tool_id='research.core_plan',tool_version='1.0.0',execution_status='completed',charged=zero()),output)
         completed.append(key)
@@ -542,8 +552,12 @@ def export(host, destination=None):
             info.size=len(body)
             archive.addfile(info,io.BytesIO(body))
             members.append(dict(name=name,sha256=identity,bytes=info.size,media='application/json'))
-    current=packet(host) or dict(resource_use=dict(shared_ledger=host.store.remaining()))
     s=state(host)
+    if s['spec'].get('budget_semantics',{}).get('mode')=='count':
+        from tools.research.rl import packet as rl_packet
+        current=dict(resource_use=resource_use(host),rl=rl_packet(host) if enabled(s['spec'],'rl') else None)
+    else:
+        current=packet(host) or dict(resource_use=resource_use(host))
     if s['spec'].get('budget_semantics',{}).get('mode')=='count':
         disposition={key:s.get(key) for key in ('research_status','freeze','selected','selected_solution','success_gate','final_disposition','validation_extensions','closed_unix')}
         disposition.update(study_id=host.run_id,claims=claims(host),resource_use=current['resource_use'],

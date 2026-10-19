@@ -9,6 +9,7 @@ from tools.research import core
 from tools.research.control_correction import (corrected_tensions, task_outputs,
     task_measure, fitting_residual, output_error_budget, improvement_test)
 from tools.research.feedback import task_gap
+from tools.research_tasks import task_adapter
 from tools.research.numerics import archived
 from tools.research.state import state, save, update
 from tools.state_io import atomic_json, read, digest
@@ -42,7 +43,9 @@ def main():
     settings=state(host)['spec']['correction_search'];knots=settings['knots_s']
     reference=np.asarray(trajectory['tensions_n']);n=len(knots)*reference.shape[1]
     times=np.asarray(trajectory['times_s'][:-1]);limits=host.store.artifact(candidate)['resolved_parameters']['force_limits_n']
-    target=np.asarray(cfg['task']['goal']['data']['target_m']);hold=.30;pl=.01;vl=.02
+    adapter=task_adapter(cfg);ranking=adapter.ranking_limits()
+    target=np.asarray(cfg['task']['goal']['data']['target_m'])
+    hold=adapter.holding_start_s();pl=ranking['holding_max_error_m'];vl=ranking['holding_max_speed_m_s']
     rows=read(DEST/'progress.json')['candidates'] if (DEST/'progress.json').exists() else []
     cache={row['sequence_identity']:row for row in rows}
     math_rows=read(DEST/'mathematics.json') if (DEST/'mathematics.json').exists() else {}

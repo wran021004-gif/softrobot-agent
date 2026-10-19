@@ -2,6 +2,7 @@
 import unittest
 from copy import deepcopy
 import numpy as np
+from unittest.mock import patch
 from tools.research.control_correction import (corrected_tensions,task_measure,
     fitting_residual,output_error_budget,improvement_test)
 from tools.research.physical_replay import explicit_control_source,numerically_verified_source
@@ -79,6 +80,21 @@ class ControlCorrectionTests(unittest.TestCase):
         self.assertEqual(spec['budgets']['physical_launches'],192)
         self.assertEqual(spec['budgets']['provider_requests'],0)
         self.assertEqual(spec['correction_search']['knots_s'],[0.,.18,.3])
+
+
+class LedgerReportingTests(unittest.TestCase):
+    def test_plan_response_does_not_rebuild_full_history(self):
+        from tests.research.test_agent_feedback import AgentFeedbackTests
+        from tools.research import core
+        fixture=AgentFeedbackTests('runTest')
+        fixture.setUp()
+        try:
+            with patch.object(core,'packet',side_effect=AssertionError('full history must not be rebuilt')):
+                fixture.generate()
+                use=core.resource_use(fixture.host)
+                self.assertEqual(use['shared_ledger'],fixture.host.store.remaining())
+                self.assertIn('numerical_reserved_s',use)
+        finally:fixture.doCleanups()
 
 
 if __name__=='__main__':unittest.main()
