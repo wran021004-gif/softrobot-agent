@@ -143,6 +143,10 @@ class AdmissionTests(unittest.TestCase):
 
     def test_wrong_intent_rejected(self):
         with self.assertRaisesRegex(ValueError,'INTENT_ACTION'):admit_decision(self.host,plan(decision=decision('CONTROL_SEARCH')))
+        self.s['success_gate']={'observed_task_pass':True}
+        with self.assertRaisesRegex(ValueError,'EXACT_SELECTION_BEFORE_STOP'):admit_decision(self.host,plan('stop',decision=decision('STOP')))
+        from tools.research.budget import closeout_operations
+        self.assertEqual(closeout_operations(self.host)['research_plan'],['select'])
 
     def test_zero_rule_cannot_hide_nonzero_initial_state(self):
         spec=dict(start_mode='family_space',candidate_initialization='all_candidate_dofs_zero_v1')

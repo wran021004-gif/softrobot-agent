@@ -71,7 +71,8 @@ def science_fits(host):
 def closeout_operations(host):
     from tools.research.state import state
     s = state(host)
-    return dict(research_plan=['stop', 'select'],
+    actions=['select'] if s.get('spec',{}).get('research_decisions') and s.get('success_gate') and not s.get('selected') else ['stop','select']
+    return dict(research_plan=actions,
         research_rl=[a for a in ('status', 'stop', 'evaluate') if s.get('rl_runs') and (a != 'evaluate' or not s.get('success_gate'))])
 
 

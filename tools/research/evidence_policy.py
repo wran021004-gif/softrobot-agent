@@ -161,6 +161,8 @@ def admit_decision(host,plan):
     if not s['spec'].get('research_decisions'):return None
     d=plan.decision
     if d is None:raise ValueError('VERSIONED_RESEARCH_DECISION_REQUIRED')
+    if plan.action=='stop' and s.get('success_gate') and not s.get('selected'):
+        raise ValueError('FRESH_PASS_REQUIRES_EXACT_SELECTION_BEFORE_STOP')
     intents={'generate':'DESIGN_MODIFICATION','propose':'DESIGN_MODIFICATION','execute':'NMPC_EXECUTION',
         'control_search':'CONTROL_SEARCH','physical_replay':'PHYSICAL_VALIDATION','select':'SELECT','stop':'STOP',
         'diagnose':'DIAGNOSE','search':'MATHEMATICAL_ANALYSIS','mechanics':'MATHEMATICAL_ANALYSIS',
