@@ -218,6 +218,25 @@ class ControlCorrectionSettings(Contract):
         return self
 
 
+class LocalControlSearchSettings(Contract):
+    method: Literal['response','pattern'] = 'response'
+    knots_s: list[FiniteFloat] = Field(default_factory=lambda:[0.,.18,.30],min_length=2,max_length=4)
+    coefficient_limit_n: FiniteFloat = Field(default=2.,gt=0)
+    difference_step_n: FiniteFloat = Field(default=.01,gt=0)
+    initial_radius_n: FiniteFloat = Field(default=.1,gt=0)
+    minimum_radius_n: FiniteFloat = Field(default=.0001,gt=0)
+    evaluation_requests: int = Field(default=24,ge=1,le=1000,strict=True)
+    iterations: int = Field(default=16,ge=1,le=100,strict=True)
+
+    @model_validator(mode='after')
+    def domain(self):
+        if self.knots_s[0]!=0 or any(b<=a for a,b in zip(self.knots_s,self.knots_s[1:])):
+            raise ValueError('ORDERED_KNOTS_STARTING_AT_ZERO_REQUIRED')
+        if not self.minimum_radius_n<=self.initial_radius_n<=self.coefficient_limit_n or self.difference_step_n>self.coefficient_limit_n:
+            raise ValueError('STEPS_MUST_FIT_COEFFICIENT_DOMAIN')
+        return self
+
+
 class FixedSequenceRefinement(Contract):
     candidate: EvidenceRef
     source: EvidenceRef

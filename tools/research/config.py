@@ -64,6 +64,7 @@ def resolve(path, profile=None, *, backend_profile=None):
     study = read(path)
     provenance = dict(root=dict(path=str(path), sha256=digest(study)), references={})
     correction=study.pop('correction_search',None)
+    local_search=study.pop('local_control_search',None)
     family_mode=study.get('start_mode')=='family_space'
     additions={key:study.pop(key) for key in ('fidelity_policy','family_search') if key in study}
     if family_mode:
@@ -294,6 +295,15 @@ def resolve(path, profile=None, *, backend_profile=None):
                 source=dict(family_space_identity=study['family_space_identity'],request=bootstrap['request']),
                 reason='Host.create and compile_input require concrete robot signals and backend checks',
                 scientific_candidate=False, candidate_pool_member=False))
+    if local_search is not None:
+        from tools.research.contracts import LocalControlSearchSettings
+        if not isinstance(local_search,list) or not local_search:
+            raise ValueError('EXPLICIT_LOCAL_SEARCH_METHOD_SETTINGS_REQUIRED')
+        local_search=[plain(LocalControlSearchSettings.model_validate(v)) for v in local_search]
+        if ('control_correction' not in study['capabilities'] or any(
+                v['knots_s'][-1]>cfg['task']['timing']['duration_s'] for v in local_search)):
+            raise ValueError('LOCAL_SEARCH_CAPABILITY_AND_TASK_HORIZON_REQUIRED')
+        study['local_control_search']=local_search
     if correction is not None:
         from tools.research.contracts import ControlCorrectionSettings
         correction=plain(ControlCorrectionSettings.model_validate(correction))

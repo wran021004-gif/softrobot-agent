@@ -1,0 +1,21 @@
+{
+  "defaults": "family_study_defaults.json",
+  "start_mode": "family_space",
+  "family_space": "family_space_v2.json",
+  "candidate_initialization": "all_candidate_dofs_zero_v1",
+  "base_commit": "64b9ebd5",
+  "control": "control_sorosim_s56_braking.json",
+  "topology_scope": {"segment_counts": [2], "tendon_counts": [4]},
+  "study_id": "control-search-p1-20261019",
+  "evidence_destination": "evidence/control_search_p1",
+  "capabilities": ["physical_replay", "control_correction"],
+  "allowed_plan_actions": ["generate", "physical_replay", "select", "stop"],
+  "budgets": {"public_operations": 40, "protected_public_operations": 4, "physical_launches": 24},
+  "physical_replay_limit": 24,
+  "authorization": "User P1 authorization: at most 24 new full MuJoCo evaluations in this independent study, including baselines, finite differences and failures. Zero provider requests, PPO, NMPC, mathematical integrations or full NLP. Stop at first complete original-task pass. No borrowing from P0 or sealed studies.",
+  "execution_instructions": "Both methods start from P0-verified S5.6 actual NMPC controls and S5.8 best residual PPO controls, each bound to its own design. Same three-knot four-tendon parameterization, exact Store reuse, independent original acceptance and validity-first ranking. Response gets 16 evaluation requests; pattern gets 10 including the two shared cached baselines. This is a bounded engineering pilot, not an equal-budget superiority test. Original 35 commands, 0.30-0.35 s window, 10 mm position, 0.020 m/s speed, [0,8] N remain frozen.",
+  "local_control_search": [
+    {"method": "response", "evaluation_requests": 16},
+    {"method": "pattern", "evaluation_requests": 10}
+  ]
+}

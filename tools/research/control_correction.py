@@ -119,3 +119,43 @@ def improvement_test(base_model, new_model, base_sim, new_sim, base_budget, new_
         sufficient_condition_met=bool(sufficient>0),
         prospective_guarantee=False,
         scope='A posteriori at the two evaluated endpoints; prospective guarantee requires independently valid endpoint error bounds before execution')
+
+
+def constraint_vectors(outputs, target, holding_start, position_limit, speed_limit):
+    """Every terminal/holding norm constraint, without averaging away a violation."""
+    task_measure(outputs,target,holding_start,position_limit,speed_limit)
+    p=(np.asarray(outputs['tip_positions_m'])-target)/position_limit
+    v=np.asarray(outputs['tip_velocities_m_s'])/speed_limit
+    hold=np.asarray(outputs['times_s'])>=holding_start-1e-12
+    return np.vstack([p[-1:],p[hold],v[hold]])
+
+
+def correction_basis(times, knots, channels):
+    knots=np.asarray(knots,dtype=float)
+    return np.kron(np.column_stack([np.interp(times,knots,row) for row in np.eye(len(knots))]),np.eye(channels))
+
+
+def constrained_response_step(vectors, response, coefficients, reference, basis, limits,
+                              radius, coefficient_limit, regularization=.01):
+    """Numerical SLSQP epigraph step; no global proof or physical acceptance."""
+    from scipy.optimize import minimize
+    y=np.asarray(vectors);jac=np.asarray(response);x=np.asarray(coefficients)
+    if (y.ndim!=2 or y.shape[1]!=3 or jac.shape!=(*y.shape,len(x)) or
+            not all(np.isfinite(a).all() for a in (y,jac,x,reference,basis,limits))):
+        raise ValueError('FINITE_ALIGNED_LOCAL_RESPONSE_REQUIRED')
+    low=np.maximum(-radius,-coefficient_limit-x);high=np.minimum(radius,coefficient_limit-x)
+    base=np.asarray(reference).ravel()+basis@x;upper=np.tile(limits,len(reference))
+    def norms(z):return np.linalg.norm(y+jac@z[:-1],axis=1)
+    def constraints(z):return np.r_[1+z[-1]-norms(z),base+basis@z[:-1],upper-base-basis@z[:-1]]
+    def derivatives(z):
+        moved=y+jac@z[:-1];normal=moved/np.maximum(np.linalg.norm(moved,axis=1)[:,None],1e-15)
+        return np.vstack([np.c_[-np.einsum('ij,ijk->ik',normal,jac),np.ones(len(y))],
+            np.c_[basis,np.zeros(len(base))],np.c_[-basis,np.zeros(len(base))]])
+    solved=minimize(lambda z:z[-1]+regularization*(z[:-1]@z[:-1]),
+        np.r_[np.zeros(len(x)),max(0.,max(np.linalg.norm(y,axis=1))-1)],
+        jac=lambda z:np.r_[2*regularization*z[:-1],1.],method='SLSQP',
+        bounds=[*zip(low,high),(0,None)],constraints=[dict(type='ineq',fun=constraints,jac=derivatives)],
+        options=dict(maxiter=100,ftol=1e-10))
+    valid=bool(solved.success and np.isfinite(solved.x).all() and min(constraints(solved.x))>=-1e-8)
+    return dict(success=valid,delta=solved.x[:-1],predicted_gap=float(max(0.,max(norms(solved.x))-1)),
+        numerical_status=str(solved.message),iterations=int(solved.nit),global_optimality_proved=False)

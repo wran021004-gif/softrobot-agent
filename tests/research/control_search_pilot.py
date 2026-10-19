@@ -53,8 +53,48 @@ def finish(host,destination,summary):
     atomic_json(destination/'summary.json',dict(summary,summary_reference=ref,ledger=host.store.remaining()))
 
 
+def run_search(host,rows,destination):
+    from tools.research.local_control_search import search, SearchStopped
+    from tools.research.control_correction import task_outputs
+    from tools.research_tasks import task_adapter
+    starts=[]
+    p0=read(ROOT/'evidence/control_search_p0/summary.json')
+    for prefix in ('96615db5','a323c937'):
+        row=next(r for r in rows if r['source_result']['artifact_id'].startswith(prefix))
+        verified=next(p['new_result'] for p in p0['paired'] if p['historical']['source_result']==row['source_result'])
+        result=archived('evidence/control_search_p0/study',verified['reference'])
+        src=archived('evidence/control_search_p0/study',result['source_reference'])
+        if not task_gap(result)['valid_complete'] or src['trajectory']!=row['schedule']['trajectory']:
+            raise ValueError('INDEPENDENT_VALID_START_REQUIRED')
+        candidate,source=materialize(host,row);source['provenance']['independent_p0_result']=verified['reference']
+        cfg=host.store.artifact(candidate)['configuration'];adapter=task_adapter(cfg);limits=adapter.ranking_limits()
+        starts.append(dict(id=prefix,candidate=candidate,schedule=source,limits=[8]*4,
+            task_options=dict(target=cfg['task']['goal']['data']['target_m'],holding_start=adapter.holding_start_s(),
+                position_limit=limits['holding_max_error_m'],speed_limit=limits['holding_max_speed_m_s'])))
+    def callback(start,source,metadata):
+        try:row=evaluate(host,start['candidate'],source)
+        except ValueError as exc:
+            if str(exc)=='PHYSICAL_REPLAY_LAUNCH_BUDGET_EXHAUSTED':raise SearchStopped('Store physical budget exhausted') from exc
+            raise
+        result=host.store.artifact(row['reference']);raw=host.store.artifact(result['raw_reference'])
+        row['outputs']=task_outputs(raw) if row['task_gap']['valid_complete'] else None
+        print(json.dumps(dict(algorithm=metadata['algorithm'],label=metadata['label'],
+            cache_hit=row['cache_hit'],gap=row['task_gap'],used=row['cumulative_used']['backend_solves'])),flush=True)
+        return row
+    methods=[]
+    for settings in state(host)['spec']['local_control_search']:
+        if state(host).get('success_gate'):break
+        methods.append(search(starts,callback,settings))
+        atomic_json(destination/'search_progress.json',dict(methods=methods))
+    ranked=sorted((r for m in methods for r in m['candidates']),key=ranking_key)
+    return dict(stage='p1',freeze=state(host)['freeze'],methods=methods,best=ranked[0] if ranked else None,
+        original_task_passed=bool(state(host).get('success_gate')),
+        stop_reason='first_original_task_pass' if state(host).get('success_gate') else 'finite_search_complete',
+        interpretation='Limited pilot; no structure infeasibility or method superiority claim.')
+
+
 def main():
-    parser=argparse.ArgumentParser();parser.add_argument('--stage',choices=['p0'],default='p0')
+    parser=argparse.ArgumentParser();parser.add_argument('--stage',choices=['p0','p1'],default='p0')
     parser.add_argument('--audit-only',action='store_true');args=parser.parse_args()
     destination=ROOT/f'evidence/control_search_{args.stage}';before=source_hashes()
     rows=historical_records();atomic_json(destination/'portfolio.json',portfolio(rows))
@@ -65,6 +105,11 @@ def main():
     if state(host)['research_status']=='stopped':print('sealed; no science relaunched');return
     if 'freeze' not in state(host):core.bind(host)
     if state(host).get('pending'):raise ValueError('RECOVER_EXISTING_STUDY_BEFORE_RESUMING')
+    if args.stage=='p1':
+        summary=run_search(host,rows,destination);after=source_hashes()
+        atomic_json(destination/'source_audit.json',dict(before=before,after=after,unchanged=before==after))
+        if before!=after:raise ValueError('HISTORICAL_SOURCE_CHANGED')
+        finish(host,destination,summary);return
     prefixes=['96615db5','a323c937','15cce211','8e7ee1af'];paired=[]
     for prefix in prefixes:
         row=next(r for r in rows if r['source_result']['artifact_id'].startswith(prefix))

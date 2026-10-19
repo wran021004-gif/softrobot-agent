@@ -56,6 +56,8 @@ def evaluate_schedule(host, candidate, source, plan_factory):
         prior_cfg=host.store.artifact(result['candidate'])['configuration']
         if schedule_identity(prior_cfg,previous['trajectory'])==identity:
             return dict(reference=ref,**result),True
+    if host.store.remaining()['remaining']['backend_solves']<1:
+        raise ValueError('PHYSICAL_REPLAY_LAUNCH_BUDGET_EXHAUSTED')
     source_ref=save(host,source,'bound_applied_control_schedule')
     result=core.dispatch(host,plan_factory('physical_replay',physical_replay=dict(candidate=candidate,source=source_ref)),
         'schedule-'+identity,origin='engineering')['result']
