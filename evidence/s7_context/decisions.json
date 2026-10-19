@@ -1,0 +1,140 @@
+{
+  "requests": [
+    {
+      "tool_use": {
+        "input": {
+          "action": "stop",
+          "decision": {
+            "claimed_inference": "empirical_search",
+            "hypothesis_id": "CONTROL_SEARCH_INCOMPLETE",
+            "requested_budget": 0,
+            "research_intent": "STOP",
+            "selected_candidate": null,
+            "selected_method": "truthful budget-constrained closeout with no candidate, no physical execution and no selection",
+            "selected_variables": [],
+            "version": "research_decision_v1"
+          },
+          "expected_observation": "STOP is accepted as a truthful budget-constrained closeout: no selected_execution is frozen, all_fresh_results stays empty, and no acceptance or task success is claimed.",
+          "fixed_conditions": "Frozen task.reach contract (sealed evaluator evaluate.reach, tolerance 0.01 m), target [0.29,-0.035,0.19] m, 0.35 s duration, 0.05 s holding window with 0.01 m / 0.02 m/s limits, family serial_external_tendons_s7 with 2 segments and tendon domains as declared, frozen budget: backend_solves 0, model_calls 2, tool_calls 8, worker_calls 0.",
+          "hypothesis": "No admissible research action in this context can produce independent physical evidence: remaining backend_solves is 0, so control initialization, control_search, physical_replay and NMPC execution are all unavailable, and the only exposed actions are stop/select. With no candidate in the family space, best_valid=null, observations=[], evidence=[], and all_fresh_results empty, there is no fresh complete passing result that could be truthfully selected.",
+          "interpretation": "The study closes unresolved and without a solution. No candidate design was generated, no control seed or control search was run, no physical replay or NMPC execution occurred, and no mathematical diagnostic produced evidence, because zero physical backend budget was available. This is an accounting/authority limit only: it is not evidence of global feasibility or infeasibility, of structural limitation of the serial external-tendon family, of controller parameterization limits, of solver or numerical trouble, or of any hardware behavior, robustness or repeatability. All listed unresolved hypotheses remain unverified and unmeasured for this task.",
+          "next_step": "stop",
+          "stopping_condition": "Stop when no admissible action can generate a fresh physical observation, and no fresh complete passing result exists to select, or at budget exhaustion.",
+          "supporting_evidence": [
+            {
+              "artifact_id": "0793d20569402760ca055f73f6f97d80d73d0fe3c051ff2b60ebad1519db02aa",
+              "media_type": "application/json"
+            }
+          ],
+          "weakening_observation": "If this context contained any fresh physical observation, a nonzero backend_solves allowance, or an already-passing result to select, closing out without exploration or selection would be premature and this STOP hypothesis would be weakened."
+        },
+        "name": "research_plan",
+        "toolUseId": "call_00_kITw8UpFPDjnxynrSccn2081"
+      }
+    },
+    {
+      "tool_use": {
+        "input": {
+          "action": "stop",
+          "decision": {
+            "claimed_inference": "empirical_search",
+            "hypothesis_id": "CONTROL_SEARCH_INCOMPLETE",
+            "requested_budget": 0,
+            "research_intent": "STOP",
+            "selected_candidate": null,
+            "selected_method": "truthful budget-constrained closeout with no candidate, no physical execution and no selection",
+            "selected_variables": [],
+            "version": "research_decision_v1"
+          },
+          "expected_observation": "STOP is accepted as a truthful budget-constrained closeout: no selected_execution is frozen, all_fresh_results stays empty, and no acceptance, task success, robustness or feasibility is claimed.",
+          "fixed_conditions": "Frozen task.reach contract (sealed evaluator evaluate.reach, tolerance 0.01 m), target [0.29,-0.035,0.19] m, 0.35 s duration, 0.05 s holding window with 0.01 m / 0.02 m/s limits, family serial_external_tendons_s7 with the declared 2-segment / tendon domains, frozen budget: backend_solves 0, model_calls 2, tool_calls 8, worker_calls 0, nmpc and physical_replay method allowance 0.",
+          "hypothesis": "No admissible research action in this context can produce independent physical evidence: remaining backend_solves is 0 and remaining nmpc / physical_replay / mathematical_evaluation allowances are 0, so generation validation, initialize_control, control_search, physical_replay and NMPC execution are all unavailable; only stop/select are exposed. With no candidate in the family space, best_valid=null, observations=[], evidence=[] and all_fresh_results empty, there is no fresh complete passing result that could be truthfully selected.",
+          "interpretation": "The study closes unresolved and without a solution. No candidate design was generated, no control seed or control search was run, no physical replay or NMPC execution occurred, and no mathematical diagnostic produced evidence, because zero physical backend and zero method allowance were available in this context. This is purely an accounting/authority limit: it is not evidence of global nonlinear feasibility or infeasibility, not a structural limitation of the serial external-tendon family, not a controller-parameterization limit, not solver or numerical trouble, and not evidence about hardware, robustness or repeatability. All five unresolved hypotheses (CONTROL_SEARCH_INCOMPLETE, MODEL_PREDICTION_UNRELIABLE, CONTROL_PARAMETERIZATION_LIMITED, DESIGN_LIMITATION_POSSIBLE, SOLVER_OR_NUMERICAL_ISSUE) remain unverified and unmeasured for this task, and no acceptance-bearing result exists to cite.",
+          "next_step": "stop",
+          "stopping_condition": "Stop when no admissible action can generate a fresh physical observation and no fresh complete passing result exists to select, or at budget exhaustion.",
+          "weakening_observation": "If this context contained any fresh physical observation, a nonzero backend_solves or method allowance, or an already-passing result to select, closing out without exploration or selection would be premature and this STOP hypothesis would be weakened."
+        },
+        "name": "research_plan",
+        "toolUseId": "call_00_qQAjhDc0P41AyLgq3NY09049"
+      }
+    }
+  ],
+  "feedback": [
+    {
+      "result": {
+        "content": [
+          {
+            "text": "{\"error\": \"ValueError\", \"message\": \"UNREGISTERED_RESEARCH_EVIDENCE\", \"research_context\": {\"version\": \"research_context_v2\", \"task_identity\": \"d24aeac7041052ce1d2ae60e825a802e7367107784f6fec192b0a65c4a5e76e7\", \"task\": {\"contract\": \"research.task_adapter\", \"version\": \"1.0.0\", \"family\": \"task.reach\", \"evaluator\": {\"extension_id\": \"evaluate.reach\", \"parameters\": {\"contract\": \"reference.reach_evaluation\", \"data\": {\"tolerance_m\": 0.01}, \"version\": \"1.0.0\"}, \"version\": \"1.0.0\"}, \"output\": {\"dimension\": 3, \"entity\": \"tip\", \"frame\": \"world\", \"missing\": \"unsupported\", \"name\": \"tip_position\", \"phase\": \"post_step\", \"units\": \"m\"}, \"reference\": {\"contract\": \"reference.reach_goal\", \"data\": {\"target_m\": [0.29, -0.035, 0.19]}, \"version\": \"1.0.0\"}, \"operating_point\": {\"time_s\": 0.0, \"reference_position_m\": [0.29, -0.035, 0.19], \"reference_velocity_m_s\": [0.0, 0.0, 0.0], \"frame\": \"world\", \"state_source\": \"Named task initializer; subsequent measured backend state\", \"reference_is_equilibrium\": false}, \"metrics\": [{\"name\": \"terminal_error_m\", \"unit\": \"m\", \"meaning\": \"Sealed endpoint evaluator position error\"}, {\"name\": \"holding_max_error_m\", \"unit\": \"m\", \"meaning\": \"Maximum sampled final-window tip error\"}, {\"name\": \"holding_max_speed_m_s\", \"unit\": \"m/s\", \"meaning\": \"Maximum sampled world translational tip speed\"}], \"scoring_interval_s\": [0.0, 0.35], \"holding\": {\"position_limit_m\": 0.01, \"speed_limit_m_s\": 0.02, \"window_s\": 0.05}, \"timing\": {\"control_period_s\": 0.01, \"duration_s\": 0.35, \"sample_period_s\": 0.01, \"termination\": [\"duration\", \"numerical_failure\"], \"timestep_s\": 0.0005}, \"continuous_time_guarantee\": false, \"context\": \"Endpoint reach and final-window position/speed are distinct components. Offline deployment timing is diagnostic.\"}, \"structure_domain\": {\"artifact_id\": \"0793d20569402760ca055f73f6f97d80d73d0fe3c051ff2b60ebad1519db02aa\", \"media_type\": \"application/json\"}, \"capabilities\": [\"physical_replay\", \"control_correction\", \"control_search\"], \"best_valid\": null, \"pareto_candidates\": [], \"observations\": [], \"evidence\": [], \"unresolved_hypotheses\": {\"CONTROL_SEARCH_INCOMPLETE\": {\"claim_kind\": \"UNVERIFIED_HYPOTHESIS\", \"acceptable_evidence\": [\"PHYSICAL_OBSERVATION\", \"NUMERICAL_DIAGNOSTIC\"], \"discriminating_experiments\": [\"additional_bounded_starts\", \"paired_control_search\"], \"forbidden_inferences\": [\"global_nonlinear_feasibility\", \"global_nonlinear_infeasibility\", \"structural_infeasibility\", \"whole_horizon_from_instantaneous_braking\", \"adapted_dynamic_improvement_from_static_sensitivity\", \"unvisited_simulation_descent_guarantee\", \"continuous_time_compliance\", \"hardware_performance\", \"robustness\", \"repeatability\", \"identified_root_cause\"], \"scope\": \"Only searched starts, controls and budgets.\", \"probability\": null}, \"MODEL_PREDICTION_UNRELIABLE\": {\"claim_kind\": \"UNVERIFIED_HYPOTHESIS\", \"acceptable_evidence\": [\"EMPIRICAL_COMPARISON\", \"NUMERICAL_DIAGNOSTIC\"], \"discriminating_experiments\": [\"aligned_model_physics_pairs\", \"fixed_input_grid_refinement\"], \"forbidden_inferences\": [\"global_nonlinear_feasibility\", \"global_nonlinear_infeasibility\", \"structural_infeasibility\", \"whole_horizon_from_instantaneous_braking\", \"adapted_dynamic_improvement_from_static_sensitivity\", \"unvisited_simulation_descent_guarantee\", \"continuous_time_compliance\", \"hardware_performance\", \"robustness\", \"repeatability\", \"identified_root_cause\"], \"scope\": \"Only checked operating points and input sequences.\", \"probability\": null}, \"CONTROL_PARAMETERIZATION_LIMITED\": {\"claim_kind\": \"UNVERIFIED_HYPOTHESIS\", \"acceptable_evidence\": [\"PHYSICAL_OBSERVATION\", \"EMPIRICAL_COMPARISON\"], \"discriminating_experiments\": [\"paired_basis_comparison_with_equal_budget\"], \"forbidden_inferences\": [\"global_nonlinear_feasibility\", \"global_nonlinear_infeasibility\", \"structural_infeasibility\", \"whole_horizon_from_instantaneous_braking\", \"adapted_dynamic_improvement_from_static_sensitivity\", \"unvisited_simulation_descent_guarantee\", \"continuous_time_compliance\", \"hardware_performance\", \"robustness\", \"repeatability\", \"identified_root_cause\"], \"scope\": \"Only declared bases and coefficient domains.\", \"probability\": null}, \"DESIGN_LIMITATION_POSSIBLE\": {\"claim_kind\": \"UNVERIFIED_HYPOTHESIS\", \"acceptable_evidence\": [\"MODEL_EXCLUSION\", \"EMPIRICAL_COMPARISON\"], \"discriminating_experiments\": [\"paired_designs_with_equal_control_adaptation\"], \"forbidden_inferences\": [\"global_nonlinear_feasibility\", \"global_nonlinear_infeasibility\", \"structural_infeasibility\", \"whole_horizon_from_instantaneous_braking\", \"adapted_dynamic_improvement_from_static_sensitivity\", \"unvisited_simulation_descent_guarantee\", \"continuous_time_compliance\", \"hardware_performance\", \"robustness\", \"repeatability\", \"identified_root_cause\"], \"scope\": \"Only tested designs; a local model exclusion is not physical exclusion.\", \"probability\": null}, \"SOLVER_OR_NUMERICAL_ISSUE\": {\"claim_kind\": \"UNVERIFIED_HYPOTHESIS\", \"acceptable_evidence\": [\"NUMERICAL_DIAGNOSTIC\"], \"discriminating_experiments\": [\"derivative_checks\", \"same_input_refinement\", \"alternative_initialization\"], \"forbidden_inferences\": [\"global_nonlinear_feasibility\", \"global_nonlinear_infeasibility\", \"structural_infeasibility\", \"whole_horizon_from_instantaneous_braking\", \"adapted_dynamic_improvement_from_static_sensitivity\", \"unvisited_simulation_descent_guarantee\", \"continuous_time_compliance\", \"hardware_performance\", \"robustness\", \"repeatability\", \"identified_root_cause\"], \"scope\": \"Only measured solver/model/grid conditions.\", \"probability\": null}}, \"control_search_starts\": [], \"actions\": [\"stop\", \"select\"], \"budget\": {\"limit\": {\"backend_solves\": 0, \"model_calls\": 2, \"tool_calls\": 8, \"wall_s\": null, \"worker_calls\": 0}, \"used\": {\"tool_calls\": 0, \"model_calls\": 1, \"backend_solves\": 0, \"worker_calls\": 0, \"wall_s\": 8.186999999918044}, \"remaining\": {\"backend_solves\": 0, \"model_calls\": 1, \"tool_calls\": 8, \"wall_s\": null, \"worker_calls\": 0}, \"occupied\": {}}, \"method_limits\": {\"mathematical_evaluations\": 0, \"offline_nlp\": 0, \"bdf_replays\": 0, \"nmpc\": {\"executions\": 0}, \"rl\": {\"actions_per_trial\": 65536, \"diagnostic_physics_steps\": 0, \"diagnostic_replays\": 0, \"evaluation_episodes\": 0, \"seconds_per_trial\": null, \"training_actions\": 65536, \"training_active_seconds\": null, \"training_stages\": 0}}, \"method_used\": {\"mathematical_evaluations\": 0, \"offline_nlp\": 0, \"bdf_replays\": 0, \"nmpc_launches\": 0, \"admitted_training_stages\": 0, \"physical_replay_launches\": 0}, \"method_remaining\": {\"mathematical_evaluations\": 0, \"offline_nlp\": 0, \"bdf_replays\": 0, \"nmpc\": 0, \"rl_stages\": 0}, \"rl_accounting\": {\"admitted\": 0, \"limit\": 0, \"actual_actions\": 0, \"verified_actions_lower_bound\": 0, \"accounted_actions_upper_bound\": 0, \"actual_active_seconds\": 0, \"outstanding\": []}, \"control_search_usage\": \"action=control_search, control_search={candidate,source,settings,adaptation_from?}; decision fields required. v2 dimensions come from schedule. Optional correction_window_s masks all changes outside the window. Current optimizer supports registered reach-hold norm constraints only; other tasks return unsupported. Full original task always evaluated.\", \"all_fresh_results\": [], \"observation_count\": 0, \"history_count\": 0, \"completed_decision_count\": 0, \"recent_decisions\": [], \"evidence_access\": \"Full artifacts remain in Store. all_fresh_results is the complete STOP citation index; observations is a bounded recent view.\"}}"
+          }
+        ],
+        "status": "error",
+        "toolUseId": "call_00_kITw8UpFPDjnxynrSccn2081"
+      },
+      "tool_use": {
+        "input": {
+          "action": "stop",
+          "decision": {
+            "claimed_inference": "empirical_search",
+            "hypothesis_id": "CONTROL_SEARCH_INCOMPLETE",
+            "requested_budget": 0,
+            "research_intent": "STOP",
+            "selected_candidate": null,
+            "selected_method": "truthful budget-constrained closeout with no candidate, no physical execution and no selection",
+            "selected_variables": [],
+            "version": "research_decision_v1"
+          },
+          "expected_observation": "STOP is accepted as a truthful budget-constrained closeout: no selected_execution is frozen, all_fresh_results stays empty, and no acceptance or task success is claimed.",
+          "fixed_conditions": "Frozen task.reach contract (sealed evaluator evaluate.reach, tolerance 0.01 m), target [0.29,-0.035,0.19] m, 0.35 s duration, 0.05 s holding window with 0.01 m / 0.02 m/s limits, family serial_external_tendons_s7 with 2 segments and tendon domains as declared, frozen budget: backend_solves 0, model_calls 2, tool_calls 8, worker_calls 0.",
+          "hypothesis": "No admissible research action in this context can produce independent physical evidence: remaining backend_solves is 0, so control initialization, control_search, physical_replay and NMPC execution are all unavailable, and the only exposed actions are stop/select. With no candidate in the family space, best_valid=null, observations=[], evidence=[], and all_fresh_results empty, there is no fresh complete passing result that could be truthfully selected.",
+          "interpretation": "The study closes unresolved and without a solution. No candidate design was generated, no control seed or control search was run, no physical replay or NMPC execution occurred, and no mathematical diagnostic produced evidence, because zero physical backend budget was available. This is an accounting/authority limit only: it is not evidence of global feasibility or infeasibility, of structural limitation of the serial external-tendon family, of controller parameterization limits, of solver or numerical trouble, or of any hardware behavior, robustness or repeatability. All listed unresolved hypotheses remain unverified and unmeasured for this task.",
+          "next_step": "stop",
+          "stopping_condition": "Stop when no admissible action can generate a fresh physical observation, and no fresh complete passing result exists to select, or at budget exhaustion.",
+          "supporting_evidence": [
+            {
+              "artifact_id": "0793d20569402760ca055f73f6f97d80d73d0fe3c051ff2b60ebad1519db02aa",
+              "media_type": "application/json"
+            }
+          ],
+          "weakening_observation": "If this context contained any fresh physical observation, a nonzero backend_solves allowance, or an already-passing result to select, closing out without exploration or selection would be premature and this STOP hypothesis would be weakened."
+        },
+        "name": "research_plan",
+        "toolUseId": "call_00_kITw8UpFPDjnxynrSccn2081"
+      }
+    },
+    {
+      "result": {
+        "content": [
+          {
+            "text": "{\"reference\":{\"artifact_id\":\"726396f58bb48aa3846ea9f5ad08783362a4c1c530a5bafdc1e36d5a8c93514c\",\"media_type\":\"application/json\"},\"pointer\":\"\",\"view\":\"deterministic_summary\",\"value\":{\"plan\":{\"artifact_id\":\"8d2f18adfd4042045cc4dfb1e0e451e2e6783230b0ad5b2247748a25c57a3373\",\"media_type\":\"application/json\"},\"result\":{\"accepted_stop\":true,\"claims\":{\"claim_version\":\"bounded_research_claims_v1\",\"selected\":null,\"selected_candidate\":null,\"candidate_generated_from_family_space\":false,\"physically_constructed_and_validated_candidates\":[],\"design_changes_between_candidates\":[],\"distinct_generated_designs\":0,\"structure_control_search_performed\":false,\"optimizer_feedback_decisions\":[],\"selected_structurally_new\":null,\"model_selected_structure_search_evaluations\":null,\"new_design_and_control_confirmed\":null,\"reference_comparison\":\"not_applicable_no_reference_design\",\"task_passed\":false,\"independent_task_acceptance\":null,\"confirmation_progress\":{\"required_total\":0,\"historical_confirmations\":0,\"current_study_confirmations\":0,\"remaining\":0,\"failures\":0,\"invalid_executions\":0,\"executions\":[],\"confirmed\":false,\"correct_operation\":{\"tool\":\"research_plan\",\"action\":\"select\",\"selected_execution\":null}},\"limited_repeat_supported_acceptance\":false,\"confirmation_status\":\"not_required\",\"reproducibility_assessed\":false,\"parameter_improvement_attribution_permitted\":false,\"explicit_structure_control_adaptations\":[],\"local_control_search_results\":[]}},\"scientific_preflight\":null,\"resource_use\":{\"shared_ledger\":{\"limit\":{\"backend_solves\":0,\"model_calls\":2,\"tool_calls\":8,\"wall_s\":null,\"worker_calls\":0},\"used\":{\"tool_calls\":2,\"model_calls\":2,\"backend_solves\":0,\"worker_calls\":0,\"wall_s\":11.920999999856576},\"remaining\":{\"backend_solves\":0,\"model_calls\":0,\"tool_calls\":6,\"wall_s\":null,\"worker_calls\":0},\"occupied\":{}},\"numerical_s\":0.0,\"numerical_reserved_s\":0.0,\"remaining_numerical_s\":null,\"charged_starts\":0,\"shared_start_limit\":null,\"elapsed_s\":34.22683906555176}},\"retrieval\":\"evidence_read(view=full,pointer=...) or fields/range; no acceptance transfer\"}"
+          }
+        ],
+        "status": "success",
+        "toolUseId": "call_00_qQAjhDc0P41AyLgq3NY09049"
+      },
+      "tool_use": {
+        "input": {
+          "action": "stop",
+          "decision": {
+            "claimed_inference": "empirical_search",
+            "hypothesis_id": "CONTROL_SEARCH_INCOMPLETE",
+            "requested_budget": 0,
+            "research_intent": "STOP",
+            "selected_candidate": null,
+            "selected_method": "truthful budget-constrained closeout with no candidate, no physical execution and no selection",
+            "selected_variables": [],
+            "version": "research_decision_v1"
+          },
+          "expected_observation": "STOP is accepted as a truthful budget-constrained closeout: no selected_execution is frozen, all_fresh_results stays empty, and no acceptance, task success, robustness or feasibility is claimed.",
+          "fixed_conditions": "Frozen task.reach contract (sealed evaluator evaluate.reach, tolerance 0.01 m), target [0.29,-0.035,0.19] m, 0.35 s duration, 0.05 s holding window with 0.01 m / 0.02 m/s limits, family serial_external_tendons_s7 with the declared 2-segment / tendon domains, frozen budget: backend_solves 0, model_calls 2, tool_calls 8, worker_calls 0, nmpc and physical_replay method allowance 0.",
+          "hypothesis": "No admissible research action in this context can produce independent physical evidence: remaining backend_solves is 0 and remaining nmpc / physical_replay / mathematical_evaluation allowances are 0, so generation validation, initialize_control, control_search, physical_replay and NMPC execution are all unavailable; only stop/select are exposed. With no candidate in the family space, best_valid=null, observations=[], evidence=[] and all_fresh_results empty, there is no fresh complete passing result that could be truthfully selected.",
+          "interpretation": "The study closes unresolved and without a solution. No candidate design was generated, no control seed or control search was run, no physical replay or NMPC execution occurred, and no mathematical diagnostic produced evidence, because zero physical backend and zero method allowance were available in this context. This is purely an accounting/authority limit: it is not evidence of global nonlinear feasibility or infeasibility, not a structural limitation of the serial external-tendon family, not a controller-parameterization limit, not solver or numerical trouble, and not evidence about hardware, robustness or repeatability. All five unresolved hypotheses (CONTROL_SEARCH_INCOMPLETE, MODEL_PREDICTION_UNRELIABLE, CONTROL_PARAMETERIZATION_LIMITED, DESIGN_LIMITATION_POSSIBLE, SOLVER_OR_NUMERICAL_ISSUE) remain unverified and unmeasured for this task, and no acceptance-bearing result exists to cite.",
+          "next_step": "stop",
+          "stopping_condition": "Stop when no admissible action can generate a fresh physical observation and no fresh complete passing result exists to select, or at budget exhaustion.",
+          "weakening_observation": "If this context contained any fresh physical observation, a nonzero backend_solves or method allowance, or an already-passing result to select, closing out without exploration or selection would be premature and this STOP hypothesis would be weakened."
+        },
+        "name": "research_plan",
+        "toolUseId": "call_00_qQAjhDc0P41AyLgq3NY09049"
+      }
+    }
+  ]
+}

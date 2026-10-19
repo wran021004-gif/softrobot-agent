@@ -1,0 +1,4580 @@
+{
+  "study_id": "s7-engineering-integration-20261019",
+  "freeze": "09c23504338da3e1b58699b1cafc9f8116ec49f7",
+  "status": "stopped",
+  "original_task_passed": false,
+  "selected": null,
+  "native_model_stop": false,
+  "native_model_selection": false,
+  "engineering_closeout": null,
+  "pending": null,
+  "ledger": {
+    "limit": {
+      "backend_solves": 2,
+      "model_calls": 0,
+      "tool_calls": 16,
+      "wall_s": null,
+      "worker_calls": 0
+    },
+    "used": {
+      "tool_calls": 7,
+      "model_calls": 0,
+      "backend_solves": 2,
+      "worker_calls": 0,
+      "wall_s": 2.236217000056058
+    },
+    "remaining": {
+      "backend_solves": 0,
+      "model_calls": 0,
+      "tool_calls": 9,
+      "wall_s": null,
+      "worker_calls": 0
+    },
+    "occupied": {}
+  },
+  "provider_requests": 0,
+  "provider_usage": [],
+  "mathematical_evaluations": 0,
+  "nmpc": 0,
+  "ppo_stages": 0,
+  "physical_replays": 2,
+  "numerical_s": 4.283011200139299,
+  "control_search_results": [],
+  "results": [
+    {
+      "reference": {
+        "artifact_id": "da0143fd36f57b5b351ac5831678beb8e1096a6685b588222d3feda45ab345d2",
+        "media_type": "application/json"
+      },
+      "candidate": {
+        "artifact_id": "babf4b4d2ae2c203bab7b262d7ebc23d8392adeb6ebcdd42cc7695344be0f675",
+        "media_type": "application/json"
+      },
+      "task_gap": {
+        "normalized_gap": 6.4161951108867274,
+        "components": {
+          "evaluator:task_bound": 6.373681193364423,
+          "holding_position": 6.4161951108867274,
+          "holding_speed": 0.37804431153476603
+        },
+        "valid_complete": true,
+        "accepted": false,
+        "interpretation": "Research ranking only; invalid executions remain invalid regardless of gap"
+      },
+      "acceptance": {
+        "accepted": false,
+        "components": {
+          "evaluation_validity": {
+            "limit": null,
+            "passed": true,
+            "reason": null,
+            "unit": null,
+            "value": "valid"
+          },
+          "evaluator:task_bound": {
+            "limit": 0.01,
+            "passed": false,
+            "reason": null,
+            "unit": "m",
+            "value": 0.07373681193364423
+          },
+          "execution_complete": {
+            "limit": null,
+            "passed": true,
+            "reason": null,
+            "unit": null,
+            "value": true
+          },
+          "force_bounds": {
+            "limit": 1e-08,
+            "passed": true,
+            "reason": null,
+            "unit": "N",
+            "value": 0.0
+          },
+          "holding_coverage": {
+            "limit": 6,
+            "passed": true,
+            "reason": null,
+            "unit": "inclusive uniform samples",
+            "value": true
+          },
+          "holding_position": {
+            "limit": 0.01,
+            "passed": false,
+            "reason": null,
+            "unit": "m",
+            "value": 0.07416195110886728
+          },
+          "holding_speed": {
+            "limit": 0.02,
+            "passed": false,
+            "reason": null,
+            "unit": "m/s",
+            "value": 0.02756088623069532
+          },
+          "solver_errors": {
+            "limit": 0,
+            "passed": true,
+            "reason": null,
+            "unit": "count",
+            "value": 0
+          },
+          "task_evaluator": {
+            "limit": null,
+            "passed": false,
+            "reason": null,
+            "unit": null,
+            "value": false
+          }
+        },
+        "continuous_time_guarantee": false,
+        "contract": "research.task_acceptance",
+        "evaluator_tension_channels": null,
+        "evidence_binding": {
+          "evaluation": {
+            "artifact_id": "10b9b9b1e27aea3c7104d4ae303f72b9fe0fd69021261847b90a12726ed44d77",
+            "media_type": "application/json"
+          },
+          "evaluation_binding": {
+            "original_execution_id": null,
+            "source": {
+              "artifact_id": "fa6a334538ac3ecc1f15bb45de62554f89a577c7e4bda89e28d27c56da17263a",
+              "media_type": "application/json"
+            },
+            "source_execution_id": null
+          },
+          "profile": null,
+          "profile_binding": {
+            "evaluation": {
+              "artifact_id": "10b9b9b1e27aea3c7104d4ae303f72b9fe0fd69021261847b90a12726ed44d77",
+              "media_type": "application/json"
+            },
+            "execution_id": "fdb312556f3a44eeb0871f1ddad98e02",
+            "simulation": {
+              "artifact_id": "fa6a334538ac3ecc1f15bb45de62554f89a577c7e4bda89e28d27c56da17263a",
+              "media_type": "application/json"
+            }
+          },
+          "simulation": {
+            "artifact_id": "fa6a334538ac3ecc1f15bb45de62554f89a577c7e4bda89e28d27c56da17263a",
+            "media_type": "application/json"
+          }
+        },
+        "execution_id": "fdb312556f3a44eeb0871f1ddad98e02",
+        "issues": [],
+        "metrics": {
+          "holding_max_error_m": 0.07416195110886728,
+          "holding_max_speed_m_s": 0.02756088623069532,
+          "terminal_error_m": 0.07373681193364423
+        },
+        "missing": [],
+        "protocol_id": "offline_reach_hold_v1",
+        "sources": {
+          "evaluation": {
+            "artifact_id": "10b9b9b1e27aea3c7104d4ae303f72b9fe0fd69021261847b90a12726ed44d77",
+            "media_type": "application/json"
+          },
+          "profile": null
+        },
+        "status": "valid_failure",
+        "task_family": "task.reach",
+        "task_identity": "bd9df2d930423f2b2a12152f076e2ae88b4d1a0af84d6126aa13b0b1fac9ec77",
+        "timing": {
+          "control_period_s": 0.01,
+          "deadline_misses": null,
+          "duration_s": 0.35,
+          "mean_update_s": null,
+          "real_time_demonstrated": null,
+          "real_time_required": false,
+          "sample_period_s": 0.01,
+          "simulation_wall_s": null,
+          "termination": [
+            "duration",
+            "numerical_failure"
+          ],
+          "timestep_s": 0.0005
+        },
+        "version": "1.0.0"
+      },
+      "execution_id": "engineering-physical-4-physical",
+      "task_identity": "bd9df2d930423f2b2a12152f076e2ae88b4d1a0af84d6126aa13b0b1fac9ec77",
+      "structure": {
+        "assumptions": [
+          "SI; serial bending only; external frictionless straight tendon spans",
+          "One independent ideal tension per tendon; guide holes have fixed supplied inertia",
+          "Task environment owns mount and forces; assembly prototypes own connector, guide and payload",
+          "Clearance checks cover route stations and guide holes; swept self-collision is not validated"
+        ],
+        "channels": [
+          "actuator_commands"
+        ],
+        "family": "tendon_robot_family",
+        "frame": "world_base_x_forward_yz_cross_section",
+        "sources": [
+          "frozen family-space assembly prototypes"
+        ],
+        "structure": {
+          "contract": "family.design",
+          "data": {
+            "actuators": [
+              {
+                "command_type": "displacement",
+                "drum_radius_m": null,
+                "id": "actuator_0",
+                "limits": [
+                  -0.015,
+                  0.015
+                ],
+                "transmission": [
+                  {
+                    "ratio": 1.0,
+                    "tendon": "tendon_0"
+                  }
+                ],
+                "units": "m",
+                "velocity_limit": 0.025
+              },
+              {
+                "command_type": "displacement",
+                "drum_radius_m": null,
+                "id": "actuator_1",
+                "limits": [
+                  -0.015,
+                  0.015
+                ],
+                "transmission": [
+                  {
+                    "ratio": 1.0,
+                    "tendon": "tendon_1"
+                  }
+                ],
+                "units": "m",
+                "velocity_limit": 0.025
+              },
+              {
+                "command_type": "displacement",
+                "drum_radius_m": null,
+                "id": "actuator_2",
+                "limits": [
+                  -0.015,
+                  0.015
+                ],
+                "transmission": [
+                  {
+                    "ratio": 1.0,
+                    "tendon": "tendon_2"
+                  }
+                ],
+                "units": "m",
+                "velocity_limit": 0.025
+              },
+              {
+                "command_type": "displacement",
+                "drum_radius_m": null,
+                "id": "actuator_3",
+                "limits": [
+                  -0.015,
+                  0.015
+                ],
+                "transmission": [
+                  {
+                    "ratio": 1.0,
+                    "tendon": "tendon_3"
+                  }
+                ],
+                "units": "m",
+                "velocity_limit": 0.025
+              }
+            ],
+            "components": [
+              {
+                "connection": {
+                  "part": "fixed_base",
+                  "position_m": [
+                    0.0,
+                    0.0,
+                    0.0
+                  ],
+                  "quaternion_wxyz": [
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0
+                  ],
+                  "s": 0.0
+                },
+                "id": "segment_0",
+                "interpolation": "step",
+                "kind": "flexible_segment",
+                "length_m": 0.195,
+                "natural_curvature_rad_m": [
+                  0.0,
+                  0.0
+                ],
+                "physics": {
+                  "bending_ei_nm2": null,
+                  "bending_viscosity_nm2_s": [
+                    0.0005,
+                    0.0007
+                  ],
+                  "density_kg_m3": 1200.0,
+                  "line_density_kg_m": null,
+                  "mode": "material",
+                  "young_pa": 10450000.0
+                },
+                "sections": [
+                  {
+                    "s": 0.0,
+                    "section": {
+                      "angle_rad": 0.35,
+                      "holes_yz_m": [],
+                      "kind": "ellipse",
+                      "outer_yz_m": [],
+                      "parameters": {
+                        "semi_y_m": 0.01175,
+                        "semi_z_m": 0.0076
+                      }
+                    }
+                  }
+                ]
+              },
+              {
+                "com_local_m": [
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                "connection": {
+                  "part": "segment_0",
+                  "position_m": [
+                    0.0,
+                    0.0,
+                    0.0
+                  ],
+                  "quaternion_wxyz": [
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0
+                  ],
+                  "s": 1.0
+                },
+                "envelope_halfsize_m": [
+                  0.002,
+                  0.025,
+                  0.025
+                ],
+                "guide_holes": {
+                  "tendon_0_hole": [
+                    0.0,
+                    -0.018,
+                    2.2043642384652355e-18
+                  ],
+                  "tendon_1_hole": [
+                    0.0,
+                    -3.3065463576978533e-18,
+                    -0.018
+                  ],
+                  "tendon_2_hole": [
+                    0.0,
+                    0.018,
+                    0.0
+                  ],
+                  "tendon_3_hole": [
+                    0.0,
+                    1.1021821192326178e-18,
+                    0.018
+                  ]
+                },
+                "hole_radius_m": 0.0015,
+                "id": "guide_1",
+                "inertia_com_local_kg_m2": [
+                  [
+                    4e-07,
+                    0.0,
+                    0.0
+                  ],
+                  [
+                    0.0,
+                    2e-07,
+                    0.0
+                  ],
+                  [
+                    0.0,
+                    0.0,
+                    2e-07
+                  ]
+                ],
+                "kind": "guide",
+                "mass_kg": 0.002
+              },
+              {
+                "com_local_m": [
+                  0.006,
+                  0.0,
+                  0.0
+                ],
+                "connection": {
+                  "part": "guide_1",
+                  "position_m": [
+                    0.002,
+                    0.0,
+                    0.0
+                  ],
+                  "quaternion_wxyz": [
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0
+                  ],
+                  "s": 0.0
+                },
+                "envelope_halfsize_m": [
+                  0.006,
+                  0.006,
+                  0.006
+                ],
+                "guide_holes": {},
+                "hole_radius_m": 0.0,
+                "id": "connector_1",
+                "inertia_com_local_kg_m2": [
+                  [
+                    5e-08,
+                    0.0,
+                    0.0
+                  ],
+                  [
+                    0.0,
+                    7e-08,
+                    0.0
+                  ],
+                  [
+                    0.0,
+                    0.0,
+                    7e-08
+                  ]
+                ],
+                "kind": "rigid_connector",
+                "mass_kg": 0.003
+              },
+              {
+                "connection": {
+                  "part": "connector_1",
+                  "position_m": [
+                    0.012,
+                    0.0,
+                    0.0
+                  ],
+                  "quaternion_wxyz": [
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0
+                  ],
+                  "s": 0.0
+                },
+                "id": "segment_1",
+                "interpolation": "linear",
+                "kind": "flexible_segment",
+                "length_m": 0.11,
+                "natural_curvature_rad_m": [
+                  0.0,
+                  0.0
+                ],
+                "physics": {
+                  "bending_ei_nm2": null,
+                  "bending_viscosity_nm2_s": [
+                    0.0003,
+                    0.0004
+                  ],
+                  "density_kg_m3": 1050.0,
+                  "line_density_kg_m": null,
+                  "mode": "material",
+                  "young_pa": 5400000.0
+                },
+                "sections": [
+                  {
+                    "s": 0.0,
+                    "section": {
+                      "angle_rad": -0.25,
+                      "holes_yz_m": [],
+                      "kind": "rectangle",
+                      "outer_yz_m": [],
+                      "parameters": {
+                        "height_z_m": 0.0095,
+                        "width_y_m": 0.0133
+                      }
+                    }
+                  },
+                  {
+                    "s": 1.0,
+                    "section": {
+                      "angle_rad": 0.15000000000000002,
+                      "holes_yz_m": [],
+                      "kind": "rectangle",
+                      "outer_yz_m": [],
+                      "parameters": {
+                        "height_z_m": 0.0095,
+                        "width_y_m": 0.0133
+                      }
+                    }
+                  }
+                ]
+              },
+              {
+                "com_local_m": [
+                  0.007,
+                  0.001,
+                  -0.002
+                ],
+                "connection": {
+                  "part": "segment_1",
+                  "position_m": [
+                    0.0,
+                    0.0,
+                    0.0
+                  ],
+                  "quaternion_wxyz": [
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0
+                  ],
+                  "s": 1.0
+                },
+                "envelope_halfsize_m": [
+                  0.009,
+                  0.009,
+                  0.008
+                ],
+                "guide_holes": {},
+                "hole_radius_m": 0.0,
+                "id": "payload",
+                "inertia_com_local_kg_m2": [
+                  [
+                    6e-07,
+                    1e-07,
+                    0.0
+                  ],
+                  [
+                    1e-07,
+                    8e-07,
+                    1e-07
+                  ],
+                  [
+                    0.0,
+                    1e-07,
+                    9e-07
+                  ]
+                ],
+                "kind": "payload",
+                "mass_kg": 0.01
+              }
+            ],
+            "id": "serial_family_candidate",
+            "metadata": {},
+            "tendons": [
+              {
+                "diameter_m": 0.001,
+                "force_limit_n": 8.0,
+                "id": "tendon_0",
+                "length_servo_gain_n_m": 900.0,
+                "model": "straight_frictionless",
+                "points": [
+                  {
+                    "attachment": {
+                      "part": "fixed_base",
+                      "position_m": [
+                        0.0,
+                        -0.018,
+                        2.2043642384652355e-18
+                      ],
+                      "quaternion_wxyz": [
+                        1.0,
+                        0.0,
+                        0.0,
+                        0.0
+                      ],
+                      "s": 0.0
+                    },
+                    "hole": null,
+                    "role": "start"
+                  },
+                  {
+                    "attachment": {
+                      "part": "segment_0",
+                      "position_m": [
+                        0.0,
+                        -0.018,
+                        2.2043642384652355e-18
+                      ],
+                      "quaternion_wxyz": [
+                        1.0,
+                        0.0,
+                        0.0,
+                        0.0
+                      ],
+                      "s": 0.5
+                    },
+                    "hole": null,
+                    "role": "guide"
+                  },
+                  {
+                    "attachment": {
+                      "part": "guide_1",
+                      "position_m": [
+                        0.0,
+                        0.0,
+                        0.0
+                      ],
+                      "quaternion_wxyz": [
+                        1.0,
+                        0.0,
+                        0.0,
+                        0.0
+                      ],
+                      "s": 0.0
+                    },
+                    "hole": "tendon_0_hole",
+                    "role": "guide"
+                  },
+                  {
+                    "attachment": {
+                      "part": "segment_1",
+                      "position_m": [
+                        0.0,
+                        -0.018,
+                        2.2043642384652355e-18
+                      ],
+                      "quaternion_wxyz": [
+                        1.0,
+                        0.0,
+                        0.0,
+                        0.0
+                      ],
+                      "s": 0.5
+                    },
+                    "hole": null,
+                    "role": "guide"
+                  },
+                  {
+                    "attachment": {
+                      "part": "segment_1",
+                      "position_m": [
+                        0.0,
+                        -0.018,
+                        2.2043642384652355e-18
+                      ],
+                      "quaternion_wxyz": [
+                        1.0,
+                        0.0,
+                        0.0,
+                        0.0
+                      ],
+                      "s": 1.0
+                    },
+                    "hole": null,
+                    "role": "anchor"
+                  }
+                ],
+                "pretension_n": 0.2
+              },
+              {
+                "diameter_m": 0.001,
+                "force_limit_n": 8.0,
+                "id": "tendon_1",
+                "length_servo_gain_n_m": 900.0,
+                "model": "straight_frictionless",
+                "points": [
+                  {
+                    "attachment": {
+                      "part": "fixed_base",
+                      "position_m": [
+                        0.0,
+                        -3.3065463576978533e-18,
+                        -0.018
+                      ],
+                      "quaternion_wxyz": [
+                        1.0,
+                        0.0,
+                        0.0,
+                        0.0
+                      ],
+                      "s": 0.0
+                    },
+                    "hole": null,
+                    "role": "start"
+                  },
+                  {
+                    "attachment": {
+                      "part": "segment_0",
+                      "position_m": [
+                        0.0,
+                        -3.3065463576978533e-18,
+                        -0.018
+                      ],
+                      "quaternion_wxyz": [
+                        1.0,
+                        0.0,
+                        0.0,
+                        0.0
+                      ],
+                      "s": 0.5
+                    },
+                    "hole": null,
+                    "role": "guide"
+                  },
+                  {
+                    "attachment": {
+                      "part": "guide_1",
+                      "position_m": [
+                        0.0,
+                        0.0,
+                        0.0
+                      ],
+                      "quaternion_wxyz": [
+                        1.0,
+                        0.0,
+                        0.0,
+                        0.0
+                      ],
+                      "s": 0.0
+                    },
+                    "hole": "tendon_1_hole",
+                    "role": "guide"
+                  },
+                  {
+                    "attachment": {
+                      "part": "segment_1",
+                      "position_m": [
+                        0.0,
+                        -3.3065463576978533e-18,
+                        -0.018
+                      ],
+                      "quaternion_wxyz": [
+                        1.0,
+                        0.0,
+                        0.0,
+                        0.0
+                      ],
+                      "s": 0.5
+                    },
+                    "hole": null,
+                    "role": "guide"
+                  },
+                  {
+                    "attachment": {
+                      "part": "segment_1",
+                      "position_m": [
+                        0.0,
+                        -3.3065463576978533e-18,
+                        -0.018
+                      ],
+                      "quaternion_wxyz": [
+                        1.0,
+                        0.0,
+                        0.0,
+                        0.0
+                      ],
+                      "s": 1.0
+                    },
+                    "hole": null,
+                    "role": "anchor"
+                  }
+                ],
+                "pretension_n": 0.2
+              },
+              {
+                "diameter_m": 0.001,
+                "force_limit_n": 8.0,
+                "id": "tendon_2",
+                "length_servo_gain_n_m": 900.0,
+                "model": "straight_frictionless",
+                "points": [
+                  {
+                    "attachment": {
+                      "part": "fixed_base",
+                      "position_m": [
+                        0.0,
+                        0.018,
+                        0.0
+                      ],
+                      "quaternion_wxyz": [
+                        1.0,
+                        0.0,
+                        0.0,
+                        0.0
+                      ],
+                      "s": 0.0
+                    },
+                    "hole": null,
+                    "role": "start"
+                  },
+                  {
+                    "attachment": {
+                      "part": "segment_0",
+                      "position_m": [
+                        0.0,
+                        0.018,
+                        0.0
+                      ],
+                      "quaternion_wxyz": [
+                        1.0,
+                        0.0,
+                        0.0,
+                        0.0
+                      ],
+                      "s": 0.5
+                    },
+                    "hole": null,
+                    "role": "guide"
+                  },
+                  {
+                    "attachment": {
+                      "part": "guide_1",
+                      "position_m": [
+                        0.0,
+                        0.0,
+                        0.0
+                      ],
+                      "quaternion_wxyz": [
+                        1.0,
+                        0.0,
+                        0.0,
+                        0.0
+                      ],
+                      "s": 0.0
+                    },
+                    "hole": "tendon_2_hole",
+                    "role": "guide"
+                  },
+                  {
+                    "attachment": {
+                      "part": "segment_1",
+                      "position_m": [
+                        0.0,
+                        0.018,
+                        0.0
+                      ],
+                      "quaternion_wxyz": [
+                        1.0,
+                        0.0,
+                        0.0,
+                        0.0
+                      ],
+                      "s": 0.5
+                    },
+                    "hole": null,
+                    "role": "guide"
+                  },
+                  {
+                    "attachment": {
+                      "part": "segment_1",
+                      "position_m": [
+                        0.0,
+                        0.018,
+                        0.0
+                      ],
+                      "quaternion_wxyz": [
+                        1.0,
+                        0.0,
+                        0.0,
+                        0.0
+                      ],
+                      "s": 1.0
+                    },
+                    "hole": null,
+                    "role": "anchor"
+                  }
+                ],
+                "pretension_n": 0.2
+              },
+              {
+                "diameter_m": 0.001,
+                "force_limit_n": 8.0,
+                "id": "tendon_3",
+                "length_servo_gain_n_m": 900.0,
+                "model": "straight_frictionless",
+                "points": [
+                  {
+                    "attachment": {
+                      "part": "fixed_base",
+                      "position_m": [
+                        0.0,
+                        1.1021821192326178e-18,
+                        0.018
+                      ],
+                      "quaternion_wxyz": [
+                        1.0,
+                        0.0,
+                        0.0,
+                        0.0
+                      ],
+                      "s": 0.0
+                    },
+                    "hole": null,
+                    "role": "start"
+                  },
+                  {
+                    "attachment": {
+                      "part": "segment_0",
+                      "position_m": [
+                        0.0,
+                        1.1021821192326178e-18,
+                        0.018
+                      ],
+                      "quaternion_wxyz": [
+                        1.0,
+                        0.0,
+                        0.0,
+                        0.0
+                      ],
+                      "s": 0.5
+                    },
+                    "hole": null,
+                    "role": "guide"
+                  },
+                  {
+                    "attachment": {
+                      "part": "guide_1",
+                      "position_m": [
+                        0.0,
+                        0.0,
+                        0.0
+                      ],
+                      "quaternion_wxyz": [
+                        1.0,
+                        0.0,
+                        0.0,
+                        0.0
+                      ],
+                      "s": 0.0
+                    },
+                    "hole": "tendon_3_hole",
+                    "role": "guide"
+                  },
+                  {
+                    "attachment": {
+                      "part": "segment_1",
+                      "position_m": [
+                        0.0,
+                        1.1021821192326178e-18,
+                        0.018
+                      ],
+                      "quaternion_wxyz": [
+                        1.0,
+                        0.0,
+                        0.0,
+                        0.0
+                      ],
+                      "s": 0.5
+                    },
+                    "hole": null,
+                    "role": "guide"
+                  },
+                  {
+                    "attachment": {
+                      "part": "segment_1",
+                      "position_m": [
+                        0.0,
+                        1.1021821192326178e-18,
+                        0.018
+                      ],
+                      "quaternion_wxyz": [
+                        1.0,
+                        0.0,
+                        0.0,
+                        0.0
+                      ],
+                      "s": 1.0
+                    },
+                    "hole": null,
+                    "role": "anchor"
+                  }
+                ],
+                "pretension_n": 0.2
+              }
+            ],
+            "tip": {
+              "part": "payload",
+              "position_m": [
+                0.014,
+                0.0,
+                0.0
+              ],
+              "quaternion_wxyz": [
+                1.0,
+                0.0,
+                0.0,
+                0.0
+              ],
+              "s": 0.0
+            },
+            "version": "tendon_family_v1"
+          },
+          "version": "1.0.0"
+        },
+        "units": "SI",
+        "unsupported": [
+          "8-12 tendons: declared, not execution validated",
+          "polygon section domain not granted in this example",
+          "axial extension",
+          "shear",
+          "twist",
+          "friction",
+          "swept self-collision",
+          "High segment-count dynamics and controller compatibility require candidate-specific validation"
+        ]
+      },
+      "source": {
+        "artifact_id": "a6fc7992e30cde7b669dadf92a04981fb8e06ab5df4b2bb1cd598a487a94713b",
+        "media_type": "application/json"
+      },
+      "numerical_s": 1.1128864001948386,
+      "implementation": "09c23504338da3e1b58699b1cafc9f8116ec49f7",
+      "original_result": {
+        "acceptance": {
+          "accepted": false,
+          "components": {
+            "evaluation_validity": {
+              "limit": null,
+              "passed": true,
+              "reason": null,
+              "unit": null,
+              "value": "valid"
+            },
+            "evaluator:task_bound": {
+              "limit": 0.01,
+              "passed": false,
+              "reason": null,
+              "unit": "m",
+              "value": 0.07373681193364423
+            },
+            "execution_complete": {
+              "limit": null,
+              "passed": true,
+              "reason": null,
+              "unit": null,
+              "value": true
+            },
+            "force_bounds": {
+              "limit": 1e-08,
+              "passed": true,
+              "reason": null,
+              "unit": "N",
+              "value": 0.0
+            },
+            "holding_coverage": {
+              "limit": 6,
+              "passed": true,
+              "reason": null,
+              "unit": "inclusive uniform samples",
+              "value": true
+            },
+            "holding_position": {
+              "limit": 0.01,
+              "passed": false,
+              "reason": null,
+              "unit": "m",
+              "value": 0.07416195110886728
+            },
+            "holding_speed": {
+              "limit": 0.02,
+              "passed": false,
+              "reason": null,
+              "unit": "m/s",
+              "value": 0.02756088623069532
+            },
+            "solver_errors": {
+              "limit": 0,
+              "passed": true,
+              "reason": null,
+              "unit": "count",
+              "value": 0
+            },
+            "task_evaluator": {
+              "limit": null,
+              "passed": false,
+              "reason": null,
+              "unit": null,
+              "value": false
+            }
+          },
+          "continuous_time_guarantee": false,
+          "contract": "research.task_acceptance",
+          "evaluator_tension_channels": null,
+          "evidence_binding": {
+            "evaluation": {
+              "artifact_id": "10b9b9b1e27aea3c7104d4ae303f72b9fe0fd69021261847b90a12726ed44d77",
+              "media_type": "application/json"
+            },
+            "evaluation_binding": {
+              "original_execution_id": null,
+              "source": {
+                "artifact_id": "fa6a334538ac3ecc1f15bb45de62554f89a577c7e4bda89e28d27c56da17263a",
+                "media_type": "application/json"
+              },
+              "source_execution_id": null
+            },
+            "profile": null,
+            "profile_binding": {
+              "evaluation": {
+                "artifact_id": "10b9b9b1e27aea3c7104d4ae303f72b9fe0fd69021261847b90a12726ed44d77",
+                "media_type": "application/json"
+              },
+              "execution_id": "fdb312556f3a44eeb0871f1ddad98e02",
+              "simulation": {
+                "artifact_id": "fa6a334538ac3ecc1f15bb45de62554f89a577c7e4bda89e28d27c56da17263a",
+                "media_type": "application/json"
+              }
+            },
+            "simulation": {
+              "artifact_id": "fa6a334538ac3ecc1f15bb45de62554f89a577c7e4bda89e28d27c56da17263a",
+              "media_type": "application/json"
+            }
+          },
+          "execution_id": "fdb312556f3a44eeb0871f1ddad98e02",
+          "issues": [],
+          "metrics": {
+            "holding_max_error_m": 0.07416195110886728,
+            "holding_max_speed_m_s": 0.02756088623069532,
+            "terminal_error_m": 0.07373681193364423
+          },
+          "missing": [],
+          "protocol_id": "offline_reach_hold_v1",
+          "sources": {
+            "evaluation": {
+              "artifact_id": "10b9b9b1e27aea3c7104d4ae303f72b9fe0fd69021261847b90a12726ed44d77",
+              "media_type": "application/json"
+            },
+            "profile": null
+          },
+          "status": "valid_failure",
+          "task_family": "task.reach",
+          "task_identity": "bd9df2d930423f2b2a12152f076e2ae88b4d1a0af84d6126aa13b0b1fac9ec77",
+          "timing": {
+            "control_period_s": 0.01,
+            "deadline_misses": null,
+            "duration_s": 0.35,
+            "mean_update_s": null,
+            "real_time_demonstrated": null,
+            "real_time_required": false,
+            "sample_period_s": 0.01,
+            "simulation_wall_s": null,
+            "termination": [
+              "duration",
+              "numerical_failure"
+            ],
+            "timestep_s": 0.0005
+          },
+          "version": "1.0.0"
+        },
+        "boundary": {
+          "elapsed_s": 1.1128864001948386,
+          "returncode": 0,
+          "termination_confirmed": true
+        },
+        "candidate": {
+          "artifact_id": "babf4b4d2ae2c203bab7b262d7ebc23d8392adeb6ebcdd42cc7695344be0f675",
+          "media_type": "application/json"
+        },
+        "charged_numerical_s": 1.1128864001948386,
+        "comparison": {
+          "aligned": false,
+          "available_samples": 0,
+          "initial_position_offset_m": null,
+          "max_position_difference_m": null,
+          "max_velocity_difference_m_s": null,
+          "samples": []
+        },
+        "evaluation_reference": {
+          "artifact_id": "10b9b9b1e27aea3c7104d4ae303f72b9fe0fd69021261847b90a12726ed44d77",
+          "media_type": "application/json"
+        },
+        "execution_id": "engineering-physical-4-physical",
+        "implementation": "09c23504338da3e1b58699b1cafc9f8116ec49f7",
+        "log_reference": {
+          "artifact_id": "53b713d459391a29c468ed56534152d9d3d4f2152f907a5c59901a3751430a2b",
+          "media_type": "application/json"
+        },
+        "mathematical_reintegrations": 0,
+        "nmpc_updates": 0,
+        "owning_study": "s7-engineering-integration-20261019",
+        "physical_launches": 1,
+        "profile": {
+          "complete": true,
+          "evaluation": {
+            "artifact_id": "10b9b9b1e27aea3c7104d4ae303f72b9fe0fd69021261847b90a12726ed44d77",
+            "media_type": "application/json"
+          },
+          "execution_id": "fdb312556f3a44eeb0871f1ddad98e02",
+          "force_bound_violation_n": 0.0,
+          "official_task_success": false,
+          "sampled_settling": {
+            "available": true,
+            "max_error_m": 0.07416195110886728,
+            "max_speed_m_s": 0.02756088623069532,
+            "passed": false,
+            "position_limit_m": 0.01,
+            "speed_limit_m_s": 0.02,
+            "window_s": 0.05
+          },
+          "simulation": {
+            "artifact_id": "fa6a334538ac3ecc1f15bb45de62554f89a577c7e4bda89e28d27c56da17263a",
+            "media_type": "application/json"
+          },
+          "solver_error_count": 0,
+          "task": {
+            "actuator_channels": [
+              "actuator_commands"
+            ],
+            "contract_version": "1.0.0",
+            "environment": {
+              "contract": "experiment.assembly",
+              "data": {
+                "environment": {
+                  "coordinate_frame": "world_base_x_forward_yz_cross_section",
+                  "environment_id": "reach_free",
+                  "gravity_m_s2": [
+                    0.0,
+                    0.0,
+                    -9.81
+                  ],
+                  "gravity_source": "main@245a785 reach_free environment; Human-owned benchmark gravity",
+                  "lights": [
+                    {
+                      "direction": [
+                        0.0,
+                        0.0,
+                        -1.0
+                      ],
+                      "position_m": [
+                        0.0,
+                        0.0,
+                        2.0
+                      ]
+                    }
+                  ],
+                  "objects": [
+                    {
+                      "conaffinity": 1,
+                      "contype": 0,
+                      "half_size_m": [
+                        2.0,
+                        2.0,
+                        0.1
+                      ],
+                      "kind": "plane",
+                      "name": "floor",
+                      "position_m": [
+                        0.0,
+                        0.0,
+                        -0.02
+                      ]
+                    }
+                  ],
+                  "schema_version": "1",
+                  "truth_status": "HUMAN_OWNED",
+                  "units": "SI"
+                },
+                "external_forces": [],
+                "floor_id": "floor",
+                "mount": {
+                  "position_m": [
+                    0.0,
+                    0.0,
+                    0.15
+                  ],
+                  "quaternion_wxyz": [
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0
+                  ]
+                }
+              },
+              "version": "1.0.0"
+            },
+            "evaluator": {
+              "extension_id": "evaluate.reach",
+              "parameters": {
+                "contract": "reference.reach_evaluation",
+                "data": {
+                  "tolerance_m": 0.01
+                },
+                "version": "1.0.0"
+              },
+              "version": "1.0.0"
+            },
+            "failure_policy": "retain_invalid_and_constraint_failures",
+            "family": "task.reach",
+            "goal": {
+              "contract": "reference.reach_goal",
+              "data": {
+                "target_m": [
+                  0.29,
+                  -0.035,
+                  0.19
+                ]
+              },
+              "version": "1.0.0"
+            },
+            "initializer": {
+              "extension_id": "initialize.family",
+              "parameters": {
+                "contract": "family.initial",
+                "data": {
+                  "qpos_rad": {
+                    "segment_0_cell_0_y": 0.0,
+                    "segment_0_cell_0_z": 0.0,
+                    "segment_0_cell_10_y": 0.0,
+                    "segment_0_cell_10_z": 0.0,
+                    "segment_0_cell_11_y": 0.0,
+                    "segment_0_cell_11_z": 0.0,
+                    "segment_0_cell_1_y": 0.0,
+                    "segment_0_cell_1_z": 0.0,
+                    "segment_0_cell_2_y": 0.0,
+                    "segment_0_cell_2_z": 0.0,
+                    "segment_0_cell_3_y": 0.0,
+                    "segment_0_cell_3_z": 0.0,
+                    "segment_0_cell_4_y": 0.0,
+                    "segment_0_cell_4_z": 0.0,
+                    "segment_0_cell_5_y": 0.0,
+                    "segment_0_cell_5_z": 0.0,
+                    "segment_0_cell_6_y": 0.0,
+                    "segment_0_cell_6_z": 0.0,
+                    "segment_0_cell_7_y": 0.0,
+                    "segment_0_cell_7_z": 0.0,
+                    "segment_0_cell_8_y": 0.0,
+                    "segment_0_cell_8_z": 0.0,
+                    "segment_0_cell_9_y": 0.0,
+                    "segment_0_cell_9_z": 0.0,
+                    "segment_1_cell_0_y": 0.0,
+                    "segment_1_cell_0_z": 0.0,
+                    "segment_1_cell_10_y": 0.0,
+                    "segment_1_cell_10_z": 0.0,
+                    "segment_1_cell_11_y": 0.0,
+                    "segment_1_cell_11_z": 0.0,
+                    "segment_1_cell_1_y": 0.0,
+                    "segment_1_cell_1_z": 0.0,
+                    "segment_1_cell_2_y": 0.0,
+                    "segment_1_cell_2_z": 0.0,
+                    "segment_1_cell_3_y": 0.0,
+                    "segment_1_cell_3_z": 0.0,
+                    "segment_1_cell_4_y": 0.0,
+                    "segment_1_cell_4_z": 0.0,
+                    "segment_1_cell_5_y": 0.0,
+                    "segment_1_cell_5_z": 0.0,
+                    "segment_1_cell_6_y": 0.0,
+                    "segment_1_cell_6_z": 0.0,
+                    "segment_1_cell_7_y": 0.0,
+                    "segment_1_cell_7_z": 0.0,
+                    "segment_1_cell_8_y": 0.0,
+                    "segment_1_cell_8_z": 0.0,
+                    "segment_1_cell_9_y": 0.0,
+                    "segment_1_cell_9_z": 0.0
+                  },
+                  "qvel_rad_s": {
+                    "segment_0_cell_0_y": 0.0,
+                    "segment_0_cell_0_z": 0.0,
+                    "segment_0_cell_10_y": 0.0,
+                    "segment_0_cell_10_z": 0.0,
+                    "segment_0_cell_11_y": 0.0,
+                    "segment_0_cell_11_z": 0.0,
+                    "segment_0_cell_1_y": 0.0,
+                    "segment_0_cell_1_z": 0.0,
+                    "segment_0_cell_2_y": 0.0,
+                    "segment_0_cell_2_z": 0.0,
+                    "segment_0_cell_3_y": 0.0,
+                    "segment_0_cell_3_z": 0.0,
+                    "segment_0_cell_4_y": 0.0,
+                    "segment_0_cell_4_z": 0.0,
+                    "segment_0_cell_5_y": 0.0,
+                    "segment_0_cell_5_z": 0.0,
+                    "segment_0_cell_6_y": 0.0,
+                    "segment_0_cell_6_z": 0.0,
+                    "segment_0_cell_7_y": 0.0,
+                    "segment_0_cell_7_z": 0.0,
+                    "segment_0_cell_8_y": 0.0,
+                    "segment_0_cell_8_z": 0.0,
+                    "segment_0_cell_9_y": 0.0,
+                    "segment_0_cell_9_z": 0.0,
+                    "segment_1_cell_0_y": 0.0,
+                    "segment_1_cell_0_z": 0.0,
+                    "segment_1_cell_10_y": 0.0,
+                    "segment_1_cell_10_z": 0.0,
+                    "segment_1_cell_11_y": 0.0,
+                    "segment_1_cell_11_z": 0.0,
+                    "segment_1_cell_1_y": 0.0,
+                    "segment_1_cell_1_z": 0.0,
+                    "segment_1_cell_2_y": 0.0,
+                    "segment_1_cell_2_z": 0.0,
+                    "segment_1_cell_3_y": 0.0,
+                    "segment_1_cell_3_z": 0.0,
+                    "segment_1_cell_4_y": 0.0,
+                    "segment_1_cell_4_z": 0.0,
+                    "segment_1_cell_5_y": 0.0,
+                    "segment_1_cell_5_z": 0.0,
+                    "segment_1_cell_6_y": 0.0,
+                    "segment_1_cell_6_z": 0.0,
+                    "segment_1_cell_7_y": 0.0,
+                    "segment_1_cell_7_z": 0.0,
+                    "segment_1_cell_8_y": 0.0,
+                    "segment_1_cell_8_z": 0.0,
+                    "segment_1_cell_9_y": 0.0,
+                    "segment_1_cell_9_z": 0.0
+                  },
+                  "unspecified": "zero"
+                },
+                "version": "1.0.0"
+              },
+              "version": "1.0.0"
+            },
+            "name": "New negative-y reach-and-hold feasibility study",
+            "objectives": [
+              {
+                "direction": "minimize",
+                "metric": "position_error",
+                "units": "m",
+                "weight": 1.0
+              }
+            ],
+            "observations": [
+              {
+                "dimension": 3,
+                "entity": "tip",
+                "frame": "world",
+                "missing": "unsupported",
+                "name": "tip_position",
+                "phase": "post_step",
+                "units": "m"
+              }
+            ],
+            "robot_families": [
+              "tendon_robot_family"
+            ],
+            "sampling": {
+              "aggregation": "per_instance",
+              "seeds": [
+                17
+              ],
+              "split": "development",
+              "window_s": [
+                0.0,
+                0.35
+              ]
+            },
+            "source": "User-authorized M3-B first-feasible scope b555900c; target frozen before its physical outcomes. Reuses reach_hold.json evaluator, initializer, timing, holding and sampling unchanged.",
+            "status": "development_valid",
+            "task_id": "family-multisegment-mirror-dev",
+            "task_version": "1.0.0",
+            "timing": {
+              "control_period_s": 0.01,
+              "duration_s": 0.35,
+              "sample_period_s": 0.01,
+              "termination": [
+                "duration",
+                "numerical_failure"
+              ],
+              "timestep_s": 0.0005
+            }
+          }
+        },
+        "raw_reference": {
+          "artifact_id": "fa6a334538ac3ecc1f15bb45de62554f89a577c7e4bda89e28d27c56da17263a",
+          "media_type": "application/json"
+        },
+        "rl_actions": 0,
+        "source_reference": {
+          "artifact_id": "a6fc7992e30cde7b669dadf92a04981fb8e06ab5df4b2bb1cd598a487a94713b",
+          "media_type": "application/json"
+        },
+        "status": "evaluated"
+      }
+    },
+    {
+      "reference": {
+        "artifact_id": "ef02b2cf83ea595555dfc871dbc3e9431ba8d2e03116fe7cd020e55a146e2c86",
+        "media_type": "application/json"
+      },
+      "candidate": {
+        "artifact_id": "23f06f94f58966723177ae799197e5fdd928ac08ad1806e3726fef695c5140a4",
+        "media_type": "application/json"
+      },
+      "task_gap": {
+        "normalized_gap": 38.41998962322941,
+        "components": {
+          "evaluator:task_bound": 16.766584756189573,
+          "holding_position": 19.54902628091839,
+          "holding_speed": 38.41998962322941
+        },
+        "valid_complete": true,
+        "accepted": false,
+        "interpretation": "Research ranking only; invalid executions remain invalid regardless of gap"
+      },
+      "acceptance": {
+        "accepted": false,
+        "components": {
+          "evaluation_validity": {
+            "limit": null,
+            "passed": true,
+            "reason": null,
+            "unit": null,
+            "value": "valid"
+          },
+          "evaluator:task_bound": {
+            "limit": 0.01,
+            "passed": false,
+            "reason": null,
+            "unit": "m",
+            "value": 0.17766584756189574
+          },
+          "execution_complete": {
+            "limit": null,
+            "passed": true,
+            "reason": null,
+            "unit": null,
+            "value": true
+          },
+          "force_bounds": {
+            "limit": 1e-08,
+            "passed": true,
+            "reason": null,
+            "unit": "N",
+            "value": 0.0
+          },
+          "holding_coverage": {
+            "limit": 6,
+            "passed": true,
+            "reason": null,
+            "unit": "inclusive uniform samples",
+            "value": true
+          },
+          "holding_position": {
+            "limit": 0.01,
+            "passed": false,
+            "reason": null,
+            "unit": "m",
+            "value": 0.2054902628091839
+          },
+          "holding_speed": {
+            "limit": 0.02,
+            "passed": false,
+            "reason": null,
+            "unit": "m/s",
+            "value": 0.7883997924645882
+          },
+          "solver_errors": {
+            "limit": 0,
+            "passed": true,
+            "reason": null,
+            "unit": "count",
+            "value": 0
+          },
+          "task_evaluator": {
+            "limit": null,
+            "passed": false,
+            "reason": null,
+            "unit": null,
+            "value": false
+          }
+        },
+        "continuous_time_guarantee": false,
+        "contract": "research.task_acceptance",
+        "evaluator_tension_channels": null,
+        "evidence_binding": {
+          "evaluation": {
+            "artifact_id": "13a909feba1ce3a06a36f6659b45569b101d49cbdba6d361ff0439c8a4646886",
+            "media_type": "application/json"
+          },
+          "evaluation_binding": {
+            "original_execution_id": null,
+            "source": {
+              "artifact_id": "e49777e64e6e8402ef6cc19577e6eeb6bddc9e894c4acbe1bab0a1252dedd49c",
+              "media_type": "application/json"
+            },
+            "source_execution_id": null
+          },
+          "profile": null,
+          "profile_binding": {
+            "evaluation": {
+              "artifact_id": "13a909feba1ce3a06a36f6659b45569b101d49cbdba6d361ff0439c8a4646886",
+              "media_type": "application/json"
+            },
+            "execution_id": "d949c69c0b3a43198adbdd9ce68f910d",
+            "simulation": {
+              "artifact_id": "e49777e64e6e8402ef6cc19577e6eeb6bddc9e894c4acbe1bab0a1252dedd49c",
+              "media_type": "application/json"
+            }
+          },
+          "simulation": {
+            "artifact_id": "e49777e64e6e8402ef6cc19577e6eeb6bddc9e894c4acbe1bab0a1252dedd49c",
+            "media_type": "application/json"
+          }
+        },
+        "execution_id": "d949c69c0b3a43198adbdd9ce68f910d",
+        "issues": [],
+        "metrics": {
+          "holding_max_error_m": 0.2054902628091839,
+          "holding_max_speed_m_s": 0.7883997924645882,
+          "terminal_error_m": 0.17766584756189574
+        },
+        "missing": [],
+        "protocol_id": "offline_reach_hold_v1",
+        "sources": {
+          "evaluation": {
+            "artifact_id": "13a909feba1ce3a06a36f6659b45569b101d49cbdba6d361ff0439c8a4646886",
+            "media_type": "application/json"
+          },
+          "profile": null
+        },
+        "status": "valid_failure",
+        "task_family": "task.reach",
+        "task_identity": "bd9df2d930423f2b2a12152f076e2ae88b4d1a0af84d6126aa13b0b1fac9ec77",
+        "timing": {
+          "control_period_s": 0.01,
+          "deadline_misses": null,
+          "duration_s": 0.35,
+          "mean_update_s": null,
+          "real_time_demonstrated": null,
+          "real_time_required": false,
+          "sample_period_s": 0.01,
+          "simulation_wall_s": null,
+          "termination": [
+            "duration",
+            "numerical_failure"
+          ],
+          "timestep_s": 0.0005
+        },
+        "version": "1.0.0"
+      },
+      "execution_id": "engineering-physical-3-physical",
+      "task_identity": "bd9df2d930423f2b2a12152f076e2ae88b4d1a0af84d6126aa13b0b1fac9ec77",
+      "structure": {
+        "assumptions": [
+          "SI; serial bending only; external frictionless straight tendon spans",
+          "One independent ideal tension per tendon; guide holes have fixed supplied inertia",
+          "Task environment owns mount and forces; assembly prototypes own connector, guide and payload",
+          "Clearance checks cover route stations and guide holes; swept self-collision is not validated"
+        ],
+        "channels": [
+          "actuator_commands"
+        ],
+        "family": "tendon_robot_family",
+        "frame": "world_base_x_forward_yz_cross_section",
+        "sources": [
+          "frozen family-space assembly prototypes"
+        ],
+        "structure": {
+          "contract": "family.design",
+          "data": {
+            "actuators": [
+              {
+                "command_type": "displacement",
+                "drum_radius_m": null,
+                "id": "actuator_0",
+                "limits": [
+                  -0.015,
+                  0.015
+                ],
+                "transmission": [
+                  {
+                    "ratio": 1.0,
+                    "tendon": "tendon_0"
+                  }
+                ],
+                "units": "m",
+                "velocity_limit": 0.025
+              },
+              {
+                "command_type": "displacement",
+                "drum_radius_m": null,
+                "id": "actuator_1",
+                "limits": [
+                  -0.015,
+                  0.015
+                ],
+                "transmission": [
+                  {
+                    "ratio": 1.0,
+                    "tendon": "tendon_1"
+                  }
+                ],
+                "units": "m",
+                "velocity_limit": 0.025
+              },
+              {
+                "command_type": "displacement",
+                "drum_radius_m": null,
+                "id": "actuator_2",
+                "limits": [
+                  -0.015,
+                  0.015
+                ],
+                "transmission": [
+                  {
+                    "ratio": 1.0,
+                    "tendon": "tendon_2"
+                  }
+                ],
+                "units": "m",
+                "velocity_limit": 0.025
+              }
+            ],
+            "components": [
+              {
+                "connection": {
+                  "part": "fixed_base",
+                  "position_m": [
+                    0.0,
+                    0.0,
+                    0.0
+                  ],
+                  "quaternion_wxyz": [
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0
+                  ],
+                  "s": 0.0
+                },
+                "id": "segment_0",
+                "interpolation": "step",
+                "kind": "flexible_segment",
+                "length_m": 0.195,
+                "natural_curvature_rad_m": [
+                  0.0,
+                  0.0
+                ],
+                "physics": {
+                  "bending_ei_nm2": null,
+                  "bending_viscosity_nm2_s": [
+                    0.0005,
+                    0.0007
+                  ],
+                  "density_kg_m3": 1200.0,
+                  "line_density_kg_m": null,
+                  "mode": "material",
+                  "young_pa": 10450000.0
+                },
+                "sections": [
+                  {
+                    "s": 0.0,
+                    "section": {
+                      "angle_rad": 0.35,
+                      "holes_yz_m": [],
+                      "kind": "ellipse",
+                      "outer_yz_m": [],
+                      "parameters": {
+                        "semi_y_m": 0.01175,
+                        "semi_z_m": 0.0076
+                      }
+                    }
+                  }
+                ]
+              },
+              {
+                "com_local_m": [
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                "connection": {
+                  "part": "segment_0",
+                  "position_m": [
+                    0.0,
+                    0.0,
+                    0.0
+                  ],
+                  "quaternion_wxyz": [
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0
+                  ],
+                  "s": 1.0
+                },
+                "envelope_halfsize_m": [
+                  0.002,
+                  0.025,
+                  0.025
+                ],
+                "guide_holes": {
+                  "tendon_0_hole": [
+                    0.0,
+                    0.018,
+                    0.0
+                  ],
+                  "tendon_1_hole": [
+                    0.0,
+                    -0.008999999999999996,
+                    0.015588457268119896
+                  ],
+                  "tendon_2_hole": [
+                    0.0,
+                    -0.009000000000000008,
+                    -0.015588457268119891
+                  ]
+                },
+                "hole_radius_m": 0.0015,
+                "id": "guide_1",
+                "inertia_com_local_kg_m2": [
+                  [
+                    4e-07,
+                    0.0,
+                    0.0
+                  ],
+                  [
+                    0.0,
+                    2e-07,
+                    0.0
+                  ],
+                  [
+                    0.0,
+                    0.0,
+                    2e-07
+                  ]
+                ],
+                "kind": "guide",
+                "mass_kg": 0.002
+              },
+              {
+                "com_local_m": [
+                  0.006,
+                  0.0,
+                  0.0
+                ],
+                "connection": {
+                  "part": "guide_1",
+                  "position_m": [
+                    0.002,
+                    0.0,
+                    0.0
+                  ],
+                  "quaternion_wxyz": [
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0
+                  ],
+                  "s": 0.0
+                },
+                "envelope_halfsize_m": [
+                  0.006,
+                  0.006,
+                  0.006
+                ],
+                "guide_holes": {},
+                "hole_radius_m": 0.0,
+                "id": "connector_1",
+                "inertia_com_local_kg_m2": [
+                  [
+                    5e-08,
+                    0.0,
+                    0.0
+                  ],
+                  [
+                    0.0,
+                    7e-08,
+                    0.0
+                  ],
+                  [
+                    0.0,
+                    0.0,
+                    7e-08
+                  ]
+                ],
+                "kind": "rigid_connector",
+                "mass_kg": 0.003
+              },
+              {
+                "connection": {
+                  "part": "connector_1",
+                  "position_m": [
+                    0.012,
+                    0.0,
+                    0.0
+                  ],
+                  "quaternion_wxyz": [
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0
+                  ],
+                  "s": 0.0
+                },
+                "id": "segment_1",
+                "interpolation": "linear",
+                "kind": "flexible_segment",
+                "length_m": 0.11,
+                "natural_curvature_rad_m": [
+                  0.0,
+                  0.0
+                ],
+                "physics": {
+                  "bending_ei_nm2": null,
+                  "bending_viscosity_nm2_s": [
+                    0.0003,
+                    0.0004
+                  ],
+                  "density_kg_m3": 1050.0,
+                  "line_density_kg_m": null,
+                  "mode": "material",
+                  "young_pa": 5400000.0
+                },
+                "sections": [
+                  {
+                    "s": 0.0,
+                    "section": {
+                      "angle_rad": -0.25,
+                      "holes_yz_m": [],
+                      "kind": "rectangle",
+                      "outer_yz_m": [],
+                      "parameters": {
+                        "height_z_m": 0.0095,
+                        "width_y_m": 0.0133
+                      }
+                    }
+                  },
+                  {
+                    "s": 1.0,
+                    "section": {
+                      "angle_rad": 0.15000000000000002,
+                      "holes_yz_m": [],
+                      "kind": "rectangle",
+                      "outer_yz_m": [],
+                      "parameters": {
+                        "height_z_m": 0.0095,
+                        "width_y_m": 0.0133
+                      }
+                    }
+                  }
+                ]
+              },
+              {
+                "com_local_m": [
+                  0.007,
+                  0.001,
+                  -0.002
+                ],
+                "connection": {
+                  "part": "segment_1",
+                  "position_m": [
+                    0.0,
+                    0.0,
+                    0.0
+                  ],
+                  "quaternion_wxyz": [
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0
+                  ],
+                  "s": 1.0
+                },
+                "envelope_halfsize_m": [
+                  0.009,
+                  0.009,
+                  0.008
+                ],
+                "guide_holes": {},
+                "hole_radius_m": 0.0,
+                "id": "payload",
+                "inertia_com_local_kg_m2": [
+                  [
+                    6e-07,
+                    1e-07,
+                    0.0
+                  ],
+                  [
+                    1e-07,
+                    8e-07,
+                    1e-07
+                  ],
+                  [
+                    0.0,
+                    1e-07,
+                    9e-07
+                  ]
+                ],
+                "kind": "payload",
+                "mass_kg": 0.01
+              }
+            ],
+            "id": "serial_family_candidate",
+            "metadata": {},
+            "tendons": [
+              {
+                "diameter_m": 0.001,
+                "force_limit_n": 8.0,
+                "id": "tendon_0",
+                "length_servo_gain_n_m": 900.0,
+                "model": "straight_frictionless",
+                "points": [
+                  {
+                    "attachment": {
+                      "part": "fixed_base",
+                      "position_m": [
+                        0.0,
+                        0.018,
+                        0.0
+                      ],
+                      "quaternion_wxyz": [
+                        1.0,
+                        0.0,
+                        0.0,
+                        0.0
+                      ],
+                      "s": 0.0
+                    },
+                    "hole": null,
+                    "role": "start"
+                  },
+                  {
+                    "attachment": {
+                      "part": "segment_0",
+                      "position_m": [
+                        0.0,
+                        0.018,
+                        0.0
+                      ],
+                      "quaternion_wxyz": [
+                        1.0,
+                        0.0,
+                        0.0,
+                        0.0
+                      ],
+                      "s": 0.5
+                    },
+                    "hole": null,
+                    "role": "guide"
+                  },
+                  {
+                    "attachment": {
+                      "part": "guide_1",
+                      "position_m": [
+                        0.0,
+                        0.0,
+                        0.0
+                      ],
+                      "quaternion_wxyz": [
+                        1.0,
+                        0.0,
+                        0.0,
+                        0.0
+                      ],
+                      "s": 0.0
+                    },
+                    "hole": "tendon_0_hole",
+                    "role": "guide"
+                  },
+                  {
+                    "attachment": {
+                      "part": "segment_1",
+                      "position_m": [
+                        0.0,
+                        0.018,
+                        0.0
+                      ],
+                      "quaternion_wxyz": [
+                        1.0,
+                        0.0,
+                        0.0,
+                        0.0
+                      ],
+                      "s": 0.5
+                    },
+                    "hole": null,
+                    "role": "guide"
+                  },
+                  {
+                    "attachment": {
+                      "part": "segment_1",
+                      "position_m": [
+                        0.0,
+                        0.018,
+                        0.0
+                      ],
+                      "quaternion_wxyz": [
+                        1.0,
+                        0.0,
+                        0.0,
+                        0.0
+                      ],
+                      "s": 1.0
+                    },
+                    "hole": null,
+                    "role": "anchor"
+                  }
+                ],
+                "pretension_n": 0.2
+              },
+              {
+                "diameter_m": 0.001,
+                "force_limit_n": 8.0,
+                "id": "tendon_1",
+                "length_servo_gain_n_m": 900.0,
+                "model": "straight_frictionless",
+                "points": [
+                  {
+                    "attachment": {
+                      "part": "fixed_base",
+                      "position_m": [
+                        0.0,
+                        -0.008999999999999996,
+                        0.015588457268119896
+                      ],
+                      "quaternion_wxyz": [
+                        1.0,
+                        0.0,
+                        0.0,
+                        0.0
+                      ],
+                      "s": 0.0
+                    },
+                    "hole": null,
+                    "role": "start"
+                  },
+                  {
+                    "attachment": {
+                      "part": "segment_0",
+                      "position_m": [
+                        0.0,
+                        -0.008999999999999996,
+                        0.015588457268119896
+                      ],
+                      "quaternion_wxyz": [
+                        1.0,
+                        0.0,
+                        0.0,
+                        0.0
+                      ],
+                      "s": 0.5
+                    },
+                    "hole": null,
+                    "role": "guide"
+                  },
+                  {
+                    "attachment": {
+                      "part": "guide_1",
+                      "position_m": [
+                        0.0,
+                        0.0,
+                        0.0
+                      ],
+                      "quaternion_wxyz": [
+                        1.0,
+                        0.0,
+                        0.0,
+                        0.0
+                      ],
+                      "s": 0.0
+                    },
+                    "hole": "tendon_1_hole",
+                    "role": "guide"
+                  },
+                  {
+                    "attachment": {
+                      "part": "segment_1",
+                      "position_m": [
+                        0.0,
+                        -0.008999999999999996,
+                        0.015588457268119896
+                      ],
+                      "quaternion_wxyz": [
+                        1.0,
+                        0.0,
+                        0.0,
+                        0.0
+                      ],
+                      "s": 0.5
+                    },
+                    "hole": null,
+                    "role": "guide"
+                  },
+                  {
+                    "attachment": {
+                      "part": "segment_1",
+                      "position_m": [
+                        0.0,
+                        -0.008999999999999996,
+                        0.015588457268119896
+                      ],
+                      "quaternion_wxyz": [
+                        1.0,
+                        0.0,
+                        0.0,
+                        0.0
+                      ],
+                      "s": 1.0
+                    },
+                    "hole": null,
+                    "role": "anchor"
+                  }
+                ],
+                "pretension_n": 0.2
+              },
+              {
+                "diameter_m": 0.001,
+                "force_limit_n": 8.0,
+                "id": "tendon_2",
+                "length_servo_gain_n_m": 900.0,
+                "model": "straight_frictionless",
+                "points": [
+                  {
+                    "attachment": {
+                      "part": "fixed_base",
+                      "position_m": [
+                        0.0,
+                        -0.009000000000000008,
+                        -0.015588457268119891
+                      ],
+                      "quaternion_wxyz": [
+                        1.0,
+                        0.0,
+                        0.0,
+                        0.0
+                      ],
+                      "s": 0.0
+                    },
+                    "hole": null,
+                    "role": "start"
+                  },
+                  {
+                    "attachment": {
+                      "part": "segment_0",
+                      "position_m": [
+                        0.0,
+                        -0.009000000000000008,
+                        -0.015588457268119891
+                      ],
+                      "quaternion_wxyz": [
+                        1.0,
+                        0.0,
+                        0.0,
+                        0.0
+                      ],
+                      "s": 0.5
+                    },
+                    "hole": null,
+                    "role": "guide"
+                  },
+                  {
+                    "attachment": {
+                      "part": "guide_1",
+                      "position_m": [
+                        0.0,
+                        0.0,
+                        0.0
+                      ],
+                      "quaternion_wxyz": [
+                        1.0,
+                        0.0,
+                        0.0,
+                        0.0
+                      ],
+                      "s": 0.0
+                    },
+                    "hole": "tendon_2_hole",
+                    "role": "guide"
+                  },
+                  {
+                    "attachment": {
+                      "part": "segment_1",
+                      "position_m": [
+                        0.0,
+                        -0.009000000000000008,
+                        -0.015588457268119891
+                      ],
+                      "quaternion_wxyz": [
+                        1.0,
+                        0.0,
+                        0.0,
+                        0.0
+                      ],
+                      "s": 0.5
+                    },
+                    "hole": null,
+                    "role": "guide"
+                  },
+                  {
+                    "attachment": {
+                      "part": "segment_1",
+                      "position_m": [
+                        0.0,
+                        -0.009000000000000008,
+                        -0.015588457268119891
+                      ],
+                      "quaternion_wxyz": [
+                        1.0,
+                        0.0,
+                        0.0,
+                        0.0
+                      ],
+                      "s": 1.0
+                    },
+                    "hole": null,
+                    "role": "anchor"
+                  }
+                ],
+                "pretension_n": 0.2
+              }
+            ],
+            "tip": {
+              "part": "payload",
+              "position_m": [
+                0.014,
+                0.0,
+                0.0
+              ],
+              "quaternion_wxyz": [
+                1.0,
+                0.0,
+                0.0,
+                0.0
+              ],
+              "s": 0.0
+            },
+            "version": "tendon_family_v1"
+          },
+          "version": "1.0.0"
+        },
+        "units": "SI",
+        "unsupported": [
+          "8-12 tendons: declared, not execution validated",
+          "polygon section domain not granted in this example",
+          "axial extension",
+          "shear",
+          "twist",
+          "friction",
+          "swept self-collision",
+          "High segment-count dynamics and controller compatibility require candidate-specific validation"
+        ]
+      },
+      "source": {
+        "artifact_id": "c95fa825d776defcf757e0bd2633f8ec0db7fd5b7ce17f34718247cb8c0ae929",
+        "media_type": "application/json"
+      },
+      "numerical_s": 1.1233305998612195,
+      "implementation": "09c23504338da3e1b58699b1cafc9f8116ec49f7",
+      "original_result": {
+        "acceptance": {
+          "accepted": false,
+          "components": {
+            "evaluation_validity": {
+              "limit": null,
+              "passed": true,
+              "reason": null,
+              "unit": null,
+              "value": "valid"
+            },
+            "evaluator:task_bound": {
+              "limit": 0.01,
+              "passed": false,
+              "reason": null,
+              "unit": "m",
+              "value": 0.17766584756189574
+            },
+            "execution_complete": {
+              "limit": null,
+              "passed": true,
+              "reason": null,
+              "unit": null,
+              "value": true
+            },
+            "force_bounds": {
+              "limit": 1e-08,
+              "passed": true,
+              "reason": null,
+              "unit": "N",
+              "value": 0.0
+            },
+            "holding_coverage": {
+              "limit": 6,
+              "passed": true,
+              "reason": null,
+              "unit": "inclusive uniform samples",
+              "value": true
+            },
+            "holding_position": {
+              "limit": 0.01,
+              "passed": false,
+              "reason": null,
+              "unit": "m",
+              "value": 0.2054902628091839
+            },
+            "holding_speed": {
+              "limit": 0.02,
+              "passed": false,
+              "reason": null,
+              "unit": "m/s",
+              "value": 0.7883997924645882
+            },
+            "solver_errors": {
+              "limit": 0,
+              "passed": true,
+              "reason": null,
+              "unit": "count",
+              "value": 0
+            },
+            "task_evaluator": {
+              "limit": null,
+              "passed": false,
+              "reason": null,
+              "unit": null,
+              "value": false
+            }
+          },
+          "continuous_time_guarantee": false,
+          "contract": "research.task_acceptance",
+          "evaluator_tension_channels": null,
+          "evidence_binding": {
+            "evaluation": {
+              "artifact_id": "13a909feba1ce3a06a36f6659b45569b101d49cbdba6d361ff0439c8a4646886",
+              "media_type": "application/json"
+            },
+            "evaluation_binding": {
+              "original_execution_id": null,
+              "source": {
+                "artifact_id": "e49777e64e6e8402ef6cc19577e6eeb6bddc9e894c4acbe1bab0a1252dedd49c",
+                "media_type": "application/json"
+              },
+              "source_execution_id": null
+            },
+            "profile": null,
+            "profile_binding": {
+              "evaluation": {
+                "artifact_id": "13a909feba1ce3a06a36f6659b45569b101d49cbdba6d361ff0439c8a4646886",
+                "media_type": "application/json"
+              },
+              "execution_id": "d949c69c0b3a43198adbdd9ce68f910d",
+              "simulation": {
+                "artifact_id": "e49777e64e6e8402ef6cc19577e6eeb6bddc9e894c4acbe1bab0a1252dedd49c",
+                "media_type": "application/json"
+              }
+            },
+            "simulation": {
+              "artifact_id": "e49777e64e6e8402ef6cc19577e6eeb6bddc9e894c4acbe1bab0a1252dedd49c",
+              "media_type": "application/json"
+            }
+          },
+          "execution_id": "d949c69c0b3a43198adbdd9ce68f910d",
+          "issues": [],
+          "metrics": {
+            "holding_max_error_m": 0.2054902628091839,
+            "holding_max_speed_m_s": 0.7883997924645882,
+            "terminal_error_m": 0.17766584756189574
+          },
+          "missing": [],
+          "protocol_id": "offline_reach_hold_v1",
+          "sources": {
+            "evaluation": {
+              "artifact_id": "13a909feba1ce3a06a36f6659b45569b101d49cbdba6d361ff0439c8a4646886",
+              "media_type": "application/json"
+            },
+            "profile": null
+          },
+          "status": "valid_failure",
+          "task_family": "task.reach",
+          "task_identity": "bd9df2d930423f2b2a12152f076e2ae88b4d1a0af84d6126aa13b0b1fac9ec77",
+          "timing": {
+            "control_period_s": 0.01,
+            "deadline_misses": null,
+            "duration_s": 0.35,
+            "mean_update_s": null,
+            "real_time_demonstrated": null,
+            "real_time_required": false,
+            "sample_period_s": 0.01,
+            "simulation_wall_s": null,
+            "termination": [
+              "duration",
+              "numerical_failure"
+            ],
+            "timestep_s": 0.0005
+          },
+          "version": "1.0.0"
+        },
+        "boundary": {
+          "elapsed_s": 1.1233305998612195,
+          "returncode": 0,
+          "termination_confirmed": true
+        },
+        "candidate": {
+          "artifact_id": "23f06f94f58966723177ae799197e5fdd928ac08ad1806e3726fef695c5140a4",
+          "media_type": "application/json"
+        },
+        "charged_numerical_s": 1.1233305998612195,
+        "comparison": {
+          "aligned": false,
+          "available_samples": 0,
+          "initial_position_offset_m": null,
+          "max_position_difference_m": null,
+          "max_velocity_difference_m_s": null,
+          "samples": []
+        },
+        "evaluation_reference": {
+          "artifact_id": "13a909feba1ce3a06a36f6659b45569b101d49cbdba6d361ff0439c8a4646886",
+          "media_type": "application/json"
+        },
+        "execution_id": "engineering-physical-3-physical",
+        "implementation": "09c23504338da3e1b58699b1cafc9f8116ec49f7",
+        "log_reference": {
+          "artifact_id": "53b713d459391a29c468ed56534152d9d3d4f2152f907a5c59901a3751430a2b",
+          "media_type": "application/json"
+        },
+        "mathematical_reintegrations": 0,
+        "nmpc_updates": 0,
+        "owning_study": "s7-engineering-integration-20261019",
+        "physical_launches": 1,
+        "profile": {
+          "complete": true,
+          "evaluation": {
+            "artifact_id": "13a909feba1ce3a06a36f6659b45569b101d49cbdba6d361ff0439c8a4646886",
+            "media_type": "application/json"
+          },
+          "execution_id": "d949c69c0b3a43198adbdd9ce68f910d",
+          "force_bound_violation_n": 0.0,
+          "official_task_success": false,
+          "sampled_settling": {
+            "available": true,
+            "max_error_m": 0.2054902628091839,
+            "max_speed_m_s": 0.7883997924645882,
+            "passed": false,
+            "position_limit_m": 0.01,
+            "speed_limit_m_s": 0.02,
+            "window_s": 0.05
+          },
+          "simulation": {
+            "artifact_id": "e49777e64e6e8402ef6cc19577e6eeb6bddc9e894c4acbe1bab0a1252dedd49c",
+            "media_type": "application/json"
+          },
+          "solver_error_count": 0,
+          "task": {
+            "actuator_channels": [
+              "actuator_commands"
+            ],
+            "contract_version": "1.0.0",
+            "environment": {
+              "contract": "experiment.assembly",
+              "data": {
+                "environment": {
+                  "coordinate_frame": "world_base_x_forward_yz_cross_section",
+                  "environment_id": "reach_free",
+                  "gravity_m_s2": [
+                    0.0,
+                    0.0,
+                    -9.81
+                  ],
+                  "gravity_source": "main@245a785 reach_free environment; Human-owned benchmark gravity",
+                  "lights": [
+                    {
+                      "direction": [
+                        0.0,
+                        0.0,
+                        -1.0
+                      ],
+                      "position_m": [
+                        0.0,
+                        0.0,
+                        2.0
+                      ]
+                    }
+                  ],
+                  "objects": [
+                    {
+                      "conaffinity": 1,
+                      "contype": 0,
+                      "half_size_m": [
+                        2.0,
+                        2.0,
+                        0.1
+                      ],
+                      "kind": "plane",
+                      "name": "floor",
+                      "position_m": [
+                        0.0,
+                        0.0,
+                        -0.02
+                      ]
+                    }
+                  ],
+                  "schema_version": "1",
+                  "truth_status": "HUMAN_OWNED",
+                  "units": "SI"
+                },
+                "external_forces": [],
+                "floor_id": "floor",
+                "mount": {
+                  "position_m": [
+                    0.0,
+                    0.0,
+                    0.15
+                  ],
+                  "quaternion_wxyz": [
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0
+                  ]
+                }
+              },
+              "version": "1.0.0"
+            },
+            "evaluator": {
+              "extension_id": "evaluate.reach",
+              "parameters": {
+                "contract": "reference.reach_evaluation",
+                "data": {
+                  "tolerance_m": 0.01
+                },
+                "version": "1.0.0"
+              },
+              "version": "1.0.0"
+            },
+            "failure_policy": "retain_invalid_and_constraint_failures",
+            "family": "task.reach",
+            "goal": {
+              "contract": "reference.reach_goal",
+              "data": {
+                "target_m": [
+                  0.29,
+                  -0.035,
+                  0.19
+                ]
+              },
+              "version": "1.0.0"
+            },
+            "initializer": {
+              "extension_id": "initialize.family",
+              "parameters": {
+                "contract": "family.initial",
+                "data": {
+                  "qpos_rad": {
+                    "segment_0_cell_0_y": 0.0,
+                    "segment_0_cell_0_z": 0.0,
+                    "segment_0_cell_10_y": 0.0,
+                    "segment_0_cell_10_z": 0.0,
+                    "segment_0_cell_11_y": 0.0,
+                    "segment_0_cell_11_z": 0.0,
+                    "segment_0_cell_1_y": 0.0,
+                    "segment_0_cell_1_z": 0.0,
+                    "segment_0_cell_2_y": 0.0,
+                    "segment_0_cell_2_z": 0.0,
+                    "segment_0_cell_3_y": 0.0,
+                    "segment_0_cell_3_z": 0.0,
+                    "segment_0_cell_4_y": 0.0,
+                    "segment_0_cell_4_z": 0.0,
+                    "segment_0_cell_5_y": 0.0,
+                    "segment_0_cell_5_z": 0.0,
+                    "segment_0_cell_6_y": 0.0,
+                    "segment_0_cell_6_z": 0.0,
+                    "segment_0_cell_7_y": 0.0,
+                    "segment_0_cell_7_z": 0.0,
+                    "segment_0_cell_8_y": 0.0,
+                    "segment_0_cell_8_z": 0.0,
+                    "segment_0_cell_9_y": 0.0,
+                    "segment_0_cell_9_z": 0.0,
+                    "segment_1_cell_0_y": 0.0,
+                    "segment_1_cell_0_z": 0.0,
+                    "segment_1_cell_10_y": 0.0,
+                    "segment_1_cell_10_z": 0.0,
+                    "segment_1_cell_11_y": 0.0,
+                    "segment_1_cell_11_z": 0.0,
+                    "segment_1_cell_1_y": 0.0,
+                    "segment_1_cell_1_z": 0.0,
+                    "segment_1_cell_2_y": 0.0,
+                    "segment_1_cell_2_z": 0.0,
+                    "segment_1_cell_3_y": 0.0,
+                    "segment_1_cell_3_z": 0.0,
+                    "segment_1_cell_4_y": 0.0,
+                    "segment_1_cell_4_z": 0.0,
+                    "segment_1_cell_5_y": 0.0,
+                    "segment_1_cell_5_z": 0.0,
+                    "segment_1_cell_6_y": 0.0,
+                    "segment_1_cell_6_z": 0.0,
+                    "segment_1_cell_7_y": 0.0,
+                    "segment_1_cell_7_z": 0.0,
+                    "segment_1_cell_8_y": 0.0,
+                    "segment_1_cell_8_z": 0.0,
+                    "segment_1_cell_9_y": 0.0,
+                    "segment_1_cell_9_z": 0.0
+                  },
+                  "qvel_rad_s": {
+                    "segment_0_cell_0_y": 0.0,
+                    "segment_0_cell_0_z": 0.0,
+                    "segment_0_cell_10_y": 0.0,
+                    "segment_0_cell_10_z": 0.0,
+                    "segment_0_cell_11_y": 0.0,
+                    "segment_0_cell_11_z": 0.0,
+                    "segment_0_cell_1_y": 0.0,
+                    "segment_0_cell_1_z": 0.0,
+                    "segment_0_cell_2_y": 0.0,
+                    "segment_0_cell_2_z": 0.0,
+                    "segment_0_cell_3_y": 0.0,
+                    "segment_0_cell_3_z": 0.0,
+                    "segment_0_cell_4_y": 0.0,
+                    "segment_0_cell_4_z": 0.0,
+                    "segment_0_cell_5_y": 0.0,
+                    "segment_0_cell_5_z": 0.0,
+                    "segment_0_cell_6_y": 0.0,
+                    "segment_0_cell_6_z": 0.0,
+                    "segment_0_cell_7_y": 0.0,
+                    "segment_0_cell_7_z": 0.0,
+                    "segment_0_cell_8_y": 0.0,
+                    "segment_0_cell_8_z": 0.0,
+                    "segment_0_cell_9_y": 0.0,
+                    "segment_0_cell_9_z": 0.0,
+                    "segment_1_cell_0_y": 0.0,
+                    "segment_1_cell_0_z": 0.0,
+                    "segment_1_cell_10_y": 0.0,
+                    "segment_1_cell_10_z": 0.0,
+                    "segment_1_cell_11_y": 0.0,
+                    "segment_1_cell_11_z": 0.0,
+                    "segment_1_cell_1_y": 0.0,
+                    "segment_1_cell_1_z": 0.0,
+                    "segment_1_cell_2_y": 0.0,
+                    "segment_1_cell_2_z": 0.0,
+                    "segment_1_cell_3_y": 0.0,
+                    "segment_1_cell_3_z": 0.0,
+                    "segment_1_cell_4_y": 0.0,
+                    "segment_1_cell_4_z": 0.0,
+                    "segment_1_cell_5_y": 0.0,
+                    "segment_1_cell_5_z": 0.0,
+                    "segment_1_cell_6_y": 0.0,
+                    "segment_1_cell_6_z": 0.0,
+                    "segment_1_cell_7_y": 0.0,
+                    "segment_1_cell_7_z": 0.0,
+                    "segment_1_cell_8_y": 0.0,
+                    "segment_1_cell_8_z": 0.0,
+                    "segment_1_cell_9_y": 0.0,
+                    "segment_1_cell_9_z": 0.0
+                  },
+                  "unspecified": "zero"
+                },
+                "version": "1.0.0"
+              },
+              "version": "1.0.0"
+            },
+            "name": "New negative-y reach-and-hold feasibility study",
+            "objectives": [
+              {
+                "direction": "minimize",
+                "metric": "position_error",
+                "units": "m",
+                "weight": 1.0
+              }
+            ],
+            "observations": [
+              {
+                "dimension": 3,
+                "entity": "tip",
+                "frame": "world",
+                "missing": "unsupported",
+                "name": "tip_position",
+                "phase": "post_step",
+                "units": "m"
+              }
+            ],
+            "robot_families": [
+              "tendon_robot_family"
+            ],
+            "sampling": {
+              "aggregation": "per_instance",
+              "seeds": [
+                17
+              ],
+              "split": "development",
+              "window_s": [
+                0.0,
+                0.35
+              ]
+            },
+            "source": "User-authorized M3-B first-feasible scope b555900c; target frozen before its physical outcomes. Reuses reach_hold.json evaluator, initializer, timing, holding and sampling unchanged.",
+            "status": "development_valid",
+            "task_id": "family-multisegment-mirror-dev",
+            "task_version": "1.0.0",
+            "timing": {
+              "control_period_s": 0.01,
+              "duration_s": 0.35,
+              "sample_period_s": 0.01,
+              "termination": [
+                "duration",
+                "numerical_failure"
+              ],
+              "timestep_s": 0.0005
+            }
+          }
+        },
+        "raw_reference": {
+          "artifact_id": "e49777e64e6e8402ef6cc19577e6eeb6bddc9e894c4acbe1bab0a1252dedd49c",
+          "media_type": "application/json"
+        },
+        "rl_actions": 0,
+        "source_reference": {
+          "artifact_id": "c95fa825d776defcf757e0bd2633f8ec0db7fd5b7ce17f34718247cb8c0ae929",
+          "media_type": "application/json"
+        },
+        "status": "evaluated"
+      }
+    }
+  ],
+  "best": {
+    "reference": {
+      "artifact_id": "da0143fd36f57b5b351ac5831678beb8e1096a6685b588222d3feda45ab345d2",
+      "media_type": "application/json"
+    },
+    "candidate": {
+      "artifact_id": "babf4b4d2ae2c203bab7b262d7ebc23d8392adeb6ebcdd42cc7695344be0f675",
+      "media_type": "application/json"
+    },
+    "task_gap": {
+      "normalized_gap": 6.4161951108867274,
+      "components": {
+        "evaluator:task_bound": 6.373681193364423,
+        "holding_position": 6.4161951108867274,
+        "holding_speed": 0.37804431153476603
+      },
+      "valid_complete": true,
+      "accepted": false,
+      "interpretation": "Research ranking only; invalid executions remain invalid regardless of gap"
+    },
+    "acceptance": {
+      "accepted": false,
+      "components": {
+        "evaluation_validity": {
+          "limit": null,
+          "passed": true,
+          "reason": null,
+          "unit": null,
+          "value": "valid"
+        },
+        "evaluator:task_bound": {
+          "limit": 0.01,
+          "passed": false,
+          "reason": null,
+          "unit": "m",
+          "value": 0.07373681193364423
+        },
+        "execution_complete": {
+          "limit": null,
+          "passed": true,
+          "reason": null,
+          "unit": null,
+          "value": true
+        },
+        "force_bounds": {
+          "limit": 1e-08,
+          "passed": true,
+          "reason": null,
+          "unit": "N",
+          "value": 0.0
+        },
+        "holding_coverage": {
+          "limit": 6,
+          "passed": true,
+          "reason": null,
+          "unit": "inclusive uniform samples",
+          "value": true
+        },
+        "holding_position": {
+          "limit": 0.01,
+          "passed": false,
+          "reason": null,
+          "unit": "m",
+          "value": 0.07416195110886728
+        },
+        "holding_speed": {
+          "limit": 0.02,
+          "passed": false,
+          "reason": null,
+          "unit": "m/s",
+          "value": 0.02756088623069532
+        },
+        "solver_errors": {
+          "limit": 0,
+          "passed": true,
+          "reason": null,
+          "unit": "count",
+          "value": 0
+        },
+        "task_evaluator": {
+          "limit": null,
+          "passed": false,
+          "reason": null,
+          "unit": null,
+          "value": false
+        }
+      },
+      "continuous_time_guarantee": false,
+      "contract": "research.task_acceptance",
+      "evaluator_tension_channels": null,
+      "evidence_binding": {
+        "evaluation": {
+          "artifact_id": "10b9b9b1e27aea3c7104d4ae303f72b9fe0fd69021261847b90a12726ed44d77",
+          "media_type": "application/json"
+        },
+        "evaluation_binding": {
+          "original_execution_id": null,
+          "source": {
+            "artifact_id": "fa6a334538ac3ecc1f15bb45de62554f89a577c7e4bda89e28d27c56da17263a",
+            "media_type": "application/json"
+          },
+          "source_execution_id": null
+        },
+        "profile": null,
+        "profile_binding": {
+          "evaluation": {
+            "artifact_id": "10b9b9b1e27aea3c7104d4ae303f72b9fe0fd69021261847b90a12726ed44d77",
+            "media_type": "application/json"
+          },
+          "execution_id": "fdb312556f3a44eeb0871f1ddad98e02",
+          "simulation": {
+            "artifact_id": "fa6a334538ac3ecc1f15bb45de62554f89a577c7e4bda89e28d27c56da17263a",
+            "media_type": "application/json"
+          }
+        },
+        "simulation": {
+          "artifact_id": "fa6a334538ac3ecc1f15bb45de62554f89a577c7e4bda89e28d27c56da17263a",
+          "media_type": "application/json"
+        }
+      },
+      "execution_id": "fdb312556f3a44eeb0871f1ddad98e02",
+      "issues": [],
+      "metrics": {
+        "holding_max_error_m": 0.07416195110886728,
+        "holding_max_speed_m_s": 0.02756088623069532,
+        "terminal_error_m": 0.07373681193364423
+      },
+      "missing": [],
+      "protocol_id": "offline_reach_hold_v1",
+      "sources": {
+        "evaluation": {
+          "artifact_id": "10b9b9b1e27aea3c7104d4ae303f72b9fe0fd69021261847b90a12726ed44d77",
+          "media_type": "application/json"
+        },
+        "profile": null
+      },
+      "status": "valid_failure",
+      "task_family": "task.reach",
+      "task_identity": "bd9df2d930423f2b2a12152f076e2ae88b4d1a0af84d6126aa13b0b1fac9ec77",
+      "timing": {
+        "control_period_s": 0.01,
+        "deadline_misses": null,
+        "duration_s": 0.35,
+        "mean_update_s": null,
+        "real_time_demonstrated": null,
+        "real_time_required": false,
+        "sample_period_s": 0.01,
+        "simulation_wall_s": null,
+        "termination": [
+          "duration",
+          "numerical_failure"
+        ],
+        "timestep_s": 0.0005
+      },
+      "version": "1.0.0"
+    },
+    "execution_id": "engineering-physical-4-physical",
+    "task_identity": "bd9df2d930423f2b2a12152f076e2ae88b4d1a0af84d6126aa13b0b1fac9ec77",
+    "structure": {
+      "assumptions": [
+        "SI; serial bending only; external frictionless straight tendon spans",
+        "One independent ideal tension per tendon; guide holes have fixed supplied inertia",
+        "Task environment owns mount and forces; assembly prototypes own connector, guide and payload",
+        "Clearance checks cover route stations and guide holes; swept self-collision is not validated"
+      ],
+      "channels": [
+        "actuator_commands"
+      ],
+      "family": "tendon_robot_family",
+      "frame": "world_base_x_forward_yz_cross_section",
+      "sources": [
+        "frozen family-space assembly prototypes"
+      ],
+      "structure": {
+        "contract": "family.design",
+        "data": {
+          "actuators": [
+            {
+              "command_type": "displacement",
+              "drum_radius_m": null,
+              "id": "actuator_0",
+              "limits": [
+                -0.015,
+                0.015
+              ],
+              "transmission": [
+                {
+                  "ratio": 1.0,
+                  "tendon": "tendon_0"
+                }
+              ],
+              "units": "m",
+              "velocity_limit": 0.025
+            },
+            {
+              "command_type": "displacement",
+              "drum_radius_m": null,
+              "id": "actuator_1",
+              "limits": [
+                -0.015,
+                0.015
+              ],
+              "transmission": [
+                {
+                  "ratio": 1.0,
+                  "tendon": "tendon_1"
+                }
+              ],
+              "units": "m",
+              "velocity_limit": 0.025
+            },
+            {
+              "command_type": "displacement",
+              "drum_radius_m": null,
+              "id": "actuator_2",
+              "limits": [
+                -0.015,
+                0.015
+              ],
+              "transmission": [
+                {
+                  "ratio": 1.0,
+                  "tendon": "tendon_2"
+                }
+              ],
+              "units": "m",
+              "velocity_limit": 0.025
+            },
+            {
+              "command_type": "displacement",
+              "drum_radius_m": null,
+              "id": "actuator_3",
+              "limits": [
+                -0.015,
+                0.015
+              ],
+              "transmission": [
+                {
+                  "ratio": 1.0,
+                  "tendon": "tendon_3"
+                }
+              ],
+              "units": "m",
+              "velocity_limit": 0.025
+            }
+          ],
+          "components": [
+            {
+              "connection": {
+                "part": "fixed_base",
+                "position_m": [
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                "quaternion_wxyz": [
+                  1.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                "s": 0.0
+              },
+              "id": "segment_0",
+              "interpolation": "step",
+              "kind": "flexible_segment",
+              "length_m": 0.195,
+              "natural_curvature_rad_m": [
+                0.0,
+                0.0
+              ],
+              "physics": {
+                "bending_ei_nm2": null,
+                "bending_viscosity_nm2_s": [
+                  0.0005,
+                  0.0007
+                ],
+                "density_kg_m3": 1200.0,
+                "line_density_kg_m": null,
+                "mode": "material",
+                "young_pa": 10450000.0
+              },
+              "sections": [
+                {
+                  "s": 0.0,
+                  "section": {
+                    "angle_rad": 0.35,
+                    "holes_yz_m": [],
+                    "kind": "ellipse",
+                    "outer_yz_m": [],
+                    "parameters": {
+                      "semi_y_m": 0.01175,
+                      "semi_z_m": 0.0076
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "com_local_m": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "connection": {
+                "part": "segment_0",
+                "position_m": [
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                "quaternion_wxyz": [
+                  1.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                "s": 1.0
+              },
+              "envelope_halfsize_m": [
+                0.002,
+                0.025,
+                0.025
+              ],
+              "guide_holes": {
+                "tendon_0_hole": [
+                  0.0,
+                  -0.018,
+                  2.2043642384652355e-18
+                ],
+                "tendon_1_hole": [
+                  0.0,
+                  -3.3065463576978533e-18,
+                  -0.018
+                ],
+                "tendon_2_hole": [
+                  0.0,
+                  0.018,
+                  0.0
+                ],
+                "tendon_3_hole": [
+                  0.0,
+                  1.1021821192326178e-18,
+                  0.018
+                ]
+              },
+              "hole_radius_m": 0.0015,
+              "id": "guide_1",
+              "inertia_com_local_kg_m2": [
+                [
+                  4e-07,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  2e-07,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0,
+                  2e-07
+                ]
+              ],
+              "kind": "guide",
+              "mass_kg": 0.002
+            },
+            {
+              "com_local_m": [
+                0.006,
+                0.0,
+                0.0
+              ],
+              "connection": {
+                "part": "guide_1",
+                "position_m": [
+                  0.002,
+                  0.0,
+                  0.0
+                ],
+                "quaternion_wxyz": [
+                  1.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                "s": 0.0
+              },
+              "envelope_halfsize_m": [
+                0.006,
+                0.006,
+                0.006
+              ],
+              "guide_holes": {},
+              "hole_radius_m": 0.0,
+              "id": "connector_1",
+              "inertia_com_local_kg_m2": [
+                [
+                  5e-08,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  7e-08,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0,
+                  7e-08
+                ]
+              ],
+              "kind": "rigid_connector",
+              "mass_kg": 0.003
+            },
+            {
+              "connection": {
+                "part": "connector_1",
+                "position_m": [
+                  0.012,
+                  0.0,
+                  0.0
+                ],
+                "quaternion_wxyz": [
+                  1.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                "s": 0.0
+              },
+              "id": "segment_1",
+              "interpolation": "linear",
+              "kind": "flexible_segment",
+              "length_m": 0.11,
+              "natural_curvature_rad_m": [
+                0.0,
+                0.0
+              ],
+              "physics": {
+                "bending_ei_nm2": null,
+                "bending_viscosity_nm2_s": [
+                  0.0003,
+                  0.0004
+                ],
+                "density_kg_m3": 1050.0,
+                "line_density_kg_m": null,
+                "mode": "material",
+                "young_pa": 5400000.0
+              },
+              "sections": [
+                {
+                  "s": 0.0,
+                  "section": {
+                    "angle_rad": -0.25,
+                    "holes_yz_m": [],
+                    "kind": "rectangle",
+                    "outer_yz_m": [],
+                    "parameters": {
+                      "height_z_m": 0.0095,
+                      "width_y_m": 0.0133
+                    }
+                  }
+                },
+                {
+                  "s": 1.0,
+                  "section": {
+                    "angle_rad": 0.15000000000000002,
+                    "holes_yz_m": [],
+                    "kind": "rectangle",
+                    "outer_yz_m": [],
+                    "parameters": {
+                      "height_z_m": 0.0095,
+                      "width_y_m": 0.0133
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "com_local_m": [
+                0.007,
+                0.001,
+                -0.002
+              ],
+              "connection": {
+                "part": "segment_1",
+                "position_m": [
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                "quaternion_wxyz": [
+                  1.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                "s": 1.0
+              },
+              "envelope_halfsize_m": [
+                0.009,
+                0.009,
+                0.008
+              ],
+              "guide_holes": {},
+              "hole_radius_m": 0.0,
+              "id": "payload",
+              "inertia_com_local_kg_m2": [
+                [
+                  6e-07,
+                  1e-07,
+                  0.0
+                ],
+                [
+                  1e-07,
+                  8e-07,
+                  1e-07
+                ],
+                [
+                  0.0,
+                  1e-07,
+                  9e-07
+                ]
+              ],
+              "kind": "payload",
+              "mass_kg": 0.01
+            }
+          ],
+          "id": "serial_family_candidate",
+          "metadata": {},
+          "tendons": [
+            {
+              "diameter_m": 0.001,
+              "force_limit_n": 8.0,
+              "id": "tendon_0",
+              "length_servo_gain_n_m": 900.0,
+              "model": "straight_frictionless",
+              "points": [
+                {
+                  "attachment": {
+                    "part": "fixed_base",
+                    "position_m": [
+                      0.0,
+                      -0.018,
+                      2.2043642384652355e-18
+                    ],
+                    "quaternion_wxyz": [
+                      1.0,
+                      0.0,
+                      0.0,
+                      0.0
+                    ],
+                    "s": 0.0
+                  },
+                  "hole": null,
+                  "role": "start"
+                },
+                {
+                  "attachment": {
+                    "part": "segment_0",
+                    "position_m": [
+                      0.0,
+                      -0.018,
+                      2.2043642384652355e-18
+                    ],
+                    "quaternion_wxyz": [
+                      1.0,
+                      0.0,
+                      0.0,
+                      0.0
+                    ],
+                    "s": 0.5
+                  },
+                  "hole": null,
+                  "role": "guide"
+                },
+                {
+                  "attachment": {
+                    "part": "guide_1",
+                    "position_m": [
+                      0.0,
+                      0.0,
+                      0.0
+                    ],
+                    "quaternion_wxyz": [
+                      1.0,
+                      0.0,
+                      0.0,
+                      0.0
+                    ],
+                    "s": 0.0
+                  },
+                  "hole": "tendon_0_hole",
+                  "role": "guide"
+                },
+                {
+                  "attachment": {
+                    "part": "segment_1",
+                    "position_m": [
+                      0.0,
+                      -0.018,
+                      2.2043642384652355e-18
+                    ],
+                    "quaternion_wxyz": [
+                      1.0,
+                      0.0,
+                      0.0,
+                      0.0
+                    ],
+                    "s": 0.5
+                  },
+                  "hole": null,
+                  "role": "guide"
+                },
+                {
+                  "attachment": {
+                    "part": "segment_1",
+                    "position_m": [
+                      0.0,
+                      -0.018,
+                      2.2043642384652355e-18
+                    ],
+                    "quaternion_wxyz": [
+                      1.0,
+                      0.0,
+                      0.0,
+                      0.0
+                    ],
+                    "s": 1.0
+                  },
+                  "hole": null,
+                  "role": "anchor"
+                }
+              ],
+              "pretension_n": 0.2
+            },
+            {
+              "diameter_m": 0.001,
+              "force_limit_n": 8.0,
+              "id": "tendon_1",
+              "length_servo_gain_n_m": 900.0,
+              "model": "straight_frictionless",
+              "points": [
+                {
+                  "attachment": {
+                    "part": "fixed_base",
+                    "position_m": [
+                      0.0,
+                      -3.3065463576978533e-18,
+                      -0.018
+                    ],
+                    "quaternion_wxyz": [
+                      1.0,
+                      0.0,
+                      0.0,
+                      0.0
+                    ],
+                    "s": 0.0
+                  },
+                  "hole": null,
+                  "role": "start"
+                },
+                {
+                  "attachment": {
+                    "part": "segment_0",
+                    "position_m": [
+                      0.0,
+                      -3.3065463576978533e-18,
+                      -0.018
+                    ],
+                    "quaternion_wxyz": [
+                      1.0,
+                      0.0,
+                      0.0,
+                      0.0
+                    ],
+                    "s": 0.5
+                  },
+                  "hole": null,
+                  "role": "guide"
+                },
+                {
+                  "attachment": {
+                    "part": "guide_1",
+                    "position_m": [
+                      0.0,
+                      0.0,
+                      0.0
+                    ],
+                    "quaternion_wxyz": [
+                      1.0,
+                      0.0,
+                      0.0,
+                      0.0
+                    ],
+                    "s": 0.0
+                  },
+                  "hole": "tendon_1_hole",
+                  "role": "guide"
+                },
+                {
+                  "attachment": {
+                    "part": "segment_1",
+                    "position_m": [
+                      0.0,
+                      -3.3065463576978533e-18,
+                      -0.018
+                    ],
+                    "quaternion_wxyz": [
+                      1.0,
+                      0.0,
+                      0.0,
+                      0.0
+                    ],
+                    "s": 0.5
+                  },
+                  "hole": null,
+                  "role": "guide"
+                },
+                {
+                  "attachment": {
+                    "part": "segment_1",
+                    "position_m": [
+                      0.0,
+                      -3.3065463576978533e-18,
+                      -0.018
+                    ],
+                    "quaternion_wxyz": [
+                      1.0,
+                      0.0,
+                      0.0,
+                      0.0
+                    ],
+                    "s": 1.0
+                  },
+                  "hole": null,
+                  "role": "anchor"
+                }
+              ],
+              "pretension_n": 0.2
+            },
+            {
+              "diameter_m": 0.001,
+              "force_limit_n": 8.0,
+              "id": "tendon_2",
+              "length_servo_gain_n_m": 900.0,
+              "model": "straight_frictionless",
+              "points": [
+                {
+                  "attachment": {
+                    "part": "fixed_base",
+                    "position_m": [
+                      0.0,
+                      0.018,
+                      0.0
+                    ],
+                    "quaternion_wxyz": [
+                      1.0,
+                      0.0,
+                      0.0,
+                      0.0
+                    ],
+                    "s": 0.0
+                  },
+                  "hole": null,
+                  "role": "start"
+                },
+                {
+                  "attachment": {
+                    "part": "segment_0",
+                    "position_m": [
+                      0.0,
+                      0.018,
+                      0.0
+                    ],
+                    "quaternion_wxyz": [
+                      1.0,
+                      0.0,
+                      0.0,
+                      0.0
+                    ],
+                    "s": 0.5
+                  },
+                  "hole": null,
+                  "role": "guide"
+                },
+                {
+                  "attachment": {
+                    "part": "guide_1",
+                    "position_m": [
+                      0.0,
+                      0.0,
+                      0.0
+                    ],
+                    "quaternion_wxyz": [
+                      1.0,
+                      0.0,
+                      0.0,
+                      0.0
+                    ],
+                    "s": 0.0
+                  },
+                  "hole": "tendon_2_hole",
+                  "role": "guide"
+                },
+                {
+                  "attachment": {
+                    "part": "segment_1",
+                    "position_m": [
+                      0.0,
+                      0.018,
+                      0.0
+                    ],
+                    "quaternion_wxyz": [
+                      1.0,
+                      0.0,
+                      0.0,
+                      0.0
+                    ],
+                    "s": 0.5
+                  },
+                  "hole": null,
+                  "role": "guide"
+                },
+                {
+                  "attachment": {
+                    "part": "segment_1",
+                    "position_m": [
+                      0.0,
+                      0.018,
+                      0.0
+                    ],
+                    "quaternion_wxyz": [
+                      1.0,
+                      0.0,
+                      0.0,
+                      0.0
+                    ],
+                    "s": 1.0
+                  },
+                  "hole": null,
+                  "role": "anchor"
+                }
+              ],
+              "pretension_n": 0.2
+            },
+            {
+              "diameter_m": 0.001,
+              "force_limit_n": 8.0,
+              "id": "tendon_3",
+              "length_servo_gain_n_m": 900.0,
+              "model": "straight_frictionless",
+              "points": [
+                {
+                  "attachment": {
+                    "part": "fixed_base",
+                    "position_m": [
+                      0.0,
+                      1.1021821192326178e-18,
+                      0.018
+                    ],
+                    "quaternion_wxyz": [
+                      1.0,
+                      0.0,
+                      0.0,
+                      0.0
+                    ],
+                    "s": 0.0
+                  },
+                  "hole": null,
+                  "role": "start"
+                },
+                {
+                  "attachment": {
+                    "part": "segment_0",
+                    "position_m": [
+                      0.0,
+                      1.1021821192326178e-18,
+                      0.018
+                    ],
+                    "quaternion_wxyz": [
+                      1.0,
+                      0.0,
+                      0.0,
+                      0.0
+                    ],
+                    "s": 0.5
+                  },
+                  "hole": null,
+                  "role": "guide"
+                },
+                {
+                  "attachment": {
+                    "part": "guide_1",
+                    "position_m": [
+                      0.0,
+                      0.0,
+                      0.0
+                    ],
+                    "quaternion_wxyz": [
+                      1.0,
+                      0.0,
+                      0.0,
+                      0.0
+                    ],
+                    "s": 0.0
+                  },
+                  "hole": "tendon_3_hole",
+                  "role": "guide"
+                },
+                {
+                  "attachment": {
+                    "part": "segment_1",
+                    "position_m": [
+                      0.0,
+                      1.1021821192326178e-18,
+                      0.018
+                    ],
+                    "quaternion_wxyz": [
+                      1.0,
+                      0.0,
+                      0.0,
+                      0.0
+                    ],
+                    "s": 0.5
+                  },
+                  "hole": null,
+                  "role": "guide"
+                },
+                {
+                  "attachment": {
+                    "part": "segment_1",
+                    "position_m": [
+                      0.0,
+                      1.1021821192326178e-18,
+                      0.018
+                    ],
+                    "quaternion_wxyz": [
+                      1.0,
+                      0.0,
+                      0.0,
+                      0.0
+                    ],
+                    "s": 1.0
+                  },
+                  "hole": null,
+                  "role": "anchor"
+                }
+              ],
+              "pretension_n": 0.2
+            }
+          ],
+          "tip": {
+            "part": "payload",
+            "position_m": [
+              0.014,
+              0.0,
+              0.0
+            ],
+            "quaternion_wxyz": [
+              1.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "s": 0.0
+          },
+          "version": "tendon_family_v1"
+        },
+        "version": "1.0.0"
+      },
+      "units": "SI",
+      "unsupported": [
+        "8-12 tendons: declared, not execution validated",
+        "polygon section domain not granted in this example",
+        "axial extension",
+        "shear",
+        "twist",
+        "friction",
+        "swept self-collision",
+        "High segment-count dynamics and controller compatibility require candidate-specific validation"
+      ]
+    },
+    "source": {
+      "artifact_id": "a6fc7992e30cde7b669dadf92a04981fb8e06ab5df4b2bb1cd598a487a94713b",
+      "media_type": "application/json"
+    },
+    "numerical_s": 1.1128864001948386,
+    "implementation": "09c23504338da3e1b58699b1cafc9f8116ec49f7",
+    "original_result": {
+      "acceptance": {
+        "accepted": false,
+        "components": {
+          "evaluation_validity": {
+            "limit": null,
+            "passed": true,
+            "reason": null,
+            "unit": null,
+            "value": "valid"
+          },
+          "evaluator:task_bound": {
+            "limit": 0.01,
+            "passed": false,
+            "reason": null,
+            "unit": "m",
+            "value": 0.07373681193364423
+          },
+          "execution_complete": {
+            "limit": null,
+            "passed": true,
+            "reason": null,
+            "unit": null,
+            "value": true
+          },
+          "force_bounds": {
+            "limit": 1e-08,
+            "passed": true,
+            "reason": null,
+            "unit": "N",
+            "value": 0.0
+          },
+          "holding_coverage": {
+            "limit": 6,
+            "passed": true,
+            "reason": null,
+            "unit": "inclusive uniform samples",
+            "value": true
+          },
+          "holding_position": {
+            "limit": 0.01,
+            "passed": false,
+            "reason": null,
+            "unit": "m",
+            "value": 0.07416195110886728
+          },
+          "holding_speed": {
+            "limit": 0.02,
+            "passed": false,
+            "reason": null,
+            "unit": "m/s",
+            "value": 0.02756088623069532
+          },
+          "solver_errors": {
+            "limit": 0,
+            "passed": true,
+            "reason": null,
+            "unit": "count",
+            "value": 0
+          },
+          "task_evaluator": {
+            "limit": null,
+            "passed": false,
+            "reason": null,
+            "unit": null,
+            "value": false
+          }
+        },
+        "continuous_time_guarantee": false,
+        "contract": "research.task_acceptance",
+        "evaluator_tension_channels": null,
+        "evidence_binding": {
+          "evaluation": {
+            "artifact_id": "10b9b9b1e27aea3c7104d4ae303f72b9fe0fd69021261847b90a12726ed44d77",
+            "media_type": "application/json"
+          },
+          "evaluation_binding": {
+            "original_execution_id": null,
+            "source": {
+              "artifact_id": "fa6a334538ac3ecc1f15bb45de62554f89a577c7e4bda89e28d27c56da17263a",
+              "media_type": "application/json"
+            },
+            "source_execution_id": null
+          },
+          "profile": null,
+          "profile_binding": {
+            "evaluation": {
+              "artifact_id": "10b9b9b1e27aea3c7104d4ae303f72b9fe0fd69021261847b90a12726ed44d77",
+              "media_type": "application/json"
+            },
+            "execution_id": "fdb312556f3a44eeb0871f1ddad98e02",
+            "simulation": {
+              "artifact_id": "fa6a334538ac3ecc1f15bb45de62554f89a577c7e4bda89e28d27c56da17263a",
+              "media_type": "application/json"
+            }
+          },
+          "simulation": {
+            "artifact_id": "fa6a334538ac3ecc1f15bb45de62554f89a577c7e4bda89e28d27c56da17263a",
+            "media_type": "application/json"
+          }
+        },
+        "execution_id": "fdb312556f3a44eeb0871f1ddad98e02",
+        "issues": [],
+        "metrics": {
+          "holding_max_error_m": 0.07416195110886728,
+          "holding_max_speed_m_s": 0.02756088623069532,
+          "terminal_error_m": 0.07373681193364423
+        },
+        "missing": [],
+        "protocol_id": "offline_reach_hold_v1",
+        "sources": {
+          "evaluation": {
+            "artifact_id": "10b9b9b1e27aea3c7104d4ae303f72b9fe0fd69021261847b90a12726ed44d77",
+            "media_type": "application/json"
+          },
+          "profile": null
+        },
+        "status": "valid_failure",
+        "task_family": "task.reach",
+        "task_identity": "bd9df2d930423f2b2a12152f076e2ae88b4d1a0af84d6126aa13b0b1fac9ec77",
+        "timing": {
+          "control_period_s": 0.01,
+          "deadline_misses": null,
+          "duration_s": 0.35,
+          "mean_update_s": null,
+          "real_time_demonstrated": null,
+          "real_time_required": false,
+          "sample_period_s": 0.01,
+          "simulation_wall_s": null,
+          "termination": [
+            "duration",
+            "numerical_failure"
+          ],
+          "timestep_s": 0.0005
+        },
+        "version": "1.0.0"
+      },
+      "boundary": {
+        "elapsed_s": 1.1128864001948386,
+        "returncode": 0,
+        "termination_confirmed": true
+      },
+      "candidate": {
+        "artifact_id": "babf4b4d2ae2c203bab7b262d7ebc23d8392adeb6ebcdd42cc7695344be0f675",
+        "media_type": "application/json"
+      },
+      "charged_numerical_s": 1.1128864001948386,
+      "comparison": {
+        "aligned": false,
+        "available_samples": 0,
+        "initial_position_offset_m": null,
+        "max_position_difference_m": null,
+        "max_velocity_difference_m_s": null,
+        "samples": []
+      },
+      "evaluation_reference": {
+        "artifact_id": "10b9b9b1e27aea3c7104d4ae303f72b9fe0fd69021261847b90a12726ed44d77",
+        "media_type": "application/json"
+      },
+      "execution_id": "engineering-physical-4-physical",
+      "implementation": "09c23504338da3e1b58699b1cafc9f8116ec49f7",
+      "log_reference": {
+        "artifact_id": "53b713d459391a29c468ed56534152d9d3d4f2152f907a5c59901a3751430a2b",
+        "media_type": "application/json"
+      },
+      "mathematical_reintegrations": 0,
+      "nmpc_updates": 0,
+      "owning_study": "s7-engineering-integration-20261019",
+      "physical_launches": 1,
+      "profile": {
+        "complete": true,
+        "evaluation": {
+          "artifact_id": "10b9b9b1e27aea3c7104d4ae303f72b9fe0fd69021261847b90a12726ed44d77",
+          "media_type": "application/json"
+        },
+        "execution_id": "fdb312556f3a44eeb0871f1ddad98e02",
+        "force_bound_violation_n": 0.0,
+        "official_task_success": false,
+        "sampled_settling": {
+          "available": true,
+          "max_error_m": 0.07416195110886728,
+          "max_speed_m_s": 0.02756088623069532,
+          "passed": false,
+          "position_limit_m": 0.01,
+          "speed_limit_m_s": 0.02,
+          "window_s": 0.05
+        },
+        "simulation": {
+          "artifact_id": "fa6a334538ac3ecc1f15bb45de62554f89a577c7e4bda89e28d27c56da17263a",
+          "media_type": "application/json"
+        },
+        "solver_error_count": 0,
+        "task": {
+          "actuator_channels": [
+            "actuator_commands"
+          ],
+          "contract_version": "1.0.0",
+          "environment": {
+            "contract": "experiment.assembly",
+            "data": {
+              "environment": {
+                "coordinate_frame": "world_base_x_forward_yz_cross_section",
+                "environment_id": "reach_free",
+                "gravity_m_s2": [
+                  0.0,
+                  0.0,
+                  -9.81
+                ],
+                "gravity_source": "main@245a785 reach_free environment; Human-owned benchmark gravity",
+                "lights": [
+                  {
+                    "direction": [
+                      0.0,
+                      0.0,
+                      -1.0
+                    ],
+                    "position_m": [
+                      0.0,
+                      0.0,
+                      2.0
+                    ]
+                  }
+                ],
+                "objects": [
+                  {
+                    "conaffinity": 1,
+                    "contype": 0,
+                    "half_size_m": [
+                      2.0,
+                      2.0,
+                      0.1
+                    ],
+                    "kind": "plane",
+                    "name": "floor",
+                    "position_m": [
+                      0.0,
+                      0.0,
+                      -0.02
+                    ]
+                  }
+                ],
+                "schema_version": "1",
+                "truth_status": "HUMAN_OWNED",
+                "units": "SI"
+              },
+              "external_forces": [],
+              "floor_id": "floor",
+              "mount": {
+                "position_m": [
+                  0.0,
+                  0.0,
+                  0.15
+                ],
+                "quaternion_wxyz": [
+                  1.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              }
+            },
+            "version": "1.0.0"
+          },
+          "evaluator": {
+            "extension_id": "evaluate.reach",
+            "parameters": {
+              "contract": "reference.reach_evaluation",
+              "data": {
+                "tolerance_m": 0.01
+              },
+              "version": "1.0.0"
+            },
+            "version": "1.0.0"
+          },
+          "failure_policy": "retain_invalid_and_constraint_failures",
+          "family": "task.reach",
+          "goal": {
+            "contract": "reference.reach_goal",
+            "data": {
+              "target_m": [
+                0.29,
+                -0.035,
+                0.19
+              ]
+            },
+            "version": "1.0.0"
+          },
+          "initializer": {
+            "extension_id": "initialize.family",
+            "parameters": {
+              "contract": "family.initial",
+              "data": {
+                "qpos_rad": {
+                  "segment_0_cell_0_y": 0.0,
+                  "segment_0_cell_0_z": 0.0,
+                  "segment_0_cell_10_y": 0.0,
+                  "segment_0_cell_10_z": 0.0,
+                  "segment_0_cell_11_y": 0.0,
+                  "segment_0_cell_11_z": 0.0,
+                  "segment_0_cell_1_y": 0.0,
+                  "segment_0_cell_1_z": 0.0,
+                  "segment_0_cell_2_y": 0.0,
+                  "segment_0_cell_2_z": 0.0,
+                  "segment_0_cell_3_y": 0.0,
+                  "segment_0_cell_3_z": 0.0,
+                  "segment_0_cell_4_y": 0.0,
+                  "segment_0_cell_4_z": 0.0,
+                  "segment_0_cell_5_y": 0.0,
+                  "segment_0_cell_5_z": 0.0,
+                  "segment_0_cell_6_y": 0.0,
+                  "segment_0_cell_6_z": 0.0,
+                  "segment_0_cell_7_y": 0.0,
+                  "segment_0_cell_7_z": 0.0,
+                  "segment_0_cell_8_y": 0.0,
+                  "segment_0_cell_8_z": 0.0,
+                  "segment_0_cell_9_y": 0.0,
+                  "segment_0_cell_9_z": 0.0,
+                  "segment_1_cell_0_y": 0.0,
+                  "segment_1_cell_0_z": 0.0,
+                  "segment_1_cell_10_y": 0.0,
+                  "segment_1_cell_10_z": 0.0,
+                  "segment_1_cell_11_y": 0.0,
+                  "segment_1_cell_11_z": 0.0,
+                  "segment_1_cell_1_y": 0.0,
+                  "segment_1_cell_1_z": 0.0,
+                  "segment_1_cell_2_y": 0.0,
+                  "segment_1_cell_2_z": 0.0,
+                  "segment_1_cell_3_y": 0.0,
+                  "segment_1_cell_3_z": 0.0,
+                  "segment_1_cell_4_y": 0.0,
+                  "segment_1_cell_4_z": 0.0,
+                  "segment_1_cell_5_y": 0.0,
+                  "segment_1_cell_5_z": 0.0,
+                  "segment_1_cell_6_y": 0.0,
+                  "segment_1_cell_6_z": 0.0,
+                  "segment_1_cell_7_y": 0.0,
+                  "segment_1_cell_7_z": 0.0,
+                  "segment_1_cell_8_y": 0.0,
+                  "segment_1_cell_8_z": 0.0,
+                  "segment_1_cell_9_y": 0.0,
+                  "segment_1_cell_9_z": 0.0
+                },
+                "qvel_rad_s": {
+                  "segment_0_cell_0_y": 0.0,
+                  "segment_0_cell_0_z": 0.0,
+                  "segment_0_cell_10_y": 0.0,
+                  "segment_0_cell_10_z": 0.0,
+                  "segment_0_cell_11_y": 0.0,
+                  "segment_0_cell_11_z": 0.0,
+                  "segment_0_cell_1_y": 0.0,
+                  "segment_0_cell_1_z": 0.0,
+                  "segment_0_cell_2_y": 0.0,
+                  "segment_0_cell_2_z": 0.0,
+                  "segment_0_cell_3_y": 0.0,
+                  "segment_0_cell_3_z": 0.0,
+                  "segment_0_cell_4_y": 0.0,
+                  "segment_0_cell_4_z": 0.0,
+                  "segment_0_cell_5_y": 0.0,
+                  "segment_0_cell_5_z": 0.0,
+                  "segment_0_cell_6_y": 0.0,
+                  "segment_0_cell_6_z": 0.0,
+                  "segment_0_cell_7_y": 0.0,
+                  "segment_0_cell_7_z": 0.0,
+                  "segment_0_cell_8_y": 0.0,
+                  "segment_0_cell_8_z": 0.0,
+                  "segment_0_cell_9_y": 0.0,
+                  "segment_0_cell_9_z": 0.0,
+                  "segment_1_cell_0_y": 0.0,
+                  "segment_1_cell_0_z": 0.0,
+                  "segment_1_cell_10_y": 0.0,
+                  "segment_1_cell_10_z": 0.0,
+                  "segment_1_cell_11_y": 0.0,
+                  "segment_1_cell_11_z": 0.0,
+                  "segment_1_cell_1_y": 0.0,
+                  "segment_1_cell_1_z": 0.0,
+                  "segment_1_cell_2_y": 0.0,
+                  "segment_1_cell_2_z": 0.0,
+                  "segment_1_cell_3_y": 0.0,
+                  "segment_1_cell_3_z": 0.0,
+                  "segment_1_cell_4_y": 0.0,
+                  "segment_1_cell_4_z": 0.0,
+                  "segment_1_cell_5_y": 0.0,
+                  "segment_1_cell_5_z": 0.0,
+                  "segment_1_cell_6_y": 0.0,
+                  "segment_1_cell_6_z": 0.0,
+                  "segment_1_cell_7_y": 0.0,
+                  "segment_1_cell_7_z": 0.0,
+                  "segment_1_cell_8_y": 0.0,
+                  "segment_1_cell_8_z": 0.0,
+                  "segment_1_cell_9_y": 0.0,
+                  "segment_1_cell_9_z": 0.0
+                },
+                "unspecified": "zero"
+              },
+              "version": "1.0.0"
+            },
+            "version": "1.0.0"
+          },
+          "name": "New negative-y reach-and-hold feasibility study",
+          "objectives": [
+            {
+              "direction": "minimize",
+              "metric": "position_error",
+              "units": "m",
+              "weight": 1.0
+            }
+          ],
+          "observations": [
+            {
+              "dimension": 3,
+              "entity": "tip",
+              "frame": "world",
+              "missing": "unsupported",
+              "name": "tip_position",
+              "phase": "post_step",
+              "units": "m"
+            }
+          ],
+          "robot_families": [
+            "tendon_robot_family"
+          ],
+          "sampling": {
+            "aggregation": "per_instance",
+            "seeds": [
+              17
+            ],
+            "split": "development",
+            "window_s": [
+              0.0,
+              0.35
+            ]
+          },
+          "source": "User-authorized M3-B first-feasible scope b555900c; target frozen before its physical outcomes. Reuses reach_hold.json evaluator, initializer, timing, holding and sampling unchanged.",
+          "status": "development_valid",
+          "task_id": "family-multisegment-mirror-dev",
+          "task_version": "1.0.0",
+          "timing": {
+            "control_period_s": 0.01,
+            "duration_s": 0.35,
+            "sample_period_s": 0.01,
+            "termination": [
+              "duration",
+              "numerical_failure"
+            ],
+            "timestep_s": 0.0005
+          }
+        }
+      },
+      "raw_reference": {
+        "artifact_id": "fa6a334538ac3ecc1f15bb45de62554f89a577c7e4bda89e28d27c56da17263a",
+        "media_type": "application/json"
+      },
+      "rl_actions": 0,
+      "source_reference": {
+        "artifact_id": "a6fc7992e30cde7b669dadf92a04981fb8e06ab5df4b2bb1cd598a487a94713b",
+        "media_type": "application/json"
+      },
+      "status": "evaluated"
+    }
+  },
+  "inherited_best": {
+    "reference": {
+      "artifact_id": "da0143fd36f57b5b351ac5831678beb8e1096a6685b588222d3feda45ab345d2",
+      "media_type": "application/json"
+    },
+    "candidate": {
+      "artifact_id": "babf4b4d2ae2c203bab7b262d7ebc23d8392adeb6ebcdd42cc7695344be0f675",
+      "media_type": "application/json"
+    },
+    "source": {
+      "artifact_id": "a6fc7992e30cde7b669dadf92a04981fb8e06ab5df4b2bb1cd598a487a94713b",
+      "media_type": "application/json"
+    },
+    "task_identity": "bd9df2d930423f2b2a12152f076e2ae88b4d1a0af84d6126aa13b0b1fac9ec77",
+    "historical_only": false,
+    "task_gap": {
+      "normalized_gap": 6.4161951108867274,
+      "components": {
+        "evaluator:task_bound": 6.373681193364423,
+        "holding_position": 6.4161951108867274,
+        "holding_speed": 0.37804431153476603
+      },
+      "valid_complete": true,
+      "accepted": false,
+      "interpretation": "Research ranking only; invalid executions remain invalid regardless of gap"
+    },
+    "constraints": {
+      "evaluation_validity": {
+        "limit": null,
+        "passed": true,
+        "reason": null,
+        "unit": null,
+        "value": "valid"
+      },
+      "evaluator:task_bound": {
+        "limit": 0.01,
+        "passed": false,
+        "reason": null,
+        "unit": "m",
+        "value": 0.07373681193364423
+      },
+      "execution_complete": {
+        "limit": null,
+        "passed": true,
+        "reason": null,
+        "unit": null,
+        "value": true
+      },
+      "force_bounds": {
+        "limit": 1e-08,
+        "passed": true,
+        "reason": null,
+        "unit": "N",
+        "value": 0.0
+      },
+      "holding_coverage": {
+        "limit": 6,
+        "passed": true,
+        "reason": null,
+        "unit": "inclusive uniform samples",
+        "value": true
+      },
+      "holding_position": {
+        "limit": 0.01,
+        "passed": false,
+        "reason": null,
+        "unit": "m",
+        "value": 0.07416195110886728
+      },
+      "holding_speed": {
+        "limit": 0.02,
+        "passed": false,
+        "reason": null,
+        "unit": "m/s",
+        "value": 0.02756088623069532
+      },
+      "solver_errors": {
+        "limit": 0,
+        "passed": true,
+        "reason": null,
+        "unit": "count",
+        "value": 0
+      },
+      "task_evaluator": {
+        "limit": null,
+        "passed": false,
+        "reason": null,
+        "unit": null,
+        "value": false
+      }
+    },
+    "violations": {
+      "status": "sampled_diagnostic",
+      "samples": [
+        {
+          "constraint": "holding_max_error_m",
+          "time_s": 0.3,
+          "value": 0.07416195110886728,
+          "limit": 0.01,
+          "normalized_excess": 6.4161951108867274,
+          "raw_pointer": "/samples/30/position_error_m"
+        },
+        {
+          "constraint": "holding_max_error_m",
+          "time_s": 0.31,
+          "value": 0.07407992530773236,
+          "limit": 0.01,
+          "normalized_excess": 6.407992530773235,
+          "raw_pointer": "/samples/31/position_error_m"
+        },
+        {
+          "constraint": "holding_max_error_m",
+          "time_s": 0.32,
+          "value": 0.0739827676706415,
+          "limit": 0.01,
+          "normalized_excess": 6.39827676706415,
+          "raw_pointer": "/samples/32/position_error_m"
+        },
+        {
+          "constraint": "holding_max_error_m",
+          "time_s": 0.33,
+          "value": 0.07388111371784263,
+          "limit": 0.01,
+          "normalized_excess": 6.388111371784263,
+          "raw_pointer": "/samples/33/position_error_m"
+        },
+        {
+          "constraint": "holding_max_error_m",
+          "time_s": 0.34,
+          "value": 0.07379024446066644,
+          "limit": 0.01,
+          "normalized_excess": 6.379024446066644,
+          "raw_pointer": "/samples/34/position_error_m"
+        },
+        {
+          "constraint": "terminal_error_m",
+          "time_s": 0.35000000000000003,
+          "value": 0.07373681193364423,
+          "limit": 0.01,
+          "normalized_excess": 6.373681193364423,
+          "raw_pointer": "/samples/35/position_error_m"
+        }
+      ],
+      "total": 9
+    },
+    "raw_reference": {
+      "artifact_id": "fa6a334538ac3ecc1f15bb45de62554f89a577c7e4bda89e28d27c56da17263a",
+      "media_type": "application/json"
+    },
+    "evidence": {
+      "claim_kind": "PHYSICAL_OBSERVATION",
+      "verification_status": "complete_registered_execution",
+      "supported_inferences": [
+        "observed_task_outcome"
+      ],
+      "unsupported_inferences": [
+        "global_nonlinear_feasibility",
+        "global_nonlinear_infeasibility",
+        "structural_infeasibility",
+        "whole_horizon_from_instantaneous_braking",
+        "adapted_dynamic_improvement_from_static_sensitivity",
+        "unvisited_simulation_descent_guarantee",
+        "continuous_time_compliance",
+        "hardware_performance",
+        "robustness",
+        "repeatability",
+        "observed_task_pass"
+      ],
+      "evidence_reference": {
+        "artifact_id": "da0143fd36f57b5b351ac5831678beb8e1096a6685b588222d3feda45ab345d2",
+        "media_type": "application/json"
+      },
+      "prospective_guarantee": false
+    }
+  },
+  "remaining_hypotheses": {
+    "CONTROL_SEARCH_INCOMPLETE": {
+      "claim_kind": "UNVERIFIED_HYPOTHESIS",
+      "acceptable_evidence": [
+        "PHYSICAL_OBSERVATION",
+        "NUMERICAL_DIAGNOSTIC"
+      ],
+      "discriminating_experiments": [
+        "additional_bounded_starts",
+        "paired_control_search"
+      ],
+      "forbidden_inferences": [
+        "global_nonlinear_feasibility",
+        "global_nonlinear_infeasibility",
+        "structural_infeasibility",
+        "whole_horizon_from_instantaneous_braking",
+        "adapted_dynamic_improvement_from_static_sensitivity",
+        "unvisited_simulation_descent_guarantee",
+        "continuous_time_compliance",
+        "hardware_performance",
+        "robustness",
+        "repeatability",
+        "identified_root_cause"
+      ],
+      "scope": "Only searched starts, controls and budgets.",
+      "probability": null
+    },
+    "MODEL_PREDICTION_UNRELIABLE": {
+      "claim_kind": "UNVERIFIED_HYPOTHESIS",
+      "acceptable_evidence": [
+        "EMPIRICAL_COMPARISON",
+        "NUMERICAL_DIAGNOSTIC"
+      ],
+      "discriminating_experiments": [
+        "aligned_model_physics_pairs",
+        "fixed_input_grid_refinement"
+      ],
+      "forbidden_inferences": [
+        "global_nonlinear_feasibility",
+        "global_nonlinear_infeasibility",
+        "structural_infeasibility",
+        "whole_horizon_from_instantaneous_braking",
+        "adapted_dynamic_improvement_from_static_sensitivity",
+        "unvisited_simulation_descent_guarantee",
+        "continuous_time_compliance",
+        "hardware_performance",
+        "robustness",
+        "repeatability",
+        "identified_root_cause"
+      ],
+      "scope": "Only checked operating points and input sequences.",
+      "probability": null
+    },
+    "CONTROL_PARAMETERIZATION_LIMITED": {
+      "claim_kind": "UNVERIFIED_HYPOTHESIS",
+      "acceptable_evidence": [
+        "PHYSICAL_OBSERVATION",
+        "EMPIRICAL_COMPARISON"
+      ],
+      "discriminating_experiments": [
+        "paired_basis_comparison_with_equal_budget"
+      ],
+      "forbidden_inferences": [
+        "global_nonlinear_feasibility",
+        "global_nonlinear_infeasibility",
+        "structural_infeasibility",
+        "whole_horizon_from_instantaneous_braking",
+        "adapted_dynamic_improvement_from_static_sensitivity",
+        "unvisited_simulation_descent_guarantee",
+        "continuous_time_compliance",
+        "hardware_performance",
+        "robustness",
+        "repeatability",
+        "identified_root_cause"
+      ],
+      "scope": "Only declared bases and coefficient domains.",
+      "probability": null
+    },
+    "DESIGN_LIMITATION_POSSIBLE": {
+      "claim_kind": "UNVERIFIED_HYPOTHESIS",
+      "acceptable_evidence": [
+        "MODEL_EXCLUSION",
+        "EMPIRICAL_COMPARISON"
+      ],
+      "discriminating_experiments": [
+        "paired_designs_with_equal_control_adaptation"
+      ],
+      "forbidden_inferences": [
+        "global_nonlinear_feasibility",
+        "global_nonlinear_infeasibility",
+        "structural_infeasibility",
+        "whole_horizon_from_instantaneous_braking",
+        "adapted_dynamic_improvement_from_static_sensitivity",
+        "unvisited_simulation_descent_guarantee",
+        "continuous_time_compliance",
+        "hardware_performance",
+        "robustness",
+        "repeatability",
+        "identified_root_cause"
+      ],
+      "scope": "Only tested designs; a local model exclusion is not physical exclusion.",
+      "probability": null
+    },
+    "SOLVER_OR_NUMERICAL_ISSUE": {
+      "claim_kind": "UNVERIFIED_HYPOTHESIS",
+      "acceptable_evidence": [
+        "NUMERICAL_DIAGNOSTIC"
+      ],
+      "discriminating_experiments": [
+        "derivative_checks",
+        "same_input_refinement",
+        "alternative_initialization"
+      ],
+      "forbidden_inferences": [
+        "global_nonlinear_feasibility",
+        "global_nonlinear_infeasibility",
+        "structural_infeasibility",
+        "whole_horizon_from_instantaneous_braking",
+        "adapted_dynamic_improvement_from_static_sensitivity",
+        "unvisited_simulation_descent_guarantee",
+        "continuous_time_compliance",
+        "hardware_performance",
+        "robustness",
+        "repeatability",
+        "identified_root_cause"
+      ],
+      "scope": "Only measured solver/model/grid conditions.",
+      "probability": null
+    }
+  },
+  "interpretation": "Only original registered acceptance establishes physical success. Finite search failure does not establish structural infeasibility; no method superiority, robustness or hardware claim."
+}
