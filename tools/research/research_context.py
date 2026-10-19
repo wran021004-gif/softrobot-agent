@@ -66,7 +66,8 @@ def observation(host,ref,historical=False):
     raw_ref=result.get('raw_reference');adapter=task_adapter(cfg)
     return dict(reference=plain(ref),candidate=result['candidate'],source=result.get('source_reference'),
         task_identity=digest(cfg['task']),historical_only=historical,task_gap=task_gap(result),
-        constraints=result['acceptance'].get('components',{}),
+        constraints=(result.get('acceptance') or {}).get('components',{}),
+        execution_status=result.get('status'),execution=result.get('execution'),
         violations=adapter.violation_samples(host.store.artifact(raw_ref)) if raw_ref else dict(status='unavailable',samples=[]),
         raw_reference=raw_ref,evidence=summarize_evidence(result,ref))
 

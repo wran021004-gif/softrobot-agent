@@ -187,6 +187,14 @@ def load_credential(path):
         raise ValueError('MODEL_KEY_MISSING')
 
 
+def read_tool_evidence(host,query):
+    """Apply compact defaults without replacing an explicit retrieval view."""
+    from tools.research.core import read_evidence
+    if state(host)['spec'].get('research_decisions',{}).get('context_limits'):
+        query={'view':'summary',**query}
+    return read_evidence(host,query)
+
+
 def plan_schema(actions):
     """Advertise only executable action payloads and their reachable definitions."""
     from tools.research.contracts import Plan
@@ -324,10 +332,7 @@ async def converse(host):
                         if kind=='experience':
                             value=experience(host,use['input'])
                         else:
-                            query=use['input']
-                            if state(host)['spec'].get('research_decisions',{}).get('context_limits'):
-                                query=dict(view='summary',**query)
-                            value=read_evidence(host,query)
+                            value=read_tool_evidence(host,use['input'])
                         host.store.complete(row,dict(request_id=key,execution_id=row['execution_id'],caller=host.actor,
                             tool_id='research.core_'+kind,tool_version='1.0.0',execution_status='completed',charged=zero()),value)
                 if kind!='evidence' and state(host)['spec'].get('research_decisions',{}).get('context_limits'):

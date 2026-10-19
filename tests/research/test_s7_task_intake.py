@@ -101,12 +101,32 @@ class S7IntakeTests(unittest.TestCase):
         np.testing.assert_array_equal(np.asarray(self.host.store.artifact(mapped['source'])['trajectory']['tensions_n'])[:,0],np.asarray(old['tensions_n'])[:,1])
 
     def test_query_views_and_exact_retrieval(self):
+        from tools.research.agent import read_tool_evidence
         ref=save(self.host,dict(samples=list(range(150)),nested=dict(trajectory=list(range(1000)))),'offline_fixture')
         self.assertEqual(core.read_evidence(self.host,dict(reference=ref,pointer='/samples',view='range',start=98,count=3))['items'],[98,99,100])
         preview=core.read_evidence(self.host,dict(reference=ref,view='summary'))
         self.assertEqual(preview['value']['nested']['trajectory']['read_pointer'],'/nested/trajectory')
         self.assertEqual(core.read_evidence(self.host,dict(reference=ref,view='fields',fields=['samples']))['samples'],list(range(150)))
         self.assertEqual(core.read_evidence(self.host,dict(reference=ref,pointer='/nested/trajectory',view='full')),list(range(1000)))
+        query=dict(reference=ref,pointer='/nested/trajectory',view='full');before=deepcopy(query)
+        self.assertEqual(read_tool_evidence(self.host,query),list(range(1000)))
+        self.assertEqual(query,before)
+        self.assertEqual(read_tool_evidence(self.host,dict(reference=ref))['view'],'deterministic_summary')
+
+    def test_incomplete_nmpc_remains_invalid_and_does_not_break_context(self):
+        from tools.research.evidence_policy import summarize_evidence
+        value=dict(status='execution_incomplete',candidate=self.entry['candidate'],acceptance=None,raw_reference=None,
+            execution=dict(stage='simulation',status='execution_incomplete'))
+        ref=save(self.host,value,'offline_incomplete_execution_fixture');before=state(self.host)['results']
+        try:
+            update(self.host,results=[*before,ref])
+            c=context(self.host)
+            self.assertIn(ref,c['all_fresh_results']);self.assertIsNone(c['best_valid'])
+            self.assertFalse(c['observations'][-1]['task_gap']['valid_complete'])
+            summary=summarize_evidence(value,ref)
+            self.assertEqual(summary['verification_status'],'incomplete_or_unbound_execution')
+            self.assertNotIn('observed_task_pass',summary['supported_inferences'])
+        finally:update(self.host,results=before)
 
     def test_changed_horizon_and_period_use_explicit_zero_order_hold(self):
         cfg=deepcopy(self.candidate['configuration'])

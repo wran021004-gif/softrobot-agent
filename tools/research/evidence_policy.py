@@ -71,7 +71,8 @@ def summarize_evidence(value,reference=None,*,refinement=None):
         unresolved+=['Nonlinear realization and constraints outside declared model/sample coverage remain unresolved.']
     if 'acceptance' in value:
         gap=task_gap(value);pointer='/acceptance'
-        task=task or value['acceptance'].get('task_identity')
+        acceptance=value.get('acceptance') or {}
+        task=task or acceptance.get('task_identity')
         if reference and candidate and task and gap['valid_complete']:
             kind='PHYSICAL_OBSERVATION';status='complete_registered_execution';supported=['observed_task_outcome']
             if gap['accepted']:supported.append('observed_task_pass')
