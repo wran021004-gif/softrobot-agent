@@ -111,6 +111,49 @@ def live(host,destination):
     return summary
 
 
+def verify_searches(host):
+    """Reconstruct every stored trial without executing physics or optimization."""
+    import numpy as np
+    from tools.research.state import state
+    from tools.research.contracts import ControlSearchRequest
+    from tools.research.control_correction import corrected_tensions
+    from tools.research.physical_replay import initialize_schedule
+    s=state(host);plans=[];checks=[]
+    for ref in s['plans']:
+        p=host.store.artifact(ref)['original_plan']
+        if p['action']=='control_search':plans.append(ControlSearchRequest.model_validate(p['control_search']))
+    assert len(plans)==len(s.get('control_search_results',[]))
+    for q,ref in zip(plans,s.get('control_search_results',[])):
+        result=host.store.artifact(ref);starts={}
+        for i,item in enumerate([q,*q.additional_starts]):
+            cfg=host.store.artifact(item.candidate)['configuration'];source=host.store.artifact(item.source)
+            if item.adaptation_from:source=initialize_schedule(cfg,source,item.adaptation_from)
+            tr=source['trajectory'];limits={t['id']:t['force_limit_n'] for t in cfg['robot']['structure']['data']['tendons']}
+            starts[str(i)+'-'+item.source.artifact_id]=(tr,[limits[c] for c in tr['tendon_order']])
+        rows=result['candidates'];new_fd=0
+        for row in rows:
+            tr,limits=starts[row['start']];x=np.asarray(row['coefficients_n']);selected=row['active_coefficients']
+            inactive=[i for i in range(len(x)) if i not in selected]
+            assert np.all(x[inactive]==0)
+            expected=corrected_tensions(tr['tensions_n'],tr['times_s'][:-1],q.settings.knots_s,x,limits,q.settings.correction_window_s)
+            applied=host.store.artifact(row['source'])['trajectory']['tensions_n']
+            assert np.allclose(expected,applied,rtol=0,atol=1e-12)
+            if q.settings.correction_window_s:
+                a,b=q.settings.correction_window_s;t=np.asarray(tr['times_s'][:-1]);outside=(t<a)|(t>b)
+                np.testing.assert_array_equal(expected[outside],np.asarray(tr['tensions_n'])[outside])
+            if row['label']=='finite_difference' and not row['cache_hit']:new_fd+=1
+        assert result['finite_difference_evaluations']==sum(r['label']=='finite_difference' for r in rows)
+        checks.append(dict(reference=ref,active_coefficients=result['active_coefficients'],search_dimension=result['search_dimension'],
+            starts=result['start_count'],callbacks=len(rows),new_physical=sum(not r['cache_hit'] for r in rows),
+            cache_hits=sum(r['cache_hit'] for r in rows),finite_difference_callbacks=result['finite_difference_evaluations'],
+            new_finite_difference_physical=new_fd,all_trial_inputs_reconstructed=True,inactive_coefficients_exact_zero=True,
+            window_exterior_unchanged=True,stop_reason=result['stop_reason']))
+    with host.store.connect(True) as db:
+        assert db.execute('SELECT COUNT(*) FROM calls WHERE receipt IS NULL').fetchone()[0]==0
+    assert s['pending'] is None
+    return dict(study_id=host.run_id,searches=checks,all_receipts_settled=True,pending=None,new_physical_launches=0)
+
+
 if __name__=='__main__':
     p=argparse.ArgumentParser();p.add_argument('--offline',type=Path);p.add_argument('--run-id');p.add_argument('--destination',type=Path)
     args=p.parse_args()

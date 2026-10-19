@@ -431,6 +431,16 @@ def compact_result(value, reference):
     summary=dict(reference=reference,**{k:value.get(k) for k in (
         'status','candidate','operation','proxy_values','origin','charged_numerical_s','charged_analysis_evaluations',
         'local_model_constraints','internal_calculations','score_semantics','scoped_claim','analysis_applicability')})
+    summary['stored_result_keys']=list(value)
+    summary['retrieval_note']='This is a tool summary, not the stored artifact layout. Read only the explicit stored pointers; oversized full results may be offloaded.'
+    tensions=(value.get('construction') or {}).get('computed_tensions_n')
+    if value.get('status')=='computed' and tensions is not None:
+        summary['static_input_observation']=dict(tensions_n=tensions,units='N',
+            tendon_order=(value.get('binding') or {}).get('tendon_order'),pointer='/construction/computed_tensions_n',
+            task_acceptance='unmeasured',scope='Computed static operating input; no dynamic reach or hold guarantee')
+    if value.get('sensitivity'):
+        summary['input_response_observation']=dict(pointer='/sensitivity',
+            verification=value['sensitivity'].get('verification'),task_acceptance='unmeasured')
     trajectory=value.get('trajectory') or {}
     cert=trajectory.get('certificate') or {}
     summary.update(task_acceptance='unmeasured',numerical_evidence=dict(reference=reference,
@@ -442,7 +452,8 @@ def compact_result(value, reference):
     from tools.research.evidence_policy import summarize_evidence
     summary['evidence_summary']=summarize_evidence(value,reference)
     if value.get('instantaneous_braking'):summary['instantaneous_braking']=value['instantaneous_braking']
-    return summary
+    return {**{k:summary[k] for k in ('reference','stored_result_keys','static_input_observation',
+        'input_response_observation','retrieval_note') if k in summary},**summary}
 
 
 def decision_result(value, reference):

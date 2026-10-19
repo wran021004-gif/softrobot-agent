@@ -48,5 +48,17 @@ class AgentInterfaceTests(unittest.TestCase):
         self.assertIn('available_keys',prefix);self.assertIn('normalized_gap',prefix)
         self.assertIn('/best',prefix);self.assertLess(len(json.dumps(r)),5000)
 
+    def test_mathematical_summary_has_actual_static_input_pointer(self):
+        from tools.research.analysis import compact_result
+        value=dict(status='computed',operation='equilibrium',construction={'computed_tensions_n':[.1,.2]},
+            binding={'tendon_order':['a','b']},scoped_claim={'fixture_large':'x'*20000})
+        with patch('tools.research.evidence_policy.summarize_evidence',return_value={}):
+            r=compact_result(value,{'artifact_id':'a'*64})
+        self.assertEqual(r['static_input_observation']['tensions_n'],[.1,.2])
+        self.assertEqual(r['static_input_observation']['task_acceptance'],'unmeasured')
+        self.assertEqual(r['static_input_observation']['pointer'],'/construction/computed_tensions_n')
+        self.assertNotIn('numerical_evidence',r['stored_result_keys'])
+        self.assertIn('static_input_observation',json.dumps(r)[:1800])
+
 
 if __name__=='__main__':unittest.main()

@@ -2,6 +2,9 @@
 from types import SimpleNamespace
 from unittest.mock import Mock, patch
 import unittest
+import subprocess
+from pathlib import Path
+from uuid import uuid4
 from tools.research import tool_readiness as tr
 
 
@@ -48,6 +51,19 @@ class ReadinessTests(unittest.TestCase):
         with patch.object(tr,'state',return_value=s),patch.object(tr,'update') as update:
             tr.observe_failure(host,{'error':'UnicodeDecodeError'},{'artifact_id':'a'*64,'media_type':'application/json'})
             self.assertFalse(update.call_args.kwargs['tool_failures']['sorosim_matlab']['scientific_infeasibility'])
+
+    def test_timeout_owned_by_engineering_store_no_scientific_charge(self):
+        host=Mock();host.run_id='fixture';host.actor='fixture'
+        host.store.root=Path('runs/s8-test-'+uuid4().hex);host.store.root.mkdir()
+        host.store.reserve.return_value=({'execution_id':'fixture'},True)
+        exc=subprocess.TimeoutExpired('fixture',1);exc.termination_confirmed=True
+        s={'spec':{'mode':'engineering_numerical','runtime':{'research_python':'fixture'}}}
+        with patch.object(tr,'state',return_value=s),patch.object(tr,'save',return_value={}),patch('tools.service_execution._run_contained',side_effect=exc):
+            r=tr.check(host,timeout_s=1)
+        self.assertEqual(r['status'],'timeout');self.assertTrue(r['boundary']['termination_confirmed'])
+        reserved=host.store.reserve.call_args.args[4]
+        self.assertEqual(reserved['model_calls'],0);self.assertEqual(reserved['backend_solves'],0)
+        self.assertEqual(reserved['tool_calls'],1)
 
 
 if __name__=='__main__':unittest.main()
