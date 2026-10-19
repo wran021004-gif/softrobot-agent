@@ -27,6 +27,11 @@ def search(starts,evaluate,settings):
     cfg=LocalControlSearchSettings.model_validate(settings)
     if not starts:raise ValueError('BOUND_STARTS_REQUIRED')
     channels=len(starts[0]['schedule']['trajectory']['tendon_order']);n=channels*len(cfg.knots_s)
+    selected=list(range(n)) if cfg.active_coefficients is None else cfg.active_coefficients
+    if any(i>=n for i in selected):raise ValueError('ACTIVE_COEFFICIENT_OUTSIDE_BOUND_DIMENSIONS')
+    if len({s['id'] for s in starts})!=len(starts):raise ValueError('UNIQUE_SEARCH_START_IDS_REQUIRED')
+    if len({digest({k:s['schedule']['trajectory'][k] for k in ('times_s','tendon_order')}) for s in starts})!=1:
+        raise ValueError('COMPATIBLE_TENDON_ORDER_AND_GRID_REQUIRED')
     if len({digest([s['schedule']['trajectory']['task_identity'],s['task_options']]) for s in starts})!=1:
         raise ValueError('COMPARABLE_TASKS_REQUIRED')
     for s in starts:
@@ -51,6 +56,7 @@ def search(starts,evaluate,settings):
         source=deepcopy(start['schedule']);tr=source['trajectory']
         tr['tensions_n']=corrected_tensions(tr['tensions_n'],tr['times_s'][:-1],cfg.knots_s,x,start['limits'],cfg.correction_window_s).tolist()
         meta=dict(algorithm=cfg.method,start=start['id'],coefficients_n=x.tolist(),label=label,
+            active_coefficients=selected,search_dimension=len(selected),
             safety_margin_fraction=cfg.safety_margin_fraction,
             sequence_hash=digest(tr['tensions_n']),prediction_base=base['reference'] if base else None,
             predicted_improvement=predicted,trust_radius_n=radius,prospective_guarantee=False,
@@ -83,7 +89,7 @@ def search(starts,evaluate,settings):
             if cfg.method=='pattern':
                 improved=False
                 # Late knots first; a complete sweep still covers earlier control.
-                for j in reversed(range(n)):
+                for j in reversed(selected):
                     for direction in (1,-1):
                         trial=x.copy();trial[j]=np.clip(x[j]+direction*radius,-cfg.coefficient_limit_n,cfg.coefficient_limit_n)
                         if np.array_equal(trial,x):continue
@@ -93,7 +99,7 @@ def search(starts,evaluate,settings):
                 if not improved:radii[start['id']]*=.5
             else:
                 y=vectors(center,start);columns=[];valid=True
-                for j in range(n):
+                for j in selected:
                     trial=x.copy();h=min(cfg.difference_step_n,radius)
                     h=h if x[j]+h<=cfg.coefficient_limit_n else -h;trial[j]+=h
                     row=attempt(start,trial,'finite_difference',base=center,radius=radius)
@@ -101,11 +107,12 @@ def search(starts,evaluate,settings):
                     columns.append((vectors(row,start)-y)/h)
                 if not valid:radii[start['id']]*=.5;continue
                 tr=start['schedule']['trajectory'];basis=correction_basis(tr['times_s'][:-1],cfg.knots_s,channels,cfg.correction_window_s)
-                solved=constrained_response_step(y,np.stack(columns,axis=-1),x,tr['tensions_n'],basis,
+                solved=constrained_response_step(y,np.stack(columns,axis=-1),x[selected],tr['tensions_n'],basis[:,selected],
                     start['limits'],radius,cfg.coefficient_limit_n,safety_margin_fraction=cfg.safety_margin_fraction)
                 if not solved['success']:raise SearchStopped('numerical_failure: '+solved['numerical_status'])
                 predicted=center['task_gap']['normalized_gap']-solved['predicted_gap']
-                row=attempt(start,x+solved['delta'],'local_response_proposal',base=center,predicted=predicted,radius=radius)
+                proposal=x.copy();proposal[selected]+=solved['delta']
+                row=attempt(start,proposal,'local_response_proposal',base=center,predicted=predicted,radius=radius)
                 row['local_solver']={k:v for k,v in solved.items() if k!='delta'}
                 radii[start['id']]=trust_radius(radius,predicted,row['actual_improvement'],cfg.coefficient_limit_n)
                 row['next_trust_radius_n']=radii[start['id']]
@@ -113,6 +120,8 @@ def search(starts,evaluate,settings):
                 centers[start['id']]=min(eligible,key=ranking_key)
     except SearchStopped as exc:stop=str(exc)
     return dict(version=cfg.version,algorithm=cfg.method,stop_reason=stop,
+        active_coefficients=selected,search_dimension=len(selected),start_count=len(starts),
+        finite_difference_evaluations=sum(r['label']=='finite_difference' for r in rows),
         candidates=rows,best=best,trust_radii_n=radii,prospective_guarantee=False,
         interpretation='Finite control search outcome; structural infeasibility remains unknown.')
 
@@ -133,32 +142,38 @@ def dispatch(host,plan,key,*,origin='model'):
     admit_decision(host,plan)
     if q.settings.evaluation_requests>state(host)['spec']['budgets']['physical_launches']+1:
         raise ValueError('BATCH_REQUEST_EXCEEDS_FROZEN_SHARED_CAPACITY')
-    cfg=verify_candidate(host,q.candidate)['configuration'];adapter=task_adapter(cfg)
-    if cfg['task']['family']!='task.reach':raise ValueError('UNSUPPORTED_CONTROL_SEARCH_TASK_CONSTRAINTS')
-    source=host.store.artifact(q.source)
-    if q.adaptation_from:
-        parent=host.store.artifact(q.adaptation_from)
-        if source.get('trajectory') is None:raise ValueError('CONTROL_SCHEDULE_SOURCE_REQUIRED')
-        # Parent owns the old source; topology/time compatibility checked explicitly.
-        binding(parent['configuration'],source['trajectory'])
-        old_task=deepcopy(parent['configuration']['task']);new_task=deepcopy(cfg['task'])
-        for task in (old_task,new_task):task['initializer']['parameters']['data']={}
-        if old_task!=new_task:raise ValueError('CROSS_TASK_ADAPTATION_REQUIRES_INDEPENDENT_TRANSFER_STUDY')
-        source=initialize_schedule(cfg,source,q.adaptation_from)
-    binding(cfg,source['trajectory'])
+    def make_start(item,index):
+        cfg=verify_candidate(host,item.candidate)['configuration'];adapter=task_adapter(cfg)
+        if cfg['task']['family']!='task.reach':raise ValueError('UNSUPPORTED_CONTROL_SEARCH_TASK_CONSTRAINTS')
+        source=host.store.artifact(item.source)
+        from tools.research.physical_replay import explicit_control_source, numerically_verified_source
+        if not (explicit_control_source(source) or numerically_verified_source(source)):
+            raise ValueError('VERIFIED_OR_EXPLICIT_CONTROL_START_REQUIRED')
+        if item.adaptation_from:
+            parent=host.store.artifact(item.adaptation_from)
+            if source.get('trajectory') is None:raise ValueError('CONTROL_SCHEDULE_SOURCE_REQUIRED')
+            binding(parent['configuration'],source['trajectory'])
+            old_task=deepcopy(parent['configuration']['task']);new_task=deepcopy(cfg['task'])
+            for task in (old_task,new_task):task['initializer']['parameters']['data']={}
+            if old_task!=new_task:raise ValueError('CROSS_TASK_ADAPTATION_REQUIRES_INDEPENDENT_TRANSFER_STUDY')
+            source=initialize_schedule(cfg,source,item.adaptation_from)
+        binding(cfg,source['trajectory'])
+        limits=adapter.ranking_limits()
+        tendon_limits={t['id']:t['force_limit_n'] for t in cfg['robot']['structure']['data']['tendons']}
+        return dict(id=str(index)+'-'+plain(item.source)['artifact_id'],candidate=plain(item.candidate),schedule=source,
+            configuration=cfg,source=plain(item.source),
+            limits=[tendon_limits[t] for t in source['trajectory']['tendon_order']],
+            task_options=dict(target=cfg['task']['goal']['data']['target_m'],holding_start=adapter.holding_start_s(),
+                position_limit=limits['holding_max_error_m'],terminal_position_limit=limits['terminal_error_m'],speed_limit=limits['holding_max_speed_m_s']))
     if q.settings.version!='local_control_search_v2':raise ValueError('PUBLIC_SEARCH_REQUIRES_V2_SETTINGS')
-    limits=adapter.ranking_limits()
-    tendon_limits={t['id']:t['force_limit_n'] for t in cfg['robot']['structure']['data']['tendons']}
-    start=dict(id=plain(q.candidate)['artifact_id'],candidate=plain(q.candidate),schedule=source,
-        limits=[tendon_limits[t] for t in source['trajectory']['tendon_order']],
-        task_options=dict(target=cfg['task']['goal']['data']['target_m'],holding_start=adapter.holding_start_s(),
-            position_limit=limits['holding_max_error_m'],terminal_position_limit=limits['terminal_error_m'],speed_limit=limits['holding_max_speed_m_s']))
-    def factory(action,**kwargs):
+    starts=[make_start(item,i) for i,item in enumerate([q,*q.additional_starts])]
+    def factory(start,action,**kwargs):
         value={k:getattr(plan,k) for k in ('hypothesis','supporting_evidence','expected_observation','weakening_observation','fixed_conditions','stopping_condition','interpretation')}
-        decision=plain(plan.decision);decision.update(research_intent='PHYSICAL_VALIDATION',selected_candidate=plain(q.candidate),requested_budget=1,claimed_inference='empirical_search')
+        decision=plain(plan.decision);decision.update(research_intent='PHYSICAL_VALIDATION',selected_candidate=start['candidate'],requested_budget=1,claimed_inference='empirical_search')
         return dict(value,action=action,decision=decision,**kwargs)
     def evaluate(start,schedule,metadata):
         from tools.research.budget import protected
+        cfg=start['configuration']
         if protected(host):raise SearchStopped('protected_closeout')
         guard(host,True)
         schedule['provenance']['batch_request']=key
@@ -174,14 +189,14 @@ def dispatch(host,plan,key,*,origin='model'):
             from tools.research.budget import backend_capacity
             available=host.store.remaining()['remaining']['tool_calls']-state(host)['spec']['budgets']['protected_public_operations']
             if available<1 or backend_capacity(host)<1:raise SearchStopped('protected_or_shared_budget_exhausted')
-            result,cached=evaluate_schedule(host,q.candidate,schedule,factory,origin=origin)
+            result,cached=evaluate_schedule(host,start['candidate'],schedule,lambda action,**kw:factory(start,action,**kw),origin=origin)
         gap=task_gap(result)
-        return dict(reference=result['reference'],source=result['source_reference'],candidate=plain(q.candidate),
+        return dict(reference=result['reference'],source=result['source_reference'],candidate=start['candidate'],
             task_gap=gap,cache_hit=cached,cost_s=0. if cached else result['charged_numerical_s'],
             outputs=task_outputs(host.store.artifact(result['raw_reference'])) if gap['valid_complete'] else None,
             original_acceptance=result['acceptance'])
-    result=search([start],evaluate,q.settings)
-    result.update(candidate=plain(q.candidate),source=plain(q.source),adaptation_from=plain(q.adaptation_from),
+    result=search(starts,evaluate,q.settings)
+    result.update(starts=[{k:s[k] for k in ('id','candidate','source')} for s in starts],candidate=plain(q.candidate),source=plain(q.source),adaptation_from=plain(q.adaptation_from),
         adaptation_budget=q.settings.evaluation_requests,plan_decision=plain(plan.decision))
     ref=save(host,result,'public_control_search_result')
     update(host,control_search_results=[*state(host).get('control_search_results',[]),ref])

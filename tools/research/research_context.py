@@ -153,6 +153,19 @@ def context(host):
         key=(entry['candidate']['artifact_id'],entry['source']['artifact_id'])
         if key not in seen:unique.append(entry);seen.add(key)
     current['control_search_starts']=unique[:(settings or {}).get('candidates',3)]
+    domains=[]
+    remaining=host.store.remaining()['remaining']['backend_solves']
+    for entry in current['control_search_starts']:
+        tr=host.store.artifact(entry['source'])['trajectory'];channels=len(tr['tendon_order'])
+        domains.append(dict(candidate=entry['candidate'],source=entry['source'],tendon_order=tr['tendon_order'],
+            intervals=len(tr['tensions_n']),horizon_s=tr['times_s'][-1],
+            full_two_knot_response_requests=2*channels+2,
+            one_coefficient_response_requests=3,remaining_backend_launches=remaining,
+            full_two_knot_response_fits=remaining>=2*channels+2))
+    current['control_start_domains']=domains
+    current['control_initialization_methods']=dict(baseline='Pretension, explicit tensions_n, or source+parent with optional channel_map',
+        mathematical_response='response_evidence must be a current verified input_sensitivity analysis; optional channels, trust_radius_n, regularization',
+        physical_response='Optional baseline source+parent; channels, difference_step_n, trust_radius_n, regularization, evaluation_requests; one baseline plus one full rollout per channel, charged to shared budget')
     current['control_search_domain']=dict(coefficient_order='knot_index * tendon_count + tendon_index',
         active_coefficients='Optional unique flat indices; inactive coefficients remain zero relative to each start',
         response_cost='baseline per start + active coefficient count probes + one proposal per local response iteration; all share one cap',
