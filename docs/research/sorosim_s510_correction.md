@@ -61,9 +61,21 @@ retain exact counts. `core.resource_use` now owns the unchanged ledger projectio
 shared by full packets, plan receipts, recovery and count-mode export. Numerical
 kernels are unchanged. A committed explicit migration preserves cumulative costs;
 the exact prior candidate/profile is retained through the existing imported-candidate
-contract. Restart reconstructs the deterministic optimizer from cached function
-evaluations; it does not claim continuation of an in-memory optimizer checkpoint.
-No completed numerical trajectory is replayed during this repair.
+contract. A restarted optimizer initializes from the best observed incumbent and
+reuses exact cached function evaluations; it does not claim continuation of an
+in-memory optimizer checkpoint. The configured 16 major evaluations apply to
+each invocation, while the shared 192-backend limit remains cumulative.
+
+The first metadata interruption also exposed one settled evaluation absent from
+the driver's local journal. A second boundary retained 52 completed evaluations;
+the Store remains authoritative. One new outer plan had begun preflight between
+the boundary check and process termination, with no worker reservation. Its
+charged public operation is explicitly sealed failed as
+`ENGINEERING_STOP_BEFORE_WORKER_RESERVATION`; the original recovery rejection is
+retained. Recovery now reconciles every completed Store result into the journal
+and ranks it, checks remaining shared backend capacity, and uses a distinct
+request only for that known prelaunch failure. No completed numerical trajectory
+is replayed. All boundaries, migrations and optimizer restarts are reported.
 
 Launch through the existing research interpreter with MATLAB Engine on PYTHONPATH,
 the pinned SOROSIM_ROOT and configured single-thread numerical environment:

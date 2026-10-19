@@ -82,21 +82,27 @@ def main():
         if not row['complete']:raise RuntimeError('INCOMPLETE_MATHEMATICAL_INTEGRATION: '+label)
         return row
 
-    def simulation(x,label):
-        identity=digest(controls(x).tolist())
-        if identity in cache:return cache[identity]
-        if len(rows)>=state(host)['spec']['budgets']['physical_launches']:raise SearchFinished('physical count ceiling')
-        prediction=surrogate(x) if surrogate else None
-        source=schedule(x)
-        result=core.dispatch(host,plan('physical_replay',physical_replay=dict(candidate=candidate,source=source),
-            supporting_evidence=[raw_source]),'s510-sim-'+identity[:20],origin='engineering')['result']
+    def recorded_result(result,x,label,prediction=None):
         core.read_evidence(host,dict(reference=result['reference']))
         actual=task_gap(result);raw=host.store.artifact(result['raw_reference'])
-        row=dict(sequence_identity=identity,label=label,coefficients_n=np.asarray(x).tolist(),
-            source=source,reference=result['reference'],valid=actual['valid_complete'],accepted=result['acceptance']['accepted'],
+        return dict(sequence_identity=digest(controls(x).tolist()),label=label,coefficients_n=np.asarray(x).tolist(),
+            source=result['source_reference'],reference=result['reference'],valid=actual['valid_complete'],accepted=result['acceptance']['accepted'],
             registered_task_gap=actual,measure=measure(task_outputs(raw)) if actual['valid_complete'] else None,
             predicted_measure=measure(prediction) if prediction else None,
             prediction_kind='32-grid-anchor_plus_4-grid_one-sided_response_not_certified' if prediction else None)
+
+    def simulation(x,label):
+        identity=digest(controls(x).tolist())
+        if identity in cache:return cache[identity]
+        if host.store.remaining()['remaining']['backend_solves']<1:raise SearchFinished('physical count ceiling')
+        prediction=surrogate(x) if surrogate else None
+        source=schedule(x);key='s510-sim-'+identity[:20]
+        prior=host.store.lookup(host.run_id,key)
+        if prior and prior['receipt'] and json.loads(prior['receipt']).get('error')=='ENGINEERING_STOP_BEFORE_WORKER_RESERVATION':
+            key+='-after-known-prelaunch-stop'
+        result=core.dispatch(host,plan('physical_replay',physical_replay=dict(candidate=candidate,source=source),
+            supporting_evidence=[raw_source]),key,origin='engineering')['result']
+        row=recorded_result(result,x,label,prediction)
         rows.append(row);cache[identity]=row
         atomic_json(DEST/'progress.json',dict(candidate=candidate,candidates=rows))
         print(json.dumps(dict(simulations=len(rows),label=label,valid=row['valid'],measure=row['measure'])),flush=True)
@@ -110,6 +116,18 @@ def main():
 
     zero=np.zeros(n);stop_reason=None
     try:
+        known={r['reference']['artifact_id'] for r in rows}
+        settled=state(host)['physical_replays']
+        for ref in settled:
+            if ref['artifact_id'] in known:continue
+            result=dict(reference=ref,**host.store.artifact(ref))
+            src=host.store.artifact(result['source_reference'])
+            row=recorded_result(result,np.asarray(src['provenance']['correction_coefficients_n']),
+                'recovered-from-sealed-worker-no-replay')
+            rows.append(row);cache[row['sequence_identity']]=row
+        order={r['artifact_id']:i for i,r in enumerate(settled)}
+        rows.sort(key=lambda row:order[row['reference']['artifact_id']])
+        atomic_json(DEST/'progress.json',dict(candidate=candidate,candidates=rows))
         coarse=integrate(zero,4,'reference-4');fine=integrate(zero,32,'reference-32')
         saved_states=np.asarray(original['trajectory']['states'])[::4]
         replay=host.store.artifact(coarse['reference'])['raw']
@@ -140,6 +158,10 @@ def main():
         integrate(proposed,32,'recommended-32')
         best=min((r for r in rows if r['valid']),key=lambda r:(r['measure']['normalized_gap'],r['measure']['sum_normalized_excess']))
         x0=np.asarray(best['coefficients_n']);cap=settings['coefficient_limit_n']
+        s=state(host)
+        update(host,s510_optimizer_starts=[*s.get('s510_optimizer_starts',[]),
+            dict(at_backend_count=host.store.remaining()['used']['backend_solves'],
+                initial_result=best['reference'],continuation='fresh optimizer from incumbent; exact evaluations cached')])
         def fun(x):
             row=simulation(x,'simulation-correction')
             return residual(outputs(row)) if row['valid'] else np.full(len(residual(fine['outputs'])),1e3)
@@ -172,6 +194,7 @@ def main():
             if label!='reference-32':comparisons[label]=improvement_test(b['model_measure'],a['model_measure'],b['simulation_measure'],a['simulation_measure'],b['error_budget'],a['error_budget'])
     summary=dict(study_id=host.run_id,freeze=state(host)['freeze'],candidate=candidate,
         reference_source=SOURCE,stop_reason=stop_reason,selected=state(host).get('selected'),
+        optimizer_starts=state(host).get('s510_optimizer_starts',[]),
         original_task_passed=bool(state(host).get('success_gate')),ranked_candidates=ranked,
         invalid_candidates=[r for r in rows if not r['valid']],paired_error_budgets=paired,
         exact_paired_direction_checks=comparisons,prospective_regional_bound='not_established',
