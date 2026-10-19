@@ -244,7 +244,7 @@ def error_feedback(host, use, exc, before):
         'UNREGISTERED_RESEARCH_EVIDENCE':('supporting_evidence','Cite registered result, candidate or source references from current packet'),
         'ENGINEERING_TOOL_UNAVAILABLE':('action','Choose an available operation from current packet; engine failure is not scientific infeasibility')}
     for marker,(f,hint) in hints.items():
-        if marker in message:code=marker;field=field or f;expected=hint
+        if marker in message:code=marker;field=f;expected=hint
     if 'ACTION_REQUIRES_ONLY_' in message:
         field='action';expected=message[message.index('ACTION_REQUIRES_ONLY_'):].split('\n')[0][:160]
     if isinstance(exc,(KeyError,IndexError)):
@@ -455,7 +455,8 @@ async def converse(host):
         if s['spec'].get('tool_readiness') or s.get('tool_failures'):
             native[0].tool_spec={**native[0].tool_spec,'inputSchema':{'json':plan_schema(current['research']['actions'])}}
             from tools.research.tool_readiness import availability
-            if (availability(host) or {}).get('status')!='ready':agent.tool_registry.registry.pop('research_analysis',None)
+            if (availability(host) or {}).get('status')!='ready' or current['research']['method_remaining']['mathematical_evaluations']<1:
+                agent.tool_registry.registry.pop('research_analysis',None)
         record(host,'model_decision_packet',current)
         agent.system_prompt=instructions+'\nCURRENT_RESEARCH_PACKET\n'+json.dumps(current,separators=(',',':'))
         if protected(host):

@@ -144,6 +144,8 @@ def context(host):
         status=availability(host)
         current['tool_readiness']={k:status.get(k) for k in ('status','checked_unix','failed_stage','reason','failure_reference','log_reference')}
         if status['status']!='ready':current['actions']=[a for a in current['actions'] if a not in MATLAB_ACTIONS]
+        exhausted=[a for a,k in (('execute','nmpc'),('mechanics','offline_nlp'),('replay','bdf_replays'),('refine','bdf_replays')) if current['method_remaining'][k]<1]
+        current['actions']=[a for a in current['actions'] if a not in exhausted]
     # New valid observations are executable starts, with exact same-task bindings.
     starts=[dict(candidate=host.store.artifact(r)['candidate'],source=host.store.artifact(r)['source_reference'],
         observation=r) for r in reversed(s.get('physical_replays',[])) if task_gap(host.store.artifact(r))['valid_complete']]
