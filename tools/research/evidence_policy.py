@@ -139,3 +139,52 @@ def check_inference(summary,inference,*,target=None,legal_candidate=False):
                 return dict(allowed=False,reason='evidence_identity_or_scope_mismatch:'+key)
     if allowed:reason='supported_only_within_declared_evidence_scope'
     return dict(allowed=allowed,reason=reason)
+
+
+def admit_decision(host,plan):
+    """Public Plan boundary resolves references, never accepts model-made summaries."""
+    from tools.research.state import state
+    from tools.research.design import verify_candidate
+    from tools.state_io import digest
+    s=state(host)
+    if not s['spec'].get('research_decisions'):return None
+    d=plan.decision
+    if d is None:raise ValueError('VERSIONED_RESEARCH_DECISION_REQUIRED')
+    intents={'generate':'DESIGN_MODIFICATION','propose':'DESIGN_MODIFICATION','execute':'NMPC_EXECUTION',
+        'control_search':'CONTROL_SEARCH','physical_replay':'PHYSICAL_VALIDATION','select':'SELECT','stop':'STOP',
+        'diagnose':'DIAGNOSE','search':'MATHEMATICAL_ANALYSIS','mechanics':'MATHEMATICAL_ANALYSIS',
+        'replay':'MATHEMATICAL_ANALYSIS','refine':'MATHEMATICAL_ANALYSIS','cross_replay':'MATHEMATICAL_ANALYSIS',
+        'matched_state':'DIAGNOSE','nmpc_prediction_diagnostic':'DIAGNOSE','confirm':'PHYSICAL_VALIDATION'}
+    if d.research_intent!=intents[plan.action]:raise ValueError('RESEARCH_INTENT_ACTION_MISMATCH')
+    actual=plan.candidate
+    if plan.control_search:actual=plan.control_search.candidate
+    if plan.physical_replay:actual=plan.physical_replay.candidate
+    if actual is not None and plain(d.selected_candidate)!=plain(actual):raise ValueError('DECISION_CANDIDATE_MISMATCH')
+    cfg=verify_candidate(host,d.selected_candidate)['configuration'] if d.selected_candidate else None
+    if plan.control_search and d.requested_budget!=plan.control_search.settings.evaluation_requests:
+        raise ValueError('DECISION_SEARCH_BUDGET_MISMATCH')
+    known=[*s.get('results',[]),*s.get('physical_replays',[]),*s.get('analysis_results',[]),
+        *s.get('mechanics_results',[]),*s.get('rl_evaluations',[]),*s.get('scoped_context',[]),
+        *s.get('control_search_results',[]),*s.get('research_mathematics',[]),*[e['reference'] for e in s.get('research_history',[])]]
+    summaries=[]
+    for ref in plan.supporting_evidence:
+        if plain(ref) not in known:raise ValueError('UNREGISTERED_RESEARCH_EVIDENCE')
+        value=host.store.artifact(ref);summary=summarize_evidence(value,ref)
+        source_candidate=value.get('candidate')
+        if source_candidate:
+            source_cfg=host.store.artifact(source_candidate)['configuration']
+            task=deepcopy(source_cfg['task'])
+            if s['spec'].get('start_mode')=='family_space':
+                task['initializer']['parameters']['data']=dict(rule=s['spec']['candidate_initialization'])
+                expected=s['spec']['canonical_task']
+            else:expected=s['base_configuration']['task']
+            if task!=expected:raise ValueError('EVIDENCE_TASK_IDENTITY_MISMATCH')
+            if d.claimed_inference!='empirical_search' and cfg and source_cfg['robot']!=cfg['robot']:
+                raise ValueError('EVIDENCE_DESIGN_IDENTITY_MISMATCH')
+            if d.claimed_inference!='empirical_search' and cfg and any(source_cfg['policy'][k]!=cfg['policy'][k] for k in ('backend','discretization','dynamics_model')):
+                raise ValueError('EVIDENCE_MODEL_SCOPE_MISMATCH')
+        summaries.append(summary)
+    if d.claimed_inference!='empirical_search' and not any(check_inference(v,d.claimed_inference)['allowed'] for v in summaries):
+        raise ValueError('INFERENCE_NOT_SUPPORTED_BY_TRUSTED_EVIDENCE: '+d.claimed_inference)
+    return dict(version=d.version,claimed_inference=d.claimed_inference,
+        resolved_evidence=[v['evidence_reference'] for v in summaries],prospective_guarantee=False)

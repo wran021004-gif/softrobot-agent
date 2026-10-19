@@ -1,0 +1,98 @@
+{
+  "defaults": "family_study_defaults.json",
+  "start_mode": "family_space",
+  "family_space": "family_space_v2.json",
+  "candidate_initialization": "all_candidate_dofs_zero_v1",
+  "base_commit": "68c9e61413e896e191000d47c0509eb7be6a4f1b",
+  "mode": "formal_research",
+  "control": "control_sorosim_s56_braking.json",
+  "topology_scope": {
+    "segment_counts": [
+      2
+    ],
+    "tendon_counts": [
+      4
+    ]
+  },
+  "study_id": "s6-3-live-20261019",
+  "evidence_destination": "evidence/s6_3/study",
+  "capabilities": [
+    "analysis",
+    "mathematics",
+    "replay",
+    "physical_replay",
+    "control_correction",
+    "control_search",
+    "nmpc",
+    "rl"
+  ],
+  "allowed_plan_actions": [
+    "generate",
+    "execute",
+    "mechanics",
+    "replay",
+    "physical_replay",
+    "control_search",
+    "refine",
+    "diagnose",
+    "select",
+    "stop"
+  ],
+  "budgets": {
+    "provider_requests": 24,
+    "protected_provider_requests": 4,
+    "public_operations": 90,
+    "protected_public_operations": 10,
+    "physical_launches": 48,
+    "mathematical_evaluations": 8,
+    "offline_nlp": 1,
+    "bdf_replays": 2
+  },
+  "nmpc_limits": {
+    "executions": 2
+  },
+  "physical_replay_limit": 48,
+  "rl_limits": {
+    "training_stages": 1,
+    "actions_per_trial": 65536,
+    "training_actions": 65536,
+    "evaluation_episodes": 1
+  },
+  "research_decisions": {
+    "version": "research_decision_v1",
+    "history": [
+      {
+        "folder": "evidence/control_search_p1/study",
+        "reference": {
+          "artifact_id": "df28c38f59726d06bc59573eb93fc22294d38089a13565774c77a2801c2ff352",
+          "media_type": "application/json"
+        }
+      }
+    ],
+    "mathematics": [
+      {
+        "folder": "evidence/sorosim_s59/study",
+        "reference": {
+          "artifact_id": "8a0502b42a3c8439104c27837e71ca167263ab34547bf41290707daa47fef6f6",
+          "media_type": "application/json"
+        }
+      },
+      {
+        "folder": "evidence/sorosim_s59/study",
+        "reference": {
+          "artifact_id": "d4eeec73cb2e97dbeb90e992062201434dbdb7b6091b41adeb62fa1b9042c8b2",
+          "media_type": "application/json"
+        }
+      },
+      {
+        "folder": "evidence/sorosim_s59/study",
+        "reference": {
+          "artifact_id": "3d32d8858de05abc41be80900eb9ade43bb3c4b033db1f594a9e13ccaf9e2bf7",
+          "media_type": "application/json"
+        }
+      }
+    ]
+  },
+  "authorization": "Explicit user S6.3 authorization. Finite independent counts include all failures, probes and engineering preparation. Shared backend ceiling; no uncertain retries or borrowing sealed budgets. Stop at first original-task pass.",
+  "execution_instructions": "You choose experiments through real Strands tools. The task, physics and evaluator are frozen. Read the compact research packet and exact evidence when needed. P1 best complete physical failure is inherited as historical evidence only, G=.054502039; two speed samples fail, positions have margin. Do not repeat that baseline: control_search reuses its observation without launching. Choose your hypothesis, candidate, method, variables and finite allocation; there is no prescribed method sequence. Every research_plan needs decision={version:research_decision_v1,hypothesis_id,claimed_inference:empirical_search for exploratory experiments,research_intent,selected_method,selected_variables,selected_candidate,requested_budget}. Intent must match action. control_search requires control_search={candidate,source,settings:{version:local_control_search_v2,method:response or pattern,knots_s,correction_window_s optional,coefficient_limit_n,difference_step_n,initial_radius_n,minimum_radius_n,evaluation_requests,iterations},adaptation_from optional exact parent candidate}. Requested_budget must equal evaluation_requests. Baseline and probes count toward the request cap; baseline is cached historical evidence. For new structure use generate, copy existing parameters with CURRENT family_space_identity, modify within frozen domains, then control_search with adaptation_from=old candidate and old source; same channels and time grid required, old acceptance never transfers. Read candidate parameters before design changes. Lower dimensional local windows are optional; outside selected window inputs remain exactly unchanged. Always evaluate all original constraints. Local response and mathematics are diagnostics, not proofs of global feasibility or structural infeasibility. Read results after experiments and freely choose next action or STOP. If a fresh complete physical pass occurs, immediately evidence_read it and select its exact reference (intent SELECT, empirical_search); no further exploration. STOP (intent STOP, empirical_search) must cite ALL fresh physical/math results, including internal probes from control_search. All fresh result references are in next research packet observations; cite only nonhistorical ones plus evidence actually used. If search does not pass, preserve best, remaining violations, unresolved hypotheses and a useful next research question. Protected budgets are for reads/selection/STOP. Do not consume them in exploration. This independent study tests JOINT structure/control capability. At least one useful new structure and explicit control adaptation should be tested when legal capacity permits. You select variables and direction from evidence. Previous fixed-design failures do not prove a required design change. Record adaptation budget for each design; comparisons are finite-budget observations."
+}

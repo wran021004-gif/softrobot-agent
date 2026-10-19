@@ -277,6 +277,8 @@ def dispatch(host,query,key,*,guard,origin='model'):
         return dict(**compact_result(host.store.artifact(ref),ref),
             operation_reuse=dict(additional_numerical_s=0,additional_analysis_evaluations=0))
     guard(host,origin!='engineering_preflight')
+    if state(host)['spec'].get('research_decisions') and 'analysis' not in state(host)['spec']['capabilities']:
+        raise ValueError('ANALYSIS_CAPABILITY_REQUIRED')
     c=verify_candidate(host,q.candidate)
     sensitivity_context=None
     if q.design_sensitivity:

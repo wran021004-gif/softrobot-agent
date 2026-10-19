@@ -85,6 +85,22 @@ class ResearchTaskAdapter:
         controller = self.configuration['policy']['controller']
         return dict(contract='research.task_adapter', version='1.0.0', family=task['family'], evaluator=task['evaluator'], output=next((s for s in task['observations'] if s['name'] == 'tip_position')), reference=task['goal'], operating_point=self.operating_point(), metrics=metrics, scoring_interval_s=task['sampling']['window_s'], holding=controller['parameters']['data'].get('settling') if reach else None, timing=task['timing'], continuous_time_guarantee=False, context='Endpoint reach and final-window position/speed are distinct components. Offline deployment timing is diagnostic.' if reach else 'Timed world reference and inclusive interval error; no absolute-speed holding requirement.')
 
+    def violation_samples(self, raw):
+        """Task-specific diagnostic samples; independent acceptance stays authoritative."""
+        if self.task['family']!='task.reach':return dict(status='unsupported',samples=[])
+        limits=self.ranking_limits();rows=[];samples=raw.get('samples',[])
+        for i,sample in enumerate(samples):
+            tests=[]
+            if i==len(samples)-1:tests.append(('terminal_error_m','position_error_m'))
+            if sample['time_s']>=self.holding_start_s()-1e-12:
+                tests.extend([('holding_max_error_m','position_error_m'),('holding_max_speed_m_s','speed_m_s')])
+            for constraint,field in tests:
+                value=sample[field];limit=limits[constraint]
+                if value>limit:
+                    rows.append(dict(constraint=constraint,time_s=sample['time_s'],value=value,limit=limit,
+                        normalized_excess=value/limit-1,raw_pointer='/samples/'+str(i)+'/'+field))
+        return dict(status='sampled_diagnostic',samples=rows)
+
     def check_compatibility(self):
         """Check the actual registered pairing, separately from historical matches."""
         from tools.platform_tasks import compile_input

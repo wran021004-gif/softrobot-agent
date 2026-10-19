@@ -62,6 +62,7 @@ def extend_engineering_counts(spec, changes, authorization):
 def resolve(path, profile=None, *, backend_profile=None):
     path = Path(path).resolve()
     study = read(path)
+    decisions=study.pop('research_decisions',None)
     provenance = dict(root=dict(path=str(path), sha256=digest(study)), references={})
     correction=study.pop('correction_search',None)
     local_search=study.pop('local_control_search',None)
@@ -314,6 +315,10 @@ def resolve(path, profile=None, *, backend_profile=None):
     if additions:
         study['final_evaluation_identity']=digest(dict(policy=policy,backend=cfg['policy']['backend'],
             task=study['canonical_task'],controller=cfg['policy']['controller'],model=cfg['policy']['dynamics_model']))
+    if decisions is not None:
+        if decisions.get('version')!='research_decision_v1' or set(decisions)-{'version','history','mathematics'}:
+            raise ValueError('VERSIONED_RESEARCH_DECISIONS_REQUIRED')
+        study['research_decisions']=decisions
     study['resolved_identity'] = digest(study)
     return study
 

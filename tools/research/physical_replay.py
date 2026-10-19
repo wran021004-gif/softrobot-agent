@@ -64,7 +64,7 @@ def evaluate_schedule(host, candidate, source, plan_factory):
     return result,False
 
 
-def binding(configuration, trajectory):
+def model_context(configuration):
     from extensions.tendon_family.sorosim_control import checked_control
     from extensions.tendon_family.sorosim_spec import SorosimModel
     from extensions.tendon_family.backends import physics_for
@@ -76,6 +76,24 @@ def binding(configuration, trajectory):
         gauss_per_interval=control.solver.gauss_per_interval)).convert(
         inp.robot.structure.data,inp.policy.discretization.data,inp.task.environment.data,solver=control.solver)
     physics=physics_for(inp);scene=assemble(inp,physics)
+    return inp,physics,scene,spec
+
+
+def initialize_schedule(configuration, source, parent):
+    """Explicit same-channel initialization for a new design; no acceptance transfer."""
+    from copy import deepcopy
+    inp,physics,scene,spec=model_context(configuration)
+    tr=deepcopy(source['trajectory']);order=[t['entity'] for t in physics['tendons']]
+    if tr['tendon_order']!=order:raise ValueError('UNSUPPORTED_CROSS_TOPOLOGY_CONTROL_INITIALIZATION')
+    tr.update(model_identity=spec['identity'],design_identity=spec['design_identity'],task_identity=digest(plain(inp.task)))
+    binding(configuration,tr)
+    return dict(source_kind='explicit_control_schedule_v1',task_acceptance='unmeasured',trajectory=tr,
+        provenance=dict(control_initialization='same_channels_new_candidate_binding_v1',parent=plain(parent),
+            inherited_acceptance=False,source_provenance=source['provenance']))
+
+
+def binding(configuration, trajectory):
+    inp,physics,scene,spec=model_context(configuration)
     timing=inp.task.timing;count=round(timing.duration_s/timing.control_period_s)
     order=[t['entity'] for t in physics['tendons']]
     u=np.asarray(trajectory['tensions_n'],dtype=float)
@@ -111,6 +129,8 @@ def calculate(request,folder):
 def dispatch(host,arguments,key):
     guard(host,True)
     s=state(host)
+    if s['spec'].get('research_decisions') and 'physical_replay' not in s['spec']['capabilities']:
+        raise ValueError('PHYSICAL_REPLAY_CAPABILITY_REQUIRED')
     replay_limit=s['spec'].get('physical_replay_limit')
     if s.get('physical_replay_launches',0)>=(s['spec']['budgets']['physical_launches'] if replay_limit is None else replay_limit):
         raise ValueError('PHYSICAL_REPLAY_LAUNCH_BUDGET_EXHAUSTED')

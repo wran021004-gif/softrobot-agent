@@ -168,6 +168,9 @@ def bind(host, reason=None, specification=None):
         update(host,reference_candidate=ref,selected=None)
     atomic_json(host.store.root/'implementation_freeze.json',dict(commit=commit,profile=profile))
     atomic_json(host.store.root/'resolved_configuration.json',state(host)['spec'])
+    if s['spec'].get('research_decisions'):
+        from tools.research.research_context import import_history
+        import_history(host)
 
 
 from tools.research.execution import execute, finish_execution, compact_result
@@ -282,6 +285,7 @@ def packet(host):
             handoffs=[dict(reference=r,**host.store.artifact(r)) for r in s.get('handoffs',[])],
             rl=rl_packet(host) if enabled(s['spec'],'rl') else None,
             nmpc_admission=[dict(candidate=r,**nmpc_timing(host,r),remaining_phase_admission=capacity(host,1,candidate=r)) for r in s['candidates'].values() if host.store.artifact(r)['profile_identity']==s['profile']['identity']] if enabled(s['spec'],'nmpc') else None,
+            research_context=__import__('tools.research.research_context',fromlist=['context']).context(host) if s['spec'].get('research_decisions') else None,
             resource_use=resource_use(host),
             claims=claims(host),research_status=s['research_status'])
 
@@ -293,7 +297,7 @@ def dispatch(host, value, request_id, origin='model'):
     plan=Plan.model_validate(value)
     if state(host)['spec'].get('allowed_plan_actions') is not None and plan.action not in state(host)['spec']['allowed_plan_actions']:
         raise ValueError('Operation outside declared follow-up scope')
-    capability={'execute':'nmpc','search':'search','mechanics':'mathematics','replay':'replay','cross_replay':'replay','refine':'replay',
+    capability={'control_search':'control_search','execute':'nmpc','search':'search','mechanics':'mathematics','replay':'replay','cross_replay':'replay','refine':'replay',
         'physical_replay':'physical_replay','matched_state':'physical_replay','nmpc_prediction_diagnostic':'prediction_diagnostic'}.get(plan.action)
     if capability and not enabled(state(host)['spec'],capability):
         raise ValueError('Undeclared capability: '+capability)
@@ -305,8 +309,10 @@ def dispatch(host, value, request_id, origin='model'):
             from tools.research.feedback import cached
             return cached(host.store.artifact(json.loads(old['receipt'])['output']))
         raise ValueError('RECOVER_EXISTING_OPERATION_NO_NEW_EXECUTION')
+    from tools.research.evidence_policy import admit_decision
+    decision_admission=admit_decision(host,plan)
     admit_closeout(host,'research_plan',plain(plan))
-    guard(host,plan.action in ('generate','propose','execute','search','mechanics','replay','cross_replay','refine','nmpc_prediction_diagnostic','physical_replay','matched_state') or plan.diagnostic is not None)
+    guard(host,plan.action in ('control_search','generate','propose','execute','search','mechanics','replay','cross_replay','refine','nmpc_prediction_diagnostic','physical_replay','matched_state') or plan.diagnostic is not None)
     s=state(host)
     for r in plan.supporting_evidence:
         host.store.artifact(r)
@@ -362,6 +368,7 @@ def dispatch(host, value, request_id, origin='model'):
     row,_=host.store.reserve(host.run_id,request_id,digest(plain(plan)),host.actor,{**zero(),'tool_calls':1})
     ref=save(host,dict(origin=origin,request_id=request_id,original_plan=plain(plan),admission=admission,
         scientific_preflight=scientific_preflight,
+        decision_admission=decision_admission,
         experience_read_bindings=experience_bindings),'original_research_plan')
     update(host,plans=[*state(host)['plans'],ref])
     try:
@@ -379,6 +386,9 @@ def dispatch(host, value, request_id, origin='model'):
             result=execute(host,plain(plan.candidate),request_id)
         elif plan.action=='search':
             result=run_search(host,plan.search,request_id)
+        elif plan.action=='control_search':
+            from tools.research.local_control_search import dispatch as control_dispatch
+            result=control_dispatch(host,plan,request_id)
         elif plan.action in ('mechanics','replay','cross_replay','refine','nmpc_prediction_diagnostic'):
             from tools.research.mechanics import dispatch as mechanics_dispatch
             result=mechanics_dispatch(host,{'mechanics':'solve','replay':'replay','cross_replay':'cross_replay','refine':'refine','nmpc_prediction_diagnostic':'nmpc_prediction_diagnostic'}[plan.action],
@@ -474,7 +484,13 @@ def recover(host):
         if not row or row['receipt']:
             continue
         plan=Plan.model_validate(original['original_plan'])
-        if plan.action=='search':
+        if plan.action=='control_search':
+            refs=[r for r in s.get('physical_replays',[]) if host.store.artifact(
+                host.store.artifact(r)['source_reference']).get('provenance',{}).get('batch_request')==key]
+            result=dict(status='interrupted_control_search',saved_results=refs,
+                optimizer_state_restored=False,new_launches=0,
+                reason='Existing physical outputs settled; a new bounded Plan is required for further search')
+        elif plan.action=='search':
             result=dict(status='search_execution_incomplete',saved_checkpoint=s['searches'].get(key),
                 attempted_executions=[r for r in s['results'] if host.store.artifact(r)['operation_key'].startswith(key+':')],
                 reason='Recovery packages existing evidence only; further proposals require a new model-requested search')

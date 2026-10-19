@@ -23,7 +23,7 @@ def _scaled_interval(interval,scale):
     return [math.nextafter(interval[0]/scale,-math.inf),math.nextafter(interval[1]/scale,math.inf)]
 
 
-def corrected_tensions(reference, times, knots, coefficients, limits):
+def corrected_tensions(reference, times, knots, coefficients, limits, window=None):
     reference=np.asarray(reference,dtype=float)
     times=np.asarray(times,dtype=float);knots=np.asarray(knots,dtype=float)
     limits=np.asarray(limits,dtype=float)
@@ -33,6 +33,7 @@ def corrected_tensions(reference, times, knots, coefficients, limits):
             or np.any(limits<=0) or np.any(reference<0) or np.any(reference>limits)):
         raise ValueError('FINITE_ORDERED_BOUND_CONTROLS_REQUIRED')
     correction=np.column_stack([np.interp(times,knots,coefficients[:,j]) for j in range(len(limits))])
+    if window is not None:correction[(times<window[0]) | (times>window[1])]=0.
     return np.clip(reference+correction,0,limits)
 
 
@@ -130,9 +131,12 @@ def constraint_vectors(outputs, target, holding_start, position_limit, speed_lim
     return np.vstack([p[-1:],p[hold],v[hold]])
 
 
-def correction_basis(times, knots, channels):
+def correction_basis(times, knots, channels, window=None):
     knots=np.asarray(knots,dtype=float)
-    return np.kron(np.column_stack([np.interp(times,knots,row) for row in np.eye(len(knots))]),np.eye(channels))
+    basis=np.column_stack([np.interp(times,knots,row) for row in np.eye(len(knots))])
+    if window is not None:
+        times=np.asarray(times);basis[(times<window[0]) | (times>window[1])]=0.
+    return np.kron(basis,np.eye(channels))
 
 
 def constrained_response_step(vectors, response, coefficients, reference, basis, limits,

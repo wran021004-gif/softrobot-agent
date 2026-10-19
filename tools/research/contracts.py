@@ -219,6 +219,8 @@ class ControlCorrectionSettings(Contract):
 
 
 class LocalControlSearchSettings(Contract):
+    version: Literal['local_control_search_v1','local_control_search_v2'] = 'local_control_search_v1'
+    correction_window_s: tuple[FiniteFloat,FiniteFloat] | None = None
     method: Literal['response','pattern'] = 'response'
     knots_s: list[FiniteFloat] = Field(default_factory=lambda:[0.,.18,.30],min_length=2,max_length=4)
     coefficient_limit_n: FiniteFloat = Field(default=2.,gt=0)
@@ -230,8 +232,12 @@ class LocalControlSearchSettings(Contract):
 
     @model_validator(mode='after')
     def domain(self):
-        if self.knots_s[0]!=0 or any(b<=a for a,b in zip(self.knots_s,self.knots_s[1:])):
+        if (self.version=='local_control_search_v1' and self.knots_s[0]!=0) or any(b<=a for a,b in zip(self.knots_s,self.knots_s[1:])):
             raise ValueError('ORDERED_KNOTS_STARTING_AT_ZERO_REQUIRED')
+        if self.correction_window_s is not None:
+            a,b=self.correction_window_s
+            if self.version!='local_control_search_v2' or not 0<=a<=self.knots_s[0]<self.knots_s[-1]<=b or a>=b:
+                raise ValueError('ORDERED_V2_CORRECTION_WINDOW_REQUIRED')
         if not self.minimum_radius_n<=self.initial_radius_n<=self.coefficient_limit_n or self.difference_step_n>self.coefficient_limit_n:
             raise ValueError('STEPS_MUST_FIT_COEFFICIENT_DOMAIN')
         return self
@@ -279,8 +285,28 @@ class NMPCPredictionDiagnostic(Contract):
     substeps: Literal[1,4,8,16,32]
 
 
+class ControlSearchRequest(Contract):
+    candidate: EvidenceRef
+    source: EvidenceRef
+    settings: LocalControlSearchSettings
+    adaptation_from: EvidenceRef | None = None
+
+
+class ResearchDecision(Contract):
+    version: Literal['research_decision_v1'] = 'research_decision_v1'
+    hypothesis_id: str = Field(min_length=1)
+    claimed_inference: str = Field(default='empirical_search',min_length=1)
+    research_intent: Literal['DIAGNOSE','MATHEMATICAL_ANALYSIS','CONTROL_SEARCH','DESIGN_MODIFICATION','NMPC_EXECUTION','RL_TRAINING','PHYSICAL_VALIDATION','SELECT','STOP']
+    selected_method: str = Field(min_length=1)
+    selected_variables: list[str] = Field(default_factory=list)
+    selected_candidate: EvidenceRef | None = None
+    requested_budget: int = Field(default=0,ge=0,strict=True,description='Physical request cap for control search; otherwise declared operation units')
+
+
 class Plan(Contract):
-    action: Literal['generate', 'propose', 'execute', 'search', 'mechanics', 'replay', 'cross_replay', 'physical_replay', 'refine', 'matched_state', 'nmpc_prediction_diagnostic', 'diagnose', 'confirm', 'select', 'stop']
+    action: Literal['generate', 'propose', 'execute', 'search', 'control_search', 'mechanics', 'replay', 'cross_replay', 'physical_replay', 'refine', 'matched_state', 'nmpc_prediction_diagnostic', 'diagnose', 'confirm', 'select', 'stop']
+    decision: ResearchDecision | None = None
+    control_search: ControlSearchRequest | None = None
     next_step: Literal['adjust_training','revise_design','diagnose','stop'] | None = None
     hypothesis: str = Field(min_length=1)
     supporting_evidence: list[EvidenceRef] = Field(default_factory=list)
@@ -310,18 +336,20 @@ class Plan(Contract):
         result=handler(self)
         if self.generation is None:
             result.pop('generation',None)
+        for key in ('decision','control_search'):
+            if getattr(self,key) is None:result.pop(key,None)
         return result
 
     @model_validator(mode='after')
     def required(self):
         if self.revise_selection and self.action not in ('confirm','select'):
             raise ValueError('REVISE_SELECTION_REQUIRES_CONFIRM_ACTION')
-        required = {'generate': 'generation', 'propose': 'parameters', 'execute': 'candidate', 'search': 'search', 'confirm': 'selected_execution', 'select': 'selected_execution',
+        required = {'control_search':'control_search','generate': 'generation', 'propose': 'parameters', 'execute': 'candidate', 'search': 'search', 'confirm': 'selected_execution', 'select': 'selected_execution',
                     'mechanics': 'mechanics', 'replay': 'mechanics_source', 'cross_replay':'cross_replay',
                     'physical_replay':'physical_replay','refine':'refinement','matched_state':'matched_state',
                     'nmpc_prediction_diagnostic':'nmpc_prediction_diagnostic'}
         active = required.get(self.action)
-        for field in ('generation', 'parameters', 'search', 'candidate', 'selected_execution', 'mechanics', 'cross_replay','physical_replay','refinement','matched_state','nmpc_prediction_diagnostic'):
+        for field in ('control_search','generation', 'parameters', 'search', 'candidate', 'selected_execution', 'mechanics', 'cross_replay','physical_replay','refinement','matched_state','nmpc_prediction_diagnostic'):
             if (getattr(self, field) is not None) != (field == active):
                 raise ValueError('ACTION_REQUIRES_ONLY_' + str(active))
         if self.action=='replay' and self.mechanics_source is None:

@@ -90,7 +90,6 @@ def record(folder, reference, diagnostic=None):
             row['physical_model_sha256']=diagnostic['source_files']['robot.xml']['artifact_id']
         timing=cfg['task']['timing'];count=round(timing['duration_s']/timing['control_period_s'])
         limits=[next(t['force_limit_n'] for t in cfg['robot']['structure']['data']['tendons'] if t['id']==name) for name in order]
-        if count!=35 or len(order)!=4:raise ValueError('CURRENT_35_BY_4_TASK_REQUIRED')
         u=history.applied_schedule(diagnostic['timeline'],phase=diagnostic['sampling_phase'],
             period=timing['control_period_s'],timestep=timing['timestep_s'],intervals=count,
             order=diagnostic['tendon_order'],expected_order=order,limits=limits)

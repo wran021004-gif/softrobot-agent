@@ -23,6 +23,11 @@ def readable_results(s, host=None):
     linked=list(s.get('analysis_results',[]))+list(s.get('search_results',[]))
     linked += [entry['reference'] for entry in s.get('stage_context',[])]
     linked += list(s.get('runtime_capabilities',{}).values())
+    linked += list(s.get('control_search_results',[]))
+    linked += list(s.get('research_mathematics',[]))
+    linked += [e[k] for e in s.get('research_history',[]) for k in ('reference','source','candidate','historical_candidate')]
+    if host:
+        linked += [host.store.artifact(e['reference'])['raw_reference'] for e in s.get('research_history',[])]
     if host:
         for ref in s.get('mechanics_results',[]):
             result=host.store.artifact(ref)
