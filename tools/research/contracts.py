@@ -231,6 +231,13 @@ class LocalControlSearchSettings(Contract):
     evaluation_requests: int = Field(default=24,ge=1,le=1000,strict=True)
     iterations: int = Field(default=16,ge=1,le=100,strict=True)
 
+    @model_serializer(mode='wrap')
+    def preserve_legacy_settings(self,handler):
+        result=handler(self)
+        for key in ('version','correction_window_s','safety_margin_fraction'):
+            if key not in self.model_fields_set:result.pop(key,None)
+        return result
+
     @model_validator(mode='after')
     def domain(self):
         if self.version=='local_control_search_v1' and self.safety_margin_fraction!=0:

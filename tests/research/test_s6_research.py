@@ -36,6 +36,9 @@ def decision(intent='DIAGNOSE',inference='empirical_search',**changes):
 class ContractTests(unittest.TestCase):
     def test_old_serialization_does_not_add_new_semantics(self):
         p=plan();self.assertNotIn('decision',p.model_dump(mode='json'));self.assertNotIn('control_search',p.model_dump(mode='json'))
+        legacy=LocalControlSearchSettings().model_dump(mode='json')
+        self.assertFalse({'version','correction_window_s','safety_margin_fraction'} & legacy.keys())
+        self.assertEqual(LocalControlSearchSettings(version='local_control_search_v2',safety_margin_fraction=.05).model_dump(mode='json')['safety_margin_fraction'],.05)
 
     def test_new_action_does_not_replace_old_search(self):
         ref=dict(artifact_id='a'*64)
