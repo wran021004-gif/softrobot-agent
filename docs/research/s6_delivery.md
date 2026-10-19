@@ -13,3 +13,7 @@ P1 最优实际张力通过原 archive/member SHA256 验证，并与新候选的
 预执行验证：72 项聚焦测试通过；随后新增公共搜索缓存/重复请求验证及独立公共能力检查，50 项相关测试通过。执行命令使用现有 `.mainline5-env/Scripts/python.exe`、仓库 PYTHONPATH 和已安装 MATLAB Engine 路径，三个数值线程环境变量均为 1。一次未设线程变量的回归被现有 NMPC 环境准入拒绝，设为冻结值后通过；没有在测试中运行真实 provider、NMPC、PPO 或物理步。早期 tempfile 测试触发 Windows ACL/SQLite 清理问题，改用仓库测试目录、独立 fixture grant 及 GC 后通过。一次测试初始化在 DB 建立前绑定了无实际科学消耗的 `s6-2-20261019` grant；它保留在本地 authority 中，未删除或重置。真实 Study 明确使用带 `-live-` 的 ID，测试此后使用独立 UUID fixture grant。
 
 真实研究尚待启动。各 Study 的 provider、公开操作、共享后端及数学/NMPC/PPO 上限在 `configs/research/study_s6_*.json` 中冻结；S6.1 不启用数学、NMPC、PPO。S6.2/S6.3 不借用封存预算。真实模型动作、原始请求、反馈、成本和接受结果将由既有 export 及 `python -m tests.research.s6_audit` 归档，完成后更新本报告。当前没有新增物理成功结论。
+
+首个工程冻结为 `c3c1f5aa`，已普通 push。S6.1 已 prepare/bind 并导入历史，provider/后端用量均为 0。真实启动两次被自动审批在进程建立前拒绝：第一轮认为目的地/载荷授权不明确；随后生成 24,204 字节科学载荷清单、核实没有凭据字段并引用附件明确条款，复核仍不接受附件条款为可信用户授权。已向用户请求在当前对话明确批准 `https://api.deepseek.com` 的指定科学数据发送，没有通过间接执行绕过。清单及拒绝记录在 `evidence/s6_1/`。
+
+等待授权期间增加显式镜像工程验证配置和驱动（独立最多 4 次后端、0 provider），以及跨设计初始化、模型范围和不同终点阈值测试。补充后的 63 项相关检查通过；另一组 55 项检查含 1 项按 opt-in 规则跳过的真实 RL 测试。仅已跑过的测试作为工程证据，未运行项目不充当科学结果。

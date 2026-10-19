@@ -45,21 +45,22 @@ def task_outputs(raw):
     return {key:raw[key] for key in ('times_s','tip_positions_m','tip_velocities_m_s')}
 
 
-def task_measure(outputs, target, holding_start, position_limit, speed_limit):
+def task_measure(outputs, target, holding_start, position_limit, speed_limit, terminal_position_limit=None):
+    terminal_position_limit=position_limit if terminal_position_limit is None else terminal_position_limit
     times=np.asarray(outputs['times_s']);p=np.asarray(outputs['tip_positions_m'])
     v=np.asarray(outputs['tip_velocities_m_s']);target=np.asarray(target)
     if (p.shape!=v.shape or p.shape!=(len(times),3) or np.any(np.diff(times)<=0)
             or not all(np.isfinite(a).all() for a in (times,p,v,target))
-            or position_limit<=0 or speed_limit<=0):
+            or position_limit<=0 or speed_limit<=0 or terminal_position_limit<=0):
         raise ValueError('FINITE_ALIGNED_OUTPUTS_AND_POSITIVE_SCALES_REQUIRED')
     hold=times>=holding_start-1e-12
     if not hold.any():raise ValueError('HOLDING_SAMPLES_REQUIRED')
     error=np.linalg.norm(p-target,axis=1);speed=np.linalg.norm(v,axis=1)
-    ratios=np.array([error[-1]/position_limit,max(error[hold])/position_limit,max(speed[hold])/speed_limit])
+    ratios=np.array([error[-1]/terminal_position_limit,max(error[hold])/position_limit,max(speed[hold])/speed_limit])
     excess=np.maximum(ratios-1,0)
     position_intervals=[_scaled_interval(_norm_interval(a,target),position_limit) for a in p]
     velocity_intervals=[_scaled_interval(_norm_interval(a,[0.,0.,0.]),speed_limit) for a in v[hold]]
-    intervals=[position_intervals[-1],*[position_intervals[i] for i in np.flatnonzero(hold)],*velocity_intervals]
+    intervals=[_scaled_interval(_norm_interval(p[-1],target),terminal_position_limit),*[position_intervals[i] for i in np.flatnonzero(hold)],*velocity_intervals]
     gap_interval=[max(0.,math.nextafter(max(a[0] for a in intervals)-1,-math.inf)),
         max(0.,math.nextafter(max(a[1] for a in intervals)-1,math.inf))]
     return dict(normalized_gap=float(max(excess)),sum_normalized_excess=float(sum(excess)),
@@ -122,13 +123,14 @@ def improvement_test(base_model, new_model, base_sim, new_sim, base_budget, new_
         scope='A posteriori at the two evaluated endpoints; prospective guarantee requires independently valid endpoint error bounds before execution')
 
 
-def constraint_vectors(outputs, target, holding_start, position_limit, speed_limit):
+def constraint_vectors(outputs, target, holding_start, position_limit, speed_limit, terminal_position_limit=None):
     """Every terminal/holding norm constraint, without averaging away a violation."""
-    task_measure(outputs,target,holding_start,position_limit,speed_limit)
+    task_measure(outputs,target,holding_start,position_limit,speed_limit,terminal_position_limit)
     p=(np.asarray(outputs['tip_positions_m'])-target)/position_limit
     v=np.asarray(outputs['tip_velocities_m_s'])/speed_limit
     hold=np.asarray(outputs['times_s'])>=holding_start-1e-12
-    return np.vstack([p[-1:],p[hold],v[hold]])
+    terminal=(np.asarray(outputs['tip_positions_m'])[-1:]-target)/(position_limit if terminal_position_limit is None else terminal_position_limit)
+    return np.vstack([terminal,p[hold],v[hold]])
 
 
 def correction_basis(times, knots, channels, window=None):

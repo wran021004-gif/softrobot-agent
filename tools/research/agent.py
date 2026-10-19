@@ -437,7 +437,7 @@ def decision_packet(host):
         from extensions.tendon_family.family_space import decision_summary
         s=state(host);spec=s['spec']
         return dict(research=context(host),implementation=s['freeze'],study_id=host.run_id,
-            candidates=list(s['candidates'].values()),family_space=decision_summary(spec['family_space'],s['family_space_reference'],
+            candidates=[r for r in s['candidates'].values() if host.store.artifact(r)['profile_identity']==s['profile']['identity']],family_space=decision_summary(spec['family_space'],s['family_space_reference'],
                 dict(actions=spec['allowed_plan_actions'],capabilities=spec['capabilities'])),analysis_protocol=spec['analysis_protocol'],
             guidance='Use exact evidence refs and a typed decision in every research_plan. Source references contain complete trajectory; evidence_read is available. New designs need explicit control adaptation. Do not infer global feasibility/infeasibility. Stop at first complete pass; publicly read and select it. STOP must cite every new result.')
     result=packet(host)

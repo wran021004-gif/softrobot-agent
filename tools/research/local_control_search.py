@@ -116,7 +116,7 @@ def search(starts,evaluate,settings):
         interpretation='Finite control search outcome; structural infeasibility remains unknown.')
 
 
-def dispatch(host,plan,key):
+def dispatch(host,plan,key,*,origin='model'):
     """One public batch; every new rollout uses the original public replay path."""
     from tools.platform_store import plain
     from tools.research import core
@@ -151,12 +151,14 @@ def dispatch(host,plan,key):
     start=dict(id=plain(q.candidate)['artifact_id'],candidate=plain(q.candidate),schedule=source,
         limits=[tendon_limits[t] for t in source['trajectory']['tendon_order']],
         task_options=dict(target=cfg['task']['goal']['data']['target_m'],holding_start=adapter.holding_start_s(),
-            position_limit=limits['holding_max_error_m'],speed_limit=limits['holding_max_speed_m_s']))
+            position_limit=limits['holding_max_error_m'],terminal_position_limit=limits['terminal_error_m'],speed_limit=limits['holding_max_speed_m_s']))
     def factory(action,**kwargs):
         value={k:getattr(plan,k) for k in ('hypothesis','supporting_evidence','expected_observation','weakening_observation','fixed_conditions','stopping_condition','interpretation')}
         decision=plain(plan.decision);decision.update(research_intent='PHYSICAL_VALIDATION',selected_candidate=plain(q.candidate),requested_budget=1,claimed_inference='empirical_search')
         return dict(value,action=action,decision=decision,**kwargs)
     def evaluate(start,schedule,metadata):
+        from tools.research.budget import protected
+        if protected(host):raise SearchStopped('protected_closeout')
         guard(host,True)
         schedule['provenance']['batch_request']=key
         # Exact historical observations are reusable baselines, never fresh passes.
@@ -171,7 +173,7 @@ def dispatch(host,plan,key):
             from tools.research.budget import backend_capacity
             available=host.store.remaining()['remaining']['tool_calls']-state(host)['spec']['budgets']['protected_public_operations']
             if available<1 or backend_capacity(host)<1:raise SearchStopped('protected_or_shared_budget_exhausted')
-            result,cached=evaluate_schedule(host,q.candidate,schedule,factory)
+            result,cached=evaluate_schedule(host,q.candidate,schedule,factory,origin=origin)
         gap=task_gap(result)
         return dict(reference=result['reference'],source=result['source_reference'],candidate=plain(q.candidate),
             task_gap=gap,cache_hit=cached,cost_s=0. if cached else result['charged_numerical_s'],

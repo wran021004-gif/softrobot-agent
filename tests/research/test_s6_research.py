@@ -10,11 +10,12 @@ from schemas.platform import ProjectConfig
 import numpy as np
 from tools.research import core
 from tools.research.contracts import Plan, LocalControlSearchSettings
-from tools.research.control_correction import corrected_tensions, correction_basis
+from tools.research.control_correction import corrected_tensions, correction_basis, constraint_vectors
 from tools.research.local_control_search import search
 from tools.research.evidence_policy import admit_decision
 from tools.research.research_context import import_history, context
 from tools.research.state import state
+from tools.research.physical_replay import initialize_schedule
 from tools.state_io import read
 from tests.research.test_local_control_search import start
 
@@ -66,6 +67,23 @@ class ContractTests(unittest.TestCase):
             result=search([s],evaluate,dict(version='local_control_search_v2',method='pattern',knots_s=[0,.05],evaluation_requests=2))
             self.assertEqual(len(result['candidates']),2)
 
+    def test_distinct_terminal_and_holding_limits(self):
+        outputs=dict(times_s=[0.,.1],tip_positions_m=[[.01,0,0],[.01,0,0]],tip_velocities_m_s=[[0,0,0]]*2)
+        vectors=constraint_vectors(outputs,[0,0,0],.1,.02,.02,terminal_position_limit=.005)
+        np.testing.assert_array_equal(vectors[:,0],[2.,.5,0.])
+
+    def test_new_structure_initialization_is_explicit_and_unmeasured(self):
+        source=start()['schedule'];before=deepcopy(source)
+        model=(SimpleNamespace(task={'id':'new-task'}),dict(tendons=[dict(entity=k) for k in ['a','b','c','d']]),{},dict(identity='new-model',design_identity='new-design'))
+        with patch('tools.research.physical_replay.model_context',return_value=model),patch('tools.research.physical_replay.binding') as binding:
+            result=initialize_schedule({},source,dict(artifact_id='a'*64))
+        self.assertEqual(source,before);self.assertEqual(result['task_acceptance'],'unmeasured')
+        self.assertFalse(result['provenance']['inherited_acceptance'])
+        self.assertEqual(result['trajectory']['model_identity'],'new-model');binding.assert_called_once()
+        model[1]['tendons'].pop()
+        with patch('tools.research.physical_replay.model_context',return_value=model):
+            with self.assertRaisesRegex(ValueError,'UNSUPPORTED_CROSS_TOPOLOGY'):initialize_schedule({},source,{})
+
 
 class AdmissionTests(unittest.TestCase):
     def setUp(self):
@@ -96,6 +114,19 @@ class AdmissionTests(unittest.TestCase):
         self.host.store.artifact.side_effect=lambda r:dict(candidate=self.ref) if r==self.ref else {}
         with patch('tools.research.evidence_policy.summarize_evidence',return_value={}),patch.object(self.host.store,'artifact',side_effect=[dict(candidate=self.ref),dict(configuration=dict(task={'id':'other'}))]):
             with self.assertRaisesRegex(ValueError,'TASK_IDENTITY'):admit_decision(self.host,plan(decision=decision(),supporting_evidence=[self.ref]))
+
+    def test_wrong_design_and_model_scope_rejected(self):
+        self.s['results']=[self.ref]
+        target=dict(robot={'id':'r'},task={'id':'t'},policy={k:{} for k in ('backend','discretization','dynamics_model')})
+        for mismatch in ('design','model'):
+            source=deepcopy(target)
+            if mismatch=='design':source['robot']['id']='different'
+            else:source['policy']['backend']={'different':True}
+            with patch('tools.research.design.verify_candidate',return_value={'configuration':target}),patch(
+                    'tools.research.evidence_policy.summarize_evidence',return_value={}),patch.object(self.host.store,'artifact',
+                    side_effect=[dict(candidate=self.ref),dict(configuration=source)]):
+                with self.assertRaisesRegex(ValueError,'DESIGN_IDENTITY' if mismatch=='design' else 'MODEL_SCOPE'):
+                    admit_decision(self.host,plan(decision=decision(inference='local_diagnostic',selected_candidate=self.ref),supporting_evidence=[self.ref]))
 
 
 class HistoryTests(unittest.TestCase):

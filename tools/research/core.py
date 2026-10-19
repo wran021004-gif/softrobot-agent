@@ -170,6 +170,7 @@ def bind(host, reason=None, specification=None):
     atomic_json(host.store.root/'resolved_configuration.json',state(host)['spec'])
     if s['spec'].get('research_decisions'):
         from tools.research.research_context import import_history
+        if changed:update(host,research_history_imported=False)
         import_history(host)
 
 
@@ -310,7 +311,12 @@ def dispatch(host, value, request_id, origin='model'):
             return cached(host.store.artifact(json.loads(old['receipt'])['output']))
         raise ValueError('RECOVER_EXISTING_OPERATION_NO_NEW_EXECUTION')
     from tools.research.evidence_policy import admit_decision
-    decision_admission=admit_decision(host,plan)
+    try:
+        decision_admission=admit_decision(host,plan)
+    except ValueError as exc:
+        save(host,dict(origin=origin,request_id=request_id,plan=plain(plan),reason=str(exc)),
+            'research_decision_rejected')
+        raise
     admit_closeout(host,'research_plan',plain(plan))
     guard(host,plan.action in ('control_search','generate','propose','execute','search','mechanics','replay','cross_replay','refine','nmpc_prediction_diagnostic','physical_replay','matched_state') or plan.diagnostic is not None)
     s=state(host)
@@ -388,7 +394,7 @@ def dispatch(host, value, request_id, origin='model'):
             result=run_search(host,plan.search,request_id)
         elif plan.action=='control_search':
             from tools.research.local_control_search import dispatch as control_dispatch
-            result=control_dispatch(host,plan,request_id)
+            result=control_dispatch(host,plan,request_id,origin=origin)
         elif plan.action in ('mechanics','replay','cross_replay','refine','nmpc_prediction_diagnostic'):
             from tools.research.mechanics import dispatch as mechanics_dispatch
             result=mechanics_dispatch(host,{'mechanics':'solve','replay':'replay','cross_replay':'cross_replay','refine':'refine','nmpc_prediction_diagnostic':'nmpc_prediction_diagnostic'}[plan.action],

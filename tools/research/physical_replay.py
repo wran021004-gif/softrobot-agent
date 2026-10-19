@@ -41,7 +41,7 @@ def schedule_identity(configuration, trajectory):
         trajectory={k:trajectory[k] for k in ('times_s','tensions_n','tendon_order','task_identity','model_identity','design_identity')}))
 
 
-def evaluate_schedule(host, candidate, source, plan_factory):
+def evaluate_schedule(host, candidate, source, plan_factory, *, origin='engineering'):
     """Reuse completed Store results, including settlement before a driver crash.
 
     There is no second cache or budget: the Store owns durable receipts and
@@ -60,7 +60,7 @@ def evaluate_schedule(host, candidate, source, plan_factory):
         raise ValueError('PHYSICAL_REPLAY_LAUNCH_BUDGET_EXHAUSTED')
     source_ref=save(host,source,'bound_applied_control_schedule')
     result=core.dispatch(host,plan_factory('physical_replay',physical_replay=dict(candidate=candidate,source=source_ref)),
-        'schedule-'+identity,origin='engineering')['result']
+        'schedule-'+identity,origin=origin)['result']
     return result,False
 
 
