@@ -1,0 +1,17 @@
+{
+  "defaults": "family_study_defaults.json",
+  "start_mode": "family_space",
+  "family_space": "family_space_v2.json",
+  "candidate_initialization": "all_candidate_dofs_zero_v1",
+  "base_commit": "5cd05310",
+  "control": "control_sorosim_s56_braking.json",
+  "topology_scope": {"segment_counts": [2], "tendon_counts": [4]},
+  "study_id": "control-search-p0-20261019",
+  "evidence_destination": "evidence/control_search_p0",
+  "capabilities": ["physical_replay", "control_correction"],
+  "allowed_plan_actions": ["generate", "physical_replay", "select", "stop"],
+  "budgets": {"public_operations": 20, "protected_public_operations": 4, "physical_launches": 4},
+  "physical_replay_limit": 4,
+  "authorization": "User P0 authorization: at most four new complete MuJoCo evaluations, no provider calls, PPO training, NMPC or mathematical NLP. Independent study; preserve all sealed studies and original task. Stop on first registered pass.",
+  "execution_instructions": "Recover actual S5.6 NMPC, S5.8 best residual PPO and NMPC, S5.10 best inputs. Check exact source robot/task/model/order/time/initialization. Execute 35 commands with original 0.30-0.35 s hold, 10 mm position and 0.020 m/s speed bounds, four [0,8] N channels. Select only original complete valid registered pass; otherwise archive paired failures."
+}

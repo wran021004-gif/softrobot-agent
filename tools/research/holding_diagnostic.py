@@ -48,6 +48,8 @@ def nmpc(folder, reference):
     motion=archived(folder,r['profile']['motion'])
     trajectory=json.loads(gzip.decompress(archived(folder,files['trajectory.json.gz'],raw=True)))
     obs=archived(folder,files['controller_observations.json']);rows=[]
+    if not len(motion)==len(trajectory)==len(obs):
+        raise ValueError('HISTORICAL_RECORD_LENGTH_MISMATCH')
     for i,(m,t,o) in enumerate(zip(motion,trajectory,obs)):
         if abs(m['time_s']-t['time_s'])>1e-12 or abs(m['time_s']-o['time_s']-.01)>1e-12:
             raise ValueError('HISTORICAL_TIME_ALIGNMENT_MISMATCH')
@@ -69,6 +71,7 @@ def nmpc(folder, reference):
     result=diagnose(rows,cfg['task']['goal']['data']['target_m'])
     result.update(route='nmpc',source_folder=folder,source_result=reference,candidate=r['candidate'],
         source_files=files,motion_reference=r['profile']['motion'],task_identity=digest(cfg['task']),
+        sampling_phase='post_control_interval',tendon_order=archived(folder,files['control_spec.json'])['specification']['tendon_order'],
         model_identity=archived(folder,files['control_spec.json'])['specification']['identity'],
         robot_identity=digest(cfg['robot']),frame='world',historical_acceptance=r['acceptance'])
     return result
@@ -83,14 +86,49 @@ def rl(folder, reference, raw_folder, raw_index):
     rows=[dict(time_s=float(r['time_s']),position_m=[float(r[f'tip_{a}_m']) for a in 'xyz'],
         velocity_m_s=[float(r[f'velocity_{a}_m_s']) for a in 'xyz'],
         actual_tension_n=[float(r[f'{t}_applied_n']) for t in order],
+        commanded_tension_n=[float(r[f'{t}_commanded_n']) for t in order],
         control_update_index=int(r['control_step'])-1,
         saturated=[bool(int(r[f'{t}_saturated'])) for t in order],
         validity='completed archived episode; per-physics-step validity unavailable') for r in records]
     value=diagnose(rows,cfg['task']['target_m'])
     value.update(route='rl',source_folder=folder,source_result=reference,candidate=result['candidate'],
         frame='world',raw_trajectory_reference=item['reference'],raw_folder=raw_folder,
+        sampling_phase='post_control_interval',tendon_order=order,effective_configuration=cfg,
         historical_acceptance=result['acceptance'],policy_sha256=result['policy_sha256'])
     return value
+
+
+def applied_schedule(rows, *, phase, period, timestep, intervals, order, expected_order, limits):
+    """Recover held actions, never planned inputs or averages of substep forces.
+
+    Post-interval rows are the held ideal command just executed. A dense source
+    must explicitly declare post-physics-step phase, cover every step and show
+    constant applied inputs within each control interval.
+    """
+    if order!=expected_order or phase not in ('post_control_interval','post_physics_step'):
+        raise ValueError('CONTROL_ORDER_OR_PHASE_MISMATCH')
+    stride=round(period/timestep) if phase=='post_physics_step' else 1
+    if stride<1 or (phase=='post_physics_step' and abs(stride*timestep-period)>1e-12):
+        raise ValueError('CONTROL_PHYSICS_GRID_MISMATCH')
+    rows=list(rows)
+    if rows and rows[0]['time_s']==0 and rows[0]['control_update_index']==-1:rows=rows[1:]
+    if len(rows)!=intervals*stride:raise ValueError('INCOMPLETE_APPLIED_CONTROL_COVERAGE')
+    commands=[]
+    for k in range(intervals):
+        block=rows[k*stride:(k+1)*stride]
+        u=np.asarray([r['actual_tension_n'] for r in block],dtype=float)
+        if u.shape!=(stride,len(order)) or not np.isfinite(u).all() or np.any(u<0) or np.any(u>limits):
+            raise ValueError('ILLEGAL_ACTUAL_TENSION')
+        for j,r in enumerate(block):
+            if (abs(r['time_s']-(k+(j+1)/stride)*period)>1e-12 or r['control_update_index']!=k
+                    or ('control_start_s' in r and abs(r['control_start_s']-k*period)>1e-12)):
+                raise ValueError('APPLIED_CONTROL_TIME_OR_INDEX_MISMATCH')
+            command=r.get('commanded_tension_n')
+            if command is not None and not np.array_equal(command,u[j]):
+                raise ValueError('IDEAL_COMMAND_APPLIED_MISMATCH')
+        if not np.all(u==u[0]):raise ValueError('NONCONSTANT_INTERVAL_CANNOT_RECONSTRUCT_HELD_COMMAND')
+        commands.append(u[0].tolist())
+    return commands
 
 
 def historical():

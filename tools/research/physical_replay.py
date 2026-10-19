@@ -34,6 +34,34 @@ def explicit_control_source(value):
         and bool(value.get('provenance')))
 
 
+def schedule_identity(configuration, trajectory):
+    """Exact executed inputs plus physical/task binding, independent of provenance."""
+    return digest(dict(robot=configuration['robot'],task=configuration['task'],seed=configuration['seed'],
+        physics={k:configuration['policy'][k] for k in ('backend','discretization','dynamics_model')},
+        trajectory={k:trajectory[k] for k in ('times_s','tensions_n','tendon_order','task_identity','model_identity','design_identity')}))
+
+
+def evaluate_schedule(host, candidate, source, plan_factory):
+    """Reuse completed Store results, including settlement before a driver crash.
+
+    There is no second cache or budget: the Store owns durable receipts and
+    cumulative costs. An unfinished request must be recovered, never relaunched.
+    """
+    from tools.research import core
+    cfg=verify_candidate(host,candidate)['configuration']
+    binding(cfg,source['trajectory'])
+    identity=schedule_identity(cfg,source['trajectory'])
+    for ref in state(host).get('physical_replays',[]):
+        result=host.store.artifact(ref);previous=host.store.artifact(result['source_reference'])
+        prior_cfg=host.store.artifact(result['candidate'])['configuration']
+        if schedule_identity(prior_cfg,previous['trajectory'])==identity:
+            return dict(reference=ref,**result),True
+    source_ref=save(host,source,'bound_applied_control_schedule')
+    result=core.dispatch(host,plan_factory('physical_replay',physical_replay=dict(candidate=candidate,source=source_ref)),
+        'schedule-'+identity,origin='engineering')['result']
+    return result,False
+
+
 def binding(configuration, trajectory):
     from extensions.tendon_family.sorosim_control import checked_control
     from extensions.tendon_family.sorosim_spec import SorosimModel
