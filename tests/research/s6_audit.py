@@ -36,10 +36,13 @@ def audit(host,destination):
             elif e['kind']=='model_original_tool_feedback':feedback.append(value)
             elif value.get('usage') is not None:usage.append(dict(request_id=e.get('request_id'),usage=value['usage']))
     atomic_json(destination/'decisions.json',dict(requests=decisions,feedback=feedback))
+    disposition=host.store.artifact(s['final_disposition']) if s.get('final_disposition') else {}
+    action=disposition.get('original_plan',{}).get('action')
     summary=dict(study_id=host.run_id,freeze=s.get('freeze'),status=s['research_status'],
         original_task_passed=bool(s.get('success_gate')),selected=s.get('selected'),
-        native_model_stop=bool(s.get('final_disposition') and host.store.artifact(s['final_disposition']).get('origin')=='model'),
-        engineering_closeout=s.get('engineering_closeout'),pending=s.get('pending'),
+        native_model_stop=disposition.get('origin')=='model' and action=='stop',
+        native_model_selection=disposition.get('origin')=='model' and action=='select',
+        engineering_closeout=disposition if disposition.get('kind')=='engineering_count_budget_closure' else None,pending=s.get('pending'),
         ledger=host.store.remaining(),provider_requests=s['pilot']['live_model_requests'],provider_usage=usage,
         mathematical_evaluations=s.get('mathematical_evaluations',0),nmpc=s.get('nmpc_launches',0),
         ppo_stages=s.get('admitted_training_stages',0),physical_replays=s.get('physical_replay_launches',0),

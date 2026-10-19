@@ -1,0 +1,613 @@
+{
+  "version": "s6_open_loop_feasible_witness_v1",
+  "study_id": "s6-3-live-20261019",
+  "implementation": "c780e3fb826c0b6f09057666da1830c435f71374",
+  "evaluation": {
+    "artifact_id": "a92601d47c8143b458c598caeaaaf3881a861e01ff239cdd0b72e275bbb17fc3",
+    "media_type": "application/json"
+  },
+  "candidate": {
+    "artifact_id": "dd98c6eabc6c2ebd5c0588ffdc91325e9cccbfced6b05c30c28d268b38c90d32",
+    "media_type": "application/json"
+  },
+  "source": {
+    "artifact_id": "42a8565869c2e6769befdbf5b1d624a6f2b9886488f9be8f06d097d0c35d044d",
+    "media_type": "application/json"
+  },
+  "raw_reference": {
+    "artifact_id": "1c7b082add3109b9e79eb927fb58e5bc2e8a2ef2a4fe2b320669ed0471fbe2a9",
+    "media_type": "application/json"
+  },
+  "registered_evaluator_reference": {
+    "artifact_id": "b469155004cd1fc781360848af1f93d4914809a95016c4ce3fa90e64d4d8a8c9",
+    "media_type": "application/json"
+  },
+  "original_task_identity": "882b3493037dcc8f8da294b3473e1223f0465e92c35bc3064bfc42d467bf212e",
+  "model_identity": "8f8eceb5f74d4b171c87f333db4db0f353aad051b375ff26aca795f7ac1fbaf2",
+  "design_identity": "10035885ded80b7afbf2faa28988c6275a18ac04f3232c5d0972acced81af9ad",
+  "candidate_identity": "ae1d74acb9765e787f6994f476bfd72416d6b7fac1ca7d7582a28724d465d9d1",
+  "structure_parameters": {
+    "control_weights": {
+      "holding_tip_speed_weight": 0.1,
+      "terminal_tip_speed_weight": 0.1
+    },
+    "family_space_identity": "6f36c2b7cc870ca0298f56c9c940103f8b7ef19ee542c6b5fefd710abc58af90",
+    "route_overrides": {},
+    "segment_count": 2,
+    "segments": {
+      "0": {
+        "cells": 12,
+        "length_m": 0.195,
+        "sections": [
+          {
+            "angle_rad": 0.35,
+            "holes_yz_m": [],
+            "kind": "ellipse",
+            "outer_yz_m": [],
+            "parameters": {
+              "semi_y_m": 0.01175,
+              "semi_z_m": 0.0076
+            }
+          }
+        ],
+        "young_pa": 10450000.0
+      },
+      "1": {
+        "cells": 12,
+        "length_m": 0.11,
+        "sections": [
+          {
+            "angle_rad": -0.25,
+            "holes_yz_m": [],
+            "kind": "rectangle",
+            "outer_yz_m": [],
+            "parameters": {
+              "height_z_m": 0.0095,
+              "width_y_m": 0.0133
+            }
+          },
+          {
+            "angle_rad": 0.15000000000000002,
+            "holes_yz_m": [],
+            "kind": "rectangle",
+            "outer_yz_m": [],
+            "parameters": {
+              "height_z_m": 0.0095,
+              "width_y_m": 0.0133
+            }
+          }
+        ],
+        "young_pa": 5400000.0
+      }
+    },
+    "spans": [
+      {
+        "anchor_angle_offset_rad": 0.0,
+        "anchor_s": 1.0,
+        "angular_offsets_rad": [
+          0.0
+        ],
+        "count": 1,
+        "first_segment": 0,
+        "guide_angle_offset_rad": 0.0,
+        "guide_s": [
+          0.5
+        ],
+        "last_segment": 1,
+        "phase_rad": 3.141592653589793,
+        "radius_m": 0.018
+      },
+      {
+        "anchor_angle_offset_rad": 0.0,
+        "anchor_s": 1.0,
+        "angular_offsets_rad": [
+          0.0
+        ],
+        "count": 1,
+        "first_segment": 0,
+        "guide_angle_offset_rad": 0.0,
+        "guide_s": [
+          0.5
+        ],
+        "last_segment": 1,
+        "phase_rad": 4.71238898038469,
+        "radius_m": 0.018
+      },
+      {
+        "anchor_angle_offset_rad": 0.0,
+        "anchor_s": 1.0,
+        "angular_offsets_rad": [
+          0.0
+        ],
+        "count": 1,
+        "first_segment": 0,
+        "guide_angle_offset_rad": 0.0,
+        "guide_s": [
+          0.5
+        ],
+        "last_segment": 1,
+        "phase_rad": 0.0,
+        "radius_m": 0.018
+      },
+      {
+        "anchor_angle_offset_rad": 0.0,
+        "anchor_s": 1.0,
+        "angular_offsets_rad": [
+          0.0
+        ],
+        "count": 1,
+        "first_segment": 0,
+        "guide_angle_offset_rad": 0.0,
+        "guide_s": [
+          0.5
+        ],
+        "last_segment": 1,
+        "phase_rad": 1.5707963267948966,
+        "radius_m": 0.018
+      }
+    ],
+    "strategy": "polar_consecutive_spans_v1",
+    "tendon_count": 4,
+    "tendon_parameters": {},
+    "version": "serial_family_generation_v2"
+  },
+  "control_kind": "open_loop_explicit_tendon_tensions",
+  "execution_mode": "ideal_tension",
+  "units": "N",
+  "input_phase": "held over each pre-step control interval",
+  "configuration_file": "evidence/s6_3/best_control.json#/configuration",
+  "trajectory": {
+    "design_identity": "10035885ded80b7afbf2faa28988c6275a18ac04f3232c5d0972acced81af9ad",
+    "model_identity": "8f8eceb5f74d4b171c87f333db4db0f353aad051b375ff26aca795f7ac1fbaf2",
+    "task_identity": "882b3493037dcc8f8da294b3473e1223f0465e92c35bc3064bfc42d467bf212e",
+    "tendon_order": [
+      "tendon_0",
+      "tendon_1",
+      "tendon_2",
+      "tendon_3"
+    ],
+    "tensions_n": [
+      [
+        1.3759336008899605e-16,
+        1.8517747327468543,
+        8.0,
+        7.984037604164508
+      ],
+      [
+        3.430545382191524,
+        3.4729860719029144,
+        7.9991552946970845,
+        7.980052045432353
+      ],
+      [
+        4.546632723650678,
+        2.2403329202409514,
+        6.012279614281155,
+        5.527114569885663
+      ],
+      [
+        5.562824275192771,
+        1.4469725767630728,
+        5.170228079613397,
+        3.9460406665548358
+      ],
+      [
+        6.129234117678781,
+        0.7536050719620306,
+        4.8760822866922515,
+        2.8380969039937525
+      ],
+      [
+        6.030290860896687,
+        0.07053921825060908,
+        4.539253495326954,
+        2.0488055267570497
+      ],
+      [
+        5.146827464189751,
+        0.023693601675022793,
+        3.7317184350652335,
+        2.0331494221017805
+      ],
+      [
+        4.354787668345093,
+        0.02619410471373602,
+        3.19428467297151,
+        2.0918161747419015
+      ],
+      [
+        3.7908646332449956,
+        0.028694607752449246,
+        3.005609986443828,
+        2.1244745084394316
+      ],
+      [
+        3.400996798274875,
+        0.03119511079116247,
+        3.0552026002717123,
+        2.1309597688963167
+      ],
+      [
+        3.10619173011266,
+        0.0336956138298757,
+        3.2080554976050224,
+        2.1236018112060395
+      ],
+      [
+        2.724861399769467,
+        0.17428981522580553,
+        3.232956265143134,
+        2.2505807079845326
+      ],
+      [
+        2.279267869087793,
+        0.4205250129533478,
+        3.1191431203178945,
+        2.4779636459326433
+      ],
+      [
+        1.8364015444244985,
+        0.7153241711617796,
+        2.918283109220523,
+        2.747233332566011
+      ],
+      [
+        1.4473803729990622,
+        1.0177588710852112,
+        2.6815248781003347,
+        3.016376894921133
+      ],
+      [
+        1.1497979086317653,
+        1.2940696604065667,
+        2.4533353306289603,
+        3.2519279858555286
+      ],
+      [
+        0.9571916233636139,
+        1.5243047095443025,
+        2.2622347626984607,
+        3.436324867352149
+      ],
+      [
+        0.8644297729874625,
+        1.6994482712737555,
+        2.120147574138537,
+        3.562833364553922
+      ],
+      [
+        0.8548144144102418,
+        1.8285512527933194,
+        2.028601689675224,
+        3.633198987469873
+      ],
+      [
+        1.0721892138112314,
+        1.6144487983404352,
+        2.1679328673610607,
+        3.4474037088723004
+      ],
+      [
+        1.24653639942344,
+        1.5098005753781332,
+        2.250711494729982,
+        3.3219342387189004
+      ],
+      [
+        1.4352288030816918,
+        1.4442330818901354,
+        2.337897599004557,
+        3.228179814150519
+      ],
+      [
+        1.590490244002434,
+        1.3831692974925283,
+        2.4016867663242722,
+        3.150001301647985
+      ],
+      [
+        1.6818545928016138,
+        1.3345376690641786,
+        2.4256880024823433,
+        3.08850690234132
+      ],
+      [
+        1.7176071185916515,
+        1.3135275221588774,
+        2.4131372100072404,
+        3.0265575345629006
+      ],
+      [
+        1.7435229127113459,
+        1.3330462308076743,
+        2.3873780881352995,
+        2.95963515679603
+      ],
+      [
+        1.8179967279644416,
+        1.364498092489998,
+        2.403470586895217,
+        2.87291494487288
+      ],
+      [
+        2.164836294519889,
+        1.320677281532773,
+        2.8974961127043857,
+        3.227550025437322
+      ],
+      [
+        1.967474614347816,
+        1.2690744860027574,
+        2.648189323560726,
+        3.0273998762229586
+      ],
+      [
+        1.6579232603389735,
+        1.2990471397613677,
+        2.371113197494052,
+        3.1309461518153316
+      ],
+      [
+        1.3239881259059623,
+        1.4085896219059395,
+        2.075645580445531,
+        3.3169569001131958
+      ],
+      [
+        1.0837402813498709,
+        1.5539990175647562,
+        1.850477753446764,
+        3.4692830224647078
+      ],
+      [
+        1.1611331553722344,
+        1.697876096505786,
+        1.8901207889587914,
+        3.4568708241475656
+      ],
+      [
+        2.195815719292212,
+        2.0837242909587355,
+        2.8399750741830716,
+        3.2720589939065707
+      ],
+      [
+        2.1958358945497523,
+        2.083362450382502,
+        2.840037229186948,
+        3.272496033839244
+      ]
+    ],
+    "times_s": [
+      0.0,
+      0.01,
+      0.02,
+      0.03,
+      0.04,
+      0.05,
+      0.06,
+      0.07,
+      0.08,
+      0.09,
+      0.1,
+      0.11,
+      0.12,
+      0.13,
+      0.14,
+      0.15,
+      0.16,
+      0.17,
+      0.18,
+      0.19,
+      0.2,
+      0.21,
+      0.22,
+      0.23,
+      0.24,
+      0.25,
+      0.26,
+      0.27,
+      0.28,
+      0.29,
+      0.3,
+      0.31,
+      0.32,
+      0.33,
+      0.34,
+      0.35000000000000003
+    ]
+  },
+  "acceptance": {
+    "accepted": true,
+    "components": {
+      "evaluation_validity": {
+        "limit": null,
+        "passed": true,
+        "reason": null,
+        "unit": null,
+        "value": "valid"
+      },
+      "evaluator:task_bound": {
+        "limit": 0.01,
+        "passed": true,
+        "reason": null,
+        "unit": "m",
+        "value": 0.0054392057526873525
+      },
+      "execution_complete": {
+        "limit": null,
+        "passed": true,
+        "reason": null,
+        "unit": null,
+        "value": true
+      },
+      "force_bounds": {
+        "limit": 1e-08,
+        "passed": true,
+        "reason": null,
+        "unit": "N",
+        "value": 0.0
+      },
+      "holding_coverage": {
+        "limit": 6,
+        "passed": true,
+        "reason": null,
+        "unit": "inclusive uniform samples",
+        "value": true
+      },
+      "holding_position": {
+        "limit": 0.01,
+        "passed": true,
+        "reason": null,
+        "unit": "m",
+        "value": 0.0054392057526873525
+      },
+      "holding_speed": {
+        "limit": 0.02,
+        "passed": true,
+        "reason": null,
+        "unit": "m/s",
+        "value": 0.019977863170385274
+      },
+      "solver_errors": {
+        "limit": 0,
+        "passed": true,
+        "reason": null,
+        "unit": "count",
+        "value": 0
+      },
+      "task_evaluator": {
+        "limit": null,
+        "passed": true,
+        "reason": null,
+        "unit": null,
+        "value": true
+      }
+    },
+    "continuous_time_guarantee": false,
+    "contract": "research.task_acceptance",
+    "evaluator_tension_channels": null,
+    "evidence_binding": {
+      "evaluation": {
+        "artifact_id": "b469155004cd1fc781360848af1f93d4914809a95016c4ce3fa90e64d4d8a8c9",
+        "media_type": "application/json"
+      },
+      "evaluation_binding": {
+        "original_execution_id": null,
+        "source": {
+          "artifact_id": "1c7b082add3109b9e79eb927fb58e5bc2e8a2ef2a4fe2b320669ed0471fbe2a9",
+          "media_type": "application/json"
+        },
+        "source_execution_id": null
+      },
+      "profile": null,
+      "profile_binding": {
+        "evaluation": {
+          "artifact_id": "b469155004cd1fc781360848af1f93d4914809a95016c4ce3fa90e64d4d8a8c9",
+          "media_type": "application/json"
+        },
+        "execution_id": "e5f5047fdfc146a4877d7e7c3d4984d6",
+        "simulation": {
+          "artifact_id": "1c7b082add3109b9e79eb927fb58e5bc2e8a2ef2a4fe2b320669ed0471fbe2a9",
+          "media_type": "application/json"
+        }
+      },
+      "simulation": {
+        "artifact_id": "1c7b082add3109b9e79eb927fb58e5bc2e8a2ef2a4fe2b320669ed0471fbe2a9",
+        "media_type": "application/json"
+      }
+    },
+    "execution_id": "e5f5047fdfc146a4877d7e7c3d4984d6",
+    "issues": [],
+    "metrics": {
+      "holding_max_error_m": 0.0054392057526873525,
+      "holding_max_speed_m_s": 0.019977863170385274,
+      "terminal_error_m": 0.0054392057526873525
+    },
+    "missing": [],
+    "protocol_id": "offline_reach_hold_v1",
+    "sources": {
+      "evaluation": {
+        "artifact_id": "b469155004cd1fc781360848af1f93d4914809a95016c4ce3fa90e64d4d8a8c9",
+        "media_type": "application/json"
+      },
+      "profile": null
+    },
+    "status": "accepted",
+    "task_family": "task.reach",
+    "task_identity": "882b3493037dcc8f8da294b3473e1223f0465e92c35bc3064bfc42d467bf212e",
+    "timing": {
+      "control_period_s": 0.01,
+      "deadline_misses": null,
+      "duration_s": 0.35,
+      "mean_update_s": null,
+      "real_time_demonstrated": null,
+      "real_time_required": false,
+      "sample_period_s": 0.01,
+      "simulation_wall_s": null,
+      "termination": [
+        "duration",
+        "numerical_failure"
+      ],
+      "timestep_s": 0.0005
+    },
+    "version": "1.0.0"
+  },
+  "holding_samples": [
+    {
+      "time_s": 0.3,
+      "position_error_m": 0.005400848288437444,
+      "speed_m_s": 0.019977863170385274
+    },
+    {
+      "time_s": 0.31,
+      "position_error_m": 0.005367155130493574,
+      "speed_m_s": 0.013483061600666684
+    },
+    {
+      "time_s": 0.32,
+      "position_error_m": 0.005298472749807964,
+      "speed_m_s": 0.009382691468111102
+    },
+    {
+      "time_s": 0.33,
+      "position_error_m": 0.005237558422159492,
+      "speed_m_s": 0.01989053167523533
+    },
+    {
+      "time_s": 0.34,
+      "position_error_m": 0.0052882210333814236,
+      "speed_m_s": 0.011887499757896047
+    },
+    {
+      "time_s": 0.35000000000000003,
+      "position_error_m": 0.0054392057526873525,
+      "speed_m_s": 0.019062396582407153
+    }
+  ],
+  "discovery": {
+    "origin": "real_model_selected_control_search",
+    "label": "finite_difference",
+    "coefficients_n": [
+      0.0,
+      0.01,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "optimizer_proposal": false,
+    "margin_setting_did_not_generate_this_finite_difference_probe": true
+  },
+  "scope": "One fresh independent registered MuJoCo sampled-task pass; no NMPC/RL feedback, hardware, repeatability, robustness or continuous-time claim"
+}

@@ -52,7 +52,7 @@ class ContractTests(unittest.TestCase):
         np.testing.assert_allclose(result-ref,(basis@x.ravel()).reshape(20,3))
 
     def test_window_and_horizon_validation(self):
-        for options in [dict(knots_s=[.1,.2]),dict(version='local_control_search_v2',knots_s=[.1,.2],correction_window_s=[.11,.2])]:
+        for options in [dict(knots_s=[.1,.2]),dict(version='local_control_search_v2',knots_s=[-.1,.2]),dict(version='local_control_search_v2',knots_s=[.1,.2],correction_window_s=[.11,.2])]:
             with self.assertRaises(ValueError):LocalControlSearchSettings(**options)
         with self.assertRaises(ValueError):search([start()],Mock(),dict(version='local_control_search_v2',knots_s=[0,1]))
 
@@ -184,6 +184,8 @@ class HistoryTests(unittest.TestCase):
                 current=context(host)
             dispatch.assert_not_called()
             best=current['best_valid'];self.assertTrue(best['historical_only']);self.assertFalse(best['task_gap']['accepted'])
+            self.assertEqual(current['method_remaining']['mathematical_evaluations'],8)
+            self.assertEqual(current['rl_accounting']['admitted'],0)
             self.assertAlmostEqual(best['task_gap']['normalized_gap'],.054502039,places=8)
             self.assertEqual([round(v['time_s'],2) for v in best['violations']['samples']],[.3,.33])
             self.assertEqual(before,host.store.remaining());self.assertEqual(before['used']['backend_solves'],0)
@@ -204,6 +206,9 @@ class HistoryTests(unittest.TestCase):
             self.assertEqual(output['result']['best']['reference'],entry['reference'])
             self.assertEqual(output['result'],again['result'])
             self.assertEqual(host.store.remaining()['used']['tool_calls'],1)
+            from tools.research.state import update
+            update(host,research_status='stopped')
+            self.assertEqual(context(host)['actions'],[])
 
 
 if __name__=='__main__':unittest.main()

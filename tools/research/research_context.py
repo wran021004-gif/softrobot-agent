@@ -61,7 +61,7 @@ def observation(host,ref,historical=False):
 def context(host):
     from tools.research.candidate_portfolio import ranking_key
     from tools.research_tasks import task_adapter
-    from tools.research.budget import protected, closeout_operations
+    from tools.research.budget import protected, closeout_operations, stage_usage
     s=state(host);spec=s['spec']
     rows=[observation(host,e['reference'],True) for e in s.get('research_history',[])]
     rows += [observation(host,r) for r in [*s.get('results',[]),*s.get('physical_replays',[]),*s.get('rl_evaluations',[])]]
@@ -89,6 +89,14 @@ def context(host):
         control_search_starts=[dict(candidate=e['candidate'],source=e['source'],historical_observation=e['reference'],
             ownership='Current executable candidate; observation retains sealed historical ownership') for e in sorted(
                 s.get('research_history',[]),key=lambda e:ranking_key(dict(task_gap=task_gap(host.store.artifact(e['reference'])))))],
-        actions=closeout_operations(host)['research_plan'] if protected(host) else spec['allowed_plan_actions'],
+        actions=[] if s['research_status']=='stopped' else closeout_operations(host)['research_plan'] if protected(host) else spec['allowed_plan_actions'],
         budget=host.store.remaining(),completed_decisions=s.get('plans',[]),
-        control_search_usage='action=control_search, control_search={candidate,source,settings,adaptation_from?}; decision fields required. v2 dimensions come from schedule. Optional correction_window_s masks all changes outside the window. Full original task always evaluated.')
+        method_limits=dict(mathematical_evaluations=spec['budgets']['mathematical_evaluations'],offline_nlp=spec['budgets']['offline_nlp'],
+            bdf_replays=spec['budgets']['bdf_replays'],nmpc=spec['nmpc_limits'],rl=spec['rl_limits']),
+        method_used={k:s.get(k,0) for k in ('mathematical_evaluations','offline_nlp','bdf_replays','nmpc_launches','admitted_training_stages','physical_replay_launches')},
+        method_remaining={k:max(0,total-used) for k,total,used in (
+            ('mathematical_evaluations',spec['budgets']['mathematical_evaluations'],s.get('mathematical_evaluations',0)),
+            ('offline_nlp',spec['budgets']['offline_nlp'],s.get('offline_nlp',0)),('bdf_replays',spec['budgets']['bdf_replays'],s.get('bdf_replays',0)),
+            ('nmpc',spec['nmpc_limits']['executions'],s.get('nmpc_launches',0)),('rl_stages',spec['rl_limits']['training_stages'],s.get('admitted_training_stages',0)))},
+        rl_accounting=stage_usage(s),
+        control_search_usage='action=control_search, control_search={candidate,source,settings,adaptation_from?}; decision fields required. v2 dimensions come from schedule. Optional correction_window_s masks all changes outside the window. Current optimizer supports registered reach-hold norm constraints only; other tasks return unsupported. Full original task always evaluated.')

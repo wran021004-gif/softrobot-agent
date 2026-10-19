@@ -237,8 +237,8 @@ class LocalControlSearchSettings(Contract):
             raise ValueError('SAFETY_MARGIN_REQUIRES_V2_SEARCH')
         if self.method=='pattern' and self.safety_margin_fraction!=0:
             raise ValueError('SAFETY_MARGIN_REQUIRES_RESPONSE_METHOD')
-        if (self.version=='local_control_search_v1' and self.knots_s[0]!=0) or any(b<=a for a,b in zip(self.knots_s,self.knots_s[1:])):
-            raise ValueError('ORDERED_KNOTS_STARTING_AT_ZERO_REQUIRED')
+        if self.knots_s[0]<0 or (self.version=='local_control_search_v1' and self.knots_s[0]!=0) or any(b<=a for a,b in zip(self.knots_s,self.knots_s[1:])):
+            raise ValueError('ORDERED_KNOTS_STARTING_AT_ZERO_REQUIRED' if self.version=='local_control_search_v1' else 'ORDERED_NONNEGATIVE_KNOTS_REQUIRED')
         if self.correction_window_s is not None:
             a,b=self.correction_window_s
             if self.version!='local_control_search_v2' or not 0<=a<=self.knots_s[0]<self.knots_s[-1]<=b or a>=b:
