@@ -60,8 +60,9 @@ def record(folder, reference, diagnostic=None):
         historical_status='original_task_passed' if gap['valid_complete'] and gap['accepted'] else
             'valid_task_failure' if gap['valid_complete'] else 'invalid_or_incomplete_execution',
         replay_status='replay_unavailable',rejection_reasons=[],schedule=None,
-        cost=dict(numerical_s=result.get('charged_numerical_s',result.get('evaluation_elapsed_s')),
-            execution=result.get('execution',{}).get('cost')),
+        cost=dict(numerical_s=result.get('charged_numerical_s',result.get('evaluation_elapsed_s',result.get('numerical_s'))),
+            source_pointer='/charged_numerical_s' if 'charged_numerical_s' in result else
+                '/evaluation_elapsed_s' if 'evaluation_elapsed_s' in result else '/numerical_s'),
         lineage=candidate.get('provenance'),source_hash=reference['artifact_id'])
     try:
         if scene['control']['tension_execution_mode']!='ideal_tension':raise ValueError('IDEAL_TENSION_REQUIRED')

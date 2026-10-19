@@ -97,13 +97,15 @@ def main():
     parser=argparse.ArgumentParser();parser.add_argument('--stage',choices=['p0','p1'],default='p0')
     parser.add_argument('--audit-only',action='store_true');args=parser.parse_args()
     destination=ROOT/f'evidence/control_search_{args.stage}';before=source_hashes()
-    rows=historical_records();atomic_json(destination/'portfolio.json',portfolio(rows))
+    rows=historical_records()
     if args.audit_only:
+        atomic_json(destination/'portfolio.json',portfolio(rows))
         atomic_json(destination/'source_audit.json',dict(before=before,after=source_hashes(),unchanged=before==source_hashes()))
         print(json.dumps([(r['source_result']['artifact_id'][:8],r['replay_status'],r['rejection_reasons']) for r in rows]));return
     host=core.prepare(ROOT/f'configs/research/study_control_search_{args.stage}.json')
     if state(host)['research_status']=='stopped':print('sealed; no science relaunched');return
     if 'freeze' not in state(host):core.bind(host)
+    atomic_json(destination/'portfolio.json',portfolio(rows))
     if state(host).get('pending'):raise ValueError('RECOVER_EXISTING_STUDY_BEFORE_RESUMING')
     if args.stage=='p1':
         summary=run_search(host,rows,destination);after=source_hashes()
