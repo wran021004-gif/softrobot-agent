@@ -92,10 +92,11 @@ def initialize_schedule(configuration, source, parent):
             inherited_acceptance=False,source_provenance=source['provenance']))
 
 
-def seed_control(host, request, operation_key=None):
+def seed_control(host, request, operation_key=None, plan=None):
     """Candidate-owned bounded inputs; explicit ZOH time/channel transfer or pretension."""
     started=time.perf_counter()
     try:
+        if request.method!='baseline':return guided_seed(host,request,operation_key,plan)
         return _seed_control(host,request,operation_key)
     finally:
         elapsed=time.perf_counter()-started;s=state(host)
@@ -140,6 +141,74 @@ def _seed_control(host,request,operation_key):
     source=save(host,dict(source_kind='explicit_control_schedule_v1',task_acceptance='unmeasured',
         trajectory=trajectory,provenance=provenance),'candidate_control_initialization')
     entry=dict(candidate=plain(request.candidate),source=source,task_acceptance='unmeasured')
+    update(host,control_initializations=[*state(host).get('control_initializations',[]),entry])
+    return entry
+
+
+def guided_seed(host,request,key,plan):
+    """Resolve trusted local evidence or charge complete public MuJoCo probes."""
+    from copy import deepcopy
+    from tools.research.control_seed import directed_inputs
+    from tools.research.feedback import task_gap
+    from tools.research.budget import backend_capacity, protected
+    cfg=verify_candidate(host,request.candidate)['configuration']
+    if cfg['task']['family']!='task.reach':raise ValueError('NOT_APPLICABLE_SEED_REQUIRES_ENDPOINT_TARGET')
+    baseline=_seed_control(host,request.model_copy(update={'method':'baseline'}),key)
+    source=host.store.artifact(baseline['source']);tr=source['trajectory'];order=tr['tendon_order']
+    channels=request.channels or order
+    if not set(channels)<=set(order):raise ValueError('SEED_CHANNEL_OUTSIDE_CANDIDATE')
+    indices=[order.index(c) for c in channels]
+    limits=np.array([{t['id']:t['force_limit_n'] for t in cfg['robot']['structure']['data']['tendons']}[c] for c in order])
+    u=np.asarray(tr['tensions_n']);evidence=[];calls=[]
+    if request.method=='mathematical_response':
+        if plain(request.response_evidence) not in state(host).get('analysis_results',[]):raise ValueError('REGISTERED_CURRENT_ANALYSIS_REQUIRED')
+        analysis=host.store.artifact(request.response_evidence);sensitivity=analysis.get('sensitivity') or {}
+        model=analysis.get('model') or {}
+        if (analysis.get('status')!='computed' or analysis.get('operation')!='input_sensitivity'
+                or analysis['candidate']!=plain(request.candidate) or not sensitivity.get('verification',{}).get('passed')
+                or model.get('binding',{}).get('tendon_order')!=order):
+            raise ValueError('VERIFIED_CANDIDATE_INPUT_SENSITIVITY_REQUIRED')
+        u=np.tile(model['u0'],(len(u),1));position=np.asarray(model['y0']);response=np.asarray(sensitivity['dp_du'])
+        evidence=[plain(request.response_evidence)]
+    else:
+        required=len(indices)+1
+        if required>request.evaluation_requests or required>backend_capacity(host):raise ValueError('INSUFFICIENT_SHARED_BUDGET_FOR_SEED_RESPONSE')
+        if plan is None:raise ValueError('PHYSICAL_RESPONSE_REQUIRES_PUBLIC_PLAN')
+        def factory(action,**payload):
+            value={k:getattr(plan,k) for k in ('hypothesis','supporting_evidence','expected_observation','weakening_observation','fixed_conditions','stopping_condition','interpretation')}
+            decision=plain(plan.decision);decision.update(research_intent='PHYSICAL_VALIDATION',requested_budget=1)
+            return dict(value,action=action,decision=decision,**payload)
+        response=np.zeros((3,len(order)))
+        for j in [None,*indices]:
+            if protected(host):raise ValueError('PROTECTED_BUDGET_BLOCKS_SEED_PROBES')
+            trial=deepcopy(source)
+            if j is not None:
+                h=min(request.difference_step_n,float(np.min(limits[j]-u[:,j])))
+                if h<1e-10:h=-min(request.difference_step_n,float(np.min(u[:,j])))
+                if abs(h)<1e-10:return dict(status='no_input_room',candidate=plain(request.candidate),source=baseline['source'])
+                moved=u.copy();moved[:,j]+=h;trial['trajectory']['tensions_n']=moved.tolist()
+            result,cached=evaluate_schedule(host,request.candidate,trial,factory,origin='model')
+            evidence.append(result['reference']);calls.append(dict(reference=result['reference'],cache_hit=cached))
+            gap=task_gap(result)
+            if gap['accepted']:return dict(status='first_original_task_pass',evaluation=result['reference'],candidate=plain(request.candidate),source=result['source_reference'])
+            if not gap['valid_complete']:return dict(status='invalid_physical_response',evidence=evidence)
+            raw=host.store.artifact(result['raw_reference']);endpoint=np.asarray(raw['samples'][-1]['tip_m'])
+            if j is None:position=endpoint
+            else:response[:,j]=(endpoint-position)/h
+    fit=directed_inputs(u[:,indices],response[:,indices],np.asarray(cfg['task']['goal']['data']['target_m'])-position,
+        limits[indices],request.trust_radius_n,request.regularization)
+    provenance=dict(control_initialization=request.method,candidate=plain(request.candidate),evidence=evidence,
+        task_identity=tr['task_identity'],model_identity=tr['model_identity'],operating_position_m=position.tolist(),
+        channel_order=channels,settings=plain(request),response_diagnostic={k:v for k,v in fit.items() if k!='inputs'},
+        physical_requests=calls,new_physical_evaluations=sum(not c['cache_hit'] for c in calls),
+        limitations='Local constant input response; static mathematics and terminal physics do not certify dynamic holding constraints',
+        inherited_acceptance=False,operation_key=key)
+    diagnostic=save(host,provenance,'control_seed_response_diagnostic')
+    if fit['status']!='generated':return dict(status=fit['status'],diagnostic=diagnostic,candidate=plain(request.candidate))
+    u[:,indices]=fit['inputs'];source['trajectory']['tensions_n']=u.tolist();source['provenance']=provenance
+    binding(cfg,source['trajectory'])
+    source_ref=save(host,source,'candidate_directed_initialization')
+    entry=dict(candidate=plain(request.candidate),source=source_ref,task_acceptance='unmeasured',diagnostic=diagnostic,method=request.method)
     update(host,control_initializations=[*state(host).get('control_initializations',[]),entry])
     return entry
 

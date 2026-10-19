@@ -401,7 +401,7 @@ def dispatch(host, value, request_id, origin='model'):
     try:
         if plan.action=='initialize_control':
             from tools.research.physical_replay import seed_control
-            result=seed_control(host,plan.control_seed,request_id)
+            result=seed_control(host,plan.control_seed,request_id,plan)
         elif plan.action=='generate':
             from tools.research.design import generate_candidate
             result=generate_candidate(host,plan.generation,dict(origin=origin,plan=ref))

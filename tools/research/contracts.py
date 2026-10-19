@@ -1,6 +1,6 @@
 """Native business fields for the bounded reach-and-hold research entry."""
 from typing import Literal
-from pydantic import Field, FiniteFloat, model_validator, model_serializer
+from pydantic import Field, FiniteFloat, StrictInt, model_validator, model_serializer
 from schemas.common import Contract
 from schemas.platform import EvidenceRef
 from schemas.platform_analysis import TaskAnalysisProtocol
@@ -230,16 +230,21 @@ class LocalControlSearchSettings(Contract):
     minimum_radius_n: FiniteFloat = Field(default=.0001,gt=0)
     evaluation_requests: int = Field(default=24,ge=1,le=1000,strict=True)
     iterations: int = Field(default=16,ge=1,le=100,strict=True)
+    active_coefficients: list[StrictInt] | None = Field(default=None,min_length=1,description='Unique flat knot-major coefficient indices; omitted selects all. Each inactive offset remains exactly zero.')
 
     @model_serializer(mode='wrap')
     def preserve_legacy_settings(self,handler):
         result=handler(self)
-        for key in ('version','correction_window_s','safety_margin_fraction'):
+        for key in ('version','correction_window_s','safety_margin_fraction','active_coefficients'):
             if key not in self.model_fields_set:result.pop(key,None)
         return result
 
     @model_validator(mode='after')
     def domain(self):
+        if self.active_coefficients is not None and (self.version!='local_control_search_v2'
+                or any(type(i) is not int or i<0 for i in self.active_coefficients)
+                or len(set(self.active_coefficients))!=len(self.active_coefficients)):
+            raise ValueError('UNIQUE_NONNEGATIVE_V2_ACTIVE_COEFFICIENTS_REQUIRED')
         if self.version=='local_control_search_v1' and self.safety_margin_fraction!=0:
             raise ValueError('SAFETY_MARGIN_REQUIRES_V2_SEARCH')
         if self.method=='pattern' and self.safety_margin_fraction!=0:
@@ -297,11 +302,21 @@ class NMPCPredictionDiagnostic(Contract):
     substeps: Literal[1,4,8,16,32]
 
 
-class ControlSearchRequest(Contract):
+class ControlSearchStart(Contract):
     candidate: EvidenceRef
     source: EvidenceRef
-    settings: LocalControlSearchSettings
     adaptation_from: EvidenceRef | None = None
+
+
+class ControlSearchRequest(ControlSearchStart):
+    settings: LocalControlSearchSettings
+    additional_starts: list[ControlSearchStart] = Field(default_factory=list,max_length=7)
+
+    @model_serializer(mode='wrap')
+    def preserve_single_start(self,handler):
+        result=handler(self)
+        if not self.additional_starts:result.pop('additional_starts',None)
+        return result
 
 
 class ControlSeedRequest(Contract):
@@ -310,9 +325,27 @@ class ControlSeedRequest(Contract):
     parent: EvidenceRef | None = None
     channel_map: dict[str, str] | None = None
     tensions_n: list[list[FiniteFloat]] | None = None
+    method: Literal['baseline','mathematical_response','physical_response'] = 'baseline'
+    response_evidence: EvidenceRef | None = None
+    channels: list[str] | None = Field(default=None,min_length=1)
+    difference_step_n: FiniteFloat = Field(default=.02,gt=0)
+    trust_radius_n: FiniteFloat = Field(default=.2,gt=0)
+    regularization: FiniteFloat = Field(default=.000001,gt=0)
+    evaluation_requests: int = Field(default=8,ge=1,le=64,strict=True)
+
+    @model_serializer(mode='wrap')
+    def preserve_baseline(self,handler):
+        result=handler(self)
+        for key in ('method','response_evidence','channels','difference_step_n','trust_radius_n','regularization','evaluation_requests'):
+            if key not in self.model_fields_set:result.pop(key,None)
+        return result
 
     @model_validator(mode='after')
     def paired_source(self):
+        if (self.method=='mathematical_response')!=(self.response_evidence is not None):
+            raise ValueError('MATHEMATICAL_SEED_REQUIRES_REGISTERED_RESPONSE_EVIDENCE')
+        if self.channels is not None and len(set(self.channels))!=len(self.channels):
+            raise ValueError('UNIQUE_SEED_CHANNELS_REQUIRED')
         if (self.source is None) != (self.parent is None):
             raise ValueError('CONTROL_SOURCE_REQUIRES_EXACT_PARENT')
         if self.channel_map is not None and self.source is None:
