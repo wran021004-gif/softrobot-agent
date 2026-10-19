@@ -33,7 +33,11 @@ def read_evidence(host, query):
     for part in q.pointer.strip('/').split('/') if q.pointer else []:
         part = part.replace('~1', '/').replace('~0', '~')
         value = value[int(part)] if isinstance(value, list) else value[part]
-    if q.view=='summary':
+    if q.view=='capabilities':
+        from extensions.tendon_family.family_space import parameter_capabilities
+        if q.pointer or 'parameters' not in value:raise ValueError('CAPABILITIES_VIEW_REQUIRES_WHOLE_CANDIDATE')
+        value=parameter_capabilities(s['spec']['family_space'],value['parameters'])
+    elif q.view=='summary':
         from tools.research.research_context import compact_evidence
         value=compact_evidence(value,plain(q.reference),q.pointer)
     elif q.view=='fields':

@@ -54,6 +54,7 @@ class S7IntakeTests(unittest.TestCase):
         before=state(self.host);import_history(self.host);self.assertEqual(before,state(self.host))
 
     def test_conditional_capabilities_and_inactive_servo(self):
+        from tools.research.agent import read_tool_evidence
         request=deepcopy(self.candidate['parameters']);request.update(segment_count=1,tendon_count=3,segments={})
         request['spans']=[];request['route_overrides']={}
         rows=parameter_capabilities(self.spec['family_space'],request)
@@ -61,6 +62,10 @@ class S7IntakeTests(unittest.TestCase):
         self.assertFalse(any('segments.1.' in i or 'route_overrides.3' in i for i in ids))
         self.assertTrue(any(i.endswith('density_kg_m3') for i in ids))
         self.assertFalse(next(r for r in rows if r['parameter_id']=='tendon_parameters.length_servo_gain_n_m')['effective_in_current_execution'])
+        actual=read_tool_evidence(self.host,dict(reference=self.entry['candidate'],view='capabilities'))
+        self.assertTrue(any(r['parameter_id']=='segments.1.physical_parameters.density_kg_m3' for r in actual))
+        with self.assertRaisesRegex(ValueError,'WHOLE_CANDIDATE'):
+            core.read_evidence(self.host,dict(reference=self.entry['candidate'],pointer='/parameters',view='capabilities'))
 
     def test_material_edits_affect_compiled_mass_stiffness_and_rest_pose(self):
         cfg=self.candidate['configuration'];_,base_physics,_,base_spec=model_context(cfg)
