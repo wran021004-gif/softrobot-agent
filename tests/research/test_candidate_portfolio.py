@@ -1,6 +1,7 @@
 """Synthetic fixtures only: no simulator, MATLAB or archive loads."""
 from copy import deepcopy
 import unittest
+from unittest.mock import patch
 import numpy as np
 from tools.research.holding_diagnostic import applied_schedule
 from tools.research.candidate_portfolio import portfolio, ranking_key, compatible_schedule
@@ -22,7 +23,8 @@ class CandidatePortfolioTests(unittest.TestCase):
         self.assertEqual(applied_schedule([initial,*self.rows],**self.options),applied_schedule(self.rows,**self.options))
 
     def test_missing_duplicate_shifted_index_and_start_rejected(self):
-        for field,value in [('time_s',.012),('control_update_index',1),('control_start_s',.001)]:
+        for field,value in [('time_s',.012),('control_update_index',1),('control_start_s',.001),
+                ('time_s',float('nan')),('control_start_s',float('nan')),('engine_time_s',.1),('engine_time_s',float('nan'))]:
             rows=deepcopy(self.rows);rows[0][field]=value
             with self.subTest(field=field),self.assertRaises(ValueError):applied_schedule(rows,**self.options)
         with self.assertRaises(ValueError):applied_schedule(self.rows[:-1],**self.options)
@@ -66,6 +68,22 @@ class CandidatePortfolioTests(unittest.TestCase):
             compatible_schedule(dict(replay_status='replay_unavailable'),{})
         with self.assertRaisesRegex(ValueError,'ROBOT_OR_TASK'):
             compatible_schedule(dict(replay_status='pending_independent_replay',robot_identity='other'),dict(robot={},task={}))
+
+    def test_same_robot_changed_integrator_or_seed_does_not_transfer(self):
+        from tools.research.physical_replay import schedule_identity
+        from tools.state_io import digest
+        from tests.research.test_local_control_search import start
+        cfg=dict(robot={},task={},seed=17,policy={k:{} for k in ('backend','discretization','dynamics_model')})
+        schedule=start()['schedule']
+        row=dict(replay_status='pending_independent_replay',robot_identity=digest({}),task_identity=digest({}),
+            bound_schedule_identity=schedule_identity(cfg,schedule['trajectory']),schedule=schedule)
+        with patch('tools.research.physical_replay.binding'):
+            self.assertEqual(compatible_schedule(row,cfg),schedule)
+        for field in ('seed','backend','discretization'):
+            changed=deepcopy(cfg)
+            if field=='seed':changed[field]=18
+            else:changed['policy'][field]={'changed':True}
+            with self.assertRaisesRegex(ValueError,'PHYSICAL_MODEL_OR_SEED'):compatible_schedule(row,changed)
 
 
 if __name__=='__main__':unittest.main()

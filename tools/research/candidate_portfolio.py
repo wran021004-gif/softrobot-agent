@@ -3,7 +3,6 @@ from copy import deepcopy
 import hashlib
 import tempfile
 from pathlib import Path
-import numpy as np
 from tools.research import holding_diagnostic as history
 from tools.research.numerics import archived, ROOT
 from tools.research.feedback import task_gap
@@ -102,6 +101,8 @@ def record(folder, reference, diagnostic=None):
                     raw_folder=diagnostic.get('raw_folder',folder),sampling_phase=diagnostic['sampling_phase']),
                 trajectory=dict(tensions_n=u,times_s=[k*timing['control_period_s'] for k in range(count+1)],
                     tendon_order=order,model_identity=spec['identity'],design_identity=spec['design_identity'],task_identity=digest(cfg['task']))))
+        from tools.research.physical_replay import schedule_identity
+        row['bound_schedule_identity']=schedule_identity(cfg,row['schedule']['trajectory'])
     except (ValueError,KeyError,StopIteration) as exc:row['rejection_reasons'].append(str(exc))
     return row
 
@@ -123,9 +124,11 @@ def historical_records():
 
 def compatible_schedule(row, configuration):
     """Check the target before transferring a control; no execution implied."""
-    from tools.research.physical_replay import binding
+    from tools.research.physical_replay import binding,schedule_identity
     if row['replay_status']!='pending_independent_replay':raise ValueError('REPLAY_UNAVAILABLE')
     if digest(configuration['robot'])!=row['robot_identity'] or digest(configuration['task'])!=row['task_identity']:
         raise ValueError('CONTROL_TRANSFER_ROBOT_OR_TASK_MISMATCH')
+    if schedule_identity(configuration,row['schedule']['trajectory'])!=row['bound_schedule_identity']:
+        raise ValueError('CONTROL_TRANSFER_PHYSICAL_MODEL_OR_SEED_MISMATCH')
     binding(configuration,row['schedule']['trajectory'])
     return deepcopy(row['schedule'])

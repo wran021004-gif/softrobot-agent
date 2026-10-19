@@ -1,0 +1,5067 @@
+{
+  "views": [
+    {
+      "source_folder": "evidence/sorosim_s59/study",
+      "summary": {
+        "version": "evidence_policy_v1",
+        "claim_kind": "NUMERICAL_DIAGNOSTIC",
+        "verification_status": "insufficient",
+        "model_identity": null,
+        "candidate_identity": {
+          "artifact_id": "9b162aa76f10c6cf76dd12ca03bec8fbf7ac03235207d9354af3b54f11314ffa",
+          "media_type": "application/json"
+        },
+        "design_identity": null,
+        "task_identity": "882b3493037dcc8f8da294b3473e1223f0465e92c35bc3064bfc42d467bf212e",
+        "operating_point": {
+          "name": "saved_state"
+        },
+        "covered_samples": {
+          "horizon": {
+            "analysis_horizon_s": 0.0,
+            "interpretation": "Actual saved-state remaining horizon, or nominal horizon from the declared configuration operating point.",
+            "origin": 0.29,
+            "period_s": 0.01,
+            "remaining_task_s": 0.06,
+            "task_duration_s": 0.35
+          },
+          "constraints": [
+            {
+              "analyzed_indices": [],
+              "constraint_id": "terminal_error_m",
+              "expressible": true,
+              "reason": "Instantaneous speed derivative only; no frozen task samples verified.",
+              "status": "diagnostic"
+            },
+            {
+              "analyzed_indices": [],
+              "constraint_id": "holding_max_error_m",
+              "expressible": true,
+              "reason": "Instantaneous speed derivative only; no frozen task samples verified.",
+              "status": "diagnostic"
+            },
+            {
+              "analyzed_indices": [],
+              "constraint_id": "holding_max_speed_m_s",
+              "expressible": true,
+              "reason": "Instantaneous speed derivative only; no frozen task samples verified.",
+              "status": "diagnostic"
+            }
+          ],
+          "full_task_supported": false
+        },
+        "assumptions": {
+          "model": {
+            "model_id": "model.sorosim_gvs",
+            "model_version": "1.0.0",
+            "relevant_assumptions": [
+              "supported serial tendon-driven continuum topology",
+              "selected strain basis spans deformation relevant to the use",
+              "inextensible centerline",
+              "no shear",
+              "no torsion",
+              "straight frictionless tendon spans"
+            ],
+            "representation_id": "63aab968b8f0732f13dc73454e2628ee015c67b6b92aa47639d9f8b55d928f0e"
+          },
+          "physical_inputs": {
+            "control_period_s": 0.01,
+            "frame": "tendon_path",
+            "lower": [
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "phase": "pre_step",
+            "provenance": [
+              "/robot/structure/data/tendons",
+              "/task/timing/control_period_s"
+            ],
+            "signal": "tendon_tension",
+            "tendon_order": [
+              "tendon_0",
+              "tendon_1",
+              "tendon_2",
+              "tendon_3"
+            ],
+            "units": "N",
+            "upper": [
+              8.0,
+              8.0,
+              8.0,
+              8.0
+            ]
+          },
+          "legacy_applicability": {
+            "constraint_coverage": [
+              {
+                "analyzed_indices": [],
+                "constraint_id": "terminal_error_m",
+                "expressible": true,
+                "reason": "Instantaneous speed derivative only; no frozen task samples verified.",
+                "status": "diagnostic"
+              },
+              {
+                "analyzed_indices": [],
+                "constraint_id": "holding_max_error_m",
+                "expressible": true,
+                "reason": "Instantaneous speed derivative only; no frozen task samples verified.",
+                "status": "diagnostic"
+              },
+              {
+                "analyzed_indices": [],
+                "constraint_id": "holding_max_speed_m_s",
+                "expressible": true,
+                "reason": "Instantaneous speed derivative only; no frozen task samples verified.",
+                "status": "diagnostic"
+              }
+            ],
+            "execution_support": "not_assessed",
+            "full_task_supported": false,
+            "horizon": {
+              "analysis_horizon_s": 0.0,
+              "interpretation": "Actual saved-state remaining horizon, or nominal horizon from the declared configuration operating point.",
+              "origin": 0.29,
+              "period_s": 0.01,
+              "remaining_task_s": 0.06,
+              "task_duration_s": 0.35
+            },
+            "model_assessment": {
+              "design_id": "serial_family_candidate",
+              "design_identity": "10035885ded80b7afbf2faa28988c6275a18ac04f3232c5d0972acced81af9ad",
+              "generalized_coordinate_dimension": 12,
+              "model_id": "model.sorosim_gvs",
+              "model_version": "1.0.0",
+              "relevant_assumptions": [
+                "supported serial tendon-driven continuum topology",
+                "selected strain basis spans deformation relevant to the use",
+                "inextensible centerline",
+                "no shear",
+                "no torsion",
+                "straight frictionless tendon spans"
+              ],
+              "representation_id": "63aab968b8f0732f13dc73454e2628ee015c67b6b92aa47639d9f8b55d928f0e",
+              "representation_kind": "gvs_bending_basis_v1",
+              "representation_strategy": "structural_linear",
+              "state_dimension": 24,
+              "unsupported_requested_physics": [],
+              "uses": {
+                "linearization": {
+                  "evidence": [],
+                  "reasons": [
+                    "SoRoSim local bending computation is supported; physical agreement outside measured operating points is unvalidated."
+                  ],
+                  "status": "WARN",
+                  "validation": "unavailable"
+                }
+              }
+            },
+            "reasons": [],
+            "status": "applicable"
+          },
+          "source": "Trusted resolved tool artifact; not arbitrary LLM assertions"
+        },
+        "supported_inferences": [
+          "local_diagnostic"
+        ],
+        "unsupported_inferences": [
+          "global_nonlinear_feasibility",
+          "global_nonlinear_infeasibility",
+          "structural_infeasibility",
+          "whole_horizon_from_instantaneous_braking",
+          "adapted_dynamic_improvement_from_static_sensitivity",
+          "unvisited_simulation_descent_guarantee",
+          "continuous_time_compliance",
+          "hardware_performance",
+          "robustness",
+          "repeatability",
+          "observed_task_pass"
+        ],
+        "evidence_reference": {
+          "artifact_id": "9c418bbc04b4a3944df0ddb8b8163a57acd17e98fba1467632ef0c75cc88fa40",
+          "media_type": "application/json"
+        },
+        "numerical_evidence_pointer": "",
+        "prospective_guarantee": false,
+        "unresolved": [
+          "Nonlinear realization and constraints outside declared model/sample coverage remain unresolved.",
+          "Original independent physical task acceptance is unmeasured by this evidence."
+        ],
+        "next_checks": [
+          "independent_legal_physical_evaluation",
+          "matched_input_refinement",
+          "paired_local_response_check"
+        ]
+      }
+    },
+    {
+      "source_folder": "evidence/sorosim_s59/study",
+      "summary": {
+        "version": "evidence_policy_v1",
+        "claim_kind": "NUMERICAL_DIAGNOSTIC",
+        "verification_status": "insufficient",
+        "model_identity": null,
+        "candidate_identity": {
+          "artifact_id": "9b162aa76f10c6cf76dd12ca03bec8fbf7ac03235207d9354af3b54f11314ffa",
+          "media_type": "application/json"
+        },
+        "design_identity": null,
+        "task_identity": "882b3493037dcc8f8da294b3473e1223f0465e92c35bc3064bfc42d467bf212e",
+        "operating_point": {
+          "name": "fixed_input_equilibrium"
+        },
+        "covered_samples": {
+          "horizon": {
+            "analysis_horizon_s": 0.35,
+            "interpretation": "Actual saved-state remaining horizon, or nominal horizon from the declared configuration operating point.",
+            "origin": null,
+            "period_s": 0.01,
+            "remaining_task_s": 0.35,
+            "task_duration_s": 0.35
+          },
+          "constraints": [
+            {
+              "analyzed_indices": [],
+              "constraint_id": "terminal_error_m",
+              "expressible": true,
+              "reason": "Local position authority/static construction only; no sampled constraint verification.",
+              "status": "diagnostic"
+            },
+            {
+              "analyzed_indices": [],
+              "constraint_id": "holding_max_error_m",
+              "expressible": true,
+              "reason": "Local position authority/static construction only; no sampled constraint verification.",
+              "status": "diagnostic"
+            },
+            {
+              "analyzed_indices": [],
+              "constraint_id": "holding_max_speed_m_s",
+              "expressible": true,
+              "reason": "Existing tools do not enforce this constraint kind or sampled window.",
+              "status": "not_applicable"
+            }
+          ],
+          "full_task_supported": false
+        },
+        "assumptions": {
+          "model": {
+            "model_id": "model.sorosim_gvs",
+            "model_version": "1.0.0",
+            "relevant_assumptions": [
+              "supported serial tendon-driven continuum topology",
+              "selected strain basis spans deformation relevant to the use",
+              "inextensible centerline",
+              "no shear",
+              "no torsion",
+              "straight frictionless tendon spans"
+            ],
+            "representation_id": "63aab968b8f0732f13dc73454e2628ee015c67b6b92aa47639d9f8b55d928f0e"
+          },
+          "physical_inputs": {
+            "control_period_s": 0.01,
+            "frame": "tendon_path",
+            "lower": [
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "phase": "pre_step",
+            "provenance": [
+              "/robot/structure/data/tendons",
+              "/task/timing/control_period_s"
+            ],
+            "signal": "tendon_tension",
+            "tendon_order": [
+              "tendon_0",
+              "tendon_1",
+              "tendon_2",
+              "tendon_3"
+            ],
+            "units": "N",
+            "upper": [
+              8.0,
+              8.0,
+              8.0,
+              8.0
+            ]
+          },
+          "legacy_applicability": {
+            "constraint_coverage": [
+              {
+                "analyzed_indices": [],
+                "constraint_id": "terminal_error_m",
+                "expressible": true,
+                "reason": "Local position authority/static construction only; no sampled constraint verification.",
+                "status": "diagnostic"
+              },
+              {
+                "analyzed_indices": [],
+                "constraint_id": "holding_max_error_m",
+                "expressible": true,
+                "reason": "Local position authority/static construction only; no sampled constraint verification.",
+                "status": "diagnostic"
+              },
+              {
+                "analyzed_indices": [],
+                "constraint_id": "holding_max_speed_m_s",
+                "expressible": true,
+                "reason": "Existing tools do not enforce this constraint kind or sampled window.",
+                "status": "not_applicable"
+              }
+            ],
+            "execution_support": "not_assessed",
+            "full_task_supported": false,
+            "horizon": {
+              "analysis_horizon_s": 0.35,
+              "interpretation": "Actual saved-state remaining horizon, or nominal horizon from the declared configuration operating point.",
+              "origin": null,
+              "period_s": 0.01,
+              "remaining_task_s": 0.35,
+              "task_duration_s": 0.35
+            },
+            "model_assessment": {
+              "design_id": "serial_family_candidate",
+              "design_identity": "10035885ded80b7afbf2faa28988c6275a18ac04f3232c5d0972acced81af9ad",
+              "generalized_coordinate_dimension": 12,
+              "model_id": "model.sorosim_gvs",
+              "model_version": "1.0.0",
+              "relevant_assumptions": [
+                "supported serial tendon-driven continuum topology",
+                "selected strain basis spans deformation relevant to the use",
+                "inextensible centerline",
+                "no shear",
+                "no torsion",
+                "straight frictionless tendon spans"
+              ],
+              "representation_id": "63aab968b8f0732f13dc73454e2628ee015c67b6b92aa47639d9f8b55d928f0e",
+              "representation_kind": "gvs_bending_basis_v1",
+              "representation_strategy": "structural_linear",
+              "state_dimension": 24,
+              "unsupported_requested_physics": [],
+              "uses": {
+                "static_equilibrium": {
+                  "evidence": [],
+                  "reasons": [
+                    "SoRoSim local bending computation is supported; physical agreement outside measured operating points is unvalidated."
+                  ],
+                  "status": "WARN",
+                  "validation": "unavailable"
+                }
+              }
+            },
+            "reasons": [],
+            "status": "applicable"
+          },
+          "source": "Trusted resolved tool artifact; not arbitrary LLM assertions"
+        },
+        "supported_inferences": [
+          "local_diagnostic"
+        ],
+        "unsupported_inferences": [
+          "global_nonlinear_feasibility",
+          "global_nonlinear_infeasibility",
+          "structural_infeasibility",
+          "whole_horizon_from_instantaneous_braking",
+          "adapted_dynamic_improvement_from_static_sensitivity",
+          "unvisited_simulation_descent_guarantee",
+          "continuous_time_compliance",
+          "hardware_performance",
+          "robustness",
+          "repeatability",
+          "observed_task_pass"
+        ],
+        "evidence_reference": {
+          "artifact_id": "880bd35ed70b6bfd4c03f928fcfaa7bf85aa2f0aca58e345c6108e56bd2e39d7",
+          "media_type": "application/json"
+        },
+        "numerical_evidence_pointer": "",
+        "prospective_guarantee": false,
+        "unresolved": [
+          "Nonlinear realization and constraints outside declared model/sample coverage remain unresolved.",
+          "Original independent physical task acceptance is unmeasured by this evidence."
+        ],
+        "next_checks": [
+          "independent_legal_physical_evaluation",
+          "matched_input_refinement",
+          "paired_local_response_check"
+        ]
+      }
+    },
+    {
+      "source_folder": "evidence/sorosim_s59/study",
+      "summary": {
+        "version": "evidence_policy_v1",
+        "claim_kind": "NUMERICAL_DIAGNOSTIC",
+        "verification_status": "insufficient",
+        "model_identity": null,
+        "candidate_identity": {
+          "artifact_id": "9b162aa76f10c6cf76dd12ca03bec8fbf7ac03235207d9354af3b54f11314ffa",
+          "media_type": "application/json"
+        },
+        "design_identity": null,
+        "task_identity": "882b3493037dcc8f8da294b3473e1223f0465e92c35bc3064bfc42d467bf212e",
+        "operating_point": {
+          "name": "fixed_input_equilibrium"
+        },
+        "covered_samples": {
+          "horizon": {
+            "analysis_horizon_s": 0.35,
+            "interpretation": "Actual saved-state remaining horizon, or nominal horizon from the declared configuration operating point.",
+            "origin": null,
+            "period_s": 0.01,
+            "remaining_task_s": 0.35,
+            "task_duration_s": 0.35
+          },
+          "constraints": [
+            {
+              "analyzed_indices": [],
+              "constraint_id": "terminal_error_m",
+              "expressible": true,
+              "reason": "Local position authority/static construction only; no sampled constraint verification.",
+              "status": "diagnostic"
+            },
+            {
+              "analyzed_indices": [],
+              "constraint_id": "holding_max_error_m",
+              "expressible": true,
+              "reason": "Local position authority/static construction only; no sampled constraint verification.",
+              "status": "diagnostic"
+            },
+            {
+              "analyzed_indices": [],
+              "constraint_id": "holding_max_speed_m_s",
+              "expressible": true,
+              "reason": "Existing tools do not enforce this constraint kind or sampled window.",
+              "status": "not_applicable"
+            }
+          ],
+          "full_task_supported": false
+        },
+        "assumptions": {
+          "model": {
+            "model_id": "model.sorosim_gvs",
+            "model_version": "1.0.0",
+            "relevant_assumptions": [
+              "supported serial tendon-driven continuum topology",
+              "selected strain basis spans deformation relevant to the use",
+              "inextensible centerline",
+              "no shear",
+              "no torsion",
+              "straight frictionless tendon spans"
+            ],
+            "representation_id": "63aab968b8f0732f13dc73454e2628ee015c67b6b92aa47639d9f8b55d928f0e"
+          },
+          "physical_inputs": {
+            "control_period_s": 0.01,
+            "frame": "tendon_path",
+            "lower": [
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "phase": "pre_step",
+            "provenance": [
+              "/robot/structure/data/tendons",
+              "/task/timing/control_period_s"
+            ],
+            "signal": "tendon_tension",
+            "tendon_order": [
+              "tendon_0",
+              "tendon_1",
+              "tendon_2",
+              "tendon_3"
+            ],
+            "units": "N",
+            "upper": [
+              8.0,
+              8.0,
+              8.0,
+              8.0
+            ]
+          },
+          "legacy_applicability": {
+            "constraint_coverage": [
+              {
+                "analyzed_indices": [],
+                "constraint_id": "terminal_error_m",
+                "expressible": true,
+                "reason": "Local position authority/static construction only; no sampled constraint verification.",
+                "status": "diagnostic"
+              },
+              {
+                "analyzed_indices": [],
+                "constraint_id": "holding_max_error_m",
+                "expressible": true,
+                "reason": "Local position authority/static construction only; no sampled constraint verification.",
+                "status": "diagnostic"
+              },
+              {
+                "analyzed_indices": [],
+                "constraint_id": "holding_max_speed_m_s",
+                "expressible": true,
+                "reason": "Existing tools do not enforce this constraint kind or sampled window.",
+                "status": "not_applicable"
+              }
+            ],
+            "execution_support": "not_assessed",
+            "full_task_supported": false,
+            "horizon": {
+              "analysis_horizon_s": 0.35,
+              "interpretation": "Actual saved-state remaining horizon, or nominal horizon from the declared configuration operating point.",
+              "origin": null,
+              "period_s": 0.01,
+              "remaining_task_s": 0.35,
+              "task_duration_s": 0.35
+            },
+            "model_assessment": {
+              "design_id": "serial_family_candidate",
+              "design_identity": "10035885ded80b7afbf2faa28988c6275a18ac04f3232c5d0972acced81af9ad",
+              "generalized_coordinate_dimension": 12,
+              "model_id": "model.sorosim_gvs",
+              "model_version": "1.0.0",
+              "relevant_assumptions": [
+                "supported serial tendon-driven continuum topology",
+                "selected strain basis spans deformation relevant to the use",
+                "inextensible centerline",
+                "no shear",
+                "no torsion",
+                "straight frictionless tendon spans"
+              ],
+              "representation_id": "63aab968b8f0732f13dc73454e2628ee015c67b6b92aa47639d9f8b55d928f0e",
+              "representation_kind": "gvs_bending_basis_v1",
+              "representation_strategy": "structural_linear",
+              "state_dimension": 24,
+              "unsupported_requested_physics": [],
+              "uses": {
+                "static_equilibrium": {
+                  "evidence": [],
+                  "reasons": [
+                    "SoRoSim local bending computation is supported; physical agreement outside measured operating points is unvalidated."
+                  ],
+                  "status": "WARN",
+                  "validation": "unavailable"
+                }
+              }
+            },
+            "reasons": [],
+            "status": "applicable"
+          },
+          "source": "Trusted resolved tool artifact; not arbitrary LLM assertions"
+        },
+        "supported_inferences": [
+          "local_diagnostic"
+        ],
+        "unsupported_inferences": [
+          "global_nonlinear_feasibility",
+          "global_nonlinear_infeasibility",
+          "structural_infeasibility",
+          "whole_horizon_from_instantaneous_braking",
+          "adapted_dynamic_improvement_from_static_sensitivity",
+          "unvisited_simulation_descent_guarantee",
+          "continuous_time_compliance",
+          "hardware_performance",
+          "robustness",
+          "repeatability",
+          "observed_task_pass"
+        ],
+        "evidence_reference": {
+          "artifact_id": "8231810b059f90603c7c71fda920df145ad8e13ead752d3cede8e5ee98a5dee0",
+          "media_type": "application/json"
+        },
+        "numerical_evidence_pointer": "",
+        "prospective_guarantee": false,
+        "unresolved": [
+          "Nonlinear realization and constraints outside declared model/sample coverage remain unresolved.",
+          "Original independent physical task acceptance is unmeasured by this evidence."
+        ],
+        "next_checks": [
+          "independent_legal_physical_evaluation",
+          "matched_input_refinement",
+          "paired_local_response_check"
+        ]
+      }
+    },
+    {
+      "source_folder": "evidence/sorosim_s59/study",
+      "summary": {
+        "version": "evidence_policy_v1",
+        "claim_kind": "NUMERICAL_DIAGNOSTIC",
+        "verification_status": "fixed_state_box_minimum",
+        "model_identity": "876c994522c3984ad911cd62da566c4feaf3ed8089ebc6d0492e0836f77710a0",
+        "candidate_identity": {
+          "artifact_id": "9b162aa76f10c6cf76dd12ca03bec8fbf7ac03235207d9354af3b54f11314ffa",
+          "media_type": "application/json"
+        },
+        "design_identity": null,
+        "task_identity": "882b3493037dcc8f8da294b3473e1223f0465e92c35bc3064bfc42d467bf212e",
+        "operating_point": {
+          "actual_time_s": 0.29,
+          "available": true,
+          "candidate": {
+            "artifact_id": "9b162aa76f10c6cf76dd12ca03bec8fbf7ac03235207d9354af3b54f11314ffa",
+            "media_type": "application/json"
+          },
+          "configuration_identity": "4e615c9c9ce0f20ad61b5b63d868655cf2c2c4f683d774e85a6f002212cbfb30",
+          "construction": {
+            "method": "provided candidate operating point",
+            "state": {
+              "artifact_id": "f61c2e39fbbf823dd67b6c4a9a0ab95c21897363403dbbb3ae899289d73a44ea",
+              "media_type": "application/json"
+            },
+            "static_equilibrium": false
+          },
+          "coordinate_order": [
+            "segment_0.kappa_y_node_0",
+            "segment_0.kappa_y_node_1",
+            "segment_0.kappa_y_node_2",
+            "segment_0.kappa_z_node_0",
+            "segment_0.kappa_z_node_1",
+            "segment_0.kappa_z_node_2",
+            "segment_1.kappa_y_node_0",
+            "segment_1.kappa_y_node_1",
+            "segment_1.kappa_y_node_2",
+            "segment_1.kappa_z_node_0",
+            "segment_1.kappa_z_node_1",
+            "segment_1.kappa_z_node_2"
+          ],
+          "equilibrium": false,
+          "input_units": "N",
+          "linearization_scope": "frozen nonequilibrium local affine model",
+          "meaning": "Exact archived projected GVS state; not a complete or exact MuJoCo integration snapshot.",
+          "name": "saved_state",
+          "original_execution": {
+            "artifact_id": "96615db5434bdf07196a3150afc909e4b68a2ddc397c6cf36c08bdd52a4016ea",
+            "media_type": "application/json"
+          },
+          "original_state_pointer": "/controller_observations/29",
+          "phase": "interval_start_previous_applied_input",
+          "remaining_task_s": 0.06,
+          "tendon_order": [
+            "tendon_0",
+            "tendon_1",
+            "tendon_2",
+            "tendon_3"
+          ]
+        },
+        "covered_samples": {
+          "horizon": {
+            "analysis_horizon_s": 0.0,
+            "interpretation": "Actual saved-state remaining horizon, or nominal horizon from the declared configuration operating point.",
+            "origin": 0.29,
+            "period_s": 0.01,
+            "remaining_task_s": 0.06,
+            "task_duration_s": 0.35
+          },
+          "constraints": [
+            {
+              "analyzed_indices": [],
+              "constraint_id": "terminal_error_m",
+              "expressible": true,
+              "reason": "Instantaneous speed derivative only; no frozen task samples verified.",
+              "status": "diagnostic"
+            },
+            {
+              "analyzed_indices": [],
+              "constraint_id": "holding_max_error_m",
+              "expressible": true,
+              "reason": "Instantaneous speed derivative only; no frozen task samples verified.",
+              "status": "diagnostic"
+            },
+            {
+              "analyzed_indices": [],
+              "constraint_id": "holding_max_speed_m_s",
+              "expressible": true,
+              "reason": "Instantaneous speed derivative only; no frozen task samples verified.",
+              "status": "diagnostic"
+            }
+          ],
+          "full_task_supported": false
+        },
+        "assumptions": {
+          "model": {
+            "model_id": "model.sorosim_gvs",
+            "model_version": "1.0.0",
+            "relevant_assumptions": [
+              "supported serial tendon-driven continuum topology",
+              "selected strain basis spans deformation relevant to the use",
+              "inextensible centerline",
+              "no shear",
+              "no torsion",
+              "straight frictionless tendon spans"
+            ],
+            "representation_id": "63aab968b8f0732f13dc73454e2628ee015c67b6b92aa47639d9f8b55d928f0e"
+          },
+          "physical_inputs": {
+            "control_period_s": 0.01,
+            "frame": "tendon_path",
+            "lower": [
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "phase": "pre_step",
+            "provenance": [
+              "/robot/structure/data/tendons",
+              "/task/timing/control_period_s"
+            ],
+            "signal": "tendon_tension",
+            "tendon_order": [
+              "tendon_0",
+              "tendon_1",
+              "tendon_2",
+              "tendon_3"
+            ],
+            "units": "N",
+            "upper": [
+              8.0,
+              8.0,
+              8.0,
+              8.0
+            ]
+          },
+          "legacy_applicability": {
+            "constraint_coverage": [
+              {
+                "analyzed_indices": [],
+                "constraint_id": "terminal_error_m",
+                "expressible": true,
+                "reason": "Instantaneous speed derivative only; no frozen task samples verified.",
+                "status": "diagnostic"
+              },
+              {
+                "analyzed_indices": [],
+                "constraint_id": "holding_max_error_m",
+                "expressible": true,
+                "reason": "Instantaneous speed derivative only; no frozen task samples verified.",
+                "status": "diagnostic"
+              },
+              {
+                "analyzed_indices": [],
+                "constraint_id": "holding_max_speed_m_s",
+                "expressible": true,
+                "reason": "Instantaneous speed derivative only; no frozen task samples verified.",
+                "status": "diagnostic"
+              }
+            ],
+            "execution_support": "not_assessed",
+            "full_task_supported": false,
+            "horizon": {
+              "analysis_horizon_s": 0.0,
+              "interpretation": "Actual saved-state remaining horizon, or nominal horizon from the declared configuration operating point.",
+              "origin": 0.29,
+              "period_s": 0.01,
+              "remaining_task_s": 0.06,
+              "task_duration_s": 0.35
+            },
+            "model_assessment": {
+              "design_id": "serial_family_candidate",
+              "design_identity": "10035885ded80b7afbf2faa28988c6275a18ac04f3232c5d0972acced81af9ad",
+              "generalized_coordinate_dimension": 12,
+              "model_id": "model.sorosim_gvs",
+              "model_version": "1.0.0",
+              "relevant_assumptions": [
+                "supported serial tendon-driven continuum topology",
+                "selected strain basis spans deformation relevant to the use",
+                "inextensible centerline",
+                "no shear",
+                "no torsion",
+                "straight frictionless tendon spans"
+              ],
+              "representation_id": "63aab968b8f0732f13dc73454e2628ee015c67b6b92aa47639d9f8b55d928f0e",
+              "representation_kind": "gvs_bending_basis_v1",
+              "representation_strategy": "structural_linear",
+              "state_dimension": 24,
+              "unsupported_requested_physics": [],
+              "uses": {
+                "linearization": {
+                  "evidence": [],
+                  "reasons": [
+                    "SoRoSim local bending computation is supported; physical agreement outside measured operating points is unvalidated."
+                  ],
+                  "status": "WARN",
+                  "validation": "unavailable"
+                }
+              }
+            },
+            "reasons": [],
+            "status": "applicable"
+          },
+          "source": "Trusted resolved tool artifact; not arbitrary LLM assertions"
+        },
+        "supported_inferences": [
+          "local_diagnostic"
+        ],
+        "unsupported_inferences": [
+          "global_nonlinear_feasibility",
+          "global_nonlinear_infeasibility",
+          "structural_infeasibility",
+          "whole_horizon_from_instantaneous_braking",
+          "adapted_dynamic_improvement_from_static_sensitivity",
+          "unvisited_simulation_descent_guarantee",
+          "continuous_time_compliance",
+          "hardware_performance",
+          "robustness",
+          "repeatability",
+          "observed_task_pass"
+        ],
+        "evidence_reference": {
+          "artifact_id": "8a0502b42a3c8439104c27837e71ca167263ab34547bf41290707daa47fef6f6",
+          "media_type": "application/json"
+        },
+        "numerical_evidence_pointer": "/instantaneous_braking",
+        "prospective_guarantee": false,
+        "unresolved": [
+          "Nonlinear realization and constraints outside declared model/sample coverage remain unresolved.",
+          "Original independent physical task acceptance is unmeasured by this evidence."
+        ],
+        "next_checks": [
+          "independent_legal_physical_evaluation",
+          "matched_input_refinement",
+          "paired_local_response_check"
+        ]
+      }
+    },
+    {
+      "source_folder": "evidence/sorosim_s59/study",
+      "summary": {
+        "version": "evidence_policy_v1",
+        "claim_kind": "NUMERICAL_DIAGNOSTIC",
+        "verification_status": "perturbed_equilibria_checked",
+        "model_identity": "7ed216185179eff450f302e2fcbe6e5a9c2cc9536cc06a06318110ad4458d135",
+        "candidate_identity": {
+          "artifact_id": "9b162aa76f10c6cf76dd12ca03bec8fbf7ac03235207d9354af3b54f11314ffa",
+          "media_type": "application/json"
+        },
+        "design_identity": null,
+        "task_identity": "882b3493037dcc8f8da294b3473e1223f0465e92c35bc3064bfc42d467bf212e",
+        "operating_point": {
+          "actual_time_s": null,
+          "construction": {
+            "computed_tensions_n": [
+              0.2,
+              0.2,
+              0.2,
+              0.2
+            ],
+            "function_evaluations": 5,
+            "iterations": 4,
+            "method": "existing candidate initializer/control preparation",
+            "provenance": {
+              "actual_initial_state_source": "Candidate Task initializer then measured backend state at every update",
+              "current_scope": {
+                "backend": {
+                  "extension_id": "backend.family_mujoco",
+                  "parameters": {
+                    "contract": "family.mujoco_parameters",
+                    "data": {
+                      "contact_model": "mujoco_convex_native",
+                      "friction": [
+                        0.0,
+                        0.0,
+                        0.0
+                      ],
+                      "integrator": "implicitfast",
+                      "timestep_source": "task.timing.timestep_s"
+                    },
+                    "version": "1.0.0"
+                  },
+                  "version": "1.1.0"
+                },
+                "controller": {
+                  "extension_id": "controller.sorosim_matlab_nmpc",
+                  "parameters": {
+                    "contract": "family.sorosim_reach_control",
+                    "data": {
+                      "numerical_source": "initial_state_pretension",
+                      "recipe": {
+                        "basis": {
+                          "strategy": "structural_linear"
+                        },
+                        "constraint_jacobian_mode": "reverse",
+                        "curvature_scale_rad_m": 10.0,
+                        "evaluation_threads": 1,
+                        "feasible_return": null,
+                        "holding_brake_lead_s": 0.02,
+                        "holding_speed_cost_mode": "time_integral_v1",
+                        "holding_speed_cost_window_s": 0.05,
+                        "holding_tip_speed_weight": 0.1,
+                        "horizon": 10,
+                        "integration_method": "implicit_euler",
+                        "max_cpu_s": null,
+                        "max_iterations": 120,
+                        "max_unusable_updates": 3,
+                        "position_error_scale_m": null,
+                        "rate_scale_rad_m_s": 1000.0,
+                        "recover_returned_tensions": true,
+                        "regenerate_warm_states": true,
+                        "root_tolerance": 1e-10,
+                        "seed_position_tolerance_fraction": 0.5,
+                        "seed_speed_limit_m_s": 0.02,
+                        "stopping_policy": "research_work_v1",
+                        "substeps": 1,
+                        "tension_weight": 0.0001,
+                        "terminal_tip_speed_weight": 0.1,
+                        "terminal_velocity_weight": 0.0001,
+                        "terminal_weight": 5.0,
+                        "tip_speed_scale_m_s": 0.02,
+                        "tolerance": 1e-06,
+                        "tracking_weight": 1.0,
+                        "variation_weight": 0.001,
+                        "velocity_weight": 0.0001
+                      },
+                      "settling": {
+                        "position_limit_m": 0.01,
+                        "speed_limit_m_s": 0.02,
+                        "window_s": 0.05
+                      },
+                      "solver": {
+                        "algorithm": "sqp",
+                        "constraint_tolerance": 1e-08,
+                        "engine_options": "-nodesktop -nosplash",
+                        "gauss_per_interval": 5,
+                        "optimality_tolerance": 1e-06,
+                        "routing_difference_step": 1e-05,
+                        "step_tolerance": 1e-10
+                      }
+                    },
+                    "version": "1.0.0"
+                  },
+                  "version": "1.0.0"
+                },
+                "discretization": {
+                  "contract": "family.discretization",
+                  "data": {
+                    "cells": {
+                      "segment_0": 12,
+                      "segment_1": 12
+                    },
+                    "coordinates": "two_principal_bending_angles_per_cell",
+                    "model": "serial_bending_cells_v1",
+                    "version": "serial_bending_discretization_v1"
+                  },
+                  "version": "1.0.0"
+                },
+                "execution_model": {
+                  "extension_id": "model.serial_bending_cells",
+                  "parameters": {
+                    "contract": "family.dynamics_model",
+                    "data": {},
+                    "version": "1.0.0"
+                  },
+                  "version": "1.0.0"
+                },
+                "robot": {
+                  "family": "tendon_robot_family",
+                  "identity": "bb72ca368cfc65aaeb4314a98be2519b20468e803da4bb0ec70e23cf015a81ee"
+                },
+                "seed": 17,
+                "task": {
+                  "environment": "5cee25b33f4ff19cb0abd93651ce9077a81665990f07d8f5a4967497e8e82a4d",
+                  "family": "task.reach",
+                  "goal": "7906a8d6f1938670b3b029be161c8f1869097280b1ee24a198da30b2fff4c264",
+                  "identity": "882b3493037dcc8f8da294b3473e1223f0465e92c35bc3064bfc42d467bf212e",
+                  "initializer": "3a90c93217f15e9a60db7f65f611911f4aa53f1a4987340949e1068fd2647c22",
+                  "timing": {
+                    "control_period_s": 0.01,
+                    "duration_s": 0.35,
+                    "sample_period_s": 0.01,
+                    "termination": [
+                      "duration",
+                      "numerical_failure"
+                    ],
+                    "timestep_s": 0.0005
+                  }
+                }
+              },
+              "historical_states_reused": false,
+              "nominal_is_current_target_solution": false,
+              "physics_identity": "bd0371aad5cdc49b4e074ac130fb27ed12d86b8b6bfcbc2ee9450ab6857d798f",
+              "previous_input_source": "candidate bounded pretension",
+              "resolved_basis_identity": "63aab968b8f0732f13dc73454e2628ee015c67b6b92aa47639d9f8b55d928f0e",
+              "reused": false,
+              "source_kind": "project_initial_state_and_bounded_pretension",
+              "validity": "Tensions are numerical guesses; placeholder states must be regenerated using candidate dynamics before use"
+            },
+            "solver": "MATLAB fsolve",
+            "static_residual_inf": 5.753047777751208e-17,
+            "status": 3,
+            "success": true
+          },
+          "equilibrium": true,
+          "linearization_scope": "local equilibrium linearization",
+          "name": "fixed_input_equilibrium",
+          "phase": "configuration_fixed_input_equilibrium",
+          "remaining_task_s": 0.35
+        },
+        "covered_samples": {
+          "horizon": {
+            "analysis_horizon_s": 0.35,
+            "interpretation": "Actual saved-state remaining horizon, or nominal horizon from the declared configuration operating point.",
+            "origin": null,
+            "period_s": 0.01,
+            "remaining_task_s": 0.35,
+            "task_duration_s": 0.35
+          },
+          "constraints": [
+            {
+              "analyzed_indices": [],
+              "constraint_id": "terminal_error_m",
+              "expressible": true,
+              "reason": "Local position authority/static construction only; no sampled constraint verification.",
+              "status": "diagnostic"
+            },
+            {
+              "analyzed_indices": [],
+              "constraint_id": "holding_max_error_m",
+              "expressible": true,
+              "reason": "Local position authority/static construction only; no sampled constraint verification.",
+              "status": "diagnostic"
+            },
+            {
+              "analyzed_indices": [],
+              "constraint_id": "holding_max_speed_m_s",
+              "expressible": true,
+              "reason": "Existing tools do not enforce this constraint kind or sampled window.",
+              "status": "not_applicable"
+            }
+          ],
+          "full_task_supported": false
+        },
+        "assumptions": {
+          "model": {
+            "model_id": "model.sorosim_gvs",
+            "model_version": "1.0.0",
+            "relevant_assumptions": [
+              "supported serial tendon-driven continuum topology",
+              "selected strain basis spans deformation relevant to the use",
+              "inextensible centerline",
+              "no shear",
+              "no torsion",
+              "straight frictionless tendon spans"
+            ],
+            "representation_id": "63aab968b8f0732f13dc73454e2628ee015c67b6b92aa47639d9f8b55d928f0e"
+          },
+          "physical_inputs": {
+            "control_period_s": 0.01,
+            "frame": "tendon_path",
+            "lower": [
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "phase": "pre_step",
+            "provenance": [
+              "/robot/structure/data/tendons",
+              "/task/timing/control_period_s"
+            ],
+            "signal": "tendon_tension",
+            "tendon_order": [
+              "tendon_0",
+              "tendon_1",
+              "tendon_2",
+              "tendon_3"
+            ],
+            "units": "N",
+            "upper": [
+              8.0,
+              8.0,
+              8.0,
+              8.0
+            ]
+          },
+          "legacy_applicability": {
+            "constraint_coverage": [
+              {
+                "analyzed_indices": [],
+                "constraint_id": "terminal_error_m",
+                "expressible": true,
+                "reason": "Local position authority/static construction only; no sampled constraint verification.",
+                "status": "diagnostic"
+              },
+              {
+                "analyzed_indices": [],
+                "constraint_id": "holding_max_error_m",
+                "expressible": true,
+                "reason": "Local position authority/static construction only; no sampled constraint verification.",
+                "status": "diagnostic"
+              },
+              {
+                "analyzed_indices": [],
+                "constraint_id": "holding_max_speed_m_s",
+                "expressible": true,
+                "reason": "Existing tools do not enforce this constraint kind or sampled window.",
+                "status": "not_applicable"
+              }
+            ],
+            "execution_support": "not_assessed",
+            "full_task_supported": false,
+            "horizon": {
+              "analysis_horizon_s": 0.35,
+              "interpretation": "Actual saved-state remaining horizon, or nominal horizon from the declared configuration operating point.",
+              "origin": null,
+              "period_s": 0.01,
+              "remaining_task_s": 0.35,
+              "task_duration_s": 0.35
+            },
+            "model_assessment": {
+              "design_id": "serial_family_candidate",
+              "design_identity": "10035885ded80b7afbf2faa28988c6275a18ac04f3232c5d0972acced81af9ad",
+              "generalized_coordinate_dimension": 12,
+              "model_id": "model.sorosim_gvs",
+              "model_version": "1.0.0",
+              "relevant_assumptions": [
+                "supported serial tendon-driven continuum topology",
+                "selected strain basis spans deformation relevant to the use",
+                "inextensible centerline",
+                "no shear",
+                "no torsion",
+                "straight frictionless tendon spans"
+              ],
+              "representation_id": "63aab968b8f0732f13dc73454e2628ee015c67b6b92aa47639d9f8b55d928f0e",
+              "representation_kind": "gvs_bending_basis_v1",
+              "representation_strategy": "structural_linear",
+              "state_dimension": 24,
+              "unsupported_requested_physics": [],
+              "uses": {
+                "static_equilibrium": {
+                  "evidence": [],
+                  "reasons": [
+                    "SoRoSim local bending computation is supported; physical agreement outside measured operating points is unvalidated."
+                  ],
+                  "status": "WARN",
+                  "validation": "unavailable"
+                }
+              }
+            },
+            "reasons": [],
+            "status": "applicable"
+          },
+          "source": "Trusted resolved tool artifact; not arbitrary LLM assertions"
+        },
+        "supported_inferences": [
+          "local_diagnostic"
+        ],
+        "unsupported_inferences": [
+          "global_nonlinear_feasibility",
+          "global_nonlinear_infeasibility",
+          "structural_infeasibility",
+          "whole_horizon_from_instantaneous_braking",
+          "adapted_dynamic_improvement_from_static_sensitivity",
+          "unvisited_simulation_descent_guarantee",
+          "continuous_time_compliance",
+          "hardware_performance",
+          "robustness",
+          "repeatability",
+          "observed_task_pass"
+        ],
+        "evidence_reference": {
+          "artifact_id": "d4eeec73cb2e97dbeb90e992062201434dbdb7b6091b41adeb62fa1b9042c8b2",
+          "media_type": "application/json"
+        },
+        "numerical_evidence_pointer": "/sensitivity",
+        "prospective_guarantee": false,
+        "unresolved": [
+          "Nonlinear realization and constraints outside declared model/sample coverage remain unresolved.",
+          "Original independent physical task acceptance is unmeasured by this evidence."
+        ],
+        "next_checks": [
+          "independent_legal_physical_evaluation",
+          "matched_input_refinement",
+          "paired_local_response_check"
+        ]
+      }
+    },
+    {
+      "source_folder": "evidence/sorosim_s59/study",
+      "summary": {
+        "version": "evidence_policy_v1",
+        "claim_kind": "NUMERICAL_DIAGNOSTIC",
+        "verification_status": "perturbed_equilibria_checked",
+        "model_identity": "7ed216185179eff450f302e2fcbe6e5a9c2cc9536cc06a06318110ad4458d135",
+        "candidate_identity": {
+          "artifact_id": "9b162aa76f10c6cf76dd12ca03bec8fbf7ac03235207d9354af3b54f11314ffa",
+          "media_type": "application/json"
+        },
+        "design_identity": null,
+        "task_identity": "882b3493037dcc8f8da294b3473e1223f0465e92c35bc3064bfc42d467bf212e",
+        "operating_point": {
+          "actual_time_s": null,
+          "construction": {
+            "computed_tensions_n": [
+              0.2,
+              0.2,
+              0.2,
+              0.2
+            ],
+            "function_evaluations": 5,
+            "iterations": 4,
+            "method": "existing candidate initializer/control preparation",
+            "provenance": {
+              "actual_initial_state_source": "Candidate Task initializer then measured backend state at every update",
+              "current_scope": {
+                "backend": {
+                  "extension_id": "backend.family_mujoco",
+                  "parameters": {
+                    "contract": "family.mujoco_parameters",
+                    "data": {
+                      "contact_model": "mujoco_convex_native",
+                      "friction": [
+                        0.0,
+                        0.0,
+                        0.0
+                      ],
+                      "integrator": "implicitfast",
+                      "timestep_source": "task.timing.timestep_s"
+                    },
+                    "version": "1.0.0"
+                  },
+                  "version": "1.1.0"
+                },
+                "controller": {
+                  "extension_id": "controller.sorosim_matlab_nmpc",
+                  "parameters": {
+                    "contract": "family.sorosim_reach_control",
+                    "data": {
+                      "numerical_source": "initial_state_pretension",
+                      "recipe": {
+                        "basis": {
+                          "strategy": "structural_linear"
+                        },
+                        "constraint_jacobian_mode": "reverse",
+                        "curvature_scale_rad_m": 10.0,
+                        "evaluation_threads": 1,
+                        "feasible_return": null,
+                        "holding_brake_lead_s": 0.02,
+                        "holding_speed_cost_mode": "time_integral_v1",
+                        "holding_speed_cost_window_s": 0.05,
+                        "holding_tip_speed_weight": 0.1,
+                        "horizon": 10,
+                        "integration_method": "implicit_euler",
+                        "max_cpu_s": null,
+                        "max_iterations": 120,
+                        "max_unusable_updates": 3,
+                        "position_error_scale_m": null,
+                        "rate_scale_rad_m_s": 1000.0,
+                        "recover_returned_tensions": true,
+                        "regenerate_warm_states": true,
+                        "root_tolerance": 1e-10,
+                        "seed_position_tolerance_fraction": 0.5,
+                        "seed_speed_limit_m_s": 0.02,
+                        "stopping_policy": "research_work_v1",
+                        "substeps": 1,
+                        "tension_weight": 0.0001,
+                        "terminal_tip_speed_weight": 0.1,
+                        "terminal_velocity_weight": 0.0001,
+                        "terminal_weight": 5.0,
+                        "tip_speed_scale_m_s": 0.02,
+                        "tolerance": 1e-06,
+                        "tracking_weight": 1.0,
+                        "variation_weight": 0.001,
+                        "velocity_weight": 0.0001
+                      },
+                      "settling": {
+                        "position_limit_m": 0.01,
+                        "speed_limit_m_s": 0.02,
+                        "window_s": 0.05
+                      },
+                      "solver": {
+                        "algorithm": "sqp",
+                        "constraint_tolerance": 1e-08,
+                        "engine_options": "-nodesktop -nosplash",
+                        "gauss_per_interval": 5,
+                        "optimality_tolerance": 1e-06,
+                        "routing_difference_step": 1e-05,
+                        "step_tolerance": 1e-10
+                      }
+                    },
+                    "version": "1.0.0"
+                  },
+                  "version": "1.0.0"
+                },
+                "discretization": {
+                  "contract": "family.discretization",
+                  "data": {
+                    "cells": {
+                      "segment_0": 12,
+                      "segment_1": 12
+                    },
+                    "coordinates": "two_principal_bending_angles_per_cell",
+                    "model": "serial_bending_cells_v1",
+                    "version": "serial_bending_discretization_v1"
+                  },
+                  "version": "1.0.0"
+                },
+                "execution_model": {
+                  "extension_id": "model.serial_bending_cells",
+                  "parameters": {
+                    "contract": "family.dynamics_model",
+                    "data": {},
+                    "version": "1.0.0"
+                  },
+                  "version": "1.0.0"
+                },
+                "robot": {
+                  "family": "tendon_robot_family",
+                  "identity": "bb72ca368cfc65aaeb4314a98be2519b20468e803da4bb0ec70e23cf015a81ee"
+                },
+                "seed": 17,
+                "task": {
+                  "environment": "5cee25b33f4ff19cb0abd93651ce9077a81665990f07d8f5a4967497e8e82a4d",
+                  "family": "task.reach",
+                  "goal": "7906a8d6f1938670b3b029be161c8f1869097280b1ee24a198da30b2fff4c264",
+                  "identity": "882b3493037dcc8f8da294b3473e1223f0465e92c35bc3064bfc42d467bf212e",
+                  "initializer": "3a90c93217f15e9a60db7f65f611911f4aa53f1a4987340949e1068fd2647c22",
+                  "timing": {
+                    "control_period_s": 0.01,
+                    "duration_s": 0.35,
+                    "sample_period_s": 0.01,
+                    "termination": [
+                      "duration",
+                      "numerical_failure"
+                    ],
+                    "timestep_s": 0.0005
+                  }
+                }
+              },
+              "historical_states_reused": false,
+              "nominal_is_current_target_solution": false,
+              "physics_identity": "bd0371aad5cdc49b4e074ac130fb27ed12d86b8b6bfcbc2ee9450ab6857d798f",
+              "previous_input_source": "candidate bounded pretension",
+              "resolved_basis_identity": "63aab968b8f0732f13dc73454e2628ee015c67b6b92aa47639d9f8b55d928f0e",
+              "reused": false,
+              "source_kind": "project_initial_state_and_bounded_pretension",
+              "validity": "Tensions are numerical guesses; placeholder states must be regenerated using candidate dynamics before use"
+            },
+            "solver": "MATLAB fsolve",
+            "static_residual_inf": 5.753047777751208e-17,
+            "status": 3,
+            "success": true
+          },
+          "equilibrium": true,
+          "linearization_scope": "local equilibrium linearization",
+          "name": "fixed_input_equilibrium",
+          "phase": "configuration_fixed_input_equilibrium",
+          "remaining_task_s": 0.35
+        },
+        "covered_samples": {
+          "horizon": {
+            "analysis_horizon_s": 0.35,
+            "interpretation": "Actual saved-state remaining horizon, or nominal horizon from the declared configuration operating point.",
+            "origin": null,
+            "period_s": 0.01,
+            "remaining_task_s": 0.35,
+            "task_duration_s": 0.35
+          },
+          "constraints": [
+            {
+              "analyzed_indices": [],
+              "constraint_id": "terminal_error_m",
+              "expressible": true,
+              "reason": "Local position authority/static construction only; no sampled constraint verification.",
+              "status": "diagnostic"
+            },
+            {
+              "analyzed_indices": [],
+              "constraint_id": "holding_max_error_m",
+              "expressible": true,
+              "reason": "Local position authority/static construction only; no sampled constraint verification.",
+              "status": "diagnostic"
+            },
+            {
+              "analyzed_indices": [],
+              "constraint_id": "holding_max_speed_m_s",
+              "expressible": true,
+              "reason": "Existing tools do not enforce this constraint kind or sampled window.",
+              "status": "not_applicable"
+            }
+          ],
+          "full_task_supported": false
+        },
+        "assumptions": {
+          "model": {
+            "model_id": "model.sorosim_gvs",
+            "model_version": "1.0.0",
+            "relevant_assumptions": [
+              "supported serial tendon-driven continuum topology",
+              "selected strain basis spans deformation relevant to the use",
+              "inextensible centerline",
+              "no shear",
+              "no torsion",
+              "straight frictionless tendon spans"
+            ],
+            "representation_id": "63aab968b8f0732f13dc73454e2628ee015c67b6b92aa47639d9f8b55d928f0e"
+          },
+          "physical_inputs": {
+            "control_period_s": 0.01,
+            "frame": "tendon_path",
+            "lower": [
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "phase": "pre_step",
+            "provenance": [
+              "/robot/structure/data/tendons",
+              "/task/timing/control_period_s"
+            ],
+            "signal": "tendon_tension",
+            "tendon_order": [
+              "tendon_0",
+              "tendon_1",
+              "tendon_2",
+              "tendon_3"
+            ],
+            "units": "N",
+            "upper": [
+              8.0,
+              8.0,
+              8.0,
+              8.0
+            ]
+          },
+          "legacy_applicability": {
+            "constraint_coverage": [
+              {
+                "analyzed_indices": [],
+                "constraint_id": "terminal_error_m",
+                "expressible": true,
+                "reason": "Local position authority/static construction only; no sampled constraint verification.",
+                "status": "diagnostic"
+              },
+              {
+                "analyzed_indices": [],
+                "constraint_id": "holding_max_error_m",
+                "expressible": true,
+                "reason": "Local position authority/static construction only; no sampled constraint verification.",
+                "status": "diagnostic"
+              },
+              {
+                "analyzed_indices": [],
+                "constraint_id": "holding_max_speed_m_s",
+                "expressible": true,
+                "reason": "Existing tools do not enforce this constraint kind or sampled window.",
+                "status": "not_applicable"
+              }
+            ],
+            "execution_support": "not_assessed",
+            "full_task_supported": false,
+            "horizon": {
+              "analysis_horizon_s": 0.35,
+              "interpretation": "Actual saved-state remaining horizon, or nominal horizon from the declared configuration operating point.",
+              "origin": null,
+              "period_s": 0.01,
+              "remaining_task_s": 0.35,
+              "task_duration_s": 0.35
+            },
+            "model_assessment": {
+              "design_id": "serial_family_candidate",
+              "design_identity": "10035885ded80b7afbf2faa28988c6275a18ac04f3232c5d0972acced81af9ad",
+              "generalized_coordinate_dimension": 12,
+              "model_id": "model.sorosim_gvs",
+              "model_version": "1.0.0",
+              "relevant_assumptions": [
+                "supported serial tendon-driven continuum topology",
+                "selected strain basis spans deformation relevant to the use",
+                "inextensible centerline",
+                "no shear",
+                "no torsion",
+                "straight frictionless tendon spans"
+              ],
+              "representation_id": "63aab968b8f0732f13dc73454e2628ee015c67b6b92aa47639d9f8b55d928f0e",
+              "representation_kind": "gvs_bending_basis_v1",
+              "representation_strategy": "structural_linear",
+              "state_dimension": 24,
+              "unsupported_requested_physics": [],
+              "uses": {
+                "static_equilibrium": {
+                  "evidence": [],
+                  "reasons": [
+                    "SoRoSim local bending computation is supported; physical agreement outside measured operating points is unvalidated."
+                  ],
+                  "status": "WARN",
+                  "validation": "unavailable"
+                }
+              }
+            },
+            "reasons": [],
+            "status": "applicable"
+          },
+          "source": "Trusted resolved tool artifact; not arbitrary LLM assertions"
+        },
+        "supported_inferences": [
+          "local_diagnostic"
+        ],
+        "unsupported_inferences": [
+          "global_nonlinear_feasibility",
+          "global_nonlinear_infeasibility",
+          "structural_infeasibility",
+          "whole_horizon_from_instantaneous_braking",
+          "adapted_dynamic_improvement_from_static_sensitivity",
+          "unvisited_simulation_descent_guarantee",
+          "continuous_time_compliance",
+          "hardware_performance",
+          "robustness",
+          "repeatability",
+          "observed_task_pass"
+        ],
+        "evidence_reference": {
+          "artifact_id": "3d32d8858de05abc41be80900eb9ade43bb3c4b033db1f594a9e13ccaf9e2bf7",
+          "media_type": "application/json"
+        },
+        "numerical_evidence_pointer": "/sensitivity",
+        "prospective_guarantee": false,
+        "unresolved": [
+          "Nonlinear realization and constraints outside declared model/sample coverage remain unresolved.",
+          "Original independent physical task acceptance is unmeasured by this evidence."
+        ],
+        "next_checks": [
+          "independent_legal_physical_evaluation",
+          "matched_input_refinement",
+          "paired_local_response_check"
+        ]
+      }
+    },
+    {
+      "source_folder": "evidence/control_search_p1/study",
+      "summary": {
+        "version": "evidence_policy_v1",
+        "claim_kind": "PHYSICAL_OBSERVATION",
+        "verification_status": "complete_registered_execution",
+        "model_identity": "8f8eceb5f74d4b171c87f333db4db0f353aad051b375ff26aca795f7ac1fbaf2",
+        "candidate_identity": {
+          "artifact_id": "c5f8ed0f59611a9dd1e5f71a3be8b14378321c2a873debcde9e57b8261196969",
+          "media_type": "application/json"
+        },
+        "design_identity": "10035885ded80b7afbf2faa28988c6275a18ac04f3232c5d0972acced81af9ad",
+        "task_identity": "882b3493037dcc8f8da294b3473e1223f0465e92c35bc3064bfc42d467bf212e",
+        "operating_point": {},
+        "covered_samples": {
+          "timing": {
+            "control_period_s": 0.01,
+            "deadline_misses": null,
+            "duration_s": 0.35,
+            "mean_update_s": null,
+            "real_time_demonstrated": null,
+            "real_time_required": false,
+            "sample_period_s": 0.01,
+            "simulation_wall_s": null,
+            "termination": [
+              "duration",
+              "numerical_failure"
+            ],
+            "timestep_s": 0.0005
+          },
+          "components": {
+            "evaluation_validity": {
+              "limit": null,
+              "passed": true,
+              "reason": null,
+              "unit": null,
+              "value": "valid"
+            },
+            "evaluator:task_bound": {
+              "limit": 0.01,
+              "passed": true,
+              "reason": null,
+              "unit": "m",
+              "value": 0.006120971961039191
+            },
+            "execution_complete": {
+              "limit": null,
+              "passed": true,
+              "reason": null,
+              "unit": null,
+              "value": true
+            },
+            "force_bounds": {
+              "limit": 1e-08,
+              "passed": true,
+              "reason": null,
+              "unit": "N",
+              "value": 0.0
+            },
+            "holding_coverage": {
+              "limit": 6,
+              "passed": true,
+              "reason": null,
+              "unit": "inclusive uniform samples",
+              "value": true
+            },
+            "holding_position": {
+              "limit": 0.01,
+              "passed": true,
+              "reason": null,
+              "unit": "m",
+              "value": 0.006926833645295584
+            },
+            "holding_speed": {
+              "limit": 0.02,
+              "passed": false,
+              "reason": null,
+              "unit": "m/s",
+              "value": 0.04181409404195048
+            },
+            "solver_errors": {
+              "limit": 0,
+              "passed": true,
+              "reason": null,
+              "unit": "count",
+              "value": 0
+            },
+            "task_evaluator": {
+              "limit": null,
+              "passed": true,
+              "reason": null,
+              "unit": null,
+              "value": true
+            }
+          },
+          "episodes": null,
+          "execution_id": "schedule-61c5deb95a89fa38ed3929aa7966ec514df6a1e38129fdce36b78d6e9420006e-physical",
+          "scope": "Only this completed independent execution"
+        },
+        "assumptions": {
+          "model": {},
+          "physical_inputs": {},
+          "legacy_applicability": {},
+          "source": "Trusted resolved tool artifact; not arbitrary LLM assertions"
+        },
+        "supported_inferences": [
+          "observed_task_outcome"
+        ],
+        "unsupported_inferences": [
+          "global_nonlinear_feasibility",
+          "global_nonlinear_infeasibility",
+          "structural_infeasibility",
+          "whole_horizon_from_instantaneous_braking",
+          "adapted_dynamic_improvement_from_static_sensitivity",
+          "unvisited_simulation_descent_guarantee",
+          "continuous_time_compliance",
+          "hardware_performance",
+          "robustness",
+          "repeatability",
+          "observed_task_pass"
+        ],
+        "evidence_reference": {
+          "artifact_id": "441a6a3f8a409a3407d517f88fc2dc1532d50c08c39e8b90f44a90aef59cd04e",
+          "media_type": "application/json"
+        },
+        "numerical_evidence_pointer": "/acceptance",
+        "prospective_guarantee": false,
+        "unresolved": [],
+        "next_checks": [
+          "independent_legal_physical_evaluation",
+          "matched_input_refinement",
+          "paired_local_response_check"
+        ]
+      }
+    },
+    {
+      "source_folder": "evidence/control_search_p1/study",
+      "summary": {
+        "version": "evidence_policy_v1",
+        "claim_kind": "PHYSICAL_OBSERVATION",
+        "verification_status": "complete_registered_execution",
+        "model_identity": "6d6abb77898378065e38e6bf2d026682f33881301eb8e69a92759a8378d63af1",
+        "candidate_identity": {
+          "artifact_id": "47b453a8079c217a4f880ac1c843a6dd2ba81e0ca27b57c187e88143b9a7411a",
+          "media_type": "application/json"
+        },
+        "design_identity": "e370e9aebc93060ad08e1f91e548c49fd0768dc8e329645eb0f5f04409c65bd3",
+        "task_identity": "882b3493037dcc8f8da294b3473e1223f0465e92c35bc3064bfc42d467bf212e",
+        "operating_point": {},
+        "covered_samples": {
+          "timing": {
+            "control_period_s": 0.01,
+            "deadline_misses": null,
+            "duration_s": 0.35,
+            "mean_update_s": null,
+            "real_time_demonstrated": null,
+            "real_time_required": false,
+            "sample_period_s": 0.01,
+            "simulation_wall_s": null,
+            "termination": [
+              "duration",
+              "numerical_failure"
+            ],
+            "timestep_s": 0.0005
+          },
+          "components": {
+            "evaluation_validity": {
+              "limit": null,
+              "passed": true,
+              "reason": null,
+              "unit": null,
+              "value": "valid"
+            },
+            "evaluator:task_bound": {
+              "limit": 0.01,
+              "passed": true,
+              "reason": null,
+              "unit": "m",
+              "value": 0.005917143773777798
+            },
+            "execution_complete": {
+              "limit": null,
+              "passed": true,
+              "reason": null,
+              "unit": null,
+              "value": true
+            },
+            "force_bounds": {
+              "limit": 1e-08,
+              "passed": true,
+              "reason": null,
+              "unit": "N",
+              "value": 0.0
+            },
+            "holding_coverage": {
+              "limit": 6,
+              "passed": true,
+              "reason": null,
+              "unit": "inclusive uniform samples",
+              "value": true
+            },
+            "holding_position": {
+              "limit": 0.01,
+              "passed": true,
+              "reason": null,
+              "unit": "m",
+              "value": 0.006618027540341892
+            },
+            "holding_speed": {
+              "limit": 0.02,
+              "passed": false,
+              "reason": null,
+              "unit": "m/s",
+              "value": 0.06961280995452018
+            },
+            "solver_errors": {
+              "limit": 0,
+              "passed": true,
+              "reason": null,
+              "unit": "count",
+              "value": 0
+            },
+            "task_evaluator": {
+              "limit": null,
+              "passed": true,
+              "reason": null,
+              "unit": null,
+              "value": true
+            }
+          },
+          "episodes": null,
+          "execution_id": "schedule-ea9a9867575066f435e53760ecd3bcc694186919de8827b472d60fcf6767b465-physical",
+          "scope": "Only this completed independent execution"
+        },
+        "assumptions": {
+          "model": {},
+          "physical_inputs": {},
+          "legacy_applicability": {},
+          "source": "Trusted resolved tool artifact; not arbitrary LLM assertions"
+        },
+        "supported_inferences": [
+          "observed_task_outcome"
+        ],
+        "unsupported_inferences": [
+          "global_nonlinear_feasibility",
+          "global_nonlinear_infeasibility",
+          "structural_infeasibility",
+          "whole_horizon_from_instantaneous_braking",
+          "adapted_dynamic_improvement_from_static_sensitivity",
+          "unvisited_simulation_descent_guarantee",
+          "continuous_time_compliance",
+          "hardware_performance",
+          "robustness",
+          "repeatability",
+          "observed_task_pass"
+        ],
+        "evidence_reference": {
+          "artifact_id": "278dfebed8ce60ac893a690eaa9d7b2acfedc1940a9890c2c2ac40f839111b45",
+          "media_type": "application/json"
+        },
+        "numerical_evidence_pointer": "/acceptance",
+        "prospective_guarantee": false,
+        "unresolved": [],
+        "next_checks": [
+          "independent_legal_physical_evaluation",
+          "matched_input_refinement",
+          "paired_local_response_check"
+        ]
+      }
+    },
+    {
+      "source_folder": "evidence/control_search_p1/study",
+      "summary": {
+        "version": "evidence_policy_v1",
+        "claim_kind": "PHYSICAL_OBSERVATION",
+        "verification_status": "complete_registered_execution",
+        "model_identity": "8f8eceb5f74d4b171c87f333db4db0f353aad051b375ff26aca795f7ac1fbaf2",
+        "candidate_identity": {
+          "artifact_id": "c5f8ed0f59611a9dd1e5f71a3be8b14378321c2a873debcde9e57b8261196969",
+          "media_type": "application/json"
+        },
+        "design_identity": "10035885ded80b7afbf2faa28988c6275a18ac04f3232c5d0972acced81af9ad",
+        "task_identity": "882b3493037dcc8f8da294b3473e1223f0465e92c35bc3064bfc42d467bf212e",
+        "operating_point": {},
+        "covered_samples": {
+          "timing": {
+            "control_period_s": 0.01,
+            "deadline_misses": null,
+            "duration_s": 0.35,
+            "mean_update_s": null,
+            "real_time_demonstrated": null,
+            "real_time_required": false,
+            "sample_period_s": 0.01,
+            "simulation_wall_s": null,
+            "termination": [
+              "duration",
+              "numerical_failure"
+            ],
+            "timestep_s": 0.0005
+          },
+          "components": {
+            "evaluation_validity": {
+              "limit": null,
+              "passed": true,
+              "reason": null,
+              "unit": null,
+              "value": "valid"
+            },
+            "evaluator:task_bound": {
+              "limit": 0.01,
+              "passed": true,
+              "reason": null,
+              "unit": "m",
+              "value": 0.006194626987613342
+            },
+            "execution_complete": {
+              "limit": null,
+              "passed": true,
+              "reason": null,
+              "unit": null,
+              "value": true
+            },
+            "force_bounds": {
+              "limit": 1e-08,
+              "passed": true,
+              "reason": null,
+              "unit": "N",
+              "value": 0.0
+            },
+            "holding_coverage": {
+              "limit": 6,
+              "passed": true,
+              "reason": null,
+              "unit": "inclusive uniform samples",
+              "value": true
+            },
+            "holding_position": {
+              "limit": 0.01,
+              "passed": true,
+              "reason": null,
+              "unit": "m",
+              "value": 0.007018238021282893
+            },
+            "holding_speed": {
+              "limit": 0.02,
+              "passed": false,
+              "reason": null,
+              "unit": "m/s",
+              "value": 0.04266598533460278
+            },
+            "solver_errors": {
+              "limit": 0,
+              "passed": true,
+              "reason": null,
+              "unit": "count",
+              "value": 0
+            },
+            "task_evaluator": {
+              "limit": null,
+              "passed": true,
+              "reason": null,
+              "unit": null,
+              "value": true
+            }
+          },
+          "episodes": null,
+          "execution_id": "schedule-7d15c764ab1ea94b3e8c1192891a558b3f9f57a88adb59b2220d09155bb27919-physical",
+          "scope": "Only this completed independent execution"
+        },
+        "assumptions": {
+          "model": {},
+          "physical_inputs": {},
+          "legacy_applicability": {},
+          "source": "Trusted resolved tool artifact; not arbitrary LLM assertions"
+        },
+        "supported_inferences": [
+          "observed_task_outcome"
+        ],
+        "unsupported_inferences": [
+          "global_nonlinear_feasibility",
+          "global_nonlinear_infeasibility",
+          "structural_infeasibility",
+          "whole_horizon_from_instantaneous_braking",
+          "adapted_dynamic_improvement_from_static_sensitivity",
+          "unvisited_simulation_descent_guarantee",
+          "continuous_time_compliance",
+          "hardware_performance",
+          "robustness",
+          "repeatability",
+          "observed_task_pass"
+        ],
+        "evidence_reference": {
+          "artifact_id": "0e6608329290ab7f8067b1d18a32dbeea681ed2def5933ed709c2422371cc843",
+          "media_type": "application/json"
+        },
+        "numerical_evidence_pointer": "/acceptance",
+        "prospective_guarantee": false,
+        "unresolved": [],
+        "next_checks": [
+          "independent_legal_physical_evaluation",
+          "matched_input_refinement",
+          "paired_local_response_check"
+        ]
+      }
+    },
+    {
+      "source_folder": "evidence/control_search_p1/study",
+      "summary": {
+        "version": "evidence_policy_v1",
+        "claim_kind": "PHYSICAL_OBSERVATION",
+        "verification_status": "complete_registered_execution",
+        "model_identity": "8f8eceb5f74d4b171c87f333db4db0f353aad051b375ff26aca795f7ac1fbaf2",
+        "candidate_identity": {
+          "artifact_id": "c5f8ed0f59611a9dd1e5f71a3be8b14378321c2a873debcde9e57b8261196969",
+          "media_type": "application/json"
+        },
+        "design_identity": "10035885ded80b7afbf2faa28988c6275a18ac04f3232c5d0972acced81af9ad",
+        "task_identity": "882b3493037dcc8f8da294b3473e1223f0465e92c35bc3064bfc42d467bf212e",
+        "operating_point": {},
+        "covered_samples": {
+          "timing": {
+            "control_period_s": 0.01,
+            "deadline_misses": null,
+            "duration_s": 0.35,
+            "mean_update_s": null,
+            "real_time_demonstrated": null,
+            "real_time_required": false,
+            "sample_period_s": 0.01,
+            "simulation_wall_s": null,
+            "termination": [
+              "duration",
+              "numerical_failure"
+            ],
+            "timestep_s": 0.0005
+          },
+          "components": {
+            "evaluation_validity": {
+              "limit": null,
+              "passed": true,
+              "reason": null,
+              "unit": null,
+              "value": "valid"
+            },
+            "evaluator:task_bound": {
+              "limit": 0.01,
+              "passed": true,
+              "reason": null,
+              "unit": "m",
+              "value": 0.005980072942853529
+            },
+            "execution_complete": {
+              "limit": null,
+              "passed": true,
+              "reason": null,
+              "unit": null,
+              "value": true
+            },
+            "force_bounds": {
+              "limit": 1e-08,
+              "passed": true,
+              "reason": null,
+              "unit": "N",
+              "value": 0.0
+            },
+            "holding_coverage": {
+              "limit": 6,
+              "passed": true,
+              "reason": null,
+              "unit": "inclusive uniform samples",
+              "value": true
+            },
+            "holding_position": {
+              "limit": 0.01,
+              "passed": true,
+              "reason": null,
+              "unit": "m",
+              "value": 0.006715365975092638
+            },
+            "holding_speed": {
+              "limit": 0.02,
+              "passed": false,
+              "reason": null,
+              "unit": "m/s",
+              "value": 0.0393744443267976
+            },
+            "solver_errors": {
+              "limit": 0,
+              "passed": true,
+              "reason": null,
+              "unit": "count",
+              "value": 0
+            },
+            "task_evaluator": {
+              "limit": null,
+              "passed": true,
+              "reason": null,
+              "unit": null,
+              "value": true
+            }
+          },
+          "episodes": null,
+          "execution_id": "schedule-a789d7f807a61fa01d0d75444d67b4b7d272f7f581024d0e61901f5a53791b25-physical",
+          "scope": "Only this completed independent execution"
+        },
+        "assumptions": {
+          "model": {},
+          "physical_inputs": {},
+          "legacy_applicability": {},
+          "source": "Trusted resolved tool artifact; not arbitrary LLM assertions"
+        },
+        "supported_inferences": [
+          "observed_task_outcome"
+        ],
+        "unsupported_inferences": [
+          "global_nonlinear_feasibility",
+          "global_nonlinear_infeasibility",
+          "structural_infeasibility",
+          "whole_horizon_from_instantaneous_braking",
+          "adapted_dynamic_improvement_from_static_sensitivity",
+          "unvisited_simulation_descent_guarantee",
+          "continuous_time_compliance",
+          "hardware_performance",
+          "robustness",
+          "repeatability",
+          "observed_task_pass"
+        ],
+        "evidence_reference": {
+          "artifact_id": "98b814b5bfe4c02b980b739e55180078df55be7f433b5384cc9719faa8f7960b",
+          "media_type": "application/json"
+        },
+        "numerical_evidence_pointer": "/acceptance",
+        "prospective_guarantee": false,
+        "unresolved": [],
+        "next_checks": [
+          "independent_legal_physical_evaluation",
+          "matched_input_refinement",
+          "paired_local_response_check"
+        ]
+      }
+    },
+    {
+      "source_folder": "evidence/control_search_p1/study",
+      "summary": {
+        "version": "evidence_policy_v1",
+        "claim_kind": "PHYSICAL_OBSERVATION",
+        "verification_status": "complete_registered_execution",
+        "model_identity": "8f8eceb5f74d4b171c87f333db4db0f353aad051b375ff26aca795f7ac1fbaf2",
+        "candidate_identity": {
+          "artifact_id": "c5f8ed0f59611a9dd1e5f71a3be8b14378321c2a873debcde9e57b8261196969",
+          "media_type": "application/json"
+        },
+        "design_identity": "10035885ded80b7afbf2faa28988c6275a18ac04f3232c5d0972acced81af9ad",
+        "task_identity": "882b3493037dcc8f8da294b3473e1223f0465e92c35bc3064bfc42d467bf212e",
+        "operating_point": {},
+        "covered_samples": {
+          "timing": {
+            "control_period_s": 0.01,
+            "deadline_misses": null,
+            "duration_s": 0.35,
+            "mean_update_s": null,
+            "real_time_demonstrated": null,
+            "real_time_required": false,
+            "sample_period_s": 0.01,
+            "simulation_wall_s": null,
+            "termination": [
+              "duration",
+              "numerical_failure"
+            ],
+            "timestep_s": 0.0005
+          },
+          "components": {
+            "evaluation_validity": {
+              "limit": null,
+              "passed": true,
+              "reason": null,
+              "unit": null,
+              "value": "valid"
+            },
+            "evaluator:task_bound": {
+              "limit": 0.01,
+              "passed": true,
+              "reason": null,
+              "unit": "m",
+              "value": 0.006132626908110702
+            },
+            "execution_complete": {
+              "limit": null,
+              "passed": true,
+              "reason": null,
+              "unit": null,
+              "value": true
+            },
+            "force_bounds": {
+              "limit": 1e-08,
+              "passed": true,
+              "reason": null,
+              "unit": "N",
+              "value": 0.0
+            },
+            "holding_coverage": {
+              "limit": 6,
+              "passed": true,
+              "reason": null,
+              "unit": "inclusive uniform samples",
+              "value": true
+            },
+            "holding_position": {
+              "limit": 0.01,
+              "passed": true,
+              "reason": null,
+              "unit": "m",
+              "value": 0.006944505052189203
+            },
+            "holding_speed": {
+              "limit": 0.02,
+              "passed": false,
+              "reason": null,
+              "unit": "m/s",
+              "value": 0.04139125013996114
+            },
+            "solver_errors": {
+              "limit": 0,
+              "passed": true,
+              "reason": null,
+              "unit": "count",
+              "value": 0
+            },
+            "task_evaluator": {
+              "limit": null,
+              "passed": true,
+              "reason": null,
+              "unit": null,
+              "value": true
+            }
+          },
+          "episodes": null,
+          "execution_id": "schedule-9664393318b36aa621ebf36f143cab439c193d748ef4b1ff916f21943a140c8c-physical",
+          "scope": "Only this completed independent execution"
+        },
+        "assumptions": {
+          "model": {},
+          "physical_inputs": {},
+          "legacy_applicability": {},
+          "source": "Trusted resolved tool artifact; not arbitrary LLM assertions"
+        },
+        "supported_inferences": [
+          "observed_task_outcome"
+        ],
+        "unsupported_inferences": [
+          "global_nonlinear_feasibility",
+          "global_nonlinear_infeasibility",
+          "structural_infeasibility",
+          "whole_horizon_from_instantaneous_braking",
+          "adapted_dynamic_improvement_from_static_sensitivity",
+          "unvisited_simulation_descent_guarantee",
+          "continuous_time_compliance",
+          "hardware_performance",
+          "robustness",
+          "repeatability",
+          "observed_task_pass"
+        ],
+        "evidence_reference": {
+          "artifact_id": "7742aa420e1e506c5ae143d6f88aaa8946fc85aa73b9e77140584e9094a5c55c",
+          "media_type": "application/json"
+        },
+        "numerical_evidence_pointer": "/acceptance",
+        "prospective_guarantee": false,
+        "unresolved": [],
+        "next_checks": [
+          "independent_legal_physical_evaluation",
+          "matched_input_refinement",
+          "paired_local_response_check"
+        ]
+      }
+    },
+    {
+      "source_folder": "evidence/control_search_p1/study",
+      "summary": {
+        "version": "evidence_policy_v1",
+        "claim_kind": "PHYSICAL_OBSERVATION",
+        "verification_status": "complete_registered_execution",
+        "model_identity": "8f8eceb5f74d4b171c87f333db4db0f353aad051b375ff26aca795f7ac1fbaf2",
+        "candidate_identity": {
+          "artifact_id": "c5f8ed0f59611a9dd1e5f71a3be8b14378321c2a873debcde9e57b8261196969",
+          "media_type": "application/json"
+        },
+        "design_identity": "10035885ded80b7afbf2faa28988c6275a18ac04f3232c5d0972acced81af9ad",
+        "task_identity": "882b3493037dcc8f8da294b3473e1223f0465e92c35bc3064bfc42d467bf212e",
+        "operating_point": {},
+        "covered_samples": {
+          "timing": {
+            "control_period_s": 0.01,
+            "deadline_misses": null,
+            "duration_s": 0.35,
+            "mean_update_s": null,
+            "real_time_demonstrated": null,
+            "real_time_required": false,
+            "sample_period_s": 0.01,
+            "simulation_wall_s": null,
+            "termination": [
+              "duration",
+              "numerical_failure"
+            ],
+            "timestep_s": 0.0005
+          },
+          "components": {
+            "evaluation_validity": {
+              "limit": null,
+              "passed": true,
+              "reason": null,
+              "unit": null,
+              "value": "valid"
+            },
+            "evaluator:task_bound": {
+              "limit": 0.01,
+              "passed": true,
+              "reason": null,
+              "unit": "m",
+              "value": 0.006318762149710552
+            },
+            "execution_complete": {
+              "limit": null,
+              "passed": true,
+              "reason": null,
+              "unit": null,
+              "value": true
+            },
+            "force_bounds": {
+              "limit": 1e-08,
+              "passed": true,
+              "reason": null,
+              "unit": "N",
+              "value": 0.0
+            },
+            "holding_coverage": {
+              "limit": 6,
+              "passed": true,
+              "reason": null,
+              "unit": "inclusive uniform samples",
+              "value": true
+            },
+            "holding_position": {
+              "limit": 0.01,
+              "passed": true,
+              "reason": null,
+              "unit": "m",
+              "value": 0.00719399838791787
+            },
+            "holding_speed": {
+              "limit": 0.02,
+              "passed": false,
+              "reason": null,
+              "unit": "m/s",
+              "value": 0.04396676263495414
+            },
+            "solver_errors": {
+              "limit": 0,
+              "passed": true,
+              "reason": null,
+              "unit": "count",
+              "value": 0
+            },
+            "task_evaluator": {
+              "limit": null,
+              "passed": true,
+              "reason": null,
+              "unit": null,
+              "value": true
+            }
+          },
+          "episodes": null,
+          "execution_id": "schedule-e8f876b11d6f1c6c68e6c8f3721f73da8812e258f506e76b64c9adeea0a29a7d-physical",
+          "scope": "Only this completed independent execution"
+        },
+        "assumptions": {
+          "model": {},
+          "physical_inputs": {},
+          "legacy_applicability": {},
+          "source": "Trusted resolved tool artifact; not arbitrary LLM assertions"
+        },
+        "supported_inferences": [
+          "observed_task_outcome"
+        ],
+        "unsupported_inferences": [
+          "global_nonlinear_feasibility",
+          "global_nonlinear_infeasibility",
+          "structural_infeasibility",
+          "whole_horizon_from_instantaneous_braking",
+          "adapted_dynamic_improvement_from_static_sensitivity",
+          "unvisited_simulation_descent_guarantee",
+          "continuous_time_compliance",
+          "hardware_performance",
+          "robustness",
+          "repeatability",
+          "observed_task_pass"
+        ],
+        "evidence_reference": {
+          "artifact_id": "463b1a4b900d521f53bd9f50001b205901f332d26b16907deaab7689609ba810",
+          "media_type": "application/json"
+        },
+        "numerical_evidence_pointer": "/acceptance",
+        "prospective_guarantee": false,
+        "unresolved": [],
+        "next_checks": [
+          "independent_legal_physical_evaluation",
+          "matched_input_refinement",
+          "paired_local_response_check"
+        ]
+      }
+    },
+    {
+      "source_folder": "evidence/control_search_p1/study",
+      "summary": {
+        "version": "evidence_policy_v1",
+        "claim_kind": "PHYSICAL_OBSERVATION",
+        "verification_status": "complete_registered_execution",
+        "model_identity": "8f8eceb5f74d4b171c87f333db4db0f353aad051b375ff26aca795f7ac1fbaf2",
+        "candidate_identity": {
+          "artifact_id": "c5f8ed0f59611a9dd1e5f71a3be8b14378321c2a873debcde9e57b8261196969",
+          "media_type": "application/json"
+        },
+        "design_identity": "10035885ded80b7afbf2faa28988c6275a18ac04f3232c5d0972acced81af9ad",
+        "task_identity": "882b3493037dcc8f8da294b3473e1223f0465e92c35bc3064bfc42d467bf212e",
+        "operating_point": {},
+        "covered_samples": {
+          "timing": {
+            "control_period_s": 0.01,
+            "deadline_misses": null,
+            "duration_s": 0.35,
+            "mean_update_s": null,
+            "real_time_demonstrated": null,
+            "real_time_required": false,
+            "sample_period_s": 0.01,
+            "simulation_wall_s": null,
+            "termination": [
+              "duration",
+              "numerical_failure"
+            ],
+            "timestep_s": 0.0005
+          },
+          "components": {
+            "evaluation_validity": {
+              "limit": null,
+              "passed": true,
+              "reason": null,
+              "unit": null,
+              "value": "valid"
+            },
+            "evaluator:task_bound": {
+              "limit": 0.01,
+              "passed": true,
+              "reason": null,
+              "unit": "m",
+              "value": 0.006251038307165498
+            },
+            "execution_complete": {
+              "limit": null,
+              "passed": true,
+              "reason": null,
+              "unit": null,
+              "value": true
+            },
+            "force_bounds": {
+              "limit": 1e-08,
+              "passed": true,
+              "reason": null,
+              "unit": "N",
+              "value": 0.0
+            },
+            "holding_coverage": {
+              "limit": 6,
+              "passed": true,
+              "reason": null,
+              "unit": "inclusive uniform samples",
+              "value": true
+            },
+            "holding_position": {
+              "limit": 0.01,
+              "passed": true,
+              "reason": null,
+              "unit": "m",
+              "value": 0.007024938720209154
+            },
+            "holding_speed": {
+              "limit": 0.02,
+              "passed": false,
+              "reason": null,
+              "unit": "m/s",
+              "value": 0.04198708274956272
+            },
+            "solver_errors": {
+              "limit": 0,
+              "passed": true,
+              "reason": null,
+              "unit": "count",
+              "value": 0
+            },
+            "task_evaluator": {
+              "limit": null,
+              "passed": true,
+              "reason": null,
+              "unit": null,
+              "value": true
+            }
+          },
+          "episodes": null,
+          "execution_id": "schedule-e9c02c1d0632a7c06ec0ad77d760f63f5553e0804201c77c7c8343d1fa7f5364-physical",
+          "scope": "Only this completed independent execution"
+        },
+        "assumptions": {
+          "model": {},
+          "physical_inputs": {},
+          "legacy_applicability": {},
+          "source": "Trusted resolved tool artifact; not arbitrary LLM assertions"
+        },
+        "supported_inferences": [
+          "observed_task_outcome"
+        ],
+        "unsupported_inferences": [
+          "global_nonlinear_feasibility",
+          "global_nonlinear_infeasibility",
+          "structural_infeasibility",
+          "whole_horizon_from_instantaneous_braking",
+          "adapted_dynamic_improvement_from_static_sensitivity",
+          "unvisited_simulation_descent_guarantee",
+          "continuous_time_compliance",
+          "hardware_performance",
+          "robustness",
+          "repeatability",
+          "observed_task_pass"
+        ],
+        "evidence_reference": {
+          "artifact_id": "fdd279b11f4336985ee2ca846465f9007056e180f62715eec07ac4618203abf8",
+          "media_type": "application/json"
+        },
+        "numerical_evidence_pointer": "/acceptance",
+        "prospective_guarantee": false,
+        "unresolved": [],
+        "next_checks": [
+          "independent_legal_physical_evaluation",
+          "matched_input_refinement",
+          "paired_local_response_check"
+        ]
+      }
+    },
+    {
+      "source_folder": "evidence/control_search_p1/study",
+      "summary": {
+        "version": "evidence_policy_v1",
+        "claim_kind": "PHYSICAL_OBSERVATION",
+        "verification_status": "complete_registered_execution",
+        "model_identity": "8f8eceb5f74d4b171c87f333db4db0f353aad051b375ff26aca795f7ac1fbaf2",
+        "candidate_identity": {
+          "artifact_id": "c5f8ed0f59611a9dd1e5f71a3be8b14378321c2a873debcde9e57b8261196969",
+          "media_type": "application/json"
+        },
+        "design_identity": "10035885ded80b7afbf2faa28988c6275a18ac04f3232c5d0972acced81af9ad",
+        "task_identity": "882b3493037dcc8f8da294b3473e1223f0465e92c35bc3064bfc42d467bf212e",
+        "operating_point": {},
+        "covered_samples": {
+          "timing": {
+            "control_period_s": 0.01,
+            "deadline_misses": null,
+            "duration_s": 0.35,
+            "mean_update_s": null,
+            "real_time_demonstrated": null,
+            "real_time_required": false,
+            "sample_period_s": 0.01,
+            "simulation_wall_s": null,
+            "termination": [
+              "duration",
+              "numerical_failure"
+            ],
+            "timestep_s": 0.0005
+          },
+          "components": {
+            "evaluation_validity": {
+              "limit": null,
+              "passed": true,
+              "reason": null,
+              "unit": null,
+              "value": "valid"
+            },
+            "evaluator:task_bound": {
+              "limit": 0.01,
+              "passed": true,
+              "reason": null,
+              "unit": "m",
+              "value": 0.005792662792044858
+            },
+            "execution_complete": {
+              "limit": null,
+              "passed": true,
+              "reason": null,
+              "unit": null,
+              "value": true
+            },
+            "force_bounds": {
+              "limit": 1e-08,
+              "passed": true,
+              "reason": null,
+              "unit": "N",
+              "value": 0.0
+            },
+            "holding_coverage": {
+              "limit": 6,
+              "passed": true,
+              "reason": null,
+              "unit": "inclusive uniform samples",
+              "value": true
+            },
+            "holding_position": {
+              "limit": 0.01,
+              "passed": true,
+              "reason": null,
+              "unit": "m",
+              "value": 0.006557420297522467
+            },
+            "holding_speed": {
+              "limit": 0.02,
+              "passed": false,
+              "reason": null,
+              "unit": "m/s",
+              "value": 0.040370221966922845
+            },
+            "solver_errors": {
+              "limit": 0,
+              "passed": true,
+              "reason": null,
+              "unit": "count",
+              "value": 0
+            },
+            "task_evaluator": {
+              "limit": null,
+              "passed": true,
+              "reason": null,
+              "unit": null,
+              "value": true
+            }
+          },
+          "episodes": null,
+          "execution_id": "schedule-e663de34659445603f6d5b8aabdaa69026189826100239c6640d6145a6743bbf-physical",
+          "scope": "Only this completed independent execution"
+        },
+        "assumptions": {
+          "model": {},
+          "physical_inputs": {},
+          "legacy_applicability": {},
+          "source": "Trusted resolved tool artifact; not arbitrary LLM assertions"
+        },
+        "supported_inferences": [
+          "observed_task_outcome"
+        ],
+        "unsupported_inferences": [
+          "global_nonlinear_feasibility",
+          "global_nonlinear_infeasibility",
+          "structural_infeasibility",
+          "whole_horizon_from_instantaneous_braking",
+          "adapted_dynamic_improvement_from_static_sensitivity",
+          "unvisited_simulation_descent_guarantee",
+          "continuous_time_compliance",
+          "hardware_performance",
+          "robustness",
+          "repeatability",
+          "observed_task_pass"
+        ],
+        "evidence_reference": {
+          "artifact_id": "2b73b667ba11abcedac1e73411effe0082061978e69252100af4b3d1e7969fd6",
+          "media_type": "application/json"
+        },
+        "numerical_evidence_pointer": "/acceptance",
+        "prospective_guarantee": false,
+        "unresolved": [],
+        "next_checks": [
+          "independent_legal_physical_evaluation",
+          "matched_input_refinement",
+          "paired_local_response_check"
+        ]
+      }
+    },
+    {
+      "source_folder": "evidence/control_search_p1/study",
+      "summary": {
+        "version": "evidence_policy_v1",
+        "claim_kind": "PHYSICAL_OBSERVATION",
+        "verification_status": "complete_registered_execution",
+        "model_identity": "8f8eceb5f74d4b171c87f333db4db0f353aad051b375ff26aca795f7ac1fbaf2",
+        "candidate_identity": {
+          "artifact_id": "c5f8ed0f59611a9dd1e5f71a3be8b14378321c2a873debcde9e57b8261196969",
+          "media_type": "application/json"
+        },
+        "design_identity": "10035885ded80b7afbf2faa28988c6275a18ac04f3232c5d0972acced81af9ad",
+        "task_identity": "882b3493037dcc8f8da294b3473e1223f0465e92c35bc3064bfc42d467bf212e",
+        "operating_point": {},
+        "covered_samples": {
+          "timing": {
+            "control_period_s": 0.01,
+            "deadline_misses": null,
+            "duration_s": 0.35,
+            "mean_update_s": null,
+            "real_time_demonstrated": null,
+            "real_time_required": false,
+            "sample_period_s": 0.01,
+            "simulation_wall_s": null,
+            "termination": [
+              "duration",
+              "numerical_failure"
+            ],
+            "timestep_s": 0.0005
+          },
+          "components": {
+            "evaluation_validity": {
+              "limit": null,
+              "passed": true,
+              "reason": null,
+              "unit": null,
+              "value": "valid"
+            },
+            "evaluator:task_bound": {
+              "limit": 0.01,
+              "passed": true,
+              "reason": null,
+              "unit": "m",
+              "value": 0.006262943169517622
+            },
+            "execution_complete": {
+              "limit": null,
+              "passed": true,
+              "reason": null,
+              "unit": null,
+              "value": true
+            },
+            "force_bounds": {
+              "limit": 1e-08,
+              "passed": true,
+              "reason": null,
+              "unit": "N",
+              "value": 0.0
+            },
+            "holding_coverage": {
+              "limit": 6,
+              "passed": true,
+              "reason": null,
+              "unit": "inclusive uniform samples",
+              "value": true
+            },
+            "holding_position": {
+              "limit": 0.01,
+              "passed": true,
+              "reason": null,
+              "unit": "m",
+              "value": 0.007111363535345468
+            },
+            "holding_speed": {
+              "limit": 0.02,
+              "passed": false,
+              "reason": null,
+              "unit": "m/s",
+              "value": 0.04127618481507504
+            },
+            "solver_errors": {
+              "limit": 0,
+              "passed": true,
+              "reason": null,
+              "unit": "count",
+              "value": 0
+            },
+            "task_evaluator": {
+              "limit": null,
+              "passed": true,
+              "reason": null,
+              "unit": null,
+              "value": true
+            }
+          },
+          "episodes": null,
+          "execution_id": "schedule-9eb8768b685d668a662d08ffca4f66eaab8cc1530aa19bc24bba74ed78248e96-physical",
+          "scope": "Only this completed independent execution"
+        },
+        "assumptions": {
+          "model": {},
+          "physical_inputs": {},
+          "legacy_applicability": {},
+          "source": "Trusted resolved tool artifact; not arbitrary LLM assertions"
+        },
+        "supported_inferences": [
+          "observed_task_outcome"
+        ],
+        "unsupported_inferences": [
+          "global_nonlinear_feasibility",
+          "global_nonlinear_infeasibility",
+          "structural_infeasibility",
+          "whole_horizon_from_instantaneous_braking",
+          "adapted_dynamic_improvement_from_static_sensitivity",
+          "unvisited_simulation_descent_guarantee",
+          "continuous_time_compliance",
+          "hardware_performance",
+          "robustness",
+          "repeatability",
+          "observed_task_pass"
+        ],
+        "evidence_reference": {
+          "artifact_id": "972aca608996ca50a272df7dbef0d59d902f05d4f440c4f3c437f553e097facb",
+          "media_type": "application/json"
+        },
+        "numerical_evidence_pointer": "/acceptance",
+        "prospective_guarantee": false,
+        "unresolved": [],
+        "next_checks": [
+          "independent_legal_physical_evaluation",
+          "matched_input_refinement",
+          "paired_local_response_check"
+        ]
+      }
+    },
+    {
+      "source_folder": "evidence/control_search_p1/study",
+      "summary": {
+        "version": "evidence_policy_v1",
+        "claim_kind": "PHYSICAL_OBSERVATION",
+        "verification_status": "complete_registered_execution",
+        "model_identity": "8f8eceb5f74d4b171c87f333db4db0f353aad051b375ff26aca795f7ac1fbaf2",
+        "candidate_identity": {
+          "artifact_id": "c5f8ed0f59611a9dd1e5f71a3be8b14378321c2a873debcde9e57b8261196969",
+          "media_type": "application/json"
+        },
+        "design_identity": "10035885ded80b7afbf2faa28988c6275a18ac04f3232c5d0972acced81af9ad",
+        "task_identity": "882b3493037dcc8f8da294b3473e1223f0465e92c35bc3064bfc42d467bf212e",
+        "operating_point": {},
+        "covered_samples": {
+          "timing": {
+            "control_period_s": 0.01,
+            "deadline_misses": null,
+            "duration_s": 0.35,
+            "mean_update_s": null,
+            "real_time_demonstrated": null,
+            "real_time_required": false,
+            "sample_period_s": 0.01,
+            "simulation_wall_s": null,
+            "termination": [
+              "duration",
+              "numerical_failure"
+            ],
+            "timestep_s": 0.0005
+          },
+          "components": {
+            "evaluation_validity": {
+              "limit": null,
+              "passed": true,
+              "reason": null,
+              "unit": null,
+              "value": "valid"
+            },
+            "evaluator:task_bound": {
+              "limit": 0.01,
+              "passed": true,
+              "reason": null,
+              "unit": "m",
+              "value": 0.006733629433409352
+            },
+            "execution_complete": {
+              "limit": null,
+              "passed": true,
+              "reason": null,
+              "unit": null,
+              "value": true
+            },
+            "force_bounds": {
+              "limit": 1e-08,
+              "passed": true,
+              "reason": null,
+              "unit": "N",
+              "value": 0.0
+            },
+            "holding_coverage": {
+              "limit": 6,
+              "passed": true,
+              "reason": null,
+              "unit": "inclusive uniform samples",
+              "value": true
+            },
+            "holding_position": {
+              "limit": 0.01,
+              "passed": true,
+              "reason": null,
+              "unit": "m",
+              "value": 0.007584264209053886
+            },
+            "holding_speed": {
+              "limit": 0.02,
+              "passed": false,
+              "reason": null,
+              "unit": "m/s",
+              "value": 0.042709439297200565
+            },
+            "solver_errors": {
+              "limit": 0,
+              "passed": true,
+              "reason": null,
+              "unit": "count",
+              "value": 0
+            },
+            "task_evaluator": {
+              "limit": null,
+              "passed": true,
+              "reason": null,
+              "unit": null,
+              "value": true
+            }
+          },
+          "episodes": null,
+          "execution_id": "schedule-34b18dda06ef6c06988f3b8aef204d554ff106390ab6fad0c3adea3854a86738-physical",
+          "scope": "Only this completed independent execution"
+        },
+        "assumptions": {
+          "model": {},
+          "physical_inputs": {},
+          "legacy_applicability": {},
+          "source": "Trusted resolved tool artifact; not arbitrary LLM assertions"
+        },
+        "supported_inferences": [
+          "observed_task_outcome"
+        ],
+        "unsupported_inferences": [
+          "global_nonlinear_feasibility",
+          "global_nonlinear_infeasibility",
+          "structural_infeasibility",
+          "whole_horizon_from_instantaneous_braking",
+          "adapted_dynamic_improvement_from_static_sensitivity",
+          "unvisited_simulation_descent_guarantee",
+          "continuous_time_compliance",
+          "hardware_performance",
+          "robustness",
+          "repeatability",
+          "observed_task_pass"
+        ],
+        "evidence_reference": {
+          "artifact_id": "42dd63f0f30a47b47e8ef3e92df5ea80215424d425e7f6a1f343ff39e9201da8",
+          "media_type": "application/json"
+        },
+        "numerical_evidence_pointer": "/acceptance",
+        "prospective_guarantee": false,
+        "unresolved": [],
+        "next_checks": [
+          "independent_legal_physical_evaluation",
+          "matched_input_refinement",
+          "paired_local_response_check"
+        ]
+      }
+    },
+    {
+      "source_folder": "evidence/control_search_p1/study",
+      "summary": {
+        "version": "evidence_policy_v1",
+        "claim_kind": "PHYSICAL_OBSERVATION",
+        "verification_status": "complete_registered_execution",
+        "model_identity": "8f8eceb5f74d4b171c87f333db4db0f353aad051b375ff26aca795f7ac1fbaf2",
+        "candidate_identity": {
+          "artifact_id": "c5f8ed0f59611a9dd1e5f71a3be8b14378321c2a873debcde9e57b8261196969",
+          "media_type": "application/json"
+        },
+        "design_identity": "10035885ded80b7afbf2faa28988c6275a18ac04f3232c5d0972acced81af9ad",
+        "task_identity": "882b3493037dcc8f8da294b3473e1223f0465e92c35bc3064bfc42d467bf212e",
+        "operating_point": {},
+        "covered_samples": {
+          "timing": {
+            "control_period_s": 0.01,
+            "deadline_misses": null,
+            "duration_s": 0.35,
+            "mean_update_s": null,
+            "real_time_demonstrated": null,
+            "real_time_required": false,
+            "sample_period_s": 0.01,
+            "simulation_wall_s": null,
+            "termination": [
+              "duration",
+              "numerical_failure"
+            ],
+            "timestep_s": 0.0005
+          },
+          "components": {
+            "evaluation_validity": {
+              "limit": null,
+              "passed": true,
+              "reason": null,
+              "unit": null,
+              "value": "valid"
+            },
+            "evaluator:task_bound": {
+              "limit": 0.01,
+              "passed": true,
+              "reason": null,
+              "unit": "m",
+              "value": 0.006134524393874824
+            },
+            "execution_complete": {
+              "limit": null,
+              "passed": true,
+              "reason": null,
+              "unit": null,
+              "value": true
+            },
+            "force_bounds": {
+              "limit": 1e-08,
+              "passed": true,
+              "reason": null,
+              "unit": "N",
+              "value": 0.0
+            },
+            "holding_coverage": {
+              "limit": 6,
+              "passed": true,
+              "reason": null,
+              "unit": "inclusive uniform samples",
+              "value": true
+            },
+            "holding_position": {
+              "limit": 0.01,
+              "passed": true,
+              "reason": null,
+              "unit": "m",
+              "value": 0.0069370647948037555
+            },
+            "holding_speed": {
+              "limit": 0.02,
+              "passed": false,
+              "reason": null,
+              "unit": "m/s",
+              "value": 0.040667088775033056
+            },
+            "solver_errors": {
+              "limit": 0,
+              "passed": true,
+              "reason": null,
+              "unit": "count",
+              "value": 0
+            },
+            "task_evaluator": {
+              "limit": null,
+              "passed": true,
+              "reason": null,
+              "unit": null,
+              "value": true
+            }
+          },
+          "episodes": null,
+          "execution_id": "schedule-5fb010688796b44ec2c224f8a550c9cb1e078c505f167e2ca3e4816564dada6c-physical",
+          "scope": "Only this completed independent execution"
+        },
+        "assumptions": {
+          "model": {},
+          "physical_inputs": {},
+          "legacy_applicability": {},
+          "source": "Trusted resolved tool artifact; not arbitrary LLM assertions"
+        },
+        "supported_inferences": [
+          "observed_task_outcome"
+        ],
+        "unsupported_inferences": [
+          "global_nonlinear_feasibility",
+          "global_nonlinear_infeasibility",
+          "structural_infeasibility",
+          "whole_horizon_from_instantaneous_braking",
+          "adapted_dynamic_improvement_from_static_sensitivity",
+          "unvisited_simulation_descent_guarantee",
+          "continuous_time_compliance",
+          "hardware_performance",
+          "robustness",
+          "repeatability",
+          "observed_task_pass"
+        ],
+        "evidence_reference": {
+          "artifact_id": "5a3000c1af5a654698debc89911f86cd24ca36b9942722bfb86bd8ae38eddbbf",
+          "media_type": "application/json"
+        },
+        "numerical_evidence_pointer": "/acceptance",
+        "prospective_guarantee": false,
+        "unresolved": [],
+        "next_checks": [
+          "independent_legal_physical_evaluation",
+          "matched_input_refinement",
+          "paired_local_response_check"
+        ]
+      }
+    },
+    {
+      "source_folder": "evidence/control_search_p1/study",
+      "summary": {
+        "version": "evidence_policy_v1",
+        "claim_kind": "PHYSICAL_OBSERVATION",
+        "verification_status": "complete_registered_execution",
+        "model_identity": "8f8eceb5f74d4b171c87f333db4db0f353aad051b375ff26aca795f7ac1fbaf2",
+        "candidate_identity": {
+          "artifact_id": "c5f8ed0f59611a9dd1e5f71a3be8b14378321c2a873debcde9e57b8261196969",
+          "media_type": "application/json"
+        },
+        "design_identity": "10035885ded80b7afbf2faa28988c6275a18ac04f3232c5d0972acced81af9ad",
+        "task_identity": "882b3493037dcc8f8da294b3473e1223f0465e92c35bc3064bfc42d467bf212e",
+        "operating_point": {},
+        "covered_samples": {
+          "timing": {
+            "control_period_s": 0.01,
+            "deadline_misses": null,
+            "duration_s": 0.35,
+            "mean_update_s": null,
+            "real_time_demonstrated": null,
+            "real_time_required": false,
+            "sample_period_s": 0.01,
+            "simulation_wall_s": null,
+            "termination": [
+              "duration",
+              "numerical_failure"
+            ],
+            "timestep_s": 0.0005
+          },
+          "components": {
+            "evaluation_validity": {
+              "limit": null,
+              "passed": true,
+              "reason": null,
+              "unit": null,
+              "value": "valid"
+            },
+            "evaluator:task_bound": {
+              "limit": 0.01,
+              "passed": true,
+              "reason": null,
+              "unit": "m",
+              "value": 0.0059116114097380445
+            },
+            "execution_complete": {
+              "limit": null,
+              "passed": true,
+              "reason": null,
+              "unit": null,
+              "value": true
+            },
+            "force_bounds": {
+              "limit": 1e-08,
+              "passed": true,
+              "reason": null,
+              "unit": "N",
+              "value": 0.0
+            },
+            "holding_coverage": {
+              "limit": 6,
+              "passed": true,
+              "reason": null,
+              "unit": "inclusive uniform samples",
+              "value": true
+            },
+            "holding_position": {
+              "limit": 0.01,
+              "passed": true,
+              "reason": null,
+              "unit": "m",
+              "value": 0.006808591397705197
+            },
+            "holding_speed": {
+              "limit": 0.02,
+              "passed": false,
+              "reason": null,
+              "unit": "m/s",
+              "value": 0.04483107513454825
+            },
+            "solver_errors": {
+              "limit": 0,
+              "passed": true,
+              "reason": null,
+              "unit": "count",
+              "value": 0
+            },
+            "task_evaluator": {
+              "limit": null,
+              "passed": true,
+              "reason": null,
+              "unit": null,
+              "value": true
+            }
+          },
+          "episodes": null,
+          "execution_id": "schedule-d8e32a438fb8aac4fdc72a985e6962802ec95befdad9b3a462360b825b69469b-physical",
+          "scope": "Only this completed independent execution"
+        },
+        "assumptions": {
+          "model": {},
+          "physical_inputs": {},
+          "legacy_applicability": {},
+          "source": "Trusted resolved tool artifact; not arbitrary LLM assertions"
+        },
+        "supported_inferences": [
+          "observed_task_outcome"
+        ],
+        "unsupported_inferences": [
+          "global_nonlinear_feasibility",
+          "global_nonlinear_infeasibility",
+          "structural_infeasibility",
+          "whole_horizon_from_instantaneous_braking",
+          "adapted_dynamic_improvement_from_static_sensitivity",
+          "unvisited_simulation_descent_guarantee",
+          "continuous_time_compliance",
+          "hardware_performance",
+          "robustness",
+          "repeatability",
+          "observed_task_pass"
+        ],
+        "evidence_reference": {
+          "artifact_id": "407c84d44d74222f3107b7261ad10fec56a67fb4c37fa6109524130b41b440a6",
+          "media_type": "application/json"
+        },
+        "numerical_evidence_pointer": "/acceptance",
+        "prospective_guarantee": false,
+        "unresolved": [],
+        "next_checks": [
+          "independent_legal_physical_evaluation",
+          "matched_input_refinement",
+          "paired_local_response_check"
+        ]
+      }
+    },
+    {
+      "source_folder": "evidence/control_search_p1/study",
+      "summary": {
+        "version": "evidence_policy_v1",
+        "claim_kind": "PHYSICAL_OBSERVATION",
+        "verification_status": "complete_registered_execution",
+        "model_identity": "8f8eceb5f74d4b171c87f333db4db0f353aad051b375ff26aca795f7ac1fbaf2",
+        "candidate_identity": {
+          "artifact_id": "c5f8ed0f59611a9dd1e5f71a3be8b14378321c2a873debcde9e57b8261196969",
+          "media_type": "application/json"
+        },
+        "design_identity": "10035885ded80b7afbf2faa28988c6275a18ac04f3232c5d0972acced81af9ad",
+        "task_identity": "882b3493037dcc8f8da294b3473e1223f0465e92c35bc3064bfc42d467bf212e",
+        "operating_point": {},
+        "covered_samples": {
+          "timing": {
+            "control_period_s": 0.01,
+            "deadline_misses": null,
+            "duration_s": 0.35,
+            "mean_update_s": null,
+            "real_time_demonstrated": null,
+            "real_time_required": false,
+            "sample_period_s": 0.01,
+            "simulation_wall_s": null,
+            "termination": [
+              "duration",
+              "numerical_failure"
+            ],
+            "timestep_s": 0.0005
+          },
+          "components": {
+            "evaluation_validity": {
+              "limit": null,
+              "passed": true,
+              "reason": null,
+              "unit": null,
+              "value": "valid"
+            },
+            "evaluator:task_bound": {
+              "limit": 0.01,
+              "passed": true,
+              "reason": null,
+              "unit": "m",
+              "value": 0.006299873258892856
+            },
+            "execution_complete": {
+              "limit": null,
+              "passed": true,
+              "reason": null,
+              "unit": null,
+              "value": true
+            },
+            "force_bounds": {
+              "limit": 1e-08,
+              "passed": true,
+              "reason": null,
+              "unit": "N",
+              "value": 0.0
+            },
+            "holding_coverage": {
+              "limit": 6,
+              "passed": true,
+              "reason": null,
+              "unit": "inclusive uniform samples",
+              "value": true
+            },
+            "holding_position": {
+              "limit": 0.01,
+              "passed": true,
+              "reason": null,
+              "unit": "m",
+              "value": 0.007024374836826323
+            },
+            "holding_speed": {
+              "limit": 0.02,
+              "passed": false,
+              "reason": null,
+              "unit": "m/s",
+              "value": 0.04161042278553533
+            },
+            "solver_errors": {
+              "limit": 0,
+              "passed": true,
+              "reason": null,
+              "unit": "count",
+              "value": 0
+            },
+            "task_evaluator": {
+              "limit": null,
+              "passed": true,
+              "reason": null,
+              "unit": null,
+              "value": true
+            }
+          },
+          "episodes": null,
+          "execution_id": "schedule-3fcaaa63f619e9f267c074639d1f33d5a0f5e9988f0d1abbf4432e1f41f7d7a7-physical",
+          "scope": "Only this completed independent execution"
+        },
+        "assumptions": {
+          "model": {},
+          "physical_inputs": {},
+          "legacy_applicability": {},
+          "source": "Trusted resolved tool artifact; not arbitrary LLM assertions"
+        },
+        "supported_inferences": [
+          "observed_task_outcome"
+        ],
+        "unsupported_inferences": [
+          "global_nonlinear_feasibility",
+          "global_nonlinear_infeasibility",
+          "structural_infeasibility",
+          "whole_horizon_from_instantaneous_braking",
+          "adapted_dynamic_improvement_from_static_sensitivity",
+          "unvisited_simulation_descent_guarantee",
+          "continuous_time_compliance",
+          "hardware_performance",
+          "robustness",
+          "repeatability",
+          "observed_task_pass"
+        ],
+        "evidence_reference": {
+          "artifact_id": "9dce6f00e5e2c62d4ef43ff33c490d7a398f9a20bcf2066588cf22116593c447",
+          "media_type": "application/json"
+        },
+        "numerical_evidence_pointer": "/acceptance",
+        "prospective_guarantee": false,
+        "unresolved": [],
+        "next_checks": [
+          "independent_legal_physical_evaluation",
+          "matched_input_refinement",
+          "paired_local_response_check"
+        ]
+      }
+    },
+    {
+      "source_folder": "evidence/control_search_p1/study",
+      "summary": {
+        "version": "evidence_policy_v1",
+        "claim_kind": "PHYSICAL_OBSERVATION",
+        "verification_status": "complete_registered_execution",
+        "model_identity": "8f8eceb5f74d4b171c87f333db4db0f353aad051b375ff26aca795f7ac1fbaf2",
+        "candidate_identity": {
+          "artifact_id": "c5f8ed0f59611a9dd1e5f71a3be8b14378321c2a873debcde9e57b8261196969",
+          "media_type": "application/json"
+        },
+        "design_identity": "10035885ded80b7afbf2faa28988c6275a18ac04f3232c5d0972acced81af9ad",
+        "task_identity": "882b3493037dcc8f8da294b3473e1223f0465e92c35bc3064bfc42d467bf212e",
+        "operating_point": {},
+        "covered_samples": {
+          "timing": {
+            "control_period_s": 0.01,
+            "deadline_misses": null,
+            "duration_s": 0.35,
+            "mean_update_s": null,
+            "real_time_demonstrated": null,
+            "real_time_required": false,
+            "sample_period_s": 0.01,
+            "simulation_wall_s": null,
+            "termination": [
+              "duration",
+              "numerical_failure"
+            ],
+            "timestep_s": 0.0005
+          },
+          "components": {
+            "evaluation_validity": {
+              "limit": null,
+              "passed": true,
+              "reason": null,
+              "unit": null,
+              "value": "valid"
+            },
+            "evaluator:task_bound": {
+              "limit": 0.01,
+              "passed": true,
+              "reason": null,
+              "unit": "m",
+              "value": 0.0065189380090279
+            },
+            "execution_complete": {
+              "limit": null,
+              "passed": true,
+              "reason": null,
+              "unit": null,
+              "value": true
+            },
+            "force_bounds": {
+              "limit": 1e-08,
+              "passed": true,
+              "reason": null,
+              "unit": "N",
+              "value": 0.0
+            },
+            "holding_coverage": {
+              "limit": 6,
+              "passed": true,
+              "reason": null,
+              "unit": "inclusive uniform samples",
+              "value": true
+            },
+            "holding_position": {
+              "limit": 0.01,
+              "passed": true,
+              "reason": null,
+              "unit": "m",
+              "value": 0.007166239863356039
+            },
+            "holding_speed": {
+              "limit": 0.02,
+              "passed": false,
+              "reason": null,
+              "unit": "m/s",
+              "value": 0.03745471155460872
+            },
+            "solver_errors": {
+              "limit": 0,
+              "passed": true,
+              "reason": null,
+              "unit": "count",
+              "value": 0
+            },
+            "task_evaluator": {
+              "limit": null,
+              "passed": true,
+              "reason": null,
+              "unit": null,
+              "value": true
+            }
+          },
+          "episodes": null,
+          "execution_id": "schedule-12775d8591833ac143aca5ca261fa9c14f1ab46d17ce2fb70aee2b44fda5be3e-physical",
+          "scope": "Only this completed independent execution"
+        },
+        "assumptions": {
+          "model": {},
+          "physical_inputs": {},
+          "legacy_applicability": {},
+          "source": "Trusted resolved tool artifact; not arbitrary LLM assertions"
+        },
+        "supported_inferences": [
+          "observed_task_outcome"
+        ],
+        "unsupported_inferences": [
+          "global_nonlinear_feasibility",
+          "global_nonlinear_infeasibility",
+          "structural_infeasibility",
+          "whole_horizon_from_instantaneous_braking",
+          "adapted_dynamic_improvement_from_static_sensitivity",
+          "unvisited_simulation_descent_guarantee",
+          "continuous_time_compliance",
+          "hardware_performance",
+          "robustness",
+          "repeatability",
+          "observed_task_pass"
+        ],
+        "evidence_reference": {
+          "artifact_id": "523014923ccee4a8bce366d7e450c5bdc3da2177d25cd7b7ce910da14b418a71",
+          "media_type": "application/json"
+        },
+        "numerical_evidence_pointer": "/acceptance",
+        "prospective_guarantee": false,
+        "unresolved": [],
+        "next_checks": [
+          "independent_legal_physical_evaluation",
+          "matched_input_refinement",
+          "paired_local_response_check"
+        ]
+      }
+    },
+    {
+      "source_folder": "evidence/control_search_p1/study",
+      "summary": {
+        "version": "evidence_policy_v1",
+        "claim_kind": "PHYSICAL_OBSERVATION",
+        "verification_status": "complete_registered_execution",
+        "model_identity": "8f8eceb5f74d4b171c87f333db4db0f353aad051b375ff26aca795f7ac1fbaf2",
+        "candidate_identity": {
+          "artifact_id": "c5f8ed0f59611a9dd1e5f71a3be8b14378321c2a873debcde9e57b8261196969",
+          "media_type": "application/json"
+        },
+        "design_identity": "10035885ded80b7afbf2faa28988c6275a18ac04f3232c5d0972acced81af9ad",
+        "task_identity": "882b3493037dcc8f8da294b3473e1223f0465e92c35bc3064bfc42d467bf212e",
+        "operating_point": {},
+        "covered_samples": {
+          "timing": {
+            "control_period_s": 0.01,
+            "deadline_misses": null,
+            "duration_s": 0.35,
+            "mean_update_s": null,
+            "real_time_demonstrated": null,
+            "real_time_required": false,
+            "sample_period_s": 0.01,
+            "simulation_wall_s": null,
+            "termination": [
+              "duration",
+              "numerical_failure"
+            ],
+            "timestep_s": 0.0005
+          },
+          "components": {
+            "evaluation_validity": {
+              "limit": null,
+              "passed": true,
+              "reason": null,
+              "unit": null,
+              "value": "valid"
+            },
+            "evaluator:task_bound": {
+              "limit": 0.01,
+              "passed": true,
+              "reason": null,
+              "unit": "m",
+              "value": 0.005193064009374885
+            },
+            "execution_complete": {
+              "limit": null,
+              "passed": true,
+              "reason": null,
+              "unit": null,
+              "value": true
+            },
+            "force_bounds": {
+              "limit": 1e-08,
+              "passed": true,
+              "reason": null,
+              "unit": "N",
+              "value": 0.0
+            },
+            "holding_coverage": {
+              "limit": 6,
+              "passed": true,
+              "reason": null,
+              "unit": "inclusive uniform samples",
+              "value": true
+            },
+            "holding_position": {
+              "limit": 0.01,
+              "passed": true,
+              "reason": null,
+              "unit": "m",
+              "value": 0.005193909968382813
+            },
+            "holding_speed": {
+              "limit": 0.02,
+              "passed": false,
+              "reason": null,
+              "unit": "m/s",
+              "value": 0.021090040784831825
+            },
+            "solver_errors": {
+              "limit": 0,
+              "passed": true,
+              "reason": null,
+              "unit": "count",
+              "value": 0
+            },
+            "task_evaluator": {
+              "limit": null,
+              "passed": true,
+              "reason": null,
+              "unit": null,
+              "value": true
+            }
+          },
+          "episodes": null,
+          "execution_id": "schedule-44cf9a5a9ef16443bff62b05417bb3f404f98905ed820cb3699b4c9bb2d7a5d6-physical",
+          "scope": "Only this completed independent execution"
+        },
+        "assumptions": {
+          "model": {},
+          "physical_inputs": {},
+          "legacy_applicability": {},
+          "source": "Trusted resolved tool artifact; not arbitrary LLM assertions"
+        },
+        "supported_inferences": [
+          "observed_task_outcome"
+        ],
+        "unsupported_inferences": [
+          "global_nonlinear_feasibility",
+          "global_nonlinear_infeasibility",
+          "structural_infeasibility",
+          "whole_horizon_from_instantaneous_braking",
+          "adapted_dynamic_improvement_from_static_sensitivity",
+          "unvisited_simulation_descent_guarantee",
+          "continuous_time_compliance",
+          "hardware_performance",
+          "robustness",
+          "repeatability",
+          "observed_task_pass"
+        ],
+        "evidence_reference": {
+          "artifact_id": "df28c38f59726d06bc59573eb93fc22294d38089a13565774c77a2801c2ff352",
+          "media_type": "application/json"
+        },
+        "numerical_evidence_pointer": "/acceptance",
+        "prospective_guarantee": false,
+        "unresolved": [],
+        "next_checks": [
+          "independent_legal_physical_evaluation",
+          "matched_input_refinement",
+          "paired_local_response_check"
+        ]
+      }
+    },
+    {
+      "source_folder": "evidence/control_search_p1/study",
+      "summary": {
+        "version": "evidence_policy_v1",
+        "claim_kind": "PHYSICAL_OBSERVATION",
+        "verification_status": "complete_registered_execution",
+        "model_identity": "6d6abb77898378065e38e6bf2d026682f33881301eb8e69a92759a8378d63af1",
+        "candidate_identity": {
+          "artifact_id": "47b453a8079c217a4f880ac1c843a6dd2ba81e0ca27b57c187e88143b9a7411a",
+          "media_type": "application/json"
+        },
+        "design_identity": "e370e9aebc93060ad08e1f91e548c49fd0768dc8e329645eb0f5f04409c65bd3",
+        "task_identity": "882b3493037dcc8f8da294b3473e1223f0465e92c35bc3064bfc42d467bf212e",
+        "operating_point": {},
+        "covered_samples": {
+          "timing": {
+            "control_period_s": 0.01,
+            "deadline_misses": null,
+            "duration_s": 0.35,
+            "mean_update_s": null,
+            "real_time_demonstrated": null,
+            "real_time_required": false,
+            "sample_period_s": 0.01,
+            "simulation_wall_s": null,
+            "termination": [
+              "duration",
+              "numerical_failure"
+            ],
+            "timestep_s": 0.0005
+          },
+          "components": {
+            "evaluation_validity": {
+              "limit": null,
+              "passed": true,
+              "reason": null,
+              "unit": null,
+              "value": "valid"
+            },
+            "evaluator:task_bound": {
+              "limit": 0.01,
+              "passed": true,
+              "reason": null,
+              "unit": "m",
+              "value": 0.006014304302649361
+            },
+            "execution_complete": {
+              "limit": null,
+              "passed": true,
+              "reason": null,
+              "unit": null,
+              "value": true
+            },
+            "force_bounds": {
+              "limit": 1e-08,
+              "passed": true,
+              "reason": null,
+              "unit": "N",
+              "value": 0.0
+            },
+            "holding_coverage": {
+              "limit": 6,
+              "passed": true,
+              "reason": null,
+              "unit": "inclusive uniform samples",
+              "value": true
+            },
+            "holding_position": {
+              "limit": 0.01,
+              "passed": true,
+              "reason": null,
+              "unit": "m",
+              "value": 0.006704637254219675
+            },
+            "holding_speed": {
+              "limit": 0.02,
+              "passed": false,
+              "reason": null,
+              "unit": "m/s",
+              "value": 0.07046023067947245
+            },
+            "solver_errors": {
+              "limit": 0,
+              "passed": true,
+              "reason": null,
+              "unit": "count",
+              "value": 0
+            },
+            "task_evaluator": {
+              "limit": null,
+              "passed": true,
+              "reason": null,
+              "unit": null,
+              "value": true
+            }
+          },
+          "episodes": null,
+          "execution_id": "schedule-85e18f995eb80de9f4fc0a05ea7088f361eee1b3f35176f1195281ea4454f3fe-physical",
+          "scope": "Only this completed independent execution"
+        },
+        "assumptions": {
+          "model": {},
+          "physical_inputs": {},
+          "legacy_applicability": {},
+          "source": "Trusted resolved tool artifact; not arbitrary LLM assertions"
+        },
+        "supported_inferences": [
+          "observed_task_outcome"
+        ],
+        "unsupported_inferences": [
+          "global_nonlinear_feasibility",
+          "global_nonlinear_infeasibility",
+          "structural_infeasibility",
+          "whole_horizon_from_instantaneous_braking",
+          "adapted_dynamic_improvement_from_static_sensitivity",
+          "unvisited_simulation_descent_guarantee",
+          "continuous_time_compliance",
+          "hardware_performance",
+          "robustness",
+          "repeatability",
+          "observed_task_pass"
+        ],
+        "evidence_reference": {
+          "artifact_id": "9ad8c033864ca922a5edcbbe5878d331c49d67627896964e3a888abf8159ff95",
+          "media_type": "application/json"
+        },
+        "numerical_evidence_pointer": "/acceptance",
+        "prospective_guarantee": false,
+        "unresolved": [],
+        "next_checks": [
+          "independent_legal_physical_evaluation",
+          "matched_input_refinement",
+          "paired_local_response_check"
+        ]
+      }
+    },
+    {
+      "source_folder": "evidence/control_search_p1/study",
+      "summary": {
+        "version": "evidence_policy_v1",
+        "claim_kind": "PHYSICAL_OBSERVATION",
+        "verification_status": "complete_registered_execution",
+        "model_identity": "8f8eceb5f74d4b171c87f333db4db0f353aad051b375ff26aca795f7ac1fbaf2",
+        "candidate_identity": {
+          "artifact_id": "c5f8ed0f59611a9dd1e5f71a3be8b14378321c2a873debcde9e57b8261196969",
+          "media_type": "application/json"
+        },
+        "design_identity": "10035885ded80b7afbf2faa28988c6275a18ac04f3232c5d0972acced81af9ad",
+        "task_identity": "882b3493037dcc8f8da294b3473e1223f0465e92c35bc3064bfc42d467bf212e",
+        "operating_point": {},
+        "covered_samples": {
+          "timing": {
+            "control_period_s": 0.01,
+            "deadline_misses": null,
+            "duration_s": 0.35,
+            "mean_update_s": null,
+            "real_time_demonstrated": null,
+            "real_time_required": false,
+            "sample_period_s": 0.01,
+            "simulation_wall_s": null,
+            "termination": [
+              "duration",
+              "numerical_failure"
+            ],
+            "timestep_s": 0.0005
+          },
+          "components": {
+            "evaluation_validity": {
+              "limit": null,
+              "passed": true,
+              "reason": null,
+              "unit": null,
+              "value": "valid"
+            },
+            "evaluator:task_bound": {
+              "limit": 0.01,
+              "passed": false,
+              "reason": null,
+              "unit": "m",
+              "value": 0.010200439517407739
+            },
+            "execution_complete": {
+              "limit": null,
+              "passed": true,
+              "reason": null,
+              "unit": null,
+              "value": true
+            },
+            "force_bounds": {
+              "limit": 1e-08,
+              "passed": true,
+              "reason": null,
+              "unit": "N",
+              "value": 0.0
+            },
+            "holding_coverage": {
+              "limit": 6,
+              "passed": true,
+              "reason": null,
+              "unit": "inclusive uniform samples",
+              "value": true
+            },
+            "holding_position": {
+              "limit": 0.01,
+              "passed": false,
+              "reason": null,
+              "unit": "m",
+              "value": 0.010200439517407739
+            },
+            "holding_speed": {
+              "limit": 0.02,
+              "passed": false,
+              "reason": null,
+              "unit": "m/s",
+              "value": 0.05772520680273755
+            },
+            "solver_errors": {
+              "limit": 0,
+              "passed": true,
+              "reason": null,
+              "unit": "count",
+              "value": 0
+            },
+            "task_evaluator": {
+              "limit": null,
+              "passed": false,
+              "reason": null,
+              "unit": null,
+              "value": false
+            }
+          },
+          "episodes": null,
+          "execution_id": "schedule-a3babcd39b8d03dce1f7170c561497ee4006db467874b78b7e736f0a61fd5c33-physical",
+          "scope": "Only this completed independent execution"
+        },
+        "assumptions": {
+          "model": {},
+          "physical_inputs": {},
+          "legacy_applicability": {},
+          "source": "Trusted resolved tool artifact; not arbitrary LLM assertions"
+        },
+        "supported_inferences": [
+          "observed_task_outcome"
+        ],
+        "unsupported_inferences": [
+          "global_nonlinear_feasibility",
+          "global_nonlinear_infeasibility",
+          "structural_infeasibility",
+          "whole_horizon_from_instantaneous_braking",
+          "adapted_dynamic_improvement_from_static_sensitivity",
+          "unvisited_simulation_descent_guarantee",
+          "continuous_time_compliance",
+          "hardware_performance",
+          "robustness",
+          "repeatability",
+          "observed_task_pass"
+        ],
+        "evidence_reference": {
+          "artifact_id": "2d46a03369533eb5bf14b60e07c855096b6e907fdfd196cd15a513c22e8cf937",
+          "media_type": "application/json"
+        },
+        "numerical_evidence_pointer": "/acceptance",
+        "prospective_guarantee": false,
+        "unresolved": [],
+        "next_checks": [
+          "independent_legal_physical_evaluation",
+          "matched_input_refinement",
+          "paired_local_response_check"
+        ]
+      }
+    },
+    {
+      "source_folder": "evidence/control_search_p1/study",
+      "summary": {
+        "version": "evidence_policy_v1",
+        "claim_kind": "PHYSICAL_OBSERVATION",
+        "verification_status": "complete_registered_execution",
+        "model_identity": "8f8eceb5f74d4b171c87f333db4db0f353aad051b375ff26aca795f7ac1fbaf2",
+        "candidate_identity": {
+          "artifact_id": "c5f8ed0f59611a9dd1e5f71a3be8b14378321c2a873debcde9e57b8261196969",
+          "media_type": "application/json"
+        },
+        "design_identity": "10035885ded80b7afbf2faa28988c6275a18ac04f3232c5d0972acced81af9ad",
+        "task_identity": "882b3493037dcc8f8da294b3473e1223f0465e92c35bc3064bfc42d467bf212e",
+        "operating_point": {},
+        "covered_samples": {
+          "timing": {
+            "control_period_s": 0.01,
+            "deadline_misses": null,
+            "duration_s": 0.35,
+            "mean_update_s": null,
+            "real_time_demonstrated": null,
+            "real_time_required": false,
+            "sample_period_s": 0.01,
+            "simulation_wall_s": null,
+            "termination": [
+              "duration",
+              "numerical_failure"
+            ],
+            "timestep_s": 0.0005
+          },
+          "components": {
+            "evaluation_validity": {
+              "limit": null,
+              "passed": true,
+              "reason": null,
+              "unit": null,
+              "value": "valid"
+            },
+            "evaluator:task_bound": {
+              "limit": 0.01,
+              "passed": true,
+              "reason": null,
+              "unit": "m",
+              "value": 0.002630586372397402
+            },
+            "execution_complete": {
+              "limit": null,
+              "passed": true,
+              "reason": null,
+              "unit": null,
+              "value": true
+            },
+            "force_bounds": {
+              "limit": 1e-08,
+              "passed": true,
+              "reason": null,
+              "unit": "N",
+              "value": 0.0
+            },
+            "holding_coverage": {
+              "limit": 6,
+              "passed": true,
+              "reason": null,
+              "unit": "inclusive uniform samples",
+              "value": true
+            },
+            "holding_position": {
+              "limit": 0.01,
+              "passed": true,
+              "reason": null,
+              "unit": "m",
+              "value": 0.004988603913718473
+            },
+            "holding_speed": {
+              "limit": 0.02,
+              "passed": false,
+              "reason": null,
+              "unit": "m/s",
+              "value": 0.09160043208421394
+            },
+            "solver_errors": {
+              "limit": 0,
+              "passed": true,
+              "reason": null,
+              "unit": "count",
+              "value": 0
+            },
+            "task_evaluator": {
+              "limit": null,
+              "passed": true,
+              "reason": null,
+              "unit": null,
+              "value": true
+            }
+          },
+          "episodes": null,
+          "execution_id": "schedule-7954487095e9235d7277f34e5be96f7b7578bff124e98628eb07906079d89422-physical",
+          "scope": "Only this completed independent execution"
+        },
+        "assumptions": {
+          "model": {},
+          "physical_inputs": {},
+          "legacy_applicability": {},
+          "source": "Trusted resolved tool artifact; not arbitrary LLM assertions"
+        },
+        "supported_inferences": [
+          "observed_task_outcome"
+        ],
+        "unsupported_inferences": [
+          "global_nonlinear_feasibility",
+          "global_nonlinear_infeasibility",
+          "structural_infeasibility",
+          "whole_horizon_from_instantaneous_braking",
+          "adapted_dynamic_improvement_from_static_sensitivity",
+          "unvisited_simulation_descent_guarantee",
+          "continuous_time_compliance",
+          "hardware_performance",
+          "robustness",
+          "repeatability",
+          "observed_task_pass"
+        ],
+        "evidence_reference": {
+          "artifact_id": "92911d85dc13d2bbff48561176327c323846a459b86b10cb6198068d5564efb9",
+          "media_type": "application/json"
+        },
+        "numerical_evidence_pointer": "/acceptance",
+        "prospective_guarantee": false,
+        "unresolved": [],
+        "next_checks": [
+          "independent_legal_physical_evaluation",
+          "matched_input_refinement",
+          "paired_local_response_check"
+        ]
+      }
+    },
+    {
+      "source_folder": "evidence/control_search_p1/study",
+      "summary": {
+        "version": "evidence_policy_v1",
+        "claim_kind": "PHYSICAL_OBSERVATION",
+        "verification_status": "complete_registered_execution",
+        "model_identity": "8f8eceb5f74d4b171c87f333db4db0f353aad051b375ff26aca795f7ac1fbaf2",
+        "candidate_identity": {
+          "artifact_id": "c5f8ed0f59611a9dd1e5f71a3be8b14378321c2a873debcde9e57b8261196969",
+          "media_type": "application/json"
+        },
+        "design_identity": "10035885ded80b7afbf2faa28988c6275a18ac04f3232c5d0972acced81af9ad",
+        "task_identity": "882b3493037dcc8f8da294b3473e1223f0465e92c35bc3064bfc42d467bf212e",
+        "operating_point": {},
+        "covered_samples": {
+          "timing": {
+            "control_period_s": 0.01,
+            "deadline_misses": null,
+            "duration_s": 0.35,
+            "mean_update_s": null,
+            "real_time_demonstrated": null,
+            "real_time_required": false,
+            "sample_period_s": 0.01,
+            "simulation_wall_s": null,
+            "termination": [
+              "duration",
+              "numerical_failure"
+            ],
+            "timestep_s": 0.0005
+          },
+          "components": {
+            "evaluation_validity": {
+              "limit": null,
+              "passed": true,
+              "reason": null,
+              "unit": null,
+              "value": "valid"
+            },
+            "evaluator:task_bound": {
+              "limit": 0.01,
+              "passed": true,
+              "reason": null,
+              "unit": "m",
+              "value": 0.008108973168313395
+            },
+            "execution_complete": {
+              "limit": null,
+              "passed": true,
+              "reason": null,
+              "unit": null,
+              "value": true
+            },
+            "force_bounds": {
+              "limit": 1e-08,
+              "passed": true,
+              "reason": null,
+              "unit": "N",
+              "value": 0.0
+            },
+            "holding_coverage": {
+              "limit": 6,
+              "passed": true,
+              "reason": null,
+              "unit": "inclusive uniform samples",
+              "value": true
+            },
+            "holding_position": {
+              "limit": 0.01,
+              "passed": true,
+              "reason": null,
+              "unit": "m",
+              "value": 0.00815105461641441
+            },
+            "holding_speed": {
+              "limit": 0.02,
+              "passed": false,
+              "reason": null,
+              "unit": "m/s",
+              "value": 0.04753740946551566
+            },
+            "solver_errors": {
+              "limit": 0,
+              "passed": true,
+              "reason": null,
+              "unit": "count",
+              "value": 0
+            },
+            "task_evaluator": {
+              "limit": null,
+              "passed": true,
+              "reason": null,
+              "unit": null,
+              "value": true
+            }
+          },
+          "episodes": null,
+          "execution_id": "schedule-0828a2fa953cb8e9fef01a263817dd91451f691ecbc11882e67365abe7aa9f9f-physical",
+          "scope": "Only this completed independent execution"
+        },
+        "assumptions": {
+          "model": {},
+          "physical_inputs": {},
+          "legacy_applicability": {},
+          "source": "Trusted resolved tool artifact; not arbitrary LLM assertions"
+        },
+        "supported_inferences": [
+          "observed_task_outcome"
+        ],
+        "unsupported_inferences": [
+          "global_nonlinear_feasibility",
+          "global_nonlinear_infeasibility",
+          "structural_infeasibility",
+          "whole_horizon_from_instantaneous_braking",
+          "adapted_dynamic_improvement_from_static_sensitivity",
+          "unvisited_simulation_descent_guarantee",
+          "continuous_time_compliance",
+          "hardware_performance",
+          "robustness",
+          "repeatability",
+          "observed_task_pass"
+        ],
+        "evidence_reference": {
+          "artifact_id": "22c805bee8d8867de08d3f8b50f0b7876dbfe855dd987092e381cf6e617ae68b",
+          "media_type": "application/json"
+        },
+        "numerical_evidence_pointer": "/acceptance",
+        "prospective_guarantee": false,
+        "unresolved": [],
+        "next_checks": [
+          "independent_legal_physical_evaluation",
+          "matched_input_refinement",
+          "paired_local_response_check"
+        ]
+      }
+    },
+    {
+      "source_folder": "evidence/control_search_p1/study",
+      "summary": {
+        "version": "evidence_policy_v1",
+        "claim_kind": "PHYSICAL_OBSERVATION",
+        "verification_status": "complete_registered_execution",
+        "model_identity": "8f8eceb5f74d4b171c87f333db4db0f353aad051b375ff26aca795f7ac1fbaf2",
+        "candidate_identity": {
+          "artifact_id": "c5f8ed0f59611a9dd1e5f71a3be8b14378321c2a873debcde9e57b8261196969",
+          "media_type": "application/json"
+        },
+        "design_identity": "10035885ded80b7afbf2faa28988c6275a18ac04f3232c5d0972acced81af9ad",
+        "task_identity": "882b3493037dcc8f8da294b3473e1223f0465e92c35bc3064bfc42d467bf212e",
+        "operating_point": {},
+        "covered_samples": {
+          "timing": {
+            "control_period_s": 0.01,
+            "deadline_misses": null,
+            "duration_s": 0.35,
+            "mean_update_s": null,
+            "real_time_demonstrated": null,
+            "real_time_required": false,
+            "sample_period_s": 0.01,
+            "simulation_wall_s": null,
+            "termination": [
+              "duration",
+              "numerical_failure"
+            ],
+            "timestep_s": 0.0005
+          },
+          "components": {
+            "evaluation_validity": {
+              "limit": null,
+              "passed": true,
+              "reason": null,
+              "unit": null,
+              "value": "valid"
+            },
+            "evaluator:task_bound": {
+              "limit": 0.01,
+              "passed": true,
+              "reason": null,
+              "unit": "m",
+              "value": 0.004757258240935469
+            },
+            "execution_complete": {
+              "limit": null,
+              "passed": true,
+              "reason": null,
+              "unit": null,
+              "value": true
+            },
+            "force_bounds": {
+              "limit": 1e-08,
+              "passed": true,
+              "reason": null,
+              "unit": "N",
+              "value": 0.0
+            },
+            "holding_coverage": {
+              "limit": 6,
+              "passed": true,
+              "reason": null,
+              "unit": "inclusive uniform samples",
+              "value": true
+            },
+            "holding_position": {
+              "limit": 0.01,
+              "passed": true,
+              "reason": null,
+              "unit": "m",
+              "value": 0.006075298213677946
+            },
+            "holding_speed": {
+              "limit": 0.02,
+              "passed": false,
+              "reason": null,
+              "unit": "m/s",
+              "value": 0.05330820260555101
+            },
+            "solver_errors": {
+              "limit": 0,
+              "passed": true,
+              "reason": null,
+              "unit": "count",
+              "value": 0
+            },
+            "task_evaluator": {
+              "limit": null,
+              "passed": true,
+              "reason": null,
+              "unit": null,
+              "value": true
+            }
+          },
+          "episodes": null,
+          "execution_id": "schedule-53699a9ea18cd07b3445491c68c7e5a4ae0e19bb9fdfd2219bb3267bdedbfab9-physical",
+          "scope": "Only this completed independent execution"
+        },
+        "assumptions": {
+          "model": {},
+          "physical_inputs": {},
+          "legacy_applicability": {},
+          "source": "Trusted resolved tool artifact; not arbitrary LLM assertions"
+        },
+        "supported_inferences": [
+          "observed_task_outcome"
+        ],
+        "unsupported_inferences": [
+          "global_nonlinear_feasibility",
+          "global_nonlinear_infeasibility",
+          "structural_infeasibility",
+          "whole_horizon_from_instantaneous_braking",
+          "adapted_dynamic_improvement_from_static_sensitivity",
+          "unvisited_simulation_descent_guarantee",
+          "continuous_time_compliance",
+          "hardware_performance",
+          "robustness",
+          "repeatability",
+          "observed_task_pass"
+        ],
+        "evidence_reference": {
+          "artifact_id": "6f67f726573d84b039a41bb5d08eedefabcb9acf9d9475efa50826bb9f86a34f",
+          "media_type": "application/json"
+        },
+        "numerical_evidence_pointer": "/acceptance",
+        "prospective_guarantee": false,
+        "unresolved": [],
+        "next_checks": [
+          "independent_legal_physical_evaluation",
+          "matched_input_refinement",
+          "paired_local_response_check"
+        ]
+      }
+    },
+    {
+      "source_folder": "evidence/control_search_p1/study",
+      "summary": {
+        "version": "evidence_policy_v1",
+        "claim_kind": "PHYSICAL_OBSERVATION",
+        "verification_status": "complete_registered_execution",
+        "model_identity": "8f8eceb5f74d4b171c87f333db4db0f353aad051b375ff26aca795f7ac1fbaf2",
+        "candidate_identity": {
+          "artifact_id": "c5f8ed0f59611a9dd1e5f71a3be8b14378321c2a873debcde9e57b8261196969",
+          "media_type": "application/json"
+        },
+        "design_identity": "10035885ded80b7afbf2faa28988c6275a18ac04f3232c5d0972acced81af9ad",
+        "task_identity": "882b3493037dcc8f8da294b3473e1223f0465e92c35bc3064bfc42d467bf212e",
+        "operating_point": {},
+        "covered_samples": {
+          "timing": {
+            "control_period_s": 0.01,
+            "deadline_misses": null,
+            "duration_s": 0.35,
+            "mean_update_s": null,
+            "real_time_demonstrated": null,
+            "real_time_required": false,
+            "sample_period_s": 0.01,
+            "simulation_wall_s": null,
+            "termination": [
+              "duration",
+              "numerical_failure"
+            ],
+            "timestep_s": 0.0005
+          },
+          "components": {
+            "evaluation_validity": {
+              "limit": null,
+              "passed": true,
+              "reason": null,
+              "unit": null,
+              "value": "valid"
+            },
+            "evaluator:task_bound": {
+              "limit": 0.01,
+              "passed": true,
+              "reason": null,
+              "unit": "m",
+              "value": 0.0042290578175553685
+            },
+            "execution_complete": {
+              "limit": null,
+              "passed": true,
+              "reason": null,
+              "unit": null,
+              "value": true
+            },
+            "force_bounds": {
+              "limit": 1e-08,
+              "passed": true,
+              "reason": null,
+              "unit": "N",
+              "value": 0.0
+            },
+            "holding_coverage": {
+              "limit": 6,
+              "passed": true,
+              "reason": null,
+              "unit": "inclusive uniform samples",
+              "value": true
+            },
+            "holding_position": {
+              "limit": 0.01,
+              "passed": true,
+              "reason": null,
+              "unit": "m",
+              "value": 0.005852510140273402
+            },
+            "holding_speed": {
+              "limit": 0.02,
+              "passed": false,
+              "reason": null,
+              "unit": "m/s",
+              "value": 0.07305352843786722
+            },
+            "solver_errors": {
+              "limit": 0,
+              "passed": true,
+              "reason": null,
+              "unit": "count",
+              "value": 0
+            },
+            "task_evaluator": {
+              "limit": null,
+              "passed": true,
+              "reason": null,
+              "unit": null,
+              "value": true
+            }
+          },
+          "episodes": null,
+          "execution_id": "schedule-dd32dc4e4c0edd165eb398346ce10eca1e4e8de797790f44b33b7a11b3996f31-physical",
+          "scope": "Only this completed independent execution"
+        },
+        "assumptions": {
+          "model": {},
+          "physical_inputs": {},
+          "legacy_applicability": {},
+          "source": "Trusted resolved tool artifact; not arbitrary LLM assertions"
+        },
+        "supported_inferences": [
+          "observed_task_outcome"
+        ],
+        "unsupported_inferences": [
+          "global_nonlinear_feasibility",
+          "global_nonlinear_infeasibility",
+          "structural_infeasibility",
+          "whole_horizon_from_instantaneous_braking",
+          "adapted_dynamic_improvement_from_static_sensitivity",
+          "unvisited_simulation_descent_guarantee",
+          "continuous_time_compliance",
+          "hardware_performance",
+          "robustness",
+          "repeatability",
+          "observed_task_pass"
+        ],
+        "evidence_reference": {
+          "artifact_id": "3f218fb2c3c862ad2cac0d56ada5302c851f492a7a4bff3d21b2cc1070b7d5e6",
+          "media_type": "application/json"
+        },
+        "numerical_evidence_pointer": "/acceptance",
+        "prospective_guarantee": false,
+        "unresolved": [],
+        "next_checks": [
+          "independent_legal_physical_evaluation",
+          "matched_input_refinement",
+          "paired_local_response_check"
+        ]
+      }
+    },
+    {
+      "source_folder": "evidence/control_search_p1/study",
+      "summary": {
+        "version": "evidence_policy_v1",
+        "claim_kind": "PHYSICAL_OBSERVATION",
+        "verification_status": "complete_registered_execution",
+        "model_identity": "8f8eceb5f74d4b171c87f333db4db0f353aad051b375ff26aca795f7ac1fbaf2",
+        "candidate_identity": {
+          "artifact_id": "c5f8ed0f59611a9dd1e5f71a3be8b14378321c2a873debcde9e57b8261196969",
+          "media_type": "application/json"
+        },
+        "design_identity": "10035885ded80b7afbf2faa28988c6275a18ac04f3232c5d0972acced81af9ad",
+        "task_identity": "882b3493037dcc8f8da294b3473e1223f0465e92c35bc3064bfc42d467bf212e",
+        "operating_point": {},
+        "covered_samples": {
+          "timing": {
+            "control_period_s": 0.01,
+            "deadline_misses": null,
+            "duration_s": 0.35,
+            "mean_update_s": null,
+            "real_time_demonstrated": null,
+            "real_time_required": false,
+            "sample_period_s": 0.01,
+            "simulation_wall_s": null,
+            "termination": [
+              "duration",
+              "numerical_failure"
+            ],
+            "timestep_s": 0.0005
+          },
+          "components": {
+            "evaluation_validity": {
+              "limit": null,
+              "passed": true,
+              "reason": null,
+              "unit": null,
+              "value": "valid"
+            },
+            "evaluator:task_bound": {
+              "limit": 0.01,
+              "passed": true,
+              "reason": null,
+              "unit": "m",
+              "value": 0.00833237762029288
+            },
+            "execution_complete": {
+              "limit": null,
+              "passed": true,
+              "reason": null,
+              "unit": null,
+              "value": true
+            },
+            "force_bounds": {
+              "limit": 1e-08,
+              "passed": true,
+              "reason": null,
+              "unit": "N",
+              "value": 0.0
+            },
+            "holding_coverage": {
+              "limit": 6,
+              "passed": true,
+              "reason": null,
+              "unit": "inclusive uniform samples",
+              "value": true
+            },
+            "holding_position": {
+              "limit": 0.01,
+              "passed": true,
+              "reason": null,
+              "unit": "m",
+              "value": 0.008376590064650958
+            },
+            "holding_speed": {
+              "limit": 0.02,
+              "passed": false,
+              "reason": null,
+              "unit": "m/s",
+              "value": 0.04096503883670168
+            },
+            "solver_errors": {
+              "limit": 0,
+              "passed": true,
+              "reason": null,
+              "unit": "count",
+              "value": 0
+            },
+            "task_evaluator": {
+              "limit": null,
+              "passed": true,
+              "reason": null,
+              "unit": null,
+              "value": true
+            }
+          },
+          "episodes": null,
+          "execution_id": "schedule-447aaa87ad5ea103f945447a3f4bfdb5fadaf2919fc60bd0082f020789dce7bb-physical",
+          "scope": "Only this completed independent execution"
+        },
+        "assumptions": {
+          "model": {},
+          "physical_inputs": {},
+          "legacy_applicability": {},
+          "source": "Trusted resolved tool artifact; not arbitrary LLM assertions"
+        },
+        "supported_inferences": [
+          "observed_task_outcome"
+        ],
+        "unsupported_inferences": [
+          "global_nonlinear_feasibility",
+          "global_nonlinear_infeasibility",
+          "structural_infeasibility",
+          "whole_horizon_from_instantaneous_braking",
+          "adapted_dynamic_improvement_from_static_sensitivity",
+          "unvisited_simulation_descent_guarantee",
+          "continuous_time_compliance",
+          "hardware_performance",
+          "robustness",
+          "repeatability",
+          "observed_task_pass"
+        ],
+        "evidence_reference": {
+          "artifact_id": "58df4992fe728ed14ef9e125c13de41b5d521652bf7ac591531c3c663f1fc1b0",
+          "media_type": "application/json"
+        },
+        "numerical_evidence_pointer": "/acceptance",
+        "prospective_guarantee": false,
+        "unresolved": [],
+        "next_checks": [
+          "independent_legal_physical_evaluation",
+          "matched_input_refinement",
+          "paired_local_response_check"
+        ]
+      }
+    },
+    {
+      "source_folder": "evidence/control_search_p1/study",
+      "summary": {
+        "version": "evidence_policy_v1",
+        "claim_kind": "PHYSICAL_OBSERVATION",
+        "verification_status": "complete_registered_execution",
+        "model_identity": "6d6abb77898378065e38e6bf2d026682f33881301eb8e69a92759a8378d63af1",
+        "candidate_identity": {
+          "artifact_id": "47b453a8079c217a4f880ac1c843a6dd2ba81e0ca27b57c187e88143b9a7411a",
+          "media_type": "application/json"
+        },
+        "design_identity": "e370e9aebc93060ad08e1f91e548c49fd0768dc8e329645eb0f5f04409c65bd3",
+        "task_identity": "882b3493037dcc8f8da294b3473e1223f0465e92c35bc3064bfc42d467bf212e",
+        "operating_point": {},
+        "covered_samples": {
+          "timing": {
+            "control_period_s": 0.01,
+            "deadline_misses": null,
+            "duration_s": 0.35,
+            "mean_update_s": null,
+            "real_time_demonstrated": null,
+            "real_time_required": false,
+            "sample_period_s": 0.01,
+            "simulation_wall_s": null,
+            "termination": [
+              "duration",
+              "numerical_failure"
+            ],
+            "timestep_s": 0.0005
+          },
+          "components": {
+            "evaluation_validity": {
+              "limit": null,
+              "passed": true,
+              "reason": null,
+              "unit": null,
+              "value": "valid"
+            },
+            "evaluator:task_bound": {
+              "limit": 0.01,
+              "passed": true,
+              "reason": null,
+              "unit": "m",
+              "value": 0.008219121752061015
+            },
+            "execution_complete": {
+              "limit": null,
+              "passed": true,
+              "reason": null,
+              "unit": null,
+              "value": true
+            },
+            "force_bounds": {
+              "limit": 1e-08,
+              "passed": true,
+              "reason": null,
+              "unit": "N",
+              "value": 0.0
+            },
+            "holding_coverage": {
+              "limit": 6,
+              "passed": true,
+              "reason": null,
+              "unit": "inclusive uniform samples",
+              "value": true
+            },
+            "holding_position": {
+              "limit": 0.01,
+              "passed": true,
+              "reason": null,
+              "unit": "m",
+              "value": 0.008219121752061015
+            },
+            "holding_speed": {
+              "limit": 0.02,
+              "passed": false,
+              "reason": null,
+              "unit": "m/s",
+              "value": 0.10731729911995745
+            },
+            "solver_errors": {
+              "limit": 0,
+              "passed": true,
+              "reason": null,
+              "unit": "count",
+              "value": 0
+            },
+            "task_evaluator": {
+              "limit": null,
+              "passed": true,
+              "reason": null,
+              "unit": null,
+              "value": true
+            }
+          },
+          "episodes": null,
+          "execution_id": "schedule-80f163ad3bcb3bb465cfee9d2ce5e14c1cce6656347f3fa80d0868dfbdae0cf0-physical",
+          "scope": "Only this completed independent execution"
+        },
+        "assumptions": {
+          "model": {},
+          "physical_inputs": {},
+          "legacy_applicability": {},
+          "source": "Trusted resolved tool artifact; not arbitrary LLM assertions"
+        },
+        "supported_inferences": [
+          "observed_task_outcome"
+        ],
+        "unsupported_inferences": [
+          "global_nonlinear_feasibility",
+          "global_nonlinear_infeasibility",
+          "structural_infeasibility",
+          "whole_horizon_from_instantaneous_braking",
+          "adapted_dynamic_improvement_from_static_sensitivity",
+          "unvisited_simulation_descent_guarantee",
+          "continuous_time_compliance",
+          "hardware_performance",
+          "robustness",
+          "repeatability",
+          "observed_task_pass"
+        ],
+        "evidence_reference": {
+          "artifact_id": "c708275b81e560c290b2296ce037435c8d00be5ca4959da16d238b320fb37b51",
+          "media_type": "application/json"
+        },
+        "numerical_evidence_pointer": "/acceptance",
+        "prospective_guarantee": false,
+        "unresolved": [],
+        "next_checks": [
+          "independent_legal_physical_evaluation",
+          "matched_input_refinement",
+          "paired_local_response_check"
+        ]
+      }
+    },
+    {
+      "source_folder": "evidence/control_search_p1/study",
+      "summary": {
+        "version": "evidence_policy_v1",
+        "claim_kind": "PHYSICAL_OBSERVATION",
+        "verification_status": "complete_registered_execution",
+        "model_identity": "6d6abb77898378065e38e6bf2d026682f33881301eb8e69a92759a8378d63af1",
+        "candidate_identity": {
+          "artifact_id": "47b453a8079c217a4f880ac1c843a6dd2ba81e0ca27b57c187e88143b9a7411a",
+          "media_type": "application/json"
+        },
+        "design_identity": "e370e9aebc93060ad08e1f91e548c49fd0768dc8e329645eb0f5f04409c65bd3",
+        "task_identity": "882b3493037dcc8f8da294b3473e1223f0465e92c35bc3064bfc42d467bf212e",
+        "operating_point": {},
+        "covered_samples": {
+          "timing": {
+            "control_period_s": 0.01,
+            "deadline_misses": null,
+            "duration_s": 0.35,
+            "mean_update_s": null,
+            "real_time_demonstrated": null,
+            "real_time_required": false,
+            "sample_period_s": 0.01,
+            "simulation_wall_s": null,
+            "termination": [
+              "duration",
+              "numerical_failure"
+            ],
+            "timestep_s": 0.0005
+          },
+          "components": {
+            "evaluation_validity": {
+              "limit": null,
+              "passed": true,
+              "reason": null,
+              "unit": null,
+              "value": "valid"
+            },
+            "evaluator:task_bound": {
+              "limit": 0.01,
+              "passed": true,
+              "reason": null,
+              "unit": "m",
+              "value": 0.007510239751054857
+            },
+            "execution_complete": {
+              "limit": null,
+              "passed": true,
+              "reason": null,
+              "unit": null,
+              "value": true
+            },
+            "force_bounds": {
+              "limit": 1e-08,
+              "passed": true,
+              "reason": null,
+              "unit": "N",
+              "value": 0.0
+            },
+            "holding_coverage": {
+              "limit": 6,
+              "passed": true,
+              "reason": null,
+              "unit": "inclusive uniform samples",
+              "value": true
+            },
+            "holding_position": {
+              "limit": 0.01,
+              "passed": true,
+              "reason": null,
+              "unit": "m",
+              "value": 0.007510239751054857
+            },
+            "holding_speed": {
+              "limit": 0.02,
+              "passed": false,
+              "reason": null,
+              "unit": "m/s",
+              "value": 0.0881100553543809
+            },
+            "solver_errors": {
+              "limit": 0,
+              "passed": true,
+              "reason": null,
+              "unit": "count",
+              "value": 0
+            },
+            "task_evaluator": {
+              "limit": null,
+              "passed": true,
+              "reason": null,
+              "unit": null,
+              "value": true
+            }
+          },
+          "episodes": null,
+          "execution_id": "schedule-9048be98426e082cf13bc56d850b94b4708c6de070f90900277a53cb89acac98-physical",
+          "scope": "Only this completed independent execution"
+        },
+        "assumptions": {
+          "model": {},
+          "physical_inputs": {},
+          "legacy_applicability": {},
+          "source": "Trusted resolved tool artifact; not arbitrary LLM assertions"
+        },
+        "supported_inferences": [
+          "observed_task_outcome"
+        ],
+        "unsupported_inferences": [
+          "global_nonlinear_feasibility",
+          "global_nonlinear_infeasibility",
+          "structural_infeasibility",
+          "whole_horizon_from_instantaneous_braking",
+          "adapted_dynamic_improvement_from_static_sensitivity",
+          "unvisited_simulation_descent_guarantee",
+          "continuous_time_compliance",
+          "hardware_performance",
+          "robustness",
+          "repeatability",
+          "observed_task_pass"
+        ],
+        "evidence_reference": {
+          "artifact_id": "2488e2f0ec08a270af14022860f2b41d7e4f3c6378fbc0f8396eb60b581e284e",
+          "media_type": "application/json"
+        },
+        "numerical_evidence_pointer": "/acceptance",
+        "prospective_guarantee": false,
+        "unresolved": [],
+        "next_checks": [
+          "independent_legal_physical_evaluation",
+          "matched_input_refinement",
+          "paired_local_response_check"
+        ]
+      }
+    }
+  ],
+  "control_binding_audit": [
+    {
+      "source": {
+        "artifact_id": "96615db5434bdf07196a3150afc909e4b68a2ddc397c6cf36c08bdd52a4016ea",
+        "media_type": "application/json"
+      },
+      "sequence_hash": "474563736fb5e266a41b6e062b31b98894b0393b706a2702b5f9e8b96c5d13ed",
+      "bound_schedule_identity": "7413ba4715f05e8d340c6888d9a06151d796d1c232c27a3f8f8703562f87f7be",
+      "engine_time_and_model_checked": true
+    },
+    {
+      "source": {
+        "artifact_id": "c0da16dc3c57c8d871fc3886d15645ec3739cc734792fb09b583ce1df9bd80d5",
+        "media_type": "application/json"
+      },
+      "sequence_hash": "8f8feff3141f9c59124cbe9547915115bedf99fc545df8c58b20884c1afb7235",
+      "bound_schedule_identity": "813c7da5b37a3b1dd521479f7202d8cc140008901f2877ea5d5365997ccdc7eb",
+      "engine_time_and_model_checked": true
+    },
+    {
+      "source": {
+        "artifact_id": "ec6b9563a756fa6031038a9aa31f0868ddef9fdd69885884a601789df32af36b",
+        "media_type": "application/json"
+      },
+      "sequence_hash": "bcc7a58b0c3b1163aa8e405f854f23730425dfb82a58904a8f0f59f836c2445f",
+      "bound_schedule_identity": "199b27d66ff3af32b83efee5615854f92bbc9783178dfd07bf33014dc504f1da",
+      "engine_time_and_model_checked": true
+    },
+    {
+      "source": {
+        "artifact_id": "6525abb1b05cd70719a6dc91a72aec49fc9770549d7a29ebecc939db640314f9",
+        "media_type": "application/json"
+      },
+      "sequence_hash": "d3b185de641fecfec0239c6f0c183ed89e200eb9da4c7e4cde8fb858af1acbe8",
+      "bound_schedule_identity": "361c80b715c27ee936815ef051f0a9405cb50af70cac5528aa4648db607af45a",
+      "engine_time_and_model_checked": true
+    },
+    {
+      "source": {
+        "artifact_id": "15cce2112131c38030ce36174f7931a99db4cd9e447029c0f3dc655410edad0b",
+        "media_type": "application/json"
+      },
+      "sequence_hash": "b5421f6056b0bb0ecf0b9a88c305ad37f8ea6640665212b25739c21c5f2d62c2",
+      "bound_schedule_identity": "9abff402780f9713db57196b1f1ccc47ec7bf7335700d84f7cec229c3fa46947",
+      "engine_time_and_model_checked": true
+    },
+    {
+      "source": {
+        "artifact_id": "ad716d412cb283a8fe3c1cc28cd36c179164c8f0b76a5e5dd29b9c7472af6c63",
+        "media_type": "application/json"
+      },
+      "sequence_hash": "76c27c1f42f65e1845c4ea0329b6a921381da1bfd9c160c0af6abb9ae5f82ab3",
+      "bound_schedule_identity": "0d37ca618f5ce147807e081c9a16288af9e72f71fbc8a5b0c1d5e08ce4b5848a",
+      "engine_time_and_model_checked": true
+    },
+    {
+      "source": {
+        "artifact_id": "a323c9375b4666e6d31952b11b8ea39de5486a51361ec3a0a1fc534243140b06",
+        "media_type": "application/json"
+      },
+      "sequence_hash": "2afabbbd4a24296f8056ab03bdca8de161f529b47cb4f0329684d51911e8130b",
+      "bound_schedule_identity": "ea9a9867575066f435e53760ecd3bcc694186919de8827b472d60fcf6767b465",
+      "engine_time_and_model_checked": true
+    },
+    {
+      "source": {
+        "artifact_id": "88a9368baf2732e3d3a982ac72048c74daa89707082ed7286f31012ee2e837f2",
+        "media_type": "application/json"
+      },
+      "sequence_hash": "3e28d0fd728f18f544b474bbcd9292f50b3d79a822d021829f102a8f665f5afa",
+      "bound_schedule_identity": "354db269363230ddae0cac67fe19a088e4aac603b5ced90e036a74b637aa50f1",
+      "engine_time_and_model_checked": true
+    },
+    {
+      "source": {
+        "artifact_id": "1099c6f4e978814ddabbd4167653e61660621d0c2ca7bd89178ce778ee644e17",
+        "media_type": "application/json"
+      },
+      "sequence_hash": "e3d6846f80c963bba7be55032abb3b81ccbb426c74b5a42b55517c1cd0d3f56c",
+      "bound_schedule_identity": "f28273106e76db55d096f6a50db188ff1cd0dea55581d7edd409db5799d3d4d5",
+      "engine_time_and_model_checked": true
+    },
+    {
+      "source": {
+        "artifact_id": "d9f90ae212e27bcba705bd3139cc18deaf6cafe29b41c8b0e3909e8b4c94bb34",
+        "media_type": "application/json"
+      },
+      "sequence_hash": "4f89909b44cd8090f0e7058fbb895657ceb1d6bbb57d682856796724cddbb841",
+      "bound_schedule_identity": "d8b54d1c9b0ed2d13c1447f07e5beda16fdbb71414769c7e42fa26473259834e",
+      "engine_time_and_model_checked": true
+    },
+    {
+      "source": {
+        "artifact_id": "8e7ee1afd56c7bee5df27cd5b64bdc757525bf14c155e4cfd378c328558a8fc3",
+        "media_type": "application/json"
+      },
+      "sequence_hash": "e07373c102172d36a1f05ce045f23057ca0f433268696ca0f4f7912a761fe0ad",
+      "bound_schedule_identity": "2cbd9b903c1b1973c8bbb8ff564a3fbef1d2fdbcc5a93690f51487acff6a8937",
+      "engine_time_and_model_checked": true
+    }
+  ],
+  "refined_reference": {
+    "version": "evidence_policy_v1",
+    "claim_kind": "NUMERICAL_DIAGNOSTIC",
+    "verification_status": "refinement_failed_or_unverified",
+    "model_identity": "8f8eceb5f74d4b171c87f333db4db0f353aad051b375ff26aca795f7ac1fbaf2",
+    "candidate_identity": {
+      "artifact_id": "f7a046d25bfd4760f084fb420ed2926a7e36500ce8df1f1cf1706ae14d7ccea7",
+      "media_type": "application/json"
+    },
+    "design_identity": null,
+    "task_identity": null,
+    "operating_point": {},
+    "covered_samples": {
+      "horizon": {},
+      "constraints": [],
+      "full_task_supported": false
+    },
+    "assumptions": {
+      "model": {},
+      "physical_inputs": {},
+      "legacy_applicability": {},
+      "source": "Trusted resolved tool artifact; not arbitrary LLM assertions"
+    },
+    "supported_inferences": [
+      "local_diagnostic"
+    ],
+    "unsupported_inferences": [
+      "global_nonlinear_feasibility",
+      "global_nonlinear_infeasibility",
+      "structural_infeasibility",
+      "whole_horizon_from_instantaneous_braking",
+      "adapted_dynamic_improvement_from_static_sensitivity",
+      "unvisited_simulation_descent_guarantee",
+      "continuous_time_compliance",
+      "hardware_performance",
+      "robustness",
+      "repeatability",
+      "observed_task_pass"
+    ],
+    "evidence_reference": {
+      "artifact_id": "f4ac78aa29c002ca527cca34333e427551699e5f2d5c3034e9f4de319addb73b",
+      "media_type": "application/json"
+    },
+    "numerical_evidence_pointer": "",
+    "prospective_guarantee": false,
+    "unresolved": [
+      "Nonlinear realization and constraints outside declared model/sample coverage remain unresolved.",
+      "Coarse sampled feasibility does not survive or lacks independent finer integration verification.",
+      "Original independent physical task acceptance is unmeasured by this evidence."
+    ],
+    "next_checks": [
+      "independent_legal_physical_evaluation",
+      "matched_input_refinement",
+      "paired_local_response_check"
+    ]
+  },
+  "refinement_evidence": {
+    "artifact_id": "bcec3dac830e5fe2ca518e8ff6545d86928baac9d8f6392254d6e8d8f5977efb",
+    "media_type": "application/json"
+  },
+  "hypotheses": {
+    "CONTROL_SEARCH_INCOMPLETE": {
+      "claim_kind": "UNVERIFIED_HYPOTHESIS",
+      "acceptable_evidence": [
+        "PHYSICAL_OBSERVATION",
+        "NUMERICAL_DIAGNOSTIC"
+      ],
+      "discriminating_experiments": [
+        "additional_bounded_starts",
+        "paired_control_search"
+      ],
+      "forbidden_inferences": [
+        "global_nonlinear_feasibility",
+        "global_nonlinear_infeasibility",
+        "structural_infeasibility",
+        "whole_horizon_from_instantaneous_braking",
+        "adapted_dynamic_improvement_from_static_sensitivity",
+        "unvisited_simulation_descent_guarantee",
+        "continuous_time_compliance",
+        "hardware_performance",
+        "robustness",
+        "repeatability",
+        "identified_root_cause"
+      ],
+      "scope": "Only searched starts, controls and budgets.",
+      "probability": null
+    },
+    "MODEL_PREDICTION_UNRELIABLE": {
+      "claim_kind": "UNVERIFIED_HYPOTHESIS",
+      "acceptable_evidence": [
+        "EMPIRICAL_COMPARISON",
+        "NUMERICAL_DIAGNOSTIC"
+      ],
+      "discriminating_experiments": [
+        "aligned_model_physics_pairs",
+        "fixed_input_grid_refinement"
+      ],
+      "forbidden_inferences": [
+        "global_nonlinear_feasibility",
+        "global_nonlinear_infeasibility",
+        "structural_infeasibility",
+        "whole_horizon_from_instantaneous_braking",
+        "adapted_dynamic_improvement_from_static_sensitivity",
+        "unvisited_simulation_descent_guarantee",
+        "continuous_time_compliance",
+        "hardware_performance",
+        "robustness",
+        "repeatability",
+        "identified_root_cause"
+      ],
+      "scope": "Only checked operating points and input sequences.",
+      "probability": null
+    },
+    "CONTROL_PARAMETERIZATION_LIMITED": {
+      "claim_kind": "UNVERIFIED_HYPOTHESIS",
+      "acceptable_evidence": [
+        "PHYSICAL_OBSERVATION",
+        "EMPIRICAL_COMPARISON"
+      ],
+      "discriminating_experiments": [
+        "paired_basis_comparison_with_equal_budget"
+      ],
+      "forbidden_inferences": [
+        "global_nonlinear_feasibility",
+        "global_nonlinear_infeasibility",
+        "structural_infeasibility",
+        "whole_horizon_from_instantaneous_braking",
+        "adapted_dynamic_improvement_from_static_sensitivity",
+        "unvisited_simulation_descent_guarantee",
+        "continuous_time_compliance",
+        "hardware_performance",
+        "robustness",
+        "repeatability",
+        "identified_root_cause"
+      ],
+      "scope": "Only declared bases and coefficient domains.",
+      "probability": null
+    },
+    "DESIGN_LIMITATION_POSSIBLE": {
+      "claim_kind": "UNVERIFIED_HYPOTHESIS",
+      "acceptable_evidence": [
+        "MODEL_EXCLUSION",
+        "EMPIRICAL_COMPARISON"
+      ],
+      "discriminating_experiments": [
+        "paired_designs_with_equal_control_adaptation"
+      ],
+      "forbidden_inferences": [
+        "global_nonlinear_feasibility",
+        "global_nonlinear_infeasibility",
+        "structural_infeasibility",
+        "whole_horizon_from_instantaneous_braking",
+        "adapted_dynamic_improvement_from_static_sensitivity",
+        "unvisited_simulation_descent_guarantee",
+        "continuous_time_compliance",
+        "hardware_performance",
+        "robustness",
+        "repeatability",
+        "identified_root_cause"
+      ],
+      "scope": "Only tested designs; a local model exclusion is not physical exclusion.",
+      "probability": null
+    },
+    "SOLVER_OR_NUMERICAL_ISSUE": {
+      "claim_kind": "UNVERIFIED_HYPOTHESIS",
+      "acceptable_evidence": [
+        "NUMERICAL_DIAGNOSTIC"
+      ],
+      "discriminating_experiments": [
+        "derivative_checks",
+        "same_input_refinement",
+        "alternative_initialization"
+      ],
+      "forbidden_inferences": [
+        "global_nonlinear_feasibility",
+        "global_nonlinear_infeasibility",
+        "structural_infeasibility",
+        "whole_horizon_from_instantaneous_braking",
+        "adapted_dynamic_improvement_from_static_sensitivity",
+        "unvisited_simulation_descent_guarantee",
+        "continuous_time_compliance",
+        "hardware_performance",
+        "robustness",
+        "repeatability",
+        "identified_root_cause"
+      ],
+      "scope": "Only measured solver/model/grid conditions.",
+      "probability": null
+    }
+  },
+  "scientific_launches": 0,
+  "provider_requests": 0,
+  "source_files_unchanged": true,
+  "note": "Additive deterministic views. Existing claims and sealed raw values are unchanged."
+}

@@ -237,6 +237,27 @@ class LocalControlSearchSettings(Contract):
         return self
 
 
+class EvidenceSummary(Contract):
+    version: Literal['evidence_policy_v1'] = 'evidence_policy_v1'
+    claim_kind: Literal['MODEL_WITNESS','MODEL_EXCLUSION','NUMERICAL_DIAGNOSTIC',
+        'PHYSICAL_OBSERVATION','EMPIRICAL_COMPARISON','STATISTICAL_EVIDENCE','UNVERIFIED_HYPOTHESIS']
+    verification_status: str
+    model_identity: str | None = None
+    candidate_identity: dict | str | None = None
+    design_identity: str | None = None
+    task_identity: str | None = None
+    operating_point: dict = Field(default_factory=dict)
+    covered_samples: dict = Field(default_factory=dict)
+    assumptions: dict = Field(default_factory=dict)
+    supported_inferences: list[str] = Field(default_factory=list)
+    unsupported_inferences: list[str] = Field(default_factory=list)
+    evidence_reference: EvidenceRef | None = None
+    numerical_evidence_pointer: str = ''
+    prospective_guarantee: Literal[False] = False
+    unresolved: list[str] = Field(default_factory=list)
+    next_checks: list[str] = Field(default_factory=list)
+
+
 class FixedSequenceRefinement(Contract):
     candidate: EvidenceRef
     source: EvidenceRef

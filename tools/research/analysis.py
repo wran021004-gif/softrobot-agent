@@ -433,6 +433,8 @@ def compact_result(value, reference):
             witness_pointer='/trajectory/replay' if trajectory.get('replay',{}).get('passed') else None,
             certificate_pointer='/trajectory/certificate' if cert else None,
             certificate={k:cert.get(k) for k in ('constraint_id','sample_index','kind','margin')} if cert else None))
+    from tools.research.evidence_policy import summarize_evidence
+    summary['evidence_summary']=summarize_evidence(value,reference)
     if value.get('instantaneous_braking'):summary['instantaneous_braking']=value['instantaneous_braking']
     return summary
 
@@ -481,6 +483,8 @@ def decision_result(value, reference):
         decision_relevance=dict(supported_facts=[fact],unresolved_questions=[unresolved],potential_discriminating_checks=[check],
             unsupported_inferences=['Global/physical feasibility, structural necessity or surrounding-region exclusion.']),
         failure_pointer='' if value.get('status') not in ('computed','not_applicable') else None)
+    from tools.research.evidence_policy import summarize_evidence
+    result['evidence_summary']=summarize_evidence(value,reference)
     if value.get('instantaneous_braking'):result['instantaneous_braking']=value['instantaneous_braking']
     return result
 

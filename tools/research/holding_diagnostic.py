@@ -83,7 +83,7 @@ def rl(folder, reference, raw_folder, raw_index):
     suffix=result['trajectory'].replace('\\','/').split('/')[-2]+'/trajectory.csv'
     item=next(r for r in items if r['path'].replace('\\','/').endswith(suffix))
     records=list(csv.DictReader(io.StringIO(archived(raw_folder,item['reference'],raw=True).decode('utf8'))))
-    rows=[dict(time_s=float(r['time_s']),position_m=[float(r[f'tip_{a}_m']) for a in 'xyz'],
+    rows=[dict(time_s=float(r['time_s']),engine_time_s=float(r['engine_time_s']),position_m=[float(r[f'tip_{a}_m']) for a in 'xyz'],
         velocity_m_s=[float(r[f'velocity_{a}_m_s']) for a in 'xyz'],
         actual_tension_n=[float(r[f'{t}_applied_n']) for t in order],
         commanded_tension_n=[float(r[f'{t}_commanded_n']) for t in order],
@@ -107,6 +107,8 @@ def applied_schedule(rows, *, phase, period, timestep, intervals, order, expecte
     """
     if order!=expected_order or phase not in ('post_control_interval','post_physics_step'):
         raise ValueError('CONTROL_ORDER_OR_PHASE_MISMATCH')
+    if not np.isfinite([period,timestep,*limits]).all() or min(period,timestep,*limits)<=0:
+        raise ValueError('FINITE_POSITIVE_GRID_AND_LIMITS_REQUIRED')
     stride=round(period/timestep) if phase=='post_physics_step' else 1
     if stride<1 or (phase=='post_physics_step' and abs(stride*timestep-period)>1e-12):
         raise ValueError('CONTROL_PHYSICS_GRID_MISMATCH')
@@ -120,7 +122,9 @@ def applied_schedule(rows, *, phase, period, timestep, intervals, order, expecte
         if u.shape!=(stride,len(order)) or not np.isfinite(u).all() or np.any(u<0) or np.any(u>limits):
             raise ValueError('ILLEGAL_ACTUAL_TENSION')
         for j,r in enumerate(block):
-            if (abs(r['time_s']-(k+(j+1)/stride)*period)>1e-12 or r['control_update_index']!=k
+            if (not np.isfinite([r['time_s'],r.get('control_start_s',k*period),r.get('engine_time_s',r['time_s'])]).all()
+                    or abs(r.get('engine_time_s',r['time_s'])-r['time_s'])>1e-10
+                    or abs(r['time_s']-(k+(j+1)/stride)*period)>1e-12 or r['control_update_index']!=k
                     or ('control_start_s' in r and abs(r['control_start_s']-k*period)>1e-12)):
                 raise ValueError('APPLIED_CONTROL_TIME_OR_INDEX_MISMATCH')
             command=r.get('commanded_tension_n')
