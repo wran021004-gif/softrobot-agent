@@ -1,0 +1,191 @@
+{
+  "version": "robot_design_delivery_v1",
+  "study_id": "s125-preflight-3c786a38d0eb4e509be322d8a74b381c",
+  "implementation": "isolated_s126_protocol_fixture",
+  "frozen_study_identity": "e38d9bc420d587cb2ad4ca3e3a29d419e030f1b41cd3fcbc396b56c2878368cd",
+  "canonical_task": {
+    "actuator_channels": [
+      "actuator_commands"
+    ],
+    "contract_version": "1.0.0",
+    "environment": {
+      "contract": "experiment.assembly",
+      "data": {
+        "environment": {
+          "coordinate_frame": "world_base_x_forward_yz_cross_section",
+          "environment_id": "reach_free",
+          "gravity_m_s2": [
+            0.0,
+            0.0,
+            -9.81
+          ],
+          "gravity_source": "main@245a785 reach_free environment; Human-owned benchmark gravity",
+          "lights": [
+            {
+              "direction": [
+                0.0,
+                0.0,
+                -1.0
+              ],
+              "position_m": [
+                0.0,
+                0.0,
+                2.0
+              ]
+            }
+          ],
+          "objects": [
+            {
+              "conaffinity": 1,
+              "contype": 0,
+              "half_size_m": [
+                2.0,
+                2.0,
+                0.1
+              ],
+              "kind": "plane",
+              "name": "floor",
+              "position_m": [
+                0.0,
+                0.0,
+                -0.02
+              ]
+            }
+          ],
+          "schema_version": "1",
+          "truth_status": "HUMAN_OWNED",
+          "units": "SI"
+        },
+        "external_forces": [],
+        "floor_id": "floor",
+        "mount": {
+          "position_m": [
+            0.0,
+            0.0,
+            0.15
+          ],
+          "quaternion_wxyz": [
+            1.0,
+            0.0,
+            0.0,
+            0.0
+          ]
+        }
+      },
+      "version": "1.0.0"
+    },
+    "evaluator": {
+      "extension_id": "evaluate.reach",
+      "parameters": {
+        "contract": "reference.reach_evaluation",
+        "data": {
+          "tolerance_m": 0.01
+        },
+        "version": "1.0.0"
+      },
+      "version": "1.0.0"
+    },
+    "failure_policy": "retain_invalid_and_constraint_failures",
+    "family": "task.reach",
+    "goal": {
+      "contract": "reference.reach_goal",
+      "data": {
+        "target_m": [
+          0.29,
+          -0.035,
+          0.19
+        ]
+      },
+      "version": "1.0.0"
+    },
+    "initializer": {
+      "extension_id": "initialize.family",
+      "parameters": {
+        "contract": "family.initial",
+        "data": {
+          "rule": "all_candidate_dofs_zero_v1"
+        },
+        "version": "1.0.0"
+      },
+      "version": "1.0.0"
+    },
+    "name": "New negative-y reach-and-hold feasibility study",
+    "objectives": [
+      {
+        "direction": "minimize",
+        "metric": "position_error",
+        "units": "m",
+        "weight": 1.0
+      }
+    ],
+    "observations": [
+      {
+        "dimension": 3,
+        "entity": "tip",
+        "frame": "world",
+        "missing": "unsupported",
+        "name": "tip_position",
+        "phase": "post_step",
+        "units": "m"
+      }
+    ],
+    "robot_families": [
+      "tendon_robot_family"
+    ],
+    "sampling": {
+      "aggregation": "per_instance",
+      "seeds": [
+        17
+      ],
+      "split": "development",
+      "window_s": [
+        0.0,
+        0.35
+      ]
+    },
+    "source": "User-authorized M3-B first-feasible scope b555900c; target frozen before its physical outcomes. Reuses reach_hold.json evaluator, initializer, timing, holding and sampling unchanged.",
+    "status": "development_valid",
+    "task_id": "family-multisegment-mirror-dev",
+    "task_version": "1.0.0",
+    "timing": {
+      "control_period_s": 0.01,
+      "duration_s": 0.35,
+      "sample_period_s": 0.01,
+      "termination": [
+        "duration",
+        "numerical_failure"
+      ],
+      "timestep_s": 0.0005
+    }
+  },
+  "accepted": false,
+  "status": "no_valid_candidate",
+  "ledger": {
+    "limit": {
+      "backend_solves": 64,
+      "model_calls": 48,
+      "tool_calls": 200,
+      "wall_s": null,
+      "worker_calls": 0
+    },
+    "used": {
+      "tool_calls": 0,
+      "model_calls": 3,
+      "backend_solves": 0,
+      "worker_calls": 0,
+      "wall_s": 0.0
+    },
+    "remaining": {
+      "backend_solves": 64,
+      "model_calls": 45,
+      "tool_calls": 200,
+      "wall_s": null,
+      "worker_calls": 0
+    },
+    "occupied": {}
+  },
+  "stop": null,
+  "archive_manifest": "archive_manifest.json",
+  "scope": "Frozen nominal sampled task only; optimality, robustness, hardware and repeatability unassessed",
+  "content_identity": "fa6ceb5b038f20e1ff68a80523c43a31a6adc28904184052714db8383e6e708a"
+}

@@ -274,6 +274,7 @@ def validate_request(space, request):
 def decision_summary(value, evidence, operations):
     """Exact frozen domains without repeating component meshes and inertias."""
     from tools.platform_store import plain
+    from tools.state_io import digest
     space = parse_space(value)
     frozen = plain(space)
     result = {k:frozen[k] for k in (
@@ -295,7 +296,7 @@ def decision_summary(value, evidence, operations):
         result['generation_version']='serial_family_generation_v2'
     else:
         result['generation_version']='serial_family_generation_v1'
-    result.update(full_specification=evidence, available_operations=operations,
+    result.update(family_space_identity=digest(frozen),full_specification=evidence, available_operations=operations,
         routing_strategy='polar_consecutive_spans_v1',
         span_semantics='first_segment <= last_segment < selected segment_count; counts sum to tendon_count',
         angular_semantics='theta_j = phase_rad + 2*pi*j/count + angular_offsets_rad[j]; omitted/empty offsets mean equal spacing. Explicit offsets are additional, not absolute angles. Route overrides remain exact.',

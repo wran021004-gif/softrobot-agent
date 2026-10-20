@@ -38,13 +38,13 @@ def checkpoint(host,boundary,*,interrupt=None):
         completed=host.store.artifact(boundary)
         if completed['session_id']!=s['pilot']['framework_session_id']:raise ValueError('STALE_BOUNDARY')
         if completed['source_state_identity']!=digest(s):raise ValueError('STATE_CHANGED')
-        outstanding=set()
+        outstanding=set();seen=set()
         for message in completed['messages']:
             for block in message['content']:
                 if 'toolUse' in block:
                     key=block['toolUse']['toolUseId']
-                    if key in outstanding:raise ValueError('DUPLICATE_TOOL_ID')
-                    outstanding.add(key)
+                    if key in seen:raise ValueError('DUPLICATE_TOOL_ID')
+                    outstanding.add(key);seen.add(key)
                 if 'toolResult' in block:
                     key=block['toolResult']['toolUseId']
                     if key not in outstanding:raise ValueError('UNPAIRED_RESULT')
@@ -135,6 +135,8 @@ class CheckpointTests(unittest.TestCase):
             self.assertFalse(any(m.get('reasoning_content') for m in wires[-1]['messages']))
             self.assertEqual(h.store.remaining()['used']['model_calls'],3)
             self.assertFalse(state(h)['pilot'].get('unconsumed_response'))
+            from tools.research.core import export
+            export(h,ROOT/'evidence/s126_checkpoint/study')
             atomic_json(ROOT/'evidence/s126_checkpoint/offline.json',dict(status='offline_protocol_passed',
                 formal_admission='not_admitted',reason='Real-provider continuation, actual usage and complete crash recovery admission remain untested',
                 sdk='1.59.0',harness='0.2.0',session_manager='SnapshotSessionManager',
@@ -142,6 +144,23 @@ class CheckpointTests(unittest.TestCase):
                 simulated_model_calls=3,new_provider_requests=0,new_scientific_executions=0,
                 actual_token_savings=None,synthetic_usage_is_not_measurement=True))
             await transport.aclose()
+        asyncio.run(exercise())
+
+    def test_unknown_send_in_new_session_never_resends_or_rotates(self):
+        h=cold_host();checkpoint(h,completed_boundary(h,[]));identity=state(h)['pilot']['framework_session_id']
+        provider=state(h)['pilot']['provider'];sent=[]
+        def fail(request):sent.append(request);raise httpx.ReadError('Synthetic unknown outcome')
+        wire=dict(model=provider['model'],thinking=dict(type=provider['thinking']),reasoning_effort=provider['reasoning_effort'],
+            max_tokens=provider['max_tokens'],stream=False,messages=[dict(role='user',content='Synthetic new session')])
+        async def exercise():
+            boundary=LiveBoundary(h,httpx.MockTransport(fail))
+            request=lambda:httpx.Request('POST',provider['base_url']+'/chat/completions',json=wire)
+            with self.assertRaises(httpx.ReadError):await boundary.handle_async_request(request())
+            with self.assertRaisesRegex(ValueError,'UNCONFIRMED'):await boundary.handle_async_request(request())
+            with self.assertRaisesRegex(ValueError,'UNSETTLED'):checkpoint(h,completed_boundary(h,[]))
+            self.assertEqual(len(sent),1);self.assertEqual(h.store.remaining()['used']['model_calls'],1)
+            self.assertEqual(state(h)['pilot']['framework_session_id'],identity)
+            await boundary.aclose()
         asyncio.run(exercise())
 
 

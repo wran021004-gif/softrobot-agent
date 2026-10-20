@@ -131,12 +131,17 @@ def live_audit(host):
             if not isinstance(business,dict):business={}
             item=dict(sequence=e['sequence'],provider_order=i+1,reference=e['outputs'][0],tool=use['name'],
                 action=use['input'].get('action'),status=result['status'],business_status=business.get('status'),
+                business_reference=business.get('reference'),
                 reason=business.get('reason'),error_code=detail.get('error_code') if result['status']=='error' else None)
             row['tool_outcomes'].append(item);outcomes.append(item)
         totals.update(row['serialized_bytes']);rows.append(row)
-    s=state(host);scientific=[o for o in outcomes if o['status']=='success' and o['action']=='execute'
-        and o['business_status']=='evaluated']
-    first=min((o['sequence'] for o in scientific),default=float('inf'))
+    s=state(host)
+    science_ids={r['artifact_id'] for k in ('results','mechanics_results','analysis_results','physical_replays','control_search_results','rl_evaluations') for r in s.get(k,[])}
+    physical_ids={r['artifact_id'] for k in ('results','physical_replays','rl_evaluations') for r in s.get(k,[])}
+    scientific=[o for o in outcomes if o['status']=='success' and
+        (o['tool']=='research_analysis' or o['action'] in ('execute','mechanics','replay','refine','physical_replay','control_search')) and
+        (o.get('business_reference') or {}).get('artifact_id') in science_ids]
+    first=min((o['sequence'] for o in scientific if (o.get('business_reference') or {}).get('artifact_id') in physical_ids),default=float('inf'))
     changed=[o for o in outcomes if o['sequence']>first and o['action'] in
         ('generate','initialize_control','mechanics','control_search','physical_replay','execute','refine')]
     child_events=[e for ref in s['results'] for e in host.store.events(host.store.artifact(ref)['owner_run_id'])]
@@ -155,9 +160,11 @@ def live_audit(host):
         successful_generation_calls=sum(o['business_status']=='generated' for o in outcomes),
         first_physics=first_physics,
         executed_scientific_decisions=scientific,feedback_revision_proposals=changed,
-        executed_feedback_revisions=sum(o['status']=='success' for o in changed),
+        executed_feedback_revisions=sum(o in scientific for o in changed),
+        registered_scientific_results={k:s.get(k,[]) for k in ('results','mechanics_results','analysis_results','physical_replays','control_search_results','rl_evaluations')},
+        admitted_ppo_stages=s.get('admitted_training_stages',0),
         new_provider_requests=0,new_scientific_executions=0,
-        limitation='Canonical JSON bytes are not token savings. execute is the sole actual scientific method in this study; NMPC internal solves are separate. Rejected feedback proposals are not executed revisions.')
+        limitation='Canonical JSON bytes are not token savings. Scientific decisions require a registered result reference; optimizer internal iterations and admitted PPO stages are separate. Rejected feedback proposals, structural generation and baseline initialization are not executed feedback calculations.')
 
 
 if __name__=='__main__':

@@ -396,10 +396,16 @@ def tool_feedback(host,value):
             p=tendon['points'][0];a=p['attachment']
             position=guides[a['part']]['guide_holes'][p['hole']] if p.get('hole') else a['position_m']
             layout.append(dict(tendon=tendon['id'],start_part=a['part'],start_position_m=position))
+        spans=candidate['parameters'].get('spans') or [dict(first_segment=0,last_segment=len(resolved['segments'])-1,count=len(resolved['tendons']))]
+        span_layout=[];offset=0
+        for span in spans[:12]:
+            span_layout.append(dict(first_segment=span.get('first_segment',0),last_segment=span['last_segment'],
+                tendons=[t['id'] for t in resolved['tendons'][offset:offset+span['count']]]))
+            offset+=span['count']
         view['structure_facts']=dict(candidate=result['candidate'],construction='compiled_valid',
             scientific_acceptance='unmeasured',segment_count=len(resolved['segments']),
             tendon_count=len(resolved['tendons']),lengths_m=[p['length_m'] for p in resolved['segments']],
-            spans=candidate['parameters'].get('spans',[])[:12],layout=layout,layout_limit=12,
+            spans=span_layout,layout=layout,layout_limit=12,
             checks_passed=['family_domain','section_route_clearance','tendon_attachment_clearance',
                 'ordered_route_stations','guide_hole_clearance','guide_envelope','resolved_nonzero_spans'],
             minimum_clearance=dict(status='unavailable',reason='Not retained by original successful checks'),

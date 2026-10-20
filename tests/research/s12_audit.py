@@ -190,7 +190,7 @@ def final_checks(run_id='s12-mirror-live-20261020', destination='evidence/s12_mi
         acceptance=assemble_acceptance(cfg,ev,profile,evaluation_reference=v['evaluation_reference'],profile_reference=None,motion=[dict(time_s=x['time_s']) for x in samples])
         assert acceptance==v['acceptance'] and profile==v['profile']
         physical.append(dict(reference=ref,original_evaluator_and_full_acceptance_equal=True,accepted=acceptance['accepted'],task_gap=task_gap(v)))
-    if run_id.startswith('s125-'):physical.extend(verify_nmpc(h,out))
+    if run_id.startswith(('s125-','s126-')):physical.extend(verify_nmpc(h,out))
     manifest=read(out/'study/archive_manifest.json');archive=out/'study/immutable_artifacts.tar.gz'
     assert hashlib.sha256(archive.read_bytes()).hexdigest()==manifest['archive_sha256']
     load_credential(Path(s['spec']['runtime']['credentials_reference']).expanduser());secret=os.environ['DEEPSEEK_API_KEY'].encode()
@@ -199,6 +199,7 @@ def final_checks(run_id='s12-mirror-live-20261020', destination='evidence/s12_mi
             b=tar.extractfile(m['name']).read();assert hashlib.sha256(b).hexdigest()==m['sha256'] and secret not in b
     unchanged=['extensions','matlab','schemas','tasks','evidence/s7_mirror','evidence/s8_mirror','evidence/s9_variant','evidence/s10_mirror','evidence/s11_mirror','configs/research/family_space_s7.json']
     if run_id.startswith('s125-'):unchanged+=['evidence/s12_mirror','evidence/s12_decision_probe']
+    if run_id.startswith('s126-'):unchanged+=['evidence/s12_mirror','evidence/s12_decision_probe','evidence/s125_cold','evidence/s125_wire_audit']
     assert not subprocess.check_output(['git','diff',baseline,'--',*unchanged],text=True)
     checks=dict(study_id=h.run_id,freeze=s['freeze'],source_hashes_match_frozen=True,original_task_science_and_sealed_history_unchanged=True,
         provider_requests=len(requests),model_tool_pairs=len(feedback),original_request_response_tool_ids_verified=True,all_receipts_settled=True,

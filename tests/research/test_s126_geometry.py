@@ -44,7 +44,10 @@ def replay():
     counts=Counter(r['status'] for r in rows)
     assert len(rows)==19 and counts==dict(generated=9,invalid=10),counts
     assert host.store.remaining()['used']['model_calls']==host.store.remaining()['used']['backend_solves']==0
+    from tools.research.core import export
+    export(host,ROOT/'evidence/s126_geometry/study')
     return dict(source='evidence/s125_cold/study',requests=rows,counts=dict(counts),
+        replay_store=str(host.store.root),replay_archive='evidence/s126_geometry/study',
         new_provider_requests=0,new_scientific_executions=0,legal_science_identities_unchanged=True)
 
 
@@ -91,9 +94,13 @@ class GeometryTests(unittest.TestCase):
         self.assertEqual(current['candidate_status']['independent_physical_evaluations'],0)
         self.assertFalse(current['task_accepted'])
         facts=tool_feedback(h,dict(result=result))['new_facts']['structure_facts']
+        from extensions.tendon_family.family_space import decision_summary
+        summary=decision_summary(s['spec']['family_space'],s['family_space_reference'],{})
+        self.assertEqual(summary['family_space_identity'],s['spec']['family_space_identity'])
         self.assertEqual(facts['scientific_acceptance'],'unmeasured')
         self.assertFalse(facts['control_source_initialized'])
         self.assertEqual(facts['tendon_count'],4)
+        self.assertEqual(facts['spans'][0]['tendons'],['tendon_'+str(i) for i in range(4)])
         self.assertEqual(budget['provider_budget']['exploration_after_additional_read_requests']['3'],40)
         routes=h.store.artifact(facts['full_routes']['reference'])['resolved_parameters']['tendons']
         self.assertEqual(len(routes),4)
