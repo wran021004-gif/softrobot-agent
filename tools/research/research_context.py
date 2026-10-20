@@ -116,7 +116,7 @@ def legacy_context(host):
         control_search_usage='action=control_search, control_search={candidate,source,settings,adaptation_from?}; decision fields required. v2 dimensions come from schedule. Optional correction_window_s masks all changes outside the window. Current optimizer supports registered reach-hold norm constraints only; other tasks return unsupported. Full original task always evaluated.')
 
 
-def compact_evidence(value, reference, pointer=''):
+def compact_evidence(value, reference, pointer='', *, facts_only=False):
     """Deterministic bounded preview; the exact Store artifact remains authoritative."""
     def preview(v,depth=0,path=pointer):
         if isinstance(v,list):
@@ -153,6 +153,7 @@ def compact_evidence(value, reference, pointer=''):
     if isinstance(value,dict) and 'acceptance' in value:
         summary.update(task_gap=task_gap(value),constraints=(value['acceptance'] or {}).get('components',{}),
             limitations=['Only this recorded execution establishes its task outcome'])
+    if facts_only and summary:result=dict(read_pointer=pointer,available_keys=list(value))
     return dict(reference=reference,pointer=pointer,view='deterministic_summary',
         available_keys=list(value) if isinstance(value,dict) else None,summary=summary,
         retrieval='Display value/summary/preview are not Store path prefixes. All read_pointer values are absolute paths in reference. Use evidence_read(view=full,pointer=...). No acceptance transfer.',value=result)
@@ -173,6 +174,9 @@ def context(host):
     starts=[dict(candidate=host.store.artifact(r)['candidate'],source=host.store.artifact(r)['source_reference'],
         observation=r) for r in reversed(s.get('physical_replays',[])) if task_gap(host.store.artifact(r))['valid_complete']]
     starts += list(reversed(s.get('control_initializations',[])))+current['control_search_starts']
+    best=current['best_valid']
+    if best and best.get('source'):
+        starts.insert(0,dict(candidate=best.get('executable_candidate',best['candidate']),source=best['source'],observation=best['reference']))
     seen=set();unique=[]
     for entry in starts:
         key=(entry['candidate']['artifact_id'],entry['source']['artifact_id'])
@@ -206,6 +210,21 @@ def context(host):
             for r in reversed([*s.get('results',[]),*s.get('physical_replays',[]),*s.get('rl_evaluations',[])][-3:])],
         actions=action_feedback(host,current),
         citation_rule='STOP must explain the outcome and explicitly cite all_fresh_results. This index does not record model reading or understanding.')
+    from tools.research.budget import decision_budget
+    current['budget']=decision_budget(host)
+    current['task_accepted']=bool(s.get('success_gate'))
+    refs=[*current['all_fresh_results'],*s.get('control_search_results',[])]
+    ids={r['artifact_id'] for r in refs}
+    latest=next((r for e in reversed(host.store.events(host.run_id)) for r in e.get('outputs',[]) if r['artifact_id'] in ids),None)
+    current['latest_scientific_feedback']=None
+    if latest:
+        value=host.store.artifact(latest)
+        if latest in s.get('analysis_results',[]):
+            from tools.research.analysis import compact_result
+            result=compact_result(value,latest)
+            current['latest_scientific_feedback']={k:result.get(k) for k in ('reference','operation','status',
+                'static_input_observation','input_response_observation','control_handoff','scoped_claim','analysis_applicability')}
+        else:current['latest_scientific_feedback']=dict(reference=latest,**compact_evidence(value,latest)['summary'])
     return current
 
 
@@ -214,12 +233,13 @@ def action_feedback(host,current):
     from tools.research.physical_replay import binding, verified_input_response, explicit_control_source, numerically_verified_source
     from tools.research.design import verify_candidate
     from tools.research.budget import protected, backend_capacity
-    s=state(host);rows=[];capacity=backend_capacity(host)
+    from tools.research.evidence_policy import registered_references
+    s=state(host);rows=[];capacity=backend_capacity(host);known=registered_references(host)
     closed=s['research_status']=='stopped' or protected(host)
     for entry in current['control_search_starts']:
         candidate=entry['candidate'];source=entry['source'];cfg=host.store.artifact(candidate)['configuration']
         for action in ('physical_replay','control_search'):
-            reason=None;status='eligible'
+            reason=None;status='preflight_eligible'
             if closed or action not in current['actions'] or action not in s['spec']['capabilities'] or capacity<1:
                 status='unavailable';reason='Protected/stopped state, action availability or shared backend capacity'
             elif action=='control_search' and cfg['task']['family']!='task.reach':
@@ -233,6 +253,8 @@ def action_feedback(host,current):
                     binding(cfg,control['trajectory'])
                 except ValueError as exc:status='blocked';reason=str(exc)
             rows.append(dict(action=action,status=status,candidate=candidate,source=source,reason=reason,
+                supporting_evidence=[r for r in (entry.get('observation',entry.get('historical_observation')),source) if r and r in known],
+                remaining_checks=['full_plan_admission','requested_budget','scientific_preflight'],
                 remaining_backend_launches=capacity,minimum_new_launches=1,
                 requires_agent_fields=['decision','hypothesis','finite search settings'] if action=='control_search' else ['decision','hypothesis'],
                 scope='Candidate/source admission only; full typed Plan, budget and scientific preflight remain authoritative'))
@@ -243,7 +265,7 @@ def action_feedback(host,current):
             and host.store.artifact(r).get('operation')=='input_sensitivity']
         status='blocked';reason='verified_input_sensitivity_required';ref=None
         for ref in reversed(references):
-            try:verified_input_response(host,candidate,ref);status='eligible';reason=None;break
+            try:verified_input_response(host,candidate,ref);status='preflight_eligible';reason=None;break
             except ValueError as exc:reason=str(exc)
         cfg=host.store.artifact(candidate)['configuration']
         if cfg['task']['family']!='task.reach':status='not_applicable';reason='Endpoint-target seed required'
@@ -253,6 +275,49 @@ def action_feedback(host,current):
             candidate=candidate,response_evidence=ref,task_acceptance='unmeasured',new_physical_evaluations=0,
             requires_agent_fields=['decision','hypothesis','initialization settings']))
     return rows
+
+
+def decision_brief(current):
+    """Pure current-state projection; raw evidence and conversation are untouched."""
+    brief=deepcopy(current)
+    for key in ('observations','pareto_candidates','recent_decisions','control_search_usage',
+                'control_search_starts','control_start_domains','structure_domain'):
+        brief.pop(key,None)
+    best=brief.get('best_valid')
+    if best:
+        brief['best_valid']={k:best[k] for k in ('reference','candidate','source','executable_candidate',
+            'task_identity','historical_only','task_gap') if k in best}
+        brief['best_valid']['violated_constraints']={k:v for k,v in best['constraints'].items() if not v['passed']}
+    brief['task_accepted']=current.get('task_accepted',bool(best and best['task_gap']['accepted'] and not best['historical_only']))
+    brief['unresolved_hypotheses']={k:dict(scope=v['scope'],claim_kind=v['claim_kind'])
+        for k,v in brief.get('unresolved_hypotheses',{}).items()}
+    feedback=brief.pop('decision_feedback')
+    brief['recent_searches']=feedback['recent_searches']
+    brief['available_research_actions']=feedback['actions']
+    domains=current.get('control_start_domains',[])
+    for row in brief['available_research_actions']:
+        domain=next((d for d in domains if d['candidate']==row.get('candidate') and d['source']==row.get('source')),None)
+        if domain:row['domain']={k:v for k,v in domain.items() if k not in ('candidate','source')}
+    brief['citation_rule']=feedback['citation_rule']
+    brief['version']='decision_brief_v1'
+    return brief
+
+
+def tool_feedback(host,value):
+    """Return new facts once, distinguishing the wrapper from registered evidence."""
+    from tools.research.evidence_policy import registered_references
+    wrapper=save(host,value,'complete_tool_output');result=value.get('result',value)
+    reference=result.get('reference') if isinstance(result,dict) else None
+    known=registered_references(host)
+    if reference in known:
+        raw=host.store.artifact(reference)
+        view=compact_evidence(raw,reference,facts_only=True)
+        if reference in state(host).get('analysis_results',[]):
+            from tools.research.analysis import compact_result
+            view=compact_result(raw,reference)
+    else:view=compact_evidence(result,wrapper)
+    return dict(wrapper_reference=wrapper,wrapper_role='Retrieval only; not supporting_evidence',
+        scientific_reference=reference if reference in known else None,new_facts=view)
 
 
 def bounded_context(current,settings,initializations=()):

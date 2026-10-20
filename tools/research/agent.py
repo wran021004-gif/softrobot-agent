@@ -389,13 +389,8 @@ async def converse(host):
                         host.store.complete(row,dict(request_id=key,execution_id=row['execution_id'],caller=host.actor,
                             tool_id='research.core_'+kind,tool_version='1.0.0',execution_status='completed',charged=zero()),value)
                 if kind!='evidence' and state(host)['spec'].get('research_decisions',{}).get('context_limits'):
-                    from tools.research.research_context import compact_evidence
-                    ref=record(host,'complete_tool_output',value)
-                    value=compact_evidence(value,ref)
-                    from tools.research.research_context import context
-                    current=context(host)
-                    value=dict(reference=ref,decision_feedback=current['decision_feedback'],
-                        all_fresh_results=current['all_fresh_results'],**{k:v for k,v in value.items() if k!='reference'})
+                    from tools.research.research_context import tool_feedback
+                    value=tool_feedback(host,value)
                 return dict(toolUseId=use['toolUseId'],status='success',content=[dict(text=json.dumps(value,separators=(',',':')))])
             except Exception as exc:
                 key='native-'+use['toolUseId']
@@ -545,10 +540,10 @@ async def converse(host):
 def decision_packet(host):
     from tools.research.core import packet
     if state(host)['spec'].get('research_decisions'):
-        from tools.research.research_context import context
+        from tools.research.research_context import context, decision_brief
         from extensions.tendon_family.family_space import decision_summary
         s=state(host);spec=s['spec']
-        return dict(research=context(host),implementation=s['freeze'],study_id=host.run_id,
+        return dict(research=decision_brief(context(host)),implementation=s['freeze'],study_id=host.run_id,
             controller_capabilities=dict(recipe_defaults=spec['configuration']['policy']['controller']['parameters']['data']['recipe'],
                 solver_defaults=spec['configuration']['policy']['controller']['parameters']['data'].get('solver'),
                 patch='Generation v2 controller_recipe/controller_solver sparse patches use registered owner validation; settling remains task-owned'),

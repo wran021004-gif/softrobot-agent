@@ -44,6 +44,21 @@ def protected(host):
         (s['spec'].get('budget_semantics',{}).get('mode')=='count' and not science_fits(host)))
 
 
+def decision_budget(host):
+    """Derived counts only; the next Provider request is charged before its tools."""
+    from tools.research.state import state
+    s=state(host);remaining=host.store.remaining()['remaining'];b=s['spec']['budgets']
+    total=remaining['model_calls'];reserve=b['protected_provider_requests']
+    active=protected(host)
+    return dict(provider_budget=dict(remaining_total=total,reserved_for_closeout=reserve,
+        available_for_exploration=max(0,total-reserve),
+        next_request_exploration_remaining=max(0,total-reserve-1)),
+        science_budget=dict(remaining_physical=backend_capacity(host),
+            remaining_mathematical=max(0,b['mathematical_evaluations']-s.get('mathematical_evaluations',0))),
+        closeout=dict(active=active,next_request_will_protect=active or total-1<=reserve,
+            reason='Existing success/count/resource protection' if active else None))
+
+
 def science_fits(host):
     """Route counts, rather than the clock, decide when only closeout remains."""
     from tools.research.state import state

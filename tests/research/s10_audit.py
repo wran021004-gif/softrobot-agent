@@ -34,8 +34,9 @@ def decision_chain(h,out):
             expected_observation=q.get('expected_observation'),weakening_observation=q.get('weakening_observation'),interpretation=q.get('interpretation'),
             hypothesis_status='Interpret original expected/observed facts; no mathematical proof inferred',tool_status=result.get('status'),
             source_references=dict(request=e['outputs'][0],feedback=fe['outputs'][0] if fe else None),original_request=q,observed_feedback=response)
-        if result.get('status')=='success' and response.get('reference'):
-            value=h.store.artifact(response['reference']);row['complete_output_reference']=response['reference'];row['observed_result']=value.get('result',value)
+        output=response.get('wrapper_reference',response.get('reference'))
+        if result.get('status')=='success' and output:
+            value=h.store.artifact(output);row['complete_output_reference']=output;row['observed_result']=value.get('result',value)
         rows.append(row)
     for a,b in zip(rows,rows[1:]):a['next_decision']=dict(index=b['decision_index'],action=b['action'],request=b['source_references']['request'])
     if rows:rows[-1]['next_decision']=None

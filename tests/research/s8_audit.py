@@ -33,6 +33,72 @@ def payload(wire):
         measurement='Canonical compact UTF-8 JSON serialization; excludes HTTP headers. Byte parts are not token parts.')
 
 
+def archive_host(folder):
+    """Hash-checked, in-memory read-only Host for original request regressions."""
+    from types import SimpleNamespace
+    folder=ROOT/folder;manifest=read(folder/'archive_manifest.json');values={}
+    assert hashlib.sha256((folder/'immutable_artifacts.tar.gz').read_bytes()).hexdigest()==manifest['archive_sha256']
+    with tarfile.open(folder/'immutable_artifacts.tar.gz') as tar:
+        for m in manifest['members']:
+            body=tar.extractfile(m['name']).read();assert hashlib.sha256(body).hexdigest()==m['sha256']
+            values[m['sha256']]=json.loads(body) if m['media']=='application/json' else body
+    snapshot=next(values[m['sha256']] for m in manifest['members'] if m['name'].startswith('snapshot/'))
+    from tools.platform_store import plain
+    store=Mock();store.artifact.side_effect=lambda r,raw=False:values[plain(r)['artifact_id']]
+    store.session.return_value=snapshot['session'];store.events.return_value=snapshot['events'];store.remaining.return_value=snapshot['ledger']
+    return SimpleNamespace(store=store,run_id=snapshot['session']['state']['spec']['study_id']),values
+
+
+def decision_projection(host):
+    """Saved S10 packets and queries; byte partitions reuse the original audit."""
+    from collections import Counter
+    from copy import deepcopy
+    from tools.research.research_context import decision_brief
+    requests=[];states=[];reads=[];errors=[];usage={};duplicate=Counter()
+    for e in host.store.events(host.run_id):
+        if e['kind']=='r3_request':
+            wire=host.store.artifact(host.store.artifact(e['outputs'][0])['request'])
+            repeated=large=marked=0;markers=Counter()
+            for m in wire['messages']:
+                if m['role']!='tool':continue
+                markers.update({k:m['content'].count(k) for k in ('decision_feedback','all_fresh_results','tensions_n')})
+                if any(k in m['content'] for k in ('decision_feedback','all_fresh_results')):marked+=size(m)
+                if 'tensions_n' in m['content']:large+=size(m)
+                try:v=json.loads(m['content'])
+                except (ValueError,TypeError):continue
+                repeated+=sum(size(v[k]) for k in ('decision_feedback','all_fresh_results') if k in v)
+            requests.append(dict(request=e['outputs'][0],**payload(wire),
+                parseable_repeated_subtree_bytes=repeated,tool_messages_containing_state_bytes=marked,
+                repeated_state_markers=dict(markers),tool_messages_containing_controls_bytes=large))
+        elif e['kind']=='r3_response':
+            value=host.store.artifact(e['outputs'][0]);usage[e['request_id']]=value.get('usage')
+        elif e['kind']=='model_decision_packet':
+            old=host.store.artifact(e['outputs'][0]);new=deepcopy(old);a=old['research']
+            new['research']=decision_brief(a);b=new['research']
+            facts=dict(task=a['task']==b['task'],task_identity=a['task_identity']==b['task_identity'],
+                best_gap=(a['best_valid'] or {}).get('task_gap')==(b['best_valid'] or {}).get('task_gap'),
+                best_reference=(a['best_valid'] or {}).get('reference')==(b['best_valid'] or {}).get('reference'),
+                actions=a['actions']==b['actions'],budgets=a['budget']==b['budget'],
+                methods=all(a[k]==b[k] for k in ('method_limits','method_remaining','method_used')),
+                stop_citations=a['all_fresh_results']==b['all_fresh_results'],
+                constraints=not a['best_valid'] or all(v['passed'] or b['best_valid']['violated_constraints'][k]==v for k,v in a['best_valid']['constraints'].items()))
+            assert all(facts.values()),facts
+            states.append(dict(packet=e['outputs'][0],old_bytes=size(old),new_bytes=size(new),retained_facts=facts))
+        elif e['kind']=='model_original_tool_request':
+            tool=host.store.artifact(e['outputs'][0])['tool_use']
+            if tool['name']=='evidence_read':
+                q=tool['input'];duplicate[json.dumps(q,sort_keys=True)]+=1
+                reads.append(dict(request=e['outputs'][0],query=q))
+        elif e['kind']=='model_original_tool_feedback':
+            v=host.store.artifact(e['outputs'][0])
+            if v['result']['status']=='error':errors.append(dict(reference=e['outputs'][0],**v))
+    return dict(requests=requests,packet_comparisons=states,reads=reads,errors=errors,
+        repeated_exact_queries=[dict(query=json.loads(k),count=v) for k,v in duplicate.items() if v>1],
+        provider_usage=usage,provider_total_tokens=sum(v['total_tokens'] for v in usage.values() if v),
+        new_provider_requests=0,new_scientific_executions=0,estimated_tokens=None,
+        limitation='Serialized bytes are not tokens. Original Provider usage is historical, not S11 usage. Pure saved-packet projection does not simulate decisions or claim session token savings; new runtime fields are tested separately.')
+
+
 def offline():
     studies=[]
     for name in ('mirror','variant'):
