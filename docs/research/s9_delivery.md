@@ -42,5 +42,16 @@ diagnostic completed dependencies, engine, gateway, sqrt(4), shutdown (`ready`).
 See `evidence/s9_readiness/{initial,verified}`. Both consumed zero Provider and
 zero scientific starts. No new MATLAB runtime or encoding workaround was added.
 
-Engineering handoff execution and S9.2–S9.3 results remain pending. No new feasible
-solution is claimed at this source-freeze stage.
+Frozen S9.1 source `1da7bec9c7906cd9e7ded7a463cd9a5e2bd2b824` was pushed and
+remote verified. Real engineering completed 2 analyses, 1 physics start, 3 public
+operations, zero Provider requests. `evidence/s9_engineering/handoff.json` links
+target equilibrium, verified sensitivity, candidate-bound 35×4 seed and independent
+MuJoCo result; full Store archive and independent recomputation are included.
+All original bounds/grid/identity checks passed. Re-reading the completed physics
+operation preserved result reference and ledger. Dynamic task failed: terminal
+error 0.1705341285 m, holding position 0.1954246923 m, holding speed 0.7460602523 m/s,
+gap 36.3030126126. This proves executable handoff, not improved dynamic control or
+autonomous Agent choice. The current seed uses the selected fixed-input local
+static response; the equilibrium result is separate mathematical evidence.
+
+S9.2–S9.3 remain pending. No new feasible solution is claimed.

@@ -1,0 +1,3889 @@
+{
+  "engineering_only": true,
+  "provider_requests": 0,
+  "equilibrium": {
+    "reference": {
+      "artifact_id": "25a330127846cc5a0c2b860227eaae57bf10917d2a14b027a83b80ed84e42cae",
+      "media_type": "application/json"
+    },
+    "stored_result_keys": [
+      "status",
+      "operation",
+      "binding",
+      "protocol",
+      "operating_point",
+      "construction",
+      "local_model_constraints",
+      "task_acceptance",
+      "proxy_values",
+      "raw",
+      "internal_calculations",
+      "limitations",
+      "score_semantics",
+      "model",
+      "units",
+      "tension_margins_n",
+      "task_analysis",
+      "analysis_applicability",
+      "scoped_claim",
+      "candidate",
+      "requested_operation",
+      "operation_key",
+      "owning_study",
+      "origin",
+      "implementation",
+      "charged_numerical_s",
+      "charged_analysis_evaluations",
+      "boundary",
+      "worker_log"
+    ],
+    "control_handoff": {
+      "candidate": {
+        "artifact_id": "5a6ee862b969524dff14a16772736dafef0be3d99988ec718b4c808840f3a15e",
+        "media_type": "application/json"
+      },
+      "scope": {
+        "task_identity": "67cb0abab77924700a286e07217f3252fff71d9a38558c2528676346d454c535",
+        "effective_configuration_identity": "f38a7bb25aabcb4d792d3ee322577053560e49e4bbb8acf669b28f424533d00e",
+        "tendon_order": [
+          "tendon_0",
+          "tendon_1",
+          "tendon_2",
+          "tendon_3"
+        ]
+      },
+      "operating_point": "target_equilibrium",
+      "numerically_verified_input_sensitivity": false,
+      "request_fields": null,
+      "remaining_checks": "Current registered evidence, candidate/model/task/operating-point/channel binding and Plan admission",
+      "missing": "Verified input_sensitivity required for mathematical_response; equilibrium alone is not dynamic success",
+      "task_acceptance": "unmeasured"
+    },
+    "static_input_observation": {
+      "tensions_n": [
+        2.544627287044392,
+        2.220549608774058,
+        2.537366163595899,
+        3.64265635818008
+      ],
+      "units": "N",
+      "tendon_order": [
+        "tendon_0",
+        "tendon_1",
+        "tendon_2",
+        "tendon_3"
+      ],
+      "pointer": "/construction/computed_tensions_n",
+      "task_acceptance": "unmeasured",
+      "scope": "Computed static operating input; no dynamic reach or hold guarantee"
+    },
+    "retrieval_note": "This is a tool summary, not the stored artifact layout. Read only the explicit stored pointers; oversized full results may be offloaded.",
+    "status": "computed",
+    "candidate": {
+      "artifact_id": "5a6ee862b969524dff14a16772736dafef0be3d99988ec718b4c808840f3a15e",
+      "media_type": "application/json"
+    },
+    "operation": "equilibrium",
+    "proxy_values": {
+      "target_equilibrium_residual": 1.800473206788679e-09
+    },
+    "origin": "engineering",
+    "charged_numerical_s": 10.799065000144765,
+    "charged_analysis_evaluations": 1,
+    "local_model_constraints": {
+      "status": "satisfied",
+      "position_residual_m": 1.800473206788679e-09,
+      "static_residual_inf": 1.3899471851264167e-16,
+      "equilibrium_available": true,
+      "global_infeasibility_proven": false
+    },
+    "internal_calculations": [
+      {
+        "solver": "MATLAB fmincon SQP",
+        "purpose": "operating_point_construction",
+        "iterations": 16,
+        "function_evaluations": 42,
+        "status": 2
+      }
+    ],
+    "score_semantics": {
+      "held_position_min_eigenvalue": {
+        "candidate_identity": "core-c40023793e53d6f04af68c55ed4247f60836b1d6d07692d105c4d6b8a166328b",
+        "model_identity": "8dffa643a4b43584675e38bc8525c16b5315c3d70481038a975f67bde5588e1e",
+        "operating_point": {
+          "name": "target_equilibrium",
+          "construction": {
+            "method": "bounded target-associated MATLAB SQP",
+            "provenance": {
+              "source_kind": "project_initial_state_and_bounded_pretension",
+              "reused": false,
+              "nominal_is_current_target_solution": false,
+              "historical_states_reused": false,
+              "current_scope": {
+                "robot": {
+                  "family": "tendon_robot_family",
+                  "identity": "bb72ca368cfc65aaeb4314a98be2519b20468e803da4bb0ec70e23cf015a81ee"
+                },
+                "task": {
+                  "family": "task.reach",
+                  "identity": "67cb0abab77924700a286e07217f3252fff71d9a38558c2528676346d454c535",
+                  "environment": "5cee25b33f4ff19cb0abd93651ce9077a81665990f07d8f5a4967497e8e82a4d",
+                  "goal": "bb82685eef609372d56d39203f4988af6bd5afe14bb4e908cbe889c051cb9365",
+                  "timing": {
+                    "timestep_s": 0.0005,
+                    "control_period_s": 0.01,
+                    "sample_period_s": 0.01,
+                    "duration_s": 0.35,
+                    "termination": [
+                      "duration",
+                      "numerical_failure"
+                    ]
+                  },
+                  "initializer": "3a90c93217f15e9a60db7f65f611911f4aa53f1a4987340949e1068fd2647c22"
+                },
+                "backend": {
+                  "extension_id": "backend.family_mujoco",
+                  "version": "1.1.0",
+                  "parameters": {
+                    "contract": "family.mujoco_parameters",
+                    "version": "1.0.0",
+                    "data": {
+                      "contact_model": "mujoco_convex_native",
+                      "friction": [
+                        0.0,
+                        0.0,
+                        0.0
+                      ],
+                      "integrator": "implicitfast",
+                      "timestep_source": "task.timing.timestep_s"
+                    }
+                  }
+                },
+                "execution_model": {
+                  "extension_id": "model.serial_bending_cells",
+                  "version": "1.0.0",
+                  "parameters": {
+                    "contract": "family.dynamics_model",
+                    "version": "1.0.0",
+                    "data": {}
+                  }
+                },
+                "discretization": {
+                  "contract": "family.discretization",
+                  "version": "1.0.0",
+                  "data": {
+                    "cells": {
+                      "segment_0": 12,
+                      "segment_1": 12
+                    },
+                    "coordinates": "two_principal_bending_angles_per_cell",
+                    "model": "serial_bending_cells_v1",
+                    "version": "serial_bending_discretization_v1"
+                  }
+                },
+                "controller": {
+                  "extension_id": "controller.sorosim_matlab_nmpc",
+                  "version": "1.0.0",
+                  "parameters": {
+                    "contract": "family.sorosim_reach_control",
+                    "version": "1.0.0",
+                    "data": {
+                      "numerical_source": "initial_state_pretension",
+                      "recipe": {
+                        "basis": {
+                          "strategy": "structural_linear"
+                        },
+                        "constraint_jacobian_mode": "reverse",
+                        "curvature_scale_rad_m": 10.0,
+                        "evaluation_threads": 1,
+                        "feasible_return": null,
+                        "holding_brake_lead_s": 0.02,
+                        "holding_speed_cost_mode": "time_integral_v1",
+                        "holding_speed_cost_window_s": 0.05,
+                        "holding_tip_speed_weight": 0.1,
+                        "horizon": 10,
+                        "integration_method": "implicit_euler",
+                        "max_cpu_s": null,
+                        "max_iterations": 120,
+                        "max_unusable_updates": 3,
+                        "position_error_scale_m": null,
+                        "rate_scale_rad_m_s": 1000.0,
+                        "recover_returned_tensions": true,
+                        "regenerate_warm_states": true,
+                        "root_tolerance": 1e-10,
+                        "seed_position_tolerance_fraction": 0.5,
+                        "seed_speed_limit_m_s": 0.02,
+                        "stopping_policy": "research_work_v1",
+                        "substeps": 1,
+                        "tension_weight": 0.0001,
+                        "terminal_tip_speed_weight": 0.1,
+                        "terminal_velocity_weight": 0.0001,
+                        "terminal_weight": 5.0,
+                        "tip_speed_scale_m_s": 0.02,
+                        "tolerance": 1e-06,
+                        "tracking_weight": 1.0,
+                        "variation_weight": 0.001,
+                        "velocity_weight": 0.0001
+                      },
+                      "settling": {
+                        "position_limit_m": 0.01,
+                        "speed_limit_m_s": 0.02,
+                        "window_s": 0.05
+                      },
+                      "solver": {
+                        "algorithm": "sqp",
+                        "constraint_tolerance": 1e-08,
+                        "engine_options": "-nodesktop -nosplash",
+                        "gauss_per_interval": 5,
+                        "optimality_tolerance": 1e-06,
+                        "routing_difference_step": 1e-05,
+                        "step_tolerance": 1e-10
+                      }
+                    }
+                  }
+                },
+                "seed": 17
+              },
+              "physics_identity": "bd0371aad5cdc49b4e074ac130fb27ed12d86b8b6bfcbc2ee9450ab6857d798f",
+              "resolved_basis_identity": "63aab968b8f0732f13dc73454e2628ee015c67b6b92aa47639d9f8b55d928f0e",
+              "actual_initial_state_source": "Candidate Task initializer then measured backend state at every update",
+              "previous_input_source": "candidate bounded pretension",
+              "validity": "Tensions are numerical guesses; placeholder states must be regenerated using candidate dynamics before use"
+            },
+            "solver": "MATLAB fmincon SQP",
+            "success": true,
+            "status": 2,
+            "iterations": 16,
+            "function_evaluations": 42,
+            "position_residual_m": 1.800473206788679e-09,
+            "static_residual_inf": 1.3899471851264167e-16,
+            "computed_tensions_n": [
+              2.544627287044392,
+              2.220549608774058,
+              2.537366163595899,
+              3.64265635818008
+            ],
+            "requested_world_point_m": [
+              0.28,
+              0.02,
+              0.2
+            ],
+            "achieved_world_point_m": [
+              0.28000000026021266,
+              0.0200000003182464,
+              0.2000000017529154
+            ],
+            "static_equilibrium": true,
+            "maximum_iterations": 20
+          },
+          "source": {
+            "name": "target_equilibrium",
+            "phase": "configuration_target_equilibrium",
+            "remaining_task_s": 0.35,
+            "actual_time_s": null,
+            "construction": {
+              "method": "bounded target-associated MATLAB SQP",
+              "provenance": {
+                "source_kind": "project_initial_state_and_bounded_pretension",
+                "reused": false,
+                "nominal_is_current_target_solution": false,
+                "historical_states_reused": false,
+                "current_scope": {
+                  "robot": {
+                    "family": "tendon_robot_family",
+                    "identity": "bb72ca368cfc65aaeb4314a98be2519b20468e803da4bb0ec70e23cf015a81ee"
+                  },
+                  "task": {
+                    "family": "task.reach",
+                    "identity": "67cb0abab77924700a286e07217f3252fff71d9a38558c2528676346d454c535",
+                    "environment": "5cee25b33f4ff19cb0abd93651ce9077a81665990f07d8f5a4967497e8e82a4d",
+                    "goal": "bb82685eef609372d56d39203f4988af6bd5afe14bb4e908cbe889c051cb9365",
+                    "timing": {
+                      "timestep_s": 0.0005,
+                      "control_period_s": 0.01,
+                      "sample_period_s": 0.01,
+                      "duration_s": 0.35,
+                      "termination": [
+                        "duration",
+                        "numerical_failure"
+                      ]
+                    },
+                    "initializer": "3a90c93217f15e9a60db7f65f611911f4aa53f1a4987340949e1068fd2647c22"
+                  },
+                  "backend": {
+                    "extension_id": "backend.family_mujoco",
+                    "version": "1.1.0",
+                    "parameters": {
+                      "contract": "family.mujoco_parameters",
+                      "version": "1.0.0",
+                      "data": {
+                        "contact_model": "mujoco_convex_native",
+                        "friction": [
+                          0.0,
+                          0.0,
+                          0.0
+                        ],
+                        "integrator": "implicitfast",
+                        "timestep_source": "task.timing.timestep_s"
+                      }
+                    }
+                  },
+                  "execution_model": {
+                    "extension_id": "model.serial_bending_cells",
+                    "version": "1.0.0",
+                    "parameters": {
+                      "contract": "family.dynamics_model",
+                      "version": "1.0.0",
+                      "data": {}
+                    }
+                  },
+                  "discretization": {
+                    "contract": "family.discretization",
+                    "version": "1.0.0",
+                    "data": {
+                      "cells": {
+                        "segment_0": 12,
+                        "segment_1": 12
+                      },
+                      "coordinates": "two_principal_bending_angles_per_cell",
+                      "model": "serial_bending_cells_v1",
+                      "version": "serial_bending_discretization_v1"
+                    }
+                  },
+                  "controller": {
+                    "extension_id": "controller.sorosim_matlab_nmpc",
+                    "version": "1.0.0",
+                    "parameters": {
+                      "contract": "family.sorosim_reach_control",
+                      "version": "1.0.0",
+                      "data": {
+                        "numerical_source": "initial_state_pretension",
+                        "recipe": {
+                          "basis": {
+                            "strategy": "structural_linear"
+                          },
+                          "constraint_jacobian_mode": "reverse",
+                          "curvature_scale_rad_m": 10.0,
+                          "evaluation_threads": 1,
+                          "feasible_return": null,
+                          "holding_brake_lead_s": 0.02,
+                          "holding_speed_cost_mode": "time_integral_v1",
+                          "holding_speed_cost_window_s": 0.05,
+                          "holding_tip_speed_weight": 0.1,
+                          "horizon": 10,
+                          "integration_method": "implicit_euler",
+                          "max_cpu_s": null,
+                          "max_iterations": 120,
+                          "max_unusable_updates": 3,
+                          "position_error_scale_m": null,
+                          "rate_scale_rad_m_s": 1000.0,
+                          "recover_returned_tensions": true,
+                          "regenerate_warm_states": true,
+                          "root_tolerance": 1e-10,
+                          "seed_position_tolerance_fraction": 0.5,
+                          "seed_speed_limit_m_s": 0.02,
+                          "stopping_policy": "research_work_v1",
+                          "substeps": 1,
+                          "tension_weight": 0.0001,
+                          "terminal_tip_speed_weight": 0.1,
+                          "terminal_velocity_weight": 0.0001,
+                          "terminal_weight": 5.0,
+                          "tip_speed_scale_m_s": 0.02,
+                          "tolerance": 1e-06,
+                          "tracking_weight": 1.0,
+                          "variation_weight": 0.001,
+                          "velocity_weight": 0.0001
+                        },
+                        "settling": {
+                          "position_limit_m": 0.01,
+                          "speed_limit_m_s": 0.02,
+                          "window_s": 0.05
+                        },
+                        "solver": {
+                          "algorithm": "sqp",
+                          "constraint_tolerance": 1e-08,
+                          "engine_options": "-nodesktop -nosplash",
+                          "gauss_per_interval": 5,
+                          "optimality_tolerance": 1e-06,
+                          "routing_difference_step": 1e-05,
+                          "step_tolerance": 1e-10
+                        }
+                      }
+                    }
+                  },
+                  "seed": 17
+                },
+                "physics_identity": "bd0371aad5cdc49b4e074ac130fb27ed12d86b8b6bfcbc2ee9450ab6857d798f",
+                "resolved_basis_identity": "63aab968b8f0732f13dc73454e2628ee015c67b6b92aa47639d9f8b55d928f0e",
+                "actual_initial_state_source": "Candidate Task initializer then measured backend state at every update",
+                "previous_input_source": "candidate bounded pretension",
+                "validity": "Tensions are numerical guesses; placeholder states must be regenerated using candidate dynamics before use"
+              },
+              "solver": "MATLAB fmincon SQP",
+              "success": true,
+              "status": 2,
+              "iterations": 16,
+              "function_evaluations": 42,
+              "position_residual_m": 1.800473206788679e-09,
+              "static_residual_inf": 1.3899471851264167e-16,
+              "computed_tensions_n": [
+                2.544627287044392,
+                2.220549608774058,
+                2.537366163595899,
+                3.64265635818008
+              ],
+              "requested_world_point_m": [
+                0.28,
+                0.02,
+                0.2
+              ],
+              "achieved_world_point_m": [
+                0.28000000026021266,
+                0.0200000003182464,
+                0.2000000017529154
+              ],
+              "static_equilibrium": true,
+              "maximum_iterations": 20
+            },
+            "equilibrium": true,
+            "linearization_scope": "local equilibrium linearization"
+          }
+        },
+        "scoring_window_s": null,
+        "comparison_conditions": "Same protocol, window, normalization, input treatment, operating-point construction, task and model implementation. Changed candidates use their own compiled model.",
+        "unsupported_conclusions": [
+          "backend task acceptance",
+          "whole holding-window compliance",
+          "damping margin or decay rate",
+          "global feasibility/infeasibility",
+          "structural improvement attribution",
+          "manufacturable material validation"
+        ],
+        "definition": "Minimum eigenvalue of local finite-horizon position-output controllability Gramian for input held over each control interval",
+        "preference": "larger",
+        "units": "dimensionless under declared input/output normalization",
+        "normalization": {
+          "input_scale_n": 8.0,
+          "output_scale_m": 0.01
+        },
+        "input_treatment": "Unconstrained signed incremental input held per control interval; physical unilateral bounded tensions are reported separately and not fully represented by this scalar",
+        "represented_constraints": "Local linear model and held-input sampling only",
+        "supported_interpretation": "Local normalized position-output authority; held means held input, not task holding success"
+      },
+      "target_equilibrium_residual": {
+        "candidate_identity": "core-c40023793e53d6f04af68c55ed4247f60836b1d6d07692d105c4d6b8a166328b",
+        "model_identity": "8dffa643a4b43584675e38bc8525c16b5315c3d70481038a975f67bde5588e1e",
+        "operating_point": {
+          "name": "target_equilibrium",
+          "construction": {
+            "method": "bounded target-associated MATLAB SQP",
+            "provenance": {
+              "source_kind": "project_initial_state_and_bounded_pretension",
+              "reused": false,
+              "nominal_is_current_target_solution": false,
+              "historical_states_reused": false,
+              "current_scope": {
+                "robot": {
+                  "family": "tendon_robot_family",
+                  "identity": "bb72ca368cfc65aaeb4314a98be2519b20468e803da4bb0ec70e23cf015a81ee"
+                },
+                "task": {
+                  "family": "task.reach",
+                  "identity": "67cb0abab77924700a286e07217f3252fff71d9a38558c2528676346d454c535",
+                  "environment": "5cee25b33f4ff19cb0abd93651ce9077a81665990f07d8f5a4967497e8e82a4d",
+                  "goal": "bb82685eef609372d56d39203f4988af6bd5afe14bb4e908cbe889c051cb9365",
+                  "timing": {
+                    "timestep_s": 0.0005,
+                    "control_period_s": 0.01,
+                    "sample_period_s": 0.01,
+                    "duration_s": 0.35,
+                    "termination": [
+                      "duration",
+                      "numerical_failure"
+                    ]
+                  },
+                  "initializer": "3a90c93217f15e9a60db7f65f611911f4aa53f1a4987340949e1068fd2647c22"
+                },
+                "backend": {
+                  "extension_id": "backend.family_mujoco",
+                  "version": "1.1.0",
+                  "parameters": {
+                    "contract": "family.mujoco_parameters",
+                    "version": "1.0.0",
+                    "data": {
+                      "contact_model": "mujoco_convex_native",
+                      "friction": [
+                        0.0,
+                        0.0,
+                        0.0
+                      ],
+                      "integrator": "implicitfast",
+                      "timestep_source": "task.timing.timestep_s"
+                    }
+                  }
+                },
+                "execution_model": {
+                  "extension_id": "model.serial_bending_cells",
+                  "version": "1.0.0",
+                  "parameters": {
+                    "contract": "family.dynamics_model",
+                    "version": "1.0.0",
+                    "data": {}
+                  }
+                },
+                "discretization": {
+                  "contract": "family.discretization",
+                  "version": "1.0.0",
+                  "data": {
+                    "cells": {
+                      "segment_0": 12,
+                      "segment_1": 12
+                    },
+                    "coordinates": "two_principal_bending_angles_per_cell",
+                    "model": "serial_bending_cells_v1",
+                    "version": "serial_bending_discretization_v1"
+                  }
+                },
+                "controller": {
+                  "extension_id": "controller.sorosim_matlab_nmpc",
+                  "version": "1.0.0",
+                  "parameters": {
+                    "contract": "family.sorosim_reach_control",
+                    "version": "1.0.0",
+                    "data": {
+                      "numerical_source": "initial_state_pretension",
+                      "recipe": {
+                        "basis": {
+                          "strategy": "structural_linear"
+                        },
+                        "constraint_jacobian_mode": "reverse",
+                        "curvature_scale_rad_m": 10.0,
+                        "evaluation_threads": 1,
+                        "feasible_return": null,
+                        "holding_brake_lead_s": 0.02,
+                        "holding_speed_cost_mode": "time_integral_v1",
+                        "holding_speed_cost_window_s": 0.05,
+                        "holding_tip_speed_weight": 0.1,
+                        "horizon": 10,
+                        "integration_method": "implicit_euler",
+                        "max_cpu_s": null,
+                        "max_iterations": 120,
+                        "max_unusable_updates": 3,
+                        "position_error_scale_m": null,
+                        "rate_scale_rad_m_s": 1000.0,
+                        "recover_returned_tensions": true,
+                        "regenerate_warm_states": true,
+                        "root_tolerance": 1e-10,
+                        "seed_position_tolerance_fraction": 0.5,
+                        "seed_speed_limit_m_s": 0.02,
+                        "stopping_policy": "research_work_v1",
+                        "substeps": 1,
+                        "tension_weight": 0.0001,
+                        "terminal_tip_speed_weight": 0.1,
+                        "terminal_velocity_weight": 0.0001,
+                        "terminal_weight": 5.0,
+                        "tip_speed_scale_m_s": 0.02,
+                        "tolerance": 1e-06,
+                        "tracking_weight": 1.0,
+                        "variation_weight": 0.001,
+                        "velocity_weight": 0.0001
+                      },
+                      "settling": {
+                        "position_limit_m": 0.01,
+                        "speed_limit_m_s": 0.02,
+                        "window_s": 0.05
+                      },
+                      "solver": {
+                        "algorithm": "sqp",
+                        "constraint_tolerance": 1e-08,
+                        "engine_options": "-nodesktop -nosplash",
+                        "gauss_per_interval": 5,
+                        "optimality_tolerance": 1e-06,
+                        "routing_difference_step": 1e-05,
+                        "step_tolerance": 1e-10
+                      }
+                    }
+                  }
+                },
+                "seed": 17
+              },
+              "physics_identity": "bd0371aad5cdc49b4e074ac130fb27ed12d86b8b6bfcbc2ee9450ab6857d798f",
+              "resolved_basis_identity": "63aab968b8f0732f13dc73454e2628ee015c67b6b92aa47639d9f8b55d928f0e",
+              "actual_initial_state_source": "Candidate Task initializer then measured backend state at every update",
+              "previous_input_source": "candidate bounded pretension",
+              "validity": "Tensions are numerical guesses; placeholder states must be regenerated using candidate dynamics before use"
+            },
+            "solver": "MATLAB fmincon SQP",
+            "success": true,
+            "status": 2,
+            "iterations": 16,
+            "function_evaluations": 42,
+            "position_residual_m": 1.800473206788679e-09,
+            "static_residual_inf": 1.3899471851264167e-16,
+            "computed_tensions_n": [
+              2.544627287044392,
+              2.220549608774058,
+              2.537366163595899,
+              3.64265635818008
+            ],
+            "requested_world_point_m": [
+              0.28,
+              0.02,
+              0.2
+            ],
+            "achieved_world_point_m": [
+              0.28000000026021266,
+              0.0200000003182464,
+              0.2000000017529154
+            ],
+            "static_equilibrium": true,
+            "maximum_iterations": 20
+          },
+          "source": {
+            "name": "target_equilibrium",
+            "phase": "configuration_target_equilibrium",
+            "remaining_task_s": 0.35,
+            "actual_time_s": null,
+            "construction": {
+              "method": "bounded target-associated MATLAB SQP",
+              "provenance": {
+                "source_kind": "project_initial_state_and_bounded_pretension",
+                "reused": false,
+                "nominal_is_current_target_solution": false,
+                "historical_states_reused": false,
+                "current_scope": {
+                  "robot": {
+                    "family": "tendon_robot_family",
+                    "identity": "bb72ca368cfc65aaeb4314a98be2519b20468e803da4bb0ec70e23cf015a81ee"
+                  },
+                  "task": {
+                    "family": "task.reach",
+                    "identity": "67cb0abab77924700a286e07217f3252fff71d9a38558c2528676346d454c535",
+                    "environment": "5cee25b33f4ff19cb0abd93651ce9077a81665990f07d8f5a4967497e8e82a4d",
+                    "goal": "bb82685eef609372d56d39203f4988af6bd5afe14bb4e908cbe889c051cb9365",
+                    "timing": {
+                      "timestep_s": 0.0005,
+                      "control_period_s": 0.01,
+                      "sample_period_s": 0.01,
+                      "duration_s": 0.35,
+                      "termination": [
+                        "duration",
+                        "numerical_failure"
+                      ]
+                    },
+                    "initializer": "3a90c93217f15e9a60db7f65f611911f4aa53f1a4987340949e1068fd2647c22"
+                  },
+                  "backend": {
+                    "extension_id": "backend.family_mujoco",
+                    "version": "1.1.0",
+                    "parameters": {
+                      "contract": "family.mujoco_parameters",
+                      "version": "1.0.0",
+                      "data": {
+                        "contact_model": "mujoco_convex_native",
+                        "friction": [
+                          0.0,
+                          0.0,
+                          0.0
+                        ],
+                        "integrator": "implicitfast",
+                        "timestep_source": "task.timing.timestep_s"
+                      }
+                    }
+                  },
+                  "execution_model": {
+                    "extension_id": "model.serial_bending_cells",
+                    "version": "1.0.0",
+                    "parameters": {
+                      "contract": "family.dynamics_model",
+                      "version": "1.0.0",
+                      "data": {}
+                    }
+                  },
+                  "discretization": {
+                    "contract": "family.discretization",
+                    "version": "1.0.0",
+                    "data": {
+                      "cells": {
+                        "segment_0": 12,
+                        "segment_1": 12
+                      },
+                      "coordinates": "two_principal_bending_angles_per_cell",
+                      "model": "serial_bending_cells_v1",
+                      "version": "serial_bending_discretization_v1"
+                    }
+                  },
+                  "controller": {
+                    "extension_id": "controller.sorosim_matlab_nmpc",
+                    "version": "1.0.0",
+                    "parameters": {
+                      "contract": "family.sorosim_reach_control",
+                      "version": "1.0.0",
+                      "data": {
+                        "numerical_source": "initial_state_pretension",
+                        "recipe": {
+                          "basis": {
+                            "strategy": "structural_linear"
+                          },
+                          "constraint_jacobian_mode": "reverse",
+                          "curvature_scale_rad_m": 10.0,
+                          "evaluation_threads": 1,
+                          "feasible_return": null,
+                          "holding_brake_lead_s": 0.02,
+                          "holding_speed_cost_mode": "time_integral_v1",
+                          "holding_speed_cost_window_s": 0.05,
+                          "holding_tip_speed_weight": 0.1,
+                          "horizon": 10,
+                          "integration_method": "implicit_euler",
+                          "max_cpu_s": null,
+                          "max_iterations": 120,
+                          "max_unusable_updates": 3,
+                          "position_error_scale_m": null,
+                          "rate_scale_rad_m_s": 1000.0,
+                          "recover_returned_tensions": true,
+                          "regenerate_warm_states": true,
+                          "root_tolerance": 1e-10,
+                          "seed_position_tolerance_fraction": 0.5,
+                          "seed_speed_limit_m_s": 0.02,
+                          "stopping_policy": "research_work_v1",
+                          "substeps": 1,
+                          "tension_weight": 0.0001,
+                          "terminal_tip_speed_weight": 0.1,
+                          "terminal_velocity_weight": 0.0001,
+                          "terminal_weight": 5.0,
+                          "tip_speed_scale_m_s": 0.02,
+                          "tolerance": 1e-06,
+                          "tracking_weight": 1.0,
+                          "variation_weight": 0.001,
+                          "velocity_weight": 0.0001
+                        },
+                        "settling": {
+                          "position_limit_m": 0.01,
+                          "speed_limit_m_s": 0.02,
+                          "window_s": 0.05
+                        },
+                        "solver": {
+                          "algorithm": "sqp",
+                          "constraint_tolerance": 1e-08,
+                          "engine_options": "-nodesktop -nosplash",
+                          "gauss_per_interval": 5,
+                          "optimality_tolerance": 1e-06,
+                          "routing_difference_step": 1e-05,
+                          "step_tolerance": 1e-10
+                        }
+                      }
+                    }
+                  },
+                  "seed": 17
+                },
+                "physics_identity": "bd0371aad5cdc49b4e074ac130fb27ed12d86b8b6bfcbc2ee9450ab6857d798f",
+                "resolved_basis_identity": "63aab968b8f0732f13dc73454e2628ee015c67b6b92aa47639d9f8b55d928f0e",
+                "actual_initial_state_source": "Candidate Task initializer then measured backend state at every update",
+                "previous_input_source": "candidate bounded pretension",
+                "validity": "Tensions are numerical guesses; placeholder states must be regenerated using candidate dynamics before use"
+              },
+              "solver": "MATLAB fmincon SQP",
+              "success": true,
+              "status": 2,
+              "iterations": 16,
+              "function_evaluations": 42,
+              "position_residual_m": 1.800473206788679e-09,
+              "static_residual_inf": 1.3899471851264167e-16,
+              "computed_tensions_n": [
+                2.544627287044392,
+                2.220549608774058,
+                2.537366163595899,
+                3.64265635818008
+              ],
+              "requested_world_point_m": [
+                0.28,
+                0.02,
+                0.2
+              ],
+              "achieved_world_point_m": [
+                0.28000000026021266,
+                0.0200000003182464,
+                0.2000000017529154
+              ],
+              "static_equilibrium": true,
+              "maximum_iterations": 20
+            },
+            "equilibrium": true,
+            "linearization_scope": "local equilibrium linearization"
+          }
+        },
+        "scoring_window_s": null,
+        "comparison_conditions": "Same protocol, window, normalization, input treatment, operating-point construction, task and model implementation. Changed candidates use their own compiled model.",
+        "unsupported_conclusions": [
+          "backend task acceptance",
+          "whole holding-window compliance",
+          "damping margin or decay rate",
+          "global feasibility/infeasibility",
+          "structural improvement attribution",
+          "manufacturable material validation"
+        ],
+        "scoring_horizon": "static operating-point construction; no dynamic horizon",
+        "definition": "Euclidean target position residual from bounded local equilibrium construction",
+        "preference": "smaller",
+        "units": "m",
+        "normalization": "none for scalar position residual",
+        "input_treatment": "Attempt tensions bounded by actual candidate limits",
+        "represented_constraints": "Bounded local static solve and independently checked residuals",
+        "supported_interpretation": "Quality of this local construction; failure is not proof of global infeasibility"
+      }
+    },
+    "scoped_claim": {
+      "contract": "scoped-mathematical-claim-v1",
+      "conclusion": "diagnostic",
+      "binding": {
+        "candidate_id": "core-c40023793e53d6f04af68c55ed4247f60836b1d6d07692d105c4d6b8a166328b",
+        "candidate": {
+          "artifact_id": "5a6ee862b969524dff14a16772736dafef0be3d99988ec718b4c808840f3a15e",
+          "media_type": "application/json"
+        },
+        "configuration": {
+          "artifact_id": "f38a7bb25aabcb4d792d3ee322577053560e49e4bbb8acf669b28f424533d00e",
+          "media_type": "application/json"
+        },
+        "effective_configuration_identity": "f38a7bb25aabcb4d792d3ee322577053560e49e4bbb8acf669b28f424533d00e",
+        "task_identity": "67cb0abab77924700a286e07217f3252fff71d9a38558c2528676346d454c535",
+        "basis": {
+          "strategy": "structural_linear"
+        },
+        "coordinate_order": [
+          "segment_0.kappa_y_node_0",
+          "segment_0.kappa_y_node_1",
+          "segment_0.kappa_y_node_2",
+          "segment_0.kappa_z_node_0",
+          "segment_0.kappa_z_node_1",
+          "segment_0.kappa_z_node_2",
+          "segment_1.kappa_y_node_0",
+          "segment_1.kappa_y_node_1",
+          "segment_1.kappa_y_node_2",
+          "segment_1.kappa_z_node_0",
+          "segment_1.kappa_z_node_1",
+          "segment_1.kappa_z_node_2"
+        ],
+        "tendon_order": [
+          "tendon_0",
+          "tendon_1",
+          "tendon_2",
+          "tendon_3"
+        ],
+        "tension_limits_n": [
+          8.0,
+          8.0,
+          8.0,
+          8.0
+        ],
+        "tension_bounds_n": [
+          [
+            0.0,
+            8.0
+          ],
+          [
+            0.0,
+            8.0
+          ],
+          [
+            0.0,
+            8.0
+          ],
+          [
+            0.0,
+            8.0
+          ]
+        ],
+        "target_m": [
+          0.28,
+          0.02,
+          0.2
+        ],
+        "source_identity": "0793d20569402760ca055f73f6f97d80d73d0fe3c051ff2b60ebad1519db02aa",
+        "evaluation_profile_identity": "f45b3651e07e3f9d5fecd7812304fabe5e7a015aae5844f4862c0ef69dd1df65",
+        "canonical_task_identity": "596fd628ade55dea581780cb3eebd3efebe83b7585554220ca83a7f2717e0ca0",
+        "initialization_provenance": {
+          "canonical_task_identity": "596fd628ade55dea581780cb3eebd3efebe83b7585554220ca83a7f2717e0ca0",
+          "effective": {
+            "qpos_rad": {
+              "segment_0_cell_0_y": 0.0,
+              "segment_0_cell_0_z": 0.0,
+              "segment_0_cell_10_y": 0.0,
+              "segment_0_cell_10_z": 0.0,
+              "segment_0_cell_11_y": 0.0,
+              "segment_0_cell_11_z": 0.0,
+              "segment_0_cell_1_y": 0.0,
+              "segment_0_cell_1_z": 0.0,
+              "segment_0_cell_2_y": 0.0,
+              "segment_0_cell_2_z": 0.0,
+              "segment_0_cell_3_y": 0.0,
+              "segment_0_cell_3_z": 0.0,
+              "segment_0_cell_4_y": 0.0,
+              "segment_0_cell_4_z": 0.0,
+              "segment_0_cell_5_y": 0.0,
+              "segment_0_cell_5_z": 0.0,
+              "segment_0_cell_6_y": 0.0,
+              "segment_0_cell_6_z": 0.0,
+              "segment_0_cell_7_y": 0.0,
+              "segment_0_cell_7_z": 0.0,
+              "segment_0_cell_8_y": 0.0,
+              "segment_0_cell_8_z": 0.0,
+              "segment_0_cell_9_y": 0.0,
+              "segment_0_cell_9_z": 0.0,
+              "segment_1_cell_0_y": 0.0,
+              "segment_1_cell_0_z": 0.0,
+              "segment_1_cell_10_y": 0.0,
+              "segment_1_cell_10_z": 0.0,
+              "segment_1_cell_11_y": 0.0,
+              "segment_1_cell_11_z": 0.0,
+              "segment_1_cell_1_y": 0.0,
+              "segment_1_cell_1_z": 0.0,
+              "segment_1_cell_2_y": 0.0,
+              "segment_1_cell_2_z": 0.0,
+              "segment_1_cell_3_y": 0.0,
+              "segment_1_cell_3_z": 0.0,
+              "segment_1_cell_4_y": 0.0,
+              "segment_1_cell_4_z": 0.0,
+              "segment_1_cell_5_y": 0.0,
+              "segment_1_cell_5_z": 0.0,
+              "segment_1_cell_6_y": 0.0,
+              "segment_1_cell_6_z": 0.0,
+              "segment_1_cell_7_y": 0.0,
+              "segment_1_cell_7_z": 0.0,
+              "segment_1_cell_8_y": 0.0,
+              "segment_1_cell_8_z": 0.0,
+              "segment_1_cell_9_y": 0.0,
+              "segment_1_cell_9_z": 0.0
+            },
+            "qvel_rad_s": {
+              "segment_0_cell_0_y": 0.0,
+              "segment_0_cell_0_z": 0.0,
+              "segment_0_cell_10_y": 0.0,
+              "segment_0_cell_10_z": 0.0,
+              "segment_0_cell_11_y": 0.0,
+              "segment_0_cell_11_z": 0.0,
+              "segment_0_cell_1_y": 0.0,
+              "segment_0_cell_1_z": 0.0,
+              "segment_0_cell_2_y": 0.0,
+              "segment_0_cell_2_z": 0.0,
+              "segment_0_cell_3_y": 0.0,
+              "segment_0_cell_3_z": 0.0,
+              "segment_0_cell_4_y": 0.0,
+              "segment_0_cell_4_z": 0.0,
+              "segment_0_cell_5_y": 0.0,
+              "segment_0_cell_5_z": 0.0,
+              "segment_0_cell_6_y": 0.0,
+              "segment_0_cell_6_z": 0.0,
+              "segment_0_cell_7_y": 0.0,
+              "segment_0_cell_7_z": 0.0,
+              "segment_0_cell_8_y": 0.0,
+              "segment_0_cell_8_z": 0.0,
+              "segment_0_cell_9_y": 0.0,
+              "segment_0_cell_9_z": 0.0,
+              "segment_1_cell_0_y": 0.0,
+              "segment_1_cell_0_z": 0.0,
+              "segment_1_cell_10_y": 0.0,
+              "segment_1_cell_10_z": 0.0,
+              "segment_1_cell_11_y": 0.0,
+              "segment_1_cell_11_z": 0.0,
+              "segment_1_cell_1_y": 0.0,
+              "segment_1_cell_1_z": 0.0,
+              "segment_1_cell_2_y": 0.0,
+              "segment_1_cell_2_z": 0.0,
+              "segment_1_cell_3_y": 0.0,
+              "segment_1_cell_3_z": 0.0,
+              "segment_1_cell_4_y": 0.0,
+              "segment_1_cell_4_z": 0.0,
+              "segment_1_cell_5_y": 0.0,
+              "segment_1_cell_5_z": 0.0,
+              "segment_1_cell_6_y": 0.0,
+              "segment_1_cell_6_z": 0.0,
+              "segment_1_cell_7_y": 0.0,
+              "segment_1_cell_7_z": 0.0,
+              "segment_1_cell_8_y": 0.0,
+              "segment_1_cell_8_z": 0.0,
+              "segment_1_cell_9_y": 0.0,
+              "segment_1_cell_9_z": 0.0
+            },
+            "unspecified": "zero"
+          },
+          "rule": "all_candidate_dofs_zero_v1"
+        },
+        "task_id": "s7-reach-offset-20261019",
+        "task_version": "1.0.0"
+      },
+      "requirement_identity": "8e7b2f7dad38692d98d304e153d6d551c778cdafe829cf34978191911f44f075",
+      "model_identity": "8dffa643a4b43584675e38bc8525c16b5315c3d70481038a975f67bde5588e1e",
+      "model_declaration": {
+        "model_id": "model.sorosim_gvs",
+        "model_version": "1.0.0",
+        "representation_id": "63aab968b8f0732f13dc73454e2628ee015c67b6b92aa47639d9f8b55d928f0e",
+        "relevant_assumptions": [
+          "supported serial tendon-driven continuum topology",
+          "selected strain basis spans deformation relevant to the use",
+          "inextensible centerline",
+          "no shear",
+          "no torsion",
+          "straight frictionless tendon spans"
+        ]
+      },
+      "protocol_identity": "7ee044c26f91b5a7cbb53bfc95322dd6dbe8d298f196f1a6ca121305d13082d9",
+      "operating_point": {
+        "name": "target_equilibrium",
+        "phase": "configuration_target_equilibrium",
+        "remaining_task_s": 0.35,
+        "actual_time_s": null,
+        "construction": {
+          "method": "bounded target-associated MATLAB SQP",
+          "provenance": {
+            "source_kind": "project_initial_state_and_bounded_pretension",
+            "reused": false,
+            "nominal_is_current_target_solution": false,
+            "historical_states_reused": false,
+            "current_scope": {
+              "robot": {
+                "family": "tendon_robot_family",
+                "identity": "bb72ca368cfc65aaeb4314a98be2519b20468e803da4bb0ec70e23cf015a81ee"
+              },
+              "task": {
+                "family": "task.reach",
+                "identity": "67cb0abab77924700a286e07217f3252fff71d9a38558c2528676346d454c535",
+                "environment": "5cee25b33f4ff19cb0abd93651ce9077a81665990f07d8f5a4967497e8e82a4d",
+                "goal": "bb82685eef609372d56d39203f4988af6bd5afe14bb4e908cbe889c051cb9365",
+                "timing": {
+                  "timestep_s": 0.0005,
+                  "control_period_s": 0.01,
+                  "sample_period_s": 0.01,
+                  "duration_s": 0.35,
+                  "termination": [
+                    "duration",
+                    "numerical_failure"
+                  ]
+                },
+                "initializer": "3a90c93217f15e9a60db7f65f611911f4aa53f1a4987340949e1068fd2647c22"
+              },
+              "backend": {
+                "extension_id": "backend.family_mujoco",
+                "version": "1.1.0",
+                "parameters": {
+                  "contract": "family.mujoco_parameters",
+                  "version": "1.0.0",
+                  "data": {
+                    "contact_model": "mujoco_convex_native",
+                    "friction": [
+                      0.0,
+                      0.0,
+                      0.0
+                    ],
+                    "integrator": "implicitfast",
+                    "timestep_source": "task.timing.timestep_s"
+                  }
+                }
+              },
+              "execution_model": {
+                "extension_id": "model.serial_bending_cells",
+                "version": "1.0.0",
+                "parameters": {
+                  "contract": "family.dynamics_model",
+                  "version": "1.0.0",
+                  "data": {}
+                }
+              },
+              "discretization": {
+                "contract": "family.discretization",
+                "version": "1.0.0",
+                "data": {
+                  "cells": {
+                    "segment_0": 12,
+                    "segment_1": 12
+                  },
+                  "coordinates": "two_principal_bending_angles_per_cell",
+                  "model": "serial_bending_cells_v1",
+                  "version": "serial_bending_discretization_v1"
+                }
+              },
+              "controller": {
+                "extension_id": "controller.sorosim_matlab_nmpc",
+                "version": "1.0.0",
+                "parameters": {
+                  "contract": "family.sorosim_reach_control",
+                  "version": "1.0.0",
+                  "data": {
+                    "numerical_source": "initial_state_pretension",
+                    "recipe": {
+                      "basis": {
+                        "strategy": "structural_linear"
+                      },
+                      "constraint_jacobian_mode": "reverse",
+                      "curvature_scale_rad_m": 10.0,
+                      "evaluation_threads": 1,
+                      "feasible_return": null,
+                      "holding_brake_lead_s": 0.02,
+                      "holding_speed_cost_mode": "time_integral_v1",
+                      "holding_speed_cost_window_s": 0.05,
+                      "holding_tip_speed_weight": 0.1,
+                      "horizon": 10,
+                      "integration_method": "implicit_euler",
+                      "max_cpu_s": null,
+                      "max_iterations": 120,
+                      "max_unusable_updates": 3,
+                      "position_error_scale_m": null,
+                      "rate_scale_rad_m_s": 1000.0,
+                      "recover_returned_tensions": true,
+                      "regenerate_warm_states": true,
+                      "root_tolerance": 1e-10,
+                      "seed_position_tolerance_fraction": 0.5,
+                      "seed_speed_limit_m_s": 0.02,
+                      "stopping_policy": "research_work_v1",
+                      "substeps": 1,
+                      "tension_weight": 0.0001,
+                      "terminal_tip_speed_weight": 0.1,
+                      "terminal_velocity_weight": 0.0001,
+                      "terminal_weight": 5.0,
+                      "tip_speed_scale_m_s": 0.02,
+                      "tolerance": 1e-06,
+                      "tracking_weight": 1.0,
+                      "variation_weight": 0.001,
+                      "velocity_weight": 0.0001
+                    },
+                    "settling": {
+                      "position_limit_m": 0.01,
+                      "speed_limit_m_s": 0.02,
+                      "window_s": 0.05
+                    },
+                    "solver": {
+                      "algorithm": "sqp",
+                      "constraint_tolerance": 1e-08,
+                      "engine_options": "-nodesktop -nosplash",
+                      "gauss_per_interval": 5,
+                      "optimality_tolerance": 1e-06,
+                      "routing_difference_step": 1e-05,
+                      "step_tolerance": 1e-10
+                    }
+                  }
+                }
+              },
+              "seed": 17
+            },
+            "physics_identity": "bd0371aad5cdc49b4e074ac130fb27ed12d86b8b6bfcbc2ee9450ab6857d798f",
+            "resolved_basis_identity": "63aab968b8f0732f13dc73454e2628ee015c67b6b92aa47639d9f8b55d928f0e",
+            "actual_initial_state_source": "Candidate Task initializer then measured backend state at every update",
+            "previous_input_source": "candidate bounded pretension",
+            "validity": "Tensions are numerical guesses; placeholder states must be regenerated using candidate dynamics before use"
+          },
+          "solver": "MATLAB fmincon SQP",
+          "success": true,
+          "status": 2,
+          "iterations": 16,
+          "function_evaluations": 42,
+          "position_residual_m": 1.800473206788679e-09,
+          "static_residual_inf": 1.3899471851264167e-16,
+          "computed_tensions_n": [
+            2.544627287044392,
+            2.220549608774058,
+            2.537366163595899,
+            3.64265635818008
+          ],
+          "requested_world_point_m": [
+            0.28,
+            0.02,
+            0.2
+          ],
+          "achieved_world_point_m": [
+            0.28000000026021266,
+            0.0200000003182464,
+            0.2000000017529154
+          ],
+          "static_equilibrium": true,
+          "maximum_iterations": 20
+        },
+        "equilibrium": true,
+        "linearization_scope": "local equilibrium linearization"
+      },
+      "horizon": {
+        "task_duration_s": 0.35,
+        "remaining_task_s": 0.35,
+        "analysis_horizon_s": null,
+        "period_s": 0.01,
+        "origin": null,
+        "interpretation": "static construction"
+      },
+      "physical_inputs": {
+        "signal": "tendon_tension",
+        "units": "N",
+        "frame": "tendon_path",
+        "phase": "pre_step",
+        "control_period_s": 0.01,
+        "tendon_order": [
+          "tendon_0",
+          "tendon_1",
+          "tendon_2",
+          "tendon_3"
+        ],
+        "lower": [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "upper": [
+          8.0,
+          8.0,
+          8.0,
+          8.0
+        ],
+        "provenance": [
+          "/robot/structure/data/tendons",
+          "/task/timing/control_period_s"
+        ]
+      },
+      "constraint_coverage": [
+        {
+          "constraint_id": "terminal_error_m",
+          "expressible": true,
+          "status": "diagnostic",
+          "analyzed_indices": [],
+          "reason": "Local position authority/static construction only; no sampled constraint verification."
+        },
+        {
+          "constraint_id": "holding_max_error_m",
+          "expressible": true,
+          "status": "diagnostic",
+          "analyzed_indices": [],
+          "reason": "Local position authority/static construction only; no sampled constraint verification."
+        },
+        {
+          "constraint_id": "holding_max_speed_m_s",
+          "expressible": true,
+          "status": "not_applicable",
+          "analyzed_indices": [],
+          "reason": "Existing tools do not enforce this constraint kind or sampled window."
+        }
+      ],
+      "numerical_result_pointer": "/raw",
+      "computation_status": "computed",
+      "verification_status": "static_construction_only",
+      "supported_interpretation": "Local static construction residuals only; sampled holding and execution remain unverified.",
+      "unsupported_conclusions": [
+        "task acceptance",
+        "whole holding-window compliance",
+        "global nonlinear feasibility or infeasibility",
+        "hardware performance",
+        "robustness",
+        "repeatability",
+        "equilibrium validity at a non-equilibrium point"
+      ]
+    },
+    "analysis_applicability": {
+      "status": "applicable",
+      "reasons": [],
+      "constraint_coverage": [
+        {
+          "constraint_id": "terminal_error_m",
+          "expressible": true,
+          "status": "diagnostic",
+          "analyzed_indices": [],
+          "reason": "Local position authority/static construction only; no sampled constraint verification."
+        },
+        {
+          "constraint_id": "holding_max_error_m",
+          "expressible": true,
+          "status": "diagnostic",
+          "analyzed_indices": [],
+          "reason": "Local position authority/static construction only; no sampled constraint verification."
+        },
+        {
+          "constraint_id": "holding_max_speed_m_s",
+          "expressible": true,
+          "status": "not_applicable",
+          "analyzed_indices": [],
+          "reason": "Existing tools do not enforce this constraint kind or sampled window."
+        }
+      ],
+      "full_task_supported": false,
+      "execution_support": "not_assessed",
+      "model_assessment": {
+        "model_id": "model.sorosim_gvs",
+        "model_version": "1.0.0",
+        "design_id": "serial_family_candidate",
+        "design_identity": "10035885ded80b7afbf2faa28988c6275a18ac04f3232c5d0972acced81af9ad",
+        "representation_id": "63aab968b8f0732f13dc73454e2628ee015c67b6b92aa47639d9f8b55d928f0e",
+        "representation_kind": "gvs_bending_basis_v1",
+        "representation_strategy": "structural_linear",
+        "generalized_coordinate_dimension": 12,
+        "state_dimension": 24,
+        "uses": {
+          "static_equilibrium": {
+            "status": "WARN",
+            "reasons": [
+              "SoRoSim local bending computation is supported; physical agreement outside measured operating points is unvalidated."
+            ],
+            "validation": "unavailable",
+            "evidence": []
+          }
+        },
+        "relevant_assumptions": [
+          "supported serial tendon-driven continuum topology",
+          "selected strain basis spans deformation relevant to the use",
+          "inextensible centerline",
+          "no shear",
+          "no torsion",
+          "straight frictionless tendon spans"
+        ],
+        "unsupported_requested_physics": []
+      },
+      "horizon": {
+        "task_duration_s": 0.35,
+        "remaining_task_s": 0.35,
+        "analysis_horizon_s": null,
+        "period_s": 0.01,
+        "origin": null,
+        "interpretation": "static construction"
+      }
+    },
+    "task_acceptance": "unmeasured",
+    "numerical_evidence": {
+      "reference": {
+        "artifact_id": "25a330127846cc5a0c2b860227eaae57bf10917d2a14b027a83b80ed84e42cae",
+        "media_type": "application/json"
+      },
+      "pointer": "/raw"
+    },
+    "trajectory_evidence": {
+      "solver_scope": null,
+      "witness_pointer": null,
+      "certificate_pointer": null,
+      "certificate": null
+    },
+    "evidence_summary": {
+      "version": "evidence_policy_v1",
+      "claim_kind": "NUMERICAL_DIAGNOSTIC",
+      "verification_status": "static_construction_only",
+      "model_identity": "8dffa643a4b43584675e38bc8525c16b5315c3d70481038a975f67bde5588e1e",
+      "candidate_identity": {
+        "artifact_id": "5a6ee862b969524dff14a16772736dafef0be3d99988ec718b4c808840f3a15e",
+        "media_type": "application/json"
+      },
+      "design_identity": null,
+      "task_identity": "67cb0abab77924700a286e07217f3252fff71d9a38558c2528676346d454c535",
+      "operating_point": {
+        "name": "target_equilibrium",
+        "phase": "configuration_target_equilibrium",
+        "remaining_task_s": 0.35,
+        "actual_time_s": null,
+        "construction": {
+          "method": "bounded target-associated MATLAB SQP",
+          "provenance": {
+            "source_kind": "project_initial_state_and_bounded_pretension",
+            "reused": false,
+            "nominal_is_current_target_solution": false,
+            "historical_states_reused": false,
+            "current_scope": {
+              "robot": {
+                "family": "tendon_robot_family",
+                "identity": "bb72ca368cfc65aaeb4314a98be2519b20468e803da4bb0ec70e23cf015a81ee"
+              },
+              "task": {
+                "family": "task.reach",
+                "identity": "67cb0abab77924700a286e07217f3252fff71d9a38558c2528676346d454c535",
+                "environment": "5cee25b33f4ff19cb0abd93651ce9077a81665990f07d8f5a4967497e8e82a4d",
+                "goal": "bb82685eef609372d56d39203f4988af6bd5afe14bb4e908cbe889c051cb9365",
+                "timing": {
+                  "timestep_s": 0.0005,
+                  "control_period_s": 0.01,
+                  "sample_period_s": 0.01,
+                  "duration_s": 0.35,
+                  "termination": [
+                    "duration",
+                    "numerical_failure"
+                  ]
+                },
+                "initializer": "3a90c93217f15e9a60db7f65f611911f4aa53f1a4987340949e1068fd2647c22"
+              },
+              "backend": {
+                "extension_id": "backend.family_mujoco",
+                "version": "1.1.0",
+                "parameters": {
+                  "contract": "family.mujoco_parameters",
+                  "version": "1.0.0",
+                  "data": {
+                    "contact_model": "mujoco_convex_native",
+                    "friction": [
+                      0.0,
+                      0.0,
+                      0.0
+                    ],
+                    "integrator": "implicitfast",
+                    "timestep_source": "task.timing.timestep_s"
+                  }
+                }
+              },
+              "execution_model": {
+                "extension_id": "model.serial_bending_cells",
+                "version": "1.0.0",
+                "parameters": {
+                  "contract": "family.dynamics_model",
+                  "version": "1.0.0",
+                  "data": {}
+                }
+              },
+              "discretization": {
+                "contract": "family.discretization",
+                "version": "1.0.0",
+                "data": {
+                  "cells": {
+                    "segment_0": 12,
+                    "segment_1": 12
+                  },
+                  "coordinates": "two_principal_bending_angles_per_cell",
+                  "model": "serial_bending_cells_v1",
+                  "version": "serial_bending_discretization_v1"
+                }
+              },
+              "controller": {
+                "extension_id": "controller.sorosim_matlab_nmpc",
+                "version": "1.0.0",
+                "parameters": {
+                  "contract": "family.sorosim_reach_control",
+                  "version": "1.0.0",
+                  "data": {
+                    "numerical_source": "initial_state_pretension",
+                    "recipe": {
+                      "basis": {
+                        "strategy": "structural_linear"
+                      },
+                      "constraint_jacobian_mode": "reverse",
+                      "curvature_scale_rad_m": 10.0,
+                      "evaluation_threads": 1,
+                      "feasible_return": null,
+                      "holding_brake_lead_s": 0.02,
+                      "holding_speed_cost_mode": "time_integral_v1",
+                      "holding_speed_cost_window_s": 0.05,
+                      "holding_tip_speed_weight": 0.1,
+                      "horizon": 10,
+                      "integration_method": "implicit_euler",
+                      "max_cpu_s": null,
+                      "max_iterations": 120,
+                      "max_unusable_updates": 3,
+                      "position_error_scale_m": null,
+                      "rate_scale_rad_m_s": 1000.0,
+                      "recover_returned_tensions": true,
+                      "regenerate_warm_states": true,
+                      "root_tolerance": 1e-10,
+                      "seed_position_tolerance_fraction": 0.5,
+                      "seed_speed_limit_m_s": 0.02,
+                      "stopping_policy": "research_work_v1",
+                      "substeps": 1,
+                      "tension_weight": 0.0001,
+                      "terminal_tip_speed_weight": 0.1,
+                      "terminal_velocity_weight": 0.0001,
+                      "terminal_weight": 5.0,
+                      "tip_speed_scale_m_s": 0.02,
+                      "tolerance": 1e-06,
+                      "tracking_weight": 1.0,
+                      "variation_weight": 0.001,
+                      "velocity_weight": 0.0001
+                    },
+                    "settling": {
+                      "position_limit_m": 0.01,
+                      "speed_limit_m_s": 0.02,
+                      "window_s": 0.05
+                    },
+                    "solver": {
+                      "algorithm": "sqp",
+                      "constraint_tolerance": 1e-08,
+                      "engine_options": "-nodesktop -nosplash",
+                      "gauss_per_interval": 5,
+                      "optimality_tolerance": 1e-06,
+                      "routing_difference_step": 1e-05,
+                      "step_tolerance": 1e-10
+                    }
+                  }
+                }
+              },
+              "seed": 17
+            },
+            "physics_identity": "bd0371aad5cdc49b4e074ac130fb27ed12d86b8b6bfcbc2ee9450ab6857d798f",
+            "resolved_basis_identity": "63aab968b8f0732f13dc73454e2628ee015c67b6b92aa47639d9f8b55d928f0e",
+            "actual_initial_state_source": "Candidate Task initializer then measured backend state at every update",
+            "previous_input_source": "candidate bounded pretension",
+            "validity": "Tensions are numerical guesses; placeholder states must be regenerated using candidate dynamics before use"
+          },
+          "solver": "MATLAB fmincon SQP",
+          "success": true,
+          "status": 2,
+          "iterations": 16,
+          "function_evaluations": 42,
+          "position_residual_m": 1.800473206788679e-09,
+          "static_residual_inf": 1.3899471851264167e-16,
+          "computed_tensions_n": [
+            2.544627287044392,
+            2.220549608774058,
+            2.537366163595899,
+            3.64265635818008
+          ],
+          "requested_world_point_m": [
+            0.28,
+            0.02,
+            0.2
+          ],
+          "achieved_world_point_m": [
+            0.28000000026021266,
+            0.0200000003182464,
+            0.2000000017529154
+          ],
+          "static_equilibrium": true,
+          "maximum_iterations": 20
+        },
+        "equilibrium": true,
+        "linearization_scope": "local equilibrium linearization"
+      },
+      "covered_samples": {
+        "horizon": {
+          "task_duration_s": 0.35,
+          "remaining_task_s": 0.35,
+          "analysis_horizon_s": null,
+          "period_s": 0.01,
+          "origin": null,
+          "interpretation": "static construction"
+        },
+        "constraints": [
+          {
+            "constraint_id": "terminal_error_m",
+            "expressible": true,
+            "status": "diagnostic",
+            "analyzed_indices": [],
+            "reason": "Local position authority/static construction only; no sampled constraint verification."
+          },
+          {
+            "constraint_id": "holding_max_error_m",
+            "expressible": true,
+            "status": "diagnostic",
+            "analyzed_indices": [],
+            "reason": "Local position authority/static construction only; no sampled constraint verification."
+          },
+          {
+            "constraint_id": "holding_max_speed_m_s",
+            "expressible": true,
+            "status": "not_applicable",
+            "analyzed_indices": [],
+            "reason": "Existing tools do not enforce this constraint kind or sampled window."
+          }
+        ],
+        "full_task_supported": false
+      },
+      "assumptions": {
+        "model": {
+          "model_id": "model.sorosim_gvs",
+          "model_version": "1.0.0",
+          "representation_id": "63aab968b8f0732f13dc73454e2628ee015c67b6b92aa47639d9f8b55d928f0e",
+          "relevant_assumptions": [
+            "supported serial tendon-driven continuum topology",
+            "selected strain basis spans deformation relevant to the use",
+            "inextensible centerline",
+            "no shear",
+            "no torsion",
+            "straight frictionless tendon spans"
+          ]
+        },
+        "physical_inputs": {
+          "signal": "tendon_tension",
+          "units": "N",
+          "frame": "tendon_path",
+          "phase": "pre_step",
+          "control_period_s": 0.01,
+          "tendon_order": [
+            "tendon_0",
+            "tendon_1",
+            "tendon_2",
+            "tendon_3"
+          ],
+          "lower": [
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "upper": [
+            8.0,
+            8.0,
+            8.0,
+            8.0
+          ],
+          "provenance": [
+            "/robot/structure/data/tendons",
+            "/task/timing/control_period_s"
+          ]
+        },
+        "legacy_applicability": {
+          "status": "applicable",
+          "reasons": [],
+          "constraint_coverage": [
+            {
+              "constraint_id": "terminal_error_m",
+              "expressible": true,
+              "status": "diagnostic",
+              "analyzed_indices": [],
+              "reason": "Local position authority/static construction only; no sampled constraint verification."
+            },
+            {
+              "constraint_id": "holding_max_error_m",
+              "expressible": true,
+              "status": "diagnostic",
+              "analyzed_indices": [],
+              "reason": "Local position authority/static construction only; no sampled constraint verification."
+            },
+            {
+              "constraint_id": "holding_max_speed_m_s",
+              "expressible": true,
+              "status": "not_applicable",
+              "analyzed_indices": [],
+              "reason": "Existing tools do not enforce this constraint kind or sampled window."
+            }
+          ],
+          "full_task_supported": false,
+          "execution_support": "not_assessed",
+          "model_assessment": {
+            "model_id": "model.sorosim_gvs",
+            "model_version": "1.0.0",
+            "design_id": "serial_family_candidate",
+            "design_identity": "10035885ded80b7afbf2faa28988c6275a18ac04f3232c5d0972acced81af9ad",
+            "representation_id": "63aab968b8f0732f13dc73454e2628ee015c67b6b92aa47639d9f8b55d928f0e",
+            "representation_kind": "gvs_bending_basis_v1",
+            "representation_strategy": "structural_linear",
+            "generalized_coordinate_dimension": 12,
+            "state_dimension": 24,
+            "uses": {
+              "static_equilibrium": {
+                "status": "WARN",
+                "reasons": [
+                  "SoRoSim local bending computation is supported; physical agreement outside measured operating points is unvalidated."
+                ],
+                "validation": "unavailable",
+                "evidence": []
+              }
+            },
+            "relevant_assumptions": [
+              "supported serial tendon-driven continuum topology",
+              "selected strain basis spans deformation relevant to the use",
+              "inextensible centerline",
+              "no shear",
+              "no torsion",
+              "straight frictionless tendon spans"
+            ],
+            "unsupported_requested_physics": []
+          },
+          "horizon": {
+            "task_duration_s": 0.35,
+            "remaining_task_s": 0.35,
+            "analysis_horizon_s": null,
+            "period_s": 0.01,
+            "origin": null,
+            "interpretation": "static construction"
+          }
+        },
+        "source": "Trusted resolved tool artifact; not arbitrary LLM assertions"
+      },
+      "supported_inferences": [
+        "local_diagnostic"
+      ],
+      "unsupported_inferences": [
+        "global_nonlinear_feasibility",
+        "global_nonlinear_infeasibility",
+        "structural_infeasibility",
+        "whole_horizon_from_instantaneous_braking",
+        "adapted_dynamic_improvement_from_static_sensitivity",
+        "unvisited_simulation_descent_guarantee",
+        "continuous_time_compliance",
+        "hardware_performance",
+        "robustness",
+        "repeatability",
+        "observed_task_pass"
+      ],
+      "evidence_reference": {
+        "artifact_id": "25a330127846cc5a0c2b860227eaae57bf10917d2a14b027a83b80ed84e42cae",
+        "media_type": "application/json"
+      },
+      "numerical_evidence_pointer": "/raw",
+      "prospective_guarantee": false,
+      "unresolved": [
+        "Nonlinear realization and constraints outside declared model/sample coverage remain unresolved.",
+        "Original independent physical task acceptance is unmeasured by this evidence."
+      ],
+      "next_checks": [
+        "independent_legal_physical_evaluation",
+        "matched_input_refinement",
+        "paired_local_response_check"
+      ]
+    }
+  },
+  "sensitivity": {
+    "reference": {
+      "artifact_id": "8a466cfcd57cfe18daef6f04fcb822e2cfcaea4230eaf82248b5170bee766799",
+      "media_type": "application/json"
+    },
+    "stored_result_keys": [
+      "status",
+      "operation",
+      "binding",
+      "protocol",
+      "operating_point",
+      "construction",
+      "local_model_constraints",
+      "task_acceptance",
+      "proxy_values",
+      "raw",
+      "internal_calculations",
+      "limitations",
+      "score_semantics",
+      "raw_facts",
+      "research_interpretations",
+      "sensitivity",
+      "sensitivity_protocol",
+      "model",
+      "units",
+      "task_analysis",
+      "analysis_applicability",
+      "scoped_claim",
+      "candidate",
+      "requested_operation",
+      "operation_key",
+      "owning_study",
+      "origin",
+      "implementation",
+      "charged_numerical_s",
+      "charged_analysis_evaluations",
+      "boundary",
+      "worker_log"
+    ],
+    "control_handoff": {
+      "candidate": {
+        "artifact_id": "5a6ee862b969524dff14a16772736dafef0be3d99988ec718b4c808840f3a15e",
+        "media_type": "application/json"
+      },
+      "scope": {
+        "task_identity": "67cb0abab77924700a286e07217f3252fff71d9a38558c2528676346d454c535",
+        "effective_configuration_identity": "f38a7bb25aabcb4d792d3ee322577053560e49e4bbb8acf669b28f424533d00e",
+        "tendon_order": [
+          "tendon_0",
+          "tendon_1",
+          "tendon_2",
+          "tendon_3"
+        ]
+      },
+      "operating_point": "fixed_input_equilibrium",
+      "numerically_verified_input_sensitivity": true,
+      "request_fields": {
+        "candidate": {
+          "artifact_id": "5a6ee862b969524dff14a16772736dafef0be3d99988ec718b4c808840f3a15e",
+          "media_type": "application/json"
+        },
+        "method": "mathematical_response",
+        "response_evidence": {
+          "artifact_id": "8a466cfcd57cfe18daef6f04fcb822e2cfcaea4230eaf82248b5170bee766799",
+          "media_type": "application/json"
+        }
+      },
+      "remaining_checks": "Current registered evidence, candidate/model/task/operating-point/channel binding and Plan admission",
+      "missing": null,
+      "task_acceptance": "unmeasured"
+    },
+    "static_input_observation": {
+      "tensions_n": [
+        0.2,
+        0.2,
+        0.2,
+        0.2
+      ],
+      "units": "N",
+      "tendon_order": [
+        "tendon_0",
+        "tendon_1",
+        "tendon_2",
+        "tendon_3"
+      ],
+      "pointer": "/construction/computed_tensions_n",
+      "task_acceptance": "unmeasured",
+      "scope": "Computed static operating input; no dynamic reach or hold guarantee"
+    },
+    "input_response_observation": {
+      "pointer": "/sensitivity",
+      "verification": {
+        "passed": true,
+        "absolute_norm": 7.416538802697572e-08,
+        "relative_norm": 1.302214583149102e-07,
+        "max_normalized_error": 6.423621016438119e-06,
+        "max_tolerance_ratio": 0.0008348255353463815
+      },
+      "task_acceptance": "unmeasured"
+    },
+    "retrieval_note": "This is a tool summary, not the stored artifact layout. Read only the explicit stored pointers; oversized full results may be offloaded.",
+    "status": "computed",
+    "candidate": {
+      "artifact_id": "5a6ee862b969524dff14a16772736dafef0be3d99988ec718b4c808840f3a15e",
+      "media_type": "application/json"
+    },
+    "operation": "input_sensitivity",
+    "proxy_values": {},
+    "origin": "engineering",
+    "charged_numerical_s": 14.038174499990419,
+    "charged_analysis_evaluations": 1,
+    "local_model_constraints": {
+      "status": "unmeasured"
+    },
+    "internal_calculations": [
+      {
+        "solver": "MATLAB fsolve",
+        "purpose": "operating_point_construction",
+        "iterations": 4,
+        "function_evaluations": 5,
+        "status": 3
+      },
+      {
+        "purpose": "perturbed_equilibrium_verification",
+        "perturbation_index": 0,
+        "solver": "MATLAB fsolve",
+        "status": 1,
+        "iterations": 2,
+        "function_evaluations": 3,
+        "static_residual_inf": 2.2402327388981735e-17,
+        "success": true,
+        "computed_tensions_n": [
+          0.20006731767878463,
+          0.20007274379414605,
+          0.2000112896006448,
+          0.19993945580037537
+        ]
+      },
+      {
+        "purpose": "perturbed_equilibrium_verification",
+        "perturbation_index": 1,
+        "solver": "MATLAB fsolve",
+        "status": 1,
+        "iterations": 2,
+        "function_evaluations": 3,
+        "static_residual_inf": 3.2573499019611374e-17,
+        "success": true,
+        "computed_tensions_n": [
+          0.1999326823212154,
+          0.19992725620585397,
+          0.19998871039935523,
+          0.20006054419962466
+        ]
+      }
+    ],
+    "score_semantics": {
+      "held_position_min_eigenvalue": {
+        "candidate_identity": "core-c40023793e53d6f04af68c55ed4247f60836b1d6d07692d105c4d6b8a166328b",
+        "model_identity": "cdbe0eef21f1623a94338a321017319ab190b13786741cf89869b16b492fb45f",
+        "operating_point": {
+          "name": "fixed_input_equilibrium",
+          "construction": {
+            "method": "existing candidate initializer/control preparation",
+            "provenance": {
+              "source_kind": "project_initial_state_and_bounded_pretension",
+              "reused": false,
+              "nominal_is_current_target_solution": false,
+              "historical_states_reused": false,
+              "current_scope": {
+                "robot": {
+                  "family": "tendon_robot_family",
+                  "identity": "bb72ca368cfc65aaeb4314a98be2519b20468e803da4bb0ec70e23cf015a81ee"
+                },
+                "task": {
+                  "family": "task.reach",
+                  "identity": "67cb0abab77924700a286e07217f3252fff71d9a38558c2528676346d454c535",
+                  "environment": "5cee25b33f4ff19cb0abd93651ce9077a81665990f07d8f5a4967497e8e82a4d",
+                  "goal": "bb82685eef609372d56d39203f4988af6bd5afe14bb4e908cbe889c051cb9365",
+                  "timing": {
+                    "timestep_s": 0.0005,
+                    "control_period_s": 0.01,
+                    "sample_period_s": 0.01,
+                    "duration_s": 0.35,
+                    "termination": [
+                      "duration",
+                      "numerical_failure"
+                    ]
+                  },
+                  "initializer": "3a90c93217f15e9a60db7f65f611911f4aa53f1a4987340949e1068fd2647c22"
+                },
+                "backend": {
+                  "extension_id": "backend.family_mujoco",
+                  "version": "1.1.0",
+                  "parameters": {
+                    "contract": "family.mujoco_parameters",
+                    "version": "1.0.0",
+                    "data": {
+                      "contact_model": "mujoco_convex_native",
+                      "friction": [
+                        0.0,
+                        0.0,
+                        0.0
+                      ],
+                      "integrator": "implicitfast",
+                      "timestep_source": "task.timing.timestep_s"
+                    }
+                  }
+                },
+                "execution_model": {
+                  "extension_id": "model.serial_bending_cells",
+                  "version": "1.0.0",
+                  "parameters": {
+                    "contract": "family.dynamics_model",
+                    "version": "1.0.0",
+                    "data": {}
+                  }
+                },
+                "discretization": {
+                  "contract": "family.discretization",
+                  "version": "1.0.0",
+                  "data": {
+                    "cells": {
+                      "segment_0": 12,
+                      "segment_1": 12
+                    },
+                    "coordinates": "two_principal_bending_angles_per_cell",
+                    "model": "serial_bending_cells_v1",
+                    "version": "serial_bending_discretization_v1"
+                  }
+                },
+                "controller": {
+                  "extension_id": "controller.sorosim_matlab_nmpc",
+                  "version": "1.0.0",
+                  "parameters": {
+                    "contract": "family.sorosim_reach_control",
+                    "version": "1.0.0",
+                    "data": {
+                      "numerical_source": "initial_state_pretension",
+                      "recipe": {
+                        "basis": {
+                          "strategy": "structural_linear"
+                        },
+                        "constraint_jacobian_mode": "reverse",
+                        "curvature_scale_rad_m": 10.0,
+                        "evaluation_threads": 1,
+                        "feasible_return": null,
+                        "holding_brake_lead_s": 0.02,
+                        "holding_speed_cost_mode": "time_integral_v1",
+                        "holding_speed_cost_window_s": 0.05,
+                        "holding_tip_speed_weight": 0.1,
+                        "horizon": 10,
+                        "integration_method": "implicit_euler",
+                        "max_cpu_s": null,
+                        "max_iterations": 120,
+                        "max_unusable_updates": 3,
+                        "position_error_scale_m": null,
+                        "rate_scale_rad_m_s": 1000.0,
+                        "recover_returned_tensions": true,
+                        "regenerate_warm_states": true,
+                        "root_tolerance": 1e-10,
+                        "seed_position_tolerance_fraction": 0.5,
+                        "seed_speed_limit_m_s": 0.02,
+                        "stopping_policy": "research_work_v1",
+                        "substeps": 1,
+                        "tension_weight": 0.0001,
+                        "terminal_tip_speed_weight": 0.1,
+                        "terminal_velocity_weight": 0.0001,
+                        "terminal_weight": 5.0,
+                        "tip_speed_scale_m_s": 0.02,
+                        "tolerance": 1e-06,
+                        "tracking_weight": 1.0,
+                        "variation_weight": 0.001,
+                        "velocity_weight": 0.0001
+                      },
+                      "settling": {
+                        "position_limit_m": 0.01,
+                        "speed_limit_m_s": 0.02,
+                        "window_s": 0.05
+                      },
+                      "solver": {
+                        "algorithm": "sqp",
+                        "constraint_tolerance": 1e-08,
+                        "engine_options": "-nodesktop -nosplash",
+                        "gauss_per_interval": 5,
+                        "optimality_tolerance": 1e-06,
+                        "routing_difference_step": 1e-05,
+                        "step_tolerance": 1e-10
+                      }
+                    }
+                  }
+                },
+                "seed": 17
+              },
+              "physics_identity": "bd0371aad5cdc49b4e074ac130fb27ed12d86b8b6bfcbc2ee9450ab6857d798f",
+              "resolved_basis_identity": "63aab968b8f0732f13dc73454e2628ee015c67b6b92aa47639d9f8b55d928f0e",
+              "actual_initial_state_source": "Candidate Task initializer then measured backend state at every update",
+              "previous_input_source": "candidate bounded pretension",
+              "validity": "Tensions are numerical guesses; placeholder states must be regenerated using candidate dynamics before use"
+            },
+            "solver": "MATLAB fsolve",
+            "status": 3,
+            "iterations": 4,
+            "function_evaluations": 5,
+            "static_residual_inf": 5.753047777751208e-17,
+            "success": true,
+            "computed_tensions_n": [
+              0.2,
+              0.2,
+              0.2,
+              0.2
+            ]
+          },
+          "source": {
+            "name": "fixed_input_equilibrium",
+            "phase": "configuration_fixed_input_equilibrium",
+            "remaining_task_s": 0.35,
+            "actual_time_s": null,
+            "construction": {
+              "method": "existing candidate initializer/control preparation",
+              "provenance": {
+                "source_kind": "project_initial_state_and_bounded_pretension",
+                "reused": false,
+                "nominal_is_current_target_solution": false,
+                "historical_states_reused": false,
+                "current_scope": {
+                  "robot": {
+                    "family": "tendon_robot_family",
+                    "identity": "bb72ca368cfc65aaeb4314a98be2519b20468e803da4bb0ec70e23cf015a81ee"
+                  },
+                  "task": {
+                    "family": "task.reach",
+                    "identity": "67cb0abab77924700a286e07217f3252fff71d9a38558c2528676346d454c535",
+                    "environment": "5cee25b33f4ff19cb0abd93651ce9077a81665990f07d8f5a4967497e8e82a4d",
+                    "goal": "bb82685eef609372d56d39203f4988af6bd5afe14bb4e908cbe889c051cb9365",
+                    "timing": {
+                      "timestep_s": 0.0005,
+                      "control_period_s": 0.01,
+                      "sample_period_s": 0.01,
+                      "duration_s": 0.35,
+                      "termination": [
+                        "duration",
+                        "numerical_failure"
+                      ]
+                    },
+                    "initializer": "3a90c93217f15e9a60db7f65f611911f4aa53f1a4987340949e1068fd2647c22"
+                  },
+                  "backend": {
+                    "extension_id": "backend.family_mujoco",
+                    "version": "1.1.0",
+                    "parameters": {
+                      "contract": "family.mujoco_parameters",
+                      "version": "1.0.0",
+                      "data": {
+                        "contact_model": "mujoco_convex_native",
+                        "friction": [
+                          0.0,
+                          0.0,
+                          0.0
+                        ],
+                        "integrator": "implicitfast",
+                        "timestep_source": "task.timing.timestep_s"
+                      }
+                    }
+                  },
+                  "execution_model": {
+                    "extension_id": "model.serial_bending_cells",
+                    "version": "1.0.0",
+                    "parameters": {
+                      "contract": "family.dynamics_model",
+                      "version": "1.0.0",
+                      "data": {}
+                    }
+                  },
+                  "discretization": {
+                    "contract": "family.discretization",
+                    "version": "1.0.0",
+                    "data": {
+                      "cells": {
+                        "segment_0": 12,
+                        "segment_1": 12
+                      },
+                      "coordinates": "two_principal_bending_angles_per_cell",
+                      "model": "serial_bending_cells_v1",
+                      "version": "serial_bending_discretization_v1"
+                    }
+                  },
+                  "controller": {
+                    "extension_id": "controller.sorosim_matlab_nmpc",
+                    "version": "1.0.0",
+                    "parameters": {
+                      "contract": "family.sorosim_reach_control",
+                      "version": "1.0.0",
+                      "data": {
+                        "numerical_source": "initial_state_pretension",
+                        "recipe": {
+                          "basis": {
+                            "strategy": "structural_linear"
+                          },
+                          "constraint_jacobian_mode": "reverse",
+                          "curvature_scale_rad_m": 10.0,
+                          "evaluation_threads": 1,
+                          "feasible_return": null,
+                          "holding_brake_lead_s": 0.02,
+                          "holding_speed_cost_mode": "time_integral_v1",
+                          "holding_speed_cost_window_s": 0.05,
+                          "holding_tip_speed_weight": 0.1,
+                          "horizon": 10,
+                          "integration_method": "implicit_euler",
+                          "max_cpu_s": null,
+                          "max_iterations": 120,
+                          "max_unusable_updates": 3,
+                          "position_error_scale_m": null,
+                          "rate_scale_rad_m_s": 1000.0,
+                          "recover_returned_tensions": true,
+                          "regenerate_warm_states": true,
+                          "root_tolerance": 1e-10,
+                          "seed_position_tolerance_fraction": 0.5,
+                          "seed_speed_limit_m_s": 0.02,
+                          "stopping_policy": "research_work_v1",
+                          "substeps": 1,
+                          "tension_weight": 0.0001,
+                          "terminal_tip_speed_weight": 0.1,
+                          "terminal_velocity_weight": 0.0001,
+                          "terminal_weight": 5.0,
+                          "tip_speed_scale_m_s": 0.02,
+                          "tolerance": 1e-06,
+                          "tracking_weight": 1.0,
+                          "variation_weight": 0.001,
+                          "velocity_weight": 0.0001
+                        },
+                        "settling": {
+                          "position_limit_m": 0.01,
+                          "speed_limit_m_s": 0.02,
+                          "window_s": 0.05
+                        },
+                        "solver": {
+                          "algorithm": "sqp",
+                          "constraint_tolerance": 1e-08,
+                          "engine_options": "-nodesktop -nosplash",
+                          "gauss_per_interval": 5,
+                          "optimality_tolerance": 1e-06,
+                          "routing_difference_step": 1e-05,
+                          "step_tolerance": 1e-10
+                        }
+                      }
+                    }
+                  },
+                  "seed": 17
+                },
+                "physics_identity": "bd0371aad5cdc49b4e074ac130fb27ed12d86b8b6bfcbc2ee9450ab6857d798f",
+                "resolved_basis_identity": "63aab968b8f0732f13dc73454e2628ee015c67b6b92aa47639d9f8b55d928f0e",
+                "actual_initial_state_source": "Candidate Task initializer then measured backend state at every update",
+                "previous_input_source": "candidate bounded pretension",
+                "validity": "Tensions are numerical guesses; placeholder states must be regenerated using candidate dynamics before use"
+              },
+              "solver": "MATLAB fsolve",
+              "status": 3,
+              "iterations": 4,
+              "function_evaluations": 5,
+              "static_residual_inf": 5.753047777751208e-17,
+              "success": true,
+              "computed_tensions_n": [
+                0.2,
+                0.2,
+                0.2,
+                0.2
+              ]
+            },
+            "equilibrium": true,
+            "linearization_scope": "local equilibrium linearization"
+          }
+        },
+        "scoring_window_s": null,
+        "comparison_conditions": "Same protocol, window, normalization, input treatment, operating-point construction, task and model implementation. Changed candidates use their own compiled model.",
+        "unsupported_conclusions": [
+          "backend task acceptance",
+          "whole holding-window compliance",
+          "damping margin or decay rate",
+          "global feasibility/infeasibility",
+          "structural improvement attribution",
+          "manufacturable material validation"
+        ],
+        "definition": "Minimum eigenvalue of local finite-horizon position-output controllability Gramian for input held over each control interval",
+        "preference": "larger",
+        "units": "dimensionless under declared input/output normalization",
+        "normalization": {
+          "input_scale_n": 8.0,
+          "output_scale_m": 0.01
+        },
+        "input_treatment": "Unconstrained signed incremental input held per control interval; physical unilateral bounded tensions are reported separately and not fully represented by this scalar",
+        "represented_constraints": "Local linear model and held-input sampling only",
+        "supported_interpretation": "Local normalized position-output authority; held means held input, not task holding success"
+      },
+      "target_equilibrium_residual": {
+        "candidate_identity": "core-c40023793e53d6f04af68c55ed4247f60836b1d6d07692d105c4d6b8a166328b",
+        "model_identity": "cdbe0eef21f1623a94338a321017319ab190b13786741cf89869b16b492fb45f",
+        "operating_point": {
+          "name": "fixed_input_equilibrium",
+          "construction": {
+            "method": "existing candidate initializer/control preparation",
+            "provenance": {
+              "source_kind": "project_initial_state_and_bounded_pretension",
+              "reused": false,
+              "nominal_is_current_target_solution": false,
+              "historical_states_reused": false,
+              "current_scope": {
+                "robot": {
+                  "family": "tendon_robot_family",
+                  "identity": "bb72ca368cfc65aaeb4314a98be2519b20468e803da4bb0ec70e23cf015a81ee"
+                },
+                "task": {
+                  "family": "task.reach",
+                  "identity": "67cb0abab77924700a286e07217f3252fff71d9a38558c2528676346d454c535",
+                  "environment": "5cee25b33f4ff19cb0abd93651ce9077a81665990f07d8f5a4967497e8e82a4d",
+                  "goal": "bb82685eef609372d56d39203f4988af6bd5afe14bb4e908cbe889c051cb9365",
+                  "timing": {
+                    "timestep_s": 0.0005,
+                    "control_period_s": 0.01,
+                    "sample_period_s": 0.01,
+                    "duration_s": 0.35,
+                    "termination": [
+                      "duration",
+                      "numerical_failure"
+                    ]
+                  },
+                  "initializer": "3a90c93217f15e9a60db7f65f611911f4aa53f1a4987340949e1068fd2647c22"
+                },
+                "backend": {
+                  "extension_id": "backend.family_mujoco",
+                  "version": "1.1.0",
+                  "parameters": {
+                    "contract": "family.mujoco_parameters",
+                    "version": "1.0.0",
+                    "data": {
+                      "contact_model": "mujoco_convex_native",
+                      "friction": [
+                        0.0,
+                        0.0,
+                        0.0
+                      ],
+                      "integrator": "implicitfast",
+                      "timestep_source": "task.timing.timestep_s"
+                    }
+                  }
+                },
+                "execution_model": {
+                  "extension_id": "model.serial_bending_cells",
+                  "version": "1.0.0",
+                  "parameters": {
+                    "contract": "family.dynamics_model",
+                    "version": "1.0.0",
+                    "data": {}
+                  }
+                },
+                "discretization": {
+                  "contract": "family.discretization",
+                  "version": "1.0.0",
+                  "data": {
+                    "cells": {
+                      "segment_0": 12,
+                      "segment_1": 12
+                    },
+                    "coordinates": "two_principal_bending_angles_per_cell",
+                    "model": "serial_bending_cells_v1",
+                    "version": "serial_bending_discretization_v1"
+                  }
+                },
+                "controller": {
+                  "extension_id": "controller.sorosim_matlab_nmpc",
+                  "version": "1.0.0",
+                  "parameters": {
+                    "contract": "family.sorosim_reach_control",
+                    "version": "1.0.0",
+                    "data": {
+                      "numerical_source": "initial_state_pretension",
+                      "recipe": {
+                        "basis": {
+                          "strategy": "structural_linear"
+                        },
+                        "constraint_jacobian_mode": "reverse",
+                        "curvature_scale_rad_m": 10.0,
+                        "evaluation_threads": 1,
+                        "feasible_return": null,
+                        "holding_brake_lead_s": 0.02,
+                        "holding_speed_cost_mode": "time_integral_v1",
+                        "holding_speed_cost_window_s": 0.05,
+                        "holding_tip_speed_weight": 0.1,
+                        "horizon": 10,
+                        "integration_method": "implicit_euler",
+                        "max_cpu_s": null,
+                        "max_iterations": 120,
+                        "max_unusable_updates": 3,
+                        "position_error_scale_m": null,
+                        "rate_scale_rad_m_s": 1000.0,
+                        "recover_returned_tensions": true,
+                        "regenerate_warm_states": true,
+                        "root_tolerance": 1e-10,
+                        "seed_position_tolerance_fraction": 0.5,
+                        "seed_speed_limit_m_s": 0.02,
+                        "stopping_policy": "research_work_v1",
+                        "substeps": 1,
+                        "tension_weight": 0.0001,
+                        "terminal_tip_speed_weight": 0.1,
+                        "terminal_velocity_weight": 0.0001,
+                        "terminal_weight": 5.0,
+                        "tip_speed_scale_m_s": 0.02,
+                        "tolerance": 1e-06,
+                        "tracking_weight": 1.0,
+                        "variation_weight": 0.001,
+                        "velocity_weight": 0.0001
+                      },
+                      "settling": {
+                        "position_limit_m": 0.01,
+                        "speed_limit_m_s": 0.02,
+                        "window_s": 0.05
+                      },
+                      "solver": {
+                        "algorithm": "sqp",
+                        "constraint_tolerance": 1e-08,
+                        "engine_options": "-nodesktop -nosplash",
+                        "gauss_per_interval": 5,
+                        "optimality_tolerance": 1e-06,
+                        "routing_difference_step": 1e-05,
+                        "step_tolerance": 1e-10
+                      }
+                    }
+                  }
+                },
+                "seed": 17
+              },
+              "physics_identity": "bd0371aad5cdc49b4e074ac130fb27ed12d86b8b6bfcbc2ee9450ab6857d798f",
+              "resolved_basis_identity": "63aab968b8f0732f13dc73454e2628ee015c67b6b92aa47639d9f8b55d928f0e",
+              "actual_initial_state_source": "Candidate Task initializer then measured backend state at every update",
+              "previous_input_source": "candidate bounded pretension",
+              "validity": "Tensions are numerical guesses; placeholder states must be regenerated using candidate dynamics before use"
+            },
+            "solver": "MATLAB fsolve",
+            "status": 3,
+            "iterations": 4,
+            "function_evaluations": 5,
+            "static_residual_inf": 5.753047777751208e-17,
+            "success": true,
+            "computed_tensions_n": [
+              0.2,
+              0.2,
+              0.2,
+              0.2
+            ]
+          },
+          "source": {
+            "name": "fixed_input_equilibrium",
+            "phase": "configuration_fixed_input_equilibrium",
+            "remaining_task_s": 0.35,
+            "actual_time_s": null,
+            "construction": {
+              "method": "existing candidate initializer/control preparation",
+              "provenance": {
+                "source_kind": "project_initial_state_and_bounded_pretension",
+                "reused": false,
+                "nominal_is_current_target_solution": false,
+                "historical_states_reused": false,
+                "current_scope": {
+                  "robot": {
+                    "family": "tendon_robot_family",
+                    "identity": "bb72ca368cfc65aaeb4314a98be2519b20468e803da4bb0ec70e23cf015a81ee"
+                  },
+                  "task": {
+                    "family": "task.reach",
+                    "identity": "67cb0abab77924700a286e07217f3252fff71d9a38558c2528676346d454c535",
+                    "environment": "5cee25b33f4ff19cb0abd93651ce9077a81665990f07d8f5a4967497e8e82a4d",
+                    "goal": "bb82685eef609372d56d39203f4988af6bd5afe14bb4e908cbe889c051cb9365",
+                    "timing": {
+                      "timestep_s": 0.0005,
+                      "control_period_s": 0.01,
+                      "sample_period_s": 0.01,
+                      "duration_s": 0.35,
+                      "termination": [
+                        "duration",
+                        "numerical_failure"
+                      ]
+                    },
+                    "initializer": "3a90c93217f15e9a60db7f65f611911f4aa53f1a4987340949e1068fd2647c22"
+                  },
+                  "backend": {
+                    "extension_id": "backend.family_mujoco",
+                    "version": "1.1.0",
+                    "parameters": {
+                      "contract": "family.mujoco_parameters",
+                      "version": "1.0.0",
+                      "data": {
+                        "contact_model": "mujoco_convex_native",
+                        "friction": [
+                          0.0,
+                          0.0,
+                          0.0
+                        ],
+                        "integrator": "implicitfast",
+                        "timestep_source": "task.timing.timestep_s"
+                      }
+                    }
+                  },
+                  "execution_model": {
+                    "extension_id": "model.serial_bending_cells",
+                    "version": "1.0.0",
+                    "parameters": {
+                      "contract": "family.dynamics_model",
+                      "version": "1.0.0",
+                      "data": {}
+                    }
+                  },
+                  "discretization": {
+                    "contract": "family.discretization",
+                    "version": "1.0.0",
+                    "data": {
+                      "cells": {
+                        "segment_0": 12,
+                        "segment_1": 12
+                      },
+                      "coordinates": "two_principal_bending_angles_per_cell",
+                      "model": "serial_bending_cells_v1",
+                      "version": "serial_bending_discretization_v1"
+                    }
+                  },
+                  "controller": {
+                    "extension_id": "controller.sorosim_matlab_nmpc",
+                    "version": "1.0.0",
+                    "parameters": {
+                      "contract": "family.sorosim_reach_control",
+                      "version": "1.0.0",
+                      "data": {
+                        "numerical_source": "initial_state_pretension",
+                        "recipe": {
+                          "basis": {
+                            "strategy": "structural_linear"
+                          },
+                          "constraint_jacobian_mode": "reverse",
+                          "curvature_scale_rad_m": 10.0,
+                          "evaluation_threads": 1,
+                          "feasible_return": null,
+                          "holding_brake_lead_s": 0.02,
+                          "holding_speed_cost_mode": "time_integral_v1",
+                          "holding_speed_cost_window_s": 0.05,
+                          "holding_tip_speed_weight": 0.1,
+                          "horizon": 10,
+                          "integration_method": "implicit_euler",
+                          "max_cpu_s": null,
+                          "max_iterations": 120,
+                          "max_unusable_updates": 3,
+                          "position_error_scale_m": null,
+                          "rate_scale_rad_m_s": 1000.0,
+                          "recover_returned_tensions": true,
+                          "regenerate_warm_states": true,
+                          "root_tolerance": 1e-10,
+                          "seed_position_tolerance_fraction": 0.5,
+                          "seed_speed_limit_m_s": 0.02,
+                          "stopping_policy": "research_work_v1",
+                          "substeps": 1,
+                          "tension_weight": 0.0001,
+                          "terminal_tip_speed_weight": 0.1,
+                          "terminal_velocity_weight": 0.0001,
+                          "terminal_weight": 5.0,
+                          "tip_speed_scale_m_s": 0.02,
+                          "tolerance": 1e-06,
+                          "tracking_weight": 1.0,
+                          "variation_weight": 0.001,
+                          "velocity_weight": 0.0001
+                        },
+                        "settling": {
+                          "position_limit_m": 0.01,
+                          "speed_limit_m_s": 0.02,
+                          "window_s": 0.05
+                        },
+                        "solver": {
+                          "algorithm": "sqp",
+                          "constraint_tolerance": 1e-08,
+                          "engine_options": "-nodesktop -nosplash",
+                          "gauss_per_interval": 5,
+                          "optimality_tolerance": 1e-06,
+                          "routing_difference_step": 1e-05,
+                          "step_tolerance": 1e-10
+                        }
+                      }
+                    }
+                  },
+                  "seed": 17
+                },
+                "physics_identity": "bd0371aad5cdc49b4e074ac130fb27ed12d86b8b6bfcbc2ee9450ab6857d798f",
+                "resolved_basis_identity": "63aab968b8f0732f13dc73454e2628ee015c67b6b92aa47639d9f8b55d928f0e",
+                "actual_initial_state_source": "Candidate Task initializer then measured backend state at every update",
+                "previous_input_source": "candidate bounded pretension",
+                "validity": "Tensions are numerical guesses; placeholder states must be regenerated using candidate dynamics before use"
+              },
+              "solver": "MATLAB fsolve",
+              "status": 3,
+              "iterations": 4,
+              "function_evaluations": 5,
+              "static_residual_inf": 5.753047777751208e-17,
+              "success": true,
+              "computed_tensions_n": [
+                0.2,
+                0.2,
+                0.2,
+                0.2
+              ]
+            },
+            "equilibrium": true,
+            "linearization_scope": "local equilibrium linearization"
+          }
+        },
+        "scoring_window_s": null,
+        "comparison_conditions": "Same protocol, window, normalization, input treatment, operating-point construction, task and model implementation. Changed candidates use their own compiled model.",
+        "unsupported_conclusions": [
+          "backend task acceptance",
+          "whole holding-window compliance",
+          "damping margin or decay rate",
+          "global feasibility/infeasibility",
+          "structural improvement attribution",
+          "manufacturable material validation"
+        ],
+        "scoring_horizon": "static operating-point construction; no dynamic horizon",
+        "definition": "Euclidean target position residual from bounded local equilibrium construction",
+        "preference": "smaller",
+        "units": "m",
+        "normalization": "none for scalar position residual",
+        "input_treatment": "Attempt tensions bounded by actual candidate limits",
+        "represented_constraints": "Bounded local static solve and independently checked residuals",
+        "supported_interpretation": "Quality of this local construction; failure is not proof of global infeasibility"
+      }
+    },
+    "scoped_claim": {
+      "contract": "scoped-mathematical-claim-v1",
+      "conclusion": "diagnostic",
+      "binding": {
+        "candidate_id": "core-c40023793e53d6f04af68c55ed4247f60836b1d6d07692d105c4d6b8a166328b",
+        "candidate": {
+          "artifact_id": "5a6ee862b969524dff14a16772736dafef0be3d99988ec718b4c808840f3a15e",
+          "media_type": "application/json"
+        },
+        "configuration": {
+          "artifact_id": "f38a7bb25aabcb4d792d3ee322577053560e49e4bbb8acf669b28f424533d00e",
+          "media_type": "application/json"
+        },
+        "effective_configuration_identity": "f38a7bb25aabcb4d792d3ee322577053560e49e4bbb8acf669b28f424533d00e",
+        "task_identity": "67cb0abab77924700a286e07217f3252fff71d9a38558c2528676346d454c535",
+        "basis": {
+          "strategy": "structural_linear"
+        },
+        "coordinate_order": [
+          "segment_0.kappa_y_node_0",
+          "segment_0.kappa_y_node_1",
+          "segment_0.kappa_y_node_2",
+          "segment_0.kappa_z_node_0",
+          "segment_0.kappa_z_node_1",
+          "segment_0.kappa_z_node_2",
+          "segment_1.kappa_y_node_0",
+          "segment_1.kappa_y_node_1",
+          "segment_1.kappa_y_node_2",
+          "segment_1.kappa_z_node_0",
+          "segment_1.kappa_z_node_1",
+          "segment_1.kappa_z_node_2"
+        ],
+        "tendon_order": [
+          "tendon_0",
+          "tendon_1",
+          "tendon_2",
+          "tendon_3"
+        ],
+        "tension_limits_n": [
+          8.0,
+          8.0,
+          8.0,
+          8.0
+        ],
+        "tension_bounds_n": [
+          [
+            0.0,
+            8.0
+          ],
+          [
+            0.0,
+            8.0
+          ],
+          [
+            0.0,
+            8.0
+          ],
+          [
+            0.0,
+            8.0
+          ]
+        ],
+        "target_m": [
+          0.28,
+          0.02,
+          0.2
+        ],
+        "source_identity": "0793d20569402760ca055f73f6f97d80d73d0fe3c051ff2b60ebad1519db02aa",
+        "evaluation_profile_identity": "f45b3651e07e3f9d5fecd7812304fabe5e7a015aae5844f4862c0ef69dd1df65",
+        "canonical_task_identity": "596fd628ade55dea581780cb3eebd3efebe83b7585554220ca83a7f2717e0ca0",
+        "initialization_provenance": {
+          "canonical_task_identity": "596fd628ade55dea581780cb3eebd3efebe83b7585554220ca83a7f2717e0ca0",
+          "effective": {
+            "qpos_rad": {
+              "segment_0_cell_0_y": 0.0,
+              "segment_0_cell_0_z": 0.0,
+              "segment_0_cell_10_y": 0.0,
+              "segment_0_cell_10_z": 0.0,
+              "segment_0_cell_11_y": 0.0,
+              "segment_0_cell_11_z": 0.0,
+              "segment_0_cell_1_y": 0.0,
+              "segment_0_cell_1_z": 0.0,
+              "segment_0_cell_2_y": 0.0,
+              "segment_0_cell_2_z": 0.0,
+              "segment_0_cell_3_y": 0.0,
+              "segment_0_cell_3_z": 0.0,
+              "segment_0_cell_4_y": 0.0,
+              "segment_0_cell_4_z": 0.0,
+              "segment_0_cell_5_y": 0.0,
+              "segment_0_cell_5_z": 0.0,
+              "segment_0_cell_6_y": 0.0,
+              "segment_0_cell_6_z": 0.0,
+              "segment_0_cell_7_y": 0.0,
+              "segment_0_cell_7_z": 0.0,
+              "segment_0_cell_8_y": 0.0,
+              "segment_0_cell_8_z": 0.0,
+              "segment_0_cell_9_y": 0.0,
+              "segment_0_cell_9_z": 0.0,
+              "segment_1_cell_0_y": 0.0,
+              "segment_1_cell_0_z": 0.0,
+              "segment_1_cell_10_y": 0.0,
+              "segment_1_cell_10_z": 0.0,
+              "segment_1_cell_11_y": 0.0,
+              "segment_1_cell_11_z": 0.0,
+              "segment_1_cell_1_y": 0.0,
+              "segment_1_cell_1_z": 0.0,
+              "segment_1_cell_2_y": 0.0,
+              "segment_1_cell_2_z": 0.0,
+              "segment_1_cell_3_y": 0.0,
+              "segment_1_cell_3_z": 0.0,
+              "segment_1_cell_4_y": 0.0,
+              "segment_1_cell_4_z": 0.0,
+              "segment_1_cell_5_y": 0.0,
+              "segment_1_cell_5_z": 0.0,
+              "segment_1_cell_6_y": 0.0,
+              "segment_1_cell_6_z": 0.0,
+              "segment_1_cell_7_y": 0.0,
+              "segment_1_cell_7_z": 0.0,
+              "segment_1_cell_8_y": 0.0,
+              "segment_1_cell_8_z": 0.0,
+              "segment_1_cell_9_y": 0.0,
+              "segment_1_cell_9_z": 0.0
+            },
+            "qvel_rad_s": {
+              "segment_0_cell_0_y": 0.0,
+              "segment_0_cell_0_z": 0.0,
+              "segment_0_cell_10_y": 0.0,
+              "segment_0_cell_10_z": 0.0,
+              "segment_0_cell_11_y": 0.0,
+              "segment_0_cell_11_z": 0.0,
+              "segment_0_cell_1_y": 0.0,
+              "segment_0_cell_1_z": 0.0,
+              "segment_0_cell_2_y": 0.0,
+              "segment_0_cell_2_z": 0.0,
+              "segment_0_cell_3_y": 0.0,
+              "segment_0_cell_3_z": 0.0,
+              "segment_0_cell_4_y": 0.0,
+              "segment_0_cell_4_z": 0.0,
+              "segment_0_cell_5_y": 0.0,
+              "segment_0_cell_5_z": 0.0,
+              "segment_0_cell_6_y": 0.0,
+              "segment_0_cell_6_z": 0.0,
+              "segment_0_cell_7_y": 0.0,
+              "segment_0_cell_7_z": 0.0,
+              "segment_0_cell_8_y": 0.0,
+              "segment_0_cell_8_z": 0.0,
+              "segment_0_cell_9_y": 0.0,
+              "segment_0_cell_9_z": 0.0,
+              "segment_1_cell_0_y": 0.0,
+              "segment_1_cell_0_z": 0.0,
+              "segment_1_cell_10_y": 0.0,
+              "segment_1_cell_10_z": 0.0,
+              "segment_1_cell_11_y": 0.0,
+              "segment_1_cell_11_z": 0.0,
+              "segment_1_cell_1_y": 0.0,
+              "segment_1_cell_1_z": 0.0,
+              "segment_1_cell_2_y": 0.0,
+              "segment_1_cell_2_z": 0.0,
+              "segment_1_cell_3_y": 0.0,
+              "segment_1_cell_3_z": 0.0,
+              "segment_1_cell_4_y": 0.0,
+              "segment_1_cell_4_z": 0.0,
+              "segment_1_cell_5_y": 0.0,
+              "segment_1_cell_5_z": 0.0,
+              "segment_1_cell_6_y": 0.0,
+              "segment_1_cell_6_z": 0.0,
+              "segment_1_cell_7_y": 0.0,
+              "segment_1_cell_7_z": 0.0,
+              "segment_1_cell_8_y": 0.0,
+              "segment_1_cell_8_z": 0.0,
+              "segment_1_cell_9_y": 0.0,
+              "segment_1_cell_9_z": 0.0
+            },
+            "unspecified": "zero"
+          },
+          "rule": "all_candidate_dofs_zero_v1"
+        },
+        "task_id": "s7-reach-offset-20261019",
+        "task_version": "1.0.0"
+      },
+      "requirement_identity": "8e7b2f7dad38692d98d304e153d6d551c778cdafe829cf34978191911f44f075",
+      "model_identity": "cdbe0eef21f1623a94338a321017319ab190b13786741cf89869b16b492fb45f",
+      "model_declaration": {
+        "model_id": "model.sorosim_gvs",
+        "model_version": "1.0.0",
+        "representation_id": "63aab968b8f0732f13dc73454e2628ee015c67b6b92aa47639d9f8b55d928f0e",
+        "relevant_assumptions": [
+          "supported serial tendon-driven continuum topology",
+          "selected strain basis spans deformation relevant to the use",
+          "inextensible centerline",
+          "no shear",
+          "no torsion",
+          "straight frictionless tendon spans"
+        ]
+      },
+      "protocol_identity": "7ee044c26f91b5a7cbb53bfc95322dd6dbe8d298f196f1a6ca121305d13082d9",
+      "operating_point": {
+        "name": "fixed_input_equilibrium",
+        "phase": "configuration_fixed_input_equilibrium",
+        "remaining_task_s": 0.35,
+        "actual_time_s": null,
+        "construction": {
+          "method": "existing candidate initializer/control preparation",
+          "provenance": {
+            "source_kind": "project_initial_state_and_bounded_pretension",
+            "reused": false,
+            "nominal_is_current_target_solution": false,
+            "historical_states_reused": false,
+            "current_scope": {
+              "robot": {
+                "family": "tendon_robot_family",
+                "identity": "bb72ca368cfc65aaeb4314a98be2519b20468e803da4bb0ec70e23cf015a81ee"
+              },
+              "task": {
+                "family": "task.reach",
+                "identity": "67cb0abab77924700a286e07217f3252fff71d9a38558c2528676346d454c535",
+                "environment": "5cee25b33f4ff19cb0abd93651ce9077a81665990f07d8f5a4967497e8e82a4d",
+                "goal": "bb82685eef609372d56d39203f4988af6bd5afe14bb4e908cbe889c051cb9365",
+                "timing": {
+                  "timestep_s": 0.0005,
+                  "control_period_s": 0.01,
+                  "sample_period_s": 0.01,
+                  "duration_s": 0.35,
+                  "termination": [
+                    "duration",
+                    "numerical_failure"
+                  ]
+                },
+                "initializer": "3a90c93217f15e9a60db7f65f611911f4aa53f1a4987340949e1068fd2647c22"
+              },
+              "backend": {
+                "extension_id": "backend.family_mujoco",
+                "version": "1.1.0",
+                "parameters": {
+                  "contract": "family.mujoco_parameters",
+                  "version": "1.0.0",
+                  "data": {
+                    "contact_model": "mujoco_convex_native",
+                    "friction": [
+                      0.0,
+                      0.0,
+                      0.0
+                    ],
+                    "integrator": "implicitfast",
+                    "timestep_source": "task.timing.timestep_s"
+                  }
+                }
+              },
+              "execution_model": {
+                "extension_id": "model.serial_bending_cells",
+                "version": "1.0.0",
+                "parameters": {
+                  "contract": "family.dynamics_model",
+                  "version": "1.0.0",
+                  "data": {}
+                }
+              },
+              "discretization": {
+                "contract": "family.discretization",
+                "version": "1.0.0",
+                "data": {
+                  "cells": {
+                    "segment_0": 12,
+                    "segment_1": 12
+                  },
+                  "coordinates": "two_principal_bending_angles_per_cell",
+                  "model": "serial_bending_cells_v1",
+                  "version": "serial_bending_discretization_v1"
+                }
+              },
+              "controller": {
+                "extension_id": "controller.sorosim_matlab_nmpc",
+                "version": "1.0.0",
+                "parameters": {
+                  "contract": "family.sorosim_reach_control",
+                  "version": "1.0.0",
+                  "data": {
+                    "numerical_source": "initial_state_pretension",
+                    "recipe": {
+                      "basis": {
+                        "strategy": "structural_linear"
+                      },
+                      "constraint_jacobian_mode": "reverse",
+                      "curvature_scale_rad_m": 10.0,
+                      "evaluation_threads": 1,
+                      "feasible_return": null,
+                      "holding_brake_lead_s": 0.02,
+                      "holding_speed_cost_mode": "time_integral_v1",
+                      "holding_speed_cost_window_s": 0.05,
+                      "holding_tip_speed_weight": 0.1,
+                      "horizon": 10,
+                      "integration_method": "implicit_euler",
+                      "max_cpu_s": null,
+                      "max_iterations": 120,
+                      "max_unusable_updates": 3,
+                      "position_error_scale_m": null,
+                      "rate_scale_rad_m_s": 1000.0,
+                      "recover_returned_tensions": true,
+                      "regenerate_warm_states": true,
+                      "root_tolerance": 1e-10,
+                      "seed_position_tolerance_fraction": 0.5,
+                      "seed_speed_limit_m_s": 0.02,
+                      "stopping_policy": "research_work_v1",
+                      "substeps": 1,
+                      "tension_weight": 0.0001,
+                      "terminal_tip_speed_weight": 0.1,
+                      "terminal_velocity_weight": 0.0001,
+                      "terminal_weight": 5.0,
+                      "tip_speed_scale_m_s": 0.02,
+                      "tolerance": 1e-06,
+                      "tracking_weight": 1.0,
+                      "variation_weight": 0.001,
+                      "velocity_weight": 0.0001
+                    },
+                    "settling": {
+                      "position_limit_m": 0.01,
+                      "speed_limit_m_s": 0.02,
+                      "window_s": 0.05
+                    },
+                    "solver": {
+                      "algorithm": "sqp",
+                      "constraint_tolerance": 1e-08,
+                      "engine_options": "-nodesktop -nosplash",
+                      "gauss_per_interval": 5,
+                      "optimality_tolerance": 1e-06,
+                      "routing_difference_step": 1e-05,
+                      "step_tolerance": 1e-10
+                    }
+                  }
+                }
+              },
+              "seed": 17
+            },
+            "physics_identity": "bd0371aad5cdc49b4e074ac130fb27ed12d86b8b6bfcbc2ee9450ab6857d798f",
+            "resolved_basis_identity": "63aab968b8f0732f13dc73454e2628ee015c67b6b92aa47639d9f8b55d928f0e",
+            "actual_initial_state_source": "Candidate Task initializer then measured backend state at every update",
+            "previous_input_source": "candidate bounded pretension",
+            "validity": "Tensions are numerical guesses; placeholder states must be regenerated using candidate dynamics before use"
+          },
+          "solver": "MATLAB fsolve",
+          "status": 3,
+          "iterations": 4,
+          "function_evaluations": 5,
+          "static_residual_inf": 5.753047777751208e-17,
+          "success": true,
+          "computed_tensions_n": [
+            0.2,
+            0.2,
+            0.2,
+            0.2
+          ]
+        },
+        "equilibrium": true,
+        "linearization_scope": "local equilibrium linearization"
+      },
+      "horizon": {
+        "task_duration_s": 0.35,
+        "remaining_task_s": 0.35,
+        "analysis_horizon_s": 0.35,
+        "period_s": 0.01,
+        "origin": null,
+        "interpretation": "Actual saved-state remaining horizon, or nominal horizon from the declared configuration operating point."
+      },
+      "physical_inputs": {
+        "signal": "tendon_tension",
+        "units": "N",
+        "frame": "tendon_path",
+        "phase": "pre_step",
+        "control_period_s": 0.01,
+        "tendon_order": [
+          "tendon_0",
+          "tendon_1",
+          "tendon_2",
+          "tendon_3"
+        ],
+        "lower": [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "upper": [
+          8.0,
+          8.0,
+          8.0,
+          8.0
+        ],
+        "provenance": [
+          "/robot/structure/data/tendons",
+          "/task/timing/control_period_s"
+        ]
+      },
+      "constraint_coverage": [
+        {
+          "constraint_id": "terminal_error_m",
+          "expressible": true,
+          "status": "diagnostic",
+          "analyzed_indices": [],
+          "reason": "Local position authority/static construction only; no sampled constraint verification."
+        },
+        {
+          "constraint_id": "holding_max_error_m",
+          "expressible": true,
+          "status": "diagnostic",
+          "analyzed_indices": [],
+          "reason": "Local position authority/static construction only; no sampled constraint verification."
+        },
+        {
+          "constraint_id": "holding_max_speed_m_s",
+          "expressible": true,
+          "status": "not_applicable",
+          "analyzed_indices": [],
+          "reason": "Existing tools do not enforce this constraint kind or sampled window."
+        }
+      ],
+      "numerical_result_pointer": "/sensitivity",
+      "computation_status": "computed",
+      "verification_status": "perturbed_equilibria_checked",
+      "supported_interpretation": "Local implicit-function sensitivity in the fixed-topology physical model; not a globally improving direction or task feasibility.",
+      "unsupported_conclusions": [
+        "task acceptance",
+        "whole holding-window compliance",
+        "global nonlinear feasibility or infeasibility",
+        "hardware performance",
+        "robustness",
+        "repeatability",
+        "equilibrium validity at a non-equilibrium point"
+      ]
+    },
+    "analysis_applicability": {
+      "status": "applicable",
+      "reasons": [],
+      "constraint_coverage": [
+        {
+          "constraint_id": "terminal_error_m",
+          "expressible": true,
+          "status": "diagnostic",
+          "analyzed_indices": [],
+          "reason": "Local position authority/static construction only; no sampled constraint verification."
+        },
+        {
+          "constraint_id": "holding_max_error_m",
+          "expressible": true,
+          "status": "diagnostic",
+          "analyzed_indices": [],
+          "reason": "Local position authority/static construction only; no sampled constraint verification."
+        },
+        {
+          "constraint_id": "holding_max_speed_m_s",
+          "expressible": true,
+          "status": "not_applicable",
+          "analyzed_indices": [],
+          "reason": "Existing tools do not enforce this constraint kind or sampled window."
+        }
+      ],
+      "full_task_supported": false,
+      "execution_support": "not_assessed",
+      "model_assessment": {
+        "model_id": "model.sorosim_gvs",
+        "model_version": "1.0.0",
+        "design_id": "serial_family_candidate",
+        "design_identity": "10035885ded80b7afbf2faa28988c6275a18ac04f3232c5d0972acced81af9ad",
+        "representation_id": "63aab968b8f0732f13dc73454e2628ee015c67b6b92aa47639d9f8b55d928f0e",
+        "representation_kind": "gvs_bending_basis_v1",
+        "representation_strategy": "structural_linear",
+        "generalized_coordinate_dimension": 12,
+        "state_dimension": 24,
+        "uses": {
+          "static_equilibrium": {
+            "status": "WARN",
+            "reasons": [
+              "SoRoSim local bending computation is supported; physical agreement outside measured operating points is unvalidated."
+            ],
+            "validation": "unavailable",
+            "evidence": []
+          }
+        },
+        "relevant_assumptions": [
+          "supported serial tendon-driven continuum topology",
+          "selected strain basis spans deformation relevant to the use",
+          "inextensible centerline",
+          "no shear",
+          "no torsion",
+          "straight frictionless tendon spans"
+        ],
+        "unsupported_requested_physics": []
+      },
+      "horizon": {
+        "task_duration_s": 0.35,
+        "remaining_task_s": 0.35,
+        "analysis_horizon_s": 0.35,
+        "period_s": 0.01,
+        "origin": null,
+        "interpretation": "Actual saved-state remaining horizon, or nominal horizon from the declared configuration operating point."
+      }
+    },
+    "task_acceptance": "unmeasured",
+    "numerical_evidence": {
+      "reference": {
+        "artifact_id": "8a466cfcd57cfe18daef6f04fcb822e2cfcaea4230eaf82248b5170bee766799",
+        "media_type": "application/json"
+      },
+      "pointer": "/sensitivity"
+    },
+    "trajectory_evidence": {
+      "solver_scope": null,
+      "witness_pointer": null,
+      "certificate_pointer": null,
+      "certificate": null
+    },
+    "evidence_summary": {
+      "version": "evidence_policy_v1",
+      "claim_kind": "NUMERICAL_DIAGNOSTIC",
+      "verification_status": "perturbed_equilibria_checked",
+      "model_identity": "cdbe0eef21f1623a94338a321017319ab190b13786741cf89869b16b492fb45f",
+      "candidate_identity": {
+        "artifact_id": "5a6ee862b969524dff14a16772736dafef0be3d99988ec718b4c808840f3a15e",
+        "media_type": "application/json"
+      },
+      "design_identity": null,
+      "task_identity": "67cb0abab77924700a286e07217f3252fff71d9a38558c2528676346d454c535",
+      "operating_point": {
+        "name": "fixed_input_equilibrium",
+        "phase": "configuration_fixed_input_equilibrium",
+        "remaining_task_s": 0.35,
+        "actual_time_s": null,
+        "construction": {
+          "method": "existing candidate initializer/control preparation",
+          "provenance": {
+            "source_kind": "project_initial_state_and_bounded_pretension",
+            "reused": false,
+            "nominal_is_current_target_solution": false,
+            "historical_states_reused": false,
+            "current_scope": {
+              "robot": {
+                "family": "tendon_robot_family",
+                "identity": "bb72ca368cfc65aaeb4314a98be2519b20468e803da4bb0ec70e23cf015a81ee"
+              },
+              "task": {
+                "family": "task.reach",
+                "identity": "67cb0abab77924700a286e07217f3252fff71d9a38558c2528676346d454c535",
+                "environment": "5cee25b33f4ff19cb0abd93651ce9077a81665990f07d8f5a4967497e8e82a4d",
+                "goal": "bb82685eef609372d56d39203f4988af6bd5afe14bb4e908cbe889c051cb9365",
+                "timing": {
+                  "timestep_s": 0.0005,
+                  "control_period_s": 0.01,
+                  "sample_period_s": 0.01,
+                  "duration_s": 0.35,
+                  "termination": [
+                    "duration",
+                    "numerical_failure"
+                  ]
+                },
+                "initializer": "3a90c93217f15e9a60db7f65f611911f4aa53f1a4987340949e1068fd2647c22"
+              },
+              "backend": {
+                "extension_id": "backend.family_mujoco",
+                "version": "1.1.0",
+                "parameters": {
+                  "contract": "family.mujoco_parameters",
+                  "version": "1.0.0",
+                  "data": {
+                    "contact_model": "mujoco_convex_native",
+                    "friction": [
+                      0.0,
+                      0.0,
+                      0.0
+                    ],
+                    "integrator": "implicitfast",
+                    "timestep_source": "task.timing.timestep_s"
+                  }
+                }
+              },
+              "execution_model": {
+                "extension_id": "model.serial_bending_cells",
+                "version": "1.0.0",
+                "parameters": {
+                  "contract": "family.dynamics_model",
+                  "version": "1.0.0",
+                  "data": {}
+                }
+              },
+              "discretization": {
+                "contract": "family.discretization",
+                "version": "1.0.0",
+                "data": {
+                  "cells": {
+                    "segment_0": 12,
+                    "segment_1": 12
+                  },
+                  "coordinates": "two_principal_bending_angles_per_cell",
+                  "model": "serial_bending_cells_v1",
+                  "version": "serial_bending_discretization_v1"
+                }
+              },
+              "controller": {
+                "extension_id": "controller.sorosim_matlab_nmpc",
+                "version": "1.0.0",
+                "parameters": {
+                  "contract": "family.sorosim_reach_control",
+                  "version": "1.0.0",
+                  "data": {
+                    "numerical_source": "initial_state_pretension",
+                    "recipe": {
+                      "basis": {
+                        "strategy": "structural_linear"
+                      },
+                      "constraint_jacobian_mode": "reverse",
+                      "curvature_scale_rad_m": 10.0,
+                      "evaluation_threads": 1,
+                      "feasible_return": null,
+                      "holding_brake_lead_s": 0.02,
+                      "holding_speed_cost_mode": "time_integral_v1",
+                      "holding_speed_cost_window_s": 0.05,
+                      "holding_tip_speed_weight": 0.1,
+                      "horizon": 10,
+                      "integration_method": "implicit_euler",
+                      "max_cpu_s": null,
+                      "max_iterations": 120,
+                      "max_unusable_updates": 3,
+                      "position_error_scale_m": null,
+                      "rate_scale_rad_m_s": 1000.0,
+                      "recover_returned_tensions": true,
+                      "regenerate_warm_states": true,
+                      "root_tolerance": 1e-10,
+                      "seed_position_tolerance_fraction": 0.5,
+                      "seed_speed_limit_m_s": 0.02,
+                      "stopping_policy": "research_work_v1",
+                      "substeps": 1,
+                      "tension_weight": 0.0001,
+                      "terminal_tip_speed_weight": 0.1,
+                      "terminal_velocity_weight": 0.0001,
+                      "terminal_weight": 5.0,
+                      "tip_speed_scale_m_s": 0.02,
+                      "tolerance": 1e-06,
+                      "tracking_weight": 1.0,
+                      "variation_weight": 0.001,
+                      "velocity_weight": 0.0001
+                    },
+                    "settling": {
+                      "position_limit_m": 0.01,
+                      "speed_limit_m_s": 0.02,
+                      "window_s": 0.05
+                    },
+                    "solver": {
+                      "algorithm": "sqp",
+                      "constraint_tolerance": 1e-08,
+                      "engine_options": "-nodesktop -nosplash",
+                      "gauss_per_interval": 5,
+                      "optimality_tolerance": 1e-06,
+                      "routing_difference_step": 1e-05,
+                      "step_tolerance": 1e-10
+                    }
+                  }
+                }
+              },
+              "seed": 17
+            },
+            "physics_identity": "bd0371aad5cdc49b4e074ac130fb27ed12d86b8b6bfcbc2ee9450ab6857d798f",
+            "resolved_basis_identity": "63aab968b8f0732f13dc73454e2628ee015c67b6b92aa47639d9f8b55d928f0e",
+            "actual_initial_state_source": "Candidate Task initializer then measured backend state at every update",
+            "previous_input_source": "candidate bounded pretension",
+            "validity": "Tensions are numerical guesses; placeholder states must be regenerated using candidate dynamics before use"
+          },
+          "solver": "MATLAB fsolve",
+          "status": 3,
+          "iterations": 4,
+          "function_evaluations": 5,
+          "static_residual_inf": 5.753047777751208e-17,
+          "success": true,
+          "computed_tensions_n": [
+            0.2,
+            0.2,
+            0.2,
+            0.2
+          ]
+        },
+        "equilibrium": true,
+        "linearization_scope": "local equilibrium linearization"
+      },
+      "covered_samples": {
+        "horizon": {
+          "task_duration_s": 0.35,
+          "remaining_task_s": 0.35,
+          "analysis_horizon_s": 0.35,
+          "period_s": 0.01,
+          "origin": null,
+          "interpretation": "Actual saved-state remaining horizon, or nominal horizon from the declared configuration operating point."
+        },
+        "constraints": [
+          {
+            "constraint_id": "terminal_error_m",
+            "expressible": true,
+            "status": "diagnostic",
+            "analyzed_indices": [],
+            "reason": "Local position authority/static construction only; no sampled constraint verification."
+          },
+          {
+            "constraint_id": "holding_max_error_m",
+            "expressible": true,
+            "status": "diagnostic",
+            "analyzed_indices": [],
+            "reason": "Local position authority/static construction only; no sampled constraint verification."
+          },
+          {
+            "constraint_id": "holding_max_speed_m_s",
+            "expressible": true,
+            "status": "not_applicable",
+            "analyzed_indices": [],
+            "reason": "Existing tools do not enforce this constraint kind or sampled window."
+          }
+        ],
+        "full_task_supported": false
+      },
+      "assumptions": {
+        "model": {
+          "model_id": "model.sorosim_gvs",
+          "model_version": "1.0.0",
+          "representation_id": "63aab968b8f0732f13dc73454e2628ee015c67b6b92aa47639d9f8b55d928f0e",
+          "relevant_assumptions": [
+            "supported serial tendon-driven continuum topology",
+            "selected strain basis spans deformation relevant to the use",
+            "inextensible centerline",
+            "no shear",
+            "no torsion",
+            "straight frictionless tendon spans"
+          ]
+        },
+        "physical_inputs": {
+          "signal": "tendon_tension",
+          "units": "N",
+          "frame": "tendon_path",
+          "phase": "pre_step",
+          "control_period_s": 0.01,
+          "tendon_order": [
+            "tendon_0",
+            "tendon_1",
+            "tendon_2",
+            "tendon_3"
+          ],
+          "lower": [
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "upper": [
+            8.0,
+            8.0,
+            8.0,
+            8.0
+          ],
+          "provenance": [
+            "/robot/structure/data/tendons",
+            "/task/timing/control_period_s"
+          ]
+        },
+        "legacy_applicability": {
+          "status": "applicable",
+          "reasons": [],
+          "constraint_coverage": [
+            {
+              "constraint_id": "terminal_error_m",
+              "expressible": true,
+              "status": "diagnostic",
+              "analyzed_indices": [],
+              "reason": "Local position authority/static construction only; no sampled constraint verification."
+            },
+            {
+              "constraint_id": "holding_max_error_m",
+              "expressible": true,
+              "status": "diagnostic",
+              "analyzed_indices": [],
+              "reason": "Local position authority/static construction only; no sampled constraint verification."
+            },
+            {
+              "constraint_id": "holding_max_speed_m_s",
+              "expressible": true,
+              "status": "not_applicable",
+              "analyzed_indices": [],
+              "reason": "Existing tools do not enforce this constraint kind or sampled window."
+            }
+          ],
+          "full_task_supported": false,
+          "execution_support": "not_assessed",
+          "model_assessment": {
+            "model_id": "model.sorosim_gvs",
+            "model_version": "1.0.0",
+            "design_id": "serial_family_candidate",
+            "design_identity": "10035885ded80b7afbf2faa28988c6275a18ac04f3232c5d0972acced81af9ad",
+            "representation_id": "63aab968b8f0732f13dc73454e2628ee015c67b6b92aa47639d9f8b55d928f0e",
+            "representation_kind": "gvs_bending_basis_v1",
+            "representation_strategy": "structural_linear",
+            "generalized_coordinate_dimension": 12,
+            "state_dimension": 24,
+            "uses": {
+              "static_equilibrium": {
+                "status": "WARN",
+                "reasons": [
+                  "SoRoSim local bending computation is supported; physical agreement outside measured operating points is unvalidated."
+                ],
+                "validation": "unavailable",
+                "evidence": []
+              }
+            },
+            "relevant_assumptions": [
+              "supported serial tendon-driven continuum topology",
+              "selected strain basis spans deformation relevant to the use",
+              "inextensible centerline",
+              "no shear",
+              "no torsion",
+              "straight frictionless tendon spans"
+            ],
+            "unsupported_requested_physics": []
+          },
+          "horizon": {
+            "task_duration_s": 0.35,
+            "remaining_task_s": 0.35,
+            "analysis_horizon_s": 0.35,
+            "period_s": 0.01,
+            "origin": null,
+            "interpretation": "Actual saved-state remaining horizon, or nominal horizon from the declared configuration operating point."
+          }
+        },
+        "source": "Trusted resolved tool artifact; not arbitrary LLM assertions"
+      },
+      "supported_inferences": [
+        "local_diagnostic"
+      ],
+      "unsupported_inferences": [
+        "global_nonlinear_feasibility",
+        "global_nonlinear_infeasibility",
+        "structural_infeasibility",
+        "whole_horizon_from_instantaneous_braking",
+        "adapted_dynamic_improvement_from_static_sensitivity",
+        "unvisited_simulation_descent_guarantee",
+        "continuous_time_compliance",
+        "hardware_performance",
+        "robustness",
+        "repeatability",
+        "observed_task_pass"
+      ],
+      "evidence_reference": {
+        "artifact_id": "8a466cfcd57cfe18daef6f04fcb822e2cfcaea4230eaf82248b5170bee766799",
+        "media_type": "application/json"
+      },
+      "numerical_evidence_pointer": "/sensitivity",
+      "prospective_guarantee": false,
+      "unresolved": [
+        "Nonlinear realization and constraints outside declared model/sample coverage remain unresolved.",
+        "Original independent physical task acceptance is unmeasured by this evidence."
+      ],
+      "next_checks": [
+        "independent_legal_physical_evaluation",
+        "matched_input_refinement",
+        "paired_local_response_check"
+      ]
+    }
+  },
+  "seed": {
+    "candidate": {
+      "artifact_id": "5a6ee862b969524dff14a16772736dafef0be3d99988ec718b4c808840f3a15e",
+      "media_type": "application/json"
+    },
+    "source": {
+      "artifact_id": "b22aa6f30d0743b5975711085bf6ec57f1bc3227a37ffd65493a6327978033d7",
+      "media_type": "application/json"
+    },
+    "task_acceptance": "unmeasured",
+    "diagnostic": {
+      "artifact_id": "13773f10954679315a606debd67f7f8e5454d38df5f3e525c92aa00e811cd579",
+      "media_type": "application/json"
+    },
+    "method": "mathematical_response"
+  },
+  "physical_result": {
+    "reference": {
+      "artifact_id": "fe1dc376e49fce954cfdf60ca49bd63f090493ae7a961f4ffe68b7503754dab3",
+      "media_type": "application/json"
+    },
+    "status": "evaluated",
+    "candidate": {
+      "artifact_id": "5a6ee862b969524dff14a16772736dafef0be3d99988ec718b4c808840f3a15e",
+      "media_type": "application/json"
+    },
+    "owning_study": "s9-engineering-20261020",
+    "execution_id": "s9-eng-physics-physical",
+    "source_reference": {
+      "artifact_id": "b22aa6f30d0743b5975711085bf6ec57f1bc3227a37ffd65493a6327978033d7",
+      "media_type": "application/json"
+    },
+    "raw_reference": {
+      "artifact_id": "f609f802a558cd116cb379850fa7b2bac3becd5b004966eab8cf3f882a618b2a",
+      "media_type": "application/json"
+    },
+    "evaluation_reference": {
+      "artifact_id": "3135bd5bd2f43113468d5b6bebd1d3817ef9bd7f96e7e216025f5983c840cb3a",
+      "media_type": "application/json"
+    },
+    "acceptance": {
+      "contract": "research.task_acceptance",
+      "version": "1.0.0",
+      "protocol_id": "offline_reach_hold_v1",
+      "task_family": "task.reach",
+      "task_identity": "67cb0abab77924700a286e07217f3252fff71d9a38558c2528676346d454c535",
+      "status": "valid_failure",
+      "accepted": false,
+      "components": {
+        "evaluation_validity": {
+          "value": "valid",
+          "passed": true,
+          "unit": null,
+          "limit": null,
+          "reason": null
+        },
+        "execution_complete": {
+          "value": true,
+          "passed": true,
+          "unit": null,
+          "limit": null,
+          "reason": null
+        },
+        "task_evaluator": {
+          "value": false,
+          "passed": false,
+          "unit": null,
+          "limit": null,
+          "reason": null
+        },
+        "evaluator:task_bound": {
+          "value": 0.17053412847521832,
+          "passed": false,
+          "unit": "m",
+          "limit": 0.01,
+          "reason": null
+        },
+        "solver_errors": {
+          "value": 0,
+          "passed": true,
+          "unit": "count",
+          "limit": 0,
+          "reason": null
+        },
+        "force_bounds": {
+          "value": 0.0,
+          "passed": true,
+          "unit": "N",
+          "limit": 1e-08,
+          "reason": null
+        },
+        "holding_coverage": {
+          "value": true,
+          "passed": true,
+          "unit": "inclusive uniform samples",
+          "limit": 6,
+          "reason": null
+        },
+        "holding_position": {
+          "value": 0.19542469227190418,
+          "passed": false,
+          "unit": "m",
+          "limit": 0.01,
+          "reason": null
+        },
+        "holding_speed": {
+          "value": 0.7460602522521099,
+          "passed": false,
+          "unit": "m/s",
+          "limit": 0.02,
+          "reason": null
+        }
+      },
+      "metrics": {
+        "terminal_error_m": 0.17053412847521832,
+        "holding_max_error_m": 0.19542469227190418,
+        "holding_max_speed_m_s": 0.7460602522521099
+      },
+      "missing": [],
+      "issues": [],
+      "execution_id": "8368e998e75047d3a1ff7d390bacf6a6",
+      "sources": {
+        "evaluation": {
+          "artifact_id": "3135bd5bd2f43113468d5b6bebd1d3817ef9bd7f96e7e216025f5983c840cb3a",
+          "media_type": "application/json"
+        },
+        "profile": null
+      },
+      "evidence_binding": {
+        "evaluation": {
+          "artifact_id": "3135bd5bd2f43113468d5b6bebd1d3817ef9bd7f96e7e216025f5983c840cb3a",
+          "media_type": "application/json"
+        },
+        "profile": null,
+        "simulation": {
+          "artifact_id": "f609f802a558cd116cb379850fa7b2bac3becd5b004966eab8cf3f882a618b2a",
+          "media_type": "application/json"
+        },
+        "evaluation_binding": {
+          "source": {
+            "artifact_id": "f609f802a558cd116cb379850fa7b2bac3becd5b004966eab8cf3f882a618b2a",
+            "media_type": "application/json"
+          },
+          "source_execution_id": null,
+          "original_execution_id": null
+        },
+        "profile_binding": {
+          "evaluation": {
+            "artifact_id": "3135bd5bd2f43113468d5b6bebd1d3817ef9bd7f96e7e216025f5983c840cb3a",
+            "media_type": "application/json"
+          },
+          "simulation": {
+            "artifact_id": "f609f802a558cd116cb379850fa7b2bac3becd5b004966eab8cf3f882a618b2a",
+            "media_type": "application/json"
+          },
+          "execution_id": "8368e998e75047d3a1ff7d390bacf6a6"
+        }
+      },
+      "evaluator_tension_channels": null,
+      "timing": {
+        "control_period_s": 0.01,
+        "duration_s": 0.35,
+        "sample_period_s": 0.01,
+        "termination": [
+          "duration",
+          "numerical_failure"
+        ],
+        "timestep_s": 0.0005,
+        "real_time_required": false,
+        "real_time_demonstrated": null,
+        "deadline_misses": null,
+        "mean_update_s": null,
+        "simulation_wall_s": null
+      },
+      "continuous_time_guarantee": false
+    },
+    "comparison": {
+      "aligned": false,
+      "available_samples": 0,
+      "initial_position_offset_m": null,
+      "max_position_difference_m": null,
+      "max_velocity_difference_m_s": null,
+      "samples": []
+    },
+    "profile": {
+      "complete": true,
+      "execution_id": "8368e998e75047d3a1ff7d390bacf6a6",
+      "simulation": {
+        "artifact_id": "f609f802a558cd116cb379850fa7b2bac3becd5b004966eab8cf3f882a618b2a",
+        "media_type": "application/json"
+      },
+      "evaluation": {
+        "artifact_id": "3135bd5bd2f43113468d5b6bebd1d3817ef9bd7f96e7e216025f5983c840cb3a",
+        "media_type": "application/json"
+      },
+      "task": {
+        "contract_version": "1.0.0",
+        "task_id": "s7-reach-offset-20261019",
+        "task_version": "1.0.0",
+        "name": "S7 independently frozen offset reach and hold",
+        "status": "development_valid",
+        "source": "User S7 second target fixed before any S7 physical execution; original reach thresholds and timing retained.",
+        "family": "task.reach",
+        "goal": {
+          "contract": "reference.reach_goal",
+          "version": "1.0.0",
+          "data": {
+            "target_m": [
+              0.28,
+              0.02,
+              0.2
+            ]
+          }
+        },
+        "environment": {
+          "contract": "experiment.assembly",
+          "version": "1.0.0",
+          "data": {
+            "environment": {
+              "coordinate_frame": "world_base_x_forward_yz_cross_section",
+              "environment_id": "reach_free",
+              "gravity_m_s2": [
+                0.0,
+                0.0,
+                -9.81
+              ],
+              "gravity_source": "main@245a785 reach_free environment; Human-owned benchmark gravity",
+              "lights": [
+                {
+                  "direction": [
+                    0.0,
+                    0.0,
+                    -1.0
+                  ],
+                  "position_m": [
+                    0.0,
+                    0.0,
+                    2.0
+                  ]
+                }
+              ],
+              "objects": [
+                {
+                  "conaffinity": 1,
+                  "contype": 0,
+                  "half_size_m": [
+                    2.0,
+                    2.0,
+                    0.1
+                  ],
+                  "kind": "plane",
+                  "name": "floor",
+                  "position_m": [
+                    0.0,
+                    0.0,
+                    -0.02
+                  ]
+                }
+              ],
+              "schema_version": "1",
+              "truth_status": "HUMAN_OWNED",
+              "units": "SI"
+            },
+            "external_forces": [],
+            "floor_id": "floor",
+            "mount": {
+              "position_m": [
+                0.0,
+                0.0,
+                0.15
+              ],
+              "quaternion_wxyz": [
+                1.0,
+                0.0,
+                0.0,
+                0.0
+              ]
+            }
+          }
+        },
+        "robot_families": [
+          "tendon_robot_family"
+        ],
+        "actuator_channels": [
+          "actuator_commands"
+        ],
+        "initializer": {
+          "extension_id": "initialize.family",
+          "version": "1.0.0",
+          "parameters": {
+            "contract": "family.initial",
+            "version": "1.0.0",
+            "data": {
+              "qpos_rad": {
+                "segment_0_cell_0_y": 0.0,
+                "segment_0_cell_0_z": 0.0,
+                "segment_0_cell_10_y": 0.0,
+                "segment_0_cell_10_z": 0.0,
+                "segment_0_cell_11_y": 0.0,
+                "segment_0_cell_11_z": 0.0,
+                "segment_0_cell_1_y": 0.0,
+                "segment_0_cell_1_z": 0.0,
+                "segment_0_cell_2_y": 0.0,
+                "segment_0_cell_2_z": 0.0,
+                "segment_0_cell_3_y": 0.0,
+                "segment_0_cell_3_z": 0.0,
+                "segment_0_cell_4_y": 0.0,
+                "segment_0_cell_4_z": 0.0,
+                "segment_0_cell_5_y": 0.0,
+                "segment_0_cell_5_z": 0.0,
+                "segment_0_cell_6_y": 0.0,
+                "segment_0_cell_6_z": 0.0,
+                "segment_0_cell_7_y": 0.0,
+                "segment_0_cell_7_z": 0.0,
+                "segment_0_cell_8_y": 0.0,
+                "segment_0_cell_8_z": 0.0,
+                "segment_0_cell_9_y": 0.0,
+                "segment_0_cell_9_z": 0.0,
+                "segment_1_cell_0_y": 0.0,
+                "segment_1_cell_0_z": 0.0,
+                "segment_1_cell_10_y": 0.0,
+                "segment_1_cell_10_z": 0.0,
+                "segment_1_cell_11_y": 0.0,
+                "segment_1_cell_11_z": 0.0,
+                "segment_1_cell_1_y": 0.0,
+                "segment_1_cell_1_z": 0.0,
+                "segment_1_cell_2_y": 0.0,
+                "segment_1_cell_2_z": 0.0,
+                "segment_1_cell_3_y": 0.0,
+                "segment_1_cell_3_z": 0.0,
+                "segment_1_cell_4_y": 0.0,
+                "segment_1_cell_4_z": 0.0,
+                "segment_1_cell_5_y": 0.0,
+                "segment_1_cell_5_z": 0.0,
+                "segment_1_cell_6_y": 0.0,
+                "segment_1_cell_6_z": 0.0,
+                "segment_1_cell_7_y": 0.0,
+                "segment_1_cell_7_z": 0.0,
+                "segment_1_cell_8_y": 0.0,
+                "segment_1_cell_8_z": 0.0,
+                "segment_1_cell_9_y": 0.0,
+                "segment_1_cell_9_z": 0.0
+              },
+              "qvel_rad_s": {
+                "segment_0_cell_0_y": 0.0,
+                "segment_0_cell_0_z": 0.0,
+                "segment_0_cell_10_y": 0.0,
+                "segment_0_cell_10_z": 0.0,
+                "segment_0_cell_11_y": 0.0,
+                "segment_0_cell_11_z": 0.0,
+                "segment_0_cell_1_y": 0.0,
+                "segment_0_cell_1_z": 0.0,
+                "segment_0_cell_2_y": 0.0,
+                "segment_0_cell_2_z": 0.0,
+                "segment_0_cell_3_y": 0.0,
+                "segment_0_cell_3_z": 0.0,
+                "segment_0_cell_4_y": 0.0,
+                "segment_0_cell_4_z": 0.0,
+                "segment_0_cell_5_y": 0.0,
+                "segment_0_cell_5_z": 0.0,
+                "segment_0_cell_6_y": 0.0,
+                "segment_0_cell_6_z": 0.0,
+                "segment_0_cell_7_y": 0.0,
+                "segment_0_cell_7_z": 0.0,
+                "segment_0_cell_8_y": 0.0,
+                "segment_0_cell_8_z": 0.0,
+                "segment_0_cell_9_y": 0.0,
+                "segment_0_cell_9_z": 0.0,
+                "segment_1_cell_0_y": 0.0,
+                "segment_1_cell_0_z": 0.0,
+                "segment_1_cell_10_y": 0.0,
+                "segment_1_cell_10_z": 0.0,
+                "segment_1_cell_11_y": 0.0,
+                "segment_1_cell_11_z": 0.0,
+                "segment_1_cell_1_y": 0.0,
+                "segment_1_cell_1_z": 0.0,
+                "segment_1_cell_2_y": 0.0,
+                "segment_1_cell_2_z": 0.0,
+                "segment_1_cell_3_y": 0.0,
+                "segment_1_cell_3_z": 0.0,
+                "segment_1_cell_4_y": 0.0,
+                "segment_1_cell_4_z": 0.0,
+                "segment_1_cell_5_y": 0.0,
+                "segment_1_cell_5_z": 0.0,
+                "segment_1_cell_6_y": 0.0,
+                "segment_1_cell_6_z": 0.0,
+                "segment_1_cell_7_y": 0.0,
+                "segment_1_cell_7_z": 0.0,
+                "segment_1_cell_8_y": 0.0,
+                "segment_1_cell_8_z": 0.0,
+                "segment_1_cell_9_y": 0.0,
+                "segment_1_cell_9_z": 0.0
+              },
+              "unspecified": "zero"
+            }
+          }
+        },
+        "timing": {
+          "timestep_s": 0.0005,
+          "control_period_s": 0.01,
+          "sample_period_s": 0.01,
+          "duration_s": 0.35,
+          "termination": [
+            "duration",
+            "numerical_failure"
+          ]
+        },
+        "evaluator": {
+          "extension_id": "evaluate.reach",
+          "version": "1.0.0",
+          "parameters": {
+            "contract": "reference.reach_evaluation",
+            "version": "1.0.0",
+            "data": {
+              "tolerance_m": 0.01
+            }
+          }
+        },
+        "objectives": [
+          {
+            "metric": "position_error",
+            "direction": "minimize",
+            "units": "m",
+            "weight": 1.0
+          }
+        ],
+        "failure_policy": "retain_invalid_and_constraint_failures",
+        "observations": [
+          {
+            "name": "tip_position",
+            "entity": "tip",
+            "dimension": 3,
+            "units": "m",
+            "frame": "world",
+            "phase": "post_step",
+            "missing": "unsupported"
+          }
+        ],
+        "sampling": {
+          "split": "development",
+          "seeds": [
+            17
+          ],
+          "aggregation": "per_instance",
+          "window_s": [
+            0.0,
+            0.35
+          ]
+        }
+      },
+      "official_task_success": false,
+      "solver_error_count": 0,
+      "force_bound_violation_n": 0.0,
+      "sampled_settling": {
+        "window_s": 0.05,
+        "position_limit_m": 0.01,
+        "speed_limit_m_s": 0.02,
+        "available": true,
+        "max_error_m": 0.19542469227190418,
+        "max_speed_m_s": 0.7460602522521099,
+        "passed": false
+      }
+    },
+    "boundary": {
+      "termination_confirmed": true,
+      "returncode": 0,
+      "elapsed_s": 1.187110000057146
+    },
+    "charged_numerical_s": 1.187110000057146,
+    "implementation": "1da7bec9c7906cd9e7ded7a463cd9a5e2bd2b824",
+    "log_reference": {
+      "artifact_id": "53b713d459391a29c468ed56534152d9d3d4f2152f907a5c59901a3751430a2b",
+      "media_type": "application/json"
+    },
+    "physical_launches": 1,
+    "mathematical_reintegrations": 0,
+    "rl_actions": 0,
+    "nmpc_updates": 0
+  },
+  "binding_verified": true,
+  "recovered_operation_preserved_cost_and_reference": true
+}
