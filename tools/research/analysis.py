@@ -67,8 +67,6 @@ def calculate(configuration,binding,query,exact_point=None,*,checkpoint=None,des
         from extensions.tendon_family.sorosim_analysis import calculate_candidate_configuration
     else:
         from extensions.tendon_family.math_analysis import calculate_candidate_configuration
-    if q.operation=='equilibrium' and q.operating_point!='target_equilibrium':
-        raise ValueError('EQUILIBRIUM_REQUIRES_TARGET_POINT')
     requirements=describe_analysis_requirements(inp,binding)
     assessment=model_assessment(inp,requirements,q.operation)
     applicability=check_analysis_applicability(requirements,q,assessment,exact_point=exact_point)
@@ -79,8 +77,6 @@ def calculate(configuration,binding,query,exact_point=None,*,checkpoint=None,des
     envelope=plain(calculate_candidate_configuration(inp,binding,p,binding['configuration'],
         operating_points=[q.operating_point],exact_point=exact_point,**({'checkpoint':checkpoint,'design_context':design_context,
             'check_instantaneous_braking':q.operation=='instantaneous_braking_v1'} if sorosim else {})))
-    if q.scoring_window_s is not None and q.scoring_window_s not in p.windows_s:
-        raise ValueError('SCORING_WINDOW_NOT_IN_PROTOCOL')
     rows=envelope['records'][1:]
     row=rows[0]
     construction=row.get('construction') or {}

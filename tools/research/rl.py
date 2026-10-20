@@ -529,8 +529,8 @@ def compatible_references(host, *, publish=True):
             times=np.asarray(trajectory['times_s'])
             if (source_cfg!=cfg or trajectory['tendon_order']!=order or u.shape!=(steps,len(order))
                 or not np.isfinite(u).all() or np.any(u<0) or np.any(u>limits)
-                or abs(times[0])>1e-12 or abs(times[-1]-duration)>1e-12
-                or any(not np.any(np.abs(times-k*period)<1e-12) for k in range(steps+1))):
+                or times.shape!=(steps+1,) or not np.isfinite(times).all()
+                or not np.allclose(times,np.arange(steps+1)*period,rtol=0,atol=1e-12)):
                 raise ValueError('Exact candidate/task/order/grid/bounds required; no mapping, resampling or clipping')
             folder=host.store.root/'rl_inputs'
             folder.mkdir(exist_ok=True)
@@ -542,6 +542,7 @@ def compatible_references(host, *, publish=True):
                     raise ValueError('Saved reference changed')
             rows.append(dict(candidate=candidate_ref,source=ref,source_kind=kind,available=True,
                 reference=dict(path=str(path.resolve()),sha256=hashlib.sha256(path.read_bytes()).hexdigest(),candidate_identity=candidate['identity'],task_identity=scene['task_identity'],tendon_order=order,control_period_s=period),
+                command_origin='measured_applied_interval_inputs' if kind=='nmpc' else 'mathematical_prediction',
                 convention='Exact candidate/task/channel SI interval tensions; reference completeness does not imply task acceptance'))
         except (ValueError,KeyError,IndexError) as exc:
             rows.append(dict(candidate=candidate_ref,source=ref,source_kind=kind,available=False,reason=str(exc)))

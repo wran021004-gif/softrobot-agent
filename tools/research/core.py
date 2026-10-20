@@ -28,6 +28,9 @@ def read_evidence(host, query):
     q = EvidenceQuery.model_validate(query)
     s = state(host)
     value = host.store.artifact(q.reference)
+    if isinstance(value,bytes):
+        try:value=json.loads(value)
+        except (ValueError,UnicodeError) as exc:raise ValueError('EVIDENCE_NOT_JSON: select a saved JSON measurement artifact') from exc
     if protected(host) and plain(q.reference) not in readable_results(s,host):
         raise ValueError('PROTECTED_EVIDENCE_READ_REQUIRES_NEW_RESULT_OR_TRAINING_SUMMARY')
     if q.pointer and not q.pointer.startswith('/'):

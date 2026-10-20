@@ -60,22 +60,54 @@ def import_history(host):
     update(host,research_history=entries,research_mathematics=mathematics,research_history_imported=True)
 
 
+def measured_samples(host,result):
+    """Adapt sealed measurements only; never use optimizer states or predictions."""
+    raw_ref=result.get('raw_reference')
+    if raw_ref:return host.store.artifact(raw_ref),dict(reference=raw_ref,pointer='/samples',fields={})
+    motion_ref=(result.get('profile') or {}).get('motion')
+    if not motion_ref:return {},dict(status='unavailable',reason='No saved measured motion')
+    motion=host.store.artifact(motion_ref);updates=[];input_ref=None
+    try:
+        from extensions.tendon_family.control_evidence import ControlEvidence
+        reader=ControlEvidence(host.store);source=reader.resolve(result['execution_id'])
+        input_ref=source['files'].get('controller_observations.json')
+        updates=reader.read_file(source,'controller_observations.json',[])
+    except (ValueError,KeyError):pass
+    fields=dict(tip_m='tip_position_m',position_error_m='tip_error_m',speed_m_s='tip_speed_m_s')
+    samples=[]
+    for m in motion:
+        # Normalize names for the existing task adapter; endpoint uses the preceding interval.
+        row={**m,**{k:m[v] for k,v in fields.items() if v in m}}
+        previous=[(i,u) for i,u in enumerate(updates) if u['time_s']<m['time_s']-1e-12]
+        if previous:
+            i,u=previous[-1];row.update(actual_tension_n=u.get('actual_tension_n'),
+                input_query=dict(reference=input_ref,pointer='/'+str(i)+'/actual_tension_n'),input_time_s=u['time_s'])
+        samples.append(row)
+    return dict(samples=samples),dict(reference=motion_ref,pointer='',fields=fields,input_reference=input_ref,
+        input_rows=[u['actual_tension_n'] for u in updates if u.get('actual_tension_n') is not None],
+        input_phase='Measured pre-step input of the interval ending at the motion sample')
+
+
 def observation(host,ref,historical=False):
     from tools.research_tasks import task_adapter
     result=host.store.artifact(ref);cfg=host.store.artifact(result['candidate'])['configuration']
-    raw_ref=result.get('raw_reference');adapter=task_adapter(cfg)
+    raw_ref=result.get('raw_reference');adapter=task_adapter(cfg);raw,measurement=measured_samples(host,result)
+    violations=adapter.violation_samples(raw) if raw.get('samples') else dict(status='unavailable',samples=[])
+    if not task_gap(result)['valid_complete']:
+        violations=dict(status='partial_measurements_not_complete_task_failure',samples=[v for v in violations['samples']
+            if v['constraint']!='terminal_error_m' or abs(v['time_s']-cfg['task']['timing']['duration_s'])<=1e-9])
     return dict(reference=plain(ref),candidate=result['candidate'],source=result.get('source_reference'),
         task_identity=digest(cfg['task']),historical_only=historical,task_gap=task_gap(result),
         constraints=(result.get('acceptance') or {}).get('components',{}),
         execution_status=result.get('status'),execution=result.get('execution'),
-        violations=adapter.violation_samples(host.store.artifact(raw_ref)) if raw_ref else dict(status='unavailable',samples=[]),
+        violations=violations,
         raw_reference=raw_ref,evidence=summarize_evidence(result,ref))
 
 
 def physical_diagnostic(host,reference):
     """Select measured extrema from the existing adapter, never infer a cause."""
-    row=observation(host,reference);raw_ref=row['raw_reference']
-    raw=host.store.artifact(raw_ref) if raw_ref else {};samples=raw.get('samples',[])
+    result=host.store.artifact(reference);row=observation(host,reference)
+    raw,measurement=measured_samples(host,result);raw_ref=measurement.get('reference');samples=raw.get('samples',[])
     extrema={}
     for violation in row['violations']['samples']:
         key=violation['constraint']
@@ -83,14 +115,31 @@ def physical_diagnostic(host,reference):
     chosen={len(samples)-1:[]} if samples else {}
     for violation in extrema.values():chosen.setdefault(int(violation['raw_pointer'].split('/')[2]),[]).append(violation)
     observed=('tip_m','tip_velocity_m_s','position_error_m','speed_m_s','actual_tension_n')
-    inputs=[s['actual_tension_n'] for s in samples if s.get('actual_tension_n') is not None]
-    return dict(task_passed=row['task_gap']['accepted'],valid_complete=row['task_gap']['valid_complete'],
+    inputs=measurement.get('input_rows',[s['actual_tension_n'] for s in samples if s.get('actual_tension_n') is not None])
+    cfg=host.store.artifact(result['candidate'])['configuration']
+    limits=[t['force_limit_n'] for t in cfg['robot']['structure']['data']['tendons']]
+    evaluation=result.get('evaluation_reference') or (result.get('execution',{}).get('receipts',{}).get('evaluation') or {}).get('output')
+    evaluator=dict(status='unavailable',reference=evaluation)
+    if evaluation:
+        try:evaluator=dict(reference=evaluation,result=host.store.artifact(evaluation))
+        except (ValueError,KeyError):evaluator['reason']='Original evaluator artifact unavailable in this readable snapshot'
+    for violations in chosen.values():
+        for v in violations:
+            _,_,i,field=v['raw_pointer'].split('/')
+            v.update(raw_reference=raw_ref,raw_pointer=measurement.get('pointer','')+'/'+i+'/'+measurement.get('fields',{}).get(field,field))
+    return dict(evaluation_reference=reference,candidate_reference=result['candidate'],
+        control_source_reference=result.get('source_reference',reference),execution_status=result.get('status'),
+        original_acceptance=result.get('acceptance'),original_evaluation=evaluator,
+        task_passed=row['task_gap']['accepted'],valid_complete=row['task_gap']['valid_complete'],
         owning_study=host.store.artifact(reference).get('owning_study'),
         violated_constraints={k:v for k,v in row['constraints'].items() if v['passed'] is False},
-        critical_samples=[dict(time_s=samples[i]['time_s'],observed={k:samples[i][k] for k in observed if k in samples[i]},
-            constraints=chosen[i],raw_reference=raw_ref,read_pointer='/samples/'+str(i)) for i in sorted(chosen)],
+        critical_samples=[dict(time_s=samples[i]['time_s'],observed={k:samples[i].get(k) if samples[i].get(k) is not None else dict(status='unavailable') for k in observed},
+            constraints=chosen[i],raw_reference=raw_ref,read_pointer=measurement.get('pointer','')+'/'+str(i),
+            input_query=samples[i].get('input_query'),input_time_s=samples[i].get('input_time_s')) for i in sorted(chosen)],
         input_bounds_summary=dict(measured_min_n=[min(x) for x in zip(*inputs)],measured_max_n=[max(x) for x in zip(*inputs)],
-            acceptance_component=row['constraints'].get('force_bounds')) if inputs else dict(status='unavailable'),
+            limits_n=limits,touches_upper_bound=[any(abs(u[j]-hi)<=1e-9 for u in inputs) for j,hi in enumerate(limits)],
+            raw_query=dict(reference=measurement.get('input_reference',raw_ref),pointer='' if measurement.get('input_reference') else '/samples'),
+            phase=measurement.get('input_phase','Saved replay sample input'),acceptance_component=row['constraints'].get('force_bounds')) if inputs else dict(status='unavailable'),
         limitations=['These are measured facts, not a proven failure cause',row['violations']['status'],
             'Only the original registered acceptance establishes this execution outcome'])
 
@@ -204,7 +253,7 @@ def context(host):
         observation=r) for r in reversed(s.get('physical_replays',[])) if task_gap(host.store.artifact(r))['valid_complete']]
     starts += list(reversed(s.get('control_initializations',[])))+current['control_search_starts']
     best=current['best_valid']
-    if best and best.get('raw_reference'):best['physical_diagnostic']=physical_diagnostic(host,best['reference'])
+    if best:best['physical_diagnostic']=physical_diagnostic(host,best['reference'])
     if best and best.get('source'):
         starts.insert(0,dict(candidate=best.get('executable_candidate',best['candidate']),source=best['source'],observation=best['reference']))
     seen=set();unique=[]
@@ -263,19 +312,145 @@ def context(host):
                 'static_input_observation','input_response_observation','control_handoff','scoped_claim','analysis_applicability')}
         else:
             current['latest_scientific_feedback']=dict(reference=latest,**compact_evidence(value,latest)['summary'])
-            if value.get('acceptance') and value.get('raw_reference'):
+            if value.get('acceptance'):
                 current['latest_scientific_feedback']['physical_diagnostic']=physical_diagnostic(host,latest)
+    current['evidence_working_set']=working_set(host,current)
     return current
+
+
+def read_coverage(host):
+    """Only paired successful feedback counts as delivery; summary is never full."""
+    import json
+    from tools.research.contracts import EvidenceQuery
+    rows=[];events=host.store.events(host.run_id);deliveries={}
+    confirmed={e['request_id'] for e in events if e['kind']=='r3_response' and 200<=host.store.artifact(e['outputs'][0]).get('http_status',0)<300}
+    for event in events:
+        if event['kind']!='r3_request' or event['request_id'] not in confirmed:continue
+        wire=host.store.artifact(host.store.artifact(event['outputs'][0])['request'])
+        for message in wire.get('messages',[]):
+            if message.get('role')=='tool':deliveries.setdefault(message.get('tool_call_id'),[]).append(message.get('content'))
+    for event in events:
+        if event['kind']!='model_original_tool_feedback':continue
+        saved=host.store.artifact(event['outputs'][0]);use=saved['tool_use'];result=saved['result']
+        if use['name']!='evidence_read' or result.get('status')!='success' or result.get('toolUseId')!=use['toolUseId']:continue
+        try:
+            default='summary' if state(host)['spec'].get('research_decisions',{}).get('context_limits') else 'full'
+            q=EvidenceQuery.model_validate({'view':default,**use['input']})
+            delivered=json.loads(''.join(b.get('text','') for b in result['content']))
+            provided=any(content==''.join(b.get('text','') for b in result['content']) for content in deliveries.get(use['toolUseId'],[]))
+            expected=host.store.artifact(q.reference)
+            if isinstance(expected,bytes):expected=json.loads(expected)
+            for part in q.pointer[1:].split('/') if q.pointer else []:
+                part=part.replace('~1','/').replace('~0','~');expected=expected[int(part)] if isinstance(expected,list) else expected[part]
+            if q.view=='fields':expected={k:expected[k] for k in q.fields}
+            elif q.view=='range':expected=dict(total=len(expected),start=q.start,items=expected[q.start:q.start+q.count])
+            complete=provided and q.view in ('full','fields','range') and delivered==expected
+        except (ValueError,KeyError,IndexError,TypeError):continue
+        query=plain(q);classification='new_query'
+        for prior in rows:
+            if query==prior['query'] and prior['successfully_provided']:classification='exact_repeat';break
+            if plain(q.reference)!=prior['query']['reference'] or not prior['complete_data']:continue
+            p=prior['query'];prefix=p['pointer']
+            if p['view']=='full' and (q.pointer==prefix or q.pointer.startswith(prefix+'/')):classification='covered_subnode'
+            if p['view']=='fields' and any(q.pointer==prefix+'/'+k.replace('~','~0').replace('/','~1') or
+                q.pointer.startswith(prefix+'/'+k.replace('~','~0').replace('/','~1')+'/') for k in p['fields']):classification='covered_subnode'
+            if p['view']=='fields' and q.view=='fields' and q.pointer==prefix and set(q.fields)<=set(p['fields']):classification='covered_subnode'
+            if p['view']=='range' and q.pointer==prefix and q.view=='range' and p['start']<=q.start and q.start+len(delivered.get('items',[]))<=p['start']+prior['item_count']:
+                classification='covered_subnode'
+            if p['view']=='range' and q.pointer.startswith(prefix+'/'):
+                index=q.pointer[len(prefix)+1:].split('/')[0]
+                if index.isdecimal() and p['start']<=int(index)<p['start']+prior['item_count']:classification='covered_subnode'
+        rows.append(dict(query=query,owning_study=host.run_id,tool_call_id=use['toolUseId'],feedback_reference=event['outputs'][0],
+            successfully_provided=provided,complete_data=complete,item_count=len(delivered.get('items',[])) if q.view=='range' and isinstance(delivered,dict) else None,
+            full_artifact=complete and q.view=='full' and not q.pointer,
+            classification=classification))
+    return rows
+
+
+def working_set(host,current):
+    """Recomputable bounded Store projection; science and next-method choice stay separate."""
+    from tools.research.candidate_portfolio import ranking_key
+    from tools.research.evidence_policy import registered_references
+    s=state(host);candidates=list(s['candidates'].values());index=[];links=[];facts=[];comparisons=[]
+    references=current['all_fresh_results'];coverage=read_coverage(host)
+    shown=candidates[-3:];best=current.get('best_valid') or {};important=best.get('executable_candidate',best.get('candidate'))
+    if important in candidates and important not in shown:shown=[*shown[-2:],important]
+    for candidate in shown:
+        c=host.store.artifact(candidate);results=[];math=[]
+        controls=[e['source'] for e in s.get('control_initializations',[]) if e['candidate']==candidate]
+        for ref in references:
+            value=host.store.artifact(ref)
+            if value.get('candidate',value.get('design_candidate'))!=candidate:continue
+            if ref in [*s.get('analysis_results',[]),*s.get('mechanics_results',[])]:math.append(ref)
+            if ref in [*s.get('results',[]),*s.get('physical_replays',[]),*s.get('rl_evaluations',[])]:results.append((ref,value))
+        for source in controls[-3:]:
+            control=host.store.artifact(source);tr=control['trajectory']
+            links.append(dict(candidate=candidate,source=source,source_kind=control.get('source_kind'),
+                trajectory_query=dict(reference=source,pointer='/trajectory'),
+                grid=dict(intervals=len(tr['tensions_n']),start_s=tr['times_s'][0],end_s=tr['times_s'][-1],tendon_order=tr['tendon_order']),
+                execution_references=[r for r,v in results if v.get('source_reference')==source]))
+        for ref in math[-3:]:
+            value=host.store.artifact(ref)
+            links.append(dict(candidate=candidate,source=ref,evaluation_reference=ref,source_kind='mathematical_prediction',
+                status=value.get('status'),operation=value.get('operation'),trajectory_query=dict(reference=ref,pointer='/trajectory') if value.get('trajectory') else None,
+                task_acceptance='unmeasured'))
+        valid=sorted((dict(reference=r,task_gap=task_gap(v)) for r,v in results if task_gap(v)['valid_complete']),key=ranking_key)
+        index.append(dict(candidate=candidate,structure_identity=c.get('physical_design_identity',c['identity']),
+            parameters_query=dict(reference=candidate,pointer='/parameters'),
+            structure=dict(segments=len(c['resolved_parameters']['segments']),tendons=len(c['resolved_parameters']['tendons'])),
+            generated=True,compiled=True,control_initialized=bool(controls),control_sources=controls,
+            has_executable_control_source=bool(controls),methods_used=sorted({host.store.artifact(r).get('operation','mathematics') for r in math} |
+                {'fixed_tension' if v.get('source_reference') else 'ppo' if v.get('run_id') else 'nmpc' for r,v in results}),
+            mathematically_evaluated=any(host.store.artifact(r).get('status')=='computed' for r in math),mathematical_records=math,
+            physically_evaluated=bool(valid),physical_records=[r for r,v in results],accepted=any(r['task_gap']['accepted'] for r in valid),
+            best_valid=valid[0] if valid else None))
+        for ref,value in results[-6:]:
+            source=value.get('source_reference',ref);control=host.store.artifact(source);tr=control.get('trajectory') or {}
+            links.append(dict(candidate=candidate,source=source,evaluation_reference=ref,
+                source_kind='fixed_tension' if value.get('source_reference') else 'policy' if value.get('run_id') else 'nmpc_actual_execution',
+                trajectory_query=dict(reference=source,pointer='/trajectory') if tr else None,
+                grid=dict(intervals=len(tr.get('tensions_n',[])),start_s=tr['times_s'][0],end_s=tr['times_s'][-1],tendon_order=tr.get('tendon_order')) if tr else dict(reference=ref,pointer='/profile'),
+                task_gap=task_gap(value),original_acceptance=value.get('acceptance'),
+                scope='Recorded execution; cross-structure differences cannot be attributed to control alone'))
+        facts.extend(dict(reference=r,task_gap=task_gap(v),pointer='/acceptance',claim_kind='PHYSICAL_OBSERVATION') for r,v in results[-3:])
+        recent=results[-6:]
+        for (a,x),(b,y) in zip(recent,recent[1:]):
+            xc=(x.get('acceptance') or {}).get('components',{});yc=(y.get('acceptance') or {}).get('components',{})
+            comparable=bool(task_gap(x)['valid_complete'] and task_gap(y)['valid_complete'] and xc and
+                {k:v.get('limit') for k,v in xc.items()}=={k:v.get('limit') for k,v in yc.items()} and
+                x.get('profile_identity')==y.get('profile_identity') and x.get('evaluation_version')==y.get('evaluation_version'))
+            comparisons.append(dict(candidate=candidate,baseline=a,variant=b,comparable=comparable,
+                normalized_violation_change={k:v-task_gap(x)['components'][k] for k,v in task_gap(y)['components'].items()
+                    if k in task_gap(x)['components']} if comparable else None,
+                scope='Same candidate and recorded evaluation settings only; negative is improvement, no causal or global claim'))
+    return dict(version='evidence_working_set_v1',candidate_index=index,candidate_count=len(candidates),
+        candidate_index_query='All candidate references remain in source_references; previews retain the latest three',
+        control_result_links=links,control_comparisons=comparisons,measured_facts=facts,read_coverage=coverage[-12:],read_coverage_count=len(coverage),
+        read_counts={k:sum(r['successfully_provided'] and r['classification']==k for r in coverage) for k in ('exact_repeat','covered_subnode','new_query')},
+        missing_prerequisites=[{k:r[k] for k in ('action','method','candidate','reason','remaining_checks') if k in r}
+            for r in current['decision_feedback']['actions'] if r['status'] in ('blocked','unavailable','prerequisites_only')],
+        coverage_scope='Delivery is not understanding. Repeated queries remain legal; scientific question/intent is not inferred.',
+        method_scope=dict(static_analysis='Constructs and checks operating points; local mathematical assumptions only. AnalysisRequest validates operation/point/window before workers.',
+            offline_nlp='Predicted tension trajectories and search starts; independent physics still required.',
+            nmpc='Optional closed-loop control and soft screening; numerical convergence, prediction and MuJoCo acceptance are separate. No verified model error bound means no structural hard veto. Cost is measured, not presumed low.',
+            response_search='Finite differences of full physical rollouts; local information near evaluated coefficients.',
+            pattern_search='Finite nongradient physical search; budget and full original acceptance remain authoritative.',
+            direct_ppo='Independent optional policy training, without an NMPC prerequisite; published policies require separate evaluation.',
+            residual_ppo='Requires a complete compatible reference, including failed-but-complete NMPC execution; predicted and measured references retain their origin.'),
+        eligible_methods=[{k:r[k] for k in ('action','method','candidate','source','status','reason','remaining_checks') if k in r}
+            for r in current['decision_feedback']['actions']],budget=current['budget'],method_remaining=current['method_remaining'],
+        source_references=list({r['artifact_id']:r for r in registered_references(host)}.values()),all_fresh_results=references,
+        scientific_scope='No model-authored hypotheses are promoted to measured causes; only original independent acceptance establishes success')
 
 
 def action_feedback(host,current):
     """Admission prerequisites for parameterized actions, not model decisions."""
     from tools.research.physical_replay import binding, verified_input_response, explicit_control_source, numerically_verified_source
     from tools.research.design import verify_candidate
-    from tools.research.budget import protected, backend_capacity
+    from tools.research.budget import protected, backend_capacity, decision_budget
     from tools.research.evidence_policy import registered_references
     s=state(host);rows=[];capacity=backend_capacity(host);known=registered_references(host)
-    closed=s['research_status']=='stopped' or protected(host)
+    closed=s['research_status']=='stopped' or protected(host) or decision_budget(host)['closeout']['next_request_will_protect']
     for entry in current['control_search_starts']:
         candidate=entry['candidate'];source=entry['source'];cfg=host.store.artifact(candidate)['configuration']
         for action in ('physical_replay','control_search'):
@@ -305,6 +480,18 @@ def action_feedback(host,current):
         from tools.research.mechanics import warm_start
         from tools.research_tasks import task_adapter
         cfg=host.store.artifact(candidate)['configuration']
+        from tools.research.rl import allocation_feedback, compatible_references
+        rl_budget=allocation_feedback(host);refs=compatible_references(host,publish=False)
+        for mode in ('direct','residual'):
+            available=[r for r in refs if r['candidate']==candidate and r.get('available')]
+            missing=[] if mode=='direct' or available else ['complete_exact_candidate_reference']
+            rows.append(dict(action='research_rl',method=mode,candidate=candidate,
+                status='unavailable' if closed or 'rl' not in s['spec']['capabilities']
+                    or rl_budget['remaining_stages']==0 or rl_budget['remaining_allocatable_actions']==0
+                    else 'blocked' if missing else 'prerequisites_only',
+                reason=missing or None,references=available if mode=='residual' else [],budget=rl_budget,
+                remaining_checks=['full_RLRequest','ideal_tension_reach_environment','aligned_allocation','training_capacity'],
+                scope='Training/checkpoint is not task acceptance; direct PPO needs no reference'))
         rows.append(dict(action='initialize_control',method='baseline',candidate=candidate,
             status='preflight_eligible' if not closed and 'initialize_control' in current['actions'] else 'unavailable',
             task_acceptance='unmeasured',new_physical_evaluations=0,
@@ -414,7 +601,7 @@ def tool_feedback(host,value):
             control_source_initialized=any(e['candidate']==result['candidate'] for e in state(host).get('control_initializations',[])),
             mathematical_observations=[r for k in ('analysis_results','mechanics_results') for r in state(host).get(k,[]) if host.store.artifact(r).get('candidate')==result['candidate']],
             physical_observations=[r for k in ('results','physical_replays','rl_evaluations') for r in state(host).get(k,[]) if host.store.artifact(r).get('candidate')==result['candidate']])
-    if reference in known and isinstance(raw,dict) and raw.get('acceptance') and raw.get('raw_reference'):
+    if reference in known and isinstance(raw,dict) and raw.get('acceptance'):
         view['physical_diagnostic']=physical_diagnostic(host,reference)
     return dict(wrapper_reference=wrapper,wrapper_role='Retrieval only; not supporting_evidence',
         scientific_reference=reference if reference in known else None,new_facts=view)

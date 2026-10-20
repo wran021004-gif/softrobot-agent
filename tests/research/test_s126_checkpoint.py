@@ -136,8 +136,8 @@ class CheckpointTests(unittest.TestCase):
             self.assertEqual(h.store.remaining()['used']['model_calls'],3)
             self.assertFalse(state(h)['pilot'].get('unconsumed_response'))
             from tools.research.core import export
-            export(h,ROOT/'evidence/s126_checkpoint/study')
-            atomic_json(ROOT/'evidence/s126_checkpoint/offline.json',dict(status='offline_protocol_passed',
+            export(h,h.store.root/'checkpoint_validation/study')
+            atomic_json(h.store.root/'checkpoint_validation/offline.json',dict(status='offline_protocol_passed',
                 formal_admission='not_admitted',reason='Real-provider continuation, actual usage and complete crash recovery admission remain untested',
                 sdk='1.59.0',harness='0.2.0',session_manager='SnapshotSessionManager',
                 original_message_identity=digest(original),handoff=ref,study_id=h.run_id,

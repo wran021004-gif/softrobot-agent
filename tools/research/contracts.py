@@ -139,6 +139,8 @@ class AnalysisRequest(Contract):
 
     @model_validator(mode='after')
     def exact_state(self):
+        if self.operation=='equilibrium' and self.operating_point!='target_equilibrium':
+            raise ValueError('EQUILIBRIUM_REQUIRES_TARGET_POINT: operating_point=target_equilibrium')
         if self.operation=='instantaneous_braking_v1' and self.operating_point!='saved_state':
             raise ValueError('INSTANTANEOUS_BRAKING_REQUIRES_EXACT_SAVED_STATE')
         if (self.operation=='design_sensitivity')!=(self.design_sensitivity is not None):
@@ -147,6 +149,8 @@ class AnalysisRequest(Contract):
             raise ValueError('STATIC_SENSITIVITY_REQUIRES_FIXED_INPUT_EQUILIBRIUM')
         if self.operation in ('linearization','controllability') and self.scoring_window_s is None:
             raise ValueError('EXPLICIT_SCORE_WINDOW_REQUIRED')
+        if self.scoring_window_s is not None and self.scoring_window_s not in self.protocol.windows_s:
+            raise ValueError('SCORING_WINDOW_NOT_IN_PROTOCOL')
         if (self.execution is None)!=(self.update_id is None):
             raise ValueError('EXECUTION_REQUIRES_UPDATE_ID')
         sources=int(self.saved_state is not None)+int(self.execution is not None)

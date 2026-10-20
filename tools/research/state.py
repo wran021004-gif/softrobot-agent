@@ -30,6 +30,12 @@ def readable_results(s, host=None):
     if host:
         linked += [host.store.artifact(e['reference'])['raw_reference'] for e in s.get('research_history',[])]
     if host:
+        from extensions.tendon_family.control_evidence import ControlEvidence
+        for ref in s.get('results',[]):
+            result=host.store.artifact(ref)
+            if result.get('profile',{}).get('motion'):linked.append(result['profile']['motion'])
+            try:linked.extend(ControlEvidence(host.store).resolve(result['execution_id'])['files'].values())
+            except (ValueError,KeyError):pass
         for ref in s.get('mechanics_results',[]):
             result=host.store.artifact(ref)
             linked.extend(result[k] for k in ('checkpoint_reference','trajectory_reference','original_request','log_reference') if result.get(k))

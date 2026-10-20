@@ -21,7 +21,7 @@ class S12DecisionTests(unittest.TestCase):
                 h,p,values,event=snapshot(450);s=state(h)
                 h.store.root=Path('runs/s12-hook-fixture');h.store.remaining.return_value['remaining']['model_calls']=remaining
                 if success:s['success_gate']={'evidence':s['physical_replays'][0]}
-                if rl:s['rl_runs']={'existing-fixture-job':{'evaluations':0}}
+                if rl:s['rl_runs']={'existing-fixture-job':{'evaluations':0,'allocation':{'actions':512}}}
                 if saved:
                     original_event=next(e for e in reversed(h.store.events(h.run_id)) if e['kind']=='r3_request')
                     s['pilot']['unconsumed_response']=original_event['request_id']

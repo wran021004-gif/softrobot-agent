@@ -1,0 +1,39 @@
+{
+  "status": "proposal_only_not_authorized_not_started",
+  "parent_specification": "configs/research/study_s126_cold.json",
+  "parent_json_identity": "c971dbde43805daf57c5776789bdc52206cf93ebc5895412e18c342532e2d331",
+  "canonical_task_identity": "d24aeac7041052ce1d2ae60e825a802e7367107784f6fec192b0a65c4a5e76e7",
+  "proposed_changes": {
+    "study_id": "s127-cold-<new-authorized-date-and-identity>",
+    "evidence_destination": "evidence/s127_cold/study",
+    "authorization": "REPLACE WITH NEW EXPLICIT PROVIDER, SCIENTIFIC-BUDGET AND DATA-TRANSFER AUTHORIZATION; S12.6 authorization is not reusable",
+    "execution_instructions": "Version the existing autonomous instructions for S12.7. Use evidence_working_set_v1 and exact diagnostic queries, including saved NMPC motion and applied-input pointers. All methods remain optional. Validate AnalysisRequest; target equilibrium and fixed-input sensitivity construct their own points. Preserve every original acceptance threshold and the complete STOP index. Session rotation remains disabled. No historical experiments, controls or mathematics may enter the new cold-start Store."
+  },
+  "unchanged": {
+    "history": [],
+    "mathematics": [],
+    "control_seeds": [],
+    "supplied_evidence": [],
+    "task": "tasks/reach_hold_mirror_v1.json",
+    "family_space": "configs/research/family_space_s7.json",
+    "control": "configs/research/control_sorosim_s56_braking.json",
+    "provider_requests": 48,
+    "protected_provider_requests": 4,
+    "public_operations": 200,
+    "protected_public_operations": 12,
+    "physical_launches": 64,
+    "mathematical_evaluations": 4,
+    "offline_nlp": 1,
+    "bdf_replays": 2,
+    "nmpc_executions": 2,
+    "rl_training_stages": 1,
+    "rl_training_actions": 65536,
+    "rl_evaluation_episodes": 1
+  },
+  "before_first_request": [
+    "Obtain independent authorization for the proposed budget and project-only transmission to the chosen Provider endpoint.",
+    "Replace the historical base_commit and readiness references with newly verified immutable source/dependency identities; freeze the exact delivery commit and all science/core hashes.",
+    "Validate a new empty Store and a new continuous Strands session with no engineering/probe imports.",
+    "Retain original evaluator, task horizon, input bounds, sampling phases and numerical environment. No method order is prescribed."
+  ]
+}
