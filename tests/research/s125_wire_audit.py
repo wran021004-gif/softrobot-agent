@@ -127,7 +127,8 @@ def live_audit(host):
             try:detail=json.loads(text)
             except ValueError:detail=dict(error_code=text)
             if not isinstance(detail,dict):detail=dict(value=detail)
-            business=host.store.artifact(detail['wrapper_reference']).get('result',{}) if detail.get('wrapper_reference') else detail
+            wrapper=host.store.artifact(detail['wrapper_reference']) if detail.get('wrapper_reference') else detail
+            business=wrapper.get('result',wrapper)
             if not isinstance(business,dict):business={}
             item=dict(sequence=e['sequence'],provider_order=i+1,reference=e['outputs'][0],tool=use['name'],
                 action=use['input'].get('action'),status=result['status'],business_status=business.get('status'),

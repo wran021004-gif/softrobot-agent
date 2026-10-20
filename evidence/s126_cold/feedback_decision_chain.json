@@ -1,0 +1,1134 @@
+{
+  "study_id": "s126-cold-live-20261020",
+  "decisions": [
+    {
+      "sequence": 15,
+      "provider_order": 1,
+      "plan": {
+        "artifact_id": "02497bb308e858bd84a809e7a0a26d40d996b29fc8f7a012282a5a425b28f047",
+        "media_type": "application/json"
+      },
+      "action": "generate",
+      "decision": {
+        "claimed_inference": "empirical_search",
+        "hypothesis_id": "DESIGN_LIMITATION_POSSIBLE",
+        "requested_budget": 0,
+        "research_intent": "DESIGN_MODIFICATION",
+        "selected_candidate": null,
+        "selected_method": "serial_family_generation_v2 with pre-curved segments 0.24/0.16 m, E=8 MPa, r=11 mm, rho=600 kg/m3, kappa_y=3.0/5.0 rad/m, kappa_z=0.5/0.6 rad/m",
+        "selected_variables": [
+          "segment lengths",
+          "rest curvature_y_rad_m",
+          "rest curvature_z_rad_m",
+          "section radius",
+          "Young modulus",
+          "density",
+          "tendon radius/pretension"
+        ],
+        "version": "research_decision_v1"
+      },
+      "hypothesis_source": {
+        "reference": {
+          "artifact_id": "02497bb308e858bd84a809e7a0a26d40d996b29fc8f7a012282a5a425b28f047",
+          "media_type": "application/json"
+        },
+        "pointer": "/original_plan"
+      },
+      "supporting_evidence": []
+    },
+    {
+      "sequence": 52,
+      "provider_order": 4,
+      "plan": {
+        "artifact_id": "074e62b267c8072208f228656c51f74c6cf421240b22510c00135ebe522cd84b",
+        "media_type": "application/json"
+      },
+      "action": "generate",
+      "decision": {
+        "claimed_inference": "empirical_search",
+        "hypothesis_id": "DESIGN_LIMITATION_POSSIBLE",
+        "requested_budget": 0,
+        "research_intent": "DESIGN_MODIFICATION",
+        "selected_candidate": null,
+        "selected_method": "serial_family_generation_v2, pre-curved 0.24 m + 0.16 m segments, explicit guide station s=0.5",
+        "selected_variables": [
+          "guide_s stations",
+          "rest curvature_y_rad_m",
+          "rest curvature_z_rad_m",
+          "segment lengths",
+          "section radius",
+          "Young modulus",
+          "density"
+        ],
+        "version": "research_decision_v1"
+      },
+      "hypothesis_source": {
+        "reference": {
+          "artifact_id": "074e62b267c8072208f228656c51f74c6cf421240b22510c00135ebe522cd84b",
+          "media_type": "application/json"
+        },
+        "pointer": "/original_plan"
+      },
+      "supporting_evidence": []
+    },
+    {
+      "sequence": 122,
+      "provider_order": 10,
+      "plan": {
+        "artifact_id": "143a65b183e6fb23b2c04998c96b3a0852fca532c7504787ddb021bef3e5d2a9",
+        "media_type": "application/json"
+      },
+      "action": "generate",
+      "decision": {
+        "claimed_inference": "empirical_search",
+        "hypothesis_id": "DESIGN_LIMITATION_POSSIBLE",
+        "requested_budget": 0,
+        "research_intent": "DESIGN_MODIFICATION",
+        "selected_candidate": null,
+        "selected_method": "serial_family_generation_v2 inheriting prototype section stations, overridden lengths/curvatures/modulus/density",
+        "selected_variables": [
+          "rest curvature_y_rad_m",
+          "rest curvature_z_rad_m",
+          "segment lengths",
+          "Young modulus",
+          "density",
+          "cells"
+        ],
+        "version": "research_decision_v1"
+      },
+      "hypothesis_source": {
+        "reference": {
+          "artifact_id": "143a65b183e6fb23b2c04998c96b3a0852fca532c7504787ddb021bef3e5d2a9",
+          "media_type": "application/json"
+        },
+        "pointer": "/original_plan"
+      },
+      "supporting_evidence": []
+    },
+    {
+      "sequence": 199,
+      "provider_order": 15,
+      "plan": {
+        "artifact_id": "fb995e3262782a1b8e2d37a471eced8030d3d4512b3717b7d65fcebb9ec1cdf5",
+        "media_type": "application/json"
+      },
+      "action": "initialize_control",
+      "decision": {
+        "claimed_inference": "empirical_search",
+        "hypothesis_id": "MODEL_PREDICTION_UNRELIABLE",
+        "requested_budget": 0,
+        "research_intent": "CONTROL_SEARCH",
+        "selected_candidate": {
+          "artifact_id": "de9dbe4f1cb3f4c83cb564487ec7dfb4cf30cc78760b0adc4715e58ca38cac3f",
+          "media_type": "application/json"
+        },
+        "selected_method": "baseline pretension control source (structure pretension 0.2 N)",
+        "selected_variables": [
+          "static pretension 0.2 N on all three tendons"
+        ],
+        "version": "research_decision_v1"
+      },
+      "hypothesis_source": {
+        "reference": {
+          "artifact_id": "fb995e3262782a1b8e2d37a471eced8030d3d4512b3717b7d65fcebb9ec1cdf5",
+          "media_type": "application/json"
+        },
+        "pointer": "/original_plan"
+      },
+      "supporting_evidence": []
+    },
+    {
+      "sequence": 213,
+      "provider_order": 16,
+      "plan": {
+        "artifact_id": "7774de33f426b194531aa0536c99ea3c07052d2288bd88c1f54962c3623bfc3d",
+        "media_type": "application/json"
+      },
+      "action": "physical_replay",
+      "decision": {
+        "claimed_inference": "empirical_search",
+        "hypothesis_id": "MODEL_PREDICTION_UNRELIABLE",
+        "requested_budget": 0,
+        "research_intent": "PHYSICAL_VALIDATION",
+        "selected_candidate": {
+          "artifact_id": "de9dbe4f1cb3f4c83cb564487ec7dfb4cf30cc78760b0adc4715e58ca38cac3f",
+          "media_type": "application/json"
+        },
+        "selected_method": "independent physical replay of the pretension baseline source with the sealed reach evaluator",
+        "selected_variables": [
+          "pretension-only tension profile"
+        ],
+        "version": "research_decision_v1"
+      },
+      "hypothesis_source": {
+        "reference": {
+          "artifact_id": "7774de33f426b194531aa0536c99ea3c07052d2288bd88c1f54962c3623bfc3d",
+          "media_type": "application/json"
+        },
+        "pointer": "/original_plan"
+      },
+      "supporting_evidence": []
+    },
+    {
+      "sequence": 288,
+      "provider_order": 22,
+      "plan": {
+        "artifact_id": "562412cd775a8f3afacbe7814ffb13e84668873d8c0cadfa61144c305925d6a3",
+        "media_type": "application/json"
+      },
+      "action": "generate",
+      "decision": {
+        "claimed_inference": "empirical_search",
+        "hypothesis_id": "MODEL_PREDICTION_UNRELIABLE",
+        "requested_budget": 0,
+        "research_intent": "DESIGN_MODIFICATION",
+        "selected_candidate": null,
+        "selected_method": "serial_family_generation_v2, uniform circular sections R=8.5 mm, E=15 MPa, rho=500, rest curvature 3.0/3.0 and -0.5/-0.5, routing radius 23 mm",
+        "selected_variables": [
+          "section radius 8.5 mm",
+          "E 15 MPa",
+          "density 500",
+          "viscosity 0.05",
+          "rest curvature_y 3.0",
+          "rest curvature_z -0.5",
+          "routing radius 23 mm",
+          "segment lengths 0.20/0.14"
+        ],
+        "version": "research_decision_v1"
+      },
+      "hypothesis_source": {
+        "reference": {
+          "artifact_id": "562412cd775a8f3afacbe7814ffb13e84668873d8c0cadfa61144c305925d6a3",
+          "media_type": "application/json"
+        },
+        "pointer": "/original_plan"
+      },
+      "supporting_evidence": []
+    },
+    {
+      "sequence": 313,
+      "provider_order": 24,
+      "plan": {
+        "artifact_id": "74b7596d7926748e653635d9f2061ef2c0573da1015a12d0eb3dc8b33cb66027",
+        "media_type": "application/json"
+      },
+      "action": "generate",
+      "decision": {
+        "claimed_inference": "empirical_search",
+        "hypothesis_id": "MODEL_PREDICTION_UNRELIABLE",
+        "requested_budget": 0,
+        "research_intent": "DESIGN_MODIFICATION",
+        "selected_candidate": null,
+        "selected_method": "serial_family_generation_v2, isotropic ellipse sections 8.5x8.5 mm, E=15 MPa, rho=500, rest curvature 3.0/-0.5, routing radius 23 mm",
+        "selected_variables": [
+          "section semi-axes 8.5 mm",
+          "E 15 MPa",
+          "density 500",
+          "viscosity 0.05",
+          "rest curvature_y 3.0",
+          "rest curvature_z -0.5",
+          "routing radius 23 mm",
+          "segment lengths 0.20/0.14"
+        ],
+        "version": "research_decision_v1"
+      },
+      "hypothesis_source": {
+        "reference": {
+          "artifact_id": "74b7596d7926748e653635d9f2061ef2c0573da1015a12d0eb3dc8b33cb66027",
+          "media_type": "application/json"
+        },
+        "pointer": "/original_plan"
+      },
+      "supporting_evidence": []
+    },
+    {
+      "sequence": 327,
+      "provider_order": 25,
+      "plan": {
+        "artifact_id": "69c35078ad54bfb059185b3a2067264bf64cab6dd028417ef29d231e2fdd26f1",
+        "media_type": "application/json"
+      },
+      "action": "generate",
+      "decision": {
+        "claimed_inference": "empirical_search",
+        "hypothesis_id": "MODEL_PREDICTION_UNRELIABLE",
+        "requested_budget": 0,
+        "research_intent": "DESIGN_MODIFICATION",
+        "selected_candidate": null,
+        "selected_method": "serial_family_generation_v2, isotropic ellipse sections, E=15 MPa, rho=500, rest curvature 3.0/-0.5, routing radius 18 mm",
+        "selected_variables": [
+          "routing radius 18 mm",
+          "section semi-axes 8.5 mm",
+          "E 15 MPa",
+          "density 500",
+          "viscosity 0.05",
+          "rest curvature_y 3.0",
+          "rest curvature_z -0.5"
+        ],
+        "version": "research_decision_v1"
+      },
+      "hypothesis_source": {
+        "reference": {
+          "artifact_id": "69c35078ad54bfb059185b3a2067264bf64cab6dd028417ef29d231e2fdd26f1",
+          "media_type": "application/json"
+        },
+        "pointer": "/original_plan"
+      },
+      "supporting_evidence": []
+    },
+    {
+      "sequence": 342,
+      "provider_order": 26,
+      "plan": {
+        "artifact_id": "468f8e70448962ca23007c010b4d20d9267bb112a46bade689ee40483f0b58d9",
+        "media_type": "application/json"
+      },
+      "action": "initialize_control",
+      "decision": {
+        "claimed_inference": "empirical_search",
+        "hypothesis_id": "MODEL_PREDICTION_UNRELIABLE",
+        "requested_budget": 0,
+        "research_intent": "CONTROL_SEARCH",
+        "selected_candidate": {
+          "artifact_id": "89aa710b01aae4cdb160658807d0615989330f2eca6f22dc5d1d469f9d2e8868",
+          "media_type": "application/json"
+        },
+        "selected_method": "baseline pretension control source for the stiff-light candidate",
+        "selected_variables": [
+          "pretension 0.2 N on all three tendons"
+        ],
+        "version": "research_decision_v1"
+      },
+      "hypothesis_source": {
+        "reference": {
+          "artifact_id": "468f8e70448962ca23007c010b4d20d9267bb112a46bade689ee40483f0b58d9",
+          "media_type": "application/json"
+        },
+        "pointer": "/original_plan"
+      },
+      "supporting_evidence": []
+    },
+    {
+      "sequence": 356,
+      "provider_order": 27,
+      "plan": {
+        "artifact_id": "89fecf9e0461dba9787cdcf8ec2126e90c09680f9f277c16471616814dc3829b",
+        "media_type": "application/json"
+      },
+      "action": "physical_replay",
+      "decision": {
+        "claimed_inference": "empirical_search",
+        "hypothesis_id": "MODEL_PREDICTION_UNRELIABLE",
+        "requested_budget": 0,
+        "research_intent": "PHYSICAL_VALIDATION",
+        "selected_candidate": {
+          "artifact_id": "89aa710b01aae4cdb160658807d0615989330f2eca6f22dc5d1d469f9d2e8868",
+          "media_type": "application/json"
+        },
+        "selected_method": "independent physical replay of the pretension baseline for the stiff-light candidate",
+        "selected_variables": [
+          "pretension 0.2 N only"
+        ],
+        "version": "research_decision_v1"
+      },
+      "hypothesis_source": {
+        "reference": {
+          "artifact_id": "89fecf9e0461dba9787cdcf8ec2126e90c09680f9f277c16471616814dc3829b",
+          "media_type": "application/json"
+        },
+        "pointer": "/original_plan"
+      },
+      "supporting_evidence": []
+    },
+    {
+      "sequence": 386,
+      "provider_order": 29,
+      "plan": {
+        "artifact_id": "4e2270fec3d40d35d8897fbfd24de1d2c0eb5cf279de76abb85db4df82475eb2",
+        "media_type": "application/json"
+      },
+      "action": "generate",
+      "decision": {
+        "claimed_inference": "empirical_search",
+        "hypothesis_id": "DESIGN_LIMITATION_POSSIBLE",
+        "requested_budget": 0,
+        "research_intent": "DESIGN_MODIFICATION",
+        "selected_candidate": null,
+        "selected_method": "serial_family_generation_v2, soft light rod: ellipse semi-axes 6 mm, E=15 MPa, rho=500, routing radius 22 mm",
+        "selected_variables": [
+          "section semi-axes 6 mm",
+          "E 15 MPa",
+          "density 500",
+          "viscosity 0.05",
+          "routing radius 22 mm",
+          "segment lengths 0.20/0.14"
+        ],
+        "version": "research_decision_v1"
+      },
+      "hypothesis_source": {
+        "reference": {
+          "artifact_id": "4e2270fec3d40d35d8897fbfd24de1d2c0eb5cf279de76abb85db4df82475eb2",
+          "media_type": "application/json"
+        },
+        "pointer": "/original_plan"
+      },
+      "supporting_evidence": []
+    },
+    {
+      "sequence": 401,
+      "provider_order": 30,
+      "plan": {
+        "artifact_id": "1ac6b1e117bd84728a3e274081070aabbac873304c8ffdd674553801ecacd045",
+        "media_type": "application/json"
+      },
+      "action": "generate",
+      "decision": {
+        "claimed_inference": "empirical_search",
+        "hypothesis_id": "DESIGN_LIMITATION_POSSIBLE",
+        "requested_budget": 0,
+        "research_intent": "DESIGN_MODIFICATION",
+        "selected_candidate": null,
+        "selected_method": "serial_family_generation_v2, stiff-light rod 10 mm semi-axes, E=15 MPa, rho=500, rest curvature_y 5.0 rad/m, routing 22 mm",
+        "selected_variables": [
+          "section semi-axes 10 mm",
+          "rest curvature_y 5.0 rad/m",
+          "rest curvature_z -0.3 rad/m",
+          "E 15 MPa",
+          "density 500",
+          "routing radius 22 mm",
+          "segment lengths 0.20/0.14"
+        ],
+        "version": "research_decision_v1"
+      },
+      "hypothesis_source": {
+        "reference": {
+          "artifact_id": "1ac6b1e117bd84728a3e274081070aabbac873304c8ffdd674553801ecacd045",
+          "media_type": "application/json"
+        },
+        "pointer": "/original_plan"
+      },
+      "supporting_evidence": []
+    },
+    {
+      "sequence": 416,
+      "provider_order": 31,
+      "plan": {
+        "artifact_id": "225f7fe602a0da21835ffd9aa85e1562d9f763bb4fc4282dcf024939cd2d43dd",
+        "media_type": "application/json"
+      },
+      "action": "initialize_control",
+      "decision": {
+        "claimed_inference": "empirical_search",
+        "hypothesis_id": "CONTROL_PARAMETERIZATION_LIMITED",
+        "requested_budget": 0,
+        "research_intent": "CONTROL_SEARCH",
+        "selected_candidate": {
+          "artifact_id": "1ba8a074933e95e672dd20e5acab8a717d7abf245ca0a0278077600fee4b9aeb",
+          "media_type": "application/json"
+        },
+        "selected_method": "baseline constant tension profile (0.3, 6.2, 0.2) N on tendon_0/1/2",
+        "selected_variables": [
+          "constant tendon tensions",
+          "tendon_1 lifting share",
+          "tendon_0 y-balance share"
+        ],
+        "version": "research_decision_v1"
+      },
+      "hypothesis_source": {
+        "reference": {
+          "artifact_id": "225f7fe602a0da21835ffd9aa85e1562d9f763bb4fc4282dcf024939cd2d43dd",
+          "media_type": "application/json"
+        },
+        "pointer": "/original_plan"
+      },
+      "supporting_evidence": []
+    },
+    {
+      "sequence": 430,
+      "provider_order": 32,
+      "plan": {
+        "artifact_id": "da7ec5ce712dbe3fd90da1d68a9bdaa8f44e19f1908fb16a94f72e28cf166657",
+        "media_type": "application/json"
+      },
+      "action": "physical_replay",
+      "decision": {
+        "claimed_inference": "empirical_search",
+        "hypothesis_id": "CONTROL_PARAMETERIZATION_LIMITED",
+        "requested_budget": 0,
+        "research_intent": "PHYSICAL_VALIDATION",
+        "selected_candidate": {
+          "artifact_id": "1ba8a074933e95e672dd20e5acab8a717d7abf245ca0a0278077600fee4b9aeb",
+          "media_type": "application/json"
+        },
+        "selected_method": "independent physical replay of the constant (0.3, 6.2, 0.2) N tension profile",
+        "selected_variables": [
+          "constant tendon tensions"
+        ],
+        "version": "research_decision_v1"
+      },
+      "hypothesis_source": {
+        "reference": {
+          "artifact_id": "da7ec5ce712dbe3fd90da1d68a9bdaa8f44e19f1908fb16a94f72e28cf166657",
+          "media_type": "application/json"
+        },
+        "pointer": "/original_plan"
+      },
+      "supporting_evidence": []
+    },
+    {
+      "sequence": 449,
+      "provider_order": 33,
+      "plan": {
+        "artifact_id": "a31e0afdc655cf6c7b7b33bc81d3915f56d1aa11e4ecfcaf1680c40465bf930d",
+        "media_type": "application/json"
+      },
+      "action": "initialize_control",
+      "decision": {
+        "claimed_inference": "empirical_search",
+        "hypothesis_id": "CONTROL_PARAMETERIZATION_LIMITED",
+        "requested_budget": 0,
+        "research_intent": "CONTROL_SEARCH",
+        "selected_candidate": {
+          "artifact_id": "1ba8a074933e95e672dd20e5acab8a717d7abf245ca0a0278077600fee4b9aeb",
+          "media_type": "application/json"
+        },
+        "selected_method": "baseline constant tension profile (0.3, 0.2, 6.5) N using tendon_2 as the lifting tendon",
+        "selected_variables": [
+          "constant tendon tensions",
+          "tendon_2 lifting share"
+        ],
+        "version": "research_decision_v1"
+      },
+      "hypothesis_source": {
+        "reference": {
+          "artifact_id": "a31e0afdc655cf6c7b7b33bc81d3915f56d1aa11e4ecfcaf1680c40465bf930d",
+          "media_type": "application/json"
+        },
+        "pointer": "/original_plan"
+      },
+      "supporting_evidence": []
+    },
+    {
+      "sequence": 463,
+      "provider_order": 34,
+      "plan": {
+        "artifact_id": "b5e772886f585fe6cb93ec75127a3943a81961eaf2bded7e4af168bbfa17593a",
+        "media_type": "application/json"
+      },
+      "action": "physical_replay",
+      "decision": {
+        "claimed_inference": "empirical_search",
+        "hypothesis_id": "CONTROL_PARAMETERIZATION_LIMITED",
+        "requested_budget": 0,
+        "research_intent": "PHYSICAL_VALIDATION",
+        "selected_candidate": {
+          "artifact_id": "1ba8a074933e95e672dd20e5acab8a717d7abf245ca0a0278077600fee4b9aeb",
+          "media_type": "application/json"
+        },
+        "selected_method": "independent physical replay of the constant (0.3, 0.2, 6.5) N tendon_2-lift profile",
+        "selected_variables": [
+          "constant tendon tensions"
+        ],
+        "version": "research_decision_v1"
+      },
+      "hypothesis_source": {
+        "reference": {
+          "artifact_id": "b5e772886f585fe6cb93ec75127a3943a81961eaf2bded7e4af168bbfa17593a",
+          "media_type": "application/json"
+        },
+        "pointer": "/original_plan"
+      },
+      "supporting_evidence": []
+    },
+    {
+      "sequence": 482,
+      "provider_order": 35,
+      "plan": {
+        "artifact_id": "7116b2968855f8d15523e085ba6d11494ebdc5f04281656e8e83a0eaa282c754",
+        "media_type": "application/json"
+      },
+      "action": "execute",
+      "decision": {
+        "claimed_inference": "empirical_search",
+        "hypothesis_id": "CONTROL_SEARCH_INCOMPLETE",
+        "requested_budget": 0,
+        "research_intent": "NMPC_EXECUTION",
+        "selected_candidate": {
+          "artifact_id": "fa1f567468bbeab9f537c4b25c888ba57e1a919753bf059ee6255576ca805075",
+          "media_type": "application/json"
+        },
+        "selected_method": "registered closed-loop NMPC controller (horizon 10 steps, 120 iterations, terminal weight 5, tension weight 1e-4)",
+        "selected_variables": [
+          "closed-loop tension policy",
+          "candidate fa1f5674 (EI~0.0153, mass ~0.034 kg)"
+        ],
+        "version": "research_decision_v1"
+      },
+      "hypothesis_source": {
+        "reference": {
+          "artifact_id": "7116b2968855f8d15523e085ba6d11494ebdc5f04281656e8e83a0eaa282c754",
+          "media_type": "application/json"
+        },
+        "pointer": "/original_plan"
+      },
+      "supporting_evidence": []
+    },
+    {
+      "sequence": 516,
+      "provider_order": 36,
+      "plan": {
+        "artifact_id": "f46965720e823e784c87ec7f896222d9f15079b5684511bd612721a349f74b04",
+        "media_type": "application/json"
+      },
+      "action": "generate",
+      "decision": {
+        "claimed_inference": "empirical_search",
+        "hypothesis_id": "CONTROL_PARAMETERIZATION_LIMITED",
+        "requested_budget": 0,
+        "research_intent": "DESIGN_MODIFICATION",
+        "selected_candidate": null,
+        "selected_method": "serial_family_generation_v2 with two independent three-tendon spans (one per segment) enabling opposite-sign per-segment bending",
+        "selected_variables": [
+          "tendon count 6",
+          "two spans (segment_0 only, segment_1 only)",
+          "section semi-axes 7 mm",
+          "E 15 MPa",
+          "density 500",
+          "routing radius 20 mm",
+          "segment lengths 0.20/0.14"
+        ],
+        "version": "research_decision_v1"
+      },
+      "hypothesis_source": {
+        "reference": {
+          "artifact_id": "f46965720e823e784c87ec7f896222d9f15079b5684511bd612721a349f74b04",
+          "media_type": "application/json"
+        },
+        "pointer": "/original_plan"
+      },
+      "supporting_evidence": []
+    },
+    {
+      "sequence": 531,
+      "provider_order": 37,
+      "plan": {
+        "artifact_id": "77fc02a44112d67a99989e6f0c089648ee619ea012f449b253dc3848a2043340",
+        "media_type": "application/json"
+      },
+      "action": "execute",
+      "decision": {
+        "claimed_inference": "empirical_search",
+        "hypothesis_id": "CONTROL_PARAMETERIZATION_LIMITED",
+        "requested_budget": 0,
+        "research_intent": "NMPC_EXECUTION",
+        "selected_candidate": {
+          "artifact_id": "e6304c14a5c9511ce9f3884a4ec549ea78ba2b70b3615f858f51df1d5815de04",
+          "media_type": "application/json"
+        },
+        "selected_method": "registered closed-loop NMPC controller with per-segment tendon spans (6 inputs)",
+        "selected_variables": [
+          "per-segment tendon moments (tendon_0-2 on segment_0, tendon_3-5 on segment_1)",
+          "closed-loop policy"
+        ],
+        "version": "research_decision_v1"
+      },
+      "hypothesis_source": {
+        "reference": {
+          "artifact_id": "77fc02a44112d67a99989e6f0c089648ee619ea012f449b253dc3848a2043340",
+          "media_type": "application/json"
+        },
+        "pointer": "/original_plan"
+      },
+      "supporting_evidence": []
+    },
+    {
+      "sequence": 565,
+      "provider_order": 38,
+      "plan": {
+        "artifact_id": "2b73ec2bafc60f35aa6d09da5976d44db65e37927534deeeae7bb69e38e587f4",
+        "media_type": "application/json"
+      },
+      "action": "generate",
+      "decision": {
+        "claimed_inference": "empirical_search",
+        "hypothesis_id": "DESIGN_LIMITATION_POSSIBLE",
+        "requested_budget": 0,
+        "research_intent": "DESIGN_MODIFICATION",
+        "selected_candidate": null,
+        "selected_method": "serial_family_generation_v2 short chain (0.16+0.11 m) matching the goal chord, soft-light 6 mm elliptical section, 3 tendons at 20 mm",
+        "selected_variables": [
+          "segment lengths 0.16/0.11",
+          "section semi-axes 6 mm",
+          "E 15 MPa",
+          "density 500",
+          "routing radius 20 mm",
+          "cells 8/8"
+        ],
+        "version": "research_decision_v1"
+      },
+      "hypothesis_source": {
+        "reference": {
+          "artifact_id": "2b73ec2bafc60f35aa6d09da5976d44db65e37927534deeeae7bb69e38e587f4",
+          "media_type": "application/json"
+        },
+        "pointer": "/original_plan"
+      },
+      "supporting_evidence": []
+    },
+    {
+      "sequence": 580,
+      "provider_order": 39,
+      "plan": {
+        "artifact_id": "43f05fab297e8041fc798a7e9eb755331c277f8d4aadc2ba3864a0e1fba17e83",
+        "media_type": "application/json"
+      },
+      "action": "initialize_control",
+      "decision": {
+        "claimed_inference": "empirical_search",
+        "hypothesis_id": "DESIGN_LIMITATION_POSSIBLE",
+        "requested_budget": 0,
+        "research_intent": "CONTROL_SEARCH",
+        "selected_candidate": {
+          "artifact_id": "5b4e69b3ccebff90c316ce227801ced050a1f39c1c372ad8bbed056a4034cd82",
+          "media_type": "application/json"
+        },
+        "selected_method": "baseline constant tension profile (1.3, 0.2, 4.1) N: tendon_2 lift+(-y), tendon_0 y-balance",
+        "selected_variables": [
+          "constant tendon tensions",
+          "tendon_2 lift share 4.1 N",
+          "tendon_0 y-balance 1.3 N"
+        ],
+        "version": "research_decision_v1"
+      },
+      "hypothesis_source": {
+        "reference": {
+          "artifact_id": "43f05fab297e8041fc798a7e9eb755331c277f8d4aadc2ba3864a0e1fba17e83",
+          "media_type": "application/json"
+        },
+        "pointer": "/original_plan"
+      },
+      "supporting_evidence": []
+    },
+    {
+      "sequence": 594,
+      "provider_order": 40,
+      "plan": {
+        "artifact_id": "0d0107fce33ce5d24f5b5c6fd7ac0da1e9015d7b116fd7607674d70b6e378bda",
+        "media_type": "application/json"
+      },
+      "action": "physical_replay",
+      "decision": {
+        "claimed_inference": "empirical_search",
+        "hypothesis_id": "DESIGN_LIMITATION_POSSIBLE",
+        "requested_budget": 0,
+        "research_intent": "PHYSICAL_VALIDATION",
+        "selected_candidate": {
+          "artifact_id": "5b4e69b3ccebff90c316ce227801ced050a1f39c1c372ad8bbed056a4034cd82",
+          "media_type": "application/json"
+        },
+        "selected_method": "independent physical replay of the constant (1.3, 0.2, 4.1) N profile on the short chain",
+        "selected_variables": [
+          "constant tendon tensions"
+        ],
+        "version": "research_decision_v1"
+      },
+      "hypothesis_source": {
+        "reference": {
+          "artifact_id": "0d0107fce33ce5d24f5b5c6fd7ac0da1e9015d7b116fd7607674d70b6e378bda",
+          "media_type": "application/json"
+        },
+        "pointer": "/original_plan"
+      },
+      "supporting_evidence": []
+    },
+    {
+      "sequence": 613,
+      "provider_order": 41,
+      "plan": {
+        "artifact_id": "7e88c565d560c1000909459f5e76c2dee40be552fc938bba9970d4cbe51e4cba",
+        "media_type": "application/json"
+      },
+      "action": "initialize_control",
+      "decision": {
+        "claimed_inference": "empirical_search",
+        "hypothesis_id": "DESIGN_LIMITATION_POSSIBLE",
+        "requested_budget": 0,
+        "research_intent": "CONTROL_SEARCH",
+        "selected_candidate": {
+          "artifact_id": "5b4e69b3ccebff90c316ce227801ced050a1f39c1c372ad8bbed056a4034cd82",
+          "media_type": "application/json"
+        },
+        "selected_method": "baseline constant profile (0.2, 2.6, 7.4) N from calibrated moment-arm inversion (tendon_2 lift 7.4 N, tendon_1 counter 2.6 N, tendon_0 released)",
+        "selected_variables": [
+          "tendon_2 lift 7.4 N",
+          "tendon_1 counter 2.6 N",
+          "tendon_0 0.2 N"
+        ],
+        "version": "research_decision_v1"
+      },
+      "hypothesis_source": {
+        "reference": {
+          "artifact_id": "7e88c565d560c1000909459f5e76c2dee40be552fc938bba9970d4cbe51e4cba",
+          "media_type": "application/json"
+        },
+        "pointer": "/original_plan"
+      },
+      "supporting_evidence": []
+    },
+    {
+      "sequence": 627,
+      "provider_order": 42,
+      "plan": {
+        "artifact_id": "67016974797c2b28864cf83932a6d2617386b26376014087c1e6d8b8cc9d5e9a",
+        "media_type": "application/json"
+      },
+      "action": "physical_replay",
+      "decision": {
+        "claimed_inference": "empirical_search",
+        "hypothesis_id": "DESIGN_LIMITATION_POSSIBLE",
+        "requested_budget": 0,
+        "research_intent": "PHYSICAL_VALIDATION",
+        "selected_candidate": {
+          "artifact_id": "5b4e69b3ccebff90c316ce227801ced050a1f39c1c372ad8bbed056a4034cd82",
+          "media_type": "application/json"
+        },
+        "selected_method": "independent physical replay of the calibrated counter-tensioned constant profile (0.2, 2.6, 7.4) N",
+        "selected_variables": [
+          "tendon_2 7.4 N",
+          "tendon_1 2.6 N",
+          "tendon_0 0.2 N"
+        ],
+        "version": "research_decision_v1"
+      },
+      "hypothesis_source": {
+        "reference": {
+          "artifact_id": "67016974797c2b28864cf83932a6d2617386b26376014087c1e6d8b8cc9d5e9a",
+          "media_type": "application/json"
+        },
+        "pointer": "/original_plan"
+      },
+      "supporting_evidence": []
+    },
+    {
+      "sequence": 646,
+      "provider_order": 43,
+      "plan": {
+        "artifact_id": "d73bd3cefd321906f3cc575263733d5a64e19747eeac601546fdd3461e8862e0",
+        "media_type": "application/json"
+      },
+      "action": "stop",
+      "decision": {
+        "claimed_inference": "empirical_search",
+        "hypothesis_id": "TENDON_CHORD_LIFT_SATURATION",
+        "requested_budget": 0,
+        "research_intent": "STOP",
+        "selected_candidate": null,
+        "selected_method": "stop with measured evidence; no complete original-task pass exists among the fresh results",
+        "selected_variables": [],
+        "version": "research_decision_v1"
+      },
+      "hypothesis_source": {
+        "reference": {
+          "artifact_id": "d73bd3cefd321906f3cc575263733d5a64e19747eeac601546fdd3461e8862e0",
+          "media_type": "application/json"
+        },
+        "pointer": "/original_plan"
+      },
+      "supporting_evidence": [
+        {
+          "artifact_id": "5bf1f17e384431482ba288950bd0b37a351a7b9b5ac7f918135d6ba42be2d796",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "ba7bfc6bbc21ea1469dbf0feb1fd67988634ca029f0cf1577532976bb60cb3c8",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "17706a0e200bb9a223baef1a4d472ae6b7f3c9edc5796cf1066d7410f9ce72cb",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "4ecbe22c984e18f9f3fcc6a002d18c30139bc954134f750270d9b8139cba537f",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "7ffda7ec2aefcff9dfb728c6a99102c3b647724a6cb9045676874dc551393d70",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "589abf600df82d419eb2e7cee2c4e85e53c59d782348954096a72c1fb107cb48",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "25156810b93c3d8454e5e1f9b2f1bb532e9c031f263c71dc240d3a4ccbbeb2a8",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "c9342f6e95b3e8e02851365773510f3a233ef96442fe262803dba3d97b132c2b",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "4fb21be9db6e0cae44253c74778f85baa76f14d84e307f3c4f396943b6c591b7",
+          "media_type": "application/json"
+        }
+      ]
+    }
+  ],
+  "scientific_records": [
+    {
+      "kind": "analysis_results",
+      "reference": {
+        "artifact_id": "4fb21be9db6e0cae44253c74778f85baa76f14d84e307f3c4f396943b6c591b7",
+        "media_type": "application/json"
+      },
+      "status": "execution_incomplete",
+      "candidate": {
+        "artifact_id": "de9dbe4f1cb3f4c83cb564487ec7dfb4cf30cc78760b0adc4715e58ca38cac3f",
+        "media_type": "application/json"
+      },
+      "operation": "equilibrium",
+      "reason": "EQUILIBRIUM_REQUIRES_TARGET_POINT",
+      "source": null,
+      "implementation": "6a14e9cd68c40c9f7de8b74fdd1ed4ea26e8a3ed",
+      "task_gap": null
+    },
+    {
+      "kind": "results",
+      "reference": {
+        "artifact_id": "ba7bfc6bbc21ea1469dbf0feb1fd67988634ca029f0cf1577532976bb60cb3c8",
+        "media_type": "application/json"
+      },
+      "status": "evaluated",
+      "candidate": {
+        "artifact_id": "fa1f567468bbeab9f537c4b25c888ba57e1a919753bf059ee6255576ca805075",
+        "media_type": "application/json"
+      },
+      "operation": null,
+      "reason": null,
+      "source": null,
+      "implementation": "6a14e9cd68c40c9f7de8b74fdd1ed4ea26e8a3ed",
+      "task_gap": {
+        "normalized_gap": 6.631149639453365,
+        "components": {
+          "evaluator:task_bound": 6.517445330369861,
+          "holding_position": 6.631149639453365,
+          "holding_speed": 6.343677830514935
+        },
+        "valid_complete": true,
+        "accepted": false,
+        "interpretation": "Research ranking only; invalid executions remain invalid regardless of gap"
+      }
+    },
+    {
+      "kind": "results",
+      "reference": {
+        "artifact_id": "5bf1f17e384431482ba288950bd0b37a351a7b9b5ac7f918135d6ba42be2d796",
+        "media_type": "application/json"
+      },
+      "status": "evaluated",
+      "candidate": {
+        "artifact_id": "e6304c14a5c9511ce9f3884a4ec549ea78ba2b70b3615f858f51df1d5815de04",
+        "media_type": "application/json"
+      },
+      "operation": null,
+      "reason": null,
+      "source": null,
+      "implementation": "6a14e9cd68c40c9f7de8b74fdd1ed4ea26e8a3ed",
+      "task_gap": {
+        "normalized_gap": 6.491881645324795,
+        "components": {
+          "evaluator:task_bound": 6.346021712605776,
+          "holding_position": 6.491881645324795,
+          "holding_speed": 6.060988694416959
+        },
+        "valid_complete": true,
+        "accepted": false,
+        "interpretation": "Research ranking only; invalid executions remain invalid regardless of gap"
+      }
+    },
+    {
+      "kind": "physical_replays",
+      "reference": {
+        "artifact_id": "25156810b93c3d8454e5e1f9b2f1bb532e9c031f263c71dc240d3a4ccbbeb2a8",
+        "media_type": "application/json"
+      },
+      "status": "execution_incomplete",
+      "candidate": {
+        "artifact_id": "de9dbe4f1cb3f4c83cb564487ec7dfb4cf30cc78760b0adc4715e58ca38cac3f",
+        "media_type": "application/json"
+      },
+      "operation": null,
+      "reason": null,
+      "source": {
+        "artifact_id": "2dd6af98425204933e2265669bf27959020127d7439b3c98c2c166e6b41823a9",
+        "media_type": "application/json"
+      },
+      "implementation": "6a14e9cd68c40c9f7de8b74fdd1ed4ea26e8a3ed",
+      "task_gap": {
+        "normalized_gap": null,
+        "components": {
+          "holding_position": 22.17025363343014,
+          "holding_speed": 21.970600390990015
+        },
+        "valid_complete": false,
+        "accepted": false,
+        "interpretation": "Research ranking only; invalid executions remain invalid regardless of gap"
+      }
+    },
+    {
+      "kind": "physical_replays",
+      "reference": {
+        "artifact_id": "c9342f6e95b3e8e02851365773510f3a233ef96442fe262803dba3d97b132c2b",
+        "media_type": "application/json"
+      },
+      "status": "evaluated",
+      "candidate": {
+        "artifact_id": "89aa710b01aae4cdb160658807d0615989330f2eca6f22dc5d1d469f9d2e8868",
+        "media_type": "application/json"
+      },
+      "operation": null,
+      "reason": null,
+      "source": {
+        "artifact_id": "5af9604061eb84ca48c8888b146069aa20d78f57b22cdab9902e16b72dc6aa43",
+        "media_type": "application/json"
+      },
+      "implementation": "6a14e9cd68c40c9f7de8b74fdd1ed4ea26e8a3ed",
+      "task_gap": {
+        "normalized_gap": 14.074531856387788,
+        "components": {
+          "evaluator:task_bound": 14.074531856387788,
+          "holding_position": 14.074531856387788,
+          "holding_speed": 11.061249295350224
+        },
+        "valid_complete": true,
+        "accepted": false,
+        "interpretation": "Research ranking only; invalid executions remain invalid regardless of gap"
+      }
+    },
+    {
+      "kind": "physical_replays",
+      "reference": {
+        "artifact_id": "7ffda7ec2aefcff9dfb728c6a99102c3b647724a6cb9045676874dc551393d70",
+        "media_type": "application/json"
+      },
+      "status": "evaluated",
+      "candidate": {
+        "artifact_id": "1ba8a074933e95e672dd20e5acab8a717d7abf245ca0a0278077600fee4b9aeb",
+        "media_type": "application/json"
+      },
+      "operation": null,
+      "reason": null,
+      "source": {
+        "artifact_id": "89caccbd99f3980999cc3341c6e0015a611980e04d343cb6f8a1a607f74f6930",
+        "media_type": "application/json"
+      },
+      "implementation": "6a14e9cd68c40c9f7de8b74fdd1ed4ea26e8a3ed",
+      "task_gap": {
+        "normalized_gap": 20.068513983918812,
+        "components": {
+          "evaluator:task_bound": 20.068513983918812,
+          "holding_position": 20.068513983918812,
+          "holding_speed": 18.45355302728994
+        },
+        "valid_complete": true,
+        "accepted": false,
+        "interpretation": "Research ranking only; invalid executions remain invalid regardless of gap"
+      }
+    },
+    {
+      "kind": "physical_replays",
+      "reference": {
+        "artifact_id": "589abf600df82d419eb2e7cee2c4e85e53c59d782348954096a72c1fb107cb48",
+        "media_type": "application/json"
+      },
+      "status": "evaluated",
+      "candidate": {
+        "artifact_id": "1ba8a074933e95e672dd20e5acab8a717d7abf245ca0a0278077600fee4b9aeb",
+        "media_type": "application/json"
+      },
+      "operation": null,
+      "reason": null,
+      "source": {
+        "artifact_id": "0af853b154227817991909249ebdc5a25276c32ffe76fe09c29c11d3b0a90cbc",
+        "media_type": "application/json"
+      },
+      "implementation": "6a14e9cd68c40c9f7de8b74fdd1ed4ea26e8a3ed",
+      "task_gap": {
+        "normalized_gap": 35.311068099640444,
+        "components": {
+          "evaluator:task_bound": 18.631023773464165,
+          "holding_position": 18.631023773464165,
+          "holding_speed": 35.311068099640444
+        },
+        "valid_complete": true,
+        "accepted": false,
+        "interpretation": "Research ranking only; invalid executions remain invalid regardless of gap"
+      }
+    },
+    {
+      "kind": "physical_replays",
+      "reference": {
+        "artifact_id": "17706a0e200bb9a223baef1a4d472ae6b7f3c9edc5796cf1066d7410f9ce72cb",
+        "media_type": "application/json"
+      },
+      "status": "evaluated",
+      "candidate": {
+        "artifact_id": "5b4e69b3ccebff90c316ce227801ced050a1f39c1c372ad8bbed056a4034cd82",
+        "media_type": "application/json"
+      },
+      "operation": null,
+      "reason": null,
+      "source": {
+        "artifact_id": "6faf9996a78ac084cf13132f4c9cc355149ba0f4337560d45e194803b1f7d69e",
+        "media_type": "application/json"
+      },
+      "implementation": "6a14e9cd68c40c9f7de8b74fdd1ed4ea26e8a3ed",
+      "task_gap": {
+        "normalized_gap": 6.6919092306970205,
+        "components": {
+          "evaluator:task_bound": 6.6919092306970205,
+          "holding_position": 6.6919092306970205,
+          "holding_speed": 3.3272478120758944
+        },
+        "valid_complete": true,
+        "accepted": false,
+        "interpretation": "Research ranking only; invalid executions remain invalid regardless of gap"
+      }
+    },
+    {
+      "kind": "physical_replays",
+      "reference": {
+        "artifact_id": "4ecbe22c984e18f9f3fcc6a002d18c30139bc954134f750270d9b8139cba537f",
+        "media_type": "application/json"
+      },
+      "status": "evaluated",
+      "candidate": {
+        "artifact_id": "5b4e69b3ccebff90c316ce227801ced050a1f39c1c372ad8bbed056a4034cd82",
+        "media_type": "application/json"
+      },
+      "operation": null,
+      "reason": null,
+      "source": {
+        "artifact_id": "519dcae8de639ab5b5ac0d7f0b576fbe166503df4f1c423660a612137fa89376",
+        "media_type": "application/json"
+      },
+      "implementation": "6a14e9cd68c40c9f7de8b74fdd1ed4ea26e8a3ed",
+      "task_gap": {
+        "normalized_gap": 6.566324574986201,
+        "components": {
+          "evaluator:task_bound": 6.566324574986201,
+          "holding_position": 6.566324574986201,
+          "holding_speed": 5.395970783508331
+        },
+        "valid_complete": true,
+        "accepted": false,
+        "interpretation": "Research ranking only; invalid executions remain invalid regardless of gap"
+      }
+    }
+  ],
+  "disposition": {
+    "artifact_id": "d73bd3cefd321906f3cc575263733d5a64e19747eeac601546fdd3461e8862e0",
+    "media_type": "application/json"
+  },
+  "native_action": "stop"
+}
