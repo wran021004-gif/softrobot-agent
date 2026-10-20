@@ -477,7 +477,7 @@ async def converse(host):
                 agent.tool_registry.registry.pop('research_analysis',None)
         record(host,'model_decision_packet',current)
         agent.system_prompt=instructions+'\nCURRENT_RESEARCH_PACKET\n'+json.dumps(current,separators=(',',':'))
-        if protected(host):
+        if current.get('research',{}).get('budget',{}).get('closeout',{}).get('next_request_will_protect',protected(host)):
             permitted=closeout_operations(host)
             schema=plan_schema(permitted['research_plan'])
             native[0].tool_spec={**native[0].tool_spec,'inputSchema':{'json':schema}}

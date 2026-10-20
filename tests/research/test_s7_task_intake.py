@@ -172,6 +172,29 @@ class S7IntakeTests(unittest.TestCase):
             await boundary.aclose()
         asyncio.run(exercise())
 
+    def test_provider_unknown_send_blocks_retry_and_preserves_charge(self):
+        import asyncio,httpx
+        from tools.research.agent import LiveBoundary,pending
+        directory=self.directory/'unknown-provider-fixture'
+        fixture=lambda **v:ProjectConfig(**{**v,'project_id':'unknown-provider-fixture','grant_id':'unknown-provider-fixture'})
+        with patch.object(core,'ProjectConfig',side_effect=fixture):
+            host=core.prepare(ROOT/'configs/research/study_s7_mirror.json',directory)
+        provider=state(host)['pilot']['provider'];sends=[]
+        wire=dict(model=provider['model'],thinking=dict(type=provider['thinking']),reasoning_effort=provider['reasoning_effort'],
+            max_tokens=provider['max_tokens'],stream=False,messages=[dict(role='user',content='OFFLINE_FAILURE_FIXTURE')])
+        def fail(request):
+            sends.append(request);raise httpx.ReadError('synthetic unknown send outcome')
+        async def exercise():
+            boundary=LiveBoundary(host,httpx.MockTransport(fail))
+            request=lambda:httpx.Request('POST',provider['base_url']+'/chat/completions',json=wire)
+            with self.assertRaises(httpx.ReadError):await boundary.handle_async_request(request())
+            with self.assertRaisesRegex(ValueError,'R3_UNCONFIRMED_ATTEMPT_BLOCKS_SEND'):
+                await boundary.handle_async_request(request())
+            self.assertEqual(len(sends),1);self.assertEqual(host.store.remaining()['used']['model_calls'],1)
+            self.assertEqual(len(pending(host)),1);self.assertFalse(state(host)['pilot'].get('unconsumed_response'))
+            await boundary.aclose()
+        asyncio.run(exercise())
+
     def test_controller_patches_are_validated_and_cannot_modify_acceptance(self):
         request=deepcopy(self.candidate['parameters']);request['controller_recipe']=dict(horizon=8,max_iterations=25)
         result=design.generate_candidate(self.host,request,dict(origin='offline_fixture'))

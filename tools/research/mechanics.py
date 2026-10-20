@@ -21,6 +21,22 @@ def handoff(host,reference,parameters=None,provenance=None):
         raise ValueError('HANDOFF_REQUIRES_EXACT_SOLVED_CANDIDATE')
     return dict(candidate=value['design_candidate'],reference=plain(reference),trajectory=value['trajectory'],interpretation='Mathematical trajectory is not backend acceptance')
 
+def warm_start(host,arguments):
+    """Existing source eligibility shared with the read-only decision view."""
+    if not arguments.warm_source:return None
+    if plain(arguments.warm_source) in state(host).get('mechanics_results',[]):
+        warm=source(host,arguments.warm_source)
+    else:
+        warm=host.store.artifact(arguments.warm_source)
+        from tools.research.physical_replay import numerically_verified_source
+        verified=(numerically_verified_source(warm) and
+            (warm.get('source_kind')=='verified_mathematical_trajectory' or
+                arguments.initialization=='saved_candidate_controls'))
+        historical=(warm.get('source_kind')=='historical_mathematical_trajectory' and
+            (arguments.initialization=='saved_candidate_controls' or arguments.objective_mode!='task_capability'))
+        if not (verified or historical):raise ValueError('VERIFIED_MATHEMATICAL_WARM_SOURCE_REQUIRED')
+    return warm['trajectory']
+
 def dispatch(host,operation,arguments,key):
     guard(host,True)
     s=state(host)
@@ -42,21 +58,7 @@ def dispatch(host,operation,arguments,key):
         candidate=plain(arguments.candidate)
         cfg=verify_candidate(host,candidate)['configuration']
         trajectory=None
-        warm_trajectory=None
-        if arguments.warm_source:
-            if plain(arguments.warm_source) in s.get('mechanics_results',[]):
-                warm=source(host,arguments.warm_source)
-            else:
-                warm=host.store.artifact(arguments.warm_source)
-                from tools.research.physical_replay import numerically_verified_source
-                verified=(numerically_verified_source(warm) and
-                    (warm.get('source_kind')=='verified_mathematical_trajectory' or
-                        arguments.initialization=='saved_candidate_controls'))
-                historical=(warm.get('source_kind')=='historical_mathematical_trajectory' and
-                    (arguments.initialization=='saved_candidate_controls' or arguments.objective_mode!='task_capability'))
-                if not (verified or historical):
-                    raise ValueError('VERIFIED_MATHEMATICAL_WARM_SOURCE_REQUIRED')
-            warm_trajectory=warm['trajectory']
+        warm_trajectory=warm_start(host,arguments)
     elif operation=='refine':
         candidate=plain(arguments.candidate)
         cfg=verify_candidate(host,candidate)['configuration']

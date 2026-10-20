@@ -72,6 +72,29 @@ def observation(host,ref,historical=False):
         raw_reference=raw_ref,evidence=summarize_evidence(result,ref))
 
 
+def physical_diagnostic(host,reference):
+    """Select measured extrema from the existing adapter, never infer a cause."""
+    row=observation(host,reference);raw_ref=row['raw_reference']
+    raw=host.store.artifact(raw_ref) if raw_ref else {};samples=raw.get('samples',[])
+    extrema={}
+    for violation in row['violations']['samples']:
+        key=violation['constraint']
+        if key not in extrema or violation['normalized_excess']>extrema[key]['normalized_excess']:extrema[key]=violation
+    chosen={len(samples)-1:[]} if samples else {}
+    for violation in extrema.values():chosen.setdefault(int(violation['raw_pointer'].split('/')[2]),[]).append(violation)
+    observed=('tip_m','tip_velocity_m_s','position_error_m','speed_m_s','actual_tension_n')
+    inputs=[s['actual_tension_n'] for s in samples if s.get('actual_tension_n') is not None]
+    return dict(task_passed=row['task_gap']['accepted'],valid_complete=row['task_gap']['valid_complete'],
+        owning_study=host.store.artifact(reference).get('owning_study'),
+        violated_constraints={k:v for k,v in row['constraints'].items() if v['passed'] is False},
+        critical_samples=[dict(time_s=samples[i]['time_s'],observed={k:samples[i][k] for k in observed if k in samples[i]},
+            constraints=chosen[i],raw_reference=raw_ref,read_pointer='/samples/'+str(i)) for i in sorted(chosen)],
+        input_bounds_summary=dict(measured_min_n=[min(x) for x in zip(*inputs)],measured_max_n=[max(x) for x in zip(*inputs)],
+            acceptance_component=row['constraints'].get('force_bounds')) if inputs else dict(status='unavailable'),
+        limitations=['These are measured facts, not a proven failure cause',row['violations']['status'],
+            'Only the original registered acceptance establishes this execution outcome'])
+
+
 def legacy_context(host):
     from tools.research.candidate_portfolio import ranking_key
     from tools.research_tasks import task_adapter
@@ -163,6 +186,9 @@ def context(host):
     s=state(host);settings=s['spec'].get('research_decisions',{}).get('context_limits')
     current=legacy_context(host)
     if settings is not None:current=bounded_context(current,settings,s.get('control_initializations',[]))
+    from tools.research.budget import decision_budget, closeout_operations
+    if decision_budget(host)['closeout']['next_request_will_protect']:
+        current['actions']=[] if s['research_status']=='stopped' else closeout_operations(host)['research_plan']
     if s['spec'].get('tool_readiness') or s.get('tool_failures'):
         from tools.research.tool_readiness import availability, MATLAB_ACTIONS
         status=availability(host)
@@ -224,7 +250,10 @@ def context(host):
             result=compact_result(value,latest)
             current['latest_scientific_feedback']={k:result.get(k) for k in ('reference','operation','status',
                 'static_input_observation','input_response_observation','control_handoff','scoped_claim','analysis_applicability')}
-        else:current['latest_scientific_feedback']=dict(reference=latest,**compact_evidence(value,latest)['summary'])
+        else:
+            current['latest_scientific_feedback']=dict(reference=latest,**compact_evidence(value,latest)['summary'])
+            if value.get('acceptance') and value.get('raw_reference'):
+                current['latest_scientific_feedback']['physical_diagnostic']=physical_diagnostic(host,latest)
     return current
 
 
@@ -261,6 +290,27 @@ def action_feedback(host,current):
     candidates=list({e['candidate']['artifact_id']:e['candidate'] for e in current['control_search_starts']}.values())
     candidates += [r for r in list(s.get('candidates',{}).values())[-3:] if r not in candidates]
     for candidate in candidates:
+        from tools.research.contracts import MechanicsRequest
+        from tools.research.mechanics import warm_start
+        from tools.research_tasks import task_adapter
+        cfg=host.store.artifact(candidate)['configuration']
+        requirements=task_adapter(cfg).analysis_requirements({})
+        applicable=all(c.kind=='norm_bound' and c.signal.name in ('tip_position','tip_velocity') for c in requirements.constraints)
+        modes=MechanicsRequest.model_json_schema()['properties']['initialization']['enum'];warm=[]
+        for source in known:
+            for mode in modes[2:]:
+                try:
+                    request=MechanicsRequest(candidate=candidate,initialization=mode,warm_source=source)
+                    trajectory=warm_start(host,request);binding(cfg,trajectory)
+                    warm.append(dict(initialization=mode,warm_source=source,objective_mode=request.objective_mode))
+                except (ValueError,KeyError,TypeError):continue
+        rows.append(dict(action='mechanics',candidate=candidate,status='preflight_eligible' if applicable and 'mechanics' in current['actions'] else 'unavailable',
+            task_applicable=applicable,cold_initializations=modes[:2],warm_sources=warm,
+            warm_source_scope='Advertised defaults: substeps=1, objective_mode=task_gap; other objectives/grids require full preflight',
+            missing_warm_source=None if warm else 'No eligible bound mathematical source for advertised defaults; explicit physical schedules do not qualify',
+            check_only='Mathematical checking uses the analysis allowance; it is not an optimized or physically accepted result',
+            remaining_checks=['full_plan_admission','requested_budget','model/coordinate/state/substeps/grid preflight'],
+            example=dict(action='mechanics',mechanics=dict(candidate=candidate,initialization=modes[0],check_only=False))))
         references=[r for r in s.get('analysis_results',[]) if host.store.artifact(r).get('candidate')==candidate
             and host.store.artifact(r).get('operation')=='input_sensitivity']
         status='blocked';reason='verified_input_sensitivity_required';ref=None
@@ -315,7 +365,9 @@ def tool_feedback(host,value):
         if reference in state(host).get('analysis_results',[]):
             from tools.research.analysis import compact_result
             view=compact_result(raw,reference)
-    else:view=compact_evidence(result,wrapper)
+    else:view=compact_evidence(result,wrapper,'/result' if 'result' in value else '')
+    if reference in known and isinstance(raw,dict) and raw.get('acceptance') and raw.get('raw_reference'):
+        view['physical_diagnostic']=physical_diagnostic(host,reference)
     return dict(wrapper_reference=wrapper,wrapper_role='Retrieval only; not supporting_evidence',
         scientific_reference=reference if reference in known else None,new_facts=view)
 

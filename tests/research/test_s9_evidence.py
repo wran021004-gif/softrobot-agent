@@ -69,7 +69,7 @@ class EvidenceTests(unittest.TestCase):
         s=dict(spec={},research_status='stopped',mechanics_results=[REF],analysis_results=[dict(REF,artifact_id='b'*64)])
         current=dict(actions=[],method_remaining={},control_search_starts=[],best_valid=None)
         host=Mock();host.store.remaining.return_value={'remaining':{'backend_solves':0}};host.store.events.return_value=[]
-        with patch('tools.research.budget.decision_budget',return_value={}),patch('tools.research.research_context.state',return_value=s),patch('tools.research.research_context.legacy_context',return_value=current),patch('tools.research.research_context.action_feedback',return_value=[]):
+        with patch('tools.research.budget.decision_budget',return_value={'closeout':{'next_request_will_protect':False}}),patch('tools.research.research_context.state',return_value=s),patch('tools.research.research_context.legacy_context',return_value=current),patch('tools.research.research_context.action_feedback',return_value=[]):
             view=context(host)
         self.assertEqual(view['all_fresh_results'],[REF,dict(REF,artifact_id='b'*64)])
 
