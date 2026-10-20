@@ -57,3 +57,5 @@ Deferred in accordance with the required sequence: perform it only after the for
 Only the designated worktree is edited. No force push, history rewrite, unrelated worktree edit, sealed S7–S11 change or credential inclusion is authorized by this work.
 
 Ordinary push was also rejected before execution: automatic approval did not confirm trusted authorization to send these specific code/configuration/evidence commits to `github.com/wran021004-gif/softrobot-agent`, branch `feat/sorosim-matlab-nmpc`. Explicit authorization has been requested; no alternate push was attempted. Local commits remain retained; remote equality has not been claimed.
+
+A repeated test run exposed a fixed grant identifier in the new unknown-send fixture. The original budget mechanism correctly rejected it with `GRANT_ALREADY_BOUND`. A follow-up test-only change derives the fixture grant from its unique directory; no registry entry or budget was deleted/reset. The retained final regression now records 103 tests, zero failures/errors and one opt-in skip. Earlier local commit history retains the failed intermediate run.

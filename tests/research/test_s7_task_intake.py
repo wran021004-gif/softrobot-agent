@@ -176,7 +176,7 @@ class S7IntakeTests(unittest.TestCase):
         import asyncio,httpx
         from tools.research.agent import LiveBoundary,pending
         directory=self.directory/'unknown-provider-fixture'
-        fixture=lambda **v:ProjectConfig(**{**v,'project_id':'unknown-provider-fixture','grant_id':'unknown-provider-fixture'})
+        fixture=lambda **v:ProjectConfig(**{**v,'project_id':self.directory.name+'-unknown','grant_id':self.directory.name+'-unknown'})
         with patch.object(core,'ProjectConfig',side_effect=fixture):
             host=core.prepare(ROOT/'configs/research/study_s7_mirror.json',directory)
         provider=state(host)['pilot']['provider'];sends=[]
