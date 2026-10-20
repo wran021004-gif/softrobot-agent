@@ -72,6 +72,59 @@ def cold_preflight():
     return dict(status='passed',direct_rl=report['direct_rl_environment'],provider_requests=0,new_physics=0)
 
 
+def verify_nmpc(host, destination):
+    """Recompute sealed NMPC evaluation/profile without stepping or optimizing."""
+    from schemas.platform import SessionInput, BackendResult
+    from tools.platform_store import plain
+    from tools.state_io import digest
+    from tools.research_tasks import assemble_acceptance
+    from tools.research.feedback import task_gap
+    from extensions.tendon_family.control_evidence import ControlEvidence
+    from extensions.tendon_family.gvs_reporting import reconstruct_motion, summarize
+    from extensions.tendon_family.gvs_profile import settling_for
+    checks=[];reader=ControlEvidence(host.store)
+    for ref in state(host)['results']:
+        value=host.store.artifact(ref)
+        if value['status']!='evaluated':
+            checks.append(dict(reference=ref,status=value['status'],independent_recompute='not_tested'));continue
+        source=reader.resolve(value['execution_id']);cfg=SessionInput.model_validate(source['configuration'])
+        snapshot=host.store.session(source['owner'])['snapshot'];base=SessionInput.model_validate(snapshot['input'])
+        receipts=value['execution']['receipts'];sim=receipts['simulation']['output'];evref=receipts['evaluation']['output']
+        result=BackendResult.model_validate(host.store.artifact(sim));original=host.store.artifact(evref)
+        evaluator,_=host.reg.bind(base.task.evaluator,'evaluator')
+        identity=digest(dict(instance=snapshot['instance_identity'],task=plain(base.task),evaluator=plain(base.task.evaluator),
+            backend=result.backend_id,model=result.model_id,
+            evaluator_dependencies=snapshot['dependencies'][evaluator.extension_id+'@'+evaluator.version],
+            backend_dependencies=snapshot['dependencies'][base.policy.backend.extension_id+'@'+base.policy.backend.version]))
+        evaluation=evaluator.resolve()(cfg.task,result,sim,host.reg,identity).model_copy(update=dict(
+            source_execution_id=value['execution_id'],original_execution_id=source['metadata'].get('original_execution_id'),
+            candidate_id=source['metadata']['candidate'],evaluator_version=evaluator.version))
+        assert plain(evaluation)==original
+        files={name:host.store.artifact(r,raw=True) for name,r in source['files'].items()}
+        rows=reader.read_file(source,'trajectory.json.gz');observations=reader.read_file(source,'controller_observations.json')
+        motion,physics=reconstruct_motion(files,rows,cfg.task.goal.data['target_m'])
+        profile=value['profile'];assert motion==host.store.artifact(profile['motion'])
+        recomputed=summarize(cfg.task,plain(result),plain(evaluation),rows,observations,motion,
+            [t['force_limit_n'] for t in physics['tendons']],settling_for(cfg))
+        assert recomputed.pop('one_step_prediction_comparisons')==host.store.artifact(profile['one_step_prediction_evidence'])
+        recomputed['drive_utilization']=[dict(row,tendon=physics['tendons'][i]['entity'])
+            for i,row in enumerate(recomputed['drive_utilization'])]
+        assert all(profile[k]==v for k,v in recomputed.items())
+        acceptance=assemble_acceptance(source['configuration'],evaluation,dict(profile,**recomputed),
+            evaluation_reference=evref,profile_reference=receipts['profile']['output'],motion=motion)
+        assert acceptance==value['acceptance']
+        commands=reader.read_file(source,'actual_commands.json')
+        checks.append(dict(reference=ref,execution_id=value['execution_id'],accepted=acceptance['accepted'],
+            original_evaluator_and_full_acceptance_equal=True,saved_state_motion_and_profile_equal=True,
+            trajectory_samples=len(rows),controller_updates=len(observations),task_gap=task_gap(value),
+            metrics=acceptance['metrics'],exports=source['files']))
+        atomic_json(destination/('nmpc_design_control_'+value['execution_id']+'.json'),dict(
+            scientific_result=ref,candidate=value['candidate'],configuration=source['configuration'],
+            actual_commands=commands,acceptance=acceptance,exports=source['files'],
+            scope='Recorded closed-loop commands, not a newly executed open-loop replay or a successful solution.'))
+    return checks
+
+
 def final_checks(run_id='s12-mirror-live-20261020', destination='evidence/s12_mirror', baseline='25e1c889'):
     import hashlib,os,tarfile
     from pathlib import Path
@@ -137,6 +190,7 @@ def final_checks(run_id='s12-mirror-live-20261020', destination='evidence/s12_mi
         acceptance=assemble_acceptance(cfg,ev,profile,evaluation_reference=v['evaluation_reference'],profile_reference=None,motion=[dict(time_s=x['time_s']) for x in samples])
         assert acceptance==v['acceptance'] and profile==v['profile']
         physical.append(dict(reference=ref,original_evaluator_and_full_acceptance_equal=True,accepted=acceptance['accepted'],task_gap=task_gap(v)))
+    if run_id.startswith('s125-'):physical.extend(verify_nmpc(h,out))
     manifest=read(out/'study/archive_manifest.json');archive=out/'study/immutable_artifacts.tar.gz'
     assert hashlib.sha256(archive.read_bytes()).hexdigest()==manifest['archive_sha256']
     load_credential(Path(s['spec']['runtime']['credentials_reference']).expanduser());secret=os.environ['DEEPSEEK_API_KEY'].encode()
