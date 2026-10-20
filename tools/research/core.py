@@ -30,8 +30,12 @@ def read_evidence(host, query):
     value = host.store.artifact(q.reference)
     if protected(host) and plain(q.reference) not in readable_results(s,host):
         raise ValueError('PROTECTED_EVIDENCE_READ_REQUIRES_NEW_RESULT_OR_TRAINING_SUMMARY')
-    for part in q.pointer.strip('/').split('/') if q.pointer else []:
+    if q.pointer and not q.pointer.startswith('/'):
+        raise ValueError('INVALID_EVIDENCE_POINTER: use an absolute JSON pointer or empty root')
+    for part in q.pointer[1:].split('/') if q.pointer else []:
         part = part.replace('~1', '/').replace('~0', '~')
+        if isinstance(value,list) and (not part.isdecimal() or int(part)>=len(value)):
+            raise IndexError('List index must be in [0, '+str(len(value))+')')
         value = value[int(part)] if isinstance(value, list) else value[part]
     if q.view=='capabilities':
         from extensions.tendon_family.family_space import parameter_capabilities
@@ -41,9 +45,11 @@ def read_evidence(host, query):
         from tools.research.research_context import compact_evidence
         value=compact_evidence(value,plain(q.reference),q.pointer)
     elif q.view=='fields':
+        if not isinstance(value,dict):raise ValueError('EVIDENCE_FIELDS_REQUIRES_OBJECT_POINTER')
         value={key:value[key] for key in q.fields}
     elif q.view=='range':
         if not isinstance(value,list):raise ValueError('EVIDENCE_RANGE_REQUIRES_LIST_POINTER')
+        if q.start>len(value):raise ValueError('EVIDENCE_RANGE_START_OUTSIDE_LIST: length='+str(len(value)))
         value=dict(total=len(value),start=q.start,items=value[q.start:q.start+q.count])
     if not q.pointer and plain(q.reference) in [s.get('holding_diagnostic_reference'),*s.get('task_math_references',[])]:
         update(host,guidance_reads=[*s.get('guidance_reads',[]),plain(q.reference)])

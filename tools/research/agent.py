@@ -242,6 +242,9 @@ def error_feedback(host, use, exc, before):
         'DECISION_CANDIDATE_MISMATCH':('decision.selected_candidate','Use the exact candidate in this action payload'),
         'PHYSICAL_REPLAY_CANDIDATE_TASK_MODEL_OR_SEQUENCE_MISMATCH':('source','Use a candidate-bound source; initialize_control explicitly rebinds inherited controls'),
         'UNREGISTERED_RESEARCH_EVIDENCE':('supporting_evidence','Cite registered result, candidate or source references from current packet'),
+        'REGISTERED_CURRENT_ANALYSIS_REQUIRED':('control_seed.response_evidence','Request input_sensitivity for the selected candidate, then use its registered result reference'),
+        'VERIFIED_CANDIDATE_INPUT_SENSITIVITY_REQUIRED':('control_seed.response_evidence','Use computed, numerically verified input_sensitivity bound to this candidate, model, task, operating point and tendon order'),
+        'STOP_MUST_CITE_ALL_NEW_EXPERIMENT_RESULTS':('supporting_evidence','Explicitly cite the complete current research.all_fresh_results index and explain the conclusions'),
         'ENGINEERING_TOOL_UNAVAILABLE':('action','Choose an available operation from current packet; engine failure is not scientific infeasibility')}
     for marker,(f,hint) in hints.items():
         if marker in message:code=marker;field=f;expected=hint
@@ -259,10 +262,11 @@ def error_feedback(host, use, exc, before):
                     if isinstance(value,list) and (not key.isdigit() or int(key)>=len(value)):break
                     value=value[int(key)] if isinstance(value,list) else value[key];parent+='/'+part
                 if isinstance(value,dict):expected='Available children at '+(parent or '/')+': '+', '.join(value)
+                elif isinstance(value,list):expected='List at '+(parent or '/')+' has '+str(len(value))+' items; use view=range or an index from 0 through '+str(len(value)-1)
                 if use['input'].get('view')=='fields':field='fields'
             except (ValueError,KeyError,IndexError,TypeError):pass
     if 'EVIDENCE_RANGE_REQUIRES_LIST_POINTER' in message:
-        field='pointer';expected='Use the actual list pointer, e.g. /trajectory/tensions_n on a control source or /samples on its raw_reference'
+        field='pointer';expected='Read the current reference root with view=summary, then use an advertised list read_pointer with view=range'
     if 'PROTECTED_EVIDENCE_READ_REQUIRES' in message:
         field='reference';expected='Only current result references are readable during closeout; use all_fresh_results and select a fresh pass or STOP'
     return dict(status='rejected' if counts(before)==counts(s) else 'execution_failed',error_code=code[:100],field=field,
@@ -388,6 +392,9 @@ async def converse(host):
                     from tools.research.research_context import compact_evidence
                     ref=record(host,'complete_tool_output',value)
                     value=compact_evidence(value,ref)
+                    from tools.research.research_context import context
+                    current=context(host)
+                    value=dict(decision_feedback=current['decision_feedback'],all_fresh_results=current['all_fresh_results'],**value)
                 return dict(toolUseId=use['toolUseId'],status='success',content=[dict(text=json.dumps(value,separators=(',',':')))])
             except Exception as exc:
                 key='native-'+use['toolUseId']

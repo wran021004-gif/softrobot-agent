@@ -142,10 +142,14 @@ def compact_evidence(value, reference, pointer=''):
         summary=dict(stop_reason=value.get('stop_reason'),search_dimension=value.get('search_dimension'),
             finite_difference_evaluations=value.get('finite_difference_evaluations'),
             best={k:best.get(k) for k in ('reference','candidate','source','task_gap','coefficients_n')},
-            small_query=dict(pointer=pointer+'/best',view='fields',fields=['reference','candidate','source','task_gap','coefficients_n']))
+            small_query=dict(pointer=pointer+'/best',view='fields',fields=[k for k in
+                ('reference','candidate','source','task_gap','coefficients_n') if k in best]))
+    if isinstance(value,dict) and 'acceptance' in value:
+        summary.update(task_gap=task_gap(value),constraints=value['acceptance'].get('components',{}),
+            limitations=['Only this recorded execution establishes its task outcome'])
     return dict(reference=reference,pointer=pointer,view='deterministic_summary',
-        available_keys=list(value) if isinstance(value,dict) else None,summary=summary,value=result,
-        retrieval='evidence_read(view=full,pointer=...) or fields/range; no acceptance transfer')
+        available_keys=list(value) if isinstance(value,dict) else None,summary=summary,
+        retrieval='Display value/summary/preview are not Store path prefixes. All read_pointer values are absolute paths in reference. Use evidence_read(view=full,pointer=...). No acceptance transfer.',value=result)
 
 
 def context(host):
@@ -186,7 +190,39 @@ def context(host):
         response_cost='baseline per start + active coefficient count probes + one proposal per local response iteration; all share one cap',
         time_constraint='0 <= window_start <= knots[0] < knots[-1] <= window_end <= task duration',
         multi_start='additional_starts=[{candidate,source,adaptation_from?}]; same task, tendon order and time grid required')
+    # One authoritative STOP index, including results absent from observation previews.
+    current['all_fresh_results']=[r for key in ('results','mechanics_results','physical_replays',
+        'matched_state_results','rl_evaluations','analysis_results') for r in s.get(key,[])]
+    current['decision_feedback']=dict(
+        recent_observations=[compact_evidence(host.store.artifact(r),r)['summary'] | dict(reference=r)
+            for r in [*s.get('results',[]),*s.get('physical_replays',[]),*s.get('rl_evaluations',[])][-3:]],
+        actions=action_feedback(host,current),
+        citation_rule='STOP must explain the outcome and explicitly cite all_fresh_results. This index does not record model reading or understanding.')
     return current
+
+
+def action_feedback(host,current):
+    """Admission prerequisites for parameterized actions, not model decisions."""
+    from tools.research.physical_replay import binding
+    from tools.research.budget import protected, backend_capacity
+    s=state(host);rows=[];capacity=backend_capacity(host)
+    closed=s['research_status']=='stopped' or protected(host)
+    for entry in current['control_search_starts']:
+        candidate=entry['candidate'];source=entry['source'];cfg=host.store.artifact(candidate)['configuration']
+        for action in ('physical_replay','control_search'):
+            reason=None;status='eligible'
+            if closed or action not in current['actions'] or capacity<1:
+                status='unavailable';reason='Protected/stopped state, action availability or shared backend capacity'
+            elif action=='control_search' and cfg['task']['family']!='task.reach':
+                status='not_applicable';reason='Current search requires reach-hold norm constraints'
+            else:
+                try:binding(cfg,host.store.artifact(source)['trajectory'])
+                except ValueError as exc:status='blocked';reason=str(exc)
+            rows.append(dict(action=action,status=status,candidate=candidate,source=source,reason=reason,
+                remaining_backend_launches=capacity,minimum_new_launches=1,
+                requires_agent_fields=['decision','hypothesis','finite search settings'] if action=='control_search' else ['decision','hypothesis'],
+                scope='Candidate/source admission only; full typed Plan, budget and scientific preflight remain authoritative'))
+    return rows
 
 
 def bounded_context(current,settings,initializations=()):
