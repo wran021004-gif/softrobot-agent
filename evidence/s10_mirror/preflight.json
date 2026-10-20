@@ -1,0 +1,1292 @@
+{
+  "scientific_evidence": false,
+  "provider_requests": 0,
+  "new_physics": 0,
+  "training_executed": false,
+  "canonical_task_identity": "d24aeac7041052ce1d2ae60e825a802e7367107784f6fec192b0a65c4a5e76e7",
+  "canonical_task": {
+    "actuator_channels": [
+      "actuator_commands"
+    ],
+    "contract_version": "1.0.0",
+    "environment": {
+      "contract": "experiment.assembly",
+      "data": {
+        "environment": {
+          "coordinate_frame": "world_base_x_forward_yz_cross_section",
+          "environment_id": "reach_free",
+          "gravity_m_s2": [
+            0.0,
+            0.0,
+            -9.81
+          ],
+          "gravity_source": "main@245a785 reach_free environment; Human-owned benchmark gravity",
+          "lights": [
+            {
+              "direction": [
+                0.0,
+                0.0,
+                -1.0
+              ],
+              "position_m": [
+                0.0,
+                0.0,
+                2.0
+              ]
+            }
+          ],
+          "objects": [
+            {
+              "conaffinity": 1,
+              "contype": 0,
+              "half_size_m": [
+                2.0,
+                2.0,
+                0.1
+              ],
+              "kind": "plane",
+              "name": "floor",
+              "position_m": [
+                0.0,
+                0.0,
+                -0.02
+              ]
+            }
+          ],
+          "schema_version": "1",
+          "truth_status": "HUMAN_OWNED",
+          "units": "SI"
+        },
+        "external_forces": [],
+        "floor_id": "floor",
+        "mount": {
+          "position_m": [
+            0.0,
+            0.0,
+            0.15
+          ],
+          "quaternion_wxyz": [
+            1.0,
+            0.0,
+            0.0,
+            0.0
+          ]
+        }
+      },
+      "version": "1.0.0"
+    },
+    "evaluator": {
+      "extension_id": "evaluate.reach",
+      "parameters": {
+        "contract": "reference.reach_evaluation",
+        "data": {
+          "tolerance_m": 0.01
+        },
+        "version": "1.0.0"
+      },
+      "version": "1.0.0"
+    },
+    "failure_policy": "retain_invalid_and_constraint_failures",
+    "family": "task.reach",
+    "goal": {
+      "contract": "reference.reach_goal",
+      "data": {
+        "target_m": [
+          0.29,
+          -0.035,
+          0.19
+        ]
+      },
+      "version": "1.0.0"
+    },
+    "initializer": {
+      "extension_id": "initialize.family",
+      "parameters": {
+        "contract": "family.initial",
+        "data": {
+          "rule": "all_candidate_dofs_zero_v1"
+        },
+        "version": "1.0.0"
+      },
+      "version": "1.0.0"
+    },
+    "name": "New negative-y reach-and-hold feasibility study",
+    "objectives": [
+      {
+        "direction": "minimize",
+        "metric": "position_error",
+        "units": "m",
+        "weight": 1.0
+      }
+    ],
+    "observations": [
+      {
+        "dimension": 3,
+        "entity": "tip",
+        "frame": "world",
+        "missing": "unsupported",
+        "name": "tip_position",
+        "phase": "post_step",
+        "units": "m"
+      }
+    ],
+    "robot_families": [
+      "tendon_robot_family"
+    ],
+    "sampling": {
+      "aggregation": "per_instance",
+      "seeds": [
+        17
+      ],
+      "split": "development",
+      "window_s": [
+        0.0,
+        0.35
+      ]
+    },
+    "source": "User-authorized M3-B first-feasible scope b555900c; target frozen before its physical outcomes. Reuses reach_hold.json evaluator, initializer, timing, holding and sampling unchanged.",
+    "status": "development_valid",
+    "task_id": "family-multisegment-mirror-dev",
+    "task_version": "1.0.0",
+    "timing": {
+      "control_period_s": 0.01,
+      "duration_s": 0.35,
+      "sample_period_s": 0.01,
+      "termination": [
+        "duration",
+        "numerical_failure"
+      ],
+      "timestep_s": 0.0005
+    }
+  },
+  "candidate": {
+    "artifact_id": "43cb7056771d70678b360abde7c6bda6152ed0d8e866fc8276189ce0568a9e4d",
+    "media_type": "application/json"
+  },
+  "effective_task_identity": "bd9df2d930423f2b2a12152f076e2ae88b4d1a0af84d6126aa13b0b1fac9ec77",
+  "history": [
+    {
+      "candidate": {
+        "artifact_id": "43cb7056771d70678b360abde7c6bda6152ed0d8e866fc8276189ce0568a9e4d",
+        "media_type": "application/json"
+      },
+      "folder": "evidence/s7_mirror/study",
+      "historical_candidate": {
+        "artifact_id": "f321c5d26ae747d30de42f2e5e4dfa102ab4913a42368b418652c521f676f284",
+        "media_type": "application/json"
+      },
+      "historical_only": true,
+      "reference": {
+        "artifact_id": "7f10b14a33494099a74a7fdc7b02010b317fa67d3eecd9e1e4ed56dfb0701610",
+        "media_type": "application/json"
+      },
+      "source": {
+        "artifact_id": "897b50e749d7a9387b54294f2561bf96daffa7bbca616b710b16a0fcc44be1a8",
+        "media_type": "application/json"
+      }
+    }
+  ],
+  "historical_mathematics": [
+    {
+      "reference": {
+        "artifact_id": "8250de0f40729fc8525baaf4fcedd304b39618e5fcc3dcd8c773ce755ab09c56",
+        "media_type": "application/json"
+      },
+      "operation": "equilibrium",
+      "status": "computed",
+      "candidate": {
+        "artifact_id": "8c0582ad362895a390127bcc779c9dfb6eb84570cf18ae0f3446f9282546e16f",
+        "media_type": "application/json"
+      }
+    },
+    {
+      "reference": {
+        "artifact_id": "8bd4296c16ec1a0195012879a933a52c9b23b9859e8201604f1e65aec50d7278",
+        "media_type": "application/json"
+      },
+      "operation": "equilibrium",
+      "status": "computed",
+      "candidate": {
+        "artifact_id": "8c0582ad362895a390127bcc779c9dfb6eb84570cf18ae0f3446f9282546e16f",
+        "media_type": "application/json"
+      }
+    }
+  ],
+  "action_prerequisites": [
+    {
+      "action": "physical_replay",
+      "status": "eligible",
+      "candidate": {
+        "artifact_id": "43cb7056771d70678b360abde7c6bda6152ed0d8e866fc8276189ce0568a9e4d",
+        "media_type": "application/json"
+      },
+      "source": {
+        "artifact_id": "9ca1a0dde17c1f307c8913cfe187ab29e7cd88312b25bb17dfc901672a4f70e4",
+        "media_type": "application/json"
+      },
+      "reason": null,
+      "remaining_backend_launches": 64,
+      "minimum_new_launches": 1,
+      "requires_agent_fields": [
+        "decision",
+        "hypothesis"
+      ],
+      "scope": "Candidate/source admission only; full typed Plan, budget and scientific preflight remain authoritative"
+    },
+    {
+      "action": "control_search",
+      "status": "eligible",
+      "candidate": {
+        "artifact_id": "43cb7056771d70678b360abde7c6bda6152ed0d8e866fc8276189ce0568a9e4d",
+        "media_type": "application/json"
+      },
+      "source": {
+        "artifact_id": "9ca1a0dde17c1f307c8913cfe187ab29e7cd88312b25bb17dfc901672a4f70e4",
+        "media_type": "application/json"
+      },
+      "reason": null,
+      "remaining_backend_launches": 64,
+      "minimum_new_launches": 1,
+      "requires_agent_fields": [
+        "decision",
+        "hypothesis",
+        "finite search settings"
+      ],
+      "scope": "Candidate/source admission only; full typed Plan, budget and scientific preflight remain authoritative"
+    },
+    {
+      "action": "physical_replay",
+      "status": "eligible",
+      "candidate": {
+        "artifact_id": "43cb7056771d70678b360abde7c6bda6152ed0d8e866fc8276189ce0568a9e4d",
+        "media_type": "application/json"
+      },
+      "source": {
+        "artifact_id": "897b50e749d7a9387b54294f2561bf96daffa7bbca616b710b16a0fcc44be1a8",
+        "media_type": "application/json"
+      },
+      "reason": null,
+      "remaining_backend_launches": 64,
+      "minimum_new_launches": 1,
+      "requires_agent_fields": [
+        "decision",
+        "hypothesis"
+      ],
+      "scope": "Candidate/source admission only; full typed Plan, budget and scientific preflight remain authoritative"
+    },
+    {
+      "action": "control_search",
+      "status": "eligible",
+      "candidate": {
+        "artifact_id": "43cb7056771d70678b360abde7c6bda6152ed0d8e866fc8276189ce0568a9e4d",
+        "media_type": "application/json"
+      },
+      "source": {
+        "artifact_id": "897b50e749d7a9387b54294f2561bf96daffa7bbca616b710b16a0fcc44be1a8",
+        "media_type": "application/json"
+      },
+      "reason": null,
+      "remaining_backend_launches": 64,
+      "minimum_new_launches": 1,
+      "requires_agent_fields": [
+        "decision",
+        "hypothesis",
+        "finite search settings"
+      ],
+      "scope": "Candidate/source admission only; full typed Plan, budget and scientific preflight remain authoritative"
+    },
+    {
+      "action": "initialize_control",
+      "method": "mathematical_response",
+      "status": "blocked",
+      "reason": "verified_input_sensitivity_required",
+      "candidate": {
+        "artifact_id": "43cb7056771d70678b360abde7c6bda6152ed0d8e866fc8276189ce0568a9e4d",
+        "media_type": "application/json"
+      },
+      "response_evidence": null,
+      "task_acceptance": "unmeasured",
+      "new_physical_evaluations": 0,
+      "requires_agent_fields": [
+        "decision",
+        "hypothesis",
+        "initialization settings"
+      ]
+    }
+  ],
+  "rl": [
+    {
+      "mode": "direct",
+      "status": "prepared",
+      "task": {
+        "artifact_id": "d24aeac7041052ce1d2ae60e825a802e7367107784f6fec192b0a65c4a5e76e7",
+        "media_type": "application/json"
+      },
+      "actions": 65536,
+      "rollout": 256,
+      "updates": 256,
+      "xml_nu": 4,
+      "xml_nv": 48,
+      "reference": null,
+      "environment_check": {
+        "returncode": 0,
+        "stdout": "{\"mode\": \"direct\", \"candidate\": \"12564696ca84a8518cc30a3a5770f8cc6116b74ad5f6482924962660176acd81\", \"task\": \"bd9df2d930423f2b2a12152f076e2ae88b4d1a0af84d6126aa13b0b1fac9ec77\", \"control_object\": {\"joint_names\": [\"segment_0_cell_0_y\", \"segment_0_cell_0_z\", \"segment_0_cell_1_y\", \"segment_0_cell_1_z\", \"segment_0_cell_2_y\", \"segment_0_cell_2_z\", \"segment_0_cell_3_y\", \"segment_0_cell_3_z\", \"segment_0_cell_4_y\", \"segment_0_cell_4_z\", \"segment_0_cell_5_y\", \"segment_0_cell_5_z\", \"segment_0_cell_6_y\", \"segment_0_cell_6_z\", \"segment_0_cell_7_y\", \"segment_0_cell_7_z\", \"segment_0_cell_8_y\", \"segment_0_cell_8_z\", \"segment_0_cell_9_y\", \"segment_0_cell_9_z\", \"segment_0_cell_10_y\", \"segment_0_cell_10_z\", \"segment_0_cell_11_y\", \"segment_0_cell_11_z\", \"segment_1_cell_0_y\", \"segment_1_cell_0_z\", \"segment_1_cell_1_y\", \"segment_1_cell_1_z\", \"segment_1_cell_2_y\", \"segment_1_cell_2_z\", \"segment_1_cell_3_y\", \"segment_1_cell_3_z\", \"segment_1_cell_4_y\", \"segment_1_cell_4_z\", \"segment_1_cell_5_y\", \"segment_1_cell_5_z\", \"segment_1_cell_6_y\", \"segment_1_cell_6_z\", \"segment_1_cell_7_y\", \"segment_1_cell_7_z\", \"segment_1_cell_8_y\", \"segment_1_cell_8_z\", \"segment_1_cell_9_y\", \"segment_1_cell_9_z\", \"segment_1_cell_10_y\", \"segment_1_cell_10_z\", \"segment_1_cell_11_y\", \"segment_1_cell_11_z\"], \"tendon_names\": [\"tendon_0\", \"tendon_1\", \"tendon_2\", \"tendon_3\"], \"actuator_names\": [\"tendon_0_direct_tension\", \"tendon_1_direct_tension\", \"tendon_2_direct_tension\", \"tendon_3_direct_tension\"], \"tip_site\": \"tip_site\", \"semantics\": \"ideal_tension\"}, \"tension_limits_n\": [[0.0, 8.0], [0.0, 8.0], [0.0, 8.0], [0.0, 8.0]], \"residual_scale_n\": [8.0, 8.0, 8.0, 8.0], \"physics_dt_s\": 0.0005, \"control_dt_s\": 0.01, \"substeps\": 20, \"horizon\": 35, \"holding_steps\": [30, 31, 32, 33, 34, 35], \"observation_dimension\": 107, \"action_dimension\": 4, \"reward\": {\"failure_penalty\": -10000.0, \"holding_speed\": 1.0, \"position\": 1.0, \"smoothness\": 0.001}, \"reference\": null}\n",
+        "stderr": ""
+      },
+      "training_executed": false
+    },
+    {
+      "mode": "residual",
+      "status": "not_applicable",
+      "reason": "1 validation error for RLRequest\n  Value error, RESIDUAL_REQUIRES_REFERENCE_DIRECT_REQUIRES_NONE [type=value_error, input_value={'operation': 'start', 'c...only, no worker launch'}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.14/v/value_error",
+      "training_executed": false
+    }
+  ],
+  "residual_references": [],
+  "family_capabilities": [
+    {
+      "parameter_id": "segment_count",
+      "category": "topology",
+      "data_type": "integer",
+      "unit": "count",
+      "choices": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ],
+      "conditional_dependencies": {
+        "segment_count": 2,
+        "tendon_count": 4
+      },
+      "effective_in_current_execution": true,
+      "supported_methods": [
+        "generate"
+      ],
+      "validation_status": "candidate_specific_compilation_required"
+    },
+    {
+      "parameter_id": "tendon_count",
+      "category": "topology",
+      "data_type": "integer",
+      "unit": "count",
+      "choices": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "conditional_dependencies": {
+        "segment_count": 2,
+        "tendon_count": 4
+      },
+      "effective_in_current_execution": true,
+      "supported_methods": [
+        "generate"
+      ],
+      "validation_status": "candidate_specific_compilation_required"
+    },
+    {
+      "parameter_id": "segments.0.length_m",
+      "category": "segment",
+      "data_type": "number",
+      "unit": "m",
+      "minimum": 0.08,
+      "maximum": 0.24,
+      "default": 0.16,
+      "choices": null,
+      "conditional_dependencies": {
+        "segment_count": 2,
+        "tendon_count": 4
+      },
+      "effective_in_current_execution": true,
+      "supported_methods": [
+        "generate"
+      ],
+      "validation_status": "candidate_specific_compilation_required"
+    },
+    {
+      "parameter_id": "segments.0.young_pa",
+      "category": "segment",
+      "data_type": "number",
+      "unit": "Pa",
+      "minimum": 2000000.0,
+      "maximum": 15000000.0,
+      "default": 7200000.0,
+      "choices": null,
+      "conditional_dependencies": {
+        "segment_count": 2,
+        "tendon_count": 4
+      },
+      "effective_in_current_execution": true,
+      "supported_methods": [
+        "generate"
+      ],
+      "validation_status": "candidate_specific_compilation_required"
+    },
+    {
+      "parameter_id": "segments.0.physical_parameters.curvature_y_rad_m",
+      "category": "material_geometry",
+      "data_type": "number",
+      "unit": "rad/m",
+      "minimum": -10.0,
+      "maximum": 10.0,
+      "default": 0.0,
+      "choices": null,
+      "conditional_dependencies": {
+        "segment_count": 2,
+        "tendon_count": 4
+      },
+      "effective_in_current_execution": true,
+      "supported_methods": [
+        "generate"
+      ],
+      "validation_status": "candidate_specific_compilation_required",
+      "domain_proposal_default": 0.0,
+      "current_value": 0.0,
+      "default_source": "assembly prototype"
+    },
+    {
+      "parameter_id": "segments.0.physical_parameters.curvature_z_rad_m",
+      "category": "material_geometry",
+      "data_type": "number",
+      "unit": "rad/m",
+      "minimum": -10.0,
+      "maximum": 10.0,
+      "default": 0.0,
+      "choices": null,
+      "conditional_dependencies": {
+        "segment_count": 2,
+        "tendon_count": 4
+      },
+      "effective_in_current_execution": true,
+      "supported_methods": [
+        "generate"
+      ],
+      "validation_status": "candidate_specific_compilation_required",
+      "domain_proposal_default": 0.0,
+      "current_value": 0.0,
+      "default_source": "assembly prototype"
+    },
+    {
+      "parameter_id": "segments.0.physical_parameters.density_kg_m3",
+      "category": "material_geometry",
+      "data_type": "number",
+      "unit": "kg/m^3",
+      "minimum": 500.0,
+      "maximum": 2500.0,
+      "default": 1100.0,
+      "choices": null,
+      "conditional_dependencies": {
+        "segment_count": 2,
+        "tendon_count": 4
+      },
+      "effective_in_current_execution": true,
+      "supported_methods": [
+        "generate"
+      ],
+      "validation_status": "candidate_specific_compilation_required",
+      "domain_proposal_default": 1100.0,
+      "current_value": 1100.0,
+      "default_source": "assembly prototype"
+    },
+    {
+      "parameter_id": "segments.0.physical_parameters.section_angle_rad",
+      "category": "material_geometry",
+      "data_type": "number",
+      "unit": "rad",
+      "minimum": -3.141592653589793,
+      "maximum": 3.141592653589793,
+      "default": 0.35,
+      "choices": null,
+      "conditional_dependencies": {
+        "segment_count": 2,
+        "tendon_count": 4
+      },
+      "effective_in_current_execution": true,
+      "supported_methods": [
+        "generate"
+      ],
+      "validation_status": "candidate_specific_compilation_required",
+      "domain_proposal_default": 0.0,
+      "current_value": 0.35,
+      "default_source": "assembly prototype"
+    },
+    {
+      "parameter_id": "segments.0.physical_parameters.viscosity_y_nm2_s",
+      "category": "material_geometry",
+      "data_type": "number",
+      "unit": "N*m^2*s",
+      "minimum": 0.0,
+      "maximum": 0.05,
+      "default": 0.0005,
+      "choices": null,
+      "conditional_dependencies": {
+        "segment_count": 2,
+        "tendon_count": 4
+      },
+      "effective_in_current_execution": true,
+      "supported_methods": [
+        "generate"
+      ],
+      "validation_status": "candidate_specific_compilation_required",
+      "domain_proposal_default": 0.0,
+      "current_value": 0.0005,
+      "default_source": "assembly prototype"
+    },
+    {
+      "parameter_id": "segments.0.physical_parameters.viscosity_z_nm2_s",
+      "category": "material_geometry",
+      "data_type": "number",
+      "unit": "N*m^2*s",
+      "minimum": 0.0,
+      "maximum": 0.05,
+      "default": 0.0007,
+      "choices": null,
+      "conditional_dependencies": {
+        "segment_count": 2,
+        "tendon_count": 4
+      },
+      "effective_in_current_execution": true,
+      "supported_methods": [
+        "generate"
+      ],
+      "validation_status": "candidate_specific_compilation_required",
+      "domain_proposal_default": 0.0,
+      "current_value": 0.0007,
+      "default_source": "assembly prototype"
+    },
+    {
+      "parameter_id": "segments.0.sections.0.kind",
+      "category": "geometry",
+      "data_type": "enum",
+      "unit": "none",
+      "choices": [
+        "circle",
+        "ellipse",
+        "rectangle",
+        "tube"
+      ],
+      "conditional_dependencies": {
+        "segment_count": 2,
+        "tendon_count": 4
+      },
+      "effective_in_current_execution": true,
+      "supported_methods": [
+        "generate"
+      ],
+      "validation_status": "candidate_specific_compilation_required"
+    },
+    {
+      "parameter_id": "segments.0.sections.0.parameters.semi_y_m",
+      "category": "geometry",
+      "data_type": "number",
+      "unit": "m",
+      "minimum": 0.003,
+      "maximum": 0.012,
+      "default": 0.0095,
+      "choices": null,
+      "conditional_dependencies": {
+        "segment_count": 2,
+        "tendon_count": 4,
+        "section_kind": "ellipse"
+      },
+      "effective_in_current_execution": true,
+      "supported_methods": [
+        "generate"
+      ],
+      "validation_status": "candidate_specific_compilation_required"
+    },
+    {
+      "parameter_id": "segments.0.sections.0.parameters.semi_z_m",
+      "category": "geometry",
+      "data_type": "number",
+      "unit": "m",
+      "minimum": 0.003,
+      "maximum": 0.012,
+      "default": 0.0076,
+      "choices": null,
+      "conditional_dependencies": {
+        "segment_count": 2,
+        "tendon_count": 4,
+        "section_kind": "ellipse"
+      },
+      "effective_in_current_execution": true,
+      "supported_methods": [
+        "generate"
+      ],
+      "validation_status": "candidate_specific_compilation_required"
+    },
+    {
+      "parameter_id": "segments.0.cells",
+      "category": "discretization",
+      "data_type": "integer",
+      "unit": "count",
+      "minimum": 1.0,
+      "maximum": 32.0,
+      "default": 12.0,
+      "choices": null,
+      "conditional_dependencies": {
+        "segment_count": 2,
+        "tendon_count": 4
+      },
+      "effective_in_current_execution": true,
+      "supported_methods": [
+        "generate"
+      ],
+      "validation_status": "candidate_specific_compilation_required"
+    },
+    {
+      "parameter_id": "segments.1.length_m",
+      "category": "segment",
+      "data_type": "number",
+      "unit": "m",
+      "minimum": 0.06,
+      "maximum": 0.2,
+      "default": 0.11,
+      "choices": null,
+      "conditional_dependencies": {
+        "segment_count": 2,
+        "tendon_count": 4
+      },
+      "effective_in_current_execution": true,
+      "supported_methods": [
+        "generate"
+      ],
+      "validation_status": "candidate_specific_compilation_required"
+    },
+    {
+      "parameter_id": "segments.1.young_pa",
+      "category": "segment",
+      "data_type": "number",
+      "unit": "Pa",
+      "minimum": 2000000.0,
+      "maximum": 15000000.0,
+      "default": 5400000.0,
+      "choices": null,
+      "conditional_dependencies": {
+        "segment_count": 2,
+        "tendon_count": 4
+      },
+      "effective_in_current_execution": true,
+      "supported_methods": [
+        "generate"
+      ],
+      "validation_status": "candidate_specific_compilation_required"
+    },
+    {
+      "parameter_id": "segments.1.physical_parameters.curvature_y_rad_m",
+      "category": "material_geometry",
+      "data_type": "number",
+      "unit": "rad/m",
+      "minimum": -10.0,
+      "maximum": 10.0,
+      "default": 0.0,
+      "choices": null,
+      "conditional_dependencies": {
+        "segment_count": 2,
+        "tendon_count": 4
+      },
+      "effective_in_current_execution": true,
+      "supported_methods": [
+        "generate"
+      ],
+      "validation_status": "candidate_specific_compilation_required",
+      "domain_proposal_default": 0.0,
+      "current_value": 0.0,
+      "default_source": "assembly prototype"
+    },
+    {
+      "parameter_id": "segments.1.physical_parameters.curvature_z_rad_m",
+      "category": "material_geometry",
+      "data_type": "number",
+      "unit": "rad/m",
+      "minimum": -10.0,
+      "maximum": 10.0,
+      "default": 0.0,
+      "choices": null,
+      "conditional_dependencies": {
+        "segment_count": 2,
+        "tendon_count": 4
+      },
+      "effective_in_current_execution": true,
+      "supported_methods": [
+        "generate"
+      ],
+      "validation_status": "candidate_specific_compilation_required",
+      "domain_proposal_default": 0.0,
+      "current_value": 0.0,
+      "default_source": "assembly prototype"
+    },
+    {
+      "parameter_id": "segments.1.physical_parameters.density_kg_m3",
+      "category": "material_geometry",
+      "data_type": "number",
+      "unit": "kg/m^3",
+      "minimum": 500.0,
+      "maximum": 2500.0,
+      "default": 1050.0,
+      "choices": null,
+      "conditional_dependencies": {
+        "segment_count": 2,
+        "tendon_count": 4
+      },
+      "effective_in_current_execution": true,
+      "supported_methods": [
+        "generate"
+      ],
+      "validation_status": "candidate_specific_compilation_required",
+      "domain_proposal_default": 1100.0,
+      "current_value": 1050.0,
+      "default_source": "assembly prototype"
+    },
+    {
+      "parameter_id": "segments.1.physical_parameters.section_angle_rad",
+      "category": "material_geometry",
+      "data_type": "number",
+      "unit": "rad",
+      "minimum": -3.141592653589793,
+      "maximum": 3.141592653589793,
+      "default": -0.25,
+      "choices": null,
+      "conditional_dependencies": {
+        "segment_count": 2,
+        "tendon_count": 4
+      },
+      "effective_in_current_execution": true,
+      "supported_methods": [
+        "generate"
+      ],
+      "validation_status": "candidate_specific_compilation_required",
+      "domain_proposal_default": 0.0,
+      "current_value": -0.25,
+      "default_source": "assembly prototype"
+    },
+    {
+      "parameter_id": "segments.1.physical_parameters.viscosity_y_nm2_s",
+      "category": "material_geometry",
+      "data_type": "number",
+      "unit": "N*m^2*s",
+      "minimum": 0.0,
+      "maximum": 0.05,
+      "default": 0.0003,
+      "choices": null,
+      "conditional_dependencies": {
+        "segment_count": 2,
+        "tendon_count": 4
+      },
+      "effective_in_current_execution": true,
+      "supported_methods": [
+        "generate"
+      ],
+      "validation_status": "candidate_specific_compilation_required",
+      "domain_proposal_default": 0.0,
+      "current_value": 0.0003,
+      "default_source": "assembly prototype"
+    },
+    {
+      "parameter_id": "segments.1.physical_parameters.viscosity_z_nm2_s",
+      "category": "material_geometry",
+      "data_type": "number",
+      "unit": "N*m^2*s",
+      "minimum": 0.0,
+      "maximum": 0.05,
+      "default": 0.0004,
+      "choices": null,
+      "conditional_dependencies": {
+        "segment_count": 2,
+        "tendon_count": 4
+      },
+      "effective_in_current_execution": true,
+      "supported_methods": [
+        "generate"
+      ],
+      "validation_status": "candidate_specific_compilation_required",
+      "domain_proposal_default": 0.0,
+      "current_value": 0.0004,
+      "default_source": "assembly prototype"
+    },
+    {
+      "parameter_id": "segments.1.sections.0.kind",
+      "category": "geometry",
+      "data_type": "enum",
+      "unit": "none",
+      "choices": [
+        "circle",
+        "ellipse",
+        "rectangle",
+        "tube"
+      ],
+      "conditional_dependencies": {
+        "segment_count": 2,
+        "tendon_count": 4
+      },
+      "effective_in_current_execution": true,
+      "supported_methods": [
+        "generate"
+      ],
+      "validation_status": "candidate_specific_compilation_required"
+    },
+    {
+      "parameter_id": "segments.1.sections.0.parameters.height_z_m",
+      "category": "geometry",
+      "data_type": "number",
+      "unit": "m",
+      "minimum": 0.006,
+      "maximum": 0.018,
+      "default": 0.0095,
+      "choices": null,
+      "conditional_dependencies": {
+        "segment_count": 2,
+        "tendon_count": 4,
+        "section_kind": "rectangle"
+      },
+      "effective_in_current_execution": true,
+      "supported_methods": [
+        "generate"
+      ],
+      "validation_status": "candidate_specific_compilation_required"
+    },
+    {
+      "parameter_id": "segments.1.sections.0.parameters.width_y_m",
+      "category": "geometry",
+      "data_type": "number",
+      "unit": "m",
+      "minimum": 0.006,
+      "maximum": 0.018,
+      "default": 0.0133,
+      "choices": null,
+      "conditional_dependencies": {
+        "segment_count": 2,
+        "tendon_count": 4,
+        "section_kind": "rectangle"
+      },
+      "effective_in_current_execution": true,
+      "supported_methods": [
+        "generate"
+      ],
+      "validation_status": "candidate_specific_compilation_required"
+    },
+    {
+      "parameter_id": "segments.1.sections.1.kind",
+      "category": "geometry",
+      "data_type": "enum",
+      "unit": "none",
+      "choices": [
+        "circle",
+        "ellipse",
+        "rectangle",
+        "tube"
+      ],
+      "conditional_dependencies": {
+        "segment_count": 2,
+        "tendon_count": 4
+      },
+      "effective_in_current_execution": true,
+      "supported_methods": [
+        "generate"
+      ],
+      "validation_status": "candidate_specific_compilation_required"
+    },
+    {
+      "parameter_id": "segments.1.sections.1.parameters.height_z_m",
+      "category": "geometry",
+      "data_type": "number",
+      "unit": "m",
+      "minimum": 0.006,
+      "maximum": 0.018,
+      "default": 0.0095,
+      "choices": null,
+      "conditional_dependencies": {
+        "segment_count": 2,
+        "tendon_count": 4,
+        "section_kind": "rectangle"
+      },
+      "effective_in_current_execution": true,
+      "supported_methods": [
+        "generate"
+      ],
+      "validation_status": "candidate_specific_compilation_required"
+    },
+    {
+      "parameter_id": "segments.1.sections.1.parameters.width_y_m",
+      "category": "geometry",
+      "data_type": "number",
+      "unit": "m",
+      "minimum": 0.006,
+      "maximum": 0.018,
+      "default": 0.0133,
+      "choices": null,
+      "conditional_dependencies": {
+        "segment_count": 2,
+        "tendon_count": 4,
+        "section_kind": "rectangle"
+      },
+      "effective_in_current_execution": true,
+      "supported_methods": [
+        "generate"
+      ],
+      "validation_status": "candidate_specific_compilation_required"
+    },
+    {
+      "parameter_id": "segments.1.cells",
+      "category": "discretization",
+      "data_type": "integer",
+      "unit": "count",
+      "minimum": 1.0,
+      "maximum": 32.0,
+      "default": 12.0,
+      "choices": null,
+      "conditional_dependencies": {
+        "segment_count": 2,
+        "tendon_count": 4
+      },
+      "effective_in_current_execution": true,
+      "supported_methods": [
+        "generate"
+      ],
+      "validation_status": "candidate_specific_compilation_required"
+    },
+    {
+      "parameter_id": "tendon_parameters.diameter_m",
+      "category": "tendon",
+      "data_type": "number",
+      "unit": "m",
+      "minimum": 0.0005,
+      "maximum": 0.0012,
+      "default": 0.001,
+      "choices": null,
+      "conditional_dependencies": {
+        "segment_count": 2,
+        "tendon_count": 4
+      },
+      "effective_in_current_execution": true,
+      "supported_methods": [
+        "generate"
+      ],
+      "validation_status": "candidate_specific_compilation_required"
+    },
+    {
+      "parameter_id": "tendon_parameters.force_limit_n",
+      "category": "tendon",
+      "data_type": "number",
+      "unit": "N",
+      "minimum": 1.0,
+      "maximum": 8.0,
+      "default": 8.0,
+      "choices": null,
+      "conditional_dependencies": {
+        "segment_count": 2,
+        "tendon_count": 4
+      },
+      "effective_in_current_execution": true,
+      "supported_methods": [
+        "generate"
+      ],
+      "validation_status": "candidate_specific_compilation_required"
+    },
+    {
+      "parameter_id": "tendon_parameters.length_servo_gain_n_m",
+      "category": "tendon",
+      "data_type": "number",
+      "unit": "N/m",
+      "minimum": 300.0,
+      "maximum": 1500.0,
+      "default": 900.0,
+      "choices": null,
+      "conditional_dependencies": {
+        "segment_count": 2,
+        "tendon_count": 4
+      },
+      "effective_in_current_execution": false,
+      "supported_methods": [
+        "generate"
+      ],
+      "validation_status": "candidate_specific_compilation_required"
+    },
+    {
+      "parameter_id": "tendon_parameters.pretension_n",
+      "category": "tendon",
+      "data_type": "number",
+      "unit": "N",
+      "minimum": 0.0,
+      "maximum": 1.0,
+      "default": 0.2,
+      "choices": null,
+      "conditional_dependencies": {
+        "segment_count": 2,
+        "tendon_count": 4
+      },
+      "effective_in_current_execution": true,
+      "supported_methods": [
+        "generate"
+      ],
+      "validation_status": "candidate_specific_compilation_required"
+    },
+    {
+      "parameter_id": "spans.*.anchor_s",
+      "category": "routing",
+      "data_type": "number",
+      "unit": "normalized_station",
+      "minimum": 0.8,
+      "maximum": 1.0,
+      "default": 1.0,
+      "choices": null,
+      "conditional_dependencies": {
+        "segment_count": 2,
+        "tendon_count": 4
+      },
+      "effective_in_current_execution": true,
+      "supported_methods": [
+        "generate"
+      ],
+      "validation_status": "candidate_specific_compilation_required"
+    },
+    {
+      "parameter_id": "spans.*.angular_offset_rad",
+      "category": "routing",
+      "data_type": "number",
+      "unit": "rad",
+      "minimum": -3.141592653589793,
+      "maximum": 3.141592653589793,
+      "default": 0.0,
+      "choices": null,
+      "conditional_dependencies": {
+        "segment_count": 2,
+        "tendon_count": 4
+      },
+      "effective_in_current_execution": true,
+      "supported_methods": [
+        "generate"
+      ],
+      "validation_status": "candidate_specific_compilation_required"
+    },
+    {
+      "parameter_id": "spans.*.guide_s",
+      "category": "routing",
+      "data_type": "number",
+      "unit": "normalized_station",
+      "minimum": 0.15,
+      "maximum": 0.75,
+      "default": 0.5,
+      "choices": null,
+      "conditional_dependencies": {
+        "segment_count": 2,
+        "tendon_count": 4
+      },
+      "effective_in_current_execution": true,
+      "supported_methods": [
+        "generate"
+      ],
+      "validation_status": "candidate_specific_compilation_required"
+    },
+    {
+      "parameter_id": "spans.*.phase_rad",
+      "category": "routing",
+      "data_type": "number",
+      "unit": "rad",
+      "minimum": -6.283185307179586,
+      "maximum": 6.283185307179586,
+      "default": 0.0,
+      "choices": null,
+      "conditional_dependencies": {
+        "segment_count": 2,
+        "tendon_count": 4
+      },
+      "effective_in_current_execution": true,
+      "supported_methods": [
+        "generate"
+      ],
+      "validation_status": "candidate_specific_compilation_required"
+    },
+    {
+      "parameter_id": "spans.*.radius_m",
+      "category": "routing",
+      "data_type": "number",
+      "unit": "rad",
+      "minimum": 0.014,
+      "maximum": 0.023,
+      "default": 0.018,
+      "choices": null,
+      "conditional_dependencies": {
+        "segment_count": 2,
+        "tendon_count": 4
+      },
+      "effective_in_current_execution": true,
+      "supported_methods": [
+        "generate"
+      ],
+      "validation_status": "candidate_specific_compilation_required"
+    },
+    {
+      "parameter_id": "route_overrides.0",
+      "category": "routing",
+      "data_type": "route_points",
+      "unit": "SI",
+      "choices": null,
+      "conditional_dependencies": {
+        "segment_count": 2,
+        "tendon_count": 4
+      },
+      "effective_in_current_execution": true,
+      "supported_methods": [
+        "generate"
+      ],
+      "validation_status": "candidate_specific_compilation_required"
+    },
+    {
+      "parameter_id": "route_overrides.1",
+      "category": "routing",
+      "data_type": "route_points",
+      "unit": "SI",
+      "choices": null,
+      "conditional_dependencies": {
+        "segment_count": 2,
+        "tendon_count": 4
+      },
+      "effective_in_current_execution": true,
+      "supported_methods": [
+        "generate"
+      ],
+      "validation_status": "candidate_specific_compilation_required"
+    },
+    {
+      "parameter_id": "route_overrides.2",
+      "category": "routing",
+      "data_type": "route_points",
+      "unit": "SI",
+      "choices": null,
+      "conditional_dependencies": {
+        "segment_count": 2,
+        "tendon_count": 4
+      },
+      "effective_in_current_execution": true,
+      "supported_methods": [
+        "generate"
+      ],
+      "validation_status": "candidate_specific_compilation_required"
+    },
+    {
+      "parameter_id": "route_overrides.3",
+      "category": "routing",
+      "data_type": "route_points",
+      "unit": "SI",
+      "choices": null,
+      "conditional_dependencies": {
+        "segment_count": 2,
+        "tendon_count": 4
+      },
+      "effective_in_current_execution": true,
+      "supported_methods": [
+        "generate"
+      ],
+      "validation_status": "candidate_specific_compilation_required"
+    },
+    {
+      "parameter_id": "control_weights.holding_tip_speed_weight",
+      "category": "controller",
+      "data_type": "number",
+      "unit": "controller_weight",
+      "minimum": 0.0,
+      "maximum": 1.0,
+      "default": 0.1,
+      "choices": null,
+      "conditional_dependencies": {
+        "segment_count": 2,
+        "tendon_count": 4
+      },
+      "effective_in_current_execution": false,
+      "supported_methods": [
+        "generate"
+      ],
+      "validation_status": "candidate_specific_compilation_required"
+    },
+    {
+      "parameter_id": "control_weights.terminal_tip_speed_weight",
+      "category": "controller",
+      "data_type": "number",
+      "unit": "controller_weight",
+      "minimum": 0.0,
+      "maximum": 1.0,
+      "default": 0.1,
+      "choices": null,
+      "conditional_dependencies": {
+        "segment_count": 2,
+        "tendon_count": 4
+      },
+      "effective_in_current_execution": false,
+      "supported_methods": [
+        "generate"
+      ],
+      "validation_status": "candidate_specific_compilation_required"
+    }
+  ],
+  "limits": {
+    "budgets": {
+      "provider_requests": 32,
+      "protected_provider_requests": 4,
+      "public_operations": 160,
+      "protected_public_operations": 12,
+      "physical_launches": 64,
+      "mathematical_evaluations": 4,
+      "offline_nlp": 1,
+      "bdf_replays": 2
+    },
+    "nmpc": {
+      "executions": 2
+    },
+    "rl": {
+      "training_stages": 1,
+      "actions_per_trial": 65536,
+      "training_actions": 65536,
+      "evaluation_episodes": 1
+    }
+  },
+  "credential_file_present": true,
+  "provider_destination": "https://api.deepseek.com/chat/completions",
+  "versions": {
+    "numpy": "2.4.6",
+    "scipy": "1.17.1",
+    "casadi": "3.7.2",
+    "mujoco": "3.13.0",
+    "strands-agents": "1.59.0"
+  },
+  "ledger": {
+    "limit": {
+      "backend_solves": 64,
+      "model_calls": 0,
+      "tool_calls": 160,
+      "wall_s": null,
+      "worker_calls": 0
+    },
+    "used": {
+      "tool_calls": 0,
+      "model_calls": 0,
+      "backend_solves": 0,
+      "worker_calls": 0,
+      "wall_s": 0.0
+    },
+    "remaining": {
+      "backend_solves": 64,
+      "model_calls": 0,
+      "tool_calls": 160,
+      "wall_s": null,
+      "worker_calls": 0
+    },
+    "occupied": {}
+  },
+  "limitations": [
+    "MATLAB readiness is not a candidate solve or NMPC rollout",
+    "RL XML/config admission is not training or independent evaluation",
+    "Residual mode requires exact compatible reference; fixed-tension history is not automatically published as a residual reference",
+    "Historical equilibrium is not verified current input_sensitivity"
+  ]
+}
