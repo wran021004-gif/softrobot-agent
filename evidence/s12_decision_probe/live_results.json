@@ -1,0 +1,551 @@
+{
+  "results": [
+    {
+      "name": "historical_start",
+      "version": "s11",
+      "sequence": 34,
+      "file": "historical_start_s11.json",
+      "identity": "90a8ab2ebe5552f27c1ab1ced554fdfd330e5eeeb59bfea39f3a024733de2243",
+      "usage": {
+        "prompt_tokens": 20137,
+        "completion_tokens": 6552,
+        "total_tokens": 26689,
+        "prompt_tokens_details": {
+          "cached_tokens": 896
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 4681
+        },
+        "prompt_cache_hit_tokens": 896,
+        "prompt_cache_miss_tokens": 19241
+      },
+      "http_status": 200,
+      "proposals": [
+        {
+          "tool": "research_plan",
+          "request": {
+            "action": "control_search",
+            "hypothesis": "Hypothesis CONTROL_SEARCH_INCOMPLETE (bounded form): the imported best complete replay of source 62ddc238 on executable candidate 15d2a97a already reaches near the target (terminal/holding position error 0.034190924922822975 m) but violates the final-window speed bound (0.06801494131306313 m/s vs 0.02 m/s), so the residual task gap is dominated by late-horizon tension shaping rather than by structure or model error. A response-based local refinement of tendon tension offsets (\\u00b12 N, knots at 0.20 s and 0.34 s, all four tendons active, tendon_0..tendon_3) added on top of that source schedule should brake the tip before the 0.30-0.35 s holding window and shrink holding position error, without touching the design.",
+            "expected_observation": "The local search returns at least one proposal strictly better than the uncached source baseline under the original evaluator, with holding_max_speed_m_s decreasing from 0.068 toward and below 0.02 m/s and holding_max_error_m staying at or below 0.01 m over the 0.30-0.35 s window; ideally one proposal yields a complete fresh original-task pass (terminal_error_m <= 0.01 m, holding position <= 0.01 m, holding speed <= 0.02 m/s), which I would then read via evidence_read /acceptance and freeze with select.",
+            "weakening_observation": "No proposal beats the source baseline, or position error improves only while holding speed worsens (or vice versa), or the best proposed offsets sit at the 2 N coefficient limit / 0.30 N trust radius (indicating the local model is pushed to saturation rather than finding interior braking authority), or every rollout still fails the speed component. Any of these weakens the late-tension-shaping explanation for these knots, tendons and budget, and would motivate a different knot placement, a different source start, or a structural change.",
+            "fixed_conditions": "Frozen: task identity d24aeac7041052ce1d2ae60e825a802e7367107784f6fec192b0a65c4a5e76e7 (target [0.29,-0.035,0.19] m, 0.35 s horizon, 0.01 s control period, final 0.05 s window, position 0.01 m and speed 0.02 m/s limits, sealed evaluate.reach evaluator), candidate 15d2a97a0f7e788864f66360bc733200c393e583b300d01db27c887481667df1 (serial_external_tendons_s7, 4 tendons, unchanged topology/material/section/routing/mesh), tendon order [tendon_0,tendon_1,tendon_2,tendon_3], and source 62ddc2387077c5b49440d16208cd83d07d9108187e3e94df00043e4bfdb9557d as the unmodified starting schedule with offsets zero outside 0.15-0.35 s. No structure generation and no prior-history credit; every rollout here is a new physical experiment.",
+            "stopping_condition": "Stop this search when the 36 evaluation_requests cap is consumed, 12 iterations are completed, or a proposal becomes a complete fresh pass of the original task; on the first complete pass do not extend the search - read that exact result with evidence_read (/acceptance) and immediately select the exact execution. If the cap expires without a pass and without monotone improvement in the reported task cost, treat this parameterization as exhausted and move to alternate knots/source start or a design change rather than repeating the same search.",
+            "interpretation": "Interpretation is empirical and local: a passing result freezes an exact fresh complete solution for this candidate and task. A non-passing result is evidence about this two-knot, all-tendon, \\u00b12 N, 36-rollout response search only - it does not establish control infeasibility, structural infeasibility, optimality or robustness, and it does not transfer to other knot sets, other source starts or other designs.",
+            "decision": {
+              "hypothesis_id": "CONTROL_SEARCH_INCOMPLETE",
+              "research_intent": "CONTROL_SEARCH",
+              "selected_method": "local_control_search_v2, response method, two late knots (0.20 s, 0.34 s) with all 8 knot-major tendon tension offsets active, relative to source 62ddc238 on candidate 15d2a97a",
+              "selected_variables": [
+                "tendon tension offsets at knot 0.20 s (flat coefficients 0-3 = tendon_0..tendon_3)",
+                "tendon tension offsets at knot 0.34 s (flat coefficients 4-7 = tendon_0..tendon_3)",
+                "coefficient_limit_n 2.0",
+                "initial_radius_n 0.30 -> minimum_radius_n 0.02",
+                "difference_step_n 0.05"
+              ],
+              "selected_candidate": {
+                "artifact_id": "15d2a97a0f7e788864f66360bc733200c393e583b300d01db27c887481667df1",
+                "media_type": "application/json"
+              },
+              "requested_budget": 36,
+              "claimed_inference": "empirical_search"
+            },
+            "supporting_evidence": [
+              {
+                "artifact_id": "49c76e42767e0ab9870e7a18322bebc916215f721c955a7bbbba472ac72ab0ed",
+                "media_type": "application/json"
+              },
+              {
+                "artifact_id": "62ddc2387077c5b49440d16208cd83d07d9108187e3e94df00043e4bfdb9557d",
+                "media_type": "application/json"
+              },
+              {
+                "artifact_id": "15d2a97a0f7e788864f66360bc733200c393e583b300d01db27c887481667df1",
+                "media_type": "application/json"
+              }
+            ],
+            "control_search": {
+              "candidate": {
+                "artifact_id": "15d2a97a0f7e788864f66360bc733200c393e583b300d01db27c887481667df1",
+                "media_type": "application/json"
+              },
+              "source": {
+                "artifact_id": "62ddc2387077c5b49440d16208cd83d07d9108187e3e94df00043e4bfdb9557d",
+                "media_type": "application/json"
+              },
+              "settings": {
+                "version": "local_control_search_v2",
+                "method": "response",
+                "knots_s": [
+                  0.2,
+                  0.34
+                ],
+                "correction_window_s": [
+                  0.15,
+                  0.35
+                ],
+                "active_coefficients": [
+                  0,
+                  1,
+                  2,
+                  3,
+                  4,
+                  5,
+                  6,
+                  7
+                ],
+                "coefficient_limit_n": 2.0,
+                "difference_step_n": 0.05,
+                "initial_radius_n": 0.3,
+                "minimum_radius_n": 0.02,
+                "evaluation_requests": 36,
+                "iterations": 12,
+                "safety_margin_fraction": 0.0
+              }
+            },
+            "experience_disposition": {
+              "CONTROL_SEARCH_INCOMPLETE": "rejected",
+              "CONTROL_PARAMETERIZATION_LIMITED": "context_only",
+              "DESIGN_LIMITATION_POSSIBLE": "context_only",
+              "MODEL_PREDICTION_UNRELIABLE": "context_only"
+            }
+          },
+          "scientific_execution_started": false,
+          "full_execution_admission": "not_tested",
+          "contract_and_reference_checks": "passed",
+          "error": null
+        }
+      ]
+    },
+    {
+      "name": "historical_start",
+      "version": "s12",
+      "sequence": 34,
+      "file": "historical_start_s12.json",
+      "identity": "87818e7edb186a9d3025da1c72828a47124199173110fa24b050f90f318a35a8",
+      "usage": {
+        "prompt_tokens": 20407,
+        "completion_tokens": 5190,
+        "total_tokens": 25597,
+        "prompt_tokens_details": {
+          "cached_tokens": 3328
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 3715
+        },
+        "prompt_cache_hit_tokens": 3328,
+        "prompt_cache_miss_tokens": 17079
+      },
+      "http_status": 200,
+      "proposals": [
+        {
+          "tool": "research_plan",
+          "request": {
+            "action": "control_search",
+            "hypothesis": "A two-knot, four-tendon local response correction relative to source 62dd… can reduce the current executable candidate's terminal and holding-window errors enough to approach the original task thresholds within a small finite search budget.",
+            "supporting_evidence": [
+              {
+                "artifact_id": "49c76e42767e0ab9870e7a18322bebc916215f721c955a7bbbba472ac72ab0ed",
+                "media_type": "application/json"
+              },
+              {
+                "artifact_id": "62ddc2387077c5b49440d16208cd83d07d9108187e3e94df00043e4bfdb9557d",
+                "media_type": "application/json"
+              },
+              {
+                "artifact_id": "15d2a97a0f7e788864f66360bc733200c393e583b300d01db27c887481667df1",
+                "media_type": "application/json"
+              }
+            ],
+            "expected_observation": "The fresh baseline will reproduce a nontrivial reach/holding violation, and at least one of the two local response iterations will lower the combined terminal-error and holding-speed objective relative to that baseline without violating declared tension limits.",
+            "weakening_observation": "The baseline is numerically invalid or already unexpectedly passes; or neither proposal improves the objective, both metrics worsen, or the local radius collapses before any useful correction is found.",
+            "fixed_conditions": "Same frozen task and evaluator, candidate 15d2…, source 62dd…, four-tendon order, 0.35 s duration, 0.01 s control period, 0.0005 s timestep, and original 0.01 m / 0.02 m/s acceptance thresholds. Search is limited to tension offsets around the source; structural variables remain fixed.",
+            "stopping_condition": "Stop this search when the 20-evaluation cap is reached, the local radius falls below 1e-4 N, or a proposal yields a fresh complete original-task pass. If a complete pass appears, immediately read its acceptance evidence and select that exact execution; otherwise report the bounded outcome without claiming global infeasibility.",
+            "interpretation": "This is a bounded, local empirical test of control authority and temporal shaping. A pass would be a fresh task result; failure would only weaken the hypothesis that a two-knot correction around this source is sufficient and would guide a revised control or structural study.",
+            "decision": {
+              "version": "research_decision_v1",
+              "hypothesis_id": "TWO_KNOT_RESPONSE_CORRECTION",
+              "research_intent": "CONTROL_SEARCH",
+              "selected_method": "local_control_search_v2.response",
+              "selected_variables": [
+                "tension offsets at knot 0.0 s for tendons 0-3",
+                "tension offsets at knot 0.34 s for tendons 0-3",
+                "coefficient limit",
+                "local trust radius"
+              ],
+              "selected_candidate": {
+                "artifact_id": "15d2a97a0f7e788864f66360bc733200c393e583b300d01db27c887481667df1",
+                "media_type": "application/json"
+              },
+              "requested_budget": 20,
+              "claimed_inference": "empirical_search"
+            },
+            "control_search": {
+              "candidate": {
+                "artifact_id": "15d2a97a0f7e788864f66360bc733200c393e583b300d01db27c887481667df1",
+                "media_type": "application/json"
+              },
+              "source": {
+                "artifact_id": "62ddc2387077c5b49440d16208cd83d07d9108187e3e94df00043e4bfdb9557d",
+                "media_type": "application/json"
+              },
+              "settings": {
+                "version": "local_control_search_v2",
+                "method": "response",
+                "knots_s": [
+                  0.0,
+                  0.34
+                ],
+                "correction_window_s": [
+                  0.0,
+                  0.35
+                ],
+                "active_coefficients": [
+                  0,
+                  1,
+                  2,
+                  3,
+                  4,
+                  5,
+                  6,
+                  7
+                ],
+                "coefficient_limit_n": 0.5,
+                "difference_step_n": 0.01,
+                "initial_radius_n": 0.1,
+                "minimum_radius_n": 0.0001,
+                "evaluation_requests": 20,
+                "iterations": 2,
+                "safety_margin_fraction": 0.0
+              }
+            },
+            "hypothesis_id": "TWO_KNOT_RESPONSE_CORRECTION"
+          },
+          "scientific_execution_started": false,
+          "full_execution_admission": "not_tested",
+          "contract_and_reference_checks": "rejected",
+          "error": "1 validation error for Plan\nhypothesis_id\n  Extra inputs are not permitted [type=extra_forbidden, input_value='TWO_KNOT_RESPONSE_CORRECTION', input_type=str]\n    For further information visit https://errors.pydantic.dev/2.14/v/extra_forbidden"
+        }
+      ]
+    },
+    {
+      "name": "fresh_failure",
+      "version": "s11",
+      "sequence": 319,
+      "file": "fresh_failure_s11.json",
+      "identity": "a9878c293f9046ffa00cc216ba85bf45bd42708795c9abca7c4809b9ae5c64af",
+      "usage": {
+        "prompt_tokens": 20601,
+        "completion_tokens": 7806,
+        "total_tokens": 28407,
+        "prompt_tokens_details": {
+          "cached_tokens": 3456
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 6796
+        },
+        "prompt_cache_hit_tokens": 3456,
+        "prompt_cache_miss_tokens": 17145
+      },
+      "http_status": 200,
+      "proposals": [
+        {
+          "tool": "research_plan",
+          "request": {
+            "action": "physical_replay",
+            "hypothesis": "The best-valid historical source 62dd, replayed unchanged on the executable candidate 15d2, is the strongest known starting point: it should produce a fresh valid complete execution near the historical best-valid gap of 2.419 (holding position about 0.0342 m and holding speed about 0.0680 m/s), and may pass the original thresholds.",
+            "expected_observation": "A fresh execution with valid_complete=true and metrics close to the historical best-valid result. If holding position <= 0.01 m and holding speed <= 0.02 m/s over the final window, the replay is a complete original-task pass; otherwise it establishes the fresh baseline for a subsequent local control search.",
+            "weakening_observation": "The replay is invalid/incomplete, or its task gap is far above 2.419 with substantially worse holding position or speed, indicating that source 62dd does not transfer reliably to candidate 15d2 and weakening the baseline-transfer hypothesis.",
+            "fixed_conditions": "Task identity bd9df2d930423f2b2a12152f076e2ae88b4d1a0af84d6126aa13b0b1fac9ec77; executable candidate 15d2a97a0f7e788864f66360bc733200c393e583b300d01db27c887481667df1; source control 62ddc2387077c5b49440d16208cd83d07d9108187e3e94df00043e4bfdb9557d; unchanged task duration, 0.01 s control period, 0.05 s holding window, tendon order, and original evaluator thresholds; no design or control edits in this action.",
+            "stopping_condition": "Conclude this replay after one fresh independent execution. If it is a complete original-task pass, stop exploration, read its acceptance exactly, and select it. If it does not pass, retain the measured baseline and use the observed holding-position and holding-speed errors to choose a finite local control correction.",
+            "interpretation": "This is a physical validation, not a claim of task acceptance. A fresh pass would immediately qualify for selection; a near-historical baseline would support using source 62dd for local correction, while a large degradation would show that the best historical source is not transferable and would force reconsideration of the starting source or design.",
+            "decision": {
+              "version": "research_decision_v1",
+              "hypothesis_id": "BEST_VALID_TRANSFER",
+              "research_intent": "PHYSICAL_VALIDATION",
+              "selected_method": "physical_replay",
+              "selected_variables": [
+                "candidate_identity",
+                "source_control_trajectory"
+              ],
+              "selected_candidate": {
+                "artifact_id": "15d2a97a0f7e788864f66360bc733200c393e583b300d01db27c887481667df1",
+                "media_type": "application/json"
+              },
+              "requested_budget": 1,
+              "claimed_inference": "empirical_search"
+            },
+            "supporting_evidence": [
+              {
+                "artifact_id": "62ddc2387077c5b49440d16208cd83d07d9108187e3e94df00043e4bfdb9557d",
+                "media_type": "application/json"
+              },
+              {
+                "artifact_id": "49c76e42767e0ab9870e7a18322bebc916215f721c955a7bbbba472ac72ab0ed",
+                "media_type": "application/json"
+              }
+            ],
+            "physical_replay": {
+              "candidate": {
+                "artifact_id": "15d2a97a0f7e788864f66360bc733200c393e583b300d01db27c887481667df1",
+                "media_type": "application/json"
+              },
+              "source": {
+                "artifact_id": "62ddc2387077c5b49440d16208cd83d07d9108187e3e94df00043e4bfdb9557d",
+                "media_type": "application/json"
+              }
+            }
+          },
+          "scientific_execution_started": false,
+          "full_execution_admission": "not_tested",
+          "contract_and_reference_checks": "passed",
+          "error": null
+        }
+      ]
+    },
+    {
+      "name": "fresh_failure",
+      "version": "s12",
+      "sequence": 319,
+      "file": "fresh_failure_s12.json",
+      "identity": "ddb1a8f6de4fefa7a10944523509adf5b15380cc24a95ccc5e4827399d379e28",
+      "usage": {
+        "prompt_tokens": 21940,
+        "completion_tokens": 19851,
+        "total_tokens": 41791,
+        "prompt_tokens_details": {
+          "cached_tokens": 5504
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 18000
+        },
+        "prompt_cache_hit_tokens": 5504,
+        "prompt_cache_miss_tokens": 16436
+      },
+      "http_status": 200,
+      "proposals": [
+        {
+          "tool": "research_plan",
+          "request": {
+            "action": "mechanics",
+            "hypothesis": "H1_MATH_NLP_TASK_GAP: On the current executable candidate 15d2a97a (4 tendons), the binding limitation is control shaping, not static reachability of the target (0.29,-0.035,0.19). A full-horizon offline trajectory optimization of the four tendon tensions that minimizes the task gap (terminal/holding tip position error plus holding tip speed) can shape a rest-to-rest manoeuvre whose tip is inside the 1 cm / 0.02 m/s holding envelope during 0.30-0.35 s. Motivation from the only fresh measurement: the replayed historical source 62ddc238 terminates at 0.315,-0.044,0.121 (error 0.0740 m) with constant tensions [4.130,1.814,2.101,3.240] N and tip still climbing at 0.678 m/s, i.e. the tip is still inside an undamped transient oscillation about a shifted equilibrium rather than being commanded through a shaped manoeuvre; a trajectory optimizer that can vary tensions in time should be able to quench that motion. The 0.0342 m / 0.068 m/s historical record on a different (now historical-only) candidate is treated only as an existence hint for this model family, not as transferable evidence.",
+            "expected_observation": "The mechanics run returns a converged (or iteration-capped) optimized tension sequence whose predicted task-gap components are far below the fresh replay's 0.0740 m terminal error and 0.6838 m/s holding speed, ideally inside 0.01 m and 0.02 m/s over the 0.30-0.35 s window, with all tensions within [0,8] N, no solver failure, and a reportable objective trajectory over the 120 iterations. Concrete expected outcome: a new mathematical source artifact usable as the seed for an independent physical replay.",
+            "weakening_observation": "Solver non-convergence, numerical failure, or an optimized schedule whose predicted best achievable holding error stays above 0.01 m or holding speed above 0.02 m/s (e.g. because the undamped 1.25 m arm cannot be brought to rest within 0.35 s with <=8 N tensions, or the optimizer stalls at the initial 0.2-0.4 N tension scale). This would weaken the control-shaping hypothesis and shift weight toward design modification (segment lengths/stiffness/section damping via viscosity) and/or a knot-based physical control search with a different parameterization, and it would also weaken trust in model-predicted transfer to the evaluator.",
+            "fixed_conditions": "Frozen original mirror task: task_identity d24aeac7041052ce1d2ae60e825a802e7367107784f6fec192b0a65c4a5e76e7, target_m [0.29,-0.035,0.19], evaluator tolerance 0.01 m, holding window 0.05 s with speed limit 0.02 m/s, duration 0.35 s, sample period 0.01 s, timestep 0.0005 s; candidate 15d2a97a0f7e788864f66360bc733200c393e583b300d01db27c887481667df1 unchanged (structure, sections, 9 segments, 4 tendons, tendon order tendon_0..tendon_3, radius/anchor routing, force limits <= 8 N, pretension initialization), analysis protocol task-local-v2 unchanged, advertised mechanics defaults used (substeps=1, objective_mode=task_gap) so no non-default grid/objective preflight is triggered; only the 4-tendon tension trajectory over the fixed horizon is optimized (cold start, ramp_0_2_to_0_4); position_weight=1.0, speed_weight=1.0, secondary_coefficient=0.001 unchanged; exactly one mathematical evaluation is consumed.",
+            "stopping_condition": "Stop this probe as soon as the single mechanics optimization returns, whether converged or iteration-capped (max_iterations=120). No second optimization is launched in this step; the returned artifact is then inspected and a decision is made between (a) independent physical replay of the optimized schedule, (b) a knot-based control search using it and/or 62ddc238 as the source, or (c) a design modification. Any physical acceptance claim is deferred to an independent execution.",
+            "interpretation": "This is a model-based mathematical optimization only: it produces at most a predicted tension schedule and a predicted task gap, never task acceptance, and cannot establish feasibility, optimality, robustness or hardware behaviour. Comparison rule for the next decision: if predicted holding error < 0.01 m and holding speed < 0.02 m/s with bounded tensions, the control-shaping hypothesis survives at this operating point and the first physical replay of the resulting source is the highest-value next experiment; if it does not, control-shaping at fixed design is weakened within this bounded parameterization and either a differently shaped/initialized optimization, a physical control search from a different source (4a7879eb / 9ca1a0dd), or a damping/stiffness/length design change becomes the better next probe, with all real costs (1 of 4 mathematical evaluations, 0 of 63 physical launches) preserved.",
+            "supporting_evidence": [
+              {
+                "artifact_id": "289592aeb8f31ee4dd620b3aa8ad9cbe21612752d1d1cef2e6810e77eff61d5d",
+                "media_type": "application/json"
+              },
+              {
+                "artifact_id": "06fc9d6bcb3dbd5ed6fec8211c3cf3f1b6519c2a0600ac5b023504a4e29174b0",
+                "media_type": "application/json"
+              },
+              {
+                "artifact_id": "62ddc2387077c5b49440d16208cd83d07d9108187e3e94df00043e4bfdb9557d",
+                "media_type": "application/json"
+              },
+              {
+                "artifact_id": "15d2a97a0f7e788864f66360bc733200c393e583b300d01db27c887481667df1",
+                "media_type": "application/json"
+              }
+            ],
+            "decision": {
+              "version": "research_decision_v1",
+              "hypothesis_id": "H1_MATH_NLP_TASK_GAP",
+              "research_intent": "MATHEMATICAL_ANALYSIS",
+              "selected_method": "offline NLP trajectory optimization (mechanics, objective_mode=task_gap, initialization=ramp_0_2_to_0_4, substeps=1, max_iterations=120, check_only=false)",
+              "selected_variables": [
+                "four tendon tension trajectories over 0.0-0.35 s",
+                "task gap objective (terminal/holding tip position error + holding tip speed)",
+                "optimization iteration budget 120"
+              ],
+              "selected_candidate": {
+                "artifact_id": "15d2a97a0f7e788864f66360bc733200c393e583b300d01db27c887481667df1",
+                "media_type": "application/json"
+              },
+              "requested_budget": 1,
+              "claimed_inference": "empirical_search"
+            },
+            "mechanics": {
+              "candidate": {
+                "artifact_id": "15d2a97a0f7e788864f66360bc733200c393e583b300d01db27c887481667df1",
+                "media_type": "application/json"
+              },
+              "initialization": "ramp_0_2_to_0_4",
+              "objective_mode": "task_gap",
+              "substeps": 1,
+              "max_iterations": 120,
+              "check_only": false,
+              "position_weight": 1.0,
+              "speed_weight": 1.0,
+              "secondary_coefficient": 0.001
+            }
+          },
+          "scientific_execution_started": false,
+          "full_execution_admission": "not_tested",
+          "contract_and_reference_checks": "passed",
+          "error": null
+        }
+      ]
+    },
+    {
+      "name": "last_exploration_request",
+      "version": "s11",
+      "sequence": 450,
+      "file": "last_exploration_request_s11.json",
+      "identity": "b2cce9ced3c931993ab5094483aa4754ee4d7ee2aac8d81f120b0f5cc4b06aa3",
+      "usage": {
+        "prompt_tokens": 20601,
+        "completion_tokens": 6677,
+        "total_tokens": 27278,
+        "prompt_tokens_details": {
+          "cached_tokens": 6272
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 5778
+        },
+        "prompt_cache_hit_tokens": 6272,
+        "prompt_cache_miss_tokens": 14329
+      },
+      "http_status": 200,
+      "proposals": [
+        {
+          "tool": "research_plan",
+          "request": {
+            "action": "execute",
+            "candidate": {
+              "artifact_id": "15d2a97a0f7e788864f66360bc733200c393e583b300d01db27c887481667df1",
+              "media_type": "application/json"
+            },
+            "decision": {
+              "version": "research_decision_v1",
+              "hypothesis_id": "NMPC_CLOSED_LOOP_REACH",
+              "research_intent": "NMPC_EXECUTION",
+              "selected_method": "closed_loop_nmpc_execution_with_registered_controller_recipe",
+              "selected_variables": [
+                "controller_recipe",
+                "tendon_tension_commands",
+                "closed_loop_state_feedback"
+              ],
+              "selected_candidate": {
+                "artifact_id": "15d2a97a0f7e788864f66360bc733200c393e583b300d01db27c887481667df1",
+                "media_type": "application/json"
+              },
+              "requested_budget": 1,
+              "claimed_inference": "empirical_search"
+            },
+            "hypothesis": "Closed-loop NMPC on the current executable candidate can reach the frozen target and satisfy the final-window position and speed bounds, succeeding where the transferred open-loop schedules have failed.",
+            "expected_observation": "A fresh complete execution with task_evaluator=true, terminal_error_m <= 0.01, holding_max_error_m <= 0.01, holding_max_speed_m_s <= 0.02, force bounds satisfied, and no solver errors.",
+            "weakening_observation": "Any fresh execution that violates terminal or holding position/speed limits, produces solver/numerical failure, or does not improve materially on the best valid open-loop result (terminal 0.03419 m, holding speed 0.06801 m/s) weakens the closed-loop-control hypothesis.",
+            "fixed_conditions": "Same task identity bd9df2d930423f2b2a12152f076e2ae88b4d1a0af84d6126aa13b0b1fac9ec77, target [0.29,-0.035,0.19] m, initializer, 0.35 s horizon, 0.01 s control period, 0.05 s holding window, original evaluator thresholds, and registered controller recipe defaults; no changes to candidate geometry or task.",
+            "stopping_condition": "After this single NMPC execution: if the fresh result is complete and every original task bound passes, immediately read and select that exact execution; otherwise retain the failure and diagnose the violated terminal/holding component before considering STOP.",
+            "interpretation": "This is a direct test of feedback control, not a claim of global feasibility. Prior open-loop failures only reject those particular schedules; a complete pass would satisfy the mirror task and a failure would identify whether the remaining gap is in closed-loop reach, holding speed, or numerical execution.",
+            "supporting_evidence": [
+              {
+                "artifact_id": "15d2a97a0f7e788864f66360bc733200c393e583b300d01db27c887481667df1",
+                "media_type": "application/json"
+              },
+              {
+                "artifact_id": "289592aeb8f31ee4dd620b3aa8ad9cbe21612752d1d1cef2e6810e77eff61d5d",
+                "media_type": "application/json"
+              },
+              {
+                "artifact_id": "49c76e42767e0ab9870e7a18322bebc916215f721c955a7bbbba472ac72ab0ed",
+                "media_type": "application/json"
+              }
+            ]
+          },
+          "scientific_execution_started": false,
+          "full_execution_admission": "not_tested",
+          "contract_and_reference_checks": "rejected",
+          "error": "POST_REQUEST_PROTECTED_CLOSEOUT"
+        }
+      ]
+    },
+    {
+      "name": "last_exploration_request",
+      "version": "s12",
+      "sequence": 450,
+      "file": "last_exploration_request_s12.json",
+      "identity": "f72402522b07ad7c192d9f403e99eec813a6e5e754999f6400b1de5e27c9ee1d",
+      "usage": {
+        "prompt_tokens": 12314,
+        "completion_tokens": 1588,
+        "total_tokens": 13902,
+        "prompt_tokens_details": {
+          "cached_tokens": 5504
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 791
+        },
+        "prompt_cache_hit_tokens": 5504,
+        "prompt_cache_miss_tokens": 6810
+      },
+      "http_status": 200,
+      "proposals": [
+        {
+          "tool": "research_plan",
+          "request": {
+            "action": "stop",
+            "hypothesis": "No further legal finite experiment can be performed with the remaining exploration allowance, and the sole fresh original-task execution is a complete but failing physical replay; therefore the study must close without a task pass rather than claim feasibility or optimality.",
+            "supporting_evidence": [
+              {
+                "artifact_id": "289592aeb8f31ee4dd620b3aa8ad9cbe21612752d1d1cef2e6810e77eff61d5d",
+                "media_type": "application/json"
+              }
+            ],
+            "expected_observation": "The fresh result remains valid and complete but fails every acceptance component: terminal error about 0.0740 m versus 0.01 m, holding maximum position error about 0.1047 m versus 0.01 m, and holding maximum speed about 0.6838 m/s versus 0.02 m/s, with force bounds and solver status clean.",
+            "weakening_observation": "A newly available exploration allowance or an admissible fresh execution that completes the original task within all thresholds would weaken the stop decision; no such result is present in the frozen evidence.",
+            "fixed_conditions": "Frozen original reach task, target [0.29,-0.035,0.19] m, 0.35 s horizon, 0.01 s control period, 0.05 s holding window, 0.01 m position and 0.02 m/s speed limits, candidate/source lineage unchanged, provider exploration budget exhausted with next_request_exploration_remaining = 0, and all advertised physical_replay/control_search actions currently unavailable.",
+            "stopping_condition": "Stop immediately because no additional exploration request is legally available and there is no publicly read fresh complete original-task pass to select; close out with the single fresh failing result preserved exactly.",
+            "interpretation": "The complete all_fresh_results index contains exactly one result, artifact 289592aeb8f31ee4dd620b3aa8ad9cbe21612752d1d1cef2e6810e77eff61d5d. That physical replay was a valid complete execution with zero solver errors and satisfied force bounds, but it did not pass: terminal_error_m = 0.07402178904506207 m, holding_position = 0.10466109167176951 m, and holding_speed = 0.6838386787264206 m/s, all exceeding their limits. The frozen packet exposes no passing fresh execution and no exploration budget for another legal finite experiment, so this study stops without claiming global infeasibility, optimality, robustness, repeatability, or hardware performance.",
+            "decision": {
+              "version": "research_decision_v1",
+              "hypothesis_id": "H_STOP_EXPLORATION_EXHAUSTED_SINGLE_FRESH_FAILURE",
+              "research_intent": "STOP",
+              "selected_method": "close_study_after_exploration_budget_exhaustion_with_no_fresh_task_pass",
+              "selected_variables": [],
+              "selected_candidate": null,
+              "requested_budget": 0,
+              "claimed_inference": "empirical_search"
+            },
+            "next_step": "stop"
+          },
+          "scientific_execution_started": false,
+          "full_execution_admission": "not_tested",
+          "contract_and_reference_checks": "passed",
+          "error": null
+        }
+      ]
+    }
+  ],
+  "ledger": {
+    "limit": {
+      "backend_solves": 0,
+      "model_calls": 6,
+      "tool_calls": 0,
+      "wall_s": null,
+      "worker_calls": 0
+    },
+    "used": {
+      "tool_calls": 0,
+      "model_calls": 6,
+      "backend_solves": 0,
+      "worker_calls": 0,
+      "wall_s": 235.4830000004731
+    },
+    "remaining": {
+      "backend_solves": 0,
+      "model_calls": 0,
+      "tool_calls": 0,
+      "wall_s": null,
+      "worker_calls": 0
+    },
+    "occupied": {}
+  },
+  "new_scientific_executions": 0,
+  "full_scientific_admission": "not_tested; no dispatch or fabricated result",
+  "limitation": "One turn per case/interface; valid evidence queries are not research actions; legality is separate from method quality"
+}

@@ -1,0 +1,81 @@
+{
+  "versions": {
+    "s11": {
+      "provider_requests": 3,
+      "actual_tokens": 82374,
+      "proposals": 3,
+      "scientific_proposals": 3,
+      "scientific_contract_checks_passed": 2,
+      "full_scientific_admission": "not_tested",
+      "budget_protection_misjudgments": 1,
+      "evidence_reads": 0,
+      "invalid_read_count": 0,
+      "actions": [
+        {
+          "case": "historical_start",
+          "action": "control_search",
+          "requested_budget": 36,
+          "checks": "passed",
+          "error": null
+        },
+        {
+          "case": "fresh_failure",
+          "action": "physical_replay",
+          "requested_budget": 1,
+          "checks": "passed",
+          "error": null
+        },
+        {
+          "case": "last_exploration_request",
+          "action": "execute",
+          "requested_budget": 1,
+          "checks": "rejected",
+          "error": "POST_REQUEST_PROTECTED_CLOSEOUT"
+        }
+      ]
+    },
+    "s12": {
+      "provider_requests": 3,
+      "actual_tokens": 81290,
+      "proposals": 3,
+      "scientific_proposals": 2,
+      "scientific_contract_checks_passed": 1,
+      "full_scientific_admission": "not_tested",
+      "budget_protection_misjudgments": 0,
+      "evidence_reads": 0,
+      "invalid_read_count": 0,
+      "actions": [
+        {
+          "case": "historical_start",
+          "action": "control_search",
+          "requested_budget": 20,
+          "checks": "rejected",
+          "error": "1 validation error for Plan\nhypothesis_id\n  Extra inputs are not permitted [type=extra_forbidden, input_value='TWO_KNOT_RESPONSE_CORRECTION', input_type=str]\n    For further information visit https://errors.pydantic.dev/2.14/v/extra_forbidden"
+        },
+        {
+          "case": "fresh_failure",
+          "action": "mechanics",
+          "requested_budget": 1,
+          "checks": "passed",
+          "error": null
+        },
+        {
+          "case": "last_exploration_request",
+          "action": "stop",
+          "requested_budget": 0,
+          "checks": "passed",
+          "error": null
+        }
+      ]
+    }
+  },
+  "actual_tokens": 163664,
+  "actual_requests": 6,
+  "new_scientific_executions": 0,
+  "comparison": "Paired authentic cutoff packets, same model/settings/capabilities/budget; one response per arm. No method-quality ranking or general causal claim.",
+  "first_research_proposal_request": 1,
+  "first_fully_admitted_scientific_action": "not_tested",
+  "invalid_scientific_citations": "No unregistered citation detected in checked typed proposals; reference checking of the malformed extra-field proposal was not reached",
+  "exact_receipts": "provider_receipts.json",
+  "post_probe_change": "Final formal source also retains physical_diagnostic on historical best_valid. Six frozen probe wires were not changed or resampled."
+}

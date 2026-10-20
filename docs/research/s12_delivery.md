@@ -1,3 +1,11 @@
+# S12 in progress ? real decision probe completed, formal Study preparing
+
+User has explicitly approved the stated DeepSeek data scope (6 decision requests + 32 formal requests) and ordinary push to the target GitHub branch. The six actual decision requests completed with 163,664 tokens and zero scientific executions. The first ordinary push was verified at 54800681. Earlier transport rejection records are retained as history, not a current blocker.
+
+The frozen paired probe found an S11 NMPC proposal rejected by the post-charge boundary and an S12 STOP proposal at the same boundary. S12 also proposed cold NLP after failure, but its other scientific proposal had an extra top-level field and was rejected. These are single-turn contract checks, not completed scientific admission or a general efficiency claim. See evidence/s12_decision_probe/summary.json.
+
+Final formal source adds the historical-best diagnostic projection and explicit existing Plan-field guidance after the six frozen wires; no wires were changed or resampled. 104 regression tests completed with zero failures/errors and one opt-in skip. Formal science remains pending. The following earlier progress record will be replaced by the final audited delivery.
+
 # S12 progress — engineering verified, external transport awaiting authorization
 
 S12 is **not complete**. Local decision-interface regressions and MATLAB readiness passed. Automatic approval rejected the attempted decision-probe launch before process creation because transfer of internal research states, evidence and tool contracts to DeepSeek lacked confirmed trusted authorization for the specific payload and destination. Actual new Provider sends, mathematical solves, physical evaluations and RL training are all **zero**. No scientific acceptance or autonomous-research improvement is claimed.

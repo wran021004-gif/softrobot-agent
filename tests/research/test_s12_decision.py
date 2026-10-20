@@ -73,6 +73,13 @@ class S12DecisionTests(unittest.TestCase):
         h.store.remaining.return_value['remaining']['model_calls']=0
         self.assertIn('mechanics',context(h)['actions'])
 
+    def test_historical_best_also_retains_exact_failure_samples(self):
+        h,p,values,event=snapshot(34)
+        best=decision_brief(context(h))['best_valid']
+        self.assertTrue(best['historical_only'])
+        self.assertFalse(best['physical_diagnostic']['task_passed'])
+        self.assertTrue(best['physical_diagnostic']['critical_samples'])
+
     def test_wrapper_result_paths(self):
         h,p,values,event=snapshot(319)
         for result in ({'candidate':p['candidates'][0],'source':state(h)['control_initializations'][-1]['source'],'trajectory':{'fixture':True}},

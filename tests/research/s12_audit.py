@@ -33,4 +33,89 @@ def preflight():
     return dict(matlab=report['matlab'],direct_rl=report['direct_rl_environment'],new_physics=0,provider_requests=0)
 
 
-if __name__=='__main__':print(json.dumps(preflight()))
+def final_checks():
+    import hashlib,os,tarfile
+    from pathlib import Path
+    from tools.research.state import science_hashes,core_hashes
+    from tools.research.agent import load_credential
+    from tools.research.feedback import task_gap
+    from tools.state_io import read,digest
+    from tools.platform_store import plain
+    from schemas.platform import SessionInput,BackendResult,Signal,Payload
+    from extensions.reference.implementation import evaluate_reach
+    from tools.platform_registry import registry
+    from tools.research_tasks import task_adapter,assemble_acceptance
+    h=Host(ROOT/'runs/research/s12-mirror-live-20261020','s12-mirror-live-20261020',actor='unified-research')
+    s=state(h);out=ROOT/'evidence/s12_mirror';f=read(out/'frozen_protocol.json')
+    assert s['research_status']=='stopped' and not s['pending'] and not s['pilot'].get('unconsumed_response')
+    assert s['freeze']==f['implementation_commit'] and s['spec']['resolved_identity']==f['configuration_identity']
+    assert science_hashes()==f['science_hashes'] and core_hashes()==f['core_hashes']
+    with h.store.connect(True) as db:assert db.execute('SELECT COUNT(*) FROM calls WHERE receipt IS NULL').fetchone()[0]==0
+    events=h.store.events(h.run_id);requests=[e for e in events if e['kind']=='r3_request']
+    responses={e['request_id']:h.store.artifact(e['outputs'][0]) for e in events if e['kind']=='r3_response'}
+    assert len(requests)==len(responses)==s['pilot']['live_model_requests']==h.store.remaining()['used']['model_calls']
+    feedback={}
+    for e in events:
+        if e['kind']=='model_original_tool_feedback':
+            v=h.store.artifact(e['outputs'][0]);key=v['tool_use']['toolUseId'];assert key not in feedback;feedback[key]=v
+    for e in requests:
+        wire=h.store.artifact(h.store.artifact(e['outputs'][0])['request']);assert digest(wire)==h.store.lookup(h.run_id,e['request_id'])['request_hash']
+        ids={t['id'] for m in wire['messages'] if m['role']=='assistant' for t in m.get('tool_calls',[])}
+        assert all(m.get('tool_call_id') in ids for m in wire['messages'] if m['role']=='tool')
+    for e in events:
+        if e['kind']=='model_original_tool_request':
+            t=h.store.artifact(e['outputs'][0])['tool_use'];assert feedback[t['toolUseId']]['tool_use']==t
+    for r in responses.values():assert hashlib.sha256(h.store.artifact(r['body'],raw=True)).hexdigest()==r['body']['artifact_id']
+    fresh=[r for k in ('results','mechanics_results','physical_replays','matched_state_results','rl_evaluations','analysis_results') for r in s.get(k,[])]
+    disposition=h.store.artifact(s['final_disposition']);plan=disposition.get('original_plan',{})
+    if plan.get('action')=='stop':assert all(r in plan['supporting_evidence'] for r in fresh)
+    physical=[]
+    for ref in s.get('physical_replays',[]):
+        v=h.store.artifact(ref);assert v['owning_study']==h.run_id
+        cfg=h.store.artifact(v['candidate'])['configuration'];inp=SessionInput.model_validate(cfg)
+        raw=h.store.artifact(v['raw_reference']);samples=raw['samples'];source=h.store.artifact(v['source_reference'])['trajectory']
+        if not task_gap(v)['valid_complete']:
+            physical.append(dict(reference=ref,complete=False,independent_recompute='not_tested'));continue
+        signal=next(x for x in inp.task.observations if x.name=='tip_position' and x.phase=='post_step')
+        backend=BackendResult(solver_status='completed',backend_id='backend.family_mujoco',model_id='mujoco_serial_bending_v1',
+            signals=[Signal(spec=signal,times_s=[x['time_s'] for x in samples[1:]],values=[x['tip_m'] for x in samples[1:]])],
+            data=Payload(contract='family.backend_data',data=dict(physical_replay=True)),limitations=['Ideal direct tendon tension; nominal sampled task only'],
+            initial_state=inp.task.initializer.parameters,seed=inp.seed)
+        ev=evaluate_reach(inp.task,backend,v['raw_reference'],registry(),digest(dict(candidate=v['candidate'],source=v['source_reference'])))
+        assert plain(ev)==h.store.artifact(v['evaluation_reference'])
+        adapter=task_adapter(cfg);limits=adapter.ranking_limits();hold=[x for x in samples if x['time_s']>=adapter.holding_start_s()-1e-12]
+        complete=raw['status']=='completed' and len(samples)==len(source['tensions_n'])+1
+        complete=complete and raw['physics_steps']==round(inp.task.timing.duration_s/raw['physics_timestep_s'])
+        error=max(x['position_error_m'] for x in hold);speed=max(x['speed_m_s'] for x in hold)
+        bounds={t['id']:t['force_limit_n'] for t in cfg['robot']['structure']['data']['tendons']}
+        force=max(max(0.,-u,u-bounds[name]) for x in samples[1:] for name,u in zip(raw['tendon_order'],x['actual_tension_n']))
+        expected_hold=round(inp.policy.controller.parameters.data['settling']['window_s']/inp.task.timing.control_period_s)+1
+        profile=dict(complete=complete,execution_id=v['profile']['execution_id'],simulation=v['raw_reference'],evaluation=v['evaluation_reference'],
+            task=plain(inp.task),official_task_success=ev.task_success,solver_error_count=0 if complete else 1,force_bound_violation_n=force,
+            sampled_settling=dict(window_s=inp.policy.controller.parameters.data['settling']['window_s'],position_limit_m=limits['holding_max_error_m'],
+                speed_limit_m_s=limits['holding_max_speed_m_s'],available=len(hold)==expected_hold,max_error_m=error,max_speed_m_s=speed,
+                passed=bool(len(hold)==expected_hold and error<=limits['holding_max_error_m'] and speed<=limits['holding_max_speed_m_s'])))
+        acceptance=assemble_acceptance(cfg,ev,profile,evaluation_reference=v['evaluation_reference'],profile_reference=None,motion=[dict(time_s=x['time_s']) for x in samples])
+        assert acceptance==v['acceptance'] and profile==v['profile']
+        physical.append(dict(reference=ref,original_evaluator_and_full_acceptance_equal=True,accepted=acceptance['accepted'],task_gap=task_gap(v)))
+    manifest=read(out/'study/archive_manifest.json');archive=out/'study/immutable_artifacts.tar.gz'
+    assert hashlib.sha256(archive.read_bytes()).hexdigest()==manifest['archive_sha256']
+    load_credential(Path(s['spec']['runtime']['credentials_reference']).expanduser());secret=os.environ['DEEPSEEK_API_KEY'].encode()
+    with tarfile.open(archive) as tar:
+        for m in manifest['members']:
+            b=tar.extractfile(m['name']).read();assert hashlib.sha256(b).hexdigest()==m['sha256'] and secret not in b
+    unchanged=['extensions','matlab','schemas','tasks','evidence/s7_mirror','evidence/s8_mirror','evidence/s9_variant','evidence/s10_mirror','evidence/s11_mirror','configs/research/family_space_s7.json']
+    assert not subprocess.check_output(['git','diff','25e1c889','--',*unchanged],text=True)
+    checks=dict(study_id=h.run_id,freeze=s['freeze'],source_hashes_match_frozen=True,original_task_science_and_sealed_history_unchanged=True,
+        provider_requests=len(requests),model_tool_pairs=len(feedback),original_request_response_tool_ids_verified=True,all_receipts_settled=True,
+        pending=None,unconsumed_response=None,complete_stop_citations=len(fresh) if plan.get('action')=='stop' else None,
+        native_action=plan.get('action'),disposition_origin=disposition.get('origin'),accepted=bool(s.get('selected')),
+        fresh_physical_results=len(s.get('physical_replays',[])),fresh_mathematics=len(s.get('analysis_results',[]))+len(s.get('mechanics_results',[])),
+        archive_members_verified=len(manifest['members']),configured_key_matches=0,ledger=h.store.remaining(),independent_acceptance=physical,new_scientific_executions_in_audit=0)
+    atomic_json(out/'final_artifact_checks.json',checks)
+    return checks
+
+
+if __name__=='__main__':
+    import sys
+    print(json.dumps(final_checks() if '--final' in sys.argv else preflight()))

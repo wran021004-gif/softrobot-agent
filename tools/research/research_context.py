@@ -201,6 +201,7 @@ def context(host):
         observation=r) for r in reversed(s.get('physical_replays',[])) if task_gap(host.store.artifact(r))['valid_complete']]
     starts += list(reversed(s.get('control_initializations',[])))+current['control_search_starts']
     best=current['best_valid']
+    if best and best.get('raw_reference'):best['physical_diagnostic']=physical_diagnostic(host,best['reference'])
     if best and best.get('source'):
         starts.insert(0,dict(candidate=best.get('executable_candidate',best['candidate']),source=best['source'],observation=best['reference']))
     seen=set();unique=[]
@@ -336,7 +337,7 @@ def decision_brief(current):
     best=brief.get('best_valid')
     if best:
         brief['best_valid']={k:best[k] for k in ('reference','candidate','source','executable_candidate',
-            'task_identity','historical_only','task_gap') if k in best}
+            'task_identity','historical_only','task_gap','physical_diagnostic') if k in best}
         brief['best_valid']['violated_constraints']={k:v for k,v in best['constraints'].items() if not v['passed']}
     brief['task_accepted']=current.get('task_accepted',bool(best and best['task_gap']['accepted'] and not best['historical_only']))
     brief['unresolved_hypotheses']={k:dict(scope=v['scope'],claim_kind=v['claim_kind'])
