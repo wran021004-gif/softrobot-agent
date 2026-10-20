@@ -16,7 +16,7 @@ def size(value):return len(json.dumps(value,separators=(',',':'),ensure_ascii=Fa
 def payload(wire):
     """Partition canonical serialized bytes, never estimate provider token parts."""
     result=dict(fixed_instructions=0,tool_schema=size(wire.get('tools',[])),current_packet=0,
-        history_model_messages=0,history_tool_results=0)
+        history_model_messages=0,history_reasoning=0,history_tool_results=0)
     for m in wire['messages']:
         if m['role']=='system':
             text=m['content'];mark='\nCURRENT_RESEARCH_PACKET\n'
@@ -26,7 +26,10 @@ def payload(wire):
                 result['current_packet']+=size(packet)-2
             else:result['fixed_instructions']+=size(text)-2
         elif m['role']=='tool':result['history_tool_results']+=size(m)
-        elif m['role']=='assistant':result['history_model_messages']+=size(m)
+        elif m['role']=='assistant':
+            # Content bytes only; keys, quotes, calls and framing remain protocol.
+            result['history_model_messages']+=size(m.get('content'))-2 if isinstance(m.get('content'),str) else 0
+            result['history_reasoning']+=size(m['reasoning_content'])-2 if isinstance(m.get('reasoning_content'),str) else 0
     result['other_protocol']=size(wire)-sum(result.values())
     assert result['other_protocol']>=0
     return dict(total_bytes=size(wire),serialized_bytes=result,token_parts=None,
