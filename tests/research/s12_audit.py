@@ -72,7 +72,7 @@ def cold_preflight():
     return dict(status='passed',direct_rl=report['direct_rl_environment'],provider_requests=0,new_physics=0)
 
 
-def final_checks():
+def final_checks(run_id='s12-mirror-live-20261020', destination='evidence/s12_mirror', baseline='25e1c889'):
     import hashlib,os,tarfile
     from pathlib import Path
     from tools.research.state import science_hashes,core_hashes
@@ -84,8 +84,8 @@ def final_checks():
     from extensions.reference.implementation import evaluate_reach
     from tools.platform_registry import registry
     from tools.research_tasks import task_adapter,assemble_acceptance
-    h=Host(ROOT/'runs/research/s12-mirror-live-20261020','s12-mirror-live-20261020',actor='unified-research')
-    s=state(h);out=ROOT/'evidence/s12_mirror';f=read(out/'frozen_protocol.json')
+    h=Host(ROOT/'runs/research'/run_id,run_id,actor='unified-research')
+    s=state(h);out=ROOT/destination;f=read(out/'frozen_protocol.json')
     assert s['research_status']=='stopped' and not s['pending'] and not s['pilot'].get('unconsumed_response')
     assert s['freeze']==f['implementation_commit'] and s['spec']['resolved_identity']==f['configuration_identity']
     assert science_hashes()==f['science_hashes'] and core_hashes()==f['core_hashes']
@@ -144,7 +144,8 @@ def final_checks():
         for m in manifest['members']:
             b=tar.extractfile(m['name']).read();assert hashlib.sha256(b).hexdigest()==m['sha256'] and secret not in b
     unchanged=['extensions','matlab','schemas','tasks','evidence/s7_mirror','evidence/s8_mirror','evidence/s9_variant','evidence/s10_mirror','evidence/s11_mirror','configs/research/family_space_s7.json']
-    assert not subprocess.check_output(['git','diff','25e1c889','--',*unchanged],text=True)
+    if run_id.startswith('s125-'):unchanged+=['evidence/s12_mirror','evidence/s12_decision_probe']
+    assert not subprocess.check_output(['git','diff',baseline,'--',*unchanged],text=True)
     checks=dict(study_id=h.run_id,freeze=s['freeze'],source_hashes_match_frozen=True,original_task_science_and_sealed_history_unchanged=True,
         provider_requests=len(requests),model_tool_pairs=len(feedback),original_request_response_tool_ids_verified=True,all_receipts_settled=True,
         pending=None,unconsumed_response=None,complete_stop_citations=len(fresh) if plan.get('action')=='stop' else None,

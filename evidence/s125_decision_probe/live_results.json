@@ -1,0 +1,1309 @@
+{
+  "results": [
+    {
+      "name": "empty",
+      "version": "s12",
+      "request": {
+        "artifact_id": "d52a28dde82622cd61ba39b3857a43154730420222197b12ae19aca7a62096f1",
+        "media_type": "application/json"
+      },
+      "state": {
+        "artifact_id": "64a58d47d6f6a2dce5de25c6cb19d7c3cc49a3855342be612cd0e55b5356ef58",
+        "media_type": "application/json"
+      },
+      "packet": {
+        "artifact_id": "99e3a7a84900a3c323c1983770ead84d395d81b558eb118c98d27d98700a67c8",
+        "media_type": "application/json"
+      },
+      "identity": "d52a28dde82622cd61ba39b3857a43154730420222197b12ae19aca7a62096f1",
+      "source_event": null,
+      "total_bytes": 55074,
+      "serialized_bytes": {
+        "fixed_instructions": 6318,
+        "tool_schema": 34319,
+        "current_packet": 14039,
+        "history_model_messages": 0,
+        "history_reasoning": 0,
+        "history_tool_results": 0,
+        "other_protocol": 398
+      },
+      "token_parts": null,
+      "measurement": "Canonical compact UTF-8 JSON serialization; excludes HTTP headers. Byte parts are not token parts.",
+      "usage": {
+        "prompt_tokens": 16406,
+        "completion_tokens": 4055,
+        "total_tokens": 20461,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 2561
+        },
+        "prompt_cache_hit_tokens": 0,
+        "prompt_cache_miss_tokens": 16406
+      },
+      "http_status": 200,
+      "proposals": [
+        {
+          "tool": "research_plan",
+          "request": {
+            "action": "generate",
+            "hypothesis": "A 3-segment, 6-tendon serial candidate (total nominal length ~0.38 m, circle sections r=0.008 m, three per-segment opposed-tendon pairs at 60-degree phase increments) provides enough redundant bending authority to reach the world target (0.29,-0.035,0.19) within the 0.01 m tolerance, and satisfies the declared routing/clearance constraints.",
+            "expected_observation": "Generation compiles successfully under serial_family_generation_v2, returning a candidate identity whose capability view reports 3 segments, 6 tendons, executable tendon routes with guides preceding anchors, and no clearance violation.",
+            "weakening_observation": "Generation is rejected by conditional/clearance validation, or the compiled capability view shows fewer executable tendons than requested or incompatible segment topology, in which case the routing/span construction must be revised before any control initialization.",
+            "fixed_conditions": "Frozen family space serial_family_space_v2 / serial_external_tendons_s7; original reach task, evaluator tolerance 0.01 m, duration 0.35 s and control period 0.01 s remain unchanged; no prior candidate exists, so this is a cold design with no measured control.",
+            "stopping_condition": "Stop this request after one generation attempt; if a candidate identity is returned, proceed next to explicit initialize_control baseline seeding rather than attempting task acceptance from design alone.",
+            "interpretation": "Generation is a design-prior step only: success certifies structural/route compilation, not dynamics or task feasibility. A compiled candidate will next need an explicit independent control seed and finite physical evaluation.",
+            "next_step": "revise_design",
+            "decision": {
+              "version": "research_decision_v1",
+              "hypothesis_id": "H_REACH_3SEG_6T_POLAR",
+              "research_intent": "DESIGN_MODIFICATION",
+              "selected_method": "serial_family_generation_v2 polar_consecutive_spans_v1",
+              "selected_variables": [
+                "segment_count",
+                "segment lengths",
+                "section radius",
+                "young_pa",
+                "tendon_count",
+                "span routing radius",
+                "guide_s",
+                "anchor_s",
+                "angular_offsets_rad",
+                "phase_rad",
+                "pretension_n"
+              ],
+              "selected_candidate": null,
+              "requested_budget": 0,
+              "claimed_inference": "empirical_search"
+            },
+            "generation": {
+              "version": "serial_family_generation_v2",
+              "family_space_identity": "0793d20569402760ca055f73f6f97d80d73d0fe3c051ff2b60ebad1519db02aa",
+              "segment_count": 3,
+              "tendon_count": 6,
+              "strategy": "polar_consecutive_spans_v1",
+              "segments": {
+                "0": {
+                  "length_m": 0.13,
+                  "young_pa": 7000000.0,
+                  "cells": 8,
+                  "physical_parameters": {
+                    "density_kg_m3": 1100.0,
+                    "curvature_y_rad_m": 0.0,
+                    "curvature_z_rad_m": 0.0,
+                    "viscosity_y_nm2_s": 0.0,
+                    "viscosity_z_nm2_s": 0.0,
+                    "section_angle_rad": 0.0
+                  },
+                  "sections": [
+                    {
+                      "kind": "circle",
+                      "parameters": {
+                        "radius_m": 0.008
+                      }
+                    }
+                  ]
+                },
+                "1": {
+                  "length_m": 0.12,
+                  "young_pa": 7000000.0,
+                  "cells": 8,
+                  "physical_parameters": {
+                    "density_kg_m3": 1100.0,
+                    "curvature_y_rad_m": 0.0,
+                    "curvature_z_rad_m": 0.0,
+                    "viscosity_y_nm2_s": 0.0,
+                    "viscosity_z_nm2_s": 0.0,
+                    "section_angle_rad": 0.0
+                  },
+                  "sections": [
+                    {
+                      "kind": "circle",
+                      "parameters": {
+                        "radius_m": 0.008
+                      }
+                    }
+                  ]
+                },
+                "2": {
+                  "length_m": 0.13,
+                  "young_pa": 7000000.0,
+                  "cells": 8,
+                  "physical_parameters": {
+                    "density_kg_m3": 1100.0,
+                    "curvature_y_rad_m": 0.0,
+                    "curvature_z_rad_m": 0.0,
+                    "viscosity_y_nm2_s": 0.0,
+                    "viscosity_z_nm2_s": 0.0,
+                    "section_angle_rad": 0.0
+                  },
+                  "sections": [
+                    {
+                      "kind": "circle",
+                      "parameters": {
+                        "radius_m": 0.008
+                      }
+                    }
+                  ]
+                }
+              },
+              "tendon_parameters": {
+                "diameter_m": 0.0008,
+                "force_limit_n": 6.0,
+                "pretension_n": 0.2
+              },
+              "spans": [
+                {
+                  "first_segment": 0,
+                  "last_segment": 0,
+                  "count": 2,
+                  "radius_m": 0.018,
+                  "anchor_s": 1.0,
+                  "guide_s": [
+                    0.5
+                  ],
+                  "angular_offsets_rad": [
+                    0.0,
+                    3.141592653589793
+                  ],
+                  "phase_rad": 0.0
+                },
+                {
+                  "first_segment": 1,
+                  "last_segment": 1,
+                  "count": 2,
+                  "radius_m": 0.018,
+                  "anchor_s": 1.0,
+                  "guide_s": [
+                    0.5
+                  ],
+                  "angular_offsets_rad": [
+                    0.0,
+                    3.141592653589793
+                  ],
+                  "phase_rad": 1.0471975511965976
+                },
+                {
+                  "first_segment": 2,
+                  "last_segment": 2,
+                  "count": 2,
+                  "radius_m": 0.018,
+                  "anchor_s": 1.0,
+                  "guide_s": [
+                    0.5
+                  ],
+                  "angular_offsets_rad": [
+                    0.0,
+                    3.141592653589793
+                  ],
+                  "phase_rad": 2.0943951023931953
+                }
+              ],
+              "control_weights": {
+                "holding_tip_speed_weight": 0.1,
+                "terminal_tip_speed_weight": 0.1
+              }
+            }
+          },
+          "scientific_execution_started": false,
+          "full_execution_admission": "not_tested",
+          "contract_and_reference_checks": "passed",
+          "error": null
+        }
+      ]
+    },
+    {
+      "name": "empty",
+      "version": "s125",
+      "request": {
+        "artifact_id": "c5033046b75de0ed77feabc498ea11f40f279b74a5c363435076abb9e1f1f923",
+        "media_type": "application/json"
+      },
+      "state": {
+        "artifact_id": "64a58d47d6f6a2dce5de25c6cb19d7c3cc49a3855342be612cd0e55b5356ef58",
+        "media_type": "application/json"
+      },
+      "packet": {
+        "artifact_id": "99e3a7a84900a3c323c1983770ead84d395d81b558eb118c98d27d98700a67c8",
+        "media_type": "application/json"
+      },
+      "identity": "c5033046b75de0ed77feabc498ea11f40f279b74a5c363435076abb9e1f1f923",
+      "source_event": null,
+      "total_bytes": 54816,
+      "serialized_bytes": {
+        "fixed_instructions": 6318,
+        "tool_schema": 34061,
+        "current_packet": 14039,
+        "history_model_messages": 0,
+        "history_reasoning": 0,
+        "history_tool_results": 0,
+        "other_protocol": 398
+      },
+      "token_parts": null,
+      "measurement": "Canonical compact UTF-8 JSON serialization; excludes HTTP headers. Byte parts are not token parts.",
+      "usage": {
+        "prompt_tokens": 16298,
+        "completion_tokens": 15827,
+        "total_tokens": 32125,
+        "prompt_tokens_details": {
+          "cached_tokens": 8576
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 14390
+        },
+        "prompt_cache_hit_tokens": 8576,
+        "prompt_cache_miss_tokens": 7722
+      },
+      "http_status": 200,
+      "proposals": [
+        {
+          "tool": "research_plan",
+          "request": {
+            "action": "generate",
+            "generation": {
+              "version": "serial_family_generation_v2",
+              "family_space_identity": "serial_external_tendons_s7",
+              "strategy": "polar_consecutive_spans_v1",
+              "segment_count": 2,
+              "tendon_count": 6,
+              "segments": {
+                "0": {
+                  "length_m": 0.2,
+                  "young_pa": 7000000.0,
+                  "cells": 16,
+                  "sections": [
+                    {
+                      "kind": "circle",
+                      "parameters": {
+                        "radius_m": 0.008
+                      }
+                    }
+                  ],
+                  "physical_parameters": {
+                    "density_kg_m3": 1100.0,
+                    "section_angle_rad": 0.0,
+                    "viscosity_y_nm2_s": 0.0,
+                    "viscosity_z_nm2_s": 0.0
+                  }
+                },
+                "1": {
+                  "length_m": 0.16,
+                  "young_pa": 7000000.0,
+                  "cells": 12,
+                  "sections": [
+                    {
+                      "kind": "circle",
+                      "parameters": {
+                        "radius_m": 0.008
+                      }
+                    }
+                  ],
+                  "physical_parameters": {
+                    "density_kg_m3": 1100.0,
+                    "section_angle_rad": 0.0,
+                    "viscosity_y_nm2_s": 0.0,
+                    "viscosity_z_nm2_s": 0.0
+                  }
+                }
+              },
+              "tendon_parameters": {
+                "diameter_m": 0.001,
+                "force_limit_n": 8.0,
+                "pretension_n": 0.2
+              },
+              "spans": [
+                {
+                  "first_segment": 0,
+                  "last_segment": 0,
+                  "count": 3,
+                  "radius_m": 0.018,
+                  "guide_s": [
+                    0.5
+                  ],
+                  "anchor_s": 1.0,
+                  "angular_offsets_rad": [
+                    0.0,
+                    2.0943951023931953,
+                    4.1887902047863905
+                  ],
+                  "phase_rad": 0.0,
+                  "guide_angle_offset_rad": 0.0,
+                  "anchor_angle_offset_rad": 0.0
+                },
+                {
+                  "first_segment": 1,
+                  "last_segment": 1,
+                  "count": 3,
+                  "radius_m": 0.018,
+                  "guide_s": [
+                    0.5
+                  ],
+                  "anchor_s": 1.0,
+                  "angular_offsets_rad": [
+                    0.0,
+                    2.0943951023931953,
+                    4.1887902047863905
+                  ],
+                  "phase_rad": 0.0,
+                  "guide_angle_offset_rad": 0.0,
+                  "anchor_angle_offset_rad": 0.0
+                }
+              ]
+            },
+            "hypothesis": "A two-segment serial external-tendon design with lengths 0.20 m and 0.16 m, circular sections radius 0.008 m, and three independent 120-degree-spaced tendons on each segment can realize the required first-segment bend while leaving the distal segment nearly straight. In a planar calculation, a 0.20 m first segment bent by about 0.8 rad and a straight 0.16 m distal segment produce a tip near (0.291, 0, 0.190) m; a small out-of-plane bend can supply the target -0.035 m y-coordinate. The 3-per-segment tendon spans are intended to provide independent bending authority rather than coupling both segments through a single span.",
+            "expected_observation": "Generation returns a valid serial_family_generation_v2 candidate artifact with two segments, six tendons, accepted section/routing/clearance and parameter domains, and a capability view showing the intended segment and tendon ordering. This is expected to be a design-validity result only, not a task-acceptance or measured-reach result.",
+            "weakening_observation": "Generation rejects the span configuration, guide/anchor stations, tendon clearance, or section domains; or the resulting candidate capability view shows a topology or tendon ordering incompatible with independent three-tendon control of each segment. Any such outcome weakens the design hypothesis and requires a structural revision before control initialization.",
+            "fixed_conditions": "Frozen reach task identity d24aeac7041052ce1d2ae60e825a802e7367107784f6fec192b0a65c4a5e76e7, target_m [0.29, -0.035, 0.19], 0.35 s duration, 0.01 s control period, 0.05 s holding window, original sealed evaluator and thresholds remain unchanged. Family space is serial_external_tendons_s7 with generation serial_family_generation_v2 and polar_consecutive_spans_v1 routing.",
+            "stopping_condition": "Stop this generation attempt if the candidate is rejected or invalid; otherwise stop after the generated candidate artifact is returned and proceed to explicit baseline control initialization. Do not claim reach or task acceptance from generation alone.",
+            "interpretation": "A valid generated candidate would be only a legal structural prior. It would not establish controllability, dynamic reach, or acceptance; those require a later independent measured evaluation. Rejection would provide concrete structural feedback for revision rather than evidence of global infeasibility.",
+            "decision": {
+              "hypothesis_id": "DESIGN_INITIAL_TWO_SEGMENT_SIX_TENDON",
+              "research_intent": "DESIGN_MODIFICATION",
+              "selected_method": "serial_family_generation_v2_polar_consecutive_spans_v1",
+              "selected_variables": [
+                "segment_count",
+                "segment_0.length_m",
+                "segment_1.length_m",
+                "segment_section_radius_m",
+                "young_pa",
+                "tendon_count",
+                "span_topology",
+                "routing.radius_m",
+                "routing.angular_offsets_rad",
+                "routing.guide_s",
+                "routing.anchor_s",
+                "tendon_parameters.force_limit_n",
+                "tendon_parameters.pretension_n"
+              ],
+              "selected_candidate": null,
+              "requested_budget": 1,
+              "claimed_inference": "empirical_search"
+            },
+            "supporting_evidence": []
+          },
+          "scientific_execution_started": false,
+          "full_execution_admission": "not_tested",
+          "contract_and_reference_checks": "passed",
+          "error": null
+        }
+      ]
+    },
+    {
+      "name": "generated_without_control",
+      "version": "s12",
+      "request": {
+        "artifact_id": "626a86e31d38d183e206cb72aae379690143d489f6e35a735b90a9130508aff1",
+        "media_type": "application/json"
+      },
+      "state": {
+        "artifact_id": "1a237bf052982a8e7697adaa54116ec8d9a55f4a2d7df7aaafeb9a0d268da636",
+        "media_type": "application/json"
+      },
+      "packet": {
+        "artifact_id": "3533cf867f8061be6d4128534ba63911b81449ccfa4f23e318c67ff5644356b2",
+        "media_type": "application/json"
+      },
+      "identity": "626a86e31d38d183e206cb72aae379690143d489f6e35a735b90a9130508aff1",
+      "source_event": null,
+      "total_bytes": 56718,
+      "serialized_bytes": {
+        "fixed_instructions": 6318,
+        "tool_schema": 34319,
+        "current_packet": 15683,
+        "history_model_messages": 0,
+        "history_reasoning": 0,
+        "history_tool_results": 0,
+        "other_protocol": 398
+      },
+      "token_parts": null,
+      "measurement": "Canonical compact UTF-8 JSON serialization; excludes HTTP headers. Byte parts are not token parts.",
+      "usage": {
+        "prompt_tokens": 16860,
+        "completion_tokens": 8968,
+        "total_tokens": 25828,
+        "prompt_tokens_details": {
+          "cached_tokens": 2432
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 8009
+        },
+        "prompt_cache_hit_tokens": 2432,
+        "prompt_cache_miss_tokens": 14428
+      },
+      "http_status": 200,
+      "proposals": [
+        {
+          "tool": "research_plan",
+          "request": {
+            "action": "generate",
+            "hypothesis": "A two-segment, 0.44 m total-length, four-tendon polar-routed continuum design with 8 mm circular sections and 18 mm tendon routing radius can produce the roughly 5 rad/m bending curvature needed to bring the tip near the target (0.29, -0.035, 0.19) while respecting the declared curvature, force, clearance, and tendon domains.",
+            "expected_observation": "Generation returns a valid new candidate artifact for two segments and four tendons, with capabilities confirming the requested lengths, circular section dimensions, one polar span over both segments, four tendon routes, 8 N force limits, and no domain or clearance rejection.",
+            "weakening_observation": "Generation is rejected, the candidate capability view shows incompatible routing or guide clearance, the effective total length is insufficient, or the declared curvature/force domains cannot realize the required bend.",
+            "fixed_conditions": "Frozen task target and duration; family space serial_external_tendons_s7; two segments; four tendons; one polar consecutive span from segment 0 to segment 1; task grid and evaluator unchanged.",
+            "stopping_condition": "Stop the design-generation step when a valid candidate artifact is returned, or when generation fails and the exact domain/routing rejection is available for revision; do not begin physical replay before a valid design and control seed exist.",
+            "interpretation": "Generation is only a design proposal and establishes no measured task acceptance. A valid artifact would justify initialization and independent physical evaluation; a rejection would identify which structural domain or routing constraint must be revised.",
+            "generation": {
+              "version": "serial_family_generation_v2",
+              "family_space_identity": "0793d20569402760ca055f73f6f97d80d73d0fe3c051ff2b60ebad1519db02aa",
+              "segment_count": 2,
+              "tendon_count": 4,
+              "segments": {
+                "0": {
+                  "length_m": 0.24,
+                  "young_pa": 7200000.0,
+                  "sections": [
+                    {
+                      "kind": "circle",
+                      "parameters": {
+                        "radius_m": 0.008
+                      }
+                    }
+                  ],
+                  "cells": 12
+                },
+                "1": {
+                  "length_m": 0.2,
+                  "young_pa": 5400000.0,
+                  "sections": [
+                    {
+                      "kind": "circle",
+                      "parameters": {
+                        "radius_m": 0.008
+                      }
+                    }
+                  ],
+                  "cells": 12
+                }
+              },
+              "spans": [
+                {
+                  "first_segment": 0,
+                  "last_segment": 1,
+                  "count": 4,
+                  "radius_m": 0.018,
+                  "guide_s": [
+                    0.5
+                  ],
+                  "anchor_s": 1.0,
+                  "phase_rad": 0.0,
+                  "angular_offsets_rad": [
+                    0.0,
+                    1.5707963267948966,
+                    3.141592653589793,
+                    4.71238898038469
+                  ]
+                }
+              ],
+              "tendon_parameters": {
+                "diameter_m": 0.001,
+                "force_limit_n": 8.0,
+                "pretension_n": 0.2,
+                "length_servo_gain_n_m": 900.0
+              },
+              "control_weights": {
+                "holding_tip_speed_weight": 0.1,
+                "terminal_tip_speed_weight": 0.1
+              }
+            },
+            "decision": {
+              "version": "research_decision_v1",
+              "hypothesis_id": "DESIGN_REACHABILITY_TWO_SEGMENT_FOUR_TENDON",
+              "research_intent": "DESIGN_MODIFICATION",
+              "selected_method": "serial_family_generation_v2",
+              "selected_variables": [
+                "segment_count",
+                "segment_length_m",
+                "young_pa",
+                "section_radius_m",
+                "tendon_count",
+                "routing_radius_m",
+                "pretension_n",
+                "force_limit_n"
+              ],
+              "selected_candidate": null,
+              "requested_budget": 0,
+              "claimed_inference": "empirical_search"
+            }
+          },
+          "scientific_execution_started": false,
+          "full_execution_admission": "not_tested",
+          "contract_and_reference_checks": "passed",
+          "error": null
+        }
+      ]
+    },
+    {
+      "name": "generated_without_control",
+      "version": "s125",
+      "request": {
+        "artifact_id": "f93d1324d4c352819fcf829cadcfd3daebb119886d299c18e3dbcb4a63ae0203",
+        "media_type": "application/json"
+      },
+      "state": {
+        "artifact_id": "1a237bf052982a8e7697adaa54116ec8d9a55f4a2d7df7aaafeb9a0d268da636",
+        "media_type": "application/json"
+      },
+      "packet": {
+        "artifact_id": "3533cf867f8061be6d4128534ba63911b81449ccfa4f23e318c67ff5644356b2",
+        "media_type": "application/json"
+      },
+      "identity": "f93d1324d4c352819fcf829cadcfd3daebb119886d299c18e3dbcb4a63ae0203",
+      "source_event": null,
+      "total_bytes": 56460,
+      "serialized_bytes": {
+        "fixed_instructions": 6318,
+        "tool_schema": 34061,
+        "current_packet": 15683,
+        "history_model_messages": 0,
+        "history_reasoning": 0,
+        "history_tool_results": 0,
+        "other_protocol": 398
+      },
+      "token_parts": null,
+      "measurement": "Canonical compact UTF-8 JSON serialization; excludes HTTP headers. Byte parts are not token parts.",
+      "usage": {
+        "prompt_tokens": 16752,
+        "completion_tokens": 2974,
+        "total_tokens": 19726,
+        "prompt_tokens_details": {
+          "cached_tokens": 8960
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 1753
+        },
+        "prompt_cache_hit_tokens": 8960,
+        "prompt_cache_miss_tokens": 7792
+      },
+      "http_status": 200,
+      "proposals": [
+        {
+          "tool": "research_plan",
+          "request": {
+            "action": "mechanics",
+            "hypothesis": "The registered default candidate (artifact 8a73…d31d, serial_external_tendons_s7, generation v2 defaults) has enough bending authority under its declared tension limits that a model-based task_gap optimization from a cold constant-0.2 N initialization reaches a predicted post-step tip within a small multiple of the 0.01 m tolerance of the target [0.29,-0.035,0.19]; i.e. the design is not the binding limitation and the remaining gap, if any, is a control/timing problem.",
+            "expected_observation": "A converged (or iteration-limited) SoRoSim task_gap solution whose predicted terminal tip error is on the order of 1e-3 to low 1e-2 m — small enough to be plausible under 0.01 m once controllers move faster than the cold-optimized schedule — with tensions staying inside the declared per-tendon force limits and a terminal speed low enough that the final-0.05 s holding window is not obviously hopeless.",
+            "weakening_observation": "The reported predicted task gap stays at the order of the workspace scale (tens of mm) with saturated tensions, i.e. the optimizer cannot move the tip toward the target direction at all from this design, or it terminates on numerical/iteration limits without meaningful improvement over the constant pretension start. That would indicate the geometry/routing, not the input sequence, is binding and push toward generate (design modification).",
+            "fixed_conditions": "Frozen task (target [0.29,-0.035,0.19], 0.35 s, 0.01 s control period, 0.0005 s timestep, 0.05 s holding window, position 0.01 m / speed 0.02 m/s limits), candidate 8a73…d31d unmodified, declared tendon force limits and pretension defaults, objective_mode task_gap, position_weight 1, speed_weight 1, secondary_coefficient 0.001, substeps 1, max_iterations 120, no warm source (none eligible).",
+            "stopping_condition": "One mathematical evaluation is charged regardless of outcome; stop this analysis step when the mechanics run returns a predicted trajectory/task-gap summary or a numerical-failure status, and do not repeat it with the other cold initialization in this same step.",
+            "interpretation": "If the predicted gap is small I will treat the design as a usable prior, initialize control on this candidate (baseline pretension or a response-based seed) and spend the physical budget on control search over the 0.35 s window. If the predicted gap is large despite saturated tensions, the model result weakens the design prior and I will instead modify structure via generate (segment count/length/section/stiffness) and re-check. Either way this result is a model-side, check-only prior with no task acceptance; no feasibility, optimality or robustness claim follows from it.",
+            "decision": {
+              "hypothesis_id": "DEFAULT_DESIGN_TASK_GAP_PRIOR",
+              "research_intent": "MATHEMATICAL_ANALYSIS",
+              "selected_method": "sorosim_task_gap_optimization_from_cold_constant_0_2_pretension",
+              "selected_variables": [
+                "tendon tension schedule (cold-initialized)",
+                "predicted post-step tip position",
+                "terminal tip speed"
+              ],
+              "selected_candidate": {
+                "artifact_id": "8a73f203be30601c173da6fd70d5d8835c0a26ea42f6c99a496352a7c76ed31d",
+                "media_type": "application/json"
+              },
+              "requested_budget": 1,
+              "claimed_inference": "empirical_search"
+            },
+            "mechanics": {
+              "candidate": {
+                "artifact_id": "8a73f203be30601c173da6fd70d5d8835c0a26ea42f6c99a496352a7c76ed31d",
+                "media_type": "application/json"
+              },
+              "initialization": "constant_0_2",
+              "objective_mode": "task_gap",
+              "check_only": false,
+              "substeps": 1,
+              "max_iterations": 120,
+              "position_weight": 1.0,
+              "speed_weight": 1.0,
+              "secondary_coefficient": 0.001
+            },
+            "supporting_evidence": []
+          },
+          "scientific_execution_started": false,
+          "full_execution_admission": "not_tested",
+          "contract_and_reference_checks": "passed",
+          "error": null
+        }
+      ]
+    },
+    {
+      "name": "fresh_failure",
+      "version": "s12",
+      "request": {
+        "artifact_id": "2bda2fdf796cd0c4c5b64dea789718152738c1932b5bc1ac3c50a3038c56f947",
+        "media_type": "application/json"
+      },
+      "state": {
+        "artifact_id": "10d68437fa89f38eb038a9e223a4e445b74370750957bbdfeb33ee2ceae6fc13",
+        "media_type": "application/json"
+      },
+      "packet": {
+        "artifact_id": "2f3c62225d070634b63cc18f283282ade95729f16387b76df9c5b8a64bb27946",
+        "media_type": "application/json"
+      },
+      "identity": "2bda2fdf796cd0c4c5b64dea789718152738c1932b5bc1ac3c50a3038c56f947",
+      "source_event": {
+        "agent_id": "host",
+        "candidate_id": null,
+        "contract_version": "1.0.0",
+        "cost": {
+          "backend_solves": 0,
+          "model_calls": 0,
+          "tool_calls": 0,
+          "wall_s": 0.0,
+          "worker_calls": 0
+        },
+        "event_id": "cd9120e2d9d44e2880176ad757a8eac2",
+        "execution_id": null,
+        "implementation_version": "1.0.0",
+        "inputs": [],
+        "kind": "model_decision_packet",
+        "outputs": [
+          {
+            "artifact_id": "4ea1b32b91ae9f745a532ff48c706dd9332437bc694ef6fe712b983daf26da25",
+            "media_type": "application/json"
+          }
+        ],
+        "parent_id": null,
+        "project_id": "s12-mirror-live-20261020",
+        "request_id": null,
+        "run_id": "s12-mirror-live-20261020",
+        "sequence": 299,
+        "status": "recorded",
+        "timestamp": "2026-10-20T09:47:51.058153+00:00"
+      },
+      "total_bytes": 73439,
+      "serialized_bytes": {
+        "fixed_instructions": 6318,
+        "tool_schema": 32631,
+        "current_packet": 34092,
+        "history_model_messages": 0,
+        "history_reasoning": 0,
+        "history_tool_results": 0,
+        "other_protocol": 398
+      },
+      "token_parts": null,
+      "measurement": "Canonical compact UTF-8 JSON serialization; excludes HTTP headers. Byte parts are not token parts.",
+      "usage": {
+        "prompt_tokens": 22006,
+        "completion_tokens": 7849,
+        "total_tokens": 29855,
+        "prompt_tokens_details": {
+          "cached_tokens": 1536
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 7043
+        },
+        "prompt_cache_hit_tokens": 1536,
+        "prompt_cache_miss_tokens": 20470
+      },
+      "http_status": 200,
+      "proposals": [
+        {
+          "tool": "research_plan",
+          "request": {
+            "action": "execute",
+            "candidate": {
+              "artifact_id": "5f6f99b6c44900c0868942d35ce39eab45df2f2e6f168e92184036993b1e241b",
+              "media_type": "application/json"
+            },
+            "decision": {
+              "hypothesis_id": "HS-nmpc-5f6f99-v1",
+              "research_intent": "NMPC_EXECUTION",
+              "selected_method": "nmpc",
+              "selected_variables": [
+                "nmpc_control_inputs"
+              ],
+              "selected_candidate": {
+                "artifact_id": "5f6f99b6c44900c0868942d35ce39eab45df2f2e6f168e92184036993b1e241b",
+                "media_type": "application/json"
+              },
+              "requested_budget": 1,
+              "claimed_inference": "empirical_search"
+            },
+            "hypothesis": "A default NMPC execution on executable candidate 5f6f99 can reach the target and satisfy both the 1 cm holding-position limit and the 2 cm/s holding-speed limit within the 0.35 s task.",
+            "expected_observation": "The fresh NMPC execution reports valid completion, force bounds satisfied, terminal_error_m < 0.01 m, and holding_max_speed_m_s < 0.02 m/s over the final 0.05 s window.",
+            "weakening_observation": "The execution remains numerically valid but terminal or holding error is >= 0.01 m or holding speed is >= 0.02 m/s, or the execution fails numerically.",
+            "fixed_conditions": "Original task target [0.29,-0.035,0.19] m, duration 0.35 s, control period 0.01 s, timestep 0.0005 s, candidate 5f6f99, default controller recipe and solver, and tendon order tendon_0 through tendon_3.",
+            "stopping_condition": "Stop exploration immediately if this exact fresh execution is a complete original-task pass and select it; otherwise retain the result and decide whether to use the remaining NMPC launch or move to local control search.",
+            "interpretation": "A complete pass would establish the first full solution. A valid non-pass would show that default NMPC on this candidate is insufficient under the frozen task and would guide whether to adjust the controller recipe or use local control search.",
+            "supporting_evidence": [
+              {
+                "artifact_id": "5f6f99b6c44900c0868942d35ce39eab45df2f2e6f168e92184036993b1e241b",
+                "media_type": "application/json"
+              },
+              {
+                "artifact_id": "49c76e42767e0ab9870e7a18322bebc916215f721c955a7bbbba472ac72ab0ed",
+                "media_type": "application/json"
+              },
+              {
+                "artifact_id": "62ddc2387077c5b49440d16208cd83d07d9108187e3e94df00043e4bfdb9557d",
+                "media_type": "application/json"
+              }
+            ]
+          },
+          "scientific_execution_started": false,
+          "full_execution_admission": "not_tested",
+          "contract_and_reference_checks": "passed",
+          "error": null
+        }
+      ]
+    },
+    {
+      "name": "fresh_failure",
+      "version": "s125",
+      "request": {
+        "artifact_id": "122b271a86b6eea1a8780cffeecc94bc2d4d7daae4a7ce26f07d7f3bea1949f4",
+        "media_type": "application/json"
+      },
+      "state": {
+        "artifact_id": "10d68437fa89f38eb038a9e223a4e445b74370750957bbdfeb33ee2ceae6fc13",
+        "media_type": "application/json"
+      },
+      "packet": {
+        "artifact_id": "2f3c62225d070634b63cc18f283282ade95729f16387b76df9c5b8a64bb27946",
+        "media_type": "application/json"
+      },
+      "identity": "122b271a86b6eea1a8780cffeecc94bc2d4d7daae4a7ce26f07d7f3bea1949f4",
+      "source_event": {
+        "agent_id": "host",
+        "candidate_id": null,
+        "contract_version": "1.0.0",
+        "cost": {
+          "backend_solves": 0,
+          "model_calls": 0,
+          "tool_calls": 0,
+          "wall_s": 0.0,
+          "worker_calls": 0
+        },
+        "event_id": "cd9120e2d9d44e2880176ad757a8eac2",
+        "execution_id": null,
+        "implementation_version": "1.0.0",
+        "inputs": [],
+        "kind": "model_decision_packet",
+        "outputs": [
+          {
+            "artifact_id": "4ea1b32b91ae9f745a532ff48c706dd9332437bc694ef6fe712b983daf26da25",
+            "media_type": "application/json"
+          }
+        ],
+        "parent_id": null,
+        "project_id": "s12-mirror-live-20261020",
+        "request_id": null,
+        "run_id": "s12-mirror-live-20261020",
+        "sequence": 299,
+        "status": "recorded",
+        "timestamp": "2026-10-20T09:47:51.058153+00:00"
+      },
+      "total_bytes": 73128,
+      "serialized_bytes": {
+        "fixed_instructions": 6318,
+        "tool_schema": 32320,
+        "current_packet": 34092,
+        "history_model_messages": 0,
+        "history_reasoning": 0,
+        "history_tool_results": 0,
+        "other_protocol": 398
+      },
+      "token_parts": null,
+      "measurement": "Canonical compact UTF-8 JSON serialization; excludes HTTP headers. Byte parts are not token parts.",
+      "usage": {
+        "prompt_tokens": 21880,
+        "completion_tokens": 2696,
+        "total_tokens": 24576,
+        "prompt_tokens_details": {
+          "cached_tokens": 14208
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 2308
+        },
+        "prompt_cache_hit_tokens": 14208,
+        "prompt_cache_miss_tokens": 7672
+      },
+      "http_status": 200,
+      "proposals": [
+        {
+          "tool": "evidence_read",
+          "request": {
+            "reference": {
+              "artifact_id": "5f6f99b6c44900c0868942d35ce39eab45df2f2e6f168e92184036993b1e241b",
+              "media_type": "application/json"
+            },
+            "view": "capabilities"
+          },
+          "scientific_execution_started": false,
+          "full_execution_admission": "not_tested",
+          "contract_and_reference_checks": "passed",
+          "error": null
+        },
+        {
+          "tool": "evidence_read",
+          "request": {
+            "reference": {
+              "artifact_id": "62ddc2387077c5b49440d16208cd83d07d9108187e3e94df00043e4bfdb9557d",
+              "media_type": "application/json"
+            },
+            "view": "summary"
+          },
+          "scientific_execution_started": false,
+          "full_execution_admission": "not_tested",
+          "contract_and_reference_checks": "passed",
+          "error": null
+        },
+        {
+          "tool": "evidence_read",
+          "request": {
+            "reference": {
+              "artifact_id": "b55bd800f1c3d9524f60546776dc3bf324cd06a0afe1616155bd5d8a75498687",
+              "media_type": "application/json"
+            },
+            "view": "summary"
+          },
+          "scientific_execution_started": false,
+          "full_execution_admission": "not_tested",
+          "contract_and_reference_checks": "passed",
+          "error": null
+        },
+        {
+          "tool": "evidence_read",
+          "request": {
+            "reference": {
+              "artifact_id": "9ca1a0dde17c1f307c8913cfe187ab29e7cd88312b25bb17dfc901672a4f70e4",
+              "media_type": "application/json"
+            },
+            "view": "summary"
+          },
+          "scientific_execution_started": false,
+          "full_execution_admission": "not_tested",
+          "contract_and_reference_checks": "passed",
+          "error": null
+        }
+      ]
+    },
+    {
+      "name": "mathematics_before_physics",
+      "version": "s12",
+      "request": {
+        "artifact_id": "aeeabea662c65725a1dc3ae3fed6cb6a7716d6ef59cde53e209cbbc4acc789c6",
+        "media_type": "application/json"
+      },
+      "state": {
+        "artifact_id": "3d993e9234156632d84a3422cc518fbb74722b69680f8603447200973e510669",
+        "media_type": "application/json"
+      },
+      "packet": {
+        "artifact_id": "eaf7b5e71456087dfda8fa4ece8b59222aeddceca64e47a398812398ec8a3330",
+        "media_type": "application/json"
+      },
+      "identity": "aeeabea662c65725a1dc3ae3fed6cb6a7716d6ef59cde53e209cbbc4acc789c6",
+      "source_event": {
+        "agent_id": "host",
+        "candidate_id": null,
+        "contract_version": "1.0.0",
+        "cost": {
+          "backend_solves": 0,
+          "model_calls": 0,
+          "tool_calls": 0,
+          "wall_s": 0.0,
+          "worker_calls": 0
+        },
+        "event_id": "ba95ef681a9641cc8f3cdd0d61560d64",
+        "execution_id": null,
+        "implementation_version": "1.0.0",
+        "inputs": [],
+        "kind": "model_decision_packet",
+        "outputs": [
+          {
+            "artifact_id": "dda6fd4380a9adc0ff156b0f5fff1f5be9a6c0ca67e4c2fc1e6579ffb9061506",
+            "media_type": "application/json"
+          }
+        ],
+        "parent_id": null,
+        "project_id": "s12-mirror-live-20261020",
+        "request_id": null,
+        "run_id": "s12-mirror-live-20261020",
+        "sequence": 121,
+        "status": "recorded",
+        "timestamp": "2026-10-20T09:45:44.871626+00:00"
+      },
+      "total_bytes": 69152,
+      "serialized_bytes": {
+        "fixed_instructions": 6318,
+        "tool_schema": 32631,
+        "current_packet": 29805,
+        "history_model_messages": 0,
+        "history_reasoning": 0,
+        "history_tool_results": 0,
+        "other_protocol": 398
+      },
+      "token_parts": null,
+      "measurement": "Canonical compact UTF-8 JSON serialization; excludes HTTP headers. Byte parts are not token parts.",
+      "usage": {
+        "prompt_tokens": 20707,
+        "completion_tokens": 863,
+        "total_tokens": 21570,
+        "prompt_tokens_details": {
+          "cached_tokens": 4096
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 474
+        },
+        "prompt_cache_hit_tokens": 4096,
+        "prompt_cache_miss_tokens": 16611
+      },
+      "http_status": 200,
+      "proposals": [
+        {
+          "tool": "evidence_read",
+          "request": {
+            "reference": {
+              "artifact_id": "49c76e42767e0ab9870e7a18322bebc916215f721c955a7bbbba472ac72ab0ed",
+              "media_type": "application/json"
+            },
+            "view": "summary"
+          },
+          "scientific_execution_started": false,
+          "full_execution_admission": "not_tested",
+          "contract_and_reference_checks": "passed",
+          "error": null
+        },
+        {
+          "tool": "evidence_read",
+          "request": {
+            "reference": {
+              "artifact_id": "5f6f99b6c44900c0868942d35ce39eab45df2f2e6f168e92184036993b1e241b",
+              "media_type": "application/json"
+            },
+            "view": "summary"
+          },
+          "scientific_execution_started": false,
+          "full_execution_admission": "not_tested",
+          "contract_and_reference_checks": "passed",
+          "error": null
+        },
+        {
+          "tool": "evidence_read",
+          "request": {
+            "reference": {
+              "artifact_id": "62ddc2387077c5b49440d16208cd83d07d9108187e3e94df00043e4bfdb9557d",
+              "media_type": "application/json"
+            },
+            "view": "summary"
+          },
+          "scientific_execution_started": false,
+          "full_execution_admission": "not_tested",
+          "contract_and_reference_checks": "passed",
+          "error": null
+        },
+        {
+          "tool": "evidence_read",
+          "request": {
+            "reference": {
+              "artifact_id": "8a2ee4f9c69ccf5e2ffa031fb4530a4706b8ed43a6e24cd3c7747bd17d716366",
+              "media_type": "application/json"
+            },
+            "view": "summary"
+          },
+          "scientific_execution_started": false,
+          "full_execution_admission": "not_tested",
+          "contract_and_reference_checks": "passed",
+          "error": null
+        }
+      ]
+    },
+    {
+      "name": "mathematics_before_physics",
+      "version": "s125",
+      "request": {
+        "artifact_id": "674d2daa5a1c38462b2c4447604d91851eb03383272c19260ea2bd491e7b8e96",
+        "media_type": "application/json"
+      },
+      "state": {
+        "artifact_id": "3d993e9234156632d84a3422cc518fbb74722b69680f8603447200973e510669",
+        "media_type": "application/json"
+      },
+      "packet": {
+        "artifact_id": "eaf7b5e71456087dfda8fa4ece8b59222aeddceca64e47a398812398ec8a3330",
+        "media_type": "application/json"
+      },
+      "identity": "674d2daa5a1c38462b2c4447604d91851eb03383272c19260ea2bd491e7b8e96",
+      "source_event": {
+        "agent_id": "host",
+        "candidate_id": null,
+        "contract_version": "1.0.0",
+        "cost": {
+          "backend_solves": 0,
+          "model_calls": 0,
+          "tool_calls": 0,
+          "wall_s": 0.0,
+          "worker_calls": 0
+        },
+        "event_id": "ba95ef681a9641cc8f3cdd0d61560d64",
+        "execution_id": null,
+        "implementation_version": "1.0.0",
+        "inputs": [],
+        "kind": "model_decision_packet",
+        "outputs": [
+          {
+            "artifact_id": "dda6fd4380a9adc0ff156b0f5fff1f5be9a6c0ca67e4c2fc1e6579ffb9061506",
+            "media_type": "application/json"
+          }
+        ],
+        "parent_id": null,
+        "project_id": "s12-mirror-live-20261020",
+        "request_id": null,
+        "run_id": "s12-mirror-live-20261020",
+        "sequence": 121,
+        "status": "recorded",
+        "timestamp": "2026-10-20T09:45:44.871626+00:00"
+      },
+      "total_bytes": 68841,
+      "serialized_bytes": {
+        "fixed_instructions": 6318,
+        "tool_schema": 32320,
+        "current_packet": 29805,
+        "history_model_messages": 0,
+        "history_reasoning": 0,
+        "history_tool_results": 0,
+        "other_protocol": 398
+      },
+      "token_parts": null,
+      "measurement": "Canonical compact UTF-8 JSON serialization; excludes HTTP headers. Byte parts are not token parts.",
+      "usage": {
+        "prompt_tokens": 20581,
+        "completion_tokens": 590,
+        "total_tokens": 21171,
+        "prompt_tokens_details": {
+          "cached_tokens": 12928
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 295
+        },
+        "prompt_cache_hit_tokens": 12928,
+        "prompt_cache_miss_tokens": 7653
+      },
+      "http_status": 200,
+      "proposals": [
+        {
+          "tool": "evidence_read",
+          "request": {
+            "reference": {
+              "artifact_id": "5f6f99b6c44900c0868942d35ce39eab45df2f2e6f168e92184036993b1e241b",
+              "media_type": "application/json"
+            },
+            "view": "capabilities"
+          },
+          "scientific_execution_started": false,
+          "full_execution_admission": "not_tested",
+          "contract_and_reference_checks": "passed",
+          "error": null
+        },
+        {
+          "tool": "evidence_read",
+          "request": {
+            "reference": {
+              "artifact_id": "62ddc2387077c5b49440d16208cd83d07d9108187e3e94df00043e4bfdb9557d",
+              "media_type": "application/json"
+            },
+            "view": "summary"
+          },
+          "scientific_execution_started": false,
+          "full_execution_admission": "not_tested",
+          "contract_and_reference_checks": "passed",
+          "error": null
+        },
+        {
+          "tool": "evidence_read",
+          "request": {
+            "reference": {
+              "artifact_id": "0033f11e7656dad352c7aadd0b407ef616108b8b6aae980a1b9996b0809f3a23",
+              "media_type": "application/json"
+            },
+            "view": "summary"
+          },
+          "scientific_execution_started": false,
+          "full_execution_admission": "not_tested",
+          "contract_and_reference_checks": "passed",
+          "error": null
+        }
+      ]
+    },
+    {
+      "name": "next_request_protected",
+      "version": "s12",
+      "request": {
+        "artifact_id": "20afe6791e5d12011548df141f65c36683617db403745e91f51e7c221508a6a3",
+        "media_type": "application/json"
+      },
+      "state": {
+        "artifact_id": "a9745d9e9f16af88e4e9382b59bd073af857e3fdb8d353be9d295f3a8352b537",
+        "media_type": "application/json"
+      },
+      "packet": {
+        "artifact_id": "748e4a6e3c4646dc6f7667319ba64077e5cb7549e72fbe72d3bca3bb9be864d8",
+        "media_type": "application/json"
+      },
+      "identity": "20afe6791e5d12011548df141f65c36683617db403745e91f51e7c221508a6a3",
+      "source_event": null,
+      "total_bytes": 32899,
+      "serialized_bytes": {
+        "fixed_instructions": 6318,
+        "tool_schema": 10635,
+        "current_packet": 15548,
+        "history_model_messages": 0,
+        "history_reasoning": 0,
+        "history_tool_results": 0,
+        "other_protocol": 398
+      },
+      "token_parts": null,
+      "measurement": "Canonical compact UTF-8 JSON serialization; excludes HTTP headers. Byte parts are not token parts.",
+      "usage": {
+        "prompt_tokens": 9063,
+        "completion_tokens": 955,
+        "total_tokens": 10018,
+        "prompt_tokens_details": {
+          "cached_tokens": 1792
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 476
+        },
+        "prompt_cache_hit_tokens": 1792,
+        "prompt_cache_miss_tokens": 7271
+      },
+      "http_status": 200,
+      "proposals": [
+        {
+          "tool": "research_plan",
+          "request": {
+            "action": "stop",
+            "hypothesis": "With the frozen budget, no further legal fresh scientific evaluation can be launched: available_for_exploration is 1, but next_request_exploration_remaining is 0 and the next request will protect closeout, while all_fresh_results is empty and best_valid is null.",
+            "expected_observation": "A STOP decision is recorded with no selected execution and no new scientific result; the complete fresh-result index remains empty.",
+            "weakening_observation": "STOP would be premature if a fresh exploration allowance were available or if any complete fresh original-task result existed in all_fresh_results.",
+            "fixed_conditions": "Task identity, frozen evaluator, unchanged 0.01 m acceptance tolerance, control period, duration, family domains, and all budget counters remain unchanged.",
+            "stopping_condition": "Stop now because the next request cannot explore and there is no fresh complete passing result to select.",
+            "interpretation": "The complete all_fresh_results index contains zero entries: no generation, initialization, control search, replay, or evaluation was executed in this study. Consequently there is no measured candidate, no accepted task result, and no basis for claiming feasibility, infeasibility, optimality, robustness, repeatability, or hardware behavior. No execution is selected.",
+            "decision": {
+              "hypothesis_id": "CONTROL_SEARCH_INCOMPLETE",
+              "research_intent": "STOP",
+              "selected_method": "stop_with_empty_result_index",
+              "selected_variables": [],
+              "selected_candidate": null,
+              "requested_budget": 0,
+              "claimed_inference": "empirical_search"
+            },
+            "supporting_evidence": [],
+            "next_step": "stop"
+          },
+          "scientific_execution_started": false,
+          "full_execution_admission": "not_tested",
+          "contract_and_reference_checks": "passed",
+          "error": null
+        }
+      ]
+    },
+    {
+      "name": "next_request_protected",
+      "version": "s125",
+      "request": {
+        "artifact_id": "35a36c3fd9870eed5fed5dd87d021795796ccd72f8089d1e3499a6a578505826",
+        "media_type": "application/json"
+      },
+      "state": {
+        "artifact_id": "a9745d9e9f16af88e4e9382b59bd073af857e3fdb8d353be9d295f3a8352b537",
+        "media_type": "application/json"
+      },
+      "packet": {
+        "artifact_id": "748e4a6e3c4646dc6f7667319ba64077e5cb7549e72fbe72d3bca3bb9be864d8",
+        "media_type": "application/json"
+      },
+      "identity": "35a36c3fd9870eed5fed5dd87d021795796ccd72f8089d1e3499a6a578505826",
+      "source_event": null,
+      "total_bytes": 33346,
+      "serialized_bytes": {
+        "fixed_instructions": 6318,
+        "tool_schema": 11082,
+        "current_packet": 15548,
+        "history_model_messages": 0,
+        "history_reasoning": 0,
+        "history_tool_results": 0,
+        "other_protocol": 398
+      },
+      "token_parts": null,
+      "measurement": "Canonical compact UTF-8 JSON serialization; excludes HTTP headers. Byte parts are not token parts.",
+      "usage": {
+        "prompt_tokens": 9157,
+        "completion_tokens": 2980,
+        "total_tokens": 12137,
+        "prompt_tokens_details": {
+          "cached_tokens": 5760
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 2386
+        },
+        "prompt_cache_hit_tokens": 5760,
+        "prompt_cache_miss_tokens": 3397
+      },
+      "http_status": 200,
+      "proposals": [
+        {
+          "tool": "research_plan",
+          "request": {
+            "action": "stop",
+            "hypothesis": "Under the frozen state, no admissible finite experiment can produce a fresh original-task evaluation because the advertised research actions are unavailable and the remaining exploration allowance is zero after charging the next request.",
+            "expected_observation": "The study seals without any fresh result or task acceptance; all_fresh_results remains empty and the protected closeout allowance remains reserved.",
+            "weakening_observation": "If an executable finite experiment or a fresh complete original-task result were available, stopping would be premature.",
+            "fixed_conditions": "Original task identity d24aeac7041052ce1d2ae60e825a802e7367107784f6fec192b0a65c4a5e76e7; unchanged evaluator and 0.01 m tolerance, holding position limit 0.01 m, holding speed limit 0.02 m/s, duration 0.35 s; provider remaining_total 5, reserved_for_closeout 4, available_for_exploration 1, next_request_exploration_remaining 0; all_fresh_results empty; best_valid null.",
+            "stopping_condition": "Stop immediately because no legal executable research action is exposed and no fresh complete pass exists to select; do not claim task infeasibility, optimality, robustness, repeatability or a successful original-task pass.",
+            "interpretation": "No full original-task pass is established. The complete all_fresh_results index contains 0 entries. The advertised research actions are unavailable, and the only permitted plan actions are stop/select; select requires a passing selected_execution, which does not exist. This is a stop on the frozen decision state, not a claim of task infeasibility.",
+            "next_step": "stop",
+            "selected_execution": null,
+            "supporting_evidence": [],
+            "decision": {
+              "hypothesis_id": "NO_EXECUTABLE_ACTION",
+              "research_intent": "STOP",
+              "selected_method": "stop",
+              "selected_variables": [
+                "none"
+              ],
+              "selected_candidate": null,
+              "requested_budget": 0,
+              "claimed_inference": "no_inference_stop",
+              "version": "research_decision_v1"
+            }
+          },
+          "scientific_execution_started": false,
+          "full_execution_admission": "not_tested",
+          "contract_and_reference_checks": "rejected",
+          "error": "INFERENCE_NOT_SUPPORTED_BY_TRUSTED_EVIDENCE: no_inference_stop"
+        }
+      ]
+    }
+  ],
+  "ledger": {
+    "limit": {
+      "backend_solves": 0,
+      "model_calls": 10,
+      "tool_calls": 0,
+      "wall_s": null,
+      "worker_calls": 0
+    },
+    "used": {
+      "tool_calls": 0,
+      "model_calls": 10,
+      "backend_solves": 0,
+      "worker_calls": 0,
+      "wall_s": 233.6260000001639
+    },
+    "remaining": {
+      "backend_solves": 0,
+      "model_calls": 0,
+      "tool_calls": 0,
+      "wall_s": null,
+      "worker_calls": 0
+    },
+    "occupied": {}
+  },
+  "new_scientific_executions": 0,
+  "full_scientific_admission": "not_tested; no dispatch or fabricated result",
+  "limitation": "One turn per case/interface; valid evidence queries are not research actions; legality is separate from method quality"
+}
