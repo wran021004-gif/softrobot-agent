@@ -38,6 +38,14 @@ class EvidenceTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,'START_OUTSIDE'):self.read([1],view='range',start=2)
         with self.assertRaisesRegex(ValueError,'INVALID_EVIDENCE_POINTER'):self.read({},pointer='best')
 
+    def test_synthetic_key_preview_never_advertises_synthetic_paths(self):
+        raw=dict(rows=[dict(a=1,b=2,c=3,d=4,e=5)]*8,best=None,candidates=[])
+        view=compact_evidence(raw,REF)
+        item=view['value']['rows']['preview'][0]
+        self.assertIsInstance(item['keys'],list)
+        self.assertEqual(self.read(raw,pointer=item['read_pointer']),raw['rows'][0])
+        self.assertIsNone(self.read(raw,**view['summary']['small_query']))
+
     def test_protected_read_rejected_before_traversal(self):
         host=Mock();host.store.artifact.return_value={}
         with patch('tools.research.core.state',return_value={}),patch('tools.research.core.protected',return_value=True),patch('tools.research.core.readable_results',return_value=[]):

@@ -124,7 +124,10 @@ def compact_evidence(value, reference, pointer=''):
             for i,x in enumerate(v[:3]):
                 if len(v)>3 and isinstance(x,dict):
                     fields=('reference','candidate','source','task_gap','label','time_s','tip_m','speed_m_s','position_error_m')
-                    x={k:x[k] for k in fields if k in x} or dict(keys=list(x),read_pointer=path+'/'+str(i))
+                    shown={k:x[k] for k in fields if k in x}
+                    if not shown:
+                        items.append(dict(keys=list(x),read_pointer=path+'/'+str(i)));continue
+                    x=shown
                 items.append(preview(x,depth+1,path+'/'+str(i)))
             return dict(total=len(v),read_pointer=path,item_keys=list(v[0]) if isinstance(v[0],dict) else None,preview=items) if len(v)>3 else items
         if isinstance(v,dict):
@@ -145,7 +148,7 @@ def compact_evidence(value, reference, pointer=''):
             starts=[dict(start=s['start'],initial_gap=s['initial_gap'],best={k:(s.get('best') or {}).get(k)
                 for k in ('reference','candidate','source','task_gap')}) for s in value.get('start_feedback',[])],
             best={k:best.get(k) for k in ('reference','candidate','source','task_gap','coefficients_n')},
-            small_query=dict(pointer=pointer+'/best',view='fields',fields=[k for k in
+            small_query=dict(pointer=pointer+'/best',view='fields' if isinstance(value.get('best'),dict) else 'full',fields=[k for k in
                 ('reference','candidate','source','task_gap','coefficients_n') if k in best]))
     if isinstance(value,dict) and 'acceptance' in value:
         summary.update(task_gap=task_gap(value),constraints=(value['acceptance'] or {}).get('components',{}),

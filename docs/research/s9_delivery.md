@@ -79,7 +79,7 @@ Logs preserve an initial missing-engine-import-path run and the subsequently fix
 `acceptance=null` regression. Tests launched no real Provider or scientific workers.
 Saved S8 invalid-pointer requests were replayed against hash-verified artifacts.
 
-Production delta is **+177/-26, net 151 lines**, six existing modules, zero new
+Production delta is **+181/-27, net 154 lines**, six existing modules, zero new
 production modules. This is below the suggested range because existing admission,
 binding, evidence, task-gap and Store cache functions were reused. No production
 changes to contracts, evaluator, scientific kernels or numerical acceptance.
@@ -102,4 +102,33 @@ ready, key-file presence is checked without recording its content, and the curre
 archive/Store restoration path is unchanged. During formal execution no source,
 budget, threshold or task modification is permitted. The Agent chooses its own
 actions through the existing `python -m tools.research run`; no engineering driver
-is used for formal science. Formal results and final Git receipts remain pending.
+is used for formal science.
+
+## S9.3 execution block and pre-send correction
+
+S9.2 source `db4dd4951113695d0edbc05d0b8d1babfa9a4094` was ordinarily pushed
+and remote SHA verified. The real `run` command was attempted, but automatic
+approval review rejected external transmission to
+`https://api.deepseek.com/chat/completions`: internal study configuration,
+evidence and repository-derived context require explicit payload/destination
+approval. The rejected command did not run. No workaround or indirect send was
+performed. A focused authorization question is pending with the user.
+
+Local prepare/bind and historical materialization succeeded independently.
+The frozen task/history identities are verified; two legal physical/search starts
+exist, mathematical_response correctly reports missing current sensitivity,
+all formal counts remain unused, pending operations are empty. The full initial
+payload review is `evidence/s9_variant/provider_payload_review.json`. It describes
+instructions, research packet and tool contracts, not an actual Provider request;
+Strands framing and future Agent/tool conversation would also be sent. Credentials
+and authentication headers are not part of the saved research payload.
+
+While external approval was pending, read-only traversal of real engineering
+artifacts found a preview-only `/keys` path defect. Synthetic list-key previews
+are now terminal display objects; a null best result advertises a full read
+instead of object-fields access. No actual scientific run had begun (0 Provider,
+0 formal physics); the pending Study will record an explicit pre-send source
+migration with preserved configuration, identities, counters and history.
+**755 generated read queries across 30 real engineering artifacts resolve** using
+the original read_evidence. Focused regressions include these boundary cases.
+No S7/S8 sealed artifact was changed.

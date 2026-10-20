@@ -50,5 +50,18 @@ class HandoffTests(unittest.TestCase):
         r=directed_inputs([[0.],[8.]],[[1.],[0.],[0.]],[1.,0.,0.],[8.],1.,1e-6)
         self.assertEqual(r['status'],'no_input_room');self.assertNotIn('inputs',r)
 
+    def test_physical_budget_rejection_precedes_baseline(self):
+        q=ControlSeedRequest(candidate=self.candidate,method='physical_response',evaluation_requests=1)
+        with patch('tools.research.physical_replay.verify_candidate',return_value=dict(configuration=self.cfg)),patch('tools.research.physical_replay.model_context',return_value=(None,None,None,dict(tendon_order=self.analysis['binding']['tendon_order']))),patch('tools.research.budget.backend_capacity',return_value=0),patch('tools.research.physical_replay._seed_control') as baseline:
+            with self.assertRaisesRegex(ValueError,'INSUFFICIENT_SHARED_BUDGET'):guided_seed(Mock(),q,'fixture',None)
+            baseline.assert_not_called()
+
+    def test_non_endpoint_task_rejected_before_persistence(self):
+        cfg=deepcopy(self.cfg);cfg['task']['family']='fixture.unsupported'
+        q=ControlSeedRequest(candidate=self.candidate,method='mathematical_response',response_evidence=self.ref)
+        with patch('tools.research.physical_replay.verify_candidate',return_value=dict(configuration=cfg)),patch('tools.research.physical_replay._seed_control') as baseline:
+            with self.assertRaisesRegex(ValueError,'NOT_APPLICABLE'):guided_seed(Mock(),q,'fixture',None)
+            baseline.assert_not_called()
+
 
 if __name__=='__main__':unittest.main()
