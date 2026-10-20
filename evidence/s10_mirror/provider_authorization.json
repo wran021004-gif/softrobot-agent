@@ -1,5 +1,5 @@
 {
-  "status": "awaiting_explicit_S10_payload_destination_authorization",
+  "status": "explicitly_authorized",
   "destination": "https://api.deepseek.com/chat/completions",
   "review": "provider_payload_review.json",
   "blocked_command": "python -m tools.research run --run-id s10-mirror-live-20261020",
@@ -7,5 +7,15 @@
   "automatic_review_reason": "This sends potentially sensitive project, numerical, control, and conversation data to an external DeepSeek endpoint; the available trusted user text authorizes a DeepSeek study but does not clearly authorize this exact payload and destination combination.",
   "bypass_attempted": false,
   "provider_requests_sent": 0,
-  "question_presented": true
+  "question_presented": true,
+  "initial_attempt": {
+    "command_executed": false,
+    "automatic_review_reason": "This sends potentially sensitive project, numerical, control, and conversation data to an external DeepSeek endpoint; the available trusted user text authorizes a DeepSeek study but does not clearly authorize this exact payload and destination combination.",
+    "bypass_attempted": false,
+    "provider_requests_sent": 0
+  },
+  "user_authorization": "???? S10 ????????????",
+  "authorized_scope": "Frozen S10 project task, robot/control parameters, mathematical/simulation evidence, budgets, tool definitions and subsequent Agent/tool conversation; excludes credentials, authentication headers and unrelated worktrees.",
+  "authorization_source": "User answer to the exact S10 scope/destination question in this conversation",
+  "initial_rejection_resolved": true
 }
