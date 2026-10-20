@@ -441,6 +441,16 @@ def compact_result(value, reference):
     if value.get('sensitivity'):
         summary['input_response_observation']=dict(pointer='/sensitivity',
             verification=value['sensitivity'].get('verification'),task_acceptance='unmeasured')
+    summary['control_handoff']=dict(candidate=value.get('candidate'),
+        scope={k:(value.get('binding') or {}).get(k) for k in ('task_identity','effective_configuration_identity','tendon_order')},
+        operating_point=(value.get('operating_point') or {}).get('name'),
+        numerically_verified_input_sensitivity=bool(value.get('operation')=='input_sensitivity' and value.get('status')=='computed'
+            and value.get('sensitivity',{}).get('verification',{}).get('passed') is True),
+        request_fields=dict(candidate=value.get('candidate'),method='mathematical_response',response_evidence=reference)
+            if value.get('operation')=='input_sensitivity' else None,
+        remaining_checks='Current registered evidence, candidate/model/task/operating-point/channel binding and Plan admission',
+        missing=None if value.get('operation')=='input_sensitivity' else 'Verified input_sensitivity required for mathematical_response; equilibrium alone is not dynamic success',
+        task_acceptance='unmeasured')
     trajectory=value.get('trajectory') or {}
     cert=trajectory.get('certificate') or {}
     summary.update(task_acceptance='unmeasured',numerical_evidence=dict(reference=reference,
@@ -452,7 +462,7 @@ def compact_result(value, reference):
     from tools.research.evidence_policy import summarize_evidence
     summary['evidence_summary']=summarize_evidence(value,reference)
     if value.get('instantaneous_braking'):summary['instantaneous_braking']=value['instantaneous_braking']
-    return {**{k:summary[k] for k in ('reference','stored_result_keys','static_input_observation',
+    return {**{k:summary[k] for k in ('reference','stored_result_keys','control_handoff','static_input_observation',
         'input_response_observation','retrieval_note') if k in summary},**summary}
 
 

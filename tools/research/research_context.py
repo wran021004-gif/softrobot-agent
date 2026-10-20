@@ -203,7 +203,7 @@ def context(host):
 
 def action_feedback(host,current):
     """Admission prerequisites for parameterized actions, not model decisions."""
-    from tools.research.physical_replay import binding
+    from tools.research.physical_replay import binding, verified_input_response
     from tools.research.budget import protected, backend_capacity
     s=state(host);rows=[];capacity=backend_capacity(host)
     closed=s['research_status']=='stopped' or protected(host)
@@ -222,6 +222,22 @@ def action_feedback(host,current):
                 remaining_backend_launches=capacity,minimum_new_launches=1,
                 requires_agent_fields=['decision','hypothesis','finite search settings'] if action=='control_search' else ['decision','hypothesis'],
                 scope='Candidate/source admission only; full typed Plan, budget and scientific preflight remain authoritative'))
+    candidates=list({e['candidate']['artifact_id']:e['candidate'] for e in current['control_search_starts']}.values())
+    candidates += [r for r in list(s.get('candidates',{}).values())[-3:] if r not in candidates]
+    for candidate in candidates:
+        references=[r for r in s.get('analysis_results',[]) if host.store.artifact(r).get('candidate')==candidate
+            and host.store.artifact(r).get('operation')=='input_sensitivity']
+        status='blocked';reason='verified_input_sensitivity_required';ref=None
+        for ref in reversed(references):
+            try:verified_input_response(host,candidate,ref);status='eligible';reason=None;break
+            except ValueError as exc:reason=str(exc)
+        cfg=host.store.artifact(candidate)['configuration']
+        if cfg['task']['family']!='task.reach':status='not_applicable';reason='Endpoint-target seed required'
+        elif closed or 'initialize_control' not in current['actions']:
+            status='unavailable';reason='Initialization unavailable in current stage'
+        rows.append(dict(action='initialize_control',method='mathematical_response',status=status,reason=reason,
+            candidate=candidate,response_evidence=ref,task_acceptance='unmeasured',new_physical_evaluations=0,
+            requires_agent_fields=['decision','hypothesis','initialization settings']))
     return rows
 
 

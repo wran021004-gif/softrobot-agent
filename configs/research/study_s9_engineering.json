@@ -1,0 +1,83 @@
+{
+  "defaults": "family_study_defaults.json",
+  "start_mode": "family_space",
+  "family_space": "family_space_s7.json",
+  "candidate_initialization": "all_candidate_dofs_zero_v1",
+  "base_commit": "728a5a754694f238bdf97c405ba1cbf39b3d8e02",
+  "mode": "engineering_numerical",
+  "control": "control_sorosim_s56_braking.json",
+  "study_id": "s9-engineering-20261020",
+  "evidence_destination": "evidence/s9_engineering/study",
+  "capabilities": [
+    "analysis",
+    "mathematics",
+    "replay",
+    "nmpc",
+    "rl",
+    "physical_replay",
+    "control_correction",
+    "control_search"
+  ],
+  "allowed_plan_actions": [
+    "generate",
+    "initialize_control",
+    "physical_replay",
+    "control_search",
+    "execute",
+    "mechanics",
+    "replay",
+    "refine",
+    "diagnose",
+    "select",
+    "stop"
+  ],
+  "budgets": {
+    "provider_requests": 0,
+    "protected_provider_requests": 0,
+    "public_operations": 40,
+    "protected_public_operations": 0,
+    "physical_launches": 8,
+    "mathematical_evaluations": 2,
+    "offline_nlp": 0,
+    "bdf_replays": 0
+  },
+  "nmpc_limits": {
+    "executions": 0
+  },
+  "rl_limits": {
+    "training_stages": 1,
+    "actions_per_trial": 65536,
+    "training_actions": 65536,
+    "evaluation_episodes": 1
+  },
+  "reserve_rl_evaluation": true,
+  "research_decisions": {
+    "version": "research_decision_v1",
+    "history": [],
+    "mathematics": [],
+    "control_seeds": [
+      {
+        "folder": "evidence/s6_3/study",
+        "candidate": {
+          "artifact_id": "dd98c6eabc6c2ebd5c0588ffdc91325e9cccbfced6b05c30c28d268b38c90d32",
+          "media_type": "application/json"
+        },
+        "source": {
+          "artifact_id": "42a8565869c2e6769befdbf5b1d624a6f2b9886488f9be8f06d097d0c35d044d",
+          "media_type": "application/json"
+        }
+      }
+    ],
+    "context_limits": {
+      "candidates": 3,
+      "recent": 4,
+      "pareto": 3,
+      "samples": 6,
+      "evidence": 3
+    }
+  },
+  "authorization": "User S9 engineering authorization: separate ledger; zero provider requests, 40 public operations, 8 physics starts, 2 analyses. Explicit integration only, no autonomous-study claims.",
+  "execution_instructions": "You are the autonomous robot structure/control research Agent. Frozen task, complete family domains, tool readiness, shared count budgets and original independent acceptance are authoritative. Choose hypotheses, methods, structure/control variables and finite allocations from evidence. No mandatory method order or design change. Historical controls and observations never transfer acceptance to new science. This S8 study investigates target-directed initialization, optional active coefficient subspaces and multiple compatible starts; use these new capabilities when scientifically appropriate, rather than repeat the old full-coordinate experiment unchanged. Every research_plan needs decision={hypothesis_id,research_intent,selected_method,selected_variables,selected_candidate,requested_budget,claimed_inference:empirical_search}. Intent matches action: generate=DESIGN_MODIFICATION, initialize_control/control_search=CONTROL_SEARCH, physical_replay=PHYSICAL_VALIDATION, execute=NMPC_EXECUTION, mechanics/replay/refine=MATHEMATICAL_ANALYSIS, diagnose=DIAGNOSE, select=SELECT, stop=STOP. selected_candidate exactly matches payload candidate. requested_budget equals control_search.settings.evaluation_requests. Read current packet for exact candidate/source pairs, time bounds, methods, domains and costs; do not guess artifact IDs. All legal family parameters are open; evidence_read(candidate,view=capabilities) gives exact domains. New designs require initialize_control(source,parent) before reusing controls. initialize_control(method=physical_response) can use source+parent and selected channels to estimate a target-directed bounded constant offset, charging baseline plus each channel probe. method=mathematical_response requires current verified input_sensitivity analysis in response_evidence; this is a local static prediction only. method=baseline supports pretension, one constant tensions_n row, full arrays or explicit history adaptation. All resulting seeds are unmeasured until original independent evaluation. control_search has required candidate,source,settings; additional_starts=[{candidate,source,adaptation_from?}] is optional and shares evaluation_requests. settings version=local_control_search_v2, method=response or pattern, knots_s, correction_window_s optional, active_coefficients optional unique flat knot-major indices, coefficient_limit_n,difference_step_n,initial_radius_n,minimum_radius_n,evaluation_requests,iterations,safety_margin_fraction optional response-only. All times must fit current task; window_start <= first knot < last knot <= window_end. Inactive offsets remain zero. A response iteration costs one baseline if uncached, one probe per active coefficient and one proposal. Choose finite meaningful caps using remaining shared budget; completed exact observations are reused. Mathematical analysis, NMPC, direct/residual PPO remain optional within capabilities and scope. Tool results are compact deterministic views; evidence_read supports view=summary/full/fields/range and exact JSON pointer. Raw samples are under a result raw_reference; a result itself has no /samples. Treat tool rejection as a precise request correction; do not repeat unavailable tools. Engineering failures are not mathematical infeasibility. At first fresh complete original-task pass, end exploration immediately, evidence_read that result /acceptance, then select selected_execution=that exact result. STOP cites every reference in all_fresh_results; complete index remains retrievable if previews truncate it. Protected budget is for evidence, exact selection and truthful STOP only. Preserve all failures and real usage. No threshold changes, hidden retries, claims of optimality/global infeasibility/robustness/hardware/repeatability, or calls beyond frozen counts.",
+  "task": "../../tasks/s7_reach_variant.json",
+  "tool_readiness": "../../evidence/s9_readiness/verified/report.json"
+}

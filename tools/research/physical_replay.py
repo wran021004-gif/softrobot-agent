@@ -145,6 +145,29 @@ def _seed_control(host,request,operation_key):
     return entry
 
 
+def verified_input_response(host,candidate,reference):
+    """Side-effect-free handoff admission, shared by display and seed execution."""
+    if plain(reference) not in state(host).get('analysis_results',[]):
+        raise ValueError('REGISTERED_CURRENT_ANALYSIS_REQUIRED')
+    cfg=verify_candidate(host,candidate)['configuration']
+    if cfg['task']['family']!='task.reach':raise ValueError('NOT_APPLICABLE_SEED_REQUIRES_ENDPOINT_TARGET')
+    analysis=host.store.artifact(reference);model=analysis.get('model') or {}
+    bound=model.get('binding') or {};outer=analysis.get('binding') or {}
+    inp,physics,scene,spec=model_context(cfg)
+    expected=dict(candidate=plain(candidate),task_identity=digest(cfg['task']),
+        effective_configuration_identity=digest(cfg),tendon_order=spec['tendon_order'])
+    if (analysis.get('status')!='computed' or analysis.get('operation')!='input_sensitivity'
+            or analysis.get('candidate')!=plain(candidate)
+            or analysis.get('sensitivity',{}).get('verification',{}).get('passed') is not True
+            or any(bound.get(k)!=v or outer.get(k)!=v for k,v in expected.items())
+            or bound.get('model_identity')!=spec['identity']
+            or model.get('operating_point')!=analysis.get('operating_point')
+            or model.get('protocol_identity')!=digest(state(host)['spec']['analysis_protocol'])
+            or bound.get('coordinate_order')!=spec['coordinate_order']):
+        raise ValueError('VERIFIED_CANDIDATE_INPUT_SENSITIVITY_REQUIRED')
+    return analysis
+
+
 def guided_seed(host,request,key,plan):
     """Resolve trusted local evidence or charge complete public MuJoCo probes."""
     from copy import deepcopy
@@ -153,27 +176,25 @@ def guided_seed(host,request,key,plan):
     from tools.research.budget import backend_capacity, protected
     cfg=verify_candidate(host,request.candidate)['configuration']
     if cfg['task']['family']!='task.reach':raise ValueError('NOT_APPLICABLE_SEED_REQUIRES_ENDPOINT_TARGET')
-    baseline=_seed_control(host,request.model_copy(update={'method':'baseline'}),key)
-    source=host.store.artifact(baseline['source']);tr=source['trajectory'];order=tr['tendon_order']
+    inp,physics,scene,spec=model_context(cfg);order=spec['tendon_order']
     channels=request.channels or order
     if not set(channels)<=set(order):raise ValueError('SEED_CHANNEL_OUTSIDE_CANDIDATE')
     indices=[order.index(c) for c in channels]
-    limits=np.array([{t['id']:t['force_limit_n'] for t in cfg['robot']['structure']['data']['tendons']}[c] for c in order])
-    u=np.asarray(tr['tensions_n']);evidence=[];calls=[]
     if request.method=='mathematical_response':
-        if plain(request.response_evidence) not in state(host).get('analysis_results',[]):raise ValueError('REGISTERED_CURRENT_ANALYSIS_REQUIRED')
-        analysis=host.store.artifact(request.response_evidence);sensitivity=analysis.get('sensitivity') or {}
-        model=analysis.get('model') or {}
-        if (analysis.get('status')!='computed' or analysis.get('operation')!='input_sensitivity'
-                or analysis['candidate']!=plain(request.candidate) or not sensitivity.get('verification',{}).get('passed')
-                or model.get('binding',{}).get('tendon_order')!=order):
-            raise ValueError('VERIFIED_CANDIDATE_INPUT_SENSITIVITY_REQUIRED')
-        u=np.tile(model['u0'],(len(u),1));position=np.asarray(model['y0']);response=np.asarray(sensitivity['dp_du'])
-        evidence=[plain(request.response_evidence)]
+        analysis=verified_input_response(host,request.candidate,request.response_evidence)
     else:
         required=len(indices)+1
         if required>request.evaluation_requests or required>backend_capacity(host):raise ValueError('INSUFFICIENT_SHARED_BUDGET_FOR_SEED_RESPONSE')
         if plan is None:raise ValueError('PHYSICAL_RESPONSE_REQUIRES_PUBLIC_PLAN')
+    baseline=_seed_control(host,request.model_copy(update={'method':'baseline'}),key)
+    source=host.store.artifact(baseline['source']);tr=source['trajectory']
+    limits=np.array([{t['id']:t['force_limit_n'] for t in cfg['robot']['structure']['data']['tendons']}[c] for c in order])
+    u=np.asarray(tr['tensions_n']);evidence=[];calls=[]
+    if request.method=='mathematical_response':
+        sensitivity=analysis['sensitivity'];model=analysis['model']
+        u=np.tile(model['u0'],(len(u),1));position=np.asarray(model['y0']);response=np.asarray(sensitivity['dp_du'])
+        evidence=[plain(request.response_evidence)]
+    else:
         def factory(action,**payload):
             value={k:getattr(plan,k) for k in ('hypothesis','supporting_evidence','expected_observation','weakening_observation','fixed_conditions','stopping_condition','interpretation')}
             decision=plain(plan.decision);decision.update(research_intent='PHYSICAL_VALIDATION',requested_budget=1)
