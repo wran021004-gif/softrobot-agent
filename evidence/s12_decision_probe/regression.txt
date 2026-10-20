@@ -1,5 +1,18 @@
-....................................................................................................s.
+................................E....................................................................s.
+======================================================================
+ERROR: test_provider_unknown_send_blocks_retry_and_preserves_charge (tests.research.test_s7_task_intake.S7IntakeTests.test_provider_unknown_send_blocks_retry_and_preserves_charge)
 ----------------------------------------------------------------------
-Ran 102 tests in 24.572s
+Traceback (most recent call last):
+  File "D:\softrobot-agent\.worktrees\sorosim-matlab-nmpc\tests\research\test_s7_task_intake.py", line 181, in test_provider_unknown_send_blocks_retry_and_preserves_charge
+    host=core.prepare(ROOT/'configs/research/study_s7_mirror.json',directory)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\softrobot-agent\.worktrees\sorosim-matlab-nmpc\tools\research\core.py", line 84, in prepare
+    h.store.create(ProjectConfig(project_id=run_id, grant_id=run_id+'-authorized',
+  File "D:\softrobot-agent\.worktrees\sorosim-matlab-nmpc\tools\platform_store.py", line 104, in create
+    raise ValueError('GRANT_ALREADY_BOUND: copying a directory does not create a new budget')
+ValueError: GRANT_ALREADY_BOUND: copying a directory does not create a new budget
 
-OK (skipped=1)
+----------------------------------------------------------------------
+Ran 103 tests in 24.647s
+
+FAILED (errors=1, skipped=1)

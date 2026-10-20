@@ -1,0 +1,889 @@
+{
+  "scientific_evidence": false,
+  "provider_requests": 0,
+  "new_physics": 0,
+  "training_executed": false,
+  "engineering_study": "s12-engineering-verified-20261020",
+  "implementation": "89582fe759fcad47782ab3c497207ce4dc265384",
+  "canonical_task_identity": "d24aeac7041052ce1d2ae60e825a802e7367107784f6fec192b0a65c4a5e76e7",
+  "family_space_identity": "0793d20569402760ca055f73f6f97d80d73d0fe3c051ff2b60ebad1519db02aa",
+  "matlab": "ready",
+  "mathematics_admission": {
+    "admitted": 1,
+    "requested": 1,
+    "reservation_s": 0.0,
+    "timeout_s": null,
+    "remaining_numerical_s": null
+  },
+  "nmpc_admission": {
+    "available": true,
+    "cap_s": null,
+    "reservation_s": null,
+    "complete_execution_s": null,
+    "first_use_available": true,
+    "evidence_sources": [],
+    "reason": "Finite execution count and physical horizon; elapsed time is measured only",
+    "design_feasibility": "not assessed by admission"
+  },
+  "direct_rl_environment": {
+    "status": "constructed",
+    "mode": "direct",
+    "dofs": 48,
+    "actions": [
+      4
+    ],
+    "observations": [
+      107
+    ],
+    "command_intervals": 35,
+    "lower": [
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "upper": [
+      8.0,
+      8.0,
+      8.0,
+      8.0
+    ]
+  },
+  "residual_rl": "Requires original complete compatible published reference; no acceptance transfer",
+  "history": [
+    {
+      "candidate": {
+        "artifact_id": "704761d937a110633bf1317fa938d90ee0abfb44e7451b87557bf0e87cbfd0e3",
+        "media_type": "application/json"
+      },
+      "folder": "evidence/s7_mirror/study",
+      "historical_candidate": {
+        "artifact_id": "f321c5d26ae747d30de42f2e5e4dfa102ab4913a42368b418652c521f676f284",
+        "media_type": "application/json"
+      },
+      "historical_only": true,
+      "reference": {
+        "artifact_id": "7f10b14a33494099a74a7fdc7b02010b317fa67d3eecd9e1e4ed56dfb0701610",
+        "media_type": "application/json"
+      },
+      "source": {
+        "artifact_id": "897b50e749d7a9387b54294f2561bf96daffa7bbca616b710b16a0fcc44be1a8",
+        "media_type": "application/json"
+      }
+    },
+    {
+      "candidate": {
+        "artifact_id": "704761d937a110633bf1317fa938d90ee0abfb44e7451b87557bf0e87cbfd0e3",
+        "media_type": "application/json"
+      },
+      "folder": "evidence/s10_mirror/study",
+      "historical_candidate": {
+        "artifact_id": "8a2ee4f9c69ccf5e2ffa031fb4530a4706b8ed43a6e24cd3c7747bd17d716366",
+        "media_type": "application/json"
+      },
+      "historical_only": true,
+      "reference": {
+        "artifact_id": "49c76e42767e0ab9870e7a18322bebc916215f721c955a7bbbba472ac72ab0ed",
+        "media_type": "application/json"
+      },
+      "source": {
+        "artifact_id": "62ddc2387077c5b49440d16208cd83d07d9108187e3e94df00043e4bfdb9557d",
+        "media_type": "application/json"
+      }
+    }
+  ],
+  "mathematics": [
+    {
+      "artifact_id": "8250de0f40729fc8525baaf4fcedd304b39618e5fcc3dcd8c773ce755ab09c56",
+      "media_type": "application/json"
+    },
+    {
+      "artifact_id": "8bd4296c16ec1a0195012879a933a52c9b23b9859e8201604f1e65aec50d7278",
+      "media_type": "application/json"
+    },
+    {
+      "artifact_id": "3573c3b24e533bda8ee635e7f652d265390814b56790820ae335905e2a4f01bd",
+      "media_type": "application/json"
+    }
+  ],
+  "current_context": {
+    "version": "decision_brief_v1",
+    "task_identity": "d24aeac7041052ce1d2ae60e825a802e7367107784f6fec192b0a65c4a5e76e7",
+    "task": {
+      "contract": "research.task_adapter",
+      "version": "1.0.0",
+      "family": "task.reach",
+      "evaluator": {
+        "extension_id": "evaluate.reach",
+        "parameters": {
+          "contract": "reference.reach_evaluation",
+          "data": {
+            "tolerance_m": 0.01
+          },
+          "version": "1.0.0"
+        },
+        "version": "1.0.0"
+      },
+      "output": {
+        "dimension": 3,
+        "entity": "tip",
+        "frame": "world",
+        "missing": "unsupported",
+        "name": "tip_position",
+        "phase": "post_step",
+        "units": "m"
+      },
+      "reference": {
+        "contract": "reference.reach_goal",
+        "data": {
+          "target_m": [
+            0.29,
+            -0.035,
+            0.19
+          ]
+        },
+        "version": "1.0.0"
+      },
+      "operating_point": {
+        "time_s": 0.0,
+        "reference_position_m": [
+          0.29,
+          -0.035,
+          0.19
+        ],
+        "reference_velocity_m_s": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "frame": "world",
+        "state_source": "Named task initializer; subsequent measured backend state",
+        "reference_is_equilibrium": false
+      },
+      "metrics": [
+        {
+          "name": "terminal_error_m",
+          "unit": "m",
+          "meaning": "Sealed endpoint evaluator position error"
+        },
+        {
+          "name": "holding_max_error_m",
+          "unit": "m",
+          "meaning": "Maximum sampled final-window tip error"
+        },
+        {
+          "name": "holding_max_speed_m_s",
+          "unit": "m/s",
+          "meaning": "Maximum sampled world translational tip speed"
+        }
+      ],
+      "scoring_interval_s": [
+        0.0,
+        0.35
+      ],
+      "holding": {
+        "position_limit_m": 0.01,
+        "speed_limit_m_s": 0.02,
+        "window_s": 0.05
+      },
+      "timing": {
+        "control_period_s": 0.01,
+        "duration_s": 0.35,
+        "sample_period_s": 0.01,
+        "termination": [
+          "duration",
+          "numerical_failure"
+        ],
+        "timestep_s": 0.0005
+      },
+      "continuous_time_guarantee": false,
+      "context": "Endpoint reach and final-window position/speed are distinct components. Offline deployment timing is diagnostic."
+    },
+    "capabilities": [
+      "analysis",
+      "mathematics",
+      "replay",
+      "nmpc",
+      "rl",
+      "physical_replay",
+      "control_correction",
+      "control_search"
+    ],
+    "best_valid": {
+      "reference": {
+        "artifact_id": "49c76e42767e0ab9870e7a18322bebc916215f721c955a7bbbba472ac72ab0ed",
+        "media_type": "application/json"
+      },
+      "candidate": {
+        "artifact_id": "8a2ee4f9c69ccf5e2ffa031fb4530a4706b8ed43a6e24cd3c7747bd17d716366",
+        "media_type": "application/json"
+      },
+      "source": {
+        "artifact_id": "62ddc2387077c5b49440d16208cd83d07d9108187e3e94df00043e4bfdb9557d",
+        "media_type": "application/json"
+      },
+      "executable_candidate": {
+        "artifact_id": "704761d937a110633bf1317fa938d90ee0abfb44e7451b87557bf0e87cbfd0e3",
+        "media_type": "application/json"
+      },
+      "task_identity": "bd9df2d930423f2b2a12152f076e2ae88b4d1a0af84d6126aa13b0b1fac9ec77",
+      "historical_only": true,
+      "task_gap": {
+        "normalized_gap": 2.4190924922822976,
+        "components": {
+          "evaluator:task_bound": 2.4190924922822976,
+          "holding_position": 2.4190924922822976,
+          "holding_speed": 2.400747065653156
+        },
+        "valid_complete": true,
+        "accepted": false,
+        "interpretation": "Research ranking only; invalid executions remain invalid regardless of gap"
+      },
+      "violated_constraints": {
+        "evaluator:task_bound": {
+          "limit": 0.01,
+          "passed": false,
+          "reason": null,
+          "unit": "m",
+          "value": 0.034190924922822975
+        },
+        "holding_position": {
+          "limit": 0.01,
+          "passed": false,
+          "reason": null,
+          "unit": "m",
+          "value": 0.034190924922822975
+        },
+        "holding_speed": {
+          "limit": 0.02,
+          "passed": false,
+          "reason": null,
+          "unit": "m/s",
+          "value": 0.06801494131306313
+        },
+        "task_evaluator": {
+          "limit": null,
+          "passed": false,
+          "reason": null,
+          "unit": null,
+          "value": false
+        }
+      }
+    },
+    "evidence": [
+      {
+        "claim_kind": "NUMERICAL_DIAGNOSTIC",
+        "verification_status": "static_construction_only",
+        "model_identity": "b914e60c3b64a2234098a9f15760bc06c4aa452725e4f2e9b7f11f3778c8ed0b",
+        "candidate_identity": {
+          "artifact_id": "8c0582ad362895a390127bcc779c9dfb6eb84570cf18ae0f3446f9282546e16f",
+          "media_type": "application/json"
+        },
+        "task_identity": "bd9df2d930423f2b2a12152f076e2ae88b4d1a0af84d6126aa13b0b1fac9ec77",
+        "supported_inferences": [
+          "local_diagnostic"
+        ],
+        "unsupported_inferences": [
+          "global_nonlinear_feasibility",
+          "global_nonlinear_infeasibility",
+          "structural_infeasibility",
+          "whole_horizon_from_instantaneous_braking",
+          "adapted_dynamic_improvement_from_static_sensitivity",
+          "unvisited_simulation_descent_guarantee",
+          "continuous_time_compliance",
+          "hardware_performance",
+          "robustness",
+          "repeatability",
+          "observed_task_pass"
+        ],
+        "evidence_reference": {
+          "artifact_id": "8250de0f40729fc8525baaf4fcedd304b39618e5fcc3dcd8c773ce755ab09c56",
+          "media_type": "application/json"
+        },
+        "numerical_evidence_pointer": "/raw",
+        "prospective_guarantee": false
+      },
+      {
+        "claim_kind": "NUMERICAL_DIAGNOSTIC",
+        "verification_status": "static_construction_only",
+        "model_identity": "b914e60c3b64a2234098a9f15760bc06c4aa452725e4f2e9b7f11f3778c8ed0b",
+        "candidate_identity": {
+          "artifact_id": "8c0582ad362895a390127bcc779c9dfb6eb84570cf18ae0f3446f9282546e16f",
+          "media_type": "application/json"
+        },
+        "task_identity": "bd9df2d930423f2b2a12152f076e2ae88b4d1a0af84d6126aa13b0b1fac9ec77",
+        "supported_inferences": [
+          "local_diagnostic"
+        ],
+        "unsupported_inferences": [
+          "global_nonlinear_feasibility",
+          "global_nonlinear_infeasibility",
+          "structural_infeasibility",
+          "whole_horizon_from_instantaneous_braking",
+          "adapted_dynamic_improvement_from_static_sensitivity",
+          "unvisited_simulation_descent_guarantee",
+          "continuous_time_compliance",
+          "hardware_performance",
+          "robustness",
+          "repeatability",
+          "observed_task_pass"
+        ],
+        "evidence_reference": {
+          "artifact_id": "8bd4296c16ec1a0195012879a933a52c9b23b9859e8201604f1e65aec50d7278",
+          "media_type": "application/json"
+        },
+        "numerical_evidence_pointer": "/raw",
+        "prospective_guarantee": false
+      },
+      {
+        "claim_kind": "NUMERICAL_DIAGNOSTIC",
+        "verification_status": "static_construction_only",
+        "model_identity": "ddd5979f5d4e10ced113301d96be0c8ed838037d99113f7b3688566d320ba787",
+        "candidate_identity": {
+          "artifact_id": "8a2ee4f9c69ccf5e2ffa031fb4530a4706b8ed43a6e24cd3c7747bd17d716366",
+          "media_type": "application/json"
+        },
+        "task_identity": "bd9df2d930423f2b2a12152f076e2ae88b4d1a0af84d6126aa13b0b1fac9ec77",
+        "supported_inferences": [
+          "local_diagnostic"
+        ],
+        "unsupported_inferences": [
+          "global_nonlinear_feasibility",
+          "global_nonlinear_infeasibility",
+          "structural_infeasibility",
+          "whole_horizon_from_instantaneous_braking",
+          "adapted_dynamic_improvement_from_static_sensitivity",
+          "unvisited_simulation_descent_guarantee",
+          "continuous_time_compliance",
+          "hardware_performance",
+          "robustness",
+          "repeatability",
+          "observed_task_pass"
+        ],
+        "evidence_reference": {
+          "artifact_id": "3573c3b24e533bda8ee635e7f652d265390814b56790820ae335905e2a4f01bd",
+          "media_type": "application/json"
+        },
+        "numerical_evidence_pointer": "/raw",
+        "prospective_guarantee": false
+      }
+    ],
+    "unresolved_hypotheses": {
+      "CONTROL_SEARCH_INCOMPLETE": {
+        "scope": "Only searched starts, controls and budgets.",
+        "claim_kind": "UNVERIFIED_HYPOTHESIS"
+      },
+      "MODEL_PREDICTION_UNRELIABLE": {
+        "scope": "Only checked operating points and input sequences.",
+        "claim_kind": "UNVERIFIED_HYPOTHESIS"
+      },
+      "CONTROL_PARAMETERIZATION_LIMITED": {
+        "scope": "Only declared bases and coefficient domains.",
+        "claim_kind": "UNVERIFIED_HYPOTHESIS"
+      },
+      "DESIGN_LIMITATION_POSSIBLE": {
+        "scope": "Only tested designs; a local model exclusion is not physical exclusion.",
+        "claim_kind": "UNVERIFIED_HYPOTHESIS"
+      },
+      "SOLVER_OR_NUMERICAL_ISSUE": {
+        "scope": "Only measured solver/model/grid conditions.",
+        "claim_kind": "UNVERIFIED_HYPOTHESIS"
+      }
+    },
+    "actions": [
+      "stop",
+      "select"
+    ],
+    "budget": {
+      "provider_budget": {
+        "remaining_total": 0,
+        "reserved_for_closeout": 0,
+        "available_for_exploration": 0,
+        "next_request_exploration_remaining": 0
+      },
+      "science_budget": {
+        "remaining_physical": 64,
+        "remaining_mathematical": 4
+      },
+      "closeout": {
+        "active": false,
+        "next_request_will_protect": true,
+        "reason": null
+      }
+    },
+    "method_limits": {
+      "mathematical_evaluations": 4,
+      "offline_nlp": 1,
+      "bdf_replays": 2,
+      "nmpc": {
+        "executions": 2
+      },
+      "rl": {
+        "actions_per_trial": 65536,
+        "diagnostic_physics_steps": 0,
+        "diagnostic_replays": 0,
+        "evaluation_episodes": 1,
+        "seconds_per_trial": null,
+        "training_actions": 65536,
+        "training_active_seconds": null,
+        "training_stages": 1
+      }
+    },
+    "method_used": {
+      "mathematical_evaluations": 0,
+      "offline_nlp": 0,
+      "bdf_replays": 0,
+      "nmpc_launches": 0,
+      "admitted_training_stages": 0,
+      "physical_replay_launches": 0
+    },
+    "method_remaining": {
+      "mathematical_evaluations": 4,
+      "offline_nlp": 1,
+      "bdf_replays": 2,
+      "nmpc": 2,
+      "rl_stages": 1
+    },
+    "rl_accounting": {
+      "admitted": 0,
+      "limit": 1,
+      "actual_actions": 0,
+      "verified_actions_lower_bound": 0,
+      "accounted_actions_upper_bound": 0,
+      "actual_active_seconds": 0,
+      "outstanding": []
+    },
+    "all_fresh_results": [],
+    "observation_count": 2,
+    "history_count": 2,
+    "completed_decision_count": 0,
+    "evidence_access": "Full artifacts remain in Store. all_fresh_results is the complete STOP citation index; observations is a bounded recent view.",
+    "tool_readiness": {
+      "status": "ready",
+      "checked_unix": 1792469108.9644845,
+      "failed_stage": null,
+      "reason": null,
+      "failure_reference": null,
+      "log_reference": {
+        "artifact_id": "63be7e41e020bc00ee1c7926929730c6f0a0b9c0c3d83427c76eb5acfba8dc67",
+        "media_type": "application/json"
+      }
+    },
+    "control_initialization_methods": {
+      "baseline": "Pretension, explicit tensions_n, or source+parent with optional channel_map",
+      "mathematical_response": "response_evidence must be a current verified input_sensitivity analysis; optional channels, trust_radius_n, regularization",
+      "physical_response": "Optional baseline source+parent; channels, difference_step_n, trust_radius_n, regularization, evaluation_requests; one baseline plus one full rollout per channel, charged to shared budget"
+    },
+    "control_search_domain": {
+      "coefficient_order": "knot_index * tendon_count + tendon_index",
+      "active_coefficients": "Optional unique flat indices; inactive coefficients remain zero relative to each start",
+      "response_cost": "baseline per start + active coefficient count probes + one proposal per local response iteration; all share one cap",
+      "time_constraint": "0 <= window_start <= knots[0] < knots[-1] <= window_end <= task duration",
+      "multi_start": "additional_starts=[{candidate,source,adaptation_from?}]; same task, tendon order and time grid required"
+    },
+    "task_accepted": false,
+    "latest_scientific_feedback": null,
+    "recent_searches": [],
+    "available_research_actions": [
+      {
+        "action": "physical_replay",
+        "status": "unavailable",
+        "candidate": {
+          "artifact_id": "704761d937a110633bf1317fa938d90ee0abfb44e7451b87557bf0e87cbfd0e3",
+          "media_type": "application/json"
+        },
+        "source": {
+          "artifact_id": "62ddc2387077c5b49440d16208cd83d07d9108187e3e94df00043e4bfdb9557d",
+          "media_type": "application/json"
+        },
+        "reason": "Protected/stopped state, action availability or shared backend capacity",
+        "supporting_evidence": [
+          {
+            "artifact_id": "49c76e42767e0ab9870e7a18322bebc916215f721c955a7bbbba472ac72ab0ed",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "62ddc2387077c5b49440d16208cd83d07d9108187e3e94df00043e4bfdb9557d",
+            "media_type": "application/json"
+          }
+        ],
+        "remaining_checks": [
+          "full_plan_admission",
+          "requested_budget",
+          "scientific_preflight"
+        ],
+        "remaining_backend_launches": 64,
+        "minimum_new_launches": 1,
+        "requires_agent_fields": [
+          "decision",
+          "hypothesis"
+        ],
+        "scope": "Candidate/source admission only; full typed Plan, budget and scientific preflight remain authoritative",
+        "domain": {
+          "tendon_order": [
+            "tendon_0",
+            "tendon_1",
+            "tendon_2",
+            "tendon_3"
+          ],
+          "intervals": 35,
+          "horizon_s": 0.35000000000000003,
+          "full_two_knot_response_requests": 10,
+          "one_coefficient_response_requests": 3,
+          "remaining_backend_launches": 64,
+          "full_two_knot_response_fits": true
+        }
+      },
+      {
+        "action": "control_search",
+        "status": "unavailable",
+        "candidate": {
+          "artifact_id": "704761d937a110633bf1317fa938d90ee0abfb44e7451b87557bf0e87cbfd0e3",
+          "media_type": "application/json"
+        },
+        "source": {
+          "artifact_id": "62ddc2387077c5b49440d16208cd83d07d9108187e3e94df00043e4bfdb9557d",
+          "media_type": "application/json"
+        },
+        "reason": "Protected/stopped state, action availability or shared backend capacity",
+        "supporting_evidence": [
+          {
+            "artifact_id": "49c76e42767e0ab9870e7a18322bebc916215f721c955a7bbbba472ac72ab0ed",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "62ddc2387077c5b49440d16208cd83d07d9108187e3e94df00043e4bfdb9557d",
+            "media_type": "application/json"
+          }
+        ],
+        "remaining_checks": [
+          "full_plan_admission",
+          "requested_budget",
+          "scientific_preflight"
+        ],
+        "remaining_backend_launches": 64,
+        "minimum_new_launches": 1,
+        "requires_agent_fields": [
+          "decision",
+          "hypothesis",
+          "finite search settings"
+        ],
+        "scope": "Candidate/source admission only; full typed Plan, budget and scientific preflight remain authoritative",
+        "domain": {
+          "tendon_order": [
+            "tendon_0",
+            "tendon_1",
+            "tendon_2",
+            "tendon_3"
+          ],
+          "intervals": 35,
+          "horizon_s": 0.35000000000000003,
+          "full_two_knot_response_requests": 10,
+          "one_coefficient_response_requests": 3,
+          "remaining_backend_launches": 64,
+          "full_two_knot_response_fits": true
+        }
+      },
+      {
+        "action": "physical_replay",
+        "status": "unavailable",
+        "candidate": {
+          "artifact_id": "704761d937a110633bf1317fa938d90ee0abfb44e7451b87557bf0e87cbfd0e3",
+          "media_type": "application/json"
+        },
+        "source": {
+          "artifact_id": "9ca1a0dde17c1f307c8913cfe187ab29e7cd88312b25bb17dfc901672a4f70e4",
+          "media_type": "application/json"
+        },
+        "reason": "Protected/stopped state, action availability or shared backend capacity",
+        "supporting_evidence": [
+          {
+            "artifact_id": "9ca1a0dde17c1f307c8913cfe187ab29e7cd88312b25bb17dfc901672a4f70e4",
+            "media_type": "application/json"
+          }
+        ],
+        "remaining_checks": [
+          "full_plan_admission",
+          "requested_budget",
+          "scientific_preflight"
+        ],
+        "remaining_backend_launches": 64,
+        "minimum_new_launches": 1,
+        "requires_agent_fields": [
+          "decision",
+          "hypothesis"
+        ],
+        "scope": "Candidate/source admission only; full typed Plan, budget and scientific preflight remain authoritative",
+        "domain": {
+          "tendon_order": [
+            "tendon_0",
+            "tendon_1",
+            "tendon_2",
+            "tendon_3"
+          ],
+          "intervals": 35,
+          "horizon_s": 0.35000000000000003,
+          "full_two_knot_response_requests": 10,
+          "one_coefficient_response_requests": 3,
+          "remaining_backend_launches": 64,
+          "full_two_knot_response_fits": true
+        }
+      },
+      {
+        "action": "control_search",
+        "status": "unavailable",
+        "candidate": {
+          "artifact_id": "704761d937a110633bf1317fa938d90ee0abfb44e7451b87557bf0e87cbfd0e3",
+          "media_type": "application/json"
+        },
+        "source": {
+          "artifact_id": "9ca1a0dde17c1f307c8913cfe187ab29e7cd88312b25bb17dfc901672a4f70e4",
+          "media_type": "application/json"
+        },
+        "reason": "Protected/stopped state, action availability or shared backend capacity",
+        "supporting_evidence": [
+          {
+            "artifact_id": "9ca1a0dde17c1f307c8913cfe187ab29e7cd88312b25bb17dfc901672a4f70e4",
+            "media_type": "application/json"
+          }
+        ],
+        "remaining_checks": [
+          "full_plan_admission",
+          "requested_budget",
+          "scientific_preflight"
+        ],
+        "remaining_backend_launches": 64,
+        "minimum_new_launches": 1,
+        "requires_agent_fields": [
+          "decision",
+          "hypothesis",
+          "finite search settings"
+        ],
+        "scope": "Candidate/source admission only; full typed Plan, budget and scientific preflight remain authoritative",
+        "domain": {
+          "tendon_order": [
+            "tendon_0",
+            "tendon_1",
+            "tendon_2",
+            "tendon_3"
+          ],
+          "intervals": 35,
+          "horizon_s": 0.35000000000000003,
+          "full_two_knot_response_requests": 10,
+          "one_coefficient_response_requests": 3,
+          "remaining_backend_launches": 64,
+          "full_two_knot_response_fits": true
+        }
+      },
+      {
+        "action": "physical_replay",
+        "status": "unavailable",
+        "candidate": {
+          "artifact_id": "704761d937a110633bf1317fa938d90ee0abfb44e7451b87557bf0e87cbfd0e3",
+          "media_type": "application/json"
+        },
+        "source": {
+          "artifact_id": "897b50e749d7a9387b54294f2561bf96daffa7bbca616b710b16a0fcc44be1a8",
+          "media_type": "application/json"
+        },
+        "reason": "Protected/stopped state, action availability or shared backend capacity",
+        "supporting_evidence": [
+          {
+            "artifact_id": "7f10b14a33494099a74a7fdc7b02010b317fa67d3eecd9e1e4ed56dfb0701610",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "897b50e749d7a9387b54294f2561bf96daffa7bbca616b710b16a0fcc44be1a8",
+            "media_type": "application/json"
+          }
+        ],
+        "remaining_checks": [
+          "full_plan_admission",
+          "requested_budget",
+          "scientific_preflight"
+        ],
+        "remaining_backend_launches": 64,
+        "minimum_new_launches": 1,
+        "requires_agent_fields": [
+          "decision",
+          "hypothesis"
+        ],
+        "scope": "Candidate/source admission only; full typed Plan, budget and scientific preflight remain authoritative",
+        "domain": {
+          "tendon_order": [
+            "tendon_0",
+            "tendon_1",
+            "tendon_2",
+            "tendon_3"
+          ],
+          "intervals": 35,
+          "horizon_s": 0.35000000000000003,
+          "full_two_knot_response_requests": 10,
+          "one_coefficient_response_requests": 3,
+          "remaining_backend_launches": 64,
+          "full_two_knot_response_fits": true
+        }
+      },
+      {
+        "action": "control_search",
+        "status": "unavailable",
+        "candidate": {
+          "artifact_id": "704761d937a110633bf1317fa938d90ee0abfb44e7451b87557bf0e87cbfd0e3",
+          "media_type": "application/json"
+        },
+        "source": {
+          "artifact_id": "897b50e749d7a9387b54294f2561bf96daffa7bbca616b710b16a0fcc44be1a8",
+          "media_type": "application/json"
+        },
+        "reason": "Protected/stopped state, action availability or shared backend capacity",
+        "supporting_evidence": [
+          {
+            "artifact_id": "7f10b14a33494099a74a7fdc7b02010b317fa67d3eecd9e1e4ed56dfb0701610",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "897b50e749d7a9387b54294f2561bf96daffa7bbca616b710b16a0fcc44be1a8",
+            "media_type": "application/json"
+          }
+        ],
+        "remaining_checks": [
+          "full_plan_admission",
+          "requested_budget",
+          "scientific_preflight"
+        ],
+        "remaining_backend_launches": 64,
+        "minimum_new_launches": 1,
+        "requires_agent_fields": [
+          "decision",
+          "hypothesis",
+          "finite search settings"
+        ],
+        "scope": "Candidate/source admission only; full typed Plan, budget and scientific preflight remain authoritative",
+        "domain": {
+          "tendon_order": [
+            "tendon_0",
+            "tendon_1",
+            "tendon_2",
+            "tendon_3"
+          ],
+          "intervals": 35,
+          "horizon_s": 0.35000000000000003,
+          "full_two_knot_response_requests": 10,
+          "one_coefficient_response_requests": 3,
+          "remaining_backend_launches": 64,
+          "full_two_knot_response_fits": true
+        }
+      },
+      {
+        "action": "mechanics",
+        "candidate": {
+          "artifact_id": "704761d937a110633bf1317fa938d90ee0abfb44e7451b87557bf0e87cbfd0e3",
+          "media_type": "application/json"
+        },
+        "status": "unavailable",
+        "task_applicable": true,
+        "cold_initializations": [
+          "constant_0_2",
+          "ramp_0_2_to_0_4"
+        ],
+        "warm_sources": [],
+        "warm_source_scope": "Advertised defaults: substeps=1, objective_mode=task_gap; other objectives/grids require full preflight",
+        "missing_warm_source": "No eligible bound mathematical source for advertised defaults; explicit physical schedules do not qualify",
+        "check_only": "Mathematical checking uses the analysis allowance; it is not an optimized or physically accepted result",
+        "remaining_checks": [
+          "full_plan_admission",
+          "requested_budget",
+          "model/coordinate/state/substeps/grid preflight"
+        ],
+        "example": {
+          "action": "mechanics",
+          "mechanics": {
+            "candidate": {
+              "artifact_id": "704761d937a110633bf1317fa938d90ee0abfb44e7451b87557bf0e87cbfd0e3",
+              "media_type": "application/json"
+            },
+            "initialization": "constant_0_2",
+            "check_only": false
+          }
+        }
+      },
+      {
+        "action": "initialize_control",
+        "method": "mathematical_response",
+        "status": "unavailable",
+        "reason": "Initialization unavailable in current stage",
+        "candidate": {
+          "artifact_id": "704761d937a110633bf1317fa938d90ee0abfb44e7451b87557bf0e87cbfd0e3",
+          "media_type": "application/json"
+        },
+        "response_evidence": null,
+        "task_acceptance": "unmeasured",
+        "new_physical_evaluations": 0,
+        "requires_agent_fields": [
+          "decision",
+          "hypothesis",
+          "initialization settings"
+        ]
+      }
+    ],
+    "citation_rule": "STOP must explain the outcome and explicitly cite all_fresh_results. This index does not record model reading or understanding."
+  },
+  "limits": {
+    "budgets": {
+      "provider_requests": 32,
+      "protected_provider_requests": 4,
+      "public_operations": 160,
+      "protected_public_operations": 12,
+      "physical_launches": 64,
+      "local_solves": 0,
+      "local_solve_s": null,
+      "offline_nlp": 1,
+      "bdf_replays": 2,
+      "mathematical_evaluations": 4,
+      "numerical_s": null,
+      "activity_s": null,
+      "delivery_reserve_s": null
+    },
+    "nmpc": {
+      "executions": 2
+    },
+    "rl": {
+      "training_stages": 1,
+      "actions_per_trial": 65536,
+      "seconds_per_trial": null,
+      "training_actions": 65536,
+      "training_active_seconds": null,
+      "evaluation_episodes": 1,
+      "diagnostic_replays": 0,
+      "diagnostic_physics_steps": 0
+    }
+  },
+  "ledger": {
+    "limit": {
+      "backend_solves": 64,
+      "model_calls": 0,
+      "tool_calls": 160,
+      "wall_s": null,
+      "worker_calls": 0
+    },
+    "used": {
+      "tool_calls": 1,
+      "model_calls": 0,
+      "backend_solves": 0,
+      "worker_calls": 0,
+      "wall_s": 0.0
+    },
+    "remaining": {
+      "backend_solves": 64,
+      "model_calls": 0,
+      "tool_calls": 159,
+      "wall_s": null,
+      "worker_calls": 0
+    },
+    "occupied": {}
+  },
+  "limitations": [
+    "Readiness does not establish NMPC, training or task acceptance",
+    "Historical mathematics is not current verified input sensitivity"
+  ]
+}

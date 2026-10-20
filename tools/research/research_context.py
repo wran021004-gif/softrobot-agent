@@ -187,7 +187,7 @@ def context(host):
     current=legacy_context(host)
     if settings is not None:current=bounded_context(current,settings,s.get('control_initializations',[]))
     from tools.research.budget import decision_budget, closeout_operations
-    if decision_budget(host)['closeout']['next_request_will_protect']:
+    if s['spec'].get('mode')!='engineering_numerical' and decision_budget(host)['closeout']['next_request_will_protect']:
         current['actions']=[] if s['research_status']=='stopped' else closeout_operations(host)['research_plan']
     if s['spec'].get('tool_readiness') or s.get('tool_failures'):
         from tools.research.tool_readiness import availability, MATLAB_ACTIONS

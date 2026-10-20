@@ -67,6 +67,12 @@ class S12DecisionTests(unittest.TestCase):
             self.assertEqual(row['warm_sources'],[])
             self.assertTrue(row['missing_warm_source'])
 
+    def test_engineering_context_does_not_project_a_nonexistent_provider_send(self):
+        h,p,values,event=snapshot(319)
+        state(h)['spec']['mode']='engineering_numerical'
+        h.store.remaining.return_value['remaining']['model_calls']=0
+        self.assertIn('mechanics',context(h)['actions'])
+
     def test_wrapper_result_paths(self):
         h,p,values,event=snapshot(319)
         for result in ({'candidate':p['candidates'][0],'source':state(h)['control_initializations'][-1]['source'],'trajectory':{'fixture':True}},
