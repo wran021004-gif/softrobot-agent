@@ -1,0 +1,120 @@
+{
+  "defaults": "family_study_defaults.json",
+  "start_mode": "family_space",
+  "family_space": "family_space_s7.json",
+  "candidate_initialization": "all_candidate_dofs_zero_v1",
+  "base_commit": "72b933d5af87fb0317d5cce3b08f4c6723f00a1e",
+  "mode": "formal_research",
+  "control": "control_sorosim_s56_braking.json",
+  "study_id": "s11-mirror-live-20261020",
+  "evidence_destination": "evidence/s11_mirror/study",
+  "capabilities": [
+    "analysis",
+    "mathematics",
+    "replay",
+    "nmpc",
+    "rl",
+    "physical_replay",
+    "control_correction",
+    "control_search"
+  ],
+  "allowed_plan_actions": [
+    "generate",
+    "initialize_control",
+    "physical_replay",
+    "control_search",
+    "execute",
+    "mechanics",
+    "replay",
+    "refine",
+    "diagnose",
+    "select",
+    "stop"
+  ],
+  "budgets": {
+    "provider_requests": 32,
+    "protected_provider_requests": 4,
+    "public_operations": 160,
+    "protected_public_operations": 12,
+    "physical_launches": 64,
+    "mathematical_evaluations": 4,
+    "offline_nlp": 1,
+    "bdf_replays": 2
+  },
+  "nmpc_limits": {
+    "executions": 2
+  },
+  "rl_limits": {
+    "training_stages": 1,
+    "actions_per_trial": 65536,
+    "training_actions": 65536,
+    "evaluation_episodes": 1
+  },
+  "reserve_rl_evaluation": true,
+  "research_decisions": {
+    "version": "research_decision_v1",
+    "history": [
+      {
+        "folder": "evidence/s7_mirror/study",
+        "reference": {
+          "artifact_id": "7f10b14a33494099a74a7fdc7b02010b317fa67d3eecd9e1e4ed56dfb0701610",
+          "media_type": "application/json"
+        }
+      },
+      {
+        "folder": "evidence/s10_mirror/study",
+        "reference": {
+          "artifact_id": "49c76e42767e0ab9870e7a18322bebc916215f721c955a7bbbba472ac72ab0ed",
+          "media_type": "application/json"
+        }
+      }
+    ],
+    "mathematics": [
+      {
+        "folder": "evidence/s8_mirror/study",
+        "reference": {
+          "artifact_id": "8250de0f40729fc8525baaf4fcedd304b39618e5fcc3dcd8c773ce755ab09c56",
+          "media_type": "application/json"
+        }
+      },
+      {
+        "folder": "evidence/s8_mirror/study",
+        "reference": {
+          "artifact_id": "8bd4296c16ec1a0195012879a933a52c9b23b9859e8201604f1e65aec50d7278",
+          "media_type": "application/json"
+        }
+      },
+      {
+        "folder": "evidence/s10_mirror/study",
+        "reference": {
+          "artifact_id": "3573c3b24e533bda8ee635e7f652d265390814b56790820ae335905e2a4f01bd",
+          "media_type": "application/json"
+        }
+      }
+    ],
+    "control_seeds": [
+      {
+        "folder": "evidence/s6_3/study",
+        "candidate": {
+          "artifact_id": "dd98c6eabc6c2ebd5c0588ffdc91325e9cccbfced6b05c30c28d268b38c90d32",
+          "media_type": "application/json"
+        },
+        "source": {
+          "artifact_id": "42a8565869c2e6769befdbf5b1d624a6f2b9886488f9be8f06d097d0c35d044d",
+          "media_type": "application/json"
+        }
+      }
+    ],
+    "context_limits": {
+      "candidates": 3,
+      "recent": 4,
+      "pareto": 3,
+      "samples": 6,
+      "evidence": 3
+    }
+  },
+  "authorization": "User S11 task: decision-efficient autonomous mirror research through the original DeepSeek/Strands CLI. New ledger; ceilings 32 Provider requests/4 protected, 160 public operations/12 protected, 64 shared physical starts, 4 mathematical analyses, 1 offline NLP, 2 BDF, 2 NMPC, 1 PPO stage/65536 aggregate actions/1 independent RL evaluation. No mandatory research method or action order. Frozen original task and full family space; stop exploration at first fresh complete pass and select exact public evidence. Scope is project task, robot/family, controls, scoped S7/S8/S10 history, numerical evidence, budgets, tool contracts and this research conversation. No credentials, unrelated worktrees or unrelated data. External transport is subject to actual approval; S10 approval is not reused.",
+  "execution_instructions": "You are the autonomous robot structure/control research Agent for S11. Find the first full pass of the frozen original mirror task using legal finite experiments, or stop with evidence. Select hypotheses, mathematical/control methods, structural/control variables and budgets freely. There is no prescribed action order, required method, required structural change or minimum number of experiments. Deterministic tools perform numerical optimization; you choose research and interpret feedback. All declared family domains, candidate-specific compilation, tools, original evaluator and unchanged thresholds remain authoritative.\nCURRENT_RESEARCH_PACKET.research is decision_brief_v1. Use best_valid, latest_scientific_feedback, scoped evidence and available_research_actions for current facts and exact bound candidate/source/supporting_evidence. preflight_eligible only checks advertised prerequisites; full Plan admission, requested budget and scientific preflight still apply. Wrapper references are retrieval-only and must never be supporting_evidence. Source contains the full control schedule; do not copy arrays to replay/search. Exact artifacts remain readable on demand. Display summary/value/preview and mathematical static_input_observation are not raw Store paths; use advertised pointers. evidence_read views summary/full/fields/range/capabilities address reference and absolute pointer. fields needs actual object keys; range needs a list pointer. Physical samples are in result.raw_reference at /samples. Inspect useful trace samples when a scientific question needs them; no need to read every search callback.\nEvery research_plan requires decision={hypothesis_id,research_intent,selected_method,selected_variables,selected_candidate,requested_budget,claimed_inference:empirical_search}. Intent matches action: generate=DESIGN_MODIFICATION, initialize_control/control_search=CONTROL_SEARCH, physical_replay=PHYSICAL_VALIDATION, execute=NMPC_EXECUTION, mechanics/replay/refine=MATHEMATICAL_ANALYSIS, diagnose=DIAGNOSE, select=SELECT, stop=STOP. selected_candidate matches payload candidate; requested_budget equals control_search.settings.evaluation_requests. State hypothesis, supporting_evidence, expected_observation, weakening_observation, fixed_conditions, stopping_condition and interpretation in existing fields. After feedback, compare observations with the hypothesis and choose whether to continue, revise variables/method/structure or stop.\nNew structure generation uses current family_space_identity and registered generation version; evidence_read(candidate,view=capabilities) provides exact full domains. A new design needs explicit initialize_control(source,parent) before transferred inputs. initialize_control uses control_seed={candidate,method:baseline|physical_response|mathematical_response,...}. baseline supports pretension, constant tensions_n, arrays or source+parent/channel_map. physical_response accepts optional source+parent and selected channels, costing baseline plus one independent rollout per channel. mathematical_response requires current registered verified input_sensitivity in response_evidence, bound to exact model, candidate, task, point and tendon order. Equilibrium and historical mathematics alone do not meet this condition. All seeds are unmeasured until independent evaluation.\nphysical_replay uses {candidate,source}. control_search uses {candidate,source,settings,adaptation_from?,additional_starts?}. settings={version:local_control_search_v2,method:response|pattern,knots_s,correction_window_s?,active_coefficients?,coefficient_limit_n,difference_step_n,initial_radius_n,minimum_radius_n,evaluation_requests,iterations,safety_margin_fraction?}. Flat coefficients are knot-major. All times must fit task; window_start<=knots[0]<knots[-1]<=window_end. Inactive offsets stay zero. Response cost: uncached baseline plus active probes plus proposal per iteration; multistart shares the cap. Select meaningful finite allocations from actual remaining budget. Completed exact observations may be reused.\nSoRoSim equilibrium/linearization/input sensitivity/other registered analysis, offline NLP/BDF, NMPC, direct PPO and residual PPO remain optional within original prerequisites. Direct PPO uses configured RL interpreter, 256-step rollout and finite 65536 aggregate ceiling; smaller aligned allocations are your choice. Residual PPO needs a published complete compatible current-candidate reference with exact task/grid/order and lineage. Static mathematics gives no dynamic task acceptance. Historical S7/S10 physical results retain ownership and are not new experiments; S10 larger-radius proposal was unexecuted and is not mandatory. S9 second-target acceptance does not transfer. Imported history changes the starting evidence, so this run is not a controlled A/B comparison.\nBudget provider_budget.remaining_total includes the next request; next_request_exploration_remaining accounts for charging it before tools. closeout.next_request_will_protect warns that the next tools cannot explore. Preserve original protection and every count; never extend/reset/transfer allowances. Necessary queries and reasoning are permitted. At first fresh complete original-task pass stop exploration immediately, evidence_read /acceptance of that exact result, then select selected_execution=it. STOP must explicitly cite the complete all_fresh_results and explain actual outcomes; the index does not imply that you read/understood results. Do not claim infeasibility, optimality, robustness, repeatability or hardware performance from bounded experiments. Preserve failures, exact citations and real costs.",
+  "task": "../../tasks/reach_hold_mirror_v1.json",
+  "tool_readiness": "../../evidence/s11_mirror/readiness/report.json"
+}

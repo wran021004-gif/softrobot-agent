@@ -133,5 +133,16 @@ class DecisionContextTests(unittest.TestCase):
         self.assertEqual(wire[1]['reasoning_content'],'fixture reasoning')
         self.assertEqual(wire[1]['tool_calls'][0]['id'],wire[2]['tool_call_id']);self.assertEqual(messages,original)
 
+    def test_frozen_s11_task_methods_budgets_and_historical_ownership(self):
+        from tools.research.config import resolve
+        current=resolve(ROOT/'configs/research/study_s11_mirror.json')
+        old=resolve(ROOT/'configs/research/study_s10_mirror.json')
+        for key in ('canonical_task','family_space','capabilities','allowed_plan_actions','budgets','rl_limits','nmpc_limits','confirmation'):
+            self.assertEqual(current[key],old[key],key)
+        self.assertNotEqual(current['study_id'],old['study_id'])
+        self.assertEqual(len(current['research_decisions']['history']),2)
+        self.assertEqual(current['tool_readiness']['sorosim_matlab']['status'],'ready')
+        self.assertEqual(current['control']['rl_defaults']['ppo']['n_steps'],256)
+
 
 if __name__=='__main__':unittest.main()
