@@ -1,0 +1,56 @@
+................................F..F..F...........................................E...................................................s.
+======================================================================
+ERROR: setUpClass (tests.research.test_s7_task_intake.S7IntakeTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\softrobot-agent\.worktrees\sorosim-matlab-nmpc\tests\research\test_s7_task_intake.py", line 32, in setUpClass
+    cls.host=core.prepare(ROOT/'configs/research/study_s7_mirror.json',cls.directory)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\softrobot-agent\.worktrees\sorosim-matlab-nmpc\tools\research\core.py", line 87, in prepare
+    h.create(cfg)
+  File "D:\softrobot-agent\.worktrees\sorosim-matlab-nmpc\tools\platform_host.py", line 64, in create
+    snapshot = compile_input(value, self.reg)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\softrobot-agent\.worktrees\sorosim-matlab-nmpc\tools\platform_tasks.py", line 114, in compile_input
+    raise ValueError('CAPABILITY_UNAVAILABLE: ' + d.extension_id + ': ' + ';'.join(availability['reasons']))
+ValueError: CAPABILITY_UNAVAILABLE: controller.sorosim_matlab_nmpc: DEPENDENCY_MISSING: matlab.engine
+
+======================================================================
+FAIL: test_gateway_distinguished (tests.research.test_s8_tool_readiness.ReadinessTests.test_gateway_distinguished)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\softrobot-agent\.worktrees\sorosim-matlab-nmpc\tests\research\test_s8_tool_readiness.py", line 35, in test_gateway_distinguished
+    self.assertEqual(tr.probe(lambda:s)['status'],'gateway_failed')
+AssertionError: 'dependency_unavailable' != 'gateway_failed'
+- dependency_unavailable
++ gateway_failed
+
+
+======================================================================
+FAIL: test_success_gateway_calculation_shutdown (tests.research.test_s8_tool_readiness.ReadinessTests.test_success_gateway_calculation_shutdown)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\softrobot-agent\.worktrees\sorosim-matlab-nmpc\tests\research\test_s8_tool_readiness.py", line 21, in test_success_gateway_calculation_shutdown
+    self.assertEqual(result['status'],'ready');self.assertIn('shutdown',result['steps'])
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'dependency_unavailable' != 'ready'
+- dependency_unavailable
++ ready
+
+
+======================================================================
+FAIL: test_unicode_startup_preserved_not_infeasibility (tests.research.test_s8_tool_readiness.ReadinessTests.test_unicode_startup_preserved_not_infeasibility)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\softrobot-agent\.worktrees\sorosim-matlab-nmpc\tests\research\test_s8_tool_readiness.py", line 29, in test_unicode_startup_preserved_not_infeasibility
+    self.assertEqual(r['status'],'engine_start_failed');self.assertEqual(r['error'],'UnicodeDecodeError')
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'dependency_unavailable' != 'engine_start_failed'
+- dependency_unavailable
++ engine_start_failed
+
+
+----------------------------------------------------------------------
+Ran 135 tests in 30.861s
+
+FAILED (failures=3, errors=1, skipped=1)

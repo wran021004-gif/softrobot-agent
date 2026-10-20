@@ -65,5 +65,30 @@ class EvidenceTests(unittest.TestCase):
             view=context(host)
         self.assertEqual(view['all_fresh_results'],[REF,dict(REF,artifact_id='b'*64)])
 
+    def test_saved_s8_pointer_errors_remain_strictly_rejected(self):
+        import json,tarfile,hashlib
+        from tools.research.config import ROOT
+        checked=0
+        for name in ('variant','mirror'):
+            with tarfile.open(ROOT/('evidence/s8_'+name+'/study/immutable_artifacts.tar.gz')) as archive:
+                values={}
+                for member in archive.getmembers():
+                    if not member.name.endswith('.json'):continue
+                    body=archive.extractfile(member).read();key=member.name.split('/')[-1][:-5]
+                    self.assertEqual(hashlib.sha256(body).hexdigest(),key);values[key]=json.loads(body)
+            snapshot=next(v for v in values.values() if isinstance(v,dict) and 'events' in v and 'calls' in v)
+            for event in snapshot['events']:
+                if event['kind']!='model_original_tool_feedback':continue
+                feedback=values[event['outputs'][0]['artifact_id']]
+                if feedback['result']['status']!='error':continue
+                try:old=json.loads(''.join(c.get('text','') for c in feedback['result']['content']))
+                except ValueError:continue
+                if old.get('error_code') not in ('INVALID_EVIDENCE_POINTER','EVIDENCE_RANGE_REQUIRES_LIST_POINTER'):continue
+                query=feedback['tool_use']['input'];value=values[query['reference']['artifact_id']]
+                with self.assertRaises((KeyError,IndexError,ValueError,TypeError)):
+                    self.read(value,**{k:v for k,v in query.items() if k!='reference'})
+                checked+=1
+        self.assertGreaterEqual(checked,10)
+
 
 if __name__=='__main__':unittest.main()

@@ -394,7 +394,8 @@ async def converse(host):
                     value=compact_evidence(value,ref)
                     from tools.research.research_context import context
                     current=context(host)
-                    value=dict(decision_feedback=current['decision_feedback'],all_fresh_results=current['all_fresh_results'],**value)
+                    value=dict(reference=ref,decision_feedback=current['decision_feedback'],
+                        all_fresh_results=current['all_fresh_results'],**{k:v for k,v in value.items() if k!='reference'})
                 return dict(toolUseId=use['toolUseId'],status='success',content=[dict(text=json.dumps(value,separators=(',',':')))])
             except Exception as exc:
                 key='native-'+use['toolUseId']

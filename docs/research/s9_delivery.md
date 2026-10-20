@@ -54,4 +54,52 @@ gap 36.3030126126. This proves executable handoff, not improved dynamic control 
 autonomous Agent choice. The current seed uses the selected fixed-input local
 static response; the equilibrium result is separate mathematical evidence.
 
-S9.2–S9.3 remain pending. No new feasible solution is claimed.
+## S9.2 and formal freeze protocol
+
+The existing response search now checks actual clipped input changes before
+calling the public evaluator. It tries the opposite bounded direction/step when
+necessary, excludes zero-change directions, identifies projected perturbations,
+and records input-direction rank, observed-response rank/singular values and
+resolved-subspace conditioning. Zero observed response terminates that start with
+an explicit diagnostic. The existing constrained solver, trust radius, ranking,
+Store cache and common multistart budget remain the sole implementation.
+Cost feedback distinguishes callbacks, new physics, valid cached results,
+duplicate sequences, ineffective attempts, unique local response probes, costs
+and per-start initial/best results. Context presents newest summaries first.
+
+Final focused regression: **146 tests, 145 pass, 1 skip** (opt-in real RL). Command:
+`python -m unittest tests.research.test_{s9_evidence,s9_handoff,s9_probes,
+s8_agent_interface,s8_control_seed,s8_sparse_search,s8_tool_readiness,
+local_control_search,control_correction,evidence_policy,s7_context,s7_task_intake,
+mainline,count_continuation,agent_feedback,sorosim_analysis,sorosim_contract,
+rl_integration}` (expand braces into separate module arguments). Environment:
+`PYTHONPATH=.;tests/research;C:/Program Files/MATLAB/R2024a/extern/engines/python/build/lib`,
+the existing pinned `SOROSIM_ROOT`, and OMP/OPENBLAS/MKL threads each 1.
+Logs preserve an initial missing-engine-import-path run and the subsequently fixed
+`acceptance=null` regression. Tests launched no real Provider or scientific workers.
+Saved S8 invalid-pointer requests were replayed against hash-verified artifacts.
+
+Production delta is **+177/-26, net 151 lines**, six existing modules, zero new
+production modules. This is below the suggested range because existing admission,
+binding, evidence, task-gap and Store cache functions were reused. No production
+changes to contracts, evaluator, scientific kernels or numerical acceptance.
+The inventory lists function owners; new files are focused tests, a separate
+engineering test driver, one read-only accounting supplement (reusing S8 archive,
+search reconstruction and independent audit), study configurations and evidence.
+
+Formal S9 uses `s9-variant-live-20261020` and `study_s9_variant.json`: 24 Provider
+requests (4 protected), 150 public operations (12 protected), 64 backend starts,
+4 analyses, 1 NLP, 2 BDF replays, 2 NMPC executions, 1 PPO stage/65,536 actions/
+1 evaluation. No scientific time limits are added. The original second target
+and task identity `596fd628…` match S8 exactly: 0.35 s horizon, 0.01 s controls,
+0.0005 s physics, 0.30–0.35 s hold, 0.01 m position, 0.02 m/s speed, original input
+bounds and evaluator. Historical S8 best is imported with its historical ownership;
+S6 control remains an optional unmeasured seed. Engineering data is not imported.
+This is a new Study of a previously studied target, not an unseen task.
+
+The configuration and source are committed before prepare/bind/run. Readiness is
+ready, key-file presence is checked without recording its content, and the current
+archive/Store restoration path is unchanged. During formal execution no source,
+budget, threshold or task modification is permitted. The Agent chooses its own
+actions through the existing `python -m tools.research run`; no engineering driver
+is used for formal science. Formal results and final Git receipts remain pending.

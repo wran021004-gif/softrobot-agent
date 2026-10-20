@@ -1,0 +1,23 @@
+.......................................................................................E........................................................s.
+======================================================================
+ERROR: test_incomplete_nmpc_remains_invalid_and_does_not_break_context (tests.research.test_s7_task_intake.S7IntakeTests.test_incomplete_nmpc_remains_invalid_and_does_not_break_context)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\softrobot-agent\.worktrees\sorosim-matlab-nmpc\tests\research\test_s7_task_intake.py", line 132, in test_incomplete_nmpc_remains_invalid_and_does_not_break_context
+    c=context(self.host)
+      ^^^^^^^^^^^^^^^^^^
+  File "D:\softrobot-agent\.worktrees\sorosim-matlab-nmpc\tools\research\research_context.py", line 202, in context
+    recent_observations=[compact_evidence(host.store.artifact(r),r)['summary'] | dict(reference=r)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\softrobot-agent\.worktrees\sorosim-matlab-nmpc\tools\research\research_context.py", line 202, in <listcomp>
+    recent_observations=[compact_evidence(host.store.artifact(r),r)['summary'] | dict(reference=r)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\softrobot-agent\.worktrees\sorosim-matlab-nmpc\tools\research\research_context.py", line 151, in compact_evidence
+    summary.update(task_gap=task_gap(value),constraints=value['acceptance'].get('components',{}),
+                                                        ^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'get'
+
+----------------------------------------------------------------------
+Ran 146 tests in 35.295s
+
+FAILED (errors=1, skipped=1)

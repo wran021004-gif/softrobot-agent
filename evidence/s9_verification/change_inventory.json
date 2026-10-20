@@ -1,0 +1,111 @@
+{
+  "production_changes": [
+    {
+      "path": "tools/research/agent.py",
+      "added": 9,
+      "deleted": 1,
+      "functions": [
+        "pilot",
+        "record",
+        "pending",
+        "received",
+        "settle",
+        "live_model_class",
+        "load_credential",
+        "read_tool_evidence",
+        "plan_schema",
+        "error_feedback",
+        "build_harness",
+        "wait_training",
+        "converse",
+        "decision_packet"
+      ]
+    },
+    {
+      "path": "tools/research/analysis.py",
+      "added": 11,
+      "deleted": 1,
+      "functions": [
+        "kkt_reliability",
+        "complete_lagrangian_sensitivity",
+        "calculate",
+        "scoped_result",
+        "admission",
+        "dispatch",
+        "recover",
+        "compact_result",
+        "decision_result",
+        "score_semantics"
+      ]
+    },
+    {
+      "path": "tools/research/core.py",
+      "added": 7,
+      "deleted": 1,
+      "functions": [
+        "read_evidence",
+        "prepare",
+        "bind",
+        "search_problem",
+        "run_search",
+        "experience",
+        "claims",
+        "family_claims",
+        "resource_use",
+        "packet",
+        "dispatch",
+        "recover",
+        "export"
+      ]
+    },
+    {
+      "path": "tools/research/local_control_search.py",
+      "added": 51,
+      "deleted": 8,
+      "functions": [
+        "trust_radius",
+        "search",
+        "dispatch"
+      ]
+    },
+    {
+      "path": "tools/research/physical_replay.py",
+      "added": 33,
+      "deleted": 12,
+      "functions": [
+        "numerically_verified_source",
+        "explicit_control_source",
+        "schedule_identity",
+        "evaluate_schedule",
+        "model_context",
+        "initialize_schedule",
+        "seed_control",
+        "_seed_control",
+        "verified_input_response",
+        "guided_seed",
+        "binding",
+        "calculate",
+        "dispatch",
+        "recover"
+      ]
+    },
+    {
+      "path": "tools/research/research_context.py",
+      "added": 66,
+      "deleted": 3,
+      "functions": [
+        "import_history",
+        "observation",
+        "legacy_context",
+        "compact_evidence",
+        "context",
+        "action_feedback",
+        "bounded_context"
+      ]
+    }
+  ],
+  "net_lines": 151,
+  "new_production_modules": 0,
+  "reason": "Extended existing Store/context/seed/search functions; no extra planner, evaluator, optimizer, budget or scheduler.",
+  "scope": "Inventory before S9.3 source freeze"
+}

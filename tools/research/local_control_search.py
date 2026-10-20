@@ -46,24 +46,31 @@ def search(starts,evaluate,settings):
                 or cfg.knots_s[-1]>times[-1] or (cfg.correction_window_s and cfg.correction_window_s[1]>times[-1])):
             raise ValueError('BOUND_ALIGNED_CONTROL_GRID_REQUIRED')
     rows=[];best=None;centers={};radii={s['id']:cfg.initial_radius_n for s in starts};stop='iteration_limit'
+    seen=set();information=set();ineffective=[];responses=[]
 
     def vectors(row,start):return constraint_vectors(row['outputs'],**start['task_options'])
+    def applied(start,x):
+        tr=start['schedule']['trajectory']
+        return corrected_tensions(tr['tensions_n'],tr['times_s'][:-1],cfg.knots_s,x,start['limits'],cfg.correction_window_s)
 
     def attempt(start,x,label,base=None,predicted=None,radius=None):
         nonlocal best
         if len(rows)>=cfg.evaluation_requests:raise SearchStopped('evaluation_request_budget')
         if not np.isfinite(x).all() or np.any(abs(x)>cfg.coefficient_limit_n+1e-12):raise ValueError('ILLEGAL_COEFFICIENTS')
         source=deepcopy(start['schedule']);tr=source['trajectory']
-        tr['tensions_n']=corrected_tensions(tr['tensions_n'],tr['times_s'][:-1],cfg.knots_s,x,start['limits'],cfg.correction_window_s).tolist()
+        tr['tensions_n']=applied(start,x).tolist()
+        identity=digest([tr[k] for k in ('task_identity','model_identity','design_identity','tendon_order','times_s','tensions_n')])
         meta=dict(algorithm=cfg.method,start=start['id'],coefficients_n=x.tolist(),label=label,
             active_coefficients=selected,search_dimension=len(selected),
             safety_margin_fraction=cfg.safety_margin_fraction,
-            sequence_hash=digest(tr['tensions_n']),prediction_base=base['reference'] if base else None,
+            sequence_hash=digest(tr['tensions_n']),duplicate_applied_sequence=identity in seen,
+            prediction_base=base['reference'] if base else None,
             predicted_improvement=predicted,trust_radius_n=radius,prospective_guarantee=False,
             applicability='Local sampled response at the stated candidate only; no regional error bound',
             extrapolation=bool(base and radius is not None and np.max(abs(x-np.asarray(base['coefficients_n'])))>radius+1e-12))
         source['provenance']=dict(source['provenance'],search=meta)
         row=dict(evaluate(start,source,meta),**meta)
+        seen.add(identity)
         valid=row['task_gap']['valid_complete'] and row['task_gap']['normalized_gap'] is not None
         if not valid:row['task_gap']={**row['task_gap'],'normalized_gap':None}
         actual=(base['task_gap']['normalized_gap']-row['task_gap']['normalized_gap']) if base and valid else None
@@ -93,25 +100,51 @@ def search(starts,evaluate,settings):
                     for direction in (1,-1):
                         trial=x.copy();trial[j]=np.clip(x[j]+direction*radius,-cfg.coefficient_limit_n,cfg.coefficient_limit_n)
                         if np.array_equal(trial,x):continue
+                        if np.max(abs(applied(start,trial)-applied(start,x)))<=1e-12:
+                            ineffective.append(dict(start=start['id'],coefficient=j,label='coordinate',reason='no_applied_input_change'));continue
                         row=attempt(start,trial,'coordinate',base=center,radius=radius)
                         if ranking_key(row)<ranking_key(center):centers[start['id']]=row;improved=True;break
                     if improved:break
                 if not improved:radii[start['id']]*=.5
             else:
-                y=vectors(center,start);columns=[];valid=True
+                y=vectors(center,start);columns=[];directions=[];effective=[];valid=True
+                base_u=applied(start,x)
+                tr=start['schedule']['trajectory'];basis=correction_basis(tr['times_s'][:-1],cfg.knots_s,channels,cfg.correction_window_s)
                 for j in selected:
-                    trial=x.copy();h=min(cfg.difference_step_n,radius)
-                    h=h if x[j]+h<=cfg.coefficient_limit_n else -h;trial[j]+=h
+                    h0=min(cfg.difference_step_n,radius);trial=None
+                    for step in dict.fromkeys((h0,-h0,radius,-radius)):
+                        probe=x.copy();probe[j]=np.clip(x[j]+step,-cfg.coefficient_limit_n,cfg.coefficient_limit_n)
+                        delta_u=applied(start,probe)-base_u
+                        if np.max(abs(delta_u))>1e-12:
+                            trial=probe;h=trial[j]-x[j];break
+                        ineffective.append(dict(start=start['id'],coefficient=j,step_n=step,reason='no_applied_input_change'))
+                    if trial is None:continue
                     row=attempt(start,trial,'finite_difference',base=center,radius=radius)
                     if not row['task_gap']['valid_complete']:valid=False;break
+                    projected=not np.allclose(delta_u.reshape(-1),basis[:,j]*h,rtol=0,atol=1e-12)
+                    token=(start['id'],center['sequence_hash'],row['sequence_hash'])
+                    row.update(projected_response=projected,effective_input_change_inf_n=float(np.max(abs(delta_u))),
+                        provides_new_local_information=token not in information,
+                        derivative_scope='one-sided projected control response' if projected else 'one-sided unclipped control response')
+                    information.add(token);directions.append(delta_u.reshape(-1)/h);effective.append(j)
                     columns.append((vectors(row,start)-y)/h)
                 if not valid:radii[start['id']]*=.5;continue
-                tr=start['schedule']['trajectory'];basis=correction_basis(tr['times_s'][:-1],cfg.knots_s,channels,cfg.correction_window_s)
-                solved=constrained_response_step(y,np.stack(columns,axis=-1),x[selected],tr['tensions_n'],basis[:,selected],
+                jac=np.stack(columns,axis=-1) if columns else None
+                rank=int(np.linalg.matrix_rank(jac.reshape(-1,len(columns)))) if columns else 0
+                singular=np.linalg.svd(jac.reshape(-1,len(columns)),compute_uv=False) if columns else np.array([])
+                responses.append(dict(start=start['id'],iteration=iteration,effective_coefficients=effective,
+                    response_rank=rank,input_direction_rank=int(np.linalg.matrix_rank(np.stack(directions,axis=-1))) if directions else 0,
+                    singular_values=singular.tolist(),resolved_subspace_condition=float(singular[0]/singular[rank-1]) if rank else None,
+                    diagnostic='no_effective_response' if not rank else 'rank_deficient_response' if rank<len(effective) else 'resolved_local_response'))
+                if not rank:
+                    active.remove(start)
+                    if not active:raise SearchStopped('degenerate_local_response')
+                    continue
+                solved=constrained_response_step(y,jac,x[effective],tr['tensions_n'],basis[:,effective],
                     start['limits'],radius,cfg.coefficient_limit_n,safety_margin_fraction=cfg.safety_margin_fraction)
                 if not solved['success']:raise SearchStopped('numerical_failure: '+solved['numerical_status'])
                 predicted=center['task_gap']['normalized_gap']-solved['predicted_gap']
-                proposal=x.copy();proposal[selected]+=solved['delta']
+                proposal=x.copy();proposal[effective]+=solved['delta']
                 row=attempt(start,proposal,'local_response_proposal',base=center,predicted=predicted,radius=radius)
                 row['local_solver']={k:v for k,v in solved.items() if k!='delta'}
                 radii[start['id']]=trust_radius(radius,predicted,row['actual_improvement'],cfg.coefficient_limit_n)
@@ -120,6 +153,15 @@ def search(starts,evaluate,settings):
                 centers[start['id']]=min(eligible,key=ranking_key)
     except SearchStopped as exc:stop=str(exc)
     return dict(version=cfg.version,algorithm=cfg.method,stop_reason=stop,
+        cost_feedback=dict(request_budget=cfg.evaluation_requests,evaluation_callbacks=len(rows),
+            new_physical_evaluations=sum(not r.get('cache_hit',False) for r in rows),
+            cache_reuses=sum(r.get('cache_hit',False) for r in rows),unique_input_sequences=len(seen),
+            duplicate_applied_sequences=sum(r['duplicate_applied_sequence'] for r in rows),
+            ineffective_probe_attempts=len(ineffective),unique_response_probes=len(information),
+            charged_numerical_s=sum(r.get('cost_s',0.) for r in rows)),
+        start_feedback=[dict(start=s['id'],initial_gap=next((r['task_gap'] for r in rows if r['start']==s['id']),None),
+            best=min((r for r in rows if r['start']==s['id'] and r['task_gap']['valid_complete']),key=ranking_key,default=None)) for s in starts],
+        local_responses=responses,ineffective_probes=ineffective,
         active_coefficients=selected,search_dimension=len(selected),start_count=len(starts),
         finite_difference_evaluations=sum(r['label']=='finite_difference' for r in rows),
         candidates=rows,best=best,trust_radii_n=radii,prospective_guarantee=False,
@@ -201,4 +243,5 @@ def dispatch(host,plan,key,*,origin='model'):
     ref=save(host,result,'public_control_search_result')
     update(host,control_search_results=[*state(host).get('control_search_results',[]),ref])
     return dict(reference=ref,best=result['best'],stop_reason=result['stop_reason'],
+        cost_feedback=result['cost_feedback'],start_feedback=result['start_feedback'],local_responses=result['local_responses'],
         evaluation_requests=len(result['candidates']),new_physical_evaluations=sum(not r['cache_hit'] for r in result['candidates']))

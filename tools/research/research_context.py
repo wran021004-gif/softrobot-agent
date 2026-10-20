@@ -141,11 +141,14 @@ def compact_evidence(value, reference, pointer=''):
         best=value.get('best') or {}
         summary=dict(stop_reason=value.get('stop_reason'),search_dimension=value.get('search_dimension'),
             finite_difference_evaluations=value.get('finite_difference_evaluations'),
+            cost_feedback=value.get('cost_feedback'),local_responses=value.get('local_responses',[])[-3:],
+            starts=[dict(start=s['start'],initial_gap=s['initial_gap'],best={k:(s.get('best') or {}).get(k)
+                for k in ('reference','candidate','source','task_gap')}) for s in value.get('start_feedback',[])],
             best={k:best.get(k) for k in ('reference','candidate','source','task_gap','coefficients_n')},
             small_query=dict(pointer=pointer+'/best',view='fields',fields=[k for k in
                 ('reference','candidate','source','task_gap','coefficients_n') if k in best]))
     if isinstance(value,dict) and 'acceptance' in value:
-        summary.update(task_gap=task_gap(value),constraints=value['acceptance'].get('components',{}),
+        summary.update(task_gap=task_gap(value),constraints=(value['acceptance'] or {}).get('components',{}),
             limitations=['Only this recorded execution establishes its task outcome'])
     return dict(reference=reference,pointer=pointer,view='deterministic_summary',
         available_keys=list(value) if isinstance(value,dict) else None,summary=summary,
@@ -194,8 +197,10 @@ def context(host):
     current['all_fresh_results']=[r for key in ('results','mechanics_results','physical_replays',
         'matched_state_results','rl_evaluations','analysis_results') for r in s.get(key,[])]
     current['decision_feedback']=dict(
+        recent_searches=[dict(reference=r,**compact_evidence(host.store.artifact(r),r)['summary'])
+            for r in reversed(s.get('control_search_results',[])[-2:])],
         recent_observations=[compact_evidence(host.store.artifact(r),r)['summary'] | dict(reference=r)
-            for r in [*s.get('results',[]),*s.get('physical_replays',[]),*s.get('rl_evaluations',[])][-3:]],
+            for r in reversed([*s.get('results',[]),*s.get('physical_replays',[]),*s.get('rl_evaluations',[])][-3:])],
         actions=action_feedback(host,current),
         citation_rule='STOP must explain the outcome and explicitly cite all_fresh_results. This index does not record model reading or understanding.')
     return current
@@ -203,7 +208,8 @@ def context(host):
 
 def action_feedback(host,current):
     """Admission prerequisites for parameterized actions, not model decisions."""
-    from tools.research.physical_replay import binding, verified_input_response
+    from tools.research.physical_replay import binding, verified_input_response, explicit_control_source, numerically_verified_source
+    from tools.research.design import verify_candidate
     from tools.research.budget import protected, backend_capacity
     s=state(host);rows=[];capacity=backend_capacity(host)
     closed=s['research_status']=='stopped' or protected(host)
@@ -211,12 +217,17 @@ def action_feedback(host,current):
         candidate=entry['candidate'];source=entry['source'];cfg=host.store.artifact(candidate)['configuration']
         for action in ('physical_replay','control_search'):
             reason=None;status='eligible'
-            if closed or action not in current['actions'] or capacity<1:
+            if closed or action not in current['actions'] or action not in s['spec']['capabilities'] or capacity<1:
                 status='unavailable';reason='Protected/stopped state, action availability or shared backend capacity'
             elif action=='control_search' and cfg['task']['family']!='task.reach':
                 status='not_applicable';reason='Current search requires reach-hold norm constraints'
             else:
-                try:binding(cfg,host.store.artifact(source)['trajectory'])
+                try:
+                    verify_candidate(host,candidate)
+                    control=host.store.artifact(source)
+                    if not (explicit_control_source(control) or numerically_verified_source(control)):
+                        raise ValueError('VERIFIED_OR_EXPLICIT_CONTROL_START_REQUIRED')
+                    binding(cfg,control['trajectory'])
                 except ValueError as exc:status='blocked';reason=str(exc)
             rows.append(dict(action=action,status=status,candidate=candidate,source=source,reason=reason,
                 remaining_backend_launches=capacity,minimum_new_launches=1,
@@ -233,7 +244,7 @@ def action_feedback(host,current):
             except ValueError as exc:reason=str(exc)
         cfg=host.store.artifact(candidate)['configuration']
         if cfg['task']['family']!='task.reach':status='not_applicable';reason='Endpoint-target seed required'
-        elif closed or 'initialize_control' not in current['actions']:
+        elif closed or 'initialize_control' not in current['actions'] or 'control_correction' not in s['spec']['capabilities']:
             status='unavailable';reason='Initialization unavailable in current stage'
         rows.append(dict(action='initialize_control',method='mathematical_response',status=status,reason=reason,
             candidate=candidate,response_evidence=ref,task_acceptance='unmeasured',new_physical_evaluations=0,
