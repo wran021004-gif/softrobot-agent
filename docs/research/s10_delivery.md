@@ -1,8 +1,8 @@
 # S10 feedback-driven mirror study
 
-Status: engineering preparation complete; formal Provider study not yet started.
-This document will report actual outcomes after formal execution. Passing tests
-and historical observations are not S10 scientific success.
+Status: prepared and frozen; formal Provider study is awaiting explicit external
+payload/destination authorization. No S10 Provider request or fresh scientific
+evaluation has run. Passing tests and historical observations are not S10 success.
 
 Only `feat/sorosim-matlab-nmpc` and its designated worktree are modified.
 Initial local and fetched origin HEAD are both
@@ -86,3 +86,49 @@ schemas and Agent/tool conversation. Authentication is loaded from the existing
 credential reference; key contents, headers and unrelated worktrees are excluded
 from saved/exported research payload. Any external-send approval requirement
 must be resolved against this S10 scope, without relying on S9 authorization.
+
+## Formal launch and current research conclusions
+
+Preparation commit `8c2eb88ee5e076c873edc5fe9e4fb22966b93d64` and formal protocol
+commit `7bac54ad311fab798d806ccd29504740a5cf07c4` were ordinarily pushed; each
+remote SHA was verified. Formal Store is
+`runs/research/s10-mirror-live-20261020`, bound to `7bac54ad…`. The initial binding
+at preparation commit was migrated using the existing CLI before any Provider
+request, with an explicit metadata-only reason. Frozen configuration, source
+hashes, historical ownership and zero scientific counters were preserved.
+
+The requested `python -m tools.research run --run-id s10-mirror-live-20261020`
+was rejected by automatic approval review **before command execution**. Its stated
+reason: potentially sensitive project/numerical/control/conversation data would
+be transmitted to DeepSeek, and existing trusted authorization did not clearly
+authorize the exact payload/destination combination. There was no retry or
+indirect send. A new S10-specific authorization question names the exact scope,
+review file and `https://api.deepseek.com/chat/completions` destination.
+
+The formal study remains ready and recoverable, rather than scientifically
+stopped or falsely marked failed. All formal counts remain unused, pending and
+unconsumed response are empty. The exported archive preserves configuration,
+identities, materialized history, initial controls, binding and ledger. Historical
+best failure is retained through its original references; there is no fresh S10
+best candidate to deliver. The archive does not claim new dynamic acceptance.
+
+Current answers to the requested research questions:
+
+1. **Autonomous calculations:** none yet; no real Provider request executed.
+   Engineering readiness and admission checks are not Agent research decisions.
+2. **Failure-driven strategy revision:** not observed; no new scientific batch
+   or subsequent Agent decision exists. No synthetic failure or decision was made.
+3. **Mathematical value:** formal value remains untested. The gateway check and
+   scoped historical equilibria establish preparation only; neither establishes
+   improved control or physical feasibility.
+4. **Structure/control exploration:** none in formal S10. Historical structure
+   materialization and legal seed adaptation are preparation, not a model-selected
+   structural experiment. The full legal space remains available.
+5. **Feasible S10 solution:** not established. There is no new independent MuJoCo
+   evaluation, accepted result or native SELECT/STOP. The external approval block
+   is not evidence of mathematical or physical infeasibility.
+
+After explicit authorization, resume through the same `run` command and frozen
+Study; do not prepare a duplicate Study, reset counts or substitute a local
+scientific plan. The existing recovery mechanism handles any later uncertain
+Provider/worker outcome. No new research direction has been selected by Codex.
