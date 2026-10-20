@@ -243,6 +243,13 @@ def context(host):
     from tools.research.budget import decision_budget
     current['budget']=decision_budget(host)
     current['task_accepted']=bool(s.get('success_gate'))
+    current['candidate_status']=dict(generated_valid=len(s['candidates']),
+        control_sources_initialized=len(s.get('control_initializations',[])),
+        mathematical_evaluations=len(s.get('analysis_results',[]))+len(s.get('mechanics_results',[])),
+        independent_physical_evaluations=sum(len(s.get(k,[])) for k in ('results','physical_replays','rl_evaluations')),
+        has_executable_candidate=bool(s['candidates']),task_passed=current['task_accepted'])
+    current['candidate_status']['has_measured_task_feedback']=bool(current['candidate_status']['independent_physical_evaluations'])
+    current['research_information']='Compilation establishes structure validity only. Creating structures adds candidate information; completed mathematical analysis or independent physical evaluation adds task-performance evidence. Neither compilation nor control initialization establishes task success.'
     refs=[*current['all_fresh_results'],*s.get('control_search_results',[])]
     ids={r['artifact_id'] for r in refs}
     latest=next((r for e in reversed(host.store.events(host.run_id)) for r in e.get('outputs',[]) if r['artifact_id'] in ids),None)
@@ -298,6 +305,15 @@ def action_feedback(host,current):
         from tools.research.mechanics import warm_start
         from tools.research_tasks import task_adapter
         cfg=host.store.artifact(candidate)['configuration']
+        rows.append(dict(action='initialize_control',method='baseline',candidate=candidate,
+            status='preflight_eligible' if not closed and 'initialize_control' in current['actions'] else 'unavailable',
+            task_acceptance='unmeasured',new_physical_evaluations=0,
+            remaining_checks=['full_plan_admission','selected_control_settings'],
+            requires_agent_fields=['decision','hypothesis','control_seed']))
+        rows.append(dict(action='execute',method='nmpc',candidate=candidate,
+            status='preflight_eligible' if not closed and 'execute' in current['actions'] and capacity>0 else 'unavailable',
+            remaining_checks=['full_plan_admission','method_budget','replication_admission','scientific_preflight'],
+            task_acceptance='unmeasured'))
         requirements=task_adapter(cfg).analysis_requirements({})
         applicable=all(c.kind=='norm_bound' and c.signal.name in ('tip_position','tip_velocity') for c in requirements.constraints)
         modes=MechanicsRequest.model_json_schema()['properties']['initialization']['enum'];warm=[]
@@ -371,6 +387,27 @@ def tool_feedback(host,value):
             from tools.research.analysis import compact_result
             view=compact_result(raw,reference)
     else:view=compact_evidence(result,wrapper,'/result' if 'result' in value else '')
+    if isinstance(result,dict) and result.get('status')=='generated':
+        candidate=host.store.artifact(result['candidate']);resolved=candidate['resolved_parameters']
+        robot=candidate['configuration']['robot']['structure']['data']
+        guides={c['id']:c for c in robot['components'] if c['kind']=='guide'}
+        layout=[]
+        for tendon in resolved['tendons'][:12]:
+            p=tendon['points'][0];a=p['attachment']
+            position=guides[a['part']]['guide_holes'][p['hole']] if p.get('hole') else a['position_m']
+            layout.append(dict(tendon=tendon['id'],start_part=a['part'],start_position_m=position))
+        view['structure_facts']=dict(candidate=result['candidate'],construction='compiled_valid',
+            scientific_acceptance='unmeasured',segment_count=len(resolved['segments']),
+            tendon_count=len(resolved['tendons']),lengths_m=[p['length_m'] for p in resolved['segments']],
+            spans=candidate['parameters'].get('spans',[])[:12],layout=layout,layout_limit=12,
+            checks_passed=['family_domain','section_route_clearance','tendon_attachment_clearance',
+                'ordered_route_stations','guide_hole_clearance','guide_envelope','resolved_nonzero_spans'],
+            minimum_clearance=dict(status='unavailable',reason='Not retained by original successful checks'),
+            full_routes=dict(reference=result['candidate'],pointer='/resolved_parameters/tendons'),
+            full_structure=dict(reference=candidate['configuration_reference'],pointer='/robot/structure/data'),
+            control_source_initialized=any(e['candidate']==result['candidate'] for e in state(host).get('control_initializations',[])),
+            mathematical_observations=[r for k in ('analysis_results','mechanics_results') for r in state(host).get(k,[]) if host.store.artifact(r).get('candidate')==result['candidate']],
+            physical_observations=[r for k in ('results','physical_replays','rl_evaluations') for r in state(host).get(k,[]) if host.store.artifact(r).get('candidate')==result['candidate']])
     if reference in known and isinstance(raw,dict) and raw.get('acceptance') and raw.get('raw_reference'):
         view['physical_diagnostic']=physical_diagnostic(host,reference)
     return dict(wrapper_reference=wrapper,wrapper_role='Retrieval only; not supporting_evidence',

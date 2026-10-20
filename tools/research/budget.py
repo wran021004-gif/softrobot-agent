@@ -52,9 +52,11 @@ def decision_budget(host):
     active=protected(host)
     return dict(provider_budget=dict(remaining_total=total,reserved_for_closeout=reserve,
         available_for_exploration=max(0,total-reserve),
-        next_request_exploration_remaining=max(0,total-reserve-1)),
+        next_request_exploration_remaining=max(0,total-reserve-1),
+        exploration_after_additional_read_requests={str(n):max(0,total-reserve-1-n) for n in (1,3,5)}),
         science_budget=dict(remaining_physical=backend_capacity(host),
-            remaining_mathematical=max(0,b['mathematical_evaluations']-s.get('mathematical_evaluations',0))),
+            remaining_mathematical=max(0,b['mathematical_evaluations']-s.get('mathematical_evaluations',0)),
+            any_scientific_route_fits=science_fits(host) and not (active or total-1<=reserve)),
         closeout=dict(active=active,next_request_will_protect=active or total-1<=reserve,
             reason='Existing success/count/resource protection' if active else None))
 

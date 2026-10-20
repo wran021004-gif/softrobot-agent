@@ -278,7 +278,12 @@ def generate_candidate(host,request,provenance,*,screening_fidelity=None):
     except UnsupportedGeneration as exc:
         return dict(status='not_yet_supported',unsupported_capability=str(exc),candidate=None,task_success=None)
     except ValueError as exc:
-        return dict(status='invalid',reason=str(exc),candidate=None,task_success=None)
+        diagnostic=deepcopy(getattr(exc,'diagnostic',dict(status='unavailable',reason='No structured facts captured by this check')))
+        reference=save(host,dict(request=request,reason=str(exc),diagnostic=diagnostic,
+            scientific_acceptance='unmeasured'),'generation_failure')
+        return dict(status='invalid',reason=str(exc),candidate=None,task_success=None,
+            diagnostic={**diagnostic,'raw_reference':reference,'read_pointer':'/diagnostic'},
+            scientific_acceptance='unmeasured')
     finally:
         elapsed=time.perf_counter()-started;current=state(host)
         update(host,numerical_s=current['numerical_s']+elapsed,

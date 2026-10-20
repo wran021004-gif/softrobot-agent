@@ -201,6 +201,13 @@ def topology_declarations():
         future=['nonlinear closed-loop comparisons','variable segment count'])
 
 
+class GeometryFailure(ValueError):
+    """Facts captured by the authoritative construction check, not a re-check."""
+    def __init__(self, reason, diagnostic):
+        super().__init__(reason)
+        self.diagnostic=diagnostic
+
+
 def generate_family(value):
     """Expand polar spans; v1 preserves its assembly, v2 expands named prototypes."""
     from .family_space import parse_build, Span, validate_request, FamilyBuildV2
@@ -255,7 +262,7 @@ def generate_family(value):
         return dict(attachment=dict(part=part,s=s,position_m=position),role=role,hole=hole)
     def yz(radius,angle):return [0.,radius*float(np.cos(angle)),radius*float(np.sin(angle))]
     spans=r.spans or [Span(last_segment=len(segments)-1,count=r.tendon_count)]
-    for span in spans:
+    for span_index,span in enumerate(spans):
         bounds=space.routing_domains
         radius=bounds['radius_m'].check(span.radius_m if span.radius_m is not None else bounds['radius_m'].default,'radius_m')
         anchor=bounds['anchor_s'].check(span.anchor_s if span.anchor_s is not None else bounds['anchor_s'].default,'anchor_s')
@@ -305,13 +312,24 @@ def generate_family(value):
                 else:raise ValueError('ROUTE_ATTACHMENT_OUTSIDE_FAMILY')
             if order!=sorted(set(order)) or route[0]['attachment']['part']!=('fixed_base' if span.first_segment==0 else guides_by_segment[span.first_segment]['id']) or route[-1]['attachment']['part']!=segments[span.last_segment]['id']:
                 raise ValueError('ORDERED_SELECTED_SPAN_REQUIRED')
-            for p in route:
+            for point_index,p in enumerate(route):
                 a=p['attachment']
                 position=guides_by_id[a['part']]['guide_holes'][p['hole']] if p.get('hole') else a['position_m']
                 station=(a['part'],a['s']);previous=attachments.setdefault(station,[])
-                if any(np.linalg.norm(np.asarray(position)-old)<tendon_values['diameter_m'] for old in previous):
-                    raise ValueError('TENDON_ATTACHMENT_CLEARANCE')
-                previous.append(position)
+                paths=([f'/route_overrides/{index}/{point_index}'] if index in r.route_overrides else
+                    [f'/spans/{span_index}'] if r.spans else ['/tendon_count','/spans'])
+                facts=dict(tendon=name,position_m=position,request_paths=paths,
+                    polar_angle_rad=None if index in r.route_overrides else angle,
+                    point_index=point_index)
+                for old in previous:
+                    distance=float(np.linalg.norm(np.asarray(position)-old['position_m']))
+                    if distance<tendon_values['diameter_m']:
+                        raise GeometryFailure('TENDON_ATTACHMENT_CLEARANCE',dict(
+                            status='available',constraint='tendon_attachment_clearance',
+                            station=dict(part=a['part'],s=a['s']),local_frame='attachment part YZ plane',
+                            attachments=[old,facts],actual_distance_m=distance,
+                            required_distance_m=tendon_values['diameter_m']))
+                previous.append(facts)
             tendons.append(dict(id=name,points=route,**tendon_values))
             actuators.append(dict(id='actuator_'+str(index),command_type='displacement',units='m',
                 limits=space.actuator_defaults.limits_m,velocity_limit=space.actuator_defaults.velocity_limit_m_s,

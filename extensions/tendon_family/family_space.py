@@ -126,7 +126,8 @@ class Span(Contract):
     last_segment: int = Field(ge=0, strict=True)
     count: int = Field(ge=1, strict=True)
     phase_rad: FiniteFloat = 0.
-    angular_offsets_rad: list[FiniteFloat] = Field(default_factory=list)
+    angular_offsets_rad: list[FiniteFloat] = Field(default_factory=list,
+        description='Extra offsets: theta_j = phase_rad + 2*pi*j/count + angular_offsets_rad[j]. Empty uses equal spacing. These are not absolute angles.')
     radius_m: FiniteFloat | None = None
     guide_s: list[FiniteFloat] | None = None
     anchor_s: FiniteFloat | None = None
@@ -297,6 +298,7 @@ def decision_summary(value, evidence, operations):
     result.update(full_specification=evidence, available_operations=operations,
         routing_strategy='polar_consecutive_spans_v1',
         span_semantics='first_segment <= last_segment < selected segment_count; counts sum to tendon_count',
+        angular_semantics='theta_j = phase_rad + 2*pi*j/count + angular_offsets_rad[j]; omitted/empty offsets mean equal spacing. Explicit offsets are additional, not absolute angles. Route overrides remain exact.',
         conditional_parameters='Segment and route overrides must exist in selected topology; per-span offsets match count',
         attachment_constraints=dict(local_frame='segment YZ plane; normalized station s',
             order='unique increasing stations; guides precede anchor; anchor on last selected segment',
