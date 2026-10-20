@@ -1,0 +1,62 @@
+{
+  "frozen_source_unchanged_after_run": true,
+  "fallback_wrapper_projection": [
+    {
+      "action": "initialize_control",
+      "feedback_reference": {
+        "artifact_id": "3d6b0eba9594f424460bd68dc47bbf12e4e5e7c4e3c7e8f52e6cf88ad0970d81",
+        "media_type": "application/json"
+      },
+      "wrapper_reference": {
+        "artifact_id": "86f441f41ec170f83200f1c4b02304629ac303475c1b786724c22978e60c296f",
+        "media_type": "application/json"
+      },
+      "advertised_pointer": "",
+      "actual_result_pointer": "/result",
+      "advertised_keys": [
+        "candidate",
+        "source",
+        "task_acceptance"
+      ],
+      "wrapper_root_keys": [
+        "plan",
+        "resource_use",
+        "result",
+        "scientific_preflight"
+      ],
+      "observed_invalid_read_of_this_wrapper": false
+    },
+    {
+      "action": "stop",
+      "feedback_reference": {
+        "artifact_id": "611e7d1345731b6e95d9f1cd7951592d1b66e6d4c5dda5cdab2ffe2f9a015f3c",
+        "media_type": "application/json"
+      },
+      "wrapper_reference": {
+        "artifact_id": "b213bf80d34ea0725a11dec98caf68d2ad4baf78fce4e6a98f83ad434734a590",
+        "media_type": "application/json"
+      },
+      "advertised_pointer": "",
+      "actual_result_pointer": "/result",
+      "advertised_keys": [
+        "accepted_stop",
+        "claims"
+      ],
+      "wrapper_root_keys": [
+        "plan",
+        "resource_use",
+        "result",
+        "scientific_preflight"
+      ],
+      "observed_invalid_read_of_this_wrapper": false
+    }
+  ],
+  "limitation": "Seed/STOP fallback feedback labels the wrapper retrieval-only and shows result fields, but its pointer remains empty instead of /result. This is not a registered scientific citation; actual bound source handoff remained usable. No model read this fallback wrapper, so it is a code-level residual defect, not an observed live error or proven cause of the efficiency result.",
+  "other_gaps": [
+    "Offline mechanics warm-source prerequisites were not parameterized by action_feedback; the actual plan correctly remained blocked",
+    "Agent continued low-value field navigation despite available compact facts",
+    "Agent submitted wider-radius search after explicit next-request-closeout warning",
+    "STOP narrative overstates a dynamic root cause and incorrectly calls the fresh replay reused; independent audit corrects both interpretations"
+  ],
+  "followup": "Any repair requires a separately versioned implementation and new frozen study; S11 source/task/model/budgets were not changed after results."
+}

@@ -1,0 +1,2488 @@
+{
+  "study_id": "s11-mirror-live-20261020",
+  "decisions": [
+    {
+      "decision_index": 1,
+      "sequence": 293,
+      "tool": "research_plan",
+      "action": "initialize_control",
+      "evidence_before": {
+        "packet_reference": {
+          "artifact_id": "1088e7a8b18c6d2a13635c8c694a343f1de2b6fd97a9dadc26b20ff413591c3c",
+          "media_type": "application/json"
+        },
+        "supporting_evidence": [
+          {
+            "artifact_id": "3573c3b24e533bda8ee635e7f652d265390814b56790820ae335905e2a4f01bd",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "62ddc2387077c5b49440d16208cd83d07d9108187e3e94df00043e4bfdb9557d",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "15d2a97a0f7e788864f66360bc733200c393e583b300d01db27c887481667df1",
+            "media_type": "application/json"
+          }
+        ]
+      },
+      "hypothesis": "TARGET_EQUILIBRIUM_HOLD: the historical static construction for this identical design (candidate_id core-12564696..., artifact 3573c3b2) shows a static equilibrium with the tip at the task target (residual 1.2e-8 m) at tensions [4.130153, 1.813905, 2.101490, 3.240433] N. The previous best open-loop schedule (62ddc238) ended 1.6 N away from that on tendon_1 with terminal error 0.0342 m. If this schedule drives the four tensions smoothly from the 0.2 N pretension to that static target-equilibrium vector within 0.10 s and holds it to 0.35 s, the tip should settle onto the target and the residual tip speed should decay below 0.02 m/s.",
+      "hypothesis_id": "TARGET_EQUILIBRIUM_HOLD",
+      "selected_method": "baseline_control_seed_from_static_target_equilibrium_ramp_and_hold",
+      "selected_variables": [
+        "tensions_n schedule: cosine ramp 0.2 N -> [4.130153,1.813905,2.101490,3.240433] N over 0.10 s",
+        "hold target-equilibrium tensions from 0.10 s to 0.35 s"
+      ],
+      "requested_budget": 0,
+      "expected_observation": "A fresh physical replay will show the tip approaching (0.29,-0.035,0.19) with the error shrinking far below the historical 0.0342 m; if model damping is adequate the oscillating residual decays and the final-window tip speed falls toward the 0.02 m/s limit. If the approach overshoots, samples will reveal the dominant ringing period and decay, which is directly usable for a two-step damped-arrival schedule.",
+      "weakening_observation": "Terminal error stays near or above 0.01 m, or the holding-window tip speed stays well above 0.02 m/s, or the tip trajectory rings without decaying, or the tip cannot approach the target at all - any of these weakens the equilibrium-hold hypothesis and points to a dynamic (settling) or model-mismatch limitation rather than a static one.",
+      "interpretation": "This seed is an unmeasured hypothesis built from historical static evidence only; it creates no acceptance and the static tensions are treated as numerical guesses. A single physical replay will convert it into exact measured evidence.",
+      "hypothesis_status": "Interpret original expected/observed facts; no mathematical proof inferred",
+      "tool_status": "success",
+      "source_references": {
+        "request": {
+          "artifact_id": "9d00565a8edbe3dc7b5be8a49a075ab158a04c1fdee795a86c26c6e09d00fb14",
+          "media_type": "application/json"
+        },
+        "feedback": {
+          "artifact_id": "3d6b0eba9594f424460bd68dc47bbf12e4e5e7c4e3c7e8f52e6cf88ad0970d81",
+          "media_type": "application/json"
+        }
+      },
+      "original_request": {
+        "action": "initialize_control",
+        "control_seed": {
+          "candidate": {
+            "artifact_id": "15d2a97a0f7e788864f66360bc733200c393e583b300d01db27c887481667df1",
+            "media_type": "application/json"
+          },
+          "method": "baseline",
+          "tensions_n": [
+            [
+              0.2,
+              0.2,
+              0.2,
+              0.2
+            ],
+            [
+              0.296181,
+              0.239496,
+              0.246533,
+              0.274406
+            ],
+            [
+              0.575302,
+              0.354119,
+              0.381581,
+              0.490336
+            ],
+            [
+              1.01004,
+              0.532645,
+              0.591922,
+              0.826656
+            ],
+            [
+              1.557855,
+              0.757594,
+              0.856938,
+              1.250456
+            ],
+            [
+              2.165077,
+              1.006953,
+              1.150745,
+              1.720217
+            ],
+            [
+              2.772324,
+              1.256313,
+              1.444544,
+              2.189989
+            ],
+            [
+              3.320109,
+              1.4812,
+              1.709622,
+              2.613844
+            ],
+            [
+              3.754845,
+              1.66005,
+              1.91974,
+              2.950109
+            ],
+            [
+              4.034045,
+              1.774568,
+              2.054857,
+              3.16645
+            ],
+            [
+              4.130153,
+              1.813905,
+              2.10149,
+              3.240433
+            ],
+            [
+              4.130153,
+              1.813905,
+              2.10149,
+              3.240433
+            ],
+            [
+              4.130153,
+              1.813905,
+              2.10149,
+              3.240433
+            ],
+            [
+              4.130153,
+              1.813905,
+              2.10149,
+              3.240433
+            ],
+            [
+              4.130153,
+              1.813905,
+              2.10149,
+              3.240433
+            ],
+            [
+              4.130153,
+              1.813905,
+              2.10149,
+              3.240433
+            ],
+            [
+              4.130153,
+              1.813905,
+              2.10149,
+              3.240433
+            ],
+            [
+              4.130153,
+              1.813905,
+              2.10149,
+              3.240433
+            ],
+            [
+              4.130153,
+              1.813905,
+              2.10149,
+              3.240433
+            ],
+            [
+              4.130153,
+              1.813905,
+              2.10149,
+              3.240433
+            ],
+            [
+              4.130153,
+              1.813905,
+              2.10149,
+              3.240433
+            ],
+            [
+              4.130153,
+              1.813905,
+              2.10149,
+              3.240433
+            ],
+            [
+              4.130153,
+              1.813905,
+              2.10149,
+              3.240433
+            ],
+            [
+              4.130153,
+              1.813905,
+              2.10149,
+              3.240433
+            ],
+            [
+              4.130153,
+              1.813905,
+              2.10149,
+              3.240433
+            ],
+            [
+              4.130153,
+              1.813905,
+              2.10149,
+              3.240433
+            ],
+            [
+              4.130153,
+              1.813905,
+              2.10149,
+              3.240433
+            ],
+            [
+              4.130153,
+              1.813905,
+              2.10149,
+              3.240433
+            ],
+            [
+              4.130153,
+              1.813905,
+              2.10149,
+              3.240433
+            ],
+            [
+              4.130153,
+              1.813905,
+              2.10149,
+              3.240433
+            ],
+            [
+              4.130153,
+              1.813905,
+              2.10149,
+              3.240433
+            ],
+            [
+              4.130153,
+              1.813905,
+              2.10149,
+              3.240433
+            ],
+            [
+              4.130153,
+              1.813905,
+              2.10149,
+              3.240433
+            ],
+            [
+              4.130153,
+              1.813905,
+              2.10149,
+              3.240433
+            ],
+            [
+              4.130153,
+              1.813905,
+              2.10149,
+              3.240433
+            ]
+          ]
+        },
+        "decision": {
+          "claimed_inference": "empirical_search",
+          "hypothesis_id": "TARGET_EQUILIBRIUM_HOLD",
+          "requested_budget": 0,
+          "research_intent": "CONTROL_SEARCH",
+          "selected_candidate": {
+            "artifact_id": "15d2a97a0f7e788864f66360bc733200c393e583b300d01db27c887481667df1",
+            "media_type": "application/json"
+          },
+          "selected_method": "baseline_control_seed_from_static_target_equilibrium_ramp_and_hold",
+          "selected_variables": [
+            "tensions_n schedule: cosine ramp 0.2 N -> [4.130153,1.813905,2.101490,3.240433] N over 0.10 s",
+            "hold target-equilibrium tensions from 0.10 s to 0.35 s"
+          ]
+        },
+        "expected_observation": "A fresh physical replay will show the tip approaching (0.29,-0.035,0.19) with the error shrinking far below the historical 0.0342 m; if model damping is adequate the oscillating residual decays and the final-window tip speed falls toward the 0.02 m/s limit. If the approach overshoots, samples will reveal the dominant ringing period and decay, which is directly usable for a two-step damped-arrival schedule.",
+        "fixed_conditions": "Same executable candidate 15d2a97a (design core-12564696..., 2 segments, 4 tendons, route radius 0.018 m), same task identity d24aeac7 (target [0.29,-0.035,0.19], 0.35 s, 0.01 s control grid, tolerance 0.01 m, holding window 0.05 s, speed limit 0.02 m/s), 35x4 zero-order-hold tension grid, pretension 0.2 N at t=0, unchanged evaluator thresholds.",
+        "hypothesis": "TARGET_EQUILIBRIUM_HOLD: the historical static construction for this identical design (candidate_id core-12564696..., artifact 3573c3b2) shows a static equilibrium with the tip at the task target (residual 1.2e-8 m) at tensions [4.130153, 1.813905, 2.101490, 3.240433] N. The previous best open-loop schedule (62ddc238) ended 1.6 N away from that on tendon_1 with terminal error 0.0342 m. If this schedule drives the four tensions smoothly from the 0.2 N pretension to that static target-equilibrium vector within 0.10 s and holds it to 0.35 s, the tip should settle onto the target and the residual tip speed should decay below 0.02 m/s.",
+        "interpretation": "This seed is an unmeasured hypothesis built from historical static evidence only; it creates no acceptance and the static tensions are treated as numerical guesses. A single physical replay will convert it into exact measured evidence.",
+        "stopping_condition": "Stop this initialization step once a source schedule artifact exists; it is unmeasured until an independent physical replay is run.",
+        "supporting_evidence": [
+          {
+            "artifact_id": "3573c3b24e533bda8ee635e7f652d265390814b56790820ae335905e2a4f01bd",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "62ddc2387077c5b49440d16208cd83d07d9108187e3e94df00043e4bfdb9557d",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "15d2a97a0f7e788864f66360bc733200c393e583b300d01db27c887481667df1",
+            "media_type": "application/json"
+          }
+        ],
+        "weakening_observation": "Terminal error stays near or above 0.01 m, or the holding-window tip speed stays well above 0.02 m/s, or the tip trajectory rings without decaying, or the tip cannot approach the target at all - any of these weakens the equilibrium-hold hypothesis and points to a dynamic (settling) or model-mismatch limitation rather than a static one."
+      },
+      "observed_feedback": {
+        "wrapper_reference": {
+          "artifact_id": "86f441f41ec170f83200f1c4b02304629ac303475c1b786724c22978e60c296f",
+          "media_type": "application/json"
+        },
+        "wrapper_role": "Retrieval only; not supporting_evidence",
+        "scientific_reference": null,
+        "new_facts": {
+          "reference": {
+            "artifact_id": "86f441f41ec170f83200f1c4b02304629ac303475c1b786724c22978e60c296f",
+            "media_type": "application/json"
+          },
+          "pointer": "",
+          "view": "deterministic_summary",
+          "available_keys": [
+            "candidate",
+            "source",
+            "task_acceptance"
+          ],
+          "summary": {},
+          "retrieval": "Display value/summary/preview are not Store path prefixes. All read_pointer values are absolute paths in reference. Use evidence_read(view=full,pointer=...). No acceptance transfer.",
+          "value": {
+            "candidate": {
+              "artifact_id": "15d2a97a0f7e788864f66360bc733200c393e583b300d01db27c887481667df1",
+              "media_type": "application/json"
+            },
+            "source": {
+              "artifact_id": "4a7879ebfde39a634f9446facb1f000c27ef3a2ac47fb10569db2b8699fcf153",
+              "media_type": "application/json"
+            },
+            "task_acceptance": "unmeasured"
+          }
+        }
+      },
+      "complete_output_reference": {
+        "artifact_id": "86f441f41ec170f83200f1c4b02304629ac303475c1b786724c22978e60c296f",
+        "media_type": "application/json"
+      },
+      "observed_result": {
+        "candidate": {
+          "artifact_id": "15d2a97a0f7e788864f66360bc733200c393e583b300d01db27c887481667df1",
+          "media_type": "application/json"
+        },
+        "source": {
+          "artifact_id": "4a7879ebfde39a634f9446facb1f000c27ef3a2ac47fb10569db2b8699fcf153",
+          "media_type": "application/json"
+        },
+        "task_acceptance": "unmeasured"
+      },
+      "next_decision": {
+        "index": 2,
+        "action": "physical_replay",
+        "request": {
+          "artifact_id": "e8f46f94d761b8994f558a995deabc9df4b940b852e8b9804c357c5af4eb7e13",
+          "media_type": "application/json"
+        }
+      }
+    },
+    {
+      "decision_index": 2,
+      "sequence": 307,
+      "tool": "research_plan",
+      "action": "physical_replay",
+      "evidence_before": {
+        "packet_reference": {
+          "artifact_id": "078cd24b14190af2add60582b938f13cf6277c07e03c1142e7580e6ff4c3cb46",
+          "media_type": "application/json"
+        },
+        "supporting_evidence": [
+          {
+            "artifact_id": "3573c3b24e533bda8ee635e7f652d265390814b56790820ae335905e2a4f01bd",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "4a7879ebfde39a634f9446facb1f000c27ef3a2ac47fb10569db2b8699fcf153",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "62ddc2387077c5b49440d16208cd83d07d9108187e3e94df00043e4bfdb9557d",
+            "media_type": "application/json"
+          }
+        ]
+      },
+      "hypothesis": "TARGET_EQUILIBRIUM_HOLD: driving the four tendon tensions from the 0.2 N pretension to the historical static target-equilibrium vector [4.130153, 1.813905, 2.101490, 3.240433] N over 0.10 s and holding it to 0.35 s will place the tip near the task target, because that static solve achieved the target point to 1.2e-8 m on this identical design. The remaining question is purely dynamic: whether the tip velocity decays below 0.02 m/s in the final 0.05 s window.",
+      "hypothesis_id": "TARGET_EQUILIBRIUM_HOLD",
+      "selected_method": "exact_physical_replay_of_equilibrium_hold_schedule",
+      "selected_variables": [
+        "fixed 35x4 tension schedule from source 4a7879eb"
+      ],
+      "requested_budget": 1,
+      "expected_observation": "Terminal error much smaller than the historical 0.0342 m; the sampled tip trajectory should approach [0.29,-0.035,0.19] and either settle (holding speed toward/below 0.02 m/s) or ring with a measurable period and decay envelope that I can read from the samples.",
+      "weakening_observation": "Terminal error remains near or above 0.01 m, or the final-window tip speed stays far above 0.02 m/s, or the tip moves away from the target / rings without decay. That would show the static-equilibrium tensions do not transfer dynamically to this backend and that the blocker is settling, model mismatch or input authority rather than the equilibrium value.",
+      "interpretation": "This is a fresh exact measurement of an unmeasured hypothesis schedule, not a transfer of historical acceptance. It separates the static part (equilibrium tensions known to reach the target) from the dynamic part (arrival and settling), and any failure must be attributed only to sampled conditions of this run.",
+      "hypothesis_status": "Interpret original expected/observed facts; no mathematical proof inferred",
+      "tool_status": "success",
+      "source_references": {
+        "request": {
+          "artifact_id": "e8f46f94d761b8994f558a995deabc9df4b940b852e8b9804c357c5af4eb7e13",
+          "media_type": "application/json"
+        },
+        "feedback": {
+          "artifact_id": "1c907b339daeec0ff11a21bd39ea66ec1613dd47f8d662d03dcdaf41a57d6c31",
+          "media_type": "application/json"
+        }
+      },
+      "original_request": {
+        "action": "physical_replay",
+        "decision": {
+          "claimed_inference": "empirical_search",
+          "hypothesis_id": "TARGET_EQUILIBRIUM_HOLD",
+          "requested_budget": 1,
+          "research_intent": "PHYSICAL_VALIDATION",
+          "selected_candidate": {
+            "artifact_id": "15d2a97a0f7e788864f66360bc733200c393e583b300d01db27c887481667df1",
+            "media_type": "application/json"
+          },
+          "selected_method": "exact_physical_replay_of_equilibrium_hold_schedule",
+          "selected_variables": [
+            "fixed 35x4 tension schedule from source 4a7879eb"
+          ]
+        },
+        "expected_observation": "Terminal error much smaller than the historical 0.0342 m; the sampled tip trajectory should approach [0.29,-0.035,0.19] and either settle (holding speed toward/below 0.02 m/s) or ring with a measurable period and decay envelope that I can read from the samples.",
+        "fixed_conditions": "Executable candidate 15d2a97a unchanged; task d24aeac7 unchanged (target [0.29,-0.035,0.19], 0.35 s, 0.01 s control grid, 0.05 s holding window, 0.01 m and 0.02 m/s limits); source 4a7879eb schedule exactly as initialized (35x4 tensions, zero-order hold); no evaluator threshold changes.",
+        "hypothesis": "TARGET_EQUILIBRIUM_HOLD: driving the four tendon tensions from the 0.2 N pretension to the historical static target-equilibrium vector [4.130153, 1.813905, 2.101490, 3.240433] N over 0.10 s and holding it to 0.35 s will place the tip near the task target, because that static solve achieved the target point to 1.2e-8 m on this identical design. The remaining question is purely dynamic: whether the tip velocity decays below 0.02 m/s in the final 0.05 s window.",
+        "interpretation": "This is a fresh exact measurement of an unmeasured hypothesis schedule, not a transfer of historical acceptance. It separates the static part (equilibrium tensions known to reach the target) from the dynamic part (arrival and settling), and any failure must be attributed only to sampled conditions of this run.",
+        "physical_replay": {
+          "candidate": {
+            "artifact_id": "15d2a97a0f7e788864f66360bc733200c393e583b300d01db27c887481667df1",
+            "media_type": "application/json"
+          },
+          "source": {
+            "artifact_id": "4a7879ebfde39a634f9446facb1f000c27ef3a2ac47fb10569db2b8699fcf153",
+            "media_type": "application/json"
+          }
+        },
+        "stopping_condition": "One complete 0.35 s replay with its exact terminal error, holding position error and holding speed; stop this step immediately after that measurement is returned and interpret the trajectory samples.",
+        "supporting_evidence": [
+          {
+            "artifact_id": "3573c3b24e533bda8ee635e7f652d265390814b56790820ae335905e2a4f01bd",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "4a7879ebfde39a634f9446facb1f000c27ef3a2ac47fb10569db2b8699fcf153",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "62ddc2387077c5b49440d16208cd83d07d9108187e3e94df00043e4bfdb9557d",
+            "media_type": "application/json"
+          }
+        ],
+        "weakening_observation": "Terminal error remains near or above 0.01 m, or the final-window tip speed stays far above 0.02 m/s, or the tip moves away from the target / rings without decay. That would show the static-equilibrium tensions do not transfer dynamically to this backend and that the blocker is settling, model mismatch or input authority rather than the equilibrium value."
+      },
+      "observed_feedback": {
+        "wrapper_reference": {
+          "artifact_id": "632b8ecfd92218f2b805895c0bd53f9698bfc40e91b2718cbf65ca7fd298de40",
+          "media_type": "application/json"
+        },
+        "wrapper_role": "Retrieval only; not supporting_evidence",
+        "scientific_reference": {
+          "artifact_id": "289592aeb8f31ee4dd620b3aa8ad9cbe21612752d1d1cef2e6810e77eff61d5d",
+          "media_type": "application/json"
+        },
+        "new_facts": {
+          "reference": {
+            "artifact_id": "289592aeb8f31ee4dd620b3aa8ad9cbe21612752d1d1cef2e6810e77eff61d5d",
+            "media_type": "application/json"
+          },
+          "pointer": "",
+          "view": "deterministic_summary",
+          "available_keys": [
+            "acceptance",
+            "boundary",
+            "candidate",
+            "charged_numerical_s",
+            "comparison",
+            "evaluation_reference",
+            "execution_id",
+            "implementation",
+            "log_reference",
+            "mathematical_reintegrations",
+            "nmpc_updates",
+            "owning_study",
+            "physical_launches",
+            "profile",
+            "raw_reference",
+            "rl_actions",
+            "source_reference",
+            "status"
+          ],
+          "summary": {
+            "task_gap": {
+              "normalized_gap": 33.19193393632103,
+              "components": {
+                "evaluator:task_bound": 6.402178904506207,
+                "holding_position": 9.46610916717695,
+                "holding_speed": 33.19193393632103
+              },
+              "valid_complete": true,
+              "accepted": false,
+              "interpretation": "Research ranking only; invalid executions remain invalid regardless of gap"
+            },
+            "constraints": {
+              "evaluation_validity": {
+                "limit": null,
+                "passed": true,
+                "reason": null,
+                "unit": null,
+                "value": "valid"
+              },
+              "evaluator:task_bound": {
+                "limit": 0.01,
+                "passed": false,
+                "reason": null,
+                "unit": "m",
+                "value": 0.07402178904506207
+              },
+              "execution_complete": {
+                "limit": null,
+                "passed": true,
+                "reason": null,
+                "unit": null,
+                "value": true
+              },
+              "force_bounds": {
+                "limit": 1e-08,
+                "passed": true,
+                "reason": null,
+                "unit": "N",
+                "value": 0.0
+              },
+              "holding_coverage": {
+                "limit": 6,
+                "passed": true,
+                "reason": null,
+                "unit": "inclusive uniform samples",
+                "value": true
+              },
+              "holding_position": {
+                "limit": 0.01,
+                "passed": false,
+                "reason": null,
+                "unit": "m",
+                "value": 0.10466109167176951
+              },
+              "holding_speed": {
+                "limit": 0.02,
+                "passed": false,
+                "reason": null,
+                "unit": "m/s",
+                "value": 0.6838386787264206
+              },
+              "solver_errors": {
+                "limit": 0,
+                "passed": true,
+                "reason": null,
+                "unit": "count",
+                "value": 0
+              },
+              "task_evaluator": {
+                "limit": null,
+                "passed": false,
+                "reason": null,
+                "unit": null,
+                "value": false
+              }
+            },
+            "limitations": [
+              "Only this recorded execution establishes its task outcome"
+            ]
+          },
+          "retrieval": "Display value/summary/preview are not Store path prefixes. All read_pointer values are absolute paths in reference. Use evidence_read(view=full,pointer=...). No acceptance transfer.",
+          "value": {
+            "read_pointer": "",
+            "available_keys": [
+              "acceptance",
+              "boundary",
+              "candidate",
+              "charged_numerical_s",
+              "comparison",
+              "evaluation_reference",
+              "execution_id",
+              "implementation",
+              "log_reference",
+              "mathematical_reintegrations",
+              "nmpc_updates",
+              "owning_study",
+              "physical_launches",
+              "profile",
+              "raw_reference",
+              "rl_actions",
+              "source_reference",
+              "status"
+            ]
+          }
+        }
+      },
+      "complete_output_reference": {
+        "artifact_id": "632b8ecfd92218f2b805895c0bd53f9698bfc40e91b2718cbf65ca7fd298de40",
+        "media_type": "application/json"
+      },
+      "observed_result": {
+        "acceptance": {
+          "accepted": false,
+          "components": {
+            "evaluation_validity": {
+              "limit": null,
+              "passed": true,
+              "reason": null,
+              "unit": null,
+              "value": "valid"
+            },
+            "evaluator:task_bound": {
+              "limit": 0.01,
+              "passed": false,
+              "reason": null,
+              "unit": "m",
+              "value": 0.07402178904506207
+            },
+            "execution_complete": {
+              "limit": null,
+              "passed": true,
+              "reason": null,
+              "unit": null,
+              "value": true
+            },
+            "force_bounds": {
+              "limit": 1e-08,
+              "passed": true,
+              "reason": null,
+              "unit": "N",
+              "value": 0.0
+            },
+            "holding_coverage": {
+              "limit": 6,
+              "passed": true,
+              "reason": null,
+              "unit": "inclusive uniform samples",
+              "value": true
+            },
+            "holding_position": {
+              "limit": 0.01,
+              "passed": false,
+              "reason": null,
+              "unit": "m",
+              "value": 0.10466109167176951
+            },
+            "holding_speed": {
+              "limit": 0.02,
+              "passed": false,
+              "reason": null,
+              "unit": "m/s",
+              "value": 0.6838386787264206
+            },
+            "solver_errors": {
+              "limit": 0,
+              "passed": true,
+              "reason": null,
+              "unit": "count",
+              "value": 0
+            },
+            "task_evaluator": {
+              "limit": null,
+              "passed": false,
+              "reason": null,
+              "unit": null,
+              "value": false
+            }
+          },
+          "continuous_time_guarantee": false,
+          "contract": "research.task_acceptance",
+          "evaluator_tension_channels": null,
+          "evidence_binding": {
+            "evaluation": {
+              "artifact_id": "b2529557c79d6933e33ee25094d3c84af50351ca590fa2f5afba74e7a618554e",
+              "media_type": "application/json"
+            },
+            "evaluation_binding": {
+              "original_execution_id": null,
+              "source": {
+                "artifact_id": "06fc9d6bcb3dbd5ed6fec8211c3cf3f1b6519c2a0600ac5b023504a4e29174b0",
+                "media_type": "application/json"
+              },
+              "source_execution_id": null
+            },
+            "profile": null,
+            "profile_binding": {
+              "evaluation": {
+                "artifact_id": "b2529557c79d6933e33ee25094d3c84af50351ca590fa2f5afba74e7a618554e",
+                "media_type": "application/json"
+              },
+              "execution_id": "44f90ddf8b4c4549867917d5d15c6c0f",
+              "simulation": {
+                "artifact_id": "06fc9d6bcb3dbd5ed6fec8211c3cf3f1b6519c2a0600ac5b023504a4e29174b0",
+                "media_type": "application/json"
+              }
+            },
+            "simulation": {
+              "artifact_id": "06fc9d6bcb3dbd5ed6fec8211c3cf3f1b6519c2a0600ac5b023504a4e29174b0",
+              "media_type": "application/json"
+            }
+          },
+          "execution_id": "44f90ddf8b4c4549867917d5d15c6c0f",
+          "issues": [],
+          "metrics": {
+            "holding_max_error_m": 0.10466109167176951,
+            "holding_max_speed_m_s": 0.6838386787264206,
+            "terminal_error_m": 0.07402178904506207
+          },
+          "missing": [],
+          "protocol_id": "offline_reach_hold_v1",
+          "sources": {
+            "evaluation": {
+              "artifact_id": "b2529557c79d6933e33ee25094d3c84af50351ca590fa2f5afba74e7a618554e",
+              "media_type": "application/json"
+            },
+            "profile": null
+          },
+          "status": "valid_failure",
+          "task_family": "task.reach",
+          "task_identity": "bd9df2d930423f2b2a12152f076e2ae88b4d1a0af84d6126aa13b0b1fac9ec77",
+          "timing": {
+            "control_period_s": 0.01,
+            "deadline_misses": null,
+            "duration_s": 0.35,
+            "mean_update_s": null,
+            "real_time_demonstrated": null,
+            "real_time_required": false,
+            "sample_period_s": 0.01,
+            "simulation_wall_s": null,
+            "termination": [
+              "duration",
+              "numerical_failure"
+            ],
+            "timestep_s": 0.0005
+          },
+          "version": "1.0.0"
+        },
+        "boundary": {
+          "elapsed_s": 1.1041937998961657,
+          "returncode": 0,
+          "termination_confirmed": true
+        },
+        "candidate": {
+          "artifact_id": "15d2a97a0f7e788864f66360bc733200c393e583b300d01db27c887481667df1",
+          "media_type": "application/json"
+        },
+        "charged_numerical_s": 1.1041937998961657,
+        "comparison": {
+          "aligned": false,
+          "available_samples": 0,
+          "initial_position_offset_m": null,
+          "max_position_difference_m": null,
+          "max_velocity_difference_m_s": null,
+          "samples": []
+        },
+        "evaluation_reference": {
+          "artifact_id": "b2529557c79d6933e33ee25094d3c84af50351ca590fa2f5afba74e7a618554e",
+          "media_type": "application/json"
+        },
+        "execution_id": "native-call_00_GAGcC9HwnIKOGaYz5tRV8610-physical",
+        "implementation": "6f6f3a52a287de431b80f4969a01750b7ecad791",
+        "log_reference": {
+          "artifact_id": "53b713d459391a29c468ed56534152d9d3d4f2152f907a5c59901a3751430a2b",
+          "media_type": "application/json"
+        },
+        "mathematical_reintegrations": 0,
+        "nmpc_updates": 0,
+        "owning_study": "s11-mirror-live-20261020",
+        "physical_launches": 1,
+        "profile": {
+          "complete": true,
+          "evaluation": {
+            "artifact_id": "b2529557c79d6933e33ee25094d3c84af50351ca590fa2f5afba74e7a618554e",
+            "media_type": "application/json"
+          },
+          "execution_id": "44f90ddf8b4c4549867917d5d15c6c0f",
+          "force_bound_violation_n": 0.0,
+          "official_task_success": false,
+          "sampled_settling": {
+            "available": true,
+            "max_error_m": 0.10466109167176951,
+            "max_speed_m_s": 0.6838386787264206,
+            "passed": false,
+            "position_limit_m": 0.01,
+            "speed_limit_m_s": 0.02,
+            "window_s": 0.05
+          },
+          "simulation": {
+            "artifact_id": "06fc9d6bcb3dbd5ed6fec8211c3cf3f1b6519c2a0600ac5b023504a4e29174b0",
+            "media_type": "application/json"
+          },
+          "solver_error_count": 0,
+          "task": {
+            "actuator_channels": [
+              "actuator_commands"
+            ],
+            "contract_version": "1.0.0",
+            "environment": {
+              "contract": "experiment.assembly",
+              "data": {
+                "environment": {
+                  "coordinate_frame": "world_base_x_forward_yz_cross_section",
+                  "environment_id": "reach_free",
+                  "gravity_m_s2": [
+                    0.0,
+                    0.0,
+                    -9.81
+                  ],
+                  "gravity_source": "main@245a785 reach_free environment; Human-owned benchmark gravity",
+                  "lights": [
+                    {
+                      "direction": [
+                        0.0,
+                        0.0,
+                        -1.0
+                      ],
+                      "position_m": [
+                        0.0,
+                        0.0,
+                        2.0
+                      ]
+                    }
+                  ],
+                  "objects": [
+                    {
+                      "conaffinity": 1,
+                      "contype": 0,
+                      "half_size_m": [
+                        2.0,
+                        2.0,
+                        0.1
+                      ],
+                      "kind": "plane",
+                      "name": "floor",
+                      "position_m": [
+                        0.0,
+                        0.0,
+                        -0.02
+                      ]
+                    }
+                  ],
+                  "schema_version": "1",
+                  "truth_status": "HUMAN_OWNED",
+                  "units": "SI"
+                },
+                "external_forces": [],
+                "floor_id": "floor",
+                "mount": {
+                  "position_m": [
+                    0.0,
+                    0.0,
+                    0.15
+                  ],
+                  "quaternion_wxyz": [
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0
+                  ]
+                }
+              },
+              "version": "1.0.0"
+            },
+            "evaluator": {
+              "extension_id": "evaluate.reach",
+              "parameters": {
+                "contract": "reference.reach_evaluation",
+                "data": {
+                  "tolerance_m": 0.01
+                },
+                "version": "1.0.0"
+              },
+              "version": "1.0.0"
+            },
+            "failure_policy": "retain_invalid_and_constraint_failures",
+            "family": "task.reach",
+            "goal": {
+              "contract": "reference.reach_goal",
+              "data": {
+                "target_m": [
+                  0.29,
+                  -0.035,
+                  0.19
+                ]
+              },
+              "version": "1.0.0"
+            },
+            "initializer": {
+              "extension_id": "initialize.family",
+              "parameters": {
+                "contract": "family.initial",
+                "data": {
+                  "qpos_rad": {
+                    "segment_0_cell_0_y": 0.0,
+                    "segment_0_cell_0_z": 0.0,
+                    "segment_0_cell_10_y": 0.0,
+                    "segment_0_cell_10_z": 0.0,
+                    "segment_0_cell_11_y": 0.0,
+                    "segment_0_cell_11_z": 0.0,
+                    "segment_0_cell_1_y": 0.0,
+                    "segment_0_cell_1_z": 0.0,
+                    "segment_0_cell_2_y": 0.0,
+                    "segment_0_cell_2_z": 0.0,
+                    "segment_0_cell_3_y": 0.0,
+                    "segment_0_cell_3_z": 0.0,
+                    "segment_0_cell_4_y": 0.0,
+                    "segment_0_cell_4_z": 0.0,
+                    "segment_0_cell_5_y": 0.0,
+                    "segment_0_cell_5_z": 0.0,
+                    "segment_0_cell_6_y": 0.0,
+                    "segment_0_cell_6_z": 0.0,
+                    "segment_0_cell_7_y": 0.0,
+                    "segment_0_cell_7_z": 0.0,
+                    "segment_0_cell_8_y": 0.0,
+                    "segment_0_cell_8_z": 0.0,
+                    "segment_0_cell_9_y": 0.0,
+                    "segment_0_cell_9_z": 0.0,
+                    "segment_1_cell_0_y": 0.0,
+                    "segment_1_cell_0_z": 0.0,
+                    "segment_1_cell_10_y": 0.0,
+                    "segment_1_cell_10_z": 0.0,
+                    "segment_1_cell_11_y": 0.0,
+                    "segment_1_cell_11_z": 0.0,
+                    "segment_1_cell_1_y": 0.0,
+                    "segment_1_cell_1_z": 0.0,
+                    "segment_1_cell_2_y": 0.0,
+                    "segment_1_cell_2_z": 0.0,
+                    "segment_1_cell_3_y": 0.0,
+                    "segment_1_cell_3_z": 0.0,
+                    "segment_1_cell_4_y": 0.0,
+                    "segment_1_cell_4_z": 0.0,
+                    "segment_1_cell_5_y": 0.0,
+                    "segment_1_cell_5_z": 0.0,
+                    "segment_1_cell_6_y": 0.0,
+                    "segment_1_cell_6_z": 0.0,
+                    "segment_1_cell_7_y": 0.0,
+                    "segment_1_cell_7_z": 0.0,
+                    "segment_1_cell_8_y": 0.0,
+                    "segment_1_cell_8_z": 0.0,
+                    "segment_1_cell_9_y": 0.0,
+                    "segment_1_cell_9_z": 0.0
+                  },
+                  "qvel_rad_s": {
+                    "segment_0_cell_0_y": 0.0,
+                    "segment_0_cell_0_z": 0.0,
+                    "segment_0_cell_10_y": 0.0,
+                    "segment_0_cell_10_z": 0.0,
+                    "segment_0_cell_11_y": 0.0,
+                    "segment_0_cell_11_z": 0.0,
+                    "segment_0_cell_1_y": 0.0,
+                    "segment_0_cell_1_z": 0.0,
+                    "segment_0_cell_2_y": 0.0,
+                    "segment_0_cell_2_z": 0.0,
+                    "segment_0_cell_3_y": 0.0,
+                    "segment_0_cell_3_z": 0.0,
+                    "segment_0_cell_4_y": 0.0,
+                    "segment_0_cell_4_z": 0.0,
+                    "segment_0_cell_5_y": 0.0,
+                    "segment_0_cell_5_z": 0.0,
+                    "segment_0_cell_6_y": 0.0,
+                    "segment_0_cell_6_z": 0.0,
+                    "segment_0_cell_7_y": 0.0,
+                    "segment_0_cell_7_z": 0.0,
+                    "segment_0_cell_8_y": 0.0,
+                    "segment_0_cell_8_z": 0.0,
+                    "segment_0_cell_9_y": 0.0,
+                    "segment_0_cell_9_z": 0.0,
+                    "segment_1_cell_0_y": 0.0,
+                    "segment_1_cell_0_z": 0.0,
+                    "segment_1_cell_10_y": 0.0,
+                    "segment_1_cell_10_z": 0.0,
+                    "segment_1_cell_11_y": 0.0,
+                    "segment_1_cell_11_z": 0.0,
+                    "segment_1_cell_1_y": 0.0,
+                    "segment_1_cell_1_z": 0.0,
+                    "segment_1_cell_2_y": 0.0,
+                    "segment_1_cell_2_z": 0.0,
+                    "segment_1_cell_3_y": 0.0,
+                    "segment_1_cell_3_z": 0.0,
+                    "segment_1_cell_4_y": 0.0,
+                    "segment_1_cell_4_z": 0.0,
+                    "segment_1_cell_5_y": 0.0,
+                    "segment_1_cell_5_z": 0.0,
+                    "segment_1_cell_6_y": 0.0,
+                    "segment_1_cell_6_z": 0.0,
+                    "segment_1_cell_7_y": 0.0,
+                    "segment_1_cell_7_z": 0.0,
+                    "segment_1_cell_8_y": 0.0,
+                    "segment_1_cell_8_z": 0.0,
+                    "segment_1_cell_9_y": 0.0,
+                    "segment_1_cell_9_z": 0.0
+                  },
+                  "unspecified": "zero"
+                },
+                "version": "1.0.0"
+              },
+              "version": "1.0.0"
+            },
+            "name": "New negative-y reach-and-hold feasibility study",
+            "objectives": [
+              {
+                "direction": "minimize",
+                "metric": "position_error",
+                "units": "m",
+                "weight": 1.0
+              }
+            ],
+            "observations": [
+              {
+                "dimension": 3,
+                "entity": "tip",
+                "frame": "world",
+                "missing": "unsupported",
+                "name": "tip_position",
+                "phase": "post_step",
+                "units": "m"
+              }
+            ],
+            "robot_families": [
+              "tendon_robot_family"
+            ],
+            "sampling": {
+              "aggregation": "per_instance",
+              "seeds": [
+                17
+              ],
+              "split": "development",
+              "window_s": [
+                0.0,
+                0.35
+              ]
+            },
+            "source": "User-authorized M3-B first-feasible scope b555900c; target frozen before its physical outcomes. Reuses reach_hold.json evaluator, initializer, timing, holding and sampling unchanged.",
+            "status": "development_valid",
+            "task_id": "family-multisegment-mirror-dev",
+            "task_version": "1.0.0",
+            "timing": {
+              "control_period_s": 0.01,
+              "duration_s": 0.35,
+              "sample_period_s": 0.01,
+              "termination": [
+                "duration",
+                "numerical_failure"
+              ],
+              "timestep_s": 0.0005
+            }
+          }
+        },
+        "raw_reference": {
+          "artifact_id": "06fc9d6bcb3dbd5ed6fec8211c3cf3f1b6519c2a0600ac5b023504a4e29174b0",
+          "media_type": "application/json"
+        },
+        "reference": {
+          "artifact_id": "289592aeb8f31ee4dd620b3aa8ad9cbe21612752d1d1cef2e6810e77eff61d5d",
+          "media_type": "application/json"
+        },
+        "rl_actions": 0,
+        "source_reference": {
+          "artifact_id": "4a7879ebfde39a634f9446facb1f000c27ef3a2ac47fb10569db2b8699fcf153",
+          "media_type": "application/json"
+        },
+        "status": "evaluated"
+      },
+      "next_decision": {
+        "index": 3,
+        "action": "mechanics",
+        "request": {
+          "artifact_id": "e060326e6388584af2b9097d8e76b18ad3efd8e2035c92495f6835f56b48ca8f",
+          "media_type": "application/json"
+        }
+      }
+    },
+    {
+      "decision_index": 3,
+      "sequence": 432,
+      "tool": "research_plan",
+      "action": "mechanics",
+      "evidence_before": {
+        "packet_reference": {
+          "artifact_id": "e852037698f4f2741ec231ddec6f8f523c14347325db86370cd1dbd1833d5d86",
+          "media_type": "application/json"
+        },
+        "supporting_evidence": [
+          {
+            "artifact_id": "06fc9d6bcb3dbd5ed6fec8211c3cf3f1b6519c2a0600ac5b023504a4e29174b0",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "289592aeb8f31ee4dd620b3aa8ad9cbe21612752d1d1cef2e6810e77eff61d5d",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "62ddc2387077c5b49440d16208cd83d07d9108187e3e94df00043e4bfdb9557d",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "3573c3b24e533bda8ee635e7f652d265390814b56790820ae335905e2a4f01bd",
+            "media_type": "application/json"
+          }
+        ]
+      },
+      "hypothesis": "SWING_AND_STOP_OPTIMAL_CONTROL: the measured equilibrium-hold replay proves the target is dynamically reachable only through a timed swing - the tip dips to z=0.059 m at 0.21 s and is still rising at 0.68 m/s at 0.35 s. The best known schedule (62ddc238) already gets within 0.034 m with 0.068 m/s at the end, so it sits in a usable basin. A constrained trajectory optimization (minimise effort subject to the true endpoint and holding-speed bounds) warm-started from that schedule should find an input sequence that arrives at the target with near-zero tip velocity inside the final 0.05 s window.",
+      "hypothesis_id": "SWING_AND_STOP_OPTIMAL_CONTROL",
+      "selected_method": "offline_nlp_task_feasible_effort_warm_started",
+      "selected_variables": [
+        "35x4 open-loop tendon tension sequence",
+        "terminal tip position constraint 0.01 m",
+        "terminal/holding tip speed constraint 0.02 m/s"
+      ],
+      "requested_budget": 1,
+      "expected_observation": "The offline NLP returns an input sequence whose predicted terminal tip error and final-window tip speed both satisfy the original bounds (<=0.01 m, <=0.02 m/s) or at least cut the current violations substantially, and whose schedule I can then replay exactly on the sealed MuJoCo evaluator.",
+      "weakening_observation": "The NLP reports no feasible solution, fails to converge within 120 iterations, returns no improved input sequence, or its predicted terminal error/speed still violate the original bounds by a wide margin. Any of these weakens the swing-and-stop-optimization hypothesis and indicates solver, initialisation or model-mismatch limitations rather than impossibility.",
+      "interpretation": "Any NLP output is a model-level prediction and carries no task acceptance; it must be replayed on the sealed physical evaluator before any claim. A failure of the NLP is a bounded solver/initialisation result, not evidence that the task is infeasible.",
+      "hypothesis_status": "Interpret original expected/observed facts; no mathematical proof inferred",
+      "tool_status": "error",
+      "source_references": {
+        "request": {
+          "artifact_id": "e060326e6388584af2b9097d8e76b18ad3efd8e2035c92495f6835f56b48ca8f",
+          "media_type": "application/json"
+        },
+        "feedback": {
+          "artifact_id": "08714568e675a867c259c7623ffe739d838fd03c92ec3d37cfbc47f00e822876",
+          "media_type": "application/json"
+        }
+      },
+      "original_request": {
+        "action": "mechanics",
+        "decision": {
+          "claimed_inference": "empirical_search",
+          "hypothesis_id": "SWING_AND_STOP_OPTIMAL_CONTROL",
+          "requested_budget": 1,
+          "research_intent": "MATHEMATICAL_ANALYSIS",
+          "selected_candidate": {
+            "artifact_id": "15d2a97a0f7e788864f66360bc733200c393e583b300d01db27c887481667df1",
+            "media_type": "application/json"
+          },
+          "selected_method": "offline_nlp_task_feasible_effort_warm_started",
+          "selected_variables": [
+            "35x4 open-loop tendon tension sequence",
+            "terminal tip position constraint 0.01 m",
+            "terminal/holding tip speed constraint 0.02 m/s"
+          ]
+        },
+        "expected_observation": "The offline NLP returns an input sequence whose predicted terminal tip error and final-window tip speed both satisfy the original bounds (<=0.01 m, <=0.02 m/s) or at least cut the current violations substantially, and whose schedule I can then replay exactly on the sealed MuJoCo evaluator.",
+        "fixed_conditions": "Same executable candidate 15d2a97a, same task d24aeac7 (target [0.29,-0.035,0.19], 0.35 s, 0.01 s grid, 0.05 s holding window, 0.01 m / 0.02 m/s limits), same 4-tendon order, unchanged evaluator thresholds; warm start from the best known schedule 62ddc238 without altering its artifact.",
+        "hypothesis": "SWING_AND_STOP_OPTIMAL_CONTROL: the measured equilibrium-hold replay proves the target is dynamically reachable only through a timed swing - the tip dips to z=0.059 m at 0.21 s and is still rising at 0.68 m/s at 0.35 s. The best known schedule (62ddc238) already gets within 0.034 m with 0.068 m/s at the end, so it sits in a usable basin. A constrained trajectory optimization (minimise effort subject to the true endpoint and holding-speed bounds) warm-started from that schedule should find an input sequence that arrives at the target with near-zero tip velocity inside the final 0.05 s window.",
+        "interpenetration_note": "not used",
+        "interpretation": "Any NLP output is a model-level prediction and carries no task acceptance; it must be replayed on the sealed physical evaluator before any claim. A failure of the NLP is a bounded solver/initialisation result, not evidence that the task is infeasible.",
+        "mechanics": {
+          "candidate": {
+            "artifact_id": "15d2a97a0f7e788864f66360bc733200c393e583b300d01db27c887481667df1",
+            "media_type": "application/json"
+          },
+          "check_only": false,
+          "initialization": "saved_candidate_controls",
+          "max_iterations": 120,
+          "objective_mode": "task_feasible_effort",
+          "position_weight": 1.0,
+          "secondary_coefficient": 0.001,
+          "speed_weight": 1.0,
+          "substeps": 1,
+          "warm_source": {
+            "artifact_id": "62ddc2387077c5b49440d16208cd83d07d9108187e3e94df00043e4bfdb9557d",
+            "media_type": "application/json"
+          }
+        },
+        "stopping_condition": "Stop after one offline NLP analysis is returned; read its exact facts (predicted endpoint and speed residuals, convergence) and immediately either replay the resulting sequence physically or move to a different method if it did not produce a better sequence.",
+        "supporting_evidence": [
+          {
+            "artifact_id": "06fc9d6bcb3dbd5ed6fec8211c3cf3f1b6519c2a0600ac5b023504a4e29174b0",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "289592aeb8f31ee4dd620b3aa8ad9cbe21612752d1d1cef2e6810e77eff61d5d",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "62ddc2387077c5b49440d16208cd83d07d9108187e3e94df00043e4bfdb9557d",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "3573c3b24e533bda8ee635e7f652d265390814b56790820ae335905e2a4f01bd",
+            "media_type": "application/json"
+          }
+        ],
+        "weakening_observation": "The NLP reports no feasible solution, fails to converge within 120 iterations, returns no improved input sequence, or its predicted terminal error/speed still violate the original bounds by a wide margin. Any of these weakens the swing-and-stop-optimization hypothesis and indicates solver, initialisation or model-mismatch limitations rather than impossibility."
+      },
+      "observed_feedback": {
+        "status": "rejected",
+        "error_code": "extra_forbidden",
+        "field": "interpenetration_note",
+        "expected": "Extra inputs are not permitted",
+        "scientific_execution_started": false,
+        "relevant_references": [],
+        "full_error_reference": {
+          "artifact_id": "c72a084e63134e54db813ed93646719bd6e320b39bd2f1d85cedb479b4f368f8",
+          "media_type": "application/json"
+        }
+      },
+      "next_decision": {
+        "index": 4,
+        "action": "mechanics",
+        "request": {
+          "artifact_id": "a9009b570e97bf87b4890ffc765ff115aa9e48af77b9637ba566d100272e32cf",
+          "media_type": "application/json"
+        }
+      }
+    },
+    {
+      "decision_index": 4,
+      "sequence": 444,
+      "tool": "research_plan",
+      "action": "mechanics",
+      "evidence_before": {
+        "packet_reference": {
+          "artifact_id": "d86ccfbd5a59ccd7d556cc44314782d053d529762d6c84336f8ba1af4279facc",
+          "media_type": "application/json"
+        },
+        "supporting_evidence": [
+          {
+            "artifact_id": "06fc9d6bcb3dbd5ed6fec8211c3cf3f1b6519c2a0600ac5b023504a4e29174b0",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "289592aeb8f31ee4dd620b3aa8ad9cbe21612752d1d1cef2e6810e77eff61d5d",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "62ddc2387077c5b49440d16208cd83d07d9108187e3e94df00043e4bfdb9557d",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "3573c3b24e533bda8ee635e7f652d265390814b56790820ae335905e2a4f01bd",
+            "media_type": "application/json"
+          }
+        ]
+      },
+      "hypothesis": "SWING_AND_STOP_OPTIMAL_CONTROL: the measured equilibrium-hold replay proves the target is dynamically reachable only through a timed swing - the tip dips to z=0.059 m at 0.21 s and is still rising at 0.68 m/s at 0.35 s. The best known schedule (62ddc238) already gets within 0.034 m with 0.068 m/s at the end, so it sits in a usable basin. A constrained trajectory optimization (minimise effort subject to the true endpoint and holding-speed bounds) warm-started from that schedule should find an input sequence that arrives at the target with near-zero tip velocity inside the final 0.05 s window.",
+      "hypothesis_id": "SWING_AND_STOP_OPTIMAL_CONTROL",
+      "selected_method": "offline_nlp_task_feasible_effort_warm_started",
+      "selected_variables": [
+        "35x4 open-loop tendon tension sequence",
+        "terminal tip position constraint 0.01 m",
+        "terminal/holding tip speed constraint 0.02 m/s"
+      ],
+      "requested_budget": 1,
+      "expected_observation": "The offline NLP returns an input sequence whose predicted terminal tip error and final-window tip speed both satisfy the original bounds (<=0.01 m, <=0.02 m/s) or at least cut the current violations substantially, and whose schedule I can then replay exactly on the sealed MuJoCo evaluator.",
+      "weakening_observation": "The NLP reports no feasible solution, fails to converge within 120 iterations, returns no improved input sequence, or its predicted terminal error/speed still violate the original bounds by a wide margin. Any of these weakens the swing-and-stop-optimization hypothesis and indicates solver, initialisation or model-mismatch limitations rather than impossibility.",
+      "interpretation": "Any NLP output is a model-level prediction and carries no task acceptance; it must be replayed on the sealed physical evaluator before any claim. A failure of the NLP is a bounded solver/initialisation result, not evidence that the task is infeasible.",
+      "hypothesis_status": "Interpret original expected/observed facts; no mathematical proof inferred",
+      "tool_status": "error",
+      "source_references": {
+        "request": {
+          "artifact_id": "a9009b570e97bf87b4890ffc765ff115aa9e48af77b9637ba566d100272e32cf",
+          "media_type": "application/json"
+        },
+        "feedback": {
+          "artifact_id": "30693b8733a128a434336957c94bd0e5930a11862fb43485590f1d16c737eedc",
+          "media_type": "application/json"
+        }
+      },
+      "original_request": {
+        "action": "mechanics",
+        "decision": {
+          "claimed_inference": "empirical_search",
+          "hypothesis_id": "SWING_AND_STOP_OPTIMAL_CONTROL",
+          "requested_budget": 1,
+          "research_intent": "MATHEMATICAL_ANALYSIS",
+          "selected_candidate": {
+            "artifact_id": "15d2a97a0f7e788864f66360bc733200c393e583b300d01db27c887481667df1",
+            "media_type": "application/json"
+          },
+          "selected_method": "offline_nlp_task_feasible_effort_warm_started",
+          "selected_variables": [
+            "35x4 open-loop tendon tension sequence",
+            "terminal tip position constraint 0.01 m",
+            "terminal/holding tip speed constraint 0.02 m/s"
+          ]
+        },
+        "expected_observation": "The offline NLP returns an input sequence whose predicted terminal tip error and final-window tip speed both satisfy the original bounds (<=0.01 m, <=0.02 m/s) or at least cut the current violations substantially, and whose schedule I can then replay exactly on the sealed MuJoCo evaluator.",
+        "fixed_conditions": "Same executable candidate 15d2a97a, same task d24aeac7 (target [0.29,-0.035,0.19], 0.35 s, 0.01 s grid, 0.05 s holding window, 0.01 m / 0.02 m/s limits), same 4-tendon order, unchanged evaluator thresholds; warm start from the best known schedule 62ddc238 without altering its artifact.",
+        "hypothesis": "SWING_AND_STOP_OPTIMAL_CONTROL: the measured equilibrium-hold replay proves the target is dynamically reachable only through a timed swing - the tip dips to z=0.059 m at 0.21 s and is still rising at 0.68 m/s at 0.35 s. The best known schedule (62ddc238) already gets within 0.034 m with 0.068 m/s at the end, so it sits in a usable basin. A constrained trajectory optimization (minimise effort subject to the true endpoint and holding-speed bounds) warm-started from that schedule should find an input sequence that arrives at the target with near-zero tip velocity inside the final 0.05 s window.",
+        "interpretation": "Any NLP output is a model-level prediction and carries no task acceptance; it must be replayed on the sealed physical evaluator before any claim. A failure of the NLP is a bounded solver/initialisation result, not evidence that the task is infeasible.",
+        "mechanics": {
+          "candidate": {
+            "artifact_id": "15d2a97a0f7e788864f66360bc733200c393e583b300d01db27c887481667df1",
+            "media_type": "application/json"
+          },
+          "check_only": false,
+          "initialization": "saved_candidate_controls",
+          "max_iterations": 120,
+          "objective_mode": "task_feasible_effort",
+          "position_weight": 1.0,
+          "secondary_coefficient": 0.001,
+          "speed_weight": 1.0,
+          "substeps": 1,
+          "warm_source": {
+            "artifact_id": "62ddc2387077c5b49440d16208cd83d07d9108187e3e94df00043e4bfdb9557d",
+            "media_type": "application/json"
+          }
+        },
+        "stopping_condition": "Stop after one offline NLP analysis is returned; read its exact facts (predicted endpoint and speed residuals, convergence) and immediately either replay the resulting sequence physically or move to a different method if it did not produce a better sequence.",
+        "supporting_evidence": [
+          {
+            "artifact_id": "06fc9d6bcb3dbd5ed6fec8211c3cf3f1b6519c2a0600ac5b023504a4e29174b0",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "289592aeb8f31ee4dd620b3aa8ad9cbe21612752d1d1cef2e6810e77eff61d5d",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "62ddc2387077c5b49440d16208cd83d07d9108187e3e94df00043e4bfdb9557d",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "3573c3b24e533bda8ee635e7f652d265390814b56790820ae335905e2a4f01bd",
+            "media_type": "application/json"
+          }
+        ],
+        "weakening_observation": "The NLP reports no feasible solution, fails to converge within 120 iterations, returns no improved input sequence, or its predicted terminal error/speed still violate the original bounds by a wide margin. Any of these weakens the swing-and-stop-optimization hypothesis and indicates solver, initialisation or model-mismatch limitations rather than impossibility."
+      },
+      "observed_feedback": {
+        "status": "rejected",
+        "error_code": "VERIFIED_MATHEMATICAL_WARM_SOURCE_REQUIRED",
+        "field": null,
+        "expected": "VERIFIED_MATHEMATICAL_WARM_SOURCE_REQUIRED",
+        "scientific_execution_started": false,
+        "relevant_references": [],
+        "full_error_reference": {
+          "artifact_id": "e15c46dfed6dcd87b3a3d5bcc9ee266d79cf0fdb5d4e196017f6eccf709d7b92",
+          "media_type": "application/json"
+        }
+      },
+      "next_decision": {
+        "index": 5,
+        "action": "control_search",
+        "request": {
+          "artifact_id": "4f1fe63c34143b6d224ff8859e1c83bf1d0ff7d42e198f311c87b411e9e77d60",
+          "media_type": "application/json"
+        }
+      }
+    },
+    {
+      "decision_index": 5,
+      "sequence": 457,
+      "tool": "research_plan",
+      "action": "control_search",
+      "evidence_before": {
+        "packet_reference": {
+          "artifact_id": "127bf3d0885adc817b830728083b10d93c7c29141049b3b54c6f1c4204cfeec0",
+          "media_type": "application/json"
+        },
+        "supporting_evidence": [
+          {
+            "artifact_id": "62ddc2387077c5b49440d16208cd83d07d9108187e3e94df00043e4bfdb9557d",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "06fc9d6bcb3dbd5ed6fec8211c3cf3f1b6519c2a0600ac5b023504a4e29174b0",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "3573c3b24e533bda8ee635e7f652d265390814b56790820ae335905e2a4f01bd",
+            "media_type": "application/json"
+          }
+        ]
+      },
+      "hypothesis": "CONTROL_SEARCH_WIDER_RADIUS: the previous local searches saturated their coefficients at 0.4-0.5 N while the target-equilibrium tensions are up to 1.6 N away from the reached values, and the measured step response shows a slow (about 0.5 s period) lightly damped swing. Therefore the 0.034 m / 0.068 m/s plateau is a search-radius and shape limitation rather than a physical one, and a response search with a 2.5 N coefficient limit, three knots spanning 0.10-0.32 s and three trust-region iterations around 62ddc238 can reach a sequence whose endpoint error and holding speed both satisfy the original bounds.",
+      "hypothesis_id": "CONTROL_SEARCH_WIDER_RADIUS",
+      "selected_method": "local_control_search_v2_response_3knots_wide_bounds",
+      "selected_variables": [
+        "12 flat knot-major tension offsets at knots 0.10 s, 0.21 s, 0.32 s",
+        "coefficient limit 2.5 N",
+        "trust radius 0.75 N -> 0.005 N",
+        "56 evaluation requests, 3 response iterations"
+      ],
+      "requested_budget": 56,
+      "expected_observation": "The search should move the final tensions toward the static target-equilibrium vector [4.13,1.81,2.10,3.24] N and reshape the mid/late input so the tip arrives with near-zero velocity: terminal error dropping from 0.0342 m toward or below 0.01 m and holding-window speed dropping from 0.068 m/s toward or below 0.02 m/s, with the improvement persisting at the physically replayed sequence.",
+      "weakening_observation": "If the returned best sequence still shows endpoint error above 0.01 m or holding-window speed above 0.02 m/s, in particular if improvements stall while coefficients again sit at their limits or the trust radius collapses, the wide-radius local-response hypothesis is weakened and the remaining blocker is the local parameterisation/optimiser rather than the budget.",
+      "interpretation": "The search evaluates real executions but its ranking metric is a research gap score, not acceptance; any candidate sequence it returns must still be replayed as a fresh complete execution before it can be selected. Failure here is bounded evidence about the searched start, knots and budget only.",
+      "hypothesis_status": "Interpret original expected/observed facts; no mathematical proof inferred",
+      "tool_status": "error",
+      "source_references": {
+        "request": {
+          "artifact_id": "4f1fe63c34143b6d224ff8859e1c83bf1d0ff7d42e198f311c87b411e9e77d60",
+          "media_type": "application/json"
+        },
+        "feedback": {
+          "artifact_id": "1ee76256999259c63ce544734c8135c8a95d62ace1714fd053101b96a24d20cd",
+          "media_type": "application/json"
+        }
+      },
+      "original_request": {
+        "action": "control_search",
+        "control_search": {
+          "candidate": {
+            "artifact_id": "15d2a97a0f7e788864f66360bc733200c393e583b300d01db27c887481667df1",
+            "media_type": "application/json"
+          },
+          "settings": {
+            "active_coefficients": [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9,
+              10,
+              11
+            ],
+            "coefficient_limit_n": 2.5,
+            "difference_step_n": 0.01,
+            "evaluation_requests": 56,
+            "initial_radius_n": 0.75,
+            "iterations": 3,
+            "knots_s": [
+              0.1,
+              0.21,
+              0.32
+            ],
+            "method": "response",
+            "minimum_radius_n": 0.005,
+            "safety_margin_fraction": 0.0,
+            "version": "local_control_search_v2"
+          },
+          "source": {
+            "artifact_id": "62ddc2387077c5b49440d16208cd83d07d9108187e3e94df00043e4bfdb9557d",
+            "media_type": "application/json"
+          }
+        },
+        "decision": {
+          "claimed_inference": "empirical_search",
+          "hypothesis_id": "CONTROL_SEARCH_WIDER_RADIUS",
+          "requested_budget": 56,
+          "research_intent": "CONTROL_SEARCH",
+          "selected_candidate": {
+            "artifact_id": "15d2a97a0f7e788864f660733200c393e583b300d01db27c887481667df1",
+            "media_type": "application/json"
+          },
+          "selected_method": "local_control_search_v2_response_3knots_wide_bounds",
+          "selected_variables": [
+            "12 flat knot-major tension offsets at knots 0.10 s, 0.21 s, 0.32 s",
+            "coefficient limit 2.5 N",
+            "trust radius 0.75 N -> 0.005 N",
+            "56 evaluation requests, 3 response iterations"
+          ]
+        },
+        "expected_observation": "The search should move the final tensions toward the static target-equilibrium vector [4.13,1.81,2.10,3.24] N and reshape the mid/late input so the tip arrives with near-zero velocity: terminal error dropping from 0.0342 m toward or below 0.01 m and holding-window speed dropping from 0.068 m/s toward or below 0.02 m/s, with the improvement persisting at the physically replayed sequence.",
+        "fixed_conditions": "Same executable candidate 15d2a97a, same task d24aeac7 (0.35 s, 0.01 s grid, target [0.29,-0.035,0.19], 0.01 m and 0.02 m/s limits, 0.05 s holding window), same 4-tendon order, start schedule 62ddc238 unchanged, inactive offsets exactly zero, all knots and the correction inside the task horizon.",
+        "hypothesis": "CONTROL_SEARCH_WIDER_RADIUS: the previous local searches saturated their coefficients at 0.4-0.5 N while the target-equilibrium tensions are up to 1.6 N away from the reached values, and the measured step response shows a slow (about 0.5 s period) lightly damped swing. Therefore the 0.034 m / 0.068 m/s plateau is a search-radius and shape limitation rather than a physical one, and a response search with a 2.5 N coefficient limit, three knots spanning 0.10-0.32 s and three trust-region iterations around 62ddc238 can reach a sequence whose endpoint error and holding speed both satisfy the original bounds.",
+        "interpretation": "The search evaluates real executions but its ranking metric is a research gap score, not acceptance; any candidate sequence it returns must still be replayed as a fresh complete execution before it can be selected. Failure here is bounded evidence about the searched start, knots and budget only.",
+        "stopping_condition": "Stop when the finite 56-evaluation search returns. If its best sequence is predicted/observed to satisfy both original bounds, immediately replay it as a fresh complete execution; if not, interpret which component (endpoint vs holding speed) remains blocked before choosing another method.",
+        "supporting_evidence": [
+          {
+            "artifact_id": "62ddc2387077c5b49440d16208cd83d07d9108187e3e94df00043e4bfdb9557d",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "06fc9d6bcb3dbd5ed6fec8211c3cf3f1b6519c2a0600ac5b023504a4e29174b0",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "3573c3b24e533bda8ee635e7f652d265390814b56790820ae335905e2a4f01bd",
+            "media_type": "application/json"
+          }
+        ],
+        "weakening_observation": "If the returned best sequence still shows endpoint error above 0.01 m or holding-window speed above 0.02 m/s, in particular if improvements stall while coefficients again sit at their limits or the trust radius collapses, the wide-radius local-response hypothesis is weakened and the remaining blocker is the local parameterisation/optimiser rather than the budget."
+      },
+      "observed_feedback": {
+        "text": "PROTECTED_CLOSEOUT_REQUIRES_EVIDENCE_SELECTION_OR_STOP"
+      },
+      "next_decision": {
+        "index": 6,
+        "action": "stop",
+        "request": {
+          "artifact_id": "3e26747cf32b1fcd694003ddb5d6ac4dd5935b2726059f5619e3383787abbeeb",
+          "media_type": "application/json"
+        }
+      }
+    },
+    {
+      "decision_index": 6,
+      "sequence": 483,
+      "tool": "research_plan",
+      "action": "stop",
+      "evidence_before": {
+        "packet_reference": {
+          "artifact_id": "868747fffa5f7ecaecc980542467cfca735b33e27e3bc6dbff7d19360fec1464",
+          "media_type": "application/json"
+        },
+        "supporting_evidence": [
+          {
+            "artifact_id": "289592aeb8f31ee4dd620b3aa8ad9cbe21612752d1d1cef2e6810e77eff61d5d",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "06fc9d6bcb3dbd5ed6fec8211c3cf3f1b6519c2a0600ac5b023504a4e29174b0",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "3573c3b24e533bda8ee635e7f652d265390814b56790820ae335905e2a4f01bd",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "62ddc2387077c5b49440d16208cd83d07d9108187e3e94df00043e4bfdb9557d",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "4a7879ebfde39a634f9446facb1f000c27ef3a2ac47fb10569db2b8699fcf153",
+            "media_type": "application/json"
+          }
+        ]
+      },
+      "hypothesis": "CLOSEOUT_NO_FRESH_COMPLETE_PASS: no execution in this study is a complete fresh pass of the frozen original reach-and-hold task. The evidence gathered shows the limiting mechanism is dynamic arrival/settling inside 0.35 s (a slow, weakly damped swing of roughly 0.5 s period), not demonstrated static reachability of the goal: a static target equilibrium exists on this design, but driving to it overshoots and the arm is still moving fast at the horizon.",
+      "hypothesis_id": "CLOSEOUT_NO_FRESH_COMPLETE_PASS",
+      "selected_method": "evidence_bound_stop_after_exploration_budget_exhaustion",
+      "selected_variables": [],
+      "requested_budget": 0,
+      "expected_observation": "A complete fresh pass would have shown terminal_error_m <= 0.01, holding_max_error_m <= 0.01 m and holding_max_speed_m_s <= 0.02 m/s in one immutable execution. The only fresh complete result shows the opposite: 0.0740 m, 0.1047 m and 0.6838 m/s, i.e. it does not even hold the initial 0.0684 m error and is still swinging at the end.",
+      "weakening_observation": "This closeout would be weakened by any complete fresh execution of this task satisfying terminal_error_m <= 0.01, holding_max_error_m <= 0.01 m and holding_max_speed_m_s <= 0.02 m/s, or by evidence that the sampled swing can be stopped at the goal within 0.35 s under an unexecuted schedule.",
+      "interpretation": "Truthful closeout. (1) The only entry of all_fresh_results, artifact 289592ae (execution_id 44f90ddf8b4c4549867917d5d15c6c0f, source 4a7879eb, simulation 06fc9d6b), is valid_failure: terminal_error_m 0.07402178904506207, holding_max_error_m 0.10466109167176951, holding_max_speed_m_s 0.6838386787264206; evaluation_validity valid, execution_complete true, solver_errors 0, force_bounds 0. (2) Its 36 samples show the initial tip at [0.333,0,0.150] (initial error 0.06837 m), the tip driven DOWN to about [0.3050,-0.0480,0.0589] at 0.21 s and returning to [0.3153,-0.0440,0.1210] at 0.35 s with tip velocity [0.027,-0.009,0.678] m/s, so the arm is a slow lightly damped swing and the commanded target-equilibrium tensions arrive far too late. (3) Historical static evidence (3573c3b2, static_construction_only, same design core-12564696...) reports a static target equilibrium at [4.130152978474259,1.8139051284080312,2.1014899944119647,3.2404328923821337] N with achieved point equal to the target and position residual 1.24e-8 m; this is a local static construction and no dynamic acceptance. (4) The best historical sequence 62ddc238 ended at tensions [2.5386,1.4468,2.1442,3.1386] N with historical 0.03419 m / 0.06801 m/s, i.e. the prior nested searches moved only about 0.4-0.5 N per stage (coefficients saturating at 0.4 and 0.5 N) and never reached the equilibrium tensions. (5) Real costs: one initialize_control call produced source 4a7879eb (no physical launch); the physical_replay request deterministically returned the existing immutable execution 289592ae (physical_launches 1, owned by that earlier run, no new launch); the warm-started mechanics proposal was rejected before scientific execution (VERIFIED_MATHEMATICAL_WARM_SOURCE_REQUIRED) and the wider-radius control_search was blocked by closeout protection, so neither consumed a launch. No claim is made of infeasibility, optimality, robustness, repeatability or hardware behaviour; the untested levers are a shape/wider-radius open-loop optimisation, an offline NLP from a valid non-warm initialization, and feedback NMPC, all of which remain open within the original boundaries.",
+      "hypothesis_status": "Interpret original expected/observed facts; no mathematical proof inferred",
+      "tool_status": "success",
+      "source_references": {
+        "request": {
+          "artifact_id": "3e26747cf32b1fcd694003ddb5d6ac4dd5935b2726059f5619e3383787abbeeb",
+          "media_type": "application/json"
+        },
+        "feedback": {
+          "artifact_id": "611e7d1345731b6e95d9f1cd7951592d1b66e6d4c5dda5cdab2ffe2f9a015f3c",
+          "media_type": "application/json"
+        }
+      },
+      "original_request": {
+        "action": "stop",
+        "decision": {
+          "claimed_inference": "empirical_search",
+          "hypothesis_id": "CLOSEOUT_NO_FRESH_COMPLETE_PASS",
+          "requested_budget": 0,
+          "research_intent": "STOP",
+          "selected_candidate": {
+            "artifact_id": "15d2a97a0f7e788864f66360bc733200c393e583b300d01db27c887481667df1",
+            "media_type": "application/json"
+          },
+          "selected_method": "evidence_bound_stop_after_exploration_budget_exhaustion",
+          "selected_variables": []
+        },
+        "expected_observation": "A complete fresh pass would have shown terminal_error_m <= 0.01, holding_max_error_m <= 0.01 m and holding_max_speed_m_s <= 0.02 m/s in one immutable execution. The only fresh complete result shows the opposite: 0.0740 m, 0.1047 m and 0.6838 m/s, i.e. it does not even hold the initial 0.0684 m error and is still swinging at the end.",
+        "fixed_conditions": "Executable candidate 15d2a97a (design core-12564696..., 2 segments, 4 tendons, radius 0.018 m, pretension 0.2 N) and task d24aeac7/effective bd9df2 (target [0.29,-0.035,0.19], 0.35 s, 0.01 s control grid, 0.0005 s timestep, 0.05 s holding window) with the unchanged evaluator and the unchanged 0.01 m / 0.02 m/s thresholds; original protection and every method counter preserved.",
+        "hypothesis": "CLOSEOUT_NO_FRESH_COMPLETE_PASS: no execution in this study is a complete fresh pass of the frozen original reach-and-hold task. The evidence gathered shows the limiting mechanism is dynamic arrival/settling inside 0.35 s (a slow, weakly damped swing of roughly 0.5 s period), not demonstrated static reachability of the goal: a static target equilibrium exists on this design, but driving to it overshoots and the arm is still moving fast at the horizon.",
+        "interpretation": "Truthful closeout. (1) The only entry of all_fresh_results, artifact 289592ae (execution_id 44f90ddf8b4c4549867917d5d15c6c0f, source 4a7879eb, simulation 06fc9d6b), is valid_failure: terminal_error_m 0.07402178904506207, holding_max_error_m 0.10466109167176951, holding_max_speed_m_s 0.6838386787264206; evaluation_validity valid, execution_complete true, solver_errors 0, force_bounds 0. (2) Its 36 samples show the initial tip at [0.333,0,0.150] (initial error 0.06837 m), the tip driven DOWN to about [0.3050,-0.0480,0.0589] at 0.21 s and returning to [0.3153,-0.0440,0.1210] at 0.35 s with tip velocity [0.027,-0.009,0.678] m/s, so the arm is a slow lightly damped swing and the commanded target-equilibrium tensions arrive far too late. (3) Historical static evidence (3573c3b2, static_construction_only, same design core-12564696...) reports a static target equilibrium at [4.130152978474259,1.8139051284080312,2.1014899944119647,3.2404328923821337] N with achieved point equal to the target and position residual 1.24e-8 m; this is a local static construction and no dynamic acceptance. (4) The best historical sequence 62ddc238 ended at tensions [2.5386,1.4468,2.1442,3.1386] N with historical 0.03419 m / 0.06801 m/s, i.e. the prior nested searches moved only about 0.4-0.5 N per stage (coefficients saturating at 0.4 and 0.5 N) and never reached the equilibrium tensions. (5) Real costs: one initialize_control call produced source 4a7879eb (no physical launch); the physical_replay request deterministically returned the existing immutable execution 289592ae (physical_launches 1, owned by that earlier run, no new launch); the warm-started mechanics proposal was rejected before scientific execution (VERIFIED_MATHEMATICAL_WARM_SOURCE_REQUIRED) and the wider-radius control_search was blocked by closeout protection, so neither consumed a launch. No claim is made of infeasibility, optimality, robustness, repeatability or hardware behaviour; the untested levers are a shape/wider-radius open-loop optimisation, an offline NLP from a valid non-warm initialization, and feedback NMPC, all of which remain open within the original boundaries.",
+        "next_step": "stop",
+        "stopping_condition": "Stop the study: the provider budget has zero available for exploration (4 remaining requests are reserved for closeout), all_fresh_results contains exactly one complete result and it is a valid failure, and no selection of a passing execution is possible.",
+        "supporting_evidence": [
+          {
+            "artifact_id": "289592aeb8f31ee4dd620b3aa8ad9cbe21612752d1d1cef2e6810e77eff61d5d",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "06fc9d6bcb3dbd5ed6fec8211c3cf3f1b6519c2a0600ac5b023504a4e29174b0",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "3573c3b24e533bda8ee635e7f652d265390814b56790820ae335905e2a4f01bd",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "62ddc2387077c5b49440d16208cd83d07d9108187e3e94df00043e4bfdb9557d",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "4a7879ebfde39a634f9446facb1f000c27ef3a2ac47fb10569db2b8699fcf153",
+            "media_type": "application/json"
+          }
+        ],
+        "weakening_observation": "This closeout would be weakened by any complete fresh execution of this task satisfying terminal_error_m <= 0.01, holding_max_error_m <= 0.01 m and holding_max_speed_m_s <= 0.02 m/s, or by evidence that the sampled swing can be stopped at the goal within 0.35 s under an unexecuted schedule."
+      },
+      "observed_feedback": {
+        "wrapper_reference": {
+          "artifact_id": "b213bf80d34ea0725a11dec98caf68d2ad4baf78fce4e6a98f83ad434734a590",
+          "media_type": "application/json"
+        },
+        "wrapper_role": "Retrieval only; not supporting_evidence",
+        "scientific_reference": null,
+        "new_facts": {
+          "reference": {
+            "artifact_id": "b213bf80d34ea0725a11dec98caf68d2ad4baf78fce4e6a98f83ad434734a590",
+            "media_type": "application/json"
+          },
+          "pointer": "",
+          "view": "deterministic_summary",
+          "available_keys": [
+            "accepted_stop",
+            "claims"
+          ],
+          "summary": {},
+          "retrieval": "Display value/summary/preview are not Store path prefixes. All read_pointer values are absolute paths in reference. Use evidence_read(view=full,pointer=...). No acceptance transfer.",
+          "value": {
+            "accepted_stop": true,
+            "claims": {
+              "claim_version": "bounded_research_claims_v1",
+              "selected": null,
+              "selected_candidate": null,
+              "candidate_generated_from_family_space": true,
+              "physically_constructed_and_validated_candidates": [
+                {
+                  "artifact_id": "15d2a97a0f7e788864f66360bc733200c393e583b300d01db27c887481667df1",
+                  "media_type": "application/json"
+                }
+              ],
+              "design_changes_between_candidates": [],
+              "distinct_generated_designs": 1,
+              "structure_control_search_performed": false,
+              "optimizer_feedback_decisions": [],
+              "selected_structurally_new": null,
+              "model_selected_structure_search_evaluations": null,
+              "new_design_and_control_confirmed": null,
+              "reference_comparison": "not_applicable_no_reference_design",
+              "task_passed": false,
+              "independent_task_acceptance": null,
+              "confirmation_progress": {
+                "required_total": 0,
+                "historical_confirmations": 0,
+                "current_study_confirmations": 0,
+                "remaining": 0,
+                "failures": 0,
+                "invalid_executions": 0,
+                "executions": [],
+                "confirmed": false,
+                "correct_operation": {
+                  "tool": "research_plan",
+                  "action": "select",
+                  "selected_execution": null
+                }
+              },
+              "limited_repeat_supported_acceptance": false,
+              "confirmation_status": "not_required",
+              "reproducibility_assessed": false,
+              "parameter_improvement_attribution_permitted": false,
+              "explicit_structure_control_adaptations": [],
+              "local_control_search_results": []
+            }
+          }
+        }
+      },
+      "complete_output_reference": {
+        "artifact_id": "b213bf80d34ea0725a11dec98caf68d2ad4baf78fce4e6a98f83ad434734a590",
+        "media_type": "application/json"
+      },
+      "observed_result": {
+        "accepted_stop": true,
+        "claims": {
+          "candidate_generated_from_family_space": true,
+          "claim_version": "bounded_research_claims_v1",
+          "confirmation_progress": {
+            "confirmed": false,
+            "correct_operation": {
+              "action": "select",
+              "selected_execution": null,
+              "tool": "research_plan"
+            },
+            "current_study_confirmations": 0,
+            "executions": [],
+            "failures": 0,
+            "historical_confirmations": 0,
+            "invalid_executions": 0,
+            "remaining": 0,
+            "required_total": 0
+          },
+          "confirmation_status": "not_required",
+          "design_changes_between_candidates": [],
+          "distinct_generated_designs": 1,
+          "explicit_structure_control_adaptations": [],
+          "independent_task_acceptance": null,
+          "limited_repeat_supported_acceptance": false,
+          "local_control_search_results": [],
+          "model_selected_structure_search_evaluations": null,
+          "new_design_and_control_confirmed": null,
+          "optimizer_feedback_decisions": [],
+          "parameter_improvement_attribution_permitted": false,
+          "physically_constructed_and_validated_candidates": [
+            {
+              "artifact_id": "15d2a97a0f7e788864f66360bc733200c393e583b300d01db27c887481667df1",
+              "media_type": "application/json"
+            }
+          ],
+          "reference_comparison": "not_applicable_no_reference_design",
+          "reproducibility_assessed": false,
+          "selected": null,
+          "selected_candidate": null,
+          "selected_structurally_new": null,
+          "structure_control_search_performed": false,
+          "task_passed": false
+        }
+      },
+      "next_decision": null
+    }
+  ],
+  "evidence_read_requests": [
+    {
+      "sequence": 41,
+      "request": {
+        "artifact_id": "460b073150eb69d4c9fca5aed002ff4d680a28575f148df07cbc43696523f579",
+        "media_type": "application/json"
+      },
+      "query": {
+        "reference": {
+          "artifact_id": "15d2a97a0f7e788864f66360bc733200c393e583b300d01db27c887481667df1",
+          "media_type": "application/json"
+        },
+        "view": "capabilities"
+      }
+    },
+    {
+      "sequence": 45,
+      "request": {
+        "artifact_id": "7d1d846dbb73a99d7f8f72f0f1ae9906afb08dfea9729b588e87b62f7dc729d1",
+        "media_type": "application/json"
+      },
+      "query": {
+        "reference": {
+          "artifact_id": "62ddc2387077c5b49440d16208cd83d07d9108187e3e94df00043e4bfdb9557d",
+          "media_type": "application/json"
+        },
+        "view": "summary"
+      }
+    },
+    {
+      "sequence": 49,
+      "request": {
+        "artifact_id": "1c749290249b595bfbdb17d39f0ebf92ef02ecc787a35c8d8c1b2c5c10901d16",
+        "media_type": "application/json"
+      },
+      "query": {
+        "reference": {
+          "artifact_id": "9ca1a0dde17c1f307c8913cfe187ab29e7cd88312b25bb17dfc901672a4f70e4",
+          "media_type": "application/json"
+        },
+        "view": "summary"
+      }
+    },
+    {
+      "sequence": 53,
+      "request": {
+        "artifact_id": "210555c3a59450391670f56e55d9871e2701cd47d54eac80ecef0418c6412459",
+        "media_type": "application/json"
+      },
+      "query": {
+        "reference": {
+          "artifact_id": "897b50e749d7a9387b54294f2561bf96daffa7bbca616b710b16a0fcc44be1a8",
+          "media_type": "application/json"
+        },
+        "view": "summary"
+      }
+    },
+    {
+      "sequence": 64,
+      "request": {
+        "artifact_id": "609905e1b40f2605675717746172e19dcd998d32912755af4a3d98f3e1621493",
+        "media_type": "application/json"
+      },
+      "query": {
+        "reference": {
+          "artifact_id": "15d2a97a0f7e788864f66360bc733200c393e583b300d01db27c887481667df1",
+          "media_type": "application/json"
+        },
+        "view": "summary"
+      }
+    },
+    {
+      "sequence": 68,
+      "request": {
+        "artifact_id": "7cd279bff51c186798fdd34373474e733daae570728b51eae27909446f6b8ce3",
+        "media_type": "application/json"
+      },
+      "query": {
+        "pointer": "/provenance/search/coefficients_n",
+        "reference": {
+          "artifact_id": "62ddc2387077c5b49440d16208cd83d07d9108187e3e94df00043e4bfdb9557d",
+          "media_type": "application/json"
+        },
+        "view": "full"
+      }
+    },
+    {
+      "sequence": 79,
+      "request": {
+        "artifact_id": "ea8ffe359b0837ae47adcc0f263bc421f41af5ae01a1a1d4972aee65e855b321",
+        "media_type": "application/json"
+      },
+      "query": {
+        "pointer": "/resolved_parameters",
+        "reference": {
+          "artifact_id": "15d2a97a0f7e788864f66360bc733200c393e583b300d01db27c887481667df1",
+          "media_type": "application/json"
+        },
+        "view": "full"
+      }
+    },
+    {
+      "sequence": 83,
+      "request": {
+        "artifact_id": "6b9b1bb41e7250a69b535220777b0c1853bb3589679dfda713f5287fec8ba75b",
+        "media_type": "application/json"
+      },
+      "query": {
+        "pointer": "/offline_trajectory",
+        "reference": {
+          "artifact_id": "15d2a97a0f7e788864f66360bc733200c393e583b300d01db27c887481667df1",
+          "media_type": "application/json"
+        },
+        "view": "summary"
+      }
+    },
+    {
+      "sequence": 94,
+      "request": {
+        "artifact_id": "84e9afdaac6c572845727ef795f18b5e874300db6af95c98ddfe544f7aab9871",
+        "media_type": "application/json"
+      },
+      "query": {
+        "pointer": "/parameters",
+        "reference": {
+          "artifact_id": "15d2a97a0f7e788864f66360bc733200c393e583b300d01db27c887481667df1",
+          "media_type": "application/json"
+        },
+        "view": "full"
+      }
+    },
+    {
+      "sequence": 105,
+      "request": {
+        "artifact_id": "f29d680b85c447eca3677af08bce5bde40e0265f105aa414252d2b0843bdc99d",
+        "media_type": "application/json"
+      },
+      "query": {
+        "pointer": "/trajectory",
+        "reference": {
+          "artifact_id": "62ddc2387077c5b49440d16208cd83d07d9108187e3e94df00043e4bfdb9557d",
+          "media_type": "application/json"
+        },
+        "view": "fields"
+      }
+    },
+    {
+      "sequence": 109,
+      "request": {
+        "artifact_id": "2e62753e5854d1a207a3a164001847e6379c2189b800fea772e18419143af7c4",
+        "media_type": "application/json"
+      },
+      "query": {
+        "pointer": "/scientific_configuration",
+        "reference": {
+          "artifact_id": "15d2a97a0f7e788864f66360bc733200c393e583b300d01db27c887481667df1",
+          "media_type": "application/json"
+        },
+        "view": "full"
+      }
+    },
+    {
+      "sequence": 120,
+      "request": {
+        "artifact_id": "53a3095c219771fc738fa8a8877b7830206ca58fbf6e3ecde1d5f6e5e3bc33e0",
+        "media_type": "application/json"
+      },
+      "query": {
+        "pointer": "/trajectory",
+        "reference": {
+          "artifact_id": "62ddc2387077c5b49440d16208cd83d07d9108187e3e94df00043e4bfdb9557d",
+          "media_type": "application/json"
+        },
+        "view": "summary"
+      }
+    },
+    {
+      "sequence": 131,
+      "request": {
+        "artifact_id": "a87983870d96825482206f7efd0c75921e41284c6b3363dd25d495ea280ef086",
+        "media_type": "application/json"
+      },
+      "query": {
+        "pointer": "/configuration",
+        "reference": {
+          "artifact_id": "15d2a97a0f7e788864f66360bc733200c393e583b300d01db27c887481667df1",
+          "media_type": "application/json"
+        },
+        "view": "full"
+      }
+    },
+    {
+      "sequence": 135,
+      "request": {
+        "artifact_id": "dab188dc4f46abb75cd5f1584f4cbdf9e921ca1b5c204c24f1944f0cfa98184d",
+        "media_type": "application/json"
+      },
+      "query": {
+        "reference": {
+          "artifact_id": "8250de0f40729fc8525baaf4fcedd304b39618e5fcc3dcd8c773ce755ab09c56",
+          "media_type": "application/json"
+        },
+        "view": "summary"
+      }
+    },
+    {
+      "sequence": 146,
+      "request": {
+        "artifact_id": "7e3c8af672c9e6fbdb19d795f99268bba5ad9298aad8cf6087c833f7e36889e0",
+        "media_type": "application/json"
+      },
+      "query": {
+        "pointer": "/boundary",
+        "reference": {
+          "artifact_id": "3573c3b24e533bda8ee635e7f652d265390814b56790820ae335905e2a4f01bd",
+          "media_type": "application/json"
+        },
+        "view": "full"
+      }
+    },
+    {
+      "sequence": 150,
+      "request": {
+        "artifact_id": "5257c3f6590be848395201cbb15193f5d275c57c8f898e4fd085689f4ca53be9",
+        "media_type": "application/json"
+      },
+      "query": {
+        "pointer": "/raw",
+        "reference": {
+          "artifact_id": "3573c3b24e533bda8ee635e7f652d265390814b56790820ae335905e2a4f01bd",
+          "media_type": "application/json"
+        },
+        "view": "summary"
+      }
+    },
+    {
+      "sequence": 161,
+      "request": {
+        "artifact_id": "1655d18b13578ed0c6b825dd01b11c34da8a9e9ba3e46109acf63eb9999a1869",
+        "media_type": "application/json"
+      },
+      "query": {
+        "pointer": "/raw/facts",
+        "reference": {
+          "artifact_id": "3573c3b24e533bda8ee635e7f652d265390814b56790820ae335905e2a4f01bd",
+          "media_type": "application/json"
+        },
+        "view": "summary"
+      }
+    },
+    {
+      "sequence": 165,
+      "request": {
+        "artifact_id": "19e25b423d91522c1da895ff52c5472f14226e3006ed185a3fd3cc66a65f9d95",
+        "media_type": "application/json"
+      },
+      "query": {
+        "pointer": "/scoped_claim",
+        "reference": {
+          "artifact_id": "3573c3b24e533bda8ee635e7f652d265390814b56790820ae335905e2a4f01bd",
+          "media_type": "application/json"
+        },
+        "view": "full"
+      }
+    },
+    {
+      "sequence": 176,
+      "request": {
+        "artifact_id": "070c635f1f1292e9e6c7d8251809eda97543b30608ba76011823f6b415323820",
+        "media_type": "application/json"
+      },
+      "query": {
+        "pointer": "/configuration",
+        "reference": {
+          "artifact_id": "15d2a97a0f7e788864f66360bc733200c393e583b300d01db27c887481667df1",
+          "media_type": "application/json"
+        },
+        "view": "fields"
+      }
+    },
+    {
+      "sequence": 187,
+      "request": {
+        "artifact_id": "1ca4445be038b7c812698651bbb38b618b39ba5669e8b9937dd6f1d9a70b00fa",
+        "media_type": "application/json"
+      },
+      "query": {
+        "pointer": "/configuration/robot/structure",
+        "reference": {
+          "artifact_id": "15d2a97a0f7e788864f66360bc733200c393e583b300d01db27c887481667df1",
+          "media_type": "application/json"
+        },
+        "view": "summary"
+      }
+    },
+    {
+      "sequence": 198,
+      "request": {
+        "artifact_id": "1b5c37f647b8b535d67c8fdb651990ea5de0a9da813ddd5967d398a9af63c6b8",
+        "media_type": "application/json"
+      },
+      "query": {
+        "pointer": "/configuration/robot/structure/data/components/4",
+        "reference": {
+          "artifact_id": "15d2a97a0f7e788864f66360bc733200c393e583b300d01db27c887481667df1",
+          "media_type": "application/json"
+        },
+        "view": "full"
+      }
+    },
+    {
+      "sequence": 202,
+      "request": {
+        "artifact_id": "141d3eb53bba7f9036d7385e64b6ee9ba06fc4060f80f24a5a025658d7a0186d",
+        "media_type": "application/json"
+      },
+      "query": {
+        "pointer": "/configuration/robot/structure/data/components/0",
+        "reference": {
+          "artifact_id": "15d2a97a0f7e788864f66360bc733200c393e583b300d01db27c887481667df1",
+          "media_type": "application/json"
+        },
+        "view": "summary"
+      }
+    },
+    {
+      "sequence": 213,
+      "request": {
+        "artifact_id": "1e16f4860d2794779c161120882c2be43455a8033bd2431c17bee41387471725",
+        "media_type": "application/json"
+      },
+      "query": {
+        "pointer": "/identity",
+        "reference": {
+          "artifact_id": "15d2a97a0f7e788864f66360bc733200c393e583b300d01db27c887481667df1",
+          "media_type": "application/json"
+        },
+        "view": "full"
+      }
+    },
+    {
+      "sequence": 217,
+      "request": {
+        "artifact_id": "c24a18baeed9d19e6cf36f7a3805323823c413cc820a45e346c7f36efa78750b",
+        "media_type": "application/json"
+      },
+      "query": {
+        "pointer": "/physical_validation",
+        "reference": {
+          "artifact_id": "15d2a97a0f7e788864f66360bc733200c393e583b300d01db27c887481667df1",
+          "media_type": "application/json"
+        },
+        "view": "summary"
+      }
+    },
+    {
+      "sequence": 228,
+      "request": {
+        "artifact_id": "146310cf95bd8ede24052ef2a0ec33d878c082fc61fc36db98663c224e8552e6",
+        "media_type": "application/json"
+      },
+      "query": {
+        "pointer": "/raw/records/0",
+        "reference": {
+          "artifact_id": "3573c3b24e533bda8ee635e7f652d265390814b56790820ae335905e2a4f01bd",
+          "media_type": "application/json"
+        },
+        "view": "fields"
+      }
+    },
+    {
+      "sequence": 232,
+      "request": {
+        "artifact_id": "a70c525c533efbbfd336c8368e2bb4de6b3cbfebb9201ab69324d864462c4e94",
+        "media_type": "application/json"
+      },
+      "query": {
+        "pointer": "/operating_point",
+        "reference": {
+          "artifact_id": "3573c3b24e533bda8ee635e7f652d265390814b56790820ae335905e2a4f01bd",
+          "media_type": "application/json"
+        },
+        "view": "summary"
+      }
+    },
+    {
+      "sequence": 243,
+      "request": {
+        "artifact_id": "9ad8f044878f1b8fb2194a9bfb85ca42acdb7f27509c7d955ec220ae3b22924e",
+        "media_type": "application/json"
+      },
+      "query": {
+        "pointer": "/operating_point/construction/computed_tensions_n",
+        "reference": {
+          "artifact_id": "3573c3b24e533bda8ee635e7f652d265390814b56790820ae335905e2a4f01bd",
+          "media_type": "application/json"
+        },
+        "view": "full"
+      }
+    },
+    {
+      "sequence": 247,
+      "request": {
+        "artifact_id": "1ad5b9ecb3152f6ca629a47104df36e7f9690fab873367e9a3e2d2f43462ee63",
+        "media_type": "application/json"
+      },
+      "query": {
+        "pointer": "/operating_point/name",
+        "reference": {
+          "artifact_id": "8bd4296c16ec1a0195012879a933a52c9b23b9859e8201604f1e65aec50d7278",
+          "media_type": "application/json"
+        },
+        "view": "full"
+      }
+    },
+    {
+      "sequence": 252,
+      "request": {
+        "artifact_id": "9df26ee97d26d6a1ec08bccd17335fdc5cc83682368d26fe570edefef9dd9608",
+        "media_type": "application/json"
+      },
+      "query": {
+        "pointer": "/operation",
+        "reference": {
+          "artifact_id": "8bd4296c16ec1a0195012879a933a52c9b23b9859e8201604f1e65aec50d7278",
+          "media_type": "application/json"
+        },
+        "view": "full"
+      }
+    },
+    {
+      "sequence": 256,
+      "request": {
+        "artifact_id": "bdc543ffa205213a100f057474754ab22538551e0feeb14d4a24b22aa8df237e",
+        "media_type": "application/json"
+      },
+      "query": {
+        "pointer": "/operating_point/name",
+        "reference": {
+          "artifact_id": "8250de0f40729fc8525baaf4fcedd304b39618e5fcc3dcd8c773ce755ab09c56",
+          "media_type": "application/json"
+        },
+        "view": "full"
+      }
+    },
+    {
+      "sequence": 267,
+      "request": {
+        "artifact_id": "9fa314b10e9efa1253e3497fab57ca35726a1a7ad8e2e642f80907f18257db6d",
+        "media_type": "application/json"
+      },
+      "query": {
+        "count": 5,
+        "pointer": "/trajectory/tensions_n",
+        "reference": {
+          "artifact_id": "62ddc2387077c5b49440d16208cd83d07d9108187e3e94df00043e4bfdb9557d",
+          "media_type": "application/json"
+        },
+        "start": 30,
+        "view": "range"
+      }
+    },
+    {
+      "sequence": 278,
+      "request": {
+        "artifact_id": "8d8d5b532cd912ab3b9b47ade2bc3f8e9145c898432723186fc8dbfe7eba06eb",
+        "media_type": "application/json"
+      },
+      "query": {
+        "pointer": "/provenance/search",
+        "reference": {
+          "artifact_id": "62ddc2387077c5b49440d16208cd83d07d9108187e3e94df00043e4bfdb9557d",
+          "media_type": "application/json"
+        },
+        "view": "full"
+      }
+    },
+    {
+      "sequence": 282,
+      "request": {
+        "artifact_id": "2a712ded880f0c5ca4da73f1c5abdc4a02521cf674af7666ae9f1712104f8601",
+        "media_type": "application/json"
+      },
+      "query": {
+        "pointer": "/provenance/search",
+        "reference": {
+          "artifact_id": "897b50e749d7a9387b54294f2561bf96daffa7bbca616b710b16a0fcc44be1a8",
+          "media_type": "application/json"
+        },
+        "view": "full"
+      }
+    },
+    {
+      "sequence": 326,
+      "request": {
+        "artifact_id": "3010d8e774d0be0a5036331ea25151afde5640c4d99ae2d3f1955bbb420749b2",
+        "media_type": "application/json"
+      },
+      "query": {
+        "pointer": "/raw_reference",
+        "reference": {
+          "artifact_id": "289592aeb8f31ee4dd620b3aa8ad9cbe21612752d1d1cef2e6810e77eff61d5d",
+          "media_type": "application/json"
+        },
+        "view": "summary"
+      }
+    },
+    {
+      "sequence": 337,
+      "request": {
+        "artifact_id": "134337739d29c0c004433980a7d705a5bddce856b8fe720a6ec4fb64c0e42a0f",
+        "media_type": "application/json"
+      },
+      "query": {
+        "reference": {
+          "artifact_id": "06fc9d6bcb3dbd5ed6fec8211c3cf3f1b6519c2a0600ac5b023504a4e29174b0",
+          "media_type": "application/json"
+        },
+        "view": "summary"
+      }
+    },
+    {
+      "sequence": 348,
+      "request": {
+        "artifact_id": "58ffbeb0088113d4ad30de58653c94bd2bc7f75ea9b26de42d3832fd27e2e3ef",
+        "media_type": "application/json"
+      },
+      "query": {
+        "pointer": "/samples",
+        "reference": {
+          "artifact_id": "06fc9d6bcb3dbd5ed6fec8211c3cf3f1b6519c2a0600ac5b023504a4e29174b0",
+          "media_type": "application/json"
+        },
+        "view": "summary"
+      }
+    },
+    {
+      "sequence": 359,
+      "request": {
+        "artifact_id": "691afbc692414646cea21929e7891374da1d886d042fdd69fa7963281e0802ff",
+        "media_type": "application/json"
+      },
+      "query": {
+        "count": 36,
+        "pointer": "/samples",
+        "reference": {
+          "artifact_id": "06fc9d6bcb3dbd5ed6fec8211c3cf3f1b6519c2a0600ac5b023504a4e29174b0",
+          "media_type": "application/json"
+        },
+        "start": 0,
+        "view": "range"
+      }
+    },
+    {
+      "sequence": 370,
+      "request": {
+        "artifact_id": "f81290b70446099b950d8b8f7558e55dbc4d90ee279f38231fdccd8b419111d8",
+        "media_type": "application/json"
+      },
+      "query": {
+        "count": 36,
+        "fields": [
+          "time_s",
+          "tip_m",
+          "speed_m_s"
+        ],
+        "pointer": "/samples",
+        "reference": {
+          "artifact_id": "06fc9d6bcb3dbd5ed6fec8211c3cf3f1b6519c2a0600ac5b023504a4e29174b0",
+          "media_type": "application/json"
+        },
+        "start": 0,
+        "view": "range"
+      }
+    },
+    {
+      "sequence": 381,
+      "request": {
+        "artifact_id": "fa5fcba0fadd2093cd826405273833280104b94391c4f5a890fcb21db2014676",
+        "media_type": "application/json"
+      },
+      "query": {
+        "pointer": "/samples/3/tip_m",
+        "reference": {
+          "artifact_id": "06fc9d6bcb3dbd5ed6fec8211c3cf3f1b6519c2a0600ac5b023504a4e29174b0",
+          "media_type": "application/json"
+        },
+        "view": "full"
+      }
+    },
+    {
+      "sequence": 385,
+      "request": {
+        "artifact_id": "b284d2a14600bd4d1bba20fbab7fda9d56876959b6e64cf331e8829f40b5184e",
+        "media_type": "application/json"
+      },
+      "query": {
+        "pointer": "/samples/6/tip_m",
+        "reference": {
+          "artifact_id": "06fc9d6bcb3dbd5ed6fec8211c3cf3f1b6519c2a0600ac5b023504a4e29174b0",
+          "media_type": "application/json"
+        },
+        "view": "full"
+      }
+    },
+    {
+      "sequence": 389,
+      "request": {
+        "artifact_id": "86613010c469dd98f9c758fbba12cd0bff7f32e46367702dbe08d97497b1bc0b",
+        "media_type": "application/json"
+      },
+      "query": {
+        "pointer": "/samples/9/tip_m",
+        "reference": {
+          "artifact_id": "06fc9d6bcb3dbd5ed6fec8211c3cf3f1b6519c2a0600ac5b023504a4e29174b0",
+          "media_type": "application/json"
+        },
+        "view": "full"
+      }
+    },
+    {
+      "sequence": 393,
+      "request": {
+        "artifact_id": "ae4b77bf228496b0ace8f5741a5828d69627a1c5542eec6699d00e1260f1062e",
+        "media_type": "application/json"
+      },
+      "query": {
+        "pointer": "/samples/12/tip_m",
+        "reference": {
+          "artifact_id": "06fc9d6bcb3dbd5ed6fec8211c3cf3f1b6519c2a0600ac5b023504a4e29174b0",
+          "media_type": "application/json"
+        },
+        "view": "full"
+      }
+    },
+    {
+      "sequence": 397,
+      "request": {
+        "artifact_id": "e43461aa28846041f9640a23f236dfd135591ad9acab405a87b34921ac1dc407",
+        "media_type": "application/json"
+      },
+      "query": {
+        "pointer": "/samples/15/tip_m",
+        "reference": {
+          "artifact_id": "06fc9d6bcb3dbd5ed6fec8211c3cf3f1b6519c2a0600ac5b023504a4e29174b0",
+          "media_type": "application/json"
+        },
+        "view": "full"
+      }
+    },
+    {
+      "sequence": 401,
+      "request": {
+        "artifact_id": "44d934e818356ca1dd6e6d14807a0b11e7950d3e9f763b4950779d5f0f5a805d",
+        "media_type": "application/json"
+      },
+      "query": {
+        "pointer": "/samples/18/tip_m",
+        "reference": {
+          "artifact_id": "06fc9d6bcb3dbd5ed6fec8211c3cf3f1b6519c2a0600ac5b023504a4e29174b0",
+          "media_type": "application/json"
+        },
+        "view": "full"
+      }
+    },
+    {
+      "sequence": 405,
+      "request": {
+        "artifact_id": "94fd41081f7dfb9655ac15098f9e34124bffee4e584c29750218769e725cedd3",
+        "media_type": "application/json"
+      },
+      "query": {
+        "pointer": "/samples/21/tip_m",
+        "reference": {
+          "artifact_id": "06fc9d6bcb3dbd5ed6fec8211c3cf3f1b6519c2a0600ac5b023504a4e29174b0",
+          "media_type": "application/json"
+        },
+        "view": "full"
+      }
+    },
+    {
+      "sequence": 409,
+      "request": {
+        "artifact_id": "e7e63eeb5fe68656a6865f0ce46d59f9d5970e84e3d5cea08917cdb5e8ca9c0f",
+        "media_type": "application/json"
+      },
+      "query": {
+        "pointer": "/samples/24/tip_m",
+        "reference": {
+          "artifact_id": "06fc9d6bcb3dbd5ed6fec8211c3cf3f1b6519c2a0600ac5b023504a4e29174b0",
+          "media_type": "application/json"
+        },
+        "view": "full"
+      }
+    },
+    {
+      "sequence": 413,
+      "request": {
+        "artifact_id": "1f07448c956facf0834bf6992ebe67031ab422156dd2f5190feeab4fdbba5e60",
+        "media_type": "application/json"
+      },
+      "query": {
+        "pointer": "/samples/27/tip_m",
+        "reference": {
+          "artifact_id": "06fc9d6bcb3dbd5ed6fec8211c3cf3f1b6519c2a0600ac5b023504a4e29174b0",
+          "media_type": "application/json"
+        },
+        "view": "full"
+      }
+    },
+    {
+      "sequence": 417,
+      "request": {
+        "artifact_id": "09d74991c85ce5124e677aa5b784d585aa8c94b66e56f711c30adb9ca64d6363",
+        "media_type": "application/json"
+      },
+      "query": {
+        "pointer": "/samples/30/tip_m",
+        "reference": {
+          "artifact_id": "06fc9d6bcb3dbd5ed6fec8211c3cf3f1b6519c2a0600ac5b023504a4e29174b0",
+          "media_type": "application/json"
+        },
+        "view": "full"
+      }
+    },
+    {
+      "sequence": 421,
+      "request": {
+        "artifact_id": "bf2507355c2077f1114b01f0ffc4d752689cc98c480ed3baed1b4aaff8917fdf",
+        "media_type": "application/json"
+      },
+      "query": {
+        "pointer": "/samples/33/tip_m",
+        "reference": {
+          "artifact_id": "06fc9d6bcb3dbd5ed6fec8211c3cf3f1b6519c2a0600ac5b023504a4e29174b0",
+          "media_type": "application/json"
+        },
+        "view": "full"
+      }
+    },
+    {
+      "sequence": 468,
+      "request": {
+        "artifact_id": "6e81d41f425ef0f37f5b61167df250742f5e582b74712d9ee27e4a7ee991da2c",
+        "media_type": "application/json"
+      },
+      "query": {
+        "pointer": "/acceptance",
+        "reference": {
+          "artifact_id": "289592aeb8f31ee4dd620b3aa8ad9cbe21612752d1d1cef2e6810e77eff61d5d",
+          "media_type": "application/json"
+        },
+        "view": "full"
+      }
+    },
+    {
+      "sequence": 472,
+      "request": {
+        "artifact_id": "17cd90de409a8948a80f2524f0b4fee5c9085a6a69e3c2b3e278e8b99c551951",
+        "media_type": "application/json"
+      },
+      "query": {
+        "pointer": "/physical_launches",
+        "reference": {
+          "artifact_id": "289592aeb8f31ee4dd620b3aa8ad9cbe21612752d1d1cef2e6810e77eff61d5d",
+          "media_type": "application/json"
+        },
+        "view": "full"
+      }
+    }
+  ],
+  "successful_calculation_decisions": 1,
+  "closeout_decisions": [
+    6
+  ],
+  "limitation": "One optimizer batch is one Agent decision regardless of probes. Rejected requests and STOP are separate. Explain revisions using original requests, feedback and intervening reads, not signatures alone. Missing analysis-contract hypothesis fields remain null."
+}
