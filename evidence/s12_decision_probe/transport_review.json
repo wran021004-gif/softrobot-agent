@@ -1,19 +1,19 @@
 {
-  "status": "explicit_user_authorized",
+  "status": "explicit_user_authorized_probe_completed",
   "destination": "https://api.deepseek.com/chat/completions",
   "request_manifest": "wire_manifest.json",
   "max_decision_requests": 6,
   "max_formal_requests": 32,
-  "actual_sends": 0,
+  "actual_sends": 6,
   "review_reason": "Automatic approval review rejected transfer of internal research states, evidence and tool contracts; requires trusted explicit user authorization of payload scope and destination. No workaround attempted.",
   "user_question_pending": false,
   "github_push": {
-    "status": "explicit_user_authorized_and_pushed",
+    "status": "explicit_user_authorized_pushed_and_verified",
     "destination": "git@github.com:wran021004-gif/softrobot-agent.git",
     "branch": "feat/sorosim-matlab-nmpc",
-    "actual_pushes": 1,
     "reason": "Automatic approval review did not confirm trusted authorization for specific code/configuration/evidence data to the GitHub destination. No workaround attempted.",
-    "verified_local_remote_sha": "54800681ad7252255ee4ed50d2c2e75b81c32d04"
+    "verified_local_remote_sha": "54800681ad7252255ee4ed50d2c2e75b81c32d04",
+    "actual_pushes_before_delivery": 3
   },
   "authorization": {
     "destination": "https://api.deepseek.com",
@@ -23,5 +23,6 @@
     "user_reply": "????????? 6?32 ???",
     "github_reply": "??????? push"
   },
-  "prior_rejection_retained": true
+  "prior_rejection_retained": true,
+  "formal_sends": 22
 }

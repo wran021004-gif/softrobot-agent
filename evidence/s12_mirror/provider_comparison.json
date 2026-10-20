@@ -1,0 +1,254 @@
+{
+  "studies": {
+    "s10": {
+      "provider_requests": 29,
+      "prompt_tokens": 1706805,
+      "completion_tokens": 47544,
+      "total_tokens": 1754349,
+      "evidence_reads": 48,
+      "tool_calls": 54,
+      "tool_errors": 6,
+      "first_successful_scientific_decision_provider_requests": 6,
+      "successful_scientific_decisions": 3,
+      "scientific_decision_index": [
+        {
+          "sequence": 132,
+          "tool": "research_plan",
+          "action": "physical_replay",
+          "provider_requests": 6
+        },
+        {
+          "sequence": 280,
+          "tool": "research_plan",
+          "action": "control_search",
+          "provider_requests": 16
+        },
+        {
+          "sequence": 577,
+          "tool": "research_analysis",
+          "action": "equilibrium",
+          "provider_requests": 24
+        }
+      ],
+      "physical": 20,
+      "first_physics": {
+        "provider_requests": 6,
+        "wall_s": 54.051624
+      },
+      "ledger": {
+        "limit": {
+          "backend_solves": 64,
+          "model_calls": 32,
+          "tool_calls": 160,
+          "wall_s": null,
+          "worker_calls": 0
+        },
+        "used": {
+          "tool_calls": 73,
+          "model_calls": 29,
+          "backend_solves": 20,
+          "worker_calls": 0,
+          "wall_s": 309.41354240081273
+        },
+        "remaining": {
+          "backend_solves": 44,
+          "model_calls": 3,
+          "tool_calls": 87,
+          "wall_s": null,
+          "worker_calls": 0
+        },
+        "occupied": {}
+      }
+    },
+    "s11": {
+      "provider_requests": 30,
+      "prompt_tokens": 1767033,
+      "completion_tokens": 70152,
+      "total_tokens": 1837185,
+      "evidence_reads": 51,
+      "tool_calls": 57,
+      "tool_errors": 4,
+      "first_successful_scientific_decision_provider_requests": 19,
+      "successful_scientific_decisions": 1,
+      "scientific_decision_index": [
+        {
+          "sequence": 307,
+          "tool": "research_plan",
+          "action": "physical_replay",
+          "provider_requests": 19
+        }
+      ],
+      "physical": 1,
+      "first_physics": {
+        "provider_requests": 19,
+        "wall_s": 297.978503
+      },
+      "ledger": {
+        "limit": {
+          "backend_solves": 64,
+          "model_calls": 32,
+          "tool_calls": 160,
+          "wall_s": null,
+          "worker_calls": 0
+        },
+        "used": {
+          "tool_calls": 57,
+          "model_calls": 30,
+          "backend_solves": 1,
+          "worker_calls": 0,
+          "wall_s": 397.1641938001849
+        },
+        "remaining": {
+          "backend_solves": 63,
+          "model_calls": 2,
+          "tool_calls": 103,
+          "wall_s": null,
+          "worker_calls": 0
+        },
+        "occupied": {}
+      }
+    },
+    "s12": {
+      "provider_requests": 22,
+      "prompt_tokens": 1557945,
+      "completion_tokens": 52961,
+      "total_tokens": 1610906,
+      "evidence_reads": 22,
+      "tool_calls": 32,
+      "tool_errors": 4,
+      "first_successful_scientific_decision_provider_requests": 5,
+      "successful_scientific_decisions": 3,
+      "scientific_decision_index": [
+        {
+          "sequence": 109,
+          "tool": "research_plan",
+          "action": "mechanics",
+          "provider_requests": 5
+        },
+        {
+          "sequence": 287,
+          "tool": "research_plan",
+          "action": "physical_replay",
+          "provider_requests": 18
+        },
+        {
+          "sequence": 306,
+          "tool": "research_plan",
+          "action": "control_search",
+          "provider_requests": 19
+        }
+      ],
+      "physical": 27,
+      "first_physics": {
+        "provider_requests": 18,
+        "wall_s": 358.521875
+      },
+      "ledger": {
+        "limit": {
+          "backend_solves": 64,
+          "model_calls": 32,
+          "tool_calls": 160,
+          "wall_s": null,
+          "worker_calls": 0
+        },
+        "used": {
+          "tool_calls": 58,
+          "model_calls": 22,
+          "backend_solves": 27,
+          "worker_calls": 0,
+          "wall_s": 438.26497099990956
+        },
+        "remaining": {
+          "backend_solves": 37,
+          "model_calls": 10,
+          "tool_calls": 102,
+          "wall_s": null,
+          "worker_calls": 0
+        },
+        "occupied": {}
+      }
+    }
+  },
+  "separate_s12_decision_probe": {
+    "versions": {
+      "s11": {
+        "provider_requests": 3,
+        "actual_tokens": 82374,
+        "proposals": 3,
+        "scientific_proposals": 3,
+        "scientific_contract_checks_passed": 2,
+        "full_scientific_admission": "not_tested",
+        "budget_protection_misjudgments": 1,
+        "evidence_reads": 0,
+        "invalid_read_count": 0,
+        "actions": [
+          {
+            "case": "historical_start",
+            "action": "control_search",
+            "requested_budget": 36,
+            "checks": "passed",
+            "error": null
+          },
+          {
+            "case": "fresh_failure",
+            "action": "physical_replay",
+            "requested_budget": 1,
+            "checks": "passed",
+            "error": null
+          },
+          {
+            "case": "last_exploration_request",
+            "action": "execute",
+            "requested_budget": 1,
+            "checks": "rejected",
+            "error": "POST_REQUEST_PROTECTED_CLOSEOUT"
+          }
+        ]
+      },
+      "s12": {
+        "provider_requests": 3,
+        "actual_tokens": 81290,
+        "proposals": 3,
+        "scientific_proposals": 2,
+        "scientific_contract_checks_passed": 1,
+        "full_scientific_admission": "not_tested",
+        "budget_protection_misjudgments": 0,
+        "evidence_reads": 0,
+        "invalid_read_count": 0,
+        "actions": [
+          {
+            "case": "historical_start",
+            "action": "control_search",
+            "requested_budget": 20,
+            "checks": "rejected",
+            "error": "1 validation error for Plan\nhypothesis_id\n  Extra inputs are not permitted [type=extra_forbidden, input_value='TWO_KNOT_RESPONSE_CORRECTION', input_type=str]\n    For further information visit https://errors.pydantic.dev/2.14/v/extra_forbidden"
+          },
+          {
+            "case": "fresh_failure",
+            "action": "mechanics",
+            "requested_budget": 1,
+            "checks": "passed",
+            "error": null
+          },
+          {
+            "case": "last_exploration_request",
+            "action": "stop",
+            "requested_budget": 0,
+            "checks": "passed",
+            "error": null
+          }
+        ]
+      }
+    },
+    "actual_tokens": 163664,
+    "actual_requests": 6,
+    "new_scientific_executions": 0,
+    "comparison": "Paired authentic cutoff packets, same model/settings/capabilities/budget; one response per arm. No method-quality ranking or general causal claim.",
+    "first_research_proposal_request": 1,
+    "first_fully_admitted_scientific_action": "not_tested",
+    "invalid_scientific_citations": "No unregistered citation detected in checked typed proposals; reference checking of the malformed extra-field proposal was not reached",
+    "exact_receipts": "provider_receipts.json",
+    "post_probe_change": "Final formal source also retains physical_diagnostic on historical best_valid. Six frozen probe wires were not changed or resampled."
+  },
+  "limitation": "Historical starting evidence differs. Single observational runs do not establish a causal interface benefit. Contract-only probes do not establish full scientific admission. Public operations include internal physical calls; model tools count original model requests only."
+}

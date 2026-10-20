@@ -1,0 +1,164 @@
+{
+  "study_id": "s12-mirror-live-20261020",
+  "implementation": "a65dc0381573dacea693aebf16d15d8cf1d4c6e7",
+  "evaluation": {
+    "artifact_id": "72a0334662dddb2ce4a75460c6d0381795ae868014196f66f14da22c8c65ff1e",
+    "media_type": "application/json"
+  },
+  "candidate": {
+    "artifact_id": "5f6f99b6c44900c0868942d35ce39eab45df2f2e6f168e92184036993b1e241b",
+    "media_type": "application/json"
+  },
+  "control_source": {
+    "artifact_id": "b06959b4a5affbfe566b3256575893ef34b465ddab1454a0b1376dddfe29adea",
+    "media_type": "application/json"
+  },
+  "raw_reference": {
+    "artifact_id": "401a00c292e23125a1f8382ab30c67156807701b2f62a4fa3f73c53ac1c2cee9",
+    "media_type": "application/json"
+  },
+  "metrics": {
+    "holding_max_error_m": 0.008429987595659346,
+    "holding_max_speed_m_s": 0.019585799995396225,
+    "terminal_error_m": 0.008340186060374276
+  },
+  "acceptance": {
+    "accepted": true,
+    "components": {
+      "evaluation_validity": {
+        "limit": null,
+        "passed": true,
+        "reason": null,
+        "unit": null,
+        "value": "valid"
+      },
+      "evaluator:task_bound": {
+        "limit": 0.01,
+        "passed": true,
+        "reason": null,
+        "unit": "m",
+        "value": 0.008340186060374276
+      },
+      "execution_complete": {
+        "limit": null,
+        "passed": true,
+        "reason": null,
+        "unit": null,
+        "value": true
+      },
+      "force_bounds": {
+        "limit": 1e-08,
+        "passed": true,
+        "reason": null,
+        "unit": "N",
+        "value": 0.0
+      },
+      "holding_coverage": {
+        "limit": 6,
+        "passed": true,
+        "reason": null,
+        "unit": "inclusive uniform samples",
+        "value": true
+      },
+      "holding_position": {
+        "limit": 0.01,
+        "passed": true,
+        "reason": null,
+        "unit": "m",
+        "value": 0.008429987595659346
+      },
+      "holding_speed": {
+        "limit": 0.02,
+        "passed": true,
+        "reason": null,
+        "unit": "m/s",
+        "value": 0.019585799995396225
+      },
+      "solver_errors": {
+        "limit": 0,
+        "passed": true,
+        "reason": null,
+        "unit": "count",
+        "value": 0
+      },
+      "task_evaluator": {
+        "limit": null,
+        "passed": true,
+        "reason": null,
+        "unit": null,
+        "value": true
+      }
+    },
+    "continuous_time_guarantee": false,
+    "contract": "research.task_acceptance",
+    "evaluator_tension_channels": null,
+    "evidence_binding": {
+      "evaluation": {
+        "artifact_id": "3f6ee06a9779f694076a399f638ebab491bd9425bb8d5ea789b1aab8c436991d",
+        "media_type": "application/json"
+      },
+      "evaluation_binding": {
+        "original_execution_id": null,
+        "source": {
+          "artifact_id": "401a00c292e23125a1f8382ab30c67156807701b2f62a4fa3f73c53ac1c2cee9",
+          "media_type": "application/json"
+        },
+        "source_execution_id": null
+      },
+      "profile": null,
+      "profile_binding": {
+        "evaluation": {
+          "artifact_id": "3f6ee06a9779f694076a399f638ebab491bd9425bb8d5ea789b1aab8c436991d",
+          "media_type": "application/json"
+        },
+        "execution_id": "7f2c94264c1b438f8cb278d166be9f4d",
+        "simulation": {
+          "artifact_id": "401a00c292e23125a1f8382ab30c67156807701b2f62a4fa3f73c53ac1c2cee9",
+          "media_type": "application/json"
+        }
+      },
+      "simulation": {
+        "artifact_id": "401a00c292e23125a1f8382ab30c67156807701b2f62a4fa3f73c53ac1c2cee9",
+        "media_type": "application/json"
+      }
+    },
+    "execution_id": "7f2c94264c1b438f8cb278d166be9f4d",
+    "issues": [],
+    "metrics": {
+      "holding_max_error_m": 0.008429987595659346,
+      "holding_max_speed_m_s": 0.019585799995396225,
+      "terminal_error_m": 0.008340186060374276
+    },
+    "missing": [],
+    "protocol_id": "offline_reach_hold_v1",
+    "sources": {
+      "evaluation": {
+        "artifact_id": "3f6ee06a9779f694076a399f638ebab491bd9425bb8d5ea789b1aab8c436991d",
+        "media_type": "application/json"
+      },
+      "profile": null
+    },
+    "status": "accepted",
+    "task_family": "task.reach",
+    "task_identity": "bd9df2d930423f2b2a12152f076e2ae88b4d1a0af84d6126aa13b0b1fac9ec77",
+    "timing": {
+      "control_period_s": 0.01,
+      "deadline_misses": null,
+      "duration_s": 0.35,
+      "mean_update_s": null,
+      "real_time_demonstrated": null,
+      "real_time_required": false,
+      "sample_period_s": 0.01,
+      "simulation_wall_s": null,
+      "termination": [
+        "duration",
+        "numerical_failure"
+      ],
+      "timestep_s": 0.0005
+    },
+    "version": "1.0.0"
+  },
+  "full_structure_and_control": "study/design_package.json",
+  "content_identity": "e38e356cfab1a9c35219ba526cf92e0e4e1a98a1e805b58428995dfe75929839",
+  "scope": "One nominal sampled original-task pass; no optimality, robustness, repeatability or hardware claim"
+}

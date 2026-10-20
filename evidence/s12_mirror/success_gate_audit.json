@@ -1,0 +1,87 @@
+{
+  "first_fresh_complete_pass": {
+    "artifact_id": "72a0334662dddb2ce4a75460c6d0381795ae868014196f66f14da22c8c65ff1e",
+    "media_type": "application/json"
+  },
+  "last_physical_is_first_pass": true,
+  "public_acceptance_read_before_native_select": true,
+  "post_pass_tool_requests": [
+    {
+      "input": {
+        "pointer": "/acceptance",
+        "reference": {
+          "artifact_id": "72a0334662dddb2ce4a75460c6d0381795ae868014196f66f14da22c8c65ff1e",
+          "media_type": "application/json"
+        },
+        "view": "full"
+      },
+      "name": "evidence_read",
+      "toolUseId": "call_00_415trE7WN7pGnhj4LBoI6303"
+    },
+    {
+      "input": {
+        "reference": {
+          "artifact_id": "72a0334662dddb2ce4a75460c6d0381795ae868014196f66f14da22c8c65ff1e",
+          "media_type": "application/json"
+        },
+        "view": "summary"
+      },
+      "name": "evidence_read",
+      "toolUseId": "call_01_8Jxnd0psXEfSw9eRZiwI5853"
+    },
+    {
+      "input": {
+        "fields": [
+          "owning_study",
+          "physical_launches",
+          "status",
+          "execution_id",
+          "source_reference",
+          "candidate",
+          "boundary",
+          "charged_numerical_s"
+        ],
+        "reference": {
+          "artifact_id": "72a0334662dddb2ce4a75460c6d0381795ae868014196f66f14da22c8c65ff1e",
+          "media_type": "application/json"
+        },
+        "view": "fields"
+      },
+      "name": "evidence_read",
+      "toolUseId": "call_00_AplYgVSqx625FnOBzUVM1593"
+    },
+    {
+      "input": {
+        "action": "select",
+        "decision": {
+          "claimed_inference": "empirical_search",
+          "hypothesis_id": "FROZEN_ORIGINAL_TASK_PASS_SELECTED",
+          "requested_budget": 0,
+          "research_intent": "SELECT",
+          "selected_candidate": {
+            "artifact_id": "5f6f99b6c44900c0868942d35ce39eab45df2f2e6f168e92184036993b1e241b",
+            "media_type": "application/json"
+          },
+          "selected_method": "freeze the exact measured accepted execution 72a0334 (source b06959b4, execution_id 7f2c94264c1b438f8cb278d166be9f4d) as the study solution",
+          "selected_variables": [
+            "covered by frozen execution"
+          ]
+        },
+        "expected_observation": "Selection binds the immutable accepted execution (evaluator:task_bound 0.008340 m, holding_position 0.008430 m, holding_speed 0.019586 m/s, all under unchanged 0.01 m / 0.02 m/s limits, force bounds 0, no solver errors) and seals with zero additional configured repetitions; no new rollout is launched.",
+        "fixed_conditions": "Candidate 5f6f99b6 with source b06959b4 on the frozen task (effective task identity bd9df2d9, target [0.29,-0.035,0.19]), original evaluator evaluate.reach, tolerance 0.01 m, holding window 0.05 s / 0.02 m/s, duration 0.35 s, control period 0.01 s, timestep 0.0005 s, tendon order tendon_0..tendon_3; thresholds unchanged.",
+        "hypothesis": "The exact execution 72a0334 is a complete, valid, accepted pass of the frozen original task, and its acceptance artifact (status accepted, accepted true, execution_complete true, evaluation_validity valid, holding_coverage true, force_bounds passed) is sufficient to freeze it as the study solution without any further search.",
+        "interpretation": "Freezing records a real measured pass with small margins (position 0.0083-0.0084 m against a 0.010 m limit; holding speed 0.01959 m/s against a 0.020 m/s limit) and continuity guarantee false. This claims only a single accepted execution: no robustness, repeatability, optimality, infeasibility, continuous-time or hardware claim is made.",
+        "selected_execution": {
+          "artifact_id": "72a0334662dddb2ce4a75460c6d0381795ae868014196f66f14da22c8c65ff1e",
+          "media_type": "application/json"
+        },
+        "stopping_condition": "Seal on this selection with zero configured extra repetitions; do not launch further searches, replays or refinements.",
+        "weakening_observation": "If the acceptance were re-read and any original component failed, or if the source/candidate/task identity did not match this execution, the freeze would be invalid; none of these conditions was observed (accepted true, all nine components passed)."
+      },
+      "name": "research_plan",
+      "toolUseId": "call_00_HvxwC5BfumTAcf2nbK8j6980"
+    }
+  ],
+  "additional_physical_launches_after_pass": 0,
+  "new_scientific_executions_in_audit": 0
+}
