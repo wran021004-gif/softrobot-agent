@@ -339,8 +339,118 @@
   "cache_reuses": 0,
   "search_feedback": [],
   "math_to_control_handoff": [],
-  "research_decision_changes": 0,
-  "decisions": [],
+  "research_decision_changes": 2,
+  "decisions": [
+    {
+      "reference": {
+        "artifact_id": "12d64760b692a1eb5c79c2160c872ef71e7ba6389a366009a7e72afde623c29b",
+        "media_type": "application/json"
+      },
+      "action": "analysis",
+      "decision": {
+        "claimed_inference": "empirical_search",
+        "hypothesis_id": "TARGET_EQUILIBRIUM_REACHABLE",
+        "requested_budget": 1,
+        "research_intent": "MATHEMATICAL_ANALYSIS",
+        "selected_candidate": {
+          "artifact_id": "8c0582ad362895a390127bcc779c9dfb6eb84570cf18ae0f3446f9282546e16f",
+          "media_type": "application/json"
+        },
+        "selected_method": "research_analysis.equilibrium",
+        "selected_variables": [
+          "tip_position",
+          "tendon_tensions_n"
+        ]
+      }
+    },
+    {
+      "reference": {
+        "artifact_id": "92f83c5feb176f191a2cd15b41ba705cacfe53694f8dceaa7b6f8ca15af889e3",
+        "media_type": "application/json"
+      },
+      "action": "initialize_control",
+      "decision": {
+        "claimed_inference": "empirical_search",
+        "hypothesis_id": "TARGET_RAMP_CONVERGES",
+        "requested_budget": 0,
+        "research_intent": "CONTROL_SEARCH",
+        "selected_candidate": {
+          "artifact_id": "8c0582ad362895a390127bcc779c9dfb6eb84570cf18ae0f3446f9282546e16f",
+          "media_type": "application/json"
+        },
+        "selected_method": "initialize_control.baseline",
+        "selected_variables": [
+          "tensions_n[36x4]",
+          "target_equilibrium_tensions_n"
+        ]
+      }
+    },
+    {
+      "reference": {
+        "artifact_id": "5932eea22ef769d88b0d2a1458e9bcc57bc55b4c696b3a7deddf97114d14c82b",
+        "media_type": "application/json"
+      },
+      "action": "stop",
+      "decision": {
+        "claimed_inference": "empirical_search",
+        "hypothesis_id": "NO_FRESH_PASS_TO_SELECT",
+        "requested_budget": 0,
+        "research_intent": "STOP",
+        "selected_candidate": null,
+        "selected_method": "stop",
+        "selected_variables": []
+      }
+    },
+    {
+      "reference": {
+        "artifact_id": "439c6069e05cd686fffcf8c5a4c129b7fb85bbc27555f02a2bd94719e31d5358",
+        "media_type": "application/json"
+      },
+      "action": "stop",
+      "decision": {
+        "claimed_inference": "empirical_search",
+        "hypothesis_id": "NO_FRESH_PASS_TO_SELECT",
+        "requested_budget": 0,
+        "research_intent": "STOP",
+        "selected_candidate": null,
+        "selected_method": "stop",
+        "selected_variables": []
+      }
+    },
+    {
+      "reference": {
+        "artifact_id": "cc40737efa9a5b3d640bd86225198d4b9aafd07db80d748cca83d850b1ed0c85",
+        "media_type": "application/json"
+      },
+      "action": "stop",
+      "decision": {
+        "claimed_inference": "empirical_search",
+        "hypothesis_id": "NO_FRESH_PASS_TO_SELECT",
+        "requested_budget": 0,
+        "research_intent": "STOP",
+        "selected_candidate": null,
+        "selected_method": "stop",
+        "selected_variables": []
+      }
+    },
+    {
+      "reference": {
+        "artifact_id": "ec10951606d3ec7c04dc7c03dbe2fe59145b4fc20689dfb2c2604de1221e7c8d",
+        "media_type": "application/json"
+      },
+      "action": "stop",
+      "decision": {
+        "claimed_inference": "empirical_search",
+        "hypothesis_id": "NO_FRESH_PASS_TO_SELECT",
+        "requested_budget": 0,
+        "research_intent": "STOP",
+        "selected_candidate": null,
+        "selected_method": "stop",
+        "selected_variables": []
+      }
+    }
+  ],
+  "best_task_gap": null,
   "task_passed": false,
   "ledger": {
     "limit": {
@@ -367,5 +477,5 @@
     "occupied": {}
   },
   "numerical_s": 22.82241449994035,
-  "limitation": "Decision signature changes need interpretation from raw feedback. Distinct sequences are not a proof of independent response directions. Cached observations may supply valid information. Currency unknown."
+  "limitation": "Decision signature changes include selection/STOP, not necessarily scientific strategy changes; inspect raw feedback. Distinct sequences are not a proof of independent response directions. Cached observations may supply valid information. Currency unknown."
 }

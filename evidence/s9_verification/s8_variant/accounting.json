@@ -334,14 +334,41 @@
   "new_physical_evaluations": 21,
   "backend_starts": 21,
   "unique_physical_input_sequences": 21,
-  "unique_response_probes": 0,
+  "unique_response_probes": null,
   "cache_reuses": 15,
   "search_feedback": [
     null
   ],
   "math_to_control_handoff": [],
   "research_decision_changes": 0,
-  "decisions": [],
+  "decisions": [
+    {
+      "reference": {
+        "artifact_id": "ed5fe369aa9b7838672dca5f2a5944e695d7e21e01fa0d51e6090c6b89b33ce9",
+        "media_type": "application/json"
+      },
+      "action": "control_search",
+      "decision": {
+        "claimed_inference": "empirical_search",
+        "hypothesis_id": "CONTROL_SEARCH_INCOMPLETE",
+        "requested_budget": 36,
+        "research_intent": "CONTROL_SEARCH",
+        "selected_candidate": {
+          "artifact_id": "15fb884f14be78c4021697b1ea26bba42a303738ff50121f6f0b24add84bb73d",
+          "media_type": "application/json"
+        },
+        "selected_method": "control_search_response_final_window_subspace",
+        "selected_variables": [
+          "tension offset knot t=0.30 tendon_0",
+          "tension offset knot t=0.30 tendon_1",
+          "tension offset knot t=0.30 tendon_2",
+          "tension offset knot t=0.30 tendon_3"
+        ],
+        "version": "research_decision_v1"
+      }
+    }
+  ],
+  "best_task_gap": 0.11786172695770314,
   "task_passed": false,
   "ledger": {
     "limit": {
@@ -368,5 +395,5 @@
     "occupied": {}
   },
   "numerical_s": 35.43725349963643,
-  "limitation": "Decision signature changes need interpretation from raw feedback. Distinct sequences are not a proof of independent response directions. Cached observations may supply valid information. Currency unknown."
+  "limitation": "Decision signature changes include selection/STOP, not necessarily scientific strategy changes; inspect raw feedback. Distinct sequences are not a proof of independent response directions. Cached observations may supply valid information. Currency unknown."
 }

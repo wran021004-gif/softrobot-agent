@@ -20,7 +20,7 @@ def accounting(host):
             if v.get('usage'):usage[e['request_id']]=v['usage']
         if e['kind']=='model_original_tool_feedback':feedback.append(host.store.artifact(e['outputs'][0]))
         if e['kind']=='model_original_tool_request':
-            v=host.store.artifact(e['outputs'][0]);payload=v.get('input',{})
+            v=host.store.artifact(e['outputs'][0]);payload=v['tool_use']['input']
             if payload.get('decision'):decisions.append(dict(reference=e['outputs'][0],action=payload.get('action'),decision=payload['decision']))
     errors=Counter()
     for item in feedback:
@@ -35,6 +35,8 @@ def accounting(host):
     searches=[host.store.artifact(r) for r in s.get('control_search_results',[])]
     plans=[host.store.artifact(r)['original_plan'] for r in s.get('plans',[])]
     signatures=[digest({k:d['decision'].get(k) for k in ('selected_method','selected_variables','selected_candidate')}) for d in decisions]
+    from tools.research.feedback import task_gap
+    gaps=[task_gap(host.store.artifact(r)) for key in ('results','physical_replays','rl_evaluations') for r in s.get(key,[])]
     first=next(iter(requests),None)
     return dict(study_id=host.run_id,freeze=s.get('freeze'),provider_requests=len(requests),
         total_tokens=sum(v.get('total_tokens',0) for v in usage.values()),provider_usage=usage,
@@ -45,13 +47,15 @@ def accounting(host):
             wall_s=(datetime.fromisoformat(first_physics['timestamp'])-datetime.fromisoformat(first['timestamp'])).total_seconds()) if first and first_physics else None,
         new_physical_evaluations=sum(len(s.get(k,[])) for k in ('results','physical_replays','rl_evaluations')),
         backend_starts=host.store.remaining()['used']['backend_solves'],unique_physical_input_sequences=len(set(physical)),
-        unique_response_probes=sum(r.get('cost_feedback',{}).get('unique_response_probes',0) for r in searches),
+        unique_response_probes=None if any('cost_feedback' not in r for r in searches) else
+            sum(r['cost_feedback']['unique_response_probes'] for r in searches),
         cache_reuses=sum(sum(v.get('cache_hit',False) for v in r['candidates']) for r in searches),
         search_feedback=[r.get('cost_feedback') for r in searches],
         math_to_control_handoff=[p['control_seed']['response_evidence'] for p in plans if (p.get('control_seed') or {}).get('method')=='mathematical_response'],
         research_decision_changes=sum(a!=b for a,b in zip(signatures,signatures[1:])),decisions=decisions,
+        best_task_gap=min((g['normalized_gap'] for g in gaps if g['valid_complete'] and g['normalized_gap'] is not None),default=None),
         task_passed=bool(s.get('selected')),ledger=host.store.remaining(),numerical_s=s.get('numerical_s'),
-        limitation='Decision signature changes need interpretation from raw feedback. Distinct sequences are not a proof of independent response directions. Cached observations may supply valid information. Currency unknown.')
+        limitation='Decision signature changes include selection/STOP, not necessarily scientific strategy changes; inspect raw feedback. Distinct sequences are not a proof of independent response directions. Cached observations may supply valid information. Currency unknown.')
 
 
 if __name__=='__main__':
