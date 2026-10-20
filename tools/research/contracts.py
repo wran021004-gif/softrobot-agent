@@ -358,12 +358,21 @@ class ControlSeedRequest(Contract):
 class ResearchDecision(Contract):
     version: Literal['research_decision_v1'] = 'research_decision_v1'
     hypothesis_id: str = Field(min_length=1)
-    claimed_inference: str = Field(default='empirical_search',min_length=1)
+    claimed_inference: str = Field(default='empirical_search',min_length=1,description='Use empirical_search for a proposed falsifiable experiment, including testing a mathematical prediction in physics. This is not a proven inference. Any stronger claim must match supported_inferences of registered supporting_evidence with the required identity and scope.')
     research_intent: Literal['DIAGNOSE','MATHEMATICAL_ANALYSIS','CONTROL_SEARCH','DESIGN_MODIFICATION','NMPC_EXECUTION','RL_TRAINING','PHYSICAL_VALIDATION','SELECT','STOP']
     selected_method: str = Field(min_length=1)
     selected_variables: list[str] = Field(default_factory=list)
     selected_candidate: EvidenceRef | None = None
     requested_budget: int = Field(default=0,ge=0,strict=True,description='Physical request cap for control search; otherwise declared operation units')
+
+
+# Payload ownership belongs to Plan; the provider schema projects this contract.
+PLAN_PAYLOADS = dict(initialize_control='control_seed',generate='generation',propose='parameters',
+    execute='candidate',search='search',control_search='control_search',mechanics='mechanics',
+    replay='mechanics_source',cross_replay='cross_replay',physical_replay='physical_replay',
+    refine='refinement',matched_state='matched_state',nmpc_prediction_diagnostic='nmpc_prediction_diagnostic',
+    diagnose='diagnostic',confirm='selected_execution',select='selected_execution')
+PLAN_OPTIONAL_PAYLOADS = dict(propose=('mechanics_source',),diagnose=('diagnostic',))
 
 
 class Plan(Contract):
@@ -408,12 +417,8 @@ class Plan(Contract):
     def required(self):
         if self.revise_selection and self.action not in ('confirm','select'):
             raise ValueError('REVISE_SELECTION_REQUIRES_CONFIRM_ACTION')
-        required = {'initialize_control':'control_seed','control_search':'control_search','generate': 'generation', 'propose': 'parameters', 'execute': 'candidate', 'search': 'search', 'confirm': 'selected_execution', 'select': 'selected_execution',
-                    'mechanics': 'mechanics', 'replay': 'mechanics_source', 'cross_replay':'cross_replay',
-                    'physical_replay':'physical_replay','refine':'refinement','matched_state':'matched_state',
-                    'nmpc_prediction_diagnostic':'nmpc_prediction_diagnostic'}
-        active = required.get(self.action)
-        for field in ('control_seed','control_search','generation', 'parameters', 'search', 'candidate', 'selected_execution', 'mechanics', 'cross_replay','physical_replay','refinement','matched_state','nmpc_prediction_diagnostic'):
+        active = PLAN_PAYLOADS.get(self.action)
+        for field in set(PLAN_PAYLOADS.values())-{'mechanics_source','diagnostic'}:
             if (getattr(self, field) is not None) != (field == active):
                 raise ValueError('ACTION_REQUIRES_ONLY_' + str(active))
         if self.action=='replay' and self.mechanics_source is None:

@@ -154,7 +154,7 @@ def compact_evidence(value, reference, pointer='', *, facts_only=False):
                 items.append(preview(x,depth+1,path+'/'+str(i)))
             return dict(total=len(v),read_pointer=path,item_keys=list(v[0]) if isinstance(v[0],dict) else None,preview=items) if len(v)>3 else items
         if isinstance(v,dict):
-            if depth>5:return dict(keys=list(v))
+            if depth>5:return dict(keys=list(v),read_pointer=path)
             return {k:(dict(available=True,read_pointer=path+'/'+k) if k in (
                 'configuration','scientific_configuration','resolved','trajectory','outputs','samples','request','original_result')
                 else preview(x,depth+1,path+'/'+k.replace('~','~0').replace('/','~1'))) for k,x in v.items()}
@@ -179,6 +179,9 @@ def compact_evidence(value, reference, pointer='', *, facts_only=False):
     if facts_only and summary:result=dict(read_pointer=pointer,available_keys=list(value))
     return dict(reference=reference,pointer=pointer,view='deterministic_summary',
         available_keys=list(value) if isinstance(value,dict) else None,summary=summary,
+        read_queries=[dict(reference=reference,pointer=pointer+'/'+k.replace('~','~0').replace('/','~1'),
+            view='range' if isinstance(v,list) else 'summary') for k,v in value.items()
+            if isinstance(v,(dict,list)) and (not facts_only or k in ('parameters','acceptance','best'))][:6] if isinstance(value,dict) else [],
         retrieval='Display value/summary/preview are not Store path prefixes. All read_pointer values are absolute paths in reference. Use evidence_read(view=full,pointer=...). No acceptance transfer.',value=result)
 
 
@@ -348,7 +351,8 @@ def decision_brief(current):
     domains=current.get('control_start_domains',[])
     for row in brief['available_research_actions']:
         domain=next((d for d in domains if d['candidate']==row.get('candidate') and d['source']==row.get('source')),None)
-        if domain:row['domain']={k:v for k,v in domain.items() if k not in ('candidate','source')}
+        if domain and row['action']=='control_search':
+            row['domain']={k:v for k,v in domain.items() if k not in ('candidate','source')}
     brief['citation_rule']=feedback['citation_rule']
     brief['version']='decision_brief_v1'
     return brief

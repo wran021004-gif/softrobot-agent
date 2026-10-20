@@ -33,6 +33,45 @@ def preflight():
     return dict(matlab=report['matlab'],direct_rl=report['direct_rl_environment'],new_physics=0,provider_requests=0)
 
 
+def cold_preflight():
+    """S12.5 disposable engineering candidate; never imported by the formal Study."""
+    from tests.research.test_s125_contract import cold_host
+    from tools.research.research_context import import_history
+    from tools.research.design import generate_candidate
+    from tools.research.physical_replay import seed_control
+    from tools.research.contracts import ControlSeedRequest, MechanicsRequest
+    from tools.research.mechanics import warm_start
+    from tools.research.core import read_evidence
+    h=cold_host();import_history(h);s=state(h);initial=decision_brief(context(h))
+    assert not any(s.get(k) for k in ('candidates','reference_candidate','research_history','research_mathematics','control_initializations'))
+    from tests.research.s125_wire_audit import audit
+    old_ref=audit()['errors'][0]['tool_use']['input']['reference']
+    try:read_evidence(h,dict(reference=old_ref))
+    except ValueError as exc:rejection=str(exc)
+    else:raise AssertionError('OLD_STUDY_ACCESS')
+    candidate=generate_candidate(h,dict(version='serial_family_generation_v2',
+        family_space_identity=s['spec']['family_space_identity'],segment_count=2,tendon_count=4),
+        dict(origin='s125_engineering_only_no_formal_import'))['candidate']
+    seed=seed_control(h,ControlSeedRequest(candidate=candidate))
+    assert warm_start(h,MechanicsRequest(candidate=candidate,initialization='constant_0_2')) is None
+    cfg,task=prepare_input(h,RLRequest(operation='start',candidate=candidate,mode='direct',rationale='Environment construction only'))
+    atomic_json(h.store.root/'rl_environment_input.json',cfg)
+    code="import json,sys; from tools.rl.env import TensionEnv; c=json.load(open(sys.argv[1],encoding='utf8')); e=TensionEnv(c); print(json.dumps(dict(status='constructed',mode=e.mode,dofs=e.model.nv,actions=list(e.action_space.shape),observations=list(e.observation_space.shape),intervals=c['task']['command_intervals']))); e.close()"
+    p=subprocess.run([s['spec']['runtime']['rl_python'],'-c',code,str(h.store.root/'rl_environment_input.json')],cwd=ROOT,capture_output=True,text=True)
+    if p.returncode:raise ValueError(p.stderr)
+    report=dict(scientific_evidence=False,engineering_store=str(h.store.root),initial_context=initial,
+        old_reference_rejection=rejection,bootstrap=s['spec']['implementation_scaffold'],
+        framework_session_id=s['pilot']['framework_session_id'],session_history_exists=(h.store.root/'framework_sessions').exists(),
+        engineering_candidate=candidate,initialization=seed,cold_mathematics=True,
+        mathematics_admission=admission(h),nmpc_admission=nmpc_timing(h,candidate),
+        direct_rl_environment=json.loads(p.stdout),canonical_task_identity=s['spec']['canonical_task_identity'],
+        family_space_identity=s['spec']['family_space_identity'],ledger=h.store.remaining(),
+        scope='No Provider, simulation, training or numerical solve. Engineering candidate and seed are not formal study inputs.')
+    assert report['ledger']['used']['model_calls']==report['ledger']['used']['backend_solves']==0
+    atomic_json(ROOT/'evidence/s125_preflight/cold_start.json',report)
+    return dict(status='passed',direct_rl=report['direct_rl_environment'],provider_requests=0,new_physics=0)
+
+
 def final_checks():
     import hashlib,os,tarfile
     from pathlib import Path

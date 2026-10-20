@@ -195,20 +195,36 @@ def read_tool_evidence(host,query):
     return read_evidence(host,query)
 
 
-def plan_schema(actions):
+def plan_schema(actions, *, decision_required=False):
     """Advertise only executable action payloads and their reachable definitions."""
-    from tools.research.contracts import Plan
+    from tools.research.contracts import Plan, PLAN_PAYLOADS, PLAN_OPTIONAL_PAYLOADS
     schema=Plan.model_json_schema()
-    payloads=dict(initialize_control='control_seed',generate='generation',propose='parameters',execute='candidate',
-        search='search',control_search='control_search',mechanics='mechanics',replay='mechanics_source',
-        cross_replay='cross_replay',physical_replay='physical_replay',refine='refinement',matched_state='matched_state',
-        nmpc_prediction_diagnostic='nmpc_prediction_diagnostic',diagnose='diagnostic',confirm='selected_execution',select='selected_execution')
+    payloads=PLAN_PAYLOADS
     allowed={payloads[a] for a in actions if a in payloads}
+    allowed.update(f for a in actions for f in PLAN_OPTIONAL_PAYLOADS.get(a,()))
     for field in set(payloads.values())-allowed:schema['properties'].pop(field,None)
     schema['properties']['action']={'type':'string','enum':actions}
-    schema['allOf']=[
-        {'if':{'properties':{'action':{'const':a}}},'then':{'required':[payloads[a]],
-            'properties':{payloads[a]:{'not':{'type':'null'}}}}} for a in actions if a in payloads and a!='diagnose']
+    if decision_required:
+        schema['required'].append('decision')
+        schema['properties']['decision']={'$ref':'#/$defs/ResearchDecision'}
+    schema['allOf']=[]
+    for field in dict.fromkeys(payloads.values()):
+        owners=[a for a in actions if payloads.get(a)==field or field in PLAN_OPTIONAL_PAYLOADS.get(a,())]
+        if not owners:continue
+        required_by=[a for a in owners if field not in PLAN_OPTIONAL_PAYLOADS.get(a,())]
+        branch=dict(required=[field],properties={field:{'not':{'type':'null'}}}) if required_by else {}
+        if required_by and required_by!=owners:
+            branch={'if':{'properties':{'action':{'enum':required_by}}},'then':branch}
+        if len(actions)==1:
+            if required_by:
+                schema['required'].append(field)
+                schema['properties'][field].pop('default',None)
+                schema['properties'][field]['anyOf']=[v for v in schema['properties'][field]['anyOf'] if v.get('type')!='null']
+        else:
+            schema['allOf'].append({'if':{'properties':{'action':{'enum':owners}}},'then':branch,
+                'else':{'properties':{field:{'type':'null'}}}})
+    schema['allOf'].append({'if':{'properties':{'action':{'not':{'enum':['select','confirm']}}}},
+        'then':{'properties':{'revise_selection':{'const':False}}}})
     needed=set()
     def visit(v):
         if isinstance(v,dict):
@@ -416,7 +432,7 @@ async def converse(host):
         if formal and state(host)['spec'].get('mode')!='rl_interface':
             actions += [a for a,c in [('execute','nmpc'),('search','search'),('mechanics','mathematics'),('replay','replay')] if enabled(state(host)['spec'],c)]
         actions=state(host)['spec'].get('allowed_plan_actions',actions)
-        schema=plan_schema(actions)
+        schema=plan_schema(actions,decision_required=bool(state(host)['spec'].get('research_decisions')))
         native[0].tool_spec={**native[0].tool_spec,'inputSchema':{'json':schema}}
     if state(host)['spec'].get('nominal_source') or state(host)['spec'].get('start_mode')=='family_space':
         native.append(PythonAgentTool('research_analysis',dict(name='research_analysis',description='Candidate-bound mathematics; saved_state or execution plus update_id selects exact projected state at previous applied input with actual remaining task time. Historical candidate binding required. Each calculation charged once; task acceptance unmeasured.',inputSchema={'json':AnalysisRequest.model_json_schema()}),handler('analysis')))
@@ -470,8 +486,10 @@ async def converse(host):
             return
         guard(host)
         current=decision_packet(host)
+        if formal:agent.tool_registry.registry.pop('experience_retrieve',None)
+        if 'research' in current:
+            native[0].tool_spec={**native[0].tool_spec,'inputSchema':{'json':plan_schema(current['research']['actions'],decision_required=bool(s['spec'].get('research_decisions')))}}
         if s['spec'].get('tool_readiness') or s.get('tool_failures'):
-            native[0].tool_spec={**native[0].tool_spec,'inputSchema':{'json':plan_schema(current['research']['actions'])}}
             from tools.research.tool_readiness import availability
             if (availability(host) or {}).get('status')!='ready' or current['research']['method_remaining']['mathematical_evaluations']<1:
                 agent.tool_registry.registry.pop('research_analysis',None)
@@ -479,7 +497,7 @@ async def converse(host):
         agent.system_prompt=instructions+'\nCURRENT_RESEARCH_PACKET\n'+json.dumps(current,separators=(',',':'))
         if current.get('research',{}).get('budget',{}).get('closeout',{}).get('next_request_will_protect',protected(host)):
             permitted=closeout_operations(host)
-            schema=plan_schema(permitted['research_plan'])
+            schema=plan_schema(permitted['research_plan'],decision_required=bool(s['spec'].get('research_decisions')))
             native[0].tool_spec={**native[0].tool_spec,'inputSchema':{'json':schema}}
             agent.tool_registry.registry.pop('experience_retrieve',None)
             agent.tool_registry.registry.pop('research_analysis',None)

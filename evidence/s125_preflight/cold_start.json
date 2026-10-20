@@ -1,0 +1,333 @@
+{
+  "scientific_evidence": false,
+  "engineering_store": "D:\\softrobot-agent\\.worktrees\\sorosim-matlab-nmpc\\runs\\s125-preflight-25a8ced4fa29409588b54248a36adb8c",
+  "initial_context": {
+    "version": "decision_brief_v1",
+    "task_identity": "d24aeac7041052ce1d2ae60e825a802e7367107784f6fec192b0a65c4a5e76e7",
+    "task": {
+      "contract": "research.task_adapter",
+      "version": "1.0.0",
+      "family": "task.reach",
+      "evaluator": {
+        "extension_id": "evaluate.reach",
+        "parameters": {
+          "contract": "reference.reach_evaluation",
+          "data": {
+            "tolerance_m": 0.01
+          },
+          "version": "1.0.0"
+        },
+        "version": "1.0.0"
+      },
+      "output": {
+        "dimension": 3,
+        "entity": "tip",
+        "frame": "world",
+        "missing": "unsupported",
+        "name": "tip_position",
+        "phase": "post_step",
+        "units": "m"
+      },
+      "reference": {
+        "contract": "reference.reach_goal",
+        "data": {
+          "target_m": [
+            0.29,
+            -0.035,
+            0.19
+          ]
+        },
+        "version": "1.0.0"
+      },
+      "operating_point": {
+        "time_s": 0.0,
+        "reference_position_m": [
+          0.29,
+          -0.035,
+          0.19
+        ],
+        "reference_velocity_m_s": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "frame": "world",
+        "state_source": "Named task initializer; subsequent measured backend state",
+        "reference_is_equilibrium": false
+      },
+      "metrics": [
+        {
+          "name": "terminal_error_m",
+          "unit": "m",
+          "meaning": "Sealed endpoint evaluator position error"
+        },
+        {
+          "name": "holding_max_error_m",
+          "unit": "m",
+          "meaning": "Maximum sampled final-window tip error"
+        },
+        {
+          "name": "holding_max_speed_m_s",
+          "unit": "m/s",
+          "meaning": "Maximum sampled world translational tip speed"
+        }
+      ],
+      "scoring_interval_s": [
+        0.0,
+        0.35
+      ],
+      "holding": {
+        "position_limit_m": 0.01,
+        "speed_limit_m_s": 0.02,
+        "window_s": 0.05
+      },
+      "timing": {
+        "control_period_s": 0.01,
+        "duration_s": 0.35,
+        "sample_period_s": 0.01,
+        "termination": [
+          "duration",
+          "numerical_failure"
+        ],
+        "timestep_s": 0.0005
+      },
+      "continuous_time_guarantee": false,
+      "context": "Endpoint reach and final-window position/speed are distinct components. Offline deployment timing is diagnostic."
+    },
+    "capabilities": [
+      "analysis",
+      "mathematics",
+      "replay",
+      "nmpc",
+      "rl",
+      "physical_replay",
+      "control_correction",
+      "control_search"
+    ],
+    "best_valid": null,
+    "evidence": [],
+    "unresolved_hypotheses": {
+      "CONTROL_SEARCH_INCOMPLETE": {
+        "scope": "Only searched starts, controls and budgets.",
+        "claim_kind": "UNVERIFIED_HYPOTHESIS"
+      },
+      "MODEL_PREDICTION_UNRELIABLE": {
+        "scope": "Only checked operating points and input sequences.",
+        "claim_kind": "UNVERIFIED_HYPOTHESIS"
+      },
+      "CONTROL_PARAMETERIZATION_LIMITED": {
+        "scope": "Only declared bases and coefficient domains.",
+        "claim_kind": "UNVERIFIED_HYPOTHESIS"
+      },
+      "DESIGN_LIMITATION_POSSIBLE": {
+        "scope": "Only tested designs; a local model exclusion is not physical exclusion.",
+        "claim_kind": "UNVERIFIED_HYPOTHESIS"
+      },
+      "SOLVER_OR_NUMERICAL_ISSUE": {
+        "scope": "Only measured solver/model/grid conditions.",
+        "claim_kind": "UNVERIFIED_HYPOTHESIS"
+      }
+    },
+    "actions": [
+      "generate",
+      "initialize_control",
+      "physical_replay",
+      "control_search",
+      "execute",
+      "mechanics",
+      "replay",
+      "refine",
+      "diagnose",
+      "select",
+      "stop"
+    ],
+    "budget": {
+      "provider_budget": {
+        "remaining_total": 48,
+        "reserved_for_closeout": 4,
+        "available_for_exploration": 44,
+        "next_request_exploration_remaining": 43
+      },
+      "science_budget": {
+        "remaining_physical": 64,
+        "remaining_mathematical": 4
+      },
+      "closeout": {
+        "active": false,
+        "next_request_will_protect": false,
+        "reason": null
+      }
+    },
+    "method_limits": {
+      "mathematical_evaluations": 4,
+      "offline_nlp": 1,
+      "bdf_replays": 2,
+      "nmpc": {
+        "executions": 2
+      },
+      "rl": {
+        "actions_per_trial": 65536,
+        "diagnostic_physics_steps": 0,
+        "diagnostic_replays": 0,
+        "evaluation_episodes": 1,
+        "seconds_per_trial": null,
+        "training_actions": 65536,
+        "training_active_seconds": null,
+        "training_stages": 1
+      }
+    },
+    "method_used": {
+      "mathematical_evaluations": 0,
+      "offline_nlp": 0,
+      "bdf_replays": 0,
+      "nmpc_launches": 0,
+      "admitted_training_stages": 0,
+      "physical_replay_launches": 0
+    },
+    "method_remaining": {
+      "mathematical_evaluations": 4,
+      "offline_nlp": 1,
+      "bdf_replays": 2,
+      "nmpc": 2,
+      "rl_stages": 1
+    },
+    "rl_accounting": {
+      "admitted": 0,
+      "limit": 1,
+      "actual_actions": 0,
+      "verified_actions_lower_bound": 0,
+      "accounted_actions_upper_bound": 0,
+      "actual_active_seconds": 0,
+      "outstanding": []
+    },
+    "all_fresh_results": [],
+    "observation_count": 0,
+    "history_count": 0,
+    "completed_decision_count": 0,
+    "evidence_access": "Full artifacts remain in Store. all_fresh_results is the complete STOP citation index; observations is a bounded recent view.",
+    "tool_readiness": {
+      "status": "ready",
+      "checked_unix": 1792497114.5432615,
+      "failed_stage": null,
+      "reason": null,
+      "failure_reference": null,
+      "log_reference": {
+        "artifact_id": "63be7e41e020bc00ee1c7926929730c6f0a0b9c0c3d83427c76eb5acfba8dc67",
+        "media_type": "application/json"
+      }
+    },
+    "control_initialization_methods": {
+      "baseline": "Pretension, explicit tensions_n, or source+parent with optional channel_map",
+      "mathematical_response": "response_evidence must be a current verified input_sensitivity analysis; optional channels, trust_radius_n, regularization",
+      "physical_response": "Optional baseline source+parent; channels, difference_step_n, trust_radius_n, regularization, evaluation_requests; one baseline plus one full rollout per channel, charged to shared budget"
+    },
+    "control_search_domain": {
+      "coefficient_order": "knot_index * tendon_count + tendon_index",
+      "active_coefficients": "Optional unique flat indices; inactive coefficients remain zero relative to each start",
+      "response_cost": "baseline per start + active coefficient count probes + one proposal per local response iteration; all share one cap",
+      "time_constraint": "0 <= window_start <= knots[0] < knots[-1] <= window_end <= task duration",
+      "multi_start": "additional_starts=[{candidate,source,adaptation_from?}]; same task, tendon order and time grid required"
+    },
+    "task_accepted": false,
+    "latest_scientific_feedback": null,
+    "recent_searches": [],
+    "available_research_actions": [],
+    "citation_rule": "STOP must explain the outcome and explicitly cite all_fresh_results. This index does not record model reading or understanding."
+  },
+  "old_reference_rejection": "EVIDENCE_MISSING_OR_CHANGED: 5f6f99b6c44900c0868942d35ce39eab45df2f2e6f168e92184036993b1e241b",
+  "bootstrap": {
+    "candidate_pool_member": false,
+    "purpose": "Host SessionInput compatibility only; not an Agent candidate",
+    "reason": "Host.create and compile_input require concrete robot signals and backend checks",
+    "scientific_candidate": false,
+    "source": {
+      "family_space_identity": "0793d20569402760ca055f73f6f97d80d73d0fe3c051ff2b60ebad1519db02aa",
+      "request": {
+        "control_weights": {},
+        "family_space_identity": "0793d20569402760ca055f73f6f97d80d73d0fe3c051ff2b60ebad1519db02aa",
+        "route_overrides": {},
+        "segment_count": 1,
+        "segments": {},
+        "spans": [],
+        "strategy": "polar_consecutive_spans_v1",
+        "tendon_count": 1,
+        "tendon_parameters": {},
+        "version": "serial_family_generation_v2"
+      }
+    }
+  },
+  "framework_session_id": "s125-preflight-25a8ced4fa29409588b54248a36adb8c",
+  "session_history_exists": false,
+  "engineering_candidate": {
+    "artifact_id": "f81d1e40a109c0f7b674647c6497447c2b09170661f4227a404cfa36c18b43bf",
+    "media_type": "application/json"
+  },
+  "initialization": {
+    "candidate": {
+      "artifact_id": "f81d1e40a109c0f7b674647c6497447c2b09170661f4227a404cfa36c18b43bf",
+      "media_type": "application/json"
+    },
+    "source": {
+      "artifact_id": "09c5d8a3ec6d206e2d0dd52826e9a3765d375e6521bb13d94425dc38d1849594",
+      "media_type": "application/json"
+    },
+    "task_acceptance": "unmeasured"
+  },
+  "cold_mathematics": true,
+  "mathematics_admission": {
+    "admitted": 1,
+    "requested": 1,
+    "reservation_s": 0.0,
+    "timeout_s": null,
+    "remaining_numerical_s": null
+  },
+  "nmpc_admission": {
+    "available": true,
+    "cap_s": null,
+    "reservation_s": null,
+    "complete_execution_s": null,
+    "first_use_available": true,
+    "evidence_sources": [],
+    "reason": "Finite execution count and physical horizon; elapsed time is measured only",
+    "design_feasibility": "not assessed by admission"
+  },
+  "direct_rl_environment": {
+    "status": "constructed",
+    "mode": "direct",
+    "dofs": 48,
+    "actions": [
+      4
+    ],
+    "observations": [
+      107
+    ],
+    "intervals": 35
+  },
+  "canonical_task_identity": "d24aeac7041052ce1d2ae60e825a802e7367107784f6fec192b0a65c4a5e76e7",
+  "family_space_identity": "0793d20569402760ca055f73f6f97d80d73d0fe3c051ff2b60ebad1519db02aa",
+  "ledger": {
+    "limit": {
+      "backend_solves": 64,
+      "model_calls": 48,
+      "tool_calls": 200,
+      "wall_s": null,
+      "worker_calls": 0
+    },
+    "used": {
+      "tool_calls": 0,
+      "model_calls": 0,
+      "backend_solves": 0,
+      "worker_calls": 0,
+      "wall_s": 0.0
+    },
+    "remaining": {
+      "backend_solves": 64,
+      "model_calls": 48,
+      "tool_calls": 200,
+      "wall_s": null,
+      "worker_calls": 0
+    },
+    "occupied": {}
+  },
+  "scope": "No Provider, simulation, training or numerical solve. Engineering candidate and seed are not formal study inputs."
+}

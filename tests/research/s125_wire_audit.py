@@ -11,7 +11,7 @@ from tools.state_io import atomic_json, digest
 
 def audit():
     h,values=archive_host('evidence/s12_mirror/study')
-    events=h.store.events(h.run_id);usage={};rows=[];errors=[];duplicates=Counter()
+    events=h.store.events(h.run_id);usage={};rows=[];errors=[];duplicates=Counter();subtrees=Counter()
     for e in events:
         if e['kind']=='r3_response':
             v=h.store.artifact(e['outputs'][0])
@@ -28,13 +28,40 @@ def audit():
                         if counts[fingerprint]:repeated[kind+'_'+key]+=size(m[key])-2
                         counts[fingerprint]+=1
             duplicates.update(repeated)
+            seen=set();duplicate_nodes=Counter()
+            def visit(value,path):
+                if not isinstance(value,(dict,list)):return
+                n=size(value);key=digest(value)
+                if n>=128 and key in seen:
+                    duplicate_nodes[path.rsplit('/',1)[-1]]+=n
+                    return  # Do not count children again within this occurrence.
+                seen.add(key)
+                for k,v in (value.items() if isinstance(value,dict) else enumerate(value)):
+                    visit(v,path+'/'+str(k))
+            for m in wire['messages']:
+                text=m.get('content')
+                if not isinstance(text,str):continue
+                if '\nCURRENT_RESEARCH_PACKET\n' in text:text=text.split('\nCURRENT_RESEARCH_PACKET\n',1)[1]
+                try:parsed=json.loads(text)
+                except ValueError:continue
+                visit(parsed,m['role'])
+            subtrees.update(duplicate_nodes)
             u=usage[e['request_id']]
+            from tools.research.agent import plan_schema
+            projected=deepcopy(wire)
+            projected['tools']=[t for t in projected['tools'] if t['function']['name']!='experience_retrieve']
+            for t in projected['tools']:
+                if t['function']['name']=='research_plan':
+                    actions=t['function']['parameters']['properties']['action']['enum']
+                    t['function']['parameters']=plan_schema(actions,decision_required=True)
             rows.append(dict(order=len(rows)+1,request_id=e['request_id'],request=metadata['request'],
                 **parts,message_count=len(wire['messages']),usage=u,
                 prompt_cache_hit_tokens=u.get('prompt_cache_hit_tokens','unavailable'),
                 prompt_cache_miss_tokens=u.get('prompt_cache_miss_tokens','unavailable'),
                 reasoning_tokens=u.get('completion_tokens_details',{}).get('reasoning_tokens','unavailable'),
-                repeated_exact_string_bytes=dict(repeated)))
+                repeated_exact_string_bytes=dict(repeated),repeated_parsed_subtree_bytes=dict(duplicate_nodes),
+                projected_schema_bytes=size(projected['tools']),projected_request_bytes=size(projected),
+                projection='Schema-only S12.5 projection, not a sent request; preserves all original messages and reasoning'))
         if e['kind']=='model_original_tool_feedback':
             v=h.store.artifact(e['outputs'][0])
             if v['result']['status']=='error':
@@ -54,6 +81,7 @@ def audit():
     return dict(source='evidence/s12_mirror/study',requests=rows,errors=errors,
         cumulative_bytes=dict(totals),ranked_components=totals.most_common(),
         repeated_exact_strings_ranked=duplicates.most_common(),
+        repeated_parsed_subtrees_ranked=subtrees.most_common(),
         provider_totals={k:sum(v[k] for v in usage.values()) for k in ('prompt_tokens','completion_tokens','total_tokens')},
         new_provider_requests=0,new_scientific_executions=0,
         limitation='Canonical JSON bytes, not HTTP byte recording or token estimates. Repeated strings are exact within-request matches; semantic similarity is not measured. Reasoning is retained unchanged.')

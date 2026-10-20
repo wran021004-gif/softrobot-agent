@@ -16,10 +16,11 @@ from tools.research.agent import plan_schema
 from tests.research.s125_wire_audit import audit, reproduce
 
 
-def cold_host():
+def cold_host(mode='formal_research'):
     """Unique isolated engineering grant; never reuse a formal Study budget."""
     c=json.loads((ROOT/'configs/research/study_s125_cold.json').read_text())
     c['study_id']='s125-preflight-'+uuid4().hex
+    c['mode']=mode
     path=ROOT/'runs'/c['study_id'];path.mkdir(parents=True)
     for key in ('defaults','family_space','control','task'):
         c[key]=str((ROOT/'configs/research'/c[key]).resolve())
@@ -109,6 +110,30 @@ class S125ContractTests(unittest.TestCase):
         self.assertEqual(query,dict(reference=ref,pointer='/parameters',view='summary'))
         self.assertEqual(view['value']['empty'],[])
         self.assertEqual(view['value']['parameters']['a/b']['~key']['read_pointer'],'/parameters/a~1b/~0key')
+
+    def test_actual_strands_http_wire_schema(self):
+        import asyncio, os, httpx
+        from tools.research.agent import converse
+        h=cold_host();import_history(h);captured={}
+        class Captured(BaseException):pass
+        class Boundary(httpx.AsyncBaseTransport):
+            def __init__(self,*args,**kwargs):pass
+            async def handle_async_request(self,request):
+                captured.update(json.loads(request.content));raise Captured()
+        packet=dict(research=decision_brief(context(h)),implementation='isolated_wire_fixture')
+        with patch('tools.research.agent.LiveBoundary',Boundary),patch('tools.research.core.guard'),\
+             patch('tools.research.agent.decision_packet',return_value=packet),\
+             patch('tools.research.agent.load_credential'),patch.dict(os.environ,{'DEEPSEEK_API_KEY':'synthetic-fixture'}):
+            with self.assertRaises(Captured):asyncio.run(converse(h))
+        schema=next(t['function']['parameters'] for t in captured['tools'] if t['function']['name']=='research_plan')
+        def constraints(v):
+            if isinstance(v,dict):return {k:constraints(x) for k,x in v.items() if k not in ('description','title')}
+            if isinstance(v,list):return [constraints(x) for x in v]
+            return v
+        self.assertEqual(constraints(schema),constraints(plan_schema(packet['research']['actions'],decision_required=True)))
+        Draft202012Validator.check_schema(schema)
+        self.assertEqual(h.store.remaining()['used']['model_calls'],0)
+        self.assertEqual(h.store.remaining()['used']['backend_solves'],0)
 
 
 if __name__=='__main__':unittest.main()
