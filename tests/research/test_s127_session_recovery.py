@@ -176,7 +176,7 @@ class SessionRecoveryTests(unittest.TestCase):
                 rows.append(dict(mode=mode,killed_process=True,reopened_sdk_and_store=True,new_science=0,external_requests=0,
                     max_sdk_path_chars=max(len(str(p)) for p in (h.store.root/'sdk').rglob('*.json'))))
         self.assertEqual(len(rows),len(modes))
-        atomic_json(ROOT/'evidence/s127_session_recovery/crash_matrix.json',dict(tests=rows,
+        atomic_json(ROOT/'runs/s127_4_recovery/crash_matrix.json',dict(tests=rows,
             offline_protocol_passed=True,production_recovery_validated=False,live_provider_continuation_unverified=True,
             scope='Real SDK and process termination. HTTP usage and pending-worker markers are fixtures; no scientific execution is claimed.'))
 
@@ -249,7 +249,7 @@ class SessionRecoveryTests(unittest.TestCase):
                 return saved['scientific_results']
             refs=asyncio.run(exercise());rows.append(dict(kind=kind,original_tool_id=use['toolUseId'],scientific_results=refs,
                 exact_saved_scientific_receipts=True,new_scientific_executions=0,external_requests=0,synthetic_consumption_requests=1))
-        atomic_json(ROOT/'evidence/s127_session_recovery/saved_worker_recovery.json',dict(tests=rows,
+        atomic_json(ROOT/'runs/s127_4_recovery/saved_worker_recovery.json',dict(tests=rows,
             scope='Actual saved S12.6 scientific receipts in independent protocol grants. Invocation prefixes and HTTP are fixtures; no live Provider continuation or repeated worker computation.'))
 
 
