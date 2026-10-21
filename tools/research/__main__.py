@@ -46,8 +46,11 @@ def main():
         print(json.dumps(recover(h)))
         return
     elif args.command in ('run','live'):
-        from tools.research.agent import converse
-        asyncio.run(converse(h,session_handoff=args.session_handoff))
+        from tools.research.agent import converse,IncompleteModelOutput
+        try:asyncio.run(converse(h,session_handoff=args.session_handoff))
+        except IncompleteModelOutput as exc:
+            print(json.dumps(dict(status='confirmed_incomplete',provider=exc.diagnostic)))
+            raise SystemExit(2) from exc
     elif args.command=='export':
         print(json.dumps(export(h)))
         return

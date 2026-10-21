@@ -4,7 +4,7 @@ from tools.platform_store import plain
 from tools.state_io import digest
 from tools.research.state import state, save, update
 from tools.research.feedback import task_gap
-from tools.research.evidence_policy import summarize_evidence, hypothesis_catalog, comparable_task
+from tools.research.evidence_policy import summarize_evidence, hypothesis_catalog, comparable_task, citation_inventory
 
 
 def import_history(host):
@@ -458,6 +458,7 @@ def working_set(host,current):
                 method_remaining={k:v for k,v in current['method_remaining'].items() if k not in ('mathematical_evaluations','rl_stages')}),
         control_search_domain=current.get('control_search_domain'),
         source_references=list({r['artifact_id']:r for r in registered_references(host)}.values()),all_fresh_results=references,
+        citation_eligibility=citation_inventory(host),
         scientific_scope='No model-authored hypotheses are promoted to measured causes; only original independent acceptance establishes success')
 
 
@@ -561,7 +562,11 @@ def decision_brief(current):
     ws=current['evidence_working_set'];feedback=current['decision_feedback']
     anchor=next(iter(ws['source_references']),current.get('structure_domain'))
     brief['evidence_access']=dict(reference=anchor,view='working_set',pointer='',
-        scope='Derived retrieval view, never scientific proof. JSON pointers select candidate_index, control_result_links, eligible_methods, read_coverage or source_references. Original references support full/fields/range reads.')
+        scope='Derived retrieval view, never scientific proof. JSON pointers select candidate_index, control_result_links, eligible_methods, read_coverage, source_references or citation_eligibility. Original references support full/fields/range reads.')
+    brief['citation_eligibility']=dict(query=dict(reference=anchor,view='working_set',pointer='/citation_eligibility'),
+        registered_count=len(ws['citation_eligibility']),latest_registered=deepcopy(ws['citation_eligibility'][-1:]),
+        rule='supporting_evidence requires registration AND matching inference/candidate/task/model scope. Candidate/control identity is not task success. FamilySpace and unregistered raw motion samples are readable only; reading never registers evidence.',
+        required_observations='Physical claims need a complete bound independent evaluation; mathematical claims need verified scoped results. STOP cites all_fresh_results; SELECT requires a read fresh pass.')
     brief['budget']=deepcopy(current['budget'])
     brief['budget']['method_remaining']={k:v for k,v in current['method_remaining'].items() if k not in ('mathematical_evaluations','rl_stages')}
     brief['budget']['training']=deepcopy(current['training_budget'])

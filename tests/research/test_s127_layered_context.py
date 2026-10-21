@@ -13,6 +13,54 @@ def size(value):return len(json.dumps(value,ensure_ascii=False,separators=(',','
 
 
 class LayeredContextTests(unittest.TestCase):
+    def test_citation_inventory_is_read_only_and_preserves_registered_scopes(self):
+        from tools.research.evidence_policy import registered_references,citation_inventory,admit_decision
+        from tools.research.contracts import Plan
+        from tests.research.s7_study import engineering_plan
+        h=historical_host();before=deepcopy(state(h));ledger=h.store.remaining();events=h.store.events(h.run_id)
+        rows=citation_inventory(h);known=registered_references(h)
+        self.assertEqual({r['reference']['artifact_id'] for r in rows},{r['artifact_id'] for r in known})
+        brief=decision_brief(context(h));query=brief['citation_eligibility']['query']
+        self.assertEqual(read_evidence(h,query),rows)
+        self.assertNotIn(before['family_space_reference'],known)
+        checked=[]
+        for kind in ('PHYSICAL_OBSERVATION','NUMERICAL_DIAGNOSTIC'):
+            row=next(r for r in rows if r['claim_kind']==kind and r['supported_inferences'] and r['candidate'])
+            plan=engineering_plan('diagnose','DIAGNOSE',row['candidate'])
+            plan['decision']['claimed_inference']=row['supported_inferences'][0]
+            plan['supporting_evidence']=[row['reference']]
+            admit_decision(h,Plan.model_validate(plan));checked.append(kind)
+        self.assertEqual(len(checked),2)
+        self.assertEqual(state(h),before);self.assertEqual(h.store.remaining(),ledger);self.assertEqual(h.store.events(h.run_id),events)
+
+    def test_two_actual_s127_4_citation_errors_still_reject_with_repair_feedback(self):
+        from unittest.mock import patch
+        from tools.platform_host import Host
+        from tools.research.config import ROOT
+        from tools.research.evidence_policy import admit_decision,registered_references
+        from tools.research.contracts import Plan
+        from tools.research.agent import received,error_feedback
+        from tools.state_io import read
+        from tests.research.s126_decision_probe import frozen_s127
+        manifest=read(ROOT/'evidence/s127_decision_probe/manifest.json')
+        source=Host(manifest['store'],manifest['run_id']);live=Host(ROOT/'runs/s127-4a-decision-20261021','s127-4a-decision-20261021')
+        errors=[]
+        for result in read(ROOT/'evidence/s127_4_decision/results.json')['cases']:
+            if not any('UNREGISTERED_RESEARCH_EVIDENCE' in (c.get('error') or '') for c in result['checks']):continue
+            case=next(c for c in manifest['cases'] if c['name']==result['name'] and c['arm']==result['arm'])
+            h=frozen_s127(source,case);before=deepcopy(state(h));ledger=h.store.remaining()
+            reception=received(live,result['request_id']);body=json.loads(live.store.artifact(reception['body'],raw=True))
+            call=next(c for c in body['choices'][0]['message']['tool_calls'] if c['function']['name']=='research_plan')
+            value=json.loads(call['function']['arguments']);use=dict(name='research_plan',toolUseId=call['id'],input=value)
+            with self.assertRaisesRegex(ValueError,'UNREGISTERED_RESEARCH_EVIDENCE') as raised:admit_decision(h,Plan.model_validate(value))
+            with patch('tools.research.agent.record',return_value={'artifact_id':'0'*64}):feedback=error_feedback(h,use,raised.exception,before)
+            self.assertTrue(feedback['rejected_references']);self.assertIn('citation_eligibility',feedback['inventory_query']['pointer'])
+            self.assertFalse(feedback['scientific_execution_started'])
+            self.assertTrue(all(r not in registered_references(h) for r in feedback['rejected_references']))
+            self.assertEqual(state(h),before);self.assertEqual(h.store.remaining(),ledger)
+            errors.append(feedback)
+        self.assertEqual(len(errors),2)
+
     def test_truncated_probe_response_replays_without_resend_or_native_submission(self):
         import asyncio
         import httpx
@@ -33,8 +81,9 @@ class LayeredContextTests(unittest.TestCase):
             recovery=LiveBoundary(h,httpx.MockTransport(forbidden),allow_truncated_response=True)
             response=await recovery.handle_async_request(request())
             self.assertEqual(response.json()['choices'][0]['finish_reason'],'length')
-            self.assertEqual(h.store.remaining(),before);recovery.consumed()
-            self.assertNotIn('unconsumed_response',state(h)['pilot'])
+            self.assertEqual(h.store.remaining(),before)
+            with self.assertRaisesRegex(ValueError,'LENGTH_TRUNCATED'):recovery.consumed()
+            self.assertIn('unconsumed_response',state(h)['pilot'])
             self.assertEqual(len(sent),1)
             await first.aclose();await recovery.aclose()
         asyncio.run(exercise())

@@ -59,6 +59,38 @@ def settle(host,row,reception):
         tool_id='model.deepseek',tool_version='1.0.0',execution_status=status,charged=zero()),
         reception,elapsed=reception['elapsed_s'],kind='r3_model')
 
+
+class IncompleteModelOutput(ValueError):
+    """Confirmed Provider output, never a transport failure or scientific action."""
+    def __init__(self,diagnostic):
+        self.diagnostic=diagnostic
+        code='R3_LENGTH_TRUNCATED_NO_NATIVE_SUBMISSION' if 'length' in diagnostic['finish_reasons'] else 'R3_INCOMPLETE_NO_NATIVE_SUBMISSION'
+        super().__init__(code+': '+json.dumps(diagnostic,separators=(',',':')))
+
+
+def provider_outcome(host,request_id):
+    """Read durable transport/output facts without consuming or settling anything."""
+    reception=received(host,request_id)
+    row=host.store.lookup(host.run_id,request_id)
+    if not reception:
+        return dict(request_id=request_id,transport='outcome_unknown',outcome_unknown=True,
+            response_saved=False,provider_charged=False,model_output='unknown',finish_reasons=[],
+            native_tool_action='not_submitted')
+    reasons=[];calls=[];decoded=False
+    try:
+        choices=json.loads(host.store.artifact(reception['body'],raw=True)).get('choices',[])
+        reasons=[c.get('finish_reason') for c in choices]
+        calls=[t for c in choices for t in (c.get('message') or {}).get('tool_calls',[])]
+        decoded=bool(choices)
+    except (ValueError,AttributeError,TypeError):pass
+    complete=decoded and all(r in ('stop','tool_calls') for r in reasons)
+    return dict(request_id=request_id,transport='confirmed_http_'+str(reception['http_status']),
+        http_status=reception['http_status'],outcome_unknown=False,response_saved=True,
+        provider_charged=bool(row and row['receipt']),finish_reasons=reasons,
+        model_output='complete_unvalidated' if complete else 'confirmed_incomplete',
+        native_tool_action='fields_present_unvalidated' if calls else 'not_produced',
+        scientific_execution='not_admitted_by_provider_response',body=reception['body'])
+
 class LiveBoundary(httpx.AsyncBaseTransport):
     """One durable reservation per actual send, including auxiliary summarization.
 
@@ -92,10 +124,16 @@ class LiveBoundary(httpx.AsyncBaseTransport):
             if not reception:
                 raise ValueError('R3_SAVED_RESPONSE_MISSING')
             self.last_request=saved
+            if not row['receipt']:settle(host,row,reception)
             record(host,'r3_response_replay',dict(request_id=saved,new_send=False))
+            if not self.allow_truncated_response:self.require_complete()
             return httpx.Response(reception['http_status'],content=store.artifact(reception['body'],raw=True),request=request)
         if pending(host):
             raise ValueError('R3_UNCONFIRMED_ATTEMPT_BLOCKS_SEND')
+        context=expected['context_guard']
+        # Explicit conservative capacity estimate, never reported as actual tokens.
+        if len(request.content)+expected['max_tokens']+context['framing_headroom_tokens']>context['context_limit_tokens']:
+            raise ValueError('R3_CONTEXT_CAPACITY_EXCEEDED_CONSERVATIVE_UTF8_ESTIMATE')
         def guard(db):
             if store.remaining(db=db)['remaining']['model_calls']<1:
                 raise ValueError('PROVIDER_COUNT_EXHAUSTED')
@@ -144,8 +182,7 @@ class LiveBoundary(httpx.AsyncBaseTransport):
                 ref=store.put(db,reception)
                 store.event(db,run,'r3_response','metadata_saved',request=key,execution=row['execution_id'],outputs=[ref])
             settle(host,row,reception)
-            if 'length' in (reception['finish_reasons'] or []) and not self.allow_truncated_response:
-                raise ValueError('R3_LENGTH_TRUNCATED_NO_NATIVE_SUBMISSION')
+            if not self.allow_truncated_response:self.require_complete()
             return httpx.Response(response.status_code,content=body,request=request)
         except BaseException as exc:
             # Local archive/settlement failures do not erase already saved reception.
@@ -158,7 +195,15 @@ class LiveBoundary(httpx.AsyncBaseTransport):
                 response_saved=reception is not None),status='stopped')
             raise
 
+    def require_complete(self):
+        if not self.last_request:return
+        diagnostic=provider_outcome(self.host,self.last_request)
+        if (diagnostic.get('http_status',0) in range(200,300)
+            and diagnostic['model_output']=='confirmed_incomplete'):
+            raise IncompleteModelOutput(diagnostic)
+
     def consumed(self):
+        self.require_complete()
         with self.host.store.transaction() as db:
             state=self.host.store.session(self.host.run_id,db)['state']
             if state['pilot'].get('unconsumed_response')==self.last_request:
@@ -172,8 +217,16 @@ class LiveBoundary(httpx.AsyncBaseTransport):
 def live_model_class(boundary):
     class AccountedDeepSeekModel(DeepSeekModel):
         async def stream(self,*args,**kwargs):
-            async for item in super().stream(*args,**kwargs):
-                yield item
+            # Reject saved incomplete output before even the first SDK event.
+            boundary.require_complete()
+            try:
+                async for item in super().stream(*args,**kwargs):
+                    boundary.require_complete()
+                    yield item
+            except Exception as exc:
+                try:boundary.require_complete()
+                except IncompleteModelOutput as confirmed:raise confirmed from exc
+                raise
             boundary.consumed()  # Failed conversion leaves the saved response available.
     return AccountedDeepSeekModel
 
@@ -257,7 +310,7 @@ def error_feedback(host, use, exc, before):
         'ORDERED_V2_CORRECTION_WINDOW_REQUIRED':('control_search.settings.correction_window_s','0 <= window[0] <= knots[0] < knots[-1] <= window[1] <= task duration'),
         'DECISION_CANDIDATE_MISMATCH':('decision.selected_candidate','Use the exact candidate in this action payload'),
         'PHYSICAL_REPLAY_CANDIDATE_TASK_MODEL_OR_SEQUENCE_MISMATCH':('source','Use a candidate-bound source; initialize_control explicitly rebinds inherited controls'),
-        'UNREGISTERED_RESEARCH_EVIDENCE':('supporting_evidence','Cite registered result, candidate or source references from current packet'),
+        'UNREGISTERED_RESEARCH_EVIDENCE':('supporting_evidence','Readable does not mean registered. Query working_set /citation_eligibility; use only registered references whose supported_inferences match the claim. Reading does not register evidence.'),
         'REGISTERED_CURRENT_ANALYSIS_REQUIRED':('control_seed.response_evidence','Request input_sensitivity for the selected candidate, then use its registered result reference'),
         'VERIFIED_CANDIDATE_INPUT_SENSITIVITY_REQUIRED':('control_seed.response_evidence','Use computed, numerically verified input_sensitivity bound to this candidate, model, task, operating point and tendon order'),
         'STOP_MUST_CITE_ALL_NEW_EXPERIMENT_RESULTS':('supporting_evidence','Explicitly cite the complete current research.all_fresh_results index and explain the conclusions'),
@@ -285,8 +338,18 @@ def error_feedback(host, use, exc, before):
         field='pointer';expected='Read the current reference root with view=summary, then use an advertised list read_pointer with view=range'
     if 'PROTECTED_EVIDENCE_READ_REQUIRES' in message:
         field='reference';expected='Only current result references are readable during closeout; use all_fresh_results and select a fresh pass or STOP'
+    citation={}
+    if code=='UNREGISTERED_RESEARCH_EVIDENCE' or code.startswith(('INFERENCE_NOT_SUPPORTED','EVIDENCE_TASK_IDENTITY','EVIDENCE_DESIGN_IDENTITY','EVIDENCE_MODEL_SCOPE')):
+        from tools.research.evidence_policy import registered_references,citation_inventory
+        known=registered_references(host)
+        refs=[r for r in use['input'].get('supporting_evidence',[]) if r not in known]
+        anchor=next(iter(known),s.get('family_space_reference'))
+        citation=dict(rejected_references=refs,reason=message[:300],registered_count=len({r['artifact_id'] for r in known}),
+            recent_registered=citation_inventory(host)[-3:],
+            inventory_query=dict(reference=anchor,view='working_set',pointer='/citation_eligibility'),
+            missing_validation='FamilySpace/raw samples do not establish independent task acceptance. Use a bound registered physical evaluation or scoped mathematical result for the corresponding claim.')
     return dict(status='rejected' if counts(before)==counts(s) else 'execution_failed',error_code=code[:100],field=field,
-        expected=expected,scientific_execution_started=counts(before)!=counts(s),relevant_references=refs,full_error_reference=full)
+        expected=expected,scientific_execution_started=counts(before)!=counts(s),relevant_references=refs,full_error_reference=full,**citation)
 
 def build_harness(host,*,transport,api_key,instructions,model_class,tool_executor,research_tools,configuration_path,session_directory,session_id=None):
     from strands.experimental.context_manager import Offload
@@ -381,7 +444,7 @@ async def converse(host,*,session_handoff=False):
                         if advertised is None or not set(advertised)<=set(feedback_context_references()):
                             raise ValueError('PROTECTED_CONTEXT_RETRIEVAL_REQUIRES_EXISTING_FEEDBACK')
             return await super().handle_async_request(request)
-    boundary=Boundary(host,allow_truncated_response=True)
+    boundary=Boundary(host)
     def handler(kind):
         def run(use,**kwargs):
             before=state(host)

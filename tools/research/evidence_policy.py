@@ -170,6 +170,16 @@ def registered_references(host):
     return known
 
 
+def citation_inventory(host):
+    """Registration permits citation checks; it never upgrades an artifact's claim."""
+    rows=[]
+    for ref in {r['artifact_id']:r for r in registered_references(host)}.values():
+        value=host.store.artifact(ref);summary=summarize_evidence(value,ref)
+        rows.append(dict(reference=ref,candidate=summary['candidate_identity'],task_identity=summary['task_identity'],
+            claim_kind=summary['claim_kind'],supported_inferences=summary['supported_inferences']))
+    return rows
+
+
 def admit_decision(host,plan):
     """Public Plan boundary resolves references, never accepts model-made summaries."""
     from tools.research.state import state
