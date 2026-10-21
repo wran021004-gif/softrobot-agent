@@ -89,11 +89,20 @@ def s1274_decision():
         choices=[]
         for call,check in zip(body['choices'][0]['message'].get('tool_calls',[]),row['checks']):
             q=json.loads(call['function']['arguments']);kind=call['function']['name']
+            prerequisites=(
+                'Actual local pointer/view read was checked; subsequent delivery and model use are outside this single-request arm.'
+                if kind=='evidence_read' else
+                'Formal execute still needs candidate/control/profile binding, full capability/novelty/guard preflight, NMPC/shared-backend/public-operation capacity and an owned settled worker receipt. Only original independent acceptance can establish physical success.'
+                if q.get('action')=='execute' else
+                'Control initialization still needs a registered candidate and exact source/parent, compatible measured task/model/grid/tendon order and force bounds, formal admission and a settled native operation receipt.'
+                if q.get('action')=='initialize_control' else
+                'STOP still needs all fresh scientific results explicitly cited, settled work and formal lifecycle admission; it is not a new scientific experiment.'
+                if q.get('action')=='stop' else 'Full formal capability, ownership, budget and operation-specific admission remain untested.')
             choices.append(dict(tool=kind,action=q.get('action'),analysis=q.get('operation'),
                 rl_mode=q.get('mode'),evidence_view=q.get('view') if kind=='evidence_read' else None,
                 pointer=q.get('pointer') if kind=='evidence_read' else None,
                 partial_checks=check['contract_and_reference_checks'],rejection=check.get('error'),
-                full_scientific_admission='not_tested'))
+                full_scientific_admission='not_tested',remaining_preconditions=prerequisites))
         records.append(dict(name=row['name'],arm=row['arm'],request_id=row['request_id'],provider_response_id=row['provider_response_id'],
             actual_model=row['actual_model'],raw_body_reference=reception['body'],wire_identity=wire['identity'],
             schema_identity=row['tool_schema_identity'],usage=row['usage'],tools=choices,
