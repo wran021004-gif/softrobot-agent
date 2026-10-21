@@ -1,0 +1,5762 @@
+{
+  "version": "s128_math_readonly_audit_v1",
+  "study_id": "s128-cold-live-20261021",
+  "baseline": "67c8fd9c6e79d5479a0c7ba2def00a44ffe74e70",
+  "source_commit": "988acfe3339dc4a55b6a46df7349ed98783ae4ee",
+  "source_state_sha256": "6e1c7e68685679a8ff91134cbf1a190b8e2a52d4644e7be2b9be6f9e0b8cdab8",
+  "source_events_identity": "25cbf7e8d140e69183c34a9a8536c42b367c7cc988f3eec7ceb1d6d931067000",
+  "source_archive_sha256": "acb3ab8f6cabbdf9239c5bc0e80784dd09356e53a2aa3194873b08d96fc29604",
+  "source_paths_are_local_only": true,
+  "comparisons": {
+    "family_space_identity": "0793d20569402760ca055f73f6f97d80d73d0fe3c051ff2b60ebad1519db02aa",
+    "configured_space_equal": false,
+    "configured_space_equal_after_existing_parser": true,
+    "exact_s12_frozen_space_equal": true,
+    "s12_canonical_task_equal": true,
+    "s12_effective_task_equal": true,
+    "s12_effective_task_identity": "bd9df2d930423f2b2a12152f076e2ae88b4d1a0af84d6126aa13b0b1fac9ec77",
+    "s128_canonical_task_identity": "d24aeac7041052ce1d2ae60e825a802e7367107784f6fec192b0a65c4a5e76e7",
+    "backend_equal": true,
+    "policy_discretization_equal": true,
+    "controller_differences_for_sample": [
+      {
+        "pointer": "/parameters/data/recipe/holding_tip_speed_weight",
+        "s12": 0.1,
+        "s128": 1.0
+      },
+      {
+        "pointer": "/parameters/data/recipe/terminal_tip_speed_weight",
+        "s12": 0.1,
+        "s128": 1.0
+      }
+    ]
+  },
+  "s12_structure": {
+    "reference": {
+      "artifact_id": "5f6f99b6c44900c0868942d35ce39eab45df2f2e6f168e92184036993b1e241b",
+      "media_type": "application/json"
+    },
+    "parameters": {
+      "control_weights": {
+        "holding_tip_speed_weight": 0.1,
+        "terminal_tip_speed_weight": 0.1
+      },
+      "family_space_identity": "0793d20569402760ca055f73f6f97d80d73d0fe3c051ff2b60ebad1519db02aa",
+      "route_overrides": {},
+      "segment_count": 2,
+      "segments": {
+        "0": {
+          "cells": 12,
+          "length_m": 0.195,
+          "sections": [
+            {
+              "angle_rad": 0.35,
+              "holes_yz_m": [],
+              "kind": "ellipse",
+              "outer_yz_m": [],
+              "parameters": {
+                "semi_y_m": 0.01175,
+                "semi_z_m": 0.0076
+              }
+            }
+          ],
+          "young_pa": 10450000.0
+        },
+        "1": {
+          "cells": 12,
+          "length_m": 0.11,
+          "sections": [
+            {
+              "angle_rad": -0.25,
+              "holes_yz_m": [],
+              "kind": "rectangle",
+              "outer_yz_m": [],
+              "parameters": {
+                "height_z_m": 0.0095,
+                "width_y_m": 0.0133
+              }
+            },
+            {
+              "angle_rad": 0.15000000000000002,
+              "holes_yz_m": [],
+              "kind": "rectangle",
+              "outer_yz_m": [],
+              "parameters": {
+                "height_z_m": 0.0095,
+                "width_y_m": 0.0133
+              }
+            }
+          ],
+          "young_pa": 5400000.0
+        }
+      },
+      "spans": [
+        {
+          "anchor_angle_offset_rad": 0.0,
+          "anchor_s": 1.0,
+          "angular_offsets_rad": [
+            0.0
+          ],
+          "count": 1,
+          "first_segment": 0,
+          "guide_angle_offset_rad": 0.0,
+          "guide_s": [
+            0.5
+          ],
+          "last_segment": 1,
+          "phase_rad": 3.141592653589793,
+          "radius_m": 0.018
+        },
+        {
+          "anchor_angle_offset_rad": 0.0,
+          "anchor_s": 1.0,
+          "angular_offsets_rad": [
+            0.0
+          ],
+          "count": 1,
+          "first_segment": 0,
+          "guide_angle_offset_rad": 0.0,
+          "guide_s": [
+            0.5
+          ],
+          "last_segment": 1,
+          "phase_rad": 4.71238898038469,
+          "radius_m": 0.018
+        },
+        {
+          "anchor_angle_offset_rad": 0.0,
+          "anchor_s": 1.0,
+          "angular_offsets_rad": [
+            0.0
+          ],
+          "count": 1,
+          "first_segment": 0,
+          "guide_angle_offset_rad": 0.0,
+          "guide_s": [
+            0.5
+          ],
+          "last_segment": 1,
+          "phase_rad": 0.0,
+          "radius_m": 0.018
+        },
+        {
+          "anchor_angle_offset_rad": 0.0,
+          "anchor_s": 1.0,
+          "angular_offsets_rad": [
+            0.0
+          ],
+          "count": 1,
+          "first_segment": 0,
+          "guide_angle_offset_rad": 0.0,
+          "guide_s": [
+            0.5
+          ],
+          "last_segment": 1,
+          "phase_rad": 1.5707963267948966,
+          "radius_m": 0.018
+        }
+      ],
+      "strategy": "polar_consecutive_spans_v1",
+      "tendon_count": 4,
+      "tendon_parameters": {},
+      "version": "serial_family_generation_v2"
+    },
+    "effective_task_identity": "bd9df2d930423f2b2a12152f076e2ae88b4d1a0af84d6126aa13b0b1fac9ec77",
+    "segments": [
+      {
+        "connection": {
+          "part": "fixed_base",
+          "position_m": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "quaternion_wxyz": [
+            1.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "s": 0.0
+        },
+        "id": "segment_0",
+        "interpolation": "step",
+        "kind": "flexible_segment",
+        "length_m": 0.195,
+        "natural_curvature_rad_m": [
+          0.0,
+          0.0
+        ],
+        "physics": {
+          "bending_ei_nm2": null,
+          "bending_viscosity_nm2_s": [
+            0.0005,
+            0.0007
+          ],
+          "density_kg_m3": 1100.0,
+          "line_density_kg_m": null,
+          "mode": "material",
+          "young_pa": 10450000.0
+        },
+        "sections": [
+          {
+            "s": 0.0,
+            "section": {
+              "angle_rad": 0.35,
+              "holes_yz_m": [],
+              "kind": "ellipse",
+              "outer_yz_m": [],
+              "parameters": {
+                "semi_y_m": 0.01175,
+                "semi_z_m": 0.0076
+              }
+            }
+          }
+        ]
+      },
+      {
+        "connection": {
+          "part": "connector_1",
+          "position_m": [
+            0.012,
+            0.0,
+            0.0
+          ],
+          "quaternion_wxyz": [
+            1.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "s": 0.0
+        },
+        "id": "segment_1",
+        "interpolation": "linear",
+        "kind": "flexible_segment",
+        "length_m": 0.11,
+        "natural_curvature_rad_m": [
+          0.0,
+          0.0
+        ],
+        "physics": {
+          "bending_ei_nm2": null,
+          "bending_viscosity_nm2_s": [
+            0.0003,
+            0.0004
+          ],
+          "density_kg_m3": 1050.0,
+          "line_density_kg_m": null,
+          "mode": "material",
+          "young_pa": 5400000.0
+        },
+        "sections": [
+          {
+            "s": 0.0,
+            "section": {
+              "angle_rad": -0.25,
+              "holes_yz_m": [],
+              "kind": "rectangle",
+              "outer_yz_m": [],
+              "parameters": {
+                "height_z_m": 0.0095,
+                "width_y_m": 0.0133
+              }
+            }
+          },
+          {
+            "s": 1.0,
+            "section": {
+              "angle_rad": 0.15000000000000002,
+              "holes_yz_m": [],
+              "kind": "rectangle",
+              "outer_yz_m": [],
+              "parameters": {
+                "height_z_m": 0.0095,
+                "width_y_m": 0.0133
+              }
+            }
+          }
+        ]
+      }
+    ],
+    "tendon_order": [
+      "tendon_0",
+      "tendon_1",
+      "tendon_2",
+      "tendon_3"
+    ],
+    "pretension_n": [
+      0.2,
+      0.2,
+      0.2,
+      0.2
+    ],
+    "force_limits_n": [
+      8.0,
+      8.0,
+      8.0,
+      8.0
+    ]
+  },
+  "s128_structures": [
+    {
+      "reference": {
+        "artifact_id": "cb9e9bfc7c405f5a5b142f023245ba0874d4e374cc45a31d52b181963bd706f7",
+        "media_type": "application/json"
+      },
+      "parameters": {
+        "control_weights": {
+          "holding_tip_speed_weight": 1.0,
+          "terminal_tip_speed_weight": 1.0
+        },
+        "family_space_identity": "0793d20569402760ca055f73f6f97d80d73d0fe3c051ff2b60ebad1519db02aa",
+        "route_overrides": {},
+        "segment_count": 2,
+        "segments": {
+          "0": {
+            "cells": 12,
+            "length_m": 0.2,
+            "physical_parameters": {
+              "density_kg_m3": 1100.0,
+              "viscosity_y_nm2_s": 0.05,
+              "viscosity_z_nm2_s": 0.05
+            },
+            "sections": null,
+            "young_pa": 2000000.0
+          },
+          "1": {
+            "cells": 12,
+            "length_m": 0.068,
+            "physical_parameters": {
+              "density_kg_m3": 1100.0,
+              "viscosity_y_nm2_s": 0.05,
+              "viscosity_z_nm2_s": 0.05
+            },
+            "sections": null,
+            "young_pa": 2000000.0
+          }
+        },
+        "spans": [
+          {
+            "anchor_angle_offset_rad": 0.0,
+            "anchor_s": 1.0,
+            "angular_offsets_rad": [],
+            "count": 3,
+            "first_segment": 0,
+            "guide_angle_offset_rad": 0.0,
+            "guide_s": [
+              0.5
+            ],
+            "last_segment": 0,
+            "phase_rad": 0.0,
+            "radius_m": 0.018
+          },
+          {
+            "anchor_angle_offset_rad": 0.0,
+            "anchor_s": 1.0,
+            "angular_offsets_rad": [],
+            "count": 3,
+            "first_segment": 1,
+            "guide_angle_offset_rad": 0.0,
+            "guide_s": [
+              0.5
+            ],
+            "last_segment": 1,
+            "phase_rad": 0.0,
+            "radius_m": 0.018
+          }
+        ],
+        "strategy": "polar_consecutive_spans_v1",
+        "tendon_count": 6,
+        "tendon_parameters": {
+          "diameter_m": 0.001,
+          "force_limit_n": 8.0,
+          "length_servo_gain_n_m": 900.0,
+          "pretension_n": 0.0
+        },
+        "version": "serial_family_generation_v2"
+      },
+      "effective_task_identity": "bd9df2d930423f2b2a12152f076e2ae88b4d1a0af84d6126aa13b0b1fac9ec77",
+      "segments": [
+        {
+          "connection": {
+            "part": "fixed_base",
+            "position_m": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "quaternion_wxyz": [
+              1.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "s": 0.0
+          },
+          "id": "segment_0",
+          "interpolation": "step",
+          "kind": "flexible_segment",
+          "length_m": 0.2,
+          "natural_curvature_rad_m": [
+            0.0,
+            0.0
+          ],
+          "physics": {
+            "bending_ei_nm2": null,
+            "bending_viscosity_nm2_s": [
+              0.05,
+              0.05
+            ],
+            "density_kg_m3": 1100.0,
+            "line_density_kg_m": null,
+            "mode": "material",
+            "young_pa": 2000000.0
+          },
+          "sections": [
+            {
+              "s": 0.0,
+              "section": {
+                "angle_rad": 0.35,
+                "holes_yz_m": [],
+                "kind": "ellipse",
+                "outer_yz_m": [],
+                "parameters": {
+                  "semi_y_m": 0.0095,
+                  "semi_z_m": 0.0076
+                }
+              }
+            }
+          ]
+        },
+        {
+          "connection": {
+            "part": "connector_1",
+            "position_m": [
+              0.012,
+              0.0,
+              0.0
+            ],
+            "quaternion_wxyz": [
+              1.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "s": 0.0
+          },
+          "id": "segment_1",
+          "interpolation": "linear",
+          "kind": "flexible_segment",
+          "length_m": 0.068,
+          "natural_curvature_rad_m": [
+            0.0,
+            0.0
+          ],
+          "physics": {
+            "bending_ei_nm2": null,
+            "bending_viscosity_nm2_s": [
+              0.05,
+              0.05
+            ],
+            "density_kg_m3": 1100.0,
+            "line_density_kg_m": null,
+            "mode": "material",
+            "young_pa": 2000000.0
+          },
+          "sections": [
+            {
+              "s": 0.0,
+              "section": {
+                "angle_rad": -0.25,
+                "holes_yz_m": [],
+                "kind": "rectangle",
+                "outer_yz_m": [],
+                "parameters": {
+                  "height_z_m": 0.0095,
+                  "width_y_m": 0.0133
+                }
+              }
+            },
+            {
+              "s": 1.0,
+              "section": {
+                "angle_rad": 0.15000000000000002,
+                "holes_yz_m": [],
+                "kind": "rectangle",
+                "outer_yz_m": [],
+                "parameters": {
+                  "height_z_m": 0.008549999999999999,
+                  "width_y_m": 0.0114
+                }
+              }
+            }
+          ]
+        }
+      ],
+      "tendon_order": [
+        "tendon_0",
+        "tendon_1",
+        "tendon_2",
+        "tendon_3",
+        "tendon_4",
+        "tendon_5"
+      ],
+      "pretension_n": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "force_limits_n": [
+        8.0,
+        8.0,
+        8.0,
+        8.0,
+        8.0,
+        8.0
+      ]
+    },
+    {
+      "reference": {
+        "artifact_id": "318c922bdd96b863487b097d6bd6bfd1dd90142b18d15a04af9aeaf508f701a6",
+        "media_type": "application/json"
+      },
+      "parameters": {
+        "control_weights": {
+          "holding_tip_speed_weight": 1.0,
+          "terminal_tip_speed_weight": 1.0
+        },
+        "family_space_identity": "0793d20569402760ca055f73f6f97d80d73d0fe3c051ff2b60ebad1519db02aa",
+        "route_overrides": {},
+        "segment_count": 3,
+        "segments": {
+          "0": {
+            "cells": 12,
+            "length_m": 0.1,
+            "physical_parameters": {
+              "density_kg_m3": 1100.0,
+              "viscosity_y_nm2_s": 0.05,
+              "viscosity_z_nm2_s": 0.05
+            },
+            "sections": null,
+            "young_pa": 2000000.0
+          },
+          "1": {
+            "cells": 12,
+            "length_m": 0.1,
+            "physical_parameters": {
+              "density_kg_m3": 1100.0,
+              "viscosity_y_nm2_s": 0.05,
+              "viscosity_z_nm2_s": 0.05
+            },
+            "sections": null,
+            "young_pa": 2000000.0
+          },
+          "2": {
+            "cells": 12,
+            "length_m": 0.1,
+            "physical_parameters": {
+              "density_kg_m3": 1100.0,
+              "viscosity_y_nm2_s": 0.05,
+              "viscosity_z_nm2_s": 0.05
+            },
+            "sections": null,
+            "young_pa": 2000000.0
+          }
+        },
+        "spans": [
+          {
+            "anchor_angle_offset_rad": 0.0,
+            "anchor_s": 1.0,
+            "angular_offsets_rad": [],
+            "count": 2,
+            "first_segment": 0,
+            "guide_angle_offset_rad": 0.0,
+            "guide_s": [
+              0.5
+            ],
+            "last_segment": 0,
+            "phase_rad": 1.5707963267948966,
+            "radius_m": 0.018
+          },
+          {
+            "anchor_angle_offset_rad": 0.0,
+            "anchor_s": 1.0,
+            "angular_offsets_rad": [],
+            "count": 2,
+            "first_segment": 1,
+            "guide_angle_offset_rad": 0.0,
+            "guide_s": [
+              0.5
+            ],
+            "last_segment": 1,
+            "phase_rad": 1.5707963267948966,
+            "radius_m": 0.018
+          },
+          {
+            "anchor_angle_offset_rad": 0.0,
+            "anchor_s": 1.0,
+            "angular_offsets_rad": [],
+            "count": 2,
+            "first_segment": 2,
+            "guide_angle_offset_rad": 0.0,
+            "guide_s": [
+              0.5
+            ],
+            "last_segment": 2,
+            "phase_rad": 1.5707963267948966,
+            "radius_m": 0.018
+          },
+          {
+            "anchor_angle_offset_rad": 0.0,
+            "anchor_s": 1.0,
+            "angular_offsets_rad": [],
+            "count": 1,
+            "first_segment": 0,
+            "guide_angle_offset_rad": 0.0,
+            "guide_s": [
+              0.5
+            ],
+            "last_segment": 2,
+            "phase_rad": 3.141592653589793,
+            "radius_m": 0.018
+          }
+        ],
+        "strategy": "polar_consecutive_spans_v1",
+        "tendon_count": 7,
+        "tendon_parameters": {
+          "diameter_m": 0.001,
+          "force_limit_n": 8.0,
+          "length_servo_gain_n_m": 900.0,
+          "pretension_n": 0.0
+        },
+        "version": "serial_family_generation_v2"
+      },
+      "effective_task_identity": "53a615f4aa1b6f42fe0a9101912343a895a73c7e475b7c1082f5d99967ef2649",
+      "segments": [
+        {
+          "connection": {
+            "part": "fixed_base",
+            "position_m": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "quaternion_wxyz": [
+              1.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "s": 0.0
+          },
+          "id": "segment_0",
+          "interpolation": "step",
+          "kind": "flexible_segment",
+          "length_m": 0.1,
+          "natural_curvature_rad_m": [
+            0.0,
+            0.0
+          ],
+          "physics": {
+            "bending_ei_nm2": null,
+            "bending_viscosity_nm2_s": [
+              0.05,
+              0.05
+            ],
+            "density_kg_m3": 1100.0,
+            "line_density_kg_m": null,
+            "mode": "material",
+            "young_pa": 2000000.0
+          },
+          "sections": [
+            {
+              "s": 0.0,
+              "section": {
+                "angle_rad": 0.35,
+                "holes_yz_m": [],
+                "kind": "ellipse",
+                "outer_yz_m": [],
+                "parameters": {
+                  "semi_y_m": 0.0095,
+                  "semi_z_m": 0.0076
+                }
+              }
+            }
+          ]
+        },
+        {
+          "connection": {
+            "part": "connector_1",
+            "position_m": [
+              0.012,
+              0.0,
+              0.0
+            ],
+            "quaternion_wxyz": [
+              1.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "s": 0.0
+          },
+          "id": "segment_1",
+          "interpolation": "linear",
+          "kind": "flexible_segment",
+          "length_m": 0.1,
+          "natural_curvature_rad_m": [
+            0.0,
+            0.0
+          ],
+          "physics": {
+            "bending_ei_nm2": null,
+            "bending_viscosity_nm2_s": [
+              0.05,
+              0.05
+            ],
+            "density_kg_m3": 1100.0,
+            "line_density_kg_m": null,
+            "mode": "material",
+            "young_pa": 2000000.0
+          },
+          "sections": [
+            {
+              "s": 0.0,
+              "section": {
+                "angle_rad": -0.25,
+                "holes_yz_m": [],
+                "kind": "rectangle",
+                "outer_yz_m": [],
+                "parameters": {
+                  "height_z_m": 0.0095,
+                  "width_y_m": 0.0133
+                }
+              }
+            },
+            {
+              "s": 1.0,
+              "section": {
+                "angle_rad": 0.15000000000000002,
+                "holes_yz_m": [],
+                "kind": "rectangle",
+                "outer_yz_m": [],
+                "parameters": {
+                  "height_z_m": 0.008549999999999999,
+                  "width_y_m": 0.0114
+                }
+              }
+            }
+          ]
+        },
+        {
+          "connection": {
+            "part": "connector_2",
+            "position_m": [
+              0.012,
+              0.0,
+              0.0
+            ],
+            "quaternion_wxyz": [
+              1.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "s": 0.0
+          },
+          "id": "segment_2",
+          "interpolation": "linear",
+          "kind": "flexible_segment",
+          "length_m": 0.1,
+          "natural_curvature_rad_m": [
+            0.0,
+            0.0
+          ],
+          "physics": {
+            "bending_ei_nm2": null,
+            "bending_viscosity_nm2_s": [
+              0.05,
+              0.05
+            ],
+            "density_kg_m3": 1100.0,
+            "line_density_kg_m": null,
+            "mode": "material",
+            "young_pa": 2000000.0
+          },
+          "sections": [
+            {
+              "s": 0.0,
+              "section": {
+                "angle_rad": -0.25,
+                "holes_yz_m": [],
+                "kind": "rectangle",
+                "outer_yz_m": [],
+                "parameters": {
+                  "height_z_m": 0.0095,
+                  "width_y_m": 0.0133
+                }
+              }
+            },
+            {
+              "s": 1.0,
+              "section": {
+                "angle_rad": 0.15000000000000002,
+                "holes_yz_m": [],
+                "kind": "rectangle",
+                "outer_yz_m": [],
+                "parameters": {
+                  "height_z_m": 0.008549999999999999,
+                  "width_y_m": 0.0114
+                }
+              }
+            }
+          ]
+        }
+      ],
+      "tendon_order": [
+        "tendon_0",
+        "tendon_1",
+        "tendon_2",
+        "tendon_3",
+        "tendon_4",
+        "tendon_5",
+        "tendon_6"
+      ],
+      "pretension_n": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "force_limits_n": [
+        8.0,
+        8.0,
+        8.0,
+        8.0,
+        8.0,
+        8.0,
+        8.0
+      ]
+    },
+    {
+      "reference": {
+        "artifact_id": "54ff3fe518b2a53e25fcc6064933fe92b8d3a4523c5234a5dcab3923b498b0a7",
+        "media_type": "application/json"
+      },
+      "parameters": {
+        "control_weights": {
+          "holding_tip_speed_weight": 1.0,
+          "terminal_tip_speed_weight": 1.0
+        },
+        "family_space_identity": "0793d20569402760ca055f73f6f97d80d73d0fe3c051ff2b60ebad1519db02aa",
+        "route_overrides": {},
+        "segment_count": 2,
+        "segments": {
+          "0": {
+            "cells": 12,
+            "length_m": 0.24,
+            "physical_parameters": {
+              "density_kg_m3": 1100.0,
+              "viscosity_y_nm2_s": 0.02,
+              "viscosity_z_nm2_s": 0.02
+            },
+            "sections": null,
+            "young_pa": 2000000.0
+          },
+          "1": {
+            "cells": 12,
+            "length_m": 0.06,
+            "physical_parameters": {
+              "density_kg_m3": 1100.0,
+              "viscosity_y_nm2_s": 0.02,
+              "viscosity_z_nm2_s": 0.02
+            },
+            "sections": null,
+            "young_pa": 2000000.0
+          }
+        },
+        "spans": [
+          {
+            "anchor_angle_offset_rad": 0.0,
+            "anchor_s": 1.0,
+            "angular_offsets_rad": [],
+            "count": 3,
+            "first_segment": 0,
+            "guide_angle_offset_rad": 0.0,
+            "guide_s": [
+              0.5
+            ],
+            "last_segment": 0,
+            "phase_rad": 0.0,
+            "radius_m": 0.018
+          },
+          {
+            "anchor_angle_offset_rad": 0.0,
+            "anchor_s": 1.0,
+            "angular_offsets_rad": [],
+            "count": 3,
+            "first_segment": 1,
+            "guide_angle_offset_rad": 0.0,
+            "guide_s": [
+              0.5
+            ],
+            "last_segment": 1,
+            "phase_rad": 0.0,
+            "radius_m": 0.018
+          }
+        ],
+        "strategy": "polar_consecutive_spans_v1",
+        "tendon_count": 6,
+        "tendon_parameters": {
+          "diameter_m": 0.001,
+          "force_limit_n": 8.0,
+          "length_servo_gain_n_m": 900.0,
+          "pretension_n": 0.2
+        },
+        "version": "serial_family_generation_v2"
+      },
+      "effective_task_identity": "bd9df2d930423f2b2a12152f076e2ae88b4d1a0af84d6126aa13b0b1fac9ec77",
+      "segments": [
+        {
+          "connection": {
+            "part": "fixed_base",
+            "position_m": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "quaternion_wxyz": [
+              1.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "s": 0.0
+          },
+          "id": "segment_0",
+          "interpolation": "step",
+          "kind": "flexible_segment",
+          "length_m": 0.24,
+          "natural_curvature_rad_m": [
+            0.0,
+            0.0
+          ],
+          "physics": {
+            "bending_ei_nm2": null,
+            "bending_viscosity_nm2_s": [
+              0.02,
+              0.02
+            ],
+            "density_kg_m3": 1100.0,
+            "line_density_kg_m": null,
+            "mode": "material",
+            "young_pa": 2000000.0
+          },
+          "sections": [
+            {
+              "s": 0.0,
+              "section": {
+                "angle_rad": 0.35,
+                "holes_yz_m": [],
+                "kind": "ellipse",
+                "outer_yz_m": [],
+                "parameters": {
+                  "semi_y_m": 0.0095,
+                  "semi_z_m": 0.0076
+                }
+              }
+            }
+          ]
+        },
+        {
+          "connection": {
+            "part": "connector_1",
+            "position_m": [
+              0.012,
+              0.0,
+              0.0
+            ],
+            "quaternion_wxyz": [
+              1.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "s": 0.0
+          },
+          "id": "segment_1",
+          "interpolation": "linear",
+          "kind": "flexible_segment",
+          "length_m": 0.06,
+          "natural_curvature_rad_m": [
+            0.0,
+            0.0
+          ],
+          "physics": {
+            "bending_ei_nm2": null,
+            "bending_viscosity_nm2_s": [
+              0.02,
+              0.02
+            ],
+            "density_kg_m3": 1100.0,
+            "line_density_kg_m": null,
+            "mode": "material",
+            "young_pa": 2000000.0
+          },
+          "sections": [
+            {
+              "s": 0.0,
+              "section": {
+                "angle_rad": -0.25,
+                "holes_yz_m": [],
+                "kind": "rectangle",
+                "outer_yz_m": [],
+                "parameters": {
+                  "height_z_m": 0.0095,
+                  "width_y_m": 0.0133
+                }
+              }
+            },
+            {
+              "s": 1.0,
+              "section": {
+                "angle_rad": 0.15000000000000002,
+                "holes_yz_m": [],
+                "kind": "rectangle",
+                "outer_yz_m": [],
+                "parameters": {
+                  "height_z_m": 0.008549999999999999,
+                  "width_y_m": 0.0114
+                }
+              }
+            }
+          ]
+        }
+      ],
+      "tendon_order": [
+        "tendon_0",
+        "tendon_1",
+        "tendon_2",
+        "tendon_3",
+        "tendon_4",
+        "tendon_5"
+      ],
+      "pretension_n": [
+        0.2,
+        0.2,
+        0.2,
+        0.2,
+        0.2,
+        0.2
+      ],
+      "force_limits_n": [
+        8.0,
+        8.0,
+        8.0,
+        8.0,
+        8.0,
+        8.0
+      ]
+    },
+    {
+      "reference": {
+        "artifact_id": "8334e480f41abc889c83dbee2e6ed21db6042cc000dca6cff141398356048c19",
+        "media_type": "application/json"
+      },
+      "parameters": {
+        "control_weights": {
+          "holding_tip_speed_weight": 1.0,
+          "terminal_tip_speed_weight": 1.0
+        },
+        "family_space_identity": "0793d20569402760ca055f73f6f97d80d73d0fe3c051ff2b60ebad1519db02aa",
+        "route_overrides": {},
+        "segment_count": 2,
+        "segments": {
+          "0": {
+            "cells": 12,
+            "length_m": 0.24,
+            "physical_parameters": {
+              "density_kg_m3": 1100.0,
+              "viscosity_y_nm2_s": 0.05,
+              "viscosity_z_nm2_s": 0.05
+            },
+            "sections": null,
+            "young_pa": 7200000.0
+          },
+          "1": {
+            "cells": 12,
+            "length_m": 0.06,
+            "physical_parameters": {
+              "density_kg_m3": 1100.0,
+              "viscosity_y_nm2_s": 0.05,
+              "viscosity_z_nm2_s": 0.05
+            },
+            "sections": null,
+            "young_pa": 5400000.0
+          }
+        },
+        "spans": [
+          {
+            "anchor_angle_offset_rad": 0.0,
+            "anchor_s": 1.0,
+            "angular_offsets_rad": [],
+            "count": 3,
+            "first_segment": 0,
+            "guide_angle_offset_rad": 0.0,
+            "guide_s": [
+              0.5
+            ],
+            "last_segment": 0,
+            "phase_rad": 0.0,
+            "radius_m": 0.018
+          },
+          {
+            "anchor_angle_offset_rad": 0.0,
+            "anchor_s": 1.0,
+            "angular_offsets_rad": [],
+            "count": 3,
+            "first_segment": 1,
+            "guide_angle_offset_rad": 0.0,
+            "guide_s": [
+              0.5
+            ],
+            "last_segment": 1,
+            "phase_rad": 0.0,
+            "radius_m": 0.018
+          }
+        ],
+        "strategy": "polar_consecutive_spans_v1",
+        "tendon_count": 6,
+        "tendon_parameters": {
+          "diameter_m": 0.001,
+          "force_limit_n": 8.0,
+          "length_servo_gain_n_m": 900.0,
+          "pretension_n": 0.0
+        },
+        "version": "serial_family_generation_v2"
+      },
+      "effective_task_identity": "bd9df2d930423f2b2a12152f076e2ae88b4d1a0af84d6126aa13b0b1fac9ec77",
+      "segments": [
+        {
+          "connection": {
+            "part": "fixed_base",
+            "position_m": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "quaternion_wxyz": [
+              1.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "s": 0.0
+          },
+          "id": "segment_0",
+          "interpolation": "step",
+          "kind": "flexible_segment",
+          "length_m": 0.24,
+          "natural_curvature_rad_m": [
+            0.0,
+            0.0
+          ],
+          "physics": {
+            "bending_ei_nm2": null,
+            "bending_viscosity_nm2_s": [
+              0.05,
+              0.05
+            ],
+            "density_kg_m3": 1100.0,
+            "line_density_kg_m": null,
+            "mode": "material",
+            "young_pa": 7200000.0
+          },
+          "sections": [
+            {
+              "s": 0.0,
+              "section": {
+                "angle_rad": 0.35,
+                "holes_yz_m": [],
+                "kind": "ellipse",
+                "outer_yz_m": [],
+                "parameters": {
+                  "semi_y_m": 0.0095,
+                  "semi_z_m": 0.0076
+                }
+              }
+            }
+          ]
+        },
+        {
+          "connection": {
+            "part": "connector_1",
+            "position_m": [
+              0.012,
+              0.0,
+              0.0
+            ],
+            "quaternion_wxyz": [
+              1.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "s": 0.0
+          },
+          "id": "segment_1",
+          "interpolation": "linear",
+          "kind": "flexible_segment",
+          "length_m": 0.06,
+          "natural_curvature_rad_m": [
+            0.0,
+            0.0
+          ],
+          "physics": {
+            "bending_ei_nm2": null,
+            "bending_viscosity_nm2_s": [
+              0.05,
+              0.05
+            ],
+            "density_kg_m3": 1100.0,
+            "line_density_kg_m": null,
+            "mode": "material",
+            "young_pa": 5400000.0
+          },
+          "sections": [
+            {
+              "s": 0.0,
+              "section": {
+                "angle_rad": -0.25,
+                "holes_yz_m": [],
+                "kind": "rectangle",
+                "outer_yz_m": [],
+                "parameters": {
+                  "height_z_m": 0.0095,
+                  "width_y_m": 0.0133
+                }
+              }
+            },
+            {
+              "s": 1.0,
+              "section": {
+                "angle_rad": 0.15000000000000002,
+                "holes_yz_m": [],
+                "kind": "rectangle",
+                "outer_yz_m": [],
+                "parameters": {
+                  "height_z_m": 0.008549999999999999,
+                  "width_y_m": 0.0114
+                }
+              }
+            }
+          ]
+        }
+      ],
+      "tendon_order": [
+        "tendon_0",
+        "tendon_1",
+        "tendon_2",
+        "tendon_3",
+        "tendon_4",
+        "tendon_5"
+      ],
+      "pretension_n": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "force_limits_n": [
+        8.0,
+        8.0,
+        8.0,
+        8.0,
+        8.0,
+        8.0
+      ]
+    },
+    {
+      "reference": {
+        "artifact_id": "a0a831fd902cfcf1782bc5af05181e5f040ac9c56017acc0836b69dffe171f58",
+        "media_type": "application/json"
+      },
+      "parameters": {
+        "control_weights": {
+          "holding_tip_speed_weight": 1.0,
+          "terminal_tip_speed_weight": 1.0
+        },
+        "family_space_identity": "0793d20569402760ca055f73f6f97d80d73d0fe3c051ff2b60ebad1519db02aa",
+        "route_overrides": {},
+        "segment_count": 2,
+        "segments": {
+          "0": {
+            "cells": 12,
+            "length_m": 0.19,
+            "physical_parameters": {
+              "density_kg_m3": 1100.0,
+              "viscosity_y_nm2_s": 0.02,
+              "viscosity_z_nm2_s": 0.02
+            },
+            "sections": null,
+            "young_pa": 2000000.0
+          },
+          "1": {
+            "cells": 12,
+            "length_m": 0.19,
+            "physical_parameters": {
+              "density_kg_m3": 1100.0,
+              "viscosity_y_nm2_s": 0.02,
+              "viscosity_z_nm2_s": 0.02
+            },
+            "sections": null,
+            "young_pa": 2000000.0
+          }
+        },
+        "spans": [
+          {
+            "anchor_angle_offset_rad": 0.0,
+            "anchor_s": 1.0,
+            "angular_offsets_rad": [],
+            "count": 3,
+            "first_segment": 0,
+            "guide_angle_offset_rad": 0.0,
+            "guide_s": [
+              0.5
+            ],
+            "last_segment": 0,
+            "phase_rad": 0.0,
+            "radius_m": 0.018
+          },
+          {
+            "anchor_angle_offset_rad": 0.0,
+            "anchor_s": 1.0,
+            "angular_offsets_rad": [],
+            "count": 3,
+            "first_segment": 1,
+            "guide_angle_offset_rad": 0.0,
+            "guide_s": [
+              0.5
+            ],
+            "last_segment": 1,
+            "phase_rad": 0.0,
+            "radius_m": 0.018
+          }
+        ],
+        "strategy": "polar_consecutive_spans_v1",
+        "tendon_count": 6,
+        "tendon_parameters": {
+          "diameter_m": 0.001,
+          "force_limit_n": 8.0,
+          "length_servo_gain_n_m": 900.0,
+          "pretension_n": 0.2
+        },
+        "version": "serial_family_generation_v2"
+      },
+      "effective_task_identity": "bd9df2d930423f2b2a12152f076e2ae88b4d1a0af84d6126aa13b0b1fac9ec77",
+      "segments": [
+        {
+          "connection": {
+            "part": "fixed_base",
+            "position_m": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "quaternion_wxyz": [
+              1.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "s": 0.0
+          },
+          "id": "segment_0",
+          "interpolation": "step",
+          "kind": "flexible_segment",
+          "length_m": 0.19,
+          "natural_curvature_rad_m": [
+            0.0,
+            0.0
+          ],
+          "physics": {
+            "bending_ei_nm2": null,
+            "bending_viscosity_nm2_s": [
+              0.02,
+              0.02
+            ],
+            "density_kg_m3": 1100.0,
+            "line_density_kg_m": null,
+            "mode": "material",
+            "young_pa": 2000000.0
+          },
+          "sections": [
+            {
+              "s": 0.0,
+              "section": {
+                "angle_rad": 0.35,
+                "holes_yz_m": [],
+                "kind": "ellipse",
+                "outer_yz_m": [],
+                "parameters": {
+                  "semi_y_m": 0.0095,
+                  "semi_z_m": 0.0076
+                }
+              }
+            }
+          ]
+        },
+        {
+          "connection": {
+            "part": "connector_1",
+            "position_m": [
+              0.012,
+              0.0,
+              0.0
+            ],
+            "quaternion_wxyz": [
+              1.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "s": 0.0
+          },
+          "id": "segment_1",
+          "interpolation": "linear",
+          "kind": "flexible_segment",
+          "length_m": 0.19,
+          "natural_curvature_rad_m": [
+            0.0,
+            0.0
+          ],
+          "physics": {
+            "bending_ei_nm2": null,
+            "bending_viscosity_nm2_s": [
+              0.02,
+              0.02
+            ],
+            "density_kg_m3": 1100.0,
+            "line_density_kg_m": null,
+            "mode": "material",
+            "young_pa": 2000000.0
+          },
+          "sections": [
+            {
+              "s": 0.0,
+              "section": {
+                "angle_rad": -0.25,
+                "holes_yz_m": [],
+                "kind": "rectangle",
+                "outer_yz_m": [],
+                "parameters": {
+                  "height_z_m": 0.0095,
+                  "width_y_m": 0.0133
+                }
+              }
+            },
+            {
+              "s": 1.0,
+              "section": {
+                "angle_rad": 0.15000000000000002,
+                "holes_yz_m": [],
+                "kind": "rectangle",
+                "outer_yz_m": [],
+                "parameters": {
+                  "height_z_m": 0.008549999999999999,
+                  "width_y_m": 0.0114
+                }
+              }
+            }
+          ]
+        }
+      ],
+      "tendon_order": [
+        "tendon_0",
+        "tendon_1",
+        "tendon_2",
+        "tendon_3",
+        "tendon_4",
+        "tendon_5"
+      ],
+      "pretension_n": [
+        0.2,
+        0.2,
+        0.2,
+        0.2,
+        0.2,
+        0.2
+      ],
+      "force_limits_n": [
+        8.0,
+        8.0,
+        8.0,
+        8.0,
+        8.0,
+        8.0
+      ]
+    },
+    {
+      "reference": {
+        "artifact_id": "c5db6ee4065e9362032c1b129e0923efbb6cb16ad8ba3c9d45806c0cfe208e94",
+        "media_type": "application/json"
+      },
+      "parameters": {
+        "control_weights": {
+          "holding_tip_speed_weight": 1.0,
+          "terminal_tip_speed_weight": 1.0
+        },
+        "family_space_identity": "0793d20569402760ca055f73f6f97d80d73d0fe3c051ff2b60ebad1519db02aa",
+        "route_overrides": {},
+        "segment_count": 2,
+        "segments": {
+          "0": {
+            "cells": 12,
+            "length_m": 0.19,
+            "physical_parameters": {
+              "density_kg_m3": 1100.0,
+              "viscosity_y_nm2_s": 0.02,
+              "viscosity_z_nm2_s": 0.02
+            },
+            "sections": null,
+            "young_pa": 7200000.0
+          },
+          "1": {
+            "cells": 12,
+            "length_m": 0.19,
+            "physical_parameters": {
+              "density_kg_m3": 1100.0,
+              "viscosity_y_nm2_s": 0.02,
+              "viscosity_z_nm2_s": 0.02
+            },
+            "sections": null,
+            "young_pa": 5400000.0
+          }
+        },
+        "spans": [
+          {
+            "anchor_angle_offset_rad": 0.0,
+            "anchor_s": 1.0,
+            "angular_offsets_rad": [],
+            "count": 3,
+            "first_segment": 0,
+            "guide_angle_offset_rad": 0.0,
+            "guide_s": [
+              0.5
+            ],
+            "last_segment": 0,
+            "phase_rad": 0.0,
+            "radius_m": 0.018
+          },
+          {
+            "anchor_angle_offset_rad": 0.0,
+            "anchor_s": 1.0,
+            "angular_offsets_rad": [],
+            "count": 3,
+            "first_segment": 1,
+            "guide_angle_offset_rad": 0.0,
+            "guide_s": [
+              0.5
+            ],
+            "last_segment": 1,
+            "phase_rad": 0.0,
+            "radius_m": 0.018
+          }
+        ],
+        "strategy": "polar_consecutive_spans_v1",
+        "tendon_count": 6,
+        "tendon_parameters": {
+          "diameter_m": 0.001,
+          "force_limit_n": 8.0,
+          "length_servo_gain_n_m": 900.0,
+          "pretension_n": 0.2
+        },
+        "version": "serial_family_generation_v2"
+      },
+      "effective_task_identity": "bd9df2d930423f2b2a12152f076e2ae88b4d1a0af84d6126aa13b0b1fac9ec77",
+      "segments": [
+        {
+          "connection": {
+            "part": "fixed_base",
+            "position_m": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "quaternion_wxyz": [
+              1.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "s": 0.0
+          },
+          "id": "segment_0",
+          "interpolation": "step",
+          "kind": "flexible_segment",
+          "length_m": 0.19,
+          "natural_curvature_rad_m": [
+            0.0,
+            0.0
+          ],
+          "physics": {
+            "bending_ei_nm2": null,
+            "bending_viscosity_nm2_s": [
+              0.02,
+              0.02
+            ],
+            "density_kg_m3": 1100.0,
+            "line_density_kg_m": null,
+            "mode": "material",
+            "young_pa": 7200000.0
+          },
+          "sections": [
+            {
+              "s": 0.0,
+              "section": {
+                "angle_rad": 0.35,
+                "holes_yz_m": [],
+                "kind": "ellipse",
+                "outer_yz_m": [],
+                "parameters": {
+                  "semi_y_m": 0.0095,
+                  "semi_z_m": 0.0076
+                }
+              }
+            }
+          ]
+        },
+        {
+          "connection": {
+            "part": "connector_1",
+            "position_m": [
+              0.012,
+              0.0,
+              0.0
+            ],
+            "quaternion_wxyz": [
+              1.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "s": 0.0
+          },
+          "id": "segment_1",
+          "interpolation": "linear",
+          "kind": "flexible_segment",
+          "length_m": 0.19,
+          "natural_curvature_rad_m": [
+            0.0,
+            0.0
+          ],
+          "physics": {
+            "bending_ei_nm2": null,
+            "bending_viscosity_nm2_s": [
+              0.02,
+              0.02
+            ],
+            "density_kg_m3": 1100.0,
+            "line_density_kg_m": null,
+            "mode": "material",
+            "young_pa": 5400000.0
+          },
+          "sections": [
+            {
+              "s": 0.0,
+              "section": {
+                "angle_rad": -0.25,
+                "holes_yz_m": [],
+                "kind": "rectangle",
+                "outer_yz_m": [],
+                "parameters": {
+                  "height_z_m": 0.0095,
+                  "width_y_m": 0.0133
+                }
+              }
+            },
+            {
+              "s": 1.0,
+              "section": {
+                "angle_rad": 0.15000000000000002,
+                "holes_yz_m": [],
+                "kind": "rectangle",
+                "outer_yz_m": [],
+                "parameters": {
+                  "height_z_m": 0.008549999999999999,
+                  "width_y_m": 0.0114
+                }
+              }
+            }
+          ]
+        }
+      ],
+      "tendon_order": [
+        "tendon_0",
+        "tendon_1",
+        "tendon_2",
+        "tendon_3",
+        "tendon_4",
+        "tendon_5"
+      ],
+      "pretension_n": [
+        0.2,
+        0.2,
+        0.2,
+        0.2,
+        0.2,
+        0.2
+      ],
+      "force_limits_n": [
+        8.0,
+        8.0,
+        8.0,
+        8.0,
+        8.0,
+        8.0
+      ]
+    },
+    {
+      "reference": {
+        "artifact_id": "cfddd272905521fd476e9f7c455ae664e6a83f3d65d3f3ee9ff939017feea1eb",
+        "media_type": "application/json"
+      },
+      "parameters": {
+        "control_weights": {
+          "holding_tip_speed_weight": 1.0,
+          "terminal_tip_speed_weight": 1.0
+        },
+        "family_space_identity": "0793d20569402760ca055f73f6f97d80d73d0fe3c051ff2b60ebad1519db02aa",
+        "route_overrides": {},
+        "segment_count": 2,
+        "segments": {
+          "0": {
+            "cells": 12,
+            "length_m": 0.24,
+            "physical_parameters": {
+              "density_kg_m3": 1100.0,
+              "viscosity_y_nm2_s": 0.02,
+              "viscosity_z_nm2_s": 0.02
+            },
+            "sections": null,
+            "young_pa": 2000000.0
+          },
+          "1": {
+            "cells": 12,
+            "length_m": 0.06,
+            "physical_parameters": {
+              "density_kg_m3": 1100.0,
+              "viscosity_y_nm2_s": 0.02,
+              "viscosity_z_nm2_s": 0.02
+            },
+            "sections": null,
+            "young_pa": 2000000.0
+          }
+        },
+        "spans": [
+          {
+            "anchor_angle_offset_rad": 0.0,
+            "anchor_s": 1.0,
+            "angular_offsets_rad": [],
+            "count": 3,
+            "first_segment": 0,
+            "guide_angle_offset_rad": 0.0,
+            "guide_s": [
+              0.5
+            ],
+            "last_segment": 0,
+            "phase_rad": 0.0,
+            "radius_m": 0.018
+          },
+          {
+            "anchor_angle_offset_rad": 0.0,
+            "anchor_s": 1.0,
+            "angular_offsets_rad": [],
+            "count": 3,
+            "first_segment": 1,
+            "guide_angle_offset_rad": 0.0,
+            "guide_s": [
+              0.5
+            ],
+            "last_segment": 1,
+            "phase_rad": 0.0,
+            "radius_m": 0.018
+          }
+        ],
+        "strategy": "polar_consecutive_spans_v1",
+        "tendon_count": 6,
+        "tendon_parameters": {
+          "diameter_m": 0.001,
+          "force_limit_n": 8.0,
+          "length_servo_gain_n_m": 900.0,
+          "pretension_n": 0.0
+        },
+        "version": "serial_family_generation_v2"
+      },
+      "effective_task_identity": "bd9df2d930423f2b2a12152f076e2ae88b4d1a0af84d6126aa13b0b1fac9ec77",
+      "segments": [
+        {
+          "connection": {
+            "part": "fixed_base",
+            "position_m": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "quaternion_wxyz": [
+              1.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "s": 0.0
+          },
+          "id": "segment_0",
+          "interpolation": "step",
+          "kind": "flexible_segment",
+          "length_m": 0.24,
+          "natural_curvature_rad_m": [
+            0.0,
+            0.0
+          ],
+          "physics": {
+            "bending_ei_nm2": null,
+            "bending_viscosity_nm2_s": [
+              0.02,
+              0.02
+            ],
+            "density_kg_m3": 1100.0,
+            "line_density_kg_m": null,
+            "mode": "material",
+            "young_pa": 2000000.0
+          },
+          "sections": [
+            {
+              "s": 0.0,
+              "section": {
+                "angle_rad": 0.35,
+                "holes_yz_m": [],
+                "kind": "ellipse",
+                "outer_yz_m": [],
+                "parameters": {
+                  "semi_y_m": 0.0095,
+                  "semi_z_m": 0.0076
+                }
+              }
+            }
+          ]
+        },
+        {
+          "connection": {
+            "part": "connector_1",
+            "position_m": [
+              0.012,
+              0.0,
+              0.0
+            ],
+            "quaternion_wxyz": [
+              1.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "s": 0.0
+          },
+          "id": "segment_1",
+          "interpolation": "linear",
+          "kind": "flexible_segment",
+          "length_m": 0.06,
+          "natural_curvature_rad_m": [
+            0.0,
+            0.0
+          ],
+          "physics": {
+            "bending_ei_nm2": null,
+            "bending_viscosity_nm2_s": [
+              0.02,
+              0.02
+            ],
+            "density_kg_m3": 1100.0,
+            "line_density_kg_m": null,
+            "mode": "material",
+            "young_pa": 2000000.0
+          },
+          "sections": [
+            {
+              "s": 0.0,
+              "section": {
+                "angle_rad": -0.25,
+                "holes_yz_m": [],
+                "kind": "rectangle",
+                "outer_yz_m": [],
+                "parameters": {
+                  "height_z_m": 0.0095,
+                  "width_y_m": 0.0133
+                }
+              }
+            },
+            {
+              "s": 1.0,
+              "section": {
+                "angle_rad": 0.15000000000000002,
+                "holes_yz_m": [],
+                "kind": "rectangle",
+                "outer_yz_m": [],
+                "parameters": {
+                  "height_z_m": 0.008549999999999999,
+                  "width_y_m": 0.0114
+                }
+              }
+            }
+          ]
+        }
+      ],
+      "tendon_order": [
+        "tendon_0",
+        "tendon_1",
+        "tendon_2",
+        "tendon_3",
+        "tendon_4",
+        "tendon_5"
+      ],
+      "pretension_n": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "force_limits_n": [
+        8.0,
+        8.0,
+        8.0,
+        8.0,
+        8.0,
+        8.0
+      ]
+    }
+  ],
+  "candidate_task_comparisons": [
+    {
+      "candidate": {
+        "artifact_id": "cb9e9bfc7c405f5a5b142f023245ba0874d4e374cc45a31d52b181963bd706f7",
+        "media_type": "application/json"
+      },
+      "exact_task_equal_s12": true,
+      "differences": [],
+      "named_initial_joints": 48,
+      "all_named_initial_values_zero": true
+    },
+    {
+      "candidate": {
+        "artifact_id": "318c922bdd96b863487b097d6bd6bfd1dd90142b18d15a04af9aeaf508f701a6",
+        "media_type": "application/json"
+      },
+      "exact_task_equal_s12": false,
+      "differences": [
+        {
+          "pointer": "/initializer/parameters/data/qpos_rad/segment_2_cell_0_y",
+          "s12": null,
+          "s128": 0.0
+        },
+        {
+          "pointer": "/initializer/parameters/data/qpos_rad/segment_2_cell_0_z",
+          "s12": null,
+          "s128": 0.0
+        },
+        {
+          "pointer": "/initializer/parameters/data/qpos_rad/segment_2_cell_10_y",
+          "s12": null,
+          "s128": 0.0
+        },
+        {
+          "pointer": "/initializer/parameters/data/qpos_rad/segment_2_cell_10_z",
+          "s12": null,
+          "s128": 0.0
+        },
+        {
+          "pointer": "/initializer/parameters/data/qpos_rad/segment_2_cell_11_y",
+          "s12": null,
+          "s128": 0.0
+        },
+        {
+          "pointer": "/initializer/parameters/data/qpos_rad/segment_2_cell_11_z",
+          "s12": null,
+          "s128": 0.0
+        },
+        {
+          "pointer": "/initializer/parameters/data/qpos_rad/segment_2_cell_1_y",
+          "s12": null,
+          "s128": 0.0
+        },
+        {
+          "pointer": "/initializer/parameters/data/qpos_rad/segment_2_cell_1_z",
+          "s12": null,
+          "s128": 0.0
+        },
+        {
+          "pointer": "/initializer/parameters/data/qpos_rad/segment_2_cell_2_y",
+          "s12": null,
+          "s128": 0.0
+        },
+        {
+          "pointer": "/initializer/parameters/data/qpos_rad/segment_2_cell_2_z",
+          "s12": null,
+          "s128": 0.0
+        },
+        {
+          "pointer": "/initializer/parameters/data/qpos_rad/segment_2_cell_3_y",
+          "s12": null,
+          "s128": 0.0
+        },
+        {
+          "pointer": "/initializer/parameters/data/qpos_rad/segment_2_cell_3_z",
+          "s12": null,
+          "s128": 0.0
+        },
+        {
+          "pointer": "/initializer/parameters/data/qpos_rad/segment_2_cell_4_y",
+          "s12": null,
+          "s128": 0.0
+        },
+        {
+          "pointer": "/initializer/parameters/data/qpos_rad/segment_2_cell_4_z",
+          "s12": null,
+          "s128": 0.0
+        },
+        {
+          "pointer": "/initializer/parameters/data/qpos_rad/segment_2_cell_5_y",
+          "s12": null,
+          "s128": 0.0
+        },
+        {
+          "pointer": "/initializer/parameters/data/qpos_rad/segment_2_cell_5_z",
+          "s12": null,
+          "s128": 0.0
+        },
+        {
+          "pointer": "/initializer/parameters/data/qpos_rad/segment_2_cell_6_y",
+          "s12": null,
+          "s128": 0.0
+        },
+        {
+          "pointer": "/initializer/parameters/data/qpos_rad/segment_2_cell_6_z",
+          "s12": null,
+          "s128": 0.0
+        },
+        {
+          "pointer": "/initializer/parameters/data/qpos_rad/segment_2_cell_7_y",
+          "s12": null,
+          "s128": 0.0
+        },
+        {
+          "pointer": "/initializer/parameters/data/qpos_rad/segment_2_cell_7_z",
+          "s12": null,
+          "s128": 0.0
+        },
+        {
+          "pointer": "/initializer/parameters/data/qpos_rad/segment_2_cell_8_y",
+          "s12": null,
+          "s128": 0.0
+        },
+        {
+          "pointer": "/initializer/parameters/data/qpos_rad/segment_2_cell_8_z",
+          "s12": null,
+          "s128": 0.0
+        },
+        {
+          "pointer": "/initializer/parameters/data/qpos_rad/segment_2_cell_9_y",
+          "s12": null,
+          "s128": 0.0
+        },
+        {
+          "pointer": "/initializer/parameters/data/qpos_rad/segment_2_cell_9_z",
+          "s12": null,
+          "s128": 0.0
+        },
+        {
+          "pointer": "/initializer/parameters/data/qvel_rad_s/segment_2_cell_0_y",
+          "s12": null,
+          "s128": 0.0
+        },
+        {
+          "pointer": "/initializer/parameters/data/qvel_rad_s/segment_2_cell_0_z",
+          "s12": null,
+          "s128": 0.0
+        },
+        {
+          "pointer": "/initializer/parameters/data/qvel_rad_s/segment_2_cell_10_y",
+          "s12": null,
+          "s128": 0.0
+        },
+        {
+          "pointer": "/initializer/parameters/data/qvel_rad_s/segment_2_cell_10_z",
+          "s12": null,
+          "s128": 0.0
+        },
+        {
+          "pointer": "/initializer/parameters/data/qvel_rad_s/segment_2_cell_11_y",
+          "s12": null,
+          "s128": 0.0
+        },
+        {
+          "pointer": "/initializer/parameters/data/qvel_rad_s/segment_2_cell_11_z",
+          "s12": null,
+          "s128": 0.0
+        },
+        {
+          "pointer": "/initializer/parameters/data/qvel_rad_s/segment_2_cell_1_y",
+          "s12": null,
+          "s128": 0.0
+        },
+        {
+          "pointer": "/initializer/parameters/data/qvel_rad_s/segment_2_cell_1_z",
+          "s12": null,
+          "s128": 0.0
+        },
+        {
+          "pointer": "/initializer/parameters/data/qvel_rad_s/segment_2_cell_2_y",
+          "s12": null,
+          "s128": 0.0
+        },
+        {
+          "pointer": "/initializer/parameters/data/qvel_rad_s/segment_2_cell_2_z",
+          "s12": null,
+          "s128": 0.0
+        },
+        {
+          "pointer": "/initializer/parameters/data/qvel_rad_s/segment_2_cell_3_y",
+          "s12": null,
+          "s128": 0.0
+        },
+        {
+          "pointer": "/initializer/parameters/data/qvel_rad_s/segment_2_cell_3_z",
+          "s12": null,
+          "s128": 0.0
+        },
+        {
+          "pointer": "/initializer/parameters/data/qvel_rad_s/segment_2_cell_4_y",
+          "s12": null,
+          "s128": 0.0
+        },
+        {
+          "pointer": "/initializer/parameters/data/qvel_rad_s/segment_2_cell_4_z",
+          "s12": null,
+          "s128": 0.0
+        },
+        {
+          "pointer": "/initializer/parameters/data/qvel_rad_s/segment_2_cell_5_y",
+          "s12": null,
+          "s128": 0.0
+        },
+        {
+          "pointer": "/initializer/parameters/data/qvel_rad_s/segment_2_cell_5_z",
+          "s12": null,
+          "s128": 0.0
+        },
+        {
+          "pointer": "/initializer/parameters/data/qvel_rad_s/segment_2_cell_6_y",
+          "s12": null,
+          "s128": 0.0
+        },
+        {
+          "pointer": "/initializer/parameters/data/qvel_rad_s/segment_2_cell_6_z",
+          "s12": null,
+          "s128": 0.0
+        },
+        {
+          "pointer": "/initializer/parameters/data/qvel_rad_s/segment_2_cell_7_y",
+          "s12": null,
+          "s128": 0.0
+        },
+        {
+          "pointer": "/initializer/parameters/data/qvel_rad_s/segment_2_cell_7_z",
+          "s12": null,
+          "s128": 0.0
+        },
+        {
+          "pointer": "/initializer/parameters/data/qvel_rad_s/segment_2_cell_8_y",
+          "s12": null,
+          "s128": 0.0
+        },
+        {
+          "pointer": "/initializer/parameters/data/qvel_rad_s/segment_2_cell_8_z",
+          "s12": null,
+          "s128": 0.0
+        },
+        {
+          "pointer": "/initializer/parameters/data/qvel_rad_s/segment_2_cell_9_y",
+          "s12": null,
+          "s128": 0.0
+        },
+        {
+          "pointer": "/initializer/parameters/data/qvel_rad_s/segment_2_cell_9_z",
+          "s12": null,
+          "s128": 0.0
+        }
+      ],
+      "named_initial_joints": 72,
+      "all_named_initial_values_zero": true
+    },
+    {
+      "candidate": {
+        "artifact_id": "54ff3fe518b2a53e25fcc6064933fe92b8d3a4523c5234a5dcab3923b498b0a7",
+        "media_type": "application/json"
+      },
+      "exact_task_equal_s12": true,
+      "differences": [],
+      "named_initial_joints": 48,
+      "all_named_initial_values_zero": true
+    },
+    {
+      "candidate": {
+        "artifact_id": "8334e480f41abc889c83dbee2e6ed21db6042cc000dca6cff141398356048c19",
+        "media_type": "application/json"
+      },
+      "exact_task_equal_s12": true,
+      "differences": [],
+      "named_initial_joints": 48,
+      "all_named_initial_values_zero": true
+    },
+    {
+      "candidate": {
+        "artifact_id": "a0a831fd902cfcf1782bc5af05181e5f040ac9c56017acc0836b69dffe171f58",
+        "media_type": "application/json"
+      },
+      "exact_task_equal_s12": true,
+      "differences": [],
+      "named_initial_joints": 48,
+      "all_named_initial_values_zero": true
+    },
+    {
+      "candidate": {
+        "artifact_id": "c5db6ee4065e9362032c1b129e0923efbb6cb16ad8ba3c9d45806c0cfe208e94",
+        "media_type": "application/json"
+      },
+      "exact_task_equal_s12": true,
+      "differences": [],
+      "named_initial_joints": 48,
+      "all_named_initial_values_zero": true
+    },
+    {
+      "candidate": {
+        "artifact_id": "cfddd272905521fd476e9f7c455ae664e6a83f3d65d3f3ee9ff939017feea1eb",
+        "media_type": "application/json"
+      },
+      "exact_task_equal_s12": true,
+      "differences": [],
+      "named_initial_joints": 48,
+      "all_named_initial_values_zero": true
+    }
+  ],
+  "advertisement_summary": {
+    "provider_requests": 59,
+    "requests_advertising_analysis": 59,
+    "analysis_schema_variants": 1,
+    "analysis_schemas": {
+      "f9fc6e48630e25af32d7535da51332129640dde78c7cabbef7162b8830f4ab96": {
+        "description": "Candidate-bound mathematics; saved_state or execution plus update_id selects exact projected state at previous applied input with actual remaining task time. Historical candidate binding required. Each calculation charged once; task acceptance unmeasured.",
+        "required": [
+          "candidate",
+          "operation",
+          "protocol"
+        ],
+        "operations": [
+          "equilibrium",
+          "linearization",
+          "controllability",
+          "endpoint",
+          "braking",
+          "instantaneous_braking_v1",
+          "trajectory_feasibility",
+          "input_sensitivity",
+          "design_sensitivity"
+        ],
+        "operating_points": [
+          "standardized_initial_pretension",
+          "controller_start_input",
+          "target_equilibrium",
+          "halfway_waypoint",
+          "saved_state",
+          "fixed_input_equilibrium"
+        ]
+      }
+    },
+    "native_tool_calls": {
+      "research_plan": 34,
+      "evidence_read": 34
+    },
+    "packets": 59,
+    "readiness_states": {
+      "ready": 59
+    },
+    "remaining_mathematical": [
+      8
+    ],
+    "mathematical_response_statuses": {
+      "blocked": 148
+    },
+    "direct_analysis_action_rows": 0
+  },
+  "saved_one_step_comparisons": [
+    {
+      "reference": {
+        "artifact_id": "9bffb6391437dd1fed64841b7da873259f8e19ed551ca07af75263b25f714364",
+        "media_type": "application/json"
+      },
+      "samples": 35,
+      "raw_recorded_maxima_unvalidated": {
+        "tip_difference_m": 0.339372151991886,
+        "velocity_difference_m_s": 0.0433476450374464,
+        "applied_input_difference_n": 0.0
+      },
+      "valid_vector_rows": 34,
+      "valid_vector_maxima": {
+        "tip_difference_m": 0.0012839225708479527,
+        "velocity_difference_m_s": 0.014570221208809672,
+        "applied_input_difference_n": 0.0
+      },
+      "invalid_vector_rows": [
+        {
+          "pointer": "/34",
+          "start_s": 0.34,
+          "invalid_fields": [
+            "predicted_tip_m",
+            "predicted_tip_velocity_m_s"
+          ]
+        }
+      ],
+      "scope": "Only finite dimension-3 vectors support output comparison. Scalar-broadcast error magnitudes are not physical evidence; projection, integration and model error are not separated."
+    },
+    {
+      "reference": {
+        "artifact_id": "c69b1f7900fffeb636b0be3538bf1a15189915977c57f8fd9ce4908a4c187868",
+        "media_type": "application/json"
+      },
+      "samples": 35,
+      "raw_recorded_maxima_unvalidated": {
+        "tip_difference_m": 0.41031623672125667,
+        "velocity_difference_m_s": 0.044812944629787785,
+        "applied_input_difference_n": 0.0
+      },
+      "valid_vector_rows": 34,
+      "valid_vector_maxima": {
+        "tip_difference_m": 0.0013108903579757652,
+        "velocity_difference_m_s": 0.03196616446809845,
+        "applied_input_difference_n": 0.0
+      },
+      "invalid_vector_rows": [
+        {
+          "pointer": "/34",
+          "start_s": 0.34,
+          "invalid_fields": [
+            "predicted_tip_m",
+            "predicted_tip_velocity_m_s"
+          ]
+        }
+      ],
+      "scope": "Only finite dimension-3 vectors support output comparison. Scalar-broadcast error magnitudes are not physical evidence; projection, integration and model error are not separated."
+    }
+  ],
+  "mechanics_results": [
+    {
+      "reference": {
+        "artifact_id": "90bc0b90bd0ba21f85c8933a5cdcf4ac9187b0df639dc15cfb0ce0c0f3b240cc",
+        "media_type": "application/json"
+      },
+      "candidate": {
+        "artifact_id": "a0a831fd902cfcf1782bc5af05181e5f040ac9c56017acc0836b69dffe171f58",
+        "media_type": "application/json"
+      },
+      "operation": "solve",
+      "status": "computed",
+      "facts": {
+        "converged": true,
+        "iterations": 78,
+        "function_evaluations": 176,
+        "objective": 115.64175490824711,
+        "original_feasible": false,
+        "relaxed_feasible": true,
+        "model_identity": "affecb11a95f4152065c1adc4398110c0d836f97bbd18e0d5d595586a78fd876"
+      },
+      "conclusions": [
+        {
+          "conclusion": "inconclusive",
+          "verification_status": "requires_independent_replay",
+          "numerical_result_pointer": "/mathematical_facts"
+        }
+      ]
+    }
+  ],
+  "analysis_results": [],
+  "mathematical_evaluations": 0,
+  "request_advertisements": [
+    {
+      "sequence": 9,
+      "envelope": {
+        "artifact_id": "ceb1b166bcc8342aa4906cb41c5984a9bd45bc8dc8c0ba38b472fe7c53fc5165",
+        "media_type": "application/json"
+      },
+      "request": {
+        "artifact_id": "6ba210a8d6920c7c16542bd8c6888538643bde1d975aa9126b103a23da397b01",
+        "media_type": "application/json"
+      },
+      "advertised_tools": [
+        "research_plan",
+        "evidence_read",
+        "research_analysis",
+        "research_rl",
+        "retrieve_context"
+      ],
+      "analysis_schema_identity": "f9fc6e48630e25af32d7535da51332129640dde78c7cabbef7162b8830f4ab96",
+      "plan_actions": [
+        "generate",
+        "initialize_control",
+        "physical_replay",
+        "control_search",
+        "execute",
+        "mechanics",
+        "replay",
+        "refine",
+        "diagnose",
+        "select",
+        "stop"
+      ]
+    },
+    {
+      "sequence": 23,
+      "envelope": {
+        "artifact_id": "2227dd478edd10a800a3f20675125b76932b7ba5fb98121d44cc0c9921e6a7ee",
+        "media_type": "application/json"
+      },
+      "request": {
+        "artifact_id": "f84cd5ab9e00f07ee3d1a5b7ed02cddcac8113df5b5368e08ea7ea20c8df803a",
+        "media_type": "application/json"
+      },
+      "advertised_tools": [
+        "research_plan",
+        "evidence_read",
+        "research_analysis",
+        "research_rl",
+        "retrieve_context"
+      ],
+      "analysis_schema_identity": "f9fc6e48630e25af32d7535da51332129640dde78c7cabbef7162b8830f4ab96",
+      "plan_actions": [
+        "generate",
+        "initialize_control",
+        "physical_replay",
+        "control_search",
+        "execute",
+        "mechanics",
+        "replay",
+        "refine",
+        "diagnose",
+        "select",
+        "stop"
+      ]
+    },
+    {
+      "sequence": 35,
+      "envelope": {
+        "artifact_id": "7ee9c6581c4ccca55982de0933fc117dafcd1fe612c070014758d6693aaea957",
+        "media_type": "application/json"
+      },
+      "request": {
+        "artifact_id": "36d791bad27d78d6338ae14842e75374d1f0a05f748bf5906af965c3957980a9",
+        "media_type": "application/json"
+      },
+      "advertised_tools": [
+        "research_plan",
+        "evidence_read",
+        "research_analysis",
+        "research_rl",
+        "retrieve_context"
+      ],
+      "analysis_schema_identity": "f9fc6e48630e25af32d7535da51332129640dde78c7cabbef7162b8830f4ab96",
+      "plan_actions": [
+        "generate",
+        "initialize_control",
+        "physical_replay",
+        "control_search",
+        "execute",
+        "mechanics",
+        "replay",
+        "refine",
+        "diagnose",
+        "select",
+        "stop"
+      ]
+    },
+    {
+      "sequence": 50,
+      "envelope": {
+        "artifact_id": "aba2206c251435dc71d80ee2fb754fd18f153c7db1d577578c702b77c454bbb9",
+        "media_type": "application/json"
+      },
+      "request": {
+        "artifact_id": "86ca59db364422b930e775393a7107bd4830344402ba3aadd1d37cd6204de60e",
+        "media_type": "application/json"
+      },
+      "advertised_tools": [
+        "research_plan",
+        "evidence_read",
+        "research_analysis",
+        "research_rl",
+        "retrieve_context"
+      ],
+      "analysis_schema_identity": "f9fc6e48630e25af32d7535da51332129640dde78c7cabbef7162b8830f4ab96",
+      "plan_actions": [
+        "generate",
+        "initialize_control",
+        "physical_replay",
+        "control_search",
+        "execute",
+        "mechanics",
+        "replay",
+        "refine",
+        "diagnose",
+        "select",
+        "stop"
+      ]
+    },
+    {
+      "sequence": 61,
+      "envelope": {
+        "artifact_id": "1ab64a99631871f783f0d93a5c3c5415b8a0c80202fbe1d95c86dfc2a5817765",
+        "media_type": "application/json"
+      },
+      "request": {
+        "artifact_id": "dc67bbad2a7eebc4e76b8ff64ee198c6ad28a1c454e938a97b47aa0478af77c3",
+        "media_type": "application/json"
+      },
+      "advertised_tools": [
+        "research_plan",
+        "evidence_read",
+        "research_analysis",
+        "research_rl",
+        "retrieve_context"
+      ],
+      "analysis_schema_identity": "f9fc6e48630e25af32d7535da51332129640dde78c7cabbef7162b8830f4ab96",
+      "plan_actions": [
+        "generate",
+        "initialize_control",
+        "physical_replay",
+        "control_search",
+        "execute",
+        "mechanics",
+        "replay",
+        "refine",
+        "diagnose",
+        "select",
+        "stop"
+      ]
+    },
+    {
+      "sequence": 76,
+      "envelope": {
+        "artifact_id": "158615d98416604f128cc1fce64d52c52bcbaa5fb728c5dd43d97b823a2357c1",
+        "media_type": "application/json"
+      },
+      "request": {
+        "artifact_id": "34587da35e5cb2352632aea5d5049228e1977e03860d836affd59c33dda96fde",
+        "media_type": "application/json"
+      },
+      "advertised_tools": [
+        "research_plan",
+        "evidence_read",
+        "research_analysis",
+        "research_rl",
+        "retrieve_context"
+      ],
+      "analysis_schema_identity": "f9fc6e48630e25af32d7535da51332129640dde78c7cabbef7162b8830f4ab96",
+      "plan_actions": [
+        "generate",
+        "initialize_control",
+        "physical_replay",
+        "control_search",
+        "execute",
+        "mechanics",
+        "replay",
+        "refine",
+        "diagnose",
+        "select",
+        "stop"
+      ]
+    },
+    {
+      "sequence": 87,
+      "envelope": {
+        "artifact_id": "7248b6c34a1b639dd57a709909dd94d7abc012edc707ce735aef57a92f2401a0",
+        "media_type": "application/json"
+      },
+      "request": {
+        "artifact_id": "30269bf6f434918480952a2342dbf45c824c60844d6038b7d97d78a0e58d0905",
+        "media_type": "application/json"
+      },
+      "advertised_tools": [
+        "research_plan",
+        "evidence_read",
+        "research_analysis",
+        "research_rl",
+        "retrieve_context"
+      ],
+      "analysis_schema_identity": "f9fc6e48630e25af32d7535da51332129640dde78c7cabbef7162b8830f4ab96",
+      "plan_actions": [
+        "generate",
+        "initialize_control",
+        "physical_replay",
+        "control_search",
+        "execute",
+        "mechanics",
+        "replay",
+        "refine",
+        "diagnose",
+        "select",
+        "stop"
+      ]
+    },
+    {
+      "sequence": 98,
+      "envelope": {
+        "artifact_id": "9db0c1bc8789a84504bbcfd4b580d2ac13302106b86ac52d3144992b9501f510",
+        "media_type": "application/json"
+      },
+      "request": {
+        "artifact_id": "ecf597b73b761c55249ebedfe71fc6a87a3aeedafba259ff100f55d88bc057ea",
+        "media_type": "application/json"
+      },
+      "advertised_tools": [
+        "research_plan",
+        "evidence_read",
+        "research_analysis",
+        "research_rl",
+        "retrieve_context"
+      ],
+      "analysis_schema_identity": "f9fc6e48630e25af32d7535da51332129640dde78c7cabbef7162b8830f4ab96",
+      "plan_actions": [
+        "generate",
+        "initialize_control",
+        "physical_replay",
+        "control_search",
+        "execute",
+        "mechanics",
+        "replay",
+        "refine",
+        "diagnose",
+        "select",
+        "stop"
+      ]
+    },
+    {
+      "sequence": 112,
+      "envelope": {
+        "artifact_id": "3b6a2ed2a1a7570a03ead23b5c5d2f05998c3359c4c163d9a48aa1958c55a005",
+        "media_type": "application/json"
+      },
+      "request": {
+        "artifact_id": "a9782c27a7b13024535e25936feb861b59bb25fb66672b5692782e8ee4967ed5",
+        "media_type": "application/json"
+      },
+      "advertised_tools": [
+        "research_plan",
+        "evidence_read",
+        "research_analysis",
+        "research_rl",
+        "retrieve_context"
+      ],
+      "analysis_schema_identity": "f9fc6e48630e25af32d7535da51332129640dde78c7cabbef7162b8830f4ab96",
+      "plan_actions": [
+        "generate",
+        "initialize_control",
+        "physical_replay",
+        "control_search",
+        "execute",
+        "mechanics",
+        "replay",
+        "refine",
+        "diagnose",
+        "select",
+        "stop"
+      ]
+    },
+    {
+      "sequence": 123,
+      "envelope": {
+        "artifact_id": "72735708997bbb2dffbbfac1df0f9e877dac935c63859ba61d4623aa3fa954ca",
+        "media_type": "application/json"
+      },
+      "request": {
+        "artifact_id": "3754297c320d00cdb63801d20d911ca5f592f7213921a6409e182210318a9337",
+        "media_type": "application/json"
+      },
+      "advertised_tools": [
+        "research_plan",
+        "evidence_read",
+        "research_analysis",
+        "research_rl",
+        "retrieve_context"
+      ],
+      "analysis_schema_identity": "f9fc6e48630e25af32d7535da51332129640dde78c7cabbef7162b8830f4ab96",
+      "plan_actions": [
+        "generate",
+        "initialize_control",
+        "physical_replay",
+        "control_search",
+        "execute",
+        "mechanics",
+        "replay",
+        "refine",
+        "diagnose",
+        "select",
+        "stop"
+      ]
+    },
+    {
+      "sequence": 134,
+      "envelope": {
+        "artifact_id": "6e353b87fe6c4aae1c522ab5855a65ecd7b7f721c4d434b7138e0e8d283de2c0",
+        "media_type": "application/json"
+      },
+      "request": {
+        "artifact_id": "b230090d5d58fcaee80ec0c306bf4ff8e5ad041f38e36cf18d4c16e584fc1bfc",
+        "media_type": "application/json"
+      },
+      "advertised_tools": [
+        "research_plan",
+        "evidence_read",
+        "research_analysis",
+        "research_rl",
+        "retrieve_context"
+      ],
+      "analysis_schema_identity": "f9fc6e48630e25af32d7535da51332129640dde78c7cabbef7162b8830f4ab96",
+      "plan_actions": [
+        "generate",
+        "initialize_control",
+        "physical_replay",
+        "control_search",
+        "execute",
+        "mechanics",
+        "replay",
+        "refine",
+        "diagnose",
+        "select",
+        "stop"
+      ]
+    },
+    {
+      "sequence": 148,
+      "envelope": {
+        "artifact_id": "3a91925996729473ee1eca97438b56b489d03a4d6ef49792b3853d88267e76af",
+        "media_type": "application/json"
+      },
+      "request": {
+        "artifact_id": "c787da8ade51770015b6f1d9ee7c1eed51ef468c7bd46df787efad23e53c2798",
+        "media_type": "application/json"
+      },
+      "advertised_tools": [
+        "research_plan",
+        "evidence_read",
+        "research_analysis",
+        "research_rl",
+        "retrieve_context"
+      ],
+      "analysis_schema_identity": "f9fc6e48630e25af32d7535da51332129640dde78c7cabbef7162b8830f4ab96",
+      "plan_actions": [
+        "generate",
+        "initialize_control",
+        "physical_replay",
+        "control_search",
+        "execute",
+        "mechanics",
+        "replay",
+        "refine",
+        "diagnose",
+        "select",
+        "stop"
+      ]
+    },
+    {
+      "sequence": 163,
+      "envelope": {
+        "artifact_id": "d2ee147912e27542495207f729ca8299bd3b4a567fbd6c29343f120f14c66095",
+        "media_type": "application/json"
+      },
+      "request": {
+        "artifact_id": "36acfeed3d26e9ef7b49bf9a6dcb72b306fd4ffdc6bf7ac2a0e637c49912e6e4",
+        "media_type": "application/json"
+      },
+      "advertised_tools": [
+        "research_plan",
+        "evidence_read",
+        "research_analysis",
+        "research_rl",
+        "retrieve_context"
+      ],
+      "analysis_schema_identity": "f9fc6e48630e25af32d7535da51332129640dde78c7cabbef7162b8830f4ab96",
+      "plan_actions": [
+        "generate",
+        "initialize_control",
+        "physical_replay",
+        "control_search",
+        "execute",
+        "mechanics",
+        "replay",
+        "refine",
+        "diagnose",
+        "select",
+        "stop"
+      ]
+    },
+    {
+      "sequence": 177,
+      "envelope": {
+        "artifact_id": "9fb169ad2b386cfe9525cda1475f87d54255d69d094f8e40b0ff9029eaaaeaf9",
+        "media_type": "application/json"
+      },
+      "request": {
+        "artifact_id": "7fa6089df1987c716b66902408e553bb065f3606e317bbd68e6c9e18631d8d19",
+        "media_type": "application/json"
+      },
+      "advertised_tools": [
+        "research_plan",
+        "evidence_read",
+        "research_analysis",
+        "research_rl",
+        "retrieve_context"
+      ],
+      "analysis_schema_identity": "f9fc6e48630e25af32d7535da51332129640dde78c7cabbef7162b8830f4ab96",
+      "plan_actions": [
+        "generate",
+        "initialize_control",
+        "physical_replay",
+        "control_search",
+        "execute",
+        "mechanics",
+        "replay",
+        "refine",
+        "diagnose",
+        "select",
+        "stop"
+      ]
+    },
+    {
+      "sequence": 188,
+      "envelope": {
+        "artifact_id": "c1f6c6bb9842c6bba0c8024222a6db5bca986199d3ef3d8ea45194fcef7a7e01",
+        "media_type": "application/json"
+      },
+      "request": {
+        "artifact_id": "72f41c8411ffab2b3d2f6c17dd2756fde50253220cc1cb74d8aee4c9c90e34de",
+        "media_type": "application/json"
+      },
+      "advertised_tools": [
+        "research_plan",
+        "evidence_read",
+        "research_analysis",
+        "research_rl",
+        "retrieve_context"
+      ],
+      "analysis_schema_identity": "f9fc6e48630e25af32d7535da51332129640dde78c7cabbef7162b8830f4ab96",
+      "plan_actions": [
+        "generate",
+        "initialize_control",
+        "physical_replay",
+        "control_search",
+        "execute",
+        "mechanics",
+        "replay",
+        "refine",
+        "diagnose",
+        "select",
+        "stop"
+      ]
+    },
+    {
+      "sequence": 207,
+      "envelope": {
+        "artifact_id": "9222ac02ac3ef9fd754e59b6d56e401334db13c9e9128a85a192d1bf1a0d8573",
+        "media_type": "application/json"
+      },
+      "request": {
+        "artifact_id": "2b8385c5602cab2cf652f85bead98ec725c1809bcdc0e1dac9155daabeea9ae1",
+        "media_type": "application/json"
+      },
+      "advertised_tools": [
+        "research_plan",
+        "evidence_read",
+        "research_analysis",
+        "research_rl",
+        "retrieve_context"
+      ],
+      "analysis_schema_identity": "f9fc6e48630e25af32d7535da51332129640dde78c7cabbef7162b8830f4ab96",
+      "plan_actions": [
+        "generate",
+        "initialize_control",
+        "physical_replay",
+        "control_search",
+        "execute",
+        "mechanics",
+        "replay",
+        "refine",
+        "diagnose",
+        "select",
+        "stop"
+      ]
+    },
+    {
+      "sequence": 218,
+      "envelope": {
+        "artifact_id": "2b1344f743c78e8bb507cea9e48ca6776216841511f3797794d0efa5ae48992b",
+        "media_type": "application/json"
+      },
+      "request": {
+        "artifact_id": "855018fc6e65b3aa5e46cbae6f953c035883c2b7c110f5989ac65e705a91393e",
+        "media_type": "application/json"
+      },
+      "advertised_tools": [
+        "research_plan",
+        "evidence_read",
+        "research_analysis",
+        "research_rl",
+        "retrieve_context"
+      ],
+      "analysis_schema_identity": "f9fc6e48630e25af32d7535da51332129640dde78c7cabbef7162b8830f4ab96",
+      "plan_actions": [
+        "generate",
+        "initialize_control",
+        "physical_replay",
+        "control_search",
+        "execute",
+        "mechanics",
+        "replay",
+        "refine",
+        "diagnose",
+        "select",
+        "stop"
+      ]
+    },
+    {
+      "sequence": 231,
+      "envelope": {
+        "artifact_id": "8588d233f307e3fde87cf96bf0e7ed8a3d8e43330f067446d51c18c131a97d58",
+        "media_type": "application/json"
+      },
+      "request": {
+        "artifact_id": "8ace3e210621d52325aa9069d28cf8da056f9c118208fce526ae37a1926ea5d8",
+        "media_type": "application/json"
+      },
+      "advertised_tools": [
+        "research_plan",
+        "evidence_read",
+        "research_analysis",
+        "research_rl",
+        "retrieve_context"
+      ],
+      "analysis_schema_identity": "f9fc6e48630e25af32d7535da51332129640dde78c7cabbef7162b8830f4ab96",
+      "plan_actions": [
+        "generate",
+        "initialize_control",
+        "physical_replay",
+        "control_search",
+        "execute",
+        "mechanics",
+        "replay",
+        "refine",
+        "diagnose",
+        "select",
+        "stop"
+      ]
+    },
+    {
+      "sequence": 250,
+      "envelope": {
+        "artifact_id": "948748124f29dac7b451e99629238ed71fe5e2420e43ca3ae1b1461e53a297ca",
+        "media_type": "application/json"
+      },
+      "request": {
+        "artifact_id": "87e5d761371fba39a7ade733ffecbf5cfea41e2ef342d7de38808296d62a349a",
+        "media_type": "application/json"
+      },
+      "advertised_tools": [
+        "research_plan",
+        "evidence_read",
+        "research_analysis",
+        "research_rl",
+        "retrieve_context"
+      ],
+      "analysis_schema_identity": "f9fc6e48630e25af32d7535da51332129640dde78c7cabbef7162b8830f4ab96",
+      "plan_actions": [
+        "generate",
+        "initialize_control",
+        "physical_replay",
+        "control_search",
+        "execute",
+        "mechanics",
+        "replay",
+        "refine",
+        "diagnose",
+        "select",
+        "stop"
+      ]
+    },
+    {
+      "sequence": 261,
+      "envelope": {
+        "artifact_id": "7fcec8748c7ef0ebe1b45056b21dd7291bffbf67f305b997ff01f24230b25dc7",
+        "media_type": "application/json"
+      },
+      "request": {
+        "artifact_id": "902df035949609b1aba9dd7f70e3d62e077c125524a4751c706edac677343f4f",
+        "media_type": "application/json"
+      },
+      "advertised_tools": [
+        "research_plan",
+        "evidence_read",
+        "research_analysis",
+        "research_rl",
+        "retrieve_context"
+      ],
+      "analysis_schema_identity": "f9fc6e48630e25af32d7535da51332129640dde78c7cabbef7162b8830f4ab96",
+      "plan_actions": [
+        "generate",
+        "initialize_control",
+        "physical_replay",
+        "control_search",
+        "execute",
+        "mechanics",
+        "replay",
+        "refine",
+        "diagnose",
+        "select",
+        "stop"
+      ]
+    },
+    {
+      "sequence": 284,
+      "envelope": {
+        "artifact_id": "242bfacd38e8740fe2ea776bbfde563e8162c1715ca892568bbdcf0c35d1333b",
+        "media_type": "application/json"
+      },
+      "request": {
+        "artifact_id": "2575a46f1c0b783b97da23c8ef5cb46ced9017c59666410e33c9a1383d94444c",
+        "media_type": "application/json"
+      },
+      "advertised_tools": [
+        "research_plan",
+        "evidence_read",
+        "research_analysis",
+        "research_rl",
+        "retrieve_context"
+      ],
+      "analysis_schema_identity": "f9fc6e48630e25af32d7535da51332129640dde78c7cabbef7162b8830f4ab96",
+      "plan_actions": [
+        "generate",
+        "initialize_control",
+        "physical_replay",
+        "control_search",
+        "execute",
+        "mechanics",
+        "replay",
+        "refine",
+        "diagnose",
+        "select",
+        "stop"
+      ]
+    },
+    {
+      "sequence": 295,
+      "envelope": {
+        "artifact_id": "9458ab59f8c9c2ce2f6a3f59ab1fb66c11744554292179dfc56a76738646975d",
+        "media_type": "application/json"
+      },
+      "request": {
+        "artifact_id": "fd6b24e02c6a0dfb5fdaa4fc5a9954b0f4d6909710f649e0cd0b96c92327cef3",
+        "media_type": "application/json"
+      },
+      "advertised_tools": [
+        "research_plan",
+        "evidence_read",
+        "research_analysis",
+        "research_rl",
+        "retrieve_context"
+      ],
+      "analysis_schema_identity": "f9fc6e48630e25af32d7535da51332129640dde78c7cabbef7162b8830f4ab96",
+      "plan_actions": [
+        "generate",
+        "initialize_control",
+        "physical_replay",
+        "control_search",
+        "execute",
+        "mechanics",
+        "replay",
+        "refine",
+        "diagnose",
+        "select",
+        "stop"
+      ]
+    },
+    {
+      "sequence": 306,
+      "envelope": {
+        "artifact_id": "7e72c5ab5e307ab2c8d0a08b7e5492e271c8cdf48f7ec8932cbd49c0dc4d4843",
+        "media_type": "application/json"
+      },
+      "request": {
+        "artifact_id": "5cdb681e28be42679e7b08097b7555438d024f3a2f49a0e9c0b4028631a81d4c",
+        "media_type": "application/json"
+      },
+      "advertised_tools": [
+        "research_plan",
+        "evidence_read",
+        "research_analysis",
+        "research_rl",
+        "retrieve_context"
+      ],
+      "analysis_schema_identity": "f9fc6e48630e25af32d7535da51332129640dde78c7cabbef7162b8830f4ab96",
+      "plan_actions": [
+        "generate",
+        "initialize_control",
+        "physical_replay",
+        "control_search",
+        "execute",
+        "mechanics",
+        "replay",
+        "refine",
+        "diagnose",
+        "select",
+        "stop"
+      ]
+    },
+    {
+      "sequence": 317,
+      "envelope": {
+        "artifact_id": "e515ba7986f4054da46a5159ac1a43030865c524c929ecec2095ea58147eac44",
+        "media_type": "application/json"
+      },
+      "request": {
+        "artifact_id": "7925e5c39784bb78d9926911d30861a9fdfe67696e4882b36e293fe466c7661e",
+        "media_type": "application/json"
+      },
+      "advertised_tools": [
+        "research_plan",
+        "evidence_read",
+        "research_analysis",
+        "research_rl",
+        "retrieve_context"
+      ],
+      "analysis_schema_identity": "f9fc6e48630e25af32d7535da51332129640dde78c7cabbef7162b8830f4ab96",
+      "plan_actions": [
+        "generate",
+        "initialize_control",
+        "physical_replay",
+        "control_search",
+        "execute",
+        "mechanics",
+        "replay",
+        "refine",
+        "diagnose",
+        "select",
+        "stop"
+      ]
+    },
+    {
+      "sequence": 331,
+      "envelope": {
+        "artifact_id": "8c56b84a9b50b516cb8d7b6ce98724ae26a3b5c6b8745a39bbd3b224b5fa63f5",
+        "media_type": "application/json"
+      },
+      "request": {
+        "artifact_id": "367913dc445e210d1c86c6ea53484b40cbfe4e11d870dc28c0801724466ea77b",
+        "media_type": "application/json"
+      },
+      "advertised_tools": [
+        "research_plan",
+        "evidence_read",
+        "research_analysis",
+        "research_rl",
+        "retrieve_context"
+      ],
+      "analysis_schema_identity": "f9fc6e48630e25af32d7535da51332129640dde78c7cabbef7162b8830f4ab96",
+      "plan_actions": [
+        "generate",
+        "initialize_control",
+        "physical_replay",
+        "control_search",
+        "execute",
+        "mechanics",
+        "replay",
+        "refine",
+        "diagnose",
+        "select",
+        "stop"
+      ]
+    },
+    {
+      "sequence": 350,
+      "envelope": {
+        "artifact_id": "447c44b540bcdce8c764426e915474da0ff47ee820ee548cf1d42ab42234fb6a",
+        "media_type": "application/json"
+      },
+      "request": {
+        "artifact_id": "12b570b023184034e234fff945e825d904d8638383983bce362683302d814bc8",
+        "media_type": "application/json"
+      },
+      "advertised_tools": [
+        "research_plan",
+        "evidence_read",
+        "research_analysis",
+        "research_rl",
+        "retrieve_context"
+      ],
+      "analysis_schema_identity": "f9fc6e48630e25af32d7535da51332129640dde78c7cabbef7162b8830f4ab96",
+      "plan_actions": [
+        "generate",
+        "initialize_control",
+        "physical_replay",
+        "control_search",
+        "execute",
+        "mechanics",
+        "replay",
+        "refine",
+        "diagnose",
+        "select",
+        "stop"
+      ]
+    },
+    {
+      "sequence": 361,
+      "envelope": {
+        "artifact_id": "a875e091d036192e764e09f485f765dbad8f6150dc32c59fb3fa26176891c754",
+        "media_type": "application/json"
+      },
+      "request": {
+        "artifact_id": "f1f2c6c015ccd289291f1709cd6a0b2faead53a9fd743903ccb7948d3ff07810",
+        "media_type": "application/json"
+      },
+      "advertised_tools": [
+        "research_plan",
+        "evidence_read",
+        "research_analysis",
+        "research_rl",
+        "retrieve_context"
+      ],
+      "analysis_schema_identity": "f9fc6e48630e25af32d7535da51332129640dde78c7cabbef7162b8830f4ab96",
+      "plan_actions": [
+        "generate",
+        "initialize_control",
+        "physical_replay",
+        "control_search",
+        "execute",
+        "mechanics",
+        "replay",
+        "refine",
+        "diagnose",
+        "select",
+        "stop"
+      ]
+    },
+    {
+      "sequence": 376,
+      "envelope": {
+        "artifact_id": "49556f20e1b5f244e2ba0ec2a0c9134f5c0af02aea64dec63fefdbb7104679ab",
+        "media_type": "application/json"
+      },
+      "request": {
+        "artifact_id": "2cbb8fa1982bd512db147cb6b6277b3baf1302eec73d5ba4380c69acba947d30",
+        "media_type": "application/json"
+      },
+      "advertised_tools": [
+        "research_plan",
+        "evidence_read",
+        "research_analysis",
+        "research_rl",
+        "retrieve_context"
+      ],
+      "analysis_schema_identity": "f9fc6e48630e25af32d7535da51332129640dde78c7cabbef7162b8830f4ab96",
+      "plan_actions": [
+        "generate",
+        "initialize_control",
+        "physical_replay",
+        "control_search",
+        "execute",
+        "mechanics",
+        "replay",
+        "refine",
+        "diagnose",
+        "select",
+        "stop"
+      ]
+    },
+    {
+      "sequence": 462,
+      "envelope": {
+        "artifact_id": "dbd689b7ba9f14d33d9f97adaab25c05b8708e955c6a8c97f687b56a7ac9f3f8",
+        "media_type": "application/json"
+      },
+      "request": {
+        "artifact_id": "33b8c77a87189a9cdac528bb50602d1e7a8cd738586fa8e7c7283c957e25b242",
+        "media_type": "application/json"
+      },
+      "advertised_tools": [
+        "research_plan",
+        "evidence_read",
+        "research_analysis",
+        "research_rl",
+        "retrieve_context"
+      ],
+      "analysis_schema_identity": "f9fc6e48630e25af32d7535da51332129640dde78c7cabbef7162b8830f4ab96",
+      "plan_actions": [
+        "generate",
+        "initialize_control",
+        "physical_replay",
+        "control_search",
+        "execute",
+        "mechanics",
+        "replay",
+        "refine",
+        "diagnose",
+        "select",
+        "stop"
+      ]
+    },
+    {
+      "sequence": 477,
+      "envelope": {
+        "artifact_id": "d26a8df7216f8be5a4026be024767a8c00808535cfd041defdf6dd33cfd519da",
+        "media_type": "application/json"
+      },
+      "request": {
+        "artifact_id": "b360a025db29aeeffd547985e43daef78e0f2722973c6f1fe9b954b43c259858",
+        "media_type": "application/json"
+      },
+      "advertised_tools": [
+        "research_plan",
+        "evidence_read",
+        "research_analysis",
+        "research_rl",
+        "retrieve_context"
+      ],
+      "analysis_schema_identity": "f9fc6e48630e25af32d7535da51332129640dde78c7cabbef7162b8830f4ab96",
+      "plan_actions": [
+        "generate",
+        "initialize_control",
+        "physical_replay",
+        "control_search",
+        "execute",
+        "mechanics",
+        "replay",
+        "refine",
+        "diagnose",
+        "select",
+        "stop"
+      ]
+    },
+    {
+      "sequence": 492,
+      "envelope": {
+        "artifact_id": "678ffd979e7960be62f57a7eb911c2c9b522dbbed14ae3384335ec4f6770166f",
+        "media_type": "application/json"
+      },
+      "request": {
+        "artifact_id": "3bf68995501450ac6683aa033e1a0653619466406cdae966f3d973af87602b61",
+        "media_type": "application/json"
+      },
+      "advertised_tools": [
+        "research_plan",
+        "evidence_read",
+        "research_analysis",
+        "research_rl",
+        "retrieve_context"
+      ],
+      "analysis_schema_identity": "f9fc6e48630e25af32d7535da51332129640dde78c7cabbef7162b8830f4ab96",
+      "plan_actions": [
+        "generate",
+        "initialize_control",
+        "physical_replay",
+        "control_search",
+        "execute",
+        "mechanics",
+        "replay",
+        "refine",
+        "diagnose",
+        "select",
+        "stop"
+      ]
+    },
+    {
+      "sequence": 507,
+      "envelope": {
+        "artifact_id": "c7b7e759b28d7b2799c6052f903d5a0ed87b5bcf9c418615ab682426cf8d2e08",
+        "media_type": "application/json"
+      },
+      "request": {
+        "artifact_id": "1ac8184f8aad46797a2e320c6e31584b0ae4a7cf6ce7af91346847891ce9e241",
+        "media_type": "application/json"
+      },
+      "advertised_tools": [
+        "research_plan",
+        "evidence_read",
+        "research_analysis",
+        "research_rl",
+        "retrieve_context"
+      ],
+      "analysis_schema_identity": "f9fc6e48630e25af32d7535da51332129640dde78c7cabbef7162b8830f4ab96",
+      "plan_actions": [
+        "generate",
+        "initialize_control",
+        "physical_replay",
+        "control_search",
+        "execute",
+        "mechanics",
+        "replay",
+        "refine",
+        "diagnose",
+        "select",
+        "stop"
+      ]
+    },
+    {
+      "sequence": 522,
+      "envelope": {
+        "artifact_id": "e12fbdc11d087103339cd341cb591f6c24fd76093f99033696af73cbf615b91b",
+        "media_type": "application/json"
+      },
+      "request": {
+        "artifact_id": "c32d5ae1083d751bbaca2ec8239ca2d91fdacb4aa1f2d3f95801a1e8539e0235",
+        "media_type": "application/json"
+      },
+      "advertised_tools": [
+        "research_plan",
+        "evidence_read",
+        "research_analysis",
+        "research_rl",
+        "retrieve_context"
+      ],
+      "analysis_schema_identity": "f9fc6e48630e25af32d7535da51332129640dde78c7cabbef7162b8830f4ab96",
+      "plan_actions": [
+        "generate",
+        "initialize_control",
+        "physical_replay",
+        "control_search",
+        "execute",
+        "mechanics",
+        "replay",
+        "refine",
+        "diagnose",
+        "select",
+        "stop"
+      ]
+    },
+    {
+      "sequence": 608,
+      "envelope": {
+        "artifact_id": "d29f0cc21c1c5871e38c5e8cf35fefbd7848163b9838d4235e7671d4b8a38cf9",
+        "media_type": "application/json"
+      },
+      "request": {
+        "artifact_id": "1602e7ed3fe89e15800d1c121a9de26d5e3d794180ebd382c15c8ae7ac4af317",
+        "media_type": "application/json"
+      },
+      "advertised_tools": [
+        "research_plan",
+        "evidence_read",
+        "research_analysis",
+        "research_rl",
+        "retrieve_context"
+      ],
+      "analysis_schema_identity": "f9fc6e48630e25af32d7535da51332129640dde78c7cabbef7162b8830f4ab96",
+      "plan_actions": [
+        "generate",
+        "initialize_control",
+        "physical_replay",
+        "control_search",
+        "execute",
+        "mechanics",
+        "replay",
+        "refine",
+        "diagnose",
+        "select",
+        "stop"
+      ]
+    },
+    {
+      "sequence": 623,
+      "envelope": {
+        "artifact_id": "c8edab8c1c9b581d1f25ffa541824fa1906319fce24c0f790050dbc0952c0660",
+        "media_type": "application/json"
+      },
+      "request": {
+        "artifact_id": "5528b40b58f47f2014c9f57bf46ae0cf7a41f57fb77dfafc85f8d586b7b08710",
+        "media_type": "application/json"
+      },
+      "advertised_tools": [
+        "research_plan",
+        "evidence_read",
+        "research_analysis",
+        "research_rl",
+        "retrieve_context"
+      ],
+      "analysis_schema_identity": "f9fc6e48630e25af32d7535da51332129640dde78c7cabbef7162b8830f4ab96",
+      "plan_actions": [
+        "generate",
+        "initialize_control",
+        "physical_replay",
+        "control_search",
+        "execute",
+        "mechanics",
+        "replay",
+        "refine",
+        "diagnose",
+        "select",
+        "stop"
+      ]
+    },
+    {
+      "sequence": 634,
+      "envelope": {
+        "artifact_id": "f34a98009e625fa9efcfd20245d4524aa566fd530b266ad78bd69534ec5ae5eb",
+        "media_type": "application/json"
+      },
+      "request": {
+        "artifact_id": "967a28553bb0f86dfefa5b54be0c1ca1b002f67d2ebc3812a368644e92b64832",
+        "media_type": "application/json"
+      },
+      "advertised_tools": [
+        "research_plan",
+        "evidence_read",
+        "research_analysis",
+        "research_rl",
+        "retrieve_context"
+      ],
+      "analysis_schema_identity": "f9fc6e48630e25af32d7535da51332129640dde78c7cabbef7162b8830f4ab96",
+      "plan_actions": [
+        "generate",
+        "initialize_control",
+        "physical_replay",
+        "control_search",
+        "execute",
+        "mechanics",
+        "replay",
+        "refine",
+        "diagnose",
+        "select",
+        "stop"
+      ]
+    },
+    {
+      "sequence": 645,
+      "envelope": {
+        "artifact_id": "98a2eddc1234bc46862bb3e3248e436b7071463fa7a56f2eaae91c2cbe93ffec",
+        "media_type": "application/json"
+      },
+      "request": {
+        "artifact_id": "a6b0938f422ba8251b4615506feb48eb6f345991e57617fc96027134016c7ca2",
+        "media_type": "application/json"
+      },
+      "advertised_tools": [
+        "research_plan",
+        "evidence_read",
+        "research_analysis",
+        "research_rl",
+        "retrieve_context"
+      ],
+      "analysis_schema_identity": "f9fc6e48630e25af32d7535da51332129640dde78c7cabbef7162b8830f4ab96",
+      "plan_actions": [
+        "generate",
+        "initialize_control",
+        "physical_replay",
+        "control_search",
+        "execute",
+        "mechanics",
+        "replay",
+        "refine",
+        "diagnose",
+        "select",
+        "stop"
+      ]
+    },
+    {
+      "sequence": 656,
+      "envelope": {
+        "artifact_id": "43818302ce0c42e66e0509f87e9ce3aab8091856af4aa457d387b0830a6f9554",
+        "media_type": "application/json"
+      },
+      "request": {
+        "artifact_id": "25ab663d42fa5bbdf34844f6a2edf63d3c1defde6da593ca6c6c1f387066685d",
+        "media_type": "application/json"
+      },
+      "advertised_tools": [
+        "research_plan",
+        "evidence_read",
+        "research_analysis",
+        "research_rl",
+        "retrieve_context"
+      ],
+      "analysis_schema_identity": "f9fc6e48630e25af32d7535da51332129640dde78c7cabbef7162b8830f4ab96",
+      "plan_actions": [
+        "generate",
+        "initialize_control",
+        "physical_replay",
+        "control_search",
+        "execute",
+        "mechanics",
+        "replay",
+        "refine",
+        "diagnose",
+        "select",
+        "stop"
+      ]
+    },
+    {
+      "sequence": 671,
+      "envelope": {
+        "artifact_id": "ea9d67fb95e2d622f57a1fadafa14c2ef048c9ae0f2af2ebe80c27be2418ab6c",
+        "media_type": "application/json"
+      },
+      "request": {
+        "artifact_id": "95e7410c8bb1a6449a111cdd01aa69652ce3a36163810f3da63452b7da29921b",
+        "media_type": "application/json"
+      },
+      "advertised_tools": [
+        "research_plan",
+        "evidence_read",
+        "research_analysis",
+        "research_rl",
+        "retrieve_context"
+      ],
+      "analysis_schema_identity": "f9fc6e48630e25af32d7535da51332129640dde78c7cabbef7162b8830f4ab96",
+      "plan_actions": [
+        "generate",
+        "initialize_control",
+        "physical_replay",
+        "control_search",
+        "execute",
+        "mechanics",
+        "replay",
+        "refine",
+        "diagnose",
+        "select",
+        "stop"
+      ]
+    },
+    {
+      "sequence": 682,
+      "envelope": {
+        "artifact_id": "afb0164003a9e864df2a6ccaf7f3b5ceedc27fd33e9985a8199637429184492e",
+        "media_type": "application/json"
+      },
+      "request": {
+        "artifact_id": "7612232ffe9926825ab8509b6718427e376df0257162d341ac97398a45f5ba40",
+        "media_type": "application/json"
+      },
+      "advertised_tools": [
+        "research_plan",
+        "evidence_read",
+        "research_analysis",
+        "research_rl",
+        "retrieve_context"
+      ],
+      "analysis_schema_identity": "f9fc6e48630e25af32d7535da51332129640dde78c7cabbef7162b8830f4ab96",
+      "plan_actions": [
+        "generate",
+        "initialize_control",
+        "physical_replay",
+        "control_search",
+        "execute",
+        "mechanics",
+        "replay",
+        "refine",
+        "diagnose",
+        "select",
+        "stop"
+      ]
+    },
+    {
+      "sequence": 696,
+      "envelope": {
+        "artifact_id": "dfbcf9c457ca4b77835b50ccf5094cdac36725bcbf1c1c852c9300b653e608d2",
+        "media_type": "application/json"
+      },
+      "request": {
+        "artifact_id": "9098dc03ed769b61b4c5c7db1859edb2ca4716da889205c98a9a70bde4483503",
+        "media_type": "application/json"
+      },
+      "advertised_tools": [
+        "research_plan",
+        "evidence_read",
+        "research_analysis",
+        "research_rl",
+        "retrieve_context"
+      ],
+      "analysis_schema_identity": "f9fc6e48630e25af32d7535da51332129640dde78c7cabbef7162b8830f4ab96",
+      "plan_actions": [
+        "generate",
+        "initialize_control",
+        "physical_replay",
+        "control_search",
+        "execute",
+        "mechanics",
+        "replay",
+        "refine",
+        "diagnose",
+        "select",
+        "stop"
+      ]
+    },
+    {
+      "sequence": 715,
+      "envelope": {
+        "artifact_id": "00fdec464be9c8d4db1c2dd88197dd8ea9f62fd87f48dfb553f579b296568387",
+        "media_type": "application/json"
+      },
+      "request": {
+        "artifact_id": "7e21b695bb8ffb8c7a915d046ea35ca55df8323a3451e6d7e7aafcbadd4cb04d",
+        "media_type": "application/json"
+      },
+      "advertised_tools": [
+        "research_plan",
+        "evidence_read",
+        "research_analysis",
+        "research_rl",
+        "retrieve_context"
+      ],
+      "analysis_schema_identity": "f9fc6e48630e25af32d7535da51332129640dde78c7cabbef7162b8830f4ab96",
+      "plan_actions": [
+        "generate",
+        "initialize_control",
+        "physical_replay",
+        "control_search",
+        "execute",
+        "mechanics",
+        "replay",
+        "refine",
+        "diagnose",
+        "select",
+        "stop"
+      ]
+    },
+    {
+      "sequence": 1249,
+      "envelope": {
+        "artifact_id": "8f9179ba3a013600dc52b6fd2b8e0b6da2ade61d0784f05ba9fd93e67e3e69e6",
+        "media_type": "application/json"
+      },
+      "request": {
+        "artifact_id": "1d3df5b698336627ddbf69599d66d1f7c7700a715f06ed9e291041eb45ef65b1",
+        "media_type": "application/json"
+      },
+      "advertised_tools": [
+        "research_plan",
+        "evidence_read",
+        "research_analysis",
+        "research_rl",
+        "retrieve_context"
+      ],
+      "analysis_schema_identity": "f9fc6e48630e25af32d7535da51332129640dde78c7cabbef7162b8830f4ab96",
+      "plan_actions": [
+        "generate",
+        "initialize_control",
+        "physical_replay",
+        "control_search",
+        "execute",
+        "mechanics",
+        "replay",
+        "refine",
+        "diagnose",
+        "select",
+        "stop"
+      ]
+    },
+    {
+      "sequence": 1263,
+      "envelope": {
+        "artifact_id": "0dd35e0919682b788adedd386a615b8fa65f767815d7ebf2c45c63ef24d72557",
+        "media_type": "application/json"
+      },
+      "request": {
+        "artifact_id": "2dccb7ce74feb1fc0274b1f0f2caee777e53d53e295f5d2c9f8bff3d073c9803",
+        "media_type": "application/json"
+      },
+      "advertised_tools": [
+        "research_plan",
+        "evidence_read",
+        "research_analysis",
+        "research_rl",
+        "retrieve_context"
+      ],
+      "analysis_schema_identity": "f9fc6e48630e25af32d7535da51332129640dde78c7cabbef7162b8830f4ab96",
+      "plan_actions": [
+        "generate",
+        "initialize_control",
+        "physical_replay",
+        "control_search",
+        "execute",
+        "mechanics",
+        "replay",
+        "refine",
+        "diagnose",
+        "select",
+        "stop"
+      ]
+    },
+    {
+      "sequence": 1278,
+      "envelope": {
+        "artifact_id": "5f7aa43f568514ec933c20d2bf25862ccd97e1e48f488f327431f09d5b4ba653",
+        "media_type": "application/json"
+      },
+      "request": {
+        "artifact_id": "592d4d7bd67e8c8eb2b37134216fbafe2e6a928907e0610dcf4fc88957f59bc7",
+        "media_type": "application/json"
+      },
+      "advertised_tools": [
+        "research_plan",
+        "evidence_read",
+        "research_analysis",
+        "research_rl",
+        "retrieve_context"
+      ],
+      "analysis_schema_identity": "f9fc6e48630e25af32d7535da51332129640dde78c7cabbef7162b8830f4ab96",
+      "plan_actions": [
+        "generate",
+        "initialize_control",
+        "physical_replay",
+        "control_search",
+        "execute",
+        "mechanics",
+        "replay",
+        "refine",
+        "diagnose",
+        "select",
+        "stop"
+      ]
+    },
+    {
+      "sequence": 1292,
+      "envelope": {
+        "artifact_id": "9b466d1843b08d1903f239dbf70fbce48a3da09b94a14af6b1135cbc0415ee72",
+        "media_type": "application/json"
+      },
+      "request": {
+        "artifact_id": "67d6471d854ff5aa06b9f09aca881c2e1ba25f45917edcdb030bcb081085bf56",
+        "media_type": "application/json"
+      },
+      "advertised_tools": [
+        "research_plan",
+        "evidence_read",
+        "research_analysis",
+        "research_rl",
+        "retrieve_context"
+      ],
+      "analysis_schema_identity": "f9fc6e48630e25af32d7535da51332129640dde78c7cabbef7162b8830f4ab96",
+      "plan_actions": [
+        "generate",
+        "initialize_control",
+        "physical_replay",
+        "control_search",
+        "execute",
+        "mechanics",
+        "replay",
+        "refine",
+        "diagnose",
+        "select",
+        "stop"
+      ]
+    },
+    {
+      "sequence": 1311,
+      "envelope": {
+        "artifact_id": "a1d66c58f440bfe02dc873adda2295346a343e08d274d3f1b00f2d0308822f03",
+        "media_type": "application/json"
+      },
+      "request": {
+        "artifact_id": "c7d57144a870dfa9b9212c0b9a452d3f14cff22e0bf3f68272575038059c2c39",
+        "media_type": "application/json"
+      },
+      "advertised_tools": [
+        "research_plan",
+        "evidence_read",
+        "research_analysis",
+        "research_rl",
+        "retrieve_context"
+      ],
+      "analysis_schema_identity": "f9fc6e48630e25af32d7535da51332129640dde78c7cabbef7162b8830f4ab96",
+      "plan_actions": [
+        "generate",
+        "initialize_control",
+        "physical_replay",
+        "control_search",
+        "execute",
+        "mechanics",
+        "replay",
+        "refine",
+        "diagnose",
+        "select",
+        "stop"
+      ]
+    },
+    {
+      "sequence": 1325,
+      "envelope": {
+        "artifact_id": "99c9034d969193ca012ee320f8a1ebb44ee3482b8ccb0a45144d5ad16ce1611e",
+        "media_type": "application/json"
+      },
+      "request": {
+        "artifact_id": "91829c2893abb90f941d937323fc7f4a95cf755ff8152e12688de832dba25dad",
+        "media_type": "application/json"
+      },
+      "advertised_tools": [
+        "research_plan",
+        "evidence_read",
+        "research_analysis",
+        "research_rl",
+        "retrieve_context"
+      ],
+      "analysis_schema_identity": "f9fc6e48630e25af32d7535da51332129640dde78c7cabbef7162b8830f4ab96",
+      "plan_actions": [
+        "generate",
+        "initialize_control",
+        "physical_replay",
+        "control_search",
+        "execute",
+        "mechanics",
+        "replay",
+        "refine",
+        "diagnose",
+        "select",
+        "stop"
+      ]
+    },
+    {
+      "sequence": 1344,
+      "envelope": {
+        "artifact_id": "1ae07ed285ad01dd39024fa0b183b407821352442ace5f48125c14bcb3ee439e",
+        "media_type": "application/json"
+      },
+      "request": {
+        "artifact_id": "5ba874f5520514316960e8d1a5f07668bec5d2502bbcb10492776a6cbab052ca",
+        "media_type": "application/json"
+      },
+      "advertised_tools": [
+        "research_plan",
+        "evidence_read",
+        "research_analysis",
+        "research_rl",
+        "retrieve_context"
+      ],
+      "analysis_schema_identity": "f9fc6e48630e25af32d7535da51332129640dde78c7cabbef7162b8830f4ab96",
+      "plan_actions": [
+        "generate",
+        "initialize_control",
+        "physical_replay",
+        "control_search",
+        "execute",
+        "mechanics",
+        "replay",
+        "refine",
+        "diagnose",
+        "select",
+        "stop"
+      ]
+    },
+    {
+      "sequence": 1359,
+      "envelope": {
+        "artifact_id": "32ca38e1c53f0d6e94e3f276b8725afbe80affbda22776071eda26f1b2671abe",
+        "media_type": "application/json"
+      },
+      "request": {
+        "artifact_id": "9bcefd68811c81de26f6787effc1238f4529a4a8a3f06e7ae7eb45c139d9a0fe",
+        "media_type": "application/json"
+      },
+      "advertised_tools": [
+        "research_plan",
+        "evidence_read",
+        "research_analysis",
+        "research_rl",
+        "retrieve_context"
+      ],
+      "analysis_schema_identity": "f9fc6e48630e25af32d7535da51332129640dde78c7cabbef7162b8830f4ab96",
+      "plan_actions": [
+        "generate",
+        "initialize_control",
+        "physical_replay",
+        "control_search",
+        "execute",
+        "mechanics",
+        "replay",
+        "refine",
+        "diagnose",
+        "select",
+        "stop"
+      ]
+    },
+    {
+      "sequence": 1373,
+      "envelope": {
+        "artifact_id": "f6afc5880d2119d8d5522cef16d113f1e91ade7688498f55cd8668373daaa291",
+        "media_type": "application/json"
+      },
+      "request": {
+        "artifact_id": "b2845a70a733643f1662c11f42edfc46d6b8bb3cc02f42a32c8d137e133fb536",
+        "media_type": "application/json"
+      },
+      "advertised_tools": [
+        "research_plan",
+        "evidence_read",
+        "research_analysis",
+        "research_rl",
+        "retrieve_context"
+      ],
+      "analysis_schema_identity": "f9fc6e48630e25af32d7535da51332129640dde78c7cabbef7162b8830f4ab96",
+      "plan_actions": [
+        "generate",
+        "initialize_control",
+        "physical_replay",
+        "control_search",
+        "execute",
+        "mechanics",
+        "replay",
+        "refine",
+        "diagnose",
+        "select",
+        "stop"
+      ]
+    },
+    {
+      "sequence": 1392,
+      "envelope": {
+        "artifact_id": "e0851af2737ed4a4b24db2e33d556a5f7cac609e8fdda0d3033bccaeb13eae94",
+        "media_type": "application/json"
+      },
+      "request": {
+        "artifact_id": "df3f1ef41f89cad36a06f22f3c2731fa36f79dfcac6d5cbd1884eeb32e57a560",
+        "media_type": "application/json"
+      },
+      "advertised_tools": [
+        "research_plan",
+        "evidence_read",
+        "research_analysis",
+        "research_rl",
+        "retrieve_context"
+      ],
+      "analysis_schema_identity": "f9fc6e48630e25af32d7535da51332129640dde78c7cabbef7162b8830f4ab96",
+      "plan_actions": [
+        "generate",
+        "initialize_control",
+        "physical_replay",
+        "control_search",
+        "execute",
+        "mechanics",
+        "replay",
+        "refine",
+        "diagnose",
+        "select",
+        "stop"
+      ]
+    },
+    {
+      "sequence": 1456,
+      "envelope": {
+        "artifact_id": "b933f09dcc7529853194e2f4b01ef7f310eb4463205f5276bb6407aeb0a9857d",
+        "media_type": "application/json"
+      },
+      "request": {
+        "artifact_id": "ba3a9f70cf50ac7e2a8e2bcb2ea32aaa5a2da18c935d6be5aae75aee59708b72",
+        "media_type": "application/json"
+      },
+      "advertised_tools": [
+        "research_plan",
+        "evidence_read",
+        "research_analysis",
+        "research_rl",
+        "retrieve_context"
+      ],
+      "analysis_schema_identity": "f9fc6e48630e25af32d7535da51332129640dde78c7cabbef7162b8830f4ab96",
+      "plan_actions": [
+        "generate",
+        "initialize_control",
+        "physical_replay",
+        "control_search",
+        "execute",
+        "mechanics",
+        "replay",
+        "refine",
+        "diagnose",
+        "select",
+        "stop"
+      ]
+    },
+    {
+      "sequence": 1490,
+      "envelope": {
+        "artifact_id": "1e137b01cf92a5341a8c125242d809a150b7d7f794741d58d885306980c72589",
+        "media_type": "application/json"
+      },
+      "request": {
+        "artifact_id": "dd316bfc90be2443166047566010a5dfe2ecad2ba6ad0996795fdd2fba74507e",
+        "media_type": "application/json"
+      },
+      "advertised_tools": [
+        "research_plan",
+        "evidence_read",
+        "research_analysis",
+        "research_rl",
+        "retrieve_context"
+      ],
+      "analysis_schema_identity": "f9fc6e48630e25af32d7535da51332129640dde78c7cabbef7162b8830f4ab96",
+      "plan_actions": [
+        "generate",
+        "initialize_control",
+        "physical_replay",
+        "control_search",
+        "execute",
+        "mechanics",
+        "replay",
+        "refine",
+        "diagnose",
+        "select",
+        "stop"
+      ]
+    },
+    {
+      "sequence": 1505,
+      "envelope": {
+        "artifact_id": "2f087958909c21f91793e7ffd53347ff0f22c093341a21981123d28749ec9714",
+        "media_type": "application/json"
+      },
+      "request": {
+        "artifact_id": "9c0be501bdc45dafaf4c832ea3f0f11295eacce2bb8073b61600bf445e6fb2bd",
+        "media_type": "application/json"
+      },
+      "advertised_tools": [
+        "research_plan",
+        "evidence_read",
+        "research_analysis",
+        "research_rl",
+        "retrieve_context"
+      ],
+      "analysis_schema_identity": "f9fc6e48630e25af32d7535da51332129640dde78c7cabbef7162b8830f4ab96",
+      "plan_actions": [
+        "generate",
+        "initialize_control",
+        "physical_replay",
+        "control_search",
+        "execute",
+        "mechanics",
+        "replay",
+        "refine",
+        "diagnose",
+        "select",
+        "stop"
+      ]
+    },
+    {
+      "sequence": 1539,
+      "envelope": {
+        "artifact_id": "a141796a3528f10733a7c78bc201210b790d07fefe24cfb098faf663728de986",
+        "media_type": "application/json"
+      },
+      "request": {
+        "artifact_id": "6c674d16fa6d6f20a48e7c156c232ce70edddce2791fe88de7d8c20d17c5a12b",
+        "media_type": "application/json"
+      },
+      "advertised_tools": [
+        "research_plan",
+        "evidence_read",
+        "research_analysis",
+        "research_rl",
+        "retrieve_context"
+      ],
+      "analysis_schema_identity": "f9fc6e48630e25af32d7535da51332129640dde78c7cabbef7162b8830f4ab96",
+      "plan_actions": [
+        "generate",
+        "initialize_control",
+        "physical_replay",
+        "control_search",
+        "execute",
+        "mechanics",
+        "replay",
+        "refine",
+        "diagnose",
+        "select",
+        "stop"
+      ]
+    },
+    {
+      "sequence": 1551,
+      "envelope": {
+        "artifact_id": "a838b3291c5d5b7b78334cecb2729171ad4c0f906e8a1c2c34e6b1b0d2142cb2",
+        "media_type": "application/json"
+      },
+      "request": {
+        "artifact_id": "c2f11670c53b2bc5f7328c955c720bd5147917ef8827b4c2f40aad14adb9508b",
+        "media_type": "application/json"
+      },
+      "advertised_tools": [
+        "research_plan",
+        "evidence_read",
+        "research_analysis",
+        "research_rl",
+        "retrieve_context"
+      ],
+      "analysis_schema_identity": "f9fc6e48630e25af32d7535da51332129640dde78c7cabbef7162b8830f4ab96",
+      "plan_actions": [
+        "generate",
+        "initialize_control",
+        "physical_replay",
+        "control_search",
+        "execute",
+        "mechanics",
+        "replay",
+        "refine",
+        "diagnose",
+        "select",
+        "stop"
+      ]
+    },
+    {
+      "sequence": 1563,
+      "envelope": {
+        "artifact_id": "8a57f5a914eb7c06de751723dca78f4466642189703f793507bc5d0c0d5496ed",
+        "media_type": "application/json"
+      },
+      "request": {
+        "artifact_id": "b60f7b850b7cecc8a113e92943876f82da27774f8392f99ae862d4835ca59e6d",
+        "media_type": "application/json"
+      },
+      "advertised_tools": [
+        "research_plan",
+        "evidence_read",
+        "research_analysis",
+        "research_rl",
+        "retrieve_context"
+      ],
+      "analysis_schema_identity": "f9fc6e48630e25af32d7535da51332129640dde78c7cabbef7162b8830f4ab96",
+      "plan_actions": [
+        "generate",
+        "initialize_control",
+        "physical_replay",
+        "control_search",
+        "execute",
+        "mechanics",
+        "replay",
+        "refine",
+        "diagnose",
+        "select",
+        "stop"
+      ]
+    },
+    {
+      "sequence": 1574,
+      "envelope": {
+        "artifact_id": "0ce138a1e0b906d94c2cbd5180a52ae24945fc1926296fcd6488fb1f1cdcab81",
+        "media_type": "application/json"
+      },
+      "request": {
+        "artifact_id": "0a9e95fb5ede65ef1d1cc1ebae3e0a588520cb50b0821e4e840b32c75bb34a5d",
+        "media_type": "application/json"
+      },
+      "advertised_tools": [
+        "research_plan",
+        "evidence_read",
+        "research_analysis",
+        "research_rl",
+        "retrieve_context"
+      ],
+      "analysis_schema_identity": "f9fc6e48630e25af32d7535da51332129640dde78c7cabbef7162b8830f4ab96",
+      "plan_actions": [
+        "generate",
+        "initialize_control",
+        "physical_replay",
+        "control_search",
+        "execute",
+        "mechanics",
+        "replay",
+        "refine",
+        "diagnose",
+        "select",
+        "stop"
+      ]
+    }
+  ],
+  "packet_metadata": [
+    {
+      "sequence": 7,
+      "reference": {
+        "artifact_id": "32d29fdf18be377a375cb81e09b04fbe77e52b5c51e2db6ef8cb96611873610d",
+        "media_type": "application/json"
+      },
+      "remaining_mathematical": 8,
+      "readiness": "ready",
+      "capabilities": [
+        "analysis",
+        "mathematics",
+        "replay",
+        "nmpc",
+        "rl",
+        "physical_replay",
+        "control_correction",
+        "control_search"
+      ],
+      "mathematical_response_rows": 0,
+      "mathematical_response_statuses": {},
+      "direct_analysis_action_rows": 0,
+      "analysis_protocol_visible": true
+    },
+    {
+      "sequence": 21,
+      "reference": {
+        "artifact_id": "8e02fd128fa3b2621fdb127a0092c5dcd906597d78bd478b6ef041f0554146ec",
+        "media_type": "application/json"
+      },
+      "remaining_mathematical": 8,
+      "readiness": "ready",
+      "capabilities": [
+        "analysis",
+        "mathematics",
+        "replay",
+        "nmpc",
+        "rl",
+        "physical_replay",
+        "control_correction",
+        "control_search"
+      ],
+      "mathematical_response_rows": 0,
+      "mathematical_response_statuses": {},
+      "direct_analysis_action_rows": 0,
+      "analysis_protocol_visible": true
+    },
+    {
+      "sequence": 33,
+      "reference": {
+        "artifact_id": "cbf891348b619b2db524094fb8a8df345c2fb4b64070d2ff928972eacd2b1b9c",
+        "media_type": "application/json"
+      },
+      "remaining_mathematical": 8,
+      "readiness": "ready",
+      "capabilities": [
+        "analysis",
+        "mathematics",
+        "replay",
+        "nmpc",
+        "rl",
+        "physical_replay",
+        "control_correction",
+        "control_search"
+      ],
+      "mathematical_response_rows": 0,
+      "mathematical_response_statuses": {},
+      "direct_analysis_action_rows": 0,
+      "analysis_protocol_visible": true
+    },
+    {
+      "sequence": 48,
+      "reference": {
+        "artifact_id": "3571ebc285426c80b1d680c022b2cbb808b03201114aadddb630b68eea18fcb8",
+        "media_type": "application/json"
+      },
+      "remaining_mathematical": 8,
+      "readiness": "ready",
+      "capabilities": [
+        "analysis",
+        "mathematics",
+        "replay",
+        "nmpc",
+        "rl",
+        "physical_replay",
+        "control_correction",
+        "control_search"
+      ],
+      "mathematical_response_rows": 0,
+      "mathematical_response_statuses": {},
+      "direct_analysis_action_rows": 0,
+      "analysis_protocol_visible": true
+    },
+    {
+      "sequence": 59,
+      "reference": {
+        "artifact_id": "bbee30fa11696ac490ef374f52c417e02034813f6d332fd1fa264af615eee03e",
+        "media_type": "application/json"
+      },
+      "remaining_mathematical": 8,
+      "readiness": "ready",
+      "capabilities": [
+        "analysis",
+        "mathematics",
+        "replay",
+        "nmpc",
+        "rl",
+        "physical_replay",
+        "control_correction",
+        "control_search"
+      ],
+      "mathematical_response_rows": 0,
+      "mathematical_response_statuses": {},
+      "direct_analysis_action_rows": 0,
+      "analysis_protocol_visible": true
+    },
+    {
+      "sequence": 74,
+      "reference": {
+        "artifact_id": "8e12ff2b55ab1d4d19a691d098d1d31d383aa0f561bf6cb895d22170d8b579b6",
+        "media_type": "application/json"
+      },
+      "remaining_mathematical": 8,
+      "readiness": "ready",
+      "capabilities": [
+        "analysis",
+        "mathematics",
+        "replay",
+        "nmpc",
+        "rl",
+        "physical_replay",
+        "control_correction",
+        "control_search"
+      ],
+      "mathematical_response_rows": 1,
+      "mathematical_response_statuses": {
+        "blocked": 1
+      },
+      "direct_analysis_action_rows": 0,
+      "analysis_protocol_visible": true
+    },
+    {
+      "sequence": 85,
+      "reference": {
+        "artifact_id": "29441cebb4a058e9f79cc35de6cc47807faa1e486581f3d01b434033f0088f8d",
+        "media_type": "application/json"
+      },
+      "remaining_mathematical": 8,
+      "readiness": "ready",
+      "capabilities": [
+        "analysis",
+        "mathematics",
+        "replay",
+        "nmpc",
+        "rl",
+        "physical_replay",
+        "control_correction",
+        "control_search"
+      ],
+      "mathematical_response_rows": 1,
+      "mathematical_response_statuses": {
+        "blocked": 1
+      },
+      "direct_analysis_action_rows": 0,
+      "analysis_protocol_visible": true
+    },
+    {
+      "sequence": 96,
+      "reference": {
+        "artifact_id": "198691c2316cdb8daefe622bdc45722e05ea5317e70684555c96ed00171c1c51",
+        "media_type": "application/json"
+      },
+      "remaining_mathematical": 8,
+      "readiness": "ready",
+      "capabilities": [
+        "analysis",
+        "mathematics",
+        "replay",
+        "nmpc",
+        "rl",
+        "physical_replay",
+        "control_correction",
+        "control_search"
+      ],
+      "mathematical_response_rows": 1,
+      "mathematical_response_statuses": {
+        "blocked": 1
+      },
+      "direct_analysis_action_rows": 0,
+      "analysis_protocol_visible": true
+    },
+    {
+      "sequence": 110,
+      "reference": {
+        "artifact_id": "72e5df7f137f7b1566f248091602118a9f27c93d789db47760a215c5f7b4cae0",
+        "media_type": "application/json"
+      },
+      "remaining_mathematical": 8,
+      "readiness": "ready",
+      "capabilities": [
+        "analysis",
+        "mathematics",
+        "replay",
+        "nmpc",
+        "rl",
+        "physical_replay",
+        "control_correction",
+        "control_search"
+      ],
+      "mathematical_response_rows": 1,
+      "mathematical_response_statuses": {
+        "blocked": 1
+      },
+      "direct_analysis_action_rows": 0,
+      "analysis_protocol_visible": true
+    },
+    {
+      "sequence": 121,
+      "reference": {
+        "artifact_id": "a9b753dc777ec35f9b4045efff20437f834f69acca92b9061854ee1fd2b70f2e",
+        "media_type": "application/json"
+      },
+      "remaining_mathematical": 8,
+      "readiness": "ready",
+      "capabilities": [
+        "analysis",
+        "mathematics",
+        "replay",
+        "nmpc",
+        "rl",
+        "physical_replay",
+        "control_correction",
+        "control_search"
+      ],
+      "mathematical_response_rows": 1,
+      "mathematical_response_statuses": {
+        "blocked": 1
+      },
+      "direct_analysis_action_rows": 0,
+      "analysis_protocol_visible": true
+    },
+    {
+      "sequence": 132,
+      "reference": {
+        "artifact_id": "01f4178fafb270079e1b8457126feae9b82cd37d3bf903356fb2e6412ba8c3c9",
+        "media_type": "application/json"
+      },
+      "remaining_mathematical": 8,
+      "readiness": "ready",
+      "capabilities": [
+        "analysis",
+        "mathematics",
+        "replay",
+        "nmpc",
+        "rl",
+        "physical_replay",
+        "control_correction",
+        "control_search"
+      ],
+      "mathematical_response_rows": 1,
+      "mathematical_response_statuses": {
+        "blocked": 1
+      },
+      "direct_analysis_action_rows": 0,
+      "analysis_protocol_visible": true
+    },
+    {
+      "sequence": 146,
+      "reference": {
+        "artifact_id": "b2119a03be3288567bcd16813ae9de2f464639fca56632a23c8609491b89e9bc",
+        "media_type": "application/json"
+      },
+      "remaining_mathematical": 8,
+      "readiness": "ready",
+      "capabilities": [
+        "analysis",
+        "mathematics",
+        "replay",
+        "nmpc",
+        "rl",
+        "physical_replay",
+        "control_correction",
+        "control_search"
+      ],
+      "mathematical_response_rows": 1,
+      "mathematical_response_statuses": {
+        "blocked": 1
+      },
+      "direct_analysis_action_rows": 0,
+      "analysis_protocol_visible": true
+    },
+    {
+      "sequence": 161,
+      "reference": {
+        "artifact_id": "115548b37012fe1cab14ede42791ed03b7c5561f0817ada55477775c6afde96f",
+        "media_type": "application/json"
+      },
+      "remaining_mathematical": 8,
+      "readiness": "ready",
+      "capabilities": [
+        "analysis",
+        "mathematics",
+        "replay",
+        "nmpc",
+        "rl",
+        "physical_replay",
+        "control_correction",
+        "control_search"
+      ],
+      "mathematical_response_rows": 2,
+      "mathematical_response_statuses": {
+        "blocked": 2
+      },
+      "direct_analysis_action_rows": 0,
+      "analysis_protocol_visible": true
+    },
+    {
+      "sequence": 175,
+      "reference": {
+        "artifact_id": "cdc8ef593a9876903677ec45875131e66d89025f569ffa4249e1a6b1d627983c",
+        "media_type": "application/json"
+      },
+      "remaining_mathematical": 8,
+      "readiness": "ready",
+      "capabilities": [
+        "analysis",
+        "mathematics",
+        "replay",
+        "nmpc",
+        "rl",
+        "physical_replay",
+        "control_correction",
+        "control_search"
+      ],
+      "mathematical_response_rows": 2,
+      "mathematical_response_statuses": {
+        "blocked": 2
+      },
+      "direct_analysis_action_rows": 0,
+      "analysis_protocol_visible": true
+    },
+    {
+      "sequence": 186,
+      "reference": {
+        "artifact_id": "b7c9d8c1ecd6d8e1ee6fe6da2cd7b709c6bf632d30eeffd3ef8b38d8aaf43188",
+        "media_type": "application/json"
+      },
+      "remaining_mathematical": 8,
+      "readiness": "ready",
+      "capabilities": [
+        "analysis",
+        "mathematics",
+        "replay",
+        "nmpc",
+        "rl",
+        "physical_replay",
+        "control_correction",
+        "control_search"
+      ],
+      "mathematical_response_rows": 2,
+      "mathematical_response_statuses": {
+        "blocked": 2
+      },
+      "direct_analysis_action_rows": 0,
+      "analysis_protocol_visible": true
+    },
+    {
+      "sequence": 205,
+      "reference": {
+        "artifact_id": "6cca353f05e34af375234a50500ccb60348f1e715106e6e82d7d76487e311b85",
+        "media_type": "application/json"
+      },
+      "remaining_mathematical": 8,
+      "readiness": "ready",
+      "capabilities": [
+        "analysis",
+        "mathematics",
+        "replay",
+        "nmpc",
+        "rl",
+        "physical_replay",
+        "control_correction",
+        "control_search"
+      ],
+      "mathematical_response_rows": 2,
+      "mathematical_response_statuses": {
+        "blocked": 2
+      },
+      "direct_analysis_action_rows": 0,
+      "analysis_protocol_visible": true
+    },
+    {
+      "sequence": 216,
+      "reference": {
+        "artifact_id": "c8476f0fdd23c10d6440e4278f8e8d71b0e3f2cef56448bdabc4b01ddf196f44",
+        "media_type": "application/json"
+      },
+      "remaining_mathematical": 8,
+      "readiness": "ready",
+      "capabilities": [
+        "analysis",
+        "mathematics",
+        "replay",
+        "nmpc",
+        "rl",
+        "physical_replay",
+        "control_correction",
+        "control_search"
+      ],
+      "mathematical_response_rows": 2,
+      "mathematical_response_statuses": {
+        "blocked": 2
+      },
+      "direct_analysis_action_rows": 0,
+      "analysis_protocol_visible": true
+    },
+    {
+      "sequence": 229,
+      "reference": {
+        "artifact_id": "bf8c46cd079b0c9fa3f416d79f0cd82c88825c1d2be35945c63fed44cc2795b3",
+        "media_type": "application/json"
+      },
+      "remaining_mathematical": 8,
+      "readiness": "ready",
+      "capabilities": [
+        "analysis",
+        "mathematics",
+        "replay",
+        "nmpc",
+        "rl",
+        "physical_replay",
+        "control_correction",
+        "control_search"
+      ],
+      "mathematical_response_rows": 2,
+      "mathematical_response_statuses": {
+        "blocked": 2
+      },
+      "direct_analysis_action_rows": 0,
+      "analysis_protocol_visible": true
+    },
+    {
+      "sequence": 248,
+      "reference": {
+        "artifact_id": "2d9ae23488fdfffd5d7d113bd86ad056bcaf4827490de7ce5a3f2adde96485c2",
+        "media_type": "application/json"
+      },
+      "remaining_mathematical": 8,
+      "readiness": "ready",
+      "capabilities": [
+        "analysis",
+        "mathematics",
+        "replay",
+        "nmpc",
+        "rl",
+        "physical_replay",
+        "control_correction",
+        "control_search"
+      ],
+      "mathematical_response_rows": 2,
+      "mathematical_response_statuses": {
+        "blocked": 2
+      },
+      "direct_analysis_action_rows": 0,
+      "analysis_protocol_visible": true
+    },
+    {
+      "sequence": 259,
+      "reference": {
+        "artifact_id": "3ab609c60f399de0aebeceb3838944c12f83ec0e4834a0a35a650bc74e7222f0",
+        "media_type": "application/json"
+      },
+      "remaining_mathematical": 8,
+      "readiness": "ready",
+      "capabilities": [
+        "analysis",
+        "mathematics",
+        "replay",
+        "nmpc",
+        "rl",
+        "physical_replay",
+        "control_correction",
+        "control_search"
+      ],
+      "mathematical_response_rows": 2,
+      "mathematical_response_statuses": {
+        "blocked": 2
+      },
+      "direct_analysis_action_rows": 0,
+      "analysis_protocol_visible": true
+    },
+    {
+      "sequence": 282,
+      "reference": {
+        "artifact_id": "48702f7f1c767ac363bc15fbec78c33b476a820c448e31cccaac1399ee6c690b",
+        "media_type": "application/json"
+      },
+      "remaining_mathematical": 8,
+      "readiness": "ready",
+      "capabilities": [
+        "analysis",
+        "mathematics",
+        "replay",
+        "nmpc",
+        "rl",
+        "physical_replay",
+        "control_correction",
+        "control_search"
+      ],
+      "mathematical_response_rows": 2,
+      "mathematical_response_statuses": {
+        "blocked": 2
+      },
+      "direct_analysis_action_rows": 0,
+      "analysis_protocol_visible": true
+    },
+    {
+      "sequence": 293,
+      "reference": {
+        "artifact_id": "8e08407a179607a5fe0e2aa71decefc0bc91fab8d8c39125ea3cfd9d8f8eab5b",
+        "media_type": "application/json"
+      },
+      "remaining_mathematical": 8,
+      "readiness": "ready",
+      "capabilities": [
+        "analysis",
+        "mathematics",
+        "replay",
+        "nmpc",
+        "rl",
+        "physical_replay",
+        "control_correction",
+        "control_search"
+      ],
+      "mathematical_response_rows": 2,
+      "mathematical_response_statuses": {
+        "blocked": 2
+      },
+      "direct_analysis_action_rows": 0,
+      "analysis_protocol_visible": true
+    },
+    {
+      "sequence": 304,
+      "reference": {
+        "artifact_id": "bc33ec414981198fd0892c0c86b7de84627a14f74a529dc5887b87b3232bd85c",
+        "media_type": "application/json"
+      },
+      "remaining_mathematical": 8,
+      "readiness": "ready",
+      "capabilities": [
+        "analysis",
+        "mathematics",
+        "replay",
+        "nmpc",
+        "rl",
+        "physical_replay",
+        "control_correction",
+        "control_search"
+      ],
+      "mathematical_response_rows": 2,
+      "mathematical_response_statuses": {
+        "blocked": 2
+      },
+      "direct_analysis_action_rows": 0,
+      "analysis_protocol_visible": true
+    },
+    {
+      "sequence": 315,
+      "reference": {
+        "artifact_id": "1a464f10e2c10b94d1950a08abe47449395c2fb2f80e833b16ecaa9cbff75633",
+        "media_type": "application/json"
+      },
+      "remaining_mathematical": 8,
+      "readiness": "ready",
+      "capabilities": [
+        "analysis",
+        "mathematics",
+        "replay",
+        "nmpc",
+        "rl",
+        "physical_replay",
+        "control_correction",
+        "control_search"
+      ],
+      "mathematical_response_rows": 2,
+      "mathematical_response_statuses": {
+        "blocked": 2
+      },
+      "direct_analysis_action_rows": 0,
+      "analysis_protocol_visible": true
+    },
+    {
+      "sequence": 329,
+      "reference": {
+        "artifact_id": "10cb4f91fceb7d0d90e08526563cfd27207158dd017236916ce3fc4e460f5ccd",
+        "media_type": "application/json"
+      },
+      "remaining_mathematical": 8,
+      "readiness": "ready",
+      "capabilities": [
+        "analysis",
+        "mathematics",
+        "replay",
+        "nmpc",
+        "rl",
+        "physical_replay",
+        "control_correction",
+        "control_search"
+      ],
+      "mathematical_response_rows": 2,
+      "mathematical_response_statuses": {
+        "blocked": 2
+      },
+      "direct_analysis_action_rows": 0,
+      "analysis_protocol_visible": true
+    },
+    {
+      "sequence": 348,
+      "reference": {
+        "artifact_id": "ac195226af9c1b8e4ff12d4ed1780505e0dba3716ef1c8fdaa4b79472f533711",
+        "media_type": "application/json"
+      },
+      "remaining_mathematical": 8,
+      "readiness": "ready",
+      "capabilities": [
+        "analysis",
+        "mathematics",
+        "replay",
+        "nmpc",
+        "rl",
+        "physical_replay",
+        "control_correction",
+        "control_search"
+      ],
+      "mathematical_response_rows": 2,
+      "mathematical_response_statuses": {
+        "blocked": 2
+      },
+      "direct_analysis_action_rows": 0,
+      "analysis_protocol_visible": true
+    },
+    {
+      "sequence": 359,
+      "reference": {
+        "artifact_id": "7b0606700ad5d1ba6eb3f5b52d8cd19a52ce675dfd9fc8218a8cc985b00b13c6",
+        "media_type": "application/json"
+      },
+      "remaining_mathematical": 8,
+      "readiness": "ready",
+      "capabilities": [
+        "analysis",
+        "mathematics",
+        "replay",
+        "nmpc",
+        "rl",
+        "physical_replay",
+        "control_correction",
+        "control_search"
+      ],
+      "mathematical_response_rows": 2,
+      "mathematical_response_statuses": {
+        "blocked": 2
+      },
+      "direct_analysis_action_rows": 0,
+      "analysis_protocol_visible": true
+    },
+    {
+      "sequence": 374,
+      "reference": {
+        "artifact_id": "5029a339c6d5a128a15be4dc9511ab54859fd31f67fdb462baf721cf4644d181",
+        "media_type": "application/json"
+      },
+      "remaining_mathematical": 8,
+      "readiness": "ready",
+      "capabilities": [
+        "analysis",
+        "mathematics",
+        "replay",
+        "nmpc",
+        "rl",
+        "physical_replay",
+        "control_correction",
+        "control_search"
+      ],
+      "mathematical_response_rows": 3,
+      "mathematical_response_statuses": {
+        "blocked": 3
+      },
+      "direct_analysis_action_rows": 0,
+      "analysis_protocol_visible": true
+    },
+    {
+      "sequence": 460,
+      "reference": {
+        "artifact_id": "98620551a2cbea4d1a4adaaf39af51362af83afd2eedb0fc578af426cae15fcd",
+        "media_type": "application/json"
+      },
+      "remaining_mathematical": 8,
+      "readiness": "ready",
+      "capabilities": [
+        "analysis",
+        "mathematics",
+        "replay",
+        "nmpc",
+        "rl",
+        "physical_replay",
+        "control_correction",
+        "control_search"
+      ],
+      "mathematical_response_rows": 3,
+      "mathematical_response_statuses": {
+        "blocked": 3
+      },
+      "direct_analysis_action_rows": 0,
+      "analysis_protocol_visible": true
+    },
+    {
+      "sequence": 475,
+      "reference": {
+        "artifact_id": "90b9d2a5773e55930544dfa1906d57a03c8e17c673881629c9977a522c13760a",
+        "media_type": "application/json"
+      },
+      "remaining_mathematical": 8,
+      "readiness": "ready",
+      "capabilities": [
+        "analysis",
+        "mathematics",
+        "replay",
+        "nmpc",
+        "rl",
+        "physical_replay",
+        "control_correction",
+        "control_search"
+      ],
+      "mathematical_response_rows": 3,
+      "mathematical_response_statuses": {
+        "blocked": 3
+      },
+      "direct_analysis_action_rows": 0,
+      "analysis_protocol_visible": true
+    },
+    {
+      "sequence": 490,
+      "reference": {
+        "artifact_id": "8aa8d456a0b16141d91d9aedc823efac4f191752f5bd6bb74a41c8f1ab22b5bc",
+        "media_type": "application/json"
+      },
+      "remaining_mathematical": 8,
+      "readiness": "ready",
+      "capabilities": [
+        "analysis",
+        "mathematics",
+        "replay",
+        "nmpc",
+        "rl",
+        "physical_replay",
+        "control_correction",
+        "control_search"
+      ],
+      "mathematical_response_rows": 3,
+      "mathematical_response_statuses": {
+        "blocked": 3
+      },
+      "direct_analysis_action_rows": 0,
+      "analysis_protocol_visible": true
+    },
+    {
+      "sequence": 505,
+      "reference": {
+        "artifact_id": "2a7a1e8d9a2e58df406ff6084db3cc13b28c8896a548c6b1e0d5262d5ce72c6e",
+        "media_type": "application/json"
+      },
+      "remaining_mathematical": 8,
+      "readiness": "ready",
+      "capabilities": [
+        "analysis",
+        "mathematics",
+        "replay",
+        "nmpc",
+        "rl",
+        "physical_replay",
+        "control_correction",
+        "control_search"
+      ],
+      "mathematical_response_rows": 3,
+      "mathematical_response_statuses": {
+        "blocked": 3
+      },
+      "direct_analysis_action_rows": 0,
+      "analysis_protocol_visible": true
+    },
+    {
+      "sequence": 520,
+      "reference": {
+        "artifact_id": "9f91e8d31e3b69148ac9881de05442a8af7afa23db9e9b6371870dc285b1d8fd",
+        "media_type": "application/json"
+      },
+      "remaining_mathematical": 8,
+      "readiness": "ready",
+      "capabilities": [
+        "analysis",
+        "mathematics",
+        "replay",
+        "nmpc",
+        "rl",
+        "physical_replay",
+        "control_correction",
+        "control_search"
+      ],
+      "mathematical_response_rows": 4,
+      "mathematical_response_statuses": {
+        "blocked": 4
+      },
+      "direct_analysis_action_rows": 0,
+      "analysis_protocol_visible": true
+    },
+    {
+      "sequence": 606,
+      "reference": {
+        "artifact_id": "b3648274430c4e9cea5cb9136af8c45c1f340aa3e05493d4dba4c5a18bb9bffc",
+        "media_type": "application/json"
+      },
+      "remaining_mathematical": 8,
+      "readiness": "ready",
+      "capabilities": [
+        "analysis",
+        "mathematics",
+        "replay",
+        "nmpc",
+        "rl",
+        "physical_replay",
+        "control_correction",
+        "control_search"
+      ],
+      "mathematical_response_rows": 3,
+      "mathematical_response_statuses": {
+        "blocked": 3
+      },
+      "direct_analysis_action_rows": 0,
+      "analysis_protocol_visible": true
+    },
+    {
+      "sequence": 621,
+      "reference": {
+        "artifact_id": "1db64affbf711221c1a4d02ea4510dfa279a7a638b65cda694c2d90da0572756",
+        "media_type": "application/json"
+      },
+      "remaining_mathematical": 8,
+      "readiness": "ready",
+      "capabilities": [
+        "analysis",
+        "mathematics",
+        "replay",
+        "nmpc",
+        "rl",
+        "physical_replay",
+        "control_correction",
+        "control_search"
+      ],
+      "mathematical_response_rows": 3,
+      "mathematical_response_statuses": {
+        "blocked": 3
+      },
+      "direct_analysis_action_rows": 0,
+      "analysis_protocol_visible": true
+    },
+    {
+      "sequence": 632,
+      "reference": {
+        "artifact_id": "636129ec5639c5fe074fee08f0df32f63ae178d3c6a39ba8977066bdddac90fe",
+        "media_type": "application/json"
+      },
+      "remaining_mathematical": 8,
+      "readiness": "ready",
+      "capabilities": [
+        "analysis",
+        "mathematics",
+        "replay",
+        "nmpc",
+        "rl",
+        "physical_replay",
+        "control_correction",
+        "control_search"
+      ],
+      "mathematical_response_rows": 3,
+      "mathematical_response_statuses": {
+        "blocked": 3
+      },
+      "direct_analysis_action_rows": 0,
+      "analysis_protocol_visible": true
+    },
+    {
+      "sequence": 643,
+      "reference": {
+        "artifact_id": "b5b9aa09d62ec4d5bf47587abad23580af50b88ac84ad79fac650e89cf058766",
+        "media_type": "application/json"
+      },
+      "remaining_mathematical": 8,
+      "readiness": "ready",
+      "capabilities": [
+        "analysis",
+        "mathematics",
+        "replay",
+        "nmpc",
+        "rl",
+        "physical_replay",
+        "control_correction",
+        "control_search"
+      ],
+      "mathematical_response_rows": 3,
+      "mathematical_response_statuses": {
+        "blocked": 3
+      },
+      "direct_analysis_action_rows": 0,
+      "analysis_protocol_visible": true
+    },
+    {
+      "sequence": 654,
+      "reference": {
+        "artifact_id": "884d90631f6515affc71c5bf9dd5a7b9f22d233c92cd716b3bf421579ba899a7",
+        "media_type": "application/json"
+      },
+      "remaining_mathematical": 8,
+      "readiness": "ready",
+      "capabilities": [
+        "analysis",
+        "mathematics",
+        "replay",
+        "nmpc",
+        "rl",
+        "physical_replay",
+        "control_correction",
+        "control_search"
+      ],
+      "mathematical_response_rows": 3,
+      "mathematical_response_statuses": {
+        "blocked": 3
+      },
+      "direct_analysis_action_rows": 0,
+      "analysis_protocol_visible": true
+    },
+    {
+      "sequence": 669,
+      "reference": {
+        "artifact_id": "a4bf5863728d4b6b0e5370105b5b13cc6525128d5fa67dc69c644195ed9556ba",
+        "media_type": "application/json"
+      },
+      "remaining_mathematical": 8,
+      "readiness": "ready",
+      "capabilities": [
+        "analysis",
+        "mathematics",
+        "replay",
+        "nmpc",
+        "rl",
+        "physical_replay",
+        "control_correction",
+        "control_search"
+      ],
+      "mathematical_response_rows": 3,
+      "mathematical_response_statuses": {
+        "blocked": 3
+      },
+      "direct_analysis_action_rows": 0,
+      "analysis_protocol_visible": true
+    },
+    {
+      "sequence": 680,
+      "reference": {
+        "artifact_id": "b24584fc269296b2ad2cf11c6801b9bfc17a3a247dd57b0403ec140a7239f104",
+        "media_type": "application/json"
+      },
+      "remaining_mathematical": 8,
+      "readiness": "ready",
+      "capabilities": [
+        "analysis",
+        "mathematics",
+        "replay",
+        "nmpc",
+        "rl",
+        "physical_replay",
+        "control_correction",
+        "control_search"
+      ],
+      "mathematical_response_rows": 3,
+      "mathematical_response_statuses": {
+        "blocked": 3
+      },
+      "direct_analysis_action_rows": 0,
+      "analysis_protocol_visible": true
+    },
+    {
+      "sequence": 694,
+      "reference": {
+        "artifact_id": "3f2f96848f39c24d20754c2ed9ac43ba7328beb8db30a4dee0888f3581eb531f",
+        "media_type": "application/json"
+      },
+      "remaining_mathematical": 8,
+      "readiness": "ready",
+      "capabilities": [
+        "analysis",
+        "mathematics",
+        "replay",
+        "nmpc",
+        "rl",
+        "physical_replay",
+        "control_correction",
+        "control_search"
+      ],
+      "mathematical_response_rows": 3,
+      "mathematical_response_statuses": {
+        "blocked": 3
+      },
+      "direct_analysis_action_rows": 0,
+      "analysis_protocol_visible": true
+    },
+    {
+      "sequence": 713,
+      "reference": {
+        "artifact_id": "1c40d570a632fb64ee3df9ecee39d09044f4153a1fa8eb62e4c4e48d2f0e1d91",
+        "media_type": "application/json"
+      },
+      "remaining_mathematical": 8,
+      "readiness": "ready",
+      "capabilities": [
+        "analysis",
+        "mathematics",
+        "replay",
+        "nmpc",
+        "rl",
+        "physical_replay",
+        "control_correction",
+        "control_search"
+      ],
+      "mathematical_response_rows": 3,
+      "mathematical_response_statuses": {
+        "blocked": 3
+      },
+      "direct_analysis_action_rows": 0,
+      "analysis_protocol_visible": true
+    },
+    {
+      "sequence": 1247,
+      "reference": {
+        "artifact_id": "0f804eb4004112143bfb9166a4512bc24c337ce56ca61590d74eb622dd9d13d1",
+        "media_type": "application/json"
+      },
+      "remaining_mathematical": 8,
+      "readiness": "ready",
+      "capabilities": [
+        "analysis",
+        "mathematics",
+        "replay",
+        "nmpc",
+        "rl",
+        "physical_replay",
+        "control_correction",
+        "control_search"
+      ],
+      "mathematical_response_rows": 3,
+      "mathematical_response_statuses": {
+        "blocked": 3
+      },
+      "direct_analysis_action_rows": 0,
+      "analysis_protocol_visible": true
+    },
+    {
+      "sequence": 1261,
+      "reference": {
+        "artifact_id": "23c7b66b8f20b380a51527d74bf3b4d4f1eb9b6f967c73a7fa9f20c41e50c85b",
+        "media_type": "application/json"
+      },
+      "remaining_mathematical": 8,
+      "readiness": "ready",
+      "capabilities": [
+        "analysis",
+        "mathematics",
+        "replay",
+        "nmpc",
+        "rl",
+        "physical_replay",
+        "control_correction",
+        "control_search"
+      ],
+      "mathematical_response_rows": 3,
+      "mathematical_response_statuses": {
+        "blocked": 3
+      },
+      "direct_analysis_action_rows": 0,
+      "analysis_protocol_visible": true
+    },
+    {
+      "sequence": 1276,
+      "reference": {
+        "artifact_id": "9ac1085044975a77eadd6da27df9f4848d0316b868ee51aca7b956ac2ce4974d",
+        "media_type": "application/json"
+      },
+      "remaining_mathematical": 8,
+      "readiness": "ready",
+      "capabilities": [
+        "analysis",
+        "mathematics",
+        "replay",
+        "nmpc",
+        "rl",
+        "physical_replay",
+        "control_correction",
+        "control_search"
+      ],
+      "mathematical_response_rows": 3,
+      "mathematical_response_statuses": {
+        "blocked": 3
+      },
+      "direct_analysis_action_rows": 0,
+      "analysis_protocol_visible": true
+    },
+    {
+      "sequence": 1290,
+      "reference": {
+        "artifact_id": "4017d3b054dd01a237444c9e7a85f3f98b5481bb933f3ca81e7dfdf8cd079a68",
+        "media_type": "application/json"
+      },
+      "remaining_mathematical": 8,
+      "readiness": "ready",
+      "capabilities": [
+        "analysis",
+        "mathematics",
+        "replay",
+        "nmpc",
+        "rl",
+        "physical_replay",
+        "control_correction",
+        "control_search"
+      ],
+      "mathematical_response_rows": 3,
+      "mathematical_response_statuses": {
+        "blocked": 3
+      },
+      "direct_analysis_action_rows": 0,
+      "analysis_protocol_visible": true
+    },
+    {
+      "sequence": 1309,
+      "reference": {
+        "artifact_id": "c58f960a39b064095742ce704e09dcb2eb36c56789c9d1899378c622a7666077",
+        "media_type": "application/json"
+      },
+      "remaining_mathematical": 8,
+      "readiness": "ready",
+      "capabilities": [
+        "analysis",
+        "mathematics",
+        "replay",
+        "nmpc",
+        "rl",
+        "physical_replay",
+        "control_correction",
+        "control_search"
+      ],
+      "mathematical_response_rows": 4,
+      "mathematical_response_statuses": {
+        "blocked": 4
+      },
+      "direct_analysis_action_rows": 0,
+      "analysis_protocol_visible": true
+    },
+    {
+      "sequence": 1323,
+      "reference": {
+        "artifact_id": "224deb9146eaf4da9bcaa5206cac7793ecc2adda4babd9da13fc23cbb3225b86",
+        "media_type": "application/json"
+      },
+      "remaining_mathematical": 8,
+      "readiness": "ready",
+      "capabilities": [
+        "analysis",
+        "mathematics",
+        "replay",
+        "nmpc",
+        "rl",
+        "physical_replay",
+        "control_correction",
+        "control_search"
+      ],
+      "mathematical_response_rows": 4,
+      "mathematical_response_statuses": {
+        "blocked": 4
+      },
+      "direct_analysis_action_rows": 0,
+      "analysis_protocol_visible": true
+    },
+    {
+      "sequence": 1342,
+      "reference": {
+        "artifact_id": "e2fb2793f8c4c60bba28c12fe81767ae9ec5ba0d895846dd3809bc990e3b5561",
+        "media_type": "application/json"
+      },
+      "remaining_mathematical": 8,
+      "readiness": "ready",
+      "capabilities": [
+        "analysis",
+        "mathematics",
+        "replay",
+        "nmpc",
+        "rl",
+        "physical_replay",
+        "control_correction",
+        "control_search"
+      ],
+      "mathematical_response_rows": 4,
+      "mathematical_response_statuses": {
+        "blocked": 4
+      },
+      "direct_analysis_action_rows": 0,
+      "analysis_protocol_visible": true
+    },
+    {
+      "sequence": 1357,
+      "reference": {
+        "artifact_id": "a2d5e91df7069f380ba195d8da9a0fd64085fbe4a5532709a9123573d4646bfe",
+        "media_type": "application/json"
+      },
+      "remaining_mathematical": 8,
+      "readiness": "ready",
+      "capabilities": [
+        "analysis",
+        "mathematics",
+        "replay",
+        "nmpc",
+        "rl",
+        "physical_replay",
+        "control_correction",
+        "control_search"
+      ],
+      "mathematical_response_rows": 4,
+      "mathematical_response_statuses": {
+        "blocked": 4
+      },
+      "direct_analysis_action_rows": 0,
+      "analysis_protocol_visible": true
+    },
+    {
+      "sequence": 1371,
+      "reference": {
+        "artifact_id": "3827d27cde5dc40df952c83f9097554283a62b3dbf55f6223f57862d71297285",
+        "media_type": "application/json"
+      },
+      "remaining_mathematical": 8,
+      "readiness": "ready",
+      "capabilities": [
+        "analysis",
+        "mathematics",
+        "replay",
+        "nmpc",
+        "rl",
+        "physical_replay",
+        "control_correction",
+        "control_search"
+      ],
+      "mathematical_response_rows": 4,
+      "mathematical_response_statuses": {
+        "blocked": 4
+      },
+      "direct_analysis_action_rows": 0,
+      "analysis_protocol_visible": true
+    },
+    {
+      "sequence": 1390,
+      "reference": {
+        "artifact_id": "b5133da95cd8c5e875a6a4f60bd71fcabc435a19d2c444ebefad1018115cb8cb",
+        "media_type": "application/json"
+      },
+      "remaining_mathematical": 8,
+      "readiness": "ready",
+      "capabilities": [
+        "analysis",
+        "mathematics",
+        "replay",
+        "nmpc",
+        "rl",
+        "physical_replay",
+        "control_correction",
+        "control_search"
+      ],
+      "mathematical_response_rows": 5,
+      "mathematical_response_statuses": {
+        "blocked": 5
+      },
+      "direct_analysis_action_rows": 0,
+      "analysis_protocol_visible": true
+    },
+    {
+      "sequence": 1454,
+      "reference": {
+        "artifact_id": "bdf47a23f130bb304fde76ea42f541e556211ea5be46cb36869d1d6602414032",
+        "media_type": "application/json"
+      },
+      "remaining_mathematical": 8,
+      "readiness": "ready",
+      "capabilities": [
+        "analysis",
+        "mathematics",
+        "replay",
+        "nmpc",
+        "rl",
+        "physical_replay",
+        "control_correction",
+        "control_search"
+      ],
+      "mathematical_response_rows": 4,
+      "mathematical_response_statuses": {
+        "blocked": 4
+      },
+      "direct_analysis_action_rows": 0,
+      "analysis_protocol_visible": true
+    },
+    {
+      "sequence": 1488,
+      "reference": {
+        "artifact_id": "2c5a4e8bec72a99ad9bdc88dce180481ee89e01bbcf480b48a99fc6a7bcb5991",
+        "media_type": "application/json"
+      },
+      "remaining_mathematical": 8,
+      "readiness": "ready",
+      "capabilities": [
+        "analysis",
+        "mathematics",
+        "replay",
+        "nmpc",
+        "rl",
+        "physical_replay",
+        "control_correction",
+        "control_search"
+      ],
+      "mathematical_response_rows": 4,
+      "mathematical_response_statuses": {
+        "blocked": 4
+      },
+      "direct_analysis_action_rows": 0,
+      "analysis_protocol_visible": true
+    },
+    {
+      "sequence": 1503,
+      "reference": {
+        "artifact_id": "623034dedc156a653d3741e39c62789b724e38cb2918aef1644942346a25c8a7",
+        "media_type": "application/json"
+      },
+      "remaining_mathematical": 8,
+      "readiness": "ready",
+      "capabilities": [
+        "analysis",
+        "mathematics",
+        "replay",
+        "nmpc",
+        "rl",
+        "physical_replay",
+        "control_correction",
+        "control_search"
+      ],
+      "mathematical_response_rows": 4,
+      "mathematical_response_statuses": {
+        "blocked": 4
+      },
+      "direct_analysis_action_rows": 0,
+      "analysis_protocol_visible": true
+    },
+    {
+      "sequence": 1537,
+      "reference": {
+        "artifact_id": "df13ccdef8e8856b42d9867cf4f564659a2f52f35e5ec5935b153a16eabb7ce5",
+        "media_type": "application/json"
+      },
+      "remaining_mathematical": 8,
+      "readiness": "ready",
+      "capabilities": [
+        "analysis",
+        "mathematics",
+        "replay",
+        "nmpc",
+        "rl",
+        "physical_replay",
+        "control_correction",
+        "control_search"
+      ],
+      "mathematical_response_rows": 4,
+      "mathematical_response_statuses": {
+        "blocked": 4
+      },
+      "direct_analysis_action_rows": 0,
+      "analysis_protocol_visible": true
+    },
+    {
+      "sequence": 1549,
+      "reference": {
+        "artifact_id": "d9aa88898bc434eb5e13b585cf2ec3c1173ed07534bfc18ea82597692c984dd0",
+        "media_type": "application/json"
+      },
+      "remaining_mathematical": 8,
+      "readiness": "ready",
+      "capabilities": [
+        "analysis",
+        "mathematics",
+        "replay",
+        "nmpc",
+        "rl",
+        "physical_replay",
+        "control_correction",
+        "control_search"
+      ],
+      "mathematical_response_rows": 4,
+      "mathematical_response_statuses": {
+        "blocked": 4
+      },
+      "direct_analysis_action_rows": 0,
+      "analysis_protocol_visible": true
+    },
+    {
+      "sequence": 1561,
+      "reference": {
+        "artifact_id": "ed3d0bef23be9eb6fe12d83ab45fc53c9cc17b1631845b2ef23494d2db95d36f",
+        "media_type": "application/json"
+      },
+      "remaining_mathematical": 8,
+      "readiness": "ready",
+      "capabilities": [
+        "analysis",
+        "mathematics",
+        "replay",
+        "nmpc",
+        "rl",
+        "physical_replay",
+        "control_correction",
+        "control_search"
+      ],
+      "mathematical_response_rows": 4,
+      "mathematical_response_statuses": {
+        "blocked": 4
+      },
+      "direct_analysis_action_rows": 0,
+      "analysis_protocol_visible": true
+    },
+    {
+      "sequence": 1572,
+      "reference": {
+        "artifact_id": "940553fdb51681acaff495b00add63455025740dab93ccb454f2f042eca02437",
+        "media_type": "application/json"
+      },
+      "remaining_mathematical": 8,
+      "readiness": "ready",
+      "capabilities": [
+        "analysis",
+        "mathematics",
+        "replay",
+        "nmpc",
+        "rl",
+        "physical_replay",
+        "control_correction",
+        "control_search"
+      ],
+      "mathematical_response_rows": 4,
+      "mathematical_response_statuses": {
+        "blocked": 4
+      },
+      "direct_analysis_action_rows": 0,
+      "analysis_protocol_visible": true
+    }
+  ],
+  "source_unchanged_during_read": true,
+  "scope": "Saved metadata and exact JSON comparisons only. No capability execution, model validation, causal policy inference or new scientific evaluation."
+}
