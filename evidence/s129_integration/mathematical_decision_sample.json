@@ -1,5 +1,5 @@
 {
-  "scope": "Saved F1-B engineering evidence, read-only F2 projection; no new physical or numerical execution",
+  "scope": "Saved F1-B engineering evidence; read-only projection, no new execution",
   "results": [
     {
       "reference": {
@@ -424,7 +424,8 @@
           ],
           "reason": null,
           "problem_pointer": "/trajectory/problem_definition",
-          "quantities_pointer": "/trajectory/quantities"
+          "quantities_pointer": "/trajectory/quantities",
+          "sample_records_pointer": "/trajectory/replay/records"
         },
         "critical_samples": [
           {
@@ -950,6 +951,7 @@
           "reason": null,
           "problem_pointer": "/trajectory/problem_definition",
           "quantities_pointer": "/trajectory/quantities",
+          "sample_records_pointer": "/trajectory/replay/records",
           "structural_comparison": {
             "status": "computed_estimate",
             "variable": "segments.near.length_m",
@@ -977,7 +979,19 @@
               "artifact_id": "9c22f54b6f258c56a1105bb6b6f14a9e5e62ad4c30e5831a2931c50b3add1a17",
               "media_type": "application/json"
             },
-            "derivative_scope": "Two-design finite secants of computed values; no envelope gradient or descent guarantee"
+            "derivative_scope": "Two-design finite secants of computed values; no envelope gradient or descent guarantee",
+            "baseline_violation": -0.1999999515720519,
+            "fixed_control_violation": -0.08298844105123285,
+            "fixed_control_pointer": "/trajectory/structural_comparison/fixed_control",
+            "fixed_control_verification": {
+              "discrete_replay": true,
+              "input_legality": true,
+              "lower_bound": "Analytic -1 from the signed constraint definitions, for analyzed samples",
+              "optimality": false,
+              "rigorous_floating_point_upper_bound": false,
+              "sampled_score": true,
+              "tolerances": "Replay agreement uses check_atol; witness additionally requires signed_violation <= 0"
+            }
           }
         },
         "critical_samples": [

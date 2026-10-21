@@ -90,10 +90,15 @@ def capability_summary(trajectory):
     summary['reason'] = trajectory.get('reason')
     summary['problem_pointer'] = '/trajectory/problem_definition'
     summary['quantities_pointer'] = '/trajectory/quantities'
+    summary['sample_records_pointer'] = '/trajectory/replay/records'
     comparison = trajectory.get('structural_comparison')
     if comparison:
         summary['structural_comparison'] = {k: comparison[k] for k in (
             'status', 'variable', 'step', 'normalization_scale', 'quantities', 'baseline_result', 'derivative_scope')}
+        summary['structural_comparison'].update(baseline_violation=comparison['baseline_violation'],
+            fixed_control_violation=comparison['fixed_control'].get('best_found_violation'),
+            fixed_control_pointer='/trajectory/structural_comparison/fixed_control',
+            fixed_control_verification=comparison['fixed_control'].get('verification_scope'))
     return summary
 
 

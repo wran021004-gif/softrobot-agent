@@ -34,12 +34,19 @@ def prepare(live):
     raw['execution_instructions']='F2 engineering validation only. Use saved mathematical evidence; no scientific execution. '
     raw['execution_instructions']+='After one requested tool, consume its feedback and answer concisely. Numerical replay is not optimality or physical acceptance.'
     for k in ('defaults','family_space','control','task'):raw[k]=str((ROOT/'configs/research'/raw[k]).resolve())
+    pair=read(ROOT/'evidence/s129_math_capability/gvs_pair.json')
+    source=pair['supporting_artifacts'][pair['baseline']['candidate']['artifact_id']]['configuration']
+    task_path=ROOT/'runs'/(raw['study_id']+'-task.json')
+    atomic_json(task_path,dict(task=source['task'],seed=source['seed'],
+        settling=source['policy']['controller']['parameters']['data']['settling']))
+    raw['task']=str(task_path)  # Same frozen task as the evidence being diagnosed.
     path=ROOT/'configs/research'/('._'+raw['study_id']+'.json');atomic_json(path,raw)
     try:h=core.prepare(path)
     finally:path.unlink()
     if live:core.bind(h)
-    else:update(h,freeze='offline_F2_engineering_fixture')
-    pair=read(ROOT/'evidence/s129_math_capability/gvs_pair.json')
+    else:
+        from tools.research.state import core_hashes
+        update(h,freeze='offline_F2_engineering_fixture',core_hashes=core_hashes())
     for value in pair['supporting_artifacts'].values():save(h,value,'saved_B_engineering_artifact')
     refs=[save(h,pair[k],'saved_B_engineering_result') for k in ('baseline','changed')]
     update(h,analysis_results=refs)
@@ -67,12 +74,18 @@ async def run(live=False):
             from tests.research.test_s129_agent_reporting import reporter_response
             from tests.research.test_s127_session_recovery import response
             if role=='reporter':return reporter_response(request)
-            if calls.count(role)==1:
+            if calls.count(role) in (1,3):
+                name='research_investigate'
+                args=dict(question='Is the structure comparison certified?',references=refs)
+                if calls.count(role)==3:
+                    from tests.research.s7_study import engineering_plan
+                    name='research_plan';args=engineering_plan('diagnose','DIAGNOSE',supporting_evidence=refs)
+                    args['decision']['hypothesis_id']='H-F2'
+                    args['hypothesis']='Engineering fixture: incomplete search versus local-model error remains unresolved'
                 return httpx.Response(200,json=dict(id='fixture',object='chat.completion',created=1,model=wire['model'],
                     choices=[dict(index=0,finish_reason='tool_calls',message=dict(role='assistant',content=None,
-                        reasoning_content='Synthetic engineering fixture',tool_calls=[dict(id='f2-original-investigation',
-                            type='function',function=dict(name='research_investigate',arguments=json.dumps(dict(
-                                question='Is the structure comparison certified?',references=refs))))]))],
+                        reasoning_content='Synthetic engineering fixture',tool_calls=[dict(id='f2-original-'+name,
+                            type='function',function=dict(name=name,arguments=json.dumps(args)))]))],
                     usage=dict(prompt_tokens=10,completion_tokens=2,total_tokens=12)))
             return response(request)
         async def aclose(self):await self.inner.aclose()
@@ -131,7 +144,14 @@ async def run(live=False):
         reopened_store=Host(h.store.root,h.run_id,actor=h.actor)
         assert reopened_store.store.remaining()==h.store.remaining()
         assert reporter.provider_usage(h).get('reporter',{}).get('requests',0)>0
-        result.update(passed=True,sdk_reopened=True,store_reopened=True,scientific_artifacts_unchanged=True)
+        from tools.research.research_context import research_intent
+        intent=research_intent(h)
+        assert intent['latest_decision']['agent_hypothesis']['decision']['hypothesis_id']=='H-F2'
+        requests=[h.store.artifact(e['outputs'][0])['tool_use'] for e in h.store.events(h.run_id) if e['kind']=='model_original_tool_request']
+        feedback=[h.store.artifact(e['outputs'][0]) for e in h.store.events(h.run_id) if e['kind']=='model_original_tool_feedback']
+        assert all(any(f['tool_use']==use and f['result']['toolUseId']==use['toolUseId'] for f in feedback) for use in requests)
+        result.update(passed=True,sdk_reopened=True,store_reopened=True,scientific_artifacts_unchanged=True,
+            recovered_hypothesis='H-F2',original_tool_ids=[u['toolUseId'] for u in requests],native_pairing_verified=True)
     except Exception as exc:result['error']=type(exc).__name__+': '+str(exc)
     finally:
         result.update(sessions=sessions,handoffs=checkpoints,usage=reporter.provider_usage(h),ledger=h.store.remaining(),

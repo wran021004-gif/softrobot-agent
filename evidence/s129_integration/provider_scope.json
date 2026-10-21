@@ -1,0 +1,35 @@
+{
+  "status": "awaiting_explicit_egress_approval",
+  "endpoint": "https://api.deepseek.com/chat/completions",
+  "model": "deepseek-flash",
+  "max_tokens_per_request": 32768,
+  "main_request_ceiling": 7,
+  "reporter_request_ceiling": 3,
+  "total_request_ceiling": 10,
+  "automatic_retries": 0,
+  "payload": [
+    "New isolated F2 engineering prompts and native tool JSON schemas",
+    "Saved F1-B GVS engineering results and selected exact reads, task/model/structure parameters, artifact hashes and non-secret provenance",
+    "Generated deterministic reports, non-authoritative Reporter interpretations and the new engineering-session tool dialogue/reasoning",
+    "Budget, receipt and session metadata required by the decision/handoff packet"
+  ],
+  "source_files": [
+    "evidence/s129_math_capability/gvs_pair.json",
+    "tests/research/s129_provider_check.py",
+    "configs/research/runtime.json (provider settings only)"
+  ],
+  "excluded": [
+    "Credential contents in prompts/logs (key used only for normal Provider Authorization header)",
+    "Unrelated repository files or existing conversation history",
+    "Sealed S12.8 Store/SDK histories",
+    "New physical, NMPC, PPO or scientific worker execution"
+  ],
+  "validation_plan": [
+    "Three main SDK Sessions and two verified handoffs",
+    "Real main and Reporter usage separately recorded",
+    "Exact native tool/receipt pairing, H-F2 intent, Store/SDK reopen and unchanged scientific artifacts",
+    "No resend of unknown or unconsumed Provider responses"
+  ],
+  "raw_archive": "New isolated runs/research/s129-f2-live-*/ Store and SDK only; no raw bodies committed to Git",
+  "risk": "The named external Provider receives the listed repository-derived engineering data and new dialogue. Real billed usage is possible; USD price is unknown."
+}

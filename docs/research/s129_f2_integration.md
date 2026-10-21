@@ -39,6 +39,7 @@ No additional TaskSpec, registry, optimizer, scheduler, database or event framew
 - `recover_feedback(host, agent)` passes the exact saved receipt to report recovery.
 - `core.dispatch` records the operation's `scientific_results` in its original receipt output.
 - `analysis.decision_result` removes duplicate scope/configuration projection, preserving inference strength.
+- `capability_summary` projects original fixed-control scores, verification and active-record indices.
 - `reporter.provider_usage` includes actual cache usage and explicit unknown USD cost.
 - `tests/research/s129_provider_check.py` is a bounded engineering entrypoint using existing SDK/Store methods.
 
@@ -100,7 +101,8 @@ Neither result proves MuJoCo task acceptance, nonlinear/hardware performance or 
 Saved original tool feedback wins. Otherwise original tool ID, request hash, execution receipt
 and receipt output determine the result. Analysis uses the receipt output artifact itself;
 new Plan receipts contain the exact newly produced result list. Multiple results produce
-multiple F0 one-result reports; F0's one-result-summary contract is unchanged.
+multiple F0 one-result reports; feedback carries the primary report and complete report index.
+F0's one-result-summary contract is unchanged.
 An already saved report for the same exact results is reused. No global latest-result fallback
 exists during recovery. Missing binding preserves the original operation facts and marks
 interpretation unavailable. Science workers and resource reservations are never replayed.
@@ -158,3 +160,34 @@ An engineering check is not blanket approval for all future Study configurations
 
 No tracking evaluator, contact/obstacle/hybrid solver, rigorous minimax optimality certificate,
 regional structural guarantee or F3 scientific experiment is added by this change.
+
+## Final engineering disposition
+
+Across the initial 35-test F0/F1 suite and the affected 117-test suite, 131 distinct tests
+have passing final results. The affected suite initially passed 116/117; the remaining
+test assumed a full and compact EvidenceSummary must be identical. It now checks every
+retained field exactly while scope stays accessible through the original pointer.
+The 41-test focused rerun passed, followed by seven focused projection/recovery tests.
+The old 1:5 size assertion was not relaxed. `git diff --check` passes.
+
+The final offline check runs five mock main requests plus one mock Reporter request,
+three actual SDK Sessions and two handoffs. Native investigation and diagnostic tool IDs,
+H-F2 intent, original scientific hashes, independently reopened Store/SDK and accounting
+remain consistent. These token counts are explicitly mocked, not real usage.
+An earlier driver preflight correctly rejected B evidence under the unrelated mirror task;
+the driver now freezes the original B task before preparation, without changing acceptance.
+
+Real Provider requests: **0**. The live command was rejected by automatic approval review
+before process startup: it required explicit approval of destination and outbound data.
+No retry or alternate route was attempted; production handoff admission remains **closed**.
+The reviewable request scope is [provider_scope.json](../../evidence/s129_integration/provider_scope.json):
+`https://api.deepseek.com/chat/completions`, `deepseek-flash`, existing 32,768-token output
+cap, main <=7 / Reporter <=3 / total <=10 requests. It lists the saved B engineering data,
+tool schemas and new engineering dialogue to be sent, exclusions and possible paid usage.
+Actual prompt/completion/cache usage is unavailable; USD cost is unknown.
+F2 is therefore engineering-complete but **not production-admitted**; F3 must wait for this gate.
+
+Implementation commit `9fe8383c` was ordinarily pushed before the live attempt. The follow-up
+audit commit preserves the final scores, request scope and blocked admission status.
+Detailed measurements: [validation.json](../../evidence/s129_integration/validation.json).
+Actual B-to-Agent sample: [mathematical_decision_sample.json](../../evidence/s129_integration/mathematical_decision_sample.json).

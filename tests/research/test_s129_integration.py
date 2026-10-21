@@ -57,6 +57,7 @@ class IntegrationTests(unittest.TestCase):
                     from tools.research.core import read_evidence
                     self.assertEqual(read_evidence(self.h,quantity['source'],record_read=False),quantity['value'])
         comparison=views[1]['capability']['structural_comparison']['quantities']
+        self.assertAlmostEqual(views[1]['capability']['structural_comparison']['fixed_control_violation'],-.0829884411)
         self.assertAlmostEqual(comparison['fixed_control_delta']['value'],.1170115105)
         self.assertAlmostEqual(comparison['reoptimized_control_delta']['value'],.1000004343)
         wire=json.dumps(views)
