@@ -6,6 +6,7 @@ from schemas.platform import EvidenceRef
 from schemas.platform_analysis import TaskAnalysisProtocol
 from extensions.tendon_family.generated_serial import TopologyPatch
 from extensions.tendon_family.family_space import GenerationRequest, GenerationRequestV2
+from tools.research.capability import CapabilityComparison
 
 
 class SegmentParameters(Contract):
@@ -128,9 +129,10 @@ class StaticDesignSensitivity(Contract):
 
 class AnalysisRequest(Contract):
     candidate: EvidenceRef
-    operation: Literal['equilibrium','linearization','controllability','endpoint','braking','instantaneous_braking_v1','trajectory_feasibility','input_sensitivity','design_sensitivity']
+    operation: Literal['equilibrium','linearization','controllability','endpoint','braking','instantaneous_braking_v1','trajectory_feasibility','task_capability','input_sensitivity','design_sensitivity']
     operating_point: Literal['standardized_initial_pretension','controller_start_input','target_equilibrium','halfway_waypoint','saved_state','fixed_input_equilibrium'] = 'halfway_waypoint'
     design_sensitivity: StaticDesignSensitivity | None = None
+    capability_comparison: CapabilityComparison | None = None
     saved_state: EvidenceRef | None = None
     execution: EvidenceRef | None = None
     update_id: int | None = Field(default=None,ge=0,strict=True)
@@ -139,6 +141,8 @@ class AnalysisRequest(Contract):
 
     @model_validator(mode='after')
     def exact_state(self):
+        if self.capability_comparison is not None and self.operation != "task_capability":
+            raise ValueError("CAPABILITY_COMPARISON_REQUIRES_TASK_CAPABILITY")
         if self.operation=='equilibrium' and self.operating_point!='target_equilibrium':
             raise ValueError('EQUILIBRIUM_REQUIRES_TARGET_POINT: operating_point=target_equilibrium')
         if self.operation=='instantaneous_braking_v1' and self.operating_point!='saved_state':
@@ -162,6 +166,7 @@ class AnalysisRequest(Contract):
     def unchanged_legacy_serialization(self,handler):
         value=handler(self)
         if self.design_sensitivity is None:value.pop('design_sensitivity',None)
+        if self.capability_comparison is None:value.pop('capability_comparison',None)
         return value
 
 

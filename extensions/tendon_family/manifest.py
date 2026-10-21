@@ -54,6 +54,8 @@ PHYSICAL_SOURCES = (
 NMPC_SOURCES = (
     'extensions/math_analysis/kernels.py',
     'extensions/math_analysis/trajectory.py',
+    'extensions/math_analysis/task_capability.py',
+    'tools/research/capability.py',
     'extensions/math_analysis/tools.py',
     'extensions/optimization/contracts.py',
     'extensions/optimization/ipopt.py',

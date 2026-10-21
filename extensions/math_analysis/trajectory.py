@@ -164,61 +164,70 @@ def _certificate(c, index, base, matrix, reference, lower, upper, atol):
         delta_lower=lower.tolist(), delta_upper=upper.tolist(), scope='Necessary sampled constraint under the complete physical input box only.')
 
 
+def prepare_trajectory(model, requirements, protocol, result, initial_delta=None):
+    """Shared physical box, exact sample maps and coverage; performs no solve."""
+    scope = time_scope(requirements, protocol, model.operating_point.get('actual_time_s'))
+    result['horizon'] = scope
+    remaining = model.operating_point.get('remaining_task_s')
+    if remaining is None or abs(remaining-scope['remaining_task_s']) > protocol.horizon_alignment_atol_s:
+        raise ValueError('MODEL_REMAINING_TIME_DISAGREES_WITH_ABSOLUTE_GRID')
+    steps = scope['step_count']; u0 = np.asarray(model.u0, dtype=float); nu = len(u0)
+    limits = np.asarray(model.binding['tension_limits_n'], dtype=float)
+    if (limits.shape != u0.shape or not np.all(np.isfinite(limits)) or not np.all(np.isfinite(u0))
+            or np.any(limits <= 0) or np.any(u0 < 0) or np.any(u0 > limits)):
+        raise ValueError('INVALID_PHYSICAL_INPUT_BOX_OR_NOMINAL_INPUT')
+    if (requirements.physical_inputs.get('lower') != [0.]*nu
+            or requirements.physical_inputs.get('upper') != limits.tolist()):
+        raise ValueError('REQUIREMENT_AND_MODEL_PHYSICAL_INPUT_BOX_MISMATCH')
+    previous = model.operating_point.get('previous_applied_input_n')
+    if previous is not None:
+        previous = np.asarray(previous, dtype=float)
+        if previous.shape != u0.shape or not np.all(np.isfinite(previous)) or np.any(previous < 0) or np.any(previous > limits):
+            raise ValueError('INVALID_PREVIOUS_PHYSICAL_INPUT')
+    dynamics, states = sampled_maps(model, steps, protocol.period_s, initial_delta)
+    result['discrete_dynamics'] = dict(zip(('A_d','B_d','drift_d'), (v.tolist() for v in dynamics)))
+    initial = states[0][0]; outputs = {o.name:o for o in model.endpoint_outputs}; rows = []
+    for c in requirements.constraints:
+        output = outputs.get(c.signal.name); indices = []; reasons = []
+        compatible = (c.kind in ('norm_bound','component_interval') and output is not None
+            and (output.units,output.frame,len(output.value0)) == (c.signal.units,c.signal.frame,c.signal.dimension)
+            and c.signal.phase == 'post_step')
+        for index, reference in zip(c.indices, c.reference):
+            if not compatible:
+                reasons.append('Unsupported kind or output identity/units/frame/phase.'); continue
+            if index not in scope['sample_steps']:
+                reasons.append('Sample precedes analysis start; no prior evidence supplied.'); continue
+            k = scope['sample_steps'][index]
+            try:
+                base, matrix = _output_map(output, states[k], k, steps, u0, previous)
+            except ValueError as exc:
+                reasons.append(str(exc)); continue
+            rows.append((c,index,k,np.asarray(reference),output,base,matrix)); indices.append(index)
+        result['coverage'].append(dict(constraint_id=c.constraint_id, analyzed_indices=indices,
+            unchecked_indices=[i for i in c.indices if i not in indices], reasons=sorted(set(reasons))))
+    result['full_requested_coverage'] = all(not c['unchecked_indices'] for c in result['coverage'])
+    lower, upper = np.tile(-u0, steps), np.tile(limits-u0, steps)
+    atol = protocol.endpoint_check_atol
+    result['physical_bounds_n'] = dict(lower=[0.]*nu, upper=limits.tolist(), nominal=u0.tolist())
+    result['initial_delta_state'] = initial.tolist()
+    scale = np.tile(np.asarray(model.input_scales, dtype=float), steps)
+    if scale.shape != lower.shape or np.any(scale <= 0) or not np.all(np.isfinite(scale)):
+        raise ValueError('INVALID_INPUT_SCALES')
+    return scope, dynamics, initial, rows, lower, upper, scale
+
+
 def trajectory_feasibility(model, requirements, protocol, *, initial_delta=None):
     """One convex bounded sequence; only replay or a checked separation decides."""
     result = dict(solver_scope=SCOPE, status='not_applicable', coverage=[], certificate=None,
         all_requested_checked=False,
         model_scope='Frozen local affine dynamics, exact ZOH; sampled constraints only, no nonlinear/physical acceptance.')
     try:
-        scope = time_scope(requirements, protocol, model.operating_point.get('actual_time_s'))
-        result['horizon'] = scope
-        remaining = model.operating_point.get('remaining_task_s')
-        if remaining is None or abs(remaining-scope['remaining_task_s']) > protocol.horizon_alignment_atol_s:
-            raise ValueError('MODEL_REMAINING_TIME_DISAGREES_WITH_ABSOLUTE_GRID')
-        steps = scope['step_count']; u0 = np.asarray(model.u0, dtype=float); nu = len(u0)
-        limits = np.asarray(model.binding['tension_limits_n'], dtype=float)
-        if (limits.shape != u0.shape or not np.all(np.isfinite(limits)) or not np.all(np.isfinite(u0))
-                or np.any(limits <= 0) or np.any(u0 < 0) or np.any(u0 > limits)):
-            raise ValueError('INVALID_PHYSICAL_INPUT_BOX_OR_NOMINAL_INPUT')
-        if (requirements.physical_inputs.get('lower') != [0.]*nu
-                or requirements.physical_inputs.get('upper') != limits.tolist()):
-            raise ValueError('REQUIREMENT_AND_MODEL_PHYSICAL_INPUT_BOX_MISMATCH')
-        previous = model.operating_point.get('previous_applied_input_n')
-        if previous is not None:
-            previous = np.asarray(previous, dtype=float)
-            if previous.shape != u0.shape or not np.all(np.isfinite(previous)) or np.any(previous < 0) or np.any(previous > limits):
-                raise ValueError('INVALID_PREVIOUS_PHYSICAL_INPUT')
-        dynamics, states = sampled_maps(model, steps, protocol.period_s, initial_delta)
-        result['discrete_dynamics'] = dict(zip(('A_d','B_d','drift_d'), (v.tolist() for v in dynamics)))
-        initial = states[0][0]; outputs = {o.name:o for o in model.endpoint_outputs}; rows = []
-        for c in requirements.constraints:
-            output = outputs.get(c.signal.name); indices = []; reasons = []
-            compatible = (c.kind in ('norm_bound','component_interval') and output is not None
-                and (output.units,output.frame,len(output.value0)) == (c.signal.units,c.signal.frame,c.signal.dimension)
-                and c.signal.phase == 'post_step')
-            for index, reference in zip(c.indices, c.reference):
-                if not compatible:
-                    reasons.append('Unsupported kind or output identity/units/frame/phase.'); continue
-                if index not in scope['sample_steps']:
-                    reasons.append('Sample precedes analysis start; no prior evidence supplied.'); continue
-                k = scope['sample_steps'][index]
-                try:
-                    base, matrix = _output_map(output, states[k], k, steps, u0, previous)
-                except ValueError as exc:
-                    reasons.append(str(exc)); continue
-                rows.append((c,index,k,np.asarray(reference),output,base,matrix)); indices.append(index)
-            result['coverage'].append(dict(constraint_id=c.constraint_id, analyzed_indices=indices,
-                unchecked_indices=[i for i in c.indices if i not in indices], reasons=sorted(set(reasons))))
-        result['full_requested_coverage'] = all(not c['unchecked_indices'] for c in result['coverage'])
+        scope, dynamics, initial, rows, lower, upper, scale = prepare_trajectory(
+            model, requirements, protocol, result, initial_delta)
         if not rows:
             result['reason'] = 'No compatible future sampled constraints.'; return result
-        lower, upper = np.tile(-u0, steps), np.tile(limits-u0, steps)
+        steps = scope['step_count']; u0 = np.asarray(model.u0); nu = len(u0)
         atol = protocol.endpoint_check_atol
-        result['physical_bounds_n'] = dict(lower=[0.]*nu, upper=limits.tolist(), nominal=u0.tolist())
-        result['initial_delta_state'] = initial.tolist()
-        scale = np.tile(np.asarray(model.input_scales, dtype=float), steps)
-        if scale.shape != lower.shape or np.any(scale <= 0) or not np.all(np.isfinite(scale)):
-            raise ValueError('INVALID_INPUT_SCALES')
         def objective(z): return float(protocol.period_s*np.sum((z/scale)**2))
         evaluations = dict(constraint=0, constraint_jacobian=0)
         def margins(z):

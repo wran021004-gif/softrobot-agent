@@ -75,7 +75,7 @@ def calculate(configuration,binding,query,exact_point=None,*,checkpoint=None,des
             operating_point=exact_point or dict(name=q.operating_point),task_acceptance='unmeasured',
             proxy_values={},internal_calculations=[],limitations=LIMITATIONS),requirements,applicability,q)
     envelope=plain(calculate_candidate_configuration(inp,binding,p,binding['configuration'],
-        operating_points=[q.operating_point],exact_point=exact_point,**({'checkpoint':checkpoint,'design_context':design_context,
+        operating_points=[q.operating_point],exact_point=exact_point,**({'checkpoint':checkpoint,'design_context':design_context if q.operation=='design_sensitivity' else None,
             'check_instantaneous_braking':q.operation=='instantaneous_braking_v1'} if sorosim else {})))
     rows=envelope['records'][1:]
     row=rows[0]
@@ -103,7 +103,7 @@ def calculate(configuration,binding,query,exact_point=None,*,checkpoint=None,des
         return scoped_result(result,requirements,applicability,q)
     if row.get('model'):
         model=EndpointLinearizedModel.model_validate(row['model'])
-        if q.operation == 'trajectory_feasibility':
+        if q.operation in ('trajectory_feasibility', 'task_capability'):
             point = dict(model.operating_point)
             if q.operating_point in ('standardized_initial_pretension','controller_start_input'):
                 point.update(actual_time_s=0., time_origin='frozen initializer via existing controller preparation')
@@ -152,11 +152,20 @@ def calculate(configuration,binding,query,exact_point=None,*,checkpoint=None,des
         result['proxy_values']['held_position_min_eigenvalue']=float(score)
         result['units']=metrics['units']
         internal.append(dict(purpose='local_linearization_and_gramian',solver=('SoRoSim MATLAB residual derivatives' if sorosim else 'CasADi AD')+' / SciPy scaled Van Loan and ZOH',windows_s=p.windows_s))
-    elif q.operation == 'trajectory_feasibility':
+    elif q.operation in ('trajectory_feasibility', 'task_capability'):
         from extensions.math_analysis.trajectory import trajectory_feasibility
-        trajectory=trajectory_feasibility(model,requirements,p)
+        if q.operation == 'task_capability':
+            from extensions.math_analysis.task_capability import task_capability
+            trajectory=task_capability(model,requirements,p)
+        else:
+            trajectory=trajectory_feasibility(model,requirements,p)
+        if q.capability_comparison is not None:
+            from tools.research.capability import compare_control_response
+            trajectory['structural_comparison']=compare_control_response(model,requirements,p,trajectory,design_context)
         result['trajectory']=trajectory
         records=trajectory.get('replay',{}).get('records',[])
+        if q.operation=='task_capability' and not trajectory.get('replay',{}).get('numerically_valid'):
+            records=[]
         for coverage in applicability['constraint_coverage']:
             actual=next((c for c in trajectory['coverage'] if c['constraint_id']==coverage['constraint_id']),None)
             if actual:
@@ -176,6 +185,10 @@ def calculate(configuration,binding,query,exact_point=None,*,checkpoint=None,des
             worst_violation=replay.get('worst_violation'),minimum_tension_margin_n=replay.get('minimum_tension_margin_n'))
         internal.append(dict(purpose='sampled_trajectory',solver=trajectory.get('solver'),
             certificate=trajectory.get('certificate',{}).get('kind') if trajectory.get('certificate') else None))
+        if q.operation=='task_capability':
+            internal[-1].update(starts=[{k:s.get(k) for k in ('success','status','iterations','elapsed_s','objective_evaluations')} for s in trajectory.get('starts',[])],
+                kernel_elapsed_s=trajectory.get('kernel_elapsed_s'),
+                fixed_control_replay_elapsed_s=trajectory.get('structural_comparison',{}).get('fixed_control',{}).get('kernel_elapsed_s'))
         result['units']=dict(position='m',speed='m/s',tension='N')
         result['limitations']=[s for s in result['limitations'] if 'holding-window compliance' not in s]+[
             'Only explicitly replay-verified samples in the frozen local affine model; no continuous-time, nonlinear, or backend acceptance.']
@@ -224,6 +237,11 @@ def scoped_result(result, requirements, applicability, query):
                     and math.isfinite(trajectory['certificate'].get('margin',float('nan'))) and trajectory['certificate']['margin']>0):
                 conclusion,verification='model_infeasibility_certificate','necessary_constraint_box_exclusion_verified'
                 interpretation='The identified necessary sampled constraint excludes the joint local-model task under the complete declared input box; other constraints need not be analyzed.'
+            if query.operation=='task_capability' and trajectory.get('replay',{}).get('numerically_valid'):
+                if conclusion=='inconclusive':
+                    verification='legal_input_and_signed_score_replay_checked'
+                    interpretation='A legal control and its signed sampled score were checked; no feasible witness or infeasibility proof found.'
+                interpretation+=' Optimal task violation and structural optimality remain unverified.'
         elif endpoint.get('status') == 'feasible_in_local_model' and endpoint.get('applied_input_n') and all(
                 checks.get(k) is True for k in ('finite','lower_bounds','upper_bounds','position','speed')):
             conclusion, verification = 'feasible_witness', 'kernel_independent_checks_passed'
@@ -283,11 +301,14 @@ def dispatch(host,query,key,*,guard,origin='model'):
         from extensions.tendon_family.sorosim_analysis import design_context
         sensitivity_context=design_context(c,verify_candidate(host,q.design_sensitivity.minus_candidate),
             verify_candidate(host,q.design_sensitivity.plus_candidate),q.design_sensitivity,q.protocol)
+    if q.capability_comparison is not None:
+        from tools.research.capability import comparison_context
+        sensitivity_context=comparison_context(host,c,q)
     s=state(host)
     protocol=plain(q.protocol)
     if protocol!=s['spec']['analysis_protocol'] or (q.scoring_window_s is not None and q.scoring_window_s not in protocol['windows_s']):
         raise ValueError('ANALYSIS_REQUIRES_DECLARED_FROZEN_PROTOCOL')
-    count=3 if q.operation=='design_sensitivity' else 1
+    count=3 if q.operation=='design_sensitivity' else 2 if q.capability_comparison is not None else 1
     fit=admission(host,requested=count,engineering=origin=='engineering_preflight')
     if fit['admitted']<count:
         raise ValueError('ANALYSIS_AND_CONFIRMATION_BUDGET_CANNOT_FIT')
@@ -457,6 +478,9 @@ def compact_result(value, reference):
             certificate={k:cert.get(k) for k in ('constraint_id','sample_index','kind','margin')} if cert else None))
     from tools.research.evidence_policy import summarize_evidence
     summary['evidence_summary']=summarize_evidence(value,reference)
+    if value.get('operation') == 'task_capability':
+        from tools.research.capability import capability_summary
+        summary['task_capability']=capability_summary(trajectory)
     if value.get('instantaneous_braking'):summary['instantaneous_braking']=value['instantaneous_braking']
     return {**{k:summary[k] for k in ('reference','stored_result_keys','control_handoff','static_input_observation',
         'input_response_observation','retrieval_note') if k in summary},**summary}
@@ -467,6 +491,8 @@ def decision_result(value, reference):
     claim=value.get('scoped_claim') or {}
     trajectory=value.get('trajectory') or {}
     replay=trajectory.get('replay') or {}
+    if value.get('operation')=='task_capability' and not replay.get('numerically_valid'):
+        replay={}
     constraints={c['constraint_id']:c for c in (value.get('task_analysis') or {}).get('constraints',[])}
     rows=[]
     for i,r in enumerate(replay.get('records',[])):
@@ -480,7 +506,10 @@ def decision_result(value, reference):
     # Prefer the kernel's worst normalized violation; otherwise retain a tight
     # sampled margin. Ranking only selects records, never recomputes their values.
     records=replay.get('records',[])
-    rows.sort(key=lambda r:(-records[int(r['source_pointer'].rsplit('/',1)[1])]['normalized_violation'],min(r['margin'])))
+    def rank(row):
+        record=records[int(row['source_pointer'].rsplit('/',1)[1])]
+        return (-record.get('signed_violation',record['normalized_violation']),min(row['margin']))
+    rows.sort(key=rank)
     conclusion=claim.get('conclusion','inconclusive')
     meanings={
         'feasible_witness':('Bounded local-model witness for checked samples.',
@@ -508,6 +537,9 @@ def decision_result(value, reference):
         failure_pointer='' if value.get('status') not in ('computed','not_applicable') else None)
     from tools.research.evidence_policy import summarize_evidence
     result['evidence_summary']=summarize_evidence(value,reference)
+    if value.get('operation') == 'task_capability':
+        from tools.research.capability import capability_summary
+        result['task_capability']=capability_summary(trajectory)
     if value.get('instantaneous_braking'):result['instantaneous_braking']=value['instantaneous_braking']
     return result
 

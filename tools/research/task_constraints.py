@@ -50,7 +50,7 @@ def check_analysis_applicability(requirements, query, assessment, model=None, ex
     if abs(p.period_s-requirements.physical_inputs['control_period_s']) > p.horizon_alignment_atol_s:
         reasons.append('Protocol period differs from the frozen physical input grid.')
     point = model.operating_point if model is not None else exact_point or {}
-    trajectory = query.operation == 'trajectory_feasibility'
+    trajectory = query.operation in ('trajectory_feasibility', 'task_capability')
     sampled = None
     if trajectory:
         from extensions.math_analysis.trajectory import time_scope
