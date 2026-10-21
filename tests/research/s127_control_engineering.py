@@ -65,6 +65,7 @@ def run():
     h=core.prepare(SPEC)
     if state(h)['research_status']=='stopped':raise ValueError('SEALED_ENGINEERING_STUDY_NO_RELAUNCH')
     if 'freeze' not in state(h):core.bind(h)
+    elif (OUT/'settings_repair.json').exists():core.bind(h,reason='Prelaunch search knot correction to original 0.35-second task horizon; existing baseline and all costs preserved')
     seed=state(h)['control_initializations'][0];candidate=seed['candidate'];source=seed['source']
     cfg=h.store.artifact(candidate)['configuration'];tr=h.store.artifact(source)['trajectory'];binding(cfg,tr)
     chosen=frozen['rows'][-1];measured,_=measured_nmpc_trajectory(original,chosen['execution'])
@@ -75,9 +76,10 @@ def run():
     baseline=act('physical_replay','PHYSICAL_VALIDATION','s127-open-loop-baseline',physical_replay=dict(candidate=candidate,source=source))
     result=h.store.artifact(baseline['reference']);search=None
     if task_gap(result)['valid_complete'] and not task_gap(result)['accepted']:
-        proposal=engineering_plan('control_search','CONTROL_SEARCH',candidate,control_search=dict(candidate=candidate,source=source,settings=frozen['settings']))
+        settings=read(OUT/'settings_repair.json')['settings'] if (OUT/'settings_repair.json').exists() else frozen['settings']
+        proposal=engineering_plan('control_search','CONTROL_SEARCH',candidate,control_search=dict(candidate=candidate,source=source,settings=settings))
         proposal['decision']['requested_budget']=3
-        search=core.dispatch(h,proposal,'s127-one-coefficient-response',origin='engineering')['result']
+        search=core.dispatch(h,proposal,'s127-one-coefficient-response-grid-corrected',origin='engineering')['result']
     s=state(h)
     for ref in s['physical_replays']:core.read_evidence(h,dict(reference=ref,pointer='/acceptance'))
     if s.get('success_gate'):act('select','SELECT','s127-select',selected_execution=s['success_gate']['evidence'],supporting_evidence=s['physical_replays'])
