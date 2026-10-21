@@ -59,7 +59,8 @@ async def run(authorization=None,*,offline=False):
             or approval.get('request_ceiling')!=6 or not approval.get('user_approval')):
             raise ValueError('INDEPENDENT_S127_4B_TRANSFER_AUTHORIZATION_REQUIRED')
     else:
-        raw['study_id']='s127-4b-fixture-20261021'
+        from uuid import uuid4
+        raw['study_id']='s127-4b-fixture-'+uuid4().hex[:8]
         # Keep dependencies adjacent through absolute references in the fixture leaf.
         for k in ('defaults','family_space','control','task'):
             raw[k]=str((SPEC.parent/raw[k]).resolve())
@@ -154,7 +155,15 @@ async def run(authorization=None,*,offline=False):
         assert all(state(h)['candidates'].get(k)==v for k,v in science.items())
         assert not pending(h) and state(h)['pending'] is None and not state(h)['pilot'].get('unconsumed_response')
         with h.store.connect(True) as db:assert db.execute('SELECT COUNT(*) FROM calls WHERE receipt IS NULL').fetchone()[0]==0
-        actions=[r for r in completed if r['phase']=='new' and r['name']=='research_plan' and r['action']!='stop']
+        actions=[]
+        for row in completed:
+            if row['phase']!='new' or row['name']!='research_plan':continue
+            value=h.store.artifact(row['value'])['result']
+            actual=(row['action']=='generate' and value.get('status')=='generated'
+                or row['action']=='initialize_control' and bool(value.get('source'))
+                or row['action']=='physical_replay' and bool(value.get('reference'))
+                and h.store.artifact(value['reference']).get('status')=='evaluated')
+            if actual:actions.append(row)
         result.update(offline_protocol_passed=offline,live_sdk_continuation_passed=not offline,
             live_scientific_action_passed=bool(actions) and not offline,real_tool_actions=completed,
             old_sdk_history_unchanged=True,cumulative_budget_continuous=True,no_unsettled_calls=True)

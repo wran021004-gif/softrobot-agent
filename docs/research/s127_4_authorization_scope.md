@@ -31,7 +31,21 @@
 
 ## B：独立 SDK 接续
 
-B 不包含在 A 的 12 次额度中；待独立新 Study、最多 6 次请求、低成本工具边界、
-数据范围和真实 SDK 持久化验证驱动冻结后单独申请。不得复用 A 或历史授权。
+B 不包含在 A 的 12 次额度中。[B 冻结范围](../../evidence/s127_4_handoff/scope.json)
+和 `configs/research/study_s127_4_handoff.json` 定义独立新 Study，最多 6 次
+同一 endpoint/model 的请求，每次最多 8192 输出 tokens，零重试。
+最多 40 次公共工具操作，数学/NMPC/PPO 为零；共享最多 2 次小型固定输入物理启动。
+Agent 可选结构生成、显式控制初始化、固定输入评价、证据读取或 STOP，
+每个 SDK invocation 最多执行一项科研动作；达到验证目标即结束，不消费剩余额度。
+
+传输仅限该新 Study 的任务/设计域、自产候选/控制、预算和结果，
+`research_plan`/`evidence_read` Schema，以及本 invocation 必需的完整推理和工具回合。
+新会话只装入权威交接工作集，不拷贝旧 tool-use/tool-result 历史。
+不导入 S12.6 数据或授权，不发送无关文件和凭证内容，不上传原始 SDK/Store/对话。
+
+离线驱动已使用真实 Strands Harness、SDK 文件存储、独立重开、原子指针提交，
+并通过正式工具实际生成候选和初始化控制；HTTP 和决策是明确的合成 fixture，
+不能作为真实 DeepSeek 科研决策证据。B 的 live 两项及生产准入仍为 false。
+生产 `--session-handoff` 门禁保持原样，未修改任何生产批准标志。
 
 未获授权仍完成所有离线恢复、控制分析与可执行工程验证。
