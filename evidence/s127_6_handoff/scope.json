@@ -1,0 +1,28 @@
+{
+  "stage": "S12.7.6B",
+  "spec_identity": "6f4f77a6427d1edae54b1a41837bda4bdf60c7e08990368e35073d2e09739283",
+  "runtime_identity": "f453931bc668e57bd4f5e07f872218825f8d1ade8383bf4cc4c365f9fd96c5fc",
+  "endpoint": "https://api.deepseek.com/chat/completions",
+  "model": "deepseek-flash",
+  "thinking": "enabled",
+  "reasoning_effort": "high",
+  "max_output_tokens": 65536,
+  "request_ceiling": 12,
+  "automatic_retries": 0,
+  "new_physical_ceiling": 2,
+  "mathematics": 0,
+  "nmpc": 0,
+  "ppo": 0,
+  "scientific_actions": [
+    "generate",
+    "initialize_control",
+    "physical_replay",
+    "stop"
+  ],
+  "new_session_scientific_action_ceiling": 1,
+  "transfer_scope": "Only new isolated original Reach task/FamilySpace, generated candidates/controls, own tool feedback/evidence/budgets and research_plan/evidence_read schemas. Existing S12/S12.6/S12.7 experiments are excluded. Own old-session history retains full reasoning/tool IDs within its invocation. New SDK session receives authoritative handoff, never copied old chat. Own raw physical samples may be read if the model chooses one of at most two fixed-input evaluations.",
+  "local_archive": "Complete request/response bytes, reasoning, Store and SDK snapshots remain under ignored runs/research/s127-6b-sdk-20261021. No raw transcript upload to GitHub.",
+  "publication_scope": "Code/configuration, derived metrics, hashes and precise references only.",
+  "status": "awaiting_independent_authorization",
+  "independent_authorization_required": true
+}

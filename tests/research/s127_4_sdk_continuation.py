@@ -47,28 +47,30 @@ def prepare():
     return scope
 
 
-async def run(authorization=None,*,offline=False):
+async def run(authorization=None,*,offline=False,spec_path=SPEC,out=OUT,stage='S12.7.4B'):
     from strands.hooks import BeforeModelCallEvent,BeforeToolCallEvent,AfterToolCallEvent
     from strands.tools.executors import SequentialToolExecutor
     from strands.tools.tools import PythonAgentTool
-    scope=read(OUT/'scope.json');raw=read(SPEC)
+    scope=read(out/'scope.json');raw=read(spec_path)
     if digest(raw)!=scope['spec_identity']:raise ValueError('FROZEN_B_SPEC_CHANGED')
+    if scope.get('runtime_identity') and digest(read((spec_path.parent/raw['runtime']).resolve()))!=scope['runtime_identity']:
+        raise ValueError('FROZEN_B_RUNTIME_CHANGED')
     if not offline:
         approval=read(authorization) if authorization else {}
-        if (approval.get('stage')!='S12.7.4B' or approval.get('scope_identity')!=digest(scope)
-            or approval.get('request_ceiling')!=6 or not approval.get('user_approval')):
-            raise ValueError('INDEPENDENT_S127_4B_TRANSFER_AUTHORIZATION_REQUIRED')
+        if (approval.get('stage')!=stage or approval.get('scope_identity')!=digest(scope)
+            or approval.get('request_ceiling')!=scope['request_ceiling'] or not approval.get('user_approval')):
+            raise ValueError('INDEPENDENT_'+stage.replace('.','_')+'_TRANSFER_AUTHORIZATION_REQUIRED')
     else:
         from uuid import uuid4
         raw['study_id']='s127-4b-fixture-'+uuid4().hex[:8]
         # Keep dependencies adjacent through absolute references in the fixture leaf.
         for k in ('defaults','family_space','control','task'):
-            raw[k]=str((SPEC.parent/raw[k]).resolve())
-        fixture=SPEC.parent/'._s127_4_sdk_fixture.json';atomic_json(fixture,raw)
+            raw[k]=str((spec_path.parent/raw[k]).resolve())
+        fixture=spec_path.parent/'._s127_4_sdk_fixture.json';atomic_json(fixture,raw)
     from tools.platform_host import Host
     study=raw['study_id'];directory=ROOT/'runs/research'/study
     if (directory/'store.sqlite3').exists() or directory.exists():raise ValueError('EXISTING_B_GRANT_NO_AUTOMATIC_RESEND')
-    try:h=core.prepare(fixture if offline else SPEC)
+    try:h=core.prepare(fixture if offline else spec_path)
     finally:
         if offline:fixture.unlink()
     core.bind(h)
@@ -105,6 +107,7 @@ async def run(authorization=None,*,offline=False):
             return await super().handle_async_request(request)
     boundary=ScopedBoundary(h,httpx.MockTransport(synthetic) if offline else None)
     def execute(use,**kwargs):
+        before=deepcopy(state(h))
         try:
             if use['name']=='research_plan':value=core.dispatch(h,use['input'],'native-'+use['toolUseId'])
             else:
@@ -119,7 +122,8 @@ async def run(authorization=None,*,offline=False):
             if reserved and not reserved['receipt']:
                 h.store.complete(reserved,dict(request_id=key,execution_id=reserved['execution_id'],caller=h.actor,
                     tool_id=use['name'],tool_version='1.0.0',execution_status='failed',charged=zero()),dict(error=str(exc)))
-            return dict(toolUseId=use['toolUseId'],status='error',content=[dict(text=json.dumps(dict(error=str(exc))))])
+            from tools.research.agent import error_feedback
+            return dict(toolUseId=use['toolUseId'],status='error',content=[dict(text=json.dumps(error_feedback(h,use,exc,before)))])
     tools=[PythonAgentTool(name,dict(name=name,description=description,inputSchema={'json':schema}),execute)
         for name,description,schema in [('research_plan','Execute one legal bounded scientific Plan or STOP',plan_schema(raw['allowed_plan_actions'],decision_required=True)),
             ('evidence_read','Read own exact immutable evidence',EvidenceQuery.model_json_schema())]]
@@ -154,13 +158,24 @@ async def run(authorization=None,*,offline=False):
         await agent.invoke_async('Inspect the authoritative current state, choose one useful legal action or STOP, consume its feedback, then conclude this invocation.')
         record(h,'model_original_turn',dict(session_id=agent._session_manager.session_id,sdk_message_identity=digest(agent.messages)))
         await agent._session_manager.save_snapshot(agent,is_latest=True)
-    result=dict(stage='S12.7.4B',mode='synthetic_protocol_fixture' if offline else 'live',study_id=study,
+    result=dict(stage=stage,mode='synthetic_protocol_fixture' if offline else 'live',study_id=study,
         offline_protocol_passed=False,live_sdk_continuation_passed=False,live_scientific_action_passed=False,
         production_recovery_validated=False,production_handoff_admitted=False)
+    def scientific_actions(which):
+        actions=[]
+        for row in completed:
+            if row['phase']!=which or row['name']!='research_plan':continue
+            value=h.store.artifact(row['value'])['result']
+            if (row['action']=='generate' and value.get('status')=='generated'
+                or row['action']=='initialize_control' and bool(value.get('source'))
+                or row['action']=='physical_replay' and bool(value.get('reference'))
+                and h.store.artifact(value['reference']).get('status')=='evaluated'):actions.append(row)
+        return actions
     try:
         old=build();await invoke(old)
         old_messages=deepcopy(old.messages);ledger=deepcopy(h.store.remaining());science=deepcopy(state(h)['candidates'])
-        result['old_complete_tool_round']=bool(completed) and not unmatched(old.messages) and old.messages[-1]['role']=='assistant'
+        result['old_complete_tool_round']=bool(scientific_actions('old')) and not unmatched(old.messages) and old.messages[-1]['role']=='assistant'
+        result['live_old_tool_round_passed']=not offline and result['old_complete_tool_round']
         if not result['old_complete_tool_round'] or state(h)['research_status']=='stopped':
             result['reason']='Old invocation did not establish a complete continuing tool boundary';return result
         ref,new=await handoff(h,old,build,directory/'sdk')
@@ -175,15 +190,7 @@ async def run(authorization=None,*,offline=False):
         assert all(state(h)['candidates'].get(k)==v for k,v in science.items())
         assert not pending(h) and state(h)['pending'] is None and not state(h)['pilot'].get('unconsumed_response')
         with h.store.connect(True) as db:assert db.execute('SELECT COUNT(*) FROM calls WHERE receipt IS NULL').fetchone()[0]==0
-        actions=[]
-        for row in completed:
-            if row['phase']!='new' or row['name']!='research_plan':continue
-            value=h.store.artifact(row['value'])['result']
-            actual=(row['action']=='generate' and value.get('status')=='generated'
-                or row['action']=='initialize_control' and bool(value.get('source'))
-                or row['action']=='physical_replay' and bool(value.get('reference'))
-                and h.store.artifact(value['reference']).get('status')=='evaluated')
-            if actual:actions.append(row)
+        actions=scientific_actions('new')
         new_requests=state(h)['pilot']['live_model_requests']-before_new_requests
         continued=new_requests>0 and new.messages[-1]['role']=='assistant'
         assert len(actions)<=1
@@ -191,10 +198,14 @@ async def run(authorization=None,*,offline=False):
             live_scientific_action_passed=bool(actions) and not offline and continued,new_session_requests=new_requests,real_tool_actions=completed,
             old_sdk_history_unchanged=True,cumulative_budget_continuous=True,no_unsettled_calls=True)
         return result
+    except Exception as exc:
+        result.update(status='blocked',error_type=type(exc).__name__,reason=str(exc),
+            provider_diagnostic=getattr(exc,'diagnostic',None))
+        raise
     finally:
         result.update(ledger=h.store.remaining(),new_provider_requests=0 if offline else state(h)['pilot']['live_model_requests'],
             synthetic_http_requests=fixture_requests if offline else 0,physics=state(h).get('physical_replay_launches',0))
-        atomic_json(OUT/('offline.json' if offline else 'live.json'),result)
+        atomic_json(out/('offline.json' if offline else 'live.json'),result)
         await boundary.aclose()
 
 

@@ -1,0 +1,184 @@
+{
+  "status": "offline_prepared_live_authorization_pending",
+  "verified_date": "2026-10-21",
+  "official_sources": [
+    "https://api-docs.deepseek.com/api/create-chat-completion/",
+    "https://api-docs.deepseek.com/quick_start/pricing/",
+    "https://api-docs.deepseek.com/guides/thinking_mode/"
+  ],
+  "official_limits": {
+    "model": "deepseek-flash",
+    "context": "1M",
+    "maximum_output_tokens": 393216,
+    "thinking_default_output": 65536
+  },
+  "production_runtime_unchanged_max_tokens": 32768,
+  "validation_provider": {
+    "adapter": "deepseek",
+    "adapter_version": "8.0.0",
+    "base_url": "https://api.deepseek.com",
+    "context_bytes": 4194304,
+    "context_guard": {
+      "context_limit_tokens": 1000000,
+      "estimate": "one token per serialized UTF-8 byte plus framing; conservative estimate, not tokenization",
+      "framing_headroom_tokens": 8192,
+      "source": "https://api-docs.deepseek.com/quick_start/pricing/",
+      "verified_date": "2026-10-03"
+    },
+    "investigation_max_tokens": 32768,
+    "max_no_progress": 3,
+    "max_repairs": 10,
+    "max_tokens": 65536,
+    "max_turns": 40,
+    "model": "deepseek-flash",
+    "parameters": {},
+    "protocol_recovery": {
+      "max_consecutive": 40,
+      "max_total": 40
+    },
+    "reasoning_effort": "high",
+    "strategy": "strategy.tool",
+    "strategy_version": "1.0.0",
+    "supports_images": false,
+    "supports_text": true,
+    "supports_tools": true,
+    "thinking": "enabled",
+    "timeout_s": 600.0
+  },
+  "capacities": [
+    {
+      "name": "candidate_without_results",
+      "arm": "full",
+      "serialized_utf8_bytes": 70417,
+      "max_output_tokens": 65536,
+      "framing_headroom": 8192,
+      "conservative_total_capacity_estimate": 144145,
+      "context_limit_tokens": 1000000,
+      "fits": true,
+      "actual_tokens": null
+    },
+    {
+      "name": "candidate_without_results",
+      "arm": "layered",
+      "serialized_utf8_bytes": 60291,
+      "max_output_tokens": 65536,
+      "framing_headroom": 8192,
+      "conservative_total_capacity_estimate": 134019,
+      "context_limit_tokens": 1000000,
+      "fits": true,
+      "actual_tokens": null
+    },
+    {
+      "name": "same_candidate_failed_controls",
+      "arm": "full",
+      "serialized_utf8_bytes": 150818,
+      "max_output_tokens": 65536,
+      "framing_headroom": 8192,
+      "conservative_total_capacity_estimate": 224546,
+      "context_limit_tokens": 1000000,
+      "fits": true,
+      "actual_tokens": null
+    },
+    {
+      "name": "same_candidate_failed_controls",
+      "arm": "layered",
+      "serialized_utf8_bytes": 86294,
+      "max_output_tokens": 65536,
+      "framing_headroom": 8192,
+      "conservative_total_capacity_estimate": 160022,
+      "context_limit_tokens": 1000000,
+      "fits": true,
+      "actual_tokens": null
+    },
+    {
+      "name": "complete_nmpc_residual_reference",
+      "arm": "full",
+      "serialized_utf8_bytes": 160913,
+      "max_output_tokens": 65536,
+      "framing_headroom": 8192,
+      "conservative_total_capacity_estimate": 234641,
+      "context_limit_tokens": 1000000,
+      "fits": true,
+      "actual_tokens": null
+    },
+    {
+      "name": "complete_nmpc_residual_reference",
+      "arm": "layered",
+      "serialized_utf8_bytes": 85072,
+      "max_output_tokens": 65536,
+      "framing_headroom": 8192,
+      "conservative_total_capacity_estimate": 158800,
+      "context_limit_tokens": 1000000,
+      "fits": true,
+      "actual_tokens": null
+    }
+  ],
+  "capacity_scope": "Serialized UTF-8 byte count is a conservative guard estimate, not actual tokens. Reserve max output and framing on every new send. Provider usage remains authoritative.",
+  "sdk_context": {
+    "offload": "tool_results truncate, preview_tokens=500 above threshold=1500; no auxiliary model calls",
+    "reasoning": "All assistant reasoning_content retained by DeepSeekModel.format_request_messages; no history deletion",
+    "session": "Continuous Strands default; handoff production gate closed pending actual live validation"
+  },
+  "historical_usage": {
+    "study_id": "s126-cold-live-20261020",
+    "state_identity": "d366a9a2791a6d35d881ca5c11bf82c182e03c38b912536ce8b900dfb071b5f3",
+    "ledger": {
+      "limit": {
+        "backend_solves": 64,
+        "model_calls": 48,
+        "tool_calls": 200,
+        "wall_s": null,
+        "worker_calls": 0
+      },
+      "used": {
+        "tool_calls": 52,
+        "model_calls": 43,
+        "backend_solves": 8,
+        "worker_calls": 0,
+        "wall_s": 1178.855309199309
+      },
+      "remaining": {
+        "backend_solves": 56,
+        "model_calls": 5,
+        "tool_calls": 148,
+        "wall_s": null,
+        "worker_calls": 0
+      },
+      "occupied": {}
+    },
+    "method_counts": {
+      "mathematical_evaluations": 1,
+      "offline_nlp": 0,
+      "bdf_replays": 0,
+      "nmpc_launches": 2,
+      "physical_replay_launches": 6,
+      "admitted_training_stages": 0
+    },
+    "scientific_executions_are_not_new_s128_evidence": true
+  },
+  "s128_proposal": {
+    "status": "discussion_only_requires_new_separate_authorization",
+    "provider_requests": 96,
+    "protected_provider_requests": 8,
+    "public_operations": 300,
+    "protected_public_operations": 20,
+    "shared_physical_launches": 64,
+    "mathematical_evaluations": 8,
+    "offline_nlp": 4,
+    "bdf_replays": 4,
+    "nmpc_executions": 4,
+    "ppo_training_stages": 2,
+    "ppo_total_actions": 131072,
+    "ppo_actions_per_trial": 65536,
+    "rl_evaluation_episodes": 2,
+    "max_tokens": 65536,
+    "context_limit_tokens": 1000000,
+    "session_strategy": "Continuous Strands until live handoff formally admitted",
+    "methods": "All original structure/mathematics/NLP/NMPC/explicit control/response/pattern/Direct PPO/Residual PPO entries remain optional",
+    "initial_state": "New Study ID, Store and SDK; empty experiments/mathematics/control seeds/external scientific evidence",
+    "task": "tasks/reach_hold_mirror_v1.json unchanged; original independent MuJoCo acceptance"
+  },
+  "new_provider_requests": 0,
+  "new_physical_launches": 0,
+  "new_s128_study_started": false
+}

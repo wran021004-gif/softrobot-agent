@@ -1,0 +1,33 @@
+{
+  "stage": "S12.7.6A",
+  "manifest_identity": "311acbde20f669cb9f51e06df9896a0bfa014e0bb6c8fa2ee8a5e6938f024242",
+  "endpoint": "https://api.deepseek.com/chat/completions",
+  "model": "deepseek-flash",
+  "thinking": "enabled",
+  "reasoning_effort": "high",
+  "max_output_tokens": 65536,
+  "request_ceiling": 18,
+  "automatic_retries": 0,
+  "new_numerical_executions": 0,
+  "pairs": [
+    {
+      "name": "candidate_without_results",
+      "rounds_per_arm": 3
+    },
+    {
+      "name": "same_candidate_failed_controls",
+      "rounds_per_arm": 3
+    },
+    {
+      "name": "complete_nmpc_residual_reference",
+      "rounds_per_arm": 3
+    }
+  ],
+  "transfer_scope": "Three cutoff project scientific states (legal candidate without results, completed physical failures, completed failed NMPC), original task/domain/control and method contracts, registered evidence, budgets and Store-derived views. Both arms have the same task, tools, initial scientific state and budget. The layered arm adds compact citation eligibility. Actual evidence_read may expose original raw physical samples and measured NMPC arrays reachable at the cutoff. No later results, unrelated files or credentials.",
+  "history_scope": "No old chat history. Within each new three-request arm, transmit its own complete assistant reasoning/tool IDs and actual tool feedback unchanged. Never transfer history between arms.",
+  "local_archive": "Full request/response bytes, reasoning and feedback only under ignored runs/s127-6a-decision-20261021 and the local frozen Store recorded in manifest.json. No raw transcript upload.",
+  "admission_scope": "Original typed contracts and real scientific preflight run in disposable local replicas. Numerical workers are intercepted without fabricated outputs. An intercepted early entry is reported separately from full prelaunch admission.",
+  "publication_scope": "Code, derived usage/check statistics, hashes and precise references only.",
+  "status": "awaiting_independent_authorization",
+  "independent_authorization_required": true
+}
