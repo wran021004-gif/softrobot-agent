@@ -73,5 +73,70 @@ def probe_inventory():
         metrics='No actual prompt/completion/cache tokens, legal proposal rates, evidence delivery counts or decision degradation measurements exist. Bytes are not tokens.'))
 
 
+def s1274_decision():
+    """Summarize actual provider usage; never write historical S12.7 evidence."""
+    from tools.platform_host import Host
+    from tools.research.agent import received
+    folder=ROOT/'evidence/s127_4_decision';result=read(folder/'results.json')
+    h=Host(ROOT/'runs/s127-4a-decision-20261021','s127-4a-decision-20261021')
+    manifest=read(ROOT/'evidence/s127_decision_probe/manifest.json')
+    fields=('prompt_tokens','completion_tokens','total_tokens','prompt_cache_hit_tokens','prompt_cache_miss_tokens')
+    records=[]
+    for row in result['cases']:
+        reception=received(h,row['request_id']);body=json.loads(h.store.artifact(reception['body'],raw=True))
+        assert body['usage']==row['usage']
+        wire=next(c for c in manifest['cases'] if c['name']==row['name'] and c['arm']==row['arm'])
+        choices=[]
+        for call,check in zip(body['choices'][0]['message'].get('tool_calls',[]),row['checks']):
+            q=json.loads(call['function']['arguments']);kind=call['function']['name']
+            choices.append(dict(tool=kind,action=q.get('action'),analysis=q.get('operation'),
+                rl_mode=q.get('mode'),evidence_view=q.get('view') if kind=='evidence_read' else None,
+                pointer=q.get('pointer') if kind=='evidence_read' else None,
+                partial_checks=check['contract_and_reference_checks'],rejection=check.get('error'),
+                full_scientific_admission='not_tested'))
+        records.append(dict(name=row['name'],arm=row['arm'],request_id=row['request_id'],provider_response_id=row['provider_response_id'],
+            actual_model=row['actual_model'],raw_body_reference=reception['body'],wire_identity=wire['identity'],
+            schema_identity=row['tool_schema_identity'],usage=row['usage'],tools=choices,
+            reasoning_tokens=row['usage'].get('completion_tokens_details',{}).get('reasoning_tokens'),
+            finish_reason=body['choices'][0].get('finish_reason'),truncated=body['choices'][0].get('finish_reason')=='length',
+            effective_new_evidence_deliveries=0,
+            legal_scientific_proposal='not_tested',remaining_preconditions='Only contract/reference/budget subset checked. Actual construction, scientific ownership/admission and worker-specific prerequisites remain untested unless a read was actually performed locally.'))
+    def totals(rows):
+        return {arm:dict(requests=len(chosen),**{key:sum(r['usage'][key] for r in chosen)
+            if chosen and all(r['usage'].get(key) is not None for r in chosen) else None for key in fields},
+            reasoning_tokens=sum(r['reasoning_tokens'] for r in chosen) if chosen and all(r['reasoning_tokens'] is not None for r in chosen) else None,
+            truncated_requests=sum(r['truncated'] for r in chosen),
+            evidence_read_requests=sum(c['tool']=='evidence_read' for r in chosen for c in r['tools']),
+            working_set_read_requests=sum(c['tool']=='evidence_read' and c['evidence_view']=='working_set' for r in chosen for c in r['tools']),
+            partial_check_rejections=sum(c['partial_checks']=='rejected' for r in chosen for c in r['tools']),
+            partially_checked_plan_proposals=sum(c['tool']=='research_plan' and c['partial_checks']=='passed' for r in chosen for c in r['tools']),
+            full_scientific_admission='not_tested',effective_new_evidence_deliveries=0,
+            unnecessary_detail_reads=None,critical_scientific_fact_omissions=None)
+            for arm in ('s127_full','layered') for chosen in [[r for r in rows if r['arm']==arm]]}
+    main=totals([r for r in records if r['name']!='independent_session_boundary'])
+    pairs=[]
+    for name in dict.fromkeys(r['name'] for r in records):
+        pair=[r for r in records if r['name']==name]
+        if len(pair)!=2:continue
+        a,b=pair
+        pairs.append(dict(name=name,experiment='separate_session_condition' if name=='independent_session_boundary' else 'layered_context_pair',
+            tokens={r['arm']:r['usage'] for r in pair},
+            prompt_token_reduction=a['usage']['prompt_tokens']-b['usage']['prompt_tokens'],
+            total_token_reduction=a['usage']['total_tokens']-b['usage']['total_tokens']))
+    report=dict(status=result['status'],actual_requests=len(records),request_ceiling=12,cases=records,pairs=pairs,
+        compression_only=main,all_six_pairs_descriptive=totals(records),
+        separate_session_condition=totals([r for r in records if r['name']=='independent_session_boundary']),
+        ledger=result['ledger'],new_scientific_executions=0,
+        limitation='Six fixed states, one request per arm, no follow-up evidence feedback. Only first-request token cost and partial admission observed. No adaptive retrieval net-cost, complete scientific legality rate, factual non-degradation or study success-rate conclusion.',
+        money_usd=None,source='Actual DeepSeek usage fields; no byte-to-token substitution or synthetic usage.')
+    atomic_json(folder/'metrics.json',report)
+    return report
+
+
 if __name__=='__main__':
-    result=layered();probe_inventory();print(json.dumps({k:v for k,v in result.items() if k.endswith('_bytes')}))
+    import argparse
+    parser=argparse.ArgumentParser();parser.add_argument('--s1274-decision',action='store_true');args=parser.parse_args()
+    if args.s1274_decision:
+        result=s1274_decision();print(json.dumps(dict(status=result['status'],actual_requests=result['actual_requests'],totals=result['compression_only'])))
+    else:
+        result=layered();probe_inventory();print(json.dumps({k:v for k,v in result.items() if k.endswith('_bytes')}))

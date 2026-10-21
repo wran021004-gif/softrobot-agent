@@ -13,6 +13,32 @@ def size(value):return len(json.dumps(value,ensure_ascii=False,separators=(',','
 
 
 class LayeredContextTests(unittest.TestCase):
+    def test_truncated_probe_response_replays_without_resend_or_native_submission(self):
+        import asyncio
+        import httpx
+        from tools.research.agent import LiveBoundary
+        from tests.research.test_s125_contract import cold_host
+        h=cold_host();provider=state(h)['pilot']['provider'];sent=[]
+        wire=dict(model=provider['model'],thinking=dict(type=provider['thinking']),reasoning_effort=provider['reasoning_effort'],
+            max_tokens=provider['max_tokens'],stream=False,messages=[dict(role='user',content='Synthetic truncated fixture')])
+        def reply(request):
+            sent.append(request)
+            return httpx.Response(200,json=dict(choices=[dict(finish_reason='length',message=dict(role='assistant',content='',reasoning_content='fixture'))],
+                usage=dict(prompt_tokens=10,completion_tokens=8192,total_tokens=8202)))
+        async def exercise():
+            first=LiveBoundary(h,httpx.MockTransport(reply));request=lambda:httpx.Request('POST',provider['base_url']+'/chat/completions',json=wire)
+            with self.assertRaisesRegex(ValueError,'LENGTH_TRUNCATED'):await first.handle_async_request(request())
+            before=h.store.remaining()
+            def forbidden(request):raise AssertionError('NO_RESEND')
+            recovery=LiveBoundary(h,httpx.MockTransport(forbidden),allow_truncated_response=True)
+            response=await recovery.handle_async_request(request())
+            self.assertEqual(response.json()['choices'][0]['finish_reason'],'length')
+            self.assertEqual(h.store.remaining(),before);recovery.consumed()
+            self.assertNotIn('unconsumed_response',state(h)['pilot'])
+            self.assertEqual(len(sent),1)
+            await first.aclose();await recovery.aclose()
+        asyncio.run(exercise())
+
     def test_s127_4_frozen_scope_and_real_detail_read_do_not_dispatch(self):
         from unittest.mock import patch
         from tools.platform_host import Host

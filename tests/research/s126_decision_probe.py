@@ -326,7 +326,7 @@ def check_s127(host,call):
     return {k:v for k,v in checked.items() if k!='request'}
 
 
-async def live_s127(authorization):
+async def live_s127(authorization,*,resume=False):
     import httpx
     from tools.platform_host import Host
     from schemas.platform import ProjectConfig
@@ -338,27 +338,47 @@ async def live_s127(authorization):
         raise ValueError('INDEPENDENT_S127_4A_TRANSFER_AUTHORIZATION_REQUIRED')
     manifest=read(ROOT/'evidence/s127_decision_probe/manifest.json');source=Host(manifest['store'],manifest['run_id'])
     run='s127-4a-decision-20261021';h=Host(ROOT/'runs'/run,run)
-    if h.store.db.exists():raise ValueError('EXISTING_LIVE_GRANT_NO_AUTOMATIC_RESEND')
-    h.store.create(ProjectConfig(project_id=run,grant_id=run,authorization_source=approval['user_approval'],
-        budget=dict(model_calls=12,tool_calls=0,backend_solves=0,worker_calls=0,wall_s=None),exclusive_resources={'provider_request':1}))
-    original=state(source);cfg=deepcopy(original['base_configuration']);cfg['run_id']=run;h.create(cfg);h.resume()
-    provider=deepcopy(original['pilot']['provider']);provider['max_tokens']=8192
-    update(h,pilot=dict(provider=provider,live_model_requests=0))
+    original=state(source);results=[]
+    if h.store.db.exists():
+        if not resume:raise ValueError('EXISTING_LIVE_GRANT_NO_AUTOMATIC_RESEND')
+        from tools.research.agent import pending,received
+        if pending(h):raise ValueError('UNKNOWN_SEND_BLOCKS_PROBE_CONTINUATION')
+        sent=[e for e in h.store.events(run) if e['kind']=='r3_request']
+        if len(sent)>12 or h.store.remaining()['limit']['model_calls']!=12:raise ValueError('FROZEN_COUNT_MISMATCH')
+        for event,case in zip(sent,manifest['cases']):
+            wire=h.store.artifact(h.store.artifact(event['outputs'][0])['request'])
+            if digest(wire)!=case['identity'] or not received(h,event['request_id']):raise ValueError('EXACT_CONFIRMED_PREFIX_REQUIRED')
+        results=read(S127_OUT/'results.json')['cases']
+        if len(results)>len(sent):raise ValueError('RESULTS_EXCEED_CONFIRMED_SENDS')
+        for row,event,case in zip(results,sent,manifest['cases']):
+            if row['request_id']!=event['request_id'] or row['wire_identity']!=case['identity']:raise ValueError('EXACT_RESULT_PREFIX_REQUIRED')
+        # A response received before local result registration must remain replayable.
+        if len(sent)>len(results) and (len(sent)!=len(results)+1 or state(h)['pilot'].get('unconsumed_response')!=sent[-1]['request_id']):
+            raise ValueError('CONFIRMED_UNCONSUMED_RESPONSE_REQUIRED')
+    else:
+        if resume:raise ValueError('EXISTING_PROBE_REQUIRED')
+        h.store.create(ProjectConfig(project_id=run,grant_id=run,authorization_source=approval['user_approval'],
+            budget=dict(model_calls=12,tool_calls=0,backend_solves=0,worker_calls=0,wall_s=None),exclusive_resources={'provider_request':1}))
+        cfg=deepcopy(original['base_configuration']);cfg['run_id']=run;h.create(cfg);h.resume()
+        provider=deepcopy(original['pilot']['provider']);provider['max_tokens']=8192
+        update(h,pilot=dict(provider=provider,live_model_requests=0))
     load_credential(Path(original['spec']['runtime']['credentials_reference']).expanduser())
-    boundary=LiveBoundary(h);results=[]
+    # Truncated decisions are counted as failures, never native submissions.
+    boundary=LiveBoundary(h,allow_truncated_response=True)
     try:
-        for case in manifest['cases']:
+        for case in manifest['cases'][len(results):]:
             wire=source.store.artifact(case['request']);assert digest(wire)==case['identity']
             response=await boundary.handle_async_request(httpx.Request('POST',scope['endpoint']+'/chat/completions',json=wire,
                 headers={'Authorization':'Bearer '+os.environ['DEEPSEEK_API_KEY']},extensions={'timeout':dict(connect=30,read=600,write=30,pool=30)}))
             response.raise_for_status();body=response.json();message=body['choices'][0]['message']
             frozen=frozen_s127(source,case)
-            checks=[check_s127(frozen,c) for c in message.get('tool_calls',[])]
+            truncated=body['choices'][0].get('finish_reason')=='length'
+            checks=[] if truncated else [check_s127(frozen,c) for c in message.get('tool_calls',[])]
             raw=record(h,'s127_4a_local_checks',dict(case=case['name'],arm=case['arm'],checks=checks))
             results.append(dict(name=case['name'],arm=case['arm'],request_id=boundary.last_request,
                 provider_response_id=body.get('id'),actual_model=body.get('model'),request_model=wire['model'],
                 wire_identity=case['identity'],tool_schema_identity=digest(wire['tools']),raw_checks_reference=raw,
-                usage=body.get('usage'),checks=checks,full_execution_admission='not_tested',
+                usage=body.get('usage'),checks=checks,truncated=truncated,full_execution_admission='not_tested',
                 effective_new_evidence_deliveries=0,unnecessary_detail_reads=None,critical_fact_omissions=None))
             boundary.consumed()
             atomic_json(S127_OUT/'results.json',dict(status='partial' if len(results)<12 else 'completed',cases=results,
@@ -370,9 +390,9 @@ async def live_s127(authorization):
 if __name__=='__main__':
     import argparse
     parser=argparse.ArgumentParser();parser.add_argument('--authorization',type=Path);parser.add_argument('--prepare-s127',action='store_true')
-    parser.add_argument('--audit-s127',action='store_true');parser.add_argument('--s127-authorization',type=Path);args=parser.parse_args()
+    parser.add_argument('--audit-s127',action='store_true');parser.add_argument('--s127-authorization',type=Path);parser.add_argument('--resume-s127',action='store_true');args=parser.parse_args()
     if args.audit_s127:print(json.dumps(audit_s127()))
-    elif args.s127_authorization:asyncio.run(live_s127(args.s127_authorization))
+    elif args.s127_authorization:asyncio.run(live_s127(args.s127_authorization,resume=args.resume_s127))
     elif args.prepare_s127:print(json.dumps(prepare_s127()))
     elif args.authorization:asyncio.run(live(args.authorization))
     else:print(json.dumps(prepare()))
