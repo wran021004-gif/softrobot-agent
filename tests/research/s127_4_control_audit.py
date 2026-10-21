@@ -67,7 +67,11 @@ def audit():
     other=[]
     for path in ('evidence/control_search_p1/summary.json','evidence/s12_mirror/summary.json'):
         value=read(ROOT/path)
-        other.append(dict(path=path,identity=digest(value),
+        best=value.get('best') or {}
+        other.append(dict(path=path,identity=digest(value),original_task_passed=value.get('original_task_passed'),
+            best_task_gap=best.get('task_gap'),
+            methods=[dict(algorithm=m['algorithm'],initial_gap=m['candidates'][0]['task_gap'],best_gap=m['best']['task_gap'])
+                for m in value.get('methods',[])],
             scope='Four-tendon algorithm capability reference only; different candidate/task, not a six-tendon Jacobian'))
     result=dict(stage='S12.7.4C',source_study=h.run_id,source_status='stopped',candidate=base['candidate'],
         baseline_source=base['source_reference'],probe_source=probe['source_reference'],task_options=opt,

@@ -126,6 +126,9 @@ def s1274_decision():
     report=dict(status=result['status'],actual_requests=len(records),request_ceiling=12,cases=records,pairs=pairs,
         compression_only=main,all_six_pairs_descriptive=totals(records),
         separate_session_condition=totals([r for r in records if r['name']=='independent_session_boundary']),
+        sixth_pair_wire_identical_to_fifth={arm:manifest['cases'][8+i]['identity']==manifest['cases'][10+i]['identity']
+            for i,arm in enumerate(('s127_full','layered'))},
+        sixth_pair_limitation='Both arms repeat the exact fifth-pair request body with no old assistant/tool history. This is a separately sampled stateless condition with strongly warmed provider cache, not an actual different-history comparison or SDK recovery.',
         ledger=result['ledger'],new_scientific_executions=0,
         limitation='Six fixed states, one request per arm, no follow-up evidence feedback. Only first-request token cost and partial admission observed. No adaptive retrieval net-cost, complete scientific legality rate, factual non-degradation or study success-rate conclusion.',
         money_usd=None,source='Actual DeepSeek usage fields; no byte-to-token substitution or synthetic usage.')
