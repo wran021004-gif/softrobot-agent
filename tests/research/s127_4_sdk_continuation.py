@@ -94,7 +94,16 @@ async def run(authorization=None,*,offline=False):
             choices=[dict(index=0,finish_reason='tool_calls' if calls else 'stop',message=dict(role='assistant',content=None if calls else 'Consumed fixture feedback.',
                 reasoning_content='Explicit synthetic fixture, never live scientific reasoning.',**({'tool_calls':calls} if calls else {})))],
             usage=dict(prompt_tokens=10,completion_tokens=2,total_tokens=12)))
-    boundary=LiveBoundary(h,httpx.MockTransport(synthetic) if offline else None)
+    class ScopedBoundary(LiveBoundary):
+        async def handle_async_request(self,request):
+            wire=json.loads(request.content)
+            if set(t['function']['name'] for t in wire.get('tools',[]))-{'research_plan','evidence_read'}:
+                raise ValueError('UNSCOPED_B_TOOL_SCHEMA')
+            secret=os.environ.get('DEEPSEEK_API_KEY')
+            if secret and secret.encode() in request.content:raise ValueError('CREDENTIAL_IN_REQUEST_BODY')
+            if b'credentials_reference' in request.content:raise ValueError('PRIVATE_RUNTIME_IN_REQUEST_BODY')
+            return await super().handle_async_request(request)
+    boundary=ScopedBoundary(h,httpx.MockTransport(synthetic) if offline else None)
     def execute(use,**kwargs):
         try:
             if use['name']=='research_plan':value=core.dispatch(h,use['input'],'native-'+use['toolUseId'])
@@ -106,6 +115,10 @@ async def run(authorization=None,*,offline=False):
             completed.append(dict(phase=phase,name=use['name'],action=use['input'].get('action'),id=use['toolUseId'],value=record(h,'s127_4b_tool_output',value)))
             return dict(toolUseId=use['toolUseId'],status='success',content=[dict(text=json.dumps(value,separators=(',',':')))])
         except (ValueError,KeyError,TypeError) as exc:
+            key='native-'+use['toolUseId'];reserved=h.store.lookup(h.run_id,key)
+            if reserved and not reserved['receipt']:
+                h.store.complete(reserved,dict(request_id=key,execution_id=reserved['execution_id'],caller=h.actor,
+                    tool_id=use['name'],tool_version='1.0.0',execution_status='failed',charged=zero()),dict(error=str(exc)))
             return dict(toolUseId=use['toolUseId'],status='error',content=[dict(text=json.dumps(dict(error=str(exc))))])
     tools=[PythonAgentTool(name,dict(name=name,description=description,inputSchema={'json':schema}),execute)
         for name,description,schema in [('research_plan','Execute one legal bounded scientific Plan or STOP',plan_schema(raw['allowed_plan_actions'],decision_required=True)),
@@ -127,7 +140,13 @@ async def run(authorization=None,*,offline=False):
             record(h,'model_original_tool_request',dict(tool_use=event.tool_use))
             if any(r['phase']==phase and r['name']=='research_plan' and r['action']!='stop' for r in completed):
                 event.cancel_tool='One scientific action per invocation; consume its feedback and conclude.'
-        def after_tool(event):record(h,'model_original_tool_feedback',dict(tool_use=event.tool_use,result=event.result))
+        def after_tool(event):
+            record(h,'model_original_tool_feedback',dict(tool_use=event.tool_use,result=event.result))
+            key='native-'+event.tool_use['toolUseId']
+            if h.store.lookup(h.run_id,key) is None:
+                row,_=h.store.reserve(h.run_id,key,digest(event.tool_use),h.actor,{**zero(),'tool_calls':1})
+                h.store.complete(row,dict(request_id=key,execution_id=row['execution_id'],caller=h.actor,
+                    tool_id=event.tool_use['name'],tool_version='1.0.0',execution_status='completed',charged=zero()),event.result)
         agent.hooks.add_callback(BeforeModelCallEvent,before);agent.hooks.add_callback(BeforeToolCallEvent,before_tool)
         agent.hooks.add_callback(AfterToolCallEvent,after_tool)
     async def invoke(agent):
