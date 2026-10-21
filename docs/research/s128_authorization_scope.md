@@ -1,6 +1,7 @@
-# S12.8 独立正式授权范围（待批准）
+# S12.8 独立正式授权范围
 
-当前状态：准备与源码冻结完成，**尚无正式授权，未启动科研**。
+2026-10-21 用户对完整冻结范围回复“批准”。独立批准已绑定下列范围身份和源码身份，
+记录见 `evidence/s128_preflight/authorization.json`；正式研究已完成，自主 STOP、无 SELECT。
 此范围不能用 S12.7.6 A/B 的批准或剩余额度代替。
 
 - Study：`s128-cold-live-20261021`。
@@ -33,7 +34,7 @@ Direct/Residual PPO 等合法方法，读取真实反馈，修订研究或 SELEC
 允许传输：本 Study 的冻结任务、FamilySpace、生成结构、控制、工具 Schema、合法科学证据，
 以及后续真实工具调用/ID/结果和完整 assistant reasoning。原始 HTTP、使用量和 receipt 完整留存。
 不传输凭据、无关私人文件、旧 Study 聊天或已测实验答案。
-Provider 文档参数已核对；账户权限/可用性仍待批准后确认，不能把本地预检当作本次 API 成功。
+Provider 文档参数已核对；批准后的 59 次正式请求均 HTTP 200，账户可用性已由实际请求确认。
 
 原始 HTTP、完整 reasoning、SDK、Store、checkpoint、科学数组和完整 export
 只保存在本地忽略目录 `runs/research/s128-cold-live-20261021`。

@@ -1,12 +1,68 @@
 {
-  "status": "frozen_awaiting_independent_formal_approval",
   "study_id": "s128-cold-live-20261021",
+  "status": "model_stop_without_original_task_pass",
+  "scientific_success_proven": false,
+  "selected": null,
   "source_commit": "988acfe3339dc4a55b6a46df7349ed98783ae4ee",
-  "current_local_sha": "988acfe3339dc4a55b6a46df7349ed98783ae4ee",
   "source_hashes_match": true,
-  "old_sealed_files_unchanged": true,
-  "old_s126_state_identity": "d366a9a2791a6d35d881ca5c11bf82c182e03c38b912536ce8b900dfb071b5f3",
-  "store_state_identity": "f30a9f4fdc945f6744b34c6c45475c6984e7723a05b3ccb6c7b51b0869c05b45",
+  "canonical_task_identity": "d24aeac7041052ce1d2ae60e825a802e7367107784f6fec192b0a65c4a5e76e7",
+  "started_asia_shanghai": "2026-10-21T14:15:11.117498+08:00",
+  "closed_asia_shanghai": "2026-10-21T14:59:46.850785+08:00",
+  "study_elapsed_s": 2675.7332866191864,
+  "candidate_count": 7,
+  "independent_complete_physical_evaluations": 79,
+  "accepted_evaluations": 0,
+  "best_valid": {
+    "reference": {
+      "artifact_id": "569a406dd84017cd950b7be9fe5da24902c950d106a4ecc0d69b45d1313f38e4",
+      "media_type": "application/json"
+    },
+    "candidate": {
+      "artifact_id": "cfddd272905521fd476e9f7c455ae664e6a83f3d65d3f3ee9ff939017feea1eb",
+      "media_type": "application/json"
+    },
+    "source": {
+      "artifact_id": "c7747a5d6d9a60dd17dc6f300caf8f0f068f2cd9c2192e755381f8969facb42a",
+      "media_type": "application/json"
+    },
+    "complete": true,
+    "accepted": false,
+    "metrics": {
+      "terminal_error_m": 0.032493758607885524,
+      "holding_max_error_m": 0.0326245895310124,
+      "holding_max_speed_m_s": 0.06524966448764628
+    },
+    "task_gap": {
+      "normalized_gap": 2.262483224382314,
+      "components": {
+        "evaluator:task_bound": 2.2493758607885526,
+        "holding_position": 2.2624589531012402,
+        "holding_speed": 2.262483224382314
+      },
+      "valid_complete": true,
+      "accepted": false,
+      "interpretation": "Research ranking only; invalid executions remain invalid regardless of gap"
+    },
+    "original_evaluator_and_full_acceptance_equal": true,
+    "raw_time_grid_force_motion_and_profile_verified": true,
+    "physics_steps": 700
+  },
+  "model_stop_reference": {
+    "artifact_id": "6358d7743ad04bffd5ee69e5d37c307b30a1907ebf9a50923aa820df36609c45",
+    "media_type": "application/json"
+  },
+  "model_stop_cites_all_fresh_results": true,
+  "fresh_results_cited": 80,
+  "actual_provider_requests": 59,
+  "actual_usage": {
+    "prompt_tokens": 7093807,
+    "completion_tokens": 144255,
+    "total_tokens": 7238062,
+    "prompt_cache_hit_tokens": 146560,
+    "prompt_cache_miss_tokens": 6947247,
+    "reasoning_tokens": 103138,
+    "reasoning_usage_responses": 59
+  },
   "ledger": {
     "limit": {
       "backend_solves": 80,
@@ -16,43 +72,113 @@
       "worker_calls": 0
     },
     "used": {
-      "tool_calls": 0,
-      "model_calls": 0,
-      "backend_solves": 0,
+      "tool_calls": 145,
+      "model_calls": 59,
+      "backend_solves": 79,
       "worker_calls": 0,
-      "wall_s": 0.0
+      "wall_s": 1673.9140052015428
     },
     "remaining": {
-      "backend_solves": 80,
-      "model_calls": 128,
-      "tool_calls": 400,
+      "backend_solves": 1,
+      "model_calls": 69,
+      "tool_calls": 255,
       "wall_s": null,
       "worker_calls": 0
     },
     "occupied": {}
   },
-  "provider_requests": [],
-  "actual_usage": {},
-  "unsettled_receipts": 0,
-  "pending": [],
-  "worker_pending": null,
-  "candidate_count": 0,
-  "research_status": "ready",
-  "selected": null,
-  "selected_solution": null,
-  "original_task_acceptance": "not_evaluated",
-  "method_counts": {
-    "mathematical_evaluations": 0,
-    "offline_nlp": 0,
-    "bdf_replays": 0,
-    "nmpc_launches": 0,
-    "physical_replay_launches": 0,
-    "admitted_training_stages": 0
+  "rl": {
+    "admitted": 0,
+    "limit": 8,
+    "actual_actions": 0,
+    "verified_actions_lower_bound": 0,
+    "accounted_actions_upper_bound": 0,
+    "actual_active_seconds": 0,
+    "outstanding": []
   },
-  "authorization_approved": false,
+  "method_counts": {
+    "offline_nlp": 1,
+    "nmpc": 2,
+    "physical_replay": 77,
+    "control_searches": 2,
+    "mathematical_analysis": 0,
+    "ppo_stages": 0
+  },
+  "model_tool_counts": {
+    "research_plan": 34,
+    "evidence_read": 34
+  },
+  "tool_rejections": [
+    {
+      "tool_use_id": "call_00_j4hvuT4754YsReWdCW9I5617",
+      "tool": "evidence_read",
+      "action": null,
+      "error_code": "INVALID_EVIDENCE_POINTER",
+      "field": "fields",
+      "scientific_execution_started": false
+    },
+    {
+      "tool_use_id": "call_00_QDqwT6nx2QX4NfL8SofB0439",
+      "tool": "research_plan",
+      "action": "mechanics",
+      "error_code": "VERIFIED_MATHEMATICAL_WARM_SOURCE_REQUIRED",
+      "field": null,
+      "scientific_execution_started": false
+    },
+    {
+      "tool_use_id": "call_00_P0HQgIFPpTK7IET1R0Cp5117",
+      "tool": "research_plan",
+      "action": "stop",
+      "error_code": "STOP_MUST_CITE_ALL_NEW_EXPERIMENT_RESULTS",
+      "field": "supporting_evidence",
+      "scientific_execution_started": false
+    },
+    {
+      "tool_use_id": "call_00_CX5iPCVEWFqTtA7KEkK39246",
+      "tool": "research_plan",
+      "action": "stop",
+      "error_code": "STOP_MUST_CITE_ALL_NEW_EXPERIMENT_RESULTS",
+      "field": "supporting_evidence",
+      "scientific_execution_started": false
+    }
+  ],
+  "feedback_delivery": {
+    "full": 49,
+    "configured_offload_preview": 18,
+    "last_STOP_feedback_not_sent_to_another_model_request": true
+  },
+  "generation_attempts": 11,
+  "invalid_generation_attempts": 4,
+  "input_or_admission_rejections": 8,
+  "context_capacity_peak": 864652,
+  "context_capacity_limit": 1000000,
+  "sdk": {
+    "independent_process_reopen": true,
+    "completed_history_matches_store": true,
+    "tool_ids_results_paired": true,
+    "reasoning_messages_verified": 59,
+    "sdk_files_unchanged": true,
+    "sdk_message_identity": "f57d9d6be977bc36572e5e21888494b0e33e59c39ace0a78bc92aaf2b8b2721a",
+    "sdk_files": 71,
+    "provider_requests": 0,
+    "scientific_executions": 0
+  },
+  "pending": null,
+  "unsettled_receipts": 0,
+  "unknown_sends": 0,
+  "confirmed_truncations": 0,
+  "new_scientific_executions_in_audit": 0,
+  "archive": {
+    "local_path": "runs\\research\\s128-cold-live-20261021\\export\\immutable_artifacts.tar.gz",
+    "sha256": "acb3ab8f6cabbdf9239c5bc0e80784dd09356e53a2aa3194873b08d96fc29604",
+    "members_verified": 1421,
+    "bytes": 14143716,
+    "raw_data_published": false
+  },
+  "store_state_identity": "6e1c7e68685679a8ff91134cbf1a190b8e2a52d4644e7be2b9be6f9e0b8cdab8",
+  "store_state_ledger_events_unchanged": true,
+  "old_sealed_evidence_unchanged": true,
+  "ppo_not_tested_reason": "Agent allocated physical launches to design/control response searches and NMPC; before its final STOP only one shared launch remained, below the unchanged two-launch training/evaluation admission requirement. No RL learning efficacy conclusion.",
   "production_handoff_admitted": false,
-  "actual_provider_requests": 0,
-  "formal_agent_started": false,
-  "scientific_success_proven": false,
-  "raw_data_published": false
+  "framework_sessions": 1
 }

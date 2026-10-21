@@ -1,0 +1,842 @@
+{
+  "decisions": [
+    {
+      "sequence": 14,
+      "tool_use_id": "call_00_4pVhixqd84HVxSw4ItPk1710",
+      "tool": "research_plan",
+      "action": "generate",
+      "hypothesis_id": "H1-two-segment-reach-design",
+      "method": "serial_family_generation_v2",
+      "variables": [
+        "segment_count",
+        "segment_length_m",
+        "section_radius_m",
+        "tendon_count",
+        "span_topology",
+        "routing_radius_m",
+        "pretension_n",
+        "viscosity"
+      ],
+      "requested_budget": 0,
+      "candidate": null
+    },
+    {
+      "sequence": 66,
+      "tool_use_id": "call_00_MJEKsnc0Qe26x19zTGhO1830",
+      "tool": "research_plan",
+      "action": "generate",
+      "hypothesis_id": "H2-inherit-exact-section-stations",
+      "method": "serial_family_generation_v2",
+      "variables": [
+        "section_source",
+        "segment_length_m",
+        "cells",
+        "tendon_topology"
+      ],
+      "requested_budget": 0,
+      "candidate": null
+    },
+    {
+      "sequence": 103,
+      "tool_use_id": "call_00_vod5oeluuFKPT0GwJvVM4891",
+      "tool": "research_plan",
+      "action": "generate",
+      "hypothesis_id": "H3-explicit-station-sections-soft",
+      "method": "serial_family_generation_v2",
+      "variables": [
+        "section_station_count",
+        "section_radius_m",
+        "segment_length_m",
+        "tendon_topology"
+      ],
+      "requested_budget": 0,
+      "candidate": null
+    },
+    {
+      "sequence": 139,
+      "tool_use_id": "call_00_TdXtQmZAhGV6T5ZeWAPs1966",
+      "tool": "research_plan",
+      "action": "generate",
+      "hypothesis_id": "H4-single-section-no-cells",
+      "method": "serial_family_generation_v2",
+      "variables": [
+        "section_radius_m",
+        "cells_override",
+        "segment_length_m"
+      ],
+      "requested_budget": 0,
+      "candidate": null
+    },
+    {
+      "sequence": 153,
+      "tool_use_id": "call_00_Zas3xi7Pu2weNruB2I2I3039",
+      "tool": "research_plan",
+      "action": "generate",
+      "hypothesis_id": "H5-low-modulus-inherited-sections",
+      "method": "serial_family_generation_v2",
+      "variables": [
+        "young_pa",
+        "segment_length_m",
+        "tendon_topology",
+        "pretension_n"
+      ],
+      "requested_budget": 0,
+      "candidate": null
+    },
+    {
+      "sequence": 168,
+      "tool_use_id": "call_00_5f669LX0WtqDJFDxG9BT6287",
+      "tool": "research_plan",
+      "action": "initialize_control",
+      "hypothesis_id": "H6-static-tension-seed",
+      "method": "baseline_control_seed",
+      "variables": [
+        "tensions_n"
+      ],
+      "requested_budget": 0,
+      "candidate": {
+        "artifact_id": "a0a831fd902cfcf1782bc5af05181e5f040ac9c56017acc0836b69dffe171f58",
+        "media_type": "application/json"
+      }
+    },
+    {
+      "sequence": 193,
+      "tool_use_id": "call_00_r4rAWscL1R5pPxvqBQEf8143",
+      "tool": "research_plan",
+      "action": "physical_replay",
+      "hypothesis_id": "H7-constant-seed-physical",
+      "method": "physical_replay",
+      "variables": [
+        "tensions_n"
+      ],
+      "requested_budget": 1,
+      "candidate": {
+        "artifact_id": "a0a831fd902cfcf1782bc5af05181e5f040ac9c56017acc0836b69dffe171f58",
+        "media_type": "application/json"
+      }
+    },
+    {
+      "sequence": 223,
+      "tool_use_id": "call_00_QDqwT6nx2QX4NfL8SofB0439",
+      "tool": "research_plan",
+      "action": "mechanics",
+      "hypothesis_id": "H8-offline-nlp-warm-seed",
+      "method": "offline_nlp_task_gap",
+      "variables": [
+        "tension_schedule",
+        "terminal_position",
+        "holding_speed"
+      ],
+      "requested_budget": 1,
+      "candidate": {
+        "artifact_id": "a0a831fd902cfcf1782bc5af05181e5f040ac9c56017acc0836b69dffe171f58",
+        "media_type": "application/json"
+      }
+    },
+    {
+      "sequence": 236,
+      "tool_use_id": "call_00_frAxtpP0b8odkD9inaHg6216",
+      "tool": "research_plan",
+      "action": "mechanics",
+      "hypothesis_id": "H9-offline-nlp-cold",
+      "method": "offline_nlp_task_gap",
+      "variables": [
+        "tension_schedule",
+        "terminal_position",
+        "holding_speed"
+      ],
+      "requested_budget": 1,
+      "candidate": {
+        "artifact_id": "a0a831fd902cfcf1782bc5af05181e5f040ac9c56017acc0836b69dffe171f58",
+        "media_type": "application/json"
+      }
+    },
+    {
+      "sequence": 322,
+      "tool_use_id": "call_00_PxjFAvCTVJTJZhcURGfh7509",
+      "tool": "research_plan",
+      "action": "initialize_control",
+      "hypothesis_id": "H10-bottom-tendon-sign-probe",
+      "method": "baseline_control_seed",
+      "variables": [
+        "tensions_n"
+      ],
+      "requested_budget": 0,
+      "candidate": {
+        "artifact_id": "a0a831fd902cfcf1782bc5af05181e5f040ac9c56017acc0836b69dffe171f58",
+        "media_type": "application/json"
+      }
+    },
+    {
+      "sequence": 336,
+      "tool_use_id": "call_00_mxfb7ucgfgEUnReaSphP4467",
+      "tool": "research_plan",
+      "action": "physical_replay",
+      "hypothesis_id": "H11-bottom-seed-physical",
+      "method": "physical_replay",
+      "variables": [
+        "tensions_n"
+      ],
+      "requested_budget": 1,
+      "candidate": {
+        "artifact_id": "a0a831fd902cfcf1782bc5af05181e5f040ac9c56017acc0836b69dffe171f58",
+        "media_type": "application/json"
+      }
+    },
+    {
+      "sequence": 366,
+      "tool_use_id": "call_00_8PyxkCjpF2XLelLBbLId1516",
+      "tool": "research_plan",
+      "action": "generate",
+      "hypothesis_id": "H12-short-reach-design",
+      "method": "serial_family_generation_v2",
+      "variables": [
+        "segment_length_m",
+        "young_pa",
+        "tendon_topology",
+        "routing_radius_m"
+      ],
+      "requested_budget": 0,
+      "candidate": null
+    },
+    {
+      "sequence": 381,
+      "tool_use_id": "call_00_mqaZsFkLgqhLFTNn97kZ2005",
+      "tool": "research_plan",
+      "action": "initialize_control",
+      "hypothesis_id": "H13-short-robot-physical-response-seed",
+      "method": "physical_response_control_seed",
+      "variables": [
+        "tendon_tensions",
+        "tip_response"
+      ],
+      "requested_budget": 8,
+      "candidate": {
+        "artifact_id": "54ff3fe518b2a53e25fcc6064933fe92b8d3a4523c5234a5dcab3923b498b0a7",
+        "media_type": "application/json"
+      }
+    },
+    {
+      "sequence": 512,
+      "tool_use_id": "call_00_dqNkS0swzhD49TnmQloF4886",
+      "tool": "research_plan",
+      "action": "generate",
+      "hypothesis_id": "H14-zero-pretension-short",
+      "method": "serial_family_generation_v2",
+      "variables": [
+        "pretension_n",
+        "segment_length_m",
+        "young_pa",
+        "tendon_topology"
+      ],
+      "requested_budget": 0,
+      "candidate": null
+    },
+    {
+      "sequence": 527,
+      "tool_use_id": "call_00_wsC8uquj9g2XIR58OLLj6708",
+      "tool": "research_plan",
+      "action": "initialize_control",
+      "hypothesis_id": "H15-zero-pretension-response-seed",
+      "method": "physical_response_control_seed",
+      "variables": [
+        "tendon_tensions",
+        "tip_response"
+      ],
+      "requested_budget": 8,
+      "candidate": {
+        "artifact_id": "cfddd272905521fd476e9f7c455ae664e6a83f3d65d3f3ee9ff939017feea1eb",
+        "media_type": "application/json"
+      }
+    },
+    {
+      "sequence": 687,
+      "tool_use_id": "call_00_BJHCYyDYxgAIIwVGQ9PY7518",
+      "tool": "research_plan",
+      "action": "initialize_control",
+      "hypothesis_id": "H16-eight-newton-top-seed",
+      "method": "baseline_control_seed",
+      "variables": [
+        "tensions_n"
+      ],
+      "requested_budget": 0,
+      "candidate": {
+        "artifact_id": "cfddd272905521fd476e9f7c455ae664e6a83f3d65d3f3ee9ff939017feea1eb",
+        "media_type": "application/json"
+      }
+    },
+    {
+      "sequence": 701,
+      "tool_use_id": "call_00_jZU0U624eupajaTd7K1I5677",
+      "tool": "research_plan",
+      "action": "physical_replay",
+      "hypothesis_id": "H17-eight-newton-physical",
+      "method": "physical_replay",
+      "variables": [
+        "tensions_n"
+      ],
+      "requested_budget": 1,
+      "candidate": {
+        "artifact_id": "cfddd272905521fd476e9f7c455ae664e6a83f3d65d3f3ee9ff939017feea1eb",
+        "media_type": "application/json"
+      }
+    },
+    {
+      "sequence": 720,
+      "tool_use_id": "call_00_U04bSbbqaQwUmdIHTYSk3891",
+      "tool": "research_plan",
+      "action": "control_search",
+      "hypothesis_id": "H18-four-knot-brake-and-trim",
+      "method": "local_control_search_v2_response",
+      "variables": [
+        "tendon_0_knots",
+        "tendon_1_knots",
+        "tendon_2_knots"
+      ],
+      "requested_budget": 60,
+      "candidate": {
+        "artifact_id": "cfddd272905521fd476e9f7c455ae664e6a83f3d65d3f3ee9ff939017feea1eb",
+        "media_type": "application/json"
+      }
+    },
+    {
+      "sequence": 1254,
+      "tool_use_id": "call_00_dFKkaUXRZOeRqr9SMxiu8471",
+      "tool": "research_plan",
+      "action": "generate",
+      "hypothesis_id": "H19-wider-routing-and-damping",
+      "method": "serial_family_generation_v2",
+      "variables": [
+        "routing_radius_m",
+        "viscosity_y_nm2_s",
+        "viscosity_z_nm2_s",
+        "segment_length_m",
+        "pretension_n"
+      ],
+      "requested_budget": 0,
+      "candidate": null
+    },
+    {
+      "sequence": 1268,
+      "tool_use_id": "call_00_rD0LwyLpEUTd95A5KwdQ3785",
+      "tool": "research_plan",
+      "action": "generate",
+      "hypothesis_id": "H20-stiff-short-high-damping",
+      "method": "serial_family_generation_v2",
+      "variables": [
+        "young_pa",
+        "viscosity_y_nm2_s",
+        "viscosity_z_nm2_s",
+        "segment_length_m",
+        "pretension_n"
+      ],
+      "requested_budget": 0,
+      "candidate": null
+    },
+    {
+      "sequence": 1283,
+      "tool_use_id": "call_00_ws49rPfEQcgjdWumhe2A2709",
+      "tool": "research_plan",
+      "action": "initialize_control",
+      "hypothesis_id": "H21-stiff-short-seed",
+      "method": "baseline_control_seed",
+      "variables": [
+        "tendon_1_tension",
+        "tendon_2_tension"
+      ],
+      "requested_budget": 0,
+      "candidate": {
+        "artifact_id": "8334e480f41abc889c83dbee2e6ed21db6042cc000dca6cff141398356048c19",
+        "media_type": "application/json"
+      }
+    },
+    {
+      "sequence": 1297,
+      "tool_use_id": "call_00_FhkEcvV6u2dxr3BN8SXX4785",
+      "tool": "research_plan",
+      "action": "physical_replay",
+      "hypothesis_id": "H22-stiff-short-physical",
+      "method": "physical_replay",
+      "variables": [
+        "tensions_n"
+      ],
+      "requested_budget": 1,
+      "candidate": {
+        "artifact_id": "8334e480f41abc889c83dbee2e6ed21db6042cc000dca6cff141398356048c19",
+        "media_type": "application/json"
+      }
+    },
+    {
+      "sequence": 1316,
+      "tool_use_id": "call_00_2VST6LSpKxTiBKAQJAe20915",
+      "tool": "research_plan",
+      "action": "initialize_control",
+      "hypothesis_id": "H23-stiff-short-eight-newton",
+      "method": "baseline_control_seed",
+      "variables": [
+        "tendon_1_tension"
+      ],
+      "requested_budget": 0,
+      "candidate": {
+        "artifact_id": "8334e480f41abc889c83dbee2e6ed21db6042cc000dca6cff141398356048c19",
+        "media_type": "application/json"
+      }
+    },
+    {
+      "sequence": 1330,
+      "tool_use_id": "call_00_eUehjagw2tz9awfelQPa0041",
+      "tool": "research_plan",
+      "action": "physical_replay",
+      "hypothesis_id": "H24-stiff-short-eight-newton-physical",
+      "method": "physical_replay",
+      "variables": [
+        "tensions_n"
+      ],
+      "requested_budget": 1,
+      "candidate": {
+        "artifact_id": "8334e480f41abc889c83dbee2e6ed21db6042cc000dca6cff141398356048c19",
+        "media_type": "application/json"
+      }
+    },
+    {
+      "sequence": 1349,
+      "tool_use_id": "call_00_IPy2pv6fvUS8EJIJsxtM4991",
+      "tool": "research_plan",
+      "action": "generate",
+      "hypothesis_id": "H25-short-soft-matched-length",
+      "method": "serial_family_generation_v2",
+      "variables": [
+        "segment_0_length_m",
+        "segment_1_length_m",
+        "young_pa",
+        "viscosity",
+        "pretension_n"
+      ],
+      "requested_budget": 0,
+      "candidate": null
+    },
+    {
+      "sequence": 1364,
+      "tool_use_id": "call_00_BZjnTXOTfqLtwBiYyKXE8770",
+      "tool": "research_plan",
+      "action": "initialize_control",
+      "hypothesis_id": "H26-matched-length-seed",
+      "method": "baseline_control_seed",
+      "variables": [
+        "tendon_0_tension",
+        "tendon_1_tension"
+      ],
+      "requested_budget": 0,
+      "candidate": {
+        "artifact_id": "cb9e9bfc7c405f5a5b142f023245ba0874d4e374cc45a31d52b181963bd706f7",
+        "media_type": "application/json"
+      }
+    },
+    {
+      "sequence": 1378,
+      "tool_use_id": "call_00_OdAWDTfvKiwAtyDuT9tf3588",
+      "tool": "research_plan",
+      "action": "physical_replay",
+      "hypothesis_id": "H27-matched-length-physical",
+      "method": "physical_replay",
+      "variables": [
+        "tensions_n"
+      ],
+      "requested_budget": 1,
+      "candidate": {
+        "artifact_id": "cb9e9bfc7c405f5a5b142f023245ba0874d4e374cc45a31d52b181963bd706f7",
+        "media_type": "application/json"
+      }
+    },
+    {
+      "sequence": 1397,
+      "tool_use_id": "call_00_ZMwlzapo3rLH6PyCoC5Z4998",
+      "tool": "research_plan",
+      "action": "control_search",
+      "hypothesis_id": "H28-matched-length-final-knot-trim",
+      "method": "local_control_search_v2_response",
+      "variables": [
+        "tendon_0_final_knot",
+        "tendon_1_final_knot"
+      ],
+      "requested_budget": 6,
+      "candidate": {
+        "artifact_id": "cb9e9bfc7c405f5a5b142f023245ba0874d4e374cc45a31d52b181963bd706f7",
+        "media_type": "application/json"
+      }
+    },
+    {
+      "sequence": 1461,
+      "tool_use_id": "call_00_KEmc1zhVsNI0VBQ2jhUe6586",
+      "tool": "research_plan",
+      "action": "execute",
+      "hypothesis_id": "H29-nmpc-matched-length",
+      "method": "nmpc",
+      "variables": [
+        "closed_loop_control"
+      ],
+      "requested_budget": 1,
+      "candidate": {
+        "artifact_id": "cb9e9bfc7c405f5a5b142f023245ba0874d4e374cc45a31d52b181963bd706f7",
+        "media_type": "application/json"
+      }
+    },
+    {
+      "sequence": 1495,
+      "tool_use_id": "call_00_WN2Dye49FwLh66fAREOv2337",
+      "tool": "research_plan",
+      "action": "generate",
+      "hypothesis_id": "H30-three-segment-seven-tendon",
+      "method": "serial_family_generation_v2",
+      "variables": [
+        "segment_count",
+        "segment_length_m",
+        "tendon_count",
+        "span_topology",
+        "young_pa",
+        "viscosity"
+      ],
+      "requested_budget": 0,
+      "candidate": null
+    },
+    {
+      "sequence": 1510,
+      "tool_use_id": "call_00_vdet1Poudi42T0v1yk2p7197",
+      "tool": "research_plan",
+      "action": "execute",
+      "hypothesis_id": "H31-three-segment-nmpc",
+      "method": "nmpc",
+      "variables": [
+        "closed_loop_control",
+        "seven_tendon_tensions"
+      ],
+      "requested_budget": 1,
+      "candidate": {
+        "artifact_id": "318c922bdd96b863487b097d6bd6bfd1dd90142b18d15a04af9aeaf508f701a6",
+        "media_type": "application/json"
+      }
+    },
+    {
+      "sequence": 1544,
+      "tool_use_id": "call_00_P0HQgIFPpTK7IET1R0Cp5117",
+      "tool": "research_plan",
+      "action": "stop",
+      "hypothesis_id": "H32-stop-no-complete-pass",
+      "method": "stop",
+      "variables": [],
+      "requested_budget": 0,
+      "candidate": null
+    },
+    {
+      "sequence": 1556,
+      "tool_use_id": "call_00_CX5iPCVEWFqTtA7KEkK39246",
+      "tool": "research_plan",
+      "action": "stop",
+      "hypothesis_id": "H33-stop-no-complete-pass",
+      "method": "stop",
+      "variables": [],
+      "requested_budget": 0,
+      "candidate": null
+    },
+    {
+      "sequence": 1579,
+      "tool_use_id": "call_00_metV19i635UZUFDQtUeZ1318",
+      "tool": "research_plan",
+      "action": "stop",
+      "hypothesis_id": "H34-stop-no-complete-pass",
+      "method": "stop",
+      "variables": [],
+      "requested_budget": 0,
+      "candidate": null
+    }
+  ],
+  "generations": [
+    {
+      "tool_use_id": "call_00_4pVhixqd84HVxSw4ItPk1710",
+      "hypothesis_id": "H1-two-segment-reach-design",
+      "status": "invalid",
+      "reason": "EXACT_SECTION_STATIONS_REQUIRED",
+      "candidate": null,
+      "result_reference": {
+        "artifact_id": "9573b7078dcff012fb89bcbdf49ac21f24a81b6624df7344ee4f1d41688bde3c",
+        "media_type": "application/json"
+      }
+    },
+    {
+      "tool_use_id": "call_00_MJEKsnc0Qe26x19zTGhO1830",
+      "hypothesis_id": "H2-inherit-exact-section-stations",
+      "status": "generated",
+      "reason": null,
+      "candidate": {
+        "artifact_id": "c5db6ee4065e9362032c1b129e0923efbb6cb16ad8ba3c9d45806c0cfe208e94",
+        "media_type": "application/json"
+      },
+      "result_reference": {
+        "artifact_id": "b503b68621d1b51b9999efa11ab8607bfb8bb57558252cc05bb182a261cd550f",
+        "media_type": "application/json"
+      }
+    },
+    {
+      "tool_use_id": "call_00_vod5oeluuFKPT0GwJvVM4891",
+      "hypothesis_id": "H3-explicit-station-sections-soft",
+      "status": "invalid",
+      "reason": "EXACT_SECTION_STATIONS_REQUIRED",
+      "candidate": null,
+      "result_reference": {
+        "artifact_id": "79f78d3ad6de9b1c19f06dd1acf12c484ef8b22e91a66d6484a049a12336a6da",
+        "media_type": "application/json"
+      }
+    },
+    {
+      "tool_use_id": "call_00_TdXtQmZAhGV6T5ZeWAPs1966",
+      "hypothesis_id": "H4-single-section-no-cells",
+      "status": "invalid",
+      "reason": "EXACT_SECTION_STATIONS_REQUIRED",
+      "candidate": null,
+      "result_reference": {
+        "artifact_id": "bd50c061e704c26b9d95367b42d0b210cd4b276a359e87298f496cc3c160aa05",
+        "media_type": "application/json"
+      }
+    },
+    {
+      "tool_use_id": "call_00_Zas3xi7Pu2weNruB2I2I3039",
+      "hypothesis_id": "H5-low-modulus-inherited-sections",
+      "status": "generated",
+      "reason": null,
+      "candidate": {
+        "artifact_id": "a0a831fd902cfcf1782bc5af05181e5f040ac9c56017acc0836b69dffe171f58",
+        "media_type": "application/json"
+      },
+      "result_reference": {
+        "artifact_id": "632a1799c809be43595e4c37de65ba46d9bc4c63e03541053648a3dc3360ef1f",
+        "media_type": "application/json"
+      }
+    },
+    {
+      "tool_use_id": "call_00_8PyxkCjpF2XLelLBbLId1516",
+      "hypothesis_id": "H12-short-reach-design",
+      "status": "generated",
+      "reason": null,
+      "candidate": {
+        "artifact_id": "54ff3fe518b2a53e25fcc6064933fe92b8d3a4523c5234a5dcab3923b498b0a7",
+        "media_type": "application/json"
+      },
+      "result_reference": {
+        "artifact_id": "00da29c4d99ef69bfebfac8ffcbaf27271dd62feed5c9134ed5c4c3f541bf03b",
+        "media_type": "application/json"
+      }
+    },
+    {
+      "tool_use_id": "call_00_dqNkS0swzhD49TnmQloF4886",
+      "hypothesis_id": "H14-zero-pretension-short",
+      "status": "generated",
+      "reason": null,
+      "candidate": {
+        "artifact_id": "cfddd272905521fd476e9f7c455ae664e6a83f3d65d3f3ee9ff939017feea1eb",
+        "media_type": "application/json"
+      },
+      "result_reference": {
+        "artifact_id": "db4d9b41ebf3de9277e2a9a71c78c40704dfe81eecc849fdb93c26b0a283ca75",
+        "media_type": "application/json"
+      }
+    },
+    {
+      "tool_use_id": "call_00_dFKkaUXRZOeRqr9SMxiu8471",
+      "hypothesis_id": "H19-wider-routing-and-damping",
+      "status": "invalid",
+      "reason": "OUTSIDE_FAMILY_DOMAIN: base_radius_m",
+      "candidate": null,
+      "result_reference": {
+        "artifact_id": "463daa61aff6f75d457ca3571b9508fdcec0a1da87b280cd640157ca3790be51",
+        "media_type": "application/json"
+      }
+    },
+    {
+      "tool_use_id": "call_00_rD0LwyLpEUTd95A5KwdQ3785",
+      "hypothesis_id": "H20-stiff-short-high-damping",
+      "status": "generated",
+      "reason": null,
+      "candidate": {
+        "artifact_id": "8334e480f41abc889c83dbee2e6ed21db6042cc000dca6cff141398356048c19",
+        "media_type": "application/json"
+      },
+      "result_reference": {
+        "artifact_id": "7b90ec059f7abe97387689a87005a1d188c472fb7ff14df48d8d044c8f702236",
+        "media_type": "application/json"
+      }
+    },
+    {
+      "tool_use_id": "call_00_IPy2pv6fvUS8EJIJsxtM4991",
+      "hypothesis_id": "H25-short-soft-matched-length",
+      "status": "generated",
+      "reason": null,
+      "candidate": {
+        "artifact_id": "cb9e9bfc7c405f5a5b142f023245ba0874d4e374cc45a31d52b181963bd706f7",
+        "media_type": "application/json"
+      },
+      "result_reference": {
+        "artifact_id": "4aa72e68e171431d5f37ee3e5dd3721ecb3efbbc23edf3c9e20b7df0164638c7",
+        "media_type": "application/json"
+      }
+    },
+    {
+      "tool_use_id": "call_00_WN2Dye49FwLh66fAREOv2337",
+      "hypothesis_id": "H30-three-segment-seven-tendon",
+      "status": "generated",
+      "reason": null,
+      "candidate": {
+        "artifact_id": "318c922bdd96b863487b097d6bd6bfd1dd90142b18d15a04af9aeaf508f701a6",
+        "media_type": "application/json"
+      },
+      "result_reference": {
+        "artifact_id": "08334dd5b8bc4c5062b80ce0361049e761e881e2e2d6244b53dbaf5b09bb471e",
+        "media_type": "application/json"
+      }
+    }
+  ],
+  "searches": [
+    {
+      "reference": {
+        "artifact_id": "4abf6242e92a269861b13df291597e55bede300b02eb97d62b409abcd5794365",
+        "media_type": "application/json"
+      },
+      "algorithm": "response",
+      "search_dimension": 12,
+      "finite_difference_evaluations": 48,
+      "stop_reason": "iteration_limit",
+      "cost_feedback": {
+        "cache_reuses": 1,
+        "charged_numerical_s": 58.20773980091326,
+        "duplicate_applied_sequences": 0,
+        "evaluation_callbacks": 53,
+        "ineffective_probe_attempts": 8,
+        "new_physical_evaluations": 52,
+        "request_budget": 60,
+        "unique_input_sequences": 53,
+        "unique_response_probes": 48
+      },
+      "best": {
+        "reference": {
+          "artifact_id": "569a406dd84017cd950b7be9fe5da24902c950d106a4ecc0d69b45d1313f38e4",
+          "media_type": "application/json"
+        },
+        "candidate": {
+          "artifact_id": "cfddd272905521fd476e9f7c455ae664e6a83f3d65d3f3ee9ff939017feea1eb",
+          "media_type": "application/json"
+        },
+        "source": {
+          "artifact_id": "c7747a5d6d9a60dd17dc6f300caf8f0f068f2cd9c2192e755381f8969facb42a",
+          "media_type": "application/json"
+        },
+        "best_valid_reference": {
+          "artifact_id": "569a406dd84017cd950b7be9fe5da24902c950d106a4ecc0d69b45d1313f38e4",
+          "media_type": "application/json"
+        },
+        "task_gap": {
+          "accepted": false,
+          "components": {
+            "evaluator:task_bound": 2.2493758607885526,
+            "holding_position": 2.2624589531012402,
+            "holding_speed": 2.262483224382314
+          },
+          "interpretation": "Research ranking only; invalid executions remain invalid regardless of gap",
+          "normalized_gap": 2.262483224382314,
+          "valid_complete": true
+        },
+        "predicted_improvement": 0.0023865225785097977,
+        "actual_improvement": 0.002383592565438075,
+        "prospective_guarantee": false,
+        "applicability": "Local sampled response at the stated candidate only; no regional error bound"
+      }
+    },
+    {
+      "reference": {
+        "artifact_id": "4d4110672bd6a4c987bed16efa1f08c24487ed5f124e93b119c7b961a19bf3f2",
+        "media_type": "application/json"
+      },
+      "algorithm": "response",
+      "search_dimension": 2,
+      "finite_difference_evaluations": 4,
+      "stop_reason": "evaluation_request_budget",
+      "cost_feedback": {
+        "cache_reuses": 1,
+        "charged_numerical_s": 5.516038300003856,
+        "duplicate_applied_sequences": 0,
+        "evaluation_callbacks": 6,
+        "ineffective_probe_attempts": 2,
+        "new_physical_evaluations": 5,
+        "request_budget": 6,
+        "unique_input_sequences": 6,
+        "unique_response_probes": 4
+      },
+      "best": {
+        "reference": {
+          "artifact_id": "3430ea8f9d3439ce13c571b92870b5962c83055795a89a6ebb1ceea4c8876295",
+          "media_type": "application/json"
+        },
+        "candidate": {
+          "artifact_id": "cb9e9bfc7c405f5a5b142f023245ba0874d4e374cc45a31d52b181963bd706f7",
+          "media_type": "application/json"
+        },
+        "source": {
+          "artifact_id": "f11c14a3de5a94c6e98333d2edab03fdafd3ef632c58d344624da3a6e3a348ee",
+          "media_type": "application/json"
+        },
+        "best_valid_reference": {
+          "artifact_id": "3430ea8f9d3439ce13c571b92870b5962c83055795a89a6ebb1ceea4c8876295",
+          "media_type": "application/json"
+        },
+        "task_gap": {
+          "accepted": false,
+          "components": {
+            "evaluator:task_bound": 2.270506637392296,
+            "holding_position": 2.599686852712064,
+            "holding_speed": 2.3779886380667
+          },
+          "interpretation": "Research ranking only; invalid executions remain invalid regardless of gap",
+          "normalized_gap": 2.599686852712064,
+          "valid_complete": true
+        },
+        "predicted_improvement": 0.02809867326189064,
+        "actual_improvement": 0.02809646438710134,
+        "prospective_guarantee": false,
+        "applicability": "Local sampled response at the stated candidate only; no regional error bound"
+      }
+    }
+  ],
+  "errors": [
+    {
+      "tool_use_id": "call_00_j4hvuT4754YsReWdCW9I5617",
+      "tool": "evidence_read",
+      "action": null,
+      "error_code": "INVALID_EVIDENCE_POINTER",
+      "field": "fields",
+      "scientific_execution_started": false
+    },
+    {
+      "tool_use_id": "call_00_QDqwT6nx2QX4NfL8SofB0439",
+      "tool": "research_plan",
+      "action": "mechanics",
+      "error_code": "VERIFIED_MATHEMATICAL_WARM_SOURCE_REQUIRED",
+      "field": null,
+      "scientific_execution_started": false
+    },
+    {
+      "tool_use_id": "call_00_P0HQgIFPpTK7IET1R0Cp5117",
+      "tool": "research_plan",
+      "action": "stop",
+      "error_code": "STOP_MUST_CITE_ALL_NEW_EXPERIMENT_RESULTS",
+      "field": "supporting_evidence",
+      "scientific_execution_started": false
+    },
+    {
+      "tool_use_id": "call_00_CX5iPCVEWFqTtA7KEkK39246",
+      "tool": "research_plan",
+      "action": "stop",
+      "error_code": "STOP_MUST_CITE_ALL_NEW_EXPERIMENT_RESULTS",
+      "field": "supporting_evidence",
+      "scientific_execution_started": false
+    }
+  ],
+  "raw_hypotheses_and_reasoning": "Local immutable Store only; this file contains scientific metadata and derived counts, not raw Provider messages"
+}
