@@ -51,7 +51,7 @@ def admit_read_only_resume(h,scope,approval):
     """Only a completed read-only old SDK prefix may continue this same grant."""
     s=state(h)
     if (s['research_status']=='stopped' or s['pending'] or pending(h) or s['pilot'].get('unconsumed_response')
-        or s['pilot'].get('handoff') or s['pilot'].get('handoff_preparation') or s['candidates'] or s['control_initializations']):
+        or s['pilot'].get('handoff') or s['pilot'].get('handoff_preparation') or s['candidates'] or s.get('control_initializations',[])):
         raise ValueError('READ_ONLY_RESUME_REQUIRES_CLEAN_OLD_SESSION_WITHOUT_SCIENCE')
     if (h.store.remaining()['limit']['model_calls']!=scope['request_ceiling']
         or h.store.remaining()['remaining']['model_calls']<2

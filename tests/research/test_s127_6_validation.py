@@ -18,7 +18,7 @@ class NewValidationTests(unittest.TestCase):
         from unittest.mock import MagicMock
         from tests.research import s127_4_sdk_continuation as sdk
         approval=dict(stage='explicit-fixture');scope=dict(request_ceiling=12,max_output_tokens=65536)
-        original=dict(research_status='ready',pending=None,candidates={},control_initializations=[],
+        original=dict(research_status='ready',pending=None,candidates={},
             pilot=dict(provider=dict(max_tokens=65536)))
         store=MagicMock();h=SimpleNamespace(store=store,run_id='fixture')
         store.remaining.return_value=dict(limit=dict(model_calls=12),remaining=dict(model_calls=9),used=dict(model_calls=3))
