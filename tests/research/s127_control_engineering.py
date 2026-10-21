@@ -1,4 +1,4 @@
-"""Explicit finite engineering experiment; no LLM, NMPC solve or PPO training."""
+﻿"""Explicit finite engineering experiment; no LLM, NMPC solve or PPO training."""
 import argparse
 from copy import deepcopy
 import hashlib
@@ -46,7 +46,7 @@ def prepare():
     raw['nmpc_limits']['executions']=0
     raw['capabilities']=['physical_replay','control_correction','control_search']
     raw['allowed_plan_actions']=['generate','initialize_control','physical_replay','control_search','select','stop']
-    raw['rl_limits'].update(training_stages=0,training_actions=0,evaluation_episodes=0)
+    raw['rl_limits'].update(training_stages=0,training_actions=1,actions_per_trial=1,evaluation_episodes=0)
     chosen=rows[-1]
     raw['research_decisions']['control_seeds']=[dict(folder=str(folder.relative_to(ROOT)).replace('\\','/'),candidate=chosen['candidate'],source=chosen['source'])]
     raw['research_decisions']['history']=[];raw['research_decisions']['mathematics']=[]
@@ -102,3 +102,4 @@ if __name__=='__main__':
     parser=argparse.ArgumentParser();parser.add_argument('--prepare',action='store_true');args=parser.parse_args()
     if args.prepare:print(json.dumps(prepare()))
     else:run()
+
