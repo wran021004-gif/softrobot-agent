@@ -1,0 +1,56 @@
+{
+  "label": "Offline engineering regression, no formal Study or physical execution",
+  "modules": [
+    "test_s129_task_capability",
+    "test_trajectory_feasibility",
+    "test_task_analysis_contract",
+    "test_research_reporting",
+    "test_mainline",
+    "test_s127_math_admission",
+    "test_evidence_policy",
+    "test_sorosim_analysis"
+  ],
+  "tests_run": 88,
+  "failures": [
+    {
+      "test": "test_trajectory_feasibility.ResearchIntegrationTests.test_saved_m2_decision_boundary_and_paged_retrieval",
+      "trace": "Traceback (most recent call last):\n  File \"D:\\softrobot-agent\\.worktrees\\s129-math-capability\\tests\\research\\test_trajectory_feasibility.py\", line 305, in test_saved_m2_decision_boundary_and_paged_retrieval\n    self.assertLess(size(entry),size(old)/5)\nAssertionError: 11501 not less than 8192.0\n"
+    }
+  ],
+  "skipped": [],
+  "elapsed_s": 49.41694099991582,
+  "initial_errors": [
+    {
+      "test": "test_s129_task_capability.IntegrationTests.test_real_gvs_pair_dispatch_store_budget_and_reuse",
+      "trace": "Traceback (most recent call last):\n  File \"D:\\softrobot-agent\\.worktrees\\s129-math-capability\\tests\\research\\test_s129_task_capability.py\", line 300, in test_real_gvs_pair_dispatch_store_budget_and_reuse\n    changed=raw['trajectory']['best_found_violation'], comparison=result['quantities'],\n                                                                  ~~~~~~^^^^^^^^^^^^^^\nKeyError: 'quantities'\n"
+    }
+  ],
+  "errors": [],
+  "targeted_rerun": {
+    "test": "test_s129_task_capability.IntegrationTests.test_real_gvs_pair_dispatch_store_budget_and_reuse",
+    "passed": true,
+    "tests_run": 1,
+    "elapsed_s": 18.948,
+    "correction": "Test-only export loop shadowed the comparison variable used by the final diagnostic print; renamed it. Numerical assertions had already passed."
+  },
+  "final_unique_results": {
+    "total": 88,
+    "passed": 87,
+    "known_baseline_failures": 1,
+    "errors": 0,
+    "new_tests_passed": 14,
+    "new_tests_total": 14
+  },
+  "baseline_failure_check": {
+    "commit": "6e5c0e4c7f3af62cc345d44461369d795af4da4b",
+    "method": "Loaded original tools/research/analysis.py with git show and substituted its decision_result and compact_result in the same unchanged regression test.",
+    "reproduced": true,
+    "assertion": "11501 not less than 8192.0",
+    "scope": "F0 original summary functions; no baseline reset or archived evidence changes"
+  },
+  "artifact_verification": {
+    "original_result_hashes_match": true,
+    "supporting_artifact_hashes_match": true,
+    "current_source_hashes_match": true
+  }
+}

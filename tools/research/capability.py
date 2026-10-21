@@ -1,0 +1,127 @@
+"""B-line adapters: controlled comparisons and projection into unchanged F0 slots."""
+from copy import deepcopy
+from pydantic import FiniteFloat, Field
+from schemas.common import Contract
+from schemas.platform import EvidenceRef
+
+
+class CapabilityComparison(Contract):
+    baseline_result: EvidenceRef
+    variable: str
+    normalization_scale: FiniteFloat = Field(gt=0)
+
+
+def comparison_context(host, candidate, query):
+    """Resolve an existing owned result; no baseline solve or budget reset."""
+    from tools.research.core import read_evidence
+    from tools.research.design import verify_candidate, parameter_value, set_parameter
+    from tools.research.state import state
+    from tools.platform_store import plain
+    request = query.capability_comparison
+    reference = plain(request.baseline_result)
+    current = state(host)
+    if reference not in current.get('analysis_results', []):
+        raise ValueError('CAPABILITY_COMPARISON_REQUIRES_REGISTERED_BASELINE')
+    baseline = read_evidence(host, dict(reference=reference), record_read=False)
+    base_candidate = verify_candidate(host, baseline['candidate'])
+    if (baseline.get('operation') != 'task_capability' or baseline.get('status') != 'computed'
+            or baseline.get('implementation') != current['freeze']
+            or baseline['protocol'] != plain(query.protocol)
+            or baseline['requested_operation']['operating_point'] != query.operating_point
+            or query.operating_point not in ('controller_start_input', 'standardized_initial_pretension')
+            or not baseline.get('trajectory', {}).get('replay', {}).get('numerically_valid')):
+        raise ValueError('CAPABILITY_COMPARISON_REQUIRES_MATCHED_VERIFIED_BASELINE')
+    variable = request.variable
+    if not (variable.startswith('segments.') and variable.split('.')[-1] in ('length_m', 'young_pa')
+            and len(variable.split('.')) == 3):
+        raise ValueError('CAPABILITY_COMPARISON_REQUIRES_SUPPORTED_CONTINUOUS_PARAMETER')
+    a, b = (parameter_value(c['parameters'], variable) for c in (base_candidate, candidate))
+    if a is None or b is None or a == b:
+        raise ValueError('CAPABILITY_COMPARISON_REQUIRES_NONZERO_NUMERIC_STEP')
+    expected = deepcopy(base_candidate['parameters']); set_parameter(expected, variable, b)
+    left, right = base_candidate['configuration'], candidate['configuration']
+    if (candidate['parameters'] != expected or candidate['source_identity'] != base_candidate['source_identity']
+            or candidate['profile_identity'] != base_candidate['profile_identity'] or left['task'] != right['task']
+            or any(left['policy'][k] != right['policy'][k] for k in ('controller', 'backend', 'dynamics_model'))):
+        raise ValueError('CAPABILITY_COMPARISON_REQUIRES_SINGLE_PARAMETER_AND_FIXED_TASK_MODEL_CONTROL')
+    return dict(kind='task_capability_comparison', baseline=baseline, baseline_result=reference,
+        variable=variable, baseline_parameter=a, candidate_parameter=b, step=b-a,
+        normalization_scale=request.normalization_scale)
+
+
+def compare_control_response(model, requirements, protocol, optimized, context):
+    """Reuse baseline physical commands; current candidate has its own rebuilt model."""
+    from extensions.math_analysis.task_capability import task_capability
+    import json
+    base = context['baseline']
+    baseline = base['trajectory']
+    if (base['task_analysis']['constraints'] != [c.model_dump() for c in requirements.constraints]
+            or base['task_analysis']['physical_inputs'] != requirements.physical_inputs
+            or base['model']['binding']['coordinate_order'] != model.binding['coordinate_order']
+            or baseline['horizon'] != json.loads(json.dumps(optimized.get('horizon')))):
+        raise ValueError('CAPABILITY_COMPARISON_SAMPLING_INPUT_OR_COORDINATE_MISMATCH')
+    fixed = task_capability(model, requirements, protocol, applied_input_n=baseline['applied_input_n'])
+    before = baseline['best_found_violation']
+    comparison = {k: v for k, v in context.items() if k not in ('baseline', 'kind')}
+    comparison.update(baseline_violation=before, fixed_control=fixed,
+        status='inconclusive', control_alignment='identical physical tensions, tendon order and time grid',
+        reoptimization='Both candidates independently solved with the same three starts and iteration budget',
+        derivative_scope='Two-design finite secants of computed values; no envelope gradient or descent guarantee',
+        attribution='Same frozen source and candidate parameters except the declared continuous parameter',
+        quantities={})
+    for mode, result in (('fixed_control', fixed), ('reoptimized_control', optimized)):
+        if not result.get('replay', {}).get('numerically_valid') or 'best_found_violation' not in result:
+            continue
+        delta = result['best_found_violation']-before
+        comparison['quantities'][mode+'_delta'] = dict(value=delta, status='unverified_estimate')
+        comparison['quantities'][mode+'_normalized_secant'] = dict(
+            value=delta/context['step']*context['normalization_scale'], status='unverified_estimate')
+    if len(comparison['quantities']) == 4:
+        comparison['status'] = 'computed_estimate'
+    return comparison
+
+
+def capability_summary(trajectory):
+    keys = ('best_found_violation', 'status', 'control_reoptimization', 'verification_scope',
+        'start_value_spread', 'research_diagnostics', 'input_diagnostics', 'locality_diagnostics', 'kernel_elapsed_s')
+    summary = {k: trajectory[k] for k in keys if k in trajectory}
+    summary['solver_starts'] = [{k: s.get(k) for k in ('start_index', 'success', 'status', 'iterations', 'returned_violation', 'epigraph_residual')} for s in trajectory.get('starts', [])]
+    summary['reason'] = trajectory.get('reason')
+    summary['problem_pointer'] = '/trajectory/problem_definition'
+    summary['quantities_pointer'] = '/trajectory/quantities'
+    comparison = trajectory.get('structural_comparison')
+    if comparison:
+        summary['structural_comparison'] = {k: comparison[k] for k in (
+            'status', 'variable', 'step', 'normalization_scale', 'quantities', 'baseline_result', 'derivative_scope')}
+    return summary
+
+
+def populate_mathematics(mathematics, trajectory, reference):
+    """F0 quantity statuses describe the exact checked object, not stronger claims."""
+    from schemas.research_reporting import EvidenceLocation, MathematicalQuantity, RecordedField
+    def location(pointer):
+        return EvidenceLocation(reference=reference, pointer=pointer)
+    quantities = []
+    groups = [(trajectory.get('quantities', {}), '/trajectory/quantities', [],
+        trajectory.get('control_reoptimization', 'not_assessed'))]
+    comparison = trajectory.get('structural_comparison')
+    if comparison:
+        for name, value in comparison['quantities'].items():
+            groups.append(({name: value}, '/trajectory/structural_comparison/quantities', [comparison['variable']],
+                'fixed_control' if name.startswith('fixed_control') else 'required'))
+    for values, pointer, parameters, control in groups:
+        for name, row in values.items():
+            quantities.append(MathematicalQuantity(name=name, value=row['value'], status=row['status'],
+                unit='dimensionless', source=location(pointer+'/'+name+'/value') if row['value'] is not None else None,
+                structural_parameters=parameters, control_reoptimization=control,
+                conditions=[RecordedField(name='problem_and_scope', value=trajectory['problem_definition'],
+                    source=location('/trajectory/problem_definition')),
+                    RecordedField(name='verification_scope', value=trajectory.get('verification_scope'),
+                        source=location('/trajectory/verification_scope'))] if trajectory.get('verification_scope') else []))
+    if comparison:
+        for quantity in quantities:
+            if quantity.structural_parameters:
+                quantity.conditions.extend(RecordedField(name=key, value=comparison[key],
+                    source=location('/trajectory/structural_comparison/'+key)) for key in
+                    ('step','normalization_scale','reoptimization','control_alignment','derivative_scope','baseline_result'))
+    return mathematics.model_copy(update=dict(problem_definition=location('/trajectory/problem_definition'), quantities=quantities))

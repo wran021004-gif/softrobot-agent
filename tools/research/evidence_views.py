@@ -124,6 +124,11 @@ def result_card(host, reference):
         mathematics=MathematicalEvidence(claim=value['scoped_claim'],
             claim_source=_location(reference,'/scoped_claim'),
             requirement_source=_location(reference,'/task_analysis') if 'task_analysis' in value else None)
+        if value.get('operation') == 'task_capability' and value.get('trajectory', {}).get('problem_definition'):
+            from tools.research.capability import populate_mathematics
+            mathematics=populate_mathematics(mathematics,value['trajectory'],reference)
+            if value['trajectory'].get('structural_comparison'):
+                details.append(_location(value['trajectory']['structural_comparison']['baseline_result']))
         details.append(_location(reference,value['scoped_claim']['numerical_result_pointer']))
         for row in summary['margins']:
             constraint=next(c for c in value['task_analysis']['constraints'] if c['constraint_id']==row['constraint_id'])
