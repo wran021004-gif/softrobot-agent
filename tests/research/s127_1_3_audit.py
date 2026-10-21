@@ -133,10 +133,40 @@ def s1274_decision():
     return report
 
 
+def s1274_handoff():
+    from tools.platform_host import Host
+    from tools.research.agent import received,pending
+    folder=ROOT/'evidence/s127_4_handoff';h=Host(ROOT/'runs/research/s127-4b-sdk-20261021','s127-4b-sdk-20261021')
+    s=state(h);rows=[]
+    for event in h.store.events(h.run_id):
+        if event['kind']!='r3_request':continue
+        reception=received(h,event['request_id'])
+        body=json.loads(h.store.artifact(reception['body'],raw=True)) if reception else {}
+        rows.append(dict(request_id=event['request_id'],http_status=reception['http_status'] if reception else None,
+            body_reference=reception.get('body') if reception else None,usage=body.get('usage'),actual_model=body.get('model'),
+            finish_reasons=reception.get('finish_reasons') if reception else None,
+            raw_reasoning_preserved=bool((body.get('choices') or [{}])[0].get('message',{}).get('reasoning_content'))))
+    value=read(folder/'live.json')
+    truncated=any('length' in (r['finish_reasons'] or []) for r in rows)
+    value.update(status='blocked' if truncated else 'observed',requests=rows,source_freeze=s['freeze'],
+        block_reason='Old first SDK response exhausted the frozen 8192-token output cap with reasoning only; no tool call/complete round. Native submission was rejected. SDK wrapped the local truncation rejection as APIConnectionError despite HTTP 200.' if truncated else None,
+        old_complete_tool_round=bool(value.get('old_complete_tool_round')),old_scientific_actions=len(s['candidates']),
+        new_snapshot_persisted_and_reopened=bool(value.get('snapshot_independently_reopened')),
+        framework_session_id=s['pilot']['framework_session_id'],handoff_committed=bool(s['pilot'].get('handoff')),
+        unknown_provider_outcomes=len(pending(h)),known_saved_response_unconsumed=bool(s['pilot'].get('unconsumed_response')),
+        budget_unchanged_ceiling=h.store.remaining()['limit'],production_flags_modified=False,
+        further_requests_not_sent='Remaining five requests deliberately not sent across an incomplete old tool boundary. No retries, new grant, rewritten response, raised token cap or manual admission flag.',
+        interpretation='Live scientific continuation not validated. Offline SDK clean-path and crash fixtures do not substitute for it.')
+    atomic_json(folder/'live.json',value)
+    return value
+
+
 if __name__=='__main__':
     import argparse
-    parser=argparse.ArgumentParser();parser.add_argument('--s1274-decision',action='store_true');args=parser.parse_args()
-    if args.s1274_decision:
+    parser=argparse.ArgumentParser();parser.add_argument('--s1274-decision',action='store_true');parser.add_argument('--s1274-handoff',action='store_true');args=parser.parse_args()
+    if args.s1274_handoff:
+        result=s1274_handoff();print(json.dumps(dict(status=result['status'],reason=result['block_reason'],requests=result['requests'])))
+    elif args.s1274_decision:
         result=s1274_decision();print(json.dumps(dict(status=result['status'],actual_requests=result['actual_requests'],totals=result['compression_only'])))
     else:
         result=layered();probe_inventory();print(json.dumps({k:v for k,v in result.items() if k.endswith('_bytes')}))

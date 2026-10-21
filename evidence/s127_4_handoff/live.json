@@ -1,0 +1,85 @@
+{
+  "stage": "S12.7.4B",
+  "mode": "live",
+  "study_id": "s127-4b-sdk-20261021",
+  "offline_protocol_passed": false,
+  "live_sdk_continuation_passed": false,
+  "live_scientific_action_passed": false,
+  "production_recovery_validated": false,
+  "production_handoff_admitted": false,
+  "ledger": {
+    "limit": {
+      "backend_solves": 2,
+      "model_calls": 6,
+      "tool_calls": 40,
+      "wall_s": null,
+      "worker_calls": 0
+    },
+    "used": {
+      "tool_calls": 0,
+      "model_calls": 1,
+      "backend_solves": 0,
+      "worker_calls": 0,
+      "wall_s": 38.20299999997951
+    },
+    "remaining": {
+      "backend_solves": 2,
+      "model_calls": 5,
+      "tool_calls": 40,
+      "wall_s": null,
+      "worker_calls": 0
+    },
+    "occupied": {}
+  },
+  "new_provider_requests": 1,
+  "synthetic_http_requests": 0,
+  "physics": 0,
+  "status": "blocked",
+  "requests": [
+    {
+      "request_id": "r3-request-2bf94b901eda453f817644c38d12cffe",
+      "http_status": 200,
+      "body_reference": {
+        "artifact_id": "2c6db6ee8cd779818574f576b8059f0b247129c6dfde93aa26753dc31fb08f4c",
+        "media_type": "application/octet-stream"
+      },
+      "usage": {
+        "prompt_tokens": 9890,
+        "completion_tokens": 8192,
+        "total_tokens": 18082,
+        "prompt_tokens_details": {
+          "cached_tokens": 1024
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 8192
+        },
+        "prompt_cache_hit_tokens": 1024,
+        "prompt_cache_miss_tokens": 8866
+      },
+      "actual_model": "deepseek-flash",
+      "finish_reasons": [
+        "length"
+      ],
+      "raw_reasoning_preserved": true
+    }
+  ],
+  "source_freeze": "7117a1c6c5000ff6c72c395a8fa651e511d3039d",
+  "block_reason": "Old first SDK response exhausted the frozen 8192-token output cap with reasoning only; no tool call/complete round. Native submission was rejected. SDK wrapped the local truncation rejection as APIConnectionError despite HTTP 200.",
+  "old_complete_tool_round": false,
+  "old_scientific_actions": 0,
+  "new_snapshot_persisted_and_reopened": false,
+  "framework_session_id": "s127-4b-sdk-20261021",
+  "handoff_committed": false,
+  "unknown_provider_outcomes": 0,
+  "known_saved_response_unconsumed": true,
+  "budget_unchanged_ceiling": {
+    "backend_solves": 2,
+    "model_calls": 6,
+    "tool_calls": 40,
+    "wall_s": null,
+    "worker_calls": 0
+  },
+  "production_flags_modified": false,
+  "further_requests_not_sent": "Remaining five requests deliberately not sent across an incomplete old tool boundary. No retries, new grant, rewritten response, raised token cap or manual admission flag.",
+  "interpretation": "Live scientific continuation not validated. Offline SDK clean-path and crash fixtures do not substitute for it."
+}
