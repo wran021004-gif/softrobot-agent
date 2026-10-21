@@ -91,8 +91,11 @@ async def handoff(host,agent,build,directory,*,stage=lambda name:None):
     """Prepare -> persist -> independently reopen -> verify -> atomic pointer commit."""
     from tools.research.agent import decision_packet
     current=state(host);committed=current['pilot'].get('handoff')
-    if committed and host.store.artifact(committed)['next_session']==agent._session_manager.session_id:
-        return committed,await validate_snapshot(host,committed,build,directory)
+    if committed:
+        prior=host.store.artifact(committed);session_id=agent._session_manager.session_id
+        repeated_old=(prior['previous_session']==session_id and prior['completed_boundary_identity']==digest(agent.messages))
+        untouched_new=(prior['next_session']==session_id and agent.messages==prior['initial_messages'])
+        if repeated_old or untouched_new:return committed,await validate_snapshot(host,committed,build,directory)
     if agent._session_manager.session_id!=current['pilot']['framework_session_id']:raise ValueError('OLD_SESSION_ID_MISMATCH')
     # Preserve the original SDK reasoning/tool IDs before recording a handoff boundary.
     await agent._session_manager.save_snapshot(agent,is_latest=True)

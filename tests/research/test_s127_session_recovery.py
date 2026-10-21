@@ -61,7 +61,10 @@ def child(directory,run_id,mode):
             if name==mode and mode!='writing_snapshot':os._exit(71)
         ref,new=await handoff(h,old,build,h.store.root/'sdk',stage=stage)
         if mode=='repeat':
-            await handoff(h,new,build,h.store.root/'sdk');os._exit(71)
+            await handoff(h,new,build,h.store.root/'sdk')
+            repeated,_=await handoff(h,old,build,h.store.root/'sdk')
+            assert repeated==ref
+            os._exit(71)
         provider=state(h)['pilot']['provider']
         wire=dict(model=provider['model'],thinking=dict(type=provider['thinking']),reasoning_effort=provider['reasoning_effort'],
             max_tokens=provider['max_tokens'],stream=False,messages=[dict(role='user',content='Offline new-session fixture')])
@@ -164,7 +167,8 @@ class SessionRecoveryTests(unittest.TestCase):
                                 with self.assertRaisesRegex(ValueError,'UNCONFIRMED'):await transport.handle_async_request(request)
                             else:self.assertEqual((await transport.handle_async_request(request)).status_code,200)
                         self.assertEqual(h.store.remaining(),ledger)
-                        with self.assertRaises(ValueError):await handoff(h,build(info['previous']),build,h.store.root/'sdk')
+                        ref,_=await handoff(h,build(info['previous']),build,h.store.root/'sdk')
+                        self.assertEqual(ref,s['pilot']['handoff']);self.assertEqual(h.store.remaining(),ledger)
                     await transport.aclose()
                 asyncio.run(check())
                 self.assertEqual(h.store.remaining()['used']['backend_solves'],0)
@@ -189,6 +193,11 @@ class SessionRecoveryTests(unittest.TestCase):
         h=cold_host();transport=LiveBoundary(h,httpx.MockTransport(response));build=factory(h,transport)
         async def missing():
             old=build();await old.invoke_async('Complete fixture');ref,new=await handoff(h,old,build,h.store.root/'sdk')
+            ledger=h.store.remaining()
+            await new.invoke_async('Complete a second offline invocation')
+            second,new=await handoff(h,new,build,h.store.root/'sdk')
+            self.assertNotEqual(second,ref)
+            self.assertEqual(h.store.remaining()['used']['model_calls'],ledger['used']['model_calls']+1)
             from types import SimpleNamespace
             def wrong_schema(session_id):
                 restored=build(session_id)
