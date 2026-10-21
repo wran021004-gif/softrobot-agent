@@ -19,16 +19,15 @@ class RLHandoffTests(unittest.TestCase):
         self.period=self.cfg['task']['timing']['control_period_s'];self.steps=round(self.cfg['task']['timing']['duration_s']/self.period)
         self.observations=[dict(time_s=i*self.period,actual_tension_n=[.2]*len(self.order),predicted_tension_n=[999.]*len(self.order)) for i in range(self.steps)]
         metadata=save(h,dict(solver_status='completed'))
-        self.source=dict(metadata=metadata,configuration=deepcopy(self.cfg))
-        self.result=save(h,dict(status='evaluated',candidate=self.candidate,execution_id='synthetic-recorded-fixture',
-            acceptance=dict(accepted=False),execution=dict(receipts=dict(simulation={'fixture':True}))))
+        self.source=dict(metadata=metadata,configuration=deepcopy(self.cfg),owner=h.run_id,
+            files={'controller_observations.json':metadata})
+        self.result=save(h,dict(status='evaluated',candidate=self.candidate,execution_id='synthetic-recorded-fixture',owning_study=h.run_id,
+            acceptance=dict(accepted=False),execution=dict(receipts=dict(simulation=dict(execution_id='synthetic-recorded-fixture',output=metadata)))))
         update(h,results=[self.result],mechanics_results=[],compatible_residual_references=[])
 
     def references(self):
         from extensions.tendon_family.control_evidence import ControlEvidence
-        with patch.object(ControlEvidence,'resolve',return_value=self.source),patch.object(ControlEvidence,'read_file',return_value=self.observations),\
-            patch('extensions.tendon_family.backends.physics_for',return_value=dict(tendons=[dict(entity=t) for t in self.order])),\
-            patch('extensions.tendon_family.scene.assemble',return_value=dict(task_identity=digest(self.cfg['task']))):
+        with patch.object(ControlEvidence,'resolve',return_value=self.source),patch.object(ControlEvidence,'read_file',return_value=self.observations):
             return rl.compatible_references(self.h)
 
     def test_failed_complete_nmpc_uses_measured_inputs_and_no_repeat_execution(self):

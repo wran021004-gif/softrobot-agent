@@ -118,6 +118,13 @@ def _seed_control(host,request,operation_key):
     if request.source:
         parent=host.store.artifact(request.parent)
         source=host.store.artifact(request.source)
+        if source.get('execution_id') and not source.get('trajectory'):
+            from tools.research.rl import measured_nmpc_trajectory
+            if plain(request.parent)!=plain(request.candidate) or source.get('candidate')!=plain(request.candidate) or request.channel_map is not None:
+                raise ValueError('EXACT_NMPC_CANDIDATE_WITHOUT_CHANNEL_MAPPING_REQUIRED')
+            trajectory,origin=measured_nmpc_trajectory(host,request.source)
+            source=dict(trajectory=trajectory)
+            provenance.update(source_kind='measured_nmpc_execution_v1',**origin)
         binding(parent['configuration'],source['trajectory'])
         old=source['trajectory'];old_order=old['tendon_order']
         mapping=request.channel_map

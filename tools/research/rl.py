@@ -470,6 +470,38 @@ def dispatch(host, value, request_id, selected=None):
             state_api.update(host,numerical_s=state_api.state(host)['numerical_s']+time.perf_counter()-operation_started)
 
 
+def measured_nmpc_trajectory(host, reference):
+    """One owned, complete measured SI grid, shared by PPO and explicit controls."""
+    from extensions.tendon_family.control_evidence import ControlEvidence
+    from tools.research.design import full_science
+    from tools.research.physical_replay import binding, model_context
+    from tools.research.state import state
+    reference=plain(reference)
+    if reference not in state(host).get('results',[]):raise ValueError('REGISTERED_CURRENT_NMPC_EXECUTION_REQUIRED')
+    value=host.store.artifact(reference)
+    if value.get('status')!='evaluated' or not value.get('execution',{}).get('receipts',{}).get('simulation'):
+        raise ValueError('COMPLETE_NMPC_EXECUTION_REQUIRED')
+    reader=ControlEvidence(host.store);source=reader.resolve(value['execution_id'])
+    receipt=value['execution']['receipts']['simulation']
+    if (value.get('owning_study')!=host.run_id or receipt.get('execution_id')!=value['execution_id']
+            or receipt.get('output',{}).get('artifact_id')!=source['metadata']['artifact_id']):
+        raise ValueError('CURRENT_STUDY_NMPC_OWNERSHIP_REQUIRED')
+    if host.store.artifact({'artifact_id':source['metadata']['artifact_id']})['solver_status']!='completed':raise ValueError('COMPLETE_NMPC_EXECUTION_REQUIRED')
+    cfg=verify_candidate(host,value['candidate'])['configuration']
+    if full_science(source['configuration'])!=full_science(cfg):raise ValueError('EXACT_NMPC_SCIENTIFIC_CONFIGURATION_REQUIRED')
+    observations=reader.read_file(source,'controller_observations.json',[])
+    inp,physics,scene,model=model_context(cfg)
+    trajectory=dict(tendon_order=[t['entity'] for t in physics['tendons']],
+        tensions_n=[o['actual_tension_n'] for o in observations],
+        times_s=[o['time_s'] for o in observations]+[inp.task.timing.duration_s],
+        task_identity=digest(plain(inp.task)),model_identity=model['identity'],design_identity=model['design_identity'])
+    binding(cfg,trajectory)
+    return trajectory,dict(execution_reference=reference,execution_id=value['execution_id'],
+        candidate=value['candidate'],task_identity=trajectory['task_identity'],
+        measured_input_reference=source['files']['controller_observations.json'],
+        command_origin='measured_applied_interval_inputs',units='N',semantics='open_loop_zero_order_hold')
+
+
 def compatible_references(host, *, publish=True):
     """Complete exact-candidate schedules remain usable even when task scores fail."""
     from tools.research.state import state,update
@@ -498,18 +530,8 @@ def compatible_references(host, *, publish=True):
             continue
         candidate_ref=value['candidate']
         try:
-            from extensions.tendon_family.control_evidence import ControlEvidence
-            reader=ControlEvidence(host.store)
-            source=reader.resolve(value['execution_id'])
-            if host.store.artifact({'artifact_id':source['metadata']['artifact_id']})['solver_status']!='completed':
-                raise ValueError('Complete backend execution required')
-            observations=reader.read_file(source,'controller_observations.json',[])
+            trajectory,_=measured_nmpc_trajectory(host,ref)
             cfg=verify_candidate(host,candidate_ref)['configuration']
-            if full_science(source['configuration'])!=full_science(cfg):
-                raise ValueError('Exact reference scientific configuration required')
-            trajectory=dict(tendon_order=[t['id'] for t in cfg['robot']['structure']['data']['tendons']],
-                tensions_n=[o['actual_tension_n'] for o in observations],
-                times_s=[o['time_s'] for o in observations]+[cfg['task']['timing']['duration_s']])
             sources.append((ref,candidate_ref,trajectory,cfg,'nmpc'))
         except (ValueError,KeyError) as exc:
             rows.append(dict(candidate=candidate_ref,source=ref,source_kind='nmpc',available=False,reason=str(exc)))

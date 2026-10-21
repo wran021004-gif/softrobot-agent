@@ -1,0 +1,75 @@
+{
+  "defaults": "family_study_defaults.json",
+  "start_mode": "family_space",
+  "family_space": "family_space_s7.json",
+  "candidate_initialization": "all_candidate_dofs_zero_v1",
+  "base_commit": "174cd8c04ede5058cb78ffd91a45fb43f5399cec",
+  "mode": "engineering_numerical",
+  "control": "control_sorosim_s56_braking.json",
+  "study_id": "s127-measured-control-engineering-20261021",
+  "evidence_destination": "runs/s127_control_engineering_export",
+  "capabilities": [
+    "physical_replay",
+    "control_correction",
+    "control_search"
+  ],
+  "allowed_plan_actions": [
+    "generate",
+    "initialize_control",
+    "physical_replay",
+    "control_search",
+    "select",
+    "stop"
+  ],
+  "budgets": {
+    "provider_requests": 1,
+    "protected_provider_requests": 0,
+    "public_operations": 200,
+    "protected_public_operations": 12,
+    "physical_launches": 6,
+    "mathematical_evaluations": 0,
+    "offline_nlp": 0,
+    "bdf_replays": 0
+  },
+  "nmpc_limits": {
+    "executions": 0
+  },
+  "rl_limits": {
+    "training_stages": 0,
+    "actions_per_trial": 65536,
+    "training_actions": 0,
+    "evaluation_episodes": 0
+  },
+  "reserve_rl_evaluation": true,
+  "research_decisions": {
+    "version": "research_decision_v1",
+    "history": [],
+    "mathematics": [],
+    "control_seeds": [
+      {
+        "folder": "runs/s127_measured_control_import",
+        "candidate": {
+          "artifact_id": "e6304c14a5c9511ce9f3884a4ec549ea78ba2b70b3615f858f51df1d5815de04",
+          "media_type": "application/json"
+        },
+        "source": {
+          "artifact_id": "80c5732a208e0e9b2161875dcf94e60cc45e7252878f5ce145b1861bf3c4dbac",
+          "media_type": "application/json"
+        }
+      }
+    ],
+    "context_limits": {
+      "candidates": 3,
+      "recent": 4,
+      "pareto": 3,
+      "samples": 6,
+      "evidence": 3
+    }
+  },
+  "authorization": "Current S12.7.2 task: independent numerical engineering only, at most 6 new physics launches, zero external Provider requests, zero NMPC and PPO launches.",
+  "execution_instructions": "Engineering-only numerical tool validation. No application model calls.",
+  "task": "../../tasks/reach_hold_mirror_v1.json",
+  "supplied_evidence": [],
+  "require_task_guidance": false,
+  "tool_readiness": null
+}
