@@ -30,7 +30,7 @@ class S12DecisionTests(unittest.TestCase):
                 def build(*args,**kwargs):
                     registry={t.tool_name:t for t in kwargs['research_tools']}
                     if saved:registry['retrieve_context']=SimpleNamespace(tool_spec={})
-                    agent=SimpleNamespace(tool_registry=SimpleNamespace(registry=registry),
+                    agent=SimpleNamespace(messages=[],tool_registry=SimpleNamespace(registry=registry),
                         hooks=SimpleNamespace(add_callback=lambda event,fn:callbacks.update({event:fn})),system_prompt='')
                     async def invoke(prompt):
                         await callbacks[BeforeModelCallEvent](SimpleNamespace(cancel=None))

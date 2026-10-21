@@ -15,10 +15,10 @@ OUT=ROOT/'evidence/s126_decision_probe'
 BASE='3e370ab7adc97deadb0f2d5b0bc641280774bf1a'
 
 
-def baseline_module(name):
+def baseline_module(name,baseline=BASE):
     module=ModuleType('s126_baseline_'+name)
-    source=subprocess.check_output(['git','show',BASE+':tools/research/'+name+'.py'],cwd=ROOT,encoding='utf8')
-    exec(compile(source,BASE+'/'+name+'.py','exec'),module.__dict__)
+    source=subprocess.check_output(['git','show',baseline+':tools/research/'+name+'.py'],cwd=ROOT,encoding='utf8')
+    exec(compile(source,baseline+'/'+name+'.py','exec'),module.__dict__)
     return module
 
 
@@ -169,8 +169,77 @@ def plain_id(ref):
     return plain(ref)['artifact_id']
 
 
+def prepare_s127():
+    """Reuse the existing cutoff snapshots, wire Store and intercepted probe scope."""
+    from tools.research.agent import decision_packet, plan_schema
+    import hashlib
+    from tools.research.contracts import EvidenceQuery
+    from extensions.tendon_family.control_evidence import ControlEvidence
+    from tests.research.test_s127_working_set import historical_host
+    destination=ROOT/'evidence/s127_decision_probe'
+    previous=read(destination/'manifest.json') if (destination/'manifest.json').exists() else None
+    if previous and (previous['new_provider_requests'] or (destination/'live_results.json').exists()):raise ValueError('EXECUTED_S127_PROBE_CANNOT_BE_REFROZEN')
+    sink=cold_host();source=historical_host();old=baseline_module('research_context','bd31326296afb6daace6db5afb1205daa8e01841')
+    superseded=save(sink,previous,'unexecuted_s127_probe_draft') if previous else None
+    cases=[('candidate_without_results',128),('invalid_math_correction',144),('same_candidate_failed_controls',473),
+        ('fixed_failure_near_protection',637),('complete_nmpc_residual_reference',556),('independent_session_boundary',556)]
+    first=next(e for e in source.store.events(source.run_id) if e['kind']=='r3_request')
+    template=source.store.artifact(source.store.artifact(first['outputs'][0])['request']);rows=[]
+    for name,sequence in cases:
+        frozen,_,available,event=snapshot(sequence,'evidence/s126_cold/study');s=state(frozen)
+        cutoff_events=frozen.store.events.return_value
+        frozen.store.connect.side_effect=source.store.connect
+        frozen.store.events.side_effect=lambda run,events=cutoff_events:events if run==source.run_id else source.store.events(run)
+        # Make only known completed executions' immutable backend measurements readable.
+        for ref in s.get('results',[]):
+            result=source.store.artifact(ref);backend=ControlEvidence(source.store).resolve(result['execution_id'])
+            for r in [backend['manifest'],backend['metadata']['candidate_input'],{'artifact_id':backend['metadata']['artifact_id']},*backend['files'].values()]:
+                available[r['artifact_id']]=source.store.artifact(r,raw=r.get('media_type','application/json')!='application/json')
+        frozen.store.artifact.side_effect=lambda ref,raw=False,a=available:a[plain_id(ref)]
+        # The source cache is filtered to results that already exist at the cutoff.
+        s['compatible_residual_references']=[r for r in s.get('compatible_residual_references',[]) if r['source'] in s['results']+s['mechanics_results']]
+        if name=='fixed_failure_near_protection':frozen.store.remaining.return_value['remaining']['model_calls']=5
+        new_packet=decision_packet(frozen)
+        with patch('tools.research.research_context.decision_brief',side_effect=lambda c:old.decision_brief(old.context(frozen))):prior=decision_packet(frozen)
+        assert prior['research']['all_fresh_results']==new_packet['research']['all_fresh_results']
+        with sink.store.transaction() as db:
+            for identity,value in available.items():
+                ref=sink.store.put(db,value,media='application/octet-stream' if isinstance(value,bytes) else 'application/json')
+                assert ref.artifact_id==identity
+        frozen_ref=save(sink,dict(state=s,ledger=frozen.store.remaining(),accessible_artifacts=list(available)), 's127_frozen_probe_state')
+        tools=deepcopy(template['tools'])
+        for tool in tools:
+            if tool['function']['name']=='research_plan':tool['function']['parameters']=plan_schema(new_packet['research']['actions'],decision_required=True)
+            if tool['function']['name']=='evidence_read':tool['function']['parameters']=EvidenceQuery.model_json_schema()
+        for arm,packet in (('s127_full',prior),('layered',new_packet)):
+            wire={k:deepcopy(v) for k,v in template.items() if k not in ('messages','tools')}
+            wire.update(max_tokens=8192,tools=deepcopy(tools),messages=[dict(role='system',content=s['spec']['execution_instructions']+
+                '\nCURRENT_RESEARCH_PACKET\n'+json.dumps(packet,separators=(',',':'))),dict(role='user',content=
+                'Choose one next research tool using this frozen evidence. Scientific execution is intercepted. Full scientific admission is not_tested until checked. No adaptive additional request is authorized.')])
+            ref=save(sink,wire,'s127_frozen_probe_wire')
+            rows.append(dict(name=name,arm=arm,cutoff_sequence=sequence,state=frozen_ref,request=ref,identity=digest(wire),
+                experiment='session_protocol_separate_no_compression_causality_claim' if name=='independent_session_boundary' else 'layered_context_pair',
+                decision_context_bytes=payload(wire)['serialized_bytes']['current_packet'],**payload(wire)))
+    manifest=dict(status='frozen_offline_independent_authorization_required',request_ceiling=12,automatic_retries=0,
+        endpoint='https://api.deepseek.com',model=template['model'],max_output_tokens_per_request=8192,
+        store=str(sink.store.root),run_id=sink.run_id,baseline='bd31326296afb6daace6db5afb1205daa8e01841',
+        cases=rows,scientific_execution='intercepted; full admission not_tested',
+        source_commit=subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip(),
+        source_hashes={str(p.relative_to(ROOT)).replace('\\','/'):hashlib.sha256(p.read_bytes()).hexdigest() for p in (ROOT/'tools/research').glob('*.py')},
+        superseded_unexecuted_draft=superseded,
+        data_scope='Six exact frozen project states, their candidate/task/evidence references and tool schemas, system/user instructions only. No unrelated files, credentials or old complete chat history.',
+        actual_prompt_tokens=None,actual_completion_tokens=None,cache_hit_tokens=None,cache_miss_tokens=None,
+        new_provider_requests=0,new_scientific_executions=0,legal_proposals=None,first_scientifically_admissible_proposal=None,
+        effective_evidence_deliveries=None,unnecessary_detail_reads=None,
+        publication_scope='Only metadata/byte counts/hashes. Raw wires and raw responses are not authorized for GitHub upload.')
+    manifest['frozen_manifest_identity']=digest(manifest)
+    atomic_json(destination/'manifest.json',manifest)
+    return manifest
+
+
 if __name__=='__main__':
     import argparse
-    parser=argparse.ArgumentParser();parser.add_argument('--authorization',type=Path);args=parser.parse_args()
-    if args.authorization:asyncio.run(live(args.authorization))
+    parser=argparse.ArgumentParser();parser.add_argument('--authorization',type=Path);parser.add_argument('--prepare-s127',action='store_true');args=parser.parse_args()
+    if args.prepare_s127:print(json.dumps(prepare_s127()))
+    elif args.authorization:asyncio.run(live(args.authorization))
     else:print(json.dumps(prepare()))

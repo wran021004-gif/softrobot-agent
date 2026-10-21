@@ -470,7 +470,7 @@ def dispatch(host, value, request_id, selected=None):
             state_api.update(host,numerical_s=state_api.state(host)['numerical_s']+time.perf_counter()-operation_started)
 
 
-def measured_nmpc_trajectory(host, reference):
+def measured_nmpc_trajectory(host, reference, *, bind_model=True):
     """One owned, complete measured SI grid, shared by PPO and explicit controls."""
     from extensions.tendon_family.control_evidence import ControlEvidence
     from tools.research.design import full_science
@@ -490,12 +490,17 @@ def measured_nmpc_trajectory(host, reference):
     cfg=verify_candidate(host,value['candidate'])['configuration']
     if full_science(source['configuration'])!=full_science(cfg):raise ValueError('EXACT_NMPC_SCIENTIFIC_CONFIGURATION_REQUIRED')
     observations=reader.read_file(source,'controller_observations.json',[])
-    inp,physics,scene,model=model_context(cfg)
+    if any(o.get('phase')!='current_state_before_integration' for o in observations):raise ValueError('MEASURED_PRE_STEP_INPUT_PHASE_REQUIRED')
+    from extensions.tendon_family.backends import physics_for
+    inp=SessionInput.model_validate(cfg);physics=physics_for(inp)
     trajectory=dict(tendon_order=[t['entity'] for t in physics['tendons']],
         tensions_n=[o['actual_tension_n'] for o in observations],
         times_s=[o['time_s'] for o in observations]+[inp.task.timing.duration_s],
-        task_identity=digest(plain(inp.task)),model_identity=model['identity'],design_identity=model['design_identity'])
-    binding(cfg,trajectory)
+        task_identity=digest(plain(inp.task)))
+    if bind_model:
+        _,_,_,model=model_context(cfg)
+        trajectory.update(model_identity=model['identity'],design_identity=model['design_identity'])
+        binding(cfg,trajectory)
     return trajectory,dict(execution_reference=reference,execution_id=value['execution_id'],
         candidate=value['candidate'],task_identity=trajectory['task_identity'],
         measured_input_reference=source['files']['controller_observations.json'],
@@ -530,7 +535,7 @@ def compatible_references(host, *, publish=True):
             continue
         candidate_ref=value['candidate']
         try:
-            trajectory,_=measured_nmpc_trajectory(host,ref)
+            trajectory,_=measured_nmpc_trajectory(host,ref,bind_model=False)
             cfg=verify_candidate(host,candidate_ref)['configuration']
             sources.append((ref,candidate_ref,trajectory,cfg,'nmpc'))
         except (ValueError,KeyError) as exc:

@@ -36,7 +36,7 @@ def read_evidence(host, query):
     if q.view=='working_set':
         from tools.research.evidence_policy import registered_references
         from tools.research.research_context import context
-        if plain(q.reference) not in registered_references(host):raise ValueError('REGISTERED_WORKING_SET_ANCHOR_REQUIRED')
+        if plain(q.reference) not in [s.get('family_space_reference'),*registered_references(host)]:raise ValueError('REGISTERED_WORKING_SET_ANCHOR_REQUIRED')
         value=dict(context(host)['evidence_working_set'],source_state_identity=digest(s),
             authoritative_scientific_evidence=False)
     if q.pointer and not q.pointer.startswith('/'):

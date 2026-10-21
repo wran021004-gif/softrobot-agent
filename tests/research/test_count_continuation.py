@@ -300,13 +300,13 @@ class CountContinuationTests(fixtures.MainlineTests):
         from extensions.tendon_family import backends,scene,control_evidence
         order=[t['id'] for t in self.cfg['robot']['structure']['data']['tendons']]
         value=self.host.store.artifact(self.result)
-        value.update(acceptance={'accepted':False},execution={'receipts':{'simulation':{'execution_id':'source'}}})
+        metadata=save(self.host,{'solver_status':'completed'})
+        value.update(acceptance={'accepted':False},owning_study=self.host.run_id,
+            execution={'receipts':{'simulation':{'execution_id':value['execution_id'],'output':metadata}}})
         update(self.host,results=[save(self.host,value)])
-        source={'configuration':self.cfg,'metadata':{'artifact_id':save(self.host,{'solver_status':'completed'})['artifact_id']}}
-        observations=[dict(time_s=k*.01,actual_tension_n=[.2]*6) for k in range(35)]
-        with patch.object(backends,'physics_for',return_value={'tendons':[dict(entity=t) for t in order]}), \
-             patch.object(scene,'assemble',return_value={'task_identity':'fixture'}), \
-             patch.object(control_evidence.ControlEvidence,'resolve',return_value=source), \
+        source={'configuration':self.cfg,'metadata':metadata,'files':{'controller_observations.json':metadata}}
+        observations=[dict(time_s=k*.01,phase='current_state_before_integration',actual_tension_n=[.2]*6) for k in range(35)]
+        with patch.object(control_evidence.ControlEvidence,'resolve',return_value=source), \
              patch.object(control_evidence.ControlEvidence,'read_file',return_value=observations):
             reference=rl.compatible_references(self.host)[0]
         self.assertTrue(reference['available'])

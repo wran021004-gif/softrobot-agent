@@ -255,6 +255,7 @@ def binding(configuration, trajectory):
             or trajectory['task_identity']!=digest(plain(inp.task)) or trajectory['tendon_order']!=order
             or u.shape!=(count,len(order)) or not np.isfinite(u).all() or np.any(u<0) or np.any(u>limits)
             or len(trajectory['times_s'])!=count+1 or
+            not np.isfinite(trajectory['times_s']).all() or
             any(abs(t-k*timing.control_period_s)>1e-12 for k,t in enumerate(trajectory['times_s']))
             or scene['control']['tension_execution_mode']!='ideal_tension'):
         raise ValueError('PHYSICAL_REPLAY_CANDIDATE_TASK_MODEL_OR_SEQUENCE_MISMATCH')

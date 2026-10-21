@@ -288,7 +288,7 @@ def error_feedback(host, use, exc, before):
     return dict(status='rejected' if counts(before)==counts(s) else 'execution_failed',error_code=code[:100],field=field,
         expected=expected,scientific_execution_started=counts(before)!=counts(s),relevant_references=refs,full_error_reference=full)
 
-def build_harness(host,*,transport,api_key,instructions,model_class,tool_executor,research_tools,configuration_path,session_directory):
+def build_harness(host,*,transport,api_key,instructions,model_class,tool_executor,research_tools,configuration_path,session_directory,session_id=None):
     from strands.experimental.context_manager import Offload
     s=state(host)
     provider=s['pilot']['provider']
@@ -303,10 +303,10 @@ def build_harness(host,*,transport,api_key,instructions,model_class,tool_executo
     context=dict(strategies=[Offload.truncate('tool_results',{'preview_tokens':500 if compact else 1024}).when(threshold=1500 if compact else 4096)])
     agent=create_harness(model=model,tools=research_tools,instructions=instructions,
         builtin_tools=[],builtin_plugins=[],background_tasks=False,memory=False,skills=False,
-        context_manager=context,session=dict(id=s['pilot']['framework_session_id'],dir=str(session_directory)),
+        context_manager=context,session=dict(id=session_id or s['pilot']['framework_session_id'],dir=str(session_directory)),
         retry_strategy=None,callback_handler=None,caching=False,tool_executor=tool_executor)
     atomic_json(configuration_path,dict(harness='strands-harness==0.2.0',sdk='strands-agents==1.59.0',
-        provider=provider,registered_tools=sorted(agent.tool_names),session_id=s['pilot']['framework_session_id'],
+        provider=provider,registered_tools=sorted(agent.tool_names),session_id=session_id or s['pilot']['framework_session_id'],
         retry_controllers=0,context='public tool-result offload and retrieval',offload_threshold=1500 if compact else 4096,
         offload_preview_tokens=500 if compact else 1024,
         dynamic_context='bounded packet in stable system prefix; installed BeforeModelCallEvent exposes cancellation only',
@@ -326,9 +326,11 @@ async def wait_training(host):
             return
         await asyncio.sleep(2.)
 
-async def converse(host):
+async def converse(host,*,session_handoff=False):
     from tools.research.core import guard,dispatch,experience,read_evidence,packet
     from tools.research.contracts import Plan,ExperienceQuery,EvidenceQuery,AnalysisRequest,RLRequest
+    if session_handoff and not state(host)['pilot'].get('session_handoff_live_admitted'):
+        raise ValueError('LIVE_PROVIDER_CONTINUATION_UNVERIFIED_HANDOFF_NOT_ADMITTED')
     if state(host)['spec'].get('mode') == 'engineering_numerical':
         raise ValueError('NUMERICAL_MODE_FORBIDS_APPLICATION_MODEL_ENDPOINTS')
     from strands.tools.tools import PythonAgentTool
@@ -448,9 +450,16 @@ async def converse(host):
         native[-1].tool_spec={**native[-1].tool_spec,'inputSchema':{'json':schema}}
     if formal:
         native[1].tool_spec={**native[1].tool_spec,'description':'Unavailable outside scoped milestone evidence'}
-    agent=build_harness(host,transport=boundary,api_key=os.environ['DEEPSEEK_API_KEY'],instructions=instructions,
-        model_class=live_model_class(boundary),tool_executor=SequentialToolExecutor(),research_tools=[t for t in native if t is not native[1]] if state(host)['spec'].get('rl_evaluation_source') else native,
-        configuration_path=host.store.root/'framework_configuration.json',session_directory=host.store.root/'framework_sessions')
+    def build_session(session_id=None):
+        return build_harness(host,transport=boundary,api_key=os.environ['DEEPSEEK_API_KEY'],instructions=instructions,
+            model_class=live_model_class(boundary),tool_executor=SequentialToolExecutor(),research_tools=[t for t in native if t is not native[1]] if state(host)['spec'].get('rl_evaluation_source') else native,
+            configuration_path=host.store.root/'framework_configuration.json',session_directory=host.store.root/'framework_sessions',session_id=session_id)
+    agent=build_session()
+    from tools.research.session_handoff import unmatched, recover_feedback
+    if unmatched(agent.messages):await recover_feedback(host,agent)
+    if state(host)['pilot'].get('handoff'):
+        from tools.research.session_handoff import reconcile
+        agent=await reconcile(host,build_session,host.store.root/'framework_sessions')
     if state(host)['spec'].get('rl_evaluation_source'):
         agent.tool_registry.registry.pop('retrieve_context',None)
     async def before_model(event):
@@ -543,14 +552,33 @@ async def converse(host):
     agent.hooks.add_callback(BeforeToolCallEvent,before_tool)
     agent.hooks.add_callback(AfterToolCallEvent,after_tool)
     try:
+        rotated=False
         while state(host)['research_status']!='stopped':
             if host.store.remaining()['remaining']['model_calls']<1:
                 engineering_closeout(host,'Provider request count exhausted without model STOP/selection')
                 break
             result=await agent.invoke_async('Use actual saved evidence, choose your next research action or STOP, then consume feedback and decide freely.')
-            record(host,'model_original_turn',dict(result=str(result)))
+            record(host,'model_original_turn',dict(result=str(result),session_id=agent._session_manager.session_id,
+                sdk_message_identity=digest(agent.messages)))
             if state(host)['pending'] or pending(host):
                 raise ValueError('PENDING_OUTCOME_REQUIRES_LOCAL_RECOVERY')
+            if session_handoff and not rotated and state(host)['research_status']!='stopped' and not state(host).get('success_gate'):
+                from tools.research.session_handoff import handoff, reconcile
+                previous=agent
+                try:_,agent=await handoff(host,agent,build_session,host.store.root/'framework_sessions')
+                except Exception as exc:
+                    s=state(host)
+                    if s['pending'] or pending(host) or s['pilot'].get('unconsumed_response'):raise
+                    if s['pilot']['framework_session_id']!=previous._session_manager.session_id:
+                        agent=await reconcile(host,build_session,host.store.root/'framework_sessions')
+                    else:
+                        agent=build_session(previous._session_manager.session_id)
+                        if agent.messages!=previous.messages:raise ValueError('OLD_SDK_HISTORY_NOT_DURABLE') from exc
+                        record(host,'session_handoff_not_committed',dict(reason=str(exc),old_session_retained=True))
+                agent.hooks.add_callback(BeforeModelCallEvent,before_model)
+                agent.hooks.add_callback(BeforeToolCallEvent,before_tool)
+                agent.hooks.add_callback(AfterToolCallEvent,after_tool)
+                rotated=True
     finally:
         await boundary.aclose()
 

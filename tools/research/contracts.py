@@ -325,7 +325,7 @@ class ControlSearchRequest(ControlSearchStart):
 
 class ControlSeedRequest(Contract):
     candidate: EvidenceRef
-    source: EvidenceRef | None = None
+    source: EvidenceRef | None = Field(default=None,description='Explicit schedule or a registered complete NMPC execution result. NMPC uses measured applied SI interval tensions; parent must equal candidate, without channel_map. New open-loop schedule inherits no acceptance.')
     parent: EvidenceRef | None = None
     channel_map: dict[str, str] | None = None
     tensions_n: list[list[FiniteFloat]] | None = None

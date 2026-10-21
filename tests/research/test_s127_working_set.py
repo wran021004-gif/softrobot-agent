@@ -50,7 +50,7 @@ class WorkingSetTests(unittest.TestCase):
         h=historical_host();before=state(h);c=context(h);ws=c['evidence_working_set']
         self.assertEqual(ws['candidate_index'],decision_brief(c)['evidence_working_set']['candidate_index'])
         self.assertEqual(ws['all_fresh_results'],c['all_fresh_results']);self.assertEqual(len(ws['all_fresh_results']),9)
-        self.assertLessEqual(len(ws['candidate_index']),3);self.assertLessEqual(len(ws['read_coverage']),12)
+        self.assertLessEqual(len(ws['candidate_index']),3);self.assertEqual(len(ws['read_coverage']),ws['read_coverage_count'])
         self.assertTrue(ws['control_result_links']);self.assertTrue(ws['control_comparisons'])
         for r in ws['candidate_index']:
             self.assertTrue(r['compiled']);self.assertFalse(r['accepted'])

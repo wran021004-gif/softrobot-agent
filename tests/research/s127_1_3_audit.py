@@ -3,7 +3,7 @@ from copy import deepcopy
 import json
 import subprocess
 from unittest.mock import patch
-from tools.research.agent import decision_packet
+from tools.research.agent import decision_packet, plan_schema
 from tools.research.research_context import context, decision_brief
 from tools.research.state import state
 from tools.research.contracts import EvidenceQuery
@@ -31,6 +31,10 @@ def layered():
         envelopes.append(request)
     for tool in envelopes[1]['tools']:
         if tool['function']['name']=='evidence_read':tool['function']['parameters']=EvidenceQuery.model_json_schema()
+        if tool['function']['name']=='research_plan':
+            actions=tool['function']['parameters']['properties']['action']['enum']
+            tool['function']['parameters']=plan_schema(actions,decision_required=True)
+    envelopes[0]['tools']=deepcopy(envelopes[1]['tools'])
     out=dict(baseline='bd31326296afb6daace6db5afb1205daa8e01841',source_study=h.run_id,
         source_state_identity=before,source_commit=subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip(),
         old_decision_brief_bytes=size(frozen['brief']),new_decision_brief_bytes=size(brief),
@@ -50,5 +54,24 @@ def layered():
     return out
 
 
+def probe_inventory():
+    from tools.platform_host import Host
+    manifest=read(ROOT/'evidence/s127_decision_probe/manifest.json');h=Host(manifest['store'],manifest['run_id']);rows=[]
+    assert len(manifest['cases'])==12
+    for i in range(0,12,2):
+        pair=manifest['cases'][i:i+2];a,b=[h.store.artifact(r['request']) for r in pair]
+        assert a['tools']==b['tools']
+        pa,pb=[json.loads(w['messages'][0]['content'].split('\nCURRENT_RESEARCH_PACKET\n',1)[1])['research'] for w in (a,b)]
+        assert pa['all_fresh_results']==pb['all_fresh_results'] and pa['task']==pb['task'] and pa['actions']==pb['actions']
+        assert all(pa['budget'][k]==pb['budget'][k] for k in pa['budget'])
+        for row in pair:assert digest(h.store.artifact(row['request']))==row['identity']
+        rows.append(dict(name=pair[0]['name'],same_task_actions_budget_science_index_and_tools=True,
+            all_fresh_result_count=len(pa['all_fresh_results']),wire_identities=[r['identity'] for r in pair],
+            full_scientific_admission='not_tested',actual_tokens=None))
+    atomic_json(ROOT/'evidence/s127_decision_probe/offline_checks.json',dict(tests=rows,
+        frozen_manifest_identity=manifest['frozen_manifest_identity'],live_status='blocked_independent_authorization_required',
+        metrics='No actual prompt/completion/cache tokens, legal proposal rates, evidence delivery counts or decision degradation measurements exist. Bytes are not tokens.'))
+
+
 if __name__=='__main__':
-    result=layered();print(json.dumps({k:v for k,v in result.items() if k.endswith('_bytes')}))
+    result=layered();probe_inventory();print(json.dumps({k:v for k,v in result.items() if k.endswith('_bytes')}))

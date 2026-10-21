@@ -117,7 +117,7 @@ class CrossProcessCheckpointTests(unittest.TestCase):
                 self.assertEqual(h.store.remaining()['used']['backend_solves'],0)
                 rows.append(dict(mode=mode,killed_process=True,original_history_restored=True,external_provider_requests=0,
                     synthetic_provider_charges=h.store.remaining()['used']['model_calls'],new_scientific_executions=0))
-        destination=ROOT/'evidence/s127_checkpoint';destination.mkdir(parents=True,exist_ok=True)
+        destination=ROOT/'runs/s127_checkpoint_regression';destination.mkdir(parents=True,exist_ok=True)
         atomic_json(destination/'admission.json',dict(status='not_admitted',production_rotation=False,tests=rows,
             blockers=['Prototype commits Store pointer before validating a new SDK snapshot; killed-process test confirms this gap.',
                 'Pending completed-worker fixtures fail closed, but real scientific recovery and feedback replay across a new SDK conversation are not validated.',

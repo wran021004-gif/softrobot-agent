@@ -272,6 +272,7 @@ def context(host):
             full_two_knot_response_fits=remaining>=2*channels+2))
     current['control_start_domains']=domains
     current['control_initialization_methods']=dict(baseline='Pretension, explicit tensions_n, or source+parent with optional channel_map',
+        measured_nmpc='initialize_control baseline with source=completed NMPC result, parent=candidate exactly, no channel_map. Saves measured inputs as an unmeasured open-loop ZOH schedule; no inherited acceptance.',
         mathematical_response='response_evidence must be a current verified input_sensitivity analysis; optional channels, trust_radius_n, regularization',
         physical_response='Optional baseline source+parent; channels, difference_step_n, trust_radius_n, regularization, evaluation_requests; one baseline plus one full rollout per channel, charged to shared budget')
     current['control_search_domain']=dict(coefficient_order='knot_index * tendon_count + tendon_index',
@@ -291,6 +292,13 @@ def context(host):
         citation_rule='STOP must explain the outcome and explicitly cite all_fresh_results. This index does not record model reading or understanding.')
     from tools.research.budget import decision_budget
     current['budget']=decision_budget(host)
+    from tools.research.rl import allocation_feedback
+    training=allocation_feedback(host)
+    current['training_budget_details']=training
+    current['training_budget']=dict(remaining_stages=training['remaining_stages'],
+        remaining_allocatable_actions=training['remaining_allocatable_actions'],
+        actions_per_trial=training['authorized_limits']['actions_per_trial'],
+        remaining_evaluation_episodes=training['evaluation_capacity']['remaining_episodes'])
     current['task_accepted']=bool(s.get('success_gate'))
     current['candidate_status']=dict(generated_valid=len(s['candidates']),
         control_sources_initialized=len(s.get('control_initializations',[])),
@@ -338,17 +346,19 @@ def read_coverage(host):
             q=EvidenceQuery.model_validate({'view':default,**use['input']})
             delivered=json.loads(''.join(b.get('text','') for b in result['content']))
             provided=any(content==''.join(b.get('text','') for b in result['content']) for content in deliveries.get(use['toolUseId'],[]))
-            expected=host.store.artifact(q.reference)
-            if isinstance(expected,bytes):expected=json.loads(expected)
-            for part in q.pointer[1:].split('/') if q.pointer else []:
-                part=part.replace('~1','/').replace('~0','~');expected=expected[int(part)] if isinstance(expected,list) else expected[part]
-            if q.view=='fields':expected={k:expected[k] for k in q.fields}
-            elif q.view=='range':expected=dict(total=len(expected),start=q.start,items=expected[q.start:q.start+q.count])
+            expected=None
+            if q.view!='working_set':
+                expected=host.store.artifact(q.reference)
+                if isinstance(expected,bytes):expected=json.loads(expected)
+                for part in q.pointer[1:].split('/') if q.pointer else []:
+                    part=part.replace('~1','/').replace('~0','~');expected=expected[int(part)] if isinstance(expected,list) else expected[part]
+                if q.view=='fields':expected={k:expected[k] for k in q.fields}
+                elif q.view=='range':expected=dict(total=len(expected),start=q.start,items=expected[q.start:q.start+q.count])
             complete=provided and q.view in ('full','fields','range') and delivered==expected
         except (ValueError,KeyError,IndexError,TypeError):continue
         query=plain(q);classification='new_query'
         for prior in rows:
-            if query==prior['query'] and prior['successfully_provided']:classification='exact_repeat';break
+            if query==prior['query'] and prior['successfully_provided'] and (q.view!='working_set' or prior['delivery_identity']==digest(delivered)):classification='exact_repeat';break
             if plain(q.reference)!=prior['query']['reference'] or not prior['complete_data']:continue
             p=prior['query'];prefix=p['pointer']
             if p['view']=='full' and (q.pointer==prefix or q.pointer.startswith(prefix+'/')):classification='covered_subnode'
@@ -361,6 +371,7 @@ def read_coverage(host):
                 index=q.pointer[len(prefix)+1:].split('/')[0]
                 if index.isdecimal() and p['start']<=int(index)<p['start']+prior['item_count']:classification='covered_subnode'
         rows.append(dict(query=query,owning_study=host.run_id,tool_call_id=use['toolUseId'],feedback_reference=event['outputs'][0],
+            retrieval_view=q.view=='working_set',delivery_identity=digest(delivered),
             successfully_provided=provided,complete_data=complete,item_count=len(delivered.get('items',[])) if q.view=='range' and isinstance(delivered,dict) else None,
             full_artifact=complete and q.view=='full' and not q.pointer,
             classification=classification))
@@ -428,12 +439,12 @@ def working_set(host,current):
                 normalized_violation_change={k:v-task_gap(x)['components'][k] for k,v in task_gap(y)['components'].items()
                     if k in task_gap(x)['components']} if comparable else None,
                 scope='Same candidate and recorded evaluation settings only; negative is improvement, no causal or global claim'))
-    return dict(version='evidence_working_set_v1',candidate_index=index,candidate_count=len(candidates),
+    return dict(version='evidence_working_set_v2',candidate_index=index,candidate_count=len(candidates),
         candidate_index_query='All candidate references remain in source_references; previews retain the latest three',
-        control_result_links=links,control_comparisons=comparisons,measured_facts=facts,read_coverage=coverage[-12:],read_coverage_count=len(coverage),
+        control_result_links=links,control_comparisons=comparisons,measured_facts=facts,read_coverage=coverage,read_coverage_count=len(coverage),
         read_counts={k:sum(r['successfully_provided'] and r['classification']==k for r in coverage) for k in ('exact_repeat','covered_subnode','new_query')},
-        missing_prerequisites=[{k:r[k] for k in ('action','method','candidate','reason','remaining_checks') if k in r}
-            for r in current['decision_feedback']['actions'] if r['status'] in ('blocked','unavailable','prerequisites_only')],
+        method_requirements={r['action']+('/'+r['method'] if r.get('method') else ''):
+            {k:r[k] for k in ('remaining_checks','scope','requires_agent_fields') if k in r} for r in current['decision_feedback']['actions']},
         coverage_scope='Delivery is not understanding. Repeated queries remain legal; scientific question/intent is not inferred.',
         method_scope=dict(static_analysis='Constructs and checks operating points; local mathematical assumptions only. AnalysisRequest validates operation/point/window before workers.',
             offline_nlp='Predicted tension trajectories and search starts; independent physics still required.',
@@ -442,8 +453,10 @@ def working_set(host,current):
             pattern_search='Finite nongradient physical search; budget and full original acceptance remain authoritative.',
             direct_ppo='Independent optional policy training, without an NMPC prerequisite; published policies require separate evaluation.',
             residual_ppo='Requires a complete compatible reference, including failed-but-complete NMPC execution; predicted and measured references retain their origin.'),
-        eligible_methods=[{k:r[k] for k in ('action','method','candidate','source','status','reason','remaining_checks') if k in r}
-            for r in current['decision_feedback']['actions']],budget=current['budget'],method_remaining=current['method_remaining'],
+        eligible_methods=[{k:v for k,v in r.items() if k not in ('remaining_checks','scope','requires_agent_fields','budget','remaining_backend_launches')}
+            for r in current['decision_feedback']['actions']],budget=dict(current['budget'],training=current['training_budget_details'],
+                method_remaining={k:v for k,v in current['method_remaining'].items() if k not in ('mathematical_evaluations','rl_stages')}),
+        control_search_domain=current.get('control_search_domain'),
         source_references=list({r['artifact_id']:r for r in registered_references(host)}.values()),all_fresh_results=references,
         scientific_scope='No model-authored hypotheses are promoted to measured causes; only original independent acceptance establishes success')
 
@@ -543,14 +556,15 @@ def decision_brief(current):
     """Layer-one facts only; layer two is an exact recomputable Store view."""
     if 'evidence_working_set' not in current:return legacy_decision_brief(current)
     keys=('task_identity','task','capabilities','actions','task_accepted','candidate_status',
-        'tool_readiness','all_fresh_results','control_initialization_methods','control_search_domain')
+        'tool_readiness','all_fresh_results','control_initialization_methods')
     brief={k:deepcopy(current[k]) for k in keys if k in current}
     ws=current['evidence_working_set'];feedback=current['decision_feedback']
-    anchor=next(iter(ws['source_references']),None)
+    anchor=next(iter(ws['source_references']),current.get('structure_domain'))
     brief['evidence_access']=dict(reference=anchor,view='working_set',pointer='',
         scope='Derived retrieval view, never scientific proof. JSON pointers select candidate_index, control_result_links, eligible_methods, read_coverage or source_references. Original references support full/fields/range reads.')
     brief['budget']=deepcopy(current['budget'])
-    brief['budget']['method_remaining']={k:v for k,v in current['method_remaining'].items() if k!='mathematical_evaluations'}
+    brief['budget']['method_remaining']={k:v for k,v in current['method_remaining'].items() if k not in ('mathematical_evaluations','rl_stages')}
+    brief['budget']['training']=deepcopy(current['training_budget'])
     brief['best_valid']=None
     best=current.get('best_valid')
     if best:
@@ -566,6 +580,7 @@ def decision_brief(current):
     links=[]
     for row in ws['control_result_links']:
         item={k:row[k] for k in ('candidate','source','source_kind','evaluation_reference','status','operation','task_acceptance','task_gap') if k in row}
+        if 'task_gap' in item:item['task_gap']={k:v for k,v in item['task_gap'].items() if k!='interpretation'}
         if row.get('original_acceptance'):
             item['constraints']={k:{f:v[f] for f in ('passed','value','limit') if f in v}
                 for k,v in row['original_acceptance'].get('components',{}).items()}

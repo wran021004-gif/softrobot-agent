@@ -11,7 +11,7 @@ from tools.research.control_correction import task_outputs
 from tools.research_tasks import task_adapter
 from tools.research.local_control_search import search
 from tests.research.test_s127_working_set import historical_host
-from tests.research.test_s127_rl_handoff import RLHandoffTests
+from tests.research import test_s127_rl_handoff as rl_fixture
 from tests.research.test_s125_contract import cold_host
 
 
@@ -49,7 +49,7 @@ class NMPCControlStartTests(unittest.TestCase):
         self.assertEqual(sink.store.remaining()['used']['backend_solves'],0)
 
     def test_bad_current_ownership_and_missing_execution_are_rejected(self):
-        RLHandoffTests.setUpClass();fixture=RLHandoffTests();fixture.setUp()
+        rl_fixture.RLHandoffTests.setUpClass();fixture=rl_fixture.RLHandoffTests();fixture.setUp()
         h=fixture.h
         other=save(h,dict(status='evaluated',candidate=fixture.candidate,execution_id='unregistered'))
         with self.assertRaisesRegex(ValueError,'REGISTERED_CURRENT'):measured_nmpc_trajectory(h,other)

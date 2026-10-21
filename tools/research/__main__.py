@@ -16,6 +16,7 @@ def main():
     parser.add_argument('--profile')
     parser.add_argument('--request-id')
     parser.add_argument('--reason')
+    parser.add_argument('--session-handoff',action='store_true',help='Opt in only after separate live continuation admission')
     args=parser.parse_args()
     if args.command in ('prepare','readiness'):
         h=prepare(args.spec,profile=args.profile)
@@ -46,7 +47,7 @@ def main():
         return
     elif args.command in ('run','live'):
         from tools.research.agent import converse
-        asyncio.run(converse(h))
+        asyncio.run(converse(h,session_handoff=args.session_handoff))
     elif args.command=='export':
         print(json.dumps(export(h)))
         return
