@@ -33,6 +33,9 @@ class NMPCControlStartTests(unittest.TestCase):
             self.assertEqual(source['provenance']['execution_reference'],ref);self.assertEqual(source['task_acceptance'],'unmeasured')
             self.assertEqual(source['provenance']['command_origin'],'measured_applied_interval_inputs')
             self.assertTrue(replay.explicit_control_source(source));replay.binding(cfg,source['trajectory'])
+            positive_zero=deepcopy(source['trajectory'])
+            positive_zero['tensions_n']=(np.asarray(positive_zero['tensions_n'])+0.).tolist()
+            self.assertEqual(replay.schedule_identity(cfg,source['trajectory']),replay.schedule_identity(cfg,positive_zero))
             for method in ('pattern','response'):
                 adapter=task_adapter(cfg);limits=adapter.ranking_limits();channels=len(trajectory['tendon_order'])
                 start=dict(id='real-source',candidate=candidate,schedule=source,limits=[t['force_limit_n'] for t in cfg['robot']['structure']['data']['tendons']],

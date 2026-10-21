@@ -36,9 +36,12 @@ def explicit_control_source(value):
 
 def schedule_identity(configuration, trajectory):
     """Exact executed inputs plus physical/task binding, independent of provenance."""
+    bound={k:trajectory[k] for k in ('times_s','tensions_n','tendon_order','task_identity','model_identity','design_identity')}
+    # Adding a zero correction turns -0.0 into +0.0; this is the same physical input.
+    bound['tensions_n']=[[0. if u==0 else u for u in row] for row in trajectory['tensions_n']]
     return digest(dict(robot=configuration['robot'],task=configuration['task'],seed=configuration['seed'],
         physics={k:configuration['policy'][k] for k in ('backend','discretization','dynamics_model')},
-        trajectory={k:trajectory[k] for k in ('times_s','tensions_n','tendon_order','task_identity','model_identity','design_identity')}))
+        trajectory=bound))
 
 
 def evaluate_schedule(host, candidate, source, plan_factory, *, origin='engineering'):

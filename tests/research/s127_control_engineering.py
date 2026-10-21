@@ -79,7 +79,7 @@ def run():
         settings=read(OUT/'settings_repair.json')['settings'] if (OUT/'settings_repair.json').exists() else frozen['settings']
         proposal=engineering_plan('control_search','CONTROL_SEARCH',candidate,control_search=dict(candidate=candidate,source=source,settings=settings))
         proposal['decision']['requested_budget']=3
-        search=core.dispatch(h,proposal,'s127-one-coefficient-response-grid-corrected',origin='engineering')['result']
+        search=core.dispatch(h,proposal,'s127-one-coefficient-response-signed-zero-reuse',origin='engineering')['result']
     s=state(h)
     for ref in s['physical_replays']:core.read_evidence(h,dict(reference=ref,pointer='/acceptance'))
     if s.get('success_gate'):act('select','SELECT','s127-select',selected_execution=s['success_gate']['evidence'],supporting_evidence=s['physical_replays'])
