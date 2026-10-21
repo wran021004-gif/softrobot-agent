@@ -4,6 +4,12 @@
 尚未发送真实 Provider 请求、启动正式数学/NMPC/PPO/物理实验或取得任务通过结果。
 这是一份准备阶段交付，不是科研完成报告。
 
+P0 已提交：`3848db8eb992a207dffe8c93ad8c8f6f00755013`。
+正式源码冻结：`988acfe3339dc4a55b6a46df7349ed98783ae4ee`，冻结时本地和远端完全一致。
+324 个源文件 hash 已封存。后继提交只归档冻结证据和本文，不更改冻结源码。
+新 Store 与持久化后独立重开的 SDK 均无科研历史/消息；0 候选、0 实验、0 Provider、0 PPO 动作、
+0 未结 receipt、0 pending。原任务尚未验收。
+
 具体冻结条件、资源、资料范围、会话准入和运行规则见 [S12.8 协议](s128_protocol.md)。
 起点为 `096488569644d8bdd9b2907486585adec563b41e`，目标分支和工作树不变；
 未更改原任务、科学评价器、历史 Study 配置或 sealed archives。
@@ -49,5 +55,6 @@ S12.7.6 真实旧/新 SDK 已在新进程只读重开，原 7/4 段 reasoning、
 完整原始 Store/SDK/Provider 文件与 export 留在本地 `runs/`，不上传 GitHub。
 
 独立授权的完整机器可读范围见 `evidence/s128_preflight/provider_scope.json`。
+人工审阅范围见 [S12.8 独立授权范围](s128_authorization_scope.md)。
 目前没有 S12.8 正式批准记录；账户可用模型/余额检查、正式运行、原始 MuJoCo 验收重建、
 SELECT/STOP 与最终科研结论均待批准后进行。未找到解与尚未运行是不同状态；本轮当前是后者。
