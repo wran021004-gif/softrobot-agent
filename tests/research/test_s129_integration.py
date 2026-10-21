@@ -87,6 +87,32 @@ class IntegrationTests(unittest.TestCase):
         self.assertEqual(self.h.store.remaining(),ledger)
         self.assertEqual(state(self.h)['analysis_results'],science)
 
+    def test_math_comparison_uses_recorded_scope_in_both_orders_and_exact_paths(self):
+        from tools.research.core import read_evidence
+        pair,refs=self.saved_pair()
+        for order in (refs,refs[::-1]):
+            report=reporter.assemble(self.h,order,question='Compare computed values')
+            relation=report.relations[0]
+            self.assertTrue(relation.comparable)
+            self.assertIsNone(relation.single_factor_attribution)
+            self.assertIn('no certified optimal ranking',' '.join(relation.reasons))
+            self.assertNotIn('Complete physical outcomes',' '.join(relation.reasons))
+            for source in relation.sources:read_evidence(self.h,plain(source),record_read=False)
+        summary=reporter._card(self.h,refs[1]).deterministic_summary['task_capability']
+        comparison=summary['structural_comparison']
+        self.assertEqual(read_evidence(self.h,dict(reference=refs[1],pointer=comparison['fixed_control_value_pointer']),
+            record_read=False),comparison['fixed_control_violation'])
+        self.assertEqual(len(read_evidence(self.h,dict(reference=refs[1],pointer=summary['solver_starts_pointer']),
+            record_read=False)),3)
+        # The observed live hallucinated alias remains rejected, never repaired silently.
+        with self.assertRaises(KeyError):
+            read_evidence(self.h,dict(reference=refs[1],pointer='/trajectory/structural_comparison/fixed_control_violation'),
+                record_read=False)
+        independent=deepcopy(pair['changed']);independent['trajectory'].pop('structural_comparison')
+        ref=save(self.h,independent);update(self.h,analysis_results=[*refs,ref])
+        relation=reporter.assemble(self.h,[refs[0],ref],question='Unpaired model estimates').relations[0]
+        self.assertIsNone(relation.comparable)
+
     def test_multi_result_receipt_and_missing_binding(self):
         _,refs=self.saved_pair()
         receipt=dict(request_id='original',execution_id='original-exec',output=refs[0])

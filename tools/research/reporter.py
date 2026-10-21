@@ -116,10 +116,24 @@ def _comparison(host, left, right):
         for key,factor in (('robot','structure'),('policy','control')):
             if ca.get(key)!=cb.get(key):factors.append(factor)
         sources += [EvidenceLocation(reference=c,pointer='/configuration') for c in (a.candidate,b.candidate)]
-    comparable=paired_evidence(plain(left.evidence_summary),plain(right.evidence_summary),
-        plain(a.result.reference))['verification_status']=='paired_observations'
-    if not comparable:reasons.append('Complete physical outcomes, task, timing and original thresholds must match')
-    reasons.append('Recorded differences do not identify a single-factor cause')
+    if left.mathematics and right.mathematics:
+        # B already owns the controlled mathematical comparison. Physical outcome
+        # pairing cannot negate that narrower recorded comparison.
+        comparable=None
+        for current,baseline in ((a,b),(b,a)):
+            comparison=host.store.artifact(current.result.reference).get('trajectory',{}).get('structural_comparison',{})
+            if comparison.get('baseline_result')==plain(baseline.result.reference):
+                comparable=comparison.get('status')=='computed_estimate'
+                sources.append(EvidenceLocation(reference=current.result.reference,pointer='/trajectory/structural_comparison'))
+                reasons=[comparison[k] for k in ('control_alignment','reoptimization','derivative_scope','attribution')]
+                reasons.append('Comparable only as recorded computed model values; no certified optimal ranking or physical acceptance')
+                break
+        if comparable is None:reasons.append('No recorded controlled mathematical comparison binds these results')
+    else:
+        comparable=paired_evidence(plain(left.evidence_summary),plain(right.evidence_summary),
+            plain(a.result.reference))['verification_status']=='paired_observations'
+        if not comparable:reasons.append('Complete physical outcomes, task, timing and original thresholds must match')
+        reasons.append('Recorded differences do not identify a single-factor cause')
     relation=EvidenceRelation(kind='model_physics' if bool(left.mathematics)!=bool(right.mathematics)
         else 'structures' if 'structure' in factors else 'same_structure_controls',
         left=a,right=b,comparable=comparable,reasons=reasons,
@@ -254,6 +268,8 @@ def _wire(host, reference, saved):
             'You are a read-only scientific Reporter. Return JSON with only interpretations, a list '
             'of ReporterInterpretation objects using this schema: '+json.dumps(InterpretationResponse.model_json_schema())+
             '. Every item requires at least one exact evidence source. Explain quantitative new information, '
+            'Copy provided raw evidence reference/pointer pairs exactly. Summary aliases are not raw JSON paths; '
+            'use an explicit provided pointer or the result root, never invent a path from a summary field name. '
             'supported/weakened hypotheses, unresolved questions and discriminating observations. '
             'Respect focus and constraints as evidence scope. Request missing evidence in further_investigation. '
             'Facts, identities, metrics, costs and relations are frozen. Multi-factor differences do not '

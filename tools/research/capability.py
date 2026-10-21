@@ -87,6 +87,9 @@ def capability_summary(trajectory):
         'near_active_records', 'co_bottleneck_records', 'solver_scope')
     summary = {k: trajectory[k] for k in keys if k in trajectory}
     summary['solver_starts'] = [{k: s.get(k) for k in ('start_index', 'success', 'status', 'iterations', 'returned_violation', 'epigraph_residual')} for s in trajectory.get('starts', [])]
+    summary['solver_starts_pointer'] = '/trajectory/starts'
+    summary['score_semantics'] = ('Signed maximum normalized constraint residual over analyzed samples; '
+        'negative means positive normalized margin inside those bounds. A score is not a delta or secant.')
     summary['reason'] = trajectory.get('reason')
     summary['problem_pointer'] = '/trajectory/problem_definition'
     summary['quantities_pointer'] = '/trajectory/quantities'
@@ -94,9 +97,12 @@ def capability_summary(trajectory):
     comparison = trajectory.get('structural_comparison')
     if comparison:
         summary['structural_comparison'] = {k: comparison[k] for k in (
-            'status', 'variable', 'step', 'normalization_scale', 'quantities', 'baseline_result', 'derivative_scope')}
+            'status', 'variable', 'step', 'normalization_scale', 'quantities', 'baseline_result', 'derivative_scope',
+            'control_alignment', 'reoptimization', 'attribution')}
         summary['structural_comparison'].update(baseline_violation=comparison['baseline_violation'],
             fixed_control_violation=comparison['fixed_control'].get('best_found_violation'),
+            comparison_pointer='/trajectory/structural_comparison',
+            fixed_control_value_pointer='/trajectory/structural_comparison/fixed_control/best_found_violation',
             fixed_control_pointer='/trajectory/structural_comparison/fixed_control',
             fixed_control_verification=comparison['fixed_control'].get('verification_scope'))
     return summary
