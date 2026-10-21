@@ -40,8 +40,9 @@ def prepare():
 if __name__=='__main__':
     parser=argparse.ArgumentParser();parser.add_argument('--prepare',action='store_true')
     parser.add_argument('--offline',action='store_true');parser.add_argument('--authorization',type=Path)
+    parser.add_argument('--resume',action='store_true',help='Continue a verified completed read-only prefix in the same live grant')
     args=parser.parse_args()
     if args.prepare:print(prepare())
     elif args.offline or args.authorization:
-        print(asyncio.run(run(args.authorization,offline=args.offline,spec_path=SPEC,out=OUT,stage='S12.7.6B')))
+        print(asyncio.run(run(args.authorization,offline=args.offline,spec_path=SPEC,out=OUT,stage='S12.7.6B',resume=args.resume)))
     else:parser.error('Choose --prepare, --offline or --authorization')

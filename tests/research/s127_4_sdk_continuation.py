@@ -47,7 +47,25 @@ def prepare():
     return scope
 
 
-async def run(authorization=None,*,offline=False,spec_path=SPEC,out=OUT,stage='S12.7.4B'):
+def admit_read_only_resume(h,scope,approval):
+    """Only a completed read-only old SDK prefix may continue this same grant."""
+    s=state(h)
+    if (s['research_status']=='stopped' or s['pending'] or pending(h) or s['pilot'].get('unconsumed_response')
+        or s['pilot'].get('handoff') or s['pilot'].get('handoff_preparation') or s['candidates'] or s['control_initializations']):
+        raise ValueError('READ_ONLY_RESUME_REQUIRES_CLEAN_OLD_SESSION_WITHOUT_SCIENCE')
+    if (h.store.remaining()['limit']['model_calls']!=scope['request_ceiling']
+        or h.store.remaining()['remaining']['model_calls']<2
+        or s['pilot']['provider']['max_tokens']!=scope['max_output_tokens']):
+        raise ValueError('ORIGINAL_RESUME_BUDGET_OR_OUTPUT_CONFIGURATION_MISMATCH')
+    approvals=[h.store.artifact(e['outputs'][0]) for e in h.store.events(h.run_id) if e['kind']=='s127_4b_authorization']
+    if approval not in approvals:raise ValueError('ORIGINAL_STORED_AUTHORIZATION_REQUIRED')
+    with h.store.connect(True) as db:
+        if db.execute('SELECT COUNT(*) FROM calls WHERE receipt IS NULL').fetchone()[0]:raise ValueError('UNSETTLED_RECEIPT_BLOCKS_READ_ONLY_RESUME')
+    core.guard(h)
+    return dict(state_identity=digest(s),ledger=h.store.remaining())
+
+
+async def run(authorization=None,*,offline=False,spec_path=SPEC,out=OUT,stage='S12.7.4B',resume=False):
     from strands.hooks import BeforeModelCallEvent,BeforeToolCallEvent,AfterToolCallEvent
     from strands.tools.executors import SequentialToolExecutor
     from strands.tools.tools import PythonAgentTool
@@ -69,15 +87,21 @@ async def run(authorization=None,*,offline=False,spec_path=SPEC,out=OUT,stage='S
         fixture=spec_path.parent/'._s127_4_sdk_fixture.json';atomic_json(fixture,raw)
     from tools.platform_host import Host
     study=raw['study_id'];directory=ROOT/'runs/research'/study
-    if (directory/'store.sqlite3').exists() or directory.exists():raise ValueError('EXISTING_B_GRANT_NO_AUTOMATIC_RESEND')
-    try:h=core.prepare(fixture if offline else spec_path)
-    finally:
-        if offline:fixture.unlink()
-    core.bind(h)
+    if resume:
+        if offline:raise ValueError('READ_ONLY_RESUME_REQUIRES_ORIGINAL_LIVE_GRANT')
+        h=Host(directory,study,actor='unified-research')
+        prefix=admit_read_only_resume(h,scope,approval)
+    else:
+        if (directory/'store.sqlite3').exists() or directory.exists():raise ValueError('EXISTING_B_GRANT_NO_AUTOMATIC_RESEND')
+        try:h=core.prepare(fixture if offline else spec_path)
+        finally:
+            if offline:fixture.unlink()
+        core.bind(h)
     if not offline:
         with h.store.transaction() as db:
             # Keep the exact separately approved transfer identity in the existing Store.
-            ref=h.store.put(db,approval);h.store.event(db,h.run_id,'s127_4b_authorization','approved',outputs=[ref])
+            if not resume:
+                ref=h.store.put(db,approval);h.store.event(db,h.run_id,'s127_4b_authorization','approved',outputs=[ref])
         load_credential(Path(state(h)['spec']['runtime']['credentials_reference']).expanduser())
     phase='old';completed=[];fixture_requests=0
     def synthetic(request):
@@ -142,7 +166,8 @@ async def run(authorization=None,*,offline=False,spec_path=SPEC,out=OUT,stage='S
             agent.system_prompt=state(h)['spec']['execution_instructions']+'\nCURRENT_RESEARCH_PACKET\n'+json.dumps(packet,separators=(',',':'))
         def before_tool(event):
             record(h,'model_original_tool_request',dict(tool_use=event.tool_use))
-            if any(r['phase']==phase and r['name']=='research_plan' and r['action']!='stop' for r in completed):
+            if (event.tool_use['name']=='research_plan' and event.tool_use['input'].get('action')!='stop'
+                and any(r['phase']==phase and r['name']=='research_plan' and r['action']!='stop' for r in completed)):
                 event.cancel_tool='One scientific action per invocation; consume its feedback and conclude.'
         def after_tool(event):
             record(h,'model_original_tool_feedback',dict(tool_use=event.tool_use,result=event.result))
@@ -153,8 +178,9 @@ async def run(authorization=None,*,offline=False,spec_path=SPEC,out=OUT,stage='S
                     tool_id=event.tool_use['name'],tool_version='1.0.0',execution_status='completed',charged=zero()),event.result)
         agent.hooks.add_callback(BeforeModelCallEvent,before);agent.hooks.add_callback(BeforeToolCallEvent,before_tool)
         agent.hooks.add_callback(AfterToolCallEvent,after_tool)
+    attached=set()
     async def invoke(agent):
-        attach(agent)
+        if id(agent) not in attached:attach(agent);attached.add(id(agent))
         await agent.invoke_async('Inspect the authoritative current state, choose one useful legal action or STOP, consume its feedback, then conclude this invocation.')
         record(h,'model_original_turn',dict(session_id=agent._session_manager.session_id,sdk_message_identity=digest(agent.messages)))
         await agent._session_manager.save_snapshot(agent,is_latest=True)
@@ -172,7 +198,20 @@ async def run(authorization=None,*,offline=False,spec_path=SPEC,out=OUT,stage='S
                 and h.store.artifact(value['reference']).get('status')=='evaluated'):actions.append(row)
         return actions
     try:
-        old=build();await invoke(old)
+        old=build()
+        if resume:
+            turns=[h.store.artifact(e['outputs'][0]) for e in h.store.events(h.run_id) if e['kind']=='model_original_turn']
+            if (not turns or turns[-1]['sdk_message_identity']!=digest(old.messages) or unmatched(old.messages)
+                or not old.messages or old.messages[-1]['role']!='assistant'
+                or turns[-1]['session_id']!=old._session_manager.session_id):
+                raise ValueError('ORIGINAL_COMPLETED_SDK_PREFIX_REQUIRED')
+            record(h,'s127_6b_read_only_continuation',dict(**prefix,original_sdk_message_identity=digest(old.messages),
+                new_invocation=True,original_requests_resent=False,budget_reset=False,
+                driver_source_identity=digest(Path(__file__).read_text(encoding='utf8'))))
+        await invoke(old)
+        while (not scientific_actions('old') and not any(r['name']=='research_plan' for r in completed)
+            and state(h)['research_status']!='stopped' and h.store.remaining()['remaining']['model_calls']>=4):
+            await invoke(old)
         old_messages=deepcopy(old.messages);ledger=deepcopy(h.store.remaining());science=deepcopy(state(h)['candidates'])
         result['old_complete_tool_round']=bool(scientific_actions('old')) and not unmatched(old.messages) and old.messages[-1]['role']=='assistant'
         result['live_old_tool_round_passed']=not offline and result['old_complete_tool_round']
@@ -185,6 +224,9 @@ async def run(authorization=None,*,offline=False,spec_path=SPEC,out=OUT,stage='S
             snapshot_file_count=len(snapshot_files(directory/'sdk',new._session_manager.session_id)))
         before_new_requests=state(h)['pilot']['live_model_requests']
         phase='new';await invoke(new)
+        while (not scientific_actions('new') and not any(r['phase']=='new' and r['name']=='research_plan' for r in completed)
+            and state(h)['research_status']!='stopped' and h.store.remaining()['remaining']['model_calls']>=2):
+            await invoke(new)
         restored=await validate_snapshot(h,ref,build,directory/'sdk')
         assert restored.messages==new.messages and not unmatched(new.messages)
         assert all(state(h)['candidates'].get(k)==v for k,v in science.items())

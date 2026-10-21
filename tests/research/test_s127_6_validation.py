@@ -12,6 +12,33 @@ from tests.research.s7_study import engineering_plan
 
 
 class NewValidationTests(unittest.TestCase):
+    def test_read_only_resume_rejects_unresolved_or_scientifically_changed_prefix(self):
+        from copy import deepcopy
+        from types import SimpleNamespace
+        from unittest.mock import MagicMock
+        from tests.research import s127_4_sdk_continuation as sdk
+        approval=dict(stage='explicit-fixture');scope=dict(request_ceiling=12,max_output_tokens=65536)
+        original=dict(research_status='ready',pending=None,candidates={},control_initializations=[],
+            pilot=dict(provider=dict(max_tokens=65536)))
+        store=MagicMock();h=SimpleNamespace(store=store,run_id='fixture')
+        store.remaining.return_value=dict(limit=dict(model_calls=12),remaining=dict(model_calls=9),used=dict(model_calls=3))
+        store.events.return_value=[dict(kind='s127_4b_authorization',outputs=[dict(artifact_id='fixture')])]
+        store.artifact.return_value=approval
+        store.connect.return_value.__enter__.return_value.execute.return_value.fetchone.return_value=[0]
+        with patch.object(sdk,'state',return_value=original),patch.object(sdk,'pending',return_value=[]),patch.object(sdk.core,'guard') as guard:
+            ledger=deepcopy(store.remaining())
+            self.assertEqual(sdk.admit_read_only_resume(h,scope,approval)['ledger'],ledger);guard.assert_called_once_with(h)
+            self.assertFalse(store.create.called or store.reserve.called or store.transaction.called)
+            for field in ('unconsumed_response','handoff','handoff_preparation'):
+                bad=deepcopy(original);bad['pilot'][field]=dict(fixture=True)
+                with patch.object(sdk,'state',return_value=bad):
+                    with self.assertRaisesRegex(ValueError,'READ_ONLY_RESUME_REQUIRES'):sdk.admit_read_only_resume(h,scope,approval)
+            with patch.object(sdk,'pending',return_value=[dict(status='unknown')]):
+                with self.assertRaisesRegex(ValueError,'READ_ONLY_RESUME_REQUIRES'):sdk.admit_read_only_resume(h,scope,approval)
+            bad=deepcopy(original);bad['candidates']={'fixture':{}}
+            with patch.object(sdk,'state',return_value=bad):
+                with self.assertRaisesRegex(ValueError,'READ_ONLY_RESUME_REQUIRES'):sdk.admit_read_only_resume(h,scope,approval)
+
     def test_old_approval_is_rejected_before_credentials_or_grant_creation(self):
         path=ROOT/'runs/s127_6_old_authorization_fixture.json'
         atomic_json(path,dict(stage='S12.7.4A',user_approval='Old fixture authorization',request_ceiling=18))
