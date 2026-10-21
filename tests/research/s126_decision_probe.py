@@ -237,9 +237,142 @@ def prepare_s127():
     return manifest
 
 
+S127_ID='330d4b06ec479abcf97a08996430ed601de6cf751bd6c4cd1eee609571929c6a'
+S127_OUT=ROOT/'evidence/s127_4_decision'
+
+
+def audit_s127():
+    """Read the original frozen wires, never regenerate or amend the experiment."""
+    import re
+    from tools.platform_host import Host
+    manifest=read(ROOT/'evidence/s127_decision_probe/manifest.json')
+    unsigned=dict(manifest);unsigned.pop('frozen_manifest_identity')
+    if digest(unsigned)!=S127_ID or manifest['frozen_manifest_identity']!=S127_ID:
+        raise ValueError('FROZEN_S127_MANIFEST_CHANGED')
+    source=Host(manifest['store'],manifest['run_id']);rows=[]
+    assert len(manifest['cases'])==manifest['request_ceiling']==12 and manifest['automatic_retries']==0
+    for case in manifest['cases']:
+        wire=source.store.artifact(case['request']);saved=source.store.artifact(case['state'])
+        assert digest(wire)==case['identity']
+        assert set(wire)=={'model','messages','tools','max_tokens','stream','thinking','reasoning_effort'}
+        assert wire['model']=='deepseek-flash' and wire['max_tokens']==8192 and wire['stream'] is False
+        assert wire['thinking']=={'type':'enabled'} and wire['reasoning_effort']=='high'
+        assert [m['role'] for m in wire['messages']]==['system','user']
+        text=json.dumps(wire)
+        assert not re.search(r'DEEPSEEK_API_KEY|credentials_reference|api_key|Authorization|\.env\b|C:\\\\Users',text,re.I)
+        packet=json.loads(wire['messages'][0]['content'].split('\nCURRENT_RESEARCH_PACKET\n')[1])
+        rows.append(dict(name=case['name'],arm=case['arm'],wire_identity=case['identity'],state=case['state'],
+            tool_schema_identity=digest(wire['tools']),tool_names=[t['function']['name'] for t in wire['tools']],
+            roles=['system','user'],history_messages=0,accessible_artifact_count=len(saved['accessible_artifacts']),
+            scientific_result_count=len(packet['research']['all_fresh_results']),bytes=case['total_bytes'],
+            credentials_or_unrelated_file_content_found=False))
+    for a,b in zip(rows[::2],rows[1::2]):
+        assert a['name']==b['name'] and a['state']==b['state'] and a['tool_schema_identity']==b['tool_schema_identity']
+        wires=[source.store.artifact(c['request']) for c in manifest['cases'] if c['name']==a['name']]
+        packets=[json.loads(w['messages'][0]['content'].split('\nCURRENT_RESEARCH_PACKET\n')[1])['research'] for w in wires]
+        assert all(packets[0][k]==packets[1][k] for k in ('task','actions','all_fresh_results'))
+        assert all(packets[0]['budget'][k]==packets[1]['budget'][k] for k in packets[0]['budget'])
+    result=dict(stage='S12.7.4A',status='not_run',frozen_manifest_identity=S127_ID,endpoint=manifest['endpoint'],
+        model=manifest['model'],request_ceiling=12,max_output_tokens=8192,automatic_retries=0,cases=rows,
+        transfer_scope='Only the 12 exact hash-verified system/user request bodies: frozen project task, family/design/control descriptions, scientific evidence summaries/references, budgets and five tool schemas. No prior assistant/tool history or unrelated files. API key is an authentication header only and is never stored in request artifacts.',
+        isolation='Only read evidence or check a proposal; no dispatch, worker, NMPC, physics or PPO. All execution admission remains not_tested.',
+        evidence_read_limit='One request per arm. A requested detail can be read locally but cannot be delivered to the model in a later request within this frozen design. Effective new detail deliveries are zero; retrieval benefit and adaptive token cost are unmeasured.',
+        sixth_pair='Separate independent-session condition; exclude from compression-only totals. Both frozen wires contain no assistant/tool history; no SDK continuation claim.',
+        new_provider_requests=0,actual_tokens=None,
+        official_protocol_sources=['https://api-docs.deepseek.com/guides/thinking_mode/','https://api-docs.deepseek.com/api/create-chat-completion/'],
+        availability='Official documentation checked 2026-10-21: deepseek-flash, thinking enabled, high effort, tools and non-streaming Chat Completions are documented. Account availability not tested before scoped approval.',
+        publication_scope='Derived metadata, hashes, statistics and code only. Raw prompts/responses/reasoning, full Store and SDK files remain under ignored runs/.')
+    atomic_json(S127_OUT/'scope.json',result)
+    return result
+
+
+def frozen_s127(source,case):
+    from tests.research.test_s127_working_set import historical_host
+    saved=source.store.artifact(case['state']);store=Mock()
+    store.session.return_value=dict(state=deepcopy(saved['state']));store.remaining.return_value=deepcopy(saved['ledger'])
+    def artifact(ref,raw=False):
+        if plain_id(ref) not in saved['accessible_artifacts']:raise ValueError('UNSCOPED_EVIDENCE')
+        return source.store.artifact(ref,raw=raw)
+    store.artifact.side_effect=artifact
+    history=historical_host()
+    store.connect.side_effect=lambda *args,**kwargs:history.store.connect(True)
+    store.events.side_effect=lambda run:[e for e in history.store.events(run)
+        if run!=history.run_id or e['sequence']<=case['cutoff_sequence']]
+    store.reserve.side_effect=store.transaction.side_effect=AssertionError('NO_SCIENTIFIC_EXECUTION')
+    return SimpleNamespace(store=store,run_id=saved['state']['spec']['study_id'])
+
+
+def check_s127(host,call):
+    """Partial, side-effect-free checks; never claim scientific dispatch admission."""
+    name=call['function']['name']
+    if name=='evidence_read':
+        from tools.research.contracts import EvidenceQuery
+        from tools.research.core import read_evidence
+        try:
+            q=EvidenceQuery.model_validate_json(call['function']['arguments'])
+            with patch('tools.research.core.update'):
+                value=read_evidence(host,q)
+            return dict(tool=name,contract_and_reference_checks='passed',local_read=True,
+                working_set=q.view=='working_set',provided_to_model=False,read_value_identity=digest(value),
+                full_execution_admission='not_tested',scientific_execution_started=False)
+        except (ValueError,KeyError,TypeError,IndexError) as exc:
+            return dict(tool=name,contract_and_reference_checks='rejected',error=str(exc),
+                full_execution_admission='not_tested',scientific_execution_started=False)
+    if name=='retrieve_context':
+        return dict(tool=name,contract_and_reference_checks='not_tested',
+            reason='No SDK offload history exists in this frozen single-request arm',full_execution_admission='not_tested')
+    checked=validate(host,call)
+    # Raw proposed arguments are archived locally only.
+    return {k:v for k,v in checked.items() if k!='request'}
+
+
+async def live_s127(authorization):
+    import httpx
+    from tools.platform_host import Host
+    from schemas.platform import ProjectConfig
+    from tools.research.agent import LiveBoundary,load_credential,record
+    scope=audit_s127();approval=read(authorization)
+    if (approval.get('stage')!='S12.7.4A' or approval.get('frozen_manifest_identity')!=S127_ID
+        or approval.get('scope_identity')!=digest(scope) or approval.get('request_ceiling')!=12
+        or approval.get('endpoint')!=scope['endpoint'] or not approval.get('user_approval')):
+        raise ValueError('INDEPENDENT_S127_4A_TRANSFER_AUTHORIZATION_REQUIRED')
+    manifest=read(ROOT/'evidence/s127_decision_probe/manifest.json');source=Host(manifest['store'],manifest['run_id'])
+    run='s127-4a-decision-20261021';h=Host(ROOT/'runs'/run,run)
+    if h.store.db.exists():raise ValueError('EXISTING_LIVE_GRANT_NO_AUTOMATIC_RESEND')
+    h.store.create(ProjectConfig(project_id=run,grant_id=run,authorization_source=approval['user_approval'],
+        budget=dict(model_calls=12,tool_calls=0,backend_solves=0,worker_calls=0,wall_s=None),exclusive_resources={'provider_request':1}))
+    original=state(source);cfg=deepcopy(original['base_configuration']);cfg['run_id']=run;h.create(cfg);h.resume()
+    provider=deepcopy(original['pilot']['provider']);provider['max_tokens']=8192
+    update(h,pilot=dict(provider=provider,live_model_requests=0))
+    load_credential(Path(original['spec']['runtime']['credentials_reference']).expanduser())
+    boundary=LiveBoundary(h);results=[]
+    try:
+        for case in manifest['cases']:
+            wire=source.store.artifact(case['request']);assert digest(wire)==case['identity']
+            response=await boundary.handle_async_request(httpx.Request('POST',scope['endpoint']+'/chat/completions',json=wire,
+                headers={'Authorization':'Bearer '+os.environ['DEEPSEEK_API_KEY']},extensions={'timeout':dict(connect=30,read=600,write=30,pool=30)}))
+            response.raise_for_status();body=response.json();message=body['choices'][0]['message']
+            frozen=frozen_s127(source,case)
+            checks=[check_s127(frozen,c) for c in message.get('tool_calls',[])]
+            raw=record(h,'s127_4a_local_checks',dict(case=case['name'],arm=case['arm'],checks=checks))
+            results.append(dict(name=case['name'],arm=case['arm'],request_id=boundary.last_request,
+                provider_response_id=body.get('id'),actual_model=body.get('model'),request_model=wire['model'],
+                wire_identity=case['identity'],tool_schema_identity=digest(wire['tools']),raw_checks_reference=raw,
+                usage=body.get('usage'),checks=checks,full_execution_admission='not_tested',
+                effective_new_evidence_deliveries=0,unnecessary_detail_reads=None,critical_fact_omissions=None))
+            boundary.consumed()
+            atomic_json(S127_OUT/'results.json',dict(status='partial' if len(results)<12 else 'completed',cases=results,
+                ledger=h.store.remaining(),new_scientific_executions=0,
+                compression_only_cases=[r for r in results if r['name']!='independent_session_boundary']))
+    finally:await boundary.aclose()
+
+
 if __name__=='__main__':
     import argparse
-    parser=argparse.ArgumentParser();parser.add_argument('--authorization',type=Path);parser.add_argument('--prepare-s127',action='store_true');args=parser.parse_args()
-    if args.prepare_s127:print(json.dumps(prepare_s127()))
+    parser=argparse.ArgumentParser();parser.add_argument('--authorization',type=Path);parser.add_argument('--prepare-s127',action='store_true')
+    parser.add_argument('--audit-s127',action='store_true');parser.add_argument('--s127-authorization',type=Path);args=parser.parse_args()
+    if args.audit_s127:print(json.dumps(audit_s127()))
+    elif args.s127_authorization:asyncio.run(live_s127(args.s127_authorization))
+    elif args.prepare_s127:print(json.dumps(prepare_s127()))
     elif args.authorization:asyncio.run(live(args.authorization))
     else:print(json.dumps(prepare()))

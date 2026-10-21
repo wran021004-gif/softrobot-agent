@@ -13,6 +13,41 @@ def size(value):return len(json.dumps(value,ensure_ascii=False,separators=(',','
 
 
 class LayeredContextTests(unittest.TestCase):
+    def test_s127_4_frozen_scope_and_real_detail_read_do_not_dispatch(self):
+        from unittest.mock import patch
+        from tools.platform_host import Host
+        from tools.research.config import ROOT
+        from tools.state_io import read
+        from tests.research.s126_decision_probe import audit_s127, frozen_s127, check_s127
+        scope=audit_s127();manifest=read(ROOT/'evidence/s127_decision_probe/manifest.json')
+        source=Host(manifest['store'],manifest['run_id']);case=manifest['cases'][-1]
+        host=frozen_s127(source,case);wire=source.store.artifact(case['request'])
+        packet=json.loads(wire['messages'][0]['content'].split('\nCURRENT_RESEARCH_PACKET\n')[1])
+        query={k:v for k,v in packet['research']['evidence_access'].items() if k!='scope'}
+        call=dict(function=dict(name='evidence_read',arguments=json.dumps(query)))
+        with patch('tools.research.core.dispatch',side_effect=AssertionError('NO_SCIENCE')):
+            result=check_s127(host,call)
+        self.assertEqual(len(scope['cases']),12)
+        self.assertTrue(result['working_set'] and result['local_read'])
+        self.assertFalse(result['provided_to_model'])
+        self.assertEqual(result['full_execution_admission'],'not_tested')
+        self.assertFalse(host.store.transaction.called or host.store.reserve.called)
+        query['reference']={'artifact_id':'0'*64,'media_type':'application/json'}
+        call['function']['arguments']=json.dumps(query)
+        self.assertEqual(check_s127(host,call)['contract_and_reference_checks'],'rejected')
+
+    def test_s127_4_rejects_old_provider_authorization_before_credentials(self):
+        import asyncio
+        from unittest.mock import patch
+        from tools.research.config import ROOT
+        from tools.state_io import atomic_json
+        from tests.research.s126_decision_probe import live_s127
+        path=ROOT/'runs/s127_4_old_authorization_fixture.json'
+        atomic_json(path,dict(endpoint='https://api.deepseek.com',probe_request_ceiling=20,user_approval='OLD FIXTURE'))
+        with patch('tools.research.agent.load_credential',side_effect=AssertionError('NO_CREDENTIAL_READ')):
+            with self.assertRaisesRegex(ValueError,'INDEPENDENT_S127_4A'):
+                asyncio.run(live_s127(path))
+
     def test_derived_delivery_is_audited_without_claiming_raw_artifact_coverage(self):
         from tests.research.test_s125_contract import cold_host
         from tools.research.agent import record
