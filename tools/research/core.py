@@ -24,7 +24,8 @@ from tools.state_io import atomic_json, read, digest
 
 ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_SPEC = ROOT/'configs/research/study.json'
-def read_evidence(host, query):
+def read_evidence(host, query, *, record_read=True):
+    """Use the existing evidence boundary; internal reads may omit read markers."""
     q = EvidenceQuery.model_validate(query)
     s = state(host)
     value = host.store.artifact(q.reference)
@@ -60,7 +61,7 @@ def read_evidence(host, query):
         if not isinstance(value,list):raise ValueError('EVIDENCE_RANGE_REQUIRES_LIST_POINTER')
         if q.start>len(value):raise ValueError('EVIDENCE_RANGE_START_OUTSIDE_LIST: length='+str(len(value)))
         value=dict(total=len(value),start=q.start,items=value[q.start:q.start+q.count])
-    if q.view=='working_set':return value
+    if q.view=='working_set' or not record_read:return value
     if not q.pointer and plain(q.reference) in [s.get('holding_diagnostic_reference'),*s.get('task_math_references',[])]:
         update(host,guidance_reads=[*s.get('guidance_reads',[]),plain(q.reference)])
     if plain(q.reference) in [*s.get('results', []),*s.get('physical_replays', []),*s.get('rl_evaluations', []), *s.get('rl_training_summaries', [])]:

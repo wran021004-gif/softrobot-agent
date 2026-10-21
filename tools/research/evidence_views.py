@@ -1,0 +1,169 @@
+"""Read-only result cards composed from existing deterministic evidence views.
+
+No persistence, scientific dispatch, report generation or evidence registration.
+L0/L2 stay in research_context; L3 stays in core.read_evidence/EvidenceQuery.
+"""
+from copy import deepcopy
+from schemas.research_reporting import (
+    ControlSearchEvidence, ControlSearchStep, CriticalObservation, EvidenceLocation,
+    MathematicalEvidence, RecordedField, ReportedMetric, ResourceUse, ResultCard,
+    ResultIdentity,
+)
+from tools.platform_store import plain
+from tools.research.analysis import decision_result
+from tools.research.core import read_evidence
+from tools.research.evidence_policy import summarize_evidence
+from tools.research.research_context import compact_evidence, physical_diagnostic
+
+
+def _location(reference, pointer=''):
+    return EvidenceLocation(reference=reference, pointer=pointer)
+
+
+def _token(key):
+    return key.replace('~', '~0').replace('/', '~1')
+
+
+def _acceptance_metrics(acceptance, reference):
+    metrics=[]
+    for name,row in acceptance.get('components',{}).items():
+        if type(row.get('value')) not in (int,float):continue
+        pointer='/acceptance/components/'+_token(name)
+        metrics.append(ReportedMetric(name=name,value=row['value'],unit=row.get('unit'),
+            threshold=row.get('limit'),threshold_source=_location(reference,pointer+'/limit') if 'limit' in row else None,
+            passed=row.get('passed'),scope='physical_task',source=_location(reference,pointer+'/value')))
+    return metrics
+
+
+def _search(value, reference):
+    def step(row, pointer):
+        return ControlSearchStep(label=row['label'], source=_location(reference, pointer),
+            evaluation=row['reference'], candidate=row.get('candidate'),
+            control_source=row.get('source'), prediction_base=row.get('prediction_base'),
+            predicted_improvement=row.get('predicted_improvement'),
+            actual_improvement=row.get('actual_improvement'), task_gap=row['task_gap'],
+            metrics=_acceptance_metrics(row.get('original_acceptance') or {},row['reference']))
+
+    rows=value['candidates']
+    baselines=[step(r, f'/candidates/{i}') for i,r in enumerate(rows) if r['label']=='baseline']
+    proposals=[step(r, f'/candidates/{i}') for i,r in enumerate(rows)
+        if r['label'] in ('local_response_proposal', 'coordinate')][-3:]
+    # The original best row may be a finite-difference probe, not a proposal.
+    return ControlSearchEvidence(
+        stop_reason=RecordedField(name='stop_reason', value=value['stop_reason'],
+            source=_location(reference, '/stop_reason')) if 'stop_reason' in value else None,
+        baselines=baselines, proposals=proposals,
+        best=step(value['best'], '/best') if value.get('best') else None,
+        all_steps=_location(reference, '/candidates'))
+
+
+def _resources(value, reference):
+    resources=[]
+    def add(data, key, unit, prefix='', time_basis=None):
+        if key in data:
+            resources.append(ResourceUse(name=key, amount=data[key], unit=unit,
+                time_basis=time_basis, source=_location(reference, prefix+'/'+_token(key))))
+
+    for key,unit in (('physical_launches','evaluations'), ('physics_steps','steps'),
+            ('charged_analysis_evaluations','analyses'), ('mathematical_reintegrations','reintegrations'),
+            ('nmpc_updates','updates'), ('rl_actions','actions'), ('finite_difference_evaluations','evaluations')):
+        add(value,key,unit)
+    for key in ('charged_numerical_s','numerical_s','evaluation_elapsed_s'):
+        add(value,key,'s',time_basis='recorded_elapsed_unspecified')
+    boundary=value.get('boundary') or {}
+    add(boundary,'elapsed_s','s','/boundary','worker_wall')
+    costs=value.get('cost_feedback') or {}
+    for key in ('new_physical_evaluations','evaluation_callbacks','cache_reuses'):
+        add(costs,key,'evaluations','/cost_feedback')
+    add(costs,'charged_numerical_s','s','/cost_feedback','recorded_elapsed_unspecified')
+    # No cost computation: each entry is a recorded quantity, never additive by default.
+    resources.extend([ResourceUse(name='provider_cost',unit='USD'),
+        ResourceUse(name='parent_action_elapsed',unit='s',time_basis='parent_action_wall'),
+        ResourceUse(name='cpu_time',unit='s',time_basis='cpu')])
+    return resources
+
+
+def result_card(host, reference):
+    """L1 ResultCard from one trusted Store result; no formal read markers.
+
+    The ordinary read boundary still enforces protected-result admission. Only
+    saved candidate/measurement metadata used by existing projections is read.
+    Copies isolate nested dicts from the underlying saved artifacts.
+    """
+    reference=deepcopy(plain(reference))
+    value=deepcopy(read_evidence(host, dict(reference=reference), record_read=False))
+    if not isinstance(value,dict):
+        raise ValueError('RESULT_CARD_REQUIRES_RESULT_OBJECT')
+    evidence=summarize_evidence(value,reference)
+    binding=(value.get('scoped_claim') or {}).get('binding') or value.get('binding') or {}
+    identity=ResultIdentity(result=_location(reference),
+        study=value.get('owning_study') or value.get('study'),
+        task_identity=evidence['task_identity'], candidate=value.get('candidate',binding.get('candidate')),
+        control_source=value.get('source_reference',value.get('source')),
+        operation=value.get('operation'), model_identity=evidence['model_identity'],
+        design_identity=evidence['design_identity'],
+        evaluation_profile_identity=value.get('profile_identity'),evaluation_identity=value.get('execution_id'))
+    summary=compact_evidence(value,reference,facts_only=True)['summary']
+    metrics=[];violations=[];critical=[];mathematics=None;search=None
+    resources=_resources(value,reference)
+    details=[_location(reference)]
+    context=[RecordedField(name=k,value=value[k],source=_location(reference,'/'+_token(k)))
+        for k in ('purpose','rationale','hypothesis','fixed_conditions','changed_parameters','plan_decision') if k in value]
+    for key in ('protocol','binding','analysis_applicability','score_semantics','provenance','configuration','proxy_values'):
+        if key in value:details.append(_location(reference,'/'+key))
+    if identity.candidate is not None:
+        candidate=host.store.artifact(identity.candidate)
+        identity=identity.model_copy(update=dict(canonical_task_identity=candidate.get('task_identity'),
+            evaluation_profile_identity=identity.evaluation_profile_identity or candidate.get('profile_identity')))
+        details.extend(_location(identity.candidate,'/'+key) for key in
+            ('configuration','parameters','provenance') if key in candidate)
+    if identity.control_source is not None:details.append(_location(identity.control_source))
+
+    if value.get('scoped_claim'):
+        summary=decision_result(value,reference)
+        mathematics=MathematicalEvidence(claim=value['scoped_claim'],
+            claim_source=_location(reference,'/scoped_claim'),
+            requirement_source=_location(reference,'/task_analysis') if 'task_analysis' in value else None)
+        details.append(_location(reference,value['scoped_claim']['numerical_result_pointer']))
+        for row in summary['margins']:
+            constraint=next(c for c in value['task_analysis']['constraints'] if c['constraint_id']==row['constraint_id'])
+            index=value['task_analysis']['constraints'].index(constraint)
+            metrics.append(ReportedMetric(name=row['constraint_id'],value=row['observed_value'],
+                unit=row['units'],threshold=row['bound'] if constraint['kind']=='norm_bound' else None,
+                threshold_source=_location(reference,f'/task_analysis/constraints/{index}/radius') if constraint['kind']=='norm_bound'
+                    else _location(reference,f'/task_analysis/constraints/{index}'),
+                passed=row['status']=='satisfied_sample',scope='model_sample',time_s=row['absolute_time_s'],
+                source=_location(reference,row['source_pointer']+'/value')))
+            if row['status']!='satisfied_sample':violations.append(row['constraint_id'])
+    elif 'acceptance' in value:
+        components=(value['acceptance'] or {}).get('components',{})
+        metrics=_acceptance_metrics(value['acceptance'] or {},reference)
+        # Reuse existing task ranking and measured-extrema selection; do not rescore.
+        gap=summary.get('task_gap',{})
+        violations=sorted((k for k in gap.get('components',{}) if components.get(k,{}).get('passed') is False),
+            key=lambda k:gap['components'][k],reverse=True)
+        violations.extend(k for k,r in components.items() if r.get('passed') is False and k not in violations)
+        diagnostic=physical_diagnostic(host,reference)
+        critical=[CriticalObservation(time_s=r['time_s'],observed=deepcopy(r['observed']),
+            source=_location(r['raw_reference'],r['read_pointer']),
+            input_source=EvidenceLocation.model_validate(r['input_query']) if r.get('input_query') else None)
+            for r in diagnostic['critical_samples']]
+        if value.get('raw_reference'):
+            raw_ref=value['raw_reference'];raw=host.store.artifact(raw_ref)
+            details.append(_location(raw_ref))
+            context.extend(RecordedField(name=key,value=raw[key],source=_location(raw_ref,'/'+key))
+                for key in ('model_identity','mathematical_model_identity','physical_backend','scene_identity',
+                    'tendon_order','physics_timestep_s') if key in raw)
+            # Physics steps and model identities may live only in the saved measurement.
+            if 'physics_steps' in raw:
+                resources.append(ResourceUse(name='physics_steps',amount=raw['physics_steps'],
+                    unit='steps',source=_location(raw_ref,'/physics_steps')))
+    elif 'best' in value and 'candidates' in value:
+        search=_search(value,reference)
+        # compact_evidence already owns search summaries. Response matrices stay in Store.
+        summary={k:v for k,v in summary.items() if k not in ('local_responses',)}
+        details.extend([_location(reference,'/candidates'),_location(reference,'/starts')])
+    return ResultCard(identity=identity,evidence_summary=evidence,
+        recorded_context=context,metrics=metrics,main_violations=violations,critical_observations=critical,
+        deterministic_summary=summary,mathematics=mathematics,control_search=search,
+        resources=resources,detail_sources=details)
