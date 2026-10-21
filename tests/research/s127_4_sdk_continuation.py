@@ -149,6 +149,7 @@ async def run(authorization=None,*,offline=False):
         assert not any('toolUse' in b or 'toolResult' in b for m in new.messages for b in m['content'])
         result.update(handoff_reference=ref,snapshot_independently_reopened=True,ledger_at_handoff=ledger,
             snapshot_file_count=len(snapshot_files(directory/'sdk',new._session_manager.session_id)))
+        before_new_requests=state(h)['pilot']['live_model_requests']
         phase='new';await invoke(new)
         restored=await validate_snapshot(h,ref,build,directory/'sdk')
         assert restored.messages==new.messages and not unmatched(new.messages)
@@ -164,8 +165,11 @@ async def run(authorization=None,*,offline=False):
                 or row['action']=='physical_replay' and bool(value.get('reference'))
                 and h.store.artifact(value['reference']).get('status')=='evaluated')
             if actual:actions.append(row)
-        result.update(offline_protocol_passed=offline,live_sdk_continuation_passed=not offline,
-            live_scientific_action_passed=bool(actions) and not offline,real_tool_actions=completed,
+        new_requests=state(h)['pilot']['live_model_requests']-before_new_requests
+        continued=new_requests>0 and new.messages[-1]['role']=='assistant'
+        assert len(actions)<=1
+        result.update(offline_protocol_passed=offline and continued,live_sdk_continuation_passed=not offline and continued,
+            live_scientific_action_passed=bool(actions) and not offline and continued,new_session_requests=new_requests,real_tool_actions=completed,
             old_sdk_history_unchanged=True,cumulative_budget_continuous=True,no_unsettled_calls=True)
         return result
     finally:
