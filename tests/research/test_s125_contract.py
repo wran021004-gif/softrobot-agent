@@ -118,6 +118,7 @@ class S125ContractTests(unittest.TestCase):
         class Captured(BaseException):pass
         class Boundary(httpx.AsyncBaseTransport):
             def __init__(self,*args,**kwargs):pass
+            def require_complete(self):pass  # Wire-capture fixture never receives a response.
             async def handle_async_request(self,request):
                 captured.update(json.loads(request.content));raise Captured()
         packet=dict(research=decision_brief(context(h)),implementation='isolated_wire_fixture')
