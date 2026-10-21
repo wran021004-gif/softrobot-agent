@@ -37,11 +37,17 @@ def factory(h,transport):
     return build
 
 
+async def complete(h,agent,prompt):
+    """Use the same durable completed-invocation anchor as the production loop."""
+    await agent.invoke_async(prompt)
+    record(h,'model_original_turn',dict(session_id=agent._session_manager.session_id,sdk_message_identity=digest(agent.messages)))
+
+
 def child(directory,run_id,mode):
     h=Host(directory,run_id,actor='unified-research')
     async def exercise():
         transport=LiveBoundary(h,httpx.MockTransport(response));build=factory(h,transport);old=build()
-        await old.invoke_async('Complete the offline fixture')
+        await complete(h,old,'Complete the offline fixture')
         atomic_json(h.store.root/'crash.json',dict(previous=state(h)['pilot']['framework_session_id'],
             messages=old.messages,ledger=h.store.remaining(),mode=mode))
         if mode in ('math_pending','physics_pending'):update(h,pending=dict(kind=mode,fixture=True))
@@ -103,6 +109,72 @@ def feedback_child(directory,run_id):
 
 
 class SessionRecoveryTests(unittest.TestCase):
+    def test_initial_contents_completed_growth_and_unrecorded_round(self):
+        h=cold_host();boundary=LiveBoundary(h,httpx.MockTransport(response));build=factory(h,boundary)
+        async def exercise():
+            old=build();await complete(h,old,'Complete source fixture')
+            _,new=await handoff(h,old,build,h.store.root/'sdk')
+            self.assertEqual((await reconcile(h,build,h.store.root/'sdk')).messages,new.messages)
+            latest=next((h.store.root/'sdk'/'session'/new._session_manager.session_id).rglob('snapshot_latest.json'))
+            original=latest.read_bytes();before=state(h);events=h.store.events(h.run_id);ledger=h.store.remaining()
+            edited=json.loads(original);edited['data']['messages'][0]['content'][0]['text']+=' inconsistent initial text'
+            atomic_json(latest,edited)  # Real SDK snapshot, still valid JSON and marker.
+            with self.assertRaisesRegex(ValueError,'INITIAL_CONTEXT'):await reconcile(h,build,h.store.root/'sdk')
+            latest.write_bytes(original)
+            edited=json.loads(original);edited['created_at']='2000-01-01T00:00:00Z';atomic_json(latest,edited)
+            with self.assertRaisesRegex(ValueError,'SNAPSHOT_FILES'):await reconcile(h,build,h.store.root/'sdk')
+            latest.write_bytes(original)
+            self.assertEqual(state(h),before);self.assertEqual(h.store.events(h.run_id),events);self.assertEqual(h.store.remaining(),ledger)
+            await complete(h,new,'Normal subsequent invocation')
+            self.assertEqual((await reconcile(h,build,h.store.root/'sdk')).messages,new.messages)
+            original=latest.read_bytes();before=state(h);events=h.store.events(h.run_id);ledger=h.store.remaining()
+            for kind in ('body','reasoning','delete','insert','reorder'):
+                edited=json.loads(original);messages=edited['data']['messages']
+                if kind=='body':messages[-1]['content'].append(dict(text='Inconsistent completed body'))
+                elif kind=='reasoning':
+                    block=next(b for m in messages for b in m['content'] if 'reasoningContent' in b)
+                    block['reasoningContent']['reasoningText']['text']+=' inconsistent reasoning'
+                elif kind=='delete':messages.pop()
+                elif kind=='insert':messages.insert(0,dict(role='user',content=[dict(text='Extra message')]))
+                else:messages[0],messages[1]=messages[1],messages[0]
+                atomic_json(latest,edited)
+                with self.subTest(kind=kind):
+                    with self.assertRaisesRegex(ValueError,'HISTORY_IDENTITY'):await reconcile(h,build,h.store.root/'sdk')
+                    self.assertEqual(state(h),before);self.assertEqual(h.store.events(h.run_id),events);self.assertEqual(h.store.remaining(),ledger)
+                latest.write_bytes(original)
+            # A finished SDK invocation without its Store commit is not a clean boundary.
+            await new.invoke_async('Simulate exit before completed-turn Store record')
+            with self.assertRaisesRegex(ValueError,'HISTORY_IDENTITY'):await reconcile(h,build,h.store.root/'sdk')
+            record(h,'model_original_turn',dict(session_id=new._session_manager.session_id,sdk_message_identity=digest(new.messages)))
+            self.assertEqual((await reconcile(h,build,h.store.root/'sdk')).messages,new.messages)
+            await handoff(h,new,build,h.store.root/'sdk')
+            before=state(h);events=h.store.events(h.run_id);ledger=h.store.remaining()
+            process=subprocess.run([sys.executable,'-m','tests.research.test_s127_session_recovery','--check-snapshot',str(h.store.root),h.run_id],
+                cwd=ROOT,capture_output=True,text=True,timeout=55,creationflags=getattr(subprocess,'CREATE_NO_WINDOW',0))
+            self.assertEqual(process.returncode,0,process.stderr[-3000:])
+            self.assertEqual(state(h),before);self.assertEqual(h.store.events(h.run_id),events);self.assertEqual(h.store.remaining(),ledger)
+            await boundary.aclose()
+        asyncio.run(exercise())
+
+    def test_startup_rejects_inconsistent_history_before_feedback_or_store_changes(self):
+        from unittest.mock import patch
+        from tools.research.agent import converse
+        h=cold_host();boundary=LiveBoundary(h,httpx.MockTransport(response));build=factory(h,boundary)
+        async def provision():
+            agent=build();await complete(h,agent,'Trusted completed prefix');await boundary.aclose()
+        asyncio.run(provision())
+        latest=next((h.store.root/'sdk').rglob('snapshot_latest.json'));edited=read(latest)
+        edited['data']['messages'][0]['content'][0]['text']+=' inconsistent prefix';atomic_json(latest,edited)
+        before=state(h);events=h.store.events(h.run_id);ledger=h.store.remaining()
+        def forbidden(request):raise AssertionError('No Provider send')
+        with patch('tools.research.agent.load_credential'),patch.dict(os.environ,{'DEEPSEEK_API_KEY':'offline-fixture'}),\
+                patch('tools.research.core.guard'),patch('tools.research.agent.guard'),\
+                patch('httpx.AsyncHTTPTransport',return_value=httpx.MockTransport(forbidden)),\
+                patch('tools.research.agent.build_harness',side_effect=lambda *a,**kw:build(kw.get('session_id'))),\
+                patch('tools.research.session_handoff.recover_feedback',side_effect=AssertionError('No feedback recovery before consistency check')):
+            with self.assertRaisesRegex(ValueError,'HISTORY_IDENTITY'):asyncio.run(converse(h))
+        self.assertEqual(state(h),before);self.assertEqual(h.store.events(h.run_id),events);self.assertEqual(h.store.remaining(),ledger)
+
     def test_optional_checkpoint_failure_keeps_original_safe_conversation(self):
         from unittest.mock import patch
         from tools.research.agent import converse
@@ -183,7 +255,7 @@ class SessionRecoveryTests(unittest.TestCase):
     def test_committed_snapshot_loss_and_changed_preparation_fail_closed(self):
         h=cold_host();transport=LiveBoundary(h,httpx.MockTransport(response));build=factory(h,transport)
         async def exercise():
-            old=build();await old.invoke_async('Complete fixture')
+            old=build();await complete(h,old,'Complete fixture')
             def changed(stage):
                 if stage=='verified':update(h,numerical_s=state(h)['numerical_s']+1.)
             with self.assertRaisesRegex(ValueError,'CHANGED'):await handoff(h,old,build,h.store.root/'sdk',stage=changed)
@@ -192,9 +264,9 @@ class SessionRecoveryTests(unittest.TestCase):
         asyncio.run(exercise())
         h=cold_host();transport=LiveBoundary(h,httpx.MockTransport(response));build=factory(h,transport)
         async def missing():
-            old=build();await old.invoke_async('Complete fixture');ref,new=await handoff(h,old,build,h.store.root/'sdk')
+            old=build();await complete(h,old,'Complete fixture');ref,new=await handoff(h,old,build,h.store.root/'sdk')
             ledger=h.store.remaining()
-            await new.invoke_async('Complete a second offline invocation')
+            await complete(h,new,'Complete a second offline invocation')
             second,new=await handoff(h,new,build,h.store.root/'sdk')
             self.assertNotEqual(second,ref)
             self.assertEqual(h.store.remaining()['used']['model_calls'],ledger['used']['model_calls']+1)
@@ -238,7 +310,7 @@ class SessionRecoveryTests(unittest.TestCase):
                 self.assertEqual(h.store.remaining(),ledger)
                 with self.assertRaisesRegex(ValueError,'CONSUMED'):await handoff(h,old,build,h.store.root/'sdk')
                 # Consume in original SDK with synthetic HTTP, then start independent SDK context.
-                restored=build();await restored.invoke_async('Consume the recovered original tool feedback')
+                restored=build();await complete(h,restored,'Consume the recovered original tool feedback')
                 ref,new=await handoff(h,restored,build,h.store.root/'sdk')
                 self.assertEqual(len(new.messages),1);saved=h.store.artifact(ref)
                 self.assertEqual(saved['scientific_results'],state(h)['results']+state(h)['mechanics_results']+state(h)['physical_replays']+state(h).get('matched_state_results',[])+state(h).get('rl_evaluations',[])+state(h)['analysis_results'])
@@ -256,4 +328,13 @@ class SessionRecoveryTests(unittest.TestCase):
 if __name__=='__main__':
     if len(sys.argv)>1 and sys.argv[1]=='--child':child(*sys.argv[2:])
     elif len(sys.argv)>1 and sys.argv[1]=='--recover-feedback':feedback_child(*sys.argv[2:])
+    elif len(sys.argv)>1 and sys.argv[1]=='--check-snapshot':
+        h=Host(sys.argv[2],sys.argv[3],actor='unified-research');before=state(h);ledger=h.store.remaining();events=h.store.events(h.run_id)
+        def forbidden(request):raise AssertionError('Fresh-process consistency check cannot send')
+        boundary=LiveBoundary(h,httpx.MockTransport(forbidden))
+        async def check():
+            assert await reconcile(h,factory(h,boundary),h.store.root/'sdk') is not None
+            await boundary.aclose()
+        asyncio.run(check())
+        assert state(h)==before and h.store.remaining()==ledger and h.store.events(h.run_id)==events
     else:unittest.main()

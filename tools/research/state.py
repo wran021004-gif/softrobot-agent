@@ -74,8 +74,24 @@ def limits(spec):
     return dict(model_calls=b['provider_requests'], tool_calls=b['public_operations'],
         backend_solves=b['physical_launches'], worker_calls=0, wall_s=b['activity_s'])
 
+def require_authorization(host):
+    """New opt-in studies require local approval bound to their frozen identity."""
+    s=state(host)
+    if not s['spec']['authorization'].startswith('PENDING_EXPLICIT_APPROVAL:'):return
+    from tools.state_io import digest
+    for event in reversed(host.store.events(host.run_id)):
+        if event['kind']!='formal_study_authorization':continue
+        approval=host.store.artifact(event['outputs'][0])
+        scope=approval.get('scope',{})
+        if (approval.get('user_approval') and approval.get('scope_identity')==digest(scope)
+                and scope.get('resolved_identity')==s['spec']['resolved_identity']
+                and scope.get('study_id')==host.run_id):return
+    raise ValueError('INDEPENDENT_FORMAL_STUDY_APPROVAL_REQUIRED_BEFORE_PROVIDER_OR_SCIENCE')
+
+
 def guard(host, expensive=False):
     s=state(host)
+    require_authorization(host)
     if s['research_status']=='stopped':
         raise ValueError('ACCEPTED_STOP_SEALED')
     if expensive and s.get('success_gate'):

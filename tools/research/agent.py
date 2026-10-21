@@ -390,6 +390,8 @@ async def wait_training(host):
         await asyncio.sleep(2.)
 
 async def converse(host,*,session_handoff=False):
+    from tools.research.state import require_authorization
+    require_authorization(host)
     from tools.research.core import guard,dispatch,experience,read_evidence,packet
     from tools.research.contracts import Plan,ExperienceQuery,EvidenceQuery,AnalysisRequest,RLRequest
     if session_handoff and not state(host)['pilot'].get('session_handoff_live_admitted'):
@@ -412,12 +414,6 @@ async def converse(host,*,session_handoff=False):
                 continue
             refs.extend(use['toolUseId']+'_'+str(i) for i,_ in enumerate(value['result'].get('content',[])))
         return refs
-    if (state(host)['spec'].get('mode')=='rl_interface' or state(host)['spec'].get('capabilities')) and not state(host).get('live_started_unix'):
-        s=state(host)
-        started=time.time()
-        pilot=deepcopy(s['pilot'])
-        pilot.update(request_deadline_unix=None,bounded_request_reservation=False)
-        update(host,live_started_unix=started,pilot=pilot)
     guard(host)
     if pending(host):
         raise ValueError('UNKNOWN_PROVIDER_OUTCOME_RECOVER_BEFORE_SEND')
@@ -518,11 +514,21 @@ async def converse(host,*,session_handoff=False):
             model_class=live_model_class(boundary),tool_executor=SequentialToolExecutor(),research_tools=[t for t in native if t is not native[1]] if state(host)['spec'].get('rl_evaluation_source') else native,
             configuration_path=host.store.root/'framework_configuration.json',session_directory=host.store.root/'framework_sessions',session_id=session_id)
     agent=build_session()
-    from tools.research.session_handoff import unmatched, recover_feedback
-    if unmatched(agent.messages):await recover_feedback(host,agent)
-    if state(host)['pilot'].get('handoff'):
-        from tools.research.session_handoff import reconcile
-        agent=await reconcile(host,build_session,host.store.root/'framework_sessions')
+    from tools.research.session_handoff import unmatched, recover_feedback, trusted_history
+    try:
+        if state(host)['pilot'].get('handoff'):
+            from tools.research.session_handoff import reconcile
+            agent=await reconcile(host,build_session,host.store.root/'framework_sessions',allow_incomplete=True)
+        else:
+            trusted_history(host,agent,allow_incomplete=True)
+        if unmatched(agent.messages):await recover_feedback(host,agent)
+    except BaseException:
+        await boundary.aclose()
+        raise
+    if (state(host)['spec'].get('mode')=='rl_interface' or state(host)['spec'].get('capabilities')) and not state(host).get('live_started_unix'):
+        s=state(host);pilot=deepcopy(s['pilot'])
+        pilot.update(request_deadline_unix=None,bounded_request_reservation=False)
+        update(host,live_started_unix=time.time(),pilot=pilot)
     if state(host)['spec'].get('rl_evaluation_source'):
         agent.tool_registry.registry.pop('retrieve_context',None)
     async def before_model(event):

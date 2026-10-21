@@ -64,9 +64,40 @@ def snapshot_files(directory,session_id,*,flush=False):
     return result
 
 
-async def validate_snapshot(host,preparation,build,directory,*,initial=False):
+def trusted_history(host,agent,*,initial_messages=None,files=None,preparation=None,allow_incomplete=False):
+    """Check normal recovery boundaries against existing Store identities."""
+    s=state(host);session_id=agent._session_manager.session_id
+    if session_id!=s['pilot']['framework_session_id']:raise ValueError('STORE_SESSION_POINTER_MISMATCH')
+    # An interrupted tool round is not a clean boundary. Its original receipts
+    # and feedback remain owned by recover_feedback(), never replayed here.
+    if allow_incomplete and (s['pilot'].get('unconsumed_response') or unmatched(agent.messages) or (agent.messages and
+            agent.messages[-1]['role']=='user' and any('toolResult' in b for b in agent.messages[-1]['content']))):
+        return 'incomplete'
+    anchors=[]
+    for event in host.store.events(host.run_id):
+        if event['kind']!='model_original_turn':continue
+        value=host.store.artifact(event['outputs'][0])
+        if value.get('session_id')==session_id and value.get('sdk_message_identity'):
+            anchors.append(value)
+    if anchors:
+        anchor=anchors[-1]
+        if digest(agent.messages)!=anchor['sdk_message_identity']:raise ValueError('SDK_HISTORY_IDENTITY_MISMATCH_OR_UNTRUSTED_SUFFIX')
+        if unmatched(agent.messages):raise ValueError('SDK_COMPLETED_HISTORY_HAS_UNPAIRED_TOOLS')
+        return 'completed'
+    if initial_messages is not None:
+        if agent.messages!=initial_messages:raise ValueError('SDK_INITIAL_CONTEXT_MISMATCH')
+        verification=host.store.artifact(s['pilot']['handoff_verification'])
+        if (verification.get('preparation')!=preparation or not verification.get('independently_restored')
+                or files!=verification['snapshot_files']):raise ValueError('SDK_COMMITTED_SNAPSHOT_FILES_MISMATCH')
+        return 'initial'
+    if agent.messages or any(e['kind']=='r3_request' for e in host.store.events(host.run_id)):
+        raise ValueError('SDK_HISTORY_HAS_NO_TRUSTED_STORE_ANCHOR')
+    return 'empty'
+
+
+async def validate_snapshot(host,preparation,build,directory,*,initial=False,allow_incomplete=False):
     value=host.store.artifact(preparation)
-    snapshot_files(directory,value['next_session'])
+    files=snapshot_files(directory,value['next_session'])
     agent=build(value['next_session'])
     if not await agent._session_manager.restore_snapshot(agent):raise ValueError('SDK_SNAPSHOT_MISSING')
     if agent._session_manager.session_id!=value['next_session']:raise ValueError('SDK_SESSION_ID_MISMATCH')
@@ -74,17 +105,23 @@ async def validate_snapshot(host,preparation,build,directory,*,initial=False):
     if marker!=dict(preparation=preparation,state_identity=value['source_state_identity']):raise ValueError('SDK_HANDOFF_IDENTITY_MISMATCH')
     if schemas(agent)!=value['tool_schemas']:raise ValueError('SDK_TOOL_SCHEMA_MISMATCH')
     for ref in value['scientific_results']:host.store.artifact(ref)
-    if initial and agent.messages!=value['initial_messages']:raise ValueError('SDK_INITIAL_CONTEXT_MISMATCH')
+    if value['study_id']!=host.run_id:raise ValueError('SDK_HANDOFF_STUDY_MISMATCH')
+    if initial:
+        if agent.messages!=value['initial_messages']:raise ValueError('SDK_INITIAL_CONTEXT_MISMATCH')
+    else:
+        s=state(host)
+        if s['pilot'].get('handoff')!=preparation:raise ValueError('STORE_HANDOFF_POINTER_MISMATCH')
+        trusted_history(host,agent,initial_messages=value['initial_messages'],files=files,preparation=preparation,allow_incomplete=allow_incomplete)
     return agent
 
 
-async def reconcile(host,build,directory):
+async def reconcile(host,build,directory,*,allow_incomplete=False):
     """A preparation never switches automatically; a broken committed pointer blocks."""
     s=state(host);ref=s['pilot'].get('handoff')
     if not ref:return None
     value=host.store.artifact(ref)
     if value['next_session']!=s['pilot']['framework_session_id']:raise ValueError('STORE_SESSION_POINTER_MISMATCH')
-    return await validate_snapshot(host,ref,build,directory)
+    return await validate_snapshot(host,ref,build,directory,allow_incomplete=allow_incomplete)
 
 
 async def handoff(host,agent,build,directory,*,stage=lambda name:None):

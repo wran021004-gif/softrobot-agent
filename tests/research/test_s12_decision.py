@@ -40,6 +40,7 @@ class S12DecisionTests(unittest.TestCase):
                     return agent
                 async def no_wait(*args):pass
                 with patch('tools.research.agent.build_harness',side_effect=build),patch('tools.research.core.guard'),\
+                     patch('tools.research.session_handoff.trusted_history'),\
                      patch('tools.research.agent.pending',return_value=[]),patch('tools.research.agent.load_credential'),\
                      patch('tools.research.agent.record'),patch('tools.research.agent.wait_training',side_effect=no_wait),\
                      patch.dict(os.environ,{'DEEPSEEK_API_KEY':'synthetic-fixture'}):
