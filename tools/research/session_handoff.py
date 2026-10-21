@@ -235,7 +235,7 @@ async def recover_feedback(host,agent):
             if use['name']!='research_investigate' and s['spec'].get('research_decisions',{}).get('context_limits'):value=tool_feedback(host,value)
             if use['name'] in ('research_plan','research_analysis') and s['spec'].get('research_decisions'):
                 from tools.research.reporter import scientific_feedback
-                report=scientific_feedback(host,host.store.artifact(receipt['output']),{})
+                report=scientific_feedback(host,host.store.artifact(receipt['output']),receipt=receipt)
                 if report is not None:value=report
             result=dict(toolUseId=key,status='success',content=[dict(text=json.dumps(value,separators=(',',':')))])
             record(host,'model_original_tool_feedback',dict(tool_use=use,result=result,recovered_from_receipt=True))

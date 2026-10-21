@@ -1,0 +1,164 @@
+"""F2 engineering fixtures and read-only saved B evidence; no live Provider."""
+import asyncio
+from copy import deepcopy
+import json
+from pathlib import Path
+from types import SimpleNamespace
+import unittest
+from unittest.mock import AsyncMock, patch
+import httpx
+from tools.platform_store import plain, zero
+from tools.state_io import digest
+from tools.research import reporter
+from tools.research.agent import record
+from tools.research.state import state, update, save
+from tools.research.session_handoff import recover_feedback
+from tools.research.research_context import agent_decision_brief, mathematical_decision_view
+from tools.research.task_constraints import analysis_capabilities, describe_analysis_requirements
+from tests.research.test_s129_agent_reporting import AgentReportingTests, reporter_response
+from tests.research.test_task_analysis_contract import TaskAnalysisTests
+from tests.research.test_trajectory_feasibility import fixture
+
+
+class IntegrationTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):AgentReportingTests.setUpClass()
+
+    def setUp(self):
+        self.fixture=AgentReportingTests();self.fixture.setUp()
+        self.addCleanup(self.fixture.doCleanups)
+        self.h=self.fixture.h
+        spec=deepcopy(state(self.h)['spec']);spec['research_decisions']={'fixture':True}
+        update(self.h,spec=spec,candidates={})
+
+    def saved_pair(self):
+        pair=json.loads(Path('evidence/s129_math_capability/gvs_pair.json').read_text())
+        for value in pair['supporting_artifacts'].values():save(self.h,value,'saved_B_engineering_artifact')
+        refs=[save(self.h,pair[k],'saved_B_engineering_result') for k in ('baseline','changed')]
+        self.assertEqual(refs,[pair['baseline_result'],pair['changed_result']])
+        update(self.h,analysis_results=refs)
+        return pair,refs
+
+    def test_saved_b_quantities_reach_new_agent_packet_with_exact_sources(self):
+        pair,refs=self.saved_pair()
+        for ref in refs:reporter.scientific_feedback(self.h,dict(reference=ref),{})
+        packet=agent_decision_brief(self.h)
+        views=[r['results'][0]['mathematics'] for r in packet['latest_reports']]
+        self.assertEqual(len(views),2)
+        for view,key in zip(views,('baseline','changed')):
+            self.assertEqual(view['capability']['best_found_violation'],pair[key]['trajectory']['best_found_violation'])
+            self.assertFalse(view['capability']['verification_scope']['optimality'])
+            self.assertTrue(all(not s['success'] and s['iterations']==100 for s in view['capability']['solver_starts']))
+            self.assertTrue(view['scope']['constraint_coverage'])
+            self.assertTrue(view['problem'])
+            self.assertTrue(view['unresolved'])
+            for quantity in view['quantities']:
+                if quantity['source']:
+                    from tools.research.core import read_evidence
+                    self.assertEqual(read_evidence(self.h,quantity['source'],record_read=False),quantity['value'])
+        comparison=views[1]['capability']['structural_comparison']['quantities']
+        self.assertAlmostEqual(comparison['fixed_control_delta']['value'],.1170115105)
+        self.assertAlmostEqual(comparison['reoptimized_control_delta']['value'],.1000004343)
+        wire=json.dumps(views)
+        for key in ('"states"','"discrete_dynamics"','"applied_input_n"'):self.assertNotIn(key,wire)
+
+    def test_receipt_recovery_selects_old_math_not_newest_and_never_reexecutes(self):
+        pair,refs=self.saved_pair();raw=pair['baseline'];query=raw['requested_operation']
+        use=dict(name='research_analysis',toolUseId='old-math',input=query)
+        key='native-old-math-analysis'
+        row,_=self.h.store.reserve(self.h.run_id,key,digest(query),self.h.actor,zero())
+        self.h.store.complete(row,dict(request_id=key,execution_id=row['execution_id'],caller=self.h.actor,
+            tool_id='research.candidate_analysis',tool_version='1.0.0',execution_status='completed',charged=zero()),raw)
+        record(self.h,'model_original_tool_request',dict(tool_use=use))
+        agent=SimpleNamespace(messages=[dict(role='assistant',content=[dict(toolUse=use)])],
+            _session_manager=SimpleNamespace(session_id='offline-main',save_snapshot=AsyncMock()))
+        ledger=self.h.store.remaining();science=deepcopy(state(self.h)['analysis_results'])
+        with patch('tools.research.analysis.dispatch',side_effect=AssertionError('No worker replay')):
+            self.assertEqual(asyncio.run(recover_feedback(self.h,agent)),1)
+            result=agent.messages[-1]['content'][0]['toolResult']
+            value=json.loads(result['content'][0]['text'])
+            self.assertEqual(value['report']['results'][0]['identity']['result']['reference'],refs[0])
+            self.assertEqual(result['toolUseId'],'old-math')
+            # A second interruption uses persisted original feedback byte-for-byte.
+            agent.messages=agent.messages[:1]
+            self.assertEqual(asyncio.run(recover_feedback(self.h,agent)),1)
+            self.assertEqual(agent.messages[-1]['content'][0]['toolResult'],result)
+        self.assertEqual(self.h.store.remaining(),ledger)
+        self.assertEqual(state(self.h)['analysis_results'],science)
+
+    def test_multi_result_receipt_and_missing_binding(self):
+        _,refs=self.saved_pair()
+        receipt=dict(request_id='original',execution_id='original-exec',output=refs[0])
+        result=reporter.scientific_feedback(self.h,dict(scientific_results=refs),receipt=receipt)
+        self.assertEqual([v['reference'] for v in result['scientific_result_index']],refs)
+        for row in result['scientific_result_index']:
+            saved=self.h.store.artifact(row['report_reference'])
+            self.assertEqual(saved['report']['results'][0]['identity']['result']['reference'],row['reference'])
+        same=reporter.scientific_feedback(self.h,dict(scientific_results=refs),receipt=receipt)
+        self.assertEqual(same['scientific_result_index'],result['scientific_result_index'])
+        raw=dict(status='completed',original_fact='keep me')
+        missing=reporter.scientific_feedback(self.h,raw,receipt={**receipt,'output':save(self.h,raw)})
+        self.assertEqual(missing['operation_outcome'],raw)
+        self.assertEqual(missing['error'],'EXACT_SCIENTIFIC_RESULT_BINDING_UNAVAILABLE')
+        self.assertNotIn('report',missing)
+
+    def test_priority_keeps_reports_and_limits_duplicate_physics_calls(self):
+        before=state(self.h);ref=self.fixture.physical()
+        first=reporter.scientific_feedback(self.h,dict(reference=ref),before)
+        other=deepcopy(self.h.store.artifact(ref));other['fixture_repetition']='second'
+        second=save(self.h,other);update(self.h,physical_replays=[ref,second])
+        repeated=reporter.scientific_feedback(self.h,dict(reference=second),before)
+        calls=[]
+        def respond(request):calls.append(request);return reporter_response(request)
+        asyncio.run(reporter.complete_reports(self.h,httpx.MockTransport(respond)))
+        self.assertEqual(len(calls),1)
+        reports=reporter.entries(self.h)
+        skipped=next(v for _,v in reports if v['interpretation_for']==repeated['report_reference'])
+        self.assertEqual(skipped['interpretation_status'],'skipped')
+        self.assertEqual(skipped['report'],repeated['report'])
+        investigation=reporter.investigate(self.h,dict(question='Explicitly compare the repetition',references=[second]))
+        asyncio.run(reporter.complete_reports(self.h,httpx.MockTransport(respond)))
+        self.assertEqual(len(calls),2)
+        self.assertTrue(any(v['interpretation_for']==investigation['report_reference'] and
+            v['interpretation_status']=='available' for _,v in reporter.entries(self.h)))
+
+
+class CrossTaskTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):TaskAnalysisTests.setUpClass()
+
+    def test_catalogue_reuses_execution_coverage_and_budget(self):
+        f=TaskAnalysisTests();f.setUp()
+        req=describe_analysis_requirements(f.cfg,f.binding)
+        rows=analysis_capabilities(f.cfg,req,f.q.protocol,remaining_evaluations=2)
+        by={r['operation']:r for r in rows}
+        self.assertEqual(by['task_capability']['status'],'applicable')
+        self.assertTrue(by['task_capability']['full_task_supported'])
+        self.assertFalse(by['design_sensitivity']['budget_allowed'])
+        self.assertEqual(by['input_sensitivity']['status'],'not_applicable')
+        self.assertEqual(by['instantaneous_braking_v1']['status'],'not_applicable')
+        self.assertTrue(all(r['wall_cost']=='unknown' for r in rows))
+        unsupported=req.model_copy(update=dict(constraints=[req.constraints[0].model_copy(update=dict(
+            kind='unsupported',unsupported_requirement=dict(contact_event=True)))]))
+        self.assertTrue(all(r['status']=='not_applicable' for r in analysis_capabilities(f.cfg,unsupported,f.q.protocol)))
+
+    def test_synthetic_moving_reference_preserved_by_both_kernels(self):
+        from extensions.math_analysis.task_capability import task_capability
+        from extensions.math_analysis.trajectory import trajectory_feasibility
+        model,req,p=fixture();original=plain(req)
+        for kernel in (task_capability,trajectory_feasibility):
+            out=kernel(model,req,p)
+            self.assertEqual(out['status'],'feasible_witness')
+            self.assertTrue(out['full_requested_coverage'])
+            self.assertEqual({r['signal'] for r in out['replay']['records']},{'test_output'})
+            self.assertEqual(plain(req),original)
+            model.operating_point.update(actual_time_s=1.,remaining_task_s=2.)
+            partial=kernel(model,req,p)
+            self.assertFalse(partial['full_requested_coverage'])
+            model.operating_point.update(actual_time_s=0.,remaining_task_s=3.)
+            unknown=req.model_copy(update=dict(constraints=[req.constraints[0].model_copy(update=dict(
+                signal=req.constraints[0].signal.model_copy(update=dict(name='contact_impulse'))))]))
+            self.assertEqual(kernel(model,unknown,p)['status'],'not_applicable')
+
+
+if __name__=='__main__':unittest.main()

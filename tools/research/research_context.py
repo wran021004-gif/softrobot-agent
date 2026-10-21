@@ -669,6 +669,14 @@ def agent_decision_brief(host):
     from tools.research.reporter import entries
     brief=decision_brief(context(host))
     brief['research_intent']=research_intent(host)
+    from tools.research.task_constraints import describe_analysis_requirements, analysis_capabilities
+    s=state(host);cfg=s.get('nominal_configuration',s.get('base_configuration'))
+    if s.get('candidates'):
+        cfg=host.store.artifact(list(s['candidates'].values())[-1])['configuration']
+    if cfg and s['spec'].get('analysis_protocol'):
+        requirements=describe_analysis_requirements(cfg,{})
+        brief['mathematical_capabilities']=analysis_capabilities(cfg,requirements,s['spec']['analysis_protocol'],
+            remaining_evaluations=max(0,s['spec']['budgets']['mathematical_evaluations']-s.get('mathematical_evaluations',0)))
     reports=entries(host);latest={}
     for ref,saved in reports:
         key=(saved['report']['mode'],saved['interpretation_for']['artifact_id'] if saved['interpretation_for'] else ref['artifact_id'])
@@ -680,6 +688,7 @@ def agent_decision_brief(host):
         question=s['report']['question'],interpretation_status=s['interpretation_status'],
         error=s['error'],interpretations=s['report']['interpretations'],relations=s['report']['relations'],
         results=[dict(identity=c['identity'],metrics=c['metrics'],resources=c['resources'],
+            mathematics=mathematical_decision_view(c),
             main_violations=c['main_violations'],evidence_strength=c['evidence_summary']['claim_kind'],
             evidence_scope={k:c['evidence_summary'][k] for k in ('verification_status',
                 'supported_inferences','unsupported_inferences','numerical_evidence_pointer')},
@@ -687,6 +696,11 @@ def agent_decision_brief(host):
                 'task_gap','comparisons','recorded_mathematics','recorded_conclusions','status',
                 'conclusion','coverage','decision_relevance','certificate_verified')},
             unresolved=c['evidence_summary']['unresolved']) for c in s['report']['results']]) for r,s in selected]
+    from tools.research.evidence_views import result_card
+    shown=[c['identity']['result']['reference'] for r in brief['latest_reports'] for c in r['results']]
+    brief['additional_mathematical_evidence']=[dict(reference=r,
+        mathematics=mathematical_decision_view(plain(result_card(host,r))))
+        for r in s.get('analysis_results',[])[-2:] if r not in shown]
     anchor=brief.get('evidence_access',{}).get('reference')
     if anchor:
         refs=brief.pop('all_fresh_results',[])
@@ -700,6 +714,24 @@ def agent_decision_brief(host):
                 rows=ws.pop(key);ws[key+'_access']=dict(count=len(rows),
                     query=dict(reference=anchor,view='working_set',pointer='/'+key))
     return brief
+
+
+def mathematical_decision_view(card):
+    """Project B/F0 facts once; shared quantity conditions stay behind exact pointers."""
+    math=card.get('mathematics')
+    if not math:return None
+    claim=math['claim']
+    summary=card['deterministic_summary']
+    return dict(claim_source=math['claim_source'],requirement_source=math['requirement_source'],
+        problem_definition=math['problem_definition'],
+        scope={k:claim[k] for k in ('model_declaration','horizon','constraint_coverage',
+            'computation_status','verification_status','supported_interpretation','unsupported_conclusions')},
+        operating_point={k:v for k,v in claim['operating_point'].items() if k in
+            ('name','actual_time_s','time_s','remaining_task_s','phase','input_units')},
+        quantities=[{k:v for k,v in q.items() if k!='conditions'} for q in math['quantities']],
+        problem=next((c['value'] for q in math['quantities'] for c in q['conditions']
+            if c['name']=='problem_and_scope'),None),capability=summary.get('task_capability'),
+        critical_samples=summary.get('margins'),unresolved=summary.get('decision_relevance'))
 
 
 def tool_feedback(host,value):

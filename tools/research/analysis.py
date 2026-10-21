@@ -536,7 +536,11 @@ def decision_result(value, reference):
             unsupported_inferences=['Global/physical feasibility, structural necessity or surrounding-region exclusion.']),
         failure_pointer='' if value.get('status') not in ('computed','not_applicable') else None)
     from tools.research.evidence_policy import summarize_evidence
-    result['evidence_summary']=summarize_evidence(value,reference)
+    evidence=summarize_evidence(value,reference)
+    # Scope/operating-point payloads repeat the original claim and model config.
+    # Keep inference strength inline; exact scope remains at scope_pointer.
+    result['evidence_summary']={k:v for k,v in evidence.items() if k not in
+        ('operating_point','covered_samples','assumptions')}
     if value.get('operation') == 'task_capability':
         from tools.research.capability import capability_summary
         result['task_capability']=capability_summary(trajectory)

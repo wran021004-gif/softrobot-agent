@@ -481,7 +481,10 @@ def dispatch(host, value, request_id, origin='model'):
         else:
             update(host,research_status='stopped',final_disposition=ref,closed_unix=time.time())
             result=dict(accepted_stop=True,claims=claims(host))
-        output=dict(plan=ref,result=result,scientific_preflight=scientific_preflight,
+        from tools.research.reporter import RESULT_KEYS
+        after=state(host)
+        scientific_results=[r for key in RESULT_KEYS for r in after.get(key,[]) if r not in s.get(key,[])]
+        output=dict(plan=ref,result=result,scientific_results=scientific_results,scientific_preflight=scientific_preflight,
             resource_use=resource_use(host))
         host.store.complete(row,dict(request_id=request_id,execution_id=row['execution_id'],caller=host.actor,
             tool_id='research.core_plan',tool_version='1.0.0',execution_status='completed',charged=zero()),output)

@@ -1,0 +1,1016 @@
+{
+  "scope": "Saved F1-B engineering evidence, read-only F2 projection; no new physical or numerical execution",
+  "results": [
+    {
+      "reference": {
+        "artifact_id": "9c22f54b6f258c56a1105bb6b6f14a9e5e62ad4c30e5831a2931c50b3add1a17",
+        "media_type": "application/json"
+      },
+      "mathematics": {
+        "claim_source": {
+          "reference": {
+            "artifact_id": "9c22f54b6f258c56a1105bb6b6f14a9e5e62ad4c30e5831a2931c50b3add1a17",
+            "media_type": "application/json"
+          },
+          "pointer": "/scoped_claim"
+        },
+        "requirement_source": {
+          "reference": {
+            "artifact_id": "9c22f54b6f258c56a1105bb6b6f14a9e5e62ad4c30e5831a2931c50b3add1a17",
+            "media_type": "application/json"
+          },
+          "pointer": "/task_analysis"
+        },
+        "problem_definition": {
+          "reference": {
+            "artifact_id": "9c22f54b6f258c56a1105bb6b6f14a9e5e62ad4c30e5831a2931c50b3add1a17",
+            "media_type": "application/json"
+          },
+          "pointer": "/trajectory/problem_definition"
+        },
+        "scope": {
+          "model_declaration": {
+            "model_id": "model.gvs",
+            "model_version": "1.0.0",
+            "relevant_assumptions": [
+              "supported serial tendon-driven continuum topology",
+              "selected strain basis spans deformation relevant to the use",
+              "inextensible centerline",
+              "no shear",
+              "no torsion",
+              "straight frictionless tendon spans"
+            ],
+            "representation_id": "ca1a49e5a421b0480f5e5e9e235dba07e38a89dbd6f56dd8f42483087ef3238b"
+          },
+          "horizon": {
+            "analysis_horizon_s": 0.35,
+            "interpretation": "Actual saved-state remaining horizon, or nominal horizon from the declared configuration operating point.",
+            "origin": 0.0,
+            "period_s": 0.01,
+            "remaining_task_s": 0.35,
+            "task_duration_s": 0.35,
+            "trajectory_grid": {
+              "control_period_s": 0.01,
+              "input_hold_s": 0.01,
+              "remaining_task_s": 0.35,
+              "sample_period_s": 0.01,
+              "sample_phase": "post_step_preceding_hold",
+              "sample_steps": {
+                "0": 0,
+                "1": 1,
+                "10": 10,
+                "11": 11,
+                "12": 12,
+                "13": 13,
+                "14": 14,
+                "15": 15,
+                "16": 16,
+                "17": 17,
+                "18": 18,
+                "19": 19,
+                "2": 2,
+                "20": 20,
+                "21": 21,
+                "22": 22,
+                "23": 23,
+                "24": 24,
+                "25": 25,
+                "26": 26,
+                "27": 27,
+                "28": 28,
+                "29": 29,
+                "3": 3,
+                "30": 30,
+                "31": 31,
+                "32": 32,
+                "33": 33,
+                "34": 34,
+                "35": 35,
+                "4": 4,
+                "5": 5,
+                "6": 6,
+                "7": 7,
+                "8": 8,
+                "9": 9
+              },
+              "start_time_s": 0.0,
+              "step_count": 35
+            }
+          },
+          "constraint_coverage": [
+            {
+              "analyzed_indices": [
+                35
+              ],
+              "checked_indices": [
+                35
+              ],
+              "constraint_id": "terminal_error_m",
+              "expressible": true,
+              "reason": "Shared held-input trajectory; past samples require separate evidence.",
+              "reasons": [],
+              "satisfied_indices": [
+                35
+              ],
+              "status": "applicable",
+              "unchecked_indices": []
+            },
+            {
+              "analyzed_indices": [
+                30,
+                31,
+                32,
+                33,
+                34,
+                35
+              ],
+              "checked_indices": [
+                30,
+                31,
+                32,
+                33,
+                34,
+                35
+              ],
+              "constraint_id": "holding_max_error_m",
+              "expressible": true,
+              "reason": "Shared held-input trajectory; past samples require separate evidence.",
+              "reasons": [],
+              "satisfied_indices": [
+                30,
+                31,
+                32,
+                33,
+                34,
+                35
+              ],
+              "status": "applicable",
+              "unchecked_indices": []
+            },
+            {
+              "analyzed_indices": [
+                30,
+                31,
+                32,
+                33,
+                34,
+                35
+              ],
+              "checked_indices": [
+                30,
+                31,
+                32,
+                33,
+                34,
+                35
+              ],
+              "constraint_id": "holding_max_speed_m_s",
+              "expressible": true,
+              "reason": "Shared held-input trajectory; past samples require separate evidence.",
+              "reasons": [],
+              "satisfied_indices": [
+                30,
+                31,
+                32,
+                33,
+                34,
+                35
+              ],
+              "status": "applicable",
+              "unchecked_indices": []
+            }
+          ],
+          "computation_status": "computed",
+          "verification_status": "independent_discrete_replay_passed",
+          "supported_interpretation": "All declared sampled constraints verified in the specified local affine model only. Optimal task violation and structural optimality remain unverified.",
+          "unsupported_conclusions": [
+            "task acceptance",
+            "continuous-time holding-window compliance",
+            "global nonlinear feasibility or infeasibility",
+            "hardware performance",
+            "robustness",
+            "repeatability",
+            "equilibrium validity at a non-equilibrium point"
+          ]
+        },
+        "operating_point": {
+          "actual_time_s": 0.0,
+          "name": "controller_start_input",
+          "phase": "configuration_controller_start_input",
+          "remaining_task_s": 0.35
+        },
+        "quantities": [
+          {
+            "name": "best_found_violation",
+            "status": "unverified_estimate",
+            "value": -0.1999999515720519,
+            "unit": "dimensionless",
+            "source": {
+              "reference": {
+                "artifact_id": "9c22f54b6f258c56a1105bb6b6f14a9e5e62ad4c30e5831a2931c50b3add1a17",
+                "media_type": "application/json"
+              },
+              "pointer": "/trajectory/quantities/best_found_violation/value"
+            },
+            "structural_parameters": [],
+            "control_reoptimization": "required"
+          },
+          {
+            "name": "lower_bound",
+            "status": "verified",
+            "value": -1.0,
+            "unit": "dimensionless",
+            "source": {
+              "reference": {
+                "artifact_id": "9c22f54b6f258c56a1105bb6b6f14a9e5e62ad4c30e5831a2931c50b3add1a17",
+                "media_type": "application/json"
+              },
+              "pointer": "/trajectory/quantities/lower_bound/value"
+            },
+            "structural_parameters": [],
+            "control_reoptimization": "required"
+          },
+          {
+            "name": "optimal_task_violation",
+            "status": "unavailable",
+            "value": null,
+            "unit": "dimensionless",
+            "source": null,
+            "structural_parameters": [],
+            "control_reoptimization": "required"
+          },
+          {
+            "name": "replayed_violation",
+            "status": "verified",
+            "value": -0.1999999515720519,
+            "unit": "dimensionless",
+            "source": {
+              "reference": {
+                "artifact_id": "9c22f54b6f258c56a1105bb6b6f14a9e5e62ad4c30e5831a2931c50b3add1a17",
+                "media_type": "application/json"
+              },
+              "pointer": "/trajectory/quantities/replayed_violation/value"
+            },
+            "structural_parameters": [],
+            "control_reoptimization": "required"
+          },
+          {
+            "name": "upper_bound",
+            "status": "unavailable",
+            "value": null,
+            "unit": "dimensionless",
+            "source": null,
+            "structural_parameters": [],
+            "control_reoptimization": "required"
+          },
+          {
+            "name": "witness_upper_bound_estimate",
+            "status": "unverified_estimate",
+            "value": -0.1999999515720519,
+            "unit": "dimensionless",
+            "source": {
+              "reference": {
+                "artifact_id": "9c22f54b6f258c56a1105bb6b6f14a9e5e62ad4c30e5831a2931c50b3add1a17",
+                "media_type": "application/json"
+              },
+              "pointer": "/trajectory/quantities/witness_upper_bound_estimate/value"
+            },
+            "structural_parameters": [],
+            "control_reoptimization": "required"
+          }
+        ],
+        "problem": {
+          "bounds_scope": "Analyzed sampled subproblem only; missing samples are not certified",
+          "computed": "Best discovered signed maximum over explicitly analyzed samples",
+          "ideal": "V_tau(d) = inf_{U in physical input box} max_i g_i(d,U)",
+          "interval": "max(lower-residual, residual-upper)/max(abs(lower),abs(upper))",
+          "norm": "norm(output-reference)/radius - 1",
+          "optimality": "unverified; solver convergence is not an optimality certificate"
+        },
+        "capability": {
+          "best_found_violation": -0.1999999515720519,
+          "status": "feasible_witness",
+          "control_reoptimization": "required",
+          "verification_scope": {
+            "discrete_replay": true,
+            "input_legality": true,
+            "lower_bound": "Analytic -1 from the signed constraint definitions, for analyzed samples",
+            "optimality": false,
+            "rigorous_floating_point_upper_bound": false,
+            "sampled_score": true,
+            "tolerances": "Replay agreement uses check_atol; witness additionally requires signed_violation <= 0"
+          },
+          "start_value_spread": 9.514266740090482e-06,
+          "research_diagnostics": {
+            "bottleneck": {
+              "absolute_time_s": 0.33,
+              "constraint_id": "holding_max_error_m",
+              "sample_index": 33,
+              "signed_violation": -0.1999999515720519
+            },
+            "competing_explanations": [
+              "Limited authority in this frozen model",
+              "Incomplete numerical control search",
+              "Local model may differ from nonlinear or physical execution"
+            ],
+            "discriminating_checks": [
+              "Compare starts and solver termination at the same model and budget",
+              "Compare fixed control and separately reoptimized controls after a supported structural perturbation",
+              "Compare this replay with compatible nonlinear or recorded execution"
+            ],
+            "unsupported_inferences": [
+              "Global optimality",
+              "Structural necessity",
+              "Physical task acceptance",
+              "Envelope gradient or regional descent guarantee"
+            ]
+          },
+          "input_diagnostics": {
+            "minimum_lower_margin_n": [
+              1.8506004088579509,
+              1.8129429265658907,
+              1.0107344057993441,
+              1.6775142145687372,
+              1.864483471067751,
+              0.6349523540968242
+            ],
+            "minimum_upper_margin_n": [
+              5.424829506389763,
+              5.5014622969805735,
+              5.715777594324289,
+              4.748565491014972,
+              5.652964397617405,
+              5.635468824254289
+            ],
+            "near_bound_samples": 0,
+            "tendon_order": [
+              "near_t0",
+              "near_t1",
+              "near_t2",
+              "far_t0",
+              "far_t1",
+              "far_t2"
+            ]
+          },
+          "locality_diagnostics": {
+            "interpretation": "State excursions are recorded, but local nonlinear agreement is unvalidated.",
+            "max_absolute_delta_state": [
+              4.038367061065848,
+              1.3146131271237216,
+              1.2784269293804484,
+              1.1731304040781447,
+              0.7394875521351623,
+              0.5059208323550086,
+              3.5495410710678765,
+              5.074678022364095,
+              7.599161479290437,
+              1.7116776958056867,
+              1.1986933197038203,
+              0.7601510392538803,
+              43.40880839325384,
+              16.210776582506398,
+              31.365317952350395,
+              10.711345652183994,
+              7.527864037233358,
+              6.238697338147694,
+              45.11457693973671,
+              56.60264461273662,
+              89.31263286041002,
+              16.978381426774305,
+              15.079415899381988,
+              15.79627493296377
+            ],
+            "validated_locality_radius": null
+          },
+          "kernel_elapsed_s": 0.4508322000037879,
+          "near_active_records": [],
+          "co_bottleneck_records": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            8,
+            9
+          ],
+          "solver_scope": "sampled-affine-signed-minimax-v1",
+          "solver_starts": [
+            {
+              "start_index": 0,
+              "success": false,
+              "status": 9,
+              "iterations": 100,
+              "returned_violation": -0.19999920005567412,
+              "epigraph_residual": 5.271504613657552e-07
+            },
+            {
+              "start_index": 1,
+              "success": false,
+              "status": 9,
+              "iterations": 100,
+              "returned_violation": -0.19998968578893403,
+              "epigraph_residual": 1.0306919283387117e-05
+            },
+            {
+              "start_index": 2,
+              "success": false,
+              "status": 9,
+              "iterations": 100,
+              "returned_violation": -0.19999440061041918,
+              "epigraph_residual": 5.556907076459394e-06
+            }
+          ],
+          "reason": null,
+          "problem_pointer": "/trajectory/problem_definition",
+          "quantities_pointer": "/trajectory/quantities"
+        },
+        "critical_samples": [
+          {
+            "constraint_id": "holding_max_error_m",
+            "signal": "tip_position",
+            "absolute_time_s": 0.33,
+            "observed_value": 0.008000000484279481,
+            "bound": 0.01,
+            "margin": [
+              0.001999999515720519
+            ],
+            "violation": 0.0,
+            "units": "m",
+            "status": "satisfied_sample",
+            "source_pointer": "/trajectory/replay/records/4"
+          }
+        ],
+        "unresolved": {
+          "supported_facts": [
+            "Bounded local-model witness for checked samples."
+          ],
+          "unresolved_questions": [
+            "Controller/nonlinear/backend realization unresolved."
+          ],
+          "potential_discriminating_checks": [
+            "Compare compatible execution or solver diagnosis."
+          ],
+          "unsupported_inferences": [
+            "Global/physical feasibility, structural necessity or surrounding-region exclusion."
+          ]
+        }
+      }
+    },
+    {
+      "reference": {
+        "artifact_id": "9e7a21648b529c3bb72b28f4c8778224348b16cb3782dcff82aac9fe6a38943f",
+        "media_type": "application/json"
+      },
+      "mathematics": {
+        "claim_source": {
+          "reference": {
+            "artifact_id": "9e7a21648b529c3bb72b28f4c8778224348b16cb3782dcff82aac9fe6a38943f",
+            "media_type": "application/json"
+          },
+          "pointer": "/scoped_claim"
+        },
+        "requirement_source": {
+          "reference": {
+            "artifact_id": "9e7a21648b529c3bb72b28f4c8778224348b16cb3782dcff82aac9fe6a38943f",
+            "media_type": "application/json"
+          },
+          "pointer": "/task_analysis"
+        },
+        "problem_definition": {
+          "reference": {
+            "artifact_id": "9e7a21648b529c3bb72b28f4c8778224348b16cb3782dcff82aac9fe6a38943f",
+            "media_type": "application/json"
+          },
+          "pointer": "/trajectory/problem_definition"
+        },
+        "scope": {
+          "model_declaration": {
+            "model_id": "model.gvs",
+            "model_version": "1.0.0",
+            "relevant_assumptions": [
+              "supported serial tendon-driven continuum topology",
+              "selected strain basis spans deformation relevant to the use",
+              "inextensible centerline",
+              "no shear",
+              "no torsion",
+              "straight frictionless tendon spans"
+            ],
+            "representation_id": "a13af638a1f49c154450588b1a3f1bd803ea0d89a3d288505c8d4acda2abe9b2"
+          },
+          "horizon": {
+            "analysis_horizon_s": 0.35,
+            "interpretation": "Actual saved-state remaining horizon, or nominal horizon from the declared configuration operating point.",
+            "origin": 0.0,
+            "period_s": 0.01,
+            "remaining_task_s": 0.35,
+            "task_duration_s": 0.35,
+            "trajectory_grid": {
+              "control_period_s": 0.01,
+              "input_hold_s": 0.01,
+              "remaining_task_s": 0.35,
+              "sample_period_s": 0.01,
+              "sample_phase": "post_step_preceding_hold",
+              "sample_steps": {
+                "0": 0,
+                "1": 1,
+                "10": 10,
+                "11": 11,
+                "12": 12,
+                "13": 13,
+                "14": 14,
+                "15": 15,
+                "16": 16,
+                "17": 17,
+                "18": 18,
+                "19": 19,
+                "2": 2,
+                "20": 20,
+                "21": 21,
+                "22": 22,
+                "23": 23,
+                "24": 24,
+                "25": 25,
+                "26": 26,
+                "27": 27,
+                "28": 28,
+                "29": 29,
+                "3": 3,
+                "30": 30,
+                "31": 31,
+                "32": 32,
+                "33": 33,
+                "34": 34,
+                "35": 35,
+                "4": 4,
+                "5": 5,
+                "6": 6,
+                "7": 7,
+                "8": 8,
+                "9": 9
+              },
+              "start_time_s": 0.0,
+              "step_count": 35
+            }
+          },
+          "constraint_coverage": [
+            {
+              "analyzed_indices": [
+                35
+              ],
+              "checked_indices": [
+                35
+              ],
+              "constraint_id": "terminal_error_m",
+              "expressible": true,
+              "reason": "Shared held-input trajectory; past samples require separate evidence.",
+              "reasons": [],
+              "satisfied_indices": [
+                35
+              ],
+              "status": "applicable",
+              "unchecked_indices": []
+            },
+            {
+              "analyzed_indices": [
+                30,
+                31,
+                32,
+                33,
+                34,
+                35
+              ],
+              "checked_indices": [
+                30,
+                31,
+                32,
+                33,
+                34,
+                35
+              ],
+              "constraint_id": "holding_max_error_m",
+              "expressible": true,
+              "reason": "Shared held-input trajectory; past samples require separate evidence.",
+              "reasons": [],
+              "satisfied_indices": [
+                30,
+                31,
+                32,
+                33,
+                34,
+                35
+              ],
+              "status": "applicable",
+              "unchecked_indices": []
+            },
+            {
+              "analyzed_indices": [
+                30,
+                31,
+                32,
+                33,
+                34,
+                35
+              ],
+              "checked_indices": [
+                30,
+                31,
+                32,
+                33,
+                34,
+                35
+              ],
+              "constraint_id": "holding_max_speed_m_s",
+              "expressible": true,
+              "reason": "Shared held-input trajectory; past samples require separate evidence.",
+              "reasons": [],
+              "satisfied_indices": [
+                30,
+                31,
+                32,
+                33,
+                34,
+                35
+              ],
+              "status": "applicable",
+              "unchecked_indices": []
+            }
+          ],
+          "computation_status": "computed",
+          "verification_status": "independent_discrete_replay_passed",
+          "supported_interpretation": "All declared sampled constraints verified in the specified local affine model only. Optimal task violation and structural optimality remain unverified.",
+          "unsupported_conclusions": [
+            "task acceptance",
+            "continuous-time holding-window compliance",
+            "global nonlinear feasibility or infeasibility",
+            "hardware performance",
+            "robustness",
+            "repeatability",
+            "equilibrium validity at a non-equilibrium point"
+          ]
+        },
+        "operating_point": {
+          "actual_time_s": 0.0,
+          "name": "controller_start_input",
+          "phase": "configuration_controller_start_input",
+          "remaining_task_s": 0.35
+        },
+        "quantities": [
+          {
+            "name": "best_found_violation",
+            "status": "unverified_estimate",
+            "value": -0.09999951729772974,
+            "unit": "dimensionless",
+            "source": {
+              "reference": {
+                "artifact_id": "9e7a21648b529c3bb72b28f4c8778224348b16cb3782dcff82aac9fe6a38943f",
+                "media_type": "application/json"
+              },
+              "pointer": "/trajectory/quantities/best_found_violation/value"
+            },
+            "structural_parameters": [],
+            "control_reoptimization": "required"
+          },
+          {
+            "name": "lower_bound",
+            "status": "verified",
+            "value": -1.0,
+            "unit": "dimensionless",
+            "source": {
+              "reference": {
+                "artifact_id": "9e7a21648b529c3bb72b28f4c8778224348b16cb3782dcff82aac9fe6a38943f",
+                "media_type": "application/json"
+              },
+              "pointer": "/trajectory/quantities/lower_bound/value"
+            },
+            "structural_parameters": [],
+            "control_reoptimization": "required"
+          },
+          {
+            "name": "optimal_task_violation",
+            "status": "unavailable",
+            "value": null,
+            "unit": "dimensionless",
+            "source": null,
+            "structural_parameters": [],
+            "control_reoptimization": "required"
+          },
+          {
+            "name": "replayed_violation",
+            "status": "verified",
+            "value": -0.09999951729772974,
+            "unit": "dimensionless",
+            "source": {
+              "reference": {
+                "artifact_id": "9e7a21648b529c3bb72b28f4c8778224348b16cb3782dcff82aac9fe6a38943f",
+                "media_type": "application/json"
+              },
+              "pointer": "/trajectory/quantities/replayed_violation/value"
+            },
+            "structural_parameters": [],
+            "control_reoptimization": "required"
+          },
+          {
+            "name": "upper_bound",
+            "status": "unavailable",
+            "value": null,
+            "unit": "dimensionless",
+            "source": null,
+            "structural_parameters": [],
+            "control_reoptimization": "required"
+          },
+          {
+            "name": "witness_upper_bound_estimate",
+            "status": "unverified_estimate",
+            "value": -0.09999951729772974,
+            "unit": "dimensionless",
+            "source": {
+              "reference": {
+                "artifact_id": "9e7a21648b529c3bb72b28f4c8778224348b16cb3782dcff82aac9fe6a38943f",
+                "media_type": "application/json"
+              },
+              "pointer": "/trajectory/quantities/witness_upper_bound_estimate/value"
+            },
+            "structural_parameters": [],
+            "control_reoptimization": "required"
+          },
+          {
+            "name": "fixed_control_delta",
+            "status": "unverified_estimate",
+            "value": 0.11701151052081904,
+            "unit": "dimensionless",
+            "source": {
+              "reference": {
+                "artifact_id": "9e7a21648b529c3bb72b28f4c8778224348b16cb3782dcff82aac9fe6a38943f",
+                "media_type": "application/json"
+              },
+              "pointer": "/trajectory/structural_comparison/quantities/fixed_control_delta/value"
+            },
+            "structural_parameters": [
+              "segments.near.length_m"
+            ],
+            "control_reoptimization": "fixed_control"
+          },
+          {
+            "name": "fixed_control_normalized_secant",
+            "status": "unverified_estimate",
+            "value": 18.72184168333103,
+            "unit": "dimensionless",
+            "source": {
+              "reference": {
+                "artifact_id": "9e7a21648b529c3bb72b28f4c8778224348b16cb3782dcff82aac9fe6a38943f",
+                "media_type": "application/json"
+              },
+              "pointer": "/trajectory/structural_comparison/quantities/fixed_control_normalized_secant/value"
+            },
+            "structural_parameters": [
+              "segments.near.length_m"
+            ],
+            "control_reoptimization": "fixed_control"
+          },
+          {
+            "name": "reoptimized_control_delta",
+            "status": "unverified_estimate",
+            "value": 0.10000043427432215,
+            "unit": "dimensionless",
+            "source": {
+              "reference": {
+                "artifact_id": "9e7a21648b529c3bb72b28f4c8778224348b16cb3782dcff82aac9fe6a38943f",
+                "media_type": "application/json"
+              },
+              "pointer": "/trajectory/structural_comparison/quantities/reoptimized_control_delta/value"
+            },
+            "structural_parameters": [
+              "segments.near.length_m"
+            ],
+            "control_reoptimization": "required"
+          },
+          {
+            "name": "reoptimized_control_normalized_secant",
+            "status": "unverified_estimate",
+            "value": 16.00006948389153,
+            "unit": "dimensionless",
+            "source": {
+              "reference": {
+                "artifact_id": "9e7a21648b529c3bb72b28f4c8778224348b16cb3782dcff82aac9fe6a38943f",
+                "media_type": "application/json"
+              },
+              "pointer": "/trajectory/structural_comparison/quantities/reoptimized_control_normalized_secant/value"
+            },
+            "structural_parameters": [
+              "segments.near.length_m"
+            ],
+            "control_reoptimization": "required"
+          }
+        ],
+        "problem": {
+          "bounds_scope": "Analyzed sampled subproblem only; missing samples are not certified",
+          "computed": "Best discovered signed maximum over explicitly analyzed samples",
+          "ideal": "V_tau(d) = inf_{U in physical input box} max_i g_i(d,U)",
+          "interval": "max(lower-residual, residual-upper)/max(abs(lower),abs(upper))",
+          "norm": "norm(output-reference)/radius - 1",
+          "optimality": "unverified; solver convergence is not an optimality certificate"
+        },
+        "capability": {
+          "best_found_violation": -0.09999951729772974,
+          "status": "feasible_witness",
+          "control_reoptimization": "required",
+          "verification_scope": {
+            "discrete_replay": true,
+            "input_legality": true,
+            "lower_bound": "Analytic -1 from the signed constraint definitions, for analyzed samples",
+            "optimality": false,
+            "rigorous_floating_point_upper_bound": false,
+            "sampled_score": true,
+            "tolerances": "Replay agreement uses check_atol; witness additionally requires signed_violation <= 0"
+          },
+          "start_value_spread": 0.0003698521807378452,
+          "research_diagnostics": {
+            "bottleneck": {
+              "absolute_time_s": 0.3,
+              "constraint_id": "holding_max_speed_m_s",
+              "sample_index": 30,
+              "signed_violation": -0.09999951729772974
+            },
+            "competing_explanations": [
+              "Limited authority in this frozen model",
+              "Incomplete numerical control search",
+              "Local model may differ from nonlinear or physical execution"
+            ],
+            "discriminating_checks": [
+              "Compare starts and solver termination at the same model and budget",
+              "Compare fixed control and separately reoptimized controls after a supported structural perturbation",
+              "Compare this replay with compatible nonlinear or recorded execution"
+            ],
+            "unsupported_inferences": [
+              "Global optimality",
+              "Structural necessity",
+              "Physical task acceptance",
+              "Envelope gradient or regional descent guarantee"
+            ]
+          },
+          "input_diagnostics": {
+            "minimum_lower_margin_n": [
+              1.8459338200000421,
+              1.947301597971797,
+              1.3208035884596943,
+              1.3808845282666844,
+              1.8415315068002573,
+              0.6885015656983906
+            ],
+            "minimum_upper_margin_n": [
+              5.695430696298136,
+              5.478750985570358,
+              5.812500730890573,
+              4.582377383028952,
+              5.635410377020394,
+              5.364714133804287
+            ],
+            "near_bound_samples": 0,
+            "tendon_order": [
+              "near_t0",
+              "near_t1",
+              "near_t2",
+              "far_t0",
+              "far_t1",
+              "far_t2"
+            ]
+          },
+          "locality_diagnostics": {
+            "interpretation": "State excursions are recorded, but local nonlinear agreement is unvalidated.",
+            "max_absolute_delta_state": [
+              4.107161198726483,
+              1.3299492652341318,
+              1.3226385926843884,
+              1.2276405361192282,
+              0.7360756433400691,
+              0.5007894154781976,
+              3.5397015868359305,
+              5.087262796095638,
+              7.610735469547952,
+              1.6967368725504959,
+              1.1761103897631664,
+              0.7920652341533505,
+              47.12941347445228,
+              16.2342917008588,
+              30.60496427103153,
+              11.08852500971438,
+              7.689666356432184,
+              6.341913053187074,
+              39.253905614800246,
+              74.23994329902747,
+              109.83770922436614,
+              17.156507564881398,
+              18.73961120814187,
+              22.476668567979925
+            ],
+            "validated_locality_radius": null
+          },
+          "kernel_elapsed_s": 0.45046139997430146,
+          "near_active_records": [],
+          "co_bottleneck_records": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "solver_scope": "sampled-affine-signed-minimax-v1",
+          "solver_starts": [
+            {
+              "start_index": 0,
+              "success": false,
+              "status": 9,
+              "iterations": 100,
+              "returned_violation": -0.09999950907491599,
+              "epigraph_residual": 1.5214095291926633e-07
+            },
+            {
+              "start_index": 1,
+              "success": false,
+              "status": 9,
+              "iterations": 100,
+              "returned_violation": -0.09997080486199207,
+              "epigraph_residual": 2.9138199071368498e-05
+            },
+            {
+              "start_index": 2,
+              "success": false,
+              "status": 9,
+              "iterations": 100,
+              "returned_violation": -0.09962965689417815,
+              "epigraph_residual": 0.0003703428890553251
+            }
+          ],
+          "reason": null,
+          "problem_pointer": "/trajectory/problem_definition",
+          "quantities_pointer": "/trajectory/quantities",
+          "structural_comparison": {
+            "status": "computed_estimate",
+            "variable": "segments.near.length_m",
+            "step": 0.0010000000000000009,
+            "normalization_scale": 0.16,
+            "quantities": {
+              "fixed_control_delta": {
+                "status": "unverified_estimate",
+                "value": 0.11701151052081904
+              },
+              "fixed_control_normalized_secant": {
+                "status": "unverified_estimate",
+                "value": 18.72184168333103
+              },
+              "reoptimized_control_delta": {
+                "status": "unverified_estimate",
+                "value": 0.10000043427432215
+              },
+              "reoptimized_control_normalized_secant": {
+                "status": "unverified_estimate",
+                "value": 16.00006948389153
+              }
+            },
+            "baseline_result": {
+              "artifact_id": "9c22f54b6f258c56a1105bb6b6f14a9e5e62ad4c30e5831a2931c50b3add1a17",
+              "media_type": "application/json"
+            },
+            "derivative_scope": "Two-design finite secants of computed values; no envelope gradient or descent guarantee"
+          }
+        },
+        "critical_samples": [
+          {
+            "constraint_id": "holding_max_speed_m_s",
+            "signal": "tip_velocity",
+            "absolute_time_s": 0.3,
+            "observed_value": 0.018000009654045405,
+            "bound": 0.02,
+            "margin": [
+              0.001999990345954595
+            ],
+            "violation": 0.0,
+            "units": "m/s",
+            "status": "satisfied_sample",
+            "source_pointer": "/trajectory/replay/records/7"
+          }
+        ],
+        "unresolved": {
+          "supported_facts": [
+            "Bounded local-model witness for checked samples."
+          ],
+          "unresolved_questions": [
+            "Controller/nonlinear/backend realization unresolved."
+          ],
+          "potential_discriminating_checks": [
+            "Compare compatible execution or solver diagnosis."
+          ],
+          "unsupported_inferences": [
+            "Global/physical feasibility, structural necessity or surrounding-region exclusion."
+          ]
+        }
+      }
+    }
+  ]
+}

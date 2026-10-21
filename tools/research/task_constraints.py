@@ -4,6 +4,50 @@ from tools.platform_store import plain
 from tools.research_tasks import task_adapter
 
 
+def analysis_capabilities(configuration, requirements, protocol, *, model=None, exact_point=None,
+                          remaining_evaluations=None):
+    """Candidates for existing operations, using the same execution applicability gate."""
+    from types import SimpleNamespace
+    from typing import get_args
+    from tools.research.contracts import AnalysisRequest
+    from schemas.platform_analysis import TaskAnalysisProtocol
+    from schemas.platform import SessionInput
+    configuration=SessionInput.model_validate(configuration)
+    p=TaskAnalysisProtocol.model_validate(protocol)
+    rows=[]
+    for operation in get_args(AnalysisRequest.model_fields['operation'].annotation):
+        sampled=operation in ('trajectory_feasibility','task_capability')
+        static=operation in ('equilibrium','input_sensitivity','design_sensitivity')
+        point='target_equilibrium' if operation=='equilibrium' else 'fixed_input_equilibrium' if static else 'controller_start_input'
+        if exact_point and not static:point='saved_state'
+        query=SimpleNamespace(operation=operation,operating_point=point,protocol=p,
+            scoring_window_s=p.windows_s[0] if p.windows_s else None)
+        assessment=model_assessment(configuration,requirements,operation)
+        applicability=check_analysis_applicability(requirements,query,assessment,model,exact_point)
+        reasons=list(applicability['reasons'])
+        if operation=='instantaneous_braking_v1' and exact_point is None:
+            reasons.append('Exact saved state required.')
+        count=3 if operation=='design_sensitivity' else 1
+        budget=None if remaining_evaluations is None else remaining_evaluations>=count
+        if budget is False:reasons.append('Insufficient mathematical evaluation budget.')
+        rows.append(dict(operation=operation,status='not_applicable' if reasons else applicability['status'],
+            reasons=reasons,model=assessment['model_id'],
+            constraint_kinds=['norm_bound','component_interval'] if sampled else ['norm_bound'],
+            required_outputs=sorted({c.signal.name for c in requirements.constraints}) if sampled else
+                ['tip_velocity'] if operation in ('braking','instantaneous_braking_v1') else ['tip_position'],
+            category='task_capability_estimate' if operation=='task_capability' else 'sampled_feasibility' if sampled else 'diagnostic',
+            control='reoptimized; optional fixed baseline replay' if operation=='task_capability' else
+                'bounded sequence search' if sampled or operation in ('endpoint','braking') else 'operating-point diagnostic',
+            prerequisites=['candidate','frozen protocol',point]+(['paired structure candidates'] if operation=='design_sensitivity' else []),
+            time_scope='aligned post-step samples over actual remaining horizon' if sampled else
+                'static operating point' if static else 'declared local scoring window or exact instant',
+            coverage=applicability['constraint_coverage'],full_task_supported=applicability['full_task_supported'],
+            budget_allowed=budget,evaluations=count,wall_cost='unknown',
+            limitations=['Model-scoped calculation; independent physical acceptance required.',
+                'Final admission checks candidate, exact state, numerical time budget and constructed outputs.']))
+    return rows
+
+
 def describe_analysis_requirements(configuration, binding):
     return task_adapter(configuration).analysis_requirements(binding)
 

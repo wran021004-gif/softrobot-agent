@@ -83,7 +83,8 @@ def compare_control_response(model, requirements, protocol, optimized, context):
 
 def capability_summary(trajectory):
     keys = ('best_found_violation', 'status', 'control_reoptimization', 'verification_scope',
-        'start_value_spread', 'research_diagnostics', 'input_diagnostics', 'locality_diagnostics', 'kernel_elapsed_s')
+        'start_value_spread', 'research_diagnostics', 'input_diagnostics', 'locality_diagnostics', 'kernel_elapsed_s',
+        'near_active_records', 'co_bottleneck_records', 'solver_scope')
     summary = {k: trajectory[k] for k in keys if k in trajectory}
     summary['solver_starts'] = [{k: s.get(k) for k in ('start_index', 'success', 'status', 'iterations', 'returned_violation', 'epigraph_residual')} for s in trajectory.get('starts', [])]
     summary['reason'] = trajectory.get('reason')

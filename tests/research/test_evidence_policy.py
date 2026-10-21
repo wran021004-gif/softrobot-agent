@@ -120,7 +120,10 @@ class EvidencePolicyTests(unittest.TestCase):
         value=fixture.compute_fixture();original=deepcopy(value)
         compact=analysis.compact_result(value,REF);decision=analysis.decision_result(value,REF)
         self.assertEqual(value,original);self.assertEqual(compact['scoped_claim'],original['scoped_claim'])
-        self.assertEqual(compact['evidence_summary'],decision['evidence_summary'])
+        # F2 keeps inference strength in the decision view and retrieves repeated
+        # operating-point/configuration/coverage from the original scope pointer.
+        self.assertEqual({k:v for k,v in compact['evidence_summary'].items() if k not in
+            ('operating_point','covered_samples','assumptions')},decision['evidence_summary'])
         self.assertEqual(compact['evidence_summary']['claim_kind'],'MODEL_WITNESS')
 
 

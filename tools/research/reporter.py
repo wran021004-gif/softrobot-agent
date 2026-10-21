@@ -175,16 +175,40 @@ def investigate(host, request):
     return dict(report_reference=ref,**host.store.artifact(ref))
 
 
-def scientific_feedback(host, value, before):
+def scientific_feedback(host, value, before=None, *, receipt=None):
     """Deliver a saved deterministic report without jeopardizing completed science."""
     from tools.research.agent import record
     s=state(host);result=value.get('result',value)
     reference=result.get('reference') if isinstance(result,dict) else None
-    fresh=[r for key in RESULT_KEYS for r in s.get(key,[]) if r not in before.get(key,[])]
-    if reference not in fresh:reference=next(iter(reversed(fresh)),None)
-    if reference is None:return None
+    known=[r for key in RESULT_KEYS for r in s.get(key,[])]
+    references=value.get('scientific_results')
+    if references==[]:return None  # This receipt explicitly recorded no new science.
+    if references is None:
+        references=[reference] if reference in known else []
+        if receipt and receipt['output'] in known:references=[receipt['output']]
+        if not references and before is not None:
+            references=[r for r in known if all(r not in before.get(key,[]) for key in RESULT_KEYS)]
+    if not references:
+        if receipt:
+            return dict(operation_outcome=value,interpretation_status='unavailable',
+                error='EXACT_SCIENTIFIC_RESULT_BINDING_UNAVAILABLE',receipt=receipt)
+        return None
+    if any(r not in known for r in references):
+        return dict(operation_outcome=value,interpretation_status='unavailable',
+            error='UNREGISTERED_SCIENTIFIC_RESULT_BINDING',receipt=receipt)
+    if len(references)>1:
+        deliveries=[scientific_feedback(host,{**value,'scientific_results':[r]},receipt=receipt) for r in references]
+        main=references.index(reference) if reference in references else len(references)-1
+        return dict(**deliveries[main],scientific_result_index=[dict(reference=r,
+            report_reference=d.get('report_reference'),interpretation_status=d['interpretation_status'])
+            for r,d in zip(references,deliveries)])
     try:
-        report=assemble(host,[reference]);ref=_save(host,report)
+        # A crash after report persistence must reuse that exact report as well.
+        saved=next(((r,v) for r,v in entries(host) if not v['interpretation_for']
+            and v['report']['mode']=='result_summary' and
+            [c['identity']['result']['reference'] for c in v['report']['results']]==references),None)
+        if saved:ref,stored=saved;report=ScientificReport.model_validate(stored['report'])
+        else:report=assemble(host,references);ref=_save(host,report)
         return dict(report_reference=ref,report=plain(report),interpretation_status='deferred',
             operation_outcome={k:result[k] for k in ('candidate','source','reference','status',
                 'evaluation','selected','task_passed','stop_reason') if k in result},
@@ -192,7 +216,31 @@ def scientific_feedback(host, value, before):
             formal_read_required='Reports do not satisfy SELECT/STOP/RL evidence_read obligations')
     except Exception as exc:
         record(host,'research_report_failure',dict(reference=reference,error=str(exc),science_preserved=True))
-        return None
+        return dict(operation_outcome=value,interpretation_status='unavailable',
+            error='REPORT_ASSEMBLY_UNAVAILABLE: '+str(exc),scientific_results=references)
+
+
+def interpretation_priority(report, previous):
+    """Observable novelty only; no action selection or inferred importance score."""
+    if report['mode']=='investigation':return 'explicit_investigation'
+    old=[c for r in previous for c in r['results']]
+    for card in report['results']:
+        summary=card['deterministic_summary'];math=summary.get('task_capability',{})
+        if math.get('structural_comparison'):return 'structure_control_comparison'
+        if card['mathematics'] and not any(c['identity']['operation']==card['identity']['operation'] for c in old):
+            return 'first_mathematical_method'
+        gap=summary.get('task_gap',{})
+        if gap.get('accepted') and not any(c['deterministic_summary'].get('task_gap',{}).get('accepted') for c in old):
+            return 'first_complete_task_pass'
+        if gap.get('valid_complete') and gap.get('normalized_gap') is not None:
+            prior=[c['deterministic_summary']['task_gap']['normalized_gap'] for c in old
+                if c['deterministic_summary'].get('task_gap',{}).get('valid_complete')
+                and c['deterministic_summary']['task_gap'].get('normalized_gap') is not None
+                and c['identity']['task_identity']==card['identity']['task_identity']]
+            if not prior or gap['normalized_gap']<min(prior):return 'best_complete_result_changed'
+        if set(card['main_violations'])-{v for c in old for v in c['main_violations']}:
+            return 'new_task_bottleneck'
+    return 'routine_or_repeated_result'
 
 
 def _wire(host, reference, saved):
@@ -279,6 +327,14 @@ async def complete_reports(host, transport, *, recover_only=False):
             _save(host,ScientificReport.model_validate(saved['report']),request=saved.get('request'),
                 status='unavailable',interpretation_for=ref,error='REPORTER_INTERRUPTED_NO_AUTOMATIC_RETRY')
             continue
+        previous=[v['report'] for r,v in reports[:reports.index((ref,saved))] if not v['interpretation_for']]
+        priority=interpretation_priority(saved['report'],previous)
+        record(host,'reporter_priority',dict(base_report=ref,reason=priority,
+            requested=priority!='routine_or_repeated_result'))
+        if priority=='routine_or_repeated_result':
+            _save(host,ScientificReport.model_validate(saved['report']),request=saved.get('request'),
+                status='skipped',interpretation_for=ref,error='REPORTER_LOW_PRIORITY_DETERMINISTIC_REPORT_RETAINED')
+            continue
         # Keep protected closure capacity and at least one main decision request.
         reserve=s['spec']['budgets'].get('protected_provider_requests',0)
         if protected(host) or s['research_status']=='stopped' or host.store.remaining()['remaining']['model_calls']<=reserve+1:
@@ -310,11 +366,12 @@ def provider_usage(host):
     for key,request in requests.items():
         role=request['purpose'];result=responses.get(key,{})
         group=totals.setdefault(role,dict(requests=0,usage_missing=0,prompt_tokens=0,
-            completion_tokens=0,total_tokens=0,input_bytes=[]))
+            completion_tokens=0,total_tokens=0,prompt_cache_hit_tokens=0,prompt_cache_miss_tokens=0,
+            cost_usd='unknown',input_bytes=[]))
         group['requests']+=1;group['input_bytes'].append(request.get('input_bytes'))
         usage=result.get('usage') or {}
         if not usage:group['usage_missing']+=1
-        for field in ('prompt_tokens','completion_tokens','total_tokens'):
+        for field in ('prompt_tokens','completion_tokens','total_tokens','prompt_cache_hit_tokens','prompt_cache_miss_tokens'):
             if usage.get(field) is None:group[field]=None
             elif group[field] is not None:group[field]+=usage[field]
     return totals
