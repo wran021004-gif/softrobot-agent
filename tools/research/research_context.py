@@ -639,6 +639,69 @@ def diagnostic_brief(value):
         'execution_status','task_passed','valid_complete','violated_constraints','critical_samples','limitations') if k in value}
 
 
+def research_intent(host):
+    """Rebuild the last decision and experiment from original plans and receipts."""
+    import json
+    s=state(host);latest=None;experiment=None
+    for reference in reversed(s.get('plans',[])):
+        saved=host.store.artifact(reference);plan=saved['original_plan']
+        row=host.store.lookup(host.run_id,saved['request_id'])
+        receipt=json.loads(row['receipt']) if row and row['receipt'] else None
+        output=host.store.artifact(receipt['output']) if receipt and receipt.get('output') else {}
+        result=output.get('result',output)
+        item=dict(plan_reference=reference,action=plan['action'],
+            agent_hypothesis={k:deepcopy(plan.get(k)) for k in ('hypothesis','decision',
+                'expected_observation','weakening_observation','fixed_conditions',
+                'interpretation','stopping_condition','supporting_evidence')},
+            scope='Previous Agent intent and interpretation; not confirmed scientific facts',
+            execution_status=receipt['execution_status'] if receipt else 'pending',
+            actual_result=result.get('reference'),failure=output.get('error') or output.get('message'))
+        if latest is None:latest=item
+        if plan['action'] not in ('stop','select','diagnose'):
+            experiment=item;break
+    return dict(latest_decision=latest,last_research=experiment,
+        unresolved_question=(experiment or latest or {}).get('agent_hypothesis',{}).get('weakening_observation'),
+        question_scope='Prior falsification target; main Agent decides the next scientific question')
+
+
+def agent_decision_brief(host):
+    """A-line compact input; existing L0/L2 retrieval contracts remain unchanged."""
+    from tools.research.reporter import entries
+    brief=decision_brief(context(host))
+    brief['research_intent']=research_intent(host)
+    reports=entries(host);latest={}
+    for ref,saved in reports:
+        key=(saved['report']['mode'],saved['interpretation_for']['artifact_id'] if saved['interpretation_for'] else ref['artifact_id'])
+        latest[key]=(ref,saved)
+    # Revisions supersede deterministic delivery, without copying every report.
+    revisions={s['interpretation_for']['artifact_id'] for _,s in reports if s['interpretation_for']}
+    selected=[(r,s) for r,s in latest.values() if r['artifact_id'] not in revisions][-2:]
+    brief['latest_reports']=[dict(report_reference=r,mode=s['report']['mode'],
+        question=s['report']['question'],interpretation_status=s['interpretation_status'],
+        error=s['error'],interpretations=s['report']['interpretations'],relations=s['report']['relations'],
+        results=[dict(identity=c['identity'],metrics=c['metrics'],resources=c['resources'],
+            main_violations=c['main_violations'],evidence_strength=c['evidence_summary']['claim_kind'],
+            evidence_scope={k:c['evidence_summary'][k] for k in ('verification_status',
+                'supported_inferences','unsupported_inferences','numerical_evidence_pointer')},
+            recorded_summary={k:v for k,v in c['deterministic_summary'].items() if k in (
+                'task_gap','comparisons','recorded_mathematics','recorded_conclusions','status',
+                'conclusion','coverage','decision_relevance','certificate_verified')},
+            unresolved=c['evidence_summary']['unresolved']) for c in s['report']['results']]) for r,s in selected]
+    anchor=brief.get('evidence_access',{}).get('reference')
+    if anchor:
+        refs=brief.pop('all_fresh_results',[])
+        brief['stop_result_index']=dict(count=len(refs),query=dict(reference=anchor,
+            view='working_set',pointer='/all_fresh_results'),
+            rule='Exact complete STOP citation index; retrieve on demand. Reports give no formal read credit.')
+        brief.pop('citation_eligibility',None)
+        ws=brief.get('evidence_working_set',{})
+        for key in ('candidate_index','control_result_links','control_comparisons'):
+            if key in ws:
+                rows=ws.pop(key);ws[key+'_access']=dict(count=len(rows),
+                    query=dict(reference=anchor,view='working_set',pointer='/'+key))
+    return brief
+
+
 def tool_feedback(host,value):
     """Return new facts once, distinguishing the wrapper from registered evidence."""
     from tools.research.evidence_policy import registered_references

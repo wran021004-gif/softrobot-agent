@@ -154,7 +154,9 @@ async def handoff(host,agent,build,directory,*,stage=lambda name:None):
                 previous_session=s['pilot']['framework_session_id'],source_state_identity=state_identity(s),
                 source_state=plain(host.store.put(db,s)),completed_boundary_identity=digest(agent.messages),
                 completed_boundary=plain(host.store.put(db,dict(session_id=s['pilot']['framework_session_id'],messages=agent.messages))),
-                budget=host.store.remaining(db=db),scientific_results=packet.get('research',{}).get('all_fresh_results',[]),
+                budget=host.store.remaining(db=db),scientific_results=[r for key in
+                    ('results','mechanics_results','physical_replays','matched_state_results','rl_evaluations','analysis_results')
+                    for r in s.get(key,[])],
                 tool_schemas=schemas(agent),initial_messages=initial)
             value['next_session']='rh-'+digest(value)[:24]
             preparation=plain(host.store.put(db,value));s['pilot']['handoff_preparation']=preparation
@@ -224,11 +226,17 @@ async def recover_feedback(host,agent):
                 # Recover the frozen request; a newer admission contract must not reinterpret it.
                 query=value['requested_operation']
                 if row['request_hash']!=digest(query) or any(query.get(k)!=v for k,v in use['input'].items()):raise ValueError('ORIGINAL_TOOL_IDENTITY_MISMATCH')
+            elif use['name']=='research_investigate':
+                if row['request_hash']!=digest(use['input']):raise ValueError('ORIGINAL_TOOL_IDENTITY_MISMATCH')
             else:raise ValueError('SDK_RECOVERY_REQUIRES_SAVED_FEEDBACK_FOR_THIS_TOOL')
             if use['name']=='research_analysis':
                 from tools.research.analysis import compact_result
                 value=compact_result(value,receipt['output'])
-            if s['spec'].get('research_decisions',{}).get('context_limits'):value=tool_feedback(host,value)
+            if use['name']!='research_investigate' and s['spec'].get('research_decisions',{}).get('context_limits'):value=tool_feedback(host,value)
+            if use['name'] in ('research_plan','research_analysis') and s['spec'].get('research_decisions'):
+                from tools.research.reporter import scientific_feedback
+                report=scientific_feedback(host,host.store.artifact(receipt['output']),{})
+                if report is not None:value=report
             result=dict(toolUseId=key,status='success',content=[dict(text=json.dumps(value,separators=(',',':')))])
             record(host,'model_original_tool_feedback',dict(tool_use=use,result=result,recovered_from_receipt=True))
         if result.get('toolUseId')!=key:raise ValueError('SAVED_TOOL_RESULT_ID_MISMATCH')

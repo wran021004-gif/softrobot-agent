@@ -147,12 +147,13 @@ class LiveBoundary(httpx.AsyncBaseTransport):
             record(host,'r3_send_rejected',dict(request=plain(raw_request),sent=False,reason=str(exc)),status='blocked')
             raise
         self.last_request=key
-        purpose='conversation' if wire.get('tools') else 'summarization'
+        purpose=getattr(self,'purpose',None) or ('conversation' if wire.get('tools') else 'summarization')
         with store.transaction() as db:
             state=store.session(run,db)['state']
             state['pilot']['live_model_requests']+=1
             store.update_state(db,run,state)
             metadata=store.put(db,dict(request=plain(raw_request),purpose=purpose,pid=os.getpid(),
+                input_bytes=len(request.content),
                 endpoint=str(request.url),timeout_s=request.extensions.get('timeout'),client_retries=0,transport_retries=0))
             store.event(db,run,'r3_request','sent',request=key,execution=row['execution_id'],outputs=[metadata])
         started=time.monotonic()
@@ -394,6 +395,7 @@ async def converse(host,*,session_handoff=False):
     require_authorization(host)
     from tools.research.core import guard,dispatch,experience,read_evidence,packet
     from tools.research.contracts import Plan,ExperienceQuery,EvidenceQuery,AnalysisRequest,RLRequest
+    from tools.research.reporter import InvestigationRequest, investigate, scientific_feedback, complete_reports
     if session_handoff and not state(host)['pilot'].get('session_handoff_live_admitted'):
         raise ValueError('LIVE_PROVIDER_CONTINUATION_UNVERIFIED_HANDOFF_NOT_ADMITTED')
     if state(host)['spec'].get('mode') == 'engineering_numerical':
@@ -461,13 +463,19 @@ async def converse(host,*,session_handoff=False):
                     else:
                         if kind=='experience':
                             value=experience(host,use['input'])
+                        elif kind=='investigate':
+                            value=investigate(host,use['input'])
                         else:
                             value=read_tool_evidence(host,use['input'])
                         host.store.complete(row,dict(request_id=key,execution_id=row['execution_id'],caller=host.actor,
                             tool_id='research.core_'+kind,tool_version='1.0.0',execution_status='completed',charged=zero()),value)
-                if kind!='evidence' and state(host)['spec'].get('research_decisions',{}).get('context_limits'):
+                original=value
+                if kind not in ('evidence','investigate') and state(host)['spec'].get('research_decisions',{}).get('context_limits'):
                     from tools.research.research_context import tool_feedback
                     value=tool_feedback(host,value)
+                if kind in ('plan','analysis','rl') and state(host)['spec'].get('research_decisions'):
+                    report=scientific_feedback(host,original,before)
+                    if report is not None:value=report
                 return dict(toolUseId=use['toolUseId'],status='success',content=[dict(text=json.dumps(value,separators=(',',':')))])
             except Exception as exc:
                 key='native-'+use['toolUseId']
@@ -507,20 +515,49 @@ async def converse(host,*,session_handoff=False):
         schema['properties']['run_id']['enum']=[source['run_id']]
         schema['properties']['checkpoint']['enum']=[source['checkpoint']]
         native[-1].tool_spec={**native[-1].tool_spec,'inputSchema':{'json':schema}}
+    if state(host)['spec'].get('research_decisions') and not state(host)['spec'].get('rl_evaluation_source'):
+        native.append(PythonAgentTool('research_investigate',dict(name='research_investigate',
+            description='Investigate an explicit scientific question using saved results and optional exact reads only. Returns deterministic report now; separate Reporter interpretation is delivered at a settled outer turn. No new scientific computation; internal reads give no SELECT/STOP credit.',
+            inputSchema={'json':InvestigationRequest.model_json_schema()}),handler('investigate')))
     if formal:
         native[1].tool_spec={**native[1].tool_spec,'description':'Unavailable outside scoped milestone evidence'}
+    agent=None
     def build_session(session_id=None):
-        return build_harness(host,transport=boundary,api_key=os.environ['DEEPSEEK_API_KEY'],instructions=instructions,
+        restored=build_harness(host,transport=boundary,api_key=os.environ['DEEPSEEK_API_KEY'],instructions=instructions,
             model_class=live_model_class(boundary),tool_executor=SequentialToolExecutor(),research_tools=[t for t in native if t is not native[1]] if state(host)['spec'].get('rl_evaluation_source') else native,
             configuration_path=host.store.root/'framework_configuration.json',session_directory=host.store.root/'framework_sessions',session_id=session_id)
+        # Dynamic schemas and removed tools are part of the verified boundary.
+        # Recreate that exact registry before snapshot verification, including on
+        # process restart. before_model will derive the next legal schema again.
+        definitions=None
+        if agent is not None:
+            from tools.research.session_handoff import schemas
+            definitions=schemas(agent)
+        else:
+            s=state(host)
+            for key in ('handoff_preparation','handoff'):
+                ref=s['pilot'].get(key)
+                saved=host.store.artifact(ref) if ref else {}
+                if saved.get('next_session')==(session_id or s['pilot']['framework_session_id']):
+                    definitions=saved['tool_schemas'];break
+        if definitions is not None:
+            registry=restored.tool_registry.registry
+            if set(definitions)-set(registry):raise ValueError('SAVED_SESSION_TOOL_IMPLEMENTATION_UNAVAILABLE')
+            for name in list(registry):
+                if name not in definitions:registry.pop(name)
+            for name,spec in definitions.items():registry[name].tool_spec=deepcopy(spec)
+        return restored
     agent=build_session()
     from tools.research.session_handoff import unmatched, recover_feedback, trusted_history
     try:
+        saved=state(host)['pilot'].get('unconsumed_response')
+        reporter_saved=bool(saved and (received(host,saved) or {}).get('purpose')=='reporter')
         if state(host)['pilot'].get('handoff'):
             from tools.research.session_handoff import reconcile
-            agent=await reconcile(host,build_session,host.store.root/'framework_sessions',allow_incomplete=True)
+            agent=await reconcile(host,build_session,host.store.root/'framework_sessions',allow_incomplete=not reporter_saved)
         else:
-            trusted_history(host,agent,allow_incomplete=True)
+            trusted_history(host,agent,allow_incomplete=not reporter_saved)
+        await complete_reports(host,boundary.inner,recover_only=True)
         if unmatched(agent.messages):await recover_feedback(host,agent)
     except BaseException:
         await boundary.aclose()
@@ -580,10 +617,12 @@ async def converse(host,*,session_handoff=False):
             agent.tool_registry.registry.pop('experience_retrieve',None)
             agent.tool_registry.registry.pop('research_analysis',None)
             if rl_mode:
-                schema=deepcopy(native[-1].tool_spec['inputSchema']['json'])
+                rl_tool=next(t for t in native if t.tool_name=='research_rl')
+                schema=deepcopy(rl_tool.tool_spec['inputSchema']['json'])
                 schema['properties']['operation']['enum']=permitted['research_rl']
                 schema['properties']['run_id']['enum']=list(s.get('rl_runs',{}))
-                native[-1].tool_spec={**native[-1].tool_spec,'inputSchema':{'json':schema}}
+                rl_tool.tool_spec={**rl_tool.tool_spec,'inputSchema':{'json':schema}}
+            agent.tool_registry.registry.pop('research_investigate',None)
             schema=EvidenceQuery.model_json_schema()
             schema['$defs']['EvidenceRef']['properties']['artifact_id']['enum']=[r['artifact_id'] for r in readable_results(s,host)]
             native[2].tool_spec={**native[2].tool_spec,'inputSchema':{'json':schema}}
@@ -621,7 +660,6 @@ async def converse(host,*,session_handoff=False):
     agent.hooks.add_callback(BeforeToolCallEvent,before_tool)
     agent.hooks.add_callback(AfterToolCallEvent,after_tool)
     try:
-        rotated=False
         while state(host)['research_status']!='stopped':
             if host.store.remaining()['remaining']['model_calls']<1:
                 engineering_closeout(host,'Provider request count exhausted without model STOP/selection')
@@ -631,7 +669,9 @@ async def converse(host,*,session_handoff=False):
                 sdk_message_identity=digest(agent.messages)))
             if state(host)['pending'] or pending(host):
                 raise ValueError('PENDING_OUTCOME_REQUIRES_LOCAL_RECOVERY')
-            if session_handoff and not rotated and state(host)['research_status']!='stopped' and not state(host).get('success_gate'):
+            if state(host)['spec'].get('research_decisions'):
+                await complete_reports(host,boundary.inner)
+            if session_handoff and state(host)['research_status']!='stopped' and not state(host).get('success_gate'):
                 from tools.research.session_handoff import handoff, reconcile
                 previous=agent
                 try:_,agent=await handoff(host,agent,build_session,host.store.root/'framework_sessions')
@@ -647,7 +687,6 @@ async def converse(host,*,session_handoff=False):
                 agent.hooks.add_callback(BeforeModelCallEvent,before_model)
                 agent.hooks.add_callback(BeforeToolCallEvent,before_tool)
                 agent.hooks.add_callback(AfterToolCallEvent,after_tool)
-                rotated=True
     finally:
         await boundary.aclose()
 
@@ -655,16 +694,16 @@ async def converse(host,*,session_handoff=False):
 def decision_packet(host):
     from tools.research.core import packet
     if state(host)['spec'].get('research_decisions'):
-        from tools.research.research_context import context, decision_brief
+        from tools.research.research_context import agent_decision_brief
         from extensions.tendon_family.family_space import decision_summary
         s=state(host);spec=s['spec']
-        return dict(research=decision_brief(context(host)),implementation=s['freeze'],study_id=host.run_id,
+        return dict(research=agent_decision_brief(host),implementation=s['freeze'],study_id=host.run_id,
             controller_capabilities=dict(recipe_defaults=spec['configuration']['policy']['controller']['parameters']['data']['recipe'],
                 solver_defaults=spec['configuration']['policy']['controller']['parameters']['data'].get('solver'),
                 patch='Generation v2 controller_recipe/controller_solver sparse patches use registered owner validation; settling remains task-owned'),
-            candidates=[r for r in s['candidates'].values() if host.store.artifact(r)['profile_identity']==s['profile']['identity']][-spec.get('research_decisions',{}).get('context_limits',{}).get('candidates',100000):],family_space=decision_summary(spec['family_space'],s['family_space_reference'],
+            candidates=[r for r in s['candidates'].values() if host.store.artifact(r)['profile_identity']==s['profile']['identity']][-spec.get('research_decisions',{}).get('context_limits',{}).get('candidates',3):],family_space=decision_summary(spec['family_space'],s['family_space_reference'],
                 dict(actions=spec['allowed_plan_actions'],capabilities=spec['capabilities'])),analysis_protocol=spec['analysis_protocol'],
-            guidance='Use exact evidence refs and a typed decision in every research_plan. Source references contain complete trajectory; evidence_read is available. New designs need explicit control adaptation. Do not infer global feasibility/infeasibility. Stop at first complete pass; publicly read and select it. STOP must cite every new result.')
+            guidance='Use exact evidence refs and a typed decision in every research_plan. evidence_read and research_investigate permit drill-down. Reporter interpretations are hypotheses, never authoritative facts or action choices. New designs need explicit control adaptation. Do not infer global feasibility/infeasibility. Stop at first complete pass; publicly read and select it. Retrieve the exact stop_result_index before STOP; cite every new result.')
     result=packet(host)
     spec=result.pop('specification')
     result['configuration_identity']=spec['resolved_identity']

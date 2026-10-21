@@ -1,0 +1,655 @@
+{
+  "version": "s129_A_offline_validation_v1",
+  "date": "2026-10-21",
+  "branch": "feat/s129-agent-reporting",
+  "f0_commit": "6e5c0e4c7f3af62cc345d44461369d795af4da4b",
+  "scope": "Engineering fixtures and read-only saved-result projections. Mock token usage is not real Provider usage or proof of token savings.",
+  "tests": {
+    "unique_passed": 73,
+    "new_reporting": 13,
+    "f0_reporting": 8,
+    "layered_context": 9,
+    "working_set": 3,
+    "evidence_policy": 14,
+    "task_analysis": 14,
+    "provider_output": 5,
+    "session_recovery": 7,
+    "existing_killed_process_subcases": 14
+  },
+  "three_sessions": {
+    "session_ids": [
+      "s125-preflight-486627a715424940b77bb9397fbd739b",
+      "rh-544a6f21e8e5223d9d8556f3",
+      "rh-fe0d5b532ad4663d8dd65d7c"
+    ],
+    "initial_context_bytes": [
+      17837,
+      17837
+    ],
+    "completed_context_bytes": [
+      60442,
+      78331
+    ],
+    "rotated_usage": {
+      "conversation": {
+        "requests": 3,
+        "usage_missing": 0,
+        "prompt_tokens": 30,
+        "completion_tokens": 6,
+        "total_tokens": 36,
+        "input_bytes": [
+          63344,
+          81194,
+          81194
+        ]
+      }
+    },
+    "continuous_usage": {
+      "conversation": {
+        "requests": 3,
+        "usage_missing": 0,
+        "prompt_tokens": 30,
+        "completion_tokens": 6,
+        "total_tokens": 36,
+        "input_bytes": [
+          63344,
+          123556,
+          183768
+        ]
+      }
+    },
+    "mocked_prompt_tokens": 30,
+    "mocked_completion_tokens": 6
+  },
+  "native_investigation_usage": {
+    "conversation": {
+      "requests": 3,
+      "usage_missing": 0,
+      "prompt_tokens": 30,
+      "completion_tokens": 6,
+      "total_tokens": 36,
+      "input_bytes": [
+        59840,
+        65742,
+        80460
+      ]
+    },
+    "reporter": {
+      "requests": 1,
+      "usage_missing": 0,
+      "prompt_tokens": 17,
+      "completion_tokens": 3,
+      "total_tokens": 20,
+      "input_bytes": [
+        5996
+      ]
+    }
+  },
+  "saved_results": {
+    "source_db_sha256": "24df37fc6afd4e489cfe957ec01aadac5f6366e63614dd19cdbef3e271522cc6",
+    "report_count": 82,
+    "counts": {
+      "results": 2,
+      "physical_replays": 77,
+      "mechanics_results": 1,
+      "control_search_results": 2
+    },
+    "metric_pointer_checks": 440,
+    "state_ledger_events_unchanged": true,
+    "new_science": 0,
+    "provider_requests": 0
+  },
+  "saved_examples": [
+    {
+      "kind": "results",
+      "reference": {
+        "reference": {
+          "artifact_id": "c8b584a84de9ca5f5679c6144024321d4c57631fdf7b68aaf2ec20bb557f8321",
+          "media_type": "application/json"
+        },
+        "pointer": ""
+      },
+      "operation": null,
+      "metrics": [
+        {
+          "name": "evaluator:task_bound",
+          "value": 0.025075775970512176,
+          "unit": "m",
+          "threshold": 0.01,
+          "threshold_source": {
+            "reference": {
+              "artifact_id": "c8b584a84de9ca5f5679c6144024321d4c57631fdf7b68aaf2ec20bb557f8321",
+              "media_type": "application/json"
+            },
+            "pointer": "/acceptance/components/evaluator:task_bound/limit"
+          },
+          "passed": false,
+          "scope": "physical_task",
+          "source": {
+            "reference": {
+              "artifact_id": "c8b584a84de9ca5f5679c6144024321d4c57631fdf7b68aaf2ec20bb557f8321",
+              "media_type": "application/json"
+            },
+            "pointer": "/acceptance/components/evaluator:task_bound/value"
+          },
+          "time_s": null,
+          "window_s": null,
+          "conditions": []
+        },
+        {
+          "name": "holding_position",
+          "value": 0.028379867263697144,
+          "unit": "m",
+          "threshold": 0.01,
+          "threshold_source": {
+            "reference": {
+              "artifact_id": "c8b584a84de9ca5f5679c6144024321d4c57631fdf7b68aaf2ec20bb557f8321",
+              "media_type": "application/json"
+            },
+            "pointer": "/acceptance/components/holding_position/limit"
+          },
+          "passed": false,
+          "scope": "physical_task",
+          "source": {
+            "reference": {
+              "artifact_id": "c8b584a84de9ca5f5679c6144024321d4c57631fdf7b68aaf2ec20bb557f8321",
+              "media_type": "application/json"
+            },
+            "pointer": "/acceptance/components/holding_position/value"
+          },
+          "time_s": null,
+          "window_s": null,
+          "conditions": []
+        },
+        {
+          "name": "holding_speed",
+          "value": 0.08564162821630071,
+          "unit": "m/s",
+          "threshold": 0.02,
+          "threshold_source": {
+            "reference": {
+              "artifact_id": "c8b584a84de9ca5f5679c6144024321d4c57631fdf7b68aaf2ec20bb557f8321",
+              "media_type": "application/json"
+            },
+            "pointer": "/acceptance/components/holding_speed/limit"
+          },
+          "passed": false,
+          "scope": "physical_task",
+          "source": {
+            "reference": {
+              "artifact_id": "c8b584a84de9ca5f5679c6144024321d4c57631fdf7b68aaf2ec20bb557f8321",
+              "media_type": "application/json"
+            },
+            "pointer": "/acceptance/components/holding_speed/value"
+          },
+          "time_s": null,
+          "window_s": null,
+          "conditions": []
+        }
+      ],
+      "recorded_mathematics": null,
+      "comparisons": [
+        {
+          "baseline": {
+            "artifact_id": "569a406dd84017cd950b7be9fe5da24902c950d106a4ecc0d69b45d1313f38e4",
+            "media_type": "application/json"
+          },
+          "metrics": [
+            {
+              "metric": "evaluator:task_bound",
+              "value": 0.025075775970512176,
+              "baseline": 0.032493758607885524,
+              "delta": -0.007417982637373349,
+              "unit": "m",
+              "threshold": 0.01,
+              "source": {
+                "reference": {
+                  "artifact_id": "c8b584a84de9ca5f5679c6144024321d4c57631fdf7b68aaf2ec20bb557f8321",
+                  "media_type": "application/json"
+                },
+                "pointer": "/acceptance/components/evaluator:task_bound/value"
+              },
+              "baseline_source": {
+                "reference": {
+                  "artifact_id": "569a406dd84017cd950b7be9fe5da24902c950d106a4ecc0d69b45d1313f38e4",
+                  "media_type": "application/json"
+                },
+                "pointer": "/acceptance/components/evaluator:task_bound/value"
+              },
+              "comparable": false,
+              "scope": "Descriptive arithmetic only; relation conditions govern comparison, no causal conclusion"
+            },
+            {
+              "metric": "force_bounds",
+              "value": 0.0,
+              "baseline": 0.0,
+              "delta": 0.0,
+              "unit": "N",
+              "threshold": 1e-08,
+              "source": {
+                "reference": {
+                  "artifact_id": "c8b584a84de9ca5f5679c6144024321d4c57631fdf7b68aaf2ec20bb557f8321",
+                  "media_type": "application/json"
+                },
+                "pointer": "/acceptance/components/force_bounds/value"
+              },
+              "baseline_source": {
+                "reference": {
+                  "artifact_id": "569a406dd84017cd950b7be9fe5da24902c950d106a4ecc0d69b45d1313f38e4",
+                  "media_type": "application/json"
+                },
+                "pointer": "/acceptance/components/force_bounds/value"
+              },
+              "comparable": false,
+              "scope": "Descriptive arithmetic only; relation conditions govern comparison, no causal conclusion"
+            },
+            {
+              "metric": "holding_position",
+              "value": 0.028379867263697144,
+              "baseline": 0.0326245895310124,
+              "delta": -0.00424472226731526,
+              "unit": "m",
+              "threshold": 0.01,
+              "source": {
+                "reference": {
+                  "artifact_id": "c8b584a84de9ca5f5679c6144024321d4c57631fdf7b68aaf2ec20bb557f8321",
+                  "media_type": "application/json"
+                },
+                "pointer": "/acceptance/components/holding_position/value"
+              },
+              "baseline_source": {
+                "reference": {
+                  "artifact_id": "569a406dd84017cd950b7be9fe5da24902c950d106a4ecc0d69b45d1313f38e4",
+                  "media_type": "application/json"
+                },
+                "pointer": "/acceptance/components/holding_position/value"
+              },
+              "comparable": false,
+              "scope": "Descriptive arithmetic only; relation conditions govern comparison, no causal conclusion"
+            },
+            {
+              "metric": "holding_speed",
+              "value": 0.08564162821630071,
+              "baseline": 0.06524966448764628,
+              "delta": 0.020391963728654428,
+              "unit": "m/s",
+              "threshold": 0.02,
+              "source": {
+                "reference": {
+                  "artifact_id": "c8b584a84de9ca5f5679c6144024321d4c57631fdf7b68aaf2ec20bb557f8321",
+                  "media_type": "application/json"
+                },
+                "pointer": "/acceptance/components/holding_speed/value"
+              },
+              "baseline_source": {
+                "reference": {
+                  "artifact_id": "569a406dd84017cd950b7be9fe5da24902c950d106a4ecc0d69b45d1313f38e4",
+                  "media_type": "application/json"
+                },
+                "pointer": "/acceptance/components/holding_speed/value"
+              },
+              "comparable": false,
+              "scope": "Descriptive arithmetic only; relation conditions govern comparison, no causal conclusion"
+            },
+            {
+              "metric": "solver_errors",
+              "value": 0.0,
+              "baseline": 0.0,
+              "delta": 0.0,
+              "unit": "count",
+              "threshold": 0.0,
+              "source": {
+                "reference": {
+                  "artifact_id": "c8b584a84de9ca5f5679c6144024321d4c57631fdf7b68aaf2ec20bb557f8321",
+                  "media_type": "application/json"
+                },
+                "pointer": "/acceptance/components/solver_errors/value"
+              },
+              "baseline_source": {
+                "reference": {
+                  "artifact_id": "569a406dd84017cd950b7be9fe5da24902c950d106a4ecc0d69b45d1313f38e4",
+                  "media_type": "application/json"
+                },
+                "pointer": "/acceptance/components/solver_errors/value"
+              },
+              "comparable": false,
+              "scope": "Descriptive arithmetic only; relation conditions govern comparison, no causal conclusion"
+            }
+          ]
+        }
+      ],
+      "comparison_conditions": [
+        {
+          "comparable": false,
+          "reasons": [
+            "Unknown design_identity; no causal attribution",
+            "Unknown control_source; no causal attribution",
+            "Unknown model_identity; no causal attribution",
+            "Complete physical outcomes, task, timing and original thresholds must match",
+            "Recorded differences do not identify a single-factor cause"
+          ],
+          "changed_factors": [
+            "structure",
+            "control"
+          ],
+          "single_factor_attribution": null
+        }
+      ]
+    },
+    {
+      "kind": "results",
+      "reference": {
+        "reference": {
+          "artifact_id": "37a6af52813071775ac583ac0f2ecec9656bd68aec7dd0403eada4f9fc5ffd5e",
+          "media_type": "application/json"
+        },
+        "pointer": ""
+      },
+      "operation": null,
+      "metrics": [
+        {
+          "name": "evaluator:task_bound",
+          "value": 0.04806610314305191,
+          "unit": "m",
+          "threshold": 0.01,
+          "threshold_source": {
+            "reference": {
+              "artifact_id": "37a6af52813071775ac583ac0f2ecec9656bd68aec7dd0403eada4f9fc5ffd5e",
+              "media_type": "application/json"
+            },
+            "pointer": "/acceptance/components/evaluator:task_bound/limit"
+          },
+          "passed": false,
+          "scope": "physical_task",
+          "source": {
+            "reference": {
+              "artifact_id": "37a6af52813071775ac583ac0f2ecec9656bd68aec7dd0403eada4f9fc5ffd5e",
+              "media_type": "application/json"
+            },
+            "pointer": "/acceptance/components/evaluator:task_bound/value"
+          },
+          "time_s": null,
+          "window_s": null,
+          "conditions": []
+        },
+        {
+          "name": "holding_position",
+          "value": 0.04934045553426071,
+          "unit": "m",
+          "threshold": 0.01,
+          "threshold_source": {
+            "reference": {
+              "artifact_id": "37a6af52813071775ac583ac0f2ecec9656bd68aec7dd0403eada4f9fc5ffd5e",
+              "media_type": "application/json"
+            },
+            "pointer": "/acceptance/components/holding_position/limit"
+          },
+          "passed": false,
+          "scope": "physical_task",
+          "source": {
+            "reference": {
+              "artifact_id": "37a6af52813071775ac583ac0f2ecec9656bd68aec7dd0403eada4f9fc5ffd5e",
+              "media_type": "application/json"
+            },
+            "pointer": "/acceptance/components/holding_position/value"
+          },
+          "time_s": null,
+          "window_s": null,
+          "conditions": []
+        },
+        {
+          "name": "holding_speed",
+          "value": 0.09220547644520825,
+          "unit": "m/s",
+          "threshold": 0.02,
+          "threshold_source": {
+            "reference": {
+              "artifact_id": "37a6af52813071775ac583ac0f2ecec9656bd68aec7dd0403eada4f9fc5ffd5e",
+              "media_type": "application/json"
+            },
+            "pointer": "/acceptance/components/holding_speed/limit"
+          },
+          "passed": false,
+          "scope": "physical_task",
+          "source": {
+            "reference": {
+              "artifact_id": "37a6af52813071775ac583ac0f2ecec9656bd68aec7dd0403eada4f9fc5ffd5e",
+              "media_type": "application/json"
+            },
+            "pointer": "/acceptance/components/holding_speed/value"
+          },
+          "time_s": null,
+          "window_s": null,
+          "conditions": []
+        }
+      ],
+      "recorded_mathematics": null,
+      "comparisons": [
+        {
+          "baseline": {
+            "artifact_id": "569a406dd84017cd950b7be9fe5da24902c950d106a4ecc0d69b45d1313f38e4",
+            "media_type": "application/json"
+          },
+          "metrics": [
+            {
+              "metric": "evaluator:task_bound",
+              "value": 0.04806610314305191,
+              "baseline": 0.032493758607885524,
+              "delta": 0.015572344535166385,
+              "unit": "m",
+              "threshold": 0.01,
+              "source": {
+                "reference": {
+                  "artifact_id": "37a6af52813071775ac583ac0f2ecec9656bd68aec7dd0403eada4f9fc5ffd5e",
+                  "media_type": "application/json"
+                },
+                "pointer": "/acceptance/components/evaluator:task_bound/value"
+              },
+              "baseline_source": {
+                "reference": {
+                  "artifact_id": "569a406dd84017cd950b7be9fe5da24902c950d106a4ecc0d69b45d1313f38e4",
+                  "media_type": "application/json"
+                },
+                "pointer": "/acceptance/components/evaluator:task_bound/value"
+              },
+              "comparable": false,
+              "scope": "Descriptive arithmetic only; relation conditions govern comparison, no causal conclusion"
+            },
+            {
+              "metric": "force_bounds",
+              "value": 0.0,
+              "baseline": 0.0,
+              "delta": 0.0,
+              "unit": "N",
+              "threshold": 1e-08,
+              "source": {
+                "reference": {
+                  "artifact_id": "37a6af52813071775ac583ac0f2ecec9656bd68aec7dd0403eada4f9fc5ffd5e",
+                  "media_type": "application/json"
+                },
+                "pointer": "/acceptance/components/force_bounds/value"
+              },
+              "baseline_source": {
+                "reference": {
+                  "artifact_id": "569a406dd84017cd950b7be9fe5da24902c950d106a4ecc0d69b45d1313f38e4",
+                  "media_type": "application/json"
+                },
+                "pointer": "/acceptance/components/force_bounds/value"
+              },
+              "comparable": false,
+              "scope": "Descriptive arithmetic only; relation conditions govern comparison, no causal conclusion"
+            },
+            {
+              "metric": "holding_position",
+              "value": 0.04934045553426071,
+              "baseline": 0.0326245895310124,
+              "delta": 0.016715866003248307,
+              "unit": "m",
+              "threshold": 0.01,
+              "source": {
+                "reference": {
+                  "artifact_id": "37a6af52813071775ac583ac0f2ecec9656bd68aec7dd0403eada4f9fc5ffd5e",
+                  "media_type": "application/json"
+                },
+                "pointer": "/acceptance/components/holding_position/value"
+              },
+              "baseline_source": {
+                "reference": {
+                  "artifact_id": "569a406dd84017cd950b7be9fe5da24902c950d106a4ecc0d69b45d1313f38e4",
+                  "media_type": "application/json"
+                },
+                "pointer": "/acceptance/components/holding_position/value"
+              },
+              "comparable": false,
+              "scope": "Descriptive arithmetic only; relation conditions govern comparison, no causal conclusion"
+            },
+            {
+              "metric": "holding_speed",
+              "value": 0.09220547644520825,
+              "baseline": 0.06524966448764628,
+              "delta": 0.02695581195756197,
+              "unit": "m/s",
+              "threshold": 0.02,
+              "source": {
+                "reference": {
+                  "artifact_id": "37a6af52813071775ac583ac0f2ecec9656bd68aec7dd0403eada4f9fc5ffd5e",
+                  "media_type": "application/json"
+                },
+                "pointer": "/acceptance/components/holding_speed/value"
+              },
+              "baseline_source": {
+                "reference": {
+                  "artifact_id": "569a406dd84017cd950b7be9fe5da24902c950d106a4ecc0d69b45d1313f38e4",
+                  "media_type": "application/json"
+                },
+                "pointer": "/acceptance/components/holding_speed/value"
+              },
+              "comparable": false,
+              "scope": "Descriptive arithmetic only; relation conditions govern comparison, no causal conclusion"
+            },
+            {
+              "metric": "solver_errors",
+              "value": 0.0,
+              "baseline": 0.0,
+              "delta": 0.0,
+              "unit": "count",
+              "threshold": 0.0,
+              "source": {
+                "reference": {
+                  "artifact_id": "37a6af52813071775ac583ac0f2ecec9656bd68aec7dd0403eada4f9fc5ffd5e",
+                  "media_type": "application/json"
+                },
+                "pointer": "/acceptance/components/solver_errors/value"
+              },
+              "baseline_source": {
+                "reference": {
+                  "artifact_id": "569a406dd84017cd950b7be9fe5da24902c950d106a4ecc0d69b45d1313f38e4",
+                  "media_type": "application/json"
+                },
+                "pointer": "/acceptance/components/solver_errors/value"
+              },
+              "comparable": false,
+              "scope": "Descriptive arithmetic only; relation conditions govern comparison, no causal conclusion"
+            }
+          ]
+        }
+      ],
+      "comparison_conditions": [
+        {
+          "comparable": false,
+          "reasons": [
+            "Unknown design_identity; no causal attribution",
+            "Unknown control_source; no causal attribution",
+            "Unknown model_identity; no causal attribution",
+            "Complete physical outcomes, task, timing and original thresholds must match",
+            "Recorded differences do not identify a single-factor cause"
+          ],
+          "changed_factors": [
+            "task",
+            "structure",
+            "control"
+          ],
+          "single_factor_attribution": null
+        }
+      ]
+    },
+    {
+      "kind": "mechanics_results",
+      "reference": {
+        "reference": {
+          "artifact_id": "90bc0b90bd0ba21f85c8933a5cdcf4ac9187b0df639dc15cfb0ce0c0f3b240cc",
+          "media_type": "application/json"
+        },
+        "pointer": ""
+      },
+      "operation": "solve",
+      "metrics": [
+        {
+          "name": "objective",
+          "value": 115.64175490824711,
+          "unit": null,
+          "threshold": null,
+          "threshold_source": null,
+          "passed": null,
+          "scope": "solver",
+          "source": {
+            "reference": {
+              "artifact_id": "90bc0b90bd0ba21f85c8933a5cdcf4ac9187b0df639dc15cfb0ce0c0f3b240cc",
+              "media_type": "application/json"
+            },
+            "pointer": "/mathematical_facts/objective"
+          },
+          "time_s": null,
+          "window_s": null,
+          "conditions": []
+        },
+        {
+          "name": "iterations",
+          "value": 78.0,
+          "unit": null,
+          "threshold": null,
+          "threshold_source": null,
+          "passed": null,
+          "scope": "solver",
+          "source": {
+            "reference": {
+              "artifact_id": "90bc0b90bd0ba21f85c8933a5cdcf4ac9187b0df639dc15cfb0ce0c0f3b240cc",
+              "media_type": "application/json"
+            },
+            "pointer": "/mathematical_facts/iterations"
+          },
+          "time_s": null,
+          "window_s": null,
+          "conditions": []
+        }
+      ],
+      "recorded_mathematics": {
+        "status": "returned",
+        "converged": true,
+        "exitflag": 1,
+        "original_feasible": false,
+        "relaxed_feasible": true,
+        "physical_task_acceptance": "unmeasured",
+        "objective_definition": {
+          "check_only": false,
+          "diagnostic_mode": [],
+          "diagnostic_source": [],
+          "initialization": "constant_0_2",
+          "max_iterations": 120,
+          "objective_mode": "task_gap",
+          "position_weight": 1,
+          "secondary_coefficient": 0.001,
+          "speed_weight": 1,
+          "substeps": 2,
+          "warm_source": []
+        }
+      },
+      "comparisons": null,
+      "comparison_conditions": []
+    }
+  ],
+  "paid_provider_calls": 0,
+  "new_formal_scientific_executions": 0,
+  "production_handoff_admitted": false,
+  "f2_required": true
+}
