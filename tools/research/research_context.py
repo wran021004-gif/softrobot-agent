@@ -395,11 +395,16 @@ def working_set(host,current):
                 status=value.get('status'),operation=value.get('operation'),trajectory_query=dict(reference=ref,pointer='/trajectory') if value.get('trajectory') else None,
                 task_acceptance='unmeasured'))
         valid=sorted((dict(reference=r,task_gap=task_gap(v)) for r,v in results if task_gap(v)['valid_complete']),key=ranking_key)
+        residual=[r for r in s.get('compatible_residual_references',[]) if r['candidate']==candidate and r.get('available')]
         index.append(dict(candidate=candidate,structure_identity=c.get('physical_design_identity',c['identity']),
             parameters_query=dict(reference=candidate,pointer='/parameters'),
             structure=dict(segments=len(c['resolved_parameters']['segments']),tendons=len(c['resolved_parameters']['tendons'])),
             generated=True,compiled=True,control_initialized=bool(controls),control_sources=controls,
-            has_executable_control_source=bool(controls),methods_used=sorted({host.store.artifact(r).get('operation','mathematics') for r in math} |
+            has_executable_control_source=bool(controls),has_explicit_control_schedule=bool(controls),
+            has_completed_nmpc_execution=any(v.get('execution_id') and not v.get('source_reference') and not v.get('run_id') and task_gap(v)['valid_complete'] for r,v in results),
+            has_measured_nmpc_reference=any(r['source_kind']=='nmpc' for r in residual),
+            has_local_search_start=any(r.get('candidate')==candidate and r['action']=='control_search' and r['status']=='preflight_eligible' for r in current['decision_feedback']['actions']),
+            has_residual_ppo_reference=bool(residual),methods_used=sorted({host.store.artifact(r).get('operation','mathematics') for r in math} |
                 {'fixed_tension' if v.get('source_reference') else 'ppo' if v.get('run_id') else 'nmpc' for r,v in results}),
             mathematically_evaluated=any(host.store.artifact(r).get('status')=='computed' for r in math),mathematical_records=math,
             physically_evaluated=bool(valid),physical_records=[r for r,v in results],accepted=any(r['task_gap']['accepted'] for r in valid),
@@ -535,6 +540,54 @@ def action_feedback(host,current):
 
 
 def decision_brief(current):
+    """Layer-one facts only; layer two is an exact recomputable Store view."""
+    if 'evidence_working_set' not in current:return legacy_decision_brief(current)
+    keys=('task_identity','task','capabilities','actions','task_accepted','candidate_status',
+        'tool_readiness','all_fresh_results','control_initialization_methods','control_search_domain')
+    brief={k:deepcopy(current[k]) for k in keys if k in current}
+    ws=current['evidence_working_set'];feedback=current['decision_feedback']
+    anchor=next(iter(ws['source_references']),None)
+    brief['evidence_access']=dict(reference=anchor,view='working_set',pointer='',
+        scope='Derived retrieval view, never scientific proof. JSON pointers select candidate_index, control_result_links, eligible_methods, read_coverage or source_references. Original references support full/fields/range reads.')
+    brief['budget']=deepcopy(current['budget'])
+    brief['budget']['method_remaining']={k:v for k,v in current['method_remaining'].items() if k!='mathematical_evaluations'}
+    brief['best_valid']=None
+    best=current.get('best_valid')
+    if best:
+        brief['best_valid']={k:deepcopy(best[k]) for k in ('reference','candidate','source','executable_candidate',
+            'task_identity','historical_only','task_gap') if k in best}
+        brief['best_valid']['violated_constraints']={k:v for k,v in best['constraints'].items() if not v['passed']}
+        brief['best_valid']['physical_diagnostic']=diagnostic_brief(best['physical_diagnostic'])
+    latest=deepcopy(current.get('latest_scientific_feedback'))
+    if latest and latest.get('physical_diagnostic'):
+        latest['physical_diagnostic']=dict(same_as='best_valid/physical_diagnostic') if best and latest['reference']==best['reference'] else diagnostic_brief(latest['physical_diagnostic'])
+        latest.pop('constraints',None)
+    brief['latest_scientific_feedback']=latest
+    links=[]
+    for row in ws['control_result_links']:
+        item={k:row[k] for k in ('candidate','source','source_kind','evaluation_reference','status','operation','task_acceptance','task_gap') if k in row}
+        if row.get('original_acceptance'):
+            item['constraints']={k:{f:v[f] for f in ('passed','value','limit') if f in v}
+                for k,v in row['original_acceptance'].get('components',{}).items()}
+        links.append(item)
+    brief['evidence_working_set']=dict(version='evidence_working_set_summary_v2',
+        candidate_count=ws['candidate_count'],candidate_index=deepcopy(ws['candidate_index']),
+        control_result_links=links,control_comparisons=ws['control_comparisons'],
+        method_scope=ws['method_scope'],scientific_scope=ws['scientific_scope'])
+    definitions={};actions=[]
+    for row in feedback['actions']:
+        method=row['action']+('/'+row['method'] if row.get('method') else '')
+        definitions.setdefault(method,{k:row[k] for k in ('remaining_checks','scope','requires_agent_fields') if k in row})
+        item={k:row[k] for k in ('action','method','candidate','source','status','reason','response_evidence') if k in row}
+        # References remain independently selectable without duplicating allocations or file paths.
+        if row.get('references'):item['references']=[{k:r[k] for k in ('source','source_kind','available')} for r in row['references']]
+        actions.append(item)
+    brief.update(version='decision_brief_v2',method_requirements=definitions,available_research_actions=actions,
+        recent_searches=feedback['recent_searches'],citation_rule=feedback['citation_rule'])
+    return brief
+
+
+def legacy_decision_brief(current):
     """Pure current-state projection; raw evidence and conversation are untouched."""
     brief=deepcopy(current)
     for key in ('observations','pareto_candidates','recent_decisions','control_search_usage',
@@ -559,6 +612,11 @@ def decision_brief(current):
     brief['citation_rule']=feedback['citation_rule']
     brief['version']='decision_brief_v1'
     return brief
+
+
+def diagnostic_brief(value):
+    return {k:deepcopy(value[k]) for k in ('evaluation_reference','candidate_reference','control_source_reference',
+        'execution_status','task_passed','valid_complete','violated_constraints','critical_samples','limitations') if k in value}
 
 
 def tool_feedback(host,value):

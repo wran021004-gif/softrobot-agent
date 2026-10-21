@@ -448,7 +448,7 @@ class ExperienceQuery(Contract):
 class EvidenceQuery(Contract):
     reference: EvidenceRef
     pointer: str = ''
-    view: Literal['full','summary','fields','range','capabilities'] = 'full'
+    view: Literal['full','summary','fields','range','capabilities','working_set'] = 'full'
     fields: list[str] = Field(default_factory=list, max_length=32)
     start: int = Field(default=0, ge=0, strict=True)
     count: int = Field(default=20, ge=1, le=100, strict=True)

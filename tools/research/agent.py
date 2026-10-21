@@ -491,7 +491,7 @@ async def converse(host):
             native[0].tool_spec={**native[0].tool_spec,'inputSchema':{'json':plan_schema(current['research']['actions'],decision_required=bool(s['spec'].get('research_decisions')))}}
         if s['spec'].get('tool_readiness') or s.get('tool_failures'):
             from tools.research.tool_readiness import availability
-            if (availability(host) or {}).get('status')!='ready' or current['research']['method_remaining']['mathematical_evaluations']<1:
+            if (availability(host) or {}).get('status')!='ready' or current['research']['budget']['science_budget']['remaining_mathematical']<1:
                 agent.tool_registry.registry.pop('research_analysis',None)
         record(host,'model_decision_packet',current)
         agent.system_prompt=instructions+'\nCURRENT_RESEARCH_PACKET\n'+json.dumps(current,separators=(',',':'))

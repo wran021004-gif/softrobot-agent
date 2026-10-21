@@ -33,6 +33,12 @@ def read_evidence(host, query):
         except (ValueError,UnicodeError) as exc:raise ValueError('EVIDENCE_NOT_JSON: select a saved JSON measurement artifact') from exc
     if protected(host) and plain(q.reference) not in readable_results(s,host):
         raise ValueError('PROTECTED_EVIDENCE_READ_REQUIRES_NEW_RESULT_OR_TRAINING_SUMMARY')
+    if q.view=='working_set':
+        from tools.research.evidence_policy import registered_references
+        from tools.research.research_context import context
+        if plain(q.reference) not in registered_references(host):raise ValueError('REGISTERED_WORKING_SET_ANCHOR_REQUIRED')
+        value=dict(context(host)['evidence_working_set'],source_state_identity=digest(s),
+            authoritative_scientific_evidence=False)
     if q.pointer and not q.pointer.startswith('/'):
         raise ValueError('INVALID_EVIDENCE_POINTER: use an absolute JSON pointer or empty root')
     for part in q.pointer[1:].split('/') if q.pointer else []:
@@ -54,6 +60,7 @@ def read_evidence(host, query):
         if not isinstance(value,list):raise ValueError('EVIDENCE_RANGE_REQUIRES_LIST_POINTER')
         if q.start>len(value):raise ValueError('EVIDENCE_RANGE_START_OUTSIDE_LIST: length='+str(len(value)))
         value=dict(total=len(value),start=q.start,items=value[q.start:q.start+q.count])
+    if q.view=='working_set':return value
     if not q.pointer and plain(q.reference) in [s.get('holding_diagnostic_reference'),*s.get('task_math_references',[])]:
         update(host,guidance_reads=[*s.get('guidance_reads',[]),plain(q.reference)])
     if plain(q.reference) in [*s.get('results', []),*s.get('physical_replays', []),*s.get('rl_evaluations', []), *s.get('rl_training_summaries', [])]:
