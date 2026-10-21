@@ -1,0 +1,44 @@
+{
+  "research_python": "D:/softrobot-agent/.mainline5-env/Scripts/python.exe",
+  "rl_python": "D:/softrobot-agent/.rl-pilot-env/Scripts/python.exe",
+  "provider": {
+    "adapter": "deepseek",
+    "adapter_version": "8.0.0",
+    "base_url": "https://api.deepseek.com",
+    "context_bytes": 4194304,
+    "context_guard": {
+      "context_limit_tokens": 1000000,
+      "estimate": "one token per serialized UTF-8 byte plus framing; conservative estimate, not tokenization",
+      "framing_headroom_tokens": 8192,
+      "source": "https://api-docs.deepseek.com/quick_start/pricing/",
+      "verified_date": "2026-10-21"
+    },
+    "investigation_max_tokens": 32768,
+    "max_no_progress": 3,
+    "max_repairs": 10,
+    "max_tokens": 131072,
+    "max_turns": 40,
+    "model": "deepseek-flash",
+    "parameters": {},
+    "protocol_recovery": {
+      "max_consecutive": 40,
+      "max_total": 40
+    },
+    "reasoning_effort": "high",
+    "strategy": "strategy.tool",
+    "strategy_version": "1.0.0",
+    "supports_images": false,
+    "supports_text": true,
+    "supports_tools": true,
+    "thinking": "enabled",
+    "timeout_s": 600.0
+  },
+  "threads": {
+    "OPENBLAS_NUM_THREADS": "1",
+    "OMP_NUM_THREADS": "1",
+    "MKL_NUM_THREADS": "1"
+  },
+  "rl_evaluation_hard_cap_s": null,
+  "rl_diagnostic_hard_cap_s": null,
+  "credentials_reference": "~/.codex/.env"
+}
