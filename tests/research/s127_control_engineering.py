@@ -100,8 +100,114 @@ def run():
     print(json.dumps(dict(study=h.run_id,new_physics=len(rows),gaps=[r['task_gap']['normalized_gap'] for r in rows])))
 
 
+S1274_SPEC=ROOT/'configs/research/study_s127_4_control.json'
+S1274_OUT=ROOT/'evidence/s127_4_control'
+
+
+def prepare_s1274():
+    from tools.platform_host import Host
+    from tests.research.s127_4_control_audit import audit
+    import numpy as np
+    from tools.research.control_correction import corrected_tensions
+    checked=audit();old=Host(ROOT/'runs/research'/checked['source_study'],checked['source_study'])
+    before=(digest(state(old)),old.store.remaining(),digest(old.store.events(old.run_id)))
+    folder=ROOT/'runs/s127_4_control_history';core.export(old,folder)
+    raw=read(ROOT/'configs/research/study_s127_control_handoff.json')
+    raw.update(study_id='s127-4-control-sensitivity-20261021',evidence_destination='runs/s127_4_control_export',
+        authorization='Current S12.7.4C task: independent targeted engineering grant, at most 4 new physics starts; zero Provider, mathematics, NMPC or PPO; never reopen the STOP predecessor.')
+    raw['budgets'].update(provider_requests=0,physical_launches=4)
+    raw['research_decisions']['history']=[dict(folder=str(folder.relative_to(ROOT)).replace('\\','/'),reference=r) for r in state(old)['physical_replays']]
+    base=old.store.artifact(state(old)['physical_replays'][0]);source=old.store.artifact(base['source_reference']);tr=source['trajectory']
+    cfg=old.store.artifact(base['candidate'])['configuration']
+    trials=[]
+    for label,changes in [('half_positive_6',{6:.005}),('release_late_1',{7:-.01}),
+            ('release_late_4',{10:-.01}),('paired_release',{7:-.01,10:-.01})]:
+        x=np.zeros(12)
+        for j,v in changes.items():x[j]=v
+        moved=deepcopy(tr);moved['tensions_n']=corrected_tensions(tr['tensions_n'],tr['times_s'][:-1],[0.,.35],x,[8.]*6).tolist()
+        assert schedule_identity(cfg,moved)!=schedule_identity(cfg,tr)
+        trials.append(dict(label=label,coefficients_n=x.tolist(),applied_identity=schedule_identity(cfg,moved)))
+    preflight=dict(stage='S12.7.4C',source_study=old.run_id,source_status='stopped',historical_results=state(old)['physical_replays'],
+        historical_state_identity=before[0],baseline_source=base['source_reference'],task_identity=tr['task_identity'],
+        study_id=raw['study_id'],new_physical_ceiling=4,provider_ceiling=0,nmpc_ceiling=0,ppo_ceiling=0,
+        knots_s=[0.,.35],trials=trials,
+        rationale='Half-positive coefficient 6 checks measured one-sided scale consistency. Negative late coefficients 7 and 10 release the two upper-bound tendons throughout the pre-hold/hold intervals with no clipping. The fourth combines those same two releases to test additive local response. Negative coefficient 6 is not a reverse of the measured input direction and is deferred.',
+        no_new_baseline='Use exact historical failure with identity preserved, never spend a new rollout on an already measured sequence.',
+        first_original_pass_stops=True,old_budget_reused=False)
+    if S1274_SPEC.exists() and read(S1274_SPEC)!=raw:raise ValueError('FROZEN_C_SPEC_CHANGED')
+    atomic_json(S1274_SPEC,raw);atomic_json(S1274_OUT/'preflight.json',preflight)
+    assert before==(digest(state(old)),old.store.remaining(),digest(old.store.events(old.run_id)))
+    return preflight
+
+
+def run_s1274():
+    import numpy as np
+    from tools.platform_host import Host
+    from tools.research.control_correction import corrected_tensions,task_outputs,task_measure,correction_basis
+    from tools.research.physical_replay import evaluate_schedule
+    from tests.research.s127_4_control_audit import options
+    frozen=read(S1274_OUT/'preflight.json');old=Host(ROOT/'runs/research'/frozen['source_study'],frozen['source_study'])
+    before=(digest(state(old)),old.store.remaining(),digest(old.store.events(old.run_id)))
+    h=core.prepare(S1274_SPEC)
+    if state(h)['research_status']=='stopped':raise ValueError('SEALED_NEW_STUDY_NO_RELAUNCH')
+    if 'freeze' not in state(h):core.bind(h)
+    seed=state(h)['control_initializations'][0];candidate=seed['candidate'];source=h.store.artifact(seed['source'])
+    tr=source['trajectory'];cfg=h.store.artifact(candidate)['configuration'];opt=options(cfg)
+    baseline=old.store.artifact(frozen['historical_results'][0]);prior_probe=old.store.artifact(frozen['historical_results'][1])
+    raw_base=task_outputs(old.store.artifact(baseline['raw_reference']))
+    old_delta={k:np.asarray(task_outputs(old.store.artifact(prior_probe['raw_reference']))[k])-raw_base[k]
+        for k in ('tip_positions_m','tip_velocities_m_s')}
+    rows=[]
+    def factory(action,**kwargs):return engineering_plan(action,'PHYSICAL_VALIDATION',candidate,**kwargs)
+    for trial in frozen['trials']:
+        move=deepcopy(source);coeff=trial['coefficients_n']
+        move['trajectory']['tensions_n']=corrected_tensions(tr['tensions_n'],tr['times_s'][:-1],frozen['knots_s'],coeff,[8.]*6).tolist()
+        move['provenance']['s127_4_trial']=dict(label=trial['label'],coefficients_n=coeff,source_study=old.run_id,
+            historical_baseline=frozen['historical_results'][0],inherited_acceptance=False)
+        assert schedule_identity(cfg,move['trajectory'])==trial['applied_identity']
+        prediction=None
+        if trial['label']=='half_positive_6':
+            predicted=dict(times_s=raw_base['times_s'],**{k:(np.asarray(raw_base[k])+.5*v).tolist() for k,v in old_delta.items()})
+            prediction=task_measure(predicted,**opt)['normalized_gap']
+        if trial['label']=='paired_release' and len(rows)==3:
+            deltas=[task_outputs(h.store.artifact(h.store.artifact(r['reference'])['raw_reference'])) for r in rows[1:3]]
+            predicted=dict(times_s=raw_base['times_s'],**{k:(np.asarray(deltas[0][k])+deltas[1][k]-np.asarray(raw_base[k])).tolist() for k in old_delta})
+            prediction=task_measure(predicted,**opt)['normalized_gap']
+        result,cached=evaluate_schedule(h,candidate,move,factory)
+        # Independent returned-array recomputation checks every terminal/hold sample.
+        outputs=task_outputs(h.store.artifact(result['raw_reference']));measure=task_measure(outputs,**opt)
+        np.testing.assert_allclose(measure['normalized_gap'],task_gap(result)['normalized_gap'],rtol=0,atol=1e-12)
+        actual=task_gap(baseline)['normalized_gap']-measure['normalized_gap']
+        predicted_improvement=None if prediction is None else task_gap(baseline)['normalized_gap']-prediction
+        rows.append(dict(label=trial['label'],coefficients_n=coeff,reference=result['reference'],source=result['source_reference'],
+            raw_reference=result['raw_reference'],task_gap=task_gap(result),acceptance=result['acceptance'],
+            independent_array_measure=measure,independent_array_recomputation_passed=True,
+            input_inf_n=float(np.max(abs(np.asarray(move['trajectory']['tensions_n'])-tr['tensions_n']))),
+            clipped_entries=int(np.sum(abs(np.asarray(move['trajectory']['tensions_n'])-tr['tensions_n']-
+                (correction_basis(tr['times_s'][:-1],frozen['knots_s'],6)@coeff).reshape(-1,6))>1e-12)),
+            actual_improvement=actual,predicted_improvement=predicted_improvement,
+            direction_agrees=None if predicted_improvement is None or actual==0 else bool(actual*predicted_improvement>0),
+            cost_s=0. if cached else result['charged_numerical_s'],cache_hit=cached))
+        if result['acceptance']['accepted']:break
+    for r in state(h)['physical_replays']:core.read_evidence(h,dict(reference=r,pointer='/acceptance'))
+    if state(h).get('success_gate'):
+        core.dispatch(h,engineering_plan('select','SELECT',selected_execution=state(h)['success_gate']['evidence'],supporting_evidence=state(h)['physical_replays']),'s127-4-select',origin='engineering')
+    if state(h)['research_status']!='stopped':
+        core.dispatch(h,engineering_plan('stop','STOP',supporting_evidence=state(h)['physical_replays']),'s127-4-stop',origin='engineering')
+    assert before==(digest(state(old)),old.store.remaining(),digest(old.store.events(old.run_id)))
+    result=dict(stage='S12.7.4C',study_id=h.run_id,freeze=state(h)['freeze'],status=state(h)['research_status'],
+        historical_baseline=frozen['historical_results'][0],historical_baseline_gap=task_gap(baseline),trials=rows,
+        ledger=h.store.remaining(),numerical_s=state(h)['numerical_s'],new_provider_requests=0,new_nmpc_launches=0,new_ppo_stages=0,
+        historical_state_ledger_events_unchanged=True,baseline_physics_repeated=False,
+        interpretation='Finite engineering observations around one measured six-tendon failure; no autonomous cold-start success, full Jacobian, structural infeasibility or general method superiority claim.')
+    atomic_json(S1274_OUT/'experiment.json',result)
+    print(json.dumps(dict(study=h.run_id,gaps=[r['task_gap']['normalized_gap'] for r in rows],ledger=h.store.remaining())))
+
+
 if __name__=='__main__':
-    parser=argparse.ArgumentParser();parser.add_argument('--prepare',action='store_true');args=parser.parse_args()
-    if args.prepare:print(json.dumps(prepare()))
+    parser=argparse.ArgumentParser();parser.add_argument('--prepare',action='store_true');parser.add_argument('--prepare-s1274',action='store_true');parser.add_argument('--s1274',action='store_true');args=parser.parse_args()
+    if args.prepare_s1274:print(json.dumps(prepare_s1274()))
+    elif args.s1274:run_s1274()
+    elif args.prepare:print(json.dumps(prepare()))
     else:run()
 

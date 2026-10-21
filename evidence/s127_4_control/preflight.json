@@ -1,0 +1,108 @@
+{
+  "stage": "S12.7.4C",
+  "source_study": "s127-measured-control-engineering-20261021",
+  "source_status": "stopped",
+  "historical_results": [
+    {
+      "artifact_id": "6e2a2723f94f53540b459f61fc526424a442987a72ef7ae3ae404733ece78985",
+      "media_type": "application/json"
+    },
+    {
+      "artifact_id": "8426d1b5572b064b71eda8c7d9b0553b871868a88cb03d5a1d5176c3448d9e17",
+      "media_type": "application/json"
+    }
+  ],
+  "historical_state_identity": "90877581e6399c27c8d310ee6a81344c150790cfbde2422eeb096a86d71c3c47",
+  "baseline_source": {
+    "artifact_id": "f30e37849d238652598e1b5efe199dc90daafb1e85544f4bd6ffa8bb24ce4401",
+    "media_type": "application/json"
+  },
+  "task_identity": "4305cc78792bfaf7697f7207bb87a2ee074bc8c36aae96404b1ea96982926a25",
+  "study_id": "s127-4-control-sensitivity-20261021",
+  "new_physical_ceiling": 4,
+  "provider_ceiling": 0,
+  "nmpc_ceiling": 0,
+  "ppo_ceiling": 0,
+  "knots_s": [
+    0.0,
+    0.35
+  ],
+  "trials": [
+    {
+      "label": "half_positive_6",
+      "coefficients_n": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.005,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "applied_identity": "9828046381293e4e791a0de93f18a9f02e7943159e0636177258cbfb21eead8d"
+    },
+    {
+      "label": "release_late_1",
+      "coefficients_n": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        -0.01,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "applied_identity": "a37752d549cf049febbe2d105e6f46749293598d37502aff2882a6647a22145a"
+    },
+    {
+      "label": "release_late_4",
+      "coefficients_n": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        -0.01,
+        0.0
+      ],
+      "applied_identity": "bc2fee0f446ad46589e20abd8364d4d62e8a624fbf75247a94e842adf62886b5"
+    },
+    {
+      "label": "paired_release",
+      "coefficients_n": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        -0.01,
+        0.0,
+        0.0,
+        -0.01,
+        0.0
+      ],
+      "applied_identity": "8d3238285ad83ea6e035522d7872f51313b67ed55a61d1801a745238ebc0f2ec"
+    }
+  ],
+  "rationale": "Half-positive coefficient 6 checks measured one-sided scale consistency. Negative late coefficients 7 and 10 release the two upper-bound tendons throughout the pre-hold/hold intervals with no clipping. The fourth combines those same two releases to test additive local response. Negative coefficient 6 is not a reverse of the measured input direction and is deferred.",
+  "no_new_baseline": "Use exact historical failure with identity preserved, never spend a new rollout on an already measured sequence.",
+  "first_original_pass_stops": true,
+  "old_budget_reused": false
+}
