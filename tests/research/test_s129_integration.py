@@ -99,6 +99,7 @@ class IntegrationTests(unittest.TestCase):
             self.assertNotIn('Complete physical outcomes',' '.join(relation.reasons))
             for source in relation.sources:read_evidence(self.h,plain(source),record_read=False)
         summary=reporter._card(self.h,refs[1]).deterministic_summary['task_capability']
+        self.assertIn('Smaller is better',summary['score_semantics'])
         comparison=summary['structural_comparison']
         self.assertEqual(read_evidence(self.h,dict(reference=refs[1],pointer=comparison['fixed_control_value_pointer']),
             record_read=False),comparison['fixed_control_violation'])

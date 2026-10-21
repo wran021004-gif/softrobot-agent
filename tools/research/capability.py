@@ -89,7 +89,8 @@ def capability_summary(trajectory):
     summary['solver_starts'] = [{k: s.get(k) for k in ('start_index', 'success', 'status', 'iterations', 'returned_violation', 'epigraph_residual')} for s in trajectory.get('starts', [])]
     summary['solver_starts_pointer'] = '/trajectory/starts'
     summary['score_semantics'] = ('Signed maximum normalized constraint residual over analyzed samples; '
-        'negative means positive normalized margin inside those bounds. A score is not a delta or secant.')
+        'negative means positive normalized margin inside those bounds. Smaller is better; a negative score moving '
+        'toward zero worsens this minimax score. A score is not a delta or secant.')
     summary['reason'] = trajectory.get('reason')
     summary['problem_pointer'] = '/trajectory/problem_definition'
     summary['quantities_pointer'] = '/trajectory/quantities'

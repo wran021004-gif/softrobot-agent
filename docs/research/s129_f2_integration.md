@@ -39,7 +39,8 @@ No additional TaskSpec, registry, optimizer, scheduler, database or event framew
 - `recover_feedback(host, agent)` passes the exact saved receipt to report recovery.
 - `core.dispatch` records the operation's `scientific_results` in its original receipt output.
 - `analysis.decision_result` removes duplicate scope/configuration projection, preserving inference strength.
-- `capability_summary` projects original fixed-control scores, verification and active-record indices.
+- `capability_summary` projects original fixed-control scores, verification, active-record indices and exact raw pointers.
+- `reporter._comparison` reuses B's explicitly bound mathematical comparison; physical pairing rules remain for physical comparisons.
 - `reporter.provider_usage` includes actual cache usage and explicit unknown USD cost.
 - `tests/research/s129_provider_check.py` is a bounded engineering entrypoint using existing SDK/Store methods.
 
@@ -163,7 +164,7 @@ regional structural guarantee or F3 scientific experiment is added by this chang
 
 ## Final engineering disposition
 
-Across the initial 35-test F0/F1 suite and the affected 117-test suite, 131 distinct tests
+Across the initial 35-test F0/F1 suite and the affected 117-test suite, 132 distinct tests
 have passing final results. The affected suite initially passed 116/117; the remaining
 test assumed a full and compact EvidenceSummary must be identical. It now checks every
 retained field exactly while scope stays accessible through the original pointer.
@@ -177,17 +178,47 @@ remain consistent. These token counts are explicitly mocked, not real usage.
 An earlier driver preflight correctly rejected B evidence under the unrelated mirror task;
 the driver now freezes the original B task before preparation, without changing acceptance.
 
-Real Provider requests: **0**. The live command was rejected by automatic approval review
-before process startup: it required explicit approval of destination and outbound data.
-No retry or alternate route was attempted; production handoff admission remains **closed**.
-The reviewable request scope is [provider_scope.json](../../evidence/s129_integration/provider_scope.json):
-`https://api.deepseek.com/chat/completions`, `deepseek-flash`, existing 32,768-token output
-cap, main <=7 / Reporter <=3 / total <=10 requests. It lists the saved B engineering data,
-tool schemas and new engineering dialogue to be sent, exclusions and possible paid usage.
-Actual prompt/completion/cache usage is unavailable; USD cost is unknown.
-F2 is therefore engineering-complete but **not production-admitted**; F3 must wait for this gate.
+After the initial automatic-review rejection, the user explicitly approved the recorded
+[egress scope](../../evidence/s129_integration/provider_scope.json). Real requests then ran in
+one isolated Study, `s129-f2-live-3d6206f07b`, with no budget reset. The first stage used
+implementation `40a1a340`; the same-Study corrective stage bound `ea637c1f` through the
+existing migration path. All original results, failures and costs remain immutable.
 
-Implementation commit `9fe8383c` was ordinarily pushed before the live attempt. The follow-up
-audit commit preserves the final scores, request scope and blocked admission status.
-Detailed measurements: [validation.json](../../evidence/s129_integration/validation.json).
+| Actual usage | Requests | Prompt | Completion | Cache hit | Cache miss |
+|---|---:|---:|---:|---:|---:|
+| Main Agent | 7 | 244,542 | 11,987 | 123,776 | 120,766 |
+| Reporter | 2 | 63,750 | 25,638 | 256 | 63,494 |
+
+Total 9/10 requests; USD **unknown**. Three real SDK Sessions and two real handoffs
+passed independent reopening, native schema/tool/receipt pairing and ledger checks.
+One invalid evidence reference was rejected before reservation; the main Agent corrected
+it autonomously. Reporter ran only after main responses were consumed. No unknown sends,
+unsettled receipts, unconsumed responses or new science workers remain.
+
+The first Reporter interpretation was explicitly unavailable: it invented a raw pointer
+from a summary alias. Its deterministic report survived unchanged. Exact pointer guidance
+and B comparison scope were fixed; 20 focused tests and the offline three-Session check
+passed. A distinct follow-up investigation used the same remaining grant, produced a legal
+Reporter interpretation, and changed only the interpretation slot. Original failures were
+not retried or overwritten. All interpretation sources resolve to original evidence.
+
+**Production admission remains closed.** The final main response corrected margin meaning,
+score versus secant, comparison scope and replay versus optimum, and retained H-F2. It
+nevertheless called the candidate's larger (worse) minimax score a "better score" and used
+`/score_semantics`, a summary alias, like a raw source path. This fails the required
+scientific-interpretation gate even though all authoritative numbers and hashes are intact.
+The main 7-request ceiling is exhausted; the remaining total slot cannot authorize another
+main request. No automatic resend or fresh Study/grant was used to bypass that limit.
+
+The deterministic projection now explicitly says smaller is better; its focused regression
+passes. That final wording change has **not** been validated by another real main request.
+The engineering Study's candidate handoff flag is disabled again, with the blocked admission
+record saved in its original Store. A separately authorized bounded validation must resolve
+this gate before F3. No F3 Study or sealed S12.8 execution was started.
+
+Commits `9fe8383c` and `40a1a340` were ordinarily pushed before live validation;
+`ea637c1f` contains the live source/scope correction. Final audit and directional wording
+are committed separately. The isolated integration branch is the only push target.
+Detailed checks: [validation.json](../../evidence/s129_integration/validation.json),
+[live_validation.json](../../evidence/s129_integration/live_validation.json).
 Actual B-to-Agent sample: [mathematical_decision_sample.json](../../evidence/s129_integration/mathematical_decision_sample.json).
