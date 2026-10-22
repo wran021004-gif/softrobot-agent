@@ -1,0 +1,49 @@
+{
+  "tests": 11,
+  "passed": [
+    "tests.research.test_f3_provider_recovery.ProviderLossRecoveryTests.test_active_worker_and_saved_response_require_their_original_recovery",
+    "tests.research.test_s127_provider_output.ProviderOutputTests.test_complete_saved_response_replays_without_new_charge",
+    "tests.research.test_s127_provider_output.ProviderOutputTests.test_context_reserves_output_before_any_send_or_charge",
+    "tests.research.test_s127_provider_output.ProviderOutputTests.test_normal_native_tool_round_retains_reasoning_and_ids",
+    "tests.research.test_s127_provider_output.ProviderOutputTests.test_sdk_restores_local_error_and_never_submits_partial_tools",
+    "tests.research.test_s127_provider_output.ProviderOutputTests.test_unknown_send_blocks_retry_and_differs_from_confirmed_output",
+    "tests.research.test_f3_request_tail.RequestTailTests.test_tail_does_not_change_history_and_saved_request_replays_exactly"
+  ],
+  "failures": [
+    {
+      "test": "tests.research.test_f3_provider_recovery.ProviderLossRecoveryTests.test_live_owner_and_changed_sdk_history_block_disposition",
+      "traceback": "ValueError: EXITED_MAIN_PROVIDER_OWNER_REQUIRED\n\nDuring handling of the above exception, another exception occurred:\n\nTraceback (most recent call last):\n  File \"D:\\softrobot-agent\\.worktrees\\f3-prestudy\\tests\\research\\test_f3_provider_recovery.py\", line 95, in test_live_owner_and_changed_sdk_history_block_disposition\n    with self.assertRaisesRegex(ValueError,'WIRE_HISTORY_MISMATCH'):inspect(self.h,self.request_id)\nAssertionError: \"WIRE_HISTORY_MISMATCH\" does not match \"EXITED_MAIN_PROVIDER_OWNER_REQUIRED\"\n"
+    }
+  ],
+  "errors": [
+    {
+      "test": "tests.research.test_f3_provider_recovery.ProviderLossRecoveryTests.test_approval_or_scope_change_is_rejected_without_settlement",
+      "traceback": "Traceback (most recent call last):\n  File \"D:\\softrobot-agent\\.worktrees\\f3-prestudy\\tests\\research\\test_f3_provider_recovery.py\", line 81, in test_approval_or_scope_change_is_rejected_without_settlement\n    approval=self.approval();before=self.h.store.remaining()\n             ^^^^^^^^^^^^^^^\n  File \"D:\\softrobot-agent\\.worktrees\\f3-prestudy\\tests\\research\\test_f3_provider_recovery.py\", line 42, in approval\n    scope=inspect(self.h,self.request_id)\n          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"D:\\softrobot-agent\\.worktrees\\f3-prestudy\\tests\\research\\f3_provider_recovery.py\", line 42, in inspect\n    raise ValueError('EXITED_MAIN_PROVIDER_OWNER_REQUIRED')\nValueError: EXITED_MAIN_PROVIDER_OWNER_REQUIRED\n"
+    },
+    {
+      "test": "tests.research.test_f3_provider_recovery.ProviderLossRecoveryTests.test_loss_keeps_costs_state_history_and_unknown_remote_outcome",
+      "traceback": "Traceback (most recent call last):\n  File \"D:\\softrobot-agent\\.worktrees\\f3-prestudy\\tests\\research\\test_f3_provider_recovery.py\", line 47, in test_loss_keeps_costs_state_history_and_unknown_remote_outcome\n    approval=self.approval();before=deepcopy(state(self.h));ledger=self.h.store.remaining()\n             ^^^^^^^^^^^^^^^\n  File \"D:\\softrobot-agent\\.worktrees\\f3-prestudy\\tests\\research\\test_f3_provider_recovery.py\", line 42, in approval\n    scope=inspect(self.h,self.request_id)\n          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"D:\\softrobot-agent\\.worktrees\\f3-prestudy\\tests\\research\\f3_provider_recovery.py\", line 42, in inspect\n    raise ValueError('EXITED_MAIN_PROVIDER_OWNER_REQUIRED')\nValueError: EXITED_MAIN_PROVIDER_OWNER_REQUIRED\n"
+    },
+    {
+      "test": "tests.research.test_f3_provider_recovery.ProviderLossRecoveryTests.test_next_send_is_new_and_charged_in_original_total",
+      "traceback": "Traceback (most recent call last):\n  File \"D:\\softrobot-agent\\.worktrees\\f3-prestudy\\tests\\research\\test_f3_provider_recovery.py\", line 66, in test_next_send_is_new_and_charged_in_original_total\n    apply(self.h,self.approval())\n                 ^^^^^^^^^^^^^^^\n  File \"D:\\softrobot-agent\\.worktrees\\f3-prestudy\\tests\\research\\test_f3_provider_recovery.py\", line 42, in approval\n    scope=inspect(self.h,self.request_id)\n          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"D:\\softrobot-agent\\.worktrees\\f3-prestudy\\tests\\research\\f3_provider_recovery.py\", line 42, in inspect\n    raise ValueError('EXITED_MAIN_PROVIDER_OWNER_REQUIRED')\nValueError: EXITED_MAIN_PROVIDER_OWNER_REQUIRED\n"
+    }
+  ],
+  "skipped": [],
+  "elapsed_s": 15.119054300012067,
+  "successful": false,
+  "historical_archive": {
+    "path": "None",
+    "sha256": null,
+    "unchanged": true
+  },
+  "scope": "Offline contracts and numerical fixtures; real SDK/Store, mock HTTP. No scientific execution Study.",
+  "substitutions": [
+    "Short UUID only for Windows cold SDK fixture path length",
+    "Saved numerical matrices and explicit mocked scientific worker returns in contract tests",
+    "New family T2 model binding tests substitute task applicability; kernel tested separately"
+  ],
+  "real_provider_requests": 0,
+  "physical_experiments": 0,
+  "ppo_training": 0
+}
