@@ -24,6 +24,122 @@ def _token(key):
     return key.replace('~', '~0').replace('/', '~1')
 
 
+def recorded_math_summary(value,reference):
+    """Project recorded strict predicates and magnitudes without changing acceptance."""
+    facts=value.get('mathematical_facts') or {}
+    if not facts:return None
+    requirements={r['constraint_id']:r for r in (value.get('task_requirements') or {}).get('constraints',[])}
+    samples={}
+    for name,task in (('returned',(facts.get('raw_returned') or {}).get('task')),('recomputed',facts.get('task'))):
+        if not task:continue
+        rows=[]
+        for i,(key,time,margin) in enumerate(zip(task.get('constraint_ids',[]),task.get('times_s',[]),task.get('signed_margin',[]))):
+            requirement=requirements.get(key,{})
+            rows.append(dict(constraint_id=key,time_s=time,signed_margin=margin,positive_violation=max(0.,-margin),
+                unit=(requirement.get('signal') or {}).get('units'),limit=requirement.get('radius'),
+                actual_norm=task.get('actual_norm',[None]*len(task.get('constraint_ids',[])))[i],
+                source=dict(reference=reference,pointer=('/mathematical_facts/raw_returned/task' if name=='returned' else '/mathematical_facts/task')+'/signed_margin/'+str(i))))
+        maxima=[]
+        for key in dict.fromkeys(r['constraint_id'] for r in rows):
+            row=max((r for r in rows if r['constraint_id']==key),key=lambda r:r['positive_violation'])
+            maxima.append({k:row[k] for k in ('constraint_id','positive_violation','unit','time_s','limit','source')})
+        samples[name]=dict(strict_satisfied=task.get('original_sampled_requirements_satisfied'),maxima_by_constraint=maxima,
+            samples=rows,required_slacks=task.get('required_slacks'))
+    slacks=(value.get('trajectory') or {}).get('slacks',(facts.get('raw_returned') or {}).get('slacks'))
+    claims=value.get('verified_conclusions',[])
+    return dict(version='recorded_mathematics_v2',source=dict(reference=reference,pointer='/mathematical_facts'),
+        status=facts.get('status'),
+        solver={k:facts.get(k) for k in ('status','converged','exitflag','iterations','function_evaluations','objective','initial_objective','scaled_violation')},
+        original_feasible=facts.get('original_feasible'),relaxed_feasible=facts.get('relaxed_feasible'),
+        returned_slacks=slacks,original_predicate_diagnostics=samples,
+        zero_slack_with_positive_recorded_violation=bool(isinstance(slacks,dict) and slacks and all(x==0 for x in slacks.values())
+            and any(r['positive_violation']>0 for task in samples.values() for r in task['samples'])),
+        predicate_tolerance='Strict recorded comparison; no added acceptance tolerance',
+        kkt={k:(facts.get('kkt') or {}).get(k) for k in ('primal_inf','stationarity_inf','global_optimality')},
+        conclusion=[c.get('conclusion') if isinstance(c,dict) else c for c in claims],
+        scope=[dict(conclusion=c.get('conclusion'),supported_interpretation=c.get('supported_interpretation'),
+            unsupported_conclusions=c.get('unsupported_conclusions'),verification_status=c.get('verification_status')) for c in claims if isinstance(c,dict)],
+        physical_validation=value.get('physical_validation'),task_acceptance=value.get('task_acceptance',facts.get('physical_task_acceptance')),
+        independent_physical_acceptance_established=False)
+
+
+def recorded_static_summary(value,reference):
+    construction=value.get('construction')
+    if not construction:return None
+    return dict(source=dict(reference=reference,pointer='/construction'),
+        **{k:v for k,v in construction.items() if k!='provenance'},
+        local_model_constraints=value.get('local_model_constraints'),tension_margins_n=value.get('tension_margins_n'),
+        task_acceptance=value.get('task_acceptance'))
+
+
+def recorded_control_diagnostics(host,value):
+    """Project update-bound solver/selection facts; never replay or rescore physics."""
+    if not value.get('execution_id'):return None
+    from extensions.tendon_family.control_evidence import ControlEvidence
+    from extensions.tendon_family.gvs_reporting import vector3
+    import numpy as np
+    reader=ControlEvidence(host.store)
+    try:source=reader.resolve(value['execution_id'])
+    except ValueError as exc:return dict(status='unavailable',reason=str(exc))
+    observations=reader.read_file(source,'controller_observations.json',[])
+    if not observations:return None
+    rows=[]
+    for i,o in enumerate(observations):
+        facts=o.get('mathematical_facts') or {};planned=facts.get('tensions')
+        first=planned if facts.get('horizon')==1 and planned and not isinstance(planned[0],list) else planned[0] if planned else None
+        actual=o.get('actual_tension_n');prediction=o.get('one_step_prediction')
+        invalid=prediction is not None and (not vector3(prediction.get('tip_position_m')) or
+            (prediction.get('tip_velocity_m_s') is not None and not vector3(prediction['tip_velocity_m_s'])))
+        matched=None if first is None or actual is None else bool(np.asarray(first).shape==np.asarray(actual).shape
+            and np.allclose(first,actual,rtol=0,atol=1e-10))
+        rows.append(dict(update_id=i,time_s=o['time_s'],source=dict(reference=source['files']['controller_observations.json'],pointer='/'+str(i)),
+            optimization_status=o.get('optimization_status'),optimization_raw_status=o.get('optimization_raw_status'),
+            plan_accepted=o.get('plan_accepted'),plan_source=o.get('plan_source'),
+            recovery=o.get('feasibility_recovery'),failure_response_used=o.get('failure_response_used'),
+            planned_first_input_n=first,actual_input_n=actual,accepted_plan_matches_actual_input=matched if o.get('plan_accepted') else None,
+            prediction_diagnostic_available=bool(prediction and not invalid and matched is not False),
+            prediction_shape_invalid=invalid,complete_update_available=bool(o.get('complete_update_record')),
+            solver_request_available=bool(o.get('solver_request_record'))))
+    invalid=[r['update_id'] for r in rows if r['prediction_shape_invalid']]
+    mismatches=[r['update_id'] for r in rows if r['accepted_plan_matches_actual_input'] is False]
+    return dict(version='recorded_control_diagnostics_v1',updates=len(rows),
+        prediction_aggregate_available=not invalid and not mismatches,
+        invalid_prediction_updates=invalid,accepted_plan_input_mismatch_updates=mismatches,
+        relevant_updates=[r for r in rows if r['update_id']>=len(rows)-6 or r['update_id'] in invalid+mismatches],
+        full_observations_query=dict(reference=source['files']['controller_observations.json'],view='range',pointer='',start=0,count=100),
+        scope='Historical applied-input observations and original independent acceptance retained. Invalid prediction aggregates cannot diagnose model error. No fallback mechanism or counterfactual physical success inferred.')
+
+
+def data_access(host,reference,value):
+    """Executable original-artifact reads; working-set paths remain a distinct view."""
+    access=dict(reference=reference,view_scope='original_artifact',queries=[])
+    if isinstance(value,list):
+        access.update(items=len(value),queries=[dict(reference=reference,view='range',pointer='',start=0,count=min(100,max(1,len(value))))])
+    elif isinstance(value,dict):
+        access['queries']=[dict(reference=reference,view='full',pointer='/'+_token(k)) for k in
+            ('trajectory','mathematical_facts','task_requirements','acceptance') if k in value]
+        from tools.research.state import state
+        if reference in state(host).get('results',[]) and value.get('execution_id'):
+            from extensions.tendon_family.control_evidence import ControlEvidence
+            reader=ControlEvidence(host.store)
+            try:source=reader.resolve(value['execution_id'])
+            except ValueError as exc:
+                access['execution_files']=dict(status='unavailable',reason=str(exc));return access
+            files=source['files']
+            for key in ('controller_observations.json','trajectory.json.gz','control_spec.json','nmpc_updates.json'):
+                if key in files:access['queries'].append(dict(reference=files[key],view='full' if key=='control_spec.json' else 'range',pointer='',start=0,count=100))
+            if value.get('profile',{}).get('motion'):
+                access['queries'].append(dict(reference=value['profile']['motion'],view='range',pointer='',start=0,count=100))
+            observations=reader.read_file(source,'controller_observations.json',[])
+            access['updates']=[dict(update_id=i,time_s=o['time_s'],
+                observation_query=dict(reference=files['controller_observations.json'],view='full',pointer='/'+str(i)),
+                complete_update_available=bool(o.get('complete_update_record')),
+                solver_request_available=bool(o.get('solver_request_record')),
+                mathematical_facts_query=dict(reference=files['controller_observations.json'],view='full',pointer=f'/{i}/mathematical_facts') if o.get('mathematical_facts') else None)
+                for i,o in enumerate(observations)]
+    return access
+
+
 def _acceptance_metrics(acceptance, reference):
     metrics=[]
     for name,row in acceptance.get('components',{}).items():
@@ -98,12 +214,14 @@ def result_card(host, reference):
     binding=(value.get('scoped_claim') or {}).get('binding') or value.get('binding') or {}
     identity=ResultIdentity(result=_location(reference),
         study=value.get('owning_study') or value.get('study'),
-        task_identity=evidence['task_identity'], candidate=value.get('candidate',binding.get('candidate')),
+        task_identity=evidence['task_identity'], candidate=value.get('candidate',value.get('design_candidate',binding.get('candidate'))),
         control_source=value.get('source_reference',value.get('source')),
         operation=value.get('operation'), model_identity=evidence['model_identity'],
         design_identity=evidence['design_identity'],
         evaluation_profile_identity=value.get('profile_identity'),evaluation_identity=value.get('execution_id'))
     summary=compact_evidence(value,reference,facts_only=True)['summary']
+    recorded=recorded_math_summary(value,reference)
+    if recorded is not None:summary['recorded_mathematics']=recorded
     metrics=[];violations=[];critical=[];mathematics=None;search=None
     resources=_resources(value,reference)
     details=[_location(reference)]
@@ -162,6 +280,7 @@ def result_card(host, reference):
                 source=_location(reference,row['source_pointer']+'/value')))
             if row['status']!='satisfied_sample':violations.append(row['constraint_id'])
     elif 'acceptance' in value:
+        summary['recorded_control_diagnostics']=recorded_control_diagnostics(host,value)
         components=(value['acceptance'] or {}).get('components',{})
         metrics=_acceptance_metrics(value['acceptance'] or {},reference)
         # Reuse existing task ranking and measured-extrema selection; do not rescore.
@@ -189,6 +308,8 @@ def result_card(host, reference):
         # compact_evidence already owns search summaries. Response matrices stay in Store.
         summary={k:v for k,v in summary.items() if k not in ('local_responses',)}
         details.extend([_location(reference,'/candidates'),_location(reference,'/starts')])
+    construction=recorded_static_summary(value,reference)
+    if construction:summary['recorded_static_construction']=construction
     return ResultCard(identity=identity,evidence_summary=evidence,
         recorded_context=context,metrics=metrics,main_violations=violations,critical_observations=critical,
         deterministic_summary=summary,mathematics=mathematics,control_search=search,

@@ -1,0 +1,2102 @@
+[
+  {
+    "reference": {
+      "artifact_id": "4483162942300f9492983478cc18916909de00822269473bce620075a39cfcaa",
+      "media_type": "application/json"
+    },
+    "original_acceptance": {
+      "accepted": false,
+      "components": {
+        "evaluation_validity": {
+          "limit": null,
+          "passed": true,
+          "reason": null,
+          "unit": null,
+          "value": "valid"
+        },
+        "evaluator:task_bound": {
+          "limit": 0.01,
+          "passed": false,
+          "reason": null,
+          "unit": "m",
+          "value": 0.012715284303493486
+        },
+        "execution_complete": {
+          "limit": null,
+          "passed": true,
+          "reason": null,
+          "unit": null,
+          "value": true
+        },
+        "force_bounds": {
+          "limit": 1e-08,
+          "passed": true,
+          "reason": null,
+          "unit": "N",
+          "value": 0.0
+        },
+        "holding_coverage": {
+          "limit": 6,
+          "passed": true,
+          "reason": null,
+          "unit": "inclusive uniform samples",
+          "value": true
+        },
+        "holding_position": {
+          "limit": 0.01,
+          "passed": false,
+          "reason": null,
+          "unit": "m",
+          "value": 0.01817015352801499
+        },
+        "holding_speed": {
+          "limit": 0.02,
+          "passed": false,
+          "reason": null,
+          "unit": "m/s",
+          "value": 0.6233310628167376
+        },
+        "solver_errors": {
+          "limit": 0,
+          "passed": true,
+          "reason": null,
+          "unit": "count",
+          "value": 0
+        },
+        "task_evaluator": {
+          "limit": null,
+          "passed": false,
+          "reason": null,
+          "unit": null,
+          "value": false
+        }
+      },
+      "continuous_time_guarantee": false,
+      "contract": "research.task_acceptance",
+      "evaluator_tension_channels": null,
+      "evidence_binding": {
+        "evaluation": {
+          "artifact_id": "903a576bef4ad986349e30c9672e92e8dec85e108f5af5443680b22cbff1f0b0",
+          "media_type": "application/json"
+        },
+        "evaluation_binding": {
+          "original_execution_id": "5ce5acf760df4ee2842b49d53a30e62c",
+          "source": {
+            "artifact_id": "aa1e0c88a51dd5f33be7dbeb635b20cf0a1ea3381e15b4202815bfde4cd6a41d",
+            "media_type": "application/json"
+          },
+          "source_execution_id": "5ce5acf760df4ee2842b49d53a30e62c"
+        },
+        "profile": {
+          "artifact_id": "c2e9e236f6fb4cb0578ed3d691b6c30cc10c02857eedb31ecc25910090e0db97",
+          "media_type": "application/json"
+        },
+        "profile_binding": {
+          "evaluation": {
+            "artifact_id": "903a576bef4ad986349e30c9672e92e8dec85e108f5af5443680b22cbff1f0b0",
+            "media_type": "application/json"
+          },
+          "execution_id": "5ce5acf760df4ee2842b49d53a30e62c",
+          "simulation": {
+            "artifact_id": "aa1e0c88a51dd5f33be7dbeb635b20cf0a1ea3381e15b4202815bfde4cd6a41d",
+            "media_type": "application/json"
+          }
+        },
+        "simulation": {
+          "artifact_id": "aa1e0c88a51dd5f33be7dbeb635b20cf0a1ea3381e15b4202815bfde4cd6a41d",
+          "media_type": "application/json"
+        }
+      },
+      "execution_id": "5ce5acf760df4ee2842b49d53a30e62c",
+      "issues": [],
+      "metrics": {
+        "holding_max_error_m": 0.01817015352801499,
+        "holding_max_speed_m_s": 0.6233310628167376,
+        "terminal_error_m": 0.012715284303493486
+      },
+      "missing": [],
+      "protocol_id": "offline_reach_hold_v1",
+      "sources": {
+        "evaluation": {
+          "artifact_id": "903a576bef4ad986349e30c9672e92e8dec85e108f5af5443680b22cbff1f0b0",
+          "media_type": "application/json"
+        },
+        "profile": {
+          "artifact_id": "c2e9e236f6fb4cb0578ed3d691b6c30cc10c02857eedb31ecc25910090e0db97",
+          "media_type": "application/json"
+        }
+      },
+      "status": "valid_failure",
+      "task_family": "task.reach",
+      "task_identity": "bd9df2d930423f2b2a12152f076e2ae88b4d1a0af84d6126aa13b0b1fac9ec77",
+      "timing": {
+        "control_period_s": 0.01,
+        "deadline_misses": 35,
+        "duration_s": 0.35,
+        "mean_update_s": 123.86848094859826,
+        "real_time_demonstrated": false,
+        "real_time_required": false,
+        "sample_period_s": 0.01,
+        "simulation_wall_s": 4345.84300000011,
+        "termination": [
+          "duration",
+          "numerical_failure"
+        ],
+        "timestep_s": 0.0005
+      },
+      "version": "1.0.0"
+    },
+    "diagnostic": {
+      "version": "recorded_control_diagnostics_v1",
+      "updates": 35,
+      "prediction_aggregate_available": false,
+      "invalid_prediction_updates": [
+        34
+      ],
+      "accepted_plan_input_mismatch_updates": [
+        34
+      ],
+      "relevant_updates": [
+        {
+          "update_id": 29,
+          "time_s": 0.29,
+          "source": {
+            "reference": {
+              "artifact_id": "e69eaff894f911d840b22611993f030ae5a839b82ebc703f15ea226459c4fa8b",
+              "media_type": "application/octet-stream"
+            },
+            "pointer": "/29"
+          },
+          "optimization_status": "converged",
+          "optimization_raw_status": "fmincon_exitflag_1",
+          "plan_accepted": true,
+          "plan_source": "fmincon_selected",
+          "recovery": {
+            "enabled": true,
+            "attempted": false,
+            "selected": false,
+            "error": [],
+            "wall_s": 0,
+            "source": "returned_fmincon_tensions_reintegrated_from_current_measurement"
+          },
+          "failure_response_used": false,
+          "planned_first_input_n": [
+            3.210812037041245e-22,
+            2.1222219909013877,
+            1.4195907151665774,
+            2.6883384795511683e-22
+          ],
+          "actual_input_n": [
+            3.210812037041245e-22,
+            2.1222219909013877,
+            1.4195907151665774,
+            2.6883384795511683e-22
+          ],
+          "accepted_plan_matches_actual_input": true,
+          "prediction_diagnostic_available": true,
+          "prediction_shape_invalid": false,
+          "complete_update_available": false,
+          "solver_request_available": false
+        },
+        {
+          "update_id": 30,
+          "time_s": 0.3,
+          "source": {
+            "reference": {
+              "artifact_id": "e69eaff894f911d840b22611993f030ae5a839b82ebc703f15ea226459c4fa8b",
+              "media_type": "application/octet-stream"
+            },
+            "pointer": "/30"
+          },
+          "optimization_status": "converged",
+          "optimization_raw_status": "fmincon_exitflag_1",
+          "plan_accepted": true,
+          "plan_source": "fmincon_selected",
+          "recovery": {
+            "enabled": true,
+            "attempted": false,
+            "selected": false,
+            "error": [],
+            "wall_s": 0,
+            "source": "returned_fmincon_tensions_reintegrated_from_current_measurement"
+          },
+          "failure_response_used": false,
+          "planned_first_input_n": [
+            0,
+            2.132624917137114,
+            1.316138945931822,
+            0
+          ],
+          "actual_input_n": [
+            -0.0,
+            2.132624917137114,
+            1.316138945931822,
+            -0.0
+          ],
+          "accepted_plan_matches_actual_input": true,
+          "prediction_diagnostic_available": true,
+          "prediction_shape_invalid": false,
+          "complete_update_available": false,
+          "solver_request_available": false
+        },
+        {
+          "update_id": 31,
+          "time_s": 0.31,
+          "source": {
+            "reference": {
+              "artifact_id": "e69eaff894f911d840b22611993f030ae5a839b82ebc703f15ea226459c4fa8b",
+              "media_type": "application/octet-stream"
+            },
+            "pointer": "/31"
+          },
+          "optimization_status": "converged",
+          "optimization_raw_status": "fmincon_exitflag_1",
+          "plan_accepted": true,
+          "plan_source": "fmincon_selected",
+          "recovery": {
+            "enabled": true,
+            "attempted": false,
+            "selected": false,
+            "error": [],
+            "wall_s": 0,
+            "source": "returned_fmincon_tensions_reintegrated_from_current_measurement"
+          },
+          "failure_response_used": false,
+          "planned_first_input_n": [
+            0,
+            2.064247442413636,
+            1.2559638390141425,
+            3.0820208039177214e-21
+          ],
+          "actual_input_n": [
+            -0.0,
+            2.064247442413636,
+            1.2559638390141425,
+            3.0820208039177214e-21
+          ],
+          "accepted_plan_matches_actual_input": true,
+          "prediction_diagnostic_available": true,
+          "prediction_shape_invalid": false,
+          "complete_update_available": false,
+          "solver_request_available": false
+        },
+        {
+          "update_id": 32,
+          "time_s": 0.32,
+          "source": {
+            "reference": {
+              "artifact_id": "e69eaff894f911d840b22611993f030ae5a839b82ebc703f15ea226459c4fa8b",
+              "media_type": "application/octet-stream"
+            },
+            "pointer": "/32"
+          },
+          "optimization_status": "converged",
+          "optimization_raw_status": "fmincon_exitflag_1",
+          "plan_accepted": true,
+          "plan_source": "fmincon_selected",
+          "recovery": {
+            "enabled": true,
+            "attempted": false,
+            "selected": false,
+            "error": [],
+            "wall_s": 0,
+            "source": "returned_fmincon_tensions_reintegrated_from_current_measurement"
+          },
+          "failure_response_used": false,
+          "planned_first_input_n": [
+            0,
+            1.875426633873157,
+            1.241744652477078,
+            6.173359554635217e-24
+          ],
+          "actual_input_n": [
+            -0.0,
+            1.875426633873157,
+            1.241744652477078,
+            6.173359554635217e-24
+          ],
+          "accepted_plan_matches_actual_input": true,
+          "prediction_diagnostic_available": true,
+          "prediction_shape_invalid": false,
+          "complete_update_available": false,
+          "solver_request_available": false
+        },
+        {
+          "update_id": 33,
+          "time_s": 0.33,
+          "source": {
+            "reference": {
+              "artifact_id": "e69eaff894f911d840b22611993f030ae5a839b82ebc703f15ea226459c4fa8b",
+              "media_type": "application/octet-stream"
+            },
+            "pointer": "/33"
+          },
+          "optimization_status": "converged",
+          "optimization_raw_status": "fmincon_exitflag_2",
+          "plan_accepted": true,
+          "plan_source": "fmincon_selected",
+          "recovery": {
+            "enabled": true,
+            "attempted": false,
+            "selected": false,
+            "error": [],
+            "wall_s": 0,
+            "source": "returned_fmincon_tensions_reintegrated_from_current_measurement"
+          },
+          "failure_response_used": false,
+          "planned_first_input_n": [
+            0,
+            1.5328834068786523,
+            1.3074179861258226,
+            0
+          ],
+          "actual_input_n": [
+            -0.0,
+            1.5328834068786523,
+            1.3074179861258226,
+            -0.0
+          ],
+          "accepted_plan_matches_actual_input": true,
+          "prediction_diagnostic_available": true,
+          "prediction_shape_invalid": false,
+          "complete_update_available": false,
+          "solver_request_available": false
+        },
+        {
+          "update_id": 34,
+          "time_s": 0.34,
+          "source": {
+            "reference": {
+              "artifact_id": "e69eaff894f911d840b22611993f030ae5a839b82ebc703f15ea226459c4fa8b",
+              "media_type": "application/octet-stream"
+            },
+            "pointer": "/34"
+          },
+          "optimization_status": "converged",
+          "optimization_raw_status": "fmincon_exitflag_1",
+          "plan_accepted": true,
+          "plan_source": "fmincon_selected",
+          "recovery": {
+            "enabled": true,
+            "attempted": false,
+            "selected": false,
+            "error": [],
+            "wall_s": 0,
+            "source": "returned_fmincon_tensions_reintegrated_from_current_measurement"
+          },
+          "failure_response_used": false,
+          "planned_first_input_n": [
+            0.4289298051317019,
+            2.6404426938476777,
+            1.530662571245416,
+            4.107683501503277e-20
+          ],
+          "actual_input_n": [
+            0.4289298051317019,
+            0.4289298051317019,
+            0.4289298051317019,
+            0.4289298051317019
+          ],
+          "accepted_plan_matches_actual_input": false,
+          "prediction_diagnostic_available": false,
+          "prediction_shape_invalid": true,
+          "complete_update_available": false,
+          "solver_request_available": false
+        }
+      ],
+      "full_observations_query": {
+        "reference": {
+          "artifact_id": "e69eaff894f911d840b22611993f030ae5a839b82ebc703f15ea226459c4fa8b",
+          "media_type": "application/octet-stream"
+        },
+        "view": "range",
+        "pointer": "",
+        "start": 0,
+        "count": 100
+      },
+      "scope": "Historical applied-input observations and original independent acceptance retained. Invalid prediction aggregates cannot diagnose model error. No fallback mechanism or counterfactual physical success inferred."
+    },
+    "executable_navigation_verified": true,
+    "raw_acceptance_unchanged": true
+  },
+  {
+    "reference": {
+      "artifact_id": "96682a9fc5f07a8230465273e9ff842ef9e5162592447bc2a872a918472ecb6a",
+      "media_type": "application/json"
+    },
+    "original_acceptance": {
+      "accepted": false,
+      "components": {
+        "evaluation_validity": {
+          "limit": null,
+          "passed": true,
+          "reason": null,
+          "unit": null,
+          "value": "valid"
+        },
+        "evaluator:task_bound": {
+          "limit": 0.01,
+          "passed": false,
+          "reason": null,
+          "unit": "m",
+          "value": 0.10810059436179664
+        },
+        "execution_complete": {
+          "limit": null,
+          "passed": true,
+          "reason": null,
+          "unit": null,
+          "value": true
+        },
+        "force_bounds": {
+          "limit": 1e-08,
+          "passed": true,
+          "reason": null,
+          "unit": "N",
+          "value": 0.0
+        },
+        "holding_coverage": {
+          "limit": 6,
+          "passed": true,
+          "reason": null,
+          "unit": "inclusive uniform samples",
+          "value": true
+        },
+        "holding_position": {
+          "limit": 0.01,
+          "passed": false,
+          "reason": null,
+          "unit": "m",
+          "value": 0.10872251161722626
+        },
+        "holding_speed": {
+          "limit": 0.02,
+          "passed": false,
+          "reason": null,
+          "unit": "m/s",
+          "value": 0.09798267692123938
+        },
+        "solver_errors": {
+          "limit": 0,
+          "passed": true,
+          "reason": null,
+          "unit": "count",
+          "value": 0
+        },
+        "task_evaluator": {
+          "limit": null,
+          "passed": false,
+          "reason": null,
+          "unit": null,
+          "value": false
+        }
+      },
+      "continuous_time_guarantee": false,
+      "contract": "research.task_acceptance",
+      "evaluator_tension_channels": null,
+      "evidence_binding": {
+        "evaluation": {
+          "artifact_id": "b76c20a542aed26db7e7f5d74c00cee089ab177eba85aff0255ce48c6d5a8179",
+          "media_type": "application/json"
+        },
+        "evaluation_binding": {
+          "original_execution_id": "fb18f8f55a8d41158fb464e61dd6c8e5",
+          "source": {
+            "artifact_id": "a78a7d68c4e680fc77d9b4046ef97bb99f247cdd4318661ac4b1d0542512bb20",
+            "media_type": "application/json"
+          },
+          "source_execution_id": "fb18f8f55a8d41158fb464e61dd6c8e5"
+        },
+        "profile": {
+          "artifact_id": "4af2247431dc9879c421de63f559a6992fdb8d07323f47ffe82ea0fd424e96ff",
+          "media_type": "application/json"
+        },
+        "profile_binding": {
+          "evaluation": {
+            "artifact_id": "b76c20a542aed26db7e7f5d74c00cee089ab177eba85aff0255ce48c6d5a8179",
+            "media_type": "application/json"
+          },
+          "execution_id": "fb18f8f55a8d41158fb464e61dd6c8e5",
+          "simulation": {
+            "artifact_id": "a78a7d68c4e680fc77d9b4046ef97bb99f247cdd4318661ac4b1d0542512bb20",
+            "media_type": "application/json"
+          }
+        },
+        "simulation": {
+          "artifact_id": "a78a7d68c4e680fc77d9b4046ef97bb99f247cdd4318661ac4b1d0542512bb20",
+          "media_type": "application/json"
+        }
+      },
+      "execution_id": "fb18f8f55a8d41158fb464e61dd6c8e5",
+      "issues": [],
+      "metrics": {
+        "holding_max_error_m": 0.10872251161722626,
+        "holding_max_speed_m_s": 0.09798267692123938,
+        "terminal_error_m": 0.10810059436179664
+      },
+      "missing": [],
+      "protocol_id": "offline_reach_hold_v1",
+      "sources": {
+        "evaluation": {
+          "artifact_id": "b76c20a542aed26db7e7f5d74c00cee089ab177eba85aff0255ce48c6d5a8179",
+          "media_type": "application/json"
+        },
+        "profile": {
+          "artifact_id": "4af2247431dc9879c421de63f559a6992fdb8d07323f47ffe82ea0fd424e96ff",
+          "media_type": "application/json"
+        }
+      },
+      "status": "valid_failure",
+      "task_family": "task.reach",
+      "task_identity": "bd9df2d930423f2b2a12152f076e2ae88b4d1a0af84d6126aa13b0b1fac9ec77",
+      "timing": {
+        "control_period_s": 0.01,
+        "deadline_misses": 35,
+        "duration_s": 0.35,
+        "mean_update_s": 11.182118714288142,
+        "real_time_demonstrated": false,
+        "real_time_required": false,
+        "sample_period_s": 0.01,
+        "simulation_wall_s": 401.4849999998696,
+        "termination": [
+          "duration",
+          "numerical_failure"
+        ],
+        "timestep_s": 0.0005
+      },
+      "version": "1.0.0"
+    },
+    "diagnostic": {
+      "version": "recorded_control_diagnostics_v1",
+      "updates": 35,
+      "prediction_aggregate_available": false,
+      "invalid_prediction_updates": [
+        34
+      ],
+      "accepted_plan_input_mismatch_updates": [
+        34
+      ],
+      "relevant_updates": [
+        {
+          "update_id": 29,
+          "time_s": 0.29,
+          "source": {
+            "reference": {
+              "artifact_id": "ccd5e9a38dccc820da2f6534f7470aeb1888b91f66b5f51859f91cbb60b7fcab",
+              "media_type": "application/octet-stream"
+            },
+            "pointer": "/29"
+          },
+          "optimization_status": "converged",
+          "optimization_raw_status": "fmincon_exitflag_1",
+          "plan_accepted": true,
+          "plan_source": "fmincon_selected",
+          "recovery": {
+            "enabled": true,
+            "attempted": false,
+            "selected": false,
+            "error": [],
+            "wall_s": 0,
+            "source": "returned_fmincon_tensions_reintegrated_from_current_measurement"
+          },
+          "failure_response_used": false,
+          "planned_first_input_n": [
+            8,
+            8,
+            8,
+            6.4022551304729785
+          ],
+          "actual_input_n": [
+            8.0,
+            8.0,
+            8.0,
+            6.4022551304729785
+          ],
+          "accepted_plan_matches_actual_input": true,
+          "prediction_diagnostic_available": true,
+          "prediction_shape_invalid": false,
+          "complete_update_available": false,
+          "solver_request_available": false
+        },
+        {
+          "update_id": 30,
+          "time_s": 0.3,
+          "source": {
+            "reference": {
+              "artifact_id": "ccd5e9a38dccc820da2f6534f7470aeb1888b91f66b5f51859f91cbb60b7fcab",
+              "media_type": "application/octet-stream"
+            },
+            "pointer": "/30"
+          },
+          "optimization_status": "converged",
+          "optimization_raw_status": "fmincon_exitflag_1",
+          "plan_accepted": true,
+          "plan_source": "fmincon_selected",
+          "recovery": {
+            "enabled": true,
+            "attempted": false,
+            "selected": false,
+            "error": [],
+            "wall_s": 0,
+            "source": "returned_fmincon_tensions_reintegrated_from_current_measurement"
+          },
+          "failure_response_used": false,
+          "planned_first_input_n": [
+            8,
+            8,
+            8,
+            6.458444309868823
+          ],
+          "actual_input_n": [
+            8.0,
+            8.0,
+            8.0,
+            6.458444309868823
+          ],
+          "accepted_plan_matches_actual_input": true,
+          "prediction_diagnostic_available": true,
+          "prediction_shape_invalid": false,
+          "complete_update_available": false,
+          "solver_request_available": false
+        },
+        {
+          "update_id": 31,
+          "time_s": 0.31,
+          "source": {
+            "reference": {
+              "artifact_id": "ccd5e9a38dccc820da2f6534f7470aeb1888b91f66b5f51859f91cbb60b7fcab",
+              "media_type": "application/octet-stream"
+            },
+            "pointer": "/31"
+          },
+          "optimization_status": "converged",
+          "optimization_raw_status": "fmincon_exitflag_1",
+          "plan_accepted": true,
+          "plan_source": "fmincon_selected",
+          "recovery": {
+            "enabled": true,
+            "attempted": false,
+            "selected": false,
+            "error": [],
+            "wall_s": 0,
+            "source": "returned_fmincon_tensions_reintegrated_from_current_measurement"
+          },
+          "failure_response_used": false,
+          "planned_first_input_n": [
+            8,
+            8,
+            8,
+            6.496008705335194
+          ],
+          "actual_input_n": [
+            8.0,
+            8.0,
+            8.0,
+            6.496008705335194
+          ],
+          "accepted_plan_matches_actual_input": true,
+          "prediction_diagnostic_available": true,
+          "prediction_shape_invalid": false,
+          "complete_update_available": false,
+          "solver_request_available": false
+        },
+        {
+          "update_id": 32,
+          "time_s": 0.32,
+          "source": {
+            "reference": {
+              "artifact_id": "ccd5e9a38dccc820da2f6534f7470aeb1888b91f66b5f51859f91cbb60b7fcab",
+              "media_type": "application/octet-stream"
+            },
+            "pointer": "/32"
+          },
+          "optimization_status": "converged",
+          "optimization_raw_status": "fmincon_exitflag_1",
+          "plan_accepted": true,
+          "plan_source": "fmincon_selected",
+          "recovery": {
+            "enabled": true,
+            "attempted": false,
+            "selected": false,
+            "error": [],
+            "wall_s": 0,
+            "source": "returned_fmincon_tensions_reintegrated_from_current_measurement"
+          },
+          "failure_response_used": false,
+          "planned_first_input_n": [
+            8,
+            8,
+            8,
+            6.243458707896725
+          ],
+          "actual_input_n": [
+            8.0,
+            8.0,
+            8.0,
+            6.243458707896725
+          ],
+          "accepted_plan_matches_actual_input": true,
+          "prediction_diagnostic_available": true,
+          "prediction_shape_invalid": false,
+          "complete_update_available": false,
+          "solver_request_available": false
+        },
+        {
+          "update_id": 33,
+          "time_s": 0.33,
+          "source": {
+            "reference": {
+              "artifact_id": "ccd5e9a38dccc820da2f6534f7470aeb1888b91f66b5f51859f91cbb60b7fcab",
+              "media_type": "application/octet-stream"
+            },
+            "pointer": "/33"
+          },
+          "optimization_status": "converged",
+          "optimization_raw_status": "fmincon_exitflag_1",
+          "plan_accepted": true,
+          "plan_source": "fmincon_selected",
+          "recovery": {
+            "enabled": true,
+            "attempted": false,
+            "selected": false,
+            "error": [],
+            "wall_s": 0,
+            "source": "returned_fmincon_tensions_reintegrated_from_current_measurement"
+          },
+          "failure_response_used": false,
+          "planned_first_input_n": [
+            8,
+            8,
+            8,
+            3.7594793237000816
+          ],
+          "actual_input_n": [
+            8.0,
+            8.0,
+            8.0,
+            3.7594793237000816
+          ],
+          "accepted_plan_matches_actual_input": true,
+          "prediction_diagnostic_available": true,
+          "prediction_shape_invalid": false,
+          "complete_update_available": false,
+          "solver_request_available": false
+        },
+        {
+          "update_id": 34,
+          "time_s": 0.34,
+          "source": {
+            "reference": {
+              "artifact_id": "ccd5e9a38dccc820da2f6534f7470aeb1888b91f66b5f51859f91cbb60b7fcab",
+              "media_type": "application/octet-stream"
+            },
+            "pointer": "/34"
+          },
+          "optimization_status": "converged",
+          "optimization_raw_status": "fmincon_exitflag_1",
+          "plan_accepted": true,
+          "plan_source": "fmincon_selected",
+          "recovery": {
+            "enabled": true,
+            "attempted": false,
+            "selected": false,
+            "error": [],
+            "wall_s": 0,
+            "source": "returned_fmincon_tensions_reintegrated_from_current_measurement"
+          },
+          "failure_response_used": false,
+          "planned_first_input_n": [
+            8,
+            8,
+            8,
+            7.324474480812997
+          ],
+          "actual_input_n": [
+            8.0,
+            8.0,
+            8.0,
+            8.0
+          ],
+          "accepted_plan_matches_actual_input": false,
+          "prediction_diagnostic_available": false,
+          "prediction_shape_invalid": true,
+          "complete_update_available": false,
+          "solver_request_available": false
+        }
+      ],
+      "full_observations_query": {
+        "reference": {
+          "artifact_id": "ccd5e9a38dccc820da2f6534f7470aeb1888b91f66b5f51859f91cbb60b7fcab",
+          "media_type": "application/octet-stream"
+        },
+        "view": "range",
+        "pointer": "",
+        "start": 0,
+        "count": 100
+      },
+      "scope": "Historical applied-input observations and original independent acceptance retained. Invalid prediction aggregates cannot diagnose model error. No fallback mechanism or counterfactual physical success inferred."
+    },
+    "executable_navigation_verified": true,
+    "raw_acceptance_unchanged": true
+  },
+  {
+    "reference": {
+      "artifact_id": "84a7e8e02722731c2fa021eda2f110e45415ee5dc4748bbbfe95b309dbf2e936",
+      "media_type": "application/json"
+    },
+    "original_acceptance": {
+      "accepted": false,
+      "components": {
+        "evaluation_validity": {
+          "limit": null,
+          "passed": true,
+          "reason": null,
+          "unit": null,
+          "value": "valid"
+        },
+        "evaluator:task_bound": {
+          "limit": 0.01,
+          "passed": true,
+          "reason": null,
+          "unit": "m",
+          "value": 0.006922747056846264
+        },
+        "execution_complete": {
+          "limit": null,
+          "passed": true,
+          "reason": null,
+          "unit": null,
+          "value": true
+        },
+        "force_bounds": {
+          "limit": 1e-08,
+          "passed": true,
+          "reason": null,
+          "unit": "N",
+          "value": 0.0
+        },
+        "holding_coverage": {
+          "limit": 6,
+          "passed": true,
+          "reason": null,
+          "unit": "inclusive uniform samples",
+          "value": true
+        },
+        "holding_position": {
+          "limit": 0.01,
+          "passed": true,
+          "reason": null,
+          "unit": "m",
+          "value": 0.009378065423466884
+        },
+        "holding_speed": {
+          "limit": 0.02,
+          "passed": false,
+          "reason": null,
+          "unit": "m/s",
+          "value": 0.3306080077772869
+        },
+        "solver_errors": {
+          "limit": 0,
+          "passed": true,
+          "reason": null,
+          "unit": "count",
+          "value": 0
+        },
+        "task_evaluator": {
+          "limit": null,
+          "passed": true,
+          "reason": null,
+          "unit": null,
+          "value": true
+        }
+      },
+      "continuous_time_guarantee": false,
+      "contract": "research.task_acceptance",
+      "evaluator_tension_channels": null,
+      "evidence_binding": {
+        "evaluation": {
+          "artifact_id": "afab9e508df766e06ebfbe976f114e543f97d51e03dbd3e1a5e8338817ec76d0",
+          "media_type": "application/json"
+        },
+        "evaluation_binding": {
+          "original_execution_id": "4355d613f8c44dc78125482fbdc8966a",
+          "source": {
+            "artifact_id": "026537f1aec7ef158c0370cc66f08324680ae7763280464790d281f25eb509df",
+            "media_type": "application/json"
+          },
+          "source_execution_id": "4355d613f8c44dc78125482fbdc8966a"
+        },
+        "profile": {
+          "artifact_id": "609edba40cc98a5e1f9c36f025de42250881abe980d02f6971fed3e341ac95d3",
+          "media_type": "application/json"
+        },
+        "profile_binding": {
+          "evaluation": {
+            "artifact_id": "afab9e508df766e06ebfbe976f114e543f97d51e03dbd3e1a5e8338817ec76d0",
+            "media_type": "application/json"
+          },
+          "execution_id": "4355d613f8c44dc78125482fbdc8966a",
+          "simulation": {
+            "artifact_id": "026537f1aec7ef158c0370cc66f08324680ae7763280464790d281f25eb509df",
+            "media_type": "application/json"
+          }
+        },
+        "simulation": {
+          "artifact_id": "026537f1aec7ef158c0370cc66f08324680ae7763280464790d281f25eb509df",
+          "media_type": "application/json"
+        }
+      },
+      "execution_id": "4355d613f8c44dc78125482fbdc8966a",
+      "issues": [],
+      "metrics": {
+        "holding_max_error_m": 0.009378065423466884,
+        "holding_max_speed_m_s": 0.3306080077772869,
+        "terminal_error_m": 0.006922747056846264
+      },
+      "missing": [],
+      "protocol_id": "offline_reach_hold_v1",
+      "sources": {
+        "evaluation": {
+          "artifact_id": "afab9e508df766e06ebfbe976f114e543f97d51e03dbd3e1a5e8338817ec76d0",
+          "media_type": "application/json"
+        },
+        "profile": {
+          "artifact_id": "609edba40cc98a5e1f9c36f025de42250881abe980d02f6971fed3e341ac95d3",
+          "media_type": "application/json"
+        }
+      },
+      "status": "valid_failure",
+      "task_family": "task.reach",
+      "task_identity": "bd9df2d930423f2b2a12152f076e2ae88b4d1a0af84d6126aa13b0b1fac9ec77",
+      "timing": {
+        "control_period_s": 0.01,
+        "deadline_misses": 35,
+        "duration_s": 0.35,
+        "mean_update_s": 50.71182800572632,
+        "real_time_demonstrated": false,
+        "real_time_required": false,
+        "sample_period_s": 0.01,
+        "simulation_wall_s": 1785.0629999998491,
+        "termination": [
+          "duration",
+          "numerical_failure"
+        ],
+        "timestep_s": 0.0005
+      },
+      "version": "1.0.0"
+    },
+    "diagnostic": {
+      "version": "recorded_control_diagnostics_v1",
+      "updates": 35,
+      "prediction_aggregate_available": false,
+      "invalid_prediction_updates": [
+        34
+      ],
+      "accepted_plan_input_mismatch_updates": [
+        34
+      ],
+      "relevant_updates": [
+        {
+          "update_id": 29,
+          "time_s": 0.29,
+          "source": {
+            "reference": {
+              "artifact_id": "e8ca76af56973ea0e30c03dfbe4d351823fcb66faf00f6ce7f9e9d195c874e8a",
+              "media_type": "application/octet-stream"
+            },
+            "pointer": "/29"
+          },
+          "optimization_status": "converged",
+          "optimization_raw_status": "fmincon_exitflag_1",
+          "plan_accepted": true,
+          "plan_source": "fmincon_selected",
+          "recovery": {
+            "enabled": true,
+            "attempted": false,
+            "selected": false,
+            "error": [],
+            "wall_s": 0,
+            "source": "returned_fmincon_tensions_reintegrated_from_current_measurement"
+          },
+          "failure_response_used": false,
+          "planned_first_input_n": [
+            0,
+            2.434655785212019,
+            1.0347620753073352,
+            0.5518100920031067
+          ],
+          "actual_input_n": [
+            -0.0,
+            2.434655785212019,
+            1.0347620753073352,
+            0.5518100920031067
+          ],
+          "accepted_plan_matches_actual_input": true,
+          "prediction_diagnostic_available": true,
+          "prediction_shape_invalid": false,
+          "complete_update_available": false,
+          "solver_request_available": false
+        },
+        {
+          "update_id": 30,
+          "time_s": 0.3,
+          "source": {
+            "reference": {
+              "artifact_id": "e8ca76af56973ea0e30c03dfbe4d351823fcb66faf00f6ce7f9e9d195c874e8a",
+              "media_type": "application/octet-stream"
+            },
+            "pointer": "/30"
+          },
+          "optimization_status": "converged",
+          "optimization_raw_status": "fmincon_exitflag_1",
+          "plan_accepted": true,
+          "plan_source": "fmincon_selected",
+          "recovery": {
+            "enabled": true,
+            "attempted": false,
+            "selected": false,
+            "error": [],
+            "wall_s": 0,
+            "source": "returned_fmincon_tensions_reintegrated_from_current_measurement"
+          },
+          "failure_response_used": false,
+          "planned_first_input_n": [
+            2.6696541758115364e-22,
+            2.2910506168619156,
+            1.0527889173225924,
+            0.305805895954647
+          ],
+          "actual_input_n": [
+            2.6696541758115364e-22,
+            2.2910506168619156,
+            1.0527889173225924,
+            0.305805895954647
+          ],
+          "accepted_plan_matches_actual_input": true,
+          "prediction_diagnostic_available": true,
+          "prediction_shape_invalid": false,
+          "complete_update_available": false,
+          "solver_request_available": false
+        },
+        {
+          "update_id": 31,
+          "time_s": 0.31,
+          "source": {
+            "reference": {
+              "artifact_id": "e8ca76af56973ea0e30c03dfbe4d351823fcb66faf00f6ce7f9e9d195c874e8a",
+              "media_type": "application/octet-stream"
+            },
+            "pointer": "/31"
+          },
+          "optimization_status": "converged",
+          "optimization_raw_status": "fmincon_exitflag_1",
+          "plan_accepted": true,
+          "plan_source": "fmincon_selected",
+          "recovery": {
+            "enabled": true,
+            "attempted": false,
+            "selected": false,
+            "error": [],
+            "wall_s": 0,
+            "source": "returned_fmincon_tensions_reintegrated_from_current_measurement"
+          },
+          "failure_response_used": false,
+          "planned_first_input_n": [
+            0,
+            2.200460877597109,
+            1.0606473494941062,
+            0.16250195026938705
+          ],
+          "actual_input_n": [
+            -0.0,
+            2.200460877597109,
+            1.0606473494941062,
+            0.16250195026938705
+          ],
+          "accepted_plan_matches_actual_input": true,
+          "prediction_diagnostic_available": true,
+          "prediction_shape_invalid": false,
+          "complete_update_available": false,
+          "solver_request_available": false
+        },
+        {
+          "update_id": 32,
+          "time_s": 0.32,
+          "source": {
+            "reference": {
+              "artifact_id": "e8ca76af56973ea0e30c03dfbe4d351823fcb66faf00f6ce7f9e9d195c874e8a",
+              "media_type": "application/octet-stream"
+            },
+            "pointer": "/32"
+          },
+          "optimization_status": "converged",
+          "optimization_raw_status": "fmincon_exitflag_1",
+          "plan_accepted": true,
+          "plan_source": "fmincon_selected",
+          "recovery": {
+            "enabled": true,
+            "attempted": false,
+            "selected": false,
+            "error": [],
+            "wall_s": 0,
+            "source": "returned_fmincon_tensions_reintegrated_from_current_measurement"
+          },
+          "failure_response_used": false,
+          "planned_first_input_n": [
+            0.08004377000008278,
+            2.1287789234819323,
+            1.1213627391714471,
+            0.1529230800805121
+          ],
+          "actual_input_n": [
+            0.08004377000008278,
+            2.1287789234819323,
+            1.1213627391714471,
+            0.1529230800805121
+          ],
+          "accepted_plan_matches_actual_input": true,
+          "prediction_diagnostic_available": true,
+          "prediction_shape_invalid": false,
+          "complete_update_available": false,
+          "solver_request_available": false
+        },
+        {
+          "update_id": 33,
+          "time_s": 0.33,
+          "source": {
+            "reference": {
+              "artifact_id": "e8ca76af56973ea0e30c03dfbe4d351823fcb66faf00f6ce7f9e9d195c874e8a",
+              "media_type": "application/octet-stream"
+            },
+            "pointer": "/33"
+          },
+          "optimization_status": "converged",
+          "optimization_raw_status": "fmincon_exitflag_1",
+          "plan_accepted": true,
+          "plan_source": "fmincon_selected",
+          "recovery": {
+            "enabled": true,
+            "attempted": false,
+            "selected": false,
+            "error": [],
+            "wall_s": 0,
+            "source": "returned_fmincon_tensions_reintegrated_from_current_measurement"
+          },
+          "failure_response_used": false,
+          "planned_first_input_n": [
+            0.4615973191580085,
+            1.7935281988670284,
+            1.4401515398074392,
+            0.11400182023882005
+          ],
+          "actual_input_n": [
+            0.4615973191580085,
+            1.7935281988670284,
+            1.4401515398074392,
+            0.11400182023882005
+          ],
+          "accepted_plan_matches_actual_input": true,
+          "prediction_diagnostic_available": true,
+          "prediction_shape_invalid": false,
+          "complete_update_available": false,
+          "solver_request_available": false
+        },
+        {
+          "update_id": 34,
+          "time_s": 0.34,
+          "source": {
+            "reference": {
+              "artifact_id": "e8ca76af56973ea0e30c03dfbe4d351823fcb66faf00f6ce7f9e9d195c874e8a",
+              "media_type": "application/octet-stream"
+            },
+            "pointer": "/34"
+          },
+          "optimization_status": "converged",
+          "optimization_raw_status": "fmincon_exitflag_2",
+          "plan_accepted": true,
+          "plan_source": "fmincon_selected",
+          "recovery": {
+            "enabled": true,
+            "attempted": false,
+            "selected": false,
+            "error": [],
+            "wall_s": 0,
+            "source": "returned_fmincon_tensions_reintegrated_from_current_measurement"
+          },
+          "failure_response_used": false,
+          "planned_first_input_n": [
+            1.1087046603754003,
+            1.8737783479746355,
+            2.125238837024435,
+            4.790021165031591e-29
+          ],
+          "actual_input_n": [
+            1.1087046603754003,
+            1.1087046603754003,
+            1.1087046603754003,
+            1.1087046603754003
+          ],
+          "accepted_plan_matches_actual_input": false,
+          "prediction_diagnostic_available": false,
+          "prediction_shape_invalid": true,
+          "complete_update_available": false,
+          "solver_request_available": false
+        }
+      ],
+      "full_observations_query": {
+        "reference": {
+          "artifact_id": "e8ca76af56973ea0e30c03dfbe4d351823fcb66faf00f6ce7f9e9d195c874e8a",
+          "media_type": "application/octet-stream"
+        },
+        "view": "range",
+        "pointer": "",
+        "start": 0,
+        "count": 100
+      },
+      "scope": "Historical applied-input observations and original independent acceptance retained. Invalid prediction aggregates cannot diagnose model error. No fallback mechanism or counterfactual physical success inferred."
+    },
+    "executable_navigation_verified": true,
+    "raw_acceptance_unchanged": true
+  },
+  {
+    "reference": {
+      "artifact_id": "6bc60a0fef4c1854cea2af840e2e3271ba0cb2e689c1ce31386c6dc90606360a",
+      "media_type": "application/json"
+    },
+    "original_acceptance": {
+      "accepted": false,
+      "components": {
+        "evaluation_validity": {
+          "limit": null,
+          "passed": true,
+          "reason": null,
+          "unit": null,
+          "value": "valid"
+        },
+        "evaluator:task_bound": {
+          "limit": 0.01,
+          "passed": true,
+          "reason": null,
+          "unit": "m",
+          "value": 0.007784109656280053
+        },
+        "execution_complete": {
+          "limit": null,
+          "passed": true,
+          "reason": null,
+          "unit": null,
+          "value": true
+        },
+        "force_bounds": {
+          "limit": 1e-08,
+          "passed": true,
+          "reason": null,
+          "unit": "N",
+          "value": 0.0
+        },
+        "holding_coverage": {
+          "limit": 6,
+          "passed": true,
+          "reason": null,
+          "unit": "inclusive uniform samples",
+          "value": true
+        },
+        "holding_position": {
+          "limit": 0.01,
+          "passed": true,
+          "reason": null,
+          "unit": "m",
+          "value": 0.009572623134153238
+        },
+        "holding_speed": {
+          "limit": 0.02,
+          "passed": false,
+          "reason": null,
+          "unit": "m/s",
+          "value": 0.3081132665624312
+        },
+        "solver_errors": {
+          "limit": 0,
+          "passed": true,
+          "reason": null,
+          "unit": "count",
+          "value": 0
+        },
+        "task_evaluator": {
+          "limit": null,
+          "passed": true,
+          "reason": null,
+          "unit": null,
+          "value": true
+        }
+      },
+      "continuous_time_guarantee": false,
+      "contract": "research.task_acceptance",
+      "evaluator_tension_channels": null,
+      "evidence_binding": {
+        "evaluation": {
+          "artifact_id": "3c2dab4249ac5631b5ffc81468650486712fa6e8bb55d107557ec41004e53621",
+          "media_type": "application/json"
+        },
+        "evaluation_binding": {
+          "original_execution_id": "576e51ae2ac9430d971e2926cbdb60f3",
+          "source": {
+            "artifact_id": "d11be3542b678cec84fdc393f02139836c5a8a81f858cbe4cdffe534f9905942",
+            "media_type": "application/json"
+          },
+          "source_execution_id": "576e51ae2ac9430d971e2926cbdb60f3"
+        },
+        "profile": {
+          "artifact_id": "2a704a3c2d9de22fcd2e3f3bcb60295b2c2de7e7b64eac5e4c873b009e008d58",
+          "media_type": "application/json"
+        },
+        "profile_binding": {
+          "evaluation": {
+            "artifact_id": "3c2dab4249ac5631b5ffc81468650486712fa6e8bb55d107557ec41004e53621",
+            "media_type": "application/json"
+          },
+          "execution_id": "576e51ae2ac9430d971e2926cbdb60f3",
+          "simulation": {
+            "artifact_id": "d11be3542b678cec84fdc393f02139836c5a8a81f858cbe4cdffe534f9905942",
+            "media_type": "application/json"
+          }
+        },
+        "simulation": {
+          "artifact_id": "d11be3542b678cec84fdc393f02139836c5a8a81f858cbe4cdffe534f9905942",
+          "media_type": "application/json"
+        }
+      },
+      "execution_id": "576e51ae2ac9430d971e2926cbdb60f3",
+      "issues": [],
+      "metrics": {
+        "holding_max_error_m": 0.009572623134153238,
+        "holding_max_speed_m_s": 0.3081132665624312,
+        "terminal_error_m": 0.007784109656280053
+      },
+      "missing": [],
+      "protocol_id": "offline_reach_hold_v1",
+      "sources": {
+        "evaluation": {
+          "artifact_id": "3c2dab4249ac5631b5ffc81468650486712fa6e8bb55d107557ec41004e53621",
+          "media_type": "application/json"
+        },
+        "profile": {
+          "artifact_id": "2a704a3c2d9de22fcd2e3f3bcb60295b2c2de7e7b64eac5e4c873b009e008d58",
+          "media_type": "application/json"
+        }
+      },
+      "status": "valid_failure",
+      "task_family": "task.reach",
+      "task_identity": "bd9df2d930423f2b2a12152f076e2ae88b4d1a0af84d6126aa13b0b1fac9ec77",
+      "timing": {
+        "control_period_s": 0.01,
+        "deadline_misses": 35,
+        "duration_s": 0.35,
+        "mean_update_s": 56.40563807427617,
+        "real_time_demonstrated": false,
+        "real_time_required": false,
+        "sample_period_s": 0.01,
+        "simulation_wall_s": 1984.78199999989,
+        "termination": [
+          "duration",
+          "numerical_failure"
+        ],
+        "timestep_s": 0.0005
+      },
+      "version": "1.0.0"
+    },
+    "diagnostic": {
+      "version": "recorded_control_diagnostics_v1",
+      "updates": 35,
+      "prediction_aggregate_available": false,
+      "invalid_prediction_updates": [
+        34
+      ],
+      "accepted_plan_input_mismatch_updates": [
+        34
+      ],
+      "relevant_updates": [
+        {
+          "update_id": 29,
+          "time_s": 0.29,
+          "source": {
+            "reference": {
+              "artifact_id": "1601e74670abee6afe100c8fa9839a05af846f1451096546ec7ec253b23a5844",
+              "media_type": "application/octet-stream"
+            },
+            "pointer": "/29"
+          },
+          "optimization_status": "converged",
+          "optimization_raw_status": "fmincon_exitflag_1",
+          "plan_accepted": true,
+          "plan_source": "fmincon_selected",
+          "recovery": {
+            "enabled": true,
+            "attempted": false,
+            "selected": false,
+            "error": [],
+            "wall_s": 0,
+            "source": "returned_fmincon_tensions_reintegrated_from_current_measurement"
+          },
+          "failure_response_used": false,
+          "planned_first_input_n": [
+            0,
+            2.544848274097882,
+            1.0153197915640455,
+            0.7360608660325758
+          ],
+          "actual_input_n": [
+            -0.0,
+            2.544848274097882,
+            1.0153197915640455,
+            0.7360608660325758
+          ],
+          "accepted_plan_matches_actual_input": true,
+          "prediction_diagnostic_available": true,
+          "prediction_shape_invalid": false,
+          "complete_update_available": false,
+          "solver_request_available": false
+        },
+        {
+          "update_id": 30,
+          "time_s": 0.3,
+          "source": {
+            "reference": {
+              "artifact_id": "1601e74670abee6afe100c8fa9839a05af846f1451096546ec7ec253b23a5844",
+              "media_type": "application/octet-stream"
+            },
+            "pointer": "/30"
+          },
+          "optimization_status": "converged",
+          "optimization_raw_status": "fmincon_exitflag_1",
+          "plan_accepted": true,
+          "plan_source": "fmincon_selected",
+          "recovery": {
+            "enabled": true,
+            "attempted": false,
+            "selected": false,
+            "error": [],
+            "wall_s": 0,
+            "source": "returned_fmincon_tensions_reintegrated_from_current_measurement"
+          },
+          "failure_response_used": false,
+          "planned_first_input_n": [
+            0,
+            2.4237645954203404,
+            1.0363448469304282,
+            0.5121990968172614
+          ],
+          "actual_input_n": [
+            -0.0,
+            2.4237645954203404,
+            1.0363448469304282,
+            0.5121990968172614
+          ],
+          "accepted_plan_matches_actual_input": true,
+          "prediction_diagnostic_available": true,
+          "prediction_shape_invalid": false,
+          "complete_update_available": false,
+          "solver_request_available": false
+        },
+        {
+          "update_id": 31,
+          "time_s": 0.31,
+          "source": {
+            "reference": {
+              "artifact_id": "1601e74670abee6afe100c8fa9839a05af846f1451096546ec7ec253b23a5844",
+              "media_type": "application/octet-stream"
+            },
+            "pointer": "/31"
+          },
+          "optimization_status": "converged",
+          "optimization_raw_status": "fmincon_exitflag_1",
+          "plan_accepted": true,
+          "plan_source": "fmincon_selected",
+          "recovery": {
+            "enabled": true,
+            "attempted": false,
+            "selected": false,
+            "error": [],
+            "wall_s": 0,
+            "source": "returned_fmincon_tensions_reintegrated_from_current_measurement"
+          },
+          "failure_response_used": false,
+          "planned_first_input_n": [
+            7.835967353161731e-23,
+            2.3674393645216956,
+            1.0476203746517225,
+            0.40641830772523324
+          ],
+          "actual_input_n": [
+            7.835967353161731e-23,
+            2.3674393645216956,
+            1.0476203746517225,
+            0.40641830772523324
+          ],
+          "accepted_plan_matches_actual_input": true,
+          "prediction_diagnostic_available": true,
+          "prediction_shape_invalid": false,
+          "complete_update_available": false,
+          "solver_request_available": false
+        },
+        {
+          "update_id": 32,
+          "time_s": 0.32,
+          "source": {
+            "reference": {
+              "artifact_id": "1601e74670abee6afe100c8fa9839a05af846f1451096546ec7ec253b23a5844",
+              "media_type": "application/octet-stream"
+            },
+            "pointer": "/32"
+          },
+          "optimization_status": "converged",
+          "optimization_raw_status": "fmincon_exitflag_1",
+          "plan_accepted": true,
+          "plan_source": "fmincon_selected",
+          "recovery": {
+            "enabled": true,
+            "attempted": false,
+            "selected": false,
+            "error": [],
+            "wall_s": 0,
+            "source": "returned_fmincon_tensions_reintegrated_from_current_measurement"
+          },
+          "failure_response_used": false,
+          "planned_first_input_n": [
+            0,
+            2.346182466399601,
+            1.0513267353151483,
+            0.3747995091676928
+          ],
+          "actual_input_n": [
+            -0.0,
+            2.346182466399601,
+            1.0513267353151483,
+            0.3747995091676928
+          ],
+          "accepted_plan_matches_actual_input": true,
+          "prediction_diagnostic_available": true,
+          "prediction_shape_invalid": false,
+          "complete_update_available": false,
+          "solver_request_available": false
+        },
+        {
+          "update_id": 33,
+          "time_s": 0.33,
+          "source": {
+            "reference": {
+              "artifact_id": "1601e74670abee6afe100c8fa9839a05af846f1451096546ec7ec253b23a5844",
+              "media_type": "application/octet-stream"
+            },
+            "pointer": "/33"
+          },
+          "optimization_status": "converged",
+          "optimization_raw_status": "fmincon_exitflag_1",
+          "plan_accepted": true,
+          "plan_source": "fmincon_selected",
+          "recovery": {
+            "enabled": true,
+            "attempted": false,
+            "selected": false,
+            "error": [],
+            "wall_s": 0,
+            "source": "returned_fmincon_tensions_reintegrated_from_current_measurement"
+          },
+          "failure_response_used": false,
+          "planned_first_input_n": [
+            0.2168324232800576,
+            2.0283163639285697,
+            1.2795169237237425,
+            0.036079483902186564
+          ],
+          "actual_input_n": [
+            0.2168324232800576,
+            2.0283163639285697,
+            1.2795169237237425,
+            0.036079483902186564
+          ],
+          "accepted_plan_matches_actual_input": true,
+          "prediction_diagnostic_available": true,
+          "prediction_shape_invalid": false,
+          "complete_update_available": false,
+          "solver_request_available": false
+        },
+        {
+          "update_id": 34,
+          "time_s": 0.34,
+          "source": {
+            "reference": {
+              "artifact_id": "1601e74670abee6afe100c8fa9839a05af846f1451096546ec7ec253b23a5844",
+              "media_type": "application/octet-stream"
+            },
+            "pointer": "/34"
+          },
+          "optimization_status": "converged",
+          "optimization_raw_status": "fmincon_exitflag_1",
+          "plan_accepted": true,
+          "plan_source": "fmincon_selected",
+          "recovery": {
+            "enabled": true,
+            "attempted": false,
+            "selected": false,
+            "error": [],
+            "wall_s": 0,
+            "source": "returned_fmincon_tensions_reintegrated_from_current_measurement"
+          },
+          "failure_response_used": false,
+          "planned_first_input_n": [
+            1.0970366223688486,
+            1.764623951162243,
+            2.0881687004061704,
+            0
+          ],
+          "actual_input_n": [
+            1.0970366223688486,
+            1.0970366223688486,
+            1.0970366223688486,
+            1.0970366223688486
+          ],
+          "accepted_plan_matches_actual_input": false,
+          "prediction_diagnostic_available": false,
+          "prediction_shape_invalid": true,
+          "complete_update_available": false,
+          "solver_request_available": false
+        }
+      ],
+      "full_observations_query": {
+        "reference": {
+          "artifact_id": "1601e74670abee6afe100c8fa9839a05af846f1451096546ec7ec253b23a5844",
+          "media_type": "application/octet-stream"
+        },
+        "view": "range",
+        "pointer": "",
+        "start": 0,
+        "count": 100
+      },
+      "scope": "Historical applied-input observations and original independent acceptance retained. Invalid prediction aggregates cannot diagnose model error. No fallback mechanism or counterfactual physical success inferred."
+    },
+    "executable_navigation_verified": true,
+    "raw_acceptance_unchanged": true
+  },
+  {
+    "reference": {
+      "artifact_id": "5a541c9c18f9d47131d90b563612ff1c46641e809c07e76d47a5130cba3fee7c",
+      "media_type": "application/json"
+    },
+    "original_acceptance": {
+      "accepted": false,
+      "components": {
+        "evaluation_validity": {
+          "limit": null,
+          "passed": true,
+          "reason": null,
+          "unit": null,
+          "value": "valid"
+        },
+        "evaluator:task_bound": {
+          "limit": 0.01,
+          "passed": false,
+          "reason": null,
+          "unit": "m",
+          "value": 0.03784422847935708
+        },
+        "execution_complete": {
+          "limit": null,
+          "passed": true,
+          "reason": null,
+          "unit": null,
+          "value": true
+        },
+        "force_bounds": {
+          "limit": 1e-08,
+          "passed": true,
+          "reason": null,
+          "unit": "N",
+          "value": 0.0
+        },
+        "holding_coverage": {
+          "limit": 6,
+          "passed": true,
+          "reason": null,
+          "unit": "inclusive uniform samples",
+          "value": true
+        },
+        "holding_position": {
+          "limit": 0.01,
+          "passed": false,
+          "reason": null,
+          "unit": "m",
+          "value": 0.038524862749504146
+        },
+        "holding_speed": {
+          "limit": 0.02,
+          "passed": false,
+          "reason": null,
+          "unit": "m/s",
+          "value": 0.12491759451822294
+        },
+        "solver_errors": {
+          "limit": 0,
+          "passed": true,
+          "reason": null,
+          "unit": "count",
+          "value": 0
+        },
+        "task_evaluator": {
+          "limit": null,
+          "passed": false,
+          "reason": null,
+          "unit": null,
+          "value": false
+        }
+      },
+      "continuous_time_guarantee": false,
+      "contract": "research.task_acceptance",
+      "evaluator_tension_channels": null,
+      "evidence_binding": {
+        "evaluation": {
+          "artifact_id": "fd09c099f045a6c4c3e3f0078c0135b01648cd81568234345fc0e2ff0e6afe85",
+          "media_type": "application/json"
+        },
+        "evaluation_binding": {
+          "original_execution_id": "92dfecf9717e443e931718fe27dbfe31",
+          "source": {
+            "artifact_id": "4825e38477814055262f3f0fdfcb24c4738533a2318299ea9ece2398e9a834cc",
+            "media_type": "application/json"
+          },
+          "source_execution_id": "92dfecf9717e443e931718fe27dbfe31"
+        },
+        "profile": {
+          "artifact_id": "2fe0bf3a0d384d9bcb66d0e79b956d8ae7d1c531f1919cc11fc2e1c99995bfc2",
+          "media_type": "application/json"
+        },
+        "profile_binding": {
+          "evaluation": {
+            "artifact_id": "fd09c099f045a6c4c3e3f0078c0135b01648cd81568234345fc0e2ff0e6afe85",
+            "media_type": "application/json"
+          },
+          "execution_id": "92dfecf9717e443e931718fe27dbfe31",
+          "simulation": {
+            "artifact_id": "4825e38477814055262f3f0fdfcb24c4738533a2318299ea9ece2398e9a834cc",
+            "media_type": "application/json"
+          }
+        },
+        "simulation": {
+          "artifact_id": "4825e38477814055262f3f0fdfcb24c4738533a2318299ea9ece2398e9a834cc",
+          "media_type": "application/json"
+        }
+      },
+      "execution_id": "92dfecf9717e443e931718fe27dbfe31",
+      "issues": [],
+      "metrics": {
+        "holding_max_error_m": 0.038524862749504146,
+        "holding_max_speed_m_s": 0.12491759451822294,
+        "terminal_error_m": 0.03784422847935708
+      },
+      "missing": [],
+      "protocol_id": "offline_reach_hold_v1",
+      "sources": {
+        "evaluation": {
+          "artifact_id": "fd09c099f045a6c4c3e3f0078c0135b01648cd81568234345fc0e2ff0e6afe85",
+          "media_type": "application/json"
+        },
+        "profile": {
+          "artifact_id": "2fe0bf3a0d384d9bcb66d0e79b956d8ae7d1c531f1919cc11fc2e1c99995bfc2",
+          "media_type": "application/json"
+        }
+      },
+      "status": "valid_failure",
+      "task_family": "task.reach",
+      "task_identity": "bd9df2d930423f2b2a12152f076e2ae88b4d1a0af84d6126aa13b0b1fac9ec77",
+      "timing": {
+        "control_period_s": 0.01,
+        "deadline_misses": 35,
+        "duration_s": 0.35,
+        "mean_update_s": 16.579595782847278,
+        "real_time_demonstrated": false,
+        "real_time_required": false,
+        "sample_period_s": 0.01,
+        "simulation_wall_s": 590.469000000041,
+        "termination": [
+          "duration",
+          "numerical_failure"
+        ],
+        "timestep_s": 0.0005
+      },
+      "version": "1.0.0"
+    },
+    "diagnostic": {
+      "version": "recorded_control_diagnostics_v1",
+      "updates": 35,
+      "prediction_aggregate_available": false,
+      "invalid_prediction_updates": [
+        34
+      ],
+      "accepted_plan_input_mismatch_updates": [
+        34
+      ],
+      "relevant_updates": [
+        {
+          "update_id": 29,
+          "time_s": 0.29,
+          "source": {
+            "reference": {
+              "artifact_id": "e8145a660bb4de9edc3d6f17f5d332e3e66bdceb114a4c31f3157898e34e5ac8",
+              "media_type": "application/octet-stream"
+            },
+            "pointer": "/29"
+          },
+          "optimization_status": "converged",
+          "optimization_raw_status": "fmincon_exitflag_1",
+          "plan_accepted": true,
+          "plan_source": "fmincon_selected",
+          "recovery": {
+            "enabled": true,
+            "attempted": false,
+            "selected": false,
+            "error": [],
+            "wall_s": 0,
+            "source": "returned_fmincon_tensions_reintegrated_from_current_measurement"
+          },
+          "failure_response_used": false,
+          "planned_first_input_n": [
+            7.746672253133212,
+            8,
+            8,
+            5.640078558868161
+          ],
+          "actual_input_n": [
+            7.746672253133212,
+            8.0,
+            8.0,
+            5.640078558868161
+          ],
+          "accepted_plan_matches_actual_input": true,
+          "prediction_diagnostic_available": true,
+          "prediction_shape_invalid": false,
+          "complete_update_available": false,
+          "solver_request_available": false
+        },
+        {
+          "update_id": 30,
+          "time_s": 0.3,
+          "source": {
+            "reference": {
+              "artifact_id": "e8145a660bb4de9edc3d6f17f5d332e3e66bdceb114a4c31f3157898e34e5ac8",
+              "media_type": "application/octet-stream"
+            },
+            "pointer": "/30"
+          },
+          "optimization_status": "converged",
+          "optimization_raw_status": "fmincon_exitflag_1",
+          "plan_accepted": true,
+          "plan_source": "fmincon_selected",
+          "recovery": {
+            "enabled": true,
+            "attempted": false,
+            "selected": false,
+            "error": [],
+            "wall_s": 0,
+            "source": "returned_fmincon_tensions_reintegrated_from_current_measurement"
+          },
+          "failure_response_used": false,
+          "planned_first_input_n": [
+            7.74977496901388,
+            8,
+            8,
+            5.652312419905929
+          ],
+          "actual_input_n": [
+            7.74977496901388,
+            8.0,
+            8.0,
+            5.652312419905929
+          ],
+          "accepted_plan_matches_actual_input": true,
+          "prediction_diagnostic_available": true,
+          "prediction_shape_invalid": false,
+          "complete_update_available": false,
+          "solver_request_available": false
+        },
+        {
+          "update_id": 31,
+          "time_s": 0.31,
+          "source": {
+            "reference": {
+              "artifact_id": "e8145a660bb4de9edc3d6f17f5d332e3e66bdceb114a4c31f3157898e34e5ac8",
+              "media_type": "application/octet-stream"
+            },
+            "pointer": "/31"
+          },
+          "optimization_status": "converged",
+          "optimization_raw_status": "fmincon_exitflag_1",
+          "plan_accepted": true,
+          "plan_source": "fmincon_selected",
+          "recovery": {
+            "enabled": true,
+            "attempted": false,
+            "selected": false,
+            "error": [],
+            "wall_s": 0,
+            "source": "returned_fmincon_tensions_reintegrated_from_current_measurement"
+          },
+          "failure_response_used": false,
+          "planned_first_input_n": [
+            7.746646557903933,
+            8,
+            8,
+            5.650050017517522
+          ],
+          "actual_input_n": [
+            7.746646557903933,
+            8.0,
+            8.0,
+            5.650050017517522
+          ],
+          "accepted_plan_matches_actual_input": true,
+          "prediction_diagnostic_available": true,
+          "prediction_shape_invalid": false,
+          "complete_update_available": false,
+          "solver_request_available": false
+        },
+        {
+          "update_id": 32,
+          "time_s": 0.32,
+          "source": {
+            "reference": {
+              "artifact_id": "e8145a660bb4de9edc3d6f17f5d332e3e66bdceb114a4c31f3157898e34e5ac8",
+              "media_type": "application/octet-stream"
+            },
+            "pointer": "/32"
+          },
+          "optimization_status": "converged",
+          "optimization_raw_status": "fmincon_exitflag_1",
+          "plan_accepted": true,
+          "plan_source": "fmincon_selected",
+          "recovery": {
+            "enabled": true,
+            "attempted": false,
+            "selected": false,
+            "error": [],
+            "wall_s": 0,
+            "source": "returned_fmincon_tensions_reintegrated_from_current_measurement"
+          },
+          "failure_response_used": false,
+          "planned_first_input_n": [
+            7.699939893867843,
+            8,
+            8,
+            5.549577144308965
+          ],
+          "actual_input_n": [
+            7.699939893867843,
+            8.0,
+            8.0,
+            5.549577144308965
+          ],
+          "accepted_plan_matches_actual_input": true,
+          "prediction_diagnostic_available": true,
+          "prediction_shape_invalid": false,
+          "complete_update_available": false,
+          "solver_request_available": false
+        },
+        {
+          "update_id": 33,
+          "time_s": 0.33,
+          "source": {
+            "reference": {
+              "artifact_id": "e8145a660bb4de9edc3d6f17f5d332e3e66bdceb114a4c31f3157898e34e5ac8",
+              "media_type": "application/octet-stream"
+            },
+            "pointer": "/33"
+          },
+          "optimization_status": "converged",
+          "optimization_raw_status": "fmincon_exitflag_1",
+          "plan_accepted": true,
+          "plan_source": "fmincon_selected",
+          "recovery": {
+            "enabled": true,
+            "attempted": false,
+            "selected": false,
+            "error": [],
+            "wall_s": 0,
+            "source": "returned_fmincon_tensions_reintegrated_from_current_measurement"
+          },
+          "failure_response_used": false,
+          "planned_first_input_n": [
+            7.334952587963106,
+            8,
+            8,
+            4.762023578933061
+          ],
+          "actual_input_n": [
+            7.334952587963106,
+            8.0,
+            8.0,
+            4.762023578933061
+          ],
+          "accepted_plan_matches_actual_input": true,
+          "prediction_diagnostic_available": true,
+          "prediction_shape_invalid": false,
+          "complete_update_available": false,
+          "solver_request_available": false
+        },
+        {
+          "update_id": 34,
+          "time_s": 0.34,
+          "source": {
+            "reference": {
+              "artifact_id": "e8145a660bb4de9edc3d6f17f5d332e3e66bdceb114a4c31f3157898e34e5ac8",
+              "media_type": "application/octet-stream"
+            },
+            "pointer": "/34"
+          },
+          "optimization_status": "converged",
+          "optimization_raw_status": "fmincon_exitflag_2",
+          "plan_accepted": true,
+          "plan_source": "fmincon_selected",
+          "recovery": {
+            "enabled": true,
+            "attempted": false,
+            "selected": false,
+            "error": [],
+            "wall_s": 0,
+            "source": "returned_fmincon_tensions_reintegrated_from_current_measurement"
+          },
+          "failure_response_used": false,
+          "planned_first_input_n": [
+            1.882030402559167e-31,
+            2.384926413280579,
+            0.5816273336857573,
+            5.770228700848913e-31
+          ],
+          "actual_input_n": [
+            1.882030402559167e-31,
+            1.882030402559167e-31,
+            1.882030402559167e-31,
+            1.882030402559167e-31
+          ],
+          "accepted_plan_matches_actual_input": false,
+          "prediction_diagnostic_available": false,
+          "prediction_shape_invalid": true,
+          "complete_update_available": false,
+          "solver_request_available": false
+        }
+      ],
+      "full_observations_query": {
+        "reference": {
+          "artifact_id": "e8145a660bb4de9edc3d6f17f5d332e3e66bdceb114a4c31f3157898e34e5ac8",
+          "media_type": "application/octet-stream"
+        },
+        "view": "range",
+        "pointer": "",
+        "start": 0,
+        "count": 100
+      },
+      "scope": "Historical applied-input observations and original independent acceptance retained. Invalid prediction aggregates cannot diagnose model error. No fallback mechanism or counterfactual physical success inferred."
+    },
+    "executable_navigation_verified": true,
+    "raw_acceptance_unchanged": true
+  }
+]

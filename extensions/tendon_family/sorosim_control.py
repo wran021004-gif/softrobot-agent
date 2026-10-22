@@ -12,6 +12,22 @@ class SorosimReachControl(ReachControl):
     solver: SorosimSolver = Field(default_factory=SorosimSolver)
 
 
+def normalize_nmpc_rows(solved,*,state_size,input_size,substeps):
+    """Restore only MATLAB JSON's singleton axes before any action is selected."""
+    horizon=solved['horizon'];result=dict(solved);shapes={}
+    for key,rows,columns in (('states',horizon*substeps+1,state_size),('tensions',horizon,input_size),
+            ('tip_positions',horizon*substeps,3),('tip_velocities',horizon*substeps,3)):
+        value=np.asarray(solved[key],dtype=float);shapes[key]=list(value.shape)
+        singleton=(rows==1 and value.shape==(columns,)) or (columns==1 and value.shape==(rows,)) or (rows==columns==1 and value.ndim==0)
+        if singleton:value=value.reshape(rows,columns)
+        if value.shape!=(rows,columns) or not np.isfinite(value).all():
+            raise ValueError(f'SOROSIM_OUTPUT_SHAPE_INVALID: {key}; expected={[rows,columns]}; actual={shapes[key]}')
+        result[key]=value.tolist()
+    result['serialization']=dict(version='matlab_nmpc_rows_v1',raw_shapes=shapes,
+        state_size=state_size,input_size=input_size,substeps=substeps)
+    return result
+
+
 def checked_control(inp):
     from .generated_serial import checked_reach
     control = checked_reach(inp)
@@ -86,8 +102,10 @@ class SorosimNMPCController:
     def command(self, t, geometry, q, v):
         from .control import execute_ideal_tension
         started=time.perf_counter();state=np.r_[q,v];solved=None;error=None
+        solver_request=self.request(t,state)
         try:
-            solved=self.session.evaluate('nmpc',self.request(t,state))
+            solved=self.session.evaluate('nmpc',solver_request)
+            solved=normalize_nmpc_rows(solved,state_size=len(state),input_size=len(self.limits),substeps=self.parameters.substeps)
             success=solved['accepted']
         except Exception as exc:
             success=False;error=str(exc)
@@ -117,6 +135,13 @@ class SorosimNMPCController:
             plan_validation_s=None if solved is None else solved['validation_s'],
             recovery_wall_s=None if solved is None else solved['recovery']['wall_s'],
             policy_stop_reason='iteration_convergence_policy_no_time_limit',
+            control_update_id=len(self.observations),
+            actual_solver_termination=dict(exitflag=flag,message=None if solved is None else solved.get('message'),
+                converged=flag is not None and flag>0,iteration_limit=flag==0),
+            applied_input_selection=dict(branch='accepted_selected_plan' if success else 'stop_after_unusable_updates' if self.stop_requested else 'hold_previous_input',
+                accepted=success,recovery_selected=None if solved is None else solved['recovery']['selected'],
+                planned_first_input_n=None if not success else solved['tensions'][0],
+                previous_input_n=previous.tolist(),actual_input_n=command.tolist()),
             gvs_projection_residual_max_rad_m=geometry['gvs_projection']['projection_residual_max_rad_m'])
         if success:
             node=self.parameters.substeps
@@ -141,6 +166,10 @@ class SorosimNMPCController:
             tip_position_m=geometry['tip'].tolist(),gvs_q=list(q),gvs_qdot=list(v),
             measured_initial_state=state.tolist(),graph_construction_s=self.construction['construction_s'],
             mathematical_facts=solved,verified_conclusions=[claim.model_dump(mode='json')],
+            solver_request_record=dict(version='sorosim_solver_request_v1',request=solver_request,
+                request_identity=digest(solver_request),controller_identity=self.plan['identity'],
+                coordinate_order=list(self.coordinate_order),tendon_order=self.plan['specification']['tendon_order'],
+                exact_solver_replay_supported=False),
             research_interpretations=[],matlab_call_timing=self.session.timings['calls'][-1],**self.last))
         elapsed=time.perf_counter()-started
         self.last.update(update_wall_s=elapsed,deadline_missed=elapsed>self.period_s)

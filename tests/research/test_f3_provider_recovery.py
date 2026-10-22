@@ -131,5 +131,18 @@ class ProviderLossRecoveryTests(unittest.TestCase):
                 approve_from_standing(self.h,grant({**scope,**changes}),self.request_id)
         self.assertEqual(self.h.store.lookup(self.h.run_id,self.request_id)['status'],'unknown')
 
+    def test_old_loss_receipt_requires_contiguous_retained_migration_chain(self):
+        apply(self.h,self.approval());original=state(self.h)['freeze']
+        repair=dict(previous_commit=original,commit='explicit-core-repair',old_results_and_costs_retained=True)
+        update(self.h,freeze='explicit-core-repair',core_repairs=[repair])
+        row=self.h.store.lookup(self.h.run_id,self.request_id)
+        self.assertEqual(loss_disposition(self.h,row)['remote_outcome'],'unknown')
+        ledger=self.h.store.remaining()
+        for changed in (dict(commit='unrelated'),dict(old_results_and_costs_retained=False)):
+            update(self.h,core_repairs=[{**repair,**changed}])
+            with self.assertRaisesRegex(ValueError,'INVALID_AUTHORIZED_LOSS_RECEIPT'):
+                loss_disposition(self.h,row)
+            self.assertEqual(self.h.store.remaining(),ledger)
+
 
 if __name__=='__main__':unittest.main()

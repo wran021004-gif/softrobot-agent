@@ -102,6 +102,12 @@ def summarize(task, result, evaluation, rows, observations, motion, limits, sett
     comparisons, missing = aligned_predictions(rows, observations, motion)
     summary['one_step_prediction_comparisons'] = comparisons
     summary['one_step_prediction_summary'] = dict(aligned_count=len(comparisons), missing=missing, maximum_tip_difference_m=max((r['tip_difference_m'] for r in comparisons), default=None), mean_tip_difference_m=float(np.mean([r['tip_difference_m'] for r in comparisons])) if comparisons else None, velocity_matched_count=sum((r.get('velocity_difference_m_s') is not None for r in comparisons)), velocity_missing=[dict(time_s=r['start_s'], reason=r['velocity_missing_reason']) for r in comparisons if r.get('velocity_missing_reason')], maximum_velocity_vector_difference_m_s=max((r['velocity_difference_m_s'] for r in comparisons if r.get('velocity_difference_m_s') is not None), default=None), maximum_speed_magnitude_difference_m_s=max((r['speed_magnitude_difference_m_s'] for r in comparisons if r.get('speed_magnitude_difference_m_s') is not None), default=None), frame='world', scope='Only accepted first-step predictions matched to next execution timestamp; no future-plan replay comparison')
+    invalid=[r for r in missing if 'shape invalid' in r['reason']]
+    diagnostic=summary['one_step_prediction_summary'];diagnostic['available']=bool(comparisons) and not invalid
+    if invalid:
+        diagnostic['status']='unavailable_invalid_vector_shape'
+        diagnostic['valid_subset']={k:diagnostic[k] for k in ('maximum_tip_difference_m','maximum_velocity_vector_difference_m_s','maximum_speed_magnitude_difference_m_s')}
+        for key in ('maximum_tip_difference_m','mean_tip_difference_m','maximum_velocity_vector_difference_m_s','maximum_speed_magnitude_difference_m_s'):diagnostic[key]=None
     summary['drive_utilization'] = [dict(tendon_index=i, limit_n=limit, maximum_n=float(tensions[:, i].max()) if rows else None, minimum_n=float(tensions[:, i].min()) if rows else None, near_upper_fraction=float(np.mean(tensions[:, i] >= 0.99 * limit)) if rows else None, near_zero_fraction=float(np.mean(tensions[:, i] <= 1e-06)) if rows else None) for i, limit in enumerate(limits)]
     summary['error_phases'] = [dict(interval_s=[a, b], maximum_error_m=max(es, default=None), final_error_m=es[-1] if es else None) for a, b in ((0.0, duration / 3), (duration / 3, 2 * duration / 3), (2 * duration / 3, duration)) for es in [[e for r, e in zip(rows, errors) if a - 1e-09 <= r['time_s'] <= b + 1e-09]]]
     summary['diagnostic_hypotheses'] = []
@@ -117,6 +123,8 @@ def aligned_predictions(rows, observations, motion=None):
         reason=None
         if pred is None:
             reason='accepted first-step prediction unavailable'
+        elif not vector3(pred.get('tip_position_m')) or (pred.get('tip_velocity_m_s') is not None and not vector3(pred['tip_velocity_m_s'])):
+            reason='prediction vector shape invalid: world position and velocity must each be finite shape [3]'
         elif pred.get('frame','world')!='world':
             reason='coordinate frame mismatch'
         else:
@@ -125,6 +133,7 @@ def aligned_predictions(rows, observations, motion=None):
             actual=o.get('actual_tension_n')
             difference=None if actual is None else float(np.max(np.abs(np.asarray(actual)-pred['applied_tension_n'])))
             if len(following)!=1: reason='next execution timestamp missing or ambiguous'
+            elif not vector3(following[0].get('tip_m')):reason='measured position vector shape invalid'
             elif intervening: reason='intervening control update'
             elif difference is None: reason='applied input unavailable'
             elif difference>1e-8: reason='applied input mismatch'
@@ -138,7 +147,7 @@ def aligned_predictions(rows, observations, motion=None):
                 velocity=pred.get('tip_velocity_m_s')
                 if velocity is None:
                     comparison['velocity_missing_reason']='predicted velocity vector unavailable'
-                elif len(measured)!=1 or 'tip_velocity_m_s' not in measured[0]:
+                elif len(measured)!=1 or not vector3(measured[0].get('tip_velocity_m_s')):
                     comparison['velocity_missing_reason']='saved-state world velocity missing or ambiguous'
                 else:
                     actual_velocity=measured[0]['tip_velocity_m_s']
@@ -148,6 +157,11 @@ def aligned_predictions(rows, observations, motion=None):
                 comparisons.append(comparison)
         if reason:missing.append(dict(time_s=o['time_s'],reason=reason))
     return comparisons,missing
+
+
+def vector3(value):
+    value=np.asarray(value)
+    return value.shape==(3,) and np.issubdtype(value.dtype,np.number) and bool(np.isfinite(value).all())
 
 
 def reconstruct_motion(files, rows, target):

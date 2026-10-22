@@ -378,11 +378,42 @@ def read_coverage(host):
     return rows
 
 
+def ordered_candidates(host,s):
+    known=list(s['candidates'].values());ordered=[]
+    for event in host.store.events(host.run_id):
+        if event['kind']=='candidate_constructed':
+            for ref in event['outputs']:
+                if ref in known and ref not in ordered:ordered.append(ref)
+    return [*ordered,*[ref for ref in known if ref not in ordered]]
+
+
+def resolved_candidate_facts(candidate,reference):
+    cfg=candidate['configuration'];robot=cfg['robot']['structure']['data']
+    return dict(candidate=reference,source=dict(reference=reference,pointer='/configuration'),
+        segments=[{k:c.get(k) for k in ('id','length_m','physics','sections','natural_curvature_rad_m','connection')}
+            for c in robot['components'] if c['kind']=='flexible_segment'],
+        tendon_order=[t['id'] for t in robot['tendons']],
+        frame=cfg['robot'].get('frame'),mount=cfg['task']['environment']['data'].get('mount'),
+        target_world_m=cfg['task']['goal']['data'].get('target_m'),
+        coordinate_scope='Mount pose maps the robot base into world; world origin and mounted base are distinct.',
+        units=dict(length='m',density='kg/m^3',young_modulus='Pa',bending_viscosity='N*m^2*s'))
+
+
+def recorded_changes(before,after,path=''):
+    if before==after:return []
+    if isinstance(before,dict) and isinstance(after,dict):
+        return [r for key in sorted(before.keys()|after.keys())
+            for r in recorded_changes(before.get(key),after.get(key),path+'/'+key.replace('~','~0').replace('/','~1'))]
+    if isinstance(before,list) and isinstance(after,list) and len(before)==len(after):
+        return [r for i,(a,b) in enumerate(zip(before,after)) for r in recorded_changes(a,b,path+'/'+str(i))]
+    return [dict(pointer=path,before=before,after=after)]
+
+
 def working_set(host,current):
     """Recomputable bounded Store projection; science and next-method choice stay separate."""
     from tools.research.candidate_portfolio import ranking_key
     from tools.research.evidence_policy import registered_references
-    s=state(host);candidates=list(s['candidates'].values());index=[];links=[];facts=[];comparisons=[]
+    s=state(host);candidates=ordered_candidates(host,s);index=[];links=[];facts=[];comparisons=[]
     references=current['all_fresh_results'];coverage=read_coverage(host)
     shown=candidates[-3:];best=current.get('best_valid') or {};important=best.get('executable_candidate',best.get('candidate'))
     if important in candidates and important not in shown:shown=[*shown[-2:],important]
@@ -408,6 +439,9 @@ def working_set(host,current):
         valid=sorted((dict(reference=r,task_gap=task_gap(v)) for r,v in results if task_gap(v)['valid_complete']),key=ranking_key)
         residual=[r for r in s.get('compatible_residual_references',[]) if r['candidate']==candidate and r.get('available')]
         index.append(dict(candidate=candidate,structure_identity=c.get('physical_design_identity',c['identity']),
+            profile_identity=c.get('profile_identity'),current_profile_identity=s['profile']['identity'],
+            executable_under_current_profile=c.get('profile_identity')==s['profile']['identity'],
+            resolved_facts=resolved_candidate_facts(c,candidate),
             parameters_query=dict(reference=candidate,pointer='/parameters'),
             structure=dict(segments=len(c['resolved_parameters']['segments']),tendons=len(c['resolved_parameters']['tendons'])),
             generated=True,compiled=True,control_initialized=bool(controls),control_sources=controls,
@@ -423,6 +457,7 @@ def working_set(host,current):
         for ref,value in results[-6:]:
             source=value.get('source_reference',ref);control=host.store.artifact(source);tr=control.get('trajectory') or {}
             links.append(dict(candidate=candidate,source=source,evaluation_reference=ref,
+                data_access=__import__('tools.research.evidence_views',fromlist=['data_access']).data_access(host,ref,value),
                 source_kind='fixed_tension' if value.get('source_reference') else 'policy' if value.get('run_id') else 'nmpc_actual_execution',
                 trajectory_query=dict(reference=source,pointer='/trajectory') if tr else None,
                 grid=dict(intervals=len(tr.get('tensions_n',[])),start_s=tr['times_s'][0],end_s=tr['times_s'][-1],tendon_order=tr.get('tendon_order')) if tr else dict(reference=ref,pointer='/profile'),
@@ -550,6 +585,11 @@ def action_feedback(host,current):
         rows.append(dict(action='initialize_control',method='mathematical_response',status=status,reason=reason,
             candidate=candidate,response_evidence=ref,task_acceptance='unmeasured',new_physical_evaluations=0,
             requires_agent_fields=['decision','hypothesis','initialization settings']))
+    for row in rows:
+        candidate=row.get('candidate')
+        if candidate and host.store.artifact(candidate).get('profile_identity')!=s['profile']['identity']:
+            row.update(status='blocked',reason='CANDIDATE_PROFILE_CHANGED: historical candidate retained under its original implementation profile',
+                current_profile_compatible=False)
     return rows
 
 
@@ -584,7 +624,7 @@ def decision_brief(current):
     brief['latest_scientific_feedback']=latest
     links=[]
     for row in ws['control_result_links']:
-        item={k:row[k] for k in ('candidate','source','source_kind','evaluation_reference','status','operation','task_acceptance','task_gap') if k in row}
+        item={k:row[k] for k in ('candidate','source','source_kind','evaluation_reference','status','operation','task_acceptance','task_gap','data_access') if k in row}
         if 'task_gap' in item:item['task_gap']={k:v for k,v in item['task_gap'].items() if k!='interpretation'}
         if row.get('original_acceptance'):
             item['constraints']={k:{f:v[f] for f in ('passed','value','limit') if f in v}
@@ -710,7 +750,10 @@ def research_action_trace(host, limit=5):
             # rejected before science admission. That is not a failed worker.
             rows[key]['execution_status']='failed' if rows[key]['execution_status']=='failed' else 'rejected'
     ordered=sorted(rows.values(),key=lambda r:r['_position'])
-    for row in ordered:row.pop('_position')
+    for row in ordered:
+        row.pop('_position')
+        row['interpretation_status']='Agent interpretation or mechanism hypothesis; no causal verification inferred'
+        row['distinguishing_observation_status']='saved_scientific_evidence_available' if row['result_references'] else 'no_saved_scientific_result_for_this_action'
     return dict(total=len(ordered),failed_or_rejected=sum(r['execution_status'] in ('failed','rejected') for r in ordered),
         recent=ordered[-limit:] if limit is not None else ordered,
         scope='Original Agent intent and recorded execution only; hypotheses are not confirmed or falsified by Reporter prose')
@@ -729,6 +772,21 @@ def public_prior_manifest(spec):
         comparison_rule='Comparison Agents must receive the same frozen public priors and resource conditions')
 
 
+def mathematics_authorization(host,s):
+    """Separate the frozen method grant, formal approval and input readiness."""
+    approvals=[(e,host.store.artifact(e['outputs'][0])) for e in host.store.events(host.run_id)
+        if e['kind']=='formal_study_authorization']
+    valid=[(e,a) for e,a in approvals if a.get('user_approval') is True and a.get('scope_identity')==digest(a.get('scope'))
+        and a.get('scope',{}).get('study_id')==host.run_id and a['scope'].get('resolved_identity')==s['spec']['resolved_identity']]
+    approval=valid[-1] if valid else None
+    methods=s['spec'].get('mathematical_methods',{})
+    return dict(registered_study_scope_authorized=('registered mathematics' in approval[1]['scope'].get('execution_scopes',[])) if approval else None,
+        approval_reference=approval[0]['outputs'][0] if approval else None,
+        methods=[dict(method=key,frozen_method_grant=bool(value),configuration_description=value) for key,value in methods.items()],
+        proposal_text_is_current_execution_gate=False,
+        method_preconditions='Candidate/model-group/dependency and remaining-budget admission still required; authorization does not supply missing prerequisites.')
+
+
 def agent_decision_brief(host):
     """A-line compact input; existing L0/L2 retrieval contracts remain unchanged."""
     from tools.research.reporter import current_reports, reporter_handoff_summary
@@ -737,6 +795,9 @@ def agent_decision_brief(host):
     brief['action_trace']=research_action_trace(host)
     from tools.research.task_constraints import describe_analysis_requirements, analysis_capabilities
     s=state(host);cfg=s.get('nominal_configuration',s.get('base_configuration'))
+    brief['mathematics_authorization']=mathematics_authorization(host,s)
+    if s.get('engineering_feedback_correction'):
+        brief['recorded_evidence_corrections']=host.store.artifact(s['engineering_feedback_correction'])
     if s.get('public_prior_manifest'):
         brief['public_prior_manifest']=dict(reference=s['public_prior_manifest'],view='full',
             scope='Frozen engineering priors; no historical experimental feedback')
@@ -747,7 +808,7 @@ def agent_decision_brief(host):
                 'Complete registered symmetric model group with exact bindings','Sufficient model-preparation and kernel budget'],
             scope='Generation legality alone does not establish mathematical method support')
     if s.get('candidates'):
-        cfg=host.store.artifact(list(s['candidates'].values())[-1])['configuration']
+        cfg=host.store.artifact(ordered_candidates(host,s)[-1])['configuration']
     if cfg and s['spec'].get('analysis_protocol'):
         requirements=describe_analysis_requirements(cfg,{})
         brief['mathematical_capabilities']=analysis_capabilities(cfg,requirements,s['spec']['analysis_protocol'],
@@ -755,17 +816,22 @@ def agent_decision_brief(host):
             remaining_evaluations=max(0,s['spec']['budgets']['mathematical_evaluations']-s.get('mathematical_evaluations',0)))
         if s.get('candidates') and s['spec'].get('mathematical_methods'):
             from tools.research.optimal_capability import candidate_methods
-            candidate=list(s['candidates'].values())[-1]
-            availability=candidate_methods(host,candidate)
-            brief['optimal_sensitivity_readiness']={k:availability[k] for k in ('method','status','reasons','remaining_evaluations','planning')}
-            brief['optimal_sensitivity_readiness']['detail_query']=dict(reference=candidate,view='mathematical_capabilities')
+            candidate=ordered_candidates(host,s)[-1]
+            if host.store.artifact(candidate)['profile_identity']==s['profile']['identity']:
+                availability=candidate_methods(host,candidate)
+                brief['optimal_sensitivity_readiness']={k:availability[k] for k in ('method','status','reasons','remaining_evaluations','planning')}
+                brief['optimal_sensitivity_readiness']['detail_query']=dict(reference=candidate,view='mathematical_capabilities')
+            else:
+                brief['optimal_sensitivity_readiness']=dict(status='requires_current_profile_candidate',
+                    reasons=['Historical candidate preserves its original profile binding after explicit implementation migration.'],
+                    candidate=candidate,route_authorization_withdrawn=False)
     selected=current_reports(host)[-2:]
     brief['latest_reports']=[reporter_handoff_summary(host,r,saved) for r,saved in selected]
     from tools.research.evidence_views import result_card
     shown=[ref for r in brief['latest_reports'] for ref in r['result_references']]
     brief['additional_mathematical_evidence']=[dict(reference=r,
         mathematics=mathematical_decision_view(plain(result_card(host,r))))
-        for r in s.get('analysis_results',[])[-2:] if r not in shown]
+        for r in [*s.get('analysis_results',[]),*s.get('mechanics_results',[])][-3:] if r not in shown]
     latest=brief.get('latest_scientific_feedback')
     if latest and latest.get('reference') in shown:
         delivery=next(r for r in brief['latest_reports'] if latest['reference'] in r['result_references'])
@@ -794,7 +860,8 @@ def agent_decision_brief(host):
 def mathematical_decision_view(card):
     """Core computed numbers and scope; all starts/samples remain in L2/L3."""
     math=card.get('mathematics')
-    if not math:return None
+    if not math:
+        return card.get('deterministic_summary',{}).get('recorded_mathematics')
     claim=math['claim']
     summary=card['deterministic_summary']
     from tools.research.capability import signed_score_comparisons
@@ -825,6 +892,7 @@ def mathematical_decision_view(card):
             if not capability or capability.get('method_version') or q['name'] in ('best_found_violation','optimal_task_violation')],
         capability=compact,unresolved=summary.get('decision_relevance'))
     if summary.get('optimal_sensitivity'):result['optimal_sensitivity']=summary['optimal_sensitivity']
+    if summary.get('recorded_static_construction'):result['recorded_static_construction']=summary['recorded_static_construction']
     if summary.get('optimal_sensitivity') or (capability and capability.get('method_version')):
         result['cost']=dict(evaluations=summary.get('evaluations'),numerical_s=summary.get('numerical_s'),
             sources=[dict(reference=card['identity']['result']['reference'],pointer='/'+key)
@@ -861,6 +929,7 @@ def tool_feedback(host,value):
                 tendons=[t['id'] for t in resolved['tendons'][offset:offset+span['count']]]))
             offset+=span['count']
         view['structure_facts']=dict(candidate=result['candidate'],construction='compiled_valid',
+            resolved_facts=resolved_candidate_facts(candidate,result['candidate']),
             scientific_acceptance='unmeasured',segment_count=len(resolved['segments']),
             tendon_count=len(resolved['tendons']),lengths_m=[p['length_m'] for p in resolved['segments']],
             spans=span_layout,layout=layout,layout_limit=12,
@@ -872,6 +941,12 @@ def tool_feedback(host,value):
             control_source_initialized=any(e['candidate']==result['candidate'] for e in state(host).get('control_initializations',[])),
             mathematical_observations=[r for k in ('analysis_results','mechanics_results') for r in state(host).get(k,[]) if host.store.artifact(r).get('candidate')==result['candidate']],
             physical_observations=[r for k in ('results','physical_replays','rl_evaluations') for r in state(host).get(k,[]) if host.store.artifact(r).get('candidate')==result['candidate']])
+        ordered=ordered_candidates(host,state(host));position=ordered.index(result['candidate'])
+        if position:
+            prior=ordered[position-1];old=host.store.artifact(prior)
+            changes=recorded_changes(old['configuration']['robot']['structure']['data'],robot)
+            view['structure_facts']['previous_candidate_comparison']=dict(candidate=prior,changed_paths=changes,
+                changed_leaf_count=len(changes),causal_attribution='Unassessed; parameter differences do not establish single-factor causality')
     if reference in known and isinstance(raw,dict) and raw.get('acceptance'):
         view['physical_diagnostic']=physical_diagnostic(host,reference)
     return dict(wrapper_reference=wrapper,wrapper_role='Retrieval only; not supporting_evidence',

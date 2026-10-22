@@ -1,0 +1,1130 @@
+{
+  "version": "engineering_evidence_feedback_correction_v1",
+  "mathematics_authorization": {
+    "registered_study_scope_authorized": true,
+    "approval_reference": {
+      "artifact_id": "04f53584daddc0a4c29f1e1e365d71c26f27a5f8378a4cede2cc033925098491",
+      "media_type": "application/json"
+    },
+    "methods": [
+      {
+        "method": "controlled-capability-sensitivity-v1",
+        "frozen_method_grant": true,
+        "configuration_description": "Proposed controlled sensitivity, blocked until independent Study approval"
+      },
+      {
+        "method": "sampled-affine-conic-minimax-v1",
+        "frozen_method_grant": true,
+        "configuration_description": "Proposed SOCP method, blocked until independent Study approval"
+      }
+    ],
+    "proposal_text_is_current_execution_gate": false,
+    "method_preconditions": "Candidate/model-group/dependency and remaining-budget admission still required; authorization does not supply missing prerequisites."
+  },
+  "mathematics": [
+    {
+      "reference": {
+        "artifact_id": "707dc66474d2610ec411f603a55a5f162a14e0a2023739f6f452c3ffe35026ea",
+        "media_type": "application/json"
+      },
+      "summary": {
+        "version": "recorded_mathematics_v2",
+        "source": {
+          "reference": {
+            "artifact_id": "707dc66474d2610ec411f603a55a5f162a14e0a2023739f6f452c3ffe35026ea",
+            "media_type": "application/json"
+          },
+          "pointer": "/mathematical_facts"
+        },
+        "status": "returned",
+        "solver": {
+          "status": "returned",
+          "converged": true,
+          "exitflag": 1,
+          "iterations": 31,
+          "function_evaluations": 137,
+          "objective": 0,
+          "initial_objective": 893.7953002763446,
+          "scaled_violation": 3.0704605524789486e-13
+        },
+        "original_feasible": false,
+        "relaxed_feasible": true,
+        "returned_slacks": {
+          "position": 0,
+          "speed": 0
+        },
+        "original_predicate_diagnostics": {
+          "returned": {
+            "strict_satisfied": false,
+            "maxima_by_constraint": [
+              {
+                "constraint_id": "terminal_error_m",
+                "positive_violation": 0.0,
+                "unit": "m",
+                "time_s": 0.35000000000000003,
+                "limit": 0.01,
+                "source": {
+                  "reference": {
+                    "artifact_id": "707dc66474d2610ec411f603a55a5f162a14e0a2023739f6f452c3ffe35026ea",
+                    "media_type": "application/json"
+                  },
+                  "pointer": "/mathematical_facts/raw_returned/task/signed_margin/0"
+                }
+              },
+              {
+                "constraint_id": "holding_max_error_m",
+                "positive_violation": 0.0,
+                "unit": "m",
+                "time_s": 0.3,
+                "limit": 0.01,
+                "source": {
+                  "reference": {
+                    "artifact_id": "707dc66474d2610ec411f603a55a5f162a14e0a2023739f6f452c3ffe35026ea",
+                    "media_type": "application/json"
+                  },
+                  "pointer": "/mathematical_facts/raw_returned/task/signed_margin/1"
+                }
+              },
+              {
+                "constraint_id": "holding_max_speed_m_s",
+                "positive_violation": 7.112366251504909e-16,
+                "unit": "m/s",
+                "time_s": 0.34,
+                "limit": 0.02,
+                "source": {
+                  "reference": {
+                    "artifact_id": "707dc66474d2610ec411f603a55a5f162a14e0a2023739f6f452c3ffe35026ea",
+                    "media_type": "application/json"
+                  },
+                  "pointer": "/mathematical_facts/raw_returned/task/signed_margin/11"
+                }
+              }
+            ],
+            "samples": [
+              {
+                "constraint_id": "terminal_error_m",
+                "time_s": 0.35000000000000003,
+                "signed_margin": 7.122054814647644e-05,
+                "positive_violation": 0.0,
+                "unit": "m",
+                "limit": 0.01,
+                "actual_norm": 0.009928779451853524,
+                "source": {
+                  "reference": {
+                    "artifact_id": "707dc66474d2610ec411f603a55a5f162a14e0a2023739f6f452c3ffe35026ea",
+                    "media_type": "application/json"
+                  },
+                  "pointer": "/mathematical_facts/raw_returned/task/signed_margin/0"
+                }
+              },
+              {
+                "constraint_id": "holding_max_error_m",
+                "time_s": 0.3,
+                "signed_margin": 0.00010093668780564342,
+                "positive_violation": 0.0,
+                "unit": "m",
+                "limit": 0.01,
+                "actual_norm": 0.009899063312194357,
+                "source": {
+                  "reference": {
+                    "artifact_id": "707dc66474d2610ec411f603a55a5f162a14e0a2023739f6f452c3ffe35026ea",
+                    "media_type": "application/json"
+                  },
+                  "pointer": "/mathematical_facts/raw_returned/task/signed_margin/1"
+                }
+              },
+              {
+                "constraint_id": "holding_max_error_m",
+                "time_s": 0.31,
+                "signed_margin": 0.00016114716874916085,
+                "positive_violation": 0.0,
+                "unit": "m",
+                "limit": 0.01,
+                "actual_norm": 0.00983885283125084,
+                "source": {
+                  "reference": {
+                    "artifact_id": "707dc66474d2610ec411f603a55a5f162a14e0a2023739f6f452c3ffe35026ea",
+                    "media_type": "application/json"
+                  },
+                  "pointer": "/mathematical_facts/raw_returned/task/signed_margin/2"
+                }
+              },
+              {
+                "constraint_id": "holding_max_error_m",
+                "time_s": 0.32,
+                "signed_margin": 0.0001013658516654907,
+                "positive_violation": 0.0,
+                "unit": "m",
+                "limit": 0.01,
+                "actual_norm": 0.00989863414833451,
+                "source": {
+                  "reference": {
+                    "artifact_id": "707dc66474d2610ec411f603a55a5f162a14e0a2023739f6f452c3ffe35026ea",
+                    "media_type": "application/json"
+                  },
+                  "pointer": "/mathematical_facts/raw_returned/task/signed_margin/3"
+                }
+              },
+              {
+                "constraint_id": "holding_max_error_m",
+                "time_s": 0.33,
+                "signed_margin": 0.00014410023533786148,
+                "positive_violation": 0.0,
+                "unit": "m",
+                "limit": 0.01,
+                "actual_norm": 0.009855899764662139,
+                "source": {
+                  "reference": {
+                    "artifact_id": "707dc66474d2610ec411f603a55a5f162a14e0a2023739f6f452c3ffe35026ea",
+                    "media_type": "application/json"
+                  },
+                  "pointer": "/mathematical_facts/raw_returned/task/signed_margin/4"
+                }
+              },
+              {
+                "constraint_id": "holding_max_error_m",
+                "time_s": 0.34,
+                "signed_margin": 0.00018860812176405353,
+                "positive_violation": 0.0,
+                "unit": "m",
+                "limit": 0.01,
+                "actual_norm": 0.009811391878235947,
+                "source": {
+                  "reference": {
+                    "artifact_id": "707dc66474d2610ec411f603a55a5f162a14e0a2023739f6f452c3ffe35026ea",
+                    "media_type": "application/json"
+                  },
+                  "pointer": "/mathematical_facts/raw_returned/task/signed_margin/5"
+                }
+              },
+              {
+                "constraint_id": "holding_max_error_m",
+                "time_s": 0.35000000000000003,
+                "signed_margin": 7.122054814647644e-05,
+                "positive_violation": 0.0,
+                "unit": "m",
+                "limit": 0.01,
+                "actual_norm": 0.009928779451853524,
+                "source": {
+                  "reference": {
+                    "artifact_id": "707dc66474d2610ec411f603a55a5f162a14e0a2023739f6f452c3ffe35026ea",
+                    "media_type": "application/json"
+                  },
+                  "pointer": "/mathematical_facts/raw_returned/task/signed_margin/6"
+                }
+              },
+              {
+                "constraint_id": "holding_max_speed_m_s",
+                "time_s": 0.3,
+                "signed_margin": 0.005657733452752563,
+                "positive_violation": 0.0,
+                "unit": "m/s",
+                "limit": 0.02,
+                "actual_norm": 0.014342266547247438,
+                "source": {
+                  "reference": {
+                    "artifact_id": "707dc66474d2610ec411f603a55a5f162a14e0a2023739f6f452c3ffe35026ea",
+                    "media_type": "application/json"
+                  },
+                  "pointer": "/mathematical_facts/raw_returned/task/signed_margin/7"
+                }
+              },
+              {
+                "constraint_id": "holding_max_speed_m_s",
+                "time_s": 0.31,
+                "signed_margin": 0.0005187425966868241,
+                "positive_violation": 0.0,
+                "unit": "m/s",
+                "limit": 0.02,
+                "actual_norm": 0.019481257403313176,
+                "source": {
+                  "reference": {
+                    "artifact_id": "707dc66474d2610ec411f603a55a5f162a14e0a2023739f6f452c3ffe35026ea",
+                    "media_type": "application/json"
+                  },
+                  "pointer": "/mathematical_facts/raw_returned/task/signed_margin/8"
+                }
+              },
+              {
+                "constraint_id": "holding_max_speed_m_s",
+                "time_s": 0.32,
+                "signed_margin": 0.0005078183800281307,
+                "positive_violation": 0.0,
+                "unit": "m/s",
+                "limit": 0.02,
+                "actual_norm": 0.01949218161997187,
+                "source": {
+                  "reference": {
+                    "artifact_id": "707dc66474d2610ec411f603a55a5f162a14e0a2023739f6f452c3ffe35026ea",
+                    "media_type": "application/json"
+                  },
+                  "pointer": "/mathematical_facts/raw_returned/task/signed_margin/9"
+                }
+              },
+              {
+                "constraint_id": "holding_max_speed_m_s",
+                "time_s": 0.33,
+                "signed_margin": 3.608224830031759e-16,
+                "positive_violation": 0.0,
+                "unit": "m/s",
+                "limit": 0.02,
+                "actual_norm": 0.01999999999999964,
+                "source": {
+                  "reference": {
+                    "artifact_id": "707dc66474d2610ec411f603a55a5f162a14e0a2023739f6f452c3ffe35026ea",
+                    "media_type": "application/json"
+                  },
+                  "pointer": "/mathematical_facts/raw_returned/task/signed_margin/10"
+                }
+              },
+              {
+                "constraint_id": "holding_max_speed_m_s",
+                "time_s": 0.34,
+                "signed_margin": -7.112366251504909e-16,
+                "positive_violation": 7.112366251504909e-16,
+                "unit": "m/s",
+                "limit": 0.02,
+                "actual_norm": 0.02000000000000071,
+                "source": {
+                  "reference": {
+                    "artifact_id": "707dc66474d2610ec411f603a55a5f162a14e0a2023739f6f452c3ffe35026ea",
+                    "media_type": "application/json"
+                  },
+                  "pointer": "/mathematical_facts/raw_returned/task/signed_margin/11"
+                }
+              },
+              {
+                "constraint_id": "holding_max_speed_m_s",
+                "time_s": 0.35000000000000003,
+                "signed_margin": 5.655198531684391e-16,
+                "positive_violation": 0.0,
+                "unit": "m/s",
+                "limit": 0.02,
+                "actual_norm": 0.019999999999999435,
+                "source": {
+                  "reference": {
+                    "artifact_id": "707dc66474d2610ec411f603a55a5f162a14e0a2023739f6f452c3ffe35026ea",
+                    "media_type": "application/json"
+                  },
+                  "pointer": "/mathematical_facts/raw_returned/task/signed_margin/12"
+                }
+              }
+            ],
+            "required_slacks": {
+              "position": 0,
+              "speed": 7.105427357601002e-14
+            }
+          },
+          "recomputed": {
+            "strict_satisfied": false,
+            "maxima_by_constraint": [
+              {
+                "constraint_id": "terminal_error_m",
+                "positive_violation": 0.0,
+                "unit": "m",
+                "time_s": 0.35000000000000003,
+                "limit": 0.01,
+                "source": {
+                  "reference": {
+                    "artifact_id": "707dc66474d2610ec411f603a55a5f162a14e0a2023739f6f452c3ffe35026ea",
+                    "media_type": "application/json"
+                  },
+                  "pointer": "/mathematical_facts/task/signed_margin/0"
+                }
+              },
+              {
+                "constraint_id": "holding_max_error_m",
+                "positive_violation": 0.0,
+                "unit": "m",
+                "time_s": 0.3,
+                "limit": 0.01,
+                "source": {
+                  "reference": {
+                    "artifact_id": "707dc66474d2610ec411f603a55a5f162a14e0a2023739f6f452c3ffe35026ea",
+                    "media_type": "application/json"
+                  },
+                  "pointer": "/mathematical_facts/task/signed_margin/1"
+                }
+              },
+              {
+                "constraint_id": "holding_max_speed_m_s",
+                "positive_violation": 1.594557819117881e-14,
+                "unit": "m/s",
+                "time_s": 0.33,
+                "limit": 0.02,
+                "source": {
+                  "reference": {
+                    "artifact_id": "707dc66474d2610ec411f603a55a5f162a14e0a2023739f6f452c3ffe35026ea",
+                    "media_type": "application/json"
+                  },
+                  "pointer": "/mathematical_facts/task/signed_margin/10"
+                }
+              }
+            ],
+            "samples": [
+              {
+                "constraint_id": "terminal_error_m",
+                "time_s": 0.35000000000000003,
+                "signed_margin": 7.122054814869688e-05,
+                "positive_violation": 0.0,
+                "unit": "m",
+                "limit": 0.01,
+                "actual_norm": 0.009928779451851303,
+                "source": {
+                  "reference": {
+                    "artifact_id": "707dc66474d2610ec411f603a55a5f162a14e0a2023739f6f452c3ffe35026ea",
+                    "media_type": "application/json"
+                  },
+                  "pointer": "/mathematical_facts/task/signed_margin/0"
+                }
+              },
+              {
+                "constraint_id": "holding_max_error_m",
+                "time_s": 0.3,
+                "signed_margin": 0.00010093668780741284,
+                "positive_violation": 0.0,
+                "unit": "m",
+                "limit": 0.01,
+                "actual_norm": 0.009899063312192587,
+                "source": {
+                  "reference": {
+                    "artifact_id": "707dc66474d2610ec411f603a55a5f162a14e0a2023739f6f452c3ffe35026ea",
+                    "media_type": "application/json"
+                  },
+                  "pointer": "/mathematical_facts/task/signed_margin/1"
+                }
+              },
+              {
+                "constraint_id": "holding_max_error_m",
+                "time_s": 0.31,
+                "signed_margin": 0.00016114716875109854,
+                "positive_violation": 0.0,
+                "unit": "m",
+                "limit": 0.01,
+                "actual_norm": 0.009838852831248902,
+                "source": {
+                  "reference": {
+                    "artifact_id": "707dc66474d2610ec411f603a55a5f162a14e0a2023739f6f452c3ffe35026ea",
+                    "media_type": "application/json"
+                  },
+                  "pointer": "/mathematical_facts/task/signed_margin/2"
+                }
+              },
+              {
+                "constraint_id": "holding_max_error_m",
+                "time_s": 0.32,
+                "signed_margin": 0.00010136585166779094,
+                "positive_violation": 0.0,
+                "unit": "m",
+                "limit": 0.01,
+                "actual_norm": 0.00989863414833221,
+                "source": {
+                  "reference": {
+                    "artifact_id": "707dc66474d2610ec411f603a55a5f162a14e0a2023739f6f452c3ffe35026ea",
+                    "media_type": "application/json"
+                  },
+                  "pointer": "/mathematical_facts/task/signed_margin/3"
+                }
+              },
+              {
+                "constraint_id": "holding_max_error_m",
+                "time_s": 0.33,
+                "signed_margin": 0.00014410023534006805,
+                "positive_violation": 0.0,
+                "unit": "m",
+                "limit": 0.01,
+                "actual_norm": 0.009855899764659932,
+                "source": {
+                  "reference": {
+                    "artifact_id": "707dc66474d2610ec411f603a55a5f162a14e0a2023739f6f452c3ffe35026ea",
+                    "media_type": "application/json"
+                  },
+                  "pointer": "/mathematical_facts/task/signed_margin/4"
+                }
+              },
+              {
+                "constraint_id": "holding_max_error_m",
+                "time_s": 0.34,
+                "signed_margin": 0.00018860812176640235,
+                "positive_violation": 0.0,
+                "unit": "m",
+                "limit": 0.01,
+                "actual_norm": 0.009811391878233598,
+                "source": {
+                  "reference": {
+                    "artifact_id": "707dc66474d2610ec411f603a55a5f162a14e0a2023739f6f452c3ffe35026ea",
+                    "media_type": "application/json"
+                  },
+                  "pointer": "/mathematical_facts/task/signed_margin/5"
+                }
+              },
+              {
+                "constraint_id": "holding_max_error_m",
+                "time_s": 0.35000000000000003,
+                "signed_margin": 7.122054814869688e-05,
+                "positive_violation": 0.0,
+                "unit": "m",
+                "limit": 0.01,
+                "actual_norm": 0.009928779451851303,
+                "source": {
+                  "reference": {
+                    "artifact_id": "707dc66474d2610ec411f603a55a5f162a14e0a2023739f6f452c3ffe35026ea",
+                    "media_type": "application/json"
+                  },
+                  "pointer": "/mathematical_facts/task/signed_margin/6"
+                }
+              },
+              {
+                "constraint_id": "holding_max_speed_m_s",
+                "time_s": 0.3,
+                "signed_margin": 0.005657733452745934,
+                "positive_violation": 0.0,
+                "unit": "m/s",
+                "limit": 0.02,
+                "actual_norm": 0.014342266547254066,
+                "source": {
+                  "reference": {
+                    "artifact_id": "707dc66474d2610ec411f603a55a5f162a14e0a2023739f6f452c3ffe35026ea",
+                    "media_type": "application/json"
+                  },
+                  "pointer": "/mathematical_facts/task/signed_margin/7"
+                }
+              },
+              {
+                "constraint_id": "holding_max_speed_m_s",
+                "time_s": 0.31,
+                "signed_margin": 0.0005187425967041505,
+                "positive_violation": 0.0,
+                "unit": "m/s",
+                "limit": 0.02,
+                "actual_norm": 0.01948125740329585,
+                "source": {
+                  "reference": {
+                    "artifact_id": "707dc66474d2610ec411f603a55a5f162a14e0a2023739f6f452c3ffe35026ea",
+                    "media_type": "application/json"
+                  },
+                  "pointer": "/mathematical_facts/task/signed_margin/8"
+                }
+              },
+              {
+                "constraint_id": "holding_max_speed_m_s",
+                "time_s": 0.32,
+                "signed_margin": 0.0005078183800430562,
+                "positive_violation": 0.0,
+                "unit": "m/s",
+                "limit": 0.02,
+                "actual_norm": 0.019492181619956944,
+                "source": {
+                  "reference": {
+                    "artifact_id": "707dc66474d2610ec411f603a55a5f162a14e0a2023739f6f452c3ffe35026ea",
+                    "media_type": "application/json"
+                  },
+                  "pointer": "/mathematical_facts/task/signed_margin/9"
+                }
+              },
+              {
+                "constraint_id": "holding_max_speed_m_s",
+                "time_s": 0.33,
+                "signed_margin": -1.594557819117881e-14,
+                "positive_violation": 1.594557819117881e-14,
+                "unit": "m/s",
+                "limit": 0.02,
+                "actual_norm": 0.020000000000015946,
+                "source": {
+                  "reference": {
+                    "artifact_id": "707dc66474d2610ec411f603a55a5f162a14e0a2023739f6f452c3ffe35026ea",
+                    "media_type": "application/json"
+                  },
+                  "pointer": "/mathematical_facts/task/signed_margin/10"
+                }
+              },
+              {
+                "constraint_id": "holding_max_speed_m_s",
+                "time_s": 0.34,
+                "signed_margin": 4.978656376053436e-15,
+                "positive_violation": 0.0,
+                "unit": "m/s",
+                "limit": 0.02,
+                "actual_norm": 0.019999999999995022,
+                "source": {
+                  "reference": {
+                    "artifact_id": "707dc66474d2610ec411f603a55a5f162a14e0a2023739f6f452c3ffe35026ea",
+                    "media_type": "application/json"
+                  },
+                  "pointer": "/mathematical_facts/task/signed_margin/11"
+                }
+              },
+              {
+                "constraint_id": "holding_max_speed_m_s",
+                "time_s": 0.35000000000000003,
+                "signed_margin": -5.7696902810988604e-15,
+                "positive_violation": 5.7696902810988604e-15,
+                "unit": "m/s",
+                "limit": 0.02,
+                "actual_norm": 0.02000000000000577,
+                "source": {
+                  "reference": {
+                    "artifact_id": "707dc66474d2610ec411f603a55a5f162a14e0a2023739f6f452c3ffe35026ea",
+                    "media_type": "application/json"
+                  },
+                  "pointer": "/mathematical_facts/task/signed_margin/12"
+                }
+              }
+            ],
+            "required_slacks": {
+              "position": 0,
+              "speed": 1.5949463971764999e-12
+            }
+          }
+        },
+        "zero_slack_with_positive_recorded_violation": true,
+        "predicate_tolerance": "Strict recorded comparison; no added acceptance tolerance",
+        "kkt": {
+          "primal_inf": 3.0704605524789486e-13,
+          "stationarity_inf": 4.799243977182501e-12,
+          "global_optimality": "unclaimed"
+        },
+        "conclusion": [
+          "inconclusive"
+        ],
+        "scope": [
+          {
+            "conclusion": "inconclusive",
+            "supported_interpretation": "Returned mathematical optimization; solver status alone is not feasibility evidence.",
+            "unsupported_conclusions": [
+              "physical task success",
+              "original unrelaxed constraints when slacks are nonzero",
+              "global optimality",
+              "dynamic model equivalence to MuJoCo"
+            ],
+            "verification_status": "requires_independent_replay"
+          }
+        ],
+        "physical_validation": "not_run",
+        "task_acceptance": "unmeasured",
+        "independent_physical_acceptance_established": false
+      }
+    }
+  ],
+  "static_constructions": [
+    {
+      "reference": {
+        "artifact_id": "ac72c619830a52a139217fa4fd7f7c808df7d0a2845099aff61e1cc6f34a8ab5",
+        "media_type": "application/json"
+      },
+      "summary": {
+        "source": {
+          "reference": {
+            "artifact_id": "ac72c619830a52a139217fa4fd7f7c808df7d0a2845099aff61e1cc6f34a8ab5",
+            "media_type": "application/json"
+          },
+          "pointer": "/construction"
+        },
+        "achieved_world_point_m": [
+          0.2751146391581688,
+          -0.03127903238719637,
+          0.18586644778303282
+        ],
+        "computed_tensions_n": [
+          2.1313751239306247,
+          7.321547782727171,
+          1.0546586766879287,
+          0
+        ],
+        "function_evaluations": 47,
+        "iterations": 17,
+        "maximum_iterations": 20,
+        "method": "bounded target-associated MATLAB SQP",
+        "position_residual_m": 0.015890431753021964,
+        "requested_world_point_m": [
+          0.29,
+          -0.035,
+          0.19
+        ],
+        "solver": "MATLAB fmincon SQP",
+        "static_equilibrium": true,
+        "static_residual_inf": 1.5005358067199381e-16,
+        "status": 2,
+        "success": true,
+        "local_model_constraints": {
+          "equilibrium_available": false,
+          "global_infeasibility_proven": false,
+          "position_residual_m": 0.015890431753021964,
+          "static_residual_inf": 1.5005358067199381e-16,
+          "status": "unsatisfied_in_this_attempt"
+        },
+        "tension_margins_n": {
+          "interpretation": "Computed attempt tensions; equilibrium validity remains separately reported",
+          "lower": [
+            2.1313751239306247,
+            7.321547782727171,
+            1.0546586766879287,
+            0
+          ],
+          "upper": [
+            5.868624876069376,
+            0.6784522172728291,
+            6.945341323312071,
+            8.0
+          ]
+        },
+        "task_acceptance": "unmeasured"
+      }
+    },
+    {
+      "reference": {
+        "artifact_id": "76c1aff318512e15df82de9f4dbca8a6438eabc8adb7186f479ef8f10db40c2c",
+        "media_type": "application/json"
+      },
+      "summary": {
+        "source": {
+          "reference": {
+            "artifact_id": "76c1aff318512e15df82de9f4dbca8a6438eabc8adb7186f479ef8f10db40c2c",
+            "media_type": "application/json"
+          },
+          "pointer": "/construction"
+        },
+        "achieved_world_point_m": [
+          0.29000000156306927,
+          -0.0349999987195761,
+          0.19000000448818447
+        ],
+        "computed_tensions_n": [
+          5.804664323587263,
+          4.538629582770549,
+          6.180805510173193,
+          1.6377777592754268
+        ],
+        "function_evaluations": 60,
+        "iterations": 20,
+        "maximum_iterations": 20,
+        "method": "bounded target-associated MATLAB SQP",
+        "position_residual_m": 4.922039286945606e-09,
+        "requested_world_point_m": [
+          0.29,
+          -0.035,
+          0.19
+        ],
+        "solver": "MATLAB fmincon SQP",
+        "static_equilibrium": true,
+        "static_residual_inf": 6.314393452555578e-16,
+        "status": 0,
+        "success": false,
+        "local_model_constraints": {
+          "equilibrium_available": false,
+          "global_infeasibility_proven": false,
+          "position_residual_m": 4.922039286945606e-09,
+          "static_residual_inf": 6.314393452555578e-16,
+          "status": "unsatisfied_in_this_attempt"
+        },
+        "tension_margins_n": {
+          "interpretation": "Computed attempt tensions; equilibrium validity remains separately reported",
+          "lower": [
+            5.804664323587263,
+            4.538629582770549,
+            6.180805510173193,
+            1.6377777592754268
+          ],
+          "upper": [
+            2.1953356764127374,
+            3.4613704172294506,
+            1.819194489826807,
+            6.362222240724574
+          ]
+        },
+        "task_acceptance": "unmeasured"
+      }
+    }
+  ],
+  "historical_control_updates": [
+    {
+      "reference": {
+        "artifact_id": "4483162942300f9492983478cc18916909de00822269473bce620075a39cfcaa",
+        "media_type": "application/json"
+      },
+      "invalid_prediction_updates": [
+        34
+      ],
+      "accepted_plan_input_mismatch_updates": [
+        34
+      ],
+      "prediction_aggregate_available": false,
+      "terminal_update": {
+        "update_id": 34,
+        "time_s": 0.34,
+        "source": {
+          "reference": {
+            "artifact_id": "e69eaff894f911d840b22611993f030ae5a839b82ebc703f15ea226459c4fa8b",
+            "media_type": "application/octet-stream"
+          },
+          "pointer": "/34"
+        },
+        "optimization_status": "converged",
+        "optimization_raw_status": "fmincon_exitflag_1",
+        "plan_accepted": true,
+        "plan_source": "fmincon_selected",
+        "recovery": {
+          "enabled": true,
+          "attempted": false,
+          "selected": false,
+          "error": [],
+          "wall_s": 0,
+          "source": "returned_fmincon_tensions_reintegrated_from_current_measurement"
+        },
+        "failure_response_used": false,
+        "planned_first_input_n": [
+          0.4289298051317019,
+          2.6404426938476777,
+          1.530662571245416,
+          4.107683501503277e-20
+        ],
+        "actual_input_n": [
+          0.4289298051317019,
+          0.4289298051317019,
+          0.4289298051317019,
+          0.4289298051317019
+        ],
+        "accepted_plan_matches_actual_input": false,
+        "prediction_diagnostic_available": false,
+        "prediction_shape_invalid": true,
+        "complete_update_available": false,
+        "solver_request_available": false
+      },
+      "full_observations_query": {
+        "reference": {
+          "artifact_id": "e69eaff894f911d840b22611993f030ae5a839b82ebc703f15ea226459c4fa8b",
+          "media_type": "application/octet-stream"
+        },
+        "view": "range",
+        "pointer": "",
+        "start": 0,
+        "count": 100
+      }
+    },
+    {
+      "reference": {
+        "artifact_id": "96682a9fc5f07a8230465273e9ff842ef9e5162592447bc2a872a918472ecb6a",
+        "media_type": "application/json"
+      },
+      "invalid_prediction_updates": [
+        34
+      ],
+      "accepted_plan_input_mismatch_updates": [
+        34
+      ],
+      "prediction_aggregate_available": false,
+      "terminal_update": {
+        "update_id": 34,
+        "time_s": 0.34,
+        "source": {
+          "reference": {
+            "artifact_id": "ccd5e9a38dccc820da2f6534f7470aeb1888b91f66b5f51859f91cbb60b7fcab",
+            "media_type": "application/octet-stream"
+          },
+          "pointer": "/34"
+        },
+        "optimization_status": "converged",
+        "optimization_raw_status": "fmincon_exitflag_1",
+        "plan_accepted": true,
+        "plan_source": "fmincon_selected",
+        "recovery": {
+          "enabled": true,
+          "attempted": false,
+          "selected": false,
+          "error": [],
+          "wall_s": 0,
+          "source": "returned_fmincon_tensions_reintegrated_from_current_measurement"
+        },
+        "failure_response_used": false,
+        "planned_first_input_n": [
+          8,
+          8,
+          8,
+          7.324474480812997
+        ],
+        "actual_input_n": [
+          8.0,
+          8.0,
+          8.0,
+          8.0
+        ],
+        "accepted_plan_matches_actual_input": false,
+        "prediction_diagnostic_available": false,
+        "prediction_shape_invalid": true,
+        "complete_update_available": false,
+        "solver_request_available": false
+      },
+      "full_observations_query": {
+        "reference": {
+          "artifact_id": "ccd5e9a38dccc820da2f6534f7470aeb1888b91f66b5f51859f91cbb60b7fcab",
+          "media_type": "application/octet-stream"
+        },
+        "view": "range",
+        "pointer": "",
+        "start": 0,
+        "count": 100
+      }
+    },
+    {
+      "reference": {
+        "artifact_id": "84a7e8e02722731c2fa021eda2f110e45415ee5dc4748bbbfe95b309dbf2e936",
+        "media_type": "application/json"
+      },
+      "invalid_prediction_updates": [
+        34
+      ],
+      "accepted_plan_input_mismatch_updates": [
+        34
+      ],
+      "prediction_aggregate_available": false,
+      "terminal_update": {
+        "update_id": 34,
+        "time_s": 0.34,
+        "source": {
+          "reference": {
+            "artifact_id": "e8ca76af56973ea0e30c03dfbe4d351823fcb66faf00f6ce7f9e9d195c874e8a",
+            "media_type": "application/octet-stream"
+          },
+          "pointer": "/34"
+        },
+        "optimization_status": "converged",
+        "optimization_raw_status": "fmincon_exitflag_2",
+        "plan_accepted": true,
+        "plan_source": "fmincon_selected",
+        "recovery": {
+          "enabled": true,
+          "attempted": false,
+          "selected": false,
+          "error": [],
+          "wall_s": 0,
+          "source": "returned_fmincon_tensions_reintegrated_from_current_measurement"
+        },
+        "failure_response_used": false,
+        "planned_first_input_n": [
+          1.1087046603754003,
+          1.8737783479746355,
+          2.125238837024435,
+          4.790021165031591e-29
+        ],
+        "actual_input_n": [
+          1.1087046603754003,
+          1.1087046603754003,
+          1.1087046603754003,
+          1.1087046603754003
+        ],
+        "accepted_plan_matches_actual_input": false,
+        "prediction_diagnostic_available": false,
+        "prediction_shape_invalid": true,
+        "complete_update_available": false,
+        "solver_request_available": false
+      },
+      "full_observations_query": {
+        "reference": {
+          "artifact_id": "e8ca76af56973ea0e30c03dfbe4d351823fcb66faf00f6ce7f9e9d195c874e8a",
+          "media_type": "application/octet-stream"
+        },
+        "view": "range",
+        "pointer": "",
+        "start": 0,
+        "count": 100
+      }
+    },
+    {
+      "reference": {
+        "artifact_id": "6bc60a0fef4c1854cea2af840e2e3271ba0cb2e689c1ce31386c6dc90606360a",
+        "media_type": "application/json"
+      },
+      "invalid_prediction_updates": [
+        34
+      ],
+      "accepted_plan_input_mismatch_updates": [
+        34
+      ],
+      "prediction_aggregate_available": false,
+      "terminal_update": {
+        "update_id": 34,
+        "time_s": 0.34,
+        "source": {
+          "reference": {
+            "artifact_id": "1601e74670abee6afe100c8fa9839a05af846f1451096546ec7ec253b23a5844",
+            "media_type": "application/octet-stream"
+          },
+          "pointer": "/34"
+        },
+        "optimization_status": "converged",
+        "optimization_raw_status": "fmincon_exitflag_1",
+        "plan_accepted": true,
+        "plan_source": "fmincon_selected",
+        "recovery": {
+          "enabled": true,
+          "attempted": false,
+          "selected": false,
+          "error": [],
+          "wall_s": 0,
+          "source": "returned_fmincon_tensions_reintegrated_from_current_measurement"
+        },
+        "failure_response_used": false,
+        "planned_first_input_n": [
+          1.0970366223688486,
+          1.764623951162243,
+          2.0881687004061704,
+          0
+        ],
+        "actual_input_n": [
+          1.0970366223688486,
+          1.0970366223688486,
+          1.0970366223688486,
+          1.0970366223688486
+        ],
+        "accepted_plan_matches_actual_input": false,
+        "prediction_diagnostic_available": false,
+        "prediction_shape_invalid": true,
+        "complete_update_available": false,
+        "solver_request_available": false
+      },
+      "full_observations_query": {
+        "reference": {
+          "artifact_id": "1601e74670abee6afe100c8fa9839a05af846f1451096546ec7ec253b23a5844",
+          "media_type": "application/octet-stream"
+        },
+        "view": "range",
+        "pointer": "",
+        "start": 0,
+        "count": 100
+      }
+    },
+    {
+      "reference": {
+        "artifact_id": "5a541c9c18f9d47131d90b563612ff1c46641e809c07e76d47a5130cba3fee7c",
+        "media_type": "application/json"
+      },
+      "invalid_prediction_updates": [
+        34
+      ],
+      "accepted_plan_input_mismatch_updates": [
+        34
+      ],
+      "prediction_aggregate_available": false,
+      "terminal_update": {
+        "update_id": 34,
+        "time_s": 0.34,
+        "source": {
+          "reference": {
+            "artifact_id": "e8145a660bb4de9edc3d6f17f5d332e3e66bdceb114a4c31f3157898e34e5ac8",
+            "media_type": "application/octet-stream"
+          },
+          "pointer": "/34"
+        },
+        "optimization_status": "converged",
+        "optimization_raw_status": "fmincon_exitflag_2",
+        "plan_accepted": true,
+        "plan_source": "fmincon_selected",
+        "recovery": {
+          "enabled": true,
+          "attempted": false,
+          "selected": false,
+          "error": [],
+          "wall_s": 0,
+          "source": "returned_fmincon_tensions_reintegrated_from_current_measurement"
+        },
+        "failure_response_used": false,
+        "planned_first_input_n": [
+          1.882030402559167e-31,
+          2.384926413280579,
+          0.5816273336857573,
+          5.770228700848913e-31
+        ],
+        "actual_input_n": [
+          1.882030402559167e-31,
+          1.882030402559167e-31,
+          1.882030402559167e-31,
+          1.882030402559167e-31
+        ],
+        "accepted_plan_matches_actual_input": false,
+        "prediction_diagnostic_available": false,
+        "prediction_shape_invalid": true,
+        "complete_update_available": false,
+        "solver_request_available": false
+      },
+      "full_observations_query": {
+        "reference": {
+          "artifact_id": "e8145a660bb4de9edc3d6f17f5d332e3e66bdceb114a4c31f3157898e34e5ac8",
+          "media_type": "application/octet-stream"
+        },
+        "view": "range",
+        "pointer": "",
+        "start": 0,
+        "count": 100
+      }
+    }
+  ],
+  "reporter_saved_output_revalidation": [
+    {
+      "original_provider_request": "r3-request-9b795d1ffc484ce6a7c4f88e0f4aa268",
+      "original_unavailable_report": {
+        "artifact_id": "8c528d3ac0714daa07f2f7178f947545a175d37b15c4d7257357a9427997836f",
+        "media_type": "application/json"
+      },
+      "revalidated_revision": {
+        "artifact_id": "303db13cc5273e1ef434622155c1ea1c7d657fa67d03874a8577671275cac8f2",
+        "media_type": "application/json"
+      },
+      "source_catalog": {
+        "artifact_id": "3e44827616c6e21f66057491839ed3a36171b46e705dcdf679f7c46bd80d8454",
+        "media_type": "application/json"
+      },
+      "original_response": {
+        "artifact_id": "eed0b62d946f7e48bdafd6886241788765a404bb1ff0fd31924529f41fab5c9c",
+        "media_type": "application/octet-stream"
+      },
+      "all_source_ids_were_in_original_catalog": true,
+      "new_provider_requests": 0,
+      "scope": "Revalidation of saved original output after source-catalog gate repair. Original unavailable revision and original delivery history retained; this revision was not available to earlier decisions."
+    },
+    {
+      "original_provider_request": "r3-request-d3a94ebc3e524db5a6146b739d96a3da",
+      "original_unavailable_report": {
+        "artifact_id": "4cc74120c782a255c4433e5a4db74e474f65f70f9862933924de5f3d153ad1fb",
+        "media_type": "application/json"
+      },
+      "revalidated_revision": {
+        "artifact_id": "a279e89087a62ccd831875c2a39f26307a2fc2f5413220f29f8f11e60e865aa4",
+        "media_type": "application/json"
+      },
+      "source_catalog": {
+        "artifact_id": "91ae8368d53b541335aaf9a3f20ba6f5f5c703a6d35b2482342d7c7f692b838f",
+        "media_type": "application/json"
+      },
+      "original_response": {
+        "artifact_id": "3f1b56b0c83c314f508f4f11c51b257481f41f1a589557205cc8b01b29cc2e58",
+        "media_type": "application/octet-stream"
+      },
+      "all_source_ids_were_in_original_catalog": true,
+      "new_provider_requests": 0,
+      "scope": "Revalidation of saved original output after source-catalog gate repair. Original unavailable revision and original delivery history retained; this revision was not available to earlier decisions."
+    },
+    {
+      "original_provider_request": "r3-request-b353ba472b9e42ae943fe766b0162e19",
+      "original_unavailable_report": {
+        "artifact_id": "9a29642b76a36ff6ac25a4f2bdda551ca9652131ce6230a7c85a67a5b402d74a",
+        "media_type": "application/json"
+      },
+      "revalidated_revision": {
+        "artifact_id": "fd2ca5044c84f6cef5ce28ed578d338d966eb34b5587f33a5f3372956a489312",
+        "media_type": "application/json"
+      },
+      "source_catalog": {
+        "artifact_id": "9b5b416e222cc66aa7062aee1809f61213dfe65a315f4bd804eeb205a1f97b96",
+        "media_type": "application/json"
+      },
+      "original_response": {
+        "artifact_id": "147c7a54cb1d51482ceb35ce8e343d8daee101ae39da0d4eb6cd24cf9139704e",
+        "media_type": "application/octet-stream"
+      },
+      "all_source_ids_were_in_original_catalog": true,
+      "new_provider_requests": 0,
+      "scope": "Revalidation of saved original output after source-catalog gate repair. Original unavailable revision and original delivery history retained; this revision was not available to earlier decisions."
+    }
+  ],
+  "scope": "Deterministic corrections from immutable current-Study evidence. Historical physical acceptance is unchanged. Tiny positive violations remain strict false, not an infeasibility proof. No counterfactual successful rollout, complete-update contract, new method prerequisites or causal mechanism is fabricated."
+}

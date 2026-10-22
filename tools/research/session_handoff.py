@@ -36,7 +36,7 @@ def schemas(agent):
     return {name:deepcopy(normalize_tool_spec(tool.tool_spec)) for name,tool in sorted(agent.tool_registry.registry.items())}
 
 
-def safe_boundary(host,current,db,messages):
+def settled_boundary(current,db,messages):
     if current['research_status']=='stopped':raise ValueError('STOPPED')
     if current.get('success_gate'):raise ValueError('SELECT_REQUIRED')
     if current.get('pending') or current['pilot'].get('unconsumed_response'):raise ValueError('PENDING_FEEDBACK_OR_EXECUTION')
@@ -44,11 +44,78 @@ def safe_boundary(host,current,db,messages):
     if any(e.get('active_reservation') or e.get('status',{}).get('worker_alive',True)
             for e in current.get('rl_runs',{}).values()):raise ValueError('WORKER_RECOVERY_REQUIRED')
     if unmatched(messages):raise ValueError('MISSING_TOOL_RESULT')
+
+
+def safe_boundary(host,current,db,messages,*,boundary='completed_invocation'):
+    settled_boundary(current,db,messages)
+    if boundary=='request_feedback':
+        anchors=[host.store.artifact(e['outputs'][0]) for e in host.store.events(host.run_id)
+            if e['kind']=='request_feedback_boundary']
+        if not anchors or anchors[-1]['session_id']!=current['pilot']['framework_session_id']:
+            raise ValueError('VERIFIED_REQUEST_FEEDBACK_BOUNDARY_REQUIRED')
+        if anchors[-1]['sdk_message_identity']!=digest(messages):raise ValueError('REQUEST_BOUNDARY_HISTORY_CHANGED')
+        return
+    if boundary!='completed_invocation':raise ValueError('UNKNOWN_HANDOFF_BOUNDARY')
     if not messages or messages[-1]['role']!='assistant':raise ValueError('OLD_FEEDBACK_MUST_BE_CONSUMED_FIRST')
     turns=[host.store.artifact(e['outputs'][0]) for e in host.store.events(host.run_id) if e['kind']=='model_original_turn']
     complete=next((t for t in reversed(turns) if t.get('session_id')==current['pilot']['framework_session_id']),None)
     if current['pilot'].get('session_handoff_live_admitted') and complete is None:raise ValueError('DURABLE_COMPLETED_INVOCATION_REQUIRED')
     if complete and complete['sdk_message_identity']!=digest(messages):raise ValueError('OLD_SDK_HISTORY_NOT_DURABLE')
+
+
+async def request_feedback_boundary(host,agent):
+    """Anchor a real response and its paired feedback; no invocation completion."""
+    from tools.research.agent import DeepSeekModel, received, record
+    from tools.research.reporter import current_reports
+    s=state(host);messages=agent.messages
+    with host.store.connect(True) as db:settled_boundary(s,db,messages)
+    if (not messages or messages[-1]['role']!='user'
+            or not any('toolResult' in b for b in messages[-1]['content'])):
+        raise ValueError('PAIRED_TOOL_FEEDBACK_REQUEST_BOUNDARY_REQUIRED')
+    if any(v['interpretation_status']=='deferred' for _,v in current_reports(host)):
+        raise ValueError('REPORTER_DELIVERY_REQUIRED_BEFORE_REQUEST_HANDOFF')
+    events=host.store.events(host.run_id)
+    main=[e for e in events if e['kind']=='r3_request'
+        and host.store.artifact(e['outputs'][0])['purpose']=='conversation']
+    if not main:raise ValueError('REAL_MAIN_RESPONSE_REQUIRED')
+    event=main[-1];reception=received(host,event['request_id']);row=host.store.lookup(host.run_id,event['request_id'])
+    if not reception or reception['http_status']!=200 or not row['receipt']:
+        raise ValueError('REAL_SETTLED_MAIN_RESPONSE_REQUIRED')
+    meta=host.store.artifact(event['outputs'][0]);wire=host.store.artifact(meta['request'])
+    body=json.loads(host.store.artifact(reception['body'],raw=True));choice=body['choices'][0]
+    if len(body['choices'])!=1 or choice['finish_reason']!='tool_calls':raise ValueError('COMPLETE_NATIVE_TOOL_RESPONSE_REQUIRED')
+    index=max(i for i,m in enumerate(messages) if m['role']=='assistant')
+    prefix=wire['messages']
+    if prefix[-1]['role']=='user' and str(prefix[-1].get('content','')).startswith('CURRENT_RESEARCH_PACKET\n'):prefix=prefix[:-1]
+    if DeepSeekModel.format_request_messages(messages[:index],wire['messages'][0]['content'])!=prefix:
+        raise ValueError('REQUEST_BOUNDARY_ORIGINAL_WIRE_PREFIX_MISMATCH')
+    def assistant(value):
+        return dict(content=value.get('content') or None,reasoning=value.get('reasoning_content',''),
+            tools=[dict(id=t['id'],name=t['function']['name'],arguments=json.loads(t['function']['arguments']))
+                for t in value.get('tool_calls',[])])
+    actual=DeepSeekModel.format_request_messages([messages[index]])
+    if len(actual)!=1 or assistant(actual[0])!=assistant(choice['message']):
+        raise ValueError('REQUEST_BOUNDARY_ORIGINAL_RESPONSE_MISMATCH')
+    uses={b['toolUse']['toolUseId']:b['toolUse'] for b in messages[index]['content'] if 'toolUse' in b}
+    originals={host.store.artifact(e['outputs'][0])['tool_use']['toolUseId']:host.store.artifact(e['outputs'][0])
+        for e in events if e['kind']=='model_original_tool_feedback'}
+    results={b['toolResult']['toolUseId']:b['toolResult'] for m in messages[index+1:] for b in m['content'] if 'toolResult' in b}
+    if set(uses)!=set(results):raise ValueError('EXACT_REQUEST_FEEDBACK_IDS_REQUIRED')
+    for key,use in uses.items():
+        original=originals.get(key)
+        if not original or original['tool_use']!=use or original['result']['status']!=results[key]['status']:
+            raise ValueError('ORIGINAL_REQUEST_FEEDBACK_REQUIRED')
+        if original['result']!=results[key]:
+            stash=getattr(agent.context_manager,'_stash',None)
+            if stash is None:raise ValueError('SDK_OFFLOAD_ORIGINAL_REQUIRED')
+            for i,block in enumerate(original['result']['content']):
+                if await stash.retrieve(key+'_'+str(i))!=block:raise ValueError('SDK_OFFLOAD_ORIGINAL_MISMATCH')
+    await agent._session_manager.save_snapshot(agent,is_latest=True)
+    proof=dict(version='request_feedback_boundary_v1',session_id=s['pilot']['framework_session_id'],
+        sdk_message_identity=digest(messages),last_model_request=event['request_id'],
+        original_wire=meta['request'],original_response=reception['body'],tool_ids=sorted(uses),
+        receipts_settled=True,reporter_delivered=True,invocation_completed=False)
+    return record(host,'request_feedback_boundary',proof)
 
 
 def snapshot_files(directory,session_id,*,flush=False):
@@ -75,7 +142,7 @@ def trusted_history(host,agent,*,initial_messages=None,files=None,preparation=No
         return 'incomplete'
     anchors=[]
     for event in host.store.events(host.run_id):
-        if event['kind']!='model_original_turn':continue
+        if event['kind'] not in ('model_original_turn','request_feedback_boundary'):continue
         value=host.store.artifact(event['outputs'][0])
         if value.get('session_id')==session_id and value.get('sdk_message_identity'):
             anchors.append(value)
@@ -83,7 +150,7 @@ def trusted_history(host,agent,*,initial_messages=None,files=None,preparation=No
         anchor=anchors[-1]
         if digest(agent.messages)!=anchor['sdk_message_identity']:raise ValueError('SDK_HISTORY_IDENTITY_MISMATCH_OR_UNTRUSTED_SUFFIX')
         if unmatched(agent.messages):raise ValueError('SDK_COMPLETED_HISTORY_HAS_UNPAIRED_TOOLS')
-        return 'completed'
+        return 'request_feedback' if anchor.get('version')=='request_feedback_boundary_v1' else 'completed'
     if initial_messages is not None:
         if agent.messages!=initial_messages:raise ValueError('SDK_INITIAL_CONTEXT_MISMATCH')
         verification=host.store.artifact(s['pilot']['handoff_verification'])
@@ -124,12 +191,12 @@ async def reconcile(host,build,directory,*,allow_incomplete=False):
     return await validate_snapshot(host,ref,build,directory,allow_incomplete=allow_incomplete)
 
 
-async def handoff(host,agent,build,directory,*,stage=lambda name:None):
+async def handoff(host,agent,build,directory,*,stage=lambda name:None,boundary='completed_invocation'):
     """Prepare -> persist -> independently reopen -> verify -> atomic pointer commit."""
     current=state(host);committed=current['pilot'].get('handoff')
     if committed:
         prior=host.store.artifact(committed);session_id=agent._session_manager.session_id
-        repeated_old=(prior['previous_session']==session_id and prior['completed_boundary_identity']==digest(agent.messages))
+        repeated_old=(prior['previous_session']==session_id and prior.get('boundary_identity',prior.get('completed_boundary_identity'))==digest(agent.messages))
         untouched_new=(prior['next_session']==session_id and agent.messages==prior['initial_messages'])
         if repeated_old or untouched_new:return committed,await validate_snapshot(host,committed,build,directory)
     if agent._session_manager.session_id!=current['pilot']['framework_session_id']:raise ValueError('OLD_SESSION_ID_MISMATCH')
@@ -139,11 +206,11 @@ async def handoff(host,agent,build,directory,*,stage=lambda name:None):
     if restored.messages!=agent.messages:raise ValueError('OLD_SDK_HISTORY_NOT_DURABLE')
     stage('before_prepare')
     with host.store.transaction() as db:
-        s=host.store.session(host.run_id,db)['state'];safe_boundary(host,s,db,agent.messages)
+        s=host.store.session(host.run_id,db)['state'];safe_boundary(host,s,db,agent.messages,boundary=boundary)
         prior=s['pilot'].get('handoff_preparation')
         if prior:
             value=host.store.artifact(prior)
-            if value['source_state_identity']!=state_identity(s) or value['completed_boundary_identity']!=digest(agent.messages):
+            if value['source_state_identity']!=state_identity(s) or value.get('boundary_identity',value.get('completed_boundary_identity'))!=digest(agent.messages):
                 raise ValueError('PREPARATION_STATE_CHANGED_KEEP_OLD_SESSION')
             preparation=prior
         else:
@@ -160,6 +227,11 @@ async def handoff(host,agent,build,directory,*,stage=lambda name:None):
                     ('results','mechanics_results','physical_replays','matched_state_results','rl_evaluations','analysis_results')
                     for r in s.get(key,[])],
                 tool_schemas=schemas(agent),initial_messages=initial)
+            if boundary=='request_feedback':
+                value['version']='research_session_handoff_v3';value['boundary_kind']=boundary
+                value['boundary_identity']=value.pop('completed_boundary_identity')
+                value['boundary']=value.pop('completed_boundary')
+                value['invocation_completed']=False
             value['next_session']='rh-'+digest(value)[:24]
             preparation=plain(host.store.put(db,value));s['pilot']['handoff_preparation']=preparation
             host.store.update_state(db,host.run_id,s)
@@ -182,7 +254,7 @@ async def handoff(host,agent,build,directory,*,stage=lambda name:None):
     with host.store.transaction() as db:
         s=host.store.session(host.run_id,db)['state']
         if s['pilot'].get('handoff')==preparation:return preparation,new
-        safe_boundary(host,s,db,agent.messages)
+        safe_boundary(host,s,db,agent.messages,boundary=boundary)
         if (s['pilot'].get('handoff_preparation')!=preparation or state_identity(s)!=value['source_state_identity']
                 or host.store.remaining(db=db)!=value['budget'] or schemas(agent)!=value['tool_schemas']):
             raise ValueError('HANDOFF_STATE_OR_LEDGER_CHANGED')

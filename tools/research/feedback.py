@@ -11,7 +11,11 @@ def execution_evidence(result):
     acceptance=result.get('acceptance') or {}
     profile=result.get('profile') or {}
     execution=result.get('execution') or {}
-    return dict(numerical_validity=dict(acceptance_status=acceptance.get('status'),
+    return dict(configured_termination_conditions=(acceptance.get('timing') or {}).get('termination'),
+        configured_termination_is_observed_reason=False,
+        actual_termination=dict(solver_status=profile.get('solver_status'),complete=profile.get('complete'),
+            reason=execution.get('failure_reason') or profile.get('execution_failure_reason')),
+        numerical_validity=dict(acceptance_status=acceptance.get('status'),
         execution_status=result.get('status'),failure_stage=execution.get('stage'),
         failure_reason=execution.get('failure_reason') or profile.get('execution_failure_reason'),
         components={k:v for k,v in acceptance.get('components',{}).items() if k in

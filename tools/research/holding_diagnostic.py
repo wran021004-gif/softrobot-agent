@@ -60,13 +60,19 @@ def nmpc(folder, reference):
             and pred['frame']=='world' and pred['prediction_source']=='accepted_plan'
             and abs(pred['time_s']-m['time_s'])<1e-12)
         facts=o.get('mathematical_facts') or {}
-        same_input=aligned and np.allclose(facts['tensions'][0],t['tension_n'],rtol=0,atol=1e-12)
+        from extensions.tendon_family.gvs_reporting import vector3
+        plan=np.asarray(facts.get('tensions',[]))
+        predicted_input=plan[0] if plan.ndim==2 else plan if facts.get('horizon')==1 and plan.shape==np.asarray(t['tension_n']).shape else None
+        vectors_valid=bool(pred and vector3(pred.get('tip_position_m')) and vector3(pred.get('tip_velocity_m_s')))
+        same_input=bool(aligned and vectors_valid and predicted_input is not None and np.allclose(predicted_input,t['tension_n'],rtol=0,atol=1e-12))
         rows.append(dict(time_s=m['time_s'],position_m=m['tip_position_m'],velocity_m_s=m['tip_velocity_m_s'],
             actual_tension_n=t['tension_n'],control_update_index=i,control_start_s=o['time_s'],
             valid_plan=o['plan_accepted'],fallback=o['failure_response_used'],plan_source=o['plan_source'],
             saturated=t['force_limit_saturated'],qpos_rad=t['qpos_rad'],qvel_rad_s=t['qvel_rad_s'],
             projection_rate_residual=m.get('rate_projection_residual_rad_m_s'),
             aligned_accepted_prediction=pred if aligned else None,prediction_uses_actual_tension=bool(same_input),
+            prediction_diagnostic_available=bool(same_input),
+            prediction_diagnostic_missing_reason=None if same_input else 'Invalid vector dimensions or selected-plan input does not match the actually applied input',
             signed_prediction_velocity_error_m_s=(np.array(pred['tip_velocity_m_s'])-m['tip_velocity_m_s']).tolist() if same_input else None))
     result=diagnose(rows,cfg['task']['goal']['data']['target_m'])
     result.update(route='nmpc',source_folder=folder,source_result=reference,candidate=r['candidate'],

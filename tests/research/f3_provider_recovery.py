@@ -71,10 +71,16 @@ def loss_disposition(host,row):
     if receipt['execution_status']!='failed' or receipt.get('error')!=ERROR:return None
     value=host.store.artifact(receipt['output'])
     approval=host.store.artifact(value['authorization']);scope=approval['scope'];s=state(host)
+    # Historical receipts keep their original binding after an explicit retained
+    # core migration. Only the contiguous chain ending at today's binding counts.
+    bound_freezes={s['freeze']};cursor=s['freeze']
+    for repair in reversed(s.get('core_repairs',[])):
+        if repair.get('commit')!=cursor or repair.get('old_results_and_costs_retained') is not True:break
+        cursor=repair['previous_commit'];bound_freezes.add(cursor)
     if (value.get('version')!='provider_response_loss_disposition_v1' or value.get('remote_outcome')!='unknown'
             or approval.get('user_approval') is not True or approval.get('scope_identity')!=digest(scope)
             or scope.get('policy')!=POLICY or scope.get('study_id')!=host.run_id
-            or scope.get('resolved_identity')!=s['spec']['resolved_identity'] or scope.get('freeze')!=s['freeze']
+            or scope.get('resolved_identity')!=s['spec']['resolved_identity'] or scope.get('freeze') not in bound_freezes
             or scope.get('request_id')!=row['request_id'] or scope.get('request_hash')!=row['request_hash']
             or receipt['charged']!=json.loads(row['reserved'])):
         raise ValueError('INVALID_AUTHORIZED_LOSS_RECEIPT')

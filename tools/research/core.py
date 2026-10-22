@@ -28,9 +28,13 @@ def read_evidence(host, query, *, record_read=True):
     """Use the existing evidence boundary; internal reads may omit read markers."""
     q = EvidenceQuery.model_validate(query)
     s = state(host)
-    value = host.store.artifact(q.reference)
+    value = host.store.artifact(q.reference,raw=True) if q.reference.media_type in ('application/gzip','application/octet-stream') else host.store.artifact(q.reference)
     if isinstance(value,bytes):
-        try:value=json.loads(value)
+        try:
+            if value.startswith(b'\x1f\x8b'):
+                import gzip
+                value=gzip.decompress(value)
+            value=json.loads(value)
         except (ValueError,UnicodeError) as exc:raise ValueError('EVIDENCE_NOT_JSON: select a saved JSON measurement artifact') from exc
     if protected(host) and plain(q.reference) not in readable_results(s,host):
         raise ValueError('PROTECTED_EVIDENCE_READ_REQUIRES_NEW_RESULT_OR_TRAINING_SUMMARY')
@@ -40,13 +44,29 @@ def read_evidence(host, query, *, record_read=True):
         if plain(q.reference) not in [s.get('family_space_reference'),*registered_references(host)]:raise ValueError('REGISTERED_WORKING_SET_ANCHOR_REQUIRED')
         value=dict(context(host)['evidence_working_set'],source_state_identity=digest(s),
             authoritative_scientific_evidence=False)
+    root_value=value
+    def navigation(exc,node,path):
+        from tools.research.evidence_views import data_access
+        details=dict(reference=plain(q.reference),view=q.view,failed_pointer=q.pointer,
+            parent_pointer=path,available_fields=list(node) if isinstance(node,dict) else None,
+            list_length=len(node) if isinstance(node,list) else None,
+            parent_query=dict(reference=plain(q.reference),view='working_set' if q.view=='working_set' else 'summary',pointer=path),
+            data_access=data_access(host,plain(q.reference),root_value))
+        if q.view!='working_set' and q.pointer and q.pointer.split('/')[1] in ('candidate_index','control_result_links','control_comparisons','citation_eligibility'):
+            details['derived_view_query']=dict(reference=plain(q.reference),view='working_set',pointer=q.pointer)
+        exc.evidence_navigation=details
+        return exc
     if q.pointer and not q.pointer.startswith('/'):
         raise ValueError('INVALID_EVIDENCE_POINTER: use an absolute JSON pointer or empty root')
+    parent=''
     for part in q.pointer[1:].split('/') if q.pointer else []:
         part = part.replace('~1', '/').replace('~0', '~')
         if isinstance(value,list) and (not part.isdecimal() or int(part)>=len(value)):
-            raise IndexError('List index must be in [0, '+str(len(value))+')')
+            raise navigation(IndexError('List index must be in [0, '+str(len(value))+')'),value,parent)
+        if not isinstance(value,(list,dict)) or (isinstance(value,dict) and part not in value):
+            raise navigation(KeyError(part),value,parent)
         value = value[int(part)] if isinstance(value, list) else value[part]
+        parent+='/'+part.replace('~','~0').replace('/','~1')
     if q.view=='capabilities':
         from extensions.tendon_family.family_space import parameter_capabilities
         if q.pointer or 'parameters' not in value:raise ValueError('CAPABILITIES_VIEW_REQUIRES_WHOLE_CANDIDATE')
@@ -58,8 +78,12 @@ def read_evidence(host, query, *, record_read=True):
     elif q.view=='summary':
         from tools.research.research_context import compact_evidence
         value=compact_evidence(value,plain(q.reference),q.pointer)
+        from tools.research.evidence_views import data_access
+        value['data_access']=data_access(host,plain(q.reference),root_value)
     elif q.view=='fields':
         if not isinstance(value,dict):raise ValueError('EVIDENCE_FIELDS_REQUIRES_OBJECT_POINTER')
+        missing=[key for key in q.fields if key not in value]
+        if missing:raise navigation(KeyError(missing[0]),value,q.pointer)
         value={key:value[key] for key in q.fields}
     elif q.view=='range':
         if not isinstance(value,list):raise ValueError('EVIDENCE_RANGE_REQUIRES_LIST_POINTER')

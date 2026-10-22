@@ -15,7 +15,7 @@ from schemas.research_reporting import (EvidenceLocation, EvidenceRelation,
 from tools.platform_store import plain
 from tools.research.core import read_evidence
 from tools.research.contracts import EvidenceQuery
-from tools.research.evidence_views import result_card
+from tools.research.evidence_views import result_card,recorded_math_summary,recorded_control_diagnostics,recorded_static_summary
 from tools.research.evidence_policy import paired_evidence
 from tools.research.state import state, protected
 
@@ -61,8 +61,7 @@ def _card(host, reference):
         # Legacy mechanics predates scoped_claim. Copy its recorded solver facts
         # without manufacturing a MathematicalEvidence certificate or conclusion.
         facts=value['mathematical_facts'];summary=deepcopy(card.deterministic_summary)
-        summary['recorded_mathematics']={k:facts[k] for k in ('status','converged','exitflag',
-            'original_feasible','relaxed_feasible','physical_task_acceptance','objective_definition') if k in facts}
+        summary['recorded_mathematics']=recorded_math_summary(value,plain(reference))
         summary['recorded_conclusions']=value.get('verified_conclusions',[])
         metrics=[*card.metrics,*[ReportedMetric(name=k,value=facts[k],scope='solver',
             source=EvidenceLocation(reference=reference,pointer='/mathematical_facts/'+k))
@@ -183,10 +182,10 @@ def assemble(host, references, *, question=None):
         question=question,results=cards,relations=relations)
 
 
-def _save(host, report, *, request=None, status='deferred', interpretation_for=None, error=None):
+def _save(host, report, *, request=None, status='deferred', interpretation_for=None, error=None,rejection_details=None):
     from tools.research.agent import record
     return record(host,'research_report',dict(report=plain(report),request=plain(request),
-        interpretation_status=status,interpretation_for=interpretation_for,error=error))
+        interpretation_status=status,interpretation_for=interpretation_for,error=error,rejection_details=rejection_details))
 
 
 def investigate(host, request):
@@ -285,6 +284,14 @@ def reporter_handoff_summary(host, reference, saved):
     from tools.research.research_context import mathematical_decision_view
     report=saved['report'];findings=[];scope=[];limitations=[];unresolved=[]
     for card in report['results']:
+        # Refresh projections from the same immutable source, preserving old reports.
+        card=deepcopy(card)
+        raw=host.store.artifact(card['identity']['result']['reference'])
+        recorded=recorded_math_summary(raw,card['identity']['result']['reference'])
+        if recorded is not None:card['deterministic_summary']['recorded_mathematics']=recorded
+        if raw.get('execution_id'):card['deterministic_summary']['recorded_control_diagnostics']=recorded_control_diagnostics(host,raw)
+        construction=recorded_static_summary(raw,card['identity']['result']['reference'])
+        if construction:card['deterministic_summary']['recorded_static_construction']=construction
         evidence=card['evidence_summary'];math=mathematical_decision_view(card)
         metrics=sorted(card['metrics'],key=lambda m:m['passed'] is not False)[:3]
         fact=dict(result=card['identity']['result'],operation=card['identity']['operation'],
@@ -293,7 +300,7 @@ def reporter_handoff_summary(host, reference, saved):
         if math:fact['mathematics']=math
         else:
             fact['recorded_summary']={k:v for k,v in card['deterministic_summary'].items()
-                if k in ('task_gap','status','conclusion','recorded_mathematics','recorded_conclusions')}
+                if k in ('task_gap','status','conclusion','recorded_mathematics','recorded_conclusions','recorded_control_diagnostics')}
         findings.append(fact)
         scope.append(dict(result=card['identity']['result'],claim_kind=evidence['claim_kind'],
             verification_status=evidence['verification_status'],supported_inferences=evidence['supported_inferences']))
@@ -310,7 +317,7 @@ def reporter_handoff_summary(host, reference, saved):
         limitations=list(dict.fromkeys(limitations)),unresolved=list(dict.fromkeys(unresolved)),
         interpretations=interpretations,interpretation_sources=[s for i in interpretations for s in i['sources']],
         interpretation_scope='Non-authoritative interpretations; hypothesis and further_investigation are unconfirmed questions, not decisions',
-        error=saved['error'])
+        error=saved['error'],rejection_details=saved.get('rejection_details'))
 
 
 def _source_catalog(host, report, queries):
@@ -383,7 +390,7 @@ def _finish(host, boundary, wire, response):
     from tools.research.agent import record
     payload=json.loads(wire['messages'][-1]['content']);base=payload['report_reference']
     saved=host.store.artifact(base);report=ScientificReport.model_validate(saved['report'])
-    status='available';error=None
+    status='available';error=None;rejection=None
     try:
         body=response.json();choice=body['choices'][0]
         if response.status_code not in range(200,300) or choice['finish_reason']!='stop':
@@ -391,8 +398,10 @@ def _finish(host, boundary, wire, response):
         if 'source_catalog' in payload:
             output=SourceIdResponse.model_validate_json(choice['message']['content'])
             catalog=payload['source_catalog'];interpretations=[]
-            for item in output.interpretations:
-                if any(key not in catalog for key in item.source_ids):
+            for index,item in enumerate(output.interpretations):
+                invalid=[key for key in item.source_ids if key not in catalog]
+                if invalid:
+                    rejection=dict(code='REPORTER_UNKNOWN_SOURCE_ID',interpretation_index=index,invalid_source_ids=invalid)
                     raise ValueError('REPORTER_UNKNOWN_SOURCE_ID')
                 interpretations.append(ReporterInterpretation(kind=item.kind,text=item.text,
                     sources=[catalog[key] for key in item.source_ids]))
@@ -404,16 +413,30 @@ def _finish(host, boundary, wire, response):
         allowed.update(f.source.reference.artifact_id for card in report.results for f in card.recorded_context)
         for relation in report.relations:allowed.update(s.reference.artifact_id for s in relation.sources)
         allowed.update(q['reference']['artifact_id'] for q in (saved.get('request') or {}).get('reads',[]))
-        for item in interpretations:
+        # The exact persisted request catalog already contains typed metric,
+        # critical-sample and input sources. They are part of this request scope.
+        allowed.update(loc['reference']['artifact_id'] for loc in payload.get('source_catalog',{}).values())
+        for index,item in enumerate(interpretations):
             if not item.sources:raise ValueError('REPORTER_INTERPRETATION_REQUIRES_SOURCE')
             for source in item.sources:
-                if source.reference.artifact_id not in allowed:raise ValueError('REPORTER_SOURCE_OUTSIDE_SCOPE')
-                read_evidence(host,plain(source),record_read=False)
+                if source.reference.artifact_id not in allowed:
+                    rejection=dict(code='REPORTER_SOURCE_OUTSIDE_SCOPE',interpretation_index=index,invalid_locations=[plain(source)])
+                    raise ValueError('REPORTER_SOURCE_OUTSIDE_SCOPE')
+                try:read_evidence(host,plain(source),record_read=False)
+                except Exception as exc:
+                    rejection=dict(code='REPORTER_SOURCE_READ_INVALID',interpretation_index=index,
+                        invalid_locations=[plain(source)],navigation=getattr(exc,'evidence_navigation',None))
+                    raise
         # The model is allowed to fill only the interpretation field.
         report=report.model_copy(update=dict(interpretations=interpretations))
     except Exception as exc:
         status='unavailable';error=str(exc)
-    ref=_save(host,report,request=saved.get('request'),status=status,interpretation_for=base,error=error)
+        rejection=dict(rejection or dict(code=str(exc)),exception_type=type(exc).__name__,
+            catalog=payload.get('source_catalog'),provider_request=boundary.last_request)
+        from tools.research.agent import received
+        reception=received(host,boundary.last_request)
+        rejection['raw_response_reference']=(reception or {}).get('body')
+    ref=_save(host,report,request=saved.get('request'),status=status,interpretation_for=base,error=error,rejection_details=rejection)
     record(host,'reporter_completed',dict(report_reference=ref,base_report=base,
         provider_request=boundary.last_request,status=status))
     # A Reporter has no executable output: even malformed/truncated text can be

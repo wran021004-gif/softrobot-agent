@@ -1,5 +1,7 @@
 # Formal F3 autonomous study
 
+Current engineering repair: [request-boundary continuity, evidence feedback and mathematics authorization](f3_feedback_repair.md). The later request-feedback handoff policy supersedes the completed-invocation-only recovery policy described in the historical sections below. The registered mathematics grant is approved; T2 still requires its actual candidate/model-group prerequisites. This repair retains all prior results and budgets and explicitly versions the changed control-input behavior.
+
 This record starts with final engineering admission. The formal Store is not yet created at this commit; the exact final pushed SHA, resolved identities, user authorization and subsequent executions will be recorded from immutable Store artifacts.
 
 The user explicitly authorized one new Study with 128 total Provider requests (including independent Reporter, 8 protected), 400 public operations (20 protected), 64 mathematical evaluations, 80 shared physical launches, 6 NMPC executions, 2 PPO stages with 262144 aggregate actions and 2 independent evaluation episodes, 2 offline NLP and 2 BDF replays. No budget reset, automatic extension or substitute Study is authorized.

@@ -109,7 +109,14 @@ def execution_update(host, reference, update_id):
     measured=next((r for r in motion if abs(r['time_s']-observation['time_s'])<=1e-12),{})
     observation.update({k:measured[k] for k in ('tip_velocity_m_s','tip_speed_m_s') if k in measured})
     record=deepcopy(observation.get('complete_update_record'))
-    if not record:raise ValueError('ACTUAL_COMPLETE_UPDATE_INPUT_REQUIRED')
+    if not record:
+        error=ValueError('ACTUAL_COMPLETE_UPDATE_INPUT_REQUIRED')
+        error.evidence_navigation=dict(execution_reference=reference,update_id=update_id,
+            observation_query=dict(reference=source['files']['controller_observations.json'],view='full',pointer='/'+str(update_id)),
+            solver_request_query=dict(reference=source['files']['controller_observations.json'],view='full',pointer=f'/{update_id}/solver_request_record') if observation.get('solver_request_record') else None,
+            exact_local_optimizer_replay_available=False,
+            missing='Actual complete optimizer-input contract is absent; saved solver facts do not manufacture that contract.')
+        raise error
     definition=record.get('resolved_problem_reference')
     if definition:
         body=host.store.artifact(source['files'][definition['filename']],raw=True)

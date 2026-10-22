@@ -68,6 +68,10 @@ class IncompleteModelOutput(ValueError):
         super().__init__(code+': '+json.dumps(diagnostic,separators=(',',':')))
 
 
+class RequestBoundaryHandoff(Exception):
+    """Unwind the SDK loop before a send; never a completed model invocation."""
+
+
 def provider_outcome(host,request_id):
     """Read durable transport/output facts without consuming or settling anything."""
     reception=received(host,request_id)
@@ -366,6 +370,7 @@ def error_feedback(host, use, exc, before):
             inventory_query=dict(reference=anchor,view='working_set',pointer='/citation_eligibility'),
             missing_validation='FamilySpace/raw samples do not establish independent task acceptance. Use a bound registered physical evaluation or scoped mathematical result for the corresponding claim.')
     return dict(status='rejected' if counts(before)==counts(s) else 'execution_failed',error_code=code[:100],field=field,
+        evidence_navigation=getattr(exc,'evidence_navigation',None),
         expected=expected,scientific_execution_started=counts(before)!=counts(s),relevant_references=refs,full_error_reference=full,**citation)
 
 def build_harness(host,*,transport,api_key,instructions,model_class,tool_executor,research_tools,configuration_path,session_directory,session_id=None):
@@ -459,7 +464,7 @@ async def pause_completed_invocation(host,agent,completed):
         research_status=state(host)['research_status'],budgets_preserved=True))
 
 
-async def converse(host,*,session_handoff=False,pause_after_completed_invocations=None):
+async def converse(host,*,session_handoff=False,pause_after_completed_invocations=None,handoff_before_next_request=False):
     if pause_after_completed_invocations is not None and (type(pause_after_completed_invocations) is not int or pause_after_completed_invocations<1):
         raise ValueError('POSITIVE_COMPLETED_INVOCATION_COUNT_REQUIRED')
     from tools.research.state import require_authorization
@@ -469,6 +474,8 @@ async def converse(host,*,session_handoff=False,pause_after_completed_invocation
     from tools.research.reporter import InvestigationRequest, investigate, scientific_feedback, complete_reports
     if session_handoff and not state(host)['pilot'].get('session_handoff_live_admitted'):
         raise ValueError('LIVE_PROVIDER_CONTINUATION_UNVERIFIED_HANDOFF_NOT_ADMITTED')
+    if handoff_before_next_request and (not session_handoff or state(host)['pilot'].get('session_handoff_boundary')!='request_feedback'):
+        raise ValueError('REQUEST_FEEDBACK_LIVE_ADMISSION_REQUIRED')
     if state(host)['spec'].get('mode') == 'engineering_numerical':
         raise ValueError('NUMERICAL_MODE_FORBIDS_APPLICATION_MODEL_ENDPOINTS')
     from strands.tools.tools import PythonAgentTool
@@ -720,6 +727,16 @@ async def converse(host,*,session_handoff=False,pause_after_completed_invocation
                 spec['inputSchema']['json']['properties']['reference']['enum']=feedback_context_references()
                 retrieval.tool_spec=spec
             boundary.research_packet['protected_closeout_rule']='PROTECTED CLOSEOUT: status/stop existing workers, pinned published-policy evaluation, explicit evidence reads, selected passing solution confirmations and truthful STOP. No start/resume/solve/exploration.'
+        if (session_handoff and state(host)['pilot'].get('session_handoff_boundary')=='request_feedback'
+                and agent.messages and agent.messages[-1]['role']=='user'
+                and any('toolResult' in b for b in agent.messages[-1]['content'])):
+            wire=agent.model.format_request(agent.messages,agent.tool_registry.get_all_tool_specs(),agent.system_prompt)
+            size=len(httpx.Request('POST',s['pilot']['provider']['base_url']+'/chat/completions',json=wire).content)
+            provider=s['pilot']['provider'];context=provider['context_guard']
+            if handoff_before_next_request or size+provider['max_tokens']+context['framing_headroom_tokens']>context['context_limit_tokens']:
+                from tools.research.session_handoff import request_feedback_boundary
+                await request_feedback_boundary(host,agent)
+                raise RequestBoundaryHandoff('Verified request-feedback boundary; next model send has not started')
     def before_tool(event):
         if state(host)['spec'].get('rl_evaluation_source') and event.tool_use['name'] not in ('research_plan','research_rl','evidence_read'):
             event.cancel_tool='Only declared follow-up evaluation, evidence reads and STOP are permitted.'
@@ -752,7 +769,22 @@ async def converse(host,*,session_handoff=False,pause_after_completed_invocation
             if host.store.remaining()['remaining']['model_calls']<1:
                 engineering_closeout(host,'Provider request count exhausted without model STOP/selection')
                 break
-            result=await agent.invoke_async('Use actual saved evidence, choose your next research action or STOP, then consume feedback and decide freely.')
+            try:
+                result=await agent.invoke_async('Use actual saved evidence, choose your next research action or STOP, then consume feedback and decide freely.')
+            except Exception as exc:
+                cause=exc;seen=set()
+                while cause is not None and id(cause) not in seen and not isinstance(cause,RequestBoundaryHandoff):
+                    seen.add(id(cause));cause=cause.__cause__
+                if not isinstance(cause,RequestBoundaryHandoff):raise
+                record(host,'sdk_invocation_suspended_for_handoff',dict(session_id=agent._session_manager.session_id,
+                    sdk_message_identity=digest(agent.messages),invocation_completed=False,next_request_sent=False))
+                from tools.research.session_handoff import handoff
+                _,agent=await handoff(host,agent,build_session,host.store.root/'framework_sessions',boundary='request_feedback')
+                handoff_before_next_request=False
+                agent.hooks.add_callback(BeforeModelCallEvent,before_model)
+                agent.hooks.add_callback(BeforeToolCallEvent,before_tool)
+                agent.hooks.add_callback(AfterToolCallEvent,after_tool)
+                continue
             record(host,'model_original_turn',dict(result=str(result),session_id=agent._session_manager.session_id,
                 sdk_message_identity=digest(agent.messages)))
             if state(host)['pending'] or pending(host):
@@ -786,15 +818,22 @@ async def converse(host,*,session_handoff=False,pause_after_completed_invocation
 
 def decision_packet(host):
     from tools.research.core import packet
+    from tools.research.research_context import ordered_candidates
     if state(host)['spec'].get('research_decisions'):
         from tools.research.research_context import agent_decision_brief
         from extensions.tendon_family.family_space import decision_summary
         s=state(host);spec=s['spec']
         return dict(research=agent_decision_brief(host),implementation=s['freeze'],study_id=host.run_id,
+            evaluation_profile={k:s['profile'][k] for k in ('identity','version')},
+            implementation_migration=s.get('core_repairs',[])[-1] if s.get('core_repairs') else None,
             controller_capabilities=dict(recipe_defaults=spec['configuration']['policy']['controller']['parameters']['data']['recipe'],
                 solver_defaults=spec['configuration']['policy']['controller']['parameters']['data'].get('solver'),
                 patch='Generation v2 controller_recipe/controller_solver sparse patches use registered owner validation; settling remains task-owned'),
-            candidates=[r for r in s['candidates'].values() if host.store.artifact(r)['profile_identity']==s['profile']['identity']][-spec.get('research_decisions',{}).get('context_limits',{}).get('candidates',3):],family_space=decision_summary(spec['family_space'],s['family_space_reference'],
+            candidates=ordered_candidates(host,s)[-spec.get('research_decisions',{}).get('context_limits',{}).get('candidates',3):],
+            candidate_profile_bindings=[dict(candidate=r,profile_identity=host.store.artifact(r)['profile_identity'],
+                executable_under_current_profile=host.store.artifact(r)['profile_identity']==s['profile']['identity'])
+                for r in ordered_candidates(host,s)[-spec.get('research_decisions',{}).get('context_limits',{}).get('candidates',3):]],
+            family_space=decision_summary(spec['family_space'],s['family_space_reference'],
                 dict(actions=spec['allowed_plan_actions'],capabilities=spec['capabilities'])),analysis_protocol=spec['analysis_protocol'],
             guidance='Tool results acknowledge execution and saved references; use latest_reports L1 for scientific decisions. Signed score direction, comparison scope and optimality come from structured facts. Use exact evidence refs and a typed decision in every research_plan. evidence_read and research_investigate permit drill-down. Reporter interpretations are hypotheses, never authoritative facts or action choices. Choose the next research method freely. New designs need explicit control adaptation. Do not infer global feasibility/infeasibility. Stop at first complete pass; publicly read and select it. Retrieve the exact stop_result_index before STOP; cite every new result.')
     result=packet(host)

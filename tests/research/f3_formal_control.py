@@ -90,7 +90,7 @@ def authorize():
         public_prior_manifest=state(h)['public_prior_manifest'],resolved_identity=spec['resolved_identity'])
 
 
-async def admit(h):
+async def admit(h,*,boundary='completed_invocation'):
     from tools.research.agent import build_harness, LiveBoundary, live_model_class
     from tools.research.session_handoff import safe_boundary, trusted_history, schemas, snapshot_files
     from tools.research.reporter import current_reports
@@ -135,18 +135,22 @@ async def admit(h):
         # retrieve_context is SDK-owned; restore its exact last advertised schema.
         for d in definitions:
             agent.tool_registry.registry[d['name']].tool_spec=dict(name=d['name'],description=d.get('description',''),inputSchema={'json':d['parameters']})
+        if boundary=='request_feedback':
+            from tools.research.session_handoff import request_feedback_boundary
+            await request_feedback_boundary(h,agent)
         trusted_history(h,agent)
-        with h.store.connect(True) as db:safe_boundary(h,state(h),db,agent.messages)
+        with h.store.connect(True) as db:safe_boundary(h,state(h),db,agent.messages,boundary=boundary)
         packet=decision_packet(h)
         proof=dict(real_requests=[e['request_id'] for e,_ in requests],tool_ids=[u['toolUseId'] for u in uses],
             authorized_response_losses=losses,
             sdk_history_identity=digest(agent.messages),tool_schemas=schemas(agent),
             snapshot_files=snapshot_files(h.store.root/'framework_sessions',s['pilot']['framework_session_id']),
-            l0_identity=digest(packet),independently_restored=True,scope='Real current-Study continuity plus original explicit user handoff authorization')
+            l0_identity=digest(packet),independently_restored=True,boundary_kind=boundary,
+            scope='Real current-Study continuity plus explicit user handoff authorization; request-feedback timing additionally requested on 2026-10-23')
         with h.store.transaction() as db:
             current=h.store.session(h.run_id,db)['state']
             if current!=s:raise ValueError('ADMISSION_STATE_CHANGED')
-            ref=h.store.put(db,proof);current['pilot'].update(session_handoff_live_admitted=True,live_admission_reference=dict(artifact_id=ref.artifact_id))
+            ref=h.store.put(db,proof);current['pilot'].update(session_handoff_live_admitted=True,live_admission_reference=dict(artifact_id=ref.artifact_id),session_handoff_boundary=boundary)
             h.store.update_state(db,h.run_id,current)
             h.store.event(db,h.run_id,'session_handoff_live_admission','admitted',outputs=[ref])
         return dict(study_id=h.run_id,live_admitted=True,proof=dict(artifact_id=ref.artifact_id))
