@@ -4,6 +4,8 @@
 后续真实调用的两轮结果、最小修复与未通过事项见 [S130 真实 LLM 验证](s130_live_validation.md)。
 当前最小契约修复、新旧行为对照与零请求重放见 [S130 协议修复](s130_protocol_repair.md)；
 下文 N1/N2 交付记录中的强制 null、逐字覆盖拒绝和全部时序拒绝由该修复说明更新。
+第三轮三例受控真实复测与最终验收意见见 [S130 最终真实验证](s130_final_validation.md)：
+2/3 合法草稿，Reach 未形成真实配置预览；本轮停止，尚不满足成功验收条件。
 
 本次仅新增四个文件：`schemas/task_intake.py`、`tools/task_intake.py`、
 `tests/research/test_task_intake.py` 和本文。没有接入科研 Agent，也没有实施 N2。
