@@ -33,3 +33,13 @@
 - [Reporter 重新验证](../../evidence/f3_formal/feedback_repair_20261023/reporter_revalidation.json)：仅重读已保存请求/响应，新增模型请求为 0。
 
 修复审计时 Provider 为 47/128、公共操作 59/400、物理调用 8/80、NMPC 5/6、数学 2/64、offline NLP 1/2。没有获得完整任务通过结论。完整 Store 和 SDK checkpoint 保留在本机，新的原始会话包未纳入本次推送。
+
+## 实际恢复
+
+修复 `07fde5ed` 已推送并通过既有 `core.bind` 显式迁移为评估版本 2；[迁移回执](../../evidence/f3_formal/feedback_repair_20261023/implementation_binding.json) 保留原候选及全部结果与成本，未把旧候选静默绑定到新版本。新候选与科研路线仍由主 Agent 自主选择。
+
+首次真实只读准入发现 Provider 字符串正文与 SDK 文本块列表的表示差异，原文、reasoning、工具 ID 和解析后的参数均一致。拒绝发生时未发送新请求。`55d1b988` 仅规范化精确文本的表示形式，保留逐字符检查；19 项接续/准入/恢复测试通过，[后续绑定](../../evidence/f3_formal/feedback_repair_20261023/boundary_format_binding.json) 保持科学版本 2 和账本不变。
+
+真实请求反馈边界准入已通过，`live_admitted=true`。恢复后的真实工具反馈边界完成 v3 prepare、独立 SDK 恢复验证和原子提交，当时累计 Provider 48 次；其后的新会话请求返回 HTTP 200，正文为 209,579 字节。请求明确携带研究意图、原预算、候选版本绑定、证据修正与正式数学授权；原 invocation 为 suspended，`invocation_completed=false`，没有伪造自然返回。详见 [实际接续证明](../../evidence/f3_formal/feedback_repair_20261023/live_resume_verification.json)。
+
+该证明记录时 Provider 52/128、物理调用 8/80、NMPC 5/6。主 CLI 与每 10 秒检查的监督进程均存活，心跳为 `runs/f3-formal-supervision.json`。运行将继续消耗同一个原始账本；证明中的数字为采样时点，不是最终用量。T2 当前还需新实施版本下的合法候选与完整绑定模型组；方法授权继续有效。未声明获得完整任务通过结果。
