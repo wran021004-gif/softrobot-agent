@@ -222,3 +222,179 @@ are committed separately. The isolated integration branch is the only push targe
 Detailed checks: [validation.json](../../evidence/s129_integration/validation.json),
 [live_validation.json](../../evidence/s129_integration/live_validation.json).
 Actual B-to-Agent sample: [mathematical_decision_sample.json](../../evidence/s129_integration/mathematical_decision_sample.json).
+
+## F2.1: science before the next decision (2026-10-22)
+
+Implementation commit: `c8dd71de`; documentation/audit committed separately.
+Disposition: **offline_ready; production handoff remains closed**. Fetched origin;
+the clean integration worktree and remote both started at `8a1640c67e67329f7d51c0209cdf3743289597b2`.
+No new live Provider request, scientific worker, S12.8 continuation or F3 Study ran.
+The historical sections above describe F2; their outer-invocation Reporter timing
+is superseded by the following F2.1 contract.
+
+### Audited input and implementation
+
+Read-only inspection of the original F2 Store confirms that its engineering driver
+put the initial packet in user history and full packets in handoff messages. Its
+seven main requests had 1,936-byte system-message arrays, 6,254-byte tool-schema
+arrays and 78,049–245,045-byte history arrays. Each request after handoff retained
+one full handoff packet. The two Reporter history arrays were 106,249 and 107,604
+bytes: Reporter deliberately consumes full L2, not L0. These are component sizes,
+not token measurements or a claim that every F2 driver request used the production
+`before_model` hook. Production source separately duplicated the current packet
+in the system prompt and handoff user message, and expanded reports in both tool
+feedback and L0. No raw request body, SDK history or private Store was added to Git.
+
+Changes remain in the existing owners:
+
+- `reporter.py`: `scientific_feedback` and `investigate` save full reports but return
+  `scientific_delivery_v2` acknowledgements; `current_reports` resolves revisions;
+  `reporter_handoff_summary` supplies deterministic L1 or saved Reporter interpretation.
+- `agent.py`: `deliver_science_before_decision` and the existing async `before_model`
+  enforce delivery before a new main request. `converse` can recover a received
+  intra-invocation Reporter response using the exact saved SDK boundary identity.
+- `research_context.py`: `agent_decision_brief` consumes at most two recent L1
+  deliveries, removes repeated latest mathematical scope, and preserves budget,
+  acceptance, candidate/control binding, action schemas and exact STOP lookup.
+  `mathematical_decision_view` replaces full solver starts/sample indices with
+  counts, termination facts and exact detail references.
+- `research_action_trace(host, limit=5)` derives recent actions and total/error
+  counts from original plans, native events and exact receipts. Full trace is
+  retrievable through `evidence_read(view='working_set', pointer='/action_trace')`
+  with the existing working-set anchor. Ordinary evidence reads do not count.
+- `capability.py`: `signed_score_comparisons` projects B's recorded controlled
+  comparisons; no solver or new mathematical certificate was introduced.
+- `session_handoff.py`: only new initial-message construction changed. The short
+  anchor retains the existing preparation/Store/SDK binding. `safe_boundary`,
+  `trusted_history`, `validate_snapshot` and historical snapshots are unchanged.
+
+### Actual delivery and recovery boundary
+
+The production chain is:
+
+`worker/Store + execution receipt (L3) -> assemble/_save full ScientificReport (L2)
+-> short native toolResult -> SDK tool-result history -> before_model
+-> complete_reports -> saved interpretation/skipped/unavailable revision
+-> reporter_handoff_summary (L1) -> decision_packet (L0) -> main Provider`.
+
+An acknowledgement contains `delivery_version`, `execution_status`,
+`scientific_result_reference`, `report_reference`, `interpretation_status`, and
+the existing formal-read obligation. Multiple-result receipts retain the complete
+`scientific_result_index`; recovery never selects a globally latest result.
+Investigation additionally returns its question and selected-result count.
+For example, `evidence_read(reference=ack.report_reference, view='full',
+pointer='/report')` retrieves full L2, while a raw result reference plus
+`/trajectory/structural_comparison/fixed_control/best_found_violation` retrieves
+the original fixed-input score. Neither report delivery nor internal Reporter
+reading grants SELECT/STOP reading credit.
+
+Strands **1.59.0** was inspected locally: `live_model_class.stream` consumes the
+original Provider response after stream conversion; `_handle_tool_execution`
+awaits `_append_messages(tool_result_message)` before recursing into the next
+`BeforeModelCallEvent`. F2.1 checks no unsettled Provider/science receipts, no
+unmatched tool IDs, and preserved tool-result statuses, then explicitly saves an
+SDK snapshot before Reporter. Public SDK offload may shorten large requested
+evidence text; immutable original feedback and SDK stash remain intact.
+This is not the stricter completed-invocation boundary used by Session handoff.
+
+The actual real-SDK MockTransport test observes, in one invocation:
+
+1. Initial L0 and first main request; original response is consumed.
+2. Explicit large `evidence_read` and mocked science executor using saved B data;
+   original receipt, full L2 and both original tool feedback records persist.
+3. SDK pairs results; `science_delivery_boundary` snapshots the exact history.
+4. Independent Reporter request; full revision saved, `reporter_completed`, then
+   `r3_response_processing=reporter_archived`.
+5. New L0 contains completed L1; only then the second main request is sent.
+
+The observed Provider order is **main, Reporter, main**. A separate production
+test checks the same ordering for `research_investigate`. Invalid Reporter pointers
+produce `unavailable` plus deterministic L1 before the second main request.
+Unknown Reporter sends block both continuation and restart. A crash after HTTP
+receipt but before Reporter archival recovers the saved response without another
+send/charge; the next main request is the only new request. Tampering with that
+SDK snapshot is rejected before recovery. Main `unconsumed_response` still restores
+the original system prompt/tool schemas and is replayed before any new L0.
+
+### Numbers, scope and trace
+
+Compact UTF-8 JSON on the same saved B fixture configuration (bytes, not tokens):
+
+| Surface | Before | F2.1 |
+|---|---:|---:|
+| Full default L0 packet | 69,144 | 45,301 |
+| One scientific tool acknowledgement | 54,367 | 648 |
+| New Session initial messages | 74,882 | 350 |
+
+The L0 measurements precede model requests; the short anchor was also measured
+through actual SDK handoff. No arbitrary compression threshold was used.
+Full L2, candidate/control access, mathematical method applicability, task
+acceptance and budgets remain available. FamilySpace and frozen analysis protocol
+were retained. Existing Session histories are not cleared or migrated.
+
+For saved B, the two explicitly different directions are:
+
+| Comparison | Baseline score | Candidate score | Delta | Computed direction |
+|---|---:|---:|---:|---|
+| New structure reoptimized vs baseline reoptimized | -0.1999999515720519 | -0.09999951729772974 | +0.10000043427432215 | worse |
+| New structure reoptimized vs same structure fixed old control | -0.08298844105123285 | -0.09999951729772974 | -0.017011076246496892 | better |
+
+`smaller_is_better=true`; both sets of three starts reached 100 iterations without
+convergence; optimality remains uncertified. The stored `computed_estimate`
+comparison owns matched task/model family, physical tensions, channel order,
+sampling, horizon and solve-budget scope. Missing or inconclusive comparisons
+return `not_comparable`. Tests resolve every displayed score location and reject
+invented summary aliases. These are local computed model scores, not MuJoCo
+performance or optimal-structure rankings.
+
+The published audit contains an actual saved offline trace: original tool
+`native-science`, request `native-native-science-analysis`, method `task_capability`,
+and the exact receipt output/result reference. It intentionally has no invented
+hypothesis because that direct request had none. The Plan test separately resolves
+`/original_plan`, retains H-fixture and its expected/weakening observations, and
+checks failure/rejection counts without turning Reporter prose into a conclusion.
+Raw B artifacts, original receipts, scientific costs and tool IDs are unchanged.
+
+### Reusable instructions and validation
+
+For a **new** Study, put the following concise rule in its existing
+`execution_instructions` source, replacing obsolete `decision_brief_v1` or
+immediate-full-report wording. Do not edit frozen S12.8 instructions:
+
+> CURRENT_RESEARCH_PACKET is the current research decision view. Scientific tool
+> results acknowledge execution and saved references; use L1 deterministic facts
+> and saved Reporter interpretations for scientific judgment. Reporter mechanisms
+> are testable hypotheses, not authoritative physical facts. Use evidence_read or
+> research_investigate for details. Choose the next structure, control, mathematics,
+> diagnosis or stopping action freely; there is no fixed method order. Use structured
+> score direction, comparison scope and optimality status as the numerical authority.
+
+The runtime packet now carries these delivery rules, and `_wire` reinforces the
+distinction between observations, model computations, hypotheses and open questions.
+Provider settings, Reporter max_tokens, frozen Study configuration and budget
+sources are unchanged.
+
+Validation: **31 distinct targeted tests passed**. The 26-test reporting,
+integration and Session-recovery run includes 14 killed-process scenarios.
+The final 11-test run rechecks the native SDK boundary and five integration cases,
+and adds five Provider-output/replay tests. No historical 132-test sweep or new
+MATLAB/MuJoCo/NMPC/PPO computation was run. `git diff --check` passes.
+
+```powershell
+$env:PYTHONPATH='.;tests/research;C:\Program Files\MATLAB\R2024a\extern\engines\python\dist'
+$env:OPENBLAS_NUM_THREADS='1'; $env:OMP_NUM_THREADS='1'; $env:MKL_NUM_THREADS='1'
+& D:/softrobot-agent/.mainline5-env/Scripts/python.exe -m unittest test_s129_agent_reporting.AgentReportingTests test_s129_agent_reporting.ReportingSessionTests test_s129_integration.IntegrationTests test_s127_session_recovery.SessionRecoveryTests -v
+& D:/softrobot-agent/.mainline5-env/Scripts/python.exe -m unittest test_s127_provider_output.ProviderOutputTests -v
+```
+
+Derived audit, interface examples, source locations and actual event order:
+[f21_delivery.json](../../evidence/s129_integration/f21_delivery.json).
+
+The remaining gate is real Provider scientific interpretation. Recommended separate
+authorization: a new frozen engineering Study, **at most two main requests plus one
+Reporter request**, one read-only investigation of the existing B pair, zero
+science workers/backends, no automatic retries or grant reset. Check that the second
+main request receives completed L1 and correctly states both directions, uncertainty
+and exact sources. STOP at any unknown send or semantic failure. Only after that
+gate passes and explicit admission is recorded should a separately budgeted F3
+Study be authorized. The exhausted F2 seven-main grant is not reused.

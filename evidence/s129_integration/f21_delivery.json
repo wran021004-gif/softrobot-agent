@@ -1,0 +1,354 @@
+{
+  "status": "offline_ready",
+  "baseline_commit": "8a1640c67e67329f7d51c0209cdf3743289597b2",
+  "sdk": "strands-agents==1.59.0",
+  "size_scope": "Compact UTF-8 JSON, same saved B fixture state before any model call; anchor measured through actual SDK handoff. Counts are bytes, not tokens.",
+  "before": {
+    "l0_bytes": 69144,
+    "tool_result_bytes": 54367,
+    "handoff_bytes": 74882
+  },
+  "after": {
+    "l0_bytes": 45301,
+    "tool_result_bytes": 648,
+    "handoff_bytes": 350
+  },
+  "original_B_hashes_unchanged": true,
+  "scientific_results": [
+    {
+      "artifact_id": "9c22f54b6f258c56a1105bb6b6f14a9e5e62ad4c30e5831a2931c50b3add1a17",
+      "media_type": "application/json"
+    },
+    {
+      "artifact_id": "9e7a21648b529c3bb72b28f4c8778224348b16cb3782dcff82aac9fe6a38943f",
+      "media_type": "application/json"
+    }
+  ],
+  "tool_acknowledgement": {
+    "delivery_version": "scientific_delivery_v2",
+    "execution_status": "completed",
+    "scientific_result_reference": {
+      "artifact_id": "9e7a21648b529c3bb72b28f4c8778224348b16cb3782dcff82aac9fe6a38943f",
+      "media_type": "application/json"
+    },
+    "report_reference": {
+      "artifact_id": "e527a645e7ba10bd079ab82945ff587976ba5513155939a7244665669bf9fffd",
+      "media_type": "application/json"
+    },
+    "interpretation_status": "deferred",
+    "operation_outcome": {
+      "reference": {
+        "artifact_id": "9e7a21648b529c3bb72b28f4c8778224348b16cb3782dcff82aac9fe6a38943f",
+        "media_type": "application/json"
+      }
+    },
+    "resource_use": null,
+    "formal_read_required": "Reports do not satisfy SELECT/STOP/RL evidence_read obligations"
+  },
+  "score_comparisons": {
+    "status": "computed_estimate",
+    "definition": "G = max(normalized_constraint_violation); smaller is better",
+    "comparisons": [
+      {
+        "comparison": "reoptimized_candidate_vs_reoptimized_baseline",
+        "baseline_score": -0.1999999515720519,
+        "candidate_score": -0.09999951729772974,
+        "delta": 0.10000043427432215,
+        "smaller_is_better": true,
+        "computed_score_direction": "worse",
+        "source_references": [
+          {
+            "reference": {
+              "artifact_id": "9e7a21648b529c3bb72b28f4c8778224348b16cb3782dcff82aac9fe6a38943f",
+              "media_type": "application/json"
+            },
+            "pointer": "/trajectory/structural_comparison/baseline_violation"
+          },
+          {
+            "reference": {
+              "artifact_id": "9e7a21648b529c3bb72b28f4c8778224348b16cb3782dcff82aac9fe6a38943f",
+              "media_type": "application/json"
+            },
+            "pointer": "/trajectory/best_found_violation"
+          }
+        ]
+      },
+      {
+        "comparison": "candidate_reoptimized_vs_candidate_fixed_old_control",
+        "baseline_score": -0.08298844105123285,
+        "candidate_score": -0.09999951729772974,
+        "delta": -0.017011076246496892,
+        "smaller_is_better": true,
+        "computed_score_direction": "better",
+        "source_references": [
+          {
+            "reference": {
+              "artifact_id": "9e7a21648b529c3bb72b28f4c8778224348b16cb3782dcff82aac9fe6a38943f",
+              "media_type": "application/json"
+            },
+            "pointer": "/trajectory/structural_comparison/fixed_control/best_found_violation"
+          },
+          {
+            "reference": {
+              "artifact_id": "9e7a21648b529c3bb72b28f4c8778224348b16cb3782dcff82aac9fe6a38943f",
+              "media_type": "application/json"
+            },
+            "pointer": "/trajectory/best_found_violation"
+          }
+        ]
+      }
+    ],
+    "comparison_scope": {
+      "variable": "segments.near.length_m",
+      "step": 0.0010000000000000009,
+      "baseline_result": {
+        "artifact_id": "9c22f54b6f258c56a1105bb6b6f14a9e5e62ad4c30e5831a2931c50b3add1a17",
+        "media_type": "application/json"
+      },
+      "control_alignment": "identical physical tensions, tendon order and time grid",
+      "reoptimization": "Both candidates independently solved with the same three starts and iteration budget",
+      "attribution": "Same frozen source and candidate parameters except the declared continuous parameter",
+      "derivative_scope": "Two-design finite secants of computed values; no envelope gradient or descent guarantee"
+    },
+    "scope_source": {
+      "reference": {
+        "artifact_id": "9e7a21648b529c3bb72b28f4c8778224348b16cb3782dcff82aac9fe6a38943f",
+        "media_type": "application/json"
+      },
+      "pointer": "/trajectory/structural_comparison"
+    },
+    "optimality_status": "uncertified",
+    "limitation": "Computed local-model scores only; no optimal structural ranking or MuJoCo task acceptance"
+  },
+  "historical_live_request_components": [
+    {
+      "purpose": "conversation",
+      "request_id": "r3-request-f0028358880f4ac980ccc629da9b7f5f",
+      "system_bytes": 1936,
+      "history_bytes": 78049,
+      "tool_schema_bytes": 6254,
+      "tool_result_messages": 0,
+      "handoff_packet_copies": 0
+    },
+    {
+      "purpose": "conversation",
+      "request_id": "r3-request-324db7e892ad44c29d6998a732cd8258",
+      "system_bytes": 1936,
+      "history_bytes": 82888,
+      "tool_schema_bytes": 6254,
+      "tool_result_messages": 1,
+      "handoff_packet_copies": 0
+    },
+    {
+      "purpose": "reporter",
+      "request_id": "r3-request-1247f76ef9544f73b3eab0cf629782c6",
+      "system_bytes": 2465,
+      "history_bytes": 106249,
+      "tool_schema_bytes": 2,
+      "tool_result_messages": 0,
+      "handoff_packet_copies": 0
+    },
+    {
+      "purpose": "conversation",
+      "request_id": "r3-request-ceeaf612b1bf420cb73312407cef8a16",
+      "system_bytes": 1936,
+      "history_bytes": 94980,
+      "tool_schema_bytes": 6254,
+      "tool_result_messages": 0,
+      "handoff_packet_copies": 1
+    },
+    {
+      "purpose": "conversation",
+      "request_id": "r3-request-e358c513fd5c47c0a9bb896abe90f1cc",
+      "system_bytes": 1936,
+      "history_bytes": 101611,
+      "tool_schema_bytes": 6254,
+      "tool_result_messages": 1,
+      "handoff_packet_copies": 1
+    },
+    {
+      "purpose": "conversation",
+      "request_id": "r3-request-c6fcc6e2c2244e2f81bec1db353eb10c",
+      "system_bytes": 1936,
+      "history_bytes": 108417,
+      "tool_schema_bytes": 6254,
+      "tool_result_messages": 2,
+      "handoff_packet_copies": 1
+    },
+    {
+      "purpose": "conversation",
+      "request_id": "r3-request-b2ea0aeef1bc4fb19c7e97fb2186f9ed",
+      "system_bytes": 1936,
+      "history_bytes": 100068,
+      "tool_schema_bytes": 6254,
+      "tool_result_messages": 0,
+      "handoff_packet_copies": 1
+    },
+    {
+      "purpose": "reporter",
+      "request_id": "r3-request-c4be741ed519415a98d338158cc2e0ac",
+      "system_bytes": 2665,
+      "history_bytes": 107604,
+      "tool_schema_bytes": 2,
+      "tool_result_messages": 0,
+      "handoff_packet_copies": 0
+    },
+    {
+      "purpose": "conversation",
+      "request_id": "r3-request-6ea13baaefe54899a139772f7e8bf04c",
+      "system_bytes": 1936,
+      "history_bytes": 245045,
+      "tool_schema_bytes": 6254,
+      "tool_result_messages": 0,
+      "handoff_packet_copies": 1
+    }
+  ],
+  "real_provider_requests": 0,
+  "scientific_worker_executions": 0,
+  "production_handoff_admitted": false,
+  "offline_sdk": {
+    "study_id": "s129-f2-offline-5961224806",
+    "event_order": [
+      {
+        "kind": "research_report",
+        "status": "recorded"
+      },
+      {
+        "kind": "research_report",
+        "status": "recorded"
+      },
+      {
+        "kind": "model_decision_packet",
+        "status": "recorded"
+      },
+      {
+        "kind": "r3_request",
+        "status": "sent"
+      },
+      {
+        "kind": "r3_response_processing",
+        "status": "decoded"
+      },
+      {
+        "kind": "model_original_tool_feedback",
+        "status": "recorded"
+      },
+      {
+        "kind": "research_report",
+        "status": "recorded"
+      },
+      {
+        "kind": "model_original_tool_feedback",
+        "status": "recorded"
+      },
+      {
+        "kind": "science_delivery_boundary",
+        "status": "recorded"
+      },
+      {
+        "kind": "r3_request",
+        "status": "sent"
+      },
+      {
+        "kind": "research_report",
+        "status": "recorded"
+      },
+      {
+        "kind": "reporter_completed",
+        "status": "recorded"
+      },
+      {
+        "kind": "r3_response_processing",
+        "status": "reporter_archived"
+      },
+      {
+        "kind": "model_decision_packet",
+        "status": "recorded"
+      },
+      {
+        "kind": "r3_request",
+        "status": "sent"
+      },
+      {
+        "kind": "r3_response_processing",
+        "status": "decoded"
+      }
+    ],
+    "provider_roles": [
+      "main",
+      "reporter",
+      "main"
+    ],
+    "action_trace_example": {
+      "request_id": "native-native-science-analysis",
+      "action": "research_analysis",
+      "method": "task_capability",
+      "agent_hypothesis": {},
+      "execution_status": "completed",
+      "result_references": [
+        {
+          "artifact_id": "878d05e41d1a613036112a29139f1d9a8d3282309f06857bc04e85adcff55f0c",
+          "media_type": "application/json"
+        }
+      ],
+      "receipt_output": {
+        "artifact_id": "878d05e41d1a613036112a29139f1d9a8d3282309f06857bc04e85adcff55f0c",
+        "media_type": "application/json"
+      },
+      "execution_id": "81d4f07dd8274cc18b97e53330ac861f",
+      "outcome": {
+        "status": "computed"
+      },
+      "source": {
+        "reference": {
+          "artifact_id": "9685512317e4e71d093bcda76d793f11d95754f42a300f70daa572f242f40820",
+          "media_type": "application/json"
+        },
+        "pointer": "/tool_use/input"
+      }
+    },
+    "original_B_hashes_unchanged": true,
+    "sdk_snapshot_independently_reopened": true,
+    "ledger": {
+      "limit": {
+        "backend_solves": 0,
+        "model_calls": 10,
+        "tool_calls": 20,
+        "wall_s": null,
+        "worker_calls": 0
+      },
+      "used": {
+        "tool_calls": 2,
+        "model_calls": 3,
+        "backend_solves": 0,
+        "worker_calls": 0,
+        "wall_s": 0.03100000019185245
+      },
+      "remaining": {
+        "backend_solves": 0,
+        "model_calls": 7,
+        "tool_calls": 18,
+        "wall_s": null,
+        "worker_calls": 0
+      },
+      "occupied": {}
+    },
+    "fixture": "Mock HTTP and saved B results behind a mocked executor; no new scientific computation"
+  },
+  "validation": {
+    "distinct_tests_passed": 31,
+    "focused_suite": 26,
+    "final_recheck": 11,
+    "killed_process_scenarios": 14,
+    "real_sdk_reporter_outcomes": [
+      "available",
+      "invalid_pointer_unavailable",
+      "unknown_send_blocked",
+      "received_response_recovered_without_resend"
+    ],
+    "tampered_intra_invocation_snapshot_rejected": true,
+    "original_main_response_replay_preserved": true,
+    "notes": "Mock usage only. Existing saved B science, zero new workers. Production real-provider interpretation still unverified."
+  },
+  "implementation_commit": "c8dd71de"
+}
