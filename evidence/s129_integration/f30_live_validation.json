@@ -1,0 +1,307 @@
+{
+  "study_id": "f30-live-20261022",
+  "implementation": "56d8af3663d01bd8390dfcdd44178b4474eebe93",
+  "mode": "real_provider",
+  "requests": [
+    {
+      "event_index": 18,
+      "request_id": "r3-request-0c76c914435d4159890402c0025f90c8",
+      "purpose": "conversation",
+      "request_identity": "d2c164dc2346a3f782b5e599dfde15dbda0a4c97b3fed792e1cf9c3106553286",
+      "request_reference": {
+        "artifact_id": "d2c164dc2346a3f782b5e599dfde15dbda0a4c97b3fed792e1cf9c3106553286",
+        "media_type": "application/json"
+      },
+      "tools": [
+        "research_plan",
+        "evidence_read",
+        "research_investigate"
+      ]
+    },
+    {
+      "event_index": 32,
+      "request_id": "r3-request-12245c5189bc43bcbaa08c33fb65087b",
+      "purpose": "reporter",
+      "request_identity": "937007e2ed6381555dec188bf9a88d1d2d583dcc07bc253739183220849607e3",
+      "request_reference": {
+        "artifact_id": "937007e2ed6381555dec188bf9a88d1d2d583dcc07bc253739183220849607e3",
+        "media_type": "application/json"
+      },
+      "tools": []
+    },
+    {
+      "event_index": 41,
+      "request_id": "r3-request-91395260ead645798716a76a3a7a9c8b",
+      "purpose": "conversation",
+      "request_identity": "5de066f53bcad4c4a2093e71931b1de205f50343cbbf7a2de3ac8bb112ba0a44",
+      "request_reference": {
+        "artifact_id": "ddb5a5c62af795afe4ad29fcf6c0733f7fb34e285164fed313714041c7f1fcda",
+        "media_type": "application/json"
+      },
+      "tools": [
+        "research_plan",
+        "evidence_read"
+      ]
+    }
+  ],
+  "usage": {
+    "conversation": {
+      "requests": 2,
+      "usage_missing": 0,
+      "prompt_tokens": 34110,
+      "completion_tokens": 3090,
+      "total_tokens": 37200,
+      "prompt_cache_hit_tokens": 512,
+      "prompt_cache_miss_tokens": 33598,
+      "cost_usd": "unknown",
+      "input_bytes": [
+        58805,
+        73367
+      ]
+    },
+    "reporter": {
+      "requests": 1,
+      "usage_missing": 0,
+      "prompt_tokens": 62282,
+      "completion_tokens": 21956,
+      "total_tokens": 84238,
+      "prompt_cache_hit_tokens": 384,
+      "prompt_cache_miss_tokens": 61898,
+      "cost_usd": "unknown",
+      "input_bytes": [
+        179834
+      ]
+    }
+  },
+  "ledger": {
+    "limit": {
+      "backend_solves": 0,
+      "model_calls": 3,
+      "tool_calls": 12,
+      "wall_s": null,
+      "worker_calls": 0
+    },
+    "used": {
+      "tool_calls": 1,
+      "model_calls": 3,
+      "backend_solves": 0,
+      "worker_calls": 0,
+      "wall_s": 116.18799999984913
+    },
+    "remaining": {
+      "backend_solves": 0,
+      "model_calls": 0,
+      "tool_calls": 11,
+      "wall_s": null,
+      "worker_calls": 0
+    },
+    "occupied": {}
+  },
+  "scientific_counters": {
+    "mathematical_evaluations": 0,
+    "physical_replay_launches": 0,
+    "nmpc_launches": 0,
+    "offline_nlp": 0,
+    "bdf_replays": 0,
+    "admitted_training_stages": 0,
+    "charged_starts": 0
+  },
+  "tool_pairing": [
+    {
+      "tool_use_id": "call_00_5mrk1edJH9oomGwiaT321365",
+      "name": "research_investigate",
+      "status": "success",
+      "paired": true,
+      "receipt": {
+        "analysis_status": "not_assessed",
+        "cache_hit": false,
+        "caller": "unified-research",
+        "charged": {
+          "backend_solves": 0,
+          "model_calls": 0,
+          "tool_calls": 1,
+          "wall_s": 0.0,
+          "worker_calls": 0
+        },
+        "contract_version": "1.2.0",
+        "error": null,
+        "execution_id": "610ad74f24ce4778a3747478ea0a7558",
+        "execution_status": "completed",
+        "original_execution_id": null,
+        "output": {
+          "artifact_id": "64b09b9c7fec5ec7fcd5399f39647eb6a64f4db5f7ccc14d70e1091547eb1b64",
+          "media_type": "application/json"
+        },
+        "request_id": "native-call_00_5mrk1edJH9oomGwiaT321365",
+        "result_contract": null,
+        "result_version": "1.0.0",
+        "solver_status": "not_run",
+        "task_success": null,
+        "tool_id": "research.core_investigate",
+        "tool_version": "1.0.0"
+      }
+    }
+  ],
+  "reporter_revisions": [
+    {
+      "reference": {
+        "artifact_id": "67c774d3e8c4456925b4c58f9b711c2565f8754c0c7f38830e887b823843364f",
+        "media_type": "application/json"
+      },
+      "status": "unavailable",
+      "error": "'score_semantics'"
+    }
+  ],
+  "reporter_authoritative_fields_unchanged": true,
+  "store_independently_reopened": true,
+  "sdk_independently_reopened": true,
+  "sdk_error": null,
+  "original_B_hashes_unchanged": true,
+  "unknown_sends": 0,
+  "unconsumed_response": null,
+  "research_status": "stopped",
+  "final_disposition": {
+    "kind": "engineering_count_budget_closure",
+    "model_stop": false,
+    "observed_pass": null,
+    "reason": "Provider request count exhausted without model STOP/selection",
+    "selected": null
+  },
+  "scope_identity": "2d03d3969ffcc5cccaa9a8ce4352b40013c74ec27b888dd347b8451008bc9e4f",
+  "scientific_admission": "failed",
+  "sdk_message_identity": "8e4d7c4d4b557b3b373aa0ed8b2b6de126ac87d7248232f98856bf5a19687994",
+  "unsettled_receipts": 0,
+  "technical_checks_passed": false,
+  "second_main_received_interpreted_L1": false,
+  "second_main_received_deterministic_L1": true,
+  "submitted_reporter_sources": {
+    "interpretations": 11,
+    "valid_unique": 16,
+    "invalid_unique": 1,
+    "invalid": [
+      {
+        "reference": {
+          "artifact_id": "9e7a21648b529c3bb72b28f4c8778224348b16cb3782dcff82aac9fe6a38943f",
+          "media_type": "application/json"
+        },
+        "pointer": "/trajectory/score_semantics"
+      }
+    ],
+    "accepted_interpretations": 0,
+    "rejection_preserves_full_raw_response_locally": true
+  },
+  "semantic_audit": {
+    "main_final_content_identity": "cc021e9df4674d95c63f3553cf02fe704f46c0cdda80436fc16c0f1e530f576c",
+    "baseline_reoptimized": -0.1999999515720519,
+    "candidate_fixed_old_control": -0.08298844105123285,
+    "candidate_reoptimized": -0.09999951729772974,
+    "structure_delta": 0.10000043427432215,
+    "control_delta": -0.017011076246496892,
+    "main_score_directions_correct": true,
+    "main_distinguishes_replay_from_optimality": true,
+    "main_distinguishes_model_from_physics": true,
+    "main_next_choice": "Proposed read-only diagnosis of saved solver/start records and speed bottleneck; not executed",
+    "reporter_contribution": "No accepted interpretation reached the main Agent. Deterministic L1 facts and failure status reached it.",
+    "additional_main_errors": [
+      {
+        "observation": "Main describes recovery as 17% and remaining degradation as 83% of the 0.10 gap.",
+        "correction": "Recovery is 0.01701108 out of the fixed-control loss 0.11701151; the residual loss is 0.10000043.",
+        "recovery_fraction_of_fixed_loss": 0.14537951156070436,
+        "residual_fraction_of_fixed_loss": 0.8546204884392956
+      },
+      {
+        "observation": "Main calls the score delta a finite secant.",
+        "correction": "The raw score delta and the length-normalized finite secant are distinct recorded quantities."
+      },
+      {
+        "observation": "Saved-start diagnosis is proposed to establish search limitation versus genuine structural loss.",
+        "correction": "It can clarify numerical records, but these saved witnesses cannot certify optimum or causal structural loss."
+      }
+    ],
+    "scientific_admission": false,
+    "decisive_blocker": "Reporter invented /trajectory/score_semantics; exact source validation rejected the complete interpretation. Deterministic fallback is not full live Reporter admission."
+  },
+  "event_order": [
+    {
+      "event_index": 16,
+      "kind": "model_decision_packet",
+      "status": "recorded",
+      "request_id": null
+    },
+    {
+      "event_index": 18,
+      "kind": "r3_request",
+      "status": "sent",
+      "request_id": "r3-request-0c76c914435d4159890402c0025f90c8"
+    },
+    {
+      "event_index": 22,
+      "kind": "r3_response_processing",
+      "status": "decoded",
+      "request_id": "r3-request-0c76c914435d4159890402c0025f90c8"
+    },
+    {
+      "event_index": 27,
+      "kind": "model_original_tool_feedback",
+      "status": "recorded",
+      "request_id": null
+    },
+    {
+      "event_index": 28,
+      "kind": "science_delivery_boundary",
+      "status": "recorded",
+      "request_id": null
+    },
+    {
+      "event_index": 32,
+      "kind": "r3_request",
+      "status": "sent",
+      "request_id": "r3-request-12245c5189bc43bcbaa08c33fb65087b"
+    },
+    {
+      "event_index": 37,
+      "kind": "reporter_completed",
+      "status": "recorded",
+      "request_id": null
+    },
+    {
+      "event_index": 38,
+      "kind": "r3_response_processing",
+      "status": "reporter_archived",
+      "request_id": "r3-request-12245c5189bc43bcbaa08c33fb65087b"
+    },
+    {
+      "event_index": 39,
+      "kind": "model_decision_packet",
+      "status": "recorded",
+      "request_id": null
+    },
+    {
+      "event_index": 41,
+      "kind": "r3_request",
+      "status": "sent",
+      "request_id": "r3-request-91395260ead645798716a76a3a7a9c8b"
+    },
+    {
+      "event_index": 45,
+      "kind": "r3_response_processing",
+      "status": "decoded",
+      "request_id": "r3-request-91395260ead645798716a76a3a7a9c8b"
+    },
+    {
+      "event_index": 47,
+      "kind": "engineering_count_budget_closure",
+      "status": "saved",
+      "request_id": null
+    }
+  ],
+  "production_handoff_admitted": false,
+  "f3": {
+    "started": false,
+    "study_created": false,
+    "provider_requests": 0,
+    "science_workers": 0,
+    "reason": "Conditional authorization not activated because F3.0 failed; no budget transfers or new grants"
+  },
+  "protocol_recovery_passed": true
+}

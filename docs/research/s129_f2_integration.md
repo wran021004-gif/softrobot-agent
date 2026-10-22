@@ -1,5 +1,65 @@
 # F2 integration: Agent, Reporter and mathematical evidence
 
+## F3.0 final disposition: FAILED; F3 not started (2026-10-22)
+
+The single authorized live validation is complete. Study `f30-live-20261022`
+bound clean, ordinarily pushed implementation `56d8af3663d01bd8390dfcdd44178b4474eebe93`.
+The actual production sequence was **main → Reporter → main**, with one native
+`research_investigate` call, matched SDK tool result and settled original receipt.
+The first main response was consumed before Reporter started. Reporter finished and
+archived its original response before the second production `before_model()` built L0.
+
+**Full scientific delivery admission failed.** Reporter invented raw JSON pointer
+`/trajectory/score_semantics` on candidate result `9e7a2164…`; the actual raw score
+definition is under `/trajectory/problem_definition`. Of its submitted unique
+source pairs, one is invalid. The formal validator rejected the entire interpretation
+with `KeyError: 'score_semantics'`, preserving the original response and deterministic
+report. The second main request received **deterministic L1 plus unavailable status**,
+not an accepted Reporter interpretation and not a repeated full L2. This verifies
+fallback/recovery, but explicitly does not satisfy the requested live Reporter gate.
+No prompt correction, Provider resend, grant reset or replacement Study followed.
+
+The main Agent correctly stated that the changed structure's reoptimized computed
+score worsened by `+0.1000004343`, while reoptimizing control on that same structure
+improved the computed score by `-0.01701107625`. It distinguished sampled replay,
+uncertified optimization and unperformed MuJoCo acceptance, and proposed a read-only
+saved-start/bottleneck diagnosis without executing it. These are observations about
+its use of deterministic evidence; they cannot establish successful Reporter influence.
+The final prose also has limitations: its 17% recovery / 83% remaining decomposition
+uses the residual 0.10 gap as denominator. Relative to the original fixed-control loss
+0.11701151, recovery is about 14.54% and residual loss about 85.46%. It also conflates
+the raw score delta with the separately length-normalized secant. Saved-start diagnosis
+can inspect numerical evidence but cannot by itself establish a true structural cause.
+
+| Actual role | Requests | Prompt tokens | Completion tokens | Cache hit | Cache miss |
+|---|---:|---:|---:|---:|---:|
+| Main Agent | 2 | 34,110 | 3,090 | 512 | 33,598 |
+| Reporter | 1 | 62,282 | 21,956 | 384 | 61,898 |
+
+Total: 3/3 Provider requests, 1/12 public operations, **USD unknown**.
+Physical launches, mathematics, NMPC, NLP, BDF, PPO stages/actions and independent
+RL evaluation are all zero. Remaining 11 public operations are not transferred.
+All requests have original response/usage/receipts; no unsettled receipt, unknown send,
+unconsumed response or occupied resource remains. Store and actual SDK snapshot were
+independently reopened in another process; tool IDs, final message identity and original
+B artifact hashes match. The Study is stopped by the existing engineering count-budget
+closure, which does not fabricate a model STOP or scientific selection. Handoff remains
+unadmitted; no session rotation was attempted or claimed in this F3.0 check.
+
+The independent semantic audit and failed-admission record are preserved in the original
+Store. Only derived audit data and scope are published:
+[f30_live_validation.json](../../evidence/s129_integration/f30_live_validation.json),
+[f30_scope.json](../../evidence/s129_integration/f30_scope.json).
+Raw requests/responses, complete SDK history and Store remain local under
+`runs/research/f30-live-20261022/`. The decisive unresolved blocker is accepted,
+source-valid real Reporter delivery followed by a main decision based on that delivery.
+This failed one-shot grant does not authorize another attempt.
+
+**F3 conditional authorization was not activated.** No F3 configuration, Study,
+Provider request or scientific experiment was created; no MuJoCo solution, autonomous
+multi-round strategy adjustment or F3 research success is claimed. F2 is blocked rather
+than declared admitted. No F4 work, sealed Study changes or unrelated branch merges ran.
+
 ## F3.0 production-entry preparation (2026-10-22)
 
 Fetched origin and verified `13ddf460f9cb792cfb8e809a4e4f225c0bfd22f0` on both
