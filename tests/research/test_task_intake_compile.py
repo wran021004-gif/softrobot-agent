@@ -210,6 +210,80 @@ class CompilationTests(unittest.TestCase):
 
 
 class ProviderBoundaryTests(unittest.TestCase):
+    def test_observed_quote_and_source_failures_remain_closed_offline(self):
+        # Small synthetic reproductions of real failures; no repaired live output
+        # is substituted for a provider result or admitted into compilation.
+        text, proposal = fixture('reach_and_hold', {
+            '末端到达目标': 'behavior', '然后保持 0.20 s': 'acceptance',
+            '目标位置尚未指定': 'constraint'}, '末端', [])
+        mutations = []
+        changed = deepcopy(proposal)
+        changed['temporal_relations'] = [dict(first='r0', relation='then', second='r1',
+            quote='末端到达目标然后保持 0.20 s')]
+        mutations.append((changed, 'USER_QUOTE_NOT_FOUND'))
+        changed = deepcopy(proposal)
+        changed['requirements'][-1].update(source='undefined', question='目标位置是什么？')
+        mutations.append((changed, 'SOURCE_CONTENT_CONFLICT'))
+        changed = deepcopy(proposal)
+        del changed['requirements'][0]['config_pointer']
+        mutations.append((changed, 'Field required'))
+        changed = deepcopy(proposal)
+        changed['requirements'][-1] = requirement('unknown', source='undefined', question='目标位置是什么？')
+        mutations.append((changed, 'UNRETAINED_USER_REQUIREMENT_TEXT'))
+        changed = deepcopy(proposal)
+        changed['requirements'].append(requirement('question', source='undefined', question='0.20 s 从何时开始？'))
+        mutations.append((changed, 'UNGROUNDED_NUMERIC_CANDIDATE'))
+        for response, error in mutations:
+            result = parse_response(text, json.dumps(response))
+            self.assertIsNone(result.draft)
+            self.assertIn(error, result.error)
+
+    @patch.dict(os.environ, {'TASK_INTAKE_API_KEY': 'synthetic', 'TASK_INTAKE_BASE_URL': 'https://intake.invalid/v1'}, clear=True)
+    def test_explicit_non_thinking_single_request_and_truncation_stays_closed(self):
+        text, proposal = CASES['reach']
+        message = SimpleNamespace(content=json.dumps(proposal), tool_calls=None, refusal=None)
+        choice = SimpleNamespace(message=message, finish_reason='stop')
+        client = Mock()
+        client.chat.completions.create.return_value = SimpleNamespace(choices=[choice], usage=None)
+        with patch('openai.OpenAI') as factory:
+            factory.return_value.__enter__.return_value = client
+            for mode in (None, 'disabled', 'enabled'):
+                client.reset_mock()
+                result = request_draft(text, enable_provider=True, model='test', thinking=mode, max_tokens=8192)
+                self.assertEqual(result.status, 'draft')
+                self.assertEqual(result.provider_receipt['thinking'], mode or 'provider_default')
+                options = client.chat.completions.create.call_args.kwargs
+                self.assertEqual(options['max_tokens'], 8192)
+                if mode is None:
+                    self.assertNotIn('extra_body', options)
+                else:
+                    self.assertEqual(options['extra_body'], {'thinking': {'type': mode}})
+                client.chat.completions.create.assert_called_once()
+            choice.finish_reason = 'length'
+            for partial in ('', '{"goal_quote":"catch","intent":"catch_and_hold"'):
+                message.content = partial
+                client.reset_mock()
+                result = request_draft(text, enable_provider=True, model='test', thinking='disabled')
+                self.assertEqual(result.error, 'INCOMPLETE_MODEL_RESPONSE: length')
+                self.assertIsNone(result.draft)
+                client.chat.completions.create.assert_called_once()
+            client.reset_mock()
+            self.assertEqual(request_draft(text, enable_provider=True, model='test', thinking='auto').error,
+                             'INVALID_THINKING_MODE')
+            client.chat.completions.create.assert_not_called()
+        # Both existing CLIs must forward the explicit choice to the same client.
+        expected = parse_response(text, json.dumps(proposal))
+        with (patch('tools.task_intake.request_draft', return_value=expected) as call,
+              redirect_stdout(io.StringIO())):
+            self.assertEqual(main(['--text', text, '--enable-provider', '--model', 'test', '--thinking', 'disabled']), 0)
+            self.assertEqual(call.call_args.kwargs['thinking'], 'disabled')
+        with (patch(__name__ + '.request_draft', return_value=expected) as call,
+              redirect_stdout(io.StringIO())):
+            self.assertEqual(validation_main(['--case', 'reach', '--enable-provider', '--model', 'test',
+                                             '--thinking', 'disabled']), 0)
+            call.assert_called_once()
+            self.assertEqual(call.call_args.kwargs['thinking'], 'disabled')
+
     @patch.dict(os.environ, {'OPENAI_API_KEY': 'wrong-service', 'OPENAI_BASE_URL': 'https://wrong.invalid',
                              'DEEPSEEK_API_KEY': 'also-wrong'}, clear=True)
     def test_no_fallback_to_other_provider(self):
@@ -237,7 +311,7 @@ class ProviderBoundaryTests(unittest.TestCase):
                 response.choices[0].finish_reason = reason
                 self.assertEqual(request_draft(text, enable_provider=True, model='synthetic').status, 'parse_failed')
         with patch('openai.OpenAI', side_effect=AssertionError('invalid bounds must not connect')):
-            for kwargs in ({'max_tokens': 4097}, {'timeout_s': 61}, {'base_url': 'http://unsafe.invalid'},
+            for kwargs in ({'max_tokens': 8193}, {'timeout_s': 61}, {'base_url': 'http://unsafe.invalid'},
                            {'base_url': 'https://user:secret@intake.invalid'}):
                 self.assertEqual(request_draft(text, enable_provider=True, model='synthetic', **kwargs).status, 'parse_failed')
 
@@ -251,6 +325,7 @@ def validation_main(argv=None):
     parser.add_argument('--base-url')
     parser.add_argument('--max-tokens', type=int, default=2000)
     parser.add_argument('--timeout-s', type=float, default=30)
+    parser.add_argument('--thinking', choices=['enabled', 'disabled'])
     parser.add_argument('--output', type=Path)
     args = parser.parse_args(argv)
     if args.enable_provider and args.case == 'all':
@@ -260,7 +335,7 @@ def validation_main(argv=None):
     for name in names:
         text, proposal = CASES[name]
         result = (request_draft(text, enable_provider=True, model=args.model, base_url=args.base_url,
-                    max_tokens=args.max_tokens, timeout_s=args.timeout_s) if args.enable_provider else
+                    max_tokens=args.max_tokens, timeout_s=args.timeout_s, thinking=args.thinking) if args.enable_provider else
                   parse_response(text, json.dumps(proposal, ensure_ascii=False)))
         draft = result.draft
         reports.append(dict(case=name, evidence_kind='real_provider' if args.enable_provider else 'synthetic_fixture',

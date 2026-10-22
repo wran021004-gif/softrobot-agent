@@ -1,0 +1,359 @@
+{
+  "date": "2026-10-22",
+  "baseline_commit": "dde3e9cb",
+  "review_method": "Assistant manual audit of full raw JSON against user expectations; not provider self-evaluation",
+  "provider": "https://api.deepseek.com",
+  "model": "deepseek-flash",
+  "first_round": {
+    "provider_requests": 6,
+    "format_pass_count": 0,
+    "semantic_confirmed_count": 0,
+    "semantic_unassessed_count": 6,
+    "input_tokens": 7847,
+    "output_tokens": 24576,
+    "reasoning_tokens": 24262,
+    "cache_hit_tokens": 4480,
+    "cache_miss_tokens": 3367,
+    "total_tokens": 32423,
+    "wall_s": 139.0789999999106
+  },
+  "second_round": {
+    "provider_requests": 6,
+    "retries": 0,
+    "thinking": "disabled",
+    "max_tokens": 8192,
+    "timeout_s": 60,
+    "json_pass_count": 6,
+    "format_pass_count": 4,
+    "intake_pass_count": 0,
+    "semantic_confirmed_count": 2,
+    "semantic_needs_review_count": 4,
+    "intent_correct_count": 6,
+    "invented_thresholds_or_imposed_conditions_observed": 0,
+    "input_tokens": 7697,
+    "output_tokens": 5617,
+    "total_tokens": 13314,
+    "cache_hit_tokens": 4480,
+    "cache_miss_tokens": 3217,
+    "wall_s": 29.717999999644235,
+    "reasoning_tokens": null,
+    "reasoning_note": "Provider usage did not supply this field; disabled is explicit request configuration."
+  },
+  "combined_provider_requests": 12,
+  "monetary_cost": null,
+  "monetary_cost_note": "No verified price/billing receipt; token usage retained exactly.",
+  "compiler_live_status": "No admitted draft in either round, so compile_draft was not run on a live result.",
+  "cases": [
+    {
+      "case": "01_reach_hold",
+      "input": "让末端到达目标 (0.29, 0.035, 0.19) m；世界坐标系；终点误差不超过 0.01 m；任务时长 0.35 s；最终保持窗口 0.05 s；保持窗口位置误差不超过 0.01 m；保持窗口速度不超过 0.02 m/s；采用参考配置的其余验收与执行设置",
+      "json_pass": true,
+      "format_pass": true,
+      "intake_pass": false,
+      "format_errors": [],
+      "invalid_quotes": [
+        {
+          "location": "temporal_relations.2",
+          "quote": "最终保持窗口 0.05 s；保持窗口速度不超过 0.02 m/s"
+        }
+      ],
+      "quotation_coverage_gaps": [],
+      "numeric_question_rows": [],
+      "compilation_status": "not_run_parse_failed",
+      "failure_cause": "model_output_contract",
+      "finish_reason": "stop",
+      "usage": {
+        "completion_tokens": 1646,
+        "prompt_tokens": 2128,
+        "total_tokens": 3774,
+        "completion_tokens_details": null,
+        "prompt_tokens_details": {
+          "audio_tokens": null,
+          "cache_write_tokens": null,
+          "cached_tokens": 0
+        },
+        "prompt_cache_hit_tokens": 0,
+        "prompt_cache_miss_tokens": 2128
+      },
+      "wall_s": 7.436999999918044,
+      "response_bytes": 5607,
+      "raw_response_sha256": "10d8087ccbf28df69dd2dbaa8e4298235ffde6eb2e9a28946d263021456b1122",
+      "result_sha256": "b409760ce46241a5c45a9b3bc4156c40e617702b780a82c9479f4ae6d53de5f7",
+      "request_messages_sha256": "b4059f5ee918f620e736f58edb64ef0ef2245f0d6d385dc0aba8fb4a371cbdaa",
+      "raw_evidence": "runs/s130-live-nonthinking-20261022/01_reach_hold",
+      "intent_correct": true,
+      "explicit_requirements_preserved": true,
+      "temporal_semantics_correct": true,
+      "missing_definitions_correct": false,
+      "hallucinated_conditions": false,
+      "semantic_correct": null,
+      "evidence": [
+        "R1/R3-R7 preserve target, terminal tolerance, duration, final hold window, hold position and speed limits.",
+        "R9-R17 cite reference pointers; R21 asks about inclusive window already specified in context.",
+        "The last temporal quote joins nonadjacent clauses. Relation meaning is plausible but source attribution is invalid."
+      ],
+      "verdict": "Core reach-and-hold semantics retained; reference interpretation needs review."
+    },
+    {
+      "case": "02_obstacle",
+      "input": "设计一条软臂，使末端在 0.35 s 内到达世界坐标系中的目标 (0.29, 0.035, 0.19) m，终点误差不超过 0.01 m；整个运动过程中，软臂任何部位都不能与球形障碍物发生碰撞。障碍物的具体位置和半径尚未指定。",
+      "json_pass": true,
+      "format_pass": false,
+      "intake_pass": false,
+      "format_errors": [
+        {
+          "location": [
+            "requirements",
+            3
+          ],
+          "message": "Value error, SOURCE_CONTENT_CONFLICT: quote"
+        },
+        {
+          "location": [
+            "requirements",
+            6,
+            "config_pointer"
+          ],
+          "message": "Field required"
+        }
+      ],
+      "invalid_quotes": [],
+      "quotation_coverage_gaps": [
+        "设计一条软臂，",
+        "。障碍物的具体位置和半径尚未指定。"
+      ],
+      "numeric_question_rows": [],
+      "compilation_status": "not_run_parse_failed",
+      "failure_cause": "model_output_contract",
+      "finish_reason": "stop",
+      "usage": {
+        "completion_tokens": 734,
+        "prompt_tokens": 1126,
+        "total_tokens": 1860,
+        "completion_tokens_details": null,
+        "prompt_tokens_details": {
+          "audio_tokens": null,
+          "cache_write_tokens": null,
+          "cached_tokens": 896
+        },
+        "prompt_cache_hit_tokens": 896,
+        "prompt_cache_miss_tokens": 230
+      },
+      "wall_s": 4.0939999998081475,
+      "response_bytes": 2658,
+      "raw_response_sha256": "603cedf51c85824665369c30458b5878cc1d0a3887cd277e7bb08af331492678",
+      "result_sha256": "72adbc15d84238f8736b391895de403151c3715f65adfb3986fd0036ef255846",
+      "request_messages_sha256": "220ca60abb82b722df30a7e279f976c2fd7642331dd04f18a39cbf7b15e14b26",
+      "raw_evidence": "runs/s130-live-nonthinking-20261022/02_obstacle",
+      "intent_correct": true,
+      "explicit_requirements_preserved": false,
+      "temporal_semantics_correct": true,
+      "missing_definitions_correct": true,
+      "hallucinated_conditions": false,
+      "semantic_correct": null,
+      "evidence": [
+        "R3 explicitly says every part of the arm must avoid collisions throughout motion, not merely the tip.",
+        "Time, world target and tolerance retained; geometry, collision criteria, signals and evaluation questioned.",
+        "The explicit instruction to design an arm is absent from extracted requirements; original missing-geometry sentence is not quoted."
+      ],
+      "verdict": "Obstacle and whole-body semantics retained; design scope and provenance incomplete."
+    },
+    {
+      "case": "03_freefall_catch",
+      "input": "让软臂接住从上方自由落下的 0.05 kg 小球，接住后至少保持 0.20 s，期间不能让小球反弹脱离或落地。小球释放高度、捕获成功的具体定义和接触测量方式尚未指定。",
+      "json_pass": true,
+      "format_pass": true,
+      "intake_pass": false,
+      "format_errors": [],
+      "invalid_quotes": [],
+      "quotation_coverage_gaps": [
+        "。小球释放高度、捕获成功的具体定义和接触测量方式尚未指定。"
+      ],
+      "numeric_question_rows": [
+        "Q4"
+      ],
+      "compilation_status": "not_run_parse_failed",
+      "failure_cause": "model_output_contract",
+      "finish_reason": "stop",
+      "usage": {
+        "completion_tokens": 681,
+        "prompt_tokens": 1107,
+        "total_tokens": 1788,
+        "completion_tokens_details": null,
+        "prompt_tokens_details": {
+          "audio_tokens": null,
+          "cache_write_tokens": null,
+          "cached_tokens": 896
+        },
+        "prompt_cache_hit_tokens": 896,
+        "prompt_cache_miss_tokens": 211
+      },
+      "wall_s": 4.186999999918044,
+      "response_bytes": 2388,
+      "raw_response_sha256": "4b3c6a794868202a3acd98f274d26f040646313f6b63841392356f9f311bdbb8",
+      "result_sha256": "0790c9ccf63648d9c57e36ba8911db2445ee9be35376d6413955c66805468b6b",
+      "request_messages_sha256": "7b93d1f5504801a9a9203e0f4f2bfa8aa8f924c662d1e363a07d89a28452dd28",
+      "raw_evidence": "runs/s130-live-nonthinking-20261022/03_freefall_catch",
+      "intent_correct": true,
+      "explicit_requirements_preserved": true,
+      "temporal_semantics_correct": true,
+      "missing_definitions_correct": true,
+      "hallucinated_conditions": false,
+      "semantic_correct": true,
+      "evidence": [
+        "R1 names free fall from above and 0.05 kg; R3 requires at least 0.20 s after capture; R4 forbids rebound separation or ground contact.",
+        "then and throughout relations preserve capture-before-hold and retention over that interval.",
+        "Q1-Q4 ask about contact measurements, release conditions, capture criteria and evaluator; no proximity-equals-capture claim."
+      ],
+      "verdict": "Requested scientific semantics retained in raw JSON; original missing-definition sentence absent from quotes and Q4 repeats digits, so intake rejects."
+    },
+    {
+      "case": "04_slope_catch",
+      "input": "让软臂接住从斜坡滚下的 0.05 kg 小球，并在接住后稳定保持至少 0.20 s。斜坡倾角、球的初始位置和滚动摩擦条件尚未指定。",
+      "json_pass": true,
+      "format_pass": true,
+      "intake_pass": false,
+      "format_errors": [],
+      "invalid_quotes": [],
+      "quotation_coverage_gaps": [
+        "，并",
+        "。斜坡倾角、球的初始位置和滚动摩擦条件尚未指定。"
+      ],
+      "numeric_question_rows": [],
+      "compilation_status": "not_run_parse_failed",
+      "failure_cause": "model_output_contract",
+      "finish_reason": "stop",
+      "usage": {
+        "completion_tokens": 838,
+        "prompt_tokens": 1099,
+        "total_tokens": 1937,
+        "completion_tokens_details": null,
+        "prompt_tokens_details": {
+          "audio_tokens": null,
+          "cache_write_tokens": null,
+          "cached_tokens": 896
+        },
+        "prompt_cache_hit_tokens": 896,
+        "prompt_cache_miss_tokens": 203
+      },
+      "wall_s": 4.344000000040978,
+      "response_bytes": 3060,
+      "raw_response_sha256": "fa4d636d840dad380d15985ffbf6ee6b89b9b60cbe55556da42e9a2d9a4d8ab5",
+      "result_sha256": "55651131d1be56289630b1c9a482f8b3ee965e16bffcdf75c76197333174f348",
+      "request_messages_sha256": "477ed8fb62dcbeacc7e8ffb874aa2e628571a37387a8831ebed2004eec9f6bf5",
+      "raw_evidence": "runs/s130-live-nonthinking-20261022/04_slope_catch",
+      "intent_correct": true,
+      "explicit_requirements_preserved": true,
+      "temporal_semantics_correct": true,
+      "missing_definitions_correct": true,
+      "hallucinated_conditions": false,
+      "semantic_correct": true,
+      "evidence": [
+        "R1 and R4 explicitly preserve rolling down a ramp; explanation repeats rolling, not free fall.",
+        "0.05 kg and stable hold for at least 0.20 s after capture retained; then relation preserves event order.",
+        "R5-R10 ask slope angle, initial ball position, rolling friction, capture/stable-hold measurements and evaluator."
+      ],
+      "verdict": "Requested ramp-rolling/capture semantics retained; omitted conjunction and original missing-definition sentence fail quotation coverage."
+    },
+    {
+      "case": "05_disturbance",
+      "input": "软臂安装在一个会受到外部扰动的平台上。平台在第 1.0 s 开始受到水平扰动，要求软臂末端相对于世界坐标系中的固定目标保持稳定，扰动后 0.5 s 内恢复到位置偏差不超过 0.01 m，并继续保持至少 0.10 s。扰动力的具体时间曲线尚未给出。",
+      "json_pass": true,
+      "format_pass": false,
+      "intake_pass": false,
+      "format_errors": [
+        {
+          "location": [
+            "requirements",
+            6
+          ],
+          "message": "Value error, SOURCE_CONTENT_CONFLICT: quote"
+        }
+      ],
+      "invalid_quotes": [],
+      "quotation_coverage_gaps": [],
+      "numeric_question_rows": [],
+      "compilation_status": "not_run_parse_failed",
+      "failure_cause": "model_output_contract",
+      "finish_reason": "stop",
+      "usage": {
+        "completion_tokens": 900,
+        "prompt_tokens": 1127,
+        "total_tokens": 2027,
+        "completion_tokens_details": null,
+        "prompt_tokens_details": {
+          "audio_tokens": null,
+          "cache_write_tokens": null,
+          "cached_tokens": 896
+        },
+        "prompt_cache_hit_tokens": 896,
+        "prompt_cache_miss_tokens": 231
+      },
+      "wall_s": 5.452999999979511,
+      "response_bytes": 3182,
+      "raw_response_sha256": "e77b1f3c08605d40f047997eeb3c6955347fd4116845c60c5f240c71c06cd7fe",
+      "result_sha256": "88bd4f9d1c2cd9e85cfb282c4943348b145d4411608c95062a0d62d145f0f3a0",
+      "request_messages_sha256": "374b2f3ddd696273136ff7d834c8ee5c25fa6e51885e35598bc4686e0b84d233",
+      "raw_evidence": "runs/s130-live-nonthinking-20261022/05_disturbance",
+      "intent_correct": true,
+      "explicit_requirements_preserved": true,
+      "temporal_semantics_correct": null,
+      "missing_definitions_correct": false,
+      "hallucinated_conditions": false,
+      "semantic_correct": null,
+      "evidence": [
+        "R1-R6 retain perturbed platform, horizontal direction, onset 1.0 s, fixed world target, recovery within 0.5 s, 0.01 m and hold at least 0.10 s.",
+        "Relations preserve disturbance-before-recovery and recovery-then-hold; pre-disturbance stability phase is not separately described.",
+        "Explanation wrongly calls the coordinate frame unspecified despite explicit world frame; waveform, target coordinates, signals and evaluator are valid open questions."
+      ],
+      "verdict": "Core disturbance/recovery task retained, no static-Reach downgrade; phase coverage and missing-definition claims need review."
+    },
+    {
+      "case": "06_tracking",
+      "input": "让软臂末端在世界坐标系内跟踪半径 0.10 m 的圆周轨迹，连续跟踪 3 个周期，每个周期 2 s，要求最大位置跟踪误差不超过 0.015 m。圆心、轨迹平面和起始相位尚未指定。",
+      "json_pass": true,
+      "format_pass": true,
+      "intake_pass": false,
+      "format_errors": [],
+      "invalid_quotes": [],
+      "quotation_coverage_gaps": [
+        "。圆心、轨迹平面和起始相位尚未指定。"
+      ],
+      "numeric_question_rows": [],
+      "compilation_status": "not_run_parse_failed",
+      "failure_cause": "model_output_contract",
+      "finish_reason": "stop",
+      "usage": {
+        "completion_tokens": 818,
+        "prompt_tokens": 1110,
+        "total_tokens": 1928,
+        "completion_tokens_details": null,
+        "prompt_tokens_details": {
+          "audio_tokens": null,
+          "cache_write_tokens": null,
+          "cached_tokens": 896
+        },
+        "prompt_cache_hit_tokens": 896,
+        "prompt_cache_miss_tokens": 214
+      },
+      "wall_s": 4.202999999979511,
+      "response_bytes": 2850,
+      "raw_response_sha256": "e11e97a1e400f2f81fd3c67f7d3685678ac21858501faac4124b3a77b6dd24d7",
+      "result_sha256": "bb8719ca9b1bc600b83dfa95294fb160cdbc0b85f9ec148f4c9a3c4fac8d10d0",
+      "request_messages_sha256": "864545037ab6d796f68fc3bc1660466cf9ec9e76f1d396315289322815ccfd55",
+      "raw_evidence": "runs/s130-live-nonthinking-20261022/06_tracking",
+      "intent_correct": true,
+      "explicit_requirements_preserved": true,
+      "temporal_semantics_correct": null,
+      "missing_definitions_correct": true,
+      "hallucinated_conditions": false,
+      "semantic_correct": null,
+      "evidence": [
+        "R1/R3-R6 retain world circular reference, radius 0.10 m, three periods, 2 s each and maximum error 0.015 m.",
+        "U1-U5 ask center, plane, phase, error measurement and evaluator; no execution-support claim.",
+        "Textual timing is correct, but temporal edges target the period-value row and error-limit row rather than a clear scoring interval; relation interpretation needs review."
+      ],
+      "verdict": "Time-varying tracking retained; formal temporal relationships need review. The LLM cannot certify Registry availability without Registry evidence."
+    }
+  ]
+}

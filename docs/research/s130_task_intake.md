@@ -1,6 +1,7 @@
 # S130：独立任务解析与确定性编译预览
 
 本文前半保留 N1 交付记录；后半 **S130-N2 交付** 描述当前接口和调用限制。
+后续真实调用的两轮结果、最小修复与未通过事项见 [S130 真实 LLM 验证](s130_live_validation.md)。
 
 本次仅新增四个文件：`schemas/task_intake.py`、`tools/task_intake.py`、
 `tests/research/test_task_intake.py` 和本文。没有接入科研 Agent，也没有实施 N2。
@@ -149,7 +150,8 @@ N2 明确要求：
 | 模型 | 显式 `--model`，不自动选模型 |
 | 地址校验 | HTTPS，禁止内嵌用户名/密码、query 和 fragment |
 | 请求上限 | 一次调用最多一条请求，`max_retries=0`，无工具和对话循环 |
-| 响应/时间上限 | 默认 2000 tokens、30 s；可调范围 1–4096 tokens、(0,60] s |
+| 响应/时间上限 | 默认 2000 tokens、30 s；N2 原范围 1–4096 tokens，后续用户授权提高为 1–8192；时间仍为 (0,60] s |
+| 思考模式 | 后续真实验证新增可选 `--thinking disabled/enabled`；省略时记录 provider_default，不改变原 SDK 默认请求 |
 
 检查时仅发现另一服务的 `DEEPSEEK_API_KEY` 环境变量名；没有读取或输出密钥值。
 独立的 `TASK_INTAKE_API_KEY` 和 `TASK_INTAKE_BASE_URL` 尚未配置，因此实际独立服务地址尚未确定。
