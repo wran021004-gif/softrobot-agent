@@ -2,6 +2,8 @@
 
 本文前半保留 N1 交付记录；后半 **S130-N2 交付** 描述当前接口和调用限制。
 后续真实调用的两轮结果、最小修复与未通过事项见 [S130 真实 LLM 验证](s130_live_validation.md)。
+当前最小契约修复、新旧行为对照与零请求重放见 [S130 协议修复](s130_protocol_repair.md)；
+下文 N1/N2 交付记录中的强制 null、逐字覆盖拒绝和全部时序拒绝由该修复说明更新。
 
 本次仅新增四个文件：`schemas/task_intake.py`、`tools/task_intake.py`、
 `tests/research/test_task_intake.py` 和本文。没有接入科研 Agent，也没有实施 N2。

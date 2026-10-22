@@ -94,6 +94,69 @@ class CompilationTests(unittest.TestCase):
         self.assertIsNone(result.configuration_preview)
         self.assertTrue({'target', 'tolerance', 'duration'} <= set(result.capabilities['semantic']['missing']))
 
+    def test_hold_relations_map_only_existing_inclusive_sampled_constraints(self):
+        text, proposal = fixture('reach_and_hold', COMPLETE_CLAUSES, '末端', [])
+        proposal['temporal_relations'] = [
+            dict(first='r5', relation='during', second='r4', quote='；'.join(list(COMPLETE_CLAUSES)[4:6])),
+            dict(first='r6', relation='throughout', second='r4', quote='；'.join(list(COMPLETE_CLAUSES)[4:7]))]
+        result = self.compile(parse_response(text, json.dumps(proposal)).draft)
+        self.assertIsNotNone(result.configuration_preview, result.diagnostics)
+        for edge in result.capabilities['temporal']['mappings']:
+            self.assertEqual(edge['status'], 'mapped')
+            self.assertAlmostEqual(edge['interval_s'][0], .30)
+            self.assertEqual(edge['interval_s'][1], .35)
+        expected = self.compile()
+        self.assertEqual(result.acceptance_spec, expected.acceptance_spec)
+        self.assertEqual(result.capabilities['mathematics'], expected.capabilities['mathematics'])
+        with self.assertRaisesRegex(ValueError, 'DEVELOPMENT_HOST_REQUIRES_DEVELOPMENT_VALID'):
+            compile_input(result.configuration_preview.model_dump(mode='json'))
+        for edge in (dict(first='r5', relation='after', second='r4'),
+                     dict(first='r4', relation='during', second='r5'),
+                     dict(first='r0', relation='before', second='r4'),
+                     dict(first='r2', relation='during', second='r4')):
+            changed = deepcopy(proposal)
+            changed['temporal_relations'].append({**edge, 'quote': text})
+            rejected = self.compile(parse_response(text, json.dumps(changed)).draft)
+            self.assertIsNone(rejected.candidate_task)
+            self.assertIn('TEMPORAL_RELATIONS_REQUIRE_REVIEW', ' '.join(rejected.diagnostics))
+
+    def test_unquoted_conditions_and_forged_coverage_cannot_bypass_full_input(self):
+        text, proposal = fixture('reach_and_hold', COMPLETE_CLAUSES, '末端', [])
+        # A known but unquoted condition remains mapped by the full-text compiler.
+        proposal['requirements'].pop(5)
+        draft = parse_response(text, json.dumps(proposal)).draft
+        self.assertTrue(draft.unquoted_spans)
+        result = self.compile(draft)
+        self.assertIsNotNone(result.candidate_task)
+        self.assertEqual(result.capabilities['quotation_coverage']['status'], 'needs_review')
+        for hidden in ('整个运动过程中软臂任何部位不能碰撞障碍物', '终点误差不超过 0.001 m',
+                       '保持窗口开始前必须已到达目标', '接近小球不等于捕获成功',
+                       '捕获后必须保持且不能反弹脱离'):
+            original = text + '；' + hidden
+            draft = parse_response(original, json.dumps(proposal)).draft
+            self.assertIsNotNone(draft)
+            self.assertIn(hidden, ''.join(g.text for g in draft.unquoted_spans))
+            forged = draft.model_copy(update={'unquoted_spans': []})
+            result = self.compile(forged)
+            self.assertIsNone(result.candidate_task, hidden)
+            self.assertIn(hidden, ''.join(g['text'] for g in
+                result.capabilities['quotation_coverage']['unquoted_spans']))
+            self.assertTrue(any('UNMAPPED_USER_CONSTRAINT' in d or 'REFERENCE_CONFLICT' in d
+                                for d in result.diagnostics))
+
+    def test_capture_proximity_claim_never_becomes_acceptance(self):
+        text, proposal = CASES['catch']
+        proposal = deepcopy(proposal)
+        proposal.update(intent='reach', explanation='末端接近小球就算捕获成功。')
+        draft = parse_response(text, json.dumps(proposal)).draft
+        self.assertIsNotNone(draft)  # Explanation is visible, unverified interpretation.
+        result = self.compile(draft)
+        self.assertIsNone(result.candidate_task)
+        self.assertIsNone(result.acceptance_spec)
+        self.assertIn('UNMAPPED_USER_CONSTRAINT', ' '.join(result.diagnostics))
+        proposal['requirements'][0]['quote'] = '末端接近小球就算捕获成功'
+        self.assertIn('USER_QUOTE_NOT_FOUND', parse_response(text, json.dumps(proposal)).error)
+
     def test_new_constraints_and_even_wrong_llm_kind_cannot_disappear(self):
         for text in ('全程不能超过 5 N', '途中避开球形障碍物', '必须连续时间满足容差',
                      '除终点外不得进入目标区域', '保持窗口速度不超过 0.01 m/s'):
@@ -225,18 +288,33 @@ class ProviderBoundaryTests(unittest.TestCase):
         changed['requirements'][-1].update(source='undefined', question='目标位置是什么？')
         mutations.append((changed, 'SOURCE_CONTENT_CONFLICT'))
         changed = deepcopy(proposal)
-        del changed['requirements'][0]['config_pointer']
-        mutations.append((changed, 'Field required'))
-        changed = deepcopy(proposal)
-        changed['requirements'][-1] = requirement('unknown', source='undefined', question='目标位置是什么？')
-        mutations.append((changed, 'UNRETAINED_USER_REQUIREMENT_TEXT'))
-        changed = deepcopy(proposal)
-        changed['requirements'].append(requirement('question', source='undefined', question='0.20 s 从何时开始？'))
+        changed['requirements'].append(requirement('question', source='undefined', question='0.21 s 从何时开始？'))
         mutations.append((changed, 'UNGROUNDED_NUMERIC_CANDIDATE'))
         for response, error in mutations:
             result = parse_response(text, json.dumps(response))
             self.assertIsNone(result.draft)
             self.assertIn(error, result.error)
+
+    def test_observed_benign_encoding_failures_become_review_drafts(self):
+        text, proposal = fixture('catch_and_hold', {
+            '软臂接住小球': 'behavior', '接住后保持 0.20 s': 'acceptance',
+            '捕获定义尚未指定': 'constraint'}, '小球', [])
+        del proposal['requirements'][0]['config_pointer']
+        proposal['requirements'][-1] = requirement('unknown', source='undefined', question='捕获定义是什么？')
+        proposal['requirements'].append(requirement('question', source='undefined', question='0.20 s 从何时开始？'))
+        result = parse_response(text, json.dumps(proposal))
+        self.assertEqual(result.status, 'draft', result.error)
+        self.assertIn('捕获定义尚未指定', ''.join(g.text for g in result.draft.unquoted_spans))
+        self.assertIsNone(result.draft.requirements[-1].value)
+        self.assertIn('0.20 s 从何时开始？', result.draft.missing_definitions)
+
+    @patch.dict(os.environ, {'TASK_INTAKE_API_KEY': 'synthetic',
+                            'TASK_INTAKE_BASE_URL': 'https://api.deepseek.com'}, clear=True)
+    def test_deepseek_requires_explicit_disabled_without_connecting(self):
+        with patch('openai.OpenAI', side_effect=AssertionError('must not connect')):
+            for mode in (None, 'enabled'):
+                result = request_draft('任务', enable_provider=True, model='deepseek-flash', thinking=mode)
+                self.assertEqual(result.error, 'DEEPSEEK_REQUIRES_EXPLICIT_THINKING_DISABLED')
 
     @patch.dict(os.environ, {'TASK_INTAKE_API_KEY': 'synthetic', 'TASK_INTAKE_BASE_URL': 'https://intake.invalid/v1'}, clear=True)
     def test_explicit_non_thinking_single_request_and_truncation_stays_closed(self):

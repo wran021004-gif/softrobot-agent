@@ -111,7 +111,6 @@ class IntakeTests(unittest.TestCase):
         original = CASES['hold'][1]
         mutations = []
         p = deepcopy(original); p['requirements'][0]['quote'] = '容差 0.001 m'; mutations.append(p)
-        p = deepcopy(original); p['requirements'].pop(2); mutations.append(p)
         p = deepcopy(original); p['requirements'][0]['value'] = 0.01; mutations.append(p)
         p = deepcopy(original); p['requirements'][0]['source'] = 'human_approved'; mutations.append(p)
         p = deepcopy(original); p['requirements'][0]['config_pointer'] = '/task'; mutations.append(p)
@@ -127,6 +126,25 @@ class IntakeTests(unittest.TestCase):
                 result = self.parse(proposal=proposal)
                 self.assertEqual(result.status, 'parse_failed')
                 self.assertIsNone(result.draft)
+
+    def test_omitted_nulls_and_quotation_gaps_are_reviewable(self):
+        proposal = deepcopy(CASES['hold'][1])
+        proposal['requirements'].pop(2)  # Explicit force constraint is omitted.
+        for row in proposal['requirements']:
+            for key in ('quote', 'config_pointer', 'question'):
+                if row[key] is None:
+                    del row[key]
+        result = self.parse(proposal=proposal)
+        self.assertEqual(result.status, 'draft', result.error)
+        self.assertEqual(result.draft.user_text, CASES['hold'][0])
+        self.assertIn('全程不能超过 5 N', ''.join(g.text for g in result.draft.unquoted_spans))
+        for gap in result.draft.unquoted_spans:
+            self.assertEqual(gap.text, result.draft.user_text[gap.start:gap.end])
+        self.assertEqual(result.draft.status, 'needs_confirmation')
+        self.assertFalse(result.draft.executable)
+        # Required source content itself is still mandatory.
+        del proposal['requirements'][0]['quote']
+        self.assertIn('SOURCE_CONTENT_REQUIRED', self.parse(proposal=proposal).error)
 
     def test_four_sources_and_deterministic_values(self):
         source = read(ROOT/'tasks/reach_hold.json')

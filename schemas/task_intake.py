@@ -15,9 +15,9 @@ class RequirementProposal(IntakeContract):
     id: str = Field(min_length=1)
     kind: Literal['behavior', 'constraint', 'observable', 'environment', 'acceptance']
     source: Literal['user_explicit', 'verified_configuration', 'llm_candidate', 'undefined']
-    quote: str | None
-    config_pointer: str | None
-    question: str | None
+    quote: str | None = None
+    config_pointer: str | None = None
+    question: str | None = None
 
     @model_validator(mode='after')
     def source_shape(self):
@@ -84,11 +84,19 @@ class DraftRequirement(RequirementProposal):
     confirmation: Literal['required'] = 'required'
 
 
+class UnquotedSpan(IntakeContract):
+    """Exact original text absent from requirement quotes; offsets are [start, end)."""
+    start: int
+    end: int
+    text: str
+
+
 class TaskIntakeDraft(IntakeContract):
     version: Literal['s130-n1'] = 's130-n1'
     status: Literal['needs_confirmation'] = 'needs_confirmation'
     executable: Literal[False] = False
     user_text: str
+    unquoted_spans: list[UnquotedSpan] = Field(default_factory=list)
     user_goal: str
     user_goal_source: Literal['user_explicit'] = 'user_explicit'
     task_object: str | None
