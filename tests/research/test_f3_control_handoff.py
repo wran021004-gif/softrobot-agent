@@ -55,6 +55,7 @@ class ControlHandoffTests(unittest.TestCase):
             lambda r:r['trajectory']['horizon'].update(start_time_s=.01),
             lambda r:r['trajectory']['replay'].update(numerically_valid=False),
             lambda r:r['trajectory']['provenance'].update(model_identity='foreign')]
+        mutations.append(lambda r:r['trajectory']['applied_input_n'][0].__setitem__(0,float('nan')))
         for mutation in mutations:
             raw=deepcopy(self.raw);mutation(raw)
             with self.subTest(mutation=mutation):

@@ -1,0 +1,3149 @@
+{
+  "report_reference": {
+    "artifact_id": "15aae6758cc397b69f617c100dc6b01db57010916625fa48b3cbd2607a48475d",
+    "media_type": "application/json"
+  },
+  "report": {
+    "version": "scientific_report_v1",
+    "mode": "result_summary",
+    "question": null,
+    "results": [
+      {
+        "version": "scientific_result_card_v1",
+        "identity": {
+          "result": {
+            "reference": {
+              "artifact_id": "7e347a23709e32829dee87bb7c15baddd056767f21419292b978b240560f0145",
+              "media_type": "application/json"
+            },
+            "pointer": ""
+          },
+          "study": "f3-preflight-socp-20261022-01",
+          "task_identity": "882b3493037dcc8f8da294b3473e1223f0465e92c35bc3064bfc42d467bf212e",
+          "canonical_task_identity": "fe7b95c3c1ba12659b59c1983544b6454c9d90ac42c4dec528e9736d99fd3a6b",
+          "design_identity": null,
+          "evaluation_profile_identity": "fb6ddbd732c5cdfd575401a52e453b4aa158d730b58ab37f34a341e2b7140588",
+          "candidate": {
+            "artifact_id": "395884912d4348ac9eb0bfabf100cca0b2479edbbaaa973f02ef69ed4d00ae04",
+            "media_type": "application/json"
+          },
+          "control_source": null,
+          "operation": "task_capability",
+          "model_identity": "01f9858eb6d42811ec0f6609967217a03ff5f4db1fc95d1cb76353476422a90e",
+          "evaluation_identity": null
+        },
+        "evidence_summary": {
+          "version": "evidence_policy_v1",
+          "claim_kind": "MODEL_WITNESS",
+          "verification_status": "independent_discrete_replay_passed",
+          "model_identity": "01f9858eb6d42811ec0f6609967217a03ff5f4db1fc95d1cb76353476422a90e",
+          "candidate_identity": {
+            "artifact_id": "395884912d4348ac9eb0bfabf100cca0b2479edbbaaa973f02ef69ed4d00ae04",
+            "media_type": "application/json"
+          },
+          "design_identity": null,
+          "task_identity": "882b3493037dcc8f8da294b3473e1223f0465e92c35bc3064bfc42d467bf212e",
+          "operating_point": {
+            "actual_time_s": 0.0,
+            "available": true,
+            "construction": {
+              "achieved_world_point_m": [
+                0.29799999999999993,
+                0.0,
+                0.15
+              ],
+              "execution_trajectory_used": false,
+              "method": "existing immutable controller preparation/numerical-source logic",
+              "numerical_source": "initial_state_pretension",
+              "position_residual_m": 0.053749418601506754,
+              "preparation_provenance": {
+                "actual_initial_state_source": "Candidate Task initializer then measured backend state at every update",
+                "current_scope": {
+                  "backend": {
+                    "extension_id": "backend.family_mujoco",
+                    "parameters": {
+                      "contract": "family.mujoco_parameters",
+                      "data": {
+                        "contact_model": "mujoco_convex_native",
+                        "friction": [
+                          0.0,
+                          0.0,
+                          0.0
+                        ],
+                        "integrator": "implicitfast",
+                        "timestep_source": "task.timing.timestep_s"
+                      },
+                      "version": "1.0.0"
+                    },
+                    "version": "1.1.0"
+                  },
+                  "controller": {
+                    "extension_id": "controller.gvs_nmpc",
+                    "parameters": {
+                      "contract": "family.gvs_reach_control",
+                      "data": {
+                        "numerical_source": "initial_state_pretension",
+                        "recipe": {
+                          "basis": {
+                            "strategy": "structural_linear"
+                          },
+                          "constraint_jacobian_mode": "reverse",
+                          "curvature_scale_rad_m": 10.0,
+                          "evaluation_threads": 1,
+                          "feasible_return": null,
+                          "holding_brake_lead_s": 0.0,
+                          "holding_speed_cost_mode": "time_integral_v1",
+                          "holding_speed_cost_window_s": 0.05,
+                          "holding_tip_speed_weight": 0.1,
+                          "horizon": 10,
+                          "integration_method": "implicit_euler",
+                          "max_cpu_s": null,
+                          "max_iterations": 120,
+                          "max_unusable_updates": 3,
+                          "position_error_scale_m": null,
+                          "rate_scale_rad_m_s": 1000.0,
+                          "recover_returned_tensions": true,
+                          "regenerate_warm_states": true,
+                          "root_tolerance": 1e-10,
+                          "seed_position_tolerance_fraction": 0.5,
+                          "seed_speed_limit_m_s": 0.02,
+                          "stopping_policy": "research_work_v1",
+                          "substeps": 1,
+                          "tension_weight": 0.0001,
+                          "terminal_tip_speed_weight": 0.1,
+                          "terminal_velocity_weight": 0.0001,
+                          "terminal_weight": 5.0,
+                          "tip_speed_scale_m_s": 0.02,
+                          "tolerance": 1e-06,
+                          "tracking_weight": 1.0,
+                          "variation_weight": 0.001,
+                          "velocity_weight": 0.0001
+                        },
+                        "settling": {
+                          "position_limit_m": 0.01,
+                          "speed_limit_m_s": 0.02,
+                          "window_s": 0.05
+                        }
+                      },
+                      "version": "1.0.0"
+                    },
+                    "version": "11.0.0"
+                  },
+                  "discretization": {
+                    "contract": "family.discretization",
+                    "data": {
+                      "cells": {
+                        "segment_0": 12,
+                        "segment_1": 12
+                      },
+                      "coordinates": "two_principal_bending_angles_per_cell",
+                      "model": "serial_bending_cells_v1",
+                      "version": "serial_bending_discretization_v1"
+                    },
+                    "version": "1.0.0"
+                  },
+                  "execution_model": {
+                    "extension_id": "model.serial_bending_cells",
+                    "parameters": {
+                      "contract": "family.dynamics_model",
+                      "data": {},
+                      "version": "1.0.0"
+                    },
+                    "version": "1.0.0"
+                  },
+                  "robot": {
+                    "family": "tendon_robot_family",
+                    "identity": "cb2d0e7bb36a94b2791b73e799536f7fd6c51fff8851de4b662c535cc38f5c5e"
+                  },
+                  "seed": 17,
+                  "task": {
+                    "environment": "5cee25b33f4ff19cb0abd93651ce9077a81665990f07d8f5a4967497e8e82a4d",
+                    "family": "task.reach",
+                    "goal": "7906a8d6f1938670b3b029be161c8f1869097280b1ee24a198da30b2fff4c264",
+                    "identity": "882b3493037dcc8f8da294b3473e1223f0465e92c35bc3064bfc42d467bf212e",
+                    "initializer": "3a90c93217f15e9a60db7f65f611911f4aa53f1a4987340949e1068fd2647c22",
+                    "timing": {
+                      "control_period_s": 0.01,
+                      "duration_s": 0.35,
+                      "sample_period_s": 0.01,
+                      "termination": [
+                        "duration",
+                        "numerical_failure"
+                      ],
+                      "timestep_s": 0.0005
+                    }
+                  }
+                },
+                "historical_states_reused": false,
+                "nominal_is_current_target_solution": false,
+                "physics_identity": "b1c04767b94e5c6bb9b1ece436c1ba79e6848e24b3bc4c4a9740f6d089bb06ce",
+                "previous_input_source": "candidate bounded pretension",
+                "resolved_basis_identity": "9637ffe35f961a28c069143bdc6d16344dc7fc76c87e168bd9802f006cbdefe9",
+                "reused": false,
+                "source_kind": "project_initial_state_and_bounded_pretension",
+                "validity": "Tensions are numerical guesses; placeholder states must be regenerated using candidate dynamics before use"
+              },
+              "static_equilibrium": false
+            },
+            "name": "controller_start_input",
+            "phase": "configuration_controller_start_input",
+            "remaining_task_s": 0.35,
+            "scope": "controller-start input",
+            "time_origin": "frozen initializer via existing controller preparation"
+          },
+          "covered_samples": {
+            "horizon": {
+              "analysis_horizon_s": 0.35,
+              "interpretation": "Actual saved-state remaining horizon, or nominal horizon from the declared configuration operating point.",
+              "origin": 0.0,
+              "period_s": 0.01,
+              "remaining_task_s": 0.35,
+              "task_duration_s": 0.35,
+              "trajectory_grid": {
+                "control_period_s": 0.01,
+                "input_hold_s": 0.01,
+                "remaining_task_s": 0.35,
+                "sample_period_s": 0.01,
+                "sample_phase": "post_step_preceding_hold",
+                "sample_steps": {
+                  "0": 0,
+                  "1": 1,
+                  "10": 10,
+                  "11": 11,
+                  "12": 12,
+                  "13": 13,
+                  "14": 14,
+                  "15": 15,
+                  "16": 16,
+                  "17": 17,
+                  "18": 18,
+                  "19": 19,
+                  "2": 2,
+                  "20": 20,
+                  "21": 21,
+                  "22": 22,
+                  "23": 23,
+                  "24": 24,
+                  "25": 25,
+                  "26": 26,
+                  "27": 27,
+                  "28": 28,
+                  "29": 29,
+                  "3": 3,
+                  "30": 30,
+                  "31": 31,
+                  "32": 32,
+                  "33": 33,
+                  "34": 34,
+                  "35": 35,
+                  "4": 4,
+                  "5": 5,
+                  "6": 6,
+                  "7": 7,
+                  "8": 8,
+                  "9": 9
+                },
+                "start_time_s": 0.0,
+                "step_count": 35
+              }
+            },
+            "constraints": [
+              {
+                "analyzed_indices": [
+                  35
+                ],
+                "checked_indices": [
+                  35
+                ],
+                "constraint_id": "terminal_error_m",
+                "expressible": true,
+                "reason": "Shared held-input trajectory; past samples require separate evidence.",
+                "reasons": [],
+                "satisfied_indices": [
+                  35
+                ],
+                "status": "applicable",
+                "unchecked_indices": []
+              },
+              {
+                "analyzed_indices": [
+                  30,
+                  31,
+                  32,
+                  33,
+                  34,
+                  35
+                ],
+                "checked_indices": [
+                  30,
+                  31,
+                  32,
+                  33,
+                  34,
+                  35
+                ],
+                "constraint_id": "holding_max_error_m",
+                "expressible": true,
+                "reason": "Shared held-input trajectory; past samples require separate evidence.",
+                "reasons": [],
+                "satisfied_indices": [
+                  30,
+                  31,
+                  32,
+                  33,
+                  34,
+                  35
+                ],
+                "status": "applicable",
+                "unchecked_indices": []
+              },
+              {
+                "analyzed_indices": [
+                  30,
+                  31,
+                  32,
+                  33,
+                  34,
+                  35
+                ],
+                "checked_indices": [
+                  30,
+                  31,
+                  32,
+                  33,
+                  34,
+                  35
+                ],
+                "constraint_id": "holding_max_speed_m_s",
+                "expressible": true,
+                "reason": "Shared held-input trajectory; past samples require separate evidence.",
+                "reasons": [],
+                "satisfied_indices": [
+                  30,
+                  31,
+                  32,
+                  33,
+                  34,
+                  35
+                ],
+                "status": "applicable",
+                "unchecked_indices": []
+              }
+            ],
+            "full_task_supported": true
+          },
+          "assumptions": {
+            "model": {
+              "model_id": "model.gvs",
+              "model_version": "1.0.0",
+              "relevant_assumptions": [
+                "supported serial tendon-driven continuum topology",
+                "selected strain basis spans deformation relevant to the use",
+                "inextensible centerline",
+                "no shear",
+                "no torsion",
+                "straight frictionless tendon spans"
+              ],
+              "representation_id": "9637ffe35f961a28c069143bdc6d16344dc7fc76c87e168bd9802f006cbdefe9"
+            },
+            "physical_inputs": {
+              "control_period_s": 0.01,
+              "frame": "tendon_path",
+              "lower": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "phase": "pre_step",
+              "provenance": [
+                "/robot/structure/data/tendons",
+                "/task/timing/control_period_s"
+              ],
+              "signal": "tendon_tension",
+              "tendon_order": [
+                "tendon_0",
+                "tendon_1",
+                "tendon_2"
+              ],
+              "units": "N",
+              "upper": [
+                8.0,
+                8.0,
+                8.0
+              ]
+            },
+            "legacy_applicability": {
+              "constraint_coverage": [
+                {
+                  "analyzed_indices": [
+                    35
+                  ],
+                  "checked_indices": [
+                    35
+                  ],
+                  "constraint_id": "terminal_error_m",
+                  "expressible": true,
+                  "reason": "Shared held-input trajectory; past samples require separate evidence.",
+                  "reasons": [],
+                  "satisfied_indices": [
+                    35
+                  ],
+                  "status": "applicable",
+                  "unchecked_indices": []
+                },
+                {
+                  "analyzed_indices": [
+                    30,
+                    31,
+                    32,
+                    33,
+                    34,
+                    35
+                  ],
+                  "checked_indices": [
+                    30,
+                    31,
+                    32,
+                    33,
+                    34,
+                    35
+                  ],
+                  "constraint_id": "holding_max_error_m",
+                  "expressible": true,
+                  "reason": "Shared held-input trajectory; past samples require separate evidence.",
+                  "reasons": [],
+                  "satisfied_indices": [
+                    30,
+                    31,
+                    32,
+                    33,
+                    34,
+                    35
+                  ],
+                  "status": "applicable",
+                  "unchecked_indices": []
+                },
+                {
+                  "analyzed_indices": [
+                    30,
+                    31,
+                    32,
+                    33,
+                    34,
+                    35
+                  ],
+                  "checked_indices": [
+                    30,
+                    31,
+                    32,
+                    33,
+                    34,
+                    35
+                  ],
+                  "constraint_id": "holding_max_speed_m_s",
+                  "expressible": true,
+                  "reason": "Shared held-input trajectory; past samples require separate evidence.",
+                  "reasons": [],
+                  "satisfied_indices": [
+                    30,
+                    31,
+                    32,
+                    33,
+                    34,
+                    35
+                  ],
+                  "status": "applicable",
+                  "unchecked_indices": []
+                }
+              ],
+              "execution_support": "not_assessed",
+              "full_task_supported": true,
+              "horizon": {
+                "analysis_horizon_s": 0.35,
+                "interpretation": "Actual saved-state remaining horizon, or nominal horizon from the declared configuration operating point.",
+                "origin": 0.0,
+                "period_s": 0.01,
+                "remaining_task_s": 0.35,
+                "task_duration_s": 0.35,
+                "trajectory_grid": {
+                  "control_period_s": 0.01,
+                  "input_hold_s": 0.01,
+                  "remaining_task_s": 0.35,
+                  "sample_period_s": 0.01,
+                  "sample_phase": "post_step_preceding_hold",
+                  "sample_steps": {
+                    "0": 0,
+                    "1": 1,
+                    "10": 10,
+                    "11": 11,
+                    "12": 12,
+                    "13": 13,
+                    "14": 14,
+                    "15": 15,
+                    "16": 16,
+                    "17": 17,
+                    "18": 18,
+                    "19": 19,
+                    "2": 2,
+                    "20": 20,
+                    "21": 21,
+                    "22": 22,
+                    "23": 23,
+                    "24": 24,
+                    "25": 25,
+                    "26": 26,
+                    "27": 27,
+                    "28": 28,
+                    "29": 29,
+                    "3": 3,
+                    "30": 30,
+                    "31": 31,
+                    "32": 32,
+                    "33": 33,
+                    "34": 34,
+                    "35": 35,
+                    "4": 4,
+                    "5": 5,
+                    "6": 6,
+                    "7": 7,
+                    "8": 8,
+                    "9": 9
+                  },
+                  "start_time_s": 0.0,
+                  "step_count": 35
+                }
+              },
+              "model_assessment": {
+                "design_id": "serial_family_candidate",
+                "design_identity": "aa57c9f64201bffcf242c681d25c263f0b661c43bc87b438b5eda0d5cf83c608",
+                "generalized_coordinate_dimension": 12,
+                "model_id": "model.gvs",
+                "model_version": "1.0.0",
+                "relevant_assumptions": [
+                  "supported serial tendon-driven continuum topology",
+                  "selected strain basis spans deformation relevant to the use",
+                  "inextensible centerline",
+                  "no shear",
+                  "no torsion",
+                  "straight frictionless tendon spans"
+                ],
+                "representation_id": "9637ffe35f961a28c069143bdc6d16344dc7fc76c87e168bd9802f006cbdefe9",
+                "representation_kind": "gvs_bending_basis_v1",
+                "representation_strategy": "structural_linear",
+                "state_dimension": 24,
+                "unsupported_requested_physics": [],
+                "uses": {
+                  "linearization": {
+                    "evidence": [],
+                    "reasons": [
+                      "GVS exports a DynamicSystem for the separate linearizer, but local physical agreement is unvalidated; validation evidence is unavailable."
+                    ],
+                    "status": "WARN",
+                    "validation": "unavailable"
+                  }
+                }
+              },
+              "reasons": [],
+              "status": "applicable"
+            },
+            "source": "Trusted resolved tool artifact; not arbitrary LLM assertions"
+          },
+          "supported_inferences": [
+            "model_sampled_feasibility",
+            "numerically_checked_sampled_optimality"
+          ],
+          "unsupported_inferences": [
+            "global_nonlinear_feasibility",
+            "global_nonlinear_infeasibility",
+            "structural_infeasibility",
+            "whole_horizon_from_instantaneous_braking",
+            "adapted_dynamic_improvement_from_static_sensitivity",
+            "unvisited_simulation_descent_guarantee",
+            "continuous_time_compliance",
+            "hardware_performance",
+            "robustness",
+            "repeatability",
+            "observed_task_pass"
+          ],
+          "evidence_reference": {
+            "artifact_id": "7e347a23709e32829dee87bb7c15baddd056767f21419292b978b240560f0145",
+            "media_type": "application/json"
+          },
+          "numerical_evidence_pointer": "/trajectory",
+          "prospective_guarantee": false,
+          "unresolved": [
+            "Nonlinear realization and constraints outside declared model/sample coverage remain unresolved.",
+            "Floating support lower estimate and gap are not strict mathematical bounds or certification.",
+            "Original independent physical task acceptance is unmeasured by this evidence."
+          ],
+          "next_checks": [
+            "independent_legal_physical_evaluation",
+            "matched_input_refinement",
+            "paired_local_response_check"
+          ]
+        },
+        "recorded_context": [],
+        "metrics": [
+          {
+            "name": "holding_max_error_m",
+            "value": 0.008000000000001313,
+            "unit": "m",
+            "threshold": 0.01,
+            "threshold_source": {
+              "reference": {
+                "artifact_id": "7e347a23709e32829dee87bb7c15baddd056767f21419292b978b240560f0145",
+                "media_type": "application/json"
+              },
+              "pointer": "/task_analysis/constraints/1/radius"
+            },
+            "passed": true,
+            "scope": "model_sample",
+            "source": {
+              "reference": {
+                "artifact_id": "7e347a23709e32829dee87bb7c15baddd056767f21419292b978b240560f0145",
+                "media_type": "application/json"
+              },
+              "pointer": "/trajectory/replay/records/5/value"
+            },
+            "time_s": 0.34,
+            "window_s": null,
+            "conditions": []
+          }
+        ],
+        "main_violations": [],
+        "critical_observations": [],
+        "deterministic_summary": {
+          "reference": {
+            "artifact_id": "7e347a23709e32829dee87bb7c15baddd056767f21419292b978b240560f0145",
+            "media_type": "application/json"
+          },
+          "candidate": {
+            "artifact_id": "395884912d4348ac9eb0bfabf100cca0b2479edbbaaa973f02ef69ed4d00ae04",
+            "media_type": "application/json"
+          },
+          "task_identity": "882b3493037dcc8f8da294b3473e1223f0465e92c35bc3064bfc42d467bf212e",
+          "operation": "task_capability",
+          "status": "computed",
+          "conclusion": "feasible_witness",
+          "scope_pointer": "/scoped_claim",
+          "coverage": "full",
+          "margins": [
+            {
+              "constraint_id": "holding_max_error_m",
+              "signal": "tip_position",
+              "absolute_time_s": 0.34,
+              "observed_value": 0.008000000000001313,
+              "bound": 0.01,
+              "margin": [
+                0.001999999999998687
+              ],
+              "violation": 0.0,
+              "units": "m",
+              "status": "satisfied_sample",
+              "source_pointer": "/trajectory/replay/records/5"
+            }
+          ],
+          "certificate_verified": null,
+          "numerical_s": 8.941454399842769,
+          "evaluations": 2,
+          "detail_pointer": "/trajectory",
+          "decision_relevance": {
+            "supported_facts": [
+              "Bounded local-model witness for checked samples."
+            ],
+            "unresolved_questions": [
+              "Controller/nonlinear/backend realization unresolved."
+            ],
+            "potential_discriminating_checks": [
+              "Compare compatible execution or solver diagnosis."
+            ],
+            "unsupported_inferences": [
+              "Global/physical feasibility, structural necessity or surrounding-region exclusion."
+            ]
+          },
+          "failure_pointer": null,
+          "evidence_summary": {
+            "version": "evidence_policy_v1",
+            "claim_kind": "MODEL_WITNESS",
+            "verification_status": "independent_discrete_replay_passed",
+            "model_identity": "01f9858eb6d42811ec0f6609967217a03ff5f4db1fc95d1cb76353476422a90e",
+            "candidate_identity": {
+              "artifact_id": "395884912d4348ac9eb0bfabf100cca0b2479edbbaaa973f02ef69ed4d00ae04",
+              "media_type": "application/json"
+            },
+            "design_identity": null,
+            "task_identity": "882b3493037dcc8f8da294b3473e1223f0465e92c35bc3064bfc42d467bf212e",
+            "supported_inferences": [
+              "model_sampled_feasibility",
+              "numerically_checked_sampled_optimality"
+            ],
+            "unsupported_inferences": [
+              "global_nonlinear_feasibility",
+              "global_nonlinear_infeasibility",
+              "structural_infeasibility",
+              "whole_horizon_from_instantaneous_braking",
+              "adapted_dynamic_improvement_from_static_sensitivity",
+              "unvisited_simulation_descent_guarantee",
+              "continuous_time_compliance",
+              "hardware_performance",
+              "robustness",
+              "repeatability",
+              "observed_task_pass"
+            ],
+            "evidence_reference": {
+              "artifact_id": "7e347a23709e32829dee87bb7c15baddd056767f21419292b978b240560f0145",
+              "media_type": "application/json"
+            },
+            "numerical_evidence_pointer": "/trajectory",
+            "prospective_guarantee": false,
+            "unresolved": [
+              "Nonlinear realization and constraints outside declared model/sample coverage remain unresolved.",
+              "Floating support lower estimate and gap are not strict mathematical bounds or certification.",
+              "Original independent physical task acceptance is unmeasured by this evidence."
+            ],
+            "next_checks": [
+              "independent_legal_physical_evaluation",
+              "matched_input_refinement",
+              "paired_local_response_check"
+            ]
+          },
+          "task_capability": {
+            "method_version": "sampled-affine-conic-minimax-v1",
+            "replayed_violation": -0.19999999999986867,
+            "optimality_status": "numerically_checked",
+            "support_lower_estimate": -0.2000000000759523,
+            "gap": 7.608363938871321e-11,
+            "full_requested_coverage": true,
+            "numerical_feasibility": "sampled_feasible_witness",
+            "dominant_constraints": [
+              "terminal_error_m",
+              "holding_max_error_m"
+            ],
+            "kernel_elapsed_s": 0.5701099000871181,
+            "solver": {
+              "error": null,
+              "extra_stats_available": false,
+              "iterations": 17,
+              "name": "CVXPY/CLARABEL",
+              "objective": -0.19999999999441767,
+              "reported_dual_objective": null,
+              "reported_dual_residual": null,
+              "reported_primal_residual": null,
+              "setup_time_s": null,
+              "solve_time_s": 0.0022471,
+              "status": "optimal",
+              "unavailable_reason": "CVXPY public Clarabel SolverStats does not expose these fields.",
+              "wall_s": 0.015899499878287315
+            },
+            "score_semantics": "Signed sampled minimax; smaller is better. Float support estimate and gap are not rigorous bounds.",
+            "strict_optimality": "unavailable",
+            "physical_failure_relation": {
+              "status": "not_assessed",
+              "mathematical_active_signals": [
+                "tip_position"
+              ],
+              "sources": [],
+              "reason": "No complete same-candidate same-task physical observation with alignable constraints.",
+              "causal_explanation": "not_established",
+              "physical_improvement": "unverified"
+            },
+            "problem_pointer": "/trajectory/problem_definition",
+            "solver_starts_pointer": "/trajectory/solver",
+            "sample_records_pointer": "/trajectory/replay/records",
+            "quantities_pointer": "/trajectory/quantities",
+            "checks_pointer": "/trajectory/dual_checks",
+            "scope": "Local sampled affine model; physical acceptance unmeasured",
+            "local_output_limitation": {
+              "world_x_first_order_state_and_input_coefficients": "zero",
+              "scope": "This stored local linearization only; not nonlinear controllability or physical invariance.",
+              "sources": [
+                {
+                  "reference": {
+                    "artifact_id": "7e347a23709e32829dee87bb7c15baddd056767f21419292b978b240560f0145",
+                    "media_type": "application/json"
+                  },
+                  "pointer": "/model/endpoint_outputs/0/C/0"
+                },
+                {
+                  "reference": {
+                    "artifact_id": "7e347a23709e32829dee87bb7c15baddd056767f21419292b978b240560f0145",
+                    "media_type": "application/json"
+                  },
+                  "pointer": "/model/endpoint_outputs/0/D/0"
+                }
+              ]
+            }
+          }
+        },
+        "mathematics": {
+          "claim": {
+            "contract": "scoped-mathematical-claim-v1",
+            "conclusion": "feasible_witness",
+            "binding": {
+              "basis": {
+                "strategy": "structural_linear"
+              },
+              "candidate": {
+                "artifact_id": "395884912d4348ac9eb0bfabf100cca0b2479edbbaaa973f02ef69ed4d00ae04",
+                "media_type": "application/json"
+              },
+              "candidate_id": "core-8f0205a83fdf252e6961dc269ad3f5e0064e0edc502a071aa1de8ed470742ea1",
+              "canonical_task_identity": "fe7b95c3c1ba12659b59c1983544b6454c9d90ac42c4dec528e9736d99fd3a6b",
+              "configuration": {
+                "artifact_id": "e479d02dbd52b230e8ab3e94ae2e8ce75f3de03edc6b25c89439336bd2b41278",
+                "media_type": "application/json"
+              },
+              "coordinate_order": [
+                "segment_0.kappa_y_node_0",
+                "segment_0.kappa_y_node_1",
+                "segment_0.kappa_y_node_2",
+                "segment_0.kappa_z_node_0",
+                "segment_0.kappa_z_node_1",
+                "segment_0.kappa_z_node_2",
+                "segment_1.kappa_y_node_0",
+                "segment_1.kappa_y_node_1",
+                "segment_1.kappa_y_node_2",
+                "segment_1.kappa_z_node_0",
+                "segment_1.kappa_z_node_1",
+                "segment_1.kappa_z_node_2"
+              ],
+              "effective_configuration_identity": "e479d02dbd52b230e8ab3e94ae2e8ce75f3de03edc6b25c89439336bd2b41278",
+              "evaluation_profile_identity": "fb6ddbd732c5cdfd575401a52e453b4aa158d730b58ab37f34a341e2b7140588",
+              "initialization_provenance": {
+                "canonical_task_identity": "fe7b95c3c1ba12659b59c1983544b6454c9d90ac42c4dec528e9736d99fd3a6b",
+                "effective": {
+                  "qpos_rad": {
+                    "segment_0_cell_0_y": 0.0,
+                    "segment_0_cell_0_z": 0.0,
+                    "segment_0_cell_10_y": 0.0,
+                    "segment_0_cell_10_z": 0.0,
+                    "segment_0_cell_11_y": 0.0,
+                    "segment_0_cell_11_z": 0.0,
+                    "segment_0_cell_1_y": 0.0,
+                    "segment_0_cell_1_z": 0.0,
+                    "segment_0_cell_2_y": 0.0,
+                    "segment_0_cell_2_z": 0.0,
+                    "segment_0_cell_3_y": 0.0,
+                    "segment_0_cell_3_z": 0.0,
+                    "segment_0_cell_4_y": 0.0,
+                    "segment_0_cell_4_z": 0.0,
+                    "segment_0_cell_5_y": 0.0,
+                    "segment_0_cell_5_z": 0.0,
+                    "segment_0_cell_6_y": 0.0,
+                    "segment_0_cell_6_z": 0.0,
+                    "segment_0_cell_7_y": 0.0,
+                    "segment_0_cell_7_z": 0.0,
+                    "segment_0_cell_8_y": 0.0,
+                    "segment_0_cell_8_z": 0.0,
+                    "segment_0_cell_9_y": 0.0,
+                    "segment_0_cell_9_z": 0.0,
+                    "segment_1_cell_0_y": 0.0,
+                    "segment_1_cell_0_z": 0.0,
+                    "segment_1_cell_10_y": 0.0,
+                    "segment_1_cell_10_z": 0.0,
+                    "segment_1_cell_11_y": 0.0,
+                    "segment_1_cell_11_z": 0.0,
+                    "segment_1_cell_1_y": 0.0,
+                    "segment_1_cell_1_z": 0.0,
+                    "segment_1_cell_2_y": 0.0,
+                    "segment_1_cell_2_z": 0.0,
+                    "segment_1_cell_3_y": 0.0,
+                    "segment_1_cell_3_z": 0.0,
+                    "segment_1_cell_4_y": 0.0,
+                    "segment_1_cell_4_z": 0.0,
+                    "segment_1_cell_5_y": 0.0,
+                    "segment_1_cell_5_z": 0.0,
+                    "segment_1_cell_6_y": 0.0,
+                    "segment_1_cell_6_z": 0.0,
+                    "segment_1_cell_7_y": 0.0,
+                    "segment_1_cell_7_z": 0.0,
+                    "segment_1_cell_8_y": 0.0,
+                    "segment_1_cell_8_z": 0.0,
+                    "segment_1_cell_9_y": 0.0,
+                    "segment_1_cell_9_z": 0.0
+                  },
+                  "qvel_rad_s": {
+                    "segment_0_cell_0_y": 0.0,
+                    "segment_0_cell_0_z": 0.0,
+                    "segment_0_cell_10_y": 0.0,
+                    "segment_0_cell_10_z": 0.0,
+                    "segment_0_cell_11_y": 0.0,
+                    "segment_0_cell_11_z": 0.0,
+                    "segment_0_cell_1_y": 0.0,
+                    "segment_0_cell_1_z": 0.0,
+                    "segment_0_cell_2_y": 0.0,
+                    "segment_0_cell_2_z": 0.0,
+                    "segment_0_cell_3_y": 0.0,
+                    "segment_0_cell_3_z": 0.0,
+                    "segment_0_cell_4_y": 0.0,
+                    "segment_0_cell_4_z": 0.0,
+                    "segment_0_cell_5_y": 0.0,
+                    "segment_0_cell_5_z": 0.0,
+                    "segment_0_cell_6_y": 0.0,
+                    "segment_0_cell_6_z": 0.0,
+                    "segment_0_cell_7_y": 0.0,
+                    "segment_0_cell_7_z": 0.0,
+                    "segment_0_cell_8_y": 0.0,
+                    "segment_0_cell_8_z": 0.0,
+                    "segment_0_cell_9_y": 0.0,
+                    "segment_0_cell_9_z": 0.0,
+                    "segment_1_cell_0_y": 0.0,
+                    "segment_1_cell_0_z": 0.0,
+                    "segment_1_cell_10_y": 0.0,
+                    "segment_1_cell_10_z": 0.0,
+                    "segment_1_cell_11_y": 0.0,
+                    "segment_1_cell_11_z": 0.0,
+                    "segment_1_cell_1_y": 0.0,
+                    "segment_1_cell_1_z": 0.0,
+                    "segment_1_cell_2_y": 0.0,
+                    "segment_1_cell_2_z": 0.0,
+                    "segment_1_cell_3_y": 0.0,
+                    "segment_1_cell_3_z": 0.0,
+                    "segment_1_cell_4_y": 0.0,
+                    "segment_1_cell_4_z": 0.0,
+                    "segment_1_cell_5_y": 0.0,
+                    "segment_1_cell_5_z": 0.0,
+                    "segment_1_cell_6_y": 0.0,
+                    "segment_1_cell_6_z": 0.0,
+                    "segment_1_cell_7_y": 0.0,
+                    "segment_1_cell_7_z": 0.0,
+                    "segment_1_cell_8_y": 0.0,
+                    "segment_1_cell_8_z": 0.0,
+                    "segment_1_cell_9_y": 0.0,
+                    "segment_1_cell_9_z": 0.0
+                  },
+                  "unspecified": "zero"
+                },
+                "rule": "all_candidate_dofs_zero_v1"
+              },
+              "source_identity": "120f23ddcf625a2fe4c0c0bfad3ad8d7a0fa25d42654e22261f2757ba539c987",
+              "target_m": [
+                0.29,
+                0.035,
+                0.19
+              ],
+              "task_id": "family-multisegment-dev",
+              "task_identity": "882b3493037dcc8f8da294b3473e1223f0465e92c35bc3064bfc42d467bf212e",
+              "task_version": "1.0.0",
+              "tendon_order": [
+                "tendon_0",
+                "tendon_1",
+                "tendon_2"
+              ],
+              "tension_bounds_n": [
+                [
+                  0.0,
+                  8.0
+                ],
+                [
+                  0.0,
+                  8.0
+                ],
+                [
+                  0.0,
+                  8.0
+                ]
+              ],
+              "tension_limits_n": [
+                8.0,
+                8.0,
+                8.0
+              ]
+            },
+            "requirement_identity": "b3ca61d2cb8b8bbbe7447590fc1ce4850cc4b8e2cc72c12d3d9fbb1d560380f9",
+            "model_identity": "01f9858eb6d42811ec0f6609967217a03ff5f4db1fc95d1cb76353476422a90e",
+            "model_declaration": {
+              "model_id": "model.gvs",
+              "model_version": "1.0.0",
+              "relevant_assumptions": [
+                "supported serial tendon-driven continuum topology",
+                "selected strain basis spans deformation relevant to the use",
+                "inextensible centerline",
+                "no shear",
+                "no torsion",
+                "straight frictionless tendon spans"
+              ],
+              "representation_id": "9637ffe35f961a28c069143bdc6d16344dc7fc76c87e168bd9802f006cbdefe9"
+            },
+            "protocol_identity": "7ee044c26f91b5a7cbb53bfc95322dd6dbe8d298f196f1a6ca121305d13082d9",
+            "operating_point": {
+              "actual_time_s": 0.0,
+              "available": true,
+              "construction": {
+                "achieved_world_point_m": [
+                  0.29799999999999993,
+                  0.0,
+                  0.15
+                ],
+                "execution_trajectory_used": false,
+                "method": "existing immutable controller preparation/numerical-source logic",
+                "numerical_source": "initial_state_pretension",
+                "position_residual_m": 0.053749418601506754,
+                "preparation_provenance": {
+                  "actual_initial_state_source": "Candidate Task initializer then measured backend state at every update",
+                  "current_scope": {
+                    "backend": {
+                      "extension_id": "backend.family_mujoco",
+                      "parameters": {
+                        "contract": "family.mujoco_parameters",
+                        "data": {
+                          "contact_model": "mujoco_convex_native",
+                          "friction": [
+                            0.0,
+                            0.0,
+                            0.0
+                          ],
+                          "integrator": "implicitfast",
+                          "timestep_source": "task.timing.timestep_s"
+                        },
+                        "version": "1.0.0"
+                      },
+                      "version": "1.1.0"
+                    },
+                    "controller": {
+                      "extension_id": "controller.gvs_nmpc",
+                      "parameters": {
+                        "contract": "family.gvs_reach_control",
+                        "data": {
+                          "numerical_source": "initial_state_pretension",
+                          "recipe": {
+                            "basis": {
+                              "strategy": "structural_linear"
+                            },
+                            "constraint_jacobian_mode": "reverse",
+                            "curvature_scale_rad_m": 10.0,
+                            "evaluation_threads": 1,
+                            "feasible_return": null,
+                            "holding_brake_lead_s": 0.0,
+                            "holding_speed_cost_mode": "time_integral_v1",
+                            "holding_speed_cost_window_s": 0.05,
+                            "holding_tip_speed_weight": 0.1,
+                            "horizon": 10,
+                            "integration_method": "implicit_euler",
+                            "max_cpu_s": null,
+                            "max_iterations": 120,
+                            "max_unusable_updates": 3,
+                            "position_error_scale_m": null,
+                            "rate_scale_rad_m_s": 1000.0,
+                            "recover_returned_tensions": true,
+                            "regenerate_warm_states": true,
+                            "root_tolerance": 1e-10,
+                            "seed_position_tolerance_fraction": 0.5,
+                            "seed_speed_limit_m_s": 0.02,
+                            "stopping_policy": "research_work_v1",
+                            "substeps": 1,
+                            "tension_weight": 0.0001,
+                            "terminal_tip_speed_weight": 0.1,
+                            "terminal_velocity_weight": 0.0001,
+                            "terminal_weight": 5.0,
+                            "tip_speed_scale_m_s": 0.02,
+                            "tolerance": 1e-06,
+                            "tracking_weight": 1.0,
+                            "variation_weight": 0.001,
+                            "velocity_weight": 0.0001
+                          },
+                          "settling": {
+                            "position_limit_m": 0.01,
+                            "speed_limit_m_s": 0.02,
+                            "window_s": 0.05
+                          }
+                        },
+                        "version": "1.0.0"
+                      },
+                      "version": "11.0.0"
+                    },
+                    "discretization": {
+                      "contract": "family.discretization",
+                      "data": {
+                        "cells": {
+                          "segment_0": 12,
+                          "segment_1": 12
+                        },
+                        "coordinates": "two_principal_bending_angles_per_cell",
+                        "model": "serial_bending_cells_v1",
+                        "version": "serial_bending_discretization_v1"
+                      },
+                      "version": "1.0.0"
+                    },
+                    "execution_model": {
+                      "extension_id": "model.serial_bending_cells",
+                      "parameters": {
+                        "contract": "family.dynamics_model",
+                        "data": {},
+                        "version": "1.0.0"
+                      },
+                      "version": "1.0.0"
+                    },
+                    "robot": {
+                      "family": "tendon_robot_family",
+                      "identity": "cb2d0e7bb36a94b2791b73e799536f7fd6c51fff8851de4b662c535cc38f5c5e"
+                    },
+                    "seed": 17,
+                    "task": {
+                      "environment": "5cee25b33f4ff19cb0abd93651ce9077a81665990f07d8f5a4967497e8e82a4d",
+                      "family": "task.reach",
+                      "goal": "7906a8d6f1938670b3b029be161c8f1869097280b1ee24a198da30b2fff4c264",
+                      "identity": "882b3493037dcc8f8da294b3473e1223f0465e92c35bc3064bfc42d467bf212e",
+                      "initializer": "3a90c93217f15e9a60db7f65f611911f4aa53f1a4987340949e1068fd2647c22",
+                      "timing": {
+                        "control_period_s": 0.01,
+                        "duration_s": 0.35,
+                        "sample_period_s": 0.01,
+                        "termination": [
+                          "duration",
+                          "numerical_failure"
+                        ],
+                        "timestep_s": 0.0005
+                      }
+                    }
+                  },
+                  "historical_states_reused": false,
+                  "nominal_is_current_target_solution": false,
+                  "physics_identity": "b1c04767b94e5c6bb9b1ece436c1ba79e6848e24b3bc4c4a9740f6d089bb06ce",
+                  "previous_input_source": "candidate bounded pretension",
+                  "resolved_basis_identity": "9637ffe35f961a28c069143bdc6d16344dc7fc76c87e168bd9802f006cbdefe9",
+                  "reused": false,
+                  "source_kind": "project_initial_state_and_bounded_pretension",
+                  "validity": "Tensions are numerical guesses; placeholder states must be regenerated using candidate dynamics before use"
+                },
+                "static_equilibrium": false
+              },
+              "name": "controller_start_input",
+              "phase": "configuration_controller_start_input",
+              "remaining_task_s": 0.35,
+              "scope": "controller-start input",
+              "time_origin": "frozen initializer via existing controller preparation"
+            },
+            "horizon": {
+              "analysis_horizon_s": 0.35,
+              "interpretation": "Actual saved-state remaining horizon, or nominal horizon from the declared configuration operating point.",
+              "origin": 0.0,
+              "period_s": 0.01,
+              "remaining_task_s": 0.35,
+              "task_duration_s": 0.35,
+              "trajectory_grid": {
+                "control_period_s": 0.01,
+                "input_hold_s": 0.01,
+                "remaining_task_s": 0.35,
+                "sample_period_s": 0.01,
+                "sample_phase": "post_step_preceding_hold",
+                "sample_steps": {
+                  "0": 0,
+                  "1": 1,
+                  "10": 10,
+                  "11": 11,
+                  "12": 12,
+                  "13": 13,
+                  "14": 14,
+                  "15": 15,
+                  "16": 16,
+                  "17": 17,
+                  "18": 18,
+                  "19": 19,
+                  "2": 2,
+                  "20": 20,
+                  "21": 21,
+                  "22": 22,
+                  "23": 23,
+                  "24": 24,
+                  "25": 25,
+                  "26": 26,
+                  "27": 27,
+                  "28": 28,
+                  "29": 29,
+                  "3": 3,
+                  "30": 30,
+                  "31": 31,
+                  "32": 32,
+                  "33": 33,
+                  "34": 34,
+                  "35": 35,
+                  "4": 4,
+                  "5": 5,
+                  "6": 6,
+                  "7": 7,
+                  "8": 8,
+                  "9": 9
+                },
+                "start_time_s": 0.0,
+                "step_count": 35
+              }
+            },
+            "physical_inputs": {
+              "control_period_s": 0.01,
+              "frame": "tendon_path",
+              "lower": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "phase": "pre_step",
+              "provenance": [
+                "/robot/structure/data/tendons",
+                "/task/timing/control_period_s"
+              ],
+              "signal": "tendon_tension",
+              "tendon_order": [
+                "tendon_0",
+                "tendon_1",
+                "tendon_2"
+              ],
+              "units": "N",
+              "upper": [
+                8.0,
+                8.0,
+                8.0
+              ]
+            },
+            "constraint_coverage": [
+              {
+                "analyzed_indices": [
+                  35
+                ],
+                "checked_indices": [
+                  35
+                ],
+                "constraint_id": "terminal_error_m",
+                "expressible": true,
+                "reason": "Shared held-input trajectory; past samples require separate evidence.",
+                "reasons": [],
+                "satisfied_indices": [
+                  35
+                ],
+                "status": "applicable",
+                "unchecked_indices": []
+              },
+              {
+                "analyzed_indices": [
+                  30,
+                  31,
+                  32,
+                  33,
+                  34,
+                  35
+                ],
+                "checked_indices": [
+                  30,
+                  31,
+                  32,
+                  33,
+                  34,
+                  35
+                ],
+                "constraint_id": "holding_max_error_m",
+                "expressible": true,
+                "reason": "Shared held-input trajectory; past samples require separate evidence.",
+                "reasons": [],
+                "satisfied_indices": [
+                  30,
+                  31,
+                  32,
+                  33,
+                  34,
+                  35
+                ],
+                "status": "applicable",
+                "unchecked_indices": []
+              },
+              {
+                "analyzed_indices": [
+                  30,
+                  31,
+                  32,
+                  33,
+                  34,
+                  35
+                ],
+                "checked_indices": [
+                  30,
+                  31,
+                  32,
+                  33,
+                  34,
+                  35
+                ],
+                "constraint_id": "holding_max_speed_m_s",
+                "expressible": true,
+                "reason": "Shared held-input trajectory; past samples require separate evidence.",
+                "reasons": [],
+                "satisfied_indices": [
+                  30,
+                  31,
+                  32,
+                  33,
+                  34,
+                  35
+                ],
+                "status": "applicable",
+                "unchecked_indices": []
+              }
+            ],
+            "numerical_result_pointer": "/trajectory",
+            "computation_status": "computed",
+            "verification_status": "independent_discrete_replay_passed",
+            "supported_interpretation": "All declared sampled constraints verified in the specified local affine model only. Finite-tolerance numerical optimality checks: numerically_checked; strict optimal-value bounds and structural optimality remain unavailable.",
+            "unsupported_conclusions": [
+              "task acceptance",
+              "continuous-time holding-window compliance",
+              "global nonlinear feasibility or infeasibility",
+              "hardware performance",
+              "robustness",
+              "repeatability",
+              "equilibrium validity at a non-equilibrium point"
+            ]
+          },
+          "claim_source": {
+            "reference": {
+              "artifact_id": "7e347a23709e32829dee87bb7c15baddd056767f21419292b978b240560f0145",
+              "media_type": "application/json"
+            },
+            "pointer": "/scoped_claim"
+          },
+          "requirement_source": {
+            "reference": {
+              "artifact_id": "7e347a23709e32829dee87bb7c15baddd056767f21419292b978b240560f0145",
+              "media_type": "application/json"
+            },
+            "pointer": "/task_analysis"
+          },
+          "problem_definition": {
+            "reference": {
+              "artifact_id": "7e347a23709e32829dee87bb7c15baddd056767f21419292b978b240560f0145",
+              "media_type": "application/json"
+            },
+            "pointer": "/trajectory/problem_definition"
+          },
+          "quantities": [
+            {
+              "name": "analytic_lower_bound",
+              "status": "verified",
+              "value": -1.0,
+              "unit": "dimensionless",
+              "source": {
+                "reference": {
+                  "artifact_id": "7e347a23709e32829dee87bb7c15baddd056767f21419292b978b240560f0145",
+                  "media_type": "application/json"
+                },
+                "pointer": "/trajectory/quantities/analytic_lower_bound/value"
+              },
+              "structural_parameters": [],
+              "control_reoptimization": "required",
+              "conditions": [
+                {
+                  "name": "strength",
+                  "value": "strict_analytic",
+                  "source": {
+                    "reference": {
+                      "artifact_id": "7e347a23709e32829dee87bb7c15baddd056767f21419292b978b240560f0145",
+                      "media_type": "application/json"
+                    },
+                    "pointer": "/trajectory/quantities/analytic_lower_bound/strength"
+                  }
+                }
+              ]
+            },
+            {
+              "name": "optimal_value",
+              "status": "unavailable",
+              "value": null,
+              "unit": "dimensionless",
+              "source": null,
+              "structural_parameters": [],
+              "control_reoptimization": "required",
+              "conditions": [
+                {
+                  "name": "strength",
+                  "value": "unavailable",
+                  "source": {
+                    "reference": {
+                      "artifact_id": "7e347a23709e32829dee87bb7c15baddd056767f21419292b978b240560f0145",
+                      "media_type": "application/json"
+                    },
+                    "pointer": "/trajectory/quantities/optimal_value/strength"
+                  }
+                }
+              ]
+            },
+            {
+              "name": "rigorous_upper_bound",
+              "status": "unavailable",
+              "value": null,
+              "unit": "dimensionless",
+              "source": null,
+              "structural_parameters": [],
+              "control_reoptimization": "required",
+              "conditions": [
+                {
+                  "name": "strength",
+                  "value": "unavailable",
+                  "source": {
+                    "reference": {
+                      "artifact_id": "7e347a23709e32829dee87bb7c15baddd056767f21419292b978b240560f0145",
+                      "media_type": "application/json"
+                    },
+                    "pointer": "/trajectory/quantities/rigorous_upper_bound/strength"
+                  }
+                }
+              ]
+            },
+            {
+              "name": "support_lower_estimate",
+              "status": "unverified_estimate",
+              "value": -0.2000000000759523,
+              "unit": "dimensionless",
+              "source": {
+                "reference": {
+                  "artifact_id": "7e347a23709e32829dee87bb7c15baddd056767f21419292b978b240560f0145",
+                  "media_type": "application/json"
+                },
+                "pointer": "/trajectory/quantities/support_lower_estimate/value"
+              },
+              "structural_parameters": [],
+              "control_reoptimization": "required",
+              "conditions": [
+                {
+                  "name": "strength",
+                  "value": "numerically_checked_float_not_rigorous",
+                  "source": {
+                    "reference": {
+                      "artifact_id": "7e347a23709e32829dee87bb7c15baddd056767f21419292b978b240560f0145",
+                      "media_type": "application/json"
+                    },
+                    "pointer": "/trajectory/quantities/support_lower_estimate/strength"
+                  }
+                }
+              ]
+            },
+            {
+              "name": "witness_upper_estimate",
+              "status": "unverified_estimate",
+              "value": -0.19999999999986867,
+              "unit": "dimensionless",
+              "source": {
+                "reference": {
+                  "artifact_id": "7e347a23709e32829dee87bb7c15baddd056767f21419292b978b240560f0145",
+                  "media_type": "application/json"
+                },
+                "pointer": "/trajectory/quantities/witness_upper_estimate/value"
+              },
+              "structural_parameters": [],
+              "control_reoptimization": "required",
+              "conditions": [
+                {
+                  "name": "strength",
+                  "value": "independently_replayed_float",
+                  "source": {
+                    "reference": {
+                      "artifact_id": "7e347a23709e32829dee87bb7c15baddd056767f21419292b978b240560f0145",
+                      "media_type": "application/json"
+                    },
+                    "pointer": "/trajectory/quantities/witness_upper_estimate/strength"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        "control_search": null,
+        "resources": [
+          {
+            "name": "charged_analysis_evaluations",
+            "amount": 2.0,
+            "unit": "analyses",
+            "time_basis": null,
+            "source": {
+              "reference": {
+                "artifact_id": "7e347a23709e32829dee87bb7c15baddd056767f21419292b978b240560f0145",
+                "media_type": "application/json"
+              },
+              "pointer": "/charged_analysis_evaluations"
+            }
+          },
+          {
+            "name": "charged_numerical_s",
+            "amount": 8.941454399842769,
+            "unit": "s",
+            "time_basis": "recorded_elapsed_unspecified",
+            "source": {
+              "reference": {
+                "artifact_id": "7e347a23709e32829dee87bb7c15baddd056767f21419292b978b240560f0145",
+                "media_type": "application/json"
+              },
+              "pointer": "/charged_numerical_s"
+            }
+          },
+          {
+            "name": "elapsed_s",
+            "amount": 8.941454399842769,
+            "unit": "s",
+            "time_basis": "worker_wall",
+            "source": {
+              "reference": {
+                "artifact_id": "7e347a23709e32829dee87bb7c15baddd056767f21419292b978b240560f0145",
+                "media_type": "application/json"
+              },
+              "pointer": "/boundary/elapsed_s"
+            }
+          },
+          {
+            "name": "provider_cost",
+            "amount": null,
+            "unit": "USD",
+            "time_basis": null,
+            "source": null
+          },
+          {
+            "name": "parent_action_elapsed",
+            "amount": null,
+            "unit": "s",
+            "time_basis": "parent_action_wall",
+            "source": null
+          },
+          {
+            "name": "cpu_time",
+            "amount": null,
+            "unit": "s",
+            "time_basis": "cpu",
+            "source": null
+          }
+        ],
+        "detail_sources": [
+          {
+            "reference": {
+              "artifact_id": "7e347a23709e32829dee87bb7c15baddd056767f21419292b978b240560f0145",
+              "media_type": "application/json"
+            },
+            "pointer": ""
+          },
+          {
+            "reference": {
+              "artifact_id": "7e347a23709e32829dee87bb7c15baddd056767f21419292b978b240560f0145",
+              "media_type": "application/json"
+            },
+            "pointer": "/protocol"
+          },
+          {
+            "reference": {
+              "artifact_id": "7e347a23709e32829dee87bb7c15baddd056767f21419292b978b240560f0145",
+              "media_type": "application/json"
+            },
+            "pointer": "/binding"
+          },
+          {
+            "reference": {
+              "artifact_id": "7e347a23709e32829dee87bb7c15baddd056767f21419292b978b240560f0145",
+              "media_type": "application/json"
+            },
+            "pointer": "/analysis_applicability"
+          },
+          {
+            "reference": {
+              "artifact_id": "7e347a23709e32829dee87bb7c15baddd056767f21419292b978b240560f0145",
+              "media_type": "application/json"
+            },
+            "pointer": "/score_semantics"
+          },
+          {
+            "reference": {
+              "artifact_id": "7e347a23709e32829dee87bb7c15baddd056767f21419292b978b240560f0145",
+              "media_type": "application/json"
+            },
+            "pointer": "/proxy_values"
+          },
+          {
+            "reference": {
+              "artifact_id": "395884912d4348ac9eb0bfabf100cca0b2479edbbaaa973f02ef69ed4d00ae04",
+              "media_type": "application/json"
+            },
+            "pointer": "/configuration"
+          },
+          {
+            "reference": {
+              "artifact_id": "395884912d4348ac9eb0bfabf100cca0b2479edbbaaa973f02ef69ed4d00ae04",
+              "media_type": "application/json"
+            },
+            "pointer": "/parameters"
+          },
+          {
+            "reference": {
+              "artifact_id": "395884912d4348ac9eb0bfabf100cca0b2479edbbaaa973f02ef69ed4d00ae04",
+              "media_type": "application/json"
+            },
+            "pointer": "/provenance"
+          },
+          {
+            "reference": {
+              "artifact_id": "7e347a23709e32829dee87bb7c15baddd056767f21419292b978b240560f0145",
+              "media_type": "application/json"
+            },
+            "pointer": "/model/endpoint_outputs/0/C/0"
+          },
+          {
+            "reference": {
+              "artifact_id": "7e347a23709e32829dee87bb7c15baddd056767f21419292b978b240560f0145",
+              "media_type": "application/json"
+            },
+            "pointer": "/model/endpoint_outputs/0/D/0"
+          },
+          {
+            "reference": {
+              "artifact_id": "7e347a23709e32829dee87bb7c15baddd056767f21419292b978b240560f0145",
+              "media_type": "application/json"
+            },
+            "pointer": "/trajectory"
+          }
+        ],
+        "authoritative_scientific_evidence": false
+      }
+    ],
+    "relations": [],
+    "interpretations": [],
+    "authoritative_scientific_evidence": false
+  },
+  "L0": {
+    "task_identity": "fe7b95c3c1ba12659b59c1983544b6454c9d90ac42c4dec528e9736d99fd3a6b",
+    "task": {
+      "contract": "research.task_adapter",
+      "version": "1.0.0",
+      "family": "task.reach",
+      "evaluator": {
+        "extension_id": "evaluate.reach",
+        "parameters": {
+          "contract": "reference.reach_evaluation",
+          "data": {
+            "tolerance_m": 0.01
+          },
+          "version": "1.0.0"
+        },
+        "version": "1.0.0"
+      },
+      "output": {
+        "dimension": 3,
+        "entity": "tip",
+        "frame": "world",
+        "missing": "unsupported",
+        "name": "tip_position",
+        "phase": "post_step",
+        "units": "m"
+      },
+      "reference": {
+        "contract": "reference.reach_goal",
+        "data": {
+          "target_m": [
+            0.29,
+            0.035,
+            0.19
+          ]
+        },
+        "version": "1.0.0"
+      },
+      "operating_point": {
+        "time_s": 0.0,
+        "reference_position_m": [
+          0.29,
+          0.035,
+          0.19
+        ],
+        "reference_velocity_m_s": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "frame": "world",
+        "state_source": "Named task initializer; subsequent measured backend state",
+        "reference_is_equilibrium": false
+      },
+      "metrics": [
+        {
+          "name": "terminal_error_m",
+          "unit": "m",
+          "meaning": "Sealed endpoint evaluator position error"
+        },
+        {
+          "name": "holding_max_error_m",
+          "unit": "m",
+          "meaning": "Maximum sampled final-window tip error"
+        },
+        {
+          "name": "holding_max_speed_m_s",
+          "unit": "m/s",
+          "meaning": "Maximum sampled world translational tip speed"
+        }
+      ],
+      "scoring_interval_s": [
+        0.0,
+        0.35
+      ],
+      "holding": {
+        "position_limit_m": 0.01,
+        "speed_limit_m_s": 0.02,
+        "window_s": 0.05
+      },
+      "timing": {
+        "control_period_s": 0.01,
+        "duration_s": 0.35,
+        "sample_period_s": 0.01,
+        "termination": [
+          "duration",
+          "numerical_failure"
+        ],
+        "timestep_s": 0.0005
+      },
+      "continuous_time_guarantee": false,
+      "context": "Endpoint reach and final-window position/speed are distinct components. Offline deployment timing is diagnostic."
+    },
+    "capabilities": [
+      "analysis",
+      "control_correction"
+    ],
+    "actions": [
+      "generate",
+      "initialize_control",
+      "stop"
+    ],
+    "task_accepted": false,
+    "candidate_status": {
+      "generated_valid": 1,
+      "control_sources_initialized": 0,
+      "mathematical_evaluations": 1,
+      "independent_physical_evaluations": 0,
+      "has_executable_candidate": true,
+      "task_passed": false,
+      "has_measured_task_feedback": false
+    },
+    "control_initialization_methods": {
+      "baseline": "Pretension, explicit tensions_n, or source+parent with optional channel_map",
+      "measured_nmpc": "initialize_control baseline with source=completed NMPC result, parent=candidate exactly, no channel_map. Saves measured inputs as an unmeasured open-loop ZOH schedule; no inherited acceptance.",
+      "mathematical_response": "response_evidence must be a current verified input_sensitivity analysis; optional channels, trust_radius_n, regularization",
+      "physical_response": "Optional baseline source+parent; channels, difference_step_n, trust_radius_n, regularization, evaluation_requests; one baseline plus one full rollout per channel, charged to shared budget"
+    },
+    "evidence_access": {
+      "reference": {
+        "artifact_id": "7e347a23709e32829dee87bb7c15baddd056767f21419292b978b240560f0145",
+        "media_type": "application/json"
+      },
+      "view": "working_set",
+      "pointer": "",
+      "scope": "Derived retrieval view, never scientific proof. JSON pointers select candidate_index, control_result_links, eligible_methods, read_coverage, source_references or citation_eligibility. Original references support full/fields/range reads."
+    },
+    "budget": {
+      "provider_budget": {
+        "remaining_total": 0,
+        "reserved_for_closeout": 0,
+        "available_for_exploration": 0,
+        "next_request_exploration_remaining": 0,
+        "exploration_after_additional_read_requests": {
+          "1": 0,
+          "3": 0,
+          "5": 0
+        }
+      },
+      "science_budget": {
+        "remaining_physical": 0,
+        "remaining_mathematical": 0,
+        "any_scientific_route_fits": false
+      },
+      "closeout": {
+        "active": false,
+        "next_request_will_protect": true,
+        "reason": null
+      },
+      "method_remaining": {
+        "offline_nlp": 0,
+        "bdf_replays": 0,
+        "nmpc": 0
+      },
+      "training": {
+        "remaining_stages": 0,
+        "remaining_allocatable_actions": null,
+        "actions_per_trial": null,
+        "remaining_evaluation_episodes": 0
+      }
+    },
+    "best_valid": null,
+    "latest_scientific_feedback": {
+      "reference": {
+        "artifact_id": "7e347a23709e32829dee87bb7c15baddd056767f21419292b978b240560f0145",
+        "media_type": "application/json"
+      },
+      "operation": "task_capability",
+      "status": "computed",
+      "control_handoff": {
+        "candidate": {
+          "artifact_id": "395884912d4348ac9eb0bfabf100cca0b2479edbbaaa973f02ef69ed4d00ae04",
+          "media_type": "application/json"
+        },
+        "scope": {
+          "task_identity": "882b3493037dcc8f8da294b3473e1223f0465e92c35bc3064bfc42d467bf212e",
+          "effective_configuration_identity": "e479d02dbd52b230e8ab3e94ae2e8ce75f3de03edc6b25c89439336bd2b41278",
+          "tendon_order": [
+            "tendon_0",
+            "tendon_1",
+            "tendon_2"
+          ]
+        },
+        "operating_point": "controller_start_input",
+        "numerically_verified_input_sensitivity": false,
+        "request_fields": {
+          "candidate": {
+            "artifact_id": "395884912d4348ac9eb0bfabf100cca0b2479edbbaaa973f02ef69ed4d00ae04",
+            "media_type": "application/json"
+          },
+          "method": "capability_sequence",
+          "response_evidence": {
+            "artifact_id": "7e347a23709e32829dee87bb7c15baddd056767f21419292b978b240560f0145",
+            "media_type": "application/json"
+          }
+        },
+        "remaining_checks": "Current Study/candidate/implementation, original full ZOH horizon, input bounds/order, independent replay and physical execution binding; no automatic execution",
+        "missing": null,
+        "task_acceptance": "unmeasured",
+        "inherited_acceptance": false
+      },
+      "report_reference": {
+        "artifact_id": "15aae6758cc397b69f617c100dc6b01db57010916625fa48b3cbd2607a48475d",
+        "media_type": "application/json"
+      }
+    },
+    "evidence_working_set": {
+      "version": "evidence_working_set_summary_v2",
+      "candidate_count": 1,
+      "method_scope": {
+        "static_analysis": "Constructs and checks operating points; local mathematical assumptions only. AnalysisRequest validates operation/point/window before workers.",
+        "offline_nlp": "Predicted tension trajectories and search starts; independent physics still required.",
+        "nmpc": "Optional closed-loop control and soft screening; numerical convergence, prediction and MuJoCo acceptance are separate. No verified model error bound means no structural hard veto. Cost is measured, not presumed low.",
+        "response_search": "Finite differences of full physical rollouts; local information near evaluated coefficients.",
+        "pattern_search": "Finite nongradient physical search; budget and full original acceptance remain authoritative.",
+        "direct_ppo": "Independent optional policy training, without an NMPC prerequisite; published policies require separate evaluation.",
+        "residual_ppo": "Requires a complete compatible reference, including failed-but-complete NMPC execution; predicted and measured references retain their origin."
+      },
+      "scientific_scope": "No model-authored hypotheses are promoted to measured causes; only original independent acceptance establishes success",
+      "candidate_index_access": {
+        "count": 1,
+        "query": {
+          "reference": {
+            "artifact_id": "7e347a23709e32829dee87bb7c15baddd056767f21419292b978b240560f0145",
+            "media_type": "application/json"
+          },
+          "view": "working_set",
+          "pointer": "/candidate_index"
+        }
+      },
+      "control_result_links_access": {
+        "count": 1,
+        "query": {
+          "reference": {
+            "artifact_id": "7e347a23709e32829dee87bb7c15baddd056767f21419292b978b240560f0145",
+            "media_type": "application/json"
+          },
+          "view": "working_set",
+          "pointer": "/control_result_links"
+        }
+      },
+      "control_comparisons_access": {
+        "count": 0,
+        "query": {
+          "reference": {
+            "artifact_id": "7e347a23709e32829dee87bb7c15baddd056767f21419292b978b240560f0145",
+            "media_type": "application/json"
+          },
+          "view": "working_set",
+          "pointer": "/control_comparisons"
+        }
+      }
+    },
+    "version": "decision_brief_v2",
+    "method_requirements": {
+      "research_rl/direct": {
+        "remaining_checks": [
+          "full_RLRequest",
+          "ideal_tension_reach_environment",
+          "aligned_allocation",
+          "training_capacity"
+        ],
+        "scope": "Training/checkpoint is not task acceptance; direct PPO needs no reference"
+      },
+      "research_rl/residual": {
+        "remaining_checks": [
+          "full_RLRequest",
+          "ideal_tension_reach_environment",
+          "aligned_allocation",
+          "training_capacity"
+        ],
+        "scope": "Training/checkpoint is not task acceptance; direct PPO needs no reference"
+      },
+      "initialize_control/baseline": {
+        "remaining_checks": [
+          "full_plan_admission",
+          "selected_control_settings"
+        ],
+        "requires_agent_fields": [
+          "decision",
+          "hypothesis",
+          "control_seed"
+        ]
+      },
+      "execute/nmpc": {
+        "remaining_checks": [
+          "full_plan_admission",
+          "method_budget",
+          "replication_admission",
+          "scientific_preflight"
+        ]
+      },
+      "mechanics": {
+        "remaining_checks": [
+          "full_plan_admission",
+          "requested_budget",
+          "model/coordinate/state/substeps/grid preflight"
+        ]
+      },
+      "initialize_control/mathematical_response": {
+        "requires_agent_fields": [
+          "decision",
+          "hypothesis",
+          "initialization settings"
+        ]
+      }
+    },
+    "available_research_actions": [
+      {
+        "action": "research_rl",
+        "method": "direct",
+        "candidate": {
+          "artifact_id": "395884912d4348ac9eb0bfabf100cca0b2479edbbaaa973f02ef69ed4d00ae04",
+          "media_type": "application/json"
+        },
+        "status": "unavailable",
+        "reason": null
+      },
+      {
+        "action": "research_rl",
+        "method": "residual",
+        "candidate": {
+          "artifact_id": "395884912d4348ac9eb0bfabf100cca0b2479edbbaaa973f02ef69ed4d00ae04",
+          "media_type": "application/json"
+        },
+        "status": "unavailable",
+        "reason": [
+          "complete_exact_candidate_reference"
+        ]
+      },
+      {
+        "action": "initialize_control",
+        "method": "baseline",
+        "candidate": {
+          "artifact_id": "395884912d4348ac9eb0bfabf100cca0b2479edbbaaa973f02ef69ed4d00ae04",
+          "media_type": "application/json"
+        },
+        "status": "unavailable"
+      },
+      {
+        "action": "execute",
+        "method": "nmpc",
+        "candidate": {
+          "artifact_id": "395884912d4348ac9eb0bfabf100cca0b2479edbbaaa973f02ef69ed4d00ae04",
+          "media_type": "application/json"
+        },
+        "status": "unavailable"
+      },
+      {
+        "action": "mechanics",
+        "candidate": {
+          "artifact_id": "395884912d4348ac9eb0bfabf100cca0b2479edbbaaa973f02ef69ed4d00ae04",
+          "media_type": "application/json"
+        },
+        "status": "unavailable"
+      },
+      {
+        "action": "initialize_control",
+        "method": "mathematical_response",
+        "candidate": {
+          "artifact_id": "395884912d4348ac9eb0bfabf100cca0b2479edbbaaa973f02ef69ed4d00ae04",
+          "media_type": "application/json"
+        },
+        "status": "unavailable",
+        "reason": "Initialization unavailable in current stage",
+        "response_evidence": null
+      }
+    ],
+    "recent_searches": [],
+    "citation_rule": "STOP must explain the outcome and explicitly cite all_fresh_results. This index does not record model reading or understanding.",
+    "research_intent": {
+      "latest_decision": {
+        "plan_reference": {
+          "artifact_id": "6f33f78362c06d720a0654a6d520e94c89f37679136cf325f5cd80be2dc71e5f",
+          "media_type": "application/json"
+        },
+        "action": "generate",
+        "agent_hypothesis": {
+          "hypothesis": "Engineering-only SOCP evidence/control handoff validation",
+          "decision": null,
+          "expected_observation": "One bounded real mathematical result; no task acceptance",
+          "weakening_observation": "Admission, solver, replay or binding failure",
+          "fixed_conditions": "Frozen task, FamilySpace, implementation and two-evaluation ceiling",
+          "interpretation": "Local mathematics only; no autonomous-science or physical success claim",
+          "stopping_condition": "Exactly one SOCP request, then deterministic evidence audit",
+          "supporting_evidence": []
+        },
+        "scope": "Previous Agent intent and interpretation; not confirmed scientific facts",
+        "execution_status": "completed",
+        "actual_result": null,
+        "failure": null
+      },
+      "last_research": {
+        "plan_reference": {
+          "artifact_id": "6f33f78362c06d720a0654a6d520e94c89f37679136cf325f5cd80be2dc71e5f",
+          "media_type": "application/json"
+        },
+        "action": "generate",
+        "agent_hypothesis": {
+          "hypothesis": "Engineering-only SOCP evidence/control handoff validation",
+          "decision": null,
+          "expected_observation": "One bounded real mathematical result; no task acceptance",
+          "weakening_observation": "Admission, solver, replay or binding failure",
+          "fixed_conditions": "Frozen task, FamilySpace, implementation and two-evaluation ceiling",
+          "interpretation": "Local mathematics only; no autonomous-science or physical success claim",
+          "stopping_condition": "Exactly one SOCP request, then deterministic evidence audit",
+          "supporting_evidence": []
+        },
+        "scope": "Previous Agent intent and interpretation; not confirmed scientific facts",
+        "execution_status": "completed",
+        "actual_result": null,
+        "failure": null
+      },
+      "unresolved_question": "Admission, solver, replay or binding failure",
+      "question_scope": "Prior falsification target; main Agent decides the next scientific question"
+    },
+    "action_trace": {
+      "total": 1,
+      "failed_or_rejected": 0,
+      "recent": [
+        {
+          "request_id": "f3-generate",
+          "action": "generate",
+          "method": null,
+          "candidate": null,
+          "task_protocol_identity": null,
+          "agent_hypothesis": {
+            "hypothesis": "Engineering-only SOCP evidence/control handoff validation",
+            "expected_observation": "One bounded real mathematical result; no task acceptance",
+            "weakening_observation": "Admission, solver, replay or binding failure",
+            "supporting_evidence": [],
+            "interpretation": "Local mathematics only; no autonomous-science or physical success claim",
+            "fixed_conditions": "Frozen task, FamilySpace, implementation and two-evaluation ceiling",
+            "stopping_condition": "Exactly one SOCP request, then deterministic evidence audit"
+          },
+          "execution_status": "completed",
+          "result_references": [],
+          "receipt_output": {
+            "artifact_id": "080b6d79acfe273a67bc5de5ec3661d70e894abfba59cb338a30d52428294d5b",
+            "media_type": "application/json"
+          },
+          "execution_id": "33f7a7a144ba47dba8c8d68acd8c424b",
+          "outcome": {
+            "status": "generated"
+          },
+          "source": {
+            "reference": {
+              "artifact_id": "6f33f78362c06d720a0654a6d520e94c89f37679136cf325f5cd80be2dc71e5f",
+              "media_type": "application/json"
+            },
+            "pointer": "/original_plan"
+          }
+        }
+      ],
+      "scope": "Original Agent intent and recorded execution only; hypotheses are not confirmed or falsified by Reporter prose",
+      "full_trace_query": {
+        "reference": {
+          "artifact_id": "7e347a23709e32829dee87bb7c15baddd056767f21419292b978b240560f0145",
+          "media_type": "application/json"
+        },
+        "view": "working_set",
+        "pointer": "/action_trace"
+      }
+    },
+    "mathematical_capabilities": [
+      {
+        "operation": "equilibrium",
+        "status": "not_applicable",
+        "reasons": [
+          "Insufficient mathematical evaluation budget."
+        ],
+        "model": "model.gvs",
+        "constraint_kinds": [
+          "norm_bound"
+        ],
+        "required_outputs": [
+          "tip_position"
+        ],
+        "category": "diagnostic",
+        "control": "operating-point diagnostic",
+        "prerequisites": [
+          "candidate",
+          "frozen protocol",
+          "target_equilibrium"
+        ],
+        "time_scope": "static operating point",
+        "coverage": [
+          {
+            "constraint_id": "terminal_error_m",
+            "expressible": true,
+            "status": "diagnostic",
+            "analyzed_indices": [],
+            "reason": "Local position authority/static construction only; no sampled constraint verification."
+          },
+          {
+            "constraint_id": "holding_max_error_m",
+            "expressible": true,
+            "status": "diagnostic",
+            "analyzed_indices": [],
+            "reason": "Local position authority/static construction only; no sampled constraint verification."
+          },
+          {
+            "constraint_id": "holding_max_speed_m_s",
+            "expressible": true,
+            "status": "not_applicable",
+            "analyzed_indices": [],
+            "reason": "Existing tools do not enforce this constraint kind or sampled window."
+          }
+        ],
+        "full_task_supported": false,
+        "budget_allowed": false,
+        "evaluations": 1,
+        "wall_cost": "unknown",
+        "limitations": [
+          "Model-scoped calculation; independent physical acceptance required.",
+          "Final admission checks candidate, exact state, numerical time budget and constructed outputs."
+        ]
+      },
+      {
+        "operation": "linearization",
+        "status": "not_applicable",
+        "reasons": [
+          "Insufficient mathematical evaluation budget."
+        ],
+        "model": "model.gvs",
+        "constraint_kinds": [
+          "norm_bound"
+        ],
+        "required_outputs": [
+          "tip_position"
+        ],
+        "category": "diagnostic",
+        "control": "operating-point diagnostic",
+        "prerequisites": [
+          "candidate",
+          "frozen protocol",
+          "controller_start_input"
+        ],
+        "time_scope": "declared local scoring window or exact instant",
+        "coverage": [
+          {
+            "constraint_id": "terminal_error_m",
+            "expressible": true,
+            "status": "diagnostic",
+            "analyzed_indices": [],
+            "reason": "Local position authority/static construction only; no sampled constraint verification."
+          },
+          {
+            "constraint_id": "holding_max_error_m",
+            "expressible": true,
+            "status": "diagnostic",
+            "analyzed_indices": [],
+            "reason": "Local position authority/static construction only; no sampled constraint verification."
+          },
+          {
+            "constraint_id": "holding_max_speed_m_s",
+            "expressible": true,
+            "status": "not_applicable",
+            "analyzed_indices": [],
+            "reason": "Existing tools do not enforce this constraint kind or sampled window."
+          }
+        ],
+        "full_task_supported": false,
+        "budget_allowed": false,
+        "evaluations": 1,
+        "wall_cost": "unknown",
+        "limitations": [
+          "Model-scoped calculation; independent physical acceptance required.",
+          "Final admission checks candidate, exact state, numerical time budget and constructed outputs."
+        ]
+      },
+      {
+        "operation": "controllability",
+        "status": "not_applicable",
+        "reasons": [
+          "Insufficient mathematical evaluation budget."
+        ],
+        "model": "model.gvs",
+        "constraint_kinds": [
+          "norm_bound"
+        ],
+        "required_outputs": [
+          "tip_position"
+        ],
+        "category": "diagnostic",
+        "control": "operating-point diagnostic",
+        "prerequisites": [
+          "candidate",
+          "frozen protocol",
+          "controller_start_input"
+        ],
+        "time_scope": "declared local scoring window or exact instant",
+        "coverage": [
+          {
+            "constraint_id": "terminal_error_m",
+            "expressible": true,
+            "status": "diagnostic",
+            "analyzed_indices": [],
+            "reason": "Local position authority/static construction only; no sampled constraint verification."
+          },
+          {
+            "constraint_id": "holding_max_error_m",
+            "expressible": true,
+            "status": "diagnostic",
+            "analyzed_indices": [],
+            "reason": "Local position authority/static construction only; no sampled constraint verification."
+          },
+          {
+            "constraint_id": "holding_max_speed_m_s",
+            "expressible": true,
+            "status": "not_applicable",
+            "analyzed_indices": [],
+            "reason": "Existing tools do not enforce this constraint kind or sampled window."
+          }
+        ],
+        "full_task_supported": false,
+        "budget_allowed": false,
+        "evaluations": 1,
+        "wall_cost": "unknown",
+        "limitations": [
+          "Model-scoped calculation; independent physical acceptance required.",
+          "Final admission checks candidate, exact state, numerical time budget and constructed outputs."
+        ]
+      },
+      {
+        "operation": "endpoint",
+        "status": "not_applicable",
+        "reasons": [
+          "Insufficient mathematical evaluation budget."
+        ],
+        "model": "model.gvs",
+        "constraint_kinds": [
+          "norm_bound"
+        ],
+        "required_outputs": [
+          "tip_position"
+        ],
+        "category": "diagnostic",
+        "control": "bounded sequence search",
+        "prerequisites": [
+          "candidate",
+          "frozen protocol",
+          "controller_start_input"
+        ],
+        "time_scope": "declared local scoring window or exact instant",
+        "coverage": [
+          {
+            "constraint_id": "terminal_error_m",
+            "expressible": true,
+            "status": "applicable",
+            "analyzed_indices": [
+              35
+            ],
+            "reason": "Terminal position only under bounded local affine dynamics."
+          },
+          {
+            "constraint_id": "holding_max_error_m",
+            "expressible": true,
+            "status": "not_applicable",
+            "analyzed_indices": [],
+            "reason": "Existing tools do not enforce this constraint kind or sampled window."
+          },
+          {
+            "constraint_id": "holding_max_speed_m_s",
+            "expressible": true,
+            "status": "not_applicable",
+            "analyzed_indices": [],
+            "reason": "Existing tools do not enforce this constraint kind or sampled window."
+          }
+        ],
+        "full_task_supported": false,
+        "budget_allowed": false,
+        "evaluations": 1,
+        "wall_cost": "unknown",
+        "limitations": [
+          "Model-scoped calculation; independent physical acceptance required.",
+          "Final admission checks candidate, exact state, numerical time budget and constructed outputs."
+        ]
+      },
+      {
+        "operation": "braking",
+        "status": "not_applicable",
+        "reasons": [
+          "Insufficient mathematical evaluation budget."
+        ],
+        "model": "model.gvs",
+        "constraint_kinds": [
+          "norm_bound"
+        ],
+        "required_outputs": [
+          "tip_velocity"
+        ],
+        "category": "diagnostic",
+        "control": "bounded sequence search",
+        "prerequisites": [
+          "candidate",
+          "frozen protocol",
+          "controller_start_input"
+        ],
+        "time_scope": "declared local scoring window or exact instant",
+        "coverage": [
+          {
+            "constraint_id": "terminal_error_m",
+            "expressible": true,
+            "status": "applicable",
+            "analyzed_indices": [
+              35
+            ],
+            "reason": "Terminal position only under bounded local affine dynamics."
+          },
+          {
+            "constraint_id": "holding_max_error_m",
+            "expressible": true,
+            "status": "not_applicable",
+            "analyzed_indices": [],
+            "reason": "Existing tools do not enforce this constraint kind or sampled window."
+          },
+          {
+            "constraint_id": "holding_max_speed_m_s",
+            "expressible": true,
+            "status": "partial",
+            "analyzed_indices": [
+              35
+            ],
+            "reason": "Terminal speed only; other holding samples are not checked."
+          }
+        ],
+        "full_task_supported": false,
+        "budget_allowed": false,
+        "evaluations": 1,
+        "wall_cost": "unknown",
+        "limitations": [
+          "Model-scoped calculation; independent physical acceptance required.",
+          "Final admission checks candidate, exact state, numerical time budget and constructed outputs."
+        ]
+      },
+      {
+        "operation": "instantaneous_braking_v1",
+        "status": "not_applicable",
+        "reasons": [
+          "Exact saved state required.",
+          "Insufficient mathematical evaluation budget."
+        ],
+        "model": "model.gvs",
+        "constraint_kinds": [
+          "norm_bound"
+        ],
+        "required_outputs": [
+          "tip_velocity"
+        ],
+        "category": "diagnostic",
+        "control": "operating-point diagnostic",
+        "prerequisites": [
+          "candidate",
+          "frozen protocol",
+          "controller_start_input"
+        ],
+        "time_scope": "declared local scoring window or exact instant",
+        "coverage": [
+          {
+            "constraint_id": "terminal_error_m",
+            "expressible": true,
+            "status": "diagnostic",
+            "analyzed_indices": [],
+            "reason": "Instantaneous speed derivative only; no frozen task samples verified."
+          },
+          {
+            "constraint_id": "holding_max_error_m",
+            "expressible": true,
+            "status": "diagnostic",
+            "analyzed_indices": [],
+            "reason": "Instantaneous speed derivative only; no frozen task samples verified."
+          },
+          {
+            "constraint_id": "holding_max_speed_m_s",
+            "expressible": true,
+            "status": "diagnostic",
+            "analyzed_indices": [],
+            "reason": "Instantaneous speed derivative only; no frozen task samples verified."
+          }
+        ],
+        "full_task_supported": false,
+        "budget_allowed": false,
+        "evaluations": 1,
+        "wall_cost": "unknown",
+        "limitations": [
+          "Model-scoped calculation; independent physical acceptance required.",
+          "Final admission checks candidate, exact state, numerical time budget and constructed outputs."
+        ]
+      },
+      {
+        "operation": "trajectory_feasibility",
+        "status": "not_applicable",
+        "reasons": [
+          "Insufficient mathematical evaluation budget."
+        ],
+        "model": "model.gvs",
+        "constraint_kinds": [
+          "norm_bound",
+          "component_interval"
+        ],
+        "required_outputs": [
+          "tip_position",
+          "tip_velocity"
+        ],
+        "category": "sampled_feasibility",
+        "control": "bounded sequence search",
+        "prerequisites": [
+          "candidate",
+          "frozen protocol",
+          "controller_start_input"
+        ],
+        "time_scope": "aligned post-step samples over actual remaining horizon",
+        "coverage": [
+          {
+            "constraint_id": "terminal_error_m",
+            "expressible": true,
+            "status": "applicable",
+            "analyzed_indices": [
+              35
+            ],
+            "reason": "Shared held-input trajectory; past samples require separate evidence.",
+            "unchecked_indices": []
+          },
+          {
+            "constraint_id": "holding_max_error_m",
+            "expressible": true,
+            "status": "applicable",
+            "analyzed_indices": [
+              30,
+              31,
+              32,
+              33,
+              34,
+              35
+            ],
+            "reason": "Shared held-input trajectory; past samples require separate evidence.",
+            "unchecked_indices": []
+          },
+          {
+            "constraint_id": "holding_max_speed_m_s",
+            "expressible": true,
+            "status": "applicable",
+            "analyzed_indices": [
+              30,
+              31,
+              32,
+              33,
+              34,
+              35
+            ],
+            "reason": "Shared held-input trajectory; past samples require separate evidence.",
+            "unchecked_indices": []
+          }
+        ],
+        "full_task_supported": true,
+        "budget_allowed": false,
+        "evaluations": 1,
+        "wall_cost": "unknown",
+        "limitations": [
+          "Model-scoped calculation; independent physical acceptance required.",
+          "Final admission checks candidate, exact state, numerical time budget and constructed outputs."
+        ]
+      },
+      {
+        "operation": "task_capability",
+        "status": "not_applicable",
+        "reasons": [
+          "Insufficient mathematical evaluation budget."
+        ],
+        "model": "model.gvs",
+        "constraint_kinds": [
+          "norm_bound",
+          "component_interval"
+        ],
+        "required_outputs": [
+          "tip_position",
+          "tip_velocity"
+        ],
+        "category": "task_capability_estimate",
+        "control": "reoptimized; optional fixed baseline replay",
+        "prerequisites": [
+          "candidate",
+          "frozen protocol",
+          "controller_start_input"
+        ],
+        "time_scope": "aligned post-step samples over actual remaining horizon",
+        "coverage": [
+          {
+            "constraint_id": "terminal_error_m",
+            "expressible": true,
+            "status": "applicable",
+            "analyzed_indices": [
+              35
+            ],
+            "reason": "Shared held-input trajectory; past samples require separate evidence.",
+            "unchecked_indices": []
+          },
+          {
+            "constraint_id": "holding_max_error_m",
+            "expressible": true,
+            "status": "applicable",
+            "analyzed_indices": [
+              30,
+              31,
+              32,
+              33,
+              34,
+              35
+            ],
+            "reason": "Shared held-input trajectory; past samples require separate evidence.",
+            "unchecked_indices": []
+          },
+          {
+            "constraint_id": "holding_max_speed_m_s",
+            "expressible": true,
+            "status": "applicable",
+            "analyzed_indices": [
+              30,
+              31,
+              32,
+              33,
+              34,
+              35
+            ],
+            "reason": "Shared held-input trajectory; past samples require separate evidence.",
+            "unchecked_indices": []
+          }
+        ],
+        "full_task_supported": true,
+        "budget_allowed": false,
+        "evaluations": 1,
+        "wall_cost": "unknown",
+        "limitations": [
+          "Model-scoped calculation; independent physical acceptance required.",
+          "Final admission checks candidate, exact state, numerical time budget and constructed outputs."
+        ]
+      },
+      {
+        "operation": "input_sensitivity",
+        "status": "not_applicable",
+        "reasons": [
+          "Static IFT v1 is implemented only by the SoRoSim provider.",
+          "Insufficient mathematical evaluation budget."
+        ],
+        "model": "model.gvs",
+        "constraint_kinds": [
+          "norm_bound"
+        ],
+        "required_outputs": [
+          "tip_position"
+        ],
+        "category": "diagnostic",
+        "control": "operating-point diagnostic",
+        "prerequisites": [
+          "candidate",
+          "frozen protocol",
+          "fixed_input_equilibrium"
+        ],
+        "time_scope": "static operating point",
+        "coverage": [
+          {
+            "constraint_id": "terminal_error_m",
+            "expressible": true,
+            "status": "not_applicable",
+            "analyzed_indices": [],
+            "reason": "Static IFT v1 is implemented only by the SoRoSim provider. Local position authority/static construction only; no sampled constraint verification."
+          },
+          {
+            "constraint_id": "holding_max_error_m",
+            "expressible": true,
+            "status": "not_applicable",
+            "analyzed_indices": [],
+            "reason": "Static IFT v1 is implemented only by the SoRoSim provider. Local position authority/static construction only; no sampled constraint verification."
+          },
+          {
+            "constraint_id": "holding_max_speed_m_s",
+            "expressible": true,
+            "status": "not_applicable",
+            "analyzed_indices": [],
+            "reason": "Static IFT v1 is implemented only by the SoRoSim provider. Existing tools do not enforce this constraint kind or sampled window."
+          }
+        ],
+        "full_task_supported": false,
+        "budget_allowed": false,
+        "evaluations": 1,
+        "wall_cost": "unknown",
+        "limitations": [
+          "Model-scoped calculation; independent physical acceptance required.",
+          "Final admission checks candidate, exact state, numerical time budget and constructed outputs."
+        ]
+      },
+      {
+        "operation": "design_sensitivity",
+        "status": "not_applicable",
+        "reasons": [
+          "Static IFT v1 is implemented only by the SoRoSim provider.",
+          "Insufficient mathematical evaluation budget."
+        ],
+        "model": "model.gvs",
+        "constraint_kinds": [
+          "norm_bound"
+        ],
+        "required_outputs": [
+          "tip_position"
+        ],
+        "category": "diagnostic",
+        "control": "operating-point diagnostic",
+        "prerequisites": [
+          "candidate",
+          "frozen protocol",
+          "fixed_input_equilibrium",
+          "paired structure candidates"
+        ],
+        "time_scope": "static operating point",
+        "coverage": [
+          {
+            "constraint_id": "terminal_error_m",
+            "expressible": true,
+            "status": "not_applicable",
+            "analyzed_indices": [],
+            "reason": "Static IFT v1 is implemented only by the SoRoSim provider. Local position authority/static construction only; no sampled constraint verification."
+          },
+          {
+            "constraint_id": "holding_max_error_m",
+            "expressible": true,
+            "status": "not_applicable",
+            "analyzed_indices": [],
+            "reason": "Static IFT v1 is implemented only by the SoRoSim provider. Local position authority/static construction only; no sampled constraint verification."
+          },
+          {
+            "constraint_id": "holding_max_speed_m_s",
+            "expressible": true,
+            "status": "not_applicable",
+            "analyzed_indices": [],
+            "reason": "Static IFT v1 is implemented only by the SoRoSim provider. Existing tools do not enforce this constraint kind or sampled window."
+          }
+        ],
+        "full_task_supported": false,
+        "budget_allowed": false,
+        "evaluations": 3,
+        "wall_cost": "unknown",
+        "limitations": [
+          "Model-scoped calculation; independent physical acceptance required.",
+          "Final admission checks candidate, exact state, numerical time budget and constructed outputs."
+        ]
+      },
+      {
+        "operation": "task_capability",
+        "capability_method": "sampled-affine-conic-minimax-v1",
+        "submode": null,
+        "method_version": "sampled-affine-conic-minimax-v1",
+        "status": "not_applicable",
+        "reasons": [
+          "insufficient_budget"
+        ],
+        "dependency_environment": {
+          "python": "D:\\softrobot-agent\\.f3-prestudy-env\\Scripts\\python.exe",
+          "available": true,
+          "cvxpy": "1.9.3",
+          "clarabel": "0.11.1"
+        },
+        "evaluations": 2,
+        "evaluation_rule": "2: one model construction plus one conic solve",
+        "remaining_evaluations": 0,
+        "budget_allowed": false,
+        "prerequisites": [
+          "Current owned candidates, applicable task/model, frozen protocol and explicit method grant"
+        ],
+        "limitations": [
+          "Floating numerical checks only; no strict optimum, gradient or physical acceptance."
+        ]
+      },
+      {
+        "operation": "task_capability",
+        "capability_method": "sampled-affine-conic-minimax-v1",
+        "submode": "optimal_sensitivity",
+        "method_version": "controlled-capability-sensitivity-v1",
+        "status": "not_applicable",
+        "reasons": [
+          "method_not_authorized",
+          "insufficient_budget",
+          "candidate_variable_and_saved_model_stencil_validation_required"
+        ],
+        "dependency_environment": {
+          "python": "D:\\softrobot-agent\\.f3-prestudy-env\\Scripts\\python.exe",
+          "available": true,
+          "cvxpy": "1.9.3",
+          "clarabel": "0.11.1"
+        },
+        "evaluations": 5,
+        "evaluation_rule": "1+4*k for k=1 or 2 explicit central step sizes; 3 or 5 existing registered models",
+        "remaining_evaluations": 0,
+        "budget_allowed": false,
+        "prerequisites": [
+          "Current owned candidates, applicable task/model, frozen protocol and explicit method grant",
+          "Single authorized parameter; model_results baseline first; explicit steps; all model bindings checked"
+        ],
+        "limitations": [
+          "Floating numerical checks only; no strict optimum, gradient or physical acceptance."
+        ]
+      }
+    ],
+    "optimal_sensitivity_readiness": {
+      "method": "controlled-capability-sensitivity-v1",
+      "status": "not_applicable",
+      "reasons": [
+        "method_not_authorized",
+        "insufficient_budget",
+        "no_authorized_continuous_variable",
+        "missing_validated_model_stencil"
+      ],
+      "remaining_evaluations": 0,
+      "planning": [
+        {
+          "required_models": 3,
+          "validated_reusable_models": null,
+          "missing_models": null,
+          "kernel_evaluations": 5,
+          "preparation_methods": [
+            {
+              "operation": "linearization",
+              "evaluations": 1
+            },
+            {
+              "operation": "task_capability",
+              "method": "sampled-affine-conic-minimax-v1",
+              "evaluations": 2
+            }
+          ],
+          "remaining_total_range": null,
+          "budget_sufficient": null,
+          "wall_cost": "unknown",
+          "other_budgets": "Candidate generation, Provider and physical launches are separate.",
+          "assumptions": "Preparation methods require their own task/model admission; no automatic generation or solve."
+        },
+        {
+          "required_models": 5,
+          "validated_reusable_models": null,
+          "missing_models": null,
+          "kernel_evaluations": 9,
+          "preparation_methods": [
+            {
+              "operation": "linearization",
+              "evaluations": 1
+            },
+            {
+              "operation": "task_capability",
+              "method": "sampled-affine-conic-minimax-v1",
+              "evaluations": 2
+            }
+          ],
+          "remaining_total_range": null,
+          "budget_sufficient": null,
+          "wall_cost": "unknown",
+          "other_budgets": "Candidate generation, Provider and physical launches are separate.",
+          "assumptions": "Preparation methods require their own task/model admission; no automatic generation or solve."
+        }
+      ],
+      "detail_query": {
+        "reference": {
+          "artifact_id": "395884912d4348ac9eb0bfabf100cca0b2479edbbaaa973f02ef69ed4d00ae04",
+          "media_type": "application/json"
+        },
+        "view": "mathematical_capabilities"
+      }
+    },
+    "latest_reports": [
+      {
+        "delivery_version": "scientific_handoff_v1",
+        "report_reference": {
+          "artifact_id": "15aae6758cc397b69f617c100dc6b01db57010916625fa48b3cbd2607a48475d",
+          "media_type": "application/json"
+        },
+        "result_references": [
+          {
+            "artifact_id": "7e347a23709e32829dee87bb7c15baddd056767f21419292b978b240560f0145",
+            "media_type": "application/json"
+          }
+        ],
+        "mode": "result_summary",
+        "question": null,
+        "reporter_status": "deterministic_only",
+        "delivery_mode": "deterministic_only",
+        "findings": [
+          {
+            "result": {
+              "pointer": "",
+              "reference": {
+                "artifact_id": "7e347a23709e32829dee87bb7c15baddd056767f21419292b978b240560f0145",
+                "media_type": "application/json"
+              }
+            },
+            "operation": "task_capability",
+            "metrics": [
+              {
+                "name": "holding_max_error_m",
+                "value": 0.008000000000001313,
+                "unit": "m",
+                "threshold": 0.01,
+                "passed": true,
+                "scope": "model_sample",
+                "source": {
+                  "pointer": "/trajectory/replay/records/5/value",
+                  "reference": {
+                    "artifact_id": "7e347a23709e32829dee87bb7c15baddd056767f21419292b978b240560f0145",
+                    "media_type": "application/json"
+                  }
+                },
+                "threshold_source": {
+                  "pointer": "/task_analysis/constraints/1/radius",
+                  "reference": {
+                    "artifact_id": "7e347a23709e32829dee87bb7c15baddd056767f21419292b978b240560f0145",
+                    "media_type": "application/json"
+                  }
+                }
+              }
+            ],
+            "main_violations": [],
+            "mathematics": {
+              "claim_source": {
+                "pointer": "/scoped_claim",
+                "reference": {
+                  "artifact_id": "7e347a23709e32829dee87bb7c15baddd056767f21419292b978b240560f0145",
+                  "media_type": "application/json"
+                }
+              },
+              "requirement_source": {
+                "pointer": "/task_analysis",
+                "reference": {
+                  "artifact_id": "7e347a23709e32829dee87bb7c15baddd056767f21419292b978b240560f0145",
+                  "media_type": "application/json"
+                }
+              },
+              "problem_definition": {
+                "pointer": "/trajectory/problem_definition",
+                "reference": {
+                  "artifact_id": "7e347a23709e32829dee87bb7c15baddd056767f21419292b978b240560f0145",
+                  "media_type": "application/json"
+                }
+              },
+              "scope": {
+                "model_declaration": {
+                  "model_id": "model.gvs",
+                  "model_version": "1.0.0",
+                  "relevant_assumptions": [
+                    "supported serial tendon-driven continuum topology",
+                    "selected strain basis spans deformation relevant to the use",
+                    "inextensible centerline",
+                    "no shear",
+                    "no torsion",
+                    "straight frictionless tendon spans"
+                  ],
+                  "representation_id": "9637ffe35f961a28c069143bdc6d16344dc7fc76c87e168bd9802f006cbdefe9"
+                },
+                "computation_status": "computed",
+                "verification_status": "independent_discrete_replay_passed",
+                "supported_interpretation": "All declared sampled constraints verified in the specified local affine model only. Finite-tolerance numerical optimality checks: numerically_checked; strict optimal-value bounds and structural optimality remain unavailable.",
+                "unsupported_conclusions": [
+                  "task acceptance",
+                  "continuous-time holding-window compliance",
+                  "global nonlinear feasibility or infeasibility",
+                  "hardware performance",
+                  "robustness",
+                  "repeatability",
+                  "equilibrium validity at a non-equilibrium point"
+                ],
+                "horizon": {
+                  "analysis_horizon_s": 0.35,
+                  "interpretation": "Actual saved-state remaining horizon, or nominal horizon from the declared configuration operating point.",
+                  "origin": 0.0,
+                  "period_s": 0.01,
+                  "remaining_task_s": 0.35,
+                  "task_duration_s": 0.35,
+                  "trajectory_grid": {
+                    "control_period_s": 0.01,
+                    "input_hold_s": 0.01,
+                    "remaining_task_s": 0.35,
+                    "sample_period_s": 0.01,
+                    "sample_phase": "post_step_preceding_hold",
+                    "start_time_s": 0.0,
+                    "step_count": 35
+                  }
+                },
+                "constraint_coverage": [
+                  {
+                    "constraint_id": "terminal_error_m",
+                    "expressible": true,
+                    "reason": "Shared held-input trajectory; past samples require separate evidence.",
+                    "reasons": [],
+                    "status": "applicable",
+                    "analyzed_indices_count": 1,
+                    "checked_indices_count": 1,
+                    "satisfied_indices_count": 1,
+                    "unchecked_indices_count": 0
+                  },
+                  {
+                    "constraint_id": "holding_max_error_m",
+                    "expressible": true,
+                    "reason": "Shared held-input trajectory; past samples require separate evidence.",
+                    "reasons": [],
+                    "status": "applicable",
+                    "analyzed_indices_count": 6,
+                    "checked_indices_count": 6,
+                    "satisfied_indices_count": 6,
+                    "unchecked_indices_count": 0
+                  },
+                  {
+                    "constraint_id": "holding_max_speed_m_s",
+                    "expressible": true,
+                    "reason": "Shared held-input trajectory; past samples require separate evidence.",
+                    "reasons": [],
+                    "status": "applicable",
+                    "analyzed_indices_count": 6,
+                    "checked_indices_count": 6,
+                    "satisfied_indices_count": 6,
+                    "unchecked_indices_count": 0
+                  }
+                ]
+              },
+              "operating_point": {
+                "actual_time_s": 0.0,
+                "name": "controller_start_input",
+                "phase": "configuration_controller_start_input",
+                "remaining_task_s": 0.35
+              },
+              "quantities": [
+                {
+                  "control_reoptimization": "required",
+                  "name": "analytic_lower_bound",
+                  "source": {
+                    "pointer": "/trajectory/quantities/analytic_lower_bound/value",
+                    "reference": {
+                      "artifact_id": "7e347a23709e32829dee87bb7c15baddd056767f21419292b978b240560f0145",
+                      "media_type": "application/json"
+                    }
+                  },
+                  "status": "verified",
+                  "structural_parameters": [],
+                  "unit": "dimensionless",
+                  "value": -1.0
+                },
+                {
+                  "control_reoptimization": "required",
+                  "name": "optimal_value",
+                  "source": null,
+                  "status": "unavailable",
+                  "structural_parameters": [],
+                  "unit": "dimensionless",
+                  "value": null
+                },
+                {
+                  "control_reoptimization": "required",
+                  "name": "rigorous_upper_bound",
+                  "source": null,
+                  "status": "unavailable",
+                  "structural_parameters": [],
+                  "unit": "dimensionless",
+                  "value": null
+                },
+                {
+                  "control_reoptimization": "required",
+                  "name": "support_lower_estimate",
+                  "source": {
+                    "pointer": "/trajectory/quantities/support_lower_estimate/value",
+                    "reference": {
+                      "artifact_id": "7e347a23709e32829dee87bb7c15baddd056767f21419292b978b240560f0145",
+                      "media_type": "application/json"
+                    }
+                  },
+                  "status": "unverified_estimate",
+                  "structural_parameters": [],
+                  "unit": "dimensionless",
+                  "value": -0.2000000000759523
+                },
+                {
+                  "control_reoptimization": "required",
+                  "name": "witness_upper_estimate",
+                  "source": {
+                    "pointer": "/trajectory/quantities/witness_upper_estimate/value",
+                    "reference": {
+                      "artifact_id": "7e347a23709e32829dee87bb7c15baddd056767f21419292b978b240560f0145",
+                      "media_type": "application/json"
+                    }
+                  },
+                  "status": "unverified_estimate",
+                  "structural_parameters": [],
+                  "unit": "dimensionless",
+                  "value": -0.19999999999986867
+                }
+              ],
+              "capability": {
+                "checks_pointer": "/trajectory/dual_checks",
+                "dominant_constraints": [
+                  "terminal_error_m",
+                  "holding_max_error_m"
+                ],
+                "full_requested_coverage": true,
+                "gap": 7.608363938871321e-11,
+                "kernel_elapsed_s": 0.5701099000871181,
+                "local_output_limitation": {
+                  "scope": "This stored local linearization only; not nonlinear controllability or physical invariance.",
+                  "sources": [
+                    {
+                      "pointer": "/model/endpoint_outputs/0/C/0",
+                      "reference": {
+                        "artifact_id": "7e347a23709e32829dee87bb7c15baddd056767f21419292b978b240560f0145",
+                        "media_type": "application/json"
+                      }
+                    },
+                    {
+                      "pointer": "/model/endpoint_outputs/0/D/0",
+                      "reference": {
+                        "artifact_id": "7e347a23709e32829dee87bb7c15baddd056767f21419292b978b240560f0145",
+                        "media_type": "application/json"
+                      }
+                    }
+                  ],
+                  "world_x_first_order_state_and_input_coefficients": "zero"
+                },
+                "method_version": "sampled-affine-conic-minimax-v1",
+                "numerical_feasibility": "sampled_feasible_witness",
+                "optimality_status": "numerically_checked",
+                "physical_failure_relation": {
+                  "causal_explanation": "not_established",
+                  "mathematical_active_signals": [
+                    "tip_position"
+                  ],
+                  "physical_improvement": "unverified",
+                  "reason": "No complete same-candidate same-task physical observation with alignable constraints.",
+                  "sources": [],
+                  "status": "not_assessed"
+                },
+                "problem_pointer": "/trajectory/problem_definition",
+                "quantities_pointer": "/trajectory/quantities",
+                "replayed_violation": -0.19999999999986867,
+                "sample_records_pointer": "/trajectory/replay/records",
+                "scope": "Local sampled affine model; physical acceptance unmeasured",
+                "score_semantics": "Signed sampled minimax; smaller is better. Float support estimate and gap are not rigorous bounds.",
+                "solver_starts_pointer": "/trajectory/solver",
+                "strict_optimality": "unavailable",
+                "support_lower_estimate": -0.2000000000759523,
+                "solver": {
+                  "status": "optimal",
+                  "iterations": 17,
+                  "solve_time_s": 0.0022471
+                }
+              },
+              "unresolved": {
+                "potential_discriminating_checks": [
+                  "Compare compatible execution or solver diagnosis."
+                ],
+                "supported_facts": [
+                  "Bounded local-model witness for checked samples."
+                ],
+                "unresolved_questions": [
+                  "Controller/nonlinear/backend realization unresolved."
+                ],
+                "unsupported_inferences": [
+                  "Global/physical feasibility, structural necessity or surrounding-region exclusion."
+                ]
+              },
+              "cost": {
+                "evaluations": 2,
+                "numerical_s": 8.941454399842769,
+                "sources": [
+                  {
+                    "reference": {
+                      "artifact_id": "7e347a23709e32829dee87bb7c15baddd056767f21419292b978b240560f0145",
+                      "media_type": "application/json"
+                    },
+                    "pointer": "/charged_analysis_evaluations"
+                  },
+                  {
+                    "reference": {
+                      "artifact_id": "7e347a23709e32829dee87bb7c15baddd056767f21419292b978b240560f0145",
+                      "media_type": "application/json"
+                    },
+                    "pointer": "/charged_numerical_s"
+                  }
+                ]
+              }
+            }
+          }
+        ],
+        "result_count": 1,
+        "scope": [
+          {
+            "result": {
+              "pointer": "",
+              "reference": {
+                "artifact_id": "7e347a23709e32829dee87bb7c15baddd056767f21419292b978b240560f0145",
+                "media_type": "application/json"
+              }
+            },
+            "claim_kind": "MODEL_WITNESS",
+            "verification_status": "independent_discrete_replay_passed",
+            "supported_inferences": [
+              "model_sampled_feasibility",
+              "numerically_checked_sampled_optimality"
+            ]
+          }
+        ],
+        "comparisons": [],
+        "limitations": [
+          "global_nonlinear_feasibility",
+          "global_nonlinear_infeasibility",
+          "structural_infeasibility",
+          "whole_horizon_from_instantaneous_braking",
+          "adapted_dynamic_improvement_from_static_sensitivity",
+          "unvisited_simulation_descent_guarantee",
+          "continuous_time_compliance",
+          "hardware_performance",
+          "robustness",
+          "repeatability",
+          "observed_task_pass"
+        ],
+        "unresolved": [
+          "Nonlinear realization and constraints outside declared model/sample coverage remain unresolved.",
+          "Floating support lower estimate and gap are not strict mathematical bounds or certification.",
+          "Original independent physical task acceptance is unmeasured by this evidence."
+        ],
+        "interpretations": [],
+        "interpretation_sources": [],
+        "interpretation_scope": "Non-authoritative interpretations; hypothesis and further_investigation are unconfirmed questions, not decisions",
+        "error": null
+      }
+    ],
+    "additional_mathematical_evidence": [],
+    "stop_result_index": {
+      "count": 1,
+      "query": {
+        "reference": {
+          "artifact_id": "7e347a23709e32829dee87bb7c15baddd056767f21419292b978b240560f0145",
+          "media_type": "application/json"
+        },
+        "view": "working_set",
+        "pointer": "/all_fresh_results"
+      },
+      "rule": "Exact complete STOP citation index; retrieve on demand. Reports give no formal read credit."
+    }
+  },
+  "operation_reuse": {
+    "additional_numerical_s": 0,
+    "additional_analysis_evaluations": 0
+  },
+  "provider_requests": 0
+}

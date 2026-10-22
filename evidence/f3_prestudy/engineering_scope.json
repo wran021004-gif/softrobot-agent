@@ -1,0 +1,100 @@
+{
+  "study_id": "f3-preflight-socp-20261022-01",
+  "resolved_identity": "bbc577883a876421c07d257b7f778c68419ce218f19338ce520943661202a2fd",
+  "task_identity": "fe7b95c3c1ba12659b59c1983544b6454c9d90ac42c4dec528e9736d99fd3a6b",
+  "family_space_identity": "120f23ddcf625a2fe4c0c0bfad3ad8d7a0fa25d42654e22261f2757ba539c987",
+  "implementation": "c51d74d28bae0186951fea5542c5cc726cf7eef1",
+  "budgets": {
+    "activity_s": null,
+    "bdf_replays": 0,
+    "delivery_reserve_s": null,
+    "local_solve_s": null,
+    "local_solves": 0,
+    "mathematical_evaluations": 2,
+    "numerical_s": null,
+    "offline_nlp": 0,
+    "physical_launches": 0,
+    "protected_provider_requests": 0,
+    "protected_public_operations": 4,
+    "provider_requests": 0,
+    "public_operations": 40
+  },
+  "nmpc_limits": {
+    "executions": 0
+  },
+  "rl_limits": {
+    "actions_per_trial": null,
+    "diagnostic_physics_steps": 0,
+    "diagnostic_replays": 0,
+    "evaluation_episodes": 0,
+    "seconds_per_trial": null,
+    "training_actions": null,
+    "training_active_seconds": null,
+    "training_stages": 0
+  },
+  "authorization": "User F3-Preflight attachment: one independent real SOCP request, reserve at most 2 mathematical evaluations; zero Provider and physical launches.",
+  "query": {
+    "candidate": {
+      "artifact_id": "395884912d4348ac9eb0bfabf100cca0b2479edbbaaa973f02ef69ed4d00ae04",
+      "media_type": "application/json"
+    },
+    "operation": "task_capability",
+    "operating_point": "controller_start_input",
+    "protocol": {
+      "authority_reason": "No independently justified task-required MIMO gain threshold; usable bandwidth undefined.",
+      "authority_rule": "Smallest singular value >= threshold, connected grid band starting at lowest frequency; no extrapolation.",
+      "authority_threshold": null,
+      "baseline_lengths_m": {
+        "segment_0": 0.16,
+        "segment_1": 0.11,
+        "segment_2": 0.14,
+        "segment_3": 0.14,
+        "segment_4": 0.14,
+        "segment_5": 0.14,
+        "segment_6": 0.14,
+        "segment_7": 0.14,
+        "segment_8": 0.14
+      },
+      "candidate_rule": "initial_target_equilibrium_halfway",
+      "comparison_atol": 1e-08,
+      "comparison_rtol": 2e-06,
+      "construction_max_iterations": 20,
+      "derivative_atol": 2e-05,
+      "derivative_rtol": 0.0002,
+      "derivative_step": 1e-05,
+      "duration_s": 0.35,
+      "endpoint_check_atol": 1e-08,
+      "endpoint_max_iterations": 100,
+      "equilibrium_normalized_residual": 1e-05,
+      "frequency_rad_s": [
+        0.1,
+        1.0,
+        10.0,
+        100.0
+      ],
+      "horizon_alignment_atol_s": 1e-12,
+      "input_scale_n": 8.0,
+      "output_scale_m": 0.01,
+      "period_s": 0.01,
+      "pole_margin_s_inv": 1e-07,
+      "protocol_id": "task-local-v2",
+      "rank_atol": 1e-12,
+      "rank_rtol": 1e-09,
+      "samples_s": [
+        0.0,
+        0.1,
+        0.2,
+        0.3,
+        0.34
+      ],
+      "static_force_tolerance": 1e-10,
+      "static_max_iterations": 20,
+      "windows_s": [
+        0.05,
+        0.1,
+        0.35
+      ]
+    },
+    "capability_method": "sampled-affine-conic-minimax-v1"
+  }
+}

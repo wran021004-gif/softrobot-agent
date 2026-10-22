@@ -29,10 +29,10 @@ NAMES=[
 
 def main():
     parser=argparse.ArgumentParser();parser.add_argument('--output',required=True)
-    parser.add_argument('--archive',type=Path);args=parser.parse_args()
+    parser.add_argument('--archive',type=Path);parser.add_argument('--names',nargs='+',default=NAMES);args=parser.parse_args()
     if Path(args.output).exists():raise ValueError('PRESERVE_PREVIOUS_REGRESSION_REPORT')
     sys.path.insert(0,str(ROOT/'tests/research'))
-    suite=unittest.defaultTestLoader.loadTestsFromNames(['tests.research.'+n for n in NAMES])
+    suite=unittest.defaultTestLoader.loadTestsFromNames(['tests.research.'+n for n in args.names])
     def restrict(group):
         for test in group:
             if isinstance(test,unittest.TestSuite):restrict(test)

@@ -32,16 +32,17 @@ class FamilySensitivityTests(unittest.TestCase):
         update(self.h,spec=spec,freeze='offline-family-fixture',analysis_results=[])
 
     def generate(self,**values):
-        result=fixture.VariableSegmentTests.generate(**dict(segment_count=2,tendon_count=3,**values))
+        result=fixture.VariableSegmentTests.generate(**(dict(segment_count=2,tendon_count=3)|values))
         self.assertEqual(result['status'],'generated',result)
         return result['candidate'],design.verify_candidate(self.h,result['candidate'])
 
-    def stencil(self):
+    def stencil(self,variable='segments.0.length_m',steps=(.0005,),count=2):
         spec=state(self.h)['spec'];refs=[];candidates=[]
-        default=spec['family_space']['segment_domains'].get('0',spec['family_space']['segment_domain'])['length_m']['default']
-        for delta in (0,-.0005,.0005):
-            edits={} if delta==0 else {'0':dict(length_m=default+delta)}
-            ref,c=self.generate(segments=edits);candidates.append(ref)
+        _,index,key=variable.split('.')
+        default=spec['family_space']['segment_domains'].get(index,spec['family_space']['segment_domain'])[key]['default']
+        for delta in [0,*[v for step in steps for v in (-step,step)]]:
+            edits={} if delta==0 else {index:{key:default+delta}}
+            ref,c=self.generate(segment_count=count,segments=edits);candidates.append(ref)
             raw=deepcopy(self.raw);cfg=c['configuration']
             bound=dict(raw['binding'],candidate=ref,candidate_id=c['candidate_id'],
                 effective_configuration_identity=digest(cfg),task_identity=digest(cfg['task']),source_identity=c['source_identity'])
@@ -55,7 +56,51 @@ class FamilySensitivityTests(unittest.TestCase):
         update(self.h,analysis_results=refs)
         return AnalysisRequest(candidate=candidates[0],operation='task_capability',operating_point='controller_start_input',
             protocol=spec['analysis_protocol'],capability_method=opt.CONIC,
-            optimal_sensitivity=dict(variable='segments.0.length_m',steps=[.0005],model_results=refs))
+            optimal_sensitivity=dict(variable=variable,steps=list(steps),model_results=refs))
+
+    def test_full_one_nine_segment_and_two_step_modulus_groups(self):
+        with patch('tools.research.task_constraints.check_analysis_applicability',return_value={'status':'applicable'}):
+            for variable,steps,count in [('segments.0.length_m',(.0005,),1),
+                    ('segments.8.length_m',(.0005,),9),('segments.1.young_pa',(10000.,5000.),2)]:
+                q=self.stencil(variable,steps,count)
+                self.assertEqual(len(opt.sensitivity_context(self.h,q)['points']),1+2*len(steps))
+
+    def test_second_changes_reach_real_stencil_gate(self):
+        q=self.stencil();refs=list(state(self.h)['analysis_results'])
+        base=design.verify_candidate(self.h,q.candidate)
+        params,_=opt.family_parameters(state(self.h)['spec'],base,'segments.0.length_m')
+        cases=[dict(tendon_count=4),dict(segment_count=3),dict(control_weights={'holding_tip_speed_weight':.5}),
+            dict(segments={'0':dict(length_m=.1005,young_pa=8e6)}),
+            dict(spans=[dict(first_segment=0,last_segment=1,count=3,phase_rad=.8)]),
+            dict(segments={'0':dict(length_m=.1005,sections=[dict(kind='circle',parameters=dict(radius_m=.008))])})]
+        for changes in cases:
+            request=deepcopy(params);request.update(changes)
+            result=design.generate_candidate(self.h,request,dict(origin='offline_stencil_negative'))
+            self.assertEqual(result['status'],'generated',result)
+            raw=deepcopy(self.raw);raw['candidate']=result['candidate']
+            raw.update(implementation=state(self.h)['freeze'],protocol=state(self.h)['spec']['analysis_protocol'])
+            raw['requested_operation']['operating_point']='controller_start_input'
+            ref=save(self.h,raw,'explicit_invalid_stencil_fixture');update(self.h,analysis_results=[*refs,ref])
+            bad=q.model_copy(update={'optimal_sensitivity':q.optimal_sensitivity.model_copy(update={
+                'model_results':[*q.optimal_sensitivity.model_results[:2],ref]})})
+            with patch('tools.research.task_constraints.check_analysis_applicability',return_value={'status':'applicable'}):
+                with self.assertRaisesRegex(ValueError,'SINGLE_PARAMETER'):opt.sensitivity_context(self.h,bad)
+
+    def test_model_task_operating_point_time_and_baseline_rejections(self):
+        q=self.stencil();refs=list(state(self.h)['analysis_results'])
+        mutations=[lambda r:r['binding'].update(task_identity='foreign'),
+            lambda r:r['requested_operation'].update(operating_point='target_equilibrium'),
+            lambda r:r['model'].update(protocol_identity='different-horizon')]
+        with patch('tools.research.task_constraints.check_analysis_applicability',return_value={'status':'applicable'}):
+            for mutation in mutations:
+                raw=self.h.store.artifact(refs[-1]);mutation(raw)
+                ref=save(self.h,raw,'explicit_invalid_model_fixture');update(self.h,analysis_results=[*refs,ref])
+                bad=q.model_copy(update={'optimal_sensitivity':q.optimal_sensitivity.model_copy(update={
+                    'model_results':[*q.optimal_sensitivity.model_results[:2],ref]})})
+                with self.assertRaises(ValueError):opt.sensitivity_context(self.h,bad)
+            bad=q.model_copy(update={'optimal_sensitivity':q.optimal_sensitivity.model_copy(update={
+                'model_results':list(reversed(q.optimal_sensitivity.model_results))})})
+            with self.assertRaisesRegex(ValueError,'BASELINE'):opt.sensitivity_context(self.h,bad)
 
     def test_sparse_defaults_and_actual_generated_geometry(self):
         ref,c=self.generate()
