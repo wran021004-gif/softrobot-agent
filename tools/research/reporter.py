@@ -33,6 +33,16 @@ class InterpretationResponse(Contract):
     interpretations: list[ReporterInterpretation]
 
 
+class SourceIdInterpretation(Contract):
+    kind: ReporterInterpretation.model_fields['kind'].annotation
+    text: str
+    source_ids: list[str] = Field(min_length=1)
+
+
+class SourceIdResponse(Contract):
+    interpretations: list[SourceIdInterpretation]
+
+
 RESULT_KEYS=('results','physical_replays','mechanics_results','analysis_results',
     'matched_state_results','rl_evaluations','control_search_results')
 
@@ -303,19 +313,60 @@ def reporter_handoff_summary(host, reference, saved):
         error=saved['error'])
 
 
+def _source_catalog(host, report, queries):
+    """Request-local raw locations; never infer paths from summary field names."""
+    catalog={};seen=set()
+    def add(source):
+        key=(source.reference.artifact_id,source.pointer)
+        if key in seen:return
+        read_evidence(host,plain(source),record_read=False)
+        seen.add(key);catalog['S'+str(len(catalog)+1)]=plain(source)
+    def collect(value):
+        if isinstance(value,EvidenceLocation):add(value)
+        elif isinstance(value,Contract):
+            for name in type(value).model_fields:collect(getattr(value,name))
+        elif isinstance(value,list):
+            for item in value:collect(item)
+        # Untyped dicts contain derived summaries, not provenance contracts.
+    for card in report.results:
+        collect(card)
+        capability=card.deterministic_summary.get('task_capability')
+        if capability:
+            pointers=[capability[k] for k in ('problem_pointer','solver_starts_pointer','sample_records_pointer')]
+            comparison=capability.get('structural_comparison')
+            if comparison:
+                pointers.extend(comparison[k] for k in ('comparison_pointer','fixed_control_value_pointer'))
+                from tools.research.capability import signed_score_comparisons
+                values=signed_score_comparisons(capability,plain(card.identity.result.reference))
+                for row in values.get('comparisons',[]):
+                    for source in row['source_references']:add(EvidenceLocation.model_validate(source))
+            for pointer in pointers:add(EvidenceLocation(reference=card.identity.result.reference,pointer=pointer))
+    for relation in report.relations:collect(relation.sources)
+    for query in queries:
+        add(EvidenceLocation(reference=query['reference'],pointer=query.get('pointer','')))
+    return catalog
+
+
 def _wire(host, reference, saved):
     provider=state(host)['pilot']['provider']
     q=saved.get('request') or {};reads=[]
     for query in q.get('reads',[]):
         reads.append(dict(query=query,value=read_evidence(host,query,record_read=False)))
+    report=ScientificReport.model_validate(saved['report'])
+    catalog=_source_catalog(host,report,q.get('reads',[]))
+    from tools.research.capability import signed_score_comparisons
+    comparisons=[dict(result=plain(card.identity.result),values=signed_score_comparisons(
+        card.deterministic_summary['task_capability'],plain(card.identity.result.reference)))
+        for card in report.results if 'task_capability' in card.deterministic_summary]
     return dict(model=provider['model'],thinking=dict(type=provider['thinking']),
         reasoning_effort=provider['reasoning_effort'],max_tokens=provider['max_tokens'],stream=False,
         messages=[dict(role='system',content=(
             'You are a read-only scientific Reporter. Return JSON with only interpretations, a list '
-            'of ReporterInterpretation objects using this schema: '+json.dumps(InterpretationResponse.model_json_schema())+
-            '. Every item requires at least one exact evidence source. Explain quantitative new information, '
-            'Copy provided raw evidence reference/pointer pairs exactly. Summary aliases are not raw JSON paths; '
-            'use an explicit provided pointer or the result root, never invent a path from a summary field name. '
+            'using this schema: '+json.dumps(SourceIdResponse.model_json_schema())+
+            '. Every item requires source_ids selected only from source_catalog. '
+            'Usually return 1-3 important interpretations; more only for an explicitly complex investigation. '
+            'Use the deterministic score_comparisons for deltas, normalized secants and recovery fractions. '
+            'Explain quantitative new information, '
             'supported/weakened hypotheses, unresolved questions and discriminating observations. '
             'Respect focus and constraints as evidence scope. Request missing evidence in further_investigation. '
             'Facts, identities, metrics, costs and relations are frozen. Multi-factor differences do not '
@@ -324,7 +375,8 @@ def _wire(host, reference, saved):
             'State uncertainty when evidence is insufficient. '
             'No scientific actions or evidence registration are available.')),
             dict(role='user',content=json.dumps(dict(report_reference=reference,
-                report=saved['report'],request=q,selected_reads=reads),separators=(',',':')))])
+                report=saved['report'],request=q,selected_reads=reads,source_catalog=catalog,
+                score_comparisons=comparisons),separators=(',',':')))])
 
 
 def _finish(host, boundary, wire, response):
@@ -336,7 +388,17 @@ def _finish(host, boundary, wire, response):
         body=response.json();choice=body['choices'][0]
         if response.status_code not in range(200,300) or choice['finish_reason']!='stop':
             raise ValueError('REPORTER_OUTPUT_INCOMPLETE_OR_HTTP_FAILURE')
-        interpretations=InterpretationResponse.model_validate_json(choice['message']['content']).interpretations
+        if 'source_catalog' in payload:
+            output=SourceIdResponse.model_validate_json(choice['message']['content'])
+            catalog=payload['source_catalog'];interpretations=[]
+            for item in output.interpretations:
+                if any(key not in catalog for key in item.source_ids):
+                    raise ValueError('REPORTER_UNKNOWN_SOURCE_ID')
+                interpretations.append(ReporterInterpretation(kind=item.kind,text=item.text,
+                    sources=[catalog[key] for key in item.source_ids]))
+        else:
+            # Replay uses the persisted request contract, never today's _wire().
+            interpretations=InterpretationResponse.model_validate_json(choice['message']['content']).interpretations
         allowed={loc['reference']['artifact_id'] for card in report.results
             for loc in [plain(card.identity.result),*map(plain,card.detail_sources)]}
         allowed.update(f.source.reference.artifact_id for card in report.results for f in card.recorded_context)

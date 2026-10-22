@@ -5,6 +5,12 @@ from schemas.common import Contract
 from schemas.platform import EvidenceRef
 
 
+SCORE_QUANTITY_SEMANTICS = dict(score='Computed signed minimax value within the declared model',
+    delta='candidate_score - baseline_score; direct score difference',
+    normalized_secant='structural score delta / structural parameter step * normalization_scale',
+    control_reoptimization_improvement='fixed-old-control score - reoptimized score on the same candidate')
+
+
 class CapabilityComparison(Contract):
     baseline_result: EvidenceRef
     variable: str
@@ -91,6 +97,7 @@ def capability_summary(trajectory):
     summary['score_semantics'] = ('Signed maximum normalized constraint residual over analyzed samples; '
         'negative means positive normalized margin inside those bounds. Smaller is better; a negative score moving '
         'toward zero worsens this minimax score. A score is not a delta or secant.')
+    summary['quantity_semantics'] = dict(SCORE_QUANTITY_SEMANTICS)
     summary['reason'] = trajectory.get('reason')
     summary['problem_pointer'] = '/trajectory/problem_definition'
     summary['quantities_pointer'] = '/trajectory/quantities'
@@ -121,14 +128,27 @@ def signed_score_comparisons(summary, reference):
         return dict(status='not_comparable',reason='No recorded controlled computed comparison')
     candidate=summary['best_found_violation'];baseline=comparison['baseline_violation']
     fixed=comparison['fixed_control_violation']
-    scope={k:comparison[k] for k in ('variable','step','baseline_result','control_alignment','reoptimization','attribution','derivative_scope')}
+    scope={k:comparison[k] for k in ('variable','step','normalization_scale','baseline_result','control_alignment','reoptimization','attribution','derivative_scope')}
     def location(pointer):return dict(reference=reference,pointer=pointer)
     def direction(name,before,after,pointer):
         delta=after-before
         return dict(comparison=name,baseline_score=before,candidate_score=after,delta=delta,
             smaller_is_better=True,computed_score_direction='worse' if delta>0 else 'better' if delta<0 else 'unchanged',
             source_references=[location(pointer),location('/trajectory/best_found_violation')])
+    fixed_loss=fixed-baseline;recovery=fixed-candidate;residual=candidate-baseline
+    decomposition=dict(fixed_control_degradation=fixed_loss,
+        control_reoptimization_improvement=recovery,residual_reoptimized_degradation=residual,
+        source_references=[location('/trajectory/structural_comparison/baseline_violation'),
+            location('/trajectory/structural_comparison/fixed_control/best_found_violation'),
+            location('/trajectory/best_found_violation')])
+    if fixed_loss>0 and recovery>=0 and residual>=0:
+        decomposition.update(fraction_denominator='fixed_control_degradation',
+            recovery_fraction=recovery/fixed_loss,residual_fraction=residual/fixed_loss)
+    secants={mode:dict(**comparison['quantities'][mode+'_normalized_secant'],
+        source=location('/trajectory/structural_comparison/quantities/'+mode+'_normalized_secant/value'))
+        for mode in ('fixed_control','reoptimized_control')}
     return dict(status='computed_estimate',definition='G = max(normalized_constraint_violation); smaller is better',
+        quantity_semantics=dict(SCORE_QUANTITY_SEMANTICS),normalized_secants=secants,decomposition=decomposition,
         comparisons=[direction('reoptimized_candidate_vs_reoptimized_baseline',baseline,candidate,
                 '/trajectory/structural_comparison/baseline_violation'),
             direction('candidate_reoptimized_vs_candidate_fixed_old_control',fixed,candidate,
