@@ -90,7 +90,11 @@ async def request_feedback_boundary(host,agent):
     if DeepSeekModel.format_request_messages(messages[:index],wire['messages'][0]['content'])!=prefix:
         raise ValueError('REQUEST_BOUNDARY_ORIGINAL_WIRE_PREFIX_MISMATCH')
     def assistant(value):
-        return dict(content=value.get('content') or None,reasoning=value.get('reasoning_content',''),
+        content=value.get('content')
+        # Strands encodes Provider string content as OpenAI text-part blocks.
+        # Normalize that representation only; preserve every text character.
+        if isinstance(content,str):content=[dict(type='text',text=content)] if content else None
+        return dict(content=content or None,reasoning=value.get('reasoning_content',''),
             tools=[dict(id=t['id'],name=t['function']['name'],arguments=json.loads(t['function']['arguments']))
                 for t in value.get('tool_calls',[])])
     actual=DeepSeekModel.format_request_messages([messages[index]])

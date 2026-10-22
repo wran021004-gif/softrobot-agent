@@ -25,7 +25,7 @@ class RequestBoundaryHandoffTests(unittest.TestCase):
             message=dict(role='assistant',content='Consumed fixture feedback',reasoning_content='Exact offline request reasoning')
             reason='stop'
             if len(sent)==1:
-                message.update(content=None,tool_calls=[dict(id='fixture-read-priors',type='function',function=dict(
+                message.update(content='Exact response text before tool use\nPreserve all characters.',tool_calls=[dict(id='fixture-read-priors',type='function',function=dict(
                     name='evidence_read',arguments=json.dumps(dict(reference=state(h)['public_prior_manifest'],view='summary'))))])
                 reason='tool_calls'
             return httpx.Response(200,json=dict(id='explicit-offline-response',object='chat.completion',created=1,
