@@ -217,6 +217,23 @@ class LiveBoundary(httpx.AsyncBaseTransport):
 
 def live_model_class(boundary):
     class AccountedDeepSeekModel(DeepSeekModel):
+        def format_request(self,*args,**kwargs):
+            request=super().format_request(*args,**kwargs)
+            saved=pilot(boundary.host).get('unconsumed_response')
+            if saved:
+                event=next(e for e in boundary.host.store.events(boundary.host.run_id)
+                    if e['kind']=='r3_request' and e['request_id']==saved)
+                original=boundary.host.store.artifact(boundary.host.store.artifact(event['outputs'][0])['request'])
+                last=original['messages'][-1]
+                # Preserve the saved tail verbatim. LiveBoundary still checks the
+                # entire wire hash; no new L0 may reinterpret a saved response.
+                if last.get('role')=='user' and isinstance(last.get('content'),str) and last['content'].startswith('CURRENT_RESEARCH_PACKET\n'):
+                    request['messages'].append(deepcopy(last))
+            elif getattr(boundary,'research_packet',None) is not None:
+                request['messages'].append(dict(role='user',content='CURRENT_RESEARCH_PACKET\n'+
+                    json.dumps(boundary.research_packet,separators=(',',':'))))
+            return request
+
         async def stream(self,*args,**kwargs):
             # Reject saved incomplete output before even the first SDK event.
             boundary.require_complete()
@@ -373,7 +390,7 @@ def build_harness(host,*,transport,api_key,instructions,model_class,tool_executo
         provider=provider,registered_tools=sorted(agent.tool_names),session_id=session_id or s['pilot']['framework_session_id'],
         retry_controllers=0,context='public tool-result offload and retrieval',offload_threshold=1500 if compact else 4096,
         offload_preview_tokens=500 if compact else 1024,
-        dynamic_context='bounded packet in stable system prefix; installed BeforeModelCallEvent exposes cancellation only',
+        dynamic_context='request-only tail via public OpenAIModel.format_request; native SDK history unchanged',
         transport='accounted live boundary'))
     return agent
 
@@ -661,7 +678,8 @@ async def converse(host,*,session_handoff=False):
             if (availability(host) or {}).get('status')!='ready' or current['research']['budget']['science_budget']['remaining_mathematical']<1:
                 agent.tool_registry.registry.pop('research_analysis',None)
         record(host,'model_decision_packet',current)
-        agent.system_prompt=instructions+'\nCURRENT_RESEARCH_PACKET\n'+json.dumps(current,separators=(',',':'))
+        agent.system_prompt=instructions
+        boundary.research_packet=deepcopy(current)
         if current.get('research',{}).get('budget',{}).get('closeout',{}).get('next_request_will_protect',protected(host)):
             permitted=closeout_operations(host)
             schema=plan_schema(permitted['research_plan'],decision_required=bool(s['spec'].get('research_decisions')))
@@ -684,7 +702,7 @@ async def converse(host,*,session_handoff=False):
                 spec=deepcopy(normalize_tool_spec(retrieval.tool_spec))
                 spec['inputSchema']['json']['properties']['reference']['enum']=feedback_context_references()
                 retrieval.tool_spec=spec
-            agent.system_prompt+='\nPROTECTED CLOSEOUT: status/stop existing workers, pinned published-policy evaluation, explicit evidence reads, selected passing solution confirmations and truthful STOP. No start/resume/solve/exploration.'
+            boundary.research_packet['protected_closeout_rule']='PROTECTED CLOSEOUT: status/stop existing workers, pinned published-policy evaluation, explicit evidence reads, selected passing solution confirmations and truthful STOP. No start/resume/solve/exploration.'
     def before_tool(event):
         if state(host)['spec'].get('rl_evaluation_source') and event.tool_use['name'] not in ('research_plan','research_rl','evidence_read'):
             event.cancel_tool='Only declared follow-up evaluation, evidence reads and STOP are permitted.'

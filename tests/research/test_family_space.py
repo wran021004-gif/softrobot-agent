@@ -170,7 +170,7 @@ class FamilySpaceTests(unittest.TestCase):
         self.assertIsNone(state(self.host)['reference_candidate'])
         # Candidate-bound mathematics reaches its ordinary frozen budget boundary,
         # rather than requiring a nominal candidate or disabling registration.
-        query=dict(candidate=self.responses['1']['candidate'],operation='equilibrium',protocol=self.spec['analysis_protocol'])
+        query=dict(candidate=self.responses['1']['candidate'],operation='equilibrium',operating_point='target_equilibrium',protocol=self.spec['analysis_protocol'])
         with self.assertRaisesRegex(ValueError,'ANALYSIS_AND_CONFIRMATION_BUDGET_CANNOT_FIT'):
             analysis.dispatch(self.host,query,'analysis-denied',guard=lambda *a:None)
         with self.assertRaises(ValueError):

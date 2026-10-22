@@ -26,6 +26,12 @@ def main():
     request=read(path)
     try:
         if request.get('kind')=='candidate_analysis':
+            import os
+            from importlib.metadata import version
+            atomic_json(path.with_name('worker_runtime.json'),dict(python=sys.executable,
+                version=sys.version,threads={k:os.environ.get(k) for k in ('OMP_NUM_THREADS','OPENBLAS_NUM_THREADS','MKL_NUM_THREADS')},
+                packages={k:version(k) for k in ('numpy','scipy','pydantic','casadi')},
+                implementation=request['implementation']))
             from tools.research.analysis import calculate
             def checkpoint(name,value):
                 destination=path.with_name('numerical_'+name+'.json')

@@ -1,0 +1,59 @@
+{
+  "attempts": [
+    {
+      "scope": "Stage A",
+      "tests": 49,
+      "passed": 49,
+      "failed": 0
+    },
+    {
+      "scope": "Initial SDK suite",
+      "tests": 58,
+      "failures": 1,
+      "error_records": 40,
+      "reason": "Missing MATLAB Engine import; before isolated .pth setup"
+    },
+    {
+      "scope": "SDK suite after Engine import",
+      "tests": 35,
+      "passed": 34,
+      "errors": 1,
+      "reason": "Historical Store absent from isolated tree"
+    },
+    {
+      "scope": "Read-only original Store recovery rerun",
+      "tests": 1,
+      "passed": 1
+    },
+    {
+      "scope": "Expanded regression 01",
+      "status": "interrupted; not counted as completed suite",
+      "known_failures": [
+        "F30 mock/audit assumed system-packet location",
+        "Legacy equilibrium test omitted target_equilibrium operating point"
+      ],
+      "import_errors": "Legacy tests required tests/research import path",
+      "legacy_real_worker_regression": {
+        "test": "test_real_gvs_pair_dispatch_store_budget_and_reuse",
+        "status": "passed",
+        "worker_requests": 2,
+        "reserved_evaluations": 3,
+        "method": "legacy GVS/SLSQP capability and comparison",
+        "physical_launches": 0,
+        "conic_requests": 0,
+        "scope": "Temporary offline regression fixture, not formal scientific Study"
+      }
+    },
+    {
+      "scope": "Corrected bounded suite",
+      "tests": 177,
+      "passed": 175,
+      "skipped": 2,
+      "failed": 0
+    }
+  ],
+  "historical_scientific_results_modified": false,
+  "real_provider_requests": 0,
+  "physical_experiments": 0,
+  "ppo_training": 0
+}

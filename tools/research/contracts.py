@@ -357,7 +357,7 @@ class ControlSeedRequest(Contract):
     parent: EvidenceRef | None = None
     channel_map: dict[str, str] | None = None
     tensions_n: list[list[FiniteFloat]] | None = None
-    method: Literal['baseline','mathematical_response','physical_response'] = 'baseline'
+    method: Literal['baseline','mathematical_response','physical_response','capability_sequence'] = 'baseline'
     response_evidence: EvidenceRef | None = None
     channels: list[str] | None = Field(default=None,min_length=1)
     difference_step_n: FiniteFloat = Field(default=.02,gt=0)
@@ -374,8 +374,11 @@ class ControlSeedRequest(Contract):
 
     @model_validator(mode='after')
     def paired_source(self):
-        if (self.method=='mathematical_response')!=(self.response_evidence is not None):
+        if (self.method in ('mathematical_response','capability_sequence'))!=(self.response_evidence is not None):
             raise ValueError('MATHEMATICAL_SEED_REQUIRES_REGISTERED_RESPONSE_EVIDENCE')
+        if self.method=='capability_sequence' and (self.source is not None or self.parent is not None
+                or self.channel_map is not None or self.tensions_n is not None or self.channels is not None):
+            raise ValueError('CAPABILITY_SEQUENCE_REQUIRES_ONLY_CANDIDATE_AND_RESULT_REFERENCE')
         if self.channels is not None and len(set(self.channels))!=len(self.channels):
             raise ValueError('UNIQUE_SEED_CHANNELS_REQUIRED')
         if (self.source is None) != (self.parent is None):

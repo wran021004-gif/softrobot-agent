@@ -336,6 +336,10 @@ def dispatch(host,query,key,*,guard,origin='model'):
         try:sensitivity_context=saved_context(host,q)
         except (ValueError,KeyError) as exc:
             return dict(status='not_applicable',reason=str(exc),admission=method_fit,task_acceptance='unmeasured')
+        from tools.research.optimal_capability import sensitivity_cost
+        reused=len(q.optimal_sensitivity.model_results)
+        method_fit.update(model_reuse=reused,model_reuse_status='validated_current_study_models',
+            planning=sensitivity_cost(len(q.optimal_sensitivity.steps),reused,method_fit['remaining_evaluations']))
     s=state(host)
     protocol=plain(q.protocol)
     if protocol!=s['spec']['analysis_protocol'] or (q.scoring_window_s is not None and q.scoring_window_s not in protocol['windows_s']):
@@ -447,6 +451,7 @@ def recover(host):
     boundary=read(folder/'boundary.json')
     elapsed=boundary['elapsed_s']
     value=read(folder/'result.json') if (folder/'result.json').exists() else dict(status='incomplete',task_acceptance='unmeasured',boundary=boundary)
+    if (folder/'worker_runtime.json').exists():value['worker_runtime']=read(folder/'worker_runtime.json')
     # New failed workers still carry scope; old receipts are never reinterpreted.
     if 'scoped_claim' not in value and (folder/'request.json').exists():
         request=read(folder/'request.json')
@@ -517,6 +522,11 @@ def compact_result(value, reference):
         missing=None if value.get('operation')=='input_sensitivity' else 'Verified input_sensitivity required for mathematical_response; equilibrium alone is not dynamic success',
         task_acceptance='unmeasured')
     trajectory=value.get('trajectory') or {}
+    if trajectory.get('method_version')=='sampled-affine-conic-minimax-v1':
+        summary['control_handoff'].update(request_fields=dict(candidate=value.get('candidate'),
+            method='capability_sequence',response_evidence=reference),
+            missing=None,remaining_checks='Current Study/candidate/implementation, original full ZOH horizon, input bounds/order, independent replay and physical execution binding; no automatic execution',
+            inherited_acceptance=False)
     cert=trajectory.get('certificate') or {}
     summary.update(task_acceptance='unmeasured',numerical_evidence=dict(reference=reference,
         pointer=(value.get('scoped_claim') or {}).get('numerical_result_pointer','')),

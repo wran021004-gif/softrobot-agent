@@ -681,9 +681,10 @@ def research_action_trace(host, limit=5):
         if not refs and receipt and receipt.get('output') in known:refs=[receipt['output']]
         decision=plan.get('decision') or {}
         return dict(request_id=request_id,action=plan.get('action',plan.get('operation')),
-            method=decision.get('selected_method',plan.get('operation')),
+            method=decision.get('selected_method',('controlled-capability-sensitivity-v1' if plan.get('optimal_sensitivity') else plan.get('capability_method')) or plan.get('operation')),
+            candidate=plan.get('candidate'),task_protocol_identity=digest(plan['protocol']) if plan.get('protocol') else None,
             agent_hypothesis={k:plan[k] for k in ('hypothesis','decision','expected_observation',
-                'weakening_observation','supporting_evidence') if k in plan},
+                'weakening_observation','supporting_evidence','interpretation','fixed_conditions','stopping_condition') if k in plan},
             execution_status=receipt['execution_status'] if receipt else 'pending',
             result_references=refs,receipt_output=receipt.get('output') if receipt else None,
             execution_id=receipt['execution_id'] if receipt else None,
@@ -700,6 +701,10 @@ def research_action_trace(host, limit=5):
         if key in rows:continue
         source=dict(reference=event['outputs'][0],pointer='/tool_use/input')
         rows[key]=item(key,{'action':use['name'],**use['input']},source,i)
+        if use['name']=='research_analysis':
+            prior=[r for r in rows.values() if r['_position']<i and r['agent_hypothesis']]
+            rows[key]['prior_intent_source']=max(prior,key=lambda r:r['_position'])['source'] if prior else None
+            rows[key]['hypothesis_effect']='unassessed; subsequent explicit Agent decision required'
         if event['kind']=='tool_request_error' or value.get('result',{}).get('status')=='error':
             # after_tool may persist a completed *protocol* receipt for a request
             # rejected before science admission. That is not a failed worker.

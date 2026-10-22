@@ -333,8 +333,8 @@ class ReportingSessionTests(unittest.TestCase):
                                 references=[reference],focus=['solver status'],constraints=['Saved evidence only']))))]))]))
             if len(main)==2:
                 self.assertEqual(len(sent),3)  # main -> Reporter -> main, same invocation
-                self.assertIn('latest_reports',wire['messages'][0]['content'])
-                self.assertIn('available',wire['messages'][0]['content'])
+                self.assertIn('latest_reports',wire['messages'][-1]['content'])
+                self.assertIn('available',wire['messages'][-1]['content'])
                 update(h,research_status='stopped')
             return response(request)
         with patch('tools.research.agent.load_credential'),patch.dict(os.environ,{'DEEPSEEK_API_KEY':'offline'}),\
@@ -357,7 +357,9 @@ class ReportingSessionTests(unittest.TestCase):
         self.assertLess(sequence.index('model_original_tool_feedback'),sequence.index('science_delivery_boundary'))
         self.assertLess(sequence.index('science_delivery_boundary'),sequence.index('reporter_completed'))
         self.assertLess(sequence.index('reporter_completed'),len(sequence)-1-sequence[::-1].index('model_decision_packet'))
-        self.assertEqual(main[1]['messages'][0]['content'].count('\nCURRENT_RESEARCH_PACKET\n'),1)
+        self.assertEqual(main[0]['messages'][0],main[1]['messages'][0])
+        self.assertTrue(main[1]['messages'][-1]['content'].startswith('CURRENT_RESEARCH_PACKET\n'))
+        self.assertEqual(sum(isinstance(m.get('content'),str) and m['content'].startswith('CURRENT_RESEARCH_PACKET\n') for m in main[1]['messages']),1)
         self.assertNotIn('report',json.loads(feedback[0]['result']['content'][0]['text']))
         atomic_json(h.store.root/'reporting_measurements.json',dict(usage=usage,report=reporter.entries(h)[-1][1]))
 
@@ -409,7 +411,7 @@ class ReportingSessionTests(unittest.TestCase):
                                 dict(id='native-science',type='function',function=dict(
                                 name='research_analysis',arguments=json.dumps(query)))]))
                         return httpx.Response(200,json=body)
-                    packet=json.loads(wire['messages'][0]['content'].split('\nCURRENT_RESEARCH_PACKET\n')[1])
+                    packet=json.loads(wire['messages'][-1]['content'].split('CURRENT_RESEARCH_PACKET\n')[1])
                     latest=packet['research']['latest_reports'][-1]
                     self.assertEqual(latest['reporter_status'],'unavailable' if outcome=='invalid_pointer' else 'available')
                     self.assertEqual(latest['delivery_mode'],'deterministic_only' if outcome=='invalid_pointer' else 'reporter_interpreted')

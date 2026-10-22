@@ -20,7 +20,8 @@ def freeze_family_variables(space, grant):
     from extensions.tendon_family.family_space import parameter_capabilities
     if (not isinstance(grant,dict) or set(grant)!={'version','variables'} or
             grant['version']!='family_sensitivity_v1' or not isinstance(grant['variables'],list)
-            or not grant['variables'] or len(set(grant['variables']))!=len(grant['variables'])):
+            or not grant['variables'] or any(not isinstance(v,str) for v in grant['variables'])
+            or len(set(grant['variables']))!=len(grant['variables'])):
         raise ValueError('EXPLICIT_VERSIONED_FAMILY_SENSITIVITY_GRANT_REQUIRED')
     request=dict(family_space_identity=digest(space),segment_count=max(space['executable_segment_counts']),
         tendon_count=space['executable_tendon_count_bounds'][0])
@@ -91,7 +92,8 @@ def method_admission(spec, query, used=0):
     return dict(status='not_applicable' if reasons else 'admissible', reasons=reasons,
         methods=required, expected_mathematical_evaluations=count, remaining_evaluations=remaining,
         model_builds=0 if query.optimal_sensitivity else 1,
-        model_reuse=len(query.optimal_sensitivity.model_results) if query.optimal_sensitivity else 0,
+        model_reuse=None if query.optimal_sensitivity else 0,
+        model_reuse_status='requires_saved_context_validation' if query.optimal_sensitivity else 'not_requested',
         required_candidate=plain(query.candidate),
         required_model_results=[plain(r) for r in query.optimal_sensitivity.model_results] if query.optimal_sensitivity else [],
         capability_solves=len(query.optimal_sensitivity.model_results) if query.optimal_sensitivity else 1,
@@ -185,6 +187,8 @@ def sensitivity_context(host, query):
     from schemas.platform import SessionInput
     from schemas.platform_analysis import EndpointLinearizedModel
     s = state(host); request = query.optimal_sensitivity; path = request.variable
+    if len(request.steps)==2 and not math.isclose(request.steps[0]/2,request.steps[1],rel_tol=1e-10,abs_tol=0.):
+        raise ValueError('EXPLICIT_STENCIL_REQUIRES_H_AND_HALF_H')
     family=s['spec'].get('start_mode')=='family_space'
     if (len(path.split('.')) != 3 or not path.startswith('segments.')
             or path.split('.')[-1] not in ('length_m','young_pa')

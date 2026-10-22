@@ -136,7 +136,7 @@ def mock_http(refs):
             finish='tool_calls'
         else:
             assert mains==2
-            packet=json.loads(wire['messages'][0]['content'].split('\nCURRENT_RESEARCH_PACKET\n')[1].split('\nPROTECTED CLOSEOUT:')[0])
+            packet=request_packet(wire)
             assert any(r['reporter_status']=='available' for r in packet['research']['latest_reports'])
             message=dict(role='assistant',content='OFFLINE FIXTURE: no scientific judgment or live admission.')
             finish='stop'
@@ -144,6 +144,15 @@ def mock_http(refs):
             choices=[dict(index=0,finish_reason=finish,message=message)],
             usage=dict(prompt_tokens=10,completion_tokens=2,total_tokens=12)))
     return httpx.MockTransport(respond)
+
+
+def request_packet(wire):
+    """Read both immutable historical system packets and new request-only tails."""
+    for message in reversed(wire['messages']):
+        content=message.get('content')
+        if isinstance(content,str) and 'CURRENT_RESEARCH_PACKET\n' in content:
+            return json.loads(content.split('CURRENT_RESEARCH_PACKET\n')[1].split('\nPROTECTED CLOSEOUT:')[0])
+    return None
 
 
 def audit(run_id):
@@ -200,9 +209,8 @@ def audit(run_id):
     main_wires=[w for w,r in zip(wires,requests) if r['purpose']=='conversation']
     delivered=False
     if len(main_wires)==2:
-        content=main_wires[1]['messages'][0]['content']
-        if '\nCURRENT_RESEARCH_PACKET\n' in content:
-            packet=json.loads(content.split('\nCURRENT_RESEARCH_PACKET\n')[1].split('\nPROTECTED CLOSEOUT:')[0])
+        packet=request_packet(main_wires[1])
+        if packet:
             delivered=any(r['reporter_status']=='available' and r['delivery_mode']=='reporter_interpreted'
                 for r in packet['research']['latest_reports'])
     completed=[i for i,e in enumerate(events) if e['kind']=='reporter_completed']

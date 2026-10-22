@@ -74,6 +74,14 @@ def model_context(configuration):
     from extensions.tendon_family.scene import assemble
 
     inp=SessionInput.model_validate(configuration)
+    if inp.policy.controller.extension_id=='controller.gvs_nmpc':
+        from extensions.tendon_family.gvs_basis import resolve_basis
+        physics=physics_for(inp);scene=assemble(inp,physics)
+        # Use the existing physical execution identity, never the affine model hash.
+        spec=dict(identity=scene['experiment_spec']['dynamics_model_identity'],design_identity=physics['design_identity'],
+            coordinate_order=list(resolve_basis(inp.robot.structure.data,inp.policy.controller.parameters.data['recipe']['basis']).coordinate_order),
+            tendon_order=[t['entity'] for t in physics['tendons']])
+        return inp,physics,scene,spec
     control=checked_control(inp)
     spec=SorosimModel(dict(basis=control.recipe.basis,
         gauss_per_interval=control.solver.gauss_per_interval)).convert(
@@ -99,6 +107,7 @@ def seed_control(host, request, operation_key=None, plan=None):
     """Candidate-owned bounded inputs; explicit ZOH time/channel transfer or pretension."""
     started=time.perf_counter()
     try:
+        if request.method=='capability_sequence':return capability_seed(host,request,operation_key)
         if request.method!='baseline':return guided_seed(host,request,operation_key,plan)
         return _seed_control(host,request,operation_key)
     finally:
@@ -150,6 +159,74 @@ def _seed_control(host,request,operation_key):
     binding(cfg,trajectory)  # Reject bounds, dimensions and ineffective execution modes.
     source=save(host,dict(source_kind='explicit_control_schedule_v1',task_acceptance='unmeasured',
         trajectory=trajectory,provenance=provenance),'candidate_control_initialization')
+    entry=dict(candidate=plain(request.candidate),source=source,task_acceptance='unmeasured')
+    update(host,control_initializations=[*state(host).get('control_initializations',[]),entry])
+    return entry
+
+
+def capability_seed(host,request,operation_key=None):
+    """Registered SOCP witness -> existing ZOH schedule; no solve or physical launch."""
+    from schemas.platform_analysis import EndpointLinearizedModel, TaskAnalysisProtocol, TaskAnalysisRequirement
+    from extensions.math_analysis.trajectory import prepare_trajectory, verify_witness
+    from tools.research.optimal_capability import CONIC
+    from tools.research.task_constraints import describe_analysis_requirements
+    s=state(host);reference=plain(request.response_evidence)
+    if reference not in s.get('analysis_results',[]):raise ValueError('REGISTERED_CURRENT_ANALYSIS_REQUIRED')
+    candidate=verify_candidate(host,request.candidate);cfg=candidate['configuration'];raw=host.store.artifact(reference)
+    tr=raw.get('trajectory') or {}
+    if (raw.get('candidate')!=plain(request.candidate) or raw.get('implementation')!=s['freeze']
+            or raw.get('status')!='computed' or raw.get('operation')!='task_capability'
+            or tr.get('method_version')!=CONIC or raw.get('optimal_sensitivity')
+            or raw.get('requested_operation',{}).get('capability_method')!=CONIC):
+        raise ValueError('CURRENT_CANDIDATE_FROZEN_SOCP_RESULT_REQUIRED')
+    m=EndpointLinearizedModel.model_validate(raw['model']);p=TaskAnalysisProtocol.model_validate(raw['protocol'])
+    req=TaskAnalysisRequirement.model_validate(raw['task_analysis']);outer=raw['binding']
+    inp,physics,scene,execution=model_context(cfg)
+    expected=dict(candidate=plain(request.candidate),candidate_id=candidate['candidate_id'],
+        effective_configuration_identity=digest(cfg),task_identity=digest(cfg['task']),
+        source_identity=candidate['source_identity'],tendon_order=execution['tendon_order'],
+        coordinate_order=execution['coordinate_order'])
+    if (any(outer.get(k)!=v or m.binding.get(k)!=v for k,v in expected.items())
+            or plain(p)!=s['spec']['analysis_protocol'] or m.protocol_identity!=digest(plain(p))
+            or m.binding.get('analysis_protocol_identity')!=m.protocol_identity
+            or plain(req)!=plain(describe_analysis_requirements(inp,outer))
+            or raw['operating_point']!=m.operating_point
+            or raw['requested_operation'].get('operating_point') not in ('controller_start_input','standardized_initial_pretension')
+            or any(v.units!='N' or v.dimension!=1 for v in m.input_definition)
+            or [v.entity for v in m.input_definition]!=execution['tendon_order']):
+        raise ValueError('SOCP_MODEL_TASK_INPUT_OR_OPERATING_POINT_MISMATCH')
+    provenance=tr.get('provenance',{})
+    if any(provenance.get(k)!=digest(v) for k,v in (
+            ('model_identity',plain(m)),('requirement_identity',plain(req)),('protocol_identity',plain(p)))):
+        raise ValueError('SOCP_NUMERICAL_PROVENANCE_MISMATCH')
+    info=dict(coverage=[])
+    scope,dynamics,initial,rows,lower,upper,_=prepare_trajectory(m,req,p,info,tr.get('initial_delta_state'))
+    timing=inp.task.timing;count=round(timing.duration_s/timing.control_period_s)
+    delta=np.asarray(tr.get('delta_input_n'),dtype=float);applied=np.asarray(tr.get('applied_input_n'),dtype=float)
+    if (scope['start_time_s']!=0 or scope['step_count']!=count or p.period_s!=timing.control_period_s
+            or p.duration_s!=timing.duration_s or tr.get('horizon')!=json.loads(json.dumps(scope))
+            or np.any(initial!=0) or delta.shape!=(count,len(m.u0)) or applied.shape!=delta.shape
+            or not np.isfinite(delta).all() or not np.isfinite(applied).all()
+            or not np.allclose(applied,delta+np.asarray(m.u0),rtol=0,atol=1e-12)
+            or np.any(delta.ravel()<lower) or np.any(delta.ravel()>upper)):
+        raise ValueError('COMPLETE_ALIGNED_FINITE_BOUNDED_SOCP_SEQUENCE_REQUIRED')
+    replay=verify_witness(m,dynamics,initial,delta,rows,scope,p.endpoint_check_atol)
+    if (not tr.get('replay',{}).get('numerically_valid') or not replay.get('finite') or not rows
+            or len(replay['records'])!=len(rows) or replay['max_prediction_replay_error']>p.endpoint_check_atol):
+        raise ValueError('INDEPENDENT_SOCP_REPLAY_REQUIRED')
+    trajectory=dict(times_s=[i*timing.control_period_s for i in range(count+1)],tensions_n=applied.tolist(),
+        tendon_order=execution['tendon_order'],model_identity=execution['identity'],
+        design_identity=execution['design_identity'],task_identity=digest(cfg['task']))
+    binding(cfg,trajectory)
+    source=save(host,dict(source_kind='explicit_control_schedule_v1',task_acceptance='unmeasured',inherited_acceptance=False,
+        trajectory=trajectory,provenance=dict(control_initialization='capability_sequence_v1',operation_key=operation_key,
+            mathematical_result=reference,local_model_identity=digest(plain(m)),
+            mathematical_model_identity=m.binding['model_identity'],execution_model_identity=execution['identity'],
+            input_identity=digest(applied.tolist()),independent_replay=replay,
+            numerical_task_passed=replay['passed'],diagnostic_only=not replay['passed'],
+            optimality_status=tr.get('optimality_status'),inherited_acceptance=False,
+            time_rule='Complete original ZOH grid; no interpolation, truncation, padding or channel transfer')),
+        'candidate_control_initialization')
     entry=dict(candidate=plain(request.candidate),source=source,task_acceptance='unmeasured')
     update(host,control_initializations=[*state(host).get('control_initializations',[]),entry])
     return entry
@@ -276,6 +353,11 @@ def calculate(request,folder):
     result=playback_tensions(inp,physics,scene,request['trajectory']['tensions_n'],folder)
     result.update(candidate=request['candidate'],source_reference=request['source_reference'],
         task_identity=digest(plain(inp.task)),mathematical_model_identity=request['trajectory']['model_identity'])
+    source=store.artifact(request['source_reference'])
+    if source.get('provenance',{}).get('control_initialization')=='capability_sequence_v1':
+        result.update(execution_model_identity=request['trajectory']['model_identity'],
+            mathematical_model_identity=source['provenance']['mathematical_model_identity'],
+            local_model_identity=source['provenance']['local_model_identity'])
     return result
 
 
