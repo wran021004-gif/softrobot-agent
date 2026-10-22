@@ -49,11 +49,15 @@ def analysis_capabilities(configuration, requirements, protocol, *, model=None, 
         from tools.research.optimal_capability import CONIC,SENSITIVITY,dependencies
         env=dependencies()
         for method in (CONIC,SENSITIVITY):
-            if method not in mathematical_methods:continue
             count=2 if method==CONIC else 5
+            reasons=[]
+            if not mathematical_methods.get(method) or not mathematical_methods.get(CONIC):reasons.append('method_not_authorized')
+            if not env['available']:reasons.append('worker_dependency_unavailable')
+            if remaining_evaluations is not None and remaining_evaluations<count:reasons.append('insufficient_budget')
+            if method==SENSITIVITY:reasons.append('candidate_variable_and_saved_model_stencil_validation_required')
             rows.append(dict(operation='task_capability',capability_method=CONIC,
                 submode='optimal_sensitivity' if method==SENSITIVITY else None,method_version=method,
-                status='conditional' if env['available'] else 'not_applicable',dependency_environment=env,
+                status='not_applicable' if reasons else 'conditional',reasons=reasons,dependency_environment=env,
                 evaluations=count,evaluation_rule='2: one model construction plus one conic solve' if method==CONIC else '1+4*k for k=1 or 2 explicit central step sizes; 3 or 5 existing registered models',
                 remaining_evaluations=remaining_evaluations,
                 budget_allowed=None if remaining_evaluations is None else remaining_evaluations>=count,

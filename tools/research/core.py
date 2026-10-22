@@ -51,6 +51,10 @@ def read_evidence(host, query, *, record_read=True):
         from extensions.tendon_family.family_space import parameter_capabilities
         if q.pointer or 'parameters' not in value:raise ValueError('CAPABILITIES_VIEW_REQUIRES_WHOLE_CANDIDATE')
         value=parameter_capabilities(s['spec']['family_space'],value['parameters'])
+    elif q.view=='mathematical_capabilities':
+        from tools.research.optimal_capability import candidate_methods
+        if q.pointer:raise ValueError('MATHEMATICAL_CAPABILITIES_REQUIRE_WHOLE_CANDIDATE')
+        value=candidate_methods(host,plain(q.reference))
     elif q.view=='summary':
         from tools.research.research_context import compact_evidence
         value=compact_evidence(value,plain(q.reference),q.pointer)

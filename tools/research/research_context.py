@@ -726,6 +726,12 @@ def agent_decision_brief(host):
         brief['mathematical_capabilities']=analysis_capabilities(cfg,requirements,s['spec']['analysis_protocol'],
             mathematical_methods=s['spec'].get('mathematical_methods'),
             remaining_evaluations=max(0,s['spec']['budgets']['mathematical_evaluations']-s.get('mathematical_evaluations',0)))
+        if s.get('candidates') and s['spec'].get('mathematical_methods'):
+            from tools.research.optimal_capability import candidate_methods
+            candidate=list(s['candidates'].values())[-1]
+            availability=candidate_methods(host,candidate)
+            brief['optimal_sensitivity_readiness']={k:availability[k] for k in ('method','status','reasons','remaining_evaluations','planning')}
+            brief['optimal_sensitivity_readiness']['detail_query']=dict(reference=candidate,view='mathematical_capabilities')
     selected=current_reports(host)[-2:]
     brief['latest_reports']=[reporter_handoff_summary(host,r,saved) for r,saved in selected]
     from tools.research.evidence_views import result_card

@@ -62,6 +62,7 @@ def extend_engineering_counts(spec, changes, authorization):
 def resolve(path, profile=None, *, backend_profile=None):
     path = Path(path).resolve()
     study = read(path)
+    family_sensitivity=study.pop('family_sensitivity_variables',None)
     methods=study.pop('mathematical_methods',None)
     if methods is not None:
         if (not isinstance(methods,dict) or not methods or
@@ -310,6 +311,10 @@ def resolve(path, profile=None, *, backend_profile=None):
                 source=dict(family_space_identity=study['family_space_identity'],request=bootstrap['request']),
                 reason='Host.create and compile_input require concrete robot signals and backend checks',
                 scientific_candidate=False, candidate_pool_member=False))
+    if family_sensitivity is not None:
+        from tools.research.optimal_capability import freeze_family_variables
+        if not family_mode:raise ValueError('FAMILY_SENSITIVITY_REQUIRES_FAMILY_SPACE')
+        study['family_sensitivity_variables']=freeze_family_variables(family_space,family_sensitivity)
     if local_search is not None:
         from tools.research.contracts import LocalControlSearchSettings
         if not isinstance(local_search,list) or not local_search:
