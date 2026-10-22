@@ -109,6 +109,34 @@ def capability_summary(trajectory):
     return summary
 
 
+def signed_score_comparisons(summary, reference):
+    """Direction of B's recorded controlled comparisons, never optimal ranking.
+
+    computed_estimate is established by comparison_context/compare_control_response:
+    matched task, model family, input coordinates, horizon, sampling and solve budget.
+    All locations below name raw B fields, not projection aliases.
+    """
+    comparison=summary.get('structural_comparison')
+    if not comparison or comparison['status']!='computed_estimate':
+        return dict(status='not_comparable',reason='No recorded controlled computed comparison')
+    candidate=summary['best_found_violation'];baseline=comparison['baseline_violation']
+    fixed=comparison['fixed_control_violation']
+    scope={k:comparison[k] for k in ('variable','step','baseline_result','control_alignment','reoptimization','attribution','derivative_scope')}
+    def location(pointer):return dict(reference=reference,pointer=pointer)
+    def direction(name,before,after,pointer):
+        delta=after-before
+        return dict(comparison=name,baseline_score=before,candidate_score=after,delta=delta,
+            smaller_is_better=True,computed_score_direction='worse' if delta>0 else 'better' if delta<0 else 'unchanged',
+            source_references=[location(pointer),location('/trajectory/best_found_violation')])
+    return dict(status='computed_estimate',definition='G = max(normalized_constraint_violation); smaller is better',
+        comparisons=[direction('reoptimized_candidate_vs_reoptimized_baseline',baseline,candidate,
+                '/trajectory/structural_comparison/baseline_violation'),
+            direction('candidate_reoptimized_vs_candidate_fixed_old_control',fixed,candidate,
+                '/trajectory/structural_comparison/fixed_control/best_found_violation')],
+        comparison_scope=scope,scope_source=location('/trajectory/structural_comparison'),
+        optimality_status='uncertified',limitation='Computed local-model scores only; no optimal structural ranking or MuJoCo task acceptance')
+
+
 def populate_mathematics(mathematics, trajectory, reference):
     """F0 quantity statuses describe the exact checked object, not stronger claims."""
     from schemas.research_reporting import EvidenceLocation, MathematicalQuantity, RecordedField

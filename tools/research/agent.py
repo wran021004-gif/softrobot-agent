@@ -390,6 +390,43 @@ async def wait_training(host):
             return
         await asyncio.sleep(2.)
 
+async def deliver_science_before_decision(host,agent,transport):
+    """Settle L1 only after native results are paired and durably recoverable.
+
+    This is an intra-invocation boundary, not session_handoff.safe_boundary.
+    The latter additionally requires a completed invocation and remains unchanged.
+    """
+    from tools.research.reporter import current_reports, complete_reports
+    from tools.research.session_handoff import unmatched
+    if pending(host) or state(host)['pilot'].get('unconsumed_response'):
+        raise ValueError('SCIENCE_DELIVERY_REQUIRES_CONSUMED_PROVIDER_RESPONSE')
+    if not any(v['interpretation_status']=='deferred' for _,v in current_reports(host)):return
+    if state(host).get('pending') or unmatched(agent.messages):
+        raise ValueError('SCIENCE_DELIVERY_REQUIRES_PAIRED_SETTLED_TOOLS')
+    with host.store.connect(True) as db:
+        if db.execute('SELECT COUNT(*) FROM calls WHERE run_id=? AND receipt IS NULL',(host.run_id,)).fetchone()[0]:
+            raise ValueError('SCIENCE_DELIVERY_REQUIRES_SETTLED_RECEIPTS')
+    original={}
+    for event in host.store.events(host.run_id):
+        if event['kind']=='model_original_tool_feedback':
+            value=host.store.artifact(event['outputs'][0]);original[value['tool_use']['toolUseId']]=value['result']
+    for message in agent.messages:
+        for block in message['content']:
+            result=block.get('toolResult')
+            # Public SDK offload may replace large evidence-read text with a
+            # retrievable preview. Identity/status pairing must survive; original
+            # content is already immutable in Store and the SDK stash.
+            if result and result['toolUseId'] in original and result['status']!=original[result['toolUseId']]['status']:
+                raise ValueError('SCIENCE_DELIVERY_ORIGINAL_TOOL_STATUS_MISMATCH')
+    await agent._session_manager.save_snapshot(agent,is_latest=True)
+    record(host,'science_delivery_boundary',dict(session_id=agent._session_manager.session_id,
+        sdk_message_identity=digest(agent.messages),paired=True,receipts_settled=True))
+    await complete_reports(host,transport)
+    if pending(host) or state(host)['pilot'].get('unconsumed_response') or any(
+            v['interpretation_status']=='deferred' for _,v in current_reports(host)):
+        raise ValueError('SCIENCE_DELIVERY_INCOMPLETE_BLOCKS_DECISION')
+
+
 async def converse(host,*,session_handoff=False):
     from tools.research.state import require_authorization
     require_authorization(host)
@@ -517,7 +554,7 @@ async def converse(host,*,session_handoff=False):
         native[-1].tool_spec={**native[-1].tool_spec,'inputSchema':{'json':schema}}
     if state(host)['spec'].get('research_decisions') and not state(host)['spec'].get('rl_evaluation_source'):
         native.append(PythonAgentTool('research_investigate',dict(name='research_investigate',
-            description='Investigate an explicit scientific question using saved results and optional exact reads only. Returns deterministic report now; separate Reporter interpretation is delivered at a settled outer turn. No new scientific computation; internal reads give no SELECT/STOP credit.',
+            description='Submit a read-only investigation of saved results and optional exact reads. Returns a saved report reference; formal interpretation arrives before the next research decision. No new scientific computation; internal reads give no SELECT/STOP credit.',
             inputSchema={'json':InvestigationRequest.model_json_schema()}),handler('investigate')))
     if formal:
         native[1].tool_spec={**native[1].tool_spec,'description':'Unavailable outside scoped milestone evidence'}
@@ -552,11 +589,20 @@ async def converse(host,*,session_handoff=False):
     try:
         saved=state(host)['pilot'].get('unconsumed_response')
         reporter_saved=bool(saved and (received(host,saved) or {}).get('purpose')=='reporter')
+        # An interrupted pre-decision Reporter owns a saved tool-result snapshot,
+        # not a completed invocation. Verify its exact Store anchor before using
+        # the existing incomplete-history recovery path.
+        intra_reporter=False
+        if reporter_saved:
+            anchors=[host.store.artifact(e['outputs'][0]) for e in host.store.events(host.run_id)
+                if e['kind']=='science_delivery_boundary']
+            if anchors and anchors[-1]['session_id']==agent._session_manager.session_id:
+                intra_reporter=anchors[-1]['sdk_message_identity']==digest(agent.messages)
         if state(host)['pilot'].get('handoff'):
             from tools.research.session_handoff import reconcile
-            agent=await reconcile(host,build_session,host.store.root/'framework_sessions',allow_incomplete=not reporter_saved)
+            agent=await reconcile(host,build_session,host.store.root/'framework_sessions',allow_incomplete=not reporter_saved or intra_reporter)
         else:
-            trusted_history(host,agent,allow_incomplete=not reporter_saved)
+            trusted_history(host,agent,allow_incomplete=not reporter_saved or intra_reporter)
         await complete_reports(host,boundary.inner,recover_only=True)
         if unmatched(agent.messages):await recover_feedback(host,agent)
     except BaseException:
@@ -575,6 +621,8 @@ async def converse(host,*,session_handoff=False):
             return
         if s['pilot'].get('unconsumed_response'):
             saved=s['pilot']['unconsumed_response']
+            if (received(host,saved) or {}).get('purpose')=='reporter':
+                raise ValueError('REPORTER_RESPONSE_MUST_BE_ARCHIVED_BEFORE_MAIN_DECISION')
             ev=next(e for e in host.store.events(host.run_id) if e['kind']=='r3_request' and e['request_id']==saved)
             original=host.store.artifact(host.store.artifact(ev['outputs'][0])['request'])
             agent.system_prompt=next(m['content'] for m in original['messages'] if m['role']=='system')
@@ -600,6 +648,8 @@ async def converse(host,*,session_handoff=False):
             event.cancel='Study stopped while waiting'
             return
         guard(host)
+        if s['spec'].get('research_decisions'):
+            await deliver_science_before_decision(host,agent,boundary.inner)
         current=decision_packet(host)
         if formal:agent.tool_registry.registry.pop('experience_retrieve',None)
         if 'research' in current:
@@ -703,7 +753,7 @@ def decision_packet(host):
                 patch='Generation v2 controller_recipe/controller_solver sparse patches use registered owner validation; settling remains task-owned'),
             candidates=[r for r in s['candidates'].values() if host.store.artifact(r)['profile_identity']==s['profile']['identity']][-spec.get('research_decisions',{}).get('context_limits',{}).get('candidates',3):],family_space=decision_summary(spec['family_space'],s['family_space_reference'],
                 dict(actions=spec['allowed_plan_actions'],capabilities=spec['capabilities'])),analysis_protocol=spec['analysis_protocol'],
-            guidance='Use exact evidence refs and a typed decision in every research_plan. evidence_read and research_investigate permit drill-down. Reporter interpretations are hypotheses, never authoritative facts or action choices. New designs need explicit control adaptation. Do not infer global feasibility/infeasibility. Stop at first complete pass; publicly read and select it. Retrieve the exact stop_result_index before STOP; cite every new result.')
+            guidance='Tool results acknowledge execution and saved references; use latest_reports L1 for scientific decisions. Signed score direction, comparison scope and optimality come from structured facts. Use exact evidence refs and a typed decision in every research_plan. evidence_read and research_investigate permit drill-down. Reporter interpretations are hypotheses, never authoritative facts or action choices. Choose the next research method freely. New designs need explicit control adaptation. Do not infer global feasibility/infeasibility. Stop at first complete pass; publicly read and select it. Retrieve the exact stop_result_index before STOP; cite every new result.')
     result=packet(host)
     spec=result.pop('specification')
     result['configuration_identity']=spec['resolved_identity']

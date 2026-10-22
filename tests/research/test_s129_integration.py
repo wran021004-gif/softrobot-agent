@@ -43,23 +43,30 @@ class IntegrationTests(unittest.TestCase):
         pair,refs=self.saved_pair()
         for ref in refs:reporter.scientific_feedback(self.h,dict(reference=ref),{})
         packet=agent_decision_brief(self.h)
-        views=[r['results'][0]['mathematics'] for r in packet['latest_reports']]
+        self.assertNotIn('scoped_claim',packet.get('latest_scientific_feedback') or {})
+        views=[r['findings'][0]['mathematics'] for r in packet['latest_reports']]
         self.assertEqual(len(views),2)
         for view,key in zip(views,('baseline','changed')):
             self.assertEqual(view['capability']['best_found_violation'],pair[key]['trajectory']['best_found_violation'])
             self.assertFalse(view['capability']['verification_scope']['optimality'])
-            self.assertTrue(all(not s['success'] and s['iterations']==100 for s in view['capability']['solver_starts']))
+            self.assertEqual(view['capability']['solver_termination']['converged'],0)
+            self.assertEqual(view['capability']['solver_termination']['max_iterations'],100)
             self.assertTrue(view['scope']['constraint_coverage'])
-            self.assertTrue(view['problem'])
+            self.assertTrue(view['problem_definition'])
             self.assertTrue(view['unresolved'])
             for quantity in view['quantities']:
                 if quantity['source']:
                     from tools.research.core import read_evidence
                     self.assertEqual(read_evidence(self.h,quantity['source'],record_read=False),quantity['value'])
-        comparison=views[1]['capability']['structural_comparison']['quantities']
-        self.assertAlmostEqual(views[1]['capability']['structural_comparison']['fixed_control_violation'],-.0829884411)
-        self.assertAlmostEqual(comparison['fixed_control_delta']['value'],.1170115105)
-        self.assertAlmostEqual(comparison['reoptimized_control_delta']['value'],.1000004343)
+        comparisons=views[1]['capability']['score_comparisons']['comparisons']
+        self.assertAlmostEqual(comparisons[0]['delta'],.1000004343)
+        self.assertEqual(comparisons[0]['computed_score_direction'],'worse')
+        self.assertAlmostEqual(comparisons[1]['delta'],-.0170110762)
+        self.assertEqual(comparisons[1]['computed_score_direction'],'better')
+        from tools.research.core import read_evidence
+        for comparison in comparisons:
+            actual=[read_evidence(self.h,source,record_read=False) for source in comparison['source_references']]
+            self.assertEqual(actual,[comparison['baseline_score'],comparison['candidate_score']])
         wire=json.dumps(views)
         for key in ('"states"','"discrete_dynamics"','"applied_input_n"'):self.assertNotIn(key,wire)
 
@@ -78,7 +85,7 @@ class IntegrationTests(unittest.TestCase):
             self.assertEqual(asyncio.run(recover_feedback(self.h,agent)),1)
             result=agent.messages[-1]['content'][0]['toolResult']
             value=json.loads(result['content'][0]['text'])
-            self.assertEqual(value['report']['results'][0]['identity']['result']['reference'],refs[0])
+            self.assertEqual(value['scientific_result_reference'],refs[0])
             self.assertEqual(result['toolUseId'],'old-math')
             # A second interruption uses persisted original feedback byte-for-byte.
             agent.messages=agent.messages[:1]
@@ -113,6 +120,13 @@ class IntegrationTests(unittest.TestCase):
         ref=save(self.h,independent);update(self.h,analysis_results=[*refs,ref])
         relation=reporter.assemble(self.h,[refs[0],ref],question='Unpaired model estimates').relations[0]
         self.assertIsNone(relation.comparable)
+        view=mathematical_decision_view(plain(reporter._card(self.h,ref)))
+        self.assertEqual(view['capability']['score_comparisons']['status'],'not_comparable')
+        independent['trajectory']['structural_comparison']=deepcopy(pair['changed']['trajectory']['structural_comparison'])
+        independent['trajectory']['structural_comparison']['status']='inconclusive'
+        ref=save(self.h,independent);update(self.h,analysis_results=[*refs,ref])
+        view=mathematical_decision_view(plain(reporter._card(self.h,ref)))
+        self.assertEqual(view['capability']['score_comparisons']['status'],'not_comparable')
 
     def test_multi_result_receipt_and_missing_binding(self):
         _,refs=self.saved_pair()
@@ -143,7 +157,7 @@ class IntegrationTests(unittest.TestCase):
         reports=reporter.entries(self.h)
         skipped=next(v for _,v in reports if v['interpretation_for']==repeated['report_reference'])
         self.assertEqual(skipped['interpretation_status'],'skipped')
-        self.assertEqual(skipped['report'],repeated['report'])
+        self.assertEqual(skipped['report'],self.h.store.artifact(repeated['report_reference'])['report'])
         investigation=reporter.investigate(self.h,dict(question='Explicitly compare the repetition',references=[second]))
         asyncio.run(reporter.complete_reports(self.h,httpx.MockTransport(respond)))
         self.assertEqual(len(calls),2)

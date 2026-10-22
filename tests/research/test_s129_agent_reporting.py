@@ -3,6 +3,7 @@ import asyncio
 from copy import deepcopy
 import json
 import os
+from pathlib import Path
 import unittest
 from unittest.mock import patch
 from unittest.mock import AsyncMock
@@ -70,8 +71,10 @@ class AgentReportingTests(unittest.TestCase):
     def test_automatic_physics_math_search_and_rl_reports_preserve_f0_facts(self):
         before=state(self.h);reference=self.physical()
         auto=reporter.scientific_feedback(self.h,dict(result=dict(reference=reference)),before)
-        self.assertEqual(auto['report']['mode'],'result_summary')
-        speed=next(m for m in auto['report']['results'][0]['metrics'] if m['name']=='holding_speed')
+        self.assertNotIn('report',auto)
+        self.assertEqual(auto['scientific_result_reference'],reference)
+        self.assertEqual(self.h.store.artifact(auto['report_reference'])['report']['mode'],'result_summary')
+        speed=next(m for m in self.h.store.artifact(auto['report_reference'])['report']['results'][0]['metrics'] if m['name']=='holding_speed')
         self.assertEqual((speed['value'],speed['threshold'],speed['unit'],speed['passed']),(.04,.02,'m/s',False))
         baseline=self.h.store.artifact(reference);variant=deepcopy(baseline)
         variant['acceptance']['components']['holding_speed']['value']=.05
@@ -112,8 +115,10 @@ class AgentReportingTests(unittest.TestCase):
             reads=[dict(reference=reference,view='fields',pointer='/acceptance/components/holding_speed',
                 fields=['value','limit','passed'])])
         result=reporter.investigate(self.h,request)
-        self.assertEqual(result['report']['question'],request['question'])
-        self.assertEqual(result['report']['mode'],'investigation')
+        self.assertNotIn('report',result)
+        self.assertEqual(result['result_count'],1)
+        self.assertEqual(self.h.store.artifact(result['report_reference'])['report']['question'],request['question'])
+        self.assertEqual(self.h.store.artifact(result['report_reference'])['report']['mode'],'investigation')
         self.assertEqual(registered_references(self.h),known)
         self.assertEqual(state(self.h),before)
         self.assertNotIn(result['report_reference'],known)
@@ -126,7 +131,7 @@ class AgentReportingTests(unittest.TestCase):
         asyncio.run(reporter.complete_reports(self.h,httpx.MockTransport(respond)))
         final=reporter.entries(self.h)[-1][1]
         self.assertEqual(final['interpretation_status'],'available')
-        self.assertEqual(final['report']['results'],initial['report']['results'])
+        self.assertEqual(final['report']['results'],self.h.store.artifact(initial['report_reference'])['report']['results'])
         self.assertEqual(self.h.store.artifact(reference),before)
         self.assertEqual(self.h.store.remaining()['used']['model_calls'],1)
         self.assertEqual(len(sent[0]['messages']),2);self.assertNotIn('tools',sent[0])
@@ -145,7 +150,7 @@ class AgentReportingTests(unittest.TestCase):
                     lambda request:reporter_response(request,malicious=malicious,finish=finish))))
             final=reporter.entries(self.h)[-1][1]
             self.assertEqual(final['interpretation_status'],'unavailable')
-            self.assertEqual(final['report'],initial['report'])
+            self.assertEqual(final['report'],self.h.store.artifact(initial['report_reference'])['report'])
             self.assertNotIn('unconsumed_response',state(self.h)['pilot'])
         self.assertEqual(self.h.store.artifact(reference),before)
         self.assertEqual(self.h.store.remaining()['used']['model_calls'],2)
@@ -202,6 +207,19 @@ class AgentReportingTests(unittest.TestCase):
         update(self.h,plans=[ref]);intent=research_intent(self.h)['last_research']
         self.assertEqual(intent['agent_hypothesis']['decision']['hypothesis_id'],'H-fixture')
         self.assertEqual(intent['actual_result'],reference)
+        from tools.research.research_context import research_action_trace
+        trace=research_action_trace(self.h)
+        self.assertEqual(trace['total'],1)
+        entry=trace['recent'][0]
+        self.assertEqual(read_evidence(self.h,entry['source'],record_read=False),plan)
+        self.assertEqual(entry['agent_hypothesis']['hypothesis'],'Damping may reduce speed')
+        self.assertEqual(entry['result_references'],[reference])
+        self.assertEqual(entry['receipt_output'],json.loads(self.h.store.lookup(self.h.run_id,key)['receipt'])['output'])
+        # Rejected research is retained; ordinary reads are not new research actions.
+        for name in ('evidence_read','research_analysis'):
+            record(self.h,'tool_request_error',dict(tool_use=dict(name=name,toolUseId=name,input={'operation':'fixture'}),error='fixture'))
+        trace=research_action_trace(self.h)
+        self.assertEqual((trace['total'],trace['failed_or_rejected']),(2,1))
         report=reporter.assemble(self.h,[reference])
         self.assertTrue(any(f.name=='agent_intent/weakening_observation' for f in report.results[0].recorded_context))
 
@@ -251,7 +269,10 @@ class ReportingSessionTests(unittest.TestCase):
                 old_sizes.append(byte_size(old_messages))
                 self.assertLess(byte_size(agent.messages),byte_size(old_messages))
                 self.assertNotIn('historical payload',json.dumps(agent.messages))
-                packet=json.loads(agent.messages[0]['content'][0]['text'].split('\n',1)[1])
+                self.assertIn('CURRENT_RESEARCH_PACKET',agent.messages[0]['content'][0]['text'])
+                self.assertNotIn('latest_reports',agent.messages[0]['content'][0]['text'])
+                from tools.research.agent import decision_packet
+                packet=decision_packet(h)
                 intent=packet['research']['research_intent']['last_research']
                 self.assertEqual(intent['agent_hypothesis']['decision']['hypothesis_id'],'H-fixture')
                 self.assertEqual(intent['agent_hypothesis']['weakening_observation'],'Higher speed')
@@ -272,7 +293,7 @@ class ReportingSessionTests(unittest.TestCase):
             await boundary.aclose()
         asyncio.run(exercise())
 
-    def test_native_investigation_round_delivers_report_next_session_and_separate_usage(self):
+    def test_native_investigation_delivers_l1_before_next_model_in_same_invocation(self):
         h=cold_host();p=deepcopy(state(h)['pilot']);p['session_handoff_live_admitted']=True;update(h,pilot=p)
         reference=save(h,dict(status='computed',operation='offline_fixture',solver_status='iteration_limit'),'synthetic_fixture')
         sent=[];main=[]
@@ -287,7 +308,8 @@ class ReportingSessionTests(unittest.TestCase):
                         tool_calls=[dict(id='original-investigation-id',type='function',function=dict(
                             name='research_investigate',arguments=json.dumps(dict(question='Does saved solver status establish success?',
                                 references=[reference],focus=['solver status'],constraints=['Saved evidence only']))))]))]))
-            if len(main)==3:
+            if len(main)==2:
+                self.assertEqual(len(sent),3)  # main -> Reporter -> main, same invocation
                 self.assertIn('latest_reports',wire['messages'][0]['content'])
                 self.assertIn('available',wire['messages'][0]['content'])
                 update(h,research_status='stopped')
@@ -296,17 +318,120 @@ class ReportingSessionTests(unittest.TestCase):
                 patch('tools.research.core.guard'),patch('tools.research.agent.guard'),\
                 patch('httpx.AsyncHTTPTransport',return_value=httpx.MockTransport(respond)):
             asyncio.run(converse(h,session_handoff=True))
-        self.assertEqual(len(sent),4);self.assertEqual(len(main),3)
+        self.assertEqual(len(sent),3);self.assertEqual(len(main),2)
         feedback=[h.store.artifact(e['outputs'][0]) for e in h.store.events(h.run_id) if e['kind']=='model_original_tool_feedback']
         self.assertEqual(feedback[0]['result']['toolUseId'],'original-investigation-id')
         self.assertEqual(feedback[0]['result']['status'],'success')
         self.assertIsNotNone(h.store.lookup(h.run_id,'native-original-investigation-id')['receipt'])
         usage=reporter.provider_usage(h)
-        self.assertEqual((usage['conversation']['prompt_tokens'],usage['reporter']['prompt_tokens']),(30,17))
-        self.assertEqual(h.store.remaining()['used']['model_calls'],4)
+        self.assertEqual((usage['conversation']['prompt_tokens'],usage['reporter']['prompt_tokens']),(20,17))
+        self.assertEqual(h.store.remaining()['used']['model_calls'],3)
         self.assertEqual(h.store.remaining()['used']['backend_solves'],0)
         self.assertEqual(state(h).get('evaluation_reads',[]),[])
+        events=h.store.events(h.run_id)
+        sequence=[e['kind'] for e in events if e['kind'] in ('r3_request','r3_response_processing',
+            'research_report','model_original_tool_feedback','science_delivery_boundary','reporter_completed','model_decision_packet')]
+        self.assertLess(sequence.index('model_original_tool_feedback'),sequence.index('science_delivery_boundary'))
+        self.assertLess(sequence.index('science_delivery_boundary'),sequence.index('reporter_completed'))
+        self.assertLess(sequence.index('reporter_completed'),len(sequence)-1-sequence[::-1].index('model_decision_packet'))
+        self.assertEqual(main[1]['messages'][0]['content'].count('\nCURRENT_RESEARCH_PACKET\n'),1)
+        self.assertNotIn('report',json.loads(feedback[0]['result']['content'][0]['text']))
         atomic_json(h.store.root/'reporting_measurements.json',dict(usage=usage,report=reporter.entries(h)[-1][1]))
+
+    def test_native_science_tool_reporter_boundary_and_unknown_send(self):
+        """Saved B fixture behind a mocked executor; actual SDK and HTTP boundary."""
+        from tests.research.s129_provider_check import prepare
+        from tools.research.analysis import compact_result
+        from tools.research.agent import build_harness, live_model_class, pending
+        from tools.research.research_context import research_action_trace
+        from strands.tools.executors import SequentialToolExecutor
+        from strands.types.exceptions import EventLoopException
+        for outcome in ('available','invalid_pointer','unknown','interrupted'):
+            with self.subTest(outcome=outcome):
+                h,refs=prepare(False);raw=deepcopy(h.store.artifact(refs[1]))
+                raw['fixture']='offline native delivery '+outcome
+                query=raw['requested_operation'];sent=[];executions=[];snapshots=[]
+                def execute(host,request,key,**kwargs):
+                    executions.append(key)
+                    row,_=host.store.reserve(host.run_id,key+'-analysis',digest(query),host.actor,zero())
+                    receipt=host.store.complete(row,dict(request_id=row['request_id'],execution_id=row['execution_id'],
+                        caller=host.actor,tool_id='research.candidate_analysis',tool_version='1.0.0',
+                        execution_status='completed',charged=zero()),raw)
+                    ref=save(host,raw,'saved_B_delivery_fixture')
+                    update(host,analysis_results=[*state(host)['analysis_results'],ref])
+                    return compact_result(raw,ref)
+                def respond(request):
+                    wire=json.loads(request.content);role='main' if wire.get('tools') else 'reporter';sent.append(role)
+                    if role=='reporter':
+                        self.assertFalse(state(h)['pilot'].get('unconsumed_response'))
+                        self.assertEqual(len(pending(h)),1)  # current Reporter reservation only
+                        # Independently reopen SDK at the saved intra-invocation boundary.
+                        boundary=LiveBoundary(h,httpx.MockTransport(lambda r: self.fail('No replay send')))
+                        reopened=build_harness(h,transport=boundary,api_key='offline',instructions='fixture',
+                            model_class=live_model_class(boundary),research_tools=[],tool_executor=SequentialToolExecutor(),
+                            configuration_path=h.store.root/'reopen.json',session_directory=h.store.root/'framework_sessions')
+                        self.assertFalse(unmatched(reopened.messages));snapshots.append(reopened.messages)
+                        if outcome=='unknown':raise httpx.ReadError('Offline unknown Reporter outcome')
+                        result=reporter_response(request)
+                        if outcome=='invalid_pointer':
+                            body=result.json();items=json.loads(body['choices'][0]['message']['content'])
+                            items['interpretations'][0]['sources'][0]['pointer']='/trajectory/score_semantics'
+                            body['choices'][0]['message']['content']=json.dumps(items)
+                            result=httpx.Response(200,json=body)
+                        return result
+                    if sent==['main']:
+                        body=response(request).json();body['choices'][0].update(finish_reason='tool_calls',message=dict(
+                            role='assistant',content=None,tool_calls=[dict(id='native-detail',type='function',function=dict(
+                                name='evidence_read',arguments=json.dumps(dict(reference=refs[1],view='full')))),
+                                dict(id='native-science',type='function',function=dict(
+                                name='research_analysis',arguments=json.dumps(query)))]))
+                        return httpx.Response(200,json=body)
+                    packet=json.loads(wire['messages'][0]['content'].split('\nCURRENT_RESEARCH_PACKET\n')[1])
+                    latest=packet['research']['latest_reports'][-1]
+                    self.assertEqual(latest['reporter_status'],'unavailable' if outcome=='invalid_pointer' else 'available')
+                    self.assertEqual(latest['delivery_mode'],'deterministic_only' if outcome=='invalid_pointer' else 'reporter_interpreted')
+                    self.assertEqual(latest['findings'][0]['mathematics']['capability']['score_comparisons']['comparisons'][0]['computed_score_direction'],'worse')
+                    update(h,research_status='stopped');return response(request)
+                original=[digest(h.store.artifact(r)) for r in refs]
+                with patch('tools.research.agent.load_credential'),patch.dict(os.environ,{'DEEPSEEK_API_KEY':'offline'}),\
+                        patch('tools.research.core.guard'),patch('tools.research.agent.guard'),\
+                        patch('tools.research.analysis.dispatch',side_effect=execute),\
+                        patch('httpx.AsyncHTTPTransport',return_value=httpx.MockTransport(respond)):
+                    if outcome=='unknown':
+                        with self.assertRaisesRegex(EventLoopException,'Offline unknown Reporter outcome'):asyncio.run(converse(h))
+                        self.assertTrue(pending(h))
+                        with self.assertRaisesRegex(ValueError,'UNKNOWN_PROVIDER'):asyncio.run(converse(h))
+                    elif outcome=='interrupted':
+                        with patch.object(reporter,'_finish',side_effect=RuntimeError('fixture before Reporter archive')):
+                            with self.assertRaisesRegex(EventLoopException,'fixture before Reporter archive'):asyncio.run(converse(h))
+                        self.assertTrue(state(h)['pilot'].get('unconsumed_response'))
+                        before=h.store.remaining()['used']['model_calls']
+                        latest=next((h.store.root/'framework_sessions'/'session'/state(h)['pilot']['framework_session_id']).rglob('snapshot_latest.json'))
+                        original_snapshot=latest.read_bytes();tampered=json.loads(original_snapshot)
+                        tampered['data']['messages'][0]['content'][0]['text']+=' tampered fixture'
+                        atomic_json(latest,tampered)
+                        with self.assertRaisesRegex(ValueError,'HISTORY'):asyncio.run(converse(h))
+                        latest.write_bytes(original_snapshot)
+                        asyncio.run(converse(h))
+                        self.assertEqual(h.store.remaining()['used']['model_calls'],before+1)  # only next main
+                    else:asyncio.run(converse(h))
+                self.assertEqual(sent,['main','reporter'] if outcome=='unknown' else ['main','reporter','main'])
+                self.assertEqual(executions,['native-native-science']);self.assertEqual(len(snapshots),1)
+                self.assertEqual([digest(h.store.artifact(r)) for r in refs],original)
+                self.assertEqual(h.store.remaining()['used']['backend_solves'],0)
+                trace=research_action_trace(h)['recent'][-1]
+                self.assertEqual(trace['action'],'research_analysis')
+                self.assertEqual(trace['result_references'],[save(h,raw)])
+                if outcome=='available':
+                    audit=[]
+                    for event in h.store.events(h.run_id):
+                        if event['kind'] in ('r3_request','r3_response_processing','research_report',
+                                'model_original_tool_feedback','science_delivery_boundary','reporter_completed','model_decision_packet'):
+                            audit.append(dict(kind=event['kind'],status=event['status']))
+                    atomic_json(Path('runs/f21_sdk_audit.json'),dict(study_id=h.run_id,event_order=audit,
+                        provider_roles=sent,action_trace_example=trace,original_B_hashes_unchanged=True,
+                        sdk_snapshot_independently_reopened=True,ledger=h.store.remaining(),
+                        fixture='Mock HTTP and saved B results behind a mocked executor; no new scientific computation'))
 
     def test_original_tool_feedback_recovery_survives_two_handoffs(self):
         from strands.tools.executors import SequentialToolExecutor

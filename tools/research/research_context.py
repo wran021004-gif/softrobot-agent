@@ -458,7 +458,7 @@ def working_set(host,current):
                 method_remaining={k:v for k,v in current['method_remaining'].items() if k not in ('mathematical_evaluations','rl_stages')}),
         control_search_domain=current.get('control_search_domain'),
         source_references=list({r['artifact_id']:r for r in registered_references(host)}.values()),all_fresh_results=references,
-        citation_eligibility=citation_inventory(host),
+        citation_eligibility=citation_inventory(host),action_trace=research_action_trace(host,limit=None),
         scientific_scope='No model-authored hypotheses are promoted to measured causes; only original independent acceptance establishes success')
 
 
@@ -664,11 +664,59 @@ def research_intent(host):
         question_scope='Prior falsification target; main Agent decides the next scientific question')
 
 
+def research_action_trace(host, limit=5):
+    """Project original plans/receipts and rejected native actions; never infer causes."""
+    import json
+    from tools.research.reporter import RESULT_KEYS
+    s=state(host);events=host.store.events(host.run_id);rows={}
+    positions={r['artifact_id']:i for i,e in enumerate(events) for r in e['outputs']}
+    known=[r for key in RESULT_KEYS for r in s.get(key,[])]
+    def item(request_id,plan,source,position):
+        row=host.store.lookup(host.run_id,request_id)
+        receipt=json.loads(row['receipt']) if row and row['receipt'] else None
+        output=host.store.artifact(receipt['output']) if receipt and receipt.get('output') else {}
+        result=output.get('result',output)
+        refs=output.get('scientific_results',[])
+        if not refs and result.get('reference') in known:refs=[result['reference']]
+        if not refs and receipt and receipt.get('output') in known:refs=[receipt['output']]
+        decision=plan.get('decision') or {}
+        return dict(request_id=request_id,action=plan.get('action',plan.get('operation')),
+            method=decision.get('selected_method',plan.get('operation')),
+            agent_hypothesis={k:plan[k] for k in ('hypothesis','decision','expected_observation',
+                'weakening_observation','supporting_evidence') if k in plan},
+            execution_status=receipt['execution_status'] if receipt else 'pending',
+            result_references=refs,receipt_output=receipt.get('output') if receipt else None,
+            execution_id=receipt['execution_id'] if receipt else None,
+            outcome={k:result[k] for k in ('status','task_passed','stop_reason','error') if k in result},
+            source=source,_position=position)
+    for ref in s.get('plans',[]):
+        saved=host.store.artifact(ref);key=saved['request_id']
+        rows[key]=item(key,saved['original_plan'],dict(reference=ref,pointer='/original_plan'),positions[ref['artifact_id']])
+    for i,event in enumerate(events):
+        if event['kind'] not in ('tool_request_error','model_original_tool_feedback'):continue
+        value=host.store.artifact(event['outputs'][0]);use=value['tool_use']
+        if use['name'] not in ('research_plan','research_analysis','research_rl','research_investigate'):continue
+        key='native-'+use['toolUseId']+('-analysis' if use['name']=='research_analysis' else '')
+        if key in rows:continue
+        source=dict(reference=event['outputs'][0],pointer='/tool_use/input')
+        rows[key]=item(key,{'action':use['name'],**use['input']},source,i)
+        if event['kind']=='tool_request_error' or value.get('result',{}).get('status')=='error':
+            # after_tool may persist a completed *protocol* receipt for a request
+            # rejected before science admission. That is not a failed worker.
+            rows[key]['execution_status']='failed' if rows[key]['execution_status']=='failed' else 'rejected'
+    ordered=sorted(rows.values(),key=lambda r:r['_position'])
+    for row in ordered:row.pop('_position')
+    return dict(total=len(ordered),failed_or_rejected=sum(r['execution_status'] in ('failed','rejected') for r in ordered),
+        recent=ordered[-limit:] if limit is not None else ordered,
+        scope='Original Agent intent and recorded execution only; hypotheses are not confirmed or falsified by Reporter prose')
+
+
 def agent_decision_brief(host):
     """A-line compact input; existing L0/L2 retrieval contracts remain unchanged."""
-    from tools.research.reporter import entries
+    from tools.research.reporter import current_reports, reporter_handoff_summary
     brief=decision_brief(context(host))
     brief['research_intent']=research_intent(host)
+    brief['action_trace']=research_action_trace(host)
     from tools.research.task_constraints import describe_analysis_requirements, analysis_capabilities
     s=state(host);cfg=s.get('nominal_configuration',s.get('base_configuration'))
     if s.get('candidates'):
@@ -677,32 +725,25 @@ def agent_decision_brief(host):
         requirements=describe_analysis_requirements(cfg,{})
         brief['mathematical_capabilities']=analysis_capabilities(cfg,requirements,s['spec']['analysis_protocol'],
             remaining_evaluations=max(0,s['spec']['budgets']['mathematical_evaluations']-s.get('mathematical_evaluations',0)))
-    reports=entries(host);latest={}
-    for ref,saved in reports:
-        key=(saved['report']['mode'],saved['interpretation_for']['artifact_id'] if saved['interpretation_for'] else ref['artifact_id'])
-        latest[key]=(ref,saved)
-    # Revisions supersede deterministic delivery, without copying every report.
-    revisions={s['interpretation_for']['artifact_id'] for _,s in reports if s['interpretation_for']}
-    selected=[(r,s) for r,s in latest.values() if r['artifact_id'] not in revisions][-2:]
-    brief['latest_reports']=[dict(report_reference=r,mode=s['report']['mode'],
-        question=s['report']['question'],interpretation_status=s['interpretation_status'],
-        error=s['error'],interpretations=s['report']['interpretations'],relations=s['report']['relations'],
-        results=[dict(identity=c['identity'],metrics=c['metrics'],resources=c['resources'],
-            mathematics=mathematical_decision_view(c),
-            main_violations=c['main_violations'],evidence_strength=c['evidence_summary']['claim_kind'],
-            evidence_scope={k:c['evidence_summary'][k] for k in ('verification_status',
-                'supported_inferences','unsupported_inferences','numerical_evidence_pointer')},
-            recorded_summary={k:v for k,v in c['deterministic_summary'].items() if k in (
-                'task_gap','comparisons','recorded_mathematics','recorded_conclusions','status',
-                'conclusion','coverage','decision_relevance','certificate_verified')},
-            unresolved=c['evidence_summary']['unresolved']) for c in s['report']['results']]) for r,s in selected]
+    selected=current_reports(host)[-2:]
+    brief['latest_reports']=[reporter_handoff_summary(host,r,saved) for r,saved in selected]
     from tools.research.evidence_views import result_card
-    shown=[c['identity']['result']['reference'] for r in brief['latest_reports'] for c in r['results']]
+    shown=[ref for r in brief['latest_reports'] for ref in r['result_references']]
     brief['additional_mathematical_evidence']=[dict(reference=r,
         mathematics=mathematical_decision_view(plain(result_card(host,r))))
         for r in s.get('analysis_results',[])[-2:] if r not in shown]
+    latest=brief.get('latest_scientific_feedback')
+    if latest and latest.get('reference') in shown:
+        delivery=next(r for r in brief['latest_reports'] if latest['reference'] in r['result_references'])
+        brief['latest_scientific_feedback']={k:latest[k] for k in
+            ('reference','operation','status','candidate','source','control_handoff') if k in latest}
+        brief['latest_scientific_feedback']['report_reference']=delivery['report_reference']
+    elif latest and latest.get('reference') in [r['reference'] for r in brief['additional_mathematical_evidence']]:
+        brief['latest_scientific_feedback']={k:latest[k] for k in
+            ('reference','operation','status','control_handoff') if k in latest}
     anchor=brief.get('evidence_access',{}).get('reference')
     if anchor:
+        brief['action_trace']['full_trace_query']=dict(reference=anchor,view='working_set',pointer='/action_trace')
         refs=brief.pop('all_fresh_results',[])
         brief['stop_result_index']=dict(count=len(refs),query=dict(reference=anchor,
             view='working_set',pointer='/all_fresh_results'),
@@ -717,21 +758,35 @@ def agent_decision_brief(host):
 
 
 def mathematical_decision_view(card):
-    """Project B/F0 facts once; shared quantity conditions stay behind exact pointers."""
+    """Core computed numbers and scope; all starts/samples remain in L2/L3."""
     math=card.get('mathematics')
     if not math:return None
     claim=math['claim']
     summary=card['deterministic_summary']
+    from tools.research.capability import signed_score_comparisons
+    capability=summary.get('task_capability');compact=None
+    if capability:
+        starts=capability['solver_starts']
+        compact={k:capability[k] for k in ('best_found_violation','score_semantics','verification_scope','solver_scope') if k in capability}
+        compact['solver_termination']=dict(starts=len(starts),converged=sum(bool(s['success']) for s in starts),
+            statuses=list(dict.fromkeys(s['status'] for s in starts)),
+            max_iterations=max((s['iterations'] or 0 for s in starts),default=0),
+            source=dict(reference=card['identity']['result']['reference'],pointer=capability['solver_starts_pointer']))
+        compact['bottleneck']=capability.get('research_diagnostics',{}).get('bottleneck')
+        compact['score_comparisons']=signed_score_comparisons(capability,card['identity']['result']['reference'])
+    horizon=deepcopy(claim['horizon'])
+    if 'trajectory_grid' in horizon:horizon['trajectory_grid'].pop('sample_steps',None)
+    coverage=[{k:v for k,v in row.items() if not k.endswith('_indices')} |
+        {k+'_count':len(v) for k,v in row.items() if k.endswith('_indices')} for row in claim['constraint_coverage']]
     return dict(claim_source=math['claim_source'],requirement_source=math['requirement_source'],
         problem_definition=math['problem_definition'],
-        scope={k:claim[k] for k in ('model_declaration','horizon','constraint_coverage',
-            'computation_status','verification_status','supported_interpretation','unsupported_conclusions')},
+        scope=dict({k:claim[k] for k in ('model_declaration','computation_status','verification_status',
+            'supported_interpretation','unsupported_conclusions')},horizon=horizon,constraint_coverage=coverage),
         operating_point={k:v for k,v in claim['operating_point'].items() if k in
             ('name','actual_time_s','time_s','remaining_task_s','phase','input_units')},
-        quantities=[{k:v for k,v in q.items() if k!='conditions'} for q in math['quantities']],
-        problem=next((c['value'] for q in math['quantities'] for c in q['conditions']
-            if c['name']=='problem_and_scope'),None),capability=summary.get('task_capability'),
-        critical_samples=summary.get('margins'),unresolved=summary.get('decision_relevance'))
+        quantities=[{k:v for k,v in q.items() if k!='conditions'} for q in math['quantities']
+            if not capability or q['name'] in ('best_found_violation','optimal_task_violation')],
+        capability=compact,unresolved=summary.get('decision_relevance'))
 
 
 def tool_feedback(host,value):
