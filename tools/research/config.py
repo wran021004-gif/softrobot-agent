@@ -193,6 +193,13 @@ def resolve(path, profile=None, *, backend_profile=None):
         'bdf_replays', 'mathematical_evaluations')
     if any(type(b[k]) is not int or b[k] < 0 for k in count_keys):
         raise ValueError('FINITE_NONNEGATIVE_COUNT_REQUIRED')
+    if study['mode']=='engineering_investigation':
+        if (study['capabilities']!=['investigation']
+                or not set(study['allowed_plan_actions'])<= {'diagnose','stop'}
+                or any(b[k] for k in ('physical_launches','local_solves','offline_nlp','bdf_replays','mathematical_evaluations'))
+                or study['nmpc_limits']['executions']
+                or any(study['rl_limits'][k] for k in ('training_stages','evaluation_episodes'))):
+            raise ValueError('READ_ONLY_INVESTIGATION_REQUIRES_ZERO_SCIENCE_AND_DIAGNOSTIC_ACTIONS')
     for total, reserved in (('provider_requests', 'protected_provider_requests'), ('public_operations', 'protected_public_operations')):
         if b[reserved] > b[total]:
             raise ValueError('PROTECTION_IS_PART_OF_TOTAL: ' + reserved)

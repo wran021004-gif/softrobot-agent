@@ -612,7 +612,7 @@ async def converse(host,*,session_handoff=False):
         s=state(host);pilot=deepcopy(s['pilot'])
         pilot.update(request_deadline_unix=None,bounded_request_reservation=False)
         update(host,live_started_unix=time.time(),pilot=pilot)
-    if state(host)['spec'].get('rl_evaluation_source'):
+    if state(host)['spec'].get('rl_evaluation_source') or state(host)['spec'].get('mode')=='engineering_investigation':
         agent.tool_registry.registry.pop('retrieve_context',None)
     async def before_model(event):
         s=state(host)
@@ -654,7 +654,9 @@ async def converse(host,*,session_handoff=False):
         if formal:agent.tool_registry.registry.pop('experience_retrieve',None)
         if 'research' in current:
             native[0].tool_spec={**native[0].tool_spec,'inputSchema':{'json':plan_schema(current['research']['actions'],decision_required=bool(s['spec'].get('research_decisions')))}}
-        if s['spec'].get('tool_readiness') or s.get('tool_failures'):
+        if not enabled(s['spec'],'analysis') or s['spec']['budgets']['mathematical_evaluations']<=s.get('mathematical_evaluations',0):
+            agent.tool_registry.registry.pop('research_analysis',None)
+        elif s['spec'].get('tool_readiness') or s.get('tool_failures'):
             from tools.research.tool_readiness import availability
             if (availability(host) or {}).get('status')!='ready' or current['research']['budget']['science_budget']['remaining_mathematical']<1:
                 agent.tool_registry.registry.pop('research_analysis',None)

@@ -41,7 +41,8 @@ def protected(host):
     return bool(s.get('success_gate') or s.get('count_closeout') or
         remaining['model_calls'] <= b['protected_provider_requests'] or
         remaining['tool_calls'] <= b.get('protected_public_operations', 0) or
-        (s['spec'].get('budget_semantics',{}).get('mode')=='count' and not science_fits(host)))
+        (s['spec'].get('budget_semantics',{}).get('mode')=='count'
+            and s['spec'].get('mode')!='engineering_investigation' and not science_fits(host)))
 
 
 def decision_budget(host):
@@ -89,6 +90,7 @@ def closeout_operations(host):
     from tools.research.state import state
     s = state(host)
     actions=['select'] if s.get('spec',{}).get('research_decisions') and s.get('success_gate') and not s.get('selected') else ['stop','select']
+    if s['spec'].get('mode')=='engineering_investigation':actions=['stop']
     return dict(research_plan=actions,
         research_rl=[a for a in ('status', 'stop', 'evaluate') if s.get('rl_runs') and (a != 'evaluate' or not s.get('success_gate'))])
 

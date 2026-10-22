@@ -1,5 +1,49 @@
 # F2 integration: Agent, Reporter and mathematical evidence
 
+## F3.0 production-entry preparation (2026-10-22)
+
+Fetched origin and verified `13ddf460f9cb792cfb8e809a4e4f225c0bfd22f0` on both
+the clean integration worktree and remote before this work. Historical grants remain sealed.
+`tests/research/f30_provider_check.py` invokes production `converse()` directly,
+including its actual native registry, hooks, pre-decision Reporter delivery and SDK settlement.
+Its only live wrapper rejects excess role counts before `LiveBoundary` reserves/sends.
+There is no alternate Agent builder, tool executor or injected scientific answer.
+
+The fixed live ID `f30-live-20261022` can be created only once. Its independent
+identity-bound authorization permits <=2 main, <=1 Reporter, <=3 total sends,
+12 public operations and zero scientific worker budgets. It imports the original
+F1-B artifacts with an explicit source manifest and preserves their content hashes.
+Provider configuration is unchanged: `https://api.deepseek.com/chat/completions`,
+`deepseek-flash`, thinking enabled, reasoning high, max_tokens 32768. Outbound data
+is the frozen project task/model/design context, scoped B evidence, tool feedback,
+Reporter interpretations and accounting identities. No unrelated workspace data,
+credential-file content or other Studies' raw SDK histories are included. Raw
+Provider bodies, SDK snapshots and Store remain under ignored `runs/research/`.
+
+Zero scientific budgets exposed a production admission issue: scientific exhaustion
+previously removed investigation and suppressed Reporter delivery. The explicit
+`engineering_investigation` mode is validated to allow only investigation capability,
+diagnose/stop Plans and zero science counts; only this mode omits the scientific-route
+exhaustion trigger. Provider/public protection remains active. Formal research exhaustion
+is unchanged. Mathematics is removed from the dynamic schema when disabled/exhausted
+even without readiness configuration; engineering investigation also removes SDK retrieval.
+
+Nine focused tests passed: four F3.0 configuration/production/schema/counter tests,
+existing Reporter recovery (available/invalid pointer/unknown send/interrupted archive),
+malformed/truncated fallback, protected Reporter budget, exact B comparison pointers,
+and internal-report SELECT-credit rejection. A test fixture initially reused null request
+IDs and was corrected to use distinct durable IDs; an incorrectly named test class was
+corrected. Neither issue involved a live send. The existing F2.1 31-test evidence is reused.
+The final offline audit independently reopens Store and SDK, verifies native tool IDs,
+receipts, L1-before-main order and unchanged scientific artifacts. Its usage is synthetic,
+and it is **not** scientific or live admission. See
+[f30_offline.json](../../evidence/s129_integration/f30_offline.json).
+
+Run with the installed research interpreter and MATLAB engine import path:
+`python -m tests.research.f30_provider_check --live`; never rerun a live failure.
+`--audit STUDY_ID` only reopens original records and does not send requests.
+F3 remains conditional on a separate semantic audit of the real main/Reporter outputs.
+
 2026-10-21; branch `integration/s129-research`; isolated worktree `s129-integration`.
 This is engineering integration, not F3 autonomous research or a reopened S12.8 Study.
 
