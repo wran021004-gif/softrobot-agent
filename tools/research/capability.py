@@ -88,6 +88,20 @@ def compare_control_response(model, requirements, protocol, optimized, context):
 
 
 def capability_summary(trajectory):
+    if trajectory.get('method_version')=='sampled-affine-conic-minimax-v1':
+        dual=trajectory.get('dual_checks',{})
+        return dict(method_version=trajectory['method_version'],
+            replayed_violation=trajectory.get('replayed_violation'),optimality_status=trajectory.get('optimality_status'),
+            support_lower_estimate=dual.get('support_lower_estimate'),gap=dual.get('replayed_support_gap'),
+            full_requested_coverage=trajectory.get('full_requested_coverage',False),
+            numerical_feasibility=trajectory.get('numerical_feasibility'),
+            dominant_constraints=list(dict.fromkeys(r['constraint_id'] for r in dual.get('constraint_multipliers',[]) if r['epigraph_active'])),
+            kernel_elapsed_s=trajectory.get('kernel_elapsed_s'),solver=trajectory.get('solver'),
+            score_semantics='Signed sampled minimax; smaller is better. Float support estimate and gap are not rigorous bounds.',
+            strict_optimality='unavailable',physical_failure_relation=dict(status='not_assessed'),
+            problem_pointer='/trajectory/problem_definition',solver_starts_pointer='/trajectory/solver',
+            sample_records_pointer='/trajectory/replay/records' if trajectory.get('replay') else '/trajectory/coverage',quantities_pointer='/trajectory/quantities',
+            checks_pointer='/trajectory/dual_checks',scope='Local sampled affine model; physical acceptance unmeasured')
     keys = ('best_found_violation', 'status', 'control_reoptimization', 'verification_scope',
         'start_value_spread', 'research_diagnostics', 'input_diagnostics', 'locality_diagnostics', 'kernel_elapsed_s',
         'near_active_records', 'co_bottleneck_records', 'solver_scope')
@@ -162,6 +176,14 @@ def populate_mathematics(mathematics, trajectory, reference):
     from schemas.research_reporting import EvidenceLocation, MathematicalQuantity, RecordedField
     def location(pointer):
         return EvidenceLocation(reference=reference, pointer=pointer)
+    if trajectory.get('method_version')=='sampled-affine-conic-minimax-v1':
+        quantities=[MathematicalQuantity(name=name,value=row['value'],
+            status='unavailable' if row['value'] is None else 'verified' if name=='analytic_lower_bound' else 'unverified_estimate',
+            control_reoptimization='required',
+            unit='dimensionless',source=location('/trajectory/quantities/'+name+'/value') if row['value'] is not None else None,
+            conditions=[RecordedField(name='strength',value=row['strength'],source=location('/trajectory/quantities/'+name+'/strength'))])
+            for name,row in trajectory['quantities'].items()]
+        return mathematics.model_copy(update=dict(problem_definition=location('/trajectory/problem_definition'),quantities=quantities))
     quantities = []
     groups = [(trajectory.get('quantities', {}), '/trajectory/quantities', [],
         trajectory.get('control_reoptimization', 'not_assessed'))]
@@ -186,3 +208,32 @@ def populate_mathematics(mathematics, trajectory, reference):
                     source=location('/trajectory/structural_comparison/'+key)) for key in
                     ('step','normalization_scale','reoptimization','control_alignment','derivative_scope','baseline_result'))
     return mathematics.model_copy(update=dict(problem_definition=location('/trajectory/problem_definition'), quantities=quantities))
+
+
+def sensitivity_summary(value):
+    """Finite differences remain diagnostics; unresolved dual faces stay visible."""
+    rows=value.get('reoptimized_finite_difference',[])
+    return dict(method_version=value['method_version'],direction_status=value['direction_status'],
+        parameter=value['parameter_identity'],preferred_parameter_direction=value.get('preferred_parameter_direction','unresolved'),
+        differences=[dict(step=r['step'],reoptimized=r['reoptimized'],interval=r['numerical_slope_interval'],
+            dual_face_status=r['dual_face']['status'],source_pointer=f'/optimal_sensitivity/reoptimized_finite_difference/{i}') for i,r in enumerate(rows)],
+        dominant_constraints=value.get('summary',{}).get('dominant_constraints'),
+        scope=value['model_scope'],strict_gradient='unavailable',cost=value.get('computation_cost'),
+        unsupported_inferences=value['unsupported_inferences']+[
+            'Shortening length necessarily improves holding speed.',
+            'Numerically flat modulus means stiffness has no physical effect.'],
+        physical_failure_relation=dict(status='not_assessed',reason='No aligned physical evidence assessed in this numerical kernel.'),
+        unresolved=['General near-optimal dual-face extrema may be unresolved; inspect each status.',
+            'Finite differences do not establish a strict gradient or nonlinear performance.'],
+        detail_pointer='/optimal_sensitivity',reason=value.get('reason'))
+
+
+def populate_sensitivity(mathematics, value, reference):
+    from schemas.research_reporting import EvidenceLocation, MathematicalQuantity
+    quantities=[MathematicalQuantity(name='reoptimized_finite_difference_'+str(i),value=r['reoptimized'],
+        status='unverified_estimate',unit='score/'+value['parameter_units'],
+        structural_parameters=[value['parameter_identity']['path']],control_reoptimization='required',
+        source=EvidenceLocation(reference=reference,pointer=f'/optimal_sensitivity/reoptimized_finite_difference/{i}/reoptimized'))
+        for i,r in enumerate(value.get('reoptimized_finite_difference',[]))]
+    return mathematics.model_copy(update=dict(quantities=quantities,
+        problem_definition=EvidenceLocation(reference=reference,pointer='/optimal_sensitivity/parameter_identity')))

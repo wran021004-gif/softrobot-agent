@@ -60,6 +60,11 @@ def calculate(configuration,binding,query,exact_point=None,*,checkpoint=None,des
     from extensions.math_analysis.kernels import bounded_endpoint, LIMITATIONS
     import numpy as np
     q=AnalysisRequest.model_validate(query)
+    if q.optimal_sensitivity is not None:
+        from tools.research.optimal_capability import calculate_sensitivity
+        if not design_context or design_context.get('kind')!='controlled-capability-sensitivity-v1':
+            raise ValueError('ADMITTED_SAVED_MODEL_CONTEXT_REQUIRED')
+        return calculate_sensitivity(design_context,q,checkpoint)
     p=q.protocol
     inp=SessionInput.model_validate(configuration)
     sorosim=inp.policy.controller.extension_id=='controller.sorosim_matlab_nmpc'
@@ -74,10 +79,12 @@ def calculate(configuration,binding,query,exact_point=None,*,checkpoint=None,des
         return scoped_result(dict(status='not_applicable',operation=q.operation,binding=binding,protocol=plain(p),
             operating_point=exact_point or dict(name=q.operating_point),task_acceptance='unmeasured',
             proxy_values={},internal_calculations=[],limitations=LIMITATIONS),requirements,applicability,q)
+    if q.capability_method and checkpoint:checkpoint('optimal_model_attempt',dict(kind='model_build',stage='attempt'))
     envelope=plain(calculate_candidate_configuration(inp,binding,p,binding['configuration'],
         operating_points=[q.operating_point],exact_point=exact_point,**({'checkpoint':checkpoint,'design_context':design_context if q.operation=='design_sensitivity' else None,
             'check_instantaneous_braking':q.operation=='instantaneous_braking_v1'} if sorosim else {})))
     rows=envelope['records'][1:]
+    if q.capability_method and checkpoint:checkpoint('optimal_model_returned',dict(kind='model_build',stage='returned'))
     row=rows[0]
     construction=row.get('construction') or {}
     internal=[]
@@ -155,8 +162,14 @@ def calculate(configuration,binding,query,exact_point=None,*,checkpoint=None,des
     elif q.operation in ('trajectory_feasibility', 'task_capability'):
         from extensions.math_analysis.trajectory import trajectory_feasibility
         if q.operation == 'task_capability':
-            from extensions.math_analysis.task_capability import task_capability
-            trajectory=task_capability(model,requirements,p)
+            if q.capability_method:
+                from extensions.math_analysis.conic_capability import conic_capability
+                if checkpoint:checkpoint('optimal_capability_attempt',dict(kind='capability',stage='attempt'))
+                trajectory=conic_capability(model,requirements,p)
+                if checkpoint:checkpoint('optimal_capability_returned',dict(kind='capability',stage='returned',solver=trajectory.get('solver')))
+            else:
+                from extensions.math_analysis.task_capability import task_capability
+                trajectory=task_capability(model,requirements,p)
         else:
             trajectory=trajectory_feasibility(model,requirements,p)
         if q.capability_comparison is not None:
@@ -221,7 +234,10 @@ def scoped_result(result, requirements, applicability, query):
         conclusion, verification, pointer = 'not_applicable', 'not_performed', '/analysis_applicability'
         interpretation = '; '.join(applicability['reasons'])
     elif result['status'] == 'computed':
-        if result.get('instantaneous_braking'):
+        if result.get('optimal_sensitivity'):
+            conclusion,verification,pointer='diagnostic',result['optimal_sensitivity']['direction_status'],'/optimal_sensitivity'
+            interpretation='Controlled reoptimized finite differences of sampled local models; no strict structural gradient, regional descent or physical improvement guarantee.'
+        elif result.get('instantaneous_braking'):
             conclusion,verification,pointer='diagnostic','fixed_state_box_minimum','/instantaneous_braking'
             interpretation=result['instantaneous_braking']['scope']
         elif result.get('sensitivity',{}).get('verification',{}).get('passed'):
@@ -241,7 +257,9 @@ def scoped_result(result, requirements, applicability, query):
                 if conclusion=='inconclusive':
                     verification='legal_input_and_signed_score_replay_checked'
                     interpretation='A legal control and its signed sampled score were checked; no feasible witness or infeasibility proof found.'
-                interpretation+=' Optimal task violation and structural optimality remain unverified.'
+                interpretation+=(' Finite-tolerance numerical optimality checks: '+trajectory.get('optimality_status','unknown')+
+                    '; strict optimal-value bounds and structural optimality remain unavailable.' if query.capability_method else
+                    ' Optimal task violation and structural optimality remain unverified.')
         elif endpoint.get('status') == 'feasible_in_local_model' and endpoint.get('applied_input_n') and all(
                 checks.get(k) is True for k in ('finite','lower_bounds','upper_bounds','position','speed')):
             conclusion, verification = 'feasible_witness', 'kernel_independent_checks_passed'
@@ -295,7 +313,16 @@ def dispatch(host,query,key,*,guard,origin='model'):
     require(host,'analysis')
     if state(host)['spec'].get('research_decisions') and 'analysis' not in state(host)['spec']['capabilities']:
         raise ValueError('ANALYSIS_CAPABILITY_REQUIRED')
-    c=verify_candidate(host,q.candidate)
+    method_fit=None
+    if q.capability_method:
+        from tools.research.optimal_capability import method_admission
+        current=state(host)
+        method_fit=method_admission(current['spec'],q,current.get('mathematical_evaluations',0))
+        if method_fit['status']!='admissible':return dict(status='not_applicable',admission=method_fit,task_acceptance='unmeasured')
+    try:c=verify_candidate(host,q.candidate)
+    except (ValueError,KeyError) as exc:
+        if method_fit:return dict(status='not_applicable',reason=str(exc),admission=method_fit,task_acceptance='unmeasured')
+        raise
     sensitivity_context=None
     if q.design_sensitivity:
         from extensions.tendon_family.sorosim_analysis import design_context
@@ -304,11 +331,17 @@ def dispatch(host,query,key,*,guard,origin='model'):
     if q.capability_comparison is not None:
         from tools.research.capability import comparison_context
         sensitivity_context=comparison_context(host,c,q)
+    if q.optimal_sensitivity is not None:
+        from tools.research.optimal_capability import sensitivity_context as saved_context
+        try:sensitivity_context=saved_context(host,q)
+        except (ValueError,KeyError) as exc:
+            return dict(status='not_applicable',reason=str(exc),admission=method_fit,task_acceptance='unmeasured')
     s=state(host)
     protocol=plain(q.protocol)
     if protocol!=s['spec']['analysis_protocol'] or (q.scoring_window_s is not None and q.scoring_window_s not in protocol['windows_s']):
         raise ValueError('ANALYSIS_REQUIRES_DECLARED_FROZEN_PROTOCOL')
     count=3 if q.operation=='design_sensitivity' else 2 if q.capability_comparison is not None else 1
+    if method_fit:count=method_fit['expected_mathematical_evaluations']
     fit=admission(host,requested=count,engineering=origin=='engineering_preflight')
     if fit['admitted']<count:
         raise ValueError('ANALYSIS_AND_CONFIRMATION_BUDGET_CANNOT_FIT')
@@ -383,9 +416,11 @@ def dispatch(host,query,key,*,guard,origin='model'):
     request=dict(implementation=s['freeze'],rationale=query.get('rationale','Model-requested '+q.operation) if isinstance(query,dict) else q.operation,kind='candidate_analysis',configuration=cfg,binding=binding,query=plain(q),exact_point=point,
         task_analysis=plain(requirements),analysis_applicability=applicability)
     if sensitivity_context:request['design_context']=sensitivity_context
+    if method_fit:request['method_admission']=method_fit
     atomic_json(folder/'request.json',request)
     pending=dict(kind='candidate_analysis',worker_request_id=request_id,reserved_s=reserve,folder=str(folder),
         request=plain(q),origin=origin,implementation=s['freeze'],started_unix=time.time(),analysis_evaluations=count)
+    if method_fit:pending['method_admission']=method_fit
     update(host,pending=pending)
     from tools.service_execution import _run_contained
     from sys import executable
@@ -421,6 +456,19 @@ def recover(host):
     value.update(candidate=p['request']['candidate'],requested_operation=p['request'],operation_key=p['worker_request_id'],
         owning_study=host.run_id,origin=p['origin'],implementation=p['implementation'],charged_numerical_s=elapsed,
         charged_analysis_evaluations=p.get('analysis_evaluations',1),boundary=boundary,worker_log=save(host,dict(text=(folder/'worker.log').read_text(encoding='utf8',errors='replace')),'analysis_worker_log'))
+    if p.get('method_admission'):
+        value['method_admission']=p['method_admission']
+        value['numerical_call_events']=[read(path) for path in sorted(folder.glob('numerical_optimal_*.json'))]
+        cost=value.get('optimal_sensitivity',{}).get('computation_cost')
+        value['actual_mathematical_calls']=(dict(capability_kernel_calls=cost['conic_solves'],dual_face_solve_attempts=cost['dual_face_solves'],model_builds=0)
+            if cost else dict(status='Returned trajectory establishes a kernel call; interrupted work without a result has unknown call counts.',
+                capability_kernel_calls=1 if value.get('trajectory') else None,
+                dual_face_solve_attempts=0 if not p['request'].get('optimal_sensitivity') else None))
+        value['recorded_attempt_boundaries']={kind:sum(e['kind']==kind and e['stage']=='attempt' for e in value['numerical_call_events'])
+            for kind in ('model_build','capability','dual_face')}
+        value['recorded_return_boundaries']={kind:sum(e['kind']==kind and e['stage']=='returned' for e in value['numerical_call_events'])
+            for kind in ('model_build','capability','dual_face')}
+        value['attempt_boundary_semantics']='Durable pre-call boundaries; interruption between checkpoint and call cannot establish that the solver entered. Reserved evaluations never reset.'
     if value['status'] not in ('computed','unavailable','not_applicable'):
         value['internal_calculations']=dict(status='partial_or_unavailable',reason='Worker failed before complete calculation records were published; reservation and analysis attempt remain charged')
     ref=save(host,value,'candidate_analysis_result')
@@ -481,6 +529,10 @@ def compact_result(value, reference):
     if value.get('operation') == 'task_capability':
         from tools.research.capability import capability_summary
         summary['task_capability']=capability_summary(trajectory)
+    if value.get('optimal_sensitivity'):
+        from tools.research.capability import sensitivity_summary
+        summary.pop('task_capability',None)
+        summary['optimal_sensitivity']=sensitivity_summary(value['optimal_sensitivity'])
     if value.get('instantaneous_braking'):summary['instantaneous_braking']=value['instantaneous_braking']
     return {**{k:summary[k] for k in ('reference','stored_result_keys','control_handoff','static_input_observation',
         'input_response_observation','retrieval_note') if k in summary},**summary}
@@ -544,6 +596,10 @@ def decision_result(value, reference):
     if value.get('operation') == 'task_capability':
         from tools.research.capability import capability_summary
         result['task_capability']=capability_summary(trajectory)
+    if value.get('optimal_sensitivity'):
+        from tools.research.capability import sensitivity_summary
+        result.pop('task_capability',None)
+        result['optimal_sensitivity']=sensitivity_summary(value['optimal_sensitivity'])
     if value.get('instantaneous_braking'):result['instantaneous_braking']=value['instantaneous_braking']
     return result
 

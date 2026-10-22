@@ -62,6 +62,12 @@ def extend_engineering_counts(spec, changes, authorization):
 def resolve(path, profile=None, *, backend_profile=None):
     path = Path(path).resolve()
     study = read(path)
+    methods=study.pop('mathematical_methods',None)
+    if methods is not None:
+        if (not isinstance(methods,dict) or not methods or
+                set(methods)-{'sampled-affine-conic-minimax-v1','controlled-capability-sensitivity-v1'} or
+                any(not isinstance(v,str) or not v.strip() for v in methods.values())):
+            raise ValueError('EXPLICIT_VERSIONED_MATHEMATICAL_METHOD_AUTHORIZATION_REQUIRED')
     decisions=study.pop('research_decisions',None)
     readiness=study.pop('tool_readiness',None)
     provenance = dict(root=dict(path=str(path), sha256=digest(study)), references={})
@@ -335,6 +341,7 @@ def resolve(path, profile=None, *, backend_profile=None):
         if report.get('scientific_evidence') is not False or report.get('status') not in ('ready','dependency_unavailable','engine_start_failed','gateway_failed','timeout'):
             raise ValueError('EXPLICIT_ENGINEERING_READINESS_REPORT_REQUIRED')
         study['tool_readiness']=dict(sorosim_matlab=report)
+    if methods is not None:study['mathematical_methods']=methods
     study['resolved_identity'] = digest(study)
     return study
 

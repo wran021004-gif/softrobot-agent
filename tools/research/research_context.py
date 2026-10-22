@@ -724,6 +724,7 @@ def agent_decision_brief(host):
     if cfg and s['spec'].get('analysis_protocol'):
         requirements=describe_analysis_requirements(cfg,{})
         brief['mathematical_capabilities']=analysis_capabilities(cfg,requirements,s['spec']['analysis_protocol'],
+            mathematical_methods=s['spec'].get('mathematical_methods'),
             remaining_evaluations=max(0,s['spec']['budgets']['mathematical_evaluations']-s.get('mathematical_evaluations',0)))
     selected=current_reports(host)[-2:]
     brief['latest_reports']=[reporter_handoff_summary(host,r,saved) for r,saved in selected]
@@ -765,7 +766,10 @@ def mathematical_decision_view(card):
     summary=card['deterministic_summary']
     from tools.research.capability import signed_score_comparisons
     capability=summary.get('task_capability');compact=None
-    if capability:
+    if capability and capability.get('method_version'):
+        compact={k:v for k,v in capability.items() if k!='solver'}
+        compact['solver']={k:capability.get('solver',{}).get(k) for k in ('status','iterations','solve_time_s')}
+    elif capability:
         starts=capability['solver_starts']
         compact={k:capability[k] for k in ('best_found_violation','score_semantics','verification_scope','solver_scope') if k in capability}
         compact['solver_termination']=dict(starts=len(starts),converged=sum(bool(s['success']) for s in starts),
@@ -778,15 +782,21 @@ def mathematical_decision_view(card):
     if 'trajectory_grid' in horizon:horizon['trajectory_grid'].pop('sample_steps',None)
     coverage=[{k:v for k,v in row.items() if not k.endswith('_indices')} |
         {k+'_count':len(v) for k,v in row.items() if k.endswith('_indices')} for row in claim['constraint_coverage']]
-    return dict(claim_source=math['claim_source'],requirement_source=math['requirement_source'],
+    result=dict(claim_source=math['claim_source'],requirement_source=math['requirement_source'],
         problem_definition=math['problem_definition'],
         scope=dict({k:claim[k] for k in ('model_declaration','computation_status','verification_status',
             'supported_interpretation','unsupported_conclusions')},horizon=horizon,constraint_coverage=coverage),
         operating_point={k:v for k,v in claim['operating_point'].items() if k in
             ('name','actual_time_s','time_s','remaining_task_s','phase','input_units')},
         quantities=[{k:v for k,v in q.items() if k!='conditions'} for q in math['quantities']
-            if not capability or q['name'] in ('best_found_violation','optimal_task_violation')],
+            if not capability or capability.get('method_version') or q['name'] in ('best_found_violation','optimal_task_violation')],
         capability=compact,unresolved=summary.get('decision_relevance'))
+    if summary.get('optimal_sensitivity'):result['optimal_sensitivity']=summary['optimal_sensitivity']
+    if summary.get('optimal_sensitivity') or (capability and capability.get('method_version')):
+        result['cost']=dict(evaluations=summary.get('evaluations'),numerical_s=summary.get('numerical_s'),
+            sources=[dict(reference=card['identity']['result']['reference'],pointer='/'+key)
+                for key in ('charged_analysis_evaluations','charged_numerical_s')])
+    return result
 
 
 def tool_feedback(host,value):

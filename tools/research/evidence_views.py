@@ -124,11 +124,32 @@ def result_card(host, reference):
         mathematics=MathematicalEvidence(claim=value['scoped_claim'],
             claim_source=_location(reference,'/scoped_claim'),
             requirement_source=_location(reference,'/task_analysis') if 'task_analysis' in value else None)
-        if value.get('operation') == 'task_capability' and value.get('trajectory', {}).get('problem_definition'):
+        if value.get('operation') == 'task_capability' and (value.get('trajectory', {}).get('problem_definition') or value.get('trajectory',{}).get('method_version')):
             from tools.research.capability import populate_mathematics
             mathematics=populate_mathematics(mathematics,value['trajectory'],reference)
             if value['trajectory'].get('structural_comparison'):
                 details.append(_location(value['trajectory']['structural_comparison']['baseline_result']))
+        if value.get('optimal_sensitivity'):
+            from tools.research.capability import populate_sensitivity
+            mathematics=populate_sensitivity(mathematics,value['optimal_sensitivity'],reference)
+            summary.pop('task_capability',None)
+        if value.get('optimal_sensitivity') or value.get('trajectory',{}).get('method_version'):
+            from tools.research.evidence_policy import mathematical_physical_relation
+            from tools.research.state import state
+            current=state(host)
+            physical=[(r,host.store.artifact(r)) for key in ('results','physical_replays','rl_evaluations') for r in current.get(key,[])]
+            relation=mathematical_physical_relation(value,physical)
+            key='optimal_sensitivity' if value.get('optimal_sensitivity') else 'task_capability'
+            summary[key]['physical_failure_relation']=relation
+            details.extend(_location(s['reference'],s['pointer']) for s in relation.get('sources',[]))
+            for i,output in enumerate(value.get('model',{}).get('endpoint_outputs',[])):
+                if (output['name']=='tip_position' and output['frame']=='world'
+                        and all(x==0 for x in output['C'][0]+output['D'][0])):
+                    sources=[_location(reference,f'/model/endpoint_outputs/{i}/{k}/0') for k in ('C','D')]
+                    summary[key]['local_output_limitation']=dict(world_x_first_order_state_and_input_coefficients='zero',
+                        scope='This stored local linearization only; not nonlinear controllability or physical invariance.',
+                        sources=[plain(s) for s in sources])
+                    details.extend(sources)
         details.append(_location(reference,value['scoped_claim']['numerical_result_pointer']))
         for row in summary['margins']:
             constraint=next(c for c in value['task_analysis']['constraints'] if c['constraint_id']==row['constraint_id'])

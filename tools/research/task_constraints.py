@@ -5,7 +5,7 @@ from tools.research_tasks import task_adapter
 
 
 def analysis_capabilities(configuration, requirements, protocol, *, model=None, exact_point=None,
-                          remaining_evaluations=None):
+                          remaining_evaluations=None, mathematical_methods=None):
     """Candidates for existing operations, using the same execution applicability gate."""
     from types import SimpleNamespace
     from typing import get_args
@@ -45,6 +45,21 @@ def analysis_capabilities(configuration, requirements, protocol, *, model=None, 
             budget_allowed=budget,evaluations=count,wall_cost='unknown',
             limitations=['Model-scoped calculation; independent physical acceptance required.',
                 'Final admission checks candidate, exact state, numerical time budget and constructed outputs.']))
+    if mathematical_methods:
+        from tools.research.optimal_capability import CONIC,SENSITIVITY,dependencies
+        env=dependencies()
+        for method in (CONIC,SENSITIVITY):
+            if method not in mathematical_methods:continue
+            count=2 if method==CONIC else 5
+            rows.append(dict(operation='task_capability',capability_method=CONIC,
+                submode='optimal_sensitivity' if method==SENSITIVITY else None,method_version=method,
+                status='conditional' if env['available'] else 'not_applicable',dependency_environment=env,
+                evaluations=count,evaluation_rule='2: one model construction plus one conic solve' if method==CONIC else '1+4*k for k=1 or 2 explicit central step sizes; 3 or 5 existing registered models',
+                remaining_evaluations=remaining_evaluations,
+                budget_allowed=None if remaining_evaluations is None else remaining_evaluations>=count,
+                prerequisites=['Current owned candidates, applicable task/model, frozen protocol and explicit method grant']+
+                    (['Single authorized parameter; model_results baseline first; explicit steps; all model bindings checked'] if method==SENSITIVITY else []),
+                limitations=['Floating numerical checks only; no strict optimum, gradient or physical acceptance.']))
     return rows
 
 

@@ -150,7 +150,7 @@ def _contributions(left, right, width, control, dual):
     return derivatives, dl, dh, records, box
 
 
-def _dual_face(data, solution, derivatives, dl, dh, parameter_scale, face_atol):
+def _dual_face(data, solution, derivatives, dl, dh, parameter_scale, face_atol, progress=None):
     """Min/max envelope over a near-optimal dual face; independently check each return.
 
     This explores nonunique multipliers at one numerical primal. It does not prove
@@ -183,8 +183,11 @@ def _dual_face(data, solution, derivatives, dl, dh, parameter_scale, face_atol):
     for sense in (1., -1.):
         problem = cp.Problem(cp.Minimize(sense*parameter_scale*objective), constraints)
         try:
+            if progress:progress('dual_face','attempt',dict(sense=sense))
             problem.solve(solver='CLARABEL', **FACE_OPTIONS)
+            if progress:progress('dual_face','returned',dict(sense=sense,status=problem.status))
         except cp.error.SolverError as exc:
+            if progress:progress('dual_face','returned',dict(sense=sense,error=str(exc)))
             extrema.append(dict(status='unavailable', error=str(exc))); continue
         if problem.status != cp.OPTIMAL:
             extrema.append(dict(status=problem.status)); continue
@@ -258,7 +261,7 @@ def _redistribute(group, atoms, derivatives, multipliers):
 
 
 def capability_sensitivity(points, parameter, protocol, *, solver_options=None,
-                           slope_rtol=.02, slope_atol=1e-7, face_atol=1e-6):
+                           slope_rtol=.02, slope_atol=1e-7, face_atol=1e-6, progress=None):
     """Analyze baseline-first controlled model points. Parameter units are SI.
 
     Each point supplies value, parameters, model, requirements, initial_delta,
@@ -290,8 +293,13 @@ def capability_sensitivity(points, parameter, protocol, *, solver_options=None,
             parameter_normalization=(dict(definition='xi=(d-dmin)/(dmax-dmin)', bounds=parameter['bounds'],
                 source=parameter['bounds_source']) if parameter.get('bounds') else
                 dict(definition=None, reason='No authoritative range; SI sensitivities only')))
-        solutions = [conic_capability(p['model'], p['requirements'], protocol,
-            initial_delta=p['initial_delta'], solver_options=solver_options) for p in points]
+        solutions = []
+        for i,p in enumerate(points):
+            if progress:progress('capability','attempt',dict(point_index=i))
+            solution=conic_capability(p['model'], p['requirements'], protocol,
+                initial_delta=p['initial_delta'], solver_options=solver_options)
+            solutions.append(solution)
+            if progress:progress('capability','returned',dict(point_index=i,status=solution['status'],solver=solution.get('solver')))
         out['numerical_optimality'] = [dict(value=float(d), model_identity=_identity(p['model']),
             initial_delta=_plain(p['initial_delta']), result=s) for d,p,s in zip(values, points, solutions)]
         out['computation_cost'] = dict(model_count=len(points),
@@ -327,7 +335,7 @@ def capability_sensitivity(points, parameter, protocol, *, solver_options=None,
             lower = [s['dual_checks']['support_lower_estimate'] for s in solutions]
             fd = (sv[right]-sv[left])/width
             interval = [(lower[right]-sv[left])/width, (sv[right]-lower[left])/width]
-            face = _dual_face(prepared[0], base, dr, dl, dh, parameter_scale, face_atol)
+            face = _dual_face(prepared[0], base, dr, dl, dh, parameter_scale, face_atol,**({'progress':progress} if progress else {}))
             out['computation_cost']['dual_face_solves'] += face['solve_count']
             out['computation_cost']['dual_face_wall_s'] += face['wall_s']
             row = dict(kind='central' if mate is not None else 'one_sided_secant',

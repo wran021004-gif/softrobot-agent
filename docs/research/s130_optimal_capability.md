@@ -485,3 +485,178 @@ $env:PYTHONPATH='.;tests/research'
 未解决问题保留为：一般近最优对偶面的可靠极值、原始解非唯一对敏感性的影响、
 严格可微性/截断误差与区域下降、模量的有效改善方向，以及非线性闭环和物理验证。
 这些限制没有阻止 T2 提供受支持的有限方向信息，也没有被转换为否定机器人可行性的结论。
+
+## S130-T3：现有科研入口、预算和证据链适配（2026-10-22）
+
+### 分支与范围
+
+开始时目标工作树干净，HEAD 为 T2 `7b95cad4cdbc8ee32cf3b87298a08d327960c152`，
+T1 为 `3d782aa435e7c3b1e1cc7cd6eac27fe5565859cb`。
+普通 fetch 确认上游为 `d17852c33a2f1c85d50f44ee5772b831fbdb418e`。
+数学分支共同基线 `40a1a340` 比 F2.1 `13ddf460` 早四个提交，上游另有六个 F3.0 提交。
+正常 merge `28f0a794` 无冲突合入这些接口与记录，没有修改集成分支。
+上游记录的 F3.0 语义失败仍是历史失败，本次离线测试不替它补发通过结论。
+
+没有调用真实 Provider、物理仿真、MATLAB、NMPC、PPO 或 T2 模型重建脚本。
+B/T1/T2 数字均读取保存文件。测试中的模型身份重绑定、速度失败是接口夹具，不是新增科学实验。
+旧冻结证据未改，没有新增 Agent、Reporter、Store、执行框架或任务配置体系。
+
+### 显式请求与冻结授权
+
+继续使用 `research_analysis` / `AnalysisRequest`，operation 仍为 `task_capability`。
+不传新字段仍走原三起点 SLSQP；两个新增可空字段在空值时不参与序列化，旧 JSON、digest、
+receipt 恢复路径保持兼容。没有修改默认 Study 配置。
+
+新 Study 可在现有配置根显式增加：
+
+```json
+{
+  "mathematical_methods": {
+    "sampled-affine-conic-minimax-v1": "明确的人类授权来源",
+    "controlled-capability-sensitivity-v1": "明确的人类授权来源"
+  }
+}
+```
+
+字段由原 config.resolve 校验并进入冻结 spec/resolved_identity；内核文件加入科学实现 hash 清单。
+没有修改任何已冻结 Study 的授权。请求不能给自己授权；原 guard 的实现冻结检查继续生效。
+SOCP 请求在原 candidate、protocol、operating_point 请求上增加：
+
+```json
+{"capability_method":"sampled-affine-conic-minimax-v1"}
+```
+
+任务翻译、Registry、模型构造和张力盒不变，T1 原始结果存于 `/trajectory`，
+不伪装成旧 `best_found_violation`。旧 `capability_comparison` 与新方法互斥。
+敏感性使用同一入口，再加以下子模式（尖括号是已有 EvidenceRef 占位符）：
+
+```text
+optimal_sensitivity = {
+  variable: "segments.near.length_m",
+  steps: [h, h/2],
+  model_results: [<baseline>, <minus h>, <plus h>, <minus h/2>, <plus h/2>]
+}
+```
+
+当前支持 `segments.<id>.length_m` / `young_pa`，每次一个参数、一档或两档中心差分，
+复用 3 或 5 个当前 Study 已登记模型。结构比较仅支持 `controller_start_input` /
+`standardized_initial_pretension`。不自动产生扰动候选，不分析全部参数，不支持拓扑敏感性、
+无规则的 saved_state 跨结构映射或未授权范围。T2 离线 JSON 本身不是生产 Store 引用。
+
+每个模型先通过当前 analysis_results、verify_candidate、参数范围、配置/候选/任务/实现冻结、
+协议和操作点检查。候选间仅指定参数变化，控制器、后端、动力学模型、源和 profile 固定。
+T2 内核继续检查输入/坐标顺序、初始条件、归一化、采样覆盖和完整映射一致性。
+指定步长必须等于已存在模型的实际参数差。缺模型、候选、依赖或预算时明确拒绝，提供读取已有
+证据、使用已授权旧方法或另行准备模型/授权等选项；不偷偷构造结构扰动。
+
+### 数学与证据语义
+
+仍求 `min_z max_i g_i(z)`：范数行为 `||M_i z+b_i||/r_i-1`，区间行为原物理尺度下的
+两侧违反量；物理张力、采样、ZOH、前一输入保持不变。本轮没有新增目标或阈值。
+T1 独立重放、数值合法控制、浮点支撑下界估计/gap、原始/对偶检查、活跃约束、覆盖和成本完整保存。
+`ScopedMathematicalClaim` 只按独立重放判断覆盖样本的 model witness；
+positive optimum、optimal 或失败不能产生不可行性证书，也不能成为物理验收。
+
+`MathematicalQuantity`：解析 -1 为 verified；浮点分数与浮点支撑估计为 unverified_estimate，
+附 strength 精确指针；严格最优值和严格数值界仍 unavailable。
+`numerically_checked_sampled_optimality` 只表示有限容差检查通过。
+T2 保留原 direction_status，`controlled_reoptimized_finite_difference` 只支持报告受控差分，
+不升级为严格梯度、区域下降或物理改进。乘子、归一化、对偶贡献、固定控制重放及来源留在 L2。
+
+### 预算、恢复、可选依赖
+
+沿用 dispatch → Store.reserve → execution_worker → recover，没有第二套缓存或计账器。
+准入说明方法、必需候选/模型、预计次数、剩余预算和 worker Python/依赖。
+
+| 请求 | 新模型构建 | 能力内核调用 | 对偶面优化尝试 | 预占评价 |
+|---|---:|---:|---:|---:|
+| SOCP | 1 | 1 | 0 | 2 |
+| 一档中心差分 | 0，复用 3 模型 | 3 | 2 | 5 |
+| 两档中心差分 | 0，复用 5 模型 | 5 | 4 | 9 |
+
+模型构建和独立优化各记一次。重放、KKT、矩阵装配不另记优化尝试，但耗时计入实际 wall time。
+所有计划次数开始前原子扣除，失败、早退或未用完尝试不退还、不清零。完整结果记录实际调用、
+复用和耗时；检查点记录调用前/返回边界。中断在“写入调用前检查点”和真正进入求解器之间时，
+不能证明已进入求解器；缺少完整结果的实际次数为 unknown，仍保留记录和费用。
+未知终止保留 pending、拒绝重启；确认终止后只结算一次。同一完成 operation ID 复用 receipt，
+额外数值评价为 0；不同 ID 是新收费请求，没有新增跨 ID 缓存。
+
+worker 使用 `sys.executable`。共享 `.mainline5-env`：Python 3.11.16、NumPy 2.4.6、
+SciPy 1.17.1、Pydantic 2.14.0、httpx 0.28.1、Strands 1.59.0，**没有 CVXPY/Clarabel**。
+因此该环境的新方法在收费/启动前返回 `OPTIONAL_CVXPY_CLARABEL_UNAVAILABLE_IN_WORKER_PYTHON`。
+没有安装或修改共享环境。数学回归使用已有 `.t1-env` 的 CVXPY 1.9.3、Clarabel 0.11.1、
+Pydantic 2.14.1。独立数学测试复用 T1/T2 清单；新增可选 `requirements-s130-t3.txt` 引用现有
+`requirements-strands-mainline5.lock`，只追加两个求解库，保留主链路的 Pydantic 2.14.0 pin，
+避免把 T1 的 2.14.1 pin 与主链路锁文件直接混装。该完整运行环境本轮未安装，需在新隔离环境
+安装并完成工程预检后启动新授权 Study。
+本轮没有声称共享环境已经具备生产 SOCP 执行条件。
+
+### L2 → L1 → L0 与物理关联
+
+继续使用 ResultCard、现有 Reporter、research_context、evidence_policy 和 evidence_read。
+Reporter source catalog 逐项解析 Store 指针，没有新增 Reporter 协议。
+L1/L0 保留分数、数值可靠性、浮点估计/gap、FD 方向/单位、主导约束、覆盖、成本、未决事项和来源；
+不内嵌原始矩阵、输入序列或乘子表。完整数据按原指针读取。
+当保存的世界系位置输出 C/D 第一行确为零时，摘要报告该局部一阶系数为零，并指向
+`/model/endpoint_outputs/<i>/C/0` 与 `D/0`，不推广为非线性不可控性。
+
+物理关系只使用当前登记、同候选同任务且完整的执行结果。缺少可对齐结果时为 `not_assessed`。
+若数学活跃信号只有位置，而物理失败含 holding_speed，报告 `constraint_mismatch`、
+`causal_explanation=not_established`；其他对齐结果为 `aligned_observations_causality_unresolved`。
+摘要最多附最近三个物理来源和总数。Agent 自主选择下一步，工具不下达设计修改命令。
+
+本轮读取的保存数字（不是新的科学重算）：
+
+| 结果 | 数值 | 限制 |
+|---|---:|---|
+| 0.160 m T1 重放分数 | -0.19999999998602022 | 模型样本，不是物理验收 |
+| 浮点支撑下界估计 | -0.20000000017849437 | 非严格数学下界 |
+| 浮点 gap | 1.9247e-10 | 非形式化认证 |
+| 0.161 m T1 重放分数 | -0.09999999999948331 | 受控局部模型比较 |
+| 长度两档 FD | 100.00000000598052、100.00000002180234 score/m | stable_reoptimized_direction_envelope_unresolved |
+| 模量两档 FD | 5.27e-17、-1.88e-16 score/Pa | numerically_flat_fd_envelope_unresolved |
+
+来源：`comparison.json#/cases`、`t2_final_comparison.json#/analyses`。
+长度由位置约束主导，不说明缩短长度改善保持速度；模量数值平坦不说明刚度物理无效。
+一般近最优对偶面极值仍未完全解决。
+
+### 离线验证与局限
+
+`test_s130_mainline.py` 的 11 项契约测试覆盖 A–F，包括 Store 指针、默认 SLSQP、授权拒绝、
+模型身份、9 次预占、失败结算、未知终止后恢复和零重算。可复用同信息对照夹具在
+`tests/research/fixtures/s130_decision_cases.json`：两臂共享任务、候选、物理观察、动作和预算，
+只替换数学信息。没有将脚本检查解释为 LLM 自主科研能力提升。
+
+T1/T2 数学目标回归 **52 项通过**，新增 progress 测试核对 5 次能力、4 次对偶调用。
+主链路、F2.1、Reporter/Agent、F3.0 明确离线类合计 **39 项通过**，记录见
+`evidence/s130_optimal_capability/t3_final_offline_validation.json`；前一轮记录保留于
+`t3_offline_validation.json`，最终轮增加了 L0 成本投影与检查。
+最初宽测试 51 项因导入路径和缺少 matlab.engine 有 16 个错误；随后 F3 冷启动夹具仅模拟
+MATLAB 依赖可用性，并强制禁止科学 worker。两项 SDK 测试另因 Windows 长路径失败；
+仅缩短测试 UUID 后完成 39 项回归，生产 Session 未修改。这些替换不证明 MATLAB 运行时可用。
+测试日志里的传输异常是故障注入，没有调用真实 Provider。
+
+```powershell
+$env:PYTHONPATH='.;tests/research'
+$env:OPENBLAS_NUM_THREADS='1'
+$env:OMP_NUM_THREADS='1'
+$env:MKL_NUM_THREADS='1'
+& D:/softrobot-agent/.mainline5-env/Scripts/python.exe -m tests.research.s130_offline_check
+.t1-env/Scripts/python.exe -m unittest tests.research.test_conic_capability tests.research.test_capability_sensitivity tests.research.test_trajectory_feasibility.NumericalTests tests.research.test_s129_task_capability.SignedTests -q
+```
+
+验证报告输出文件必须不存在，避免覆盖。结论是信息/预算/恢复契约通过，
+**不是实际 LLM 科研能力提升的实验证明，也不是物理验收**。
+
+### 后续最小 Provider 对照方案（未执行，需另行授权）
+
+A–F 六案例各旧/新两臂，共 12 次主 Agent 请求，隔离上下文；固定模型版本、采样参数、
+同任务/候选/物理观察、动作清单、预算和停止条件，仅数学信息不同。只输出研究决策 JSON，
+科学执行额度为零。最小方案使用确定性 Reporter 投影，不另调用 Reporter Provider；
+如研究自然语言 Reporter 的影响，需单列因素与预算。
+保留原始请求/响应、token/cost、来源、失败与拒绝；未知发送不自动重试。
+评分：来源可追溯、无禁止推论、动作合法且符合预算、未决作用范围正确。
+每案例每臂一次仅是语义冒烟对照，不支持统计性能力提高；重复样本需另行授权。
+
+仍未解决：共享环境缺可选依赖；生产敏感性需要新授权 Study 中匹配的登记模型组；
+真实 LLM 对照未执行；一般对偶面、严格梯度/最优界以及非线性和物理改进仍未验证。

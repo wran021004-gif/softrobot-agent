@@ -127,12 +127,29 @@ class StaticDesignSensitivity(Contract):
     plus_candidate: EvidenceRef
 
 
+class OptimalCapabilitySensitivity(Contract):
+    """Existing registered models, baseline first; no implicit model construction."""
+    variable: str
+    model_results: list[EvidenceRef] = Field(min_length=3,max_length=5)
+    steps: list[FiniteFloat] = Field(min_length=1,max_length=2)
+
+    @model_validator(mode='after')
+    def positive_steps(self):
+        if any(h<=0 for h in self.steps) or len(set(self.steps))!=len(self.steps):
+            raise ValueError('DISTINCT_POSITIVE_SENSITIVITY_STEPS_REQUIRED')
+        if len(self.model_results)!=1+2*len(self.steps):
+            raise ValueError('BASELINE_AND_TWO_EXISTING_MODELS_PER_STEP_REQUIRED')
+        return self
+
+
 class AnalysisRequest(Contract):
     candidate: EvidenceRef
     operation: Literal['equilibrium','linearization','controllability','endpoint','braking','instantaneous_braking_v1','trajectory_feasibility','task_capability','input_sensitivity','design_sensitivity']
     operating_point: Literal['standardized_initial_pretension','controller_start_input','target_equilibrium','halfway_waypoint','saved_state','fixed_input_equilibrium'] = 'halfway_waypoint'
     design_sensitivity: StaticDesignSensitivity | None = None
     capability_comparison: CapabilityComparison | None = None
+    capability_method: Literal['sampled-affine-conic-minimax-v1'] | None = None
+    optimal_sensitivity: OptimalCapabilitySensitivity | None = None
     saved_state: EvidenceRef | None = None
     execution: EvidenceRef | None = None
     update_id: int | None = Field(default=None,ge=0,strict=True)
@@ -141,6 +158,10 @@ class AnalysisRequest(Contract):
 
     @model_validator(mode='after')
     def exact_state(self):
+        if self.capability_method is not None and (self.operation!='task_capability' or self.capability_comparison is not None):
+            raise ValueError('CONIC_REQUIRES_TASK_CAPABILITY_WITHOUT_LEGACY_COMPARISON')
+        if self.optimal_sensitivity is not None and (self.capability_method is None or self.operating_point not in ('controller_start_input','standardized_initial_pretension')):
+            raise ValueError('OPTIMAL_SENSITIVITY_REQUIRES_CONIC_AND_INITIAL_OPERATING_POINT')
         if self.capability_comparison is not None and self.operation != "task_capability":
             raise ValueError("CAPABILITY_COMPARISON_REQUIRES_TASK_CAPABILITY")
         if self.operation=='equilibrium' and self.operating_point!='target_equilibrium':
@@ -167,6 +188,8 @@ class AnalysisRequest(Contract):
         value=handler(self)
         if self.design_sensitivity is None:value.pop('design_sensitivity',None)
         if self.capability_comparison is None:value.pop('capability_comparison',None)
+        for key in ('capability_method','optimal_sensitivity'):
+            if getattr(self,key) is None:value.pop(key,None)
         return value
 
 

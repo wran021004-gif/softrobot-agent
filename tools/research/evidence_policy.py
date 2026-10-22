@@ -13,6 +13,38 @@ FORBIDDEN=['global_nonlinear_feasibility','global_nonlinear_infeasibility',
     'structural_infeasibility','whole_horizon_from_instantaneous_braking',
     'adapted_dynamic_improvement_from_static_sensitivity','unvisited_simulation_descent_guarantee',
     'continuous_time_compliance','hardware_performance','robustness','repeatability']
+
+
+def mathematical_physical_relation(value, physical):
+    """Associate aligned recorded constraints, never infer a causal mechanism."""
+    task=(value.get('binding') or {}).get('task_identity')
+    candidate=value.get('candidate')
+    trajectory=value.get('trajectory') or {}
+    sensitivity=value.get('optimal_sensitivity') or {}
+    if sensitivity.get('numerical_optimality'):
+        trajectory=sensitivity['numerical_optimality'][0]['result']
+    active=[r for r in trajectory.get('dual_checks',{}).get('constraint_multipliers',[]) if r['epigraph_active']]
+    signals=sorted({r['signal']['name'] for r in active})
+    result=dict(status='not_assessed',mathematical_active_signals=signals,sources=[],
+        reason='No complete same-candidate same-task physical observation with alignable constraints.',
+        causal_explanation='not_established',physical_improvement='unverified')
+    aligned=[]
+    for ref,raw in physical:
+        evidence=summarize_evidence(raw,ref)
+        if (not candidate or not task or raw.get('candidate')!=candidate or evidence['task_identity']!=task
+                or evidence['claim_kind']!='PHYSICAL_OBSERVATION'):continue
+        components=raw.get('acceptance',{}).get('components',{})
+        failed=[k for k,v in components.items() if v.get('passed') is False]
+        if not failed:continue
+        aligned.append(dict(failed_components=failed,reference=ref,pointer='/acceptance/components'))
+    if aligned:
+        failed={k for a in aligned for k in a['failed_components']}
+        mismatch=(signals==['tip_position'] and bool(failed & {'holding_speed','holding_tip_speed','speed'}))
+        result.update(status='constraint_mismatch' if mismatch else 'aligned_observations_causality_unresolved',
+            physical_failed_components=sorted(failed),sources=aligned[-3:],aligned_observation_count=len(aligned),
+            reason='Position-dominated mathematics does not explain the recorded holding-speed failure.' if mismatch else
+                'Aligned observations are available; no validated mathematical-to-physical explanation.')
+    return result
 HYPOTHESES={
     'CONTROL_SEARCH_INCOMPLETE':(['PHYSICAL_OBSERVATION','NUMERICAL_DIAGNOSTIC'],
         ['additional_bounded_starts','paired_control_search'], 'Only searched starts, controls and budgets.'),
@@ -69,6 +101,17 @@ def summarize_evidence(value,reference=None,*,refinement=None):
                 'necessary_constraint_box_exclusion_verified','kernel_separating_lower_bound_verified'):
             kind='MODEL_EXCLUSION';supported=['model_input_box_exclusion']
         unresolved+=['Nonlinear realization and constraints outside declared model/sample coverage remain unresolved.']
+        trajectory=value.get('trajectory',{})
+        if (verified and trajectory.get('method_version')=='sampled-affine-conic-minimax-v1'
+                and trajectory.get('optimality_status')=='numerically_checked'
+                and trajectory.get('replay',{}).get('numerically_valid')):
+            supported.append('numerically_checked_sampled_optimality')
+            unresolved.append('Floating support lower estimate and gap are not strict mathematical bounds or certification.')
+        sensitivity=value.get('optimal_sensitivity',{})
+        if verified and sensitivity.get('reoptimized_finite_difference'):
+            supported.append('controlled_reoptimized_finite_difference')
+            unresolved.extend(['Strict structural gradient and regional descent unavailable.',
+                'Numerically flat modulus does not imply physical irrelevance; position improvement does not guarantee holding-speed improvement.'])
     if 'acceptance' in value:
         gap=task_gap(value);pointer='/acceptance'
         acceptance=value.get('acceptance') or {}

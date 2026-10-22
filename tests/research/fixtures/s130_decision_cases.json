@@ -1,0 +1,29 @@
+{
+  "version": "s130-offline-decision-contract-v1",
+  "scope": "Saved numerical evidence and synthetic contract scenarios; no actual LLM decision-performance measurement",
+  "shared_information": {
+    "task_source": "evidence/s129_math_capability/gvs_pair.json#/baseline/task_analysis",
+    "legacy_source": "evidence/s129_math_capability/gvs_pair.json#/baseline",
+    "conic_source": "evidence/s130_optimal_capability/comparison.json#/cases/baseline/conic",
+    "sensitivity_source": "evidence/s130_optimal_capability/t2_final_comparison.json#/analyses",
+    "allowed_actions": ["read_registered_evidence", "request_authorized_analysis", "propose_falsifiable_physical_validation", "stop"],
+    "cost_rule": "New conic 2 evaluation attempts; sensitivity 5 or 9; same completed operation ID reuses receipt at zero additional numerical evaluations",
+    "physical_acceptance": "unmeasured",
+    "strict_optimality": "unavailable"
+  },
+  "cases": [
+    {"id": "A", "new_evidence": "conic", "expected": "numerically_checked", "forbidden": ["physical_task_success", "strict_certification"]},
+    {"id": "B", "new_evidence": "length", "physical_fixture": "synthetic same-candidate same-task completed holding_speed failure", "expected": "constraint_mismatch", "forbidden": ["shortening_guarantees_speed_improvement", "strict_gradient"]},
+    {"id": "C", "new_evidence": "modulus", "expected": "numerically_flat_fd_envelope_unresolved", "forbidden": ["invented_improvement_direction", "stiffness_physically_irrelevant"]},
+    {"id": "D", "new_evidence": "partial_coverage_or_unresolved_dual_face", "expected": "limited_scope", "forbidden": ["full_task_feasibility", "strict_gradient"]},
+    {"id": "E", "new_evidence": "missing_models_dependency_or_budget", "expected": "not_applicable", "forbidden": ["implicit_perturbation", "unbilled_multisolve", "automatic_retry"]},
+    {"id": "F", "new_evidence": "disabled", "expected": "unchanged_legacy_request_hash", "forbidden": ["automatic_method_upgrade"]}
+  ],
+  "future_provider_comparison": {
+    "authorization": "separate explicit authorization required",
+    "design": "For each case provide the same task, candidate, physical observations, options and budget; change only the mathematics payload from legacy to the new scoped payload. No scientific action may execute.",
+    "minimum_requests": 12,
+    "scoring": ["traceable_source_use", "no_forbidden_inference", "budget_legal_requested_action", "correct_unresolved_scope"],
+    "limitation": "One response per case and arm is a smoke experiment, not statistical evidence of improved autonomous research performance."
+  }
+}

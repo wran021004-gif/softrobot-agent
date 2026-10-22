@@ -58,6 +58,14 @@ def group(mode='smooth', origin=.2, steps=(.02,.01)):
 
 
 class SensitivityTests(unittest.TestCase):
+    def test_optional_progress_records_actual_kernel_and_face_attempts(self):
+        events=[]
+        out=self.analyze(progress=lambda kind,stage,detail:events.append((kind,stage,detail)))
+        for kind,count in (('capability',5),('dual_face',4)):
+            self.assertEqual(sum(k==kind and s=='attempt' for k,s,d in events),count)
+            self.assertEqual(sum(k==kind and s=='returned' for k,s,d in events),count)
+        self.assertEqual(out['computation_cost']['dual_face_solves'],4)
+
     def analyze(self, mode='smooth', parameter=None, **kw):
         points, protocol=group(mode)
         out=capability_sensitivity(points, parameter or PARAMETER, protocol, **kw)

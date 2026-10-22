@@ -57,6 +57,7 @@ def confirmation_count(s):
 SCIENCE_FILES = ['extensions/tendon_family/'+n+'.py' for n in ('gvs_nmpc','gvs_trajectory','gvs_projection','contracts','control_evidence','backends','generated_serial','gvs_profile','gvs_codesign','gvs_casadi','gvs','gvs_basis','math_analysis','compiler','sections','geometry','manifest')]
 SCIENCE_FILES += ['extensions/optimization/contracts.py','extensions/optimization/ipopt.py','extensions/math_analysis/tools.py','extensions/math_analysis/kernels.py','schemas/platform_analysis.py','tools/execution_completion.py','tools/research_tasks.py']
 SCIENCE_FILES += ['extensions/math_analysis/trajectory.py','extensions/math_analysis/task_capability.py','tools/research/capability.py']
+SCIENCE_FILES += ['extensions/math_analysis/conic_capability.py','extensions/math_analysis/capability_sensitivity.py']
 SCIENCE_FILES += ['extensions/tendon_family/family_space.py']
 SCIENCE_FILES += ['tools/rl/'+name+'.py' for name in ('env','train','checks','continuation')]
 CORE_FILES = ['tools/research/'+p.name for p in (ROOT/'tools/research').glob('*.py')]
