@@ -1,4 +1,4 @@
-"""One F3.0 grant through production converse; no alternate Agent or tool executor.
+"""Final F3.0 revalidation through production converse; requires fresh approval.
 
 Only the transport counter is wrapped. Offline runs replace HTTP, never SDK hooks,
 guards, tools, Reporter delivery or settlement. Live ID is fixed: no retry/reset.
@@ -22,22 +22,29 @@ from tools.research.state import state, update, save, core_hashes
 from tools.research.session_handoff import unmatched
 from tools.state_io import atomic_json, read, digest
 
-LIVE_ID='f30-live-20261022'
-AUTHORIZATION=('User task 2026-10-22: one F3.0 validation, at most 2 main and 1 Reporter '
-    'requests, saved F1-B evidence only, zero new scientific workers; no reset or retry. '
-    'Existing frozen DeepSeek configuration and project-scoped research data only.')
+SEALED_ID='f30-live-20261022'
+LIVE_ID='f30-revalidate-20261022-01'
+SCOPE_PATH=ROOT/'evidence/s129_integration/f30_revalidation_scope.json'
 
 
-def prepare(live=False):
-    run_id=LIVE_ID if live else 'f30-offline-'+uuid4().hex[:8]
+def prepare(live=False, *, approved_commit=None):
+    run_id=LIVE_ID if live else 'f30-revalidate-offline-'+uuid4().hex[:8]
     directory=ROOT/'runs/research'/run_id
     if live and directory.exists():
         raise ValueError('F30_SINGLE_ATTEMPT_ALREADY_EXISTS: audit original Store; never recreate grant')
+    commit=subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip()
+    if live:
+        if approved_commit!=commit:
+            raise ValueError('F30_EXPLICIT_APPROVED_COMMIT_REQUIRED: pass the separately approved full HEAD SHA')
+        if (subprocess.check_output(['git','status','--porcelain'],cwd=ROOT,text=True).strip()
+                or subprocess.check_output(['git','rev-parse','origin/integration/s129-research'],cwd=ROOT,text=True).strip()!=commit):
+            raise ValueError('F30_CLEAN_PUSHED_COMMIT_REQUIRED')
+    proposal=read(SCOPE_PATH)
     raw=read(ROOT/'configs/research/study_s125_cold.json')
-    raw.update(study_id=run_id,base_commit=subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip(),
+    raw.update(study_id=run_id,base_commit=commit,
         mode='engineering_investigation',tool_readiness=None,capabilities=['investigation'],
         allowed_plan_actions=['diagnose','stop'],authorization='PENDING_EXPLICIT_APPROVAL: F3.0 independent scope',
-        evidence_destination='evidence/s129_integration/f30')
+        evidence_destination='evidence/s129_integration/f30_revalidation')
     raw['budgets'].update(provider_requests=3,protected_provider_requests=0,public_operations=12,
         protected_public_operations=0,physical_launches=0,mathematical_evaluations=0,offline_nlp=0,bdf_replays=0)
     raw['nmpc_limits']['executions']=0
@@ -83,9 +90,13 @@ def prepare(live=False):
         outbound=['Frozen task/design/model configuration','Saved scoped B evidence and exact references',
             'Agent tool requests/feedback and Reporter interpretations','Research ledger and implementation identities'],
         prohibited=['Credentials or environment file content','Unrelated workspace/user data','Other Studies raw SDK histories'],
-        local_archive=str(directory),raw_publication_authorized=False)
+        local_archive=str(directory),raw_publication_authorized=False,
+        revalidation_scope=proposal,revalidation_scope_identity=digest(proposal),
+        approved_commit=approved_commit if live else None)
     agent.record(h,'formal_study_authorization',dict(scope=scope,scope_identity=digest(scope),
-        user_approval=AUTHORIZATION if live else 'OFFLINE FIXTURE ONLY; HTTP mocked'))
+        user_approval=('Separate explicit live invocation for '+LIVE_ID+' at approved commit '+approved_commit+
+            '; <=2 main, <=1 Reporter, <=3 total requests; zero science; no retry/reset or automatic F3')
+            if live else 'OFFLINE FIXTURE ONLY; HTTP mocked'))
     agent.record(h,'f30_import_manifest',scope)
     atomic_json(directory/'scope.json',scope)
     return h,refs
@@ -100,6 +111,10 @@ class CappedBoundary(agent.LiveBoundary):
             ceiling={'conversation':2,'reporter':1}.get(role,0)
             if usage.get(role,{}).get('requests',0)>=ceiling:
                 raise ValueError('F30_ROLE_CAP_NO_SEND: '+role)
+            if role=='conversation' and usage.get(role,{}).get('requests',0)==1:
+                if not any(saved['interpretation_for'] and saved['interpretation_status']=='available'
+                        for _,saved in reporter.current_reports(self.host)):
+                    raise ValueError('F30_ACCEPTED_REPORTER_REQUIRED_NO_SEND')
         return await super().handle_async_request(request)
 
 
@@ -132,6 +147,8 @@ def mock_http(refs):
 
 
 def audit(run_id):
+    if run_id==SEALED_ID:
+        raise ValueError('F30_SEALED_HISTORY_READ_ONLY: do not rewrite its audit or SDK files')
     h=Host(ROOT/'runs/research'/run_id,run_id,actor='unified-research')
     s=state(h);events=h.store.events(run_id);requests=[];wires=[]
     for i,event in enumerate(events):
@@ -210,12 +227,14 @@ def audit(run_id):
         and receipt_checks and all(r['paired'] and r['receipt'] and r['status']=='success' for r in receipt_checks)
         and not any(counters.values()) and not result['unknown_sends'] and not result['unconsumed_response']
         and not result['unsettled_receipts'])
+    result['scientific_admission']=('pending_semantic_audit' if result['technical_checks_passed'] else 'failed') if run_id==LIVE_ID else 'not_admitted_offline_fixture'
+    result['f3_started']=False
     atomic_json(h.store.root/'f30_audit.json',result)
     return result
 
 
-async def run(live=False):
-    h,refs=prepare(live)
+async def run(live=False, *, approved_commit=None):
+    h,refs=prepare(live,approved_commit=approved_commit)
     agent.record(h,'f30_validation_started',dict(live=live,no_retry=True))
     error=None
     with ExitStack() as stack:
@@ -230,13 +249,14 @@ async def run(live=False):
             agent.record(h,'f30_execution_failure',dict(error=error,no_retry=True),status='stopped')
     result=audit(h.run_id);result['execution_error']=error
     atomic_json(h.store.root/'f30_audit.json',result)
-    atomic_json(ROOT/'runs'/('f30_live.json' if live else 'f30_offline.json'),result)
+    atomic_json(ROOT/'runs'/('f30_revalidation_live.json' if live else 'f30_revalidation_offline.json'),result)
     return result
 
 
 if __name__=='__main__':
     parser=argparse.ArgumentParser()
     parser.add_argument('--live',action='store_true')
+    parser.add_argument('--approved-commit',help='Full final SHA separately approved for live revalidation; preparation is not approval')
     parser.add_argument('--audit',metavar='STUDY_ID')
     args=parser.parse_args()
-    print(json.dumps(audit(args.audit) if args.audit else asyncio.run(run(args.live)),ensure_ascii=False))
+    print(json.dumps(audit(args.audit) if args.audit else asyncio.run(run(args.live,approved_commit=args.approved_commit)),ensure_ascii=False))

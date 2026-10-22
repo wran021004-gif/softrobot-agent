@@ -1,14 +1,24 @@
 {
-  "status": "proposal_only_not_authorized_not_executed",
+  "status": "execution_prepared_not_authorized_not_executed",
   "proposed_study_id": "f30-revalidate-20261022-01",
   "proposed_store": "runs/research/f30-revalidate-20261022-01",
   "implementation_freeze": {
-    "selection": "Exact full final delivery HEAD containing this scope, reported to the user after the ordinary push",
+    "selection": "Explicit --approved-commit FULL_SHA must equal clean HEAD and origin/integration/s129-research; archived as implementation and approved_commit in the new Store scope",
+    "final_sha_binding": "After the ordinary push, runs/f30_revalidation_scope_bound.json contains a copy of this scope with implementation_freeze.commit set to the exact final delivery SHA; this independent local review artifact avoids a Git commit containing its own hash",
     "requirements": [
       "Bind that exact commit and resolved configuration identity in a new independent explicit authorization",
       "Require clean worktree and matching origin/integration/s129-research before creation",
       "Do not substitute a subsequently changed HEAD without fresh scope review"
     ]
+  },
+  "entrypoint": {
+    "module": "tests.research.f30_provider_check",
+    "execution_command_template": "python -m tests.research.f30_provider_check --live --approved-commit FULL_SEPARATELY_APPROVED_SHA",
+    "runtime": "production tools.research.agent.converse; existing SDK, tools, receipts, Reporter and budget handling",
+    "authorization": "Preparation and this command template do not authorize execution; wait for explicit user approval",
+    "archive": "runs/research/f30-revalidate-20261022-01",
+    "result": "runs/f30_revalidation_live.json",
+    "audit_command": "python -m tests.research.f30_provider_check --audit f30-revalidate-20261022-01"
   },
   "endpoint": "https://api.deepseek.com/chat/completions",
   "provider_configuration": "Unchanged frozen provider values in evidence/s129_integration/f30_scope.json; deepseek-flash, thinking enabled, reasoning high, max_tokens 32768",
@@ -60,7 +70,7 @@
     "No automatic Provider retry, budget reset or replacement Study after failure",
     "End after the bounded check; no automatic formal F3 admission or scientific execution"
   ],
-  "historical_preservation": "f30-live-20261022 and all three original requests remain failed and immutable; do not call its fixed-ID --live entrypoint",
+  "historical_preservation": "f30-live-20261022 and all three original requests remain failed and immutable; the adapted runner uses only the new fixed ID and refuses to rewrite the sealed Study audit",
   "required_next_authorization": "User explicitly approves this new Study ID, independent Store, exact final delivery commit, outbound data and request/zero-science ceilings",
   "f3_admission": "closed"
 }

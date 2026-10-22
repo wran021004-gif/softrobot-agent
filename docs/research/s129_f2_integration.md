@@ -1,5 +1,53 @@
 # F2 integration: Agent, Reporter and mathematical evidence
 
+## Final F3.0 revalidation execution prepared; no live authorization (2026-10-22)
+
+Starting from `9e17c8b1bbcee7cc975ebb589526c78a83456858`, the existing
+`tests.research.f30_provider_check` runner now fixes live identity to
+`f30-revalidate-20261022-01` and its independent Store. It still invokes production
+`converse()` directly. No Reporter, scientific worker or Provider configuration was
+refactored. The old Study remains sealed, and its audit-writing path is refused.
+
+Live execution requires `--live --approved-commit FULL_SHA`, where the full SHA
+must match clean HEAD and `origin/integration/s129-research`. The old authorization
+text was removed; only the separately approved future live invocation records the
+new identity-bound authorization. Existing Store refusal prevents resetting the
+attempt. The original transport has no automatic retries; the runner also refuses
+a second main send unless Reporter has an accepted interpretation, so invalid
+output cannot trigger an automatic repair/fallback send. Confirmed saved responses
+still replay before role-cap checks without a new send or charge.
+
+The unchanged limits are <=2 main, <=1 Reporter, <=3 total Provider requests,
+12 public operations, and zero scientific worker/backend budgets. The planned
+operation is one read-only investigation of the saved B pair. Output now goes to
+`runs/f30_revalidation_live.json`, never the old live summary. Technical delivery
+success awaits semantic audit; it cannot authorize or launch formal F3.
+
+Six focused tests were exercised. Four passed initially; two test issues (sandbox
+temporary-directory cleanup and reading after legitimate protected closure) were
+corrected and those two passed on rerun. The production test spies on actual
+pre-send `read_evidence(..., record_read=False)` checks for every catalog entry.
+It uses real Strands SDK + MockTransport, reopens the actual SDK/Store, confirms
+three ordered requests, exact receipts and zero science, and hashes the entire
+original archive before/after. A saved source-ID response also recovers at the
+Reporter cap without another send or charge. No broad test suite was run.
+
+```powershell
+$env:PYTHONPATH='.;tests/research;C:\Program Files\MATLAB\R2024a\extern\engines\python\dist'
+$env:OPENBLAS_NUM_THREADS='1'; $env:OMP_NUM_THREADS='1'; $env:MKL_NUM_THREADS='1'
+& D:/softrobot-agent/.mainline5-env/Scripts/python.exe -m unittest tests.research.test_f30_provider_check -v
+# Only after separate explicit live approval, substitute the exact delivery SHA:
+& D:/softrobot-agent/.mainline5-env/Scripts/python.exe -m tests.research.f30_provider_check --live --approved-commit FULL_SEPARATELY_APPROVED_SHA
+```
+
+The tracked [scope](../../evidence/s129_integration/f30_revalidation_scope.json)
+defines the outbound data and invocation binding. After committing and pushing,
+the independent local `runs/f30_revalidation_scope_bound.json` records that exact
+final SHA for review. A tracked file cannot contain its own containing commit's
+hash; the runner binds the explicitly approved SHA into the actual Store scope.
+The local binding is **not** a new Study or approval. No live Store, Provider
+request or F3 research was created during preparation.
+
 ## F3.0 citation repair: offline complete; admission still closed (2026-10-22)
 
 The sealed failure below is unchanged. A read-only inspection of its actual request,
