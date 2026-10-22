@@ -33,7 +33,8 @@ def reporter_response(request, *, malicious=False, finish='stop'):
     wire=json.loads(request.content);payload=json.loads(wire['messages'][-1]['content'])
     content=dict(interpretations=[dict(kind='unresolved_question',
         text='Fixture: multiple conditions changed; evidence does not isolate a cause.',
-        sources=[payload['report']['results'][0]['identity']['result']])])
+        **(dict(source_ids=[next(iter(payload['source_catalog']))]) if 'source_catalog' in payload
+            else dict(sources=[payload['report']['results'][0]['identity']['result']])))])
     if malicious:content['results']=[{'metrics':'replace authoritative values'}]
     return httpx.Response(200,json=dict(id='offline-reporter',object='chat.completion',created=1,
         model=wire['model'],choices=[dict(index=0,finish_reason=finish,message=dict(role='assistant',
@@ -167,10 +168,14 @@ class AgentReportingTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,'SETTLED'):asyncio.run(reporter.complete_reports(self.h,forbidden))
         self.assertEqual(self.h.store.remaining()['used']['model_calls'],1)
 
-    def test_saved_reporter_response_recovers_without_resend_or_new_charge(self):
+    def test_legacy_saved_reporter_response_recovers_without_resend_or_new_charge(self):
         from tools.research.agent import received
         reference=self.physical();reporter.investigate(self.h,dict(question='Recover fixture',references=[reference]))
         ref,saved=reporter.entries(self.h)[0];wire=reporter._wire(self.h,ref,saved)
+        payload=json.loads(wire['messages'][-1]['content'])
+        payload.pop('source_catalog');payload.pop('score_comparisons')
+        wire['messages'][-1]['content']=json.dumps(payload)
+        wire['messages'][0]['content']='Legacy Reporter contract: '+json.dumps(reporter.InterpretationResponse.model_json_schema())
         boundary=LiveBoundary(self.h,httpx.MockTransport(reporter_response));boundary.purpose='reporter'
         provider=state(self.h)['pilot']['provider']
         async def exercise():
@@ -182,6 +187,24 @@ class AgentReportingTests(unittest.TestCase):
         asyncio.run(exercise())
         self.assertEqual(reporter.entries(self.h)[-1][1]['interpretation_status'],'available')
         self.assertNotIn('unconsumed_response',state(self.h)['pilot'])
+
+    def test_source_ids_reject_unknown_malformed_and_raw_locations_preserving_l2(self):
+        reference=self.physical()
+        result=reporter.investigate(self.h,dict(question='ID boundary fixture',references=[reference],
+            reads=[dict(reference=reference,pointer='/acceptance',view='fields',fields=['components'])]))
+        base=result['report_reference'];saved=self.h.store.artifact(base)
+        wire=reporter._wire(self.h,base,saved);payload=json.loads(wire['messages'][-1]['content'])
+        self.assertIn(dict(reference=reference,pointer='/acceptance'),payload['source_catalog'].values())
+        for invalid in (dict(source_ids=['S999999']),dict(source_ids=['/trajectory/score_semantics']),
+                dict(source_ids=[]),dict(source_ids=[1]),dict(sources=[dict(reference=reference,pointer='')])):
+            with self.subTest(invalid=invalid):
+                response=httpx.Response(200,json=dict(choices=[dict(finish_reason='stop',message=dict(
+                    content=json.dumps(dict(interpretations=[dict(kind='new_information',text='Fixture',**invalid)]))))]))
+                ref=reporter._finish(self.h,SimpleNamespace(last_request='offline-fixture'),wire,response)
+                final=self.h.store.artifact(ref)
+                self.assertEqual(final['interpretation_status'],'unavailable')
+                self.assertEqual(final['report'],saved['report'])
+        self.assertEqual(self.h.store.remaining()['used']['model_calls'],0)
 
     def test_budget_preserves_closeout_capacity(self):
         reference=self.physical();reporter.investigate(self.h,dict(question='Budget fixture',references=[reference]))
@@ -375,7 +398,7 @@ class ReportingSessionTests(unittest.TestCase):
                         result=reporter_response(request)
                         if outcome=='invalid_pointer':
                             body=result.json();items=json.loads(body['choices'][0]['message']['content'])
-                            items['interpretations'][0]['sources'][0]['pointer']='/trajectory/score_semantics'
+                            items['interpretations'][0]['source_ids']=['/trajectory/score_semantics']
                             body['choices'][0]['message']['content']=json.dumps(items)
                             result=httpx.Response(200,json=body)
                         return result

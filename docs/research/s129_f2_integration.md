@@ -1,5 +1,88 @@
 # F2 integration: Agent, Reporter and mathematical evidence
 
+## F3.0 citation repair: offline complete; admission still closed (2026-10-22)
+
+The sealed failure below is unchanged. A read-only inspection of its actual request,
+raw response and SDK snapshot confirmed 11 interpretations and 17 unique sources:
+16 resolve, and `/trajectory/score_semantics` does not. The request's L2 contains
+that derived summary key, whereas the original definition is
+`/trajectory/problem_definition`. The complete SDK message identity matches its
+original anchor. All 13 files in the original archive, including SQLite, receipts,
+configuration, scope and SDK history, have identical before/after SHA-256 hashes.
+
+`reporter._wire()` now builds a request-local `source_catalog` from typed report
+locations, explicit capability pointers and requested exact reads. It deduplicates
+locations and verifies each with `read_evidence(..., record_read=False)`. Untyped
+summary keys are never converted to raw paths. The saved B pair produces 64 linked
+sources, including the problem, scores, fixed control, comparison scope, solver
+starts and replay. No new evidence registry or report schema is introduced.
+
+Provider output is now `{"interpretations":[{"kind":"new_information",
+"text":"...","source_ids":["S1","S2"]}]}`. `_finish()` resolves IDs using the
+**persisted request's** catalog, then retains the existing scientific artifact
+scope check and raw read validation. Unknown/malformed IDs and direct raw-location
+output are rejected, preserving deterministic L2. Persisted ScientificReport still
+uses `ReporterInterpretation.sources: list[EvidenceLocation]`. Requests without a
+catalog continue through the original `sources` parser; saved responses recover
+without resend or another charge. Previously completed reports are not rewritten.
+The default instruction asks for 1–3 substantive interpretations; explicit complex
+investigations can use more. Provider configuration, thinking, max_tokens and budget
+validation are unchanged. Historical Reporter usage was 62,282 prompt / 21,956
+completion tokens (17,508 reasoning); no new live token measurement is claimed.
+
+The existing `signed_score_comparisons()` remains the sole projection owner.
+`mathematical_decision_view()` already forwards it to L1; Reporter receives the
+same deterministic comparisons. `score`, direct `delta`, recorded
+`normalized_secants` and positive `control_reoptimization_improvement` have explicit
+definitions. Recovery fractions appear only for a positive fixed-control loss
+with nonnegative recovery and residual, using that original loss as denominator.
+
+| Saved/derived quantity | Value |
+|---|---:|
+| Baseline reoptimized score | -0.1999999515720519 |
+| Candidate fixed-old-control score | -0.08298844105123285 |
+| Candidate reoptimized score | -0.09999951729772974 |
+| Fixed-control degradation | +0.11701151052081904 |
+| Reoptimization improvement (positive recovery) | +0.017011076246496892 |
+| Candidate reoptimized minus candidate fixed score | -0.017011076246496892 |
+| Residual reoptimized degradation | +0.10000043427432215 |
+| Recovery / original fixed-control loss | 0.14537951156070436 |
+| Residual / original fixed-control loss | 0.8546204884392956 |
+| Recorded fixed-control normalized secant | 18.72184168333103 |
+| Recorded reoptimized normalized secant | 16.00006948389153 |
+
+The structural step is `0.0010000000000000009 m`, normalization scale `0.16 m`;
+secants equal the corresponding structural delta divided by the step, times the
+scale. These are computed local-model comparisons under the recorded task, input,
+sampling and solve-budget conditions. Optimality is uncertified; neither true
+optimal structural ranking nor MuJoCo acceptance follows.
+
+**20 distinct focused offline tests passed**: 10 AgentReportingTests, 7
+IntegrationTests, the F30 production delivery/reopen test, and 2 native SDK
+investigation/Reporter-boundary tests. The latter reuses available, invalid source,
+unknown-send and interrupted-response cases. Real Strands SDK plus MockTransport
+preserves main → Reporter → main, interpreted L1 before the second main request,
+receipts and recovery. No historical 132-test sweep or scientific computation ran.
+The 18-test group completed in 13.799 s, and the additional 2 tests in 13.949 s.
+`git diff --check` passed. Local unittest stderr formatting by PowerShell does not
+represent test failures; both processes exited 0 with `OK`.
+
+```powershell
+$env:PYTHONPATH='.;tests/research;C:\Program Files\MATLAB\R2024a\extern\engines\python\dist'
+$env:OPENBLAS_NUM_THREADS='1'; $env:OMP_NUM_THREADS='1'; $env:MKL_NUM_THREADS='1'
+& D:/softrobot-agent/.mainline5-env/Scripts/python.exe -m unittest test_s129_agent_reporting.AgentReportingTests test_s129_integration.IntegrationTests test_f30_provider_check.F30Tests.test_production_delivery_reopens_with_zero_science -v
+& D:/softrobot-agent/.mainline5-env/Scripts/python.exe -m unittest test_s129_agent_reporting.ReportingSessionTests.test_native_investigation_delivers_l1_before_next_model_in_same_invocation test_s129_agent_reporting.ReportingSessionTests.test_native_science_tool_reporter_boundary_and_unknown_send -v
+```
+
+Derived audit: [f30_citation_repair.json](../../evidence/s129_integration/f30_citation_repair.json).
+Separate **unapproved, unexecuted** revalidation proposal:
+[f30_revalidation_scope.json](../../evidence/s129_integration/f30_revalidation_scope.json).
+It names a new Study and independent Store, <=2 main + <=1 Reporter requests,
+zero science workers and explicit outbound scope. Freeze the exact final pushed
+delivery HEAD reported to the user before any newly authorized run. The old fixed-ID
+live checker cannot be reused for this proposal. No new Study or authorization was
+created. F3 remains closed; offline engineering success is not live admission.
+
 ## F3.0 final disposition: FAILED; F3 not started (2026-10-22)
 
 The single authorized live validation is complete. Study `f30-live-20261022`
