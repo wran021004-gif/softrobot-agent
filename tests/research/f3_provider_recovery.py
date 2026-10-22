@@ -120,6 +120,23 @@ def apply(host,approval):
     return dict(already_applied=False,receipt=receipt,ledger=host.store.remaining(),authorization=authorization)
 
 
+def approve_from_standing(host,reference,request_id):
+    """Derive only this verified loss disposition from the user's standing scope."""
+    grant=host.store.artifact(reference);scope=grant.get('scope',{});s=state(host)
+    frozen_limits={k:s['spec'][k] for k in ('budgets','nmpc_limits','rl_limits')}
+    if (grant.get('version')!='continuous_engineering_authorization_v1' or grant.get('user_approval') is not True
+            or grant.get('scope_identity')!=digest(scope) or scope.get('study_id')!=host.run_id
+            or scope.get('resolved_identity')!=s['spec']['resolved_identity'] or scope.get('freeze')!=s['freeze']
+            or scope.get('limits_identity')!=digest(frozen_limits)
+            or 'verified_provider_response_loss' not in scope.get('operations',[])):
+        raise ValueError('CURRENT_STUDY_STANDING_ENGINEERING_APPROVAL_REQUIRED')
+    exact=inspect(host,request_id)
+    return dict(version='provider_response_loss_authorization_v1',user_approval=True,scope=exact,
+        scope_identity=digest(exact),standing_authorization=reference,
+        source='Current user explicitly authorized continuous engineering recovery within original finite Study limits; '
+            'this exact exited-owner response loss passed the same original-wire/SDK/receipt checks.')
+
+
 def main():
     p=argparse.ArgumentParser();p.add_argument('command',choices=['inspect','apply'])
     p.add_argument('--run-id',required=True);p.add_argument('--request-id');p.add_argument('--authorization');p.add_argument('--output')

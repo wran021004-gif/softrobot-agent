@@ -11,7 +11,8 @@ from tools.research.session_handoff import unmatched
 from tools.platform_store import zero
 from tools.state_io import atomic_json, digest, read
 from tests.research.test_s125_contract import cold_host
-from tests.research.f3_provider_recovery import inspect, apply, loss_disposition, ERROR
+from tests.research.f3_provider_recovery import inspect, apply, loss_disposition, approve_from_standing, ERROR
+from tools.research.state import save
 
 
 class ProviderLossRecoveryTests(unittest.TestCase):
@@ -114,6 +115,21 @@ class ProviderLossRecoveryTests(unittest.TestCase):
         self.assertIsNone(self.h.store.lookup(self.h.run_id,self.request_id)['receipt'])
         self.assertEqual(self.h.store.events(self.h.run_id),events)
         self.assertEqual(self.h.store.remaining(),before)
+
+    def test_standing_approval_is_bound_to_original_study_and_limits(self):
+        s=state(self.h)
+        scope=dict(study_id=self.h.run_id,resolved_identity=s['spec']['resolved_identity'],freeze=s['freeze'],
+            limits_identity=digest({k:s['spec'][k] for k in ('budgets','nmpc_limits','rl_limits')}),
+            operations=['verified_provider_response_loss'])
+        def grant(value):
+            return save(self.h,dict(version='continuous_engineering_authorization_v1',user_approval=True,
+                scope=value,scope_identity=digest(value)),'explicit_offline_authorization_fixture')
+        approved=approve_from_standing(self.h,grant(scope),self.request_id)
+        self.assertEqual(approved['scope'],inspect(self.h,self.request_id))
+        for changes in (dict(study_id='other'),dict(limits_identity='changed'),dict(operations=[])):
+            with self.assertRaisesRegex(ValueError,'STANDING_ENGINEERING_APPROVAL'):
+                approve_from_standing(self.h,grant({**scope,**changes}),self.request_id)
+        self.assertEqual(self.h.store.lookup(self.h.run_id,self.request_id)['status'],'unknown')
 
 
 if __name__=='__main__':unittest.main()
