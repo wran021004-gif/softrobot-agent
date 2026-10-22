@@ -97,13 +97,23 @@ async def admit(h):
     from strands.tools.tools import PythonAgentTool
     from strands.tools.executors import SequentialToolExecutor
     require_authorization(h);s=state(h);events=h.store.events(h.run_id)
+    from tests.research.f3_provider_recovery import loss_disposition
     if pending(h) or s['pilot'].get('unconsumed_response'):raise ValueError('UNSETTLED_PROVIDER')
     requests=[(e,h.store.artifact(e['outputs'][0])) for e in events if e['kind']=='r3_request']
-    main=[(e,v) for e,v in requests if v['purpose']=='conversation']
-    if len(main)<2:raise ValueError('REAL_CONTINUOUS_MAIN_REQUESTS_REQUIRED')
+    confirmed=[];losses=[]
     for e,v in requests:
         reception=received(h,e['request_id']);row=h.store.lookup(h.run_id,e['request_id'])
+        if reception is None:
+            loss=loss_disposition(h,row)
+            if loss is None:raise ValueError('REAL_SETTLED_RESPONSE_REQUIRED')
+            losses.append(dict(sequence=e['sequence'],request_id=e['request_id'],disposition=loss))
+            continue
         if not row['receipt'] or not reception or reception['http_status']!=200:raise ValueError('REAL_SETTLED_RESPONSE_REQUIRED')
+        confirmed.append((e,v))
+    main=[(e,v) for e,v in confirmed if v['purpose']=='conversation']
+    if len(main)<2:raise ValueError('REAL_CONTINUOUS_MAIN_REQUESTS_REQUIRED')
+    if losses and main[-1][0]['sequence']<=losses[-1]['sequence']:
+        raise ValueError('NEW_REAL_MAIN_RESPONSE_AFTER_AUTHORIZED_LOSS_REQUIRED')
     uses=[h.store.artifact(e['outputs'][0])['tool_use'] for e in events if e['kind']=='model_original_tool_request']
     feedback=[h.store.artifact(e['outputs'][0]) for e in events if e['kind']=='model_original_tool_feedback']
     if not uses or {u['toolUseId'] for u in uses}!={v['tool_use']['toolUseId'] for v in feedback}:
@@ -129,6 +139,7 @@ async def admit(h):
         with h.store.connect(True) as db:safe_boundary(h,state(h),db,agent.messages)
         packet=decision_packet(h)
         proof=dict(real_requests=[e['request_id'] for e,_ in requests],tool_ids=[u['toolUseId'] for u in uses],
+            authorized_response_losses=losses,
             sdk_history_identity=digest(agent.messages),tool_schemas=schemas(agent),
             snapshot_files=snapshot_files(h.store.root/'framework_sessions',s['pilot']['framework_session_id']),
             l0_identity=digest(packet),independently_restored=True,scope='Real current-Study continuity plus original explicit user handoff authorization')
