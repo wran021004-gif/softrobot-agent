@@ -114,7 +114,39 @@ def _numeric_mentions(text):
     return set(re.findall(r'[+-]?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?', text))
 
 
-def parse_response(user_text, content, *, finish_reason='stop', context=None):
+def _context_from_reference(context, trusted_reference):
+    """A view/identity alone is not proof. Reproject the explicitly trusted source."""
+    if trusted_reference is None:
+        return context, False
+    projected = acceptance_view(trusted_reference,
+        source_label=context.source_label if context else 'supplied_context')
+    if context is not None and context != projected:
+        raise ValueError('REFERENCE_CONTEXT_MISMATCH')
+    return projected, True
+
+
+def _reference_numbers(view):
+    """Numeric leaves only, not digits inside labels/versions or new arithmetic."""
+    numbers = {}
+
+    def collect(value, path):
+        if type(value) in (int, float):
+            numbers.setdefault(json.dumps(value, allow_nan=False), []).append(path)
+        elif isinstance(value, list):
+            for index, child in enumerate(value):
+                collect(child, path + '/' + str(index))
+        elif isinstance(value, dict):
+            for key, child in value.items():
+                collect(child, path + '/' + key.replace('~', '~0').replace('/', '~1'))
+
+    for pointer, value in view.facts.items():
+        collect(value, 'facts:' + pointer)
+    collect(view.holding_interval_s, 'view:/holding_interval_s')
+    collect(view.adapter_limits, 'view:/adapter_limits')
+    return numbers
+
+
+def parse_response(user_text, content, *, finish_reason='stop', context=None, trusted_reference=None):
     """Strict offline boundary; no JSON repair, retries, inference or execution."""
     if not user_text.strip():
         return _failure('EMPTY_TASK')
@@ -123,6 +155,8 @@ def parse_response(user_text, content, *, finish_reason='stop', context=None):
     if not isinstance(content, str) or not content.strip():
         return _failure('EMPTY_MODEL_RESPONSE')
     try:
+        context, verified = _context_from_reference(context, trusted_reference)
+        reference_numbers = _reference_numbers(context) if verified else {}
         # Reject duplicate keys rather than silently keeping the final claim.
         def unique(pairs):
             result = {}
@@ -142,6 +176,7 @@ def parse_response(user_text, content, *, finish_reason='stop', context=None):
         requirements = []
         for row in proposal.requirements:
             identity = None
+            numeric_references = {}
             if row.source == 'verified_configuration':
                 if context is None or row.config_pointer not in context.facts:
                     raise ValueError('UNVERIFIED_CONFIGURATION_POINTER: ' + str(row.config_pointer))
@@ -150,11 +185,17 @@ def parse_response(user_text, content, *, finish_reason='stop', context=None):
             elif row.source == 'user_explicit':
                 value = row.quote
             else:
-                # Restating a supplied number in a question is not a new fact.
-                if _numeric_mentions(row.question) - _numeric_mentions(user_text):
+                # Numeric occurrence is evidence for review, not semantic approval
+                # of a unit, threshold, or fact. Questions always retain value=None.
+                extra_numbers = _numeric_mentions(row.question) - _numeric_mentions(user_text)
+                if extra_numbers - reference_numbers.keys():
                     raise ValueError('UNGROUNDED_NUMERIC_CANDIDATE')
+                numeric_references = {n: reference_numbers[n] for n in sorted(extra_numbers)}
+                if numeric_references:
+                    identity = context.source_identity
                 value = None
-            requirements.append(DraftRequirement(**row.model_dump(), value=value, source_identity=identity))
+            requirements.append(DraftRequirement(**row.model_dump(), value=value, source_identity=identity,
+                                                numeric_references=numeric_references))
         families = sorted({d.extension_id for d in registry().extensions.values() if d.kind == 'task'})
         missing = [r.question for r in requirements if r.source == 'undefined']
         if proposal.object_quote is None:
@@ -166,7 +207,7 @@ def parse_response(user_text, content, *, finish_reason='stop', context=None):
             intent=proposal.intent, requirements=requirements, temporal_relations=proposal.temporal_relations,
             missing_definitions=missing, llm_explanation=proposal.explanation, acceptance_context=context,
             registered_task_families=families, limitations=LIMITATIONS))
-    except (ValueError, TypeError) as exc:
+    except (ValueError, TypeError, KeyError) as exc:
         return _failure('INVALID_MODEL_RESPONSE: ' + str(exc))
 
 
@@ -181,6 +222,7 @@ The program retains the full original text and reports unquoted spans for review
 Use null for an undefined object. Each requirement needs id, kind, source and ONLY its source field:
 user_explicit -> quote; verified_configuration -> config_pointer from context.facts;
 undefined or llm_candidate -> question. Omit inapplicable fields; never mix source fields.
+kind describes the requirement category; kind=undefined is only an unclassified source=undefined question.
 The program supplies configuration values. Do not copy reference facts unnecessarily or assume adoption.
 Preserve temporal relations using requirement IDs and verbatim evidence; do not infer new deadlines.
 For final-window position/speed limits, during the final window is sufficient; do not infer a
@@ -188,7 +230,7 @@ strict arrival-before-window deadline. Other task event relations must retain th
 Ask about genuinely absent definitions (signals, frames, reference, timing, contact/collision,
 disturbance, acceptance) under undefined. An unspecified sentence can become a question.
 Do not call supplied or explicitly adopted reference definitions missing. Avoid redundant questions.
-Questions may repeat supplied numbers but must not propose new thresholds, durations or physical facts.
+Questions may cite supplied user/reference numbers but must not propose new thresholds, durations or physical facts.
 No model-supplied numerical values, fabricated evaluators or additional acceptance conditions.
 All interpretations and the explanation remain unverified; do not claim execution support.
 Return one JSON object only. No tools, code, markdown or executable configuration.
@@ -199,7 +241,7 @@ Return one JSON object only. No tools, code, markdown or executable configuratio
 
 
 def request_draft(user_text, *, enable_provider=False, model=None, base_url=None, context=None,
-                  max_tokens=2000, timeout_s=30.0, thinking=None):
+                  max_tokens=2000, timeout_s=30.0, thinking=None, trusted_reference=None):
     """Opt-in independent OpenAI SDK client, exactly one call with retries off."""
     if not enable_provider:
         return _failure('PROVIDER_DISABLED_USE_OFFLINE_FIXTURE')
@@ -219,6 +261,10 @@ def request_draft(user_text, *, enable_provider=False, model=None, base_url=None
         return _failure('INVALID_THINKING_MODE')
     if address.hostname == 'api.deepseek.com' and thinking != 'disabled':
         return _failure('DEEPSEEK_REQUIRES_EXPLICIT_THINKING_DISABLED')
+    try:
+        context, _ = _context_from_reference(context, trusted_reference)
+    except (ValueError, TypeError, KeyError) as exc:
+        return _failure('INVALID_REFERENCE_CONTEXT: ' + str(exc))
     from openai import OpenAI, OpenAIError
     started = time.monotonic()
     receipt = dict(model=model, base_url=base_url, requests=1, max_tokens=max_tokens,
@@ -241,7 +287,8 @@ def request_draft(user_text, *, enable_provider=False, model=None, base_url=None
             choice = response.choices[0]
             receipt.update(response_text=choice.message.content, finish_reason=choice.finish_reason)
             result = (_failure('MODEL_REFUSAL') if choice.message.refusal else
-                      parse_response(user_text, choice.message.content, finish_reason=choice.finish_reason, context=context))
+                      parse_response(user_text, choice.message.content, finish_reason=choice.finish_reason,
+                                     context=context, trusted_reference=trusted_reference))
     except OpenAIError as exc:
         result = _failure('PROVIDER_ERROR: ' + type(exc).__name__)
     receipt['wall_s'] = time.monotonic() - started
@@ -295,14 +342,19 @@ def _holding_relations(draft, view):
             roles[row.id] = _reach_clause(parts[0])[0]
     mappings = []
     for edge in draft.temporal_relations:
-        supported = (view is not None and view.holding_interval_s is not None
-            and roles.get(edge.first) in ('hold_position', 'hold_speed')
+        holding_limit = (roles.get(edge.first) in ('hold_position', 'hold_speed')
             and edge.relation in ('during', 'throughout')
             and roles.get(edge.second) == 'hold_window')
+        containment = (roles.get(edge.first) == 'hold_window' and edge.relation == 'during'
+            and roles.get(edge.second) == 'duration')
+        supported = (view is not None and view.holding_interval_s is not None
+            and 0 <= view.holding_interval_s[0] <= view.holding_interval_s[1]
+            == view.facts['/task/timing/duration_s'] and (holding_limit or containment))
         mappings.append(dict(first=edge.first, relation=edge.relation, second=edge.second,
             quote=edge.quote, status='mapped' if supported else 'needs_review',
             interval_s=view.holding_interval_s if supported else None,
-            meaning='Existing inclusive sampled holding constraint' if supported else
+            meaning=('Existing final sampled window lies within task duration; no arrival deadline'
+                     if containment else 'Existing inclusive sampled holding constraint') if supported else
                     'Event order, strict deadlines and other temporal constraints are not compiled.'))
     return mappings
 
@@ -317,6 +369,7 @@ def compile_draft(draft, *, trusted_reference=None, reference_label=None, analys
     from tools.research.task_constraints import describe_analysis_requirements, analysis_capabilities
 
     draft = TaskIntakeDraft.model_validate(draft)
+    supported = draft.intent in ('reach', 'reach_and_hold')
     diagnostics, mappings = [], []
     reg = registry()
     capabilities = dict(
@@ -344,16 +397,17 @@ def compile_draft(draft, *, trusted_reference=None, reference_label=None, analys
         except (ValueError, TypeError, KeyError) as exc:
             diagnostics.append('INVALID_REFERENCE: ' + str(exc))
             cfg, view = None, None
-    else:
+    elif supported:
         diagnostics.append('TRUSTED_SESSION_INPUT_REFERENCE_REQUIRED')
     capabilities['physical']['reference_check'] = reference_check
 
     # A serialized draft is untrusted too. Replay the N1 boundary and compare
     # source-bound rows against a freshly projected reference, not its own view.
     proposal = dict(goal_quote=draft.user_goal, object_quote=draft.task_object, intent=draft.intent,
-        requirements=[r.model_dump(exclude={'value', 'source_identity', 'confirmation'}) for r in draft.requirements],
+        requirements=[r.model_dump(exclude={'value', 'source_identity', 'confirmation', 'numeric_references'})
+                      for r in draft.requirements],
         temporal_relations=[r.model_dump() for r in draft.temporal_relations], explanation=draft.llm_explanation)
-    checked = parse_response(draft.user_text, json.dumps(proposal), context=view)
+    checked = parse_response(draft.user_text, json.dumps(proposal), context=view, trusted_reference=cfg)
     if checked.draft is None:
         diagnostics.append('DRAFT_SOURCE_INVALID: ' + str(checked.error))
     elif checked.draft.requirements != draft.requirements:
@@ -403,9 +457,18 @@ def compile_draft(draft, *, trusted_reference=None, reference_label=None, analys
             status = 'invalid_source'
         mappings.append(dict(requirement_id=row.id, source=row.source, quote=row.quote,
             config_pointer=row.config_pointer, source_identity=row.source_identity,
-            value=row.value, question=row.question, status=status, mappings=mapped))
+            value=row.value, question=row.question, numeric_references=row.numeric_references,
+            status=status, mappings=mapped))
 
-    supported = draft.intent in ('reach', 'reach_and_hold')
+    # Side-by-side evidence, never a language heuristic that silently resolves a
+    # question. Known reference facts and every original question remain visible.
+    capabilities['reference_review'] = dict(status='review_required' if view and supported else 'not_applicable',
+        source_identity=identity if view and supported else None,
+        known_conditions=(dict(facts=view.facts, holding_interval_s=view.holding_interval_s,
+                               adapter_limits=view.adapter_limits) if view and supported else None),
+        questions=[dict(requirement_id=r.id, question=r.question, status='unresolved')
+                   for r in draft.requirements if r.question],
+        note='Compare supplied facts with questions; no question is removed or considered answered automatically.')
     if supported:
         try:
             task_extension = reg.get('task.reach', kind='task')
@@ -440,7 +503,7 @@ def compile_draft(draft, *, trusted_reference=None, reference_label=None, analys
     capabilities['temporal'] = dict(mappings=temporal, scope='Existing sampled final-window limits only')
     if any(edge['status'] != 'mapped' for edge in temporal):
         diagnostics.append('TEMPORAL_RELATIONS_REQUIRE_REVIEW: outside existing sampled holding constraints')
-    if not adoption:
+    if supported and not adoption:
         diagnostics.append('EXPLICIT_REFERENCE_SETTINGS_ADOPTION_REQUIRED: ' + ADOPT_REFERENCE)
     if any(m['status'] in ('unresolved', 'needs_confirmation', 'missing', 'context_only', 'invalid_source') for m in mappings):
         diagnostics.append('UNRESOLVED_REQUIREMENT_MAPPINGS')
@@ -503,14 +566,16 @@ def main(argv=None):
     args = parser.parse_args(argv)
     try:
         text = args.text if args.text is not None else args.file.read_text(encoding='utf-8')
-        context = acceptance_view(read(args.context), source_label=str(args.context)) if args.context else None
+        context_value = read(args.context) if args.context else None
+        context = acceptance_view(context_value, source_label=str(args.context)) if args.context else None
         if args.response_file:
             result = parse_response(text, args.response_file.read_text(encoding='utf-8'),
-                                    finish_reason=args.finish_reason, context=context)
+                                    finish_reason=args.finish_reason, context=context, trusted_reference=context_value)
         else:
             result = request_draft(text, enable_provider=args.enable_provider, model=args.model,
                                    base_url=args.base_url, context=context,
-                                   max_tokens=args.max_tokens, timeout_s=args.timeout_s, thinking=args.thinking)
+                                   max_tokens=args.max_tokens, timeout_s=args.timeout_s, thinking=args.thinking,
+                                   trusted_reference=context_value)
     except (OSError, ValueError, TypeError, KeyError) as exc:
         result = _failure('INVALID_INPUT_OR_CONTEXT: ' + str(exc))
     if args.compile_reference and result.draft is not None:

@@ -166,6 +166,23 @@ class IntakeTests(unittest.TestCase):
         p['requirements'][-2]['config_pointer'] = '/policy/model'
         self.assertEqual(self.parse(proposal=p, context=view).status, 'parse_failed')
 
+    def test_unclassified_kind_is_only_a_missing_question(self):
+        proposal = deepcopy(CASES['reach'][1])
+        proposal['requirements'][-1]['kind'] = 'undefined'
+        result = self.parse('reach', proposal)
+        self.assertEqual(result.status, 'draft', result.error)
+        self.assertEqual(result.draft.requirements[-1].kind, 'undefined')
+        self.assertIsNone(result.draft.requirements[-1].value)
+        for source in ('user_explicit', 'verified_configuration', 'llm_candidate'):
+            changed = deepcopy(proposal)
+            changed['requirements'][-1]['source'] = source
+            self.assertIn('UNCLASSIFIED_KIND_REQUIRES_UNDEFINED_SOURCE',
+                          self.parse('reach', changed).error)
+        for change in ({'question': None}, {'quote': '终点误差不超过 0.01 m'}, {'value': .01}):
+            changed = deepcopy(proposal)
+            changed['requirements'][-1].update(change)
+            self.assertIsNone(self.parse('reach', changed).draft)
+
     def test_reach_free_source_bundle_and_task_only(self):
         source = read(ROOT/'tasks/reach_hold.json'); before = deepcopy(source)
         view = acceptance_view(source, source_label='tasks/reach_hold.json')

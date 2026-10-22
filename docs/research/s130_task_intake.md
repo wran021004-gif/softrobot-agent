@@ -6,6 +6,8 @@
 下文 N1/N2 交付记录中的强制 null、逐字覆盖拒绝和全部时序拒绝由该修复说明更新。
 第三轮三例受控真实复测与最终验收意见见 [S130 最终真实验证](s130_final_validation.md)：
 2/3 合法草稿，Reach 未形成真实配置预览；本轮停止，尚不满足成功验收条件。
+最新 [离线收敛结果](s130_offline_closeout.md)：旧 Reach 原始响应现在可进入 N2，六个问题保留待审核；
+三份原始响应均可离线准入，没有生成配置预览或增加真实请求。
 
 本次仅新增四个文件：`schemas/task_intake.py`、`tools/task_intake.py`、
 `tests/research/test_task_intake.py` 和本文。没有接入科研 Agent，也没有实施 N2。

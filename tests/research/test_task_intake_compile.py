@@ -94,6 +94,137 @@ class CompilationTests(unittest.TestCase):
         self.assertIsNone(result.configuration_preview)
         self.assertTrue({'target', 'tolerance', 'duration'} <= set(result.capabilities['semantic']['missing']))
 
+    def reference_question(self):
+        text, proposal = fixture('reach_and_hold', COMPLETE_CLAUSES, '末端', [])
+        proposal['requirements'].append(requirement('q', kind='undefined', source='undefined',
+            question='最终窗口从 0.3 s 开始、积分步长为 0.0005 s 吗？'))
+        return text, proposal
+
+    def test_reference_question_numbers_require_reprojected_source(self):
+        text, proposal = self.reference_question()
+        view = acceptance_view(self.cfg)
+        raw = json.dumps(proposal)
+        result = parse_response(text, raw, context=view, trusted_reference=self.cfg)
+        self.assertEqual(result.status, 'draft', result.error)
+        question = result.draft.requirements[-1]
+        self.assertIsNone(question.value)
+        self.assertEqual(question.source_identity, view.source_identity)
+        self.assertEqual(question.numeric_references['0.3'], ['view:/holding_interval_s/0'])
+        self.assertIn('facts:/task/timing/timestep_s', question.numeric_references['0.0005'])
+        self.assertIn('UNGROUNDED_NUMERIC_CANDIDATE', parse_response(text, raw, context=view).error)
+        for change in ({'source_identity': 'f' * 64}, {'task_identity': 'e' * 64},
+                       {'holding_interval_s': [.301, .35]},
+                       {'facts': {**view.facts, '/task/timing/timestep_s': .002}}):
+            forged = view.model_copy(update=change)
+            self.assertIn('REFERENCE_CONTEXT_MISMATCH',
+                parse_response(text, raw, context=forged, trusted_reference=self.cfg).error)
+        bad = deepcopy(proposal)
+        bad['requirements'][-1]['question'] = '是否采用 0.301 s？'
+        self.assertIn('UNGROUNDED_NUMERIC_CANDIDATE',
+            parse_response(text, json.dumps(bad), context=view, trusted_reference=self.cfg).error)
+        # Metadata is program-owned; models cannot submit numeric provenance.
+        bad['requirements'][-1]['numeric_references'] = {'0.301': ['view:/holding_interval_s/0']}
+        self.assertIsNone(parse_response(text, json.dumps(bad), context=view, trusted_reference=self.cfg).draft)
+
+    def test_reference_questions_and_forged_provenance_never_auto_resolve(self):
+        text, proposal = self.reference_question()
+        proposal['temporal_relations'] = [dict(first='r4', relation='during', second='r3', quote=text)]
+        draft = parse_response(text, json.dumps(proposal), trusted_reference=self.cfg).draft
+        result = self.compile(draft)
+        self.assertIsNone(result.configuration_preview)
+        self.assertEqual(result.capabilities['temporal']['mappings'][0]['status'], 'mapped')
+        review = result.capabilities['reference_review']
+        self.assertEqual(review['source_identity'], acceptance_view(self.cfg).source_identity)
+        self.assertEqual(review['known_conditions']['holding_interval_s'], [.3, .35])
+        self.assertEqual(review['questions'][0]['question'], proposal['requirements'][-1]['question'])
+        self.assertEqual(review['questions'][0]['status'], 'unresolved')
+        self.assertEqual(result.requirement_mappings[-1]['status'], 'missing')
+        for change in ({'source_identity': 'f' * 64}, {'numeric_references': {}},
+                       {'numeric_references': {'0.3': ['view:/holding_interval_s/1']}}, {'value': .3}):
+            forged = draft.model_copy(update={'requirements': draft.requirements[:-1] +
+                [draft.requirements[-1].model_copy(update=change)]})
+            rejected = self.compile(forged)
+            self.assertIsNone(rejected.candidate_task)
+            self.assertIn('DRAFT_SOURCE_VALUES_OR_IDENTITY_MISMATCH', rejected.diagnostics)
+        # Reusing a number for a different unit/quantity is still an unapproved
+        # question, never a new threshold, even though its numeric source exists.
+        proposal['requirements'][-1]['question'] = '位置容差是否应为 0.3 m？'
+        questionable = parse_response(text, json.dumps(proposal), trusted_reference=self.cfg).draft
+        self.assertIsNone(questionable.requirements[-1].value)
+        self.assertIsNone(self.compile(questionable).candidate_task)
+
+    def test_cli_passes_full_context_source_for_offline_numeric_questions(self):
+        text, proposal = self.reference_question()
+        folder = ROOT / 'runs' / ('intake-reference-' + uuid4().hex)
+        folder.mkdir()
+        response, reference = folder / 'response.json', folder / 'reference.json'
+        try:
+            response.write_text(json.dumps(proposal), encoding='utf-8')
+            reference.write_text(json.dumps(self.cfg), encoding='utf-8')
+            with patch('openai.OpenAI', side_effect=AssertionError('offline')), redirect_stdout(io.StringIO()) as output:
+                code = main(['--text', text, '--response-file', str(response),
+                             '--context', str(reference), '--compile-reference', str(reference)])
+            data = json.loads(output.getvalue())
+            self.assertEqual(code, 2)  # Review required, not a parse failure.
+            self.assertEqual(data['intake']['status'], 'draft')
+            self.assertIsNone(data['compilation']['configuration_preview'])
+            self.assertIn('0.3', data['intake']['draft']['requirements'][-1]['numeric_references'])
+        finally:
+            response.unlink(missing_ok=True)
+            reference.unlink(missing_ok=True)
+            folder.rmdir()
+
+    @patch.dict(os.environ, {'TASK_INTAKE_API_KEY': 'synthetic',
+                            'TASK_INTAKE_BASE_URL': 'https://intake.invalid'}, clear=True)
+    def test_mocked_request_checks_context_before_send_and_propagates_source(self):
+        text, proposal = self.reference_question()
+        view = acceptance_view(self.cfg)
+        with patch('openai.OpenAI', side_effect=AssertionError('must not send forged context')):
+            result = request_draft(text, enable_provider=True, model='test', trusted_reference=self.cfg,
+                context=view.model_copy(update={'source_identity': 'forged'}))
+            self.assertIn('REFERENCE_CONTEXT_MISMATCH', result.error)
+        client = Mock()
+        client.chat.completions.create.return_value = SimpleNamespace(usage=None, choices=[SimpleNamespace(
+            finish_reason='stop', message=SimpleNamespace(content=json.dumps(proposal), tool_calls=None, refusal=None))])
+        with patch('openai.OpenAI') as factory:
+            factory.return_value.__enter__.return_value = client
+            result = request_draft(text, enable_provider=True, model='test',
+                                   context=view, trusted_reference=self.cfg)
+            self.assertEqual(result.status, 'draft', result.error)
+            self.assertEqual(result.draft.requirements[-1].source_identity, view.source_identity)
+            client.chat.completions.create.assert_called_once()
+
+    def test_final_window_containment_adds_no_acceptance_or_execution_right(self):
+        text, proposal = fixture('reach_and_hold', COMPLETE_CLAUSES, '末端', [])
+        proposal['temporal_relations'] = [dict(first='r4', relation='during', second='r3', quote=text)]
+        result = self.compile(parse_response(text, json.dumps(proposal)).draft)
+        self.assertIsNotNone(result.configuration_preview, result.diagnostics)
+        self.assertEqual(result.acceptance_spec, self.compile().acceptance_spec)
+        self.assertEqual(result.capabilities['mathematics'], self.compile().capabilities['mathematics'])
+        with self.assertRaisesRegex(ValueError, 'DEVELOPMENT_HOST_REQUIRES_DEVELOPMENT_VALID'):
+            compile_input(result.configuration_preview.model_dump(mode='json'))
+        for first, relation, second in [('r3', 'during', 'r4'), ('r4', 'throughout', 'r3'),
+                                        ('r0', 'before', 'r4'), ('r4', 'after', 'r3')]:
+            proposal['temporal_relations'] = [dict(first=first, relation=relation, second=second, quote=text)]
+            self.assertIsNone(self.compile(parse_response(text, json.dumps(proposal)).draft).candidate_task)
+
+    def test_unsupported_semantics_do_not_require_adopting_reach(self):
+        for name in ('catch', 'obstacle', 'tracking'):
+            text, proposal = CASES[name]
+            if name == 'obstacle':
+                text = '设计一条软臂；' + text  # Deliberately omitted by the model.
+            draft = parse_response(text, json.dumps(proposal)).draft
+            for kwargs in ({}, dict(trusted_reference=self.cfg, reference_label='test')):
+                result = compile_draft(draft, **kwargs)
+                self.assertEqual(result.semantic_spec.user_text, text)
+                self.assertIsNone(result.configuration_preview)
+                self.assertEqual(result.capabilities['evaluation']['status'], 'unsupported')
+                self.assertFalse(any('REFERENCE_REQUIRED' in d or 'ADOPTION_REQUIRED' in d
+                                     for d in result.diagnostics))
+                if name == 'obstacle':
+                    self.assertIn('设计一条软臂', ''.join(g.text for g in draft.unquoted_spans))
+                    self.assertIn('UNMAPPED_USER_CONSTRAINT: 设计一条软臂', result.diagnostics)
+
     def test_hold_relations_map_only_existing_inclusive_sampled_constraints(self):
         text, proposal = fixture('reach_and_hold', COMPLETE_CLAUSES, '末端', [])
         proposal['temporal_relations'] = [

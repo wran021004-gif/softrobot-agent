@@ -136,13 +136,76 @@ def replay(output):
     return summary
 
 
+def replay_third_round(output):
+    """Unmodified third-round responses; original questions are never removed."""
+    historical = read(ROOT / 'docs/research/s130_final_validation.json')
+    folder = ROOT / 'runs/s130-live-round3-20261022'
+    history_hashes = read(ROOT / 'docs/research/s130_protocol_repair.json')['historical_sha256']
+    for case in historical['cases']:
+        history_hashes.update({str((folder / case['case'] / name).relative_to(ROOT)): value
+                               for name, value in case['hashes'].items()})
+    # Also protect the immutable reports and reference snapshots themselves.
+    for name in ('s130_protocol_repair', 's130_final_validation'):
+        for suffix in ('.md', '.json'):
+            path = ROOT / 'docs/research' / (name + suffix)
+            history_hashes[str(path.relative_to(ROOT))] = sha(path)
+    for name in ('reference.json', 'analysis_protocol.json'):
+        path = ROOT / 'runs/s130-n2' / name
+        history_hashes[str(path.relative_to(ROOT))] = sha(path)
+    assert all(sha(ROOT / path) == value for path, value in history_hashes.items())
+    output.mkdir(parents=True, exist_ok=False)
+    reference = read(ROOT / 'runs/s130-n2/reference.json')
+    rows = []
+    for case in historical['cases']:
+        source = folder / case['case']
+        raw = (source / 'response.txt').read_text(encoding='utf-8')
+        text = (source / 'task.txt').read_text(encoding='utf-8')
+        old = read(source / 'result.json')
+        context = AcceptanceView.model_validate(read(source / 'context.json')) if (source / 'context.json').exists() else None
+        result = parse_response(text, raw, finish_reason=old['provider_receipt']['finish_reason'],
+                                context=context, trusted_reference=reference if context else None)
+        assert result.draft is not None, result.error
+        proposal = IntakeProposal.model_validate_json(raw, strict=True)
+        assert [r.model_dump(exclude={'value', 'source_identity', 'confirmation', 'numeric_references'})
+                for r in result.draft.requirements] == [r.model_dump() for r in proposal.requirements]
+        assert result.draft.temporal_relations == proposal.temporal_relations
+        assert result.draft.user_text == text
+        compiled = compile_draft(result.draft, trusted_reference=reference if context else None,
+            reference_label='explicit reach_free full snapshot' if context else None,
+            analysis_protocol=read(ROOT / 'runs/s130-n2/analysis_protocol.json') if context else None)
+        assert compiled.configuration_preview is None  # Questions/unsupported physics remain.
+        assert compiled.semantic_spec == result.draft
+        assert not compiled.executable
+        artifact = case['case'] + '.json'
+        save(output / artifact, dict(evidence_kind='offline_replay_only', provider_requests=0,
+            intake=result.model_dump(mode='json'), compilation=compiled.model_dump(mode='json')))
+        rows.append(dict(round=3, case=case['case'], original_status=old['status'], original_error=old['error'],
+            raw_response_sha256=sha(source / 'response.txt'), original_questions_retained=True,
+            requirement_count=len(result.draft.requirements),
+            questions=[r.model_dump(mode='json') for r in result.draft.requirements if r.question],
+            offline_status=result.status, entered_n2=True, configuration_preview=False,
+            compilation_status='needs_review' if context else 'unsupported',
+            unquoted_spans=[s.model_dump() for s in result.draft.unquoted_spans],
+            diagnostics=compiled.diagnostics, capabilities=compiled.capabilities,
+            historical_semantic_review=case['scientific_semantic_review'], replay_artifact=artifact))
+    assert all(sha(ROOT / path) == value for path, value in history_hashes.items())
+    summary = dict(evidence_kind='offline_replay_only', baseline_commit='ea230de8', provider_requests=0,
+        new_provider_tokens=0, historical_requests=15, historical_tokens=52057,
+        historical_monetary_cost=None, historical_files_unchanged=True, historical_sha256=history_hashes,
+        note='Historical review includes old contract blockers; it is not a new semantic score or Provider result.',
+        cases=rows)
+    save(output / 'summary.json', summary)
+    return summary
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output', type=Path, required=True, help='New directory; existing paths are refused')
+    parser.add_argument('--round-three', action='store_true', help='Replay the three preserved final live responses')
     args = parser.parse_args()
     with (patch('openai.OpenAI', side_effect=AssertionError('offline only')),
           patch('socket.socket.connect', side_effect=AssertionError('offline only'))):
-        summary = replay(args.output)
+        summary = replay_third_round(args.output) if args.round_three else replay(args.output)
     print(json.dumps(dict(provider_requests=0, historical_files_unchanged=True,
         cases=[{k: r[k] for k in ('round', 'case', 'offline_status', 'compilation_status')}
                for r in summary['cases']]), indent=2))

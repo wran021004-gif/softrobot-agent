@@ -13,7 +13,8 @@ class IntakeContract(Contract):
 
 class RequirementProposal(IntakeContract):
     id: str = Field(min_length=1)
-    kind: Literal['behavior', 'constraint', 'observable', 'environment', 'acceptance']
+    kind: Literal['behavior', 'constraint', 'observable', 'environment', 'acceptance', 'undefined'] = Field(
+        description='undefined means an unclassified missing-definition question; only source=undefined permits it')
     source: Literal['user_explicit', 'verified_configuration', 'llm_candidate', 'undefined']
     quote: str | None = None
     config_pointer: str | None = None
@@ -21,6 +22,8 @@ class RequirementProposal(IntakeContract):
 
     @model_validator(mode='after')
     def source_shape(self):
+        if self.kind == 'undefined' and self.source != 'undefined':
+            raise ValueError('UNCLASSIFIED_KIND_REQUIRES_UNDEFINED_SOURCE')
         expected = ('quote' if self.source == 'user_explicit' else
                     'config_pointer' if self.source == 'verified_configuration' else 'question')
         for name in ('quote', 'config_pointer', 'question'):
@@ -81,6 +84,7 @@ class AcceptanceView(IntakeContract):
 class DraftRequirement(RequirementProposal):
     value: JsonValue
     source_identity: str | None
+    numeric_references: dict[str, list[str]] = Field(default_factory=dict)
     confirmation: Literal['required'] = 'required'
 
 
