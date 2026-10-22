@@ -1,0 +1,20 @@
+{
+  "root_cause": "Conservative serialized UTF-8 byte estimate crossed the 1M-token guard inside the first unfinished SDK tool loop; the actual API prompt remained much smaller.",
+  "secondary_cause": "Supervisor required a completed pause after any external CLI exit without handling an exited, settled, still-incomplete invocation.",
+  "last_successful_request": {
+    "serialized_bytes": 900749,
+    "provider_prompt_tokens": 249903
+  },
+  "before": {
+    "provider": 43,
+    "physical": 6,
+    "nmpc": 5,
+    "completed_sdk_invocations": 0,
+    "live_handoff_admitted": false
+  },
+  "fix": "Keep the byte fast path; only refine a rejected estimate with hash-pinned official offline BPE data plus the unchanged output reservation and framing headroom. Preserve every request byte, reasoning block, tool argument, ID and feedback.",
+  "bounds": "Original Provider 128, physical 80, NMPC 6, all other original budgets and resolved/task/FamilySpace identities stay unchanged.",
+  "migration": "Required before any resumed send: existing explicit core migration on the settled original Store, preserving old code SHA, complete checkpoint, results, costs and failed invocation. No scientific kernel change.",
+  "handoff": "Remains unadmitted until a real complete SDK invocation and independent live checks; no artificial completed turn is created.",
+  "publication": "Only this code, public tokenizer data/provenance and non-secret summaries are included. The new full Store/native SDK checkpoint stays local. The earlier exact recovery checkpoint f9a3b99f is already explicitly approved and pushed."
+}

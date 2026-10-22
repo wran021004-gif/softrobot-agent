@@ -130,10 +130,8 @@ class LiveBoundary(httpx.AsyncBaseTransport):
             return httpx.Response(reception['http_status'],content=store.artifact(reception['body'],raw=True),request=request)
         if pending(host):
             raise ValueError('R3_UNCONFIRMED_ATTEMPT_BLOCKS_SEND')
-        context=expected['context_guard']
-        # Explicit conservative capacity estimate, never reported as actual tokens.
-        if len(request.content)+expected['max_tokens']+context['framing_headroom_tokens']>context['context_limit_tokens']:
-            raise ValueError('R3_CONTEXT_CAPACITY_EXCEEDED_CONSERVATIVE_UTF8_ESTIMATE')
+        from tools.research.provider_context import capacity_estimate
+        capacity=capacity_estimate(request.content,expected)
         def guard(db):
             if store.remaining(db=db)['remaining']['model_calls']<1:
                 raise ValueError('PROVIDER_COUNT_EXHAUSTED')
@@ -154,6 +152,7 @@ class LiveBoundary(httpx.AsyncBaseTransport):
             store.update_state(db,run,state)
             metadata=store.put(db,dict(request=plain(raw_request),purpose=purpose,pid=os.getpid(),
                 input_bytes=len(request.content),
+                context_capacity=capacity,
                 endpoint=str(request.url),timeout_s=request.extensions.get('timeout'),client_retries=0,transport_retries=0))
             store.event(db,run,'r3_request','sent',request=key,execution=row['execution_id'],outputs=[metadata])
         started=time.monotonic()
