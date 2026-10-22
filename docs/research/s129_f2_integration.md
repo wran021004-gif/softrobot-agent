@@ -1,5 +1,63 @@
 # F2 integration: Agent, Reporter and mathematical evidence
 
+## Final live revalidation: delivery passed; semantic admission failed (2026-10-22)
+
+The user's explicit approval activated only the prepared one-shot scope. Study
+`f30-revalidate-20261022-01` ran frozen, clean and pushed commit
+`0fff1b40de76391e22da742aca95d728ecf183b2` through production `converse()`.
+The actual sequence was **main → Reporter → main**, using exactly 3/3 Provider
+requests and one read-only `research_investigate` (1/12 public operations).
+Scientific worker/backend counters are all zero. No retry or replacement Study ran.
+
+**The repaired engineering delivery gate passed.** The real Reporter used 39 unique
+IDs from its 67-source catalog; every catalog location resolves, and all returned
+IDs map exactly to the accepted report's original EvidenceLocations. The catalog
+included the investigation's additional exact reads and no invented score-semantics
+path. Four interpretations were accepted for this explicitly detailed investigation;
+the existing bounded L1 delivered its first three before the second main request.
+Original deterministic report facts and imported B artifact hashes are unchanged.
+Store and native SDK history were reopened in a separate process, matching the
+original message identity and native tool/receipt pairing. No unknown send,
+unconsumed response, unsettled receipt or occupied resource remains.
+
+**Full scientific-semantic admission did not pass.** The final main response correctly
+compares structure degradation `+0.10000043427432215` and control improvement
+`0.017011076246496892`; it gives recovery fraction `0.1454` and residual `0.8546`
+against the original fixed-control loss. It distinguishes the `18.72` / `16.00`
+normalized secants from the raw delta, and explicitly retains uncertified optimality
+and absent MuJoCo acceptance. However, it calls the residual
+**"control-independent degradation"**. These unconverged best-found values cannot
+establish independence from further control optimization, even inside the local
+model. Later correct uncertainty caveats do not substantiate that attribution.
+The supported wording is residual best-found score degradation under the recorded
+three-start, 100-iteration search budget. Its prose also says approximately 14.6%
+recovery once, inconsistent with its correct fraction: use 14.54%, or 14.5% to one
+decimal. This is a minor numeric wording error, distinct from the attribution blocker.
+
+The proposed next saved-evidence/configuration and per-sample diagnosis was not
+executed. Such inspection alone would not certify a causal structural loss.
+The existing engineering count-budget closure stopped the Study; no model STOP,
+physical success, selected design or optimum was fabricated. A separate immutable
+semantic-admission event records the failure without changing Provider bodies,
+SDK messages, deterministic evidence or the original technical audit.
+
+| Actual role | Requests | Prompt tokens | Completion tokens |
+|---|---:|---:|---:|
+| Main | 2 | 42,370 | 3,495 |
+| Reporter | 1 | 68,155 | 4,398 |
+
+Total Provider tokens: 118,418; USD unknown. The Reporter input was 197,211 bytes;
+completion reduction versus the old attempt does not imply a reduced input cost.
+Provider settings, thinking and max_tokens were unchanged.
+
+All 13 files in sealed `f30-live-20261022` retain their pre-run hashes. Its failure
+was not reclassified. Raw new requests/responses and SDK history remain local under
+`runs/research/f30-revalidate-20261022-01/`; only the derived
+[live audit](../../evidence/s129_integration/f30_revalidation_live.json) is published.
+**F3 admission remains closed and formal F3 was not started.** This final grant is
+consumed; no further Provider requests, scope resets or implementation expansion
+are authorized by this validation. Work stops after recording this result.
+
 ## Final F3.0 revalidation execution prepared; no live authorization (2026-10-22)
 
 Starting from `9e17c8b1bbcee7cc975ebb589526c78a83456858`, the existing
