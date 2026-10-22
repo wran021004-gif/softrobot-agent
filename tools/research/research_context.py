@@ -716,6 +716,19 @@ def research_action_trace(host, limit=5):
         scope='Original Agent intent and recorded execution only; hypotheses are not confirmed or falsified by Reporter prose')
 
 
+def public_prior_manifest(spec):
+    """Frozen public engineering priors, separate from experimental observations."""
+    contents=dict(family_space=spec['family_space'],task=spec['canonical_task'],
+        control=spec['control'],analysis_protocol=spec['analysis_protocol'],
+        mathematical_methods=spec.get('mathematical_methods',{}),
+        models={k:spec['configuration']['policy'][k] for k in
+            ('backend','dynamics_model','discretization','controller')})
+    return dict(version='public_prior_manifest_v1',code_commit=spec['base_commit'],
+        sources=spec['configuration_provenance'],contents=contents,content_identity=digest(contents),
+        interpretation='Engineering defaults may carry historical design knowledge; initialization is not random or information-free. No historical experimental feedback is supplied.',
+        comparison_rule='Comparison Agents must receive the same frozen public priors and resource conditions')
+
+
 def agent_decision_brief(host):
     """A-line compact input; existing L0/L2 retrieval contracts remain unchanged."""
     from tools.research.reporter import current_reports, reporter_handoff_summary
@@ -724,6 +737,15 @@ def agent_decision_brief(host):
     brief['action_trace']=research_action_trace(host)
     from tools.research.task_constraints import describe_analysis_requirements, analysis_capabilities
     s=state(host);cfg=s.get('nominal_configuration',s.get('base_configuration'))
+    if s.get('public_prior_manifest'):
+        brief['public_prior_manifest']=dict(reference=s['public_prior_manifest'],view='full',
+            scope='Frozen engineering priors; no historical experimental feedback')
+    if s['spec'].get('family_sensitivity_variables'):
+        brief['family_sensitivity_conditions']=dict(
+            authorized_variables=s['spec']['family_sensitivity_variables']['variables'],
+            prerequisites=['Legal indices in the actual candidate','Authorized continuous variable',
+                'Complete registered symmetric model group with exact bindings','Sufficient model-preparation and kernel budget'],
+            scope='Generation legality alone does not establish mathematical method support')
     if s.get('candidates'):
         cfg=host.store.artifact(list(s['candidates'].values())[-1])['configuration']
     if cfg and s['spec'].get('analysis_protocol'):

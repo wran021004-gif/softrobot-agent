@@ -17,6 +17,7 @@ def main():
     parser.add_argument('--request-id')
     parser.add_argument('--reason')
     parser.add_argument('--session-handoff',action='store_true',help='Opt in only after separate live continuation admission')
+    parser.add_argument('--pause-after-completed-invocations',type=int,help='Supervisor pause after complete SDK invocation and Reporter delivery')
     args=parser.parse_args()
     if args.command in ('prepare','readiness'):
         h=prepare(args.spec,profile=args.profile)
@@ -47,7 +48,8 @@ def main():
         return
     elif args.command in ('run','live'):
         from tools.research.agent import converse,IncompleteModelOutput
-        try:asyncio.run(converse(h,session_handoff=args.session_handoff))
+        try:asyncio.run(converse(h,session_handoff=args.session_handoff,
+            pause_after_completed_invocations=args.pause_after_completed_invocations))
         except IncompleteModelOutput as exc:
             print(json.dumps(dict(status='confirmed_incomplete',provider=exc.diagnostic)))
             raise SystemExit(2) from exc

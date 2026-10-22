@@ -315,6 +315,20 @@ def decision_summary(value, evidence, operations):
         controller_only=['holding_tip_speed_weight','terminal_tip_speed_weight'],
         parameter_view='parameter_capabilities(space, selected generation request) resolves conditional fields; full_specification holds authoritative domains')
     result['physical_default_rule']='Omitted physical_parameters inherit assembly prototype values; physical_domains default is a proposal value, not an applied override. Candidate capability view reports actual inherited defaults.'
+    result['declared_domain']=dict(segment_count_bounds=frozen['segment_count_bounds'],
+        tendon_count_bounds=frozen['tendon_count_bounds'],
+        variables='All original segment/material/section/routing/physical/control domains below and in full_specification')
+    result['executable_domain']=dict(segment_counts=frozen['executable_segment_counts'],
+        tendon_count_bounds=frozen['executable_tendon_count_bounds'],
+        scope='Registered generator envelope; backend/model/controller admission remains candidate-specific')
+    result['candidate_specific_conditions']=['Selected topology and segment indices',
+        'Route/section/attachment/guide clearance and valid mesh',
+        'Backend model dimensions, tendon order and supported controller/solver']
+    result['currently_unavailable']=dict(
+        tendon_counts=[i for i in range(space.tendon_count_bounds[0],space.tendon_count_bounds[1]+1)
+            if not space.executable_tendon_count_bounds[0]<=i<=space.executable_tendon_count_bounds[1]],
+        reason='Outside registered execution bounds; retained in declared domain, no scientific infeasibility claim')
+    result['domain_detail_query']=dict(reference=evidence,view='full')
     return result
 
 

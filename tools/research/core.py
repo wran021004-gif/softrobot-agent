@@ -122,8 +122,10 @@ def prepare(spec_path=DEFAULT_SPEC, directory=None, profile=None):
         update(h,nominal_configuration=nominal['configuration'],nominal_provenance=nominal['provenance'],mathematical_evaluations=0,analysis_results=[],analysis_costs=[],search_results=[],assignment_started_unix=time.time(),accounting_scope='Cumulative assignment includes engineering preflight; never reset at live start')
     update(h,scoped_context=[save(h,read(ROOT/path),'supplied_scoped_context') for path in spec.get('supplied_evidence',[])])
     if spec.get('start_mode')=='family_space':
+        from tools.research.research_context import public_prior_manifest
         update(h,reference_candidate=None,mathematical_evaluations=0,analysis_results=[],analysis_costs=[],search_results=[],
             family_space_reference=save(h,spec['family_space'],'frozen_family_space'),
+            public_prior_manifest=save(h,public_prior_manifest(spec),'public_prior_manifest'),
             compatibility_preparation_s=time.perf_counter()-start)
         if enabled(spec,'rl'):
             update(h,rl_task=save(h,spec['canonical_task'],'rl_frozen_task'),

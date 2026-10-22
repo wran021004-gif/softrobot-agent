@@ -444,7 +444,25 @@ async def deliver_science_before_decision(host,agent,transport):
         raise ValueError('SCIENCE_DELIVERY_INCOMPLETE_BLOCKS_DECISION')
 
 
-async def converse(host,*,session_handoff=False):
+async def pause_completed_invocation(host,agent,completed):
+    """Pause only at the existing durable handoff boundary, with delivered reports."""
+    from tools.research.session_handoff import safe_boundary, trusted_history
+    from tools.research.reporter import current_reports
+    await wait_training(host)
+    if any(v['interpretation_status']=='deferred' for _,v in current_reports(host)):
+        raise ValueError('REPORTER_DELIVERY_REQUIRED_BEFORE_SUPERVISOR_PAUSE')
+    await agent._session_manager.save_snapshot(agent,is_latest=True)
+    with host.store.connect(True) as db:
+        safe_boundary(host,state(host),db,agent.messages)
+    trusted_history(host,agent)
+    record(host,'supervisor_pause',dict(completed_invocations=completed,
+        session_id=agent._session_manager.session_id,sdk_message_identity=digest(agent.messages),
+        research_status=state(host)['research_status'],budgets_preserved=True))
+
+
+async def converse(host,*,session_handoff=False,pause_after_completed_invocations=None):
+    if pause_after_completed_invocations is not None and (type(pause_after_completed_invocations) is not int or pause_after_completed_invocations<1):
+        raise ValueError('POSITIVE_COMPLETED_INVOCATION_COUNT_REQUIRED')
     from tools.research.state import require_authorization
     require_authorization(host)
     from tools.research.core import guard,dispatch,experience,read_evidence,packet
@@ -730,6 +748,7 @@ async def converse(host,*,session_handoff=False):
     agent.hooks.add_callback(BeforeToolCallEvent,before_tool)
     agent.hooks.add_callback(AfterToolCallEvent,after_tool)
     try:
+        completed_invocations=0
         while state(host)['research_status']!='stopped':
             if host.store.remaining()['remaining']['model_calls']<1:
                 engineering_closeout(host,'Provider request count exhausted without model STOP/selection')
@@ -741,6 +760,11 @@ async def converse(host,*,session_handoff=False):
                 raise ValueError('PENDING_OUTCOME_REQUIRES_LOCAL_RECOVERY')
             if state(host)['spec'].get('research_decisions'):
                 await complete_reports(host,boundary.inner)
+            completed_invocations+=1
+            if (pause_after_completed_invocations is not None and completed_invocations>=pause_after_completed_invocations
+                    and state(host)['research_status']!='stopped' and not state(host).get('success_gate')):
+                await pause_completed_invocation(host,agent,completed_invocations)
+                break
             if session_handoff and state(host)['research_status']!='stopped' and not state(host).get('success_gate'):
                 from tools.research.session_handoff import handoff, reconcile
                 previous=agent
