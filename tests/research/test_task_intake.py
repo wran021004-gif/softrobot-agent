@@ -193,6 +193,7 @@ class IntakeTests(unittest.TestCase):
         self.assertEqual(changed.adapter_limits['terminal_error_m'], 0.01)
         self.assertNotEqual(changed.source_identity, view.source_identity)
 
+    @patch.dict('os.environ', {'TASK_INTAKE_API_KEY': 'synthetic-intake-key', 'TASK_INTAKE_BASE_URL': 'https://intake.invalid/v1'})
     def test_provider_default_off_and_single_mocked_json_request(self):
         import openai
         with patch.object(openai, 'OpenAI', side_effect=AssertionError('provider must stay off')):
@@ -207,6 +208,8 @@ class IntakeTests(unittest.TestCase):
             self.assertEqual(result.status, 'draft', result.error)
             client.chat.completions.create.assert_called_once()
             self.assertEqual(factory.call_args.kwargs['max_retries'], 0)
+            self.assertEqual(factory.call_args.kwargs['api_key'], 'synthetic-intake-key')
+            self.assertEqual(factory.call_args.kwargs['base_url'], 'https://intake.invalid/v1')
             kwargs = client.chat.completions.create.call_args.kwargs
             self.assertEqual(kwargs['response_format'], {'type': 'json_object'})
             self.assertNotIn('tools', kwargs)
@@ -215,6 +218,7 @@ class IntakeTests(unittest.TestCase):
             self.assertEqual(request_draft(text, enable_provider=True, model='offline-mock').status, 'parse_failed')
         self.assertIn('Never downgrade', request_messages(text)[0]['content'])
 
+    @patch.dict('os.environ', {'TASK_INTAKE_API_KEY': 'synthetic-intake-key', 'TASK_INTAKE_BASE_URL': 'https://intake.invalid/v1'})
     def test_provider_mocked_failure_paths_never_retry(self):
         import openai
         text, proposal = CASES['reach']

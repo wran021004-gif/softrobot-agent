@@ -4,6 +4,7 @@ from typing import Literal
 from pydantic import ConfigDict, Field, JsonValue, model_validator
 
 from schemas.common import Contract
+from schemas.platform import SessionInput, TaskDefinition
 
 
 class IntakeContract(Contract):
@@ -108,6 +109,7 @@ class IntakeResult(IntakeContract):
     status: Literal['draft', 'parse_failed']
     draft: TaskIntakeDraft | None
     error: str | None
+    provider_receipt: dict[str, JsonValue] | None = None
 
     @model_validator(mode='after')
     def closed_failure(self):
@@ -117,3 +119,17 @@ class IntakeResult(IntakeContract):
         elif self.draft is not None or not self.error:
             raise ValueError('FAILURE_MUST_NOT_CONTAIN_DRAFT')
         return self
+
+
+class CompilationPreview(IntakeContract):
+    """Review artifact, never an execution or task approval receipt."""
+    version: Literal['s130-n2'] = 's130-n2'
+    executable: Literal[False] = False
+    semantic_spec: TaskIntakeDraft
+    requirement_mappings: list[dict[str, JsonValue]]
+    diagnostics: list[str]
+    capabilities: dict[str, JsonValue]
+    acceptance_spec: dict[str, JsonValue] | None = None
+    candidate_task: TaskDefinition | None = None
+    configuration_preview: SessionInput | None = None
+    reference_identity: str | None = None

@@ -1,12 +1,15 @@
 """Independent one-request task intake. Read-only context; no research lifecycle."""
 import argparse
 import json
+import os
 import re
+import time
 from pathlib import Path
+from urllib.parse import urlsplit
 
 from schemas.platform import SessionInput, TaskDefinition
 from schemas.task_intake import (AcceptanceView, DraftRequirement, IntakeProposal,
-                                 IntakeResult, TaskIntakeDraft)
+                                 IntakeResult, TaskIntakeDraft, CompilationPreview)
 from tools.platform_registry import registry
 from tools.platform_tasks import check_definition
 from tools.research_tasks import task_adapter
@@ -173,25 +176,253 @@ Return one JSON object only. No tools, code, markdown or executable configuratio
                 context=context.model_dump(mode='json') if context else None), ensure_ascii=False))]
 
 
-def request_draft(user_text, *, enable_provider=False, model=None, base_url=None, context=None):
+def request_draft(user_text, *, enable_provider=False, model=None, base_url=None, context=None,
+                  max_tokens=2000, timeout_s=30.0):
     """Opt-in independent OpenAI SDK client, exactly one call with retries off."""
     if not enable_provider:
         return _failure('PROVIDER_DISABLED_USE_OFFLINE_FIXTURE')
     if not model or not user_text.strip():
         return _failure('EXPLICIT_MODEL_AND_NONEMPTY_TASK_REQUIRED')
+    # Never inherit OPENAI_* or the research model service's credentials/address.
+    api_key = os.environ.get('TASK_INTAKE_API_KEY')
+    base_url = base_url or os.environ.get('TASK_INTAKE_BASE_URL')
+    if not api_key or not base_url:
+        return _failure('TASK_INTAKE_API_KEY_AND_EXPLICIT_BASE_URL_REQUIRED')
+    address = urlsplit(base_url)
+    if address.scheme != 'https' or not address.hostname or address.username or address.password or address.query or address.fragment:
+        return _failure('PROVIDER_BASE_URL_MUST_BE_HTTPS_WITHOUT_CREDENTIALS_QUERY_OR_FRAGMENT')
+    if type(max_tokens) is not int or not 1 <= max_tokens <= 4096 or not 0 < timeout_s <= 60:
+        return _failure('PROVIDER_LIMITS_REQUIRED: tokens 1..4096, timeout 0..60 seconds')
     from openai import OpenAI, OpenAIError
+    started = time.monotonic()
+    receipt = dict(model=model, base_url=base_url, requests=1, max_tokens=max_tokens,
+                   timeout_s=timeout_s, usage=None, monetary_cost=None,
+                   cost_status='unknown: no provider price supplied', response_text=None)
     try:
-        with OpenAI(base_url=base_url, max_retries=0, timeout=30.0) as client:
+        with OpenAI(api_key=api_key, base_url=base_url, max_retries=0, timeout=timeout_s) as client:
             response = client.chat.completions.create(model=model,
-                messages=request_messages(user_text, context), response_format={'type': 'json_object'})
+                messages=request_messages(user_text, context), response_format={'type': 'json_object'},
+                max_tokens=max_tokens)
+        usage = getattr(response, 'usage', None)
+        receipt['usage'] = usage.model_dump(mode='json') if usage is not None else None
         if len(response.choices) != 1 or response.choices[0].message.tool_calls:
-            return _failure('UNEXPECTED_MODEL_CHOICES_OR_TOOL_CALLS')
-        choice = response.choices[0]
-        if choice.message.refusal:
-            return _failure('MODEL_REFUSAL')
-        return parse_response(user_text, choice.message.content, finish_reason=choice.finish_reason, context=context)
+            result = _failure('UNEXPECTED_MODEL_CHOICES_OR_TOOL_CALLS')
+        else:
+            choice = response.choices[0]
+            receipt.update(response_text=choice.message.content, finish_reason=choice.finish_reason)
+            result = (_failure('MODEL_REFUSAL') if choice.message.refusal else
+                      parse_response(user_text, choice.message.content, finish_reason=choice.finish_reason, context=context))
     except OpenAIError as exc:
-        return _failure('PROVIDER_ERROR: ' + type(exc).__name__)
+        result = _failure('PROVIDER_ERROR: ' + type(exc).__name__)
+    receipt['wall_s'] = time.monotonic() - started
+    return result.model_copy(update={'provider_receipt': receipt})
+
+
+ADOPT_REFERENCE = '采用参考配置的其余验收与执行设置'
+REACH_FIELDS = {
+    'target': '/task/goal/data/target_m',
+    'tolerance': '/task/evaluator/parameters/data/tolerance_m',
+    'duration': '/task/timing/duration_s',
+    'hold_window': SETTLING + 'window_s',
+    'hold_position': SETTLING + 'position_limit_m',
+    'hold_speed': SETTLING + 'speed_limit_m_s',
+}
+
+
+def _reach_clause(text):
+    """Small exact SI grammar. Unknown text stays unmapped, never guessed away."""
+    number = r'(-?(?:\d+(?:\.\d+)?)(?:[eE][+-]?\d+)?)'
+    if text == ADOPT_REFERENCE:
+        return 'reference_settings', True
+    if text in ('让末端到达目标', '末端到达目标', '末端到达并保持'):
+        return 'behavior', 'reach'
+    if text == '世界坐标系':
+        return 'frame', 'world'
+    target = re.fullmatch(r'(?:让)?末端到达目标\s*\(' + number + r',\s*' + number + r',\s*' + number + r'\)\s*m', text)
+    if target:
+        return 'target', [float(v) for v in target.groups()]
+    for name, pattern in (
+            ('tolerance', r'终点误差不超过\s*' + number + r'\s*m'),
+            ('duration', r'任务时长\s*' + number + r'\s*s'),
+            ('hold_window', r'最终保持窗口\s*' + number + r'\s*s'),
+            ('hold_position', r'保持窗口位置误差不超过\s*' + number + r'\s*m'),
+            ('hold_speed', r'保持窗口速度不超过\s*' + number + r'\s*m/s')):
+        match = re.fullmatch(pattern, text)
+        if match:
+            return name, float(match[1])
+    return None, None
+
+
+def _clauses(text):
+    return [part.strip() for part in re.split('[；;。\n]', text) if part.strip()]
+
+
+def compile_draft(draft, *, trusted_reference=None, reference_label=None, analysis_protocol=None):
+    """Compile a review preview against an explicitly supplied complete snapshot.
+
+    Only identical reference semantics are supported in N2. No arbitrary patches,
+    approval transition, context reconstruction, Store, or execution occurs here.
+    """
+    from tools.research_tasks import assemble_acceptance
+    from tools.research.task_constraints import describe_analysis_requirements, analysis_capabilities
+
+    draft = TaskIntakeDraft.model_validate(draft)
+    diagnostics, mappings = [], []
+    reg = registry()
+    capabilities = dict(
+        semantic=dict(status='needs_review', missing=[]),
+        evaluation=dict(status='unsupported', reasons=[]),
+        physical=dict(status='not_assessed', scope='unchanged trusted reference only'),
+        mathematics=dict(status='not_assessed', reason='No compatible validated candidate and explicit analysis protocol.',
+            scope='Adapter-generated sampled mathematical constraints and physical input bounds only; full_task_supported is not full physical acceptance.'),
+        authorization=dict(status='not_authorized', reason='All previews remain draft; original admission and approval apply.'),
+        registered_tasks=sorted(d.extension_id for d in reg.extensions.values() if d.kind == 'task'),
+        registered_evaluators=sorted(d.extension_id for d in reg.extensions.values() if d.kind == 'evaluator'))
+    cfg, view, identity = None, None, None
+    reference_check = dict(status='not_assessed', reason='No validated full reference supplied.')
+    if trusted_reference is not None:
+        try:
+            if not reference_label or not reference_label.strip():
+                raise ValueError('EXPLICIT_REFERENCE_LABEL_REQUIRED')
+            cfg = SessionInput.model_validate(trusted_reference).model_dump(mode='json')
+            check_definition(cfg['task'], reg)
+            view = acceptance_view(cfg, source_label=reference_label)
+            identity = digest(cfg)
+            if cfg['task']['family'] != 'task.reach' or cfg['task']['environment']['data']['environment']['environment_id'] != 'reach_free':
+                raise ValueError('N2_REFERENCE_REQUIRES_REACH_FREE')
+            reference_check = task_adapter(cfg).check_compatibility()['technical_compatibility']
+        except (ValueError, TypeError, KeyError) as exc:
+            diagnostics.append('INVALID_REFERENCE: ' + str(exc))
+            cfg, view = None, None
+    else:
+        diagnostics.append('TRUSTED_SESSION_INPUT_REFERENCE_REQUIRED')
+    capabilities['physical']['reference_check'] = reference_check
+
+    # A serialized draft is untrusted too. Replay the N1 boundary and compare
+    # source-bound rows against a freshly projected reference, not its own view.
+    proposal = dict(goal_quote=draft.user_goal, object_quote=draft.task_object, intent=draft.intent,
+        requirements=[r.model_dump(exclude={'value', 'source_identity', 'confirmation'}) for r in draft.requirements],
+        temporal_relations=[r.model_dump() for r in draft.temporal_relations], explanation=draft.llm_explanation)
+    checked = parse_response(draft.user_text, json.dumps(proposal), context=view)
+    if checked.draft is None:
+        diagnostics.append('DRAFT_SOURCE_INVALID: ' + str(checked.error))
+    elif checked.draft.requirements != draft.requirements:
+        diagnostics.append('DRAFT_SOURCE_VALUES_OR_IDENTITY_MISMATCH')
+
+    clauses = _clauses(draft.user_text)
+    parsed = [(text, *_reach_clause(text)) for text in clauses]
+    adoption = any(key == 'reference_settings' for _, key, _ in parsed)
+    facts, conflicts = {}, []
+    for text, key, value in parsed:
+        if key is None:
+            diagnostics.append('UNMAPPED_USER_CONSTRAINT: ' + text)
+            continue
+        if key in facts and facts[key] != value:
+            conflicts.append('CONFLICTING_USER_VALUES: ' + key)
+        facts[key] = value
+        pointer = REACH_FIELDS.get(key)
+        if view and pointer and view.facts.get(pointer) != value:
+            conflicts.append('REFERENCE_CONFLICT: ' + pointer + '; user=' + json.dumps(value)
+                             + '; reference=' + json.dumps(view.facts.get(pointer)))
+    diagnostics.extend(conflicts)
+    # The entire text is compiled independently of model quote segmentation and
+    # kind labels. Each requirement retains its source and subclause outcomes.
+    checked_rows = {r.id: r for r in checked.draft.requirements} if checked.draft else {}
+    for row in draft.requirements:
+        mapped = []
+        status = 'needs_confirmation'
+        if row.source == 'user_explicit':
+            for text in _clauses(row.quote):
+                key, value = _reach_clause(text)
+                pointer = REACH_FIELDS.get(key)
+                state = 'unmapped' if key is None else 'mapped'
+                if view and pointer and view.facts.get(pointer) != value:
+                    state = 'conflict'
+                mapped.append(dict(quote=text, field=key, value=value, pointer=pointer, status=state))
+            status = 'mapped' if all(m['status'] == 'mapped' for m in mapped) else 'unresolved'
+        elif row.source == 'verified_configuration':
+            status = 'adopted_reference' if adoption and view and row.source_identity == identity else 'context_only'
+        elif row.source == 'undefined':
+            status = 'missing'
+        if checked_rows.get(row.id) != row:
+            status = 'invalid_source'
+        mappings.append(dict(requirement_id=row.id, source=row.source, quote=row.quote,
+            config_pointer=row.config_pointer, source_identity=row.source_identity,
+            value=row.value, question=row.question, status=status, mappings=mapped))
+
+    supported = draft.intent in ('reach', 'reach_and_hold')
+    if supported:
+        try:
+            task_extension = reg.get('task.reach', kind='task')
+            evaluator = reg.get('evaluate.reach', kind='evaluator')
+            capabilities['evaluation'] = dict(status='registered', task=task_extension.extension_id,
+                evaluator=evaluator.extension_id, availability=reg.inspect(evaluator, [evaluator.extension_id]),
+                scope='Endpoint evaluator plus existing offline_reach_hold_v1 composition; no evaluation performed.')
+        except ValueError as exc:
+            diagnostics.append('EVALUATOR_UNAVAILABLE: ' + str(exc))
+    else:
+        needs = {
+            'tracking': ['registered task.tracking', 'timed reference definition', 'tracking evaluator'],
+            'obstacle_reach': ['collision/distance signals', 'obstacle semantics', 'collision-aware evaluator'],
+            'catch_and_hold': ['contact and object-state signals', 'capture/retention definition', 'contact/capture evaluator'],
+            'disturbance_stabilization': ['disturbance waveform and frame', 'platform/disturbance signals', 'disturbance stability evaluator'],
+        }.get(draft.intent, ['task family', 'signals', 'independent evaluator'])
+        capabilities['evaluation']['reasons'] = needs
+        diagnostics.append('UNSUPPORTED_TASK: ' + draft.intent + '; requires ' + ', '.join(needs))
+        capabilities['mathematics'] = dict(status='not_applicable', reason='No supported task translation; original semantics retained.')
+    missing = list(draft.missing_definitions)
+    if supported:
+        required = ['target', 'frame', 'tolerance', 'duration']
+        if draft.intent == 'reach_and_hold':
+            required += ['hold_window', 'hold_position', 'hold_speed']
+        missing += [key for key in required if key not in facts and not (adoption and view and
+                    key not in ('target', 'frame') and REACH_FIELDS[key] in view.facts)]
+        if not any(key in facts for key in ('behavior', 'target')):
+            missing.append('explicit reach behavior')
+    if draft.task_object is None:
+        missing.append('task object')
+    if draft.temporal_relations:
+        diagnostics.append('TEMPORAL_RELATIONS_REQUIRE_REVIEW: no multi-stage compiler in N2')
+    if not adoption:
+        diagnostics.append('EXPLICIT_REFERENCE_SETTINGS_ADOPTION_REQUIRED: ' + ADOPT_REFERENCE)
+    if any(m['status'] in ('unresolved', 'needs_confirmation', 'missing', 'context_only', 'invalid_source') for m in mappings):
+        diagnostics.append('UNRESOLVED_REQUIREMENT_MAPPINGS')
+    capabilities['semantic'] = dict(status='incomplete' if missing else
+        'needs_review' if diagnostics else 'complete',
+        missing=sorted(set(missing)), interpreted_intent=draft.intent, intent_source='llm_candidate')
+    diagnostics += ['MISSING_DEFINITION: ' + item for item in sorted(set(missing))]
+    candidate, preview, acceptance = None, None, None
+    if cfg and supported and not diagnostics:
+        capabilities['physical'].update(reference_check)
+    if cfg and supported and not diagnostics and reference_check['status'] == 'supported':
+        # Deep copy from the actual full configuration, never AcceptanceView.
+        value = json.loads(json.dumps(cfg))
+        value['task'].update(status='draft', source='S130-N2 review preview; reference ' + reference_label + ' sha256:' + identity)
+        candidate = check_definition(value['task'], reg)
+        preview = SessionInput.model_validate(value)
+        adapter = task_adapter(preview)
+        pending = assemble_acceptance(preview, None, None)
+        acceptance = dict(source_identity=identity, source_label=reference_label,
+            facts=view.facts, adapter=adapter.describe(), limits=adapter.ranking_limits(),
+            protocol_owner='tools.research_tasks.assemble_acceptance', pending_evidence=pending,
+            evaluator_owner='extensions.reference.implementation.evaluate_reach',
+            note='Pending evidence only. Independent evaluator constraints and all protocol components remain required.')
+        acceptance['condition_sources'] = {name: dict(owner='tools.research_tasks.assemble_acceptance',
+            reference_identity=identity, evidence_status='missing') for name in pending['components']}
+        try:
+            requirements = describe_analysis_requirements(preview, {})
+            acceptance['physical_input_bounds'] = requirements.physical_inputs
+            capabilities['mathematics']['requirements'] = requirements.model_dump(mode='json')
+            if analysis_protocol is not None:
+                capabilities['mathematics'].update(status='assessed', reason='Read-only applicability; no mathematical computation or physical evidence.',
+                    operations=analysis_capabilities(preview, requirements, analysis_protocol))
+        except (ValueError, TypeError, KeyError) as exc:
+            capabilities['mathematics'].update(status='not_assessed', reason=str(exc))
+    elif cfg and reference_check['status'] != 'supported':
+        diagnostics.append('REFERENCE_PHYSICAL_COMPATIBILITY: ' + reference_check['reason'])
+    return CompilationPreview(semantic_spec=draft, requirement_mappings=mappings, diagnostics=diagnostics,
+        capabilities=capabilities, acceptance_spec=acceptance, candidate_task=candidate,
+        configuration_preview=preview, reference_identity=identity)
 
 
 def main(argv=None):
@@ -206,6 +437,10 @@ def main(argv=None):
     parser.add_argument('--context', type=Path, help='Explicit TaskDefinition/task bundle/SessionInput JSON only')
     parser.add_argument('--model')
     parser.add_argument('--base-url')
+    parser.add_argument('--max-tokens', type=int, default=2000)
+    parser.add_argument('--timeout-s', type=float, default=30.0)
+    parser.add_argument('--compile-reference', type=Path, help='Explicit trusted full SessionInput snapshot; review preview only')
+    parser.add_argument('--analysis-protocol', type=Path, help='Optional existing validated mathematical protocol')
     args = parser.parse_args(argv)
     try:
         text = args.text if args.text is not None else args.file.read_text(encoding='utf-8')
@@ -215,9 +450,20 @@ def main(argv=None):
                                     finish_reason=args.finish_reason, context=context)
         else:
             result = request_draft(text, enable_provider=args.enable_provider, model=args.model,
-                                   base_url=args.base_url, context=context)
+                                   base_url=args.base_url, context=context,
+                                   max_tokens=args.max_tokens, timeout_s=args.timeout_s)
     except (OSError, ValueError, TypeError, KeyError) as exc:
         result = _failure('INVALID_INPUT_OR_CONTEXT: ' + str(exc))
+    if args.compile_reference and result.draft is not None:
+        try:
+            preview = compile_draft(result.draft, trusted_reference=read(args.compile_reference),
+                reference_label=str(args.compile_reference),
+                analysis_protocol=read(args.analysis_protocol) if args.analysis_protocol else None)
+            print(json.dumps(dict(intake=result.model_dump(mode='json'), compilation=preview.model_dump(mode='json')),
+                             ensure_ascii=False, indent=2, allow_nan=False))
+            return 0 if preview.configuration_preview is not None else 2
+        except (OSError, ValueError, TypeError, KeyError) as exc:
+            result = _failure('INVALID_COMPILATION_INPUT: ' + str(exc))
     print(result.model_dump_json(indent=2))
     return 0 if result.status == 'draft' else 2
 
