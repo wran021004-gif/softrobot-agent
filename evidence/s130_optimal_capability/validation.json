@@ -1,0 +1,49 @@
+{
+  "date": "2026-10-22",
+  "scope": "S130-T1 offline mathematics; no integration or physical acceptance",
+  "runs": [
+    {
+      "environment": ".t1-env Python 3.11.16",
+      "command": "python -m unittest tests.research.test_conic_capability tests.research.test_trajectory_feasibility.NumericalTests -v",
+      "tests": 27,
+      "passed": 27,
+      "failures": 0,
+      "errors": 0,
+      "reported_elapsed_s": 0.412
+    },
+    {
+      "environment": "existing .mainline5-env, read-only use; PYTHONPATH=.;tests/research",
+      "command": "python -m unittest tests.research.test_s129_task_capability.SignedTests -v",
+      "tests": 9,
+      "passed": 9,
+      "failures": 0,
+      "errors": 0,
+      "reported_elapsed_s": 0.074
+    }
+  ],
+  "earlier_attempts": [
+    {
+      "scope": "initial new tests",
+      "tests": 15,
+      "passed": 14,
+      "errors": 1,
+      "reason": "CVXPY zero-horizon SOC required explicit cp.Constant for constant vector",
+      "resolution": "Fixed and covered by final passing run"
+    },
+    {
+      "scope": "overbroad selection of entire trajectory module alongside initial T1 tests",
+      "tests": 33,
+      "passed": 25,
+      "errors": 8,
+      "reason": "ResearchIntegrationTests.setUp import test_mainline failed before worker execution",
+      "resolution": "Restricted final regression to NumericalTests; these eight integration tests were not rerun or claimed passed"
+    }
+  ],
+  "scientific_comparison": "comparison.json",
+  "source_evidence_preserved": true,
+  "gvs_or_physical_worker_invocations": 0,
+  "provider_requests": 0,
+  "formal_floating_point_certificate": false,
+  "t2_sensitivity_implemented": false,
+  "t3_agent_integration_implemented": false
+}
