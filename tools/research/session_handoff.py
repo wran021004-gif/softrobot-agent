@@ -126,7 +126,6 @@ async def reconcile(host,build,directory,*,allow_incomplete=False):
 
 async def handoff(host,agent,build,directory,*,stage=lambda name:None):
     """Prepare -> persist -> independently reopen -> verify -> atomic pointer commit."""
-    from tools.research.agent import decision_packet
     current=state(host);committed=current['pilot'].get('handoff')
     if committed:
         prior=host.store.artifact(committed);session_id=agent._session_manager.session_id
@@ -148,8 +147,11 @@ async def handoff(host,agent,build,directory,*,stage=lambda name:None):
                 raise ValueError('PREPARATION_STATE_CHANGED_KEEP_OLD_SESSION')
             preparation=prior
         else:
-            packet=decision_packet(host)
-            initial=[dict(role='user',content=[dict(text='Authoritative research handoff, no prior chat copied:\n'+json.dumps(packet,separators=(',',':')))])]
+            initial=[dict(role='user',content=[dict(text=(
+                'Research Session prepared and identity-bound to the saved handoff preparation. '
+                'No prior conversation copied. The next model request supplies the authoritative '
+                'current state in CURRENT_RESEARCH_PACKET. Full history and original scientific '
+                'evidence remain queryable from Store. Study: '+host.run_id))])]
             value=dict(version='research_session_handoff_v2',study_id=host.run_id,implementation=s['freeze'],
                 previous_session=s['pilot']['framework_session_id'],source_state_identity=state_identity(s),
                 source_state=plain(host.store.put(db,s)),completed_boundary_identity=digest(agent.messages),

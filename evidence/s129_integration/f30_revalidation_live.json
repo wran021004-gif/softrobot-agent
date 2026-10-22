@@ -1,0 +1,443 @@
+{
+  "study_id": "f30-revalidate-20261022-01",
+  "implementation": "0fff1b40de76391e22da742aca95d728ecf183b2",
+  "mode": "real_provider",
+  "requests": [
+    {
+      "event_index": 18,
+      "request_id": "r3-request-9f84e2243bc74e8ca7d74173429c5fe4",
+      "purpose": "conversation",
+      "request_identity": "8ba239a80d6ea552bf9819aabf91ecf7b1427794a2e221215250ffbcd7fa4b70",
+      "request_reference": {
+        "artifact_id": "8ba239a80d6ea552bf9819aabf91ecf7b1427794a2e221215250ffbcd7fa4b70",
+        "media_type": "application/json"
+      },
+      "tools": [
+        "research_plan",
+        "evidence_read",
+        "research_investigate"
+      ]
+    },
+    {
+      "event_index": 32,
+      "request_id": "r3-request-52a7611ded214a5ab0e3148ffa2234f0",
+      "purpose": "reporter",
+      "request_identity": "09d89f2f39d79c74ec2026aac042bb795acdb68341082b16ee1593527d87ccb2",
+      "request_reference": {
+        "artifact_id": "09d89f2f39d79c74ec2026aac042bb795acdb68341082b16ee1593527d87ccb2",
+        "media_type": "application/json"
+      },
+      "tools": []
+    },
+    {
+      "event_index": 41,
+      "request_id": "r3-request-c22fc70d05cf4dd389c284e9c4f892c0",
+      "purpose": "conversation",
+      "request_identity": "cd8bac030d5a51cf316ec1cc48bae19a7967f90212abed1d276cb4ba76599132",
+      "request_reference": {
+        "artifact_id": "3b5d9bb1c52bdac19e27b83b96f09327db400c2e9aeb3db6c0bbbf36d3cfefcb",
+        "media_type": "application/json"
+      },
+      "tools": [
+        "research_plan",
+        "evidence_read"
+      ]
+    }
+  ],
+  "usage": {
+    "conversation": {
+      "requests": 2,
+      "usage_missing": 0,
+      "prompt_tokens": 42370,
+      "completion_tokens": 3495,
+      "total_tokens": 45865,
+      "prompt_cache_hit_tokens": 2816,
+      "prompt_cache_miss_tokens": 39554,
+      "cost_usd": "unknown",
+      "input_bytes": [
+        60888,
+        97686
+      ]
+    },
+    "reporter": {
+      "requests": 1,
+      "usage_missing": 0,
+      "prompt_tokens": 68155,
+      "completion_tokens": 4398,
+      "total_tokens": 72553,
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 68155,
+      "cost_usd": "unknown",
+      "input_bytes": [
+        197211
+      ]
+    }
+  },
+  "ledger": {
+    "limit": {
+      "backend_solves": 0,
+      "model_calls": 3,
+      "tool_calls": 12,
+      "wall_s": null,
+      "worker_calls": 0
+    },
+    "used": {
+      "tool_calls": 1,
+      "model_calls": 3,
+      "backend_solves": 0,
+      "worker_calls": 0,
+      "wall_s": 40.67200000002049
+    },
+    "remaining": {
+      "backend_solves": 0,
+      "model_calls": 0,
+      "tool_calls": 11,
+      "wall_s": null,
+      "worker_calls": 0
+    },
+    "occupied": {}
+  },
+  "scientific_counters": {
+    "mathematical_evaluations": 0,
+    "physical_replay_launches": 0,
+    "nmpc_launches": 0,
+    "offline_nlp": 0,
+    "bdf_replays": 0,
+    "admitted_training_stages": 0,
+    "charged_starts": 0
+  },
+  "tool_pairing": [
+    {
+      "tool_use_id": "call_00_xr1SecawxxbYr5eWvsN37198",
+      "name": "research_investigate",
+      "status": "success",
+      "paired": true,
+      "receipt": {
+        "analysis_status": "not_assessed",
+        "cache_hit": false,
+        "caller": "unified-research",
+        "charged": {
+          "backend_solves": 0,
+          "model_calls": 0,
+          "tool_calls": 1,
+          "wall_s": 0.0,
+          "worker_calls": 0
+        },
+        "contract_version": "1.2.0",
+        "error": null,
+        "execution_id": "01df1bcf3c674c23b82150ebcf0d967b",
+        "execution_status": "completed",
+        "original_execution_id": null,
+        "output": {
+          "artifact_id": "4a3365b6e61e3ffafac4be41b2d55edef36ebc99b01ffcfc0dcf1b3c23af58dc",
+          "media_type": "application/json"
+        },
+        "request_id": "native-call_00_xr1SecawxxbYr5eWvsN37198",
+        "result_contract": null,
+        "result_version": "1.0.0",
+        "solver_status": "not_run",
+        "task_success": null,
+        "tool_id": "research.core_investigate",
+        "tool_version": "1.0.0"
+      }
+    }
+  ],
+  "reporter_revisions": [
+    {
+      "reference": {
+        "artifact_id": "3828cb25a687e4c8e0506aebe00aa66863e4aaed8c7cb73a5cb8486b340941ec",
+        "media_type": "application/json"
+      },
+      "status": "available",
+      "error": null
+    }
+  ],
+  "second_main_received_L1": true,
+  "reporter_sources_resolve": true,
+  "reporter_authoritative_fields_unchanged": true,
+  "store_independently_reopened": true,
+  "sdk_independently_reopened": true,
+  "sdk_error": null,
+  "original_B_hashes_unchanged": true,
+  "unknown_sends": 0,
+  "unconsumed_response": null,
+  "research_status": "stopped",
+  "final_disposition": {
+    "kind": "engineering_count_budget_closure",
+    "model_stop": false,
+    "observed_pass": null,
+    "reason": "Provider request count exhausted without model STOP/selection",
+    "selected": null
+  },
+  "scope_identity": "ceb05a3a46552e536c6375ec6e17978f00919f748de62e1abcfb194908fc81fe",
+  "scientific_admission": "failed_semantic_admission",
+  "sdk_message_identity": "fd550fc78a2eb7c4794ed191e4a35e9ecfa39a102cb13e93971ce770dbd3e00b",
+  "unsettled_receipts": 0,
+  "technical_checks_passed": true,
+  "f3_started": false,
+  "execution_error": null,
+  "engineering_delivery_admission": "passed",
+  "semantic_audit_reference": {
+    "artifact_id": "bee0224fa1acd733501ad9efa34e385bae4563f7b2498dd128510309c84bd4eb",
+    "media_type": "application/json"
+  },
+  "semantic_audit": {
+    "study_id": "f30-revalidate-20261022-01",
+    "implementation": "0fff1b40de76391e22da742aca95d728ecf183b2",
+    "disposition": "failed_semantic_admission",
+    "engineering_delivery": "passed",
+    "reporter_citations": "passed",
+    "main_score_directions": "correct",
+    "main_recovery_denominator": "correct in explicit fractions; percentage prose inconsistent",
+    "main_delta_vs_normalized_secant": "distinct",
+    "main_optimality_and_physics_caveats": "present",
+    "findings": [
+      {
+        "severity": "admission_blocker",
+        "source_request": "r3-request-c22fc70d05cf4dd389c284e9c4f892c0",
+        "excerpt": "residual, control-independent degradation",
+        "assessment": "The residual after this finite unconverged control search is not demonstrated to be control-independent, even within the local model.",
+        "correction": "Residual best-found score degradation under the recorded three-start, 100-iteration search budget; better control search may alter it.",
+        "context": "Later explicit uncertified-optimum caveats are correct, but do not substantiate the earlier control-independent attribution."
+      },
+      {
+        "severity": "minor_numeric_prose_error",
+        "source_request": "r3-request-c22fc70d05cf4dd389c284e9c4f892c0",
+        "excerpt": "~14.6%",
+        "assessment": "Explicit fraction 0.1454 and denominator are correct; the percentage should be about 14.54%, or 14.5% to one decimal.",
+        "correct_recovery_fraction": 0.14537951156070436
+      }
+    ],
+    "reporter_interpretations": 4,
+    "reporter_catalog_entries": 67,
+    "reporter_unique_used_ids": 39,
+    "all_catalog_sources_resolve": true,
+    "exact_id_roundtrip": true,
+    "second_main_interpretations": 3,
+    "raw_reporter_content_identity": "a0c58126a9a2e2cec3d87206960a379d772ada24714bf13c895db65eff333e96",
+    "raw_main_content_identity": "e2cf4338a992ed6332a763bc43040bf50fbad82eb3d07fda9d457654e12705b7",
+    "raw_response_references": [
+      {
+        "artifact_id": "bc11aa15ee481746d32fc9b5802063ffd51ac53a7d7d3056ee8c6192d7447be3",
+        "media_type": "application/octet-stream"
+      },
+      {
+        "artifact_id": "2cccc38db1ddbb37d36b13c2e48a456f060e455aae2c156dbcdf958b68691483",
+        "media_type": "application/octet-stream"
+      },
+      {
+        "artifact_id": "b06e8d6fa7a46a6d8524b81faa3a82710d0dbf7e8ae257f12fb97164a5c77a96",
+        "media_type": "application/octet-stream"
+      }
+    ],
+    "numerical_authority": {
+      "status": "computed_estimate",
+      "definition": "G = max(normalized_constraint_violation); smaller is better",
+      "quantity_semantics": {
+        "score": "Computed signed minimax value within the declared model",
+        "delta": "candidate_score - baseline_score; direct score difference",
+        "normalized_secant": "structural score delta / structural parameter step * normalization_scale",
+        "control_reoptimization_improvement": "fixed-old-control score - reoptimized score on the same candidate"
+      },
+      "normalized_secants": {
+        "fixed_control": {
+          "status": "unverified_estimate",
+          "value": 18.72184168333103,
+          "source": {
+            "reference": {
+              "artifact_id": "9e7a21648b529c3bb72b28f4c8778224348b16cb3782dcff82aac9fe6a38943f",
+              "media_type": "application/json"
+            },
+            "pointer": "/trajectory/structural_comparison/quantities/fixed_control_normalized_secant/value"
+          }
+        },
+        "reoptimized_control": {
+          "status": "unverified_estimate",
+          "value": 16.00006948389153,
+          "source": {
+            "reference": {
+              "artifact_id": "9e7a21648b529c3bb72b28f4c8778224348b16cb3782dcff82aac9fe6a38943f",
+              "media_type": "application/json"
+            },
+            "pointer": "/trajectory/structural_comparison/quantities/reoptimized_control_normalized_secant/value"
+          }
+        }
+      },
+      "decomposition": {
+        "fixed_control_degradation": 0.11701151052081904,
+        "control_reoptimization_improvement": 0.017011076246496892,
+        "residual_reoptimized_degradation": 0.10000043427432215,
+        "source_references": [
+          {
+            "reference": {
+              "artifact_id": "9e7a21648b529c3bb72b28f4c8778224348b16cb3782dcff82aac9fe6a38943f",
+              "media_type": "application/json"
+            },
+            "pointer": "/trajectory/structural_comparison/baseline_violation"
+          },
+          {
+            "reference": {
+              "artifact_id": "9e7a21648b529c3bb72b28f4c8778224348b16cb3782dcff82aac9fe6a38943f",
+              "media_type": "application/json"
+            },
+            "pointer": "/trajectory/structural_comparison/fixed_control/best_found_violation"
+          },
+          {
+            "reference": {
+              "artifact_id": "9e7a21648b529c3bb72b28f4c8778224348b16cb3782dcff82aac9fe6a38943f",
+              "media_type": "application/json"
+            },
+            "pointer": "/trajectory/best_found_violation"
+          }
+        ],
+        "fraction_denominator": "fixed_control_degradation",
+        "recovery_fraction": 0.14537951156070436,
+        "residual_fraction": 0.8546204884392956
+      },
+      "comparisons": [
+        {
+          "comparison": "reoptimized_candidate_vs_reoptimized_baseline",
+          "baseline_score": -0.1999999515720519,
+          "candidate_score": -0.09999951729772974,
+          "delta": 0.10000043427432215,
+          "smaller_is_better": true,
+          "computed_score_direction": "worse",
+          "source_references": [
+            {
+              "reference": {
+                "artifact_id": "9e7a21648b529c3bb72b28f4c8778224348b16cb3782dcff82aac9fe6a38943f",
+                "media_type": "application/json"
+              },
+              "pointer": "/trajectory/structural_comparison/baseline_violation"
+            },
+            {
+              "reference": {
+                "artifact_id": "9e7a21648b529c3bb72b28f4c8778224348b16cb3782dcff82aac9fe6a38943f",
+                "media_type": "application/json"
+              },
+              "pointer": "/trajectory/best_found_violation"
+            }
+          ]
+        },
+        {
+          "comparison": "candidate_reoptimized_vs_candidate_fixed_old_control",
+          "baseline_score": -0.08298844105123285,
+          "candidate_score": -0.09999951729772974,
+          "delta": -0.017011076246496892,
+          "smaller_is_better": true,
+          "computed_score_direction": "better",
+          "source_references": [
+            {
+              "reference": {
+                "artifact_id": "9e7a21648b529c3bb72b28f4c8778224348b16cb3782dcff82aac9fe6a38943f",
+                "media_type": "application/json"
+              },
+              "pointer": "/trajectory/structural_comparison/fixed_control/best_found_violation"
+            },
+            {
+              "reference": {
+                "artifact_id": "9e7a21648b529c3bb72b28f4c8778224348b16cb3782dcff82aac9fe6a38943f",
+                "media_type": "application/json"
+              },
+              "pointer": "/trajectory/best_found_violation"
+            }
+          ]
+        }
+      ],
+      "comparison_scope": {
+        "variable": "segments.near.length_m",
+        "step": 0.0010000000000000009,
+        "normalization_scale": 0.16,
+        "baseline_result": {
+          "artifact_id": "9c22f54b6f258c56a1105bb6b6f14a9e5e62ad4c30e5831a2931c50b3add1a17",
+          "media_type": "application/json"
+        },
+        "control_alignment": "identical physical tensions, tendon order and time grid",
+        "reoptimization": "Both candidates independently solved with the same three starts and iteration budget",
+        "attribution": "Same frozen source and candidate parameters except the declared continuous parameter",
+        "derivative_scope": "Two-design finite secants of computed values; no envelope gradient or descent guarantee"
+      },
+      "scope_source": {
+        "reference": {
+          "artifact_id": "9e7a21648b529c3bb72b28f4c8778224348b16cb3782dcff82aac9fe6a38943f",
+          "media_type": "application/json"
+        },
+        "pointer": "/trajectory/structural_comparison"
+      },
+      "optimality_status": "uncertified",
+      "limitation": "Computed local-model scores only; no optimal structural ranking or MuJoCo task acceptance"
+    },
+    "original_failed_study_files_unchanged": 13,
+    "sdk_reopened_in_separate_process": true,
+    "retries": 0,
+    "additional_provider_requests": 0,
+    "next_choice": "Proposed saved-evidence/configuration and per-sample comparison; not executed. Such diagnosis alone cannot certify structural cause.",
+    "f3": {
+      "admitted": false,
+      "started": false,
+      "study_created": false,
+      "provider_requests": 0,
+      "science_workers": 0
+    },
+    "stop": "One final authorized revalidation exhausted; no retry, grant reset, replacement Study or further implementation work"
+  },
+  "event_order": [
+    {
+      "index": 16,
+      "kind": "model_decision_packet",
+      "status": "recorded"
+    },
+    {
+      "index": 18,
+      "kind": "r3_request",
+      "status": "sent"
+    },
+    {
+      "index": 22,
+      "kind": "r3_response_processing",
+      "status": "decoded"
+    },
+    {
+      "index": 28,
+      "kind": "science_delivery_boundary",
+      "status": "recorded"
+    },
+    {
+      "index": 32,
+      "kind": "r3_request",
+      "status": "sent"
+    },
+    {
+      "index": 37,
+      "kind": "reporter_completed",
+      "status": "recorded"
+    },
+    {
+      "index": 38,
+      "kind": "r3_response_processing",
+      "status": "reporter_archived"
+    },
+    {
+      "index": 39,
+      "kind": "model_decision_packet",
+      "status": "recorded"
+    },
+    {
+      "index": 41,
+      "kind": "r3_request",
+      "status": "sent"
+    },
+    {
+      "index": 45,
+      "kind": "r3_response_processing",
+      "status": "decoded"
+    },
+    {
+      "index": 47,
+      "kind": "engineering_count_budget_closure",
+      "status": "saved"
+    }
+  ],
+  "scope_template_identity": "400fed3a8c46111ff68d6a905068414368c406d5102fe58817cf1b185f8755fa",
+  "raw_publication_authorized": false
+}

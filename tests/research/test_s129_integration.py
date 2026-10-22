@@ -43,23 +43,30 @@ class IntegrationTests(unittest.TestCase):
         pair,refs=self.saved_pair()
         for ref in refs:reporter.scientific_feedback(self.h,dict(reference=ref),{})
         packet=agent_decision_brief(self.h)
-        views=[r['results'][0]['mathematics'] for r in packet['latest_reports']]
+        self.assertNotIn('scoped_claim',packet.get('latest_scientific_feedback') or {})
+        views=[r['findings'][0]['mathematics'] for r in packet['latest_reports']]
         self.assertEqual(len(views),2)
         for view,key in zip(views,('baseline','changed')):
             self.assertEqual(view['capability']['best_found_violation'],pair[key]['trajectory']['best_found_violation'])
             self.assertFalse(view['capability']['verification_scope']['optimality'])
-            self.assertTrue(all(not s['success'] and s['iterations']==100 for s in view['capability']['solver_starts']))
+            self.assertEqual(view['capability']['solver_termination']['converged'],0)
+            self.assertEqual(view['capability']['solver_termination']['max_iterations'],100)
             self.assertTrue(view['scope']['constraint_coverage'])
-            self.assertTrue(view['problem'])
+            self.assertTrue(view['problem_definition'])
             self.assertTrue(view['unresolved'])
             for quantity in view['quantities']:
                 if quantity['source']:
                     from tools.research.core import read_evidence
                     self.assertEqual(read_evidence(self.h,quantity['source'],record_read=False),quantity['value'])
-        comparison=views[1]['capability']['structural_comparison']['quantities']
-        self.assertAlmostEqual(views[1]['capability']['structural_comparison']['fixed_control_violation'],-.0829884411)
-        self.assertAlmostEqual(comparison['fixed_control_delta']['value'],.1170115105)
-        self.assertAlmostEqual(comparison['reoptimized_control_delta']['value'],.1000004343)
+        comparisons=views[1]['capability']['score_comparisons']['comparisons']
+        self.assertAlmostEqual(comparisons[0]['delta'],.1000004343)
+        self.assertEqual(comparisons[0]['computed_score_direction'],'worse')
+        self.assertAlmostEqual(comparisons[1]['delta'],-.0170110762)
+        self.assertEqual(comparisons[1]['computed_score_direction'],'better')
+        from tools.research.core import read_evidence
+        for comparison in comparisons:
+            actual=[read_evidence(self.h,source,record_read=False) for source in comparison['source_references']]
+            self.assertEqual(actual,[comparison['baseline_score'],comparison['candidate_score']])
         wire=json.dumps(views)
         for key in ('"states"','"discrete_dynamics"','"applied_input_n"'):self.assertNotIn(key,wire)
 
@@ -78,7 +85,7 @@ class IntegrationTests(unittest.TestCase):
             self.assertEqual(asyncio.run(recover_feedback(self.h,agent)),1)
             result=agent.messages[-1]['content'][0]['toolResult']
             value=json.loads(result['content'][0]['text'])
-            self.assertEqual(value['report']['results'][0]['identity']['result']['reference'],refs[0])
+            self.assertEqual(value['scientific_result_reference'],refs[0])
             self.assertEqual(result['toolUseId'],'old-math')
             # A second interruption uses persisted original feedback byte-for-byte.
             agent.messages=agent.messages[:1]
@@ -86,6 +93,99 @@ class IntegrationTests(unittest.TestCase):
             self.assertEqual(agent.messages[-1]['content'][0]['toolResult'],result)
         self.assertEqual(self.h.store.remaining(),ledger)
         self.assertEqual(state(self.h)['analysis_results'],science)
+
+    def test_saved_b_source_catalog_roundtrips_without_summary_aliases(self):
+        from tools.research.core import read_evidence
+        from schemas.research_reporting import EvidenceLocation, ScientificReport
+        pair,refs=self.saved_pair();before=deepcopy(state(self.h))
+        delivery=reporter.investigate(self.h,dict(question='Compare saved B scores and uncertainty',references=refs))
+        base=delivery['report_reference'];saved=self.h.store.artifact(base)
+        wire=reporter._wire(self.h,base,saved);payload=json.loads(wire['messages'][-1]['content'])
+        catalog=payload['source_catalog']
+        self.assertEqual(list(catalog),['S'+str(i+1) for i in range(len(catalog))])
+        required={'/trajectory/problem_definition','/trajectory/best_found_violation',
+            '/trajectory/structural_comparison/fixed_control/best_found_violation',
+            '/trajectory/structural_comparison','/trajectory/starts','/trajectory/replay/records'}
+        self.assertTrue(required.issubset({v['pointer'] for v in catalog.values()}))
+        self.assertNotIn('/trajectory/score_semantics',{v['pointer'] for v in catalog.values()})
+        for source in catalog.values():read_evidence(self.h,source,record_read=False)
+        self.assertEqual(state(self.h),before)
+        malformed=ScientificReport.model_validate(saved['report'])
+        malformed.results[0].detail_sources.append(EvidenceLocation(reference=refs[0],pointer='/trajectory/score_semantics'))
+        with self.assertRaises(KeyError):reporter._source_catalog(self.h,malformed,[])
+        chosen=[key for key,value in catalog.items() if value['pointer'] in required]
+        def respond(request):
+            actual=json.loads(json.loads(request.content)['messages'][-1]['content'])
+            self.assertEqual(actual['source_catalog'],catalog)
+            return httpx.Response(200,json=dict(choices=[dict(finish_reason='stop',message=dict(
+                content=json.dumps(dict(interpretations=[dict(kind='new_information',text='Offline B fixture',source_ids=chosen)]))))]))
+        asyncio.run(reporter.complete_reports(self.h,httpx.MockTransport(respond)))
+        final=reporter.entries(self.h)[-1][1]
+        self.assertEqual(final['interpretation_status'],'available',final['error'])
+        self.assertEqual(final['report']['interpretations'][0]['sources'],[catalog[key] for key in chosen])
+        self.assertNotIn('source_ids',final['report']['interpretations'][0])
+        self.assertEqual({k:v for k,v in final['report'].items() if k!='interpretations'},
+            {k:v for k,v in saved['report'].items() if k!='interpretations'})
+        for ref,key in zip(refs,('baseline','changed')):self.assertEqual(self.h.store.artifact(ref),pair[key])
+
+    def test_signed_deltas_secants_and_recovery_have_explicit_denominators(self):
+        from tools.research.core import read_evidence
+        from tools.research.capability import signed_score_comparisons
+        pair,refs=self.saved_pair();card=plain(reporter._card(self.h,refs[1]))
+        values=mathematical_decision_view(card)['capability']['score_comparisons']
+        decomposition=values['decomposition']
+        for name,expected in dict(fixed_control_degradation=.11701151052081904,
+                control_reoptimization_improvement=.017011076246496892,
+                residual_reoptimized_degradation=.10000043427432215,
+                recovery_fraction=.14537951156070436,residual_fraction=.8546204884392956).items():
+            self.assertAlmostEqual(decomposition[name],expected,places=14)
+        self.assertEqual(decomposition['fraction_denominator'],'fixed_control_degradation')
+        scope=values['comparison_scope'];raw=pair['changed']['trajectory']['structural_comparison']
+        for mode,row in values['normalized_secants'].items():
+            self.assertEqual(row['value'],read_evidence(self.h,row['source'],record_read=False))
+            self.assertAlmostEqual(row['value'],raw['quantities'][mode+'_delta']['value']/scope['step']*scope['normalization_scale'])
+            self.assertNotEqual(row['value'],raw['quantities'][mode+'_delta']['value'])
+        self.assertEqual(values['optimality_status'],'uncertified')
+        self.assertIn('no optimal structural ranking or MuJoCo',values['limitation'])
+        summary=deepcopy(card['deterministic_summary']['task_capability'])
+        summary.pop('quantity_semantics')  # Persisted pre-fix L2 remains readable.
+        self.assertEqual(signed_score_comparisons(summary,refs[1]),values)
+        summary['structural_comparison']['fixed_control_violation']=summary['structural_comparison']['baseline_violation']
+        self.assertNotIn('recovery_fraction',signed_score_comparisons(summary,refs[1])['decomposition'])
+
+    def test_math_comparison_uses_recorded_scope_in_both_orders_and_exact_paths(self):
+        from tools.research.core import read_evidence
+        pair,refs=self.saved_pair()
+        for order in (refs,refs[::-1]):
+            report=reporter.assemble(self.h,order,question='Compare computed values')
+            relation=report.relations[0]
+            self.assertTrue(relation.comparable)
+            self.assertIsNone(relation.single_factor_attribution)
+            self.assertIn('no certified optimal ranking',' '.join(relation.reasons))
+            self.assertNotIn('Complete physical outcomes',' '.join(relation.reasons))
+            for source in relation.sources:read_evidence(self.h,plain(source),record_read=False)
+        summary=reporter._card(self.h,refs[1]).deterministic_summary['task_capability']
+        self.assertIn('Smaller is better',summary['score_semantics'])
+        comparison=summary['structural_comparison']
+        self.assertEqual(read_evidence(self.h,dict(reference=refs[1],pointer=comparison['fixed_control_value_pointer']),
+            record_read=False),comparison['fixed_control_violation'])
+        self.assertEqual(len(read_evidence(self.h,dict(reference=refs[1],pointer=summary['solver_starts_pointer']),
+            record_read=False)),3)
+        # The observed live hallucinated alias remains rejected, never repaired silently.
+        with self.assertRaises(KeyError):
+            read_evidence(self.h,dict(reference=refs[1],pointer='/trajectory/structural_comparison/fixed_control_violation'),
+                record_read=False)
+        independent=deepcopy(pair['changed']);independent['trajectory'].pop('structural_comparison')
+        ref=save(self.h,independent);update(self.h,analysis_results=[*refs,ref])
+        relation=reporter.assemble(self.h,[refs[0],ref],question='Unpaired model estimates').relations[0]
+        self.assertIsNone(relation.comparable)
+        view=mathematical_decision_view(plain(reporter._card(self.h,ref)))
+        self.assertEqual(view['capability']['score_comparisons']['status'],'not_comparable')
+        independent['trajectory']['structural_comparison']=deepcopy(pair['changed']['trajectory']['structural_comparison'])
+        independent['trajectory']['structural_comparison']['status']='inconclusive'
+        ref=save(self.h,independent);update(self.h,analysis_results=[*refs,ref])
+        view=mathematical_decision_view(plain(reporter._card(self.h,ref)))
+        self.assertEqual(view['capability']['score_comparisons']['status'],'not_comparable')
 
     def test_multi_result_receipt_and_missing_binding(self):
         _,refs=self.saved_pair()
@@ -116,7 +216,7 @@ class IntegrationTests(unittest.TestCase):
         reports=reporter.entries(self.h)
         skipped=next(v for _,v in reports if v['interpretation_for']==repeated['report_reference'])
         self.assertEqual(skipped['interpretation_status'],'skipped')
-        self.assertEqual(skipped['report'],repeated['report'])
+        self.assertEqual(skipped['report'],self.h.store.artifact(repeated['report_reference'])['report'])
         investigation=reporter.investigate(self.h,dict(question='Explicitly compare the repetition',references=[second]))
         asyncio.run(reporter.complete_reports(self.h,httpx.MockTransport(respond)))
         self.assertEqual(len(calls),2)

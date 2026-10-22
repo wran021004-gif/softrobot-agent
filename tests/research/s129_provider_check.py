@@ -58,10 +58,40 @@ def prepare(live):
     return h,refs
 
 
-async def run(live=False):
-    from strands.hooks import BeforeModelCallEvent, BeforeToolCallEvent, AfterToolCallEvent
+def engineering_builder(h,boundary):
+    from strands.hooks import BeforeModelCallEvent
     from strands.tools.tools import PythonAgentTool
     from strands.tools.executors import SequentialToolExecutor
+    def execute(use,**kwargs):
+        key='native-'+use['toolUseId']
+        if use['name']=='research_plan':value=core.dispatch(h,use['input'],key)
+        else:
+            row,fresh=h.store.reserve(h.run_id,key,digest(use['input']),h.actor,{**zero(),'tool_calls':1})
+            if not fresh:raise ValueError('ORIGINAL_RECEIPT_RECOVERY_REQUIRED')
+            value=reporter.investigate(h,use['input'])
+            h.store.complete(row,dict(request_id=key,execution_id=row['execution_id'],caller=h.actor,
+                tool_id='research.core_investigate',tool_version='1.0.0',execution_status='completed',charged=zero()),value)
+        return dict(toolUseId=use['toolUseId'],status='success',content=[dict(text=json.dumps(value))])
+    tools=[PythonAgentTool(name,dict(name=name,description=description,inputSchema={'json':schema}),execute)
+        for name,description,schema in (
+            ('research_investigate','Read-only investigation of saved engineering evidence',reporter.InvestigationRequest.model_json_schema()),
+            ('research_plan','Record a diagnostic hypothesis using saved evidence; no worker',plan_schema(['diagnose'],decision_required=True)))]
+    def build(session_id=None):
+        agent=build_harness(h,transport=boundary,api_key=os.environ.get('DEEPSEEK_API_KEY','offline'),
+            instructions=state(h)['spec']['execution_instructions'],model_class=live_model_class(boundary),
+            tool_executor=SequentialToolExecutor(),research_tools=tools,configuration_path=h.store.root/'framework.json',
+            session_directory=h.store.root/'sdk',session_id=session_id)
+        agent.tool_registry.registry.pop('retrieve_context',None)
+        def cap(event):
+            if reporter.provider_usage(h).get('conversation',{}).get('requests',0)>=7:
+                event.cancel='F2 main request ceiling reached; no send'
+        agent.hooks.add_callback(BeforeModelCallEvent,cap)
+        return agent
+    return build
+
+
+async def run(live=False):
+    from strands.hooks import BeforeToolCallEvent, AfterToolCallEvent
     if live:load_credential(Path(read(ROOT/'configs/research/runtime.json')['credentials_reference']).expanduser())
     h,refs=prepare(live);sessions=[];checkpoints=[];calls=[];original=[digest(h.store.artifact(r)) for r in refs]
     class CappedTransport(httpx.AsyncBaseTransport):
@@ -90,30 +120,7 @@ async def run(live=False):
             return response(request)
         async def aclose(self):await self.inner.aclose()
     transport=CappedTransport();boundary=LiveBoundary(h,transport)
-    def execute(use,**kwargs):
-        key='native-'+use['toolUseId']
-        if use['name']=='research_plan':value=core.dispatch(h,use['input'],key)
-        else:
-            row,fresh=h.store.reserve(h.run_id,key,digest(use['input']),h.actor,{**zero(),'tool_calls':1})
-            if not fresh:raise ValueError('ORIGINAL_RECEIPT_RECOVERY_REQUIRED')
-            value=reporter.investigate(h,use['input'])
-            h.store.complete(row,dict(request_id=key,execution_id=row['execution_id'],caller=h.actor,
-                tool_id='research.core_investigate',tool_version='1.0.0',execution_status='completed',charged=zero()),value)
-        return dict(toolUseId=use['toolUseId'],status='success',content=[dict(text=json.dumps(value))])
-    tools=[PythonAgentTool(name,dict(name=name,description=description,inputSchema={'json':schema}),execute)
-        for name,description,schema in (
-            ('research_investigate','Read-only investigation of saved engineering evidence',reporter.InvestigationRequest.model_json_schema()),
-            ('research_plan','Record a diagnostic hypothesis using saved evidence; no worker',plan_schema(['diagnose'],decision_required=True)))]
-    def build(session_id=None):
-        agent=build_harness(h,transport=boundary,api_key=os.environ.get('DEEPSEEK_API_KEY','offline'),
-            instructions=state(h)['spec']['execution_instructions'],model_class=live_model_class(boundary),
-            tool_executor=SequentialToolExecutor(),research_tools=tools,configuration_path=h.store.root/'framework.json',
-            session_directory=h.store.root/'sdk',session_id=session_id)
-        agent.tool_registry.registry.pop('retrieve_context',None)
-        def cap(event):
-            if calls.count('conversation')>=7:event.cancel='F2 main request ceiling reached; no send'
-        agent.hooks.add_callback(BeforeModelCallEvent,cap)
-        return agent
+    build=engineering_builder(h,boundary)
     result=dict(mode='live' if live else 'offline_mock_usage',study_id=h.run_id,store=str(h.store.root),
         passed=False,production_handoff_admitted=False,analysis_schema_has_task_capability=
             'task_capability' in AnalysisRequest.model_json_schema()['properties']['operation']['enum'])
@@ -163,6 +170,76 @@ async def run(live=False):
     print(json.dumps(result,ensure_ascii=False));return result
 
 
+async def verify_existing(run_id):
+    """One bounded follow-up to the observed F2 failure; never a fresh grant/retry."""
+    from tools.platform_host import Host
+    h=Host(ROOT/'runs/research'/run_id,run_id,actor='unified-research')
+    usage=reporter.provider_usage(h)
+    assert {k:v['requests'] for k,v in usage.items()}=={'conversation':6,'reporter':1}
+    assert not any(e['kind']=='f2_followup_started' for e in h.store.events(run_id))
+    assert not pending(h) and not state(h)['pilot'].get('unconsumed_response')
+    load_credential(Path(read(ROOT/'configs/research/runtime.json')['credentials_reference']).expanduser())
+    class RemainingGrant(httpx.AsyncHTTPTransport):
+        async def handle_async_request(self,request):
+            # LiveBoundary already saved this request; count it, including failures.
+            counts=reporter.provider_usage(h)
+            assert counts.get('conversation',{}).get('requests',0)<=7
+            assert counts.get('reporter',{}).get('requests',0)<=3
+            assert sum(v['requests'] for v in counts.values())<=10
+            return await super().handle_async_request(request)
+    transport=RemainingGrant(retries=0);boundary=LiveBoundary(h,transport)
+    build=engineering_builder(h,boundary)
+    agent=await reconcile(h,build,h.store.root/'sdk')
+    original=deepcopy(read(h.store.root/'f2_check.json'))
+    refs=state(h)['analysis_results'];hashes=[digest(h.store.artifact(r)) for r in refs]
+    core.bind(h,reason='F2 live audit: explicit raw pointers and recorded mathematical comparison scope; no scientific recomputation')
+    record(h,'f2_followup_started',dict(user_authorization='Approved existing provider_scope.json egress and aggregate 7 main / 3 Reporter / 10 total ceiling',
+        previous_usage=usage,original_check=original,scope=read(ROOT/'evidence/s129_integration/provider_scope.json')))
+    result=dict(study_id=run_id,passed=False,production_handoff_admitted=False)
+    try:
+        question=('Audit the recorded signed score definition, score versus finite delta/secant, and the exact controlled '
+            'comparison scope. Distinguish positive normalized margin from zero slack, replay from optimality, and '
+            'computed model comparison from physical acceptance. Use exact supplied raw pointers; prior summary aliases were invalid.')
+        request=dict(question=question,references=refs,reads=[dict(reference=r,pointer=p) for r,p in (
+            (refs[0],'/trajectory/problem_definition'),(refs[1],'/trajectory/problem_definition'),
+            (refs[1],'/trajectory/structural_comparison/fixed_control/best_found_violation'),
+            (refs[1],'/trajectory/structural_comparison/quantities'))])
+        row,fresh=h.store.reserve(run_id,'f2-scope-investigation',digest(request),h.actor,{**zero(),'tool_calls':1})
+        assert fresh
+        value=reporter.investigate(h,request)
+        h.store.complete(row,dict(request_id=row['request_id'],execution_id=row['execution_id'],caller=h.actor,
+            tool_id='research.core_investigate',tool_version='1.0.0',execution_status='completed',charged=zero()),value)
+        await reporter.complete_reports(h,transport)
+        prompt=('Engineering audit follow-up in the same third Session, no tools and no new science. '
+            'Read the current corrected deterministic report and any interpretation below; previous reports remain historical. '
+            'State the three signed G scores and their margin meaning, what the recorded fixed/reoptimized comparison '
+            'supports, what remains unproved, and whether H-F2 remains open. Correct any earlier contradictory statement.\n'
+            +json.dumps(decision_packet(h)))
+        await agent.invoke_async(prompt)
+        record(h,'model_original_turn',dict(session_id=agent._session_manager.session_id,sdk_message_identity=digest(agent.messages)))
+        await agent._session_manager.save_snapshot(agent,is_latest=True)
+        assert not unmatched(agent.messages) and not pending(h) and not state(h)['pilot'].get('unconsumed_response')
+        reopened=await reconcile(h,build,h.store.root/'sdk')
+        assert reopened.messages==agent.messages
+        assert hashes==[digest(h.store.artifact(r)) for r in refs]
+        assert Host(h.store.root,run_id,actor=h.actor).store.remaining()==h.store.remaining()
+        result.update(passed=True,sdk_reopened=True,store_reopened=True,scientific_artifacts_unchanged=True,
+            session_id=agent._session_manager.session_id,new_sessions=0,new_scientific_executions=0,
+            investigation=value['report_reference'],final_message=agent.messages[-1])
+    except Exception as exc:result['error']=type(exc).__name__+': '+str(exc)
+    finally:
+        result.update(usage=reporter.provider_usage(h),ledger=h.store.remaining(),unsettled=pending(h),
+            unconsumed=state(h)['pilot'].get('unconsumed_response'),
+            reporter_statuses=[s['interpretation_status'] for _,s in reporter.entries(h)])
+        atomic_json(h.store.root/'f2_followup.json',result)
+        atomic_json(ROOT/'runs/s129_f2_followup.json',result)
+        await boundary.aclose()
+    print(json.dumps({k:v for k,v in result.items() if k!='final_message'},ensure_ascii=False))
+    return result
+
+
 if __name__=='__main__':
     parser=argparse.ArgumentParser();parser.add_argument('--live',action='store_true')
-    args=parser.parse_args();asyncio.run(run(args.live))
+    parser.add_argument('--verify-existing',help='Continue the existing 6-main/1-Reporter grant exactly once')
+    args=parser.parse_args()
+    asyncio.run(verify_existing(args.verify_existing) if args.verify_existing else run(args.live))

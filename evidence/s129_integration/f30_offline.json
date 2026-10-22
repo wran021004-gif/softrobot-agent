@@ -1,0 +1,177 @@
+{
+  "study_id": "f30-offline-8fecd67e",
+  "implementation": "offline_fixture_no_live_admission",
+  "mode": "offline_mock",
+  "requests": [
+    {
+      "event_index": 17,
+      "request_id": "r3-request-02f6cdd8fe9f4d06a697717499009c05",
+      "purpose": "conversation",
+      "request_identity": "752d266fa2909e780df50b846f5930d7312fabf2905bc37e8650ddba49821ac8",
+      "request_reference": {
+        "artifact_id": "752d266fa2909e780df50b846f5930d7312fabf2905bc37e8650ddba49821ac8",
+        "media_type": "application/json"
+      },
+      "tools": [
+        "research_plan",
+        "evidence_read",
+        "research_investigate"
+      ]
+    },
+    {
+      "event_index": 31,
+      "request_id": "r3-request-05c09c7e4f8d428097bdbd3f9c2c66da",
+      "purpose": "reporter",
+      "request_identity": "42bd1b2f7232ab95948a5d4ed565e2961e697fab21f091f0bce9cfd4c4acbd0e",
+      "request_reference": {
+        "artifact_id": "42bd1b2f7232ab95948a5d4ed565e2961e697fab21f091f0bce9cfd4c4acbd0e",
+        "media_type": "application/json"
+      },
+      "tools": []
+    },
+    {
+      "event_index": 40,
+      "request_id": "r3-request-995c32fdac3e4e3790a56a863e2c2139",
+      "purpose": "conversation",
+      "request_identity": "4592334c8b97d67cc547b2bed3eaebec14aaae10f0b5fee461ce61a911549fbf",
+      "request_reference": {
+        "artifact_id": "4592334c8b97d67cc547b2bed3eaebec14aaae10f0b5fee461ce61a911549fbf",
+        "media_type": "application/json"
+      },
+      "tools": [
+        "research_plan",
+        "evidence_read"
+      ]
+    }
+  ],
+  "usage": {
+    "conversation": {
+      "requests": 2,
+      "usage_missing": 0,
+      "prompt_tokens": 20,
+      "completion_tokens": 4,
+      "total_tokens": 24,
+      "prompt_cache_hit_tokens": null,
+      "prompt_cache_miss_tokens": null,
+      "cost_usd": "unknown",
+      "input_bytes": [
+        58801,
+        69165
+      ]
+    },
+    "reporter": {
+      "requests": 1,
+      "usage_missing": 0,
+      "prompt_tokens": 17,
+      "completion_tokens": 3,
+      "total_tokens": 20,
+      "prompt_cache_hit_tokens": null,
+      "prompt_cache_miss_tokens": null,
+      "cost_usd": "unknown",
+      "input_bytes": [
+        106733
+      ]
+    }
+  },
+  "ledger": {
+    "limit": {
+      "backend_solves": 0,
+      "model_calls": 3,
+      "tool_calls": 12,
+      "wall_s": null,
+      "worker_calls": 0
+    },
+    "used": {
+      "tool_calls": 1,
+      "model_calls": 3,
+      "backend_solves": 0,
+      "worker_calls": 0,
+      "wall_s": 0.0
+    },
+    "remaining": {
+      "backend_solves": 0,
+      "model_calls": 0,
+      "tool_calls": 11,
+      "wall_s": null,
+      "worker_calls": 0
+    },
+    "occupied": {}
+  },
+  "scientific_counters": {
+    "mathematical_evaluations": 0,
+    "physical_replay_launches": 0,
+    "nmpc_launches": 0,
+    "offline_nlp": 0,
+    "bdf_replays": 0,
+    "admitted_training_stages": 0,
+    "charged_starts": 0
+  },
+  "tool_pairing": [
+    {
+      "tool_use_id": "f30-native-investigate",
+      "name": "research_investigate",
+      "status": "success",
+      "paired": true,
+      "receipt": {
+        "analysis_status": "not_assessed",
+        "cache_hit": false,
+        "caller": "unified-research",
+        "charged": {
+          "backend_solves": 0,
+          "model_calls": 0,
+          "tool_calls": 1,
+          "wall_s": 0.0,
+          "worker_calls": 0
+        },
+        "contract_version": "1.2.0",
+        "error": null,
+        "execution_id": "4e0ebb470240460095cd01ab2b5284dd",
+        "execution_status": "completed",
+        "original_execution_id": null,
+        "output": {
+          "artifact_id": "11340ea02dc2dad4655451ae83c1918e717b4bf4e8fcf2b0ed5e965b08d104e6",
+          "media_type": "application/json"
+        },
+        "request_id": "native-f30-native-investigate",
+        "result_contract": null,
+        "result_version": "1.0.0",
+        "solver_status": "not_run",
+        "task_success": null,
+        "tool_id": "research.core_investigate",
+        "tool_version": "1.0.0"
+      }
+    }
+  ],
+  "reporter_revisions": [
+    {
+      "reference": {
+        "artifact_id": "a9a1ff367d98dc6c89698802f674f3bffa4bfa0021b0e5487da7e39556c83eef",
+        "media_type": "application/json"
+      },
+      "status": "available",
+      "error": null
+    }
+  ],
+  "second_main_received_L1": true,
+  "reporter_sources_resolve": true,
+  "reporter_authoritative_fields_unchanged": true,
+  "store_independently_reopened": true,
+  "sdk_independently_reopened": true,
+  "sdk_error": null,
+  "original_B_hashes_unchanged": true,
+  "unknown_sends": 0,
+  "unconsumed_response": null,
+  "research_status": "stopped",
+  "final_disposition": {
+    "kind": "engineering_count_budget_closure",
+    "model_stop": false,
+    "observed_pass": null,
+    "reason": "Provider request count exhausted without model STOP/selection",
+    "selected": null
+  },
+  "scope_identity": "38a48a83a57c64f4126fa049926ef5f743a7ab1c60941b047a6dd253274bb3bd",
+  "scientific_admission": "pending_semantic_audit",
+  "sdk_message_identity": "9e41c4c22e0d05d0f1e6980f58c40133979e945fb8c1943b640cd5af3047eede",
+  "unsettled_receipts": 0,
+  "technical_checks_passed": true
+}

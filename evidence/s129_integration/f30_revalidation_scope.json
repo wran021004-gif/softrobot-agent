@@ -1,0 +1,76 @@
+{
+  "status": "execution_prepared_not_authorized_not_executed",
+  "proposed_study_id": "f30-revalidate-20261022-01",
+  "proposed_store": "runs/research/f30-revalidate-20261022-01",
+  "implementation_freeze": {
+    "selection": "Explicit --approved-commit FULL_SHA must equal clean HEAD and origin/integration/s129-research; archived as implementation and approved_commit in the new Store scope",
+    "final_sha_binding": "After the ordinary push, runs/f30_revalidation_scope_bound.json contains a copy of this scope with implementation_freeze.commit set to the exact final delivery SHA; this independent local review artifact avoids a Git commit containing its own hash",
+    "requirements": [
+      "Bind that exact commit and resolved configuration identity in a new independent explicit authorization",
+      "Require clean worktree and matching origin/integration/s129-research before creation",
+      "Do not substitute a subsequently changed HEAD without fresh scope review"
+    ]
+  },
+  "entrypoint": {
+    "module": "tests.research.f30_provider_check",
+    "execution_command_template": "python -m tests.research.f30_provider_check --live --approved-commit FULL_SEPARATELY_APPROVED_SHA",
+    "runtime": "production tools.research.agent.converse; existing SDK, tools, receipts, Reporter and budget handling",
+    "authorization": "Preparation and this command template do not authorize execution; wait for explicit user approval",
+    "archive": "runs/research/f30-revalidate-20261022-01",
+    "result": "runs/f30_revalidation_live.json",
+    "audit_command": "python -m tests.research.f30_provider_check --audit f30-revalidate-20261022-01"
+  },
+  "endpoint": "https://api.deepseek.com/chat/completions",
+  "provider_configuration": "Unchanged frozen provider values in evidence/s129_integration/f30_scope.json; deepseek-flash, thinking enabled, reasoning high, max_tokens 32768",
+  "request_limits": {"main": 2, "reporter": 1, "total": 3},
+  "public_operations_ceiling": 12,
+  "planned_operations": ["One read-only research_investigate of the imported saved B pair"],
+  "scientific_budgets": {
+    "worker_calls": 0,
+    "backend_solves": 0,
+    "mathematical_evaluations": 0,
+    "physical_replay_launches": 0,
+    "nmpc_launches": 0,
+    "offline_nlp": 0,
+    "bdf_replays": 0,
+    "ppo_training_stages": 0,
+    "ppo_actions": 0,
+    "independent_rl_evaluation": 0
+  },
+  "imported_evidence": {
+    "source": "evidence/s129_math_capability/gvs_pair.json",
+    "baseline_result": "9c22f54b6f258c56a1105bb6b6f14a9e5e62ad4c30e5831a2931c50b3add1a17",
+    "candidate_result": "9e7a21648b529c3bb72b28f4c8778224348b16cb3782dcff82aac9fe6a38943f",
+    "supporting_artifacts": "Only this pair's saved candidate/configuration supporting artifacts; preserve original content hashes",
+    "provenance": "Historical engineering evidence, never new science of the proposed Study"
+  },
+  "outbound_data": [
+    "Project-scoped frozen task, design/family, model, analysis protocol and execution instructions",
+    "Imported B results and their scoped L1/L2 mathematical facts, metrics, bounds, solver/replay records and exact reads",
+    "Request-local validated source ID catalog and deterministic score/delta/secant/recovery comparisons",
+    "This new Study's main tool requests/results and Reporter interpretations needed for main-Reporter-main delivery",
+    "This new Study's request/receipt references, budget/accounting state, implementation and evidence identities"
+  ],
+  "excluded_outbound_data": [
+    "Credential values or environment/private configuration file content; authentication remains in the existing transport header",
+    "Unrelated workspace or user data",
+    "Original failed Study or any other Study's raw Provider bodies or SDK histories"
+  ],
+  "raw_archive_publication_authorized": false,
+  "acceptance_checks": [
+    "Use production converse and existing SDK hooks with main -> Reporter -> main ordering",
+    "Accept actual Reporter source IDs through exact persisted catalog lookup and unchanged scope/read checks",
+    "Second main receives completed interpreted L1 rather than deterministic fallback",
+    "Second main correctly distinguishes worsening structure score and improving control score, direct delta and normalized secant; any recovery fractions use original fixed-control loss",
+    "Keep optimality uncertified and model evidence distinct from MuJoCo acceptance",
+    "Independently reopen Store/SDK; match original tool IDs and receipts, verify imported hashes and zero science counters"
+  ],
+  "stop_conditions": [
+    "Any unknown send, exceeded role/total budget, incomplete response, invalid citation or semantic admission failure",
+    "No automatic Provider retry, budget reset or replacement Study after failure",
+    "End after the bounded check; no automatic formal F3 admission or scientific execution"
+  ],
+  "historical_preservation": "f30-live-20261022 and all three original requests remain failed and immutable; the adapted runner uses only the new fixed ID and refuses to rewrite the sealed Study audit",
+  "required_next_authorization": "User explicitly approves this new Study ID, independent Store, exact final delivery commit, outbound data and request/zero-science ceilings",
+  "f3_admission": "closed"
+}

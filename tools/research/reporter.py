@@ -1,7 +1,7 @@
 """A-line report delivery and short, accounted, read-only Reporter requests.
 
 F0 owns facts and evidence admission. Reports are retrieval artifacts, never
-registered evidence. Model interpretation runs only outside the main invocation.
+registered evidence. Model interpretation runs at settled pre-decision boundaries.
 """
 from copy import deepcopy
 import json
@@ -31,6 +31,16 @@ class InvestigationRequest(Contract):
 
 class InterpretationResponse(Contract):
     interpretations: list[ReporterInterpretation]
+
+
+class SourceIdInterpretation(Contract):
+    kind: ReporterInterpretation.model_fields['kind'].annotation
+    text: str
+    source_ids: list[str] = Field(min_length=1)
+
+
+class SourceIdResponse(Contract):
+    interpretations: list[SourceIdInterpretation]
 
 
 RESULT_KEYS=('results','physical_replays','mechanics_results','analysis_results',
@@ -116,10 +126,24 @@ def _comparison(host, left, right):
         for key,factor in (('robot','structure'),('policy','control')):
             if ca.get(key)!=cb.get(key):factors.append(factor)
         sources += [EvidenceLocation(reference=c,pointer='/configuration') for c in (a.candidate,b.candidate)]
-    comparable=paired_evidence(plain(left.evidence_summary),plain(right.evidence_summary),
-        plain(a.result.reference))['verification_status']=='paired_observations'
-    if not comparable:reasons.append('Complete physical outcomes, task, timing and original thresholds must match')
-    reasons.append('Recorded differences do not identify a single-factor cause')
+    if left.mathematics and right.mathematics:
+        # B already owns the controlled mathematical comparison. Physical outcome
+        # pairing cannot negate that narrower recorded comparison.
+        comparable=None
+        for current,baseline in ((a,b),(b,a)):
+            comparison=host.store.artifact(current.result.reference).get('trajectory',{}).get('structural_comparison',{})
+            if comparison.get('baseline_result')==plain(baseline.result.reference):
+                comparable=comparison.get('status')=='computed_estimate'
+                sources.append(EvidenceLocation(reference=current.result.reference,pointer='/trajectory/structural_comparison'))
+                reasons=[comparison[k] for k in ('control_alignment','reoptimization','derivative_scope','attribution')]
+                reasons.append('Comparable only as recorded computed model values; no certified optimal ranking or physical acceptance')
+                break
+        if comparable is None:reasons.append('No recorded controlled mathematical comparison binds these results')
+    else:
+        comparable=paired_evidence(plain(left.evidence_summary),plain(right.evidence_summary),
+            plain(a.result.reference))['verification_status']=='paired_observations'
+        if not comparable:reasons.append('Complete physical outcomes, task, timing and original thresholds must match')
+        reasons.append('Recorded differences do not identify a single-factor cause')
     relation=EvidenceRelation(kind='model_physics' if bool(left.mathematics)!=bool(right.mathematics)
         else 'structures' if 'structure' in factors else 'same_structure_controls',
         left=a,right=b,comparable=comparable,reasons=reasons,
@@ -172,7 +196,10 @@ def investigate(host, request):
     # Validate explicit reads now; only selected subnodes enter the Reporter input.
     for query in q.reads:read_evidence(host,plain(query),record_read=False)
     ref=_save(host,report,request=q)
-    return dict(report_reference=ref,**host.store.artifact(ref))
+    return dict(delivery_version='scientific_delivery_v2',execution_status='completed',
+        report_reference=ref,question=q.question,result_count=len(report.results),
+        interpretation_status='deferred',
+        detail_access='evidence_read(report_reference); L1 arrives before the next research decision')
 
 
 def scientific_feedback(host, value, before=None, *, receipt=None):
@@ -209,7 +236,8 @@ def scientific_feedback(host, value, before=None, *, receipt=None):
             [c['identity']['result']['reference'] for c in v['report']['results']]==references),None)
         if saved:ref,stored=saved;report=ScientificReport.model_validate(stored['report'])
         else:report=assemble(host,references);ref=_save(host,report)
-        return dict(report_reference=ref,report=plain(report),interpretation_status='deferred',
+        return dict(delivery_version='scientific_delivery_v2',execution_status='completed',
+            scientific_result_reference=references[0],report_reference=ref,interpretation_status='deferred',
             operation_outcome={k:result[k] for k in ('candidate','source','reference','status',
                 'evaluation','selected','task_passed','stop_reason') if k in result},
             resource_use=value.get('resource_use'),
@@ -243,24 +271,112 @@ def interpretation_priority(report, previous):
     return 'routine_or_repeated_result'
 
 
+def current_reports(host):
+    """Latest saved revision for each base report, in original result order."""
+    current={}
+    for ref,saved in entries(host):
+        base=saved['interpretation_for'] or ref
+        current[base['artifact_id']]=(ref,saved)
+    return list(current.values())
+
+
+def reporter_handoff_summary(host, reference, saved):
+    """L1: bounded facts plus explicitly non-authoritative saved interpretation."""
+    from tools.research.research_context import mathematical_decision_view
+    report=saved['report'];findings=[];scope=[];limitations=[];unresolved=[]
+    for card in report['results']:
+        evidence=card['evidence_summary'];math=mathematical_decision_view(card)
+        metrics=sorted(card['metrics'],key=lambda m:m['passed'] is not False)[:3]
+        fact=dict(result=card['identity']['result'],operation=card['identity']['operation'],
+            metrics=[{k:m[k] for k in ('name','value','unit','threshold','passed','scope','source','threshold_source')}
+                for m in metrics],main_violations=card['main_violations'])
+        if math:fact['mathematics']=math
+        else:
+            fact['recorded_summary']={k:v for k,v in card['deterministic_summary'].items()
+                if k in ('task_gap','status','conclusion','recorded_mathematics','recorded_conclusions')}
+        findings.append(fact)
+        scope.append(dict(result=card['identity']['result'],claim_kind=evidence['claim_kind'],
+            verification_status=evidence['verification_status'],supported_inferences=evidence['supported_inferences']))
+        limitations.extend(evidence['unsupported_inferences']);unresolved.extend(evidence['unresolved'])
+    interpretations=report['interpretations'] if saved['interpretation_status']=='available' else []
+    # The full revision remains readable; hypotheses retain their original kind.
+    interpretations=interpretations[:3]
+    return dict(delivery_version='scientific_handoff_v1',report_reference=reference,
+        result_references=[c['identity']['result']['reference'] for c in report['results']],
+        mode=report['mode'],question=report['question'],reporter_status=saved['interpretation_status'],
+        delivery_mode='reporter_interpreted' if saved['interpretation_status']=='available' else 'deterministic_only',
+        findings=findings[:3],result_count=len(findings),scope=scope[:3],
+        comparisons=[{k:r[k] for k in ('kind','comparable','reasons','changed_factors','sources')} for r in report['relations'][:2]],
+        limitations=list(dict.fromkeys(limitations)),unresolved=list(dict.fromkeys(unresolved)),
+        interpretations=interpretations,interpretation_sources=[s for i in interpretations for s in i['sources']],
+        interpretation_scope='Non-authoritative interpretations; hypothesis and further_investigation are unconfirmed questions, not decisions',
+        error=saved['error'])
+
+
+def _source_catalog(host, report, queries):
+    """Request-local raw locations; never infer paths from summary field names."""
+    catalog={};seen=set()
+    def add(source):
+        key=(source.reference.artifact_id,source.pointer)
+        if key in seen:return
+        read_evidence(host,plain(source),record_read=False)
+        seen.add(key);catalog['S'+str(len(catalog)+1)]=plain(source)
+    def collect(value):
+        if isinstance(value,EvidenceLocation):add(value)
+        elif isinstance(value,Contract):
+            for name in type(value).model_fields:collect(getattr(value,name))
+        elif isinstance(value,list):
+            for item in value:collect(item)
+        # Untyped dicts contain derived summaries, not provenance contracts.
+    for card in report.results:
+        collect(card)
+        capability=card.deterministic_summary.get('task_capability')
+        if capability:
+            pointers=[capability[k] for k in ('problem_pointer','solver_starts_pointer','sample_records_pointer')]
+            comparison=capability.get('structural_comparison')
+            if comparison:
+                pointers.extend(comparison[k] for k in ('comparison_pointer','fixed_control_value_pointer'))
+                from tools.research.capability import signed_score_comparisons
+                values=signed_score_comparisons(capability,plain(card.identity.result.reference))
+                for row in values.get('comparisons',[]):
+                    for source in row['source_references']:add(EvidenceLocation.model_validate(source))
+            for pointer in pointers:add(EvidenceLocation(reference=card.identity.result.reference,pointer=pointer))
+    for relation in report.relations:collect(relation.sources)
+    for query in queries:
+        add(EvidenceLocation(reference=query['reference'],pointer=query.get('pointer','')))
+    return catalog
+
+
 def _wire(host, reference, saved):
     provider=state(host)['pilot']['provider']
     q=saved.get('request') or {};reads=[]
     for query in q.get('reads',[]):
         reads.append(dict(query=query,value=read_evidence(host,query,record_read=False)))
+    report=ScientificReport.model_validate(saved['report'])
+    catalog=_source_catalog(host,report,q.get('reads',[]))
+    from tools.research.capability import signed_score_comparisons
+    comparisons=[dict(result=plain(card.identity.result),values=signed_score_comparisons(
+        card.deterministic_summary['task_capability'],plain(card.identity.result.reference)))
+        for card in report.results if 'task_capability' in card.deterministic_summary]
     return dict(model=provider['model'],thinking=dict(type=provider['thinking']),
         reasoning_effort=provider['reasoning_effort'],max_tokens=provider['max_tokens'],stream=False,
         messages=[dict(role='system',content=(
             'You are a read-only scientific Reporter. Return JSON with only interpretations, a list '
-            'of ReporterInterpretation objects using this schema: '+json.dumps(InterpretationResponse.model_json_schema())+
-            '. Every item requires at least one exact evidence source. Explain quantitative new information, '
+            'using this schema: '+json.dumps(SourceIdResponse.model_json_schema())+
+            '. Every item requires source_ids selected only from source_catalog. '
+            'Usually return 1-3 important interpretations; more only for an explicitly complex investigation. '
+            'Use the deterministic score_comparisons for deltas, normalized secants and recovery fractions. '
+            'Explain quantitative new information, '
             'supported/weakened hypotheses, unresolved questions and discriminating observations. '
             'Respect focus and constraints as evidence scope. Request missing evidence in further_investigation. '
             'Facts, identities, metrics, costs and relations are frozen. Multi-factor differences do not '
             'identify causes. Do not choose experiments or parameters for the main Agent. '
+            'Distinguish observed facts, computed model results, competing hypotheses and unresolved questions. '
+            'State uncertainty when evidence is insufficient. '
             'No scientific actions or evidence registration are available.')),
             dict(role='user',content=json.dumps(dict(report_reference=reference,
-                report=saved['report'],request=q,selected_reads=reads),separators=(',',':')))])
+                report=saved['report'],request=q,selected_reads=reads,source_catalog=catalog,
+                score_comparisons=comparisons),separators=(',',':')))])
 
 
 def _finish(host, boundary, wire, response):
@@ -272,7 +388,17 @@ def _finish(host, boundary, wire, response):
         body=response.json();choice=body['choices'][0]
         if response.status_code not in range(200,300) or choice['finish_reason']!='stop':
             raise ValueError('REPORTER_OUTPUT_INCOMPLETE_OR_HTTP_FAILURE')
-        interpretations=InterpretationResponse.model_validate_json(choice['message']['content']).interpretations
+        if 'source_catalog' in payload:
+            output=SourceIdResponse.model_validate_json(choice['message']['content'])
+            catalog=payload['source_catalog'];interpretations=[]
+            for item in output.interpretations:
+                if any(key not in catalog for key in item.source_ids):
+                    raise ValueError('REPORTER_UNKNOWN_SOURCE_ID')
+                interpretations.append(ReporterInterpretation(kind=item.kind,text=item.text,
+                    sources=[catalog[key] for key in item.source_ids]))
+        else:
+            # Replay uses the persisted request contract, never today's _wire().
+            interpretations=InterpretationResponse.model_validate_json(choice['message']['content']).interpretations
         allowed={loc['reference']['artifact_id'] for card in report.results
             for loc in [plain(card.identity.result),*map(plain,card.detail_sources)]}
         allowed.update(f.source.reference.artifact_id for card in report.results for f in card.recorded_context)
@@ -301,7 +427,7 @@ def _finish(host, boundary, wire, response):
 
 
 async def complete_reports(host, transport, *, recover_only=False):
-    """One attempt per report, at settled outer boundaries. Unknown sends block."""
+    """One attempt per report, at settled pre-decision/outer boundaries. Unknown sends block."""
     from tools.research.agent import LiveBoundary, pending, received, record
     class ReporterBoundary(LiveBoundary):
         purpose='reporter'
