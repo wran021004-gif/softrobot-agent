@@ -1,6 +1,7 @@
 """Program facts about evidence identity, ownership, cost and legal references."""
 from copy import deepcopy
 import json
+import math
 import tarfile
 from tools.platform_store import plain
 from tools.state_io import digest
@@ -44,12 +45,16 @@ def task_gap(result):
                 e['complete'] and e.get('holding_coverage_complete') and not e.get('numerical_failure') for e in episodes)),
             accepted=bool(result.get('passed')),interpretation='Research ranking only; original independent acceptance unchanged')
     components=acceptance.get('components',{})
+    tracking=acceptance.get('task_family')=='task.tracking'
+    scored=(('evaluator:tracking_max_error','evaluator:path_coverage','evaluator:path_start',
+        'evaluator:path_end','evaluator:path_progress_regression') if tracking else
+        ('evaluator:task_bound','holding_position','holding_speed'))
     ratios={name:max(0.,row['value']/row['limit']-1) for name,row in components.items()
-        if name in ('evaluator:task_bound','holding_position','holding_speed')
-        and isinstance(row.get('value'),(float,int)) and row.get('limit',0)>0}
+        if name in scored
+        and isinstance(row.get('value'),(float,int)) and math.isfinite(row['value']) and row.get('limit',0)>0}
     valid=bool(result.get('status')=='evaluated' and all(components.get(k,{}).get('passed') is True
-        for k in ('evaluation_validity','execution_complete','holding_coverage','solver_errors','force_bounds')))
-    return dict(normalized_gap=max(ratios.values()) if len(ratios)==3 else None,
+        for k in ('evaluation_validity','execution_complete','tracking_sampling' if tracking else 'holding_coverage','solver_errors','force_bounds')))
+    return dict(normalized_gap=max(ratios.values()) if len(ratios)==len(scored) else None,
         components=ratios,valid_complete=valid,accepted=bool(acceptance.get('accepted')),
         interpretation='Research ranking only; invalid executions remain invalid regardless of gap')
 

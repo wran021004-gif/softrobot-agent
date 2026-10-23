@@ -233,7 +233,7 @@ class MainlineTests(unittest.TestCase):
             self.assertEqual(state(self.h)['mathematical_evaluations'],9)
             atomic_json(Path(command[-1]).with_name('result.json'),dict(status='execution_incomplete',error='offline injected failure'))
             return SimpleNamespace(returncode=1)
-        with patch.object(opt,'dependencies',return_value={'available':True}),patch.object(opt,'sensitivity_context',return_value={'kind':opt.SENSITIVITY}),patch('tools.research.analysis.verify_candidate',return_value=candidate),patch('tools.service_execution._run_contained',side_effect=failed_worker):
+        with patch.object(opt,'dependencies',return_value={'available':True}),patch.object(opt,'sensitivity_context',return_value={'kind':opt.SENSITIVITY,'baseline':self.base}),patch('tools.research.analysis.verify_candidate',return_value=candidate),patch('tools.service_execution._run_contained',side_effect=failed_worker):
             result=analysis.dispatch(self.h,plain(q),'multi',guard=lambda *a:None)
             self.assertEqual(state(self.h)['mathematical_evaluations'],9)
             again=analysis.dispatch(self.h,plain(q),'multi',guard=lambda *a:None)

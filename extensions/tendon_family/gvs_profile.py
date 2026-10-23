@@ -96,6 +96,12 @@ def reach_numerical(inp):
     return candidate_numerical(inp,checked_reach(inp))
 
 
+def mathematical_numerical(inp):
+    """Same candidate initializer and bounded input; no physical route admission."""
+    from .generated_serial import checked_reach
+    return candidate_numerical(inp,checked_reach(inp,execution=False))
+
+
 def reach_assessment(inp):
     inp=SessionInput.model_validate(inp)
     checked_reach(inp)

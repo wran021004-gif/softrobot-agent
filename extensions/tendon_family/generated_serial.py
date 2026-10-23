@@ -170,7 +170,7 @@ def validate_initializer(before,after):
     if after.task.initializer.parameters.data!=expected:raise ValueError('NAMED_ZERO_STATE_REQUIRED')
 
 
-def checked_reach(inp):
+def checked_reach(inp, *, execution=True):
     from .gvs_profile import ReachControl
     inp=SessionInput.model_validate(inp)
     if inp.policy.controller.extension_id == 'controller.sorosim_matlab_nmpc':
@@ -189,9 +189,9 @@ def checked_reach(inp):
     if tracking:
         if (inp.policy.controller.extension_id, inp.policy.controller.version) != ('controller.gvs_nmpc', '12.0.0'):
             raise ValueError('TRACKING_CONTROLLER_UNSUPPORTED')
-        if reference['kind'] == 'timed':
+        if execution and reference['kind'] == 'timed':
             raise ValueError('TIMED_TRACKING_PHYSICAL_ROUTE_UNSUPPORTED: offline workspace only')
-        if inp.task.status != 'development_valid':
+        if execution and inp.task.status != 'development_valid':
             raise ValueError('TRACKING_REQUIRES_REVIEWED_DEVELOPMENT_TASK')
         if control.settling is not None or any((control.recipe.holding_tip_speed_weight,
                 control.recipe.terminal_tip_speed_weight, control.recipe.velocity_weight,

@@ -1,0 +1,65 @@
+{
+  "date": "2026-10-23",
+  "timezone": "Asia/Shanghai",
+  "baseline": "dcbca1b3d477ec079390d4b1cfa6432f6cbcba24",
+  "branch": "feat/s138-task-conditioned-research",
+  "python": "D:/softrobot-agent/.f3-prestudy-env/Scripts/python.exe",
+  "environment": {"PYTHONPATH": ".;tests/research", "OPENBLAS_NUM_THREADS": "1", "OMP_NUM_THREADS": "1"},
+  "test_command_prefix": "python -m unittest",
+  "runs": [
+    {
+      "modules": ["tests.research.test_task_analysis_contract", "tests.research.test_tracking_math", "tests.research.test_tracking", "tests.research.test_s130_mainline"],
+      "tests": 44, "elapsed_s": 14.332, "initial_failures": 1, "initial_errors": 1,
+      "resolution": "Updated obsolete blanket-rejection assertion; restored no-cost admission rejection before candidate validation. Both cases subsequently passed."
+    },
+    {
+      "modules": ["tests.research.test_s138_research", "tests.research.test_tracking.TrackingTests.test_robot_analysis_and_composite_acceptance_remain_explicitly_unsupported", "tests.research.test_s130_mainline.MainlineTests.test_missing_dependency_budget_and_models_reject_before_worker", "tests.research.test_mainline", "tests.research.test_mixed_search"],
+      "tests": 34, "elapsed_s": 35.620, "initial_failures": 2, "initial_errors": 2,
+      "resolution": "New search fixture needed an explicit parameter-domain grant. Corrected fixture and passed. Other three failures reproduced unchanged on the baseline."
+    },
+    {
+      "modules": ["tests.research.test_s138_research", "tests.research.test_tracking", "tests.research.test_s130_mainline", "tests.research.test_s127_math_admission", "tests.research.test_candidate_portfolio"],
+      "tests": 44, "elapsed_s": 17.321, "failures": 0, "errors": 0
+    },
+    {
+      "modules": ["tests.research.test_s138_research", "tests.research.test_task_analysis_contract", "tests.research.test_s134_delivery", "tests.research.test_s136_task_contracts", "tests.research.test_conic_capability", "tests.research.test_capability_sensitivity", "tests.research.test_mixed_search.MixedSearchTests.test_feedback_lineage_conditional_coordinates_and_reuse", "tests.research.test_mixed_search.MixedSearchTests.test_pending_checkpoint_recovery_reuses_sealed_analysis", "tests.research.test_mixed_search.MixedSearchTests.test_invalid_attempts_and_failed_math_keep_cost_and_bounds"],
+      "tests": 74, "elapsed_s": 34.980, "initial_failures": 1, "initial_errors": 0,
+      "resolution": "S134 expected the obsolete Tracking model-unavailable phrase. Updated assertion to the actual incompatible GVS recipe; final local rerun passed."
+    },
+    {
+      "modules": ["tests.research.test_s134_delivery.DeliveryTests.test_tracking_kernel_support_does_not_advertise_robot_execution", "tests.research.test_s130_mainline.MainlineTests.test_multisolve_reservation_failure_recovery_and_receipt_reuse", "tests.research.test_s138_research.ResearchTests.test_tracking_dispatch_reserves_all_branches_and_reuses_failed_receipt"],
+      "tests": 3, "elapsed_s": 2.271, "failures": 0, "errors": 0
+    },
+    {
+      "modules": ["tests.research.test_task_analysis_contract.TaskAnalysisTests.test_signal_semantics_and_unsupported_requirements"],
+      "tests": 1, "elapsed_s": 0.417, "failures": 0, "errors": 0,
+      "scope": "Includes wrong output entity as well as name, units, frame and phase."
+    }
+  ],
+  "baseline_reproduction": {
+    "commit": "dcbca1b3d477ec079390d4b1cfa6432f6cbcba24",
+    "isolated_worktree": ".worktrees/s138-baseline-check (removed after clean-status verification)",
+    "tests": 3, "elapsed_s": 6.256,
+    "unchanged_failures": {
+      "tests.research.test_mixed_search.MixedSearchTests.test_recorded_exact_six_segment_failure_never_reprobes": "runtime_unresolved != runtime_unavailable",
+      "tests.research.test_mixed_search.MixedSearchTests.test_screening_synthetic_pass_cannot_close_or_select": "EXECUTION_REQUIRES_CALIBRATED_NUMERICAL_ENVIRONMENT_BEFORE_INTERPRETER_START",
+      "tests.research.test_mixed_search.MixedSearchTests.test_search_contract_and_legacy_identities": "Configuration hash c0d723845a40108e3478ce6b7a7af92008003d415e41d888f0857bcaaf3a19b8 != historical expected 31af3e097ad29fef1ffd74c5178a6267fc5ffe35889c63e98f531dd42c0df69e"
+    }
+  },
+  "unique_tests_final_passed": 135,
+  "new_s138_tests": 9,
+  "interpretation": "Unique passing tests across targeted batches and local corrections; not one full-suite run. Three baseline failures remain documented, not waived as passes.",
+  "structure_precheck": {
+    "command": "python -m tests.research.s138_structure_precheck --output <new-output-path>",
+    "saved_output": "evidence/s138_task_conditioned/structure_precheck.json",
+    "real_generated_structures": 3, "independent_reach_conditions": 2,
+    "model_builds": 6, "conic_solves": 6, "fixed_control_replays": 2,
+    "elapsed_s": 23.00349839986302,
+    "A_control_source": "Frozen S129 baseline mathematical witness, not a new physical NMPC rollout",
+    "acceptance_scope": "Existing independent Reach evaluators on complete local affine predictions; physical task acceptance unmeasured",
+    "numerical_result": "Baseline reoptimization and both structural variations pass both model-prediction Reach evaluations; absolute C-minus-B <= 1.19e-11, no demonstrated structural gain."
+  },
+  "external_execution": {"provider_calls": 0, "mujoco_steps": 0, "ppo_training": 0, "formal_studies": 0, "matlab_calls": 0},
+  "unchanged_numerical_kernels": ["extensions/math_analysis/conic_capability.py", "extensions/math_analysis/capability_sensitivity.py", "extensions/math_analysis/task_capability.py", "extensions/math_analysis/trajectory.py"],
+  "warning": "An existing synthetic dual-face case emitted a CLARABEL solution-may-be-inaccurate warning; no strict optimality or gradient claim was added."
+}

@@ -7,7 +7,7 @@ import subprocess
 import time
 from tools.research.contracts import AnalysisRequest
 from schemas.platform import SessionInput
-from schemas.platform_analysis import TaskAnalysisProtocol, EndpointLinearizedModel, EndpointTarget, ScopedMathematicalClaim, TaskAnalysisRequirement
+from schemas.platform_analysis import TaskAnalysisProtocol, EndpointLinearizedModel, ScopedMathematicalClaim, TaskAnalysisRequirement
 from tools.platform_store import plain, zero
 from tools.state_io import digest, atomic_json, read
 from tools.research.design import verify_candidate, source_lengths
@@ -206,8 +206,8 @@ def calculate(configuration,binding,query,exact_point=None,*,checkpoint=None,des
         result['limitations']=[s for s in result['limitations'] if 'holding-window compliance' not in s]+[
             'Only explicitly replay-verified samples in the frozen local affine model; no continuous-time, nonlinear, or backend acceptance.']
     else:
-        target=EndpointTarget(position_m=inp.task.goal.data['target_m'],position_tolerance_m=inp.task.evaluator.parameters.data['tolerance_m'],
-            position_scale_m=p.output_scale_m,tip_speed_limit_m_s=inp.policy.controller.parameters.data['settling']['speed_limit_m_s'])
+        from tools.research.task_constraints import endpoint_target
+        target=endpoint_target(requirements,p,braking=q.operation=='braking')
         endpoint=bounded_endpoint(model,p,target,braking=q.operation=='braking')
         result['endpoint']=endpoint
         result['local_model_constraints']=dict(status=endpoint['status'],checks=endpoint.get('checks'))
@@ -309,8 +309,6 @@ def dispatch(host,query,key,*,guard,origin='model'):
         return dict(**compact_result(host.store.artifact(ref),ref),
             operation_reuse=dict(additional_numerical_s=0,additional_analysis_evaluations=0))
     guard(host,origin!='engineering_preflight')
-    if state(host)['base_configuration']['task']['family']=='task.tracking':
-        return dict(status='not_applicable',reason='TRACKING_ROBOT_MODEL_CONSTRUCTION_UNSUPPORTED',task_acceptance='unmeasured')
     from tools.research.tool_readiness import require
     require(host,'analysis')
     if state(host)['spec'].get('research_decisions') and 'analysis' not in state(host)['spec']['capabilities']:
@@ -338,10 +336,16 @@ def dispatch(host,query,key,*,guard,origin='model'):
         try:sensitivity_context=saved_context(host,q)
         except (ValueError,KeyError) as exc:
             return dict(status='not_applicable',reason=str(exc),admission=method_fit,task_acceptance='unmeasured')
+    if method_fit:
+        method_fit=method_admission(current['spec'],q,current.get('mathematical_evaluations',0),
+            requirements=describe_analysis_requirements(c['configuration'],{}))
+        if method_fit['status']!='admissible':return dict(status='not_applicable',admission=method_fit,task_acceptance='unmeasured')
+    if q.optimal_sensitivity is not None:
         from tools.research.optimal_capability import sensitivity_cost
         reused=len(q.optimal_sensitivity.model_results)
         method_fit.update(model_reuse=reused,model_reuse_status='validated_current_study_models',
-            planning=sensitivity_cost(len(q.optimal_sensitivity.steps),reused,method_fit['remaining_evaluations']))
+            planning=sensitivity_cost(len(q.optimal_sensitivity.steps),reused,method_fit['remaining_evaluations'],
+                subproblems=method_fit['kernel_subproblems_per_model']))
     s=state(host)
     protocol=plain(q.protocol)
     if protocol!=s['spec']['analysis_protocol'] or (q.scoring_window_s is not None and q.scoring_window_s not in protocol['windows_s']):
@@ -405,8 +409,12 @@ def dispatch(host,query,key,*,guard,origin='model'):
             raise ValueError('SCORE_WINDOW_EXCEEDS_ACTUAL_REMAINING_TASK_TIME')
     inp=SessionInput.model_validate(cfg)
     requirements=describe_analysis_requirements(inp,binding)
+    saved_model=EndpointLinearizedModel.model_validate(sensitivity_context['baseline']['model']) if q.optimal_sensitivity else None
     applicability=check_analysis_applicability(requirements,q,
-        model_assessment(inp,requirements,q.operation),exact_point=point)
+        model_assessment(inp,requirements,q.operation,model=saved_model),model=saved_model,exact_point=point)
+    if applicability['status']=='not_applicable':
+        return dict(status='not_applicable',analysis_applicability=applicability,
+            task_acceptance='unmeasured',additional_analysis_evaluations=0)
     reserve=fit['reservation_s']
     def charge(db):
         current=host.store.session(host.run_id,db)['state']
@@ -467,9 +475,11 @@ def recover(host):
         value['method_admission']=p['method_admission']
         value['numerical_call_events']=[read(path) for path in sorted(folder.glob('numerical_optimal_*.json'))]
         cost=value.get('optimal_sensitivity',{}).get('computation_cost')
-        value['actual_mathematical_calls']=(dict(capability_kernel_calls=cost['conic_solves'],dual_face_solve_attempts=cost['dual_face_solves'],model_builds=0)
+        value['actual_mathematical_calls']=(dict(capability_kernel_calls=cost['model_count'],internal_conic_solves=cost['conic_solves'],dual_face_solve_attempts=cost['dual_face_solves'],model_builds=0)
             if cost else dict(status='Returned trajectory establishes a kernel call; interrupted work without a result has unknown call counts.',
                 capability_kernel_calls=1 if value.get('trajectory') else None,
+                internal_conic_solves=value.get('trajectory',{}).get('internal_conic_solves',
+                    int('wall_s' in value['trajectory'].get('solver',{})) if value.get('trajectory') else None),
                 dual_face_solve_attempts=0 if not p['request'].get('optimal_sensitivity') else None))
         value['recorded_attempt_boundaries']={kind:sum(e['kind']==kind and e['stage']=='attempt' for e in value['numerical_call_events'])
             for kind in ('model_build','capability','dual_face')}

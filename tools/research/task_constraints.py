@@ -145,14 +145,13 @@ def analysis_capabilities(configuration, requirements, protocol, *, model=None, 
             limitations=['Model-scoped calculation; independent physical acceptance required.',
                 'Final admission checks candidate, exact state, numerical time budget and constructed outputs.']))
     if mathematical_methods:
-        from tools.research.optimal_capability import CONIC,SENSITIVITY,dependencies
+        from tools.research.optimal_capability import CONIC,SENSITIVITY,dependencies,conic_subproblems
         env=dependencies()
         path=next((c for c in requirements.constraints if c.kind=='path_bound'),None)
-        subproblems=max(1,len(path.indices)-2) if path is not None and len(path.path_vertices_m)==3 else 1
+        subproblems=conic_subproblems(requirements)
         for method in (CONIC,SENSITIVITY):
             count=1+subproblems if method==CONIC else 3*subproblems+2
             reasons=[]
-            if configuration.task.family=='task.tracking' and model is None and (configuration.policy.controller.extension_id,configuration.policy.controller.version) != ('controller.gvs_nmpc','12.0.0'):reasons.append('tracking_robot_model_construction_unsupported')
             if not mathematical_methods.get(method) or not mathematical_methods.get(CONIC):reasons.append('method_not_authorized')
             if not env['available']:reasons.append('worker_dependency_unavailable')
             if remaining_evaluations is not None and remaining_evaluations<count:reasons.append('insufficient_budget')
@@ -180,15 +179,37 @@ def describe_analysis_requirements(configuration, binding):
     return task_adapter(configuration).analysis_requirements(binding)
 
 
+def endpoint_target(requirements, protocol, *, braking=False):
+    """Project only declared terminal norm conditions into the existing kernel."""
+    from schemas.platform_analysis import EndpointTarget
+    last=len(requirements.time_grid_s)-1
+    def terminal(name):
+        return [c for c in requirements.constraints if c.kind=='norm_bound'
+                and c.signal.name==name and last in c.indices
+                and (c.signal.entity,c.signal.units,c.signal.frame,c.signal.dimension,c.signal.phase)==
+                    ('tip','m' if name=='tip_position' else 'm/s','world',3,'post_step')]
+    positions=terminal('tip_position');velocities=terminal('tip_velocity')
+    if not positions or (braking and not velocities):
+        raise ValueError('Terminal norm position (and velocity for braking) conditions required; path progress is not a fixed endpoint problem.')
+    def select(rows):
+        references=[c.reference[c.indices.index(last)] for c in rows]
+        if any(r!=references[0] for r in references):
+            raise ValueError('Endpoint kernel requires one consistent terminal reference per output.')
+        return references[0],min(c.radius for c in rows)
+    position,radius=select(positions)
+    args=dict(position_m=position,position_tolerance_m=radius,position_scale_m=protocol.output_scale_m)
+    if velocities:
+        velocity,limit=select(velocities)
+        args.update(tip_velocity_m_s=velocity,tip_speed_limit_m_s=limit)
+    return EndpointTarget(**args)
+
+
 def model_assessment(configuration, requirements, operation,model=None):
     """Use the same GVS model binding as the candidate linearization builder."""
     from extensions.tendon_family.model_applicability import assess_model_uses
     from tools.platform_registry import registry
+    saved_model=model is not None
     use = 'static_equilibrium' if operation in ('equilibrium','input_sensitivity','design_sensitivity') else 'linearization'
-    if configuration.task.family=='task.tracking' and model is None and (configuration.policy.controller.extension_id,configuration.policy.controller.version) != ('controller.gvs_nmpc','12.0.0'):
-        return dict(model_id='tracking_robot_model_unavailable',model_version=None,representation_id=None,
-            relevant_assumptions=['No supported robot model construction for free geometric path progress'],uses={use:dict(status='REJECT',
-            reasons=['Current robot model builders/controllers require fixed Reach target_m; geometric path progress and coverage are unsupported.'])})
     model = Binding(extension_id='model.gvs', version='1.0.0', parameters=Payload(
         contract='family.gvs_model', data=dict(basis=configuration.policy.controller.parameters.data['recipe']['basis'])))
     if configuration.policy.controller.extension_id == 'controller.sorosim_matlab_nmpc':
@@ -203,6 +224,25 @@ def model_assessment(configuration, requirements, operation,model=None):
     if unknown:
         assessment['uses'][use]['status'] = 'REJECT'
         assessment['uses'][use]['reasons'].append('Required physics has no declared capability: '+', '.join(sorted(unknown)))
+    if configuration.policy.controller.extension_id not in ('controller.gvs_nmpc','controller.sorosim_matlab_nmpc'):
+        assessment['uses'][use]['status']='REJECT'
+        assessment['uses'][use]['reasons'].append('No candidate model preparation implemented for this controller configuration.')
+    reference=task_adapter(plain(configuration)).control_reference()
+    preparation=[]
+    if not saved_model:
+        control=configuration.policy.controller.parameters.data
+        if control['recipe'].get('reference_mode','constant')!=reference['kind']:
+            preparation.append('Candidate initializer preparation requires a controller recipe matching the task reference kind.')
+        if assessment['model_id']=='model.sorosim_gvs' and reference['kind']!='constant':
+            preparation.append('Current SoRoSim preparation requires a constant target working point; dynamic-reference preparation is not implemented.')
+        if reference['kind']!='constant' and (configuration.policy.controller.extension_id,configuration.policy.controller.version)!=('controller.gvs_nmpc','12.0.0'):
+            preparation.append('Dynamic-reference candidate preparation requires the registered GVS 12.0.0 recipe.')
+    if preparation:
+        assessment['uses'][use]['status']='REJECT'
+        assessment['uses'][use]['reasons'].extend(preparation)
+    if use=='static_equilibrium' and reference['kind']!='constant' and operation=='equilibrium':
+        assessment['uses'][use]['status']='REJECT'
+        assessment['uses'][use]['reasons'].append('Target-equilibrium construction assumes a constant target; a timed or free-progress reference supplies no static working point.')
     return assessment
 
 
@@ -215,14 +255,19 @@ def check_analysis_applicability(requirements, query, assessment, model=None, ex
     """
     reasons = [reason for verdict in assessment['uses'].values() if verdict['status'] == 'REJECT'
                for reason in verdict['reasons']]
-    if requirements.binding.get('task_family')=='task.tracking' and query.operation not in ('trajectory_feasibility','task_capability'):
-        reasons.append('Tracking fixed-target endpoint/static operations are unsupported; use the declared timed reference or free geometric progress without substituting a Reach target.')
+    if query.operating_point in ('target_equilibrium','halfway_waypoint'):
+        positions=[c for c in requirements.constraints if c.signal.name=='tip_position']
+        if any(c.kind!='norm_bound' for c in positions) or len({tuple(r) for c in positions for r in c.reference})!=1:
+            reasons.append('Static target/halfway construction requires a single constant position reference, not a moving reference or free path progress.')
+    if query.operation in ('endpoint','braking'):
+        try:endpoint_target(requirements,query.protocol,braking=query.operation=='braking')
+        except ValueError as exc:reasons.append(str(exc))
     if (query.operation in ('input_sensitivity','design_sensitivity') or query.operating_point=='fixed_input_equilibrium') and assessment['model_id']!='model.sorosim_gvs':
         reasons.append('Static IFT v1 is implemented only by the SoRoSim provider.')
     outputs = {'tip_position':('m', 'world', 3), 'tip_velocity':('m/s', 'world', 3)}
     if model is not None:
-        if requirements.binding.get('task_family')=='task.tracking' and model.binding.get('task_identity')!=requirements.binding['task_identity']:
-            reasons.append('Saved Tracking model must bind the exact task identity.')
+        if model.binding.get('task_identity')!=requirements.binding['task_identity']:
+            reasons.append('Saved model must bind the exact task identity.')
         outputs = {o.name:(o.units, o.frame, o.dimension) for o in model.endpoint_outputs}
     p = query.protocol
     if abs(p.duration_s-requirements.duration_s) > p.horizon_alignment_atol_s:
@@ -242,6 +287,8 @@ def check_analysis_applicability(requirements, query, assessment, model=None, ex
         except ValueError as exc:
             reasons.append(str(exc))
         paths=[c for c in requirements.constraints if c.kind=='path_bound']
+        if len(paths)>1 or any(len(c.path_vertices_m) not in (2,3) for c in paths):
+            reasons.append('Current free-progress kernel supports exactly one path with one or two straight segments.')
         if paths and sampled is not None and (sampled['start_time_s']!=0
                 or any(c.indices!=list(range(len(requirements.time_grid_s))) for c in paths)):
             reasons.append('Free path progress requires the complete declared initial horizon; saved partial paths need separate prefix evidence.')
@@ -270,12 +317,12 @@ def check_analysis_applicability(requirements, query, assessment, model=None, ex
         signature = (c.signal.units, c.signal.frame, c.signal.dimension)
         if c.kind == 'unsupported':
             reason = 'Unsupported requirement retained verbatim; no compatible mathematical tool.'
-        elif outputs.get(c.signal.name) != signature or c.signal.phase != 'post_step':
+        elif outputs.get(c.signal.name) != signature or c.signal.phase != 'post_step' or c.signal.entity!='tip':
             reason = 'Output identity, units, frame, dimension, or sampling phase is not exposed by this analysis.'
         elif instantaneous:
             status,reason='diagnostic','Instantaneous speed derivative only; no frozen task samples verified.'
         elif query.operation in ('linearization','controllability','equilibrium','input_sensitivity','design_sensitivity'):
-            if c.signal.name == 'tip_position' and c.kind == 'norm_bound':
+            if c.signal.name == 'tip_position' and c.kind in ('norm_bound','path_bound'):
                 status, reason = 'diagnostic', 'Local position authority/static construction only; no sampled constraint verification.'
         elif trajectory and c.kind=='path_bound' and getattr(query,'capability_method',None)!='sampled-affine-conic-minimax-v1':
             reason='Free progress requires the conic path formulation; fixed-reference SLSQP is not substituted.'
@@ -285,8 +332,8 @@ def check_analysis_applicability(requirements, query, assessment, model=None, ex
                 status = 'applicable' if indices == c.indices else 'partial'
                 reason = 'Shared held-input trajectory; past samples require separate evidence.'
         elif c.kind == 'norm_bound':
-            if c.signal.name == 'tip_position' and c.indices == [last]:
-                status, indices, reason = 'applicable', [last], 'Terminal position only under bounded local affine dynamics.'
+            if c.signal.name == 'tip_position' and last in c.indices:
+                status, indices, reason = ('applicable' if c.indices==[last] else 'partial'), [last], 'Terminal position only under bounded local affine dynamics.'
             elif query.operation == 'braking' and c.signal.name == 'tip_velocity' and last in c.indices:
                 status, indices, reason = 'partial', [last], 'Terminal speed only; other holding samples are not checked.'
         coverage.append(dict(constraint_id=c.constraint_id, expressible=c.kind != 'unsupported',

@@ -92,7 +92,7 @@ def resolved_configuration(source,base,p,owner,*,topology_grant=None):
     if cfg['task']['initializer']['parameters']['data']!=expected:
         raise ValueError('SOURCE_NAMED_ZERO_INITIALIZER_MISMATCH')
     inp=SessionInput.model_validate(cfg)
-    family.checked_reach(inp)
+    family.checked_reach(inp,execution=False)
     return plain(inp)
 
 
@@ -206,7 +206,7 @@ def final_generation_request(spec, candidate):
 def generate_candidate(host,request,provenance,*,screening_fidelity=None):
     """Materialize a frozen family request and persist through the existing Store."""
     from extensions.tendon_family.family_space import parse_build, UnsupportedGeneration
-    from extensions.tendon_family.gvs_profile import reach_numerical
+    from extensions.tendon_family.gvs_profile import mathematical_numerical
     from tools.platform_tasks import compile_input
     s=state(host);spec=s['spec']
     if spec.get('start_mode')!='family_space':raise ValueError('FROZEN_FAMILY_SPACE_REQUIRED')
@@ -247,7 +247,7 @@ def generate_candidate(host,request,provenance,*,screening_fidelity=None):
         cfg['task']['initializer']['parameters']['data']=initial
         cfg=plain(SessionInput.model_validate(cfg))
         compile_input(cfg,host.reg)
-        numerical=reach_numerical(SessionInput.model_validate(cfg))
+        numerical=mathematical_numerical(SessionInput.model_validate(cfg))
         identity=family_candidate_identity(cfg,s)
         dimensions=dict(physical_dofs=len(physics['dofs']),gvs_coordinates=len(numerical['coordinate_order']),
             state=len(numerical['measured_initial_state']),inputs=len(numerical['tendon_order']))

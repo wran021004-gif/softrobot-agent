@@ -193,7 +193,7 @@ class DeliveryTests(unittest.TestCase):
         self.assertTrue(path['kernel_supported'])
         self.assertFalse(path['model_built']);self.assertFalse(path['full_task_supported'])
         self.assertEqual(path['execution_status'],'blocked')
-        self.assertIn('tracking_robot_model_construction_unsupported',path['missing'])
+        self.assertIn('Dynamic-reference candidate preparation requires the registered GVS 12.0.0 recipe.',path['missing'])
         self.assertEqual(view['method'],'controlled-capability-sensitivity-v1')
 
 

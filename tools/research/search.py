@@ -20,6 +20,14 @@ def coordinate_proposal(state):
 def search_problem(host,query,count):
     q=parse_search(query)
     s=state(host)
+    if q.objective=='task_violation':
+        from tools.research.task_constraints import describe_analysis_requirements,analysis_capabilities
+        from tools.research.optimal_capability import CONIC
+        cfg=s['base_configuration']
+        rows=analysis_capabilities(cfg,describe_analysis_requirements(cfg,{}),s['spec']['analysis_protocol'],
+            remaining_evaluations=count,mathematical_methods={CONIC:s['spec'].get('mathematical_methods',{}).get(CONIC)})
+        fit=next(r for r in rows if r.get('capability_method')==CONIC and not r.get('submode'))
+        if fit['status']=='not_applicable':raise ValueError('TASK_VIOLATION_SEARCH_NOT_ADMITTED: '+str(fit['reasons']))
     if isinstance(q,FamilyMixedSearch):
         from extensions.tendon_family.family_space import search_domains
         grant=s['spec'].get('family_search')
@@ -82,8 +90,14 @@ def rank(row,query,limits=None):
         valid=row.get('computation_status')=='computed' and value is not None and math.isfinite(value)
         return (0 if valid else 1,(-value if query.objective=='held_position_min_eigenvalue' else value) if valid else float('inf'))
     a=row.get('acceptance') or {}
+    if a.get('components'):
+        from tools.research.feedback import task_gap
+        gap=task_gap(dict(status='evaluated',acceptance=a))
+        valid=gap['valid_complete'] and gap['normalized_gap'] is not None
+        return (0 if valid and a.get('accepted') else 1 if valid else 2,
+            gap['normalized_gap'] if valid else float('inf'),sum(gap['components'].values()) if valid else float('inf'))
     m=a.get('metrics') or {}
-    values=[m.get(k,float('inf'))/limit for k,limit in limits.items()]
+    values=[m[k]/limit if isinstance(m.get(k),(float,int)) and math.isfinite(m[k]) else float('inf') for k,limit in limits.items()]
     return (0 if a.get('accepted') else 1,max(values),sum(values))
 
 
@@ -94,6 +108,11 @@ def run_search(host,query,key,*,guard,execute,capacity):
     mixed=isinstance(q,FamilyMixedSearch)
     mathematical=mixed or q.evaluation_mode=='mathematical_proxy'
     s=state(host)
+    per_evaluation=1
+    if q.objective=='task_violation':
+        from tools.research.optimal_capability import conic_subproblems
+        from tools.research.task_constraints import describe_analysis_requirements
+        per_evaluation=1+conic_subproblems(describe_analysis_requirements(s['base_configuration'],{}))
     fit=admission(host,q.max_evaluations) if mathematical else capacity(host,q.max_evaluations)
     identity=digest(dict(query=plain(q),profile=s['profile']['identity'],configuration_identity=s['spec']['resolved_identity']))
     owner=s.get('search_bindings',{}).get(identity,key)
@@ -124,14 +143,14 @@ def run_search(host,query,key,*,guard,execute,capacity):
     while not checkpoint['termination']:
         rows=checkpoint['evaluated']
         if checkpoint['pending'] is None:
-            consumed=sum(row.get('actual_mathematical_evaluations',1) for row in rows) if mixed else len(rows)
-            if consumed>=checkpoint['problem']['max_evaluations']:
+            consumed=sum(row.get('actual_mathematical_evaluations',1) for row in rows) if mathematical else len(rows)
+            if consumed+per_evaluation>checkpoint['problem']['max_evaluations']:
                 checkpoint['termination']='evaluation_budget_exhausted'
                 break
             if mixed and checkpoint['proposal_count']>=q.max_proposals:
                 checkpoint['termination']='proposal_budget_exhausted'
                 break
-            if mixed and not admission(host,1)['admitted']:
+            if mathematical and admission(host,per_evaluation)['admitted']<per_evaluation:
                 checkpoint['termination']='study_mathematical_budget_exhausted'
                 break
             if checkpoint['step']<q.minimum_step:
@@ -228,27 +247,42 @@ def run_search(host,query,key,*,guard,execute,capacity):
             r=output if completed else host.store.artifact(output['reference'])
             row=dict(acceptance=r.get('acceptance'),evidence=dict(candidate=ref,result=r),kind='backend_task')
         else:
-            request=dict(candidate=ref,operation='equilibrium' if q.objective=='target_equilibrium_residual' else 'controllability',
+            request=dict(candidate=ref,operation='task_capability' if q.objective=='task_violation' else 'equilibrium' if q.objective=='target_equilibrium_residual' else 'controllability',
                 operating_point=q.operating_point,protocol=s['spec']['analysis_protocol'] if mixed else plain(q.protocol),
                 scoring_window_s=s['spec']['scoring_window_s'] if mixed else q.scoring_window_s)
+            if q.objective=='task_violation':
+                from tools.research.optimal_capability import CONIC
+                request.update(capability_method=CONIC,scoring_window_s=None)
             reused=next((r for r in state(host).get('analysis_results',[]) if mixed and
                 host.store.artifact(r).get('requested_operation')==plain(AnalysisRequest.model_validate(request))),None)
             output=dict(reference=reused) if reused else analyze(host,request,op,guard=guard,origin='model_search')
+            if not output.get('reference'):
+                checkpoint['termination']='analysis_not_admitted'
+                checkpoint['analysis_rejection']=output
+                persist()
+                break
             r=host.store.artifact(output['reference'])
+            proxies=dict(r.get('proxy_values',{}))
+            trajectory=r.get('trajectory') or {}
+            if q.objective=='task_violation' and trajectory.get('replay',{}).get('numerically_valid'):
+                proxies['task_violation']=trajectory.get('replayed_violation')
             row=dict(kind='mathematical_proxy',computation_status=r['status'],proxy_values=r.get('proxy_values',{}),
                 local_model_constraints=r.get('local_model_constraints'),task_acceptance='unmeasured',
                 evidence=dict(candidate=ref,analysis=output['reference'],score_semantics=r.get('score_semantics')))
+            row.update(proxy_values=proxies,actual_mathematical_evaluations=r.get('charged_analysis_evaluations',1),
+                task_violation_scope=dict(task_identity=c.get('task_identity'),coverage=r.get('analysis_applicability'),
+                    optimality_status=trajectory.get('optimality_status'),source_pointer='/trajectory/replayed_violation') if q.objective=='task_violation' else None)
         row.update(candidate_id=c['candidate_id'],scientific_identity=c['identity'],parameters=proposal['parameters'],
             latent_coordinates=proposal['latent'],objective_identity=digest(checkpoint['problem']),used_feedback=proposal['feedback'])
         if mixed:
             attributed=not reused or r.get('operation_key')==op+'-analysis'
             row.update(point=proposal['point'],resolved_parameters=c['resolved_parameters'],
                 physical_design_identity=c['physical_design_identity'],numerical_model_identity=c['numerical_model_identity'],
-                actual_mathematical_evaluations=int(attributed),
+                actual_mathematical_evaluations=r.get('charged_analysis_evaluations',1) if attributed else 0,
                 mathematical_numerical_s=r.get('charged_numerical_s',0.) if attributed else 0.,
                 lineage={**proposal['lineage'],'new_candidate_ref':ref,'actual_mathematical_evaluation_ref':output['reference'],
-                    'observed_result':r.get('proxy_values',{}),'cost':dict(additional_evaluations=0 if reused else 1,
-                        attributed_evaluations=int(attributed),
+                    'observed_result':row['proxy_values'],'cost':dict(additional_evaluations=0 if reused else r.get('charged_analysis_evaluations',1),
+                        attributed_evaluations=r.get('charged_analysis_evaluations',1) if attributed else 0,
                         construction_numerical_s=proposal.get('construction_numerical_s',0.),
                         numerical_s=0 if reused else r.get('charged_numerical_s'))})
         rows.append(row)
@@ -258,7 +292,7 @@ def run_search(host,query,key,*,guard,execute,capacity):
             checkpoint['termination']='fresh_task_pass_requires_closeout'
         if mixed and q.stop_score is not None and rank(row,q)[0]==0:
             score=row['proxy_values'][q.objective]
-            if (score<=q.stop_score if q.objective=='target_equilibrium_residual' else score>=q.stop_score):
+            if (score>=q.stop_score if q.objective=='held_position_min_eigenvalue' else score<=q.stop_score):
                 checkpoint['termination']='requested_proxy_stopping_score; task_unmeasured'
         persist()
     checkpoint_ref=persist()
@@ -268,6 +302,7 @@ def run_search(host,query,key,*,guard,execute,capacity):
     result=dict(problem_identity=identity,status=('best_mathematical_candidate' if supported else 'no_supported_result') if mathematical else 'bounded_backend_search',
         requesting_plan=requesting_plan,best_mathematical_candidate=best if mathematical and supported else None,best_observed=best,evaluated=rows,
         termination_reason=checkpoint['termination'],search_updates=checkpoint['updates'],search_state=checkpoint_ref,
+        analysis_rejection=checkpoint.get('analysis_rejection'),
         resource_use=dict(evaluated_designs=len(rows),proposed_designs=checkpoint['proposal_count'],
             actual_mathematical_evaluations=sum(row.get('actual_mathematical_evaluations',1) for row in rows) if mathematical else 0,
             elapsed_s=time.time()-checkpoint['started']),

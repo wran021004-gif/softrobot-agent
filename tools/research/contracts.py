@@ -41,7 +41,8 @@ class Search(Contract):
     fixed: Parameters | TopologyParameters
     method: Literal['hierarchical_coordinate_v1_1'] = 'hierarchical_coordinate_v1_1'
     evaluation_mode: Literal['mathematical_proxy','backend_task'] = 'mathematical_proxy'
-    objective: Literal['held_position_min_eigenvalue','target_equilibrium_residual','joint_reach_hold']
+    objective: Literal['held_position_min_eigenvalue','target_equilibrium_residual','task_violation','joint_reach_hold','task_acceptance'] = Field(
+        description='task_violation explicitly selects the authorized CONIC method on current task conditions; task_acceptance ranks independent physical acceptance. Other mathematical objectives remain diagnostics; joint_reach_hold is the legacy physical name.')
     operating_point: Literal['standardized_initial_pretension','controller_start_input','target_equilibrium','halfway_waypoint']
     scoring_window_s: FiniteFloat = Field(gt=0)
     protocol: TaskAnalysisProtocol
@@ -57,7 +58,7 @@ class Search(Contract):
         for key,(lo,hi) in self.bounds.items():
             if not lo<hi or not lo<=parameter_value(self.fixed.model_dump(),key)<=hi:
                 raise ValueError('INITIAL_VALUE_OR_BOUNDS_INVALID: '+key)
-        if (self.evaluation_mode=='backend_task')!=(self.objective=='joint_reach_hold'):
+        if (self.evaluation_mode=='backend_task')!=(self.objective in ('joint_reach_hold','task_acceptance')):
             raise ValueError('OBJECTIVE_EVALUATOR_MISMATCH')
         if self.evaluation_mode=='mathematical_proxy' and any('speed_weight' in k for k in self.variables):
             raise ValueError('CONTROL_VARIABLES_REQUIRE_BACKEND_TASK_EVALUATOR')
@@ -91,7 +92,8 @@ class FamilyMixedSearch(Contract):
     section_types: list[Literal['circle','tube','rectangle','ellipse']] = Field(default_factory=list)
     bounds: dict[str, tuple[FiniteFloat, FiniteFloat]] = Field(default_factory=dict)
     screening_fidelity: str = Field(min_length=1)
-    objective: Literal['target_equilibrium_residual','held_position_min_eigenvalue']
+    objective: Literal['target_equilibrium_residual','held_position_min_eigenvalue','task_violation'] = Field(
+        description='task_violation selects CONIC reoptimization for current task conditions and requires its frozen grant. max_evaluations includes model builds and all internal solves. Static residual and Gramian remain explicit diagnostics.')
     operating_point: Literal['standardized_initial_pretension','controller_start_input','target_equilibrium']
     max_proposals: int = Field(ge=1, le=128, strict=True)
     max_evaluations: int = Field(ge=1, le=128, strict=True)

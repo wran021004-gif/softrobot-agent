@@ -431,7 +431,13 @@ def dispatch(host, value, request_id, origin='model'):
         if not scientific_preflight['admitted']:
             raise ValueError('EQUIVALENT_SCIENTIFIC_EXPERIMENT_REQUIRES_EXPLICIT_REPLICATION_GRANT: '
                 +json.dumps(scientific_preflight,sort_keys=True))
-    admission=dict(scope='selection without execution or numerical reservation') if plan.action=='select' else capacity(host,plan.search.max_evaluations if plan.search else 1,plan.action=='confirm',root_operation=True,candidate=plan.candidate)
+    if plan.action=='select':
+        admission=dict(scope='selection without execution or numerical reservation')
+    elif plan.action=='search' and getattr(plan.search,'evaluation_mode','mathematical_proxy')=='mathematical_proxy':
+        from tools.research.analysis import admission as mathematical_admission
+        admission=mathematical_admission(host,plan.search.max_evaluations)
+    else:
+        admission=capacity(host,plan.search.max_evaluations if plan.search else 1,plan.action=='confirm',root_operation=True,candidate=plan.candidate)
     if plan.action=='execute' and s['spec'].get('nmpc_execution_cap_s'):
         timing=nmpc_timing(host,plan.candidate)
         if not timing['available']:
