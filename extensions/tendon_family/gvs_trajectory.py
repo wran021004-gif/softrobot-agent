@@ -72,7 +72,8 @@ class GVSTrajectoryAssembler:
     def assemble(self, task, robot, space, mathematical_model, specification, context):
         p = self.parameters
         from tools.research_tasks import ResearchTaskAdapter
-        reference = ResearchTaskAdapter(dict(task=task.model_dump(mode='json'))).control_reference()
+        adapter = ResearchTaskAdapter(dict(task=task.model_dump(mode='json')))
+        reference = adapter.control_reference()
         tracking = reference['kind'] != 'constant'
         if p.reference_mode != reference['kind']:
             raise ValueError('CONTROL_REFERENCE_MODE_MUST_MATCH_TASK')
@@ -109,7 +110,7 @@ class GVSTrajectoryAssembler:
         local_tip = ca.Function('local_tip', [functions.q_symbol], [functions.tip_position_expression])
         tip_rate = ca.MX.sym('tip_rate', n)
         local_velocity = ca.Function('local_tip_velocity', [functions.q_symbol, tip_rate], [ca.jacobian(functions.tip_position_expression, functions.q_symbol) @ tip_rate]) if p.relative_velocity_weight or p.terminal_tip_speed_weight or p.holding_tip_speed_weight else None
-        target = None if tracking else ca.DM(task.goal.data['target_m'])
+        target = None if tracking else ca.DM(adapter.reference_at([0.])[0][0])
         mount = ca.DM(assembly['mount']['position_m'])
         dt = task.timing.control_period_s
         h = dt / p.substeps
@@ -189,7 +190,7 @@ class TrajectoryWorkspace:
         self.n = len(nominal_x) // 2
         from tools.research_tasks import ResearchTaskAdapter
         self.reference = ResearchTaskAdapter(dict(task=task.model_dump(mode='json')))
-        self.tracking = task.family == 'task.tracking'
+        self.tracking = self.reference.control_reference()['kind'] != 'constant'
         self.path_segment = 0
         self.duration = task.timing.duration_s
         self.holding_start = None
@@ -206,7 +207,7 @@ class TrajectoryWorkspace:
         self.nominal_u = list(nominal_u)
         self.tendons = [t['id'] for t in robot.structure.data['tendons']]
         self.period = task.timing.control_period_s
-        self.target = task.goal.data.get('target_m')
+        self.target = None if self.tracking else self.reference.reference_at([0.])[0][0]
         self.goal_tolerance = task.evaluator.parameters.data['max_error_m' if self.tracking else 'tolerance_m']
         reg = registry()
         start = time.perf_counter()

@@ -170,7 +170,7 @@ def validate_initializer(before,after):
     if after.task.initializer.parameters.data!=expected:raise ValueError('NAMED_ZERO_STATE_REQUIRED')
 
 
-def checked_reach(inp, *, execution=True):
+def checked_control(inp, *, execution=True):
     from .gvs_profile import ReachControl
     inp=SessionInput.model_validate(inp)
     if inp.policy.controller.extension_id == 'controller.sorosim_matlab_nmpc':
@@ -207,6 +207,10 @@ def checked_reach(inp, *, execution=True):
         abs(v-round(v))>1e-8 for v in grid):
         raise ValueError('REACH_TIMING_GRID')
     return control
+
+
+# Historical public entry point used by retained Reach routes.
+checked_reach = checked_control
 
 
 def declarations():

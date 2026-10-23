@@ -4,23 +4,9 @@ from pathlib import Path
 
 from schemas.platform import SessionInput
 from tools.platform_store import plain
-from tools.state_io import read, digest
+from tools.state_io import read, digest, effective_input
 
 ROOT = Path(__file__).resolve().parents[2]
-
-
-def effective_input(configuration):
-    """Read a saved effective snapshot, never resolve source files again.
-
-    Accept SessionInput, compiled/effective envelopes and resolve() Study output.
-    A task-only envelope remains useful for reference consumers; operations that
-    need robot or policy data must explicitly require the complete snapshot.
-    """
-    value = plain(configuration)
-    for key in ('effective', 'input', 'configuration'):
-        if key in value:
-            return effective_input(value[key])
-    return value
 
 
 def same_robot_structure(left, right):

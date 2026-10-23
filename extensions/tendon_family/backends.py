@@ -96,7 +96,6 @@ def playback_tensions(inp, physics, scene, commands, folder):
         position=data.site_xpos[tip].copy();velocity=jac@data.qvel
         return dict(control_step=k,time_s=k*scene['control_period_s'],engine_time_s=float(data.time),
             tip_m=position.tolist(),tip_velocity_m_s=velocity.tolist(),
-            position_error_m=float(np.linalg.norm(position-np.asarray(scene['target_world_m']))),
             speed_m_s=float(np.linalg.norm(velocity)),qpos_rad=data.qpos[qi].tolist(),qvel_rad_s=data.qvel[vi].tolist(),
             requested_tension_n=None if requested is None else requested.tolist(),actual_tension_n=actual.tolist())
     rows=[sample(0,None,np.zeros(len(aids)))];atomic_json(folder/'samples.json',rows)
@@ -197,7 +196,6 @@ class SerialBackend:
 
     def shared_input(self,timeout_s):
         c=dict(self.scene['control']['effective_parameters'])
-        c['target_world_m']=self.scene['control']['reference'].get('target_world_m')
         commands=self.scene['control']['reference'].get('commands',{})
         c['command_vector']=[commands.get(a['id'],0.) for a in self.physics['actuators']]
         return dict(physics=self.physics,scene=self.scene,config=self.config.model_dump(mode='json'),control=c,timeout_s=timeout_s)
@@ -325,10 +323,11 @@ class MujocoBackend(SerialBackend):
                             (mujoco.mjtWarning.mjWARN_BADQPOS,mujoco.mjtWarning.mjWARN_BADQVEL,mujoco.mjtWarning.mjWARN_BADQACC)}))
                     break
             if not complete:break
-            mujoco.mj_forward(model,data)
+            motion=current()
             routes=[[data.site_xpos[model.site(f"{td['entity']}_point_{j}").id].tolist() for j in range(len(td['points']))] for td in p['tendons']]
             lengths=data.ten_length[tids].copy()
-            row=dict(time_s=(step+1)*dt,solver_time_s=t,engine_time_s=data.time,tip_m=data.site_xpos[model.site('tip_site').id].tolist(),
+            row=dict(time_s=(step+1)*dt,solver_time_s=t,engine_time_s=data.time,tip_m=motion['tip'].tolist(),
+                tip_velocity_m_s=(motion['Jtip']@data.qvel[vi]).tolist(),
                 qpos_rad=data.qpos[qi].tolist(),qvel_rad_s=data.qvel[vi].tolist(),
                 tendon_length_m=lengths.tolist(),tendon_length_change_m=(lengths-initial_lengths).tolist(),
                 tendon_length_rate_m_s=((lengths-previous_lengths)/dt).tolist(),body_positions_m=data.xpos[bids].tolist(),

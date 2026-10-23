@@ -6,10 +6,7 @@ The new reach/hold protocol composes their outputs rather than replacing them.
 from dataclasses import dataclass
 import math
 
-from schemas.platform import SessionInput, EvaluationResult
-from tools.platform_store import plain
-from tools.state_io import digest
-from tools.research.config import effective_input
+from tools.state_io import digest, effective_input
 
 
 @dataclass(frozen=True)
@@ -31,6 +28,7 @@ class ResearchTaskAdapter:
         Reach hold requirements. No optimization weight supplies a hard limit.
         """
         from schemas.platform import TaskConditionView
+        from tools.platform_store import plain
         task = self.task
         signal = next(s for s in task['observations'] if s['name'] == 'tip_position')
         timing = task['timing']
@@ -284,14 +282,25 @@ class ResearchTaskAdapter:
             if sample['time_s']>=self.holding_start_s()-1e-12:
                 tests.extend([('holding_max_error_m','position_error_m'),('holding_max_speed_m_s','speed_m_s')])
             for constraint,field in tests:
-                value=sample[field];limit=limits[constraint]
+                derivation={}
+                source_field=field
+                if field=='position_error_m' and field not in sample:
+                    import numpy as np
+                    reference=self.reference_at([sample['time_s']])[0][0]
+                    value=float(np.linalg.norm(np.asarray(sample['tip_m'])-reference))
+                    source_field='tip_m'
+                    derivation=dict(operation='euclidean_distance_to_task_reference',reference_m=reference.tolist())
+                else:value=sample[field]
+                limit=limits[constraint]
                 if value>limit:
                     rows.append(dict(constraint=constraint,time_s=sample['time_s'],value=value,limit=limit,
-                        normalized_excess=value/limit-1,raw_pointer='/samples/'+str(i)+'/'+field))
+                        normalized_excess=value/limit-1,raw_pointer='/samples/'+str(i)+'/'+source_field,
+                        **(dict(derivation=derivation) if derivation else {})))
         return dict(status='sampled_diagnostic',samples=rows)
 
     def check_compatibility(self):
         """Check the actual registered pairing, separately from historical matches."""
+        from schemas.platform import SessionInput
         from tools.platform_tasks import compile_input
         from tools.platform_registry import registry
         self._require_configuration()
@@ -409,6 +418,8 @@ def assemble_acceptance(configuration, evaluation, profile, *, evaluation_refere
     Optional sealed motion verifies the exact holding grid without recomputing
     physics. The profile's `available` is otherwise the existing coverage authority.
     """
+    from schemas.platform import EvaluationResult
+    from tools.platform_store import plain
     adapter = task_adapter(configuration)
     cfg, task = (adapter.configuration, adapter.task)
     if task['family']=='task.tracking' and (task['status']!='development_valid' or
@@ -494,6 +505,7 @@ def assemble_acceptance(configuration, evaluation, profile, *, evaluation_refere
 
 def aggregate_acceptance(records, scheduled, *, schedule=None, evidence_policy=None, comparison_scope=None):
     """The frozen scheduled denominator includes absent, incomplete and replay slots."""
+    from tools.platform_store import plain
     if not isinstance(scheduled, int) or scheduled<=0 or len(records)>scheduled:
         raise ValueError('POSITIVE_FROZEN_SCHEDULE_REQUIRED')
     if schedule is not None and len(schedule)!=scheduled:

@@ -55,7 +55,8 @@ def prepare_input(host, request):
         duration_s=scene['duration_s'],control_period_s=period,command_intervals=round(scene['duration_s']/period),
         tendon_order=cfg['control_object']['tendon_names'],original=task)
     if inp.task.family == 'task.reach':
-        cfg['task'].update(target_m=scene['target_world_m'],
+        from tools.research_tasks import task_adapter
+        cfg['task'].update(target_m=task_adapter(inp).reference_at([0.])[0][0].tolist(),
             acceptance=dict(position_limit_m=settling['position_limit_m'],terminal_position_limit_m=acceptance['tolerance_m'],
             holding_speed_limit_m_s=settling['speed_limit_m_s'],
             holding_steps=[k for k in range(round(scene['duration_s']/period)+1)

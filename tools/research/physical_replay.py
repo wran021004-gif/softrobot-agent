@@ -74,8 +74,6 @@ def model_context(configuration):
     from extensions.tendon_family.scene import assemble
 
     inp=SessionInput.model_validate(configuration)
-    if inp.task.family=='task.tracking':
-        raise ValueError('GEOMETRIC_TRACKING_PHYSICAL_REPLAY_UNSUPPORTED')
     if inp.policy.controller.extension_id=='controller.gvs_nmpc':
         from extensions.tendon_family.gvs_basis import resolve_basis
         physics=physics_for(inp);scene=assemble(inp,physics)
@@ -425,10 +423,44 @@ def dispatch(host,arguments,key):
     return recover(host)
 
 
+def playback_profile(inp,raw,evaluation):
+    """Task-layer diagnostics from physical samples; no integration or solver."""
+    from tools.research_tasks import task_adapter
+    adapter=task_adapter(inp)
+    samples=raw.get('samples',[])
+    timing=inp.task.timing;intervals=round(timing.duration_s/timing.control_period_s)
+    substeps=round(timing.control_period_s/timing.timestep_s)
+    complete=raw.get('status')=='completed' and len(samples)==intervals+1 and raw.get('physics_steps')==intervals*substeps
+    configured_limits={t['id']:t['force_limit_n'] for t in inp.robot.structure.data['tendons']}
+    tendon_limits=[configured_limits[name] for name in raw.get('tendon_order',list(configured_limits))]
+    force_violation=max((max(0.,-v,v-hi) for row in samples[1:]
+        for v,hi in zip(row['actual_tension_n'],tendon_limits)),default=0.)
+    profile=dict(complete=complete,task=plain(inp.task),official_task_success=evaluation.task_success,
+        solver_error_count=0 if complete else 1,force_bound_violation_n=force_violation)
+    if inp.task.family=='task.tracking':
+        # Motion is post-step; each sample's actual tension was applied during
+        # the preceding interval. Verify both grids without scheduling the path.
+        profile['tracking_sampling_complete']=bool(complete and
+            all(abs(row['time_s']-k*timing.sample_period_s)<=1e-12 for k,row in enumerate(samples)) and
+            all(np.asarray(row['actual_tension_n']).shape==(len(tendon_limits),) for row in samples[1:]))
+    else:
+        limits=adapter.ranking_limits();settling=inp.policy.controller.parameters.data['settling']
+        hold=[v for v in samples if v['time_s']>=adapter.holding_start_s()-1e-12]
+        expected_hold=round(settling['window_s']/timing.sample_period_s)+1
+        covered=complete and len(hold)==expected_hold
+        reference,_=adapter.reference_at([v['time_s'] for v in hold])
+        max_error=max((float(np.linalg.norm(np.asarray(v['tip_m'])-r)) for v,r in zip(hold,reference)),default=None)
+        max_speed=max((v['speed_m_s'] for v in hold),default=None)
+        profile['sampled_settling']=dict(window_s=settling['window_s'],
+            position_limit_m=limits['holding_max_error_m'],speed_limit_m_s=limits['holding_max_speed_m_s'],
+            available=covered,max_error_m=max_error,max_speed_m_s=max_speed,
+            passed=bool(covered and max_error<=limits['holding_max_error_m'] and max_speed<=limits['holding_max_speed_m_s']))
+    return profile
+
+
 def recover(host):
     from tools.platform_registry import registry
-    from tools.research_tasks import assemble_acceptance, task_adapter
-    from extensions.reference.implementation import evaluate_reach
+    from tools.research_tasks import assemble_acceptance
 
     p=state(host)['pending'];folder=Path(p['folder'])
     boundary=read(folder/'boundary.json')
@@ -451,28 +483,12 @@ def recover(host):
         data=Payload(contract='family.backend_data',data=dict(physical_replay=True)),
         limitations=['Ideal direct tendon tension; no hardware or robustness claim'],
         initial_state=inp.task.initializer.parameters,seed=inp.seed)
-    evaluation=evaluate_reach(inp.task,result,raw_ref,registry(),digest(dict(candidate=p['candidate'],source=p['source_reference'])))
+    evaluator=registry().get(inp.task.evaluator.extension_id,inp.task.evaluator.version,'evaluator').resolve()
+    evaluation=evaluator(inp.task,result,raw_ref,registry(),digest(dict(candidate=p['candidate'],source=p['source_reference'])))
     evaluation_ref=save(host,plain(evaluation),'physical_playback_endpoint_evaluation')
-    adapter=task_adapter(cfg);limits=adapter.ranking_limits()
-    hold=[v for v in samples if v['time_s']>=adapter.holding_start_s()-1e-12]
-    timing=inp.task.timing;intervals=round(timing.duration_s/timing.control_period_s)
-    substeps=round(timing.control_period_s/timing.timestep_s)
-    expected_hold=round(inp.policy.controller.parameters.data['settling']['window_s']/timing.sample_period_s)+1
-    complete=raw.get('status')=='completed' and len(samples)==intervals+1 and raw.get('physics_steps')==intervals*substeps
-    covered=complete and len(hold)==expected_hold
-    max_error=max((v['position_error_m'] for v in hold),default=None)
-    max_speed=max((v['speed_m_s'] for v in hold),default=None)
-    configured_limits={t['id']:t['force_limit_n'] for t in cfg['robot']['structure']['data']['tendons']}
-    tendon_limits=[configured_limits[name] for name in raw.get('tendon_order',source['trajectory']['tendon_order'])]
-    force_violation=max((max(0.,-v,v-hi) for row in samples[1:]
-        for v,hi in zip(row['actual_tension_n'],tendon_limits)),default=0.)
-    profile=dict(complete=complete,execution_id=folder.name,simulation=raw_ref,evaluation=evaluation_ref,
-        task=plain(inp.task),official_task_success=evaluation.task_success,
-        solver_error_count=0 if complete else 1,force_bound_violation_n=force_violation,
-        sampled_settling=dict(window_s=inp.policy.controller.parameters.data['settling']['window_s'],
-            position_limit_m=limits['holding_max_error_m'],speed_limit_m_s=limits['holding_max_speed_m_s'],
-            available=covered,max_error_m=max_error,max_speed_m_s=max_speed,
-            passed=bool(covered and max_error<=limits['holding_max_error_m'] and max_speed<=limits['holding_max_speed_m_s'])))
+    profile=playback_profile(inp,raw,evaluation)
+    profile.update(execution_id=folder.name,simulation=raw_ref,evaluation=evaluation_ref)
+    complete=profile['complete']
     acceptance=assemble_acceptance(cfg,evaluation,profile,evaluation_reference=evaluation_ref,
         profile_reference=None,motion=[dict(time_s=v['time_s']) for v in samples])
     predicted=source.get('mathematical_outputs')
