@@ -93,6 +93,8 @@ def collect(kind):
         with zipfile.ZipFile(OUT/(kind+'_evidence.zip'),'w',zipfile.ZIP_DEFLATED) as archive:
             for name,ref in source['files'].items():archive.writestr(name,host.store.artifact(ref,raw=True))
             for name,value in dict(configuration=cfg,outcome=outcome,profile=profile,evaluation=evaluation,acceptance=acceptance,
+                simulation_result=host.store.artifact(outcome['receipts']['simulation']['output']),
+                motion=host.store.artifact(profile['motion']),
                 manifest=host.store.artifact(source['manifest'])).items():
                 archive.writestr(name+'.json',json.dumps(plain(value),ensure_ascii=False,indent=2))
     atomic_json(OUT/(kind+'_summary.json'),summary)
