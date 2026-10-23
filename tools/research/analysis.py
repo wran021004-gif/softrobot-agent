@@ -563,7 +563,7 @@ def decision_result(value, reference):
         c=constraints.get(r['constraint_id'])
         if not c: continue
         rows.append(dict(constraint_id=r['constraint_id'],signal=r['signal'],absolute_time_s=r['absolute_time_s'],
-            observed_value=r['value'],bound=c['radius'] if c['kind']=='norm_bound' else dict(lower=c['lower'],upper=c['upper']),
+            observed_value=r['value'],bound=c['radius'] if c['kind'] in ('norm_bound','path_bound') else dict(lower=c['lower'],upper=c['upper']),
             margin=r['margins'],violation=r['violation'],units=r['units'],
             status='satisfied_sample' if r['passed'] else 'attempted_sequence_violation',
             source_pointer=f'/trajectory/replay/records/{i}'))

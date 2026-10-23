@@ -297,6 +297,7 @@ class ReportingSessionTests(unittest.TestCase):
                 from tools.research.agent import decision_packet
                 packet=decision_packet(h)
                 intent=packet['research']['research_intent']['last_research']
+                if intent.get('same_as')=='research_intent.latest_decision':intent=packet['research']['research_intent']['latest_decision']
                 self.assertEqual(intent['agent_hypothesis']['decision']['hypothesis_id'],'H-fixture')
                 self.assertEqual(intent['agent_hypothesis']['weakening_observation'],'Higher speed')
                 self.assertEqual(intent['actual_result'],observation)

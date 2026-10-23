@@ -191,6 +191,8 @@ def _save(host, report, *, request=None, status='deferred', interpretation_for=N
 def investigate(host, request):
     """Typed synchronous tool: existing evidence only, no nested Provider send."""
     q=InvestigationRequest.model_validate(request)
+    q.reads.extend(EvidenceQuery.model_validate({k:c[k] for k in ('reference','pointer','view')})
+        for c in applicable_corrections(host,[plain(r) for r in q.references]))
     report=assemble(host,q.references,question=q.question)
     # Validate explicit reads now; only selected subnodes enter the Reporter input.
     for query in q.reads:read_evidence(host,plain(query),record_read=False)
@@ -283,6 +285,7 @@ def reporter_handoff_summary(host, reference, saved):
     """L1: bounded facts plus explicitly non-authoritative saved interpretation."""
     from tools.research.research_context import mathematical_decision_view
     report=saved['report'];findings=[];scope=[];limitations=[];unresolved=[]
+    corrections=applicable_corrections(host,[c['identity']['result']['reference'] for c in report['results']])
     for card in report['results']:
         # Refresh projections from the same immutable source, preserving old reports.
         card=deepcopy(card)
@@ -293,7 +296,7 @@ def reporter_handoff_summary(host, reference, saved):
         construction=recorded_static_summary(raw,card['identity']['result']['reference'])
         if construction:card['deterministic_summary']['recorded_static_construction']=construction
         evidence=card['evidence_summary'];math=mathematical_decision_view(card)
-        metrics=sorted(card['metrics'],key=lambda m:m['passed'] is not False)[:3]
+        metrics=sorted(card['metrics'],key=lambda m:m['passed'] is not False)
         fact=dict(result=card['identity']['result'],operation=card['identity']['operation'],
             metrics=[{k:m[k] for k in ('name','value','unit','threshold','passed','scope','source','threshold_source')}
                 for m in metrics],main_violations=card['main_violations'])
@@ -301,23 +304,52 @@ def reporter_handoff_summary(host, reference, saved):
         else:
             fact['recorded_summary']={k:v for k,v in card['deterministic_summary'].items()
                 if k in ('task_gap','status','conclusion','recorded_mathematics','recorded_conclusions','recorded_control_diagnostics')}
+        if card.get('control_search'):
+            search=card['control_search'];best=search.get('best')
+            fact['control_search']=dict(stop_reason=search['stop_reason'],all_steps=search['all_steps'],
+                best={k:v for k,v in best.items() if k!='metrics'} if best else None)
+            if best:fact['metrics']=best['metrics']
+            fact['resources']=[r for r in card['resources'] if r['amount'] is not None]
+        task_family=(raw.get('acceptance') or {}).get('task_family')
+        if task_family=='task.reach':
+            names={'evaluator:task_bound':'terminal_position_error','holding_position':'holding_max_position_error',
+                'holding_speed':'holding_max_speed'}
+            for metric in fact['metrics']:
+                if metric['name'] in names:metric['scientific_metric']=names[metric['name']]
         findings.append(fact)
         scope.append(dict(result=card['identity']['result'],claim_kind=evidence['claim_kind'],
             verification_status=evidence['verification_status'],supported_inferences=evidence['supported_inferences']))
         limitations.extend(evidence['unsupported_inferences']);unresolved.extend(evidence['unresolved'])
     interpretations=report['interpretations'] if saved['interpretation_status']=='available' else []
+    reads=(saved.get('request') or {}).get('reads',[])
+    pending=[c for c in corrections if not any(q['reference']==c['reference'] and
+        (not q.get('pointer') or q['pointer']==c['pointer']) and q.get('view','full')=='full' for q in reads)]
+    if pending:interpretations=[]
     # The full revision remains readable; hypotheses retain their original kind.
     interpretations=interpretations[:3]
     return dict(delivery_version='scientific_handoff_v1',report_reference=reference,
         result_references=[c['identity']['result']['reference'] for c in report['results']],
         mode=report['mode'],question=report['question'],reporter_status=saved['interpretation_status'],
-        delivery_mode='reporter_interpreted' if saved['interpretation_status']=='available' else 'deterministic_only',
-        findings=findings[:3],result_count=len(findings),scope=scope[:3],
+        delivery_mode='reporter_interpreted' if interpretations else 'deterministic_only',
+        findings=findings,result_count=len(findings),scope=scope,
         comparisons=[{k:r[k] for k in ('kind','comparable','reasons','changed_factors','sources')} for r in report['relations'][:2]],
         limitations=list(dict.fromkeys(limitations)),unresolved=list(dict.fromkeys(unresolved)),
         interpretations=interpretations,interpretation_sources=[s for i in interpretations for s in i['sources']],
+        applicable_corrections=corrections,
+        current_interpretation_status='superseded_pending_reinterpretation' if pending else saved['interpretation_status'],
+        historical_interpretations_query=dict(reference=reference,view='full',pointer='/report/interpretations'),
         interpretation_scope='Non-authoritative interpretations; hypothesis and further_investigation are unconfirmed questions, not decisions',
         error=saved['error'],rejection_details=saved.get('rejection_details'))
+
+
+def applicable_corrections(host, references):
+    """Link recorded corrections by exact result identity; do not judge prose truth."""
+    ref=state(host).get('engineering_feedback_correction')
+    if not ref:return []
+    value=host.store.artifact(ref)
+    return [dict(reference=ref,pointer=f'/{key}/{i}',view='full',result=row['reference'])
+        for key in ('mathematics','historical_control_updates','static_constructions')
+        for i,row in enumerate(value.get(key,[])) if row.get('reference') in references]
 
 
 def _source_catalog(host, report, queries):

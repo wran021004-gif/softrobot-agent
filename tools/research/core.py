@@ -44,13 +44,16 @@ def read_evidence(host, query, *, record_read=True):
         if plain(q.reference) not in [s.get('family_space_reference'),*registered_references(host)]:raise ValueError('REGISTERED_WORKING_SET_ANCHOR_REQUIRED')
         value=dict(context(host)['evidence_working_set'],source_state_identity=digest(s),
             authoritative_scientific_evidence=False)
+    elif q.view=='mathematical_capabilities':
+        from tools.research.task_constraints import mathematical_method_view
+        value=mathematical_method_view(host,plain(q.reference))
     root_value=value
     def navigation(exc,node,path):
         from tools.research.evidence_views import data_access
         details=dict(reference=plain(q.reference),view=q.view,failed_pointer=q.pointer,
             parent_pointer=path,available_fields=list(node) if isinstance(node,dict) else None,
             list_length=len(node) if isinstance(node,list) else None,
-            parent_query=dict(reference=plain(q.reference),view='working_set' if q.view=='working_set' else 'summary',pointer=path),
+            parent_query=dict(reference=plain(q.reference),view=q.view if q.view in ('working_set','mathematical_capabilities') else 'summary',pointer=path),
             data_access=data_access(host,plain(q.reference),root_value))
         if q.view!='working_set' and q.pointer and q.pointer.split('/')[1] in ('candidate_index','control_result_links','control_comparisons','citation_eligibility'):
             details['derived_view_query']=dict(reference=plain(q.reference),view='working_set',pointer=q.pointer)
@@ -71,10 +74,6 @@ def read_evidence(host, query, *, record_read=True):
         from extensions.tendon_family.family_space import parameter_capabilities
         if q.pointer or 'parameters' not in value:raise ValueError('CAPABILITIES_VIEW_REQUIRES_WHOLE_CANDIDATE')
         value=parameter_capabilities(s['spec']['family_space'],value['parameters'])
-    elif q.view=='mathematical_capabilities':
-        from tools.research.optimal_capability import candidate_methods
-        if q.pointer:raise ValueError('MATHEMATICAL_CAPABILITIES_REQUIRE_WHOLE_CANDIDATE')
-        value=candidate_methods(host,plain(q.reference))
     elif q.view=='summary':
         from tools.research.research_context import compact_evidence
         value=compact_evidence(value,plain(q.reference),q.pointer)
