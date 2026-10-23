@@ -192,3 +192,12 @@ wall-time 按截至核验时的保守上界计入并明确标注，不伪造精�
 原 synthetic-worker 集成测试在冻结 `.mainline5-env` 下通过；最初用 `.s135-env` 被原解释器
 一致性检查拒绝，未放松该检查。旧执行只能恢复为 execution_incomplete；没有完整 MuJoCo
 状态 checkpoint，不能从第 33 步原位续算。恢复后下一科学动作仍交由主 Agent 在原额度内选择。
+
+恢复结果：原 32/35 实验现已合法封存为 `execution_incomplete`，引用
+`364634c4cf1726a9854ddb13bd237482b6e1be337683fbbf59d5297a4b5d4794`。
+原科学工具与 simulation receipt 均已结算，pending 清除，原始边界仍缺失且退出码未知；
+事后核验依据保存在独立 recovery boundary，不冒充原 worker 的完成回执。
+计数仍为 Provider 5、物理 1、NMPC 1，没有新科学启动。6592.760 s 是截至退出核验时的
+保守耗时上界，非原进程精确存活时长。首次恢复返回中的旧展示字段误写
+`additional_scientific_executions=1`；真实计数与账本没有增加，现修正为恢复路径返回 0，
+新增回归断言通过；原首次返回记录保留，不能以该展示字段宣称又启动一次实验。

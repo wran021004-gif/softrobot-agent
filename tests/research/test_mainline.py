@@ -192,6 +192,7 @@ class MainlineTests(unittest.TestCase):
             again=core.recover(self.host)
             worker.assert_not_called()
         self.assertEqual(result['status'],'execution_incomplete')
+        self.assertEqual(result['operation_cost']['additional_scientific_executions'],0)
         self.assertIsNone(result['acceptance'])
         self.assertIsNone(state(self.host)['pending'])
         self.assertEqual(state(self.host)['nmpc_launches'],1)

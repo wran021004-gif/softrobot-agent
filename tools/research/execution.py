@@ -272,7 +272,7 @@ def finish_execution(host, recovery=False):
     compatible_references(host)
     from tools.research.feedback import eligibility
     return dict(reference=ref,**compact_result(detail),confirmation=eligibility(host,ref),
-        operation_cost=dict(additional_numerical_s=actual,additional_scientific_executions=1,cached_operation_receipt=False))
+        operation_cost=dict(additional_numerical_s=actual,additional_scientific_executions=0 if recovery else 1,cached_operation_receipt=False))
 
 
 def compact_result(r):
