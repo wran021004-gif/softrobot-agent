@@ -153,7 +153,7 @@ class TrackingTests(unittest.TestCase):
         self.assertEqual(out['status'],'not_applicable')
         self.assertEqual(out['task_acceptance'],'unmeasured')
         fit=method_admission(dict(canonical_task=TASK,mathematical_methods={CONIC:True},budgets=dict(mathematical_evaluations=8)),q)
-        self.assertIn('TRACKING_ROBOT_MODEL_CONSTRUCTION_UNSUPPORTED',fit['reasons'])
+        self.assertIn('TASK_REQUIREMENTS_REQUIRED_FOR_INTERNAL_SOLVE_ACCOUNTING',fit['reasons'])
         self.assertEqual(task_adapter(cfg).check_compatibility()['technical_compatibility']['status'],'unsupported')
         from tools.research.physical_replay import model_context
         with patch('extensions.tendon_family.backends.physics_for',side_effect=AssertionError('NO_PHYSICS')):

@@ -104,7 +104,7 @@ class TaskAnalysisTests(unittest.TestCase):
         with self.assertRaises(ValueError): describe_analysis_requirements(SessionInput.model_validate(changed),self.binding)
 
     def test_signal_semantics_and_unsupported_requirements(self):
-        for key,value in [('name','contact_force'),('units','mm'),('frame','robot_base'),('phase','pre_step')]:
+        for key,value in [('name','contact_force'),('entity','another_tip'),('units','mm'),('frame','robot_base'),('phase','pre_step')]:
             payload = plain(self.req); payload['constraints'] = payload['constraints'][:1]
             payload['constraints'][0]['signal'][key] = value
             self.assertEqual(self.applicability(TaskAnalysisRequirement.model_validate(payload))['status'],'not_applicable')

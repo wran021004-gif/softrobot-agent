@@ -126,8 +126,8 @@ def _candidate_points(inp,graph,p,requested=None):
     design=inp.robot.structure.data
     limits=np.asarray([row['force_limit_n'] for row in design['tendons']],dtype=float)
     pretension=np.clip([row['pretension_n'] for row in design['tendons']],0,limits)
-    from .gvs_profile import reach_numerical
-    numerical=reach_numerical(inp)
+    from .gvs_profile import mathematical_numerical
+    numerical=mathematical_numerical(inp)
     x0=np.asarray(numerical.get('measured_initial_state'),dtype=float)
     if x0.shape!=(2*n,):
         q=np.asarray(numerical['nominal']['q0'],dtype=float)
@@ -158,8 +158,8 @@ def _candidate_points(inp,graph,p,requested=None):
     requested=set(requested or ['standardized_initial_pretension','controller_start_input','target_equilibrium','halfway_waypoint'])
     points=[point for point in points if point['name'] in requested]
     if not requested & {'target_equilibrium','halfway_waypoint'}:return points
-    if inp.task.family != 'task.reach':
-        raise ValueError('STATIC_WORKING_POINT_REQUIRED: Tracking initial reference is not a target equilibrium')
+    if task_adapter(plain(inp)).control_reference()['kind'] != 'constant':
+        raise ValueError('STATIC_WORKING_POINT_REQUIRED: target construction assumes a constant reference, not a moving or free-progress path')
 
     qsym,usym=f.q_symbol,f.u_symbol
     mount=inp.task.environment.data['mount']

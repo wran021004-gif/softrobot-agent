@@ -24,6 +24,13 @@ def portfolio(rows):
     views=[]
     for identity,group in sorted(groups.items()):
         ranked=sorted(group,key=ranking_key)
+        if group[0].get('task_family')=='task.tracking':
+            valid=[r for r in ranked if r['task_gap']['valid_complete'] and r['task_gap']['normalized_gap'] is not None]
+            def axes(r):return [r['task_gap']['components'][k] for k in sorted(r['task_gap']['components'])]
+            pareto=[r['source_result'] for r in valid if not any(
+                all(a<=b for a,b in zip(axes(q),axes(r))) and any(a<b for a,b in zip(axes(q),axes(r))) for q in valid)]
+            views.append(dict(comparison_identity=identity,ranked=ranked,task_constraint_pareto=pareto))
+            continue
         valid=[r for r in ranked if r['task_gap']['valid_complete'] and all(v is not None for v in r['metrics'].values())]
         def axes(r):return max(r['metrics']['terminal_position_error_m'],r['metrics']['holding_max_position_error_m']),r['metrics']['holding_max_speed_m_s']
         pareto=[r['source_result'] for r in valid if not any(
@@ -47,13 +54,13 @@ def record(folder, reference, diagnostic=None):
     episodes=result.get('episodes',[]);metrics=(result.get('acceptance') or {}).get('metrics',{})
     names=('terminal_position_error_m','holding_max_position_error_m','holding_max_speed_m_s')
     if episodes:metrics={k:max((e[k] for e in episodes if e.get(k) is not None),default=None) for k in names}
-    else:metrics=dict(zip(names,[metrics.get(k) for k in ('terminal_error_m','holding_max_error_m','holding_max_speed_m_s')]))
+    elif cfg['task']['family']=='task.reach':metrics=dict(zip(names,[metrics.get(k) for k in ('terminal_error_m','holding_max_error_m','holding_max_speed_m_s')]))
     from tools.research_tasks import task_adapter
     metric_identity=digest(task_adapter(cfg).describe())
     row=dict(source_folder=folder,source_result=reference,source_candidate=result['candidate'],
         study=result.get('owning_study',result.get('study')),execution_id=result.get('execution_id'),
         controller=result.get('policy_sha256',digest(cfg['policy']['controller'])),
-        task_identity=digest(cfg['task']),robot_identity=digest(cfg['robot']),design_identity=spec['design_identity'],
+        task_identity=digest(cfg['task']),task_family=cfg['task']['family'],robot_identity=digest(cfg['robot']),design_identity=spec['design_identity'],
         model_identity=spec['identity'],metric_identity=metric_identity,tendon_order=order,control_mode='ideal_tension',
         metrics=metrics,task_gap=gap,original_acceptance=result['acceptance'],
         historical_status='original_task_passed' if gap['valid_complete'] and gap['accepted'] else

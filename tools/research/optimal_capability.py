@@ -78,17 +78,26 @@ def dependencies():
     return result
 
 
-def method_admission(spec, query, used=0):
+def conic_subproblems(requirements):
+    """Exact enumerated branch count used by the existing PATH kernel."""
+    paths=[c for c in requirements.constraints if c.kind=='path_bound'] if requirements is not None else []
+    return max(1,len(paths[0].indices)-2) if paths and len(paths[0].path_vertices_m)==3 else 1
+
+
+def method_admission(spec, query, used=0, *, requirements=None):
     methods = spec.get('mathematical_methods', {})
     required = [CONIC] + ([SENSITIVITY] if query.optimal_sensitivity else [])
-    count = 1 + 4*len(query.optimal_sensitivity.steps) if query.optimal_sensitivity else 2
+    if requirements is None and spec.get('configuration'):
+        from tools.research.task_constraints import describe_analysis_requirements
+        requirements=describe_analysis_requirements(spec['configuration'],{})
+    branches=conic_subproblems(requirements)
+    models=1+2*len(query.optimal_sensitivity.steps) if query.optimal_sensitivity else 1
+    dual=2*len(query.optimal_sensitivity.steps) if query.optimal_sensitivity else 0
+    count = models*branches+dual+(0 if query.optimal_sensitivity else 1)
     remaining = max(0, spec['budgets']['mathematical_evaluations']-used)
     reasons = []
-    if spec.get('canonical_task',{}).get('family')=='task.tracking':
-        controller=spec.get('configuration',{}).get('policy',{}).get('controller',{})
-        reasons.append('TRACKING_FORMAL_ADMISSION_UNSUPPORTED_INTERNAL_PATH_COST_ACCOUNTING'
-            if (controller.get('extension_id'),controller.get('version'))==('controller.gvs_nmpc','12.0.0')
-            else 'TRACKING_ROBOT_MODEL_CONSTRUCTION_UNSUPPORTED')
+    if requirements is None and spec.get('canonical_task'):
+        reasons.append('TASK_REQUIREMENTS_REQUIRED_FOR_INTERNAL_SOLVE_ACCOUNTING')
     if any(not methods.get(m) for m in required):
         reasons.append('EXPLICIT_FROZEN_MATHEMATICAL_METHOD_AUTHORIZATION_REQUIRED')
     environment = dependencies()
@@ -101,23 +110,23 @@ def method_admission(spec, query, used=0):
         model_reuse_status='requires_saved_context_validation' if query.optimal_sensitivity else 'not_requested',
         required_candidate=plain(query.candidate),
         required_model_results=[plain(r) for r in query.optimal_sensitivity.model_results] if query.optimal_sensitivity else [],
-        capability_solves=len(query.optimal_sensitivity.model_results) if query.optimal_sensitivity else 1,
-        dual_face_solves=2*len(query.optimal_sensitivity.steps) if query.optimal_sensitivity else 0,
+        capability_solves=models*branches,kernel_subproblems_per_model=branches,
+        dual_face_solves=dual,
         environment=environment, accounting='Reserve all planned solve attempts; failures and unused reserved attempts remain spent; receipt reuse costs zero.',
         alternatives=['Read existing registered evidence without a new solve.',
             'Request an already authorized SLSQP analysis if its budget fits.',
             'Obtain separately authorized candidate models, optional dependencies or a new Study grant.'])
 
 
-def sensitivity_cost(steps, reused, remaining, *, conic_authorized=False):
+def sensitivity_cost(steps, reused, remaining, *, conic_authorized=False, subproblems=1):
     """Planning only: reuse counts must come from validated complete stencils."""
-    required=1+2*steps;kernel=1+4*steps
+    required=1+2*steps;kernel=required*subproblems+2*steps
     missing=None if reused is None else required-reused
     methods=[dict(operation='linearization',evaluations=1)]
-    if conic_authorized:methods.append(dict(operation='task_capability',method=CONIC,evaluations=2))
+    if conic_authorized:methods.append(dict(operation='task_capability',method=CONIC,evaluations=1+subproblems))
     totals=[kernel+missing*m['evaluations'] for m in methods] if missing is not None else None
     return dict(required_models=required,validated_reusable_models=reused,missing_models=missing,
-        kernel_evaluations=kernel,preparation_methods=methods,remaining_total_range=totals,
+        kernel_evaluations=kernel,kernel_subproblems_per_model=subproblems,preparation_methods=methods,remaining_total_range=totals,
         budget_sufficient=None if totals is None else remaining>=max(totals),
         wall_cost='unknown',other_budgets='Candidate generation, Provider and physical launches are separate.',
         assumptions='Preparation methods require their own task/model admission; no automatic generation or solve.')
@@ -128,6 +137,9 @@ def candidate_methods(host, reference):
     from tools.research.design import verify_candidate, parameter_value
     from tools.research.contracts import AnalysisRequest
     s=state(host);spec=s['spec'];candidate=verify_candidate(host,reference)
+    from tools.research.task_constraints import describe_analysis_requirements
+    requirements=describe_analysis_requirements(candidate['configuration'],{})
+    branches=conic_subproblems(requirements)
     methods=spec.get('mathematical_methods',{});remaining=max(0,spec['budgets']['mathematical_evaluations']-s.get('mathematical_evaluations',0))
     variables=(spec.get('family_sensitivity_variables',{}).get('variables',[]) if spec.get('start_mode')=='family_space'
         else [p for p in spec['allowed_parameters'] if p.endswith(('.length_m','.young_pa'))])
@@ -165,9 +177,9 @@ def candidate_methods(host, reference):
                             operating_point=raw['requested_operation']['operating_point'],protocol=spec['analysis_protocol'],
                             capability_method=CONIC,optimal_sensitivity=dict(variable=variable,steps=steps,model_results=refs)))
                         sensitivity_context(host,query)
-                        fit=method_admission(spec,query,s.get('mathematical_evaluations',0))
+                        fit=method_admission(spec,query,s.get('mathematical_evaluations',0),requirements=requirements)
                         row['ready_stencils'].append(dict(request=plain(query),admission=fit,
-                            cost=sensitivity_cost(k,len(refs),remaining,conic_authorized=bool(methods.get(CONIC)))))
+                            cost=sensitivity_cost(k,len(refs),remaining,conic_authorized=bool(methods.get(CONIC)),subproblems=branches)))
                     except (ValueError,KeyError) as exc:
                         if str(exc) not in row['rejections']:row['rejections'].append(str(exc))
         if row['ready_stencils']:
@@ -176,13 +188,13 @@ def candidate_methods(host, reference):
     reasons=[]
     if not all(methods.get(m) for m in (CONIC,SENSITIVITY)):reasons.append('method_not_authorized')
     if not dependencies()['available']:reasons.append('worker_dependency_unavailable')
-    if remaining<5:reasons.append('insufficient_budget')
+    if remaining<3*branches+2:reasons.append('insufficient_budget')
     if not variables:reasons.append('no_authorized_continuous_variable')
     if not any(r['ready_stencils'] for r in rows):reasons.append('missing_validated_model_stencil')
     return dict(method=SENSITIVITY,status='executable' if not reasons and any(r['status']=='executable' for r in rows) else 'not_applicable',
         reasons=reasons,variables=rows,remaining_evaluations=remaining,
-        planning=[sensitivity_cost(k,None,remaining,conic_authorized=bool(methods.get(CONIC))) for k in (1,2)],
-        from_zero_examples=[sensitivity_cost(k,0,remaining,conic_authorized=bool(methods.get(CONIC))) for k in (1,2)])
+        planning=[sensitivity_cost(k,None,remaining,conic_authorized=bool(methods.get(CONIC)),subproblems=branches) for k in (1,2)],
+        from_zero_examples=[sensitivity_cost(k,0,remaining,conic_authorized=bool(methods.get(CONIC)),subproblems=branches) for k in (1,2)])
 
 
 def sensitivity_context(host, query):
@@ -245,7 +257,7 @@ def sensitivity_context(host, query):
         inp=SessionInput.model_validate(cfg)
         req=describe_analysis_requirements(inp,binding)
         if plain(req)!=raw['task_analysis']:raise ValueError('FROZEN_TASK_REQUIREMENT_MISMATCH')
-        applicability=check_analysis_applicability(req,query,model_assessment(inp,req,query.operation),model=m)
+        applicability=check_analysis_applicability(req,query,model_assessment(inp,req,query.operation,model=m),model=m)
         if applicability['status']=='not_applicable':raise ValueError('MODEL_NOT_APPLICABLE_TO_FROZEN_TASK')
         points.append(dict(value=value,parameters=parameters,model=plain(m),requirements=plain(req),
             initial_delta=None,source_reference=dict(reference=reference,pointer='/model'),construction_s=0.,

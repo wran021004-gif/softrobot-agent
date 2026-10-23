@@ -31,7 +31,10 @@ class ResearchTaskAdapter:
 
     def ranking_limits(self):
         if self.task['family']=='task.tracking':
-            return dict(max_position_error=self.task['evaluator']['parameters']['data']['max_error_m'])
+            names=['max_position_error']
+            if self.task['goal']['data']['time_requirement']=='none':
+                names+=['path_coverage_error','terminal_position_error','progress_regression']
+            return dict.fromkeys(names,self.task['evaluator']['parameters']['data']['max_error_m'])
         settling=self.configuration['policy']['controller']['parameters']['data']['settling']
         return dict(terminal_error_m=self.task['evaluator']['parameters']['data']['tolerance_m'],
             holding_max_error_m=settling['position_limit_m'],holding_max_speed_m_s=settling['speed_limit_m_s'])
