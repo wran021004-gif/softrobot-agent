@@ -23,6 +23,17 @@ class DeliveryTests(unittest.TestCase):
         self.f=fixtures.MainlineTests();self.f.setUp();self.addCleanup(self.f.doCleanups)
         self.h=self.f.h
 
+    def test_source_relative_candidate_counts_use_actual_structure(self):
+        from tools.research.research_context import context
+        candidate=deepcopy(self.h.store.artifact(self.f.base['candidate']))
+        candidate['resolved_parameters'].pop('tendons',None)
+        ref=save(self.h,candidate,'source_relative_candidate_fixture')
+        update(self.h,candidates={candidate['identity']:ref})
+        row=context(self.h)['evidence_working_set']['candidate_index'][0]
+        self.assertEqual(row['structure'],dict(segments=2,tendons=6))
+        self.assertEqual(row['resolved_facts']['tendon_order'],
+            [t['id'] for t in candidate['configuration']['robot']['structure']['data']['tendons']])
+
     def test_both_conic_versions_through_complete_projection_chain(self):
         saved=json.loads(Path('evidence/s132_tracking/validation.json').read_text(encoding='utf-8'))
         for path in (None,'free','bend','diagonal_cannot_follow_bend'):

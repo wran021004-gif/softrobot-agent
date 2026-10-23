@@ -32,3 +32,9 @@ Reach 终端/保持语义分离、由真实物理输出派生 Reach 诊断。
 
 结果将在同一 Study 完成或明确阻塞后追加。原始执行只保存于忽略的
 `runs/research/s142-reach-hold-coldstart-20261023`，不声称存在公开原始归档。
+
+启动时发现并最小修复一项生产缺陷：`working_set` 错把 family-space 的
+`resolved_parameters.tendons` 当作所有候选必填项，导致 source-relative 新 Study
+在 prepare 已保存后打印状态失败。现改为从候选实际 robot configuration 读取
+柔性段与腱数量，其他身份/准入不变。一项新回归与原候选方法视图测试通过（共 2 项）。
+随后 status 成功；同一 Store 得以保留，无科学执行、未 bind，不需要 implementation migrate。
