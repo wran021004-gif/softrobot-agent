@@ -1,0 +1,1409 @@
+{
+  "version": "s141-model-validity-v1",
+  "cases": {
+    "baseline": {
+      "points": [
+        {
+          "name": "controller_start_input",
+          "x": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "u": [
+            0.2,
+            0.2,
+            0.2,
+            0.2,
+            0.2,
+            0.2
+          ],
+          "available": true,
+          "phase": "configuration_controller_start_input",
+          "scope": "controller-start input",
+          "remaining_task_s": 0.35,
+          "actual_time_s": null,
+          "construction": {
+            "method": "existing immutable controller preparation/numerical-source logic",
+            "position_residual_m": 0.05981519205644435,
+            "achieved_world_point_m": [
+              0.29799999999999993,
+              0.0,
+              0.15
+            ],
+            "static_equilibrium": false,
+            "numerical_source": "initial_state_pretension",
+            "preparation_provenance": {
+              "source_kind": "project_initial_state_and_bounded_pretension",
+              "reused": false,
+              "nominal_is_current_target_solution": false,
+              "historical_states_reused": false,
+              "current_scope": {
+                "robot": {
+                  "family": "tendon_robot_family",
+                  "identity": "0b451044ae9fec9e63965f429e833e1ed29b8b8d7c630c08fae1f38449273afd"
+                },
+                "task": {
+                  "family": "task.reach",
+                  "identity": "1dfab4ed875904605b4ddccda8e0da7c68a83b6278b5a3d976db07f7fa7fb3d8",
+                  "environment": "5cee25b33f4ff19cb0abd93651ce9077a81665990f07d8f5a4967497e8e82a4d",
+                  "goal": "d309c11b1e71b34c8258b9450a9de3ff9f9b6d27a3feab8d5c46272f620aede9",
+                  "timing": {
+                    "timestep_s": 0.0005,
+                    "control_period_s": 0.01,
+                    "sample_period_s": 0.01,
+                    "duration_s": 0.35,
+                    "termination": [
+                      "duration",
+                      "numerical_failure"
+                    ]
+                  },
+                  "initializer": "ba01ba2b4441884d50bf9b7c54c572abd79d5b7bec57aed27708b63a75406930"
+                },
+                "backend": {
+                  "extension_id": "backend.family_mujoco",
+                  "version": "1.1.0",
+                  "parameters": {
+                    "contract": "family.mujoco_parameters",
+                    "version": "1.0.0",
+                    "data": {
+                      "contact_model": "mujoco_convex_native",
+                      "friction": [
+                        0.0,
+                        0.0,
+                        0.0
+                      ],
+                      "integrator": "implicitfast",
+                      "timestep_source": "task.timing.timestep_s"
+                    }
+                  }
+                },
+                "execution_model": {
+                  "extension_id": "model.serial_bending_cells",
+                  "version": "1.0.0",
+                  "parameters": {
+                    "contract": "family.dynamics_model",
+                    "version": "1.0.0",
+                    "data": {}
+                  }
+                },
+                "discretization": {
+                  "contract": "family.discretization",
+                  "version": "1.0.0",
+                  "data": {
+                    "version": "serial_bending_discretization_v1",
+                    "model": "serial_bending_cells_v1",
+                    "cells": {
+                      "distal1": 12,
+                      "near": 12
+                    },
+                    "coordinates": "two_principal_bending_angles_per_cell"
+                  }
+                },
+                "controller": {
+                  "extension_id": "controller.gvs_nmpc",
+                  "version": "11.0.0",
+                  "parameters": {
+                    "contract": "family.gvs_reach_control",
+                    "version": "1.0.0",
+                    "data": {
+                      "numerical_source": "initial_state_pretension",
+                      "recipe": {
+                        "basis": {
+                          "strategy": "structural_linear"
+                        },
+                        "constraint_jacobian_mode": "reverse",
+                        "curvature_scale_rad_m": 10.0,
+                        "evaluation_threads": 1,
+                        "feasible_return": null,
+                        "holding_brake_lead_s": 0.0,
+                        "holding_speed_cost_mode": "time_integral_v1",
+                        "holding_speed_cost_window_s": 0.05,
+                        "holding_tip_speed_weight": 0.1,
+                        "horizon": 10,
+                        "integration_method": "implicit_euler",
+                        "max_cpu_s": null,
+                        "max_iterations": 120,
+                        "max_unusable_updates": 3,
+                        "position_error_scale_m": null,
+                        "rate_scale_rad_m_s": 1000.0,
+                        "recover_returned_tensions": true,
+                        "regenerate_warm_states": true,
+                        "root_tolerance": 1e-10,
+                        "seed_position_tolerance_fraction": 0.5,
+                        "seed_speed_limit_m_s": 0.02,
+                        "stopping_policy": "research_work_v1",
+                        "substeps": 1,
+                        "tension_weight": 0.0001,
+                        "terminal_tip_speed_weight": 0.1,
+                        "terminal_velocity_weight": 0.0001,
+                        "terminal_weight": 5.0,
+                        "tip_speed_scale_m_s": 0.02,
+                        "tolerance": 1e-06,
+                        "tracking_weight": 1.0,
+                        "variation_weight": 0.001,
+                        "velocity_weight": 0.0001
+                      },
+                      "settling": {
+                        "position_limit_m": 0.01,
+                        "speed_limit_m_s": 0.02,
+                        "window_s": 0.05
+                      }
+                    }
+                  }
+                },
+                "seed": 17
+              },
+              "physics_identity": "ff8127ff7de43b039544d8c5c2f4534bee17057b3a81fb6efe78eda9f12a19f5",
+              "resolved_basis_identity": "ca1a49e5a421b0480f5e5e9e235dba07e38a89dbd6f56dd8f42483087ef3238b",
+              "actual_initial_state_source": "Candidate Task initializer then measured backend state at every update",
+              "previous_input_source": "candidate bounded pretension",
+              "validity": "Tensions are numerical guesses; placeholder states must be regenerated using candidate dynamics before use"
+            },
+            "execution_trajectory_used": false
+          }
+        },
+        {
+          "name": "target_equilibrium",
+          "available": false,
+          "scope": "target-associated static attempt",
+          "construction": {
+            "method": "single bounded-tension target-associated static SLSQP attempt; no recovery",
+            "solver": "scipy.optimize.SLSQP",
+            "success": false,
+            "status": 9,
+            "message": "Iteration limit reached",
+            "iterations": 20,
+            "maximum_iterations": 20,
+            "computed_tensions_n": [
+              5.4737863196148036,
+              4.713835546235042,
+              0.0,
+              0.28360558551893883,
+              0.3683964804908587,
+              0.08724564518000043
+            ],
+            "requested_world_point_m": [
+              0.2907183987136125,
+              0.041981159366169266,
+              0.19198115936616927
+            ],
+            "achieved_world_point_m": [
+              0.29038250672557875,
+              0.041925508088748606,
+              0.19192028837780487
+            ],
+            "position_residual_m": 0.00034586958456659837,
+            "position_limit_m": 0.01,
+            "static_residual_inf": 4.6396938548076694e-10,
+            "static_force_tolerance": 1e-10,
+            "tension_bounds_n": [
+              [
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0
+              ],
+              [
+                8.0,
+                8.0,
+                8.0,
+                8.0,
+                8.0,
+                8.0
+              ]
+            ],
+            "q_bounds": "unbounded, matching existing GVS inverse-static authorization",
+            "execution_data_used": false
+          },
+          "reason": "Target-associated equilibrium unavailable within the frozen single-attempt limits."
+        },
+        {
+          "name": "halfway_waypoint",
+          "available": false,
+          "scope": "geometric intermediate point",
+          "construction": {
+            "method": "single bounded-evaluation inverse-kinematic least-squares attempt at fixed halfway world point",
+            "solver": "scipy.optimize.least_squares",
+            "success": false,
+            "status": 0,
+            "function_evaluations": 20,
+            "maximum_evaluations": 20,
+            "requested_world_point_m": [
+              0.2943591993568062,
+              0.020990579683084633,
+              0.17099057968308462
+            ],
+            "achieved_world_point_m": [
+              0.29435919602050786,
+              0.020990579329836077,
+              0.17099057932983605
+            ],
+            "position_residual_m": 3.3734931102840634e-09,
+            "static_equilibrium": false,
+            "input_source": "family.design.tendons[].pretension_n",
+            "execution_data_used": false
+          },
+          "reason": "Geometric intermediate construction unavailable within the frozen single-attempt limits."
+        }
+      ],
+      "saved_witness_geometry": {
+        "max_m": 0.012724014007654019,
+        "holding_max_m": 0.012230320664022956,
+        "terminal_m": 0.011793108424726419,
+        "exact_world_m": [
+          [
+            0.29799376639467645,
+            -0.0006481724722693224,
+            0.1494451627964725
+          ],
+          [
+            0.29795485562739676,
+            -0.0018903603734070113,
+            0.1478625569004107
+          ],
+          [
+            0.2978652917650391,
+            -0.0033542468217007577,
+            0.14536165468149176
+          ],
+          [
+            0.2977140228306839,
+            -0.004886595242163489,
+            0.1421065497511261
+          ],
+          [
+            0.2974902541276307,
+            -0.0064057047785207755,
+            0.13830508489598262
+          ],
+          [
+            0.2971881389506736,
+            -0.007842075566141998,
+            0.1341870755227212
+          ],
+          [
+            0.29681253567747273,
+            -0.009123778222910117,
+            0.12998350756303434
+          ],
+          [
+            0.29638149173051326,
+            -0.010175386681892716,
+            0.125914042977471
+          ],
+          [
+            0.2959250262078042,
+            -0.010920653900681348,
+            0.12218114654350865
+          ],
+          [
+            0.2954807696637986,
+            -0.011288106789661297,
+            0.11896498736607965
+          ],
+          [
+            0.29508793461811217,
+            -0.011215455055191073,
+            0.11641952979838671
+          ],
+          [
+            0.29478058757936454,
+            -0.010654091575437707,
+            0.11467166556297756
+          ],
+          [
+            0.2945815181676468,
+            -0.009573495214908797,
+            0.11381991656263506
+          ],
+          [
+            0.29449765594997407,
+            -0.007963078132478037,
+            0.11393350600121842
+          ],
+          [
+            0.2945172912034171,
+            -0.005832175414721621,
+            0.11505210586983644
+          ],
+          [
+            0.29461001989875507,
+            -0.0032104515161415067,
+            0.11718573925091003
+          ],
+          [
+            0.29472800556213885,
+            -0.0001470892994626285,
+            0.12031786532204021
+          ],
+          [
+            0.29480908863323696,
+            0.003291560572277253,
+            0.12440740640443622
+          ],
+          [
+            0.29478144199137934,
+            0.0070232540177689725,
+            0.12939311215790877
+          ],
+          [
+            0.29457838869630504,
+            0.010955425987912375,
+            0.13516652909775834
+          ],
+          [
+            0.29415401215422354,
+            0.014993008704156355,
+            0.14155184532648932
+          ],
+          [
+            0.2934907418664001,
+            0.01904595027327048,
+            0.14832375807553674
+          ],
+          [
+            0.29259414702782,
+            0.02300356572594516,
+            0.15525621291834496
+          ],
+          [
+            0.2914770466028032,
+            0.026749730780629335,
+            0.162165624670634
+          ],
+          [
+            0.2901669729698079,
+            0.030172140884170046,
+            0.16889391937429374
+          ],
+          [
+            0.2887061038142773,
+            0.03319698060693149,
+            0.17529576862821578
+          ],
+          [
+            0.2871898695212053,
+            0.03580473271456051,
+            0.18118288599763893
+          ],
+          [
+            0.2859018199608698,
+            0.03797732161214129,
+            0.18616642920332552
+          ],
+          [
+            0.28551092897944924,
+            0.03953133972124731,
+            0.18942133363827082
+          ],
+          [
+            0.285975028841982,
+            0.040216602934020955,
+            0.19061478000479648
+          ],
+          [
+            0.28659317134089746,
+            0.040378299481934006,
+            0.1907655811319413
+          ],
+          [
+            0.2868492877493948,
+            0.04044616670180225,
+            0.19083793859799875
+          ],
+          [
+            0.2868629442079019,
+            0.04045323896604713,
+            0.19085431469063652
+          ],
+          [
+            0.28670104611167835,
+            0.04041667486461887,
+            0.19082735769032963
+          ],
+          [
+            0.2863854182095775,
+            0.04034215209644246,
+            0.19075945643517755
+          ]
+        ],
+        "affine_world_m": [
+          [
+            0.29799999999999993,
+            -0.0006481947508540687,
+            0.1494451614442986
+          ],
+          [
+            0.29799999999999993,
+            -0.001890711972992828,
+            0.14786231389878243
+          ],
+          [
+            0.29799999999999993,
+            -0.003355760058884192,
+            0.14535974688282202
+          ],
+          [
+            0.29799999999999993,
+            -0.004890455591349579,
+            0.14209978560803468
+          ],
+          [
+            0.29799999999999993,
+            -0.006413298483303191,
+            0.13828861280717517
+          ],
+          [
+            0.29799999999999993,
+            -0.007854993976694962,
+            0.13415475777781527
+          ],
+          [
+            0.29799999999999993,
+            -0.009143795466376867,
+            0.12992856187754448
+          ],
+          [
+            0.29799999999999993,
+            -0.01020425738220994,
+            0.12583009361677414
+          ],
+          [
+            0.29799999999999993,
+            -0.010959730627563951,
+            0.12206364433979043
+          ],
+          [
+            0.29799999999999993,
+            -0.011337884975441631,
+            0.11881265202355436
+          ],
+          [
+            0.29799999999999993,
+            -0.011275165198955137,
+            0.116235349414408
+          ],
+          [
+            0.29799999999999993,
+            -0.010721455047473464,
+            0.11446305206447216
+          ],
+          [
+            0.29799999999999993,
+            -0.009644640047262277,
+            0.11359788111327238
+          ],
+          [
+            0.29799999999999993,
+            -0.008032533588096327,
+            0.11371107884123494
+          ],
+          [
+            0.29799999999999993,
+            -0.00589280780501575,
+            0.11484244732377831
+          ],
+          [
+            0.29799999999999993,
+            -0.0032531621237242,
+            0.11700055827058087
+          ],
+          [
+            0.29799999999999993,
+            -0.00016020993398711665,
+            0.1201667045407534
+          ],
+          [
+            0.29799999999999993,
+            0.003323354646603374,
+            0.12429829333153097
+          ],
+          [
+            0.29799999999999993,
+            0.007120522933401227,
+            0.12933486282835172
+          ],
+          [
+            0.29799999999999993,
+            0.01114521565030235,
+            0.13517179490337716
+          ],
+          [
+            0.29799999999999993,
+            0.015308027666327037,
+            0.14163895238423113
+          ],
+          [
+            0.29799999999999993,
+            0.019521410887011932,
+            0.14851629249367018
+          ],
+          [
+            0.29799999999999993,
+            0.023672897519820598,
+            0.15558237937697153
+          ],
+          [
+            0.29799999999999993,
+            0.027642737398631625,
+            0.1626593537742562
+          ],
+          [
+            0.29799999999999993,
+            0.031313868495190536,
+            0.16959412522923184
+          ],
+          [
+            0.29799999999999993,
+            0.03460664475542201,
+            0.17624309988931713
+          ],
+          [
+            0.29799999999999993,
+            0.03748649353184105,
+            0.18240420693156142
+          ],
+          [
+            0.29799999999999993,
+            0.03987868993864081,
+            0.18762355928382557
+          ],
+          [
+            0.29799999999999993,
+            0.04145412547815056,
+            0.19091349061515583
+          ],
+          [
+            0.29799999999999993,
+            0.041981234105161185,
+            0.19198112147877147
+          ],
+          [
+            0.29799999999999993,
+            0.04198115936103305,
+            0.1919811593428707
+          ],
+          [
+            0.29799999999999993,
+            0.041981157331566606,
+            0.19198115715572284
+          ],
+          [
+            0.29799999999999993,
+            0.041981159501081736,
+            0.19198115956943995
+          ],
+          [
+            0.29799999999999993,
+            0.04198115935714663,
+            0.19198115930091364
+          ],
+          [
+            0.29799999999999993,
+            0.04198115932769701,
+            0.19198115666307175
+          ]
+        ]
+      },
+      "straight_jacobian_singular_values": [
+        0.022111772880133957,
+        0.022111772880133954,
+        0.0
+      ],
+      "current_vs_saved_linearization": {
+        "A_max_abs": 0.0,
+        "B_max_abs": 0.0
+      },
+      "local": {}
+    },
+    "near_shorter": {
+      "points": [
+        {
+          "name": "controller_start_input",
+          "x": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "u": [
+            0.2,
+            0.2,
+            0.2,
+            0.2,
+            0.2,
+            0.2
+          ],
+          "available": true,
+          "phase": "configuration_controller_start_input",
+          "scope": "controller-start input",
+          "remaining_task_s": 0.35,
+          "actual_time_s": null,
+          "construction": {
+            "method": "existing immutable controller preparation/numerical-source logic",
+            "position_residual_m": 0.05981519205644436,
+            "achieved_world_point_m": [
+              0.29800000000000004,
+              0.0,
+              0.15
+            ],
+            "static_equilibrium": false,
+            "numerical_source": "initial_state_pretension",
+            "preparation_provenance": {
+              "source_kind": "project_initial_state_and_bounded_pretension",
+              "reused": false,
+              "nominal_is_current_target_solution": false,
+              "historical_states_reused": false,
+              "current_scope": {
+                "robot": {
+                  "family": "tendon_robot_family",
+                  "identity": "779111c0cdd1bb505fa0e4ff3713020a09d757278c512f0c3f5b37273a413611"
+                },
+                "task": {
+                  "family": "task.reach",
+                  "identity": "3a443fe9c6d483d95dc1519de00cabb9cea39b19e148f910ee41f78b6bf82c37",
+                  "environment": "5cee25b33f4ff19cb0abd93651ce9077a81665990f07d8f5a4967497e8e82a4d",
+                  "goal": "d309c11b1e71b34c8258b9450a9de3ff9f9b6d27a3feab8d5c46272f620aede9",
+                  "timing": {
+                    "timestep_s": 0.0005,
+                    "control_period_s": 0.01,
+                    "sample_period_s": 0.01,
+                    "duration_s": 0.35,
+                    "termination": [
+                      "duration",
+                      "numerical_failure"
+                    ]
+                  },
+                  "initializer": "ba01ba2b4441884d50bf9b7c54c572abd79d5b7bec57aed27708b63a75406930"
+                },
+                "backend": {
+                  "extension_id": "backend.family_mujoco",
+                  "version": "1.1.0",
+                  "parameters": {
+                    "contract": "family.mujoco_parameters",
+                    "version": "1.0.0",
+                    "data": {
+                      "contact_model": "mujoco_convex_native",
+                      "friction": [
+                        0.0,
+                        0.0,
+                        0.0
+                      ],
+                      "integrator": "implicitfast",
+                      "timestep_source": "task.timing.timestep_s"
+                    }
+                  }
+                },
+                "execution_model": {
+                  "extension_id": "model.serial_bending_cells",
+                  "version": "1.0.0",
+                  "parameters": {
+                    "contract": "family.dynamics_model",
+                    "version": "1.0.0",
+                    "data": {}
+                  }
+                },
+                "discretization": {
+                  "contract": "family.discretization",
+                  "version": "1.0.0",
+                  "data": {
+                    "version": "serial_bending_discretization_v1",
+                    "model": "serial_bending_cells_v1",
+                    "cells": {
+                      "distal1": 12,
+                      "near": 12
+                    },
+                    "coordinates": "two_principal_bending_angles_per_cell"
+                  }
+                },
+                "controller": {
+                  "extension_id": "controller.gvs_nmpc",
+                  "version": "11.0.0",
+                  "parameters": {
+                    "contract": "family.gvs_reach_control",
+                    "version": "1.0.0",
+                    "data": {
+                      "numerical_source": "initial_state_pretension",
+                      "recipe": {
+                        "basis": {
+                          "strategy": "structural_linear"
+                        },
+                        "constraint_jacobian_mode": "reverse",
+                        "curvature_scale_rad_m": 10.0,
+                        "evaluation_threads": 1,
+                        "feasible_return": null,
+                        "holding_brake_lead_s": 0.0,
+                        "holding_speed_cost_mode": "time_integral_v1",
+                        "holding_speed_cost_window_s": 0.05,
+                        "holding_tip_speed_weight": 0.1,
+                        "horizon": 10,
+                        "integration_method": "implicit_euler",
+                        "max_cpu_s": null,
+                        "max_iterations": 120,
+                        "max_unusable_updates": 3,
+                        "position_error_scale_m": null,
+                        "rate_scale_rad_m_s": 1000.0,
+                        "recover_returned_tensions": true,
+                        "regenerate_warm_states": true,
+                        "root_tolerance": 1e-10,
+                        "seed_position_tolerance_fraction": 0.5,
+                        "seed_speed_limit_m_s": 0.02,
+                        "stopping_policy": "research_work_v1",
+                        "substeps": 1,
+                        "tension_weight": 0.0001,
+                        "terminal_tip_speed_weight": 0.1,
+                        "terminal_velocity_weight": 0.0001,
+                        "terminal_weight": 5.0,
+                        "tip_speed_scale_m_s": 0.02,
+                        "tolerance": 1e-06,
+                        "tracking_weight": 1.0,
+                        "variation_weight": 0.001,
+                        "velocity_weight": 0.0001
+                      },
+                      "settling": {
+                        "position_limit_m": 0.01,
+                        "speed_limit_m_s": 0.02,
+                        "window_s": 0.05
+                      }
+                    }
+                  }
+                },
+                "seed": 17
+              },
+              "physics_identity": "26f83b9e96f43ac0206bd961201e5e0e8241648614c47740bb9ab89c5cb5367a",
+              "resolved_basis_identity": "f82c4c81a9d5a43df7d58f555b21c9ea7a2fc38e8ba405f97c54131def04ca8d",
+              "actual_initial_state_source": "Candidate Task initializer then measured backend state at every update",
+              "previous_input_source": "candidate bounded pretension",
+              "validity": "Tensions are numerical guesses; placeholder states must be regenerated using candidate dynamics before use"
+            },
+            "execution_trajectory_used": false
+          }
+        },
+        {
+          "name": "target_equilibrium",
+          "available": false,
+          "scope": "target-associated static attempt",
+          "construction": {
+            "method": "single bounded-tension target-associated static SLSQP attempt; no recovery",
+            "solver": "scipy.optimize.SLSQP",
+            "success": false,
+            "status": 9,
+            "message": "Iteration limit reached",
+            "iterations": 20,
+            "maximum_iterations": 20,
+            "computed_tensions_n": [
+              5.610497615625872,
+              4.787589614866717,
+              0.06831473885885117,
+              0.38217567084851684,
+              0.4498034313265656,
+              0.13397704040222397
+            ],
+            "requested_world_point_m": [
+              0.2907183987136125,
+              0.041981159366169266,
+              0.19198115936616927
+            ],
+            "achieved_world_point_m": [
+              0.29048115879857905,
+              0.04193259348674931,
+              0.19193759227683474
+            ],
+            "position_residual_m": 0.0002460477864196094,
+            "position_limit_m": 0.01,
+            "static_residual_inf": 5.317001153595791e-09,
+            "static_force_tolerance": 1e-10,
+            "tension_bounds_n": [
+              [
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0
+              ],
+              [
+                8.0,
+                8.0,
+                8.0,
+                8.0,
+                8.0,
+                8.0
+              ]
+            ],
+            "q_bounds": "unbounded, matching existing GVS inverse-static authorization",
+            "execution_data_used": false
+          },
+          "reason": "Target-associated equilibrium unavailable within the frozen single-attempt limits."
+        },
+        {
+          "name": "halfway_waypoint",
+          "available": false,
+          "scope": "geometric intermediate point",
+          "construction": {
+            "method": "single bounded-evaluation inverse-kinematic least-squares attempt at fixed halfway world point",
+            "solver": "scipy.optimize.least_squares",
+            "success": false,
+            "status": 0,
+            "function_evaluations": 20,
+            "maximum_evaluations": 20,
+            "requested_world_point_m": [
+              0.29435919935680627,
+              0.020990579683084633,
+              0.17099057968308462
+            ],
+            "achieved_world_point_m": [
+              0.2943583118269199,
+              0.020990486252461533,
+              0.17099048625246152
+            ],
+            "position_residual_m": 8.973114631225655e-07,
+            "static_equilibrium": false,
+            "input_source": "family.design.tendons[].pretension_n",
+            "execution_data_used": false
+          },
+          "reason": "Geometric intermediate construction unavailable within the frozen single-attempt limits."
+        }
+      ],
+      "saved_witness_geometry": {
+        "max_m": 0.01286318118756422,
+        "holding_max_m": 0.012380096686568158,
+        "terminal_m": 0.01191567132813045,
+        "exact_world_m": [
+          [
+            0.2979939439452515,
+            -0.0006297980246044621,
+            0.14948906454538757
+          ],
+          [
+            0.29795593086973315,
+            -0.0018360860717838226,
+            0.14799656164795616
+          ],
+          [
+            0.29786869889518053,
+            -0.0032580399465524795,
+            0.14560866396686736
+          ],
+          [
+            0.2977224040505129,
+            -0.004745894740006102,
+            0.14248039509412647
+          ],
+          [
+            0.29750761368014256,
+            -0.0062182295101590145,
+            0.13881499372956002
+          ],
+          [
+            0.29721940912006595,
+            -0.007605547298017927,
+            0.1348386499374491
+          ],
+          [
+            0.29686275410134605,
+            -0.00883713880537448,
+            0.1307780233552674
+          ],
+          [
+            0.2964549033502048,
+            -0.009839341754350714,
+            0.12684833447930777
+          ],
+          [
+            0.29602428999079494,
+            -0.010537670888310076,
+            0.12324786229643916
+          ],
+          [
+            0.295606342998348,
+            -0.010862493326749354,
+            0.12015287066721161
+          ],
+          [
+            0.29523774600634634,
+            -0.010753200120836887,
+            0.11771400665755807
+          ],
+          [
+            0.2949499953863734,
+            -0.010162799285393914,
+            0.11605540518848242
+          ],
+          [
+            0.29476361207309804,
+            -0.009062091240446723,
+            0.115273350345269
+          ],
+          [
+            0.2946836705744326,
+            -0.007441177573772917,
+            0.11543521155788551
+          ],
+          [
+            0.29469755587841406,
+            -0.005309634679228761,
+            0.11657920505388547
+          ],
+          [
+            0.29477468973510146,
+            -0.002697548415667568,
+            0.1187154153468992
+          ],
+          [
+            0.29486744870360887,
+            0.00034609614643745944,
+            0.12182824245544922
+          ],
+          [
+            0.2949147886263828,
+            0.00375544934605084,
+            0.12587838915219657
+          ],
+          [
+            0.29484588963684,
+            0.007449371243399557,
+            0.13080916126674091
+          ],
+          [
+            0.29459639274713434,
+            0.011337357369072246,
+            0.1365135478580309
+          ],
+          [
+            0.29412207193982165,
+            0.015327041309515774,
+            0.1428189019792203
+          ],
+          [
+            0.2934113537200825,
+            0.01933329305527335,
+            0.14949380028284673
+          ],
+          [
+            0.29247086411934897,
+            0.023247950186856527,
+            0.15631426223083522
+          ],
+          [
+            0.2913148988950558,
+            0.026955372975929617,
+            0.1630998371792748
+          ],
+          [
+            0.2899770368767966,
+            0.030340036481863564,
+            0.16968676883688893
+          ],
+          [
+            0.28850373075704444,
+            0.03332727522471401,
+            0.1759248970965851
+          ],
+          [
+            0.28699432101479244,
+            0.03589472295955766,
+            0.18162488183377895
+          ],
+          [
+            0.2857321168986807,
+            0.038019665920135524,
+            0.18640819089899835
+          ],
+          [
+            0.28537680680034744,
+            0.039521561100139574,
+            0.1894799136920913
+          ],
+          [
+            0.28583096651389067,
+            0.040176634515365725,
+            0.19059369449559482
+          ],
+          [
+            0.2864290299609314,
+            0.040333441854893286,
+            0.19073987624602678
+          ],
+          [
+            0.286690851298694,
+            0.04040375439698165,
+            0.19081176290831692
+          ],
+          [
+            0.2867205643952401,
+            0.04041586079012605,
+            0.19082932031765448
+          ],
+          [
+            0.28657524403521184,
+            0.040384177476108674,
+            0.1908039238054419
+          ],
+          [
+            0.28626765149347316,
+            0.04031204206006551,
+            0.19073646209647635
+          ]
+        ],
+        "affine_world_m": [
+          [
+            0.29800000000000004,
+            -0.0006298187027331758,
+            0.14948906470248446
+          ],
+          [
+            0.29800000000000004,
+            -0.0018364274467510512,
+            0.1479963486760163
+          ],
+          [
+            0.29800000000000004,
+            -0.003259559728281757,
+            0.14560690361437553
+          ],
+          [
+            0.29800000000000004,
+            -0.004749855624588358,
+            0.1424740532252444
+          ],
+          [
+            0.29800000000000004,
+            -0.006226103227991139,
+            0.13879946244684707
+          ],
+          [
+            0.29800000000000004,
+            -0.007618964841218973,
+            0.13480815483303743
+          ],
+          [
+            0.29800000000000004,
+            -0.008857838195301594,
+            0.13072626756887426
+          ],
+          [
+            0.29800000000000004,
+            -0.00986896963901762,
+            0.12676949728241568
+          ],
+          [
+            0.29800000000000004,
+            -0.010577426679432738,
+            0.12313791814020711
+          ],
+          [
+            0.29800000000000004,
+            -0.01091271279936753,
+            0.12001090282040676
+          ],
+          [
+            0.29800000000000004,
+            -0.01081298582192608,
+            0.11754309196042836
+          ],
+          [
+            0.29800000000000004,
+            -0.010229801652298576,
+            0.11586270322972815
+          ],
+          [
+            0.29800000000000004,
+            -0.009132425988192493,
+            0.1150692916386662
+          ],
+          [
+            0.29800000000000004,
+            -0.007509405959592025,
+            0.11523199871956749
+          ],
+          [
+            0.29800000000000004,
+            -0.0053686382904685834,
+            0.1163890891213627
+          ],
+          [
+            0.29800000000000004,
+            -0.0027381954859948773,
+            0.11854929161178814
+          ],
+          [
+            0.29800000000000004,
+            0.0003356133682906278,
+            0.12169510305394371
+          ],
+          [
+            0.29800000000000004,
+            0.0037907967151334576,
+            0.12578615738942983
+          ],
+          [
+            0.29800000000000004,
+            0.007551738058081989,
+            0.13076711979879932
+          ],
+          [
+            0.29800000000000004,
+            0.01153471702165616,
+            0.1365353170462606
+          ],
+          [
+            0.29800000000000004,
+            0.015653327782266732,
+            0.1429241907980256
+          ],
+          [
+            0.29800000000000004,
+            0.01982471839210405,
+            0.1497071804942343
+          ],
+          [
+            0.29800000000000004,
+            0.023938924094330634,
+            0.1566648364378418
+          ],
+          [
+            0.29800000000000004,
+            0.02787648442565039,
+            0.16362220535832775
+          ],
+          [
+            0.29800000000000004,
+            0.03151595296347261,
+            0.17041936441019626
+          ],
+          [
+            0.29800000000000004,
+            0.03477568667653133,
+            0.17690658328481107
+          ],
+          [
+            0.29800000000000004,
+            0.037617075833527205,
+            0.1828791009385467
+          ],
+          [
+            0.29800000000000004,
+            0.03995993551915828,
+            0.18789268326966876
+          ],
+          [
+            0.29800000000000004,
+            0.04147886808186104,
+            0.19099165873926516
+          ],
+          [
+            0.29800000000000004,
+            0.041981155453722385,
+            0.1919811822129304
+          ],
+          [
+            0.29800000000000004,
+            0.04198115950134783,
+            0.1919811596599152
+          ],
+          [
+            0.29800000000000004,
+            0.041981158715869785,
+            0.19198115861612733
+          ],
+          [
+            0.29800000000000004,
+            0.04198115930429226,
+            0.19198115927019122
+          ],
+          [
+            0.29800000000000004,
+            0.04198115931716591,
+            0.19198115926413817
+          ],
+          [
+            0.29800000000000004,
+            0.04198115929888735,
+            0.19198115859140769
+          ]
+        ]
+      },
+      "straight_jacobian_singular_values": [
+        0.02176697593952091,
+        0.021766975939520906,
+        0.0
+      ],
+      "current_vs_saved_linearization": {
+        "A_max_abs": 0.0,
+        "B_max_abs": 0.0
+      },
+      "local": {}
+    }
+  },
+  "comparisons": {
+    "unavailable": "Neither existing baseline bent construction succeeded; no substitute or recovery attempted."
+  },
+  "budget": {
+    "model_builds": 2,
+    "linearizations": 2,
+    "slsqp_attempts": 2,
+    "least_squares_attempts": 2,
+    "conic_solves": 0,
+    "provider_calls": 0,
+    "mujoco_steps": 0,
+    "nmpc_updates": 0,
+    "ppo_training": 0,
+    "matlab": 0,
+    "formal_studies": 0
+  },
+  "versions": {
+    "numpy": "2.4.6",
+    "scipy": "1.17.1",
+    "casadi": "3.7.2",
+    "cvxpy": "1.9.3",
+    "clarabel": "0.11.1"
+  },
+  "optimizer_returns": [
+    {
+      "kind": "slsqp_attempts",
+      "success": false,
+      "status": 9,
+      "message": "Iteration limit reached",
+      "x": [
+        0.1837114554754605,
+        -1.8513907038162585,
+        -3.4896997517569335,
+        1.5169978695753061,
+        1.2866806230729138,
+        1.011190496065665,
+        2.7535497702765577,
+        0.996574887684568,
+        -0.8870733760245931,
+        -0.5675671992541029,
+        -0.26854273275690094,
+        -0.36508882160561895,
+        5.4737863196148036,
+        4.713835546235042,
+        0.0,
+        0.28360558551893883,
+        0.3683964804908587,
+        0.08724564518000043
+      ],
+      "nfev": 23,
+      "elapsed_s": 4.539204099914059
+    },
+    {
+      "kind": "least_squares_attempts",
+      "success": false,
+      "status": 0,
+      "message": "The maximum number of function evaluations is exceeded.",
+      "x": [
+        1.4098992221628868,
+        -0.9603782451637662,
+        -1.5414657608340294,
+        -1.4098992221628832,
+        0.9603782451637664,
+        1.5414657608340288,
+        -1.0561761234655611,
+        -1.6161422622232895,
+        -0.4333500531154497,
+        1.0561761234655584,
+        1.6161422622232848,
+        0.43335005311544894
+      ],
+      "nfev": 20,
+      "elapsed_s": 0.0296148001216352
+    },
+    {
+      "kind": "slsqp_attempts",
+      "success": false,
+      "status": 9,
+      "message": "Iteration limit reached",
+      "x": [
+        0.06851858703170623,
+        -1.8765006439335574,
+        -3.4712612188852594,
+        1.5407666574908734,
+        1.3255342601060784,
+        1.0555624030906912,
+        2.866421149830232,
+        0.9189696954643306,
+        -1.126774518902916,
+        -0.5793261554031097,
+        -0.2605520527919997,
+        -0.375750638909527,
+        5.610497615625872,
+        4.787589614866717,
+        0.06831473885885117,
+        0.38217567084851684,
+        0.4498034313265656,
+        0.13397704040222397
+      ],
+      "nfev": 23,
+      "elapsed_s": 4.74413640005514
+    },
+    {
+      "kind": "least_squares_attempts",
+      "success": false,
+      "status": 0,
+      "message": "The maximum number of function evaluations is exceeded.",
+      "x": [
+        1.2830313982926276,
+        -0.8376578925673092,
+        -1.4160159319491343,
+        -1.2830313982926307,
+        0.837657892567313,
+        1.4160159319491317,
+        -1.1148259790025143,
+        -1.7457030421006752,
+        -0.47248425421359663,
+        1.1148259790025128,
+        1.7457030421006718,
+        0.472484254213596
+      ],
+      "nfev": 20,
+      "elapsed_s": 0.02975769992917776
+    }
+  ],
+  "elapsed_s": 24.664362999843433
+}
