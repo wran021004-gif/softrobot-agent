@@ -1,10 +1,10 @@
 {
   "study_id": "s142-reach-hold-coldstart-20261023",
-  "conclusion": "engineering_blocked_unresolved_execution",
+  "conclusion": "original_orphan_reconciled_resume_blocked_by_automatic_egress_review",
   "formal_store_status": "ready",
-  "pending_retained": true,
+  "pending_retained": false,
   "baseline": "4de5d5d475755578653e9cca8febe395adeb8764",
-  "implementation": "c3aeacbf4e4b901fcce48d492d5a4f66d28db782",
+  "implementation": "e8abaef72c75eb1428939181a57d256c438d3570",
   "resolved_identity": "034d2cac74141856fbe4a8fe051c284d8b608f26e0f32c2e9386da34a0762a4f",
   "authorization": {
     "artifact_id": "03091d72fac5866287e14b4f022594ab2d07d74409c910565208ec5556389337",
@@ -15,22 +15,7 @@
     "media_type": "application/json"
   },
   "execution_owner": "s142-reach-hold-coldstart-20261023-exec-ab2e3bebfda74387",
-  "unsealed_calls": [
-    {
-      "run_id": "s142-reach-hold-coldstart-20261023",
-      "request_id": "native-call_00_VsLbTpBrSUux2sbGxCmT7221",
-      "caller": "unified-research",
-      "status": "running",
-      "execution_id": "508bad42dc5d4316a2405ec0ecf4622f"
-    },
-    {
-      "run_id": "s142-reach-hold-coldstart-20261023-exec-ab2e3bebfda74387",
-      "request_id": "complete-simulation",
-      "caller": "unified-research",
-      "status": "running",
-      "execution_id": "83167c03af65492e8b3c1b56758c7aa5"
-    }
-  ],
+  "unsealed_calls": [],
   "ledger": {
     "limit": {
       "backend_solves": 8,
@@ -44,7 +29,7 @@
       "model_calls": 5,
       "backend_solves": 1,
       "worker_calls": 0,
-      "wall_s": 43.00099999993108
+      "wall_s": 6635.760894132545
     },
     "remaining": {
       "backend_solves": 7,
@@ -104,13 +89,30 @@
     "combined_acceptance": null
   },
   "recovery": {
-    "command": "python -m tools.research recover --run-id s142-reach-hold-coldstart-20261023",
-    "result": "UNKNOWN_WORKER_TERMINATION_RETAINS_PENDING_RESERVATION; NO_RELAUNCH",
-    "process_inventory": "Elevated Win32_Process query returned no command lines matching this Study at supervision; this is not a durable original worker-tree termination acknowledgment.",
-    "boundary_missing": true,
-    "result_missing": true,
-    "relaunched": false,
-    "second_study": false
+    "status": "original_execution_sealed_incomplete",
+    "result_reference": {
+      "artifact_id": "364634c4cf1726a9854ddb13bd237482b6e1be337683fbbf59d5297a4b5d4794",
+      "media_type": "application/json"
+    },
+    "termination_evidence": {
+      "artifact_id": "93f0aeafd06480ea8934372535b5cba4b2a3b79be9e3479a67e42ed479fb5677",
+      "media_type": "application/json"
+    },
+    "original_inventory_reference": {
+      "artifact_id": "d6f7f4624a17779e1adc4f0beba52e9df95ba4e01fa4f73163f68f567a632957",
+      "media_type": "application/json"
+    },
+    "original_boundary_missing": true,
+    "original_exit_code": null,
+    "elapsed_semantics": "conservative upper bound through verified exit observation",
+    "elapsed_upper_bound_s": 6592.759894132614,
+    "new_scientific_launches": 0,
+    "provider_requests_repeated": 0,
+    "receipts_sealed": true,
+    "pending_cleared": true,
+    "implementation_migrated_to": "e8abaef72c75eb1428939181a57d256c438d3570",
+    "sdk_feedback_not_yet_consumed": true,
+    "no_exact_mujoco_state_checkpoint": true
   },
   "evidence": {
     "partial_files_manifest": {
@@ -161,7 +163,7 @@
     ]
   },
   "scientific_assessment": {
-    "engineering_chain": "partial; preflight and real worker succeeded, recovery remains blocked",
+    "engineering_chain": "Original orphan exit verified and incomplete receipts reconciled; original study resumable after explicit Provider egress approval",
     "autonomous_decisions": "real Provider multi-step retrieval, falsifiable hypothesis and autonomous NMPC selection observed",
     "mathematical_tools": "not used; grants and costs visible, scientific use not evaluated",
     "physical_success": "not established; incomplete execution and no independent evaluator result",
@@ -198,11 +200,35 @@
     "agent_received_completed_physical_feedback": false
   },
   "previous_store_summary_reference": {
-    "artifact_id": "069cbeafa2266244d6408a23cd96dfa1a81febf321e45577f4ca580515250b75",
+    "artifact_id": "73cd4ce6707703470cc04a21f89ecdc9a29cc6816542a7b2e78e49b944fa7e56",
     "media_type": "application/json"
   },
+  "initial_recovery_block": {
+    "command": "python -m tools.research recover --run-id s142-reach-hold-coldstart-20261023",
+    "result": "UNKNOWN_WORKER_TERMINATION_RETAINS_PENDING_RESERVATION; NO_RELAUNCH",
+    "process_inventory": "Elevated Win32_Process query returned no command lines matching this Study at supervision; this is not a durable original worker-tree termination acknowledgment.",
+    "boundary_missing": true,
+    "result_missing": true,
+    "relaunched": false,
+    "second_study": false
+  },
+  "resume_approval_block": {
+    "source": "Automatic sandbox escalation review, two CreateProcess rejections",
+    "destination": "https://api.deepseek.com/chat/completions",
+    "model": "deepseek-flash",
+    "data_scope": [
+      "S142 frozen task, robot structure, legal design domains and control settings",
+      "budgets and scientific tool schemas",
+      "actual scientific execution feedback, including original interrupted result"
+    ],
+    "request_for_user": "Explicitly authorize this data scope to this DeepSeek destination to continue the same Study",
+    "new_provider_requests_sent": 0,
+    "new_workers_started": 0,
+    "detached_launch_started": false,
+    "foreground_launch_started": false
+  },
   "store_summary_reference": {
-    "artifact_id": "73cd4ce6707703470cc04a21f89ecdc9a29cc6816542a7b2e78e49b944fa7e56",
+    "artifact_id": "e86d522190f8ea34e61fb49d49a29091a8b805935a8e14fbee39b985bb46ebf6",
     "media_type": "application/json"
   }
 }
