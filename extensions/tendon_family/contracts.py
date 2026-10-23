@@ -1002,6 +1002,12 @@ def current_nmpc_recipe(recipe):
 
 
 class GVSTrajectoryParameters(Contract):
+    reference_mode: Literal['constant', 'free_progress', 'timed'] = 'constant'
+    path_lookahead_m: FiniteFloat = Field(default=.003, gt=0)
+    path_capture_m: FiniteFloat = Field(default=.001, gt=0)
+    progress_weight: FiniteFloat = Field(default=0., ge=0)
+    regression_weight: FiniteFloat = Field(default=0., ge=0)
+    relative_velocity_weight: FiniteFloat = Field(default=0., ge=0)
     stopping_policy: Literal['historical_timed_v1', 'research_work_v1'] = 'historical_timed_v1'
     integration_method: Literal['implicit_euler', 'implicit_midpoint'] = 'implicit_euler'
     root_tolerance: FiniteFloat = Field(default=1e-10,gt=0,le=1e-8,

@@ -44,7 +44,7 @@ def linear_model(case,point,p,case_ref,graph):
         if spec.units!='rad/m': raise ValueError('UNSUPPORTED_BASIS_UNITS')
         qscale.append(1/p.baseline_lengths_m[spec.entity])
     binding={**case['binding'], 'basis':plain(f.resolved),'parameters':plain(f.parameters),
-        'target_m':inp.task.goal.data['target_m'], 'mount':inp.task.environment.data['mount'],
+        'target_m':inp.task.goal.data.get('target_m'), 'task_reference':plain(inp.task.goal), 'mount':inp.task.environment.data['mount'],
         'tension_limits_n':f.expression.tendon_force_limits_n,'model_identity':digest(plain(f.expression)),
         'output_expression':'R_world_base * symbolic_tip_position(q) + p_world_base; AD in x and u',
         'coordinate_order':f.expression.coordinate_order,'tendon_order':f.expression.tendon_order,
@@ -105,7 +105,7 @@ def _configuration_boundary(inp,binding,model_id='model.gvs'):
         analysis_binding=dict(candidate_id=binding['candidate_id'],configuration=binding.get('configuration'),
             effective_configuration_identity=binding.get('effective_configuration_identity',digest(plain(inp))),
             task_identity=binding.get('task_identity',digest(plain(inp.task))),
-            target_m=inp.task.goal.data['target_m'],duration_s=inp.task.timing.duration_s,
+            target_m=inp.task.goal.data.get('target_m'),task_reference=plain(inp.task.goal),duration_s=inp.task.timing.duration_s,
             control_period_s=inp.task.timing.control_period_s,physics_timestep_s=inp.task.timing.timestep_s,
             initializer=plain(inp.task.initializer),controller_numerical_source=control.get('numerical_source'),
             tendon_order=binding.get('tendon_order',[row['id'] for row in tendons]),
@@ -138,8 +138,9 @@ def _candidate_points(inp,graph,p,requested=None):
     if controller_start.shape!=limits.shape or np.any(controller_start<0) or np.any(controller_start>limits):
         raise ValueError('CONTROLLER_START_INPUT_UNSUPPORTED')
     initial_tip=np.asarray(output(x0,pretension)[0]).reshape(-1)
-    target=np.asarray(inp.task.goal.data['target_m'],dtype=float)
-    tolerance=float(inp.task.evaluator.parameters.data['tolerance_m'])
+    from tools.research_tasks import task_adapter
+    target=np.asarray(task_adapter(plain(inp)).operating_point()['reference_position_m'],dtype=float)
+    tolerance=float(inp.task.evaluator.parameters.data.get('tolerance_m',p.output_scale_m))
     points=[dict(name='standardized_initial_pretension',x=x0.tolist(),u=pretension.tolist(),available=True,
         phase='configuration_standardized_initial_pretension',scope='standardized initial/pretension',remaining_task_s=p.duration_s,actual_time_s=None,
         construction=dict(method='actual initializer projected by existing controller preparation plus declared tendon pretension',
@@ -157,6 +158,8 @@ def _candidate_points(inp,graph,p,requested=None):
     requested=set(requested or ['standardized_initial_pretension','controller_start_input','target_equilibrium','halfway_waypoint'])
     points=[point for point in points if point['name'] in requested]
     if not requested & {'target_equilibrium','halfway_waypoint'}:return points
+    if inp.task.family != 'task.reach':
+        raise ValueError('STATIC_WORKING_POINT_REQUIRED: Tracking initial reference is not a target equilibrium')
 
     qsym,usym=f.q_symbol,f.u_symbol
     mount=inp.task.environment.data['mount']
@@ -241,7 +244,7 @@ def calculate_candidate_configuration(inp,binding,p,protocol_ref,*,registry=None
     for point in points:
         if not point['available']:
             records.append(point); continue
-        case=dict(effective=plain(inp),binding={**binding,'target_m':inp.task.goal.data['target_m'],
+        case=dict(effective=plain(inp),binding={**binding,'target_m':inp.task.goal.data.get('target_m'),
             'tension_limits_n':limits,'configuration_only_identity':digest(boundary)})
         model=linear_model(case,point,p,binding['configuration'],graph)
         records.append(dict(point=model.operating_point,model=plain(model),

@@ -62,9 +62,22 @@ def objective_components(ws, states, tensions, previous):
     result=dict(running_position=0., running_curvature_rate=0., running_tension=0.,
         running_tension_variation=0., terminal_position=0., terminal_curvature_rate=0.,
         terminal_tip_speed=0., holding_tip_speed=0.)
+    if ws.tracking:
+        result.update(relative_velocity=0.,progress=0.,regression=0.)
     for k,state in enumerate(states[1:],1):
         tip,speed=ws._motion(state[:ws.n],state[ws.n:])
-        result['running_position']+=h*p.tracking_weight*float(np.sum((np.asarray(tip).ravel()-ws.target)**2/scale**2))
+        target = ([ws.problem.initial_guess[f'reference/{k}/{j}'] for j in range(3)]
+                  if ws.tracking else ws.target)
+        result['running_position']+=h*p.tracking_weight*float(np.sum((np.asarray(tip).ravel()-target)**2/scale**2))
+        if ws.tracking:
+            velocity=np.array([ws.problem.initial_guess[f'reference_velocity/{k}/{j}'] for j in range(3)])
+            result['relative_velocity']+=h*p.relative_velocity_weight*float(np.sum((np.asarray(speed).ravel()-velocity)**2/p.tip_speed_scale_m_s**2))
+        if p.reference_mode=='free_progress':
+            anchor=np.array([ws.problem.initial_guess[f'path_anchor/{j}'] for j in range(3)])
+            tangent=np.array([ws.problem.initial_guess[f'path_tangent/{j}'] for j in range(3)])
+            advance=float(np.dot(np.asarray(tip).ravel()-anchor,tangent)/scale)
+            result['progress']-=h*p.progress_weight*advance
+            result['regression']+=h*p.regression_weight*max(-advance,0.)**2
         result['running_curvature_rate']+=h*p.velocity_weight*float(np.sum(state[ws.n:]**2))
         if p.holding_tip_speed_weight:
             active=ws.problem.initial_guess[f'holding/{k}']
@@ -89,8 +102,8 @@ def plan_metrics(ws, states, tensions, time_s):
         motion.append(dict(time_s=float(t), position_error_m=float(np.linalg.norm(tip-ws.target)),
             tip_position_m=tip.tolist(),
             tip_velocity_m_s=velocity.tolist(),tip_speed_m_s=float(np.linalg.norm(velocity))))
-    deadline=next((m for m in motion if abs(m['time_s']-ws.duration)<1e-8),None)
-    return dict(deadline=deadline, deadline_status='within_recorded_horizon' if deadline else 'outside_recorded_horizon',
+    deadline=next((m for m in motion if abs(m['time_s']-ws.duration)<1e-8),None) if ws.parameters.reference_mode!='free_progress' else None
+    return dict(deadline=deadline, deadline_status='not_applicable_free_progress' if ws.parameters.reference_mode=='free_progress' else 'within_recorded_horizon' if deadline else 'outside_recorded_horizon',
         terminal=motion[-1], first_step=motion[ws.parameters.substeps],
         horizon_interval_s=[float(times[0]),float(times[-1])],
         first_input_n=tensions[0].tolist(),input_min_n=tensions.min(axis=0).tolist(),input_max_n=tensions.max(axis=0).tolist())

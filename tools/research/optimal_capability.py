@@ -85,7 +85,10 @@ def method_admission(spec, query, used=0):
     remaining = max(0, spec['budgets']['mathematical_evaluations']-used)
     reasons = []
     if spec.get('canonical_task',{}).get('family')=='task.tracking':
-        reasons.append('TRACKING_ROBOT_MODEL_CONSTRUCTION_UNSUPPORTED')
+        controller=spec.get('configuration',{}).get('policy',{}).get('controller',{})
+        reasons.append('TRACKING_FORMAL_ADMISSION_UNSUPPORTED_INTERNAL_PATH_COST_ACCOUNTING'
+            if (controller.get('extension_id'),controller.get('version'))==('controller.gvs_nmpc','12.0.0')
+            else 'TRACKING_ROBOT_MODEL_CONSTRUCTION_UNSUPPORTED')
     if any(not methods.get(m) for m in required):
         reasons.append('EXPLICIT_FROZEN_MATHEMATICAL_METHOD_AUTHORIZATION_REQUIRED')
     environment = dependencies()

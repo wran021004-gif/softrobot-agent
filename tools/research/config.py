@@ -28,6 +28,12 @@ def rl_configuration(defaults, training=None, reward=None):
     from tools.rl.run import validate_settings
     result = deepcopy(defaults)
     result['ppo'] = patch(result['ppo'], training or {})
+    from tools.research.contracts import RewardConfiguration
+    # Old saved stages retain their exact dictionaries. New registered terms
+    # become explicit only when selected for start/continue.
+    for key in reward or {}:
+        if key not in result['reward'] and key in RewardConfiguration.model_fields:
+            result['reward'][key] = RewardConfiguration.model_fields[key].default
     result['reward'] = patch(result['reward'], reward or {})
     validate_settings(result)
     result['requested_overrides'] = dict(training=training or {}, reward=reward or {})

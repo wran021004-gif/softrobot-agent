@@ -18,6 +18,21 @@ class NumericalFailure(RuntimeError):
     """A failed physical transition; never returned as a valid PPO sample."""
 
 
+def reward_terms(weights, info, before, delta_tension, limits, position_scale, speed_scale, holding=False):
+    """Recomputable training preference from saved physical signals, no evaluator."""
+    if info.get('numerical_failure'):
+        return dict(numerical_failure=weights['failure_penalty'])
+    terms = dict(position=-weights['position']*(info['position_error_m']/position_scale)**2,
+        holding_speed=-weights['holding_speed']*(info['speed_m_s']/speed_scale)**2 if holding else 0.,
+        smoothness=-weights['smoothness']*float(np.mean((np.asarray(delta_tension)/limits)**2)))
+    if 'path_progress_m' in info:
+        delta=(info['path_progress_m']-before['path_progress_m'])/position_scale
+        terms.update(path_error=-weights.get('path_error',0.)*(info['path_error_m']/position_scale)**2,
+            progress=weights.get('progress',0.)*max(delta,0.),
+            regression=-weights.get('regression',0.)*max(-delta,0.))
+    return terms
+
+
 class TensionEnv(gym.Env):
     metadata = {"render_modes": []}
 
@@ -28,8 +43,14 @@ class TensionEnv(gym.Env):
         if mode not in ("residual", "direct"):
             raise ValueError("Only direct and residual modes are supported")
         self.saved = config['task']
-        if self.saved['family'] != 'task.reach':
-            raise ValueError('Only reach-and-hold tasks are supported')
+        self.tracking = self.saved['family'] == 'task.tracking'
+        if self.saved['family'] not in ('task.reach','task.tracking'):
+            raise ValueError('Unsupported RL task')
+        if self.tracking:
+            from tools.research_tasks import task_adapter
+            self.task_reference = task_adapter(dict(task=self.saved['original']))
+            if self.task_reference.control_reference()['kind'] != 'free_progress':
+                raise ValueError('RL_TIMED_TRACKING_UNSUPPORTED')
         candidate=config.get('candidate')
         control=config.get('control_object')
         if not candidate or not control:
@@ -67,16 +88,23 @@ class TensionEnv(gym.Env):
         if (not np.isfinite(m.actuator_ctrlrange[a]).all() or np.any(self.lower<0) or np.any(self.upper<=self.lower)
                 or not np.allclose(m.actuator_forcerange[a],np.stack((-self.upper,-self.lower),axis=1),rtol=0,atol=1e-12)):
             raise ValueError('Tension control/force limits mismatch')
-        self.target=np.asarray(self.saved['target_m'],dtype=float)
+        self.target=np.asarray(self.saved['original']['goal']['data']['vertices_m'][-1]
+                               if self.tracking else self.saved['target_m'],dtype=float)
         self.control_dt=float(self.saved['control_period_s'])
         self.horizon=int(self.saved['command_intervals'])
-        self.hold_steps=self.saved['acceptance']['holding_steps']
+        self.hold_steps=[] if self.tracking else self.saved['acceptance']['holding_steps']
         self.substeps=round(self.control_dt/m.opt.timestep)
         if (self.substeps<1 or abs(self.substeps*m.opt.timestep-self.control_dt)>1e-12
                 or abs(self.horizon*self.control_dt-self.saved['duration_s'])>1e-12):
             raise ValueError('Candidate physics timestep must exactly divide frozen task timing')
         self.integrator=int(m.opt.integrator)
         self.reward=config['reward']
+        from tools.rl.run import validate_reward
+        validate_reward(self.reward)
+        if self.tracking and self.reward['holding_speed']:
+            raise ValueError('TRACKING_HAS_NO_HOLDING_SPEED_REWARD')
+        if not self.tracking and any(self.reward.get(k,0.) for k in ('path_error','progress','regression')):
+            raise ValueError('PATH_REWARD_REQUIRES_GEOMETRIC_TRACKING')
         self.position_scale=config['observation']['position_scale_m']
         self.speed_scale=config['observation']['speed_scale_m_s']
         self.failure_penalty=self.reward['failure_penalty']
@@ -110,7 +138,7 @@ class TensionEnv(gym.Env):
         self.jacobian = np.zeros((3, m.nv))
         self.action_space = gym.spaces.Box(-1.0, 1.0, (self.channels,), dtype=np.float32)
         self.observation_space = gym.spaces.Box(
-            -np.inf, np.inf, (len(joints)*2 + 7 + self.channels,), dtype=np.float32)
+            -np.inf, np.inf, (len(joints)*2 + 7 + self.channels + int(self.tracking),), dtype=np.float32)
         self.k = self.horizon  # reset is required before step
 
     def settings(self):
@@ -132,6 +160,7 @@ class TensionEnv(gym.Env):
                     raise ValueError('Initializer names must belong to selected robot joints')
                 destination[address[self.model.joint(name).id]] = value
         self.k = 0
+        self.path_segment = 0
         self.needs_reset = False
         self.episode += 1
         self.episode_records = []
@@ -158,17 +187,30 @@ class TensionEnv(gym.Env):
         position = self.data.site_xpos[self.site].copy()
         velocity = self.jacobian @ self.data.qvel
         error = self.target - position
+        path_info = {}
+        if self.tracking:
+            from extensions.reference.implementation import project_polyline
+            vertices=self.saved['original']['goal']['data']['vertices_m']
+            distance,progress=project_polyline([position],vertices)
+            step=self.saved['original']['evaluator']['parameters']['data']['geometry_step_m']
+            local=self.task_reference.local_path_reference(position,self.path_segment,3*step,step)
+            self.path_segment=local['segment']
+            error=np.asarray(local['position_m'])-position
+            path_info=dict(path_error_m=float(distance[0]),path_progress_m=float(progress[0]))
         observation = np.concatenate((
             self.data.qpos[self.qpos_indices], self.data.qvel[self.qvel_indices], error / self.position_scale,
             velocity / self.speed_scale, self.previous_tension / self.upper,
             [self.k / self.horizon])).astype(np.float32)
+        if self.tracking:
+            observation=np.r_[observation,path_info['path_progress_m']/self.position_scale].astype(np.float32)
         info = dict(control_step=self.k, time_s=self.k * self.control_dt,
                     engine_time_s=float(self.data.time), tip_m=position,
-                    tip_velocity_m_s=velocity, position_error_m=float(np.linalg.norm(error)),
+                    tip_velocity_m_s=velocity, position_error_m=float(np.linalg.norm(self.target-position)),
                     speed_m_s=float(np.linalg.norm(velocity)),
                     applied_tension_n=self.previous_tension.copy(),
                     commanded_tension_n=self.command.copy(), clipped=self.clipped.copy(),
                     saturated=(self.command == self.lower) | (self.command == self.upper))
+        info.update(path_info)
         return observation, info
 
     def get_state(self):
@@ -252,11 +294,11 @@ class TensionEnv(gym.Env):
         observation, info = self._observe()
         if not np.isfinite(observation).all():
             return self.fail(record, start_state, pre_step, self.substeps, ["nonfinite_observation"])
-        terms = dict(position=-self.reward["position"] * (info["position_error_m"] / self.position_scale) ** 2,
-                     holding_speed=(-self.reward["holding_speed"] * (info["speed_m_s"] / self.speed_scale) ** 2
-                                    if self.k in self.hold_steps else 0.0),
-                     smoothness=-self.reward["smoothness"] * float(np.mean(
-                         ((self.previous_tension - previous) / self.upper) ** 2)))
+        terms = reward_terms(self.reward,info,before_info,self.previous_tension-previous,
+                             self.upper,self.position_scale,self.speed_scale,self.k in self.hold_steps)
+        if self.tracking:
+            record.update(start_path_progress_m=before_info['path_progress_m'],
+                end_path_progress_m=info['path_progress_m'],end_path_error_m=info['path_error_m'])
         reward = float(sum(terms.values()))
         record.update(end_error_m=info["position_error_m"], end_speed_m_s=info["speed_m_s"],
                       reward_terms=terms, reward=reward)

@@ -822,11 +822,15 @@ def decision_packet(host):
     if state(host)['spec'].get('research_decisions'):
         from tools.research.research_context import agent_decision_brief
         from extensions.tendon_family.family_space import decision_summary
+        from tools.research_tasks import task_adapter
         s=state(host);spec=s['spec']
         return dict(research=agent_decision_brief(host),implementation=s['freeze'],study_id=host.run_id,
             evaluation_profile={k:s['profile'][k] for k in ('identity','version')},
             implementation_migration=s.get('core_repairs',[])[-1] if s.get('core_repairs') else None,
             controller_capabilities=dict(recipe_defaults=spec['configuration']['policy']['controller']['parameters']['data']['recipe'],
+                task_reference=task_adapter(spec['configuration']).control_reference(),
+                parameter_schema=host.reg.get(spec['configuration']['policy']['controller']['extension_id'],
+                    spec['configuration']['policy']['controller']['version'],'controller').input_schema.model_json_schema(),
                 solver_defaults=spec['configuration']['policy']['controller']['parameters']['data'].get('solver'),
                 patch='Generation v2 controller_recipe/controller_solver sparse patches use registered owner validation; settling remains task-owned'),
             candidates=ordered_candidates(host,s)[-spec.get('research_decisions',{}).get('context_limits',{}).get('candidates',3):],

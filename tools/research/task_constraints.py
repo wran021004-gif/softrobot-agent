@@ -152,7 +152,7 @@ def analysis_capabilities(configuration, requirements, protocol, *, model=None, 
         for method in (CONIC,SENSITIVITY):
             count=1+subproblems if method==CONIC else 3*subproblems+2
             reasons=[]
-            if configuration.task.family=='task.tracking' and model is None:reasons.append('tracking_robot_model_construction_unsupported')
+            if configuration.task.family=='task.tracking' and model is None and (configuration.policy.controller.extension_id,configuration.policy.controller.version) != ('controller.gvs_nmpc','12.0.0'):reasons.append('tracking_robot_model_construction_unsupported')
             if not mathematical_methods.get(method) or not mathematical_methods.get(CONIC):reasons.append('method_not_authorized')
             if not env['available']:reasons.append('worker_dependency_unavailable')
             if remaining_evaluations is not None and remaining_evaluations<count:reasons.append('insufficient_budget')
@@ -185,7 +185,7 @@ def model_assessment(configuration, requirements, operation,model=None):
     from extensions.tendon_family.model_applicability import assess_model_uses
     from tools.platform_registry import registry
     use = 'static_equilibrium' if operation in ('equilibrium','input_sensitivity','design_sensitivity') else 'linearization'
-    if configuration.task.family=='task.tracking' and model is None:
+    if configuration.task.family=='task.tracking' and model is None and (configuration.policy.controller.extension_id,configuration.policy.controller.version) != ('controller.gvs_nmpc','12.0.0'):
         return dict(model_id='tracking_robot_model_unavailable',model_version=None,representation_id=None,
             relevant_assumptions=['No supported robot model construction for free geometric path progress'],uses={use:dict(status='REJECT',
             reasons=['Current robot model builders/controllers require fixed Reach target_m; geometric path progress and coverage are unsupported.'])})

@@ -359,7 +359,7 @@ def dispatch(host,query,key,*,guard,origin='model'):
         effective_configuration_identity=digest(cfg),task_identity=digest(cfg['task']),basis=basis,
         coordinate_order=list(resolve_basis(design,basis).coordinate_order),tendon_order=[t['id'] for t in design['tendons']],
         tension_limits_n=[t['force_limit_n'] for t in design['tendons']],tension_bounds_n=[[0.,t['force_limit_n']] for t in design['tendons']],
-        target_m=cfg['task']['goal']['data']['target_m'],source_identity=c['source_identity'],
+        target_m=cfg['task']['goal']['data'].get('target_m'),task_reference=cfg['task']['goal'],source_identity=c['source_identity'],
         evaluation_profile_identity=c['profile_identity'])
     if c.get('generation_version'):
         binding.update(canonical_task_identity=c['task_identity'],initialization_provenance=c['initialization_provenance'])

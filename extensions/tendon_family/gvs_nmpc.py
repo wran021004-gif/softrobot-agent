@@ -41,7 +41,8 @@ def resolve_gvs_nmpc_control(inp,physics):
     plan['reference'].pop('target_world_m')
     plan['reference']['provenance']=numerical['provenance']
     plan['numerical_reference']=dict(artifact_id=digest(numerical),media_type='application/json')
-    plan['settling']=checked_reach(inp).settling.model_dump(mode='json')
+    if checked_reach(inp).settling is not None:
+        plan['settling']=checked_reach(inp).settling.model_dump(mode='json')
     plan['identity']=digest(plan)
     return plan
 
@@ -224,3 +225,11 @@ class DeadlineReachNMPCController(ReachNMPCController):
             effective_horizon=horizon,deadline_horizon_preparation_s=construction_s)
         self.last.update(timing);self.observations[-1].update(timing)
         return command
+
+
+class TaskConditionedNMPCController(DeadlineReachNMPCController):
+    """Development route: legacy Reach or ordered local-progress Tracking."""
+    def command(self, t, geometry, q, v):
+        if self.workspace.tracking:
+            return GVSNMPCController.command(self, t, geometry, q, v)
+        return super().command(t, geometry, q, v)

@@ -48,6 +48,39 @@ class ResearchTaskAdapter:
         target = self.task['goal']['data']['target_m']
         return (np.broadcast_to(target, times.shape + (3,)).copy(), np.zeros(times.shape + (3,)))
 
+    def control_reference(self):
+        """Small view of the authoritative task; no acceptance state is copied."""
+        task = self.task
+        kind = ('constant' if task['family'] == 'task.reach' else
+                'timed' if task['goal']['data']['time_requirement'] == 'timed' else 'free_progress')
+        return dict(kind=kind, task_family=task['family'], frame='world', units='m',
+                    parameter='arc_length_m' if kind == 'free_progress' else 'time_s',
+                    goal=task['goal'], evaluator=task['evaluator'],
+                    condition_source='ResearchTaskAdapter.analysis_requirements',
+                    error_signals=['position'] + (['relative_velocity'] if kind == 'timed' else []),
+                    horizon_semantics='numerical_prediction_only' if kind == 'free_progress' else 'task_time')
+
+    def local_path_reference(self, position, segment, lookahead_m, capture_m):
+        """Ordered state projection and local lookahead, never a timed schedule.
+
+        A corner must be approached before advancing to the next segment. The
+        projected progress itself may regress; the independent evaluator owns
+        regression/coverage acceptance. This is not joint optimal progress NMPC.
+        """
+        import numpy as np
+        if self.control_reference()['kind'] != 'free_progress':
+            raise ValueError('FREE_PROGRESS_REFERENCE_REQUIRED')
+        vertices = np.asarray(self.task['goal']['data']['vertices_m'])
+        lengths = np.linalg.norm(np.diff(vertices, axis=0), axis=1)
+        if segment < len(lengths)-1 and np.linalg.norm(position-vertices[segment+1]) <= capture_m:
+            segment += 1
+        tangent = (vertices[segment+1]-vertices[segment])/lengths[segment]
+        local = float(np.clip(np.dot(position-vertices[segment], tangent), 0, lengths[segment]))
+        anchor = vertices[segment]+local*tangent
+        target = vertices[segment]+min(local+lookahead_m, lengths[segment])*tangent
+        return dict(segment=segment, progress_m=float(sum(lengths[:segment])+local),
+                    anchor_m=anchor.tolist(), tangent=tangent.tolist(), position_m=target.tolist())
+
     def analysis_requirements(self, binding):
         """Translate each registered task's own sampled constraints and references."""
         from schemas.platform_analysis import TaskAnalysisRequirement
@@ -193,6 +226,9 @@ def _protocol_requirements(result):
     protocol, family = (result.get('protocol_id'), result.get('task_family'))
     if (protocol, family) == ('offline_reach_hold_v1', 'task.reach'):
         return common | {'holding_coverage', 'holding_position', 'holding_speed', 'evaluator:task_bound'}
+    if (protocol, family) == ('development_tracking_v1', 'task.tracking'):
+        return common | {'tracking_sampling', 'evaluator:tracking_max_error', 'evaluator:path_coverage',
+                         'evaluator:path_start', 'evaluator:path_end', 'evaluator:path_progress_regression'}
     return None
 
 
@@ -261,10 +297,11 @@ def assemble_acceptance(configuration, evaluation, profile, *, evaluation_refere
     """
     adapter = task_adapter(configuration)
     cfg, task = (adapter.configuration, adapter.task)
-    if task['family']=='task.tracking':
+    if task['family']=='task.tracking' and (task['status']!='development_valid' or
+            cfg['policy']['controller']['version']!='12.0.0'):
         raise ValueError('TRACKING_COMPOSITE_ACCEPTANCE_UNSUPPORTED: independent evaluator available; execution/force protocol not implemented')
     if protocol_id is None:
-        protocol_id = 'offline_reach_hold_v1' if task['family'] == 'task.reach' else 'offline_tracking_v1'
+        protocol_id = 'offline_reach_hold_v1' if task['family'] == 'task.reach' else 'development_tracking_v1'
     ev = plain(evaluation) if evaluation is not None else None
     if ev is not None:
         ev = plain(EvaluationResult.model_validate(ev))
@@ -326,18 +363,19 @@ def assemble_acceptance(configuration, evaluation, profile, *, evaluation_refere
                 issues.append('PROFILE_HOLDING_OUTCOME_MISMATCH')
         metrics.update(holding_max_error_m=settling.get('max_error_m'), holding_max_speed_m_s=settling.get('max_speed_m_s'))
     else:
-        components['tracking_sampling'] = _component(validity == 'valid' if ev else None, validity == 'valid' if ev else None, reason='Registered tracking evaluator checks inclusive motion and pre-step tension grids')
+        covered = report.get('tracking_sampling_complete')
+        components['tracking_sampling'] = _component(covered, covered, reason='Profile verifies recorded post-step motion and pre-step tension grids; acquisition completeness is not a task deadline')
     missing = [name for name, c in components.items() if c['passed'] is None]
     if issues or validity == 'invalid':
         status, accepted = ('invalid', None)
     elif validity == 'incomplete' or complete is False:
         status, accepted = ('incomplete', None)
-    elif missing or (task['family'] == 'task.reach' and (not components['holding_coverage']['passed'])):
+    elif missing or not components['holding_coverage' if task['family']=='task.reach' else 'tracking_sampling']['passed']:
         status, accepted = ('missing_evidence', None)
     else:
         accepted = all((c['passed'] for c in components.values()))
         status = 'accepted' if accepted else 'valid_failure'
-    return dict(contract='research.task_acceptance', version='1.0.0', protocol_id=protocol_id, task_family=task['family'], task_identity=digest(task), status=status, accepted=accepted, components=components, metrics=metrics, missing=missing, issues=issues, execution_id=report.get('execution_id'), sources=dict(evaluation=plain(evaluation_reference), profile=plain(profile_reference)), evidence_binding=dict(evaluation=plain(evaluation_reference), profile=plain(profile_reference), simulation=(ev or {}).get('source'), evaluation_binding={k: (ev or {}).get(k) for k in ('source', 'source_execution_id', 'original_execution_id')}, profile_binding={k: report[k] for k in ('evaluation', 'simulation', 'execution_id') if k in report}), evaluator_tension_channels=sorted(task['evaluator']['parameters']['data']['tension_limits_n']) if task['family'] == 'task.tracking' else None, timing=dict(**task['timing'], real_time_required=False, real_time_demonstrated=report.get('real_time_demonstrated'), deadline_misses=report.get('deadline_misses'), mean_update_s=report.get('mean_update_s'), simulation_wall_s=report.get('simulation_wall_s')), continuous_time_guarantee=False)
+    return dict(contract='research.task_acceptance', version='1.0.0', protocol_id=protocol_id, task_family=task['family'], task_identity=digest(task), status=status, accepted=accepted, components=components, metrics=metrics, missing=missing, issues=issues, execution_id=report.get('execution_id'), sources=dict(evaluation=plain(evaluation_reference), profile=plain(profile_reference)), evidence_binding=dict(evaluation=plain(evaluation_reference), profile=plain(profile_reference), simulation=(ev or {}).get('source'), evaluation_binding={k: (ev or {}).get(k) for k in ('source', 'source_execution_id', 'original_execution_id')}, profile_binding={k: report[k] for k in ('evaluation', 'simulation', 'execution_id') if k in report}), evaluator_tension_channels=[t['id'] for t in cfg['robot']['structure']['data']['tendons']] if task['family'] == 'task.tracking' else None, timing=dict(**task['timing'], real_time_required=False, real_time_demonstrated=report.get('real_time_demonstrated'), deadline_misses=report.get('deadline_misses'), mean_update_s=report.get('mean_update_s'), simulation_wall_s=report.get('simulation_wall_s')), continuous_time_guarantee=False)
 
 
 def aggregate_acceptance(records, scheduled, *, schedule=None, evidence_policy=None, comparison_scope=None):

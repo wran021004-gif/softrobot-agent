@@ -181,9 +181,30 @@ def checked_reach(inp):
     if control.numerical_source!='initial_state_pretension' or not control.recipe.regenerate_warm_states:
         raise ValueError('CANDIDATE_PRETENSION_AND_CURRENT_STATE_REGENERATION_REQUIRED')
     Initial.model_validate(inp.task.initializer.parameters.data);validate_initializer(inp,inp)
+    from tools.research_tasks import task_adapter
+    reference = task_adapter(plain(inp)).control_reference()
+    if getattr(control.recipe, 'reference_mode', 'constant') != reference['kind']:
+        raise ValueError('CONTROL_REFERENCE_MODE_MUST_MATCH_TASK')
+    tracking = inp.task.family == 'task.tracking'
+    if tracking:
+        if (inp.policy.controller.extension_id, inp.policy.controller.version) != ('controller.gvs_nmpc', '12.0.0'):
+            raise ValueError('TRACKING_CONTROLLER_UNSUPPORTED')
+        if reference['kind'] == 'timed':
+            raise ValueError('TIMED_TRACKING_PHYSICAL_ROUTE_UNSUPPORTED: offline workspace only')
+        if inp.task.status != 'development_valid':
+            raise ValueError('TRACKING_REQUIRES_REVIEWED_DEVELOPMENT_TASK')
+        if control.settling is not None or any((control.recipe.holding_tip_speed_weight,
+                control.recipe.terminal_tip_speed_weight, control.recipe.velocity_weight,
+                control.recipe.terminal_velocity_weight)):
+            raise ValueError('TRACKING_HAS_NO_REACH_HOLDING_OR_ABSOLUTE_SPEED_COST')
+    elif control.settling is None:
+        raise ValueError('REACH_SETTLING_REQUIRED')
     timing=inp.task.timing
-    if timing.sample_period_s!=timing.control_period_s or control.settling.window_s>timing.duration_s or any(
-        abs(v-round(v))>1e-8 for v in (timing.duration_s/timing.control_period_s,timing.control_period_s/timing.timestep_s,control.settling.window_s/timing.sample_period_s)):
+    grid = [timing.duration_s/timing.control_period_s,timing.control_period_s/timing.timestep_s]
+    if control.settling is not None:
+        grid.append(control.settling.window_s/timing.sample_period_s)
+    if timing.sample_period_s!=timing.control_period_s or (control.settling is not None and control.settling.window_s>timing.duration_s) or any(
+        abs(v-round(v))>1e-8 for v in grid):
         raise ValueError('REACH_TIMING_GRID')
     return control
 

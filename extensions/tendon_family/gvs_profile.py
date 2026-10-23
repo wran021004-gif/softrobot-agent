@@ -17,7 +17,7 @@ class SampledSettling(Contract):
 class ReachControl(Contract):
     """Task owns target/initialization/timing; this payload owns only control."""
     recipe: GVSTrajectoryParameters
-    settling: SampledSettling
+    settling: SampledSettling | None = None
     numerical_source: Literal['bundled_guess', 'initial_state_pretension'] = 'bundled_guess'
 
 def candidate_numerical(inp,control,baseline=None):

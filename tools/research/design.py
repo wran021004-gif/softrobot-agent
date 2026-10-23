@@ -237,6 +237,11 @@ def generate_candidate(host,request,provenance,*,screening_fidelity=None):
             from tools.research.config import patch
             control=cfg['policy']['controller']['parameters']['data']
             for field,edits in (('recipe',build.request.controller_recipe),('solver',build.request.controller_solver)):
+                if field=='recipe' and cfg['policy']['controller']['extension_id']=='controller.gvs_nmpc':
+                    from extensions.tendon_family.contracts import GVSTrajectoryParameters
+                    for key in edits:
+                        if key not in control[field] and key in GVSTrajectoryParameters.model_fields:
+                            control[field][key]=GVSTrajectoryParameters.model_fields[key].default
                 if edits:control[field]=patch(control[field],edits)
         initial={f:{j:0. for j in physics['dofs']} for f in ('qpos_rad','qvel_rad_s')};initial['unspecified']='zero'
         cfg['task']['initializer']['parameters']['data']=initial

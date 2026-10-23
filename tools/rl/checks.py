@@ -49,12 +49,30 @@ def run_episode(model, env, seed, task):
         reward_sum += reward
         if terminated or truncated:
             break
-    acceptance = task["acceptance"]
     indices = [row["control_step"] for row in samples]
-    hold = [row for row in samples if row["control_step"] in acceptance["holding_steps"]]
-    coverage = [row["control_step"] for row in hold] == acceptance["holding_steps"]
     complete = (failure is None and indices == list(range(task["command_intervals"] + 1)) and terminated and not truncated
                 and all(abs(row["engine_time_s"] - row["control_step"] * task["control_period_s"]) < 1e-10 for row in samples))
+    if task['family']=='task.tracking':
+        from schemas.platform import BackendResult,TaskDefinition
+        from tools.platform_registry import registry
+        from tools.state_io import digest
+        original=TaskDefinition.model_validate(task['original'])
+        raw=BackendResult(solver_status='completed' if complete else 'failed',backend_id='backend.family_mujoco',
+            model_id='mujoco_serial_bending_v1',signals=[dict(spec=original.observations[0],
+                times_s=[r['time_s'] for r in samples[1:]],values=[r['tip_m'].tolist() for r in samples[1:]])],
+            data=dict(contract='platform.empty',data={}),initial_state=original.initializer.parameters,
+            limitations=['Independent saved trajectory evaluation; no robustness claim'],seed=seed)
+        reg=registry();source=dict(artifact_id=digest(raw.model_dump(mode='json')),media_type='application/json')
+        ev=reg.get('evaluate.tracking',kind='evaluator').resolve()(original,raw,source,reg,digest(task['original']))
+        bounds=all(np.all(r['applied_tension_n']>=env.lower-1e-8) and
+                   np.all(r['applied_tension_n']<=env.upper+1e-8) for r in samples[1:])
+        return samples,dict(complete=bool(complete),passed=bool(complete and bounds and ev.task_success),
+            independent_evaluation=ev.model_dump(mode='json'),evaluated_trajectory=raw.model_dump(mode='json'),
+            force_bounds_passed=bool(bounds),trajectory_rows=len(samples),numerical_failure=failure,
+            episode_reward=reward_sum,counts={key:value-before[key] for key,value in env.counts.items()})
+    acceptance = task["acceptance"]
+    hold = [row for row in samples if row["control_step"] in acceptance["holding_steps"]]
+    coverage = [row["control_step"] for row in hold] == acceptance["holding_steps"]
     terminal = samples[-1]["position_error_m"] if complete else None
     hold_error = max((row["position_error_m"] for row in hold), default=None)
     hold_speed = max((row["speed_m_s"] for row in hold), default=None)
@@ -111,7 +129,7 @@ def evaluate(policy, output, source_root=None):
         task = copy.deepcopy(config["task"])
         samples, metrics = run_episode(model, env, config["seed"], task)
         write_trajectory(output / "trajectory.csv", samples, task["tendon_order"])
-        result = dict(policy=str(policy.resolve()), mode=config["mode"], seed=config["seed"], acceptance=task["acceptance"],
+        result = dict(policy=str(policy.resolve()), mode=config["mode"], seed=config["seed"], acceptance=task.get('acceptance',task.get('original',{}).get('evaluator')),
                       episodes=[metrics], passed=metrics["passed"], evaluation_elapsed_s=time.perf_counter() - started,
                       candidate_identity=config['candidate']['identity'],task_identity=config['candidate']['task_identity'],
                       run_id=policy.parents[2].name,

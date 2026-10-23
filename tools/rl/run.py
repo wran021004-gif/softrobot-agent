@@ -16,6 +16,14 @@ import uuid
 ROOT = Path(__file__).resolve().parents[2]
 RUNS = Path(os.environ.get("SOFTROBOT_RL_RUNS",str(ROOT / "runs/rl")))
 PYTHON = Path(sys.executable)
+REWARD_TERMS = ('position','holding_speed','smoothness','failure_penalty','path_error','progress','regression')
+
+
+def validate_reward(weights):
+    """Worker boundary stays usable in the original lightweight RL environment."""
+    for key,value in weights.items():
+        if key not in REWARD_TERMS or not isinstance(value,(int,float)) or not math.isfinite(value) or (value>0 if key=='failure_penalty' else value<0):
+            raise ValueError('Invalid or unsupported reward term '+key)
 
 
 def read_json(path):
@@ -387,9 +395,7 @@ def validate_settings(result):
         raise ValueError('policy net_arch requires bounded pi/vf layer widths')
     if not math.isfinite(kwargs.get('log_std_init',0)):
         raise ValueError('Invalid log_std_init')
-    for key,v in result['reward'].items():
-        if not isinstance(v,(int,float)) or not math.isfinite(v) or (v>0 if key=='failure_penalty' else v<0):
-            raise ValueError('Invalid reward weight '+key)
+    validate_reward(result['reward'])
     for group in ('observation', 'action'):
         if any(not isinstance(v, (int, float)) or not math.isfinite(v) or v <= 0 for v in result[group].values()):
             raise ValueError('Positive finite normalization/action scales required')

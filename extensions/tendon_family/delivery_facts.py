@@ -26,6 +26,7 @@ class TrackingFacts(Contract):
     measured_computation_s: FiniteFloat | None
     mean_complete_update_s: FiniteFloat | None
     real_time_demonstrated: bool
+    task_conditions: list[dict] = Field(default_factory=list)
 
 
 def tracking_facts(summary, candidate=None, report=None):
@@ -40,7 +41,8 @@ def tracking_facts(summary, candidate=None, report=None):
         valid_complete_execution=summary['valid_complete_execution'],
         maximum_tracking_error_m=metrics.get('max_position_error'),
         rms_tracking_error_m=metrics.get('rms_position_error'),
-        declared_limit_m=summary['tracking']['acceptance']['data']['max_position_error_m'],
+        declared_limit_m=summary['tracking']['acceptance']['data']['max_error_m'],
+        task_conditions=summary['tracking'].get('constraints',[]),
         control_updates=summary['updates'], accepted_feasible_plans=summary['accepted_plans'],
         converged_updates=summary['converged_updates'], deadline_misses=summary['deadline_misses'],
         control_period_s=summary['task']['timing']['control_period_s'],

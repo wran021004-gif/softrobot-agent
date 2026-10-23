@@ -503,11 +503,25 @@ class PPOOverrides(Contract):
     policy_kwargs: dict | None = None
 
 
+class RewardConfiguration(Contract):
+    """Finite registered reward terms; weights never change task acceptance."""
+    position: FiniteFloat = Field(default=1.,ge=0)
+    holding_speed: FiniteFloat = Field(default=1.,ge=0)
+    smoothness: FiniteFloat = Field(default=.001,ge=0)
+    failure_penalty: FiniteFloat = Field(default=-10000.,le=0)
+    path_error: FiniteFloat = Field(default=0.,ge=0)
+    progress: FiniteFloat = Field(default=0.,ge=0)
+    regression: FiniteFloat = Field(default=0.,ge=0)
+
+
 class RewardOverrides(Contract):
     position: FiniteFloat | None = Field(default=None,ge=0)
     holding_speed: FiniteFloat | None = Field(default=None,ge=0)
     smoothness: FiniteFloat | None = Field(default=None,ge=0)
     failure_penalty: FiniteFloat | None = Field(default=None,le=0)
+    path_error: FiniteFloat | None = Field(default=None,ge=0)
+    progress: FiniteFloat | None = Field(default=None,ge=0)
+    regression: FiniteFloat | None = Field(default=None,ge=0)
 
 
 class RLAllocation(Contract):

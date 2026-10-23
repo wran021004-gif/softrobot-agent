@@ -51,6 +51,14 @@ def trajectory_authorization(robot, space, parameters):
             result[f"u/{k}/{t['id']}"] = dict(type='number', bounds=[0.0, t['force_limit_n']], units='N')
     for t in robot.structure.data['tendons']:
         result['previous_u/' + t['id']] = dict(type='number', bounds=[0.0, t['force_limit_n']], units='N')
+    if p.reference_mode != 'constant':
+        for k in range(1, p.horizon*p.substeps+1):
+            for field, unit in (('reference', 'm'), ('reference_velocity', 'm/s')):
+                for j in range(3):
+                    result[f'{field}/{k}/{j}'] = dict(type='number', bounds=[0., 0.], units=unit)
+        for field, unit in (('path_anchor', 'm'), ('path_tangent', '1')):
+            for j in range(3):
+                result[f'{field}/{j}'] = dict(type='number', bounds=[0., 0.], units=unit)
     if p.holding_tip_speed_weight:
         for k in range(1, p.horizon * p.substeps + 1):
             result[f'holding/{k}'] = dict(type='number', bounds=[0.0, 1.0], units='1')
@@ -63,7 +71,18 @@ class GVSTrajectoryAssembler:
 
     def assemble(self, task, robot, space, mathematical_model, specification, context):
         p = self.parameters
-        tracking = False
+        from tools.research_tasks import ResearchTaskAdapter
+        reference = ResearchTaskAdapter(dict(task=task.model_dump(mode='json'))).control_reference()
+        tracking = reference['kind'] != 'constant'
+        if p.reference_mode != reference['kind']:
+            raise ValueError('CONTROL_REFERENCE_MODE_MUST_MATCH_TASK')
+        if tracking and any((p.holding_tip_speed_weight, p.terminal_tip_speed_weight,
+                             p.velocity_weight, p.terminal_velocity_weight)):
+            raise ValueError('TRACKING_HAS_NO_ABSOLUTE_SPEED_HOLDING_COST')
+        if p.relative_velocity_weight and p.reference_mode != 'timed':
+            raise ValueError('RELATIVE_VELOCITY_REQUIRES_TIMED_REFERENCE')
+        if (p.progress_weight or p.regression_weight) and p.reference_mode != 'free_progress':
+            raise ValueError('PROGRESS_COST_REQUIRES_FREE_PROGRESS')
         expected = trajectory_authorization(robot, {}, p)
         if specification.variables != list(expected) or space != expected:
             raise ValueError('GVS_TRAJECTORY_REQUIRES_FIXED_DESIGN_ORDER_AND_PHYSICAL_BOUNDS')
@@ -89,16 +108,16 @@ class GVSTrajectoryAssembler:
         rotation = quaternion_wxyz_to_rotation(assembly['mount']['quaternion_wxyz'])
         local_tip = ca.Function('local_tip', [functions.q_symbol], [functions.tip_position_expression])
         tip_rate = ca.MX.sym('tip_rate', n)
-        local_velocity = ca.Function('local_tip_velocity', [functions.q_symbol, tip_rate], [ca.jacobian(functions.tip_position_expression, functions.q_symbol) @ tip_rate]) if False or p.terminal_tip_speed_weight or p.holding_tip_speed_weight else None
-        target = ca.DM(task.goal.data['target_m'])
+        local_velocity = ca.Function('local_tip_velocity', [functions.q_symbol, tip_rate], [ca.jacobian(functions.tip_position_expression, functions.q_symbol) @ tip_rate]) if p.relative_velocity_weight or p.terminal_tip_speed_weight or p.holding_tip_speed_weight else None
+        target = None if tracking else ca.DM(task.goal.data['target_m'])
         mount = ca.DM(assembly['mount']['position_m'])
         dt = task.timing.control_period_s
         h = dt / p.substeps
         constraints = {}
         objective = 0
-        if task.evaluator.extension_id != 'evaluate.reach':
-            raise ValueError('GVS_TRAJECTORY_REQUIRES_REACH_EVALUATOR')
-        tolerance = p.position_error_scale_m or task.evaluator.parameters.data['tolerance_m']
+        if task.evaluator.extension_id != ('evaluate.tracking' if tracking else 'evaluate.reach'):
+            raise ValueError('GVS_TRAJECTORY_TASK_EVALUATOR_MISMATCH')
+        tolerance = p.position_error_scale_m or task.evaluator.parameters.data['max_error_m' if tracking else 'tolerance_m']
         step_residual = implicit_step_residual(functions, n, m, h, p.integration_method)
         mapped = step_residual.map(steps, 'thread', p.evaluation_threads)
         residuals = mapped(ca.horzcat(*X[:-1]), ca.horzcat(*X[1:]), ca.horzcat(*[U[k // p.substeps] for k in range(steps)]))
@@ -108,7 +127,18 @@ class GVSTrajectoryAssembler:
             for j in range(2 * n):
                 constraints[f'dynamics_{k}_{j}'] = residual[j]
             tip = ca.mtimes(ca.DM(rotation), local_tip(y[:n])) + mount
+            if tracking:
+                target = ca.vertcat(*[symbols[f'reference/{k+1}/{j}'] for j in range(3)])
             objective += h * (p.tracking_weight * ca.sumsqr((tip - target) / tolerance) + p.velocity_weight * ca.sumsqr(y[n:]))
+            if p.relative_velocity_weight:
+                reference_velocity = ca.vertcat(*[symbols[f'reference_velocity/{k+1}/{j}'] for j in range(3)])
+                velocity = ca.DM(rotation) @ local_velocity(y[:n], y[n:])
+                objective += h*p.relative_velocity_weight*ca.sumsqr((velocity-reference_velocity)/p.tip_speed_scale_m_s)
+            if p.reference_mode == 'free_progress':
+                anchor = ca.vertcat(*[symbols[f'path_anchor/{j}'] for j in range(3)])
+                tangent = ca.vertcat(*[symbols[f'path_tangent/{j}'] for j in range(3)])
+                advance = ca.dot(tip-anchor, tangent)/tolerance
+                objective += h*(-p.progress_weight*advance+p.regression_weight*ca.fmax(-advance, 0)**2)
             if p.holding_tip_speed_weight:
                 speed = ca.mtimes(ca.DM(rotation), local_velocity(y[:n], y[n:]))
                 normalization = p.holding_speed_cost_window_s if p.holding_speed_cost_mode == 'window_normalized_v1' else 1.0
@@ -116,7 +146,7 @@ class GVSTrajectoryAssembler:
         for k, u in enumerate(U):
             objective += dt * (p.tension_weight * ca.sumsqr(u) + p.variation_weight * ca.sumsqr(u - (previous if k == 0 else U[k - 1])))
         objective += p.terminal_weight * ca.sumsqr((tip - target) / tolerance) + p.terminal_velocity_weight * ca.sumsqr(X[-1][n:])
-        if local_velocity is not None:
+        if p.terminal_tip_speed_weight:
             world_velocity = ca.mtimes(ca.DM(rotation), local_velocity(X[-1][:n], X[-1][n:]))
             objective += p.terminal_tip_speed_weight * ca.sumsqr(world_velocity / p.tip_speed_scale_m_s)
         objective *= specification.objectives[0].weight
@@ -131,6 +161,10 @@ class GVSTrajectoryAssembler:
             for k in range(1, steps + 1):
                 variables[f'holding/{k}']['bounds'] = [0.0, 0.0]
         guess = dict(specification.initial_guess)
+        if tracking:
+            for name in expected:
+                if name.startswith(('reference/', 'reference_velocity/', 'path_anchor/', 'path_tangent/')):
+                    guess[name] = 0.
         if p.holding_tip_speed_weight:
             for k in range(1, steps + 1):
                 guess[f'holding/{k}'] = 0.0
@@ -153,8 +187,10 @@ class TrajectoryWorkspace:
         from schemas.platform_math import OptimizationSpecification, ObjectiveSelection, ConstraintSelection
         self.parameters = GVSTrajectoryParameters.model_validate(parameters)
         self.n = len(nominal_x) // 2
-        self.tracking = False
-        self.reference = None
+        from tools.research_tasks import ResearchTaskAdapter
+        self.reference = ResearchTaskAdapter(dict(task=task.model_dump(mode='json')))
+        self.tracking = task.family == 'task.tracking'
+        self.path_segment = 0
         self.duration = task.timing.duration_s
         self.holding_start = None
         if self.parameters.holding_tip_speed_weight:
@@ -171,7 +207,7 @@ class TrajectoryWorkspace:
         self.tendons = [t['id'] for t in robot.structure.data['tendons']]
         self.period = task.timing.control_period_s
         self.target = task.goal.data.get('target_m')
-        self.goal_tolerance = task.evaluator.parameters.data['tolerance_m']
+        self.goal_tolerance = task.evaluator.parameters.data['max_error_m' if self.tracking else 'tolerance_m']
         reg = registry()
         start = time.perf_counter()
         binding = Binding(extension_id='optimization_assembler.gvs_trajectory', parameters=Payload(contract='family.gvs_trajectory_parameters', data=self.parameters.model_dump(mode='json')))
@@ -230,9 +266,42 @@ class TrajectoryWorkspace:
             self.problem.initial_guess[f'holding/{k}'] = float(weight)
         return dict(current_time_s=float(elapsed_s), node_times_s=times.tolist(), holding_active=weights.tolist(), task_endpoint_s=self.duration, holding_start_s=self.holding_start, braking_start_s=braking_start, holding_brake_lead_s=self.parameters.holding_brake_lead_s, beyond_task='Holding continues beyond the task endpoint inside the prediction only; execution duration is unchanged.')
 
+    def _set_reference(self, measured_x, elapsed_s):
+        self._prepare_tail()
+        p = self.parameters
+        times = elapsed_s + np.arange(1, p.horizon*p.substeps+1)*self.period/p.substeps
+        local = None
+        if p.reference_mode == 'free_progress':
+            tip, _ = self._motion(measured_x[:self.n], measured_x[self.n:])
+            local = self.reference.local_path_reference(np.asarray(tip).ravel(), self.path_segment,
+                                                       p.path_lookahead_m, p.path_capture_m)
+            self.path_segment = local['segment']
+            positions = np.tile(local['position_m'], (len(times), 1))
+            velocities = np.zeros_like(positions)
+            for field, values in (('path_anchor', local['anchor_m']), ('path_tangent', local['tangent'])):
+                for j, value in enumerate(values):
+                    self.problem.variables[f'{field}/{j}']['bounds'] = [value]*2
+                    self.problem.initial_guess[f'{field}/{j}'] = value
+        else:
+            # No extrapolation or silent time clamping; callers must shorten the
+            # offline timed horizon before it exceeds the declared reference.
+            positions, velocities = self.reference.reference_at(times)
+        for k, (position, velocity) in enumerate(zip(positions, velocities), 1):
+            for field, values in (('reference', position), ('reference_velocity', velocity)):
+                for j, value in enumerate(values):
+                    value = float(value)
+                    self.problem.variables[f'{field}/{k}/{j}']['bounds'] = [value]*2
+                    self.problem.initial_guess[f'{field}/{k}/{j}'] = value
+        self.target = positions[-1]
+        return dict(reference_kind=p.reference_mode, current_time_s=float(elapsed_s),
+                    node_times_s=times.tolist(), positions_m=positions.tolist(),
+                    velocities_m_s=velocities.tolist(), local_progress=local,
+                    horizon_is_task_deadline=False if local is not None else None)
+
     def solve(self, measured_x, previous_u, warm=None, *, elapsed_s=None):
         update_start = time.perf_counter()
-        prediction_timing = self._set_prediction_time(elapsed_s)
+        prediction_timing = (self._set_reference(measured_x, 0. if elapsed_s is None else elapsed_s)
+                             if self.tracking else self._set_prediction_time(elapsed_s))
         for j, value in enumerate(measured_x):
             self.problem.variables[f'x/0/{j}']['bounds'] = [float(value) / self.state_scales[j]] * 2
         for t, value in zip(self.tendons, previous_u):
@@ -282,7 +351,7 @@ class TrajectoryWorkspace:
             self.problem.initial_guess['previous_u/' + t] = float(value)
         preparation_s = time.perf_counter() - update_start
         seed_settled = False
-        if not False and self.parameters.feasible_return is not None and (self._tail_solver is not None):
+        if not self.tracking and self.parameters.feasible_return is not None and (self._tail_solver is not None):
             metrics = []
             for k in range(self.parameters.horizon * self.parameters.substeps + 1):
                 state = np.array([self.problem.initial_guess[f'x/{k}/{j}'] for j in range(2 * self.n)]) * self.state_scales

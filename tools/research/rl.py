@@ -26,8 +26,8 @@ def prepare_input(host, request):
         raise ValueError('Candidate uses length-servo; establish ideal_tension before construction')
     if scene['forces']:
         raise ValueError('RL external-force task semantics are unsupported')
-    if inp.task.family!='task.reach':
-        raise ValueError('Only reach-and-hold supported')
+    if inp.task.family not in ('task.reach','task.tracking'):
+        raise ValueError('RL_TASK_UNSUPPORTED')
     folder=host.store.root/'rl_inputs'/c['identity']
     folder.mkdir(parents=True,exist_ok=True)
     xml=compile_xml(p,scene,host.reg.parse(inp.policy.backend.parameters),folder/'candidate.xml').read_text(encoding='utf8')
@@ -51,13 +51,17 @@ def prepare_input(host, request):
     period=scene['control_period_s']
     acceptance=task['evaluator']['parameters']['data']
     settling=c['configuration']['policy']['controller']['parameters']['data']['settling']
-    cfg['task']=dict(family=inp.task.family,target_m=scene['target_world_m'],initializer=scene['initial'],
+    cfg['task']=dict(family=inp.task.family,initializer=scene['initial'],
         duration_s=scene['duration_s'],control_period_s=period,command_intervals=round(scene['duration_s']/period),
-        tendon_order=cfg['control_object']['tendon_names'],original=task,
-        acceptance=dict(position_limit_m=settling['position_limit_m'],terminal_position_limit_m=acceptance['tolerance_m'],
+        tendon_order=cfg['control_object']['tendon_names'],original=task)
+    if inp.task.family == 'task.reach':
+        cfg['task'].update(target_m=scene['target_world_m'],
+            acceptance=dict(position_limit_m=settling['position_limit_m'],terminal_position_limit_m=acceptance['tolerance_m'],
             holding_speed_limit_m_s=settling['speed_limit_m_s'],
             holding_steps=[k for k in range(round(scene['duration_s']/period)+1)
                 if k*period>=scene['duration_s']-settling['window_s']-1e-12]))
+    elif cfg['reward']['holding_speed']:
+        raise ValueError('TRACKING_REQUIRES_EXPLICIT_ZERO_HOLDING_REWARD')
     task_ref=state_api.state(host)['rl_task']
     if request.task is not None and plain(request.task)!=task_ref:
         raise ValueError('Owned frozen study task required')
@@ -620,7 +624,7 @@ def packet(host):
         for run_id in s.get('rl_runs',{}) if (host.store.root/'rl'/run_id).exists()}
     return dict(allocation_feedback=allocation_feedback(host),frozen_task=s['rl_task'],
         numerical_failure_categories=failure_categories,
-        capabilities=dict(task='reach-and-hold',control='ideal_tension',
+        capabilities=dict(task=['reach-and-hold','development untimed geometric tracking'],control='ideal_tension',
         modes=['direct','residual'],compatible_references=compatible_references(host,publish=False),
         structural_domain=s['spec']['allowed_parameters'],
         defaults=(s['spec'].get('control') or {'rl_defaults':s['spec']['runtime'].get('rl_defaults')})['rl_defaults']),

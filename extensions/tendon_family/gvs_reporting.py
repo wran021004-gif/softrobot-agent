@@ -32,8 +32,9 @@ def summarize(task, result, evaluation, rows, observations, motion, limits, sett
     duration = task.timing.duration_s
     complete = bool(result['solver_status'] == 'completed' and rows and (abs(rows[-1]['time_s'] - duration) < 1e-08))
     valid = complete and evaluation is not None and (evaluation['validity'] == 'valid')
-    tracking = False
-    errors = [float(np.linalg.norm(np.asarray(r['tip_m']) - task.goal.data['target_m'])) for r in rows]
+    tracking = task.family == 'task.tracking'
+    errors = ([r['tip_error_m'] for r in motion] if tracking else
+              [float(np.linalg.norm(np.asarray(r['tip_m']) - task.goal.data['target_m'])) for r in rows])
     window = [r for r in motion if r['time_s'] >= duration - acceptance.window_s - 1e-09]
     expected = round(acceptance.window_s / task.timing.sample_period_s) + 1
     available = complete and len(window) == expected and (len(motion) == len(rows))
@@ -98,7 +99,22 @@ def summarize(task, result, evaluation, rows, observations, motion, limits, sett
         max_sampled_contacts=max((r['contacts'] for r in motion), default=None),
         real_time_demonstrated=bool(complete and observations and all((not o['deadline_missed'] for o in observations))),
     )
-    summary['motion_summary'] = motion_summary(motion, None if not complete else (np.asarray(rows[-1]['tip_m']) - task.goal.data['target_m']).tolist(), duration, acceptance.window_s, task.evaluator.parameters.data['tolerance_m'])
+    if tracking:
+        intervals = round(duration/task.timing.control_period_s)
+        period = task.timing.control_period_s
+        covered = (len(rows) == len(observations) == intervals and
+                   all(abs(r['time_s']-(i+1)*period)<1e-8 and
+                       abs(o['time_s']-i*period)<1e-8 and
+                       np.asarray(o.get('actual_tension_n')).shape == (len(limits),)
+                       for i,(r,o) in enumerate(zip(rows,observations))))
+        summary['tracking_sampling_complete'] = covered
+        summary['sampled_settling'] = dict(available=False, passed=None, reason='Not applicable to Tracking')
+        summary['motion_summary'] = dict(scope='Independent evaluate.tracking owns all path conditions',
+            metrics=(evaluation or {}).get('metrics',[]), constraints=(evaluation or {}).get('constraints',[]))
+        summary['tracking'] = dict(metrics=(evaluation or {}).get('metrics',[]),
+            constraints=(evaluation or {}).get('constraints',[]),acceptance=plain(task.evaluator.parameters))
+    else:
+        summary['motion_summary'] = motion_summary(motion, None if not complete else (np.asarray(rows[-1]['tip_m']) - task.goal.data['target_m']).tolist(), duration, acceptance.window_s, task.evaluator.parameters.data['tolerance_m'])
     comparisons, missing = aligned_predictions(rows, observations, motion)
     summary['one_step_prediction_comparisons'] = comparisons
     summary['one_step_prediction_summary'] = dict(aligned_count=len(comparisons), missing=missing, maximum_tip_difference_m=max((r['tip_difference_m'] for r in comparisons), default=None), mean_tip_difference_m=float(np.mean([r['tip_difference_m'] for r in comparisons])) if comparisons else None, velocity_matched_count=sum((r.get('velocity_difference_m_s') is not None for r in comparisons)), velocity_missing=[dict(time_s=r['start_s'], reason=r['velocity_missing_reason']) for r in comparisons if r.get('velocity_missing_reason')], maximum_velocity_vector_difference_m_s=max((r['velocity_difference_m_s'] for r in comparisons if r.get('velocity_difference_m_s') is not None), default=None), maximum_speed_magnitude_difference_m_s=max((r['speed_magnitude_difference_m_s'] for r in comparisons if r.get('speed_magnitude_difference_m_s') is not None), default=None), frame='world', scope='Only accepted first-step predictions matched to next execution timestamp; no future-plan replay comparison')
@@ -185,9 +201,20 @@ def reconstruct_motion(files, rows, target):
         Jr = np.zeros_like(J)
         mujoco.mj_jacSite(model, data, J, Jr, model.site('tip_site').id)
         projection = project(physics, basis, row['qpos_rad'], row['qvel_rad_s'])
-        tracking = False
         position, velocity = (target, np.zeros(3))
+        if isinstance(target, dict):
+            from extensions.reference.contracts import TrackingGoal
+            from extensions.reference.implementation import project_polyline
+            goal = TrackingGoal.model_validate(target)
+            if goal.time_requirement == 'timed':
+                position, velocity = goal.at_time(row['time_s'])
+            else:
+                distance, _ = project_polyline([row['tip_m']],goal.vertices_m)
+                position = row['tip_m']
         motion.append(dict(tip_velocity_m_s=(J @ data.qvel).tolist(), tip_position_m=list(row['tip_m']), velocity_error_m_s=float(np.linalg.norm(J @ data.qvel - velocity)), time_s=row['time_s'], tip_speed_m_s=float(np.linalg.norm(J @ data.qvel)), tip_error_m=float(np.linalg.norm(np.asarray(row['tip_m']) - position)), contacts=int(data.ncon), rate_projection_residual_rad_m_s=projection['rate_projection_residual_max_rad_m_s']))
+        if isinstance(target, dict) and goal.time_requirement == 'none':
+            motion[-1]['tip_error_m'] = float(distance[0])
+            motion[-1]['velocity_error_m_s'] = None
     return (motion, physics)
 
 
