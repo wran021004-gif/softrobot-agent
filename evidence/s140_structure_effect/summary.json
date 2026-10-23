@@ -1,0 +1,1331 @@
+{
+  "version": "s140-structure-prescreen-v1",
+  "scope": "exploratory screening only",
+  "source": {
+    "commit": "fc509271b",
+    "path": "evidence/s129_math_capability/gvs_pair.json",
+    "configuration_pointer": "/supporting_artifacts[/baseline/candidate/artifact_id]/configuration",
+    "parameters_pointer": "/supporting_artifacts[/baseline/candidate/artifact_id]/parameters",
+    "control_pointer": "/baseline/trajectory/applied_input_n",
+    "control_meaning": "S129 saved mathematical witness inherited by S138; not NMPC execution"
+  },
+  "protocol": {
+    "authority_reason": "No independently justified task-required MIMO gain threshold; usable bandwidth undefined.",
+    "authority_rule": "Smallest singular value >= threshold, connected grid band starting at lowest frequency; no extrapolation.",
+    "authority_threshold": null,
+    "baseline_lengths_m": {
+      "distal1": 0.11,
+      "near": 0.16
+    },
+    "candidate_rule": "initial_target_equilibrium_halfway",
+    "comparison_atol": 1e-08,
+    "comparison_rtol": 2e-06,
+    "construction_max_iterations": 20,
+    "derivative_atol": 2e-05,
+    "derivative_rtol": 0.0002,
+    "derivative_step": 1e-05,
+    "duration_s": 0.35,
+    "endpoint_check_atol": 1e-08,
+    "endpoint_max_iterations": 100,
+    "equilibrium_normalized_residual": 1e-05,
+    "frequency_rad_s": [
+      0.1,
+      1.0,
+      10.0,
+      100.0
+    ],
+    "horizon_alignment_atol_s": 1e-12,
+    "input_scale_n": 8.0,
+    "output_scale_m": 0.01,
+    "period_s": 0.01,
+    "pole_margin_s_inv": 1e-07,
+    "protocol_id": "task-local-v2",
+    "rank_atol": 1e-12,
+    "rank_rtol": 1e-09,
+    "samples_s": [
+      0.0,
+      0.1,
+      0.2,
+      0.3,
+      0.34
+    ],
+    "static_force_tolerance": 1e-10,
+    "static_max_iterations": 20,
+    "windows_s": [
+      0.05,
+      0.1,
+      0.35
+    ]
+  },
+  "geometry": {
+    "initial_world_tip_m": [
+      0.29799999999999993,
+      0.0,
+      0.15
+    ],
+    "position_jacobian_singular_values": [
+      0.022111772880133957,
+      0.022111772880133954,
+      0.0
+    ],
+    "axial_jacobian_norm": 0.0,
+    "static_state_matrix_condition": 1534693.2596158355
+  },
+  "target_rule": "Six fixed Y/Z and oblique directions; exact nonlinear geometry of minimum-norm initial-Jacobian bend; radius clip(0.8*static_direction_support,35,60) mm",
+  "original_selection_rule": "Before C: retain numerically checked B with max geometry error <=10 mm and holding error <=5 mm; rank descending B violation, then ID; choose second direction with dot<=0.5. If fewer than two survive, retain two diagnostic cases but do not freeze formal tasks.",
+  "selection_audit": "Original run ranked raw B scores; all six failed geometry and were tied within 1e-6. The selected opposite-Y upward diagonals are diagnostic only. Final script uses this fixed diagnostic fallback and rounds qualified ranking to 1e-6; same pair, no extra solves.",
+  "selected_targets": [
+    "yz_plus",
+    "minus_y_plus_z"
+  ],
+  "formal_targets_frozen": false,
+  "geometry_qualified_pair": false,
+  "structures": [
+    {
+      "id": "baseline",
+      "lengths_m": {
+        "distal1": 0.11,
+        "near": 0.16
+      },
+      "young_pa": {
+        "distal1": 5400000.0,
+        "near": 7200000.0
+      }
+    },
+    {
+      "id": "near_shorter",
+      "lengths_m": {
+        "distal1": 0.115,
+        "near": 0.155
+      },
+      "young_pa": {
+        "distal1": 5400000.0,
+        "near": 7200000.0
+      }
+    },
+    {
+      "id": "near_longer",
+      "lengths_m": {
+        "distal1": 0.105,
+        "near": 0.165
+      },
+      "young_pa": {
+        "distal1": 5400000.0,
+        "near": 7200000.0
+      }
+    },
+    {
+      "id": "distal_softer",
+      "lengths_m": {
+        "distal1": 0.11,
+        "near": 0.16
+      },
+      "young_pa": {
+        "distal1": 4860000.0,
+        "near": 7200000.0
+      }
+    },
+    {
+      "id": "distal_stiffer",
+      "lengths_m": {
+        "distal1": 0.11,
+        "near": 0.16
+      },
+      "young_pa": {
+        "distal1": 5940000.000000001,
+        "near": 7200000.0
+      }
+    }
+  ],
+  "bounds_source": "configs/research/study.json@fc509271b",
+  "primary_metric": "Inherited signed minimax violation plus independent Reach evaluator; numerical differences <=1e-6 ignored",
+  "secondary_metric": "Witness tension RMS/integral/margins descriptive only, not minimum-energy claims",
+  "candidates": [
+    {
+      "id": "y_plus",
+      "target_m": [
+        0.2907183987136124,
+        0.059370324939782865,
+        0.15
+      ],
+      "direction": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "requested_lateral_m": 0.06,
+      "static_direction_support_m": 0.43876969308855684,
+      "geometric_seed_q_rad_m": [
+        0.0,
+        0.0,
+        0.0,
+        1.3314321317803284,
+        2.1401814781618116,
+        0.8087493463814835,
+        0.0,
+        0.0,
+        0.0,
+        0.3563798235382724,
+        0.46571036179037184,
+        0.10933053825209921
+      ],
+      "geometric_shortening_m": 0.007281601286387551,
+      "selected": false,
+      "selection_reason": "Excluded: failed predeclared nonlinear geometry consistency screen",
+      "A": {
+        "signed_violation": 3.7403012612263655,
+        "status": "inconclusive",
+        "evaluator_pass": false,
+        "evaluator_position_error_m": 0.04740179489600747,
+        "all_requested_checked": true,
+        "constraints": {
+          "holding_max_error_m": {
+            "max_value": 0.04740301261226366,
+            "max_signed_violation": 3.7403012612263655
+          },
+          "holding_max_speed_m_s": {
+            "max_value": 0.015980204709395558,
+            "max_signed_violation": -0.20098976453022213
+          },
+          "terminal_error_m": {
+            "max_value": 0.04740179489600747,
+            "max_signed_violation": 3.7401794896007465
+          }
+        },
+        "replay_valid": true,
+        "prediction_replay_error": 1.0096090630185017e-15,
+        "solver_status": "fixed_control",
+        "solver_iterations": null,
+        "solver_wall_s": null,
+        "optimality_status": "not_checked_fixed_control",
+        "support_gap": null,
+        "primal_checks": null,
+        "tension_rms_n": 2.0786200880063297,
+        "tension_minimum_box_margin_n": 0.6349523540968242,
+        "tension_min_max_n": [
+          0.6349523540968242,
+          3.2514345089850285
+        ],
+        "tension_integral_n2_s": 9.073389087553227,
+        "locality": {
+          "geometry_screen_pass": false,
+          "max_position_linearization_error_m": 0.01080014351538145,
+          "holding_max_position_linearization_error_m": 0.010427829234948595,
+          "max_scaled_state_excursion": 3.438536365125947,
+          "max_relative_dynamics_residual": 1.0015215671283881
+        }
+      },
+      "B": {
+        "signed_violation": -0.2718398713605169,
+        "status": "feasible_witness",
+        "evaluator_pass": true,
+        "evaluator_position_error_m": 0.007281601286390963,
+        "all_requested_checked": true,
+        "constraints": {
+          "holding_max_error_m": {
+            "max_value": 0.007281601286394831,
+            "max_signed_violation": -0.2718398713605169
+          },
+          "holding_max_speed_m_s": {
+            "max_value": 0.005485448347396645,
+            "max_signed_violation": -0.7257275826301678
+          },
+          "terminal_error_m": {
+            "max_value": 0.0072816012863909626,
+            "max_signed_violation": -0.27183987136090376
+          }
+        },
+        "replay_valid": true,
+        "prediction_replay_error": 2.121566811119635e-15,
+        "solver_status": "optimal",
+        "solver_iterations": 11,
+        "solver_wall_s": 0.016111900098621845,
+        "optimality_status": "numerically_checked",
+        "support_gap": 1.395413784521793e-10,
+        "primal_checks": {
+          "source": "independent_from_original_sample_maps",
+          "epigraph_violation": 0.0,
+          "box_violation_n": 0.0
+        },
+        "tension_rms_n": 4.035942486573973,
+        "tension_minimum_box_margin_n": 2.849314862731715,
+        "tension_min_max_n": [
+          2.9315141738523534,
+          5.150685137268285
+        ],
+        "tension_integral_n2_s": 34.2065466853591,
+        "locality": {
+          "geometry_screen_pass": false,
+          "max_position_linearization_error_m": 0.009562264100047284,
+          "holding_max_position_linearization_error_m": 0.009313525084724805,
+          "max_scaled_state_excursion": 1.8490684694064856,
+          "max_relative_dynamics_residual": 1.0005825716122636
+        }
+      }
+    },
+    {
+      "id": "y_minus",
+      "target_m": [
+        0.2907183987136124,
+        -0.059370324939782865,
+        0.15
+      ],
+      "direction": [
+        0.0,
+        -1.0,
+        0.0
+      ],
+      "requested_lateral_m": 0.06,
+      "static_direction_support_m": 0.4383773353376275,
+      "geometric_seed_q_rad_m": [
+        0.0,
+        0.0,
+        0.0,
+        -1.3314321317803284,
+        -2.1401814781618116,
+        -0.8087493463814835,
+        0.0,
+        0.0,
+        0.0,
+        -0.3563798235382724,
+        -0.46571036179037184,
+        -0.10933053825209921
+      ],
+      "geometric_shortening_m": 0.007281601286387551,
+      "selected": false,
+      "selection_reason": "Excluded: failed predeclared nonlinear geometry consistency screen",
+      "A": {
+        "signed_violation": 9.27569759843032,
+        "status": "inconclusive",
+        "evaluator_pass": false,
+        "evaluator_position_error_m": 0.1027556551744476,
+        "all_requested_checked": true,
+        "constraints": {
+          "holding_max_error_m": {
+            "max_value": 0.1027569759843032,
+            "max_signed_violation": 9.27569759843032
+          },
+          "holding_max_speed_m_s": {
+            "max_value": 0.015980204709395558,
+            "max_signed_violation": -0.20098976453022213
+          },
+          "terminal_error_m": {
+            "max_value": 0.10275565517444761,
+            "max_signed_violation": 9.275565517444761
+          }
+        },
+        "replay_valid": true,
+        "prediction_replay_error": 1.0096090630185017e-15,
+        "solver_status": "fixed_control",
+        "solver_iterations": null,
+        "solver_wall_s": null,
+        "optimality_status": "not_checked_fixed_control",
+        "support_gap": null,
+        "primal_checks": null,
+        "tension_rms_n": 2.0786200880063297,
+        "tension_minimum_box_margin_n": 0.6349523540968242,
+        "tension_min_max_n": [
+          0.6349523540968242,
+          3.2514345089850285
+        ],
+        "tension_integral_n2_s": 9.073389087553227,
+        "locality": {
+          "geometry_screen_pass": false,
+          "max_position_linearization_error_m": 0.01080014351538145,
+          "holding_max_position_linearization_error_m": 0.010427829234948595,
+          "max_scaled_state_excursion": 3.438536365125947,
+          "max_relative_dynamics_residual": 1.0015215671283881
+        }
+      },
+      "B": {
+        "signed_violation": -0.27183987136122434,
+        "status": "feasible_witness",
+        "evaluator_pass": true,
+        "evaluator_position_error_m": 0.007281601286387756,
+        "all_requested_checked": true,
+        "constraints": {
+          "holding_max_error_m": {
+            "max_value": 0.007281601286387757,
+            "max_signed_violation": -0.27183987136122434
+          },
+          "holding_max_speed_m_s": {
+            "max_value": 0.005729657752315336,
+            "max_signed_violation": -0.7135171123842332
+          },
+          "terminal_error_m": {
+            "max_value": 0.007281601286387757,
+            "max_signed_violation": -0.27183987136122434
+          }
+        },
+        "replay_valid": true,
+        "prediction_replay_error": 1.942890293094024e-15,
+        "solver_status": "optimal",
+        "solver_iterations": 11,
+        "solver_wall_s": 0.012963300105184317,
+        "optimality_status": "numerically_checked",
+        "support_gap": 3.524996960990734e-11,
+        "primal_checks": {
+          "source": "independent_from_original_sample_maps",
+          "epigraph_violation": 0.0,
+          "box_violation_n": 0.0
+        },
+        "tension_rms_n": 4.039710753144587,
+        "tension_minimum_box_margin_n": 2.8670718803384174,
+        "tension_min_max_n": [
+          2.8670718803384174,
+          5.02968483180662
+        ],
+        "tension_integral_n2_s": 34.27045223505121,
+        "locality": {
+          "geometry_screen_pass": false,
+          "max_position_linearization_error_m": 0.010109513902905858,
+          "holding_max_position_linearization_error_m": 0.009801408444742322,
+          "max_scaled_state_excursion": 1.8956564180361848,
+          "max_relative_dynamics_residual": 1.0007451348409941
+        }
+      }
+    },
+    {
+      "id": "z_plus",
+      "target_m": [
+        0.2907183987136124,
+        7.059781337289982e-18,
+        0.20937032493978286
+      ],
+      "direction": [
+        0.0,
+        0.0,
+        1.0
+      ],
+      "requested_lateral_m": 0.06,
+      "static_direction_support_m": 0.6122509379682679,
+      "geometric_seed_q_rad_m": [
+        -1.3314321317803286,
+        -2.140181478161812,
+        -0.8087493463814838,
+        1.3124951874737864e-16,
+        2.624990374947573e-16,
+        1.3124951874737864e-16,
+        -0.3563798235382726,
+        -0.4657103617903719,
+        -0.10933053825209921,
+        0.0,
+        6.562475937368932e-17,
+        1.640618984342233e-17
+      ],
+      "geometric_shortening_m": 0.007281601286387551,
+      "selected": false,
+      "selection_reason": "Excluded: failed predeclared nonlinear geometry consistency screen",
+      "A": {
+        "signed_violation": 3.066245657786758,
+        "status": "inconclusive",
+        "evaluator_pass": false,
+        "evaluator_position_error_m": 0.040659849061909586,
+        "all_requested_checked": true,
+        "constraints": {
+          "holding_max_error_m": {
+            "max_value": 0.04066245657786758,
+            "max_signed_violation": 3.066245657786758
+          },
+          "holding_max_speed_m_s": {
+            "max_value": 0.015980204709395558,
+            "max_signed_violation": -0.20098976453022213
+          },
+          "terminal_error_m": {
+            "max_value": 0.04065984906190959,
+            "max_signed_violation": 3.065984906190959
+          }
+        },
+        "replay_valid": true,
+        "prediction_replay_error": 1.0096090630185017e-15,
+        "solver_status": "fixed_control",
+        "solver_iterations": null,
+        "solver_wall_s": null,
+        "optimality_status": "not_checked_fixed_control",
+        "support_gap": null,
+        "primal_checks": null,
+        "tension_rms_n": 2.0786200880063297,
+        "tension_minimum_box_margin_n": 0.6349523540968242,
+        "tension_min_max_n": [
+          0.6349523540968242,
+          3.2514345089850285
+        ],
+        "tension_integral_n2_s": 9.073389087553227,
+        "locality": {
+          "geometry_screen_pass": false,
+          "max_position_linearization_error_m": 0.01080014351538145,
+          "holding_max_position_linearization_error_m": 0.010427829234948595,
+          "max_scaled_state_excursion": 3.438536365125947,
+          "max_relative_dynamics_residual": 1.0015215671283881
+        }
+      },
+      "B": {
+        "signed_violation": -0.27183987136023363,
+        "status": "feasible_witness",
+        "evaluator_pass": true,
+        "evaluator_position_error_m": 0.007281601286397454,
+        "all_requested_checked": true,
+        "constraints": {
+          "holding_max_error_m": {
+            "max_value": 0.007281601286397664,
+            "max_signed_violation": -0.27183987136023363
+          },
+          "holding_max_speed_m_s": {
+            "max_value": 0.006120224880926551,
+            "max_signed_violation": -0.6939887559536725
+          },
+          "terminal_error_m": {
+            "max_value": 0.007281601286397454,
+            "max_signed_violation": -0.2718398713602546
+          }
+        },
+        "replay_valid": true,
+        "prediction_replay_error": 2.482389294122811e-15,
+        "solver_status": "optimal",
+        "solver_iterations": 11,
+        "solver_wall_s": 0.012930399971082807,
+        "optimality_status": "numerically_checked",
+        "support_gap": 1.5954676468865614e-10,
+        "primal_checks": {
+          "source": "independent_from_original_sample_maps",
+          "epigraph_violation": 0.0,
+          "box_violation_n": 0.0
+        },
+        "tension_rms_n": 4.06268018503932,
+        "tension_minimum_box_margin_n": 2.51404215640638,
+        "tension_min_max_n": [
+          2.51404215640638,
+          4.936119938856266
+        ],
+        "tension_integral_n2_s": 34.661277600413364,
+        "locality": {
+          "geometry_screen_pass": false,
+          "max_position_linearization_error_m": 0.013828965182903668,
+          "holding_max_position_linearization_error_m": 0.013170669904744312,
+          "max_scaled_state_excursion": 2.4716519407424307,
+          "max_relative_dynamics_residual": 1.0007859522254359
+        }
+      }
+    },
+    {
+      "id": "z_minus",
+      "target_m": [
+        0.2907183987136124,
+        -7.059781337289982e-18,
+        0.09062967506021712
+      ],
+      "direction": [
+        0.0,
+        0.0,
+        -1.0
+      ],
+      "requested_lateral_m": 0.06,
+      "static_direction_support_m": 0.8163370151452225,
+      "geometric_seed_q_rad_m": [
+        1.3314321317803286,
+        2.140181478161812,
+        0.8087493463814838,
+        -1.3124951874737864e-16,
+        -2.624990374947573e-16,
+        -1.3124951874737864e-16,
+        0.3563798235382726,
+        0.4657103617903719,
+        0.10933053825209921,
+        0.0,
+        -6.562475937368932e-17,
+        -1.640618984342233e-17
+      ],
+      "geometric_shortening_m": 0.007281601286387551,
+      "selected": false,
+      "selection_reason": "Excluded: failed predeclared nonlinear geometry consistency screen",
+      "A": {
+        "signed_violation": 9.560648875519407,
+        "status": "inconclusive",
+        "evaluator_pass": false,
+        "evaluator_position_error_m": 0.1056050732870153,
+        "all_requested_checked": true,
+        "constraints": {
+          "holding_max_error_m": {
+            "max_value": 0.10560648875519406,
+            "max_signed_violation": 9.560648875519407
+          },
+          "holding_max_speed_m_s": {
+            "max_value": 0.015980204709395558,
+            "max_signed_violation": -0.20098976453022213
+          },
+          "terminal_error_m": {
+            "max_value": 0.1056050732870153,
+            "max_signed_violation": 9.56050732870153
+          }
+        },
+        "replay_valid": true,
+        "prediction_replay_error": 1.0096090630185017e-15,
+        "solver_status": "fixed_control",
+        "solver_iterations": null,
+        "solver_wall_s": null,
+        "optimality_status": "not_checked_fixed_control",
+        "support_gap": null,
+        "primal_checks": null,
+        "tension_rms_n": 2.0786200880063297,
+        "tension_minimum_box_margin_n": 0.6349523540968242,
+        "tension_min_max_n": [
+          0.6349523540968242,
+          3.2514345089850285
+        ],
+        "tension_integral_n2_s": 9.073389087553227,
+        "locality": {
+          "geometry_screen_pass": false,
+          "max_position_linearization_error_m": 0.01080014351538145,
+          "holding_max_position_linearization_error_m": 0.010427829234948595,
+          "max_scaled_state_excursion": 3.438536365125947,
+          "max_relative_dynamics_residual": 1.0015215671283881
+        }
+      },
+      "B": {
+        "signed_violation": -0.2718398713612273,
+        "status": "feasible_witness",
+        "evaluator_pass": true,
+        "evaluator_position_error_m": 0.007281601286387727,
+        "all_requested_checked": true,
+        "constraints": {
+          "holding_max_error_m": {
+            "max_value": 0.007281601286387727,
+            "max_signed_violation": -0.2718398713612273
+          },
+          "holding_max_speed_m_s": {
+            "max_value": 0.002488195016524321,
+            "max_signed_violation": -0.8755902491737839
+          },
+          "terminal_error_m": {
+            "max_value": 0.007281601286387727,
+            "max_signed_violation": -0.2718398713612273
+          }
+        },
+        "replay_valid": true,
+        "prediction_replay_error": 1.558215362296167e-15,
+        "solver_status": "optimal",
+        "solver_iterations": 10,
+        "solver_wall_s": 0.012591100065037608,
+        "optimality_status": "numerically_checked",
+        "support_gap": 1.9491019909168017e-11,
+        "primal_checks": {
+          "source": "independent_from_original_sample_maps",
+          "epigraph_violation": 0.0,
+          "box_violation_n": 0.0
+        },
+        "tension_rms_n": 4.012782420335665,
+        "tension_minimum_box_margin_n": 3.3040793750058093,
+        "tension_min_max_n": [
+          3.3040793750058093,
+          4.401180825273455
+        ],
+        "tension_integral_n2_s": 33.8150877812054,
+        "locality": {
+          "geometry_screen_pass": false,
+          "max_position_linearization_error_m": 0.009527232977207608,
+          "holding_max_position_linearization_error_m": 0.006892770563644857,
+          "max_scaled_state_excursion": 1.6332362877565811,
+          "max_relative_dynamics_residual": 1.0005455456530192
+        }
+      }
+    },
+    {
+      "id": "yz_plus",
+      "target_m": [
+        0.2907183987136125,
+        0.041981159366169266,
+        0.19198115936616927
+      ],
+      "direction": [
+        0.0,
+        0.7071067811865475,
+        0.7071067811865475
+      ],
+      "requested_lateral_m": 0.06,
+      "static_direction_support_m": 0.4958539304865177,
+      "geometric_seed_q_rad_m": [
+        -0.9414646890715312,
+        -1.5133368361780661,
+        -0.5718721471065352,
+        0.9414646890715311,
+        1.5133368361780661,
+        0.5718721471065351,
+        -0.2519985899019777,
+        -0.32930695489081235,
+        -0.07730836498883457,
+        0.2519985899019776,
+        0.32930695489081235,
+        0.07730836498883459
+      ],
+      "geometric_shortening_m": 0.00728160128638744,
+      "selected": true,
+      "selection_reason": "Unqualified diagnostic diagonal",
+      "A": {
+        "signed_violation": 0.028097155478090663,
+        "status": "inconclusive",
+        "evaluator_pass": false,
+        "evaluator_position_error_m": 0.01028041945735419,
+        "all_requested_checked": true,
+        "constraints": {
+          "holding_max_error_m": {
+            "max_value": 0.010280971554780907,
+            "max_signed_violation": 0.028097155478090663
+          },
+          "holding_max_speed_m_s": {
+            "max_value": 0.015980204709395558,
+            "max_signed_violation": -0.20098976453022213
+          },
+          "terminal_error_m": {
+            "max_value": 0.010280419457354185,
+            "max_signed_violation": 0.028041945735418454
+          }
+        },
+        "replay_valid": true,
+        "prediction_replay_error": 1.0096090630185017e-15,
+        "solver_status": "fixed_control",
+        "solver_iterations": null,
+        "solver_wall_s": null,
+        "optimality_status": "not_checked_fixed_control",
+        "support_gap": null,
+        "primal_checks": null,
+        "tension_rms_n": 2.0786200880063297,
+        "tension_minimum_box_margin_n": 0.6349523540968242,
+        "tension_min_max_n": [
+          0.6349523540968242,
+          3.2514345089850285
+        ],
+        "tension_integral_n2_s": 9.073389087553227,
+        "locality": {
+          "geometry_screen_pass": false,
+          "max_position_linearization_error_m": 0.01080014351538145,
+          "holding_max_position_linearization_error_m": 0.010427829234948595,
+          "max_scaled_state_excursion": 3.438536365125947,
+          "max_relative_dynamics_residual": 1.0015215671283881
+        }
+      },
+      "B": {
+        "signed_violation": -0.27183987131304294,
+        "status": "feasible_witness",
+        "evaluator_pass": true,
+        "evaluator_position_error_m": 0.007281601286387942,
+        "all_requested_checked": true,
+        "constraints": {
+          "holding_max_error_m": {
+            "max_value": 0.007281601286869571,
+            "max_signed_violation": -0.27183987131304294
+          },
+          "holding_max_speed_m_s": {
+            "max_value": 0.006273574793549,
+            "max_signed_violation": -0.68632126032255
+          },
+          "terminal_error_m": {
+            "max_value": 0.0072816012863879415,
+            "max_signed_violation": -0.27183987136120585
+          }
+        },
+        "replay_valid": true,
+        "prediction_replay_error": 1.1483869410966463e-15,
+        "solver_status": "optimal",
+        "solver_iterations": 12,
+        "solver_wall_s": 0.015567499911412597,
+        "optimality_status": "numerically_checked",
+        "support_gap": 2.004638677277626e-10,
+        "primal_checks": {
+          "source": "independent_from_original_sample_maps",
+          "epigraph_violation": 3.792849367911799e-11,
+          "box_violation_n": 0.0
+        },
+        "tension_rms_n": 4.054460309803375,
+        "tension_minimum_box_margin_n": 2.6426021328596168,
+        "tension_min_max_n": [
+          2.6426021328596168,
+          5.218243218126938
+        ],
+        "tension_integral_n2_s": 34.521161647918845,
+        "locality": {
+          "geometry_screen_pass": false,
+          "max_position_linearization_error_m": 0.012724014007654019,
+          "holding_max_position_linearization_error_m": 0.012230320664022956,
+          "max_scaled_state_excursion": 2.2716030605756377,
+          "max_relative_dynamics_residual": 1.0006978623270235
+        }
+      }
+    },
+    {
+      "id": "minus_y_plus_z",
+      "target_m": [
+        0.2907183987136125,
+        -0.041981159366169266,
+        0.19198115936616927
+      ],
+      "direction": [
+        0.0,
+        -0.7071067811865475,
+        0.7071067811865475
+      ],
+      "requested_lateral_m": 0.06,
+      "static_direction_support_m": 0.5467924261791637,
+      "geometric_seed_q_rad_m": [
+        -0.9414646890715312,
+        -1.5133368361780661,
+        -0.5718721471065352,
+        -0.9414646890715309,
+        -1.5133368361780657,
+        -0.5718721471065349,
+        -0.2519985899019777,
+        -0.32930695489081235,
+        -0.07730836498883457,
+        -0.2519985899019776,
+        -0.32930695489081224,
+        -0.07730836498883456
+      ],
+      "geometric_shortening_m": 0.00728160128638744,
+      "selected": true,
+      "selection_reason": "Unqualified diagnostic diagonal",
+      "A": {
+        "signed_violation": 6.7351892155179724,
+        "status": "inconclusive",
+        "evaluator_pass": false,
+        "evaluator_position_error_m": 0.0773499404444044,
+        "all_requested_checked": true,
+        "constraints": {
+          "holding_max_error_m": {
+            "max_value": 0.07735189215517972,
+            "max_signed_violation": 6.7351892155179724
+          },
+          "holding_max_speed_m_s": {
+            "max_value": 0.015980204709395558,
+            "max_signed_violation": -0.20098976453022213
+          },
+          "terminal_error_m": {
+            "max_value": 0.07734994044440441,
+            "max_signed_violation": 6.734994044440441
+          }
+        },
+        "replay_valid": true,
+        "prediction_replay_error": 1.0096090630185017e-15,
+        "solver_status": "fixed_control",
+        "solver_iterations": null,
+        "solver_wall_s": null,
+        "optimality_status": "not_checked_fixed_control",
+        "support_gap": null,
+        "primal_checks": null,
+        "tension_rms_n": 2.0786200880063297,
+        "tension_minimum_box_margin_n": 0.6349523540968242,
+        "tension_min_max_n": [
+          0.6349523540968242,
+          3.2514345089850285
+        ],
+        "tension_integral_n2_s": 9.073389087553227,
+        "locality": {
+          "geometry_screen_pass": false,
+          "max_position_linearization_error_m": 0.01080014351538145,
+          "holding_max_position_linearization_error_m": 0.010427829234948595,
+          "max_scaled_state_excursion": 3.438536365125947,
+          "max_relative_dynamics_residual": 1.0015215671283881
+        }
+      },
+      "B": {
+        "signed_violation": -0.27183987136063026,
+        "status": "feasible_witness",
+        "evaluator_pass": true,
+        "evaluator_position_error_m": 0.007281601286393155,
+        "all_requested_checked": true,
+        "constraints": {
+          "holding_max_error_m": {
+            "max_value": 0.007281601286393697,
+            "max_signed_violation": -0.27183987136063026
+          },
+          "holding_max_speed_m_s": {
+            "max_value": 0.006061214282535906,
+            "max_signed_violation": -0.6969392858732046
+          },
+          "terminal_error_m": {
+            "max_value": 0.007281601286393154,
+            "max_signed_violation": -0.2718398713606846
+          }
+        },
+        "replay_valid": true,
+        "prediction_replay_error": 1.9611048895917804e-15,
+        "solver_status": "optimal",
+        "solver_iterations": 11,
+        "solver_wall_s": 0.0172091000713408,
+        "optimality_status": "numerically_checked",
+        "support_gap": 1.9265739004126203e-10,
+        "primal_checks": {
+          "source": "independent_from_original_sample_maps",
+          "epigraph_violation": 0.0,
+          "box_violation_n": 0.0
+        },
+        "tension_rms_n": 4.055986332984772,
+        "tension_minimum_box_margin_n": 2.611578887149376,
+        "tension_min_max_n": [
+          2.611578887149376,
+          5.125455717265645
+        ],
+        "tension_integral_n2_s": 34.54715278005445,
+        "locality": {
+          "geometry_screen_pass": false,
+          "max_position_linearization_error_m": 0.012386936742821633,
+          "holding_max_position_linearization_error_m": 0.01183204484687069,
+          "max_scaled_state_excursion": 2.3016895793719585,
+          "max_relative_dynamics_residual": 1.000792821987095
+        }
+      }
+    }
+  ],
+  "comparisons": [
+    {
+      "structure": "near_shorter",
+      "target": "yz_plus",
+      "C": {
+        "signed_violation": -0.27183987135755555,
+        "status": "feasible_witness",
+        "evaluator_pass": true,
+        "evaluator_position_error_m": 0.007281601286387593,
+        "all_requested_checked": true,
+        "constraints": {
+          "holding_max_error_m": {
+            "max_value": 0.0072816012864244445,
+            "max_signed_violation": -0.27183987135755555
+          },
+          "holding_max_speed_m_s": {
+            "max_value": 0.006340040019534578,
+            "max_signed_violation": -0.6829979990232712
+          },
+          "terminal_error_m": {
+            "max_value": 0.007281601286387593,
+            "max_signed_violation": -0.2718398713612407
+          }
+        },
+        "replay_valid": true,
+        "prediction_replay_error": 9.43689570931383e-16,
+        "solver_status": "optimal",
+        "solver_iterations": 13,
+        "solver_wall_s": 0.012828200124204159,
+        "optimality_status": "numerically_checked",
+        "support_gap": 7.978634419814057e-11,
+        "primal_checks": {
+          "source": "independent_from_original_sample_maps",
+          "epigraph_violation": 1.894484569220367e-12,
+          "box_violation_n": 0.0
+        },
+        "tension_rms_n": 4.052785605170776,
+        "tension_minimum_box_margin_n": 2.6435393673457566,
+        "tension_min_max_n": [
+          2.6435393673457566,
+          5.213501363907318
+        ],
+        "tension_integral_n2_s": 34.49264943910685,
+        "locality": {
+          "geometry_screen_pass": false,
+          "max_position_linearization_error_m": 0.01286318118756422,
+          "holding_max_position_linearization_error_m": 0.012380096686568158,
+          "max_scaled_state_excursion": 2.1839308257577716,
+          "max_relative_dynamics_residual": 1.000645122602743
+        }
+      },
+      "C_minus_B": -4.451261581550625e-11
+    },
+    {
+      "structure": "near_shorter",
+      "target": "minus_y_plus_z",
+      "C": {
+        "signed_violation": -0.2718398713610126,
+        "status": "feasible_witness",
+        "evaluator_pass": true,
+        "evaluator_position_error_m": 0.007281601286389875,
+        "all_requested_checked": true,
+        "constraints": {
+          "holding_max_error_m": {
+            "max_value": 0.007281601286389874,
+            "max_signed_violation": -0.2718398713610126
+          },
+          "holding_max_speed_m_s": {
+            "max_value": 0.006418472293697254,
+            "max_signed_violation": -0.6790763853151374
+          },
+          "terminal_error_m": {
+            "max_value": 0.007281601286389874,
+            "max_signed_violation": -0.2718398713610126
+          }
+        },
+        "replay_valid": true,
+        "prediction_replay_error": 1.5751289161869408e-15,
+        "solver_status": "optimal",
+        "solver_iterations": 11,
+        "solver_wall_s": 0.014111800119280815,
+        "optimality_status": "numerically_checked",
+        "support_gap": 1.2927864334599803e-10,
+        "primal_checks": {
+          "source": "independent_from_original_sample_maps",
+          "epigraph_violation": 0.0,
+          "box_violation_n": 0.0
+        },
+        "tension_rms_n": 4.055163246211502,
+        "tension_minimum_box_margin_n": 2.6007845504958467,
+        "tension_min_max_n": [
+          2.6007845504958467,
+          5.132252070850004
+        ],
+        "tension_integral_n2_s": 34.533132802191666,
+        "locality": {
+          "geometry_screen_pass": false,
+          "max_position_linearization_error_m": 0.012510531303567083,
+          "holding_max_position_linearization_error_m": 0.011952441046172924,
+          "max_scaled_state_excursion": 2.2465931783335424,
+          "max_relative_dynamics_residual": 1.0007002408965557
+        }
+      },
+      "C_minus_B": -3.823608096809039e-13
+    },
+    {
+      "structure": "near_longer",
+      "target": "yz_plus",
+      "C": {
+        "signed_violation": -0.27183987136071236,
+        "status": "feasible_witness",
+        "evaluator_pass": true,
+        "evaluator_position_error_m": 0.007281601286392695,
+        "all_requested_checked": true,
+        "constraints": {
+          "holding_max_error_m": {
+            "max_value": 0.007281601286392877,
+            "max_signed_violation": -0.27183987136071236
+          },
+          "holding_max_speed_m_s": {
+            "max_value": 0.006106960403768955,
+            "max_signed_violation": -0.6946519798115524
+          },
+          "terminal_error_m": {
+            "max_value": 0.007281601286392695,
+            "max_signed_violation": -0.27183987136073057
+          }
+        },
+        "replay_valid": true,
+        "prediction_replay_error": 1.2420620087993939e-15,
+        "solver_status": "optimal",
+        "solver_iterations": 11,
+        "solver_wall_s": 0.013202000176534057,
+        "optimality_status": "numerically_checked",
+        "support_gap": 1.3114326291585598e-10,
+        "primal_checks": {
+          "source": "independent_from_original_sample_maps",
+          "epigraph_violation": 0.0,
+          "box_violation_n": 0.0
+        },
+        "tension_rms_n": 4.054912327890109,
+        "tension_minimum_box_margin_n": 2.6450083808910687,
+        "tension_min_max_n": [
+          2.6450083808910687,
+          5.220574195749569
+        ],
+        "tension_integral_n2_s": 34.52885937243787,
+        "locality": {
+          "geometry_screen_pass": false,
+          "max_position_linearization_error_m": 0.012591176044719085,
+          "holding_max_position_linearization_error_m": 0.012100735121446752,
+          "max_scaled_state_excursion": 2.328803638125451,
+          "max_relative_dynamics_residual": 1.0007545876413708
+        }
+      },
+      "C_minus_B": -4.766942396372542e-11
+    },
+    {
+      "structure": "near_longer",
+      "target": "minus_y_plus_z",
+      "C": {
+        "signed_violation": -0.27183987136108745,
+        "status": "feasible_witness",
+        "evaluator_pass": true,
+        "evaluator_position_error_m": 0.007281601286389126,
+        "all_requested_checked": true,
+        "constraints": {
+          "holding_max_error_m": {
+            "max_value": 0.0072816012863891255,
+            "max_signed_violation": -0.27183987136108745
+          },
+          "holding_max_speed_m_s": {
+            "max_value": 0.006347657535797835,
+            "max_signed_violation": -0.6826171232101081
+          },
+          "terminal_error_m": {
+            "max_value": 0.0072816012863891255,
+            "max_signed_violation": -0.27183987136108745
+          }
+        },
+        "replay_valid": true,
+        "prediction_replay_error": 2.6922908347160046e-15,
+        "solver_status": "optimal",
+        "solver_iterations": 11,
+        "solver_wall_s": 0.013019700068980455,
+        "optimality_status": "numerically_checked",
+        "support_gap": 9.258349642493613e-11,
+        "primal_checks": {
+          "source": "independent_from_original_sample_maps",
+          "epigraph_violation": 0.0,
+          "box_violation_n": 0.0
+        },
+        "tension_rms_n": 4.057017758765005,
+        "tension_minimum_box_margin_n": 2.6016506119817353,
+        "tension_min_max_n": [
+          2.6016506119817353,
+          5.142628880938893
+        ],
+        "tension_integral_n2_s": 34.56472549936271,
+        "locality": {
+          "geometry_screen_pass": false,
+          "max_position_linearization_error_m": 0.012266862731967426,
+          "holding_max_position_linearization_error_m": 0.01168113786884076,
+          "max_scaled_state_excursion": 2.387133447696274,
+          "max_relative_dynamics_residual": 1.0009033838365693
+        }
+      },
+      "C_minus_B": -4.571898415406395e-13
+    },
+    {
+      "structure": "distal_softer",
+      "target": "yz_plus",
+      "C": {
+        "signed_violation": -0.2718398713606469,
+        "status": "feasible_witness",
+        "evaluator_pass": true,
+        "evaluator_position_error_m": 0.007281601286391359,
+        "all_requested_checked": true,
+        "constraints": {
+          "holding_max_error_m": {
+            "max_value": 0.007281601286393531,
+            "max_signed_violation": -0.2718398713606469
+          },
+          "holding_max_speed_m_s": {
+            "max_value": 0.006185791537357864,
+            "max_signed_violation": -0.6907104231321068
+          },
+          "terminal_error_m": {
+            "max_value": 0.007281601286391359,
+            "max_signed_violation": -0.2718398713608641
+          }
+        },
+        "replay_valid": true,
+        "prediction_replay_error": 1.1050188541972261e-15,
+        "solver_status": "optimal",
+        "solver_iterations": 11,
+        "solver_wall_s": 0.013943499885499477,
+        "optimality_status": "numerically_checked",
+        "support_gap": 1.221431289444297e-10,
+        "primal_checks": {
+          "source": "independent_from_original_sample_maps",
+          "epigraph_violation": 0.0,
+          "box_violation_n": 0.0
+        },
+        "tension_rms_n": 4.05221868819369,
+        "tension_minimum_box_margin_n": 2.6514276835003665,
+        "tension_min_max_n": [
+          2.6514276835003665,
+          5.1929425228826736
+        ],
+        "tension_integral_n2_s": 34.48300022358701,
+        "locality": {
+          "geometry_screen_pass": false,
+          "max_position_linearization_error_m": 0.013432606693373293,
+          "holding_max_position_linearization_error_m": 0.012929318710803979,
+          "max_scaled_state_excursion": 2.1654236599165357,
+          "max_relative_dynamics_residual": 1.0006515900537387
+        }
+      },
+      "C_minus_B": -4.760397631642377e-11
+    },
+    {
+      "structure": "distal_softer",
+      "target": "minus_y_plus_z",
+      "C": {
+        "signed_violation": -0.27183987136115645,
+        "status": "feasible_witness",
+        "evaluator_pass": true,
+        "evaluator_position_error_m": 0.007281601286388436,
+        "all_requested_checked": true,
+        "constraints": {
+          "holding_max_error_m": {
+            "max_value": 0.007281601286388436,
+            "max_signed_violation": -0.27183987136115645
+          },
+          "holding_max_speed_m_s": {
+            "max_value": 0.006536440220687699,
+            "max_signed_violation": -0.6731779889656151
+          },
+          "terminal_error_m": {
+            "max_value": 0.007281601286388436,
+            "max_signed_violation": -0.27183987136115645
+          }
+        },
+        "replay_valid": true,
+        "prediction_replay_error": 1.3209919269563386e-15,
+        "solver_status": "optimal",
+        "solver_iterations": 11,
+        "solver_wall_s": 0.012789200060069561,
+        "optimality_status": "numerically_checked",
+        "support_gap": 9.522371779979721e-11,
+        "primal_checks": {
+          "source": "independent_from_original_sample_maps",
+          "epigraph_violation": 0.0,
+          "box_violation_n": 0.0
+        },
+        "tension_rms_n": 4.054766744354931,
+        "tension_minimum_box_margin_n": 2.6062606714445384,
+        "tension_min_max_n": [
+          2.6062606714445384,
+          5.1280310779231355
+        ],
+        "tension_integral_n2_s": 34.52638003736605,
+        "locality": {
+          "geometry_screen_pass": false,
+          "max_position_linearization_error_m": 0.013072509092687434,
+          "holding_max_position_linearization_error_m": 0.012480025267402065,
+          "max_scaled_state_excursion": 2.230415645090558,
+          "max_relative_dynamics_residual": 1.000661549591773
+        }
+      },
+      "C_minus_B": -5.261902025210929e-13
+    },
+    {
+      "structure": "distal_stiffer",
+      "target": "yz_plus",
+      "C": {
+        "signed_violation": -0.27183987136122384,
+        "status": "feasible_witness",
+        "evaluator_pass": true,
+        "evaluator_position_error_m": 0.0072816012863876544,
+        "all_requested_checked": true,
+        "constraints": {
+          "holding_max_error_m": {
+            "max_value": 0.007281601286387762,
+            "max_signed_violation": -0.27183987136122384
+          },
+          "holding_max_speed_m_s": {
+            "max_value": 0.00584677500145739,
+            "max_signed_violation": -0.7076612499271305
+          },
+          "terminal_error_m": {
+            "max_value": 0.0072816012863876544,
+            "max_signed_violation": -0.27183987136123455
+          }
+        },
+        "replay_valid": true,
+        "prediction_replay_error": 2.6020852139652106e-15,
+        "solver_status": "optimal",
+        "solver_iterations": 12,
+        "solver_wall_s": 0.016260199947282672,
+        "optimality_status": "numerically_checked",
+        "support_gap": 2.4213575589016045e-11,
+        "primal_checks": {
+          "source": "independent_from_original_sample_maps",
+          "epigraph_violation": 0.0,
+          "box_violation_n": 0.0
+        },
+        "tension_rms_n": 4.05494181174061,
+        "tension_minimum_box_margin_n": 2.6507538824618577,
+        "tension_min_max_n": [
+          2.6507538824618577,
+          5.234109880699769
+        ],
+        "tension_integral_n2_s": 34.529361502864674,
+        "locality": {
+          "geometry_screen_pass": false,
+          "max_position_linearization_error_m": 0.012146012210127056,
+          "holding_max_position_linearization_error_m": 0.011703807840264473,
+          "max_scaled_state_excursion": 2.29601165282266,
+          "max_relative_dynamics_residual": 1.0007288135082857
+        }
+      },
+      "C_minus_B": -4.818090371117023e-11
+    },
+    {
+      "structure": "distal_stiffer",
+      "target": "minus_y_plus_z",
+      "C": {
+        "signed_violation": -0.2718398713610706,
+        "status": "feasible_witness",
+        "evaluator_pass": true,
+        "evaluator_position_error_m": 0.007281601286389295,
+        "all_requested_checked": true,
+        "constraints": {
+          "holding_max_error_m": {
+            "max_value": 0.007281601286389295,
+            "max_signed_violation": -0.2718398713610706
+          },
+          "holding_max_speed_m_s": {
+            "max_value": 0.006357093677551387,
+            "max_signed_violation": -0.6821453161224306
+          },
+          "terminal_error_m": {
+            "max_value": 0.007281601286389295,
+            "max_signed_violation": -0.2718398713610706
+          }
+        },
+        "replay_valid": true,
+        "prediction_replay_error": 2.0747292772682613e-15,
+        "solver_status": "optimal",
+        "solver_iterations": 11,
+        "solver_wall_s": 0.01340440008789301,
+        "optimality_status": "numerically_checked",
+        "support_gap": 9.133577227871115e-11,
+        "primal_checks": {
+          "source": "independent_from_original_sample_maps",
+          "epigraph_violation": 0.0,
+          "box_violation_n": 0.0
+        },
+        "tension_rms_n": 4.0571457691349835,
+        "tension_minimum_box_margin_n": 2.5966644764247593,
+        "tension_min_max_n": [
+          2.5966644764247593,
+          5.155172242264366
+        ],
+        "tension_integral_n2_s": 34.566906763220786,
+        "locality": {
+          "geometry_screen_pass": false,
+          "max_position_linearization_error_m": 0.011817334022286933,
+          "holding_max_position_linearization_error_m": 0.01126602505254853,
+          "max_scaled_state_excursion": 2.3968171663826663,
+          "max_relative_dynamics_residual": 1.0009301725019344
+        }
+      },
+      "C_minus_B": -4.403144515663371e-13
+    }
+  ],
+  "budgets": {
+    "model_builds": 15,
+    "linearizations": 15,
+    "internal_conic_solves": 14,
+    "fixed_control_replays": 6,
+    "provider_calls": 0,
+    "mujoco_steps": 0,
+    "ppo_training": 0,
+    "matlab_nmpc": 0,
+    "formal_studies": 0
+  },
+  "elapsed_s": 44.83213840005919,
+  "versions": {
+    "numpy": "2.4.6",
+    "scipy": "1.17.1",
+    "casadi": "3.7.2",
+    "cvxpy": "1.9.3",
+    "clarabel": "0.11.1"
+  },
+  "conclusion": {
+    "additional_reach_passes": 0,
+    "effective_structural_gain_found": false,
+    "max_abs_C_minus_B": 4.818090371117023e-11,
+    "affine_axial_floor": -0.2718398713612449,
+    "physical_task_acceptance": "unmeasured",
+    "recommended_next_step": "Validate local-model agreement before expanding workspace search or pursuing B3 settling"
+  },
+  "limitations": [
+    "Single initial affine model; no nonlinear integration or physical execution",
+    "Geometry/dynamics residual samples are diagnostics, not validated error bounds",
+    "No minimum-energy tie-break; different feasible control costs do not prove optimal cost gains",
+    "Exploratory selected targets are not independent validation; hide reference comparison outcomes from future study agents"
+  ],
+  "reproduction": "python -m tests.research.s140_structure_effect_screen --output runs/s140_structure_effect --summary evidence/s140_structure_effect/summary.json",
+  "export_only": "python -m tests.research.s140_structure_effect_screen --output runs/s140_structure_effect --summary evidence/s140_structure_effect/summary.json --summarize-only",
+  "validation_command": "python -m unittest tests.research.test_s140_screen -v"
+}
