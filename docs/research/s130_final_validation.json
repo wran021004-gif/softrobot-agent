@@ -1,0 +1,569 @@
+{
+  "evidence_kind": "third_round_real_provider_results",
+  "source_commit": "f7d7d6f542e4319332c1a7c3d75e1979c059b6c9",
+  "model": "deepseek-flash",
+  "provider": "https://api.deepseek.com",
+  "thinking": "disabled",
+  "max_tokens": 8192,
+  "timeout_s": 60,
+  "max_retries": 0,
+  "tools": null,
+  "provider_requests": 3,
+  "provider_completed": 3,
+  "json_pass_count": 3,
+  "format_pass_count": 2,
+  "source_admission_count": 2,
+  "draft_count": 2,
+  "explicit_requirements_preserved_count": 2,
+  "intent_correct_count": 3,
+  "complete_semantic_review_pass_count": 0,
+  "reach_real_preview_count": 0,
+  "unsupported_drafts_correctly_blocked": 2,
+  "usage": {
+    "prompt_tokens": 4596,
+    "completion_tokens": 1724,
+    "total_tokens": 6320,
+    "prompt_cache_hit_tokens": 1792,
+    "prompt_cache_miss_tokens": 2804
+  },
+  "provider_wall_s": 13.765999999828637,
+  "monetary_cost": null,
+  "monetary_cost_status": "Unknown; no verified billing receipt or price",
+  "cumulative_provider_requests": 15,
+  "cumulative_tokens": 52057,
+  "cumulative_prompt_tokens": 20140,
+  "cumulative_completion_tokens": 31917,
+  "old_evidence_unchanged": true,
+  "production_sources_unchanged": true,
+  "review_method": "Assistant audit of raw responses against user requirements; independently reviewable, not LLM self-grading",
+  "source_hashes": {
+    "schemas/task_intake.py": "2d8bb7328f05794e0b1284bd97768c0b99a4c44cbd2b39b7811273f54b030290",
+    "tools/task_intake.py": "2fd22e04640d2002af989f1fcfc4cf9b6184f4d5f525a17836fac8e2d794a9cb",
+    "schemas/platform.py": "18bc111d3c2e006425cd269bad140b406a29dd648841ff06defff424d1245e86",
+    "tools/platform_tasks.py": "2ccd8929b158cfe2580cb1c50a2134ae4fd409e1d4890215ab34ac9daed3459e",
+    "tools/platform_registry.py": "e4179da799aef17e50b2025f04c57e2569ceb88ea97d5d07782d3e3007f9c1cc",
+    "tools/research_tasks.py": "0582209ed02c141382c7c8efdb48f18b4a65182d7d94c41ae408be996fb14ff5",
+    "tools/research/task_constraints.py": "eedc2926a9fa3591667a1134cd911b7bf51df989304eadf029e86da41ed782e5"
+  },
+  "preflight_sha256": "71c733c03f4b38d0f497988fc717c642514d70d47f6d75c6785aacf37b511bc1",
+  "request_driver_sha256": "4b7a1c5e6719dfefb51dd3008b2975b8ef8f6d67b1d539ca4a9e2ba39b96405e",
+  "cases": [
+    {
+      "case": "01_reach_hold",
+      "task": "让末端到达目标 (0.29, 0.035, 0.19) m；世界坐标系；终点误差不超过 0.01 m；任务时长 0.35 s；最终保持窗口 0.05 s；保持窗口位置误差不超过 0.01 m；保持窗口速度不超过 0.02 m/s；采用参考配置的其余验收与执行设置",
+      "evidence_directory": "runs\\s130-live-round3-20261022\\01_reach_hold",
+      "provider": {
+        "requests": 1,
+        "outcome_known": true,
+        "finish_reason": "stop",
+        "json_complete": true,
+        "usage": {
+          "completion_tokens": 797,
+          "prompt_tokens": 2209,
+          "total_tokens": 3006,
+          "completion_tokens_details": null,
+          "prompt_tokens_details": {
+            "audio_tokens": null,
+            "cache_write_tokens": null,
+            "cached_tokens": 0
+          },
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 2209
+        },
+        "wall_s": 6.109999999869615,
+        "monetary_cost": null,
+        "cost_status": "unknown: no provider price supplied",
+        "truncated": false,
+        "provider_error": false
+      },
+      "n1": {
+        "format_pass": false,
+        "format_errors": [
+          {
+            "location": [
+              "requirements",
+              8,
+              "kind"
+            ],
+            "type": "literal_error",
+            "message": "Input should be 'behavior', 'constraint', 'observable', 'environment' or 'acceptance'"
+          },
+          {
+            "location": [
+              "requirements",
+              9,
+              "kind"
+            ],
+            "type": "literal_error",
+            "message": "Input should be 'behavior', 'constraint', 'observable', 'environment' or 'acceptance'"
+          },
+          {
+            "location": [
+              "requirements",
+              10,
+              "kind"
+            ],
+            "type": "literal_error",
+            "message": "Input should be 'behavior', 'constraint', 'observable', 'environment' or 'acceptance'"
+          },
+          {
+            "location": [
+              "requirements",
+              11,
+              "kind"
+            ],
+            "type": "literal_error",
+            "message": "Input should be 'behavior', 'constraint', 'observable', 'environment' or 'acceptance'"
+          },
+          {
+            "location": [
+              "requirements",
+              12,
+              "kind"
+            ],
+            "type": "literal_error",
+            "message": "Input should be 'behavior', 'constraint', 'observable', 'environment' or 'acceptance'"
+          },
+          {
+            "location": [
+              "requirements",
+              13,
+              "kind"
+            ],
+            "type": "literal_error",
+            "message": "Input should be 'behavior', 'constraint', 'observable', 'environment' or 'acceptance'"
+          }
+        ],
+        "status": "parse_failed",
+        "error": "INVALID_MODEL_RESPONSE: 6 validation errors for IntakeProposal\nrequirements.8.kind\n  Input should be 'behavior', 'constraint', 'observable', 'environment' or 'acceptance' [type=literal_error, input_value='undefined', input_type=str]\n    For further information visit https://errors.pydantic.dev/2.14/v/literal_error\nrequirements.9.kind\n  Input should be 'behavior', 'constraint', 'observable', 'environment' or 'acceptance' [type=literal_error, input_value='undefined', input_type=str]\n    For further information visit https://errors.pydantic.dev/2.14/v/literal_error\nrequirements.10.kind\n  Input should be 'behavior', 'constraint', 'observable', 'environment' or 'acceptance' [type=literal_error, input_value='undefined', input_type=str]\n    For further information visit https://errors.pydantic.dev/2.14/v/literal_error\nrequirements.11.kind\n  Input should be 'behavior', 'constraint', 'observable', 'environment' or 'acceptance' [type=literal_error, input_value='undefined', input_type=str]\n    For further information visit https://errors.pydantic.dev/2.14/v/literal_error\nrequirements.12.kind\n  Input should be 'behavior', 'constraint', 'observable', 'environment' or 'acceptance' [type=literal_error, input_value='undefined', input_type=str]\n    For further information visit https://errors.pydantic.dev/2.14/v/literal_error\nrequirements.13.kind\n  Input should be 'behavior', 'constraint', 'observable', 'environment' or 'acceptance' [type=literal_error, input_value='undefined', input_type=str]\n    For further information visit https://errors.pydantic.dev/2.14/v/literal_error",
+        "source_admission_pass": false,
+        "source_checks_status": "not_run_schema_failed",
+        "draft_produced": false,
+        "unquoted_spans": null,
+        "independent_raw_audit": {
+          "note": "Read-only checks; not a substituted N1 result",
+          "source_field_exclusivity": true,
+          "all_quotes_verbatim": true,
+          "unquoted_spans": [],
+          "numeric_questions_outside_user_text": [
+            {
+              "id": "req-hold-window-boundary",
+              "question": "最终保持窗口是任务末尾 0.05 s（即 [0.3, 0.35] s）吗？",
+              "numbers": [
+                "0.3"
+              ]
+            }
+          ]
+        }
+      },
+      "n2": {
+        "entered": false,
+        "status": "not_run_parse_failed",
+        "candidate_status": null,
+        "configuration_preview": false,
+        "executable": null,
+        "diagnostics": [],
+        "capabilities": null
+      },
+      "hashes": {
+        "completed.json": "cd4caa2acac31a9762f78f841881f7a371e5382a389cbebd5cb13934802874e2",
+        "context.json": "9f0ee8d24781ead60dbc4ff1ee529653a058f0d73c0d77b744859468ca0eeacb",
+        "request_config.json": "21d2f5665ba933cefd06fc059ed560f9725543c471dbd094b946fd305b98ed60",
+        "request_messages.json": "56329c80ba9969f8d7e501efb9d8f0a02271365adedab181d2b9b40dbeebefd0",
+        "response.txt": "f355654dbe20d210e6bd53d076c24db3d2903af1af245f5b30364fb58dfcfa13",
+        "result.json": "568c081f515fbd9624393f8b0eca94d657ece7fb71c3774be4a8392f595a70ba",
+        "started.json": "825be3c067cfbc5a7dabaa314b9b02d09f5433a6cbb0aa0490dbcc04b109fa09",
+        "task.txt": "daa5b27aae6348bea39e6592e65f033cf25b81183eb593d2033d659266a57fe8"
+      },
+      "scientific_semantic_review": {
+        "intent_correct": true,
+        "physical_mechanism_correct": true,
+        "explicit_requirements_preserved": true,
+        "temporal_semantics_correct": true,
+        "missing_definitions_correct": false,
+        "reference_adoption_correct": false,
+        "fabricated_acceptance_conditions": false,
+        "complete_review_pass": false,
+        "evidence": [
+          "req-reach-target/world-frame/terminal-error/task-duration/hold-window/hold-position/hold-speed/reference-config preserve all eight explicit clauses.",
+          "Six subsequent questions use illegal kind=undefined (source=undefined itself is valid). Actual N1 stops at Pydantic; N2 was not run.",
+          "Window boundary [0.3,0.35] and sample timing already appear in the supplied context; collision/disturbance questions add open topics despite reference adoption.",
+          "0.3 is present in context.holding_interval_s and is not a fabricated threshold. It is absent from user numeric tokens and would conflict with the existing question guard; this is static follow-on diagnosis, not the observed first error.",
+          "The sole temporal edge is hold-window during task-duration. Its meaning is plausible, but N2 only maps hold-position/speed during hold-window. This is a further compiler boundary, not an actual compiled rejection.",
+          "Text and explanation attach position/speed limits to the final window; the model did not invent an earlier arrival deadline."
+        ]
+      }
+    },
+    {
+      "case": "04_slope_catch",
+      "task": "让软臂接住从斜坡滚下的 0.05 kg 小球，并在接住后稳定保持至少 0.20 s。斜坡倾角、球的初始位置和滚动摩擦条件尚未指定。",
+      "evidence_directory": "runs\\s130-live-round3-20261022\\04_slope_catch",
+      "provider": {
+        "requests": 1,
+        "outcome_known": true,
+        "finish_reason": "stop",
+        "json_complete": true,
+        "usage": {
+          "completion_tokens": 444,
+          "prompt_tokens": 1180,
+          "total_tokens": 1624,
+          "completion_tokens_details": null,
+          "prompt_tokens_details": {
+            "audio_tokens": null,
+            "cache_write_tokens": null,
+            "cached_tokens": 896
+          },
+          "prompt_cache_hit_tokens": 896,
+          "prompt_cache_miss_tokens": 284
+        },
+        "wall_s": 4.452999999979511,
+        "monetary_cost": null,
+        "cost_status": "unknown: no provider price supplied",
+        "truncated": false,
+        "provider_error": false
+      },
+      "n1": {
+        "format_pass": true,
+        "format_errors": [],
+        "status": "draft",
+        "error": null,
+        "source_admission_pass": true,
+        "source_checks_status": "passed",
+        "draft_produced": true,
+        "unquoted_spans": [
+          {
+            "start": 22,
+            "end": 24,
+            "text": "，并"
+          },
+          {
+            "start": 41,
+            "end": 65,
+            "text": "。斜坡倾角、球的初始位置和滚动摩擦条件尚未指定。"
+          }
+        ],
+        "independent_raw_audit": {
+          "note": "Read-only checks; not a substituted N1 result",
+          "source_field_exclusivity": true,
+          "all_quotes_verbatim": true,
+          "unquoted_spans": [
+            {
+              "start": 22,
+              "end": 24,
+              "text": "，并"
+            },
+            {
+              "start": 41,
+              "end": 65,
+              "text": "。斜坡倾角、球的初始位置和滚动摩擦条件尚未指定。"
+            }
+          ],
+          "numeric_questions_outside_user_text": []
+        }
+      },
+      "n2": {
+        "entered": true,
+        "status": "unsupported",
+        "candidate_status": null,
+        "configuration_preview": false,
+        "executable": false,
+        "diagnostics": [
+          "UNMAPPED_USER_CONSTRAINT: 让软臂接住从斜坡滚下的 0.05 kg 小球，并在接住后稳定保持至少 0.20 s",
+          "UNMAPPED_USER_CONSTRAINT: 斜坡倾角、球的初始位置和滚动摩擦条件尚未指定",
+          "UNSUPPORTED_TASK: catch_and_hold; requires contact and object-state signals, capture/retention definition, contact/capture evaluator",
+          "TEMPORAL_RELATIONS_REQUIRE_REVIEW: outside existing sampled holding constraints",
+          "EXPLICIT_REFERENCE_SETTINGS_ADOPTION_REQUIRED: 采用参考配置的其余验收与执行设置",
+          "UNRESOLVED_REQUIREMENT_MAPPINGS",
+          "MISSING_DEFINITION: 小球在斜坡上的初始位置是什么？",
+          "MISSING_DEFINITION: 斜坡倾角的具体数值是多少？",
+          "MISSING_DEFINITION: 滚动摩擦条件（如摩擦系数）是什么？"
+        ],
+        "capabilities": {
+          "semantic": {
+            "status": "incomplete",
+            "missing": [
+              "小球在斜坡上的初始位置是什么？",
+              "斜坡倾角的具体数值是多少？",
+              "滚动摩擦条件（如摩擦系数）是什么？"
+            ],
+            "interpreted_intent": "catch_and_hold",
+            "intent_source": "llm_candidate"
+          },
+          "evaluation": {
+            "status": "unsupported",
+            "reasons": [
+              "contact and object-state signals",
+              "capture/retention definition",
+              "contact/capture evaluator"
+            ]
+          },
+          "physical": {
+            "status": "not_assessed",
+            "scope": "unchanged trusted reference only",
+            "reference_check": {
+              "status": "supported",
+              "reason": "Registered task, evaluator, signals, initializer, controller and backend checks passed"
+            }
+          },
+          "mathematics": {
+            "status": "not_applicable",
+            "reason": "No supported task translation; original semantics retained."
+          },
+          "authorization": {
+            "status": "not_authorized",
+            "reason": "All previews remain draft; original admission and approval apply."
+          },
+          "registered_tasks": [
+            "task.reach"
+          ],
+          "registered_evaluators": [
+            "evaluate.reach"
+          ],
+          "quotation_coverage": {
+            "status": "needs_review",
+            "unquoted_spans": [
+              {
+                "start": 22,
+                "end": 24,
+                "text": "，并"
+              },
+              {
+                "start": 41,
+                "end": 65,
+                "text": "。斜坡倾角、球的初始位置和滚动摩擦条件尚未指定。"
+              }
+            ],
+            "meaning": "Quotation diagnostic only; every original clause must separately map before preview."
+          },
+          "temporal": {
+            "mappings": [
+              {
+                "first": "catch_ball",
+                "relation": "before",
+                "second": "hold_after_catch",
+                "quote": "在接住后稳定保持至少 0.20 s",
+                "status": "needs_review",
+                "interval_s": null,
+                "meaning": "Event order, strict deadlines and other temporal constraints are not compiled."
+              }
+            ],
+            "scope": "Existing sampled final-window limits only"
+          }
+        }
+      },
+      "hashes": {
+        "compilation.json": "0825bf5659c1ecfd4284d601db801c1e3794d77ed96f3c210455b096a8eae43f",
+        "completed.json": "2d190449b223904e0c15be46c1ef3fa93e7966082eb3a2f9c47fbbefc3347dab",
+        "request_config.json": "5df5938906285cdf223f7ff258fb9ca55bed74acb7d1750ef74f1546aa01f81e",
+        "request_messages.json": "320ad3d4031e5a04f56b0907d0f3700e42e6d7efb429715b595113f404f618bf",
+        "response.txt": "6dee677e6c38db7238e977e754c5d454aba8c277e0e324a3f0d77c997e546f80",
+        "result.json": "ddffe6aed900bbc51f9702c034c684543d2bb0791f551cd65d7b6fb6b4705678",
+        "started.json": "72769cdf0db763b687f3df00d109697695c0fbdbc5b4ee6ce0bddc8d9e70ff7d",
+        "task.txt": "d9aaf9997d36453c5e715c1f88bd702c7cbc40894b8e19f15ac9c1fdfc8283fe"
+      },
+      "scientific_semantic_review": {
+        "intent_correct": true,
+        "physical_mechanism_correct": true,
+        "explicit_requirements_preserved": true,
+        "temporal_semantics_correct": true,
+        "missing_definitions_correct": false,
+        "reference_adoption_correct": null,
+        "fabricated_acceptance_conditions": false,
+        "complete_review_pass": false,
+        "evidence": [
+          "catch_ball preserves rolling from a slope and mass 0.05 kg; hold_after_catch preserves stable retention for at least 0.20 s.",
+          "The before edge and its verbatim quote preserve capture followed by holding; there is no freefall substitution or proximity-as-capture claim.",
+          "Questions cover slope inclination, initial position and rolling friction; the unquoted unspecified sentence stays visible.",
+          "The LLM omits questions about contact signals, capture success, retention criteria and evaluator availability. N2 supplies contact/object-state signals, capture/retention definition and contact/capture evaluator diagnostics.",
+          "Registry lists only task.reach/evaluate.reach. No catch task is registered. No preview or execution authority is produced."
+        ]
+      }
+    },
+    {
+      "case": "02_obstacle",
+      "task": "设计一条软臂，使末端在 0.35 s 内到达世界坐标系中的目标 (0.29, 0.035, 0.19) m，终点误差不超过 0.01 m；整个运动过程中，软臂任何部位都不能与球形障碍物发生碰撞。障碍物的具体位置和半径尚未指定。",
+      "evidence_directory": "runs\\s130-live-round3-20261022\\02_obstacle",
+      "provider": {
+        "requests": 1,
+        "outcome_known": true,
+        "finish_reason": "stop",
+        "json_complete": true,
+        "usage": {
+          "completion_tokens": 483,
+          "prompt_tokens": 1207,
+          "total_tokens": 1690,
+          "completion_tokens_details": null,
+          "prompt_tokens_details": {
+            "audio_tokens": null,
+            "cache_write_tokens": null,
+            "cached_tokens": 896
+          },
+          "prompt_cache_hit_tokens": 896,
+          "prompt_cache_miss_tokens": 311
+        },
+        "wall_s": 3.202999999979511,
+        "monetary_cost": null,
+        "cost_status": "unknown: no provider price supplied",
+        "truncated": false,
+        "provider_error": false
+      },
+      "n1": {
+        "format_pass": true,
+        "format_errors": [],
+        "status": "draft",
+        "error": null,
+        "source_admission_pass": true,
+        "source_checks_status": "passed",
+        "draft_produced": true,
+        "unquoted_spans": [
+          {
+            "start": 0,
+            "end": 7,
+            "text": "设计一条软臂，"
+          },
+          {
+            "start": 96,
+            "end": 113,
+            "text": "。障碍物的具体位置和半径尚未指定。"
+          }
+        ],
+        "independent_raw_audit": {
+          "note": "Read-only checks; not a substituted N1 result",
+          "source_field_exclusivity": true,
+          "all_quotes_verbatim": true,
+          "unquoted_spans": [
+            {
+              "start": 0,
+              "end": 7,
+              "text": "设计一条软臂，"
+            },
+            {
+              "start": 96,
+              "end": 113,
+              "text": "。障碍物的具体位置和半径尚未指定。"
+            }
+          ],
+          "numeric_questions_outside_user_text": []
+        }
+      },
+      "n2": {
+        "entered": true,
+        "status": "unsupported",
+        "candidate_status": null,
+        "configuration_preview": false,
+        "executable": false,
+        "diagnostics": [
+          "UNMAPPED_USER_CONSTRAINT: 设计一条软臂，使末端在 0.35 s 内到达世界坐标系中的目标 (0.29, 0.035, 0.19) m，终点误差不超过 0.01 m",
+          "UNMAPPED_USER_CONSTRAINT: 整个运动过程中，软臂任何部位都不能与球形障碍物发生碰撞",
+          "UNMAPPED_USER_CONSTRAINT: 障碍物的具体位置和半径尚未指定",
+          "UNSUPPORTED_TASK: obstacle_reach; requires collision/distance signals, obstacle semantics, collision-aware evaluator",
+          "TEMPORAL_RELATIONS_REQUIRE_REVIEW: outside existing sampled holding constraints",
+          "EXPLICIT_REFERENCE_SETTINGS_ADOPTION_REQUIRED: 采用参考配置的其余验收与执行设置",
+          "UNRESOLVED_REQUIREMENT_MAPPINGS",
+          "MISSING_DEFINITION: 球形障碍物的具体位置和半径是什么？",
+          "MISSING_DEFINITION: 目标点 (0.29, 0.035, 0.19) m 是世界坐标系中哪个参考点（例如末端中心、工具中心点）的位置？"
+        ],
+        "capabilities": {
+          "semantic": {
+            "status": "incomplete",
+            "missing": [
+              "球形障碍物的具体位置和半径是什么？",
+              "目标点 (0.29, 0.035, 0.19) m 是世界坐标系中哪个参考点（例如末端中心、工具中心点）的位置？"
+            ],
+            "interpreted_intent": "obstacle_reach",
+            "intent_source": "llm_candidate"
+          },
+          "evaluation": {
+            "status": "unsupported",
+            "reasons": [
+              "collision/distance signals",
+              "obstacle semantics",
+              "collision-aware evaluator"
+            ]
+          },
+          "physical": {
+            "status": "not_assessed",
+            "scope": "unchanged trusted reference only",
+            "reference_check": {
+              "status": "supported",
+              "reason": "Registered task, evaluator, signals, initializer, controller and backend checks passed"
+            }
+          },
+          "mathematics": {
+            "status": "not_applicable",
+            "reason": "No supported task translation; original semantics retained."
+          },
+          "authorization": {
+            "status": "not_authorized",
+            "reason": "All previews remain draft; original admission and approval apply."
+          },
+          "registered_tasks": [
+            "task.reach"
+          ],
+          "registered_evaluators": [
+            "evaluate.reach"
+          ],
+          "quotation_coverage": {
+            "status": "needs_review",
+            "unquoted_spans": [
+              {
+                "start": 0,
+                "end": 7,
+                "text": "设计一条软臂，"
+              },
+              {
+                "start": 96,
+                "end": 113,
+                "text": "。障碍物的具体位置和半径尚未指定。"
+              }
+            ],
+            "meaning": "Quotation diagnostic only; every original clause must separately map before preview."
+          },
+          "temporal": {
+            "mappings": [
+              {
+                "first": "R1",
+                "relation": "during",
+                "second": "R3",
+                "quote": "整个运动过程中，软臂任何部位都不能与球形障碍物发生碰撞",
+                "status": "needs_review",
+                "interval_s": null,
+                "meaning": "Event order, strict deadlines and other temporal constraints are not compiled."
+              }
+            ],
+            "scope": "Existing sampled final-window limits only"
+          }
+        }
+      },
+      "hashes": {
+        "compilation.json": "9f890100914654392132fd56d398d4a94eb653486553556670e3ff6c87ce8260",
+        "completed.json": "29cd6120725081428735c2922c84482b8d538aa0b8a9ee9206834b61da159ca6",
+        "request_config.json": "5df5938906285cdf223f7ff258fb9ca55bed74acb7d1750ef74f1546aa01f81e",
+        "request_messages.json": "b239b946093a81a09dc37a1ffdc8317d4770f02a06a1ffa9742688367b7f60ca",
+        "response.txt": "86f553a7cae094768b5ecf38241fdf0976e227d67720a7e681d65de413d76212",
+        "result.json": "b293f60611bfdb159ccc443c68824c97d23cd1b2b1763e0d0775c7027049d890",
+        "started.json": "b08592b0dfa85530b8014a39dfdf6865e3d9e5f44b770b212edbbe5cfa6a24ea",
+        "task.txt": "b95cca6956001ad0b1062d74fbf10369d081c36e3397cd4daabd0685564f32e9"
+      },
+      "scientific_semantic_review": {
+        "intent_correct": true,
+        "physical_mechanism_correct": true,
+        "explicit_requirements_preserved": false,
+        "temporal_semantics_correct": true,
+        "missing_definitions_correct": false,
+        "reference_adoption_correct": null,
+        "fabricated_acceptance_conditions": false,
+        "complete_review_pass": false,
+        "evidence": [
+          "R1 preserves world target and 0.35 s; R2 preserves terminal tolerance 0.01 m; R3 explicitly covers the entire motion and any part of the soft arm.",
+          "Designing a soft arm is omitted from requirements, goal and explanation; unquoted_spans retains the exact design-scope prefix. Thus source admission is not semantic completeness.",
+          "Q1 identifies obstacle position/radius as missing; Q2 asks the precise endpoint reference point. The model does not ask about collision/distance signals or an evaluator.",
+          "The during relation and R3 full-motion quote do not reduce collision checking to the endpoint. The source conflict observed in round two has disappeared.",
+          "N2 reports unsupported obstacle_reach, collision/distance signals, obstacle semantics and collision-aware evaluator, preserving the omitted raw design scope and refusing a plain Reach preview."
+        ]
+      }
+    }
+  ],
+  "decision": "Target not achieved: Reach real preview absent and semantic omissions remain. Stop this round; no automatic new phase or calls.",
+  "identical_system_prompt_sha256": "4f3b7140cd87dea1ee2886d9835ca7ac765d0fd37b080969e9e867c429d213d7"
+}

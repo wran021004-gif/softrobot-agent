@@ -797,7 +797,8 @@ def agent_decision_brief(host):
     s=state(host);cfg=s.get('nominal_configuration',s.get('base_configuration'))
     brief['mathematics_authorization']=mathematics_authorization(host,s)
     if s.get('engineering_feedback_correction'):
-        brief['recorded_evidence_corrections']=host.store.artifact(s['engineering_feedback_correction'])
+        ref=s['engineering_feedback_correction']
+        brief['recorded_evidence_corrections']=current_evidence_corrections(host.store.artifact(ref),ref)
     if s.get('public_prior_manifest'):
         brief['public_prior_manifest']=dict(reference=s['public_prior_manifest'],view='full',
             scope='Frozen engineering priors; no historical experimental feedback')
@@ -855,6 +856,33 @@ def agent_decision_brief(host):
                 rows=ws.pop(key);ws[key+'_access']=dict(count=len(rows),
                     query=dict(reference=anchor,view='working_set',pointer='/'+key))
     return brief
+
+
+def current_evidence_corrections(value, reference):
+    """Current numerical corrections only; full history stays at its exact source."""
+    mathematics=[]
+    for row in value.get('mathematics',[]):
+        summary=deepcopy(row['summary'])
+        for diagnostic in summary.get('original_predicate_diagnostics',{}).values():
+            diagnostic.pop('samples',None)
+        mathematics.append(dict(reference=row['reference'],summary=summary,
+            current_conclusion='Strict false with recorded residual magnitudes is not a proof of infeasibility; physical acceptance remains independent.'))
+    controls=[]
+    for row in value.get('historical_control_updates',[]):
+        terminal=row.get('terminal_update',{})
+        controls.append({k:deepcopy(row[k]) for k in ('reference','prediction_aggregate_available',
+            'invalid_prediction_updates','accepted_plan_input_mismatch_updates','full_observations_query')} |
+            dict(terminal_update={k:deepcopy(terminal.get(k)) for k in ('source','update_id',
+                'optimization_raw_status','plan_accepted','failure_response_used','prediction_shape_invalid',
+                'accepted_plan_matches_actual_input')},
+                current_conclusion='Historical prediction aggregate unavailable for model-error analysis. Applied-input mismatch is distinct from fallback; configuration termination options are not observed solver outcomes.'))
+    return dict(version='current_evidence_corrections_v1',source=reference,
+        full_history_query=dict(reference=reference,pointer='',view='full'),
+        mathematics=mathematics,historical_control_updates=controls,
+        static_constructions=deepcopy(value.get('static_constructions',[])),
+        reporter_saved_output_revalidation=deepcopy(value.get('reporter_saved_output_revalidation',[])),
+        scope=value['scope'],
+        interpretation='These corrections supersede conflicting prior Agent interpretations only. Original numbers, acceptance, task identities and past delivery history are unchanged. Mechanisms and counterfactual performance remain unknown.')
 
 
 def mathematical_decision_view(card):
