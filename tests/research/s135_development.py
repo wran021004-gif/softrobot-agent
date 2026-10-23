@@ -59,7 +59,12 @@ def run(kind):
     cfg=read(OUT/(kind+'_input.json'))
     folder=RUNS/kind
     if folder.exists():raise ValueError('S135 run already attempted; collect/inspect it, never automatically replay')
-    host=Host(folder,cfg['run_id']);host.create(cfg)
+    from schemas.platform import ProjectConfig
+    host=Host(folder,cfg['run_id'])
+    host.store.create(ProjectConfig(project_id=cfg['run_id'],grant_id=cfg['run_id'],
+        authorization_source='S135 explicit user authorization: one development execution per task; zero provider calls',
+        budget=cfg['policy']['budget']))
+    host.create(cfg)
     outcome=complete_execution(host,cfg,'s135-'+kind)
     atomic_json(folder/'outcome.json',outcome)
     collect(kind)
