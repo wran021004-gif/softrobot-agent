@@ -108,6 +108,23 @@ def project_polyline(points,vertices):
     return distances[rows,choice],progress
 
 
+def tracking_condition_specs(task):
+    """The registered evaluator's hard conditions, shared with research views."""
+    timed = task['goal']['data']['time_requirement'] == 'timed'
+    rows = [('tracking_max_error', 'max_position_error',
+             'Maximum error against r(t) at every scored post-step sample' if timed else
+             'Maximum reference-path distance over measured vertices and arc-length samples')]
+    if not timed:
+        rows += [
+            ('path_coverage', 'path_coverage_error', 'Maximum measured-polyline distance over reference arc-length samples and vertices'),
+            ('path_start', 'path_start', 'Distance from first measured position to first reference vertex'),
+            ('path_end', 'terminal_position_error', 'Distance from last measured position to last reference vertex'),
+            ('path_progress_regression', 'progress_regression', 'Maximum running-maximum minus current nearest-path arc-length progress')]
+    return [dict(condition_id=name, metric=metric, meaning=meaning,
+                 limit=task['evaluator']['parameters']['data']['max_error_m'], units='m')
+            for name, metric, meaning in rows]
+
+
 def evaluate_tracking(task,result,source,reg,identity):
     """Ordered geometric path, no timed reference, speed or arrival deadline."""
     import numpy as np
@@ -147,8 +164,10 @@ def evaluate_tracking(task,result,source,reg,identity):
     rms=float(np.sqrt(np.mean(errors**2)))
     start=math.dist(signal.values[0],goal.vertices_m[0]);end=math.dist(signal.values[-1],goal.vertices_m[-1])
     regression=float(max(np.maximum.accumulate(progress)-progress))
-    checks=[('tracking_max_error',maximum),('path_coverage',float(max(coverage))),
-        ('path_start',start),('path_end',end),('path_progress_regression',regression)]
+    observed=dict(tracking_max_error=maximum,path_coverage=float(max(coverage)),
+        path_start=start,path_end=end,path_progress_regression=regression)
+    checks=[(row['condition_id'],observed[row['condition_id']])
+            for row in tracking_condition_specs(task.model_dump(mode='json'))]
     return EvaluationResult(validity='valid',task_success=all(v<=params.max_error_m for _,v in checks),
         metrics=[Metric(name=name,value=value,units='m') for name,value in (
             ('max_position_error',maximum),('rms_position_error',rms),('terminal_position_error',end),

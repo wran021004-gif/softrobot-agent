@@ -9,6 +9,50 @@ from tools.state_io import read, digest
 ROOT = Path(__file__).resolve().parents[2]
 
 
+def effective_input(configuration):
+    """Read a saved effective snapshot, never resolve source files again.
+
+    Accept SessionInput, compiled/effective envelopes and resolve() Study output.
+    A task-only envelope remains useful for reference consumers; operations that
+    need robot or policy data must explicitly require the complete snapshot.
+    """
+    value = plain(configuration)
+    for key in ('effective', 'input', 'configuration'):
+        if key in value:
+            return effective_input(value[key])
+    return value
+
+
+def same_robot_structure(left, right):
+    """Compare actual structural payloads, independent of task/control identity."""
+    a, b = effective_input(left)['robot'], effective_input(right)['robot']
+    return a['family'] == b['family'] and a['structure'] == b['structure']
+
+
+def configuration_ownership(configuration):
+    """Describe existing owners/grants; this view grants no editing authority."""
+    value = plain(configuration)
+    cfg = effective_input(value)
+    grant = value.get('allowed_parameters')
+    structural_grant = None if grant is None else {k: v for k, v in grant.items() if k.startswith('segments.')}
+    control_grant = None if grant is None else {k: v for k, v in grant.items() if not k.startswith('segments.')}
+    return dict(
+        frozen_task=dict(paths=['/task', '/seed'], owner='reviewed TaskDefinition and frozen study'),
+        frozen_acceptance=dict(paths=['/task/evaluator', '/policy/controller/parameters/data/settling'],
+            owner='registered evaluator and frozen acceptance protocol; legacy Reach settling stays in place'),
+        structure=dict(paths=['/robot/structure'], owner='robot source and frozen structural grant',
+            grant=structural_grant, family_space=value.get('family_space')),
+        control=dict(paths=['/policy/controller/parameters/data/recipe', '/policy/controller/parameters/data/solver'],
+            grant=control_grant,
+            study_paths=['/control/rl_defaults/reward', '/control/rl_defaults/ppo'],
+            owner='candidate control/reward/training configuration within registered schema and study grant; may differ by task'),
+        algorithm_authorization=dict(owner='frozen study capabilities and continuation grants',
+            capabilities=value.get('capabilities'), actions=value.get('allowed_plan_actions'),
+            nmpc_limits=value.get('nmpc_limits'), rl_limits=value.get('rl_limits')),
+        budget=dict(owner='frozen study ceilings and existing runtime ledger; views never reset usage',
+            study=value.get('budgets'), execution=cfg.get('policy', {}).get('budget')))
+
+
 def patch(base, changes):
     """Objects merge, lists replace; null replaces and must pass the owner contract.
 

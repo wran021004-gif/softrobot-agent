@@ -137,6 +137,24 @@ class TaskDefinition(Contract):
         return self
 
 
+class TaskConditionView(Contract):
+    """Derived hard condition, not a second task definition or approval record.
+
+    Mathematical expressibility is about the existing sampled local model;
+    even an exact sampled expression cannot certify physical execution.
+    """
+    condition_id: str
+    metric: str
+    meaning: str
+    limit: FiniteFloat | None
+    units: str
+    signal: SignalSpec
+    sampling: dict
+    provenance: list[str] = Field(min_length=1)
+    expressibility: Literal['sampled_norm_bound', 'proxy_only', 'unsupported']
+    expression_reason: str
+
+
 class RobotDescription(Contract):
     family: Identifier
     structure: Payload

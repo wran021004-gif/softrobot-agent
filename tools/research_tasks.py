@@ -9,11 +9,7 @@ import math
 from schemas.platform import SessionInput, EvaluationResult
 from tools.platform_store import plain
 from tools.state_io import digest
-
-
-def effective_input(configuration):
-    value = plain(configuration)
-    return value.get('effective', value.get('input', value))
+from tools.research.config import effective_input
 
 
 @dataclass(frozen=True)
@@ -24,14 +20,112 @@ class ResearchTaskAdapter:
     def task(self):
         return self.configuration['task']
 
+    def _require_configuration(self):
+        if not {'policy', 'robot'} <= self.configuration.keys():
+            raise ValueError('EFFECTIVE_CONFIGURATION_REQUIRED: frozen policy and robot snapshot')
+
+    def condition_view(self):
+        """Generate hard conditions on demand from task + legacy frozen protocol.
+
+        Task-only calls retain known conditions and explicitly report missing
+        Reach hold requirements. No optimization weight supplies a hard limit.
+        """
+        from schemas.platform import TaskConditionView
+        task = self.task
+        signal = next(s for s in task['observations'] if s['name'] == 'tip_position')
+        timing = task['timing']
+        missing, rows = [], []
+        if task['family'] == 'task.tracking':
+            from extensions.reference.implementation import tracking_condition_specs
+            timed = task['goal']['data']['time_requirement'] == 'timed'
+            sampling = (dict(mode='inclusive_scored_post_step_grid', window_s=task['sampling']['window_s'],
+                             sample_period_s=timing['sample_period_s'], reference='r(t)',
+                             complete_record_grid='post_step from sample_period_s through duration_s') if timed else
+                        dict(mode='saved_polyline_geometry', geometry_step_m=task['evaluator']['parameters']['data']['geometry_step_m'],
+                             time_semantics='ordered recording only; no speed bound or arrival deadline',
+                             first_sample='first saved post_step measurement',
+                             acquisition_duration_s=timing['duration_s']))
+            for row in tracking_condition_specs(task):
+                rows.append(dict(**row, signal=signal, sampling=sampling,
+                    provenance=['/task/goal', '/task/evaluator/parameters', '/task/sampling'],
+                    expressibility='sampled_norm_bound' if timed else 'proxy_only',
+                    expression_reason=('norm(p_k-r(t_k)) <= limit on scored samples; no velocity hard bound' if timed else
+                        'geometric_path is a sampled free-progress proxy; it does not establish this saved-polyline condition')))
+        else:
+            rows.append(dict(condition_id='terminal_error_m', metric='position_error',
+                meaning='Distance from final saved position at task endpoint to target',
+                limit=task['evaluator']['parameters']['data']['tolerance_m'], units='m', signal=signal,
+                sampling=dict(mode='task_endpoint', time_s=timing['duration_s']),
+                provenance=['/task/evaluator/parameters/data/tolerance_m', '/task/timing', '/task/goal'],
+                expressibility='sampled_norm_bound', expression_reason='norm(p(T)-target) <= limit in the sampled local model'))
+            control = self.configuration.get('policy', {}).get('controller', {}).get('parameters', {}).get('data', {})
+            settling = control.get('settling')
+            if settling is None:
+                missing.append('frozen Reach settling and acceptance protocol require effective configuration')
+            else:
+                for name, output, unit, field, meaning in (
+                        ('holding_max_error_m', 'tip_position', 'm', 'position_limit_m', 'Maximum sampled final-window distance to target'),
+                        ('holding_max_speed_m_s', 'tip_velocity', 'm/s', 'speed_limit_m_s', 'Maximum sampled final-window absolute world tip speed')):
+                    rows.append(dict(condition_id=name, metric=name, meaning=meaning,
+                        limit=settling[field], units=unit, signal={**signal, 'name': output, 'units': unit},
+                        sampling=dict(mode='inclusive_final_window', window_s=[timing['duration_s']-settling['window_s'], timing['duration_s']],
+                            sample_period_s=timing['sample_period_s']),
+                        provenance=['/policy/controller/parameters/data/settling/'+field, '/task/timing', '/task/goal',
+                            '/policy/controller/parameters/data/settling/window_s'],
+                        expressibility='sampled_norm_bound', expression_reason='Sampled norm bound; actual holding coverage belongs to independent protocol'))
+        return dict(contract='research.task_conditions', version='1.0.0', task_identity=digest(task),
+            task_status=task['status'], evaluator=task['evaluator'],
+            conditions=[plain(TaskConditionView.model_validate(row)) for row in rows], missing=missing,
+            authority='registered evaluator plus frozen acceptance protocol; this derived view grants no approval',
+            continuous_time_guarantee=False)
+
+    def execution_requirements(self):
+        """Required signals/registered capabilities, not a claim of executability."""
+        task = self.task
+        reach = task['family'] == 'task.reach'
+        timed = not reach and task['goal']['data']['time_requirement'] == 'timed'
+        complete = {'robot', 'policy'} <= self.configuration.keys()
+        protocol = 'offline_reach_hold_v1' if reach else 'development_tracking_v1' if not timed else None
+        signals = list(task['observations'])
+        if reach:
+            position = next(s for s in signals if s['name'] == 'tip_position')
+            velocity = {**position, 'name': 'tip_velocity', 'units': 'm/s'}
+            if velocity not in signals:
+                signals.append(velocity)
+        policy = self.configuration.get('policy', {})
+        bindings = {key: {field: policy[key][field] for field in ('extension_id', 'version')}
+                    for key in ('controller', 'backend', 'dynamics_model') if policy.get(key)}
+        return dict(task_family=task['family'], task_status=task['status'],
+            robot_families=task['robot_families'], actuator_channels=task['actuator_channels'],
+            signals=signals, environment=task['environment'], initializer=task['initializer'],
+            timing=task['timing'], reference_kind=self.control_reference()['kind'],
+            protocol_id=protocol if complete else None,
+            protocol_components=sorted(_protocol_requirements(dict(protocol_id=protocol, task_family=task['family'])) or []),
+            selected_bindings=bindings,
+            physical_inputs=self._physical_inputs() if complete else None,
+            configuration_available=complete,
+            missing=(['Timed Tracking has no composite physical acceptance protocol'] if timed else []) +
+                    ([] if complete else ['Frozen effective configuration is required for execution/protocol requirements']),
+            applicability='Use check_compatibility() for the actual registered robot/controller/model/backend pairing; definition validity is not execution authorization')
+
+    def _physical_inputs(self):
+        self._require_configuration()
+        tendons = self.configuration['robot']['structure']['data']['tendons']
+        return dict(signal='tendon_tension', units='N', frame='tendon_path', phase='pre_step',
+            control_period_s=self.task['timing']['control_period_s'], tendon_order=[t['id'] for t in tendons],
+            lower=[0.]*len(tendons), upper=[t['force_limit_n'] for t in tendons],
+            provenance=['/robot/structure/data/tendons', '/task/timing/control_period_s'])
+
     def holding_start_s(self):
         if self.task['family']=='task.tracking':raise ValueError('TRACKING_HAS_NO_HOLDING_WINDOW')
+        self._require_configuration()
         settling=self.configuration['policy']['controller']['parameters']['data']['settling']
         return self.task['timing']['duration_s']-settling['window_s']
 
     def ranking_limits(self):
         if self.task['family']=='task.tracking':
             return dict(max_position_error=self.task['evaluator']['parameters']['data']['max_error_m'])
+        self._require_configuration()
         settling=self.configuration['policy']['controller']['parameters']['data']['settling']
         return dict(terminal_error_m=self.task['evaluator']['parameters']['data']['tolerance_m'],
             holding_max_error_m=settling['position_limit_m'],holding_max_speed_m_s=settling['speed_limit_m_s'])
@@ -85,12 +179,14 @@ class ResearchTaskAdapter:
         """Translate each registered task's own sampled constraints and references."""
         from schemas.platform_analysis import TaskAnalysisRequirement
         from extensions.math_analysis.kernels import aligned_steps
+        self._require_configuration()
         task, cfg = self.task, self.configuration
+        conditions = self.condition_view()['conditions']
         duration, period = task['timing']['duration_s'], task['timing']['sample_period_s']
         last, _ = aligned_steps(duration, period)
         signal = next(s for s in task['observations'] if s['name'] == 'tip_position')
         if task['family']=='task.tracking':
-            radius=task['evaluator']['parameters']['data']['max_error_m']
+            radius=conditions[0]['limit']
             provenance=['/task/goal','/task/evaluator/parameters']
             if task['goal']['data']['time_requirement']=='timed':
                 lo,hi=task['sampling']['window_s'];indices=list(range(round(lo/period),round(hi/period)+1))
@@ -103,12 +199,8 @@ class ResearchTaskAdapter:
                 # Sampled free progress is a proxy, not the saved-polyline evaluator.
                 # Retain every independent acceptance condition in the existing
                 # unsupported contract so downstream coverage cannot omit it.
-                for name, meaning in (
-                        ('tracking_max_error', 'Maximum reference-path distance over measured vertices and arc-length samples'),
-                        ('path_coverage', 'Maximum measured-polyline distance over reference arc-length samples and vertices'),
-                        ('path_start', 'Distance from first measured position to first reference vertex'),
-                        ('path_end', 'Distance from last measured position to last reference vertex'),
-                        ('path_progress_regression', 'Maximum running-maximum minus current nearest-path arc-length progress')):
+                for condition in conditions:
+                    name, meaning = condition['condition_id'], condition['meaning']
                     constraints.append(dict(constraint_id=name, signal=signal, indices=list(range(last+1)),
                         kind='unsupported', reference=[[0.]*signal['dimension'] for _ in range(last+1)],
                         provenance=provenance, unsupported_requirement=dict(
@@ -123,17 +215,17 @@ class ResearchTaskAdapter:
         else:
             count, _ = aligned_steps(cfg['policy']['controller']['parameters']['data']['settling']['window_s'], period)
             holding = list(range(last-count, last+1))
-            limits = self.ranking_limits()
             goal = task['goal']['data']['target_m']
             constraints = []
-            for name, indices, output, unit, reference, source in (
-                    ('terminal_error_m', [last], 'tip_position', 'm', goal, '/task/evaluator/parameters/data/tolerance_m'),
-                    ('holding_max_error_m', holding, 'tip_position', 'm', goal, '/policy/controller/parameters/data/settling/position_limit_m'),
-                    ('holding_max_speed_m_s', holding, 'tip_velocity', 'm/s', [0.]*3, '/policy/controller/parameters/data/settling/speed_limit_m_s')):
-                constraints.append(dict(constraint_id=name, signal={**signal, 'name':output, 'units':unit}, indices=indices,
-                    kind='norm_bound', reference=[reference for _ in indices], radius=limits[name],
-                    provenance=[source, '/task/timing', '/task/goal', '/policy/controller/parameters/data/settling/window_s']))
-        tendons = cfg['robot']['structure']['data']['tendons']
+            for condition in conditions:
+                name = condition['condition_id']
+                indices = [last] if name == 'terminal_error_m' else holding
+                reference = [0.]*3 if condition['signal']['name'] == 'tip_velocity' else goal
+                provenance = condition['provenance'] + (['/policy/controller/parameters/data/settling/window_s']
+                    if name == 'terminal_error_m' else [])
+                constraints.append(dict(constraint_id=name, signal=condition['signal'], indices=indices,
+                    kind='norm_bound', reference=[reference for _ in indices], radius=condition['limit'],
+                    provenance=provenance))
         return TaskAnalysisRequirement(binding={**binding,
             **({'task_family':'task.tracking'} if task['family']=='task.tracking' else {}), 'task_identity':digest(task),
             'effective_configuration_identity':digest(cfg), 'task_id':task['task_id'], 'task_version':task['task_version']},
@@ -141,10 +233,7 @@ class ResearchTaskAdapter:
             horizon_semantics=('numerical_witness_horizon_inclusive_samples'
                 if task['family']=='task.tracking' and task['goal']['data']['time_requirement']=='none'
                 else 'absolute_task_time_inclusive_samples'),
-            physical_inputs=dict(signal='tendon_tension', units='N', frame='tendon_path', phase='pre_step',
-                control_period_s=task['timing']['control_period_s'], tendon_order=[t['id'] for t in tendons],
-                lower=[0.]*len(tendons), upper=[t['force_limit_n'] for t in tendons],
-                provenance=['/robot/structure/data/tendons', '/task/timing/control_period_s']))
+            physical_inputs=self._physical_inputs())
 
     def operating_point(self, time_s=0.0):
         if self.task['family']=='task.tracking' and self.task['goal']['data']['time_requirement']=='none':
@@ -183,6 +272,7 @@ class ResearchTaskAdapter:
         """Check the actual registered pairing, separately from historical matches."""
         from tools.platform_tasks import compile_input
         from tools.platform_registry import registry
+        self._require_configuration()
         inp = SessionInput.model_validate(self.configuration)
         reg = registry()
         definition = reg.get(inp.policy.controller.extension_id, inp.policy.controller.version, 'controller')
@@ -204,6 +294,8 @@ class ResearchTaskAdapter:
 
 def task_adapter(configuration):
     value = effective_input(configuration)
+    if 'family' in value and 'goal' in value:
+        value = dict(task=value)
     if value['task']['family'] not in ('task.reach', 'task.tracking'):
         raise ValueError('RESEARCH_TASK_ADAPTER_REQUIRED: '+value['task']['family'])
     # Validate the registered task itself before extracting task-specific meanings.
