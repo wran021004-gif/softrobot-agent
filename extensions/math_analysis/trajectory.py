@@ -87,13 +87,18 @@ def _margin_jacobian(c, residual, matrix, atol):
     return np.concatenate((matrix, -matrix), axis=0)/scale
 
 
-def verify_witness(model, dynamics, initial, delta, rows, scope, atol):
+def verify_witness(model, dynamics, initial, delta, rows, scope, atol, auxiliary=None):
     """Replay states and outputs without multiplying the assembled prediction map."""
     Ad, Bd, cd = dynamics; steps = scope['step_count']; nu = len(model.u0)
     z = np.asarray(delta, dtype=float)
     if z.shape != (steps, nu) or not np.all(np.isfinite(z)):
         return dict(passed=False, reason='NONFINITE_OR_INCOMPATIBLE_INPUT_SEQUENCE')
     u0 = np.asarray(model.u0); applied = z+u0; limits = np.asarray(model.binding['tension_limits_n'])
+    auxiliary=np.asarray([] if auxiliary is None else auxiliary,dtype=float)
+    if auxiliary.shape!=(scope.get('auxiliary_count',0),) or not np.isfinite(auxiliary).all():
+        return dict(passed=False,finite=False,reason='INVALID_PATH_PROGRESS_COORDINATES')
+    full=np.r_[z.ravel(),auxiliary]
+    path_rows={(r['constraint_id'],r['sample_index']):r for r in scope.get('path_rows',[])}
     tension_margin = float(np.min(np.concatenate((applied.ravel(), (limits-applied).ravel())), initial=np.inf))
     x = np.asarray(initial, dtype=float); states = [x.copy()]
     for du in z:
@@ -103,6 +108,9 @@ def verify_witness(model, dynamics, initial, delta, rows, scope, atol):
     previous = model.operating_point.get('previous_applied_input_n')
     records = []; prediction_error = 0.
     for c, index, k, reference, output, base, matrix in rows:
+        original_reference=reference
+        path=path_rows.get((c.constraint_id,index))
+        if path is not None:reference=reference+np.asarray(path['direction'])*auxiliary[path['auxiliary_index']]
         direct = z[k-1] if k else np.zeros(nu) if previous is None else np.asarray(previous)-u0
         y = np.asarray(output.value0)+np.asarray(output.C)@states[k]+np.asarray(output.D)@direct
         if not np.all(np.isfinite(y)):
@@ -110,7 +118,7 @@ def verify_witness(model, dynamics, initial, delta, rows, scope, atol):
         residual = y-reference; margins, value = _margins(c, residual)
         scale = max(c.radius if c.kind == 'norm_bound' else max(np.max(np.abs(c.lower)), np.max(np.abs(c.upper))), atol)
         violation = max(0., -float(np.min(margins)))
-        prediction_error = max(prediction_error, float(np.max(np.abs(y-base-matrix@z.ravel()))))
+        prediction_error = max(prediction_error, float(np.max(np.abs((y-reference)-(base-original_reference+matrix@full)))))
         records.append(dict(constraint_id=c.constraint_id, sample_index=index, control_step=k,
             absolute_time_s=scope['start_time_s']+k*scope['control_period_s'], signal=c.signal.name,
             units=c.signal.units, frame=c.signal.frame, output=y.tolist(), reference=reference.tolist(),
@@ -120,12 +128,71 @@ def verify_witness(model, dynamics, initial, delta, rows, scope, atol):
         np.all(np.isfinite(r['output'])) and np.all(np.isfinite(r['margins'])) for r in records)
     worst = max(records, key=lambda r: r['normalized_violation'], default=None)
     max_abs = max((r['violation'] for r in records), default=0.)
-    return dict(passed=bool(finite and tension_margin >= -atol and max_abs <= atol and prediction_error <= atol),
+    progress_valid=True
+    if len(auxiliary):
+        progress_valid=bool(np.all(auxiliary>=np.asarray(scope['auxiliary_lower'])-atol)
+            and np.all(auxiliary<=np.asarray(scope['auxiliary_upper'])+atol)
+            and np.all(np.asarray(scope['hard_matrix'])@full<=np.asarray(scope['hard_upper'])+atol))
+    return dict(passed=bool(finite and progress_valid and tension_margin >= -atol and max_abs <= atol and prediction_error <= atol),
+        path_progress_valid=progress_valid,
         finite=bool(finite), records=records, states=[v.tolist() for v in states],
         max_absolute_violation=max_abs, max_normalized_violation=max((r['normalized_violation'] for r in records), default=0.),
         worst_violation=worst if worst and worst['violation'] > 0 else None,
         minimum_tension_margin_n=None if steps == 0 else tension_margin,
         max_prediction_replay_error=prediction_error, absolute_tolerance=atol)
+
+
+def prepare_conic_trajectory(model,requirements,protocol,result,initial_delta=None,path_assignment=None):
+    """Add dimensionless progress coordinates without relabelling physical inputs.
+
+    A two-segment path is a union of ordered convex subproblems. Each assignment
+    visits the corner at one free sampled boundary; callers enumerate boundaries.
+    The horizon is a numerical witness horizon, not an untimed task deadline.
+    """
+    paths=[c for c in requirements.constraints if c.kind=='path_bound']
+    if not paths:return prepare_trajectory(model,requirements,protocol,result,initial_delta)
+    if len(paths)!=1:raise ValueError('ONE_FREE_PROGRESS_PATH_REQUIRED')
+    from schemas.platform_analysis import TaskAnalysisConstraint
+    path=paths[0];ordinary=[c for c in requirements.constraints if c.kind!='path_bound']
+    scope,dynamics,initial,rows,lower,upper,scale=prepare_trajectory(model,
+        requirements.model_copy(update=dict(constraints=ordinary)),protocol,result,initial_delta)
+    if scope['start_time_s']!=0 or path.indices!=list(range(len(requirements.time_grid_s))):
+        raise ValueError('FREE_PATH_REQUIRES_COMPLETE_DECLARED_INITIAL_HORIZON')
+    outputs={o.name:o for o in model.endpoint_outputs};output=outputs.get(path.signal.name)
+    if output is None or (output.units,output.frame,len(output.value0),path.signal.phase)!=('m','world',3,'post_step'):
+        raise ValueError('FREE_PATH_REQUIRES_WORLD_METRE_POSITION_OUTPUT')
+    vertices=np.asarray(path.path_vertices_m);legs=np.diff(vertices,axis=0);lengths=np.linalg.norm(legs,axis=1)
+    fractions=np.r_[0.,np.cumsum(lengths)]/sum(lengths);count=len(path.indices);physical=len(lower)
+    if len(legs)==2:
+        if path_assignment is None:path_assignment=path.indices[1]
+        if path_assignment not in path.indices[1:-1]:raise ValueError('PATH_CORNER_REQUIRES_INTERIOR_SAMPLE')
+    lo=np.zeros(count);hi=np.ones(count);layout=[]
+    _,states=sampled_maps(model,scope['step_count'],protocol.period_s,initial_delta)
+    rows=[(*r[:-1],np.c_[r[-1],np.zeros((len(r[3]),count))]) for r in rows]
+    for j,index in enumerate(path.indices):
+        segment=0 if len(legs)==1 or index<=path_assignment else 1
+        direction=legs[segment]*sum(lengths)/lengths[segment]
+        origin=vertices[segment]-direction*fractions[segment]
+        lo[j],hi[j]=fractions[segment:segment+2]
+        if len(legs)==2 and index==path_assignment:lo[j]=hi[j]=fractions[1]
+        k=scope['sample_steps'][index]
+        base,matrix=_output_map(output,states[k],k,scope['step_count'],np.asarray(model.u0),model.operating_point.get('previous_applied_input_n'))
+        extended=np.c_[matrix,np.zeros((3,count))];extended[:,physical+j]=-direction
+        constraint=TaskAnalysisConstraint(constraint_id=path.constraint_id,signal=path.signal,indices=[index],
+            kind='norm_bound',reference=[origin.tolist()],radius=path.radius,provenance=path.provenance)
+        rows.append((constraint,index,k,origin,output,base,extended))
+        layout.append(dict(constraint_id=path.constraint_id,sample_index=index,auxiliary_index=j,direction=direction.tolist()))
+    lo[0]=hi[0]=0.;lo[-1]=hi[-1]=1.
+    hard=np.zeros((count-1,physical+count))
+    for j in range(count-1):hard[j,physical+j]=1.;hard[j,physical+j+1]=-1.
+    scope.update(physical_variable_count=physical,path_rows=layout,path_assignment=path_assignment,
+        auxiliary_count=count,auxiliary_units='dimensionless normalized path arc length',
+        auxiliary_lower=lo.tolist(),auxiliary_upper=hi.tolist(),
+        hard_matrix=hard.tolist(),hard_upper=[0.]*(count-1),
+        untimed_scope='Finite chosen analysis horizon only; failure is not infeasibility over unrestricted completion times')
+    result['coverage'].append(dict(constraint_id=path.constraint_id,analyzed_indices=path.indices,unchecked_indices=[],reasons=[]))
+    result['full_requested_coverage']=all(not r['unchecked_indices'] for r in result['coverage'])
+    return scope,dynamics,initial,rows,np.r_[lower,lo],np.r_[upper,hi],np.r_[scale,np.ones(count)]
 
 
 def _certificate(c, index, base, matrix, reference, lower, upper, atol):

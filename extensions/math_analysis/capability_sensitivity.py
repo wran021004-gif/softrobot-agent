@@ -9,7 +9,7 @@ import numpy as np
 
 from extensions.math_analysis.conic_capability import conic_capability, _identity, _plain, DEFAULT_OPTIONS
 from extensions.math_analysis.task_capability import normalization
-from extensions.math_analysis.trajectory import prepare_trajectory, verify_witness
+from extensions.math_analysis.trajectory import prepare_conic_trajectory, verify_witness
 
 
 METHOD = 'controlled-capability-sensitivity-v1'
@@ -23,15 +23,15 @@ def _parameter(parameters, path):
     return parent, path.split('.')[-1]
 
 
-def _prepare(point, protocol):
+def _prepare(point, protocol,path_assignment=None):
     model, req = point['model'], point['requirements']
     info = dict(coverage=[])
-    scope, dynamics, initial, rows, lo, hi, _ = prepare_trajectory(
-        model, req, protocol, info, point['initial_delta'])
+    scope, dynamics, initial, rows, lo, hi, _ = prepare_conic_trajectory(
+        model, req, protocol, info, point['initial_delta'],path_assignment)
     if not rows:
         raise ValueError('NO_COMMON_ANALYZED_CONSTRAINTS')
     # Convert the entire prediction map to absolute tensions U, including u0(d).
-    nominal = np.tile(model.u0, scope['step_count'])
+    nominal = np.r_[np.tile(model.u0, scope['step_count']),np.zeros(scope.get('auxiliary_count',0))]
     atoms = []
     for row_index, (c, index, k, ref, _, base, matrix) in enumerate(rows):
         scale = normalization(c)
@@ -49,10 +49,12 @@ def _prepare(point, protocol):
     if not all(np.all(np.isfinite(a[k])) for a in atoms for k in ('M', 'b')):
         raise ValueError('NONFINITE_ABSOLUTE_INPUT_MAP')
     return dict(info=info, scope=scope, dynamics=dynamics, initial=initial, rows=rows,
-                atoms=atoms, lower=lo+nominal, upper=hi+nominal)
+                atoms=atoms, lower=lo+nominal, upper=hi+nominal,
+                hard_matrix=np.asarray(scope.get('hard_matrix',np.zeros((0,len(lo))))),
+                hard_upper=np.asarray(scope.get('hard_upper',[])))
 
 
-def _validate(points, parameter, protocol):
+def _validate(points, parameter, protocol,path_assignment=None):
     base = points[0]
     path = parameter['path']
     if not parameter.get('units') or not parameter.get('source'):
@@ -106,7 +108,7 @@ def _validate(points, parameter, protocol):
             req['physical_inputs'] = {k:v for k,v in req['physical_inputs'].items() if k not in ('lower','upper')}
         if req != base_req:
             raise ValueError('FROZEN_TASK_OR_PHYSICAL_INPUT_SEMANTICS_MISMATCH')
-        data = _prepare(point, protocol)
+        data = _prepare(point, protocol,path_assignment)
         if prepared and (data['info']['coverage'] != prepared[0]['info']['coverage']
                 or data['scope'] != prepared[0]['scope']):
             raise ValueError('TASK_COVERAGE_OR_SAMPLE_PHASE_MISMATCH')
@@ -116,9 +118,10 @@ def _validate(points, parameter, protocol):
 
 def _fixed_replay(point, data, control, protocol):
     m = point['model']; scope = data['scope']
-    delta = control.reshape(scope['step_count'], len(m.u0))-m.u0
+    physical=scope.get('physical_variable_count',len(control))
+    delta = control[:physical].reshape(scope['step_count'], len(m.u0))-m.u0
     replay = verify_witness(m, data['dynamics'], data['initial'], delta, data['rows'], scope,
-                            protocol.endpoint_check_atol)
+                            protocol.endpoint_check_atol,control[physical:])
     legal = bool(np.all(control >= data['lower']) and np.all(control <= data['upper']))
     valid = bool(replay.get('finite') and len(replay.get('records', [])) == len(data['rows'])
                  and replay['max_prediction_replay_error'] <= protocol.endpoint_check_atol)
@@ -128,7 +131,7 @@ def _fixed_replay(point, data, control, protocol):
             record['signed_excesses'] = (-np.array(record['margins'])/normalization(c)).tolist()
         score = max(max(r['signed_excesses']) for r in replay['records'])
     return dict(input_legal=legal, replay_valid=valid, score=score, replay=replay,
-                control_treatment='same absolute tensions; illegal controls are diagnostic only')
+                control_treatment='same absolute tensions and, when present, baseline dimensionless path progress; fixed-progress diagnostic only')
 
 
 def _contributions(left, right, width, control, dual):
@@ -174,6 +177,10 @@ def _dual_face(data, solution, derivatives, dl, dh, parameter_scale, face_atol, 
         mass = mass+alpha; variables.append((alpha, v))
     ml = cp.Variable(n, nonneg=True) if n else None
     mh = cp.Variable(n, nonneg=True) if n else None
+    hard=data['hard_matrix'];hard_upper=data['hard_upper']
+    hard_mu=cp.Variable(len(hard_upper),nonneg=True) if len(hard_upper) else None
+    if hard_mu is not None:
+        grad=grad+hard.T@hard_mu;constant=constant-hard_upper@hard_mu
     if n:
         constraints.append(grad-ml+mh == 0)
         constant = constant+ml@data['lower']-mh@data['upper']
@@ -204,15 +211,18 @@ def _dual_face(data, solution, derivatives, dl, dh, parameter_scale, face_atol, 
                 gradient += a['M']*w; c += a['b']*w; slope += float(dr)*w
             multipliers.append(row)
         low, high = (np.array(ml.value), np.array(mh.value)) if n else (np.zeros(0), np.zeros(0))
+        hard_weights=np.array(hard_mu.value).ravel() if hard_mu is not None else np.zeros(0)
+        if len(hard_weights):gradient+=hard.T@hard_weights;c-=hard_upper@hard_weights
         gradient = gradient-low+high; c += low@data['lower']-high@data['upper']
         slope += low@dl-high@dh
         residual = max(float(np.max(abs(gradient), initial=0.)), abs(weights-1), cone,
-                       float(np.max(-low, initial=0.)), float(np.max(-high, initial=0.)))
+                       float(np.max(-low, initial=0.)), float(np.max(-high, initial=0.)),float(np.max(-hard_weights,initial=0.)))
         face_gap = float(solution['replayed_violation']-c)
         checked = bool(np.isfinite(slope) and residual <= 1e-7 and -1e-7 <= face_gap <= face_atol+1e-7)
         extrema.append(dict(status='numerically_checked' if checked else 'unresolved', solver_status=problem.status, value=float(slope),
             residual=residual, primal_dual_gap=face_gap, task_multipliers=multipliers,
             box_lower_multipliers=low.tolist(), box_upper_multipliers=high.tolist(),
+            hard_constraint_multipliers=hard_weights.tolist(),
             iterations=problem.solver_stats.num_iters, solve_time_s=problem.solver_stats.solve_time))
     available = all(e['status'] == 'numerically_checked' for e in extrema)
     return dict(status='numerically_checked' if available else 'unresolved', extrema=extrema,
@@ -300,17 +310,25 @@ def capability_sensitivity(points, parameter, protocol, *, solver_options=None,
                 initial_delta=p['initial_delta'], solver_options=solver_options)
             solutions.append(solution)
             if progress:progress('capability','returned',dict(point_index=i,status=solution['status'],solver=solution.get('solver')))
+        path=any(c.kind=='path_bound' for c in points[0]['requirements'].constraints)
+        if path:
+            prepared=_validate(points,parameter,protocol,solutions[0].get('path_assignment'))
+            out['method_version']='controlled-path-progress-sensitivity-v1'
+            out['regularity']['path_assignments']=[s.get('path_assignment') for s in solutions]
+            out['regularity']['path_assignment_ambiguous']=len(solutions[0].get('path_assignment_ties',[]))>1 or any(s.get('path_assignment')!=solutions[0].get('path_assignment') for s in solutions)
         out['numerical_optimality'] = [dict(value=float(d), model_identity=_identity(p['model']),
             initial_delta=_plain(p['initial_delta']), result=s) for d,p,s in zip(values, points, solutions)]
         out['computation_cost'] = dict(model_count=len(points),
             construction_s=sum(p.get('construction_s', 0.) for p in points),
-            conic_solves=len(solutions), conic_kernel_s=sum(s['kernel_elapsed_s'] for s in solutions),
+            conic_solves=sum(s.get('internal_conic_solves',1) for s in solutions), conic_kernel_s=sum(s['kernel_elapsed_s'] for s in solutions),
             dual_face_solves=0, dual_face_wall_s=0.)
         if any(s['optimality_status'] != 'numerically_checked' for s in solutions):
             out['reason'] = 'NUMERICAL_OPTIMALITY_INSUFFICIENT'; return out
-        base = solutions[0]; dual = base['dual_checks']; U = np.array(base['applied_input_n']).ravel()
+        base = solutions[0]; dual = base['dual_checks']; U = np.r_[np.array(base['applied_input_n']).ravel(),base.get('path_progress',[])]
         fixed = [_fixed_replay(p, d, U, protocol) for p,d in zip(points, prepared)]
-        out['fixed_control_sensitivity'] = dict(points=fixed, baseline_absolute_input_n=U.tolist())
+        physical=prepared[0]['scope'].get('physical_variable_count',len(U))
+        out['fixed_control_sensitivity'] = dict(points=fixed, baseline_absolute_input_n=U[:physical].tolist())
+        if path:out['fixed_control_sensitivity']['baseline_path_progress']=U[physical:].tolist()
         if not all(f['replay_valid'] and f['score'] is not None for f in fixed):
             out['reason'] = 'FIXED_CONTROL_REPLAY_FAILED'; return out
         duplicates = _duplicates(prepared)
@@ -396,6 +414,10 @@ def capability_sensitivity(points, parameter, protocol, *, solver_options=None,
         else:
             out['direction_status'] = 'directional_comparisons_only'
             out['preferred_parameter_direction'] = 'unresolved'
+        if path:
+            out['envelope_sensitivity']['scope']='Conditional on the baseline corner assignment; progress is optimized in each SOCP, fixed only in the control diagnostic.'
+            if out['regularity']['path_assignment_ambiguous']:
+                out['direction_status']='directional_comparisons_only';out['preferred_parameter_direction']='unresolved'
         dominant = sorted(differences[-1]['constraint_contributions'], key=lambda c: abs(c['contribution']), reverse=True)[:3]
         out['summary'] = dict(parameter=parameter['path'], direction=out['preferred_parameter_direction'],
             baseline_parameter_value=float(origin), baseline_model_identity=_identity(points[0]['model']),

@@ -480,11 +480,15 @@ def compile_draft(draft, *, trusted_reference=None, reference_label=None, analys
             diagnostics.append('EVALUATOR_UNAVAILABLE: ' + str(exc))
     else:
         needs = {
-            'tracking': ['registered task.tracking', 'timed reference definition', 'tracking evaluator'],
+            'tracking': ['registered task.tracking', 'geometric path definition', 'tracking evaluator'],
             'obstacle_reach': ['collision/distance signals', 'obstacle semantics', 'collision-aware evaluator'],
             'catch_and_hold': ['contact and object-state signals', 'capture/retention definition', 'contact/capture evaluator'],
             'disturbance_stabilization': ['disturbance waveform and frame', 'platform/disturbance signals', 'disturbance stability evaluator'],
         }.get(draft.intent, ['task family', 'signals', 'independent evaluator'])
+        if draft.intent=='tracking' and 'task.tracking' in capabilities['registered_tasks']:
+            capabilities['evaluation']['registered_definition']=dict(task='task.tracking',evaluator='evaluate.tracking',
+                scope='Open geometric path up to two segments; no time reference. No automatic mapping of the requested Tracking task.')
+            needs=['reviewed geometric tracking evaluator mapping (N2 remains Reach-only)', 'verified path-following controller/backend execution']
         capabilities['evaluation']['reasons'] = needs
         diagnostics.append('UNSUPPORTED_TASK: ' + draft.intent + '; requires ' + ', '.join(needs))
         capabilities['mathematics'] = dict(status='not_applicable', reason='No supported task translation; original semantics retained.')

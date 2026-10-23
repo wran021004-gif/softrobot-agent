@@ -10,7 +10,7 @@ from extensions.math_analysis.trajectory import prepare_trajectory, verify_witne
 
 def normalization(constraint):
     """Physical scale; zero-radius norms have no dimensionless relative excess."""
-    scale = (constraint.radius if constraint.kind == 'norm_bound' else
+    scale = (constraint.radius if constraint.kind in ('norm_bound','path_bound') else
              max(np.max(np.abs(constraint.lower)), np.max(np.abs(constraint.upper))))
     if not np.isfinite(scale) or scale <= 0:
         raise ValueError('SIGNED_VIOLATION_REQUIRES_POSITIVE_PHYSICAL_SCALE')

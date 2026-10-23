@@ -1,0 +1,534 @@
+{
+  "evidence_kind": "synthetic_offline_validation_only",
+  "source": "tests.research.test_tracking + tests.research.test_tracking_math analytical fixtures",
+  "new_provider_requests": 0,
+  "physical_rollouts": 0,
+  "nmpc_launches": 0,
+  "ppo_training": 0,
+  "f3_store_unchanged": true,
+  "regression": {
+    "tests": 172,
+    "seconds": 34.72,
+    "passed": true
+  },
+  "final_changed_regression": {
+    "tests": 33,
+    "seconds": 8.354,
+    "passed": true
+  },
+  "configurations": [
+    {
+      "path": "tasks/tracking_linear_development.json",
+      "sha256": "e2504796b32e3a3f0388cfc27e5ef7fbe961b5b9c263a199e5986ffc5c43713f",
+      "task_identity": "8d3f5b7462a2da364bb80c0ae3063edeba61147f42935ecc2b14374d8b82d9ca",
+      "mode": "none",
+      "status": "draft"
+    },
+    {
+      "path": "tasks/tracking_timed_development.json",
+      "sha256": "ffa05899a9aaf7da3bdfd006a671d18b9efa73eaf60336ef078af581e2ea4a97",
+      "task_identity": "9bb6e29ba50effd35af7c1e3431a764ccab971a90b31e78993242aa6af851c98",
+      "mode": "timed",
+      "status": "draft"
+    }
+  ],
+  "evaluator_cases": [
+    {
+      "case": "exact",
+      "validity": "valid",
+      "task_success": true,
+      "metrics": {
+        "max_position_error": 6.938893903907228e-18,
+        "rms_position_error": 4.752522582653672e-18,
+        "terminal_position_error": 0.0,
+        "path_coverage_error": 6.938893903907228e-18,
+        "progress_regression": 0.0
+      },
+      "constraints": [
+        {
+          "name": "tracking_max_error",
+          "satisfied": true,
+          "observed": 6.938893903907228e-18,
+          "limit": 0.004,
+          "units": "m"
+        },
+        {
+          "name": "path_coverage",
+          "satisfied": true,
+          "observed": 6.938893903907228e-18,
+          "limit": 0.004,
+          "units": "m"
+        },
+        {
+          "name": "path_start",
+          "satisfied": true,
+          "observed": 0.0,
+          "limit": 0.004,
+          "units": "m"
+        },
+        {
+          "name": "path_end",
+          "satisfied": true,
+          "observed": 0.0,
+          "limit": 0.004,
+          "units": "m"
+        },
+        {
+          "name": "path_progress_regression",
+          "satisfied": true,
+          "observed": 0.0,
+          "limit": 0.004,
+          "units": "m"
+        }
+      ]
+    },
+    {
+      "case": "uniform_2mm_offset",
+      "validity": "valid",
+      "task_success": true,
+      "metrics": {
+        "max_position_error": 0.001999999999999993,
+        "rms_position_error": 0.001999999999999993,
+        "terminal_position_error": 0.001999999999999993,
+        "path_coverage_error": 0.001999999999999993,
+        "progress_regression": 0.0
+      },
+      "constraints": [
+        {
+          "name": "tracking_max_error",
+          "satisfied": true,
+          "observed": 0.001999999999999993,
+          "limit": 0.004,
+          "units": "m"
+        },
+        {
+          "name": "path_coverage",
+          "satisfied": true,
+          "observed": 0.001999999999999993,
+          "limit": 0.004,
+          "units": "m"
+        },
+        {
+          "name": "path_start",
+          "satisfied": true,
+          "observed": 0.001999999999999993,
+          "limit": 0.004,
+          "units": "m"
+        },
+        {
+          "name": "path_end",
+          "satisfied": true,
+          "observed": 0.001999999999999993,
+          "limit": 0.004,
+          "units": "m"
+        },
+        {
+          "name": "path_progress_regression",
+          "satisfied": true,
+          "observed": 0.0,
+          "limit": 0.004,
+          "units": "m"
+        }
+      ]
+    },
+    {
+      "case": "single_6mm_excursion",
+      "validity": "valid",
+      "task_success": false,
+      "metrics": {
+        "max_position_error": 0.005999999999999998,
+        "rms_position_error": 0.003416968784708996,
+        "terminal_position_error": 0.0,
+        "path_coverage_error": 0.005669467095138417,
+        "progress_regression": 0.0
+      },
+      "constraints": [
+        {
+          "name": "tracking_max_error",
+          "satisfied": false,
+          "observed": 0.005999999999999998,
+          "limit": 0.004,
+          "units": "m"
+        },
+        {
+          "name": "path_coverage",
+          "satisfied": false,
+          "observed": 0.005669467095138417,
+          "limit": 0.004,
+          "units": "m"
+        },
+        {
+          "name": "path_start",
+          "satisfied": true,
+          "observed": 0.0,
+          "limit": 0.004,
+          "units": "m"
+        },
+        {
+          "name": "path_end",
+          "satisfied": true,
+          "observed": 0.0,
+          "limit": 0.004,
+          "units": "m"
+        },
+        {
+          "name": "path_progress_regression",
+          "satisfied": true,
+          "observed": 0.0,
+          "limit": 0.004,
+          "units": "m"
+        }
+      ]
+    },
+    {
+      "case": "shortcut",
+      "validity": "valid",
+      "task_success": false,
+      "metrics": {
+        "max_position_error": 0.008164965809277268,
+        "rms_position_error": 0.004611923814401242,
+        "terminal_position_error": 0.0,
+        "path_coverage_error": 0.014142135623730963,
+        "progress_regression": 0.0
+      },
+      "constraints": [
+        {
+          "name": "tracking_max_error",
+          "satisfied": false,
+          "observed": 0.008164965809277268,
+          "limit": 0.004,
+          "units": "m"
+        },
+        {
+          "name": "path_coverage",
+          "satisfied": false,
+          "observed": 0.014142135623730963,
+          "limit": 0.004,
+          "units": "m"
+        },
+        {
+          "name": "path_start",
+          "satisfied": true,
+          "observed": 0.0,
+          "limit": 0.004,
+          "units": "m"
+        },
+        {
+          "name": "path_end",
+          "satisfied": true,
+          "observed": 0.0,
+          "limit": 0.004,
+          "units": "m"
+        },
+        {
+          "name": "path_progress_regression",
+          "satisfied": true,
+          "observed": 0.0,
+          "limit": 0.004,
+          "units": "m"
+        }
+      ]
+    }
+  ],
+  "conic_cases": {
+    "free": {
+      "method_version": "sampled-affine-conic-path-progress-v1",
+      "status": "feasible_witness",
+      "optimality_status": "numerically_checked",
+      "replayed_violation": -0.9999999999923839,
+      "path_progress": [
+        0.0,
+        0.24999999999947414,
+        0.49999999999967387,
+        0.7499999999998703,
+        1.0
+      ],
+      "path_assignment": null,
+      "internal_conic_solves": 1,
+      "untimed_scope": "Finite chosen analysis horizon only; failure is not infeasibility over unrestricted completion times"
+    },
+    "timed": {
+      "method_version": "sampled-affine-conic-minimax-v1",
+      "status": "inconclusive",
+      "optimality_status": "numerically_checked",
+      "replayed_violation": 3.4999999999999996
+    },
+    "bend": {
+      "method_version": "sampled-affine-conic-path-progress-v1",
+      "status": "feasible_witness",
+      "optimality_status": "numerically_checked",
+      "replayed_violation": -0.9999999999887222,
+      "path_progress": [
+        0.0,
+        0.24999999999947264,
+        0.5,
+        0.7500000000000493,
+        1.0
+      ],
+      "path_assignment": 2,
+      "internal_conic_solves": 3,
+      "path_assignment_comparison": [
+        {
+          "corner_sample": 1,
+          "status": "inconclusive",
+          "score": 1.5000000000083715,
+          "optimality": "numerically_checked",
+          "support_lower_estimate": 1.4999999996190776
+        },
+        {
+          "corner_sample": 2,
+          "status": "feasible_witness",
+          "score": -0.9999999999887222,
+          "optimality": "numerically_checked",
+          "support_lower_estimate": -1.0000000000039784
+        },
+        {
+          "corner_sample": 3,
+          "status": "inconclusive",
+          "score": 0.25000000002720846,
+          "optimality": "numerically_checked",
+          "support_lower_estimate": 0.2499999998909943
+        }
+      ],
+      "path_assignment_ties": [
+        2
+      ],
+      "untimed_scope": "Finite chosen analysis horizon only; failure is not infeasibility over unrestricted completion times"
+    },
+    "diagonal_cannot_follow_bend": {
+      "method_version": "sampled-affine-conic-path-progress-v1",
+      "status": "inconclusive",
+      "optimality_status": "numerically_checked",
+      "replayed_violation": 2.535533905934171,
+      "path_progress": [
+        0.0,
+        0.1707678839301902,
+        0.3003405394217164,
+        0.5,
+        1.0
+      ],
+      "path_assignment": 3,
+      "internal_conic_solves": 3,
+      "path_assignment_comparison": [
+        {
+          "corner_sample": 1,
+          "status": "inconclusive",
+          "score": 2.535533905945998,
+          "optimality": "numerically_checked",
+          "support_lower_estimate": 2.5355339054852886
+        },
+        {
+          "corner_sample": 2,
+          "status": "inconclusive",
+          "score": 2.5355339059373003,
+          "optimality": "numerically_checked",
+          "support_lower_estimate": 2.5355339056652184
+        },
+        {
+          "corner_sample": 3,
+          "status": "inconclusive",
+          "score": 2.535533905934171,
+          "optimality": "numerically_checked",
+          "support_lower_estimate": 2.535533905847371
+        }
+      ],
+      "path_assignment_ties": [
+        1,
+        2,
+        3
+      ],
+      "untimed_scope": "Finite chosen analysis horizon only; failure is not infeasibility over unrestricted completion times"
+    }
+  },
+  "sensitivity": [
+    {
+      "mode": "none",
+      "method": "controlled-path-progress-sensitivity-v1",
+      "parameter": {
+        "path": "model.gain_m_per_n_s",
+        "units": "m/(N*s)",
+        "source": "Analytic synthetic gain fixture, not a robot design law"
+      },
+      "status": "computed_diagnostic",
+      "direction_status": "stable_reoptimized_direction_envelope_unresolved",
+      "preferred_direction": "increase",
+      "cost": {
+        "model_count": 5,
+        "construction_s": 0.0,
+        "conic_solves": 5,
+        "conic_kernel_s": 0.05381550011225045,
+        "dual_face_solves": 4,
+        "dual_face_wall_s": 0.040306400042027235
+      },
+      "regularity": {
+        "differentiability_proven": false,
+        "LICQ": "not_asserted",
+        "primal_uniqueness": "unassessed",
+        "path_assignments": [
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        "path_assignment_ambiguous": false,
+        "duplicate_groups_across_stencil": [],
+        "active_set_changed": false,
+        "step_and_envelope_checks_passed": false,
+        "slope_comparison_tolerance": 0.20000019998621035,
+        "finite_difference_checks_passed": true,
+        "dual_face_interpretation": "Only near-optimal multipliers at this primal explored; no LICQ/uniqueness proof"
+      },
+      "differences": [
+        {
+          "reoptimized": -9.999999999310518,
+          "envelope": -9.999999996868137,
+          "dual_face_status": "numerically_checked",
+          "dual_face_range": [
+            -9.999999961124756,
+            -9.999998036890876
+          ]
+        },
+        {
+          "reoptimized": -9.999999999262124,
+          "envelope": -9.999999996868116,
+          "dual_face_status": "unresolved",
+          "dual_face_range": null
+        }
+      ]
+    },
+    {
+      "mode": "timed",
+      "method": "controlled-capability-sensitivity-v1",
+      "parameter": {
+        "path": "model.gain_m_per_n_s",
+        "units": "m/(N*s)",
+        "source": "Analytic synthetic gain fixture, not a robot design law"
+      },
+      "status": "computed_diagnostic",
+      "direction_status": "numerically_stable_local_direction",
+      "preferred_direction": "increase",
+      "cost": {
+        "model_count": 5,
+        "construction_s": 0.0,
+        "conic_solves": 5,
+        "conic_kernel_s": 0.04879459994845092,
+        "dual_face_solves": 4,
+        "dual_face_wall_s": 0.036332699935883284
+      },
+      "regularity": {
+        "differentiability_proven": false,
+        "LICQ": "not_asserted",
+        "primal_uniqueness": "unassessed",
+        "duplicate_groups_across_stencil": [],
+        "active_set_changed": false,
+        "step_and_envelope_checks_passed": true,
+        "slope_comparison_tolerance": 0.050000200000000224,
+        "finite_difference_checks_passed": true,
+        "dual_face_interpretation": "Only near-optimal multipliers at this primal explored; no LICQ/uniqueness proof"
+      },
+      "differences": [
+        {
+          "reoptimized": -2.500000000000011,
+          "envelope": -2.5000000041457544,
+          "dual_face_status": "numerically_checked",
+          "dual_face_range": [
+            -2.500009664940804,
+            -2.499999201779145
+          ]
+        },
+        {
+          "reoptimized": -2.4999999999999445,
+          "envelope": -2.500000004145732,
+          "dual_face_status": "numerically_checked",
+          "dual_face_range": [
+            -2.5000097370554775,
+            -2.499999201726146
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "corner_ties",
+      "method": "controlled-path-progress-sensitivity-v1",
+      "parameter": {
+        "path": "model.gain_m_per_n_s",
+        "units": "m/(N*s)",
+        "source": "Analytic synthetic gain fixture, not a robot design law"
+      },
+      "status": "computed_diagnostic",
+      "direction_status": "directional_comparisons_only",
+      "preferred_direction": "unresolved",
+      "cost": {
+        "model_count": 5,
+        "construction_s": 0.0,
+        "conic_solves": 15,
+        "conic_kernel_s": 0.15375789953395724,
+        "dual_face_solves": 4,
+        "dual_face_wall_s": 0.0594010001514107
+      },
+      "regularity": {
+        "differentiability_proven": false,
+        "LICQ": "not_asserted",
+        "primal_uniqueness": "unassessed",
+        "path_assignments": [
+          3,
+          2,
+          2,
+          2,
+          1
+        ],
+        "path_assignment_ambiguous": true,
+        "duplicate_groups_across_stencil": [],
+        "active_set_changed": false,
+        "step_and_envelope_checks_passed": false,
+        "slope_comparison_tolerance": 5.015810752707068e-08,
+        "finite_difference_checks_passed": true,
+        "dual_face_interpretation": "Only near-optimal multipliers at this primal explored; no LICQ/uniqueness proof"
+      },
+      "differences": [
+        {
+          "reoptimized": -5.873920794208227e-09,
+          "envelope": -0.171560151774062,
+          "dual_face_status": "numerically_checked",
+          "dual_face_range": [
+            -1.2500002471562328,
+            5.000343326622136e-07
+          ]
+        },
+        {
+          "reoptimized": -7.905376353534247e-09,
+          "envelope": -0.17156015177406234,
+          "dual_face_status": "numerically_checked",
+          "dual_face_range": [
+            -1.2500002467362978,
+            5.000343557687303e-07
+          ]
+        }
+      ]
+    }
+  ],
+  "numerical_warnings": [
+    "Solution may be inaccurate. Try another solver, adjusting the solver settings, or solve with verbose=True for more information."
+  ],
+  "formal_study_authorized": false,
+  "mathematical_coverage": "Timed fixed references and untimed free monotone progress in a chosen finite sampled affine horizon; simple bend corner enumeration; not physical acceptance or unrestricted-time infeasibility.",
+  "production_robot_tracking_model_construction": "unsupported",
+  "tracking_controller_support": "unsupported_or_not_yet_verified",
+  "source_sha256": {
+    "schemas/platform_analysis.py": "0eeeb617a34108bbc8997541e02e4de0d9c44f866a662439361b0566c9bbcef9",
+    "extensions/reference/contracts.py": "f9ef8c36eb1ec2323b17310be71c53c6a53bf28f352a9acede82ae54ea722d0c",
+    "extensions/reference/implementation.py": "1121c5b3984c2a7062e9c54c63938db81aa9ac573abf093fb27ff81d84cf2ccc",
+    "extensions/math_analysis/trajectory.py": "dbfe1e3c21c98a3827b2ba0fa4c7fcee9841456bc3064a11218b5de839d65fd7",
+    "extensions/math_analysis/conic_capability.py": "c55d60be0f2ac5a509491062b895a378228b5c1b4343ad8343338d74bf17bf91",
+    "extensions/math_analysis/capability_sensitivity.py": "dc0aa69304638cd38094138b8ea95ddfdddcdb05c109cbcd92234f57b12cb364",
+    "tools/research_tasks.py": "ad3942f81ec602b1bf7b2464dab73e11c03d9f455bfadaf447c2e2cdc9861bbb",
+    "tools/research/task_constraints.py": "ae711dcad4cb3425885205d57f5ee26e7274b1437adb2456bdfedfd0bf22d974"
+  },
+  "final_tracking_math_regression": {
+    "tests": 19,
+    "seconds": 1.157,
+    "passed": true,
+    "process_exit_code": 0
+  }
+}

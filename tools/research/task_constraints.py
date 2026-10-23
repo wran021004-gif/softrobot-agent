@@ -22,7 +22,7 @@ def analysis_capabilities(configuration, requirements, protocol, *, model=None, 
         if exact_point and not static:point='saved_state'
         query=SimpleNamespace(operation=operation,operating_point=point,protocol=p,
             scoring_window_s=p.windows_s[0] if p.windows_s else None)
-        assessment=model_assessment(configuration,requirements,operation)
+        assessment=model_assessment(configuration,requirements,operation,model=model)
         applicability=check_analysis_applicability(requirements,query,assessment,model,exact_point)
         reasons=list(applicability['reasons'])
         if operation=='instantaneous_braking_v1' and exact_point is None:
@@ -48,17 +48,29 @@ def analysis_capabilities(configuration, requirements, protocol, *, model=None, 
     if mathematical_methods:
         from tools.research.optimal_capability import CONIC,SENSITIVITY,dependencies
         env=dependencies()
+        path=next((c for c in requirements.constraints if c.kind=='path_bound'),None)
+        subproblems=max(1,len(path.indices)-2) if path is not None and len(path.path_vertices_m)==3 else 1
         for method in (CONIC,SENSITIVITY):
-            count=2 if method==CONIC else 5
+            count=1+subproblems if method==CONIC else 3*subproblems+2
             reasons=[]
+            if configuration.task.family=='task.tracking' and model is None:reasons.append('tracking_robot_model_construction_unsupported')
             if not mathematical_methods.get(method) or not mathematical_methods.get(CONIC):reasons.append('method_not_authorized')
             if not env['available']:reasons.append('worker_dependency_unavailable')
             if remaining_evaluations is not None and remaining_evaluations<count:reasons.append('insufficient_budget')
             if method==SENSITIVITY:reasons.append('candidate_variable_and_saved_model_stencil_validation_required')
+            fit=None
+            if configuration.task.family=='task.tracking' and model is not None:
+                query=SimpleNamespace(operation='task_capability',operating_point='controller_start_input',
+                    protocol=p,scoring_window_s=None,capability_method=CONIC)
+                fit=check_analysis_applicability(requirements,query,model_assessment(configuration,requirements,'task_capability',model),model)
+                reasons.extend(fit['reasons'])
             rows.append(dict(operation='task_capability',capability_method=CONIC,
-                submode='optimal_sensitivity' if method==SENSITIVITY else None,method_version=method,
+                submode='optimal_sensitivity' if method==SENSITIVITY else None,
+                method_version=('sampled-affine-conic-path-progress-v1' if method==CONIC else 'controlled-path-progress-sensitivity-v1') if path is not None else method,
                 status='not_applicable' if reasons else 'conditional',reasons=reasons,dependency_environment=env,
-                evaluations=count,evaluation_rule='2: one model construction plus one conic solve' if method==CONIC else '1+4*k for k=1 or 2 explicit central step sizes; 3 or 5 existing registered models',
+                evaluations=count,evaluation_rule=(f'One model build plus {subproblems} internal conic subproblems' if method==CONIC else f'(1+2*k)*{subproblems}+2*k kernel/dual-face solves for k central step sizes; existing models required'),
+                **(dict(kernel_subproblems_per_model=subproblems) if path is not None else {}),
+                **(dict(coverage=fit['constraint_coverage'],full_task_supported=fit['full_task_supported']) if fit is not None else {}),
                 remaining_evaluations=remaining_evaluations,
                 budget_allowed=None if remaining_evaluations is None else remaining_evaluations>=count,
                 prerequisites=['Current owned candidates, applicable task/model, frozen protocol and explicit method grant']+
@@ -71,11 +83,15 @@ def describe_analysis_requirements(configuration, binding):
     return task_adapter(configuration).analysis_requirements(binding)
 
 
-def model_assessment(configuration, requirements, operation):
+def model_assessment(configuration, requirements, operation,model=None):
     """Use the same GVS model binding as the candidate linearization builder."""
     from extensions.tendon_family.model_applicability import assess_model_uses
     from tools.platform_registry import registry
     use = 'static_equilibrium' if operation in ('equilibrium','input_sensitivity','design_sensitivity') else 'linearization'
+    if configuration.task.family=='task.tracking' and model is None:
+        return dict(model_id='tracking_robot_model_unavailable',model_version=None,representation_id=None,
+            relevant_assumptions=['No supported robot model construction for free geometric path progress'],uses={use:dict(status='REJECT',
+            reasons=['Current robot model builders/controllers require fixed Reach target_m; geometric path progress and coverage are unsupported.'])})
     model = Binding(extension_id='model.gvs', version='1.0.0', parameters=Payload(
         contract='family.gvs_model', data=dict(basis=configuration.policy.controller.parameters.data['recipe']['basis'])))
     if configuration.policy.controller.extension_id == 'controller.sorosim_matlab_nmpc':
@@ -102,10 +118,14 @@ def check_analysis_applicability(requirements, query, assessment, model=None, ex
     """
     reasons = [reason for verdict in assessment['uses'].values() if verdict['status'] == 'REJECT'
                for reason in verdict['reasons']]
+    if requirements.binding.get('task_family')=='task.tracking' and query.operation not in ('trajectory_feasibility','task_capability'):
+        reasons.append('Geometric Tracking has free path progress and no timed reference; fixed-target endpoint/static operations are unsupported.')
     if (query.operation in ('input_sensitivity','design_sensitivity') or query.operating_point=='fixed_input_equilibrium') and assessment['model_id']!='model.sorosim_gvs':
         reasons.append('Static IFT v1 is implemented only by the SoRoSim provider.')
     outputs = {'tip_position':('m', 'world', 3), 'tip_velocity':('m/s', 'world', 3)}
     if model is not None:
+        if requirements.binding.get('task_family')=='task.tracking' and model.binding.get('task_identity')!=requirements.binding['task_identity']:
+            reasons.append('Saved Tracking model must bind the exact task identity.')
         outputs = {o.name:(o.units, o.frame, o.dimension) for o in model.endpoint_outputs}
     p = query.protocol
     if abs(p.duration_s-requirements.duration_s) > p.horizon_alignment_atol_s:
@@ -124,6 +144,12 @@ def check_analysis_applicability(requirements, query, assessment, model=None, ex
             sampled = time_scope(requirements, p, start)
         except ValueError as exc:
             reasons.append(str(exc))
+        paths=[c for c in requirements.constraints if c.kind=='path_bound']
+        if paths and sampled is not None and (sampled['start_time_s']!=0
+                or any(c.indices!=list(range(len(requirements.time_grid_s))) for c in paths)):
+            reasons.append('Free path progress requires the complete declared initial horizon; saved partial paths need separate prefix evidence.')
+        if any(len(c.path_vertices_m)==3 and len(c.indices)<3 for c in paths):
+            reasons.append('A path corner requires an interior analysis sample.')
     remaining = point.get('remaining_task_s', requirements.duration_s)
     horizon = query.scoring_window_s if query.operation in ('linearization','controllability') else remaining
     instantaneous=query.operation=='instantaneous_braking_v1'
@@ -154,7 +180,9 @@ def check_analysis_applicability(requirements, query, assessment, model=None, ex
         elif query.operation in ('linearization','controllability','equilibrium','input_sensitivity','design_sensitivity'):
             if c.signal.name == 'tip_position' and c.kind == 'norm_bound':
                 status, reason = 'diagnostic', 'Local position authority/static construction only; no sampled constraint verification.'
-        elif trajectory and c.kind in ('norm_bound','component_interval') and sampled is not None:
+        elif trajectory and c.kind=='path_bound' and getattr(query,'capability_method',None)!='sampled-affine-conic-minimax-v1':
+            reason='Free progress requires the conic path formulation; fixed-reference SLSQP is not substituted.'
+        elif trajectory and c.kind in ('norm_bound','component_interval','path_bound') and sampled is not None:
             indices = [i for i in c.indices if i in sampled['sample_steps']]
             if indices:
                 status = 'applicable' if indices == c.indices else 'partial'
@@ -178,8 +206,10 @@ def check_analysis_applicability(requirements, query, assessment, model=None, ex
             for c, source in zip(coverage, requirements.constraints):
                 c['unchecked_indices'] = source.indices
     return dict(status='not_applicable' if reasons else 'applicable', reasons=reasons,
+        path_scope=('Free progress within a chosen numerical horizon; sampled corner visits, not unrestricted-time infeasibility or independent geometric acceptance'
+            if any(c.kind=='path_bound' for c in requirements.constraints) else None),
         constraint_coverage=coverage, full_task_supported=bool(trajectory and not reasons and sampled['start_time_s'] == 0.
-            and all(c['status'] == 'applicable' for c in coverage)), execution_support='not_assessed',
+            and all(c['status'] == 'applicable' for c in coverage) and not any(c.kind=='path_bound' for c in requirements.constraints)), execution_support='not_assessed',
         model_assessment=assessment, horizon=dict(task_duration_s=requirements.duration_s,
             remaining_task_s=remaining, analysis_horizon_s=None if query.operation == 'equilibrium' else horizon,
             period_s=p.period_s, origin=point.get('actual_time_s'),

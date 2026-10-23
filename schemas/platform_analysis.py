@@ -281,7 +281,7 @@ class TaskAnalysisConstraint(Contract):
     def sampled_values(self):
         if any(i < 0 for i in self.indices) or self.indices != sorted(set(self.indices)):
             raise ValueError('ORDERED_UNIQUE_NONNEGATIVE_SAMPLE_INDICES_REQUIRED')
-        if len(self.reference) != len(self.indices) or any(len(v) != self.signal.dimension for v in self.reference):
+        if self.kind!='path_bound' and (len(self.reference) != len(self.indices) or any(len(v) != self.signal.dimension for v in self.reference)):
             raise ValueError('ONE_REFERENCE_VECTOR_PER_SAMPLE_REQUIRED')
         if self.kind == 'norm_bound' and (self.radius is None or self.lower is not None or self.upper is not None):
             raise ValueError('NORM_BOUND_REQUIRES_ONLY_RADIUS')
@@ -295,6 +295,23 @@ class TaskAnalysisConstraint(Contract):
         return self
 
 
+class PathAnalysisConstraint(TaskAnalysisConstraint):
+    """Free ordered progress, distinct from a fixed reference at each sample."""
+    kind: Literal['path_bound'] = 'path_bound'
+    path_vertices_m: list[list[float]] = Field(min_length=2,max_length=3)
+    radius: PositiveFloat
+
+    @model_validator(mode='after')
+    def path_geometry(self):
+        if (self.signal.dimension!=3 or self.signal.units!='m' or self.signal.frame!='world'
+                or any(len(v)!=3 for v in self.path_vertices_m) or self.reference
+                or self.lower is not None or self.upper is not None or self.unsupported_requirement is not None):
+            raise ValueError('WORLD_METRE_PATH_WITH_FREE_PROGRESS_REQUIRED')
+        from extensions.reference.contracts import TrackingGoal
+        TrackingGoal(vertices_m=self.path_vertices_m,time_requirement='none')
+        return self
+
+
 class TaskAnalysisRequirement(Contract):
     """Frozen context, absolute task sample grid, and physical input semantics."""
     contract: Literal['task-analysis-v1'] = 'task-analysis-v1'
@@ -302,7 +319,7 @@ class TaskAnalysisRequirement(Contract):
     duration_s: PositiveFloat
     sample_period_s: PositiveFloat
     time_grid_s: list[float] = Field(min_length=2)
-    constraints: list[TaskAnalysisConstraint] = Field(min_length=1)
+    constraints: list[TaskAnalysisConstraint | PathAnalysisConstraint] = Field(min_length=1)
     physical_inputs: dict
     required_physics: list[str] = Field(default_factory=list)
     horizon_semantics: Literal['absolute_task_time_inclusive_samples'] = 'absolute_task_time_inclusive_samples'

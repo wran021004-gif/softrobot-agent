@@ -74,6 +74,8 @@ def model_context(configuration):
     from extensions.tendon_family.scene import assemble
 
     inp=SessionInput.model_validate(configuration)
+    if inp.task.family=='task.tracking':
+        raise ValueError('GEOMETRIC_TRACKING_PHYSICAL_REPLAY_UNSUPPORTED')
     if inp.policy.controller.extension_id=='controller.gvs_nmpc':
         from extensions.tendon_family.gvs_basis import resolve_basis
         physics=physics_for(inp);scene=assemble(inp,physics)

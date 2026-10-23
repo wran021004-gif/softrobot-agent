@@ -25,30 +25,49 @@ class ResearchTaskAdapter:
         return self.configuration['task']
 
     def holding_start_s(self):
+        if self.task['family']=='task.tracking':raise ValueError('TRACKING_HAS_NO_HOLDING_WINDOW')
         settling=self.configuration['policy']['controller']['parameters']['data']['settling']
         return self.task['timing']['duration_s']-settling['window_s']
 
     def ranking_limits(self):
+        if self.task['family']=='task.tracking':
+            return dict(max_position_error=self.task['evaluator']['parameters']['data']['max_error_m'])
         settling=self.configuration['policy']['controller']['parameters']['data']['settling']
         return dict(terminal_error_m=self.task['evaluator']['parameters']['data']['tolerance_m'],
             holding_max_error_m=settling['position_limit_m'],holding_max_speed_m_s=settling['speed_limit_m_s'])
 
     def reference_at(self, times):
-        """Use existing timed-reference semantics; a reach target is constant."""
+        """Reach has a constant timed reference; geometric Tracking has none."""
         import numpy as np
         times = np.asarray(times, dtype=float)
+        if self.task['family']=='task.tracking':
+            from extensions.reference.contracts import TrackingGoal
+            goal=TrackingGoal.model_validate(self.task['goal']['data'])
+            rows=[goal.at_time(float(t)) for t in times.flat]
+            return tuple(np.asarray([r[i] for r in rows]).reshape(times.shape+(3,)) for i in (0,1))
         target = self.task['goal']['data']['target_m']
         return (np.broadcast_to(target, times.shape + (3,)).copy(), np.zeros(times.shape + (3,)))
 
     def analysis_requirements(self, binding):
-        """Translate frozen reach acceptance facts; no tracking reference is invented."""
+        """Translate each registered task's own sampled constraints and references."""
         from schemas.platform_analysis import TaskAnalysisRequirement
         from extensions.math_analysis.kernels import aligned_steps
         task, cfg = self.task, self.configuration
         duration, period = task['timing']['duration_s'], task['timing']['sample_period_s']
         last, _ = aligned_steps(duration, period)
         signal = next(s for s in task['observations'] if s['name'] == 'tip_position')
-        if task['family'] != 'task.reach':
+        if task['family']=='task.tracking':
+            radius=task['evaluator']['parameters']['data']['max_error_m']
+            provenance=['/task/goal','/task/evaluator/parameters']
+            if task['goal']['data']['time_requirement']=='timed':
+                lo,hi=task['sampling']['window_s'];indices=list(range(round(lo/period),round(hi/period)+1))
+                reference,_=self.reference_at([i*period for i in indices])
+                constraints=[dict(constraint_id='timed_tracking',signal=signal,indices=indices,kind='norm_bound',
+                    reference=reference.tolist(),radius=radius,provenance=provenance+['/task/sampling'])]
+            else:
+                constraints=[dict(constraint_id='geometric_path',signal=signal,indices=list(range(last+1)),kind='path_bound',
+                    path_vertices_m=task['goal']['data']['vertices_m'],reference=[],radius=radius,provenance=provenance)]
+        elif task['family'] != 'task.reach':
             constraints = [dict(constraint_id='unsupported_task', signal=signal, indices=[last],
                 kind='unsupported', reference=[[0.]*signal['dimension']], provenance=['/task'],
                 unsupported_requirement=task)]
@@ -66,7 +85,8 @@ class ResearchTaskAdapter:
                     kind='norm_bound', reference=[reference for _ in indices], radius=limits[name],
                     provenance=[source, '/task/timing', '/task/goal', '/policy/controller/parameters/data/settling/window_s']))
         tendons = cfg['robot']['structure']['data']['tendons']
-        return TaskAnalysisRequirement(binding={**binding, 'task_identity':digest(task),
+        return TaskAnalysisRequirement(binding={**binding,
+            **({'task_family':'task.tracking'} if task['family']=='task.tracking' else {}), 'task_identity':digest(task),
             'effective_configuration_identity':digest(cfg), 'task_id':task['task_id'], 'task_version':task['task_version']},
             duration_s=duration, sample_period_s=period, time_grid_s=[i*period for i in range(last+1)], constraints=constraints,
             physical_inputs=dict(signal='tendon_tension', units='N', frame='tendon_path', phase='pre_step',
@@ -75,15 +95,21 @@ class ResearchTaskAdapter:
                 provenance=['/robot/structure/data/tendons', '/task/timing/control_period_s']))
 
     def operating_point(self, time_s=0.0):
+        if self.task['family']=='task.tracking' and self.task['goal']['data']['time_requirement']=='none':
+            return dict(reference_position_m=self.task['goal']['data']['vertices_m'][0],reference_velocity_m_s=None,
+                frame='world',state_source='Named task initializer',reference_is_equilibrium=False,time_reference='none')
         position, velocity = self.reference_at(time_s)
         return dict(time_s=time_s, reference_position_m=position.tolist(), reference_velocity_m_s=velocity.tolist(), frame='world', state_source='Named task initializer; subsequent measured backend state', reference_is_equilibrium=False)
 
     def describe(self):
         task = self.task
         reach = task['family'] == 'task.reach'
-        metrics = [dict(name='terminal_error_m', unit='m', meaning='Sealed endpoint evaluator position error'), dict(name='holding_max_error_m', unit='m', meaning='Maximum sampled final-window tip error'), dict(name='holding_max_speed_m_s', unit='m/s', meaning='Maximum sampled world translational tip speed')] if reach else [dict(name=name, unit='m', meaning=meaning) for name, meaning in (('max_position_error', 'Maximum timed-reference error in scored interval'), ('rms_position_error', 'Arithmetic RMS over inclusive uniform scored samples'), ('terminal_position_error', 'Timed-reference error at execution endpoint'))]
+        timed=not reach and task['goal']['data']['time_requirement']=='timed'
+        metrics = [dict(name='terminal_error_m', unit='m', meaning='Sealed endpoint evaluator position error'), dict(name='holding_max_error_m', unit='m', meaning='Maximum sampled final-window tip error'), dict(name='holding_max_speed_m_s', unit='m/s', meaning='Maximum sampled world translational tip speed')] if reach else [dict(name=name, unit='m', meaning=meaning) for name, meaning in (('max_position_error', 'Maximum saved-polyline distance to geometric reference'), ('rms_position_error', 'RMS on uniform geometric arc-length samples; diagnostic'), ('terminal_position_error', 'Distance to path endpoint, no arrival deadline'), ('path_coverage_error','Reference path coverage by saved polyline'))]
         controller = self.configuration['policy']['controller']
-        return dict(contract='research.task_adapter', version='1.0.0', family=task['family'], evaluator=task['evaluator'], output=next((s for s in task['observations'] if s['name'] == 'tip_position')), reference=task['goal'], operating_point=self.operating_point(), metrics=metrics, scoring_interval_s=task['sampling']['window_s'], holding=controller['parameters']['data'].get('settling') if reach else None, timing=task['timing'], continuous_time_guarantee=False, context='Endpoint reach and final-window position/speed are distinct components. Offline deployment timing is diagnostic.' if reach else 'Timed world reference and inclusive interval error; no absolute-speed holding requirement.')
+        if timed:metrics=[dict(name=n,unit='m',meaning=m) for n,m in (
+            ('max_position_error','Maximum sampled timed-reference error'),('rms_position_error','Arithmetic RMS over inclusive scored samples'),('terminal_position_error','Error against timed terminal reference'))]
+        return dict(contract='research.task_adapter', version='1.0.0', family=task['family'], evaluator=task['evaluator'], output=next((s for s in task['observations'] if s['name'] == 'tip_position')), reference=task['goal'], operating_point=self.operating_point(), metrics=metrics, scoring_interval_s=task['sampling']['window_s'] if reach or timed else None, holding=controller['parameters']['data'].get('settling') if reach else None, timing=task['timing'], continuous_time_guarantee=False, context='Endpoint reach and final-window position/speed are distinct components. Offline deployment timing is diagnostic.' if reach else 'Explicit timed-reference tracking; no absolute-speed holding requirement.' if timed else 'Ordered geometric path and spatial coverage only; no timed reference, speed bound or arrival deadline. Timing config describes acquisition only.')
 
     def violation_samples(self, raw):
         """Task-specific diagnostic samples; independent acceptance stays authoritative."""
@@ -216,6 +242,8 @@ def assemble_acceptance(configuration, evaluation, profile, *, evaluation_refere
     """
     adapter = task_adapter(configuration)
     cfg, task = (adapter.configuration, adapter.task)
+    if task['family']=='task.tracking':
+        raise ValueError('TRACKING_COMPOSITE_ACCEPTANCE_UNSUPPORTED: independent evaluator available; execution/force protocol not implemented')
     if protocol_id is None:
         protocol_id = 'offline_reach_hold_v1' if task['family'] == 'task.reach' else 'offline_tracking_v1'
     ev = plain(evaluation) if evaluation is not None else None

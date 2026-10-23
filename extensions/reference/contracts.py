@@ -1,5 +1,5 @@
 from typing import Literal
-from pydantic import Field
+from pydantic import Field, model_validator
 from schemas.common import Contract
 from schemas.platform import EvidenceRef, Signal, Payload, EvaluationResult, BackendResult, WorkerOutput, MemoryEntry, WorkOrder
 from schemas.design_spec import DesignSpec
@@ -17,6 +17,47 @@ class ReachGoal(Contract):
 
 class ReachEvaluation(Contract):
     tolerance_m: float = Field(gt=0)
+
+
+class TrackingGoal(Contract):
+    vertices_m: list[tuple[float, float, float]] = Field(min_length=2, max_length=3)
+    units: Literal['m'] = 'm'
+    frame: Literal['world'] = 'world'
+    interpolation: Literal['linear'] = 'linear'
+    progression: Literal['ordered_start_to_end'] = 'ordered_start_to_end'
+    time_requirement: Literal['none','timed']
+    times_s: list[float] | None = None
+
+    @model_validator(mode='after')
+    def nodes(self):
+        import math
+        if self.time_requirement=='timed':
+            if (self.times_s is None or len(self.times_s)!=len(self.vertices_m) or self.times_s[0]!=0
+                    or any(b<=a for a,b in zip(self.times_s,self.times_s[1:]))):
+                raise ValueError('TIMED_TRACKING_REQUIRES_ORDERED_NODE_TIMES_FROM_ZERO')
+            return self
+        elif self.times_s is not None:raise ValueError('GEOMETRIC_TRACKING_CANNOT_IMPLY_NODE_TIMES')
+        legs=[tuple(y-x for x,y in zip(a,b)) for a,b in zip(self.vertices_m,self.vertices_m[1:])]
+        if any(math.hypot(*v)==0 for v in legs):raise ValueError('NONZERO_PATH_SEGMENTS_REQUIRED')
+        if len(legs)==2:
+            a,b=legs;cross=(a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0])
+            if sum(x*y for x,y in zip(a,b))<0 and math.hypot(*cross)<=1e-12*math.hypot(*a)*math.hypot(*b):
+                raise ValueError('OVERLAPPING_RETURN_PATH_UNSUPPORTED')
+        return self
+
+    def at_time(self,time_s):
+        from bisect import bisect_right
+        if self.time_requirement!='timed':raise ValueError('GEOMETRIC_TRACKING_HAS_NO_TIME_REFERENCE')
+        if not 0<=time_s<=self.times_s[-1]:raise ValueError('REFERENCE_TIME_OUTSIDE_HORIZON')
+        i=min(bisect_right(self.times_s,time_s)-1,len(self.times_s)-2)
+        alpha=(time_s-self.times_s[i])/(self.times_s[i+1]-self.times_s[i])
+        a,b=self.vertices_m[i:i+2]
+        return ([x+alpha*(y-x) for x,y in zip(a,b)],[(y-x)/(self.times_s[i+1]-self.times_s[i]) for x,y in zip(a,b)])
+
+
+class TrackingEvaluation(Contract):
+    max_error_m: float = Field(gt=0)
+    geometry_step_m: float = Field(gt=0)
 
 
 class HoldGoal(Contract):

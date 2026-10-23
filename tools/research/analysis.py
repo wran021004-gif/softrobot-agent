@@ -309,6 +309,8 @@ def dispatch(host,query,key,*,guard,origin='model'):
         return dict(**compact_result(host.store.artifact(ref),ref),
             operation_reuse=dict(additional_numerical_s=0,additional_analysis_evaluations=0))
     guard(host,origin!='engineering_preflight')
+    if state(host)['base_configuration']['task']['family']=='task.tracking':
+        return dict(status='not_applicable',reason='TRACKING_ROBOT_MODEL_CONSTRUCTION_UNSUPPORTED',task_acceptance='unmeasured')
     from tools.research.tool_readiness import require
     require(host,'analysis')
     if state(host)['spec'].get('research_decisions') and 'analysis' not in state(host)['spec']['capabilities']:

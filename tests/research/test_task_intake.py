@@ -74,7 +74,7 @@ class IntakeTests(unittest.TestCase):
                 self.assertFalse(draft.executable)
                 self.assertEqual(draft.status, 'needs_confirmation')
                 self.assertEqual(draft.execution_support, 'not_assessed')
-                self.assertEqual(draft.registered_task_families, ['task.reach'])
+                self.assertEqual(draft.registered_task_families, ['task.reach', 'task.tracking'])
                 self.assertTrue(draft.missing_definitions)
                 self.assertEqual([r.value for r in draft.requirements if r.source == 'user_explicit'],
                                  [r['quote'] for r in proposal['requirements'] if r['source'] == 'user_explicit'])

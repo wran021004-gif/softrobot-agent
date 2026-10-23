@@ -84,6 +84,8 @@ def method_admission(spec, query, used=0):
     count = 1 + 4*len(query.optimal_sensitivity.steps) if query.optimal_sensitivity else 2
     remaining = max(0, spec['budgets']['mathematical_evaluations']-used)
     reasons = []
+    if spec.get('canonical_task',{}).get('family')=='task.tracking':
+        reasons.append('TRACKING_ROBOT_MODEL_CONSTRUCTION_UNSUPPORTED')
     if any(not methods.get(m) for m in required):
         reasons.append('EXPLICIT_FROZEN_MATHEMATICAL_METHOD_AUTHORIZATION_REQUIRED')
     environment = dependencies()

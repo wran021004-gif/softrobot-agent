@@ -12,10 +12,11 @@ from numbers import Real
 import numpy as np
 
 from extensions.math_analysis.task_capability import normalization
-from extensions.math_analysis.trajectory import prepare_trajectory, verify_witness
+from extensions.math_analysis.trajectory import prepare_conic_trajectory, verify_witness
 
 
 METHOD = 'sampled-affine-conic-minimax-v1'
+PATH_METHOD = 'sampled-affine-conic-path-progress-v1'
 DEFAULT_OPTIONS = dict(max_iter=200, tol_gap_abs=1e-9, tol_gap_rel=1e-9, tol_feas=1e-9)
 
 
@@ -65,7 +66,7 @@ def _blocks(cp, rows, scales, z, t):
     return blocks
 
 
-def _dual_checks(blocks, box, z, t, lower, upper, tolerance):
+def _dual_checks(blocks, box, z, t, lower, upper, tolerance, hard=None, hard_matrix=None, hard_upper=None):
     """Recompute unscaled task/box KKT and a repaired box-support lower estimate.
 
     SOC dual (alpha,v) contributes -alpha*(t+1)-v@(M*z+b).
@@ -122,6 +123,15 @@ def _dual_checks(blocks, box, z, t, lower, upper, tolerance):
         raise ValueError('NONFINITE_BOX_DUAL')
     cone_error = max(cone_error, float(np.max(-mu_lower, initial=0.)),
                      float(np.max(-mu_upper, initial=0.)))
+    hard_mu=np.zeros(0)
+    if hard is not None:
+        hard_mu=np.asarray(hard.dual_value,dtype=float).ravel()
+        if not np.isfinite(hard_mu).all():raise ValueError('NONFINITE_PROGRESS_DUAL')
+        cone_error=max(cone_error,float(np.max(-hard_mu,initial=0.)))
+        gradient+=hard_matrix.T@hard_mu;constant-=float(hard_upper@hard_mu)
+        support_gradient+=hard_matrix.T@np.maximum(0.,hard_mu)
+        support_constant-=float(hard_upper@np.maximum(0.,hard_mu))
+        complementarity.extend((hard_mu*(hard_upper-hard_matrix@z)).tolist())
     stationarity = gradient-mu_lower+mu_upper
     raw_objective = float(constant+mu_lower@lower-mu_upper@upper)
     complementarity.extend((mu_lower*(z-lower)).tolist()+(mu_upper*(upper-z)).tolist())
@@ -140,6 +150,7 @@ def _dual_checks(blocks, box, z, t, lower, upper, tolerance):
         support_weight_sum=float(sum(r['support_weight'] for r in records)),
         stationarity_vector=stationarity.tolist(),
         box_lower_multipliers=mu_lower.tolist(), box_upper_multipliers=mu_upper.tolist(),
+        hard_constraint_multipliers=hard_mu.tolist(),
         constraint_multipliers=records,
         strength='floating_point_numerically_checked_estimates_not_rigorous_bounds')
     if not all(np.isfinite(checks[k]) for k in ('stationarity_inf', 'epigraph_stationarity_abs',
@@ -150,14 +161,17 @@ def _dual_checks(blocks, box, z, t, lower, upper, tolerance):
 
 
 def conic_capability(model, requirements, protocol, *, initial_delta=None,
-                     solver_options=None, check_tolerance=1e-7):
+                     solver_options=None, check_tolerance=1e-7, path_assignment=None):
     """Same analyzed subproblem as task_capability, with independent numeric checks.
 
     Local options tune numerics only; task data still belongs to the existing
     model/requirements/protocol. Nonconvergence never establishes infeasibility.
     """
+    paths=[c for c in requirements.constraints if c.kind=='path_bound']
+    if paths and len(paths[0].path_vertices_m)==3 and path_assignment is None:
+        return _path_assignments(model,requirements,protocol,initial_delta,solver_options,check_tolerance)
     started = time.perf_counter()
-    result = dict(method_version=METHOD, status='not_applicable', coverage=[], certificate=None,
+    result = dict(method_version=PATH_METHOD if paths else METHOD, status='not_applicable', coverage=[], certificate=None,
         all_requested_checked=False, optimality_status='unknown', quantities={},
         numerical_feasibility='unknown',
         model_scope='Frozen local affine model; exact ZOH and preceding hold; analyzed samples only.',
@@ -184,8 +198,13 @@ def conic_capability(model, requirements, protocol, *, initial_delta=None,
         result['numerical_options'] = dict(effective=options, overrides=solver_options or {},
             source='conic_capability v1 local defaults plus explicit caller overrides; not frozen task data',
             check_tolerance=check_tolerance, replay_atol=protocol.endpoint_check_atol)
-        scope, dynamics, initial, rows, lower, upper, _ = prepare_trajectory(
-            model, requirements, protocol, result, initial_delta)
+        scope, dynamics, initial, rows, lower, upper, _ = prepare_conic_trajectory(
+            model, requirements, protocol, result, initial_delta,path_assignment)
+        physical=scope.get('physical_variable_count',len(lower))
+        if paths:
+            result.update(method_version=PATH_METHOD,path_assignment=path_assignment,
+                auxiliary_coordinates=dict(kind='normalized_path_progress',units='dimensionless',physical_tendon_count=len(model.u0)),
+                untimed_scope=scope['untimed_scope'],internal_conic_solves=0)
         requested = sum(len(c.indices) for c in requirements.constraints)
         result['coverage_counts'] = dict(requested=requested, analyzed=len(rows), fraction=len(rows)/requested)
         if not rows:
@@ -204,13 +223,17 @@ def conic_capability(model, requirements, protocol, *, initial_delta=None,
         import cvxpy as cp
         result['versions'] = {name: version(name) for name in ('cvxpy', 'clarabel', 'numpy', 'scipy')}
         result['status'] = 'inconclusive'
-        zvar = cp.Variable(len(lower), name='physical_delta_tensions_n') if len(lower) else None
+        zvar = cp.Variable(len(lower), name='physical_and_progress' if paths else 'physical_delta_tensions_n') if len(lower) else None
         tvar = cp.Variable(name='signed_minimax')
         blocks = _blocks(cp, rows, scales, zvar, tvar)
         box = [zvar >= lower, zvar <= upper] if zvar is not None else []
-        problem = cp.Problem(cp.Minimize(tvar), box+[b['constraint'] for b in blocks])
+        hard_matrix=np.asarray(scope.get('hard_matrix',[]),dtype=float)
+        hard_upper=np.asarray(scope.get('hard_upper',[]),dtype=float)
+        hard=hard_matrix@zvar<=hard_upper if len(hard_upper) else None
+        problem = cp.Problem(cp.Minimize(tvar), box+[b['constraint'] for b in blocks]+([hard] if hard is not None else []))
         tick = time.perf_counter()
         try:
+            if paths:result['internal_conic_solves']=1
             problem.solve(solver='CLARABEL', **options)
         except cp.error.SolverError as exc:
             result['solver'].update(status='solver_error', error=str(exc))
@@ -228,8 +251,9 @@ def conic_capability(model, requirements, protocol, *, initial_delta=None,
             result['reason'] = 'NO_FINITE_PRIMAL_SOLUTION'
             return result
         t = float(tvar.value); steps, nu = scope['step_count'], len(model.u0)
-        result['raw_primal'] = dict(delta_input_n=raw.reshape(steps, nu).tolist(),
-            applied_input_n=(raw.reshape(steps, nu)+model.u0).tolist(), epigraph=t)
+        result['raw_primal'] = dict(delta_input_n=raw[:physical].reshape(steps, nu).tolist(),
+            applied_input_n=(raw[:physical].reshape(steps, nu)+model.u0).tolist(), epigraph=t)
+        if paths:result['raw_primal']['path_progress']=raw[physical:].tolist()
         raw_excess = []
         for block in blocks:
             residual = block['M']@raw+block['b']
@@ -239,26 +263,31 @@ def conic_capability(model, requirements, protocol, *, initial_delta=None,
             return result
         box_error = max(0., float(np.max(lower-raw, initial=0.)), float(np.max(raw-upper, initial=0.)))
         result['primal_checks'] = dict(source='independent_from_original_sample_maps',
-            epigraph_violation=max(0., max(raw_excess)-t), box_violation_n=box_error)
+            epigraph_violation=max(0., max(raw_excess)-t),
+            box_violation_n=max(0.,float(np.max(lower[:physical]-raw[:physical],initial=0.)),float(np.max(raw[:physical]-upper[:physical],initial=0.))))
+        hard_error=max(0.,float(np.max(hard_matrix@raw-hard_upper,initial=0.))) if hard is not None else 0.
+        if paths:result['primal_checks']['progress_constraint_violation']=max(hard_error,
+            float(np.max(lower[physical:]-raw[physical:],initial=0.)),float(np.max(raw[physical:]-upper[physical:],initial=0.)))
         try:
-            dual = _dual_checks(blocks, box, raw, t, lower, upper, check_tolerance)
+            dual = _dual_checks(blocks, box, raw, t, lower, upper, check_tolerance,hard,hard_matrix,hard_upper)
             result['dual_checks'] = dual
         except ValueError as exc:
             dual = None
             result['dual_checks'] = dict(status='unavailable', reason=str(exc))
         # Retain raw solver values; only tiny box excursions may be repaired.
-        if box_error > protocol.endpoint_check_atol:
+        if max(box_error,hard_error) > protocol.endpoint_check_atol:
             result['reason'] = 'SOLVER_CONTROL_OUTSIDE_PHYSICAL_BOX'
             return result
         z = np.clip(raw, lower, upper)
-        replay = verify_witness(model, dynamics, initial, z.reshape(steps, nu), rows, scope,
-                                protocol.endpoint_check_atol)
+        replay = verify_witness(model, dynamics, initial, z[:physical].reshape(steps, nu), rows, scope,
+                                protocol.endpoint_check_atol,z[physical:])
         valid = bool(replay.get('finite') and len(replay.get('records', [])) == len(rows)
             and replay['max_prediction_replay_error'] <= protocol.endpoint_check_atol
-            and np.all(z >= lower) and np.all(z <= upper))
+            and replay.get('path_progress_valid',True) and np.all(z >= lower) and np.all(z <= upper))
         replay['numerically_valid'] = valid
-        result.update(replay=replay, delta_input_n=z.reshape(steps, nu).tolist(),
-            applied_input_n=(z.reshape(steps, nu)+model.u0).tolist(), box_repair_inf_n=_maxabs(z-raw))
+        result.update(replay=replay, delta_input_n=z[:physical].reshape(steps, nu).tolist(),
+            applied_input_n=(z[:physical].reshape(steps, nu)+model.u0).tolist(), box_repair_inf_n=_maxabs(z[:physical]-raw[:physical]))
+        if paths:result['path_progress']=z[physical:].tolist()
         result['all_requested_checked'] = bool(valid and result['full_requested_coverage'])
         if not valid:
             result['reason'] = 'INDEPENDENT_REPLAY_FAILED_SCORES_WITHHELD'
@@ -285,6 +314,7 @@ def conic_capability(model, requirements, protocol, *, initial_delta=None,
             tol = check_tolerance*(1+max(abs(score), abs(t)))
             passed = bool(problem.status == cp.OPTIMAL
                 and result['primal_checks']['epigraph_violation'] <= tol
+                and hard_error<=tol
                 and dual['stationarity_inf'] <= check_tolerance
                 and dual['epigraph_stationarity_abs'] <= check_tolerance
                 and dual['dual_cone_violation'] <= check_tolerance
@@ -303,3 +333,29 @@ def conic_capability(model, requirements, protocol, *, initial_delta=None,
         return result
     finally:
         result['kernel_elapsed_s'] = time.perf_counter()-started
+
+
+def _path_assignments(model,requirements,protocol,initial_delta,solver_options,tolerance):
+    """Enumerate the free sampled corner, never replace a bend by its convex hull."""
+    path=next(c for c in requirements.constraints if c.kind=='path_bound')
+    choices=path.indices[1:-1]
+    if not choices:return dict(status='not_applicable',method_version=PATH_METHOD,optimality_status='unknown',
+        coverage=[],reason='PATH_CORNER_REQUIRES_INTERIOR_SAMPLE',kernel_elapsed_s=0.)
+    branches=[conic_capability(model,requirements,protocol,initial_delta=initial_delta,solver_options=solver_options,
+        check_tolerance=tolerance,path_assignment=j) for j in choices]
+    valid=[b for b in branches if b.get('replay',{}).get('numerically_valid')]
+    best=min(valid,key=lambda b:b['replayed_violation']) if valid else branches[0]
+    summaries=[dict(corner_sample=j,status=b['status'],score=b.get('replayed_violation'),
+        optimality=b['optimality_status'],support_lower_estimate=b.get('dual_checks',{}).get('support_lower_estimate')) for j,b in zip(choices,branches)]
+    best['path_assignment_comparison']=summaries
+    best['internal_conic_solves']=sum(b.get('internal_conic_solves',0) for b in branches)
+    best['kernel_elapsed_s']=sum(b['kernel_elapsed_s'] for b in branches)
+    if len(valid)==len(branches) and all(b['optimality_status']=='numerically_checked' for b in branches):
+        lower=min(r['support_lower_estimate'] for r in summaries)
+        best['dual_checks']['selected_branch_support_lower_estimate']=best['dual_checks']['support_lower_estimate']
+        best['dual_checks']['support_lower_estimate']=lower
+        best['dual_checks']['replayed_support_gap']=best['replayed_violation']-lower
+        best['optimality_status']='numerically_checked' if best['replayed_violation']-lower<=tolerance*(1+abs(lower)) else 'unknown'
+        best['path_assignment_ties']=[r['corner_sample'] for r in summaries if abs(r['score']-best['replayed_violation'])<=tolerance*(1+abs(lower))]
+    else:best['optimality_status']='unknown'
+    return best
