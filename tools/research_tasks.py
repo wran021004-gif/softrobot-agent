@@ -47,12 +47,16 @@ class ResearchTaskAdapter:
                              acquisition_duration_s=timing['duration_s']))
             for row in tracking_condition_specs(task):
                 rows.append(dict(**row, signal=signal, sampling=sampling,
+                    mathematical_binding=(dict(constraint_id='timed_tracking', coverage='exact_sampled_expression') if timed else
+                        dict(constraint_id=row['condition_id'], coverage='unsupported', proxy_constraint_id='geometric_path')),
                     provenance=['/task/goal', '/task/evaluator/parameters', '/task/sampling'],
                     expressibility='sampled_norm_bound' if timed else 'proxy_only',
                     expression_reason=('norm(p_k-r(t_k)) <= limit on scored samples; no velocity hard bound' if timed else
                         'geometric_path is a sampled free-progress proxy; it does not establish this saved-polyline condition')))
         else:
             rows.append(dict(condition_id='terminal_error_m', metric='position_error',
+                evaluation_binding=dict(source='EvaluationResult', constraint='task_bound', metric='position_error'),
+                mathematical_binding=dict(constraint_id='terminal_error_m', coverage='exact_sampled_expression'),
                 meaning='Distance from final saved position at task endpoint to target',
                 limit=task['evaluator']['parameters']['data']['tolerance_m'], units='m', signal=signal,
                 sampling=dict(mode='task_endpoint', time_s=timing['duration_s']),
@@ -67,6 +71,11 @@ class ResearchTaskAdapter:
                         ('holding_max_error_m', 'tip_position', 'm', 'position_limit_m', 'Maximum sampled final-window distance to target'),
                         ('holding_max_speed_m_s', 'tip_velocity', 'm/s', 'speed_limit_m_s', 'Maximum sampled final-window absolute world tip speed')):
                     rows.append(dict(condition_id=name, metric=name, meaning=meaning,
+                        evaluation_binding=dict(source='research.task_acceptance', metric=name,
+                            component='holding_position' if output == 'tip_position' else 'holding_speed',
+                            profile_source='ProfileOutput.detail', profile_pointer='/sampled_settling/'+
+                                ('max_error_m' if output == 'tip_position' else 'max_speed_m_s')),
+                        mathematical_binding=dict(constraint_id=name, coverage='exact_sampled_expression'),
                         limit=settling[field], units=unit, signal={**signal, 'name': output, 'units': unit},
                         sampling=dict(mode='inclusive_final_window', window_s=[timing['duration_s']-settling['window_s'], timing['duration_s']],
                             sample_period_s=timing['sample_period_s']),
@@ -95,18 +104,28 @@ class ResearchTaskAdapter:
         policy = self.configuration.get('policy', {})
         bindings = {key: {field: policy[key][field] for field in ('extension_id', 'version')}
                     for key in ('controller', 'backend', 'dynamics_model') if policy.get(key)}
+        missing = (['Timed Tracking has no composite physical acceptance protocol'] if timed else []) + (
+            [] if complete else ['Frozen effective configuration is required for execution/protocol requirements'])
+        blockers = list(missing)
+        if task['status'] != 'development_valid':
+            blockers.append('Development execution requires development_valid; drafts cannot execute and formal approval needs an independent policy')
         return dict(task_family=task['family'], task_status=task['status'],
             robot_families=task['robot_families'], actuator_channels=task['actuator_channels'],
             signals=signals, environment=task['environment'], initializer=task['initializer'],
             timing=task['timing'], reference_kind=self.control_reference()['kind'],
             protocol_id=protocol if complete else None,
+            protocol_template_id=protocol,
+            task_reviewed=task['status'] != 'draft',
+            configuration_check='not_checked', capability_check='not_checked', execution_admission='not_assessed',
+            known_blockers=blockers,
             protocol_components=sorted(_protocol_requirements(dict(protocol_id=protocol, task_family=task['family'])) or []),
             selected_bindings=bindings,
             physical_inputs=self._physical_inputs() if complete else None,
             configuration_available=complete,
-            missing=(['Timed Tracking has no composite physical acceptance protocol'] if timed else []) +
-                    ([] if complete else ['Frozen effective configuration is required for execution/protocol requirements']),
-            applicability='Use check_compatibility() for the actual registered robot/controller/model/backend pairing; definition validity is not execution authorization')
+            missing=missing,
+            applicability='protocol_id selects a known template only. Configuration presence is not validation. '
+                'This view does not run admission checks; known_blockers is not exhaustive. Use check_compatibility(), '
+                'compile_input(), Registry and route hooks for actual capability; frozen Study grants and budgets still govern execution')
 
     def _physical_inputs(self):
         self._require_configuration()

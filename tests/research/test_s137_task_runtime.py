@@ -152,6 +152,122 @@ class TaskRuntimeTests(unittest.TestCase):
         self.assertEqual(owners['algorithm_authorization']['capabilities'], self.spec['capabilities'])
         self.assertIn('/policy/controller/parameters/data/settling', owners['frozen_acceptance']['paths'])
 
+    def test_condition_bindings_select_real_results_and_math_coverage(self):
+        from tools.platform_registry import registry
+        from tools.platform_tasks import check_definition
+        from tests.research.test_tracking import SOURCE
+        cfg = self.configuration()
+        task = check_definition(cfg['task'])
+        target = task.goal.data['target_m']
+        times = [i*.01 for i in range(1, 36)]
+        reach = registry().get('evaluate.reach', kind='evaluator').resolve()(
+            task, fixture([target]*35, times=times, task=cfg['task']), SOURCE, registry(), 'synthetic')
+        timed_task = check_definition(self.timed)
+        times = [i*.02 for i in range(1, 21)]
+        positions = [registry().parse(timed_task.goal).at_time(t)[0] for t in times]
+        timed = evaluate(fixture(positions, times=times, task=self.timed), task=self.timed)
+        for configuration, result in ((cfg, reach), (self.configuration(TASK), evaluate()),
+                                      (self.configuration(self.timed), timed)):
+            adapter = task_adapter(configuration)
+            requirements = {c.constraint_id: c for c in adapter.analysis_requirements({}).constraints}
+            for row in adapter.condition_view()['conditions']:
+                binding, math = row['evaluation_binding'], row['mathematical_binding']
+                constraint = requirements[math['constraint_id']]
+                if binding['source'] == 'EvaluationResult':
+                    observed = next(c for c in result.constraints if c.name == binding['constraint'])
+                    self.assertEqual(observed.limit, row['limit'])
+                    if binding['metric'] is not None:
+                        self.assertEqual(observed.observed, next(m.value for m in result.metrics if m.name == binding['metric']))
+                    else:
+                        self.assertEqual(row['condition_id'], 'path_start')
+                        self.assertIsNone(row['metric'])
+                        self.assertNotIn('path_start', {m.name for m in result.metrics})
+                if math['coverage'] == 'unsupported':
+                    self.assertEqual(constraint.kind, 'unsupported')
+                    self.assertEqual(requirements[math['proxy_constraint_id']].kind, 'path_bound')
+                else:
+                    self.assertEqual(math['coverage'], 'exact_sampled_expression')
+                    self.assertEqual(constraint.kind, 'norm_bound')
+            if configuration['task'] == self.timed:
+                self.assertEqual(row['condition_id'], 'tracking_max_error')
+                self.assertEqual(math['constraint_id'], 'timed_tracking')
+        # Existing saved F3 acceptance/Profile, read only; no recomputed physics.
+        folder = ROOT/'evidence/f3_formal/closeout_20261023'
+        audit = json.loads((folder/'audit.json').read_text(encoding='utf-8'))
+        artifacts = json.loads((folder/'artifacts.json').read_text(encoding='utf-8'))
+        selected = artifacts[audit['references']['selected']['artifact_id']]
+        for row in task_adapter(cfg).condition_view()['conditions'][1:]:
+            binding = row['evaluation_binding']
+            self.assertEqual(binding['source'], 'research.task_acceptance')
+            value = selected['profile']
+            for part in binding['profile_pointer'].strip('/').split('/'):
+                value = value[part]
+            self.assertEqual(value, selected['acceptance']['metrics'][binding['metric']])
+            self.assertEqual(value, selected['acceptance']['components'][binding['component']]['value'])
+            self.assertNotIn(row['metric'], {m.name for m in reach.metrics})
+
+    def test_known_protocol_never_claims_execution_admission(self):
+        for task in (None, TASK, self.timed):
+            cfg = self.configuration(task)
+            cfg['task']['status'] = 'draft'
+            adapter = task_adapter(cfg)
+            view = adapter.execution_requirements()
+            self.assertFalse(view['task_reviewed'])
+            self.assertTrue(view['configuration_available'])
+            self.assertEqual(view['configuration_check'], 'not_checked')
+            self.assertEqual(view['capability_check'], 'not_checked')
+            self.assertEqual(view['execution_admission'], 'not_assessed')
+            self.assertTrue(any('drafts cannot execute' in r for r in view['known_blockers']))
+            self.assertEqual(view['protocol_id'], view['protocol_template_id'])
+            self.assertEqual(adapter.check_compatibility()['technical_compatibility']['status'], 'unsupported')
+            if task == self.timed:
+                self.assertIsNone(view['protocol_template_id'])
+            cfg['task']['status'] = 'development_valid'
+            reviewed = task_adapter(cfg).execution_requirements()
+            self.assertTrue(reviewed['task_reviewed'])
+            self.assertEqual(reviewed['execution_admission'], 'not_assessed')
+        task_only = task_adapter(dict(task=TASK)).execution_requirements()
+        self.assertEqual(task_only['protocol_template_id'], 'development_tracking_v1')
+        self.assertIsNone(task_only['protocol_id'])
+        self.assertTrue(task_only['known_blockers'])
+
+    def test_family_domains_generator_and_study_grants_remain_separate(self):
+        from extensions.tendon_family.family_space import decision_summary
+        for filename in ('study_family_space_dev.json', 'study_mixed_family_search_dev.json', 'topology.json'):
+            spec = resolve(ROOT/'configs/research'/filename)
+            before = deepcopy(spec)
+            with patch('tools.research.config.read', side_effect=AssertionError('must not reload sources')):
+                owners = configuration_ownership(spec)
+            structure = owners['structure']
+            self.assertEqual(spec, before)
+            self.assertEqual(structure['topology_authorization'], spec.get('topology_authorization'))
+            self.assertEqual(structure['family_search'], spec.get('family_search'))
+            self.assertEqual(owners['algorithm_authorization']['actions'], spec['allowed_plan_actions'])
+            self.assertEqual(owners['budget']['study']['physical_launches'], 0)
+            if 'family_space' in spec:
+                space = spec['family_space']
+                summary = decision_summary(space, None, [])
+                self.assertEqual(structure['design_space']['segment_domain'], summary['segment_domain'])
+                self.assertEqual(structure['generator_capability'], summary['executable_domain'])
+                self.assertEqual(owners['control']['family_domains'], summary['control_domains'])
+                self.assertNotIn('control_domains', structure['design_space'])
+                self.assertEqual(structure['grant'], {})
+                self.assertTrue(structure['declared_only']['tendon_counts'])
+                if filename == 'study_family_space_dev.json':
+                    self.assertIn(1, structure['declared_only']['segment_counts'])
+                    self.assertIsNone(structure['family_search'])
+                else:
+                    self.assertEqual(structure['family_search']['segment_counts'], [1, 2, 3])
+                    self.assertNotIn('control', structure['family_search']['variable_groups'])
+            else:
+                self.assertIsNone(structure['design_space'])
+                self.assertTrue(structure['grant'])
+                self.assertEqual(structure['topology_authorization']['tendon_count_bounds'], [5, 7])
+                self.assertIn('patch', ' '.join(structure['generator_capability']['parameters']))
+        unknown = configuration_ownership(self.configuration())
+        self.assertIsNone(unknown['structure']['grant'])
+        self.assertIsNone(unknown['structure']['topology_authorization'])
+
 
 if __name__ == '__main__':
     unittest.main()

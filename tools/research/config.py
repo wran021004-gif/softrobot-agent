@@ -36,14 +36,44 @@ def configuration_ownership(configuration):
     grant = value.get('allowed_parameters')
     structural_grant = None if grant is None else {k: v for k, v in grant.items() if k.startswith('segments.')}
     control_grant = None if grant is None else {k: v for k, v in grant.items() if not k.startswith('segments.')}
+    space = value.get('family_space')
+    design_space, generator = None, None
+    if space is not None:
+        from extensions.tendon_family.family_space import decision_summary
+        design_space = decision_summary(space, evidence=None, operations=[])
+        generator = design_space['executable_domain']
+        # Keep controller weights with their owner, while preserving the original
+        # full family_space field below for existing readers.
+        family_control_domains = design_space.pop('control_domains')
+        lo, hi = space['segment_count_bounds']
+        declared_only = dict(segment_counts=[n for n in range(lo, hi+1)
+            if n not in space['executable_segment_counts']],
+            tendon_counts=design_space['currently_unavailable']['tendon_counts'])
+    else:
+        family_control_domains, declared_only = None, None
+        builder = cfg.get('policy', {}).get('candidate_builder')
+        if builder:
+            from tools.platform_registry import registry
+            declaration = registry().get(builder['extension_id'], builder['version'], 'candidate_builder').hook('parameter_declarations')
+            generator = declaration() if declaration else None
     return dict(
         frozen_task=dict(paths=['/task', '/seed'], owner='reviewed TaskDefinition and frozen study'),
         frozen_acceptance=dict(paths=['/task/evaluator', '/policy/controller/parameters/data/settling'],
             owner='registered evaluator and frozen acceptance protocol; legacy Reach settling stays in place'),
         structure=dict(paths=['/robot/structure'], owner='robot source and frozen structural grant',
-            grant=structural_grant, family_space=value.get('family_space')),
+            grant=structural_grant, family_space=space, design_space=design_space,
+            generator_capability=generator, declared_only=declared_only,
+            family_search=value.get('family_search'), topology_authorization=value.get('topology_authorization'),
+            study_authorization=value.get('authorization'), start_mode=value.get('start_mode'),
+            length_constraint=value.get('length_constraint'),
+            authorization_scope='grant is legacy continuous authorization; FamilySpace declares domains and generator bounds, '
+                'not permission. family_search limits mixed search groups/counts/cost; continuous query bounds are checked '
+                'by existing search_domains against selected family domains. topology_authorization grants source-relative '
+                'patches only. Agent operations also require frozen allowed_plan_actions/capabilities and available budgets; '
+                'generation support never grants physical execution. Missing Study grants remain unknown.'),
         control=dict(paths=['/policy/controller/parameters/data/recipe', '/policy/controller/parameters/data/solver'],
             grant=control_grant,
+            family_domains=family_control_domains,
             study_paths=['/control/rl_defaults/reward', '/control/rl_defaults/ppo'],
             owner='candidate control/reward/training configuration within registered schema and study grant; may differ by task'),
         algorithm_authorization=dict(owner='frozen study capabilities and continuation grants',

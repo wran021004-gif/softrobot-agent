@@ -117,10 +117,11 @@ def tracking_condition_specs(task):
     if not timed:
         rows += [
             ('path_coverage', 'path_coverage_error', 'Maximum measured-polyline distance over reference arc-length samples and vertices'),
-            ('path_start', 'path_start', 'Distance from first measured position to first reference vertex'),
+            ('path_start', None, 'Distance from first measured position to first reference vertex'),
             ('path_end', 'terminal_position_error', 'Distance from last measured position to last reference vertex'),
             ('path_progress_regression', 'progress_regression', 'Maximum running-maximum minus current nearest-path arc-length progress')]
     return [dict(condition_id=name, metric=metric, meaning=meaning,
+                 evaluation_binding=dict(source='EvaluationResult', constraint=name, metric=metric),
                  limit=task['evaluator']['parameters']['data']['max_error_m'], units='m')
             for name, metric, meaning in rows]
 

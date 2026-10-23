@@ -86,3 +86,54 @@ Untimed 的五项真实几何验收仍不能被已有采样自由进度代理完
 RL 与组合物理验收仍未实现。单独任务无法提供旧 Reach 保持、机器人、算法授权和预算。
 可表达性不代替具体模型的信号/物理/时域适用性检查；不支持接触、避障等新物理任务。
 手工替换冻结 settling 仍会改变旧 Reach 的验收，必须继续遵循原冻结快照和授权边界。
+
+## S137.1 集成前最小修复（2026-10-23）
+
+基线 `f4800096`，继续使用原独立 worktree。远端目标分支也已核实为该基线。
+仅修改四个生产文件、原 S137 测试文件和本文；未修改 evaluator 数值、阈值、正式成功判定或保存证据。
+
+条件视图增加两个小字典，保留原条件 ID、`expressibility` 等字段：
+
+| 条件 | `evaluation_binding` 的实际来源/字段 | `mathematical_binding.constraint_id` |
+| --- | --- | --- |
+| Reach `terminal_error_m` | `EvaluationResult.metrics[position_error]`，`constraints[task_bound]` | `terminal_error_m` |
+| Reach `holding_max_error_m` | 组合验收同名 metric、`components.holding_position`；Profile detail 的 `/sampled_settling/max_error_m` | 同条件 ID |
+| Reach `holding_max_speed_m_s` | 组合验收同名 metric、`components.holding_speed`；Profile detail 的 `/sampled_settling/max_speed_m_s` | 同条件 ID |
+| Tracking `tracking_max_error` | `EvaluationResult.metrics[max_position_error]`，`constraints[tracking_max_error]` | Timed 为 `timed_tracking`；Untimed 为同条件 ID |
+| Untimed `path_coverage` | `metrics[path_coverage_error]`，同名 constraint | 同条件 ID |
+| Untimed `path_start` | 仅 `constraints[path_start]`，`metric=null` | 同条件 ID |
+| Untimed `path_end` | `metrics[terminal_position_error]`，同名 constraint | 同条件 ID |
+| Untimed `path_progress_regression` | `metrics[progress_regression]`，同名 constraint | 同条件 ID |
+
+方括号表示按 `name` 选择已有列表项，无新结果解析器。Reach 保持量不属于普通 Reach evaluator 的输出。
+Reach/Timed 的 `coverage=exact_sampled_expression` 仅表示采样局部模型中的表达等价，不是已求解或物理成功。
+Untimed 五项的 `coverage=unsupported` 对应 S136 原有五项 unsupported rows；
+`proxy_constraint_id=geometric_path` 明确关联独立代理，不能替代五项真实验收。
+下游可按约束 ID 关联既有数学结果 coverage，仍须检查实际 analyzed/unchecked indices 和模型适用性。
+S134 的数学结果强度说明保持不变：numerically_checked 不提升为严格最优性，代理失败不证明不可行。
+
+执行视图保留 `protocol_id` 原用法，另列 `protocol_template_id`、`task_reviewed`、配置是否存在、
+`configuration_check=not_checked`、`capability_check=not_checked`、`execution_admission=not_assessed` 和 `known_blockers`。
+已知协议只表示模板适用；配置存在不表示已验证。draft、缺配置、Timed 无物理组合协议等已知阻碍显式列出，
+列表不冒充完整准入检查。实际检查仍由 `check_compatibility()`、`compile_input()`、Registry、route hooks
+及 Study 原授权/预算承担；未升级任何 draft，也未开放 Timed 物理执行。
+
+结构所有权保留旧连续 `grant`，复用 FamilySpace `decision_summary()` 展示实际域、生成范围和执行影响；
+`declared_only` 列出超出生成器范围的段数/腱数。FamilySpace 原完整字段继续保留，新增结构域摘要中将
+`control_domains` 归入控制所有权。旧生成器能力复用已注册 `parameter_declarations`，不创建参数目录。
+另直接展示冻结 Study 的 `family_search`（变量组、计数范围、提案/评价上限）、`topology_authorization`、
+长度限制及授权来源。混合搜索连续范围仍由原 `search_domains()` 按所选域检查，未复制授权算法。
+声明域、生成能力和 Study 权限分别展示；未获生成支持的计数仅是声明，其他域也须受允许动作、能力和预算限制。
+控制权重、Reward/PPO 继续归控制配置，不能修改结构授权或硬验收；缺 Study 时授权保持未知。
+`same_robot_structure()` 语义未改，未重读源配置、重置预算或修改历史数据。
+
+验证复用 S135 `.s135-env/Scripts/python.exe`：S137 原 7 项及新增 3 项全部通过；
+S136 全部 7 项、S135 几何进度/独立失败 1 项、Tracking 几何反例及 Timed 评价 2 项、
+S131 保存 F3 身份/验收 1 项、S134 数学强度投影及保存 F3 指标来源 2 项全部通过，合计 **23 项不同测试**。
+回归命令曾误写 S135 测试类名，已改为 `ControlTests` 并通过；`git diff --check` 通过。
+Provider、MuJoCo 物理执行、NMPC/MATLAB 实验、PPO 训练和正式 Study 均为 0。
+剩余限制仍为 Untimed 五项未被等价数学覆盖、Timed 物理路线未实现、只读视图不授予研究权限。
+
+最终提交为本节所在 HEAD：`fix: clarify task condition bindings and runtime capability views`。
+普通 push 至 `origin/feat/s137-task-runtime`；最终短 SHA 见交付回复。
+交付时该独立 worktree 干净并与远端同步，其他 worktree 和独立研究进程未操作。

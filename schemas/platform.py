@@ -144,7 +144,7 @@ class TaskConditionView(Contract):
     even an exact sampled expression cannot certify physical execution.
     """
     condition_id: str
-    metric: str
+    metric: str | None
     meaning: str
     limit: FiniteFloat | None
     units: str
@@ -153,6 +153,12 @@ class TaskConditionView(Contract):
     provenance: list[str] = Field(min_length=1)
     expressibility: Literal['sampled_norm_bound', 'proxy_only', 'unsupported']
     expression_reason: str
+    # Result-local paths; named EvaluationResult lists are selected by name.
+    # metric is a diagnostic name in this source, not necessarily EvaluationResult.
+    evaluation_binding: dict = Field(default_factory=dict)
+    # Join to existing requirement/result coverage by constraint_id. Exact means
+    # expression equivalence on the sampled local model, never a solver verdict.
+    mathematical_binding: dict = Field(default_factory=dict)
 
 
 class RobotDescription(Contract):
