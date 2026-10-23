@@ -1,0 +1,34 @@
+# S142 Reach/Hold 自主联合研究
+
+本轮从 `origin/mainline/softarm-codesign@4de5d5d47` 建立独立 worktree 和
+`research/s142-reach-hold-autonomous`，只开展一个新的 Study：
+`s142-reach-hold-coldstart-20261023`。S140/S141 仅作只读方法边界，没有合并。
+
+启动配置为 `configs/research/study_reach_hold_coldstart.json`，沿用原 robot、task、
+control、runtime 文件。使用现有两段六腱 source-relative 生成器，段长、材料、截面及
+两个已注册 NMPC 速度权重在原明确连续域中可变；总长没有另加固定约束。
+任务仍为原目标、零初态、0–8 N 理想张力、0.35 s、0.01 s 控制周期、0.0005 s 物理步长。
+独立终点与保持误差上限 10 mm，最后 0.05 s 的保持最大速度上限 0.02 m/s。
+原冻结组合验收保持不变；控制权重不改变验收。
+
+上限：Provider 36（6 收尾）、公共操作 160（16 收尾）、物理启动 8、NMPC 3、
+数学内部评价 40、局部求解 8、PPO 2 阶段各最多 4096 effective actions（累计 8192）、
+RL 独立评价 1、成功后额外确认 0。T1/PATH、T2 显式授权，内部子问题分别计账。
+额度不是目标，不扩大离线 NLP/BDF 或诊断回放。
+
+Cold-start：全新 Store、会话和证据目的地；历史 observations、mathematics 和
+control seeds 均为空。唯一 supplied evidence 是来源明确的 S141 模型可信范围警告，
+不含历史成功候选、控制或结构调整方向。原工程配置是公开先验，不能称为无先验随机初始化。
+授权来源是 2026-10-23 本次用户 S142 完整指令；prepare/bind 后通过原 Store 的
+`formal_study_authorization` 记录真实批准，并绑定新冻结身份，不复用旧 grant。
+
+预检：配置 resolve、source-relative 控制准入、已有 CasADi/MuJoCo/CVXPY/CLARABEL、
+Strands/harness 与凭据可用。实际科研解释器复用
+`D:/softrobot-agent/.worktrees/s135-task-conditioned-control/.s135-env/Scripts/python.exe`；
+RL 仍使用 runtime 指定的 `.rl-pilot-env`。没有请求 Provider 或运行物理预检。
+5 项定向测试通过：正式批准绑定、完整 invocation 暂停边界、L1 硬指标保留、
+Reach 终端/保持语义分离、由真实物理输出派生 Reach 诊断。
+未改生产代码或新增测试；未运行全仓库测试。
+
+结果将在同一 Study 完成或明确阻塞后追加。原始执行只保存于忽略的
+`runs/research/s142-reach-hold-coldstart-20261023`，不声称存在公开原始归档。

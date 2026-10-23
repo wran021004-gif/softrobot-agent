@@ -1,0 +1,200 @@
+{
+  "evaluation_version": 1,
+  "ranking": "feasible_then_max_normalized_violation_then_sum_v1",
+  "record_update_ids": [
+    0,
+    29,
+    30
+  ],
+  "complete_update_inputs": true,
+  "execution_allowances": {
+    "simulation_s": null,
+    "evaluation_s": null,
+    "profile_s": null,
+    "construction_s": null
+  },
+  "reference_parameters": {
+    "holding_tip_speed_weight": 0.1,
+    "terminal_tip_speed_weight": 0.1
+  },
+  "allowed_parameters": {
+    "holding_tip_speed_weight": [
+      0.025,
+      0.1
+    ],
+    "terminal_tip_speed_weight": [
+      0.025,
+      0.1
+    ],
+    "segments.near.length_m": [
+      0.152,
+      0.168
+    ],
+    "segments.near.young_pa": [
+      6120000.0,
+      8279999.999999999
+    ],
+    "segments.near.sections.0.semi_y_m": [
+      0.009025,
+      0.009975
+    ],
+    "segments.near.sections.0.semi_z_m": [
+      0.00722,
+      0.007980000000000001
+    ],
+    "segments.distal1.length_m": [
+      0.1045,
+      0.1155
+    ],
+    "segments.distal1.young_pa": [
+      4590000.0,
+      6209999.999999999
+    ],
+    "segments.distal1.sections.0.height_z_m": [
+      0.009025,
+      0.009975
+    ],
+    "segments.distal1.sections.0.width_y_m": [
+      0.012634999999999999,
+      0.013965
+    ],
+    "segments.distal1.sections.1.height_z_m": [
+      0.008122499999999998,
+      0.0089775
+    ],
+    "segments.distal1.sections.1.width_y_m": [
+      0.01083,
+      0.011970000000000001
+    ]
+  },
+  "analysis_cap_s": null,
+  "analysis_protocol": {
+    "protocol_id": "task-local-v2",
+    "input_scale_n": 8.0,
+    "output_scale_m": 0.01,
+    "windows_s": [
+      0.05,
+      0.1,
+      0.35
+    ],
+    "samples_s": [
+      0.0,
+      0.1,
+      0.2,
+      0.3,
+      0.34
+    ],
+    "frequency_rad_s": [
+      0.1,
+      1.0,
+      10.0,
+      100.0
+    ],
+    "rank_atol": 1e-12,
+    "rank_rtol": 1e-09,
+    "comparison_atol": 1e-08,
+    "comparison_rtol": 2e-06,
+    "derivative_atol": 2e-05,
+    "derivative_rtol": 0.0002,
+    "derivative_step": 1e-05,
+    "equilibrium_normalized_residual": 1e-05,
+    "static_force_tolerance": 1e-10,
+    "static_max_iterations": 20,
+    "pole_margin_s_inv": 1e-07,
+    "authority_threshold": null,
+    "authority_reason": "No independently justified task-required MIMO gain threshold; usable bandwidth undefined.",
+    "authority_rule": "Smallest singular value >= threshold, connected grid band starting at lowest frequency; no extrapolation.",
+    "candidate_rule": "initial_target_equilibrium_halfway",
+    "endpoint_max_iterations": 100,
+    "construction_max_iterations": 20,
+    "horizon_alignment_atol_s": 1e-12,
+    "endpoint_check_atol": 1e-08
+  },
+  "standalone_watchdog_s": null,
+  "study_id": "s142-reach-hold-coldstart-20261023",
+  "authorization": "PENDING_EXPLICIT_APPROVAL: S142 user request dated 2026-10-23 (Asia/Shanghai), beginning S142 Reach/Hold Cold-start Agent autonomous codesign; explicitly authorizes exactly one bounded autonomous Study, existing DeepSeek Provider, registered mathematics, GVS/CasADi, MuJoCo, NMPC/PPO, same-Study recovery, commits and ordinary push to research/s142-reach-hold-autonomous. Record this actual approval against the prepared frozen identity before dispatch.",
+  "base_commit": "4de5d5d475755578653e9cca8febe395adeb8764",
+  "robot": "robot.json",
+  "task": "../../tasks/reach_hold.json",
+  "runtime": "runtime.json",
+  "mode": "formal_research",
+  "tension_execution_mode": "ideal_tension",
+  "evidence_destination": "evidence/s142_reach_hold_autonomous",
+  "capabilities": [
+    "analysis",
+    "search",
+    "nmpc",
+    "rl"
+  ],
+  "topology_scope": {
+    "flexible_segments": 2,
+    "independent_ideal_tensions": 6
+  },
+  "budgets": {
+    "provider_requests": 36,
+    "protected_provider_requests": 6,
+    "public_operations": 160,
+    "protected_public_operations": 16,
+    "physical_launches": 8,
+    "local_solves": 8,
+    "local_solve_s": null,
+    "offline_nlp": 0,
+    "bdf_replays": 0,
+    "mathematical_evaluations": 40,
+    "numerical_s": null,
+    "activity_s": null,
+    "delivery_reserve_s": null
+  },
+  "nmpc_execution_cap_s": null,
+  "nmpc_limits": {
+    "executions": 3
+  },
+  "confirmation": {
+    "fresh_independent_repetitions": 0,
+    "configuration": "Select exact fresh completed passing backend evaluation after public read. No extra repetitions; repeatability unassessed."
+  },
+  "rl_limits": {
+    "training_stages": 2,
+    "actions_per_trial": 4096,
+    "seconds_per_trial": null,
+    "training_actions": 8192,
+    "training_active_seconds": null,
+    "evaluation_episodes": 1,
+    "diagnostic_replays": 0,
+    "diagnostic_physics_steps": 0
+  },
+  "supplied_evidence": [
+    "configs/research/s142_model_scope.json"
+  ],
+  "allowed_plan_actions": [
+    "propose",
+    "execute",
+    "search",
+    "diagnose",
+    "select",
+    "confirm",
+    "stop"
+  ],
+  "scoring_window_s": 0.35,
+  "execution_instructions": "Own this one fresh Reach/Hold cold-start Study and decide your scientific route autonomously. Form your own hypotheses from the frozen task, baseline structure, legal parameter domains, available methods and actual feedback. Choose registered mathematics (including optional T1/PATH or T2), legal structure/material/section or control-weight changes, NMPC, direct PPO, compatible residual PPO, saved-state diagnosis, or justified STOP. No prescribed first action or experiment sequence. No historical successful design, control, trajectory or Agent history is supplied; source engineering defaults are public priors. Read the supplied model-scope warning. Every numerical model preparation and internal mathematical subproblem consumes the existing mathematical budget. A local Gramian is not braking capability; a static residual is not dynamic holding; solver failure is inconclusive; an affine witness is not nonlinear or MuJoCo success. Inspect complete decisive physical feedback including terminal error, holding error and maximum holding speed, force limits and numerical validity. Scientific ceilings are strict and are not targets. PPO stages have at most 4096 effective actions each and at most 8192 total; rollout alignment must fit before admission. One independent RL evaluation is available. Use compact summaries and exact evidence pointers; raw arrays need not be reread in full. After actual feedback choose the next action yourself. A fresh complete legal MuJoCo pass against ALL frozen conditions blocks all further science immediately: publicly evidence_read that exact result and select its exact execution reference. Zero additional confirmation. Otherwise STOP must publicly read and cite all new numerical results and training summaries/evaluations, explain unresolved conditions and next_step. Preserve failures, counts and receipts; never relaunch an unknown execution. No claims of structural benefit without evidence, or of robustness, repeatability, real-time performance, hardware or global optimum.",
+  "range_status": "Editable conservative study choices, not universal physical validity limits. Density, viscosity, routes, station locations and angles fixed.",
+  "control": "control.json",
+  "validation_profiles": {},
+  "research_decisions": {
+    "version": "research_decision_v1",
+    "history": [],
+    "mathematics": [],
+    "control_seeds": [],
+    "context_limits": {
+      "candidates": 5,
+      "recent": 3,
+      "pareto": 3,
+      "samples": 3,
+      "evidence": 3
+    }
+  },
+  "mathematical_methods": {
+    "sampled-affine-conic-minimax-v1": "S142 explicit user authorization for registered T1/PATH, subject to applicability, original task coverage, bounded-input witness checks and accounting for every internal subproblem.",
+    "controlled-capability-sensitivity-v1": "S142 explicit user authorization for registered T2, subject to exact matching controlled model stencils, model validity and accounting for all model preparations, capability and dual-face solves."
+  }
+}
