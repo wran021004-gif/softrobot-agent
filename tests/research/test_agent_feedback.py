@@ -240,7 +240,7 @@ class AgentFeedbackTests(unittest.TestCase):
         from tools.research.agent import decision_packet
         from tools.research.contracts import AnalysisRequest
         launched=[]
-        def worker(command,log,timeout):
+        def worker(command,log,timeout,*,lifecycle_path=None):
             request_path=Path(command[-1]);request=read(request_path)
             cfg=request['configuration']
             if request.get('kind')=='candidate_analysis':

@@ -23,6 +23,32 @@ class DeliveryTests(unittest.TestCase):
         self.f=fixtures.MainlineTests();self.f.setUp();self.addCleanup(self.f.doCleanups)
         self.h=self.f.h
 
+    def test_source_relative_candidate_counts_use_actual_structure(self):
+        from tools.research.research_context import context
+        candidate=deepcopy(self.h.store.artifact(self.f.base['candidate']))
+        candidate['resolved_parameters'].pop('tendons',None)
+        ref=save(self.h,candidate,'source_relative_candidate_fixture')
+        update(self.h,candidates={candidate['identity']:ref})
+        row=context(self.h)['evidence_working_set']['candidate_index'][0]
+        self.assertEqual(row['structure'],dict(segments=2,tendons=6))
+        self.assertEqual(row['resolved_facts']['tendon_order'],
+            [t['id'] for t in candidate['configuration']['robot']['structure']['data']['tendons']])
+
+    def test_source_relative_decision_packet_exposes_frozen_design_grant(self):
+        from tools.research.agent import decision_packet
+        from tools.research.config import resolve, ROOT
+        from tools.platform_registry import registry
+        self.h.reg=registry()
+        spec=resolve(ROOT/'configs/research/study.json')
+        spec['research_decisions']={'context_limits':{'candidates':3}}
+        update(self.h,spec=spec,freeze='offline_fixture',candidates={},
+            profile={**state(self.h)['profile'],'version':1})
+        with patch('tools.research.research_context.agent_decision_brief',return_value={}):
+            packet=decision_packet(self.h)
+        self.assertIsNone(packet['family_space'])
+        self.assertEqual(packet['source_relative_design']['allowed_parameters'],spec['allowed_parameters'])
+        self.assertEqual(packet['source_relative_design']['reference_parameters'],spec['reference_parameters'])
+
     def test_both_conic_versions_through_complete_projection_chain(self):
         saved=json.loads(Path('evidence/s132_tracking/validation.json').read_text(encoding='utf-8'))
         for path in (None,'free','bend','diagonal_cannot_follow_bend'):

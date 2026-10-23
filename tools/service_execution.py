@@ -1,7 +1,7 @@
 """Contained numerical subprocess execution with Windows kill-on-close jobs."""
-import subprocess,sys,os
+import subprocess,sys,os,time
 from tools.paths import ROOT
-def _run_contained(command, log, timeout_s):
+def _run_contained(command, log, timeout_s, *, lifecycle_path=None):
     """Kill the owned worker tree; no shell or unrelated-process enumeration."""
     import signal
     from uuid import uuid4
@@ -10,6 +10,10 @@ def _run_contained(command, log, timeout_s):
     process=subprocess.Popen(command,cwd=ROOT,stdout=log,stderr=subprocess.STDOUT,
         creationflags=getattr(subprocess,'CREATE_NO_WINDOW',0),start_new_session=os.name!='nt',env=environment)
     try:
+        if lifecycle_path is not None:
+            from tools.state_io import atomic_json
+            atomic_json(lifecycle_path,dict(pid=process.pid,job_name=job_name,
+                command=command,started_unix=time.time()))
         code=process.wait(timeout=timeout_s)
         return subprocess.CompletedProcess(command,code)
     except subprocess.TimeoutExpired as exc:
@@ -34,6 +38,27 @@ def _run_contained(command, log, timeout_s):
         if os.name!='nt':
             try:os.killpg(process.pid,signal.SIGKILL)
             except ProcessLookupError:pass
+
+
+def process_exit_observation(pid):
+    """Read-only Windows evidence; access failure and PID reuse fail closed."""
+    if os.name!='nt':raise ValueError('WINDOWS_PROCESS_OBSERVATION_REQUIRED')
+    import ctypes as c
+    from ctypes import wintypes as w
+    kernel=c.WinDLL('kernel32',use_last_error=True)
+    kernel.OpenProcess.argtypes=[w.DWORD,w.BOOL,w.DWORD];kernel.OpenProcess.restype=w.HANDLE
+    kernel.WaitForSingleObject.argtypes=[w.HANDLE,w.DWORD]
+    kernel.CloseHandle.argtypes=[w.HANDLE]
+    handle=kernel.OpenProcess(0x100000|0x1000,False,pid)
+    if not handle:
+        error=c.get_last_error()
+        if error!=87:raise ValueError('PROCESS_EXIT_UNCONFIRMED: '+str(error))
+        return dict(pid=pid,exited=True,observation='OpenProcess ERROR_INVALID_PARAMETER; PID absent')
+    try:
+        if kernel.WaitForSingleObject(handle,0)!=0:
+            raise ValueError('PROCESS_STILL_PRESENT_OR_PID_REUSED: '+str(pid))
+        return dict(pid=pid,exited=True,observation='Process handle signaled')
+    finally:kernel.CloseHandle(handle)
 
 def _terminate_worker_job(process,job_name):
     import ctypes as c

@@ -10,6 +10,43 @@ from tools.research.state import (ROOT, state, update, save, guard, charge_start
     capacity, nmpc_timing)
 from tools.research.design import verify_candidate, full_science
 
+
+def record_orphan_exit(host, inventory_reference):
+    """Trusted operator SDK recovery, never an Agent tool or a new execution.
+
+    The original supervisor inventory must bind the actual worker PID to this
+    request. Entering complete-simulation proves the worker installed its
+    kill-on-close job before science. All observed worker processes must have
+    exited; missing identity or inaccessible/live PIDs retain the pending call.
+    """
+    from tools.service_execution import process_exit_observation
+    p=state(host)['pending']
+    if not p or not p.get('launch_intent'):raise ValueError('LAUNCHED_PENDING_EXECUTION_REQUIRED')
+    folder=host.store.root/'executions'/p['owner']
+    if (folder/'boundary.json').exists():raise ValueError('USE_ORIGINAL_EXECUTION_BOUNDARY')
+    recovered=folder/'recovery_boundary.json'
+    if recovered.exists():return read(recovered)
+    inventory=host.store.artifact(inventory_reference)
+    request=str(folder/'request.json').replace('\\','/').casefold()
+    workers=[r for r in inventory['processes'] if '-m tools.research.execution_worker ' in r['CommandLine']
+        and r['CommandLine'].replace('\\','/').casefold().endswith(request)]
+    if not workers or not p['started_unix']<=inventory['captured_unix']<=time.time():
+        raise ValueError('ORIGINAL_WORKER_IDENTITY_REQUIRED')
+    simulation=host.store.lookup(p['owner'],'complete-simulation')
+    if not simulation or simulation['receipt']:raise ValueError('UNSEALED_STARTED_SIMULATION_REQUIRED')
+    observations=[process_exit_observation(r['ProcessId']) for r in inventory['processes']]
+    observed=time.time()
+    proof=dict(owner=p['owner'],original_inventory=plain(inventory_reference),observed_unix=observed,
+        process_observations=observations,containment='execution_worker installs kill-on-close job before complete-simulation',
+        classification='Supervisor-confirmed orphan exit; original exit code/time unknown; no checkpoint continuation')
+    ref=save(host,proof,'verified_orphan_exit')
+    boundary=dict(termination_confirmed=True,timed_out=False,returncode=None,
+        elapsed_s=observed-p['started_unix'],elapsed_semantics='conservative upper bound through verified exit observation',
+        recovery_source=ref,original_boundary_missing=True)
+    atomic_json(recovered,boundary)
+    return boundary
+
+
 def execute(host, candidate_ref, operation_key, *, role='development', selected=None):
     guard(host,expensive=role!='confirmation')
     s=state(host)
@@ -138,7 +175,7 @@ def finish_execution(host, recovery=False):
         try:
             with (folder/'worker.log').open('w',encoding='utf8') as log:
                 done=_run_contained([str(s['spec']['runtime']['research_python']),'-m','tools.research.execution_worker',str(request)],log,
-                    p.get('timeout_s'))
+                    p.get('timeout_s'),lifecycle_path=folder/'worker_lifecycle.json')
             boundary=dict(termination_confirmed=True,timed_out=False,returncode=done.returncode)
         except subprocess.TimeoutExpired as exc:
             boundary=dict(termination_confirmed=getattr(exc,'termination_confirmed',False),timed_out=True)
@@ -147,7 +184,9 @@ def finish_execution(host, recovery=False):
         boundary['elapsed_s']=time.perf_counter()-started
         atomic_json(outcome,boundary)
     elif not outcome.exists():
-        raise ValueError('UNKNOWN_WORKER_TERMINATION_RETAINS_PENDING_RESERVATION; NO_RELAUNCH')
+        outcome=folder/'recovery_boundary.json'
+        if not outcome.exists():
+            raise ValueError('UNKNOWN_WORKER_TERMINATION_RETAINS_PENDING_RESERVATION; NO_RELAUNCH')
     boundary=read(outcome)
     if not boundary['termination_confirmed']:
         return dict(status='execution_unresolved',reason='Worker tree termination uncertain; reservation retained; no replay',pending=p)
@@ -172,6 +211,9 @@ def finish_execution(host, recovery=False):
         result=dict(status='execution_incomplete',timed_out=boundary['timed_out'],receipts=receipts,
             stage=unfinished[0] if unfinished else 'execution',failure_reason='timeout' if boundary['timed_out'] else 'worker exit',
             task_performance='unmeasured',boundary=boundary,retained_evidence=[r for e in host.store.events(p['owner']) for r in e['outputs']])
+        if boundary.get('recovery_source'):
+            result.update(failure_reason='supervisor-verified orphan exit; incomplete physical episode, no exact state checkpoint',
+                termination_evidence=boundary['recovery_source'])
     elif output.exists():
         result=read(output)
     else:
@@ -230,7 +272,7 @@ def finish_execution(host, recovery=False):
     compatible_references(host)
     from tools.research.feedback import eligibility
     return dict(reference=ref,**compact_result(detail),confirmation=eligibility(host,ref),
-        operation_cost=dict(additional_numerical_s=actual,additional_scientific_executions=1,cached_operation_receipt=False))
+        operation_cost=dict(additional_numerical_s=actual,additional_scientific_executions=0 if recovery else 1,cached_operation_receipt=False))
 
 
 def compact_result(r):
@@ -241,6 +283,8 @@ def compact_result(r):
         'cached_operation_receipt','numerical_s','failure_categories','mechanics_context')} | dict(
         controller_facts={k:profile[k] for k in ('updates','applied_control_updates','initialization_selected','accepted_noninitialization_plans',
             'solver_error_count','unusable_plans','deadline_misses','one_step_prediction_summary') if k in profile})
+    if r.get('execution',{}).get('termination_evidence'):
+        result['interruption']={k:r['execution'][k] for k in ('failure_reason','termination_evidence')}
     if not result['execution_id']:
         result['execution_id']=r.get('execution',{}).get('receipts',{}).get('simulation',{}).get('execution_id')
         result['execution_identity_source']='sealed failed simulation receipt; no completed acceptance implied'
