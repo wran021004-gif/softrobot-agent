@@ -20,13 +20,14 @@ def workspace_key(task,robot,parameters):
 
 
 def resolve_gvs_nmpc_control(inp,physics):
-    from .gvs_profile import checked_reach,reach_numerical
-    p=checked_reach(inp).recipe;numerical=reach_numerical(inp);point=numerical['nominal']
+    from .gvs_profile import checked_control,control_numerical
+    control=checked_control(inp)
+    p=control.recipe;numerical=control_numerical(inp);point=numerical['nominal']
     basis=resolve_basis(inp.robot.structure.data,p.basis)
     plan=dict(mode='gvs_nmpc',tension_execution_mode='ideal_tension',
         robot=inp.robot.model_dump(mode='json'),task=inp.task.model_dump(mode='json'),
-        reference=dict(kind='gvs_nominal_metadata',target_world_m=inp.task.goal.data.get('target_m'),
-            q0=point['q0'],u0=point['u0'],derivation=point),
+        reference=dict(kind='numerical_guess_metadata_not_current_target_equilibrium',
+            q0=point['q0'],u0=point['u0'],derivation=point,provenance=numerical['provenance']),
         projector=description(physics,basis),effective_parameters=p.model_dump(mode='json'),
         stopping=dict(policy=p.stopping_policy,iteration_ceiling=p.max_iterations,numerical_tolerance=p.tolerance,
             feasible_return=None if p.stopping_policy=='research_work_v1' or p.feasible_return is None else p.feasible_return.model_dump(mode='json'),
@@ -37,12 +38,9 @@ def resolve_gvs_nmpc_control(inp,physics):
             physics_step_s=inp.task.timing.timestep_s,observation='interval_start_pre_step'),
         plan_acceptance='Independently feasible converged, iteration-limited or intentional early-stop plans. Early stops are suboptimal, not convergence or solver errors; raw termination is retained.',
         failure_response='Hold last bounded tension on an unusable solve (clipped nominal initially); stop after max_unusable_updates consecutive unusable updates. Every applied hold is recorded.')
-    plan['reference']['kind']='numerical_guess_metadata_not_current_target_equilibrium'
-    plan['reference'].pop('target_world_m')
-    plan['reference']['provenance']=numerical['provenance']
     plan['numerical_reference']=dict(artifact_id=digest(numerical),media_type='application/json')
-    if checked_reach(inp).settling is not None:
-        plan['settling']=checked_reach(inp).settling.model_dump(mode='json')
+    if control.settling is not None:
+        plan['settling']=control.settling.model_dump(mode='json')
     plan['identity']=digest(plan)
     return plan
 

@@ -46,6 +46,8 @@ class TensionEnv(gym.Env):
         self.tracking = self.saved['family'] == 'task.tracking'
         if self.saved['family'] not in ('task.reach','task.tracking'):
             raise ValueError('Unsupported RL task')
+        from tools.research_tasks import ResearchTaskAdapter
+        self.task_reference = ResearchTaskAdapter(dict(task=self.saved['original']))
         if self.tracking:
             from tools.research_tasks import task_adapter
             self.task_reference = task_adapter(dict(task=self.saved['original']))
@@ -88,8 +90,10 @@ class TensionEnv(gym.Env):
         if (not np.isfinite(m.actuator_ctrlrange[a]).all() or np.any(self.lower<0) or np.any(self.upper<=self.lower)
                 or not np.allclose(m.actuator_forcerange[a],np.stack((-self.upper,-self.lower),axis=1),rtol=0,atol=1e-12)):
             raise ValueError('Tension control/force limits mismatch')
+        # Endpoint shaping is retained for the S135 reward; it is not a fake
+        # Reach goal. Tracking observations still use the ordered local reference.
         self.target=np.asarray(self.saved['original']['goal']['data']['vertices_m'][-1]
-                               if self.tracking else self.saved['target_m'],dtype=float)
+                               if self.tracking else self.task_reference.reference_at([0.])[0][0],dtype=float)
         self.control_dt=float(self.saved['control_period_s'])
         self.horizon=int(self.saved['command_intervals'])
         self.hold_steps=[] if self.tracking else self.saved['acceptance']['holding_steps']

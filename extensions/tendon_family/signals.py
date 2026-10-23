@@ -5,6 +5,7 @@ from schemas.platform import Signal, SignalSpec
 def declarations(tension_reference=False, execution_mode='actuator_realistic'):
     values=[
         ('tip_position','tip',3,'m','world','post_step','tip_m'),
+        ('tip_velocity','tip',3,'m/s','world','post_step','tip_velocity_m_s'),
         ('joint_position','joint',1,'rad','joint_local','post_step','qpos_rad'),
         ('joint_velocity','joint',1,'rad/s','joint_local','post_step','qvel_rad_s'),
         ('tendon_length','tendon',1,'m','path','post_step','tendon_length_m'),

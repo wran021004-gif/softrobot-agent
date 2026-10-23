@@ -79,33 +79,35 @@ class ProfileOutput(Contract):
     detail: dict
 
 
-def checked_reach(inp):
-    from .generated_serial import checked_reach as check
+def checked_control(inp):
+    from .generated_serial import checked_control as check
     return check(inp)
 
 
-def checked_control(inp):
-    return checked_reach(inp)
+checked_reach = checked_control
 
 
 def settling_for(inp):
-    return checked_reach(inp).settling
+    return checked_control(inp).settling
 
 
-def reach_numerical(inp):
-    return candidate_numerical(inp,checked_reach(inp))
+def control_numerical(inp):
+    return candidate_numerical(inp,checked_control(inp))
+
+
+reach_numerical = control_numerical
 
 
 def reach_assessment(inp):
     inp=SessionInput.model_validate(inp)
-    checked_reach(inp)
+    checked_control(inp)
     return dict(technical_compatibility=dict(status='supported',reason=f'Explicit frozen source with candidate-owned dimensions and pretension; {sum(c["kind"]=="flexible_segment" for c in inp.robot.structure.data["components"])} segments, {len(inp.robot.structure.data["tendons"])} ideal tensions'),
         historical_evidence=dict(status='not_transferred',exact_execution_scope_match=False,reason='Only fresh evaluation measures this candidate'),
         execution_preparation=dict(status='pending_execution_hook',source='initial_state_pretension'))
 
 
 def prepare_execution(ctx,controller,inp):
-    started=time.perf_counter();numerical=reach_numerical(inp)
+    started=time.perf_counter();numerical=control_numerical(inp)
     ref=ctx.save_artifact(numerical,'control_numerical_guess')
     controller.profile=dict(numerical=numerical)
     controller.preparation=dict(status='completed',wall_s=time.perf_counter()-started,source=plain(ref),
