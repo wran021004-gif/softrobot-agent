@@ -3,6 +3,104 @@ from schemas.platform import Binding, Payload
 from tools.platform_store import plain
 from tools.research_tasks import task_adapter
 
+METHOD_MEANINGS = {
+    'linearization': ('Local dynamics', 'Frozen continuous affine A/B/C/D and drift at the declared operating point; not a trajectory or stability proof.'),
+    'controllability': ('Local drive authority', 'Finite continuous/held-input normalized Gramians and output authority; signed unbounded increments do not prove bounded nonnegative tendon feasibility.'),
+    'equilibrium': ('Static input construction', 'Bounded local static target construction; static balance does not establish dynamic reach or hold.'),
+    'input_sensitivity': ('Static input response', 'Checked local implicit-function response of equilibrium to physical input; SoRoSim fixed-input equilibrium only.'),
+    'design_sensitivity': ('Static structural response', 'Paired single-parameter local static sensitivity with fixed physical input; no global design descent guarantee.'),
+    'endpoint': ('Bounded terminal feasibility', 'Bounded affine input sequence for covered terminal position conditions; intermediate constraints remain unchecked.'),
+    'braking': ('Bounded terminal braking', 'Bounded affine sequence for covered terminal position/speed; not full holding-window compliance.'),
+    'instantaneous_braking_v1': ('Instantaneous braking authority', 'Minimum instantaneous speed derivative over the physical input box at an exact saved state; not finite-horizon braking.'),
+    'trajectory_feasibility': ('Sampled feasible sequence', 'Independent discrete replay of a bounded affine sequence; failed search is inconclusive.'),
+    'task_capability': ('Best found task violation', 'Three-start SLSQP minimization of max normalized signed residual. Smaller is better; negative means sample margin, not certified optimality.'),
+    'sampled-affine-conic-minimax-v1': ('Numerical optimal task violation', 'min_U max_i g_i over an affine sampled model and physical box. SOCP primal/dual/support/gap checks are floating estimates; strict optimal_value remains unavailable. Free path progress jointly optimizes U and s, enumerating sampled corners in a chosen finite horizon; no unrestricted-time exclusion or geometric acceptance.'),
+    'controlled-capability-sensitivity-v1': ('Controlled structural direction', 'Matched baseline and +/-h (optionally +/-h/2) models: reoptimized FD versus fixed U, conditional envelope and dual-face checks. Path progress is reoptimized too. Branch ties/active-set changes withhold a strict gradient; no physical improvement guarantee.')}
+
+
+def mathematical_method_view(host, reference):
+    """Existing candidate-bound read view: legacy T2 root plus all method details."""
+    from tools.research.state import state
+    from tools.research.contracts import AnalysisRequest
+    from tools.research.optimal_capability import candidate_methods, CONIC, SENSITIVITY
+    from tools.research.design import verify_candidate
+    from tools.research.research_context import mathematics_authorization
+    s=state(host);spec=s['spec'];c=host.store.artifact(reference)
+    if reference not in s.get('candidates',{}).values():raise ValueError('OWNED_RESOLVED_CANDIDATE_REQUIRED')
+    try:verify_candidate(host,reference);binding_error=None
+    except ValueError as exc:binding_error=str(exc)
+    readiness=candidate_methods(host,reference) if binding_error is None else dict(
+        method=SENSITIVITY,status='requires_current_profile_candidate',reasons=[binding_error])
+    cfg=c['configuration'];requirements=describe_analysis_requirements(cfg,{})
+    remaining=max(0,spec['budgets']['mathematical_evaluations']-s.get('mathematical_evaluations',0))
+    rows=analysis_capabilities(cfg,requirements,spec['analysis_protocol'],
+        remaining_evaluations=remaining,mathematical_methods={CONIC:spec.get('mathematical_methods',{}).get(CONIC),
+            SENSITIVITY:spec.get('mathematical_methods',{}).get(SENSITIVITY)})
+    models=[]
+    for r in s.get('analysis_results',[]):
+        v=host.store.artifact(r)
+        if (v.get('candidate')==reference and v.get('implementation')==s['freeze'] and
+                v.get('status')=='computed' and v.get('model') and v.get('protocol')==spec['analysis_protocol']):models.append(r)
+    authorization=mathematics_authorization(host,s);methods={}
+    for row in rows:
+        key=SENSITIVITY if row.get('submode') else row.get('capability_method') or row['operation']
+        purpose,meaning=METHOD_MEANINGS[key]
+        kinds=row.get('constraint_kinds',['norm_bound','component_interval','path_bound'])
+        reasons=[*row['reasons'],*([binding_error] if binding_error else [])]
+        if key==SENSITIVITY:
+            reasons=[r for r in reasons if r!='candidate_variable_and_saved_model_stencil_validation_required']+readiness.get('reasons',[])
+        authorized='analysis' in spec['capabilities'] and (not row.get('capability_method') or
+            bool(spec.get('mathematical_methods',{}).get(key) and spec.get('mathematical_methods',{}).get(CONIC)))
+        request=dict(candidate=reference,operation=row['operation'],protocol=spec['analysis_protocol'],
+            operating_point='target_equilibrium' if key=='equilibrium' else 'fixed_input_equilibrium' if key in
+            ('input_sensitivity','design_sensitivity') else 'saved_state' if key=='instantaneous_braking_v1' else 'controller_start_input')
+        required=[]
+        if key in ('linearization','controllability'):
+            required.append('scoring_window_s from protocol.windows_s')
+            if spec['analysis_protocol']['windows_s']:request['scoring_window_s']=spec['analysis_protocol']['windows_s'][0]
+        if key=='instantaneous_braking_v1':required.append('saved_state OR execution + update_id')
+        if key=='design_sensitivity':required.append('design_sensitivity={variable,step,minus_candidate,plus_candidate}')
+        if row.get('capability_method'):request['capability_method']=CONIC
+        if key==SENSITIVITY:required.append('optimal_sensitivity={variable,steps,model_results baseline first}; validated stencil required')
+        methods[key]=dict(operation=row['operation'],method=key,method_version=row.get('method_version',key),scientific_purpose=purpose,description=meaning,
+            candidate=reference,task_identity=c.get('task_identity'),task_family=cfg['task']['family'],
+            kernel_supported=True if key in ('linearization','controllability','instantaneous_braking_v1') else
+                all(x.kind in kinds for x in requirements.constraints),
+            model_built=bool(models),model_sources=[dict(reference=r,pointer='/model') for r in models],
+            coverage=row.get('coverage',[]),full_task_supported=row.get('full_task_supported',False),
+            study_authorized=authorized,formal_scope_authorized=authorization['registered_study_scope_authorized'],
+            formal_execution_authorized=bool(authorized and authorization['registered_study_scope_authorized'] is True
+                and cfg['task']['family']!='task.tracking'),
+            execution_status='blocked' if reasons or not authorized or s['research_status']=='stopped' else 'conditional_on_admission',
+            missing=reasons+([] if authorized else ['study_method_grant_required'])+
+                (['study_stopped'] if s['research_status']=='stopped' else []),
+            estimated_evaluations=row['evaluations'],wall_cost='unknown',
+            cost_scope=row.get('evaluation_rule','Model preparation and internal solver attempts are distinct; see original receipts.'),
+            limitations=row['limitations'],prerequisites=row['prerequisites'],applicability=row,
+            required_parameters=required,request_template=request,
+            detail_query=dict(reference=reference,view='mathematical_capabilities',pointer='/methods/'+key),
+            schema_query=dict(reference=reference,view='mathematical_capabilities',pointer='/analysis_request_schema'))
+        if key==SENSITIVITY:
+            methods[key]['readiness']=readiness
+            methods[key]['cost_scope']='M*B conic solves + up to 2*k dual-face attempts; M=1+2*k. B=1 except two-segment paths: samples-2. Model preparation additional; wall cost unknown.'
+    return dict(**readiness,candidate=reference,methods=methods,analysis_request_schema=AnalysisRequest.model_json_schema())
+
+
+def mathematical_catalog(view):
+    """Small per-method facts; full instructions and native schemas stay reachable."""
+    rows={}
+    for row in view['methods'].values():
+        item={k:v for k,v in row.items() if k not in ('description','request_template','required_parameters',
+            'schema_query','prerequisites','time_scope','required_outputs','constraint_kinds','readiness','applicability',
+            'candidate','task_identity','task_family','model_sources','formal_scope_authorized','method','limitations')}
+        item['coverage']=[{k:v for k,v in c.items() if k in ('constraint_id','status','expressible')} for c in row['coverage']]
+        rows[row['method']]=item
+    binding=next(iter(view['methods'].values()))
+    return dict(version='mathematical_capability_catalog_v1',candidate=view['candidate'],task_identity=binding['task_identity'],task_family=binding['task_family'],
+        formal_scope_authorized=binding['formal_scope_authorized'],model_sources=binding['model_sources'][-1:],
+        limitations=['Candidate-bound planning only; all model/state/input/protocol and remaining-budget admission checks still apply.',
+            'Local sampled numerical evidence does not prove physical acceptance or strict/global optimality.'],methods=rows)
+
 
 def analysis_capabilities(configuration, requirements, protocol, *, model=None, exact_point=None,
                           remaining_evaluations=None, mathematical_methods=None):
@@ -58,12 +156,10 @@ def analysis_capabilities(configuration, requirements, protocol, *, model=None, 
             if not env['available']:reasons.append('worker_dependency_unavailable')
             if remaining_evaluations is not None and remaining_evaluations<count:reasons.append('insufficient_budget')
             if method==SENSITIVITY:reasons.append('candidate_variable_and_saved_model_stencil_validation_required')
-            fit=None
-            if configuration.task.family=='task.tracking' and model is not None:
-                query=SimpleNamespace(operation='task_capability',operating_point='controller_start_input',
-                    protocol=p,scoring_window_s=None,capability_method=CONIC)
-                fit=check_analysis_applicability(requirements,query,model_assessment(configuration,requirements,'task_capability',model),model)
-                reasons.extend(fit['reasons'])
+            query=SimpleNamespace(operation='task_capability',operating_point='controller_start_input',
+                protocol=p,scoring_window_s=None,capability_method=CONIC)
+            fit=check_analysis_applicability(requirements,query,model_assessment(configuration,requirements,'task_capability',model),model)
+            reasons.extend(fit['reasons'])
             rows.append(dict(operation='task_capability',capability_method=CONIC,
                 submode='optimal_sensitivity' if method==SENSITIVITY else None,
                 method_version=('sampled-affine-conic-path-progress-v1' if method==CONIC else 'controlled-path-progress-sensitivity-v1') if path is not None else method,
@@ -119,7 +215,7 @@ def check_analysis_applicability(requirements, query, assessment, model=None, ex
     reasons = [reason for verdict in assessment['uses'].values() if verdict['status'] == 'REJECT'
                for reason in verdict['reasons']]
     if requirements.binding.get('task_family')=='task.tracking' and query.operation not in ('trajectory_feasibility','task_capability'):
-        reasons.append('Geometric Tracking has free path progress and no timed reference; fixed-target endpoint/static operations are unsupported.')
+        reasons.append('Tracking fixed-target endpoint/static operations are unsupported; use the declared timed reference or free geometric progress without substituting a Reach target.')
     if (query.operation in ('input_sensitivity','design_sensitivity') or query.operating_point=='fixed_input_equilibrium') and assessment['model_id']!='model.sorosim_gvs':
         reasons.append('Static IFT v1 is implemented only by the SoRoSim provider.')
     outputs = {'tip_position':('m', 'world', 3), 'tip_velocity':('m/s', 'world', 3)}

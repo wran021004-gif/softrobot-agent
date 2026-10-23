@@ -690,6 +690,7 @@ def research_intent(host):
         output=host.store.artifact(receipt['output']) if receipt and receipt.get('output') else {}
         result=output.get('result',output)
         item=dict(plan_reference=reference,action=plan['action'],
+            candidate=plan_candidate(plan) or result.get('candidate'),
             agent_hypothesis={k:deepcopy(plan.get(k)) for k in ('hypothesis','decision',
                 'expected_observation','weakening_observation','fixed_conditions',
                 'interpretation','stopping_condition','supporting_evidence')},
@@ -702,6 +703,28 @@ def research_intent(host):
     return dict(latest_decision=latest,last_research=experiment,
         unresolved_question=(experiment or latest or {}).get('agent_hypothesis',{}).get('weakening_observation'),
         question_scope='Prior falsification target; main Agent decides the next scientific question')
+
+
+def plan_candidate(plan):
+    return (plan.get('decision') or {}).get('selected_candidate') or plan.get('candidate') or next((
+        plan[k]['candidate'] for k in ('control_search','physical_replay','cross_replay','mechanics','control_seed')
+        if plan.get(k) and plan[k].get('candidate')),None)
+
+
+def compact_intent(intent):
+    """Retain the explicit current question once; no automatic truth/lifecycle claim."""
+    value=deepcopy(intent)
+    if value['latest_decision'] and value['last_research'] and value['latest_decision']['plan_reference']==value['last_research']['plan_reference']:
+        value['last_research']=dict(same_as='research_intent.latest_decision',plan_reference=value['latest_decision']['plan_reference'])
+    return value
+
+
+def compact_action_trace(trace):
+    value=deepcopy(trace)
+    for row in value['recent']:
+        for key in ('agent_hypothesis','interpretation_status','hypothesis_effect','task_protocol_identity'):
+            row.pop(key,None)
+    return value
 
 
 def research_action_trace(host, limit=5):
@@ -722,7 +745,7 @@ def research_action_trace(host, limit=5):
         decision=plan.get('decision') or {}
         return dict(request_id=request_id,action=plan.get('action',plan.get('operation')),
             method=decision.get('selected_method',('controlled-capability-sensitivity-v1' if plan.get('optimal_sensitivity') else plan.get('capability_method')) or plan.get('operation')),
-            candidate=plan.get('candidate'),task_protocol_identity=digest(plan['protocol']) if plan.get('protocol') else None,
+            candidate=plan_candidate(plan) or result.get('candidate'),task_protocol_identity=digest(plan['protocol']) if plan.get('protocol') else None,
             agent_hypothesis={k:plan[k] for k in ('hypothesis','decision','expected_observation',
                 'weakening_observation','supporting_evidence','interpretation','fixed_conditions','stopping_condition') if k in plan},
             execution_status=receipt['execution_status'] if receipt else 'pending',
@@ -791,10 +814,10 @@ def agent_decision_brief(host):
     """A-line compact input; existing L0/L2 retrieval contracts remain unchanged."""
     from tools.research.reporter import current_reports, reporter_handoff_summary
     brief=decision_brief(context(host))
-    brief['research_intent']=research_intent(host)
-    brief['action_trace']=research_action_trace(host)
-    from tools.research.task_constraints import describe_analysis_requirements, analysis_capabilities
-    s=state(host);cfg=s.get('nominal_configuration',s.get('base_configuration'))
+    intent=research_intent(host)
+    brief['research_intent']=compact_intent(intent)
+    brief['action_trace']=compact_action_trace(research_action_trace(host))
+    s=state(host)
     brief['mathematics_authorization']=mathematics_authorization(host,s)
     if s.get('engineering_feedback_correction'):
         ref=s['engineering_feedback_correction']
@@ -808,24 +831,18 @@ def agent_decision_brief(host):
             prerequisites=['Legal indices in the actual candidate','Authorized continuous variable',
                 'Complete registered symmetric model group with exact bindings','Sufficient model-preparation and kernel budget'],
             scope='Generation legality alone does not establish mathematical method support')
-    if s.get('candidates'):
-        cfg=host.store.artifact(ordered_candidates(host,s)[-1])['configuration']
-    if cfg and s['spec'].get('analysis_protocol'):
-        requirements=describe_analysis_requirements(cfg,{})
-        brief['mathematical_capabilities']=analysis_capabilities(cfg,requirements,s['spec']['analysis_protocol'],
-            mathematical_methods=s['spec'].get('mathematical_methods'),
-            remaining_evaluations=max(0,s['spec']['budgets']['mathematical_evaluations']-s.get('mathematical_evaluations',0)))
-        if s.get('candidates') and s['spec'].get('mathematical_methods'):
-            from tools.research.optimal_capability import candidate_methods
-            candidate=ordered_candidates(host,s)[-1]
-            if host.store.artifact(candidate)['profile_identity']==s['profile']['identity']:
-                availability=candidate_methods(host,candidate)
-                brief['optimal_sensitivity_readiness']={k:availability[k] for k in ('method','status','reasons','remaining_evaluations','planning')}
-                brief['optimal_sensitivity_readiness']['detail_query']=dict(reference=candidate,view='mathematical_capabilities')
-            else:
-                brief['optimal_sensitivity_readiness']=dict(status='requires_current_profile_candidate',
-                    reasons=['Historical candidate preserves its original profile binding after explicit implementation migration.'],
-                    candidate=candidate,route_authorization_withdrawn=False)
+    candidate=next((r['candidate'] for r in (intent['latest_decision'],intent['last_research']) if r and r.get('candidate')),None)
+    candidate=candidate or (brief.get('latest_scientific_feedback') or {}).get('candidate')
+    if candidate is None and len(s.get('candidates',{}))==1:candidate=next(iter(s['candidates'].values()))
+    if candidate:
+        from tools.research.task_constraints import mathematical_method_view, mathematical_catalog
+        view=mathematical_method_view(host,candidate)
+        brief['mathematical_capabilities']=mathematical_catalog(view)
+        selected=((intent['latest_decision'] or {}).get('agent_hypothesis',{}).get('decision') or {}).get('selected_method')
+        if selected in view['methods']:brief['selected_mathematical_method']=view['methods'][selected]
+    else:
+        brief['mathematical_capabilities']=dict(status='candidate_selection_required',
+            query_format='evidence_read(reference=<owned candidate>, view="mathematical_capabilities", pointer="/methods/<method>")')
     selected=current_reports(host)[-2:]
     brief['latest_reports']=[reporter_handoff_summary(host,r,saved) for r,saved in selected]
     from tools.research.evidence_views import result_card

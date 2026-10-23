@@ -273,8 +273,8 @@ def result_card(host, reference):
             constraint=next(c for c in value['task_analysis']['constraints'] if c['constraint_id']==row['constraint_id'])
             index=value['task_analysis']['constraints'].index(constraint)
             metrics.append(ReportedMetric(name=row['constraint_id'],value=row['observed_value'],
-                unit=row['units'],threshold=row['bound'] if constraint['kind']=='norm_bound' else None,
-                threshold_source=_location(reference,f'/task_analysis/constraints/{index}/radius') if constraint['kind']=='norm_bound'
+                unit=row['units'],threshold=row['bound'] if constraint['kind'] in ('norm_bound','path_bound') else None,
+                threshold_source=_location(reference,f'/task_analysis/constraints/{index}/radius') if constraint['kind'] in ('norm_bound','path_bound')
                     else _location(reference,f'/task_analysis/constraints/{index}'),
                 passed=row['status']=='satisfied_sample',scope='model_sample',time_s=row['absolute_time_s'],
                 source=_location(reference,row['source_pointer']+'/value')))

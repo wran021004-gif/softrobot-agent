@@ -1,0 +1,86 @@
+{
+  "date": "2026-10-23 Asia/Shanghai",
+  "baseline": "4eb740f932d1cd01ece575777c0fcef4bc646880",
+  "code_commit": "1846dbecea2d51fe249978525c178ee42fde41a7",
+  "branch": "fix/s134-research-context",
+  "new_real_provider_requests": 0,
+  "new_study_scientific_executions": 0,
+  "physical_rollouts": 0,
+  "nmpc_launches": 0,
+  "ppo_training": 0,
+  "production_files": 7,
+  "production_added_lines": 196,
+  "production_deleted_lines": 45,
+  "external_audits": [
+    {
+      "path": "C:\\Users\\gugugaga\\AppData\\Local\\Temp\\softrobot-s133-audit-20261023\\context_delivery_audit.md",
+      "sha256": "1292dec0f999ff878e22d9cfaa7e1aa28ed13ac2a7f41267f131b7f5fb8a930e"
+    },
+    {
+      "path": "C:\\Users\\gugugaga\\AppData\\Local\\Temp\\softrobot-s133-audit-20261023\\reporter_delivery_audit.md",
+      "sha256": "8dd145aaff6340208c22ccccdbfd0da02e04df1b582f9211f79fbae29177a512"
+    },
+    {
+      "path": "C:\\Users\\gugugaga\\AppData\\Local\\Temp\\softrobot-s133-audit-20261023\\mathematical_capability_matrix.md",
+      "sha256": "2ac309d7176bf50489ff37606ca603045c66528d0de5a3ae7b091cafdf212f52"
+    },
+    {
+      "path": "C:\\Users\\gugugaga\\AppData\\Local\\Temp\\softrobot-s133-audit-20261023\\rl_reward_scope.md",
+      "sha256": "2972321ef57db8f111bf9396fddf4b17aa52ec551c2cc5247c2cf430da5c7bbe"
+    },
+    {
+      "path": "C:\\Users\\gugugaga\\AppData\\Local\\Temp\\softrobot-s133-audit-20261023\\decision_guidance_findings.md",
+      "sha256": "77552983d5c901a44ae5f2c953f337950e9affe839b440c0a284f1c004a01f08"
+    }
+  ],
+  "regression": {
+    "tests": 117,
+    "seconds": 53.168,
+    "passed": true,
+    "modules": [
+      "tests.research.test_s134_delivery",
+      "tests.research.test_s130_mainline",
+      "tests.research.test_s129_agent_reporting",
+      "tests.research.test_research_reporting",
+      "tests.research.test_tracking",
+      "tests.research.test_tracking_math",
+      "tests.research.test_s131_closeout",
+      "tests.research.test_f3_feedback_repairs",
+      "tests.research.test_task_analysis_contract",
+      "tests.research.test_conic_capability",
+      "tests.research.test_capability_sensitivity"
+    ],
+    "environment": "PYTHONPATH=<worktree>;<worktree>/tests/research",
+    "transport": "offline MockTransport only"
+  },
+  "final_delivery_review": {
+    "tests": 8,
+    "seconds": 7.825,
+    "passed": true,
+    "module": "tests.research.test_s134_delivery"
+  },
+  "earlier_failure": {
+    "tests": 97,
+    "error": "test_task_analysis_contract imports test_mainline without package prefix",
+    "resolution": "Set PYTHONPATH to worktree and tests/research; failed test and final target regression passed.",
+    "production_change_required": false
+  },
+  "warnings": [
+    "Expected injected ReadError/RuntimeError logs in mocked session tests.",
+    "Existing synthetic dual-face Clarabel inaccurate warning retained; no certification upgrade."
+  ],
+  "replay_command": "python -m tests.research.s134_saved_request_comparison --store <sealed F3 folder> --output evidence/s134_delivery/offline_comparison.json",
+  "test_command": "python -m unittest tests.research.test_s134_delivery tests.research.test_s130_mainline tests.research.test_s129_agent_reporting tests.research.test_research_reporting tests.research.test_tracking tests.research.test_tracking_math tests.research.test_s131_closeout tests.research.test_f3_feedback_repairs tests.research.test_task_analysis_contract tests.research.test_conic_capability tests.research.test_capability_sensitivity -q",
+  "source_integrity": "1e090b2d152bd9a46ac89c24272b5dbeb765ed63aadd30bfb395ea5dbd4dccc6",
+  "source_unchanged": true,
+  "schemas_sdk_history_unchanged": true,
+  "push": {
+    "performed": false,
+    "reason": "No current-turn authorization for the new remote branch target."
+  },
+  "non_claims": [
+    "No measured Provider saving.",
+    "No measured LLM decision-quality improvement.",
+    "Synthetic compatibility fixtures are not robot scientific evidence."
+  ]
+}

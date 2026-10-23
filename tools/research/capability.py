@@ -4,6 +4,7 @@ from pydantic import FiniteFloat, Field
 from schemas.common import Contract
 from schemas.platform import EvidenceRef
 
+CONIC_METHODS = ('sampled-affine-conic-minimax-v1', 'sampled-affine-conic-path-progress-v1')
 
 SCORE_QUANTITY_SEMANTICS = dict(score='Computed signed minimax value within the declared model',
     delta='candidate_score - baseline_score; direct score difference',
@@ -88,7 +89,7 @@ def compare_control_response(model, requirements, protocol, optimized, context):
 
 
 def capability_summary(trajectory):
-    if trajectory.get('method_version')=='sampled-affine-conic-minimax-v1':
+    if trajectory.get('method_version') in CONIC_METHODS:
         dual=trajectory.get('dual_checks',{})
         return dict(method_version=trajectory['method_version'],
             replayed_violation=trajectory.get('replayed_violation'),optimality_status=trajectory.get('optimality_status'),
@@ -101,7 +102,13 @@ def capability_summary(trajectory):
             strict_optimality='unavailable',physical_failure_relation=dict(status='not_assessed'),
             problem_pointer='/trajectory/problem_definition',solver_starts_pointer='/trajectory/solver',
             sample_records_pointer='/trajectory/replay/records' if trajectory.get('replay') else '/trajectory/coverage',quantities_pointer='/trajectory/quantities',
-            checks_pointer='/trajectory/dual_checks',scope='Local sampled affine model; physical acceptance unmeasured')
+            checks_pointer='/trajectory/dual_checks',scope='Local sampled affine model; physical acceptance unmeasured',
+            control_reoptimization='required',
+            **{k:trajectory[k] for k in ('status','coverage','coverage_counts','all_requested_checked','model_scope',
+                'path_progress','path_assignment','path_assignment_comparison','path_assignment_ties',
+                'internal_conic_solves','untimed_scope','auxiliary_coordinates','reason') if k in trajectory},
+            sources={k:'/trajectory/'+k for k in ('replayed_violation','optimality_status','coverage',
+                'path_progress','path_assignment_comparison','internal_conic_solves','model_scope') if k in trajectory})
     keys = ('best_found_violation', 'status', 'control_reoptimization', 'verification_scope',
         'start_value_spread', 'research_diagnostics', 'input_diagnostics', 'locality_diagnostics', 'kernel_elapsed_s',
         'near_active_records', 'co_bottleneck_records', 'solver_scope')
@@ -176,13 +183,13 @@ def populate_mathematics(mathematics, trajectory, reference):
     from schemas.research_reporting import EvidenceLocation, MathematicalQuantity, RecordedField
     def location(pointer):
         return EvidenceLocation(reference=reference, pointer=pointer)
-    if trajectory.get('method_version')=='sampled-affine-conic-minimax-v1':
+    if trajectory.get('method_version') in CONIC_METHODS:
         quantities=[MathematicalQuantity(name=name,value=row['value'],
             status='unavailable' if row['value'] is None else 'verified' if name=='analytic_lower_bound' else 'unverified_estimate',
             control_reoptimization='required',
             unit='dimensionless',source=location('/trajectory/quantities/'+name+'/value') if row['value'] is not None else None,
             conditions=[RecordedField(name='strength',value=row['strength'],source=location('/trajectory/quantities/'+name+'/strength'))])
-            for name,row in trajectory['quantities'].items()]
+            for name,row in trajectory.get('quantities',{}).items()]
         return mathematics.model_copy(update=dict(problem_definition=location('/trajectory/problem_definition'),quantities=quantities))
     quantities = []
     groups = [(trajectory.get('quantities', {}), '/trajectory/quantities', [],
