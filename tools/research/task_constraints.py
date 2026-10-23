@@ -65,7 +65,8 @@ def mathematical_method_view(host, reference):
         methods[key]=dict(operation=row['operation'],method=key,method_version=row.get('method_version',key),scientific_purpose=purpose,description=meaning,
             candidate=reference,task_identity=c.get('task_identity'),task_family=cfg['task']['family'],
             kernel_supported=True if key in ('linearization','controllability','instantaneous_braking_v1') else
-                all(x.kind in kinds for x in requirements.constraints),
+                any(x.kind in kinds for x in requirements.constraints) and
+                all(x.kind in kinds or x.kind == 'unsupported' for x in requirements.constraints),
             model_built=bool(models),model_sources=[dict(reference=r,pointer='/model') for r in models],
             coverage=row.get('coverage',[]),full_task_supported=row.get('full_task_supported',False),
             study_authorized=authorized,formal_scope_authorized=authorization['registered_study_scope_authorized'],
