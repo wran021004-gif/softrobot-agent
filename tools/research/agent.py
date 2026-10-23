@@ -838,7 +838,10 @@ def decision_packet(host):
                 executable_under_current_profile=host.store.artifact(r)['profile_identity']==s['profile']['identity'])
                 for r in ordered_candidates(host,s)[-spec.get('research_decisions',{}).get('context_limits',{}).get('candidates',3):]],
             family_space=decision_summary(spec['family_space'],s['family_space_reference'],
-                dict(actions=spec['allowed_plan_actions'],capabilities=spec['capabilities'])),analysis_protocol=spec['analysis_protocol'],
+                dict(actions=spec['allowed_plan_actions'],capabilities=spec['capabilities'])) if spec.get('start_mode')=='family_space' else None,
+            source_relative_design=dict(reference_parameters=spec['reference_parameters'],allowed_parameters=spec['allowed_parameters'],
+                length_constraint=spec.get('length_constraint')) if spec.get('start_mode')!='family_space' else None,
+            analysis_protocol=spec['analysis_protocol'],
             guidance='Tool results acknowledge execution and saved references; use latest_reports L1 for scientific decisions. Signed score direction, comparison scope and optimality come from structured facts. Use exact evidence refs and a typed decision in every research_plan. evidence_read and research_investigate permit drill-down. Reporter interpretations are hypotheses, never authoritative facts or action choices. Choose the next research method freely. New designs need explicit control adaptation. Do not infer global feasibility/infeasibility. Stop at first complete pass; publicly read and select it. Retrieve the exact stop_result_index before STOP; cite every new result.')
     result=packet(host)
     spec=result.pop('specification')

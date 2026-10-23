@@ -34,6 +34,20 @@ class DeliveryTests(unittest.TestCase):
         self.assertEqual(row['resolved_facts']['tendon_order'],
             [t['id'] for t in candidate['configuration']['robot']['structure']['data']['tendons']])
 
+    def test_source_relative_decision_packet_exposes_frozen_design_grant(self):
+        from tools.research.agent import decision_packet
+        from tools.research.config import resolve, ROOT
+        from tools.platform_registry import registry
+        self.h.reg=registry()
+        spec=resolve(ROOT/'configs/research/study_reach_hold_coldstart.json')
+        update(self.h,spec=spec,freeze='offline_fixture',candidates={},
+            profile={**state(self.h)['profile'],'version':1})
+        with patch('tools.research.research_context.agent_decision_brief',return_value={}):
+            packet=decision_packet(self.h)
+        self.assertIsNone(packet['family_space'])
+        self.assertEqual(packet['source_relative_design']['allowed_parameters'],spec['allowed_parameters'])
+        self.assertEqual(packet['source_relative_design']['reference_parameters'],spec['reference_parameters'])
+
     def test_both_conic_versions_through_complete_projection_chain(self):
         saved=json.loads(Path('evidence/s132_tracking/validation.json').read_text(encoding='utf-8'))
         for path in (None,'free','bend','diagonal_cannot_follow_bend'):

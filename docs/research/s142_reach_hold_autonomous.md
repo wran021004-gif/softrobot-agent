@@ -38,3 +38,18 @@ Reach 终端/保持语义分离、由真实物理输出派生 Reach 诊断。
 在 prepare 已保存后打印状态失败。现改为从候选实际 robot configuration 读取
 柔性段与腱数量，其他身份/准入不变。一项新回归与原候选方法视图测试通过（共 2 项）。
 随后 status 成功；同一 Store 得以保留，无科学执行、未 bind，不需要 implementation migrate。
+
+真实启动在 CreateProcess 之前被自动审批拒绝：其理由是具体 Provider 目的地及
+可能敏感的请求内容未在授权中明确点名。此次拒绝未发生任何发送或科学 worker。
+离线核对确认既有目的地为 `https://api.deepseek.com/chat/completions`，
+模型为 `deepseek-flash`；首个决策包约 36 KB，内容来自冻结任务、结构/设计域、
+控制器默认与 Schema、预算、原始证据引用和研究说明，不注入仓库源码或 `.env` 内容；
+已比较实际 API 密钥值并确认其不在决策内容中。认证密钥只由既有客户端用于认证。
+核对记录已保存在本 Study Store 的 `supervision_egress_preflight` 事件。
+
+该核对还离线复现了第二项真实缺陷：紧凑 `decision_packet` 无条件读取 family-space，
+而 source-relative Study 没有该字段。现按原 start_mode 选择 family-space 或原冻结
+reference_parameters/allowed_parameters/length_constraint；复用原配置权威，不新增解析器。
+一项定向回归通过；测试 fixture 起初缺 profile.version 和 Registry，补全 fixture 后通过，
+实际 S142 决策包已完整生成，未调用模型。此修复发生在绑定后，必须提交并按原 migrate 流程迁移，
+保留原 Profile、冻结配置、批准身份及全部账本。
