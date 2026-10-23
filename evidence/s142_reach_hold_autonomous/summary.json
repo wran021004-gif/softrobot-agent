@@ -1,20 +1,49 @@
 {
   "study_id": "s142-reach-hold-coldstart-20261023",
-  "conclusion": "original_orphan_reconciled_resume_blocked_by_automatic_egress_review",
-  "formal_store_status": "ready",
-  "pending_retained": false,
+  "conclusion": "autonomous_cited_stop_without_frozen_task_pass",
+  "formal_store_status": "stopped",
   "baseline": "4de5d5d475755578653e9cca8febe395adeb8764",
   "implementation": "e8abaef72c75eb1428939181a57d256c438d3570",
   "resolved_identity": "034d2cac74141856fbe4a8fe051c284d8b608f26e0f32c2e9386da34a0762a4f",
+  "branch": "research/s142-reach-hold-autonomous",
   "authorization": {
     "artifact_id": "03091d72fac5866287e14b4f022594ab2d07d74409c910565208ec5556389337",
     "media_type": "application/json"
   },
-  "candidate": {
-    "artifact_id": "248d2a32d721c673bd3f7e11fe22793635b4b2915f931609ef2ad3dcf9b26c33",
+  "provider_egress_authorization": {
+    "artifact_id": "5f07f013072f493c55ee3d57a8ee64d1a7dd608371027f46cf56254f6b846f49",
     "media_type": "application/json"
   },
-  "execution_owner": "s142-reach-hold-coldstart-20261023-exec-ab2e3bebfda74387",
+  "selected": null,
+  "success_gate": null,
+  "final_disposition": {
+    "artifact_id": "3823d4b3d8958008291e9333c7d33794e6984e34425e80f9f3c66665f2b5d5dc",
+    "media_type": "application/json"
+  },
+  "next_step": "stop",
+  "stop_citations": [
+    {
+      "artifact_id": "364634c4cf1726a9854ddb13bd237482b6e1be337683fbbf59d5297a4b5d4794",
+      "media_type": "application/json"
+    },
+    {
+      "artifact_id": "a54a68d40c9b65f32aa6b75422ce2db5e9c2afa6aa914fe577db0fc93ce1ea1b",
+      "media_type": "application/json"
+    },
+    {
+      "artifact_id": "e2a6f6f0dae49cf4f8f562e93d5233e2a96758a0cf8b99eee6b001ba515911bb",
+      "media_type": "application/json"
+    },
+    {
+      "artifact_id": "95e200e23930894751b6565221e294991d014fd8b0670706854bbb4424c3e6c0",
+      "media_type": "application/json"
+    },
+    {
+      "artifact_id": "912261925382c2402ab66c5ee01c975c58b51b54122ab02011e61e5964f08e36",
+      "media_type": "application/json"
+    }
+  ],
+  "pending": null,
   "unsealed_calls": [],
   "ledger": {
     "limit": {
@@ -25,52 +54,71 @@
       "worker_calls": 0
     },
     "used": {
-      "tool_calls": 9,
-      "model_calls": 5,
-      "backend_solves": 1,
+      "tool_calls": 43,
+      "model_calls": 28,
+      "backend_solves": 3,
       "worker_calls": 0,
-      "wall_s": 6635.760894132545
+      "wall_s": 13835.482415332226
     },
     "remaining": {
-      "backend_solves": 7,
-      "model_calls": 31,
-      "tool_calls": 151,
+      "backend_solves": 5,
+      "model_calls": 8,
+      "tool_calls": 117,
       "wall_s": null,
       "worker_calls": 0
     },
     "occupied": {}
   },
   "counts": {
-    "provider_requests": 5,
-    "provider_complete_http_200": 5,
-    "provider_unconsumed": null,
-    "public_operations_used": 9,
-    "physical_launches": 1,
-    "nmpc_launches": 1,
-    "completed_physical_evaluations": 0,
-    "mathematical_evaluations": 0,
+    "provider_requests": 28,
+    "provider_complete_http_200": 28,
+    "provider_unknown": 0,
+    "provider_receipts_sealed": 28,
+    "public_operations_used": 43,
+    "physical_launches": 3,
+    "completed_physical_evaluations": 2,
+    "incomplete_physical_episodes": 1,
+    "nmpc_launches": 3,
+    "mathematical_evaluations": 2,
     "local_solves": 0,
     "ppo_stages": 0,
     "ppo_actions": 0,
     "rl_evaluations": 0,
     "extra_confirmations": 0
   },
-  "partial_control": {
-    "completed_updates": 32,
-    "required_updates": 35,
-    "last_recorded_pre_step_time_s": 0.31,
-    "usable_plans": 32,
-    "solver_errors": 0,
-    "raw_statuses": {
-      "Maximum_Iterations_Exceeded": 32
+  "frozen_budget_limits": {
+    "budgets": {
+      "activity_s": null,
+      "bdf_replays": 0,
+      "delivery_reserve_s": null,
+      "local_solve_s": null,
+      "local_solves": 8,
+      "mathematical_evaluations": 40,
+      "numerical_s": null,
+      "offline_nlp": 0,
+      "physical_launches": 8,
+      "protected_provider_requests": 6,
+      "protected_public_operations": 16,
+      "provider_requests": 36,
+      "public_operations": 160
     },
-    "iteration_ceiling": 120,
-    "commanded_min_n": 0.13180100032139394,
-    "commanded_max_n": 7.726616100430531,
-    "full_independent_force_acceptance": "unmeasured",
-    "complete_update_records": 32,
-    "reported_complete_update_wall_s": 4038.867769200355,
-    "time_cost_warning": "Simulation receipt unsealed; ledger wall_s is not full physical work. Recorded partial timings do not include unfinished solve or certify its termination."
+    "nmpc_limits": {
+      "executions": 3
+    },
+    "rl_limits": {
+      "actions_per_trial": 4096,
+      "diagnostic_physics_steps": 0,
+      "diagnostic_replays": 0,
+      "evaluation_episodes": 1,
+      "seconds_per_trial": null,
+      "training_actions": 8192,
+      "training_active_seconds": null,
+      "training_stages": 2
+    },
+    "confirmation": {
+      "configuration": "Select exact fresh completed passing backend evaluation after public read. No extra repetitions; repeatability unassessed.",
+      "fresh_independent_repetitions": 0
+    }
   },
   "frozen_acceptance": {
     "terminal_limit_m": 0.01,
@@ -82,95 +130,450 @@
       0.35
     ]
   },
-  "final_metrics": {
-    "terminal_error_m": null,
-    "holding_max_error_m": null,
-    "holding_max_speed_m_s": null,
-    "combined_acceptance": null
-  },
-  "recovery": {
-    "status": "original_execution_sealed_incomplete",
-    "result_reference": {
-      "artifact_id": "364634c4cf1726a9854ddb13bd237482b6e1be337683fbbf59d5297a4b5d4794",
-      "media_type": "application/json"
-    },
-    "termination_evidence": {
-      "artifact_id": "93f0aeafd06480ea8934372535b5cba4b2a3b79be9e3479a67e42ed479fb5677",
-      "media_type": "application/json"
-    },
-    "original_inventory_reference": {
-      "artifact_id": "d6f7f4624a17779e1adc4f0beba52e9df95ba4e01fa4f73163f68f567a632957",
-      "media_type": "application/json"
-    },
-    "original_boundary_missing": true,
-    "original_exit_code": null,
-    "elapsed_semantics": "conservative upper bound through verified exit observation",
-    "elapsed_upper_bound_s": 6592.759894132614,
-    "new_scientific_launches": 0,
-    "provider_requests_repeated": 0,
-    "receipts_sealed": true,
-    "pending_cleared": true,
-    "implementation_migrated_to": "e8abaef72c75eb1428939181a57d256c438d3570",
-    "sdk_feedback_not_yet_consumed": true,
-    "no_exact_mujoco_state_checkpoint": true
-  },
-  "evidence": {
-    "partial_files_manifest": {
-      "artifact_id": "6c199a9c842c4a7d6c571a9219d52435b7e11d1b7a67aa2195616878cf24d9cc",
-      "media_type": "application/json"
-    },
-    "provider_requests": [
-      {
-        "request_id": "r3-request-8d375b8ed2334187b31d9991a429b75a",
-        "response": {
-          "artifact_id": "f800d8bf12bf8370aa9268d382d552b9e380bfc06aa54895927d3ceb2b50fa0b",
-          "media_type": "application/octet-stream"
-        },
-        "outcome_unknown": false
+  "results": [
+    {
+      "reference": {
+        "artifact_id": "364634c4cf1726a9854ddb13bd237482b6e1be337683fbbf59d5297a4b5d4794",
+        "media_type": "application/json"
       },
-      {
-        "request_id": "r3-request-bcd3e83d38304a5989ee32c827682014",
-        "response": {
-          "artifact_id": "820ec87bd4835a4cdfe6f0b3453e02b09179f60b22401c5e86201a7c720a20d7",
-          "media_type": "application/octet-stream"
-        },
-        "outcome_unknown": false
+      "candidate": {
+        "artifact_id": "248d2a32d721c673bd3f7e11fe22793635b4b2915f931609ef2ad3dcf9b26c33",
+        "media_type": "application/json"
       },
-      {
-        "request_id": "r3-request-fdd5bfaff94b4f90a160b31fd21e405a",
-        "response": {
-          "artifact_id": "94e9121bc5821aa1bce8a4ba9652eff82a4b4dbab9cba07fbccad719ab97de38",
-          "media_type": "application/octet-stream"
-        },
-        "outcome_unknown": false
-      },
-      {
-        "request_id": "r3-request-831844ca9bff4afa90efc50390db9d28",
-        "response": {
-          "artifact_id": "ce08c327df346117693890ba22925b2fea51446f91de55caaeda49471908b8d6",
-          "media_type": "application/octet-stream"
-        },
-        "outcome_unknown": false
-      },
-      {
-        "request_id": "r3-request-ba4de278e2db45f1b5c9b99d027998a8",
-        "response": {
-          "artifact_id": "f72f24b007a4b11b222b0040aaeaf2f61bb67edc1f25542628861eb9a7948a8c",
-          "media_type": "application/octet-stream"
-        },
-        "outcome_unknown": false
+      "execution_id": "83167c03af65492e8b3c1b56758c7aa5",
+      "owner_run_id": "s142-reach-hold-coldstart-20261023-exec-ab2e3bebfda74387",
+      "status": "execution_incomplete",
+      "failure_categories": [
+        "engineering_or_missing_evidence"
+      ],
+      "fresh_execution": true,
+      "implementation": "c3aeacbf4e4b901fcce48d492d5a4f66d28db782",
+      "acceptance": null,
+      "factual": {
+        "valid_complete_execution": null,
+        "control_updates": null,
+        "accepted_plans": null,
+        "converged_updates": null,
+        "solver_error_count": null,
+        "hold_last_responses": null,
+        "force_bound_violation_n": null,
+        "one_step_prediction_summary": null,
+        "simulated_duration_s": null,
+        "mean_complete_update_s": null,
+        "measured_computation_s": null
       }
-    ]
-  },
-  "scientific_assessment": {
-    "engineering_chain": "Original orphan exit verified and incomplete receipts reconciled; original study resumable after explicit Provider egress approval",
-    "autonomous_decisions": "real Provider multi-step retrieval, falsifiable hypothesis and autonomous NMPC selection observed",
-    "mathematical_tools": "not used; grants and costs visible, scientific use not evaluated",
-    "physical_success": "not established; incomplete execution and no independent evaluator result",
-    "feedback_adaptation": "not evaluated; first physical result never delivered to Agent",
-    "structure_change": false,
-    "structural_gain": "not established"
-  },
+    },
+    {
+      "reference": {
+        "artifact_id": "a54a68d40c9b65f32aa6b75422ce2db5e9c2afa6aa914fe577db0fc93ce1ea1b",
+        "media_type": "application/json"
+      },
+      "candidate": {
+        "artifact_id": "dbb5a00a98ed74adf0aa42f571534421902536203c57d2bdbd47038fe1e67baf",
+        "media_type": "application/json"
+      },
+      "execution_id": "3c78b551965f443abd966bfb68b969dd",
+      "owner_run_id": "s142-reach-hold-coldstart-20261023-exec-5a16acb6383f4cf6",
+      "status": "evaluated",
+      "failure_categories": [
+        "scientific_task_failure"
+      ],
+      "fresh_execution": true,
+      "implementation": "e8abaef72c75eb1428939181a57d256c438d3570",
+      "acceptance": {
+        "accepted": false,
+        "status": "valid_failure",
+        "protocol_id": "offline_reach_hold_v1",
+        "metrics": {
+          "holding_max_error_m": 0.0031364418844500026,
+          "holding_max_speed_m_s": 0.022849089710631265,
+          "terminal_error_m": 0.0031364418844500026
+        },
+        "components": {
+          "evaluation_validity": {
+            "value": "valid",
+            "limit": null,
+            "passed": true
+          },
+          "evaluator:task_bound": {
+            "value": 0.0031364418844500026,
+            "limit": 0.01,
+            "passed": true
+          },
+          "execution_complete": {
+            "value": true,
+            "limit": null,
+            "passed": true
+          },
+          "force_bounds": {
+            "value": 0.0,
+            "limit": 1e-08,
+            "passed": true
+          },
+          "holding_coverage": {
+            "value": true,
+            "limit": 6,
+            "passed": true
+          },
+          "holding_position": {
+            "value": 0.0031364418844500026,
+            "limit": 0.01,
+            "passed": true
+          },
+          "holding_speed": {
+            "value": 0.022849089710631265,
+            "limit": 0.02,
+            "passed": false
+          },
+          "solver_errors": {
+            "value": 0,
+            "limit": 0,
+            "passed": true
+          },
+          "task_evaluator": {
+            "value": true,
+            "limit": null,
+            "passed": true
+          }
+        }
+      },
+      "factual": {
+        "valid_complete_execution": true,
+        "control_updates": 35,
+        "accepted_plans": 35,
+        "converged_updates": 0,
+        "solver_error_count": 0,
+        "hold_last_responses": 0,
+        "force_bound_violation_n": 0.0,
+        "one_step_prediction_summary": {
+          "aligned_count": 35,
+          "maximum_tip_difference_m": 0.004046742228681322,
+          "maximum_velocity_vector_difference_m_s": 0.11914538345099533,
+          "scope": "Only accepted first-step predictions matched to next execution timestamp; no future-plan replay comparison",
+          "missing": []
+        },
+        "simulated_duration_s": 0.35000000000000003,
+        "mean_complete_update_s": 94.37566245425758,
+        "measured_computation_s": 3316.3910000000615,
+        "applied_tension_range_n": [
+          0.001044410354709714,
+          7.922288456928409
+        ],
+        "near_t1_max_n": 7.922288456928409
+      },
+      "numerical_steps": 700
+    },
+    {
+      "reference": {
+        "artifact_id": "e2a6f6f0dae49cf4f8f562e93d5233e2a96758a0cf8b99eee6b001ba515911bb",
+        "media_type": "application/json"
+      },
+      "candidate": {
+        "artifact_id": "c0f655d12a96b93f59a9fcbd0a1b99dadf37cbe811b014d0e1088e70ba637516",
+        "media_type": "application/json"
+      },
+      "execution_id": "ed0d573d7f014c7aaee14387745d3135",
+      "owner_run_id": "s142-reach-hold-coldstart-20261023-exec-b087a6b7252640e6",
+      "status": "evaluated",
+      "failure_categories": [
+        "scientific_task_failure"
+      ],
+      "fresh_execution": true,
+      "implementation": "e8abaef72c75eb1428939181a57d256c438d3570",
+      "acceptance": {
+        "accepted": false,
+        "status": "valid_failure",
+        "protocol_id": "offline_reach_hold_v1",
+        "metrics": {
+          "holding_max_error_m": 0.0030310250356348953,
+          "holding_max_speed_m_s": 0.05203049356582944,
+          "terminal_error_m": 0.0027808380549602055
+        },
+        "components": {
+          "evaluation_validity": {
+            "value": "valid",
+            "limit": null,
+            "passed": true
+          },
+          "evaluator:task_bound": {
+            "value": 0.0027808380549602055,
+            "limit": 0.01,
+            "passed": true
+          },
+          "execution_complete": {
+            "value": true,
+            "limit": null,
+            "passed": true
+          },
+          "force_bounds": {
+            "value": 0.0,
+            "limit": 1e-08,
+            "passed": true
+          },
+          "holding_coverage": {
+            "value": true,
+            "limit": 6,
+            "passed": true
+          },
+          "holding_position": {
+            "value": 0.0030310250356348953,
+            "limit": 0.01,
+            "passed": true
+          },
+          "holding_speed": {
+            "value": 0.05203049356582944,
+            "limit": 0.02,
+            "passed": false
+          },
+          "solver_errors": {
+            "value": 0,
+            "limit": 0,
+            "passed": true
+          },
+          "task_evaluator": {
+            "value": true,
+            "limit": null,
+            "passed": true
+          }
+        }
+      },
+      "factual": {
+        "valid_complete_execution": true,
+        "control_updates": 35,
+        "accepted_plans": 34,
+        "converged_updates": 0,
+        "solver_error_count": 0,
+        "hold_last_responses": 1,
+        "force_bound_violation_n": 0.0,
+        "one_step_prediction_summary": {
+          "aligned_count": 34,
+          "maximum_tip_difference_m": 0.003976674329046351,
+          "maximum_velocity_vector_difference_m_s": 0.10363610390851799,
+          "scope": "Only accepted first-step predictions matched to next execution timestamp; no future-plan replay comparison",
+          "missing": [
+            {
+              "reason": "accepted first-step prediction unavailable",
+              "time_s": 0.34
+            }
+          ]
+        },
+        "simulated_duration_s": 0.35000000000000003,
+        "mean_complete_update_s": 91.47820985428989,
+        "measured_computation_s": 3210.219000000041,
+        "applied_tension_range_n": [
+          1.495301368725762e-08,
+          7.714990624983215
+        ],
+        "near_t1_max_n": 6.029038716864296
+      },
+      "numerical_steps": 700
+    }
+  ],
+  "mathematics": [
+    {
+      "reference": {
+        "artifact_id": "95e200e23930894751b6565221e294991d014fd8b0670706854bbb4424c3e6c0",
+        "media_type": "application/json"
+      },
+      "candidate": {
+        "artifact_id": "248d2a32d721c673bd3f7e11fe22793635b4b2915f931609ef2ad3dcf9b26c33",
+        "media_type": "application/json"
+      },
+      "status": "computed",
+      "operation": "trajectory_feasibility",
+      "charged_analysis_evaluations": 1,
+      "charged_numerical_s": 15.975449899910018,
+      "local_model_constraints": {
+        "max_absolute_violation": 9.547484846605947e-06,
+        "max_normalized_violation": 0.00047737424233029735,
+        "minimum_tension_margin_n": 0.0,
+        "status": "inconclusive",
+        "worst_violation": {
+          "absolute_time_s": 0.34,
+          "constraint_id": "holding_max_speed_m_s",
+          "control_step": 34,
+          "frame": "world",
+          "margins": [
+            -9.547484846605947e-06
+          ],
+          "normalized_violation": 0.00047737424233029735,
+          "output": [
+            0.0,
+            -0.0047292685942527425,
+            -0.01944263380079319
+          ],
+          "passed": false,
+          "reference": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "residual": [
+            0.0,
+            -0.0047292685942527425,
+            -0.01944263380079319
+          ],
+          "sample_index": 34,
+          "signal": "tip_velocity",
+          "units": "m/s",
+          "value": 0.020009547484846606,
+          "violation": 9.547484846605947e-06
+        }
+      },
+      "internal_calculations": [
+        {
+          "certificate": null,
+          "purpose": "sampled_trajectory",
+          "solver": {
+            "constraint_evaluations": 102,
+            "constraint_jacobian_evaluations": 101,
+            "constraint_scaling": "radius or maximum absolute component bound, floored by check atol; physical residuals replayed",
+            "iterations": 100,
+            "maximum_iterations": 100,
+            "message": "Iteration limit reached",
+            "name": "scipy.optimize.SLSQP",
+            "objective_evaluations": 101,
+            "optimization_elapsed_s": 0.5531065999530256,
+            "status": 9,
+            "success": false
+          }
+        }
+      ],
+      "limitations": [
+        "Local unconstrained frozen Jacobians; finite Gramians do not establish unilateral bounded-input feasibility.",
+        "Open-loop authority does not establish closed-loop stability, settling, or real-time execution.",
+        "Numerical agreement is implementation verification, not physical model validation.",
+        "Saved non-equilibrium frequency curves are frozen-Jacobian resolvents, not measured steady-state responses.",
+        "Only explicitly replay-verified samples in the frozen local affine model; no continuous-time, nonlinear, or backend acceptance."
+      ],
+      "operating_point": {
+        "name": "standardized_initial_pretension",
+        "actual_time_s": 0.0,
+        "scope": "standardized initial/pretension",
+        "remaining_task_s": 0.35
+      },
+      "static_equilibrium": false,
+      "model_physical_validation": "unavailable"
+    },
+    {
+      "reference": {
+        "artifact_id": "912261925382c2402ab66c5ee01c975c58b51b54122ab02011e61e5964f08e36",
+        "media_type": "application/json"
+      },
+      "candidate": {
+        "artifact_id": "dbb5a00a98ed74adf0aa42f571534421902536203c57d2bdbd47038fe1e67baf",
+        "media_type": "application/json"
+      },
+      "status": "computed",
+      "operation": "trajectory_feasibility",
+      "charged_analysis_evaluations": 1,
+      "charged_numerical_s": 18.24707129993476,
+      "local_model_constraints": {
+        "max_absolute_violation": 4.890885193561262e-06,
+        "max_normalized_violation": 0.0002445442596780631,
+        "minimum_tension_margin_n": 0.0,
+        "status": "inconclusive",
+        "worst_violation": {
+          "absolute_time_s": 0.33,
+          "constraint_id": "holding_max_speed_m_s",
+          "control_step": 33,
+          "frame": "world",
+          "margins": [
+            -4.890885193561262e-06
+          ],
+          "normalized_violation": 0.0002445442596780631,
+          "output": [
+            0.0,
+            -0.014393650111489614,
+            -0.01389310965178478
+          ],
+          "passed": false,
+          "reference": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "residual": [
+            0.0,
+            -0.014393650111489614,
+            -0.01389310965178478
+          ],
+          "sample_index": 33,
+          "signal": "tip_velocity",
+          "units": "m/s",
+          "value": 0.02000489088519356,
+          "violation": 4.890885193561262e-06
+        }
+      },
+      "internal_calculations": [
+        {
+          "certificate": null,
+          "purpose": "sampled_trajectory",
+          "solver": {
+            "constraint_evaluations": 102,
+            "constraint_jacobian_evaluations": 101,
+            "constraint_scaling": "radius or maximum absolute component bound, floored by check atol; physical residuals replayed",
+            "iterations": 100,
+            "maximum_iterations": 100,
+            "message": "Iteration limit reached",
+            "name": "scipy.optimize.SLSQP",
+            "objective_evaluations": 101,
+            "optimization_elapsed_s": 0.6180032999254763,
+            "status": 9,
+            "success": false
+          }
+        }
+      ],
+      "limitations": [
+        "Local unconstrained frozen Jacobians; finite Gramians do not establish unilateral bounded-input feasibility.",
+        "Open-loop authority does not establish closed-loop stability, settling, or real-time execution.",
+        "Numerical agreement is implementation verification, not physical model validation.",
+        "Saved non-equilibrium frequency curves are frozen-Jacobian resolvents, not measured steady-state responses.",
+        "Only explicitly replay-verified samples in the frozen local affine model; no continuous-time, nonlinear, or backend acceptance."
+      ],
+      "operating_point": {
+        "name": "standardized_initial_pretension",
+        "actual_time_s": 0.0,
+        "scope": "standardized initial/pretension",
+        "remaining_task_s": 0.35
+      },
+      "static_equilibrium": false,
+      "model_physical_validation": "unavailable"
+    }
+  ],
+  "nmpc_update_records": [
+    {
+      "path": "sessions\\s142-reach-hold-coldstart-20261023-exec-5a16acb6383f4cf6\\executions\\3c78b551965f443abd966bfb68b969dd\\backend\\nmpc_updates.json",
+      "updates": 35,
+      "usable_plans": 35,
+      "solver_exceptions": 0,
+      "raw_solver_statuses": {
+        "Maximum_Iterations_Exceeded": 35
+      },
+      "fallback_updates": 0
+    },
+    {
+      "path": "sessions\\s142-reach-hold-coldstart-20261023-exec-ab2e3bebfda74387\\executions\\83167c03af65492e8b3c1b56758c7aa5\\backend\\nmpc_updates.json",
+      "updates": 32,
+      "usable_plans": 32,
+      "solver_exceptions": 0,
+      "raw_solver_statuses": {
+        "Maximum_Iterations_Exceeded": 32
+      },
+      "fallback_updates": 0
+    },
+    {
+      "path": "sessions\\s142-reach-hold-coldstart-20261023-exec-b087a6b7252640e6\\executions\\ed0d573d7f014c7aaee14387745d3135\\backend\\nmpc_updates.json",
+      "updates": 35,
+      "usable_plans": 34,
+      "solver_exceptions": 0,
+      "raw_solver_statuses": {
+        "Maximum_Iterations_Exceeded": 34,
+        "Error_In_Step_Computation": 1
+      },
+      "fallback_updates": 1
+    }
+  ],
   "first_scientific_decision": {
     "reference": {
       "artifact_id": "ab52e18345db9608254f71e8934c8af8f6fbe24b93c85811b25b7cfc7a944095",
@@ -197,10 +600,42 @@
     "distance_to_target_m": 0.0030450693052959956,
     "scope": "Saved pre-step observation only; no terminal or complete holding-window acceptance.",
     "initial_geometric_floor_hypothesis_supported": false,
-    "agent_received_completed_physical_feedback": false
+    "agent_received_completed_physical_feedback": false,
+    "scope_warning": "Original incomplete baseline observation only; two other full physical feedback results were subsequently delivered."
+  },
+  "recovery": {
+    "status": "original_execution_sealed_incomplete",
+    "result_reference": {
+      "artifact_id": "364634c4cf1726a9854ddb13bd237482b6e1be337683fbbf59d5297a4b5d4794",
+      "media_type": "application/json"
+    },
+    "termination_evidence": {
+      "artifact_id": "93f0aeafd06480ea8934372535b5cba4b2a3b79be9e3479a67e42ed479fb5677",
+      "media_type": "application/json"
+    },
+    "original_inventory_reference": {
+      "artifact_id": "d6f7f4624a17779e1adc4f0beba52e9df95ba4e01fa4f73163f68f567a632957",
+      "media_type": "application/json"
+    },
+    "original_boundary_missing": true,
+    "original_exit_code": null,
+    "elapsed_semantics": "conservative upper bound through verified exit observation",
+    "elapsed_upper_bound_s": 6592.759894132614,
+    "new_scientific_launches": 0,
+    "provider_requests_repeated": 0,
+    "receipts_sealed": true,
+    "pending_cleared": true,
+    "implementation_migrated_to": "e8abaef72c75eb1428939181a57d256c438d3570",
+    "sdk_feedback_not_yet_consumed": false,
+    "no_exact_mujoco_state_checkpoint": true,
+    "same_study_resume_completed": true
+  },
+  "partial_files_manifest": {
+    "artifact_id": "6c199a9c842c4a7d6c571a9219d52435b7e11d1b7a67aa2195616878cf24d9cc",
+    "media_type": "application/json"
   },
   "previous_store_summary_reference": {
-    "artifact_id": "73cd4ce6707703470cc04a21f89ecdc9a29cc6816542a7b2e78e49b944fa7e56",
+    "artifact_id": "e86d522190f8ea34e61fb49d49a29091a8b805935a8e14fbee39b985bb46ebf6",
     "media_type": "application/json"
   },
   "initial_recovery_block": {
@@ -212,23 +647,53 @@
     "relaunched": false,
     "second_study": false
   },
-  "resume_approval_block": {
-    "source": "Automatic sandbox escalation review, two CreateProcess rejections",
+  "egress_review": {
+    "rejected_before_create_process": true,
+    "resolved_by_explicit_user_approval": true,
     "destination": "https://api.deepseek.com/chat/completions",
     "model": "deepseek-flash",
-    "data_scope": [
-      "S142 frozen task, robot structure, legal design domains and control settings",
-      "budgets and scientific tool schemas",
-      "actual scientific execution feedback, including original interrupted result"
+    "new_client_or_blind_retry": false
+  },
+  "execution_integrity": {
+    "same_study_only": true,
+    "old_execution_relaunched": false,
+    "budget_reset": false,
+    "unknown_request_replayed": false,
+    "core_binding_unchanged": true,
+    "science_binding_unchanged": true,
+    "cli_exit_code": 0
+  },
+  "time_cost_scope": {
+    "ledger_wall_s": 13835.482415332226,
+    "original_orphan_elapsed_s": 6592.759894132614,
+    "original_orphan_elapsed_semantics": "conservative upper bound through verified exit observation; not exact process lifetime",
+    "state_numerical_s": 13161.910247632302,
+    "total_wall_is_not_exact_measured_compute": true
+  },
+  "scientific_assessment": {
+    "engineering_chain": "Actual terminal-host interruption; verified recovery and subsequent complete mathematics/physics/Agent closeout",
+    "autonomous_decisions": "Provider-generated hypotheses, two material changes, feedback-driven switch from stiffening to softening and cited STOP",
+    "mathematical_tools": "T1/PATH not applicable at requested waypoint; no T1 witness, no T2 run; two actual SLSQP trajectory attempts inconclusive with no certificate",
+    "physical_success": false,
+    "structure_change": true,
+    "structural_gain": "Not established; no complete nominal baseline and only two joint structure/controller executions",
+    "agent_limits": [
+      "Incorrect initial straight-chain length floor",
+      "Near-bound tension does not establish saturation causality; NMPC absolute bound is 8 N, not 7.8 N",
+      "Two material samples do not prove monotonicity or isolate control-side causality",
+      "Residual reference-field rejection is not proof that RL is unavailable; Direct PPO remained authorized",
+      "Three launches include one incomplete episode, not three complete independent evaluations"
     ],
-    "request_for_user": "Explicitly authorize this data scope to this DeepSeek destination to continue the same Study",
-    "new_provider_requests_sent": 0,
-    "new_workers_started": 0,
-    "detached_launch_started": false,
-    "foreground_launch_started": false
+    "unresolved": [
+      "Holding-speed violation",
+      "Iteration-limited and failed optimizer outcomes versus model/backend mismatch",
+      "Untested control optimization and PPO routes"
+    ],
+    "scope": "Frozen nominal sampled task only; no robustness, repeatability, continuous-time, hardware, real-time or global optimality claim"
   },
   "store_summary_reference": {
-    "artifact_id": "e86d522190f8ea34e61fb49d49a29091a8b805935a8e14fbee39b985bb46ebf6",
+    "artifact_id": "1c56171175807d2c91b1f911d00d7bc7b7af54ab964a7067a2e01a092f55f0cc",
     "media_type": "application/json"
-  }
+  },
+  "summary_scope": "Compact projection of the immutable Store supervision artifact referenced below; original result bindings, per-channel ranges, receipts and raw evidence remain in that Store/export."
 }
