@@ -208,7 +208,7 @@ def run_search(host,query,key,*,guard,execute,capacity):
                 set_parameter(params,dependent,layout['fixed_total_m']-other)
             if not mixed:
                 checkpoint['proposal_count']+=1
-            if not mixed and any(digest(row['parameters'])==digest(params) for row in rows):
+            if not mixed and any(row['parameters']==params for row in rows):
                 if checkpoint['proposal_count']>128:
                     checkpoint['termination']='duplicate_proposal_limit'
                 persist()

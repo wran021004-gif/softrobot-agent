@@ -84,7 +84,8 @@ def playback_tensions(inp, physics, scene, commands, folder):
     substeps=round(scene['control_period_s']/model.opt.timestep)
     if (u.shape!=(intervals,len(aids)) or not np.isfinite(u).all() or
         np.any(u<limits[:,0]) or np.any(u>limits[:,1]) or
-        substeps!=20 or abs(substeps*model.opt.timestep-scene['control_period_s'])>1e-12):
+        substeps<1 or abs(intervals*scene['control_period_s']-scene['duration_s'])>1e-12 or
+        abs(substeps*model.opt.timestep-scene['control_period_s'])>1e-12):
         raise ValueError('PHYSICAL_PLAYBACK_GRID_OR_TENSION_MISMATCH')
     mujoco.mj_resetData(model,data)
     data.qpos[qi]=scene['qpos_rad'];data.qvel[vi]=scene['qvel_rad_s']

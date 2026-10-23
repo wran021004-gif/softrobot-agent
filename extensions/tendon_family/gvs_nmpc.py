@@ -20,9 +20,9 @@ def workspace_key(task,robot,parameters):
 
 
 def resolve_gvs_nmpc_control(inp,physics):
-    from .gvs_profile import checked_control,control_numerical
+    from .gvs_profile import checked_control,candidate_numerical
     control=checked_control(inp)
-    p=control.recipe;numerical=control_numerical(inp);point=numerical['nominal']
+    p=control.recipe;numerical=candidate_numerical(inp,control);point=numerical['nominal']
     basis=resolve_basis(inp.robot.structure.data,p.basis)
     plan=dict(mode='gvs_nmpc',tension_execution_mode='ideal_tension',
         robot=inp.robot.model_dump(mode='json'),task=inp.task.model_dump(mode='json'),

@@ -4,7 +4,7 @@ import numpy as np
 from typing import Literal
 from pydantic import Field,FiniteFloat
 from schemas.common import Contract
-from schemas.platform import Payload,SessionInput
+from schemas.platform import SessionInput
 from tools.platform_store import plain
 from tools.state_io import digest
 from .contracts import GVSTrajectoryParameters

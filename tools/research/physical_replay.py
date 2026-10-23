@@ -321,7 +321,7 @@ def guided_seed(host,request,key,plan):
     return entry
 
 
-def binding(configuration, trajectory):
+def binding(configuration, trajectory, *, mathematical_outputs=None):
     inp,physics,scene,spec=model_context(configuration)
     timing=inp.task.timing;count=round(timing.duration_s/timing.control_period_s)
     order=[t['entity'] for t in physics['tendons']]
@@ -336,6 +336,13 @@ def binding(configuration, trajectory):
             any(abs(t-k*timing.control_period_s)>1e-12 for k,t in enumerate(trajectory['times_s']))
             or scene['control']['tension_execution_mode']!='ideal_tension'):
         raise ValueError('PHYSICAL_REPLAY_CANDIDATE_TASK_MODEL_OR_SEQUENCE_MISMATCH')
+    if mathematical_outputs is not None:
+        outputs=mathematical_outputs
+        if (outputs['model_identity']!=trajectory['model_identity'] or
+                outputs['times_s']!=trajectory['times_s'] or outputs['samples']!=count+1 or
+                np.asarray(outputs['tip_positions_m']).shape!=(count+1,3) or
+                np.asarray(outputs['tip_velocities_m_s']).shape!=(count+1,3)):
+            raise ValueError('MATHEMATICAL_OUTPUT_BINDING_MISMATCH')
     return inp,physics,scene
 
 
@@ -377,16 +384,12 @@ def dispatch(host,arguments,key):
         raise ValueError('EXPLICIT_CONTROL_SCHEDULE_CAPABILITY_REQUIRED')
     if not (numerically_verified_source(source) or explicit_control_source(source)):
         raise ValueError('VERIFIED_OR_EXPLICIT_DIAGNOSTIC_MATHEMATICAL_SOURCE_REQUIRED')
-    binding(cfg,source['trajectory'])
+    binding(cfg,source['trajectory'],mathematical_outputs=source.get('mathematical_outputs'))
     from tools.research.feedback import experiment_preflight
     novelty=experiment_preflight(host,candidate,'fixed_tension',source_ref=source_ref)
     if not novelty['admitted']:
         raise ValueError('EQUIVALENT_SCIENTIFIC_EXPERIMENT_REQUIRES_EXPLICIT_REPLICATION_GRANT: '
             +json.dumps(novelty,sort_keys=True))
-    outputs=source.get('mathematical_outputs')
-    if outputs is not None and (outputs['model_identity']!=source['trajectory']['model_identity'] or
-            outputs['times_s']!=source['trajectory']['times_s'] or outputs['samples']!=36):
-        raise ValueError('MATHEMATICAL_OUTPUT_BINDING_MISMATCH')
     request=dict(kind='physical_replay',implementation=s['freeze'],study_id=host.run_id,
         store_root=str(host.store.root),request_id=key+'-physical',candidate=candidate,
         source_reference=source_ref,configuration=cfg,trajectory=source['trajectory'])
