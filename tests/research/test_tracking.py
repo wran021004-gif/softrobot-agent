@@ -126,7 +126,9 @@ class TrackingTests(unittest.TestCase):
         rows=analysis_capabilities(cfg,req,self.spec['analysis_protocol'],mathematical_methods={CONIC:True,SENSITIVITY:True})
         self.assertTrue(all(r['status']=='not_applicable' for r in rows))
         self.assertTrue(all(not r.get('full_task_supported',False) for r in rows))
-        self.assertTrue(all(c['expressible'] for r in rows for c in r.get('coverage',[])))
+        for row in rows:
+            for coverage in row.get('coverage', []):
+                self.assertEqual(coverage['expressible'], coverage['constraint_id']=='geometric_path')
 
     def test_pure_math_kernels_do_not_silently_replace_geometry_with_reach(self):
         from tests.research.test_trajectory_feasibility import fixture as affine_fixture

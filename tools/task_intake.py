@@ -487,8 +487,8 @@ def compile_draft(draft, *, trusted_reference=None, reference_label=None, analys
         }.get(draft.intent, ['task family', 'signals', 'independent evaluator'])
         if draft.intent=='tracking' and 'task.tracking' in capabilities['registered_tasks']:
             capabilities['evaluation']['registered_definition']=dict(task='task.tracking',evaluator='evaluate.tracking',
-                scope='Open geometric path up to two segments; no time reference. No automatic mapping of the requested Tracking task.')
-            needs=['reviewed geometric tracking evaluator mapping (N2 remains Reach-only)', 'verified path-following controller/backend execution']
+                scope='Piecewise-linear paths up to two segments: untimed geometric or explicitly timed references. No automatic mapping of the requested Tracking task.')
+            needs=['reviewed tracking evaluator mapping and explicit time semantics (N2 remains Reach-only)', 'verified path-following controller/backend execution']
         capabilities['evaluation']['reasons'] = needs
         diagnostics.append('UNSUPPORTED_TASK: ' + draft.intent + '; requires ' + ', '.join(needs))
         capabilities['mathematics'] = dict(status='not_applicable', reason='No supported task translation; original semantics retained.')

@@ -301,7 +301,7 @@ class CompilationTests(unittest.TestCase):
         self.assertIsNone(self.compile(complete_draft(clauses, intent='reach')).candidate_task)
 
     def test_unsupported_task_compilation_and_implementation_diagnostics(self):
-        for case, expected in [('tracking', 'reviewed geometric tracking evaluator mapping (N2 remains Reach-only)'), ('obstacle', 'collision/distance signals'),
+        for case, expected in [('tracking', 'reviewed tracking evaluator mapping and explicit time semantics (N2 remains Reach-only)'), ('obstacle', 'collision/distance signals'),
                                ('catch', 'contact/capture evaluator'), ('disturbance', 'platform/disturbance signals')]:
             text, proposal = CASES[case]
             draft = parse_response(text, json.dumps(proposal)).draft

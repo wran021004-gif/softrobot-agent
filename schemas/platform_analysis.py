@@ -313,7 +313,11 @@ class PathAnalysisConstraint(TaskAnalysisConstraint):
 
 
 class TaskAnalysisRequirement(Contract):
-    """Frozen context, absolute task sample grid, and physical input semantics."""
+    """Frozen context and sample grid; horizon_semantics distinguishes deadlines.
+
+    Constraints may retain unsupported evaluator conditions alongside solvable
+    proxies. Full requested mathematical coverage is not physical acceptance.
+    """
     contract: Literal['task-analysis-v1'] = 'task-analysis-v1'
     binding: dict
     duration_s: PositiveFloat
@@ -322,7 +326,8 @@ class TaskAnalysisRequirement(Contract):
     constraints: list[TaskAnalysisConstraint | PathAnalysisConstraint] = Field(min_length=1)
     physical_inputs: dict
     required_physics: list[str] = Field(default_factory=list)
-    horizon_semantics: Literal['absolute_task_time_inclusive_samples'] = 'absolute_task_time_inclusive_samples'
+    horizon_semantics: Literal['absolute_task_time_inclusive_samples',
+        'numerical_witness_horizon_inclusive_samples'] = 'absolute_task_time_inclusive_samples'
 
     @model_validator(mode='after')
     def exact_grid(self):

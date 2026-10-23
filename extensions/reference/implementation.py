@@ -74,7 +74,10 @@ def tracking_task(task, reg):
         raise ValueError('TRACKING_REQUIRES_WORLD_METRE_POST_STEP_TIP_SIGNAL')
     if task.environment.contract!='experiment.assembly' or task.initializer.extension_id!='initialize.family':
         raise ValueError('TRACKING_ENVIRONMENT_OR_INITIALIZER_UNSUPPORTED')
-    if any(o.metric not in ('max_position_error','rms_position_error','terminal_position_error','path_coverage_error') or o.units!='m' for o in task.objectives):
+    metrics = {'max_position_error','rms_position_error','terminal_position_error'}
+    if goal.time_requirement == 'none':
+        metrics.add('path_coverage_error')
+    if any(o.metric not in metrics or o.units!='m' for o in task.objectives):
         raise ValueError('TRACKING_METRIC_OR_UNIT_UNAVAILABLE')
     return Empty()
 

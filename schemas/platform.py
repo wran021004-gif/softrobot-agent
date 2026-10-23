@@ -86,6 +86,7 @@ class Timing(Contract):
 
 
 class Objective(Contract):
+    """Optimization preference over an evaluator metric; never a pass threshold."""
     metric: Identifier
     direction: Literal['minimize', 'maximize']
     units: str = Field(min_length=1)
@@ -109,6 +110,7 @@ class Sampling(Contract):
 
 
 class TaskDefinition(Contract):
+    """Reviewed task data; evaluator and frozen protocol own hard acceptance."""
     contract_version: Literal['1.0.0'] = VERSION
     task_id: Identifier
     task_version: str = Field(min_length=1)

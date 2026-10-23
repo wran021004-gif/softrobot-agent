@@ -1,0 +1,67 @@
+{
+  "kind": "offline_task_contract_audit_validation",
+  "date": "2026-10-23",
+  "timezone": "Asia/Shanghai",
+  "branch": "research/s136-task-contracts",
+  "baseline": "4eb740f932d1cd01ece575777c0fcef4bc646880",
+  "remote_checked": {
+    "feat/s132-tracking-task": "4eb740f932d1cd01ece575777c0fcef4bc646880",
+    "integration/s131-f3-task-intake": "8af4ab82337ebcb2fceb6f6ce835f3e29e49d0d3",
+    "fix/s134-research-context": "not returned by git ls-remote at initial audit"
+  },
+  "python": "D:/softrobot-agent/.f3-prestudy-env/Scripts/python.exe",
+  "runs": [
+    {
+      "command": "python -m unittest tests.research.test_s136_task_contracts tests.research.test_tracking tests.research.test_tracking_math tests.research.test_task_analysis_contract tests.research.test_task_intake tests.research.test_task_intake_compile -q",
+      "tests": 77,
+      "passed": 75,
+      "failures": 1,
+      "errors": 1,
+      "unittest_elapsed_s": 25.345,
+      "exit_code": 1,
+      "issues": [
+        {
+          "test": "tests.research.test_task_intake_compile.CompilationTests.test_unsupported_task_compilation_and_implementation_diagnostics",
+          "reason": "Old geometric-only capability-description assertion no longer matches the corrected timed/untimed description",
+          "resolution": "Updated expected description without changing unsupported status or executable boundary"
+        },
+        {
+          "test": "tests.research.test_task_analysis_contract.TaskAnalysisTests.test_new_worker_failure_is_scoped_and_charged_once",
+          "reason": "ModuleNotFoundError: test_mainline (existing unqualified test import)",
+          "resolution": "Rerun with PYTHONPATH=.;tests/research; no production workaround"
+        }
+      ],
+      "warning": "Existing capability_sensitivity.py CLARABEL dual-face fixture emitted Solution may be inaccurate; numerical qualification tests passed"
+    },
+    {
+      "environment": {"PYTHONPATH": ".;tests/research"},
+      "command": "python -m unittest tests.research.test_task_analysis_contract.TaskAnalysisTests.test_new_worker_failure_is_scoped_and_charged_once tests.research.test_task_intake_compile.CompilationTests.test_unsupported_task_compilation_and_implementation_diagnostics tests.research.test_s131_closeout -q",
+      "tests": 4,
+      "passed": 4,
+      "failures": 0,
+      "errors": 0,
+      "unittest_elapsed_s": 1.865,
+      "exit_code": 0
+    }
+  ],
+  "final_distinct_tests_passed": 79,
+  "new_contract_tests": 7,
+  "counting_note": "75 passed initially, 2 previously failing/error tests passed on targeted rerun, 2 additional saved F3 closeout tests passed. This is not a single 79-test run.",
+  "scope": [
+    "Synthetic saved polylines and timed position signals",
+    "Synthetic affine SOCP/T2 fixtures; no robot control optimization",
+    "Existing local GVS initial linearization diagnostic in task-analysis contract suite",
+    "Mocked provider/worker boundaries and temporary fixture Store",
+    "Read-only F3 exported artifacts and saved acceptance"
+  ],
+  "not_performed": [
+    "New formal Study",
+    "Real LLM Provider request",
+    "MuJoCo or MATLAB execution",
+    "NMPC rollout or PPO training",
+    "F3 task/data/acceptance migration",
+    "S134 worktree modifications",
+    "Remote push"
+  ],
+  "interpretation": "Contract and regression verification only; no new scientific performance, feasibility, hardware or physical acceptance evidence"
+}

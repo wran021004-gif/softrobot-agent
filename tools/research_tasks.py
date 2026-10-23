@@ -67,6 +67,22 @@ class ResearchTaskAdapter:
             else:
                 constraints=[dict(constraint_id='geometric_path',signal=signal,indices=list(range(last+1)),kind='path_bound',
                     path_vertices_m=task['goal']['data']['vertices_m'],reference=[],radius=radius,provenance=provenance)]
+                # Sampled free progress is a proxy, not the saved-polyline evaluator.
+                # Retain every independent acceptance condition in the existing
+                # unsupported contract so downstream coverage cannot omit it.
+                for name, meaning in (
+                        ('tracking_max_error', 'Maximum reference-path distance over measured vertices and arc-length samples'),
+                        ('path_coverage', 'Maximum measured-polyline distance over reference arc-length samples and vertices'),
+                        ('path_start', 'Distance from first measured position to first reference vertex'),
+                        ('path_end', 'Distance from last measured position to last reference vertex'),
+                        ('path_progress_regression', 'Maximum running-maximum minus current nearest-path arc-length progress')):
+                    constraints.append(dict(constraint_id=name, signal=signal, indices=list(range(last+1)),
+                        kind='unsupported', reference=[[0.]*signal['dimension'] for _ in range(last+1)],
+                        provenance=provenance, unsupported_requirement=dict(
+                            evaluator=task['evaluator'], condition=name, meaning=meaning,
+                            limit=radius, units='m', goal=task['goal'],
+                            scope='Complete saved polyline; indices mark the numerical witness grid, not an arrival deadline',
+                            reason='path_bound does not independently evaluate this saved-polyline condition')))
         elif task['family'] != 'task.reach':
             constraints = [dict(constraint_id='unsupported_task', signal=signal, indices=[last],
                 kind='unsupported', reference=[[0.]*signal['dimension']], provenance=['/task'],
@@ -89,6 +105,9 @@ class ResearchTaskAdapter:
             **({'task_family':'task.tracking'} if task['family']=='task.tracking' else {}), 'task_identity':digest(task),
             'effective_configuration_identity':digest(cfg), 'task_id':task['task_id'], 'task_version':task['task_version']},
             duration_s=duration, sample_period_s=period, time_grid_s=[i*period for i in range(last+1)], constraints=constraints,
+            horizon_semantics=('numerical_witness_horizon_inclusive_samples'
+                if task['family']=='task.tracking' and task['goal']['data']['time_requirement']=='none'
+                else 'absolute_task_time_inclusive_samples'),
             physical_inputs=dict(signal='tendon_tension', units='N', frame='tendon_path', phase='pre_step',
                 control_period_s=task['timing']['control_period_s'], tendon_order=[t['id'] for t in tendons],
                 lower=[0.]*len(tendons), upper=[t['force_limit_n'] for t in tendons],
