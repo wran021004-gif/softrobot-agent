@@ -124,6 +124,80 @@ class MainlineTests(unittest.TestCase):
         self.assertIn('held input',metadata['held_position_min_eigenvalue']['supported_interpretation'])
         self.assertIn('damping margin or decay rate',metadata['held_position_min_eigenvalue']['unsupported_conclusions'])
 
+    def orphan_fixture(self):
+        owner='orphan-fixture';folder=self.host.store.root/'executions'/owner
+        folder.mkdir(parents=True)
+        cfg={**self.cfg,'run_id':owner}
+        self.host.store.create_session(dict(input=cfg,parent_run_id=self.host.run_id))
+        self.host.store.reserve(owner,'complete-simulation','fixture',self.host.actor,{**zero(),'backend_solves':1})
+        update(self.host,pending=dict(owner=owner,configuration=cfg,candidate=self.candidate,
+            launch_intent=True,started_unix=time.time()-5))
+        command='python -m tools.research.execution_worker '+str(folder/'request.json')
+        inventory=dict(captured_unix=time.time(),processes=[dict(ProcessId=123,ParentProcessId=122,CommandLine=command)])
+        return folder,inventory
+
+    def test_unknown_orphan_without_proof_remains_blocked(self):
+        self.orphan_fixture();before=self.host.store.remaining()
+        with patch('tools.service_execution._run_contained') as worker:
+            with self.assertRaisesRegex(ValueError,'UNKNOWN_WORKER_TERMINATION'):
+                core.finish_execution(self.host,recovery=True)
+            worker.assert_not_called()
+        self.assertEqual(before,self.host.store.remaining())
+        self.assertIsNotNone(state(self.host)['pending'])
+
+    def test_orphan_inventory_must_bind_original_worker_request(self):
+        from tools.research.execution import record_orphan_exit
+        folder,inventory=self.orphan_fixture();inventory['processes'][0]['CommandLine']='python unrelated.py'
+        ref=save(self.host,inventory)
+        with patch('tools.service_execution.process_exit_observation') as probe:
+            with self.assertRaisesRegex(ValueError,'ORIGINAL_WORKER_IDENTITY_REQUIRED'):
+                record_orphan_exit(self.host,ref)
+            probe.assert_not_called()
+        self.assertFalse((folder/'recovery_boundary.json').exists())
+
+    def test_live_or_inaccessible_orphan_cannot_be_settled(self):
+        from tools.research.execution import record_orphan_exit
+        folder,inventory=self.orphan_fixture();ref=save(self.host,inventory)
+        for message in ('PROCESS_STILL_PRESENT_OR_PID_REUSED','PROCESS_EXIT_UNCONFIRMED'):
+            with patch('tools.service_execution.process_exit_observation',side_effect=ValueError(message)):
+                with self.assertRaisesRegex(ValueError,message):record_orphan_exit(self.host,ref)
+            self.assertFalse((folder/'recovery_boundary.json').exists())
+
+    def test_verified_orphan_exit_is_idempotent_and_preserves_reserved_counts(self):
+        from tools.research.execution import record_orphan_exit
+        folder,inventory=self.orphan_fixture();ref=save(self.host,inventory);before=self.host.store.remaining()
+        with patch('tools.service_execution.process_exit_observation',return_value=dict(pid=123,exited=True)) as probe:
+            first=record_orphan_exit(self.host,ref);second=record_orphan_exit(self.host,ref)
+            self.assertEqual(probe.call_count,1)
+        self.assertEqual(first,second)
+        self.assertIsNone(first['returncode'])
+        self.assertIn('upper bound',first['elapsed_semantics'])
+        self.assertFalse((folder/'boundary.json').exists())
+        self.assertEqual(before,self.host.store.remaining())
+        self.assertIsNone(self.host.store.lookup('orphan-fixture','complete-simulation')['receipt'])
+
+    def test_confirmed_orphan_seals_incomplete_without_relaunch_or_budget_reset(self):
+        from tools.research.execution import record_orphan_exit
+        folder,inventory=self.orphan_fixture();s=state(self.host)
+        candidate=self.host.store.artifact(self.candidate);candidate['evaluation_version']=1
+        ref=save(self.host,candidate)
+        update(self.host,freeze='offline_fixture',nmpc_launches=1,
+            profile={**s['profile'],'science_hashes':{}},results=[],
+            pending={**s['pending'],'candidate':ref,'profile_identity':'fixture','role':'development',
+                'selected_execution':None,'operation_key':'orphan-operation','reserved_s':0.})
+        with patch('tools.service_execution.process_exit_observation',return_value=dict(pid=123,exited=True)):
+            record_orphan_exit(self.host,save(self.host,inventory))
+        with patch('tools.service_execution._run_contained') as worker:
+            result=core.finish_execution(self.host,recovery=True)
+            again=core.recover(self.host)
+            worker.assert_not_called()
+        self.assertEqual(result['status'],'execution_incomplete')
+        self.assertIsNone(result['acceptance'])
+        self.assertIsNone(state(self.host)['pending'])
+        self.assertEqual(state(self.host)['nmpc_launches'],1)
+        self.assertEqual(self.host.store.remaining()['used']['backend_solves'],1)
+        self.assertIsNone(again['execution'])
+
     def test_disabled_time_and_environment(self):
         runtime=self.spec['runtime']
         update(self.host,rl_runs={},spec=self.spec,numerical_s=1e12)

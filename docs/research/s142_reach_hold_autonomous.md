@@ -166,3 +166,29 @@ Provider 状态、两条未封存操作、预算及部分记录统计；没有�
 
 配置提交为 `b08d1724b`；实际必要修复为 `3fd6ff030`、`c3aeacbf4`，均普通 push 至指定 S142 分支。
 最终文档/摘要由本报告所在提交交付。未修改 main、科研主线、S137–S141 或旧 Study，未 force push。
+
+## 同一 Study 恢复修复（2026-10-23 20:32 后）
+
+用户追加要求查清阻塞并恢复本次真实验证。进一步找到原 18:44:11 的监督工具输出，
+包含原主进程 44716/49552、worker launcher 125484 及实际 worker 126044 与本次 request.json
+的精确命令行；该原始输出已保存进原 Store，未凭记忆填写 PID。
+Windows OpenProcess 对这四个原 PID 均返回 ERROR_INVALID_PARAMETER (87)，即当前不存在；
+权限错误和 PID 仍存活/复用都不会被接受为退出。原 worker 在进入 complete-simulation 前
+已经安装 kill-on-close Job，因此确认实际 worker 退出可确认其受控子树不再继续科学执行。
+
+本地 Codex 日志显示原服务 PID 49904 的最后记录为 19:50:55，原物理更新最后写入为
+19:50:56.785；19:52:16 会话在新服务 PID 784840 中恢复，Windows 没有在该时段重启。
+这支持终端宿主链路更换/退出的解释；没有原退出码，不能进一步断言关闭来源。
+缺口是原父进程退出后无法写完成边界，而不是 Provider 未确认发送或数学不可行。
+
+最小修复保留原 recover/Store/receipt：增加仅可信 Operator SDK 可调用的 orphan 结算入口，
+要求原 worker 命令与当前 pending request 绑定、原 simulation 确已启动且未封存、
+原监督中所有进程经原生句柄核验已退出。缺身份、存活、PID 复用、权限不足仍保留阻塞。
+新 `recovery_boundary.json` 明确为事后监督确认，原 `boundary.json` 保持缺失；退出码仍未知，
+wall-time 按截至核验时的保守上界计入并明确标注，不伪造精确退出时刻。
+后续 worker 启动在既有目录持久化已有 Job 名和启动 PID，未新增调度器或 ID 系统。
+
+5 项新增定向回归通过，含完整 recover 封存路径、无重启、无计数重置和幂等核验。
+原 synthetic-worker 集成测试在冻结 `.mainline5-env` 下通过；最初用 `.s135-env` 被原解释器
+一致性检查拒绝，未放松该检查。旧执行只能恢复为 execution_incomplete；没有完整 MuJoCo
+状态 checkpoint，不能从第 33 步原位续算。恢复后下一科学动作仍交由主 Agent 在原额度内选择。
