@@ -39,18 +39,20 @@ def prepare():
             control['settling']=None
             control['recipe'].update(reference_mode='free_progress',velocity_weight=0.,
                 terminal_velocity_weight=0.,terminal_tip_speed_weight=0.,holding_tip_speed_weight=0.,
-                path_lookahead_m=.003,path_capture_m=.001,progress_weight=.1,regression_weight=1.)
+                path_lookahead_m=.003,path_capture_m=.001,progress_weight=.1,regression_weight=1.,
+                horizon=4,max_iterations=12)
         bindings={name:'1.0.0' for name in ('simulation.run','evaluation.run','control.profile_report')}
         cfg['policy'].update(allowed_tools=[],tool_bindings=bindings,
             operation_allowances={name:dict(timeout_s=None,reserve_s=None) for name in bindings},
             budget=dict(model_calls=0,tool_calls=3,backend_solves=1,worker_calls=0,wall_s=None),timeout_s=None)
         path=OUT/(kind+'_input.json')
-        if path.exists():
-            if read(path)!=cfg:raise ValueError('Preserve original S135 development input')
-        else:atomic_json(path,cfg)
+        if path.exists() and read(path)!=cfg and (RUNS/kind).exists():
+            raise ValueError('Preserve attempted S135 development input')
+        if not path.exists() or read(path)!=cfg:atomic_json(path,cfg)
         checks[kind]=compile_input(cfg)['approval']
     atomic_json(OUT/'review.json',dict(authorization='S135 user attachment: at most one Reach and one Tracking development execution',
         task_review='Original S132 draft retained. Copy has named zero initial state for this existing candidate; geometry, tolerances, reference ordering and time-free semantics unchanged.',
+        controller_review='Reach retains original recipe. Before any Tracking execution, select horizon=4 and max_iterations=12 for bounded development work; no success threshold changes.',
         approval=checks,provider_calls=0,ppo_training=False,formal_study=False))
     print(json.dumps(checks))
 
