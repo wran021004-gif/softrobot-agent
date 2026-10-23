@@ -1,0 +1,126 @@
+{
+  "date": "2026-10-23",
+  "timezone": "Asia/Shanghai",
+  "implementation_commit": "d2cbdaa81c6b8970cc3e775b16f45cd765214863",
+  "branch": "mainline/softarm-codesign",
+  "unique_tests_final_passed": 61,
+  "new_integration_tests": 3,
+  "targeted_batches": [
+    {
+      "modules": [
+        "tests.research.test_s137_task_runtime",
+        "tests.research.test_s138_research",
+        "tests.research.test_s139_execution"
+      ],
+      "tests": 26,
+      "elapsed_s": 11.322,
+      "final_status": "passed"
+    },
+    {
+      "modules": [
+        "tests.research.test_codesign_integration",
+        "tests.research.test_s135_control",
+        "tests.research.test_s127_math_admission",
+        "tests.research.test_mixed_search.MixedSearchTests.test_feedback_lineage_conditional_coordinates_and_reuse",
+        "tests.research.test_mixed_search.MixedSearchTests.test_pending_checkpoint_recovery_reuses_sealed_analysis",
+        "tests.research.test_mixed_search.MixedSearchTests.test_invalid_attempts_and_failed_math_keep_cost_and_bounds"
+      ],
+      "tests": 14,
+      "elapsed_s": 55.164,
+      "final_status": "12 passed; two gymnasium import errors repaired in next batch"
+    },
+    {
+      "modules": [
+        "tests.research.test_s135_control.ControlTests.test_reward_components_and_saved_stage_configuration",
+        "tests.research.test_s135_control.ControlTests.test_rl_observation_and_direct_residual_mapping_without_physical_steps",
+        "tests.research.test_s139_execution",
+        "tests.research.test_tracking_math",
+        "tests.research.test_task_analysis_contract"
+      ],
+      "tests": 30,
+      "elapsed_s": 11.058,
+      "final_status": "passed"
+    }
+  ],
+  "known_baseline_reproduction": {
+    "tests": 3,
+    "elapsed_s": 3.064,
+    "unchanged_failures": {
+      "tests.research.test_mixed_search.MixedSearchTests.test_recorded_exact_six_segment_failure_never_reprobes": "runtime_unresolved != runtime_unavailable",
+      "tests.research.test_mixed_search.MixedSearchTests.test_screening_synthetic_pass_cannot_close_or_select": "EXECUTION_REQUIRES_CALIBRATED_NUMERICAL_ENVIRONMENT_BEFORE_INTERPRETER_START",
+      "tests.research.test_mixed_search.MixedSearchTests.test_search_contract_and_legacy_identities": "Configuration hash c0d723845a40108e3478ce6b7a7af92008003d415e41d888f0857bcaaf3a19b8 != historical expected 31af3e097ad29fef1ffd74c5178a6267fc5ffe35889c63e98f531dd42c0df69e"
+    }
+  },
+  "setup_corrections": [
+    "Created ignored runs directory for existing fixtures",
+    "Corrected test_s137_runtime command to test_s137_task_runtime",
+    "Reused installed S135 composite environment for gymnasium tests; no installations"
+  ],
+  "environments": {
+    "research_python": "D:/softrobot-agent/.f3-prestudy-env/Scripts/python.exe",
+    "combined_python": "D:/softrobot-agent/.worktrees/s135-task-conditioned-control/.s135-env/Scripts/python.exe",
+    "lightweight_python": "D:/softrobot-agent/.rl-pilot-env/Scripts/python.exe",
+    "PYTHONPATH": ".;tests/research",
+    "OPENBLAS_NUM_THREADS": "1",
+    "OMP_NUM_THREADS": "1"
+  },
+  "numerical_checks": {
+    "real_generated_gvs_models": [
+      "constant",
+      "free_progress",
+      "timed"
+    ],
+    "real_offline_ipopt": [
+      "constant",
+      "free_progress",
+      "timed"
+    ],
+    "offline_horizon": 2,
+    "offline_substeps": 1,
+    "offline_max_iterations": 3,
+    "scope": "Interface/cost/model consistency, not convergence or task feasibility"
+  },
+  "new_physics": {
+    "launches": 2,
+    "launch_limit": 3,
+    "nmpc_launches": 1,
+    "nmpc_launch_limit": 2,
+    "steps": 800,
+    "fixed_tension_steps": 400,
+    "closed_loop_steps": 400,
+    "complete": true,
+    "tracking_updates": 20,
+    "complete_plan_records": 20,
+    "raw_solver_statuses": {
+      "Maximum_Iterations_Exceeded": 20
+    },
+    "solver_errors": 0,
+    "force_bound_violation_n": 0.0,
+    "tracking_simulation_wall_s": 149.125,
+    "original_task_robot_and_control_unchanged": true,
+    "tracking_saved_positions_identical_to_s135": true,
+    "independent_archive_reevaluation": "metrics and acceptance components agree; valid_failure",
+    "unused_physical_launches": 1,
+    "unused_nmpc_launches": 1,
+    "automatic_retries": 0
+  },
+  "excluded_execution": {
+    "provider_calls": 0,
+    "ppo_training": 0,
+    "formal_studies": 0,
+    "matlab_calls": 0,
+    "hardware": 0
+  },
+  "evidence": {
+    "historical": "historical_recheck.json",
+    "light_rl": "rl_light_reset.json",
+    "fixed_tension": "fixed_tension_evidence.zip",
+    "tracking": "tracking_evidence.zip",
+    "driver_sources": "validation_drivers.zip"
+  },
+  "limitations": [
+    "Three documented old mixed-search failures remain",
+    "Existing CLARABEL synthetic sensitivity warning does not establish strict optimality",
+    "20 feasible returned plans are iteration-limited, not converged; no task success or structure benefit demonstrated"
+  ]
+}

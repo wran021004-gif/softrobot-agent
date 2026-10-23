@@ -1,5 +1,20 @@
 # Runtime and module ownership
 
+## Codesign integration (2026-10-23)
+
+The current baseline is [mainline/softarm-codesign](softarm_codesign_mainline.md).
+`tools/state_io.effective_input` extracts saved envelopes without heavy imports;
+`config.effective_input` keeps the historical import as an alias. `config.resolve`
+alone composes new source configurations. Existing studies consume frozen inputs.
+`research_tasks` owns derived conditions, mathematical/evaluator bindings and
+execution requirements. `task_constraints`, `analysis` and `search` consume those
+views, preserve method coverage and account for actual internal solver costs.
+`generated_serial.checked_control(execution=False)` prepares mathematical inputs
+without physical admission; its default execution mode retains route checks.
+`gvs_profile` exposes thin compatibility aliases and one numerical preparation.
+`scene.assemble_physical` owns task-independent physics; `scene.assemble` binds
+control references. Backend measurements and registered evaluators remain separate.
+
 ## S5.5 and S5-T preparation (2026-10-17)
 
 `feedback.py` compares effective experiment configurations before expensive
@@ -33,8 +48,8 @@ candidate binding, complete-solve and replay settlement.
 `extensions/tendon_family/backends.playback_tensions` applies an exact fixed
 SI tension schedule in the existing candidate MuJoCo compiler. The narrow
 `tools/research/physical_replay.py` reserves one backend launch, validates
-candidate/model/task/order/grid, settles the raw 36 samples, and calls the
-registered reach evaluator plus shared acceptance assembler. `core.packet` and
+candidate/model/task/order/grid, settles the task-derived sample grid, and calls the
+task's registered evaluator plus shared acceptance assembler. `core.packet` and
 `state.readable_results` expose the result through the original Store.
 
 `tools/research/rl.py` admits a sealed same-candidate mathematical tension

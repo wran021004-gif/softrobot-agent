@@ -1,5 +1,10 @@
 # Research mainline
 
+The recommended common baseline is `mainline/softarm-codesign`; see its
+[integration, validation and next-Study guidance](softarm_codesign_mainline.md).
+The historical runs below retain their frozen configurations and evidence.
+The engineering validation in that report did not start a formal Study.
+
 ## S5.10 reference validation and control correction (2026-10-19)
 
 The [delivery](sorosim_s510_delivery.md) records 192 unique complete MuJoCo
