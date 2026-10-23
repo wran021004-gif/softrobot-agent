@@ -1,0 +1,208 @@
+{
+  "study_id": "s142-reach-hold-coldstart-20261023",
+  "conclusion": "engineering_blocked_unresolved_execution",
+  "formal_store_status": "ready",
+  "pending_retained": true,
+  "baseline": "4de5d5d475755578653e9cca8febe395adeb8764",
+  "implementation": "c3aeacbf4e4b901fcce48d492d5a4f66d28db782",
+  "resolved_identity": "034d2cac74141856fbe4a8fe051c284d8b608f26e0f32c2e9386da34a0762a4f",
+  "authorization": {
+    "artifact_id": "03091d72fac5866287e14b4f022594ab2d07d74409c910565208ec5556389337",
+    "media_type": "application/json"
+  },
+  "candidate": {
+    "artifact_id": "248d2a32d721c673bd3f7e11fe22793635b4b2915f931609ef2ad3dcf9b26c33",
+    "media_type": "application/json"
+  },
+  "execution_owner": "s142-reach-hold-coldstart-20261023-exec-ab2e3bebfda74387",
+  "unsealed_calls": [
+    {
+      "run_id": "s142-reach-hold-coldstart-20261023",
+      "request_id": "native-call_00_VsLbTpBrSUux2sbGxCmT7221",
+      "caller": "unified-research",
+      "status": "running",
+      "execution_id": "508bad42dc5d4316a2405ec0ecf4622f"
+    },
+    {
+      "run_id": "s142-reach-hold-coldstart-20261023-exec-ab2e3bebfda74387",
+      "request_id": "complete-simulation",
+      "caller": "unified-research",
+      "status": "running",
+      "execution_id": "83167c03af65492e8b3c1b56758c7aa5"
+    }
+  ],
+  "ledger": {
+    "limit": {
+      "backend_solves": 8,
+      "model_calls": 36,
+      "tool_calls": 160,
+      "wall_s": null,
+      "worker_calls": 0
+    },
+    "used": {
+      "tool_calls": 9,
+      "model_calls": 5,
+      "backend_solves": 1,
+      "worker_calls": 0,
+      "wall_s": 43.00099999993108
+    },
+    "remaining": {
+      "backend_solves": 7,
+      "model_calls": 31,
+      "tool_calls": 151,
+      "wall_s": null,
+      "worker_calls": 0
+    },
+    "occupied": {}
+  },
+  "counts": {
+    "provider_requests": 5,
+    "provider_complete_http_200": 5,
+    "provider_unconsumed": null,
+    "public_operations_used": 9,
+    "physical_launches": 1,
+    "nmpc_launches": 1,
+    "completed_physical_evaluations": 0,
+    "mathematical_evaluations": 0,
+    "local_solves": 0,
+    "ppo_stages": 0,
+    "ppo_actions": 0,
+    "rl_evaluations": 0,
+    "extra_confirmations": 0
+  },
+  "partial_control": {
+    "completed_updates": 32,
+    "required_updates": 35,
+    "last_recorded_pre_step_time_s": 0.31,
+    "usable_plans": 32,
+    "solver_errors": 0,
+    "raw_statuses": {
+      "Maximum_Iterations_Exceeded": 32
+    },
+    "iteration_ceiling": 120,
+    "commanded_min_n": 0.13180100032139394,
+    "commanded_max_n": 7.726616100430531,
+    "full_independent_force_acceptance": "unmeasured",
+    "complete_update_records": 32,
+    "reported_complete_update_wall_s": 4038.867769200355,
+    "time_cost_warning": "Simulation receipt unsealed; ledger wall_s is not full physical work. Recorded partial timings do not include unfinished solve or certify its termination."
+  },
+  "frozen_acceptance": {
+    "terminal_limit_m": 0.01,
+    "holding_position_limit_m": 0.01,
+    "holding_speed_limit_m_s": 0.02,
+    "duration_s": 0.35,
+    "holding_window_s": [
+      0.3,
+      0.35
+    ]
+  },
+  "final_metrics": {
+    "terminal_error_m": null,
+    "holding_max_error_m": null,
+    "holding_max_speed_m_s": null,
+    "combined_acceptance": null
+  },
+  "recovery": {
+    "command": "python -m tools.research recover --run-id s142-reach-hold-coldstart-20261023",
+    "result": "UNKNOWN_WORKER_TERMINATION_RETAINS_PENDING_RESERVATION; NO_RELAUNCH",
+    "process_inventory": "Elevated Win32_Process query returned no command lines matching this Study at supervision; this is not a durable original worker-tree termination acknowledgment.",
+    "boundary_missing": true,
+    "result_missing": true,
+    "relaunched": false,
+    "second_study": false
+  },
+  "evidence": {
+    "partial_files_manifest": {
+      "artifact_id": "6c199a9c842c4a7d6c571a9219d52435b7e11d1b7a67aa2195616878cf24d9cc",
+      "media_type": "application/json"
+    },
+    "provider_requests": [
+      {
+        "request_id": "r3-request-8d375b8ed2334187b31d9991a429b75a",
+        "response": {
+          "artifact_id": "f800d8bf12bf8370aa9268d382d552b9e380bfc06aa54895927d3ceb2b50fa0b",
+          "media_type": "application/octet-stream"
+        },
+        "outcome_unknown": false
+      },
+      {
+        "request_id": "r3-request-bcd3e83d38304a5989ee32c827682014",
+        "response": {
+          "artifact_id": "820ec87bd4835a4cdfe6f0b3453e02b09179f60b22401c5e86201a7c720a20d7",
+          "media_type": "application/octet-stream"
+        },
+        "outcome_unknown": false
+      },
+      {
+        "request_id": "r3-request-fdd5bfaff94b4f90a160b31fd21e405a",
+        "response": {
+          "artifact_id": "94e9121bc5821aa1bce8a4ba9652eff82a4b4dbab9cba07fbccad719ab97de38",
+          "media_type": "application/octet-stream"
+        },
+        "outcome_unknown": false
+      },
+      {
+        "request_id": "r3-request-831844ca9bff4afa90efc50390db9d28",
+        "response": {
+          "artifact_id": "ce08c327df346117693890ba22925b2fea51446f91de55caaeda49471908b8d6",
+          "media_type": "application/octet-stream"
+        },
+        "outcome_unknown": false
+      },
+      {
+        "request_id": "r3-request-ba4de278e2db45f1b5c9b99d027998a8",
+        "response": {
+          "artifact_id": "f72f24b007a4b11b222b0040aaeaf2f61bb67edc1f25542628861eb9a7948a8c",
+          "media_type": "application/octet-stream"
+        },
+        "outcome_unknown": false
+      }
+    ]
+  },
+  "scientific_assessment": {
+    "engineering_chain": "partial; preflight and real worker succeeded, recovery remains blocked",
+    "autonomous_decisions": "real Provider multi-step retrieval, falsifiable hypothesis and autonomous NMPC selection observed",
+    "mathematical_tools": "not used; grants and costs visible, scientific use not evaluated",
+    "physical_success": "not established; incomplete execution and no independent evaluator result",
+    "feedback_adaptation": "not evaluated; first physical result never delivered to Agent",
+    "structure_change": false,
+    "structural_gain": "not established"
+  },
+  "first_scientific_decision": {
+    "reference": {
+      "artifact_id": "ab52e18345db9608254f71e8934c8af8f6fbe24b93c85811b25b7cfc7a944095",
+      "media_type": "application/json"
+    },
+    "action": "execute",
+    "candidate": {
+      "artifact_id": "248d2a32d721c673bd3f7e11fe22793635b4b2915f931609ef2ad3dcf9b26c33",
+      "media_type": "application/json"
+    },
+    "hypothesis_id": "h1-default-nmpc-vs-geometric-reach-shortfall",
+    "hypothesis": "With the preflight-validated default GVS/NMPC recipe the candidate reaches the frozen target and holds it. Competing prediction from frozen geometry: base-relative target distance is sqrt(0.29^2+0.035^2+0.04^2) = 0.2948 m, while the maximum straight-chain length is 0.16 near + 0.012 connector offset + 0.11 distal = 0.282 m, so terminal error is floored near 0.013 m above the 0.01 m tolerance and the failure is geometric rather than a tuning failure.",
+    "expected_observation": "A complete NMPC closed-loop MuJoCo execution on candidate 248d2a32 reporting terminal_error_m, holding_max_error_m, holding_max_speed_m_s, tendon force-limit status and numerical-validity fields. If the geometric prediction dominates, terminal error saturates near 0.01-0.02 m with the tip pressed toward maximum reach along +x and holding speed low; if the default recipe is adequate, all three metrics fall inside 0.01 m / 0.01 m / 0.02 m/s.",
+    "selected_method": "nmpc"
+  },
+  "partial_observation": {
+    "time_s": 0.31,
+    "phase": "current_state_before_integration",
+    "tip_m": [
+      0.2889602794004258,
+      0.03619197533342442,
+      0.1926020420737153
+    ],
+    "distance_to_target_m": 0.0030450693052959956,
+    "scope": "Saved pre-step observation only; no terminal or complete holding-window acceptance.",
+    "initial_geometric_floor_hypothesis_supported": false,
+    "agent_received_completed_physical_feedback": false
+  },
+  "previous_store_summary_reference": {
+    "artifact_id": "069cbeafa2266244d6408a23cd96dfa1a81febf321e45577f4ca580515250b75",
+    "media_type": "application/json"
+  },
+  "store_summary_reference": {
+    "artifact_id": "73cd4ce6707703470cc04a21f89ecdc9a29cc6816542a7b2e78e49b944fa7e56",
+    "media_type": "application/json"
+  }
+}
