@@ -1,5 +1,7 @@
 # Formal F3 autonomous study
 
+已复核的当前状态：本 Study 于北京时间 **2026-10-23 05:09:59** 取得首次完整原任务仿真通过，由主 Agent 公开读取验收并选择，随后按冻结规则封存。HTTP 200 表示请求成功；接续后的保存响应均为合法 JSON，相关调用全部结算，没有因 HTTP 200 中断。原始采样回读确认终点误差 **9.245 mm < 10 mm**、保持段最大误差 **9.772 mm < 10 mm**、保持段最大速度 **19.134 mm/s < 20 mm/s**，6 个保持段采样点覆盖完整，700 个物理步执行完成。最终 Provider **63/128**、物理调用 **27/80**，预算未重置。按原授权，首次通过后停止探索；单次仿真通过未证明重复性、鲁棒性或硬件表现。详见 [HTTP 200 与正常结束调查](../../evidence/f3_formal/feedback_repair_20261023/http200_investigation.json) 和 [前序修复与真实接续记录](f3_feedback_repair.md)。完整原始 Store/SDK 归档保留在本机；本次远端更新仅含摘要、检查脚本和证据引用。
+
 One bounded Study `f3-autonomous-20261022-01` has legally terminated with status `accepted_solution`. Original-task acceptance: **True**. The autonomous Agent selected the scientific actions; Codex handled engineering admission and evidence supervision.
 
 Executed branch: `integration/f3-prestudy`. Current explicit implementation binding: `55d1b9880e3c13102bef7b3306f1c95eab5eeaf8`. Resolved Study identity: `2a0d8fb3770769d143005c6e7abf36ed70de94604f02f00422629d13ee0d059b`. Initial scientific execution baseline: `8269178b9cc3824b6ee3b4fc13dfb8c224405fa9`. Explicit core migrations are retained in the audit; old results and costs preserve their original provenance. Report commits do not migrate the binding.

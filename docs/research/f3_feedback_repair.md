@@ -43,3 +43,7 @@
 真实请求反馈边界准入已通过，`live_admitted=true`。恢复后的真实工具反馈边界完成 v3 prepare、独立 SDK 恢复验证和原子提交，当时累计 Provider 48 次；其后的新会话请求返回 HTTP 200，正文为 209,579 字节。请求明确携带研究意图、原预算、候选版本绑定、证据修正与正式数学授权；原 invocation 为 suspended，`invocation_completed=false`，没有伪造自然返回。详见 [实际接续证明](../../evidence/f3_formal/feedback_repair_20261023/live_resume_verification.json)。
 
 该证明记录时 Provider 52/128、物理调用 8/80、NMPC 5/6。主 CLI 与每 10 秒检查的监督进程均存活，心跳为 `runs/f3-formal-supervision.json`。运行将继续消耗同一个原始账本；证明中的数字为采样时点，不是最终用量。T2 当前还需新实施版本下的合法候选与完整绑定模型组；方法授权继续有效。未声明获得完整任务通过结果。
+
+## 后续完成与 HTTP 200 调查
+
+上述运行随后于北京时间 2026-10-23 05:09:59 取得首次完整原任务仿真通过，并按原冻结规则完成公开验收读取、选择和封存。最终 Provider 63/128、物理调用 27/80，NMPC 5/6。HTTP 200 是成功状态；接续后已保存的响应均可解析、finish_reason 完整、回执结算，没有 HTTP 故障。对原始 36 个轨迹样本、6 个保持段样本和四通道实际张力的只读复核与原验收一致，未新增模型请求或物理执行。当前 `phase=complete, status=stopped` 是正常结束，已无后台运行需求。详见 [调查回执](../../evidence/f3_formal/feedback_repair_20261023/http200_investigation.json)。
