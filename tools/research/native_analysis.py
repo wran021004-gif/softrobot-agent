@@ -13,9 +13,11 @@ from tools.research.design import parameter_value, set_parameter
 def decision_summary(value):
     """One projection of recorded native facts for existing tool/Card/L0 views."""
     summary=deepcopy(value['native_analysis']);raw=value['native_dynamics']
+    if value.get('control_schedule_reference'):summary['control_schedule_reference']=value['control_schedule_reference']
     summary['question']={
         'native_dynamics_v1':'Which native forces and drive directions determine acceleration at this state?',
         'short_input_response_v1':'How do legal tensions affect the short endpoint, and does one local correction improve its constraints?',
+        'mujoco_direct_control_v1':'Can bounded native sequence optimization improve every holding sample before independent full replay?',
         'fixed_input_structure_v1':'How does a legal parameter change mechanics, function and short endpoint constraints at fixed input?'}[value['operation']]
     if value['operation']=='native_dynamics_v1':
         mechanics=raw['mechanics'];names={q['name'] for q in summary['quantities']}
@@ -87,6 +89,9 @@ def applicability(requirements, query, assessed, point):
     horizon=0. if query.operation=='native_dynamics_v1' else query.native.horizon_s
     if query.operating_point!='saved_state' or not (point.get('integration_state') or point.get('native_replay')):
         reasons.append('Exact native integration checkpoint required; a GVS state cannot substitute.')
+    if query.operation=='mujoco_direct_control_v1':
+        from tools.research.native_control import window_applicability
+        return window_applicability(requirements,query,assessed,point,reasons)
     p=query.protocol
     if abs(p.duration_s-requirements.duration_s)>p.horizon_alignment_atol_s or abs(p.period_s-requirements.physical_inputs['control_period_s'])>p.horizon_alignment_atol_s:
         reasons.append('Frozen task duration and input period must match protocol.')
@@ -120,10 +125,13 @@ def task_proxy(requirements, terminal):
     return rows
 
 
-def calculate(configuration, binding, query, point, requirements, comparisons):
+def calculate(configuration, binding, query, point, requirements, comparisons, *, checkpoint=None):
     from extensions.tendon_family.mujoco_analysis import calculate as kernel
     from tools.research.control_correction import constrained_response_step
     from tools.research.analysis import scoped_result
+    if query.operation=='mujoco_direct_control_v1':
+        from tools.research.native_control import calculate as optimize
+        return optimize(configuration,binding,query,point,requirements,comparisons,checkpoint)
     started=time.perf_counter()
     raw,native,start=kernel(configuration,point,query.native,query.operation,comparisons)
     mechanics=raw['mechanics'];quantities=[]

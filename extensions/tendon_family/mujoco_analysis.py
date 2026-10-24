@@ -85,6 +85,7 @@ class NativeModel:
             if worst>1e-10:raise ValueError('NATIVE_PREFIX_DOES_NOT_REPRODUCE_SAVED_EXECUTION')
         saved=self.checkpoint(d)
         saved.update(candidate=point['candidate'],configuration_identity=point['configuration_identity'],u=point['u'],
+            prefix_tensions_n=[r['tension_n'] for r in point['native_replay']['rows']],
             provenance=point['provenance'],prefix_verification=dict(samples=len(point['native_replay']['rows']),max_absolute_difference=worst))
         return saved,d
 
@@ -156,6 +157,27 @@ class NativeModel:
             if _mujoco_state_failed(d,previous):raise ValueError('NATIVE_SHORT_ROLLOUT_NUMERICAL_FAILURE')
         self.forward(d);motion,_=self.motion(d)
         return dict(**motion,actual_tensions_n=actual.tolist(),qpos_rad=d.qpos[self.qi].tolist(),qvel_rad_s=d.qvel[self.vi].tolist())
+
+    def rollout_sequence(self, start, times, tensions):
+        """Clone one integration state; sample its origin and every interval end."""
+        times=np.asarray(times,dtype=float);tensions=np.asarray(tensions,dtype=float)
+        steps=np.rint(np.diff(times)/self.model.opt.timestep).astype(int)
+        if (len(times)<2 or tensions.shape!=(len(times)-1,len(self.aids)) or
+                not np.isfinite(times).all() or abs(times[0]-start.time)>1e-12 or
+                np.any(steps<1) or np.max(abs(steps*self.model.opt.timestep-np.diff(times)))>1e-12):
+            raise ValueError('NATIVE_ALIGNED_SEQUENCE_REQUIRED')
+        d=mujoco.MjData(self.model);mujoco.mj_copyData(d,self.model,start)
+        self.forward(d);samples=[self.motion(d)[0]];actual=[]
+        self.cost['rollouts']+=1
+        for count,u in zip(steps,tensions):
+            actual.append(self.apply(d,u).tolist())
+            for _ in range(count):
+                previous=float(d.time);mujoco.mj_step(self.model,d);self.cost['physics_steps']+=1
+                if _mujoco_state_failed(d,previous):raise ValueError('NATIVE_SEQUENCE_NUMERICAL_FAILURE')
+            self.forward(d);samples.append(self.motion(d)[0])
+        return dict(times_s=[s['time_s'] for s in samples],
+            tip_positions_m=[s['tip_position_m'] for s in samples],
+            tip_velocities_m_s=[s['tip_velocity_m_s'] for s in samples],actual_tensions_n=actual)
 
 
 def input_response(native, start, u, options):

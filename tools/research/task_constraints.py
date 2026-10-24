@@ -9,6 +9,7 @@ METHOD_MEANINGS = {
     'equilibrium': ('Static input construction', 'Bounded local static target construction; static balance does not establish dynamic reach or hold.'),
     'input_sensitivity': ('Static input response', 'Checked local implicit-function response of equilibrium to physical input; SoRoSim fixed-input equilibrium only.'),
     'design_sensitivity': ('Static structural response', 'Paired single-parameter local static sensitivity with fixed physical input; no global design descent guarantee.'),
+    'mujoco_direct_control_v1': ('MuJoCo-direct bounded sequence optimization', 'Reuse local response/pattern search with cloned native rollouts covering every holding sample; produces an explicit full schedule for independent physical_replay. No task acceptance or global optimality from optimization.'),
     'native_dynamics_v1': ('Native MuJoCo mechanics', 'Native mass, forces, acceleration, world tip and tendon Jacobians at an exact native state; independent of GVS.'),
     'short_input_response_v1': ('Native short input response', 'Legal actual-tension FD at two sizes, optional one bounded correction checked with nonlinear native integration; no full-task claim.'),
     'fixed_input_structure_v1': ('Native structure and function response', 'Recompile registered one-parameter candidates; compare mechanisms, local function and short task proxies at fixed input. No reoptimized capability claim.'),
@@ -62,16 +63,17 @@ def mathematical_method_view(host, reference):
             required.append('scoring_window_s from protocol.windows_s')
             if spec['analysis_protocol']['windows_s']:request['scoring_window_s']=spec['analysis_protocol']['windows_s'][0]
         if key=='instantaneous_braking_v1':required.append('saved_state OR execution + update_id')
-        if key in ('native_dynamics_v1','short_input_response_v1','fixed_input_structure_v1'):
+        if key in ('native_dynamics_v1','short_input_response_v1','fixed_input_structure_v1','mujoco_direct_control_v1'):
             request.update(model_source='mujoco',operating_point='saved_state')
             required.extend(['saved_state (native integration checkpoint) OR execution + update_id','native={tensions_n,horizon_s,difference_step_n,correction_radius_n}'])
+        if key=='mujoco_direct_control_v1':required.append('control_optimization={source,settings}; v2 search settings with explicit correction_window_s; physical_replay uses returned control_schedule_reference')
         if key=='fixed_input_structure_v1':required.append('structure_response={variable,candidates}; registered single-parameter candidates')
         if key=='design_sensitivity':required.append('design_sensitivity={variable,step,minus_candidate,plus_candidate}')
         if row.get('capability_method'):request['capability_method']=CONIC
         if key==SENSITIVITY:required.append('optimal_sensitivity={variable,steps,model_results baseline first}; validated stencil required')
         methods[key]=dict(operation=row['operation'],method=key,method_version=row.get('method_version',key),scientific_purpose=purpose,description=meaning,
             candidate=reference,task_identity=c.get('task_identity'),task_family=cfg['task']['family'],
-            kernel_supported=True if key in ('linearization','controllability','instantaneous_braking_v1','native_dynamics_v1','short_input_response_v1','fixed_input_structure_v1') else
+            kernel_supported=True if key in ('linearization','controllability','instantaneous_braking_v1','native_dynamics_v1','short_input_response_v1','fixed_input_structure_v1','mujoco_direct_control_v1') else
                 any(x.kind in kinds for x in requirements.constraints) and
                 all(x.kind in kinds or x.kind == 'unsupported' for x in requirements.constraints),
             model_built=bool(models),model_sources=[dict(reference=r,pointer='/model') for r in models],
@@ -122,14 +124,14 @@ def analysis_capabilities(configuration, requirements, protocol, *, model=None, 
     p=TaskAnalysisProtocol.model_validate(protocol)
     rows=[]
     for operation in get_args(AnalysisRequest.model_fields['operation'].annotation):
-        native=operation in ('native_dynamics_v1','short_input_response_v1','fixed_input_structure_v1')
+        native=operation in ('native_dynamics_v1','short_input_response_v1','fixed_input_structure_v1','mujoco_direct_control_v1')
         sampled=operation in ('trajectory_feasibility','task_capability')
         static=operation in ('equilibrium','input_sensitivity','design_sensitivity')
         point='saved_state' if native else 'target_equilibrium' if operation=='equilibrium' else 'fixed_input_equilibrium' if static else 'controller_start_input'
         if exact_point and not static:point='saved_state'
         query=SimpleNamespace(operation=operation,operating_point=point,protocol=p,
             scoring_window_s=p.windows_s[0] if p.windows_s else None,
-            native=NativeAnalysisOptions() if native else None)
+            native=NativeAnalysisOptions() if native else None,control_optimization=None)
         assessment=model_assessment(configuration,requirements,operation,model=model,model_source='mujoco' if native else 'controller')
         applicability=check_analysis_applicability(requirements,query,assessment,model,exact_point)
         reasons=list(applicability['reasons'])

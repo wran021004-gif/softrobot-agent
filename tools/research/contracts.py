@@ -144,6 +144,60 @@ class OptimalCapabilitySensitivity(Contract):
         return self
 
 
+class LocalControlSearchSettings(Contract):
+    version: Literal['local_control_search_v1','local_control_search_v2'] = 'local_control_search_v1'
+    correction_window_s: tuple[FiniteFloat,FiniteFloat] | None = None
+    safety_margin_fraction: FiniteFloat = Field(default=0.,ge=0,lt=.5,description='Optional v2 local model target margin inside every original norm bound; original physical acceptance is unchanged. Zero preserves boundary-seeking legacy behavior.')
+    method: Literal['response','pattern'] = 'response'
+    knots_s: list[FiniteFloat] = Field(default_factory=lambda:[0.,.18,.30],min_length=2,max_length=4)
+    coefficient_limit_n: FiniteFloat = Field(default=2.,gt=0)
+    difference_step_n: FiniteFloat = Field(default=.01,gt=0)
+    initial_radius_n: FiniteFloat = Field(default=.1,gt=0)
+    minimum_radius_n: FiniteFloat = Field(default=.0001,gt=0)
+    evaluation_requests: int = Field(default=24,ge=1,le=1000,strict=True)
+    iterations: int = Field(default=16,ge=1,le=100,strict=True)
+    active_coefficients: list[StrictInt] | None = Field(default=None,min_length=1,description='Unique flat knot-major coefficient indices; omitted selects all. Each inactive offset remains exactly zero.')
+
+    @model_serializer(mode='wrap')
+    def preserve_legacy_settings(self,handler):
+        result=handler(self)
+        for key in ('version','correction_window_s','safety_margin_fraction','active_coefficients'):
+            if key not in self.model_fields_set:result.pop(key,None)
+        return result
+
+    @model_validator(mode='after')
+    def domain(self):
+        if self.active_coefficients is not None and (self.version!='local_control_search_v2'
+                or any(type(i) is not int or i<0 for i in self.active_coefficients)
+                or len(set(self.active_coefficients))!=len(self.active_coefficients)):
+            raise ValueError('UNIQUE_NONNEGATIVE_V2_ACTIVE_COEFFICIENTS_REQUIRED')
+        if self.version=='local_control_search_v1' and self.safety_margin_fraction!=0:
+            raise ValueError('SAFETY_MARGIN_REQUIRES_V2_SEARCH')
+        if self.method=='pattern' and self.safety_margin_fraction!=0:
+            raise ValueError('SAFETY_MARGIN_REQUIRES_RESPONSE_METHOD')
+        if self.knots_s[0]<0 or (self.version=='local_control_search_v1' and self.knots_s[0]!=0) or any(b<=a for a,b in zip(self.knots_s,self.knots_s[1:])):
+            raise ValueError('ORDERED_KNOTS_STARTING_AT_ZERO_REQUIRED' if self.version=='local_control_search_v1' else 'ORDERED_NONNEGATIVE_KNOTS_REQUIRED')
+        if self.correction_window_s is not None:
+            a,b=self.correction_window_s
+            if self.version!='local_control_search_v2' or not 0<=a<=self.knots_s[0]<self.knots_s[-1]<=b or a>=b:
+                raise ValueError('ORDERED_V2_CORRECTION_WINDOW_REQUIRED')
+        if not self.minimum_radius_n<=self.initial_radius_n<=self.coefficient_limit_n or self.difference_step_n>self.coefficient_limit_n:
+            raise ValueError('STEPS_MUST_FIT_COEFFICIENT_DOMAIN')
+        return self
+
+
+
+class NativeControlOptimization(Contract):
+    source: EvidenceRef
+    settings: LocalControlSearchSettings
+
+    @model_validator(mode="after")
+    def bounded_native_window(self):
+        if self.settings.version!="local_control_search_v2" or self.settings.correction_window_s is None:
+            raise ValueError("NATIVE_OPTIMIZATION_REQUIRES_V2_AND_EXPLICIT_WINDOW")
+        return self
+
+
 class NativeStructureResponse(Contract):
     variable: str
     candidates: list[EvidenceRef] = Field(min_length=1,max_length=2)
@@ -158,10 +212,11 @@ class NativeAnalysisOptions(Contract):
 
 class AnalysisRequest(Contract):
     candidate: EvidenceRef
-    operation: Literal['equilibrium','linearization','controllability','endpoint','braking','instantaneous_braking_v1','trajectory_feasibility','task_capability','input_sensitivity','design_sensitivity','native_dynamics_v1','short_input_response_v1','fixed_input_structure_v1']
+    operation: Literal['equilibrium','linearization','controllability','endpoint','braking','instantaneous_braking_v1','trajectory_feasibility','task_capability','input_sensitivity','design_sensitivity','native_dynamics_v1','short_input_response_v1','fixed_input_structure_v1','mujoco_direct_control_v1']
     model_source: Literal['controller','gvs','sorosim','mujoco'] = 'controller'
     native: NativeAnalysisOptions = Field(default_factory=NativeAnalysisOptions)
     structure_response: NativeStructureResponse | None = None
+    control_optimization: NativeControlOptimization | None = None
     operating_point: Literal['standardized_initial_pretension','controller_start_input','target_equilibrium','halfway_waypoint','saved_state','fixed_input_equilibrium'] = 'halfway_waypoint'
     design_sensitivity: StaticDesignSensitivity | None = None
     capability_comparison: CapabilityComparison | None = None
@@ -175,9 +230,13 @@ class AnalysisRequest(Contract):
 
     @model_validator(mode='after')
     def exact_state(self):
-        native_operation=self.operation in ('native_dynamics_v1','short_input_response_v1','fixed_input_structure_v1')
+        native_operation=self.operation in ('native_dynamics_v1','short_input_response_v1','fixed_input_structure_v1','mujoco_direct_control_v1')
         if (self.model_source=='mujoco')!=native_operation:
             raise ValueError('MUJOCO_REQUIRES_EXPLICIT_NATIVE_METHOD_AND_MODEL_SOURCE')
+        if (self.operation=='mujoco_direct_control_v1')!=(self.control_optimization is not None):
+            raise ValueError('NATIVE_CONTROL_OPTIMIZATION_REQUIRES_SOURCE_AND_SETTINGS')
+        if self.control_optimization and self.native!=NativeAnalysisOptions():
+            raise ValueError('NATIVE_CONTROL_USES_SEQUENCE_AND_SEARCH_SETTINGS')
         if native_operation and self.operating_point!='saved_state':
             raise ValueError('NATIVE_ANALYSIS_REQUIRES_SAVED_NATIVE_STATE')
         if not native_operation and self.native!=NativeAnalysisOptions():
@@ -218,7 +277,7 @@ class AnalysisRequest(Contract):
             if getattr(self,key) is None:value.pop(key,None)
         if self.model_source=='controller':value.pop('model_source',None)
         if self.model_source!='mujoco':value.pop('native',None)
-        for key in ('structure_response',):
+        for key in ('structure_response','control_optimization'):
             if getattr(self,key) is None:value.pop(key,None)
         return value
 
@@ -280,46 +339,6 @@ class ControlCorrectionSettings(Contract):
         return self
 
 
-class LocalControlSearchSettings(Contract):
-    version: Literal['local_control_search_v1','local_control_search_v2'] = 'local_control_search_v1'
-    correction_window_s: tuple[FiniteFloat,FiniteFloat] | None = None
-    safety_margin_fraction: FiniteFloat = Field(default=0.,ge=0,lt=.5,description='Optional v2 local model target margin inside every original norm bound; original physical acceptance is unchanged. Zero preserves boundary-seeking legacy behavior.')
-    method: Literal['response','pattern'] = 'response'
-    knots_s: list[FiniteFloat] = Field(default_factory=lambda:[0.,.18,.30],min_length=2,max_length=4)
-    coefficient_limit_n: FiniteFloat = Field(default=2.,gt=0)
-    difference_step_n: FiniteFloat = Field(default=.01,gt=0)
-    initial_radius_n: FiniteFloat = Field(default=.1,gt=0)
-    minimum_radius_n: FiniteFloat = Field(default=.0001,gt=0)
-    evaluation_requests: int = Field(default=24,ge=1,le=1000,strict=True)
-    iterations: int = Field(default=16,ge=1,le=100,strict=True)
-    active_coefficients: list[StrictInt] | None = Field(default=None,min_length=1,description='Unique flat knot-major coefficient indices; omitted selects all. Each inactive offset remains exactly zero.')
-
-    @model_serializer(mode='wrap')
-    def preserve_legacy_settings(self,handler):
-        result=handler(self)
-        for key in ('version','correction_window_s','safety_margin_fraction','active_coefficients'):
-            if key not in self.model_fields_set:result.pop(key,None)
-        return result
-
-    @model_validator(mode='after')
-    def domain(self):
-        if self.active_coefficients is not None and (self.version!='local_control_search_v2'
-                or any(type(i) is not int or i<0 for i in self.active_coefficients)
-                or len(set(self.active_coefficients))!=len(self.active_coefficients)):
-            raise ValueError('UNIQUE_NONNEGATIVE_V2_ACTIVE_COEFFICIENTS_REQUIRED')
-        if self.version=='local_control_search_v1' and self.safety_margin_fraction!=0:
-            raise ValueError('SAFETY_MARGIN_REQUIRES_V2_SEARCH')
-        if self.method=='pattern' and self.safety_margin_fraction!=0:
-            raise ValueError('SAFETY_MARGIN_REQUIRES_RESPONSE_METHOD')
-        if self.knots_s[0]<0 or (self.version=='local_control_search_v1' and self.knots_s[0]!=0) or any(b<=a for a,b in zip(self.knots_s,self.knots_s[1:])):
-            raise ValueError('ORDERED_KNOTS_STARTING_AT_ZERO_REQUIRED' if self.version=='local_control_search_v1' else 'ORDERED_NONNEGATIVE_KNOTS_REQUIRED')
-        if self.correction_window_s is not None:
-            a,b=self.correction_window_s
-            if self.version!='local_control_search_v2' or not 0<=a<=self.knots_s[0]<self.knots_s[-1]<=b or a>=b:
-                raise ValueError('ORDERED_V2_CORRECTION_WINDOW_REQUIRED')
-        if not self.minimum_radius_n<=self.initial_radius_n<=self.coefficient_limit_n or self.difference_step_n>self.coefficient_limit_n:
-            raise ValueError('STEPS_MUST_FIT_COEFFICIENT_DOMAIN')
-        return self
 
 
 class EvidenceSummary(Contract):

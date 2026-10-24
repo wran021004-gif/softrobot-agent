@@ -17,7 +17,7 @@ def trust_radius(radius,predicted,actual,maximum):
     return min(maximum,radius*1.5) if actual/predicted>.75 else radius
 
 
-def search(starts,evaluate,settings):
+def search(starts,evaluate,settings,*,evaluation_kind='physical',stop_when=None):
     """evaluate(start, source, metadata) returns task_gap, outputs, refs and costs.
 
     All probes participate in validity-first ranking. A failed model direction
@@ -53,7 +53,7 @@ def search(starts,evaluate,settings):
         tr=start['schedule']['trajectory']
         return corrected_tensions(tr['tensions_n'],tr['times_s'][:-1],cfg.knots_s,x,start['limits'],cfg.correction_window_s)
 
-    def attempt(start,x,label,base=None,predicted=None,radius=None):
+    def attempt(start,x,label,base=None,predicted=None,radius=None,solver=None):
         nonlocal best
         if len(rows)>=cfg.evaluation_requests:raise SearchStopped('evaluation_request_budget')
         if not np.isfinite(x).all() or np.any(abs(x)>cfg.coefficient_limit_n+1e-12):raise ValueError('ILLEGAL_COEFFICIENTS')
@@ -70,6 +70,7 @@ def search(starts,evaluate,settings):
             extrapolation=bool(base and radius is not None and np.max(abs(x-np.asarray(base['coefficients_n'])))>radius+1e-12))
         source['provenance']=dict(source['provenance'],search=meta)
         row=dict(evaluate(start,source,meta),**meta)
+        if solver is not None:row['local_solver']={k:v for k,v in solver.items() if k!='delta'}
         seen.add(identity)
         valid=row['task_gap']['valid_complete'] and row['task_gap']['normalized_gap'] is not None
         if not valid:row['task_gap']={**row['task_gap'],'normalized_gap':None}
@@ -78,6 +79,7 @@ def search(starts,evaluate,settings):
         if valid and (best is None or ranking_key(row)<ranking_key(best)):best=row
         row['best_valid_reference']=best['reference'] if best else None
         rows.append(row)
+        if valid and stop_when is not None and stop_when(row):raise SearchStopped('local_target_reached')
         if valid and row['task_gap']['accepted']:raise SearchStopped('first_original_task_pass')
         return row
 
@@ -145,7 +147,7 @@ def search(starts,evaluate,settings):
                 if not solved['success']:raise SearchStopped('numerical_failure: '+solved['numerical_status'])
                 predicted=center['task_gap']['normalized_gap']-solved['predicted_gap']
                 proposal=x.copy();proposal[effective]+=solved['delta']
-                row=attempt(start,proposal,'local_response_proposal',base=center,predicted=predicted,radius=radius)
+                row=attempt(start,proposal,'local_response_proposal',base=center,predicted=predicted,radius=radius,solver=solved)
                 row['local_solver']={k:v for k,v in solved.items() if k!='delta'}
                 radii[start['id']]=trust_radius(radius,predicted,row['actual_improvement'],cfg.coefficient_limit_n)
                 row['next_trust_radius_n']=radii[start['id']]
@@ -154,7 +156,8 @@ def search(starts,evaluate,settings):
     except SearchStopped as exc:stop=str(exc)
     return dict(version=cfg.version,algorithm=cfg.method,stop_reason=stop,
         cost_feedback=dict(request_budget=cfg.evaluation_requests,evaluation_callbacks=len(rows),
-            new_physical_evaluations=sum(not r.get('cache_hit',False) for r in rows),
+            evaluation_kind=evaluation_kind,
+            new_physical_evaluations=sum(not r.get('cache_hit',False) for r in rows) if evaluation_kind=='physical' else 0,
             cache_reuses=sum(r.get('cache_hit',False) for r in rows),unique_input_sequences=len(seen),
             duplicate_applied_sequences=sum(r['duplicate_applied_sequence'] for r in rows),
             ineffective_probe_attempts=len(ineffective),unique_response_probes=len(information),

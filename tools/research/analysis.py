@@ -75,7 +75,7 @@ def calculate(configuration,binding,query,exact_point=None,*,checkpoint=None,des
         if fit['status']=='not_applicable':
             return scoped_result(dict(status='not_applicable',operation=q.operation,binding=binding,
                 protocol=plain(p),task_acceptance='unmeasured',proxy_values={}),requirements,fit,q)
-        return native_calculate(configuration,binding,q,exact_point,requirements,design_context)
+        return native_calculate(configuration,binding,q,exact_point,requirements,design_context,checkpoint=checkpoint)
     sorosim=q.model_source=='sorosim' or (q.model_source=='controller' and inp.policy.controller.extension_id=='controller.sorosim_matlab_nmpc')
     if sorosim:
         from extensions.tendon_family.sorosim_analysis import calculate_candidate_configuration
@@ -245,6 +245,8 @@ def scoped_result(result, requirements, applicability, query):
         if result.get('native_dynamics'):
             conclusion,verification,pointer='diagnostic','native_numerical_checks','/native_dynamics'
             interpretation='Native fixed-state mechanics and short fixed-input responses only; not a full-task witness or reoptimized structural capability.'
+            if query.operation=='mujoco_direct_control_v1':
+                interpretation='Bounded native sequence search with nonlinear sampled checks; full physical replay and frozen task acceptance remain independent.'
         elif result.get('optimal_sensitivity'):
             conclusion,verification,pointer='diagnostic',result['optimal_sensitivity']['direction_status'],'/optimal_sensitivity'
             interpretation='Controlled reoptimized finite differences of sampled local models; no strict structural gradient, regional descent or physical improvement guarantee.'
@@ -388,6 +390,13 @@ def dispatch(host,query,key,*,guard,origin='model'):
         from tools.research.numerics import native_point
         point=native_point(host,q,cfg)
         binding['coordinate_order']=point['dof_order']
+        if q.control_optimization:
+            from tools.research.physical_replay import binding as schedule_binding, explicit_control_source, numerically_verified_source
+            source=host.store.artifact(q.control_optimization.source)
+            if not (explicit_control_source(source) or numerically_verified_source(source)):
+                raise ValueError('BOUND_EXECUTABLE_CONTROL_SOURCE_REQUIRED')
+            schedule_binding(cfg,source['trajectory'])
+            sensitivity_context=dict(schedule=source,source=plain(q.control_optimization.source))
     elif q.execution:
         from tools.research.numerics import execution_update
         source=execution_update(host,q.execution,q.update_id)
@@ -508,6 +517,13 @@ def recover(host):
         value['attempt_boundary_semantics']='Durable pre-call boundaries; interruption between checkpoint and call cannot establish that the solver entered. Reserved evaluations never reset.'
     if value['status'] not in ('computed','unavailable','not_applicable'):
         value['internal_calculations']=dict(status='partial_or_unavailable',reason='Worker failed before complete calculation records were published; reservation and analysis attempt remain charged')
+    if value.get('operation')=='mujoco_direct_control_v1' and value['status']=='computed':
+        from tools.research.physical_replay import binding as schedule_binding
+        schedule=value['native_dynamics']['optimized_schedule']
+        schedule_binding(verify_candidate(host,value['candidate'])['configuration'],schedule['trajectory'])
+        value['control_schedule_reference']=save(host,schedule,'bound_applied_control_schedule')
+    progress=sorted(folder.glob('numerical_native_progress_*.json'))
+    if progress:value['native_progress']=read(progress[-1])
     ref=save(host,value,'candidate_analysis_result')
     row=host.store.lookup(host.run_id,p['worker_request_id'])
     with host.store.transaction() as db:
@@ -518,6 +534,8 @@ def recover(host):
         current['numerical_reserved_s']-=p['reserved_s']
         current['pending']=None
         current.setdefault('analysis_results',[]).append(ref)
+        if value.get('control_schedule_reference'):
+            current.setdefault('control_initializations',[]).append(dict(candidate=value['candidate'],source=value['control_schedule_reference']))
         current.setdefault('analysis_costs',[]).append(dict(reference=ref,origin=p['origin'],numerical_s=elapsed,
             mathematical_evaluations=p.get('analysis_evaluations',1),internal_calculations=value.get('internal_calculations',[])))
         host.store.update_state(db,host.run_id,current)

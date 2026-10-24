@@ -247,9 +247,10 @@ def result_card(host, reference):
             mathematics=mathematics.model_copy(update=dict(
                 problem_definition=_location(reference,'/native_analysis/basis'),
                 quantities=[MathematicalQuantity(name=q['name'],value=q['value'],unit=q['unit'],
-                    status='unverified_estimate',control_reoptimization='fixed_control',
+                    status='unverified_estimate',control_reoptimization='required' if value['operation']=='mujoco_direct_control_v1' else 'fixed_control',
                     source=_location(reference,q['source_pointer'])) for q in summary['native_analysis']['quantities']]))
             details.append(_location(reference,'/native_dynamics'))
+            if value.get('control_schedule_reference'):details.append(_location(value['control_schedule_reference']))
         if value.get('operation') == 'task_capability' and (value.get('trajectory', {}).get('problem_definition') or value.get('trajectory',{}).get('method_version')):
             from tools.research.capability import populate_mathematics
             mathematics=populate_mathematics(mathematics,value['trajectory'],reference)
