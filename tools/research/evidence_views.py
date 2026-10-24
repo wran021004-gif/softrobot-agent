@@ -249,6 +249,17 @@ def result_card(host, reference):
             requirement_source=_location(reference,'/task_analysis') if 'task_analysis' in value else None)
         if value.get('native_analysis'):
             from schemas.research_reporting import MathematicalQuantity
+            if value['operation']=='mujoco_direct_control_v1':
+                fields=dict(terminal_position=('terminal_error_m','terminal_position_error_m'),
+                    holding_position=('holding_max_error_m','holding_max_position_error_m'),
+                    holding_speed=('holding_max_speed_m_s','holding_max_speed_m_s'))
+                for label,measure in summary['native_analysis']['comparison'].items():
+                    worst=measure['worst_constraint'];key,field=fields[worst['kind']]
+                    i,c=next((i,c) for i,c in enumerate(value['task_analysis']['constraints']) if c['constraint_id']==key)
+                    path='/native_dynamics/optimization/'+('candidates/0' if label=='baseline' else 'best')+'/measure/'+field
+                    worst.update(constraint_id=key,value=measure[field],limit=c['radius'],unit=c['signal']['units'],
+                        scope='model_sample',source=plain(_location(reference,path)),
+                        threshold_source=plain(_location(reference,f'/task_analysis/constraints/{i}/radius')))
             mathematics=mathematics.model_copy(update=dict(
                 problem_definition=_location(reference,'/native_analysis/basis'),
                 quantities=[MathematicalQuantity(name=q['name'],value=q['value'],unit=q['unit'],

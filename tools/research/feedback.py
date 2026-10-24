@@ -31,16 +31,30 @@ def execution_evidence(result):
             'solver_error_count','solver_failure_flags','unusable_plans','maximum_plan_violation')})
 
 
+def _dominant_metrics(signed, metrics):
+    """Join the existing ranking ratios to their recorded physical quantities."""
+    worst=max(signed.values(),default=None)
+    return [dict(constraint_id=key,normalized_signed_excess=value,scope='physical_task',**metrics[key])
+        for key,value in signed.items() if value==worst]
+
+
 def task_gap(result):
     """Rank recorded physical metrics only; original acceptance owns validity."""
     acceptance=result.get('acceptance') or {}
     if 'independent_evaluation_executed' in result:
         episodes=result.get('episodes',[])
-        pairs=(('terminal_position_error_m','terminal_position_limit_m'),
-            ('holding_max_position_error_m','position_limit_m'),('holding_max_speed_m_s','holding_speed_limit_m_s'))
-        gaps={key:max(0.,max(e[key] for e in episodes)/acceptance[limit]-1)
-            for key,limit in pairs if episodes and all(e.get(key) is not None for e in episodes) and acceptance.get(limit,0)>0}
+        pairs=(('terminal_position_error_m','terminal_position_limit_m','m'),
+            ('holding_max_position_error_m','position_limit_m','m'),('holding_max_speed_m_s','holding_speed_limit_m_s','m/s'))
+        metrics={}
+        for key,limit,unit in pairs:
+            if episodes and all(e.get(key) is not None for e in episodes) and acceptance.get(limit,0)>0:
+                i,episode=max(enumerate(episodes),key=lambda item:item[1][key])
+                metrics[key]=dict(value=episode[key],limit=acceptance[limit],unit=unit,
+                    source_pointer=f'/episodes/{i}/{key}',limit_pointer='/acceptance/'+limit)
+        signed={key:row['value']/row['limit']-1 for key,row in metrics.items()}
+        gaps={key:max(0.,value) for key,value in signed.items()}
         return dict(normalized_gap=max(gaps.values()) if len(gaps)==3 else None,components=gaps,
+            dominant_constraints=_dominant_metrics(signed,metrics) if len(gaps)==3 else [],
             valid_complete=bool(result['independent_evaluation_executed'] and episodes and all(
                 e['complete'] and e.get('holding_coverage_complete') and not e.get('numerical_failure') for e in episodes)),
             accepted=bool(result.get('passed')),interpretation='Research ranking only; original independent acceptance unchanged')
@@ -49,13 +63,17 @@ def task_gap(result):
     scored=(('evaluator:tracking_max_error','evaluator:path_coverage','evaluator:path_start',
         'evaluator:path_end','evaluator:path_progress_regression') if tracking else
         ('evaluator:task_bound','holding_position','holding_speed'))
-    ratios={name:max(0.,row['value']/row['limit']-1) for name,row in components.items()
+    signed={name:row['value']/row['limit']-1 for name,row in components.items()
         if name in scored
         and isinstance(row.get('value'),(float,int)) and math.isfinite(row['value']) and row.get('limit',0)>0}
+    ratios={name:max(0.,value) for name,value in signed.items()}
+    metrics={name:dict(value=components[name]['value'],limit=components[name]['limit'],unit=components[name].get('unit'),
+        source_pointer='/acceptance/components/'+name.replace('~','~0').replace('/','~1')) for name in signed}
     valid=bool(result.get('status')=='evaluated' and all(components.get(k,{}).get('passed') is True
         for k in ('evaluation_validity','execution_complete','tracking_sampling' if tracking else 'holding_coverage','solver_errors','force_bounds')))
     return dict(normalized_gap=max(ratios.values()) if len(ratios)==len(scored) else None,
         components=ratios,valid_complete=valid,accepted=bool(acceptance.get('accepted')),
+        dominant_constraints=_dominant_metrics(signed,metrics) if len(ratios)==len(scored) else [],
         interpretation='Research ranking only; invalid executions remain invalid regardless of gap')
 
 

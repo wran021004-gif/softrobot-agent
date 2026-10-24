@@ -10,14 +10,14 @@ METHOD_MEANINGS = {
     'input_sensitivity': ('Static input response', 'Checked local implicit-function response of equilibrium to physical input; SoRoSim fixed-input equilibrium only.'),
     'design_sensitivity': ('Static structural response', 'Paired single-parameter local static sensitivity with fixed physical input; no global design descent guarantee.'),
     'mujoco_direct_control_v1': ('MuJoCo-direct bounded sequence optimization', 'Reach/Hold only. Reuse local response/pattern search with cloned native rollouts covering every holding sample; produces an explicit full schedule for independent physical_replay. No task acceptance or global optimality from optimization.'),
-    'native_dynamics_v1': ('Native MuJoCo mechanics', 'Native mass, forces, acceleration, world tip and tendon Jacobians at an exact native state; independent of GVS.'),
-    'short_input_response_v1': ('Native short input response', 'Legal actual-tension FD at two sizes, optional one bounded correction checked with nonlinear native integration; no full-task claim.'),
-    'fixed_input_structure_v1': ('Native structure and function response', 'Recompile registered one-parameter candidates; compare mechanisms, local function and short task proxies at fixed input. No reoptimized capability claim.'),
+    'native_dynamics_v1': ('Native MuJoCo mechanics', 'Native mass, forces, acceleration, world tip and tendon Jacobians at an exact native state. Small internal force-balance residuals do not establish GVS/MuJoCo prediction agreement; that requires matched state/input/output comparisons.'),
+    'short_input_response_v1': ('Native short input response', 'Legal actual-tension FD at two input step sizes, optional bounded correction checked by native integration. Neither two FD sizes nor two integration timesteps prove numerical convergence or a regional bound; a failed local correction does not establish infeasibility.'),
+    'fixed_input_structure_v1': ('Native structure and function response', 'Recompile registered one-parameter candidates at fixed input; this response is not reoptimized structural capability or an optimal-value gradient.'),
     'endpoint': ('Bounded terminal feasibility', 'Bounded affine input sequence for covered terminal position conditions; intermediate constraints remain unchecked.'),
     'braking': ('Bounded terminal braking', 'Bounded affine sequence for covered terminal position/speed; not full holding-window compliance.'),
-    'instantaneous_braking_v1': ('Instantaneous braking authority', 'Minimum instantaneous speed derivative over the physical input box at an exact saved state; not finite-horizon braking.'),
-    'trajectory_feasibility': ('Sampled feasible sequence', 'Independent discrete replay of a bounded affine sequence; failed search is inconclusive.'),
-    'task_capability': ('Best found task violation', 'Three-start SLSQP minimization of max normalized signed residual. Smaller is better; negative means sample margin, not certified optimality.'),
+    'instantaneous_braking_v1': ('Instantaneous braking authority', 'Minimum instantaneous speed derivative over the physical input box at an exact saved state. Multiplying by a time interval does not establish finite-horizon braking or controllability.'),
+    'trajectory_feasibility': ('Sampled feasible sequence', 'Independent discrete replay within the bounded affine model. Small internal dynamics/replay residuals are not cross-model prediction errors; failed search is inconclusive, not structural infeasibility.'),
+    'task_capability': ('Best found task violation', 'Three-start SLSQP minimization of a dimensionless max normalized signed residual; physical conversion depends on the active constraint and its threshold. Negative means a model-sample feasible witness, not a globally optimal control. Condition numbers alone are not task-score error bounds.'),
     'sampled-affine-conic-minimax-v1': ('Numerical optimal task violation', 'min_U max_i g_i over an affine sampled model and physical box. SOCP primal/dual/support/gap checks are floating estimates; strict optimal_value remains unavailable. Free path progress jointly optimizes U and s, enumerating sampled corners in a chosen finite horizon; no unrestricted-time exclusion or geometric acceptance.'),
     'controlled-capability-sensitivity-v1': ('Controlled structural direction', 'Matched baseline and +/-h (optionally +/-h/2) models: reoptimized FD versus fixed U, conditional envelope and dual-face checks. Path progress is reoptimized too. Branch ties/active-set changes withhold a strict gradient; no physical improvement guarantee.')}
 
@@ -102,11 +102,14 @@ def mathematical_method_view(host, reference):
             methods[key]['readiness']=readiness
             methods[key]['cost_scope']='M*B conic solves + up to 2*k dual-face attempts; M=1+2*k. B=1 except two-segment paths: samples-2. Model preparation additional; wall cost unknown.'
         if key=='mujoco_direct_control_v1':
+            methods[key]['cost_scope']='Response search: S=starts, D_i=effective active coefficients in update i; callbacks = S baselines + sum(D_i FD probes + 1 candidate evaluation per completed update), all within evaluation_requests. Partial/failed callbacks also consume the cap; recorded counts own actual cost. Each suffix rollout advances (deadline-state_time)/physics_dt steps. Native cost.physics_steps includes required prefix reconstruction and all native rollouts. evaluation_callbacks and optimization_evaluations describe the same rollouts, not extra runs. Full independent physical_replay is separate with its own physics_steps; new_physical_evaluations=0 does not mean native integration was free.'
             methods[key]['supported_task_families']=['task.reach']
             methods[key]['supported_models']=['model.mujoco_native@1.0.0']
             methods[key]['kernel_supported']=row['planning_status']!='unsupported'
             methods[key]['control_sources']='Use this candidate\'s initialize_control baseline (pretension or explicit tensions), a bound mathematical schedule, or a complete current-Study NMPC actual-input result via source+parent without channel_map. New designs require explicit legal rebinding; a PPO checkpoint is not a schedule.'
             methods[key]['handoff']='physical_replay(candidate=same candidate, source=returned control_schedule_reference); independent acceptance and public evidence_read are required before SELECT.'
+        if key=='short_input_response_v1':
+            methods[key]['cost_scope']='One baseline + up to four FD rollouts per channel (two input sizes, central or one-sided) + optional one nonlinear candidate rollout. Required prefix reconstruction is already included in native cost.physics_steps; recorded rollouts/physics_steps own actual cost. Full independent physical_replay is additional if requested.'
     return dict(**readiness,candidate=reference,methods=methods,analysis_request_schema=AnalysisRequest.model_json_schema())
 
 
@@ -115,7 +118,7 @@ def mathematical_catalog(view):
     rows={}
     shared_cost='Model preparation and internal solver attempts are distinct; see original receipts.'
     for row in view['methods'].values():
-        item={k:row[k] for k in ('scientific_purpose','method_version','kernel_supported','model_built','full_task_supported','study_authorized',
+        item={k:row[k] for k in ('scientific_purpose','description','method_version','kernel_supported','model_built','full_task_supported','study_authorized',
             'formal_execution_authorized','execution_status','planning_status','missing','estimated_evaluations','cost_scope','supported_task_families') if k in row}
         item['detail_pointer']='/methods/'+row['method']
         item['coverage']=[{k:v for k,v in c.items() if k in ('constraint_id','status','expressible')} for c in row['coverage']]
@@ -128,6 +131,7 @@ def mathematical_catalog(view):
         schema_query=dict(reference=view['candidate'],view='mathematical_capabilities',pointer='/analysis_request_schema'),
         formal_scope_authorized=binding['formal_scope_authorized'],model_sources=binding['model_sources'][-1:],cost_scope=shared_cost,
         limitations=['Candidate-bound planning only; all model/state/input/protocol and remaining-budget admission checks still apply.',
+            'Agent selected_method is proposal text, not execution admission. Unlisted combinations have no registered executable template; even listed methods require request-specific admission.',
             'Local sampled numerical evidence does not prove physical acceptance or strict/global optimality.'],methods=rows)
 
 
