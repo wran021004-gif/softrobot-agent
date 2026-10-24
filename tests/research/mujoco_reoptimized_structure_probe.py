@@ -97,10 +97,7 @@ def measure(outputs,opts):
     ratios=dict(terminal_position=value['terminal_position_error_m']/opts['terminal_position_limit'],
         holding_position=value['holding_max_position_error_m']/opts['position_limit'],
         holding_speed=value['holding_max_speed_m_s']/opts['speed_limit'])
-    hold=np.asarray(outputs['times_s'])>=opts['holding_start']-1e-12
-    return dict(**value,dominant_constraint=max(ratios,key=ratios.get),terminal_position_m=outputs['tip_positions_m'][-1],
-        holding_samples=[dict(time_s=t,position_m=p,velocity_m_s=v) for t,p,v,keep in zip(
-            outputs['times_s'],outputs['tip_positions_m'],outputs['tip_velocities_m_s'],hold) if keep])
+    return dict(**value,dominant_constraint=max(ratios,key=ratios.get),terminal_position_m=outputs['tip_positions_m'][-1])
 
 
 def optimize(native,start,schedule,opts,folder,record,guard):
@@ -125,7 +122,7 @@ def optimize(native,start,schedule,opts,folder,record,guard):
     coefficients=np.asarray(best['coefficients_n'])
     summary=dict(initial=result['candidates'][0]['measure'],best=best['measure'],best_reference=best['reference'],
         best_label=best['label'],stop_reason=result['stop_reason'],cost=result['cost_feedback'],
-        iterations=result['iterations_started'],local_responses=result['local_responses'],
+        iterations=result['iterations_started'],local_responses=[{k:v for k,v in r.items() if k!='singular_values'} for r in result['local_responses']],
         solver=[r['local_solver'] for r in result['candidates'] if 'local_solver' in r],
         effective_improvement=result['candidates'][0]['measure']['signed_maximum_excess']-best['measure']['signed_maximum_excess'],
         coefficients_n=best['coefficients_n'],correction_l2_n=float(np.linalg.norm(delta)),
@@ -145,7 +142,11 @@ def response_estimate(rows):
     return dict(name='Finite-budget MuJoCo reoptimized structural response estimate',
         unit='normalized signed excess / MPa',fixed_per_mpa=secant('fixed'),
         reoptimized_per_mpa=secant('warm_best'),reliable_structure_direction='unknown',
-        derivative_valid=False,interpretation='Descriptive finite-search secant; convergence, initialization and numerical error are not bounded.')
+        derivative_valid=False,interpretation='Descriptive finite-search secant; convergence, initialization and numerical error are not bounded.',
+        limitations=['One response update; no nonlinear optimality convergence check.',
+            'The local objective targets a 5% margin, limiting performance ranking after passage.',
+            'Single shared warm start and one pretension start per structure; no initialization distribution.',
+            'Same-model replay agreement does not bound timestep or cross-model error.'])
 
 
 def run():
