@@ -26,7 +26,8 @@ S140/S141 是不同诊断目标/长度变化的数学模型限制，明确不充
 首轮原回答完整保存，两组及两个情境各有独立历史。
 
 冻结数据及离线来源见 `tests/research/agent_math_decision_cases.json`；
-精确线上的请求与响应保存在忽略的 `runs/agent-math-decision-probe/`。
+精确线上的请求与响应保存在忽略的 `runs/agent-math-decision-probe/`（首轮）和
+`runs/agent-math-decision-probe-protocol-fixed/`（协议修复后的新对照）。
 Git 摘要为 `evidence/agent_math_decision_probe/summary.json`。
 
 ## 决策调用与预算
@@ -76,3 +77,20 @@ Provider 没有返回的金额与用量字段保持 unknown/null。
 production Schema 解析、原边界用量去重、无科学 dispatch，以及未知请求停止且不重发。
 模拟返回仅是测试夹具，不计入科研观察或真实 Provider 消耗。
 真实结果、评分与最终科研判断将在冻结后附于本节。
+
+## 用户授权的协议修复与新对照
+
+首轮 8 次请求均已确认返回，实际消耗 139,378 tokens，格式通过 5/8。
+三项失败分别为 Reach/Hold Evidence 首轮、结构 Evidence 两轮：把 Plan 顶层字段
+`revise_selection` 塞入 `ResearchDecision`；结构首轮另有未声明 `weakening_note`。
+未删除失败、未更换 ID 重试未知请求。原摘要完整保存为 `initial_summary.json`，
+不合法的原始提交以 `unvalidated_submission` 保留，没有移字段或静默纠错。
+
+用户随后明确授权修复意外错误后重跑，并说明之前不占消耗。按新对照额度解释，
+另冻结最多 8 次请求；首轮的真实计费仍保留，所有实际请求总数最多 16。
+为保持两组可比，重新运行全部四条两轮对话，而非只挑失败回答补跑。
+仅将原 Plan Schema 投影到本 Probe 真正使用的九个描述字段，保留原 ResearchDecision，
+去掉未使用的执行 payload/选择字段及分支；共同增加一句仅输出所广告字段的协议说明。
+解析仍用原 `Plan.model_validate_json`，不纠错、不增加修复请求或 fallback。
+冻结科研事实、两轮观察、方法目录、Provider 参数、评分规则和科学提问均未改变。
+新对照不是首轮科学判断错误的修复；两轮真实科学失误仍如实报告。

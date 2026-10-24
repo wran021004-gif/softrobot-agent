@@ -22,7 +22,7 @@ from tools.state_io import atomic_json, read
 
 ROOT = Path(__file__).resolve().parents[2]
 CASES = Path(__file__).with_name('agent_math_decision_cases.json')
-OUT = ROOT / 'runs/agent-math-decision-probe'
+OUT = ROOT / 'runs/agent-math-decision-probe-protocol-fixed'
 SUMMARY = ROOT / 'evidence/agent_math_decision_probe/summary.json'
 ARMS = ('baseline', 'evidence')
 AUTHORIZATION = (
@@ -30,6 +30,9 @@ AUTHORIZATION = (
     'authorizes at most 8 real main Agent Provider requests with original egress admission; '
     'only necessary frozen task, mathematical scalars, physical diagnostics and evidence summaries; '
     'same C1 Provider/model. No scientific workers or Reporter requests.'
+    ' Supplemental user instruction on 2026-10-25 authorizes repairing unexpected '
+    'protocol errors and rerunning; initial requests do not consume the new eight-request '
+    'comparison allowance, but their actual billed usage remains separately recorded.'
 )
 INSTRUCTIONS = (
     'You are the Softrobot research decision Agent. Choose the next scientific question '
@@ -48,9 +51,22 @@ INSTRUCTIONS = (
     'excerpts are not new registered Store artifacts. Do not invent artifact references. '
     'No hidden file reads or tools are available. Scheduled next-round observations are '
     'historical and independent of your choice, not results of executing your proposal. '
+    'Emit only the properties advertised in the schema, and only ResearchDecision '
+    'properties inside decision; do not add explanatory or execution-only keys. '
     'When they arrive, explicitly reassess the earlier hypotheses and explain what '
     'changes, what remains unknown and the next discriminating action. Respond in Chinese.'
 )
+
+
+def decision_schema():
+    """Project the existing Plan to its descriptive decision fields, without a new contract."""
+    schema = plan_schema(['diagnose', 'stop'], decision_required=True)
+    fields = {'action', 'hypothesis', 'decision', 'supporting_evidence', 'expected_observation',
+              'weakening_observation', 'fixed_conditions', 'stopping_condition', 'interpretation'}
+    schema['properties'] = {k: v for k, v in schema['properties'].items() if k in fields}
+    schema['$defs'] = {k: v for k, v in schema['$defs'].items() if k in ('ResearchDecision', 'EvidenceRef')}
+    schema.pop('allOf')  # Payload ownership branches are unused by descriptive diagnose/stop.
+    return schema
 
 
 def packet(data, case, arm, turn):
@@ -74,7 +90,7 @@ def wire(provider, data, case, arm, turn, history=()):
                 stream=False, tool_choice='auto',
                 tools=[dict(type='function', function=dict(name='research_plan',
                     description='Record one production research decision only; no scientific action executes.',
-                    parameters=plan_schema(['diagnose', 'stop'], decision_required=True)))],
+                    parameters=decision_schema()))],
                 messages=[dict(role='system', content=INSTRUCTIONS), *deepcopy(history),
                           dict(role='user', content=json.dumps(content, ensure_ascii=False))])
 
@@ -95,7 +111,7 @@ def freeze(out=OUT):
     data = read(CASES)
     provider = read(ROOT / 'evidence/mujoco_c1_autonomous/configuration.json')['runtime']['provider']
     out.mkdir(parents=True)
-    frozen = dict(cases=data, provider=provider, instructions=INSTRUCTIONS,
+    frozen = dict(cohort='protocol-fixed', cases=data, provider=provider, instructions=INSTRUCTIONS,
                   authorization=AUTHORIZATION, request_ceiling=8, reporter_requests=0,
                   scientific_execution='disabled; proposals only')
     atomic_json(out / 'frozen.json', frozen)
@@ -104,7 +120,9 @@ def freeze(out=OUT):
             for turn in (1, 2):
                 atomic_json(out / f'{case}-{arm}-{turn}-input.json',
                             wire(provider, data, case, arm, turn))
-    summary = dict(status='B1_frozen_provider_zero', baseline=data['baseline_commit'],
+    summary = dict(status='B1_frozen_provider_zero', cohort='protocol-fixed',
+                   prior_cohort='evidence/agent_math_decision_probe/initial_summary.json',
+                   baseline=data['baseline_commit'],
                    provider=provider, authorization=AUTHORIZATION, request_ceiling=8,
                    actual_requests=0, reporter_requests=0, physics_steps=0,
                    scientific_workers=0, formal_studies=0, cases=data['cases'],

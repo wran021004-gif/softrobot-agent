@@ -31,6 +31,10 @@ class ProbeTests(unittest.TestCase):
 
     def test_pairs_have_only_evidence_difference_and_no_future_or_rubric(self):
         frozen = probe.freeze(self.out)
+        schema = probe.decision_schema()
+        self.assertNotIn('revise_selection', schema['properties'])
+        self.assertNotIn('revise_selection', schema['$defs']['ResearchDecision']['properties'])
+        self.assertFalse(schema['additionalProperties'])
         data = frozen['cases']
         for case in data['cases']:
             for turn in (1, 2):
