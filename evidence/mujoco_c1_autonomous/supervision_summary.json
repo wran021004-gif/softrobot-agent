@@ -1,0 +1,1030 @@
+{
+  "study_id": "mujoco-c1-autonomous-20261024",
+  "status": "stopped",
+  "frozen_implementation": "68729f7a86b6ef4c9e939914d394c1bd210942ad",
+  "resolved_identity": "d8c934674fc4168d1a33fa6722f856b536c6e921ca434d09f74271adb7167caf",
+  "selected": {
+    "artifact_id": "c953cb38f4503a25b7b5178722c6eb241e17110e4bbe4dd819f4981c18aeae10",
+    "media_type": "application/json"
+  },
+  "selected_solution": {
+    "artifact_id": "cc2c985d710a63412052d1ead9e215ab4c791c10bc731bb07b0816e374e40d9e",
+    "media_type": "application/json"
+  },
+  "final_disposition": {
+    "artifact_id": "11a6a8c07a09160e7ba4d452e6318c8288291184e76609a9b587cb058dae7ba2",
+    "media_type": "application/json"
+  },
+  "cold_start": {
+    "history": [],
+    "mathematics": [],
+    "control_seeds": [],
+    "supplied_evidence": [],
+    "candidate_count": 1,
+    "structural_changes": 0,
+    "model_actions": [
+      "execute",
+      "initialize_control",
+      "physical_replay",
+      "select",
+      "select"
+    ],
+    "no_old_successful_control_imported": true
+  },
+  "references": {
+    "candidate": {
+      "artifact_id": "ef1760ab632f9a6c5f546c990875424d65d62c55b9ae14d63a4caed52575c3fc",
+      "media_type": "application/json"
+    },
+    "nmpc": {
+      "artifact_id": "5e0c3dfc02d948dcee4cb3bcb3973eb2d62302478b9948a9cfa5201d43589aa3",
+      "media_type": "application/json"
+    },
+    "measured_schedule": {
+      "artifact_id": "2e155dec7ec7fc861a7e6a651ec7a38024e4bb261b96a32af23bbf4c594480e7",
+      "media_type": "application/json"
+    },
+    "native_optimization": {
+      "artifact_id": "3e35393b6401fbfefe76d914d1592dfd25c3d4e994c21fa9a07557631cf733a6",
+      "media_type": "application/json"
+    },
+    "optimized_schedule": {
+      "artifact_id": "6e08ba12aaa09319db4bd12fa75106d7364c1856e555ca2d08337ef32ee40025",
+      "media_type": "application/json"
+    },
+    "physical_replay": {
+      "artifact_id": "c953cb38f4503a25b7b5178722c6eb241e17110e4bbe4dd819f4981c18aeae10",
+      "media_type": "application/json"
+    },
+    "evaluator": {
+      "artifact_id": "67e61a3cb5d74050bc2fee418a411757c2c4c19807725cd27fee011a666a0e65",
+      "media_type": "application/json"
+    },
+    "raw": {
+      "artifact_id": "d90973cc127bb3cf1c305ef8538099390d40b78c593c5fccc2a8a58a437637d6",
+      "media_type": "application/json"
+    }
+  },
+  "nmpc": {
+    "acceptance": {
+      "accepted": false,
+      "components": {
+        "evaluation_validity": {
+          "limit": null,
+          "passed": true,
+          "reason": null,
+          "unit": null,
+          "value": "valid"
+        },
+        "evaluator:task_bound": {
+          "limit": 0.01,
+          "passed": true,
+          "reason": null,
+          "unit": "m",
+          "value": 0.0031197439682656434
+        },
+        "execution_complete": {
+          "limit": null,
+          "passed": true,
+          "reason": null,
+          "unit": null,
+          "value": true
+        },
+        "force_bounds": {
+          "limit": 1e-08,
+          "passed": true,
+          "reason": null,
+          "unit": "N",
+          "value": 0.0
+        },
+        "holding_coverage": {
+          "limit": 6,
+          "passed": true,
+          "reason": null,
+          "unit": "inclusive uniform samples",
+          "value": true
+        },
+        "holding_position": {
+          "limit": 0.01,
+          "passed": true,
+          "reason": null,
+          "unit": "m",
+          "value": 0.0031390226975834858
+        },
+        "holding_speed": {
+          "limit": 0.02,
+          "passed": false,
+          "reason": null,
+          "unit": "m/s",
+          "value": 0.02320985264576029
+        },
+        "solver_errors": {
+          "limit": 0,
+          "passed": true,
+          "reason": null,
+          "unit": "count",
+          "value": 0
+        },
+        "task_evaluator": {
+          "limit": null,
+          "passed": true,
+          "reason": null,
+          "unit": null,
+          "value": true
+        }
+      },
+      "continuous_time_guarantee": false,
+      "contract": "research.task_acceptance",
+      "evaluator_tension_channels": null,
+      "evidence_binding": {
+        "evaluation": {
+          "artifact_id": "c3d9a2f13ca249c3b5ab7a83de2edc26ab4bd5be3cd15f2c40f22278020d4105",
+          "media_type": "application/json"
+        },
+        "evaluation_binding": {
+          "original_execution_id": "7085f71ad12d4b54acc1c2203cdbaf4b",
+          "source": {
+            "artifact_id": "8fcaa1243bd58d86c73959f049b1b412dee185300f3a0c7060cd528c8cd9ebcf",
+            "media_type": "application/json"
+          },
+          "source_execution_id": "7085f71ad12d4b54acc1c2203cdbaf4b"
+        },
+        "profile": {
+          "artifact_id": "12d9e458465ececb4b5fbe023046332feb93612ad7832b7a403f1931e4b3ce9d",
+          "media_type": "application/json"
+        },
+        "profile_binding": {
+          "evaluation": {
+            "artifact_id": "c3d9a2f13ca249c3b5ab7a83de2edc26ab4bd5be3cd15f2c40f22278020d4105",
+            "media_type": "application/json"
+          },
+          "execution_id": "7085f71ad12d4b54acc1c2203cdbaf4b",
+          "simulation": {
+            "artifact_id": "8fcaa1243bd58d86c73959f049b1b412dee185300f3a0c7060cd528c8cd9ebcf",
+            "media_type": "application/json"
+          }
+        },
+        "simulation": {
+          "artifact_id": "8fcaa1243bd58d86c73959f049b1b412dee185300f3a0c7060cd528c8cd9ebcf",
+          "media_type": "application/json"
+        }
+      },
+      "execution_id": "7085f71ad12d4b54acc1c2203cdbaf4b",
+      "issues": [],
+      "metrics": {
+        "holding_max_error_m": 0.0031390226975834858,
+        "holding_max_speed_m_s": 0.02320985264576029,
+        "terminal_error_m": 0.0031197439682656434
+      },
+      "missing": [],
+      "protocol_id": "offline_reach_hold_v1",
+      "sources": {
+        "evaluation": {
+          "artifact_id": "c3d9a2f13ca249c3b5ab7a83de2edc26ab4bd5be3cd15f2c40f22278020d4105",
+          "media_type": "application/json"
+        },
+        "profile": {
+          "artifact_id": "12d9e458465ececb4b5fbe023046332feb93612ad7832b7a403f1931e4b3ce9d",
+          "media_type": "application/json"
+        }
+      },
+      "status": "valid_failure",
+      "task_family": "task.reach",
+      "task_identity": "2b26edb492214c426263441b6adb52d7aafe41a828436d6b48a1171374a1026c",
+      "timing": {
+        "control_period_s": 0.01,
+        "deadline_misses": 35,
+        "duration_s": 0.35,
+        "mean_update_s": 93.04622795428575,
+        "real_time_demonstrated": false,
+        "real_time_required": false,
+        "sample_period_s": 0.01,
+        "simulation_wall_s": 3265.3280000000013,
+        "termination": [
+          "duration",
+          "numerical_failure"
+        ],
+        "timestep_s": 0.0005
+      },
+      "version": "1.0.0"
+    },
+    "updates": 35,
+    "optimizer_status_counts": {
+      "Maximum_Iterations_Exceeded": 35
+    },
+    "numerical_s": 3267.5103979999985,
+    "actual_input_matches_initialized_schedule": true
+  },
+  "native": {
+    "task_acceptance": "unmeasured",
+    "initial_time_s": 0,
+    "settings": {
+      "active_coefficients": null,
+      "coefficient_limit_n": 1.5,
+      "correction_window_s": [
+        0.0,
+        0.35
+      ],
+      "difference_step_n": 0.02,
+      "evaluation_requests": 350,
+      "initial_radius_n": 0.15,
+      "iterations": 12,
+      "knots_s": [
+        0.0,
+        0.12,
+        0.23,
+        0.34
+      ],
+      "method": "response",
+      "minimum_radius_n": 0.001,
+      "safety_margin_fraction": 0.05,
+      "version": "local_control_search_v2"
+    },
+    "analysis": {
+      "basis": {
+        "channels": [
+          "near_t0",
+          "near_t1",
+          "near_t2",
+          "far_t0",
+          "far_t1",
+          "far_t2"
+        ],
+        "model": "model.mujoco_native@1.0.0",
+        "sample_count": 36,
+        "search_dimension": 24,
+        "state_time_s": 0.0,
+        "window_s": [
+          0.0,
+          0.35
+        ]
+      },
+      "comparison": {
+        "baseline": {
+          "holding_max_position_error_m": 0.0031390226975834858,
+          "holding_max_speed_m_s": 0.02320985264576029,
+          "normalized_gap": 0.16049263228801447,
+          "returned_array_gap_interval": [
+            0.16049263228801333,
+            0.16049263228801539
+          ],
+          "signed_maximum_excess": 0.16049263228801447,
+          "sum_normalized_excess": 0.16049263228801447,
+          "terminal_position_error_m": 0.0031197439682656434,
+          "worst_constraint": {
+            "kind": "holding_speed",
+            "normalized_signed_excess": 0.16049263228801447,
+            "time_s": 0.35000000000000026
+          }
+        },
+        "best": {
+          "holding_max_position_error_m": 0.0027456019321310606,
+          "holding_max_speed_m_s": 0.01898530819333862,
+          "normalized_gap": 0.0,
+          "returned_array_gap_interval": [
+            0.0,
+            0.0
+          ],
+          "signed_maximum_excess": -0.05073459033306904,
+          "sum_normalized_excess": 0.0,
+          "terminal_position_error_m": 0.0026262738732580294,
+          "worst_constraint": {
+            "kind": "holding_speed",
+            "normalized_signed_excess": -0.05073459033306904,
+            "time_s": 0.35000000000000026
+          }
+        }
+      },
+      "control_schedule_pointer": "/control_schedule_reference",
+      "cost": {
+        "completed_response_steps": 1,
+        "forward_evaluations": 1847,
+        "kernel_wall_s": 0.8502095999974699,
+        "mechanics_evaluations": 0,
+        "model_builds": 1,
+        "optimization_evaluations": 26,
+        "optimization_iterations": 1,
+        "physics_steps": 18200,
+        "rollouts": 26
+      },
+      "detail_pointer": "/native_dynamics",
+      "interpretation": "Cloned nonlinear native sequence predictions with the existing bounded local control search.",
+      "limitations": [
+        "Local sampled simulation estimate; no global optimum, hardware or regional guarantee."
+      ],
+      "next_actions": [
+        "physical_replay using control_schedule_reference",
+        "Read local_responses to revise parameterization or radius",
+        "Rebuild a legal prefix for each changed structure"
+      ],
+      "quantities": [
+        {
+          "name": "baseline_holding_max_speed",
+          "source_pointer": "/native_dynamics/optimization/candidates/0/measure/holding_max_speed_m_s",
+          "unit": "m/s",
+          "value": 0.02320985264576029
+        },
+        {
+          "name": "baseline_holding_max_position_error",
+          "source_pointer": "/native_dynamics/optimization/candidates/0/measure/holding_max_position_error_m",
+          "unit": "m",
+          "value": 0.0031390226975834858
+        },
+        {
+          "name": "baseline_signed_maximum_excess",
+          "source_pointer": "/native_dynamics/optimization/candidates/0/measure/signed_maximum_excess",
+          "unit": "1",
+          "value": 0.16049263228801447
+        },
+        {
+          "name": "best_holding_max_speed",
+          "source_pointer": "/native_dynamics/optimization/best/measure/holding_max_speed_m_s",
+          "unit": "m/s",
+          "value": 0.01898530819333862
+        },
+        {
+          "name": "best_holding_max_position_error",
+          "source_pointer": "/native_dynamics/optimization/best/measure/holding_max_position_error_m",
+          "unit": "m",
+          "value": 0.0027456019321310606
+        },
+        {
+          "name": "best_signed_maximum_excess",
+          "source_pointer": "/native_dynamics/optimization/best/measure/signed_maximum_excess",
+          "unit": "1",
+          "value": -0.05073459033306904
+        }
+      ],
+      "question": "Bounded native sequence control optimization",
+      "solver": {
+        "last_local_solver": {
+          "global_optimality_proved": false,
+          "iterations": 7,
+          "numerical_status": "Optimization terminated successfully",
+          "predicted_gap": 0.0,
+          "predicted_signed_excess": -0.04999999999234761,
+          "success": true,
+          "target_margin_fraction": 0.05
+        },
+        "stop_reason": "local_target_reached"
+      },
+      "unresolved": [
+        "Full 0-to-duration replay and independent frozen acceptance remain required."
+      ]
+    },
+    "cost": [
+      {
+        "completed_response_steps": 1,
+        "forward_evaluations": 1847,
+        "kernel_wall_s": 0.8502095999974699,
+        "mechanics_evaluations": 0,
+        "model_builds": 1,
+        "optimization_evaluations": 26,
+        "optimization_iterations": 1,
+        "physics_steps": 18200,
+        "purpose": "mujoco_direct_control_v1",
+        "rollouts": 26
+      }
+    ],
+    "bound_source": {
+      "artifact_id": "2e155dec7ec7fc861a7e6a651ec7a38024e4bb261b96a32af23bbf4c594480e7",
+      "media_type": "application/json"
+    }
+  },
+  "physical": {
+    "acceptance": {
+      "accepted": true,
+      "components": {
+        "evaluation_validity": {
+          "limit": null,
+          "passed": true,
+          "reason": null,
+          "unit": null,
+          "value": "valid"
+        },
+        "evaluator:task_bound": {
+          "limit": 0.01,
+          "passed": true,
+          "reason": null,
+          "unit": "m",
+          "value": 0.0026262738732580294
+        },
+        "execution_complete": {
+          "limit": null,
+          "passed": true,
+          "reason": null,
+          "unit": null,
+          "value": true
+        },
+        "force_bounds": {
+          "limit": 1e-08,
+          "passed": true,
+          "reason": null,
+          "unit": "N",
+          "value": 0.0
+        },
+        "holding_coverage": {
+          "limit": 6,
+          "passed": true,
+          "reason": null,
+          "unit": "inclusive uniform samples",
+          "value": true
+        },
+        "holding_position": {
+          "limit": 0.01,
+          "passed": true,
+          "reason": null,
+          "unit": "m",
+          "value": 0.0027456019321310606
+        },
+        "holding_speed": {
+          "limit": 0.02,
+          "passed": true,
+          "reason": null,
+          "unit": "m/s",
+          "value": 0.01898530819333862
+        },
+        "solver_errors": {
+          "limit": 0,
+          "passed": true,
+          "reason": null,
+          "unit": "count",
+          "value": 0
+        },
+        "task_evaluator": {
+          "limit": null,
+          "passed": true,
+          "reason": null,
+          "unit": null,
+          "value": true
+        }
+      },
+      "continuous_time_guarantee": false,
+      "contract": "research.task_acceptance",
+      "evaluator_tension_channels": null,
+      "evidence_binding": {
+        "evaluation": {
+          "artifact_id": "67e61a3cb5d74050bc2fee418a411757c2c4c19807725cd27fee011a666a0e65",
+          "media_type": "application/json"
+        },
+        "evaluation_binding": {
+          "original_execution_id": null,
+          "source": {
+            "artifact_id": "d90973cc127bb3cf1c305ef8538099390d40b78c593c5fccc2a8a58a437637d6",
+            "media_type": "application/json"
+          },
+          "source_execution_id": null
+        },
+        "profile": null,
+        "profile_binding": {
+          "evaluation": {
+            "artifact_id": "67e61a3cb5d74050bc2fee418a411757c2c4c19807725cd27fee011a666a0e65",
+            "media_type": "application/json"
+          },
+          "execution_id": "199938e87efe4a06a2c740ad395de9cb",
+          "simulation": {
+            "artifact_id": "d90973cc127bb3cf1c305ef8538099390d40b78c593c5fccc2a8a58a437637d6",
+            "media_type": "application/json"
+          }
+        },
+        "simulation": {
+          "artifact_id": "d90973cc127bb3cf1c305ef8538099390d40b78c593c5fccc2a8a58a437637d6",
+          "media_type": "application/json"
+        }
+      },
+      "execution_id": "199938e87efe4a06a2c740ad395de9cb",
+      "issues": [],
+      "metrics": {
+        "holding_max_error_m": 0.0027456019321310606,
+        "holding_max_speed_m_s": 0.01898530819333862,
+        "terminal_error_m": 0.0026262738732580294
+      },
+      "missing": [],
+      "protocol_id": "offline_reach_hold_v1",
+      "sources": {
+        "evaluation": {
+          "artifact_id": "67e61a3cb5d74050bc2fee418a411757c2c4c19807725cd27fee011a666a0e65",
+          "media_type": "application/json"
+        },
+        "profile": null
+      },
+      "status": "accepted",
+      "task_family": "task.reach",
+      "task_identity": "2b26edb492214c426263441b6adb52d7aafe41a828436d6b48a1171374a1026c",
+      "timing": {
+        "control_period_s": 0.01,
+        "deadline_misses": null,
+        "duration_s": 0.35,
+        "mean_update_s": null,
+        "real_time_demonstrated": null,
+        "real_time_required": false,
+        "sample_period_s": 0.01,
+        "simulation_wall_s": null,
+        "termination": [
+          "duration",
+          "numerical_failure"
+        ],
+        "timestep_s": 0.0005
+      },
+      "version": "1.0.0"
+    },
+    "physics_steps": 700,
+    "samples": 36,
+    "hold_samples": [
+      {
+        "index": 30,
+        "time_s": 0.3,
+        "position_error_m": 0.0027018450865085235,
+        "speed_m_s": 0.00430893626480736
+      },
+      {
+        "index": 31,
+        "time_s": 0.31,
+        "position_error_m": 0.0027158065963215515,
+        "speed_m_s": 0.004450524052733229
+      },
+      {
+        "index": 32,
+        "time_s": 0.32,
+        "position_error_m": 0.0027456019321310606,
+        "speed_m_s": 0.0031192000794148965
+      },
+      {
+        "index": 33,
+        "time_s": 0.33,
+        "position_error_m": 0.002728318497357249,
+        "speed_m_s": 0.006239507918372703
+      },
+      {
+        "index": 34,
+        "time_s": 0.34,
+        "position_error_m": 0.002654375582992596,
+        "speed_m_s": 0.01811366098624372
+      },
+      {
+        "index": 35,
+        "time_s": 0.35000000000000003,
+        "position_error_m": 0.0026262738732580294,
+        "speed_m_s": 0.01898530819333862
+      }
+    ],
+    "worker_wall_s": 1.1366386999980023
+  },
+  "improvement": {
+    "holding_speed_fraction": 0.18201513455938986,
+    "scope": "Descriptive same-candidate measured schedule correction; no structural or global claim"
+  },
+  "resource_use": {
+    "ledger": {
+      "limit": {
+        "backend_solves": 9,
+        "model_calls": 32,
+        "tool_calls": 120,
+        "wall_s": null,
+        "worker_calls": 0
+      },
+      "used": {
+        "tool_calls": 18,
+        "model_calls": 16,
+        "backend_solves": 2,
+        "worker_calls": 0,
+        "wall_s": 3434.196347499994
+      },
+      "remaining": {
+        "backend_solves": 7,
+        "model_calls": 16,
+        "tool_calls": 102,
+        "wall_s": null,
+        "worker_calls": 0
+      },
+      "occupied": {}
+    },
+    "mathematical_evaluations": 1,
+    "nmpc_launches": 1,
+    "physical_replay_launches": 1,
+    "ppo_stages": 0,
+    "ppo_actions": 0,
+    "rl_evaluations": 0,
+    "confirmations": 0,
+    "numerical_s": 3271.764468399997
+  },
+  "provider": {
+    "requests": 16,
+    "purposes": {
+      "conversation": 14,
+      "reporter": 2
+    },
+    "usage": {
+      "completion_tokens": 26799,
+      "prompt_cache_hit_tokens": 271616,
+      "prompt_cache_miss_tokens": 364023,
+      "prompt_tokens": 635639,
+      "total_tokens": 662438,
+      "reasoning_tokens": 15246
+    },
+    "money": "not returned; unknown",
+    "session_id": "mujoco-c1-autonomous-20261024",
+    "wire_bytes": {
+      "min": 28780,
+      "max": 200909
+    },
+    "requests_with_unknown_outcome": 0,
+    "resends": 0,
+    "duplicate_charges": 0
+  },
+  "interfaces": {
+    "result_identities": [
+      {
+        "result": {
+          "reference": {
+            "artifact_id": "3e35393b6401fbfefe76d914d1592dfd25c3d4e994c21fa9a07557631cf733a6",
+            "media_type": "application/json"
+          },
+          "pointer": ""
+        },
+        "study": "mujoco-c1-autonomous-20261024",
+        "task_identity": "2b26edb492214c426263441b6adb52d7aafe41a828436d6b48a1171374a1026c",
+        "canonical_task_identity": "2b26edb492214c426263441b6adb52d7aafe41a828436d6b48a1171374a1026c",
+        "design_identity": "2dfc7f678654ae12e65eb8850b9a06928ec1b05ed5de5b5f6c366bf8f8a54dcb",
+        "evaluation_profile_identity": "c46901ef9334817d16b3afe146cb344aa483a4cb77d47601b8e9d4100cc0d9ef",
+        "candidate": {
+          "artifact_id": "ef1760ab632f9a6c5f546c990875424d65d62c55b9ae14d63a4caed52575c3fc",
+          "media_type": "application/json"
+        },
+        "control_source": {
+          "artifact_id": "6e08ba12aaa09319db4bd12fa75106d7364c1856e555ca2d08337ef32ee40025",
+          "media_type": "application/json"
+        },
+        "operation": "mujoco_direct_control_v1",
+        "model_identity": "a891b6d630197e3de5a6780f3578a021c1474b6c3943857079957fe4a31e6615",
+        "evaluation_identity": null
+      },
+      {
+        "result": {
+          "reference": {
+            "artifact_id": "c953cb38f4503a25b7b5178722c6eb241e17110e4bbe4dd819f4981c18aeae10",
+            "media_type": "application/json"
+          },
+          "pointer": ""
+        },
+        "study": "mujoco-c1-autonomous-20261024",
+        "task_identity": "2b26edb492214c426263441b6adb52d7aafe41a828436d6b48a1171374a1026c",
+        "canonical_task_identity": "2b26edb492214c426263441b6adb52d7aafe41a828436d6b48a1171374a1026c",
+        "design_identity": "2dfc7f678654ae12e65eb8850b9a06928ec1b05ed5de5b5f6c366bf8f8a54dcb",
+        "evaluation_profile_identity": "c46901ef9334817d16b3afe146cb344aa483a4cb77d47601b8e9d4100cc0d9ef",
+        "candidate": {
+          "artifact_id": "ef1760ab632f9a6c5f546c990875424d65d62c55b9ae14d63a4caed52575c3fc",
+          "media_type": "application/json"
+        },
+        "control_source": {
+          "artifact_id": "6e08ba12aaa09319db4bd12fa75106d7364c1856e555ca2d08337ef32ee40025",
+          "media_type": "application/json"
+        },
+        "operation": null,
+        "model_identity": "1eff34702875c584c44cb607f6943d28f4c99b176ea8661cf02ec1358bd0d85f",
+        "evaluation_identity": "native-call_00_y7CAu1Ri6n43AcH9GdX05648-physical"
+      }
+    ],
+    "control_comparisons": [
+      {
+        "candidate": {
+          "artifact_id": "ef1760ab632f9a6c5f546c990875424d65d62c55b9ae14d63a4caed52575c3fc",
+          "media_type": "application/json"
+        },
+        "baseline": {
+          "artifact_id": "5e0c3dfc02d948dcee4cb3bcb3973eb2d62302478b9948a9cfa5201d43589aa3",
+          "media_type": "application/json"
+        },
+        "variant": {
+          "artifact_id": "c953cb38f4503a25b7b5178722c6eb241e17110e4bbe4dd819f4981c18aeae10",
+          "media_type": "application/json"
+        },
+        "comparable": true,
+        "normalized_violation_change": {
+          "evaluator:task_bound": 0.0,
+          "holding_position": 0.0,
+          "holding_speed": -0.16049263228801447
+        },
+        "scope": "Same candidate and recorded evaluation settings only; negative is improvement, no causal or global claim"
+      }
+    ],
+    "read_coverage_counts": {
+      "exact_repeat": 0,
+      "covered_subnode": 0,
+      "new_query": 2
+    },
+    "evidence_read_requests": [
+      {
+        "tool_use_id": "call_00_YeTpNsH3LbYrPFWolmb35687",
+        "query": {
+          "reference": {
+            "artifact_id": "ef1760ab632f9a6c5f546c990875424d65d62c55b9ae14d63a4caed52575c3fc",
+            "media_type": "application/json"
+          },
+          "view": "summary"
+        }
+      },
+      {
+        "tool_use_id": "call_01_QM50EnNdJwQNrgKjlqlv0838",
+        "query": {
+          "fields": [
+            "candidate_index",
+            "eligible_methods",
+            "read_coverage"
+          ],
+          "reference": {
+            "artifact_id": "ef1760ab632f9a6c5f546c990875424d65d62c55b9ae14d63a4caed52575c3fc",
+            "media_type": "application/json"
+          },
+          "view": "fields"
+        }
+      },
+      {
+        "tool_use_id": "call_00_O2Dj83mlp2F4VNQITqlB5165",
+        "query": {
+          "fields": [
+            "acceptance",
+            "task_passed",
+            "valid_complete",
+            "candidate",
+            "control_source",
+            "samples",
+            "execution_status",
+            "task_identity",
+            "evaluation_profile_identity"
+          ],
+          "reference": {
+            "artifact_id": "c953cb38f4503a25b7b5178722c6eb241e17110e4bbe4dd819f4981c18aeae10",
+            "media_type": "application/json"
+          },
+          "view": "fields"
+        }
+      },
+      {
+        "tool_use_id": "call_00_7sn4j1hPiUfIkTMTAZq09469",
+        "query": {
+          "fields": [
+            "acceptance",
+            "candidate",
+            "source_reference",
+            "status",
+            "profile_identity",
+            "design_identity",
+            "role",
+            "physical_launches",
+            "operation_key",
+            "execution_id"
+          ],
+          "reference": {
+            "artifact_id": "c953cb38f4503a25b7b5178722c6eb241e17110e4bbe4dd819f4981c18aeae10",
+            "media_type": "application/json"
+          },
+          "view": "fields"
+        }
+      },
+      {
+        "tool_use_id": "call_00_KF0Id2z5Hkl2esQFVeBb7177",
+        "query": {
+          "reference": {
+            "artifact_id": "c953cb38f4503a25b7b5178722c6eb241e17110e4bbe4dd819f4981c18aeae10",
+            "media_type": "application/json"
+          },
+          "view": "full"
+        }
+      }
+    ],
+    "scientific_and_disposition_plans": [
+      {
+        "reference": {
+          "artifact_id": "63128ad2573906e1e1d3f0359b8bf5489ddaedd44dd97f351dfa1afae2d2461e",
+          "media_type": "application/json"
+        },
+        "request_id": "native-call_00_mrLi2lSL9lWIKEHOPjs16580",
+        "action": "execute",
+        "decision": {
+          "claimed_inference": "empirical_search",
+          "hypothesis_id": "H1-nmpc-closed-loop-reach",
+          "requested_budget": 1,
+          "research_intent": "NMPC_EXECUTION",
+          "selected_candidate": {
+            "artifact_id": "ef1760ab632f9a6c5f546c990875424d65d62c55b9ae14d63a4caed52575c3fc",
+            "media_type": "application/json"
+          },
+          "selected_method": "gvs_nmpc_closed_loop",
+          "selected_variables": [
+            "applied tension schedule",
+            "closed-loop tracking error",
+            "final-window tip speed"
+          ],
+          "version": "research_decision_v1"
+        },
+        "hypothesis": "A closed-loop GVS/NMPC execution from the frozen named task initializer on the current two-segment tendon candidate reaches the frozen target within the sealed limits (terminal error < 0.01 m at 0.35 s, final-window max tip error < 0.01 m, final-window max tip speed < 0.02 m/s), and its measured applied SI tension sequence is a complete schedule usable later as a MuJoCo-direct starting source.",
+        "interpretation": "This is an empirical closed-loop physical measurement, not a feasibility proof: a pass establishes task acceptance for this exact execution only; a complete failure is diagnostic about the recipe/design under this controller and its measured applied tensions remain legal raw material for independent open-loop evaluation.",
+        "supporting_evidence": []
+      },
+      {
+        "reference": {
+          "artifact_id": "f11555d50d9422fe86c651a59e64440f3fc59f4444898ceb65f617681d77efec",
+          "media_type": "application/json"
+        },
+        "request_id": "native-call_00_TwhNooeumo2xiBeue9eT2963",
+        "action": "initialize_control",
+        "decision": {
+          "claimed_inference": "empirical_search",
+          "hypothesis_id": "H2-bind-nmpc-measured-tensions",
+          "requested_budget": 0,
+          "research_intent": "CONTROL_SEARCH",
+          "selected_candidate": {
+            "artifact_id": "ef1760ab632f9a6c5f546c990875424d65d62c55b9ae14d63a4caed52575c3fc",
+            "media_type": "application/json"
+          },
+          "selected_method": "initialize_control_baseline_from_measured_nmpc",
+          "selected_variables": [
+            "applied SI tension schedule",
+            "provenance binding"
+          ],
+          "version": "research_decision_v1"
+        },
+        "hypothesis": "The completed-but-failed NMPC execution 5e0c3dfc contains a complete, same-candidate measured applied SI tension trace (35 samples x 6 tendons, all finite and within the 8 N force limit) that can be bound as an open-loop zero-order-hold schedule on the identical candidate, yielding a legal bound source schedule with task_acceptance=unmeasured that unlocks MuJoCo-direct v2 bounded sequence optimization.",
+        "interpretation": "Seeding is bookkeeping over already-measured facts, not new physics: it converts a legal measured trace into an editable open-loop schedule so that a MuJoCo-direct optimizer can correct the one violated component (final-window tip speed 0.0232 m/s) while the position components retain their measured ~3 mm margin. The seeded schedule itself proves nothing until independently evaluated.",
+        "supporting_evidence": []
+      },
+      {
+        "reference": {
+          "artifact_id": "8940c5f875bacde4628322e41f226ed4616e8862ff375e152abdcae6c53979f4",
+          "media_type": "application/json"
+        },
+        "request_id": "native-call_00_y7CAu1Ri6n43AcH9GdX05648",
+        "action": "physical_replay",
+        "decision": {
+          "claimed_inference": "empirical_search",
+          "hypothesis_id": "H3-native-optimized-schedule-transfers",
+          "requested_budget": 1,
+          "research_intent": "PHYSICAL_VALIDATION",
+          "selected_candidate": {
+            "artifact_id": "ef1760ab632f9a6c5f546c990875424d65d62c55b9ae14d63a4caed52575c3fc",
+            "media_type": "application/json"
+          },
+          "selected_method": "physical_replay_of_mujoco_direct_schedule",
+          "selected_variables": [
+            "bounded tension correction coefficients",
+            "holding max tip speed"
+          ],
+          "version": "research_decision_v1"
+        },
+        "hypothesis": "The MuJoCo-direct optimized bounded schedule 6e08ba12 (24 knot-major coefficients on 4 knots x 6 channels, correction magnitude <= 1.5 N, 5% target margin, native window 0.0-0.35 s seeded from the measured NMPC trace) transfers to an independent full 0-to-0.35 s zero-order-hold replay on candidate aea2f784 and satisfies every frozen acceptance component: terminal error < 0.01 m, holding max position error < 0.01 m, holding max tip speed < 0.02 m/s.",
+        "interpretation": "This is the decisive independent measurement for the native-optimized schedule: a pass establishes task acceptance for this exact execution only (no robustness, hardware, repeatability or global-feasibility claim); a failure quantifies the transfer gap between the sampled local native diagnostic and the registered evaluation and tests whether final-window tip speed is reducible by bounded open-loop correction on this design.",
+        "supporting_evidence": []
+      },
+      {
+        "reference": {
+          "artifact_id": "a46b5ff6e380eb9d1af258bf11c0a56245bbf30ee1de8b15e5161b1b7a591e82",
+          "media_type": "application/json"
+        },
+        "request_id": "native-call_00_2pMkd560ccOF9fULn8WY0347",
+        "action": "select",
+        "decision": {
+          "claimed_inference": "observed_task_pass",
+          "hypothesis_id": "H4-select-independent-accepted-run",
+          "requested_budget": 0,
+          "research_intent": "SELECT",
+          "selected_candidate": {
+            "artifact_id": "ef1760ab632f9a6c5f546c990875424d65d62c55b9ae14d63a4caed52575c3fc",
+            "media_type": "application/json"
+          },
+          "selected_method": "physical_replay_of_mujoco_direct_schedule",
+          "selected_variables": [
+            "bound tension schedule 6e08ba12",
+            "frozen acceptance components"
+          ],
+          "version": "research_decision_v1"
+        },
+        "hypothesis": "The already publicly read, complete and independent execution c953cb38 - an open-loop zero-order-hold replay of the MuJoCo-direct optimized schedule 6e08ba12 on candidate aea2f784 - satisfies every frozen acceptance component and is the exact reference this Study should freeze as its solution.",
+        "interpretation": "Selection is bookkeeping over an established physical observation, not new evidence. Read acceptance record for c953cb38: accepted=true, status=accepted, issues=[], missing=[], components evaluator:task_bound 0.0026263 m (limit 0.01), holding_position 0.0027456 m (limit 0.01), holding_speed 0.01898531 m/s (limit 0.02), force_bounds 0.0 N (limit 1e-8), solver_errors 0, holding_coverage 6 inclusive samples, evaluation_validity valid, execution_complete true, task_evaluator true, evaluation_reference 67e61a3c, simulation d90973cc, physical_launches 1. This supports observed task acceptance for exactly this candidate, schedule and profile - not robustness, repeatability, hardware or real-time behaviour, continuous-time compliance (continuous_time_guarantee=false), global feasibility/infeasibility or structural superiority. Holding speed retains ~5% headroom, matching the requested 5% native margin, and the earlier closed-loop NMPC attempt remains a complete-but-failed diagnostic (holding_speed 0.0232099 m/s) without proven causal status.",
+        "supporting_evidence": [
+          {
+            "artifact_id": "c953cb38f4503a25b7b5178722c6eb241e17110e4bbe4dd819f4981c18aeae10",
+            "media_type": "application/json"
+          }
+        ]
+      },
+      {
+        "reference": {
+          "artifact_id": "11a6a8c07a09160e7ba4d452e6318c8288291184e76609a9b587cb058dae7ba2",
+          "media_type": "application/json"
+        },
+        "request_id": "native-call_00_fujEyUq1e3rdiHZj9IX67340",
+        "action": "select",
+        "decision": {
+          "claimed_inference": "observed_task_pass",
+          "hypothesis_id": "H4-select-independent-accepted-run",
+          "requested_budget": 0,
+          "research_intent": "SELECT",
+          "selected_candidate": {
+            "artifact_id": "ef1760ab632f9a6c5f546c990875424d65d62c55b9ae14d63a4caed52575c3fc",
+            "media_type": "application/json"
+          },
+          "selected_method": "physical_replay_of_mujoco_direct_schedule",
+          "selected_variables": [
+            "bound tension schedule 6e08ba12",
+            "frozen acceptance components"
+          ],
+          "version": "research_decision_v1"
+        },
+        "hypothesis": "The publicly fully read, complete and independent execution c953cb38 - an open-loop zero-order-hold replay of the MuJoCo-direct optimized schedule 6e08ba12 on candidate aea2f784 - satisfies every frozen acceptance component and is the exact reference this Study should freeze as its solution.",
+        "interpretation": "Selection is bookkeeping over an established physical observation, not new evidence. Read acceptance record for c953cb38: accepted=true, status=accepted, issues=[], missing=[], components evaluator:task_bound 0.0026262739 m (limit 0.01), holding_position 0.0027456019 m (limit 0.01), holding_speed 0.0189853082 m/s (limit 0.02), force_bounds 0.0 N (limit 1e-8), solver_errors 0, holding_coverage 6 inclusive uniform samples passed, evaluation_validity valid, execution_complete true, task_evaluator true; bound to evaluation 67e61a3c, simulation d90973cc, physical_launches 1. Observed tip at 0.35 s [0.289058,0.036244,0.192112] m with the critical sample at speed 0.0189853 m/s and tensions [6.8022,7.9990,4.4551,3.5259,2.7267,2.5383] N. This supports observed task acceptance for exactly this candidate, schedule and profile only - not robustness, repeatability, hardware performance, real-time behaviour, continuous-time compliance (continuous_time_guarantee=false), global nonlinear feasibility/infeasibility, structural necessity or superiority. Holding speed retains ~5% headroom, matching the 5% native target margin, and the earlier closed-loop NMPC attempt (holding_speed 0.0232099 m/s) remains a complete-but-failed diagnostic with no established causal role.",
+        "supporting_evidence": [
+          {
+            "artifact_id": "c953cb38f4503a25b7b5178722c6eb241e17110e4bbe4dd819f4981c18aeae10",
+            "media_type": "application/json"
+          }
+        ]
+      }
+    ],
+    "tool_rejections": [
+      {
+        "tool": "evidence_read",
+        "message": "'candidate_index'",
+        "evidence": {
+          "artifact_id": "acf3a071ea8e4433ab007d5dc675d957daf3a889dac676d1f85915b434d9a56c",
+          "media_type": "application/json"
+        }
+      },
+      {
+        "tool": "research_analysis",
+        "message": "1 validation error for AnalysisRequest",
+        "evidence": {
+          "artifact_id": "ee7ef4550eaf74a090397385587af71b8423a2a85bc5c3117c3c0e3bfceaa263",
+          "media_type": "application/json"
+        }
+      },
+      {
+        "tool": "research_plan",
+        "message": "1 validation error for Plan",
+        "evidence": {
+          "artifact_id": "71fa6f570d4c9bb7e48275e57080267cedb6d7e063aabdeb4dfcc703fd4d5def",
+          "media_type": "application/json"
+        }
+      },
+      {
+        "tool": "research_plan",
+        "message": "DECISION_CANDIDATE_MISMATCH",
+        "evidence": {
+          "artifact_id": "91c0259dba15b8ef7427927a0cd7b7adc1226f8db01af75efa49a13070b72e24",
+          "media_type": "application/json"
+        }
+      },
+      {
+        "tool": "evidence_read",
+        "message": "'task_passed'",
+        "evidence": {
+          "artifact_id": "8f258168b5d878b9364b86861d21381082fefa0adcb58d72e41f8ef4509690db",
+          "media_type": "application/json"
+        }
+      },
+      {
+        "tool": "research_plan",
+        "message": "DISPOSITION_REQUIRES_EXACT_ACTUAL_READ; SEARCH_OR_STARTUP_TEXT_IS_INSUFFICIENT",
+        "evidence": {
+          "artifact_id": "d4cdde39c9e5c67f02d60f35482e5a5c005bad57dcc8515646f0b2fea16d56b6",
+          "media_type": "application/json"
+        }
+      },
+      {
+        "tool": "research_plan",
+        "message": "explicit evidence_read of this completed evaluation required before selection or confirmation",
+        "evidence": {
+          "artifact_id": "d8c159879dfb243bb347af2df7eca11c1fdca92fa8245458f4bc5d29c5e8f7cd",
+          "media_type": "application/json"
+        }
+      }
+    ],
+    "reporter_model_requests": 2,
+    "investigation_requests": 0,
+    "L0_bytes": {
+      "first": 39831,
+      "min": 39831,
+      "max": 92088
+    },
+    "unsealed_calls": 0,
+    "calls_by_status": {
+      "completed": 33,
+      "failed": 3
+    }
+  },
+  "engineering": {
+    "provider_approval_rejection_before_send": true,
+    "explicit_user_egress_approval_recorded": true,
+    "scientific_worker_interruptions": 0,
+    "recovery_dispatches": 0,
+    "study_migrations": 0,
+    "postseal_projection_fix": "Fixed-tension evaluation_version copied from candidate in new results; sealed legacy working-set comparisons use known same-profile candidate version without rewriting artifacts.",
+    "checks": [
+      "Frozen config, dependency imports, credential presence, existing ControlSeedRequest contract",
+      "Archived same-candidate L2 projection, explicit version/profile mismatch rejection, Store/events/ledger unchanged",
+      "C0ReadinessTests.test_fixed_select_zero_and_positive_confirmation_recovery: PASS (synthetic workers only)",
+      "git diff --check: PASS"
+    ],
+    "preflight_test_limit": "Old S127 fixture could not start without matlab.engine; no numerical execution. Old secondary environment path absent. No dependency installed."
+  }
+}
