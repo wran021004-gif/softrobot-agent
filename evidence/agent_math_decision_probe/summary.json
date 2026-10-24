@@ -1,5 +1,5 @@
 {
-  "status": "B1_frozen_provider_zero",
+  "status": "B4_completed_mixed_result",
   "cohort": "protocol-fixed",
   "prior_cohort": "evidence/agent_math_decision_probe/initial_summary.json",
   "baseline": "515500267",
@@ -36,8 +36,8 @@
     "timeout_s": 600.0
   },
   "authorization": "User attachment 4a906846-0f46-433c-8bf8-e0d482a4506e, sections 6 and 14: authorizes at most 8 real main Agent Provider requests with original egress admission; only necessary frozen task, mathematical scalars, physical diagnostics and evidence summaries; same C1 Provider/model. No scientific workers or Reporter requests. Supplemental user instruction on 2026-10-25 authorizes repairing unexpected protocol errors and rerunning; initial requests do not consume the new eight-request comparison allowance, but their actual billed usage remains separately recorded.",
-  "request_ceiling": 8,
-  "actual_requests": 0,
+  "request_ceiling": 16,
+  "actual_requests": 16,
   "reporter_requests": 0,
   "physics_steps": 0,
   "scientific_workers": 0,
@@ -342,7 +342,863 @@
     ],
     "review_policy": "Alternative legal low-cost discriminating actions can earn full credit. No preferred structure/method answer. Check citations, concrete measurements, falsification, budget, admission and scope manually; automate only schema and accounting. Two pairs are diagnostic, no statistical/generalization claim."
   },
-  "results": [],
-  "manual_review": null,
-  "money": null
+  "results": [
+    {
+      "case": "reach_hold",
+      "arm": "baseline",
+      "turn": 1,
+      "scientific_execution": "not_dispatched",
+      "request_id": "r3-request-1a3f17026787436e984d5c9c4010f90e",
+      "usage": {
+        "prompt_tokens": 3093,
+        "completion_tokens": 11200,
+        "total_tokens": 14293,
+        "prompt_tokens_details": {
+          "cached_tokens": 128
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 9250
+        },
+        "prompt_cache_hit_tokens": 128,
+        "prompt_cache_miss_tokens": 2965
+      },
+      "finish_reason": "tool_calls",
+      "plan": {
+        "action": "diagnose",
+        "decision": {
+          "version": "research_decision_v1",
+          "hypothesis_id": "H-RH-HOLDING-SPEED-001",
+          "claimed_inference": "empirical_search",
+          "research_intent": "DIAGNOSE",
+          "selected_method": "same_nlp_iteration_contrast",
+          "selected_variables": [
+            "ipopt_termination_status",
+            "iteration_count",
+            "max_holding_speed_m_s",
+            "holding_speed_at_0.35_s",
+            "terminal_and_holding_position_error_m",
+            "max_actual_tension_n",
+            "last_actual_tension_n",
+            "tension_headroom_n",
+            "predicted_holding_speed_m_s"
+          ],
+          "selected_candidate": null,
+          "requested_budget": 2
+        },
+        "next_step": null,
+        "hypothesis": "当前问题：在RH-O所示S142硬化候选（near/distal Young 8.279999/6.209999 MPa，6个保持样本，terminal/最大保持位置误差0.0031364419 m，max holding speed 0.0228490897 m/s，峰值在0.35 s，max actual tension 7.922288457 N且violation=0）中，保持速度失败究竟由优化器欠收敛、张力/制动权限饱和，还是保持窗/终端边界表述造成？竞争机制H1“优化器欠收敛/数值终止”：RH-S记录35次更新全部为Maximum_Iterations_Exceeded、0次converged、max_iterations=120，实际施加计划并非局部最优；若在同一保存终端NLP上提高迭代上限，应得到收敛计划并把最大保持速度压到0.02 m/s以下，而无需改变模型。H2“张力/制动权限饱和或结构限制”：RH-O的last_actual_tension为6.984/7.922/4.394/4.199/3.344/3.151 N，最大7.922 N贴近8 N上界，且速度峰值在最终保持样本0.35 s；即使优化器收敛，非负有界张力也可能缺少足够制动权限，提高迭代上限不会实质降低速度或只会把张力顶在边界。H3“保持窗/终端边界表述”：速度最大值恰在最后一个保持时刻，可能是终端速度约束单点施加、保持窗覆盖不足或采样/离散化边界效应；高迭代收敛后速度仍集中在0.35 s则支持H3而非H1。区分实验：在同一保存终端NLP和同一初值上做高迭代重解，比较收敛状态、预测保持速度与张力余量，不启动新的full NMPC。",
+        "supporting_evidence": [],
+        "expected_observation": "测量量：Ipopt termination status与iteration count；重解计划在6个holding样本上的速度、最大保持速度、terminal/holding位置误差、6根腱actual tension及相对8 N的余量；与RH-O的0.0228490897 m/s、0.0031364419 m、7.922288457 N逐项对比。分支A：高迭代重解达到Solve_Succeeded（或迭代数明显下降）且预测最大保持速度≤0.02 m/s、位置≤0.01 m、张力≤8 N，则H1优化器欠收敛为主因，RH-S的未收敛状态足以解释RH-O的保持速度失败。分支B：重解收敛但预测最大保持速度仍>0.02 m/s，且末样本速度/张力仍接近RH-O的0.35 s与7.92 N边界，则H2张力/制动权限或H3保持窗边界为主因，单提高迭代上限不足。分支C：重解仍不收敛、状态对初值/缩放敏感，或速度预测在阈值附近抖动，则数值/缩放不确定性主导，暂不能把H1或H2判为唯一机制，需先做条件数与缩放诊断。若状态可读且成本允许，用不超过720个native步仅回放重解给出的显式计划以核验实际保持速度；不重新优化，不把回放当作任务验收。",
+        "weakening_observation": "若高迭代重解没有改善收敛状态（仍为Maximum_Iterations_Exceeded或iteration count不降），或重解/回放的最大保持速度相对0.0228490897 m/s的变化小于数值容差且仍>0.02 m/s，同时末张力仍贴近7.922/8 N，则H1被削弱而H2/H3相对增强；反之，若高迭代重解收敛且把最大保持速度压到0.02 m/s以下，则H2“张力/制动权限饱和是主因”被削弱。若收敛解已满足其他约束而速度峰值仍严格出现在0.35 s，则H3被增强；若重解状态对初值敏感且分支来回翻转，则H1与H2均不能单独成立。",
+        "fixed_conditions": "固定任务与模型：target_world_m=[0.29,0.035,0.19]，mount_world_m=[0,0,0.15]，duration=0.35 s，control/sample=0.01 s，physics=0.0005 s，holding_times=[0.3,0.31,0.32,0.33,0.34,0.35] s，terminal/holding位置上限0.01 m，holding速度上限0.02 m/s，absolute tension [0,8] N，tendon_order=[near_t0,near_t1,near_t2,far_t0,far_t1,far_t2]；同一legal source-relative两段六腱臂、12 cells/segment、固定topology/sections/routing/environment；S142硬化候选长度、截面和权重不变，holding=0.1、terminal=0.1；使用同一35更新记录、同一保存终端NLP状态与同一初值；不改变目标、时域、权重、张力界或候选设计；不做full NMPC/PPO，不做新物理验收，不把局部线性化或单次NLP收敛当成稳定性或任务可行性证明。",
+        "stopping_condition": "在以下任一条件停止：完成1次同一保存终端NLP的高迭代重解，并在状态可读时完成1次不超过720 native步的显式计划回放/对比；总墙钟≤180 s、声明操作单元≤2、physics_steps≤720；或高迭代重解达到Solve_Succeeded且最大保持速度相对0.02 m/s阈值的变化>10%，足以判别；或无法读取同一保存NLP/同一初值，立即停止并报告“不可判别”，不得用680步前缀重建冒充同一实验；或重解显示问题不可行/数值异常。停止后不进入full NMPC、PPO、SELECT或任务验收。",
+        "interpretation": "结果到达后按三层区分：数学/数值层——高迭代IPOPT状态与迭代数只说明同一保存NLP的局部收敛性，不等于全局最优或物理可行；物理观测层——RH-O的0.0228490897 m/s、0.0031364419 m、7.922288457 N是已测执行事实，回放只核验显式计划；任务验收层——本diagnose不创建receipt、SELECT或acceptance，保持速度最终是否合格仍须独立注册评估器及frozen coverage/completeness/actual-tension/solver-exception检查。若分支A成立，把H1更新为“主因是迭代上限/缩放导致的欠收敛”，保留H2为待排除的必要条件（最大张力余量仅约0.0777 N），下一步唯一有区分力的动作是只提高同一NMPC的IPOPT迭代上限后重跑一次完整35更新，观察保持速度改善能否复现。若分支B成立，把H2/H3更新为主因，下一步转向有界制动权限、保持窗终端速度表述或瞬时制动权限的短native对比，而不是继续堆迭代。若分支C成立，未知量是NLP缩放与初值敏感性，下一步先做条件数/变量缩放和两次初值重解，仍不启动full NMPC。无论哪支，都不能把“收敛”或“局部速度改善”当作任务接受。requested_budget=2，单位=声明操作单元（1次高迭代离线NLP重解约125 s + 1次不超过720 native步的显式计划回放/对比，数秒），总成本上限约180 s、720 native步、0次full NMPC、0次PPO。",
+        "parameters": null,
+        "search": null,
+        "candidate": null,
+        "selected_execution": null,
+        "revise_selection": false,
+        "diagnostic": null,
+        "mechanics": null,
+        "cross_replay": null,
+        "physical_replay": null,
+        "refinement": null,
+        "matched_state": null,
+        "nmpc_prediction_diagnostic": null,
+        "mechanics_source": null,
+        "experience_disposition": {}
+      },
+      "schema_check": "passed"
+    },
+    {
+      "case": "reach_hold",
+      "arm": "evidence",
+      "turn": 1,
+      "scientific_execution": "not_dispatched",
+      "request_id": "r3-request-36daaa96a8474db1ab5d8375db9665eb",
+      "usage": {
+        "prompt_tokens": 3438,
+        "completion_tokens": 5972,
+        "total_tokens": 9410,
+        "prompt_tokens_details": {
+          "cached_tokens": 2176
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 3378
+        },
+        "prompt_cache_hit_tokens": 2176,
+        "prompt_cache_miss_tokens": 1262
+      },
+      "finish_reason": "tool_calls",
+      "plan": {
+        "action": "diagnose",
+        "decision": {
+          "version": "research_decision_v1",
+          "hypothesis_id": "H-holding-speed-mechanism-01",
+          "claimed_inference": "empirical_search",
+          "research_intent": "DIAGNOSE",
+          "selected_method": "instantaneous_braking_v1",
+          "selected_variables": [
+            "near_t0",
+            "near_t1",
+            "near_t2",
+            "far_t0",
+            "far_t1",
+            "far_t2",
+            "terminal_tip_speed_m_s",
+            "min_instantaneous_speed_derivative_m_s2",
+            "holding_speed_at_0p35_s_m_s"
+          ],
+          "selected_candidate": null,
+          "requested_budget": 720
+        },
+        "next_step": null,
+        "hypothesis": "当前问题（RH-O/RH-S）：S142 stiff 候选（近/远 Young 8.28/6.21 MPa，长度、截面、权重均未改）的 35 次更新合法执行只被\"保持速度\"判死——max_holding_speed=0.02285 m/s 超 0.02 m/s 且峰值恰在最后一个保持样本 0.35 s，而终末/最大保持位置误差 0.00314 m 在 0.01 m 限内、实际张力最大 7.922 N 未越 [0,8] N、违规量 0、无登记求解器异常；同时 35 次更新的 Ipopt 全为 Maximum_Iterations_Exceeded、converged_updates=0，但 35 个实际合法计划确已执行。需要判别的是：制动失败到底来自\"计划质量\"还是\"物理权威\"。三个互斥机制：\n\nM1（规划侧迭代截断，制动未被用尽）：120 次迭代上界下的非收敛替换使末端制动段的张力增量停留在可行输入盒内部未饱和处，物理上仍有可用制动余量；若成立，RH-S 的零收敛是失败的直接原因而非伴随现象。\n\nM2（结构/驱动侧制动权威不足）：在 0.34 s 的实际构型处，即便把六个张力在 [0,8] N 盒内取到最优，0.01 s 内可削减的末端速度也不足以把 0.02285 m/s 压到 0.02 m/s 以下；若成立，这是制度内物理极限，与 IPOPT 是否收敛无关。\n\nM3（模型动态传播/持有输入时序错配）：RH-M 显示同输入下 GVS 一步预测仅 0.002124 m/s 而实测 0.022849 m/s（向量差 0.022519），GVS 对实际末端的重构 0.018826 与实测差 0.004181、与预测差 0.018404，说明误差主要出在\"预测—实际\"这一层的传播而非输入符号。但 RH-C 的零步检查（xml 质量/质心/刚度/阻尼/重力/映射差 0，惯量重构差 1.9e-15 kg·m²，张力符号/通道/虚功匹配，0.34 s 处 GVS 隐式力平衡残差 4.33e-17 N·m²）表明两端模型的代数层并未分叉，故 M3 至多解释\"预测偏差\"，不能直接解释验收失败，必须靠 M1/M2 来定性。本方案的判别设计正是把这三者放到同一 0.34 s 精确状态上做单点对照。",
+        "supporting_evidence": [],
+        "expected_observation": "下一步具体实验（不改冻结任务、不重跑整段 NMPC、不重优化设计）：从 0.34 s 的精确状态（已保存的投影实测状态；若无可逐位复现的完整检查点，则用前缀重建到该状态）触发两类只做 0.01 s 的短动作，并同时做 2 个离线求解。\n\n(a) instantaneous_braking_v1：在该精确原生状态上，对六个张力（near_t0、near_t1、near_t2、far_t0、far_t1、far_t2，次序固定）在 [0,8] N 盒内求最小瞬时末端速度导数（即 ‖v_tip‖ 的最快下降率），与实测张力点处的值对比，得到\"制动余量\"（盒内最优 − 实测输入点）。\n\n(b) short_input_response_v1 两尺度有限差分：给出末端速度对每个张力的局部灵敏度与符号。\n\n(c) 两条 20 物理步（0.01 s）的原生短分支，输入严格为 RH-O 末段实际张力：基线分支（张力保持不变）与一条有界修正分支（沿 (a)(b) 给出的可行下降方向做小幅张力调整，仍是合法输入、不越 [0,8] N）。\n\n需测量的量：盒内最小 d‖v_tip‖/dt 及其相对实测输入点的改进、六个张力灵敏度、两条分支在 0.34→0.35 s 的末端 ‖v_tip‖、0.35 s 保持速度、GVS 与原生同输入 20 步的末端速度差、实际张力是否仍 ≤8 N。\n\n期望观测（若 M1 为真）：(a) 在实测张力点附近仍有可观的可行下降率，(b) 灵敏度非零且方向一致，(c) 基线分支复现 ≈0.0228 m/s 而合法修正分支落到 0.02 m/s 以下。(若 M2 为真)：盒内最优几乎不改进（最小速度导数贴近饱和边界，灵敏度在有效张力处退化），两条分支都在 0.02 m/s 以上。(若 M3 有独立贡献)：原生基线分支与 GVS 20 步预测仍差 0.02 量级，而 RH-C 式零步复核依旧匹配。\n\n注：已排期的下一轮观测属历史记录，与本方案的选择无关，也不构成上述分支的执行结果；无论其内容如何，判别都须由本条设计独立重放得出。",
+        "weakening_observation": "使本方案整体自我否定的观察：若在 0.34 s 状态上无法复现 RH-O 记录的 0.0228490897 m/s（原生 20 步基线分支与记录相差超过 20%，或保存状态/实际输入无法逐位重建且 680 步前缀重建后仍不一致），则\"该状态处制动权威\"这一问题的前提不成立，M1 与 M2 的判别作废，只能先退回状态与输入一致性核对；或者若 (a) 的盒内求解数值退化/不可行（无可行点、或两尺度有限差分灵敏度符号不一致），则该离线结果不能用作 M1/M2 的判别证据，只能报告 M3 的传播层偏差。",
+        "fixed_conditions": "冻结条件：目标 [0.29, 0.035, 0.19] m；安装点 [0, 0, 0.15] m；时长 0.35 s；控制/采样周期 0.01 s；物理步 0.0005 s；保持时刻 {0.30,0.31,0.32,0.33,0.34,0.35} s；终末与保持位置限 0.01 m；保持速度限 0.02 m/s；端力盒 [0,8] N；张力次序 near_t0、near_t1、near_t2、far_t0、far_t1、far_t2；六肌腱两段 12 单元拓扑、截面、走线、环境、GVS 12 曲率系数+12 速率的表示均不变；stiff 候选 Young 8.28/6.21 MPa 与 holding/terminal 权重 0.1 不变。边界：只做 0.01 s 短分支与离线求解，不做整段轨迹重优化、不改设计参数、不做物理验收、不产生正式 Study/回执/SELECT/受理。\n\n预算与单位：requested_budget = 720，单位为物理步。Justification：两条 20 步原生短分支 = 40 步；若不存在经验证的完整检查点，0.34 s 精确状态需前缀重建，预留 680 步（40+680=720，约为成本表中 short_native_comparison 与重建上限之和）；2 个离线求解（instantaneous_braking_v1、short_input_response_v1 有限差分）为 1-10 s 级小规模代数/线性化，不计物理步；预估墙钟约 180 s。full_nmpc 与 ppo 预算为 0。",
+        "stopping_condition": "停止条件：完成 2 个离线求解与两条 20 步原生短分支并给出 M1/M2/M3 的分支判定即停；如需前缀重建，用尽 680 步（累计 720 物理步，约 180 s）后无论状态是否完备、差分是否两尺度一致都停止并如实报告不完备；不进入 35 更新完整 NMPC、不做 PPO、不做 SELECT、不作任何验收或能力声明。",
+        "interpretation": "结果解释与后续判别：\n\n分支一（支持 M1，削弱 M2）：若 (a) 在 0.34 s 实测张力附近给出明显可用的盒内速度下降率，且合法有界修正分支把 0.35 s 保持速度压到 0.02 m/s 以下，同时基线分支复现 ≈0.0228 m/s，则失败的主因是计划在被截断的迭代预算下未用尽已有制动余量，RH-S 的 Maximum_Iterations_Exceeded/0 收敛应被当作因果而非伴随；下一步才是针对求解器收敛（更紧的终止判据或热启动）的有界实验，且需另行准入。\n\n分支二（支持 M2，削弱 M1）：若盒内最小速度导数相对于实测输入点几乎无改进（或灵敏度在有效张力处饱和、部分张力已贴近 8 N），且两条短分支都留在 0.02 m/s 以上，则保持速度失败是终端构型处制度内的制动权威上限问题，调整迭代次数无望解决；下一步应转向终端构型/结构层面的制动权威，而不是求解器参数。\n\n分支三（M3 的地位收窄）：若原生 20 步基线与 GVS 预测仍差 0.02 量级而 RH-C 式零步复核继续匹配，则 M3 被定位为\"动态传播与持有输入时序\"层的预测偏差，只影响以 GVS 为准的规划内部模型，不能替代对验收失败（RH-O 实测）的 M1/M2 判定；RHS-M 的 0.022519 m/s 预测-实测差不得据此写成\"模型错误导致失败\"。\n\n仍未知的部分必须在结论中显式保留：本诊断只覆盖单一 0.34→0.35 s 区间与实际输入邻域，不构成有限时域制动的证明，也不证伪全局计划最优性；\"12 曲率系数+12 速率\"到 48 qpos/qvel 的映射与权重选择是否共同作用仍未定；任何 M1/M2 结论都不得写成任务验收或能力结论。无论已排期观测内容如何，均按上述三条独立判定。",
+        "parameters": null,
+        "search": null,
+        "candidate": null,
+        "selected_execution": null,
+        "revise_selection": false,
+        "diagnostic": null,
+        "mechanics": null,
+        "cross_replay": null,
+        "physical_replay": null,
+        "refinement": null,
+        "matched_state": null,
+        "nmpc_prediction_diagnostic": null,
+        "mechanics_source": null,
+        "experience_disposition": {}
+      },
+      "schema_check": "passed"
+    },
+    {
+      "case": "reach_hold",
+      "arm": "baseline",
+      "turn": 2,
+      "scientific_execution": "not_dispatched",
+      "request_id": "r3-request-a0dd14196c8f4fe4873341b270c0dd3f",
+      "usage": {
+        "prompt_tokens": 16454,
+        "completion_tokens": 10768,
+        "total_tokens": 27222,
+        "prompt_tokens_details": {
+          "cached_tokens": 7808
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 8964
+        },
+        "prompt_cache_hit_tokens": 7808,
+        "prompt_cache_miss_tokens": 8646
+      },
+      "finish_reason": "tool_calls",
+      "plan": {
+        "action": "diagnose",
+        "decision": {
+          "version": "research_decision_v1",
+          "hypothesis_id": "H-RH-HOLDING-SPEED-002",
+          "claimed_inference": "empirical_search",
+          "research_intent": "DIAGNOSE",
+          "selected_method": "short_input_response_v1",
+          "selected_variables": [
+            "native_holding_speed_at_0.35_s",
+            "actual_tension_vector_n",
+            "tension_headroom_n",
+            "finite_difference_sensitivity_m_s_per_N",
+            "bounded_correction_magnitude_n",
+            "predicted_vs_native_speed_error_m_s",
+            "nonlinear_root_defect"
+          ],
+          "selected_candidate": null,
+          "requested_budget": 720
+        },
+        "next_step": null,
+        "hypothesis": "当前问题仍是：在RH-O的S142硬化候选上，保持速度失败（max 0.0228490897 m/s > 0.02，峰值在0.35 s，位置误差0.0031364419 m，最大张力7.922288457 N且无越界）由什么机制解释？新证据RH-N显示：同一保存NLP仅把IPOPT上限120→480后，A/B两支仍为Maximum_Iterations_Exceeded，保持速度0.0228490897/0.022752409 m/s，B仅降约0.0000967 m/s（约0.42%）；但B的selected scaled violation从4.911218e-06降到1.532882e-06、objective从0.0703198500163降到0.0703008166858，B inf_du=0.084485。这说明“仅提高迭代上限”不足以修复失败，H1需从“迭代上限是主因”弱化为“残余求解器/缩放问题仍可能”。新证据RH-H显示：同一实测投影起点与A实际输入下，隐式Euler 1×0.01 vs 2×0.005 s的velocity_prediction_change仅0.00043624 m/s，小于超限余量0.002849 m/s，max_scaled_root_defect=8.04e-12；这削弱H3的“积分步长/离散化是主因”版本。竞争机制H2“有界张力/制动权限饱和”仍成立：RH-O末张力贴近8 N且速度峰值在最终保持样本；若在已验证t=0.34公共状态上做合法张力修正仍不能把0.35 s速度压到0.02 m/s以下，则H2为主。竞争机制H4“NLP目标/约束映射与native保持速度检查不一致”：RH-N的B scaled violation已很小但native holding speed仍失败；若一个简单有界局部修正就能降低native速度，则说明可行输入存在而NLP未选中或未正确表达该速度约束，H4为主。区分实验：在已验证t=0.34 native状态和A实际输入下，做两档合法actual-tension有限差分，并至多施加一个有界修正，用非线性native积分走20步到0.35 s，测量实际保持速度与张力。",
+        "supporting_evidence": [],
+        "expected_observation": "测量量：两档有限差分下各腱对0.35 s速度的敏感度（m/s per N）、修正前后native holding speed、实际张力向量及相对8 N余量、修正幅值、预测与native速度误差、非线性root defect；与RH-O的0.0228490897 m/s和RH-N B的0.022752409 m/s对比。分支A：存在合法有界修正（各腱∈[0,8] N）使native 0.35 s速度≤0.02 m/s，则H2被削弱、H4被增强，说明失败不是纯张力/制动权限，而是NLP约束映射、目标权重或残余求解器问题。分支B：两档FD均显示速度对张力不敏感，或最佳有界修正仍使速度>0.02 m/s甚至需顶到8 N，则H2被增强、H4被削弱。分支C：FD两档结果不一致，或非线性检查与局部预测误差超过阈值/root defect超限，则局部模型不可靠，H2/H4均暂不判定，下一步转native动力学/Jacobian核验。",
+        "weakening_observation": "若在有界修正后native 0.35 s速度≤0.02 m/s且张力≤8 N，则H2“张力/制动权限饱和是主因”被削弱；若最佳有界修正仍>0.02 m/s或必须贴8 N仍失败，则H4“NLP未表达可行速度约束”被削弱。若两档FD敏感度符号或量级不一致，或非线性root defect>1e-8，则H2/H4均被削弱为“局部模型不可靠”，不能据此判断。",
+        "fixed_conditions": "固定target_world_m=[0.29,0.035,0.19]，mount_world_m=[0,0,0.15]，duration=0.35 s，control/sample=0.01 s，physics=0.0005 s，holding_times=[0.3,0.31,0.32,0.33,0.34,0.35] s，位置上限0.01 m，速度上限0.02 m/s，张力界[0,8] N，tendon_order=[near_t0,near_t1,near_t2,far_t0,far_t1,far_t2]；同一legal source-relative两段六腱臂、12 cells/segment、固定topology/sections/routing/environment；S142硬化候选长度、截面和权重不变，holding=0.1、terminal=0.1；使用RH-N已验证的共同native t=0.34状态与A实际输入，不重建680步前缀；不改变模型、时域、目标、权重或张力界；不做full NMPC/PPO，不做任务验收。",
+        "stopping_condition": "完成两档actual-tension FD和至多一个有界修正，并用非线性native积分走20步到0.35 s后停止；物理步≤720、墙钟≤180 s、full_nmpc=0、ppo=0；若修正违反[0,8] N、root defect>1e-8，或FD响应明显非线性到无法支持局部预测，提前停止并报告不可判别；不进入完整NMPC或新物理验收。",
+        "interpretation": "结果到达后：若分支A成立，H2从主因降为待排除条件，H4升为主因，H1只保留“残余求解器/缩放”次级解释；下一步应检查NLP中0.35 s速度残差与native检查的映射和权重，并用同一保存NLP只修正该映射后重解，而不是继续加迭代。若分支B成立，H2升为主因，H4降为次级；下一步转向有界制动时域、瞬时制动权限或保持窗终端约束的短native对比，判断是剩余0.01 s权限不足还是整个保持窗设计需要改。若分支C成立，未知量是局部模型与native动力学的一致性；下一步做native_dynamics_v1的精确状态质量、力、加速度和腱Jacobian核验，再决定。RH-N已削弱“仅提高迭代上限”的H1，RH-H已削弱“积分步长离散化”的H3；但H1的缩放/对偶不可行残余（B inf_du=0.084485）和H3的终端约束覆盖/检查映射仍未排除。requested_budget=720，单位=物理步；总成本≤180 s，含两档FD和至多一个有界修正，0次full NMPC、0次PPO；本诊断不创建receipt、SELECT或acceptance。",
+        "parameters": null,
+        "search": null,
+        "candidate": null,
+        "selected_execution": null,
+        "revise_selection": false,
+        "diagnostic": null,
+        "mechanics": null,
+        "cross_replay": null,
+        "physical_replay": null,
+        "refinement": null,
+        "matched_state": null,
+        "nmpc_prediction_diagnostic": null,
+        "mechanics_source": null,
+        "experience_disposition": {}
+      },
+      "schema_check": "passed"
+    },
+    {
+      "case": "reach_hold",
+      "arm": "evidence",
+      "turn": 2,
+      "scientific_execution": "not_dispatched",
+      "request_id": "r3-request-ad34942424ed47ada509bc008025c5b4",
+      "usage": {
+        "prompt_tokens": 11916,
+        "completion_tokens": 5347,
+        "total_tokens": 17263,
+        "prompt_tokens_details": {
+          "cached_tokens": 5504
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 2173
+        },
+        "prompt_cache_hit_tokens": 5504,
+        "prompt_cache_miss_tokens": 6412
+      },
+      "finish_reason": "tool_calls",
+      "plan": {
+        "action": "diagnose",
+        "decision": {
+          "version": "research_decision_v1",
+          "hypothesis_id": "H-holding-speed-mechanism-02",
+          "claimed_inference": "empirical_search",
+          "research_intent": "DIAGNOSE",
+          "selected_method": "instantaneous_braking_v1",
+          "selected_variables": [
+            "near_t0",
+            "near_t1",
+            "near_t2",
+            "far_t0",
+            "far_t1",
+            "far_t2",
+            "min_instantaneous_speed_derivative_m_s2",
+            "box_braking_margin_m_s2",
+            "native_minus_gvs_tip_velocity_gap_m_s",
+            "holding_speed_at_0p35_s_m_s"
+          ],
+          "selected_candidate": null,
+          "requested_budget": 60
+        },
+        "next_step": null,
+        "hypothesis": "对上一轮假设的显式重估（基于新披露的 RH-N、RH-H，以及既有 RH-O、RH-S、RH-M、RH-C）：\n\n一、M1（规划侧迭代截断，制动未被用尽）——大幅削弱，近乎被否。RH-N 在\"同一 stiff 结构、经验证的共同原生 t=0.34 状态、同一 NLP 初值/权重/输入盒\"下只把 IPOPT 上限从 120 提到 480（4×），A/B 两支末端速度 0.0228490897 / 0.022752409，仅差 9.7e-5 m/s；选中目标 0.07031985→0.07030082、缩放违规 4.911e-6→1.532e-6 近乎不动，且两支仍是 Maximum_Iterations_Exceeded、两支保持速度检查依旧失败。也就是说：给出 4 倍迭代预算后计划在可行盒内几乎没有额外制动可挖，速度对计划改进量的响应约 2e-4（≈0），RH-S 的\"零收敛\"更可能是伴随现象而非主因。但必须保留保留位：两支都仍未收敛（B 的 inf_du=0.0845），所以不能写成\"收敛后仍失败\"的严格结论。\n\n二、M2（结构/驱动侧制动权威不足）——仍是活跃竞争解释，且尚未被直接测量。RH-N 的两支失败与\"盒内已无可削减余量\"相容，也与\"计划在错误的目标/约束信号下停住\"相容，RH-O 只给出实际张力（最大 7.922 N，已是盒的 99%）而非盒内最优，无法分辨。判别需要在不依赖 GVS 的原生状态上做盒内最小瞬时速度导数。\n\n三、M3（模型动态传播/时序错配）——子机制被 RH-H 否掉，但主分歧仍在且位置更明确。RH-H：同一实测起点与 A 实际输入，隐式欧拉 1×0.01 与 2×0.005 的速度预测仅变 0.00043624 m/s，根残差 8.04e-12，而一步误差 0.0225186、两个半步误差 0.022842（→预测速度≈0），说明 0.0225 m/s 的\"预测—实测\"差不是积分步长/离散化误差，半步细化反而更远离实测。结合 RH-M 中 GVS 对实际末端速度的重构 0.018826 与实测仅差 0.004181，可判：GVS 的\"由已知端点数据重构速度\"是好的，而\"持输入前向积分得到的速率状态\"几乎归零——分歧落在 12 曲率系数+12 速率到世界系末端速度的前向传播上，而非力律（RH-C：质量/质心/刚度/阻尼/重力/映射差 0，惯量重构差 1.9e-15 kg·m²，张力符号/通道/虚功匹配，0.34 s 处隐式力平衡残差 4.33e-17 N·m²）。故 M3 降级为\"规划内部速度通道失明\"的机制候选（记为 M4）：NMPC 的速度项/违规项看到的是被低估近 10 倍的末端速度，因此 120 与 480 次迭代都不会去制动——这恰好统一解释了 RH-S 的零收敛与 RH-N 的\"加迭代无效\"。但它不能直接解释验收失败，因为验收取的是原生 MuJoCo 速度（RH-O）。\n\n四、结论性判断：M1 弱，M2 与 M4 为当前两个主要竞争机制，且二者可用同一原生态实验一次分开——若原生盒内存在显著制动余量，则失败主因是预测/规划通道（M4）而非物理；若原生盒内权威饱和，则 M2 成立、GVS 偏差只是旁支。\n\n仍未知：单点 0.34→0.35 s 邻域不覆盖整个保持窗口 {0.30…0.35}；48 qpos/qvel 与 12+12 表示的具体映射缺陷未定位；任何结论都不构成任务验收或能力声明。",
+        "supporting_evidence": [],
+        "expected_observation": "下一步具体实验（冻结任务不变，不重跑整段 NMPC，不做 PPO，不改设计）：以 RH-N 已验证的共同原生 t=0.34 状态为唯一起点（若该状态不能逐位复现，则本实验前提失效，见 weakening_observation）。\n\n(a) instantaneous_braking_v1：在该精确原生状态上，对六个张力 near_t0、near_t1、near_t2、far_t0、far_t1、far_t2 在 [0,8] N 盒内求最小瞬时末端速度导数（‖v_tip‖ 的最快下降率），并与 A 的实际张力点（6.984/7.922/4.394/4.199/3.344/3.151 N）处的值求差，得到\"未用尽的制动余量\"。同时记录盒内最优解落在哪些张力上界（是否贴 8 N）。\n\n(b) native_dynamics_v1 零步审计：在同一原生状态给出原生质量、力、加速度、世界系末端与肌腱雅可比，并把原生世界系末端速度与 GVS 在同一状态、同一实际输入下的末端速度输出逐分量对比，定位 M4 所说的映射缺口（只做零步代数，不推进物理）。\n\n(c) 三条 20 物理步（0.01 s）原生短分支，输入时刻与保持采样严格对齐 0.34→0.35 s：分支1 = A 实际张力保持不变（基线，应复现 RH-O 的 0.0228491 m/s）；分支2 = (a) 的盒内最优张力（饱和制动）；分支3 = 基线到最优的一半插值（检验制动是否连续可用、而非二值）。\n\n需测的量：盒内最小 d‖v_tip‖/dt 及其相对 A 输入点的改进幅度与方向；六个张力的局部灵敏度（两尺度一致时才算有效）；三条分支的 0.35 s 末端速度与保持速度、末端位置误差；原生−GVS 末端速度分量差；实际张力是否仍 ≤8 N、有无求解器异常。\n\n期望观测：(M4 为真) 盒内最优相对 A 点显著更负、(b) 中 GVS 速度分量系统性偏小（≈0 而非 ≈0.02）、分支2 落到 0.02 m/s 以下而分支1 复现 0.0228；(M2 为真) 盒内最优贴近饱和边界、(a) 改进幅度 ~1e-4 m/s 量级（与 RH-N 的 A↔B 差同量级）、三条分支全部 >0.02 m/s。\n\n注：已排期的下一轮观测属历史且与本方案选择无关，不作为上述分支的执行结果；三条分支判定须由本条设计独立重放得出。",
+        "weakening_observation": "使本方案自我否定的观察（任一成立即撤回 M2/M4 之分）：(1) t=0.34 共同原生状态无法逐位重建，或分支1 基线复现的 0.35 s 速度与 RH-O 的 0.0228490897 m/s 相差超过 20%，则\"该状态处制动权威\"这一问题的前提不成立，必须先退回状态/输入一致性核对；(2) (a) 的盒内求解数值退化或不可行（无可行点、或两尺度灵敏度符号不一致），则其结果不得用作 M2 与 M4 的判别证据，只能报告 (b) 的零步映射缺口；(3) 若 (b) 显示原生与 GVS 的末端速度分量在全部分量上一致（|差| < 0.001 m/s），则 M4 被否定，RH-M/RH-H 的 0.0225 m/s 差必须另找来源，本次不得再以\"速度通道失明\"作为解释。",
+        "fixed_conditions": "冻结：目标 [0.29, 0.035, 0.19] m；安装点 [0, 0, 0.15] m；时长 0.35 s；控制/采样 0.01 s；物理步 0.0005 s；保持时刻 {0.30,…,0.35} s；位置限 0.01 m；保持速度限 0.02 m/s；绝对张力盒 [0,8] N；张力次序 near_t0、near_t1、near_t2、far_t0、far_t1、far_t2；六肌腱两段 12 单元拓扑/截面/走线/环境、GVS 12 曲率系数+12 速率与 48 qpos/qvel 的对应关系均不改；stiff 候选 Young 8.28/6.21 MPa 与 holding/terminal 权重 0.1 不变；起点固定为 RH-N 已验证的共同原生 t=0.34 状态，A/B 的实际输入取 RH-O 末段实际张力。边界：只做 0.01 s 短分支与零步/小规模离线求解，不做整段轨迹重优化、不改设计参数、不做物理验收、不产生正式 Study/回执/SELECT/受理。\n\n预算与单位：requested_budget = 60，单位为物理步。Justification：3 条 20 步原生短分支 = 60 步（基线复现、饱和制动、半程插值）；因 RH-N 已提供经验证的共同原生 t=0.34 状态，本方案不再预留 680 步前缀重建（若 (1) 触发则直接停止而非重建）。2 个离线求解（instantaneous_braking_v1 盒内最小化、native_dynamics_v1 零步雅可比/速度输出对比）属 1-10 s 级代数，不计物理步；预估墙钟 ≤120 s。full_nmpc = 0、ppo_actions = 0、新增整段 rollout = 0。",
+        "stopping_condition": "停止条件：2 个离线求解与 3 条 20 步原生分支（共 60 物理步）完成并给出 M2/M4 的分支判定即停；任一 weakening 条件触发即立即停止并只报告否定结论；物理步与墙钟用尽即终止；不追加迭代上限对比（RH-N 已覆盖 120/480）、不进入 35 更新完整 NMPC、不做 PPO、不做 SELECT、不作任何验收或能力声明。",
+        "interpretation": "分支判定与后续判别：\n\n分支甲（支持 M4，削弱 M2）：若 (b) 显示 GVS 末端速度输出分量系统性接近 0 而原生为 ≈0.02 m/s 量级，且 (a) 给出相对 A 点显著的盒内下降率、分支2 把 0.35 s 保持速度压到 0.02 m/s 以下（分支3 居中），则失败主因是\"规划内部速度通道被低估近 10 倍\"——NMPC 的速度约束在 120 与 480 次迭代下都近似不激活（与 RH-S 零收敛、RH-N 加迭代无效一致），RH-M/RH-H 的 0.0225 m/s 差是通道缺陷的证据而非独立失败原因。下一步才是对 GVS 速度输出/速率传播做有界修正并以原生 rollout 复核，且需另行准入。\n\n分支乙（支持 M2，削弱 M1/M4）：若 (a) 的盒内最优相对 A 点改进仅 ~1e-4 m/s 且解贴 8 N 上界，三条分支（含饱和制动）都留在 0.02 m/s 以上，则保持速度失败是该终端构型处的制度内制动权威极限；RH-N 的\"加迭代无效\"被解释为盒已饱和，M1 彻底排除。下一步应转向终端构型/结构层面的制动权威（属 fixed_input_structure_v1 类问题），而非求解器或预测通道。\n\n分支丙（M4 被否定）：若 (b) 中原生与 GVS 末端速度全分量差 < 0.001 m/s，则\"速度通道失明\"不成立，RH-M/RH-H 的偏差需另找来源（此时 (a) 的结果单独用于 M2 与 M1 的残余判别）。\n\n必须显式保留的未知：60 步只覆盖 0.34→0.35 s 单区间与 A 输入邻域，不构成有限时域制动证明，也不证伪全局计划最优性或其它保持样本（0.30–0.33 s）的行为；12+12 表示到 48 qpos/qvel 的具体缺陷位置仍未定位；M1 的残余（B 仍 Maximum_Iterations_Exceeded、inf_du=0.0845）未被消除；任何结论都不得写成任务验收或能力结论。",
+        "parameters": null,
+        "search": null,
+        "candidate": null,
+        "selected_execution": null,
+        "revise_selection": false,
+        "diagnostic": null,
+        "mechanics": null,
+        "cross_replay": null,
+        "physical_replay": null,
+        "refinement": null,
+        "matched_state": null,
+        "nmpc_prediction_diagnostic": null,
+        "mechanics_source": null,
+        "experience_disposition": {}
+      },
+      "schema_check": "passed"
+    },
+    {
+      "case": "structure",
+      "arm": "baseline",
+      "turn": 1,
+      "scientific_execution": "not_dispatched",
+      "request_id": "r3-request-053a5d2f5d704d3989721332d131fdc5",
+      "usage": {
+        "prompt_tokens": 2951,
+        "completion_tokens": 6414,
+        "total_tokens": 9365,
+        "prompt_tokens_details": {
+          "cached_tokens": 1792
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 3958
+        },
+        "prompt_cache_hit_tokens": 1792,
+        "prompt_cache_miss_tokens": 1159
+      },
+      "finish_reason": "tool_calls",
+      "plan": {
+        "action": "diagnose",
+        "decision": {
+          "version": "research_decision_v1",
+          "hypothesis_id": "H-FIXED-INPUT-STRUCTURE-CONFOUND",
+          "claimed_inference": "empirical_search",
+          "research_intent": "DIAGNOSE",
+          "selected_method": "fixed_input_structure_v1",
+          "selected_variables": [
+            "distal_young_modulus_MPa [4.86, 5.40, 5.94]",
+            "fixed_control_sequence_U0",
+            "terminal_position_error_m_at_0.35s",
+            "holding_max_position_error_m_0.30_0.35s",
+            "holding_max_speed_m_s_0.30_0.35s",
+            "per_metric_normalized_residuals_g_i_and_binding_constraint",
+            "actual_tendon_tensions_n_in_order_near_t0_to_far_t2",
+            "world_tip_trajectory_samples",
+            "native_mass_matrix_eigenvalues_and_tendon_jacobian_norm_at_matched_state",
+            "repeat_execution_determinism"
+          ],
+          "selected_candidate": null,
+          "requested_budget": 65100
+        },
+        "next_step": null,
+        "hypothesis": "当前问题：ST-O（来源 A-F 的 MuJoCo 全固定控制执行）显示，仅远端 Young 模量取 4.86/5.40/5.94 MPa 的 d-/d0/d+ 在同一 U0、同一任务与时间网格、各自命名零初态下得到 J=1.517492850595981 / 0.16049263228801447 / 0.2634236075676397，三者 J>0，且呈“中间最好、两侧都变差”的单峰形状。由于 J=max(terminal_pos/0.01, holding_pos/0.01, holding_max_speed/0.02)-1 是三个硬指标的最大归一化聚合量，只保留一个标量、一个控制序列、一个结构参数方向，因此它既不能给出方向性，也不能识别机理；我判断 ST-O 不足以支撑对结构（远端刚度）的偏好。（证据：ST-O, A-F）\n至少两个竞争机理：\nH1“刚度—驱动权限机理”：远端变硬/变软改变等效弯曲刚度、质量分布与腱力臂，在完全相同的实际腱输入下产生不同曲率场与末端几何，故 J 的差是真实固定输入力学后果。可检验推断：d- 与 d+ 的绑定约束不同（例如 d+ 终端位置残差更大、d- 保持窗速度/振荡残差更大），且该状态下原生质量矩阵与腱雅可比随 E 单调变化。\nH2“输入失配/活跃集机理”：U0 是围绕标称结构构造的，扰动改变的是哪条约束先触界（0.01 m 与 0.02 m/s）以及轨迹相对阈值的整体位置，而非重优化后的能力。可检验推断：三条归一化残差近似同比例平移，且在同一结构上给 U0 一个合法的小输入改动（同量级实际张力扰动）就能把 J 差或结构排序显著改变。\n两个机理对 ST-O 现有数据几乎给出同样解释，必须用“固定输入下的逐指标分解 + 匹配状态的原生力学签名 + 合法小输入响应”三重交叉才能区分。注意 J 只是覆盖的硬指标聚合，不是任务验收（验收需注册评估器加冻结覆盖/完整性/实际张力/求解器异常检查），本探针也不创建正式 Study、SELECT 或接收判定。",
+        "supporting_evidence": [],
+        "expected_observation": "下一具体实验（固定输入结构对照，只在合法 ±15% 内单参数改远端 E，其余全冻结）：对 d-/d0/d+ 各重编译并通过原生短时执行重放同一 U0（每结构 1 次基线 700 步 rollout = 680 步前缀重建 + 20 步/0.01 s 分支，加上各控制回调的整段 rollout），测量量：(a) 0.35 s 终端位置误差（m）；(b) 0.30–0.35 s 保持窗最大位置误差（m）与最大速度（m/s）；(c) 三条归一化残差 g_i 的逐项分解与其绑定对象；(d) 六个腱按 near_t0..far_t2 顺序的实际张力轨迹及是否触及 [0,8] N 边界；(e) 世界系末端轨迹样本；(f) 与 C 中推进量分开记录：同状态下原生质量矩阵特征值、腱雅可比范数与局部刚度签名；(g) 同一结构重复执行的确定性。\n分支判读：B1 若 d-/d0/d+ 绑定约束不同、逐指标差显著超出重复执行噪声、且原生力学签名随 E 单调，则 H1 得到支持，但结论只能表述为“固定 U0 下的局部结构效应”；下一步必须是匹配基线/±h 的重优化对照（controlled-capability-sensitivity-v1，含条件包络与对偶面检查）才能谈能力偏好。B2 若三结构差异主要是同一指标的整体平移，且一个合法小输入改动或换成 d+ 上近似最优输入就把 J 差或排序压掉，则 H2 得到支持，固定控制响应不构成结构偏好证据，应停止在此方法上继续比较并转为重优化能力对照或 STOP 该分支。B3 若差异落在 0.01 m/0.02 m/s 阈值与求解器容差同量级、或重复执行不可复现，则判定为无区分力，不下任何结构偏好结论，只记录为“固定输入信息不足”。",
+        "weakening_observation": "若同一结构上两次独立原生执行 U0 得到的逐指标残差差异与三结构之间的差异同量级（即结构差异落在采样/求解器容差内），或全部结构差异仅表现为单一约束的整体平移、且对 U0 的合法小张力扰动（同量级的实际张力改动）即可反转结构排序或使 J 差塌缩，则“固定控制响应体现结构差异”这一假设被削弱，ST-O 不得被解释为任何结构偏好的证据，届时我只保留 H2 作为工作假设，并把固定输入对照从证据链中降级为诊断记录。",
+        "fixed_conditions": "冻结且不可改：target_world_m [0.29, 0.035, 0.19]、mount_world_m [0, 0, 0.15]、duration 0.35 s、控制/采样周期 0.01 s、物理步 0.0005 s、holding 采样 0.30/0.31/0.32/0.33/0.34/0.35 s、终端与保持位置限 0.01 m、保持速度限 0.02 m/s、绝对张力界 [0,8] N、腱顺序 near_t0, near_t1, near_t2, far_t0, far_t1, far_t2；合法族为源相对两段六腱臂（段长 0.16/0.11 m，源 Young 7.2/5.4 MPa，每段 12 单元，拓扑/截面/走线/环境固定）。唯一变量为远端 Young 模量 4.86/5.40/5.94 MPa（合法 ±15% 内）。三结构必须使用同一 U0（同一实际张力/命令序列）、同一命名零初态、同一时间网格与同一物理步；耦合约束继续适用；不使用 GVS 作为探针，不引用全 NMPC 或 PPO 结论，不推进任何物理时间或产生接收判定。",
+        "stopping_condition": "在三个结构上各完成同一 U0 的原生执行，并完整记录终端位置误差、保持窗最大位置误差与最大速度、逐项归一化残差 g_i 及其绑定对象、实际张力轨迹、世界末端轨迹与匹配状态的原生力学签名（预算上限：3 结构 × 31 次 700 步 rollout ≈ 65100 物理步，约 60 s 挂钟，0 次全 NMPC，0 次 PPO 动作）；或任一结构出现求解器异常、覆盖/完整性检查失败、或实际张力越界，则立即停止。达到停止点后不再扩大固定输入扫描，也不再以 J 数值排序作结论。",
+        "interpretation": "ST-O 只回答“在同一个 U0 下这三个结构的覆盖硬指标聚合量各是多少”，属于固定输入局部对比：J 为正说明 U0 在此三结构上都未能满足所覆盖的硬指标（基线约超出 16%），而“d0 最小、两侧都变大”只说明 U0 附近的单峰形状，既非重优化后的能力序，也不含方向梯度信息（步长不同、非对称，只覆盖远端 ±10%）。因此本轮不做能力判断，只做机理区分：把 J 拆成逐指标残差、绑定对象、实际张力与原生力学签名，才能分辨 H1（真实固定输入结构效应）与 H2（U0 与结构失配/活跃集切换）。数学状态与物理观察分离：J 与其分支只作诊断量，绝不作为验收或最优性；若真正需要能力偏好，必须另行准入匹配重优化对照（controlled-capability-sensitivity-v1）。已排定的下一轮观测属于历史计划、与本次选择无关，不是本提案的执行结果；数据到达时我将显式重评 H1 与 H2：若绑定约束随 E 切换且逐指标差超出重复噪声，则 H1 部分成立、需说明变化的是“差异的机理归属”，仍未知的是重优化后的能力序、U0 是否围绕标称调优、以及覆盖硬指标之外的验收分量；若差异只是整体平移且可被合法小输入改动抹平，则 H2 成立、固定输入对照降级。下一步鉴别动作固定为：在同预算下做匹配基线/±h 的重优化固定输入双向对照（含小合法输入 FD 与条件包络检查），并保留 0 次全 NMPC、0 次 PPO 的边界。请求预算单位与总量：单位=物理步（0.0005 s），3 结构 ×（30 次控制回调 × 700 步 + 1 次 700 步前缀重建）≈ 3×21700=65100 步，对应约 60 s 挂钟，与“短原生对照需 680 步前缀重建、每 0.01 s 分支 20 步”的成本口径一致；不做全 NMPC（约 3200–3300 s）与 PPO。",
+        "parameters": null,
+        "search": null,
+        "candidate": null,
+        "selected_execution": null,
+        "revise_selection": false,
+        "diagnostic": null,
+        "mechanics": null,
+        "cross_replay": null,
+        "physical_replay": null,
+        "refinement": null,
+        "matched_state": null,
+        "nmpc_prediction_diagnostic": null,
+        "mechanics_source": null,
+        "experience_disposition": {}
+      },
+      "schema_check": "passed"
+    },
+    {
+      "case": "structure",
+      "arm": "evidence",
+      "turn": 1,
+      "scientific_execution": "not_dispatched",
+      "request_id": "r3-request-e98c20592315401ab6e28ffa82cc85cf",
+      "usage": {
+        "prompt_tokens": 3368,
+        "completion_tokens": 6154,
+        "total_tokens": 9522,
+        "prompt_tokens_details": {
+          "cached_tokens": 2048
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 3119
+        },
+        "prompt_cache_hit_tokens": 2048,
+        "prompt_cache_miss_tokens": 1320
+      },
+      "finish_reason": "tool_calls",
+      "plan": {
+        "action": "diagnose",
+        "decision": {
+          "version": "research_decision_v1",
+          "hypothesis_id": "H-FIXED-U-VS-CORRECTION-STRUCTURE-PREFERENCE-01",
+          "claimed_inference": "empirical_search",
+          "research_intent": "DIAGNOSE",
+          "selected_method": "fixed_input_structure_v1 (native_response_search: 1 shared-U0 baseline rig per structure + up to 30 bounded legal-actual-tension probes, 700 native steps each, 3 structures, every holding sample covered)",
+          "selected_variables": [
+            "distal_young_modulus_MPa",
+            "shared_fixed_actual_tension_sequence_U0",
+            "single_bounded_legal_tension_correction",
+            "world_tip_position_error_terminal_and_holding",
+            "holding_max_speed",
+            "normalized_violation_J",
+            "actual_tension_vs_0_8N_bounds",
+            "solver_exception_and_coverage_completeness_flags"
+          ],
+          "selected_candidate": null,
+          "requested_budget": 65100
+        },
+        "next_step": null,
+        "hypothesis": "当前问题：在完全相同、未针对结构重优化的固定控制序列 U0 下得到的 ST-O 三组结果（d-/d0/d+ 远端杨氏模量 4.86/5.40/5.94 MPa，J=1.5175/0.1605/0.2634），是否足以支持“远端模量存在结构性偏好（偏向 d0/d+、排斥 d-）”这一结论？基于既有诊断重估后，至少有两种互相竞争、可判别的机制：\n\n机制 A（结构真实弱化，偏好成立）：ST-O 中 d- 的 J=1.5175（约为 d0 的 9.5 倍、d+ 的 5.8 倍）反映软远端段在可达/保持方向上的真实权限下降，任何合法张力序列都无法补偿，因此 ±15% 模量域内不可互换、应保留 D0 一侧的结构偏好。支持点：ST-O 的排序与量级；反证压力：ST-L 显示同族直线臂零态 GVS 线性化下“最大结构得分差 4.82e-11”，且位置雅可比奇异值为 [0.0221, 0.0221, 0]、轴向雅可比行为零，说明局部线性权限对 15% 模量变化几乎“看不见”，机制 A 无法用局部解析量支撑，只能靠非线性原生响应。\n\n机制 B（控制失配，排序是调参假象）：U0 是在 d0 附近调出的共享序列；远端变软后同一张力产生更大弯曲与端部超程，J 的爆炸主要由“共享 U 不适配”而非结构造成。因此对三种结构施加同一算子、同一幅度上限的合法实张力修正（在 [0,8] N 绝对界内、非负）后，d- 的 J 应回落到与 d0/d+ 基线同量级（≲0.3），从而固定控制响应不构成结构性偏好。支持点：ST-O 单点非单调（d0 优于 d+，d- 却极差），与“平滑结构退化”不符；ST-G 给出曲面点全时域几何误差 13.35/14.82 mm、全时域相对动力学残差 1.0009/1.0012（≈1 即仿射预测几乎无解释力），说明任何基于局部仿射/锥规划的排序都不可作准，必须由原生非线性 rollout 判定。\n\n机制 C（现有证据不足，只能先做保真度与同算子对照）：ST-L 的 4.8e-11 与 ST-G 的 ~1.0 残差共同表明局部线性与锥模型既不敏感也不可信，故当前既不能支持机制 A 也不能支持机制 B；下一步唯一公平的比较是先在原生 MuJoCo 上以同一 U0 复现 ST-O 的 J 排序（保真度门槛），再对三种结构施加同一合法修正算子，仅在“同算子”条件下比较排序是否保留。",
+        "supporting_evidence": [],
+        "expected_observation": "下一具体实验：原生固定输入结构响应（fixed_input_structure_v1 / native_response_search 语义）——3 个已注册单参数候选（仅远端杨氏模量 4.86/5.40/5.94 MPa 变化，各持有自己的命名零状态），每结构 31 条 700 步原生 rollout（1 条共享 U0 基线 + 30 条只含一个受界修正在内的响应/探针），覆盖每个保持采样时刻（0.30–0.35 s），无全 NMPC、无 PPO。\n\n测量量：各结构终端世界坐标位置误差（0.35 s）与 0.30–0.34 s 全保持窗最大位置误差、保持窗最大速度、归一化违反量 J=max(终端误差/0.01, 保持最大位置误差/0.01, 保持最大速度/0.02)-1；每步实际张力及其是否落在 [0,8] N 绝对界内；求解器异常计数；覆盖与完整性检查结果。\n\n分支 1（预期，若机制 B/C 成立）：三条 U0 基线 rollout 把 ST-O 的 J 复现到容差内（相对差 ≤10% 且终端位置差 ≤1 mm、速度差 ≤10%），说明基线可比；随后对 d- 施加的那一个受界合法修正（降低总张力/改变分配）把 J 压到 ≤0.30（d0/d+ 基线量级），且同一算子在同一幅度上限内同时施加于 d0/d+ 时二者不劣化超过该容差 → 判为“共享 U0 失配”，固定控制响应不构成结构性偏好。分支 2：同一受界修正在 d- 上无法把 J 压到 ≤0.53（即 d- 仍比 d+ 差一倍以上），且修正已被证明触及约束面（或所需方向在非负张力与 [0,8] N 界内不可行）→ 机制 A 获得支持，固定控制排序可暂时视为结构信号。分支 3：基线 rollout 无法复现 ST-O（J 相对差 >10% 或出现求解器异常/覆盖不全）→ 保真度门槛失败，任何结构偏好都不成立，必须先修复复现条件（同一 initializer、同一时间栅格、同一实张力解释）而不是推进结构结论。",
+        "weakening_observation": "使“控制失配/固定控制不足以判断结构偏好”这一立场被削弱（即反而支持结构性偏好）的观测：在基线复现通过（三结构 J 相对差 ≤10%）后，对三种结构施加完全相同的受界合法修正算子与幅度上限，d- 的 J 仍高于 0.53、且比 d+ 的修正后 J 高出一倍以上，同时该修正已抵达非负张力与 [0,8] N 绝对界所允许的边界（修正方向不可再增大）——此时“只是 U0 没调好”的解释不成立，应撤回“固定控制响应不能支持结构偏好”的判断。\n\n另有使整个比较失效的削弱观测（任一出现即停止判断）：原生基线复现 ST-O 的相对差 >10% 或终端位置差 >1 mm；出现求解器异常、覆盖或完整性检查不通过；实际张力越出 [0,8] N；或需要把 U0 之外的自由度（不同初始状态、不同时间栅格）才能复现，使“同一结构/同一输入”前提被破坏。",
+        "fixed_conditions": "固定：合法两段六腱臂家族，每段 12 单元，拓扑/截面尺寸/走线/环境不变；标称段长 0.16/0.11 m（±5% 域内此次不动），近端杨氏模量固定 7.2 MPa，仅远端杨氏模量取 4.86/5.40/5.94 MPa（名义 5.40 的 ∓15%）；每候选自持命名零 qpos/qvel 初值；物理步长 0.0005 s，控制/采样周期 0.01 s，时长 0.35 s，保持采样时刻 0.30/0.31/0.32/0.33/0.34/0.35 s；腱序 near_t0..far_t2；绝对张力界 [0,8] N 且非负；基线分支三结构共用同一 U0；探针分支三结构使用同一修正算子与同一幅度上限（不得对 d- 单独加码）；终点与保持位置限 0.01 m、保持速度限 0.02 m/s 保持不变；本探针只描述方法，frozen 评估器、覆盖/完整性/实际张力/求解器异常检查与全部组件验收均在本步之外、且不由本步结果声明通过。",
+        "stopping_condition": "满足任一即停止本诊断并出结论：(1) 三条 U0 原生基线落在 ST-O 复现容差内（相对差 ≤10%、终端位置差 ≤1 mm、速度差 ≤10%），且受界修正对三结构给出同一分支的清晰结局（d- 修正后 J ≤0.30 或 ≥0.53 且已触及约束面）；(2) 保真度门槛失败（容差外、求解器异常、覆盖或完整性检查不通过、张力越界）——立即停止，不得推进结构结论，先修复现；(3) 每结构 30 个受界控制回调用尽仍无可分辨的 J 差异（|J_d0 - J_d+| 与修正效应均小于容差），则该量级下本任务不可判别，停止并记录“不可判别”而非“无影响”。\n\n预算与成本口径：requested_budget=65100 physics steps，即 3 结构 × 31 条 rollout × 700 步 = 65100 步原生推进；3 结构 × 30 个受界控制回调 = 90 次控制回调；full_nmpc=0（节省约 3200–3300 s）、PPO 动作=0；预估墙钟约 60 s，全部为复用原生 rollout 的短路比较，不需要 680 步前缀重建（基线直接由命名零状态起算）。超出该预算的部分（同 NLP 迭代对比约 125 s/结构与全 NMPC 约 3200 s）不在本诊断内，必须另行准入。",
+        "interpretation": "本探针为只读决策：只描述所选方法，不派遣任何科学执行，不产生 Study/凭据/SELECT/验收。结论口径分四层并保持分离：数学层（ST-L：GVS 线性化位置雅可比奇异值 [0.0221,0.0221,0]、轴向行为零、最大结构得分差 4.82e-11）说明局部仿射量对 15% 模量变化几乎不可分辨，因此不能用它给出结构偏好；数值层（ST-G 全时域几何误差 13.35/14.82 mm、残差 1.0009/1.0012）说明该曲面点即使通过几何复核也不是已验平衡，锥规划近 -1 的模型得分只属浮点估计，不足以支持“最优值”或可行域结论；物理层只剩原生非线性 rollout 可比；任务层明确 ST-O 的 J 只是被覆盖硬指标的样本裕度，J≤0（以及本次任何修正后 J）都不等于验收，验收仍需已注册评估器与冻结的覆盖/完整性/实际张力/求解器异常检查。\n\n因此对既有假设的重估：机制 A 目前只有单点 ST-O 支撑，且呈非单调（d0 优于 d+、d- 断崖），与“平滑结构退化”不符，故“固定控制已证明结构偏好”不成立；机制 B 有 ST-O 的失配特征与 ST-G 的仿射失效作旁证，但尚无任何原生同算子对照，同样未经检验；机制 C 是当前最强的立场——现有可见证据只支持“固定控制响应不足以判定结构偏好”。尚未知：d- 的 J 爆炸是权限不足还是共享 U0 超程、软远端在保持窗的速度裕度是否随张力分配而非模量变化。\n\n当排定的下一轮观测到达时，将以上述三分支重新评估：若基线保真度通过且同算子受界修正把 d- 的 J 压回 ≤0.30，机制 A 被削弱、机制 B/C 加强，固定控制排序降级为调参假象；若修正触界后 d- 仍高于 d+ 一倍以上，机制 A 加强，机制 C 让位；若基线无法复现，一切结构结论撤回，下一判别动作变为修复复现条件（同一 initializer、同一时间栅格、同一实张力解释）而非增加结构比较。无论哪个分支，真正的结构能力结论都需后续单独准入的 controlled_capability_sensitivity_v1（±h 配对、固定 U 与重优化并列、路径进度同步重优化，约 125 s/结构起、全 NMPC 约 3200 s），本诊断不覆盖也不预判其结果。",
+        "parameters": null,
+        "search": null,
+        "candidate": null,
+        "selected_execution": null,
+        "revise_selection": false,
+        "diagnostic": null,
+        "mechanics": null,
+        "cross_replay": null,
+        "physical_replay": null,
+        "refinement": null,
+        "matched_state": null,
+        "nmpc_prediction_diagnostic": null,
+        "mechanics_source": null,
+        "experience_disposition": {}
+      },
+      "schema_check": "passed"
+    },
+    {
+      "case": "structure",
+      "arm": "baseline",
+      "turn": 2,
+      "scientific_execution": "not_dispatched",
+      "request_id": "r3-request-ea1e50ffeba7431f93e6fd7a020f9108",
+      "usage": {
+        "prompt_tokens": 11529,
+        "completion_tokens": 6557,
+        "total_tokens": 18086,
+        "prompt_tokens_details": {
+          "cached_tokens": 9344
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 3834
+        },
+        "prompt_cache_hit_tokens": 9344,
+        "prompt_cache_miss_tokens": 2185
+      },
+      "finish_reason": "tool_calls",
+      "plan": {
+        "action": "diagnose",
+        "decision": {
+          "version": "research_decision_v1",
+          "hypothesis_id": "H-RESOLVED-STRUCTURE-DIRECTION-VS-NUMERICAL-FLOOR",
+          "claimed_inference": "empirical_search",
+          "research_intent": "DIAGNOSE",
+          "selected_method": "controlled-capability-sensitivity-v1",
+          "selected_variables": [
+            "distal_young_modulus_MPa [4.86, 5.13, 5.40, 5.67, 5.94]",
+            "reoptimized_J_per_structure",
+            "independent_acceptance_per_structure",
+            "same_structure_repeat_spread_two_warm_starts",
+            "between_structure_fd_h_and_h_half_sign_consistency",
+            "conditional_envelope_and_dual_face_check",
+            "binding_metric_identity_and_active_set",
+            "actual_tendon_tensions_n_in_order_near_t0_to_far_t2",
+            "higher_iteration_cap_saved_terminal_nlp_contrast",
+            "cold_start_J_ceiling"
+          ],
+          "selected_candidate": null,
+          "requested_budget": 189000
+        },
+        "next_step": null,
+        "hypothesis": "重评先前两个竞争机理（新观测 ST-R/ST-P/ST-U 与历史计划无关，是其独立到达的证据）：\n先前 H1“刚度—驱动权限机理”（固定 U0 下的 J 差是真实固定输入力学后果、可外推为结构偏好）：被显著削弱。ST-O 的固定 U0 排序为 d0 最好（J=0.1605）、两侧变差（1.5175 / 0.2634），但 ST-R 中三结构各自重优化后 J=-0.02095/-0.05073/-0.04891 且 independent_acceptance 全为 true，排序发生**反转**（d- 最差、d0 与 d+ 近并列）。固定输入下的排序不具稳健性，故“固定控制响应支持结构偏好”这一问的答案现在明确为否。\n先前 H2“输入失配/活跃集机理”：被支持。ST-P 显示热启动为共享的、实际完整 C1 NMPC 执行张力 U0，26 次回调、1 次局部响应更新、5% 内部 margin、stop_reason=iteration_limit；ST-U 给出热启动响应条件数约 6.6e6/3.86e7/2.12e7、5% margin 顶点地板截断预测收益、以及互不一致的两条割线（中心割线 -0.025884/MPa 与 d0→d+ 割线 +0.003383/MPa 异号）。ST-O 与 ST-R 的排序反转正是“U0 与结构匹配程度 + 活跃集位置”主导的直接证据。\n更新后的工作假设（本轮要鉴别的新竞争机理，至少两条）：\nM1“数值分辨率主导”：ST-R 三结构的 J 差约 0.03，与 5% 内部 margin 地板、1e7 量级条件数、iteration_limit 停止处于同一量级，因此热启动后的 J 序不可分辨，合法远端刚度域内能力近似中性（ST-R, ST-P, ST-U）。\nM2“存在可分辨但尚未被分辨的结构方向”：若扩大迭代上限、做 ±h/±h/2 步长收敛与同结构重复，热启动 FD 仍保持同号且超过同结构重复散布，则存在受控结构方向（仍不是全局改进保证）（ST-R, ST-U）。\nM3“搜索质量伪迹”：冷启动 J≈15.75/15.66/15.59 与热启动 ~0.05 相差三个数量级，且冷起排序（d+ 略好）与热起排序不一致，说明排序可由热启动分布翻转（ST-R, ST-P）。三者对现有数据都能自洽解释，必须用“同结构重复散布 + 步长收敛 + 双面对偶检查”去区分。",
+        "supporting_evidence": [],
+        "expected_observation": "下一具体实验（受控能力灵敏度对照，matched baseline/±h/±h/2，固定合法族，仅远端 E 变）：结构取 4.86 / 5.13 / 5.40 / 5.67 / 5.94 MPa（h=0.54 MPa，全部落在 ±15% 内），每结构 2 个热启动（共享 U0 与邻结构重优化 U0）+ 1 个冷启动 0.2 N 上限对照，各 26 次控制回调 + 1 次基线 rollout（每 rollout 700 步 = 0.35 s/0.0005 s）。\n测量量：(a) 每结构重优化 J 及独立 acceptance（注册评估器 + 冻结覆盖/完整性/实际张力/求解器异常）；(b) **同结构重复散布**（两个热启动之间 J 的差），作为分辨率地板；(c) 结构间 FD：±h 与 ±h/2 的符号一致性与幅度，以及在 d0 处左右两面的单侧割线是否同号；(d) 条件包络与对偶面/活跃集报告（绑定的是终端位置、保持位置还是保持速度残差）；(e) 六个腱按 near_t0..far_t2 的实际张力轨迹与 [0,8] N 边界是否触及；(f) 两个更高迭代上限的已存终端 NLP 对照（约 125 s/个），检验 J 的步长收敛；(g) 冷启动 J 作为搜索质量天花板。\n分支判读：B1 若结构间 FD 幅度 > 同结构重复散布、±h 与 ±h/2 同号、d0 处两面单侧割线同号、且高迭代上限重算未跨越结构差 → 支持 M2，可陈述“受控结构方向”（含明确的前提：受此热启动分布与预算约束，非全局改进保证）。B2 若结构间差 ≤ 同结构重复散布，或 ±h/2 与 ±h 异号，或双面不一致，或提高迭代上限后 J 位移大于结构差 → 支持 M1/M3，结论为“合法远端刚度域内能力在可分辨意义上中性”，停止该线并不再以任何 J 序作结构偏好。B3 若某结构独立 acceptance 失败或出现求解器异常/张力越界，则该结构不得进入比较，并优先报告失败而非排序。",
+        "weakening_observation": "任一满足即削弱“可分辨结构方向”：同一结构上第二个热启动使 J 位移 ≥ 结构间散布；或 ±h/2 的 FD 与 ±h 的 FD 异号；或在 d0 处左右两面单侧割线异号（与 ST-U 中 -0.025884 与 +0.003383 异号同型）；或提高迭代上限重算的 J 位移大于结构间差。出现其中任一情形时，M2 被判为不可检验或被否定，M1/M3 取得支持，ST-R 的 J 序与 ST-O 的 J 序一律只作搜索/数值状态记录，不得转写为结构偏好、能力排序或任何验收结论。",
+        "fixed_conditions": "冻结：target_world_m [0.29, 0.035, 0.19]、mount [0,0,0.15]、duration 0.35 s、控制/采样 0.01 s、物理步 0.0005 s、holding 0.30–0.35 s 全部六个采样、位置限 0.01 m、速度限 0.02 m/s、绝对张力界 [0,8] N、腱顺序 near_t0/far_t2 定义不变；合法族为源相对两段六腱臂（段长 0.16/0.11 m、源 Young 7.2/5.4 MPa、每段 12 单元、拓扑/截面/走线/环境固定）。唯一自变量为远端 Young 模量，取值 4.86/5.13/5.40/5.67/5.94 MPa（合法 ±15% 内，耦合约束继续适用）；其余搜索设置与 ST-P 一致（26 次回调、1 次局部响应更新、24 个响应系数、FD 0.02 N、初始信赖域 0.15 N、5% 内部 margin），差异只允许来自迭代上限与热启动这两个显式声明项；不使用 GVS；不做全 NMPC（约 3200–3300 s）、不做 PPO；不创建正式 Study、SELECT 或接收判定。",
+        "stopping_condition": "5 个结构 × 2 次热启动（＋各 1 次冷启动上限对照）全部按 26 次回调完成并完整记录 J、独立 acceptance、同结构重复散布、±h/±h/2 FD、活跃集/绑定指标、实际张力与两个高迭代上限 NLP 对照后停止；或出现任一求解器异常、覆盖/完整性检查失败、实际张力越出 [0,8] N 时立即停止并优先报告失败；或分辨率预检（同结构两次热启动散布）已大于任何可能的结构间差时提前停止、直接判为中性。停止后不升级到全 NMPC、不扩大结构扫描、不再以 J 排序作结论。",
+        "interpretation": "本轮为新证据到达后的显式重评，与上轮“固定输入结构对照”提案相互独立（已排定观测不是该提案的执行结果）。变化之处：上一轮我把固定 U0 的 J 差列为待区分的候选机理 H1 与 H2；ST-R 的排序反转（固定 U 下 d0 最好，重优化后 d- 最差且 d0≈d+）加上 ST-U 的异号割线，已把 H2（输入失配/活跃集）提升为主导解释，并把“固定控制响应支持结构偏好”判为否；同时 ST-R 的 independent_acceptance 全为 true 说明三结构都能在各自重优化输入下通过覆盖硬指标，这属于逐结构任务状态，不构成结构偏好，也不等于完整验收之外的任何分量已通过。仍未可知：合法远端刚度域内是否存在可分辨的结构能力方向；ST-R 约 0.03 的 J 差是结构信号还是 5% margin 地板 + 1e7 条件数 + iteration_limit 造成的数值分辨率极限；冷启动三个数量级的差距说明搜索质量主导，热启动分布对排序的影响未测；步长收敛、FD 稳定性与其他热启动分布均未被测量（ST-U）。数值状态、物理观察与任务接收继续分离：J 与 FD 是浮点估计，独立 acceptance 只是各结构自身结果，二者都不作最优性证明。下一步鉴别动作已定：受控能力灵敏度对照（controlled-capability-sensitivity-v1）——同结构重复散布作分辨率地板、±h/±h/2 步长收敛、双面/对偶面与活跃集检查、并以两个高迭代上限 NLP 对照检验收敛；只有当结构间差严格超过两种数值分辨率控制时，才允许陈述“受控结构方向”。预算（单位=物理步 0.0005 s）：5 结构 × 2 热启动 × 27 次 rollout × 700 步 = 189000 步 ≈ 175 s 挂钟（按 ST-O 口径 65100 步 ≈ 60 s 折算 ~1085 步/s），另加 2 个高迭代上限已存终端 NLP 对照约 250 s，合计约 425 s；请求上限即 189000 物理步，0 次全 NMPC、0 次 PPO 动作；冷启动上限对照的 rollout 已含在该 27 次/结构的计数内。",
+        "parameters": null,
+        "search": null,
+        "candidate": null,
+        "selected_execution": null,
+        "revise_selection": false,
+        "diagnostic": null,
+        "mechanics": null,
+        "cross_replay": null,
+        "physical_replay": null,
+        "refinement": null,
+        "matched_state": null,
+        "nmpc_prediction_diagnostic": null,
+        "mechanics_source": null,
+        "experience_disposition": {}
+      },
+      "schema_check": "passed"
+    },
+    {
+      "case": "structure",
+      "arm": "evidence",
+      "turn": 2,
+      "scientific_execution": "not_dispatched",
+      "request_id": "r3-request-5d3eb5deb7e1462bbbfd44021b703af6",
+      "usage": {
+        "prompt_tokens": 12103,
+        "completion_tokens": 8171,
+        "total_tokens": 20274,
+        "prompt_tokens_details": {
+          "cached_tokens": 7808
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 4846
+        },
+        "prompt_cache_hit_tokens": 7808,
+        "prompt_cache_miss_tokens": 4295
+      },
+      "finish_reason": "tool_calls",
+      "plan": {
+        "action": "diagnose",
+        "decision": {
+          "version": "research_decision_v1",
+          "hypothesis_id": "H-CROSS-APPLY-SCHEDULE-VS-STRUCTURE-02",
+          "claimed_inference": "empirical_search",
+          "research_intent": "DIAGNOSE",
+          "selected_method": "cross_applied_schedule_decomposition (read_saved_arrays of the three saved per-structure schedules + short_native_comparison/native_dynamics_v1 measurement: 3 schedules x 3 models x 700 native steps, row(model)/column(schedule) main-effect decomposition; no reoptimization, no full NMPC)",
+          "selected_variables": [
+            "J_ij_cross_applied",
+            "model_row_main_effect",
+            "schedule_column_main_effect",
+            "terminal_position_error_0p35s",
+            "holding_max_position_error_0p30_0p35s",
+            "holding_max_speed",
+            "actual_tension_min_max_vs_0_8N",
+            "pairwise_schedule_channel_difference_N",
+            "diagonal_replay_delta_J_vs_ST_R",
+            "solver_exception_and_coverage_flags"
+          ],
+          "selected_candidate": null,
+          "requested_budget": 6300
+        },
+        "next_step": null,
+        "hypothesis": "新观测到达后的重估：ST-O 的固定共享 U0 结果（d-/d0/d+ 的 J=1.5175/0.1605/0.2634）在 ST-R 的“逐结构重优化 + 各自零初值 + 已注册评估器独立执行”下完全改观为 J=-0.02095/-0.05073/-0.04891 且三者 independent_acceptance 全为 true，同时冷启动（六通道 0.2 N、同回调预算）在三种结构上一致失败于 J≈15.59–15.75。这使前一轮的竞争机制出现明确胜负：固定控制响应**不**构成结构性偏好，d- 的断崖式失败已被证明是共享 U0 失配（原机制 B 成立，机制 A 在第一阶上被否证）。但排序并未消失——ST-O 与 ST-R 都保持非单调次序（d0 最优、d+ 居中、d- 最差），ST-U 给出的端点割线也非单调（d-→d+ 中央割线 -0.02588 MPa⁻¹，d0→d+ 割线 +0.00338 MPa⁻¹），只是量级从 1.36 塌缩到 0.030。\n\n因此当前问题变为：ST-R 中残存的约 0.03 J（≈0.3 mm，仅为 10 mm 位置限的 3%）——它究竟是模型身份（结构）效应，还是调度/数值效应？三个互相竞争、可判别的机制：\n\n机制 B′（调度主导，我倾向）：三份“最优”计划由一个共享 U0 热启动、仅 26 次回调、stop_reason=iteration_limit（ST-P）产生，且 ST-R 的 J 已落在内部目标 5% 裕度 epigraph 地板所截断的区域内（ST-U），叠加响应矩阵条件数 6.6e6/3.86e7/2.12e7 与 0.02 N 差分步（ST-U）。预测：把三份已保存计划交叉施加到三个模型上得到的 J_ij 中，计划下标 i 的列主效应远大于模型下标 j 的行主效应；d0 的计划施加到 d- 模型上也能恢复到 ≈-0.05，且不存在“每个计划下 d- 都最差”的一致行效应 → 残存排序是搜索/热启动产物，无结构偏好。\n\n机制 A′（真实但微弱的残余结构效应）：ST-O 与 ST-R 的次序一致，且 ST-U 的非单调割线暗示 d0 附近存在内部极值，软远端（4.86 MPa）在可达/保持方向确有权限损失。预测：交叉矩阵存在显著行效应，d- 模型在三份计划下都最差且差距 ≥0.03 J（≥0.3 mm），同时实际张力仍在 [0,8] N 内、无求解器异常 → 微弱结构偏好可暂时保留。\n\n机制 C′（不可判别）：0.03 J 的差距低于本次搜索分辨率（迭代上限停止、epigraph 截断、1e7 量级条件数、有限差分步长收敛性未测，见 ST-P/ST-U）。预测：对角线复现只能匹配 ST-R 到约 0.01–0.03 J，行/列主效应不可分离，或三份计划在 0.02 N 差分步内几乎相同 → 判为“不可判别”，既不能声称结构偏好也不能声称结构无关，只能通过另行准入的无截断更高迭代上限对比（约 125 s/结构，含 ±h/2 与双面检查）推进。",
+        "supporting_evidence": [],
+        "expected_observation": "下一具体实验（最便宜的判别动作，不重优化、不跑全 NMPC）：先以 read_saved_arrays 语义核对三份已保存的逐结构最优计划（完整性、是否逐保持采样覆盖 0.30–0.35 s、时间栅格一致、每步实际张力是否在 [0,8] N、两两逐通道差异是否显著大于 0.02 N 差分步与 0.15 N 初始信赖域），然后交叉施加：3 份计划 × 3 个模型 = 9 条 700 步原生 rollout（对角线 3 条为保真度复现，另 6 条为新的非对角单元）。比较机制 B′/A′/C′。\n\n测量量（逐单元 J_ij）：终端世界坐标位置误差（0.35 s）、0.30–0.34 s 保持窗最大位置误差与最大速度、归一化违反量 J=max(终端误差/0.01, 保持最大位置误差/0.01, 保持最大速度/0.02)-1、每步实际张力最小/最大值、求解器异常与覆盖/完整性标志；外加行主效应（模型）与列主效应（计划）的分解量、计划两两差异范数、对角线复现相对 ST-R 的 |ΔJ|，以及复现“冷启动 J≈15.6”这一结果的必要条件是否依赖热启动。\n\n分支 1（预期，机制 B′/C′ 成立）：列主效应远大于行主效应，且 d0 的计划施加到 d- 模型上把 J 从 ST-R 的 -0.021 拉回到 ≈-0.05 量级，不存在“三份计划下 d- 均最差”的一致行效应，对角线复现 |ΔJ| ≤0.01 → 判定固定控制排序为调度/热启动产物，结构偏好不成立，本诊断到此关闭。分支 2（机制 A′）：三份计划下 d- 模型一致最差且行效应 ≥0.03 J、张力可行、复现偏差 ≤0.01 → 微弱结构效应保留，下一动作升级为另行准入的匹配 ±h 受控能力敏感性（约 375 s 起）。分支 3（机制 C′）：对角线复现偏差 >0.01–0.02 J，或非对角单元触界/出现求解器异常/覆盖不全，或三份计划在 0.02 N 内实质相同 → 判为不可判别，输出“无分辨率内结论”，下一动作是无截断内部目标 + 更高迭代上限的对比。",
+        "weakening_observation": "削弱我倾向立场（B′/C′：残存 0.03 J 排序不是结构效应）的观测：在计划完整性、张力界与复现保真度（|ΔJ| ≤0.01）均通过、且三份计划两两逐通道差异显著大于 0.02 N 差分步的前提下，d- 模型在三份交叉施加的计划下**一律**最差且行主效应 ≥0.03 J（≥0.3 mm），而列主效应可忽略——此时“调度主导”被否证，我必须撤回“固定控制响应不能支持结构偏好”，并承认微弱的软远端结构偏好可暂时保留。\n\n另一类使整个比较失效（而非支持任一机制）的削弱观测，任一出现即判不可判别：三份计划在 0.02 N 内实质相同或缺保持采样覆盖；非对角单元实际张力越出 [0,8] N；出现求解器异常；对角线复现相对 ST-R 偏差 >0.01–0.02 J（说明已保存计划与当时执行不一致）；或需要改变初值/时间栅格才能复现。",
+        "fixed_conditions": "固定：合法两段六腱臂家族，每段 12 单元，拓扑/截面/走线/环境不变；段长 0.16/0.11 m，近端 7.2 MPa，仅远端取 4.86/5.40/5.94 MPa（名义 5.40 的 ∓15%）；每模型自持命名零 qpos/qvel 初值；物理步长 0.0005 s、控制/采样周期 0.01 s、时长 0.35 s、保持采样 0.30–0.35 s；腱序 near_t0..far_t2；绝对张力界 [0,8] N 非负；三份计划按 ST-P 记录原样使用（26 次回调、1 次局部响应更新、差分步 0.02 N、信赖域 0.15 N、内部 5% 裕度），本步**不**重优化、不改热启动、不改内部目标；终端与保持位置限 0.01 m、保持速度限 0.02 m/s 不变；已注册评估器与冻结的覆盖/完整性/实际张力/求解器异常检查仍在任务层，本诊断不声明任何验收结论。",
+        "stopping_condition": "满足任一即停止：(1) 9 个交叉单元全部完成且对角线复现 |ΔJ| ≤0.01、三份计划差异显著，则按列/行主效应给出分支 1、2 或 3 的单一结论并结束本诊断；(2) 任一单元出现张力越界、求解器异常或覆盖/完整性不通过，立即停止并输出“不可判别”，不推进结构结论；(3) 6300 步预算用尽仍无法分离主效应（差距小于复现偏差），同样输出“不可判别”并记录所需的最小后续反例条件，而非“无影响”。\n\n预算与成本口径：requested_budget=6300 physics steps，即 3 份计划 × 3 个模型 × 700 步 = 6300（其中仅 6 个非对角单元为真正新增 4200 步，3 个对角线单元为保真度复现 2100 步）；优化控制回调 0 次、全 NMPC 0 次（相对归档 3200–3300 s 的 full_nmpc 省去全部重优化）、PPO 动作 0；含保存数组读取与时间戳/实张力/保存状态比对，预估墙钟约 60 s，全部为短路原生比较，不需要 680 步前缀重建（各模型从自身命名零状态直接推进 700 步）。无截断内部目标 + 更高迭代上限的结构对比（约 125 s/结构）与匹配 ±h 受控能力敏感性（约 375 s 起）均超出本次分配，须另行准入。",
+        "interpretation": "分层重估（保持数学/数值/物理/任务四层分离）。物理层：ST-R 是本次最强的证据——三种结构各自重优化后 J 全为负（-0.0210/-0.0507/-0.0489）且独立评估器给出 independent_acceptance 全 true，说明**在 ±15% 模量域内三种结构都具备完成该任务的能力**；ST-O 中 d- 的 J=1.5175 因此不能再读作结构能力缺失，而是共享 U0 未适配的固定控制代价。设计偏好若仍要主张，是“排序/裕度”层面的主张，与“能否完成”是两件事，必须分开表述。数值层：残存排序量级仅 0.030 J（≈0.3 mm，为 10 mm 限的 3%），且与 5% 裕度 epigraph 截断地板、1e7 量级响应条件数、0.02 N 差分步、iteration_limit 停止同处一个数量级（ST-P、ST-U）；ST-U 明确端点割线不能直接当作 d0 处的局部最优梯度，故 -0.02588 与 +0.00338 MPa⁻¹ 这两个描述性割线不足以支撑“内部极值”的数学断言。任务层：ST-R 的 J<0 只是被覆盖硬指标的样本裕度，不等于验收；验收仍需已注册评估器加冻结覆盖/完整性/实张力/求解器异常全部组件，本步不产生任何验收、SELECT 或凭据。\n\n什么改变了：问题从“固定控制响应是否证明结构偏好”变为“重优化后残存的 0.03 J 排序是模型（行）效应还是计划（列）效应”。机制 A 在第一阶被否证（固定控制不足以支持结构偏好，这点已可确定）；机制 B 得到确认，但确认的是“排序由共享热启动 U0 主导”这一更弱版本，是否连残存排序也由调度主导尚未测。什么仍未变/未知：冷启动在三种结构上一律失败于 J≈15.6（ST-R），意味着本搜索下的“能力”是被热启动条件化的，任何结构能力比较都继承这一限制；±h/2 是否会翻转次序（非光滑）未知；epigraph 截断是否掩盖了单调趋势未知；有限差分步长收敛性与差分稳定性按 ST-U 属未测量。\n\n下一步判别动作即上述交叉施加分解：它用 6300 步原生推进（≈60 s，0 次重优化）把“结构 vs 调度”这一混淆直接拆开，比再跑一次昂贵搜索更省且信息量更高；无论结果落在哪个分支，真正的结构能力结论都需要另行准入的 controlled_capability_sensitivity-v1（匹配 ±h 与 ±h/2、固定 U 与重优化并列、路径进度同步重优化、双面检查，约 125 s/结构起），本诊断不覆盖也不预判其结果。",
+        "parameters": null,
+        "search": null,
+        "candidate": null,
+        "selected_execution": null,
+        "revise_selection": false,
+        "diagnostic": null,
+        "mechanics": null,
+        "cross_replay": null,
+        "physical_replay": null,
+        "refinement": null,
+        "matched_state": null,
+        "nmpc_prediction_diagnostic": null,
+        "mechanics_source": null,
+        "experience_disposition": {}
+      },
+      "schema_check": "passed"
+    }
+  ],
+  "manual_review": {
+    "reviewer": "Codex qualitative review; provisional, unblinded, independent human review pending",
+    "rubric_changed": false,
+    "unit": "one case/arm trajectory, both turns retained; five criteria each 0-2; manual scientific review, not a keyword score",
+    "trajectories": [
+      {
+        "case": "reach_hold",
+        "arm": "baseline",
+        "scores": {
+          "evidence_understanding": 1,
+          "hypothesis_quality": 2,
+          "diagnostic_discrimination": 1,
+          "decision_adaptation": 2,
+          "research_cost": 1
+        },
+        "total": 7,
+        "criterion_reviews": {
+          "evidence_understanding": {
+            "answer_locations": "1/expected_observation",
+            "review": "把高迭代 NLP 的预测通过作为原失败主因的充分支持；末尾的物理/验收免责声明没有消除该归因跃迁。"
+          },
+          "hypothesis_quality": {
+            "answer_locations": "1/hypothesis;2/hypothesis",
+            "review": "明确区分优化截断、驱动制动权限、目标/约束映射，并给出可测量。"
+          },
+          "diagnostic_discrimination": {
+            "answer_locations": "2/expected_observation",
+            "review": "两尺度张力 FD 和一次原生修正可给局部反例，但修正失败不能唯一支持权限不足，native 积分的 root defect 也未定义。"
+          },
+          "decision_adaptation": {
+            "answer_locations": "2/hypothesis",
+            "review": "用 120/480 的微小执行改善降低“只需更多迭代”的权重，保留 inf_du 和未收敛限制；仅削弱步长解释。"
+          },
+          "research_cost": {
+            "answer_locations": "1/interpretation;2/interpretation",
+            "review": "限定 180 s/720 步且不跑完整 NMPC，但第二轮未逐项计数 FD、重建与提案回放；成本核算不完整。"
+          }
+        }
+      },
+      {
+        "case": "reach_hold",
+        "arm": "evidence",
+        "scores": {
+          "evidence_understanding": 0,
+          "hypothesis_quality": 1,
+          "diagnostic_discrimination": 1,
+          "decision_adaptation": 1,
+          "research_cost": 1
+        },
+        "total": 4,
+        "criterion_reviews": {
+          "evidence_understanding": {
+            "answer_locations": "1/hypothesis;2/hypothesis",
+            "review": "把参数/符号映射和隐式自身力平衡检查当成两模型力律未分叉；两级步长当作排除离散误差，且把同端点重建误差 0.004181 m/s（大于 0.002849 超限量）称为重构良好。"
+          },
+          "hypothesis_quality": {
+            "answer_locations": "1/hypothesis",
+            "review": "列出迭代、权限和传播机制，却称为互斥并要求模型失配只能是旁支，遗漏共同作用。"
+          },
+          "diagnostic_discrimination": {
+            "answer_locations": "2/expected_observation;2/interpretation",
+            "review": "三条 20 步分支及同态读出有辨别价值，但把瞬时最优输入的有限几次失败提升为物理权威极限，把传播/输出读出问题混用。"
+          },
+          "decision_adaptation": {
+            "answer_locations": "2/hypothesis;2/interpretation",
+            "review": "确实随 RH-N/RH-H 更新解释，但“近乎被否”“子机制否掉”“M1彻底排除”超出两个仍未收敛的局部对照和两级步长的范围。"
+          },
+          "research_cost": {
+            "answer_locations": "1/expected_observation;1/stopping_condition;2/expected_observation",
+            "review": "首轮前缀 680+基线20+修正20 已占720步，额外六通道两尺度 FD 未计入；第二轮60步仅含三分支，另称需两尺度灵敏度却未核算。"
+          }
+        }
+      },
+      {
+        "case": "structure",
+        "arm": "baseline",
+        "scores": {
+          "evidence_understanding": 0,
+          "hypothesis_quality": 2,
+          "diagnostic_discrimination": 1,
+          "decision_adaptation": 1,
+          "research_cost": 0
+        },
+        "total": 4,
+        "criterion_reviews": {
+          "evidence_understanding": {
+            "answer_locations": "1/hypothesis;2/hypothesis;2/interpretation",
+            "review": "固定与 warm 排序实际同为 d0<d+<d-，回答却反复称排序反转；把无量纲条件数/5%目标截断当作0.03 J误差带，且首轮把只改Young解释成质量/Jacobian改变。"
+          },
+          "hypothesis_quality": {
+            "answer_locations": "2/hypothesis",
+            "review": "提出数值分辨率、真实结构方向、初始化/搜索质量三种可测机制。"
+          },
+          "diagnostic_discrimination": {
+            "answer_locations": "2/expected_observation",
+            "review": "多起点和不同结构步长有针对性，但把原生有限搜索直接接到仿射受控敏感性/对偶面语义，且额外终端NLP不检验结构FD收敛。"
+          },
+          "decision_adaptation": {
+            "answer_locations": "2/hypothesis",
+            "review": "吸收三结构均通过和冷/暖差异；更新依赖错误的排序反转，并把未分辨误称能力中性。"
+          },
+          "research_cost": {
+            "answer_locations": "2/decision/requested_budget;2/interpretation",
+            "review": "请求5结构/189000步/约425s，超出3结构/65100步/60s；其5×3起点×27×700实际为283500步，冷启动不能包含在每结构27条之内。"
+          }
+        }
+      },
+      {
+        "case": "structure",
+        "arm": "evidence",
+        "scores": {
+          "evidence_understanding": 0,
+          "hypothesis_quality": 2,
+          "diagnostic_discrimination": 2,
+          "decision_adaptation": 2,
+          "research_cost": 0
+        },
+        "total": 6,
+        "criterion_reviews": {
+          "evidence_understanding": {
+            "answer_locations": "2/hypothesis;2/interpretation",
+            "review": "把0.03 J无条件换为0.3 mm、把三个±10%点外推为±15%模量域都有能力、把条件数/FD步/目标地板与J称同一量级；S140分数差的数学目标范围也被扩大。"
+          },
+          "hypothesis_quality": {
+            "answer_locations": "1/hypothesis;2/hypothesis",
+            "review": "提出固定控制匹配、真实残余结构效应、搜索/数值分辨率等机制，并给各自反例。"
+          },
+          "diagnostic_discrimination": {
+            "answer_locations": "2/expected_observation",
+            "review": "3模型×3保存控制的完整交叉回放固定一个因子比较另一个，保留三对角线复现与每格硬指标；这是有辨别力的新方案，不要求与预设动作相同。行列效应的交互项仍需复核，不构成重优化能力排名。"
+          },
+          "decision_adaptation": {
+            "answer_locations": "2/hypothesis;2/interpretation",
+            "review": "正确指出固定与warm排序均为d0最好、d+中间、d-最差；由三结构通过撤回“d-任何控制都无法补偿”，把问题转到残余排序与控制初始化，未要求立即改刚度。"
+          },
+          "research_cost": {
+            "answer_locations": "1/expected_observation;1/stopping_condition;2/stopping_condition",
+            "review": "第二轮9×700=6300步、优化回调0、3结构/60s，明显优于Baseline扩展；但整条轨迹首轮仍要求1基线+30探针=31控制评价/结构，超过包含基线的30回调上限，按冻结0分规则不能忽略。"
+          }
+        }
+      }
+    ],
+    "interpretation": "Mixed result: structural Evidence selected a cheaper discriminating crossed-schedule experiment; Reach/Hold Evidence did not improve and over-updated. No statistical/generalization claim; eight dependent turn responses are four trajectories, not eight independent samples."
+  },
+  "money": null,
+  "confirmed_responses": 16,
+  "usage": {
+    "prompt_tokens": 134816,
+    "completion_tokens": 129997,
+    "total_tokens": 264813,
+    "prompt_cache_hit_tokens": 78720,
+    "prompt_cache_miss_tokens": 56096,
+    "reasoning_tokens": 92318
+  },
+  "provider_ledger": {
+    "limit": {
+      "backend_solves": 0,
+      "model_calls": 8,
+      "tool_calls": 0,
+      "wall_s": null,
+      "worker_calls": 0
+    },
+    "used": {
+      "tool_calls": 0,
+      "model_calls": 8,
+      "backend_solves": 0,
+      "worker_calls": 0,
+      "wall_s": 347.15699999999197
+    },
+    "remaining": {
+      "backend_solves": 0,
+      "model_calls": 0,
+      "tool_calls": 0,
+      "wall_s": null,
+      "worker_calls": 0
+    },
+    "occupied": {}
+  },
+  "actual_request_audit": [
+    {
+      "cohort": "initial",
+      "requests": 8,
+      "http_200": 8,
+      "unknown": 0,
+      "retries": 0,
+      "isolated_histories": true,
+      "future_observations_absent_from_round1": true,
+      "rubric_and_report_paths_absent": true,
+      "headers_not_in_saved_wire": true,
+      "actual_store_requests_audited": 8
+    },
+    {
+      "cohort": "protocol-fixed",
+      "requests": 8,
+      "http_200": 8,
+      "unknown": 0,
+      "retries": 0,
+      "isolated_histories": true,
+      "future_observations_absent_from_round1": true,
+      "rubric_and_report_paths_absent": true,
+      "headers_not_in_saved_wire": true,
+      "actual_store_requests_audited": 8
+    }
+  ],
+  "offline_validation": {
+    "targeted_tests": 3,
+    "passed": 3,
+    "rerun_after_schema_fix": 3,
+    "production_changes": 0,
+    "science_dispatch": 0,
+    "initial_fixture_failures": "missing transport-session budget and Windows SQLite handle cleanup; fixed before first real request"
+  },
+  "primary_cohort_accounting": {
+    "actual_requests": 8,
+    "confirmed_responses": 8,
+    "usage": {
+      "prompt_tokens": 64852,
+      "completion_tokens": 60583,
+      "total_tokens": 125435,
+      "prompt_cache_hit_tokens": 36608,
+      "prompt_cache_miss_tokens": 28244,
+      "reasoning_tokens": 39522
+    },
+    "provider_ledger": {
+      "limit": {
+        "backend_solves": 0,
+        "model_calls": 8,
+        "tool_calls": 0,
+        "wall_s": null,
+        "worker_calls": 0
+      },
+      "used": {
+        "tool_calls": 0,
+        "model_calls": 8,
+        "backend_solves": 0,
+        "worker_calls": 0,
+        "wall_s": 347.15699999999197
+      },
+      "remaining": {
+        "backend_solves": 0,
+        "model_calls": 0,
+        "tool_calls": 0,
+        "wall_s": null,
+        "worker_calls": 0
+      },
+      "occupied": {}
+    }
+  },
+  "initial_cohort_accounting": {
+    "summary": "evidence/agent_math_decision_probe/initial_summary.json",
+    "actual_requests": 8,
+    "confirmed_responses": 8,
+    "usage": {
+      "prompt_tokens": 69964,
+      "completion_tokens": 69414,
+      "total_tokens": 139378,
+      "prompt_cache_hit_tokens": 42112,
+      "prompt_cache_miss_tokens": 27852,
+      "reasoning_tokens": 52796
+    },
+    "schema_passes": 5,
+    "schema_failures": 3,
+    "primary_comparison_allowance_charged": false
+  },
+  "provider_ledger_scope": "primary protocol-fixed cohort only; initial ledger retained in initial_summary.json",
+  "request_authorization": {
+    "original_ceiling": 8,
+    "supplemental_repaired_comparison_ceiling": 8,
+    "automatic_retries": 0,
+    "all_actual_usage_preserved": true
+  },
+  "scientific_findings": {
+    "evidence_improves_every_case": false,
+    "reach_hold_score_baseline_evidence": [
+      7,
+      4
+    ],
+    "structure_score_baseline_evidence": [
+      4,
+      6
+    ],
+    "structural_latest_proposal_steps_baseline_evidence": [
+      189000,
+      6300
+    ],
+    "structural_primary_budget_steps": 65100,
+    "fixed_and_warm_order": [
+      "d0",
+      "d+",
+      "d-"
+    ],
+    "strict_optimal_structure_gradient_established": false,
+    "direct_failed_solver_implies_structural_infeasibility_claim_observed": false,
+    "unsafe_local_failure_or_saturation_extrapolations_observed": true,
+    "ready_for_unattended_joint_design_study": false,
+    "next_study_started": false
+  },
+  "limitations": [
+    "One trajectory per arm/case; rounds are feedback within a trajectory, not repeats.",
+    "New protocol cohort changes only a common output schema/protocol sentence; stochastic sampling prevents a causal format-reliability claim.",
+    "Scientific scores are unblinded Codex review, not independent human adjudication.",
+    "S140 scalar score difference excerpt did not explicitly name per-structure reoptimized affine minimax, which can invite fixed-input/optimization confusion; exact original source and all prompts preserved.",
+    "No experiment selected by the Agent was executed; no exact scientific payload/reference admission or full Strands loop was tested.",
+    "Cost estimates are approximate; Provider did not return money, so amount remains unknown."
+  ],
+  "necessary_followups": [
+    "Schema-only repair completed and verified; no silent correction.",
+    "Clarify existing evidence excerpt metric/optimization/model scope: S140 reoptimized affine score, implicit self residual versus model agreement, dimensionless J versus active physical metric.",
+    "Explicitly include baseline, FD probes, proposals, reconstruction and independent replay in original method cost descriptions; do not treat failed few probes as a no-control certificate.",
+    "Use existing ResultCard and method descriptions to distinguish instantaneous authority, finite-interval evidence and unknown optimized capability; validate small focused decisions before any unattended joint Study."
+  ],
+  "delivery": {
+    "branch": "research/agent-math-decision-probe",
+    "baseline": "515500267",
+    "input_and_rubric_freeze_commit": "445ac6b22",
+    "schema_repair_freeze_commit": "2567e2d04",
+    "production_files_changed": 0,
+    "final_commit": "see final git commit and delivery message; no self-referential commit ID in artifact",
+    "ordinary_push_only": true
+  }
 }
