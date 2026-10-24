@@ -1,0 +1,844 @@
+{
+  "baseline_commit": "904f4932a",
+  "implementation": "3bdae23092e1f8491ee8b4583814e4dce7cb0a24",
+  "candidate": {
+    "artifact_id": "7f17748b6d25ecb7cabf37ff15671135d855f706642a63e00b321e88e63c710d",
+    "media_type": "application/json"
+  },
+  "optimization_reference": {
+    "artifact_id": "2215b856096a25eaf692bf4fde2141cb90b70c04a9231ec657a7aa6cce26e3ac",
+    "media_type": "application/json"
+  },
+  "control_schedule_reference": {
+    "artifact_id": "daf7c908d34cb640e0012660690d9ea07d4985acfd61c7c1d7ee0f80918fb472",
+    "media_type": "application/json"
+  },
+  "source_execution": {
+    "artifact_id": "a54a68d40c9b65f32aa6b75422ce2db5e9c2afa6aa914fe577db0fc93ce1ea1b",
+    "media_type": "application/json"
+  },
+  "source_store_unchanged": true,
+  "source_store_counts": {
+    "events": 478,
+    "artifacts": 532,
+    "calls": 73
+  },
+  "source_store_size_mtime": [
+    280825856,
+    1792767553286817900
+  ],
+  "reproduction": {
+    "times_s": 2.220446049250313e-16,
+    "tip_positions_m": 0.0,
+    "tip_velocities_m_s": 1.5612511283791264e-17
+  },
+  "optimization_summary": {
+    "basis": {
+      "channels": [
+        "near_t0",
+        "near_t1",
+        "near_t2",
+        "far_t0",
+        "far_t1",
+        "far_t2"
+      ],
+      "model": "model.mujoco_native@1.0.0",
+      "sample_count": 6,
+      "search_dimension": 18,
+      "state_time_s": 0.3000000000000002,
+      "window_s": [
+        0.3,
+        0.35
+      ]
+    },
+    "comparison": {
+      "baseline": {
+        "holding_max_position_error_m": 0.0031364418844500026,
+        "holding_max_speed_m_s": 0.022849089710631265,
+        "normalized_gap": 0.14245448553156326,
+        "returned_array_gap_interval": [
+          0.14245448553156234,
+          0.1424544855315644
+        ],
+        "signed_maximum_excess": 0.14245448553156326,
+        "sum_normalized_excess": 0.14245448553156326,
+        "terminal_position_error_m": 0.0031364418844500026,
+        "worst_constraint": {
+          "kind": "holding_speed",
+          "normalized_signed_excess": 0.14245448553156326,
+          "time_s": 0.35000000000000026
+        }
+      },
+      "best": {
+        "holding_max_position_error_m": 0.0030935954133305614,
+        "holding_max_speed_m_s": 0.018846588183909725,
+        "normalized_gap": 0.0,
+        "returned_array_gap_interval": [
+          0.0,
+          0.0
+        ],
+        "signed_maximum_excess": -0.057670590804513755,
+        "sum_normalized_excess": 0.0,
+        "terminal_position_error_m": 0.0030343952130579663,
+        "worst_constraint": {
+          "kind": "holding_speed",
+          "normalized_signed_excess": -0.057670590804513755,
+          "time_s": 0.35000000000000026
+        }
+      }
+    },
+    "control_schedule_pointer": "/control_schedule_reference",
+    "cost": {
+      "forward_evaluations": 313,
+      "kernel_wall_s": 0.19838380000146572,
+      "mechanics_evaluations": 0,
+      "model_builds": 1,
+      "optimization_evaluations": 23,
+      "optimization_iterations": 1,
+      "physics_steps": 2900,
+      "rollouts": 23
+    },
+    "detail_pointer": "/native_dynamics",
+    "interpretation": "Cloned nonlinear native sequence predictions with the existing bounded local control search.",
+    "limitations": [
+      "Local sampled simulation estimate; no global optimum, hardware or regional guarantee."
+    ],
+    "next_actions": [
+      "physical_replay using control_schedule_reference",
+      "Read local_responses to revise parameterization or radius",
+      "Rebuild a legal prefix for each changed structure"
+    ],
+    "quantities": [
+      {
+        "name": "baseline_holding_max_speed",
+        "source_pointer": "/native_dynamics/optimization/candidates/0/measure/holding_max_speed_m_s",
+        "unit": "m/s",
+        "value": 0.022849089710631265
+      },
+      {
+        "name": "baseline_holding_max_position_error",
+        "source_pointer": "/native_dynamics/optimization/candidates/0/measure/holding_max_position_error_m",
+        "unit": "m",
+        "value": 0.0031364418844500026
+      },
+      {
+        "name": "baseline_signed_maximum_excess",
+        "source_pointer": "/native_dynamics/optimization/candidates/0/measure/signed_maximum_excess",
+        "unit": "1",
+        "value": 0.14245448553156326
+      },
+      {
+        "name": "best_holding_max_speed",
+        "source_pointer": "/native_dynamics/optimization/best/measure/holding_max_speed_m_s",
+        "unit": "m/s",
+        "value": 0.018846588183909725
+      },
+      {
+        "name": "best_holding_max_position_error",
+        "source_pointer": "/native_dynamics/optimization/best/measure/holding_max_position_error_m",
+        "unit": "m",
+        "value": 0.0030935954133305614
+      },
+      {
+        "name": "best_signed_maximum_excess",
+        "source_pointer": "/native_dynamics/optimization/best/measure/signed_maximum_excess",
+        "unit": "1",
+        "value": -0.057670590804513755
+      }
+    ],
+    "question": "Can bounded native sequence optimization improve every holding sample before independent full replay?",
+    "solver": {
+      "last_local_solver": {
+        "global_optimality_proved": false,
+        "iterations": 7,
+        "numerical_status": "Optimization terminated successfully",
+        "predicted_gap": 0.0,
+        "predicted_signed_excess": -0.04999999999790328,
+        "success": true,
+        "target_margin_fraction": 0.05
+      },
+      "stop_reason": "local_target_reached"
+    },
+    "unresolved": [
+      "Full 0-to-duration replay and independent frozen acceptance remain required."
+    ],
+    "control_schedule_reference": {
+      "artifact_id": "daf7c908d34cb640e0012660690d9ea07d4985acfd61c7c1d7ee0f80918fb472",
+      "media_type": "application/json"
+    }
+  },
+  "replays": {
+    "baseline": {
+      "reference": {
+        "artifact_id": "c6945454096460281826763bb51e356465c51b369f91de33a16b371195307f4c",
+        "media_type": "application/json"
+      },
+      "raw_reference": {
+        "artifact_id": "9acb208137ce6cdbbd451333a39a06bc6cf0a756b3749f265db350c8e3e990d6",
+        "media_type": "application/json"
+      },
+      "acceptance": {
+        "contract": "research.task_acceptance",
+        "version": "1.0.0",
+        "protocol_id": "offline_reach_hold_v1",
+        "task_family": "task.reach",
+        "task_identity": "2b26edb492214c426263441b6adb52d7aafe41a828436d6b48a1171374a1026c",
+        "status": "valid_failure",
+        "accepted": false,
+        "components": {
+          "evaluation_validity": {
+            "value": "valid",
+            "passed": true,
+            "unit": null,
+            "limit": null,
+            "reason": null
+          },
+          "execution_complete": {
+            "value": true,
+            "passed": true,
+            "unit": null,
+            "limit": null,
+            "reason": null
+          },
+          "task_evaluator": {
+            "value": true,
+            "passed": true,
+            "unit": null,
+            "limit": null,
+            "reason": null
+          },
+          "evaluator:task_bound": {
+            "value": 0.0031364418844500026,
+            "passed": true,
+            "unit": "m",
+            "limit": 0.01,
+            "reason": null
+          },
+          "solver_errors": {
+            "value": 0,
+            "passed": true,
+            "unit": "count",
+            "limit": 0,
+            "reason": null
+          },
+          "force_bounds": {
+            "value": 0.0,
+            "passed": true,
+            "unit": "N",
+            "limit": 1e-08,
+            "reason": null
+          },
+          "holding_coverage": {
+            "value": true,
+            "passed": true,
+            "unit": "inclusive uniform samples",
+            "limit": 6,
+            "reason": null
+          },
+          "holding_position": {
+            "value": 0.0031364418844500026,
+            "passed": true,
+            "unit": "m",
+            "limit": 0.01,
+            "reason": null
+          },
+          "holding_speed": {
+            "value": 0.022849089710631265,
+            "passed": false,
+            "unit": "m/s",
+            "limit": 0.02,
+            "reason": null
+          }
+        },
+        "metrics": {
+          "terminal_error_m": 0.0031364418844500026,
+          "holding_max_error_m": 0.0031364418844500026,
+          "holding_max_speed_m_s": 0.022849089710631265
+        },
+        "missing": [],
+        "issues": [],
+        "execution_id": "e7eaa41606324522976978adf84ea1fa",
+        "sources": {
+          "evaluation": {
+            "artifact_id": "d0aefd929834aa174837edfbbe2780c9e7436eae508441836c9d6cbf66a0b2c7",
+            "media_type": "application/json"
+          },
+          "profile": null
+        },
+        "evidence_binding": {
+          "evaluation": {
+            "artifact_id": "d0aefd929834aa174837edfbbe2780c9e7436eae508441836c9d6cbf66a0b2c7",
+            "media_type": "application/json"
+          },
+          "profile": null,
+          "simulation": {
+            "artifact_id": "9acb208137ce6cdbbd451333a39a06bc6cf0a756b3749f265db350c8e3e990d6",
+            "media_type": "application/json"
+          },
+          "evaluation_binding": {
+            "source": {
+              "artifact_id": "9acb208137ce6cdbbd451333a39a06bc6cf0a756b3749f265db350c8e3e990d6",
+              "media_type": "application/json"
+            },
+            "source_execution_id": null,
+            "original_execution_id": null
+          },
+          "profile_binding": {
+            "evaluation": {
+              "artifact_id": "d0aefd929834aa174837edfbbe2780c9e7436eae508441836c9d6cbf66a0b2c7",
+              "media_type": "application/json"
+            },
+            "simulation": {
+              "artifact_id": "9acb208137ce6cdbbd451333a39a06bc6cf0a756b3749f265db350c8e3e990d6",
+              "media_type": "application/json"
+            },
+            "execution_id": "e7eaa41606324522976978adf84ea1fa"
+          }
+        },
+        "evaluator_tension_channels": null,
+        "timing": {
+          "control_period_s": 0.01,
+          "duration_s": 0.35,
+          "sample_period_s": 0.01,
+          "termination": [
+            "duration",
+            "numerical_failure"
+          ],
+          "timestep_s": 0.0005,
+          "real_time_required": false,
+          "real_time_demonstrated": null,
+          "deadline_misses": null,
+          "mean_update_s": null,
+          "simulation_wall_s": null
+        },
+        "continuous_time_guarantee": false
+      },
+      "gap": {
+        "normalized_gap": 0.14245448553156326,
+        "components": {
+          "evaluator:task_bound": 0.0,
+          "holding_position": 0.0,
+          "holding_speed": 0.14245448553156326
+        },
+        "valid_complete": true,
+        "accepted": false,
+        "interpretation": "Research ranking only; invalid executions remain invalid regardless of gap"
+      },
+      "prediction_difference": {
+        "times_s": 2.220446049250313e-16,
+        "tip_positions_m": 0.0,
+        "tip_velocities_m_s": 0.0
+      },
+      "wall_s": 1.1910980999964522
+    },
+    "optimized": {
+      "reference": {
+        "artifact_id": "0b9406264d845317abe62d059e824794644e8e9ac64095bc6d41caf2641bb71b",
+        "media_type": "application/json"
+      },
+      "raw_reference": {
+        "artifact_id": "1628c9610738e2e983b8b84ac37ac142dc2a093b7b418ebfc75cd90d4065413a",
+        "media_type": "application/json"
+      },
+      "acceptance": {
+        "contract": "research.task_acceptance",
+        "version": "1.0.0",
+        "protocol_id": "offline_reach_hold_v1",
+        "task_family": "task.reach",
+        "task_identity": "2b26edb492214c426263441b6adb52d7aafe41a828436d6b48a1171374a1026c",
+        "status": "accepted",
+        "accepted": true,
+        "components": {
+          "evaluation_validity": {
+            "value": "valid",
+            "passed": true,
+            "unit": null,
+            "limit": null,
+            "reason": null
+          },
+          "execution_complete": {
+            "value": true,
+            "passed": true,
+            "unit": null,
+            "limit": null,
+            "reason": null
+          },
+          "task_evaluator": {
+            "value": true,
+            "passed": true,
+            "unit": null,
+            "limit": null,
+            "reason": null
+          },
+          "evaluator:task_bound": {
+            "value": 0.0030343952130579663,
+            "passed": true,
+            "unit": "m",
+            "limit": 0.01,
+            "reason": null
+          },
+          "solver_errors": {
+            "value": 0,
+            "passed": true,
+            "unit": "count",
+            "limit": 0,
+            "reason": null
+          },
+          "force_bounds": {
+            "value": 0.0,
+            "passed": true,
+            "unit": "N",
+            "limit": 1e-08,
+            "reason": null
+          },
+          "holding_coverage": {
+            "value": true,
+            "passed": true,
+            "unit": "inclusive uniform samples",
+            "limit": 6,
+            "reason": null
+          },
+          "holding_position": {
+            "value": 0.0030935954133305614,
+            "passed": true,
+            "unit": "m",
+            "limit": 0.01,
+            "reason": null
+          },
+          "holding_speed": {
+            "value": 0.018846588183909725,
+            "passed": true,
+            "unit": "m/s",
+            "limit": 0.02,
+            "reason": null
+          }
+        },
+        "metrics": {
+          "terminal_error_m": 0.0030343952130579663,
+          "holding_max_error_m": 0.0030935954133305614,
+          "holding_max_speed_m_s": 0.018846588183909725
+        },
+        "missing": [],
+        "issues": [],
+        "execution_id": "b2074673db26404a94bdf74214a04e92",
+        "sources": {
+          "evaluation": {
+            "artifact_id": "61454c070d3d8af1d7e9732458f8fa1e97840665abb0fbdcf18076da99ff0d34",
+            "media_type": "application/json"
+          },
+          "profile": null
+        },
+        "evidence_binding": {
+          "evaluation": {
+            "artifact_id": "61454c070d3d8af1d7e9732458f8fa1e97840665abb0fbdcf18076da99ff0d34",
+            "media_type": "application/json"
+          },
+          "profile": null,
+          "simulation": {
+            "artifact_id": "1628c9610738e2e983b8b84ac37ac142dc2a093b7b418ebfc75cd90d4065413a",
+            "media_type": "application/json"
+          },
+          "evaluation_binding": {
+            "source": {
+              "artifact_id": "1628c9610738e2e983b8b84ac37ac142dc2a093b7b418ebfc75cd90d4065413a",
+              "media_type": "application/json"
+            },
+            "source_execution_id": null,
+            "original_execution_id": null
+          },
+          "profile_binding": {
+            "evaluation": {
+              "artifact_id": "61454c070d3d8af1d7e9732458f8fa1e97840665abb0fbdcf18076da99ff0d34",
+              "media_type": "application/json"
+            },
+            "simulation": {
+              "artifact_id": "1628c9610738e2e983b8b84ac37ac142dc2a093b7b418ebfc75cd90d4065413a",
+              "media_type": "application/json"
+            },
+            "execution_id": "b2074673db26404a94bdf74214a04e92"
+          }
+        },
+        "evaluator_tension_channels": null,
+        "timing": {
+          "control_period_s": 0.01,
+          "duration_s": 0.35,
+          "sample_period_s": 0.01,
+          "termination": [
+            "duration",
+            "numerical_failure"
+          ],
+          "timestep_s": 0.0005,
+          "real_time_required": false,
+          "real_time_demonstrated": null,
+          "deadline_misses": null,
+          "mean_update_s": null,
+          "simulation_wall_s": null
+        },
+        "continuous_time_guarantee": false
+      },
+      "gap": {
+        "normalized_gap": 0.0,
+        "components": {
+          "evaluator:task_bound": 0.0,
+          "holding_position": 0.0,
+          "holding_speed": 0.0
+        },
+        "valid_complete": true,
+        "accepted": true,
+        "interpretation": "Research ranking only; invalid executions remain invalid regardless of gap"
+      },
+      "prediction_difference": {
+        "times_s": 2.220446049250313e-16,
+        "tip_positions_m": 0.0,
+        "tip_velocities_m_s": 0.0
+      },
+      "wall_s": 1.0963548999970953
+    }
+  },
+  "decision_view": {
+    "claim_source": {
+      "reference": {
+        "artifact_id": "2215b856096a25eaf692bf4fde2141cb90b70c04a9231ec657a7aa6cce26e3ac",
+        "media_type": "application/json"
+      },
+      "pointer": "/scoped_claim"
+    },
+    "requirement_source": {
+      "reference": {
+        "artifact_id": "2215b856096a25eaf692bf4fde2141cb90b70c04a9231ec657a7aa6cce26e3ac",
+        "media_type": "application/json"
+      },
+      "pointer": "/task_analysis"
+    },
+    "problem_definition": {
+      "reference": {
+        "artifact_id": "2215b856096a25eaf692bf4fde2141cb90b70c04a9231ec657a7aa6cce26e3ac",
+        "media_type": "application/json"
+      },
+      "pointer": "/native_analysis/basis"
+    },
+    "scope": {
+      "model_declaration": {
+        "model_id": "model.mujoco_native",
+        "model_version": "1.0.0",
+        "relevant_assumptions": [
+          "MuJoCo compiled family model; no GVS projection; ideal absolute tensions.",
+          "Contact-free, unconstrained hinges without activation dynamics; runtime checked.",
+          "Short fixed-input numerical responses; no optimal-value or KKT interpretation."
+        ],
+        "representation_id": "native_named_hinges_v1"
+      },
+      "computation_status": "computed",
+      "verification_status": "native_numerical_checks",
+      "supported_interpretation": "Bounded native sequence search with nonlinear sampled checks; full physical replay and frozen task acceptance remain independent.",
+      "unsupported_conclusions": [
+        "task acceptance",
+        "whole holding-window compliance",
+        "global nonlinear feasibility or infeasibility",
+        "hardware performance",
+        "robustness",
+        "repeatability",
+        "equilibrium validity at a non-equilibrium point"
+      ],
+      "horizon": {
+        "analysis_window_s": [
+          0.3,
+          0.35
+        ],
+        "interpretation": "Every covered constraint sample, including checkpoint origin; no inherited prefix acceptance.",
+        "origin": 0.3000000000000002,
+        "period_s": 0.01,
+        "task_duration_s": 0.35
+      },
+      "constraint_coverage": [
+        {
+          "constraint_id": "terminal_error_m",
+          "expressible": true,
+          "reason": "Sampled native control proxy; remaining acceptance components require full replay.",
+          "status": "diagnostic",
+          "analyzed_indices_count": 1
+        },
+        {
+          "constraint_id": "holding_max_error_m",
+          "expressible": true,
+          "reason": "Sampled native control proxy; remaining acceptance components require full replay.",
+          "status": "diagnostic",
+          "analyzed_indices_count": 6
+        },
+        {
+          "constraint_id": "holding_max_speed_m_s",
+          "expressible": true,
+          "reason": "Sampled native control proxy; remaining acceptance components require full replay.",
+          "status": "diagnostic",
+          "analyzed_indices_count": 6
+        }
+      ]
+    },
+    "operating_point": {
+      "actual_time_s": 0.3000000000000002,
+      "input_units": "N",
+      "phase": "interval_start_native"
+    },
+    "quantities": [
+      {
+        "name": "baseline_holding_max_speed",
+        "status": "unverified_estimate",
+        "value": 0.022849089710631265,
+        "unit": "m/s",
+        "source": {
+          "reference": {
+            "artifact_id": "2215b856096a25eaf692bf4fde2141cb90b70c04a9231ec657a7aa6cce26e3ac",
+            "media_type": "application/json"
+          },
+          "pointer": "/native_dynamics/optimization/candidates/0/measure/holding_max_speed_m_s"
+        },
+        "structural_parameters": [],
+        "control_reoptimization": "required"
+      },
+      {
+        "name": "baseline_holding_max_position_error",
+        "status": "unverified_estimate",
+        "value": 0.0031364418844500026,
+        "unit": "m",
+        "source": {
+          "reference": {
+            "artifact_id": "2215b856096a25eaf692bf4fde2141cb90b70c04a9231ec657a7aa6cce26e3ac",
+            "media_type": "application/json"
+          },
+          "pointer": "/native_dynamics/optimization/candidates/0/measure/holding_max_position_error_m"
+        },
+        "structural_parameters": [],
+        "control_reoptimization": "required"
+      },
+      {
+        "name": "baseline_signed_maximum_excess",
+        "status": "unverified_estimate",
+        "value": 0.14245448553156326,
+        "unit": "1",
+        "source": {
+          "reference": {
+            "artifact_id": "2215b856096a25eaf692bf4fde2141cb90b70c04a9231ec657a7aa6cce26e3ac",
+            "media_type": "application/json"
+          },
+          "pointer": "/native_dynamics/optimization/candidates/0/measure/signed_maximum_excess"
+        },
+        "structural_parameters": [],
+        "control_reoptimization": "required"
+      },
+      {
+        "name": "best_holding_max_speed",
+        "status": "unverified_estimate",
+        "value": 0.018846588183909725,
+        "unit": "m/s",
+        "source": {
+          "reference": {
+            "artifact_id": "2215b856096a25eaf692bf4fde2141cb90b70c04a9231ec657a7aa6cce26e3ac",
+            "media_type": "application/json"
+          },
+          "pointer": "/native_dynamics/optimization/best/measure/holding_max_speed_m_s"
+        },
+        "structural_parameters": [],
+        "control_reoptimization": "required"
+      },
+      {
+        "name": "best_holding_max_position_error",
+        "status": "unverified_estimate",
+        "value": 0.0030935954133305614,
+        "unit": "m",
+        "source": {
+          "reference": {
+            "artifact_id": "2215b856096a25eaf692bf4fde2141cb90b70c04a9231ec657a7aa6cce26e3ac",
+            "media_type": "application/json"
+          },
+          "pointer": "/native_dynamics/optimization/best/measure/holding_max_position_error_m"
+        },
+        "structural_parameters": [],
+        "control_reoptimization": "required"
+      },
+      {
+        "name": "best_signed_maximum_excess",
+        "status": "unverified_estimate",
+        "value": -0.057670590804513755,
+        "unit": "1",
+        "source": {
+          "reference": {
+            "artifact_id": "2215b856096a25eaf692bf4fde2141cb90b70c04a9231ec657a7aa6cce26e3ac",
+            "media_type": "application/json"
+          },
+          "pointer": "/native_dynamics/optimization/best/measure/signed_maximum_excess"
+        },
+        "structural_parameters": [],
+        "control_reoptimization": "required"
+      }
+    ],
+    "capability": null,
+    "unresolved": {
+      "supported_facts": [
+        "Cloned nonlinear native sequence predictions with the existing bounded local control search."
+      ],
+      "unresolved_questions": [
+        "Full 0-to-duration replay and independent frozen acceptance remain required."
+      ],
+      "potential_discriminating_checks": [
+        "Check task constraints with an applicable operation."
+      ],
+      "unsupported_inferences": [
+        "Global/physical feasibility, structural necessity or surrounding-region exclusion."
+      ]
+    },
+    "native_analysis": {
+      "basis": {
+        "channels": [
+          "near_t0",
+          "near_t1",
+          "near_t2",
+          "far_t0",
+          "far_t1",
+          "far_t2"
+        ],
+        "model": "model.mujoco_native@1.0.0",
+        "sample_count": 6,
+        "search_dimension": 18,
+        "state_time_s": 0.3000000000000002,
+        "window_s": [
+          0.3,
+          0.35
+        ]
+      },
+      "comparison": {
+        "baseline": {
+          "holding_max_position_error_m": 0.0031364418844500026,
+          "holding_max_speed_m_s": 0.022849089710631265,
+          "normalized_gap": 0.14245448553156326,
+          "returned_array_gap_interval": [
+            0.14245448553156234,
+            0.1424544855315644
+          ],
+          "signed_maximum_excess": 0.14245448553156326,
+          "sum_normalized_excess": 0.14245448553156326,
+          "terminal_position_error_m": 0.0031364418844500026,
+          "worst_constraint": {
+            "kind": "holding_speed",
+            "normalized_signed_excess": 0.14245448553156326,
+            "time_s": 0.35000000000000026
+          }
+        },
+        "best": {
+          "holding_max_position_error_m": 0.0030935954133305614,
+          "holding_max_speed_m_s": 0.018846588183909725,
+          "normalized_gap": 0.0,
+          "returned_array_gap_interval": [
+            0.0,
+            0.0
+          ],
+          "signed_maximum_excess": -0.057670590804513755,
+          "sum_normalized_excess": 0.0,
+          "terminal_position_error_m": 0.0030343952130579663,
+          "worst_constraint": {
+            "kind": "holding_speed",
+            "normalized_signed_excess": -0.057670590804513755,
+            "time_s": 0.35000000000000026
+          }
+        }
+      },
+      "control_schedule_pointer": "/control_schedule_reference",
+      "cost": {
+        "forward_evaluations": 313,
+        "kernel_wall_s": 0.19838380000146572,
+        "mechanics_evaluations": 0,
+        "model_builds": 1,
+        "optimization_evaluations": 23,
+        "optimization_iterations": 1,
+        "physics_steps": 2900,
+        "rollouts": 23
+      },
+      "detail_pointer": "/native_dynamics",
+      "interpretation": "Cloned nonlinear native sequence predictions with the existing bounded local control search.",
+      "limitations": [
+        "Local sampled simulation estimate; no global optimum, hardware or regional guarantee."
+      ],
+      "next_actions": [
+        "physical_replay using control_schedule_reference",
+        "Read local_responses to revise parameterization or radius",
+        "Rebuild a legal prefix for each changed structure"
+      ],
+      "question": "Can bounded native sequence optimization improve every holding sample before independent full replay?",
+      "solver": {
+        "last_local_solver": {
+          "global_optimality_proved": false,
+          "iterations": 7,
+          "numerical_status": "Optimization terminated successfully",
+          "predicted_gap": 0.0,
+          "predicted_signed_excess": -0.04999999999790328,
+          "success": true,
+          "target_margin_fraction": 0.05
+        },
+        "stop_reason": "local_target_reached"
+      },
+      "unresolved": [
+        "Full 0-to-duration replay and independent frozen acceptance remain required."
+      ],
+      "control_schedule_reference": {
+        "artifact_id": "daf7c908d34cb640e0012660690d9ea07d4985acfd61c7c1d7ee0f80918fb472",
+        "media_type": "application/json"
+      }
+    }
+  },
+  "reporter_delivery": {
+    "delivery_version": "scientific_delivery_v2",
+    "execution_status": "completed",
+    "scientific_result_reference": {
+      "artifact_id": "2215b856096a25eaf692bf4fde2141cb90b70c04a9231ec657a7aa6cce26e3ac",
+      "media_type": "application/json"
+    },
+    "report_reference": {
+      "artifact_id": "aa2b111daa0f96e9ad2d953d270b2f77b830fee4c5c155165d04420507419827",
+      "media_type": "application/json"
+    },
+    "interpretation_status": "deferred",
+    "operation_outcome": {
+      "candidate": {
+        "artifact_id": "7f17748b6d25ecb7cabf37ff15671135d855f706642a63e00b321e88e63c710d",
+        "media_type": "application/json"
+      },
+      "reference": {
+        "artifact_id": "2215b856096a25eaf692bf4fde2141cb90b70c04a9231ec657a7aa6cce26e3ac",
+        "media_type": "application/json"
+      },
+      "status": "computed"
+    },
+    "resource_use": null,
+    "formal_read_required": "Reports do not satisfy SELECT/STOP/RL evidence_read obligations"
+  },
+  "receipt_reuse": {
+    "additional_numerical_s": 0,
+    "additional_analysis_evaluations": 0
+  },
+  "ledger": {
+    "limit": {
+      "backend_solves": 2,
+      "model_calls": 0,
+      "tool_calls": 40,
+      "wall_s": null,
+      "worker_calls": 0
+    },
+    "used": {
+      "tool_calls": 4,
+      "model_calls": 0,
+      "backend_solves": 2,
+      "worker_calls": 0,
+      "wall_s": 3.55314269999144
+    },
+    "remaining": {
+      "backend_solves": 0,
+      "model_calls": 0,
+      "tool_calls": 36,
+      "wall_s": null,
+      "worker_calls": 0
+    },
+    "occupied": {}
+  },
+  "numerical_s": 4.202149899989308,
+  "mathematical_evaluations": 1,
+  "elapsed_s": 11.844706700001552
+}
