@@ -258,6 +258,10 @@ def resolve(path, profile=None, *, backend_profile=None):
             raise ValueError('INVALID_REFERENCE_EDIT: ' + key)
         current[parts[-1]] = value
     b = study['budgets']
+    native_limits=study.get('native_control_limits')
+    if native_limits is not None and (set(native_limits)!={'evaluation_requests','iterations','knots_s'}
+            or any(type(v) is not int or v<1 for v in native_limits.values())):
+        raise ValueError('POSITIVE_NATIVE_CONTROL_COUNT_LIMITS_REQUIRED')
     replay_limit=study.get('physical_replay_limit')
     if replay_limit is not None and (type(replay_limit) is not int or not 0<=replay_limit<=b['physical_launches']):
         raise ValueError('PHYSICAL_REPLAY_LIMIT_MUST_SHARE_BACKEND_CEILING')

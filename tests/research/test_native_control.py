@@ -11,6 +11,42 @@ from schemas.platform import SessionInput
 
 
 class NativeControlTests(unittest.TestCase):
+    def test_study_limits_reject_before_worker_or_reservation(self):
+        from unittest.mock import Mock, patch
+        from tools.research import analysis
+        from tools.research.config import ROOT, resolve
+        from tests.research.test_research_reporting import offline_host
+        spec=resolve(ROOT/'configs/research/study_c3_autonomous.json')
+        ref=dict(artifact_id='a'*64,media_type='application/json')
+        host,_=offline_host({},spec=spec)
+        host.store.lookup.return_value=None
+        query=dict(candidate=ref,operation='mujoco_direct_control_v1',model_source='mujoco',
+            operating_point='standardized_initial_pretension',protocol=spec['analysis_protocol'],
+            control_optimization=dict(source=ref,settings=dict(version='local_control_search_v2',
+                correction_window_s=[0,.35],knots_s=[0,.12,.23,.34],evaluation_requests=60,iterations=2)))
+        for field,value in (('evaluation_requests',61),('iterations',3)):
+            oversized=deepcopy(query);oversized['control_optimization']['settings'][field]=value
+            with self.subTest(field=field),self.assertRaisesRegex(ValueError,'STUDY_NATIVE_CONTROL_LIMIT: '+field):
+                analysis.dispatch(host,oversized,'test',guard=Mock())
+        with patch.object(analysis,'verify_candidate',side_effect=ValueError('PASSED_LIMIT_ADMISSION')):
+            with self.assertRaisesRegex(ValueError,'PASSED_LIMIT_ADMISSION'):
+                analysis.dispatch(host,query,'test',guard=Mock())
+        host.store.reserve.assert_not_called();host.store.transaction.assert_not_called()
+
+    def test_native_limits_visible_and_legacy_catalog_unchanged(self):
+        from tests.research.test_c1_method_context import C1Archive
+        from tools.research.task_constraints import mathematical_method_view, mathematical_catalog
+        archive=C1Archive();host,s=archive.host();reference=s['reference_candidate']
+        legacy=mathematical_catalog(mathematical_method_view(host,reference))
+        self.assertNotIn('execution_limits',legacy['methods']['mujoco_direct_control_v1'])
+        limits=dict(evaluation_requests=60,iterations=2,knots_s=4)
+        s['spec']['native_control_limits']=limits
+        current=mathematical_catalog(mathematical_method_view(host,reference))
+        self.assertEqual(current['methods']['mujoco_direct_control_v1']['execution_limits'],limits)
+        self.assertEqual(set(current['methods']),set(legacy['methods']))
+        host.store.transaction.assert_not_called();host.store.reserve.assert_not_called()
+        archive.archive.close()
+
     def test_schema_requires_source_and_explicit_v2_window(self):
         native_fixtures.NativeAnalysisTests.setUpClass();f=native_fixtures.NativeAnalysisTests();f.setUp()
         q=plain(f.q);q['operation']='mujoco_direct_control_v1'
