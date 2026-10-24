@@ -9,7 +9,7 @@ METHOD_MEANINGS = {
     'equilibrium': ('Static input construction', 'Bounded local static target construction; static balance does not establish dynamic reach or hold.'),
     'input_sensitivity': ('Static input response', 'Checked local implicit-function response of equilibrium to physical input; SoRoSim fixed-input equilibrium only.'),
     'design_sensitivity': ('Static structural response', 'Paired single-parameter local static sensitivity with fixed physical input; no global design descent guarantee.'),
-    'mujoco_direct_control_v1': ('MuJoCo-direct bounded sequence optimization', 'Reuse local response/pattern search with cloned native rollouts covering every holding sample; produces an explicit full schedule for independent physical_replay. No task acceptance or global optimality from optimization.'),
+    'mujoco_direct_control_v1': ('MuJoCo-direct bounded sequence optimization', 'Reach/Hold only. Reuse local response/pattern search with cloned native rollouts covering every holding sample; produces an explicit full schedule for independent physical_replay. No task acceptance or global optimality from optimization.'),
     'native_dynamics_v1': ('Native MuJoCo mechanics', 'Native mass, forces, acceleration, world tip and tendon Jacobians at an exact native state; independent of GVS.'),
     'short_input_response_v1': ('Native short input response', 'Legal actual-tension FD at two sizes, optional one bounded correction checked with nonlinear native integration; no full-task claim.'),
     'fixed_input_structure_v1': ('Native structure and function response', 'Recompile registered one-parameter candidates; compare mechanisms, local function and short task proxies at fixed input. No reoptimized capability claim.'),
@@ -64,8 +64,8 @@ def mathematical_method_view(host, reference):
             if spec['analysis_protocol']['windows_s']:request['scoring_window_s']=spec['analysis_protocol']['windows_s'][0]
         if key=='instantaneous_braking_v1':required.append('saved_state OR execution + update_id')
         if key in ('native_dynamics_v1','short_input_response_v1','fixed_input_structure_v1','mujoco_direct_control_v1'):
-            request.update(model_source='mujoco',operating_point='saved_state')
-            required.append('saved_state (native integration checkpoint) OR execution + update_id')
+            request.update(model_source='mujoco',operating_point='standardized_initial_pretension')
+            required.append('Frozen initialization needs no saved source; optional saved_state OR execution + update_id uses operating_point=saved_state')
             if key!='mujoco_direct_control_v1':required.append('native={tensions_n,horizon_s,difference_step_n,correction_radius_n}')
         if key=='mujoco_direct_control_v1':required.append('control_optimization={source,settings}; v2 search settings with explicit correction_window_s; physical_replay uses returned control_schedule_reference')
         if key=='fixed_input_structure_v1':required.append('structure_response={variable,candidates}; registered single-parameter candidates')
@@ -94,21 +94,27 @@ def mathematical_method_view(host, reference):
         if key==SENSITIVITY:
             methods[key]['readiness']=readiness
             methods[key]['cost_scope']='M*B conic solves + up to 2*k dual-face attempts; M=1+2*k. B=1 except two-segment paths: samples-2. Model preparation additional; wall cost unknown.'
+        if key=='mujoco_direct_control_v1':
+            methods[key]['supported_task_families']=['task.reach']
+            methods[key]['kernel_supported']=cfg['task']['family']=='task.reach'
     return dict(**readiness,candidate=reference,methods=methods,analysis_request_schema=AnalysisRequest.model_json_schema())
 
 
 def mathematical_catalog(view):
     """Small per-method facts; full instructions and native schemas stay reachable."""
     rows={}
+    shared_cost='Model preparation and internal solver attempts are distinct; see original receipts.'
     for row in view['methods'].values():
         item={k:v for k,v in row.items() if k not in ('description','request_template','required_parameters',
             'schema_query','prerequisites','time_scope','required_outputs','constraint_kinds','readiness','applicability',
             'candidate','task_identity','task_family','model_sources','formal_scope_authorized','method','limitations')}
         item['coverage']=[{k:v for k,v in c.items() if k in ('constraint_id','status','expressible')} for c in row['coverage']]
+        item['missing']=list(dict.fromkeys(item['missing']))
+        if item.get('cost_scope')==shared_cost:item.pop('cost_scope')
         rows[row['method']]=item
     binding=next(iter(view['methods'].values()))
     return dict(version='mathematical_capability_catalog_v1',candidate=view['candidate'],task_identity=binding['task_identity'],task_family=binding['task_family'],
-        formal_scope_authorized=binding['formal_scope_authorized'],model_sources=binding['model_sources'][-1:],
+        formal_scope_authorized=binding['formal_scope_authorized'],model_sources=binding['model_sources'][-1:],cost_scope=shared_cost,
         limitations=['Candidate-bound planning only; all model/state/input/protocol and remaining-budget admission checks still apply.',
             'Local sampled numerical evidence does not prove physical acceptance or strict/global optimality.'],methods=rows)
 
@@ -128,7 +134,7 @@ def analysis_capabilities(configuration, requirements, protocol, *, model=None, 
         native=operation in ('native_dynamics_v1','short_input_response_v1','fixed_input_structure_v1','mujoco_direct_control_v1')
         sampled=operation in ('trajectory_feasibility','task_capability','mujoco_direct_control_v1')
         static=operation in ('equilibrium','input_sensitivity','design_sensitivity')
-        point='saved_state' if native else 'target_equilibrium' if operation=='equilibrium' else 'fixed_input_equilibrium' if static else 'controller_start_input'
+        point='standardized_initial_pretension' if native else 'target_equilibrium' if operation=='equilibrium' else 'fixed_input_equilibrium' if static else 'controller_start_input'
         if exact_point and not static:point='saved_state'
         query=SimpleNamespace(operation=operation,operating_point=point,protocol=p,
             scoring_window_s=p.windows_s[0] if p.windows_s else None,

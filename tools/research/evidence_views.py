@@ -210,6 +210,11 @@ def result_card(host, reference):
     value=deepcopy(read_evidence(host, dict(reference=reference), record_read=False))
     if not isinstance(value,dict):
         raise ValueError('RESULT_CARD_REQUIRES_RESULT_OBJECT')
+    control=value.get('control_schedule_reference',value.get('source_reference'))
+    if control:
+        trajectory=host.store.artifact(control).get('trajectory') or {}
+        for key in ('model_identity','design_identity'):
+            if value.get(key) is None and trajectory.get(key):value[key]=trajectory[key]
     evidence=summarize_evidence(value,reference)
     binding=(value.get('scoped_claim') or {}).get('binding') or value.get('binding') or {}
     identity=ResultIdentity(result=_location(reference),

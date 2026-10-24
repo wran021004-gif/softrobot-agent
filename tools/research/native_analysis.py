@@ -86,8 +86,10 @@ def assessment(configuration, requirements):
 def applicability(requirements, query, assessed, point):
     reasons=[r for use in assessed['uses'].values() for r in use['reasons']]
     point=point or {};start=point.get('actual_time_s')
+    initial=query.operating_point=='standardized_initial_pretension'
+    if initial:point=point or dict(actual_time_s=0.);start=0.
     horizon=0. if query.operation=='native_dynamics_v1' else query.native.horizon_s
-    if query.operating_point!='saved_state' or not (point.get('integration_state') or point.get('native_replay')):
+    if not initial and (query.operating_point!='saved_state' or not (point.get('integration_state') or point.get('native_replay'))):
         reasons.append('Exact native integration checkpoint required; a GVS state cannot substitute.')
     if query.operation=='mujoco_direct_control_v1':
         from tools.research.native_control import window_applicability
@@ -210,7 +212,7 @@ def calculate(configuration, binding, query, point, requirements, comparisons, *
     # Reuse the admitted exact configuration identity (includes scene/numerics),
     # rather than hash a second native manifest or identify dynamics by mass alone.
     identity=binding['effective_configuration_identity']
-    result=dict(status='computed',operation=query.operation,binding={**binding,'model_identity':identity},
+    result=dict(status='computed',operation=query.operation,binding={**binding,'model_identity':identity,'physical_design_identity':raw['design_identity']},
         model_identity=identity,protocol=plain(query.protocol),operating_point={k:point[k] for k in
             ('actual_time_s','phase','input_units')},native_dynamics=raw,native_analysis=summary,
         task_acceptance='unmeasured',local_model_constraints=dict(status='diagnostic_only'),proxy_values={},

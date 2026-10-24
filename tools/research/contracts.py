@@ -237,8 +237,8 @@ class AnalysisRequest(Contract):
             raise ValueError('NATIVE_CONTROL_OPTIMIZATION_REQUIRES_SOURCE_AND_SETTINGS')
         if self.control_optimization and self.native!=NativeAnalysisOptions():
             raise ValueError('NATIVE_CONTROL_USES_SEQUENCE_AND_SEARCH_SETTINGS')
-        if native_operation and self.operating_point!='saved_state':
-            raise ValueError('NATIVE_ANALYSIS_REQUIRES_SAVED_NATIVE_STATE')
+        if native_operation and self.operating_point not in ('saved_state','standardized_initial_pretension'):
+            raise ValueError('NATIVE_ANALYSIS_REQUIRES_EXACT_STATE_OR_FROZEN_INITIALIZATION')
         if not native_operation and self.native!=NativeAnalysisOptions():
             raise ValueError('NATIVE_OPTIONS_REQUIRE_NATIVE_METHOD')
         if (self.operation=='fixed_input_structure_v1')!=(self.structure_response is not None):
@@ -476,7 +476,7 @@ class Plan(Contract):
     generation: GenerationRequest | GenerationRequestV2 | None = None
     search: Search | FamilyMixedSearch | None = None
     candidate: EvidenceRef | None = None
-    selected_execution: EvidenceRef | None = Field(default=None, description='Exact immutable passing NMPC result or independent RL evaluation; freezes the complete solution')
+    selected_execution: EvidenceRef | None = Field(default=None, description='Exact immutable publicly read passing NMPC, fixed-tension physical_replay or independent RL evaluation; freezes the complete solution')
     revise_selection: bool = Field(default=False, description='Explicitly replace a failed selection with a scientifically changed, freshly passing development solution; retain all confirmation records and cumulative costs')
     diagnostic: LocalDiagnostic | None = None
     mechanics: MechanicsRequest | None = None

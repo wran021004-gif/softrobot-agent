@@ -80,6 +80,8 @@ def execute(host, candidate_ref, operation_key, *, role='development', selected=
             raise ValueError('REPETITION_REQUIRES_IDENTICAL_CONFIGURATION')
     if confirmation:
         old=host.store.artifact(selected)
+        if old.get('source_reference'):
+            raise ValueError('FIXED_TENSION_CONFIRMATION_REQUIRES_PHYSICAL_REPLAY')
         if old['candidate']!=plain(candidate_ref) or old['profile_identity']!=s['profile']['identity'] or old['scientific_configuration']!=c['scientific_configuration']:
             raise ValueError('CONFIRMATION_REQUIRES_SELECTED_COMPLETE_PARAMETERS_AND_EVALUATION_CONFIGURATION')
         if not old.get('acceptance',{}).get('accepted'):

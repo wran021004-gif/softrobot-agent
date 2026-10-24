@@ -142,6 +142,19 @@ def native_point(host, query, configuration):
             raise ValueError('EXACT_NATIVE_SAVED_STATE_BINDING_REQUIRED')
         point['source']=plain(query.saved_state)
         return point
+    if query.operating_point=='standardized_initial_pretension':
+        from schemas.platform import SessionInput
+        from extensions.tendon_family.backends import physics_for
+        from extensions.tendon_family.scene import assemble_physical
+        inp=SessionInput.model_validate(configuration);physics=physics_for(inp);scene=assemble_physical(inp,physics)
+        order=[t['entity'] for t in physics['tendons']]
+        pretension={t['id']:t['pretension_n'] for t in configuration['robot']['structure']['data']['tendons']}
+        return dict(candidate=plain(query.candidate),configuration_identity=digest(configuration),
+            physics_identity=physics['identity'],dof_order=physics['dofs'],tendon_order=order,
+            phase='interval_start_native',input_units='N',actual_time_s=0.,
+            qpos_rad=scene['qpos_rad'],qvel_rad_s=scene['qvel_rad_s'],u=[pretension[t] for t in order],
+            native_replay=dict(rows=[],scene=scene),
+            provenance=dict(initialization='frozen_task_initializer_and_candidate_pretension',inherited_acceptance=False))
     from extensions.tendon_family.control_evidence import ControlEvidence
     reference=plain(query.execution)
     current=state(host)

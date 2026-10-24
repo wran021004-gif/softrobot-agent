@@ -368,8 +368,9 @@ def calculate(request,folder):
     return result
 
 
-def dispatch(host,arguments,key):
-    guard(host,True)
+def dispatch(host,arguments,key,*,role='development',selected=None):
+    confirmation=role=='confirmation'
+    guard(host,not confirmation)
     s=state(host)
     if s['spec'].get('research_decisions') and 'physical_replay' not in s['spec']['capabilities']:
         raise ValueError('PHYSICAL_REPLAY_CAPABILITY_REQUIRED')
@@ -385,14 +386,25 @@ def dispatch(host,arguments,key):
     if not (numerically_verified_source(source) or explicit_control_source(source)):
         raise ValueError('VERIFIED_OR_EXPLICIT_DIAGNOSTIC_MATHEMATICAL_SOURCE_REQUIRED')
     binding(cfg,source['trajectory'],mathematical_outputs=source.get('mathematical_outputs'))
-    from tools.research.feedback import experiment_preflight
-    novelty=experiment_preflight(host,candidate,'fixed_tension',source_ref=source_ref)
+    from tools.research.feedback import experiment_preflight,eligibility
+    if confirmation:
+        if s.get('selected')!=plain(selected):raise ValueError('CONFIRM_REQUIRES_PRIOR_FORMAL_SELECT')
+        old=host.store.artifact(selected)
+        if old['candidate']!=candidate or old.get('source_reference')!=source_ref:
+            raise ValueError('CONFIRMATION_REQUIRES_EXACT_SELECTED_CONTROL_SOURCE')
+        choice=eligibility(host,selected,selection=False,root_operation=False)
+        if not choice['eligible']:raise ValueError('; '.join(choice['reasons']))
+    from tools.research.budget import capacity
+    if capacity(host,1,confirmation,route='fixed_tension')['admitted']<1:
+        raise ValueError('PHYSICAL_REPLAY_AND_CONFIRMATION_RESERVE_CANNOT_FIT')
+    novelty=experiment_preflight(host,candidate,'fixed_tension',source_ref=source_ref,repeat=confirmation)
     if not novelty['admitted']:
         raise ValueError('EQUIVALENT_SCIENTIFIC_EXPERIMENT_REQUIRES_EXPLICIT_REPLICATION_GRANT: '
             +json.dumps(novelty,sort_keys=True))
     request=dict(kind='physical_replay',implementation=s['freeze'],study_id=host.run_id,
         store_root=str(host.store.root),request_id=key+'-physical',candidate=candidate,
-        source_reference=source_ref,configuration=cfg,trajectory=source['trajectory'])
+        source_reference=source_ref,configuration=cfg,trajectory=source['trajectory'],
+        role=role,selected_execution=plain(selected),operation_key=key)
     worker_key=request['request_id']
     old=host.store.lookup(host.run_id,worker_key)
     if old:
@@ -411,7 +423,8 @@ def dispatch(host,arguments,key):
     folder.mkdir(parents=True,exist_ok=True)
     atomic_json(folder/'request.json',request)
     update(host,pending=dict(kind='physical_replay',worker_request_id=worker_key,folder=str(folder),
-        implementation=s['freeze'],candidate=candidate,source_reference=source_ref))
+        implementation=s['freeze'],candidate=candidate,source_reference=source_ref,
+        role=role,selected_execution=plain(selected),operation_key=key))
     from tools.service_execution import _run_contained
     started=time.perf_counter()
     try:
@@ -475,7 +488,7 @@ def recover(host):
     raw.update(boundary=boundary,implementation=p['implementation'])
     raw_ref=save(host,raw,'physical_playback_raw')
     source=host.store.artifact(p['source_reference'])
-    cfg=verify_candidate(host,p['candidate'])['configuration']
+    candidate=verify_candidate(host,p['candidate']);cfg=candidate['configuration']
     inp=SessionInput.model_validate(cfg)
     samples=raw.get('samples',[])
     signal=next(v for v in inp.task.observations if v.name=='tip_position' and v.phase=='post_step')
@@ -512,6 +525,9 @@ def recover(host):
         raw_sha256=hashlib.sha256(log_bytes).hexdigest(),text=log_bytes.decode('utf8',errors='replace')),
         'physical_playback_log')
     final=dict(status='evaluated' if complete else 'execution_incomplete',candidate=p['candidate'],
+        role=p.get('role','development'),selected_execution=p.get('selected_execution'),operation_key=p.get('operation_key',p['worker_request_id']),
+        scientific_configuration=candidate['scientific_configuration'],profile_identity=candidate['profile_identity'],
+        model_identity=source['trajectory']['model_identity'],design_identity=source['trajectory']['design_identity'],
         owning_study=host.run_id,execution_id=p['worker_request_id'],
         source_reference=p['source_reference'],raw_reference=raw_ref,evaluation_reference=evaluation_ref,
         acceptance=acceptance,comparison=comparison,profile=profile,boundary=boundary,

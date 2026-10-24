@@ -4,7 +4,7 @@ from pathlib import Path
 import json,subprocess,tempfile,time,unittest
 from types import SimpleNamespace
 from unittest.mock import patch
-from schemas.platform import ProjectConfig
+from schemas.platform import ProjectConfig,SessionInput
 from tools.platform_store import Store,plain,zero
 from tools.state_io import digest
 from tools.research.config import resolve,ROOT
@@ -21,7 +21,7 @@ class MainlineTests(unittest.TestCase):
         from uuid import uuid4
         import shutil
         folder=ROOT/'runs'/('fixture-'+uuid4().hex)
-        folder.mkdir()
+        folder.mkdir(parents=True)
         def cleanup():
             resolved=folder.resolve()
             if resolved.parent!=(ROOT/'runs').resolve():
@@ -31,7 +31,7 @@ class MainlineTests(unittest.TestCase):
         self.spec=resolve(ROOT/'configs/research/study.json');self.cfg=deepcopy(self.spec['configuration'])
         self.host=SimpleNamespace(store=Store(Path(self.tmp.name)),run_id=self.cfg['run_id'],actor='fixture')
         fixture_id=Path(self.tmp.name).name
-        self.host.store.create(ProjectConfig(project_id=fixture_id,grant_id=fixture_id,authorization_source='code-only fixture',budget=self.cfg['policy']['budget']))
+        self.host.store.create(ProjectConfig(project_id=fixture_id,grant_id=fixture_id,authorization_source='code-only fixture',budget=self.cfg['policy']['budget'],exclusive_resources={'backend.family_mujoco':1}))
         self.host.store.create_session(dict(input=self.cfg))
         update(self.host,spec=self.spec,base_configuration=self.cfg,nominal_configuration=self.cfg,
             profile=dict(identity='fixture',recipe=self.cfg['policy']['controller']['parameters']['data']['recipe']),
@@ -276,6 +276,178 @@ class MainlineTests(unittest.TestCase):
         self.assertIs(registered.contracts[('family.backend_data','1.0.0')],Data)
         import sys
         self.assertFalse(any(p[:-3].replace('/','.') in sys.modules for p in banned))
+
+
+class C0ReadinessTests(unittest.TestCase):
+    """Synthetic lifecycle workers; the cold-start check uses zero physics steps."""
+    def fixture(self,repetitions=0):
+        f=MainlineTests();f.setUp();self.addCleanup(f.tearDown)
+        spec=state(f.host)['spec'];spec.update(capabilities=['analysis','control_correction','physical_replay'],
+            allowed_plan_actions=['initialize_control','physical_replay','select','confirm','stop'],require_task_guidance=False)
+        spec['confirmation']['fresh_independent_repetitions']=repetitions
+        spec['nmpc_limits']['executions']=0;spec['budgets']['physical_launches']=2
+        profile=state(f.host)['profile'];profile['version']=1
+        update(f.host,spec=spec,profile=profile,results=[],candidates={},physical_replays=[],freeze='synthetic-c0')
+        from tools.research.design import construct
+        parameters=deepcopy(spec['reference_parameters']);parameters['segments']['near']['young_pa']*=1.005
+        f.candidate=construct(f.host,parameters,dict(origin='Synthetic C0 independent generated structure'))
+        f.cfg=f.host.store.artifact(f.candidate)['configuration']
+        return f
+
+    def plan(self,f,action,**kwargs):
+        value=f.plan(action)
+        if action not in ('select','confirm'):value.pop('selected_execution')
+        value.update(kwargs);return value
+
+    def worker(self,command,log,timeout):
+        from tools.state_io import read,atomic_json
+        request=read(Path(command[-1]));u=request['trajectory']['tensions_n'];n=len(u[0])
+        target=request['configuration']['task']['goal']['data']['target_m']
+        samples=[dict(time_s=i*.01,tip_m=target,tip_velocity_m_s=[0.,0.,0.],speed_m_s=0.,
+            actual_tension_n=[0.]*n if i==0 else u[i-1]) for i in range(36)]
+        atomic_json(Path(command[-1]).with_name('result.json'),dict(status='completed',samples=samples,
+            physics_steps=700,tendon_order=request['trajectory']['tendon_order'],synthetic_fixture=True))
+        return SimpleNamespace(returncode=0)
+
+    def seed(self,f):
+        value=core.dispatch(f.host,self.plan(f,'initialize_control',control_seed=dict(candidate=f.candidate)),'c0-seed')
+        return value['result']['source']
+
+    def test_fixed_select_zero_and_positive_confirmation_recovery(self):
+        from contextlib import ExitStack
+        from tools.research.budget import closeout_operations,capacity
+        for repetitions in (0,1):
+            with self.subTest(repetitions=repetitions),ExitStack() as stack:
+                f=self.fixture(repetitions)
+                stack.enter_context(patch.object(core,'guard'))
+                stack.enter_context(patch('tools.research.physical_replay.guard'))
+                nmpc=stack.enter_context(patch.object(core,'execute',side_effect=AssertionError('NO_NMPC')))
+                worker=stack.enter_context(patch('tools.service_execution._run_contained',side_effect=self.worker))
+                source=self.seed(f)
+                result=core.dispatch(f.host,self.plan(f,'physical_replay',physical_replay=dict(candidate=f.candidate,source=source)),'c0-development')['result']
+                f.result=result['reference'];core.read_evidence(f.host,dict(reference=f.result))
+                self.assertTrue(feedback.eligibility(f.host,f.result,selection=True)['eligible'])
+                core.dispatch(f.host,self.plan(f,'select'),'c0-select')
+                self.assertEqual(state(f.host)['selected'],f.result)
+                if not repetitions:
+                    self.assertEqual(state(f.host)['research_status'],'stopped');self.assertEqual(worker.call_count,1)
+                    continue
+                self.assertIn('confirm',closeout_operations(f.host)['research_plan'])
+                from tools.research import execution
+                with patch.object(execution,'guard'),self.assertRaisesRegex(ValueError,'REQUIRES_PHYSICAL_REPLAY'):
+                    execution.execute(f.host,f.candidate,'wrong-nmpc-route',role='confirmation',selected=f.result)
+                remaining=f.host.store.remaining();remaining['remaining']['tool_calls']=1
+                with patch.object(f.host.store,'remaining',return_value=remaining):
+                    self.assertEqual(capacity(f.host,1,True,root_operation=True,route='fixed_tension')['admitted'],1)
+                    remaining['remaining']['tool_calls']=0
+                    self.assertEqual(capacity(f.host,1,True,root_operation=False,route='fixed_tension')['admitted'],1)
+                complete=f.host.store.complete
+                def interrupted(row,*args,**kwargs):
+                    if row['request_id']=='c0-confirm':raise RuntimeError('Synthetic parent interruption after worker settlement')
+                    return complete(row,*args,**kwargs)
+                with patch.object(f.host.store,'complete',side_effect=interrupted),self.assertRaisesRegex(RuntimeError,'Synthetic parent'):
+                    core.dispatch(f.host,self.plan(f,'confirm'),'c0-confirm')
+                used=deepcopy(f.host.store.remaining()['used'])
+                recovered=core.recover(f.host)
+                self.assertEqual(recovered['sealed_workflows'],['c0-confirm'])
+                self.assertEqual(f.host.store.remaining()['used'],used)
+                self.assertTrue(feedback.confirmation_progress(f.host)['confirmed'])
+                self.assertEqual(feedback.confirmation_progress(f.host)['current_study_confirmations'],1)
+                self.assertEqual(state(f.host)['research_status'],'stopped')
+                core.dispatch(f.host,self.plan(f,'confirm'),'c0-confirm')
+                self.assertEqual(f.host.store.remaining()['used'],used)
+                self.assertEqual(worker.call_count,2);nmpc.assert_not_called()
+
+    def test_fixed_repeat_admission_and_failed_confirmation_are_not_reset(self):
+        from contextlib import ExitStack
+        with ExitStack() as stack:
+            f=self.fixture(1)
+            stack.enter_context(patch.object(core,'guard'));stack.enter_context(patch('tools.research.physical_replay.guard'))
+            stack.enter_context(patch('tools.service_execution._run_contained',side_effect=self.worker))
+            source=self.seed(f)
+            result=core.dispatch(f.host,self.plan(f,'physical_replay',physical_replay=dict(candidate=f.candidate,source=source)),'c0-development')['result']
+            f.result=result['reference'];core.read_evidence(f.host,dict(reference=f.result))
+            self.assertFalse(feedback.experiment_preflight(f.host,f.candidate,'fixed_tension',source_ref=source)['admitted'])
+            core.dispatch(f.host,self.plan(f,'select'),'c0-select')
+            for status in ('evaluated','execution_incomplete'):
+                failed=deepcopy(result);failed.pop('reference');failed.update(role='confirmation',selected_execution=f.result,
+                    operation_key='failed-confirmation',execution_id='one-failed-launch',status=status)
+                failed['acceptance']['accepted']=False
+                ref=save(f.host,failed);update(f.host,physical_replays=[f.result,ref])
+                progress=feedback.confirmation_progress(f.host)
+                self.assertFalse(progress['confirmed']);self.assertEqual(progress['remaining'],0)
+                self.assertEqual(progress['failures']+progress['invalid_executions'],1)
+                self.assertFalse(feedback.eligibility(f.host,f.result,selection=False)['eligible'])
+            other=deepcopy(failed);other['source_reference']=save(f.host,dict(f.host.store.artifact(source),provenance=dict(renamed=True)))
+            from tools.research.contracts import PhysicalReplayRequest
+            from tools.research.physical_replay import dispatch
+            with self.assertRaisesRegex(ValueError,'EXACT_SELECTED_CONTROL_SOURCE'):
+                dispatch(f.host,PhysicalReplayRequest(candidate=f.candidate,source=other['source_reference']),'different-operation-key',role='confirmation',selected=f.result)
+
+    def test_frozen_initial_state_and_control_start_without_history(self):
+        f=self.fixture()
+        from tools.research.numerics import native_point
+        from tools.research.physical_replay import binding
+        from tools.research.task_constraints import describe_analysis_requirements,model_assessment,check_analysis_applicability
+        with patch.object(core,'guard'):
+            source=self.seed(f)
+        cfg=f.cfg;tr=f.host.store.artifact(source)['trajectory'];binding(cfg,tr)
+        query=AnalysisRequest(candidate=f.candidate,model_source='mujoco',operation='native_dynamics_v1',
+            operating_point='standardized_initial_pretension',protocol=f.spec['analysis_protocol'])
+        point=native_point(f.host,query,cfg)
+        self.assertEqual(point['native_replay']['rows'],[]);self.assertEqual(point['actual_time_s'],0.)
+        self.assertEqual(state(f.host)['results'],[]);self.assertEqual(state(f.host)['physical_replays'],[])
+        bound=dict(candidate=f.candidate,effective_configuration_identity=digest(cfg),task_identity=digest(cfg['task']),
+            tendon_order=tr['tendon_order'],tension_bounds_n=[[0.,8.]]*6,target_m=cfg['task']['goal']['data']['target_m'])
+        value=analysis.calculate(cfg,bound,query,point)
+        self.assertEqual(value['status'],'computed');cost=value['native_analysis']['cost']
+        self.assertTrue(value['binding']['physical_design_identity'])
+        self.assertEqual(value['task_acceptance'],'unmeasured')
+        self.assertEqual(value['scoped_claim']['conclusion'],'diagnostic')
+        self.assertEqual(cost['model_builds'],1);self.assertEqual(cost['physics_steps'],0);self.assertEqual(cost['rollouts'],0)
+        print('C0_ZERO_STEP_NATIVE_COST',json.dumps(cost))
+        raw=plain(query);raw.update(operation='mujoco_direct_control_v1',control_optimization=dict(source=source,
+            settings=dict(version='local_control_search_v2',correction_window_s=[0.,.35],knots_s=[0.,.18,.34],evaluation_requests=20,iterations=1)))
+        optimized=AnalysisRequest.model_validate(raw);requirements=describe_analysis_requirements(cfg,bound)
+        fit=check_analysis_applicability(requirements,optimized,model_assessment(SessionInput.model_validate(cfg),requirements,optimized.operation,model_source='mujoco'),exact_point=point)
+        self.assertEqual(fit['status'],'applicable');self.assertFalse(fit['full_task_supported'])
+        self.assertEqual(f.host.store.remaining()['used']['backend_solves'],0)
+
+    def test_confirmation_count_is_frozen_and_shared_capacity_bounded(self):
+        from tools.state_io import read,atomic_json
+        value=read(ROOT/'configs/research/study.json')
+        for name in ('robot','task','control','runtime'):value[name]=str((ROOT/'configs/research'/value[name]).resolve())
+        f=self.fixture();path=Path(f.tmp.name)/'positive-confirmation.json'
+        value['confirmation']['fresh_independent_repetitions']=1;atomic_json(path,value)
+        self.assertEqual(resolve(path)['confirmation']['fresh_independent_repetitions'],1)
+        value['confirmation']['fresh_independent_repetitions']=value['budgets']['physical_launches'];atomic_json(path,value)
+        with self.assertRaisesRegex(ValueError,'SHARED_DEVELOPMENT_PLUS_REPEAT_CAPACITY'):resolve(path)
+
+    def test_archived_math_controls_evaluation_relations_and_reads_are_bound(self):
+        import tarfile
+        from tools.state_io import read
+        from tools.research.evidence_views import result_card
+        from tools.research import reporter
+        from tests.research.test_research_reporting import offline_host
+        summary=read(ROOT/'evidence/mujoco_direct_stage_b/summary.json')
+        with tarfile.open(ROOT/'evidence/mujoco_direct_stage_b/study/immutable_artifacts.tar.gz') as archive:
+            values={Path(m.name).stem:json.load(archive.extractfile(m)) for m in archive.getmembers() if m.name.endswith('.json')}
+        physical=[summary['replays'][name]['reference'] for name in ('baseline','optimized')]
+        host,current=offline_host(values,physical_replays=physical,analysis_results=[summary['optimization_reference']])
+        before=deepcopy(values);before_state=deepcopy(current)
+        for ref in [summary['optimization_reference'],*physical]:
+            card=plain(result_card(host,ref));trajectory=values[card['identity']['control_source']['artifact_id']]['trajectory']
+            self.assertEqual(card['identity']['design_identity'],trajectory['design_identity'])
+            self.assertIsNotNone(card['identity']['model_identity'])
+        for ref in physical:
+            view=feedback.result_view(host,ref)
+            self.assertEqual(view['controller'],dict(route='fixed_tension',source=values[ref['artifact_id']]['source_reference']))
+        report=plain(reporter.assemble(host,physical,question='C0 archival interface comparison'))
+        self.assertTrue(report['relations'][0]['comparable'])
+        self.assertFalse(any('Unknown design_identity' in r or 'Unknown model_identity' in r for r in report['relations'][0]['reasons']))
+        raw=core.read_evidence(host,dict(reference=summary['replays']['optimized']['raw_reference'],pointer='/samples',view='range',start=30,count=6),record_read=False)
+        self.assertEqual(len(raw['items']),6)
+        self.assertEqual(values,before);self.assertEqual(current,before_state)
 
 
 if __name__=='__main__':unittest.main()

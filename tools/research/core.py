@@ -437,12 +437,16 @@ def dispatch(host, value, request_id, origin='model'):
         from tools.research.analysis import admission as mathematical_admission
         admission=mathematical_admission(host,plan.search.max_evaluations)
     else:
-        admission=capacity(host,plan.search.max_evaluations if plan.search else 1,plan.action=='confirm',root_operation=True,candidate=plan.candidate)
+        from tools.research.feedback import result_view
+        route='nmpc'
+        if plan.action=='physical_replay':route='fixed_tension'
+        elif plan.action=='confirm':route=result_view(host,plan.selected_execution)['controller_route']
+        admission=capacity(host,plan.search.max_evaluations if plan.search else 1,plan.action=='confirm',root_operation=True,candidate=plan.candidate,route=route)
     if plan.action=='execute' and s['spec'].get('nmpc_execution_cap_s'):
         timing=nmpc_timing(host,plan.candidate)
         if not timing['available']:
             raise ValueError(timing['reason'])
-    if plan.action=='execute' and admission['admitted']<1:
+    if plan.action in ('execute','physical_replay') and admission['admitted']<1:
         raise ValueError('CANDIDATE_PLUS_DECLARED_CONFIRMATIONS_CANNOT_FIT')
     row,_=host.store.reserve(host.run_id,request_id,digest(plain(plan)),host.actor,{**zero(),'tool_calls':1})
     ref=save(host,dict(origin=origin,request_id=request_id,original_plan=plain(plan),admission=admission,
@@ -488,10 +492,12 @@ def dispatch(host, value, request_id, origin='model'):
                 result['local_comparison']=local_diagnostic(host,plan.diagnostic,request_id)
         elif plan.action in ('select','confirm'):
             from tools.research.feedback import eligibility, result_view, confirmation_progress
-            choice=eligibility(host,plan.selected_execution,revise_selection=plan.revise_selection,selection=plan.action=='select')
+            choice=eligibility(host,plan.selected_execution,revise_selection=plan.revise_selection,selection=plan.action=='select',root_operation=False)
             if not choice['eligible']:
                 raise ValueError('; '.join(choice['reasons']))
             selected=result_view(host,plan.selected_execution)
+            if plan.action=='confirm' and s.get('selected')!=plain(plan.selected_execution):
+                raise ValueError('CONFIRM_REQUIRES_PRIOR_FORMAL_SELECT')
             if plan.revise_selection:
                 transition=dict(previous_selection=s['selected'],selected_execution=plain(plan.selected_execution),
                     previous_progress=confirmation_progress(host),solution_identity=selected['solution_identity'],
@@ -509,6 +515,12 @@ def dispatch(host, value, request_id, origin='model'):
             elif selected['controller_route']=='rl':
                 from tools.research.rl import confirm
                 result=confirm(host,plan.selected_execution,request_id+'-rl-confirm')
+            elif selected['controller_route']=='fixed_tension':
+                from tools.research.physical_replay import dispatch as replay_dispatch
+                from tools.research.contracts import PhysicalReplayRequest
+                result=replay_dispatch(host,PhysicalReplayRequest(candidate=selected['candidate'],
+                    source=host.store.artifact(plan.selected_execution)['source_reference']),request_id,
+                    role='confirmation',selected=plain(plan.selected_execution))
             else:
                 result=execute(host,selected['candidate'],request_id,role='confirmation',selected=plain(plan.selected_execution))
             if confirmation_progress(host)['confirmed']:
@@ -535,6 +547,7 @@ def dispatch(host, value, request_id, origin='model'):
 
 
 def recover(host):
+    from tools.research.feedback import result_view,confirmation_progress
     if (state(host).get('pending') or {}).get('kind')=='candidate_analysis':
         from tools.research.analysis import recover as recover_analysis
         recover_analysis(host)  # Seal only existing output, then reconcile the owning workflow below.
@@ -583,6 +596,15 @@ def recover(host):
             result=dict(status='search_execution_incomplete',saved_checkpoint=s['searches'].get(key),
                 attempted_executions=[r for r in s['results'] if host.store.artifact(r)['operation_key'].startswith(key+':')],
                 reason='Recovery packages existing evidence only; further proposals require a new model-requested search')
+        elif plan.action=='physical_replay' or (plan.action=='confirm' and
+                result_view(host,plan.selected_execution)['controller_route']=='fixed_tension'):
+            worker=host.store.lookup(host.run_id,key+'-physical')
+            if not worker or not worker['receipt']:raise ValueError('RECOVER_PHYSICAL_PLAYBACK_NO_RELAUNCH')
+            output_ref=json.loads(worker['receipt'])['output']
+            if output_ref not in state(host).get('physical_replays',[]):raise ValueError('RECOVER_REQUIRES_OWNED_PHYSICAL_PLAYBACK_RESULT')
+            result=dict(reference=output_ref,**host.store.artifact(output_ref),recovered_without_repeating_completed_outputs=True)
+            if plan.action=='confirm' and confirmation_progress(host)['confirmed']:
+                update(host,research_status='stopped',final_disposition=ref,closed_unix=time.time())
         elif plan.action in ('execute','confirm'):
             matches=[r for r in state(host)['results'] if host.store.artifact(r)['operation_key']==key]
             if len(matches)!=1:
@@ -598,20 +620,6 @@ def recover(host):
                 value=host.store.artifact(receipt['output'])
                 ref=next(r for r in state(host)['mechanics_results'] if host.store.artifact(r)['execution_id']==worker['execution_id'])
                 result=dict(reference=ref,status=value['status'],recovered_without_repeating_completed_outputs=True)
-        elif plan.action=='physical_replay':
-            result=recovered
-            if not result:
-                worker=host.store.lookup(host.run_id,key+'-physical')
-                if not worker or not worker['receipt']:
-                    raise ValueError('RECOVER_PHYSICAL_PLAYBACK_NO_RELAUNCH')
-                matches=[r for r in state(host).get('physical_replays',[])
-                    if host.store.artifact(r).get('source_reference')==plain(plan.physical_replay.source)
-                    and host.store.artifact(r).get('candidate')==plain(plan.physical_replay.candidate)]
-                if len(matches)!=1:
-                    raise ValueError('RECOVER_REQUIRES_UNIQUE_PHYSICAL_PLAYBACK_RESULT')
-                value=host.store.artifact(matches[0])
-                result=dict(reference=matches[0],status=value['status'],
-                    recovered_without_repeating_completed_outputs=True)
         elif plan.action=='matched_state':
             result=recovered
             if not result:

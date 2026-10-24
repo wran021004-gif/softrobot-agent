@@ -396,6 +396,7 @@ def dispatch(host,query,key,*,guard,origin='model'):
             if not (explicit_control_source(source) or numerically_verified_source(source)):
                 raise ValueError('BOUND_EXECUTABLE_CONTROL_SOURCE_REQUIRED')
             schedule_binding(cfg,source['trajectory'])
+            binding['physical_design_identity']=source['trajectory']['design_identity']
             sensitivity_context=dict(schedule=source,source=plain(q.control_optimization.source))
     elif q.execution:
         from tools.research.numerics import execution_update

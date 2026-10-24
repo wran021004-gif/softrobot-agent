@@ -72,6 +72,7 @@ class NativeModel:
         scene=point['native_replay']['scene'];d=mujoco.MjData(self.model)
         if point['physics_identity']!=self.physics['identity']:raise ValueError('NATIVE_REPLAY_PHYSICS_MISMATCH')
         d.qpos[self.qi]=scene['qpos_rad'];d.qvel[self.vi]=scene['qvel_rad_s']
+        if not point['native_replay']['rows']:self.forward(d)
         worst=0.
         for row in point['native_replay']['rows']:
             self.apply(d,row['tension_n'])
@@ -214,7 +215,7 @@ def calculate(configuration, point, options, operation, comparisons=None):
     point,start=native.reconstruct(point) if point.get('native_replay') else (point,native.restore(point))
     u=point['u'] if options.tensions_n is None else options.tensions_n
     mechanics=native.mechanics(start,u)
-    raw=dict(initial_state=point,mechanics=mechanics,physics_identity=native.physics['identity'],
+    raw=dict(initial_state=point,mechanics=mechanics,physics_identity=native.physics['identity'],design_identity=native.physics['design_identity'],
         physical_scene_identity=native.scene['identity'],
         representation='native named MuJoCo hinges; world tip; ideal absolute SI tensions',
         runtime=dict(mujoco=mujoco.__version__,timestep_s=native.model.opt.timestep,integrator=int(native.model.opt.integrator)),

@@ -91,6 +91,10 @@ def closeout_operations(host):
     s = state(host)
     actions=['select'] if s.get('spec',{}).get('research_decisions') and s.get('success_gate') and not s.get('selected') else ['stop','select']
     if s['spec'].get('mode')=='engineering_investigation':actions=['stop']
+    if s.get('selected'):
+        from tools.research.feedback import confirmation_progress
+        progress=confirmation_progress(host)
+        if progress['remaining'] and not (progress['failures'] or progress['invalid_executions']):actions.append('confirm')
     return dict(research_plan=actions,
         research_rl=[a for a in ('status', 'stop', 'evaluate') if s.get('rl_runs') and (a != 'evaluate' or not s.get('success_gate'))])
 
@@ -125,14 +129,20 @@ def nmpc_timing(host, candidate=None):
         design_feasibility='not assessed by admission')
 
 
-def capacity(host, requested=1, confirmation=False, *, root_operation=False, candidate=None):
+def capacity(host, requested=1, confirmation=False, *, root_operation=False, candidate=None, route='nmpc'):
     from tools.research.state import state
     s = state(host)
     remaining = host.store.remaining()['remaining']
     reserve = 0 if confirmation else repetition_reserve(s)
     slots = s['spec']['nmpc_limits']['executions'] - s.get('nmpc_launches', 0)
+    if route=='fixed_tension':
+        limit=s['spec'].get('physical_replay_limit')
+        slots=(s['spec']['budgets']['physical_launches'] if limit is None else limit)-s.get('physical_replay_launches',0)
     operations = max(0, remaining['tool_calls'] - (0 if confirmation else s['spec']['budgets'].get('protected_public_operations', 0)))
-    fit = max(0, min(requested, slots-reserve, backend_capacity(host)-reserve, (operations-int(root_operation))//3))
+    # Fixed replay has one public Plan and no charged child tool calls. Inside
+    # that admitted Plan, its current public call has already been paid.
+    operation_slots=operations+int(not root_operation) if route=='fixed_tension' else (operations-int(root_operation))//3
+    fit = max(0, min(requested, slots-reserve, backend_capacity(host)-reserve, operation_slots))
     return dict(requested=requested, admitted=fit, internal_launches=fit,
         numerical_reservation_s=0., confirmation_launch_reserve=reserve,
         per_execution_s=allowance(s), remaining_numerical_s=None, remaining_activity_s=None)

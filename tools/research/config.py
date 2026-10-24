@@ -282,8 +282,9 @@ def resolve(path, profile=None, *, backend_profile=None):
     time_values += [runtime[k] for k in ('rl_evaluation_hard_cap_s', 'rl_diagnostic_hard_cap_s')]
     if any(v is not None for v in time_values):
         raise ValueError('COUNT_MODE_REQUIRES_EXPLICIT_DISABLED_SCIENTIFIC_TIMING')
-    if study['confirmation']['fresh_independent_repetitions'] != 0:
-        raise ValueError('COUNT_MODE_USES_ZERO_EXTRA_CONFIRMATIONS')
+    repetitions=study['confirmation']['fresh_independent_repetitions']
+    if type(repetitions) is not int or repetitions<0 or (repetitions and repetitions>=b['physical_launches']):
+        raise ValueError('CONFIRMATIONS_REQUIRE_NONNEGATIVE_COUNT_AND_SHARED_DEVELOPMENT_PLUS_REPEAT_CAPACITY')
     stages=study['rl_limits']['training_stages'];rl='rl' in study['capabilities']
     if type(stages) is not int or not (1 if rl else 0)<=stages<=10:
         raise ValueError('DECLARED_TRAINING_STAGE_LIMIT_REQUIRED')

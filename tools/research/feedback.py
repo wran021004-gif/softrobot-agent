@@ -360,7 +360,7 @@ def confirmation_progress(host, selected=None):
     rows={}
     chosen=result_view(host,selected) if selected else None
     for historical, refs in ((True,[*s.get('historical_confirmations',[]), *s.get('linked_selections',[]), *s.get('scoped_context',[])]),
-                             (False,[*s.get('results',[]),*s.get('rl_evaluations',[])])):
+                             (False,[*s.get('results',[]),*s.get('physical_replays',[]),*s.get('rl_evaluations',[])])):
         for ref in refs:
             r=host.store.artifact(ref)
             if not isinstance(r,dict) or r.get('role')!='confirmation':
@@ -405,7 +405,7 @@ def result_view(host, reference):
     episodes=r.get('episodes',[]) if rl else []
     complete=bool(r.get('independent_evaluation_executed') and episodes and all(e['complete'] for e in episodes)) if rl else r.get('status')=='evaluated'
     passed=bool(complete and (r.get('passed') if rl else (r.get('acceptance') or {}).get('accepted')))
-    controller=dict(route='rl',configuration=r['configuration'],checkpoint=r.get('checkpoint'),policy_sha256=r.get('policy_sha256')) if rl else dict(route='fixed_tension' if r.get('source_reference') else 'nmpc',configuration=c['scientific_configuration']['policy']['controller'])
+    controller=dict(route='rl',configuration=r['configuration'],checkpoint=r.get('checkpoint'),policy_sha256=r.get('policy_sha256')) if rl else dict(route='fixed_tension',source=r['source_reference']) if r.get('source_reference') else dict(route='nmpc',configuration=c['scientific_configuration']['policy']['controller'])
     identity=solution_identity(host,r,c)
     owner=r.get('evaluation_owner') or r.get('study') or r.get('owning_study')
     s=state(host)
@@ -457,7 +457,7 @@ def result_view(host, reference):
         fresh_current_study=fresh,solution_identity=identity,solution_identity_sha256=digest(identity))
 
 
-def eligibility(host, reference, *, revise_selection=False, selection=None):
+def eligibility(host, reference, *, revise_selection=False, selection=None, root_operation=True):
     from tools.research.state import state,capacity
     from tools.research.design import verify_candidate
     from tools.research.rl import evaluation_capacity
@@ -507,7 +507,7 @@ def eligibility(host, reference, *, revise_selection=False, selection=None):
         if revise_selection and count:
             reasons.append('revised solution already has a confirmation attempt; allowance cannot restart')
         remaining=required if revise_selection else required-count
-        fit=dict(admitted=remaining,selection_without_execution=True) if selection else evaluation_capacity(host,remaining,confirmation=True) if v['controller_route']=='rl' else capacity(host,remaining,True,root_operation=True,candidate=r['candidate'])
+        fit=dict(admitted=remaining,selection_without_execution=True) if selection else evaluation_capacity(host,remaining,confirmation=True) if v['controller_route']=='rl' else capacity(host,remaining,True,root_operation=root_operation if v['controller_route']=='fixed_tension' else True,candidate=r['candidate'],route=v['controller_route'])
         if selection and required==0 and progress['current_study_confirmations']:
             reasons.append('unexpected extra confirmations in zero-repetition study')
         if fit['admitted']<remaining:
