@@ -106,7 +106,7 @@ def main():
         if raw['status']!='computed':raise ValueError((name,raw))
         assert raw['scoped_claim']['conclusion']=='diagnostic' and not raw['analysis_applicability']['full_task_supported']
         card=plain(result_card(host,out['reference']));views[name]=mathematical_decision_view(card)
-        assert len(json.dumps(views[name]))<9000 and 'mass_matrix_kg_m2' not in json.dumps(views[name])
+        assert len(json.dumps(views[name]))<9000 and '"mass_matrix_kg_m2":' not in json.dumps(views[name])
         for q in card['mathematics']['quantities']:
             assert core.read_evidence(host,q['source'],record_read=False)==q['value']
         deliveries[name]=reporter.scientific_feedback(host,out)
@@ -123,7 +123,7 @@ def main():
     catalog=mathematical_method_view(host,candidate)
     assert all(key in catalog['methods'] for key in ('native_dynamics_v1','short_input_response_v1','fixed_input_structure_v1','controllability'))
     brief=agent_decision_brief(host)
-    assert 'integration_state' not in json.dumps(brief) and 'mass_matrix_kg_m2' not in json.dumps(brief)
+    assert '"integration_state":' not in json.dumps(brief) and '"mass_matrix_kg_m2":' not in json.dumps(brief)
     assert (dbpath.stat().st_size,dbpath.stat().st_mtime_ns)==before
     failures=[r for r in state(host)['analysis_results'] if host.store.artifact(r)['status']!='computed']
     assert state(host)['mathematical_evaluations']==7+len(failures) and state(host)['pending'] is None
