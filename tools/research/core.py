@@ -57,6 +57,11 @@ def read_evidence(host, query, *, record_read=True):
             data_access=data_access(host,plain(q.reference),root_value))
         if q.view!='working_set' and q.pointer and q.pointer.split('/')[1] in ('candidate_index','control_result_links','control_comparisons','citation_eligibility'):
             details['derived_view_query']=dict(reference=plain(q.reference),view='working_set',pointer=q.pointer)
+        if q.view=='fields' and not q.pointer:
+            derived=next((k for k in q.fields if k in ('candidate_index','control_result_links','control_comparisons','citation_eligibility','eligible_methods','read_coverage')),None)
+            if derived:details['derived_view_query']=dict(reference=plain(q.reference),view='working_set',pointer='/'+derived)
+        if isinstance(root_value,dict) and root_value.get('acceptance') and ('task_passed' in (q.fields or []) or q.pointer=='/task_passed'):
+            details['acceptance_query']=dict(reference=plain(q.reference),view='full',pointer='/acceptance')
         exc.evidence_navigation=details
         return exc
     if q.pointer and not q.pointer.startswith('/'):

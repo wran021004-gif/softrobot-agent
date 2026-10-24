@@ -578,6 +578,12 @@ def compact_result(value, reference):
             method='capability_sequence',response_evidence=reference),
             missing=None,remaining_checks='Current Study/candidate/implementation, original full ZOH horizon, input bounds/order, independent replay and physical execution binding; no automatic execution',
             inherited_acceptance=False)
+    if value.get('control_schedule_reference'):
+        summary['control_handoff']=dict(candidate=value.get('candidate'),task_acceptance='unmeasured',
+            request_fields=dict(action='physical_replay',physical_replay=dict(candidate=value.get('candidate'),
+                source=value['control_schedule_reference'])),
+            remaining_checks='Bound full schedule, original Plan decision and independent full evaluation; publicly read the exact passing result before SELECT',
+            inherited_acceptance=False)
     cert=trajectory.get('certificate') or {}
     summary.update(task_acceptance='unmeasured',numerical_evidence=dict(reference=reference,
         pointer=(value.get('scoped_claim') or {}).get('numerical_result_pointer','')),

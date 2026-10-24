@@ -67,7 +67,8 @@ def mathematical_method_view(host, reference):
             request.update(model_source='mujoco',operating_point='standardized_initial_pretension')
             required.append('Frozen initialization needs no saved source; optional saved_state OR execution + update_id uses operating_point=saved_state')
             if key!='mujoco_direct_control_v1':required.append('native={tensions_n,horizon_s,difference_step_n,correction_radius_n}')
-        if key=='mujoco_direct_control_v1':required.append('control_optimization={source,settings}; v2 search settings with explicit correction_window_s; physical_replay uses returned control_schedule_reference')
+        if key=='mujoco_direct_control_v1':
+            required.append('control_optimization={source,settings}; v2 settings require explicit correction_window_s and knots_s. Window starts at the selected native state and ends at the frozen task deadline, covering all required samples.')
         if key=='fixed_input_structure_v1':required.append('structure_response={variable,candidates}; registered single-parameter candidates')
         if key=='design_sensitivity':required.append('design_sensitivity={variable,step,minus_candidate,plus_candidate}')
         if row.get('capability_method'):request['capability_method']=CONIC
@@ -83,7 +84,8 @@ def mathematical_method_view(host, reference):
             formal_execution_authorized=bool(authorized and authorization['registered_study_scope_authorized'] is True
                 and cfg['task']['family']!='task.tracking'),
             execution_status='blocked' if reasons or not authorized or s['research_status']=='stopped' else 'conditional_on_admission',
-            missing=reasons+([] if authorized else ['study_method_grant_required'])+
+            missing=reasons+row.get('parameter_requirements',[])+([] if authorized else ['study_method_grant_required'])+
+                ([] if authorization['registered_study_scope_authorized'] is True else ['formal_study_math_scope_required'])+
                 (['study_stopped'] if s['research_status']=='stopped' else []),
             estimated_evaluations=row['evaluations'],wall_cost='unknown',
             cost_scope=row.get('evaluation_rule','Model preparation and internal solver attempts are distinct; see original receipts.'),
@@ -91,12 +93,19 @@ def mathematical_method_view(host, reference):
             required_parameters=required,request_template=request,
             detail_query=dict(reference=reference,view='mathematical_capabilities',pointer='/methods/'+key),
             schema_query=dict(reference=reference,view='mathematical_capabilities',pointer='/analysis_request_schema'))
+        methods[key]['planning_status']=('unauthorized' if not authorized or authorization['registered_study_scope_authorized'] is not True else
+            'unsupported' if binding_error or row.get('planning_status')=='unsupported' else
+            'insufficient_budget' if row.get('budget_allowed') is False else
+            'blocked' if s['research_status']=='stopped' else row.get('planning_status','unsupported' if reasons else 'ready'))
         if key==SENSITIVITY:
             methods[key]['readiness']=readiness
             methods[key]['cost_scope']='M*B conic solves + up to 2*k dual-face attempts; M=1+2*k. B=1 except two-segment paths: samples-2. Model preparation additional; wall cost unknown.'
         if key=='mujoco_direct_control_v1':
             methods[key]['supported_task_families']=['task.reach']
-            methods[key]['kernel_supported']=cfg['task']['family']=='task.reach'
+            methods[key]['supported_models']=['model.mujoco_native@1.0.0']
+            methods[key]['kernel_supported']=row['planning_status']!='unsupported'
+            methods[key]['control_sources']='Use this candidate\'s initialize_control baseline (pretension or explicit tensions), a bound mathematical schedule, or a complete current-Study NMPC actual-input result via source+parent without channel_map. New designs require explicit legal rebinding; a PPO checkpoint is not a schedule.'
+            methods[key]['handoff']='physical_replay(candidate=same candidate, source=returned control_schedule_reference); independent acceptance and public evidence_read are required before SELECT.'
     return dict(**readiness,candidate=reference,methods=methods,analysis_request_schema=AnalysisRequest.model_json_schema())
 
 
@@ -105,15 +114,17 @@ def mathematical_catalog(view):
     rows={}
     shared_cost='Model preparation and internal solver attempts are distinct; see original receipts.'
     for row in view['methods'].values():
-        item={k:v for k,v in row.items() if k not in ('description','request_template','required_parameters',
-            'schema_query','prerequisites','time_scope','required_outputs','constraint_kinds','readiness','applicability',
-            'candidate','task_identity','task_family','model_sources','formal_scope_authorized','method','limitations')}
+        item={k:row[k] for k in ('scientific_purpose','method_version','kernel_supported','model_built','full_task_supported','study_authorized',
+            'formal_execution_authorized','execution_status','planning_status','missing','estimated_evaluations','cost_scope','supported_task_families') if k in row}
+        item['detail_pointer']='/methods/'+row['method']
         item['coverage']=[{k:v for k,v in c.items() if k in ('constraint_id','status','expressible')} for c in row['coverage']]
         item['missing']=list(dict.fromkeys(item['missing']))
         if item.get('cost_scope')==shared_cost:item.pop('cost_scope')
         rows[row['method']]=item
     binding=next(iter(view['methods'].values()))
-    return dict(version='mathematical_capability_catalog_v1',candidate=view['candidate'],task_identity=binding['task_identity'],task_family=binding['task_family'],
+    return dict(version='mathematical_capability_catalog_v1',listed_methods_implemented=True,candidate=view['candidate'],task_identity=binding['task_identity'],task_family=binding['task_family'],
+        detail_query=dict(reference=view['candidate'],view='mathematical_capabilities',pointer='/methods'),
+        schema_query=dict(reference=view['candidate'],view='mathematical_capabilities',pointer='/analysis_request_schema'),
         formal_scope_authorized=binding['formal_scope_authorized'],model_sources=binding['model_sources'][-1:],cost_scope=shared_cost,
         limitations=['Candidate-bound planning only; all model/state/input/protocol and remaining-budget admission checks still apply.',
             'Local sampled numerical evidence does not prove physical acceptance or strict/global optimality.'],methods=rows)
@@ -139,15 +150,26 @@ def analysis_capabilities(configuration, requirements, protocol, *, model=None, 
         query=SimpleNamespace(operation=operation,operating_point=point,protocol=p,
             scoring_window_s=p.windows_s[0] if p.windows_s else None,
             native=NativeAnalysisOptions() if native else None,control_optimization=None)
+        parameters=[]
+        if operation=='mujoco_direct_control_v1':
+            # Probe only required coverage, not a fabricated executable source or search settings.
+            start=(exact_point or {}).get('actual_time_s',0.)
+            query.control_optimization=SimpleNamespace(settings=SimpleNamespace(correction_window_s=[start,requirements.duration_s]))
+            parameters=['control_optimization.source','control_optimization.settings (version=local_control_search_v2, explicit correction_window_s and knots_s)']
         assessment=model_assessment(configuration,requirements,operation,model=model,model_source='mujoco' if native else 'controller')
         applicability=check_analysis_applicability(requirements,query,assessment,model,exact_point)
         reasons=list(applicability['reasons'])
+        if operation=='mujoco_direct_control_v1' and configuration.task.family!='task.reach':
+            reasons.append('MuJoCo-direct v1 supports Reach/Hold only.')
         if operation=='instantaneous_braking_v1' and exact_point is None:
             reasons.append('Exact saved state required.')
+        planning='unsupported' if reasons else 'requires_parameters' if parameters else 'ready'
         count=3 if operation in ('design_sensitivity','fixed_input_structure_v1') else 1
         budget=None if remaining_evaluations is None else remaining_evaluations>=count
         if budget is False:reasons.append('Insufficient mathematical evaluation budget.')
-        rows.append(dict(operation=operation,status='not_applicable' if reasons else applicability['status'],
+        rows.append(dict(operation=operation,status='not_applicable' if reasons else 'requires_parameters' if parameters else applicability['status'],
+            planning_status='unsupported' if planning=='unsupported' else 'insufficient_budget' if budget is False else planning,
+            parameter_requirements=parameters,
             reasons=reasons,model=assessment['model_id'],
             constraint_kinds=['norm_bound','component_interval'] if sampled else ['norm_bound'],
             required_outputs=sorted({c.signal.name for c in requirements.constraints}) if sampled else
@@ -182,6 +204,8 @@ def analysis_capabilities(configuration, requirements, protocol, *, model=None, 
                 submode='optimal_sensitivity' if method==SENSITIVITY else None,
                 method_version=('sampled-affine-conic-path-progress-v1' if method==CONIC else 'controlled-path-progress-sensitivity-v1') if path is not None else method,
                 status='not_applicable' if reasons else 'conditional',reasons=reasons,dependency_environment=env,
+                planning_status='unauthorized' if 'method_not_authorized' in reasons else 'unsupported' if fit['reasons'] or not env['available'] else
+                    'insufficient_budget' if 'insufficient_budget' in reasons else 'requires_parameters' if method==SENSITIVITY else 'ready',
                 evaluations=count,evaluation_rule=(f'One model build plus {subproblems} internal conic subproblems' if method==CONIC else f'(1+2*k)*{subproblems}+2*k kernel/dual-face solves for k central step sizes; existing models required'),
                 **(dict(kernel_subproblems_per_model=subproblems) if path is not None else {}),
                 **(dict(coverage=fit['constraint_coverage'],full_task_supported=fit['full_task_supported']) if fit is not None else {}),

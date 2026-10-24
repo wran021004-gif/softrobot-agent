@@ -328,8 +328,11 @@ def error_feedback(host, use, exc, before):
         expected='; '.join(e['msg'] for e in errors[:3])[:400]
         code=errors[0]['type']
     hints={
+        'NATIVE_ANALYSIS_REQUIRES_EXACT_STATE_OR_FROZEN_INITIALIZATION':('operating_point','Native methods use model_source=mujoco and operating_point=standardized_initial_pretension with no saved source, or operating_point=saved_state with saved_state OR execution+update_id. Retrieve method details for source/window requirements.'),
+        'DISPOSITION_REQUIRES_EXACT_ACTUAL_READ':('selected_execution','Use evidence_read(reference=selected_execution, view=full, pointer="") on the exact physical result, then SELECT. Reporter delivery, searches and summary text do not grant formal read credit.'),
+        'explicit evidence_read of this completed evaluation required':('selected_execution','Publicly evidence_read the exact selected_execution with view=full and pointer="" before SELECT; /acceptance alone does not satisfy the whole-result read required here.'),
         'ORDERED_V2_CORRECTION_WINDOW_REQUIRED':('control_search.settings.correction_window_s','0 <= window[0] <= knots[0] < knots[-1] <= window[1] <= task duration'),
-        'DECISION_CANDIDATE_MISMATCH':('decision.selected_candidate','Use the exact candidate in this action payload'),
+        'DECISION_CANDIDATE_MISMATCH':('decision.selected_candidate','Match the exact action candidate (for physical_replay, physical_replay.candidate); source is a control/result reference and must not replace the candidate.'),
         'PHYSICAL_REPLAY_CANDIDATE_TASK_MODEL_OR_SEQUENCE_MISMATCH':('source','Use a candidate-bound source; initialize_control explicitly rebinds inherited controls'),
         'UNREGISTERED_RESEARCH_EVIDENCE':('supporting_evidence','Readable does not mean registered. Query working_set /citation_eligibility; use only registered references whose supported_inferences match the claim. Reading does not register evidence.'),
         'REGISTERED_CURRENT_ANALYSIS_REQUIRED':('control_seed.response_evidence','Request input_sensitivity for the selected candidate, then use its registered result reference'),
@@ -340,6 +343,7 @@ def error_feedback(host, use, exc, before):
         if marker in message:code=marker;field=f;expected=hint
     if 'ACTION_REQUIRES_ONLY_' in message:
         field='action';expected=message[message.index('ACTION_REQUIRES_ONLY_'):].split('\n')[0][:160]
+        if use['input'].get('action')=='physical_replay':expected+='; put candidate/source inside physical_replay and match decision.selected_candidate to physical_replay.candidate; omit top-level candidate.'
     if isinstance(exc,(KeyError,IndexError)):
         code='INVALID_EVIDENCE_POINTER';field='pointer';expected='Read the parent pointer with view=summary to obtain actual child keys'
         if use['input'].get('reference'):

@@ -805,11 +805,12 @@ def mathematics_authorization(host,s):
     """Separate the frozen method grant, formal approval and input readiness."""
     approvals=[(e,host.store.artifact(e['outputs'][0])) for e in host.store.events(host.run_id)
         if e['kind']=='formal_study_authorization']
-    valid=[(e,a) for e,a in approvals if a.get('user_approval') is True and a.get('scope_identity')==digest(a.get('scope'))
+    valid=[(e,a) for e,a in approvals if a.get('user_approval') and a.get('scope_identity')==digest(a.get('scope'))
         and a.get('scope',{}).get('study_id')==host.run_id and a['scope'].get('resolved_identity')==s['spec']['resolved_identity']]
     approval=valid[-1] if valid else None
     methods=s['spec'].get('mathematical_methods',{})
-    return dict(registered_study_scope_authorized=('registered mathematics' in approval[1]['scope'].get('execution_scopes',[])) if approval else None,
+    return dict(registered_study_scope_authorized=('registered mathematics' in approval[1]['scope'].get('execution_scopes',[])
+        or 'analysis' in approval[1]['scope'].get('capabilities',[])) if approval else None,
         approval_reference=approval[0]['outputs'][0] if approval else None,
         methods=[dict(method=key,frozen_method_grant=bool(value),configuration_description=value) for key,value in methods.items()],
         proposal_text_is_current_execution_gate=False,
@@ -878,6 +879,22 @@ def agent_decision_brief(host):
             if key in ws:
                 rows=ws.pop(key);ws[key+'_access']=dict(count=len(rows),
                     query=dict(reference=anchor,view='working_set',pointer='/'+key))
+    return compact_scientific_delivery(brief)
+
+
+def compact_scientific_delivery(brief):
+    """Pure L0 projection; exact reports and immutable SDK history stay intact."""
+    brief=deepcopy(brief)
+    for report in brief.get('latest_reports',[]):
+        # Every interpretation already carries its own exact sources.
+        report.pop('interpretation_sources',None)
+        for finding in report.get('findings',[]):
+            diagnostics=(finding.get('recorded_summary') or {}).get('recorded_control_diagnostics')
+            if diagnostics:
+                for row in diagnostics.get('relevant_updates',[]):
+                    row.pop('actual_input_n',None);row.pop('planned_first_input_n',None)
+                    if row.get('recovery'):
+                        row['recovery']={k:row['recovery'][k] for k in ('attempted','selected','error') if k in row['recovery']}
     return brief
 
 
