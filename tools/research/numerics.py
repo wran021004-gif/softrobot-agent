@@ -127,3 +127,39 @@ def execution_update(host, reference, update_id):
         imported_historical_evidence=False,provenance=dict(candidate=result['candidate'],execution_reference=reference,
             execution_id=result['execution_id'],study_id=host.run_id,update_id=update_id))
 
+
+def native_point(host, query, configuration):
+    """Immutable native checkpoint or owned measured prefix; no projected state.
+
+    Prefix verification/integration happens inside the charged analysis worker,
+    not during admission. No complete optimizer record or GVS recipe is needed.
+    """
+    if query.saved_state:
+        point=deepcopy(host.store.artifact(query.saved_state))
+        if (point.get('candidate')!=plain(query.candidate) or
+                point.get('configuration_identity')!=digest(configuration) or
+                point.get('phase')!='interval_start_native' or point.get('input_units')!='N'):
+            raise ValueError('EXACT_NATIVE_SAVED_STATE_BINDING_REQUIRED')
+        point['source']=plain(query.saved_state)
+        return point
+    from extensions.tendon_family.control_evidence import ControlEvidence
+    reference=plain(query.execution)
+    if reference not in state(host)['results']:raise ValueError('OWNED_NATIVE_EXECUTION_REQUIRED')
+    result=host.store.artifact(reference)
+    if result['candidate']!=plain(query.candidate):raise ValueError('NATIVE_EXECUTION_CANDIDATE_MISMATCH')
+    reader=ControlEvidence(host.store);source=reader.resolve(result['execution_id'])
+    if source['configuration']!=configuration:raise ValueError('NATIVE_EXECUTION_CONFIGURATION_MISMATCH')
+    rows=reader.read_file(source,'trajectory.json.gz');physics=reader.read_file(source,'resolved_physics.json')
+    scene=reader.read_file(source,'experiment_scene.json')
+    if not rows or scene['control']['tension_execution_mode']!='ideal_tension':raise ValueError('MEASURED_IDEAL_NATIVE_TRAJECTORY_REQUIRED')
+    k=query.update_id
+    if not 0<=k<len(rows):raise ValueError('NATIVE_EXECUTION_INTERVAL_OUTSIDE_SAVED_TRACE')
+    previous=rows[k-1] if k else dict(qpos_rad=scene['qpos_rad'],qvel_rad_s=scene['qvel_rad_s'],time_s=0.)
+    return dict(candidate=plain(query.candidate),configuration_identity=digest(configuration),
+        physics_identity=physics['identity'],dof_order=physics['dofs'],tendon_order=[t['entity'] for t in physics['tendons']],
+        phase='interval_start_native',input_units='N',actual_time_s=previous['time_s'],
+        qpos_rad=previous['qpos_rad'],qvel_rad_s=previous['qvel_rad_s'],u=rows[k]['tension_n'],
+        native_replay=dict(rows=rows[:k],scene=scene),
+        provenance=dict(execution=reference,update_id=k,trajectory=source['files']['trajectory.json.gz'],
+            input_phase='actual command for requested interval; not previous applied input'))
+

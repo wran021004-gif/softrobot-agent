@@ -144,9 +144,24 @@ class OptimalCapabilitySensitivity(Contract):
         return self
 
 
+class NativeStructureResponse(Contract):
+    variable: str
+    candidates: list[EvidenceRef] = Field(min_length=1,max_length=2)
+
+
+class NativeAnalysisOptions(Contract):
+    tensions_n: list[FiniteFloat] | None = None
+    horizon_s: FiniteFloat = Field(default=.01,gt=0,le=.05)
+    difference_step_n: FiniteFloat = Field(default=.02,gt=0,le=.5)
+    correction_radius_n: FiniteFloat = Field(default=0.,ge=0,le=.5)
+
+
 class AnalysisRequest(Contract):
     candidate: EvidenceRef
-    operation: Literal['equilibrium','linearization','controllability','endpoint','braking','instantaneous_braking_v1','trajectory_feasibility','task_capability','input_sensitivity','design_sensitivity']
+    operation: Literal['equilibrium','linearization','controllability','endpoint','braking','instantaneous_braking_v1','trajectory_feasibility','task_capability','input_sensitivity','design_sensitivity','native_dynamics_v1','short_input_response_v1','fixed_input_structure_v1']
+    model_source: Literal['controller','gvs','sorosim','mujoco'] = 'controller'
+    native: NativeAnalysisOptions = Field(default_factory=NativeAnalysisOptions)
+    structure_response: NativeStructureResponse | None = None
     operating_point: Literal['standardized_initial_pretension','controller_start_input','target_equilibrium','halfway_waypoint','saved_state','fixed_input_equilibrium'] = 'halfway_waypoint'
     design_sensitivity: StaticDesignSensitivity | None = None
     capability_comparison: CapabilityComparison | None = None
@@ -160,6 +175,15 @@ class AnalysisRequest(Contract):
 
     @model_validator(mode='after')
     def exact_state(self):
+        native_operation=self.operation in ('native_dynamics_v1','short_input_response_v1','fixed_input_structure_v1')
+        if (self.model_source=='mujoco')!=native_operation:
+            raise ValueError('MUJOCO_REQUIRES_EXPLICIT_NATIVE_METHOD_AND_MODEL_SOURCE')
+        if native_operation and self.operating_point!='saved_state':
+            raise ValueError('NATIVE_ANALYSIS_REQUIRES_SAVED_NATIVE_STATE')
+        if not native_operation and self.native!=NativeAnalysisOptions():
+            raise ValueError('NATIVE_OPTIONS_REQUIRE_NATIVE_METHOD')
+        if (self.operation=='fixed_input_structure_v1')!=(self.structure_response is not None):
+            raise ValueError('STRUCTURE_RESPONSE_REQUIRES_REGISTERED_COMPARISON_CANDIDATES')
         if self.capability_method is not None and (self.operation!='task_capability' or self.capability_comparison is not None):
             raise ValueError('CONIC_REQUIRES_TASK_CAPABILITY_WITHOUT_LEGACY_COMPARISON')
         if self.optimal_sensitivity is not None and (self.capability_method is None or self.operating_point not in ('controller_start_input','standardized_initial_pretension')):
@@ -191,6 +215,10 @@ class AnalysisRequest(Contract):
         if self.design_sensitivity is None:value.pop('design_sensitivity',None)
         if self.capability_comparison is None:value.pop('capability_comparison',None)
         for key in ('capability_method','optimal_sensitivity'):
+            if getattr(self,key) is None:value.pop(key,None)
+        if self.model_source=='controller':value.pop('model_source',None)
+        if self.model_source!='mujoco':value.pop('native',None)
+        for key in ('structure_response',):
             if getattr(self,key) is None:value.pop(key,None)
         return value
 

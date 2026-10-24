@@ -67,13 +67,21 @@ def calculate(configuration,binding,query,exact_point=None,*,checkpoint=None,des
         return calculate_sensitivity(design_context,q,checkpoint)
     p=q.protocol
     inp=SessionInput.model_validate(configuration)
-    sorosim=inp.policy.controller.extension_id=='controller.sorosim_matlab_nmpc'
+    requirements=describe_analysis_requirements(inp,binding)
+    if q.model_source=='mujoco':
+        from tools.research.native_analysis import calculate as native_calculate
+        assessment=model_assessment(inp,requirements,q.operation,model_source=q.model_source)
+        fit=check_analysis_applicability(requirements,q,assessment,exact_point=exact_point)
+        if fit['status']=='not_applicable':
+            return scoped_result(dict(status='not_applicable',operation=q.operation,binding=binding,
+                protocol=plain(p),task_acceptance='unmeasured',proxy_values={}),requirements,fit,q)
+        return native_calculate(configuration,binding,q,exact_point,requirements,design_context)
+    sorosim=q.model_source=='sorosim' or (q.model_source=='controller' and inp.policy.controller.extension_id=='controller.sorosim_matlab_nmpc')
     if sorosim:
         from extensions.tendon_family.sorosim_analysis import calculate_candidate_configuration
     else:
         from extensions.tendon_family.math_analysis import calculate_candidate_configuration
-    requirements=describe_analysis_requirements(inp,binding)
-    assessment=model_assessment(inp,requirements,q.operation)
+    assessment=model_assessment(inp,requirements,q.operation,model_source=q.model_source)
     applicability=check_analysis_applicability(requirements,q,assessment,exact_point=exact_point)
     if applicability['status']=='not_applicable':
         return scoped_result(dict(status='not_applicable',operation=q.operation,binding=binding,protocol=plain(p),
@@ -234,7 +242,10 @@ def scoped_result(result, requirements, applicability, query):
         conclusion, verification, pointer = 'not_applicable', 'not_performed', '/analysis_applicability'
         interpretation = '; '.join(applicability['reasons'])
     elif result['status'] == 'computed':
-        if result.get('optimal_sensitivity'):
+        if result.get('native_dynamics'):
+            conclusion,verification,pointer='diagnostic','native_numerical_checks','/native_dynamics'
+            interpretation='Native fixed-state mechanics and short fixed-input responses only; not a full-task witness or reoptimized structural capability.'
+        elif result.get('optimal_sensitivity'):
             conclusion,verification,pointer='diagnostic',result['optimal_sensitivity']['direction_status'],'/optimal_sensitivity'
             interpretation='Controlled reoptimized finite differences of sampled local models; no strict structural gradient, regional descent or physical improvement guarantee.'
         elif result.get('instantaneous_braking'):
@@ -278,7 +289,7 @@ def scoped_result(result, requirements, applicability, query):
     result['task_analysis'] = plain(requirements)
     result['analysis_applicability'] = applicability
     result['scoped_claim'] = plain(ScopedMathematicalClaim(conclusion=conclusion, binding=requirements.binding,
-        requirement_identity=digest(plain(requirements)), model_identity=digest(result['model']) if result.get('model') else None,
+        requirement_identity=digest(plain(requirements)), model_identity=digest(result['model']) if result.get('model') else result.get('model_identity'),
         model_declaration={k:applicability['model_assessment'][k] for k in ('model_id','model_version','representation_id','relevant_assumptions')},
         protocol_identity=digest(plain(query.protocol)), operating_point=result.get('operating_point') or dict(name=query.operating_point),
         horizon=applicability['horizon'], physical_inputs=requirements.physical_inputs,
@@ -310,7 +321,7 @@ def dispatch(host,query,key,*,guard,origin='model'):
             operation_reuse=dict(additional_numerical_s=0,additional_analysis_evaluations=0))
     guard(host,origin!='engineering_preflight')
     from tools.research.tool_readiness import require
-    require(host,'analysis')
+    if q.model_source in ('controller','sorosim'):require(host,'analysis')
     if state(host)['spec'].get('research_decisions') and 'analysis' not in state(host)['spec']['capabilities']:
         raise ValueError('ANALYSIS_CAPABILITY_REQUIRED')
     method_fit=None
@@ -324,6 +335,9 @@ def dispatch(host,query,key,*,guard,origin='model'):
         if method_fit:return dict(status='not_applicable',reason=str(exc),admission=method_fit,task_acceptance='unmeasured')
         raise
     sensitivity_context=None
+    if q.structure_response:
+        from tools.research.native_analysis import structure_context
+        sensitivity_context=structure_context(c,[(r,verify_candidate(host,r)) for r in q.structure_response.candidates],q.structure_response)
     if q.design_sensitivity:
         from extensions.tendon_family.sorosim_analysis import design_context
         sensitivity_context=design_context(c,verify_candidate(host,q.design_sensitivity.minus_candidate),
@@ -351,24 +365,30 @@ def dispatch(host,query,key,*,guard,origin='model'):
     if protocol!=s['spec']['analysis_protocol'] or (q.scoring_window_s is not None and q.scoring_window_s not in protocol['windows_s']):
         raise ValueError('ANALYSIS_REQUIRES_DECLARED_FROZEN_PROTOCOL')
     count=3 if q.operation=='design_sensitivity' else 2 if q.capability_comparison is not None else 1
+    if q.structure_response:count=1+len(q.structure_response.candidates)
     if method_fit:count=method_fit['expected_mathematical_evaluations']
     fit=admission(host,requested=count,engineering=origin=='engineering_preflight')
     if fit['admitted']<count:
         raise ValueError('ANALYSIS_AND_CONFIRMATION_BUDGET_CANNOT_FIT')
     cfg=c['configuration']
     design=cfg['robot']['structure']['data']
-    from extensions.tendon_family.gvs_basis import resolve_basis
-    basis=cfg['policy']['controller']['parameters']['data']['recipe']['basis']
     binding=dict(candidate_id=c['candidate_id'],candidate=plain(q.candidate),configuration=c['configuration_reference'],
-        effective_configuration_identity=digest(cfg),task_identity=digest(cfg['task']),basis=basis,
-        coordinate_order=list(resolve_basis(design,basis).coordinate_order),tendon_order=[t['id'] for t in design['tendons']],
+        effective_configuration_identity=digest(cfg),task_identity=digest(cfg['task']),tendon_order=[t['id'] for t in design['tendons']],
         tension_limits_n=[t['force_limit_n'] for t in design['tendons']],tension_bounds_n=[[0.,t['force_limit_n']] for t in design['tendons']],
         target_m=cfg['task']['goal']['data'].get('target_m'),task_reference=cfg['task']['goal'],source_identity=c['source_identity'],
         evaluation_profile_identity=c['profile_identity'])
+    if q.model_source!='mujoco':
+        from extensions.tendon_family.gvs_basis import resolve_basis
+        basis=cfg['policy']['controller']['parameters']['data']['recipe']['basis']
+        binding.update(basis=basis,coordinate_order=list(resolve_basis(design,basis).coordinate_order))
     if c.get('generation_version'):
         binding.update(canonical_task_identity=c['task_identity'],initialization_provenance=c['initialization_provenance'])
     point=None
-    if q.execution:
+    if q.model_source=='mujoco':
+        from tools.research.numerics import native_point
+        point=native_point(host,q,cfg)
+        binding['coordinate_order']=point['dof_order']
+    elif q.execution:
         from tools.research.numerics import execution_update
         source=execution_update(host,q.execution,q.update_id)
         record=source['record']
@@ -389,7 +409,7 @@ def dispatch(host,query,key,*,guard,origin='model'):
             construction=dict(method='GVS state projected from recorded MuJoCo interval start; linearizes at previous applied input',
                 provenance=source['provenance'],new_command_n=record['actual_applied_action_n'],
                 interpretation='Backend measurements are observed; endpoint/motion estimates concern the local GVS model.'))
-    if q.saved_state:
+    if q.saved_state and q.model_source!='mujoco':
         point=deepcopy(host.store.artifact(q.saved_state))
         if point.get('candidate')!=plain(q.candidate) or point.get('configuration_identity')!=digest(cfg):
             raise ValueError('EXACT_SAVED_STATE_CANDIDATE_MISMATCH')
@@ -398,7 +418,7 @@ def dispatch(host,query,key,*,guard,origin='model'):
                 or point.get('phase')!='interval_start_previous_applied_input' or point.get('input_units')!='N'):
             raise ValueError('EXACT_SAVED_STATE_ORDER_AND_PHASE_REQUIRED')
         point.update(name='saved_state',available=True,construction=dict(method='exact immutable saved state',state=plain(q.saved_state)))
-    if point and (len(point['x'])!=2*len(binding['coordinate_order']) or len(point['u'])!=len(binding['tendon_order'])):
+    if point and q.model_source!='mujoco' and (len(point['x'])!=2*len(binding['coordinate_order']) or len(point['u'])!=len(binding['tendon_order'])):
         raise ValueError('EXACT_STATE_DIMENSION_MISMATCH')
     if point:
         actual=point.get('actual_time_s',point.get('time_s'))
@@ -411,7 +431,7 @@ def dispatch(host,query,key,*,guard,origin='model'):
     requirements=describe_analysis_requirements(inp,binding)
     saved_model=EndpointLinearizedModel.model_validate(sensitivity_context['baseline']['model']) if q.optimal_sensitivity else None
     applicability=check_analysis_applicability(requirements,q,
-        model_assessment(inp,requirements,q.operation,model=saved_model),model=saved_model,exact_point=point)
+        model_assessment(inp,requirements,q.operation,model=saved_model,model_source=q.model_source),model=saved_model,exact_point=point)
     if applicability['status']=='not_applicable':
         return dict(status='not_applicable',analysis_applicability=applicability,
             task_acceptance='unmeasured',additional_analysis_evaluations=0)
@@ -556,6 +576,7 @@ def compact_result(value, reference):
         summary.pop('task_capability',None)
         summary['optimal_sensitivity']=sensitivity_summary(value['optimal_sensitivity'])
     if value.get('instantaneous_braking'):summary['instantaneous_braking']=value['instantaneous_braking']
+    if value.get('native_analysis'):summary['native_analysis']=value['native_analysis']
     return {**{k:summary[k] for k in ('reference','stored_result_keys','control_handoff','static_input_observation',
         'input_response_observation','retrieval_note') if k in summary},**summary}
 
@@ -623,6 +644,10 @@ def decision_result(value, reference):
         result.pop('task_capability',None)
         result['optimal_sensitivity']=sensitivity_summary(value['optimal_sensitivity'])
     if value.get('instantaneous_braking'):result['instantaneous_braking']=value['instantaneous_braking']
+    if value.get('native_analysis'):
+        result['native_analysis']=value['native_analysis']
+        result['decision_relevance'].update(supported_facts=[value['native_analysis']['interpretation']],
+            unresolved_questions=value['native_analysis']['unresolved'])
     return result
 
 

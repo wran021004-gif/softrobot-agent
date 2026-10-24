@@ -242,6 +242,14 @@ def result_card(host, reference):
         mathematics=MathematicalEvidence(claim=value['scoped_claim'],
             claim_source=_location(reference,'/scoped_claim'),
             requirement_source=_location(reference,'/task_analysis') if 'task_analysis' in value else None)
+        if value.get('native_analysis'):
+            from schemas.research_reporting import MathematicalQuantity
+            mathematics=mathematics.model_copy(update=dict(
+                problem_definition=_location(reference,'/native_analysis/basis'),
+                quantities=[MathematicalQuantity(name=q['name'],value=q['value'],unit=q['unit'],
+                    status='unverified_estimate',control_reoptimization='fixed_control',
+                    source=_location(reference,q['source_pointer'])) for q in value['native_analysis']['quantities']]))
+            details.append(_location(reference,'/native_dynamics'))
         if value.get('operation') == 'task_capability' and (value.get('trajectory', {}).get('problem_definition') or value.get('trajectory',{}).get('method_version')):
             from tools.research.capability import populate_mathematics
             mathematics=populate_mathematics(mathematics,value['trajectory'],reference)

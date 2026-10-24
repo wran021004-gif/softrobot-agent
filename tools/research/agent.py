@@ -582,7 +582,7 @@ async def converse(host,*,session_handoff=False,pause_after_completed_invocation
         schema=plan_schema(actions,decision_required=bool(state(host)['spec'].get('research_decisions')))
         native[0].tool_spec={**native[0].tool_spec,'inputSchema':{'json':schema}}
     if state(host)['spec'].get('nominal_source') or state(host)['spec'].get('start_mode')=='family_space':
-        native.append(PythonAgentTool('research_analysis',dict(name='research_analysis',description='Candidate-bound mathematics; saved_state or execution plus update_id selects exact projected state at previous applied input with actual remaining task time. Historical candidate binding required. Each calculation charged once; task acceptance unmeasured.',inputSchema={'json':AnalysisRequest.model_json_schema()}),handler('analysis')))
+        native.append(PythonAgentTool('research_analysis',dict(name='research_analysis',description='Candidate-bound mathematics. model_source selects the reduced provider or native MuJoCo methods independently of control. saved_state or execution plus update_id selects a source-bound state; native methods require a complete native checkpoint or verified measured prefix. Each calculation charged once; task acceptance unmeasured.',inputSchema={'json':AnalysisRequest.model_json_schema()}),handler('analysis')))
     if rl_mode:
         native.append(PythonAgentTool('research_rl',dict(name='research_rl',description='start initializes; resume recovers original stage; continue creates a new stage from exact parent run_id/checkpoint with supported sparse training/reward changes and additional finite allocation. Query, stop, independently evaluate or diagnose an owned frozen candidate RL run',
             inputSchema={'json':RLRequest.model_json_schema()}),handler('rl')))
@@ -697,10 +697,8 @@ async def converse(host,*,session_handoff=False,pause_after_completed_invocation
             native[0].tool_spec={**native[0].tool_spec,'inputSchema':{'json':plan_schema(current['research']['actions'],decision_required=bool(s['spec'].get('research_decisions')))}}
         if not enabled(s['spec'],'analysis') or s['spec']['budgets']['mathematical_evaluations']<=s.get('mathematical_evaluations',0):
             agent.tool_registry.registry.pop('research_analysis',None)
-        elif s['spec'].get('tool_readiness') or s.get('tool_failures'):
-            from tools.research.tool_readiness import availability
-            if (availability(host) or {}).get('status')!='ready' or current['research']['budget']['science_budget']['remaining_mathematical']<1:
-                agent.tool_registry.registry.pop('research_analysis',None)
+        # Provider readiness is checked per selected model by analysis.dispatch;
+        # unavailable MATLAB must not hide authorized native MuJoCo mathematics.
         record(host,'model_decision_packet',current)
         agent.system_prompt=instructions
         boundary.research_packet=deepcopy(current)

@@ -9,6 +9,9 @@ METHOD_MEANINGS = {
     'equilibrium': ('Static input construction', 'Bounded local static target construction; static balance does not establish dynamic reach or hold.'),
     'input_sensitivity': ('Static input response', 'Checked local implicit-function response of equilibrium to physical input; SoRoSim fixed-input equilibrium only.'),
     'design_sensitivity': ('Static structural response', 'Paired single-parameter local static sensitivity with fixed physical input; no global design descent guarantee.'),
+    'native_dynamics_v1': ('Native MuJoCo mechanics', 'Native mass, forces, acceleration, world tip and tendon Jacobians at an exact native state; independent of GVS.'),
+    'short_input_response_v1': ('Native short input response', 'Legal actual-tension FD at two sizes, optional one bounded correction checked with nonlinear native integration; no full-task claim.'),
+    'fixed_input_structure_v1': ('Native structure and function response', 'Recompile registered one-parameter candidates; compare mechanisms, local function and short task proxies at fixed input. No reoptimized capability claim.'),
     'endpoint': ('Bounded terminal feasibility', 'Bounded affine input sequence for covered terminal position conditions; intermediate constraints remain unchecked.'),
     'braking': ('Bounded terminal braking', 'Bounded affine sequence for covered terminal position/speed; not full holding-window compliance.'),
     'instantaneous_braking_v1': ('Instantaneous braking authority', 'Minimum instantaneous speed derivative over the physical input box at an exact saved state; not finite-horizon braking.'),
@@ -59,12 +62,16 @@ def mathematical_method_view(host, reference):
             required.append('scoring_window_s from protocol.windows_s')
             if spec['analysis_protocol']['windows_s']:request['scoring_window_s']=spec['analysis_protocol']['windows_s'][0]
         if key=='instantaneous_braking_v1':required.append('saved_state OR execution + update_id')
+        if key in ('native_dynamics_v1','short_input_response_v1','fixed_input_structure_v1'):
+            request.update(model_source='mujoco',operating_point='saved_state')
+            required.extend(['saved_state (native integration checkpoint) OR execution + update_id','native={tensions_n,horizon_s,difference_step_n,correction_radius_n}'])
+        if key=='fixed_input_structure_v1':required.append('structure_response={variable,candidates}; registered single-parameter candidates')
         if key=='design_sensitivity':required.append('design_sensitivity={variable,step,minus_candidate,plus_candidate}')
         if row.get('capability_method'):request['capability_method']=CONIC
         if key==SENSITIVITY:required.append('optimal_sensitivity={variable,steps,model_results baseline first}; validated stencil required')
         methods[key]=dict(operation=row['operation'],method=key,method_version=row.get('method_version',key),scientific_purpose=purpose,description=meaning,
             candidate=reference,task_identity=c.get('task_identity'),task_family=cfg['task']['family'],
-            kernel_supported=True if key in ('linearization','controllability','instantaneous_braking_v1') else
+            kernel_supported=True if key in ('linearization','controllability','instantaneous_braking_v1','native_dynamics_v1','short_input_response_v1','fixed_input_structure_v1') else
                 any(x.kind in kinds for x in requirements.constraints) and
                 all(x.kind in kinds or x.kind == 'unsupported' for x in requirements.constraints),
             model_built=bool(models),model_sources=[dict(reference=r,pointer='/model') for r in models],
@@ -108,25 +115,27 @@ def analysis_capabilities(configuration, requirements, protocol, *, model=None, 
     """Candidates for existing operations, using the same execution applicability gate."""
     from types import SimpleNamespace
     from typing import get_args
-    from tools.research.contracts import AnalysisRequest
+    from tools.research.contracts import AnalysisRequest,NativeAnalysisOptions
     from schemas.platform_analysis import TaskAnalysisProtocol
     from schemas.platform import SessionInput
     configuration=SessionInput.model_validate(configuration)
     p=TaskAnalysisProtocol.model_validate(protocol)
     rows=[]
     for operation in get_args(AnalysisRequest.model_fields['operation'].annotation):
+        native=operation in ('native_dynamics_v1','short_input_response_v1','fixed_input_structure_v1')
         sampled=operation in ('trajectory_feasibility','task_capability')
         static=operation in ('equilibrium','input_sensitivity','design_sensitivity')
-        point='target_equilibrium' if operation=='equilibrium' else 'fixed_input_equilibrium' if static else 'controller_start_input'
+        point='saved_state' if native else 'target_equilibrium' if operation=='equilibrium' else 'fixed_input_equilibrium' if static else 'controller_start_input'
         if exact_point and not static:point='saved_state'
         query=SimpleNamespace(operation=operation,operating_point=point,protocol=p,
-            scoring_window_s=p.windows_s[0] if p.windows_s else None)
-        assessment=model_assessment(configuration,requirements,operation,model=model)
+            scoring_window_s=p.windows_s[0] if p.windows_s else None,
+            native=NativeAnalysisOptions() if native else None)
+        assessment=model_assessment(configuration,requirements,operation,model=model,model_source='mujoco' if native else 'controller')
         applicability=check_analysis_applicability(requirements,query,assessment,model,exact_point)
         reasons=list(applicability['reasons'])
         if operation=='instantaneous_braking_v1' and exact_point is None:
             reasons.append('Exact saved state required.')
-        count=3 if operation=='design_sensitivity' else 1
+        count=3 if operation in ('design_sensitivity','fixed_input_structure_v1') else 1
         budget=None if remaining_evaluations is None else remaining_evaluations>=count
         if budget is False:reasons.append('Insufficient mathematical evaluation budget.')
         rows.append(dict(operation=operation,status='not_applicable' if reasons else applicability['status'],
@@ -204,15 +213,18 @@ def endpoint_target(requirements, protocol, *, braking=False):
     return EndpointTarget(**args)
 
 
-def model_assessment(configuration, requirements, operation,model=None):
+def model_assessment(configuration, requirements, operation,model=None,model_source='controller'):
     """Use the same GVS model binding as the candidate linearization builder."""
+    if model_source=='mujoco':
+        from tools.research.native_analysis import assessment
+        return assessment(configuration,requirements)
     from extensions.tendon_family.model_applicability import assess_model_uses
     from tools.platform_registry import registry
     saved_model=model is not None
     use = 'static_equilibrium' if operation in ('equilibrium','input_sensitivity','design_sensitivity') else 'linearization'
     model = Binding(extension_id='model.gvs', version='1.0.0', parameters=Payload(
         contract='family.gvs_model', data=dict(basis=configuration.policy.controller.parameters.data['recipe']['basis'])))
-    if configuration.policy.controller.extension_id == 'controller.sorosim_matlab_nmpc':
+    if model_source=='sorosim' or (model_source=='controller' and configuration.policy.controller.extension_id == 'controller.sorosim_matlab_nmpc'):
         model = Binding(extension_id='model.sorosim_gvs',version='1.0.0',parameters=Payload(
             contract='family.sorosim_model',data=dict(basis=configuration.policy.controller.parameters.data['recipe']['basis'])))
     reg = registry()
@@ -224,11 +236,13 @@ def model_assessment(configuration, requirements, operation,model=None):
     if unknown:
         assessment['uses'][use]['status'] = 'REJECT'
         assessment['uses'][use]['reasons'].append('Required physics has no declared capability: '+', '.join(sorted(unknown)))
-    if configuration.policy.controller.extension_id not in ('controller.gvs_nmpc','controller.sorosim_matlab_nmpc'):
+    if model_source=='controller' and configuration.policy.controller.extension_id not in ('controller.gvs_nmpc','controller.sorosim_matlab_nmpc'):
         assessment['uses'][use]['status']='REJECT'
         assessment['uses'][use]['reasons'].append('No candidate model preparation implemented for this controller configuration.')
     reference=task_adapter(plain(configuration)).control_reference()
     preparation=[]
+    if model_source=='sorosim' and 'solver' not in configuration.policy.controller.parameters.data:
+        preparation.append('Explicit SoRoSim needs frozen SoRoSim solver settings; no settings are fabricated from another controller.')
     if not saved_model:
         control=configuration.policy.controller.parameters.data
         if control['recipe'].get('reference_mode','constant')!=reference['kind']:
@@ -253,6 +267,9 @@ def check_analysis_applicability(requirements, query, assessment, model=None, ex
     of tendon_family.math_analysis.linear_model; constructed models are checked
     again using their actual outputs before metrics/endpoint computations.
     """
+    if assessment['model_id']=='model.mujoco_native':
+        from tools.research.native_analysis import applicability
+        return applicability(requirements,query,assessment,exact_point)
     reasons = [reason for verdict in assessment['uses'].values() if verdict['status'] == 'REJECT'
                for reason in verdict['reasons']]
     if query.operating_point in ('target_equilibrium','halfway_waypoint'):

@@ -1,0 +1,213 @@
+"""Native ideal-tension mechanics and bounded short responses; no GVS or Store.
+
+MuJoCo 3.13 numerical semantics. Native integration checkpoints are never
+replaced by a projected state. Structure comparisons require identical named
+hinges and transplant qpos/qvel only, with reset solver history in every model.
+"""
+from io import BytesIO
+import time
+import mujoco
+import numpy as np
+
+from schemas.platform import SessionInput
+from tools.platform_store import plain
+from .backends import physics_for, _mujoco_state_failed
+from .scene import assemble_physical
+from .mjcf import compile_xml
+
+
+class NativeModel:
+    def __init__(self, configuration):
+        from tools.platform_registry import registry
+        inp=SessionInput.model_validate(configuration)
+        if inp.policy.backend.extension_id!='backend.family_mujoco':
+            raise ValueError('NATIVE_ANALYSIS_REQUIRES_MUJOCO_BACKEND')
+        self.physics=physics_for(inp);self.scene=assemble_physical(inp,self.physics)
+        if self.scene['forces']:raise ValueError('NATIVE_V1_EXTERNAL_FORCES_UNSUPPORTED')
+        self.scene['control']=dict(tension_execution_mode='ideal_tension')
+        xml=BytesIO()
+        compile_xml(self.physics,self.scene,registry().parse(inp.policy.backend.parameters),xml)
+        self.model=mujoco.MjModel.from_xml_string(xml.getvalue().decode('utf8'))
+        m=self.model
+        self.order=self.physics['dofs'];self.tendons=[t['entity'] for t in self.physics['tendons']]
+        jids=[m.joint(n).id for n in self.order]
+        self.qi=m.jnt_qposadr[jids];self.vi=m.jnt_dofadr[jids]
+        self.aids=[m.actuator(n+'_direct_tension').id for n in self.tendons]
+        self.tids=[m.tendon(n).id for n in self.tendons];self.tip=m.site('tip_site').id
+        self.limits=m.actuator_ctrlrange[self.aids].copy()
+        if m.nq!=len(self.order) or m.nv!=len(self.order) or m.na:
+            raise ValueError('NATIVE_V1_REQUIRES_COMPLETE_NAMED_HINGE_STATE')
+        self.cost=dict(model_builds=1,forward_evaluations=0,physics_steps=0,rollouts=0,mechanics_evaluations=0)
+
+    def forward(self, d):
+        mujoco.mj_forward(self.model,d);self.cost['forward_evaluations']+=1
+        if d.ncon or d.nefc or any(w.number for w in d.warning) or not np.isfinite(d.qacc).all():
+            raise ValueError('NATIVE_V1_REQUIRES_FINITE_CONTACT_FREE_UNCONSTRAINED_STATE')
+
+    def restore(self, point, *, comparable=False):
+        m=self.model;d=mujoco.MjData(m)
+        if point['dof_order']!=self.order or point['tendon_order']!=self.tendons:
+            raise ValueError('NATIVE_STATE_NAMED_COORDINATES_MISMATCH')
+        if comparable:
+            d.qpos[self.qi]=point['qpos_rad'];d.qvel[self.vi]=point['qvel_rad_s']
+            d.time=point['actual_time_s']
+        else:
+            if point['physics_identity']!=self.physics['identity']:
+                raise ValueError('NATIVE_STATE_PHYSICS_IDENTITY_MISMATCH')
+            spec=mujoco.mjtState.mjSTATE_INTEGRATION
+            saved=np.asarray(point['integration_state'],dtype=float)
+            if (point['state_spec']!=int(spec) or saved.shape!=(mujoco.mj_stateSize(m,spec),)
+                    or not np.isfinite(saved).all()):raise ValueError('COMPLETE_FINITE_NATIVE_INTEGRATION_STATE_REQUIRED')
+            mujoco.mj_setState(m,d,saved,spec)
+            if (abs(d.time-point['actual_time_s'])>1e-12 or
+                    not np.array_equal(d.qpos[self.qi],point['qpos_rad']) or
+                    not np.array_equal(d.qvel[self.vi],point['qvel_rad_s'])):
+                raise ValueError('NATIVE_STATE_TIME_OR_COORDINATE_MISMATCH')
+        self.forward(d)
+        if np.any(d.qfrc_applied) or np.any(d.xfrc_applied):raise ValueError('NATIVE_V1_APPLIED_EXTERNAL_FORCES_UNSUPPORTED')
+        return d
+
+    def reconstruct(self, point):
+        """Verify the saved prefix once and retain complete engine integration state."""
+        scene=point['native_replay']['scene'];d=mujoco.MjData(self.model)
+        if point['physics_identity']!=self.physics['identity']:raise ValueError('NATIVE_REPLAY_PHYSICS_MISMATCH')
+        d.qpos[self.qi]=scene['qpos_rad'];d.qvel[self.vi]=scene['qvel_rad_s']
+        worst=0.
+        for row in point['native_replay']['rows']:
+            self.apply(d,row['tension_n'])
+            for _ in range(round(scene['control_period_s']/self.model.opt.timestep)):
+                previous=float(d.time);mujoco.mj_step(self.model,d);self.cost['physics_steps']+=1
+                if _mujoco_state_failed(d,previous):raise ValueError('NATIVE_PREFIX_NUMERICAL_FAILURE')
+            self.forward(d);motion,_=self.motion(d)
+            differences=[abs(d.time-row['time_s']),*abs(d.qpos[self.qi]-row['qpos_rad']),*abs(d.qvel[self.vi]-row['qvel_rad_s']),
+                *abs(np.asarray(motion['tip_position_m'])-row['tip_m'])]
+            worst=max(worst,max(differences))
+            if worst>1e-10:raise ValueError('NATIVE_PREFIX_DOES_NOT_REPRODUCE_SAVED_EXECUTION')
+        saved=self.checkpoint(d)
+        saved.update(candidate=point['candidate'],configuration_identity=point['configuration_identity'],u=point['u'],
+            provenance=point['provenance'],prefix_verification=dict(samples=len(point['native_replay']['rows']),max_absolute_difference=worst))
+        return saved,d
+
+    def checkpoint(self, d):
+        spec=mujoco.mjtState.mjSTATE_INTEGRATION
+        saved=np.empty(mujoco.mj_stateSize(self.model,spec));mujoco.mj_getState(self.model,d,saved,spec)
+        return dict(physics_identity=self.physics['identity'],dof_order=self.order,tendon_order=self.tendons,
+            state_spec=int(spec),integration_state=saved.tolist(),qpos_rad=d.qpos[self.qi].tolist(),
+            qvel_rad_s=d.qvel[self.vi].tolist(),actual_time_s=float(d.time),
+            phase='interval_start_native',input_units='N',u=d.ctrl[self.aids].tolist())
+
+    def apply(self, d, u):
+        u=np.asarray(u,dtype=float)
+        if u.shape!=(len(self.aids),) or not np.isfinite(u).all() or np.any(u<self.limits[:,0]) or np.any(u>self.limits[:,1]):
+            raise ValueError('LEGAL_ABSOLUTE_NATIVE_TENSIONS_REQUIRED')
+        d.ctrl[self.aids]=u;self.forward(d)
+        actual=-d.actuator_force[self.aids].copy()
+        if not np.allclose(actual,u,atol=1e-10,rtol=0):raise ValueError('NATIVE_ACTUAL_TENSION_MISMATCH')
+        return actual
+
+    def motion(self, d):
+        jac=np.zeros((3,self.model.nv));mujoco.mj_jacSite(self.model,d,jac,None,self.tip)
+        return dict(time_s=float(d.time),tip_position_m=d.site_xpos[self.tip].tolist(),
+            tip_velocity_m_s=(jac@d.qvel).tolist()),jac
+
+    def mechanics(self, d, u):
+        m=self.model;self.apply(d,u);self.cost['mechanics_evaluations']+=1
+        mass=np.empty((m.nv,m.nv));mujoco.mj_fullM(m,d,mass)
+        motion,jac=self.motion(d);jdot=np.zeros_like(jac)
+        mujoco.mj_jacDot(m,d,jdot,None,d.site_xpos[self.tip],m.site_bodyid[self.tip])
+        zero=mujoco.MjData(m);mujoco.mj_copyData(zero,m,d);zero.qvel[:]=0;self.forward(zero)
+        moments=np.zeros((m.nu,m.nv))
+        mujoco.mju_sparse2dense(moments,d.actuator_moment,d.moment_rownnz,d.moment_rowadr,d.moment_colind)
+        mapping=-moments[self.aids].T
+        response=np.empty((len(self.aids),m.nv));mujoco.mj_solveM(m,d,response,mapping.T.copy())
+        passive=np.empty((1,m.nv));mujoco.mj_solveM(m,d,passive,d.qfrc_passive[None,:].copy())
+        tendon_jac=np.zeros((m.ntendon,m.nv))
+        mujoco.mju_sparse2dense(tendon_jac,d.ten_J,m.ten_J_rownnz,m.ten_J_rowadr,m.ten_J_colind)
+        balance=mass@d.qacc-d.qfrc_smooth-d.qfrc_constraint
+        acceleration=jac@d.qacc+jdot@d.qvel;drive=jac@response.T;v=np.asarray(motion['tip_velocity_m_s'])
+        speed=float(np.linalg.norm(v))
+        return dict(**motion,mass_matrix_kg_m2=mass[np.ix_(self.vi,self.vi)].tolist(),qacc_rad_s2=d.qacc[self.vi].tolist(),
+            generalized_forces_nm={key:getattr(d,'qfrc_'+key)[self.vi].tolist() for key in
+                ('bias','passive','spring','damper','actuator','applied','constraint','smooth')},
+            gravity_bias_nm=zero.qfrc_bias[self.vi].tolist(),
+            velocity_bias_nm=(d.qfrc_bias-zero.qfrc_bias)[self.vi].tolist(),
+            tip_jacobian_m_rad=jac[:,self.vi].tolist(),tip_acceleration_m_s2=acceleration.tolist(),
+            tendon_lengths_m=d.ten_length[self.tids].tolist(),tendon_jacobian_m_rad=tendon_jac[self.tids][:,self.vi].tolist(),
+            input_force_map_nm_n=mapping[self.vi].tolist(),
+            tip_acceleration_input_map_m_s2_n=drive.tolist(),
+            passive_tip_acceleration_contribution_m_s2=(jac@passive[0]).tolist(),
+            function_metrics=dict(drive_singular_values_m_s2_n=np.linalg.svd(drive,compute_uv=False).tolist(),
+                speed_derivative_m_s2=float(v@acceleration/speed) if speed>0 else None,
+                speed_derivative_input_map_m_s2_n=(v@drive/speed).tolist() if speed>0 else None),
+            mass_balance_residual_inf_nm=float(np.max(abs(balance))),
+            mass_condition_number=float(np.linalg.cond(mass)),actual_tensions_n=(-d.actuator_force[self.aids]).tolist(),
+            component_order=dict(bodies=[m.body(i).name for i in range(m.nbody)],joints=[m.joint(i).name for i in range(m.njnt)]),
+            components=dict(body_mass_kg=m.body_mass.tolist(),body_inertia_kg_m2=m.body_inertia.tolist(),
+                joint_stiffness_nm_rad=m.jnt_stiffness.tolist(),damping_nm_s_rad=m.dof_damping.tolist(),
+                body_positions_m=m.body_pos.tolist(),site_positions_m=m.site_pos.tolist()))
+
+    def rollout(self, start, u, horizon):
+        m=self.model;steps=round(horizon/m.opt.timestep)
+        if steps<1 or abs(steps*m.opt.timestep-horizon)>1e-12:raise ValueError('NATIVE_ALIGNED_HORIZON_REQUIRED')
+        d=mujoco.MjData(m);mujoco.mj_copyData(d,m,start);actual=self.apply(d,u)
+        self.cost['rollouts']+=1
+        for _ in range(steps):
+            previous=float(d.time);mujoco.mj_step(m,d);self.cost['physics_steps']+=1
+            if _mujoco_state_failed(d,previous):raise ValueError('NATIVE_SHORT_ROLLOUT_NUMERICAL_FAILURE')
+        self.forward(d);motion,_=self.motion(d)
+        return dict(**motion,actual_tensions_n=actual.tolist(),qpos_rad=d.qpos[self.qi].tolist(),qvel_rad_s=d.qvel[self.vi].tolist())
+
+
+def input_response(native, start, u, options):
+    """Two actual-input step sizes; central where legal, otherwise one-sided."""
+    u=np.asarray(u);base=native.rollout(start,u,options.horizon_s)
+    def output(row):return np.r_[row['tip_position_m'],row['tip_velocity_m_s']]
+    y=output(base);matrices=[];probes=[]
+    for h in (options.difference_step_n,options.difference_step_n/2):
+        cols=[]
+        for j in range(len(u)):
+            lo,hi=native.limits[j];minus=u.copy();plus=u.copy()
+            if u[j]-h>=lo and u[j]+h<=hi:minus[j]-=h;plus[j]+=h
+            elif hi-u[j]>=u[j]-lo:plus[j]=min(hi,u[j]+h)
+            else:minus[j]=max(lo,u[j]-h)
+            left=base if np.array_equal(minus,u) else native.rollout(start,minus,options.horizon_s)
+            right=base if np.array_equal(plus,u) else native.rollout(start,plus,options.horizon_s)
+            delta=right['actual_tensions_n'][j]-left['actual_tensions_n'][j]
+            cols.append((output(right)-output(left))/delta)
+            probes.append(dict(channel=native.tendons[j],requested_step_n=h,actual_denominator_n=delta,
+                scheme='central' if minus[j]<u[j]<plus[j] else 'one_sided',minus=left,plus=right))
+        matrices.append(np.column_stack(cols))
+    # Position and velocity have different units, so assess each block separately.
+    errors={key:float(np.linalg.norm((matrices[1]-matrices[0])[sl])/max(np.linalg.norm(matrices[1][sl]),1e-15))
+        for key,sl in [('position',slice(0,3)),('velocity',slice(3,6))]}
+    return dict(baseline=base,position_input_jacobian_m_n=matrices[1][:3].tolist(),
+        velocity_input_jacobian_m_s_n=matrices[1][3:].tolist(),coarse_response=matrices[0].tolist(),
+        step_consistency_relative=errors,step_consistency_passed=max(errors.values())<.05,
+        probes=probes,scope='Local fixed-state, fixed-horizon, absolute legal tensions; two FD sizes are not a regional error bound.')
+
+
+def calculate(configuration, point, options, operation, comparisons=None):
+    """Full numerical evidence plus costs. Research/task semantics stay outside."""
+    started=time.perf_counter();native=NativeModel(configuration)
+    point,start=native.reconstruct(point) if point.get('native_replay') else (point,native.restore(point))
+    u=point['u'] if options.tensions_n is None else options.tensions_n
+    mechanics=native.mechanics(start,u)
+    raw=dict(initial_state=point,mechanics=mechanics,physics_identity=native.physics['identity'],
+        physical_scene_identity=native.scene['identity'],
+        representation='native named MuJoCo hinges; world tip; ideal absolute SI tensions',
+        runtime=dict(mujoco=mujoco.__version__,timestep_s=native.model.opt.timestep,integrator=int(native.model.opt.integrator)),
+        state_comparison='Exact integration checkpoint')
+    if operation=='short_input_response_v1':raw['input_response']=input_response(native,start,u,options)
+    if operation=='fixed_input_structure_v1':
+        # Identical named qpos/qvel, reset warmstart/ctrl/applied forces in ALL models.
+        start=native.restore(point,comparable=True)
+        base=dict(mechanics=native.mechanics(start,u),terminal=native.rollout(start,u,options.horizon_s))
+        raw.update(structure_baseline=base,structure_responses=[],state_comparison='Same named qpos/qvel and absolute input; reset solver history in all models; not equal equilibrium or energy')
+        for comparison in comparisons:
+            other=NativeModel(comparison['configuration']);data=other.restore(point,comparable=True)
+            changed=dict(mechanics=other.mechanics(data,u),terminal=other.rollout(data,u,options.horizon_s))
+            raw['structure_responses'].append(dict(**{k:v for k,v in comparison.items() if k!='configuration'},
+                physics_identity=other.physics['identity'],**changed))
+            for key,value in other.cost.items():native.cost[key]+=value
+    raw['cost']=dict(**native.cost,kernel_wall_s=time.perf_counter()-started)
+    return raw,native,start

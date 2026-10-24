@@ -938,6 +938,8 @@ def mathematical_decision_view(card):
             if not capability or capability.get('method_version') or q['name'] in ('best_found_violation','optimal_task_violation')],
         capability=compact,unresolved=summary.get('decision_relevance'))
     if summary.get('optimal_sensitivity'):result['optimal_sensitivity']=summary['optimal_sensitivity']
+    if summary.get('native_analysis'):
+        result['native_analysis']={k:v for k,v in summary['native_analysis'].items() if k!='quantities'}
     if summary.get('recorded_static_construction'):result['recorded_static_construction']=summary['recorded_static_construction']
     if summary.get('optimal_sensitivity') or (capability and capability.get('method_version')):
         result['cost']=dict(evaluations=summary.get('evaluations'),numerical_s=summary.get('numerical_s'),

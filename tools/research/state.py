@@ -59,6 +59,7 @@ SCIENCE_FILES += ['extensions/optimization/contracts.py','extensions/optimizatio
 SCIENCE_FILES += ['extensions/math_analysis/trajectory.py','extensions/math_analysis/task_capability.py','tools/research/capability.py']
 SCIENCE_FILES += ['extensions/math_analysis/conic_capability.py','extensions/math_analysis/capability_sensitivity.py']
 SCIENCE_FILES += ['extensions/tendon_family/family_space.py']
+SCIENCE_FILES += ['extensions/tendon_family/mujoco_analysis.py']
 SCIENCE_FILES += ['tools/rl/'+name+'.py' for name in ('env','train','checks','continuation')]
 CORE_FILES = ['tools/research/'+p.name for p in (ROOT/'tools/research').glob('*.py')]
 CORE_FILES += ['tools/service_execution.py','tools/rl/env.py','tools/rl/run.py','tools/rl/train.py','tools/rl/checks.py','tools/rl/continuation.py']
