@@ -1,0 +1,2710 @@
+{
+  "source_execution": {
+    "artifact_id": "a54a68d40c9b65f32aa6b75422ce2db5e9c2afa6aa914fe577db0fc93ce1ea1b",
+    "media_type": "application/json"
+  },
+  "source_candidate": {
+    "artifact_id": "dbb5a00a98ed74adf0aa42f571534421902536203c57d2bdbd47038fe1e67baf",
+    "media_type": "application/json"
+  },
+  "candidate": {
+    "artifact_id": "51b436890701c5a45482d19ace4c85f98d1aa2e56894c1fd03f0edfc28f92368",
+    "media_type": "application/json"
+  },
+  "store": "D:\\softrobot-agent\\.worktrees\\mujoco-native-math-stage-a\\runs\\mujoco-native-stage-a\\store",
+  "source_store_unchanged": true,
+  "source_store_counts": {
+    "events": 478,
+    "artifacts": 532,
+    "calls": 73
+  },
+  "source_store_size_mtime": [
+    280825856,
+    1792767553286817900
+  ],
+  "reproduction": {
+    "qpos_rad": 0.0,
+    "qvel_rad_s": 0.0,
+    "tip_position_m": 0.0,
+    "tip_velocity_m_s": 5.204170427930421e-18
+  },
+  "checkpoint_preparation_cost": {
+    "model_builds": 1,
+    "forward_evaluations": 1,
+    "physics_steps": 0,
+    "rollouts": 0,
+    "mechanics_evaluations": 0
+  },
+  "results": {
+    "mechanics": {
+      "reference": {
+        "artifact_id": "1622aeac6f4b05e96dd7d0b150e5181481a95bfcd1ae1c1988304b7c5128d182",
+        "media_type": "application/json"
+      },
+      "summary": {
+        "basis": {
+          "channels": [
+            "near_t0",
+            "near_t1",
+            "near_t2",
+            "far_t0",
+            "far_t1",
+            "far_t2"
+          ],
+          "comparison": "Exact integration checkpoint",
+          "horizon_s": 0.0,
+          "model": "model.mujoco_native@1.0.0",
+          "state_time_s": 0.34000000000000025,
+          "tensions_n": [
+            6.9843032806247285,
+            7.922288456928409,
+            4.393994441095732,
+            4.198743008252228,
+            3.3438421638719085,
+            3.1510466263082506
+          ]
+        },
+        "cost": {
+          "forward_evaluations": 3,
+          "kernel_wall_s": 0.02934340000138036,
+          "mechanics_evaluations": 1,
+          "model_builds": 1,
+          "physics_steps": 0,
+          "rollouts": 0
+        },
+        "detail_pointer": "/native_dynamics",
+        "interpretation": "Engine mass/bias/passive/actuator forces, named tip and tendon Jacobians; gravity bias is obtained with zero velocity.",
+        "limitations": [
+          "Local floating-point native dynamics; no continuous affine model or conic/envelope claim."
+        ],
+        "quantities": [
+          {
+            "name": "native_mass_balance_residual",
+            "source_pointer": "/native_dynamics/mechanics/mass_balance_residual_inf_nm",
+            "unit": "N*m",
+            "value": 1.4779844015322396e-14
+          },
+          {
+            "name": "native_tip_speed",
+            "source_pointer": "/native_dynamics/mechanics/tip_speed_m_s",
+            "unit": "m/s",
+            "value": 0.009927943990366828
+          },
+          {
+            "name": "tip_acceleration",
+            "value": [
+              -13.919252358209988,
+              2.98825984800355,
+              -0.6632926133538268
+            ],
+            "unit": "m/s^2",
+            "source_pointer": "/native_dynamics/mechanics/tip_acceleration_m_s2"
+          },
+          {
+            "name": "local_drive_singular_values",
+            "value": [
+              171.7010024582886,
+              130.408396903972,
+              17.63850246458806
+            ],
+            "unit": "m/(s^2*N)",
+            "source_pointer": "/native_dynamics/mechanics/function_metrics/drive_singular_values_m_s2_n"
+          },
+          {
+            "name": "passive_acceleration_contribution",
+            "value": [
+              212.815534839262,
+              -1.2423830487168743,
+              -79.3642468292528
+            ],
+            "unit": "m/s^2",
+            "source_pointer": "/native_dynamics/mechanics/passive_tip_acceleration_contribution_m_s2"
+          }
+        ],
+        "question": "Which native forces and drive directions determine acceleration at this state?",
+        "unresolved": [
+          "No whole-task acceptance, reoptimized structural capability, regional bound or global infeasibility established."
+        ]
+      }
+    },
+    "input": {
+      "reference": {
+        "artifact_id": "52e0b3dbb4fa611d492e7ddd25cb078f73878e77430f73efedf6f70380dde4c6",
+        "media_type": "application/json"
+      },
+      "summary": {
+        "basis": {
+          "channels": [
+            "near_t0",
+            "near_t1",
+            "near_t2",
+            "far_t0",
+            "far_t1",
+            "far_t2"
+          ],
+          "comparison": "Exact integration checkpoint",
+          "horizon_s": 0.01,
+          "model": "model.mujoco_native@1.0.0",
+          "state_time_s": 0.34000000000000025,
+          "tensions_n": [
+            6.9843032806247285,
+            7.922288456928409,
+            4.393994441095732,
+            4.198743008252228,
+            3.3438421638719085,
+            3.1510466263082506
+          ]
+        },
+        "cost": {
+          "forward_evaluations": 53,
+          "kernel_wall_s": 0.0629862999994657,
+          "mechanics_evaluations": 1,
+          "model_builds": 1,
+          "physics_steps": 500,
+          "rollouts": 25
+        },
+        "detail_pointer": "/native_dynamics",
+        "interpretation": "Six-channel local position/velocity response uses actual legal tensions, central or one-sided FD and two step sizes.",
+        "limitations": [
+          "Local floating-point native dynamics; no continuous affine model or conic/envelope claim."
+        ],
+        "quantities": [
+          {
+            "name": "native_mass_balance_residual",
+            "source_pointer": "/native_dynamics/mechanics/mass_balance_residual_inf_nm",
+            "unit": "N*m",
+            "value": 1.4779844015322396e-14
+          },
+          {
+            "name": "native_tip_speed",
+            "source_pointer": "/native_dynamics/mechanics/tip_speed_m_s",
+            "unit": "m/s",
+            "value": 0.009927943990366828
+          },
+          {
+            "name": "baseline_short_endpoint_speed",
+            "source_pointer": "/native_dynamics/input_response/baseline/speed_m_s",
+            "unit": "m/s",
+            "value": 0.022849089710631265
+          },
+          {
+            "name": "position_step_relative_change",
+            "source_pointer": "/native_dynamics/input_response/step_consistency_relative/position",
+            "unit": "1",
+            "value": 0.00010258142151010156
+          },
+          {
+            "name": "velocity_step_relative_change",
+            "source_pointer": "/native_dynamics/input_response/step_consistency_relative/velocity",
+            "unit": "1",
+            "value": 0.00014100957333545644
+          },
+          {
+            "name": "corrected_short_endpoint_speed",
+            "source_pointer": "/native_dynamics/input_response/correction/terminal/speed_m_s",
+            "unit": "m/s",
+            "value": 0.020000528285067452
+          }
+        ],
+        "question": "How do legal tensions affect the short endpoint, and does one local correction improve its constraints?",
+        "unresolved": [
+          "No whole-task acceptance, reoptimized structural capability, regional bound or global infeasibility established."
+        ],
+        "short_endpoint_tasks": {
+          "baseline": [
+            {
+              "constraint_id": "terminal_error_m",
+              "value": 0.0031364418844500026,
+              "units": "m",
+              "limit": 0.01,
+              "margin": 0.006863558115549997,
+              "source_pointer": "/native_dynamics/input_response/task_proxy/0"
+            },
+            {
+              "constraint_id": "holding_max_speed_m_s",
+              "value": 0.022849089710631265,
+              "units": "m/s",
+              "limit": 0.02,
+              "margin": -0.0028490897106312647,
+              "source_pointer": "/native_dynamics/input_response/task_proxy/2"
+            }
+          ],
+          "corrected": [
+            {
+              "constraint_id": "terminal_error_m",
+              "value": 0.003118858278196932,
+              "units": "m",
+              "limit": 0.01,
+              "margin": 0.006881141721803068,
+              "source_pointer": "/native_dynamics/input_response/correction/task_proxy/0"
+            },
+            {
+              "constraint_id": "holding_max_speed_m_s",
+              "value": 0.020000528285067452,
+              "units": "m/s",
+              "limit": 0.02,
+              "margin": -5.282850674519224e-07,
+              "source_pointer": "/native_dynamics/input_response/correction/task_proxy/2"
+            }
+          ]
+        }
+      }
+    },
+    "young": {
+      "reference": {
+        "artifact_id": "8216c8c05be9280320271ec5145425bca19ae5ab180ad7aa56bdfd8d631cc540",
+        "media_type": "application/json"
+      },
+      "summary": {
+        "basis": {
+          "channels": [
+            "near_t0",
+            "near_t1",
+            "near_t2",
+            "far_t0",
+            "far_t1",
+            "far_t2"
+          ],
+          "comparison": "Same named qpos/qvel and absolute input; reset solver history in all models; not equal equilibrium or energy",
+          "horizon_s": 0.01,
+          "model": "model.mujoco_native@1.0.0",
+          "state_time_s": 0.34000000000000025,
+          "tensions_n": [
+            6.9843032806247285,
+            7.922288456928409,
+            4.393994441095732,
+            4.198743008252228,
+            3.3438421638719085,
+            3.1510466263082506
+          ]
+        },
+        "cost": {
+          "forward_evaluations": 18,
+          "kernel_wall_s": 0.1032868000002054,
+          "mechanics_evaluations": 4,
+          "model_builds": 3,
+          "physics_steps": 60,
+          "rollouts": 3
+        },
+        "detail_pointer": "/native_dynamics",
+        "interpretation": "Recompiled legal candidates at identical named qpos/qvel and fixed absolute tensions. Measured mass, stiffness, passive, geometry and drive changes are recorded separately.",
+        "limitations": [
+          "Local floating-point native dynamics; no continuous affine model or conic/envelope claim."
+        ],
+        "quantities": [
+          {
+            "name": "native_mass_balance_residual",
+            "source_pointer": "/native_dynamics/mechanics/mass_balance_residual_inf_nm",
+            "unit": "N*m",
+            "value": 1.4779844015322396e-14
+          },
+          {
+            "name": "native_tip_speed",
+            "source_pointer": "/native_dynamics/mechanics/tip_speed_m_s",
+            "unit": "m/s",
+            "value": 0.009927943990366828
+          },
+          {
+            "name": "mass_relative_change",
+            "source_pointer": "/native_dynamics/structure_responses/0/mechanism_changes/mass_matrix_kg_m2/relative_change",
+            "unit": "1",
+            "value": 0.0
+          },
+          {
+            "name": "drive_authority_relative_change",
+            "source_pointer": "/native_dynamics/structure_responses/0/mechanism_changes/tip_acceleration_input_map_m_s2_n/relative_change",
+            "unit": "1",
+            "value": 0.0
+          },
+          {
+            "name": "passive_response_relative_change",
+            "source_pointer": "/native_dynamics/structure_responses/0/mechanism_changes/passive_tip_acceleration_contribution_m_s2/relative_change",
+            "unit": "1",
+            "value": 0.007095666373929202
+          },
+          {
+            "name": "structure_endpoint_speed_change",
+            "source_pointer": "/native_dynamics/structure_responses/0/endpoint_speed_change_m_s",
+            "unit": "m/s",
+            "value": 0.0006268484423535663
+          }
+        ],
+        "question": "How does a legal parameter change mechanics, function and short endpoint constraints at fixed input?",
+        "unresolved": [
+          "No whole-task acceptance, reoptimized structural capability, regional bound or global infeasibility established.",
+          "Matched coordinates do not imply matched equilibria or energy; secants concern fixed input, not optimal task capability."
+        ],
+        "short_endpoint_tasks": {
+          "baseline": [
+            {
+              "constraint_id": "terminal_error_m",
+              "value": 0.0031364418844500026,
+              "units": "m",
+              "limit": 0.01,
+              "margin": 0.006863558115549997,
+              "source_pointer": "/native_dynamics/structure_baseline/task_proxy/0"
+            },
+            {
+              "constraint_id": "holding_max_speed_m_s",
+              "value": 0.022849089710631265,
+              "units": "m/s",
+              "limit": 0.02,
+              "margin": -0.0028490897106312647,
+              "source_pointer": "/native_dynamics/structure_baseline/task_proxy/2"
+            }
+          ],
+          "comparisons": [
+            {
+              "variable": "segments.distal1.young_pa",
+              "base_value": 6209999.0,
+              "value": 6147899.01,
+              "delta": -62099.99000000022,
+              "candidate": {
+                "artifact_id": "2b3a2b68e67112ffe06102314179af2e1f0bcb8262e5eb251e162d4146dca690",
+                "media_type": "application/json"
+              },
+              "constraints": [
+                {
+                  "constraint_id": "terminal_error_m",
+                  "value": 0.0031420345196213964,
+                  "units": "m",
+                  "limit": 0.01,
+                  "margin": 0.006857965480378604,
+                  "source_pointer": "/native_dynamics/structure_responses/0/task_proxy/0"
+                },
+                {
+                  "constraint_id": "holding_max_speed_m_s",
+                  "value": 0.02347593815298483,
+                  "units": "m/s",
+                  "limit": 0.02,
+                  "margin": -0.003475938152984831,
+                  "source_pointer": "/native_dynamics/structure_responses/0/task_proxy/2"
+                }
+              ]
+            },
+            {
+              "variable": "segments.distal1.young_pa",
+              "base_value": 6209999.0,
+              "value": 6178949.005,
+              "delta": -31049.99500000011,
+              "candidate": {
+                "artifact_id": "2e4abcc144fa71bd2965de857ca851374984b349a05234ca0b921c90a42fcdd9",
+                "media_type": "application/json"
+              },
+              "constraints": [
+                {
+                  "constraint_id": "terminal_error_m",
+                  "value": 0.003139237427231419,
+                  "units": "m",
+                  "limit": 0.01,
+                  "margin": 0.006860762572768581,
+                  "source_pointer": "/native_dynamics/structure_responses/1/task_proxy/0"
+                },
+                {
+                  "constraint_id": "holding_max_speed_m_s",
+                  "value": 0.023160618460645536,
+                  "units": "m/s",
+                  "limit": 0.02,
+                  "margin": -0.003160618460645536,
+                  "source_pointer": "/native_dynamics/structure_responses/1/task_proxy/2"
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "section": {
+      "reference": {
+        "artifact_id": "39371e27a42ff1ebbc62c5ac26aba9ce2f1482bcee825f1349e00fda3331cd58",
+        "media_type": "application/json"
+      },
+      "summary": {
+        "basis": {
+          "channels": [
+            "near_t0",
+            "near_t1",
+            "near_t2",
+            "far_t0",
+            "far_t1",
+            "far_t2"
+          ],
+          "comparison": "Same named qpos/qvel and absolute input; reset solver history in all models; not equal equilibrium or energy",
+          "horizon_s": 0.01,
+          "model": "model.mujoco_native@1.0.0",
+          "state_time_s": 0.34000000000000025,
+          "tensions_n": [
+            6.9843032806247285,
+            7.922288456928409,
+            4.393994441095732,
+            4.198743008252228,
+            3.3438421638719085,
+            3.1510466263082506
+          ]
+        },
+        "cost": {
+          "forward_evaluations": 13,
+          "kernel_wall_s": 0.07844649999969988,
+          "mechanics_evaluations": 3,
+          "model_builds": 2,
+          "physics_steps": 40,
+          "rollouts": 2
+        },
+        "detail_pointer": "/native_dynamics",
+        "interpretation": "Recompiled legal candidates at identical named qpos/qvel and fixed absolute tensions. Measured mass, stiffness, passive, geometry and drive changes are recorded separately.",
+        "limitations": [
+          "Local floating-point native dynamics; no continuous affine model or conic/envelope claim."
+        ],
+        "quantities": [
+          {
+            "name": "native_mass_balance_residual",
+            "source_pointer": "/native_dynamics/mechanics/mass_balance_residual_inf_nm",
+            "unit": "N*m",
+            "value": 1.4779844015322396e-14
+          },
+          {
+            "name": "native_tip_speed",
+            "source_pointer": "/native_dynamics/mechanics/tip_speed_m_s",
+            "unit": "m/s",
+            "value": 0.009927943990366828
+          },
+          {
+            "name": "mass_relative_change",
+            "source_pointer": "/native_dynamics/structure_responses/0/mechanism_changes/mass_matrix_kg_m2/relative_change",
+            "unit": "1",
+            "value": 0.0014824439949745432
+          },
+          {
+            "name": "drive_authority_relative_change",
+            "source_pointer": "/native_dynamics/structure_responses/0/mechanism_changes/tip_acceleration_input_map_m_s2_n/relative_change",
+            "unit": "1",
+            "value": 0.0002278071222024984
+          },
+          {
+            "name": "passive_response_relative_change",
+            "source_pointer": "/native_dynamics/structure_responses/0/mechanism_changes/passive_tip_acceleration_contribution_m_s2/relative_change",
+            "unit": "1",
+            "value": 0.0018052585418678836
+          },
+          {
+            "name": "structure_endpoint_speed_change",
+            "source_pointer": "/native_dynamics/structure_responses/0/endpoint_speed_change_m_s",
+            "unit": "m/s",
+            "value": -0.0006978547228090153
+          }
+        ],
+        "question": "How does a legal parameter change mechanics, function and short endpoint constraints at fixed input?",
+        "unresolved": [
+          "No whole-task acceptance, reoptimized structural capability, regional bound or global infeasibility established.",
+          "Matched coordinates do not imply matched equilibria or energy; secants concern fixed input, not optimal task capability."
+        ],
+        "short_endpoint_tasks": {
+          "baseline": [
+            {
+              "constraint_id": "terminal_error_m",
+              "value": 0.0031364418844500026,
+              "units": "m",
+              "limit": 0.01,
+              "margin": 0.006863558115549997,
+              "source_pointer": "/native_dynamics/structure_baseline/task_proxy/0"
+            },
+            {
+              "constraint_id": "holding_max_speed_m_s",
+              "value": 0.022849089710631265,
+              "units": "m/s",
+              "limit": 0.02,
+              "margin": -0.0028490897106312647,
+              "source_pointer": "/native_dynamics/structure_baseline/task_proxy/2"
+            }
+          ],
+          "comparisons": [
+            {
+              "variable": "segments.distal1.sections.0.height_z_m",
+              "base_value": 0.0095,
+              "value": 0.009595,
+              "delta": 9.49999999999996e-05,
+              "candidate": {
+                "artifact_id": "7089f8851c170c8a5b566939ee05323e933ae869e9410bd3e6ae5a6d47c99637",
+                "media_type": "application/json"
+              },
+              "constraints": [
+                {
+                  "constraint_id": "terminal_error_m",
+                  "value": 0.0031311028688488993,
+                  "units": "m",
+                  "limit": 0.01,
+                  "margin": 0.006868897131151101,
+                  "source_pointer": "/native_dynamics/structure_responses/0/task_proxy/0"
+                },
+                {
+                  "constraint_id": "holding_max_speed_m_s",
+                  "value": 0.02215123498782225,
+                  "units": "m/s",
+                  "limit": 0.02,
+                  "margin": -0.0021512349878222495,
+                  "source_pointer": "/native_dynamics/structure_responses/0/task_proxy/2"
+                }
+              ]
+            }
+          ]
+        }
+      }
+    }
+  },
+  "mathematical_evaluations": 8,
+  "store_budget": {
+    "limit": {
+      "backend_solves": 0,
+      "model_calls": 0,
+      "tool_calls": 40,
+      "wall_s": null,
+      "worker_calls": 0
+    },
+    "used": {
+      "tool_calls": 5,
+      "model_calls": 0,
+      "backend_solves": 0,
+      "worker_calls": 0,
+      "wall_s": 5.179093899998406
+    },
+    "remaining": {
+      "backend_solves": 0,
+      "model_calls": 0,
+      "tool_calls": 35,
+      "wall_s": null,
+      "worker_calls": 0
+    },
+    "occupied": {}
+  },
+  "failed_results": [
+    {
+      "artifact_id": "8a33da9431ddcaf3f23547194b0c0444a7f38c317f6fb84d2c86ba3ecc6d7afd",
+      "media_type": "application/json"
+    }
+  ],
+  "receipt_reuse": {
+    "additional_numerical_s": 0,
+    "additional_analysis_evaluations": 0
+  },
+  "decision_views": {
+    "mechanics": {
+      "claim_source": {
+        "reference": {
+          "artifact_id": "1622aeac6f4b05e96dd7d0b150e5181481a95bfcd1ae1c1988304b7c5128d182",
+          "media_type": "application/json"
+        },
+        "pointer": "/scoped_claim"
+      },
+      "requirement_source": {
+        "reference": {
+          "artifact_id": "1622aeac6f4b05e96dd7d0b150e5181481a95bfcd1ae1c1988304b7c5128d182",
+          "media_type": "application/json"
+        },
+        "pointer": "/task_analysis"
+      },
+      "problem_definition": {
+        "reference": {
+          "artifact_id": "1622aeac6f4b05e96dd7d0b150e5181481a95bfcd1ae1c1988304b7c5128d182",
+          "media_type": "application/json"
+        },
+        "pointer": "/native_analysis/basis"
+      },
+      "scope": {
+        "model_declaration": {
+          "model_id": "model.mujoco_native",
+          "model_version": "1.0.0",
+          "relevant_assumptions": [
+            "MuJoCo compiled family model; no GVS projection; ideal absolute tensions.",
+            "Contact-free, unconstrained hinges without activation dynamics; runtime checked.",
+            "Short fixed-input numerical responses; no optimal-value or KKT interpretation."
+          ],
+          "representation_id": "native_named_hinges_v1"
+        },
+        "computation_status": "computed",
+        "verification_status": "native_numerical_checks",
+        "supported_interpretation": "Native fixed-state mechanics and short fixed-input responses only; not a full-task witness or reoptimized structural capability.",
+        "unsupported_conclusions": [
+          "task acceptance",
+          "whole holding-window compliance",
+          "global nonlinear feasibility or infeasibility",
+          "hardware performance",
+          "robustness",
+          "repeatability",
+          "equilibrium validity at a non-equilibrium point"
+        ],
+        "horizon": {
+          "analysis_horizon_s": 0.0,
+          "interpretation": "Native instant or fixed-input short endpoint; no frozen full-task acceptance.",
+          "origin": 0.34000000000000025,
+          "period_s": 0.01,
+          "remaining_task_s": 0.009999999999999731,
+          "task_duration_s": 0.35
+        },
+        "constraint_coverage": [
+          {
+            "constraint_id": "terminal_error_m",
+            "expressible": true,
+            "reason": "Only matched short endpoint proxies; no full task or optimized structural capability.",
+            "status": "diagnostic",
+            "analyzed_indices_count": 0
+          },
+          {
+            "constraint_id": "holding_max_error_m",
+            "expressible": true,
+            "reason": "Only matched short endpoint proxies; no full task or optimized structural capability.",
+            "status": "diagnostic",
+            "analyzed_indices_count": 0
+          },
+          {
+            "constraint_id": "holding_max_speed_m_s",
+            "expressible": true,
+            "reason": "Only matched short endpoint proxies; no full task or optimized structural capability.",
+            "status": "diagnostic",
+            "analyzed_indices_count": 0
+          }
+        ]
+      },
+      "operating_point": {
+        "actual_time_s": 0.34000000000000025,
+        "input_units": "N",
+        "phase": "interval_start_native"
+      },
+      "quantities": [
+        {
+          "name": "native_mass_balance_residual",
+          "status": "unverified_estimate",
+          "value": 1.4779844015322396e-14,
+          "unit": "N*m",
+          "source": {
+            "reference": {
+              "artifact_id": "1622aeac6f4b05e96dd7d0b150e5181481a95bfcd1ae1c1988304b7c5128d182",
+              "media_type": "application/json"
+            },
+            "pointer": "/native_dynamics/mechanics/mass_balance_residual_inf_nm"
+          },
+          "structural_parameters": [],
+          "control_reoptimization": "fixed_control"
+        },
+        {
+          "name": "native_tip_speed",
+          "status": "unverified_estimate",
+          "value": 0.009927943990366828,
+          "unit": "m/s",
+          "source": {
+            "reference": {
+              "artifact_id": "1622aeac6f4b05e96dd7d0b150e5181481a95bfcd1ae1c1988304b7c5128d182",
+              "media_type": "application/json"
+            },
+            "pointer": "/native_dynamics/mechanics/tip_speed_m_s"
+          },
+          "structural_parameters": [],
+          "control_reoptimization": "fixed_control"
+        }
+      ],
+      "capability": null,
+      "unresolved": {
+        "supported_facts": [
+          "Engine mass/bias/passive/actuator forces, named tip and tendon Jacobians; gravity bias is obtained with zero velocity."
+        ],
+        "unresolved_questions": [
+          "No whole-task acceptance, reoptimized structural capability, regional bound or global infeasibility established."
+        ],
+        "potential_discriminating_checks": [
+          "Check task constraints with an applicable operation."
+        ],
+        "unsupported_inferences": [
+          "Global/physical feasibility, structural necessity or surrounding-region exclusion."
+        ]
+      },
+      "native_analysis": {
+        "basis": {
+          "channels": [
+            "near_t0",
+            "near_t1",
+            "near_t2",
+            "far_t0",
+            "far_t1",
+            "far_t2"
+          ],
+          "comparison": "Exact integration checkpoint",
+          "horizon_s": 0.0,
+          "model": "model.mujoco_native@1.0.0",
+          "state_time_s": 0.34000000000000025,
+          "tensions_n": [
+            6.9843032806247285,
+            7.922288456928409,
+            4.393994441095732,
+            4.198743008252228,
+            3.3438421638719085,
+            3.1510466263082506
+          ]
+        },
+        "cost": {
+          "forward_evaluations": 3,
+          "kernel_wall_s": 0.02934340000138036,
+          "mechanics_evaluations": 1,
+          "model_builds": 1,
+          "physics_steps": 0,
+          "rollouts": 0
+        },
+        "detail_pointer": "/native_dynamics",
+        "interpretation": "Engine mass/bias/passive/actuator forces, named tip and tendon Jacobians; gravity bias is obtained with zero velocity.",
+        "limitations": [
+          "Local floating-point native dynamics; no continuous affine model or conic/envelope claim."
+        ],
+        "question": "native_dynamics_v1",
+        "unresolved": [
+          "No whole-task acceptance, reoptimized structural capability, regional bound or global infeasibility established."
+        ]
+      }
+    },
+    "input": {
+      "claim_source": {
+        "reference": {
+          "artifact_id": "52e0b3dbb4fa611d492e7ddd25cb078f73878e77430f73efedf6f70380dde4c6",
+          "media_type": "application/json"
+        },
+        "pointer": "/scoped_claim"
+      },
+      "requirement_source": {
+        "reference": {
+          "artifact_id": "52e0b3dbb4fa611d492e7ddd25cb078f73878e77430f73efedf6f70380dde4c6",
+          "media_type": "application/json"
+        },
+        "pointer": "/task_analysis"
+      },
+      "problem_definition": {
+        "reference": {
+          "artifact_id": "52e0b3dbb4fa611d492e7ddd25cb078f73878e77430f73efedf6f70380dde4c6",
+          "media_type": "application/json"
+        },
+        "pointer": "/native_analysis/basis"
+      },
+      "scope": {
+        "model_declaration": {
+          "model_id": "model.mujoco_native",
+          "model_version": "1.0.0",
+          "relevant_assumptions": [
+            "MuJoCo compiled family model; no GVS projection; ideal absolute tensions.",
+            "Contact-free, unconstrained hinges without activation dynamics; runtime checked.",
+            "Short fixed-input numerical responses; no optimal-value or KKT interpretation."
+          ],
+          "representation_id": "native_named_hinges_v1"
+        },
+        "computation_status": "computed",
+        "verification_status": "native_numerical_checks",
+        "supported_interpretation": "Native fixed-state mechanics and short fixed-input responses only; not a full-task witness or reoptimized structural capability.",
+        "unsupported_conclusions": [
+          "task acceptance",
+          "whole holding-window compliance",
+          "global nonlinear feasibility or infeasibility",
+          "hardware performance",
+          "robustness",
+          "repeatability",
+          "equilibrium validity at a non-equilibrium point"
+        ],
+        "horizon": {
+          "analysis_horizon_s": 0.01,
+          "interpretation": "Native instant or fixed-input short endpoint; no frozen full-task acceptance.",
+          "origin": 0.34000000000000025,
+          "period_s": 0.01,
+          "remaining_task_s": 0.009999999999999731,
+          "task_duration_s": 0.35
+        },
+        "constraint_coverage": [
+          {
+            "constraint_id": "terminal_error_m",
+            "expressible": true,
+            "reason": "Only matched short endpoint proxies; no full task or optimized structural capability.",
+            "status": "diagnostic",
+            "analyzed_indices_count": 0
+          },
+          {
+            "constraint_id": "holding_max_error_m",
+            "expressible": true,
+            "reason": "Only matched short endpoint proxies; no full task or optimized structural capability.",
+            "status": "diagnostic",
+            "analyzed_indices_count": 0
+          },
+          {
+            "constraint_id": "holding_max_speed_m_s",
+            "expressible": true,
+            "reason": "Only matched short endpoint proxies; no full task or optimized structural capability.",
+            "status": "diagnostic",
+            "analyzed_indices_count": 0
+          }
+        ]
+      },
+      "operating_point": {
+        "actual_time_s": 0.34000000000000025,
+        "input_units": "N",
+        "phase": "interval_start_native"
+      },
+      "quantities": [
+        {
+          "name": "native_mass_balance_residual",
+          "status": "unverified_estimate",
+          "value": 1.4779844015322396e-14,
+          "unit": "N*m",
+          "source": {
+            "reference": {
+              "artifact_id": "52e0b3dbb4fa611d492e7ddd25cb078f73878e77430f73efedf6f70380dde4c6",
+              "media_type": "application/json"
+            },
+            "pointer": "/native_dynamics/mechanics/mass_balance_residual_inf_nm"
+          },
+          "structural_parameters": [],
+          "control_reoptimization": "fixed_control"
+        },
+        {
+          "name": "native_tip_speed",
+          "status": "unverified_estimate",
+          "value": 0.009927943990366828,
+          "unit": "m/s",
+          "source": {
+            "reference": {
+              "artifact_id": "52e0b3dbb4fa611d492e7ddd25cb078f73878e77430f73efedf6f70380dde4c6",
+              "media_type": "application/json"
+            },
+            "pointer": "/native_dynamics/mechanics/tip_speed_m_s"
+          },
+          "structural_parameters": [],
+          "control_reoptimization": "fixed_control"
+        },
+        {
+          "name": "baseline_short_endpoint_speed",
+          "status": "unverified_estimate",
+          "value": 0.022849089710631265,
+          "unit": "m/s",
+          "source": {
+            "reference": {
+              "artifact_id": "52e0b3dbb4fa611d492e7ddd25cb078f73878e77430f73efedf6f70380dde4c6",
+              "media_type": "application/json"
+            },
+            "pointer": "/native_dynamics/input_response/baseline/speed_m_s"
+          },
+          "structural_parameters": [],
+          "control_reoptimization": "fixed_control"
+        },
+        {
+          "name": "position_step_relative_change",
+          "status": "unverified_estimate",
+          "value": 0.00010258142151010156,
+          "unit": "1",
+          "source": {
+            "reference": {
+              "artifact_id": "52e0b3dbb4fa611d492e7ddd25cb078f73878e77430f73efedf6f70380dde4c6",
+              "media_type": "application/json"
+            },
+            "pointer": "/native_dynamics/input_response/step_consistency_relative/position"
+          },
+          "structural_parameters": [],
+          "control_reoptimization": "fixed_control"
+        },
+        {
+          "name": "velocity_step_relative_change",
+          "status": "unverified_estimate",
+          "value": 0.00014100957333545644,
+          "unit": "1",
+          "source": {
+            "reference": {
+              "artifact_id": "52e0b3dbb4fa611d492e7ddd25cb078f73878e77430f73efedf6f70380dde4c6",
+              "media_type": "application/json"
+            },
+            "pointer": "/native_dynamics/input_response/step_consistency_relative/velocity"
+          },
+          "structural_parameters": [],
+          "control_reoptimization": "fixed_control"
+        },
+        {
+          "name": "corrected_short_endpoint_speed",
+          "status": "unverified_estimate",
+          "value": 0.020000528285067452,
+          "unit": "m/s",
+          "source": {
+            "reference": {
+              "artifact_id": "52e0b3dbb4fa611d492e7ddd25cb078f73878e77430f73efedf6f70380dde4c6",
+              "media_type": "application/json"
+            },
+            "pointer": "/native_dynamics/input_response/correction/terminal/speed_m_s"
+          },
+          "structural_parameters": [],
+          "control_reoptimization": "fixed_control"
+        }
+      ],
+      "capability": null,
+      "unresolved": {
+        "supported_facts": [
+          "Six-channel local position/velocity response uses actual legal tensions, central or one-sided FD and two step sizes."
+        ],
+        "unresolved_questions": [
+          "No whole-task acceptance, reoptimized structural capability, regional bound or global infeasibility established."
+        ],
+        "potential_discriminating_checks": [
+          "Check task constraints with an applicable operation."
+        ],
+        "unsupported_inferences": [
+          "Global/physical feasibility, structural necessity or surrounding-region exclusion."
+        ]
+      },
+      "native_analysis": {
+        "basis": {
+          "channels": [
+            "near_t0",
+            "near_t1",
+            "near_t2",
+            "far_t0",
+            "far_t1",
+            "far_t2"
+          ],
+          "comparison": "Exact integration checkpoint",
+          "horizon_s": 0.01,
+          "model": "model.mujoco_native@1.0.0",
+          "state_time_s": 0.34000000000000025,
+          "tensions_n": [
+            6.9843032806247285,
+            7.922288456928409,
+            4.393994441095732,
+            4.198743008252228,
+            3.3438421638719085,
+            3.1510466263082506
+          ]
+        },
+        "cost": {
+          "forward_evaluations": 53,
+          "kernel_wall_s": 0.0629862999994657,
+          "mechanics_evaluations": 1,
+          "model_builds": 1,
+          "physics_steps": 500,
+          "rollouts": 25
+        },
+        "detail_pointer": "/native_dynamics",
+        "interpretation": "Six-channel local position/velocity response uses actual legal tensions, central or one-sided FD and two step sizes.",
+        "limitations": [
+          "Local floating-point native dynamics; no continuous affine model or conic/envelope claim."
+        ],
+        "question": "short_input_response_v1",
+        "unresolved": [
+          "No whole-task acceptance, reoptimized structural capability, regional bound or global infeasibility established."
+        ]
+      }
+    },
+    "young": {
+      "claim_source": {
+        "reference": {
+          "artifact_id": "8216c8c05be9280320271ec5145425bca19ae5ab180ad7aa56bdfd8d631cc540",
+          "media_type": "application/json"
+        },
+        "pointer": "/scoped_claim"
+      },
+      "requirement_source": {
+        "reference": {
+          "artifact_id": "8216c8c05be9280320271ec5145425bca19ae5ab180ad7aa56bdfd8d631cc540",
+          "media_type": "application/json"
+        },
+        "pointer": "/task_analysis"
+      },
+      "problem_definition": {
+        "reference": {
+          "artifact_id": "8216c8c05be9280320271ec5145425bca19ae5ab180ad7aa56bdfd8d631cc540",
+          "media_type": "application/json"
+        },
+        "pointer": "/native_analysis/basis"
+      },
+      "scope": {
+        "model_declaration": {
+          "model_id": "model.mujoco_native",
+          "model_version": "1.0.0",
+          "relevant_assumptions": [
+            "MuJoCo compiled family model; no GVS projection; ideal absolute tensions.",
+            "Contact-free, unconstrained hinges without activation dynamics; runtime checked.",
+            "Short fixed-input numerical responses; no optimal-value or KKT interpretation."
+          ],
+          "representation_id": "native_named_hinges_v1"
+        },
+        "computation_status": "computed",
+        "verification_status": "native_numerical_checks",
+        "supported_interpretation": "Native fixed-state mechanics and short fixed-input responses only; not a full-task witness or reoptimized structural capability.",
+        "unsupported_conclusions": [
+          "task acceptance",
+          "whole holding-window compliance",
+          "global nonlinear feasibility or infeasibility",
+          "hardware performance",
+          "robustness",
+          "repeatability",
+          "equilibrium validity at a non-equilibrium point"
+        ],
+        "horizon": {
+          "analysis_horizon_s": 0.01,
+          "interpretation": "Native instant or fixed-input short endpoint; no frozen full-task acceptance.",
+          "origin": 0.34000000000000025,
+          "period_s": 0.01,
+          "remaining_task_s": 0.009999999999999731,
+          "task_duration_s": 0.35
+        },
+        "constraint_coverage": [
+          {
+            "constraint_id": "terminal_error_m",
+            "expressible": true,
+            "reason": "Only matched short endpoint proxies; no full task or optimized structural capability.",
+            "status": "diagnostic",
+            "analyzed_indices_count": 0
+          },
+          {
+            "constraint_id": "holding_max_error_m",
+            "expressible": true,
+            "reason": "Only matched short endpoint proxies; no full task or optimized structural capability.",
+            "status": "diagnostic",
+            "analyzed_indices_count": 0
+          },
+          {
+            "constraint_id": "holding_max_speed_m_s",
+            "expressible": true,
+            "reason": "Only matched short endpoint proxies; no full task or optimized structural capability.",
+            "status": "diagnostic",
+            "analyzed_indices_count": 0
+          }
+        ]
+      },
+      "operating_point": {
+        "actual_time_s": 0.34000000000000025,
+        "input_units": "N",
+        "phase": "interval_start_native"
+      },
+      "quantities": [
+        {
+          "name": "native_mass_balance_residual",
+          "status": "unverified_estimate",
+          "value": 1.4779844015322396e-14,
+          "unit": "N*m",
+          "source": {
+            "reference": {
+              "artifact_id": "8216c8c05be9280320271ec5145425bca19ae5ab180ad7aa56bdfd8d631cc540",
+              "media_type": "application/json"
+            },
+            "pointer": "/native_dynamics/mechanics/mass_balance_residual_inf_nm"
+          },
+          "structural_parameters": [],
+          "control_reoptimization": "fixed_control"
+        },
+        {
+          "name": "native_tip_speed",
+          "status": "unverified_estimate",
+          "value": 0.009927943990366828,
+          "unit": "m/s",
+          "source": {
+            "reference": {
+              "artifact_id": "8216c8c05be9280320271ec5145425bca19ae5ab180ad7aa56bdfd8d631cc540",
+              "media_type": "application/json"
+            },
+            "pointer": "/native_dynamics/mechanics/tip_speed_m_s"
+          },
+          "structural_parameters": [],
+          "control_reoptimization": "fixed_control"
+        },
+        {
+          "name": "mass_relative_change",
+          "status": "unverified_estimate",
+          "value": 0.0,
+          "unit": "1",
+          "source": {
+            "reference": {
+              "artifact_id": "8216c8c05be9280320271ec5145425bca19ae5ab180ad7aa56bdfd8d631cc540",
+              "media_type": "application/json"
+            },
+            "pointer": "/native_dynamics/structure_responses/0/mechanism_changes/mass_matrix_kg_m2/relative_change"
+          },
+          "structural_parameters": [],
+          "control_reoptimization": "fixed_control"
+        },
+        {
+          "name": "drive_authority_relative_change",
+          "status": "unverified_estimate",
+          "value": 0.0,
+          "unit": "1",
+          "source": {
+            "reference": {
+              "artifact_id": "8216c8c05be9280320271ec5145425bca19ae5ab180ad7aa56bdfd8d631cc540",
+              "media_type": "application/json"
+            },
+            "pointer": "/native_dynamics/structure_responses/0/mechanism_changes/tip_acceleration_input_map_m_s2_n/relative_change"
+          },
+          "structural_parameters": [],
+          "control_reoptimization": "fixed_control"
+        },
+        {
+          "name": "passive_response_relative_change",
+          "status": "unverified_estimate",
+          "value": 0.007095666373929202,
+          "unit": "1",
+          "source": {
+            "reference": {
+              "artifact_id": "8216c8c05be9280320271ec5145425bca19ae5ab180ad7aa56bdfd8d631cc540",
+              "media_type": "application/json"
+            },
+            "pointer": "/native_dynamics/structure_responses/0/mechanism_changes/passive_tip_acceleration_contribution_m_s2/relative_change"
+          },
+          "structural_parameters": [],
+          "control_reoptimization": "fixed_control"
+        },
+        {
+          "name": "structure_endpoint_speed_change",
+          "status": "unverified_estimate",
+          "value": 0.0006268484423535663,
+          "unit": "m/s",
+          "source": {
+            "reference": {
+              "artifact_id": "8216c8c05be9280320271ec5145425bca19ae5ab180ad7aa56bdfd8d631cc540",
+              "media_type": "application/json"
+            },
+            "pointer": "/native_dynamics/structure_responses/0/endpoint_speed_change_m_s"
+          },
+          "structural_parameters": [],
+          "control_reoptimization": "fixed_control"
+        }
+      ],
+      "capability": null,
+      "unresolved": {
+        "supported_facts": [
+          "Recompiled legal candidates at identical named qpos/qvel and fixed absolute tensions. Measured mass, stiffness, passive, geometry and drive changes are recorded separately."
+        ],
+        "unresolved_questions": [
+          "No whole-task acceptance, reoptimized structural capability, regional bound or global infeasibility established.",
+          "Matched coordinates do not imply matched equilibria or energy; secants concern fixed input, not optimal task capability."
+        ],
+        "potential_discriminating_checks": [
+          "Check task constraints with an applicable operation."
+        ],
+        "unsupported_inferences": [
+          "Global/physical feasibility, structural necessity or surrounding-region exclusion."
+        ]
+      },
+      "native_analysis": {
+        "basis": {
+          "channels": [
+            "near_t0",
+            "near_t1",
+            "near_t2",
+            "far_t0",
+            "far_t1",
+            "far_t2"
+          ],
+          "comparison": "Same named qpos/qvel and absolute input; reset solver history in all models; not equal equilibrium or energy",
+          "horizon_s": 0.01,
+          "model": "model.mujoco_native@1.0.0",
+          "state_time_s": 0.34000000000000025,
+          "tensions_n": [
+            6.9843032806247285,
+            7.922288456928409,
+            4.393994441095732,
+            4.198743008252228,
+            3.3438421638719085,
+            3.1510466263082506
+          ]
+        },
+        "cost": {
+          "forward_evaluations": 18,
+          "kernel_wall_s": 0.1032868000002054,
+          "mechanics_evaluations": 4,
+          "model_builds": 3,
+          "physics_steps": 60,
+          "rollouts": 3
+        },
+        "detail_pointer": "/native_dynamics",
+        "interpretation": "Recompiled legal candidates at identical named qpos/qvel and fixed absolute tensions. Measured mass, stiffness, passive, geometry and drive changes are recorded separately.",
+        "limitations": [
+          "Local floating-point native dynamics; no continuous affine model or conic/envelope claim."
+        ],
+        "question": "fixed_input_structure_v1",
+        "unresolved": [
+          "No whole-task acceptance, reoptimized structural capability, regional bound or global infeasibility established.",
+          "Matched coordinates do not imply matched equilibria or energy; secants concern fixed input, not optimal task capability."
+        ]
+      }
+    },
+    "section": {
+      "claim_source": {
+        "reference": {
+          "artifact_id": "39371e27a42ff1ebbc62c5ac26aba9ce2f1482bcee825f1349e00fda3331cd58",
+          "media_type": "application/json"
+        },
+        "pointer": "/scoped_claim"
+      },
+      "requirement_source": {
+        "reference": {
+          "artifact_id": "39371e27a42ff1ebbc62c5ac26aba9ce2f1482bcee825f1349e00fda3331cd58",
+          "media_type": "application/json"
+        },
+        "pointer": "/task_analysis"
+      },
+      "problem_definition": {
+        "reference": {
+          "artifact_id": "39371e27a42ff1ebbc62c5ac26aba9ce2f1482bcee825f1349e00fda3331cd58",
+          "media_type": "application/json"
+        },
+        "pointer": "/native_analysis/basis"
+      },
+      "scope": {
+        "model_declaration": {
+          "model_id": "model.mujoco_native",
+          "model_version": "1.0.0",
+          "relevant_assumptions": [
+            "MuJoCo compiled family model; no GVS projection; ideal absolute tensions.",
+            "Contact-free, unconstrained hinges without activation dynamics; runtime checked.",
+            "Short fixed-input numerical responses; no optimal-value or KKT interpretation."
+          ],
+          "representation_id": "native_named_hinges_v1"
+        },
+        "computation_status": "computed",
+        "verification_status": "native_numerical_checks",
+        "supported_interpretation": "Native fixed-state mechanics and short fixed-input responses only; not a full-task witness or reoptimized structural capability.",
+        "unsupported_conclusions": [
+          "task acceptance",
+          "whole holding-window compliance",
+          "global nonlinear feasibility or infeasibility",
+          "hardware performance",
+          "robustness",
+          "repeatability",
+          "equilibrium validity at a non-equilibrium point"
+        ],
+        "horizon": {
+          "analysis_horizon_s": 0.01,
+          "interpretation": "Native instant or fixed-input short endpoint; no frozen full-task acceptance.",
+          "origin": 0.34000000000000025,
+          "period_s": 0.01,
+          "remaining_task_s": 0.009999999999999731,
+          "task_duration_s": 0.35
+        },
+        "constraint_coverage": [
+          {
+            "constraint_id": "terminal_error_m",
+            "expressible": true,
+            "reason": "Only matched short endpoint proxies; no full task or optimized structural capability.",
+            "status": "diagnostic",
+            "analyzed_indices_count": 0
+          },
+          {
+            "constraint_id": "holding_max_error_m",
+            "expressible": true,
+            "reason": "Only matched short endpoint proxies; no full task or optimized structural capability.",
+            "status": "diagnostic",
+            "analyzed_indices_count": 0
+          },
+          {
+            "constraint_id": "holding_max_speed_m_s",
+            "expressible": true,
+            "reason": "Only matched short endpoint proxies; no full task or optimized structural capability.",
+            "status": "diagnostic",
+            "analyzed_indices_count": 0
+          }
+        ]
+      },
+      "operating_point": {
+        "actual_time_s": 0.34000000000000025,
+        "input_units": "N",
+        "phase": "interval_start_native"
+      },
+      "quantities": [
+        {
+          "name": "native_mass_balance_residual",
+          "status": "unverified_estimate",
+          "value": 1.4779844015322396e-14,
+          "unit": "N*m",
+          "source": {
+            "reference": {
+              "artifact_id": "39371e27a42ff1ebbc62c5ac26aba9ce2f1482bcee825f1349e00fda3331cd58",
+              "media_type": "application/json"
+            },
+            "pointer": "/native_dynamics/mechanics/mass_balance_residual_inf_nm"
+          },
+          "structural_parameters": [],
+          "control_reoptimization": "fixed_control"
+        },
+        {
+          "name": "native_tip_speed",
+          "status": "unverified_estimate",
+          "value": 0.009927943990366828,
+          "unit": "m/s",
+          "source": {
+            "reference": {
+              "artifact_id": "39371e27a42ff1ebbc62c5ac26aba9ce2f1482bcee825f1349e00fda3331cd58",
+              "media_type": "application/json"
+            },
+            "pointer": "/native_dynamics/mechanics/tip_speed_m_s"
+          },
+          "structural_parameters": [],
+          "control_reoptimization": "fixed_control"
+        },
+        {
+          "name": "mass_relative_change",
+          "status": "unverified_estimate",
+          "value": 0.0014824439949745432,
+          "unit": "1",
+          "source": {
+            "reference": {
+              "artifact_id": "39371e27a42ff1ebbc62c5ac26aba9ce2f1482bcee825f1349e00fda3331cd58",
+              "media_type": "application/json"
+            },
+            "pointer": "/native_dynamics/structure_responses/0/mechanism_changes/mass_matrix_kg_m2/relative_change"
+          },
+          "structural_parameters": [],
+          "control_reoptimization": "fixed_control"
+        },
+        {
+          "name": "drive_authority_relative_change",
+          "status": "unverified_estimate",
+          "value": 0.0002278071222024984,
+          "unit": "1",
+          "source": {
+            "reference": {
+              "artifact_id": "39371e27a42ff1ebbc62c5ac26aba9ce2f1482bcee825f1349e00fda3331cd58",
+              "media_type": "application/json"
+            },
+            "pointer": "/native_dynamics/structure_responses/0/mechanism_changes/tip_acceleration_input_map_m_s2_n/relative_change"
+          },
+          "structural_parameters": [],
+          "control_reoptimization": "fixed_control"
+        },
+        {
+          "name": "passive_response_relative_change",
+          "status": "unverified_estimate",
+          "value": 0.0018052585418678836,
+          "unit": "1",
+          "source": {
+            "reference": {
+              "artifact_id": "39371e27a42ff1ebbc62c5ac26aba9ce2f1482bcee825f1349e00fda3331cd58",
+              "media_type": "application/json"
+            },
+            "pointer": "/native_dynamics/structure_responses/0/mechanism_changes/passive_tip_acceleration_contribution_m_s2/relative_change"
+          },
+          "structural_parameters": [],
+          "control_reoptimization": "fixed_control"
+        },
+        {
+          "name": "structure_endpoint_speed_change",
+          "status": "unverified_estimate",
+          "value": -0.0006978547228090153,
+          "unit": "m/s",
+          "source": {
+            "reference": {
+              "artifact_id": "39371e27a42ff1ebbc62c5ac26aba9ce2f1482bcee825f1349e00fda3331cd58",
+              "media_type": "application/json"
+            },
+            "pointer": "/native_dynamics/structure_responses/0/endpoint_speed_change_m_s"
+          },
+          "structural_parameters": [],
+          "control_reoptimization": "fixed_control"
+        }
+      ],
+      "capability": null,
+      "unresolved": {
+        "supported_facts": [
+          "Recompiled legal candidates at identical named qpos/qvel and fixed absolute tensions. Measured mass, stiffness, passive, geometry and drive changes are recorded separately."
+        ],
+        "unresolved_questions": [
+          "No whole-task acceptance, reoptimized structural capability, regional bound or global infeasibility established.",
+          "Matched coordinates do not imply matched equilibria or energy; secants concern fixed input, not optimal task capability."
+        ],
+        "potential_discriminating_checks": [
+          "Check task constraints with an applicable operation."
+        ],
+        "unsupported_inferences": [
+          "Global/physical feasibility, structural necessity or surrounding-region exclusion."
+        ]
+      },
+      "native_analysis": {
+        "basis": {
+          "channels": [
+            "near_t0",
+            "near_t1",
+            "near_t2",
+            "far_t0",
+            "far_t1",
+            "far_t2"
+          ],
+          "comparison": "Same named qpos/qvel and absolute input; reset solver history in all models; not equal equilibrium or energy",
+          "horizon_s": 0.01,
+          "model": "model.mujoco_native@1.0.0",
+          "state_time_s": 0.34000000000000025,
+          "tensions_n": [
+            6.9843032806247285,
+            7.922288456928409,
+            4.393994441095732,
+            4.198743008252228,
+            3.3438421638719085,
+            3.1510466263082506
+          ]
+        },
+        "cost": {
+          "forward_evaluations": 13,
+          "kernel_wall_s": 0.07844649999969988,
+          "mechanics_evaluations": 3,
+          "model_builds": 2,
+          "physics_steps": 40,
+          "rollouts": 2
+        },
+        "detail_pointer": "/native_dynamics",
+        "interpretation": "Recompiled legal candidates at identical named qpos/qvel and fixed absolute tensions. Measured mass, stiffness, passive, geometry and drive changes are recorded separately.",
+        "limitations": [
+          "Local floating-point native dynamics; no continuous affine model or conic/envelope claim."
+        ],
+        "question": "fixed_input_structure_v1",
+        "unresolved": [
+          "No whole-task acceptance, reoptimized structural capability, regional bound or global infeasibility established.",
+          "Matched coordinates do not imply matched equilibria or energy; secants concern fixed input, not optimal task capability."
+        ]
+      }
+    }
+  },
+  "reporter_deliveries": {
+    "mechanics": {
+      "delivery_version": "scientific_delivery_v2",
+      "execution_status": "completed",
+      "scientific_result_reference": {
+        "artifact_id": "1622aeac6f4b05e96dd7d0b150e5181481a95bfcd1ae1c1988304b7c5128d182",
+        "media_type": "application/json"
+      },
+      "report_reference": {
+        "artifact_id": "55211a5e90f00fa4207232e1f321c28bd006ad1d8683f2173224e9de51f26f32",
+        "media_type": "application/json"
+      },
+      "interpretation_status": "deferred",
+      "operation_outcome": {
+        "candidate": {
+          "artifact_id": "51b436890701c5a45482d19ace4c85f98d1aa2e56894c1fd03f0edfc28f92368",
+          "media_type": "application/json"
+        },
+        "reference": {
+          "artifact_id": "1622aeac6f4b05e96dd7d0b150e5181481a95bfcd1ae1c1988304b7c5128d182",
+          "media_type": "application/json"
+        },
+        "status": "computed"
+      },
+      "resource_use": null,
+      "formal_read_required": "Reports do not satisfy SELECT/STOP/RL evidence_read obligations"
+    },
+    "input": {
+      "delivery_version": "scientific_delivery_v2",
+      "execution_status": "completed",
+      "scientific_result_reference": {
+        "artifact_id": "52e0b3dbb4fa611d492e7ddd25cb078f73878e77430f73efedf6f70380dde4c6",
+        "media_type": "application/json"
+      },
+      "report_reference": {
+        "artifact_id": "271d510225d3acf7f36bc828c167bcf2740da055371b934789402a5d83d50a90",
+        "media_type": "application/json"
+      },
+      "interpretation_status": "deferred",
+      "operation_outcome": {
+        "candidate": {
+          "artifact_id": "51b436890701c5a45482d19ace4c85f98d1aa2e56894c1fd03f0edfc28f92368",
+          "media_type": "application/json"
+        },
+        "reference": {
+          "artifact_id": "52e0b3dbb4fa611d492e7ddd25cb078f73878e77430f73efedf6f70380dde4c6",
+          "media_type": "application/json"
+        },
+        "status": "computed"
+      },
+      "resource_use": null,
+      "formal_read_required": "Reports do not satisfy SELECT/STOP/RL evidence_read obligations"
+    },
+    "young": {
+      "delivery_version": "scientific_delivery_v2",
+      "execution_status": "completed",
+      "scientific_result_reference": {
+        "artifact_id": "8216c8c05be9280320271ec5145425bca19ae5ab180ad7aa56bdfd8d631cc540",
+        "media_type": "application/json"
+      },
+      "report_reference": {
+        "artifact_id": "f00fe50dd137c1e2ba4d2683578a64d61c433d8b56df67cf5be401e959bd67e4",
+        "media_type": "application/json"
+      },
+      "interpretation_status": "deferred",
+      "operation_outcome": {
+        "candidate": {
+          "artifact_id": "51b436890701c5a45482d19ace4c85f98d1aa2e56894c1fd03f0edfc28f92368",
+          "media_type": "application/json"
+        },
+        "reference": {
+          "artifact_id": "8216c8c05be9280320271ec5145425bca19ae5ab180ad7aa56bdfd8d631cc540",
+          "media_type": "application/json"
+        },
+        "status": "computed"
+      },
+      "resource_use": null,
+      "formal_read_required": "Reports do not satisfy SELECT/STOP/RL evidence_read obligations"
+    },
+    "section": {
+      "delivery_version": "scientific_delivery_v2",
+      "execution_status": "completed",
+      "scientific_result_reference": {
+        "artifact_id": "39371e27a42ff1ebbc62c5ac26aba9ce2f1482bcee825f1349e00fda3331cd58",
+        "media_type": "application/json"
+      },
+      "report_reference": {
+        "artifact_id": "b48909e1dcc3c850076e9894a639d226bc0d1293e9d158cc07c95fb473222d1d",
+        "media_type": "application/json"
+      },
+      "interpretation_status": "deferred",
+      "operation_outcome": {
+        "candidate": {
+          "artifact_id": "51b436890701c5a45482d19ace4c85f98d1aa2e56894c1fd03f0edfc28f92368",
+          "media_type": "application/json"
+        },
+        "reference": {
+          "artifact_id": "39371e27a42ff1ebbc62c5ac26aba9ce2f1482bcee825f1349e00fda3331cd58",
+          "media_type": "application/json"
+        },
+        "status": "computed"
+      },
+      "resource_use": null,
+      "formal_read_required": "Reports do not satisfy SELECT/STOP/RL evidence_read obligations"
+    }
+  },
+  "decision_brief_bytes": 38797,
+  "elapsed_s": 5.437138599998434,
+  "final_implementation": "36fa2a602b0277d4f8a99d2ed7df9f24a08fd265",
+  "final_projection_check": {
+    "views": {
+      "mechanics": {
+        "claim_source": {
+          "reference": {
+            "artifact_id": "1622aeac6f4b05e96dd7d0b150e5181481a95bfcd1ae1c1988304b7c5128d182",
+            "media_type": "application/json"
+          },
+          "pointer": "/scoped_claim"
+        },
+        "requirement_source": {
+          "reference": {
+            "artifact_id": "1622aeac6f4b05e96dd7d0b150e5181481a95bfcd1ae1c1988304b7c5128d182",
+            "media_type": "application/json"
+          },
+          "pointer": "/task_analysis"
+        },
+        "problem_definition": {
+          "reference": {
+            "artifact_id": "1622aeac6f4b05e96dd7d0b150e5181481a95bfcd1ae1c1988304b7c5128d182",
+            "media_type": "application/json"
+          },
+          "pointer": "/native_analysis/basis"
+        },
+        "scope": {
+          "model_declaration": {
+            "model_id": "model.mujoco_native",
+            "model_version": "1.0.0",
+            "relevant_assumptions": [
+              "MuJoCo compiled family model; no GVS projection; ideal absolute tensions.",
+              "Contact-free, unconstrained hinges without activation dynamics; runtime checked.",
+              "Short fixed-input numerical responses; no optimal-value or KKT interpretation."
+            ],
+            "representation_id": "native_named_hinges_v1"
+          },
+          "computation_status": "computed",
+          "verification_status": "native_numerical_checks",
+          "supported_interpretation": "Native fixed-state mechanics and short fixed-input responses only; not a full-task witness or reoptimized structural capability.",
+          "unsupported_conclusions": [
+            "task acceptance",
+            "whole holding-window compliance",
+            "global nonlinear feasibility or infeasibility",
+            "hardware performance",
+            "robustness",
+            "repeatability",
+            "equilibrium validity at a non-equilibrium point"
+          ],
+          "horizon": {
+            "analysis_horizon_s": 0.0,
+            "interpretation": "Native instant or fixed-input short endpoint; no frozen full-task acceptance.",
+            "origin": 0.34000000000000025,
+            "period_s": 0.01,
+            "remaining_task_s": 0.009999999999999731,
+            "task_duration_s": 0.35
+          },
+          "constraint_coverage": [
+            {
+              "constraint_id": "terminal_error_m",
+              "expressible": true,
+              "reason": "Only matched short endpoint proxies; no full task or optimized structural capability.",
+              "status": "diagnostic",
+              "analyzed_indices_count": 0
+            },
+            {
+              "constraint_id": "holding_max_error_m",
+              "expressible": true,
+              "reason": "Only matched short endpoint proxies; no full task or optimized structural capability.",
+              "status": "diagnostic",
+              "analyzed_indices_count": 0
+            },
+            {
+              "constraint_id": "holding_max_speed_m_s",
+              "expressible": true,
+              "reason": "Only matched short endpoint proxies; no full task or optimized structural capability.",
+              "status": "diagnostic",
+              "analyzed_indices_count": 0
+            }
+          ]
+        },
+        "operating_point": {
+          "actual_time_s": 0.34000000000000025,
+          "input_units": "N",
+          "phase": "interval_start_native"
+        },
+        "quantities": [
+          {
+            "name": "native_mass_balance_residual",
+            "status": "unverified_estimate",
+            "value": 1.4779844015322396e-14,
+            "unit": "N*m",
+            "source": {
+              "reference": {
+                "artifact_id": "1622aeac6f4b05e96dd7d0b150e5181481a95bfcd1ae1c1988304b7c5128d182",
+                "media_type": "application/json"
+              },
+              "pointer": "/native_dynamics/mechanics/mass_balance_residual_inf_nm"
+            },
+            "structural_parameters": [],
+            "control_reoptimization": "fixed_control"
+          },
+          {
+            "name": "native_tip_speed",
+            "status": "unverified_estimate",
+            "value": 0.009927943990366828,
+            "unit": "m/s",
+            "source": {
+              "reference": {
+                "artifact_id": "1622aeac6f4b05e96dd7d0b150e5181481a95bfcd1ae1c1988304b7c5128d182",
+                "media_type": "application/json"
+              },
+              "pointer": "/native_dynamics/mechanics/tip_speed_m_s"
+            },
+            "structural_parameters": [],
+            "control_reoptimization": "fixed_control"
+          },
+          {
+            "name": "tip_acceleration",
+            "status": "unverified_estimate",
+            "value": [
+              -13.919252358209988,
+              2.98825984800355,
+              -0.6632926133538268
+            ],
+            "unit": "m/s^2",
+            "source": {
+              "reference": {
+                "artifact_id": "1622aeac6f4b05e96dd7d0b150e5181481a95bfcd1ae1c1988304b7c5128d182",
+                "media_type": "application/json"
+              },
+              "pointer": "/native_dynamics/mechanics/tip_acceleration_m_s2"
+            },
+            "structural_parameters": [],
+            "control_reoptimization": "fixed_control"
+          },
+          {
+            "name": "local_drive_singular_values",
+            "status": "unverified_estimate",
+            "value": [
+              171.7010024582886,
+              130.408396903972,
+              17.63850246458806
+            ],
+            "unit": "m/(s^2*N)",
+            "source": {
+              "reference": {
+                "artifact_id": "1622aeac6f4b05e96dd7d0b150e5181481a95bfcd1ae1c1988304b7c5128d182",
+                "media_type": "application/json"
+              },
+              "pointer": "/native_dynamics/mechanics/function_metrics/drive_singular_values_m_s2_n"
+            },
+            "structural_parameters": [],
+            "control_reoptimization": "fixed_control"
+          },
+          {
+            "name": "passive_acceleration_contribution",
+            "status": "unverified_estimate",
+            "value": [
+              212.815534839262,
+              -1.2423830487168743,
+              -79.3642468292528
+            ],
+            "unit": "m/s^2",
+            "source": {
+              "reference": {
+                "artifact_id": "1622aeac6f4b05e96dd7d0b150e5181481a95bfcd1ae1c1988304b7c5128d182",
+                "media_type": "application/json"
+              },
+              "pointer": "/native_dynamics/mechanics/passive_tip_acceleration_contribution_m_s2"
+            },
+            "structural_parameters": [],
+            "control_reoptimization": "fixed_control"
+          }
+        ],
+        "capability": null,
+        "unresolved": {
+          "supported_facts": [
+            "Engine mass/bias/passive/actuator forces, named tip and tendon Jacobians; gravity bias is obtained with zero velocity."
+          ],
+          "unresolved_questions": [
+            "No whole-task acceptance, reoptimized structural capability, regional bound or global infeasibility established."
+          ],
+          "potential_discriminating_checks": [
+            "Check task constraints with an applicable operation."
+          ],
+          "unsupported_inferences": [
+            "Global/physical feasibility, structural necessity or surrounding-region exclusion."
+          ]
+        },
+        "native_analysis": {
+          "basis": {
+            "channels": [
+              "near_t0",
+              "near_t1",
+              "near_t2",
+              "far_t0",
+              "far_t1",
+              "far_t2"
+            ],
+            "comparison": "Exact integration checkpoint",
+            "horizon_s": 0.0,
+            "model": "model.mujoco_native@1.0.0",
+            "state_time_s": 0.34000000000000025,
+            "tensions_n": [
+              6.9843032806247285,
+              7.922288456928409,
+              4.393994441095732,
+              4.198743008252228,
+              3.3438421638719085,
+              3.1510466263082506
+            ]
+          },
+          "cost": {
+            "forward_evaluations": 3,
+            "kernel_wall_s": 0.02934340000138036,
+            "mechanics_evaluations": 1,
+            "model_builds": 1,
+            "physics_steps": 0,
+            "rollouts": 0
+          },
+          "detail_pointer": "/native_dynamics",
+          "interpretation": "Engine mass/bias/passive/actuator forces, named tip and tendon Jacobians; gravity bias is obtained with zero velocity.",
+          "limitations": [
+            "Local floating-point native dynamics; no continuous affine model or conic/envelope claim."
+          ],
+          "question": "Which native forces and drive directions determine acceleration at this state?",
+          "unresolved": [
+            "No whole-task acceptance, reoptimized structural capability, regional bound or global infeasibility established."
+          ]
+        }
+      },
+      "input": {
+        "claim_source": {
+          "reference": {
+            "artifact_id": "52e0b3dbb4fa611d492e7ddd25cb078f73878e77430f73efedf6f70380dde4c6",
+            "media_type": "application/json"
+          },
+          "pointer": "/scoped_claim"
+        },
+        "requirement_source": {
+          "reference": {
+            "artifact_id": "52e0b3dbb4fa611d492e7ddd25cb078f73878e77430f73efedf6f70380dde4c6",
+            "media_type": "application/json"
+          },
+          "pointer": "/task_analysis"
+        },
+        "problem_definition": {
+          "reference": {
+            "artifact_id": "52e0b3dbb4fa611d492e7ddd25cb078f73878e77430f73efedf6f70380dde4c6",
+            "media_type": "application/json"
+          },
+          "pointer": "/native_analysis/basis"
+        },
+        "scope": {
+          "model_declaration": {
+            "model_id": "model.mujoco_native",
+            "model_version": "1.0.0",
+            "relevant_assumptions": [
+              "MuJoCo compiled family model; no GVS projection; ideal absolute tensions.",
+              "Contact-free, unconstrained hinges without activation dynamics; runtime checked.",
+              "Short fixed-input numerical responses; no optimal-value or KKT interpretation."
+            ],
+            "representation_id": "native_named_hinges_v1"
+          },
+          "computation_status": "computed",
+          "verification_status": "native_numerical_checks",
+          "supported_interpretation": "Native fixed-state mechanics and short fixed-input responses only; not a full-task witness or reoptimized structural capability.",
+          "unsupported_conclusions": [
+            "task acceptance",
+            "whole holding-window compliance",
+            "global nonlinear feasibility or infeasibility",
+            "hardware performance",
+            "robustness",
+            "repeatability",
+            "equilibrium validity at a non-equilibrium point"
+          ],
+          "horizon": {
+            "analysis_horizon_s": 0.01,
+            "interpretation": "Native instant or fixed-input short endpoint; no frozen full-task acceptance.",
+            "origin": 0.34000000000000025,
+            "period_s": 0.01,
+            "remaining_task_s": 0.009999999999999731,
+            "task_duration_s": 0.35
+          },
+          "constraint_coverage": [
+            {
+              "constraint_id": "terminal_error_m",
+              "expressible": true,
+              "reason": "Only matched short endpoint proxies; no full task or optimized structural capability.",
+              "status": "diagnostic",
+              "analyzed_indices_count": 0
+            },
+            {
+              "constraint_id": "holding_max_error_m",
+              "expressible": true,
+              "reason": "Only matched short endpoint proxies; no full task or optimized structural capability.",
+              "status": "diagnostic",
+              "analyzed_indices_count": 0
+            },
+            {
+              "constraint_id": "holding_max_speed_m_s",
+              "expressible": true,
+              "reason": "Only matched short endpoint proxies; no full task or optimized structural capability.",
+              "status": "diagnostic",
+              "analyzed_indices_count": 0
+            }
+          ]
+        },
+        "operating_point": {
+          "actual_time_s": 0.34000000000000025,
+          "input_units": "N",
+          "phase": "interval_start_native"
+        },
+        "quantities": [
+          {
+            "name": "native_mass_balance_residual",
+            "status": "unverified_estimate",
+            "value": 1.4779844015322396e-14,
+            "unit": "N*m",
+            "source": {
+              "reference": {
+                "artifact_id": "52e0b3dbb4fa611d492e7ddd25cb078f73878e77430f73efedf6f70380dde4c6",
+                "media_type": "application/json"
+              },
+              "pointer": "/native_dynamics/mechanics/mass_balance_residual_inf_nm"
+            },
+            "structural_parameters": [],
+            "control_reoptimization": "fixed_control"
+          },
+          {
+            "name": "native_tip_speed",
+            "status": "unverified_estimate",
+            "value": 0.009927943990366828,
+            "unit": "m/s",
+            "source": {
+              "reference": {
+                "artifact_id": "52e0b3dbb4fa611d492e7ddd25cb078f73878e77430f73efedf6f70380dde4c6",
+                "media_type": "application/json"
+              },
+              "pointer": "/native_dynamics/mechanics/tip_speed_m_s"
+            },
+            "structural_parameters": [],
+            "control_reoptimization": "fixed_control"
+          },
+          {
+            "name": "baseline_short_endpoint_speed",
+            "status": "unverified_estimate",
+            "value": 0.022849089710631265,
+            "unit": "m/s",
+            "source": {
+              "reference": {
+                "artifact_id": "52e0b3dbb4fa611d492e7ddd25cb078f73878e77430f73efedf6f70380dde4c6",
+                "media_type": "application/json"
+              },
+              "pointer": "/native_dynamics/input_response/baseline/speed_m_s"
+            },
+            "structural_parameters": [],
+            "control_reoptimization": "fixed_control"
+          },
+          {
+            "name": "position_step_relative_change",
+            "status": "unverified_estimate",
+            "value": 0.00010258142151010156,
+            "unit": "1",
+            "source": {
+              "reference": {
+                "artifact_id": "52e0b3dbb4fa611d492e7ddd25cb078f73878e77430f73efedf6f70380dde4c6",
+                "media_type": "application/json"
+              },
+              "pointer": "/native_dynamics/input_response/step_consistency_relative/position"
+            },
+            "structural_parameters": [],
+            "control_reoptimization": "fixed_control"
+          },
+          {
+            "name": "velocity_step_relative_change",
+            "status": "unverified_estimate",
+            "value": 0.00014100957333545644,
+            "unit": "1",
+            "source": {
+              "reference": {
+                "artifact_id": "52e0b3dbb4fa611d492e7ddd25cb078f73878e77430f73efedf6f70380dde4c6",
+                "media_type": "application/json"
+              },
+              "pointer": "/native_dynamics/input_response/step_consistency_relative/velocity"
+            },
+            "structural_parameters": [],
+            "control_reoptimization": "fixed_control"
+          },
+          {
+            "name": "corrected_short_endpoint_speed",
+            "status": "unverified_estimate",
+            "value": 0.020000528285067452,
+            "unit": "m/s",
+            "source": {
+              "reference": {
+                "artifact_id": "52e0b3dbb4fa611d492e7ddd25cb078f73878e77430f73efedf6f70380dde4c6",
+                "media_type": "application/json"
+              },
+              "pointer": "/native_dynamics/input_response/correction/terminal/speed_m_s"
+            },
+            "structural_parameters": [],
+            "control_reoptimization": "fixed_control"
+          }
+        ],
+        "capability": null,
+        "unresolved": {
+          "supported_facts": [
+            "Six-channel local position/velocity response uses actual legal tensions, central or one-sided FD and two step sizes."
+          ],
+          "unresolved_questions": [
+            "No whole-task acceptance, reoptimized structural capability, regional bound or global infeasibility established."
+          ],
+          "potential_discriminating_checks": [
+            "Check task constraints with an applicable operation."
+          ],
+          "unsupported_inferences": [
+            "Global/physical feasibility, structural necessity or surrounding-region exclusion."
+          ]
+        },
+        "native_analysis": {
+          "basis": {
+            "channels": [
+              "near_t0",
+              "near_t1",
+              "near_t2",
+              "far_t0",
+              "far_t1",
+              "far_t2"
+            ],
+            "comparison": "Exact integration checkpoint",
+            "horizon_s": 0.01,
+            "model": "model.mujoco_native@1.0.0",
+            "state_time_s": 0.34000000000000025,
+            "tensions_n": [
+              6.9843032806247285,
+              7.922288456928409,
+              4.393994441095732,
+              4.198743008252228,
+              3.3438421638719085,
+              3.1510466263082506
+            ]
+          },
+          "cost": {
+            "forward_evaluations": 53,
+            "kernel_wall_s": 0.0629862999994657,
+            "mechanics_evaluations": 1,
+            "model_builds": 1,
+            "physics_steps": 500,
+            "rollouts": 25
+          },
+          "detail_pointer": "/native_dynamics",
+          "interpretation": "Six-channel local position/velocity response uses actual legal tensions, central or one-sided FD and two step sizes.",
+          "limitations": [
+            "Local floating-point native dynamics; no continuous affine model or conic/envelope claim."
+          ],
+          "question": "How do legal tensions affect the short endpoint, and does one local correction improve its constraints?",
+          "unresolved": [
+            "No whole-task acceptance, reoptimized structural capability, regional bound or global infeasibility established."
+          ],
+          "short_endpoint_tasks": {
+            "baseline": [
+              {
+                "constraint_id": "terminal_error_m",
+                "value": 0.0031364418844500026,
+                "units": "m",
+                "limit": 0.01,
+                "margin": 0.006863558115549997,
+                "source_pointer": "/native_dynamics/input_response/task_proxy/0"
+              },
+              {
+                "constraint_id": "holding_max_speed_m_s",
+                "value": 0.022849089710631265,
+                "units": "m/s",
+                "limit": 0.02,
+                "margin": -0.0028490897106312647,
+                "source_pointer": "/native_dynamics/input_response/task_proxy/2"
+              }
+            ],
+            "corrected": [
+              {
+                "constraint_id": "terminal_error_m",
+                "value": 0.003118858278196932,
+                "units": "m",
+                "limit": 0.01,
+                "margin": 0.006881141721803068,
+                "source_pointer": "/native_dynamics/input_response/correction/task_proxy/0"
+              },
+              {
+                "constraint_id": "holding_max_speed_m_s",
+                "value": 0.020000528285067452,
+                "units": "m/s",
+                "limit": 0.02,
+                "margin": -5.282850674519224e-07,
+                "source_pointer": "/native_dynamics/input_response/correction/task_proxy/2"
+              }
+            ]
+          }
+        }
+      },
+      "young": {
+        "claim_source": {
+          "reference": {
+            "artifact_id": "8216c8c05be9280320271ec5145425bca19ae5ab180ad7aa56bdfd8d631cc540",
+            "media_type": "application/json"
+          },
+          "pointer": "/scoped_claim"
+        },
+        "requirement_source": {
+          "reference": {
+            "artifact_id": "8216c8c05be9280320271ec5145425bca19ae5ab180ad7aa56bdfd8d631cc540",
+            "media_type": "application/json"
+          },
+          "pointer": "/task_analysis"
+        },
+        "problem_definition": {
+          "reference": {
+            "artifact_id": "8216c8c05be9280320271ec5145425bca19ae5ab180ad7aa56bdfd8d631cc540",
+            "media_type": "application/json"
+          },
+          "pointer": "/native_analysis/basis"
+        },
+        "scope": {
+          "model_declaration": {
+            "model_id": "model.mujoco_native",
+            "model_version": "1.0.0",
+            "relevant_assumptions": [
+              "MuJoCo compiled family model; no GVS projection; ideal absolute tensions.",
+              "Contact-free, unconstrained hinges without activation dynamics; runtime checked.",
+              "Short fixed-input numerical responses; no optimal-value or KKT interpretation."
+            ],
+            "representation_id": "native_named_hinges_v1"
+          },
+          "computation_status": "computed",
+          "verification_status": "native_numerical_checks",
+          "supported_interpretation": "Native fixed-state mechanics and short fixed-input responses only; not a full-task witness or reoptimized structural capability.",
+          "unsupported_conclusions": [
+            "task acceptance",
+            "whole holding-window compliance",
+            "global nonlinear feasibility or infeasibility",
+            "hardware performance",
+            "robustness",
+            "repeatability",
+            "equilibrium validity at a non-equilibrium point"
+          ],
+          "horizon": {
+            "analysis_horizon_s": 0.01,
+            "interpretation": "Native instant or fixed-input short endpoint; no frozen full-task acceptance.",
+            "origin": 0.34000000000000025,
+            "period_s": 0.01,
+            "remaining_task_s": 0.009999999999999731,
+            "task_duration_s": 0.35
+          },
+          "constraint_coverage": [
+            {
+              "constraint_id": "terminal_error_m",
+              "expressible": true,
+              "reason": "Only matched short endpoint proxies; no full task or optimized structural capability.",
+              "status": "diagnostic",
+              "analyzed_indices_count": 0
+            },
+            {
+              "constraint_id": "holding_max_error_m",
+              "expressible": true,
+              "reason": "Only matched short endpoint proxies; no full task or optimized structural capability.",
+              "status": "diagnostic",
+              "analyzed_indices_count": 0
+            },
+            {
+              "constraint_id": "holding_max_speed_m_s",
+              "expressible": true,
+              "reason": "Only matched short endpoint proxies; no full task or optimized structural capability.",
+              "status": "diagnostic",
+              "analyzed_indices_count": 0
+            }
+          ]
+        },
+        "operating_point": {
+          "actual_time_s": 0.34000000000000025,
+          "input_units": "N",
+          "phase": "interval_start_native"
+        },
+        "quantities": [
+          {
+            "name": "native_mass_balance_residual",
+            "status": "unverified_estimate",
+            "value": 1.4779844015322396e-14,
+            "unit": "N*m",
+            "source": {
+              "reference": {
+                "artifact_id": "8216c8c05be9280320271ec5145425bca19ae5ab180ad7aa56bdfd8d631cc540",
+                "media_type": "application/json"
+              },
+              "pointer": "/native_dynamics/mechanics/mass_balance_residual_inf_nm"
+            },
+            "structural_parameters": [],
+            "control_reoptimization": "fixed_control"
+          },
+          {
+            "name": "native_tip_speed",
+            "status": "unverified_estimate",
+            "value": 0.009927943990366828,
+            "unit": "m/s",
+            "source": {
+              "reference": {
+                "artifact_id": "8216c8c05be9280320271ec5145425bca19ae5ab180ad7aa56bdfd8d631cc540",
+                "media_type": "application/json"
+              },
+              "pointer": "/native_dynamics/mechanics/tip_speed_m_s"
+            },
+            "structural_parameters": [],
+            "control_reoptimization": "fixed_control"
+          },
+          {
+            "name": "mass_relative_change",
+            "status": "unverified_estimate",
+            "value": 0.0,
+            "unit": "1",
+            "source": {
+              "reference": {
+                "artifact_id": "8216c8c05be9280320271ec5145425bca19ae5ab180ad7aa56bdfd8d631cc540",
+                "media_type": "application/json"
+              },
+              "pointer": "/native_dynamics/structure_responses/0/mechanism_changes/mass_matrix_kg_m2/relative_change"
+            },
+            "structural_parameters": [],
+            "control_reoptimization": "fixed_control"
+          },
+          {
+            "name": "drive_authority_relative_change",
+            "status": "unverified_estimate",
+            "value": 0.0,
+            "unit": "1",
+            "source": {
+              "reference": {
+                "artifact_id": "8216c8c05be9280320271ec5145425bca19ae5ab180ad7aa56bdfd8d631cc540",
+                "media_type": "application/json"
+              },
+              "pointer": "/native_dynamics/structure_responses/0/mechanism_changes/tip_acceleration_input_map_m_s2_n/relative_change"
+            },
+            "structural_parameters": [],
+            "control_reoptimization": "fixed_control"
+          },
+          {
+            "name": "passive_response_relative_change",
+            "status": "unverified_estimate",
+            "value": 0.007095666373929202,
+            "unit": "1",
+            "source": {
+              "reference": {
+                "artifact_id": "8216c8c05be9280320271ec5145425bca19ae5ab180ad7aa56bdfd8d631cc540",
+                "media_type": "application/json"
+              },
+              "pointer": "/native_dynamics/structure_responses/0/mechanism_changes/passive_tip_acceleration_contribution_m_s2/relative_change"
+            },
+            "structural_parameters": [],
+            "control_reoptimization": "fixed_control"
+          },
+          {
+            "name": "structure_endpoint_speed_change",
+            "status": "unverified_estimate",
+            "value": 0.0006268484423535663,
+            "unit": "m/s",
+            "source": {
+              "reference": {
+                "artifact_id": "8216c8c05be9280320271ec5145425bca19ae5ab180ad7aa56bdfd8d631cc540",
+                "media_type": "application/json"
+              },
+              "pointer": "/native_dynamics/structure_responses/0/endpoint_speed_change_m_s"
+            },
+            "structural_parameters": [],
+            "control_reoptimization": "fixed_control"
+          }
+        ],
+        "capability": null,
+        "unresolved": {
+          "supported_facts": [
+            "Recompiled legal candidates at identical named qpos/qvel and fixed absolute tensions. Measured mass, stiffness, passive, geometry and drive changes are recorded separately."
+          ],
+          "unresolved_questions": [
+            "No whole-task acceptance, reoptimized structural capability, regional bound or global infeasibility established.",
+            "Matched coordinates do not imply matched equilibria or energy; secants concern fixed input, not optimal task capability."
+          ],
+          "potential_discriminating_checks": [
+            "Check task constraints with an applicable operation."
+          ],
+          "unsupported_inferences": [
+            "Global/physical feasibility, structural necessity or surrounding-region exclusion."
+          ]
+        },
+        "native_analysis": {
+          "basis": {
+            "channels": [
+              "near_t0",
+              "near_t1",
+              "near_t2",
+              "far_t0",
+              "far_t1",
+              "far_t2"
+            ],
+            "comparison": "Same named qpos/qvel and absolute input; reset solver history in all models; not equal equilibrium or energy",
+            "horizon_s": 0.01,
+            "model": "model.mujoco_native@1.0.0",
+            "state_time_s": 0.34000000000000025,
+            "tensions_n": [
+              6.9843032806247285,
+              7.922288456928409,
+              4.393994441095732,
+              4.198743008252228,
+              3.3438421638719085,
+              3.1510466263082506
+            ]
+          },
+          "cost": {
+            "forward_evaluations": 18,
+            "kernel_wall_s": 0.1032868000002054,
+            "mechanics_evaluations": 4,
+            "model_builds": 3,
+            "physics_steps": 60,
+            "rollouts": 3
+          },
+          "detail_pointer": "/native_dynamics",
+          "interpretation": "Recompiled legal candidates at identical named qpos/qvel and fixed absolute tensions. Measured mass, stiffness, passive, geometry and drive changes are recorded separately.",
+          "limitations": [
+            "Local floating-point native dynamics; no continuous affine model or conic/envelope claim."
+          ],
+          "question": "How does a legal parameter change mechanics, function and short endpoint constraints at fixed input?",
+          "unresolved": [
+            "No whole-task acceptance, reoptimized structural capability, regional bound or global infeasibility established.",
+            "Matched coordinates do not imply matched equilibria or energy; secants concern fixed input, not optimal task capability."
+          ],
+          "short_endpoint_tasks": {
+            "baseline": [
+              {
+                "constraint_id": "terminal_error_m",
+                "value": 0.0031364418844500026,
+                "units": "m",
+                "limit": 0.01,
+                "margin": 0.006863558115549997,
+                "source_pointer": "/native_dynamics/structure_baseline/task_proxy/0"
+              },
+              {
+                "constraint_id": "holding_max_speed_m_s",
+                "value": 0.022849089710631265,
+                "units": "m/s",
+                "limit": 0.02,
+                "margin": -0.0028490897106312647,
+                "source_pointer": "/native_dynamics/structure_baseline/task_proxy/2"
+              }
+            ],
+            "comparisons": [
+              {
+                "variable": "segments.distal1.young_pa",
+                "base_value": 6209999.0,
+                "value": 6147899.01,
+                "delta": -62099.99000000022,
+                "candidate": {
+                  "artifact_id": "2b3a2b68e67112ffe06102314179af2e1f0bcb8262e5eb251e162d4146dca690",
+                  "media_type": "application/json"
+                },
+                "constraints": [
+                  {
+                    "constraint_id": "terminal_error_m",
+                    "value": 0.0031420345196213964,
+                    "units": "m",
+                    "limit": 0.01,
+                    "margin": 0.006857965480378604,
+                    "source_pointer": "/native_dynamics/structure_responses/0/task_proxy/0"
+                  },
+                  {
+                    "constraint_id": "holding_max_speed_m_s",
+                    "value": 0.02347593815298483,
+                    "units": "m/s",
+                    "limit": 0.02,
+                    "margin": -0.003475938152984831,
+                    "source_pointer": "/native_dynamics/structure_responses/0/task_proxy/2"
+                  }
+                ]
+              },
+              {
+                "variable": "segments.distal1.young_pa",
+                "base_value": 6209999.0,
+                "value": 6178949.005,
+                "delta": -31049.99500000011,
+                "candidate": {
+                  "artifact_id": "2e4abcc144fa71bd2965de857ca851374984b349a05234ca0b921c90a42fcdd9",
+                  "media_type": "application/json"
+                },
+                "constraints": [
+                  {
+                    "constraint_id": "terminal_error_m",
+                    "value": 0.003139237427231419,
+                    "units": "m",
+                    "limit": 0.01,
+                    "margin": 0.006860762572768581,
+                    "source_pointer": "/native_dynamics/structure_responses/1/task_proxy/0"
+                  },
+                  {
+                    "constraint_id": "holding_max_speed_m_s",
+                    "value": 0.023160618460645536,
+                    "units": "m/s",
+                    "limit": 0.02,
+                    "margin": -0.003160618460645536,
+                    "source_pointer": "/native_dynamics/structure_responses/1/task_proxy/2"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      },
+      "section": {
+        "claim_source": {
+          "reference": {
+            "artifact_id": "39371e27a42ff1ebbc62c5ac26aba9ce2f1482bcee825f1349e00fda3331cd58",
+            "media_type": "application/json"
+          },
+          "pointer": "/scoped_claim"
+        },
+        "requirement_source": {
+          "reference": {
+            "artifact_id": "39371e27a42ff1ebbc62c5ac26aba9ce2f1482bcee825f1349e00fda3331cd58",
+            "media_type": "application/json"
+          },
+          "pointer": "/task_analysis"
+        },
+        "problem_definition": {
+          "reference": {
+            "artifact_id": "39371e27a42ff1ebbc62c5ac26aba9ce2f1482bcee825f1349e00fda3331cd58",
+            "media_type": "application/json"
+          },
+          "pointer": "/native_analysis/basis"
+        },
+        "scope": {
+          "model_declaration": {
+            "model_id": "model.mujoco_native",
+            "model_version": "1.0.0",
+            "relevant_assumptions": [
+              "MuJoCo compiled family model; no GVS projection; ideal absolute tensions.",
+              "Contact-free, unconstrained hinges without activation dynamics; runtime checked.",
+              "Short fixed-input numerical responses; no optimal-value or KKT interpretation."
+            ],
+            "representation_id": "native_named_hinges_v1"
+          },
+          "computation_status": "computed",
+          "verification_status": "native_numerical_checks",
+          "supported_interpretation": "Native fixed-state mechanics and short fixed-input responses only; not a full-task witness or reoptimized structural capability.",
+          "unsupported_conclusions": [
+            "task acceptance",
+            "whole holding-window compliance",
+            "global nonlinear feasibility or infeasibility",
+            "hardware performance",
+            "robustness",
+            "repeatability",
+            "equilibrium validity at a non-equilibrium point"
+          ],
+          "horizon": {
+            "analysis_horizon_s": 0.01,
+            "interpretation": "Native instant or fixed-input short endpoint; no frozen full-task acceptance.",
+            "origin": 0.34000000000000025,
+            "period_s": 0.01,
+            "remaining_task_s": 0.009999999999999731,
+            "task_duration_s": 0.35
+          },
+          "constraint_coverage": [
+            {
+              "constraint_id": "terminal_error_m",
+              "expressible": true,
+              "reason": "Only matched short endpoint proxies; no full task or optimized structural capability.",
+              "status": "diagnostic",
+              "analyzed_indices_count": 0
+            },
+            {
+              "constraint_id": "holding_max_error_m",
+              "expressible": true,
+              "reason": "Only matched short endpoint proxies; no full task or optimized structural capability.",
+              "status": "diagnostic",
+              "analyzed_indices_count": 0
+            },
+            {
+              "constraint_id": "holding_max_speed_m_s",
+              "expressible": true,
+              "reason": "Only matched short endpoint proxies; no full task or optimized structural capability.",
+              "status": "diagnostic",
+              "analyzed_indices_count": 0
+            }
+          ]
+        },
+        "operating_point": {
+          "actual_time_s": 0.34000000000000025,
+          "input_units": "N",
+          "phase": "interval_start_native"
+        },
+        "quantities": [
+          {
+            "name": "native_mass_balance_residual",
+            "status": "unverified_estimate",
+            "value": 1.4779844015322396e-14,
+            "unit": "N*m",
+            "source": {
+              "reference": {
+                "artifact_id": "39371e27a42ff1ebbc62c5ac26aba9ce2f1482bcee825f1349e00fda3331cd58",
+                "media_type": "application/json"
+              },
+              "pointer": "/native_dynamics/mechanics/mass_balance_residual_inf_nm"
+            },
+            "structural_parameters": [],
+            "control_reoptimization": "fixed_control"
+          },
+          {
+            "name": "native_tip_speed",
+            "status": "unverified_estimate",
+            "value": 0.009927943990366828,
+            "unit": "m/s",
+            "source": {
+              "reference": {
+                "artifact_id": "39371e27a42ff1ebbc62c5ac26aba9ce2f1482bcee825f1349e00fda3331cd58",
+                "media_type": "application/json"
+              },
+              "pointer": "/native_dynamics/mechanics/tip_speed_m_s"
+            },
+            "structural_parameters": [],
+            "control_reoptimization": "fixed_control"
+          },
+          {
+            "name": "mass_relative_change",
+            "status": "unverified_estimate",
+            "value": 0.0014824439949745432,
+            "unit": "1",
+            "source": {
+              "reference": {
+                "artifact_id": "39371e27a42ff1ebbc62c5ac26aba9ce2f1482bcee825f1349e00fda3331cd58",
+                "media_type": "application/json"
+              },
+              "pointer": "/native_dynamics/structure_responses/0/mechanism_changes/mass_matrix_kg_m2/relative_change"
+            },
+            "structural_parameters": [],
+            "control_reoptimization": "fixed_control"
+          },
+          {
+            "name": "drive_authority_relative_change",
+            "status": "unverified_estimate",
+            "value": 0.0002278071222024984,
+            "unit": "1",
+            "source": {
+              "reference": {
+                "artifact_id": "39371e27a42ff1ebbc62c5ac26aba9ce2f1482bcee825f1349e00fda3331cd58",
+                "media_type": "application/json"
+              },
+              "pointer": "/native_dynamics/structure_responses/0/mechanism_changes/tip_acceleration_input_map_m_s2_n/relative_change"
+            },
+            "structural_parameters": [],
+            "control_reoptimization": "fixed_control"
+          },
+          {
+            "name": "passive_response_relative_change",
+            "status": "unverified_estimate",
+            "value": 0.0018052585418678836,
+            "unit": "1",
+            "source": {
+              "reference": {
+                "artifact_id": "39371e27a42ff1ebbc62c5ac26aba9ce2f1482bcee825f1349e00fda3331cd58",
+                "media_type": "application/json"
+              },
+              "pointer": "/native_dynamics/structure_responses/0/mechanism_changes/passive_tip_acceleration_contribution_m_s2/relative_change"
+            },
+            "structural_parameters": [],
+            "control_reoptimization": "fixed_control"
+          },
+          {
+            "name": "structure_endpoint_speed_change",
+            "status": "unverified_estimate",
+            "value": -0.0006978547228090153,
+            "unit": "m/s",
+            "source": {
+              "reference": {
+                "artifact_id": "39371e27a42ff1ebbc62c5ac26aba9ce2f1482bcee825f1349e00fda3331cd58",
+                "media_type": "application/json"
+              },
+              "pointer": "/native_dynamics/structure_responses/0/endpoint_speed_change_m_s"
+            },
+            "structural_parameters": [],
+            "control_reoptimization": "fixed_control"
+          }
+        ],
+        "capability": null,
+        "unresolved": {
+          "supported_facts": [
+            "Recompiled legal candidates at identical named qpos/qvel and fixed absolute tensions. Measured mass, stiffness, passive, geometry and drive changes are recorded separately."
+          ],
+          "unresolved_questions": [
+            "No whole-task acceptance, reoptimized structural capability, regional bound or global infeasibility established.",
+            "Matched coordinates do not imply matched equilibria or energy; secants concern fixed input, not optimal task capability."
+          ],
+          "potential_discriminating_checks": [
+            "Check task constraints with an applicable operation."
+          ],
+          "unsupported_inferences": [
+            "Global/physical feasibility, structural necessity or surrounding-region exclusion."
+          ]
+        },
+        "native_analysis": {
+          "basis": {
+            "channels": [
+              "near_t0",
+              "near_t1",
+              "near_t2",
+              "far_t0",
+              "far_t1",
+              "far_t2"
+            ],
+            "comparison": "Same named qpos/qvel and absolute input; reset solver history in all models; not equal equilibrium or energy",
+            "horizon_s": 0.01,
+            "model": "model.mujoco_native@1.0.0",
+            "state_time_s": 0.34000000000000025,
+            "tensions_n": [
+              6.9843032806247285,
+              7.922288456928409,
+              4.393994441095732,
+              4.198743008252228,
+              3.3438421638719085,
+              3.1510466263082506
+            ]
+          },
+          "cost": {
+            "forward_evaluations": 13,
+            "kernel_wall_s": 0.07844649999969988,
+            "mechanics_evaluations": 3,
+            "model_builds": 2,
+            "physics_steps": 40,
+            "rollouts": 2
+          },
+          "detail_pointer": "/native_dynamics",
+          "interpretation": "Recompiled legal candidates at identical named qpos/qvel and fixed absolute tensions. Measured mass, stiffness, passive, geometry and drive changes are recorded separately.",
+          "limitations": [
+            "Local floating-point native dynamics; no continuous affine model or conic/envelope claim."
+          ],
+          "question": "How does a legal parameter change mechanics, function and short endpoint constraints at fixed input?",
+          "unresolved": [
+            "No whole-task acceptance, reoptimized structural capability, regional bound or global infeasibility established.",
+            "Matched coordinates do not imply matched equilibria or energy; secants concern fixed input, not optimal task capability."
+          ],
+          "short_endpoint_tasks": {
+            "baseline": [
+              {
+                "constraint_id": "terminal_error_m",
+                "value": 0.0031364418844500026,
+                "units": "m",
+                "limit": 0.01,
+                "margin": 0.006863558115549997,
+                "source_pointer": "/native_dynamics/structure_baseline/task_proxy/0"
+              },
+              {
+                "constraint_id": "holding_max_speed_m_s",
+                "value": 0.022849089710631265,
+                "units": "m/s",
+                "limit": 0.02,
+                "margin": -0.0028490897106312647,
+                "source_pointer": "/native_dynamics/structure_baseline/task_proxy/2"
+              }
+            ],
+            "comparisons": [
+              {
+                "variable": "segments.distal1.sections.0.height_z_m",
+                "base_value": 0.0095,
+                "value": 0.009595,
+                "delta": 9.49999999999996e-05,
+                "candidate": {
+                  "artifact_id": "7089f8851c170c8a5b566939ee05323e933ae869e9410bd3e6ae5a6d47c99637",
+                  "media_type": "application/json"
+                },
+                "constraints": [
+                  {
+                    "constraint_id": "terminal_error_m",
+                    "value": 0.0031311028688488993,
+                    "units": "m",
+                    "limit": 0.01,
+                    "margin": 0.006868897131151101,
+                    "source_pointer": "/native_dynamics/structure_responses/0/task_proxy/0"
+                  },
+                  {
+                    "constraint_id": "holding_max_speed_m_s",
+                    "value": 0.02215123498782225,
+                    "units": "m/s",
+                    "limit": 0.02,
+                    "margin": -0.0021512349878222495,
+                    "source_pointer": "/native_dynamics/structure_responses/0/task_proxy/2"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      }
+    },
+    "brief_bytes": 42912,
+    "matrix_range_read": true,
+    "all_quantity_pointers_resolve": true,
+    "state_unchanged": true,
+    "scientific_dispatches": 0
+  },
+  "production_code": {
+    "added": 576,
+    "removed": 29,
+    "net": 547
+  },
+  "targeted_distinct_tests_passed": 23,
+  "successful_scientific_cost": {
+    "model_builds": 7,
+    "mechanics_evaluations": 9,
+    "explicit_forward_evaluations": 87,
+    "rollouts": 30,
+    "physics_steps": 600
+  },
+  "failed_scientific_cost": {
+    "model_builds": 1,
+    "physics_steps_range": [
+      480,
+      500
+    ],
+    "worker_wall_s": 1.0089250000000902,
+    "exact_internal_count_available": false,
+    "reason": "Result encoding failed after calculation; original inner counters were not persisted."
+  },
+  "additional_engineering_preparation": {
+    "successful_model_builds": 4,
+    "explicit_forward_evaluations": 7,
+    "mechanics_evaluations": 1,
+    "physics_steps": 0
+  },
+  "elapsed_scope": "elapsed_s describes the last resume/verification process, not cumulative experiment time",
+  "total_scientific_physics_steps_range": [
+    1080,
+    1100
+  ],
+  "cumulative_worker_wall_s": 5.179093899998406,
+  "cumulative_numerical_s": 5.823800599999231,
+  "candidate_construction_s": 0.5465674000006402,
+  "final_decision_brief_bytes": 42912,
+  "engineering_disposition": {
+    "artifact_id": "f61bd32d5bca0c3e86f879693627acdc2e170259768547c9cb0c9229fc0bc7e8",
+    "media_type": "application/json"
+  }
+}
