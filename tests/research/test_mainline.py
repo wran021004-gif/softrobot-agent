@@ -325,6 +325,7 @@ class C0ReadinessTests(unittest.TestCase):
                 worker=stack.enter_context(patch('tools.service_execution._run_contained',side_effect=self.worker))
                 source=self.seed(f)
                 result=core.dispatch(f.host,self.plan(f,'physical_replay',physical_replay=dict(candidate=f.candidate,source=source)),'c0-development')['result']
+                self.assertEqual(result['evaluation_version'],f.host.store.artifact(f.candidate)['evaluation_version'])
                 f.result=result['reference'];core.read_evidence(f.host,dict(reference=f.result))
                 self.assertTrue(feedback.eligibility(f.host,f.result,selection=True)['eligible'])
                 core.dispatch(f.host,self.plan(f,'select'),'c0-select')

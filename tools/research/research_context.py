@@ -470,9 +470,12 @@ def working_set(host,current):
         recent=results[-6:]
         for (a,x),(b,y) in zip(recent,recent[1:]):
             xc=(x.get('acceptance') or {}).get('components',{});yc=(y.get('acceptance') or {}).get('components',{})
+            # Older fixed-tension receipts omitted the version of their bound candidate.
+            versions=[v.get('evaluation_version',c.get('evaluation_version') if v.get('source_reference')
+                and v.get('profile_identity')==c.get('profile_identity') else None) for v in (x,y)]
             comparable=bool(task_gap(x)['valid_complete'] and task_gap(y)['valid_complete'] and xc and
                 {k:v.get('limit') for k,v in xc.items()}=={k:v.get('limit') for k,v in yc.items()} and
-                x.get('profile_identity')==y.get('profile_identity') and x.get('evaluation_version')==y.get('evaluation_version'))
+                x.get('profile_identity')==y.get('profile_identity') and versions[0] is not None and versions[0]==versions[1])
             comparisons.append(dict(candidate=candidate,baseline=a,variant=b,comparable=comparable,
                 normalized_violation_change={k:v-task_gap(x)['components'][k] for k,v in task_gap(y)['components'].items()
                     if k in task_gap(x)['components']} if comparable else None,

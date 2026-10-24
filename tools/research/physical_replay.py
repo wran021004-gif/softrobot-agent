@@ -527,6 +527,7 @@ def recover(host):
     final=dict(status='evaluated' if complete else 'execution_incomplete',candidate=p['candidate'],
         role=p.get('role','development'),selected_execution=p.get('selected_execution'),operation_key=p.get('operation_key',p['worker_request_id']),
         scientific_configuration=candidate['scientific_configuration'],profile_identity=candidate['profile_identity'],
+        evaluation_version=candidate['evaluation_version'],
         model_identity=source['trajectory']['model_identity'],design_identity=source['trajectory']['design_identity'],
         owning_study=host.run_id,execution_id=p['worker_request_id'],
         source_reference=p['source_reference'],raw_reference=raw_ref,evaluation_reference=evaluation_ref,
