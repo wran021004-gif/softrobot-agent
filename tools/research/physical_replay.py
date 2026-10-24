@@ -474,8 +474,25 @@ def playback_profile(inp,raw,evaluation):
     return profile
 
 
-def recover(host):
+def evaluate_playback(configuration, raw, raw_reference, comparison_identity):
+    """Registered endpoint evaluation and original profile from fresh backend data."""
     from tools.platform_registry import registry
+    inp=SessionInput.model_validate(configuration)
+    samples=raw.get('samples',[])
+    signal=next(v for v in inp.task.observations if v.name=='tip_position' and v.phase=='post_step')
+    result=BackendResult(solver_status='completed' if raw.get('status')=='completed' else 'failed',
+        backend_id='backend.family_mujoco',model_id='mujoco_serial_bending_v1',
+        signals=[Signal(spec=signal,times_s=[v['time_s'] for v in samples[1:]],
+            values=[v['tip_m'] for v in samples[1:]])],
+        data=Payload(contract='family.backend_data',data=dict(physical_replay=True)),
+        limitations=['Ideal direct tendon tension; no hardware or robustness claim'],
+        initial_state=inp.task.initializer.parameters,seed=inp.seed)
+    evaluator=registry().get(inp.task.evaluator.extension_id,inp.task.evaluator.version,'evaluator').resolve()
+    evaluation=evaluator(inp.task,result,raw_reference,registry(),comparison_identity)
+    return evaluation,playback_profile(inp,raw,evaluation)
+
+
+def recover(host):
     from tools.research_tasks import assemble_acceptance
 
     p=state(host)['pending'];folder=Path(p['folder'])
@@ -489,20 +506,9 @@ def recover(host):
     raw_ref=save(host,raw,'physical_playback_raw')
     source=host.store.artifact(p['source_reference'])
     candidate=verify_candidate(host,p['candidate']);cfg=candidate['configuration']
-    inp=SessionInput.model_validate(cfg)
     samples=raw.get('samples',[])
-    signal=next(v for v in inp.task.observations if v.name=='tip_position' and v.phase=='post_step')
-    result=BackendResult(solver_status='completed' if raw.get('status')=='completed' else 'failed',
-        backend_id='backend.family_mujoco',model_id='mujoco_serial_bending_v1',
-        signals=[Signal(spec=signal,times_s=[v['time_s'] for v in samples[1:]],
-            values=[v['tip_m'] for v in samples[1:]])],
-        data=Payload(contract='family.backend_data',data=dict(physical_replay=True)),
-        limitations=['Ideal direct tendon tension; no hardware or robustness claim'],
-        initial_state=inp.task.initializer.parameters,seed=inp.seed)
-    evaluator=registry().get(inp.task.evaluator.extension_id,inp.task.evaluator.version,'evaluator').resolve()
-    evaluation=evaluator(inp.task,result,raw_ref,registry(),digest(dict(candidate=p['candidate'],source=p['source_reference'])))
+    evaluation,profile=evaluate_playback(cfg,raw,raw_ref,digest(dict(candidate=p['candidate'],source=p['source_reference'])))
     evaluation_ref=save(host,plain(evaluation),'physical_playback_endpoint_evaluation')
-    profile=playback_profile(inp,raw,evaluation)
     profile.update(execution_id=folder.name,simulation=raw_ref,evaluation=evaluation_ref)
     complete=profile['complete']
     acceptance=assemble_acceptance(cfg,evaluation,profile,evaluation_reference=evaluation_ref,

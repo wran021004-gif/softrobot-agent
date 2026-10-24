@@ -1,0 +1,160 @@
+{
+  "baseline": "e5cb92dd757f741ddab2fa1ee90fcfcbd3c97c8b",
+  "source": {
+    "archive": "evidence/mujoco_c1_autonomous/immutable_artifacts.tar.gz",
+    "candidate": {
+      "artifact_id": "ef1760ab632f9a6c5f546c990875424d65d62c55b9ae14d63a4caed52575c3fc",
+      "media_type": "application/json"
+    },
+    "schedule": {
+      "artifact_id": "2e155dec7ec7fc861a7e6a651ec7a38024e4bb261b96a32af23bbf4c594480e7",
+      "media_type": "application/json"
+    },
+    "execution": {
+      "artifact_id": "5e0c3dfc02d948dcee4cb3bcb3973eb2d62302478b9948a9cfa5201d43589aa3",
+      "media_type": "application/json"
+    },
+    "actual_input": {
+      "artifact_id": "a5df54c9fd410203c26b5195fcc92477ab20838fc21f524bb25978bc82603487",
+      "media_type": "application/octet-stream"
+    },
+    "execution_id": "7085f71ad12d4b54acc1c2203cdbaf4b",
+    "units": "N",
+    "field": "actual_tension_n",
+    "inherited_state": false,
+    "inherited_acceptance": false
+  },
+  "moduli_pa": {
+    "d_minus": 4860000.0,
+    "d_zero": 5400000.0,
+    "d_plus": 5940000.0
+  },
+  "parameters": {
+    "holding_tip_speed_weight": 0.1,
+    "segments": {
+      "distal1": {
+        "length_m": 0.11,
+        "material_scenario": null,
+        "sections": {
+          "0": {
+            "height_z_m": 0.0095,
+            "width_y_m": 0.0133
+          },
+          "1": {
+            "height_z_m": 0.008549999999999999,
+            "width_y_m": 0.0114
+          }
+        },
+        "young_pa": 5400000.0
+      },
+      "near": {
+        "length_m": 0.16,
+        "material_scenario": null,
+        "sections": {
+          "0": {
+            "semi_y_m": 0.0095,
+            "semi_z_m": 0.0076
+          }
+        },
+        "young_pa": 7200000.0
+      }
+    },
+    "terminal_tip_speed_weight": 0.1
+  },
+  "settings": {
+    "version": "local_control_search_v2",
+    "correction_window_s": [
+      0.0,
+      0.35
+    ],
+    "safety_margin_fraction": 0.05,
+    "method": "response",
+    "knots_s": [
+      0.0,
+      0.12,
+      0.23,
+      0.34
+    ],
+    "coefficient_limit_n": 1.5,
+    "difference_step_n": 0.02,
+    "initial_radius_n": 0.15,
+    "minimum_radius_n": 0.0001,
+    "evaluation_requests": 30,
+    "iterations": 1,
+    "active_coefficients": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23
+    ]
+  },
+  "task": {
+    "identity": "2b26edb492214c426263441b6adb52d7aafe41a828436d6b48a1171374a1026c",
+    "target_m": [
+      0.29,
+      0.035,
+      0.19
+    ],
+    "timing": {
+      "timestep_s": 0.0005,
+      "control_period_s": 0.01,
+      "sample_period_s": 0.01,
+      "duration_s": 0.35,
+      "termination": [
+        "duration",
+        "numerical_failure"
+      ]
+    },
+    "limits": {
+      "terminal_error_m": 0.01,
+      "holding_max_error_m": 0.01,
+      "holding_max_speed_m_s": 0.02
+    },
+    "holding_start_s": 0.3
+  },
+  "tendon_order": [
+    "near_t0",
+    "near_t1",
+    "near_t2",
+    "far_t0",
+    "far_t1",
+    "far_t2"
+  ],
+  "runtime": {
+    "python": "3.11.16",
+    "mujoco": "3.13.0",
+    "numpy": "2.4.6",
+    "scipy": "1.17.1"
+  },
+  "physics_step_limit": 160000,
+  "worst_case_steps": 130200,
+  "cold_start_rule": "After complete warm search and replay, run three pretension starts if >=63000 steps remain and no numerical failure.",
+  "metric": "max(terminal_error/0.01, hold_position/0.01, hold_speed/0.02)-1",
+  "rank": [
+    "signed_maximum_excess",
+    "sum_normalized_excess"
+  ],
+  "stop_when": null,
+  "scope": "engineering validation; no formal Study or SELECT",
+  "raw_directory": "D:\\softrobot-agent\\.worktrees\\mujoco-reoptimized-structure-sensitivity\\runs\\mujoco-reoptimized-structure"
+}
