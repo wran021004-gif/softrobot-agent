@@ -148,7 +148,7 @@ def native_point(host, query, configuration):
     result=host.store.artifact(reference)
     if result['candidate']!=plain(query.candidate):raise ValueError('NATIVE_EXECUTION_CANDIDATE_MISMATCH')
     reader=ControlEvidence(host.store);source=reader.resolve(result['execution_id'])
-    if source['configuration']!=configuration:raise ValueError('NATIVE_EXECUTION_CONFIGURATION_MISMATCH')
+    if full_science(source['configuration'])!=full_science(configuration):raise ValueError('NATIVE_EXECUTION_CONFIGURATION_MISMATCH')
     rows=reader.read_file(source,'trajectory.json.gz');physics=reader.read_file(source,'resolved_physics.json')
     scene=reader.read_file(source,'experiment_scene.json')
     if not rows or scene['control']['tension_execution_mode']!='ideal_tension':raise ValueError('MEASURED_IDEAL_NATIVE_TRAJECTORY_REQUIRED')

@@ -10,7 +10,42 @@ from schemas.platform import SessionInput
 from tools.platform_store import plain
 from tools.research.design import parameter_value, set_parameter
 
-METHODS=('native_dynamics_v1','short_input_response_v1','fixed_input_structure_v1')
+def decision_summary(value):
+    """One projection of recorded native facts for existing tool/Card/L0 views."""
+    summary=deepcopy(value['native_analysis']);raw=value['native_dynamics']
+    summary['question']={
+        'native_dynamics_v1':'Which native forces and drive directions determine acceleration at this state?',
+        'short_input_response_v1':'How do legal tensions affect the short endpoint, and does one local correction improve its constraints?',
+        'fixed_input_structure_v1':'How does a legal parameter change mechanics, function and short endpoint constraints at fixed input?'}[value['operation']]
+    if value['operation']=='native_dynamics_v1':
+        mechanics=raw['mechanics'];names={q['name'] for q in summary['quantities']}
+        for name,data,unit,path in (
+                ('tip_acceleration',mechanics.get('tip_acceleration_m_s2'),'m/s^2','mechanics/tip_acceleration_m_s2'),
+                ('local_drive_singular_values',mechanics.get('function_metrics',{}).get('drive_singular_values_m_s2_n'),'m/(s^2*N)','mechanics/function_metrics/drive_singular_values_m_s2_n'),
+                ('passive_acceleration_contribution',mechanics.get('passive_tip_acceleration_contribution_m_s2'),'m/s^2','mechanics/passive_tip_acceleration_contribution_m_s2')):
+            if data is not None and name not in names:
+                summary['quantities'].append(dict(name=name,value=data,unit=unit,source_pointer='/native_dynamics/'+path))
+    constraints={c['constraint_id']:c for c in value['task_analysis']['constraints']} if value.get('task_analysis') else {}
+    def tasks(rows,prefix):
+        seen=set();facts=[]
+        for i,row in enumerate(rows):
+            if row['signal'] in seen:continue
+            seen.add(row['signal']);c=constraints.get(row['constraint_id'],{})
+            facts.append(dict(constraint_id=row['constraint_id'],value=row['value'],units=row['units'],
+                limit=c.get('radius'),margin=min(row['margins']),source_pointer=prefix+'/'+str(i)))
+        return facts
+    response=raw.get('input_response')
+    if response:
+        summary['short_endpoint_tasks']=dict(baseline=tasks(response['task_proxy'],'/native_dynamics/input_response/task_proxy'))
+        correction=response.get('correction') or {}
+        if correction.get('terminal'):
+            summary['short_endpoint_tasks']['corrected']=tasks(correction['task_proxy'],'/native_dynamics/input_response/correction/task_proxy')
+    if raw.get('structure_baseline'):
+        summary['short_endpoint_tasks']=dict(baseline=tasks(raw['structure_baseline']['task_proxy'],'/native_dynamics/structure_baseline/task_proxy'),
+            comparisons=[dict(variable=r['variable'],base_value=r['base_value'],value=r['value'],delta=r['delta'],candidate=r['candidate'],
+                constraints=tasks(r['task_proxy'],f'/native_dynamics/structure_responses/{i}/task_proxy'))
+                for i,r in enumerate(raw['structure_responses'])])
+    return summary
 
 
 def structure_context(base, candidates, request):
@@ -172,4 +207,6 @@ def calculate(configuration, binding, query, point, requirements, comparisons):
             ('actual_time_s','phase','input_units')},native_dynamics=raw,native_analysis=summary,
         task_acceptance='unmeasured',local_model_constraints=dict(status='diagnostic_only'),proxy_values={},
         internal_calculations=[dict(purpose=query.operation,**raw['cost'])],limitations=summary['limitations'])
-    return scoped_result(result,requirements,fit,query)
+    result=scoped_result(result,requirements,fit,query)
+    result['native_analysis']=decision_summary(result)
+    return result

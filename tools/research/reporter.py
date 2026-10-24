@@ -290,6 +290,10 @@ def reporter_handoff_summary(host, reference, saved):
         # Refresh projections from the same immutable source, preserving old reports.
         card=deepcopy(card)
         raw=host.store.artifact(card['identity']['result']['reference'])
+        if raw.get('native_analysis'):
+            projected=plain(result_card(host,card['identity']['result']['reference']))
+            card['mathematics']=projected['mathematics']
+            card['deterministic_summary']['native_analysis']=projected['deterministic_summary']['native_analysis']
         recorded=recorded_math_summary(raw,card['identity']['result']['reference'])
         if recorded is not None:card['deterministic_summary']['recorded_mathematics']=recorded
         if raw.get('execution_id'):card['deterministic_summary']['recorded_control_diagnostics']=recorded_control_diagnostics(host,raw)

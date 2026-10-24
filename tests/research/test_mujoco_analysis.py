@@ -61,6 +61,25 @@ class NativeAnalysisTests(unittest.TestCase):
         other['configuration']['task']['seed_fixture']=1
         with self.assertRaisesRegex(ValueError,'FIXED_TASK'):structure_context(base,[(self.t.ref,other)],request)
 
+    def test_owned_native_prefix_uses_execution_science_without_projected_optimizer_record(self):
+        from tools.research.numerics import native_point
+        from unittest.mock import Mock
+        cfg=self.t.cfg;executed=deepcopy(cfg);executed['run_id']='execution-child-owner'
+        result_ref=dict(artifact_id='b'*64,media_type='application/json')
+        values={result_ref['artifact_id']:dict(candidate=self.f.candidate,execution_id='fixture-execution')}
+        host,current=offline_host(values,results=[result_ref])
+        query=self.q.model_copy(update=dict(saved_state=None,execution=result_ref,update_id=0))
+        source=dict(configuration=executed,files={'trajectory.json.gz':self.t.ref})
+        files={'trajectory.json.gz':[dict(tension_n=[.2]*6)],
+            'resolved_physics.json':dict(identity='fixture',dofs=['hinge'],tendons=[dict(entity='t'+str(i)) for i in range(6)]),
+            'experiment_scene.json':dict(control=dict(tension_execution_mode='ideal_tension'),qpos_rad=[0.],qvel_rad_s=[0.])}
+        reader=Mock();reader.resolve.return_value=source;reader.read_file.side_effect=lambda s,name:files[name]
+        with patch('extensions.tendon_family.control_evidence.ControlEvidence',return_value=reader):
+            point=native_point(host,query,cfg)
+        self.assertEqual(point['native_replay']['rows'],[])
+        self.assertEqual(point['u'],[.2]*6)
+        self.assertNotIn('x',point)
+
     def test_native_result_reuses_card_summary_and_pointer_reads(self):
         from schemas.platform import SessionInput
         point=dict(actual_time_s=.34,integration_state=[1.],phase='interval_start_native',input_units='N')

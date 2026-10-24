@@ -576,7 +576,9 @@ def compact_result(value, reference):
         summary.pop('task_capability',None)
         summary['optimal_sensitivity']=sensitivity_summary(value['optimal_sensitivity'])
     if value.get('instantaneous_braking'):summary['instantaneous_braking']=value['instantaneous_braking']
-    if value.get('native_analysis'):summary['native_analysis']=value['native_analysis']
+    if value.get('native_analysis'):
+        from tools.research.native_analysis import decision_summary
+        summary['native_analysis']=decision_summary(value)
     return {**{k:summary[k] for k in ('reference','stored_result_keys','control_handoff','static_input_observation',
         'input_response_observation','retrieval_note') if k in summary},**summary}
 
@@ -645,7 +647,8 @@ def decision_result(value, reference):
         result['optimal_sensitivity']=sensitivity_summary(value['optimal_sensitivity'])
     if value.get('instantaneous_braking'):result['instantaneous_braking']=value['instantaneous_braking']
     if value.get('native_analysis'):
-        result['native_analysis']=value['native_analysis']
+        from tools.research.native_analysis import decision_summary
+        result['native_analysis']=decision_summary(value)
         result['decision_relevance'].update(supported_facts=[value['native_analysis']['interpretation']],
             unresolved_questions=value['native_analysis']['unresolved'])
     return result
