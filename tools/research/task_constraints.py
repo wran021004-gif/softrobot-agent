@@ -65,7 +65,8 @@ def mathematical_method_view(host, reference):
         if key=='instantaneous_braking_v1':required.append('saved_state OR execution + update_id')
         if key in ('native_dynamics_v1','short_input_response_v1','fixed_input_structure_v1','mujoco_direct_control_v1'):
             request.update(model_source='mujoco',operating_point='saved_state')
-            required.extend(['saved_state (native integration checkpoint) OR execution + update_id','native={tensions_n,horizon_s,difference_step_n,correction_radius_n}'])
+            required.append('saved_state (native integration checkpoint) OR execution + update_id')
+            if key!='mujoco_direct_control_v1':required.append('native={tensions_n,horizon_s,difference_step_n,correction_radius_n}')
         if key=='mujoco_direct_control_v1':required.append('control_optimization={source,settings}; v2 search settings with explicit correction_window_s; physical_replay uses returned control_schedule_reference')
         if key=='fixed_input_structure_v1':required.append('structure_response={variable,candidates}; registered single-parameter candidates')
         if key=='design_sensitivity':required.append('design_sensitivity={variable,step,minus_candidate,plus_candidate}')
@@ -125,7 +126,7 @@ def analysis_capabilities(configuration, requirements, protocol, *, model=None, 
     rows=[]
     for operation in get_args(AnalysisRequest.model_fields['operation'].annotation):
         native=operation in ('native_dynamics_v1','short_input_response_v1','fixed_input_structure_v1','mujoco_direct_control_v1')
-        sampled=operation in ('trajectory_feasibility','task_capability')
+        sampled=operation in ('trajectory_feasibility','task_capability','mujoco_direct_control_v1')
         static=operation in ('equilibrium','input_sensitivity','design_sensitivity')
         point='saved_state' if native else 'target_equilibrium' if operation=='equilibrium' else 'fixed_input_equilibrium' if static else 'controller_start_input'
         if exact_point and not static:point='saved_state'
@@ -145,8 +146,8 @@ def analysis_capabilities(configuration, requirements, protocol, *, model=None, 
             constraint_kinds=['norm_bound','component_interval'] if sampled else ['norm_bound'],
             required_outputs=sorted({c.signal.name for c in requirements.constraints}) if sampled else
                 ['tip_velocity'] if operation in ('braking','instantaneous_braking_v1') else ['tip_position'],
-            category='task_capability_estimate' if operation=='task_capability' else 'sampled_feasibility' if sampled else 'diagnostic',
-            control='reoptimized; optional fixed baseline replay' if operation=='task_capability' else
+            category='native_control_diagnostic' if operation=='mujoco_direct_control_v1' else 'task_capability_estimate' if operation=='task_capability' else 'sampled_feasibility' if sampled else 'diagnostic',
+            control='bounded native sequence reoptimization' if operation=='mujoco_direct_control_v1' else 'reoptimized; optional fixed baseline replay' if operation=='task_capability' else
                 'bounded sequence search' if sampled or operation in ('endpoint','braking') else 'operating-point diagnostic',
             prerequisites=['candidate','frozen protocol',point]+(['paired structure candidates'] if operation=='design_sensitivity' else []),
             time_scope='aligned post-step samples over actual remaining horizon' if sampled else

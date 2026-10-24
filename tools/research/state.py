@@ -29,6 +29,9 @@ def readable_results(s, host=None):
     linked += [e[k] for e in s.get('research_history',[]) for k in ('reference','source','candidate','historical_candidate')]
     if host:
         linked += [host.store.artifact(e['reference'])['raw_reference'] for e in s.get('research_history',[])]
+        for ref in s.get('physical_replays',[]):
+            replay=host.store.artifact(ref)
+            linked += [replay[k] for k in ('source_reference','raw_reference','evaluation_reference') if replay.get(k)]
     if host:
         from extensions.tendon_family.control_evidence import ControlEvidence
         for ref in s.get('results',[]):

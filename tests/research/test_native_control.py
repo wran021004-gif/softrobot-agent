@@ -5,14 +5,14 @@ from tools.platform_store import plain
 from tools.research.contracts import AnalysisRequest
 from tools.research.native_analysis import applicability, assessment
 from tools.research.local_control_search import search
-from tests.research.test_mujoco_analysis import NativeAnalysisTests
-from tests.research.test_local_control_search import LocalSearchTests, start
+from tests.research import test_mujoco_analysis as native_fixtures
+from tests.research import test_local_control_search as search_fixtures
 from schemas.platform import SessionInput
 
 
 class NativeControlTests(unittest.TestCase):
     def test_schema_requires_source_and_explicit_v2_window(self):
-        NativeAnalysisTests.setUpClass();f=NativeAnalysisTests();f.setUp()
+        native_fixtures.NativeAnalysisTests.setUpClass();f=native_fixtures.NativeAnalysisTests();f.setUp()
         q=plain(f.q);q['operation']='mujoco_direct_control_v1'
         with self.assertRaises(ValueError):AnalysisRequest.model_validate(q)
         q['control_optimization']=dict(source=f.t.ref,settings=dict(version='local_control_search_v2',
@@ -28,16 +28,70 @@ class NativeControlTests(unittest.TestCase):
         self.assertTrue(any('All task' in r for r in fit['reasons']))
 
     def test_native_stop_does_not_claim_physical_acceptance(self):
-        f=LocalSearchTests();f.setUp();callback=f.evaluator()
+        f=search_fixtures.LocalSearchTests();f.setUp();callback=f.evaluator()
         def evaluate(*args):
             row=callback(*args);row['task_gap']['accepted']=False
             return row
-        result=search([start()],evaluate,dict(evaluation_requests=15),evaluation_kind='native_short_rollout',
+        result=search([search_fixtures.start()],evaluate,dict(evaluation_requests=15),evaluation_kind='native_short_rollout',
             stop_when=lambda row:row['task_gap']['normalized_gap']==0)
         self.assertEqual(result['stop_reason'],'local_target_reached')
         self.assertFalse(result['best']['task_gap']['accepted'])
         self.assertEqual(result['cost_feedback']['new_physical_evaluations'],0)
         self.assertTrue(result['best']['local_solver']['success'])
+
+    def test_recorded_sequence_search_matches_without_new_integrations(self):
+        from pathlib import Path
+        from tools.state_io import read
+        from tools.research.numerics import archived
+        root=Path(__file__).resolve().parents[2]
+        summary=read(root/'evidence/mujoco_direct_stage_b/summary.json')
+        value=archived('evidence/mujoco_direct_stage_b/study',summary['optimization_reference'])
+        raw=value['native_dynamics'];old=raw['optimization'];settings=value['requested_operation']['control_optimization']['settings']
+        initial=dict(id='native',schedule=raw['original_schedule'],limits=[8]*6,
+            task_options=dict(target=[.29,.035,.19],holding_start=.30,position_limit=.01,terminal_position_limit=.01,speed_limit=.02))
+        calls=[]
+        def recorded(start,schedule,metadata):
+            row=deepcopy(old['candidates'][len(calls)])
+            self.assertEqual(metadata['coefficients_n'],row['coefficients_n'])
+            calls.append(metadata)
+            return {k:row[k] for k in ('reference','outputs','measure','task_gap','cost_s','independent_evaluation_executed')}
+        result=search([initial],recorded,settings,evaluation_kind='native_short_rollout',
+            rank_key=lambda row:(row['measure']['signed_maximum_excess'],row['measure']['sum_normalized_excess']),
+            stop_when=lambda row:row['measure']['signed_maximum_excess']<=-settings['safety_margin_fraction'])
+        self.assertEqual(result['best']['coefficients_n'],old['best']['coefficients_n'])
+        self.assertEqual(len(calls),23)
+        self.assertEqual(result['iterations_started'],2)
+        self.assertEqual(len(result['local_responses']),1)
+        # A newly replayed structure can reenter native math without NMPC.
+        from tools.research.numerics import native_point
+        from tests.research.test_research_reporting import offline_host
+        replay_ref=summary['replays']['baseline']['reference']
+        replay=archived('evidence/mujoco_direct_stage_b/study',replay_ref)
+        replay_raw=archived('evidence/mujoco_direct_stage_b/study',replay['raw_reference'])
+        candidate=archived('evidence/mujoco_direct_stage_b/study',summary['candidate'])
+        host,_=offline_host({replay_ref['artifact_id']:replay,replay['raw_reference']['artifact_id']:replay_raw},physical_replays=[replay_ref])
+        query=AnalysisRequest.model_validate(value['requested_operation']).model_copy(update=dict(saved_state=None,execution=replay_ref,update_id=30))
+        point=native_point(host,query,candidate['configuration'])
+        self.assertEqual(point['qpos_rad'],raw['initial_state']['qpos_rad'])
+        self.assertEqual(point['qvel_rad_s'],raw['initial_state']['qvel_rad_s'])
+        self.assertEqual(len(point['native_replay']['rows']),30)
+        self.assertTrue(all(r['time_s']<=.30+1e-12 for r in point['native_replay']['rows']))
+
+    def test_protected_replay_keeps_only_its_linked_raw_evidence_readable(self):
+        from unittest.mock import patch
+        from tests.research.test_research_reporting import offline_host
+        from tools.research.core import read_evidence
+        result=dict(artifact_id='a'*64,media_type='application/json')
+        raw=dict(artifact_id='b'*64,media_type='application/json')
+        other=dict(artifact_id='c'*64,media_type='application/json')
+        values={result['artifact_id']:dict(raw_reference=raw),raw['artifact_id']:dict(samples=[{'time_s':.30}]),other['artifact_id']:dict(secret_fixture=True)}
+        host,current=offline_host(values,physical_replays=[result])
+        before=deepcopy(current)
+        with patch('tools.research.core.protected',return_value=True):
+            self.assertEqual(read_evidence(host,dict(reference=raw,pointer='/samples/0/time_s'),record_read=False),.30)
+            with self.assertRaisesRegex(ValueError,'PROTECTED_EVIDENCE'):
+                read_evidence(host,dict(reference=other),record_read=False)
+        self.assertEqual(current,before)
 
 
 if __name__=='__main__':unittest.main()

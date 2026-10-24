@@ -79,7 +79,7 @@ def assessment(configuration, requirements):
     return dict(model_id='model.mujoco_native',model_version='1.0.0',representation_id='native_named_hinges_v1',
         relevant_assumptions=['MuJoCo compiled family model; no GVS projection; ideal absolute tensions.',
             'Contact-free, unconstrained hinges without activation dynamics; runtime checked.',
-            'Short fixed-input numerical responses; no optimal-value or KKT interpretation.'],
+            'Native numerical responses; each method declares fixed or time-varying inputs. No optimal-value or KKT interpretation.'],
         uses=dict(native_numerics=dict(status='REJECT' if reasons else 'ACCEPT',reasons=reasons)))
 
 

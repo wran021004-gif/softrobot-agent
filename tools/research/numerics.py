@@ -144,13 +144,26 @@ def native_point(host, query, configuration):
         return point
     from extensions.tendon_family.control_evidence import ControlEvidence
     reference=plain(query.execution)
-    if reference not in state(host)['results']:raise ValueError('OWNED_NATIVE_EXECUTION_REQUIRED')
+    current=state(host)
+    replay=reference in current.get('physical_replays',[])
+    if reference not in current['results'] and not replay:raise ValueError('OWNED_NATIVE_EXECUTION_REQUIRED')
     result=host.store.artifact(reference)
     if result['candidate']!=plain(query.candidate):raise ValueError('NATIVE_EXECUTION_CANDIDATE_MISMATCH')
-    reader=ControlEvidence(host.store);source=reader.resolve(result['execution_id'])
-    if full_science(source['configuration'])!=full_science(configuration):raise ValueError('NATIVE_EXECUTION_CONFIGURATION_MISMATCH')
-    rows=reader.read_file(source,'trajectory.json.gz');physics=reader.read_file(source,'resolved_physics.json')
-    scene=reader.read_file(source,'experiment_scene.json')
+    if replay:
+        from schemas.platform import SessionInput
+        from extensions.tendon_family.backends import physics_for
+        from extensions.tendon_family.scene import assemble_physical
+        raw=host.store.artifact(result['raw_reference'])
+        if raw.get('status')!='completed':raise ValueError('COMPLETE_NATIVE_REPLAY_REQUIRED')
+        inp=SessionInput.model_validate(configuration);physics=physics_for(inp);scene=assemble_physical(inp,physics)
+        scene['control']=dict(tension_execution_mode=raw['tension_execution_mode'])
+        rows=[dict(row,tension_n=row['actual_tension_n']) for row in raw['samples'][1:]]
+        source=dict(files={'trajectory.json.gz':result['raw_reference']})
+    else:
+        reader=ControlEvidence(host.store);source=reader.resolve(result['execution_id'])
+        if full_science(source['configuration'])!=full_science(configuration):raise ValueError('NATIVE_EXECUTION_CONFIGURATION_MISMATCH')
+        rows=reader.read_file(source,'trajectory.json.gz');physics=reader.read_file(source,'resolved_physics.json')
+        scene=reader.read_file(source,'experiment_scene.json')
     if not rows or scene['control']['tension_execution_mode']!='ideal_tension':raise ValueError('MEASURED_IDEAL_NATIVE_TRAJECTORY_REQUIRED')
     k=query.update_id
     if not 0<=k<len(rows):raise ValueError('NATIVE_EXECUTION_INTERVAL_OUTSIDE_SAVED_TRACE')

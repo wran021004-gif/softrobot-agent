@@ -17,7 +17,7 @@ def trust_radius(radius,predicted,actual,maximum):
     return min(maximum,radius*1.5) if actual/predicted>.75 else radius
 
 
-def search(starts,evaluate,settings,*,evaluation_kind='physical',stop_when=None):
+def search(starts,evaluate,settings,*,evaluation_kind='physical',stop_when=None,rank_key=ranking_key):
     """evaluate(start, source, metadata) returns task_gap, outputs, refs and costs.
 
     All probes participate in validity-first ranking. A failed model direction
@@ -46,7 +46,7 @@ def search(starts,evaluate,settings,*,evaluation_kind='physical',stop_when=None)
                 or cfg.knots_s[-1]>times[-1] or (cfg.correction_window_s and cfg.correction_window_s[1]>times[-1])):
             raise ValueError('BOUND_ALIGNED_CONTROL_GRID_REQUIRED')
     rows=[];best=None;centers={};radii={s['id']:cfg.initial_radius_n for s in starts};stop='iteration_limit'
-    seen=set();information=set();ineffective=[];responses=[]
+    seen=set();information=set();ineffective=[];responses=[];iterations_started=0
 
     def vectors(row,start):return constraint_vectors(row['outputs'],**start['task_options'])
     def applied(start,x):
@@ -76,7 +76,7 @@ def search(starts,evaluate,settings,*,evaluation_kind='physical',stop_when=None)
         if not valid:row['task_gap']={**row['task_gap'],'normalized_gap':None}
         actual=(base['task_gap']['normalized_gap']-row['task_gap']['normalized_gap']) if base and valid else None
         row.update(actual_improvement=actual,direction_agrees=(predicted*actual>0) if predicted and actual else None)
-        if valid and (best is None or ranking_key(row)<ranking_key(best)):best=row
+        if valid and (best is None or rank_key(row)<rank_key(best)):best=row
         row['best_valid_reference']=best['reference'] if best else None
         rows.append(row)
         if valid and stop_when is not None and stop_when(row):raise SearchStopped('local_target_reached')
@@ -88,8 +88,9 @@ def search(starts,evaluate,settings,*,evaluation_kind='physical',stop_when=None)
             row=attempt(start,np.zeros(n),'baseline')
             if row['task_gap']['valid_complete']:centers[start['id']]=row
         if not centers:raise SearchStopped('no_valid_start')
-        active=sorted((s for s in starts if s['id'] in centers),key=lambda s:ranking_key(centers[s['id']]))
+        active=sorted((s for s in starts if s['id'] in centers),key=lambda s:rank_key(centers[s['id']]))
         for iteration in range(cfg.iterations):
+            iterations_started+=1
             start=active[iteration%len(active)];center=centers[start['id']];x=np.asarray(center['coefficients_n'])
             radius=radii[start['id']]
             if radius<cfg.minimum_radius_n:
@@ -105,7 +106,7 @@ def search(starts,evaluate,settings,*,evaluation_kind='physical',stop_when=None)
                         if np.max(abs(applied(start,trial)-applied(start,x)))<=1e-12:
                             ineffective.append(dict(start=start['id'],coefficient=j,label='coordinate',reason='no_applied_input_change'));continue
                         row=attempt(start,trial,'coordinate',base=center,radius=radius)
-                        if ranking_key(row)<ranking_key(center):centers[start['id']]=row;improved=True;break
+                        if rank_key(row)<rank_key(center):centers[start['id']]=row;improved=True;break
                     if improved:break
                 if not improved:radii[start['id']]*=.5
             else:
@@ -148,13 +149,13 @@ def search(starts,evaluate,settings,*,evaluation_kind='physical',stop_when=None)
                 predicted=center['task_gap']['normalized_gap']-solved['predicted_gap']
                 proposal=x.copy();proposal[effective]+=solved['delta']
                 row=attempt(start,proposal,'local_response_proposal',base=center,predicted=predicted,radius=radius,solver=solved)
-                row['local_solver']={k:v for k,v in solved.items() if k!='delta'}
                 radii[start['id']]=trust_radius(radius,predicted,row['actual_improvement'],cfg.coefficient_limit_n)
                 row['next_trust_radius_n']=radii[start['id']]
                 eligible=[r for r in rows if r['start']==start['id'] and r['task_gap']['valid_complete']]
-                centers[start['id']]=min(eligible,key=ranking_key)
+                centers[start['id']]=min(eligible,key=rank_key)
     except SearchStopped as exc:stop=str(exc)
     return dict(version=cfg.version,algorithm=cfg.method,stop_reason=stop,
+        iterations_started=iterations_started,
         cost_feedback=dict(request_budget=cfg.evaluation_requests,evaluation_callbacks=len(rows),
             evaluation_kind=evaluation_kind,
             new_physical_evaluations=sum(not r.get('cache_hit',False) for r in rows) if evaluation_kind=='physical' else 0,
@@ -163,7 +164,7 @@ def search(starts,evaluate,settings,*,evaluation_kind='physical',stop_when=None)
             ineffective_probe_attempts=len(ineffective),unique_response_probes=len(information),
             charged_numerical_s=sum(r.get('cost_s',0.) for r in rows)),
         start_feedback=[dict(start=s['id'],initial_gap=next((r['task_gap'] for r in rows if r['start']==s['id']),None),
-            best=min((r for r in rows if r['start']==s['id'] and r['task_gap']['valid_complete']),key=ranking_key,default=None)) for s in starts],
+            best=min((r for r in rows if r['start']==s['id'] and r['task_gap']['valid_complete']),key=rank_key,default=None)) for s in starts],
         local_responses=responses,ineffective_probes=ineffective,
         active_coefficients=selected,search_dimension=len(selected),start_count=len(starts),
         finite_difference_evaluations=sum(r['label']=='finite_difference' for r in rows),

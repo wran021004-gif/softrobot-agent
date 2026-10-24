@@ -434,6 +434,7 @@ def working_set(host,current):
         for ref in math[-3:]:
             value=host.store.artifact(ref)
             links.append(dict(candidate=candidate,source=ref,evaluation_reference=ref,source_kind='mathematical_prediction',
+                control_source=value.get('control_schedule_reference'),
                 status=value.get('status'),operation=value.get('operation'),trajectory_query=dict(reference=ref,pointer='/trajectory') if value.get('trajectory') else None,
                 task_acceptance='unmeasured'))
         valid=sorted((dict(reference=r,task_gap=task_gap(v)) for r,v in results if task_gap(v)['valid_complete']),key=ranking_key)

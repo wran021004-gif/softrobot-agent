@@ -24,9 +24,14 @@ def window_applicability(requirements, query, assessed, point, reasons):
             abs(query.protocol.period_s-requirements.physical_inputs['control_period_s'])>1e-12):
         reasons.append('Frozen duration and input period must match protocol.')
     coverage=[]
+    expected={'terminal_error_m':'tip_position','holding_max_error_m':'tip_position','holding_max_speed_m_s':'tip_velocity'}
+    if {c.constraint_id for c in requirements.constraints}!=set(expected):
+        reasons.append('Native control v1 requires the registered Reach/Hold norm constraints.')
     for c in requirements.constraints:
         matched=[i for i in c.indices if window and window[0]-1e-12<=requirements.time_grid_s[i]<=window[1]+1e-12]
-        supported=c.kind=='norm_bound' and c.signal.entity=='tip' and c.signal.frame=='world' and c.signal.name in ('tip_position','tip_velocity')
+        supported=(c.kind=='norm_bound' and c.signal.entity=='tip' and c.signal.frame=='world' and
+            c.signal.phase=='post_step' and c.signal.name==expected.get(c.constraint_id))
+        if not supported:reasons.append('Unsupported native control constraint: '+c.constraint_id)
         if supported and len(matched)!=len(c.indices):reasons.append('All task position/velocity constraint samples must be covered by the native window.')
         coverage.append(dict(constraint_id=c.constraint_id,expressible=supported,
             status='diagnostic' if supported else 'not_checked',analyzed_indices=matched if supported else [],
@@ -84,6 +89,7 @@ def calculate(configuration, binding, query, point, requirements, context, check
                     speed=float(max(v[hold])/options['speed_limit']-1))),
             cost_s=0.,independent_evaluation_executed=False)
     result=search([initial],evaluate,settings,evaluation_kind='native_short_rollout',
+        rank_key=lambda row:(row['measure']['signed_maximum_excess'],row['measure']['sum_normalized_excess']),
         stop_when=lambda row:row['measure']['signed_maximum_excess']<=-settings.safety_margin_fraction)
     best=result['best'];optimized=deepcopy(source)
     if best is None:raise ValueError('NO_VALID_NATIVE_CONTROL_PREDICTION')
@@ -93,7 +99,8 @@ def calculate(configuration, binding, query, point, requirements, context, check
     optimized.update(source_kind='explicit_control_schedule_v1',task_acceptance='unmeasured')
     optimized['provenance']=dict(method='mujoco_direct_control_v1',source=context['source'],candidate=binding['candidate'],
         state_provenance=point.get('provenance'),settings=plain(settings),inherited_acceptance=False)
-    cost=dict(**native.cost,optimization_iterations=len(result['local_responses']),
+    cost=dict(**native.cost,optimization_iterations=result['iterations_started'],
+        completed_response_steps=len(result['local_responses']),
         optimization_evaluations=len(evaluations),kernel_wall_s=time.perf_counter()-started)
     raw=dict(initial_state=point,original_schedule=source,optimized_schedule=optimized,optimization=result,cost=cost)
     baseline=evaluations[0];comparison=dict(baseline=baseline,best=best['measure'])
