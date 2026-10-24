@@ -272,7 +272,8 @@ def context(host):
             full_two_knot_response_fits=remaining>=2*channels+2))
     current['control_start_domains']=domains
     current['control_initialization_methods']=dict(baseline='Pretension, explicit tensions_n, or source+parent with optional channel_map',
-        measured_nmpc='initialize_control baseline with source=completed NMPC result, parent=candidate exactly, no channel_map. Saves measured inputs as an unmeasured open-loop ZOH schedule; no inherited acceptance.',
+        measured_nmpc='Optional NMPC can control directly or supply a starting schedule for MuJoCo-direct. Use initialize_control method=baseline, candidate=current candidate, parent=same candidate, source=complete current-Study same-candidate NMPC result, without channel_map. Complete valid task failures remain useful. Only actually applied SI tensions are used, never unexecuted predictions or stitched incomplete traces. The new open-loop ZOH schedule is task_acceptance=unmeasured and needs full independent evaluation. NMPC is not a prerequisite for mathematics or control optimization.',
+        capability_sequence='Current candidate-bound complete task_capability sequence via response_evidence; inherits no physical acceptance.',
         mathematical_response='response_evidence must be a current verified input_sensitivity analysis; optional channels, trust_radius_n, regularization',
         physical_response='Optional baseline source+parent; channels, difference_step_n, trust_radius_n, regularization, evaluation_requests; one baseline plus one full rollout per channel, charged to shared budget')
     current['control_search_domain']=dict(coefficient_order='knot_index * tendon_count + tendon_index',

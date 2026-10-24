@@ -571,7 +571,7 @@ async def converse(host,*,session_handoff=False,pause_after_completed_invocation
     formal=bool(state(host)['spec'].get('capabilities'))
     instructions=state(host)['spec']['execution_instructions']
     native=[PythonAgentTool(name,dict(name=name,description=description,inputSchema={'json':schema.model_json_schema()}),handler(kind))
-        for name,description,schema,kind in [('research_plan','Propose/search/execute/diagnose; Select an exact publicly read fresh complete passing evaluation and freeze it; zero configured extra repetitions seals immediately. Positive configured confirmations preserve failures and identity. History never satisfies fresh gates; failures/counters persist. STOP seals study.',Plan,'plan'),
+        for name,description,schema,kind in [('research_plan','Propose/search/execute/initialize_control/physical_replay/diagnose. Control sources and optional NMPC handoff are described in control_initialization_methods. Select an exact publicly read fresh complete passing evaluation and freeze it; zero configured extra repetitions seals immediately. Positive configured confirmations preserve failures and identity. History never satisfies fresh gates; failures/counters persist. STOP seals study.',Plan,'plan'),
             ('experience_retrieve','Read-only case/procedure draft search/read with provenance',ExperienceQuery,'experience'),
             ('evidence_read','Read exact immutable evidence and JSON pointer',EvidenceQuery,'evidence')]]
     if formal or rl_mode:
