@@ -1,0 +1,93 @@
+{
+  "version": "B-frozen-1",
+  "baseline_commit": "515500267",
+  "task": {
+    "target_world_m": [0.29, 0.035, 0.19],
+    "mount_world_m": [0, 0, 0.15],
+    "initial_state": "named zero qpos/qvel; each candidate owns its model and initializer",
+    "duration_s": 0.35,
+    "control_and_sample_period_s": 0.01,
+    "physics_step_s": 0.0005,
+    "holding_times_s": [0.30, 0.31, 0.32, 0.33, 0.34, 0.35],
+    "terminal_and_holding_position_limit_m": 0.01,
+    "holding_speed_limit_m_s": 0.02,
+    "absolute_tension_bounds_n": [0, 8],
+    "tendon_order": ["near_t0", "near_t1", "near_t2", "far_t0", "far_t1", "far_t2"],
+    "acceptance": "registered evaluator plus frozen coverage, completeness, actual-tension and solver-exception checks; all components required"
+  },
+  "engineering_prior": {
+    "family": "legal source-relative two-segment six-tendon arm; 12 cells per segment; fixed topology/sections/routing/environment",
+    "lengths_m": [0.16, 0.11],
+    "source_young_mpa": [7.2, 5.4],
+    "legal_source_relative_domain": "length +/-5%, Young modulus +/-15%, listed section dimensions +/-5%; coupled constraints remain applicable",
+    "default_speed_weights": {"holding": 0.1, "terminal": 0.1},
+    "gvs_state": "12 curvature coefficients plus 12 rates; MuJoCo has 48 qpos and 48 qvel; world-frame outputs",
+    "authority": "Choose or describe one scientific action only. No scientific worker, formal Study, receipt, SELECT or acceptance is created by this probe. Further physical work needs its real admission."
+  },
+  "costs": {
+    "read_saved_arrays": "no physics; seconds; compare timestamps, actual inputs and saved states",
+    "local_model_or_mechanics": "roughly 1-10 seconds per small saved-state algebra/linearization; no physics time advance",
+    "same_nlp_iteration_contrast": "roughly 125 seconds for one saved terminal NLP at higher iteration cap; no new full NMPC",
+    "short_native_comparison": "20 physical steps per 0.01 s branch; reconstruction may require 680 prefix steps unless a verified complete checkpoint exists",
+    "native_response_search": "1 baseline + active coefficients + 1 proposal per update, 700 steps per full rollout; roughly seconds for 26 rollouts in this small model, plus setup",
+    "full_nmpc": "35 updates, 700 physics steps, roughly 3200-3300 seconds from archived executions",
+    "ppo": "one stage requires finite rollout-aligned actions and independent checkpoint evaluation; cost uncertain, outside this diagnostic allocation"
+  },
+  "cases": {
+    "reach_hold": {
+      "question": "What mechanism currently explains the holding-speed failure, and what next bounded experiment can distinguish competing explanations?",
+      "proposed_next_action_budget": {"estimated_wall_s": 180, "offline_solves": 2, "physics_steps": 720, "full_nmpc": 0, "ppo_actions": 0},
+      "common": [
+        {"id": "RH-O", "source": "S142-O", "kind": "MuJoCo measured execution", "scope": "S142 stiff candidate, near/distal Young 8.279999/6.209999 MPa, unchanged lengths/sections/weights; execution 3c78b551965f443abd966bfb68b969dd", "values": {"updates": 35, "physics_steps": 700, "holding_samples": 6, "terminal_and_max_holding_position_error_m": 0.0031364419, "max_holding_speed_m_s": 0.0228490897, "speed_max_time_s": 0.35, "actual_tension_violation_n": 0, "max_actual_tension_n": 7.922288457, "last_actual_tension_n": [6.984303281, 7.922288457, 4.393994441, 4.198743008, 3.343842164, 3.151046626], "acceptance": "valid_failure; holding_speed alone failed"}},
+        {"id": "RH-S", "source": "S142-S", "kind": "recorded optimizer state", "scope": "same 35 executed NMPC updates; actual legal returned plans were applied", "values": {"ipopt_termination": "Maximum_Iterations_Exceeded", "converged_updates": 0, "available_plans": 35, "max_iterations": 120, "registered_solver_exceptions": 0}}
+      ],
+      "evidence": [
+        {"id": "RH-M", "source": "S143-M", "kind": "matched-input prediction diagnostic", "scope": "same stiff execution, 0.34 projected measured state, actual six tensions, interval 0.34-0.35 s; one-step GVS prediction versus MuJoCo execution, not alternative controls", "values": {"gvs_predicted_speed_m_s": 0.0021239973, "mujoco_speed_m_s": 0.0228490897, "prediction_minus_actual_velocity_vector_norm_m_s": 0.022518645, "gvs_reconstruction_of_actual_endpoint_speed_m_s": 0.018826254, "reconstruction_minus_actual_velocity_vector_norm_m_s": 0.004180880, "prediction_minus_reconstructed_endpoint_velocity_vector_norm_m_s": 0.018403837}},
+        {"id": "RH-C", "source": "S145-C", "kind": "zero-step mechanics checks", "scope": "saved states and specified actual input; algebraic checks, no new physical trajectory; does not establish model equivalence or a unique cause", "values": {"xml_mass_com_stiffness_damping_gravity_mapping_difference": 0, "inertia_tensor_reconstruction_max_difference_kg_m2": 1.90e-15, "tension_sign_channel_and_virtual_work_checks": "matched", "gvs_implicit_force_balance_max_residual_n_m2_at_034": 4.33e-17}}
+      ],
+      "round2": [
+        {"id": "RH-N", "source": "S144-N", "kind": "newly disclosed frozen diagnostic observation", "scope": "same stiff structure, verified common native t=0.34 state, same saved NLP/primal initialization/weights/input bounds; only IPOPT cap 120 to 480; 20 steps per A/B branch; no complete new task study", "raw_values": {"A_speed_m_s": 0.0228490897, "B_speed_m_s": 0.0227524090, "A_selected_objective": 0.0703198500163, "B_selected_objective": 0.0703008166858, "A_selected_scaled_violation": 4.911218e-6, "B_selected_scaled_violation": 1.532882e-6, "B_selected_inf_du": 0.084485, "both_ipopt_status": "Maximum_Iterations_Exceeded", "both_holding_speed_checks": "failed"}},
+        {"id": "RH-H", "source": "S144-H", "kind": "newly disclosed numerical comparison", "scope": "same measured projected start and A actual input; implicit Euler 1x0.01 versus 2x0.005 s, independent root residual checked; only two step sizes", "raw_values": {"velocity_prediction_change_m_s": 0.00043624, "one_step_prediction_error_m_s": 0.022518645, "two_half_step_prediction_error_m_s": 0.022841672, "max_scaled_root_defect": 8.04e-12}}
+      ]
+    },
+    "structure": {
+      "question": "Do fixed-control responses justify a structural preference? Choose the next fair comparison, then reconsider after the scheduled observation.",
+      "proposed_next_action_budget": {"estimated_wall_s": 60, "control_callbacks_per_structure": 30, "structures": 3, "physics_steps": 65100, "full_nmpc": 0, "ppo_actions": 0},
+      "common": [
+        {"id": "ST-O", "source": "A-F", "kind": "MuJoCo full fixed-control execution", "scope": "d-/d0/d+ differ only in distal Young modulus, 4.86/5.40/5.94 MPa; each owns its named zero initial state; same applied control sequence U0, task and time grid", "values": {"young_mpa": [4.86, 5.40, 5.94], "J": [1.517492850595981, 0.16049263228801447, 0.2634236075676397], "definition": "J=max(terminal_position_error/0.01, holding_max_position_error/0.01, holding_max_speed/0.02)-1; J<=0 means these covered hard metrics pass; complete acceptance also needs other frozen components"}}
+      ],
+      "evidence": [
+        {"id": "ST-L", "source": "S140-L", "kind": "local affine mathematical model", "scope": "S140 different diagnostic targets, same two-segment family; straight-arm zero-state GVS linearization, 0.2 N pretension, 0-8 N absolute inputs, 0.35 s sampled horizon; not the present MuJoCo response", "values": {"initial_tip_world_m": [0.298, 0, 0.15], "position_jacobian_singular_values": [0.02211177, 0.02211177, 0], "axial_jacobian_row": "zero", "conic_results": "14/14 optimal, floating KKT/dual numerically_checked", "largest_structure_score_difference": 4.82e-11, "all_six_target_candidates_failed_frozen_nonlinear_geometry_filter": true}},
+        {"id": "ST-G", "source": "S141-G", "kind": "nonlinear consistency diagnostic", "scope": "S141 length-allocation comparison 0.160/0.110 versus 0.155/0.115 m at a shared curved point; not a stiffness derivative; failed IK returned curve independently geometry-checked, not a validated equilibrium", "values": {"curved_position_jacobian_min_singular_value": 0.000717, "target_equilibrium_slsqp": "both status 9, unavailable", "curved_affine_full_horizon_max_geometry_error_mm": [13.3474, 14.8203], "full_horizon_max_relative_dynamics_residual": [1.0009, 1.0012], "curved_conic_status": "optimal / numerically_checked; model scores near -1", "scope_limit": "local geometry check along one direction; no neighborhood error bound, physical acceptance or optimal-value gradient"}}
+      ],
+      "round2": [
+        {"id": "ST-R", "source": "A-R", "kind": "raw reoptimization and independent MuJoCo observations", "scope": "same three structures and task; each reoptimized separately and then executed from its own zero initial state through the registered full evaluator", "raw_values": {"J": [-0.020952944348139546, -0.05073459033306904, -0.048907668841268404], "independent_acceptance": [true, true, true], "cold_02N_best_J": [15.74962296635007, 15.656092069255106, 15.587276532736325]}},
+        {"id": "ST-P", "source": "A-P", "kind": "method configuration", "scope": "same per-structure search settings for warm and cold comparisons; cold has no extra independent replay", "values": {"control_callbacks_each": 26, "local_response_updates_each": 1, "warm_start": "shared U0 from actual complete C1 NMPC applied SI tensions; not unexecuted predictions", "cold_start": "all six channels 0.2 N, same callback/update budget", "response_coefficients": 24, "difference_step_n": 0.02, "initial_trust_radius_n": 0.15, "internal_margin_fraction": 0.05, "stop_reason": "iteration_limit", "slsqp_success": [true, true, true]}},
+        {"id": "ST-U", "source": "A-U", "kind": "numerical limitations", "scope": "finite-budget responses, not independently bounded derivatives", "values": {"warm_response_condition_numbers_approx": [6600000, 38600000, 21200000], "internal_objective": "5% margin epigraph floor truncates further predicted reward", "central_secant_per_mpa": -0.025884004160304497, "d0_to_dplus_secant_per_mpa": 0.003383188, "central_secant_scope": "endpoint descriptive secant cannot directly be a local optimum gradient at d0", "unmeasured": ["step-size convergence", "finite-difference stability", "other warm-start distribution", "nonlinear search convergence"]}}
+      ]
+    }
+  },
+  "sources_offline_only": {
+    "S142-O": "6ffe7bd64:docs/research/s142_reach_hold_autonomous.md#真实物理执行与独立验收; original execution 3c78b551965f443abd966bfb68b969dd/backend/trajectory.json.gz",
+    "S142-S": "6ffe7bd64:docs/research/s142_reach_hold_autonomous.md#真实物理执行与独立验收; original backend/nmpc_updates.json",
+    "S143-M": "2cbbbc39f:docs/research/s143_reach_hold_diagnosis.md sections 2-4; paired original accepted plans and post-step states",
+    "S145-C": "e04f2bc75:docs/research/s145_gvs_prediction_diagnosis.md section 4.3; .worktrees/s145-gvs-prediction-diagnosis/runs/s145/verified/result.json",
+    "S144-N": "e1362cb5d:docs/research/s144_terminal_control_diagnosis.md sections 3-4; .worktrees/s144-terminal-control-diagnosis/runs/s144/result.json#/A,/B,/kkt",
+    "S144-H": "e1362cb5d:docs/research/s144_terminal_control_diagnosis.md section 5; same result.json#/predictions/A",
+    "S140-L": "2913fbb11:evidence/s140_structure_effect/summary.json#/geometry,/comparisons,/conclusion (scalar fields only); docs/research/s140_structure_effect_prescreen.md",
+    "S141-G": "f2223c24b:evidence/s141_model_validity/diagnostic.json#/cases; docs/research/s141_model_validity.md",
+    "A-F": "515500267:evidence/mujoco_reoptimized_structure/summary.json#/results/{d_minus,d_zero,d_plus}/fixed/signed_maximum_excess",
+    "A-R": "515500267:evidence/mujoco_reoptimized_structure/summary.json#/results/{d_minus,d_zero,d_plus}/{warm/best/signed_maximum_excess,replay,cold/best/signed_maximum_excess}",
+    "A-P": "515500267:evidence/mujoco_reoptimized_structure/frozen_plan.json#/settings,/source; summary.json#/results/*/warm/{cost,iterations,stop_reason,solver}",
+    "A-U": "515500267:docs/research/mujoco_reoptimized_structure_sensitivity.md#搜索质量、初始化与成本 and #敏感性与Agent可用结论; summary.json#/results/*/warm/local_responses"
+  },
+  "rubric_offline_only": {
+    "unit": "one case/arm trajectory, both turns retained; five criteria each 0-2; manual scientific review, not a keyword score",
+    "evidence_understanding": ["0: material scope/fact confusion", "1: mostly correct, relevant caveat or distinction missing", "2: correctly separates proxy, optimizer status, measured execution and unknowns"],
+    "hypothesis_quality": ["0: no testable alternatives", "1: alternatives overlap or lack measurable predictions", "2: at least two distinct plausible mechanisms with testable predictions"],
+    "diagnostic_discrimination": ["0: experiment cannot distinguish alternatives", "1: concrete measurement but weak controls or attribution", "2: controlled comparison with outcome branches that change the hypothesis"],
+    "decision_adaptation": ["0: ignores or contradicts new observations", "1: acknowledges observations but over/under-updates", "2: revises or explicitly justifies retaining hypotheses and next action in proportion to new evidence"],
+    "research_cost": ["0: violates allocation or unsupported expensive continuation", "1: bounded but incomplete accounting/prerequisites", "2: discriminating next action with coherent budget and stop rule"],
+    "review_policy": "Alternative legal low-cost discriminating actions can earn full credit. No preferred structure/method answer. Check citations, concrete measurements, falsification, budget, admission and scope manually; automate only schema and accounting. Two pairs are diagnostic, no statistical/generalization claim."
+  }
+}
