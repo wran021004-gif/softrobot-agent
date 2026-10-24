@@ -306,6 +306,8 @@ class Diagnosis:
                 half = np.asarray(self.paired['predictions']['A']['two_half']['state'])
             else:
                 saved = self.updates[end_index]['one_step_prediction']
+                assert saved['applied_tension_n'] == after['tension_n']
+                assert abs(saved['time_s']-after['time_s']) < 1e-12
                 pred = np.asarray(saved['state'])
                 half = None
             record = self.updates[end_index]['complete_update_record']
