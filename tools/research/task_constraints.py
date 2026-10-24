@@ -24,7 +24,7 @@ METHOD_MEANINGS = {
 
 def mathematical_method_view(host, reference):
     """Existing candidate-bound read view: legacy T2 root plus all method details."""
-    from tools.research.state import state
+    from tools.research.state import state, protected
     from tools.research.contracts import AnalysisRequest
     from tools.research.optimal_capability import candidate_methods, CONIC, SENSITIVITY
     from tools.research.design import verify_candidate
@@ -46,6 +46,7 @@ def mathematical_method_view(host, reference):
         if (v.get('candidate')==reference and v.get('implementation')==s['freeze'] and
                 v.get('status')=='computed' and v.get('model') and v.get('protocol')==spec['analysis_protocol']):models.append(r)
     authorization=mathematics_authorization(host,s);methods={}
+    closed=s['research_status']=='stopped' or protected(host)
     for row in rows:
         key=SENSITIVITY if row.get('submode') else row.get('capability_method') or row['operation']
         purpose,meaning=METHOD_MEANINGS[key]
@@ -83,10 +84,10 @@ def mathematical_method_view(host, reference):
             study_authorized=authorized,formal_scope_authorized=authorization['registered_study_scope_authorized'],
             formal_execution_authorized=bool(authorized and authorization['registered_study_scope_authorized'] is True
                 and cfg['task']['family']!='task.tracking'),
-            execution_status='blocked' if reasons or not authorized or s['research_status']=='stopped' else 'conditional_on_admission',
+            execution_status='blocked' if reasons or not authorized or closed else 'conditional_on_admission',
             missing=reasons+row.get('parameter_requirements',[])+([] if authorized else ['study_method_grant_required'])+
                 ([] if authorization['registered_study_scope_authorized'] is True else ['formal_study_math_scope_required'])+
-                (['study_stopped'] if s['research_status']=='stopped' else []),
+                (['study_stopped'] if s['research_status']=='stopped' else ['protected_closeout'] if closed else []),
             estimated_evaluations=row['evaluations'],wall_cost='unknown',
             cost_scope=row.get('evaluation_rule','Model preparation and internal solver attempts are distinct; see original receipts.'),
             limitations=row['limitations'],prerequisites=row['prerequisites'],applicability=row,
@@ -96,7 +97,7 @@ def mathematical_method_view(host, reference):
         methods[key]['planning_status']=('unauthorized' if not authorized or authorization['registered_study_scope_authorized'] is not True else
             'unsupported' if binding_error or row.get('planning_status')=='unsupported' else
             'insufficient_budget' if row.get('budget_allowed') is False else
-            'blocked' if s['research_status']=='stopped' else row.get('planning_status','unsupported' if reasons else 'ready'))
+            'blocked' if closed else row.get('planning_status','unsupported' if reasons else 'ready'))
         if key==SENSITIVITY:
             methods[key]['readiness']=readiness
             methods[key]['cost_scope']='M*B conic solves + up to 2*k dual-face attempts; M=1+2*k. B=1 except two-segment paths: samples-2. Model preparation additional; wall cost unknown.'

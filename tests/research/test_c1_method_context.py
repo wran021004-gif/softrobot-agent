@@ -60,6 +60,7 @@ class C1Archive:
 
     def project(self,packet,events):
         after=deepcopy(packet);host,s=self.host(events)
+        s['count_closeout']=packet['research']['budget']['closeout']['active']
         candidate=packet['research']['mathematical_capabilities']['candidate']
         after['research']['mathematical_capabilities']=methods.mathematical_catalog(methods.mathematical_method_view(host,candidate))
         after['research']['mathematics_authorization']=mathematics_authorization(host,s)
@@ -145,6 +146,9 @@ class MethodContextTests(unittest.TestCase):
     def test_authorization_budget_and_known_c1_approval_projection(self):
         host,s=self.c1.host();ref=s['reference_candidate'];before=deepcopy(s)
         self.assertTrue(mathematics_authorization(host,s)['registered_study_scope_authorized'])
+        s['success_gate']=dict(synthetic_existing_pass=True)
+        self.assertEqual(methods.mathematical_method_view(host,ref)['methods']['mujoco_direct_control_v1']['planning_status'],'blocked')
+        s['success_gate']=None
         s['mathematical_evaluations']=s['spec']['budgets']['mathematical_evaluations']
         self.assertEqual(methods.mathematical_method_view(host,ref)['methods']['mujoco_direct_control_v1']['planning_status'],'insufficient_budget')
         s['spec']['capabilities'].remove('analysis')
