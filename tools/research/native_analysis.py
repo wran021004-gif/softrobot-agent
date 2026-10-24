@@ -118,7 +118,7 @@ def calculate(configuration, binding, query, point, requirements, comparisons):
                     vectors.append((np.asarray(terminal[key])-c.reference[j])/c.radius);jac.append(np.asarray(matrix)/c.radius)
                 u=np.asarray(terminal['actual_tensions_n']);n=len(u);radius=query.native.correction_radius_n
                 solved=constrained_response_step(vectors,jac,np.zeros(n),u[None,:],np.eye(n),native.limits[:,1],radius,radius)
-                response['correction']={k:plain(v) for k,v in solved.items()}
+                response['correction']={**solved,'delta':solved['delta'].tolist()}
                 if solved['success']:
                     actual=np.clip(u+solved['delta'],native.limits[:,0],native.limits[:,1])
                     candidate=native.rollout(start,actual,query.native.horizon_s)

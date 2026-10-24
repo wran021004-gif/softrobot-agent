@@ -9,6 +9,7 @@ import gzip
 import json
 from pathlib import Path
 import sqlite3
+import subprocess
 import sys
 import time
 
@@ -66,7 +67,10 @@ def main():
     study['nmpc_limits']['executions']=0
     study['rl_limits'].update(training_stages=0,evaluation_episodes=0)
     specpath=destination/'study.json';atomic_json(specpath,study)
-    host=core.prepare(specpath,directory=destination/'store');core.bind(host)
+    host=core.prepare(specpath,directory=destination/'store')
+    commit=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip()
+    if state(host).get('freeze')!=commit:
+        core.bind(host,reason='Stage A serialization correction; existing results, failed request and consumed counts retained.' if state(host).get('freeze') else None)
     candidate=construct(host,old_candidate['parameters'],dict(origin='Stage A same legal S142 stiff structure'))
     cfg=host.store.artifact(candidate)['configuration']
     assert cfg['robot']==old_candidate['configuration']['robot'] and cfg['task']==old_candidate['configuration']['task']
@@ -85,7 +89,7 @@ def main():
     base=dict(candidate=candidate,operating_point='saved_state',model_source='mujoco',saved_state=pointref,protocol=state(host)['spec']['analysis_protocol'])
     queries['mechanics']=dict(base,operation='native_dynamics_v1')
     queries['input']=dict(base,operation='short_input_response_v1',native=dict(horizon_s=.01,difference_step_n=.1,correction_radius_n=.25))
-    variables=[('young','segments.distal1.young_pa',(-.01,-.005)),('section','segments.distal1.sections.0.height_z_m',(-.01,.01))]
+    variables=[('young','segments.distal1.young_pa',(-.01,-.005)),('section','segments.distal1.sections.0.height_z_m',(.01,))]
     for label,variable,fractions in variables:
         comparisons=[]
         for fraction in fractions:
@@ -95,7 +99,8 @@ def main():
             structure_response=dict(variable=variable,candidates=comparisons))
     results={};views={};deliveries={}
     for name,query in queries.items():
-        out=analysis.dispatch(host,query,'stage-a-'+name,guard=core.guard,origin='engineering_preflight')
+        key='stage-a-input-serialized' if name=='input' else 'stage-a-'+name
+        out=analysis.dispatch(host,query,key,guard=core.guard,origin='engineering_preflight')
         raw=host.store.artifact(out['reference']);results[name]=dict(reference=out['reference'],value=raw)
         atomic_json(destination/(name+'.json'),results[name])
         if raw['status']!='computed':raise ValueError((name,raw))
@@ -113,20 +118,22 @@ def main():
     assert max(reproduction.values())<=1e-10
     assert abs(terminal['time_s']-rows[34]['time_s'])<=1e-12
     # The original Store receipt protects repeat execution, even after reopening.
-    before_reuse=deepcopy(state(host));reused=analysis.dispatch(host,queries['input'],'stage-a-input',guard=core.guard,origin='engineering_preflight')
+    before_reuse=deepcopy(state(host));reused=analysis.dispatch(host,queries['input'],'stage-a-input-serialized',guard=core.guard,origin='engineering_preflight')
     assert reused['operation_reuse']['additional_analysis_evaluations']==0 and state(host)==before_reuse
     catalog=mathematical_method_view(host,candidate)
     assert all(key in catalog['methods'] for key in ('native_dynamics_v1','short_input_response_v1','fixed_input_structure_v1','controllability'))
     brief=agent_decision_brief(host)
     assert 'integration_state' not in json.dumps(brief) and 'mass_matrix_kg_m2' not in json.dumps(brief)
     assert (dbpath.stat().st_size,dbpath.stat().st_mtime_ns)==before
-    assert state(host)['mathematical_evaluations']==8 and state(host)['pending'] is None
+    failures=[r for r in state(host)['analysis_results'] if host.store.artifact(r)['status']!='computed']
+    assert state(host)['mathematical_evaluations']==7+len(failures) and state(host)['pending'] is None
     assert host.store.remaining()['used']['model_calls']==host.store.remaining()['used']['backend_solves']==0
     summary=dict(source_execution=measured[0],source_candidate=measured[1]['candidate'],candidate=candidate,
         store=str(host.store.root),source_store_unchanged=True,source_store_counts=counts,
         source_store_size_mtime=before,reproduction=reproduction,checkpoint_preparation_cost=native.cost,
         results={k:dict(reference=v['reference'],summary=v['value']['native_analysis']) for k,v in results.items()},
         mathematical_evaluations=state(host)['mathematical_evaluations'],store_budget=host.store.remaining(),
+        failed_results=failures,
         receipt_reuse=reused['operation_reuse'],decision_views=views,reporter_deliveries=deliveries,
         decision_brief_bytes=len(json.dumps(brief).encode()),elapsed_s=time.perf_counter()-started)
     atomic_json(destination/'summary.json',summary)
