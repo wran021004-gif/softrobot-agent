@@ -249,7 +249,10 @@ class FamilySensitivityTests(unittest.TestCase):
         report=reporter.assemble(self.h,[ref]);saved=dict(report=plain(report),interpretation_status='deferred',error=None)
         handoff=reporter.reporter_handoff_summary(self.h,ref,saved)
         brief=compact_scientific_delivery(dict(latest_reports=[handoff],action_trace=dict(recent=[])),decision_only=True)
-        self.assertEqual(brief['latest_reports'][0]['findings'][0]['mathematics']['optimal_sensitivity'],view['optimal_sensitivity'])
+        compact=brief['latest_reports'][0]['findings'][0]['mathematics']
+        self.assertEqual(compact['optimal_sensitivity']['direction_status'],view['optimal_sensitivity']['direction_status'])
+        self.assertEqual(compact['detail_query']['reference'],ref)
+        self.assertNotIn('differences',compact['optimal_sensitivity'])
 
 
 if __name__=='__main__':unittest.main()

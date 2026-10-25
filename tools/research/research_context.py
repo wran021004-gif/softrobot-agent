@@ -934,12 +934,6 @@ def agent_decision_brief(host):
     if s.get('public_prior_manifest'):
         brief['public_prior_manifest']=dict(reference=s['public_prior_manifest'],view='full',
             scope='Frozen engineering priors; no historical experimental feedback')
-    if s['spec'].get('family_sensitivity_variables'):
-        brief['family_sensitivity_conditions']=dict(
-            authorized_variables=s['spec']['family_sensitivity_variables']['variables'],
-            prerequisites=['Legal indices in the actual candidate','Authorized continuous variable',
-                'Complete registered symmetric model group with exact bindings','Sufficient model-preparation and kernel budget'],
-            scope='Generation legality alone does not establish mathematical method support')
     candidate=next((r['candidate'] for r in (intent['latest_decision'],intent['last_research']) if r and r.get('candidate')),None)
     candidate=candidate or (brief.get('latest_scientific_feedback') or {}).get('candidate')
     if candidate is None and len(s.get('candidates',{}))==1:candidate=next(iter(s['candidates'].values()))
@@ -1015,7 +1009,7 @@ def compact_scientific_delivery(brief,*,decision_only=False):
             # Detailed model/coverage/template information has one query owner.
             for key in list(row):
                 if key not in ('planning_status','execution_status','missing','estimated_evaluations',
-                        'study_authorized','formal_execution_authorized','detail_pointer'):
+                        'study_authorized','formal_execution_authorized','detail_pointer','registered','authorized','applicable','executable'):
                     row.pop(key)
         if brief.get('selected_mathematical_method'):
             selected=brief['selected_mathematical_method']['method']
@@ -1035,6 +1029,16 @@ def compact_scientific_delivery(brief,*,decision_only=False):
         extra=brief.get('additional_mathematical_evidence',[])[-1:]
         latest=(brief.get('latest_scientific_feedback') or {}).get('reference')
         brief['additional_mathematical_evidence']=extra if not reported_math or any(r['reference']==latest for r in extra) else []
+        math_views=[(r['mathematics'],r['reference']) for r in brief.get('additional_mathematical_evidence',[])]
+        math_views += [(f['mathematics'],f['result']['reference']) for r in brief.get('latest_reports',[])
+            for f in r.get('findings',[]) if f.get('mathematics')]
+        for math,ref in math_views:
+            if math.get('optimal_sensitivity'):
+                t2=math['optimal_sensitivity']
+                math.clear()
+                math.update(optimal_sensitivity=dict(parameter=t2['parameter']['path'],direction_status=t2['direction_status'],
+                    preferred_parameter_direction=t2['preferred_parameter_direction'],physical_acceptance='unmeasured'),
+                    detail_query=dict(reference=ref,view='working_set',pointer='/mathematical_decision_view/optimal_sensitivity'))
         for report in brief.get('latest_reports',[]):
             report['interpretations']=[dict(kind='hypothesis',text=i['text'],sources=i['sources'])
                 for i in report.get('interpretations',[])[:1]]

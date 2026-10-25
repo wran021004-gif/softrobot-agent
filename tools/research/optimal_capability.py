@@ -153,7 +153,7 @@ def candidate_methods(host, reference):
         else [p for p in spec['allowed_parameters'] if p.endswith(('.length_m','.young_pa'))])
     rows=[]
     for variable in variables:
-        row=dict(variable=variable,status='missing_models',ready_stencils=[],rejections=[])
+        row=dict(variable=variable,status='missing_models',ready_stencils=[],incomplete_stencils=[],rejections=[])
         models=[]
         for ref in s.get('analysis_results',[]):
             raw=host.store.artifact(ref)
@@ -165,21 +165,30 @@ def candidate_methods(host, reference):
                 models.append((ref,raw,parameter_value(p,variable)))
             except (ValueError,KeyError):continue
         try:
-            if spec.get('start_mode')=='family_space':family_parameters(spec,candidate,variable)
+            if spec.get('start_mode')=='family_space':
+                parameters,parameter=family_parameters(spec,candidate,variable)
+            else:
+                parameters=candidate['parameters'];parameter=dict(path=variable,
+                    units='m' if variable.endswith('length_m') else 'Pa',bounds=spec['allowed_parameters'][variable])
+            origin=parameter_value(parameters,variable)
+            row.update(parameter=parameter,current_value=origin,
+                maximum_symmetric_step=min(origin-parameter['bounds'][0],parameter['bounds'][1]-origin))
         except ValueError as exc:row.update(status='not_applicable',reason=str(exc))
         for base,raw,origin in models:
             if raw['candidate']!=plain(reference):continue
             # Discover only already registered symmetric groups. No candidate/model creation.
-            for plus,_,value in models:
-                h=value-origin
-                if h<=0:continue
+            for h in sorted({abs(value-origin) for _,_,value in models if value!=origin},reverse=True):
                 for k in (1,2):
                     steps=[h] if k==1 else [h,h/2]
-                    refs=[base]
+                    refs=[base];missing=[]
                     for offset in [v for step in steps for v in (-step,step)]:
                         match=next((r for r,_,v in models if math.isclose(v-origin,offset,rel_tol=1e-10,abs_tol=0.)),None)
                         if match is not None:refs.append(match)
-                    if len(refs)!=1+2*k:continue
+                        else:missing.append(origin+offset)
+                    if missing:
+                        row['incomplete_stencils'].append(dict(steps=steps,missing_parameter_values=missing,
+                            unvalidated_model_results=refs,operating_point=raw['requested_operation']['operating_point']))
+                        continue
                     try:
                         query=AnalysisRequest.model_validate(dict(candidate=reference,operation='task_capability',
                             operating_point=raw['requested_operation']['operating_point'],protocol=spec['analysis_protocol'],
@@ -202,7 +211,14 @@ def candidate_methods(host, reference):
     return dict(method=SENSITIVITY,status='executable' if not reasons and any(r['status']=='executable' for r in rows) else 'not_applicable',
         reasons=reasons,variables=rows,remaining_evaluations=remaining,
         planning=[sensitivity_cost(k,None,remaining,conic_authorized=bool(methods.get(CONIC)),subproblems=branches) for k in (1,2)],
-        from_zero_examples=[sensitivity_cost(k,0,remaining,conic_authorized=bool(methods.get(CONIC)),subproblems=branches) for k in (1,2)])
+        from_zero_examples=[sensitivity_cost(k,0,remaining,conic_authorized=bool(methods.get(CONIC)),subproblems=branches) for k in (1,2)],
+        model_preparation=dict(steps='Agent chooses h, optionally h/2, inside the parameter bounds; no automatic perturbation.',
+            required_values=['d0','d0-h','d0+h','d0-h/2 (two scales)','d0+h/2 (two scales)'],
+            reuse='Only ready_stencils passed sensitivity_context; incomplete groups are unvalidated inventory.',
+            request_template=dict(candidate='<generated stencil candidate>',operation='linearization',
+                operating_point='controller_start_input',scoring_window_s=spec['analysis_protocol']['windows_s'][0],protocol=spec['analysis_protocol']),
+            alternative=dict(operation='task_capability',capability_method=CONIC),
+            evidence_query=dict(reference=plain(reference),view='working_set',pointer='/all_fresh_results')))
 
 
 def sensitivity_context(host, query):

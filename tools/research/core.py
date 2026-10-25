@@ -45,6 +45,10 @@ def read_evidence(host, query, *, record_read=True):
         if q.pointer=='/diagnostic_relations' or q.pointer.startswith('/diagnostic_relations/'):
             from tools.research.evidence_views import diagnostic_relations
             derived=dict(diagnostic_relations=diagnostic_relations(host,plain(q.reference)))
+        elif q.pointer=='/mathematical_decision_view' or q.pointer.startswith('/mathematical_decision_view/'):
+            from tools.research.evidence_views import result_card
+            from tools.research.research_context import mathematical_decision_view
+            derived=dict(mathematical_decision_view=mathematical_decision_view(plain(result_card(host,plain(q.reference)))))
         elif q.pointer=='/historical_execution_files' or q.pointer.startswith('/historical_execution_files/'):
             from tools.research.numerics import execution_source, archived
             entry=next((e for e in s['spec']['research_decisions'].get('background',[]) if e['reference']==plain(q.reference)),None)

@@ -237,11 +237,25 @@ def populate_mathematics(mathematics, trajectory, reference):
 def sensitivity_summary(value):
     """Finite differences remain diagnostics; unresolved dual faces stay visible."""
     rows=value.get('reoptimized_finite_difference',[])
+    records=value.get('numerical_optimality',[{}])[0].get('result',{}).get('replay',{}).get('records',[])
     return dict(method_version=value['method_version'],direction_status=value['direction_status'],
         parameter=value['parameter_identity'],preferred_parameter_direction=value.get('preferred_parameter_direction','unresolved'),
+        baseline=value.get('summary'),control_treatment=value['control_treatment'],
+        task_scope=value.get('task_scope'),source_references=value.get('source_references'),
+        sampled_parameter_values=[r['value'] for r in value.get('numerical_optimality',[])],
+        perturbation_scope='Sampled points only; no validated neighborhood or descent radius.',
         differences=[dict(step=r['step'],reoptimized=r['reoptimized'],interval=r['numerical_slope_interval'],
+            fixed_control=r['fixed_control'],fixed_control_legal=r['fixed_control_legal'],
             dual_face_status=r['dual_face']['status'],source_pointer=f'/optimal_sensitivity/reoptimized_finite_difference/{i}') for i,r in enumerate(rows)],
         dominant_constraints=value.get('summary',{}).get('dominant_constraints'),
+        active_constraints=dict(pointer='/optimal_sensitivity/active_constraints',
+            baseline=[dict(atom_index=i,**value['active_constraints']['identities'][i],
+                observation_pointer='/optimal_sensitivity/numerical_optimality/0/result/replay/records/'+str(value['active_constraints']['identities'][i]['row_index']),
+                observation={k:v for k,v in records[value['active_constraints']['identities'][i]['row_index']].items()
+                    if k in ('absolute_time_s','value','radius','lower','upper','signed_violation','passed')})
+                for i in value.get('active_constraints',{}).get('epigraph',[[]])[0]]),
+        reliability=dict(numerical_optimality=[r['result']['optimality_status'] for r in value.get('numerical_optimality',[])],
+            regularity_pointer='/optimal_sensitivity/regularity',envelope=value.get('envelope_sensitivity')),
         scope=value['model_scope'],strict_gradient='unavailable',cost=value.get('computation_cost'),
         unsupported_inferences=value['unsupported_inferences']+[
             'Shortening length necessarily improves holding speed.',

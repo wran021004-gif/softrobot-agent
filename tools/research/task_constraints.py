@@ -111,6 +111,12 @@ def mathematical_method_view(host, reference):
         if key==SENSITIVITY:
             methods[key]['readiness']=readiness
             methods[key]['cost_scope']='M*B conic solves + up to 2*k dual-face attempts; M=1+2*k. B=1 except two-segment paths: samples-2. Model preparation additional; wall cost unknown.'
+            methods[key].update(registered=True,authorized=methods[key]['formal_execution_authorized'],
+                applicable=row['task_applicable'] and any(r.get('parameter') for r in readiness.get('variables',[])),
+                executable=bool(methods[key]['formal_execution_authorized'] and not closed and readiness.get('status')=='executable'))
+            if not methods[key]['executable']:methods[key]['execution_status']='blocked'
+            elif not reasons:methods[key]['planning_status']='ready'
+            methods[key]['structural_proposal']='Optional research_plan(action=generate, generation=<copy current parameters with one bounded edit>, supporting_evidence=[T2 result], decision.claimed_inference=empirical_search). Choose direction and step from the evidence; unresolved permits contrasts or no edit. New candidate requires its own T1 control reoptimization (1 model + B solves); physical acceptance remains unmeasured.'
         if key=='mujoco_direct_control_v1':
             if spec.get('native_control_limits'):methods[key]['execution_limits']=spec['native_control_limits']
             executions=[r for r in s.get('results',[]) if host.store.artifact(r).get('candidate')==reference]
@@ -143,7 +149,8 @@ def mathematical_catalog(view):
     shared_cost='Model preparation and internal solver attempts are distinct; see original receipts.'
     for row in view['methods'].values():
         item={k:row[k] for k in ('scientific_purpose','description','method_version','kernel_supported','model_built','full_task_supported','study_authorized',
-            'formal_execution_authorized','execution_status','planning_status','missing','estimated_evaluations','cost_scope','supported_task_families','execution_limits') if k in row}
+            'formal_execution_authorized','execution_status','planning_status','missing','estimated_evaluations','cost_scope','supported_task_families','execution_limits',
+            'registered','authorized','applicable','executable') if k in row}
         item['detail_pointer']='/methods/'+row['method']
         item['coverage']=[{k:v for k,v in c.items() if k in ('constraint_id','status','expressible')} for c in row['coverage']]
         item['missing']=list(dict.fromkeys(item['missing']))
@@ -233,6 +240,7 @@ def analysis_capabilities(configuration, requirements, protocol, *, model=None, 
                 submode='optimal_sensitivity' if method==SENSITIVITY else None,
                 method_version=('sampled-affine-conic-path-progress-v1' if method==CONIC else 'controlled-path-progress-sensitivity-v1') if path is not None else method,
                 status='not_applicable' if reasons else 'conditional',reasons=reasons,dependency_environment=env,
+                task_applicable=fit['status']!='not_applicable',
                 planning_status='unauthorized' if 'method_not_authorized' in reasons else 'unsupported' if fit['reasons'] or not env['available'] else
                     'insufficient_budget' if 'insufficient_budget' in reasons else 'requires_parameters' if method==SENSITIVITY else 'ready',
                 evaluations=count,evaluation_rule=(f'One model build plus {subproblems} internal conic subproblems' if method==CONIC else f'(1+2*k)*{subproblems}+2*k kernel/dual-face solves for k central step sizes; existing models required'),
