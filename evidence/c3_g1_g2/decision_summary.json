@@ -1,0 +1,890 @@
+{
+  "status": "B3_completed_unscored",
+  "cohort": "c3-g1-paired-decisions-v1",
+  "prior_cohort": null,
+  "baseline": "395e9b65fcb51ea14758a65ff0e8085ab3b5492a",
+  "provider": {
+    "adapter": "deepseek",
+    "adapter_version": "8.0.0",
+    "base_url": "https://api.deepseek.com",
+    "context_bytes": 4194304,
+    "context_guard": {
+      "context_limit_tokens": 1000000,
+      "estimate": "one token per serialized UTF-8 byte plus framing; conservative estimate, not tokenization",
+      "framing_headroom_tokens": 8192,
+      "source": "https://api-docs.deepseek.com/quick_start/pricing/",
+      "verified_date": "2026-10-03"
+    },
+    "investigation_max_tokens": 32768,
+    "max_no_progress": 3,
+    "max_repairs": 10,
+    "max_tokens": 32768,
+    "max_turns": 40,
+    "model": "deepseek-flash",
+    "parameters": {},
+    "protocol_recovery": {
+      "max_consecutive": 40,
+      "max_total": 40
+    },
+    "reasoning_effort": "high",
+    "strategy": "strategy.tool",
+    "strategy_version": "1.0.0",
+    "supports_images": false,
+    "supports_text": true,
+    "supports_tools": true,
+    "thinking": "enabled",
+    "timeout_s": 600.0
+  },
+  "authorization": "2026-10-25 explicit user G1/G2 authorization: G1 continuity <=2 and paired decisions <=4 DeepSeek requests, mathematics=0; only after G1 passes G2 <=8 DeepSeek requests including Reporter and <=4 total mathematical evaluations including preparation/internal calls. All stages: independent physics=0, NMPC=0, PPO=0; no retries, budget resets, full A/B or unbounded search. Necessary frozen task/design and cited scientific excerpts only. C:/Users/gugugaga/.codex/attachments/b47b5887-0227-426f-9031-13cbb0fdda25/已粘贴的文本.txt",
+  "request_ceiling": 4,
+  "actual_requests": 4,
+  "reporter_requests": 0,
+  "physics_steps": 0,
+  "scientific_workers": 0,
+  "formal_studies": 0,
+  "cases": {
+    "c3_next_decision": {
+      "question": "Which next action can distinguish structural limits, control limits, model mismatch and numerical uncertainty? State competing hypotheses and falsifying observations.",
+      "proposed_next_action_budget": {
+        "mathematical_evaluations": 2,
+        "physical_launches": 1,
+        "nmpc": 0,
+        "ppo": 0,
+        "execution": "Hypothetical next experiment requiring separate authorization; this probe executes none"
+      },
+      "common": [
+        {
+          "fact_id": "historical_nmpc_failure",
+          "source": {
+            "reference": {
+              "artifact_id": "ead9bd6e454fc25a83e34ca7147c3cca3680a07a831fc5dbedeea7c05b08474f",
+              "media_type": "application/json"
+            },
+            "pointer": "/acceptance"
+          },
+          "candidate": {
+            "artifact_id": "e0f2ccf53680ad00b1ed5d258d8b5eed38ced55fbc07f3bde07d3e5ce415ac1d",
+            "media_type": "application/json"
+          },
+          "metrics": {
+            "holding_max_error_m": 0.004517235241814829,
+            "holding_max_speed_m_s": 0.18173358255275762,
+            "terminal_error_m": 0.004092012428299794
+          },
+          "components": {
+            "evaluation_validity": {
+              "limit": null,
+              "passed": true,
+              "reason": null,
+              "unit": null,
+              "value": "valid"
+            },
+            "evaluator:task_bound": {
+              "limit": 0.01,
+              "passed": true,
+              "reason": null,
+              "unit": "m",
+              "value": 0.004092012428299794
+            },
+            "execution_complete": {
+              "limit": null,
+              "passed": true,
+              "reason": null,
+              "unit": null,
+              "value": true
+            },
+            "force_bounds": {
+              "limit": 1e-08,
+              "passed": true,
+              "reason": null,
+              "unit": "N",
+              "value": 0.0
+            },
+            "holding_coverage": {
+              "limit": 6,
+              "passed": true,
+              "reason": null,
+              "unit": "inclusive uniform samples",
+              "value": true
+            },
+            "holding_position": {
+              "limit": 0.01,
+              "passed": true,
+              "reason": null,
+              "unit": "m",
+              "value": 0.004517235241814829
+            },
+            "holding_speed": {
+              "limit": 0.02,
+              "passed": false,
+              "reason": null,
+              "unit": "m/s",
+              "value": 0.18173358255275762
+            },
+            "solver_errors": {
+              "limit": 0,
+              "passed": true,
+              "reason": null,
+              "unit": "count",
+              "value": 0
+            },
+            "task_evaluator": {
+              "limit": null,
+              "passed": true,
+              "reason": null,
+              "unit": null,
+              "value": true
+            }
+          },
+          "independent_physical_observation": true
+        },
+        {
+          "fact_id": "historical_fixed_sequence_failure",
+          "source": {
+            "reference": {
+              "artifact_id": "3f67ca10b4ebbb554f7f51809d9720230e011941412f1c138a86667ca2c8612f",
+              "media_type": "application/json"
+            },
+            "pointer": "/acceptance"
+          },
+          "metrics": {
+            "holding_max_error_m": 0.013706442098244485,
+            "holding_max_speed_m_s": 0.2741264353343463,
+            "terminal_error_m": 0.013706442098244485
+          },
+          "independent_physical_observation": true,
+          "control": "Different fixed open-loop input from NMPC"
+        },
+        {
+          "fact_id": "frozen_execution_grids",
+          "replan_s": 0.1,
+          "control_and_sampling_s": 0.01,
+          "physics_dt_s": 0.0005
+        }
+      ],
+      "evidence": [
+        {
+          "fact_id": "sampled_affine_witness",
+          "source": {
+            "reference": {
+              "artifact_id": "87d6267303ffd0e3a20cc229658a4492ccfd5799d3edfffbfbeb03b186822931",
+              "media_type": "application/json"
+            },
+            "pointer": "/trajectory"
+          },
+          "candidate": {
+            "artifact_id": "e0f2ccf53680ad00b1ed5d258d8b5eed38ced55fbc07f3bde07d3e5ce415ac1d",
+            "media_type": "application/json"
+          },
+          "method": "sampled-affine-conic-minimax-v1",
+          "score": -0.19999999999954968,
+          "optimality": "numerically_checked",
+          "numerical_replay": true,
+          "horizon": {
+            "control_period_s": 0.01,
+            "input_hold_s": 0.01,
+            "remaining_task_s": 0.35,
+            "sample_period_s": 0.01,
+            "sample_phase": "post_step_preceding_hold",
+            "sample_steps": {
+              "0": 0,
+              "1": 1,
+              "10": 10,
+              "11": 11,
+              "12": 12,
+              "13": 13,
+              "14": 14,
+              "15": 15,
+              "16": 16,
+              "17": 17,
+              "18": 18,
+              "19": 19,
+              "2": 2,
+              "20": 20,
+              "21": 21,
+              "22": 22,
+              "23": 23,
+              "24": 24,
+              "25": 25,
+              "26": 26,
+              "27": 27,
+              "28": 28,
+              "29": 29,
+              "3": 3,
+              "30": 30,
+              "31": 31,
+              "32": 32,
+              "33": 33,
+              "34": 34,
+              "35": 35,
+              "4": 4,
+              "5": 5,
+              "6": 6,
+              "7": 7,
+              "8": 8,
+              "9": 9
+            },
+            "start_time_s": 0.0,
+            "step_count": 35
+          },
+          "operating_point": {
+            "actual_time_s": 0.0,
+            "available": true,
+            "construction": {
+              "achieved_world_point_m": [
+                0.29799999999999993,
+                0.0,
+                0.15
+              ],
+              "execution_trajectory_used": false,
+              "method": "existing immutable controller preparation/numerical-source logic",
+              "numerical_source": "initial_state_pretension",
+              "position_residual_m": 0.053749418601506754,
+              "preparation_provenance": {
+                "actual_initial_state_source": "Candidate Task initializer then measured backend state at every update",
+                "current_scope": {
+                  "backend": {
+                    "extension_id": "backend.family_mujoco",
+                    "parameters": {
+                      "contract": "family.mujoco_parameters",
+                      "data": {
+                        "contact_model": "mujoco_convex_native",
+                        "friction": [
+                          0.0,
+                          0.0,
+                          0.0
+                        ],
+                        "integrator": "implicitfast",
+                        "timestep_source": "task.timing.timestep_s"
+                      },
+                      "version": "1.0.0"
+                    },
+                    "version": "1.1.0"
+                  },
+                  "controller": {
+                    "extension_id": "controller.gvs_nmpc",
+                    "parameters": {
+                      "contract": "family.gvs_reach_control",
+                      "data": {
+                        "numerical_source": "initial_state_pretension",
+                        "recipe": {
+                          "basis": {
+                            "strategy": "structural_linear"
+                          },
+                          "constraint_jacobian_mode": "reverse",
+                          "curvature_scale_rad_m": 10.0,
+                          "evaluation_threads": 1,
+                          "feasible_return": null,
+                          "holding_brake_lead_s": 0.0,
+                          "holding_speed_cost_mode": "time_integral_v1",
+                          "holding_speed_cost_window_s": 0.05,
+                          "holding_tip_speed_weight": 0.1,
+                          "horizon": 10,
+                          "integration_method": "implicit_euler",
+                          "max_cpu_s": null,
+                          "max_iterations": 120,
+                          "max_unusable_updates": 3,
+                          "path_capture_m": 0.001,
+                          "path_lookahead_m": 0.003,
+                          "position_error_scale_m": null,
+                          "progress_weight": 0.0,
+                          "rate_scale_rad_m_s": 1000.0,
+                          "recover_returned_tensions": true,
+                          "reference_mode": "constant",
+                          "regenerate_warm_states": true,
+                          "regression_weight": 0.0,
+                          "relative_velocity_weight": 0.0,
+                          "replan_period_s": 0.1,
+                          "root_tolerance": 1e-10,
+                          "seed_position_tolerance_fraction": 0.5,
+                          "seed_speed_limit_m_s": 0.02,
+                          "stopping_policy": "research_work_v1",
+                          "substeps": 1,
+                          "tension_weight": 0.0001,
+                          "terminal_tip_speed_weight": 0.1,
+                          "terminal_velocity_weight": 0.0001,
+                          "terminal_weight": 5.0,
+                          "tip_speed_scale_m_s": 0.02,
+                          "tolerance": 1e-06,
+                          "tracking_weight": 1.0,
+                          "variation_weight": 0.001,
+                          "velocity_weight": 0.0001
+                        },
+                        "settling": {
+                          "position_limit_m": 0.01,
+                          "speed_limit_m_s": 0.02,
+                          "window_s": 0.05
+                        }
+                      },
+                      "version": "1.0.0"
+                    },
+                    "version": "11.0.0"
+                  },
+                  "discretization": {
+                    "contract": "family.discretization",
+                    "data": {
+                      "cells": {
+                        "segment_0": 12,
+                        "segment_1": 12
+                      },
+                      "coordinates": "two_principal_bending_angles_per_cell",
+                      "model": "serial_bending_cells_v1",
+                      "version": "serial_bending_discretization_v1"
+                    },
+                    "version": "1.0.0"
+                  },
+                  "execution_model": {
+                    "extension_id": "model.serial_bending_cells",
+                    "parameters": {
+                      "contract": "family.dynamics_model",
+                      "data": {},
+                      "version": "1.0.0"
+                    },
+                    "version": "1.0.0"
+                  },
+                  "robot": {
+                    "family": "tendon_robot_family",
+                    "identity": "23a6d76d92dff8b228331be950e5a1e74195b7a685e938b72f5d40e92c55af8f"
+                  },
+                  "seed": 17,
+                  "task": {
+                    "environment": "5cee25b33f4ff19cb0abd93651ce9077a81665990f07d8f5a4967497e8e82a4d",
+                    "family": "task.reach",
+                    "goal": "78c3e06ccabeab73f0020e2ff3fc6a6a425eec824f878f4b25f2db1a36f41463",
+                    "identity": "69cdc96a2e400d6c92cfda4c9f43a9d7649ba49da7ac2c353cc984fc7b8fd515",
+                    "initializer": "3a90c93217f15e9a60db7f65f611911f4aa53f1a4987340949e1068fd2647c22",
+                    "timing": {
+                      "control_period_s": 0.01,
+                      "duration_s": 0.35,
+                      "sample_period_s": 0.01,
+                      "termination": [
+                        "duration",
+                        "numerical_failure"
+                      ],
+                      "timestep_s": 0.0005
+                    }
+                  }
+                },
+                "historical_states_reused": false,
+                "nominal_is_current_target_solution": false,
+                "physics_identity": "31bb2129a70091b30e29c008ecc32abb49e593c1d994a52c499071fcef4b4088",
+                "previous_input_source": "candidate bounded pretension",
+                "resolved_basis_identity": "9637ffe35f961a28c069143bdc6d16344dc7fc76c87e168bd9802f006cbdefe9",
+                "reused": false,
+                "source_kind": "project_initial_state_and_bounded_pretension",
+                "validity": "Tensions are numerical guesses; placeholder states must be regenerated using candidate dynamics before use"
+              },
+              "static_equilibrium": false
+            },
+            "name": "controller_start_input",
+            "phase": "configuration_controller_start_input",
+            "remaining_task_s": 0.35,
+            "scope": "controller-start input",
+            "time_origin": "frozen initializer via existing controller preparation"
+          },
+          "scope": "Local sampled affine model only; no nonlinear physical success"
+        },
+        {
+          "fact_id": "math_physics_alignment",
+          "left": {
+            "artifact_id": "87d6267303ffd0e3a20cc229658a4492ccfd5799d3edfffbfbeb03b186822931",
+            "media_type": "application/json"
+          },
+          "right": {
+            "artifact_id": "3f67ca10b4ebbb554f7f51809d9720230e011941412f1c138a86667ca2c8612f",
+            "media_type": "application/json"
+          },
+          "status": "partial_comparison",
+          "kind": "same_control_math_physics",
+          "alignment": {
+            "candidate": true,
+            "task": true,
+            "source_control": true,
+            "tendon_order": true,
+            "actual_tensions": true,
+            "time_grid": true,
+            "initial_state": true,
+            "saved_prediction_samples": false,
+            "recorded_aligned_difference": false,
+            "numerical_replay": true
+          },
+          "missing_conditions": [
+            "saved_prediction_samples",
+            "recorded_aligned_difference"
+          ],
+          "mathematical_aggregates": {
+            "terminal_error_m": {
+              "value": 0.008000000000002585,
+              "units": "m",
+              "absolute_time_s": 0.35000000000000003,
+              "radius": 0.01
+            },
+            "holding_max_error_m": {
+              "value": 0.008000000000004504,
+              "units": "m",
+              "absolute_time_s": 0.32,
+              "radius": 0.01
+            },
+            "holding_max_speed_m_s": {
+              "value": 0.013754640667324113,
+              "units": "m/s",
+              "absolute_time_s": 0.35000000000000003,
+              "radius": 0.02
+            }
+          },
+          "supported_scope": "Recorded task aggregates only; no sample differences reconstructed",
+          "unsupported_conclusions": [
+            "Global nonlinear feasibility",
+            "Failure cause",
+            "Different-control difference as model error"
+          ]
+        },
+        {
+          "fact_id": "search_resolution",
+          "comparison": {
+            "kind": "different_structure_task_results",
+            "left": {
+              "artifact_id": "0ce7c5e7f1cb941605d4e6d2ca558f1c950643b1fb63f0faac579a9976e11878",
+              "media_type": "application/json"
+            },
+            "right": {
+              "artifact_id": "87d6267303ffd0e3a20cc229658a4492ccfd5799d3edfffbfbeb03b186822931",
+              "media_type": "application/json"
+            },
+            "candidates": [
+              {
+                "artifact_id": "fcfb5f46268f43d2b96f3e7f292c9005a4c7ecdd103ea6c6b8d2842027b953df",
+                "media_type": "application/json"
+              },
+              {
+                "artifact_id": "e0f2ccf53680ad00b1ed5d258d8b5eed38ced55fbc07f3bde07d3e5ce415ac1d",
+                "media_type": "application/json"
+              }
+            ],
+            "resolution": {
+              "status": "indistinguishable_at_recorded_numerical_precision",
+              "score_delta": 2.62456723021387e-13,
+              "recorded_support_intervals": [
+                [
+                  -0.2000000001349602,
+                  -0.19999999999981213
+                ],
+                [
+                  -0.2000000000845339,
+                  -0.19999999999954968
+                ]
+              ],
+              "strict_structure_ranking_supported": false,
+              "scope": "Floating support/replay estimates, not rigorous bounds; independent physics is separate. Historical incumbent unchanged."
+            },
+            "changed_parameters": [
+              {
+                "pointer": "/segments/0/young_pa",
+                "before": 7200000.0,
+                "after": 10450000.0
+              }
+            ],
+            "verified_constraints": [
+              {
+                "reference": {
+                  "artifact_id": "0ce7c5e7f1cb941605d4e6d2ca558f1c950643b1fb63f0faac579a9976e11878",
+                  "media_type": "application/json"
+                },
+                "pointer": "/trajectory/coverage"
+              },
+              {
+                "reference": {
+                  "artifact_id": "87d6267303ffd0e3a20cc229658a4492ccfd5799d3edfffbfbeb03b186822931",
+                  "media_type": "application/json"
+                },
+                "pointer": "/trajectory/coverage"
+              }
+            ],
+            "independent_physical_support": {
+              "left": [],
+              "right": [
+                {
+                  "artifact_id": "3f67ca10b4ebbb554f7f51809d9720230e011941412f1c138a86667ca2c8612f",
+                  "media_type": "application/json"
+                },
+                {
+                  "artifact_id": "ead9bd6e454fc25a83e34ca7147c3cca3680a07a831fc5dbedeea7c05b08474f",
+                  "media_type": "application/json"
+                }
+              ]
+            },
+            "causal_attribution": "Unavailable: independently reoptimized control and distinct structures"
+          }
+        }
+      ],
+      "round2": [
+        {
+          "fact_id": "scheduled_historical_feedback",
+          "source": {
+            "reference": {
+              "artifact_id": "86e25bcac4b1b5b689d3582ced239b4b55a02d3f553e6cc504bc7c7108c0950e",
+              "media_type": "application/json"
+            },
+            "pointer": "/34"
+          },
+          "final_time_s": 0.35,
+          "final_speed_m_s": 0.050052001114636535,
+          "holding_max_time_s": 0.31,
+          "holding_max_speed_m_s": 0.18173358255275762,
+          "exact_saved_update_ids": [
+            30
+          ],
+          "new_execution": false,
+          "origin": "Original B history, independent of both proposed actions; identical feedback in both arms"
+        }
+      ]
+    }
+  },
+  "sources": {
+    "binding_rule": "All facts above retain original B Store references; no transfer into a new scientific candidate or acceptance.",
+    "round2_rule": "Freeze independent feedback and scoring before turn 1; never supply it early or represent scheduled feedback as execution of the Agent proposal. No post-outcome rubric edits.",
+    "output_rule": "Keep original Plan/ResearchDecision, raw response/reasoning/tool call, receipts and exact complete wire. No new Agent or evaluator."
+  },
+  "rubric": [
+    {
+      "criterion": "evidence_scope",
+      "score": null,
+      "anchor": "0 conflates model/numerics/physics; 1 partly separates; 2 correctly interprets values, bounds, units, time and inference limits"
+    },
+    {
+      "criterion": "testable_hypothesis",
+      "score": null,
+      "anchor": "0 none; 1 one falsifiable mechanism; 2 competing mechanisms with falsifying observations"
+    },
+    {
+      "criterion": "discriminating_action",
+      "score": null,
+      "anchor": "0 no mechanism separation; 1 incomplete; 2 feasible bounded action with outcome branches separating mechanisms"
+    },
+    {
+      "criterion": "feedback_revision",
+      "score": null,
+      "anchor": "0 ignores feedback; 1 mentions it; 2 updates hypotheses/actions with exact actual feedback"
+    },
+    {
+      "criterion": "complete_cost",
+      "score": null,
+      "anchor": "0 hides major costs; 1 incomplete; 2 accounts Provider/Reporter, model builds, solve attempts, internal rollouts/prefixes and separate independent launches"
+    },
+    {
+      "criterion": "independent_direction_support",
+      "score": null,
+      "anchor": "Unscored until separately authorized independent held-out evaluation. 0 contradicted, 1 unresolved, 2 supported within frozen scope; no directional proposal stays not_applicable, not zero"
+    }
+  ],
+  "results": [
+    {
+      "case": "c3_next_decision",
+      "arm": "baseline",
+      "turn": 1,
+      "scientific_execution": "not_dispatched",
+      "request_id": "r3-request-5eeaf1731d4844379f34595ba721b1d2",
+      "usage": {
+        "prompt_tokens": 5119,
+        "completion_tokens": 5434,
+        "total_tokens": 10553,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 2983
+        },
+        "prompt_cache_hit_tokens": 0,
+        "prompt_cache_miss_tokens": 5119
+      },
+      "finish_reason": "tool_calls",
+      "plan": {
+        "action": "diagnose",
+        "decision": {
+          "version": "research_decision_v1",
+          "hypothesis_id": "c3-next-decision-h1-h4-braking-authority-vs-structure",
+          "claimed_inference": "empirical_search",
+          "research_intent": "DIAGNOSE",
+          "selected_method": "instantaneous_braking_v1",
+          "selected_variables": [
+            "tip_velocity_world",
+            "tip_speed_world_norm",
+            "tip_position_world",
+            "tendon_tension_inputs",
+            "speed_derivative_over_input_box",
+            "holding_window_samples_0p30_0p35"
+          ],
+          "selected_candidate": {
+            "artifact_id": "e0f2ccf53680ad00b1ed5d258d8b5eed38ced55fbc07f3bde07d3e5ce415ac1d",
+            "media_type": "application/json"
+          },
+          "requested_budget": 3
+        },
+        "next_step": null,
+        "hypothesis": "上一轮 NMPC 已把末端位置做进容差（terminal_error_m=0.00409 m，holding_max_error_m=0.00452 m，均小于 0.01 m），唯一违约项是末窗尖端速度 0.18173 m/s（限 0.02 m/s，超 9 倍），且 solver_errors=0、execution_complete=true、force_bounds=0（见历史事实 historical_nmpc_failure）；另一组固定开环输入则位置与速度同时违约（0.01371 m / 0.27413 m/s，见 historical_fixed_sequence_failure）。据此提出四个竞争机制，它们对同一违约签名给出不同根因：H1「控制层制动缺失」——结构在该状态具备可用制动权限，但规划器未在末窗内使用它；关键线索是执行网格 replan_s=0.1 s 大于验收末窗长度 0.05 s（0.3–0.35 s，见 frozen_execution_grids），末窗内最多只覆盖一个开环块，缺少闭环修正机会。H2「结构/驱动权限极限」——在非负腱张力盒与给定两段几何、Young 模量下，目标附近的有界输入无法把尖端速度压到 0.02 m/s 以下，位置达标只是因为低速容差比速度容差宽松。H3「模型失配」——预测量与原生 MuJoCo 力学在该状态分歧（质量阵/科氏项/腱雅可比），0.1 s 开环块上的预测误差在末窗暴露为残余速度，属预测误差而非物理不可行。H4「数值不确定性」——0.0005 s 物理步长与 0.01 s 速度采样导致的离散化/抖振伪速度。四者可由「精确存档末端状态下、在物理输入盒内可达到的最小尖端速度导数」符号与量级，加上一次原生 0.05 s 复放是否真的把速度压到限内来分离；若导数显著为负而原生复放仍不能制动，则 H1 被削弱而指向 H2/H3；若静态平衡构造在目标附近存在且残余速度可忽略，则 H2 被削弱；若步长减半后速度读数不变，则 H4 被削弱。注意这些判据均只在本地区间/瞬时意义上成立，不构成有限时域制动或可控性证明。",
+        "supporting_evidence": [],
+        "expected_observation": "第一阶段（数学评估 1，成本 1）：在 historical_nmpc_failure 的精确存档末端状态上，用 legal 非负腱张力盒计算瞬时尖端速度导数的最小值/上界（instantaneous_braking_v1）。分支读数应明确落在两类之一：(i) 存在输入使 |v| 的瞬时导数显著为负（量级足以在 0.05 s 内把 0.18 m/s 降到 0.02 m/s 所需减速 >3.2 m/s²，扣除盒内可达裕度后仍有余量）→ 控制层仍有未用权限，支持 H1，并把 H2 降级为「非瞬时权限受限」；(ii) 盒内最小速度导数接近 0 或为正、或负向裕度远小于 3.2 m/s² → 该状态下结构/驱动权限不足以在末窗内耗散该动能，支持 H2。第二阶段（数学评估 2，成本 1）：在同一存档状态与目标点做有界静态输入构造/输入敏感性核对，检查是否存在盒内非负张力使平衡点尖端距目标 ≤0.01 m 且静态残余速度≈0；存在则 H2 进一步被削弱（结构可静态保位，违约属动态制动/控制问题），不存在则 H2 显著增强。第三阶段（物理发射 1，成本 1）：把由评估 1 选出的最优制动输入固定为显式 0.05 s 日程，从同一精确存档状态做独立原生复放，逐点记录 0.3–0.35 s 的尖端位置与速度。预期判据：若复放末窗 max|v| < 0.02 m/s 且位置 ≤0.01 m → 控制层可修复，H1 成立；若位置达标而速度仍在 0.1 m/s 量级 → H1 被削弱，指向 H2/H3；若原生力/雅可比与预测量差异超过 O(1%) 且复放速度明显低于预测量 → 指向 H3 模型失配；若把步长由 0.0005 s 减半后速度读数变化可忽略 → 排除 H4。",
+        "weakening_observation": "若瞬时速度导数在盒内显著为负（存在 >3.2 m/s² 量级的可用减速裕度），但同一输入的原生 0.05 s 复放仍使末窗 max|v| 停留在 0.02 m/s 以上而位置保持 ≤0.01 m，则 H1（控制层仅是没用上权限）被削弱，结果指向结构与模型之间的真实分歧（H2 或 H3），需转做匹配状态/输入/输出的 GVS–MuJoCo 对比而不是再加控制搜索。反之，若静态平衡构造显示目标附近根本不存在盒内非负张力平衡（或达到平衡所需张力超出约束），则 H1/H3 被削弱而 H2 增强。若步长减半后末窗速度读数下降超过 30%，则上述「物理残余速度」结论整体被削弱，H4 上升为主导机制。若原生复放在位置与速度上都与预测一致却仍超速，则 H3 被削弱（失配不是原因），只剩 H2 与 H1 的有限时域解释之争。",
+        "fixed_conditions": "冻结冻结任务身份 69cdc96a…b8fd515 与 c3-b-100ms-20261025；候选结构固定为 e0f2ccf5…5ac1d（两段 12 单元、长度 0.16/0.11 m、半径 0.008 m、4 束腱、spans 半径 0.018 m，几何/Young 模量不做任何修改）；初始状态与目标点沿用历史运行，不改写；控制与采样周期固定 0.01 s，物理步长 0.0005 s，重规划 0.1 s；验收末窗固定 [0.3, 0.35] s、位置限 0.01 m、速度限 0.02 m/s、力界 1e-8 N、非负腱张力盒；仅从精确存档状态出发，不重新做全局控制搜索、不改动 NMPC 权重与 horizon；本探针仅描述方法，不实际派发任何负载。预算单位与总计：requested_budget=3 = 1（instantaneous_braking_v1 数学评估）+1（静态平衡/输入敏感性数学评估）+1（一次独立物理发射/原生复放），对应 catalog 成本 model 侧各 1、物理复放 1；nmpc=0、ppo=0，与 proposed_next_action_budget（2 数学评估 + 1 物理发射）一致。",
+        "stopping_condition": "当三阶段读数把机制唯一化即可停止：即（瞬时制动导数符号与裕度）+（静态平衡存在性）+（0.05 s 原生复放末窗 max|v| 与位置）三者共同指向 H1、H2、H3、H4 中唯一一支；或 2 次数学评估与 1 次物理发射的预算耗尽仍无法分离（此时判定为「不可分辨」，应上报为数值/模型匹配问题而不再追加同类控制搜索）。任一支被确证后立即停止本诊断链，不扩展到新的控制搜索或设计修改，后者需另行授权。独立的 task_acceptance 不以本诊断任何结论替代。",
+        "interpretation": "本方案刻意把四个层面分开：(a) 数学范围——instantaneous_braking_v1 只给出精确存档点处、物理输入盒内的瞬时速度导数极值，乘以时间区间不构成有限时域制动或可控性证明；静态平衡构造只说明静态可达，不说明动态保位；(b) 数值状态——0.0005 s 步长与 0.01 s 采样下速度是浮点估计，SOCP/导数极值均为浮点近似，步长减半只作敏感性检查而非收敛证明；(c) 物理观测——只有那一次独立原生/物理复放算独立物理观测，NMPC 与固定序列的既有指标都是历史记录、不构成当前回合结果；(d) 任务验收——holding_max_speed_m_s 等条件由注册评估器与冻结验收协议独立判定，本诊断（哪怕找到可行制动证人）也不等于通过，负的模型内违约值只是模型样本内的可行证人而非全局最优控制。选 instantaneous_braking_v1 作为主方法而非再跑 task_capability/端点多起点搜索，是因为现有证据的关键不对称正是「位置已达标、速度超 9 倍、且重规划周期 0.1 s 长于末窗 0.05 s」：这一签名最需要的是判断「该状态下是否本来就存在可用的制动权限」，这是权限类问题而不是再优化问题；在权限未被判定前追加控制搜索会混淆控制极限与结构极限。若读数指向权限存在，则问题转为控制器/预测失配；若指向权限不存在，则结构或模型才是瓶颈，应转向原生动力学与匹配的 GVS–MuJoCo 状态/输入/输出对比。上述均为待验证的候选推断（claimed_inference=empirical_search），无任何已注册支撑证据提升其强度。",
+        "parameters": null,
+        "search": null,
+        "candidate": null,
+        "selected_execution": null,
+        "revise_selection": false,
+        "diagnostic": null,
+        "mechanics": null,
+        "cross_replay": null,
+        "physical_replay": null,
+        "refinement": null,
+        "matched_state": null,
+        "nmpc_prediction_diagnostic": null,
+        "mechanics_source": null,
+        "experience_disposition": {}
+      },
+      "schema_check": "passed"
+    },
+    {
+      "case": "c3_next_decision",
+      "arm": "evidence",
+      "turn": 1,
+      "scientific_execution": "not_dispatched",
+      "request_id": "r3-request-8782398caa234dd8977252016e5d86fc",
+      "usage": {
+        "prompt_tokens": 8176,
+        "completion_tokens": 9554,
+        "total_tokens": 17730,
+        "prompt_tokens_details": {
+          "cached_tokens": 4096
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 6312
+        },
+        "prompt_cache_hit_tokens": 4096,
+        "prompt_cache_miss_tokens": 4080
+      },
+      "finish_reason": "tool_calls",
+      "plan": {
+        "action": "diagnose",
+        "decision": {
+          "version": "research_decision_v1",
+          "hypothesis_id": "H-turn1-braking-authority-vs-structure-vs-speed-channel",
+          "claimed_inference": "empirical_search",
+          "research_intent": "DIAGNOSE",
+          "selected_method": "instantaneous_braking_v1（在 t* 精确保存态做输入箱最小瞬时 d|v_tip|/dt，必要条件判别）+ native_dynamics_v1（同状态 native 速度/力平衡/雅可比一致性）+ 单次诊断物理 replay：mujoco_direct_control_v1 的恒值末端张力保持候选，0.0005 s 稠密记录并与 affine 模型在 0.01 s 网格对齐比较",
+          "selected_variables": [
+            "holding_max_speed_m_s_at_t_star",
+            "instantaneous_braking_authority_m_s2",
+            "required_deceleration_r_req_m_s2",
+            "distance_of_applied_tension_from_braking_face",
+            "native_tip_speed_vs_saved_speed_relative_deviation",
+            "native_force_balance_residual_N",
+            "dense_0p0005s_tip_velocity_oscillation_amplitude_and_frequency",
+            "aligned_affine_model_vs_physics_speed_samples_in_holding_window"
+          ],
+          "selected_candidate": {
+            "artifact_id": "e0f2ccf53680ad00b1ed5d258d8b5eed38ced55fbc07f3bde07d3e5ce415ac1d",
+            "media_type": "application/json"
+          },
+          "requested_budget": 3
+        },
+        "next_step": null,
+        "hypothesis": "问题：在冻结任务 c3-b-100ms-20261025（0.35 s、0.01 s 采样、0.0005 s 物理步）中，唯一失败的验收条件是 holding_max_speed_m_s，需要区分\"结构/动力学极限\"\"控制（代价归一化与制动时机）极限\"\"模型速度通道不匹配\"\"数值/采样不确定\"这四类机制。\n\n竞争机制（含可见证据）：\nH1 控制极限（我的主检假设）：位置指标通过且有裕度（terminal 0.00409 m、holding 0.00452 m 均 < 0.01 m），仅末端窗口速度 0.1817 m/s 超 0.02 m/s（fact historical_nmpc_failure），说明\"已到但没停住\"，即收敛/制动时机与速度代价归一化不足（recipe 中 tip_speed_scale 0.02 m/s、holding_tip_speed_weight 0.1、holding_speed_cost_window_s 0.05、holding_brake_lead_s 0.0、replan 0.1 s 对 0.35 s 剩余时域，见 sampled_affine_witness 的 controller 制备记录）。若在违规采样点 t* 处输入箱内仍存在足以在剩余时间内把速度压到 0.02 m/s 的制动方向，且历史张力明显不在制动面，则控制极限成立。\nH2 结构/动力学极限：远端段 5.4 MPa、4 根腱、摩擦为 0、无附加阻尼的两段串联结构在 0.35 s 内无法从预张初始态完成到达并沉降到 0.02 m/s；固定开环序列三项全失败（holding 速度 0.274 m/s，fact historical_fixed_sequence_failure）与之相容。\nH3 模型速度通道不匹配：同一控制下 affine 采样模型给出 holding 速度 0.01375 m/s（通过）而物理给出 0.1817 m/s，位置侧 0.008 对 0.00452 却接近（fact math_physics_alignment），即速度输出通道约 13 倍失准，优化器是在错误的速度目标上寻优；该证据同时缺少 saved_prediction_samples 与 recorded_aligned_difference，尚未做同状态同输入逐点比较；模型侧结构排序也已不可分辨（score 差 2.6e-13，fact search_resolution），故继续在模型内加分辨率的搜索无判定力。\nH4 数值/采样不确定：0.1817 m/s 可能是 0.01 s 采样下对高频振动的混叠或未收敛积分产物（fact frozen_execution_grids 给出 0.01 s 采样与 0.0005 s 物理步；执行记录 4 次 deadline miss、mean_update 8.61 s 仅说明墙钟非实时，不构成物理结论）。\n\n判别逻辑：H1 与 H2 可用\"t* 处的瞬时制动能力是否达到必要速率 r_req=(|v_tip|-0.02)/(0.35-t*)\"这一必要条件分离；H3/H4 可用\"同精确保存态的 native 速度与力平衡残差是否与保存值/模型输出一致\"分离。两类检验都是廉价的、不依赖再优化的，先做，再决定是否值得投入一次物理 replay。",
+        "supporting_evidence": [],
+        "expected_observation": "预注册测量量与期望量级（仅诊断，不构成验收）：\n1) 数学评估 A（native_dynamics_v1，在 t*∈[0.30,0.35] 的最大速度采样点的精确保存态）：输出 native tip 世界速度模长、质量矩阵、tiptendon 雅可比、力平衡残差。若 H4 不成立，native |v_tip| 应与保存的 0.1817 m/s 一致（相对偏差 ≲2%），力平衡残差 ≲1e-6 N 量级。\n2) 数学评估 B（instantaneous_braking_v1，同一精确态）：输入箱（4 根腱非负且有界）上最小瞬时 d|v_tip|/dt 及其所在的箱面/顶点，并给出必要条件 r_req=(|v_tip|-0.02)/(0.35-t*)，按 t* 落点 r_req ≈ 3.2 m/s²（t*=0.30）到 16 m/s²（t*=0.34）。若 H1 成立，箱内最大制动速率应 ≥ r_req，而历史施加张力与制动箱面的距离明显（例如落在该方向上 >20% 的输入箱尺度处）。\n3) 物理 replay（1 次，诊断专用，不作为任务验收）：从 t=0.25 s 的精确保存态出发，冻结历史末端张力作常值保持至 0.35 s，以 0.0005 s 稠密记录 tip 位置/速度，并在 0.30–0.35 s 的 0.01 s 采样网格上与 affine 模型的同状态输出做对齐逐点比较（补齐此前缺失的 saved_prediction_samples 条件）。若 H2/H4 成立而 H1 不成立，期望看到：常值输入下 0.18 m/s 量级的往复/振铃持续存在（稠密记录显示有限频率振荡，而非单点噪声），且对齐比较中模型速度通道仍系统性偏低。\n判定分支（先验写定，防止事后调解释）：(a) 制动能力 ≥ r_req 且历史输入远离制动面 → H1 存活，H2 被削弱，下一步应做显式有界\"先制动后保持\"的覆盖全保持窗口的序列并单独物理验收；(b) 箱内最大制动能力 < r_req → H2 存活、H1 被削弱，下一步应转向结构性/时域性改造（刚度、段长或时间网格），而不是继续控制搜索；(c) native 速度或力平衡与保存值/模型不一致（>2% 或残差超量级）→ H4 优先，必须先做同状态同输入的逐点比较提升数值确定性，任何设计或控制结论都暂停。",
+        "weakening_observation": "若在同一精确保存态 t* 上，输入箱内能达到的最大瞬时制动速率仍显著低于必要条件 r_req（例如 < r_req/2），即冻结输入箱内在剩余时间内不存在把 0.1817 m/s 消解到 0.02 m/s 的可行输入方向，则本计划的主检假设 H1（控制极限、可通过代价归一化与制动时机修复）被削弱，判据转向 H2（结构/动力学极限或时域不足），下一步不应再提交控制搜索或候选 replay。相反地，若 native |v_tip| 与保存值偏差 >2% 或力平衡残差超量级，则主检假设同样被削弱，但归因让给 H4（数值不确定）。注意：即使 H1 存活，本计划也不构成\"存在满足全部三项条件的控制\"的证明；即使 H1 被削弱，\"冻结输入箱内不可制动\"也不等价于结构不可行。",
+        "fixed_conditions": "冻结条件：任务身份 69cdc96a2e400d6c92cfda4c9f43a9d7649ba49da7ac2c353cc984fc7b8fd515；duration 0.35 s、control_period 0.01 s、sample_period 0.01 s、timestep 0.0005 s；评估器 evaluate.reach 容差 0.01 m，holding 窗口 [0.30,0.35] 含端采样，速度限 0.02 m/s；结构 = 工程先验 serial_family_generation_v2 候选 e0f2ccf5…（12+12 单元、0.16 m/0.11 m、半径 0.008 m、young_pa 10.45 MPa / 5.4 MPa、4 根腱、无缺陷孔洞），seed 17，摩擦 [0,0,0]，contact_model mujoco_convex_native，integrator implicitfast；状态一律取历史精确保存态，不重建初始态。禁止/不做：不重开控制搜索、不训练 PPO、不改结构参数、不把任何模型分数或 replay 结果当作任务验收；本探针只描述方法，不派发任何载荷。预算单位与总额：requested_budget = 3 operation units = 1 次 native_dynamics_from_exact_saved_state（1 单位）+ 1 次 instantaneous_braking_from_exact_saved_state（1 单位）+ 1 次物理 replay（1 单位），对应 proposed_next_action_budget 的 2 次数学评估 + 1 次物理启动；理由是结构排序在记录精度下已不可分辨（score 差 2.6e-13），在速度通道存在约 13 倍偏差的前提下再做基于模型速度的再优化属于无效花费，而必要条件式的制动/一致性检查单价最低且能一次性排除两类机制。",
+        "stopping_condition": "当且仅当同时满足以下三条即停止本轮诊断并交出结论：(i) H4 已被排除或确认——native 速度/力平衡与保存值相对偏差 ≲2% 且残差 ≲1e-6 N（排除），或偏差超阈值（确认并优先处置）；(ii) 必要条件检验给出唯一分支归属——箱内最大制动速率相对 r_req 的 ≥1 或 <1/2 判定清晰，不落在 [1/2,1] 的模糊带；(iii) 0.0005 s 稠密记录已能回答\"0.18 m/s 是否对应持续振铃\"这一是/否问题。若 (ii) 落入模糊带，或两次数学评估在同一状态下结论互相矛盾（例如 native 速度一致但制动方向与雅可比/速度方向不自洽），本轮不追加 replay，停止并升级为同状态同输入高分辨率的匹配比较；物理启动总量硬上限 1 次，数学评估硬上限 2 次，超出即停止。",
+        "interpretation": "数学作用域与物理观测分离：affine 采样模型给出的全零初始态\"score -0.2\"、模型侧 terminal 0.008 m / holding 0.008 m / 速度 0.01375 m/s 只是局部仿射样本上的数值结论，不是非线性物理可行性或稳定性证明；结构排序不可分辨（Δscore 2.6e-13）意味着模型层面无法再区分候选结构。物理观测侧只有两处独立事实：NMPC 候选位置两项通过、保持速度 0.1817 m/s 单项失败；固定开环序列三项全败且位置更差。因此当前最可能的解释不是\"到不了\"，而是\"到了停不住\"，其一级原因要么是控制器在错误的速度通道上把问题当成已满足（H3+H1），要么是该结构在 0.35 s 内本身沉降不下来（H2），要么观测本身有采样/数值伪像（H4）。\n\n本计划的判别价值在于用必要条件而非充分条件做低成本排除：瞬时制动能力 × 时间不是有限时域制动的证明，输入箱内不可制动才是否定性证据；同状态 native 速度与力平衡残差只排除\"状态/积分不自洽\"，不等于 GVS 与 MuJoCo 的预测一致性——后者需要匹配的状态/输入/输出逐点比较，本计划的 0.0005 s 稠密记录只提供该比较的一半（物理侧），模型侧对齐样本仍缺失，这一点必须在结论中显式保留为未知。\n\n三种结果与后续动作：(a) 若制动能力充足且历史张力远未用制动面 → 结论为控制侧（代价归一化/制动时机）极限，下一步提交\"显式覆盖保持窗口每个采样的有界先制动后保持序列\"并走独立物理验收（每次候选仍计 1 次物理 replay），而不是继续在模型速度通道上做 conic 再优化；(b) 若冻结输入箱内最大制动不足 → 结论为结构/时域极限，下一步转向单参数结构或时间网格的受控敏感性（fixed_input_structure_v1 类），且明确该响应不是重优化结构能力或最优值梯度；(c) 若 native 状态与保存值/模型不一致 → 结论为数值不确定，必须先把保存预测样本与对齐差补齐再讨论任何机制。无论哪一支，任务验收结论（三项条件是否同时满足）仍须由冻结评估协议独立给出，本诊断不改变、也不代表任何验收状态。",
+        "parameters": null,
+        "search": null,
+        "candidate": null,
+        "selected_execution": null,
+        "revise_selection": false,
+        "diagnostic": null,
+        "mechanics": null,
+        "cross_replay": null,
+        "physical_replay": null,
+        "refinement": null,
+        "matched_state": null,
+        "nmpc_prediction_diagnostic": null,
+        "mechanics_source": null,
+        "experience_disposition": {}
+      },
+      "schema_check": "passed"
+    },
+    {
+      "case": "c3_next_decision",
+      "arm": "baseline",
+      "turn": 2,
+      "scientific_execution": "not_dispatched",
+      "request_id": "r3-request-5f348a40cad04e4eadf12ae64d12965f",
+      "usage": {
+        "prompt_tokens": 14558,
+        "completion_tokens": 7870,
+        "total_tokens": 22428,
+        "prompt_tokens_details": {
+          "cached_tokens": 10496
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 5111
+        },
+        "prompt_cache_hit_tokens": 10496,
+        "prompt_cache_miss_tokens": 4062
+      },
+      "finish_reason": "tool_calls",
+      "plan": {
+        "action": "diagnose",
+        "decision": {
+          "version": "research_decision_v1",
+          "hypothesis_id": "c3-turn2-window-minimax-h1-vs-h2-h3",
+          "claimed_inference": "empirical_search",
+          "research_intent": "DIAGNOSE",
+          "selected_method": "sampled-affine-conic-minimax-v1",
+          "selected_variables": [
+            "holding_window_sampled_speed_m_s",
+            "holding_window_sampled_position_m",
+            "tendon_tension_sequence_inputs",
+            "normalized_speed_residual",
+            "active_constraint_and_box_active_set",
+            "model_vs_native_replay_gap"
+          ],
+          "selected_candidate": {
+            "artifact_id": "e0f2ccf53680ad00b1ed5d258d8b5eed38ced55fbc07f3bde07d3e5ce415ac1d",
+            "media_type": "application/json"
+          },
+          "requested_budget": 3
+        },
+        "next_step": null,
+        "hypothesis": "先明确上一轮四个假设被新观测如何改写。「昨日假设」H1 控制层制动缺失（结构可用但未被使用）、H2 结构/驱动权限极限（盒内非负张力无法在此状态耗散该动能）、H3 模型失配、H4 数值不确定性。新观测 scheduled_historical_feedback 给出：末窗最大值出现在 t=0.31 s 处为 0.18173 m/s，而终点 t=0.35 s 只剩 0.05005 m/s，精确存档更新号 30（即 t=0.30 s，恰为末窗起点与 0.1 s 重规划节拍上的最后一次规划时刻，见 frozen_execution_grids）。这带来三点改写：(1) 速度在 0.31→0.35 单调快速衰减，按两点粗估减速约 3.3 m/s²、时间常数约 31 ms，说明结构与本构在该状态确实能实现显著耗散，因此「完全无制动权限」式的 H2 被明显削弱；(2) 峰值恰出现在最后一次重规划之后一个控制步，配合 holding/terminal_tip_speed_weight 仅 0.1 而位置是 0.01 m 硬约束（engineering_prior.control_weights），最合理的机制是末窗起始那一块开环输入注入的速度瞬态，即 H1 变强；(3) 两次采样间位移约 1.8 mm、衰减形状连贯，纯数值抖振式的 H4 基本上被削弱，但仍不能完全排除 0.0005 s 步长与 0.01 s 速度采样对峰值幅度的偏置。仍未确定的关键分歧是：从 t=0.30 s 的精确存档状态出发，在物理盒内是否存在某个输入序列能在整个 [0.30,0.35] s 内把位置保持在 0.01 m 内且把 max|v| 压到 0.02 m/s 以下。若存在，则历史违约纯属控制/节拍与权重问题（H1），H2 在模型样本内被证伪；若最优解的速度残差在 0.31–0.32 s 样本上为正且四根腱全部贴盒边界饱和，则说明该瞬态在盒内不可移除，H2（更准确的表述是 0.35 s 时域内的能量/时间预算极限）抬头；若模型给出可行证人而原生复放复现不了，则 H3 成为主因。这三条给出彼此排斥的可观测签名，是本轮要用一次采样仿射极小极大 + 一次独立物理复放去分辨的。",
+        "supporting_evidence": [],
+        "expected_observation": "数学侧（成本 2，一次 sampled-affine-conic-minimax-v1，采样覆盖 [0.30,0.35] 全部 6 个含端点样本，从更新 30 的精确存档状态取仿射模型，输出归一化残差 g_i 为位置/(0.01 m) 与速度/(0.02 m/s) 的最大值，自由变量为盒内非负腱张力序列）：读数应落在三类之一。(i) optimal_value < 0 且 primal/dual/support/gap 检查与角点枚举一致 → 存在模型样本内可行证人，H2 在该模型内被证伪，H1 成立，并报告速度残差样本的裕度（希望看到 0.31 s 与 0.32 s 样本成为最紧但仍在界内）；(ii) optimal_value > 0 且活跃约束是 0.31–0.32 s 的速度残差、位置残差松弛、四腱活跃集贴盒 → 该瞬态在盒内不可移除，指向 H2（时域/能量预算），但只作为数值最优值而非结构不可行证明；(iii) optimal_value > 0 且活跃约束是位置残差 → 说明问题不是制动能力而是位置—速度权衡，即控制权重的代理，H1 以另一种形式成立。物理侧（成本 1，一次独立物理发射）：把 (i) 或 (iii) 得到的最优序列固定为显式 0.05 s 日程，从同一更新 30 精确存档状态原生复放，并由冻结验收协议独立计算 holding_max_speed_m_s、holding_max_error_m；判据为复放末窗 max|v| 是否 <0.02 m/s、max 位置误差是否 ≤0.01 m。若模型预测 max|v| <0.02 而原生复放 max|v| 仍 ≥0.1 m/s，则模型—原生分歧显著（H3）。同时把物理步长由 0.0005 s 减半做一次仅限该状态的速度敏感性读数（不占用新发射，属数值状态记录）。",
+        "weakening_observation": "若极小极大在 0.31–0.32 s 速度样本上给出正残差、位置残差明显松弛且最优解的四根腱全部饱和在盒边界（即已用尽制动权限），则 H1「只是没用上权限」被削弱，H2 抬头，此时再谈控制权重或节拍已无意义，应转向结构/时域预算或延长时域的研究。若采样仿射模型给出负残差证人，而同一序列的原生复放末窗 max|v| 仍在 0.1 m/s 量级（同时位置达标），则 H1 被削弱、H3 模型失配成为主因，后续必须做匹配状态/输入/输出的 GVS–MuJoCo 对比而非再加控制搜索。若把物理步长减半后 0.31 s 峰值下降超过 30%，则本轮「0.18173 m/s 是物理瞬态」的前提被削弱，H4 回升为主导机制，所有基于该峰值的推断都要降级为数值不确定。此外，若极小极大只在放宽位置界后才取得负值，则「位置已达标」这一先验被削弱，历史 holding_max_error_m=0.00452 m 的解释需重新审视。",
+        "fixed_conditions": "冻结任务身份 69cdc96a…b8fd515 / c3-b-100ms-20261025；候选结构固定为 e0f2ccf5…5ac1d（两段各 12 单元、长 0.16/0.11 m、半径 0.008 m、段角 0.35/−0.25、4 束腱 span 半径 0.018 m，Young 模量 10.45/5.4 MPa），几何、材料、腱数与权重一律不改；起点固定为更新 30（t=0.30 s）的精确存档状态，目标点与历史运行一致；控制与采样周期 0.01 s、物理步长 0.0005 s、重规划 0.1 s 保持不变；末窗固定 [0.30,0.35] s 含端点均匀采样，位置限 0.01 m、速度限 0.02 m/s、力界 1e-8 N、非负腱张力盒；不新增控制搜索、不调 NMPC 权重/horizon、不做设计修改；本探针仅描述方法，不派发任何负载，且不产生任何验收结论。预算口径：requested_budget=3 个方法目录操作单位 = 2（一次 sampled-affine-conic-minimax-v1，对应 sampled_conic_with_new_model=2）+1（一次独立物理发射/原生复放），与 proposed_next_action_budget 的 2 次数学评估 + 1 次物理发射一致；nmpc=0、ppo=0，步长减半敏感性读数只是数值状态记录，不另计物理发射。",
+        "stopping_condition": "预算耗尽（2 个数学单位 + 1 个物理发射）或下列条件之一成立即停止本诊断链：极小极大给出负残差证人且原生复放末窗 max|v| <0.02 m/s、位置 ≤0.01 m → 判为 H1（控制/节拍/权重），停止，转为控制侧授权讨论；极小极大正残差且制动活跃集饱和而位置松弛 → 判为 H2（时域/能量预算），停止本链，转结构或时域延长研究；模型可行而原生复放明显不复现（末窗 max|v| ≥0.1 m/s）→ 判为 H3，停止并转入匹配状态的 GVS–MuJoCo 对比；步长减半使峰值变化 >30% → 判为 H4，停止并先做数值收敛。若三类读数都未出现，则判定本链「不可分辨」，以 gap/活跃集/未取整原始数值上报，不再追加同类控制搜索。",
+        "interpretation": "本轮把四层严格分开：(a) 数学范围——sampled-affine-conic-minimax-v1 只对采样仿射模型上的归一化最大残差做数值极小化，负值仅是模型样本内的可行证人而非全局最优控制，正值也不是结构不可行性证明；角点枚举与 primal/dual/gap 都是浮点估计，strict optimal_value 仍不可得；(b) 数值状态——0.0005 s 步长与 0.01 s 速度采样、以 [0.30,0.35] 六点取最大值，峰值 0.18173 m/s 与端点 0.05005 m/s 的对比只是两点粗估（≈3.3 m/s² 平均减速、τ≈31 ms），不是动力学的参数辨识；(c) 物理观测——只有那一次从更新 30 精确存档状态出发的独立原生复放算独立物理观测，历史两条 acceptance 记录与新观测 scheduled_historical_feedback 都只是既有历史反馈、与本轮选择无关、不因本提案而被执行；(d) 任务验收——holding_max_speed_m_s 等三项条件由注册评估器与冻结验收协议独立判定，本诊断即使找到模型内证人也不等于通过，必须由独立验收复算。选 sampled-affine-conic-minimax-v1 而不沿用上一轮的瞬时制动权限法，是因为新观测已经把问题从「是否存在制动权限」推进为「在给定 0.05 s 时域与盒约束下能否让整段窗口的最大速度都进界」：已实现的约 3.3 m/s² 单调衰减本身就是权限存在的证据，单点瞬时导数无法回答窗口内峰值是否可被规避，而覆盖全部含端点样本的极小极大恰好给出该窗口内的最优违约值与活跃约束，能把「控制/节拍」与「时域/能量预算」分开。若同时把上一轮 H2 细化为「有限时域内不可达」，则本轮唯一还未被证据触及的是原生与模型是否一致，故保留一次物理复放作为 H3 的判据。所有结论均为待验证的候选推断（claimed_inference=empirical_search），无已注册支撑证据，supporting_evidence 为空。",
+        "parameters": null,
+        "search": null,
+        "candidate": null,
+        "selected_execution": null,
+        "revise_selection": false,
+        "diagnostic": null,
+        "mechanics": null,
+        "cross_replay": null,
+        "physical_replay": null,
+        "refinement": null,
+        "matched_state": null,
+        "nmpc_prediction_diagnostic": null,
+        "mechanics_source": null,
+        "experience_disposition": {}
+      },
+      "schema_check": "passed"
+    },
+    {
+      "case": "c3_next_decision",
+      "arm": "evidence",
+      "turn": 2,
+      "scientific_execution": "not_dispatched",
+      "request_id": "r3-request-1b2481c8319e415c8c033b9b5b4f210d",
+      "usage": {
+        "prompt_tokens": 24794,
+        "completion_tokens": 7331,
+        "total_tokens": 32125,
+        "prompt_tokens_details": {
+          "cached_tokens": 12544
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 3719
+        },
+        "prompt_cache_hit_tokens": 12544,
+        "prompt_cache_miss_tokens": 12250
+      },
+      "finish_reason": "tool_calls",
+      "plan": {
+        "action": "diagnose",
+        "decision": {
+          "version": "research_decision_v1",
+          "hypothesis_id": "H-turn2-settling-phase-deficit-vs-braking-authority",
+          "claimed_inference": "empirical_search",
+          "research_intent": "DIAGNOSE",
+          "selected_method": "instantaneous_braking_v1（在 update 30 精确保存态做输入箱最小瞬时 d|v_tip|/dt，检验必要下界 4.04 m/s²）+ native_dynamics_v1（同状态 native 速度/力平衡/腱张力敏感度一致性）+ 单次诊断物理 replay：冻结 update 30 合法张力的常值保持，0.0005 s 稠密记录，含仅用于沉降时刻测量的协议外 0.35→0.40 s 延展",
+          "selected_variables": [
+            "holding_max_speed_time_s_0p31",
+            "final_speed_m_s_0p35",
+            "observed_decay_rate_s_inv_tau_s",
+            "instantaneous_braking_authority_m_s2_vs_r_req_4p04",
+            "distance_of_applied_tension_from_braking_face",
+            "native_tip_speed_vs_saved_speed_relative_deviation",
+            "native_force_balance_residual_N",
+            "dense_0p0005s_velocity_monotone_decay_vs_ringing",
+            "speed_threshold_crossing_time_s_diagnostic_only"
+          ],
+          "selected_candidate": {
+            "artifact_id": "e0f2ccf53680ad00b1ed5d258d8b5eed38ced55fbc07f3bde07d3e5ce415ac1d",
+            "media_type": "application/json"
+          },
+          "requested_budget": 3
+        },
+        "next_step": null,
+        "hypothesis": "本轮问题（在上一轮 Plan 之后、并纳入新的历史反馈 fact scheduled_historical_feedback 重新提问）：唯一失败条件 holding_max_speed_m_s 的峰值出现在 t=0.31 s（0.1817 m/s），而末端 t=0.35 s 已降到 0.0501 m/s；窗口最大值仍由 0.31 s 的采样决定。这改变了机制归因的重心：不再是\"停不下来\"，而是\"衰减已经发生但时间/相位不够\"。\n\n对上一轮四个假设的显式再评估：\n• H4 数值/采样伪像：被削弱。0.1817→0.0501 是 0.04 s 内的单调衰减（比值 3.63，对数衰减率约 32 s⁻¹、时间常数 τ≈0.031 s），0.05 m/s 对应 0.01 s 采样间约 0.5 mm 位移，量级远超噪声/混叠预期；但尚未排除（速度通道由 backend 直接给出，未做 0.0005 s 稠密核对），故降为次要，仍需一次稠密记录作闭合。\n• H3 模型速度通道不匹配：被增强。fact math_physics_alignment 中模型侧 holding 速度 0.01375 m/s 的最大值出现在 0.35 s（且整体幅值低约 13 倍），物理侧峰值出现在 0.31 s；模型不仅低估幅值，还错配了速度时间形状（相位约 0.04 s）；fact search_resolution 显示结构排序在记录精度下不可分辨（Δscore 2.6e-13）。因此任何仍以模型速度为约束的 conic 再优化都缺乏判定力，应停止该类花费。\n• H1 控制/时机极限（主检）：加强但形态改变。τ≈0.031 s 意味着 0.02 m/s 阈值的穿越时刻约为 0.24 s（上升）与 0.378 s（下降）：即物理上已\"经过\"可接受速度区间的两侧，只是到达晚了约 0.06–0.07 s；且窗口最大值在 0.31 s 意味着修复不能靠\"在 0.31 s 更用力制动\"，而必须让 0.30 s 之前的速度剖面本身更低（更早完成到达）。\n• H2 结构/时域极限：与 H1 现在共用同一可观测量，需用\"精确态上的输入箱制动能力\"和\"恒值输入下的被动沉降\"分离：若从 update 30 的精确态出发，非负有界张力箱内仍有 ≥4.04 m/s² 的制动能力且历史张力不在制动面，则晚制动/相位可修（H1）；若箱内制动能力不足或恒值保持下速度在 0.02 m/s 以上进入平台/持续振铃，则结构-驱动权限或冻结时域为限（H2）。\n\n新的关键定量判据：r_req=(0.1817−0.02)/(0.35−0.31)=4.04 m/s²，取自\"从峰值态到窗口末端\"；由于窗口最大值位于 0.31 s，这 4.04 应视为所需制动能力的下界，真正的判据是\"到达-沉降总时间能否压在 0.30 s 以内\"。上一轮的\"恒值末端输入保持 replay\"作为判别手段仍然适用，但记录时长与读数量需按 tau 与穿越时刻改写。",
+        "supporting_evidence": [],
+        "expected_observation": "预注册测量量与期望（全部为诊断量，不构成任务验收）：\n1) 数学评估 A（instantaneous_braking_v1，在 update 30 的精确保存态，对应 t≈0.31 s、|v_tip|=0.1817 m/s）：输出输入箱上最小瞬时 d|v_tip|/dt（最大制动速率）及其所在的箱面/顶点，并给出历史施加张力到该制动面的距离。期望若 H1 存活：最大制动速率 ≥4.04 m/s²，且历史张力偏离制动面（例如 ≥20% 输入箱尺度）。\n2) 数学评估 B（native_dynamics_v1，同一精确态）：native tip 世界速度模长（与保存值 0.1817 m/s 的相对偏差）、力平衡残差（期望 ≲1e-6 N）、以及 |v_tip| 对四根腱张力的 Jacobian 符号结构（哪一根、在箱边界上是否仍为制动方向）。同时用 A/B 的数值把 τ 与两个穿越时刻（上升/下降）重算一遍，核对是否与 0.24/0.378 s 的自洽。\n3) 物理 replay（1 次，诊断专用，非本 Proposal 验收）：从 update 30 精确保存态出发，冻结该更新的合法张力常值保持，0.0005 s 稠密记录 tip 位置/速度；先在协议时域 0.35 s 内取值，再作 0.35→0.40 s 的协议外延展仅用于测量\"|v| 落到 0.02 m/s 的时刻\"。期望：若 H1 存活，稠密曲线单调衰减、无持续振铃，穿越 0.02 m/s 的时刻落在 0.35–0.40 s（即缺口约 0.03 s），且外推位置偏移仍 ≤0.01 m 量级；若 H2 存活，速度在 0.02–0.05 m/s 以上进入平台或出现有限频率振铃，穿越时刻不出现或远晚于 0.40 s。\n判定分支（先写定）：(a) 制动能力 ≥4.04 m/s² 且历史张力不在制动面、恒值保持下单调衰减并跨越阈值（略晚）→ 机制为到达相位/时间预算（H1+控制侧），下一步应提交\"提前完成到达、覆盖保持窗口每个采样\"的显式有界序列并走独立物理验收；(b) 制动能力 <2.02 m/s²（<r_req/2）或恒值保持下速度在阈值上平台/振铃 → H1 被削弱、H2 存活，下一步转向结构/驱动权限或时域网格的受控敏感性；(c) native 速度与保存值偏差 >2% 或力平衡残差超量级 → H4 复活，先补同状态同输入逐点比较，暂停任何结构或控制结论。",
+        "weakening_observation": "若在 update 30 的精确保存态上，非负有界张力箱内可达到的最大瞬时制动速率仍显著低于必要下界（例如 < 2.02 m/s²，即 r_req/2），或在冻结末端输入常值保持下稠密速度记录显示 0.02 m/s 以上的平台/有限频率振铃而非单调衰减，则本轮主检假设 H1（到达相位/时间预算不足、可通过更早完成到达与提前制动修复）被削弱，判据转向 H2（结构-驱动权限或冻结时域不足），后续不应再提交控制搜索或再优化候选 replay。若 native 速度与保存值相对偏差 >2% 或力平衡残差超量级，则主检假设同样被削弱但归因让给 H4。必须同时说明：即使 H1 存活，\"从该精确态存在制动权限\"不等于\"存在满足全窗口三项条件的控制\"；即使 H1 被削弱，\"该精确态不可制动\"也不等于结构不可行，只是把矛盾点前移到更早的到达阶段。",
+        "fixed_conditions": "冻结条件：任务身份 69cdc96a2e400d6c92cfda4c9f43a9d7649ba49da7ac2c353cc984fc7b8fd515；duration 0.35 s、control_period 0.01 s、sample_period 0.01 s、timestep 0.0005 s、replan 0.1 s；evaluate.reach 容差 0.01 m，holding 窗口 [0.30,0.35] 含端采样，速度限 0.02 m/s；结构 = serial_family_generation_v2 候选 e0f2ccf5…（12+12 单元、0.16/0.11 m、r=0.008 m、young_pa 10.45 MPa / 5.4 MPa、4 腱、无孔洞），seed 17、摩擦 [0,0,0]、mujoco_convex_native、implicitfast；状态一律取历史 update 30 的精确保存态，不重建初始态、不复用其他轨迹；拓扑与结构参数一律冻结（本诊断不改设计、不做设计敏感性）。禁止与不做：不重开控制搜索、不训练 PPO、不做 conic 再优化（模型速度通道已确认错配时间与幅值）、不得把任何数学分数或 replay 结果当作任务验收；0.35→0.40 s 的延展仅属协议外诊断，绝不可用于满足或否定任何验收条件。预算单位与总额：requested_budget = 3 operation units = 1 次 instantaneous_braking_from_exact_saved_state（1 单位）+ 1 次 native_dynamics_from_exact_saved_state（1 单位）+ 1 次物理 replay（1 单位），精确对应 proposed_next_action_budget 的 2 次数学评估 + 1 次物理启动；理由：结构排序在记录精度下不可分辨、模型速度通道幅值差约 13 倍且相位差约 0.04 s，再做基于模型的搜索与结构分拣属无效花费，而\"必要条件式制动权限 + 一次恒值保持的被动沉降\"单价最低，能一次性把 H1 与 H2 分开、并同时完成 H4 的稠密闭合。",
+        "stopping_condition": "本轮诊断在以下条件同时成立时停止并交出结论：(i) H4 已闭合——native 速度/力平衡与保存值一致（相对偏差 ≲2%、残差 ≲1e-6 N）或明确不一致（超阈值）；(ii) 制动权限判据给出清晰分支——箱内最大制动速率相对 r_req=4.04 m/s² 的 ≥1 或 <1/2 判定明确，不落在 [1/2,1] 模糊带；(iii) 恒值保持 replay 的稠密速度曲线已能回答\"是否单调衰减、穿越 0.02 m/s 的时刻在 0.35 s 前/后/不出现\"这一三选一。若 (ii) 落入模糊带，或 replay 的速度曲线与 update 30 保存速度明显不自洽（例如起点偏差 >2%），本轮不追加第二次物理 replay，停止并升级为\"同状态同输入、同 0.01 s 网格\"的匹配预测-物理逐点比较（补齐 fact math_physics_alignment 缺失的 saved_prediction_samples 与 recorded_aligned_difference）。硬上限：物理启动 1 次、数学评估 2 次，超出即停止；不因结果不利而追加预算。",
+        "interpretation": "数学作用域、物理观测与独立验收三者必须分开陈述。数学侧：affine 采样模型给的全零初始态 score −0.2、模型 holding 速度 0.01375 m/s（峰值在 0.35 s）只是局部仿射样本上的数值结论，既不是非线性可行性的证明，也已确认在速度通道上与物理幅值（约 13 倍）和时间形状（峰值相位约 0.04 s）不符；模型内两结构排序不可分辨（Δscore 2.6e-13），因此\"哪个结构更好\"在模型层面无判定力，不能作为设计决策依据。物理侧：仅有两条独立观测——NMPC 候选位置两项通过而速度单项失败；固定开环序列三项全败。新到的 scheduled_historical_feedback 是历史反馈、与两臂无关，它把速度问题的时间结构显形：峰值 0.1817 m/s 在 0.31 s，末端已降至 0.0501 m/s，隐含衰减率约 32 s⁻¹（τ≈0.031 s）、阈值穿越约在 0.24 s 与 0.378 s。据此最可检验的解释不是\"结构无法减速\"，而是\"到达相位晚了约 0.06–0.07 s\"，使 0.30–0.35 s 窗口正好落在速度曲线的残余段上。\n\n本计划为什么能区分机制：瞬时制动权限是必要条件型证据（箱内不可制动才是否定的），单次恒值保持 replay 直接测被动沉降是否自然收敛——两者合起来把\"晚一点就能过（控制/相位可修）\"与\"结构-驱动权限或时域不足（需改设计或时间网格）\"分开；稠密 0.0005 s 记录同时闭合数值伪像这一支，并给出物理侧的对齐样本。必须保留的未知（不得在结论中省略）：模型侧对齐预测样本仍缺失，故本计划不能声称任何 GVS/MuJoCo 预测一致性；\"该精确态存在制动权限\"不构成\"存在满足三项条件的控制\"的证明；一次 replay 的失败也不构成结构不可行。后续动作按分支确定：(a) 控制/相位支 → 提交显式的有界\"更早到达 + 覆盖保持窗口每个采样\"的序列，仍以每次候选 1 次物理 replay 计费，并交由冻结协议独立验收；(b) 结构/时域支 → 转向单参数结构或时间网格的受控敏感性（该响应不等于重优化结构能力，也不是最优值梯度），并优先检查驱动权限（张力箱上界与腱布置）而不是继续控制搜索；(c) 数值支 → 先补匹配的状态/输入/输出逐点比较与保存预测样本，在此之前不讨论机制。无论哪一支，任务是否被接受（三项条件是否同时满足、continuous_time_guarantee 为 false 下只覆盖采样）只能由冻结评估协议单独给出，本诊断不改变任何验收状态。",
+        "parameters": null,
+        "search": null,
+        "candidate": null,
+        "selected_execution": null,
+        "revise_selection": false,
+        "diagnostic": null,
+        "mechanics": null,
+        "cross_replay": null,
+        "physical_replay": null,
+        "refinement": null,
+        "matched_state": null,
+        "nmpc_prediction_diagnostic": null,
+        "mechanics_source": null,
+        "experience_disposition": {}
+      },
+      "schema_check": "passed"
+    }
+  ],
+  "manual_review": null,
+  "money": null,
+  "confirmed_responses": 4,
+  "usage": {
+    "prompt_tokens": 52647,
+    "completion_tokens": 30189,
+    "total_tokens": 82836,
+    "prompt_cache_hit_tokens": 27136,
+    "prompt_cache_miss_tokens": 25511,
+    "reasoning_tokens": 18125
+  },
+  "provider_ledger": {
+    "limit": {
+      "backend_solves": 0,
+      "model_calls": 4,
+      "tool_calls": 16,
+      "wall_s": null,
+      "worker_calls": 0
+    },
+    "used": {
+      "tool_calls": 0,
+      "model_calls": 4,
+      "backend_solves": 0,
+      "worker_calls": 0,
+      "wall_s": 194.6240000000107
+    },
+    "remaining": {
+      "backend_solves": 0,
+      "model_calls": 0,
+      "tool_calls": 16,
+      "wall_s": null,
+      "worker_calls": 0
+    },
+    "occupied": {}
+  }
+}

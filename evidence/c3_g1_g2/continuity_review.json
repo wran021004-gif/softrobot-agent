@@ -1,0 +1,174 @@
+{
+  "status": "feedback_passed_startup_scope_confounded",
+  "original_query_permitted_after_handoff": false,
+  "post_handoff_allowed_evidence_ids": [
+    "9470fba769f2966f5de46cdc9e9af6f236811170d61c30ca2741c86322e92517",
+    "0d811aa77f5f52534e8a5a8ba47b88811025ce45ef1cd371332b6fede324828b",
+    "f32ce2b9e738cf2d5e37ff67a22ae5d337ee2b39c38d938b9a90f1c439934a04"
+  ],
+  "usage": {
+    "actual_requests": 2,
+    "confirmed_responses": 2,
+    "usage": {
+      "prompt_tokens": 21840,
+      "completion_tokens": 3322,
+      "total_tokens": 25162,
+      "prompt_cache_hit_tokens": 512,
+      "prompt_cache_miss_tokens": 21328,
+      "reasoning_tokens": 1589
+    },
+    "money": null,
+    "provider_ledger": {
+      "limit": {
+        "backend_solves": 0,
+        "model_calls": 2,
+        "tool_calls": 16,
+        "wall_s": null,
+        "worker_calls": 0
+      },
+      "used": {
+        "tool_calls": 1,
+        "model_calls": 2,
+        "backend_solves": 0,
+        "worker_calls": 0,
+        "wall_s": 20.562000000005355
+      },
+      "remaining": {
+        "backend_solves": 0,
+        "model_calls": 0,
+        "tool_calls": 15,
+        "wall_s": null,
+        "worker_calls": 0
+      },
+      "occupied": {}
+    }
+  },
+  "requests": [
+    {
+      "request_id": "r3-request-7b1f43372b6144d2820fb5e14a18d91f",
+      "reference": {
+        "artifact_id": "f8de97f5afa9ea9030d7619a8f228505556689c949dec819e4c11b081ce53df1",
+        "media_type": "application/json"
+      },
+      "bytes": 41683,
+      "messages": 3
+    },
+    {
+      "request_id": "r3-request-ef60c97eeae34037877dacd0c5d47e24",
+      "reference": {
+        "artifact_id": "917c2a1dd05beeca469d572bb4a417a498929c8f4ebadb3524eed80d92eaebc9",
+        "media_type": "application/json"
+      },
+      "bytes": 42979,
+      "messages": 4
+    }
+  ],
+  "handoff_feedback": {
+    "tool_id": "call_00_rZmglnVrl6p0yEcspUj54021",
+    "feedback_reference": {
+      "artifact_id": "9470fba769f2966f5de46cdc9e9af6f236811170d61c30ca2741c86322e92517",
+      "media_type": "application/json"
+    },
+    "query": {
+      "pointer": "",
+      "reference": {
+        "artifact_id": "7a1ff0ae028c832f292eb475d6c11bb0c534dcd2dc03476d4a7edcdf8144e146",
+        "media_type": "application/json"
+      },
+      "view": "full"
+    },
+    "exact_original_feedback": true
+  },
+  "post_handoff_read_state": {
+    "completed_reads": 1,
+    "read_counts": {
+      "exact_repeat": 0,
+      "covered_subnode": 0,
+      "new_query": 0
+    },
+    "recent": [
+      {
+        "query": {
+          "reference": {
+            "artifact_id": "7a1ff0ae028c832f292eb475d6c11bb0c534dcd2dc03476d4a7edcdf8144e146",
+            "media_type": "application/json"
+          },
+          "pointer": "",
+          "view": "full",
+          "fields": [],
+          "start": 0,
+          "count": 20
+        },
+        "delivery": "not_confirmed_in_provider_request",
+        "classification": "new_query",
+        "content_identity": "7a1ff0ae028c832f292eb475d6c11bb0c534dcd2dc03476d4a7edcdf8144e146",
+        "source_state_identity": null
+      }
+    ],
+    "full_list_query": {
+      "reference": {
+        "artifact_id": "0d811aa77f5f52534e8a5a8ba47b88811025ce45ef1cd371332b6fede324828b",
+        "media_type": "application/json"
+      },
+      "view": "working_set",
+      "pointer": "/read_coverage"
+    },
+    "rule": "Exact repeats refer to previously delivered unchanged content. Dynamic views may change. Rechecks remain allowed; delivery is not understanding."
+  },
+  "final_read_coverage": [
+    {
+      "query": {
+        "reference": {
+          "artifact_id": "7a1ff0ae028c832f292eb475d6c11bb0c534dcd2dc03476d4a7edcdf8144e146",
+          "media_type": "application/json"
+        },
+        "pointer": "",
+        "view": "full",
+        "fields": [],
+        "start": 0,
+        "count": 20
+      },
+      "owning_study": "c3-g1-continuity-20261025",
+      "tool_call_id": "call_00_rZmglnVrl6p0yEcspUj54021",
+      "feedback_reference": {
+        "artifact_id": "9470fba769f2966f5de46cdc9e9af6f236811170d61c30ca2741c86322e92517",
+        "media_type": "application/json"
+      },
+      "retrieval_view": false,
+      "delivery_identity": "7a1ff0ae028c832f292eb475d6c11bb0c534dcd2dc03476d4a7edcdf8144e146",
+      "source_state_identity": null,
+      "delivery_status": "complete_fields",
+      "successfully_provided": true,
+      "complete_data": true,
+      "item_count": null,
+      "full_artifact": true,
+      "classification": "new_query"
+    }
+  ],
+  "restore_only": [
+    {
+      "next_request_sent": false,
+      "sdk_message_identity": "3e029865d589aa6231be6c5abf60cfea7f952387b6167e1b556c25b29c1911e5",
+      "session_id": "rh-8c1296c0ff52e347dc5517c4",
+      "unmatched_tool_ids": []
+    }
+  ],
+  "prior_f1_query_identical": true,
+  "further_pending_delivery": false,
+  "post_handoff_action_trace": {
+    "total": 0,
+    "failed_or_rejected": 0,
+    "recent": [],
+    "scope": "Original Agent intent and recorded execution only; hypotheses are not confirmed or falsified by Reporter prose",
+    "selection_scope": "First route, first recorded structure/math/physics/control outcomes and latest three; no causal interpretation",
+    "full_trace_query": {
+      "reference": {
+        "artifact_id": "0d811aa77f5f52534e8a5a8ba47b88811025ce45ef1cd371332b6fede324828b",
+        "media_type": "application/json"
+      },
+      "view": "working_set",
+      "pointer": "/action_trace"
+    }
+  },
+  "trace_scope": "No Plan precedes this continuity read; archived A/B regression checks existing decision traces."
+}

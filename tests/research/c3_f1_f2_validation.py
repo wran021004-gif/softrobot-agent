@@ -145,6 +145,8 @@ def continuity(restore=False, *, study_id='c3-f1-live-20261025', destination=OUT
         overrides=dict(evidence_destination=str(destination.relative_to(ROOT))),
         budget_overrides=dict(provider_requests=provider_requests),source=source,authorization=authorization)
     assert save(h,excerpt,'authorized_historical_excerpt')==query['reference']
+    # Keep the same source legally readable after the existing closeout filter.
+    update(h,scoped_context=[*state(h).get('scoped_context',[]),query['reference']])
     approval=next(e['outputs'][0] for e in h.store.events(h.run_id) if e['kind']=='formal_study_authorization')
     admission=record(h,'session_handoff_admission',dict(authorization=approval,purpose='bounded_independent_semantic_validation',boundary='request_feedback'))
     pilot=deepcopy(state(h)['pilot']);pilot.update(session_handoff_live_admitted=True,session_handoff_boundary='request_feedback',session_handoff_admission=admission)

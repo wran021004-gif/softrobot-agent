@@ -1,0 +1,199 @@
+{
+  "g1": "failed_scientific_revision_gate",
+  "g2": "not_started_required_by_user_stop_condition",
+  "gates": {
+    "exact_feedback_delivery": "passed",
+    "study_scoped_startup": "inconclusive_original_query_filtered_by_closeout",
+    "new_plan_each_turn": "passed_4_of_4",
+    "evidence_based_valid_scientific_revision": "failed"
+  },
+  "rubric_source": "decision_protocol.json#/rubric_offline_only",
+  "manual_scores": [
+    {
+      "arm": "baseline",
+      "turn": 1,
+      "evidence_scope": 1,
+      "testable_hypothesis": 2,
+      "discriminating_action": 1,
+      "feedback_revision": null,
+      "complete_cost": 1
+    },
+    {
+      "arm": "evidence",
+      "turn": 1,
+      "evidence_scope": 0,
+      "testable_hypothesis": 2,
+      "discriminating_action": 0,
+      "feedback_revision": null,
+      "complete_cost": 1
+    },
+    {
+      "arm": "baseline",
+      "turn": 2,
+      "evidence_scope": 1,
+      "testable_hypothesis": 2,
+      "discriminating_action": 1,
+      "feedback_revision": 1,
+      "complete_cost": 1
+    },
+    {
+      "arm": "evidence",
+      "turn": 2,
+      "evidence_scope": 0,
+      "testable_hypothesis": 2,
+      "discriminating_action": 0,
+      "feedback_revision": 1,
+      "complete_cost": 1
+    }
+  ],
+  "scoring_scope": "Human review against frozen anchors; explicit competing hypotheses score separately from invalid causal branches. No response-length score or statistical inference.",
+  "independent_direction_support": "unscored_no_experiment_executed",
+  "scientific_failures": [
+    {
+      "rows": [
+        "evidence:1",
+        "evidence:2"
+      ],
+      "fields": [
+        "hypothesis",
+        "interpretation"
+      ],
+      "issue": "Compares CONIC witness with different-control NMPC as speed-channel magnitude/phase error despite partial_comparison and missing aligned samples."
+    },
+    {
+      "rows": [
+        "baseline:2",
+        "evidence:2"
+      ],
+      "fields": [
+        "hypothesis",
+        "interpretation"
+      ],
+      "issue": "Two speed norms do not establish monotone decay, exponential dynamics, noise exclusion or threshold crossings; evidence:2 invents an ascending crossing at 0.24 s."
+    },
+    {
+      "rows": [
+        "baseline:1",
+        "evidence:1",
+        "evidence:2"
+      ],
+      "fields": [
+        "expected_observation",
+        "weakening_observation"
+      ],
+      "issue": "Instantaneous braking compared with average required deceleration is not a finite-horizon necessary condition without a validated horizon-wide bound."
+    },
+    {
+      "rows": [
+        "evidence:2"
+      ],
+      "fields": [
+        "expected_observation",
+        "fixed_conditions"
+      ],
+      "issue": "Confuses update 30 at 0.30 s with the speed peak at 0.31 s; proposes 0.40 s extension outside the frozen 0.35 s protocol."
+    },
+    {
+      "rows": [
+        "baseline:1",
+        "baseline:2",
+        "evidence:1",
+        "evidence:2"
+      ],
+      "fields": [
+        "fixed_conditions",
+        "expected_observation"
+      ],
+      "issue": "Costs omit preparation/prefixes/internal steps or extra timestep reruns; A2 calls a timestep rerun a free recorded read."
+    }
+  ],
+  "usage": {
+    "continuity": {
+      "actual_requests": 2,
+      "confirmed_responses": 2,
+      "usage": {
+        "prompt_tokens": 21840,
+        "completion_tokens": 3322,
+        "total_tokens": 25162,
+        "prompt_cache_hit_tokens": 512,
+        "prompt_cache_miss_tokens": 21328,
+        "reasoning_tokens": 1589
+      },
+      "money": null,
+      "provider_ledger": {
+        "limit": {
+          "backend_solves": 0,
+          "model_calls": 2,
+          "tool_calls": 16,
+          "wall_s": null,
+          "worker_calls": 0
+        },
+        "used": {
+          "tool_calls": 1,
+          "model_calls": 2,
+          "backend_solves": 0,
+          "worker_calls": 0,
+          "wall_s": 20.562000000005355
+        },
+        "remaining": {
+          "backend_solves": 0,
+          "model_calls": 0,
+          "tool_calls": 15,
+          "wall_s": null,
+          "worker_calls": 0
+        },
+        "occupied": {}
+      }
+    },
+    "decisions": {
+      "actual_requests": 4,
+      "confirmed_responses": 4,
+      "usage": {
+        "prompt_tokens": 52647,
+        "completion_tokens": 30189,
+        "total_tokens": 82836,
+        "prompt_cache_hit_tokens": 27136,
+        "prompt_cache_miss_tokens": 25511,
+        "reasoning_tokens": 18125
+      },
+      "money": null,
+      "provider_ledger": {
+        "limit": {
+          "backend_solves": 0,
+          "model_calls": 4,
+          "tool_calls": 16,
+          "wall_s": null,
+          "worker_calls": 0
+        },
+        "used": {
+          "tool_calls": 0,
+          "model_calls": 4,
+          "backend_solves": 0,
+          "worker_calls": 0,
+          "wall_s": 194.6240000000107
+        },
+        "remaining": {
+          "backend_solves": 0,
+          "model_calls": 0,
+          "tool_calls": 16,
+          "wall_s": null,
+          "worker_calls": 0
+        },
+        "occupied": {}
+      }
+    }
+  },
+  "scientific_execution": {
+    "mathematical_evaluations": 0,
+    "independent_physics": 0,
+    "nmpc": 0,
+    "ppo": 0,
+    "reporter_requests": 0,
+    "mathematical_conclusion": "not_computed",
+    "physical_task_acceptance": "not_measured"
+  },
+  "provider_wall_s": {
+    "c3-g1-continuity-20261025": 20.562000000005355,
+    "c3-g1-decisions-20261025": 194.6240000000107
+  }
+}

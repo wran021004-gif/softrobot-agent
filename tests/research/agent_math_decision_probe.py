@@ -1,6 +1,7 @@
 """Two frozen paired decisions, using production Plan and accounted LiveBoundary.
 
-Only Provider I/O runs. No Host/research Study, scientific dispatch or Reporter.
+Only Provider I/O runs, optionally accounted in an authorized formal Study.
+No scientific dispatch or Reporter.
 Raw wire/body and the existing provider ledger live in ignored runs/.
 """
 import argparse
