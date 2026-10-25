@@ -38,7 +38,7 @@ class RequestBoundaryHandoffTests(unittest.TestCase):
         with patch('tools.research.agent.load_credential'),patch.dict(os.environ,{'DEEPSEEK_API_KEY':'offline'}),\
                 patch('tools.research.core.guard'),patch('tools.research.agent.guard'),\
                 patch('httpx.AsyncHTTPTransport',return_value=httpx.MockTransport(self.responder(h,sent))):
-            asyncio.run(converse(h,session_handoff=True,handoff_before_next_request=True,pause_after_completed_invocations=1))
+            asyncio.run(converse(h,session_handoff=True,handoff_request_bytes=1,pause_after_completed_invocations=1))
         self.assertEqual(len(sent),2);self.assertNotEqual(state(h)['pilot']['framework_session_id'],original)
         events=h.store.events(h.run_id)
         committed=next(e for e in events if e['kind']=='session_handoff' and e['status']=='committed')

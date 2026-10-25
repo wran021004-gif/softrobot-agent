@@ -500,6 +500,7 @@ def working_set(host,current):
         control_search_domain=current.get('control_search_domain'),
         source_references=list({r['artifact_id']:r for r in registered_references(host)}.values()),all_fresh_results=references,
         citation_eligibility=citation_inventory(host),action_trace=research_action_trace(host,limit=None),
+        recent_searches=current['decision_feedback']['recent_searches'],
         scientific_scope='No model-authored hypotheses are promoted to measured causes; only original independent acceptance establishes success')
 
 
@@ -879,10 +880,10 @@ def agent_decision_brief(host):
             if key in ws:
                 rows=ws.pop(key);ws[key+'_access']=dict(count=len(rows),
                     query=dict(reference=anchor,view='working_set',pointer='/'+key))
-    return compact_scientific_delivery(brief)
+    return compact_scientific_delivery(brief,decision_only=True)
 
 
-def compact_scientific_delivery(brief):
+def compact_scientific_delivery(brief,*,decision_only=False):
     """Pure L0 projection; exact reports and immutable SDK history stay intact."""
     brief=deepcopy(brief)
     for report in brief.get('latest_reports',[]):
@@ -895,6 +896,51 @@ def compact_scientific_delivery(brief):
                     row.pop('actual_input_n',None);row.pop('planned_first_input_n',None)
                     if row.get('recovery'):
                         row['recovery']={k:row['recovery'][k] for k in ('attempted','selected','error') if k in row['recovery']}
+    if decision_only:
+        catalog=brief.get('mathematical_capabilities',{})
+        for row in catalog.get('methods',{}).values():
+            # Detailed model/coverage/template information has one query owner.
+            for key in list(row):
+                if key not in ('planning_status','execution_status','missing','estimated_evaluations',
+                        'study_authorized','formal_execution_authorized','detail_pointer'):
+                    row.pop(key)
+        if brief.get('selected_mathematical_method'):
+            selected=brief['selected_mathematical_method']['method']
+            brief['selected_mathematical_method']=dict(query=dict(**catalog['detail_query'],pointer='/methods/'+selected))
+        brief['action_trace']['recent']=brief['action_trace'].get('recent',[])[-1:]
+        intent=brief.get('research_intent',{})
+        for key in ('latest_decision','last_research'):
+            if intent.get(key):
+                intent[key]={k:v for k,v in intent[key].items() if k!='agent_hypothesis'}
+        # Older mathematical results remain in L2. Deliver only the latest
+        # unreported result, rather than a second rolling evidence inventory.
+        reported_math=any(f.get('mathematics') for r in brief.get('latest_reports',[]) for f in r.get('findings',[]))
+        brief['additional_mathematical_evidence']=[] if reported_math else brief.get('additional_mathematical_evidence',[])[-1:]
+        for report in brief.get('latest_reports',[]):
+            report['interpretations']=[dict(kind='hypothesis',text=i['text'],sources=i['sources'])
+                for i in report.get('interpretations',[])[:1]]
+            for finding in report.get('findings',[]):
+                finding['metrics']=finding.get('metrics',[])[:3]
+                best=brief.get('best_valid')
+                if best and finding['result']['reference']==best['reference']:
+                    finding['metrics']=[]
+                    finding['physical_facts']=dict(same_as='best_valid/physical_diagnostic')
+                math=finding.get('mathematics') or {}
+                native=math.get('native_analysis') or {}
+                if native.get('comparison'):
+                    math['quantities']=[]
+                    native['comparison']={k:dict(worst_constraint=v.get('worst_constraint'))
+                        for k,v in native['comparison'].items()}
+                for task in (finding.get('mathematics',{}) or {}).get('original_predicate_diagnostics',{}).values():
+                    task.pop('samples',None)
+        best=brief.get('best_valid')
+        if best and best.get('physical_diagnostic'):
+            best.pop('violated_constraints',None)
+        anchor=brief.get('evidence_access',{}).get('reference')
+        if anchor:
+            for key,pointer in (('recent_searches','/recent_searches'),('method_requirements','/method_requirements')):
+                if brief.get(key):
+                    brief[key]=dict(query=dict(reference=anchor,view='working_set',pointer=pointer))
     return brief
 
 

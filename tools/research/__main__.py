@@ -18,6 +18,7 @@ def main():
     parser.add_argument('--reason')
     parser.add_argument('--session-handoff',action='store_true',help='Opt in only after separate live continuation admission')
     parser.add_argument('--handoff-before-next-request',action='store_true',help='Use independently admitted request-feedback boundary before the next model send')
+    parser.add_argument('--handoff-request-bytes',type=int,help='Rotate at a verified paired-feedback boundary when the complete next request reaches this size; requires separate live admission')
     parser.add_argument('--pause-after-completed-invocations',type=int,help='Supervisor pause after complete SDK invocation and Reporter delivery')
     args=parser.parse_args()
     if args.command in ('prepare','readiness'):
@@ -51,7 +52,7 @@ def main():
         from tools.research.agent import converse,IncompleteModelOutput
         try:asyncio.run(converse(h,session_handoff=args.session_handoff,
             pause_after_completed_invocations=args.pause_after_completed_invocations,
-            handoff_before_next_request=args.handoff_before_next_request))
+            handoff_before_next_request=args.handoff_before_next_request,handoff_request_bytes=args.handoff_request_bytes))
         except IncompleteModelOutput as exc:
             print(json.dumps(dict(status='confirmed_incomplete',provider=exc.diagnostic)))
             raise SystemExit(2) from exc

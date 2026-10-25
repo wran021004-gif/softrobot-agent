@@ -13,6 +13,14 @@ def state_identity(value):
     return digest(value)
 
 
+def initial_messages(study_id):
+    return [dict(role='user',content=[dict(text=(
+        'Research Session prepared and identity-bound to the saved handoff preparation. '
+        'No prior conversation copied. The next model request supplies the authoritative '
+        'current state in CURRENT_RESEARCH_PACKET. Full history and original scientific '
+        'evidence remain queryable from Store. Study: '+study_id))])]
+
+
 def unmatched(messages):
     outstanding={};seen=set()
     for message in messages:
@@ -218,11 +226,7 @@ async def handoff(host,agent,build,directory,*,stage=lambda name:None,boundary='
                 raise ValueError('PREPARATION_STATE_CHANGED_KEEP_OLD_SESSION')
             preparation=prior
         else:
-            initial=[dict(role='user',content=[dict(text=(
-                'Research Session prepared and identity-bound to the saved handoff preparation. '
-                'No prior conversation copied. The next model request supplies the authoritative '
-                'current state in CURRENT_RESEARCH_PACKET. Full history and original scientific '
-                'evidence remain queryable from Store. Study: '+host.run_id))])]
+            initial=initial_messages(host.run_id)
             value=dict(version='research_session_handoff_v2',study_id=host.run_id,implementation=s['freeze'],
                 previous_session=s['pilot']['framework_session_id'],source_state_identity=state_identity(s),
                 source_state=plain(host.store.put(db,s)),completed_boundary_identity=digest(agent.messages),

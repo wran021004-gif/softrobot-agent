@@ -468,7 +468,7 @@ async def pause_completed_invocation(host,agent,completed):
         research_status=state(host)['research_status'],budgets_preserved=True))
 
 
-async def converse(host,*,session_handoff=False,pause_after_completed_invocations=None,handoff_before_next_request=False):
+async def converse(host,*,session_handoff=False,pause_after_completed_invocations=None,handoff_before_next_request=False,handoff_request_bytes=None):
     if pause_after_completed_invocations is not None and (type(pause_after_completed_invocations) is not int or pause_after_completed_invocations<1):
         raise ValueError('POSITIVE_COMPLETED_INVOCATION_COUNT_REQUIRED')
     from tools.research.state import require_authorization
@@ -478,7 +478,9 @@ async def converse(host,*,session_handoff=False,pause_after_completed_invocation
     from tools.research.reporter import InvestigationRequest, investigate, scientific_feedback, complete_reports
     if session_handoff and not state(host)['pilot'].get('session_handoff_live_admitted'):
         raise ValueError('LIVE_PROVIDER_CONTINUATION_UNVERIFIED_HANDOFF_NOT_ADMITTED')
-    if handoff_before_next_request and (not session_handoff or state(host)['pilot'].get('session_handoff_boundary')!='request_feedback'):
+    if handoff_request_bytes is not None and (type(handoff_request_bytes) is not int or handoff_request_bytes<1):
+        raise ValueError('POSITIVE_HANDOFF_REQUEST_BYTES_REQUIRED')
+    if (handoff_before_next_request or handoff_request_bytes is not None) and (not session_handoff or state(host)['pilot'].get('session_handoff_boundary')!='request_feedback'):
         raise ValueError('REQUEST_FEEDBACK_LIVE_ADMISSION_REQUIRED')
     if state(host)['spec'].get('mode') == 'engineering_numerical':
         raise ValueError('NUMERICAL_MODE_FORBIDS_APPLICATION_MODEL_ENDPOINTS')
@@ -735,7 +737,7 @@ async def converse(host,*,session_handoff=False,pause_after_completed_invocation
             wire=agent.model.format_request(agent.messages,agent.tool_registry.get_all_tool_specs(),agent.system_prompt)
             size=len(httpx.Request('POST',s['pilot']['provider']['base_url']+'/chat/completions',json=wire).content)
             provider=s['pilot']['provider'];context=provider['context_guard']
-            if handoff_before_next_request or size+provider['max_tokens']+context['framing_headroom_tokens']>context['context_limit_tokens']:
+            if handoff_before_next_request or (handoff_request_bytes is not None and size>=handoff_request_bytes) or size+provider['max_tokens']+context['framing_headroom_tokens']>context['context_limit_tokens']:
                 from tools.research.session_handoff import request_feedback_boundary
                 await request_feedback_boundary(host,agent)
                 raise RequestBoundaryHandoff('Verified request-feedback boundary; next model send has not started')

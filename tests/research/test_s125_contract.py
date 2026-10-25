@@ -19,7 +19,7 @@ from tests.research.s125_wire_audit import audit, reproduce
 def cold_host(mode='formal_research'):
     """Unique isolated engineering grant; never reuse a formal Study budget."""
     c=json.loads((ROOT/'configs/research/study_s125_cold.json').read_text())
-    c['study_id']='s125-preflight-'+uuid4().hex
+    c['study_id']='s125-preflight-'+uuid4().hex[:12]  # Keep SDK temporary filenames below Windows MAX_PATH in worktrees.
     c['mode']=mode
     path=ROOT/'runs'/c['study_id'];path.mkdir(parents=True)
     for key in ('defaults','family_space','control','task'):
