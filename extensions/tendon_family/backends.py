@@ -56,6 +56,48 @@ def _mujoco_state_failed(data, previous_time):
         or not all(np.isfinite(v).all() for v in (data.qpos,data.qvel,data.qacc)))
 
 
+class MujocoFailureSnapshot:
+    """One reusable pre-call buffer; serialize only on a catchable engine failure."""
+    def __init__(self,model,identity,folder=None):
+        import mujoco
+        self.model=model;self.identity=identity;self.completed_steps=0;self.folder=folder
+        self.spec=mujoco.mjtState.mjSTATE_INTEGRATION
+        self.buffer=np.empty(mujoco.mj_stateSize(model,self.spec))
+
+    def call(self,data,operation,location):
+        import mujoco
+        m=self.model
+        mujoco.mj_getState(m,data,self.buffer,self.spec)
+        before=dict(time_s=float(data.time),ncon=int(data.ncon),nefc=int(data.nefc),
+            qpos=data.qpos.copy(),qvel=data.qvel.copy(),
+            ctrl=data.ctrl.copy(),actuator_force=data.actuator_force.copy(),
+            warnings=[dict(number=int(w.number),lastinfo=int(w.lastinfo)) for w in data.warning])
+        try:
+            operation(m,data)
+            if operation is mujoco.mj_step:
+                if _mujoco_state_failed(data,before['time_s']):raise ValueError('MUJOCO_NUMERICAL_FAILURE')
+                self.completed_steps+=1
+        except Exception as exc:
+            # Last pre-call state is known; the failing native call's internal
+            # progress and partially mutated state are deliberately not asserted.
+            exc.mujoco_diagnostic=dict(version='mujoco_failure_snapshot_v1',model_identity=self.identity,
+                mujoco_version=mujoco.__version__,
+                error_location=location,operation=operation.__name__,reason=str(exc),
+                state_spec=int(self.spec),integration_state=self.buffer.tolist(),
+                time_before_call_s=before['time_s'],qpos=before['qpos'].tolist(),qvel=before['qvel'].tolist(),
+                control_before_call=before['ctrl'].tolist(),last_evaluated_actuator_force=before['actuator_force'].tolist(),
+                control_units='Frozen model actuator units; ideal tendon tension uses N',
+                constraints_before_call=dict(ncon=before['ncon'],nefc=before['nefc']),warnings_before_call=before['warnings'],
+                warnings_after_call=[dict(number=int(w.number),lastinfo=int(w.lastinfo)) for w in data.warning],
+                model_options=dict(timestep_s=float(m.opt.timestep),integrator=int(m.opt.integrator),
+                    solver=int(m.opt.solver),jacobian=int(m.opt.jacobian),iterations=int(m.opt.iterations)),
+                confirmed_completed_steps=self.completed_steps,failed_call_internal_steps='unknown',
+                missing=['Exact native failure-instant state','Partial internal solver progress'],
+                scope='Engineering diagnosis only; no complete trajectory, optimizer update or infeasibility inference')
+            if self.folder is not None:atomic_json(Path(self.folder)/'numerical_failure.json',exc.mujoco_diagnostic)
+            raise
+
+
 def playback_tensions(inp, physics, scene, commands, folder):
     """Run a fixed SI tension sequence through the existing candidate MuJoCo scene."""
     import mujoco
@@ -67,6 +109,7 @@ def playback_tensions(inp, physics, scene, commands, folder):
     folder=Path(folder);folder.mkdir(parents=True,exist_ok=True)
     xml=compile_xml(physics,scene,registry().parse(inp.policy.backend.parameters),folder/'robot.xml')
     model=mujoco.MjModel.from_xml_path(str(xml));data=mujoco.MjData(model)
+    safety=MujocoFailureSnapshot(model,physics['identity'],folder)
     joints=[model.joint(name).id for name in physics['dofs']]
     qi=model.jnt_qposadr[joints];vi=model.jnt_dofadr[joints]
     names=[t['entity'] for t in physics['tendons']]
@@ -92,7 +135,7 @@ def playback_tensions(inp, physics, scene, commands, folder):
     tip=model.site('tip_site').id
     jac=np.zeros((3,model.nv))
     def sample(k,requested,actual):
-        mujoco.mj_forward(model,data)
+        safety.call(data,mujoco.mj_forward,'playback.sample')
         mujoco.mj_jacSite(model,data,jac,None,tip)
         position=data.site_xpos[tip].copy();velocity=jac@data.qvel
         return dict(control_step=k,time_s=k*scene['control_period_s'],engine_time_s=float(data.time),
@@ -103,12 +146,12 @@ def playback_tensions(inp, physics, scene, commands, folder):
     steps=0;failure=None
     for k,command in enumerate(u):
         data.ctrl[aids]=command
-        mujoco.mj_forward(model,data)
+        safety.call(data,mujoco.mj_forward,'playback.apply')
         actual=-data.actuator_force[aids].copy()
         if not np.allclose(actual,command,rtol=0,atol=1e-9):
             failure=dict(interval=k,reason='DIRECT_TENSION_NOT_APPLIED',requested=command.tolist(),actual=actual.tolist());break
         for j in range(substeps):
-            previous=float(data.time);mujoco.mj_step(model,data);steps+=1
+            previous=float(data.time);safety.call(data,mujoco.mj_step,'playback.step');steps+=1
             if _mujoco_state_failed(data,previous):
                 failure=dict(interval=k,substep=j+1,reason='MUJOCO_NUMERICAL_FAILURE',time_s=float(data.time));break
         if failure:break
@@ -221,6 +264,7 @@ class MujocoBackend(SerialBackend):
         start=time.perf_counter(); path=self.folder/'robot.xml'
         compile_xml(p,s,self.config,path); model=mujoco.MjModel.from_xml_path(str(path))
         data=mujoco.MjData(model); pose=mujoco.MjData(model)
+        safety=MujocoFailureSnapshot(model,p['identity'],self.folder)
         bids=[model.body(b['entity']).id for b in p['parts']]
         # Tree serialization can reorder siblings; never assume array order.
         jids=[model.joint(j).id for j in p['dofs']]; qi=model.jnt_qposadr[jids]; vi=model.jnt_dofadr[jids]
@@ -228,7 +272,7 @@ class MujocoBackend(SerialBackend):
         execution_mode=s['control'].get('tension_execution_mode','actuator_realistic')
         suffix='_direct_tension' if execution_mode=='ideal_tension' else '_length_servo'
         aids=[model.actuator(t['entity']+suffix).id for t in p['tendons']]
-        data.qpos[qi]=s['qpos_rad']; data.qvel[vi]=s['qvel_rad_s']; mujoco.mj_forward(model,data)
+        data.qpos[qi]=s['qpos_rad']; data.qvel[vi]=s['qvel_rad_s']; safety.call(data,mujoco.mj_forward,'backend.initialize')
         actuator_ids=({'direct_tension_ids':aids} if execution_mode=='ideal_tension' else {'servo_ids':aids})
         atomic_json(self.folder/'compiled_physics.json',dict(physics_identity=p['identity'],body_ids=bids,qpos_indices=qi.tolist(),qvel_indices=vi.tolist(),
             tendon_ids=tids,**actuator_ids,tension_execution_mode=execution_mode,
@@ -241,7 +285,7 @@ class MujocoBackend(SerialBackend):
         rows=[]; steps=0; start=time.perf_counter(); dt=s['control_period_s']; substeps=round(dt/s['timestep_s'])
         initial_lengths=data.ten_length[tids].copy(); previous_lengths=initial_lengths.copy()
         def current():
-            mujoco.mj_forward(model,data)
+            safety.call(data,mujoco.mj_forward,'backend.sample')
             J=np.zeros((3,model.nv)); Jr=np.zeros_like(J); mujoco.mj_jacSite(model,data,J,Jr,model.site('tip_site').id)
             # Dense Jacobian from the engine's current explicit tendon routing.
             jac=np.zeros((model.ntendon,model.nv))
@@ -290,7 +334,7 @@ class MujocoBackend(SerialBackend):
                     bid=bids[f['body']]; data.xfrc_applied[bid,:3]+=f['force_n']
                     J=np.zeros((3,model.nv)); Jr=np.zeros_like(J); mujoco.mj_jacBodyCom(model,data,J,Jr,bid)
                     external+=J.T@f['force_n']
-            mujoco.mj_forward(model,data)
+            safety.call(data,mujoco.mj_forward,'backend.apply')
             actual_tension=-data.actuator_force[aids]
             before=dict(solver_tendon_length_m=data.ten_length[tids].tolist(),tension_n=actual_tension.tolist(),
                 solver_qfrc_actuator_nm=data.qfrc_actuator[vi].tolist(),solver_qfrc_passive_nm=data.qfrc_passive[vi].tolist(),external_torque_nm=external[vi].tolist())
@@ -315,7 +359,7 @@ class MujocoBackend(SerialBackend):
                         deadline_missed=self.controller.last['deadline_missed'])
             for _ in range(substeps):
                 previous_time=data.time
-                mujoco.mj_step(model,data); steps+=1
+                safety.call(data,mujoco.mj_step,'backend.step'); steps+=1
                 if _mujoco_state_failed(data,previous_time):
                     complete=False; reason='MUJOCO_NUMERICAL_FAILURE'
                     atomic_json(self.folder/'numerical_failure.json',dict(step=steps,

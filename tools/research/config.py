@@ -141,6 +141,7 @@ def resolve(path, profile=None, *, backend_profile=None):
     correction=study.pop('correction_search',None)
     local_search=study.pop('local_control_search',None)
     native_limits=study.pop('native_control_limits',None)
+    first_strategy=study.pop('initial_structure_strategy',None)
     family_mode=study.get('start_mode')=='family_space'
     additions={key:study.pop(key) for key in ('fidelity_policy','family_search') if key in study}
     if family_mode:
@@ -170,15 +171,24 @@ def resolve(path, profile=None, *, backend_profile=None):
         scope=study.pop('topology_scope',{})
         study=patch(original,study)
         if scope:
-            if set(scope)!={'segment_counts','tendon_counts'} or scope['segment_counts']!=[2] or scope['tendon_counts']!=[4]:
-                raise ValueError('VALIDATED_TWO_SEGMENT_FOUR_TENDON_SCOPE_REQUIRED')
-            family_space.update(executable_segment_counts=[2],executable_tendon_count_bounds=[4,4])
+            counts=scope.get('segment_counts',[]);tendons=scope.get('tendon_counts',[])
+            if (set(scope)!={'segment_counts','tendon_counts'} or not counts or not tendons
+                    or any(type(v) is not int for v in [*counts,*tendons]) or counts!=sorted(set(counts))
+                    or not set(counts)<=set(family_space['executable_segment_counts'])
+                    or tendons!=list(range(min(tendons),max(tendons)+1))
+                    or not family_space['executable_tendon_count_bounds'][0]<=min(tendons)<=max(tendons)<=family_space['executable_tendon_count_bounds'][1]):
+                raise ValueError('EXECUTABLE_COMMON_FAMILY_SUBDOMAIN_REQUIRED')
+            family_space.update(executable_segment_counts=counts,executable_tendon_count_bounds=[min(tendons),max(tendons)])
         study.update(start_mode='family_space',family_space=family_space,
             family_space_identity=digest(family_space),candidate_initialization=initialization)
         provenance['references'].update(defaults=dict(path=str(source),sha256=digest(original)),
             family_space=dict(path=str(family_source),sha256=digest(family_space)))
     elif study.get('start_mode', 'reference_candidate')!='reference_candidate':
         raise ValueError('UNKNOWN_RESEARCH_START_MODE')
+    if first_strategy is not None:
+        if not family_mode or first_strategy not in ('agent_choice','math_search'):
+            raise ValueError('EXPLICIT_FAMILY_INITIAL_STRUCTURE_STRATEGY_REQUIRED')
+        study['initial_structure_strategy']=first_strategy
     if additions:
         if not family_mode:
             raise ValueError('NEW_FIDELITY_SEARCH_POLICY_REQUIRES_FAMILY_STUDY')

@@ -392,6 +392,10 @@ def dispatch(host, value, request_id, origin='model'):
     admit_closeout(host,'research_plan',plain(plan))
     guard(host,plan.action in ('initialize_control','control_search','generate','propose','execute','search','mechanics','replay','cross_replay','refine','nmpc_prediction_diagnostic','physical_replay','matched_state') or plan.diagnostic is not None)
     s=state(host)
+    if (s['spec'].get('initial_structure_strategy')=='math_search' and plan.action not in ('stop','diagnose')
+            and not any(host.store.artifact(r).get('result',{}).get('best_mathematical_candidate') for r in s.get('search_results',[]))):
+        if plan.action!='search' or getattr(plan.search,'version',None)!='family_mixed_search_v1' or plan.search.objective!='task_violation':
+            raise ValueError('FIRST_STRUCTURE_REQUIRES_FAMILY_MIXED_TASK_VIOLATION_SEARCH')
     for r in plan.supporting_evidence:
         host.store.artifact(r)
     from tools.research.experience import disposition_bindings

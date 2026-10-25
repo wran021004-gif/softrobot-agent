@@ -105,14 +105,17 @@ def parse(message):
     return plain(plan)
 
 
-def freeze(out=OUT):
+def freeze(out=OUT,*,cases_path=CASES,provider=None,authorization=None):
     if out.exists():
         raise ValueError('EXISTING_PROBE_DIRECTORY_NO_REFREEZE_OR_AUTOMATIC_RETRY')
-    data = read(CASES)
-    provider = read(ROOT / 'evidence/mujoco_c1_autonomous/configuration.json')['runtime']['provider']
+    data = read(cases_path)
+    authorization=authorization or (AUTHORIZATION if Path(cases_path).resolve()==CASES.resolve() else data.get('authorization','PENDING_EXPLICIT_APPROVAL'))
+    provider = provider or read(ROOT / 'evidence/mujoco_c1_autonomous/configuration.json')['runtime']['provider']
+    ceiling=4*len(data['cases'])
+    cohort='protocol-fixed' if Path(cases_path).resolve()==CASES.resolve() else data['version']
     out.mkdir(parents=True)
-    frozen = dict(cohort='protocol-fixed', cases=data, provider=provider, instructions=INSTRUCTIONS,
-                  authorization=AUTHORIZATION, request_ceiling=8, reporter_requests=0,
+    frozen = dict(cohort=cohort, cases=data, provider=provider, instructions=INSTRUCTIONS,
+                  authorization=authorization, request_ceiling=ceiling, reporter_requests=0,cases_source=str(Path(cases_path).resolve()),
                   scientific_execution='disabled; proposals only')
     atomic_json(out / 'frozen.json', frozen)
     for case in data['cases']:
@@ -120,10 +123,10 @@ def freeze(out=OUT):
             for turn in (1, 2):
                 atomic_json(out / f'{case}-{arm}-{turn}-input.json',
                             wire(provider, data, case, arm, turn))
-    summary = dict(status='B1_frozen_provider_zero', cohort='protocol-fixed',
-                   prior_cohort='evidence/agent_math_decision_probe/initial_summary.json',
-                   baseline=data['baseline_commit'],
-                   provider=provider, authorization=AUTHORIZATION, request_ceiling=8,
+    summary = dict(status='B1_frozen_provider_zero', cohort=cohort,
+                   prior_cohort='evidence/agent_math_decision_probe/initial_summary.json' if cohort=='protocol-fixed' else None,
+                   baseline=data.get('baseline_commit'),
+                   provider=provider, authorization=authorization, request_ceiling=ceiling,
                    actual_requests=0, reporter_requests=0, physics_steps=0,
                    scientific_workers=0, formal_studies=0, cases=data['cases'],
                    sources=data['sources_offline_only'], rubric=data['rubric_offline_only'],
@@ -151,22 +154,27 @@ def provider_usage(host):
 
 async def live(out=OUT, *, test_transport=None):
     frozen = read(out / 'frozen.json')
-    if frozen['instructions'] != INSTRUCTIONS or frozen['cases'] != read(CASES):
+    if frozen['instructions'] != INSTRUCTIONS or frozen['cases'] != read(Path(frozen.get('cases_source',CASES))):
         raise ValueError('FROZEN_INPUT_CHANGED')
+    authorization=frozen['authorization'];ceiling=frozen['request_ceiling']
+    if authorization.startswith('PENDING_EXPLICIT_APPROVAL'):
+        raise ValueError('EXPLICIT_PROBE_APPROVAL_REQUIRED_BEFORE_PROVIDER')
+    if frozen['cases'].get('binding_status') not in (None,'bound_verified_input_v1'):
+        raise ValueError('VERIFIED_CANDIDATE_STATE_AND_EVIDENCE_BINDING_REQUIRED')
     if (out / 'provider/platform.sqlite').exists():
         raise ValueError('EXISTING_PROVIDER_ATTEMPT_NO_AUTOMATIC_RESEND')
     store = Store(out / 'provider')
     host = SimpleNamespace(store=store, run_id='agent-math-decision-probe')
-    project = ProjectConfig(project_id=host.run_id, grant_id=out.name + '-provider-eight',
-        authorization_source=AUTHORIZATION, budget=dict(model_calls=8, tool_calls=0,
+    project = ProjectConfig(project_id=host.run_id, grant_id=out.name + '-provider-'+str(ceiling),
+        authorization_source=authorization, budget=dict(model_calls=ceiling, tool_calls=0,
         backend_solves=0, worker_calls=0, wall_s=None), exclusive_resources={'provider_request': 1})
     store.create(project)
     # A platform transport session, with no Research Study/spec/candidate lifecycle.
     store.create_session(dict(input=dict(run_id=host.run_id, policy=dict(budget=plain(project.budget))),
                               purpose='read-only Provider accounting; not a Study'))
     update(host, pilot=dict(provider=frozen['provider'], live_model_requests=0))
-    record(host, 'provider_egress_authorization', dict(user_approval=AUTHORIZATION,
-        endpoint=frozen['provider']['base_url'] + '/chat/completions', ceiling=8,
+    record(host, 'provider_egress_authorization', dict(user_approval=authorization,
+        endpoint=frozen['provider']['base_url'] + '/chat/completions', ceiling=ceiling,
         data_scope='frozen task/scalars/diagnostics/evidence summaries; no credentials or unrelated files'))
     boundary = LiveBoundary(host, test_transport)
     provider = frozen['provider']
@@ -220,16 +228,44 @@ async def live(out=OUT, *, test_transport=None):
 
 
 def main():
+    global SUMMARY
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('mode', choices=('freeze', 'live'))
+    parser.add_argument('mode', choices=('freeze', 'live','c3-template','review'))
+    parser.add_argument('--results',type=Path,help='Read-only review of saved original probe results')
+    parser.add_argument('--cases',type=Path,default=CASES)
+    parser.add_argument('--out',type=Path)
+    parser.add_argument('--approval-file',type=Path,help='Future explicit approval text; cannot authorize an unbound draft')
     args = parser.parse_args()
-    if args.mode == 'freeze':
-        freeze()
+    out=args.out or OUT
+    if args.out:SUMMARY=out/'summary.json'
+    if args.mode=='c3-template':
+        data=read(Path(__file__).with_name('fixtures')/'c3_math_decision_template.json')
+        provider=read(ROOT/'configs/research/runtime_c3_ab.json')['provider']
+        print(json.dumps(dict(status=data['binding_status'],authorization=data['authorization'],
+            packets=[dict(arm=arm,turn=turn,wire=wire(provider,data,'c3_next_decision',arm,turn))
+                for turn in (1,2) for arm in ARMS]),ensure_ascii=False))
+    elif args.mode=='review':
+        if args.results is None:parser.error('review requires --results')
+        data=read(args.results);rows=[]
+        for row in data.get('results',[]):
+            value=dict(case=row.get('case'),arm=row.get('arm'),turn=row.get('turn'),request_id=row.get('request_id'))
+            try:
+                p=Plan.model_validate(row['plan']);value.update(schema='passed',
+                    hypothesis=p.hypothesis,decision=plain(p.decision),expected_observation=p.expected_observation,
+                    weakening_observation=p.weakening_observation,interpretation=p.interpretation)
+            except (ValueError,KeyError) as exc:value.update(schema='failed',reason=str(exc))
+            rows.append(value)
+        print(json.dumps(dict(decisions=rows,usage=data.get('usage'),actual_requests=data.get('actual_requests'),
+            scoring='Human blind review using frozen rubric; no automatic correctness/direction answer'),ensure_ascii=False))
+    elif args.mode == 'freeze':
+        provider=read(ROOT/'configs/research/runtime_c3_ab.json')['provider'] if args.cases!=CASES else None
+        freeze(out,cases_path=args.cases,provider=provider,
+            authorization=args.approval_file.read_text(encoding='utf8') if args.approval_file else None)
         print('B1 frozen; Provider=0; science=0')
     else:
         # Only the existing credential loader reads the private file; never serialize it.
         load_credential(Path('~/.codex/.env').expanduser())
-        result = asyncio.run(live())
+        result = asyncio.run(live(out))
         print(json.dumps({k: result[k] for k in ('status', 'actual_requests', 'usage')}, ensure_ascii=False))
 
 

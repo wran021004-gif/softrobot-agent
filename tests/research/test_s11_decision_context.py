@@ -110,6 +110,7 @@ class DecisionContextTests(unittest.TestCase):
                 self.assertEqual(protected(self.host),remaining<=4)
         s['success_gate']={'evidence':s['physical_replays'][-1]}
         self.assertTrue(decision_budget(self.host)['closeout']['active'])
+        self.assertEqual(decision_budget(self.host)['provider_budget']['science_capable_main_requests'],0)
 
     def test_stop_coverage_and_display_paths_remain_strict(self):
         chain=read(ROOT/'evidence/s10_mirror/feedback_decision_chain.json')['decisions']

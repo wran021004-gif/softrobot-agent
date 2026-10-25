@@ -13,6 +13,21 @@ from tools.research.state import state, save, update
 MATLAB_ACTIONS = ('execute','mechanics','replay','cross_replay','refine','matched_state','nmpc_prediction_diagnostic','search')
 
 
+def execution_environment(spec):
+    """Read-only pre-authorization check of Host and the actual math interpreter."""
+    from tools.research.optimal_capability import dependencies,CONIC
+    from importlib.metadata import version
+    expected=Path(spec['runtime']['research_python']).resolve()
+    exact=Path(sys.executable).resolve()==expected
+    conic=dependencies()
+    threads={k:dict(expected=v,actual=os.environ.get(k)) for k,v in spec.get('numerical_environment',{}).items()}
+    ready=exact and all(v['actual']==v['expected'] for v in threads.values()) and (conic['available'] or not spec.get('mathematical_methods',{}).get(CONIC))
+    return dict(status='ready' if ready else 'not_ready',host_python=sys.executable,expected_research_python=str(expected),
+        exact_execution_interpreter=exact,mathematical_worker_python=sys.executable,conic=conic,threads=threads,
+        packages={k:version(k) for k in ('numpy','scipy','casadi','mujoco','pydantic','strands-agents','strands-harness')},
+        scope='Imports and interpreter/thread admission only; no NMPC, PPO, physics or Provider request')
+
+
 def probe(session_factory=None):
     from extensions.tendon_family.sorosim_session import SorosimSession, dependency_identity
     result=dict(tool='sorosim_matlab',checked_unix=time.time(),status='not_checked',steps=[],

@@ -1,0 +1,163 @@
+{
+  "defaults": "family_study_defaults.json",
+  "start_mode": "family_space",
+  "family_space": "family_space_v2.json",
+  "candidate_initialization": "all_candidate_dofs_zero_v1",
+  "study_id": "c3-heur-ab-pending",
+  "base_commit": "a269babef657fa1efbe52fc73ef0d818ceae7b77",
+  "authorization": "PENDING_EXPLICIT_APPROVAL: Prepared experiment only. No Provider or scientific execution is authorized by this configuration. Future approval must bind the frozen Study, runtime, common priors, finite costs, comparison protocol and verified Session Handoff admission before execution.",
+  "mode": "formal_research",
+  "task": "../../tasks/reach_hold_c3_mirror.json",
+  "control": "control.json",
+  "runtime": "runtime_c3_ab.json",
+  "evidence_destination": "evidence/c3_heuristic_ab_pending",
+  "capabilities": [
+    "analysis",
+    "search",
+    "control_correction",
+    "physical_replay",
+    "nmpc",
+    "rl",
+    "control_search"
+  ],
+  "allowed_plan_actions": [
+    "generate",
+    "search",
+    "initialize_control",
+    "physical_replay",
+    "control_search",
+    "execute",
+    "diagnose",
+    "select",
+    "confirm",
+    "stop"
+  ],
+  "budgets": {
+    "provider_requests": 64,
+    "protected_provider_requests": 8,
+    "public_operations": 160,
+    "protected_public_operations": 16,
+    "physical_launches": 8,
+    "local_solves": 0,
+    "local_solve_s": null,
+    "offline_nlp": 0,
+    "bdf_replays": 0,
+    "mathematical_evaluations": 24,
+    "numerical_s": null,
+    "activity_s": null,
+    "delivery_reserve_s": null
+  },
+  "nmpc_limits": {
+    "executions": 1
+  },
+  "rl_limits": {
+    "training_stages": 1,
+    "actions_per_trial": 4096,
+    "seconds_per_trial": null,
+    "training_actions": 4096,
+    "training_active_seconds": null,
+    "evaluation_episodes": 1,
+    "diagnostic_replays": 0,
+    "diagnostic_physics_steps": 0
+  },
+  "confirmation": {
+    "fresh_independent_repetitions": 0,
+    "configuration": "Select exact fresh completed passing backend evaluation after public read. No extra repetitions; repeatability unassessed."
+  },
+  "physical_replay_limit": 5,
+  "reserve_rl_evaluation": true,
+  "native_control_limits": {
+    "evaluation_requests": 60,
+    "iterations": 2,
+    "knots_s": 4
+  },
+  "research_decisions": {
+    "version": "research_decision_v1",
+    "history": [],
+    "mathematics": [],
+    "control_seeds": [],
+    "context_limits": {
+      "candidates": 5,
+      "recent": 3,
+      "pareto": 3,
+      "samples": 3,
+      "evidence": 3
+    }
+  },
+  "supplied_evidence": [],
+  "mathematical_methods": {
+    "sampled-affine-conic-minimax-v1": "Method-scope declaration only; future explicit Study authorization and exact original admission/accounting required.",
+    "controlled-capability-sensitivity-v1": "Method-scope declaration only; future explicit Study authorization and exact original admission/accounting required."
+  },
+  "fidelity_policy": {
+    "version": "numerical_fidelity_v1",
+    "screening": {
+      "coarse": {
+        "cells_per_segment": 4,
+        "backend": "backend.family_mujoco@1.1.0"
+      },
+      "standard": {
+        "cells_per_segment": 12,
+        "backend": "backend.family_mujoco@1.1.0"
+      }
+    },
+    "final_evaluation": {
+      "cells_per_segment": 12,
+      "backend": "backend.family_mujoco@1.1.0"
+    },
+    "require_exact_fidelity": true,
+    "alternative_runtimes": [],
+    "runtime_preflight_limit": 2
+  },
+  "family_search": {
+    "method": "bounded_mixed_coordinate_v1",
+    "variable_groups": [
+      "segment_count",
+      "tendon_count",
+      "spans",
+      "lengths",
+      "materials",
+      "sections",
+      "routing"
+    ],
+    "segment_counts": [
+      1,
+      2,
+      3
+    ],
+    "tendon_counts": [
+      3,
+      4
+    ],
+    "max_proposals": 16,
+    "max_evaluations": 12
+  },
+  "family_sensitivity_variables": {
+    "version": "family_sensitivity_v1",
+    "variables": [
+      "segments.0.length_m",
+      "segments.0.young_pa",
+      "segments.1.length_m",
+      "segments.1.young_pa",
+      "segments.2.length_m",
+      "segments.2.young_pa",
+      "spans.0.radius_m",
+      "spans.1.radius_m",
+      "spans.2.radius_m",
+      "spans.3.radius_m"
+    ]
+  },
+  "execution_instructions": "Begin with an empty scientific candidate pool, frozen task and common FamilySpace subdomain (1-3 segments, 3-4 tendons). No historical scientific feedback, controls, candidate rankings or diagnostic answers are supplied. Public generator/model/controller defaults are engineering priors, not a scientific candidate. Choose hypotheses, competing explanations, structure parameters, limited parameter blocks and control methods yourself. Use structure_actions to distinguish generate (generation payload), family_mixed_search_v1 and candidate-bound research_analysis. task_violation is sampled CONIC capability; static residual and local authority are different proxies. Label unsupported or numerical outcomes unknown/not_applicable; no optimizer failure proves infeasibility. All registered methods and control opportunities remain open under their exact applicability. Native control search caps are 60 callbacks, 2 updates, 4 knots. Search sublimit 12 mathematical evaluations is inside the Study total 24; model builds, CONIC branches, failed attempts, internal rollouts/prefixes, actual elapsed cost and Provider/Reporter usage must all be recorded. Provider total is 64 including Reporter and 8 protected closeout requests; use the live budget fields, never assume unused mathematical/physical allowances remain explorable after Provider protection. Supervisor reviews finite addenda at verified boundaries before STOP; you cannot reset or extend budgets. Fixed-control response and reoptimized capability differ. Sensitivity needs an explicitly authorized continuous variable, legal fixed-topology stencil and bound registered models; no discrete gradients. Only complete independent final-fidelity acceptance establishes task success. At first fresh pass publicly read and SELECT its exact candidate/control/result; zero extra confirmations. Otherwise publicly read and cite the complete STOP index with unresolved hypotheses and next_step. PPO checkpoints require exact independent evaluation. Keep exact sources and scientific limitations; Reporter prose is hypothesis. No global optimum, hardware, real-time, robustness, repeatability or cross-task claim follows. Choose the first candidate acquisition strategy autonomously; direct heuristic generation and mathematical search are both available.",
+  "topology_scope": {
+    "segment_counts": [
+      1,
+      2,
+      3
+    ],
+    "tendon_counts": [
+      3,
+      4
+    ]
+  },
+  "initial_structure_strategy": "agent_choice"
+}

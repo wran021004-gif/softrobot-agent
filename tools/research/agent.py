@@ -72,6 +72,10 @@ class RequestBoundaryHandoff(Exception):
     """Unwind the SDK loop before a send; never a completed model invocation."""
 
 
+class SupervisorReviewPause(RequestBoundaryHandoff):
+    """The verified paired-feedback boundary, before spending closeout capacity."""
+
+
 def provider_outcome(host,request_id):
     """Read durable transport/output facts without consuming or settling anything."""
     reception=received(host,request_id)
@@ -472,11 +476,15 @@ async def pause_completed_invocation(host,agent,completed):
         research_status=state(host)['research_status'],budgets_preserved=True))
 
 
-async def converse(host,*,session_handoff=False,pause_after_completed_invocations=None,handoff_before_next_request=False,handoff_request_bytes=None):
+async def converse(host,*,session_handoff=False,pause_after_completed_invocations=None,handoff_before_next_request=False,handoff_request_bytes=None,pause_exploration_remaining=None):
     if pause_after_completed_invocations is not None and (type(pause_after_completed_invocations) is not int or pause_after_completed_invocations<1):
         raise ValueError('POSITIVE_COMPLETED_INVOCATION_COUNT_REQUIRED')
     from tools.research.state import require_authorization
     require_authorization(host)
+    if state(host)['spec'].get('initial_structure_strategy'):
+        from tools.research.tool_readiness import execution_environment
+        if execution_environment(state(host)['spec'])['status']!='ready':
+            raise ValueError('HOST_MATH_NMPC_ENVIRONMENT_PREFLIGHT_REQUIRED_BEFORE_PROVIDER')
     from tools.research.core import guard,dispatch,experience,read_evidence,packet
     from tools.research.contracts import Plan,ExperienceQuery,EvidenceQuery,AnalysisRequest,RLRequest
     from tools.research.reporter import InvestigationRequest, investigate, scientific_feedback, complete_reports
@@ -484,7 +492,9 @@ async def converse(host,*,session_handoff=False,pause_after_completed_invocation
         raise ValueError('LIVE_PROVIDER_CONTINUATION_UNVERIFIED_HANDOFF_NOT_ADMITTED')
     if handoff_request_bytes is not None and (type(handoff_request_bytes) is not int or handoff_request_bytes<1):
         raise ValueError('POSITIVE_HANDOFF_REQUEST_BYTES_REQUIRED')
-    if (handoff_before_next_request or handoff_request_bytes is not None) and (not session_handoff or state(host)['pilot'].get('session_handoff_boundary')!='request_feedback'):
+    if pause_exploration_remaining is not None and (type(pause_exploration_remaining) is not int or pause_exploration_remaining<0):
+        raise ValueError('NONNEGATIVE_EXPLORATION_REVIEW_THRESHOLD_REQUIRED')
+    if (handoff_before_next_request or handoff_request_bytes is not None or pause_exploration_remaining is not None) and (not session_handoff or state(host)['pilot'].get('session_handoff_boundary')!='request_feedback'):
         raise ValueError('REQUEST_FEEDBACK_LIVE_ADMISSION_REQUIRED')
     if state(host)['spec'].get('mode') == 'engineering_numerical':
         raise ValueError('NUMERICAL_MODE_FORBIDS_APPLICATION_MODEL_ENDPOINTS')
@@ -742,6 +752,12 @@ async def converse(host,*,session_handoff=False,pause_after_completed_invocation
             wire=agent.model.format_request(agent.messages,agent.tool_registry.get_all_tool_specs(),agent.system_prompt)
             size=len(httpx.Request('POST',s['pilot']['provider']['base_url']+'/chat/completions',json=wire).content)
             provider=s['pilot']['provider'];context=provider['context_guard']
+            review=(pause_exploration_remaining is not None and not protected(host)
+                and current['research']['budget']['provider_budget']['science_capable_main_requests']<=pause_exploration_remaining)
+            if review:
+                from tools.research.session_handoff import request_feedback_boundary
+                await request_feedback_boundary(host,agent)
+                raise SupervisorReviewPause('Settled boundary before next request; supervisor budget review required')
             if handoff_before_next_request or (handoff_request_bytes is not None and size>=handoff_request_bytes) or size+provider['max_tokens']+context['framing_headroom_tokens']>context['context_limit_tokens']:
                 from tools.research.session_handoff import request_feedback_boundary
                 await request_feedback_boundary(host,agent)
@@ -785,6 +801,11 @@ async def converse(host,*,session_handoff=False,pause_after_completed_invocation
                 while cause is not None and id(cause) not in seen and not isinstance(cause,RequestBoundaryHandoff):
                     seen.add(id(cause));cause=cause.__cause__
                 if not isinstance(cause,RequestBoundaryHandoff):raise
+                if isinstance(cause,SupervisorReviewPause):
+                    record(host,'supervisor_pause',dict(boundary='request_feedback',session_id=agent._session_manager.session_id,
+                        sdk_message_identity=digest(agent.messages),budgets_preserved=True,next_request_sent=False,
+                        budget=decision_packet(host)['research']['budget']))
+                    break
                 record(host,'sdk_invocation_suspended_for_handoff',dict(session_id=agent._session_manager.session_id,
                     sdk_message_identity=digest(agent.messages),invocation_completed=False,next_request_sent=False))
                 from tools.research.session_handoff import handoff

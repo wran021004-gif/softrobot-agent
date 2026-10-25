@@ -79,6 +79,21 @@ class RequestBoundaryHandoffTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError,'REQUEST_FEEDBACK_LIVE_ADMISSION_REQUIRED'):
                 asyncio.run(converse(h,handoff_before_next_request=True))
 
+    def test_budget_review_pauses_at_verified_feedback_before_second_send(self):
+        h=self.provision();sent=[];original=state(h)['pilot']['framework_session_id']
+        with patch('tools.research.agent.load_credential'),patch.dict(os.environ,{'DEEPSEEK_API_KEY':'offline'}),\
+                patch('tools.research.core.guard'),patch('tools.research.agent.guard'),\
+                patch('httpx.AsyncHTTPTransport',return_value=httpx.MockTransport(self.responder(h,sent))):
+            asyncio.run(converse(h,session_handoff=True,pause_exploration_remaining=100))
+        self.assertEqual(len(sent),1)
+        self.assertEqual(state(h)['pilot']['framework_session_id'],original)
+        events=h.store.events(h.run_id)
+        self.assertTrue(any(e['kind']=='request_feedback_boundary' for e in events))
+        pause=h.store.artifact(next(e['outputs'][0] for e in events if e['kind']=='supervisor_pause'))
+        self.assertEqual(pause['boundary'],'request_feedback');self.assertFalse(pause['next_request_sent'])
+        self.assertFalse(any(e['kind']=='model_original_turn' for e in events))
+        self.assertFalse(state(h)['pending'])
+
     def test_failed_snapshot_verification_keeps_old_pointer_and_no_next_send(self):
         h=self.provision();original=state(h)['pilot']['framework_session_id'];sent=[]
         async def interrupted(*args,**kwargs):

@@ -909,7 +909,7 @@ def compact_scientific_delivery(brief,*,decision_only=False):
                     row.pop(key)
         if brief.get('selected_mathematical_method'):
             selected=brief['selected_mathematical_method']['method']
-            brief['selected_mathematical_method']=dict(query=dict(**catalog['detail_query'],pointer='/methods/'+selected))
+            brief['selected_mathematical_method']=dict(query={**catalog['detail_query'],'pointer':'/methods/'+selected})
         brief['action_trace']['recent']=brief['action_trace'].get('recent',[])[-1:]
         intent=brief.get('research_intent',{})
         for key in ('latest_decision','last_research'):
@@ -918,7 +918,9 @@ def compact_scientific_delivery(brief,*,decision_only=False):
         # Older mathematical results remain in L2. Deliver only the latest
         # unreported result, rather than a second rolling evidence inventory.
         reported_math=any(f.get('mathematics') for r in brief.get('latest_reports',[]) for f in r.get('findings',[]))
-        brief['additional_mathematical_evidence']=[] if reported_math else brief.get('additional_mathematical_evidence',[])[-1:]
+        extra=brief.get('additional_mathematical_evidence',[])[-1:]
+        latest=(brief.get('latest_scientific_feedback') or {}).get('reference')
+        brief['additional_mathematical_evidence']=extra if not reported_math or any(r['reference']==latest for r in extra) else []
         for report in brief.get('latest_reports',[]):
             report['interpretations']=[dict(kind='hypothesis',text=i['text'],sources=i['sources'])
                 for i in report.get('interpretations',[])[:1]]

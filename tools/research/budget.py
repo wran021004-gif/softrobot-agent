@@ -51,7 +51,16 @@ def decision_budget(host):
     s=state(host);remaining=host.store.remaining()['remaining'];b=s['spec']['budgets']
     total=remaining['model_calls'];reserve=b['protected_provider_requests']
     active=protected(host)
+    from tools.research.reporter import current_reports
+    reporter_used=sum(e['kind']=='r3_request' and host.store.artifact(e['outputs'][0]).get('purpose')=='reporter'
+        for e in host.store.events(host.run_id))
+    reporter_pending=sum(v['interpretation_status']=='deferred' for _,v in current_reports(host))
     return dict(provider_budget=dict(remaining_total=total,reserved_for_closeout=reserve,
+        reporter_requests_used=reporter_used,pending_reporter_requests_upper_bound=reporter_pending,
+        science_capable_main_requests=0 if active else max(0,total-reserve-1),
+        science_capable_after_pending_reporters=0 if active else max(0,total-reserve-1-reporter_pending),
+        supervisor_review_due=not active and total-reserve-1<=4+reporter_pending,
+        supervisor_rule='Review finite authorized addendum at a verified settled boundary before protection/STOP; no Agent reset. Reporter shares this total.',
         available_for_exploration=max(0,total-reserve),
         next_request_exploration_remaining=max(0,total-reserve-1),
         exploration_after_additional_read_requests={str(n):max(0,total-reserve-1-n) for n in (1,3,5)}),

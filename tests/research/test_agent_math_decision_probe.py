@@ -63,6 +63,18 @@ class ProbeTests(unittest.TestCase):
         self.assertEqual(st['common'][0]['values']['J'], [r['fixed']['signed_maximum_excess'] for r in rows])
         self.assertEqual(st['round2'][0]['raw_values']['J'], [r['warm']['best']['signed_maximum_excess'] for r in rows])
 
+    def test_c3_template_reuses_packet_and_cannot_inherit_prior_approval(self):
+        template=probe.ROOT/'tests/research/fixtures/c3_math_decision_template.json'
+        frozen=probe.freeze(self.out,cases_path=template)
+        self.assertEqual(frozen['request_ceiling'],4)
+        self.assertTrue(frozen['authorization'].startswith('PENDING_EXPLICIT_APPROVAL'))
+        a=probe.packet(frozen['cases'],'c3_next_decision','baseline',1)
+        b=probe.packet(frozen['cases'],'c3_next_decision','evidence',1)
+        a.pop('diagnostic_evidence');b.pop('diagnostic_evidence');self.assertEqual(a,b)
+        with self.assertRaisesRegex(ValueError,'EXPLICIT_PROBE_APPROVAL'):
+            asyncio.run(probe.live(self.out,test_transport=httpx.MockTransport(lambda r:(_ for _ in ()).throw(AssertionError('NO_SEND')))))
+        self.assertFalse((self.out/'provider').exists())
+
     def test_eight_single_decisions_exact_usage_and_isolated_history_no_dispatch(self):
         probe.freeze(self.out)
         requests = []

@@ -11,7 +11,7 @@ import numpy as np
 
 from schemas.platform import SessionInput
 from tools.platform_store import plain
-from .backends import physics_for, _mujoco_state_failed
+from .backends import physics_for, _mujoco_state_failed, MujocoFailureSnapshot
 from .scene import assemble_physical
 from .mjcf import compile_xml
 
@@ -29,6 +29,7 @@ class NativeModel:
         compile_xml(self.physics,self.scene,registry().parse(inp.policy.backend.parameters),xml)
         self.model=mujoco.MjModel.from_xml_string(xml.getvalue().decode('utf8'))
         m=self.model
+        self.safety=MujocoFailureSnapshot(m,self.physics['identity'])
         self.order=self.physics['dofs'];self.tendons=[t['entity'] for t in self.physics['tendons']]
         jids=[m.joint(n).id for n in self.order]
         self.qi=m.jnt_qposadr[jids];self.vi=m.jnt_dofadr[jids]
@@ -40,7 +41,7 @@ class NativeModel:
         self.cost=dict(model_builds=1,forward_evaluations=0,physics_steps=0,rollouts=0,mechanics_evaluations=0)
 
     def forward(self, d):
-        mujoco.mj_forward(self.model,d);self.cost['forward_evaluations']+=1
+        self.safety.call(d,mujoco.mj_forward,'native.forward');self.cost['forward_evaluations']+=1
         if d.ncon or d.nefc or any(w.number for w in d.warning) or not np.isfinite(d.qacc).all():
             raise ValueError('NATIVE_V1_REQUIRES_FINITE_CONTACT_FREE_UNCONSTRAINED_STATE')
 
@@ -77,7 +78,7 @@ class NativeModel:
         for row in point['native_replay']['rows']:
             self.apply(d,row['tension_n'])
             for _ in range(round(scene['control_period_s']/self.model.opt.timestep)):
-                previous=float(d.time);mujoco.mj_step(self.model,d);self.cost['physics_steps']+=1
+                previous=float(d.time);self.safety.call(d,mujoco.mj_step,'native.prefix');self.cost['physics_steps']+=1
                 if _mujoco_state_failed(d,previous):raise ValueError('NATIVE_PREFIX_NUMERICAL_FAILURE')
             self.forward(d);motion,_=self.motion(d)
             differences=[abs(d.time-row['time_s']),*abs(d.qpos[self.qi]-row['qpos_rad']),*abs(d.qvel[self.vi]-row['qvel_rad_s']),
@@ -154,7 +155,7 @@ class NativeModel:
         d=mujoco.MjData(m);mujoco.mj_copyData(d,m,start);actual=self.apply(d,u)
         self.cost['rollouts']+=1
         for _ in range(steps):
-            previous=float(d.time);mujoco.mj_step(m,d);self.cost['physics_steps']+=1
+            previous=float(d.time);self.safety.call(d,mujoco.mj_step,'native.rollout');self.cost['physics_steps']+=1
             if _mujoco_state_failed(d,previous):raise ValueError('NATIVE_SHORT_ROLLOUT_NUMERICAL_FAILURE')
         self.forward(d);motion,_=self.motion(d)
         return dict(**motion,actual_tensions_n=actual.tolist(),qpos_rad=d.qpos[self.qi].tolist(),qvel_rad_s=d.qvel[self.vi].tolist())
@@ -173,7 +174,7 @@ class NativeModel:
         for count,u in zip(steps,tensions):
             actual.append(self.apply(d,u).tolist())
             for _ in range(count):
-                previous=float(d.time);mujoco.mj_step(self.model,d);self.cost['physics_steps']+=1
+                previous=float(d.time);self.safety.call(d,mujoco.mj_step,'native.sequence');self.cost['physics_steps']+=1
                 if _mujoco_state_failed(d,previous):raise ValueError('NATIVE_SEQUENCE_NUMERICAL_FAILURE')
             self.forward(d);samples.append(self.motion(d)[0])
         return dict(times_s=[s['time_s'] for s in samples],

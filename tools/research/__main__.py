@@ -9,7 +9,7 @@ from tools.state_io import read
 
 def main():
     parser=argparse.ArgumentParser()
-    parser.add_argument('command',choices=['readiness','run','prepare','bind','migrate','execute','rl','diagnose','recover','status','export'])
+    parser.add_argument('command',choices=['environment','readiness','run','prepare','bind','migrate','execute','rl','diagnose','recover','status','export'])
     parser.add_argument('--spec',type=Path,default=DEFAULT_SPEC)
     parser.add_argument('--plan',type=Path)
     parser.add_argument('--run-id')
@@ -19,8 +19,14 @@ def main():
     parser.add_argument('--session-handoff',action='store_true',help='Opt in only after separate live continuation admission')
     parser.add_argument('--handoff-before-next-request',action='store_true',help='Use independently admitted request-feedback boundary before the next model send')
     parser.add_argument('--handoff-request-bytes',type=int,help='Rotate at a verified paired-feedback boundary when the complete next request reaches this size; requires separate live admission')
+    parser.add_argument('--pause-exploration-remaining',type=int,help='Supervisor pause at admitted paired-feedback boundary before remaining science-capable main requests reach this count')
     parser.add_argument('--pause-after-completed-invocations',type=int,help='Supervisor pause after complete SDK invocation and Reporter delivery')
     args=parser.parse_args()
+    if args.command=='environment':
+        from tools.research.config import resolve
+        from tools.research.tool_readiness import execution_environment
+        print(json.dumps(execution_environment(resolve(args.spec))))
+        return
     if args.command in ('prepare','readiness'):
         h=prepare(args.spec,profile=args.profile)
     else:
@@ -52,7 +58,8 @@ def main():
         from tools.research.agent import converse,IncompleteModelOutput
         try:asyncio.run(converse(h,session_handoff=args.session_handoff,
             pause_after_completed_invocations=args.pause_after_completed_invocations,
-            handoff_before_next_request=args.handoff_before_next_request,handoff_request_bytes=args.handoff_request_bytes))
+            handoff_before_next_request=args.handoff_before_next_request,handoff_request_bytes=args.handoff_request_bytes,
+            pause_exploration_remaining=args.pause_exploration_remaining))
         except IncompleteModelOutput as exc:
             print(json.dumps(dict(status='confirmed_incomplete',provider=exc.diagnostic)))
             raise SystemExit(2) from exc

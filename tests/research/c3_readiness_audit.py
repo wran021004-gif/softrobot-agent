@@ -12,8 +12,8 @@ from tools.research.session_handoff import initial_messages
 
 
 class C3Archive(C1Archive):
-    def __init__(self):
-        path=Path(__file__).resolve().parents[2]/'evidence/c3_blank_autonomous_softarm/immutable_artifacts.tar.gz'
+    def __init__(self,path=None):
+        path=path or Path(__file__).resolve().parents[2]/'evidence/c3_blank_autonomous_softarm/immutable_artifacts.tar.gz'
         self.archive=tarfile.open(path)
         self.snapshot=json.load(self.archive.extractfile(next(m for m in self.archive.getmembers() if m.name.startswith('snapshot/'))))
 
@@ -31,6 +31,15 @@ def context_audit():
         event,meta,wire,packet,events=requests[index]
         after=deepcopy(wire);packet=deepcopy(packet)
         packet['research']=compact_scientific_delivery(packet['research'],decision_only=True)
+        from tools.research.budget import decision_budget
+        host,s=archive.host(events);old_budget=packet['research']['budget']
+        ledger=host.store.remaining.return_value
+        ledger['remaining']['model_calls']=old_budget['provider_budget']['remaining_total']
+        ledger['remaining']['backend_solves']=old_budget['science_budget']['remaining_physical']
+        s['mathematical_evaluations']=s['spec']['budgets']['mathematical_evaluations']-old_budget['science_budget']['remaining_mathematical']
+        s['count_closeout']=old_budget['closeout']['active']
+        projected=decision_budget(host)['provider_budget']
+        old_budget['provider_budget'].update({k:v for k,v in projected.items() if k not in old_budget['provider_budget']})
         from tools.research.search import request_guidance
         packet['research']['structure_actions']=request_guidance(archive.snapshot['session']['state']['spec'])
         for tool in after.get('tools',[]):
@@ -54,7 +63,7 @@ def context_audit():
             payload_occurrences={k:{p:serialized(v).decode().count(p) for p in probes} for k,v in variants.items()},
             history_preserved=wire['messages'][:-1]==after['messages'][:-1],
             stop_and_select_rules_preserved=packet['guidance']==json.loads(wire['messages'][-1]['content'].split('\n',1)[1])['guidance'],
-            budget_preserved=packet['research']['budget']==json.loads(wire['messages'][-1]['content'].split('\n',1)[1])['research']['budget'],
+            original_budget_fields_preserved=all(old_budget['provider_budget'][k]==v for k,v in json.loads(wire['messages'][-1]['content'].split('\n',1)[1])['research']['budget']['provider_budget'].items()),
             handoff_status='Offline complete-wire projection only; actual rotation requires existing live admission and settled boundary verification'))
         for report in packet['research'].get('latest_reports',[]):
             archive.artifact(report['report_reference'])
@@ -97,5 +106,33 @@ def search_audit():
     return dict(scenarios=result,scope='Engineering geometry/coverage fixture with fixed incumbent, not scientific scores or task importance. Actual incumbent updates alter conditional coordinates.')
 
 
+def compare_exports(paths):
+    """Read recorded acceptance/cost only; never rerun the task evaluator."""
+    from tools.research.reporter import provider_usage
+    archives=[C3Archive(Path(p)/'immutable_artifacts.tar.gz') for p in paths]
+    rows=[];shared=[]
+    for archive in archives:
+        snapshot=archive.snapshot;s=snapshot['session']['state'];spec=s['spec'];host,_=archive.host()
+        shared.append({k:spec.get(k) for k in ('canonical_task','family_space_identity','budgets','fidelity_policy',
+            'nmpc_limits','rl_limits','native_control_limits','confirmation','analysis_protocol','runtime','capabilities')})
+        plans=[archive.artifact(r)['original_plan'] for r in s['plans']]
+        first=next((p for p in plans if p['action'] in ('generate','search')),None)
+        rows.append(dict(study_id=spec['study_id'],strategy=spec.get('initial_structure_strategy'),
+            first_structure_plan=first,ledger=snapshot['ledger'],provider=provider_usage(host),
+            mathematical_evaluations=s.get('mathematical_evaluations'),
+            analysis_costs=[dict(reference=r,charged_evaluations=archive.artifact(r).get('charged_analysis_evaluations'),
+                internal_calculations=archive.artifact(r).get('internal_calculations'),
+                numerical_failure=archive.artifact(r).get('numerical_failure')) for r in s.get('analysis_results',[])],
+            independent_results=[dict(reference=r,status=archive.artifact(r).get('status'),
+                acceptance=archive.artifact(r).get('acceptance')) for k in ('results','physical_replays','rl_evaluations') for r in s.get(k,[])],
+            selected=s.get('selected'),stopped=s['research_status']=='stopped'))
+        archive.archive.close()
+    return dict(common_conditions_equal=all(s==shared[0] for s in shared),studies=rows,
+        scope='Original recorded acceptance and costs, not new evidence or an independent scientific ranking. Missing internal costs remain unknown; do not add ledger wall time to kernel wall time.')
+
+
 if __name__=='__main__':
-    print(json.dumps(dict(context=context_audit(),search=search_audit()),indent=2))
+    import argparse
+    parser=argparse.ArgumentParser();parser.add_argument('--compare-exports',nargs=2,type=Path)
+    args=parser.parse_args()
+    print(json.dumps(compare_exports(args.compare_exports) if args.compare_exports else dict(context=context_audit(),search=search_audit()),indent=2))

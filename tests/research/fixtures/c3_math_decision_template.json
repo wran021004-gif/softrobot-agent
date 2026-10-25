@@ -1,0 +1,37 @@
+{
+  "version": "c3-decision-draft-v1",
+  "authorization": "PENDING_EXPLICIT_APPROVAL; no live requests authorized",
+  "binding_status": "draft_requires_same_owned_candidate_frozen_state_and_verified_sources",
+  "request_ceiling": 4,
+  "task": {"source": "tasks/reach_hold_c3_mirror.json", "frozen_task_identity": null},
+  "engineering_prior": {
+    "candidate_reference": null,
+    "frozen_initial_state_reference": null,
+    "method_catalog": "same production METHOD_MEANINGS in both arms",
+    "shared_budget": {"provider_requests": 4, "reporter_requests": 0, "scientific_workers": 0},
+    "scope": "Bind one candidate and initial research state after separate approval; never import C3 historical ranking, control or diagnostic answers"
+  },
+  "costs": {"source": "same original Store ledger and internal cost receipts", "actual_costs": null, "missing_costs": "unknown, never zero"},
+  "cases": {
+    "c3_next_decision": {
+      "question": "Which next action can distinguish structural limits, control limits, model mismatch and numerical uncertainty? State competing hypotheses and falsifying observations.",
+      "proposed_next_action_budget": {"source": "same future frozen remaining budget", "counts": null},
+      "common": [],
+      "evidence": [],
+      "round2": []
+    }
+  },
+  "sources_offline_only": {
+    "binding_rule": "Every fact carries owned evidence reference plus exact pointer, task/candidate/model/input/time/unit/sampling/scope. Mathematical diagnostic must be validated before freezing; no invented references.",
+    "round2_rule": "Freeze independent feedback and scoring before turn 1; never supply it early or represent scheduled feedback as execution of the Agent proposal. No post-outcome rubric edits.",
+    "output_rule": "Keep original Plan/ResearchDecision, raw response/reasoning/tool call, receipts and exact complete wire. No new Agent or evaluator."
+  },
+  "rubric_offline_only": [
+    {"criterion": "evidence_scope", "score": null, "anchor": "0 conflates model/numerics/physics; 1 partly separates; 2 correctly interprets values, bounds, units, time and inference limits"},
+    {"criterion": "testable_hypothesis", "score": null, "anchor": "0 none; 1 one falsifiable mechanism; 2 competing mechanisms with falsifying observations"},
+    {"criterion": "discriminating_action", "score": null, "anchor": "0 no mechanism separation; 1 incomplete; 2 feasible bounded action with outcome branches separating mechanisms"},
+    {"criterion": "feedback_revision", "score": null, "anchor": "0 ignores feedback; 1 mentions it; 2 updates hypotheses/actions with exact actual feedback"},
+    {"criterion": "complete_cost", "score": null, "anchor": "0 hides major costs; 1 incomplete; 2 accounts Provider/Reporter, model builds, solve attempts, internal rollouts/prefixes and separate independent launches"},
+    {"criterion": "independent_direction_support", "score": null, "anchor": "Unscored until separately authorized independent held-out evaluation. 0 contradicted, 1 unresolved, 2 supported within frozen scope; no directional proposal stays not_applicable, not zero"}
+  ]
+}

@@ -46,6 +46,11 @@ def main():
             value=execute(request)
     except Exception as exc:
         value=dict(status='execution_incomplete',error=type(exc).__name__,reason=str(exc))
+        if getattr(exc,'mujoco_diagnostic',None):
+            diagnostic=exc.mujoco_diagnostic
+            if not path.with_name('numerical_failure.json').exists():atomic_json(path.with_name('numerical_failure.json'),diagnostic)
+            value['numerical_failure']=diagnostic
+            value['physics_steps_lower_bound']=diagnostic['confirmed_completed_steps']
     atomic_json(path.with_name('result.json'),value)
 
 
