@@ -1,6 +1,9 @@
 # C3：正式冷启动自主 Softarm Study
 
-2026-10-25（Asia/Shanghai）。当前阶段：工程预检完成，等待本提交冻结后使用原 CLI prepare/bind 和本次用户授权启动。
+2026-10-25（Asia/Shanghai）。**旧 source-relative C3 已因用户改变设计起点而中断、结算并封存。**
+它完成一次基线控制的独立有效失败，随后 NMPC 运行中被行政中断；没有任务通过、SELECT 或 Agent 科学 STOP。
+用户随后明确要求候选池为空，段数、腱数及结构参数均由 Agent 自主生成，并另行授权新 Study 完整额度。
+该新授权不重置或删除本报告记录的旧消耗；新研究需独立身份，本报告仅记录旧 Study。
 
 ## 冻结范围
 
@@ -56,3 +59,78 @@ Codex 不提交科学 Plan、指定实验顺序、结构方向或控制系数；
 若确需运行中修复，在无未决 worker/未知请求时 commit 并按原 migrate --reason 迁移，不重置费用。
 首次完整独立通过触发原 success gate、公开读结果、精确 SELECT，零额外确认；否则仅由 Agent 合法 STOP。
 完成后使用原 export，保留原始 Store、会话、失败、receipt 和成本；最终报告另补真实科研与审计结果。
+
+## 真实运行与 Agent 决策
+
+正式源码身份 `6f265da17f428e6bbb02558accdaf7ef47cb4faf`，Study `c3-autonomous-softarm-20261025`。
+第一次启动和普通 push 均在创建进程前被自动审批拒绝；用户随后在当前聊天明确批准确切 DeepSeek endpoint/数据范围及 GitHub 仓库/分支。
+新增原 formal_study_authorization 事件绑定本次确认后才启动，无拒绝后的绕过或未知发送重试。
+原 prepare、bind、Strands run、Store、Reporter、ResultCard 和 L0–L3 均沿用；运行中生产修复及迁移均为 0。
+
+发送给 Agent 的是本次冻结任务、合法源机器人及参数范围、注册数学/控制方法、额度、工具 Schema，以及新会话中真实得到的反馈。
+没有发送 C1 成功控制、A 的最优序列、历史结构排名、S142 后续答案或 Codex 指定的科学路线。
+旧 Study 有一个源候选；它满足原附件的 source-relative 条件，但不满足用户后来追加的“空白候选池”要求。
+
+| Agent 自主选择 | 实际执行 / 反馈 |
+| --- | --- |
+| H1：长度核算导致几何可达不足；竞争解释为长度核算错误或局部模型不适用 | 最初将数学意图放进 execute，原门禁拒绝；Codex 未改写 |
+| sampled-affine-conic-minimax 能力分析 | halfway_waypoint 缺明确起始时刻，返回 `KNOWN_ANALYSIS_START_TIME_REQUIRED`，未求解，数学扣费 0 |
+| 六路恒定 1 N 控制初始化 | 先有参数/决策字段错误，Agent 自行修正后生成本 Study 合法 source，任务未测 |
+| 对上述 source 做独立 MuJoCo 全程回放 | 完整 700 步，所有位置/速度任务指标失败，张力及执行完整性通过 |
+| H2：撤回几何短臂解释，转向重力下垂、控制与 GVS/plant 预测差异 | 自主选择唯一 GVS NMPC；没有新结构，没有使用 PPO 或 MuJoCo-direct |
+| NMPC 控制更新 | 保存 3 次更新，t=0/0.01/0.02 s；每次迭代上限、计划可用，但优化未收敛；尚无完整独立任务评价 |
+
+Agent 能提出竞争解释、预测与反证条件，且确实根据新物理反馈调整了假设。
+但这不等于科学推断完全可靠：初始几何核算把总长度估为 0.282 m，而冻结 native 零态 tip 为 `[0.298,0,0.15]` m。
+它最初将几何误差预测写成约 1.28 的归一化违反量，也未扣减 signed residual 的 1，属于尺度/语义错误。
+H2 将单个 NMPC 的边界饱和失败解释为“genuinely limited”驱动能力，也过强；局部控制失败不能单独排除模型、求解或初始化限制。
+它同时正确声明未收敛不证明不可行、模型预测不等于独立验收；这些边界与上述过强文字并存，不能只摘取正确部分。
+数学 minimax 没有实算，因此本次不能证明数学证据改善了结构选择；实际促成改道的是完整物理回放及 Reporter 反馈。
+
+## 独立验收、消耗与用户中断
+
+| 恒定 1 N 回放指标 | 实测 | 冻结阈值 |
+| --- | ---: | ---: |
+| 终点位置误差 / m | 0.1982345201881802 | 0.01 |
+| 保持最大位置误差 / m | 0.21585184122916581 | 0.01 |
+| 保持最大速度 / m/s | 0.541584392862904 | 0.02 |
+| 实际张力越界 / N | 0 | 1e-8 |
+| 积分步 / 控制区间 / 保持样本 | 700 / 35 / 6 | 完整覆盖 |
+
+原验收为 `valid_failure`，不是结构不可行性证明。结果 `34d7eeb1`，原始轨迹 `80bd0d17`，独立 evaluator `c0687c4f`。
+NMPC 前 3 个更新各耗时 118.8761、108.2163、112.0996 s，均 `Maximum_Iterations_Exceeded`。
+用户在运行中明确改变要求后，Codex 核验没有未知 Provider 或未消费响应，保存原进程清单及用户指令，停止精确主会话并调用原具名 worker-job 终止接口。
+4 个相关 PID 均验证退出；使用原 `record_orphan_exit` 和 `python -m tools.research recover` 结算原 pending/request_id/receipt，无新 worker 或 Provider 发送。
+NMPC 结果 `dc9ad657` 明确为 `execution_incomplete`，保留原进度和共享图文件，不拼接完整轨迹或控制 source。
+原终止边界保守计时 438.6351 s；中断时完整物理步数未知，原保存时刻仅证明至少 40 步，不虚报为 700 步。
+
+原 `engineering_closeout` 封住旧 Store，记录 `model_stop=false` 及用户范围变更原因。
+该接口沿用的事件名称为 `engineering_count_budget_closure`，但本次**不是预算耗尽**，不是 Agent 科学 STOP，也不是正常完成自主研究。
+现有全部 28 个 calls 均有 receipt（completed 26、failed 2），pending=null，无未知执行或未决 Provider。
+7 次工具请求错误及一次数学不适用反馈全部保留，不因中断或新授权抹除。
+
+| 旧 Study 实际资源 | 消耗 / 原上限 |
+| --- | ---: |
+| Provider（主会话 / Reporter） | 13 / 32（12 / 1） |
+| Public operations | 14 / 120 |
+| 数学评价 | 0 / 12 |
+| 共享物理启动 | 2 / 8 |
+| NMPC（含本次中断） / 固定回放 | 1 / 1；1 / 5 |
+| PPO stages / actions / 独立评价 | 0 / 1；0 / 4096；0 / 1 |
+| 额外确认 | 0 / 0 |
+
+13 次真实请求均 HTTP 200、未知 0、重新发送 0。prompt 586,975 tokens（cache hit 375,168、miss 211,807），completion 50,589，total 637,564；金额未返回，保持未知。
+原 ledger wall 为 747.9718436 s，包含恢复的保守边界与其他活动口径，不当作独立 CPU 时间或与数值耗时相加。
+
+## 证据与结论范围
+
+原 export 位于 `evidence/c3_autonomous_softarm/`；单个约 1.62 MB 压缩包封存原 artifacts、会话、事件、calls、ledger 及原中断进度。
+活跃 Store 及原 worker 文件保留在 `runs/research/c3-autonomous-softarm-20261025/`。
+Git 只保留原导出及约 31 KB 的 `supervision_summary.json` 审计摘录，不另建 Store、哈希清单或复制优化矩阵。
+源码修复仍限于首次冻结前的 3 文件净增 12 行；新增 2 项定向测试与原 B 3 项回归通过。
+运行中工程修复、migration、重新 NMPC、PPO、额外确认均为 0。归档交付前检查实际凭据不在归档或文本中。
+
+本次只支持有限事实：Agent 独立提出并修正过科研假说、修正部分接口错误、生成一条合法控制并完成一次失败的独立回放，随后自主启动 NMPC。
+没有证明单任务自主控制成功、结构自主生成/修改、重优化后的结构收益或跨任务泛化。
+候选数始终为 1，结构未变，无公平结构重优化对照。未测方法或被用户中断的分支均保持未决。
+该旧研究的消耗单列保留；用户另行批准的新“空白生成”Study 不继承它的科学反馈或候选。
