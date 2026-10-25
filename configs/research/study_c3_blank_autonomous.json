@@ -1,0 +1,170 @@
+{
+  "defaults": "family_study_defaults.json",
+  "start_mode": "family_space",
+  "family_space": "family_space_v2.json",
+  "candidate_initialization": "all_candidate_dofs_zero_v1",
+  "study_id": "c3-blank-autonomous-softarm-20261025",
+  "base_commit": "e60c201f238757e013933b8e202857b9a2d2e338",
+  "authorization": "PENDING_EXPLICIT_APPROVAL: Current-chat user directions dated 2026-10-25 require no preset scientific candidate, Agent-selected segment count, tendon count and structural parameters, a new full original budget with prior source-relative Study costs separately preserved, all existing control capabilities including PPO, complete-chain execution and progress summaries, and ordinary push to the already approved GitHub branch. Exact existing DeepSeek endpoint/data scope remains approved. User permits evidence-based dynamic budget adjustments; every later finite addendum must use original authorization/accounting boundaries and retain costs.",
+  "mode": "formal_research",
+  "task": "../../tasks/reach_hold_c3_mirror.json",
+  "control": "control.json",
+  "runtime": "runtime.json",
+  "evidence_destination": "evidence/c3_blank_autonomous_softarm",
+  "capabilities": [
+    "analysis",
+    "search",
+    "control_correction",
+    "physical_replay",
+    "nmpc",
+    "rl",
+    "control_search"
+  ],
+  "allowed_plan_actions": [
+    "generate",
+    "search",
+    "initialize_control",
+    "physical_replay",
+    "control_search",
+    "execute",
+    "diagnose",
+    "select",
+    "confirm",
+    "stop"
+  ],
+  "budgets": {
+    "provider_requests": 32,
+    "protected_provider_requests": 6,
+    "public_operations": 120,
+    "protected_public_operations": 12,
+    "physical_launches": 8,
+    "local_solves": 0,
+    "local_solve_s": null,
+    "offline_nlp": 0,
+    "bdf_replays": 0,
+    "mathematical_evaluations": 12,
+    "numerical_s": null,
+    "activity_s": null,
+    "delivery_reserve_s": null
+  },
+  "nmpc_limits": {
+    "executions": 1
+  },
+  "rl_limits": {
+    "training_stages": 1,
+    "actions_per_trial": 4096,
+    "seconds_per_trial": null,
+    "training_actions": 4096,
+    "training_active_seconds": null,
+    "evaluation_episodes": 1,
+    "diagnostic_replays": 0,
+    "diagnostic_physics_steps": 0
+  },
+  "confirmation": {
+    "fresh_independent_repetitions": 0,
+    "configuration": "Select exact fresh completed passing backend evaluation after public read. No extra repetitions; repeatability unassessed."
+  },
+  "physical_replay_limit": 5,
+  "reserve_rl_evaluation": true,
+  "native_control_limits": {
+    "evaluation_requests": 60,
+    "iterations": 2,
+    "knots_s": 4
+  },
+  "research_decisions": {
+    "version": "research_decision_v1",
+    "history": [],
+    "mathematics": [],
+    "control_seeds": [],
+    "context_limits": {
+      "candidates": 5,
+      "recent": 3,
+      "pareto": 3,
+      "samples": 3,
+      "evidence": 3
+    }
+  },
+  "supplied_evidence": [],
+  "mathematical_methods": {
+    "sampled-affine-conic-minimax-v1": "C3 user authorizes existing registered mathematics, subject to exact model/task applicability, original evidence and accounting of every internal subproblem.",
+    "controlled-capability-sensitivity-v1": "C3 user authorizes existing registered mathematics, subject to exact model/task applicability, original evidence and accounting of every internal subproblem."
+  },
+  "fidelity_policy": {
+    "version": "numerical_fidelity_v1",
+    "screening": {
+      "coarse": {
+        "cells_per_segment": 4,
+        "backend": "backend.family_mujoco@1.1.0"
+      },
+      "standard": {
+        "cells_per_segment": 12,
+        "backend": "backend.family_mujoco@1.1.0"
+      }
+    },
+    "final_evaluation": {
+      "cells_per_segment": 12,
+      "backend": "backend.family_mujoco@1.1.0"
+    },
+    "require_exact_fidelity": true,
+    "alternative_runtimes": [],
+    "runtime_preflight_limit": 2
+  },
+  "family_search": {
+    "method": "bounded_mixed_coordinate_v1",
+    "variable_groups": [
+      "segment_count",
+      "tendon_count",
+      "spans",
+      "lengths",
+      "materials",
+      "sections",
+      "routing"
+    ],
+    "segment_counts": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "tendon_counts": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "max_proposals": 16,
+    "max_evaluations": 12
+  },
+  "family_sensitivity_variables": {
+    "version": "family_sensitivity_v1",
+    "variables": [
+      "segments.0.length_m",
+      "segments.0.young_pa",
+      "segments.1.length_m",
+      "segments.1.young_pa",
+      "segments.2.length_m",
+      "segments.2.young_pa",
+      "segments.3.length_m",
+      "segments.3.young_pa",
+      "segments.4.length_m",
+      "segments.4.young_pa",
+      "segments.5.length_m",
+      "segments.5.young_pa",
+      "segments.6.length_m",
+      "segments.6.young_pa",
+      "segments.7.length_m",
+      "segments.7.young_pa",
+      "segments.8.length_m",
+      "segments.8.young_pa"
+    ]
+  },
+  "execution_instructions": "Own this single autonomous structure-and-control Study, starting with an EMPTY scientific candidate pool and NO reference robot, previous candidate, successful control or historical scientific evidence. Select segment count, tendon count, spans, material, section, length, routing and compatible controller choices yourself within the frozen registered serial-family domain. The first scientific candidate must come from your own generate or admitted family search request. Family prototypes, legal domains, default values and registered models are public engineering grammar, not a preselected candidate or demonstrated solution. The Host compatibility scaffold is not in your candidate pool and must never be treated as a reference robot, tested design or comparison baseline. You may explicitly adopt defaults where scientifically justified; no complete design or action order is prescribed.\nUnderstand the frozen task and propose competing explanations, meaningful observations and observations that would weaken your hypotheses. Choose mathematical methods, structure generation/modification, control initialization, NMPC, native optimization, direct PPO, compatible residual PPO, independent evaluation, SELECT or STOP autonomously. A method being available is not a requirement to use it. Controller optimization does not substitute for the independent registered evaluator. No historical scientific results are supplied.\nRead the current method catalog and exact generation/request Schema as needed. Every research_plan retains all original required hypothesis, expected_observation, weakening_observation, fixed_conditions, stopping_condition and interpretation fields plus decision metadata and exact supporting evidence. Each request must follow its advertised payload and candidate binding. selected_method prose is a proposal, not a tool or permission. Correct rejected requests from the original feedback; do not infer scientific impossibility from a parameter, applicability, generator or solver failure.\nNative MuJoCo mathematics and MuJoCo-direct support the original Reach/Hold conditions in their actual scope. A native full sequence search has hard maxima evaluation_requests=60, iterations=2, knots_s count=4; source and full task window must be explicit. Internal baselines, difference probes, candidate rollouts, failed callbacks and required prefix reconstruction have actual numerical cost in addition to the mathematical evaluation count. Independent full physical_replay is a separate launch. Fixed-control structural response is not reoptimized structural capability, a causal structural benefit or global optimality. Controlled family sensitivity requires the registered family variable grant, candidate/model stencil and original accounting.\nGVS NMPC, direct PPO and compatible residual PPO are all available within the shared finite physical budget and original admission. Direct PPO needs no NMPC reference. Residual PPO requires a verified compatible complete current-candidate reference; a checkpoint is not a tension schedule. PPO allows one training stage and up to 4096 total actions, using original rollout alignment and minimum optimizer-batch rules; choose allocation yourself. After a real training worker exits, query status, publicly read its training summary, independently evaluate its exact published checkpoint and publicly read that evaluation. All training/evaluation launches share the original physical pool, with the original PPO evaluation reserve.\nOnly original independent complete final-fidelity acceptance establishes task success. The first such fresh pass immediately blocks exploration: publicly read that exact result and SELECT its exact candidate/control execution; zero extra confirmations seals. Otherwise STOP must publicly read and cite all fresh numerical results and training summaries/evaluations, retain unresolved explanations and state next_step. No structural improvement over an absent baseline, global optimality, hardware, real-time, robustness, repeatability or cross-task generalization follows from one task pass. A structure-control success is one feasible discovered combination; comparative structure benefit needs applicable fair reoptimization evidence.\nInitial finite ceilings are upper bounds, not targets. The supervisor owns any separately recorded user-authorized budget adjustment; you cannot reset, extend or transfer allowances yourself. Always use actual current remaining resources, protected closeout reserves and original same-Study recovery boundaries. Never relaunch an unknown Provider/worker result or change frozen task acceptance. Keep summaries compact; exact original evidence remains readable."
+}

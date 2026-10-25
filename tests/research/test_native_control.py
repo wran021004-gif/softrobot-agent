@@ -17,6 +17,8 @@ class NativeControlTests(unittest.TestCase):
         from tools.research.config import ROOT, resolve
         from tests.research.test_research_reporting import offline_host
         spec=resolve(ROOT/'configs/research/study_c3_autonomous.json')
+        family_spec=resolve(ROOT/'configs/research/study_c3_blank_autonomous.json')
+        self.assertEqual(family_spec['native_control_limits'],spec['native_control_limits'])
         ref=dict(artifact_id='a'*64,media_type='application/json')
         host,_=offline_host({},spec=spec)
         host.store.lookup.return_value=None
