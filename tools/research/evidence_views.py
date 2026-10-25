@@ -14,6 +14,7 @@ from tools.research.analysis import decision_result
 from tools.research.core import read_evidence
 from tools.research.evidence_policy import summarize_evidence
 from tools.research.research_context import compact_evidence, physical_diagnostic
+from tools.research.task_constraints import SCIENTIFIC_INTERPRETATION
 
 
 def _location(reference, pointer=''):
@@ -87,6 +88,10 @@ def diagnostic_relations(host, reference):
                 initial_state=dict(mathematics=dict(reference=mr,pointer='/model/x0'),physics=dict(reference=measurement.get('reference'),pointer='/samples/0' if p.get('raw_reference') else '/0')),
                 operating_point=m.get('operating_point'),time_scope=grid,alignment=checks,
                 missing_conditions=[k for k,v in checks.items() if not v],
+                prediction_error_comparability=dict(status='comparable' if aligned else 'not_comparable_as_model_prediction_error',
+                    reasons=[k for k,v in checks.items() if not v]),
+                temporal_support=dict(kind='discrete_samples',physics_sample_count=len(samples),
+                    scope=SCIENTIFIC_INTERPRETATION['time_scope']),
                 mathematical_aggregates=aggregates,physical_aggregates=p.get('acceptance',{}).get('metrics'),
                 sample_differences=p['comparison'] if aligned else None,
                 supported_scope='Saved aligned prediction differences' if aligned else 'Recorded task aggregates only; no sample differences reconstructed',
@@ -128,6 +133,9 @@ def diagnostic_relations(host, reference):
         req=describe_analysis_requirements(cfg,{})
         methods=analysis_capabilities(cfg,req,s['spec']['analysis_protocol'],remaining_evaluations=max(0,s['spec']['budgets']['mathematical_evaluations']-s.get('mathematical_evaluations',0)))
         diagnosis.update(task_conditions=task_adapter(cfg).condition_view(),
+            temporal_support=dict(kind='selected_discrete_observations',
+                times_s=[r['time_s'] for r in diagnosis['critical_samples']],
+                scope=SCIENTIFIC_INTERPRETATION['time_scope']),
             saved_controller_predictions=dict(reference=pr,pointer='/profile/one_step_prediction_evidence',
                 evidence=p.get('profile',{}).get('one_step_prediction_evidence'),
                 scope='Saved NMPC predictions are distinct from the earlier CONIC control witness; inspect per-update alignment before error claims') if not p.get('source_reference') else None,
@@ -137,7 +145,8 @@ def diagnostic_relations(host, reference):
             discriminating_methods=[{k:v[k] for k in ('operation','reasons','status','evaluations','prerequisites','limitations') if k in v}
                 for v in methods if v['operation'] in ('instantaneous_braking_v1','native_dynamics_v1','short_input_response_v1','task_capability')],
             braking_scope='Exact saved state/input required. Instantaneous min velocity-direction acceleration is not a remaining-horizon stop guarantee; no physical experiment launched.')
-    return dict(version='diagnostic_relations_v1',candidate=candidate,relations=relations,search_comparisons=comparisons,
+    return dict(version='diagnostic_relations_v2',candidate=candidate,relations=relations,search_comparisons=comparisons,
+        scientific_interpretation=SCIENTIFIC_INTERPRETATION,
         task_diagnosis=diagnosis,raw_evidence='Original Store references only; query trajectories/models on demand',
         authority='Derived L1 relations; Reporter explanations remain hypotheses; independent evaluator owns acceptance')
 
@@ -457,6 +466,7 @@ def result_card(host, reference):
         details.extend([_location(reference,'/candidates'),_location(reference,'/starts')])
     construction=recorded_static_summary(value,reference)
     if construction:summary['recorded_static_construction']=construction
+    summary['scientific_interpretation']=SCIENTIFIC_INTERPRETATION
     return ResultCard(identity=identity,evidence_summary=evidence,
         recorded_context=context,metrics=metrics,main_violations=violations,critical_observations=critical,
         deterministic_summary=summary,mathematics=mathematics,control_search=search,

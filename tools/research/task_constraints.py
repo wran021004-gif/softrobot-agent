@@ -3,6 +3,16 @@ from schemas.platform import Binding, Payload
 from tools.platform_store import plain
 from tools.research_tasks import task_adapter
 
+SCIENTIFIC_INTERPRETATION = dict(
+    version='scientific_interpretation_v1',
+    measured_observation='Named model or physical execution observations apply only to recorded states, actual inputs, times and sampling conditions.',
+    model_calculation='Calculations depend on the named model, assumptions, operating point, input bounds and horizon; nonlinear physical transfer requires validation.',
+    research_hypothesis='A proposed mechanism needs subsequent observations that can support or weaken it.',
+    causal_conclusion='Requires controlled conditions or other identifying evidence; unequal outcomes alone do not identify a cause.',
+    prediction_difference='Match candidate, task, actual control, initial state, input channels and time grid before computing model prediction differences.',
+    time_scope='Finite discrete observations alone do not establish between-sample or extrapolated dynamics; state any additional model assumptions.',
+    horizon_scope='Instantaneous dynamics, local sensitivity or single-time braking authority does not establish complete finite-horizon task feasibility or infeasibility.')
+
 METHOD_MEANINGS = {
     'linearization': ('Local dynamics', 'Frozen continuous affine A/B/C/D and drift at the declared operating point; not a trajectory or stability proof.'),
     'controllability': ('Local drive authority', 'Finite continuous/held-input normalized Gramians and output authority; signed unbounded increments do not prove bounded nonnegative tendon feasibility.'),
@@ -117,7 +127,8 @@ def mathematical_method_view(host, reference):
             methods[key]['handoff']='physical_replay(candidate=same candidate, source=returned control_schedule_reference); independent acceptance and public evidence_read are required before SELECT.'
         if key=='short_input_response_v1':
             methods[key]['cost_scope']='One baseline + up to four FD rollouts per channel (two input sizes, central or one-sided) + optional one nonlinear candidate rollout. Required prefix reconstruction is already included in native cost.physics_steps; recorded rollouts/physics_steps own actual cost. Full independent physical_replay is additional if requested.'
-    return dict(**readiness,candidate=reference,methods=methods,analysis_request_schema=AnalysisRequest.model_json_schema())
+    return dict(**readiness,candidate=reference,methods=methods,scientific_interpretation=SCIENTIFIC_INTERPRETATION,
+        analysis_request_schema=AnalysisRequest.model_json_schema())
 
 
 def mathematical_catalog(view):

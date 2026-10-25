@@ -8,7 +8,7 @@ from tools.platform_host import Host
 from tools.research import core
 from tools.research.agent import load_credential
 from tools.research.state import state
-from tools.state_io import atomic_json, read
+from tools.state_io import atomic_json, digest, read
 
 ROOT = Path(__file__).resolve().parents[2]
 OUT = ROOT / 'evidence/c3_g1_g2'
@@ -21,6 +21,111 @@ AUTH = ('2026-10-25 explicit user G1/G2 authorization: G1 continuity <=2 and pai
 CONTINUITY_ID = 'c3-g1-continuity-20261025'
 DECISION_ID = 'c3-g1-decisions-20261025'
 PROBE = ROOT / 'runs/c3-g1-decision-probe'
+G2_ID = 'c3-g2-scientific-20261025'
+G2_OUT = ROOT / 'evidence/c3_g2_scientific_decision_loop'
+G2_SOURCE = 'C:/Users/gugugaga/.codex/attachments/0b9bc8a1-5d03-48e6-84fc-1edfee7abd87/已粘贴的文本.txt'
+G2_AUTH = ('2026-10-25 explicit independent G2 user authorization: <=8 total DeepSeek requests including Reporter; '
+    '<=4 mathematical evaluations including preparation, internal solves and failures; <=24 public operations; '
+    'independent physics=0, NMPC=0, PPO=0. One primary Agent-selected mathematical experiment and its feedback decision. '
+    'No old Study reset, no new A/B or retry Study; ordinary commit/push authorized. ' + G2_SOURCE)
+
+
+def g2_background():
+    """Original B facts only; never import them into the new result ledger."""
+    from tools.research.evidence_views import diagnostic_relations
+    old = prior.historical_host(); s = state(old); ref = s['results'][-1]
+    p = old.store.artifact(ref); mr = s['analysis_results'][-1]; m = old.store.artifact(mr)
+    d = diagnostic_relations(old, ref)
+    value = dict(kind='historical_scoped_evidence', owning_study=old.run_id,
+        historical_only=True, original_reference=ref, historical_candidate=p['candidate'],
+        metrics=p['acceptance']['metrics'], components=p['acceptance']['components'],
+        critical_discrete_observations=[{k:r[k] for k in ('time_s','observed','raw_reference','read_pointer') if k in r}
+            for r in d['task_diagnosis']['critical_samples']],
+        task=old.store.artifact(p['candidate'])['configuration']['task'],
+        sampled_model_witness=dict(reference=mr, method=m['trajectory']['method_version'],
+            score=m['trajectory']['replayed_violation'], scope='Local sampled affine model; different control from NMPC; no physical acceptance'),
+        historical_diagnostics=dict(reference=dict(artifact_id=digest(d),
+            media_type='application/json'), pointer=''),
+        saved_state_qualification=dict(update_id=30, actual_time_s=.30, native_qpos_qvel=True,
+            integration_checkpoint=False, measured_prefix_intervals=30,
+            current_study_admission='unavailable: existing native_point requires OWNED_NATIVE_EXECUTION_REQUIRED; no registered cross-Study native state rebinding',
+            alternatives='Native methods may use standardized_initial_pretension; reduced model methods use their catalog prerequisites. Do not invent a saved_state.'),
+        scope='Historical research background only. This Study regenerates the same design; no historical acceptance or costs transfer.')
+    return value, old, p, m
+
+
+def prepare_g2():
+    from tools.research.state import save, update, guard
+    from tools.research.design import generate_candidate, verify_candidate
+    from tools.state_io import digest
+    from tools.research.tool_readiness import execution_environment
+    background, old, p, m = g2_background()
+    background_ref = dict(artifact_id=digest(background), media_type='application/json')
+    instructions = ('You are the autonomous scientific research Agent seeking a robot structure/control solution to the frozen task. '
+        'This independent G2 is limited to one primary mathematical experiment and the decision after its real feedback. '
+        'Do not generate/search designs, run independent physics, NMPC or PPO. A current candidate with the historical B design is already legally generated. '
+        'Read the historical background ONCE per entire Study, not once per SDK Session: evidence_read(reference='+json.dumps(background_ref)+', view=full). '
+        'Check read_state/pending_feedback_delivery; completed delivered reads satisfy that obligation. Purposeful rechecks remain legal. '
+        'Read candidate view=mathematical_capabilities at /scientific_interpretation and /methods/<chosen method> for method meaning, prerequisites, costs and template (L1); other methods remain available on demand. '
+        'Choose the research question and method yourself; no preferred method is prescribed. '
+        'First submit a NEW research_plan action=diagnose (without diagnostic payload), recording the selected method, hypothesis, reason, expected observation, weakening observation, frozen conditions and total requested budget. '
+        'Then invoke research_analysis with your own legal request. If admission rejects it, use its actual reason to correct it within remaining counts; do not fabricate a state or silently change the hypothesis. '
+        'After one primary experiment returns computed/unknown/inconclusive, do not run another experiment. Consume the actual saved result and L1 feedback. '
+        'Then submit a NEW research_plan action=stop: explain what remains supported, what changes, unresolved mechanisms, how this helps find a feasible solution, '
+        'and the most valuable future design/control/verification action with its conditions and complete cost justification; proposing future physics is allowed but executing it is not. '
+        'Use the exact stop_result_index and publicly read the new result before STOP; cite every new result. Reports do not grant formal read credit. '
+        'Every Plan needs decision={hypothesis_id,research_intent:DIAGNOSE for diagnose or STOP for stop,selected_method,selected_candidate,requested_budget,claimed_inference:empirical_search}; '
+        'also hypothesis,supporting_evidence,expected_observation,weakening_observation,fixed_conditions,stopping_condition,interpretation. '
+        'Keep reasoning concise in Chinese. Uncertainty and results that weaken your hypothesis are valid outcomes. '
+        'Budget is <=8 Provider including Reporter, <=4 total math evaluations including preparation/internal failures, <=24 public operations, independent physics/NMPC/PPO=0. Stop after G2.')
+    h = prior.provision('continuity', study_id=G2_ID, instructions=instructions,
+        overrides=dict(base_commit='576a18a0be6e77da6840d09ab1a2f4360d499f30', mode='formal_research',
+            capabilities=['analysis'], allowed_plan_actions=['diagnose','stop'],
+            evidence_destination=str(G2_OUT.relative_to(ROOT))),
+        budget_overrides=dict(provider_requests=8, mathematical_evaluations=4, public_operations=24,
+            protected_provider_requests=1, protected_public_operations=2), source=G2_SOURCE, authorization=G2_AUTH)
+    spec = state(h)['spec']; guard(h)
+    original = old.store.artifact(p['candidate'])
+    if m['candidate']!=p['candidate']: raise ValueError('HISTORICAL_MATHEMATICS_CANDIDATE_MISMATCH')
+    request = original['parameters']
+    generated = generate_candidate(h, request, dict(origin='user_authorized_same_historical_design',
+        historical_study=old.run_id, historical_candidate=p['candidate'], historical_result=background['original_reference']))
+    if generated['status']!='generated': raise ValueError(generated)
+    candidate = generated['candidate']; current = verify_candidate(h, candidate)
+    for key in ('robot','task'):
+        if current['configuration'][key]!=original['configuration'][key]: raise ValueError('HISTORICAL_DESIGN_OR_TASK_MISMATCH: '+key)
+    for key in ('backend','discretization','dynamics_model','controller'):
+        if current['configuration']['policy'][key]!=original['configuration']['policy'][key]: raise ValueError('HISTORICAL_MODEL_MISMATCH: '+key)
+    # Preserve exact original artifacts as historical raw sources, never current results/candidates.
+    for ref in (background['original_reference'], p['candidate'], original['configuration_reference'],
+                p['profile']['motion'], background['sampled_model_witness']['reference']):
+        if save(h, old.store.artifact(ref), 'imported_historical_raw_source')!=ref: raise ValueError('HISTORICAL_SOURCE_IDENTITY_MISMATCH')
+    from tools.research.evidence_views import diagnostic_relations
+    if save(h, diagnostic_relations(old, background['original_reference']), 'historical_l1_diagnostics')!=background['historical_diagnostics']['reference']:
+        raise ValueError('HISTORICAL_DIAGNOSTIC_IDENTITY_MISMATCH')
+    if save(h, background, 'authorized_historical_background')!=background_ref: raise ValueError('BACKGROUND_IDENTITY_MISMATCH')
+    update(h, scoped_context=[background_ref])
+    qualification = dict(candidate=candidate, historical_candidate=p['candidate'], parameters=current['parameters'],
+        same_robot_task_model=True, current_candidate_owned=True, historical_results_not_registered_as_new=True,
+        environment=execution_environment(spec), native_history=background['saved_state_qualification'])
+    record(h, 'g2_candidate_qualification', qualification)
+    atomic_json(G2_OUT / 'protocol.json', dict(study_id=G2_ID, authorization=G2_AUTH, background=background_ref,
+        candidate=candidate, qualification=qualification, evaluation_focus=['research_effectiveness','action_relevance',
+        'task_focus','feedback_use','resource_efficiency','evidence_scope'],
+        outcome_rule='Real admission and costs are strict; scientific prose mistakes are review findings, not a block on the second decision.'))
+    core.export(h)
+    return dict(study_id=G2_ID, candidate=candidate, background=background_ref, environment=qualification['environment']['status'])
+
+
+def live_g2(restore=False):
+    import asyncio
+    from tools.research.agent import converse
+    h = host(G2_ID)
+    try:
+        asyncio.run(converse(h, session_handoff=False, restore_only=restore, pause_after_completed_invocations=1))
+    finally:
+        core.export(h)
+    return dict(study_id=G2_ID, status=state(h)['research_status'], ledger=h.store.remaining())
 
 
 def host(study_id):
@@ -201,11 +306,15 @@ def inspect_historical_state():
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('mode', choices=['prepare-g1', 'continuity', 'restore', 'probe-live', 'audit-continuity', 'finalize-g1', 'inspect-state'])
+    parser.add_argument('mode', choices=['prepare-g1', 'continuity', 'restore', 'probe-live', 'audit-continuity', 'finalize-g1', 'inspect-state', 'prepare-g2', 'live-g2', 'restore-g2'])
     args = parser.parse_args()
     if args.mode in ('continuity', 'restore', 'probe-live'):
         load_credential(Path('~/.codex/.env').expanduser())
-    if args.mode == 'prepare-g1':
+    if args.mode == 'prepare-g2':
+        result = prepare_g2()
+    elif args.mode in ('live-g2','restore-g2'):
+        result = live_g2(args.mode=='restore-g2')
+    elif args.mode == 'prepare-g1':
         result = prepare_g1()
     elif args.mode == 'audit-continuity':
         result = audit_continuity()
