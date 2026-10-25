@@ -125,6 +125,11 @@ def engineering_preflight():
             if str(exc)!='EVIDENCE_TASK_IDENTITY_MISMATCH':raise
         else:raise AssertionError('Background must not establish a new-task mathematical claim')
         historical_selection=eligibility(h,value['research_decisions']['background'][1]['reference'])
+        original_execution=value['research_decisions']['background'][2]['reference']
+        catalog=core.read_evidence(h,dict(reference=original_execution,view='working_set',pointer='/historical_execution_files'),record_read=False)
+        measured=core.read_evidence(h,dict(reference=original_execution,view='working_set',
+            pointer='/historical_execution_files/controller_observations.json/30/actual_tension_n'),record_read=False)
+        assert len(measured)==4 and 'actual_commands.json' in catalog
         rows.append(dict(deadline_s=duration,hold_start_s=adapter.holding_start_s(),
             control_intervals=len(source['trajectory']['tensions_n']),control_end_s=source['trajectory']['times_s'][-1],
             physics_steps=round(duration/cfg['task']['timing']['timestep_s']),
@@ -136,6 +141,7 @@ def engineering_preflight():
             conic_kernel_supported=method['kernel_supported'],conic_full_task_supported=method['full_task_supported'],
             formal_execution_authorized=method['formal_execution_authorized'],historical_select_eligible=historical_selection['eligible'],
             fixed_structure_check=fixed_check,
+            historical_input_channels_read=len(measured),historical_execution_files_available=len(catalog),
             mathematical_request_parsed=q.operation,results=state(h)['results'],physical_replays=state(h)['physical_replays'],
             mathematical_evaluations=state(h)['mathematical_evaluations'],store_root=str(h.store.root)))
     return dict(status='conditional',environment=execution_environment(drafts[0]),conditions=rows,

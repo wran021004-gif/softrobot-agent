@@ -5,6 +5,11 @@ The recommended common baseline is `mainline/softarm-codesign`; see its
 The historical runs below retain their frozen configurations and evidence.
 The engineering validation in that report did not start a formal Study.
 
+The [B3 readiness report](b3_benchmark_readiness.md) documents the compact
+Store-derived history index and three pending 0.50 s structure/control pilot
+drafts. Difficulty remains conditional; readiness used no Provider, mathematical
+solver, independent physics, NMPC, or PPO execution.
+
 ## S5.10 reference validation and control correction (2026-10-19)
 
 The [delivery](sorosim_s510_delivery.md) records 192 unique complete MuJoCo

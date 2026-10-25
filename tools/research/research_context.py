@@ -121,7 +121,8 @@ def history_index(host,candidate=None,query=None):
             unresolved_question='Realization, aligned GVS/MuJoCo prediction, terminal braking and structural contributions remain unresolved; different controls cannot establish model error.',
             limitations=scope['unsupported_inferences'],control_source=value.get('source_reference'),
             mathematical_source=provenance.get('mathematical_result'),
-            source=dict(reference=ref,view='full',pointer='',folder=source.get('folder'),plan=source.get('plan'))))
+            source=dict(reference=ref,view='full',pointer='',folder=source.get('folder'),plan=source.get('plan'),
+                execution_files_query=dict(reference=ref,view='working_set',pointer='/historical_execution_files') if source.get('folder') and value.get('execution') else None)))
     return sorted(rows,key=lambda r:r['design_match'] is not True)
 
 

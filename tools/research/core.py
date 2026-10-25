@@ -45,6 +45,24 @@ def read_evidence(host, query, *, record_read=True):
         if q.pointer=='/diagnostic_relations' or q.pointer.startswith('/diagnostic_relations/'):
             from tools.research.evidence_views import diagnostic_relations
             derived=dict(diagnostic_relations=diagnostic_relations(host,plain(q.reference)))
+        elif q.pointer=='/historical_execution_files' or q.pointer.startswith('/historical_execution_files/'):
+            from tools.research.numerics import execution_source, archived
+            entry=next((e for e in s['spec']['research_decisions'].get('background',[]) if e['reference']==plain(q.reference)),None)
+            if entry is None:raise ValueError('DECLARED_HISTORICAL_EXECUTION_REQUIRED')
+            files=execution_source(dict(reference=plain(q.reference)),entry['folder'])['files']
+            parts=q.pointer.split('/')
+            if len(parts)>2:
+                name=parts[2].replace('~1','/').replace('~0','~')
+                if not name.endswith(('.json','.json.gz')):raise ValueError('EVIDENCE_NOT_JSON: select a saved JSON measurement artifact')
+                body=archived(entry['folder'],files[name],raw=True)
+                if body.startswith(b'\x1f\x8b'):
+                    import gzip
+                    body=gzip.decompress(body)
+                derived=dict(historical_execution_files={name:json.loads(body)},original_file_reference=files[name])
+            else:
+                derived=dict(historical_execution_files={name:dict(reference=ref,query=dict(reference=plain(q.reference),
+                    view='working_set',pointer='/historical_execution_files/'+name.replace('~','~0').replace('/','~1')))
+                    for name,ref in files.items()})
         else:derived=context(host)['evidence_working_set']
         value=dict(derived,source_state_identity=digest(s),
             authoritative_scientific_evidence=False)
