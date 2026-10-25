@@ -20,6 +20,111 @@ def _location(reference, pointer=''):
     return EvidenceLocation(reference=reference, pointer=pointer)
 
 
+def diagnostic_relations(host, reference):
+    """L1 only: relate the selected candidate's saved evidence, without solving."""
+    from tools.research.state import state
+    from tools.research.task_constraints import describe_analysis_requirements, analysis_capabilities
+    from tools.research.capability import recorded_score_resolution
+    from tools.research.research_context import measured_samples, recorded_changes
+    from tools.research_tasks import task_adapter
+    from tools.state_io import digest
+    s=state(host);selected=host.store.artifact(reference)
+    candidate=selected.get('candidate',reference if reference in s['candidates'].values() else None)
+    if candidate is None:return dict(status='candidate_selection_required',relations=[])
+    c=host.store.artifact(candidate);cfg=c['configuration']
+    mathematics=[(r,host.store.artifact(r)) for r in s.get('analysis_results',[])]
+    math=[(r,v) for r,v in mathematics if v.get('candidate')==candidate and v.get('trajectory')][-3:]
+    physics=[(r,host.store.artifact(r)) for r in [*s.get('physical_replays',[]),*s.get('results',[])]]
+    physics=[(r,v) for r,v in physics if v.get('candidate')==candidate][-6:]
+    relations=[]
+    for mr,m in math:
+        tr=m['trajectory'];grid=tr.get('horizon',{});model=m.get('model',{})
+        for pr,p in physics:
+            source=host.store.artifact(p['source_reference']) if p.get('source_reference') else {}
+            commands=source.get('trajectory',{});raw,measurement=measured_samples(host,p)
+            samples=raw.get('samples',[]);origin=source.get('provenance',{})
+            prediction=source.get('mathematical_outputs') or {}
+            same_control=origin.get('mathematical_result')==mr and commands.get('tensions_n')==tr.get('applied_input_n')
+            checks=dict(candidate=m.get('candidate')==p.get('candidate'),
+                task=commands.get('task_identity')==digest(cfg['task']),
+                source_control=same_control,
+                tendon_order=commands.get('tendon_order')==m.get('binding',{}).get('tendon_order'),
+                actual_tensions=bool(samples) and len(samples)==len(commands.get('tensions_n',[]))+1 and
+                    all(v.get('actual_tension_n')==u for v,u in zip(samples[1:],commands.get('tensions_n',[]))),
+                time_grid=bool(samples) and len(samples)==len(commands.get('times_s',[])) and
+                    all(abs(v['time_s']-t)<=m['protocol']['horizon_alignment_atol_s'] for v,t in zip(samples,commands.get('times_s',[]))),
+                initial_state=bool(samples) and all(v==0 for k in ('qpos_rad','qvel_rad_s') for v in samples[0].get(k,[]))
+                    and bool(samples[0].get('qpos_rad')) and all(v==0 for v in model.get('x0',[]))
+                    and bool(model.get('x0')) and all(v==0 for v in tr.get('initial_delta_state',[])),
+                saved_prediction_samples=bool(samples) and all(len(prediction.get(k,[]))==len(samples)
+                    for k in ('times_s','tip_positions_m','tip_velocities_m_s')) and
+                    prediction.get('times_s')==commands.get('times_s'),
+                recorded_aligned_difference=bool(p.get('comparison',{}).get('aligned')),
+                numerical_replay=bool(tr.get('replay',{}).get('numerically_valid')))
+            aligned=all(checks.values())
+            aggregates={}
+            for row in tr.get('replay',{}).get('records',[]):
+                key=row['constraint_id']
+                if key not in aggregates or row['value']>aggregates[key]['value']:
+                    aggregates[key]={k:row[k] for k in ('value','units','absolute_time_s','radius') if k in row}
+            relations.append(dict(kind='same_control_math_physics' if same_control else 'descriptive_different_control_conditions',
+                status='comparable' if aligned else 'partial_comparison' if same_control else 'not_comparable',
+                left=mr,right=pr,candidate=candidate,structure_identity=c.get('physical_design_identity',c['identity']),
+                task_identity=digest(cfg['task']),task_requirements=dict(reference=mr,pointer='/task_analysis'),
+                mathematical_model_identity=model.get('binding',{}).get('model_identity'),physical_model_identity=raw.get('execution_model_identity',p.get('model_identity')),
+                method=tr.get('method_version'),control_source=p.get('source_reference'),
+                control_sequence_identity=digest(commands) if commands else None,tendon_order=commands.get('tendon_order'),
+                initial_state=dict(mathematics=dict(reference=mr,pointer='/model/x0'),physics=dict(reference=measurement.get('reference'),pointer='/samples/0' if p.get('raw_reference') else '/0')),
+                operating_point=m.get('operating_point'),time_scope=grid,alignment=checks,
+                missing_conditions=[k for k,v in checks.items() if not v],
+                mathematical_aggregates=aggregates,physical_aggregates=p.get('acceptance',{}).get('metrics'),
+                sample_differences=p['comparison'] if aligned else None,
+                supported_scope='Saved aligned prediction differences' if aligned else 'Recorded task aggregates only; no sample differences reconstructed',
+                unsupported_conclusions=['Global nonlinear feasibility','Failure cause','Different-control difference as model error']))
+    for (lr,l),(rr,r) in zip(physics,physics[1:]):
+        relations.append(dict(kind='same_candidate_different_controllers',status='descriptive_comparison',left=lr,right=rr,
+            candidate=candidate,task_identity=digest(cfg['task']),
+            controls=[l.get('source_reference',lr),r.get('source_reference',rr)],
+            physical_aggregates=[v.get('acceptance',{}).get('metrics') for v in (l,r)],
+            unsupported_conclusions=['GVS/MuJoCo model error','Single-factor causal attribution']))
+    # A search's neighbouring evidence is read only here, never in every L0.
+    comparisons=[]
+    for mr,m in math[-1:]:
+        if m['trajectory'].get('replayed_violation') is None:continue
+        peers=[(r,v) for r,v in mathematics if v.get('candidate')!=candidate and v.get('trajectory')
+            and v['trajectory'].get('replayed_violation') is not None
+            and v.get('protocol')==m.get('protocol') and v.get('binding',{}).get('task_identity')==m.get('binding',{}).get('task_identity')
+            and v['trajectory'].get('method_version')==m['trajectory'].get('method_version')
+            and v.get('task_analysis',{}).get('constraints')==m.get('task_analysis',{}).get('constraints')]
+        if peers:
+            lr,l=min(peers,key=lambda rv:abs(rv[1]['trajectory'].get('replayed_violation',float('inf'))-m['trajectory'].get('replayed_violation',0)))
+            comparisons.append(dict(kind='different_structure_task_results',left=lr,right=mr,
+                candidates=[l['candidate'],candidate],resolution=recorded_score_resolution(l,m),
+                changed_parameters=recorded_changes(host.store.artifact(l['candidate'])['parameters'],c['parameters']),
+                verified_constraints=[dict(reference=r,pointer='/trajectory/coverage') for r in (lr,mr)],
+                independent_physical_support=[r for r,v in physics],
+                causal_attribution='Unavailable: independently reoptimized control and distinct structures'))
+    diagnosis=None
+    chosen=next(((r,v) for r,v in physics if r==reference),physics[-1] if physics else None)
+    if chosen:
+        pr,p=chosen;diagnosis=physical_diagnostic(host,pr)
+        req=describe_analysis_requirements(cfg,{})
+        methods=analysis_capabilities(cfg,req,s['spec']['analysis_protocol'],remaining_evaluations=max(0,s['spec']['budgets']['mathematical_evaluations']-s.get('mathematical_evaluations',0)))
+        diagnosis.update(task_conditions=task_adapter(cfg).condition_view(),
+            saved_controller_predictions=dict(reference=pr,pointer='/profile/one_step_prediction_evidence',
+                evidence=p.get('profile',{}).get('one_step_prediction_evidence'),
+                scope='Saved NMPC predictions are distinct from the earlier CONIC control witness; inspect per-update alignment before error claims') if not p.get('source_reference') else None,
+            bound_mathematical_prediction=next((r for r in relations if r.get('right')==pr and r['kind']=='same_control_math_physics'),None),
+            competing_hypotheses=[dict(kind='hypothesis',text=t) for t in (
+                'Finite-horizon control or braking limitation','Local affine prediction disagreement','Structure/input authority limitation')],
+            discriminating_methods=[{k:v[k] for k in ('operation','reasons','status','evaluations','prerequisites','limitations') if k in v}
+                for v in methods if v['operation'] in ('instantaneous_braking_v1','native_dynamics_v1','short_input_response_v1','task_capability')],
+            braking_scope='Exact saved state/input required. Instantaneous min velocity-direction acceleration is not a remaining-horizon stop guarantee; no physical experiment launched.')
+    return dict(version='diagnostic_relations_v1',candidate=candidate,relations=relations,search_comparisons=comparisons,
+        task_diagnosis=diagnosis,raw_evidence='Original Store references only; query trajectories/models on demand',
+        authority='Derived L1 relations; Reporter explanations remain hypotheses; independent evaluator owns acceptance')
+
+
 def _token(key):
     return key.replace('~', '~0').replace('/', '~1')
 

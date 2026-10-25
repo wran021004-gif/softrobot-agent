@@ -331,13 +331,20 @@ def read_coverage(host):
     """Only paired successful feedback counts as delivery; summary is never full."""
     import json
     from tools.research.contracts import EvidenceQuery
-    rows=[];events=host.store.events(host.run_id);deliveries={}
+    rows=[];events=host.store.events(host.run_id);deliveries={};summaries=set()
     confirmed={e['request_id'] for e in events if e['kind']=='r3_response' and 200<=host.store.artifact(e['outputs'][0]).get('http_status',0)<300}
     for event in events:
         if event['kind']!='r3_request' or event['request_id'] not in confirmed:continue
         wire=host.store.artifact(host.store.artifact(event['outputs'][0])['request'])
         for message in wire.get('messages',[]):
             if message.get('role')=='tool':deliveries.setdefault(message.get('tool_call_id'),[]).append(message.get('content'))
+            content=message.get('content')
+            if message.get('role')=='user' and isinstance(content,str) and content.startswith('CURRENT_RESEARCH_PACKET\n'):
+                packet=json.loads(content.split('\n',1)[1])
+                for item in packet.get('research',{}).get('pending_feedback_delivery',{}).get('items',[]):
+                    if item['delivery']=='exact_feedback':
+                        deliveries.setdefault(item['tool_id'],[]).append(''.join(b.get('text','') for b in item['result']['content']))
+                    else:summaries.add(item['tool_id'])
     for event in events:
         if event['kind']!='model_original_tool_feedback':continue
         saved=host.store.artifact(event['outputs'][0]);use=saved['tool_use'];result=saved['result']
@@ -373,6 +380,9 @@ def read_coverage(host):
                 if index.isdecimal() and p['start']<=int(index)<p['start']+prior['item_count']:classification='covered_subnode'
         rows.append(dict(query=query,owning_study=host.run_id,tool_call_id=use['toolUseId'],feedback_reference=event['outputs'][0],
             retrieval_view=q.view=='working_set',delivery_identity=digest(delivered),
+            source_state_identity=saved.get('source_state_identity'),
+            delivery_status=('complete_fields' if complete else 'summary_or_derived_view') if provided else
+                'summary_only' if use['toolUseId'] in summaries else 'not_confirmed_in_provider_request',
             successfully_provided=provided,complete_data=complete,item_count=len(delivered.get('items',[])) if q.view=='range' and isinstance(delivered,dict) else None,
             full_artifact=complete and q.view=='full' and not q.pointer,
             classification=classification))
@@ -641,6 +651,12 @@ def decision_brief(current):
         candidate_count=ws['candidate_count'],candidate_index=deepcopy(ws['candidate_index']),
         control_result_links=links,control_comparisons=ws['control_comparisons'],
         method_scope=ws['method_scope'],scientific_scope=ws['scientific_scope'])
+    brief['evidence_working_set']['read_state']=dict(completed_reads=len(ws['read_coverage']),
+        read_counts=ws['read_counts'],recent=[dict(query=r['query'],delivery=r['delivery_status'],
+            classification=r['classification'],content_identity=r['delivery_identity'],
+            source_state_identity=r['source_state_identity']) for r in ws['read_coverage'][-3:]],
+        full_list_query=dict(reference=anchor,view='working_set',pointer='/read_coverage'),
+        rule='Exact repeats refer to previously delivered unchanged content. Dynamic views may change. Rechecks remain allowed; delivery is not understanding.')
     definitions={};actions=[]
     for row in feedback['actions']:
         method=row['action']+('/'+row['method'] if row.get('method') else '')
@@ -830,6 +846,9 @@ def agent_decision_brief(host):
     intent=research_intent(host)
     brief['research_intent']=compact_intent(intent)
     brief['action_trace']=compact_action_trace(research_action_trace(host,limit=None))
+    from tools.research.session_handoff import pending_feedback_delivery
+    delivery=pending_feedback_delivery(host)
+    if delivery:brief['pending_feedback_delivery']=delivery
     s=state(host)
     brief['mathematics_authorization']=mathematics_authorization(host,s)
     if s['spec'].get('family_search'):
@@ -885,6 +904,10 @@ def agent_decision_brief(host):
             ('reference','operation','status','control_handoff') if k in latest}
     anchor=brief.get('evidence_access',{}).get('reference')
     if anchor:
+        diagnostic_anchor=(brief.get('best_valid') or {}).get('reference') or (brief.get('latest_scientific_feedback') or {}).get('reference') or anchor
+        brief['diagnostic_relations']=dict(status='available_on_demand',
+            query=dict(reference=diagnostic_anchor,view='working_set',pointer='/diagnostic_relations'),
+            scope='Comparison alignment and numerical credibility require L1 read; no model-error or causal conclusion from different controllers.')
         brief['action_trace']['full_trace_query']=dict(reference=anchor,view='working_set',pointer='/action_trace')
         refs=brief.pop('all_fresh_results',[])
         brief['stop_result_index']=dict(count=len(refs),query=dict(reference=anchor,

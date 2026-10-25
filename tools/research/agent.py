@@ -337,7 +337,7 @@ def error_feedback(host, use, exc, before):
         code=errors[0]['type']
     hints={
         'NATIVE_ANALYSIS_REQUIRES_EXACT_STATE_OR_FROZEN_INITIALIZATION':('operating_point','Native methods use model_source=mujoco and operating_point=standardized_initial_pretension with no saved source, or operating_point=saved_state with saved_state OR execution+update_id. Retrieve method details for source/window requirements.'),
-        'DISPOSITION_REQUIRES_EXACT_ACTUAL_READ':('selected_execution','Use evidence_read(reference=selected_execution, view=full, pointer="") on the exact physical result, then SELECT. Reporter delivery, searches and summary text do not grant formal read credit.'),
+        'DISPOSITION_REQUIRES_EXACT_ACTUAL_READ':('experience_disposition','Keys must identify an actual experience_retrieve operation=read receipt or its exact entry_id@revision. Scientific artifact IDs, invented hypothesis names, search results and SELECT physical evidence are not experience keys. If this Study does not expose legal experience_retrieve, remove the inapplicable experience_disposition field; do not guess IDs.'),
         'explicit evidence_read of this completed evaluation required':('selected_execution','Publicly evidence_read the exact selected_execution with view=full and pointer="" before SELECT; /acceptance alone does not satisfy the whole-result read required here.'),
         'ORDERED_V2_CORRECTION_WINDOW_REQUIRED':('control_search.settings.correction_window_s','0 <= window[0] <= knots[0] < knots[-1] <= window[1] <= task duration'),
         'DECISION_CANDIDATE_MISMATCH':('decision.selected_candidate','Match the exact action candidate (for physical_replay, physical_replay.candidate); source is a control/result reference and must not replace the candidate.'),
@@ -785,7 +785,10 @@ async def converse(host,*,session_handoff=False,pause_after_completed_invocation
         if protected(host) and event.tool_use['name']=='retrieve_context' and event.tool_use['input'].get('reference') not in feedback_context_references():
             event.cancel_tool='Protected closeout permits existing execution feedback only.'
     def after_tool(event):
-        record(host,'model_original_tool_feedback',dict(tool_use=event.tool_use,result=event.result))
+        saved=dict(tool_use=event.tool_use,result=event.result)
+        if event.tool_use['name']=='evidence_read' and event.tool_use['input'].get('view')=='working_set':
+            saved['source_state_identity']=digest(state(host))
+        record(host,'model_original_tool_feedback',saved)
         key='native-'+event.tool_use['toolUseId']
         if host.store.lookup(host.run_id,key) is None:
             row,_=host.store.reserve(host.run_id,key,digest(event.tool_use),host.actor,{**zero(),'tool_calls':1})

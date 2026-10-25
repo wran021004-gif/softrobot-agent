@@ -137,6 +137,23 @@ def capability_summary(trajectory):
     return summary
 
 
+def recorded_score_resolution(left, right):
+    """Compare recorded SOCP support intervals, never add an acceptance tolerance."""
+    intervals=[]
+    for value in (left,right):
+        tr=value.get('trajectory',{});dual=tr.get('dual_checks',{})
+        hi=tr.get('replayed_violation');lo=dual.get('support_lower_estimate')
+        if (hi is None or lo is None or lo>hi or not tr.get('replay',{}).get('numerically_valid')
+                or tr.get('optimality_status')!='numerically_checked'):
+            return dict(status='unknown',reason='Valid recorded primal replay and ordered numerical support estimates required')
+        intervals.append([lo,hi])
+    overlap=max(i[0] for i in intervals)<=min(i[1] for i in intervals)
+    return dict(status='indistinguishable_at_recorded_numerical_precision' if overlap else 'separated_numerical_estimates',
+        score_delta=intervals[1][1]-intervals[0][1],recorded_support_intervals=intervals,
+        strict_structure_ranking_supported=False,
+        scope='Floating support/replay estimates, not rigorous bounds; independent physics is separate. Historical incumbent unchanged.')
+
+
 def signed_score_comparisons(summary, reference):
     """Direction of B's recorded controlled comparisons, never optimal ranking.
 

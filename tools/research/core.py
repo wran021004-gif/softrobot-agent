@@ -42,7 +42,11 @@ def read_evidence(host, query, *, record_read=True):
         from tools.research.evidence_policy import registered_references
         from tools.research.research_context import context
         if plain(q.reference) not in [s.get('family_space_reference'),*registered_references(host)]:raise ValueError('REGISTERED_WORKING_SET_ANCHOR_REQUIRED')
-        value=dict(context(host)['evidence_working_set'],source_state_identity=digest(s),
+        if q.pointer=='/diagnostic_relations' or q.pointer.startswith('/diagnostic_relations/'):
+            from tools.research.evidence_views import diagnostic_relations
+            derived=dict(diagnostic_relations=diagnostic_relations(host,plain(q.reference)))
+        else:derived=context(host)['evidence_working_set']
+        value=dict(derived,source_state_identity=digest(s),
             authoritative_scientific_evidence=False)
     elif q.view=='mathematical_capabilities':
         from tools.research.task_constraints import mathematical_method_view

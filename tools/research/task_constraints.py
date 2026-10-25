@@ -103,6 +103,12 @@ def mathematical_method_view(host, reference):
             methods[key]['cost_scope']='M*B conic solves + up to 2*k dual-face attempts; M=1+2*k. B=1 except two-segment paths: samples-2. Model preparation additional; wall cost unknown.'
         if key=='mujoco_direct_control_v1':
             if spec.get('native_control_limits'):methods[key]['execution_limits']=spec['native_control_limits']
+            executions=[r for r in s.get('results',[]) if host.store.artifact(r).get('candidate')==reference]
+            if executions:
+                methods[key]['measured_control_initialization']=dict(action='initialize_control',
+                    control_seed=dict(candidate=reference,parent=reference,source=executions[-1]),
+                    next='Use the returned explicit schedule as control_optimization.source or control_search.source. Full Plan/decision and normal admission required.',
+                    scope='Measured applied NMPC tensions only, exact candidate/task/channels/grid/bounds; acceptance is not inherited.')
             methods[key]['cost_scope']='Response search: S=starts, D_i=effective active coefficients in update i; callbacks = S baselines + sum(D_i FD probes + 1 candidate evaluation per completed update), all within evaluation_requests. Partial/failed callbacks also consume the cap; recorded counts own actual cost. Each suffix rollout advances (deadline-state_time)/physics_dt steps. Native cost.physics_steps includes required prefix reconstruction and all native rollouts. evaluation_callbacks and optimization_evaluations describe the same rollouts, not extra runs. Full independent physical_replay is separate with its own physics_steps; new_physical_evaluations=0 does not mean native integration was free.'
             methods[key]['supported_task_families']=['task.reach']
             methods[key]['supported_models']=['model.mujoco_native@1.0.0']

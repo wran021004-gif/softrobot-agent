@@ -54,6 +54,11 @@ class RequestBoundaryHandoffTests(unittest.TestCase):
         self.assertEqual(h.store.remaining()['used']['model_calls'],2)
         self.assertFalse(any(m.get('tool_calls') for m in sent[1]['messages']))
         self.assertIn('CURRENT_RESEARCH_PACKET',sent[1]['messages'][-1]['content'])
+        delivery=json.loads(sent[1]['messages'][-1]['content'].split('\n',1)[1])['research']['pending_feedback_delivery']
+        self.assertEqual(delivery['items'][0]['tool_id'],'fixture-read-priors')
+        self.assertEqual(delivery['items'][0]['status'],'success')
+        from tools.research.session_handoff import pending_feedback_delivery
+        self.assertIsNone(pending_feedback_delivery(h))
         self.assertEqual(len([e for e in events if e['kind']=='model_original_tool_request']),1)
         with patch('tools.research.agent.load_credential'),patch.dict(os.environ,{'DEEPSEEK_API_KEY':'offline'}),\
                 patch('tools.research.core.guard'),patch('tools.research.agent.guard'),\

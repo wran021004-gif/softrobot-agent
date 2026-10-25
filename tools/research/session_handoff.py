@@ -21,6 +21,60 @@ def initial_messages(study_id):
         'evidence remain queryable from Store. Study: '+study_id))])]
 
 
+def feedback_delivery(host, tool_ids):
+    """Project the verified last tool round, without synthesizing SDK messages."""
+    from tools.research.research_context import compact_evidence
+    rows=[];remaining=16000
+    originals={}
+    for event in host.store.events(host.run_id):
+        if event['kind']=='model_original_tool_feedback':
+            value=host.store.artifact(event['outputs'][0])
+            originals[value['tool_use']['toolUseId']]=(event['outputs'][0],value)
+    for key in tool_ids:
+        reference,value=originals[key];result=value['result']
+        row=dict(tool_id=key,tool=value['tool_use']['name'],query=value['tool_use']['input'],
+            status=result['status'],feedback_reference=reference,
+            original_result_query=dict(reference=reference,view='full',pointer='/result'))
+        size=len(json.dumps(result,separators=(',',':')).encode())
+        if size<=min(6000,remaining):
+            row.update(delivery='exact_feedback',result=result);remaining-=size
+        else:
+            try:parsed=json.loads(''.join(b.get('text','') for b in result['content']))
+            except ValueError:parsed={}
+            facts=compact_evidence(parsed,reference)['value']
+            if len(json.dumps(facts).encode())>min(3000,remaining):
+                def important(node):
+                    if not isinstance(node,dict):return dict(value_type=type(node).__name__)
+                    keep=('status','reference','candidate','source','source_kind','evaluation_reference',
+                        'operation','task_acceptance','task_gap','error_code','field','expected')
+                    return {**{k:node[k] for k in keep if k in node},
+                        **(dict(acceptance_metrics=node['original_acceptance'].get('metrics')) if node.get('original_acceptance') else {})}
+                facts=dict(total=len(parsed),recent=[important(v) for v in parsed[-3:]]) if isinstance(parsed,list) else important(parsed)
+            row.update(delivery='summary_only',facts=facts);remaining-=len(json.dumps(facts).encode())
+        rows.append(row)
+    return dict(version='pending_feedback_delivery_v1',items=rows,
+        scope='Deterministic Store projection of settled tools; delivery does not establish model understanding. Summary grants no complete-read credit.')
+
+
+def pending_feedback_delivery(host):
+    """The existing preparation owns delivery until a confirmed saved request."""
+    ref=state(host)['pilot'].get('handoff')
+    if not ref:return None
+    delivery=host.store.artifact(ref).get('pending_feedback_delivery')
+    if not delivery:return None
+    events=host.store.events(host.run_id)
+    confirmed={e['request_id'] for e in events if e['kind']=='r3_response'
+        and 200<=host.store.artifact(e['outputs'][0]).get('http_status',0)<300}
+    for event in events:
+        if event['kind']!='r3_request' or event['request_id'] not in confirmed:continue
+        wire=host.store.artifact(host.store.artifact(event['outputs'][0])['request'])
+        tail=wire['messages'][-1].get('content')
+        if isinstance(tail,str) and tail.startswith('CURRENT_RESEARCH_PACKET\n'):
+            packet=json.loads(tail.split('\n',1)[1])
+            if packet.get('research',{}).get('pending_feedback_delivery')==delivery:return None
+    return delivery
+
+
 def unmatched(messages):
     outstanding={};seen=set()
     for message in messages:
@@ -240,6 +294,9 @@ async def handoff(host,agent,build,directory,*,stage=lambda name:None,boundary='
                 value['boundary_identity']=value.pop('completed_boundary_identity')
                 value['boundary']=value.pop('completed_boundary')
                 value['invocation_completed']=False
+                anchor=next(host.store.artifact(e['outputs'][0]) for e in reversed(host.store.events(host.run_id))
+                    if e['kind']=='request_feedback_boundary')
+                value['pending_feedback_delivery']=feedback_delivery(host,anchor['tool_ids'])
             value['next_session']='rh-'+digest(value)[:24]
             preparation=plain(host.store.put(db,value));s['pilot']['handoff_preparation']=preparation
             host.store.update_state(db,host.run_id,s)

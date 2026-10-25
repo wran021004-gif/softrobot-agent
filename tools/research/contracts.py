@@ -486,7 +486,8 @@ class Plan(Contract):
     matched_state: MatchedStateProbe | None = None
     nmpc_prediction_diagnostic: NMPCPredictionDiagnostic | None = None
     mechanics_source: EvidenceRef | None = None
-    experience_disposition: dict[str, Literal['adopted', 'rejected', 'context_only']] = Field(default_factory=dict)
+    experience_disposition: dict[str, Literal['adopted', 'rejected', 'context_only']] = Field(default_factory=dict,
+        description='Only actual experience_retrieve read receipt IDs or exact entry_id@revision keys. Omit when experience retrieval is unavailable; scientific artifact IDs and hypothesis names are not experience keys.')
 
     @model_serializer(mode='wrap')
     def preserve_legacy_plan(self, handler):
