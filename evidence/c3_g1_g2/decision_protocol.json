@@ -1,0 +1,836 @@
+{
+  "version": "c3-g1-paired-decisions-v1",
+  "authorization": "2026-10-25 explicit user G1/G2 authorization: G1 continuity <=2 and paired decisions <=4 DeepSeek requests, mathematics=0; only after G1 passes G2 <=8 DeepSeek requests including Reporter and <=4 total mathematical evaluations including preparation/internal calls. All stages: independent physics=0, NMPC=0, PPO=0; no retries, budget resets, full A/B or unbounded search. Necessary frozen task/design and cited scientific excerpts only. C:/Users/gugugaga/.codex/attachments/b47b5887-0227-426f-9031-13cbb0fdda25/已粘贴的文本.txt",
+  "binding_status": "bound_verified_input_v1",
+  "request_ceiling": 4,
+  "task": {
+    "owning_study": "c3-b-100ms-20261025",
+    "historical_only": true,
+    "frozen_task_identity": "69cdc96a2e400d6c92cfda4c9f43a9d7649ba49da7ac2c353cc984fc7b8fd515",
+    "task": {
+      "control_period_s": 0.01,
+      "deadline_misses": 4,
+      "duration_s": 0.35,
+      "mean_update_s": 8.609564299998706,
+      "real_time_demonstrated": false,
+      "real_time_required": false,
+      "sample_period_s": 0.01,
+      "simulation_wall_s": 305.42200000000594,
+      "termination": [
+        "duration",
+        "numerical_failure"
+      ],
+      "timestep_s": 0.0005
+    },
+    "conditions": {
+      "contract": "research.task_conditions",
+      "version": "1.0.0",
+      "task_identity": "69cdc96a2e400d6c92cfda4c9f43a9d7649ba49da7ac2c353cc984fc7b8fd515",
+      "task_status": "development_valid",
+      "evaluator": {
+        "extension_id": "evaluate.reach",
+        "parameters": {
+          "contract": "reference.reach_evaluation",
+          "data": {
+            "tolerance_m": 0.01
+          },
+          "version": "1.0.0"
+        },
+        "version": "1.0.0"
+      },
+      "conditions": [
+        {
+          "condition_id": "terminal_error_m",
+          "metric": "position_error",
+          "meaning": "Distance from final saved position at task endpoint to target",
+          "limit": 0.01,
+          "units": "m",
+          "signal": {
+            "name": "tip_position",
+            "entity": "tip",
+            "dimension": 3,
+            "units": "m",
+            "frame": "world",
+            "phase": "post_step",
+            "missing": "unsupported"
+          },
+          "sampling": {
+            "mode": "task_endpoint",
+            "time_s": 0.35
+          },
+          "provenance": [
+            "/task/evaluator/parameters/data/tolerance_m",
+            "/task/timing",
+            "/task/goal"
+          ],
+          "expressibility": "sampled_norm_bound",
+          "expression_reason": "norm(p(T)-target) <= limit in the sampled local model",
+          "evaluation_binding": {
+            "source": "EvaluationResult",
+            "constraint": "task_bound",
+            "metric": "position_error"
+          },
+          "mathematical_binding": {
+            "constraint_id": "terminal_error_m",
+            "coverage": "exact_sampled_expression"
+          }
+        },
+        {
+          "condition_id": "holding_max_error_m",
+          "metric": "holding_max_error_m",
+          "meaning": "Maximum sampled final-window distance to target",
+          "limit": 0.01,
+          "units": "m",
+          "signal": {
+            "name": "tip_position",
+            "entity": "tip",
+            "dimension": 3,
+            "units": "m",
+            "frame": "world",
+            "phase": "post_step",
+            "missing": "unsupported"
+          },
+          "sampling": {
+            "mode": "inclusive_final_window",
+            "window_s": [
+              0.3,
+              0.35
+            ],
+            "sample_period_s": 0.01
+          },
+          "provenance": [
+            "/policy/controller/parameters/data/settling/position_limit_m",
+            "/task/timing",
+            "/task/goal",
+            "/policy/controller/parameters/data/settling/window_s"
+          ],
+          "expressibility": "sampled_norm_bound",
+          "expression_reason": "Sampled norm bound; actual holding coverage belongs to independent protocol",
+          "evaluation_binding": {
+            "source": "research.task_acceptance",
+            "metric": "holding_max_error_m",
+            "component": "holding_position",
+            "profile_source": "ProfileOutput.detail",
+            "profile_pointer": "/sampled_settling/max_error_m"
+          },
+          "mathematical_binding": {
+            "constraint_id": "holding_max_error_m",
+            "coverage": "exact_sampled_expression"
+          }
+        },
+        {
+          "condition_id": "holding_max_speed_m_s",
+          "metric": "holding_max_speed_m_s",
+          "meaning": "Maximum sampled final-window absolute world tip speed",
+          "limit": 0.02,
+          "units": "m/s",
+          "signal": {
+            "name": "tip_velocity",
+            "entity": "tip",
+            "dimension": 3,
+            "units": "m/s",
+            "frame": "world",
+            "phase": "post_step",
+            "missing": "unsupported"
+          },
+          "sampling": {
+            "mode": "inclusive_final_window",
+            "window_s": [
+              0.3,
+              0.35
+            ],
+            "sample_period_s": 0.01
+          },
+          "provenance": [
+            "/policy/controller/parameters/data/settling/speed_limit_m_s",
+            "/task/timing",
+            "/task/goal",
+            "/policy/controller/parameters/data/settling/window_s"
+          ],
+          "expressibility": "sampled_norm_bound",
+          "expression_reason": "Sampled norm bound; actual holding coverage belongs to independent protocol",
+          "evaluation_binding": {
+            "source": "research.task_acceptance",
+            "metric": "holding_max_speed_m_s",
+            "component": "holding_speed",
+            "profile_source": "ProfileOutput.detail",
+            "profile_pointer": "/sampled_settling/max_speed_m_s"
+          },
+          "mathematical_binding": {
+            "constraint_id": "holding_max_speed_m_s",
+            "coverage": "exact_sampled_expression"
+          }
+        }
+      ],
+      "missing": [],
+      "authority": "registered evaluator plus frozen acceptance protocol; this derived view grants no approval",
+      "continuous_time_guarantee": false
+    }
+  },
+  "engineering_prior": {
+    "candidate_reference": {
+      "artifact_id": "e0f2ccf53680ad00b1ed5d258d8b5eed38ced55fbc07f3bde07d3e5ce415ac1d",
+      "media_type": "application/json"
+    },
+    "historical_only": true,
+    "structure": {
+      "control_weights": {
+        "holding_tip_speed_weight": 0.1,
+        "terminal_tip_speed_weight": 0.1
+      },
+      "family_space_identity": "0d811aa77f5f52534e8a5a8ba47b88811025ce45ef1cd371332b6fede324828b",
+      "segment_count": 2,
+      "segments": {
+        "0": {
+          "cells": 12,
+          "length_m": 0.16,
+          "sections": [
+            {
+              "angle_rad": 0.35,
+              "holes_yz_m": [],
+              "kind": "circle",
+              "outer_yz_m": [],
+              "parameters": {
+                "radius_m": 0.008
+              }
+            }
+          ],
+          "young_pa": 10450000.0
+        },
+        "1": {
+          "cells": 12,
+          "length_m": 0.11,
+          "sections": [
+            {
+              "angle_rad": -0.25,
+              "holes_yz_m": [],
+              "kind": "circle",
+              "outer_yz_m": [],
+              "parameters": {
+                "radius_m": 0.008
+              }
+            },
+            {
+              "angle_rad": 0.15000000000000002,
+              "holes_yz_m": [],
+              "kind": "circle",
+              "outer_yz_m": [],
+              "parameters": {
+                "radius_m": 0.008
+              }
+            }
+          ],
+          "young_pa": 5400000.0
+        }
+      },
+      "spans": [
+        {
+          "anchor_s": 1.0,
+          "angular_offsets_rad": [
+            0.0
+          ],
+          "count": 1,
+          "first_segment": 0,
+          "guide_s": [
+            0.5
+          ],
+          "last_segment": 1,
+          "phase_rad": 0.0,
+          "radius_m": 0.018
+        },
+        {
+          "anchor_s": 1.0,
+          "angular_offsets_rad": [
+            0.0
+          ],
+          "count": 1,
+          "first_segment": 0,
+          "guide_s": [
+            0.5
+          ],
+          "last_segment": 1,
+          "phase_rad": 1.5707963267948966,
+          "radius_m": 0.018
+        },
+        {
+          "anchor_s": 1.0,
+          "angular_offsets_rad": [
+            0.0
+          ],
+          "count": 1,
+          "first_segment": 0,
+          "guide_s": [
+            0.5
+          ],
+          "last_segment": 1,
+          "phase_rad": 3.141592653589793,
+          "radius_m": 0.018
+        },
+        {
+          "anchor_s": 1.0,
+          "angular_offsets_rad": [
+            0.0
+          ],
+          "count": 1,
+          "first_segment": 0,
+          "guide_s": [
+            0.5
+          ],
+          "last_segment": 1,
+          "phase_rad": 4.71238898038469,
+          "radius_m": 0.018
+        }
+      ],
+      "tendon_count": 4,
+      "version": "serial_family_generation_v2"
+    },
+    "initial_state": "Historical all_candidate_dofs_zero_v1; not a current test candidate",
+    "method_catalog": "Same production METHOD_MEANINGS in both arms; requests are descriptions only"
+  },
+  "costs": {
+    "source": "Original frozen method catalog and independent proposal budget",
+    "model_preparation": 1,
+    "sampled_conic_with_new_model": 2,
+    "instantaneous_braking_from_exact_saved_state": 1,
+    "native_dynamics_from_exact_saved_state": 1,
+    "unknown_wall_cost": null,
+    "control_search": "each baseline, finite-difference probe and candidate consumes a physical replay; no new control search executed",
+    "native_short_response": "one math evaluation plus internally counted native physics steps; independent physical evaluation remains separate"
+  },
+  "cases": {
+    "c3_next_decision": {
+      "question": "Which next action can distinguish structural limits, control limits, model mismatch and numerical uncertainty? State competing hypotheses and falsifying observations.",
+      "proposed_next_action_budget": {
+        "mathematical_evaluations": 2,
+        "physical_launches": 1,
+        "nmpc": 0,
+        "ppo": 0,
+        "execution": "Hypothetical next experiment requiring separate authorization; this probe executes none"
+      },
+      "common": [
+        {
+          "fact_id": "historical_nmpc_failure",
+          "source": {
+            "reference": {
+              "artifact_id": "ead9bd6e454fc25a83e34ca7147c3cca3680a07a831fc5dbedeea7c05b08474f",
+              "media_type": "application/json"
+            },
+            "pointer": "/acceptance"
+          },
+          "candidate": {
+            "artifact_id": "e0f2ccf53680ad00b1ed5d258d8b5eed38ced55fbc07f3bde07d3e5ce415ac1d",
+            "media_type": "application/json"
+          },
+          "metrics": {
+            "holding_max_error_m": 0.004517235241814829,
+            "holding_max_speed_m_s": 0.18173358255275762,
+            "terminal_error_m": 0.004092012428299794
+          },
+          "components": {
+            "evaluation_validity": {
+              "limit": null,
+              "passed": true,
+              "reason": null,
+              "unit": null,
+              "value": "valid"
+            },
+            "evaluator:task_bound": {
+              "limit": 0.01,
+              "passed": true,
+              "reason": null,
+              "unit": "m",
+              "value": 0.004092012428299794
+            },
+            "execution_complete": {
+              "limit": null,
+              "passed": true,
+              "reason": null,
+              "unit": null,
+              "value": true
+            },
+            "force_bounds": {
+              "limit": 1e-08,
+              "passed": true,
+              "reason": null,
+              "unit": "N",
+              "value": 0.0
+            },
+            "holding_coverage": {
+              "limit": 6,
+              "passed": true,
+              "reason": null,
+              "unit": "inclusive uniform samples",
+              "value": true
+            },
+            "holding_position": {
+              "limit": 0.01,
+              "passed": true,
+              "reason": null,
+              "unit": "m",
+              "value": 0.004517235241814829
+            },
+            "holding_speed": {
+              "limit": 0.02,
+              "passed": false,
+              "reason": null,
+              "unit": "m/s",
+              "value": 0.18173358255275762
+            },
+            "solver_errors": {
+              "limit": 0,
+              "passed": true,
+              "reason": null,
+              "unit": "count",
+              "value": 0
+            },
+            "task_evaluator": {
+              "limit": null,
+              "passed": true,
+              "reason": null,
+              "unit": null,
+              "value": true
+            }
+          },
+          "independent_physical_observation": true
+        },
+        {
+          "fact_id": "historical_fixed_sequence_failure",
+          "source": {
+            "reference": {
+              "artifact_id": "3f67ca10b4ebbb554f7f51809d9720230e011941412f1c138a86667ca2c8612f",
+              "media_type": "application/json"
+            },
+            "pointer": "/acceptance"
+          },
+          "metrics": {
+            "holding_max_error_m": 0.013706442098244485,
+            "holding_max_speed_m_s": 0.2741264353343463,
+            "terminal_error_m": 0.013706442098244485
+          },
+          "independent_physical_observation": true,
+          "control": "Different fixed open-loop input from NMPC"
+        },
+        {
+          "fact_id": "frozen_execution_grids",
+          "replan_s": 0.1,
+          "control_and_sampling_s": 0.01,
+          "physics_dt_s": 0.0005
+        }
+      ],
+      "evidence": [
+        {
+          "fact_id": "sampled_affine_witness",
+          "source": {
+            "reference": {
+              "artifact_id": "87d6267303ffd0e3a20cc229658a4492ccfd5799d3edfffbfbeb03b186822931",
+              "media_type": "application/json"
+            },
+            "pointer": "/trajectory"
+          },
+          "candidate": {
+            "artifact_id": "e0f2ccf53680ad00b1ed5d258d8b5eed38ced55fbc07f3bde07d3e5ce415ac1d",
+            "media_type": "application/json"
+          },
+          "method": "sampled-affine-conic-minimax-v1",
+          "score": -0.19999999999954968,
+          "optimality": "numerically_checked",
+          "numerical_replay": true,
+          "horizon": {
+            "control_period_s": 0.01,
+            "input_hold_s": 0.01,
+            "remaining_task_s": 0.35,
+            "sample_period_s": 0.01,
+            "sample_phase": "post_step_preceding_hold",
+            "sample_steps": {
+              "0": 0,
+              "1": 1,
+              "10": 10,
+              "11": 11,
+              "12": 12,
+              "13": 13,
+              "14": 14,
+              "15": 15,
+              "16": 16,
+              "17": 17,
+              "18": 18,
+              "19": 19,
+              "2": 2,
+              "20": 20,
+              "21": 21,
+              "22": 22,
+              "23": 23,
+              "24": 24,
+              "25": 25,
+              "26": 26,
+              "27": 27,
+              "28": 28,
+              "29": 29,
+              "3": 3,
+              "30": 30,
+              "31": 31,
+              "32": 32,
+              "33": 33,
+              "34": 34,
+              "35": 35,
+              "4": 4,
+              "5": 5,
+              "6": 6,
+              "7": 7,
+              "8": 8,
+              "9": 9
+            },
+            "start_time_s": 0.0,
+            "step_count": 35
+          },
+          "operating_point": {
+            "actual_time_s": 0.0,
+            "available": true,
+            "construction": {
+              "achieved_world_point_m": [
+                0.29799999999999993,
+                0.0,
+                0.15
+              ],
+              "execution_trajectory_used": false,
+              "method": "existing immutable controller preparation/numerical-source logic",
+              "numerical_source": "initial_state_pretension",
+              "position_residual_m": 0.053749418601506754,
+              "preparation_provenance": {
+                "actual_initial_state_source": "Candidate Task initializer then measured backend state at every update",
+                "current_scope": {
+                  "backend": {
+                    "extension_id": "backend.family_mujoco",
+                    "parameters": {
+                      "contract": "family.mujoco_parameters",
+                      "data": {
+                        "contact_model": "mujoco_convex_native",
+                        "friction": [
+                          0.0,
+                          0.0,
+                          0.0
+                        ],
+                        "integrator": "implicitfast",
+                        "timestep_source": "task.timing.timestep_s"
+                      },
+                      "version": "1.0.0"
+                    },
+                    "version": "1.1.0"
+                  },
+                  "controller": {
+                    "extension_id": "controller.gvs_nmpc",
+                    "parameters": {
+                      "contract": "family.gvs_reach_control",
+                      "data": {
+                        "numerical_source": "initial_state_pretension",
+                        "recipe": {
+                          "basis": {
+                            "strategy": "structural_linear"
+                          },
+                          "constraint_jacobian_mode": "reverse",
+                          "curvature_scale_rad_m": 10.0,
+                          "evaluation_threads": 1,
+                          "feasible_return": null,
+                          "holding_brake_lead_s": 0.0,
+                          "holding_speed_cost_mode": "time_integral_v1",
+                          "holding_speed_cost_window_s": 0.05,
+                          "holding_tip_speed_weight": 0.1,
+                          "horizon": 10,
+                          "integration_method": "implicit_euler",
+                          "max_cpu_s": null,
+                          "max_iterations": 120,
+                          "max_unusable_updates": 3,
+                          "path_capture_m": 0.001,
+                          "path_lookahead_m": 0.003,
+                          "position_error_scale_m": null,
+                          "progress_weight": 0.0,
+                          "rate_scale_rad_m_s": 1000.0,
+                          "recover_returned_tensions": true,
+                          "reference_mode": "constant",
+                          "regenerate_warm_states": true,
+                          "regression_weight": 0.0,
+                          "relative_velocity_weight": 0.0,
+                          "replan_period_s": 0.1,
+                          "root_tolerance": 1e-10,
+                          "seed_position_tolerance_fraction": 0.5,
+                          "seed_speed_limit_m_s": 0.02,
+                          "stopping_policy": "research_work_v1",
+                          "substeps": 1,
+                          "tension_weight": 0.0001,
+                          "terminal_tip_speed_weight": 0.1,
+                          "terminal_velocity_weight": 0.0001,
+                          "terminal_weight": 5.0,
+                          "tip_speed_scale_m_s": 0.02,
+                          "tolerance": 1e-06,
+                          "tracking_weight": 1.0,
+                          "variation_weight": 0.001,
+                          "velocity_weight": 0.0001
+                        },
+                        "settling": {
+                          "position_limit_m": 0.01,
+                          "speed_limit_m_s": 0.02,
+                          "window_s": 0.05
+                        }
+                      },
+                      "version": "1.0.0"
+                    },
+                    "version": "11.0.0"
+                  },
+                  "discretization": {
+                    "contract": "family.discretization",
+                    "data": {
+                      "cells": {
+                        "segment_0": 12,
+                        "segment_1": 12
+                      },
+                      "coordinates": "two_principal_bending_angles_per_cell",
+                      "model": "serial_bending_cells_v1",
+                      "version": "serial_bending_discretization_v1"
+                    },
+                    "version": "1.0.0"
+                  },
+                  "execution_model": {
+                    "extension_id": "model.serial_bending_cells",
+                    "parameters": {
+                      "contract": "family.dynamics_model",
+                      "data": {},
+                      "version": "1.0.0"
+                    },
+                    "version": "1.0.0"
+                  },
+                  "robot": {
+                    "family": "tendon_robot_family",
+                    "identity": "23a6d76d92dff8b228331be950e5a1e74195b7a685e938b72f5d40e92c55af8f"
+                  },
+                  "seed": 17,
+                  "task": {
+                    "environment": "5cee25b33f4ff19cb0abd93651ce9077a81665990f07d8f5a4967497e8e82a4d",
+                    "family": "task.reach",
+                    "goal": "78c3e06ccabeab73f0020e2ff3fc6a6a425eec824f878f4b25f2db1a36f41463",
+                    "identity": "69cdc96a2e400d6c92cfda4c9f43a9d7649ba49da7ac2c353cc984fc7b8fd515",
+                    "initializer": "3a90c93217f15e9a60db7f65f611911f4aa53f1a4987340949e1068fd2647c22",
+                    "timing": {
+                      "control_period_s": 0.01,
+                      "duration_s": 0.35,
+                      "sample_period_s": 0.01,
+                      "termination": [
+                        "duration",
+                        "numerical_failure"
+                      ],
+                      "timestep_s": 0.0005
+                    }
+                  }
+                },
+                "historical_states_reused": false,
+                "nominal_is_current_target_solution": false,
+                "physics_identity": "31bb2129a70091b30e29c008ecc32abb49e593c1d994a52c499071fcef4b4088",
+                "previous_input_source": "candidate bounded pretension",
+                "resolved_basis_identity": "9637ffe35f961a28c069143bdc6d16344dc7fc76c87e168bd9802f006cbdefe9",
+                "reused": false,
+                "source_kind": "project_initial_state_and_bounded_pretension",
+                "validity": "Tensions are numerical guesses; placeholder states must be regenerated using candidate dynamics before use"
+              },
+              "static_equilibrium": false
+            },
+            "name": "controller_start_input",
+            "phase": "configuration_controller_start_input",
+            "remaining_task_s": 0.35,
+            "scope": "controller-start input",
+            "time_origin": "frozen initializer via existing controller preparation"
+          },
+          "scope": "Local sampled affine model only; no nonlinear physical success"
+        },
+        {
+          "fact_id": "math_physics_alignment",
+          "left": {
+            "artifact_id": "87d6267303ffd0e3a20cc229658a4492ccfd5799d3edfffbfbeb03b186822931",
+            "media_type": "application/json"
+          },
+          "right": {
+            "artifact_id": "3f67ca10b4ebbb554f7f51809d9720230e011941412f1c138a86667ca2c8612f",
+            "media_type": "application/json"
+          },
+          "status": "partial_comparison",
+          "kind": "same_control_math_physics",
+          "alignment": {
+            "candidate": true,
+            "task": true,
+            "source_control": true,
+            "tendon_order": true,
+            "actual_tensions": true,
+            "time_grid": true,
+            "initial_state": true,
+            "saved_prediction_samples": false,
+            "recorded_aligned_difference": false,
+            "numerical_replay": true
+          },
+          "missing_conditions": [
+            "saved_prediction_samples",
+            "recorded_aligned_difference"
+          ],
+          "mathematical_aggregates": {
+            "terminal_error_m": {
+              "value": 0.008000000000002585,
+              "units": "m",
+              "absolute_time_s": 0.35000000000000003,
+              "radius": 0.01
+            },
+            "holding_max_error_m": {
+              "value": 0.008000000000004504,
+              "units": "m",
+              "absolute_time_s": 0.32,
+              "radius": 0.01
+            },
+            "holding_max_speed_m_s": {
+              "value": 0.013754640667324113,
+              "units": "m/s",
+              "absolute_time_s": 0.35000000000000003,
+              "radius": 0.02
+            }
+          },
+          "supported_scope": "Recorded task aggregates only; no sample differences reconstructed",
+          "unsupported_conclusions": [
+            "Global nonlinear feasibility",
+            "Failure cause",
+            "Different-control difference as model error"
+          ]
+        },
+        {
+          "fact_id": "search_resolution",
+          "comparison": {
+            "kind": "different_structure_task_results",
+            "left": {
+              "artifact_id": "0ce7c5e7f1cb941605d4e6d2ca558f1c950643b1fb63f0faac579a9976e11878",
+              "media_type": "application/json"
+            },
+            "right": {
+              "artifact_id": "87d6267303ffd0e3a20cc229658a4492ccfd5799d3edfffbfbeb03b186822931",
+              "media_type": "application/json"
+            },
+            "candidates": [
+              {
+                "artifact_id": "fcfb5f46268f43d2b96f3e7f292c9005a4c7ecdd103ea6c6b8d2842027b953df",
+                "media_type": "application/json"
+              },
+              {
+                "artifact_id": "e0f2ccf53680ad00b1ed5d258d8b5eed38ced55fbc07f3bde07d3e5ce415ac1d",
+                "media_type": "application/json"
+              }
+            ],
+            "resolution": {
+              "status": "indistinguishable_at_recorded_numerical_precision",
+              "score_delta": 2.62456723021387e-13,
+              "recorded_support_intervals": [
+                [
+                  -0.2000000001349602,
+                  -0.19999999999981213
+                ],
+                [
+                  -0.2000000000845339,
+                  -0.19999999999954968
+                ]
+              ],
+              "strict_structure_ranking_supported": false,
+              "scope": "Floating support/replay estimates, not rigorous bounds; independent physics is separate. Historical incumbent unchanged."
+            },
+            "changed_parameters": [
+              {
+                "pointer": "/segments/0/young_pa",
+                "before": 7200000.0,
+                "after": 10450000.0
+              }
+            ],
+            "verified_constraints": [
+              {
+                "reference": {
+                  "artifact_id": "0ce7c5e7f1cb941605d4e6d2ca558f1c950643b1fb63f0faac579a9976e11878",
+                  "media_type": "application/json"
+                },
+                "pointer": "/trajectory/coverage"
+              },
+              {
+                "reference": {
+                  "artifact_id": "87d6267303ffd0e3a20cc229658a4492ccfd5799d3edfffbfbeb03b186822931",
+                  "media_type": "application/json"
+                },
+                "pointer": "/trajectory/coverage"
+              }
+            ],
+            "independent_physical_support": {
+              "left": [],
+              "right": [
+                {
+                  "artifact_id": "3f67ca10b4ebbb554f7f51809d9720230e011941412f1c138a86667ca2c8612f",
+                  "media_type": "application/json"
+                },
+                {
+                  "artifact_id": "ead9bd6e454fc25a83e34ca7147c3cca3680a07a831fc5dbedeea7c05b08474f",
+                  "media_type": "application/json"
+                }
+              ]
+            },
+            "causal_attribution": "Unavailable: independently reoptimized control and distinct structures"
+          }
+        }
+      ],
+      "round2": [
+        {
+          "fact_id": "scheduled_historical_feedback",
+          "source": {
+            "reference": {
+              "artifact_id": "86e25bcac4b1b5b689d3582ced239b4b55a02d3f553e6cc504bc7c7108c0950e",
+              "media_type": "application/json"
+            },
+            "pointer": "/34"
+          },
+          "final_time_s": 0.35,
+          "final_speed_m_s": 0.050052001114636535,
+          "holding_max_time_s": 0.31,
+          "holding_max_speed_m_s": 0.18173358255275762,
+          "exact_saved_update_ids": [
+            30
+          ],
+          "new_execution": false,
+          "origin": "Original B history, independent of both proposed actions; identical feedback in both arms"
+        }
+      ]
+    }
+  },
+  "sources_offline_only": {
+    "binding_rule": "All facts above retain original B Store references; no transfer into a new scientific candidate or acceptance.",
+    "round2_rule": "Freeze independent feedback and scoring before turn 1; never supply it early or represent scheduled feedback as execution of the Agent proposal. No post-outcome rubric edits.",
+    "output_rule": "Keep original Plan/ResearchDecision, raw response/reasoning/tool call, receipts and exact complete wire. No new Agent or evaluator."
+  },
+  "rubric_offline_only": [
+    {
+      "criterion": "evidence_scope",
+      "score": null,
+      "anchor": "0 conflates model/numerics/physics; 1 partly separates; 2 correctly interprets values, bounds, units, time and inference limits"
+    },
+    {
+      "criterion": "testable_hypothesis",
+      "score": null,
+      "anchor": "0 none; 1 one falsifiable mechanism; 2 competing mechanisms with falsifying observations"
+    },
+    {
+      "criterion": "discriminating_action",
+      "score": null,
+      "anchor": "0 no mechanism separation; 1 incomplete; 2 feasible bounded action with outcome branches separating mechanisms"
+    },
+    {
+      "criterion": "feedback_revision",
+      "score": null,
+      "anchor": "0 ignores feedback; 1 mentions it; 2 updates hypotheses/actions with exact actual feedback"
+    },
+    {
+      "criterion": "complete_cost",
+      "score": null,
+      "anchor": "0 hides major costs; 1 incomplete; 2 accounts Provider/Reporter, model builds, solve attempts, internal rollouts/prefixes and separate independent launches"
+    },
+    {
+      "criterion": "independent_direction_support",
+      "score": null,
+      "anchor": "Unscored until separately authorized independent held-out evaluation. 0 contradicted, 1 unresolved, 2 supported within frozen scope; no directional proposal stays not_applicable, not zero"
+    }
+  ],
+  "baseline_commit": "395e9b65fcb51ea14758a65ff0e8085ab3b5492a"
+}
