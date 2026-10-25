@@ -22,19 +22,20 @@ def historical_host(arm='b'):
     return SimpleNamespace(store=Store(ROOT.parent/'c3-math-search-readiness/runs/research'/name),run_id=name)
 
 
-def authorize(h):
+def authorize(h, *, source=SOURCE, authorization=AUTH):
     s=state(h);scope=dict(study_id=h.run_id,resolved_identity=s['spec']['resolved_identity'],
         budgets=s['spec']['budgets'],capabilities=s['spec']['capabilities'],provider=s['spec']['runtime']['provider'],
         nmpc_limits=s['spec']['nmpc_limits'],rl_limits=s['spec']['rl_limits'],
         egress='Frozen task, necessary structure and cited historical excerpts; no credentials or unrelated files')
-    ref=record(h,'formal_study_authorization',dict(user_approval=True,source=SOURCE,approval_text=AUTH,
+    ref=record(h,'formal_study_authorization',dict(user_approval=True,source=source,approval_text=authorization,
         scope=scope,scope_identity=digest(scope)))
     require_authorization(h)
     return ref
 
 
-def provision(kind,*,instructions='Bounded numerical radius validation only; no Provider or physics.'):
-    name='c3-f2-radius-20261025' if kind=='math' else 'c3-f1-live-20261025'
+def provision(kind,*,instructions='Bounded numerical radius validation only; no Provider or physics.',
+              study_id=None, overrides=None, budget_overrides=None, source=SOURCE, authorization=AUTH):
+    name=study_id or ('c3-f2-radius-20261025' if kind=='math' else 'c3-f1-live-20261025')
     path=ROOT/'runs/research'/name
     if (path/'platform.sqlite').exists():raise ValueError('EXISTING_TEST_ID: inspect/recover, never reset or auto-resend')
     cfg=read(ROOT/'configs/research/study_c3_search_admission.json')
@@ -45,13 +46,15 @@ def provision(kind,*,instructions='Bounded numerical radius validation only; no 
         capabilities=['analysis'] if kind=='math' else ['investigation'],allowed_plan_actions=['generate','diagnose','stop'] if kind=='math' else ['diagnose','stop'])
     cfg['budgets'].update(provider_requests=0 if kind=='math' else 4,protected_provider_requests=0,
         public_operations=16,protected_public_operations=0,mathematical_evaluations=10 if kind=='math' else 0)
+    cfg.update(authorization='PENDING_EXPLICIT_APPROVAL: '+authorization, **(overrides or {}))
+    cfg['budgets'].update(budget_overrides or {})
     for key in ('defaults','family_space','task','control','runtime'):
         cfg[key]=str((ROOT/'configs/research'/cfg[key]).resolve())
     # Existing config owner needs a temporary adjacent leaf, removed before bind.
     leaf=ROOT/'configs/research'/('._'+name+'.json');atomic_json(leaf,cfg)
     try:h=core.prepare(leaf,directory=path)
     finally:leaf.unlink()
-    core.bind(h);authorize(h)
+    core.bind(h);authorize(h,source=source,authorization=authorization)
     return h
 
 
@@ -114,21 +117,33 @@ def mathematics():
     return {**{k:v for k,v in output.items() if k!='sensitivity'},'sensitivity_keys':list(output.get('sensitivity') or {})}
 
 
-def continuity(restore=False):
+def continuity_instructions(query):
+    return ('Independent read-only feedback-continuity validation. The following startup obligation applies ONCE to this entire Study, '
+        'not once per SDK Session or invocation. Check current read_state and pending_feedback_delivery first. '
+        'Only if this Study has not completed the specified read, call evidence_read with exactly '+json.dumps(query)+
+        '. If the read is completed and its feedback is delivered or present in pending_feedback_delivery, use that evidence to continue; '
+        'a new SDK Session does not restart the Study or its startup obligation. Immutable delivered evidence does not need rereading '
+        'to satisfy startup. A scientifically motivated recheck remains legal; explain its purpose. '
+        'After feedback, state in Chinese which constraint failed, the observed value, unit and threshold, the original source and '
+        'a falsifiable next research question with competing mechanisms. Finish the invocation with plain text. '
+        'No scientific tool execution or STOP/SELECT. Historical excerpt is not this test Study\'s newly generated result.')
+
+
+def continuity(restore=False, *, study_id='c3-f1-live-20261025', destination=OUT,
+               provider_requests=4, source=SOURCE, authorization=AUTH):
     from tests.research.agent_math_decision_probe import provider_usage
     if restore:
         from tools.platform_host import Host
-        name='c3-f1-live-20261025';h=Host(ROOT/'runs/research'/name,name,actor='unified-research')
+        name=study_id;h=Host(ROOT/'runs/research'/name,name,actor='unified-research')
         asyncio.run(converse(h,session_handoff=True,restore_only=True));core.export(h);return provider_usage(h)
     old=historical_host();s=state(old);ref=s['results'][-1];p=old.store.artifact(ref)
     excerpt=dict(kind='historical_scoped_evidence',owning_study=old.run_id,original_reference=ref,
         candidate=p['candidate'],acceptance=p['acceptance']['components'],
         scope='Historical B execution only; no candidate or science executed in this independent test')
     query=dict(reference=dict(artifact_id=digest(excerpt),media_type='application/json'),view='full',pointer='')
-    instructions=('Independent read-only feedback-continuity test. First call evidence_read with exactly '+json.dumps(query)+
-        '. After feedback, state in Chinese which constraint failed, the observed value, unit and threshold, the original source and a falsifiable next research question with competing mechanisms. '
-        'Finish the invocation with plain text. No scientific tool execution or STOP/SELECT. Historical excerpt is not this test Study\'s newly generated result.')
-    h=provision('continuity',instructions=instructions)
+    h=provision('continuity',instructions=continuity_instructions(query),study_id=study_id,
+        overrides=dict(evidence_destination=str(destination.relative_to(ROOT))),
+        budget_overrides=dict(provider_requests=provider_requests),source=source,authorization=authorization)
     assert save(h,excerpt,'authorized_historical_excerpt')==query['reference']
     approval=next(e['outputs'][0] for e in h.store.events(h.run_id) if e['kind']=='formal_study_authorization')
     admission=record(h,'session_handoff_admission',dict(authorization=approval,purpose='bounded_independent_semantic_validation',boundary='request_feedback'))
@@ -138,17 +153,18 @@ def continuity(restore=False):
     events=h.store.events(h.run_id);uses=[h.store.artifact(e['outputs'][0]) for e in events if e['kind']=='model_original_tool_request']
     result=dict(**provider_usage(h),tool_queries=[v['tool_use'] for v in uses],
         original_turns=[e['outputs'][0] for e in events if e['kind']=='model_original_turn'],store=str(h.store.root))
-    atomic_json(OUT/'continuity_summary.json',result);core.export(h)
+    atomic_json(destination/'continuity_summary.json',result);core.export(h)
     return result
 
 
-def decision_probe(live=False):
+def decision_probe(live=False, *, out=None, destination=OUT, authorization=AUTH, formal_host=None,
+                   version='c3-f1-f2-historical-decision-v1'):
     from tests.research import agent_math_decision_probe as probe
     from tools.research.evidence_views import diagnostic_relations, recorded_control_diagnostics
-    out=ROOT/'runs/c3-f2-decision-probe';probe.SUMMARY=out/'summary.json'
+    out=out or ROOT/'runs/c3-f2-decision-probe';probe.SUMMARY=out/'summary.json'
     if live:
-        result=asyncio.run(probe.live(out))
-        atomic_json(OUT/'decision_summary.json',result)
+        result=asyncio.run(probe.live(out,host=formal_host))
+        atomic_json(destination/'decision_summary.json',result)
         return {k:result[k] for k in ('status','actual_requests','usage')}
     if out.exists():raise ValueError('EXISTING_PROBE: frozen inputs and original attempts must remain unchanged')
     h=historical_host();s=state(h);ref=s['results'][-1];p=h.store.artifact(ref)
@@ -156,7 +172,7 @@ def decision_probe(live=False):
     replay=s['physical_replays'][0];v=h.store.artifact(replay)
     controls=recorded_control_diagnostics(h,p)
     data=read(ROOT/'tests/research/fixtures/c3_math_decision_template.json')
-    data.update(version='c3-f1-f2-historical-decision-v1',authorization=AUTH,binding_status='bound_verified_input_v1',
+    data.update(version=version,authorization=authorization,binding_status='bound_verified_input_v1',
         baseline_commit=s['freeze'],
         task=dict(owning_study=h.run_id,historical_only=True,frozen_task_identity=p['acceptance']['task_identity'],
             task=p['acceptance']['timing'],conditions=d['task_diagnosis']['task_conditions']),
@@ -194,9 +210,9 @@ def decision_probe(live=False):
             exact_saved_update_ids=[r['update_id'] for r in controls['relevant_updates'] if r['complete_update_available']],
             new_execution=False,origin='Original B history, independent of both proposed actions; identical feedback in both arms')])
     data['sources_offline_only']['binding_rule']='All facts above retain original B Store references; no transfer into a new scientific candidate or acceptance.'
-    cases=ROOT/'runs/c3-f2-decision-cases.json';atomic_json(cases,data)
-    probe.freeze(out,cases_path=cases,provider=s['spec']['runtime']['provider'],authorization=AUTH)
-    atomic_json(OUT/'decision_protocol.json',data)
+    cases=ROOT/'runs'/(out.name+'-inputs')/'cases.json';atomic_json(cases,data)
+    probe.freeze(out,cases_path=cases,provider=s['spec']['runtime']['provider'],authorization=authorization)
+    atomic_json(destination/'decision_protocol.json',data)
     return dict(status='frozen',request_ceiling=4,cases=str(cases),rubric=data['rubric_offline_only'])
 
 

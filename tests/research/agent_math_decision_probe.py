@@ -39,8 +39,9 @@ INSTRUCTIONS = (
     'and method autonomously from the frozen task, legal domain, engineering defaults, '
     'method descriptions, costs and visible evidence. Keep mathematical scope, numerical '
     'status, physical observation and independent task acceptance distinct. '
-    'This is a read-only decision probe, not a new Study. Submit exactly one research_plan '
-    'tool call using the production Plan/ResearchDecision contract. Use action=diagnose '
+    'This is a read-only decision probe. In EVERY independent evaluation turn submit '
+    'exactly one NEW research_plan tool call using the production Plan/ResearchDecision '
+    'contract. An earlier turn\'s Plan never satisfies the current turn. Use action=diagnose '
     'to DESCRIBE any chosen scientific method, or stop; no payload is dispatched. '
     'Put the current question and at least two competing mechanisms with evidence IDs in '
     'hypothesis; the next specific experiment, measured quantities and outcome branches '
@@ -84,6 +85,12 @@ def packet(data, case, arm, turn):
 def wire(provider, data, case, arm, turn, history=()):
     # The method descriptions are the actual production catalog, not scoring hints.
     content = packet(data, case, arm, turn)
+    prior = [call for message in history for call in message.get('tool_calls', [])
+             if call['function']['name'] == 'research_plan']
+    content['evaluation_turn'] = dict(turn_id=f'{case}:turn-{turn}', turn=turn,
+        previous_plan_tool_ids=[call['id'] for call in prior],
+        question_to_reassess=content['question'],
+        submission='Submit exactly one NEW research_plan for THIS turn; previous Plans remain context only.')
     content['mathematical_methods'] = METHOD_MEANINGS
     return dict(model=provider['model'], max_tokens=provider['max_tokens'],
                 reasoning_effort=provider['reasoning_effort'], thinking={'type': provider['thinking']},
@@ -152,7 +159,7 @@ def provider_usage(host):
                 money=None, provider_ledger=host.store.remaining())
 
 
-async def live(out=OUT, *, test_transport=None):
+async def live(out=OUT, *, test_transport=None, host=None):
     frozen = read(out / 'frozen.json')
     if frozen['instructions'] != INSTRUCTIONS or frozen['cases'] != read(Path(frozen.get('cases_source',CASES))):
         raise ValueError('FROZEN_INPUT_CHANGED')
@@ -161,18 +168,24 @@ async def live(out=OUT, *, test_transport=None):
         raise ValueError('EXPLICIT_PROBE_APPROVAL_REQUIRED_BEFORE_PROVIDER')
     if frozen['cases'].get('binding_status') not in (None,'bound_verified_input_v1'):
         raise ValueError('VERIFIED_CANDIDATE_STATE_AND_EVIDENCE_BINDING_REQUIRED')
-    if (out / 'provider/platform.sqlite').exists():
+    if host is None and (out / 'provider/platform.sqlite').exists():
         raise ValueError('EXISTING_PROVIDER_ATTEMPT_NO_AUTOMATIC_RESEND')
-    store = Store(out / 'provider')
-    host = SimpleNamespace(store=store, run_id='agent-math-decision-probe')
-    project = ProjectConfig(project_id=host.run_id, grant_id=out.name + '-provider-'+str(ceiling),
-        authorization_source=authorization, budget=dict(model_calls=ceiling, tool_calls=0,
-        backend_solves=0, worker_calls=0, wall_s=None), exclusive_resources={'provider_request': 1})
-    store.create(project)
-    # A platform transport session, with no Research Study/spec/candidate lifecycle.
-    store.create_session(dict(input=dict(run_id=host.run_id, policy=dict(budget=plain(project.budget))),
-                              purpose='read-only Provider accounting; not a Study'))
-    update(host, pilot=dict(provider=frozen['provider'], live_model_requests=0))
+    if host is None:
+        store = Store(out / 'provider')
+        host = SimpleNamespace(store=store, run_id='agent-math-decision-probe')
+        project = ProjectConfig(project_id=host.run_id, grant_id=out.name + '-provider-'+str(ceiling),
+            authorization_source=authorization, budget=dict(model_calls=ceiling, tool_calls=0,
+            backend_solves=0, worker_calls=0, wall_s=None), exclusive_resources={'provider_request': 1})
+        store.create(project)
+        # Legacy read-only probes use a platform transport session.
+        store.create_session(dict(input=dict(run_id=host.run_id, policy=dict(budget=plain(project.budget))),
+                                  purpose='read-only Provider accounting; not a Study'))
+        update(host, pilot=dict(provider=frozen['provider'], live_model_requests=0))
+    else:
+        from tools.research.state import guard
+        guard(host)
+        if provider_usage(host)['actual_requests']:
+            raise ValueError('EXISTING_PROVIDER_ATTEMPT_NO_AUTOMATIC_RESEND')
     record(host, 'provider_egress_authorization', dict(user_approval=authorization,
         endpoint=frozen['provider']['base_url'] + '/chat/completions', ceiling=ceiling,
         data_scope='frozen task/scalars/diagnostics/evidence summaries; no credentials or unrelated files'))
