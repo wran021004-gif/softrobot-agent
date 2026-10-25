@@ -223,9 +223,14 @@ class ControlEvidence:
                 item['research_interpretations']=row.get('research_interpretations',[])
                 item['residual_definitions']='Physical force balance / 0.001 N*m^2; position defects / 10 rad/m'
                 item['plan_scope']='Returned/delivered plan only; no IPOPT iteration checkpoints or complete warm-input replay'
+            elif row.get('fresh_solve') is False:
+                item['reused_plan']=row['reused_plan']
+                item['plan_scope']='Cached input from the cited earlier accepted plan; no new optimizer call or current-state feasibility certificate'
             else:missing.append(f'update:{index}:complete_warm_and_plans')
             records.append(item)
-        observations=dict(updates=records,total_updates=len(updates),initialization_selected=sum(
+        observations=dict(updates=records,total_updates=len(updates),
+            actual_solver_calls=sum(r.get('fresh_solve',True) for r in updates),
+            cached_control_intervals=sum(r.get('fresh_solve') is False for r in updates),initialization_selected=sum(
             r.get('optimization_selected_iteration') in (-1,0) for r in updates))
         if query.operation=='prediction':
             rows=self.read_file(s,'trajectory.json.gz',[])
@@ -250,7 +255,7 @@ class ControlEvidence:
             capabilities=dict(available=['saved_execution','selected_update','aligned_one_step']+(['complete_plans'] if snapshots else [])+
                 (['solver_neutral_mathematical_facts'] if any(r.get('mathematical_facts') is not None for r in updates) else []),
                 missing=missing,unsupported=['causal_identification','historical_unrecorded_horizons']),
-            comparability=dict(frame='world',prediction='same update, next sample, same actually executed input only',
+            comparability=dict(frame='world',prediction='next sample with the same actually executed input; cached steps retain the earlier source update and do not constitute a fresh solve',
                 deadline_s=task['timing']['duration_s'],full_state='Projected GVS state; endpoint and projection residuals are separate'))
 
     def compare(self, request: ExecutionComparison, variant_reader=None):

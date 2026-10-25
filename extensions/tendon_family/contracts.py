@@ -1040,6 +1040,8 @@ class GVSTrajectoryParameters(Contract):
     max_cpu_s: FiniteFloat | None = Field(default=None,gt=0)
     basis: GVSBasisSpecification = Field(default_factory=lambda:GVSBasisSpecification(strategy='structural_linear'))
     horizon: int = Field(default=10,ge=1,le=100)
+    replan_period_s: FiniteFloat | None = Field(default=None,gt=0,
+        description='Re-solve after this many seconds, executing successive accepted plan inputs on the task control grid between solves. None solves every control interval.')
     substeps: int = Field(default=1,ge=1,le=16)
     tracking_weight: FiniteFloat = Field(default=1.,gt=0)
     terminal_weight: FiniteFloat = Field(default=10.,gt=0)
@@ -1049,6 +1051,12 @@ class GVSTrajectoryParameters(Contract):
     max_iterations: int = Field(default=120,ge=1,le=1000)
     tolerance: FiniteFloat = Field(default=1e-6,gt=0)
     evaluation_threads: int = Field(default=1,ge=1,le=8)
+
+    def replan_steps(self, period_s):
+        ratio=(self.replan_period_s or period_s)/period_s
+        if abs(ratio-round(ratio))>1e-8 or not 1<=round(ratio)<=self.horizon:
+            raise ValueError('REPLAN_PERIOD_REQUIRES_ALIGNED_CONTROL_GRID_AND_COVERING_HORIZON')
+        return round(ratio)
 
 
 class SorosimSolver(Contract):

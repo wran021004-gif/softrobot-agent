@@ -243,6 +243,9 @@ def generate_candidate(host,request,provenance,*,screening_fidelity=None):
                         if key not in control[field] and key in GVSTrajectoryParameters.model_fields:
                             control[field][key]=GVSTrajectoryParameters.model_fields[key].default
                 if edits:control[field]=patch(control[field],edits)
+        if (spec.get('nmpc_replan_period_s') is not None and
+                cfg['policy']['controller']['parameters']['data']['recipe'].get('replan_period_s')!=spec['nmpc_replan_period_s']):
+            raise ValueError('FROZEN_STUDY_NMPC_REPLAN_PERIOD')
         initial={f:{j:0. for j in physics['dofs']} for f in ('qpos_rad','qvel_rad_s')};initial['unspecified']='zero'
         cfg['task']['initializer']['parameters']['data']=initial
         cfg=plain(SessionInput.model_validate(cfg))

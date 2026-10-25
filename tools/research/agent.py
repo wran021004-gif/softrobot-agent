@@ -864,6 +864,7 @@ def decision_packet(host):
             evaluation_profile={k:s['profile'][k] for k in ('identity','version')},
             implementation_migration=s.get('core_repairs',[])[-1] if s.get('core_repairs') else None,
             controller_capabilities=dict(recipe_defaults=spec['configuration']['policy']['controller']['parameters']['data']['recipe'],
+                frozen_replan_period_s=spec.get('nmpc_replan_period_s'),
                 task_reference=task_adapter(spec['configuration']).control_reference(),
                 parameter_schema=host.reg.get(spec['configuration']['policy']['controller']['extension_id'],
                     spec['configuration']['policy']['controller']['version'],'controller').input_schema.model_json_schema(),

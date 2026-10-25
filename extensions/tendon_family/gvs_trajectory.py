@@ -14,6 +14,14 @@ from .gvs_casadi import expression_from_system, functions_for
 from .pcc import quaternion_wxyz_to_rotation
 _FUNCTION_PROVIDER = ContextVar('gvs_trajectory_function_provider', default=None)
 
+
+def shifted_warm_plan(source, intervals, substeps, horizon):
+    """Shift executed controls, padding only a numerical guess with the last value."""
+    X=np.asarray(source['states']);U=np.asarray(source['tensions'])
+    sx=min(intervals*substeps,len(X)-1);su=min(intervals,len(U))
+    return dict(states=np.concatenate([X[sx:],np.repeat(X[-1:],horizon*substeps+1,axis=0)])[:horizon*substeps+1].tolist(),
+        tensions=np.concatenate([U[su:],np.repeat(U[-1:],horizon,axis=0)])[:horizon].tolist())
+
 @contextmanager
 def use_trajectory_functions(provider):
     """Execution-scoped experimental evaluator; default production is unchanged."""
@@ -299,7 +307,7 @@ class TrajectoryWorkspace:
                     velocities_m_s=velocities.tolist(), local_progress=local,
                     horizon_is_task_deadline=False if local is not None else None)
 
-    def solve(self, measured_x, previous_u, warm=None, *, elapsed_s=None):
+    def solve(self, measured_x, previous_u, warm=None, *, elapsed_s=None, executed_intervals=1):
         update_start = time.perf_counter()
         prediction_timing = (self._set_reference(measured_x, 0. if elapsed_s is None else elapsed_s)
                              if self.tracking else self._set_prediction_time(elapsed_s))
@@ -316,10 +324,11 @@ class TrajectoryWorkspace:
         if source is not None:
             X = np.asarray(source['states'])
             U = np.asarray(source['tensions'])
-            s = 0 if warm is not None else self.parameters.substeps
+            shifted=0 if warm is not None else executed_intervals
+            s = min(shifted*self.parameters.substeps,len(X)-1)
             if s:
-                X = np.concatenate([X[s:], np.repeat(X[-1:], s, axis=0)])
-                U = np.concatenate([U[1:], U[-1:]])
+                aligned=shifted_warm_plan(source,shifted,self.parameters.substeps,self.parameters.horizon)
+                X=np.asarray(aligned['states']);U=np.asarray(aligned['tensions'])
                 if not self.parameters.regenerate_warm_states:
                     for k in range(len(X) - s, len(X)):
                         X[k], diagnostic = self._extend_tail(X[k - 1], U[-1])
@@ -372,6 +381,8 @@ class TrajectoryWorkspace:
         X = np.array([[values[f'x/{k}/{j}'] * self.state_scales[j] for j in range(2 * self.n)] for k in range(steps + 1)])
         U = np.array([[values[f'u/{k}/{t}'] for t in self.tendons] for k in range(self.parameters.horizon)])
         output = dict(states=X.tolist(), tensions=U.tolist(), result=result.model_dump(mode='json'), prediction_timing=prediction_timing, decision_state_scales=self.state_scales.tolist(), diagnostics=self.solver.last_diagnostics, total_s=total, graph_s=self.graph_s, recovery=recovery, warm_start=dict(executed_intervals=int(source is not None and warm is None), root_settings=dict(abstol=self.parameters.root_tolerance, max_iterations=30, error_on_fail=True), preparation_s=preparation_s, regenerated_all_states=self.parameters.regenerate_warm_states, seed_settled=seed_settled, tail_initialization=tails), nominal_operating_state=self.nominal_x, measured_initial_state=list(measured_x), previous_tensions_n=list(previous_u), period_s=self.period, substeps=self.parameters.substeps, integration=self.parameters.integration_method, stopping_policy=self.parameters.stopping_policy, cost='Stage weights per second on squared tip/position scale, curvature rate/(1 rad/(m*s)), tension/(1 N) and delta tension/(1 N); terminal weights on squared tip/position scale, curvature rate and world tip speed/speed scale. Optional holding speed cost starts at max(0, task duration minus settling window minus holding_brake_lead_s), using absolute prediction-node times. Acceptance timing is unchanged. Position scale defaults to task tolerance. Smoothing is a design penalty.', cost_scales=dict(position_m=self.parameters.position_error_scale_m or self.goal_tolerance, tip_speed_m_s=self.parameters.tip_speed_scale_m_s))
+        output['warm_start']['executed_intervals']=(0 if source is None else
+            source.get('shifted_executed_intervals',0) if warm is not None else executed_intervals)
         accepted = result.status in ('converged', 'iteration_limit', 'feasible_early_stop') and result.constraint_violation <= 1e-05
         output['accepted'] = accepted
         output['optimization_converged'] = result.status == 'converged'

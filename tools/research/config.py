@@ -142,6 +142,7 @@ def resolve(path, profile=None, *, backend_profile=None):
     local_search=study.pop('local_control_search',None)
     native_limits=study.pop('native_control_limits',None)
     first_strategy=study.pop('initial_structure_strategy',None)
+    replan_period=study.pop('nmpc_replan_period_s',None)
     family_mode=study.get('start_mode')=='family_space'
     additions={key:study.pop(key) for key in ('fidelity_policy','family_search') if key in study}
     if family_mode:
@@ -318,6 +319,11 @@ def resolve(path, profile=None, *, backend_profile=None):
     if not provider.get('base_url') or not provider.get('model'):
         raise ValueError('EXPLICIT_PROVIDER_REQUIRED')
     controller = deepcopy(control['controller_defaults'])
+    if replan_period is not None:
+        if controller['extension_id']!='controller.gvs_nmpc':
+            raise ValueError('GVS_NMPC_REPLAN_PERIOD_REQUIRED')
+        controller['parameters']['data']['recipe']['replan_period_s']=replan_period
+        study['nmpc_replan_period_s']=replan_period
     controller['parameters']['data']['settling'] = deepcopy(task['settling'])
     for name in ('holding_tip_speed_weight', 'terminal_tip_speed_weight'):
         controller['parameters']['data']['recipe'][name] = study['reference_parameters'][name]
@@ -354,6 +360,9 @@ def resolve(path, profile=None, *, backend_profile=None):
     from extensions.tendon_family.contracts import current_nmpc_recipe, MujocoParameters
     data = ReachControl.model_validate(cfg['policy']['controller']['parameters']['data']).model_dump(mode='json')
     data['recipe'] = current_nmpc_recipe(data['recipe'])
+    if replan_period is not None:
+        from extensions.tendon_family.contracts import GVSTrajectoryParameters
+        GVSTrajectoryParameters.model_validate(data['recipe']).replan_steps(cfg['task']['timing']['control_period_s'])
     cfg['policy']['controller']['parameters']['data'] = data
     cfg['policy']['backend']['parameters']['data'] = MujocoParameters.model_validate(
         cfg['policy']['backend']['parameters']['data']).model_dump(mode='json')

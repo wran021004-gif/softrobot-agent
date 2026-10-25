@@ -7,7 +7,7 @@ from .contracts import ResolvedGVSBasis
 from .control import execute_ideal_tension
 from .gvs_basis import resolve_basis
 from .gvs_projection import description
-from .gvs_trajectory import GVSTrajectoryParameters, TrajectoryWorkspace
+from .gvs_trajectory import GVSTrajectoryParameters, TrajectoryWorkspace, shifted_warm_plan
 
 _WORKSPACES={}
 _SEEDS={}
@@ -35,6 +35,8 @@ def resolve_gvs_nmpc_control(inp,physics):
             max_wall_s=None,
             external_watchdog='Enclosing execution interruption is incomplete/timeout, never a successful timed command'),
         timing=dict(period_s=inp.task.timing.control_period_s,prediction_interval_s=inp.task.timing.control_period_s,
+            replan_period_s=(p.replan_period_s or inp.task.timing.control_period_s),
+            executed_intervals_per_plan=p.replan_steps(inp.task.timing.control_period_s),
             physics_step_s=inp.task.timing.timestep_s,observation='interval_start_pre_step'),
         plan_acceptance='Independently feasible converged, iteration-limited or intentional early-stop plans. Early stops are suboptimal, not convergence or solver errors; raw termination is retained.',
         failure_response='Hold last bounded tension on an unusable solve (clipped nominal initially); stop after max_unusable_updates consecutive unusable updates. Every applied hold is recorded.')
@@ -73,12 +75,55 @@ class GVSNMPCController:
         self.workspace.last=self.seed
         self.observations=[];self.last={};self.u=None;self.unusable_updates=0;self.stop_requested=False
         self.control_snapshots=[]
+        self.replan_steps=self.parameters.replan_steps(self.period_s)
+        self.cached_plan=None;self.last_solve_time=None;self.cached_update_id=None
         from .control_evidence import RECORD_UPDATE_IDS
         self.record_update_ids=RECORD_UPDATE_IDS.get()
+
+    def cached_index(self,t):
+        if self.cached_plan is None:return None
+        step=(t-self.last_solve_time)/self.period_s
+        if abs(step-round(step))>1e-7:raise ValueError('CACHED_PLAN_CONTROL_GRID_MISMATCH')
+        step=round(step)
+        return step if 1<=step<min(self.replan_steps,len(self.cached_plan['tensions'])) else None
+
+    def executed_intervals(self,t):
+        return 0 if self.last_solve_time is None else round((t-self.last_solve_time)/self.period_s)
+
+    def record_prediction(self,solved,index,t,command,q,source):
+        if self.workspace.tracking or 'settling' in self.plan:
+            node=(index+1)*self.parameters.substeps
+            predicted=np.asarray(solved['states'][node])
+            tip,velocity=self.workspace._motion(predicted[:len(q)],predicted[len(q):])
+            self.last['one_step_prediction']=dict(time_s=t+self.period_s,state=predicted.tolist(),
+                tip_position_m=np.asarray(tip).ravel().tolist(),tip_velocity_m_s=np.asarray(velocity).ravel().tolist(),
+                frame='world',prediction_source=source,applied_tension_n=list(command),
+                integration=self.parameters.integration_method,substeps=self.parameters.substeps,
+                source_update_id=self.cached_update_id,plan_control_index=index)
 
     def command(self,t,geometry,q,v):
         start=time.perf_counter();x=np.r_[q,v];error=None;solved=None
         update_id=len(self.observations)
+        cached_index=self.cached_index(t)
+        if cached_index is not None:
+            command,bridge=execute_ideal_tension(self.physics,self.cached_plan['tensions'][cached_index])
+            self.previous=np.asarray(command).copy()
+            self.last={**bridge,'fresh_solve':False,'plan_accepted':True,'solver_failed':False,
+                'solver_outcome':'cached_plan_step','optimization_nonconverged':None,
+                'failure_response_used':False,'unusable_updates':self.unusable_updates,'stop_requested':False,
+                'plan_source':'previous_accepted_plan','reused_plan':dict(source_update_id=self.cached_update_id,
+                    source_time_s=self.last_solve_time,control_index=cached_index,
+                    scope='Previously accepted prediction; not a fresh solve or feasibility check at the current measurement'),
+                'gvs_projection_residual_max_rad_m':geometry['gvs_projection']['projection_residual_max_rad_m']}
+            self.record_prediction(self.cached_plan,cached_index,t,command,q,'previous_accepted_plan')
+            elapsed=time.perf_counter()-start
+            self.last.update(update_wall_s=elapsed,deadline_missed=elapsed>self.period_s)
+            self.observations.append(dict(time_s=t,phase='current_state_before_integration',
+                tip_position_m=geometry['tip'].tolist(),gvs_q=list(q),gvs_qdot=list(v),
+                measured_initial_state=x.tolist(),**self.last))
+            return command
+        executed=self.executed_intervals(t)
+        self.cached_plan=None
         self.workspace.solver.diagnostic_trace=update_id in self.record_update_ids
         from .control_evidence import COMPLETE_UPDATE_INPUTS
         self.workspace.solver.complete_record=COMPLETE_UPDATE_INPUTS.get()
@@ -92,11 +137,13 @@ class GVSNMPCController:
                 source_kind='explicit' if self.seed is not None else 'workspace_last',
                 controller_identity=self.plan['identity'])
         try:
-            solved=self.workspace.solve(x,self.previous,warm=self.seed,elapsed_s=t)
+            solved=self.workspace.solve(x,self.previous,warm=self.seed,elapsed_s=t,executed_intervals=executed)
             success=solved['accepted']
         except (RuntimeError,ValueError) as exc:
             success=False;error=str(exc)
         self.seed=None
+        self.last_solve_time=t
+        if success:self.cached_plan=solved;self.cached_update_id=update_id
         self.unusable_updates=0 if success else self.unusable_updates+1
         self.stop_requested=self.unusable_updates>=self.parameters.max_unusable_updates
         requested=np.asarray(solved['tensions'][0]) if success else self.previous.copy()
@@ -107,7 +154,8 @@ class GVSNMPCController:
         outcome=('numerical_error' if error else 'unusable_solve' if not success else
             'acceptable_convergence' if raw_status=='Solved_To_Acceptable_Level' else
             'convergence' if converged else 'iteration_limit_feasible' if solved['result']['status']=='iteration_limit' else 'feasible_early_stop')
-        self.last={**bridge,'plan_accepted':success,'solver_failed':not success,'solver_outcome':outcome,
+        self.last={**bridge,'fresh_solve':True,'executed_intervals_since_solve':executed,
+            'plan_accepted':success,'solver_failed':not success,'solver_outcome':outcome,
             'optimization_nonconverged':not converged,'failure_response_used':not success and not self.stop_requested,
             'feasible_suboptimal_update':success and not converged,
             'solver_error':error,'optimization_status':None if solved is None else solved['result']['status'],
@@ -130,13 +178,7 @@ class GVSNMPCController:
             'optimization_raw_status':None if solved is None else solved['diagnostics']['return_status'],
             'unusable_updates':self.unusable_updates,'stop_requested':self.stop_requested,
             'gvs_projection_residual_max_rad_m':geometry['gvs_projection']['projection_residual_max_rad_m']}
-        if success and (self.workspace.tracking or 'settling' in self.plan):
-            node=self.parameters.substeps
-            predicted=np.asarray(solved['states'][node])
-            tip,velocity=self.workspace._motion(predicted[:len(q)],predicted[len(q):])
-            self.last['one_step_prediction']=dict(time_s=t+self.period_s,state=predicted.tolist(),
-                tip_position_m=np.asarray(tip).ravel().tolist(),tip_velocity_m_s=np.asarray(velocity).ravel().tolist(),
-                frame='world',prediction_source='accepted_plan',applied_tension_n=list(command),integration=self.parameters.integration_method,substeps=node)
+        if success:self.record_prediction(solved,0,t,command,q,'accepted_plan')
         self.observations.append(dict(time_s=t,phase='current_state_before_integration',
             tip_position_m=geometry['tip'].tolist(),gvs_q=list(q),gvs_qdot=list(v),
             measured_initial_state=x.tolist(),graph_construction_s=self.workspace.graph_s,**self.last))
@@ -203,14 +245,15 @@ class DeadlineReachNMPCController(ReachNMPCController):
     Graph construction remains part of complete-update timing.
     """
     def command(self,t,geometry,q,v):
+        if self.cached_index(t) is not None:
+            return super().command(t,geometry,q,v)
         start=time.perf_counter()
         horizon=deadline_horizon(self.workspace.duration,t,self.period_s,self.parameters.horizon)
         if horizon!=self.workspace.parameters.horizon:
             old=self.workspace;source=self.seed if self.seed is not None else old.last
-            shift=0 if self.seed is not None else self.parameters.substeps
-            seed=None if source is None else dict(
-                states=source['states'][shift:shift+horizon*self.parameters.substeps+1],
-                tensions=source['tensions'][int(bool(shift)):int(bool(shift))+horizon])
+            shift=0 if self.seed is not None else self.executed_intervals(t)
+            seed=None if source is None else shifted_warm_plan(source,shift,self.parameters.substeps,horizon)
+            if seed is not None:seed['shifted_executed_intervals']=shift
             parameters=self.parameters.model_copy(update={'horizon':horizon})
             self.workspace=TrajectoryWorkspace(TaskDefinition.model_validate(self.plan['task']),
                 RobotDescription.model_validate(self.plan['robot']),parameters,

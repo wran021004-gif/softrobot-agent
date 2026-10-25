@@ -200,6 +200,8 @@ def checked_control(inp, *, execution=True):
     elif control.settling is None:
         raise ValueError('REACH_SETTLING_REQUIRED')
     timing=inp.task.timing
+    if inp.policy.controller.extension_id=='controller.gvs_nmpc':
+        control.recipe.replan_steps(timing.control_period_s)
     grid = [timing.duration_s/timing.control_period_s,timing.control_period_s/timing.timestep_s]
     if control.settling is not None:
         grid.append(control.settling.window_s/timing.sample_period_s)

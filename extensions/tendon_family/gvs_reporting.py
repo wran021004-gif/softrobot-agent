@@ -38,6 +38,7 @@ def summarize(task, result, evaluation, rows, observations, motion, limits, sett
     window = [r for r in motion if r['time_s'] >= duration - acceptance.window_s - 1e-09]
     expected = round(acceptance.window_s / task.timing.sample_period_s) + 1
     available = complete and len(window) == expected and (len(motion) == len(rows))
+    solves=[o for o in observations if o.get('fresh_solve',True)]
 
     def values(key):
         return [o[key] for o in observations if o.get(key) is not None]
@@ -61,19 +62,21 @@ def summarize(task, result, evaluation, rows, observations, motion, limits, sett
         sampled_settling=dict(available=available, passed=all((r['tip_error_m'] <= acceptance.position_limit_m and r['tip_speed_m_s'] <= acceptance.speed_limit_m_s for r in window)) if available else None, **plain(acceptance), continuous_time_guarantee=False, max_error_m=max((r['tip_error_m'] for r in window)) if available else None, max_speed_m_s=max((r['tip_speed_m_s'] for r in window)) if available else None),
         updates=len(observations),
         applied_control_updates=sum((o.get('actual_tension_n') is not None for o in observations)),
-        accepted_plans=sum((o.get('plan_accepted', o.get('optimization_constraint_violation') is not None and o['optimization_constraint_violation'] <= 1e-05 and (not o.get('stop_requested', False)) and (not o.get('failure_response_used', False))) for o in observations)),
-        optimization_status_counts=dict(Counter((o.get('optimization_status') or 'unavailable' for o in observations))),
-        raw_termination_counts=dict(Counter((o.get('optimization_raw_status') or 'unavailable' for o in observations))),
-        initialization_selected=sum((o.get('optimization_selected_iteration') in (-1, 0) for o in observations)),
-        recovered_plans=sum((o.get('plan_source') == 'reintegrated_returned_iterate' for o in observations)),
-        recovery_attempts=sum((bool((o.get('feasibility_recovery') or {}).get('attempted')) for o in observations)),
-        recovery_failures=sum((bool((o.get('feasibility_recovery') or {}).get('error')) for o in observations)),
-        recovery_root_solves=sum(((o.get('feasibility_recovery') or {}).get('root_solve_attempts', 0) for o in observations)),
-        other_feasible_deliveries=sum((bool(o.get('plan_accepted')) and o.get('plan_source') != 'reintegrated_returned_iterate' for o in observations)),
-        accepted_noninitialization_plans=sum((bool(o.get('plan_accepted')) and (o.get('plan_source') == 'reintegrated_returned_iterate' or (o.get('optimization_selected_iteration') is not None and o['optimization_selected_iteration'] > 0)) for o in observations)),
-        converged_updates=sum((not o['optimization_nonconverged'] for o in observations)),
-        early_stopped_plans=sum((o.get('optimization_status') == 'feasible_early_stop' for o in observations)),
-        unusable_plans=sum((not o.get('plan_accepted', False) for o in observations)),
+        actual_solver_calls=len(solves),
+        cached_control_intervals=len(observations)-len(solves),
+        accepted_plans=sum((o.get('plan_accepted', o.get('optimization_constraint_violation') is not None and o['optimization_constraint_violation'] <= 1e-05 and (not o.get('stop_requested', False)) and (not o.get('failure_response_used', False))) for o in solves)),
+        optimization_status_counts=dict(Counter((o.get('optimization_status') or 'unavailable' for o in solves))),
+        raw_termination_counts=dict(Counter((o.get('optimization_raw_status') or 'unavailable' for o in solves))),
+        initialization_selected=sum((o.get('optimization_selected_iteration') in (-1, 0) for o in solves)),
+        recovered_plans=sum((o.get('plan_source') == 'reintegrated_returned_iterate' for o in solves)),
+        recovery_attempts=sum((bool((o.get('feasibility_recovery') or {}).get('attempted')) for o in solves)),
+        recovery_failures=sum((bool((o.get('feasibility_recovery') or {}).get('error')) for o in solves)),
+        recovery_root_solves=sum(((o.get('feasibility_recovery') or {}).get('root_solve_attempts', 0) for o in solves)),
+        other_feasible_deliveries=sum((bool(o.get('plan_accepted')) and o.get('plan_source') != 'reintegrated_returned_iterate' for o in solves)),
+        accepted_noninitialization_plans=sum((bool(o.get('plan_accepted')) and (o.get('plan_source') == 'reintegrated_returned_iterate' or (o.get('optimization_selected_iteration') is not None and o['optimization_selected_iteration'] > 0)) for o in solves)),
+        converged_updates=sum((not o['optimization_nonconverged'] for o in solves)),
+        early_stopped_plans=sum((o.get('optimization_status') == 'feasible_early_stop' for o in solves)),
+        unusable_plans=sum((not o.get('plan_accepted', False) for o in solves)),
         policy_stop_reason_counts=dict(Counter((o['policy_stop_reason'] for o in observations if o.get('policy_stop_reason')))),
         execution_failure_reason=result['data']['data'].get('reason'),
         solver_error_count=sum((o.get('solver_error') is not None for o in observations)),
@@ -117,7 +120,7 @@ def summarize(task, result, evaluation, rows, observations, motion, limits, sett
         summary['motion_summary'] = motion_summary(motion, None if not complete else (np.asarray(rows[-1]['tip_m']) - task.goal.data['target_m']).tolist(), duration, acceptance.window_s, task.evaluator.parameters.data['tolerance_m'])
     comparisons, missing = aligned_predictions(rows, observations, motion)
     summary['one_step_prediction_comparisons'] = comparisons
-    summary['one_step_prediction_summary'] = dict(aligned_count=len(comparisons), missing=missing, maximum_tip_difference_m=max((r['tip_difference_m'] for r in comparisons), default=None), mean_tip_difference_m=float(np.mean([r['tip_difference_m'] for r in comparisons])) if comparisons else None, velocity_matched_count=sum((r.get('velocity_difference_m_s') is not None for r in comparisons)), velocity_missing=[dict(time_s=r['start_s'], reason=r['velocity_missing_reason']) for r in comparisons if r.get('velocity_missing_reason')], maximum_velocity_vector_difference_m_s=max((r['velocity_difference_m_s'] for r in comparisons if r.get('velocity_difference_m_s') is not None), default=None), maximum_speed_magnitude_difference_m_s=max((r['speed_magnitude_difference_m_s'] for r in comparisons if r.get('speed_magnitude_difference_m_s') is not None), default=None), frame='world', scope='Only accepted first-step predictions matched to next execution timestamp; no future-plan replay comparison')
+    summary['one_step_prediction_summary'] = dict(aligned_count=len(comparisons), missing=missing, maximum_tip_difference_m=max((r['tip_difference_m'] for r in comparisons), default=None), mean_tip_difference_m=float(np.mean([r['tip_difference_m'] for r in comparisons])) if comparisons else None, velocity_matched_count=sum((r.get('velocity_difference_m_s') is not None for r in comparisons)), velocity_missing=[dict(time_s=r['start_s'], reason=r['velocity_missing_reason']) for r in comparisons if r.get('velocity_missing_reason')], maximum_velocity_vector_difference_m_s=max((r['velocity_difference_m_s'] for r in comparisons if r.get('velocity_difference_m_s') is not None), default=None), maximum_speed_magnitude_difference_m_s=max((r['speed_magnitude_difference_m_s'] for r in comparisons if r.get('speed_magnitude_difference_m_s') is not None), default=None), frame='world', scope='Accepted-plan predictions matched to the next executed interval and actual input. Cached steps originate at an earlier solve, without a fresh current-state feasibility check.')
     invalid=[r for r in missing if 'shape invalid' in r['reason']]
     diagnostic=summary['one_step_prediction_summary'];diagnostic['available']=bool(comparisons) and not invalid
     if invalid:
@@ -156,6 +159,8 @@ def aligned_predictions(rows, observations, motion=None):
             else:
                 r=following[0]
                 comparison=dict(start_s=o['time_s'],end_s=pred['time_s'],frame='world',
+                    prediction_source=pred.get('prediction_source','accepted_plan'),
+                    source_update_id=pred.get('source_update_id'),plan_control_index=pred.get('plan_control_index',0),
                     applied_input_difference_n=difference,applied_tension_n=pred['applied_tension_n'],
                     predicted_tip_m=pred['tip_position_m'],measured_tip_m=r['tip_m'],
                     tip_difference_m=float(np.linalg.norm(np.asarray(pred['tip_position_m'])-r['tip_m'])))
