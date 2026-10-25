@@ -131,8 +131,10 @@ class C3ContinuityTests(unittest.TestCase):
             physical=a.artifact(s['physical_replays'][0]);source_ref=physical['source_reference']
             source=a.artifact(source_ref);raw=a.artifact(physical['raw_reference'])
             source['mathematical_outputs']=dict(times_s=source['trajectory']['times_s'],
+                model_identity=source['trajectory']['model_identity'],
                 tip_positions_m=[v['tip_m'] for v in raw['samples']],tip_velocities_m_s=[v['tip_velocity_m_s'] for v in raw['samples']])
-            physical['comparison'].update(aligned=True,samples=[dict(fixture_only=True)])
+            physical['comparison'].update(aligned=True,available_samples=len(raw['samples']),
+                samples=[dict(fixture_only=True) for _ in raw['samples']])
             original=h.store.artifact.side_effect
             h.store.artifact.side_effect=lambda r,raw=False:deepcopy(source) if r==source_ref else deepcopy(physical) if r==s['physical_replays'][0] else original(r,raw=raw)
             self.assertEqual(diagnostic_relations(h,ref)['relations'][0]['status'],'comparable')
@@ -147,6 +149,21 @@ class C3ContinuityTests(unittest.TestCase):
         update(h,numerical_s=state(h)['numerical_s']+1)
         after=read_evidence(h,q)
         self.assertNotEqual(before['source_state_identity'],after['source_state_identity'])
+
+    def test_handoff_original_pointer_survives_protected_closeout_without_select_credit(self):
+        from tests.research.test_s125_contract import cold_host
+        from tools.research.core import read_evidence
+        from tools.research.state import state, update, save
+        h=cold_host();before=state(h).get('evaluation_reads',[])
+        feedback=save(h,dict(result=dict(status='success',content=[dict(text='Explicit read-only fixture')])),
+            'explicit_original_feedback_fixture')
+        prep=save(h,dict(pending_feedback_delivery=dict(items=[dict(feedback_reference=feedback)])),
+            'explicit_handoff_projection_fixture')
+        pilot=deepcopy(state(h)['pilot']);pilot['handoff']=prep;update(h,pilot=pilot)
+        with patch('tools.research.core.protected',return_value=True):
+            value=read_evidence(h,dict(reference=feedback,view='full',pointer='/result'))
+        self.assertEqual(value['status'],'success')
+        self.assertEqual(state(h).get('evaluation_reads',[]),before)
 
     def test_recorded_real_radius_fixture_without_new_solves(self):
         path=ROOT/'evidence/c3_f1_f2/math/immutable_artifacts.tar.gz'

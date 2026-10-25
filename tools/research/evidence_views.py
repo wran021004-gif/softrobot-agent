@@ -36,6 +36,11 @@ def diagnostic_relations(host, reference):
     math=[(r,v) for r,v in mathematics if v.get('candidate')==candidate and v.get('trajectory')][-3:]
     physics=[(r,host.store.artifact(r)) for r in [*s.get('physical_replays',[]),*s.get('results',[])]]
     physics=[(r,v) for r,v in physics if v.get('candidate')==candidate][-6:]
+    selected_physics=next((row for row in physics if row[0]==reference),physics[-1] if physics else None)
+    if physics:
+        # Keep the original mathematical-control replay plus the requested/latest
+        # result, rather than repeating every historical search perturbation.
+        physics=list({r['artifact_id']:(r,v) for r,v in [physics[0],selected_physics,physics[-1]]}.values())
     relations=[]
     for mr,m in math:
         tr=m['trajectory'];grid=tr.get('horizon',{});model=m.get('model',{})
@@ -53,13 +58,15 @@ def diagnostic_relations(host, reference):
                     all(v.get('actual_tension_n')==u for v,u in zip(samples[1:],commands.get('tensions_n',[]))),
                 time_grid=bool(samples) and len(samples)==len(commands.get('times_s',[])) and
                     all(abs(v['time_s']-t)<=m['protocol']['horizon_alignment_atol_s'] for v,t in zip(samples,commands.get('times_s',[]))),
-                initial_state=bool(samples) and all(v==0 for k in ('qpos_rad','qvel_rad_s') for v in samples[0].get(k,[]))
+                initial_state=bool(samples) and m.get('operating_point',{}).get('actual_time_s')==samples[0]['time_s']
+                    and all(v==0 for k in ('qpos_rad','qvel_rad_s') for v in samples[0].get(k,[]))
                     and bool(samples[0].get('qpos_rad')) and all(v==0 for v in model.get('x0',[]))
                     and bool(model.get('x0')) and all(v==0 for v in tr.get('initial_delta_state',[])),
                 saved_prediction_samples=bool(samples) and all(len(prediction.get(k,[]))==len(samples)
                     for k in ('times_s','tip_positions_m','tip_velocities_m_s')) and
-                    prediction.get('times_s')==commands.get('times_s'),
-                recorded_aligned_difference=bool(p.get('comparison',{}).get('aligned')),
+                    prediction.get('times_s')==commands.get('times_s') and prediction.get('model_identity')==commands.get('model_identity'),
+                recorded_aligned_difference=bool(p.get('comparison',{}).get('aligned')) and
+                    p['comparison'].get('available_samples')==len(samples)==len(p['comparison'].get('samples',[])),
                 numerical_replay=bool(tr.get('replay',{}).get('numerically_valid')))
             aligned=all(checks.values())
             aggregates={}
@@ -73,6 +80,9 @@ def diagnostic_relations(host, reference):
                 task_identity=digest(cfg['task']),task_requirements=dict(reference=mr,pointer='/task_analysis'),
                 mathematical_model_identity=model.get('binding',{}).get('model_identity'),physical_model_identity=raw.get('execution_model_identity',p.get('model_identity')),
                 method=tr.get('method_version'),control_source=p.get('source_reference'),
+                solver=dict(status=tr.get('solver',{}).get('status'),optimality=tr.get('optimality_status'),
+                    support_gap=tr.get('dual_checks',{}).get('replayed_support_gap')),
+                physical_validity=p.get('acceptance',{}).get('status'),independent_physical_observation=True,
                 control_sequence_identity=digest(commands) if commands else None,tendon_order=commands.get('tendon_order'),
                 initial_state=dict(mathematics=dict(reference=mr,pointer='/model/x0'),physics=dict(reference=measurement.get('reference'),pointer='/samples/0' if p.get('raw_reference') else '/0')),
                 operating_point=m.get('operating_point'),time_scope=grid,alignment=checks,
@@ -84,6 +94,12 @@ def diagnostic_relations(host, reference):
     for (lr,l),(rr,r) in zip(physics,physics[1:]):
         relations.append(dict(kind='same_candidate_different_controllers',status='descriptive_comparison',left=lr,right=rr,
             candidate=candidate,task_identity=digest(cfg['task']),
+            structure_identity=c.get('physical_design_identity',c['identity']),
+            task_conditions=task_adapter(cfg).condition_view(),time_grid=cfg['task']['timing'],
+            model_sources=[v.get('model_identity',v.get('scientific_identity')) for v in (l,r)],
+            initial_conditions=dict(configuration=c['configuration_reference'],pointer='/task/initializer'),
+            tendon_order=[t['id'] for t in cfg['robot']['structure']['data']['tendons']],
+            numerical_validity=[v.get('acceptance',{}).get('status') for v in (l,r)],
             controls=[l.get('source_reference',lr),r.get('source_reference',rr)],
             physical_aggregates=[v.get('acceptance',{}).get('metrics') for v in (l,r)],
             unsupported_conclusions=['GVS/MuJoCo model error','Single-factor causal attribution']))
@@ -102,7 +118,8 @@ def diagnostic_relations(host, reference):
                 candidates=[l['candidate'],candidate],resolution=recorded_score_resolution(l,m),
                 changed_parameters=recorded_changes(host.store.artifact(l['candidate'])['parameters'],c['parameters']),
                 verified_constraints=[dict(reference=r,pointer='/trajectory/coverage') for r in (lr,mr)],
-                independent_physical_support=[r for r,v in physics],
+                independent_physical_support=dict(left=[r for r in [*s.get('physical_replays',[]),*s.get('results',[])]
+                    if host.store.artifact(r).get('candidate')==l['candidate']],right=[r for r,v in physics]),
                 causal_attribution='Unavailable: independently reoptimized control and distinct structures'))
     diagnosis=None
     chosen=next(((r,v) for r,v in physics if r==reference),physics[-1] if physics else None)

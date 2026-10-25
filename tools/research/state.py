@@ -33,6 +33,9 @@ def readable_results(s, host=None):
             replay=host.store.artifact(ref)
             linked += [replay[k] for k in ('source_reference','raw_reference','evaluation_reference') if replay.get(k)]
     if host:
+        if s.get('pilot',{}).get('handoff'):
+            preparation=host.store.artifact(s['pilot']['handoff'])
+            linked += [r['feedback_reference'] for r in preparation.get('pending_feedback_delivery',{}).get('items',[])]
         from extensions.tendon_family.control_evidence import ControlEvidence
         for ref in s.get('results',[]):
             result=host.store.artifact(ref)

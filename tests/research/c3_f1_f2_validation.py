@@ -117,7 +117,8 @@ def mathematics():
 def continuity(restore=False):
     from tests.research.agent_math_decision_probe import provider_usage
     if restore:
-        name='c3-f1-live-20261025';h=SimpleNamespace(store=Store(ROOT/'runs/research'/name),run_id=name)
+        from tools.platform_host import Host
+        name='c3-f1-live-20261025';h=Host(ROOT/'runs/research'/name,name,actor='unified-research')
         asyncio.run(converse(h,session_handoff=True,restore_only=True));core.export(h);return provider_usage(h)
     old=historical_host();s=state(old);ref=s['results'][-1];p=old.store.artifact(ref)
     excerpt=dict(kind='historical_scoped_evidence',owning_study=old.run_id,original_reference=ref,
