@@ -1,0 +1,139 @@
+{
+  "status": "prepared_bound_pending_explicit_approval",
+  "drafts": [
+    {
+      "arm": "b",
+      "study_id": "b3-t2-050-b-v2-draft",
+      "store_root": "D:\\softrobot-agent\\.worktrees\\b3-t2-guided-design\\runs\\research\\b3-t2-050-b-v2-draft",
+      "configuration": "configs\\research\\study_b3_t2_pilot_b_draft.json",
+      "resolved_identity": "4a623b709812f4787383e4386a7d0deaec9ed76cb370f11312951d323423f554",
+      "implementation": "dc773ea20aad9146a4f2080ec64b2d65b6b7d99f",
+      "research_status": "ready",
+      "authorization": "PENDING_EXPLICIT_APPROVAL: M1 prepare/bind only. No Provider, physics, NMPC, PPO or formal Study execution authorized.",
+      "formal_execution_gate": "INDEPENDENT_FORMAL_STUDY_APPROVAL_REQUIRED_BEFORE_PROVIDER_OR_SCIENCE",
+      "mathematical_methods": {
+        "sampled-affine-conic-minimax-v1": "PENDING_EXPLICIT_APPROVAL: proposed registered method, within the future Study total; no execution grant from readiness."
+      },
+      "family_sensitivity_variables": null,
+      "mathematical_evaluations": 0,
+      "candidate_count": 0,
+      "provider_requests": 0,
+      "independent_physical_executions": 0,
+      "nmpc": 0,
+      "ppo": 0,
+      "session_handoff_live_admitted": false,
+      "budget": {
+        "limit": {
+          "backend_solves": 4,
+          "model_calls": 32,
+          "tool_calls": 80,
+          "wall_s": null,
+          "worker_calls": 0
+        },
+        "used": {
+          "tool_calls": 0,
+          "model_calls": 0,
+          "backend_solves": 0,
+          "worker_calls": 0,
+          "wall_s": 0.0
+        },
+        "remaining": {
+          "backend_solves": 4,
+          "model_calls": 32,
+          "tool_calls": 80,
+          "wall_s": null,
+          "worker_calls": 0
+        },
+        "occupied": {}
+      },
+      "context_background_count": 3
+    },
+    {
+      "arm": "c",
+      "study_id": "b3-t2-050-c-v2-draft",
+      "store_root": "D:\\softrobot-agent\\.worktrees\\b3-t2-guided-design\\runs\\research\\b3-t2-050-c-v2-draft",
+      "configuration": "configs\\research\\study_b3_t2_pilot_c_draft.json",
+      "resolved_identity": "4de5e88479238e3e5f478d8251aaf2a6951ec7fa7d6d06f379aba15f93a03093",
+      "implementation": "dc773ea20aad9146a4f2080ec64b2d65b6b7d99f",
+      "research_status": "ready",
+      "authorization": "PENDING_EXPLICIT_APPROVAL: M1 prepare/bind only. No Provider, physics, NMPC, PPO or formal Study execution authorized.",
+      "formal_execution_gate": "INDEPENDENT_FORMAL_STUDY_APPROVAL_REQUIRED_BEFORE_PROVIDER_OR_SCIENCE",
+      "mathematical_methods": {
+        "controlled-capability-sensitivity-v1": "PENDING_EXPLICIT_APPROVAL: optional T2 for frozen continuous family variables; model preparation, internal CONIC and dual-face attempts all consume the total math budget.",
+        "sampled-affine-conic-minimax-v1": "PENDING_EXPLICIT_APPROVAL: proposed registered method, within the future Study total; no execution grant from readiness."
+      },
+      "family_sensitivity_variables": {
+        "variables": [
+          "segments.0.length_m",
+          "segments.0.young_pa",
+          "segments.1.length_m",
+          "segments.1.young_pa",
+          "spans.0.radius_m"
+        ],
+        "version": "family_sensitivity_v1"
+      },
+      "mathematical_evaluations": 0,
+      "candidate_count": 0,
+      "provider_requests": 0,
+      "independent_physical_executions": 0,
+      "nmpc": 0,
+      "ppo": 0,
+      "session_handoff_live_admitted": false,
+      "budget": {
+        "limit": {
+          "backend_solves": 4,
+          "model_calls": 32,
+          "tool_calls": 80,
+          "wall_s": null,
+          "worker_calls": 0
+        },
+        "used": {
+          "tool_calls": 0,
+          "model_calls": 0,
+          "backend_solves": 0,
+          "worker_calls": 0,
+          "wall_s": 0.0
+        },
+        "remaining": {
+          "backend_solves": 4,
+          "model_calls": 32,
+          "tool_calls": 80,
+          "wall_s": null,
+          "worker_calls": 0
+        },
+        "occupied": {}
+      },
+      "context_background_count": 3
+    }
+  ],
+  "worker_environment": {
+    "python": "D:\\softrobot-agent\\.worktrees\\s135-task-conditioned-control\\.s135-env\\Scripts\\python.exe",
+    "available": true,
+    "cvxpy": "1.9.3",
+    "clarabel": "0.11.1"
+  },
+  "actual_scientific_resources": {
+    "model_preparations": 0,
+    "conic_solves": 0,
+    "dual_face_solves": 0,
+    "mathematical_evaluations": 0,
+    "provider_requests": 0,
+    "independent_physical_executions": 0,
+    "nmpc": 0,
+    "ppo": 0,
+    "new_formal_agent_studies": 0
+  },
+  "earlier_unapproved_fixture_ids": {
+    "reason": "v1 IDs were occupied by initial zero-usage test prepares; retained without authority-index deletion or budget reset. All later tests use unique fixture project/grant IDs.",
+    "b": {
+      "study_id": "b3-t2-050-b-v1-draft",
+      "store": "runs/b3-t2-b-fixture-e209bb4c",
+      "mathematical_evaluations": 0
+    },
+    "c": {
+      "study_id": "b3-t2-050-c-v1-draft",
+      "store": "runs/b3-t2-fixture-e8fa0c5e",
+      "mathematical_evaluations": 0
+    }
+  }
+}

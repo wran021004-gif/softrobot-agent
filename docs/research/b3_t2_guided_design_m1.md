@@ -242,8 +242,14 @@ config.py、design.py、search.py、数学内核和旧封存文件不变；没�
 最终 prepare/bind、冻结身份、原账本零使用和无授权状态见
 [frozen_drafts.json](../../evidence/b3_t2_guided_design_m1/frozen_drafts.json)。
 
-实现提交及绑定信息在最终工程收口后补录；最终交付提交的完整 SHA、普通 push 后远端 HEAD 和树状态
-在交付消息核实，避免在所属提交中制造自引用 SHA。
+实现提交为 `dc773ea20aad9146a4f2080ec64b2d65b6b7d99f`，两份正式待授权草案已实际 prepare/bind 到该实现。
+B resolved_identity 为 `4a623b709812f4787383e4386a7d0deaec9ed76cb370f11312951d323423f554`；
+C 为 `4de5e88479238e3e5f478d8251aaf2a6951ec7fa7d6d06f379aba15f93a03093`。
+两个正式待授权 Store 位于 `runs/research/<上述 v2 study_id>`，候选、模型、分析结果、数学费用、
+Provider、物理、NMPC、PPO 和 pending reservation 均为零；只导入三个明确授权背景锚点，
+没有将其计为当前结果。Handoff live 标志仍为 false，真实 expensive guard 均按原授权错误拒绝。
+随后提交仅补报告与零使用冻结收据，不修改已绑定的科学实现或冻结 spec。
+最终交付提交的完整 SHA、普通 push 后远端 HEAD 和树状态在交付消息核实，避免自引用 SHA。
 
 ## 后续运行入口与停止边界
 
@@ -252,6 +258,15 @@ config.py、design.py、search.py、数学内核和旧封存文件不变；没�
 其他机器使用同一提交及配置从原 CLI prepare/bind；已有 Store 用原 recover/restore-only，不重建或清账。
 后续显式授权必须按原 resolved_identity/scope_identity 绑定各组预算及执行范围，
 并引用已有真实 Handoff/request-feedback 准入来源，不能无来源切布尔值。
+
+新机器在干净提交下可复用这些仅准备的命令（本机已完成，无须重复创建）：
+
+```powershell
+& $researchPython -m tools.research prepare --spec configs/research/study_b3_t2_pilot_b_draft.json
+& $researchPython -m tools.research bind --run-id b3-t2-050-b-v2-draft
+& $researchPython -m tools.research prepare --spec configs/research/study_b3_t2_pilot_c_draft.json
+& $researchPython -m tools.research bind --run-id b3-t2-050-c-v2-draft
+```
 
 ```powershell
 $researchPython='D:/softrobot-agent/.worktrees/s135-task-conditioned-control/.s135-env/Scripts/python.exe'
