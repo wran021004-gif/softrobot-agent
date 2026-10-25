@@ -6,7 +6,7 @@ from pathlib import Path
 from tests.research import c3_f1_f2_validation as prior
 from tools.platform_host import Host
 from tools.research import core
-from tools.research.agent import load_credential
+from tools.research.agent import load_credential, record
 from tools.research.state import state
 from tools.state_io import atomic_json, digest, read
 
@@ -78,7 +78,7 @@ def prepare_g2():
         'also hypothesis,supporting_evidence,expected_observation,weakening_observation,fixed_conditions,stopping_condition,interpretation. '
         'Keep reasoning concise in Chinese. Uncertainty and results that weaken your hypothesis are valid outcomes. '
         'Budget is <=8 Provider including Reporter, <=4 total math evaluations including preparation/internal failures, <=24 public operations, independent physics/NMPC/PPO=0. Stop after G2.')
-    h = prior.provision('continuity', study_id=G2_ID, instructions=instructions,
+    h = host(G2_ID) if (ROOT / 'runs/research' / G2_ID / 'platform.sqlite').exists() else prior.provision('continuity', study_id=G2_ID, instructions=instructions,
         overrides=dict(base_commit='576a18a0be6e77da6840d09ab1a2f4360d499f30', mode='formal_research',
             capabilities=['analysis'], allowed_plan_actions=['diagnose','stop'],
             evidence_destination=str(G2_OUT.relative_to(ROOT))),
@@ -88,8 +88,10 @@ def prepare_g2():
     original = old.store.artifact(p['candidate'])
     if m['candidate']!=p['candidate']: raise ValueError('HISTORICAL_MATHEMATICS_CANDIDATE_MISMATCH')
     request = original['parameters']
-    generated = generate_candidate(h, request, dict(origin='user_authorized_same_historical_design',
-        historical_study=old.run_id, historical_candidate=p['candidate'], historical_result=background['original_reference']))
+    existing = next((r for r in state(h)['candidates'].values() if h.store.artifact(r)['parameters']==request), None)
+    generated = dict(status='generated', candidate=existing) if existing else generate_candidate(h, request,
+        dict(origin='user_authorized_same_historical_design', historical_study=old.run_id,
+             historical_candidate=p['candidate'], historical_result=background['original_reference']))
     if generated['status']!='generated': raise ValueError(generated)
     candidate = generated['candidate']; current = verify_candidate(h, candidate)
     for key in ('robot','task'):
