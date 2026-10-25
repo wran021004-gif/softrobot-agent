@@ -58,6 +58,19 @@ def group(mode='smooth', origin=.2, steps=(.02,.01)):
 
 
 class SensitivityTests(unittest.TestCase):
+    def test_span_radius_list_path_keeps_existing_numerical_semantics(self):
+        points,protocol=group()
+        for p in points:p['parameters']=dict(spans=[dict(radius_m=p['value'],count=3)])
+        result=capability_sensitivity(points,dict(PARAMETER,path='spans.0.radius_m'),protocol)
+        self.assertEqual(result['status'],'computed_diagnostic')
+        self.assertEqual(result['parameter_units'],'m')
+        self.assertFalse(result['regularity']['differentiability_proven'])
+        self.assertAlmostEqual(result['reoptimized_finite_difference'][0]['reoptimized'],1.,places=6)
+        bad=deepcopy(points);bad[-1]['parameters']['spans'][0]['count']=4
+        rejected=capability_sensitivity(bad,dict(PARAMETER,path='spans.0.radius_m'),protocol)
+        self.assertEqual(rejected['status'],'not_applicable')
+        self.assertIn('SINGLE_PARAMETER',rejected['reason'])
+
     def test_optional_progress_records_actual_kernel_and_face_attempts(self):
         events=[]
         out=self.analyze(progress=lambda kind,stage,detail:events.append((kind,stage,detail)))

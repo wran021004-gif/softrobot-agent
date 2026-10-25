@@ -26,7 +26,7 @@ class FamilySensitivityTests(unittest.TestCase):
         update(self.h,**deepcopy(self.original))
         spec=deepcopy(state(self.h)['spec'])
         spec['family_sensitivity_variables']=opt.freeze_family_variables(spec['family_space'],dict(
-            version='family_sensitivity_v1',variables=['segments.0.length_m','segments.1.young_pa','segments.8.length_m']))
+            version='family_sensitivity_v1',variables=['segments.0.length_m','segments.1.young_pa','segments.8.length_m','spans.0.radius_m','spans.1.radius_m']))
         spec['mathematical_methods']={opt.CONIC:'offline fixture',opt.SENSITIVITY:'offline fixture'}
         spec['budgets']['mathematical_evaluations']=30
         update(self.h,spec=spec,freeze='offline-family-fixture',analysis_results=[])
@@ -169,6 +169,87 @@ class FamilySensitivityTests(unittest.TestCase):
         self.assertEqual(opt.sensitivity_cost(2,5,30)['remaining_total_range'],[9])
         self.assertIsNone(opt.sensitivity_cost(1,None,30)['missing_models'])
         self.assertFalse(opt.sensitivity_cost(1,3,4)['budget_sufficient'])
+
+    def test_radius_defaults_geometry_bounds_and_clearance(self):
+        space=state(self.h)['spec']['family_space']
+        from extensions.tendon_family.family_space import parameter_capabilities
+        ref,c=self.generate(spans=[dict(last_segment=1,count=3)])
+        params,domain=opt.family_parameters(state(self.h)['spec'],c,'spans.0.radius_m')
+        radius=design.parameter_value(params,'spans.0.radius_m')
+        self.assertEqual(radius,space['routing_domains']['radius_m']['default'])
+        self.assertEqual(domain['bounds_source']['path'],'routing_domains.radius_m')
+        self.assertEqual(domain['affected_tendon_indices'],[0,1,2])
+        rows=parameter_capabilities(space,params)
+        self.assertEqual(next(r for r in rows if r['parameter_id']=='spans.0.radius_m')['unit'],'m')
+        with self.assertRaisesRegex(ValueError,'TOPOLOGY'):opt.family_parameters(state(self.h)['spec'],c,'spans.1.radius_m')
+        models=[]
+        for value in (.0175,.018,.0185):
+            p=deepcopy(params);design.set_parameter(p,'spans.0.radius_m',value)
+            result=design.generate_candidate(self.h,p,dict(origin='radius_geometry_fixture'))
+            self.assertEqual(result['status'],'generated',result)
+            changed=design.verify_candidate(self.h,result['candidate']);models.append(changed)
+            for tendon in changed['configuration']['robot']['structure']['data']['tendons']:
+                yz=tendon['points'][0]['attachment']['position_m'][1:]
+                self.assertAlmostEqual(sum(v*v for v in yz)**.5,value)
+        self.assertEqual(len({digest(c['configuration']['robot']['structure']) for c in models}),3)
+        for value in (space['routing_domains']['radius_m']['maximum']+.001,space['routing_domains']['radius_m']['minimum']):
+            p=deepcopy(params);design.set_parameter(p,'spans.0.radius_m',value)
+            result=design.generate_candidate(self.h,p,dict(origin='radius_illegal_fixture'))
+            self.assertEqual(result['status'],'invalid',result)
+
+    def test_radius_real_models_t2_report_and_decision_delivery(self):
+        """Three tiny real GVS builds and the existing T2 kernel; no worker/rollout."""
+        from tools.research import analysis,reporter
+        from tools.research.evidence_views import result_card
+        from tools.research.research_context import mathematical_decision_view,compact_scientific_delivery
+        from extensions.tendon_family.gvs_basis import resolve_basis
+        refs=[];candidates=[];protocol=state(self.h)['spec']['analysis_protocol']
+        for radius in (.018,.0175,.0185):
+            ref,c=self.generate(segment_count=1,segments={'0':dict(cells=4)},spans=[dict(last_segment=0,count=3,radius_m=radius)])
+            candidates.append(ref);cfg=c['configuration'];robot=cfg['robot']['structure']['data']
+            binding=dict(candidate=ref,candidate_id=c['candidate_id'],configuration=c['configuration_reference'],
+                effective_configuration_identity=digest(cfg),task_identity=digest(cfg['task']),source_identity=c['source_identity'],
+                tendon_order=[t['id'] for t in robot['tendons']],tension_limits_n=[t['force_limit_n'] for t in robot['tendons']],
+                basis=cfg['policy']['controller']['parameters']['data']['recipe']['basis'],
+                coordinate_order=list(resolve_basis(robot,cfg['policy']['controller']['parameters']['data']['recipe']['basis']).coordinate_order))
+            query=AnalysisRequest(candidate=ref,operation='linearization',model_source='gvs',operating_point='controller_start_input',
+                scoring_window_s=protocol['windows_s'][0],protocol=protocol)
+            raw=analysis.calculate(cfg,binding,plain(query))
+            self.assertEqual(raw['status'],'computed',raw)
+            raw.update(candidate=ref,implementation=state(self.h)['freeze'],requested_operation=plain(query))
+            refs.append(save(self.h,raw,'radius_real_model_engineering_fixture'))
+        update(self.h,analysis_results=refs)
+        query=AnalysisRequest(candidate=candidates[0],operation='task_capability',model_source='gvs',
+            operating_point='controller_start_input',protocol=protocol,capability_method=opt.CONIC,
+            optimal_sensitivity=dict(variable='spans.0.radius_m',steps=[.0005],model_results=refs))
+        self.assertEqual(opt.method_admission(state(self.h)['spec'],query)['status'],'admissible')
+        self.assertEqual(len({digest(self.h.store.artifact(r)['model']['B']) for r in refs}),3)
+        foreign,_=self.generate(segment_count=2,spans=[dict(last_segment=1,count=3,radius_m=.0185)])
+        changed=self.h.store.artifact(refs[-1]);changed['candidate']=foreign
+        badref=save(self.h,changed,'cross_topology_radius_negative_fixture')
+        update(self.h,analysis_results=[*refs,badref])
+        bad=query.model_copy(update=dict(optimal_sensitivity=query.optimal_sensitivity.model_copy(update=dict(model_results=[*refs[:2],badref]))))
+        with self.assertRaisesRegex(ValueError,'SINGLE_PARAMETER'):opt.sensitivity_context(self.h,bad)
+        update(self.h,analysis_results=refs)
+        context=opt.sensitivity_context(self.h,query)
+        raw=opt.calculate_sensitivity(context,query)
+        self.assertEqual(raw['status'],'computed',raw.get('optimal_sensitivity'))
+        result=raw['optimal_sensitivity']
+        self.assertEqual(result['parameter_units'],'m')
+        self.assertFalse(result['regularity']['differentiability_proven'])
+        self.assertEqual(result['computation_cost']['conic_solves'],3)
+        raw.update(candidate=candidates[0],implementation=state(self.h)['freeze'],charged_analysis_evaluations=5,charged_numerical_s=0.)
+        ref=save(self.h,raw,'radius_t2_engineering_fixture');update(self.h,analysis_results=[*refs,ref])
+        card=plain(result_card(self.h,ref));view=mathematical_decision_view(card)
+        self.assertIn('optimal_sensitivity',view)
+        self.assertTrue(all(q['unit']=='score/m' for q in card['mathematics']['quantities']))
+        if not card['mathematics']['quantities']:
+            self.assertEqual(result['direction_status'],'unresolved')
+            self.assertEqual(result['reason'],'NUMERICAL_OPTIMALITY_INSUFFICIENT')
+        report=reporter.assemble(self.h,[ref]);saved=dict(report=plain(report),interpretation_status='deferred',error=None)
+        handoff=reporter.reporter_handoff_summary(self.h,ref,saved)
+        brief=compact_scientific_delivery(dict(latest_reports=[handoff],action_trace=dict(recent=[])),decision_only=True)
+        self.assertEqual(brief['latest_reports'][0]['findings'][0]['mathematics']['optimal_sensitivity'],view['optimal_sensitivity'])
 
 
 if __name__=='__main__':unittest.main()

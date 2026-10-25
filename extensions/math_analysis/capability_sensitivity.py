@@ -19,8 +19,9 @@ FACE_OPTIONS = dict(DEFAULT_OPTIONS, tol_gap_abs=1e-8, tol_gap_rel=1e-8)
 def _parameter(parameters, path):
     parent = parameters
     for key in path.split('.')[:-1]:
-        parent = parent[key]
-    return parent, path.split('.')[-1]
+        parent = parent[int(key)] if isinstance(parent,list) else parent[key]
+    key=path.split('.')[-1]
+    return parent, int(key) if isinstance(parent,list) else key
 
 
 def _prepare(point, protocol,path_assignment=None):

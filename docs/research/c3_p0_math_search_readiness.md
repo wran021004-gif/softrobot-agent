@@ -82,6 +82,36 @@ CONIC 内部 branch 由原 conic_subproblems 计算，物理启动独立。rank 
 76,681 / 301,293 / 599,722 字节，短会话投影 76,891 / 101,116 / 90,994；
 相应短会话离线 tokens 20,459 / 28,135 / 27,606。末轮字节减少 85.8%。
 
+## 3. 指定 span 半径的受控敏感性
+
+入口仍为 `research_analysis(operation="task_capability", capability_method="sampled-affine-conic-minimax-v1",
+optimal_sensitivity={variable:"spans.0.radius_m", steps:[h], model_results:[base,minus,plus]})`，
+另需 candidate、相同 frozen protocol、合法的相同 operating_point。Study 必须显式在
+`family_sensitivity_variables.variables` 授权该路径，并授权 CONIC/T2 两方法。
+先用原 generate 准备固定拓扑的合法候选，再用原 linearization 准备三个已登记模型；
+调用者不得把工程夹具引用用于正式 Study。
+
+FamilySpace 发现现在列出实际 span 索引、SI 范围、有效/继承值及受影响腱索引。
+参数路径只扩展列表索引；无 JSONPath 或新优化器。完全 route_override 的 span 返回
+PARAMETER_HAS_NO_EFFECT_ON_GENERATED_ROUTING；缺索引、未授权、超域、生成器间隙不合法、
+额外结构/拓扑/任务/控制/输入次序/模型/时间变化均由原准入拒绝。
+原 segments.length_m/young_pa 和 source-relative 行为保留。
+
+真实生成器夹具：1 或 2 段、一个含 3 腱的 span，半径 0.0175/0.018/0.0185 m。
+三根腱的实际路由半径逐一吻合，robot 结构身份和真实 GVS 输入矩阵 B 均不同；不是未生效 JSON。
+三个小 GVS 模型直调内核（无 worker、积分或物理验收），经原 saved-model admission、T2、
+ResultCard、Reporter L1、L0 投影完成链路。发现并修复真实工程阻碍：初始工作点的
+actual_time_s 原为 null，现对具名初态明确为 0；目标/半程静态工作点不擅自赋时刻。
+
+真实夹具执行 3 次 CONIC，出现 optimality-insufficient 警告，结果为未决方向，未提供梯度，
+不为此调整 solver/物理或进行扫描。另用原解析小夹具验证 spans 列表路径、固定控制与重优化、
+FD/对偶面、score/m 单位和跨拓扑拒绝；不把其数值当机器人科研证据。
+原严格 regularity 条件不放宽，有限差分仍非严格包络梯度。模型/采样时域外、独立物理成功、
+全局最优、硬件或跨任务性能仍未验证。
+
+24 项原 family/T2 核心测试及新增 3 项（含真实小模型链路）已执行；调试先遇到缺依赖、
+真实起始时刻缺口及测试投影字段错误，修复后定向复验；完整通过数在最终验证部分记录。
+
 ## 后续阶段
 
 搜索轨迹、半径敏感性、数值快照与实验配置在后续阶段补齐。此文所有工程夹具不构成科研成功。

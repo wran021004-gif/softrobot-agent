@@ -142,13 +142,13 @@ def _candidate_points(inp,graph,p,requested=None):
     target=np.asarray(task_adapter(plain(inp)).operating_point()['reference_position_m'],dtype=float)
     tolerance=float(inp.task.evaluator.parameters.data.get('tolerance_m',p.output_scale_m))
     points=[dict(name='standardized_initial_pretension',x=x0.tolist(),u=pretension.tolist(),available=True,
-        phase='configuration_standardized_initial_pretension',scope='standardized initial/pretension',remaining_task_s=p.duration_s,actual_time_s=None,
+        phase='configuration_standardized_initial_pretension',scope='standardized initial/pretension',remaining_task_s=p.duration_s,actual_time_s=0.,
         construction=dict(method='actual initializer projected by existing controller preparation plus declared tendon pretension',
             position_residual_m=float(np.linalg.norm(initial_tip-target)),static_equilibrium=False,
             achieved_world_point_m=initial_tip.tolist(),initializer_source=plain(inp.task.initializer),
             input_source='family.design.tendons[].pretension_n',execution_data_used=False)),
         dict(name='controller_start_input',x=x0.tolist(),u=controller_start.tolist(),available=True,
-            phase='configuration_controller_start_input',scope='controller-start input',remaining_task_s=p.duration_s,actual_time_s=None,
+            phase='configuration_controller_start_input',scope='controller-start input',remaining_task_s=p.duration_s,actual_time_s=0.,
             construction=dict(method='existing immutable controller preparation/numerical-source logic',
                 position_residual_m=float(np.linalg.norm(np.asarray(output(x0,controller_start)[0]).reshape(-1)-target)),
                 achieved_world_point_m=np.asarray(output(x0,controller_start)[0]).reshape(-1).tolist(),static_equilibrium=False,

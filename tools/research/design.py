@@ -21,7 +21,7 @@ def source_lengths(cfg):
 def parameter_value(parameters,path):
     value=parameters
     for key in path.split('.'):
-        value=value[key]
+        value=value[int(key)] if isinstance(value,list) else value[key]
     return value
 
 
@@ -29,8 +29,8 @@ def set_parameter(parameters,path,value):
     parts=path.split('.')
     parent=parameters
     for key in parts[:-1]:
-        parent=parent[key]
-    parent[parts[-1]]=value
+        parent=parent[int(key)] if isinstance(parent,list) else parent[key]
+    parent[int(parts[-1]) if isinstance(parent,list) else parts[-1]]=value
 
 
 def configuration_for(host,parameters,owner):

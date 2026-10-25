@@ -28,8 +28,10 @@ def freeze_family_variables(space, grant):
     if space['version']=='serial_family_space_v2':request['version']='serial_family_generation_v2'
     domains={r['parameter_id']:r for r in parameter_capabilities(space,request)}
     for path in grant['variables']:
-        if (not isinstance(path,str) or not re.fullmatch(r'segments\.(0|[1-9][0-9]*)\.(length_m|young_pa)',path)
-                or path not in domains or domains[path]['minimum']>=domains[path]['maximum']):
+        radius=re.fullmatch(r'spans\.(0|[1-9][0-9]*)\.radius_m',path)
+        domain=domains.get('spans.*.radius_m' if radius else path)
+        supported=bool(radius and int(radius[1])<space['executable_tendon_count_bounds'][1]) or bool(re.fullmatch(r'segments\.(0|[1-9][0-9]*)\.(length_m|young_pa)',path))
+        if not supported or not domain or domain['minimum']>=domain['maximum']:
             raise ValueError('EXECUTABLE_FAMILY_CONTINUOUS_DOMAIN_REQUIRED: '+str(path))
     return deepcopy(grant)
 
@@ -47,6 +49,12 @@ def family_parameters(spec, candidate, path):
     params=plain(build.request)
     domains={r['parameter_id']:r for r in parameter_capabilities(spec['family_space'],params)}
     if path not in domains:raise ValueError('PARAMETER_NOT_IN_CURRENT_CANDIDATE_TOPOLOGY')
+    if not domains[path]['effective_in_current_execution']:raise ValueError('PARAMETER_HAS_NO_EFFECT_ON_GENERATED_ROUTING')
+    if path.startswith('spans.'):
+        from extensions.tendon_family.family_space import Span
+        params['spans']=params['spans'] or [plain(Span(last_segment=params['segment_count']-1,count=params['tendon_count']))]
+        for span in params['spans']:
+            if span['radius_m'] is None:span['radius_m']=spec['family_space']['routing_domains']['radius_m']['default']
     for i in range(params['segment_count']):
         choice=params['segments'].setdefault(str(i),{})
         for key in ('length_m','young_pa'):
@@ -59,9 +67,9 @@ def family_parameters(spec, candidate, path):
             or cfg['policy']['candidate_builder']['parameters']['data']!=plain(build)):
         raise ValueError('GENERATED_CONFIGURATION_DOES_NOT_MATCH_FROZEN_REQUEST')
     domain=domains[path];index=path.split('.')[1]
-    source=('segment_domains.'+index if index in spec['family_space']['segment_domains'] else 'segment_domain')
+    source='routing_domains' if path.startswith('spans.') else ('segment_domains.'+index if index in spec['family_space']['segment_domains'] else 'segment_domain')
     return params,dict(path=path,units=domain['unit'],bounds=[domain['minimum'],domain['maximum']],
-        source='current frozen FamilySpace continuous domain',bounds_source=dict(
+        source='current frozen FamilySpace continuous domain',affected_tendon_indices=domain.get('affected_tendon_indices'),bounds_source=dict(
             family_space_identity=spec['family_space_identity'],path=source+'.'+path.split('.')[-1]))
 
 
@@ -207,8 +215,8 @@ def sensitivity_context(host, query):
     if len(request.steps)==2 and not math.isclose(request.steps[0]/2,request.steps[1],rel_tol=1e-10,abs_tol=0.):
         raise ValueError('EXPLICIT_STENCIL_REQUIRES_H_AND_HALF_H')
     family=s['spec'].get('start_mode')=='family_space'
-    if (len(path.split('.')) != 3 or not path.startswith('segments.')
-            or path.split('.')[-1] not in ('length_m','young_pa')
+    continuous=(path.startswith('segments.') and path.split('.')[-1] in ('length_m','young_pa')) or (family and path.startswith('spans.') and path.endswith('.radius_m'))
+    if (len(path.split('.')) != 3 or not continuous
             or (not family and path not in s['spec']['allowed_parameters'])):
         raise ValueError('AUTHORIZED_CONTINUOUS_PARAMETER_REQUIRED')
     points=[]; base_candidate=None; base_result=None

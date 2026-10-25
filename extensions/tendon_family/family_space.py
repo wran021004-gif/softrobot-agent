@@ -370,6 +370,13 @@ def parameter_capabilities(value, request):
             add(root+'cells','discretization','integer','count',Domain(minimum=lo,maximum=hi,default=space.serial_assembly.default_cells))
     for k,d in space.tendon_domains.items():add('tendon_parameters.'+k,'tendon','number','m' if k=='diameter_m' else 'N/m' if 'gain' in k else 'N',d,effective=k!='length_servo_gain_n_m')
     for k,d in space.routing_domains.items():add('spans.*.'+k,'routing','number','rad' if 'rad' in k else 'm' if k=='radius_m' else 'normalized_station',d)
+    offset=0
+    for i,span in enumerate(r.spans or [Span(last_segment=r.segment_count-1,count=r.tendon_count)]):
+        affected=[j for j in range(offset,offset+span.count) if j not in r.route_overrides]
+        add(f'spans.{i}.radius_m','routing','number','m',space.routing_domains['radius_m'],effective=bool(affected))
+        rows[-1].update(current_value=span.radius_m if span.radius_m is not None else space.routing_domains['radius_m'].default,
+            affected_tendon_indices=affected,continuous_scope='Fixed topology; reoptimizing tension requires authorized saved model stencil')
+        offset+=span.count
     for i in range(r.tendon_count):add(f'route_overrides.{i}','routing','route_points','SI')
     for k,d in space.control_domains.items():add('control_weights.'+k,'controller','number','controller_weight',d,effective=False)
     return rows
