@@ -138,5 +138,36 @@ class C3ContinuityTests(unittest.TestCase):
             self.assertEqual(diagnostic_relations(h,ref)['relations'][0]['status'],'comparable')
         finally:a.archive.close()
 
+    def test_changed_working_set_is_readable_at_same_query(self):
+        from tests.research.test_s125_contract import cold_host
+        from tools.research.core import read_evidence
+        from tools.research.state import state, update
+        h=cold_host();q=dict(reference=state(h)['family_space_reference'],view='working_set')
+        before=read_evidence(h,q)
+        update(h,numerical_s=state(h)['numerical_s']+1)
+        after=read_evidence(h,q)
+        self.assertNotEqual(before['source_state_identity'],after['source_state_identity'])
+
+    def test_recorded_real_radius_fixture_without_new_solves(self):
+        path=ROOT/'evidence/c3_f1_f2/math/immutable_artifacts.tar.gz'
+        if not path.exists():self.skipTest('Bounded real radius validation has not yet been run')
+        a=C3Archive(path)
+        try:
+            s=a.snapshot['session']['state'];self.assertEqual(s['mathematical_evaluations'],8)
+            models=[a.artifact(r) for r in s['analysis_results'][:3]]
+            candidates=[a.artifact(m['candidate']) for m in models]
+            self.assertEqual([c['parameters']['spans'][0]['radius_m'] for c in candidates],[.018,.0175,.0185])
+            self.assertEqual(len({m['model']['binding']['model_identity'] for m in models}),3)
+            self.assertNotEqual(models[0]['model']['B'],models[1]['model']['B'])
+            self.assertNotEqual(models[0]['model']['B'],models[2]['model']['B'])
+            result=a.artifact(s['analysis_results'][-1]);x=result['optimal_sensitivity']
+            self.assertEqual(x['computation_cost']['conic_solves'],3)
+            self.assertEqual(x['computation_cost']['dual_face_solves'],2)
+            self.assertTrue(all(p['input_legal'] and p['replay_valid'] for p in x['fixed_control_sensitivity']['points']))
+            self.assertTrue(all(p['result']['replay']['numerically_valid'] for p in x['numerical_optimality']))
+            self.assertEqual(x['preferred_parameter_direction'],'unresolved')
+            self.assertFalse(x['regularity']['finite_difference_checks_passed'])
+        finally:a.archive.close()
+
 
 if __name__=='__main__':unittest.main()
