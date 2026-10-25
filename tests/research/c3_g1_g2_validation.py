@@ -130,6 +130,83 @@ def live_g2(restore=False):
     return dict(study_id=G2_ID, status=state(h)['research_status'], ledger=h.store.remaining())
 
 
+def audit_g2():
+    """Read original receipts and decision delivery; no new requests or calculations."""
+    from tools.research.agent import pending, received
+    from tools.research.design import verify_candidate
+    from tools.research.research_context import read_coverage
+    from tests.research.agent_math_decision_probe import provider_usage
+    h = host(G2_ID); s = state(h); events = h.store.events(h.run_id)
+    assert s['research_status']=='stopped' and not s['pending'] and not pending(h)
+    assert not s['pilot'].get('unconsumed_response')
+    assert len(s['analysis_results'])==1 and not s['results'] and not s['physical_replays']
+    reference = s['analysis_results'][0]; raw = h.store.artifact(reference); tr = raw['trajectory']
+    assert verify_candidate(h, raw['candidate']) and raw['owning_study']==G2_ID
+    assert raw['implementation']==s['freeze'] and raw['origin']=='model'
+    assert raw['status']=='computed' and raw['charged_analysis_evaluations']==s['mathematical_evaluations']==2
+    uses = [h.store.artifact(e['outputs'][0])['tool_use'] for e in events if e['kind']=='model_original_tool_request']
+    mathematical = [u for u in uses if u['name']=='research_analysis']
+    assert len(mathematical)==1
+    wires = []; delivered = []; background_delivery = None
+    background_tool = next(u for u in uses if u['name']=='evidence_read' and not u['input'].get('pointer'))
+    for event in events:
+        if event['kind']!='r3_request': continue
+        meta = h.store.artifact(event['outputs'][0]); wire = h.store.artifact(meta['request'])
+        reception = received(h, event['request_id'])
+        assert reception and reception['http_status']==200
+        entry = dict(request_id=event['request_id'],reference=meta['request'],purpose=reception['purpose'],
+            bytes=meta['input_bytes'],elapsed_s=reception['elapsed_s'])
+        wires.append(entry)
+        shown = next((m['content'] for m in wire['messages'] if m.get('tool_call_id')==background_tool['toolUseId']), None)
+        if shown is not None and background_delivery is None:
+            background_delivery = dict(request_id=event['request_id'],characters=len(shown),
+                sdk_offloaded=shown.startswith('[Truncated'),original_history_owner_in_preview='c3-b-100ms-20261025' in shown,
+                historical_witness_score_in_preview=str(tr['replayed_violation']) in shown,
+                scope='Preview is not full evidence delivery; original remains in Store/SDK stash. No complete-read credit invented.')
+        tail = wire['messages'][-1].get('content')
+        if isinstance(tail,str) and tail.startswith('CURRENT_RESEARCH_PACKET\n'):
+            packet = json.loads(tail.split('\n',1)[1])
+            for report in packet['research'].get('latest_reports',[]):
+                if reference not in report['result_references']: continue
+                math = report['findings'][0]['mathematics']
+                witness = next(q for q in math['quantities'] if q['name']=='witness_upper_estimate')
+                assert witness['value']==tr['replayed_violation']
+                assert math['cost']['evaluations']==2
+                delivered.append(dict(request_id=event['request_id'],report_reference=report['report_reference'],
+                    result=reference,witness_value=witness['value'],verification=math['scope']['verification_status']))
+    assert delivered
+    plans = [h.store.artifact(r)['original_plan'] for r in s['plans']]
+    assert [p['action'] for p in plans]==['diagnose','stop'] and reference in plans[-1]['supporting_evidence']
+    assert plans[0]['decision']['selected_method']==raw['requested_operation']['capability_method']
+    with h.store.connect(True) as db:
+        assert db.execute('SELECT COUNT(*) FROM calls WHERE receipt IS NULL').fetchone()[0]==0
+    background, old, p, historical = g2_background()
+    records = tr['replay']['records']
+    maxima = {k:max(r['value'] for r in records if r['constraint_id']==k)
+              for k in dict.fromkeys(r['constraint_id'] for r in records)}
+    result = dict(study_id=G2_ID, status=s['research_status'],implementation=s['freeze'],
+        usage=provider_usage(h),requests=wires,mathematical_request=mathematical[0],result=reference,
+        result_status=raw['status'],method=tr['method_version'],maxima=maxima,
+        score=tr['replayed_violation'],solver=tr['solver'],gap=tr['dual_checks']['replayed_support_gap'],
+        mathematical_cost=dict(evaluations=2,worker_elapsed_s=raw['charged_numerical_s'],
+            internal_calls=raw['actual_mathematical_calls'],internal_calculations=raw['internal_calculations'],
+            native_integration_steps=0,independent_physics=0,nmpc=0,ppo=0),
+        feedback_delivered_in_confirmed_main_request=delivered,
+        historical_background_delivery=background_delivery,
+        original_plan_references=s['plans'],original_decisions=plans,
+        historical_novelty=dict(original_result=background['sampled_model_witness']['reference'],
+            same_arrays={k:raw['model'][k]==historical['model'][k] for k in ('A','B','C','D','x0','u0','drift','endpoint_outputs')},
+            same_input_sequence=tr['applied_input_n']==historical['trajectory']['applied_input_n'],
+            same_score=tr['replayed_violation']==historical['trajectory']['replayed_violation'],
+            added_scope='New current-Study owned witness; not a new physical observation or a newly distinguished mechanism'),
+        explicit_read_tools=[u for u in uses if u['name']=='evidence_read'],read_coverage=read_coverage(h),
+        errors=[dict(reference=e['outputs'][0],message=h.store.artifact(e['outputs'][0])['message'])
+            for e in events if e['kind']=='tool_request_error'],
+        scientific_review='See c3_g2_scientific_decision_loop.md; numerical delivery is not proof of research effectiveness.')
+    atomic_json(G2_OUT / 'review.json', result)
+    return {k:result[k] for k in ('study_id','status','result','maxima','score','historical_novelty')}
+
+
 def host(study_id):
     return Host(ROOT / 'runs/research' / study_id, study_id, actor='unified-research')
 
@@ -308,11 +385,13 @@ def inspect_historical_state():
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('mode', choices=['prepare-g1', 'continuity', 'restore', 'probe-live', 'audit-continuity', 'finalize-g1', 'inspect-state', 'prepare-g2', 'live-g2', 'restore-g2'])
+    parser.add_argument('mode', choices=['prepare-g1', 'continuity', 'restore', 'probe-live', 'audit-continuity', 'finalize-g1', 'inspect-state', 'prepare-g2', 'live-g2', 'restore-g2', 'audit-g2'])
     args = parser.parse_args()
     if args.mode in ('continuity', 'restore', 'probe-live'):
         load_credential(Path('~/.codex/.env').expanduser())
-    if args.mode == 'prepare-g2':
+    if args.mode == 'audit-g2':
+        result = audit_g2()
+    elif args.mode == 'prepare-g2':
         result = prepare_g2()
     elif args.mode in ('live-g2','restore-g2'):
         result = live_g2(args.mode=='restore-g2')

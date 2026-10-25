@@ -19,11 +19,17 @@ class G1ProtocolTests(unittest.TestCase):
         from tools.research.state import state, update, save, protected
         from tools.research.core import read_evidence
         from tools.research.research_context import read_coverage
+        from tests.research.test_c3_f1_f2 import archive, ROOT
+        historical = archive('b'); self.addCleanup(historical.archive.close)
+        _, previous = historical.host()
+        source = previous['results'][-1]; original = historical.artifact(source)
         h = RequestBoundaryHandoffTests().provision()
-        excerpt = dict(kind='historical_scoped_evidence', owning_study='explicit-offline-history',
-                       scope='Offline protocol fixture, not scientific evidence')
+        excerpt = dict(kind='historical_scoped_evidence', owning_study=original['owning_study'],
+            original_reference=source, candidate=original['candidate'], acceptance=original['acceptance']['components'],
+            scope='Historical B execution only; no candidate or science executed in this independent test')
         reference = save(h, excerpt, 'explicit_offline_historical_excerpt')
         query = dict(reference=reference, view='full', pointer='')
+        self.assertEqual(query, read(ROOT / 'evidence/c3_f1_f2/continuity_summary.json')['tool_queries'][0]['input'])
         update(h, scoped_context=[reference])
         self.assertEqual(read_evidence(h, query, record_read=False), excerpt)
         sent = []
