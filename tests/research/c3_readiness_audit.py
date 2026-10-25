@@ -17,6 +17,11 @@ class C3Archive(C1Archive):
         self.archive=tarfile.open(path)
         self.snapshot=json.load(self.archive.extractfile(next(m for m in self.archive.getmembers() if m.name.startswith('snapshot/'))))
 
+    def host(self,events=None):
+        host,s=super().host(events)
+        host.store.lookup.side_effect=lambda run,key:next((r for r in self.snapshot['calls'] if r['request_id']==key),None)
+        return host,s
+
 
 def serialized(value):
     return httpx.Request('POST','https://offline.invalid',json=value).content
@@ -30,9 +35,15 @@ def context_audit():
     for index in (0,12,24):
         event,meta,wire,packet,events=requests[index]
         after=deepcopy(wire);packet=deepcopy(packet)
-        packet['research']=compact_scientific_delivery(packet['research'],decision_only=True)
         from tools.research.budget import decision_budget
         host,s=archive.host(events);old_budget=packet['research']['budget']
+        from tools.research.research_context import research_intent,research_action_trace,compact_action_trace,compact_intent
+        packet['research']['research_intent']=compact_intent(research_intent(host))
+        query=packet['research']['action_trace'].get('full_trace_query')
+        packet['research']['action_trace']=compact_action_trace(research_action_trace(host,limit=None))
+        if query:packet['research']['action_trace']['full_trace_query']=query
+        packet['research']=compact_scientific_delivery(packet['research'],decision_only=True)
+        old_budget=packet['research']['budget']
         ledger=host.store.remaining.return_value
         ledger['remaining']['model_calls']=old_budget['provider_budget']['remaining_total']
         ledger['remaining']['backend_solves']=old_budget['science_budget']['remaining_physical']
@@ -62,6 +73,8 @@ def context_audit():
                 schema_bytes=len(serialized(wire.get('tools',[])))),
             payload_occurrences={k:{p:serialized(v).decode().count(p) for p in probes} for k,v in variants.items()},
             history_preserved=wire['messages'][:-1]==after['messages'][:-1],
+            trace_nodes=len(packet['research']['action_trace']['recent']),
+            original_hypothesis_visible=bool((packet['research']['research_intent'].get('latest_decision') or {}).get('agent_hypothesis')),
             stop_and_select_rules_preserved=packet['guidance']==json.loads(wire['messages'][-1]['content'].split('\n',1)[1])['guidance'],
             original_budget_fields_preserved=all(old_budget['provider_budget'][k]==v for k,v in json.loads(wire['messages'][-1]['content'].split('\n',1)[1])['research']['budget']['provider_budget'].items()),
             handoff_status='Offline complete-wire projection only; actual rotation requires existing live admission and settled boundary verification'))

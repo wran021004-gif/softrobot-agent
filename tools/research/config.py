@@ -186,7 +186,7 @@ def resolve(path, profile=None, *, backend_profile=None):
     elif study.get('start_mode', 'reference_candidate')!='reference_candidate':
         raise ValueError('UNKNOWN_RESEARCH_START_MODE')
     if first_strategy is not None:
-        if not family_mode or first_strategy not in ('agent_choice','math_search'):
+        if not family_mode or first_strategy not in ('agent_choice','heuristic_generate','math_search'):
             raise ValueError('EXPLICIT_FAMILY_INITIAL_STRUCTURE_STRATEGY_REQUIRED')
         study['initial_structure_strategy']=first_strategy
     if additions:

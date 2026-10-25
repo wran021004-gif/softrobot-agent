@@ -17,6 +17,7 @@ def main():
     parser.add_argument('--request-id')
     parser.add_argument('--reason')
     parser.add_argument('--session-handoff',action='store_true',help='Opt in only after separate live continuation admission')
+    parser.add_argument('--restore-only',action='store_true',help='Reopen and verify original SDK/Store recovery without a new Provider request')
     parser.add_argument('--handoff-before-next-request',action='store_true',help='Use independently admitted request-feedback boundary before the next model send')
     parser.add_argument('--handoff-request-bytes',type=int,help='Rotate at a verified paired-feedback boundary when the complete next request reaches this size; requires separate live admission')
     parser.add_argument('--pause-exploration-remaining',type=int,help='Supervisor pause at admitted paired-feedback boundary before remaining science-capable main requests reach this count')
@@ -59,7 +60,7 @@ def main():
         try:asyncio.run(converse(h,session_handoff=args.session_handoff,
             pause_after_completed_invocations=args.pause_after_completed_invocations,
             handoff_before_next_request=args.handoff_before_next_request,handoff_request_bytes=args.handoff_request_bytes,
-            pause_exploration_remaining=args.pause_exploration_remaining))
+            pause_exploration_remaining=args.pause_exploration_remaining,restore_only=args.restore_only))
         except IncompleteModelOutput as exc:
             print(json.dumps(dict(status='confirmed_incomplete',provider=exc.diagnostic)))
             raise SystemExit(2) from exc

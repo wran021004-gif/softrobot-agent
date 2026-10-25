@@ -727,10 +727,15 @@ def compact_intent(intent):
 
 
 def compact_action_trace(trace):
-    value=deepcopy(trace)
-    for row in value['recent']:
-        for key in ('agent_hypothesis','interpretation_status','hypothesis_effect','task_protocol_identity'):
-            row.pop(key,None)
+    value=deepcopy(trace);rows=value['recent'];indices={0} if rows else set()
+    for actions in (('generate','search','propose'),('research_analysis','mechanics'),
+            ('physical_replay','execute'),('initialize_control','control_search','research_rl')):
+        first=next((i for i,r in enumerate(rows) if r['action'] in actions and r['execution_status'] not in ('rejected','failed')),None)
+        if first is not None:indices.add(first)
+    indices.update(range(max(0,len(rows)-3),len(rows)))
+    value['recent']=[{k:r[k] for k in ('action','method','execution_status','candidate','result_references','source','outcome') if k in r}
+        for i,r in enumerate(rows) if i in indices]
+    value['selection_scope']='First route, first recorded structure/math/physics/control outcomes and latest three; no causal interpretation'
     return value
 
 
@@ -824,12 +829,20 @@ def agent_decision_brief(host):
     brief=decision_brief(context(host))
     intent=research_intent(host)
     brief['research_intent']=compact_intent(intent)
-    brief['action_trace']=compact_action_trace(research_action_trace(host))
+    brief['action_trace']=compact_action_trace(research_action_trace(host,limit=None))
     s=state(host)
     brief['mathematics_authorization']=mathematics_authorization(host,s)
     if s['spec'].get('family_search'):
         from tools.research.search import request_guidance
         brief['structure_actions']=request_guidance(s['spec'])
+        from tools.research.core import initial_structure_action
+        initial=initial_structure_action(host)
+        if initial:
+            brief['actions']=[a for a in brief['actions'] if a in (initial,'diagnose','stop')]
+            brief['available_research_actions']=[r for r in brief['available_research_actions'] if r['action'] in brief['actions']]
+            brief['structure_actions'].pop('search' if initial=='generate' else 'generate',None)
+            brief['structure_actions']['first_structure_requirement']=dict(action=initial,
+                objective='task_violation' if initial=='search' else None,release='After first legal generate / supported mathematical search candidate')
     if s.get('engineering_feedback_correction'):
         ref=s['engineering_feedback_correction']
         brief['recorded_evidence_corrections']=current_evidence_corrections(host.store.artifact(ref),ref)
@@ -910,11 +923,15 @@ def compact_scientific_delivery(brief,*,decision_only=False):
         if brief.get('selected_mathematical_method'):
             selected=brief['selected_mathematical_method']['method']
             brief['selected_mathematical_method']=dict(query={**catalog['detail_query'],'pointer':'/methods/'+selected})
-        brief['action_trace']['recent']=brief['action_trace'].get('recent',[])[-1:]
         intent=brief.get('research_intent',{})
         for key in ('latest_decision','last_research'):
-            if intent.get(key):
-                intent[key]={k:v for k,v in intent[key].items() if k!='agent_hypothesis'}
+            item=intent.get(key)
+            if item and item.get('agent_hypothesis'):
+                original=item.pop('agent_hypothesis')
+                if key=='latest_decision':
+                    item['agent_hypothesis']={k:original[k][:240] for k in ('hypothesis','expected_observation','weakening_observation') if isinstance(original.get(k),str)}
+                    item['excerpt_scope']='Original Agent text excerpts, at most 240 characters per field; not a complete hypothesis or Reporter rewrite'
+                item['original_plan_query']=dict(reference=item['plan_reference'],view='full',pointer='/original_plan')
         # Older mathematical results remain in L2. Deliver only the latest
         # unreported result, rather than a second rolling evidence inventory.
         reported_math=any(f.get('mathematics') for r in brief.get('latest_reports',[]) for f in r.get('findings',[]))

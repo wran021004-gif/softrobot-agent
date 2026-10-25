@@ -1,0 +1,150 @@
+{
+  "defaults": "family_study_defaults.json",
+  "start_mode": "family_space",
+  "family_space": "family_space_v2.json",
+  "candidate_initialization": "all_candidate_dofs_zero_v1",
+  "study_id": "c3-search-admission-20261025",
+  "base_commit": "f62a6c40cc831fa005771f046449e861c30a0377",
+  "authorization": "PENDING_EXPLICIT_APPROVAL: Bind the 2026-10-25 user C3 A/B instruction to this frozen resolved Study identity and the separately verified live handoff evidence before execution.",
+  "mode": "engineering_numerical",
+  "task": "../../tasks/reach_hold_c3_mirror.json",
+  "control": "control.json",
+  "runtime": "runtime_c3_ab.json",
+  "evidence_destination": "evidence/c3_search_admission_20261025",
+  "capabilities": [
+    "analysis",
+    "search"
+  ],
+  "allowed_plan_actions": [
+    "search",
+    "diagnose",
+    "stop"
+  ],
+  "budgets": {
+    "provider_requests": 0,
+    "protected_provider_requests": 0,
+    "public_operations": 12,
+    "protected_public_operations": 2,
+    "physical_launches": 0,
+    "local_solves": 0,
+    "local_solve_s": null,
+    "offline_nlp": 0,
+    "bdf_replays": 0,
+    "mathematical_evaluations": 6,
+    "numerical_s": null,
+    "activity_s": null,
+    "delivery_reserve_s": null
+  },
+  "nmpc_limits": {
+    "executions": 0
+  },
+  "rl_limits": {
+    "training_stages": 0,
+    "actions_per_trial": null,
+    "seconds_per_trial": null,
+    "training_actions": null,
+    "training_active_seconds": null,
+    "evaluation_episodes": 0,
+    "diagnostic_replays": 0,
+    "diagnostic_physics_steps": 0
+  },
+  "confirmation": {
+    "fresh_independent_repetitions": 0,
+    "configuration": "Select exact fresh completed passing backend evaluation after public read. No extra repetitions; repeatability unassessed."
+  },
+  "physical_replay_limit": 0,
+  "reserve_rl_evaluation": false,
+  "native_control_limits": {
+    "evaluation_requests": 60,
+    "iterations": 2,
+    "knots_s": 4
+  },
+  "research_decisions": {
+    "version": "research_decision_v1",
+    "history": [],
+    "mathematics": [],
+    "control_seeds": [],
+    "context_limits": {
+      "candidates": 5,
+      "recent": 3,
+      "pareto": 3,
+      "samples": 3,
+      "evidence": 3
+    }
+  },
+  "supplied_evidence": [],
+  "mathematical_methods": {
+    "sampled-affine-conic-minimax-v1": "2026-10-25 user instruction authorizes this registered method within the frozen Study total; explicit local identity-bound approval required.",
+    "controlled-capability-sensitivity-v1": "2026-10-25 user instruction authorizes this registered method within the frozen Study total; explicit local identity-bound approval required."
+  },
+  "fidelity_policy": {
+    "version": "numerical_fidelity_v1",
+    "screening": {
+      "coarse": {
+        "cells_per_segment": 4,
+        "backend": "backend.family_mujoco@1.1.0"
+      },
+      "standard": {
+        "cells_per_segment": 12,
+        "backend": "backend.family_mujoco@1.1.0"
+      }
+    },
+    "final_evaluation": {
+      "cells_per_segment": 12,
+      "backend": "backend.family_mujoco@1.1.0"
+    },
+    "require_exact_fidelity": true,
+    "alternative_runtimes": [],
+    "runtime_preflight_limit": 2
+  },
+  "family_search": {
+    "method": "bounded_mixed_coordinate_v1",
+    "variable_groups": [
+      "segment_count",
+      "tendon_count",
+      "spans",
+      "lengths",
+      "materials",
+      "sections",
+      "routing"
+    ],
+    "segment_counts": [
+      1,
+      2,
+      3
+    ],
+    "tendon_counts": [
+      3,
+      4
+    ],
+    "max_proposals": 16,
+    "max_evaluations": 12
+  },
+  "family_sensitivity_variables": {
+    "version": "family_sensitivity_v1",
+    "variables": [
+      "segments.0.length_m",
+      "segments.0.young_pa",
+      "segments.1.length_m",
+      "segments.1.young_pa",
+      "segments.2.length_m",
+      "segments.2.young_pa",
+      "spans.0.radius_m",
+      "spans.1.radius_m",
+      "spans.2.radius_m",
+      "spans.3.radius_m"
+    ]
+  },
+  "execution_instructions": "Independent engineering Search interface admission, not autonomous science or optimization. A fixed narrow engineering subdomain is used solely to exercise the real worker chain; no outputs may enter formal A/B.",
+  "topology_scope": {
+    "segment_counts": [
+      1,
+      2,
+      3
+    ],
+    "tendon_counts": [
+      3,
+      4
+    ]
+  }
+}

@@ -1,7 +1,7 @@
-# C3 A/B 与数学证据决策对照协议（草案，尚未授权或运行）
+# C3 A/B 与数学证据决策对照协议（2026-10-25 授权冻结协议）
 
 2026-10-25，Asia/Shanghai。工程准备基线见 `c3_p0_math_search_readiness.md`。
-本文件不授权 Provider、worker、NMPC、PPO 或任何正式 Study。旧 C3 保持封存。
+本次用户指令授权独立 Search（数学≤6、Provider=0）和 Handoff（Provider≤4、public ops≤12、科学=0）准入；二者真实通过后自动执行以下两组，严格不追加额度。原授权在各 Store 中绑定 frozen resolved identity；旧 C3 保持封存。
 
 ## 对照一：首次结构获取策略
 
@@ -31,7 +31,7 @@
 模型诊断/控制/局部敏感性；不是必须用满的目标。物理和控制机会两组相同。
 内部 rollout、差分、prefix、CONIC、失败和独立物理 launch 不混为同一个计数。
 
-启发式组由 Agent 自主选择 generate 或 search。数学组在取得首个有支持的
+启发式组在取得首个合法候选前只允许 Agent 自主 generate、诊断或 STOP；非法生成可纠正重试。首次生成参数完全由 Agent 决定。数学组在取得首个有支持的
 family_mixed_search_v1/task_violation 搜索候选前，只能继续合法首次搜索、诊断或 STOP；
 不能通过一次未准入/失败搜索后直接 generate 逃离策略。参数块、拓扑、bounds 和假设仍由 Agent 选。
 静态 residual 或局部 Gramian 不替代任务能力。其后结构/控制/数学工具机会相同。
@@ -42,11 +42,11 @@ family_mixed_search_v1/task_violation 搜索候选前，只能继续合法首次
 不把本报告、旧 C3、工程复现或历史 probe 的诊断答案塞进新 Agent 上下文。
 
 建议监督启动选项：`--session-handoff --handoff-request-bytes 160000
---pause-exploration-remaining 4 --pause-after-completed-invocations 1`。
-须先通过原 live continuation 准入并保存真实验证；本轮 mock 测试不代替它。
+--pause-exploration-remaining 4`。
+须先通过本次独立真实 live continuation 准入并保存真实验证；mock 测试不代替它。
 Handoff 和暂停只发生于原收据已结算、反馈成对、Reporter 已交付的可验证边界。
 监督者每次检查 `science_capable_main_requests`、待 Reporter、保护状态、未决 worker/请求；
-如需有限追加，先取得用户授权，使用原 addendum/ledger 在保护和 STOP 前办理。
+监督暂停后取消本次暂停阈值并在原额度内恢复；不得重复暂停、扩额或另起 Study。
 未知结果先原 recover，不重发、不清零、不重建 Store 躲费用；首个独立成功或合法 STOP 即结束。
 
 封存后用只读脚本：

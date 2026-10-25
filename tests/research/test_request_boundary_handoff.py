@@ -55,6 +55,13 @@ class RequestBoundaryHandoffTests(unittest.TestCase):
         self.assertFalse(any(m.get('tool_calls') for m in sent[1]['messages']))
         self.assertIn('CURRENT_RESEARCH_PACKET',sent[1]['messages'][-1]['content'])
         self.assertEqual(len([e for e in events if e['kind']=='model_original_tool_request']),1)
+        with patch('tools.research.agent.load_credential'),patch.dict(os.environ,{'DEEPSEEK_API_KEY':'offline'}),\
+                patch('tools.research.core.guard'),patch('tools.research.agent.guard'),\
+                patch('httpx.AsyncHTTPTransport',return_value=httpx.MockTransport(self.responder(h,sent))):
+            asyncio.run(converse(h,session_handoff=True,restore_only=True))
+        self.assertEqual(len(sent),2)
+        restored=h.store.artifact(h.store.events(h.run_id)[-1]['outputs'][0])
+        self.assertFalse(restored['next_request_sent']);self.assertEqual(restored['unmatched_tool_ids'],[])
 
     def test_changed_original_response_blocks_rotation_and_next_send(self):
         h=self.provision();sent=[]

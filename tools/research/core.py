@@ -361,6 +361,13 @@ def packet(host):
             claims=claims(host),research_status=s['research_status'])
 
 
+def initial_structure_action(host):
+    """One existing-state gate, shared by execution, L0 and the advertised Schema."""
+    s=state(host);strategy=s['spec'].get('initial_structure_strategy')
+    if strategy=='heuristic_generate' and not s.get('candidates'):return 'generate'
+    if strategy=='math_search' and not any(host.store.artifact(r).get('result',{}).get('best_mathematical_candidate') for r in s.get('search_results',[])):return 'search'
+
+
 def dispatch(host, value, request_id, origin='model'):
     """Native plan acceptance and internal batch use the same project Store."""
     if state(host)['spec'].get('mode') == 'engineering_numerical':
@@ -392,9 +399,10 @@ def dispatch(host, value, request_id, origin='model'):
     admit_closeout(host,'research_plan',plain(plan))
     guard(host,plan.action in ('initialize_control','control_search','generate','propose','execute','search','mechanics','replay','cross_replay','refine','nmpc_prediction_diagnostic','physical_replay','matched_state') or plan.diagnostic is not None)
     s=state(host)
-    if (s['spec'].get('initial_structure_strategy')=='math_search' and plan.action not in ('stop','diagnose')
-            and not any(host.store.artifact(r).get('result',{}).get('best_mathematical_candidate') for r in s.get('search_results',[]))):
-        if plan.action!='search' or getattr(plan.search,'version',None)!='family_mixed_search_v1' or plan.search.objective!='task_violation':
+    initial=initial_structure_action(host)
+    if initial and plan.action not in ('stop','diagnose'):
+        if plan.action!=initial:raise ValueError('FIRST_STRUCTURE_REQUIRES_'+initial.upper())
+        if initial=='search' and (getattr(plan.search,'version',None)!='family_mixed_search_v1' or plan.search.objective!='task_violation'):
             raise ValueError('FIRST_STRUCTURE_REQUIRES_FAMILY_MIXED_TASK_VIOLATION_SEARCH')
     for r in plan.supporting_evidence:
         host.store.artifact(r)

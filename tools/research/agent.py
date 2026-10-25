@@ -476,7 +476,7 @@ async def pause_completed_invocation(host,agent,completed):
         research_status=state(host)['research_status'],budgets_preserved=True))
 
 
-async def converse(host,*,session_handoff=False,pause_after_completed_invocations=None,handoff_before_next_request=False,handoff_request_bytes=None,pause_exploration_remaining=None):
+async def converse(host,*,session_handoff=False,pause_after_completed_invocations=None,handoff_before_next_request=False,handoff_request_bytes=None,pause_exploration_remaining=None,restore_only=False):
     if pause_after_completed_invocations is not None and (type(pause_after_completed_invocations) is not int or pause_after_completed_invocations<1):
         raise ValueError('POSITIVE_COMPLETED_INVOCATION_COUNT_REQUIRED')
     from tools.research.state import require_authorization
@@ -669,6 +669,12 @@ async def converse(host,*,session_handoff=False,pause_after_completed_invocation
     except BaseException:
         await boundary.aclose()
         raise
+    if restore_only:
+        record(host,'sdk_restore_verified',dict(session_id=agent._session_manager.session_id,
+            sdk_message_identity=digest(agent.messages),unmatched_tool_ids=list(unmatched(agent.messages)),
+            next_request_sent=False))
+        await boundary.aclose()
+        return
     if (state(host)['spec'].get('mode')=='rl_interface' or state(host)['spec'].get('capabilities')) and not state(host).get('live_started_unix'):
         s=state(host);pilot=deepcopy(s['pilot'])
         pilot.update(request_deadline_unix=None,bounded_request_reservation=False)

@@ -16,6 +16,24 @@ from tests.research import test_mixed_search as mixed
 
 
 class C3ReadinessTests(unittest.TestCase):
+    def test_strict_generate_retries_and_releases_common_actions(self):
+        from tools.research.research_context import agent_decision_brief
+        fixture=mixed.MixedSearchTests();fixture.setUp();self.addCleanup(fixture.cleanup)
+        host=fixture.host;spec=deepcopy(state(host)['spec']);spec['initial_structure_strategy']='heuristic_generate'
+        update(host,spec=spec)
+        self.assertEqual(core.initial_structure_action(host),'generate')
+        self.assertNotIn('search',agent_decision_brief(host)['actions'])
+        with patch.object(core,'guard'),self.assertRaisesRegex(ValueError,'FIRST_STRUCTURE_REQUIRES_GENERATE'):
+            core.dispatch(host,mixed.plan(mixed.request(spec)),'rejected-first-search')
+        generation=dict(version='serial_family_generation_v2',family_space_identity=spec['family_space_identity'],segment_count=1,tendon_count=3)
+        p=mixed.plan(None);p.update(action='generate',generation={**generation,'segments':{'0':{'length_m':2.}}});p.pop('search')
+        with patch.object(core,'guard'):
+            self.assertEqual(core.dispatch(host,p,'invalid-generation')['result']['status'],'invalid')
+            self.assertEqual(core.initial_structure_action(host),'generate')
+            p['generation']=generation
+            self.assertEqual(core.dispatch(host,p,'legal-generation')['result']['status'],'generated')
+        self.assertIsNone(core.initial_structure_action(host))
+        self.assertIn('search',agent_decision_brief(host)['actions'])
     def test_saved_context_navigation_and_selected_method_projection(self):
         from tests.research.c3_readiness_audit import C3Archive
         from tools.research.research_context import compact_scientific_delivery
@@ -72,6 +90,10 @@ class C3ReadinessTests(unittest.TestCase):
         self.assertEqual(result['resource_use']['legally_constructed'],1)
         self.assertEqual(result['best_mathematical_candidate']['task_acceptance'],'unmeasured')
         self.assertTrue(result['best_mathematical_candidate']['lineage']['actual_mathematical_evaluation_ref'])
+        self.assertIsNone(core.initial_structure_action(host))
+        from tools.research.research_context import agent_decision_brief
+        update(host,freeze='explicit-offline-conic-fixture')
+        self.assertIn('generate',agent_decision_brief(host)['actions'])
 
     def test_failure_snapshot_is_pre_call_and_worker_persists_unknown_progress(self):
         from extensions.tendon_family.backends import MujocoFailureSnapshot
