@@ -144,7 +144,7 @@ G2 又完整复现同一旧见证。复用这些记录，没有为了追求分�
 [B](../../configs/research/study_b3_pilot_b_draft.json)、
 [C](../../configs/research/study_b3_pilot_c_draft.json)、
 [共同参考生成参数](../../configs/research/b3_reference_generation.json)。
-三个草案均已 prepare/bind 到 `e39aae516dc48f24454960f207d5a9f7123aa0e7`，
+三个草案均已 prepare/bind 到 `655e1ed7fbec5a356ac046f554995d37fc3b7063`，
 完整 resolved identities、零使用账本和待授权状态见
 [冻结清单](../../evidence/b3_benchmark_readiness/frozen_drafts.json)。没有生成正式候选或执行正式科研。
 
