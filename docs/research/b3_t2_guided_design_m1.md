@@ -262,6 +262,8 @@ Provider、物理、NMPC、PPO 和 pending reservation 均为零；只导入三�
 新机器在干净提交下可复用这些仅准备的命令（本机已完成，无须重复创建）：
 
 ```powershell
+$researchPython='D:/softrobot-agent/.worktrees/s135-task-conditioned-control/.s135-env/Scripts/python.exe'
+$env:OPENBLAS_NUM_THREADS='1'; $env:OMP_NUM_THREADS='1'; $env:MKL_NUM_THREADS='1'
 & $researchPython -m tools.research prepare --spec configs/research/study_b3_t2_pilot_b_draft.json
 & $researchPython -m tools.research bind --run-id b3-t2-050-b-v2-draft
 & $researchPython -m tools.research prepare --spec configs/research/study_b3_t2_pilot_c_draft.json
@@ -269,8 +271,6 @@ Provider、物理、NMPC、PPO 和 pending reservation 均为零；只导入三�
 ```
 
 ```powershell
-$researchPython='D:/softrobot-agent/.worktrees/s135-task-conditioned-control/.s135-env/Scripts/python.exe'
-$env:OPENBLAS_NUM_THREADS='1'; $env:OMP_NUM_THREADS='1'; $env:MKL_NUM_THREADS='1'
 # 下列仅为后续正式授权及原 Handoff 准入均完成后的入口；M1 未执行：
 & $researchPython -m tools.research run --run-id b3-t2-050-b-v2-draft --session-handoff --handoff-request-bytes 160000 --pause-exploration-remaining 4
 & $researchPython -m tools.research run --run-id b3-t2-050-c-v2-draft --session-handoff --handoff-request-bytes 160000 --pause-exploration-remaining 4
