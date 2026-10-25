@@ -827,6 +827,9 @@ def agent_decision_brief(host):
     brief['action_trace']=compact_action_trace(research_action_trace(host))
     s=state(host)
     brief['mathematics_authorization']=mathematics_authorization(host,s)
+    if s['spec'].get('family_search'):
+        from tools.research.search import request_guidance
+        brief['structure_actions']=request_guidance(s['spec'])
     if s.get('engineering_feedback_correction'):
         ref=s['engineering_feedback_correction']
         brief['recorded_evidence_corrections']=current_evidence_corrections(host.store.artifact(ref),ref)

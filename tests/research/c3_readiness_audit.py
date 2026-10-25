@@ -6,7 +6,7 @@ import tarfile
 import httpx
 from tests.research.test_c1_method_context import C1Archive
 from tools.platform_store import plain
-from tools.research.agent import DeepSeekModel
+from tools.research.agent import DeepSeekModel,plan_schema
 from tools.research.research_context import compact_scientific_delivery
 from tools.research.session_handoff import initial_messages
 
@@ -31,6 +31,12 @@ def context_audit():
         event,meta,wire,packet,events=requests[index]
         after=deepcopy(wire);packet=deepcopy(packet)
         packet['research']=compact_scientific_delivery(packet['research'],decision_only=True)
+        from tools.research.search import request_guidance
+        packet['research']['structure_actions']=request_guidance(archive.snapshot['session']['state']['spec'])
+        for tool in after.get('tools',[]):
+            if tool['function']['name']=='research_plan':
+                tool['function']['parameters']=plan_schema(packet['research']['actions'],decision_required=True,
+                    family_version='serial_family_space_v2')
         after['messages'][-1]['content']='CURRENT_RESEARCH_PACKET\n'+json.dumps(packet,separators=(',',':'))
         short=deepcopy(after)
         short['messages']=[wire['messages'][0],*DeepSeekModel.format_request_messages(initial_messages(packet['study_id'])),after['messages'][-1]]
@@ -59,5 +65,37 @@ def context_audit():
         contributions_scope='Serialized components include their own framing, not an additive partition')
 
 
+def search_audit():
+    """Frozen-incumbent coverage fixture, with the real generator, no scores/worker."""
+    from tools.research.config import ROOT,resolve
+    from tools.research.contracts import FamilyMixedSearch
+    from tools.research import mixed_moves
+    from tools.research.optimal_capability import conic_subproblems
+    from tools.research.task_constraints import describe_analysis_requirements
+    from tools.state_io import digest
+    from extensions.tendon_family.family_space import parse_build
+    from extensions.tendon_family.generated_serial import generate_family
+    spec=resolve(ROOT/'configs/research/study_c3_blank_autonomous.json');space=spec['family_space']
+    cost=1+conic_subproblems(describe_analysis_requirements(spec['configuration'],{}));result=[]
+    for groups in (spec['family_search']['variable_groups'],['lengths','materials'],['routing','sections']):
+        q=FamilyMixedSearch(version='family_mixed_search_v1',family_space_identity=digest(space),variable_groups=groups,
+            segment_counts=[1,2,3] if 'segment_count' in groups else [3],
+            tendon_counts=[3,4] if 'tendon_count' in groups else [3],screening_fidelity='coarse',
+            objective='task_violation',operating_point='controller_start_input',max_proposals=16,max_evaluations=12)
+        incumbent=mixed_moves.initial(space,q);seen=set();rows=[];evaluations=0
+        for i in range(q.max_proposals):
+            point,paths,h=(incumbent,['initial'],q.step) if i==0 else mixed_moves.next_move(space,q,incumbent,i-1,q.step)
+            params=mixed_moves.generation(space,q,point);identity=digest(params);duplicate=identity in seen;seen.add(identity)
+            try:
+                generate_family(parse_build(dict(space=space,request=params)));legal=True;error=None
+            except ValueError as exc:legal=False;error=str(exc)
+            if legal and not duplicate:evaluations+=cost
+            rows.append(dict(proposal=i+1,paths=paths,legal=legal,duplicate=duplicate,step=h,error=error))
+            if evaluations>=12:break
+        result.append(dict(groups=groups,trajectory=rows,mathematical_evaluations=evaluations,
+            conic_solves=evaluations//cost,model_preparations=evaluations//cost,physical_launches=0))
+    return dict(scenarios=result,scope='Engineering geometry/coverage fixture with fixed incumbent, not scientific scores or task importance. Actual incumbent updates alter conditional coordinates.')
+
+
 if __name__=='__main__':
-    print(json.dumps(context_audit(),indent=2))
+    print(json.dumps(dict(context=context_audit(),search=search_audit()),indent=2))

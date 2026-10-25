@@ -45,6 +45,43 @@ STOP/SELECT、预算、推断限制和原始证据引用保留；Reporter 解释
 C1 历史上下文测试另有既存环境相关失败（80,255 ≥ 78,644），已用原 HEAD 代码在内存中
 复现同一结果；没有改写历史验收来隐藏它。其余 C1 3 项通过。
 
+## 2. 搜索发现、计费与效率
+
+空池也提供 `structure_actions`：generate 使用 **generation** payload；search 使用
+`family_mixed_search_v1` 与 `variable_groups`；已有候选分析使用 research_analysis。
+列出必填字段、冻结 grant、fidelity、三种 objective 的不同含义及禁混旧字段。
+family 模式只广告当前 generation 和 mixed search Schema；原 source-relative Plan/执行解析保留。
+不替 Agent 选择 objective、拓扑或参数块。
+
+只读几何轨迹脚本使用真实 `family_space_v2`、原 mixed_moves 和 generator，固定 incumbent，
+没有优化评分、CONIC 求解或科学 worker：
+
+| 子空间（工程示例） | 依次访问的前几个坐标 | 12 数学额度覆盖 |
+|---|---|---|
+| 全部块，1–3 段/3–4 腱 | initial、段数、腱数、length.0、young.0、section.0.semi_y | 6 合法新结构，6 模型准备 + 6 CONIC |
+| lengths + materials，固定 3 段/3 腱 | initial、length.0、young.0、length.1、young.1、length.2 | 6 新结构；young.2 尚未访问 |
+| routing + sections，固定 3 段/3 腱 | initial、phase、semi_y.0、guide_s、semi_z.0、anchor_s（重复）、width_y.1 | 7 提案，6 新结构 |
+
+完整组的 spans 只有 whole_chain 一个策略，因此没有活动 span 坐标；路由未轮到。
+以上不是任务重要性排序，也不保证实际评分更新 incumbent 后访问顺序不变。
+未出现非法结构或仅改表示的有效评价；确认 anchor_s 已在上界，正移动裁剪无变化。
+有限自选 bounds 的长度也复现此问题。新增最小去重：构建前发现重复 request 时记录
+`skipped_moves`，消耗 proposal、不构建、不新增数学评价；原 receipt 复用和失败费用保持。
+不新增算法或重要性启发式，继续按 Agent 给定 variable_groups 顺序轮换。
+
+计费明确区分 proposed_designs、legally_constructed、actual_mathematical_evaluations；
+CONIC 内部 branch 由原 conic_subproblems 计算，物理启动独立。rank 仍只把 computed 的
+有限数学分数列为有效，失败为 unknown/unsupported，正负和最大/最小方向不变；任务接受仍 unmeasured。
+
+5 项核心搜索回归通过：合法公开 Schema、旧/新字段拒绝、裁剪去重计费、真实生成候选与 lineage、
+已封存分析的中断恢复复用、失败和非法候选费用。13 项旧 mixed suite 中另有 3 项既存快照/环境断言
+不适用于当前基线（旧 configuration digest、六段失败源身份、未设置线程变量的 execution 门禁），
+不修改科学身份/环境门禁去迎合旧断言。
+
+加入搜索 Schema/发现后重新计算完整请求：早/中/末的保留旧历史请求为
+76,681 / 301,293 / 599,722 字节，短会话投影 76,891 / 101,116 / 90,994；
+相应短会话离线 tokens 20,459 / 28,135 / 27,606。末轮字节减少 85.8%。
+
 ## 后续阶段
 
 搜索轨迹、半径敏感性、数值快照与实验配置在后续阶段补齐。此文所有工程夹具不构成科研成功。

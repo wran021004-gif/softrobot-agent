@@ -61,6 +61,28 @@ def parse_search(query):
     return (FamilyMixedSearch if raw.get('version')=='family_mixed_search_v1' else Search).model_validate(raw)
 
 
+def request_guidance(spec):
+    """Discovery works before a candidate exists; no scientific choice is made."""
+    grant=spec['family_search']
+    return dict(generate=dict(tool='research_plan',action='generate',payload='generation',
+            version='serial_family_generation_v2',required=['family_space_identity','segment_count','tendon_count']),
+        search=dict(tool='research_plan',action='search',payload='search',
+            version='family_mixed_search_v1',family_space_identity=spec['family_space_identity'],method=grant['method'],
+            required=['variable_groups','segment_counts','tendon_counts','screening_fidelity','objective','operating_point','max_proposals','max_evaluations'],
+            grant=grant,screening_fidelities=list(spec['fidelity_policy']['screening']),
+            parameter_blocks=dict(lengths='Segment length in m',materials='Young modulus in Pa',
+                sections='Section type/dimensions in m',routing='Span phase, station, channel angle and radius',
+                spans='Consecutive span strategy',segment_count='Discrete number of segments',tendon_count='Discrete number of channels'),
+            block_selection='Agent chooses a subset, e.g. lengths+materials or routing+sections, and singleton counts for fixed topology. Evidence-based selection requires exact evidence_used; otherwise label it a heuristic hypothesis.',
+            objectives=dict(task_violation='CONIC sampled model task capability; controller_start_input or standardized_initial_pretension; model build + internal solves charged',
+                target_equilibrium_residual='Static proxy only; target_equilibrium required',
+                held_position_min_eigenvalue='Local held-input drive proxy only; controller_start_input or standardized_initial_pretension'),
+            omit_legacy_fields=['variables','fixed','evaluation_mode','protocol','scoring_window_s']),
+        analysis=dict(tool='research_analysis',operation='task_capability',candidate='existing owned candidate required',
+            capability_method='sampled-affine-conic-minimax-v1',protocol='exact frozen analysis_protocol'),
+        scope='All actions retain Plan hypothesis/decision obligations. Numerical failure is unknown; no proxy establishes independent physical acceptance.')
+
+
 def coordinate_layout(query,constraint):
     names=sorted(query.variables)
     bounds=deepcopy(query.bounds)
@@ -126,7 +148,7 @@ def run_search(host,query,key,*,guard,execute,capacity):
             return dict(status='budget_limited',admission=fit,evaluated=[])
         problem=search_problem(host,q,fit['admitted'])
         checkpoint=dict(problem=problem,problem_identity=identity,started=time.time(),evaluated=[],updates=[],
-            iteration=0,step=q.step,pending=None,termination=None,proposal_count=0,
+            iteration=0,step=q.step,pending=None,termination=None,proposal_count=0,skipped_moves=[],
             requesting_plan=next((r for r in s['plans'] if host.store.artifact(r)['request_id']==key),None))
         update(host,search_bindings={**s.get('search_bindings',{}),identity:owner})
     if checkpoint['problem_identity']!=identity:
@@ -178,6 +200,11 @@ def run_search(host,query,key,*,guard,execute,capacity):
                         break
                 checkpoint['proposal_count']+=1
                 params=generation(space,q,point)
+                if any(row['parameters']==params for row in rows):
+                    checkpoint.setdefault('skipped_moves',[]).append(dict(proposal=checkpoint['proposal_count'],
+                        changed_paths=changes,reason='duplicate_or_clipped_no_change',additional_evaluations=0))
+                    persist()
+                    continue
                 parent=best['evidence']['candidate'] if best else plain(q.previous_candidate_ref)
                 evidence=[best['evidence']['analysis']] if best and best['evidence'].get('analysis') else [plain(r) for r in q.evidence_used]
                 checkpoint['pending']=dict(parameters=params,point=point,latent=[],proposal_id=str(checkpoint['proposal_count']),
@@ -304,6 +331,8 @@ def run_search(host,query,key,*,guard,execute,capacity):
         termination_reason=checkpoint['termination'],search_updates=checkpoint['updates'],search_state=checkpoint_ref,
         analysis_rejection=checkpoint.get('analysis_rejection'),
         resource_use=dict(evaluated_designs=len(rows),proposed_designs=checkpoint['proposal_count'],
+            legally_constructed=sum(bool(row.get('candidate_id')) for row in rows),
+            skipped_moves=checkpoint.get('skipped_moves',[]),
             actual_mathematical_evaluations=sum(row.get('actual_mathematical_evaluations',1) for row in rows) if mathematical else 0,
             elapsed_s=time.time()-checkpoint['started']),
         unsearched_scope=dict(global_feasibility_proven=False,global_optimality_proven=False))

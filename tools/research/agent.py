@@ -269,10 +269,14 @@ def read_tool_evidence(host,query):
     return read_evidence(host,query)
 
 
-def plan_schema(actions, *, decision_required=False):
+def plan_schema(actions, *, decision_required=False,family_version=None):
     """Advertise only executable action payloads and their reachable definitions."""
     from tools.research.contracts import Plan, PLAN_PAYLOADS, PLAN_OPTIONAL_PAYLOADS
     schema=Plan.model_json_schema()
+    if family_version:
+        schema['properties']['search']['anyOf']=[{'$ref':'#/$defs/FamilyMixedSearch'},{'type':'null'}]
+        generation='GenerationRequestV2' if family_version=='serial_family_space_v2' else 'GenerationRequest'
+        schema['properties']['generation']['anyOf']=[{'$ref':'#/$defs/'+generation},{'type':'null'}]
     payloads=PLAN_PAYLOADS
     allowed={payloads[a] for a in actions if a in payloads}
     allowed.update(f for a in actions for f in PLAN_OPTIONAL_PAYLOADS.get(a,()))
@@ -700,7 +704,8 @@ async def converse(host,*,session_handoff=False,pause_after_completed_invocation
         current=decision_packet(host)
         if formal:agent.tool_registry.registry.pop('experience_retrieve',None)
         if 'research' in current:
-            native[0].tool_spec={**native[0].tool_spec,'inputSchema':{'json':plan_schema(current['research']['actions'],decision_required=bool(s['spec'].get('research_decisions')))}}
+            native[0].tool_spec={**native[0].tool_spec,'inputSchema':{'json':plan_schema(current['research']['actions'],decision_required=bool(s['spec'].get('research_decisions')),
+                family_version=s['spec']['family_space']['version'] if s['spec'].get('start_mode')=='family_space' else None)}}
         if not enabled(s['spec'],'analysis') or s['spec']['budgets']['mathematical_evaluations']<=s.get('mathematical_evaluations',0):
             agent.tool_registry.registry.pop('research_analysis',None)
         # Provider readiness is checked per selected model by analysis.dispatch;

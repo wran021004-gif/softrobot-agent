@@ -128,6 +128,26 @@ class MixedSearchTests(unittest.TestCase):
         self.assertEqual(after_bad['segment_count'],1)
         self.assertNotEqual(after_good,after_bad)
 
+    def test_family_schema_and_clipped_moves_preserve_separate_counts(self):
+        from jsonschema import Draft202012Validator
+        from tools.research.agent import plan_schema
+        schema=plan_schema(['search'],family_version='serial_family_space_v2')
+        q=request(self.spec)
+        q.update(variable_groups=['lengths'],segment_counts=[1],tendon_counts=[3],span_strategies=['whole_chain'],
+            bounds={'length_m':(.09,.1)},max_proposals=3,max_evaluations=2)
+        Draft202012Validator(schema).validate(json.loads(json.dumps(plan(q))))
+        self.assertNotIn('Search',schema['$defs'])
+        self.assertIn('Search',plan_schema(['search'])['$defs'])
+        with self.assertRaises(ValueError):search.parse_search({**q,'fixed':{}})
+        with self.assertRaises(ValueError):search.parse_search({k:v for k,v in q.items() if k!='version'})
+        output=self.run_scored(q)['result']['result']
+        use=output['resource_use']
+        self.assertEqual(use['proposed_designs'],3)
+        self.assertEqual(use['evaluated_designs'],2)
+        self.assertEqual(use['actual_mathematical_evaluations'],2)
+        self.assertEqual(use['skipped_moves'][0]['additional_evaluations'],0)
+        self.assertEqual(output['best_observed']['task_acceptance'],'unmeasured')
+
     def test_pending_checkpoint_recovery_reuses_sealed_analysis(self):
         q=request(self.spec);q.update(max_evaluations=2)
         original=self.scored;calls=[]
