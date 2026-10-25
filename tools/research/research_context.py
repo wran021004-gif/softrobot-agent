@@ -14,6 +14,15 @@ def import_history(host):
     from tools.research.physical_replay import binding, schedule_identity
     s=state(host)
     if s.get('research_history_imported'):return
+    # Background is read-only, including different-task evidence. It grants no
+    # candidate, execution, acceptance, or current-task inference identity.
+    background=list(s.get('scoped_context',[]))
+    for item in s['spec']['research_decisions'].get('background',[]):
+        for ref in [item['reference'],*item.get('dependencies',[])]:
+            value=archived(item['folder'],ref,raw=ref.get('media_type','application/json')!='application/json')
+            if save(host,value,'declared_historical_background')!=ref:raise ValueError('HISTORY_BACKGROUND_IDENTITY_MISMATCH')
+            if ref==item['reference'] and ref not in background:background.append(ref)
+    update(host,scoped_context=background)
     entries=[]
     for item in s['spec']['research_decisions'].get('history',[]):
         folder=item['folder'];ref=item['reference'];result=archived(folder,ref)
@@ -58,6 +67,62 @@ def import_history(host):
         if generated['status']!='generated':raise ValueError('CONTROL_SEED_DESIGN_NOT_EXECUTABLE: '+str(generated))
         seed_control(host,ControlSeedRequest(candidate=generated['candidate'],parent=parent,source=source_ref))
     update(host,research_history=entries,research_mathematics=mathematics,research_history_imported=True)
+
+
+def history_index(host,candidate=None,query=None):
+    """Derived L1 conclusions over declared Store evidence, never a second ledger."""
+    from tools.research.config import same_robot_structure
+    s=state(host);rows=[]
+    refs=[*[e['reference'] for e in s.get('research_history',[])],
+        *s.get('research_mathematics',[]),*s.get('scoped_context',[])]
+    current=host.store.artifact(candidate) if candidate else None
+    for ref in {r['artifact_id']:r for r in refs}.values():
+        value=host.store.artifact(ref)
+        if not isinstance(value,dict) or not value.get('candidate'):continue
+        tr=value.get('trajectory') or {};acceptance=value.get('acceptance') or {}
+        if not acceptance.get('components') and not value.get('requested_operation'):continue
+        old=host.store.artifact(value['candidate']);cfg=old['configuration']
+        same_design=same_robot_structure(current['configuration'],cfg) if current else None
+        if current and not same_design and current['configuration']['task']['goal']!=cfg['task']['goal']:continue
+        same_task=comparable_task(s['spec'],cfg['task'])==s['spec'].get('canonical_task',s['base_configuration']['task'])
+        recorded=value.get('requested_operation')
+        method=tr.get('method_version') or ((recorded.get('capability_method') or recorded['operation']) if recorded else
+            'fixed_tension' if value.get('source_reference') else 'ppo' if value.get('run_id') else 'nmpc')
+        control=host.store.artifact(value['source_reference']) if value.get('source_reference') else {}
+        provenance=control.get('provenance',{})
+        if provenance.get('control_initialization'):method+=':'+provenance['control_initialization']
+        scope=summarize_evidence(value,ref)
+        equivalence='unknown'
+        # A request/configuration match is a useful repeat hint, not proof of
+        # identical rebuilt matrices, numerical environment, or control witness.
+        if query and recorded and current:
+            def request(q):
+                from tools.research.contracts import AnalysisRequest
+                return {k:v for k,v in plain(AnalysisRequest.model_validate(q)).items() if k!='candidate'}
+            aligned=same_task and same_design and all(current['configuration']['policy'][k]==cfg['policy'][k]
+                for k in ('controller','backend','discretization','dynamics_model'))
+            if aligned and request(plain(query))==request(recorded):equivalence='same_configuration_and_request'
+        if acceptance:
+            result=dict(metrics=acceptance.get('metrics'),components=acceptance.get('components'),
+                status=acceptance.get('status'),accepted=acceptance.get('accepted'))
+        else:
+            records=tr.get('replay',{}).get('records',[])
+            result=dict(status=value.get('status'),conclusion=value.get('scoped_claim',{}).get('conclusion'),
+                violation=tr.get('replayed_violation'),sampled_maxima={k:max(r['value'] for r in records if r['constraint_id']==k)
+                    for k in dict.fromkeys(r['constraint_id'] for r in records)},control_witness=bool(tr.get('applied_input_n')))
+        declarations=s['spec'].get('research_decisions',{})
+        source=next((e for k in ('background','history','mathematics') for e in declarations.get(k,[]) if e['reference']==ref),{})
+        intent=host.store.artifact(source['plan'])['original_plan'].get('hypothesis') if source.get('plan') else None
+        rows.append(dict(candidate=value['candidate'],method=method,actual_result=result,
+            research_question=(recorded or {}).get('operation','Independent reach/hold task evaluation'),
+            original_agent_intent_excerpt=intent[:240] if intent else None,
+            owning_study=value.get('owning_study'),historical_only=True,evidence_scope=scope['claim_kind'],
+            task_match=same_task,design_match=same_design,repeat_hint=equivalence,experimental_equivalence='unknown',recorded_request=recorded,
+            unresolved_question='Realization, aligned GVS/MuJoCo prediction, terminal braking and structural contributions remain unresolved; different controls cannot establish model error.',
+            limitations=scope['unsupported_inferences'],control_source=value.get('source_reference'),
+            mathematical_source=provenance.get('mathematical_result'),
+            source=dict(reference=ref,view='full',pointer='',folder=source.get('folder'),plan=source.get('plan'))))
+    return sorted(rows,key=lambda r:r['design_match'] is not True)
 
 
 def measured_samples(host,result):
@@ -509,7 +574,7 @@ def working_set(host,current):
                 method_remaining={k:v for k,v in current['method_remaining'].items() if k not in ('mathematical_evaluations','rl_stages')}),
         control_search_domain=current.get('control_search_domain'),
         source_references=list({r['artifact_id']:r for r in registered_references(host)}.values()),all_fresh_results=references,
-        citation_eligibility=citation_inventory(host),action_trace=research_action_trace(host,limit=None),
+        citation_eligibility=citation_inventory(host),research_history_index={r['source']['reference']['artifact_id']:r for r in history_index(host)},action_trace=research_action_trace(host,limit=None),
         recent_searches=current['decision_feedback']['recent_searches'],
         scientific_scope='No model-authored hypotheses are promoted to measured causes; only original independent acceptance establishes success')
 
@@ -904,6 +969,14 @@ def agent_decision_brief(host):
             ('reference','operation','status','control_handoff') if k in latest}
     anchor=brief.get('evidence_access',{}).get('reference')
     if anchor:
+        history=history_index(host,candidate)
+        if history:
+            brief['research_history']=dict(query=dict(reference=anchor,view='working_set',pointer='/research_history_index'),
+                conclusions=[dict(study=r['owning_study'],method=r['method'],scope=r['evidence_scope'],l1_pointer='/research_history_index/'+r['source']['reference']['artifact_id'],
+                    task_match=r['task_match'],result=(dict(violation=r['actual_result']['violation'],
+                        sampled_maxima=r['actual_result']['sampled_maxima']) if 'violation' in r['actual_result'] else
+                        dict(accepted=r['actual_result']['accepted'],metrics=r['actual_result']['metrics']))) for r in history[:5]],
+                decision_hint='Existing work: read L1 before repeating. State new information or a reproducibility/numerical check purpose. Exact experimental equivalence is unknown until model, point, inputs and grid align. Historical results grant no current execution/SELECT credit; braking and model-physics mechanisms remain unresolved.')
         diagnostic_anchor=(brief.get('best_valid') or {}).get('reference') or (brief.get('latest_scientific_feedback') or {}).get('reference') or anchor
         brief['diagnostic_relations']=dict(status='available_on_demand',
             query=dict(reference=diagnostic_anchor,view='working_set',pointer='/diagnostic_relations'),

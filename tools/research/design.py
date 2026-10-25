@@ -228,6 +228,10 @@ def generate_candidate(host,request,provenance,*,screening_fidelity=None):
         cfg['robot'].update(sources=['frozen family-space assembly prototypes'])
         cfg['robot']['structure']['data']=robot
         cfg['policy']['discretization']['data']=mesh
+        if spec.get('fixed_structure_reference'):
+            from tools.research.config import same_robot_structure
+            if not same_robot_structure(cfg,host.store.artifact(spec['fixed_structure_reference'])['configuration']):
+                raise ValueError('FROZEN_REFERENCE_STRUCTURE_REQUIRED')
         serial=build.request.version=='serial_family_generation_v2'
         cfg['policy']['candidate_builder']=dict(extension_id='candidate.family',version='6.0.0' if serial else '5.0.0',
             parameters=dict(contract='family.serial_space_build_v2' if serial else 'family.serial_space_build',version='1.0.0',data=plain(build)))

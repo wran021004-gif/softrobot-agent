@@ -2,7 +2,7 @@
 from copy import deepcopy
 from pathlib import Path
 
-from schemas.platform import SessionInput
+from schemas.platform import SessionInput, EvidenceRef
 from tools.platform_store import plain
 from tools.state_io import read, digest, effective_input
 
@@ -128,6 +128,7 @@ def extend_engineering_counts(spec, changes, authorization):
 def resolve(path, profile=None, *, backend_profile=None):
     path = Path(path).resolve()
     study = read(path)
+    fixed_structure=study.pop('fixed_structure_reference',None)
     family_sensitivity=study.pop('family_sensitivity_variables',None)
     methods=study.pop('mathematical_methods',None)
     if methods is not None:
@@ -144,6 +145,7 @@ def resolve(path, profile=None, *, backend_profile=None):
     first_strategy=study.pop('initial_structure_strategy',None)
     replan_period=study.pop('nmpc_replan_period_s',None)
     family_mode=study.get('start_mode')=='family_space'
+    if fixed_structure is not None and not family_mode:raise ValueError('FIXED_STRUCTURE_REQUIRES_FAMILY_STUDY')
     additions={key:study.pop(key) for key in ('fidelity_policy','family_search') if key in study}
     if family_mode:
         from extensions.tendon_family.family_space import parse_space
@@ -426,7 +428,7 @@ def resolve(path, profile=None, *, backend_profile=None):
         study['final_evaluation_identity']=digest(dict(policy=policy,backend=cfg['policy']['backend'],
             task=study['canonical_task'],controller=cfg['policy']['controller'],model=cfg['policy']['dynamics_model']))
     if decisions is not None:
-        if decisions.get('version')!='research_decision_v1' or set(decisions)-{'version','history','mathematics','control_seeds','context_limits'}:
+        if decisions.get('version')!='research_decision_v1' or set(decisions)-{'version','history','mathematics','control_seeds','context_limits','background'}:
             raise ValueError('VERSIONED_RESEARCH_DECISIONS_REQUIRED')
         for key,value in decisions.get('context_limits',{}).items():
             if key not in ('candidates','recent','pareto','samples','evidence') or type(value) is not int or not 1<=value<=100:
@@ -438,6 +440,7 @@ def resolve(path, profile=None, *, backend_profile=None):
             raise ValueError('EXPLICIT_ENGINEERING_READINESS_REPORT_REQUIRED')
         study['tool_readiness']=dict(sorosim_matlab=report)
     if methods is not None:study['mathematical_methods']=methods
+    if fixed_structure is not None:study['fixed_structure_reference']=plain(EvidenceRef.model_validate(fixed_structure))
     study['resolved_identity'] = digest(study)
     return study
 

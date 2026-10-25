@@ -258,7 +258,9 @@ def admit_decision(host,plan):
             source_cfg=host.store.artifact(source_candidate)['configuration']
             task=comparable_task(s['spec'],source_cfg['task'])
             expected=s['spec'].get('canonical_task',s['base_configuration']['task'])
-            if task!=expected:raise ValueError('EVIDENCE_TASK_IDENTITY_MISMATCH')
+            background=[e['reference'] for e in s['spec'].get('research_decisions',{}).get('background',[])]
+            if task!=expected and not (d.claimed_inference=='empirical_search' and plain(ref) in background):
+                raise ValueError('EVIDENCE_TASK_IDENTITY_MISMATCH')
             if d.claimed_inference!='empirical_search' and cfg and source_cfg['robot']!=cfg['robot']:
                 raise ValueError('EVIDENCE_DESIGN_IDENTITY_MISMATCH')
             if d.claimed_inference!='empirical_search' and cfg and any(source_cfg['policy'][k]!=cfg['policy'][k] for k in ('backend','discretization','dynamics_model')):

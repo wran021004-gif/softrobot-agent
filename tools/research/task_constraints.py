@@ -127,6 +127,12 @@ def mathematical_method_view(host, reference):
             methods[key]['handoff']='physical_replay(candidate=same candidate, source=returned control_schedule_reference); independent acceptance and public evidence_read are required before SELECT.'
         if key=='short_input_response_v1':
             methods[key]['cost_scope']='One baseline + up to four FD rollouts per channel (two input sizes, central or one-sided) + optional one nonlinear candidate rollout. Required prefix reconstruction is already included in native cost.physics_steps; recorded rollouts/physics_steps own actual cost. Full independent physical_replay is additional if requested.'
+        if key==CONIC:
+            from tools.research.research_context import history_index
+            methods[key]['previous_work']=[{k:r[k] for k in ('owning_study','evidence_scope','actual_result',
+                'repeat_hint','experimental_equivalence','source')} for r in history_index(host,reference,request)
+                if r['method']==key]
+            methods[key]['repeat_guidance']='Read the original result and state what new information a repeat adds. Reproducibility, numerical checks and changed conditions are legitimate; this hint never vetoes execution. Configuration/request matching alone does not prove identical models, working points or controls.'
     return dict(**readiness,candidate=reference,methods=methods,scientific_interpretation=SCIENTIFIC_INTERPRETATION,
         analysis_request_schema=AnalysisRequest.model_json_schema())
 

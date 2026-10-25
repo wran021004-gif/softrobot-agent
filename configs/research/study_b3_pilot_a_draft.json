@@ -1,0 +1,268 @@
+{
+  "defaults": "family_study_defaults.json",
+  "start_mode": "family_space",
+  "family_space": "family_space_v2.json",
+  "candidate_initialization": "all_candidate_dofs_zero_v1",
+  "study_id": "b3-pilot-050-a-draft",
+  "base_commit": "5e955768ea40dfe447bd2d8e6eb6bfeee430ff25",
+  "authorization": "PENDING_EXPLICIT_APPROVAL: readiness only. No Provider, physics, NMPC or PPO run authorized by this draft.",
+  "mode": "formal_research",
+  "task": "../../tasks/reach_hold_b3_050.json",
+  "control": "control.json",
+  "runtime": "runtime_c3_ab.json",
+  "evidence_destination": "evidence/b3_pilot_050_a",
+  "nmpc_replan_period_s": 0.1,
+  "capabilities": [
+    "analysis",
+    "control_correction",
+    "physical_replay",
+    "nmpc"
+  ],
+  "allowed_plan_actions": [
+    "initialize_control",
+    "physical_replay",
+    "execute",
+    "diagnose",
+    "select",
+    "stop"
+  ],
+  "budgets": {
+    "provider_requests": 16,
+    "protected_provider_requests": 4,
+    "public_operations": 32,
+    "protected_public_operations": 6,
+    "physical_launches": 1,
+    "local_solves": 0,
+    "local_solve_s": null,
+    "offline_nlp": 0,
+    "bdf_replays": 0,
+    "mathematical_evaluations": 0,
+    "numerical_s": null,
+    "activity_s": null,
+    "delivery_reserve_s": null
+  },
+  "nmpc_limits": {
+    "executions": 1
+  },
+  "rl_limits": {
+    "training_stages": 0,
+    "actions_per_trial": null,
+    "seconds_per_trial": null,
+    "training_actions": null,
+    "training_active_seconds": null,
+    "evaluation_episodes": 0,
+    "diagnostic_replays": 0,
+    "diagnostic_physics_steps": 0
+  },
+  "confirmation": {
+    "fresh_independent_repetitions": 0,
+    "configuration": "Select exact fresh completed passing backend evaluation after public read. No extra repetitions; repeatability unassessed."
+  },
+  "physical_replay_limit": 0,
+  "reserve_rl_evaluation": false,
+  "native_control_limits": {
+    "evaluation_requests": 8,
+    "iterations": 2,
+    "knots_s": 4
+  },
+  "research_decisions": {
+    "version": "research_decision_v1",
+    "history": [],
+    "mathematics": [],
+    "control_seeds": [],
+    "background": [
+      {
+        "folder": "evidence/c3_math_search_ab_100ms_20261025",
+        "reference": {
+          "artifact_id": "87d6267303ffd0e3a20cc229658a4492ccfd5799d3edfffbfbeb03b186822931",
+          "media_type": "application/json"
+        },
+        "plan": {
+          "artifact_id": "0a2daaefde868dcd954048c15e4c517397da9cb482a3af039f3ecf4b32697daa",
+          "media_type": "application/json"
+        },
+        "dependencies": [
+          {
+            "artifact_id": "e0f2ccf53680ad00b1ed5d258d8b5eed38ced55fbc07f3bde07d3e5ce415ac1d",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "7268624ddad6b5af7c90090a40192c35b570b158b17c47879a527f4400758b5c",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "63be7e41e020bc00ee1c7926929730c6f0a0b9c0c3d83427c76eb5acfba8dc67",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "0a2daaefde868dcd954048c15e4c517397da9cb482a3af039f3ecf4b32697daa",
+            "media_type": "application/json"
+          }
+        ]
+      },
+      {
+        "folder": "evidence/c3_math_search_ab_100ms_20261025",
+        "reference": {
+          "artifact_id": "3f67ca10b4ebbb554f7f51809d9720230e011941412f1c138a86667ca2c8612f",
+          "media_type": "application/json"
+        },
+        "plan": {
+          "artifact_id": "53db1af774de49939a06c84343a27ea95599edfac266c964107fda9687f8e741",
+          "media_type": "application/json"
+        },
+        "dependencies": [
+          {
+            "artifact_id": "e0f2ccf53680ad00b1ed5d258d8b5eed38ced55fbc07f3bde07d3e5ce415ac1d",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "7268624ddad6b5af7c90090a40192c35b570b158b17c47879a527f4400758b5c",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "fd6e88cb7c186aa17755096cb3f4a055332e32864ca7e48a59f01bf4e144be57",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "70d8a0fa2e68cb5d32598fd447e68ac229da707a92cc023e371ba68bd68ca9ee",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "61830ae4b79ee682b116bf6db2e563e5f9120922b385ca948aacbbfc643e38d5",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "53db1af774de49939a06c84343a27ea95599edfac266c964107fda9687f8e741",
+            "media_type": "application/json"
+          }
+        ]
+      },
+      {
+        "folder": "evidence/c3_math_search_ab_100ms_20261025",
+        "reference": {
+          "artifact_id": "ead9bd6e454fc25a83e34ca7147c3cca3680a07a831fc5dbedeea7c05b08474f",
+          "media_type": "application/json"
+        },
+        "plan": {
+          "artifact_id": "87faa43e0868554b5485744c82ad17695fa97e36208e9a704270d38d76be271d",
+          "media_type": "application/json"
+        },
+        "dependencies": [
+          {
+            "artifact_id": "e0f2ccf53680ad00b1ed5d258d8b5eed38ced55fbc07f3bde07d3e5ce415ac1d",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "7268624ddad6b5af7c90090a40192c35b570b158b17c47879a527f4400758b5c",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "86e25bcac4b1b5b689d3582ced239b4b55a02d3f553e6cc504bc7c7108c0950e",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "87faa43e0868554b5485744c82ad17695fa97e36208e9a704270d38d76be271d",
+            "media_type": "application/json"
+          }
+        ]
+      }
+    ],
+    "context_limits": {
+      "candidates": 3,
+      "recent": 3,
+      "pareto": 3,
+      "samples": 3,
+      "evidence": 3
+    }
+  },
+  "supplied_evidence": [],
+  "mathematical_methods": {
+    "sampled-affine-conic-minimax-v1": "PENDING_EXPLICIT_APPROVAL: proposed registered method, within the future Study total; no execution grant from readiness."
+  },
+  "fidelity_policy": {
+    "version": "numerical_fidelity_v1",
+    "screening": {
+      "coarse": {
+        "cells_per_segment": 4,
+        "backend": "backend.family_mujoco@1.1.0"
+      },
+      "standard": {
+        "cells_per_segment": 12,
+        "backend": "backend.family_mujoco@1.1.0"
+      }
+    },
+    "final_evaluation": {
+      "cells_per_segment": 12,
+      "backend": "backend.family_mujoco@1.1.0"
+    },
+    "require_exact_fidelity": true,
+    "alternative_runtimes": [],
+    "runtime_preflight_limit": 2
+  },
+  "execution_instructions": "Keep the seeded reference structure and original default NMPC control recipe; one current-task independent NMPC evaluation. Frozen task: target [0.29,-0.035,0.19] m, zero initial state, 0.50 s, final [0.45,0.50] s hold, position <=0.010 m, speed <=0.020 m/s, tension per channel [0,8] N, control/sample 0.01 s, physics 0.0005 s. Soft weights do not replace acceptance. B and C share total Provider/science/solver/control limits. NMPC uses horizon=10, substeps=1, replan_period_s=0.1, max_iterations<=120 per solve, tolerance=1e-6; no arm may enlarge these computation limits. Before each evaluation the supervisor checks candidate recipe and per-structure opportunities against this protocol; an out-of-protocol run cannot support B/C comparison. Final evaluation requires 12 cells per segment and 8 N channel limits. Record actual costs and opportunities per structure, and compare only best found results. Before any repeat read research_history_index and state new information or reproducibility purpose. Historical evidence remains background; never count it as a current execution or SELECT. No new PPO. Full controls must cover this new task horizon. At first fresh complete final-fidelity pass publicly read and SELECT exact candidate/control/result with zero extra confirmations; otherwise publicly read and cite all_fresh_results before STOP. Session handoff requires existing admission and settled paired feedback. Stop at caps; no resets or extensions. This draft requires a new explicit scientific authorization before run.",
+  "topology_scope": {
+    "segment_counts": [
+      1,
+      2,
+      3
+    ],
+    "tendon_counts": [
+      3,
+      4
+    ]
+  },
+  "initial_structure_strategy": "agent_choice",
+  "scoring_window_s": 0.5,
+  "fixed_structure_reference": {
+    "artifact_id": "e0f2ccf53680ad00b1ed5d258d8b5eed38ced55fbc07f3bde07d3e5ce415ac1d",
+    "media_type": "application/json"
+  },
+  "analysis_protocol": {
+    "protocol_id": "task-local-v2",
+    "input_scale_n": 8.0,
+    "output_scale_m": 0.01,
+    "windows_s": [
+      0.05,
+      0.1,
+      0.5
+    ],
+    "samples_s": [
+      0.0,
+      0.1,
+      0.3,
+      0.45,
+      0.49
+    ],
+    "frequency_rad_s": [
+      0.1,
+      1.0,
+      10.0,
+      100.0
+    ],
+    "rank_atol": 1e-12,
+    "rank_rtol": 1e-09,
+    "comparison_atol": 1e-08,
+    "comparison_rtol": 2e-06,
+    "derivative_atol": 2e-05,
+    "derivative_rtol": 0.0002,
+    "derivative_step": 1e-05,
+    "equilibrium_normalized_residual": 1e-05,
+    "static_force_tolerance": 1e-10,
+    "static_max_iterations": 20,
+    "pole_margin_s_inv": 1e-07,
+    "authority_threshold": null,
+    "authority_reason": "No independently justified task-required MIMO gain threshold; usable bandwidth undefined.",
+    "authority_rule": "Smallest singular value >= threshold, connected grid band starting at lowest frequency; no extrapolation.",
+    "candidate_rule": "initial_target_equilibrium_halfway",
+    "endpoint_max_iterations": 100,
+    "construction_max_iterations": 20,
+    "horizon_alignment_atol_s": 1e-12,
+    "endpoint_check_atol": 1e-08
+  },
+  "record_update_ids": [
+    0,
+    44,
+    45,
+    49
+  ]
+}
