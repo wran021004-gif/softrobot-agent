@@ -80,6 +80,7 @@ class MujocoFailureSnapshot:
     def __init__(self,model,identity,folder=None):
         import mujoco
         self.model=model;self.identity=identity;self.completed_steps=0;self.folder=folder
+        self.attempted_steps=0;self.forward_evaluations=0
         self.spec=mujoco.mjtState.mjSTATE_INTEGRATION
         self.buffer=np.empty(mujoco.mj_stateSize(model,self.spec))
 
@@ -91,8 +92,10 @@ class MujocoFailureSnapshot:
             qpos=data.qpos.copy(),qvel=data.qvel.copy(),
             ctrl=data.ctrl.copy(),actuator_force=data.actuator_force.copy(),
             warnings=[dict(number=int(w.number),lastinfo=int(w.lastinfo)) for w in data.warning])
+        if operation is mujoco.mj_step:self.attempted_steps+=1
         try:
             operation(m,data)
+            if operation is mujoco.mj_forward:self.forward_evaluations+=1
             if operation is mujoco.mj_step:
                 if _mujoco_state_failed(data,before['time_s']):raise ValueError('MUJOCO_NUMERICAL_FAILURE')
                 self.completed_steps+=1
@@ -110,7 +113,8 @@ class MujocoFailureSnapshot:
                 warnings_after_call=[dict(number=int(w.number),lastinfo=int(w.lastinfo)) for w in data.warning],
                 model_options=dict(timestep_s=float(m.opt.timestep),integrator=int(m.opt.integrator),
                     solver=int(m.opt.solver),jacobian=int(m.opt.jacobian),iterations=int(m.opt.iterations)),
-                confirmed_completed_steps=self.completed_steps,failed_call_internal_steps='unknown',
+                confirmed_completed_steps=self.completed_steps,attempted_steps=self.attempted_steps,
+                forward_evaluations=self.forward_evaluations,failed_call_internal_steps='unknown',
                 missing=['Exact native failure-instant state','Partial internal solver progress'],
                 scope='Engineering diagnosis only; no complete trajectory, optimizer update or infeasibility inference')
             if self.folder is not None:atomic_json(Path(self.folder)/'numerical_failure.json',exc.mujoco_diagnostic)
@@ -123,11 +127,13 @@ def playback_tensions(inp, physics, scene, commands, folder):
     from .mjcf import compile_xml
     from tools.platform_registry import registry
 
-    if scene['control']['tension_execution_mode']!='ideal_tension' or scene['forces']:
-        raise ValueError('PHYSICAL_PLAYBACK_REQUIRES_IDEAL_TENSION_AND_NO_EXTERNAL_FORCE')
+    started=time.perf_counter()
+    if scene['control']['tension_execution_mode']!='ideal_tension':
+        raise ValueError('PHYSICAL_PLAYBACK_REQUIRES_IDEAL_TENSION')
     folder=Path(folder);folder.mkdir(parents=True,exist_ok=True)
     xml=compile_xml(physics,scene,registry().parse(inp.policy.backend.parameters),folder/'robot.xml')
     model=mujoco.MjModel.from_xml_path(str(xml));data=mujoco.MjData(model)
+    forces=_bind_mujoco_forces(model,scene)
     safety=MujocoFailureSnapshot(model,physics['identity'],folder)
     joints=[model.joint(name).id for name in physics['dofs']]
     qi=model.jnt_qposadr[joints];vi=model.jnt_dofadr[joints]
@@ -154,6 +160,7 @@ def playback_tensions(inp, physics, scene, commands, folder):
     tip=model.site('tip_site').id
     jac=np.zeros((3,model.nv))
     def sample(k,requested,actual):
+        _apply_mujoco_forces(model,data,forces)
         safety.call(data,mujoco.mj_forward,'playback.sample')
         mujoco.mj_jacSite(model,data,jac,None,tip)
         position=data.site_xpos[tip].copy();velocity=jac@data.qvel
@@ -165,11 +172,13 @@ def playback_tensions(inp, physics, scene, commands, folder):
     steps=0;failure=None
     for k,command in enumerate(u):
         data.ctrl[aids]=command
+        _apply_mujoco_forces(model,data,forces)
         safety.call(data,mujoco.mj_forward,'playback.apply')
         actual=-data.actuator_force[aids].copy()
         if not np.allclose(actual,command,rtol=0,atol=1e-9):
             failure=dict(interval=k,reason='DIRECT_TENSION_NOT_APPLIED',requested=command.tolist(),actual=actual.tolist());break
         for j in range(substeps):
+            _apply_mujoco_forces(model,data,forces)
             previous=float(data.time);safety.call(data,mujoco.mj_step,'playback.step');steps+=1
             if _mujoco_state_failed(data,previous):
                 failure=dict(interval=k,substep=j+1,reason='MUJOCO_NUMERICAL_FAILURE',time_s=float(data.time));break
@@ -178,6 +187,10 @@ def playback_tensions(inp, physics, scene, commands, folder):
         atomic_json(folder/'samples.json',rows)
     return dict(status='completed' if failure is None and len(rows)==intervals+1 else 'incomplete',
         failure=failure,samples=rows,physics_steps=steps,command_intervals=len(rows)-1,
+        physics_step_attempts=safety.attempted_steps,
+        cost=dict(model_builds=1,rollouts=1,physics_steps=steps,physics_step_attempts=safety.attempted_steps,
+            forward_evaluations=safety.forward_evaluations,kernel_wall_s=time.perf_counter()-started),
+        external_force_execution=dict(forces=scene['forces'],semantics=scene['semantics'].get('external_forces')),
         model_identity=physics['identity'],scene_identity=scene['identity'],
         xml_sha256=hashlib.sha256(xml.read_bytes()).hexdigest(),tendon_order=names,
         physics_timestep_s=float(model.opt.timestep),integrator=int(model.opt.integrator),
