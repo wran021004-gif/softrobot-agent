@@ -22,6 +22,12 @@ def decision_summary(value):
         'fixed_input_structure_v1':'How does a legal parameter change mechanics, function and short endpoint constraints at fixed input?'}[value['operation']]
     if value['operation']=='native_dynamics_v1':
         mechanics=raw['mechanics'];names={q['name'] for q in summary['quantities']}
+        if mechanics.get('validity'):
+            summary['mechanics_evidence']=dict(state=mechanics['validity'],coordinates=mechanics['coordinates'],
+                input_saturation=mechanics['input_saturation'],
+                force_relation='M qacc = qfrc_passive + qfrc_actuator + qfrc_applied - qfrc_bias + qfrc_constraint',
+                raw_pointer='/native_dynamics/mechanics',
+                interpretation='Internal engine consistency only; no hardware accuracy or future trajectory guarantee.')
         for name,data,unit,path in (
                 ('tip_acceleration',mechanics.get('tip_acceleration_m_s2'),'m/s^2','mechanics/tip_acceleration_m_s2'),
                 ('local_drive_singular_values',mechanics.get('function_metrics',{}).get('drive_singular_values_m_s2_n'),'m/(s^2*N)','mechanics/function_metrics/drive_singular_values_m_s2_n'),

@@ -42,8 +42,20 @@ class NativeModel:
 
     def forward(self, d):
         self.safety.call(d,mujoco.mj_forward,'native.forward');self.cost['forward_evaluations']+=1
+        self.check_supported(d)
+
+    def check_supported(self, d, previous_time=None):
+        """Reject unsupported engine constraints, including between control samples."""
         if d.ncon or d.nefc or any(w.number for w in d.warning) or not np.isfinite(d.qacc).all():
-            raise ValueError('NATIVE_V1_REQUIRES_FINITE_CONTACT_FREE_UNCONSTRAINED_STATE')
+            diagnostic=dict(time_s=float(d.time),constraint_count=int(d.nefc),contact_count=int(d.ncon),
+                contacts=[dict(geom1=self.model.geom(int(c.geom1)).name,geom2=self.model.geom(int(c.geom2)).name,
+                    distance_m=float(c.dist)) for c in d.contact],
+                evaluation_interval_s=[previous_time,float(d.time)] if previous_time is not None else [float(d.time)] ,
+                phase='last_engine_constraint_evaluation',cost=dict(self.cost))
+            self.last_diagnostic=diagnostic
+            error=ValueError('NATIVE_V1_REQUIRES_FINITE_CONTACT_FREE_UNCONSTRAINED_STATE')
+            error.native_diagnostic=diagnostic
+            raise error
 
     def restore(self, point, *, comparable=False):
         m=self.model;d=mujoco.MjData(m)
@@ -79,6 +91,7 @@ class NativeModel:
             self.apply(d,row['tension_n'])
             for _ in range(round(scene['control_period_s']/self.model.opt.timestep)):
                 previous=float(d.time);self.safety.call(d,mujoco.mj_step,'native.prefix');self.cost['physics_steps']+=1
+                self.check_supported(d,previous)
                 if _mujoco_state_failed(d,previous):raise ValueError('NATIVE_PREFIX_NUMERICAL_FAILURE')
             self.forward(d);motion,_=self.motion(d)
             differences=[abs(d.time-row['time_s']),*abs(d.qpos[self.qi]-row['qpos_rad']),*abs(d.qvel[self.vi]-row['qvel_rad_s']),
@@ -130,6 +143,16 @@ class NativeModel:
         acceleration=jac@d.qacc+jdot@d.qvel;drive=jac@response.T;v=np.asarray(motion['tip_velocity_m_s'])
         speed=float(np.linalg.norm(v))
         return dict(**motion,mass_matrix_kg_m2=mass[np.ix_(self.vi,self.vi)].tolist(),qacc_rad_s2=d.qacc[self.vi].tolist(),
+            qpos_rad=d.qpos[self.qi].tolist(),qvel_rad_s=d.qvel[self.vi].tolist(),
+            coordinates=dict(dof_order=self.order,tendon_order=self.tendons,tip_frame='world',
+                input_semantics='absolute ideal tension in N; engine actuator force has negative sign'),
+            validity=dict(time_s=float(d.time),scope='instantaneous state and input only',contact_count=int(d.ncon),
+                constraint_count=int(d.nefc),external_applied_force=False),
+            mass_factorization=dict(source='MuJoCo mj_factorM / mj_solveM',
+                inverse_diagonal=d.qLDiagInv[self.vi].tolist(),inverse_diagonal_unit='1/(kg*m^2)'),
+            input_bounds_n=self.limits.tolist(),input_saturation=dict(
+                lower=np.isclose(np.asarray(u),self.limits[:,0],atol=1e-10,rtol=0).tolist(),
+                upper=np.isclose(np.asarray(u),self.limits[:,1],atol=1e-10,rtol=0).tolist()),
             generalized_forces_nm={key:getattr(d,'qfrc_'+key)[self.vi].tolist() for key in
                 ('bias','passive','spring','damper','actuator','applied','constraint','smooth')},
             gravity_bias_nm=zero.qfrc_bias[self.vi].tolist(),
@@ -143,6 +166,7 @@ class NativeModel:
                 speed_derivative_m_s2=float(v@acceleration/speed) if speed>0 else None,
                 speed_derivative_input_map_m_s2_n=(v@drive/speed).tolist() if speed>0 else None),
             mass_balance_residual_inf_nm=float(np.max(abs(balance))),
+            actuator_map_residual_inf_nm=float(np.max(abs(mapping@u-d.qfrc_actuator))),
             mass_condition_number=float(np.linalg.cond(mass)),actual_tensions_n=(-d.actuator_force[self.aids]).tolist(),
             component_order=dict(bodies=[m.body(i).name for i in range(m.nbody)],joints=[m.joint(i).name for i in range(m.njnt)]),
             components=dict(body_mass_kg=m.body_mass.tolist(),body_inertia_kg_m2=m.body_inertia.tolist(),
@@ -156,6 +180,7 @@ class NativeModel:
         self.cost['rollouts']+=1
         for _ in range(steps):
             previous=float(d.time);self.safety.call(d,mujoco.mj_step,'native.rollout');self.cost['physics_steps']+=1
+            self.check_supported(d,previous)
             if _mujoco_state_failed(d,previous):raise ValueError('NATIVE_SHORT_ROLLOUT_NUMERICAL_FAILURE')
         self.forward(d);motion,_=self.motion(d)
         return dict(**motion,actual_tensions_n=actual.tolist(),qpos_rad=d.qpos[self.qi].tolist(),qvel_rad_s=d.qvel[self.vi].tolist())
@@ -175,6 +200,7 @@ class NativeModel:
             actual.append(self.apply(d,u).tolist())
             for _ in range(count):
                 previous=float(d.time);self.safety.call(d,mujoco.mj_step,'native.sequence');self.cost['physics_steps']+=1
+                self.check_supported(d,previous)
                 if _mujoco_state_failed(d,previous):raise ValueError('NATIVE_SEQUENCE_NUMERICAL_FAILURE')
             self.forward(d);samples.append(self.motion(d)[0])
         return dict(times_s=[s['time_s'] for s in samples],

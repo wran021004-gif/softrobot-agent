@@ -46,6 +46,10 @@ def main():
             value=execute(request)
     except Exception as exc:
         value=dict(status='execution_incomplete',error=type(exc).__name__,reason=str(exc))
+        if getattr(exc,'native_diagnostic',None):
+            value['native_diagnostic']=exc.native_diagnostic
+            value['internal_calculations']=[dict(purpose='failed_native_analysis',**exc.native_diagnostic['cost'])]
+            value['physics_steps_lower_bound']=exc.native_diagnostic['cost']['physics_steps']
         if getattr(exc,'mujoco_diagnostic',None):
             diagnostic=exc.mujoco_diagnostic
             if not path.with_name('numerical_failure.json').exists():atomic_json(path.with_name('numerical_failure.json'),diagnostic)
