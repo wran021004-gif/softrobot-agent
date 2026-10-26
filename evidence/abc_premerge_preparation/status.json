@@ -70,33 +70,108 @@
     }
   },
   "B": {
-    "head": "a4861ede647beff8a778d257fb094645026cf6bd",
+    "head": "f28c00d79f9736aea9a8d024dd9e0b3f103f0b8e",
     "new_commits": [
       "26aaa0b0b2056e7eaafe88f2734079930a60fa47",
       "23d3d4b04e90ca61038298491ce70db885745131",
-      "a4861ede647beff8a778d257fb094645026cf6bd"
+      "a4861ede647beff8a778d257fb094645026cf6bd",
+      "f28c00d79f9736aea9a8d024dd9e0b3f103f0b8e"
     ],
     "plan_identity": "630414e96e3d1f5fe248cc35e4d798fc44adabcbcd656a800bdfbd06fbf3b948",
     "task_contract": "frozen",
     "physical_feasibility": "first_complete_independent_pair",
-    "structural_discrimination": "unmeasured",
+    "structural_discrimination": "finite_budget_structural_discrimination_observed",
     "focused_tests": 6,
-    "physics_step_attempts": 899500,
+    "physics_step_attempts": 6371809,
     "provider_requests": 0,
     "tokens": 0,
     "push": "explicitly_authorized_push_succeeded_and_remote_verified",
-    "remote_head_at_verification": "ed3e0d46e8754506ef4aa04aec62f78e87f1f3d9",
-    "physics_steps": 899500,
-    "native_full_rollouts": 1262,
-    "independent_replays": 23,
-    "authorized_cumulative_cap": 1500000,
-    "unused_search_steps": 600500,
-    "stopped_at_first_pair": true,
+    "physics_steps": 6371801,
+    "native_full_rollouts": 8962,
     "hidden_answer_admitted_to_A": false,
-    "prior_push": "auto_review_rejected_before_execution"
+    "prior_push": "auto_review_rejected_before_execution",
+    "feasibility_search": {
+      "physics_step_attempts": 899500,
+      "physics_steps": 899500,
+      "native_full_rollouts": 1262,
+      "independent_replays": 23,
+      "authorized_cumulative_cap": 1500000,
+      "unused_search_steps": 600500,
+      "stopped_at_first_pair": true
+    },
+    "independent_complete_replays": 63,
+    "structural_contrast": {
+      "source_commit": "f28c00d79f9736aea9a8d024dd9e0b3f103f0b8e",
+      "user_authorization": "启动对照，不要被预算卡住",
+      "cost": {
+        "physics_step_attempts": 5472309,
+        "confirmed_completed_step_calls": 5472301,
+        "failed_step_calls": 8,
+        "failed_call_internal_progress": "unknown",
+        "native_full_rollouts": 7700,
+        "native_partial_rollouts": 12,
+        "native_full_step_calls": 5390000,
+        "native_partial_step_calls": 5684,
+        "physical_replay_attempts": 48,
+        "physical_complete_replays": 40,
+        "physical_incomplete_replays": 8,
+        "short_response_calls": 24,
+        "short_initialization_rollouts": 448,
+        "short_initialization_step_calls": 44800,
+        "existing_response_solver_calls": 438,
+        "forward_evaluations_in_integration_ledger": 551522,
+        "recorded_scientific_wall_s": 530.866209199994,
+        "provider_requests": 0,
+        "provider_tokens": 0,
+        "previous_feasibility_attempts_separate": 899500,
+        "combined_scientific_attempts": 6371809,
+        "B1_engineering_steps_separate": 4360,
+        "stopped_because": "Consistent equal-resource and two-start contrast demonstrated after symmetric continuation, not a depleted global allowance."
+      },
+      "variant_results": [
+        {
+          "label": "S0",
+          "cases": 4,
+          "zero_accepted": 0,
+          "force_accepted": 0,
+          "paired_starts_accepted": 0
+        },
+        {
+          "label": "S1",
+          "cases": 4,
+          "zero_accepted": 2,
+          "force_accepted": 0,
+          "paired_starts_accepted": 0
+        },
+        {
+          "label": "S2",
+          "cases": 4,
+          "zero_accepted": 2,
+          "force_accepted": 0,
+          "paired_starts_accepted": 0
+        },
+        {
+          "label": "S3",
+          "cases": 4,
+          "zero_accepted": 2,
+          "force_accepted": 2,
+          "paired_starts_accepted": 2
+        }
+      ],
+      "equal_resource_pair": [
+        "S2",
+        "S3"
+      ],
+      "private_receipt_sha256": "a36c0008dd213769843b586b008c0ffa61ee8ba187261fe665331289afa34cea",
+      "hidden_mapping_or_controls_admitted_to_A": false
+    },
+    "initial_remote_head_at_verification": "ed3e0d46e8754506ef4aa04aec62f78e87f1f3d9",
+    "independent_replay_attempts": 71,
+    "independent_incomplete_replays": 8,
+    "physics_steps_scope": "Confirmed normally completed mj_step calls; eight failed calls have unknown internal progress."
   },
   "formal_agent_study_gate": "not_ready_decision_quality_and_new_budgets_pending",
-  "publishing": "user_explicitly_approved; four_branches_pushed_atomically_and_remote_heads_verified; this_status_update_pushed_under_same_scope",
+  "publishing": "Explicitly approved remote and code/test/scalar-report scope; initial four-branch publication verified; follow-up B contrast and A state reports synchronized under same scope.",
   "engineering_integration_gate": "completed_with_focused_zero_step_checks",
   "publishing_receipt": {
     "remote": "git@github.com:wran021004-gif/softrobot-agent.git",
@@ -104,11 +179,12 @@
     "force_push": false,
     "main_changed": false,
     "private_raw_data_published": false,
-    "remote_heads_verified_before_this_status_update": {
+    "initial_four_branch_publication_heads": {
       "integration/research-next": "3dc17cceaa649c3f5e0768bdbb1f9eccf892fcc1",
       "feat/b2-load-force-runtime": "a4861ede647beff8a778d257fb094645026cf6bd",
       "feat/c32-readonly-live-probe": "a555ac23b24ba17c6cf1bad834a68b4cf51d3ea8",
       "codex/c33-execution-feedback": "2761590dc79c93d6fa6542bca237541c81182aa3"
-    }
+    },
+    "followup_B_contrast_source_commit": "f28c00d79f9736aea9a8d024dd9e0b3f103f0b8e"
   }
 }
