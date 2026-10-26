@@ -1,0 +1,160 @@
+{
+  "defaults": "family_study_defaults.json",
+  "start_mode": "family_space",
+  "family_space": "family_space_v2.json",
+  "candidate_initialization": "all_candidate_dofs_zero_v1",
+  "study_id": "b3-mujoco-nonlinear-t1t2-20261026",
+  "base_commit": "78ca687fd893bfc805cfcaf1370ea62dd14dbf65",
+  "authorization": "User attachment 8af41aca-b73a-465d-aea9-edcc2e8370e0: fixed three-structure B3 engineering experiment, no Provider or Agent; authorized commit and ordinary push.",
+  "mode": "engineering_numerical",
+  "task": "../../tasks/reach_hold_b3_050.json",
+  "control": "control.json",
+  "runtime": "runtime_c3_ab.json",
+  "evidence_destination": "evidence/b3_mujoco_nonlinear_t1t2",
+  "nmpc_replan_period_s": 0.1,
+  "capabilities": [
+    "analysis",
+    "control_correction",
+    "physical_replay"
+  ],
+  "allowed_plan_actions": [
+    "generate",
+    "initialize_control",
+    "physical_replay",
+    "diagnose",
+    "stop"
+  ],
+  "budgets": {
+    "provider_requests": 0,
+    "protected_provider_requests": 0,
+    "public_operations": 40,
+    "protected_public_operations": 0,
+    "physical_launches": 6,
+    "local_solves": 0,
+    "local_solve_s": null,
+    "offline_nlp": 0,
+    "bdf_replays": 0,
+    "mathematical_evaluations": 22,
+    "numerical_s": null,
+    "activity_s": null,
+    "delivery_reserve_s": null
+  },
+  "nmpc_limits": {
+    "executions": 0
+  },
+  "rl_limits": {
+    "training_stages": 0,
+    "actions_per_trial": null,
+    "seconds_per_trial": null,
+    "training_actions": null,
+    "training_active_seconds": null,
+    "evaluation_episodes": 0,
+    "diagnostic_replays": 0,
+    "diagnostic_physics_steps": 0
+  },
+  "confirmation": {
+    "fresh_independent_repetitions": 0,
+    "configuration": "Select exact fresh completed passing backend evaluation after public read. No extra repetitions; repeatability unassessed."
+  },
+  "physical_replay_limit": 6,
+  "reserve_rl_evaluation": false,
+  "native_control_limits": {
+    "evaluation_requests": 24,
+    "iterations": 3,
+    "knots_s": 4
+  },
+  "mathematical_methods": {
+    "sampled-affine-conic-minimax-v1": "Explicit user authorization for this bounded engineering experiment; no current R1 grant changed.",
+    "controlled-capability-sensitivity-v1": "Explicit user authorization for this bounded engineering experiment; no current R1 grant changed.",
+    "mujoco-nonlinear-task-capability-v1": "Explicit user authorization for this bounded engineering experiment; no current R1 grant changed.",
+    "mujoco-reoptimized-structure-response-v1": "Explicit user authorization for this bounded engineering experiment; no current R1 grant changed."
+  },
+  "fidelity_policy": {
+    "version": "numerical_fidelity_v1",
+    "screening": {
+      "coarse": {
+        "cells_per_segment": 4,
+        "backend": "backend.family_mujoco@1.1.0"
+      },
+      "standard": {
+        "cells_per_segment": 12,
+        "backend": "backend.family_mujoco@1.1.0"
+      }
+    },
+    "final_evaluation": {
+      "cells_per_segment": 12,
+      "backend": "backend.family_mujoco@1.1.0"
+    },
+    "require_exact_fidelity": true,
+    "alternative_runtimes": [],
+    "runtime_preflight_limit": 2
+  },
+  "execution_instructions": "Fixed engineering protocol in evidence/b3_mujoco_nonlinear_t1t2/frozen_plan.json; A GVS, B fixed controls, C native T1, D T2 plus frozen recommendations, E independent replay. Three FamilySpace candidates only. No Agent, Provider, NMPC, PPO, MATLAB or extra experiments. Total MuJoCo integration <=90000 actual steps. Preserve all historical evidence. T1 signed J is best found under the stated search, never a global optimum or independent task acceptance.",
+  "topology_scope": {
+    "segment_counts": [
+      1,
+      2,
+      3
+    ],
+    "tendon_counts": [
+      3,
+      4
+    ]
+  },
+  "initial_structure_strategy": "agent_choice",
+  "scoring_window_s": 0.5,
+  "analysis_protocol": {
+    "protocol_id": "task-local-v2",
+    "input_scale_n": 8.0,
+    "output_scale_m": 0.01,
+    "windows_s": [
+      0.05,
+      0.1,
+      0.5
+    ],
+    "samples_s": [
+      0.0,
+      0.1,
+      0.3,
+      0.45,
+      0.49
+    ],
+    "frequency_rad_s": [
+      0.1,
+      1.0,
+      10.0,
+      100.0
+    ],
+    "rank_atol": 1e-12,
+    "rank_rtol": 1e-09,
+    "comparison_atol": 1e-08,
+    "comparison_rtol": 2e-06,
+    "derivative_atol": 2e-05,
+    "derivative_rtol": 0.0002,
+    "derivative_step": 1e-05,
+    "equilibrium_normalized_residual": 1e-05,
+    "static_force_tolerance": 1e-10,
+    "static_max_iterations": 20,
+    "pole_margin_s_inv": 1e-07,
+    "authority_threshold": null,
+    "authority_reason": "No independently justified task-required MIMO gain threshold; usable bandwidth undefined.",
+    "authority_rule": "Smallest singular value >= threshold, connected grid band starting at lowest frequency; no extrapolation.",
+    "candidate_rule": "initial_target_equilibrium_halfway",
+    "endpoint_max_iterations": 100,
+    "construction_max_iterations": 20,
+    "horizon_alignment_atol_s": 1e-12,
+    "endpoint_check_atol": 1e-08
+  },
+  "record_update_ids": [
+    0,
+    44,
+    45,
+    49
+  ],
+  "family_sensitivity_variables": {
+    "version": "family_sensitivity_v1",
+    "variables": [
+      "segments.1.young_pa"
+    ]
+  }
+}

@@ -1,0 +1,407 @@
+{
+  "reference": {
+    "artifact_id": "ca8654b2c86f7bbed96b8b601d8824c1a89da8868ce00a28946ac29c9547e15e",
+    "media_type": "application/json"
+  },
+  "base_commit": "78ca687fd893bfc805cfcaf1370ea62dd14dbf65",
+  "spec": "configs\\research\\study_b3_mujoco_nonlinear_t1t2.json",
+  "scope": "engineering_numerical; no autonomous Study",
+  "source": {
+    "folder": "evidence/b3_t2_pilot_050_c",
+    "reference": {
+      "artifact_id": "30994c15d28a3b1b434d1f4cdc252199773e3eb4c9888a4b47b3870ac8d004ea",
+      "media_type": "application/json"
+    },
+    "prior_replay": {
+      "artifact_id": "0f87cf01869d1892043a8c52f3893c9b0b433ff305f769d2fbb3ad28a991baca",
+      "media_type": "application/json"
+    },
+    "parent": {
+      "artifact_id": "123ba9d4accff3a08b8a7eaab7303f364ffaf50014174fc0d3320a37f366fa33",
+      "media_type": "application/json"
+    },
+    "inherited_acceptance": false
+  },
+  "variable": "segments.1.young_pa",
+  "unit": "Pa",
+  "moduli_pa": {
+    "d_minus": 4860000.0,
+    "d0": 5400000.0,
+    "d_plus": 5940000.0
+  },
+  "variants": {
+    "d_minus": {
+      "candidate": {
+        "artifact_id": "6d25eb98d8e591cb5d810c41d2304a5dccb80b3e3559304698ff0a29278bf34a",
+        "media_type": "application/json"
+      },
+      "source": {
+        "artifact_id": "3a59f1be3d3d5a59ec3c43fc2e8cb2281faea5d8264d6a9642aca05d04b8f77c",
+        "media_type": "application/json"
+      },
+      "young_pa": 4860000.0
+    },
+    "d0": {
+      "candidate": {
+        "artifact_id": "8f1041d42015db00c91e55ba0e5305814e30b173ce95313b663e95d6112d6ed9",
+        "media_type": "application/json"
+      },
+      "source": {
+        "artifact_id": "ee0317678f9cfda61b7cb238cfd606a3207c07f006e89e8389071c1ca4248562",
+        "media_type": "application/json"
+      },
+      "young_pa": 5400000.0
+    },
+    "d_plus": {
+      "candidate": {
+        "artifact_id": "998c06aaff70f7455367da752bed988fb244f1280e68bcc0fd37cd80d5f7a0fd",
+        "media_type": "application/json"
+      },
+      "source": {
+        "artifact_id": "ca068abe0f9dac6db0c2ada45eb96c58c3be82b12f8033570e404c4ea8843508",
+        "media_type": "application/json"
+      },
+      "young_pa": 5940000.0
+    }
+  },
+  "settings": {
+    "version": "local_control_search_v2",
+    "correction_window_s": [
+      0.0,
+      0.5
+    ],
+    "safety_margin_fraction": 0.0,
+    "method": "response",
+    "knots_s": [
+      0.0,
+      0.38,
+      0.45,
+      0.5
+    ],
+    "coefficient_limit_n": 2.0,
+    "difference_step_n": 0.01,
+    "initial_radius_n": 0.1,
+    "minimum_radius_n": 0.0001,
+    "evaluation_requests": 24,
+    "iterations": 3,
+    "active_coefficients": [
+      9,
+      10,
+      13,
+      14
+    ]
+  },
+  "active_subspace_reason": "M2 C recorded four-dimensional late-knot subspace; fixed before any new science.",
+  "gvs_operating_point": "controller_start_input",
+  "task": {
+    "actuator_channels": [
+      "actuator_commands"
+    ],
+    "contract_version": "1.0.0",
+    "environment": {
+      "contract": "experiment.assembly",
+      "data": {
+        "environment": {
+          "coordinate_frame": "world_base_x_forward_yz_cross_section",
+          "environment_id": "reach_free",
+          "gravity_m_s2": [
+            0.0,
+            0.0,
+            -9.81
+          ],
+          "gravity_source": "main@245a785 reach_free environment; Human-owned benchmark gravity",
+          "lights": [
+            {
+              "direction": [
+                0.0,
+                0.0,
+                -1.0
+              ],
+              "position_m": [
+                0.0,
+                0.0,
+                2.0
+              ]
+            }
+          ],
+          "objects": [
+            {
+              "conaffinity": 1,
+              "contype": 0,
+              "half_size_m": [
+                2.0,
+                2.0,
+                0.1
+              ],
+              "kind": "plane",
+              "name": "floor",
+              "position_m": [
+                0.0,
+                0.0,
+                -0.02
+              ]
+            }
+          ],
+          "schema_version": "1",
+          "truth_status": "HUMAN_OWNED",
+          "units": "SI"
+        },
+        "external_forces": [],
+        "floor_id": "floor",
+        "mount": {
+          "position_m": [
+            0.0,
+            0.0,
+            0.15
+          ],
+          "quaternion_wxyz": [
+            1.0,
+            0.0,
+            0.0,
+            0.0
+          ]
+        }
+      },
+      "version": "1.0.0"
+    },
+    "evaluator": {
+      "extension_id": "evaluate.reach",
+      "parameters": {
+        "contract": "reference.reach_evaluation",
+        "data": {
+          "tolerance_m": 0.01
+        },
+        "version": "1.0.0"
+      },
+      "version": "1.0.0"
+    },
+    "failure_policy": "retain_invalid_and_constraint_failures",
+    "family": "task.reach",
+    "goal": {
+      "contract": "reference.reach_goal",
+      "data": {
+        "target_m": [
+          0.29,
+          -0.035,
+          0.19
+        ]
+      },
+      "version": "1.0.0"
+    },
+    "initializer": {
+      "extension_id": "initialize.family",
+      "parameters": {
+        "contract": "family.initial",
+        "data": {
+          "qpos_rad": {
+            "segment_0_cell_0_y": 0.0,
+            "segment_0_cell_0_z": 0.0,
+            "segment_0_cell_10_y": 0.0,
+            "segment_0_cell_10_z": 0.0,
+            "segment_0_cell_11_y": 0.0,
+            "segment_0_cell_11_z": 0.0,
+            "segment_0_cell_1_y": 0.0,
+            "segment_0_cell_1_z": 0.0,
+            "segment_0_cell_2_y": 0.0,
+            "segment_0_cell_2_z": 0.0,
+            "segment_0_cell_3_y": 0.0,
+            "segment_0_cell_3_z": 0.0,
+            "segment_0_cell_4_y": 0.0,
+            "segment_0_cell_4_z": 0.0,
+            "segment_0_cell_5_y": 0.0,
+            "segment_0_cell_5_z": 0.0,
+            "segment_0_cell_6_y": 0.0,
+            "segment_0_cell_6_z": 0.0,
+            "segment_0_cell_7_y": 0.0,
+            "segment_0_cell_7_z": 0.0,
+            "segment_0_cell_8_y": 0.0,
+            "segment_0_cell_8_z": 0.0,
+            "segment_0_cell_9_y": 0.0,
+            "segment_0_cell_9_z": 0.0,
+            "segment_1_cell_0_y": 0.0,
+            "segment_1_cell_0_z": 0.0,
+            "segment_1_cell_10_y": 0.0,
+            "segment_1_cell_10_z": 0.0,
+            "segment_1_cell_11_y": 0.0,
+            "segment_1_cell_11_z": 0.0,
+            "segment_1_cell_1_y": 0.0,
+            "segment_1_cell_1_z": 0.0,
+            "segment_1_cell_2_y": 0.0,
+            "segment_1_cell_2_z": 0.0,
+            "segment_1_cell_3_y": 0.0,
+            "segment_1_cell_3_z": 0.0,
+            "segment_1_cell_4_y": 0.0,
+            "segment_1_cell_4_z": 0.0,
+            "segment_1_cell_5_y": 0.0,
+            "segment_1_cell_5_z": 0.0,
+            "segment_1_cell_6_y": 0.0,
+            "segment_1_cell_6_z": 0.0,
+            "segment_1_cell_7_y": 0.0,
+            "segment_1_cell_7_z": 0.0,
+            "segment_1_cell_8_y": 0.0,
+            "segment_1_cell_8_z": 0.0,
+            "segment_1_cell_9_y": 0.0,
+            "segment_1_cell_9_z": 0.0
+          },
+          "qvel_rad_s": {
+            "segment_0_cell_0_y": 0.0,
+            "segment_0_cell_0_z": 0.0,
+            "segment_0_cell_10_y": 0.0,
+            "segment_0_cell_10_z": 0.0,
+            "segment_0_cell_11_y": 0.0,
+            "segment_0_cell_11_z": 0.0,
+            "segment_0_cell_1_y": 0.0,
+            "segment_0_cell_1_z": 0.0,
+            "segment_0_cell_2_y": 0.0,
+            "segment_0_cell_2_z": 0.0,
+            "segment_0_cell_3_y": 0.0,
+            "segment_0_cell_3_z": 0.0,
+            "segment_0_cell_4_y": 0.0,
+            "segment_0_cell_4_z": 0.0,
+            "segment_0_cell_5_y": 0.0,
+            "segment_0_cell_5_z": 0.0,
+            "segment_0_cell_6_y": 0.0,
+            "segment_0_cell_6_z": 0.0,
+            "segment_0_cell_7_y": 0.0,
+            "segment_0_cell_7_z": 0.0,
+            "segment_0_cell_8_y": 0.0,
+            "segment_0_cell_8_z": 0.0,
+            "segment_0_cell_9_y": 0.0,
+            "segment_0_cell_9_z": 0.0,
+            "segment_1_cell_0_y": 0.0,
+            "segment_1_cell_0_z": 0.0,
+            "segment_1_cell_10_y": 0.0,
+            "segment_1_cell_10_z": 0.0,
+            "segment_1_cell_11_y": 0.0,
+            "segment_1_cell_11_z": 0.0,
+            "segment_1_cell_1_y": 0.0,
+            "segment_1_cell_1_z": 0.0,
+            "segment_1_cell_2_y": 0.0,
+            "segment_1_cell_2_z": 0.0,
+            "segment_1_cell_3_y": 0.0,
+            "segment_1_cell_3_z": 0.0,
+            "segment_1_cell_4_y": 0.0,
+            "segment_1_cell_4_z": 0.0,
+            "segment_1_cell_5_y": 0.0,
+            "segment_1_cell_5_z": 0.0,
+            "segment_1_cell_6_y": 0.0,
+            "segment_1_cell_6_z": 0.0,
+            "segment_1_cell_7_y": 0.0,
+            "segment_1_cell_7_z": 0.0,
+            "segment_1_cell_8_y": 0.0,
+            "segment_1_cell_8_z": 0.0,
+            "segment_1_cell_9_y": 0.0,
+            "segment_1_cell_9_z": 0.0
+          },
+          "unspecified": "zero"
+        },
+        "version": "1.0.0"
+      },
+      "version": "1.0.0"
+    },
+    "name": "B3 fast move and stable stop, 0.5 s draft",
+    "objectives": [
+      {
+        "direction": "minimize",
+        "metric": "position_error",
+        "units": "m",
+        "weight": 1.0
+      }
+    ],
+    "observations": [
+      {
+        "dimension": 3,
+        "entity": "tip",
+        "frame": "world",
+        "missing": "unsupported",
+        "name": "tip_position",
+        "phase": "post_step",
+        "units": "m"
+      }
+    ],
+    "robot_families": [
+      "tendon_robot_family"
+    ],
+    "sampling": {
+      "aggregation": "per_instance",
+      "seeds": [
+        17
+      ],
+      "split": "development",
+      "window_s": [
+        0.0,
+        0.5
+      ]
+    },
+    "source": "2026-10-25 B3 readiness draft; physical difficulty unverified. Original Reach/Hold evaluator and thresholds.",
+    "status": "development_valid",
+    "task_id": "b3-reach-hold-050-draft",
+    "task_version": "1.0.0",
+    "timing": {
+      "control_period_s": 0.01,
+      "duration_s": 0.5,
+      "sample_period_s": 0.01,
+      "termination": [
+        "duration",
+        "numerical_failure"
+      ],
+      "timestep_s": 0.0005
+    }
+  },
+  "limits": {
+    "terminal_error_m": 0.01,
+    "holding_max_error_m": 0.01,
+    "holding_max_speed_m_s": 0.02
+  },
+  "holding_window_s": [
+    0.45,
+    0.5
+  ],
+  "tendon_order": [
+    "tendon_0",
+    "tendon_1",
+    "tendon_2",
+    "tendon_3"
+  ],
+  "budgets": {
+    "provider": 0,
+    "agent": 0,
+    "gvs_charged_evaluations": 22,
+    "native_callbacks_per_structure": 24,
+    "updates_per_structure": 3,
+    "fixed_rollouts": 3,
+    "independent_best_replays": 3,
+    "physics_steps": 90000,
+    "nmpc": 0,
+    "ppo": 0,
+    "matlab": 0
+  },
+  "planned_mathematical_charges": {
+    "gvs_T1": 6,
+    "gvs_T2": 5,
+    "native_T1": 3,
+    "native_T2_aggregation": 1
+  },
+  "maximum_planned_physics_steps": 78000,
+  "stage_order": [
+    "gvs",
+    "fixed",
+    "t1",
+    "decision",
+    "verify"
+  ],
+  "decision_rule": {
+    "version": "fixed-direction-rule-v1",
+    "gvs": "Choose the corresponding endpoint only with resolved single-scale T2 direction, discriminating T1 values and no unresolved model validity; otherwise retain d0 and diagnose.",
+    "mujoco": "Choose endpoint only with comparable T1 and conditional/resolved monotone T2 direction, sufficient search quality and equal opportunities; otherwise retain d0 and diagnose.",
+    "baseline": "Always retain d0.",
+    "no_new_score": "Use signed J and original hard metrics; no weighted ranking.",
+    "reveal": "Save recommendations after T2 and before any best-control independent replay."
+  },
+  "expected_limits": [
+    "Same MuJoCo dynamics for optimization/replay; execution reproduction only.",
+    "One shared warm initialization and one control subspace; no other-controller generalization.",
+    "Three candidates, one run each; no statistical generalization."
+  ],
+  "raw_store": "runs\\b3-mujoco-nonlinear-t1t2\\store"
+}

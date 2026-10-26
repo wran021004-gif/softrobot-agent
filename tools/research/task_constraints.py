@@ -139,6 +139,27 @@ def mathematical_method_view(host, reference):
                 'repeat_hint','experimental_equivalence','source')} for r in history_index(host,reference,request)
                 if r['method']==key]
             methods[key]['repeat_guidance']='Read the original result and state what new information a repeat adds. Reproducibility, numerical checks and changed conditions are legitimate; this hint never vetoes execution. Configuration/request matching alone does not prove identical models, working points or controls.'
+    from copy import deepcopy
+    from tools.research.nonlinear_capability import METHODS, T1, T2, LIMITATIONS
+    for operation,method in METHODS.items():
+        # Frozen old studies retain their existing catalog and authorization.
+        if not spec.get('mathematical_methods',{}).get(method):continue
+        item=deepcopy(methods['mujoco_direct_control_v1'])
+        item.update(operation=operation,method=method,method_version=method,
+            scientific_purpose='Finite-budget nonlinear task capability' if method==T1 else 'Reoptimized structural response',
+            description='Limited-budget mathematical diagnostic; automatic physical ranking has not been validated.',
+            limitations=LIMITATIONS,required_parameters=['control_optimization={source,settings}'] if method==T1 else
+                ['nonlinear_response={variable,unit,t1_results=[baseline,minus,plus]}'],
+            cost_scope=item['cost_scope'] if method==T1 else 'One aggregation evaluation; reuse three T1 results, zero new models, optimizations or physics steps.',
+            request_template=dict(candidate=reference,operation=operation,model_source='mujoco',
+                operating_point='standardized_initial_pretension',protocol=spec['analysis_protocol']),
+            detail_query=dict(reference=reference,view='mathematical_capabilities',pointer='/methods/'+method))
+        if method==T2:
+            item['missing']=[m for m in item['missing'] if not m.startswith('control_optimization')]
+            item['missing'].append('three comparable completed T1 results')
+            item.pop('handoff',None)
+            item.pop('measured_control_initialization',None)
+        methods[method]=item
     return dict(**readiness,candidate=reference,methods=methods,scientific_interpretation=SCIENTIFIC_INTERPRETATION,
         analysis_request_schema=AnalysisRequest.model_json_schema())
 
@@ -184,6 +205,7 @@ def analysis_capabilities(configuration, requirements, protocol, *, model=None, 
     p=TaskAnalysisProtocol.model_validate(protocol)
     rows=[]
     for operation in get_args(AnalysisRequest.model_fields['operation'].annotation):
+        if operation in ('mujoco_nonlinear_task_capability_v1','mujoco_reoptimized_structure_response_v1'):continue
         native=operation in ('native_dynamics_v1','short_input_response_v1','fixed_input_structure_v1','mujoco_direct_control_v1')
         sampled=operation in ('trajectory_feasibility','task_capability','mujoco_direct_control_v1')
         static=operation in ('equilibrium','input_sensitivity','design_sensitivity')

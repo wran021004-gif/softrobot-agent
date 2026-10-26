@@ -23,6 +23,8 @@ def window_applicability(requirements, query, assessed, point, reasons):
     if (abs(query.protocol.duration_s-requirements.duration_s)>1e-12 or
             abs(query.protocol.period_s-requirements.physical_inputs['control_period_s'])>1e-12):
         reasons.append('Frozen duration and input period must match protocol.')
+    if query.operation=='mujoco_nonlinear_task_capability_v1' and window and abs(window[0])>1e-12:
+        reasons.append('Nonlinear T1 requires the complete frozen task from 0 s.')
     coverage=[]
     expected={'terminal_error_m':'tip_position','holding_max_error_m':'tip_position','holding_max_speed_m_s':'tip_velocity'}
     if {c.constraint_id for c in requirements.constraints}!=set(expected):
@@ -97,7 +99,7 @@ def calculate(configuration, binding, query, point, requirements, context, check
     optimized['trajectory']['tensions_n']=corrected_tensions(tr['tensions_n'],times[:-1],settings.knots_s,
         best['coefficients_n'],native.limits[:,1],settings.correction_window_s).tolist()
     optimized.update(source_kind='explicit_control_schedule_v1',task_acceptance='unmeasured')
-    optimized['provenance']=dict(method='mujoco_direct_control_v1',source=context['source'],candidate=binding['candidate'],
+    optimized['provenance']=dict(method=query.operation,source=context['source'],candidate=binding['candidate'],
         state_provenance=point.get('provenance'),settings=plain(settings),inherited_acceptance=False)
     cost=dict(**native.cost,optimization_iterations=result['iterations_started'],
         completed_response_steps=len(result['local_responses']),
@@ -126,6 +128,9 @@ def calculate(configuration, binding, query, point, requirements, context, check
         operating_point={key:point[key] for key in ('actual_time_s','phase','input_units')},native_dynamics=raw,native_analysis=summary,
         task_acceptance='unmeasured',local_model_constraints=dict(status='diagnostic_only'),proxy_values={},
         internal_calculations=[dict(purpose=query.operation,**cost)],limitations=summary['limitations'])
+    if query.operation=='mujoco_nonlinear_task_capability_v1':
+        from tools.research.nonlinear_capability import t1_summary
+        value['nonlinear_capability']=t1_summary(value,settings)
     value=scoped_result(value,requirements,fit,query)
     json.dumps(value,allow_nan=False)  # Fail before worker publication, with last progress retained.
     return value
