@@ -1,0 +1,108 @@
+{
+  "runtime": {
+    "code_sha": "c967a2a776a2f5907cc0e0771fa67115977d158c",
+    "driver_identity": "4428a03ea201a8ddd8f27f4fa607067373502f553e5b051d95e61f9337e87a73",
+    "utc": "2026-10-26T08:11:56.689074+00:00",
+    "python": "D:\\softrobot-agent\\.mainline5-env\\Scripts\\python.exe",
+    "python_version": "3.11.16 | packaged by Anaconda, Inc. | (main, Aug 27 2026, 14:36:16) [MSC v.1942 64 bit (AMD64)]",
+    "packages": {
+      "mujoco": "3.13.0",
+      "numpy": "2.4.6",
+      "scipy": "1.17.1",
+      "casadi": "3.7.2",
+      "pydantic": "2.14.0"
+    },
+    "research_llm_calls": 0,
+    "seed": 17
+  },
+  "accepted": true,
+  "configuration_identity": "bb29d2433e8061681a0f8fc2a9c50120db3b18296af43fc0afccbb0af546287e",
+  "task_identity": "a0e6777f4494fb3762b93dc6463a626ae3dc4884a416681181bcaf5579f9b234",
+  "trajectory_identity": "77b70a2b2a6fa3e04bd9967e20e796d8d1524f9f74d8103ff027a91345dcbf88",
+  "provenance_checks": {
+    "zero_offset_restart": true,
+    "failed_nmpc_source_matches": true,
+    "fresh_coefficients_reconstruct_full_sequence": true,
+    "different_from_archived_passing_sequence": true,
+    "same_structure": true,
+    "complete_original_task": true
+  },
+  "metrics": {
+    "terminal_error_m": 0.004165288341735226,
+    "holding_max_error_m": 0.004504169109782945,
+    "holding_max_speed_m_s": 0.019924587874246717
+  },
+  "speed_margin_m_s": 7.541212575328318e-05,
+  "max_absolute_correction_n": 0.08504574985290425,
+  "max_difference_from_archived_control_n": 0.0026914524673493645,
+  "channel_min_n": [
+    3.0631150827603593e-15,
+    1.854709412276834,
+    0.6883849113069697,
+    0.0
+  ],
+  "channel_max_n": [
+    5.8105954950580205,
+    7.999977193905346,
+    7.650638214086266,
+    4.738544213463094
+  ],
+  "limits_n": [
+    8.0,
+    8.0,
+    8.0,
+    8.0
+  ],
+  "native_vs_independent_replay": {
+    "max_position_difference_m": 0.0,
+    "max_velocity_difference_m_s": 0.0
+  },
+  "nominal_repeat": {
+    "accepted": true,
+    "identical_full_sample_content": true,
+    "new_process": true
+  },
+  "cost": {
+    "native": {
+      "model_builds": 1,
+      "forward_evaluations": 1011,
+      "physics_steps": 10000,
+      "rollouts": 10,
+      "mechanics_evaluations": 0,
+      "optimization_iterations": 1,
+      "completed_response_steps": 1,
+      "optimization_evaluations": 10,
+      "kernel_wall_s": 0.7484345000011672
+    },
+    "local_slsqp_iterations": 17,
+    "finite_difference_rollouts": 8,
+    "search_and_first_acceptance": {
+      "native_rollouts": 10,
+      "independent_full_replays": 1,
+      "total_mujoco_rollouts": 11,
+      "physics_steps": 11000,
+      "original_physical_evaluations": 1,
+      "calculate_wall_s": 0.875133100000312,
+      "replay_wall_s": 0.7197133999998186
+    },
+    "including_preparation_to_first_acceptance": {
+      "total_mujoco_rollouts": 13,
+      "physics_steps": 13000,
+      "original_physical_evaluations": 3,
+      "measured_phase_wall_s": 6.274786100000711
+    },
+    "including_nominal_repeat": {
+      "total_mujoco_rollouts": 14,
+      "physics_steps": 14000,
+      "original_physical_evaluations": 4,
+      "repeat_wall_s": 0.7178616000001057
+    },
+    "fresh_nmpc_solves": 0,
+    "ppo_training_steps": 0,
+    "research_llm_calls": 0
+  },
+  "limitations": [
+    "Nominal sampled open-loop simulation only; very small speed margin.",
+    "No disturbance robustness, continuous-time, hardware, global optimality, or structural-benefit proof."
+  ]
+}
