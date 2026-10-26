@@ -72,7 +72,8 @@ def persist(host, label, result):
 
 def used_steps(host):
     return sum(host.store.artifact(r).get('cost', {}).get('physics_steps', 0)
-        for r in state(host).get('research_mathematics', []))
+        for r in state(host).get('research_mathematics', [])
+        if host.store.artifact(r).get('cost_scope') != 'aggregate')
 
 
 def candidate(host, kind, factor):
@@ -226,28 +227,52 @@ def independent_trial(host, kind, trial):
     return result
 
 
+def freeze_boundary_predictions(host):
+    """Zero-integration addendum after training, before any held-out result."""
+    if (OUT / 'boundary_predictions.json').exists():return
+    assert used_steps(host) == 9000
+    saved = read(OUT / 'predictions.json')
+    base = read(OUT / 'baseline.json')['task_samples']
+    predictions = {}
+    for kind in ('structure', 'control'):
+        positive = saved['predictions'][kind]
+        samples = [dict(p, value=2*b['value']-p['value'],
+            normalized_signed_excess=2*b['normalized_signed_excess']-p['normalized_signed_excess'],
+            predicted_change=-p['predicted_change'], change_over_threshold=-p['change_over_threshold'],
+            direction='increase' if p['predicted_change'] < 0 else 'decrease' if p['predicted_change'] > 0 else 'unchanged')
+            for b, p in zip(base, positive['samples'])]
+        predictions[kind] = dict(coordinate=-positive['coordinate'], samples=samples, **metric_summary(samples))
+    persist(host, 'boundary_predictions', dict(status='prospective_boundary_addendum',
+        reason='Negative training points cross the original speed boundary. Add -0.75h held-out points to distinguish prospective classification from interpolation fit. No step tuning or new parameter direction.',
+        added_steps=4000, total_planned_steps=17000, holdout_results_used=False,
+        source_prediction=saved['reference'], predictions=predictions))
+
+
 def validate(host):
     prediction = read(OUT / 'predictions.json')
+    boundary = read(OUT / 'boundary_predictions.json')
     tracked = subprocess.check_output(['git', 'status', '--porcelain', '--',
-        str(OUT / 'predictions.json')], cwd=ROOT, text=True).strip()
+        str(OUT / 'predictions.json'), str(OUT / 'boundary_predictions.json')], cwd=ROOT, text=True).strip()
     assert not tracked, 'Commit prospective predictions before any holdout integration'
     checks = {}
-    for kind in ('structure', 'control'):
-        trial = native_trial(host, kind+'_holdout', kind, PROTOCOL['holdout_factor'])
-        actual = independent_trial(host, kind, trial)
-        predicted = prediction['predictions'][kind]
+    for key, kind, sign in [('structure','structure',1), ('control','control',1),
+            ('structure_negative','structure',-1), ('control_negative','control',-1)]:
+        trial = native_trial(host, key+'_holdout', kind, sign*PROTOCOL['holdout_factor'])
+        actual = independent_trial(host, key, trial)
+        predicted = (prediction if sign > 0 else boundary)['predictions'][kind]
         fine = next(d for d in prediction['directions'] if d['direction_id'] == f'{kind}@0.5h')['task_sensitivity']['fixed_control']
         base = read(OUT / 'baseline.json')['task_samples']
         check = validate_prediction(base, fine['finite_difference_per_unit'], predicted['coordinate'], actual['task_samples'])
-        checks[kind] = dict(validation=check, predicted=metric_summary(predicted['samples']),
+        checks[key] = dict(validation=check, predicted=metric_summary(predicted['samples']),
             actual=metric_summary(actual['task_samples']), acceptance=actual['acceptance'],
             two_scale=fine['scale_comparisons'], training_active_switches=fine['active_switches'],
             baseline_to_holdout_active_switch=active_samples(base) != active_samples(actual['task_samples']),
             reoptimization_status='reoptimized_capability_unresolved')
-    costs = [host.store.artifact(r).get('cost', {}) for r in state(host)['research_mathematics']]
+    costs = [host.store.artifact(r).get('cost', {}) for r in state(host)['research_mathematics']
+        if host.store.artifact(r).get('cost_scope') != 'aggregate']
     total = {k:sum(c.get(k, 0) for c in costs) for k in
         ('physics_steps', 'rollouts', 'model_builds', 'forward_evaluations', 'mechanics_evaluations', 'kernel_wall_s')}
-    summary = dict(status='stopped', protocol=PROTOCOL, cost=total, budget=20000,
+    summary = dict(status='stopped', protocol=PROTOCOL, cost=total, cost_scope='aggregate', budget=20000,
         unused_physics_steps=20000-total['physics_steps'], checks=checks,
         provider_calls=0, agent_calls=0, nmpc_calls=0, ppo_calls=0, optimization_calls=0,
         baseline_reproduction='all three original metrics within 1e-10; 51 world-frame samples, 48 named hinges, four tendon channels',
@@ -258,8 +283,9 @@ def validate(host):
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(); parser.add_argument('phase', choices=['prepare', 'train', 'validate'])
+    parser = argparse.ArgumentParser(); parser.add_argument('phase', choices=['prepare', 'train', 'boundary', 'validate'])
     args = parser.parse_args(); host = prepare()
     if args.phase == 'train':train(host)
+    elif args.phase == 'boundary':freeze_boundary_predictions(host)
     elif args.phase == 'validate':validate(host)
     else:print('Prepared; no physics integration', flush=True)
