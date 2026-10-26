@@ -1,0 +1,257 @@
+{
+  "date": "2026-10-27",
+  "status": "completed_single_new_state_revalidation",
+  "verdict": "no_go",
+  "frozen_identity": "4d83418988519bbc8ca15fe20e651c41036959fa3545f6256f2dc293ae8bfa7b",
+  "rubric": "tests/research/fixtures/c4_revalidation_protocol.json",
+  "original_grant": "c4-decision-pairs-20261026-12",
+  "cumulative_actual_requests": 20,
+  "cumulative_confirmed_responses": 20,
+  "cumulative_usage": {
+    "prompt_tokens": 821516,
+    "completion_tokens": 184772,
+    "total_tokens": 1006288,
+    "prompt_cache_hit_tokens": 523264,
+    "prompt_cache_miss_tokens": 298252,
+    "reasoning_tokens": 157226
+  },
+  "new_provider_requests": 8,
+  "new_usage": {
+    "prompt_tokens": 316754,
+    "completion_tokens": 81222,
+    "total_tokens": 397976,
+    "prompt_cache_hit_tokens": 215296,
+    "prompt_cache_miss_tokens": 101458,
+    "reasoning_tokens": 70774
+  },
+  "money": null,
+  "provider_ledger": {
+    "limit": {
+      "backend_solves": 0,
+      "model_calls": 20,
+      "tool_calls": 0,
+      "wall_s": null,
+      "worker_calls": 0
+    },
+    "used": {
+      "tool_calls": 0,
+      "model_calls": 20,
+      "backend_solves": 0,
+      "worker_calls": 0,
+      "wall_s": 1117.810000000005
+    },
+    "remaining": {
+      "backend_solves": 0,
+      "model_calls": 0,
+      "tool_calls": 0,
+      "wall_s": null,
+      "worker_calls": 0
+    },
+    "occupied": {}
+  },
+  "by_arm": {
+    "control": {
+      "provider_requests": 4,
+      "usage": {
+        "prompt_tokens": 146008,
+        "completion_tokens": 30450,
+        "total_tokens": 176458,
+        "prompt_cache_hit_tokens": 100352,
+        "prompt_cache_miss_tokens": 45656,
+        "reasoning_tokens": 0
+      },
+      "public_tool_calls": 6,
+      "evidence_reads": 4,
+      "errors": {
+        "extra_forbidden": 1
+      },
+      "confirmed_truncations": 0,
+      "credible_complete_proposals": 0,
+      "first_credible_proposal_cost": null
+    },
+    "treatment": {
+      "provider_requests": 4,
+      "usage": {
+        "prompt_tokens": 170746,
+        "completion_tokens": 50772,
+        "total_tokens": 221518,
+        "prompt_cache_hit_tokens": 114944,
+        "prompt_cache_miss_tokens": 55802,
+        "reasoning_tokens": 0
+      },
+      "public_tool_calls": 4,
+      "evidence_reads": 2,
+      "errors": {},
+      "confirmed_truncations": 1,
+      "credible_complete_proposals": 0,
+      "first_credible_proposal_cost": null
+    }
+  },
+  "case_reviews": [
+    {
+      "case": "D",
+      "arm": "control",
+      "context": "accurate",
+      "execution": "partial",
+      "judgment": "error",
+      "credible": false,
+      "legal_core_action": "physical_replay: exact frozen current candidate and new native control source; one shared physical launch and one full replay.",
+      "cost_through_core_action_tokens": 85336,
+      "findings": [
+        "Source and measure reads succeed; Plan and registered evidence checks succeed. Full worker admission was not run.",
+        "Correctly keeps native result unmeasured and requests independent acceptance; no unnecessary second optimization is required.",
+        "Claims three competing explanations predict mutually non-overlapping outcome bands. Structural limits, transfer error and insufficient finite control search can all produce the same failed replay; a single result cannot separate them that way.",
+        "Equality of one baseline scalar is evidence of local agreement, not proof of identical backend realization. A baseline-like replay does not uniquely prove a sequence delivery defect.",
+        "Claims two iterations were used; delivered optimization iterations_started is one. The ten callbacks are correctly identified; unused per-request callbacks are not cumulative independent allowance."
+      ]
+    },
+    {
+      "case": "D",
+      "arm": "treatment",
+      "context": "accurate",
+      "execution": "partial",
+      "judgment": "error",
+      "credible": false,
+      "legal_core_action": "physical_replay: exact frozen current candidate and new native control source; one shared physical launch and one full replay.",
+      "cost_through_core_action_tokens": 94346,
+      "findings": [
+        "Both reads and Plan/evidence checks succeed; detailed response conditioning is newly disclosed. Full worker admission remains unknown.",
+        "A reasonable direct verification choice, correct cost and conditional first-pass SELECT/STOP; explicitly no hardware or global feasibility claim.",
+        "Interprets linear/nonlinear improvement difference near 8.5e-11 as essentially exact model agreement. This compares clipped nonnegative gap improvement: predicted signed excess is +8.499956294372168e-11 while observed signed maximum excess is -0.003284013494889715. Agreement of clipped improvement does not establish trajectory accuracy or precise model transfer.",
+        "Baseline scalar equality is promoted to shared compiled model/initialization/grid and near-identity transfer. Those implementation facts and regional error bounds are not proved by that scalar.",
+        "Says a replay near the original failed speed establishes wrong delivery rather than control failure. Several physical/model/sampling explanations remain possible. Explicit later limitations do not justify that exclusive branch."
+      ]
+    },
+    {
+      "case": "E",
+      "arm": "control",
+      "context": "partial",
+      "execution": "error",
+      "judgment": "error",
+      "credible": false,
+      "cost_through_core_action_tokens": null,
+      "findings": [
+        "Two evidence reads succeed. The source is the initial bounded unmeasured schedule, not the measured NMPC input; source-specific causal predictions require that distinction.",
+        "Control_search payload is rejected at control_search.settings.regularization. Exact existing production unsupported-setting hint reaches the model; no request was executed.",
+        "Calls callback accounting unknown and budgets six callbacks plus one validation against seven shared physical launches. The visible full replay remainder is five; each uncached Plan control_search callback uses the original physical replay route. The promised maximum of seven new full replays cannot fit that sublimit.",
+        "Uses finite local probes as predicted reachable lower bounds and suggests lack of probe success identifies a restricted controllable space. Finite search failure does not identify such a bound.",
+        "Has competing explanations and outcome branches, but the actual illegal payload, source mismatch in rationale and cost mistake prevent a credible executable experiment."
+      ]
+    },
+    {
+      "case": "E",
+      "arm": "treatment",
+      "context": "unassessable",
+      "execution": "partial",
+      "judgment": "partial",
+      "credible": false,
+      "cost_through_core_action_tokens": null,
+      "findings": [
+        "Turn1 exhausted all 32768 output tokens in reasoning, produced no content/tool action, and remains a charged confirmed incomplete response. No resend or substitute sample.",
+        "Turn2 diagnose Plan/evidence checks pass and correctly acknowledges that the proposed mathematical probe needs identity-bound scope. Diagnose itself remains read-only.",
+        "Provides sensible competing braking/authority explanations and explicitly limits static/local proxies. However selected_candidate is null, selected_method names a composite conceptual probe, and no registered AnalysisRequest/operation/model/settings or execution cost is submitted.",
+        "The requested budget of two is a proposal, not permission or observed spending. No callable discriminating experiment was established in either turn."
+      ]
+    }
+  ],
+  "read_audit": {
+    "successful_reads": 6,
+    "invalid_reads": 0,
+    "exact_query_repeats_within_case_arm": 0,
+    "newly_disclosed_detail_reads": 3,
+    "provenance_verification_reads": 3,
+    "classification": "D measure/optimization and E candidate details disclose additional fields. Three source summaries verify bindings already partly visible and disclose some provenance; redundancy alone is not demonstrated waste.",
+    "confirmed_unnecessary_identical_content_repeats": 0,
+    "confirmed_empty_field_no_information_reads": 0,
+    "limitations": "No exact query repeats occurred within either two-turn arm. This small window cannot exclude semantically redundant reads or establish longitudinal efficiency."
+  },
+  "gate": {
+    "passed": false,
+    "required_distinct_scenarios": 2,
+    "strict_credible_scenarios": 0,
+    "reasonable_core_replay_scenarios": 1,
+    "sensitivity": "Even if D is credited despite the scope errors, only one distinct scenario qualifies; E has no credible executable proposal. The two-scenario gate still fails.",
+    "efficiency": "No demonstrated improvement. Treatment uses 45060 more new tokens than control and has one reasoning-only truncation; differing states and small sample preclude causal effect estimates.",
+    "stage3": "not_started",
+    "stage4": "not_started",
+    "next": "Retain no-go; no further sample/prompt tuning in C4. Remaining issue is reliable action construction, cost reading and scientific scope judgment, not missing study authorization."
+  },
+  "scientific_workers": 0,
+  "physics_steps": 0,
+  "reporter_requests": 0,
+  "unknown_transport_outcomes": 0,
+  "confirmed_incomplete_outputs": 1,
+  "automatic_resends": 0,
+  "followup_studies": [
+    {
+      "study_id": "c4-feedback-loop-20261026",
+      "resolved_identity": "c6c451a57c78b14e8837808be5d52d41c131c8c452f6b01ead4ddcf5e436b89c",
+      "started": false,
+      "candidate_count": 1,
+      "reference_candidate_is_none": true,
+      "selected_is_none": true,
+      "ledger": {
+        "limit": {
+          "backend_solves": 4,
+          "model_calls": 16,
+          "tool_calls": 40,
+          "wall_s": null,
+          "worker_calls": 0
+        },
+        "used": {
+          "tool_calls": 0,
+          "model_calls": 0,
+          "backend_solves": 0,
+          "worker_calls": 0,
+          "wall_s": 0.0
+        },
+        "remaining": {
+          "backend_solves": 4,
+          "model_calls": 16,
+          "tool_calls": 40,
+          "wall_s": null,
+          "worker_calls": 0
+        },
+        "occupied": {}
+      }
+    },
+    {
+      "study_id": "c4-coldstart-reach-hold-20261026",
+      "resolved_identity": "60a684e2389e5719b9c30afaaeb27215a9224087b5df33dc991662cf7a642d66",
+      "started": false,
+      "candidate_count": 0,
+      "reference_candidate_is_none": true,
+      "selected_is_none": true,
+      "ledger": {
+        "limit": {
+          "backend_solves": 16,
+          "model_calls": 128,
+          "tool_calls": 240,
+          "wall_s": null,
+          "worker_calls": 0
+        },
+        "used": {
+          "tool_calls": 0,
+          "model_calls": 0,
+          "backend_solves": 0,
+          "worker_calls": 0,
+          "wall_s": 0.0
+        },
+        "remaining": {
+          "backend_solves": 16,
+          "model_calls": 128,
+          "tool_calls": 240,
+          "wall_s": null,
+          "worker_calls": 0
+        },
+        "occupied": {}
+      }
+    }
+  ],
+  "limitations": [
+    "Worker-specific scientific admission and actual feedback learning are untested because no scientific action was dispatched.",
+    "Two new historical states have related archive/task lineages; no statistical independence or causal attribution claimed.",
+    "The common typed-error correction affects both arms; its behavioral effect is not isolated.",
+    "Cold-start feasibility and time/cost to first autonomous physical pass remain unmeasured. No claim of task or structural infeasibility."
+  ]
+}
