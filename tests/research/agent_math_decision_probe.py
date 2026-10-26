@@ -175,7 +175,7 @@ C3_SCOPE=(
 )
 
 
-def c3_boundary(case,arm,output,tool_input=None):
+def c3_boundary(case,arm,output,tool_input=None,*,source=None,roots=None):
     """The same small archive audit runs against either frozen production checkout."""
     import subprocess,sys
     script=Path(__file__).with_name('c3_readiness_audit.py')
@@ -183,7 +183,8 @@ def c3_boundary(case,arm,output,tool_input=None):
         'import runpy,sys;sys.path.insert(0,".");p=sys.argv.pop(1);runpy.run_path(p,run_name="__main__")',
         str(script),'--decision-efficiency',case,'--evidence-root',str(ROOT),'--output',str(output)]
     if tool_input:command+=['--tool-input',str(tool_input)]
-    subprocess.run(command,cwd=C3_ROOTS[arm],check=True)
+    if source:command+=['--source-folder',source[0],'--source-sequence',str(source[1])]
+    subprocess.run(command,cwd=(roots or C3_ROOTS)[arm],check=True)
 
 
 def c3_freeze(out):
@@ -282,6 +283,70 @@ async def c3_live(out,followup=False):
     return summary
 
 
+def c32_freeze(out):
+    """Additional saved boundaries using the C3 archive/projection, with no live entry point."""
+    import subprocess
+    from tools.research.provider_context import official_tokenizer
+    protocol=read(Path(__file__).with_name('fixtures')/'c32_scientific_decision_protocol.json')
+    roots={arm:ROOT.parent/protocol['checkouts'][arm] for arm in C3_ARMS}
+    if out.exists():raise ValueError('EXISTING_C32_DIRECTORY_NO_REFREEZE')
+    for arm,root in roots.items():
+        head=subprocess.check_output(['git','rev-parse','HEAD'],cwd=root,text=True).strip()
+        if head!=protocol['commits'][arm]:raise ValueError('C32_BASELINE_MISMATCH: '+arm)
+        subprocess.run(['git','diff','--quiet',head,'--','tools','schemas','extensions','configs','tasks'],cwd=root,check=True)
+    out.mkdir(parents=True)
+    provider=read(ROOT/'evidence/b3_r1_history_assisted_050/configuration.json')['runtime']['provider']
+    scope=C3_SCOPE.replace('C3 is','C3.2 is')
+    tokenizer=official_tokenizer();rows=[]
+    def measure(value):
+        body=httpx.Request('POST','https://offline.invalid',json=value).content
+        return dict(bytes=len(body),offline_serialized_tokens=len(tokenizer.encode(body.decode(),add_special_tokens=False).ids))
+    for case,definition in protocol['cases'].items():
+        pair=[]
+        for arm in C3_ARMS:
+            path=out/f'{case}-{arm}.json'
+            c3_boundary(case,arm,path,source=(definition['folder'],definition['sequence']),roots=roots)
+            d=read(path);pair.append(d)
+            if d['source_state']['artifact_id']!=definition['source_state']:raise ValueError('C32_SOURCE_STATE_MISMATCH')
+            if (not d['state_unchanged'] or not d['final_r1_refs_absent'] or
+                    d['future_only_outputs']!=d['future_only_outputs_denied']):raise ValueError('C32_TEMPORAL_GATE_FAILED')
+            if any(q['status']=='failed' and not q['historical_read_query'] for q in d['query_checks']):
+                raise ValueError('C32_EVIDENCE_ENTRY_FAILED: '+str(path))
+            wire=deepcopy(d['handoff_wire'])
+            wire['tools']=[t for t in wire['tools'] if t['function']['name'] in ('research_plan','evidence_read','research_analysis')]
+            wire['messages'][0]['content']+='\n\n'+scope
+            wire.update(model=provider['model'],max_tokens=provider['max_tokens'],reasoning_effort=provider['reasoning_effort'],
+                thinking={'type':provider['thinking']},stream=False,tool_choice='auto')
+            atomic_json(out/f'{case}-{arm}-1-request.json',wire)
+            rows.append(dict(case=case,arm=arm,**{k:d[k] for k in ('source_state','preparation','source_archive','event_boundary',
+                'original_next_request','methods','allowed_artifact_count','future_only_outputs','future_only_outputs_denied','source_facts')},
+                method_permissions={name:{k:row.get(k) for k in ('study_authorized','formal_execution_authorized',
+                    'planning_status','execution_status','missing')} for name,row in d['packet']['research']['mathematical_capabilities']['methods'].items()},
+                sizes=dict(probe_first_request=measure(wire),dynamic=measure(wire['messages'][-1]),
+                    tool_schema=measure(wire['tools']),all_production_context=d['sizes']),
+                query_count=len(d['query_checks']),current_queries_readable=True))
+        if (pair[0]['source_state']!=pair[1]['source_state'] or pair[0]['source_facts']!=pair[1]['source_facts'] or
+                pair[0]['allowed_artifact_count']!=pair[1]['allowed_artifact_count'] or set(pair[0]['methods'])!=set(pair[1]['methods']) or
+                pair[0]['packet']['research']['task']!=pair[1]['packet']['research']['task'] or
+                {k:v for k,v in pair[0]['packet'].items() if k!='research'}!={k:v for k,v in pair[1]['packet'].items() if k!='research'}):
+            raise ValueError('C32_PAIR_FACT_OR_METHOD_MISMATCH')
+        catalog=lambda d:d['packet']['research']['mathematical_capabilities']
+        if catalog(pair[0])!=catalog(pair[1]):raise ValueError('C32_METHOD_PERMISSION_MISMATCH')
+        # The rubric is never part of the Provider packet.
+        for arm in C3_ARMS:
+            wire=read(out/f'{case}-{arm}-1-request.json')
+            if 'rubric_offline_only' in json.dumps(wire):raise ValueError('C32_RUBRIC_LEAK')
+    summary=dict(status='offline_frozen_pending_explicit_c32_egress_authorization',verdict='insufficient_evidence',
+        commits=protocol['commits'],provider=provider,scope=scope,authorization='PENDING_EXPLICIT_C32_APPROVAL',
+        request_ceiling_proposed=12,offline_passed=True,offline=rows,protocol=protocol,
+        actual_requests=0,usage=dict(prompt_tokens=0,completion_tokens=0,total_tokens=0),money=None,public_tool_calls=0,evidence_reads=0,
+        scientific_workers=0,physics_steps=0,formal_studies=0,reporter_requests=0,provider_ledger_created=False,
+        second_turn_size=None,second_turn_size_scope='Depends on the actual first response and read-only feedback; no synthetic response or observation is supplied.',
+        order=[(case,arm) for i,case in enumerate(protocol['cases']) for arm in (C3_ARMS if i%2==0 else C3_ARMS[::-1])])
+    atomic_json(out/'frozen.json',summary)
+    return summary
+
+
 async def live(out=OUT, *, test_transport=None, host=None):
     frozen = read(out / 'frozen.json')
     if frozen['instructions'] != INSTRUCTIONS or frozen['cases'] != read(Path(frozen.get('cases_source',CASES))):
@@ -366,7 +431,7 @@ async def live(out=OUT, *, test_transport=None, host=None):
 def main():
     global SUMMARY
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('mode', choices=('freeze', 'live','c3-template','review','c3-freeze','c3-live'))
+    parser.add_argument('mode', choices=('freeze', 'live','c3-template','review','c3-freeze','c3-live','c32-freeze'))
     parser.add_argument('--results',type=Path,help='Read-only review of saved original probe results')
     parser.add_argument('--cases',type=Path,default=CASES)
     parser.add_argument('--out',type=Path)
@@ -375,7 +440,11 @@ def main():
     args = parser.parse_args()
     out=args.out or OUT
     if args.out:SUMMARY=out/'summary.json'
-    if args.mode.startswith('c3-') and args.mode!='c3-template':
+    if args.mode=='c32-freeze':
+        if args.out is None:parser.error('C3.2 requires an independent --out directory')
+        result=c32_freeze(out.resolve())
+        print('C3.2 offline pairs: '+str(len(result['offline']))+'; Provider=0; science=0; explicit egress approval pending')
+    elif args.mode.startswith('c3-') and args.mode!='c3-template':
         if args.out is None:parser.error('C3 requires an independent --out directory')
         if args.mode=='c3-freeze':
             rows=c3_freeze(out.resolve());print('C3-A passed: '+str(len(rows))+' frozen inputs; Provider=0; science=0')

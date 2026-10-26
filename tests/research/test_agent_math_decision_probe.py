@@ -75,6 +75,43 @@ class ProbeTests(unittest.TestCase):
             asyncio.run(probe.live(self.out,test_transport=httpx.MockTransport(lambda r:(_ for _ in ()).throw(AssertionError('NO_SEND')))))
         self.assertFalse((self.out/'provider').exists())
 
+    def test_c32_saved_boundary_excludes_future_and_has_no_inherited_live_grant(self):
+        from tests.research.c3_readiness_audit import FrozenDecisionBoundary,c3_frozen_audit
+        from tools.state_io import atomic_json
+        protocol=read(probe.ROOT/'tests/research/fixtures/c32_scientific_decision_protocol.json')
+        definition=protocol['cases']['M']
+        with patch('tools.research.analysis.dispatch',side_effect=AssertionError('NO_SCIENCE')) as worker, \
+                patch('httpx.AsyncHTTPTransport.handle_async_request',side_effect=AssertionError('NO_PROVIDER')) as provider:
+            b=FrozenDecisionBoundary(probe.ROOT,'M',source=(definition['folder'],definition['sequence']))
+            try:
+                self.assertEqual(b.preparation['source_state']['artifact_id'],definition['source_state'])
+                self.assertEqual(len(b.saved_state['analysis_results']),6)
+                self.assertEqual(b.saved_state.get('physical_replays',[]),[])
+                future=b.snapshot['session']['state']['physical_replays'][0]
+                with self.assertRaisesRegex(ValueError,'C3_FUTURE_OR_UNPUBLISHED_REFERENCE'):
+                    b.host.store.artifact(future)
+                packet,tools=b.projection()
+                self.assertNotIn('rubric_offline_only',json.dumps(packet))
+                self.assertNotIn(future['artifact_id'],json.dumps(packet))
+                b.host.store.transaction.assert_not_called();b.host.store.reserve.assert_not_called()
+                self.out.mkdir(parents=True)
+                original=b.artifact(b.saved_state['analysis_results'][0])['requested_operation']
+                calls=self.out/'calls.json';feedback=self.out/'feedback.json'
+                atomic_json(calls,[dict(id='recorded-analysis',function=dict(name='research_analysis',arguments=json.dumps(original)))])
+                c3_frozen_audit(probe.ROOT,'M',feedback,calls,source=(definition['folder'],definition['sequence']))
+                result=read(feedback)[0]
+                self.assertEqual(result['status'],'success')
+                self.assertEqual(result['result']['new_scientific_computations'],0)
+                self.assertIsNone(result['result']['expected_computation_cost']['native_physics_steps'])
+                self.assertTrue(result['result']['unchecked_execution_preconditions'])
+            finally:b.archive.close()
+            atomic_json(self.out/'frozen.json',dict(offline_passed=True,scope=probe.C3_SCOPE.replace('C3 is','C3.2 is'),
+                authorization='PENDING_EXPLICIT_C32_APPROVAL'))
+            with self.assertRaisesRegex(ValueError,'C3_OFFLINE_GATE_REQUIRED'):
+                asyncio.run(probe.c3_live(self.out))
+            self.assertFalse((self.out/'provider').exists())
+            worker.assert_not_called();provider.assert_not_called()
+
     def test_eight_single_decisions_exact_usage_and_isolated_history_no_dispatch(self):
         probe.freeze(self.out)
         requests = []

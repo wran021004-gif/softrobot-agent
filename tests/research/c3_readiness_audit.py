@@ -146,12 +146,12 @@ def compare_exports(paths):
 
 class FrozenDecisionBoundary(C3Archive):
     """C3 only: use a saved Handoff source state, never the final snapshot host."""
-    def __init__(self, root, case):
+    def __init__(self, root, case, *, source=None):
         import gzip, io
         from unittest.mock import Mock
         from types import SimpleNamespace
         self.root=Path(root)
-        folder,sequence={
+        folder,sequence=source or {
             'A':('b3_r1_history_assisted_050',425),
             'B':('b3_r1_history_assisted_050',2110),
             'C':('b3_t2_pilot_050_c',425),
@@ -218,13 +218,13 @@ class FrozenDecisionBoundary(C3Archive):
         return packet,tools
 
 
-def c3_frozen_audit(root,case,output,tool_input=None):
+def c3_frozen_audit(root,case,output,tool_input=None,*,source=None):
     """Run in either frozen checkout; no Provider or dispatch is reachable here."""
     from tools.research.core import read_evidence
     from tools.research.agent import error_feedback
     from unittest.mock import patch
     from tools.state_io import atomic_json
-    boundary=FrozenDecisionBoundary(root,case);host=boundary.host
+    boundary=FrozenDecisionBoundary(root,case,source=source);host=boundary.host
     try:
         packet,tools=boundary.projection()
         if tool_input is not None:
@@ -234,6 +234,9 @@ def c3_frozen_audit(root,case,output,tool_input=None):
             from tools.research.design import verify_candidate
             from jsonschema import Draft202012Validator
             definitions={t['function']['name']:t['function']['parameters'] for t in tools}
+            unknown_cost=dict(status='unverified_before_worker_admission',mathematical_evaluations=None,
+                native_rollouts=None,native_physics_steps=None,independent_replay_physics_steps=None,
+                scope='Requested budget is not actual cost. Prefix reconstruction, suffix rollouts and independent replay require request-specific admission; no computation occurred here.')
             for use in uses:
                 name=use['function']['name'];value=None;args={}
                 try:
@@ -245,11 +248,17 @@ def c3_frozen_audit(root,case,output,tool_input=None):
                         value=dict(status='proposal_recorded',action=plan.action,decision_admission=admission,
                             scientific_execution='not_dispatched_by_C3',new_scientific_computations=0,
                             observation=None,proposed_budget=plain(plan.decision).get('requested_budget'),
+                            checked_admission=['JSON Schema','Plan contract','admit_decision evidence/intent checks'],
+                            unchecked_execution_preconditions=['Complete worker applicability, permissions, source/model/state bindings and resource admission'],
+                            expected_computation_cost=unknown_cost,
                             limitation='Plan contract and evidence admission checked. Execution-specific admission was not run. An explicit local_diagnostic would compute in production; C3 does not execute it.')
                     elif name=='research_analysis':
                         q=AnalysisRequest.model_validate(args);verify_candidate(host,q.candidate)
                         value=dict(status='proposal_recorded',operation=q.operation,
-                            scientific_execution='not_dispatched_by_C3',observation=None,
+                            scientific_execution='not_dispatched_by_C3',new_scientific_computations=0,observation=None,
+                            checked_admission=['JSON Schema','AnalysisRequest contract','candidate identity'],
+                            unchecked_execution_preconditions=['Complete worker applicability, permissions, source/model/state bindings and resource admission'],
+                            expected_computation_cost=unknown_cost,
                             limitation='Schema and candidate identity checked; worker admission, numerical applicability and results are untested.')
                     else:raise ValueError('C3_TOOL_NOT_EXPOSED')
                     results.append(dict(tool_call_id=use['id'],name=name,status='success',result=value))
@@ -321,6 +330,31 @@ def c3_frozen_audit(root,case,output,tool_input=None):
         audit=json.loads((Path(root)/'evidence/b3_r1_history_assisted_050/final_audit.json').read_text())
         result['final_r1_refs_absent']=all(r['artifact_id'] not in boundary.allowed and r['artifact_id'] not in serialized(handoff).decode()
             for r in (audit['selected'],audit['selected_solution'],audit['final_disposition']))
+        later={r['artifact_id']:r for e in boundary.snapshot['events'] if e['sequence']>boundary.events[-1]['sequence']
+            for r in e['outputs'] if r['artifact_id'] not in boundary.allowed}
+        denied=0
+        for ref in later.values():
+            try:host.store.artifact(ref)
+            except ValueError as exc:
+                if str(exc)!='C3_FUTURE_OR_UNPUBLISHED_REFERENCE':raise
+                denied+=1
+        result['future_only_outputs']=len(later)
+        result['future_only_outputs_denied']=denied
+        s=boundary.saved_state
+        result['source_facts']=dict(study_id=s['spec']['study_id'],
+            candidates=list(s['candidates'].values()),charged_mathematical_evaluations=s.get('mathematical_evaluations'),
+            analyses=[dict(reference=r,**{k:v.get(k) for k in ('owning_study','operation','status',
+                'charged_analysis_evaluations','actual_mathematical_calls')},
+                conclusion=v.get('scoped_claim',{}).get('conclusion'),
+                verification=v.get('scoped_claim',{}).get('verification_status'),
+                replayed_violation=v.get('trajectory',{}).get('replayed_violation'),
+                native_cost=v.get('native_dynamics',{}).get('cost'))
+                for r in s.get('analysis_results',[]) for v in [boundary.artifact(r)]],
+            physical_results=[dict(reference=r,owning_study=v.get('owning_study'),
+                acceptance_status=v.get('acceptance',{}).get('status'),
+                accepted=v.get('acceptance',{}).get('accepted'),metrics=v.get('acceptance',{}).get('metrics'),
+                components=v.get('acceptance',{}).get('components'))
+                for key in ('results','physical_replays') for r in s.get(key,[]) for v in [boundary.artifact(r)]])
         atomic_json(Path(output),result)
     finally:boundary.archive.close()
 
@@ -328,10 +362,14 @@ def c3_frozen_audit(root,case,output,tool_input=None):
 if __name__=='__main__':
     import argparse
     parser=argparse.ArgumentParser();parser.add_argument('--compare-exports',nargs=2,type=Path)
-    parser.add_argument('--decision-efficiency',choices=('A','B','C'))
+    parser.add_argument('--decision-efficiency')
     parser.add_argument('--evidence-root',type=Path)
     parser.add_argument('--output',type=Path)
     parser.add_argument('--tool-input',type=Path)
+    parser.add_argument('--source-folder',help='Existing archive folder for an additional frozen decision state')
+    parser.add_argument('--source-sequence',type=int,help='Saved Handoff preparation event, not a reconstructed state')
     args=parser.parse_args()
-    if args.decision_efficiency:c3_frozen_audit(args.evidence_root,args.decision_efficiency,args.output,args.tool_input)
+    if bool(args.source_folder) != (args.source_sequence is not None):parser.error('Both source arguments are required')
+    source=(args.source_folder,args.source_sequence) if args.source_folder else None
+    if args.decision_efficiency:c3_frozen_audit(args.evidence_root,args.decision_efficiency,args.output,args.tool_input,source=source)
     else:print(json.dumps(compare_exports(args.compare_exports) if args.compare_exports else dict(context=context_audit(),search=search_audit()),indent=2))

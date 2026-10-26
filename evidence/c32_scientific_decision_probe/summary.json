@@ -1,0 +1,1305 @@
+{
+  "status": "offline_frozen_pending_explicit_c32_egress_authorization",
+  "verdict": "insufficient_evidence",
+  "commits": {
+    "control": "2aedb99c6ef222f6f84e0731561339b0c9883914",
+    "treatment": "e52b71c9e62fef7d4a34b145ec63789db44d0bb5"
+  },
+  "provider": {
+    "adapter": "deepseek",
+    "adapter_version": "8.0.0",
+    "base_url": "https://api.deepseek.com",
+    "context_bytes": 4194304,
+    "context_guard": {
+      "context_limit_tokens": 1000000,
+      "estimate": "one token per serialized UTF-8 byte plus framing; conservative estimate, not tokenization",
+      "framing_headroom_tokens": 8192,
+      "source": "https://api-docs.deepseek.com/quick_start/pricing/",
+      "verified_date": "2026-10-03"
+    },
+    "investigation_max_tokens": 32768,
+    "max_no_progress": 3,
+    "max_repairs": 10,
+    "max_tokens": 32768,
+    "max_turns": 40,
+    "model": "deepseek-flash",
+    "parameters": {},
+    "protocol_recovery": {
+      "max_consecutive": 40,
+      "max_total": 40
+    },
+    "reasoning_effort": "high",
+    "strategy": "strategy.tool",
+    "strategy_version": "1.0.0",
+    "supports_images": false,
+    "supports_text": true,
+    "supports_tools": true,
+    "thinking": "enabled",
+    "timeout_s": 600.0
+  },
+  "actual_requests": 0,
+  "usage": {
+    "prompt_tokens": 0,
+    "completion_tokens": 0,
+    "total_tokens": 0
+  },
+  "money": null,
+  "public_tool_calls": 0,
+  "evidence_reads": 0,
+  "scientific_workers": 0,
+  "physics_steps": 0,
+  "formal_studies": 0,
+  "reporter_requests": 0,
+  "provider_ledger_created": false,
+  "request_ceiling_proposed": 12,
+  "authorization": "PENDING_EXPLICIT_C32_APPROVAL",
+  "second_turn_size": null,
+  "second_turn_size_scope": "Depends on the actual first response and read-only feedback; no synthetic response or observation is supplied.",
+  "order": [
+    [
+      "N",
+      "control"
+    ],
+    [
+      "N",
+      "treatment"
+    ],
+    [
+      "K",
+      "treatment"
+    ],
+    [
+      "K",
+      "control"
+    ],
+    [
+      "M",
+      "control"
+    ],
+    [
+      "M",
+      "treatment"
+    ]
+  ],
+  "date": "2026-10-26",
+  "timezone": "Asia/Shanghai",
+  "pair_integrity_passed": true,
+  "live_execution_ready": false,
+  "scientific_coverage": "Evidence interpretation and conditional method proposals in three saved states; full native cost and freely executable mathematical route switching incompletely covered.",
+  "cases": {
+    "N": {
+      "source": {
+        "source_state": {
+          "artifact_id": "674aab2fa6d71affc3bde34f1e21e5a37956f9ba5c0ac1854295d6dd8c9d9629",
+          "media_type": "application/json"
+        },
+        "preparation": {
+          "artifact_id": "aed28e17af1e36ceeb2b0c9492876105ec76a0023adb5da01d4727a6d9d9b313",
+          "media_type": "application/json"
+        },
+        "source_archive": "c3_heuristic_ab_100ms_20261025",
+        "event_boundary": 337,
+        "original_next_request": {
+          "artifact_id": "76709235ac7dfa0e6be554549f5440cdd3374e233d790e622ce782f148d3b9bb",
+          "media_type": "application/json"
+        },
+        "allowed_artifact_count": 287,
+        "next_request_sequence": 342,
+        "intervening_event_kinds": [
+          "session_handoff",
+          "session_handoff",
+          "model_decision_packet",
+          "r3_model"
+        ],
+        "intervening_science_events": 0
+      },
+      "facts": {
+        "study_id": "c3-a-100ms-20261025",
+        "candidates": [
+          {
+            "artifact_id": "ea7231b55c6e86d0fe39fdecac5d41de7cec294264c1bafecd50bf276a1159e5",
+            "media_type": "application/json"
+          }
+        ],
+        "charged_mathematical_evaluations": 2,
+        "analyses": [
+          {
+            "reference": {
+              "artifact_id": "f299abbd36da4d91718e768f46580eb410644f9b07d2fd6445df8c4ed041d41c",
+              "media_type": "application/json"
+            },
+            "owning_study": "c3-a-100ms-20261025",
+            "operation": "task_capability",
+            "status": "computed",
+            "charged_analysis_evaluations": 2,
+            "actual_mathematical_calls": {
+              "capability_kernel_calls": 1,
+              "dual_face_solve_attempts": 0,
+              "internal_conic_solves": 1,
+              "status": "Returned trajectory establishes a kernel call; interrupted work without a result has unknown call counts."
+            },
+            "conclusion": "inconclusive",
+            "verification": "legal_input_and_signed_score_replay_checked",
+            "replayed_violation": 15.200000000000118,
+            "native_cost": null
+          }
+        ],
+        "physical_results": [
+          {
+            "reference": {
+              "artifact_id": "8abcf624d7d73e6c8f9da608e0dac639d8a73828f8c8f0746c2274defe43f0c4",
+              "media_type": "application/json"
+            },
+            "owning_study": "c3-a-100ms-20261025",
+            "acceptance_status": "valid_failure",
+            "accepted": false,
+            "metrics": {
+              "holding_max_error_m": 0.030189549817801562,
+              "holding_max_speed_m_s": 0.5221865945911917,
+              "terminal_error_m": 0.021912144955954616
+            },
+            "components": {
+              "evaluation_validity": {
+                "limit": null,
+                "passed": true,
+                "reason": null,
+                "unit": null,
+                "value": "valid"
+              },
+              "evaluator:task_bound": {
+                "limit": 0.01,
+                "passed": false,
+                "reason": null,
+                "unit": "m",
+                "value": 0.021912144955954616
+              },
+              "execution_complete": {
+                "limit": null,
+                "passed": true,
+                "reason": null,
+                "unit": null,
+                "value": true
+              },
+              "force_bounds": {
+                "limit": 1e-08,
+                "passed": true,
+                "reason": null,
+                "unit": "N",
+                "value": 0.0
+              },
+              "holding_coverage": {
+                "limit": 6,
+                "passed": true,
+                "reason": null,
+                "unit": "inclusive uniform samples",
+                "value": true
+              },
+              "holding_position": {
+                "limit": 0.01,
+                "passed": false,
+                "reason": null,
+                "unit": "m",
+                "value": 0.030189549817801562
+              },
+              "holding_speed": {
+                "limit": 0.02,
+                "passed": false,
+                "reason": null,
+                "unit": "m/s",
+                "value": 0.5221865945911917
+              },
+              "solver_errors": {
+                "limit": 0,
+                "passed": true,
+                "reason": null,
+                "unit": "count",
+                "value": 0
+              },
+              "task_evaluator": {
+                "limit": null,
+                "passed": false,
+                "reason": null,
+                "unit": null,
+                "value": false
+              }
+            }
+          }
+        ]
+      },
+      "method_permissions": {
+        "equilibrium": {
+          "study_authorized": true,
+          "formal_execution_authorized": false,
+          "planning_status": "unauthorized",
+          "execution_status": "conditional_on_admission",
+          "missing": [
+            "formal_study_math_scope_required"
+          ]
+        },
+        "linearization": {
+          "study_authorized": true,
+          "formal_execution_authorized": false,
+          "planning_status": "unauthorized",
+          "execution_status": "conditional_on_admission",
+          "missing": [
+            "formal_study_math_scope_required"
+          ]
+        },
+        "controllability": {
+          "study_authorized": true,
+          "formal_execution_authorized": false,
+          "planning_status": "unauthorized",
+          "execution_status": "conditional_on_admission",
+          "missing": [
+            "formal_study_math_scope_required"
+          ]
+        },
+        "endpoint": {
+          "study_authorized": true,
+          "formal_execution_authorized": false,
+          "planning_status": "unauthorized",
+          "execution_status": "conditional_on_admission",
+          "missing": [
+            "formal_study_math_scope_required"
+          ]
+        },
+        "braking": {
+          "study_authorized": true,
+          "formal_execution_authorized": false,
+          "planning_status": "unauthorized",
+          "execution_status": "conditional_on_admission",
+          "missing": [
+            "formal_study_math_scope_required"
+          ]
+        },
+        "instantaneous_braking_v1": {
+          "study_authorized": true,
+          "formal_execution_authorized": false,
+          "planning_status": "unauthorized",
+          "execution_status": "blocked",
+          "missing": [
+            "Exact saved state required.",
+            "formal_study_math_scope_required"
+          ]
+        },
+        "trajectory_feasibility": {
+          "study_authorized": true,
+          "formal_execution_authorized": false,
+          "planning_status": "unauthorized",
+          "execution_status": "conditional_on_admission",
+          "missing": [
+            "formal_study_math_scope_required"
+          ]
+        },
+        "task_capability": {
+          "study_authorized": true,
+          "formal_execution_authorized": false,
+          "planning_status": "unauthorized",
+          "execution_status": "conditional_on_admission",
+          "missing": [
+            "formal_study_math_scope_required"
+          ]
+        },
+        "input_sensitivity": {
+          "study_authorized": true,
+          "formal_execution_authorized": false,
+          "planning_status": "unauthorized",
+          "execution_status": "blocked",
+          "missing": [
+            "Static IFT v1 is implemented only by the SoRoSim provider.",
+            "formal_study_math_scope_required"
+          ]
+        },
+        "design_sensitivity": {
+          "study_authorized": true,
+          "formal_execution_authorized": false,
+          "planning_status": "unauthorized",
+          "execution_status": "blocked",
+          "missing": [
+            "Static IFT v1 is implemented only by the SoRoSim provider.",
+            "formal_study_math_scope_required"
+          ]
+        },
+        "native_dynamics_v1": {
+          "study_authorized": true,
+          "formal_execution_authorized": false,
+          "planning_status": "unauthorized",
+          "execution_status": "conditional_on_admission",
+          "missing": [
+            "formal_study_math_scope_required"
+          ]
+        },
+        "short_input_response_v1": {
+          "study_authorized": true,
+          "formal_execution_authorized": false,
+          "planning_status": "unauthorized",
+          "execution_status": "conditional_on_admission",
+          "missing": [
+            "formal_study_math_scope_required"
+          ]
+        },
+        "fixed_input_structure_v1": {
+          "study_authorized": true,
+          "formal_execution_authorized": false,
+          "planning_status": "unauthorized",
+          "execution_status": "conditional_on_admission",
+          "missing": [
+            "formal_study_math_scope_required"
+          ]
+        },
+        "mujoco_direct_control_v1": {
+          "study_authorized": true,
+          "formal_execution_authorized": false,
+          "planning_status": "unauthorized",
+          "execution_status": "conditional_on_admission",
+          "missing": [
+            "control_optimization.source",
+            "control_optimization.settings (version=local_control_search_v2, explicit correction_window_s and knots_s)",
+            "formal_study_math_scope_required"
+          ]
+        },
+        "sampled-affine-conic-minimax-v1": {
+          "study_authorized": true,
+          "formal_execution_authorized": false,
+          "planning_status": "unauthorized",
+          "execution_status": "conditional_on_admission",
+          "missing": [
+            "formal_study_math_scope_required"
+          ]
+        },
+        "controlled-capability-sensitivity-v1": {
+          "study_authorized": true,
+          "formal_execution_authorized": false,
+          "planning_status": "unauthorized",
+          "execution_status": "blocked",
+          "missing": [
+            "missing_validated_model_stencil",
+            "formal_study_math_scope_required"
+          ]
+        }
+      },
+      "pair_facts_and_permissions_equal": true,
+      "arms": {
+        "control": {
+          "sizes": {
+            "probe_first_request": {
+              "bytes": 122154,
+              "offline_serialized_tokens": 35965
+            },
+            "dynamic": {
+              "bytes": 84200,
+              "offline_serialized_tokens": 26526
+            },
+            "tool_schema": {
+              "bytes": 34213,
+              "offline_serialized_tokens": 8731
+            },
+            "all_production_context": {
+              "brief": {
+                "bytes": 60644,
+                "offline_serialized_tokens": 18110
+              },
+              "same_session": {
+                "bytes": 131180,
+                "offline_serialized_tokens": 38318
+              },
+              "handoff": {
+                "bytes": 131017,
+                "offline_serialized_tokens": 38282
+              },
+              "schema": {
+                "bytes": 43758,
+                "offline_serialized_tokens": 11181
+              },
+              "fixed_system": {
+                "bytes": 2563,
+                "offline_serialized_tokens": 459
+              },
+              "history": {
+                "bytes": 520,
+                "offline_serialized_tokens": 114
+              },
+              "dynamic": {
+                "bytes": 84200,
+                "offline_serialized_tokens": 26526
+              }
+            }
+          },
+          "query_count": 23,
+          "current_queries_readable": true,
+          "future_only_outputs": 467,
+          "future_only_outputs_denied": 467
+        },
+        "treatment": {
+          "sizes": {
+            "probe_first_request": {
+              "bytes": 123833,
+              "offline_serialized_tokens": 36343
+            },
+            "dynamic": {
+              "bytes": 85729,
+              "offline_serialized_tokens": 26862
+            },
+            "tool_schema": {
+              "bytes": 34363,
+              "offline_serialized_tokens": 8773
+            },
+            "all_production_context": {
+              "brief": {
+                "bytes": 62117,
+                "offline_serialized_tokens": 18417
+              },
+              "same_session": {
+                "bytes": 132859,
+                "offline_serialized_tokens": 38696
+              },
+              "handoff": {
+                "bytes": 132696,
+                "offline_serialized_tokens": 38660
+              },
+              "schema": {
+                "bytes": 43908,
+                "offline_serialized_tokens": 11223
+              },
+              "fixed_system": {
+                "bytes": 2563,
+                "offline_serialized_tokens": 459
+              },
+              "history": {
+                "bytes": 520,
+                "offline_serialized_tokens": 114
+              },
+              "dynamic": {
+                "bytes": 85729,
+                "offline_serialized_tokens": 26862
+              }
+            }
+          },
+          "query_count": 23,
+          "current_queries_readable": true,
+          "future_only_outputs": 467,
+          "future_only_outputs_denied": 467
+        }
+      },
+      "live_comparison": {
+        "control": null,
+        "treatment": null,
+        "reason": "No real Provider outputs; no scientific judgment or efficiency treatment effect measured"
+      }
+    },
+    "K": {
+      "source": {
+        "source_state": {
+          "artifact_id": "ef897ef6cf071c1fcd55989cb3a271ef80b0ac15a0c1f22d3e20642d0d06b2dd",
+          "media_type": "application/json"
+        },
+        "preparation": {
+          "artifact_id": "d855c17bce116d380cc07a0de455e76ef47e8b3c8b6586a43bab6184a04f8cff",
+          "media_type": "application/json"
+        },
+        "source_archive": "b3_t2_pilot_050_b",
+        "event_boundary": 151,
+        "original_next_request": {
+          "artifact_id": "68c803236f5595fabac1a27da445f0a01e420486c74daffcad2ee5419e5ad373",
+          "media_type": "application/json"
+        },
+        "allowed_artifact_count": 150,
+        "next_request_sequence": 156,
+        "intervening_event_kinds": [
+          "session_handoff",
+          "session_handoff",
+          "model_decision_packet",
+          "r3_model"
+        ],
+        "intervening_science_events": 0
+      },
+      "facts": {
+        "study_id": "b3-t2-050-b-v2-draft",
+        "candidates": [
+          {
+            "artifact_id": "c884086ce2fc5a2ddfe61a19bf67fab01dcc440e0329be0a7ae317855809d2a7",
+            "media_type": "application/json"
+          }
+        ],
+        "charged_mathematical_evaluations": 0,
+        "analyses": [],
+        "physical_results": [
+          {
+            "reference": {
+              "artifact_id": "137dd4b22b2969ed34ff611072329375e8a9edf6e483f87710561f9cdb38ba75",
+              "media_type": "application/json"
+            },
+            "owning_study": "b3-t2-050-b-v2-draft",
+            "acceptance_status": "valid_failure",
+            "accepted": false,
+            "metrics": {
+              "holding_max_error_m": 0.006038027478928508,
+              "holding_max_speed_m_s": 0.11137394399884916,
+              "terminal_error_m": 0.003148372648914904
+            },
+            "components": {
+              "evaluation_validity": {
+                "limit": null,
+                "passed": true,
+                "reason": null,
+                "unit": null,
+                "value": "valid"
+              },
+              "evaluator:task_bound": {
+                "limit": 0.01,
+                "passed": true,
+                "reason": null,
+                "unit": "m",
+                "value": 0.003148372648914904
+              },
+              "execution_complete": {
+                "limit": null,
+                "passed": true,
+                "reason": null,
+                "unit": null,
+                "value": true
+              },
+              "force_bounds": {
+                "limit": 1e-08,
+                "passed": true,
+                "reason": null,
+                "unit": "N",
+                "value": 0.0
+              },
+              "holding_coverage": {
+                "limit": 6,
+                "passed": true,
+                "reason": null,
+                "unit": "inclusive uniform samples",
+                "value": true
+              },
+              "holding_position": {
+                "limit": 0.01,
+                "passed": true,
+                "reason": null,
+                "unit": "m",
+                "value": 0.006038027478928508
+              },
+              "holding_speed": {
+                "limit": 0.02,
+                "passed": false,
+                "reason": null,
+                "unit": "m/s",
+                "value": 0.11137394399884916
+              },
+              "solver_errors": {
+                "limit": 0,
+                "passed": true,
+                "reason": null,
+                "unit": "count",
+                "value": 0
+              },
+              "task_evaluator": {
+                "limit": null,
+                "passed": true,
+                "reason": null,
+                "unit": null,
+                "value": true
+              }
+            }
+          }
+        ]
+      },
+      "method_permissions": {
+        "equilibrium": {
+          "study_authorized": true,
+          "formal_execution_authorized": true,
+          "planning_status": "ready",
+          "execution_status": "conditional_on_admission",
+          "missing": []
+        },
+        "linearization": {
+          "study_authorized": true,
+          "formal_execution_authorized": true,
+          "planning_status": "ready",
+          "execution_status": "conditional_on_admission",
+          "missing": []
+        },
+        "controllability": {
+          "study_authorized": true,
+          "formal_execution_authorized": true,
+          "planning_status": "ready",
+          "execution_status": "conditional_on_admission",
+          "missing": []
+        },
+        "endpoint": {
+          "study_authorized": true,
+          "formal_execution_authorized": true,
+          "planning_status": "ready",
+          "execution_status": "conditional_on_admission",
+          "missing": []
+        },
+        "braking": {
+          "study_authorized": true,
+          "formal_execution_authorized": true,
+          "planning_status": "ready",
+          "execution_status": "conditional_on_admission",
+          "missing": []
+        },
+        "instantaneous_braking_v1": {
+          "study_authorized": true,
+          "formal_execution_authorized": true,
+          "planning_status": "unsupported",
+          "execution_status": "blocked",
+          "missing": [
+            "Exact saved state required."
+          ]
+        },
+        "trajectory_feasibility": {
+          "study_authorized": true,
+          "formal_execution_authorized": true,
+          "planning_status": "ready",
+          "execution_status": "conditional_on_admission",
+          "missing": []
+        },
+        "task_capability": {
+          "study_authorized": true,
+          "formal_execution_authorized": true,
+          "planning_status": "ready",
+          "execution_status": "conditional_on_admission",
+          "missing": []
+        },
+        "input_sensitivity": {
+          "study_authorized": true,
+          "formal_execution_authorized": true,
+          "planning_status": "unsupported",
+          "execution_status": "blocked",
+          "missing": [
+            "Static IFT v1 is implemented only by the SoRoSim provider."
+          ]
+        },
+        "design_sensitivity": {
+          "study_authorized": true,
+          "formal_execution_authorized": true,
+          "planning_status": "unsupported",
+          "execution_status": "blocked",
+          "missing": [
+            "Static IFT v1 is implemented only by the SoRoSim provider."
+          ]
+        },
+        "native_dynamics_v1": {
+          "study_authorized": true,
+          "formal_execution_authorized": true,
+          "planning_status": "ready",
+          "execution_status": "conditional_on_admission",
+          "missing": []
+        },
+        "short_input_response_v1": {
+          "study_authorized": true,
+          "formal_execution_authorized": true,
+          "planning_status": "ready",
+          "execution_status": "conditional_on_admission",
+          "missing": []
+        },
+        "fixed_input_structure_v1": {
+          "study_authorized": true,
+          "formal_execution_authorized": true,
+          "planning_status": "ready",
+          "execution_status": "conditional_on_admission",
+          "missing": []
+        },
+        "mujoco_direct_control_v1": {
+          "study_authorized": true,
+          "formal_execution_authorized": true,
+          "planning_status": "requires_parameters",
+          "execution_status": "conditional_on_admission",
+          "missing": [
+            "control_optimization.source",
+            "control_optimization.settings (version=local_control_search_v2, explicit correction_window_s and knots_s)"
+          ]
+        },
+        "sampled-affine-conic-minimax-v1": {
+          "study_authorized": true,
+          "formal_execution_authorized": true,
+          "planning_status": "ready",
+          "execution_status": "conditional_on_admission",
+          "missing": []
+        },
+        "controlled-capability-sensitivity-v1": {
+          "study_authorized": false,
+          "formal_execution_authorized": false,
+          "planning_status": "unauthorized",
+          "execution_status": "blocked",
+          "missing": [
+            "method_not_authorized",
+            "no_authorized_continuous_variable",
+            "missing_validated_model_stencil",
+            "study_method_grant_required"
+          ]
+        }
+      },
+      "pair_facts_and_permissions_equal": true,
+      "arms": {
+        "control": {
+          "sizes": {
+            "probe_first_request": {
+              "bytes": 89378,
+              "offline_serialized_tokens": 25825
+            },
+            "dynamic": {
+              "bytes": 57795,
+              "offline_serialized_tokens": 17930
+            },
+            "tool_schema": {
+              "bytes": 27995,
+              "offline_serialized_tokens": 7119
+            },
+            "all_production_context": {
+              "brief": {
+                "bytes": 36302,
+                "offline_serialized_tokens": 10638
+              },
+              "same_session": {
+                "bytes": 92237,
+                "offline_serialized_tokens": 26540
+              },
+              "handoff": {
+                "bytes": 92074,
+                "offline_serialized_tokens": 26504
+              },
+              "schema": {
+                "bytes": 31373,
+                "offline_serialized_tokens": 7931
+              },
+              "fixed_system": {
+                "bytes": 2409,
+                "offline_serialized_tokens": 526
+              },
+              "history": {
+                "bytes": 521,
+                "offline_serialized_tokens": 115
+              },
+              "dynamic": {
+                "bytes": 57795,
+                "offline_serialized_tokens": 17930
+              }
+            }
+          },
+          "query_count": 21,
+          "current_queries_readable": true,
+          "future_only_outputs": 271,
+          "future_only_outputs_denied": 271
+        },
+        "treatment": {
+          "sizes": {
+            "probe_first_request": {
+              "bytes": 91089,
+              "offline_serialized_tokens": 26293
+            },
+            "dynamic": {
+              "bytes": 59356,
+              "offline_serialized_tokens": 18356
+            },
+            "tool_schema": {
+              "bytes": 28145,
+              "offline_serialized_tokens": 7161
+            },
+            "all_production_context": {
+              "brief": {
+                "bytes": 37769,
+                "offline_serialized_tokens": 11011
+              },
+              "same_session": {
+                "bytes": 93948,
+                "offline_serialized_tokens": 27008
+              },
+              "handoff": {
+                "bytes": 93785,
+                "offline_serialized_tokens": 26972
+              },
+              "schema": {
+                "bytes": 31523,
+                "offline_serialized_tokens": 7973
+              },
+              "fixed_system": {
+                "bytes": 2409,
+                "offline_serialized_tokens": 526
+              },
+              "history": {
+                "bytes": 521,
+                "offline_serialized_tokens": 115
+              },
+              "dynamic": {
+                "bytes": 59356,
+                "offline_serialized_tokens": 18356
+              }
+            }
+          },
+          "query_count": 24,
+          "current_queries_readable": true,
+          "future_only_outputs": 271,
+          "future_only_outputs_denied": 271
+        }
+      },
+      "live_comparison": {
+        "control": null,
+        "treatment": null,
+        "reason": "No real Provider outputs; no scientific judgment or efficiency treatment effect measured"
+      }
+    },
+    "M": {
+      "source": {
+        "source_state": {
+          "artifact_id": "90410a7fe2525c8eb921115056f96945694eb1d01aa3d6ae1efc1fef8e484d5b",
+          "media_type": "application/json"
+        },
+        "preparation": {
+          "artifact_id": "6453e0e60e46e4693f11e619741302c08d0d1c7ab0534719b4af2791ebd32305",
+          "media_type": "application/json"
+        },
+        "source_archive": "c3_math_search_ab_100ms_20261025",
+        "event_boundary": 183,
+        "original_next_request": {
+          "artifact_id": "581297de0d81f3407bfee52b08678be5866c1d65f201d792e35b9b1a77ba7ecd",
+          "media_type": "application/json"
+        },
+        "allowed_artifact_count": 142,
+        "next_request_sequence": 188,
+        "intervening_event_kinds": [
+          "session_handoff",
+          "session_handoff",
+          "model_decision_packet",
+          "r3_model"
+        ],
+        "intervening_science_events": 0
+      },
+      "facts": {
+        "study_id": "c3-b-100ms-20261025",
+        "candidates": [
+          {
+            "artifact_id": "cf88a6ed119506c5bf4ddef168f65ece4229bac1a597b088827731a59ac14035",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "e0f2ccf53680ad00b1ed5d258d8b5eed38ced55fbc07f3bde07d3e5ce415ac1d",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "fcfb5f46268f43d2b96f3e7f292c9005a4c7ecdd103ea6c6b8d2842027b953df",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "0d86cd76f0fdd31f6768c2d85632cfbd4392bdc3f9af3740d99fab0226124647",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "3d6179f1b28bfd32dcd9c0093a76bb66458e42b2d69d2f57b82e386ed70f361e",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "0fe9e8023244f00a022b0884abbbcca8986d21b11fc4c83bdffaa6a03d489aed",
+            "media_type": "application/json"
+          }
+        ],
+        "charged_mathematical_evaluations": 12,
+        "analyses": [
+          {
+            "reference": {
+              "artifact_id": "4988359ea5af2cde74117fd73dcc448149a7f1d8571789d663c3780437c6783b",
+              "media_type": "application/json"
+            },
+            "owning_study": "c3-b-100ms-20261025",
+            "operation": "task_capability",
+            "status": "computed",
+            "charged_analysis_evaluations": 2,
+            "actual_mathematical_calls": {
+              "capability_kernel_calls": 1,
+              "dual_face_solve_attempts": 0,
+              "internal_conic_solves": 1,
+              "status": "Returned trajectory establishes a kernel call; interrupted work without a result has unknown call counts."
+            },
+            "conclusion": "inconclusive",
+            "verification": "legal_input_and_signed_score_replay_checked",
+            "replayed_violation": 14.903948295803124,
+            "native_cost": null
+          },
+          {
+            "reference": {
+              "artifact_id": "005570174e33fda0d18e1f3bbcf7a7012a85425eee5149675c135787252cf3d6",
+              "media_type": "application/json"
+            },
+            "owning_study": "c3-b-100ms-20261025",
+            "operation": "task_capability",
+            "status": "computed",
+            "charged_analysis_evaluations": 2,
+            "actual_mathematical_calls": {
+              "capability_kernel_calls": 1,
+              "dual_face_solve_attempts": 0,
+              "internal_conic_solves": 1,
+              "status": "Returned trajectory establishes a kernel call; interrupted work without a result has unknown call counts."
+            },
+            "conclusion": "inconclusive",
+            "verification": "legal_input_and_signed_score_replay_checked",
+            "replayed_violation": 46.10800572005395,
+            "native_cost": null
+          },
+          {
+            "reference": {
+              "artifact_id": "8c07a2c3475d3196ffad8072648a3b4f3e345f527266eae11ba9c6b3e8192aa5",
+              "media_type": "application/json"
+            },
+            "owning_study": "c3-b-100ms-20261025",
+            "operation": "task_capability",
+            "status": "computed",
+            "charged_analysis_evaluations": 2,
+            "actual_mathematical_calls": {
+              "capability_kernel_calls": 1,
+              "dual_face_solve_attempts": 0,
+              "internal_conic_solves": 1,
+              "status": "Returned trajectory establishes a kernel call; interrupted work without a result has unknown call counts."
+            },
+            "conclusion": "inconclusive",
+            "verification": "legal_input_and_signed_score_replay_checked",
+            "replayed_violation": 13.257321976770244,
+            "native_cost": null
+          },
+          {
+            "reference": {
+              "artifact_id": "0ce7c5e7f1cb941605d4e6d2ca558f1c950643b1fb63f0faac579a9976e11878",
+              "media_type": "application/json"
+            },
+            "owning_study": "c3-b-100ms-20261025",
+            "operation": "task_capability",
+            "status": "computed",
+            "charged_analysis_evaluations": 2,
+            "actual_mathematical_calls": {
+              "capability_kernel_calls": 1,
+              "dual_face_solve_attempts": 0,
+              "internal_conic_solves": 1,
+              "status": "Returned trajectory establishes a kernel call; interrupted work without a result has unknown call counts."
+            },
+            "conclusion": "feasible_witness",
+            "verification": "independent_discrete_replay_passed",
+            "replayed_violation": -0.19999999999981213,
+            "native_cost": null
+          },
+          {
+            "reference": {
+              "artifact_id": "a196dc1fe94dafad9736396aae5c6d2754cd69cfdb0e599302fbb261674f71dc",
+              "media_type": "application/json"
+            },
+            "owning_study": "c3-b-100ms-20261025",
+            "operation": "task_capability",
+            "status": "computed",
+            "charged_analysis_evaluations": 2,
+            "actual_mathematical_calls": {
+              "capability_kernel_calls": 1,
+              "dual_face_solve_attempts": 0,
+              "internal_conic_solves": 1,
+              "status": "Returned trajectory establishes a kernel call; interrupted work without a result has unknown call counts."
+            },
+            "conclusion": "inconclusive",
+            "verification": "legal_input_and_signed_score_replay_checked",
+            "replayed_violation": 3.8000000000012952,
+            "native_cost": null
+          },
+          {
+            "reference": {
+              "artifact_id": "87d6267303ffd0e3a20cc229658a4492ccfd5799d3edfffbfbeb03b186822931",
+              "media_type": "application/json"
+            },
+            "owning_study": "c3-b-100ms-20261025",
+            "operation": "task_capability",
+            "status": "computed",
+            "charged_analysis_evaluations": 2,
+            "actual_mathematical_calls": {
+              "capability_kernel_calls": 1,
+              "dual_face_solve_attempts": 0,
+              "internal_conic_solves": 1,
+              "status": "Returned trajectory establishes a kernel call; interrupted work without a result has unknown call counts."
+            },
+            "conclusion": "feasible_witness",
+            "verification": "independent_discrete_replay_passed",
+            "replayed_violation": -0.19999999999954968,
+            "native_cost": null
+          }
+        ],
+        "physical_results": []
+      },
+      "method_permissions": {
+        "equilibrium": {
+          "study_authorized": true,
+          "formal_execution_authorized": false,
+          "planning_status": "unauthorized",
+          "execution_status": "conditional_on_admission",
+          "missing": [
+            "formal_study_math_scope_required"
+          ]
+        },
+        "linearization": {
+          "study_authorized": true,
+          "formal_execution_authorized": false,
+          "planning_status": "unauthorized",
+          "execution_status": "conditional_on_admission",
+          "missing": [
+            "formal_study_math_scope_required"
+          ]
+        },
+        "controllability": {
+          "study_authorized": true,
+          "formal_execution_authorized": false,
+          "planning_status": "unauthorized",
+          "execution_status": "conditional_on_admission",
+          "missing": [
+            "formal_study_math_scope_required"
+          ]
+        },
+        "endpoint": {
+          "study_authorized": true,
+          "formal_execution_authorized": false,
+          "planning_status": "unauthorized",
+          "execution_status": "conditional_on_admission",
+          "missing": [
+            "formal_study_math_scope_required"
+          ]
+        },
+        "braking": {
+          "study_authorized": true,
+          "formal_execution_authorized": false,
+          "planning_status": "unauthorized",
+          "execution_status": "conditional_on_admission",
+          "missing": [
+            "formal_study_math_scope_required"
+          ]
+        },
+        "instantaneous_braking_v1": {
+          "study_authorized": true,
+          "formal_execution_authorized": false,
+          "planning_status": "unauthorized",
+          "execution_status": "blocked",
+          "missing": [
+            "Exact saved state required.",
+            "formal_study_math_scope_required"
+          ]
+        },
+        "trajectory_feasibility": {
+          "study_authorized": true,
+          "formal_execution_authorized": false,
+          "planning_status": "unauthorized",
+          "execution_status": "conditional_on_admission",
+          "missing": [
+            "formal_study_math_scope_required"
+          ]
+        },
+        "task_capability": {
+          "study_authorized": true,
+          "formal_execution_authorized": false,
+          "planning_status": "unauthorized",
+          "execution_status": "conditional_on_admission",
+          "missing": [
+            "formal_study_math_scope_required"
+          ]
+        },
+        "input_sensitivity": {
+          "study_authorized": true,
+          "formal_execution_authorized": false,
+          "planning_status": "unauthorized",
+          "execution_status": "blocked",
+          "missing": [
+            "Static IFT v1 is implemented only by the SoRoSim provider.",
+            "formal_study_math_scope_required"
+          ]
+        },
+        "design_sensitivity": {
+          "study_authorized": true,
+          "formal_execution_authorized": false,
+          "planning_status": "unauthorized",
+          "execution_status": "blocked",
+          "missing": [
+            "Static IFT v1 is implemented only by the SoRoSim provider.",
+            "formal_study_math_scope_required"
+          ]
+        },
+        "native_dynamics_v1": {
+          "study_authorized": true,
+          "formal_execution_authorized": false,
+          "planning_status": "unauthorized",
+          "execution_status": "conditional_on_admission",
+          "missing": [
+            "formal_study_math_scope_required"
+          ]
+        },
+        "short_input_response_v1": {
+          "study_authorized": true,
+          "formal_execution_authorized": false,
+          "planning_status": "unauthorized",
+          "execution_status": "conditional_on_admission",
+          "missing": [
+            "formal_study_math_scope_required"
+          ]
+        },
+        "fixed_input_structure_v1": {
+          "study_authorized": true,
+          "formal_execution_authorized": false,
+          "planning_status": "unauthorized",
+          "execution_status": "conditional_on_admission",
+          "missing": [
+            "formal_study_math_scope_required"
+          ]
+        },
+        "mujoco_direct_control_v1": {
+          "study_authorized": true,
+          "formal_execution_authorized": false,
+          "planning_status": "unauthorized",
+          "execution_status": "conditional_on_admission",
+          "missing": [
+            "control_optimization.source",
+            "control_optimization.settings (version=local_control_search_v2, explicit correction_window_s and knots_s)",
+            "formal_study_math_scope_required"
+          ]
+        },
+        "sampled-affine-conic-minimax-v1": {
+          "study_authorized": true,
+          "formal_execution_authorized": false,
+          "planning_status": "unauthorized",
+          "execution_status": "conditional_on_admission",
+          "missing": [
+            "formal_study_math_scope_required"
+          ]
+        },
+        "controlled-capability-sensitivity-v1": {
+          "study_authorized": true,
+          "formal_execution_authorized": false,
+          "planning_status": "unauthorized",
+          "execution_status": "blocked",
+          "missing": [
+            "missing_validated_model_stencil",
+            "formal_study_math_scope_required"
+          ]
+        }
+      },
+      "pair_facts_and_permissions_equal": true,
+      "arms": {
+        "control": {
+          "sizes": {
+            "probe_first_request": {
+              "bytes": 120471,
+              "offline_serialized_tokens": 34718
+            },
+            "dynamic": {
+              "bytes": 82568,
+              "offline_serialized_tokens": 25281
+            },
+            "tool_schema": {
+              "bytes": 34213,
+              "offline_serialized_tokens": 8731
+            },
+            "all_production_context": {
+              "brief": {
+                "bytes": 57622,
+                "offline_serialized_tokens": 16344
+              },
+              "same_session": {
+                "bytes": 129497,
+                "offline_serialized_tokens": 37071
+              },
+              "handoff": {
+                "bytes": 129334,
+                "offline_serialized_tokens": 37035
+              },
+              "schema": {
+                "bytes": 43758,
+                "offline_serialized_tokens": 11181
+              },
+              "fixed_system": {
+                "bytes": 2512,
+                "offline_serialized_tokens": 457
+              },
+              "history": {
+                "bytes": 520,
+                "offline_serialized_tokens": 114
+              },
+              "dynamic": {
+                "bytes": 82568,
+                "offline_serialized_tokens": 25281
+              }
+            }
+          },
+          "query_count": 20,
+          "current_queries_readable": true,
+          "future_only_outputs": 650,
+          "future_only_outputs_denied": 650
+        },
+        "treatment": {
+          "sizes": {
+            "probe_first_request": {
+              "bytes": 122486,
+              "offline_serialized_tokens": 35164
+            },
+            "dynamic": {
+              "bytes": 84433,
+              "offline_serialized_tokens": 25685
+            },
+            "tool_schema": {
+              "bytes": 34363,
+              "offline_serialized_tokens": 8773
+            },
+            "all_production_context": {
+              "brief": {
+                "bytes": 59419,
+                "offline_serialized_tokens": 16713
+              },
+              "same_session": {
+                "bytes": 131512,
+                "offline_serialized_tokens": 37517
+              },
+              "handoff": {
+                "bytes": 131349,
+                "offline_serialized_tokens": 37481
+              },
+              "schema": {
+                "bytes": 43908,
+                "offline_serialized_tokens": 11223
+              },
+              "fixed_system": {
+                "bytes": 2512,
+                "offline_serialized_tokens": 457
+              },
+              "history": {
+                "bytes": 520,
+                "offline_serialized_tokens": 114
+              },
+              "dynamic": {
+                "bytes": 84433,
+                "offline_serialized_tokens": 25685
+              }
+            }
+          },
+          "query_count": 20,
+          "current_queries_readable": true,
+          "future_only_outputs": 650,
+          "future_only_outputs_denied": 650
+        }
+      },
+      "live_comparison": {
+        "control": null,
+        "treatment": null,
+        "reason": "No real Provider outputs; no scientific judgment or efficiency treatment effect measured"
+      }
+    }
+  },
+  "scoring_protocol": "tests/research/fixtures/c32_scientific_decision_protocol.json",
+  "local_complete_data": "Ignored runs/c32-final/ in the C3.2 worktree; no Provider Store created and no raw data published.",
+  "invalid_json": 0,
+  "error_queries": 0,
+  "confirmed_no_information_reads": 0,
+  "first_credible_proposal_cost": null,
+  "science_execution_counts": {
+    "mathematical_solves": 0,
+    "scientific_workers": 0,
+    "native_optimizations": 0,
+    "native_rollouts": 0,
+    "mujoco_physics_steps": 0,
+    "gvs_computations": 0,
+    "nmpc": 0,
+    "ppo_rl": 0,
+    "independent_physical_evaluations": 0,
+    "formal_studies": 0,
+    "reporter_requests": 0
+  }
+}
