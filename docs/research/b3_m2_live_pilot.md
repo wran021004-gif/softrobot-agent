@@ -1,6 +1,6 @@
 # B3 M2：有限真实自主科研试点
 
-2026-10-26（Asia/Shanghai）。状态：**用户补充明确批准后，B 已启动；C 隔离等待**。
+2026-10-26（Asia/Shanghai）。状态：**B 首次完整 NMPC 为有效失败，Agent 正在继续研究；C 隔离等待**。
 本文件持续更新，尚不是已完成的 M2 科研报告。
 
 基线 `feat/b3-t2-guided-design@fcdc0a4f47dea98afe3a355f491b15b1f7a51a6d`。
@@ -42,7 +42,7 @@ NMPC **重规划/求解间隔 0.1 s**，horizon=10、substeps=1、max_iterations
 CVXPY 1.9.3、CLARABEL 0.11.1，三种数值线程均为 1；只做导入检查，没有重复科学预检。
 两项定向 unittest 通过（8.847 s）：原 request-feedback rotation、B/C 冻结公平配置与正式授权门禁。
 
-持续监督：本聊天每 5 分钟检查的 heartbeat `b3-m2` 已在明确授权后恢复 ACTIVE。
+持续监督：本聊天 heartbeat `b3-m2` 已在明确授权后恢复 ACTIVE，随后按用户要求改为每 10 分钟检查。
 任务全部交付后停用。
 原始请求、响应、决策、收据、worker 和结果继续由原 Store 保存，不建立第二套日志或账本。
 
@@ -113,17 +113,49 @@ optimization_nonconverged=true，100.7528732 s；已保存 0–0.09 s 的 10 条
 正在后续在线求解。这是实际数值状态，不是工程错误；未调整迭代或任务阈值。
 监督应先检查这些进程与原 pending，再读取新增 nmpc_updates / Store 事件，不重复启动。
 
+### B：首项独立物理结果与反馈
+
+结果 `137dd4b22b2969ed34ff611072329375e8a9edf6e483f87710561f9cdb38ba75`，
+独立验收为 **valid_failure**。完整 0.50 s、保持覆盖 6 点、张力合法、数值有效、solver_errors=0。
+
+| 硬指标 | 本次实测 | 阈值 | 判定 |
+|---|---:|---:|---|
+| 终点位置误差 | 0.003148372648914904 m | 0.010 m | 通过 |
+| 保持最大位置误差 | 0.006038027478928508 m | 0.010 m | 通过 |
+| 保持峰速 | 0.11137394399884916 m/s | 0.020 m/s | 失败 |
+
+原 simulation_wall_s=476.266 s（7.94 分钟），50 个更新中只在 t=0/0.1/0.2/0.3/0.4 s 求解，
+各次 update_wall_s=100.753/92.406/91.659/91.923/94.676。
+五次均 iteration_limit_feasible、optimization_nonconverged=true；返回计划被接受，solver_failed=false。
+不能据此声称优化收敛、实时求解或充分控制最优。该离线任务不要求实时，不把墙钟 deadline_misses 当作物理失败原因。
+
+真实 Provider #6 是 Reporter；#7 主请求 wire
+`918586272d39efa02276f55c4cc9a0bc2e53f913807f3b669fc2a8fc65c42b9b`（133,979 bytes），
+已包含新独立结果身份、holding_speed 主违反量 0.11137394399884916 / 0.02、原 action_trace 和非权威解释。
+随后 Agent 选择瞬时制动诊断：model_source=mujoco、saved_state、当前 execution、update_id=44。
+但把方法名放在 operation 且缺少正式 native 方法字段，原 Schema 以
+MUJOCO_REQUIRES_EXPLICIT_NATIVE_METHOD_AND_MODEL_SOURCE 拒绝，数学启动和计费均为 0。
+原错误不改写为科学结果，也不免费补造一次正确调用。
+
+后续真实行为是多次读取当前候选、控制观测、历史和原 Plan，并通过 SDK retrieve_context 搜索生成参数。
+读取审计发现：候选 full 为单行长 JSON，SDK 正则 retrieve_context 命中时仍返回整行，随后可再被 offload；
+一次切换后 Agent 再用旧 SDK offload reference 收到 `reference not found`（原反馈事件 198）。
+原 Store 的 evidence_read 与 pending_feedback_delivery.original_result_query 仍可定位稳定依据，
+因此保留这一数据获取限制，不把它直接归为数值故障或静默修改上下文机制。
+当前已交付新物理失败；未发现网络或未结算 worker 故障，不因 Agent 读取低效就改变提示或替其提交新控制。
+这是后续审计需评估的资源效率与信息获取行为，尚未宣称其找到第二项有效科研方案。
+
 | 实际状态与费用 | B | C |
 |---|---:|---:|
-| 状态 | 已启动，待实际结果结算 | 未启动，隔离等待 |
-| Provider（含 Reporter） | 5 / 32 | 0 / 32 |
-| 公开操作 | 8 / 80 | 0 / 80 |
+| 状态 | 首项有效失败，继续研究 | 未启动，隔离等待 |
+| Provider（含 Reporter） | 17 / 32（含 1 Reporter） | 0 / 32 |
+| 公开操作 | 28 / 80 | 0 / 80 |
 | 数学总评价 / 模型 / CONIC / dual-face | 0 / 0 / 0 / 0 | 相同 |
 | 独立物理启动 / NMPC / 完整回放 | 1 / 1 / 0 | 0 / 0 / 0 |
 | native 内部积分 / PPO | 执行中，待原记录结算 / 0 | 0 / 0 |
-| pending / 占用 / 未消费响应 | 原 NMPC pending / 无 Provider 占用 / 无 | 无 |
+| pending / 占用 / 未消费响应 | 无物理 pending；后续 Provider 执行中 | 无 |
 
-上表为第一次 NMPC 仍在执行的账本快照；后续由原账本结算并替换。
+上表为首次物理结束后继续研究时的账本快照；后续由原账本结算并替换。
 T1/T2、分数平台、结构修改、GVS—MuJoCo 差异和最佳独立硬指标尚待本轮测量，不能把旧证据记成本轮结果。
 没有研究 Agent 的 SELECT/STOP，也未行政关闭这两份待运行 Store。
 后续须完成每组实际决策与 wire 审计、资源结算、独立物理硬验收、标准导出及完整研究结论。
