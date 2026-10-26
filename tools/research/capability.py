@@ -277,13 +277,23 @@ def populate_sensitivity(mathematics, value, reference):
         problem_definition=EvidenceLocation(reference=reference,pointer='/optimal_sensitivity/parameter_identity')))
 
 
-def nonlinear_summary(value):
-    """Small L1 facts; schedules, trajectories and local responses stay in Store."""
+def nonlinear_summary(value,reference=None):
+    """Bounded decision facts; multi-parameter matrices and sequences stay in Store."""
     result={}
+    query=lambda pointer:dict(reference=reference,view='full',pointer=pointer)
     if value.get('nonlinear_capability'):
         t=value['nonlinear_capability']
         result['nonlinear_capability']={k:t[k] for k in ('method','status','J','initial_J','improvement',
-            'best_metrics','stop_reason','callbacks','physics_steps','response_steps_completed','limitations','detail_pointer')}
+            'stop_reason','callbacks','physics_steps','response_steps_completed')}
+        result['nonlinear_capability'].update(worst_constraint=t.get('best_metrics',{}).get('worst_constraint'),
+            evidence_level='finite_budget_observation',detail_query=query('/nonlinear_capability'))
     if value.get('nonlinear_response'):
-        result['nonlinear_response']=value['nonlinear_response']
+        t=value['nonlinear_response'];matrix=t.get('comparison_summary',[])
+        baseline=next((d.get('observations',[None])[0] for d in t.get('directions',[t]) if d.get('observations')),None)
+        result['nonlinear_response']=dict(method=t['method'],status=t['status'],direction_status=t['direction_status'],
+            directions=matrix[:4],direction_count=len(matrix),omitted_directions=max(0,len(matrix)-4),
+            evidence_level='finite_budget_observation',strict_improvement_direction='unresolved',
+            worst_constraint=baseline.get('worst_constraint') if baseline else None,cost=t['cost'],
+            detail_query=query('/nonlinear_response'),comparison_query=query('/nonlinear_response/comparison_summary'),
+            task_acceptance='unmeasured')
     return result

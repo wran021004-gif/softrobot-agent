@@ -112,6 +112,10 @@ def summarize_evidence(value,reference=None,*,refinement=None):
             supported.append('controlled_reoptimized_finite_difference')
             unresolved.extend(['Strict structural gradient and regional descent unavailable.',
                 'Numerically flat modulus does not imply physical irrelevance; position improvement does not guarantee holding-speed improvement.'])
+    if value.get('nonlinear_capability') or value.get('nonlinear_response'):
+        if value.get('status')=='computed':supported.append('finite_budget_native_observation')
+        unresolved.extend(['Global optimal task capability and a strict structural improvement direction are not established.',
+            'Fixed-control response, reoptimized-control response and a coupled path secant have distinct meanings.'])
     if 'acceptance' in value:
         gap=task_gap(value);pointer='/acceptance'
         acceptance=value.get('acceptance') or {}

@@ -387,6 +387,15 @@ def parameter_capabilities(value, request):
             physical_component=path.split('.')[:2],domain_source=source,
             supported_methods=['generate']+(['mujoco-reoptimized-structure-response-v1','fixed_input_structure_v1'] if continuous else []),
             validation_status='candidate_specific_compilation_required',**detail))
+        if path.startswith('segments.'):
+            rows[-1]['physical_component']={'kind':'flexible_segment','id':'segment_'+path.split('.')[1]}
+        elif path.startswith('route_overrides.'):
+            rows[-1]['physical_component']={'kind':'tendon','id':'tendon_'+path.split('.')[1]}
+        elif category=='tendon':
+            rows[-1]['physical_component']={'kind':'tendons','ids':['tendon_'+str(i) for i in range(params['tendon_count'])]}
+        elif category=='routing' and 'affected_tendon_indices' in detail:
+            rows[-1]['physical_component']={'kind':'tendon_paths','ids':['tendon_'+str(i) for i in detail['affected_tendon_indices']]}
+
     add('segment_count','topology','integer','count',choices=space.executable_segment_counts)
     add('tendon_count','topology','integer','count',choices=list(range(space.executable_tendon_count_bounds[0],space.executable_tendon_count_bounds[1]+1)))
     add('spans','topology','routing_topology','none')
@@ -396,7 +405,12 @@ def parameter_capabilities(value, request):
         for k,unit in [('length_m','m'),('young_pa','Pa')]:add(root+k,'segment','number',unit,getattr(d,k),source=source+'.'+k)
         for k,domain in d.physical_domains.items():
             unit='kg/m^3' if k=='density_kg_m3' else 'N*m^2*s' if k.startswith('viscosity') else 'rad/m' if k.startswith('curvature') else 'rad'
-            effective=k!='section_angle_rad' or any(st['kind'] not in ('circle','tube') for st in choice['sections'])
+            effective=True
+            if k=='section_angle_rad':
+                import numpy as np
+                from .sections import properties
+                matrices=[np.asarray(properties(st)['bending_area_m4']) for st in choice['sections']]
+                effective=any(not np.allclose(m,np.eye(2)*np.trace(m)/2,rtol=1e-12,atol=1e-24) for m in matrices)
             reason=None if effective else 'Rotating circular/isotropic sections does not change bending mechanics'
             if k=='section_angle_rad' and 'section_angle_rad' not in choice.get('physical_parameters',{}):
                 reason='Nonuniform station angles require an explicit coupled geometry path'
@@ -427,6 +441,8 @@ def parameter_capabilities(value, request):
         hole_affected=[j for j in range(offset,offset+span['count']) if any(p.get('hole') for p in params['route_overrides'].get(str(j),[]))]
         def route(path,key,effective=True,**detail):
             influenced=sorted(set(affected+hole_affected)) if key in ('radius_m','phase_rad','angular_offset_rad') and not path.startswith('anchor_') else affected
+            if path.startswith('angular_offsets_rad.'):
+                tendon=offset+int(path.split('.')[-1]);influenced=[tendon] if tendon in influenced else []
             add(f'spans.{i}.'+path,'routing','number','rad' if key.endswith('_rad') else 'm' if key=='radius_m' else 'normalized_station',
                 space.routing_domains[key],effective=bool(influenced) and effective,source='routing_domains.'+key,
                 reason=None if influenced and effective else 'Route override or absent guide removes this routing effect',affected_tendon_indices=influenced,**detail)

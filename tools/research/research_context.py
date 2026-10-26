@@ -1038,6 +1038,11 @@ def compact_scientific_delivery(brief,*,decision_only=False):
         math_views += [(f['mathematics'],f['result']['reference']) for r in brief.get('latest_reports',[])
             for f in r.get('findings',[]) if f.get('mathematics')]
         for math,ref in math_views:
+            if math.get('nonlinear_response') or math.get('nonlinear_capability'):
+                key='nonlinear_response' if math.get('nonlinear_response') else 'nonlinear_capability'
+                compact=math[key];cost=math.get('cost');math.clear()
+                math.update({key:compact},cost=cost,
+                    detail_query=dict(reference=ref,view='working_set',pointer='/mathematical_decision_view/'+key))
             if math.get('optimal_sensitivity'):
                 t2=math['optimal_sensitivity']
                 math.clear()
@@ -1134,10 +1139,12 @@ def mathematical_decision_view(card):
             if not capability or capability.get('method_version') or q['name'] in ('best_found_violation','optimal_task_violation')],
         capability=compact,unresolved=summary.get('decision_relevance'))
     if summary.get('optimal_sensitivity'):result['optimal_sensitivity']=summary['optimal_sensitivity']
+    for key in ('nonlinear_capability','nonlinear_response'):
+        if summary.get(key):result[key]=summary[key]
     if summary.get('native_analysis'):
         result['native_analysis']={k:v for k,v in summary['native_analysis'].items() if k!='quantities'}
     if summary.get('recorded_static_construction'):result['recorded_static_construction']=summary['recorded_static_construction']
-    if summary.get('optimal_sensitivity') or (capability and capability.get('method_version')):
+    if summary.get('optimal_sensitivity') or summary.get('nonlinear_capability') or summary.get('nonlinear_response') or (capability and capability.get('method_version')):
         result['cost']=dict(evaluations=summary.get('evaluations'),numerical_s=summary.get('numerical_s'),
             sources=[dict(reference=card['identity']['result']['reference'],pointer='/'+key)
                 for key in ('charged_analysis_evaluations','charged_numerical_s')])

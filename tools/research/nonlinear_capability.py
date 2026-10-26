@@ -29,10 +29,19 @@ def t1_summary(value, settings):
     initial=search['candidates'][0]['measure'];measure=best['measure']
     u=np.asarray(raw['optimized_schedule']['trajectory']['tensions_n'])
     bounds=np.asarray(value['binding']['tension_bounds_n'])
+    def metric_view(row):
+        result=deepcopy(row);worst=result.get('worst_constraint')
+        fields=dict(terminal_position=('terminal_error_m','terminal_position_error_m'),
+            holding_position=('holding_max_error_m','holding_max_position_error_m'),holding_speed=('holding_max_speed_m_s','holding_max_speed_m_s'))
+        if worst and worst['kind'] in fields:
+            constraint_id,field=fields[worst['kind']]
+            c=next((c for c in value.get('task_analysis',{}).get('constraints',[]) if c['constraint_id']==constraint_id),None)
+            if c:worst.update(constraint_id=constraint_id,value=result[field],limit=c['radius'],unit=c['signal']['units'])
+        return result
     return dict(method=T1,status='finite_budget_diagnostic',
-        J=measure['signed_maximum_excess'],initial_J=initial['signed_maximum_excess'],
+        J=measure['signed_maximum_excess'],best_found_J=measure['signed_maximum_excess'],initial_J=initial['signed_maximum_excess'],
         improvement=initial['signed_maximum_excess']-measure['signed_maximum_excess'],
-        initial_metrics=initial,best_metrics=measure,
+        initial_metrics=metric_view(initial),best_metrics=metric_view(measure),
         best_control=dict(rollout=best['reference'],label=best['label'],coefficients_n=best['coefficients_n'],
             schedule_pointer='/native_dynamics/optimized_schedule',source=raw['optimized_schedule']['provenance']),
         settings=plain(settings),stop_reason=search['stop_reason'],
@@ -43,6 +52,21 @@ def t1_summary(value, settings):
         input_saturation=dict(minimum_n=float(u.min()),maximum_n=float(u.max()),
             lower=bool(np.any(u<=bounds[:,0]+1e-10)),upper=bool(np.any(u>=bounds[:,1]-1e-10))),
         coefficient_boundary=bool(np.max(np.abs(best['coefficients_n']))>=settings.coefficient_limit_n-1e-10),
+        problem=dict(task_identity=value.get('binding',{}).get('task_identity'),protocol=value.get('protocol'),
+            model=value.get('native_analysis',{}).get('basis'),constraints=value.get('task_analysis',{}).get('constraints',[]),
+            time_grid_s=value.get('task_analysis',{}).get('time_grid_s'),
+            input_bounds_n=value.get('binding',{}).get('tension_bounds_n'),
+            initial_state_pointer='/native_dynamics/initial_state',model_source='model.mujoco_native@1.0.0'),
+        search_quality=dict(global_optimality='not_established',convergence='unresolved',
+            initialization='candidate-owned frozen zero state and original absolute-tension sequence',
+            initialization_pointer='/native_dynamics/original_schedule',
+            solver_pointer='/native_dynamics/optimization',numerical_inner_solver=value.get('native_analysis',{}).get('solver'),
+            search_dimension=search.get('search_dimension'),active_coefficients=search.get('active_coefficients'),
+            finite_budget_observations_retained=True),
+        cost=raw['cost'],
+        metric_units={k:unit for k,unit in [('terminal_position_error_m','m'),('holding_max_position_error_m','m'),
+            ('holding_max_speed_m_s','m/s'),('signed_maximum_excess','1')] if k in measure},
+        evidence_level='finite_budget_observation',independent_task_acceptance='unmeasured',
         task_acceptance='unmeasured',detail_pointer='/native_dynamics',limitations=LIMITATIONS)
 
 
@@ -54,7 +78,7 @@ def saved_context(host, query):
     from tools.research.optimal_capability import family_parameters
     from tools.research.physical_replay import binding
     from tools.research.research_context import recorded_changes
-    s=state(host);request=query.nonlinear_response;cache={}
+    s=state(host);request=query.nonlinear_response;cache={};parameter_cache={}
     directions=getattr(request,'directions',None)
     legacy=not directions
     if legacy:
@@ -77,6 +101,7 @@ def saved_context(host, query):
         if point['actual_time_s']!=0. or point['configuration_identity']!=digest(cfg):
             raise ValueError('OWN_FROZEN_INITIAL_STATE_REQUIRED')
         row=dict(reference=reference,candidate=raw['candidate'],candidate_record=c,configuration=cfg,
+            original_charges={k:raw.get(k) for k in ('charged_analysis_evaluations','charged_numerical_s','operation_key')},
             t1=raw['nonlinear_capability'],protocol=raw['protocol'],input=tr,initial_state=point,cost=native['cost'])
         cache[key]=row
         return row
@@ -88,8 +113,11 @@ def saved_context(host, query):
         for row in rows:
             values={}
             for path in paths:
-                params,domain=(family_parameters(s['spec'],row['candidate_record'],path) if direction.mode=='continuous' else
-                    family_parameters(s['spec'],row['candidate_record'],path,continuous=False))
+                key=(row['candidate']['artifact_id'],path,direction.mode)
+                if key not in parameter_cache:
+                    parameter_cache[key]=(family_parameters(s['spec'],row['candidate_record'],path) if direction.mode=='continuous' else
+                        family_parameters(s['spec'],row['candidate_record'],path,continuous=False))
+                params,domain=parameter_cache[key]
                 values[path]=parameter_value(params,path);parameters.setdefault(path,domain)
                 row['parameters']=params
             row['parameter_values']=values
@@ -114,11 +142,18 @@ def saved_context(host, query):
                 raise ValueError('SINGLE_PARAMETER_FIXED_TASK_SCENE_AND_NUMERICS_REQUIRED')
             if row['t1']['settings']!=base['t1']['settings'] or row['input']['times_s']!=base['input']['times_s']:
                 raise ValueError('IDENTICAL_SEARCH_AND_COMMON_LEGAL_INITIAL_CONTROL_REQUIRED')
+            if any(row['initial_state'].get(k)!=base['initial_state'].get(k) for k in ('phase','input_units','provenance')):
+                raise ValueError('MATCHED_INITIAL_STATE_CONVENTION_REQUIRED')
+            if direction.mode=='finite_comparison' and row['candidate_record'].get('initialization_provenance'):
+                point=row['initial_state'];frozen=row['candidate_record']['initialization_provenance']['effective']
+                if any(dict(zip(point['dof_order'],point[field]))!=frozen[field] for field in ('qpos_rad','qvel_rad_s')):
+                    raise ValueError('OWN_FROZEN_INITIAL_STATE_REQUIRED')
             if direction.mode=='continuous':
                 expected=deepcopy(base['parameters'])
                 for path,coefficient in direction.variables.items():
-                    wanted=base['parameter_values'][path]+coefficient*coordinates[index]
-                    if not math.isclose(row['parameter_values'][path],wanted,rel_tol=1e-10,abs_tol=1e-12):
+                    origin=base['parameter_values'][path];delta=row['parameter_values'][path]-origin
+                    wanted=coefficient*coordinates[index]
+                    if not math.isclose(delta,wanted,rel_tol=1e-9,abs_tol=4*math.ulp(float(origin))):
                         raise ValueError('CANDIDATES_DO_NOT_FOLLOW_DECLARED_DIRECTION')
                     set_parameter(expected,path,row['parameter_values'][path])
                 if expected!=row['parameters']:raise ValueError('SINGLE_PARAMETER_FIXED_TASK_SCENE_AND_NUMERICS_REQUIRED')
@@ -157,6 +192,110 @@ def saved_context(host, query):
     return dict(directions=contexts,unique_t1_results=len(cache),baseline=plain(directions[0].t1_results[0]))
 
 
+def candidate_responses(host, reference):
+    """Derive exact requests from saved observations, using the execution gate."""
+    from tools.research.state import state
+    from tools.research.design import verify_candidate,parameter_value
+    from tools.research.optimal_capability import family_analysis_parameters
+    from extensions.tendon_family.family_space import resolved_request
+    from tools.research.contracts import AnalysisRequest
+    s=state(host);spec=s['spec'];candidate=verify_candidate(host,reference)
+    parameters=family_analysis_parameters(spec,candidate);inventory=[];ready=[]
+    for ref in s.get('analysis_results',[]):
+        raw=host.store.artifact(ref)
+        if (raw.get('status')!='computed' or raw.get('implementation')!=s['freeze'] or raw.get('protocol')!=spec['analysis_protocol']
+                or raw.get('nonlinear_capability',{}).get('method')!=T1):continue
+        c=verify_candidate(host,raw['candidate'])
+        inventory.append(dict(reference=ref,candidate=raw['candidate'],parameters=resolved_request(spec['family_space'],c['parameters'])))
+    for base in [r for r in inventory if r['candidate']==plain(reference)]:
+        for row in parameters:
+            if not row['study_authorized'] or not row['continuous_perturbation']:continue
+            path=row['parameter_id'];zero=parameter_value(base['parameters'],path);points=[]
+            for point in inventory:
+                try:points.append((parameter_value(point['parameters'],path)-zero,point))
+                except (KeyError,IndexError):continue
+            for low,minus in points:
+                if low>=0:continue
+                for high,plus in points:
+                    if high<=0 or not math.isclose(-low,high,rel_tol=1e-10):continue
+                    query=dict(candidate=plain(reference),operation=T2_OPERATION,model_source='mujoco',
+                        operating_point='standardized_initial_pretension',protocol=spec['analysis_protocol'],
+                        nonlinear_response=dict(variable=path,unit=row['unit'],t1_results=[base['reference'],minus['reference'],plus['reference']]))
+                    if 'not_comparable' not in saved_context(host,AnalysisRequest.model_validate(query)):
+                        ready.append(query)
+    batch=None
+    if ready:
+        baseline=ready[0]['nonlinear_response']['t1_results'][0];directions=[];seen=set()
+        for query in ready:
+            r=query['nonlinear_response'];path=r['variable']
+            if r['t1_results'][0]!=baseline or path in seen:continue
+            low=next(p for p in inventory if p['reference']==r['t1_results'][1]);zero=next(p for p in inventory if p['reference']==baseline)
+            h=parameter_value(zero['parameters'],path)-parameter_value(low['parameters'],path)
+            directions.append(dict(direction_id=path,variables={path:1.},coordinate_unit=r['unit'],coordinates=[0.,-h,h],t1_results=r['t1_results']))
+            seen.add(path)
+            if len(directions)==32:break
+        batch={**ready[0],'nonlinear_response':dict(version='nonlinear_response_v2',directions=directions)}
+    return dict(parameters=parameters,ready_requests=ready,batch_request=batch,
+        preparation='Choose a legal physical path/step, generate actual candidates, initialize legal controls and run authorized T1 per candidate. Reuse the common baseline. No automatic model, optimization or physical experiment.',
+        direction_semantics='V1 is one symmetric parameter; V2 explicitly records independent axes, coupled dp/ds paths or finite discrete contrasts.')
+
+
+def observations(context):
+    """Source-linked finite facts survive unresolved search/direction decisions."""
+    rows=[]
+    for r in context.get('rows',[]):
+        t=r['t1'];ref=r['reference']
+        rows.append(dict(candidate=r['candidate'],reference=ref,coordinate=r.get('value'),
+            parameter_values=r.get('parameter_values'),physical_changes=r.get('physical_changes'),
+            fixed_control=dict(J=t['initial_J'],metrics=t.get('initial_metrics'),
+                source=dict(reference=ref,pointer='/native_dynamics/optimization/candidates/0/measure')),
+            reoptimized_control=dict(best_found_J=t['J'],metrics=t.get('best_metrics'),
+                source=dict(reference=ref,pointer='/native_dynamics/optimization/best/measure')),
+            worst_constraint=t.get('best_metrics',{}).get('worst_constraint'),
+            stop_reason=t['stop_reason'],search_quality=t.get('search_quality'),settings=t.get('settings'),
+            callbacks=t['callbacks'],iterations_started=t['iterations_started'],
+            input_saturation=t['input_saturation'],coefficient_boundary=t['coefficient_boundary'],
+            model_scope=t.get('problem'),initialization=dict(reference=ref,pointer='/native_dynamics/initial_state'),
+            solver=dict(reference=ref,pointer='/native_dynamics/optimization'),
+            recorded_cost=r.get('cost'),original_charges=r.get('original_charges'),
+            cost_source=dict(reference=ref,pointer='/native_dynamics/cost'),
+            control_schedule=dict(reference=ref,pointer='/native_dynamics/optimized_schedule'),
+            evidence_level='finite_budget_observation',task_acceptance='unmeasured'))
+    return rows
+
+
+def metric_responses(rows,step,coordinate_unit):
+    units=rows[0]['t1'].get('metric_units',{})
+    matrix=[]
+    for field,unit in units.items():
+        item=dict(metric=field,unit=unit,secant_unit=unit+' / '+coordinate_unit)
+        for label,key in [('fixed_control','initial_metrics'),('reoptimized_control','best_metrics')]:
+            values=[r['t1'].get(key,{}).get(field) for r in rows]
+            if not all(type(v) in (int,float) and math.isfinite(v) for v in values):continue
+            zero,low,high=values
+            item[label]=dict(values=values,delta_minus=low-zero,delta_plus=high-zero,
+                left=(zero-low)/step,right=(high-zero)/step,central=(high-low)/(2*step),
+                sources=[dict(reference=r['reference'],pointer='/nonlinear_capability/'+key+'/'+field) for r in rows])
+        matrix.append(item)
+    return matrix
+
+
+def comparison_summary(result):
+    rows=[]
+    for i,d in enumerate(result.get('directions',[result])):
+        facts=d.get('observations',[]);base=facts[0]['reoptimized_control']['best_found_J'] if facts else None
+        lower=[dict(coordinate=r['coordinate'],delta_J=r['reoptimized_control']['best_found_J']-base) for r in facts[1:]
+            if base is not None and r['reoptimized_control']['best_found_J']<base-d.get('practical_J_tolerance',1e-6)]
+        rows.append(dict(direction_id=d.get('direction_id'),status=d['direction_status'],derivative_scope=d.get('derivative_scope'),
+            parameters=list(d.get('parameters',{})),observed_lower_J=lower,
+            observed_changed_metrics=[m['metric'] for m in d.get('metric_responses',[]) if any(
+                abs(m.get(label,{}).get(delta,0))>0 for label in ('fixed_control','reoptimized_control') for delta in ('delta_minus','delta_plus'))],
+            evidence_level='finite_budget_observation',strict_improvement_direction='unresolved',change_significance='unresolved_without_error_bound',
+            followup_hypothesis='Recheck the observed lower J with an independent control initialization' if lower else 'Check another legal step or initialization',
+            detail_pointer='/nonlinear_response/directions/'+str(i) if 'directions' in result else '/nonlinear_response'))
+    return rows
+
+
 def response(context):
     """Descriptive secants plus a conservative decision, never an optimal gradient."""
     started=time.perf_counter()
@@ -164,21 +303,23 @@ def response(context):
         results=[response(c) for c in context['directions']]
         costs={r['reference']['artifact_id']:dict(reference=r['reference'],cost=r.get('cost',{}))
             for c in context['directions'] for r in c.get('rows',[])}
-        return dict(method=T2,version='nonlinear_response_v2',status='computed_diagnostic' if any(r['status']=='computed_diagnostic' for r in results) else 'not_comparable',
+        out=dict(method=T2,version='nonlinear_response_v2',status='computed_diagnostic' if any(r['status']=='computed_diagnostic' for r in results) else 'not_comparable',
             direction_status='unresolved',baseline=context['baseline'],directions=results,task_acceptance='unmeasured',limitations=LIMITATIONS,
             cost=dict(model_builds=0,rollouts=0,physics_steps=0,optimization_evaluations=0,reused_t1_results=len(costs),kernel_wall_s=time.perf_counter()-started),
             referenced_t1_costs=list(costs.values()),cost_semantics='Referenced T1 costs were already charged; aggregation never charges them again.')
+        out['comparison_summary']=comparison_summary(out)
+        return out
     if context.get('mode')=='finite_comparison':
         rows=context['rows'];base=rows[0]
         common=all(all(r['input'][k]==base['input'][k] for k in ('times_s','tendon_order','tensions_n')) for r in rows)
-        return dict(method=T2,status='computed_diagnostic',direction_status='finite_comparison_only',direction_id=context['direction_id'],
+        return dict(observations=observations(context),method=T2,status='computed_diagnostic',direction_status='finite_comparison_only',direction_id=context['direction_id'],
             derivative_scope='no_continuous_derivative',parameters=context['parameters'],
             results=[dict(candidate=r['candidate'],reference=r['reference'],J=r['t1']['J'],initial_J=r['t1']['initial_J'],physical_changes=r['physical_changes']) for r in rows],
             fixed_control_comparable=common,control_scope='common_legal_sequence' if common else 'separate_legal_input_sets_and_initial_controls',
             task_acceptance='unmeasured',limitations=LIMITATIONS+['Discrete multi-factor contrast; unequal input channels cannot share a control sequence or establish structural causality.'],
             cost=dict(model_builds=0,rollouts=0,physics_steps=0,optimization_evaluations=0,reused_t1_results=len(rows),kernel_wall_s=time.perf_counter()-started),
             referenced_t1_costs=[dict(reference=r['reference'],cost=r['cost']) for r in rows])
-    out=dict(method=T2,status='not_comparable',direction_status='not_comparable',
+    out=dict(observations=observations(context),method=T2,status='not_comparable',direction_status='not_comparable',
         task_acceptance='unmeasured',limitations=LIMITATIONS,
         cost=dict(model_builds=0,rollouts=0,physics_steps=0,optimization_evaluations=0,
             reused_t1_results=0 if context.get('not_comparable') else 3,kernel_wall_s=0.))
@@ -196,6 +337,7 @@ def response(context):
             zero,low,high=[t[key] for t in summaries]
             return dict(left=(zero-low)/h,right=(high-zero)/h,central=(high-low)/(2*h))
         fixed=secants('initial_J');optimized=secants('J')
+        out['metric_responses']=metric_responses(rows,h,context['parameter']['units'])
         # This is an explicit practical discrimination threshold, not an error bound.
         tolerance=max(1e-6,1e-4*max(1.,*(abs(t['J']) for t in summaries)))
         left=base['t1']['J']-minus['t1']['J'];right=plus['t1']['J']-base['t1']['J']
@@ -230,6 +372,7 @@ def response(context):
         reused_t1_results=0 if context.get('not_comparable') else 3,kernel_wall_s=time.perf_counter()-started)
     out['referenced_t1_costs']=[dict(reference=r['reference'],cost=r.get('cost',{}),
         accounting='Previously charged T1 computation; referenced, not charged again by T2') for r in context.get('rows',[])]
+    out['comparison_summary']=comparison_summary(out)
     return out
 
 

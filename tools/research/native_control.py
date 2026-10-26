@@ -62,6 +62,8 @@ def calculate(configuration, binding, query, point, requirements, context, check
     if prefix is None or not np.array_equal(np.asarray(prefix).reshape(k,len(tr['tendon_order'])),np.asarray(tr['tensions_n'])[:k]):
         raise ValueError('CHECKPOINT_REQUIRES_IDENTICAL_VERIFIED_CONTROL_PREFIX')
     native=NativeModel(configuration)
+    if checkpoint:checkpoint('native_progress_0000',dict(stage='native_model_built',completed_rollouts=0,
+        cost={**native.cost,'kernel_wall_s':time.perf_counter()-started}))
     point,start=native.reconstruct(point) if point.get('native_replay') else (point,native.restore(point))
     if not np.allclose(native.limits[:,0],0,atol=0,rtol=0):raise ValueError('ZERO_LOWER_TENSION_BOUND_REQUIRED')
     adapter=task_adapter(configuration);limits=adapter.ranking_limits()
@@ -72,7 +74,14 @@ def calculate(configuration, binding, query, point, requirements, context, check
     initial=dict(id='native',schedule=source,limits=native.limits[:,1].tolist(),task_options=options)
     evaluations=[]
     def evaluate(_start, schedule, metadata):
-        outputs=native.rollout_sequence(start,times[k:],schedule['trajectory']['tensions_n'][k:])
+        try:outputs=native.rollout_sequence(start,times[k:],schedule['trajectory']['tensions_n'][k:])
+        except Exception:
+            if checkpoint:checkpoint('native_progress_'+str(len(evaluations)+1).zfill(4),dict(
+                callback_status='incomplete',completed_rollouts=len(evaluations),
+                latest_complete_measure=evaluations[-1] if evaluations else None,
+                cost={**native.cost,'kernel_wall_s':time.perf_counter()-started}))
+            raise
+
         measure=task_measure(outputs,**options)
         hold=np.asarray(outputs['times_s'])>=options['holding_start']-1e-12
         p=np.linalg.norm(np.asarray(outputs['tip_positions_m'])-options['target'],axis=1)
@@ -128,9 +137,9 @@ def calculate(configuration, binding, query, point, requirements, context, check
         operating_point={key:point[key] for key in ('actual_time_s','phase','input_units')},native_dynamics=raw,native_analysis=summary,
         task_acceptance='unmeasured',local_model_constraints=dict(status='diagnostic_only'),proxy_values={},
         internal_calculations=[dict(purpose=query.operation,**cost)],limitations=summary['limitations'])
+    value=scoped_result(value,requirements,fit,query)
     if query.operation=='mujoco_nonlinear_task_capability_v1':
         from tools.research.nonlinear_capability import t1_summary
         value['nonlinear_capability']=t1_summary(value,settings)
-    value=scoped_result(value,requirements,fit,query)
     json.dumps(value,allow_nan=False)  # Fail before worker publication, with last progress retained.
     return value

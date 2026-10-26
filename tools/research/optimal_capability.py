@@ -56,7 +56,10 @@ def family_analysis_parameters(spec,candidate):
     for row in rows:
         path=row['parameter_id'];row['study_authorized']=family_variable_authorized(spec,path) and '*' not in path
         row['applicable_mathematical_methods']=[m for m in row['supported_methods'] if m!='generate' and
-            row['study_authorized'] and (m=='fixed_input_structure_v1' or spec.get('mathematical_methods',{}).get(m))]
+            row['study_authorized'] and 'analysis' in spec.get('capabilities',[]) and (m=='fixed_input_structure_v1' or spec.get('mathematical_methods',{}).get(m))]
+        if (row['continuous_perturbation'] and row['study_authorized'] and 'analysis' in spec.get('capabilities',[])
+                and spec.get('mathematical_methods',{}).get(CONIC) and spec.get('mathematical_methods',{}).get(SENSITIVITY)):
+            row['applicable_mathematical_methods'].append(SENSITIVITY)
         if not row['study_authorized']:row['authorization_reason']='Not selected by frozen family_sensitivity_variables'
     return rows
 
@@ -94,7 +97,7 @@ def family_parameters(spec, candidate, path, *, continuous=True):
             or cfg['policy']['candidate_builder']['parameters']['data']!=plain(build)):
         raise ValueError('GENERATED_CONFIGURATION_DOES_NOT_MATCH_FROZEN_REQUEST')
     return params,dict(path=path,units=domain['unit'],bounds=[domain.get('minimum'),domain.get('maximum')],
-        current_value=domain['current_value'],category=domain['category'],data_type=domain['data_type'],
+        current_value=domain['current_value'],category=domain['category'],data_type=domain['data_type'],choices=domain['choices'],
         continuous_perturbation=domain['continuous_perturbation'],physical_component=domain['physical_component'],
         comparison_path=domain.get('comparison_path',path),input_set_changes=domain.get('input_set_changes',False),
         source='current frozen FamilySpace continuous domain',affected_tendon_indices=domain.get('affected_tendon_indices'),

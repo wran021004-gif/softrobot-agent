@@ -1,0 +1,166 @@
+{
+  "base": "c153e1731ae0925e756467f75a783b28abce2873",
+  "stages": {
+    "A1": "23711071a",
+    "A2": "a654a7b4f",
+    "A3": "See final branch HEAD"
+  },
+  "preserved": {
+    "sealed_configs_and_evidence_changed": [],
+    "unmodified_numerical_cores": [
+      "tools/research/local_control_search.py",
+      "extensions/tendon_family/generated_serial.py",
+      "extensions/tendon_family/mujoco_analysis.py"
+    ],
+    "duplicate_parameter_domain": false,
+    "new_agent_tools": 0,
+    "new_evaluators": 0,
+    "new_store_implementations": 0
+  },
+  "tests": {
+    "broad_regression": {
+      "run": 44,
+      "skipped": 1,
+      "result": "pass"
+    },
+    "final_targeted": {
+      "run": 28,
+      "skipped": 1,
+      "result": "pass"
+    },
+    "real_capped_smoke": {
+      "run": 1,
+      "result": "pass",
+      "provider_requests": 0,
+      "independent_task_evaluations": 0
+    }
+  },
+  "retained_engineering_example": {
+    "folder": "evidence/mujoco_task_capability_parameters_smoke",
+    "t2_result": {
+      "artifact_id": "0f3b8ea318eb2ec05420e161ff0863974751357b8327ef36595d399e45e45712",
+      "media_type": "application/json"
+    },
+    "parameters": [
+      "segments.0.young_pa",
+      "spans.0.radius_m"
+    ],
+    "actual": {
+      "t1_costs": [
+        {
+          "completed_response_steps": 1,
+          "forward_evaluations": 214,
+          "kernel_wall_s": 0.055003199999191565,
+          "mechanics_evaluations": 0,
+          "model_builds": 1,
+          "optimization_evaluations": 3,
+          "optimization_iterations": 1,
+          "physics_steps": 525,
+          "rollouts": 3
+        },
+        {
+          "completed_response_steps": 1,
+          "forward_evaluations": 214,
+          "kernel_wall_s": 0.05377600000065286,
+          "mechanics_evaluations": 0,
+          "model_builds": 1,
+          "optimization_evaluations": 3,
+          "optimization_iterations": 1,
+          "physics_steps": 525,
+          "rollouts": 3
+        },
+        {
+          "completed_response_steps": 1,
+          "forward_evaluations": 214,
+          "kernel_wall_s": 0.0517429000010452,
+          "mechanics_evaluations": 0,
+          "model_builds": 1,
+          "optimization_evaluations": 3,
+          "optimization_iterations": 1,
+          "physics_steps": 525,
+          "rollouts": 3
+        },
+        {
+          "completed_response_steps": 1,
+          "forward_evaluations": 214,
+          "kernel_wall_s": 0.06100450000121782,
+          "mechanics_evaluations": 0,
+          "model_builds": 1,
+          "optimization_evaluations": 3,
+          "optimization_iterations": 1,
+          "physics_steps": 525,
+          "rollouts": 3
+        },
+        {
+          "completed_response_steps": 1,
+          "forward_evaluations": 214,
+          "kernel_wall_s": 0.05213700000058452,
+          "mechanics_evaluations": 0,
+          "model_builds": 1,
+          "optimization_evaluations": 3,
+          "optimization_iterations": 1,
+          "physics_steps": 525,
+          "rollouts": 3
+        }
+      ],
+      "total_physics_steps": 2625,
+      "mathematical_evaluations": 6,
+      "numerical_s": 8.043704400002753,
+      "t2_preparation_s": 0.25201100000049337,
+      "t2_worker_s": 0.9285758000005444
+    },
+    "scope": "One segment, three tendons, timestep 0.002 s, duration 0.35 s; no task pass or strict structural direction"
+  },
+  "engineering_attempt_accounting": {
+    "note": "Unsealed unittest engineering fixtures only. Early failed/temporary attempts predate durable partial-cost checkpoints and export-before-projection checks; unknown costs are not zero.",
+    "attempts": [
+      {
+        "attempt": 1,
+        "status": "native_contact_free_scope_failure",
+        "evidence": "Tool transcript only; temporary fixture cleaned",
+        "charged_mathematical_evaluations": 1,
+        "charged_worker_s": 0.9695993000004819,
+        "physics_steps_exact": null,
+        "physics_steps_upper_bound": 700
+      },
+      {
+        "attempt": 2,
+        "status": "execution_incomplete",
+        "reference": {
+          "artifact_id": "243fdc4deb933a44e0f70b66ffd608f1ac30a9ad055019d7492d71a1f8fbfedc",
+          "media_type": "application/json"
+        },
+        "archive": "evidence/mujoco_parameter_smoke_failure_m3c2-variable-segments-dev",
+        "charged_mathematical_evaluations": 1,
+        "charged_worker_s": 0.9692057000011118,
+        "physics_steps_exact": null,
+        "physics_steps_upper_bound": 700
+      },
+      {
+        "attempt": 3,
+        "status": "Five T1 and T2 completed; ResourceUse projection enum failed",
+        "evidence": "Tool transcript only; temporary fixture cleaned",
+        "charged_mathematical_evaluations": 6,
+        "physics_steps_exact": null,
+        "physics_steps_upper_bound": 10500
+      },
+      {
+        "attempt": 4,
+        "status": "pass",
+        "archive": "evidence/mujoco_task_capability_parameters_smoke",
+        "charged_mathematical_evaluations": 6,
+        "physics_steps_exact": 2625,
+        "physics_steps_upper_bound": 2625
+      }
+    ],
+    "cumulative_mathematical_evaluations": 14,
+    "cumulative_physics_steps_upper_bound": 14525,
+    "announced_physics_steps_cap": 14700,
+    "limitation": "Exact integration counts for early temporary attempts are unavailable; the conservative total upper bound includes them. New partial-callback/worker failures preserve confirmed counts and original charges."
+  },
+  "limitations": [
+    "Reach/Hold native task adapter only; runtime contact-free unconstrained ideal tension required.",
+    "No global optimality, rigorous derivative/error bounds, GVS/MuJoCo transfer or independent task acceptance.",
+    "Domain availability and numerical applicability depend on the frozen FamilySpace, selected candidate and Study grants."
+  ]
+}
