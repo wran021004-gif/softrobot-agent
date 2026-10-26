@@ -1,0 +1,120 @@
+{
+  "version": "b2_fixed_search_v1",
+  "frozen_date": "2026-10-26",
+  "timezone": "Asia/Shanghai",
+  "task_contract": "frozen_before_search",
+  "physical_feasibility": "unmeasured",
+  "structural_discrimination": "unmeasured",
+  "tasks": {
+    "zero": "tasks/b2_load_hold_zero_frozen_v1.json",
+    "force": "tasks/b2_load_hold_force_frozen_v1.json"
+  },
+  "radii_m": [
+    0.018,
+    0.014,
+    0.023
+  ],
+  "initial_tensions_n": [
+    0.2,
+    0.4
+  ],
+  "analysis_protocol": {
+    "protocol_id": "task-local-v2",
+    "input_scale_n": 8.0,
+    "output_scale_m": 0.01,
+    "windows_s": [
+      0.05,
+      0.1,
+      0.35
+    ],
+    "samples_s": [
+      0.0,
+      0.1,
+      0.2,
+      0.3,
+      0.34
+    ],
+    "frequency_rad_s": [
+      0.1,
+      1.0,
+      10.0,
+      100.0
+    ],
+    "rank_atol": 1e-12,
+    "rank_rtol": 1e-09,
+    "comparison_atol": 1e-08,
+    "comparison_rtol": 2e-06,
+    "derivative_atol": 2e-05,
+    "derivative_rtol": 0.0002,
+    "derivative_step": 1e-05,
+    "equilibrium_normalized_residual": 1e-05,
+    "static_force_tolerance": 1e-10,
+    "static_max_iterations": 20,
+    "pole_margin_s_inv": 1e-07,
+    "authority_threshold": null,
+    "authority_reason": "No independently justified task-required MIMO gain threshold; usable bandwidth undefined.",
+    "authority_rule": "Smallest singular value >= threshold, connected grid band starting at lowest frequency; no extrapolation.",
+    "candidate_rule": "initial_target_equilibrium_halfway",
+    "endpoint_max_iterations": 100,
+    "construction_max_iterations": 20,
+    "horizon_alignment_atol_s": 1e-12,
+    "endpoint_check_atol": 1e-08,
+    "baseline_lengths_m": {
+      "segment_0": 0.16,
+      "segment_1": 0.11
+    },
+    "duration_s": 0.35,
+    "period_s": 0.01
+  },
+  "search": {
+    "version": "local_control_search_v2",
+    "method": "response",
+    "correction_window_s": [
+      0.0,
+      0.35
+    ],
+    "knots_s": [
+      0.0,
+      0.12,
+      0.23,
+      0.34
+    ],
+    "evaluation_requests": 60,
+    "iterations": 2,
+    "coefficient_limit_n": 2.0,
+    "difference_step_n": 0.01,
+    "initial_radius_n": 0.1,
+    "minimum_radius_n": 0.0001,
+    "safety_margin_fraction": 0.0
+  },
+  "budget_proposals": {
+    "neutral": {
+      "physics_step_attempts": 85400,
+      "max_native_rollouts": 120,
+      "max_independent_replays": 2
+    },
+    "feasibility": {
+      "physics_step_attempts": 256200,
+      "max_native_rollouts": 360,
+      "max_independent_replays": 6
+    },
+    "contrast": {
+      "physics_step_attempts": 512400,
+      "max_native_rollouts": 720,
+      "max_independent_replays": 12
+    }
+  },
+  "scientific_authorization": "PENDING_SEPARATE_USER_APPROVAL",
+  "provider_requests": 0,
+  "frozen_files": {
+    "configs/research/control.json": "f968238b4a9939001bb17300dc4ad3ac2cf5e71c42dc7f967c923398f7e4581a",
+    "configs/research/family_space_v1.json": "a75650123d78b14b0a97f4a81bdb761cce6830e08e55954d577e1ba61d907233",
+    "configs/research/family_study_defaults.json": "dc453370e3e308f1caa9f7fd15da0b08e975a352fe863aad1ff65ace599639ac",
+    "configs/research/runtime.json": "b10485d6a3f3faebe5de4d0dcb4622bb63e0027deb5b70ccfa9020313e08e5ff",
+    "configs/research/study_family_space_dev.json": "8beb34a8d9e4dc2a5e3cdb35eee267766f17b6b03f8567a970bf123783aed8da",
+    "tasks/b2_load_hold_force_frozen_v1.json": "f061bfbb7403ee4dfce7681af97c2a11ffd552dc5602069a24bc1012f5818a80",
+    "tasks/b2_load_hold_zero_frozen_v1.json": "8e87cb3eea0286911876899ed9ef19c8c5c0fdf23b73ec1d852226451a673d86",
+    "tasks/reach_hold.json": "e3f915f6fe57fd172316b0bf12fb3131a3005c21bd21ad02ebf52a0648f2c8cd"
+  },
+  "frozen_hash_encoding": "sha256_utf8_text_with_universal_newlines"
+}
