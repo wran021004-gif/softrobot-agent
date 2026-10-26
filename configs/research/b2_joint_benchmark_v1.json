@@ -1,0 +1,45 @@
+{
+  "contract": "benchmark.same_structure_multi_condition",
+  "version": "1.0.0",
+  "benchmark_id": "b2-reach-hold-pair-v1",
+  "status": "candidate_with_finite_algorithm_structural_evidence",
+  "hash_encoding": "sha256_utf8_text_with_universal_newlines",
+  "conditions": [
+    {
+      "condition_id": "zero",
+      "path": "tasks/b2_load_hold_zero_frozen_v1.json",
+      "task_id": "b2-load-hold-frozen-v1-zero",
+      "task_version": "1.0.0",
+      "sha256": "8e87cb3eea0286911876899ed9ef19c8c5c0fdf23b73ec1d852226451a673d86"
+    },
+    {
+      "condition_id": "force",
+      "path": "tasks/b2_load_hold_force_frozen_v1.json",
+      "task_id": "b2-load-hold-frozen-v1-force",
+      "task_version": "1.0.0",
+      "sha256": "f061bfbb7403ee4dfce7681af97c2a11ffd552dc5602069a24bc1012f5818a80"
+    }
+  ],
+  "structure_binding": {
+    "comparison": "tools.research.config.same_robot_structure",
+    "required_equal": ["robot.family", "robot.structure", "policy.discretization"],
+    "controls": "independent legal sequences for each condition; no acceptance transfer"
+  },
+  "acceptance": {
+    "per_condition": "playback_tensions -> evaluate_playback -> assemble_acceptance",
+    "protocol_id": "offline_reach_hold_v1",
+    "joint_rule": "all declared conditions independently accepted on the same structure and frozen physical discretization",
+    "missing_invalid_or_incomplete": "unresolved; never accepted",
+    "valid_failure": "joint not accepted; retain every failed component",
+    "execution_api_status": "public Study is single-task; physical_replay receipts lack generic aggregation compatibility"
+  },
+  "family_space": "configs/research/family_space_v1.json",
+  "engineering_defaults": ["configs/research/control.json", "configs/research/family_study_defaults.json"],
+  "initialization": "constant pretension, registered response-based initialization, or other authorized legal control initialization; charge all probes",
+  "cost": "new Study needs independent authorization and cumulative attempted-integration ledger including initialization, mathematical internal rollouts, failures and independent replay",
+  "cold_start": {
+    "include": ["this manifest", "referenced frozen task files", "legal FamilySpace and executable domain", "registered tool contracts and necessary engineering model/defaults", "own Study evidence"],
+    "exclude": ["historical B2 research reports and scalar results", "historical research conversations", "private witnesses and drivers", "successful structure mappings and controls", "historical Stores and Provider traces"],
+    "deployment": "separate checkout with history/files excluded, new Store, new context; no access-control implementation implied"
+  }
+}
