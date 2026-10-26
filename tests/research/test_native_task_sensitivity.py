@@ -19,7 +19,7 @@ class NativeTaskSensitivityTests(unittest.TestCase):
             return dict(value=x,reference=dict(artifact_id=str(x),media_type='application/json'),
                 parameter_values={'modulus':5.},task_samples={k:sample(x) for k in ('fixed_control','reoptimized_control')})
         return dict(rows=[row(0),row(-h),row(h)],validation_rows=[row(.75)],parameter=dict(units='Pa'),
-            parameters=dict(modulus=dict(minimum=0.,maximum=10.)),coefficients=dict(modulus=1.))
+            parameters=dict(modulus=dict(bounds=[0.,10.])),coefficients=dict(modulus=1.))
 
     def test_held_out_quadratic_prediction_units_and_optimization_scope(self):
         result=task_sensitivities(self.response_fixture())
@@ -48,6 +48,8 @@ class NativeTaskSensitivityTests(unittest.TestCase):
         base=self.response_fixture()['rows'][0]['task_samples']['fixed_control']
         actual=[dict(base[0],normalized_signed_excess=1.01)]
         self.assertEqual(validate_prediction(base,[1.],.5,actual)['status'],'unresolved')
+        actual=[dict(base[0],normalized_signed_excess=1.1)]
+        self.assertEqual(validate_prediction(base,[.3],.5,actual)['status'],'unresolved')
 
     def test_validation_requires_distinct_results_and_preserves_old_v2_request(self):
         refs=[dict(artifact_id=c*64,media_type='application/json') for c in 'abcd']
@@ -71,6 +73,18 @@ class NativeTaskSensitivityTests(unittest.TestCase):
         self.assertEqual(control_prediction_validation(rows)['status'],'unresolved')
         rows[-1]=row(.005)
         self.assertEqual(control_prediction_validation(rows)['status'],'unresolved')
+
+    def test_l0_keeps_three_physical_paths_when_each_has_two_scales(self):
+        from tools.research.capability import compact_nonlinear_directions
+        result=dict(directions=[],comparison_summary=[])
+        for path in ('modulus','routing','section'):
+            for step in (1.,.5):
+                name=path+str(step)
+                result['directions'].append(dict(coefficients={path:1.},coordinate_unit='m',step=step))
+                result['comparison_summary'].append(dict(direction_id=name))
+        rows=compact_nonlinear_directions(result)
+        self.assertEqual([r['direction_id'] for r in rows],['modulus0.5','routing0.5','section0.5'])
+        self.assertTrue(all(len(r['source_direction_ids'])==2 for r in rows))
 
     def test_contact_failure_retains_geometry_time_and_actual_cost(self):
         native=object.__new__(NativeModel)

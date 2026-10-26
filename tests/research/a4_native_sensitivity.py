@@ -101,7 +101,98 @@ def r1_audit(host):
     return ref
 
 
+def r1_peak_mechanics(host):
+    """Original R1 measured coordinates; reset history, no replay or projection."""
+    existing=next((r for r in state(host).get('research_mathematics',[]) if
+        host.store.artifact(r).get('kind')=='A4_R1_peak_mechanics'),None)
+    if existing:return existing
+    from extensions.tendon_family.family_space import parse_build
+    from extensions.tendon_family.generated_serial import generate_family
+    from tools.research_tasks import task_adapter
+    from tools.research.nonlinear_capability import sampled_constraints
+    package=read(ROOT/'evidence/b3_r1_history_assisted_050/design_package.json')
+    raw=archived('evidence/b3_r1_history_assisted_050',package['raw_reference'])
+    cfg=package['configuration'];hold=task_adapter(cfg).holding_start_s()
+    index=max((i for i,s in enumerate(raw['samples']) if s['time_s']>=hold-1e-12),key=lambda i:raw['samples'][i]['speed_m_s'])
+    sample=raw['samples'][index];started=time.perf_counter();native=NativeModel(cfg)
+    point=dict(dof_order=native.order,tendon_order=native.tendons,qpos_rad=sample['qpos_rad'],qvel_rad_s=sample['qvel_rad_s'],actual_time_s=sample['time_s'])
+    u=sample['actual_tension_n'];d=native.restore(point,comparable=True);mechanics=native.mechanics(d,u)
+    # These directions are frozen here before any perturbation model is built.
+    paths=[('segments.1.young_pa',10000.,'Pa'),('spans.0.radius_m',.00001,'m'),('segments.1.sections.0.parameters.radius_m',.00001,'m')]
+    directions=[];model_costs=[native.cost]
+    builder=cfg['policy']['candidate_builder']['parameters']['data']
+    from tools.research.task_constraints import describe_analysis_requirements
+    req=describe_analysis_requirements(cfg,{})
+    outputs=dict(times_s=[s['time_s'] for s in raw['samples']],tip_positions_m=[s['tip_m'] for s in raw['samples']],
+        tip_velocities_m_s=[s['tip_velocity_m_s'] for s in raw['samples']])
+    for path,h,unit in paths:
+        probes=[]
+        for factor in (-1.,1.,-.5,.5):
+            p=deepcopy(package['design_parameters']);p.pop('controller_recipe',None)
+            design.set_parameter(p,path,design.parameter_value(p,path)+factor*h)
+            build=parse_build(dict(space=builder['space'],request=p));robot,mesh,_=generate_family(build)
+            other_cfg=deepcopy(cfg);other_cfg['robot']['structure']['data']=robot;other_cfg['policy']['discretization']['data']=mesh
+            other=NativeModel(other_cfg);state_at_point=other.restore(point,comparable=True)
+            changed=other.mechanics(state_at_point,u);model_costs.append(other.cost)
+            fields=('mass_matrix_kg_m2','input_force_map_nm_n','tendon_jacobian_m_rad','qacc_rad_s2','tip_acceleration_m_s2')
+            probes.append(dict(delta=factor*h,physics_identity=other.physics['identity'],mechanics=changed,
+                relative_changes={k:float(np.linalg.norm(np.asarray(changed[k])-mechanics[k])/max(np.linalg.norm(mechanics[k]),1e-15)) for k in fields}))
+        directions.append(dict(variable=path,base_value=design.parameter_value(package['design_parameters'],path),unit=unit,step=h,probes=probes,
+            scope='Fixed native qpos/qvel/input only. No R1 full-task structural prediction or reoptimization.'))
+    result=dict(kind='A4_R1_peak_mechanics',source=package['raw_reference'],sample_index=index,
+        state_comparison='Original measured native qpos/qvel and actual input; reset history in all models',
+        input_phase='Previous applied interval tension at measured post-step state; not a new command',
+        mechanics=mechanics,directions=directions,original_task_samples=sampled_constraints(outputs,req),
+        cost={k:sum(c[k] for c in model_costs) for k in native.cost})
+    result['cost']['kernel_wall_s']=time.perf_counter()-started
+    ref=save(host,result,'native_R1_mechanics_and_physical_responses')
+    update(host,research_mathematics=[*state(host).get('research_mathematics',[]),ref],numerical_s=state(host)['numerical_s']+result['cost']['kernel_wall_s'])
+    return ref
+
+
+def compact_summary(summary):
+    """Keep one small delivery index; original arrays and sources stay in Store."""
+    for direction in summary['structure_predictions']:
+        direction['metric_responses']=[dict(metric=m['metric'],unit=m['unit'],secant_unit=m.get('secant_unit'),
+            **{scope:{k:v for k,v in m[scope].items() if k!='sources'} for scope in ('fixed_control','reoptimized_control')})
+            for m in direction['metric_responses']]
+    summary['control_prediction_validation']['validation'].pop('samples',None)
+    return summary
+
+
+def postflight_review(host,t2):
+    """Re-read saved samples with the final stricter policy; zero native calls."""
+    from tools.research.contracts import AnalysisRequest
+    from tools.research.nonlinear_capability import saved_context,response
+    started=time.perf_counter();raw=host.store.artifact(t2)
+    value=response(saved_context(host,AnalysisRequest.model_validate(raw['requested_operation'])))
+    card=plain(result_card(host,t2));view=mathematical_decision_view(card)
+    assert view['nonlinear_response']['direction_count']==3 and view['nonlinear_response']['stencil_count']==6
+    assert len(view['nonlinear_response']['directions'])==3
+    exact=dict(reference=t2,view='full',pointer='/nonlinear_response/directions/0/task_sensitivity/fixed_control/finite_difference_per_unit')
+    assert core.read_evidence(host,exact,record_read=False)==raw['nonlinear_response']['directions'][0]['task_sensitivity']['fixed_control']['finite_difference_per_unit']
+    result=dict(kind='A4_postflight_saved_sample_review',source=t2,
+        practical_error_fraction_of_actual_change=.25,material_normalized_change=1e-8,
+        interpretation='Stricter final empirical policy; original T2 artifact and numeric samples unchanged. Not an error bound.',
+        structural=[dict(direction_id=d['direction_id'],scopes={k:v['status'] for k,v in d['task_sensitivity'].items()}) for d in value['directions']],
+        normalized_sensitivities=[dict(direction_id=d['direction_id'],
+            scopes={k:dict(legal_coordinate_span=v['legal_coordinate_span'],dimensionless_sensitivity=v['dimensionless_sensitivity'],
+                raw_sample_pointer=f'/nonlinear_response/directions/{i}/task_sensitivity/{k}/samples',
+                raw_derivative_pointer=f'/nonlinear_response/directions/{i}/task_sensitivity/{k}/finite_difference_per_unit')
+                for k,v in d['task_sensitivity'].items()}) for i,d in enumerate(value['directions'])],
+        control_status=value['control_prediction_validation']['status'],l0_physical_paths=3,l0_stencils=6,
+        exact_matrix_query=exact,
+        cost=dict(model_builds=0,physics_steps=0,rollouts=0,kernel_wall_s=time.perf_counter()-started))
+    ref=save(host,result,'saved_sample_policy_review')
+    update(host,research_mathematics=[*state(host).get('research_mathematics',[]),ref],numerical_s=state(host)['numerical_s']+result['cost']['kernel_wall_s'])
+    return ref
+
+
 def main():
+    delivered=ROOT/'evidence/mujoco_native_task_sensitivity/summary.json'
+    if delivered.exists() and (FOLDER/'store/platform.sqlite').exists():
+        print('A4_ALREADY_DELIVERED',read(delivered)['cost'],flush=True)
+        return
     host,source=prepare();r1=r1_audit(host)
     generated={};t1={};raws={}
     def generate(parameters,label):
@@ -175,13 +266,18 @@ def main():
     before=state(host)['numerical_s'];reuse=analysis.dispatch(host,query,'a4-t2-independent-predictions',guard=core.guard,origin='engineering_preflight')
     assert reuse['operation_reuse']['additional_analysis_evaluations']==0 and state(host)['numerical_s']==before
     catalog=mathematical_method_view(host,baseline)['methods'][T2]
-    assert catalog['batch_request'] and catalog['executable']
+    assert catalog['batch_request'] and catalog['applicable']
+    assert not catalog['executable'] and 'formal_study_math_scope_required' in catalog['missing']
+    r1_mechanics=r1_peak_mechanics(host)
+    review=postflight_review(host,t2)
     total=costs(host);assert total['physics_steps']<=CAP
     final=aggregate['nonlinear_response']
     summary=dict(label='A4 bounded real MuJoCo experiment; no independent task acceptance',implementation=state(host)['freeze'],
         store=str(host.store.root),budget_physics_steps=CAP,cost=total,
         analysis_evaluations=state(host)['mathematical_evaluations'],numerical_s=state(host)['numerical_s'],
         original_store_ledger=host.store.remaining(),r1_audit=dict(reference=r1,value=host.store.artifact(r1)),
+        r1_peak_mechanics=dict(reference=r1_mechanics,query=dict(reference=r1_mechanics,view='full',pointer='/mechanics')),
+        final_saved_sample_review=dict(reference=review,value=host.store.artifact(review)),
         baseline_candidate=baseline,baseline_metrics=raws['baseline']['nonlinear_capability']['initial_metrics'],
         peak_native_mechanics=dict(reference=mechanics,query=dict(reference=mechanics,view='full',pointer='/native_dynamics/mechanics'),
             time_s=point['actual_time_s'],mass_balance_residual_inf_nm=mechanics_raw['native_dynamics']['mechanics']['mass_balance_residual_inf_nm']),
@@ -194,7 +290,12 @@ def main():
         queries=dict(structural=dict(reference=t2,view='full',pointer='/nonlinear_response/directions'),
             control=dict(reference=t2,view='full',pointer='/nonlinear_response/control_prediction_validation')))
     destination=ROOT/'evidence/mujoco_native_task_sensitivity';destination.mkdir(exist_ok=True)
-    atomic_json(destination/'summary.json',summary)
+    completion=save(host,dict(kind='A4_engineering_completion',status='stopped',task_acceptance='unmeasured',
+        results=[t2,mechanics,r1_mechanics,review],physics_steps=total['physics_steps'],
+        reason='A4 bounded verification complete; no new Study or scan authorized by this driver.'),'engineering_completed')
+    update(host,research_status='stopped',final_disposition=completion,closed_unix=time.time())
+    summary['completion_reference']=completion;summary['research_status']='stopped'
+    atomic_json(destination/'summary.json',compact_summary(summary))
     print('A4_COMPLETE',total,flush=True)
 
 

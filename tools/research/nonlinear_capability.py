@@ -347,9 +347,11 @@ def validate_prediction(base, derivative, coordinate, actual):
     predicted=zero+coordinate*np.asarray(derivative);change=truth-zero;expected=predicted-zero;error=predicted-truth
     material=np.maximum(abs(change),abs(expected))>1e-8
     correct=(change*expected>0) | ~material
-    comparable=abs(error)<np.maximum(abs(change),1e-8)
+    comparable=abs(error)<.25*np.maximum(abs(change),1e-8)
     status='validated_local_prediction' if np.all(correct & comparable) and np.any(material) else 'unresolved'
     return dict(coordinate=coordinate,status=status,direction_correct=bool(np.all(correct)),
+        practical_checks=dict(error_fraction_of_actual_change=.25,material_normalized_change=1e-8,
+            interpretation='Empirical discrimination thresholds, not derivative error bounds or task acceptance tolerances.'),
         maximum_error_over_threshold=float(max(abs(error))),
         maximum_error_over_actual_change=float(max(abs(error)/np.maximum(abs(change),1e-8))),
         predicted_J=float(max(predicted)),actual_J=float(max(truth)),J_error=float(max(predicted)-max(truth)),
@@ -368,8 +370,9 @@ def task_sensitivities(context):
     lower=[];upper=[]
     for path,coefficient in context.get('coefficients',{}).items():
         p=context['parameters'][path];origin=rows[0]['parameter_values'][path]
-        if p.get('minimum') is not None and p.get('maximum') is not None:
-            ends=sorted([(p['minimum']-origin)/coefficient,(p['maximum']-origin)/coefficient])
+        bounds=p.get('bounds',[None,None])
+        if all(bound is not None for bound in bounds):
+            ends=sorted([(bounds[0]-origin)/coefficient,(bounds[1]-origin)/coefficient])
             lower.append(ends[0]);upper.append(ends[1])
     span=min(upper)-max(lower) if upper else None
     for scope in ('fixed_control','reoptimized_control'):

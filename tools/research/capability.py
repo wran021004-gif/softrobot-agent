@@ -277,6 +277,21 @@ def populate_sensitivity(mathematics, value, reference):
         problem_definition=EvidenceLocation(reference=reference,pointer='/optimal_sensitivity/parameter_identity')))
 
 
+def compact_nonlinear_directions(result):
+    """Show physical paths in L0; two FD scales do not hide another parameter."""
+    matrix=result.get('comparison_summary',[]);groups={}
+    for i,row in enumerate(matrix):
+        direction=result.get('directions',[result])[i]
+        key=(tuple(sorted(direction['coefficients'].items())),direction.get('coordinate_unit')) if direction.get('coefficients') else i
+        if key not in groups:groups[key]=dict(row)
+        elif direction.get('step',float('inf'))<groups[key].get('_step',float('inf')):
+            ids=groups[key]['source_direction_ids'];groups[key]=dict(row,source_direction_ids=ids)
+        groups[key].setdefault('source_direction_ids',[]).append(row.get('direction_id'))
+        groups[key]['_step']=min(direction.get('step',float('inf')),groups[key].get('_step',float('inf')))
+    for row in groups.values():row.pop('_step',None)
+    return list(groups.values())
+
+
 def nonlinear_summary(value,reference=None):
     """Bounded decision facts; multi-parameter matrices and sequences stay in Store."""
     result={}
@@ -293,10 +308,11 @@ def nonlinear_summary(value,reference=None):
                 coefficients=[r['coefficient_index'] for r in controls['responses']],status='local_estimate_unvalidated',
                 detail_query=query('/native_dynamics/control_task_sensitivity'),new_physics_steps=0)
     if value.get('nonlinear_response'):
-        t=value['nonlinear_response'];matrix=t.get('comparison_summary',[])
+        t=value['nonlinear_response'];matrix=compact_nonlinear_directions(t)
         baseline=next((d.get('observations',[None])[0] for d in t.get('directions',[t]) if d.get('observations')),None)
         result['nonlinear_response']=dict(method=t['method'],status=t['status'],direction_status=t['direction_status'],
             directions=matrix[:4],direction_count=len(matrix),omitted_directions=max(0,len(matrix)-4),
+            stencil_count=len(t.get('comparison_summary',[])),
             evidence_level='finite_budget_observation',strict_improvement_direction='unresolved',
             worst_constraint=baseline.get('worst_constraint') if baseline else None,cost=t['cost'],
             detail_query=query('/nonlinear_response'),comparison_query=query('/nonlinear_response/comparison_summary'),
