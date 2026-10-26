@@ -48,7 +48,7 @@ class AgentReportingTests(unittest.TestCase):
     def setUp(self):
         self.case=mainline.MainlineTests()
         with patch.object(mainline,'ProjectConfig',side_effect=lambda **kw:ProjectConfig(
-                **kw,exclusive_resources={'provider_request':1})):
+                **{**kw,'exclusive_resources':{**kw.get('exclusive_resources',{}),'provider_request':1}})):
             self.case.setUp()
         self.addCleanup(self.case.tearDown)
         self.h=self.case.host;self.f=f0.ReportingTests();self.f.setUp()
@@ -141,6 +141,42 @@ class AgentReportingTests(unittest.TestCase):
         self.assertNotIn('unconsumed_response',state(self.h)['pilot'])
         self.assertEqual(state(self.h).get('evaluation_reads',[]),[])
         self.assertNotIn(final['report'],[self.h.store.artifact(r) for r in registered_references(self.h)])
+
+    def test_reporter_projected_reads_keep_views_and_raw_citations(self):
+        reference=self.physical()
+        queries=[dict(reference=reference,view='working_set',pointer='/control_result_links'),
+            dict(reference=self.f.candidate,view='mathematical_capabilities',pointer='/methods')]
+        from tools.research.contracts import EvidenceQuery
+        queries=[plain(EvidenceQuery.model_validate(q)) for q in queries]
+        original=reporter.read_evidence
+        def read(host,query,**kwargs):
+            if query in queries:return {'fixture_projected_value':query['view']}
+            return original(host,query,**kwargs)
+        with patch.object(reporter,'read_evidence',side_effect=read):
+            initial=reporter.investigate(self.h,dict(question='Projected evidence fixture',
+                references=[reference],reads=queries))
+            wire=reporter._wire(self.h,initial['report_reference'],self.h.store.artifact(initial['report_reference']))
+            payload=json.loads(wire['messages'][-1]['content'])
+            self.assertEqual([r['query'] for r in payload['selected_reads']],queries)
+            for query in queries:
+                self.assertIn(dict(reference=query['reference'],pointer=''),payload['source_catalog'].values())
+                self.assertNotIn(dict(reference=query['reference'],pointer=query['pointer']),payload['source_catalog'].values())
+            asyncio.run(reporter.complete_reports(self.h,httpx.MockTransport(reporter_response)))
+        self.assertEqual(reporter.entries(self.h)[-1][1]['interpretation_status'],'available')
+        self.assertEqual(self.h.store.remaining()['used']['model_calls'],1)
+        self.assertEqual(state(self.h).get('evaluation_reads',[]),[])
+
+    def test_reporter_preparation_failure_keeps_deterministic_report_without_send(self):
+        reference=self.physical()
+        initial=reporter.investigate(self.h,dict(question='Preparation failure fixture',references=[reference]))
+        with patch.object(reporter,'_wire',side_effect=KeyError('fixture_invalid_pointer')):
+            asyncio.run(reporter.complete_reports(self.h,httpx.MockTransport(
+                lambda request:(_ for _ in ()).throw(AssertionError('No send')))))
+        final=reporter.entries(self.h)[-1][1]
+        self.assertEqual(final['interpretation_status'],'unavailable')
+        self.assertEqual(final['report'],self.h.store.artifact(initial['report_reference'])['report'])
+        self.assertIn('fixture_invalid_pointer',final['error'])
+        self.assertEqual(self.h.store.remaining()['used']['model_calls'],0)
 
     def test_invalid_or_truncated_interpretation_falls_back_without_scientific_reexecution(self):
         reference=self.physical();before=self.h.store.artifact(reference)

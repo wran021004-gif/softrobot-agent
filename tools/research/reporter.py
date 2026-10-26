@@ -386,7 +386,10 @@ def _source_catalog(host, report, queries):
             for pointer in pointers:add(EvidenceLocation(reference=card.identity.result.reference,pointer=pointer))
     for relation in report.relations:collect(relation.sources)
     for query in queries:
-        add(EvidenceLocation(reference=query['reference'],pointer=query.get('pointer','')))
+        # These pointers address a projection, not the immutable raw document.
+        # Keep the exact view in selected_reads; cite its raw artifact root.
+        pointer='' if query.get('view') in ('working_set','mathematical_capabilities','summary') else query.get('pointer','')
+        add(EvidenceLocation(reference=query['reference'],pointer=pointer))
     return catalog
 
 
@@ -526,10 +529,10 @@ async def complete_reports(host, transport, *, recover_only=False):
             _save(host,ScientificReport.model_validate(saved['report']),request=saved.get('request'),
                 status='unavailable',interpretation_for=ref,error='REPORTER_SKIPPED_TO_PRESERVE_CLOSEOUT')
             continue
-        wire=_wire(host,ref,saved)
-        record(host,'reporter_attempt',dict(base_report=ref['artifact_id']))
-        attempted.add(ref['artifact_id'])
         try:
+            wire=_wire(host,ref,saved)
+            record(host,'reporter_attempt',dict(base_report=ref['artifact_id']))
+            attempted.add(ref['artifact_id'])
             request=httpx.Request('POST',s['pilot']['provider']['base_url'].rstrip('/')+'/chat/completions',
                 headers={'Authorization':'Bearer '+os.environ.get('DEEPSEEK_API_KEY','')},json=wire,
                 extensions={'timeout':{k:s['pilot']['provider']['timeout_s'] for k in ('connect','read','write','pool')}})

@@ -54,7 +54,30 @@ R0 实际 Provider、真实数学、MuJoCo 步进、NMPC、PPO 全为 **0**。
 读取了 M1/M2、C 逐轮审计、C3 A/B、F1/F2、G2 与 S140–S145；
 保留局部模型平台/退化、历史跨任务及同输入预测对齐的科学边界，未重算封存实验。
 
-## R1：已冻结，运行环境等待出口批准
+## R1：交付中断修复与同 Study 续研
+
+以下初始预检快照保留原时间语义。用户随后在聊天明确批准 DeepSeek 地址/载荷及公开 GitHub
+分支披露；`7922de156` 已推送，唯一 R1 已真实运行。中断前累计 Provider 39/48、公开操作
+74/96、独立物理 2/4、NMPC 2/2，数学 0/26；没有 Agent STOP 或 SELECT。
+新结构与控制配方的组合把 holding_speed 降到 0.043009681835387996 m/s，仍未达到 0.02，
+不能将改善归因于结构单因素。两次 NMPC 原始结果、全部费用与失败均保留。
+
+Reporter 的 `_source_catalog` 丢弃 `working_set`/`mathematical_capabilities` 视图，把投影
+路径当作 raw JSON Pointer，准备 wire 时抛出 KeyError，进程退出；该失败没有发出 Reporter
+请求。修复保留 selected_reads 的完整查询，派生路径以原始 artifact 根作来源；不伪造 raw
+子路径。准备阶段也纳入既有 unavailable 回退，不让只读解释失败阻断主 Agent。
+五项定向离线回归通过（2.743 s），涵盖投影视图、准备失败零发送、来源 ID 拒绝、历史响应
+恢复及未知发送阻塞。另直接重建真实中断报告的三个查询，原事实和账本逐值未变，见
+[reporter_repair.json](../../evidence/b3_r1_history_assisted_050/reporter_repair.json)。
+
+用户明确要求修复后恢复，并在聊天选择 **新增 Provider 48、公开操作 96**：总上限变为
+96/192，保护额度仍 4/6，所有数学、独立物理、NMPC、native 积分上限不变。
+单次人工入口 `tests/research/b3_r1_resume.py` 只接受原 R1 身份及无占用/无悬账边界，
+在原 Store 中登记授权、更新原 grant/输入快照上限，再调用原 bind 显式迁移；不新建 Study、
+不重置或复制账本。修复前原归档已保存在 ignored runs，零请求 restore-only 已通过。
+后续执行与最终结果另追加真实审计；本提交尚未应用增额或重启。
+
+### 初始预检及当时的审批状态（历史快照）
 
 R0 源码提交 **`78ca687fd893bfc805cfcaf1370ea62dd14dbf65`** 已普通推送，
 核对 `origin/feat/b3-r0-decision-efficiency` HEAD 完全相同，随后创建
