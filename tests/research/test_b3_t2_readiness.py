@@ -59,6 +59,9 @@ class B3T2Tests(unittest.TestCase):
                     dict(mathematical_capabilities=mathematical_catalog(view)),decision_only=True)['mathematical_capabilities']
                 native=brief['mathematical_capabilities']['methods']['mujoco_direct_control_v1']
                 self.assertEqual(native['execution_limits'],s['spec']['native_control_limits'])
+                if not budget['closeout']['active']:
+                    self.assertEqual(core.read_evidence(h,native['request_template_query'],record_read=False),
+                        view['methods']['mujoco_direct_control_v1']['request_template'])
                 self.assertNotIn('execution_limits',packet['research']['mathematical_capabilities']['methods']['mujoco_direct_control_v1'])
                 if s['results'] and not budget['closeout']['active']:
                     query=native['control_initialization_query']
@@ -86,6 +89,7 @@ class B3T2Tests(unittest.TestCase):
                     sizes['handoff' if handoff else 'same_session']=len(encoded)
                     delivered=json.loads(json.loads(encoded)['messages'][-1]['content'].split('\n',1)[1])['research']
                     self.assertEqual(delivered['mathematical_capabilities']['methods']['mujoco_direct_control_v1']['execution_limits'],s['spec']['native_control_limits'])
+                    self.assertEqual(delivered['mathematical_capabilities']['methods']['mujoco_direct_control_v1']['request_template_query'],native['request_template_query'])
                     if not handoff:self.assertEqual(after['messages'][:-1],wire['messages'][:-1])
                 last=[e for e in events if e['kind']=='model_original_tool_feedback'][-1:]
                 if last and not budget['closeout']['active']:

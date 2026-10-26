@@ -75,7 +75,20 @@ Reporter 的 `_source_catalog` 丢弃 `working_set`/`mathematical_capabilities` 
 单次人工入口 `tests/research/b3_r1_resume.py` 只接受原 R1 身份及无占用/无悬账边界，
 在原 Store 中登记授权、更新原 grant/输入快照上限，再调用原 bind 显式迁移；不新建 Study、
 不重置或复制账本。修复前原归档已保存在 ignored runs，零请求 restore-only 已通过。
-后续执行与最终结果另追加真实审计；本提交尚未应用增额或重启。
+增额已应用，实现迁移到 `b5362f9c3` 后原 restore-only 通过，真实 Reporter 成功返回 available，
+后续主请求 `e190bf14d55016ae5fb3f2f87ab110c56176e02d67be45877db9e95f94cc451a`
+继续含 24/3/4。累计 49 次请求时又定位到完整 native 方法读取的执行模板在 Handoff 摘要中
+丢失；最后实际反馈 `4d2e59104c19fc7f970e36c53d61fe072818c5ae56c5e0aa90f9b1463597b0f2`
+原有 1,454 字符模板，但原摘要只剩 candidate/operation。通过原 pending-binding 门禁阻止
+下一次请求，原反馈完成且无 pending/占用，未重置费用或伪造 STOP。
+
+补充修复只在原目录提供精确 `request_template_query`，并让 Handoff 在原 3,000 bytes
+事实限额内保留模板、执行上限、必填参数与实测控制初始化信息。真实长反馈现在可保留
+2,849 bytes 的执行字段，不复制完整方法；原 L2 引用及“不提供完整读取信用”语义不变。
+三项定向回归通过（25.185 s）：原 M2 完整 wire/同会话/Handoff、长方法字段限额、原 SDK
+先配对再发送。真实反馈离线核验见
+[template_delivery_repair.json](../../evidence/b3_r1_history_assisted_050/template_delivery_repair.json)。
+本次补充提交后仍通过原显式 bind/restore-only 迁移；科学实现及 96/192 总上限不再改变。
 
 ### 初始预检及当时的审批状态（历史快照）
 

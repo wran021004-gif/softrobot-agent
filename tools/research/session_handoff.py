@@ -50,6 +50,11 @@ def feedback_delivery(host, tool_ids):
                     return {**{k:node[k] for k in keep if k in node},
                         **(dict(acceptance_metrics=node['original_acceptance'].get('metrics')) if node.get('original_acceptance') else {})}
                 facts=dict(total=len(parsed),recent=[important(v) for v in parsed[-3:]]) if isinstance(parsed,list) else important(parsed)
+            if (value['tool_use']['name']=='evidence_read' and
+                    value['tool_use']['input'].get('view')=='mathematical_capabilities' and isinstance(parsed,dict)):
+                for field in ('request_template','execution_limits','required_parameters','measured_control_initialization'):
+                    if field in parsed and len(json.dumps({**facts,field:parsed[field]}).encode())<=min(3000,remaining):
+                        facts[field]=parsed[field]
             row.update(delivery='summary_only',facts=facts);remaining-=len(json.dumps(facts).encode())
         rows.append(row)
     return dict(version='pending_feedback_delivery_v1',items=rows,

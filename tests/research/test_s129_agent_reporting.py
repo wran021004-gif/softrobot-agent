@@ -178,6 +178,21 @@ class AgentReportingTests(unittest.TestCase):
         self.assertIn('fixture_invalid_pointer',final['error'])
         self.assertEqual(self.h.store.remaining()['used']['model_calls'],0)
 
+    def test_handoff_large_method_read_preserves_bounded_execution_fields(self):
+        from tools.research.session_handoff import feedback_delivery
+        template=dict(candidate=self.physical(),operation='mujoco_direct_control_v1',protocol={'fixture':True})
+        fields=dict(request_template=template,execution_limits=dict(evaluation_requests=24,iterations=3,knots_s=4),
+            required_parameters=['fixture source/settings'],measured_control_initialization={'fixture':True})
+        original={'fixture_large_detail':'x'*8000,**fields}
+        use=dict(toolUseId='fixture-large-method',name='evidence_read',input=dict(view='mathematical_capabilities'))
+        record(self.h,'model_original_tool_feedback',dict(tool_use=use,
+            result=dict(status='success',content=[dict(text=json.dumps(original))])))
+        row=feedback_delivery(self.h,[use['toolUseId']])['items'][0]
+        self.assertEqual(row['delivery'],'summary_only')
+        for key,value in fields.items():self.assertEqual(row['facts'][key],value)
+        self.assertLessEqual(len(json.dumps(row['facts']).encode()),3000)
+        self.assertEqual(read_evidence(self.h,row['original_result_query'],record_read=False)['content'][0]['text'],json.dumps(original))
+
     def test_invalid_or_truncated_interpretation_falls_back_without_scientific_reexecution(self):
         reference=self.physical();before=self.h.store.artifact(reference)
         for malicious,finish in ((True,'stop'),(False,'length')):

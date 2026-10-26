@@ -153,6 +153,7 @@ def mathematical_catalog(view):
             'formal_execution_authorized','execution_status','planning_status','missing','estimated_evaluations','cost_scope','supported_task_families','execution_limits',
             'registered','authorized','applicable','executable') if k in row}
         item['detail_pointer']='/methods/'+row['method']
+        item['request_template_query']={**row['detail_query'],'pointer':item['detail_pointer']+'/request_template'}
         if row.get('measured_control_initialization'):
             item['control_initialization_query']={**row['detail_query'],'pointer':item['detail_pointer']+'/measured_control_initialization'}
         if row['method']==SENSITIVITY and row.get('authorized') and 'missing_validated_model_stencil' in row['missing']:
