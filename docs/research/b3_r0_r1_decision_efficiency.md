@@ -54,157 +54,192 @@ R0 实际 Provider、真实数学、MuJoCo 步进、NMPC、PPO 全为 **0**。
 读取了 M1/M2、C 逐轮审计、C3 A/B、F1/F2、G2 与 S140–S145；
 保留局部模型平台/退化、历史跨任务及同输入预测对齐的科学边界，未重算封存实验。
 
-## R1：交付中断修复与同 Study 续研
+## R1 最终结果：找到名义仿真任务的通过解
 
-最新状态：首段已由 Agent 合法 STOP，Provider **99/144**、公开操作 **190/192**，
-未找到通过解。公开操作先进入保护；数学 26、回放 2、Provider 45 仍未用。
-用户随后明确授权公开操作 +96 至 **288**，Provider 保持 144、科学上限不变，
-并授权保留原 STOP/状态/费用的同 Study 追加研究段。原 STOP 见
-[首段封存摘要](../../evidence/b3_r1_history_assisted_050/closed_segment1.json)。
-详细错误记录及优先级见 [Agent 错误修复计划](b3_r1_agent_error_repair_plan.md)：
-36 条原错误中 1 条是监督暂停门禁，35 条是 Agent 请求被拒，另有 3 条 SDK/钩子失败；
-不把全部问题归责模型。
-后续计划已区分已实施与待修项，前三个交付修复另有提交和实际 wire 证明。
-追加段沿原 completed-invocation Handoff 保留旧 SDK/Store，恢复关闭阶段移除的合法工具；
-两个定向测试通过（5.566 s），新增中断恢复单项通过（3.336 s），均显式 mock HTTP。
-重开需要具体人工授权，不放宽普通 STOP 的封存规则。新原始授权与状态快照会写入原 Store，
-不建立新 Study、不重置累计账本，科学 profile 保持原版。
-追加段实际恢复到 `3b5d68bd8`、resolved_identity
-`023ff511358affa9f4cbcdf118b742a01f5e60ecea7c4916108e97ab0cd9df52`，
-原 STOP 状态已作为 `3ec99043dd08a2f5c198e92b53c3fef308c0159bf6413896aa93ca8cf48faf21`
-保存在原 Store；追加授权为 `450679a6abd1bb18bda17d1a9209b5e30cef730d70cf582e5c0e602f71b3588d`。
-在累计 Provider 103、公开操作 200 时再次暂停下一次发送，修复真实重现的派生视图 fields
-组合缺口。现在同一 EvidenceQuery 保持 working_set / mathematical_capabilities 后可选
-对象字段；错用 raw fields 时返回视图错误和实际可读查询，不存在字段明确列出。
-真实 `/control_result_links/3` 绑定查询投影为 459 bytes，零新增 Provider/数学/物理费用，
-见 [derived_fields_repair.json](../../evidence/b3_r1_history_assisted_050/derived_fields_repair.json)。
-迁移至 `58e84d45c` 后零请求恢复发现 SDK_INITIAL_CONTEXT_MISMATCH：实际新 Session
-`rh-aac8b869be6f496d091dde3a` 只有原初始消息和固定启动提示（带 SDK tracking_id），
-Handoff 提交后没有任何真实 Provider 发送。现对这一明确的未发送边界登记原 Store
-恢复证明，任意改写提示或提交后已有请求均不适用；不改旧响应，不声明 invocation 完成。
-三项定向 mock-HTTP 回归通过（6.557 s），本次修复仍无新增 Provider/数学/物理费用。
+唯一 Study `b3-r1-history-assisted-050` 最终为 **stopped / accepted**。
+主 Agent 完整读取 fresh 回放，精确 SELECT，配置的额外确认次数为 0，因此立即封存。
+没有在首次通过后启动新的科学实验。交付物是当前结构及一条完整开环张力序列，
+不是已验证可泛化的 NMPC 闭环策略。见
+[design_package.json](../../evidence/b3_r1_history_assisted_050/design_package.json)、
+[final_audit.json](../../evidence/b3_r1_history_assisted_050/final_audit.json)。
 
-以下初始预检快照保留原时间语义。用户随后在聊天明确批准 DeepSeek 地址/载荷及公开 GitHub
-分支披露；`7922de156` 已推送，唯一 R1 已真实运行。中断前累计 Provider 39/48、公开操作
-74/96、独立物理 2/4、NMPC 2/2，数学 0/26；没有 Agent STOP 或 SELECT。
-新结构与控制配方的组合把 holding_speed 降到 0.043009681835387996 m/s，仍未达到 0.02，
-不能将改善归因于结构单因素。两次 NMPC 原始结果、全部费用与失败均保留。
+| R1 独立评价 | 终点误差 m | 保持位置峰值 m | 保持速度峰值 m/s | 结论 |
+|---|---:|---:|---:|---|
+| 开局参考结构 NMPC | 0.003148373 | 0.006038027 | 0.111373944 | 完整失败，仅保持速度不满足 |
+| 新结构/新配方 NMPC | 0.004033428 | 0.004033428 | 0.043009682 | 完整失败，仅保持速度不满足 |
+| 同一新结构，native 优化序列的独立回放 | 0.004169056 | 0.004504720 | **0.019934320** | **全部验收项通过** |
+| 冻结上限 | 0.010000000 | 0.010000000 | 0.020000000 | 原 evaluator |
 
-Reporter 的 `_source_catalog` 丢弃 `working_set`/`mathematical_capabilities` 视图，把投影
-路径当作 raw JSON Pointer，准备 wire 时抛出 KeyError，进程退出；该失败没有发出 Reporter
-请求。修复保留 selected_reads 的完整查询，派生路径以原始 artifact 根作来源；不伪造 raw
-子路径。准备阶段也纳入既有 unavailable 回退，不让只读解释失败阻断主 Agent。
-五项定向离线回归通过（2.743 s），涵盖投影视图、准备失败零发送、来源 ID 拒绝、历史响应
-恢复及未知发送阻塞。另直接重建真实中断报告的三个查询，原事实和账本逐值未变，见
-[reporter_repair.json](../../evidence/b3_r1_history_assisted_050/reporter_repair.json)。
+保持速度余量仅 **0.00006568027 m/s（阈值的 0.3284%）**。全程 0.50 s，
+保持窗 [0.45,0.50] s 的六个采样点完整；张力边界、执行完整性和评价有效性均通过。
+原结果明确 continuous_time_guarantee=false。没有实机、扰动鲁棒性、连续时间保证、
+重复性或全局最优证明；本轮不追加成功确认或大型 Benchmark。
 
-用户明确要求修复后恢复，并在聊天选择 **新增 Provider 48、公开操作 96**：总上限变为
-96/192，保护额度仍 4/6，所有数学、独立物理、NMPC、native 积分上限不变。
-单次人工入口 `tests/research/b3_r1_resume.py` 只接受原 R1 身份及无占用/无悬账边界，
-在原 Store 中登记授权、更新原 grant/输入快照上限，再调用原 bind 显式迁移；不新建 Study、
-不重置或复制账本。修复前原归档已保存在 ignored runs，零请求 restore-only 已通过。
-增额已应用，实现迁移到 `b5362f9c3` 后原 restore-only 通过，真实 Reporter 成功返回 available，
-后续主请求 `e190bf14d55016ae5fb3f2f87ab110c56176e02d67be45877db9e95f94cc451a`
-继续含 24/3/4。累计 49 次请求时又定位到完整 native 方法读取的执行模板在 Handoff 摘要中
-丢失；最后实际反馈 `4d2e59104c19fc7f970e36c53d61fe072818c5ae56c5e0aa90f9b1463597b0f2`
-原有 1,454 字符模板，但原摘要只剩 candidate/operation。通过原 pending-binding 门禁阻止
-下一次请求，原反馈完成且无 pending/占用，未重置费用或伪造 STOP。
+## 授权、冻结与首段 STOP 的保留
 
-补充修复只在原目录提供精确 `request_template_query`，并让 Handoff 在原 3,000 bytes
-事实限额内保留模板、执行上限、必填参数与实测控制初始化信息。真实长反馈现在可保留
-2,849 bytes 的执行字段，不复制完整方法；原 L2 引用及“不提供完整读取信用”语义不变。
-三项定向回归通过（25.185 s）：原 M2 完整 wire/同会话/Handoff、长方法字段限额、原 SDK
-先配对再发送。真实反馈离线核验见
-[template_delivery_repair.json](../../evidence/b3_r1_history_assisted_050/template_delivery_repair.json)。
-本次补充提交后仍通过原显式 bind/restore-only 迁移；科学实现及 96/192 总上限不再改变。
+初始研究身份为 `a5754add34ed56639bacb431e256569d03a99c9094a1f7af63f75d56411b718a`，
+执行冻结从 `7283d07d652d2a382e16e2ba33e9b99533572414` 开始。
+最初自动审批要求聊天确认 DeepSeek 地址/数据范围及公开 GitHub 披露；用户分别确认后，
+`7922de156` 已推送并启动真实运行。出口始终为
+`https://api.deepseek.com/chat/completions`，使用 `deepseek-flash`。
+仅发送冻结任务、必要结构/控制、授权 M2 背景、工具定义及本 Study 反馈；凭据仅认证。
+[preflight.json](../../evidence/b3_r1_history_assisted_050/preflight.json) 保留初始零费用快照，
+不能把它当成最终账本。
 
-累计 58 次请求、107 次公开操作后，原迁移门禁再次在反馈结算后暂停。Agent 已实际使用
-精确模板查询，但多次为 diagnose 填写 MATHEMATICAL_ANALYSIS/CONTROL_SEARCH，原
-RESEARCH_INTENT_ACTION_MISMATCH 仅返回同名错误码。现由原 admit_decision 的唯一
-动作映射直接给出 action、所需 decision.research_intent 和收到值，error_feedback 标明
-字段；接受条件不变，没有另建映射或替 Agent 填值。定向原 Schema/错误反馈测试通过
-（1.066 s）；新增 fixture 初次多留了 execute 的 candidate payload，修正后通过，零科学。
+累计预算经三次明确聊天授权增加：
 
-### 初始预检及当时的审批状态（历史快照）
+| 阶段 | Provider 总额 | 公开操作总额 | 生命周期 |
+|---|---:|---:|---|
+| 初始 | 48 | 96 | 原唯一 Study |
+| 首次增额 | 96 | 192 | 同一累计账本，修复后继续 |
+| 第二次增额 | 144 | 192 | 用户选择再加 48 Provider |
+| 已封存非通过段后的授权追加段 | 144 | 288 | 用户明确批准 +96 公开操作并保留旧 STOP 继续 |
 
-R0 源码提交 **`78ca687fd893bfc805cfcaf1370ea62dd14dbf65`** 已普通推送，
-核对 `origin/feat/b3-r0-decision-efficiency` HEAD 完全相同，随后创建
-`research/b3-r1-autonomous-pilot`。R1 配置与 M2 策略监督入口提交
-**`7283d07d652d2a382e16e2ba33e9b99533572414`** 已推送；原科学源码未再修改。
+保护额度仍为 Provider 4、公开操作 6，包含在总额中。数学 26、独立物理 4、NMPC 2、
+回放 2、native 每次至多 24 callbacks/3 iterations/4 knots、总 native 积分 60,000、
+两结构各至多一次 NMPC/native 优化/完整回放、PPO 0 等科学上限均未提高。
 
-| 冻结项 | 实际登记 |
+首段在 Provider 99、公开操作 190 时因公开操作保护合法 STOP，并非 Provider 用尽。
+旧 STOP `90e356dcc684c02f4e557065afc9f982d235dd8b14e777b62bc8d6e35ae0221a`、
+其封存状态 `3ec99043dd08a2f5c198e92b53c3fef308c0159bf6413896aa93ca8cf48faf21`
+及全部收据/费用保存在原 Store，见 [closed_segment1.json](../../evidence/b3_r1_history_assisted_050/closed_segment1.json)。
+追加授权 `450679a6abd1bb18bda17d1a9209b5e30cef730d70cf582e5c0e602f71b3588d`
+经原 completed-invocation Handoff 建立新 SDK 会话，恢复关闭阶段移除的合法工具。
+普通 STOP 封存规则未放宽；模型没有获得自行重开或自动扩额工具。
+
+最终 resolved_identity 为 `023ff511358affa9f4cbcdf118b742a01f5e60ecea7c4916108e97ab0cd9df52`，
+实际执行冻结为 **`b00484525cbb4514896d50757755841d91fd2d01`**。
+全部迁移保留结果与费用，scientific profile 仍为 version 1、
+`ac839350f3b571664cdfbb38d88a90859971b21be7d8b06d0a420c1f95dea37c`；
+没有改变动力学、求解器、任务或独立评价的科学语义。
+
+## Agent 的实际研究路线与新信息
+
+1. 使用 M2 历史但重新执行参考结构 NMPC。Agent 假设显式保持/终端速度代价能进一步
+   降低历史余速；实际仍是参考配方，结果与旧参考速度 0.11137394399884916 m/s
+   一致，是新的 fresh 复现，不是新控制机制或性能改善。
+2. 自主生成新结构：近端首段 Young 模量 10.45→9.0 MPa；同时将保持/终端速度权重
+   0.1→1.0、制动提前量 0→0.06 s，并执行该候选自己的 NMPC。
+   原机器人差分还记录一处 angle_rad 浮点表示归一化，详见 physical_comparison.json。
+   Agent 依据参考结果仅速度超限，选择更强且提前生效的制动代价。速度降到
+   0.043009681835387996 m/s，仍失败。材料与配方同时改变，不能作结构单因素归因。
+3. 多次调用/引用错误后，成功绑定本结构实测 NMPC 序列。部分 diagnose Plan 仅完成
+   只读诊断，numerical_evidence=[]；两次早期 research_analysis 均在计算前被拒。
+   不能把这些记录描述为优化器已经运行或搜索证实失败。
+4. Agent 判断余速仍可通过当前结构的后段张力修正消除，授权追加段终于通过
+   research_analysis 执行 mujoco_direct_control_v1。
+   实际设置为 4 knots [0,0.3,0.4,0.5] s、8 个活跃系数、2 N 系数界、
+   24 次评估请求上限、最多 2 次外层迭代、safety_margin_fraction=0。
+   在原 0–0.50 s 全窗完成 **10 次 rollout、1 次响应更新**，局部目标达到即停。
+   最佳非线性预测速度 0.019934319730102207 m/s，数学结论仍为 native 数值诊断，
+   本身不授予任务通过信用。
+5. 对返回的精确序列执行独立完整回放。终点/保持位置/保持速度与 native 最佳预测
+   在记录精度内一致；原 evaluator 首次通过。随后公开完整读取并精确选择该回放，自动停止。
+
+最终序列来自 **当前新结构自己的实测 NMPC 输入**，不是把历史 M2 成功信用或控制源
+重新标为 fresh。相对该结构 NMPC，保持速度下降约 53.65%；相对历史 M2 C 最好速度
+0.08788779126447174 m/s，下降 **77.32%**。这证明当前固定新结构上的控制修正可以
+完成本名义任务，不能证明参考结构充分控制优化后不可行，也不能证明改结构额外有益。
+
+T1/T2、CONIC、dual-face 和相关模型组准备实际均为 **0**。
+真实 L0 持续给出 T2 registered/authorized/applicable=true、executable=false、
+missing_validated_model_stencil 和准确 preparation_query；进入保护后另有 protected_closeout。
+Agent 未读取或准备 T2 模型组，实际偏向实测输入的 native 控制路线。
+不是无数学预算或无授权，也没有新证据证明 T2 平坦、退化或无效。
+
+113 个主请求中，真正发起新科学计算并产生结果的主请求为 **#5、#16、#109、#111**：
+两次 NMPC、一次 native 分析、一次独立回放。#5 是历史结果的 fresh 复现；
+其余三个带来不同性能、控制见证及任务验收信息。Reporter 解释与历史阅读不计作新科学计算。
+追加段合计新增 **18 次 Provider、30 次公开操作、1 次数学分析、1 次独立回放**。
+这不是修复有效性的受控对照，不能单独作因果效率结论。
+
+## 交付与恢复中实际修复的缺口
+
+| 提交 | 最终行为及定向验证 |
 |---|---|
-| 新 Study | b3-r1-history-assisted-050 |
-| resolved_identity | a5754add34ed56639bacb431e256569d03a99c9094a1f7af63f75d56411b718a |
-| 当前实现 freeze | 7283d07d652d2a382e16e2ba33e9b99533572414 |
-| 原 Store formal_study_authorization | cc93c4e295158720cc6600d4c67fa2e8392d8c0b8b9bc90f01fe7f6181297734 |
-| 原 Handoff 准入 | 47459b9e33a370aaf42c3d6b5a27dfa72d9eef16838b5e17f9c48dd71bcabcd3 |
-| 原准入证明 | c3_handoff_admission_20261025 / aaaf83b7e9f8e2c8e573e42cc7bcef163197d83edcc9537322b97bfee4ac4a88 |
-| 本 Study 参考候选 | cb6db6255de7cfbe1c3286c171c90770ed4856a473a249845748de1636e31453 |
-| 合法导入后的控制源 | 2a554eeb59e44ac776b68a3d7a573e6c11017cd6dfb762569dc733212e13d3ea |
+| b5362f9c3 | Reporter 保留派生查询 view，raw 引用不伪造投影子路径；准备失败回退，五项测试 2.743 s；真实恢复报告 available |
+| 69a82930f | 精确 request_template_query，原 Handoff 3,000 bytes 内保留模板/限制/初始化，三项测试 25.185 s；真实长反馈保留 2,849 bytes |
+| a29f37134 | 原动作意图映射直接返回所需字段和值，不复制验证权威；定向测试 1.066 s |
+| 3b5d68bd8 | 仅明确授权的非通过 STOP 可追加段，原 Handoff/旧状态/费用保留；两项测试 5.566 s，中断恢复单项 3.336 s |
+| 58e84d45c | 派生视图保留 view 后选择对象 fields；错用 raw 路径返回经原读取器验证的查询及缺键，三项测试 16.493 s，补充单项 22.671 s |
+| 19b3cc1b6 | 只恢复固定初始消息/固定提示且 Handoff 后尚无发送的 SDK 边界；任意改写仍拒绝，三项测试 6.557 s |
+| b00484525 | 原快照/响应按旧 Schema 验真，新请求再更新当前查询 Schema；定向测试 3.241 s |
 
-Provider 48（保护 4）、公开操作 96（保护 6）、数学 26、独立物理 4、NMPC 2、完整回放 2；
-两结构各至多一次 NMPC、native 分析及完整回放。native 每次最多 24 callbacks、3 iterations、4 knots，
-全 Study native 积分最多 60,000；PPO 0。监督入口复用 M2 的原 dispatch 前配方/机会核对，
-增加此轮 native 单结构/总次数与原 raw cost.physics_steps 核对；保守请求步数上界包括前缀。
-它通过 `runpy` 执行原 `python -m tools.research run`，不替 Agent 选实验、不改 Plan、
-不替代 Worker、调度器或账本。完成 operation ID 仍走原收据幂等复用。
+所有测试显式离线/mock HTTP，未为测试新增真实科学执行。对真实追加段失败请求的离线纠正
+可得到 **459 bytes** 的绑定字段结果；不冒充新增实际发送。原错误、失败与历史 Snapshot 未改写。真实新请求
+`750f31021872678dc1f10dfcd86038d80fa19be875489ff8240c91aac0812888`
+已含新 fields 说明、24/3/4 限制和追加授权说明，且未处于保护。
+首次科学反馈后的实际完整 wire 及后续迁移证据见 first_feedback_wire.json、
+reporter_repair.json、template_delivery_repair.json、derived_fields_repair.json、final_audit.json。
 
-已由原 prepare/bind、formal_study_authorization/scope_identity、provider_egress_authorization、
-`archived` 准入证明核验及 `import_history` 完成独立准备。
-原 control_seeds 接口可以直接导入 C 已独立回放的完整张力序列；源
-`30994c15d28a3b1b434d1f4cdc252199773e3eb4c9888a4b47b3870ac8d004ea`、原候选、
-任务、通道、时间网格和实际张力边界保留，当前接受状态为 **unmeasured**。
-未将历史 result 注册成当前 results/analysis_results/physical_replays，未产生新 SELECT。
-历史 B NMPC 与 C 回放的 L0 结论均保留原 Study、原数值与精确 L1 查询。
+## 科研效率、错误与后续计划
 
-冻结 canonical_task 与 M2 C 逐值相同。原 s135 Python/Worker 的 NumPy 2.4.6、SciPy 1.17.1、
-CasADi 3.7.2、MuJoCo 3.13.0、CVXPY 1.9.3、Clarabel 0.11.1 可导入，三项线程均 1；
-Host compatibility=true，无 pending/占用。没有启动科学环境试算。
-另用 production decision_packet/formatter、当前 Schema、冻结 system instructions 和原工具声明，
-构造 **74,525 bytes** 离线完整请求：24/3/4、两个历史速度与 T2 已授权缺组准备入口均可见。
-这是未发送的请求构造检查，不能当成模型已经收到或理解。
-详见 [preflight.json](../../evidence/b3_r1_history_assisted_050/preflight.json)。
+| 同口径原 Store 统计 | M2 B | M2 C | R1 累计两段 |
+|---|---:|---:|---:|
+| Provider，主 Agent + Reporter | 32，31+1 | 29，26+3 | 117，113+4 |
+| tool_request_error | 13 | 9 | 42（含 1 次监督迁移门禁） |
+| candidate mismatch | 4 | 1 | **0** |
+| evidence_read | 26 | 19 | 178 |
+| 完全相同读取载荷重复 | 8 | 4 | 76 |
+| 只读主请求 | 18 | 11 | 90 |
 
-### 自动审批拦截与恢复边界
+R1 另有 3 条 SDK/钩子失败（临时引用失效 2、收尾动作钩子 1），合计 45 个原始失败工具反馈。
+不能把监督门禁归责 Agent，也不能把全部路径拒绝归为模型故意忽略已知字段。
+具体错误与完整原输入查询见 [agent_error_inventory.json](../../evidence/b3_r1_history_assisted_050/agent_error_inventory.json)。
+完全相同请求可能读取已变化的动态视图，76 不等于 76 次无价值读取；但最终整体读取比例
+与错误/重复数仍高。候选绑定和真实约束可见性改善，不代表科研效率已经充分解决。
 
-R0 普通提交/push 最初被自动审批以“未核实远端/载荷”拒绝；之后通过连接的 GitHub
-`get_repo` 确认任务指定仓库为 public 且有 push 权限，八个 R0 文件的凭据字面量检查为 0，
-将本地 commit 与远端 push 分开提交复核后均获准，没有改出口或绕过审批。
+[Agent 错误修复计划](b3_r1_agent_error_repair_plan.md) 已分清已实施和待实施：
+优先继续改善已有绑定源/来源状态的短包、raw/wrapper 查询配对、意图 Schema 的单一映射、
+只读诊断与实际计算状态、列表对象 fields 的具体导航及 STOP 预算表述。
+不新建 Agent、Store、计费账本、搜索器或通用调度框架。
 
-R1 隐藏后台启动在 **shell 进程创建前** 被自动审批拒绝，原理由为：
+## 最终资源与结论范围
 
-> the transcript lacks trusted user authorization specifying that sensitive payload and destination.
+| 资源 | 实际消耗 | 未使用 |
+|---|---:|---:|
+| Provider / 公开操作 | 117 / 220 | 27 / 68 |
+| 数学分析原账本 | 1 | 25 |
+| 独立物理 / NMPC / 完整回放 | 3 / 2 / 1 | 1 / 0 / 1 |
+| NMPC 在线 NLP | 10（两次各 5，均达迭代上限但按原规则可用） | 不解释为收敛 |
+| T1/T2 模型准备 / CONIC / dual-face / PPO | 0 / 0 / 0 / 0 | 原上限保留 |
+| native model build / callbacks / rollouts / response step | 1 / 10 / 10 / 1 | 上限未用尽 |
+| native 外层迭代 / 内部局部 solver 迭代 | 1 / 16 | 两个不同口径 |
+| native 积分 / 独立物理积分 | 10,000 / 3,000 | 总实际 MuJoCo 积分 13,000 |
 
-被拒操作是运行原 CLI 监督入口，拟向 **https://api.deepseek.com/chat/completions** 发送
-冻结 B3 任务、必要机器人结构/控制参数、显式授权的 M2 历史摘要、工具定义和本 Study 新反馈。
-附件确实声明此范围，但运行审批仍要求聊天中的可信确认；已向用户呈现具体范围并请求确认，
-不将 Store 中由助手登记的 scope 当作绕过环境审批的凭证。
-该命令没有执行、没有加载运行凭据、没有建立后台研究进程、没有 Provider 发送。
+Provider 原接收 usage：主 Agent 4,942,458 tokens，Reporter 76,808，总计 **5,019,266**；
+金额未由原回执提供，记为 unknown。原共享 wall 计费 6,265.649 s，numerical_s=959.233 s；
+它们与 worker/kernel 时间属于不同口径，不能重复相加收费。
+最终所有 117 个唯一请求均确认 HTTP 200，无未知发送、pending、占用、未消费响应或悬账。
+停止原因是首次 fresh 独立通过及精确选择，不能把剩余额度写成耗尽。
+公开操作是原共享账本的工具操作：178 次 evidence_read、12 次 retrieve_context、
+20 次 Plan、3 次 analysis、1 次 investigate，加上原执行链 simulation/evaluation/profile
+各 2 次，共 220。原 Agent 工具请求 214 与共享账本 220 是两个明确口径。
 
-本报告、收紧后的 R0 对照及 R1 preflight 的最终普通推送亦在进程创建前被自动审批拒绝：
-它认为新的 R1 preflight 和详细科研 scope/metadata 向公开 GitHub 仓库披露尚缺明确出口授权。
-因此这些最终材料仅本地提交，**没有推送**；已推送的 R0 实现及 R1 配置提交仍保留。
-拟披露范围仅为本报告、零费用 R1 preflight、精简 R0 对照及现有测试收紧，
-目的地是任务指定的公开 `wran021004-gif/softrobot-agent` 研究分支，不含凭据。
-未通过改传输方式、换目的地或减少检查绕过拒绝；其后只完成无外发的本地提交。
+工程链路已接通并实际交付；Agent 最终正确完成源绑定、native 计算和 fresh 选择，但效率仍差。
+新数学信息是当前结构上的 native 非线性控制见证；新独立物理信息是其名义完整任务通过。
+结构修改的额外价值仍未证明。后续科学问题是极小通过余量是否稳定，以及相等控制机会下
+参考结构能否同样通过；需另行授权的对照或鲁棒性研究，本轮不继续。
 
-### 截止此交付的科学状态
+## 可复核交付与原引用
 
-新 Study 的 research_status=ready，**尚未运行**，也没有由 Agent 提交 STOP 或 SELECT。
-Provider、公开操作、数学计费、模型准备、CONIC、对偶、NMPC、native rollout、native 积分、
-独立物理及 PPO 均为 **0**；所有上限完整保留。不是 Provider 保护造成额度未用。
-没有实际 Agent 路线、T1/T2、结构修改、结构控制重优化、首次科学反馈或后续 wire 可审计；
-因此本轮尚不能比较 M2 的工具错误/重复读取，也没有“产生新科学信息的 Provider 请求”。
+最终设计包、configuration/disposition/ledger/calls、review/final_audit、原不可变 artifacts
+及 snapshot 已由原 export 导出到 `evidence/b3_r1_history_assisted_050`。
+完整归档只保留一份累计版本，首段封存状态和 STOP 仍在其中；初始 preflight 保留其时间语义。
+archive_manifest 给出原归档与成员身份；凭据扫描通过，见 delivery_verification.json。
 
-工程能力已由离线真实 Schema/完整 wire/原 Store 路由验证接通；
-**R1 模型实际收到证据、正确使用证据、新数学信息、新独立物理改善、结构额外价值均未验证。**
-不能从暂停于启动前推断科研策略成败、固定结构不可行或 T2 无价值。
-控制搜索不足、同输入 GVS/MuJoCo 预测失配和结构能力仍未区分；暂不能依据新研究结果
-选择改控制、局部数学模型还是结构参数，须等待这唯一 Study 的真实自主行动。
+| 对象 | 原 artifact_id |
+|---|---|
+| 当前结构 | e85fc8e3eb57e05bfef71db74885db619ce316f90cb9e9b88dc3e971e01f7543 |
+| 本结构 NMPC 实测输入来源 | e3a06aa1b8d89ec98216cf6d86edfe264c22f8f725b453ded02e1ed0cfaa4a48 |
+| native 数学结果 | bc67e08a41e529120c54086ba2e0dcf16f0b6de35fff941b054165f658089ff8 |
+| 优化后完整控制序列 | b34d0feb1a38617f8b7dadd8c7aea92c08940042124786de359ccc0d5c8f2115 |
+| fresh 独立通过结果/选择对象 | b5b6cac95a96ab3ce235cb1e4244ffdaa5de34777ec379788d32a8b1adbda95f |
+| 原独立 evaluator | e9071ee24a4c62123c8651729e1bb851c1b72a0735935958e28d899da159ef5a |
+| 完整仿真轨迹 | 5ff0ffeed6ef9c35ea34d8360b8f4e94cf78f29906f2b5625d5e1b2be1937250 |
+| selected_solution | 5665d483dfc7873f6349f3cc84114d96696ccf76e9d6e97d93dbea8c9abe50ac |
+| 最终 SELECT disposition | a445b9128435365e9c7429fea54329ea6a3a958351e2b604170752619c1af0d8 |
 
-恢复应使用同一个已冻结 Store，经聊天出口批准后运行
-`python -m tests.research.b3_r1_supervision`，不重新 prepare、不重置预算、不新建 Study。
-只有原 settled supervisor_pause 后复核通过才加 `--reviewed`，它不增加任何额度。
-用户若批准，继续完成首次科学反馈后 wire 抽查、真实 Stop/Select、原导出及最终科研审计；
-当前只交付可审阅的准备，不声称已完成 R1。
+普通推送目标始终为 `wran021004-gif/softrobot-agent` 的
+`research/b3-r1-autonomous-pilot`。执行冻结 SHA 与后续文档/证据交付提交分开；
+最终交付 SHA、远端 HEAD 和工作树状态在推送核对后于聊天报告。

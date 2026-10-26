@@ -1,0 +1,137 @@
+{
+  "candidates": [
+    {
+      "artifact_id": "cb6db6255de7cfbe1c3286c171c90770ed4856a473a249845748de1636e31453",
+      "media_type": "application/json"
+    },
+    {
+      "artifact_id": "e85fc8e3eb57e05bfef71db74885db619ce316f90cb9e9b88dc3e971e01f7543",
+      "media_type": "application/json"
+    }
+  ],
+  "robot_changes": [
+    {
+      "pointer": "/structure/data/components/0/physics/young_pa",
+      "reference": 10450000.0,
+      "variant": 9000000.0
+    },
+    {
+      "pointer": "/structure/data/components/3/sections/1/section/angle_rad",
+      "reference": 0.15000000000000002,
+      "variant": 0.15
+    }
+  ],
+  "controller_changes": [
+    {
+      "pointer": "/parameters/data/recipe/holding_brake_lead_s",
+      "reference": 0.0,
+      "variant": 0.06
+    },
+    {
+      "pointer": "/parameters/data/recipe/holding_tip_speed_weight",
+      "reference": 0.1,
+      "variant": 1.0
+    },
+    {
+      "pointer": "/parameters/data/recipe/terminal_tip_speed_weight",
+      "reference": 0.1,
+      "variant": 1.0
+    }
+  ],
+  "task_equal": true,
+  "other_physics_equal": true,
+  "metrics": [
+    {
+      "reference": {
+        "artifact_id": "651300992f1ef43c30e49e8df1446fdde783dedeeabc44ed91bedb06a75868f8",
+        "media_type": "application/json"
+      },
+      "holding_max_error_m": 0.006038027478928508,
+      "holding_max_speed_m_s": 0.11137394399884916,
+      "terminal_error_m": 0.003148372648914904
+    },
+    {
+      "reference": {
+        "artifact_id": "629f68ead132e519aeede8727566481e4fc077eef63cf1c9bcccab87f48b208f",
+        "media_type": "application/json"
+      },
+      "holding_max_error_m": 0.0040334275990930235,
+      "holding_max_speed_m_s": 0.043009681835387996,
+      "terminal_error_m": 0.0040334275990930235
+    },
+    {
+      "reference": {
+        "artifact_id": "b5b6cac95a96ab3ce235cb1e4244ffdaa5de34777ec379788d32a8b1adbda95f",
+        "media_type": "application/json"
+      },
+      "holding_max_error_m": 0.00450472040935653,
+      "holding_max_speed_m_s": 0.019934319730102207,
+      "terminal_error_m": 0.004169056300314731
+    }
+  ],
+  "versus_m2_c_peak_speed_improvement_fraction": 0.7731844270597733,
+  "selected": {
+    "artifact_id": "b5b6cac95a96ab3ce235cb1e4244ffdaa5de34777ec379788d32a8b1adbda95f",
+    "media_type": "application/json"
+  },
+  "selected_candidate": {
+    "artifact_id": "e85fc8e3eb57e05bfef71db74885db619ce316f90cb9e9b88dc3e971e01f7543",
+    "media_type": "application/json"
+  },
+  "selected_source": {
+    "artifact_id": "b34d0feb1a38617f8b7dadd8c7aea92c08940042124786de359ccc0d5c8f2115",
+    "media_type": "application/json"
+  },
+  "native_analysis": {
+    "artifact_id": "bc67e08a41e529120c54086ba2e0dcf16f0b6de35fff941b054165f658089ff8",
+    "media_type": "application/json"
+  },
+  "native_cost": {
+    "completed_response_steps": 1,
+    "forward_evaluations": 1011,
+    "kernel_wall_s": 0.7707481999996162,
+    "mechanics_evaluations": 0,
+    "model_builds": 1,
+    "optimization_evaluations": 10,
+    "optimization_iterations": 1,
+    "physics_steps": 10000,
+    "rollouts": 10
+  },
+  "native_settings": {
+    "active_coefficients": [
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15
+    ],
+    "coefficient_limit_n": 2.0,
+    "correction_window_s": [
+      0.0,
+      0.5
+    ],
+    "difference_step_n": 0.05,
+    "evaluation_requests": 24,
+    "initial_radius_n": 0.1,
+    "iterations": 2,
+    "knots_s": [
+      0.0,
+      0.3,
+      0.4,
+      0.5
+    ],
+    "method": "response",
+    "minimum_radius_n": 0.0001,
+    "safety_margin_fraction": 0.0,
+    "version": "local_control_search_v2"
+  },
+  "native_prediction_matches_independent_replay": true,
+  "same_variant_candidate": true,
+  "versus_variant_nmpc_peak_speed_improvement_fraction": 0.5365155267505276,
+  "speed_margin_m_s": 6.56802698977936e-05,
+  "speed_margin_fraction": 0.003284013494889715,
+  "limitations": "One frozen nominal sampled simulation; no hardware, robustness, repeatability, continuous-time or structure-only causal claim."
+}

@@ -1,60 +1,72 @@
 {
   "study": "b3-r1-history-assisted-050",
-  "freeze": "4e4a7e25d3f207ed96bb49e317cea66d8b381d20",
+  "freeze": "b00484525cbb4514896d50757755841d91fd2d01",
   "status": "stopped",
-  "snapshot_event": 1843,
+  "snapshot_event": 2182,
   "ledger": {
     "limit": {
       "backend_solves": 4,
       "model_calls": 144,
-      "tool_calls": 192,
+      "tool_calls": 288,
       "wall_s": null,
       "worker_calls": 0
     },
     "used": {
-      "tool_calls": 190,
-      "model_calls": 99,
-      "backend_solves": 2,
+      "tool_calls": 220,
+      "model_calls": 117,
+      "backend_solves": 3,
       "worker_calls": 0,
-      "wall_s": 5678.730999999936
+      "wall_s": 6265.649378899938
     },
     "remaining": {
-      "backend_solves": 2,
-      "model_calls": 45,
-      "tool_calls": 2,
+      "backend_solves": 1,
+      "model_calls": 27,
+      "tool_calls": 68,
       "wall_s": null,
       "worker_calls": 0
     },
     "occupied": {}
   },
-  "raw_error_records": 36,
-  "agent_request_rejections": 35,
+  "raw_error_records": 42,
+  "agent_request_rejections": 41,
   "supervisor_gate_rejections": 1,
   "by_code": {
-    "INVALID_EVIDENCE_POINTER": 22,
+    "INVALID_EVIDENCE_POINTER": 25,
     "extra_forbidden": 1,
     "EVIDENCE_MISSING_OR_CHANGED": 1,
     "missing": 2,
-    "RESEARCH_INTENT_ACTION_MISMATCH": 3,
+    "RESEARCH_INTENT_ACTION_MISMATCH": 4,
     "EVIDENCE_RANGE_REQUIRES_LIST_POINTER": 3,
     "NATIVE_ANALYSIS_REQUIRES_EXACT_STATE_OR_FROZEN_INITIALIZATION": 1,
-    "UNREGISTERED_RESEARCH_EVIDENCE": 1,
-    "PROTECTED_EVIDENCE_READ_REQUIRES_NEW_RESULT_OR_TRAINING_SUMMARY": 1
+    "UNREGISTERED_RESEARCH_EVIDENCE": 2,
+    "PROTECTED_EVIDENCE_READ_REQUIRES_NEW_RESULT_OR_TRAINING_SUMMARY": 1,
+    "EVIDENCE_FIELDS_REQUIRES_OBJECT_POINTER": 1
   },
   "tool_counts": {
-    "evidence_read": 156,
-    "retrieve_context": 10,
-    "research_plan": 15,
-    "research_analysis": 2,
+    "evidence_read": 178,
+    "retrieve_context": 12,
+    "research_plan": 20,
+    "research_analysis": 3,
     "research_investigate": 1
   },
-  "evidence_reads": 156,
-  "exact_read_payload_repetitions": 64,
+  "evidence_reads": 178,
+  "exact_read_payload_repetitions": 76,
   "frequent_read_payloads": [
     {
-      "count": 14,
+      "count": 15,
       "input": {
         "pointer": "/methods/mujoco_direct_control_v1",
+        "reference": {
+          "artifact_id": "e85fc8e3eb57e05bfef71db74885db619ce316f90cb9e9b88dc3e971e01f7543",
+          "media_type": "application/json"
+        },
+        "view": "mathematical_capabilities"
+      }
+    },
+    {
+      "count": 10,
+      "input": {
+        "pointer": "/methods/mujoco_direct_control_v1/request_template",
         "reference": {
           "artifact_id": "e85fc8e3eb57e05bfef71db74885db619ce316f90cb9e9b88dc3e971e01f7543",
           "media_type": "application/json"
@@ -74,18 +86,7 @@
       }
     },
     {
-      "count": 8,
-      "input": {
-        "pointer": "/methods/mujoco_direct_control_v1/request_template",
-        "reference": {
-          "artifact_id": "e85fc8e3eb57e05bfef71db74885db619ce316f90cb9e9b88dc3e971e01f7543",
-          "media_type": "application/json"
-        },
-        "view": "mathematical_capabilities"
-      }
-    },
-    {
-      "count": 7,
+      "count": 9,
       "input": {
         "count": 20,
         "pointer": "/control_result_links",
@@ -158,7 +159,7 @@
       "classification": "protected_tool_hook_rejection"
     }
   ],
-  "failed_original_feedback": 39,
+  "failed_original_feedback": 45,
   "errors": [
     {
       "event": 35,
@@ -1350,12 +1351,230 @@
       "expected": "Only current result references are readable during closeout; use all_fresh_results and select a fresh pass or STOP",
       "scientific_execution_started": false,
       "classification": "agent_request_rejection"
+    },
+    {
+      "event": 1881,
+      "reference": {
+        "artifact_id": "03c90fe6825c46951a40c38987f9e9169df4ae7e862f1ebcae829ec8c5bfde4b",
+        "media_type": "application/json"
+      },
+      "tool": "evidence_read",
+      "tool_id": "call_01_OfvxMfwOFix3Jg7C0cZJ8311",
+      "action": null,
+      "input_excerpt": {
+        "fields": [
+          "candidate",
+          "source",
+          "source_kind",
+          "grid",
+          "evaluation_reference",
+          "execution_references"
+        ],
+        "pointer": "/control_result_links/2",
+        "reference": {
+          "artifact_id": "651300992f1ef43c30e49e8df1446fdde783dedeeabc44ed91bedb06a75868f8",
+          "media_type": "application/json"
+        },
+        "view": "fields"
+      },
+      "full_input_query": {
+        "reference": {
+          "artifact_id": "03c90fe6825c46951a40c38987f9e9169df4ae7e862f1ebcae829ec8c5bfde4b",
+          "media_type": "application/json"
+        },
+        "view": "full",
+        "pointer": "/tool_use/input"
+      },
+      "message": "'control_result_links'",
+      "code": "INVALID_EVIDENCE_POINTER",
+      "field": "fields",
+      "expected": "Available children at /: acceptance, cached_operation_receipt, candidate, candidate_artifact_reuse_does_not_reuse_execution, candidate_id, evaluation_version, execution, execution_id, facts_classification, failure_categories, fresh_execution, implementation, mechanics_context, numerical_environment, numerical_s, operation_key, owner_run_id, owning_study, profile, profile_identity, role, runtime_observation, science_hashes, scientific_configuration, scientific_identity, selected_execution, status",
+      "scientific_execution_started": false,
+      "classification": "agent_request_rejection"
+    },
+    {
+      "event": 1886,
+      "reference": {
+        "artifact_id": "4f3af080b03fbe0f53a649ccdbe264c8de894515de1caeb592247c7a0807dfc1",
+        "media_type": "application/json"
+      },
+      "tool": "evidence_read",
+      "tool_id": "call_02_pGe26rEKUgUpiZVfgVNe2092",
+      "action": null,
+      "input_excerpt": {
+        "fields": [
+          "candidate",
+          "source",
+          "source_kind",
+          "grid",
+          "evaluation_reference",
+          "execution_references"
+        ],
+        "pointer": "/control_result_links/3",
+        "reference": {
+          "artifact_id": "651300992f1ef43c30e49e8df1446fdde783dedeeabc44ed91bedb06a75868f8",
+          "media_type": "application/json"
+        },
+        "view": "fields"
+      },
+      "full_input_query": {
+        "reference": {
+          "artifact_id": "4f3af080b03fbe0f53a649ccdbe264c8de894515de1caeb592247c7a0807dfc1",
+          "media_type": "application/json"
+        },
+        "view": "full",
+        "pointer": "/tool_use/input"
+      },
+      "message": "'control_result_links'",
+      "code": "INVALID_EVIDENCE_POINTER",
+      "field": "fields",
+      "expected": "Available children at /: acceptance, cached_operation_receipt, candidate, candidate_artifact_reuse_does_not_reuse_execution, candidate_id, evaluation_version, execution, execution_id, facts_classification, failure_categories, fresh_execution, implementation, mechanics_context, numerical_environment, numerical_s, operation_key, owner_run_id, owning_study, profile, profile_identity, role, runtime_observation, science_hashes, scientific_configuration, scientific_identity, selected_execution, status",
+      "scientific_execution_started": false,
+      "classification": "agent_request_rejection"
+    },
+    {
+      "event": 1891,
+      "reference": {
+        "artifact_id": "6a965f92c106e8e8fe84ef59042b93121b555b1ff249c54f6711f97528077eea",
+        "media_type": "application/json"
+      },
+      "tool": "evidence_read",
+      "tool_id": "call_03_34mbFifjRQkGk1OY0OLg7859",
+      "action": null,
+      "input_excerpt": {
+        "fields": [
+          "candidate",
+          "source",
+          "source_kind",
+          "grid",
+          "evaluation_reference",
+          "execution_references"
+        ],
+        "pointer": "/control_result_links/4",
+        "reference": {
+          "artifact_id": "651300992f1ef43c30e49e8df1446fdde783dedeeabc44ed91bedb06a75868f8",
+          "media_type": "application/json"
+        },
+        "view": "fields"
+      },
+      "full_input_query": {
+        "reference": {
+          "artifact_id": "6a965f92c106e8e8fe84ef59042b93121b555b1ff249c54f6711f97528077eea",
+          "media_type": "application/json"
+        },
+        "view": "full",
+        "pointer": "/tool_use/input"
+      },
+      "message": "'control_result_links'",
+      "code": "INVALID_EVIDENCE_POINTER",
+      "field": "fields",
+      "expected": "Available children at /: acceptance, cached_operation_receipt, candidate, candidate_artifact_reuse_does_not_reuse_execution, candidate_id, evaluation_version, execution, execution_id, facts_classification, failure_categories, fresh_execution, implementation, mechanics_context, numerical_environment, numerical_s, operation_key, owner_run_id, owning_study, profile, profile_identity, role, runtime_observation, science_hashes, scientific_configuration, scientific_identity, selected_execution, status",
+      "scientific_execution_started": false,
+      "classification": "agent_request_rejection"
+    },
+    {
+      "event": 2026,
+      "reference": {
+        "artifact_id": "1d05dc4324513d37a61c9b667ab587b6df0cf6924aeb2291dc4a9cab2e7bcbca",
+        "media_type": "application/json"
+      },
+      "tool": "research_plan",
+      "tool_id": "call_00_fVEl31byzq3l5Z7RHMaU9365",
+      "action": "diagnose",
+      "input_excerpt": {
+        "action": "diagnose",
+        "candidate": null
+      },
+      "full_input_query": {
+        "reference": {
+          "artifact_id": "1d05dc4324513d37a61c9b667ab587b6df0cf6924aeb2291dc4a9cab2e7bcbca",
+          "media_type": "application/json"
+        },
+        "view": "full",
+        "pointer": "/tool_use/input"
+      },
+      "message": "RESEARCH_INTENT_ACTION_MISMATCH: action=diagnose requires decision.research_intent=DIAGNOSE; received=MATHEMATICAL_ANALYSIS",
+      "code": "RESEARCH_INTENT_ACTION_MISMATCH",
+      "field": "decision.research_intent",
+      "expected": "RESEARCH_INTENT_ACTION_MISMATCH: action=diagnose requires decision.research_intent=DIAGNOSE; received=MATHEMATICAL_ANALYSIS",
+      "scientific_execution_started": false,
+      "classification": "agent_request_rejection"
+    },
+    {
+      "event": 2063,
+      "reference": {
+        "artifact_id": "d108b04b01735cc441b969d4940f8ef82535238581a5455be03520eff300c362",
+        "media_type": "application/json"
+      },
+      "tool": "research_plan",
+      "tool_id": "call_00_Qplk1qnK8idXApOpCV0d1537",
+      "action": "diagnose",
+      "input_excerpt": {
+        "action": "diagnose"
+      },
+      "full_input_query": {
+        "reference": {
+          "artifact_id": "d108b04b01735cc441b969d4940f8ef82535238581a5455be03520eff300c362",
+          "media_type": "application/json"
+        },
+        "view": "full",
+        "pointer": "/tool_use/input"
+      },
+      "message": "UNREGISTERED_RESEARCH_EVIDENCE",
+      "code": "UNREGISTERED_RESEARCH_EVIDENCE",
+      "field": "supporting_evidence",
+      "expected": "Readable does not mean registered. Query working_set /citation_eligibility; use only registered references whose supported_inferences match the claim. Reading does not register evidence.",
+      "scientific_execution_started": false,
+      "classification": "agent_request_rejection"
+    },
+    {
+      "event": 2131,
+      "reference": {
+        "artifact_id": "f49dfb08262c5467fa71f62eb06402bbd47cfe1246c057adf13dfdec852a34be",
+        "media_type": "application/json"
+      },
+      "tool": "evidence_read",
+      "tool_id": "call_00_UEvTFqGCsKbicHZBMKP60284",
+      "action": null,
+      "input_excerpt": {
+        "fields": [
+          "artifact_id",
+          "candidate",
+          "kind",
+          "role",
+          "method",
+          "status",
+          "source",
+          "media_type",
+          "task_acceptance"
+        ],
+        "pointer": "/control_result_links",
+        "reference": {
+          "artifact_id": "651300992f1ef43c30e49e8df1446fdde783dedeeabc44ed91bedb06a75868f8",
+          "media_type": "application/json"
+        },
+        "view": "working_set"
+      },
+      "full_input_query": {
+        "reference": {
+          "artifact_id": "f49dfb08262c5467fa71f62eb06402bbd47cfe1246c057adf13dfdec852a34be",
+          "media_type": "application/json"
+        },
+        "view": "full",
+        "pointer": "/tool_use/input"
+      },
+      "message": "EVIDENCE_FIELDS_REQUIRES_OBJECT_POINTER",
+      "code": "EVIDENCE_FIELDS_REQUIRES_OBJECT_POINTER",
+      "field": null,
+      "expected": "EVIDENCE_FIELDS_REQUIRES_OBJECT_POINTER",
+      "scientific_execution_started": false,
+      "classification": "agent_request_rejection"
     }
   ],
   "science": {
-    "math": 0,
+    "math": 1,
     "nmpc": 2,
-    "physical_replays": 0
+    "physical_replays": 1
   },
   "scope": "Observed request failures, not all failures of reasoning. Exact repeat counts do not establish unchanged dynamic content or wasted reads. Reporter preparation crash is a separate delivery defect, not a tool-request rejection."
 }
