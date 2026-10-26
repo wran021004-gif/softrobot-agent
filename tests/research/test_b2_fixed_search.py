@@ -118,6 +118,8 @@ class FixedB2Tests(unittest.TestCase):
                 self.execute_fixture(folder, budget_failure=True)
             self.assertEqual(read(folder/'result/cost.json')['physics_step_attempts'], 2)
             self.assertEqual(read(folder/'result/summary.json')['status'], 'stopped_with_error')
+            self.assertTrue((folder/'result/0.2-0.018-zero-progress/native_progress_0000.json').exists())
+            self.assertTrue((folder/'result/0.2-0.018-zero-progress/native_progress_0001.json').exists())
 
 
 if __name__ == '__main__':

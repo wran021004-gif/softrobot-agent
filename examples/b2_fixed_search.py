@@ -192,7 +192,7 @@ def run(value, folder, approval, mode):
                         args = prepared(cfg, value, initial)
                         atomic_json(folder / (label+'-configuration.json'), cfg)
                         result = phase(label+'-search', lambda: calculate(cfg, *args,
-                            checkpoint=lambda name, data: atomic_json(folder / (label+'-progress.json'), data)))
+                            checkpoint=lambda name, data: atomic_json(folder / (label+'-progress') / (name+'.json'), data)))
                         atomic_json(folder / (label+'-search.json'), result)
                         schedule = result['native_dynamics']['optimized_schedule']
                         inp, physics, scene = binding(cfg, schedule['trajectory'])
