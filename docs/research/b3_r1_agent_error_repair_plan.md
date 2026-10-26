@@ -56,6 +56,9 @@ research_analysis **2** 次、research_investigate **1** 次。156 次 evidence_
    已验证且提交后没有任何 r3_request 时，登记未发送调用的恢复证明；不伪造完成记录。
    三项定向测试通过（6.557 s），包括任意改写提示拒绝、旧响应改写拒绝、追加段中断恢复。
    这是工程恢复缺口，单独计数，不能归入 Agent 参数错误或科学失败。
+6. 恢复时继续核验原保存 Schema；新 before_model 请求再从当前冻结契约更新 evidence_read /
+   research_investigate 的 Schema。定向旧快照→新请求回归通过（3.241 s），避免新 fields
+   能力存在而模型仍收到旧字段说明；原响应回放分支保持保存的旧契约。
 
 这些修复后仍有重复读取和错误路径。已通过的 diagnose 只做只读诊断，
 不是执行 selected_method 文本中的 native 优化；其 numerical_evidence 为空。

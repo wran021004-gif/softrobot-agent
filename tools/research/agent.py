@@ -755,6 +755,9 @@ async def converse(host,*,session_handoff=False,pause_after_completed_invocation
         guard(host)
         if s['spec'].get('research_decisions'):
             await deliver_science_before_decision(host,agent,boundary.inner)
+        for name,contract in (('evidence_read',EvidenceQuery),('research_investigate',InvestigationRequest)):
+            tool=agent.tool_registry.registry.get(name)
+            if tool:tool.tool_spec={**tool.tool_spec,'inputSchema':{'json':contract.model_json_schema()}}
         current=decision_packet(host)
         if formal:agent.tool_registry.registry.pop('experience_retrieve',None)
         if 'research' in current:

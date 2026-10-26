@@ -7,6 +7,7 @@ import unittest
 from unittest.mock import patch
 import httpx
 from tools.research.agent import converse
+from tools.research.contracts import EvidenceQuery
 from tools.research.session_handoff import request_feedback_boundary,handoff
 from tools.research.state import state,update,save
 from tests.research.test_s125_contract import cold_host
@@ -123,6 +124,24 @@ class RequestBoundaryHandoffTests(unittest.TestCase):
         events=h.store.events(h.run_id)
         self.assertTrue(any(e['kind']=='sdk_unsent_invocation_verified' for e in events))
         self.assertFalse(any(e['kind']=='model_original_turn' for e in events))
+
+    def test_new_requests_refresh_query_schema_after_old_snapshot_verification(self):
+        h=self.provision();sent=[]
+        current=EvidenceQuery.model_json_schema();old=deepcopy(current)
+        old['properties']['fields']['description']='Explicit synthetic older query description'
+        with patch.object(EvidenceQuery,'model_json_schema',return_value=old),\
+                patch('tools.research.agent.load_credential'),patch.dict(os.environ,{'DEEPSEEK_API_KEY':'offline'}),\
+                patch('tools.research.core.guard'),patch('tools.research.agent.guard'),\
+                patch('httpx.AsyncHTTPTransport',return_value=httpx.MockTransport(self.responder(h,sent))):
+            asyncio.run(converse(h,session_handoff=True,handoff_request_bytes=1,pause_after_completed_invocations=1))
+        with patch('tools.research.agent.load_credential'),patch.dict(os.environ,{'DEEPSEEK_API_KEY':'offline'}),\
+                patch('tools.research.core.guard'),patch('tools.research.agent.guard'),\
+                patch('httpx.AsyncHTTPTransport',return_value=httpx.MockTransport(self.responder(h,sent))):
+            asyncio.run(converse(h,session_handoff=True,pause_after_completed_invocations=1))
+        first=next(t for t in sent[1]['tools'] if t['function']['name']=='evidence_read')['function']['parameters']
+        last=next(t for t in sent[-1]['tools'] if t['function']['name']=='evidence_read')['function']['parameters']
+        self.assertEqual(first['properties']['fields']['description'],old['properties']['fields']['description'])
+        self.assertEqual(last['properties']['fields']['description'],current['properties']['fields']['description'])
 
     def test_explicit_nonpass_continuation_restores_tools_without_send_or_reset(self):
         h=self.provision();sent=[];update(h,count_closeout=True)
