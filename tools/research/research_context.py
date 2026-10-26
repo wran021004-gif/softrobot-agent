@@ -1063,7 +1063,7 @@ def agent_decision_brief(host):
         brief['stop_result_index']=dict(count=len(refs),query=dict(reference=anchor,
             view='working_set',pointer='/all_fresh_results'),
             rule='Exact complete STOP citation index; retrieve on demand. Reports give no formal read credit.')
-        brief.pop('citation_eligibility',None)
+        # Keep the compact registration rule/query in L0; the inventory stays in L1.
         ws=brief.get('evidence_working_set',{})
         for key in ('candidate_index','control_result_links','control_comparisons'):
             if key in ws:

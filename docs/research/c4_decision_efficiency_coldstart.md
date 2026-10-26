@@ -194,3 +194,25 @@ Treatment A 添加不存在的 note 字段，且提出未核准的 Native/short-
 按用户追加要求，只进行一次针对性修复，保持工具字段、路由、验证和 L0/L1/L2 层级；新状态重新冻结验证，
 原 A/B/C 输入、评分、输出与费用全部保持。后续必要预算使用原配对 grant 增量，绝不另开 ID 清零。
 本聊天每五分钟监督恢复检查已启用（automation `c4`），正常原进程运行时不启动副本。
+
+## 一次针对性修复与新状态复核准备
+
+生产仅改两处既有交付：保留原 L0 `citation_eligibility` 的简短规则/查询，完整库存仍由原 L1 管理；
+数学/物理关系保留所有原字段及 `constraint_mismatch` 状态值，补充比较仅基于 epigraph 活跃集、
+实际已检查的约束 ID，以及“活跃位置不等于没有检查速度”的准确说明。不改科研方法、Scope 准入或评分。
+原 contracts/工具字段、核心派发、优化器、Store、独立验收和 L0/L1/L2 层级没有改变。
+
+只读探针把原生产 Pydantic 解析放回冻结 JSON Schema 检查之前，从而原 C3.3 精确错误能原样到达模型；
+非法 regularization 仍拒绝，不自动删字段、改路由或执行。该公共探针修复对两组都适用，不能把其收益
+全部归因于 Treatment。新测试复现原非法设置的实际反馈，原活跃集/物理失败对照测试与原十二请求硬限测试
+各一次通过（共三项）；没有全量回归或科学计算。
+
+新协议 `c4_revalidation_protocol.json` 固定两个不同历史状态：D 为 R1 preparation2159（已有新的 Native
+预测控制，后续独立物理不可见），E 为 C3 heuristic preparation153（一次位置/速度失败、尚无数学结果）。
+二者均非原 C4 A/B/C 或 C3.2 N/K/M 的 source_state；仍与历史任务相关，不称完全盲测或统计独立。
+Control 固定 `1bbfdcab9` 的原 C4 生产代码，Treatment 为本次修复；沿用原评分，不指定方法。
+
+用户追加的自主额度授权已通过原 Store/grant owner 作有限增量：Provider 总上限12→20，已用12保持，
+只给新 D/E 两组各最多两轮（八次新增请求），无科学额度。旧原始目录和 summary 不覆盖，新的冻结/输出目录
+仅保存阶段输入；所有发送仍记入同一个 Provider Store、同一个 grant，不能靠更换目录重置。
+详见 `evidence/c4_decision_pairs/revalidation_budget_addendum.json`。若这次仍未通过，不继续刷原样本。

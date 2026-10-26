@@ -201,6 +201,27 @@ class ProbeTests(unittest.TestCase):
                 asyncio.run(probe.c3_live(self.out))
             transport.assert_not_called();store.assert_not_called()
 
+    def test_probe_preserves_production_unsupported_setting_feedback(self):
+        from tools.state_io import atomic_json
+        from tests.research.c3_readiness_audit import FrozenDecisionBoundary,c3_frozen_audit
+        boundary=FrozenDecisionBoundary(probe.ROOT,'B',source=('b3_t2_pilot_050_c',354))
+        self.addCleanup(boundary.archive.close)
+        candidate=list(boundary.saved_state['candidates'].values())[-1]
+        request=dict(candidate=candidate,operation='mujoco_direct_control_v1',model_source='mujoco',
+            protocol=boundary.saved_state['spec']['analysis_protocol'],
+            control_optimization=dict(source=boundary.saved_state['control_initializations'][-1]['source'],
+                settings=dict(version='local_control_search_v2',knots_s=[0.,.5],
+                    correction_window_s=[0.,.5],regularization=.000001)))
+        self.out.mkdir(parents=True)
+        uses=self.out/'uses.json';feedback=self.out/'feedback.json'
+        atomic_json(uses,[dict(id='fixture-native-setting',function=dict(name='research_analysis',arguments=json.dumps(request)))])
+        c3_frozen_audit(probe.ROOT,'B',feedback,uses,source=('b3_t2_pilot_050_c',354))
+        result=read(feedback)[0]
+        self.assertEqual(result['status'],'error')
+        self.assertEqual(result['result']['field'],'control_optimization.settings.regularization')
+        self.assertIn('regularization is not supported',result['result']['expected'])
+        self.assertFalse(result['result']['scientific_execution_started'])
+
 
 if __name__ == '__main__':
     unittest.main()

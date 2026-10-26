@@ -25,7 +25,10 @@ def mathematical_physical_relation(value, physical):
         trajectory=sensitivity['numerical_optimality'][0]['result']
     active=[r for r in trajectory.get('dual_checks',{}).get('constraint_multipliers',[]) if r['epigraph_active']]
     signals=sorted({r['signal']['name'] for r in active})
+    checked=sorted({r['constraint_id'] for r in trajectory.get('coverage',[])})
     result=dict(status='not_assessed',mathematical_active_signals=signals,sources=[],
+        comparison_basis='Epigraph active signals versus failed physical components; not a test of which constraints were included.',
+        mathematical_checked_constraint_ids=checked,
         reason='No complete same-candidate same-task physical observation with alignable constraints.',
         causal_explanation='not_established',physical_improvement='unverified')
     aligned=[]
@@ -42,7 +45,9 @@ def mathematical_physical_relation(value, physical):
         mismatch=(signals==['tip_position'] and bool(failed & {'holding_speed','holding_tip_speed','speed'}))
         result.update(status='constraint_mismatch' if mismatch else 'aligned_observations_causality_unresolved',
             physical_failed_components=sorted(failed),sources=aligned[-3:],aligned_observation_count=len(aligned),
-            reason='Position-dominated mathematics does not explain the recorded holding-speed failure.' if mismatch else
+            reason=('The mathematical active set is position-dominated while physical holding speed fails. '
+                'Inactive checked speed constraints are still included in the sampled minimax problem; '
+                'this status does not mean speed was omitted or establish a failure cause.') if mismatch else
                 'Aligned observations are available; no validated mathematical-to-physical explanation.')
     return result
 HYPOTHESES={

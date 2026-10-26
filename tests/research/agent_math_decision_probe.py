@@ -187,11 +187,11 @@ def c3_boundary(case,arm,output,tool_input=None,*,source=None,roots=None):
     subprocess.run(command,cwd=(roots or C3_ROOTS)[arm],check=True)
 
 
-def c4_freeze(out):
+def c4_freeze(out,protocol_path=None):
     """New historical boundaries, same production projection and accounted transport."""
     import subprocess
-    protocol=read(Path(__file__).with_name('fixtures')/'c4_decision_protocol.json')
-    roots=dict(control=ROOT.parent/'research-next',treatment=ROOT)
+    protocol=read(protocol_path or Path(__file__).with_name('fixtures')/'c4_decision_protocol.json')
+    roots=dict(control=ROOT.parent/protocol.get('control_checkout','research-next'),treatment=ROOT)
     commits={arm:subprocess.check_output(['git','rev-parse','HEAD'],cwd=root,text=True).strip()
         for arm,root in roots.items()}
     if commits['control']!=protocol['control_commit']:raise ValueError('C4_CONTROL_COMMIT_CHANGED')
@@ -219,8 +219,9 @@ def c4_freeze(out):
     provider=read(ROOT/'configs/research/runtime_c4.json')['provider']
     frozen=dict(study_id=protocol['study_id'],provider=provider,scope=C3_SCOPE.replace('C3 is','C4 is'),
         commits=commits,roots={k:str(v) for k,v in roots.items()},protocol=protocol,
-        authorization='PENDING_EXPLICIT_C4_EGRESS_APPROVAL',request_ceiling=12,offline_passed=True,offline=rows,
+        authorization='PENDING_EXPLICIT_C4_EGRESS_APPROVAL',request_ceiling=protocol['design']['maximum_requests'],offline_passed=True,offline=rows,
         order=[(c,a) for i,c in enumerate(protocol['cases']) for a in (C3_ARMS if i%2==0 else C3_ARMS[::-1])])
+    frozen.update({k:protocol[k] for k in ('provider_ledger_root','continuation_base_requests') if k in protocol})
     frozen['frozen_identity']=digest(frozen)
     atomic_json(out/'frozen.json',frozen)
     return frozen
@@ -269,35 +270,46 @@ async def c3_live(out,followup=False,*,c4_approval=None):
         import subprocess
         if c4_approval is None:raise ValueError('C4_EXPLICIT_EGRESS_APPROVAL_REQUIRED')
         for key,value in dict(study_id=frozen['study_id'],frozen_identity=frozen['frozen_identity'],
-                endpoint=frozen['provider']['base_url'].rstrip('/')+'/chat/completions',request_ceiling=12).items():
+                endpoint=frozen['provider']['base_url'].rstrip('/')+'/chat/completions',request_ceiling=frozen['request_ceiling']).items():
             if c4_approval.get(key)!=value:raise ValueError('C4_APPROVAL_BINDING_MISMATCH: '+key)
         if not c4_approval.get('user_approval'):raise ValueError('C4_EXPLICIT_EGRESS_APPROVAL_REQUIRED')
         for arm,root in frozen['roots'].items():
             paths=['tools','schemas','extensions','configs','tasks']
             if arm=='treatment':paths+=['tests/research/agent_math_decision_probe.py',
-                'tests/research/c3_readiness_audit.py','tests/research/fixtures/c4_decision_protocol.json']
+                'tests/research/c3_readiness_audit.py','tests/research/fixtures/c4_decision_protocol.json',
+                'tests/research/fixtures/c4_revalidation_protocol.json']
             subprocess.run(['git','diff','--quiet',frozen['commits'][arm],'--',*paths],cwd=root,check=True)
         for row in frozen['offline']:
             if digest(read(out/f"{row['case']}-{row['arm']}.json")['handoff_wire'])!=row['packet_identity']:
                 raise ValueError('C4_FROZEN_PACKET_CHANGED')
         frozen['authorization']=c4_approval['user_approval']
     summary_path=out/'summary.json'
+    prior_requests=frozen.get('continuation_base_requests',0)
+    ledger_root=Path(frozen.get('provider_ledger_root',out/'provider'))
     if summary_path.exists() and not followup:raise ValueError('C3_NO_AUTOMATIC_RESEND')
     if followup:
         summary=read(summary_path)
-        if (summary['status']!='first_six_complete' or summary['actual_requests']!=6 or
-                summary['confirmed_responses']!=6 or any(r['turn']==2 or r.get('error') for r in summary['results'])):
+        expected=prior_requests+len(frozen['order'])
+        if (summary['status']!=('first_batch_complete' if prior_requests else 'first_six_complete') or summary['actual_requests']!=expected or
+                summary['confirmed_responses']!=expected or any(r['turn']==2 or r.get('error') for r in summary['results'])):
             raise ValueError('C3_FOLLOWUP_REQUIRES_EXACT_COMPLETED_FIRST_SIX')
-        host=SimpleNamespace(store=Store(out/'provider'),run_id=frozen.get('study_id','c3-agent-decision-efficiency'))
+        host=SimpleNamespace(store=Store(ledger_root),run_id=frozen.get('study_id','c3-agent-decision-efficiency'))
     else:
-        if (out/'provider/platform.sqlite').exists():raise ValueError('C3_EXISTING_LEDGER_NO_RESEND')
-        host=SimpleNamespace(store=Store(out/'provider'),run_id=frozen.get('study_id','c3-agent-decision-efficiency'))
-        project=ProjectConfig(project_id=host.run_id,grant_id=host.run_id+'-12',authorization_source=frozen['authorization'],
+        if ledger_root.joinpath('platform.sqlite').exists() and not prior_requests:raise ValueError('C3_EXISTING_LEDGER_NO_RESEND')
+        host=SimpleNamespace(store=Store(ledger_root),run_id=frozen.get('study_id','c3-agent-decision-efficiency'))
+        if prior_requests:
+            usage=provider_usage(host)
+            if usage['actual_requests']!=prior_requests or usage['confirmed_responses']!=prior_requests or usage['provider_ledger']['occupied']:
+                raise ValueError('C4_CONTINUATION_REQUIRES_EXACT_SETTLED_PRIOR_USAGE')
+            if host.store.config()['budget']['model_calls']!=frozen['request_ceiling']:
+                raise ValueError('C4_CONTINUATION_REQUIRES_ORIGINAL_LEDGER_ADDENDUM')
+        else:
+            project=ProjectConfig(project_id=host.run_id,grant_id=host.run_id+'-12',authorization_source=frozen['authorization'],
             budget=dict(model_calls=12,tool_calls=0,backend_solves=0,worker_calls=0,wall_s=None),exclusive_resources={'provider_request':1})
-        host.store.create(project)
-        host.store.create_session(dict(input=dict(run_id=host.run_id,policy=dict(budget=plain(project.budget))),purpose='isolated read-only C3 Provider accounting; not a Study'))
-        update(host,pilot=dict(provider=frozen['provider'],live_model_requests=0))
-        record(host,'provider_egress_authorization',dict(user_approval=frozen['authorization'],endpoint=frozen['provider']['base_url']+'/chat/completions',ceiling=12))
+            host.store.create(project)
+            host.store.create_session(dict(input=dict(run_id=host.run_id,policy=dict(budget=plain(project.budget))),purpose='isolated read-only C3 Provider accounting; not a Study'))
+            update(host,pilot=dict(provider=frozen['provider'],live_model_requests=0))
+        record(host,'provider_egress_authorization',dict(user_approval=frozen['authorization'],endpoint=frozen['provider']['base_url']+'/chat/completions',ceiling=frozen.get('request_ceiling',12),prior_requests=prior_requests))
         summary=dict(status='running',results=[],scientific_workers=0,formal_studies=0,physics_steps=0,reporter_requests=0)
     provider=frozen['provider'];boundary=LiveBoundary(host);turn=2 if followup else 1
     try:
@@ -338,7 +350,7 @@ async def c3_live(out,followup=False,*,c4_approval=None):
             finally:
                 summary.update(provider_usage(host));summary['status']='partial'
                 atomic_json(summary_path,summary)
-        summary['status']='second_round_complete' if followup else 'first_six_complete'
+        summary['status']='second_round_complete' if followup else 'first_batch_complete' if prior_requests else 'first_six_complete'
     finally:
         await boundary.aclose();atomic_json(summary_path,summary)
     return summary
@@ -440,7 +452,7 @@ def main():
     if args.mode.startswith('c4-'):
         if args.out is None:parser.error('C4 requires an independent --out directory')
         if args.mode=='c4-freeze':
-            result=c4_freeze(out.resolve())
+            result=c4_freeze(out.resolve(),args.cases if args.cases!=CASES else None)
             print(json.dumps(dict(status='frozen_pending_approval',frozen_identity=result['frozen_identity'],inputs=len(result['offline']),provider_requests=0,science=0)))
         else:
             if args.approval_file is None:parser.error('C4 live requires --approval-file bound to frozen_identity')

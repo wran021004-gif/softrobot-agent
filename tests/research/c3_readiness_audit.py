@@ -229,7 +229,7 @@ def c3_frozen_audit(root,case,output,tool_input=None,*,source=None):
         packet,tools=boundary.projection()
         if tool_input is not None:
             uses=json.loads(Path(tool_input).read_text(encoding='utf8'));results=[]
-            from tools.research.contracts import Plan,AnalysisRequest
+            from tools.research.contracts import Plan,AnalysisRequest,EvidenceQuery
             from tools.research.evidence_policy import admit_decision
             from tools.research.design import verify_candidate
             from jsonschema import Draft202012Validator
@@ -238,16 +238,19 @@ def c3_frozen_audit(root,case,output,tool_input=None,*,source=None):
                 name=use['function']['name'];value=None;args={}
                 try:
                     args=json.loads(use['function']['arguments'])
+                    # Match production parsing first, so its precise field feedback
+                    # is not replaced by a generic JSON Schema anyOf rejection.
+                    typed={'research_plan':Plan,'research_analysis':AnalysisRequest,'evidence_read':EvidenceQuery}[name].model_validate(args)
                     Draft202012Validator(definitions[name]).validate(args)
                     if name=='evidence_read':value=read_evidence(host,{'view':'summary',**args},record_read=False)
                     elif name=='research_plan':
-                        plan=Plan.model_validate(args);admission=admit_decision(host,plan)
+                        plan=typed;admission=admit_decision(host,plan)
                         value=dict(status='proposal_recorded',action=plan.action,decision_admission=admission,
                             scientific_execution='not_dispatched_by_C3',new_scientific_computations=0,
                             observation=None,proposed_budget=plain(plan.decision).get('requested_budget'),
                             limitation='Plan contract and evidence admission checked. Execution-specific admission was not run. An explicit local_diagnostic would compute in production; C3 does not execute it.')
                     elif name=='research_analysis':
-                        q=AnalysisRequest.model_validate(args);verify_candidate(host,q.candidate)
+                        q=typed;verify_candidate(host,q.candidate)
                         value=dict(status='proposal_recorded',operation=q.operation,
                             scientific_execution='not_dispatched_by_C3',observation=None,
                             limitation='Schema and candidate identity checked; worker admission, numerical applicability and results are untested.')
@@ -343,7 +346,7 @@ def c3_frozen_audit(root,case,output,tool_input=None,*,source=None):
 if __name__=='__main__':
     import argparse
     parser=argparse.ArgumentParser();parser.add_argument('--compare-exports',nargs=2,type=Path)
-    parser.add_argument('--decision-efficiency',choices=('A','B','C'))
+    parser.add_argument('--decision-efficiency',metavar='CASE',help='A/B/C defaults, or a case label with explicit source archive/sequence')
     parser.add_argument('--evidence-root',type=Path)
     parser.add_argument('--output',type=Path)
     parser.add_argument('--tool-input',type=Path)
