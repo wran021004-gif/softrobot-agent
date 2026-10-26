@@ -332,53 +332,119 @@ def decision_summary(value, evidence, operations):
     return result
 
 
-def parameter_capabilities(value, request):
-    """Discover conditional executable paths from the existing domains and request."""
+def resolved_request(value, request):
+    """Materialize inherited choices using the generator's named prototypes."""
+    from tools.platform_store import plain
     space=parse_space(value)
     r=(GenerationRequestV2 if isinstance(space,FamilySpaceV2) else GenerationRequest).model_validate(request)
-    validate_request(space,r);rows=[]
-    def add(path,category,kind,unit,domain=None,choices=None,effective=True):
-        rows.append(dict(parameter_id=path,category=category,data_type=kind,unit=unit,
+    validate_request(space,r);params=plain(r)
+    parts={p.id:p for p in space.assembly.components}
+    prototypes=[p for p in space.assembly.components if isinstance(p,Segment)]
+    for i in range(r.segment_count):
+        prototype=(parts[space.serial_assembly.root_segment if i==0 else space.serial_assembly.repeated_segment]
+            if isinstance(space,FamilySpaceV2) else prototypes[i])
+        d=space.segment_domains.get(i,space.segment_domain)
+        choice=params['segments'].setdefault(str(i),{})
+        for k in ('length_m','young_pa'):
+            if choice.get(k) is None:choice[k]=getattr(d,k).default
+        if choice.get('sections') is None:choice['sections']=[plain(st.section) for st in prototype.sections]
+        if isinstance(space,FamilySpaceV2):
+            if choice.get('cells') is None:choice['cells']=space.serial_assembly.default_cells
+            inherited=dict(density_kg_m3=prototype.physics.density_kg_m3,
+                viscosity_y_nm2_s=prototype.physics.bending_viscosity_nm2_s[0],
+                viscosity_z_nm2_s=prototype.physics.bending_viscosity_nm2_s[1],
+                curvature_y_rad_m=prototype.natural_curvature_rad_m[0],curvature_z_rad_m=prototype.natural_curvature_rad_m[1])
+            for k in d.physical_domains:
+                if k in inherited:choice.setdefault('physical_parameters',{}).setdefault(k,inherited[k])
+            angles={st['angle_rad'] for st in choice['sections']}
+            if 'section_angle_rad' in d.physical_domains and len(angles)==1:
+                choice.setdefault('physical_parameters',{}).setdefault('section_angle_rad',angles.pop())
+    params['spans']=params['spans'] or [plain(Span(last_segment=r.segment_count-1,count=r.tendon_count))]
+    for span in params['spans']:
+        for k in ('radius_m','anchor_s'):
+            if span[k] is None:span[k]=space.routing_domains[k].default
+        if span['guide_s'] is None:span['guide_s']=[space.routing_domains['guide_s'].default]
+        if not span['angular_offsets_rad']:span['angular_offsets_rad']=[0.]*span['count']
+    for k,d in space.tendon_domains.items():params['tendon_parameters'].setdefault(k,d.default)
+    for k,d in space.control_domains.items():params['control_weights'].setdefault(k,d.default)
+    return plain((GenerationRequestV2 if isinstance(space,FamilySpaceV2) else GenerationRequest).model_validate(params))
+
+
+def parameter_capabilities(value, request):
+    """Actual candidate paths, physical effectiveness and authoritative SI domains."""
+    from tools.research.design import parameter_value
+    space=parse_space(value);params=resolved_request(value,request);rows=[]
+    def add(path,category,kind,unit,domain=None,choices=None,effective=True,reason=None,source=None,**detail):
+        try:current=parameter_value(params,path)
+        except (KeyError,IndexError,ValueError):current=None
+        continuous=bool(kind=='number' and domain and domain.minimum<domain.maximum and effective and not reason)
+        rows.append(dict(parameter_id=path,category=category,data_type=kind,unit=unit,current_value=current,
             **(dict(minimum=domain.minimum,maximum=domain.maximum,default=domain.default) if domain else {}),
-            choices=choices,conditional_dependencies=dict(segment_count=r.segment_count,tendon_count=r.tendon_count),
-            effective_in_current_execution=effective,supported_methods=['generate'],validation_status='candidate_specific_compilation_required'))
+            choices=choices,conditional_dependencies=dict(segment_count=params['segment_count'],tendon_count=params['tendon_count']),
+            effective_in_current_execution=effective,continuous_perturbation=continuous,
+            analysis_status='conditional' if continuous else 'not_applicable' if not effective or reason else 'finite_comparison_only',
+            analysis_reason=reason or ('Candidate rebuild, legal input and matched task checks required' if continuous else 'Discrete/object parameter; no ordinary continuous derivative'),
+            physical_component=path.split('.')[:2],domain_source=source,
+            supported_methods=['generate']+(['mujoco-reoptimized-structure-response-v1','fixed_input_structure_v1'] if continuous else []),
+            validation_status='candidate_specific_compilation_required',**detail))
     add('segment_count','topology','integer','count',choices=space.executable_segment_counts)
     add('tendon_count','topology','integer','count',choices=list(range(space.executable_tendon_count_bounds[0],space.executable_tendon_count_bounds[1]+1)))
-    for i in range(r.segment_count):
-        d=space.segment_domains.get(i,space.segment_domain);root=f'segments.{i}.'
-        parts=[p for p in space.assembly.components if isinstance(p,Segment)]
-        prototype=parts[min(i,len(parts)-1)];choice=r.segments.get(i)
-        sections=choice.sections if choice and choice.sections is not None else [s.section for s in prototype.sections]
-        inherited=dict(density_kg_m3=prototype.physics.density_kg_m3,
-            viscosity_y_nm2_s=prototype.physics.bending_viscosity_nm2_s[0],viscosity_z_nm2_s=prototype.physics.bending_viscosity_nm2_s[1],
-            curvature_y_rad_m=prototype.natural_curvature_rad_m[0],curvature_z_rad_m=prototype.natural_curvature_rad_m[1],
-            section_angle_rad=prototype.sections[0].section.angle_rad)
-        for k,unit in [('length_m','m'),('young_pa','Pa')]:add(root+k,'segment','number',unit,getattr(d,k))
+    add('spans','topology','routing_topology','none')
+    for i in range(params['segment_count']):
+        d=space.segment_domains.get(i,space.segment_domain);root=f'segments.{i}.';choice=params['segments'][str(i)]
+        source=f'segment_domains.{i}' if i in space.segment_domains else 'segment_domain'
+        for k,unit in [('length_m','m'),('young_pa','Pa')]:add(root+k,'segment','number',unit,getattr(d,k),source=source+'.'+k)
         for k,domain in d.physical_domains.items():
             unit='kg/m^3' if k=='density_kg_m3' else 'N*m^2*s' if k.startswith('viscosity') else 'rad/m' if k.startswith('curvature') else 'rad'
-            add(root+'physical_parameters.'+k,'material_geometry','number',unit,domain,
-                effective=k!='section_angle_rad' or any(s.kind not in ('circle','tube') for s in sections))
-            rows[-1].update(domain_proposal_default=domain.default,default=inherited[k],
-                current_value=getattr(choice,'physical_parameters',{}).get(k,inherited[k]),default_source='assembly prototype')
-        for j,section in enumerate(sections):
-            add(root+f'sections.{j}.kind','geometry','enum','none',choices=list(d.section_dimensions_m))
-            for k,domain in d.section_dimensions_m[section.kind].items():
-                add(root+f'sections.{j}.parameters.'+k,'geometry','number','m',domain)
-                rows[-1]['conditional_dependencies']['section_kind']=section.kind
+            effective=k!='section_angle_rad' or any(st['kind'] not in ('circle','tube') for st in choice['sections'])
+            reason=None if effective else 'Rotating circular/isotropic sections does not change bending mechanics'
+            if k=='section_angle_rad' and 'section_angle_rad' not in choice.get('physical_parameters',{}):
+                reason='Nonuniform station angles require an explicit coupled geometry path'
+            add(root+'physical_parameters.'+k,'material_geometry','number',unit,domain,effective=effective,reason=reason,source=source+'.physical_domains.'+k)
+            rows[-1].update(domain_proposal_default=domain.default,default=rows[-1]['current_value'],default_source='actual inherited prototype or explicit choice')
+        for j,section in enumerate(choice['sections']):
+            add(root+f'sections.{j}.kind','geometry','enum','none',choices=list(d.section_dimensions_m),comparison_path=root+f'sections.{j}')
+            for k,domain in d.section_dimensions_m[section['kind']].items():
+                add(root+f'sections.{j}.parameters.'+k,'geometry','number','m',domain,source=source+'.section_dimensions_m.'+section['kind']+'.'+k)
+                rows[-1]['conditional_dependencies']['section_kind']=section['kind']
         if isinstance(space,FamilySpaceV2):
             lo,hi=space.serial_assembly.cell_count_bounds
-            add(root+'cells','discretization','integer','count',Domain(minimum=lo,maximum=hi,default=space.serial_assembly.default_cells))
-    for k,d in space.tendon_domains.items():add('tendon_parameters.'+k,'tendon','number','m' if k=='diameter_m' else 'N/m' if 'gain' in k else 'N',d,effective=k!='length_servo_gain_n_m')
-    for k,d in space.routing_domains.items():add('spans.*.'+k,'routing','number','rad' if 'rad' in k else 'm' if k=='radius_m' else 'normalized_station',d)
+            add(root+'cells','discretization','integer','count',Domain(minimum=lo,maximum=hi,default=space.serial_assembly.default_cells),reason='Numerical model resolution, not a physical structural gradient')
+    for k,d in space.tendon_domains.items():
+        reason={'length_servo_gain_n_m':'Ideal tension bypasses the length servo',
+            'diameter_m':'Clearance/visual geometry only; native ideal tendon has no diameter-dependent inertia or friction',
+            'pretension_n':'Initialization/control choice; a common full absolute-tension sequence overrides pretension'}.get(k)
+        add('tendon_parameters.'+k,'tendon','number','m' if k=='diameter_m' else 'N/m' if 'gain' in k else 'N',d,
+            effective=k!='length_servo_gain_n_m',reason=reason,source='tendon_domains.'+k,
+            input_set_changes=k=='force_limit_n')
+    # Retain declaration templates for existing consumers; only concrete paths are analyzable.
+    for k,d in space.routing_domains.items():
+        add('spans.*.'+k,'routing','number','rad' if k.endswith('_rad') else 'm' if k=='radius_m' else 'normalized_station',d,
+            effective=False,reason='Declaration template; resolve an actual selected span and array index')
     offset=0
-    for i,span in enumerate(r.spans or [Span(last_segment=r.segment_count-1,count=r.tendon_count)]):
-        affected=[j for j in range(offset,offset+span.count) if j not in r.route_overrides]
-        add(f'spans.{i}.radius_m','routing','number','m',space.routing_domains['radius_m'],effective=bool(affected))
-        rows[-1].update(current_value=span.radius_m if span.radius_m is not None else space.routing_domains['radius_m'].default,
-            affected_tendon_indices=affected,continuous_scope='Fixed topology; reoptimizing tension requires authorized saved model stencil')
-        offset+=span.count
-    for i in range(r.tendon_count):add(f'route_overrides.{i}','routing','route_points','SI')
-    for k,d in space.control_domains.items():add('control_weights.'+k,'controller','number','controller_weight',d,effective=False)
+    for i,span in enumerate(params['spans']):
+        affected=[j for j in range(offset,offset+span['count']) if str(j) not in params['route_overrides']]
+        hole_affected=[j for j in range(offset,offset+span['count']) if any(p.get('hole') for p in params['route_overrides'].get(str(j),[]))]
+        def route(path,key,effective=True,**detail):
+            influenced=sorted(set(affected+hole_affected)) if key in ('radius_m','phase_rad','angular_offset_rad') and not path.startswith('anchor_') else affected
+            add(f'spans.{i}.'+path,'routing','number','rad' if key.endswith('_rad') else 'm' if key=='radius_m' else 'normalized_station',
+                space.routing_domains[key],effective=bool(influenced) and effective,source='routing_domains.'+key,
+                reason=None if influenced and effective else 'Route override or absent guide removes this routing effect',affected_tendon_indices=influenced,**detail)
+        for key in ('radius_m','phase_rad','anchor_s'):route(key,key)
+        for j in range(len(span['guide_s'])):route(f'guide_s.{j}','guide_s')
+        guide_effect=bool(span['guide_s']) or span['last_segment']>0
+        route('guide_angle_offset_rad','angular_offset_rad',guide_effect)
+        route('anchor_angle_offset_rad','angular_offset_rad')
+        for j in range(span['count']):route(f'angular_offsets_rad.{j}','angular_offset_rad',offset+j in affected+hole_affected)
+        offset+=span['count']
+    for i,points in params['route_overrides'].items():
+        add(f'route_overrides.{i}','routing','route_points','SI')
+        for j,point in enumerate(points):
+            a=point['attachment']
+            if a['part'].startswith('segment_'):
+                key='anchor_s' if point['role']=='anchor' else 'guide_s'
+                add(f'route_overrides.{i}.{j}.attachment.s','routing','number','normalized_station',space.routing_domains[key],source='routing_domains.'+key)
+    for k,d in space.control_domains.items():add('control_weights.'+k,'controller','number','controller_weight',d,effective=False,reason='Controller performance parameter; outside fixed-structure legal-input capability')
     return rows
 
 

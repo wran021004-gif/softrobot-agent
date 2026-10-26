@@ -51,16 +51,22 @@ def decision_summary(value):
     return summary
 
 
-def structure_context(base, candidates, request):
+def structure_context(base, candidates, request, *, spec=None):
     """Existing verified source-relative candidates; exactly one continuous edit."""
     variable=request.variable
-    if not (variable.startswith('segments.') and (variable.endswith('.young_pa') or '.sections.' in variable)):
+    generated=bool(base.get('generation_version'))
+    if generated:
+        from tools.research.optimal_capability import family_parameters
+        base_parameters,parameter=family_parameters(spec,base,variable)
+    else:base_parameters=base['parameters']
+    if not generated and not (variable.startswith('segments.') and (variable.endswith('.young_pa') or '.sections.' in variable)):
         raise ValueError('NATIVE_V1_SUPPORTS_MODULUS_OR_SECTION_PARAMETER_ONLY')
-    value=parameter_value(base['parameters'],variable);rows=[]
+    value=parameter_value(base_parameters,variable);rows=[]
     for reference,c in candidates:
-        other=parameter_value(c['parameters'],variable)
-        expected=deepcopy(base['parameters']);set_parameter(expected,variable,other)
-        if c['parameters']!=expected or other==value:raise ValueError('SINGLE_CHANGED_CONTINUOUS_PARAMETER_REQUIRED')
+        parameters=family_parameters(spec,c,variable)[0] if generated else c['parameters']
+        other=parameter_value(parameters,variable)
+        expected=deepcopy(base_parameters);set_parameter(expected,variable,other)
+        if parameters!=expected or other==value:raise ValueError('SINGLE_CHANGED_CONTINUOUS_PARAMETER_REQUIRED')
         a,b=base['configuration'],c['configuration']
         if (a['task']!=b['task'] or a['seed']!=b['seed'] or any(a['policy'][k]!=b['policy'][k]
                 for k in ('controller','backend','dynamics_model','discretization'))):

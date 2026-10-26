@@ -210,10 +210,54 @@ class NativeAnalysisOptions(Contract):
     correction_radius_n: FiniteFloat = Field(default=0.,ge=0,le=.5)
 
 
+class NonlinearResponseDirection(Contract):
+    direction_id: str = Field(min_length=1,max_length=120)
+    mode: Literal['continuous','finite_comparison'] = 'continuous'
+    variables: dict[str,FiniteFloat] = Field(default_factory=dict,description='dp/ds coefficients of an explicit legal one-dimensional path; units are parameter units / coordinate_unit.')
+    coordinate_unit: str | None = None
+    coordinates: list[FiniteFloat] = Field(default_factory=list)
+    comparison_variables: list[str] = Field(default_factory=list)
+    t1_results: list[EvidenceRef] = Field(min_length=2,max_length=8)
+
+    @model_validator(mode='after')
+    def direction(self):
+        if self.mode=='continuous':
+            if (not self.variables or any(v==0 for v in self.variables.values()) or not self.coordinate_unit
+                    or self.comparison_variables or len(self.t1_results)!=3 or len(self.coordinates)!=3
+                    or self.coordinates[0]!=0 or not self.coordinates[1]<0<self.coordinates[2]
+                    or self.coordinates[1]!=-self.coordinates[2]):
+                raise ValueError('EXPLICIT_SYMMETRIC_ONE_DIMENSIONAL_DIRECTION_REQUIRED')
+        elif self.variables or self.coordinates or self.coordinate_unit or not self.comparison_variables:
+            raise ValueError('FINITE_COMPARISON_HAS_VARIABLES_AND_NO_DERIVATIVE_COORDINATE')
+        return self
+
+
 class NonlinearStructureResponse(Contract):
-    variable: str
-    unit: str
-    t1_results: list[EvidenceRef] = Field(min_length=3,max_length=3,description='Completed current T1 results in baseline, minus, plus order; no implicit optimization.')
+    version: Literal['nonlinear_response_v1','nonlinear_response_v2'] = 'nonlinear_response_v1'
+    variable: str | None = None
+    unit: str | None = None
+    t1_results: list[EvidenceRef] = Field(default_factory=list,max_length=3)
+    directions: list[NonlinearResponseDirection] = Field(default_factory=list,max_length=32)
+
+    @model_validator(mode='after')
+    def selected_form(self):
+        if self.version=='nonlinear_response_v1':
+            if not self.variable or not self.unit or len(self.t1_results)!=3 or self.directions:
+                raise ValueError('BASELINE_MINUS_PLUS_T1_REQUIRED')
+        elif self.variable or self.unit or self.t1_results or not self.directions or len({d.direction_id for d in self.directions})!=len(self.directions):
+            raise ValueError('UNIQUE_V2_DIRECTIONS_WITHOUT_LEGACY_FIELDS_REQUIRED')
+        if self.directions and any(d.t1_results[0]!=self.directions[0].t1_results[0] for d in self.directions):
+            raise ValueError('COMMON_BASELINE_T1_REQUIRED')
+        return self
+
+    @model_serializer(mode='wrap')
+    def legacy(self,handler):
+        value=handler(self)
+        if self.version=='nonlinear_response_v1':
+            value.pop('version',None);value.pop('directions',None)
+        else:
+            for k in ('variable','unit','t1_results'):value.pop(k,None)
+        return value
 
 
 class AnalysisRequest(Contract):

@@ -355,7 +355,7 @@ def dispatch(host,query,key,*,guard,origin='model'):
     sensitivity_context=saved_context(host,q) if q.nonlinear_response else None
     if q.structure_response:
         from tools.research.native_analysis import structure_context
-        sensitivity_context=structure_context(c,[(r,verify_candidate(host,r)) for r in q.structure_response.candidates],q.structure_response)
+        sensitivity_context=structure_context(c,[(r,verify_candidate(host,r)) for r in q.structure_response.candidates],q.structure_response,spec=state(host)['spec'])
     if q.design_sensitivity:
         from extensions.tendon_family.sorosim_analysis import design_context
         sensitivity_context=design_context(c,verify_candidate(host,q.design_sensitivity.minus_candidate),
