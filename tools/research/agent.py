@@ -398,6 +398,11 @@ def error_feedback(host, use, exc, before):
     if 'EVIDENCE_RANGE_REQUIRES_LIST_POINTER' in message:
         field='pointer';expected='Read the current reference root with view=summary, then use an advertised list read_pointer with view=range'
     navigation=getattr(exc,'evidence_navigation',{})
+    if use['name']=='evidence_read' and 'EVIDENCE_FIELDS_REQUIRES_NONEMPTY_FIELDS' in message:
+        code='EVIDENCE_FIELDS_REQUIRES_NONEMPTY_FIELDS';field='fields'
+        query={k:use['input'][k] for k in ('reference','pointer') if k in use['input']}
+        query['view']='summary'
+        expected='Empty fields select no information. Read the object summary, then select at least one advertised child key. Use exact query: '+json.dumps(query,separators=(',',':'))
     if navigation:
         query=navigation['corrected_query']
         if navigation.get('derived_view_query'):code='EVIDENCE_VIEW_MISMATCH';field='view'

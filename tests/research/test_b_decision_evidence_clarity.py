@@ -220,4 +220,91 @@ class DecisionWorksetTests(unittest.TestCase):
         read_evidence(h,result['execution_feedback']['execution_entry']['methods_query'],record_read=False)
 
 
+class ScientificFeedbackTests(unittest.TestCase):
+    """Frozen C3 artifacts only; no worker, Provider or writable historical Store."""
+    @classmethod
+    def setUpClass(cls):
+        from tests.research.c3_readiness_audit import FrozenDecisionBoundary
+        from tools.research.config import ROOT
+        cls.before=FrozenDecisionBoundary(ROOT,'A')
+        cls.after=FrozenDecisionBoundary(ROOT,'C')
+        cls.addClassCleanup(cls.before.archive.close)
+        cls.addClassCleanup(cls.after.archive.close)
+
+    def test_empty_fields_schema_runtime_and_exact_summary_correction(self):
+        import json
+        from jsonschema import Draft202012Validator
+        from tools.research.contracts import EvidenceQuery
+        from tools.research.agent import error_feedback
+        from unittest.mock import patch
+        b=self.before;h=b.host;reference=b.saved_state['results'][0]
+        invalid=dict(reference=reference,view='fields',fields=[])
+        validator=Draft202012Validator(EvidenceQuery.model_json_schema())
+        for query in (invalid,dict(reference=reference,view='fields')):
+            self.assertTrue(list(validator.iter_errors(query)))
+            with self.assertRaisesRegex(ValueError,'EVIDENCE_FIELDS_REQUIRES_NONEMPTY_FIELDS') as caught:
+                read_evidence(h,query,record_read=False)
+            with patch('tools.research.agent.record',return_value=reference):
+                feedback=error_feedback(h,dict(name='evidence_read',input=query),caught.exception,b.saved_state)
+            self.assertEqual(feedback['error_code'],'EVIDENCE_FIELDS_REQUIRES_NONEMPTY_FIELDS')
+            correction=json.loads(feedback['expected'].split('Use exact query: ',1)[1])
+            self.assertEqual(correction,dict(reference=reference,view='summary'))
+            read_evidence(h,correction,record_read=False)
+        for view in ('full','summary','range','working_set','mathematical_capabilities'):
+            query=dict(reference=reference,view=view)
+            validator.validate(query);self.assertEqual(EvidenceQuery.model_validate(query).fields,[])
+        selected=dict(reference=reference,view='fields',fields=['status'])
+        validator.validate(selected);self.assertIn('status',read_evidence(h,selected,record_read=False))
+        h.store.reserve.assert_not_called();h.store.transaction.assert_not_called()
+
+    def test_finite_native_failure_scope_reaches_card_l0_and_mathematical_view(self):
+        import json
+        from tools.research.research_context import agent_decision_brief
+        b=self.after;h=b.host;r=b.saved_state['analysis_results'][0];original=b.artifact(r)
+        card=plain(result_card(h,r));view=mathematical_decision_view(card)
+        self.assertNotEqual(card['evidence_summary']['claim_kind'],'MODEL_EXCLUSION')
+        for limits in (card['evidence_summary']['unresolved'],view['unresolved']['evidence_limits']):
+            self.assertTrue(any('neither proves structural infeasibility' in text for text in limits))
+        # The last native result remains readable even when an independent replay is newer.
+        brief=agent_decision_brief(h)
+        self.assertIn('neither proves structural infeasibility',json.dumps(brief))
+        feedback=read_evidence(h,dict(reference=r,view='working_set',pointer='/mathematical_decision_view'),record_read=False)
+        self.assertEqual(feedback['unresolved'],view['unresolved'])
+        self.assertEqual(view['owning_study'],original['owning_study'])
+        self.assertEqual(original,b.artifact(r));self.assertEqual(h.store.session()['state'],b.saved_state)
+        self.assertTrue(brief['mathematical_capabilities']['methods'])
+        h.store.reserve.assert_not_called();h.store.transaction.assert_not_called()
+
+    def test_current_history_native_and_replay_costs_remain_separate(self):
+        from tools.research.budget import decision_budget
+        from tools.research.research_context import history_index
+        # Native cost is zero in R1 before execution, even with imported native evidence.
+        b=self.before;budget=decision_budget(b.host)['science_budget']
+        self.assertEqual(budget['native']['recorded_physics_steps'],0)
+        self.assertEqual(budget['charged_mathematical_evaluations'],0)
+        history=history_index(b.host)
+        self.assertTrue(any((r['cost']['native'] or {}).get('physics_steps')==8000 for r in history))
+        self.assertTrue(all(r['historical_only'] and 'no charge' in r['cost']['accounting_scope'] for r in history))
+        b=self.after;h=b.host;r=b.saved_state['analysis_results'][0]
+        budget=decision_budget(h)['science_budget'];raw=b.artifact(r)
+        self.assertEqual((budget['native']['recorded_rollouts'],budget['native']['recorded_physics_steps']),(8,8000))
+        resources={c.name:c for c in result_card(h,r).resources}
+        self.assertEqual(resources['native_physics_steps'].amount,8000)
+        self.assertEqual(read_evidence(h,plain(resources['native_physics_steps'].source),record_read=False),8000)
+        self.assertEqual(raw['native_dynamics']['cost']['optimization_evaluations'],8)
+        replay_resources={c.name:c for c in result_card(h,b.saved_state['physical_replays'][0]).resources}
+        self.assertEqual(replay_resources['physics_steps'].amount,1000)
+        self.assertEqual(budget['native']['recorded_physics_steps'],8000)
+        # Missing-cost fixture is a projection check, never new scientific evidence.
+        from tools.research.evidence_views import _resources
+        missing={c.name:c.amount for c in _resources(dict(native_dynamics={}),r)}
+        self.assertIsNone(missing['native_physics_steps']);self.assertIsNone(missing['native_rollouts'])
+        from unittest.mock import patch
+        partial=deepcopy(raw);partial['native_dynamics']['cost'].pop('physics_steps')
+        original=h.store.artifact.side_effect
+        with patch.object(h.store.artifact,'side_effect',lambda ref,**kw:partial if plain(ref)==r else original(ref,**kw)):
+            self.assertFalse(decision_budget(h)['science_budget']['native']['cost_record_complete'])
+        h.store.reserve.assert_not_called();h.store.transaction.assert_not_called()
+
+
 if __name__=='__main__':unittest.main()

@@ -101,6 +101,10 @@ def summarize_evidence(value,reference=None,*,refinement=None):
                 'necessary_constraint_box_exclusion_verified','kernel_separating_lower_bound_verified'):
             kind='MODEL_EXCLUSION';supported=['model_input_box_exclusion']
         unresolved+=['Nonlinear realization and constraints outside declared model/sample coverage remain unresolved.']
+        best=value.get('native_dynamics',{}).get('optimization',{}).get('best') or {}
+        if (value.get('operation')=='mujoco_direct_control_v1' and value.get('status')=='computed'
+                and best.get('measure',{}).get('normalized_gap',0)>0):
+            unresolved.append('Finite native search found no passing control under the recorded initialization, parameterization and budget; this neither proves structural infeasibility nor excludes control weights, parameterization or solver limitations.')
         trajectory=value.get('trajectory',{})
         if (verified and trajectory.get('method_version')=='sampled-affine-conic-minimax-v1'
                 and trajectory.get('optimality_status')=='numerically_checked'

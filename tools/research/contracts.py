@@ -533,12 +533,21 @@ class ExperienceQuery(Contract):
 
 
 class EvidenceQuery(Contract):
+    model_config = dict(json_schema_extra={
+        'allOf':[{'if':{'properties':{'view':{'const':'fields'}},'required':['view']},
+                  'then':{'required':['fields'],'properties':{'fields':{'minItems':1}}}}]})
     reference: EvidenceRef
     pointer: str = Field(default='',description='Absolute JSON Pointer; use summary to discover child keys. Permanent Store references survive session handoff; temporary SDK offload references do not.')
     view: Literal['full','summary','fields','range','capabilities','mathematical_capabilities','working_set'] = 'full'
     fields: list[str] = Field(default_factory=list, max_length=32,description='Immediate child keys at an object pointer, not dotted paths. Use with view=fields for raw JSON, or with view=working_set/mathematical_capabilities to select fields inside that derived view. For a working_set list select a row by /control_result_links/<index> first; do not switch to raw view=fields for derived paths.')
     start: int = Field(default=0, ge=0, strict=True)
     count: int = Field(default=20, ge=1, le=100, strict=True)
+
+    @model_validator(mode='after')
+    def nonempty_field_selection(self):
+        if self.view=='fields' and not self.fields:
+            raise ValueError('EVIDENCE_FIELDS_REQUIRES_NONEMPTY_FIELDS: empty fields return no information; use view=summary or select at least one immediate child key')
+        return self
 
 
 class PPOOverrides(Contract):

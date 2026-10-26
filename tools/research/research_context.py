@@ -74,7 +74,9 @@ def history_index(host,candidate=None,query=None):
     from tools.research.config import same_robot_structure
     s=state(host);rows=[]
     refs=[*[e['reference'] for e in s.get('research_history',[])],
-        *s.get('research_mathematics',[]),*s.get('scoped_context',[])]
+        *s.get('research_mathematics',[]),*s.get('scoped_context',[]),
+        *[r for e in s['spec'].get('research_decisions',{}).get('background',[]) for r in e.get('dependencies',[])
+          if r.get('media_type','application/json')=='application/json']]
     current=host.store.artifact(candidate) if candidate else None
     for ref in {r['artifact_id']:r for r in refs}.values():
         value=host.store.artifact(ref)
@@ -117,6 +119,9 @@ def history_index(host,candidate=None,query=None):
             research_question=(recorded or {}).get('operation','Independent reach/hold task evaluation'),
             original_agent_intent_excerpt=intent[:240] if intent else None,
             owning_study=value.get('owning_study'),historical_only=True,evidence_scope=scope['claim_kind'],
+            cost=dict(accounting_scope='Historical reference only; no charge to the current Study',
+                native=deepcopy(value.get('native_dynamics',{}).get('cost')),
+                source_query=dict(reference=ref,view='summary')),
             task_match=same_task,design_match=same_design,repeat_hint=equivalence,experimental_equivalence='unknown',recorded_request=recorded,
             unresolved_question='Realization, aligned GVS/MuJoCo prediction, terminal braking and structural contributions remain unresolved; different controls cannot establish model error.',
             limitations=scope['unsupported_inferences'],control_source=value.get('source_reference'),
@@ -384,7 +389,9 @@ def context(host):
             from tools.research.analysis import compact_result
             result=compact_result(value,latest)
             current['latest_scientific_feedback']={k:result.get(k) for k in ('reference','operation','status',
-                'static_input_observation','input_response_observation','control_handoff','scoped_claim','analysis_applicability')}
+                'owning_study','static_input_observation','input_response_observation','control_handoff','scoped_claim','analysis_applicability')}
+            current['latest_scientific_feedback']['scientific_scope']={k:result['evidence_summary'][k]
+                for k in ('claim_kind','verification_status','supported_inferences','unresolved')}
         else:
             current['latest_scientific_feedback']=dict(reference=latest,**compact_evidence(value,latest)['summary'])
             if value.get('acceptance'):
@@ -1016,6 +1023,13 @@ def agent_decision_brief(host):
         scope='Receipts/results establish execution. Plan selected_method is intent; read-only diagnosis starts no selected mathematical worker. Independent evaluation alone establishes task acceptance.')
     selected=current_reports(host)[-2:]
     brief['latest_reports']=[reporter_handoff_summary(host,r,saved) for r,saved in selected]
+    for report in brief['latest_reports']:
+        for finding in report.get('findings',[]):
+            if finding.get('mathematics'):
+                ref=finding['result']['reference']
+                scope=summarize_evidence(host.store.artifact(ref),ref)
+                finding['mathematics']['unresolved']={**(finding['mathematics'].get('unresolved') or {}),
+                    'evidence_limits':scope['unresolved']}
     from tools.research.evidence_views import result_card
     shown=[ref for r in brief['latest_reports'] for ref in r['result_references']]
     brief['additional_mathematical_evidence']=[dict(reference=r,
@@ -1025,18 +1039,18 @@ def agent_decision_brief(host):
     if latest and latest.get('reference') in shown:
         delivery=next(r for r in brief['latest_reports'] if latest['reference'] in r['result_references'])
         brief['latest_scientific_feedback']={k:latest[k] for k in
-            ('reference','operation','status','candidate','source','control_handoff') if k in latest}
+            ('reference','operation','status','candidate','source','control_handoff','owning_study','scientific_scope') if k in latest}
         brief['latest_scientific_feedback']['report_reference']=delivery['report_reference']
     elif latest and latest.get('reference') in [r['reference'] for r in brief['additional_mathematical_evidence']]:
         brief['latest_scientific_feedback']={k:latest[k] for k in
-            ('reference','operation','status','control_handoff') if k in latest}
+            ('reference','operation','status','control_handoff','owning_study','scientific_scope') if k in latest}
     anchor=brief.get('evidence_access',{}).get('reference')
     if anchor:
         history=history_index(host,candidate)
         if history:
             brief['research_history']=dict(query=dict(reference=anchor,view='working_set',pointer='/research_history_index'),
                 conclusions=[dict(study=r['owning_study'],method=r['method'],scope=r['evidence_scope'],l1_pointer='/research_history_index/'+r['source']['reference']['artifact_id'],
-                    task_match=r['task_match'],result=(dict(violation=r['actual_result']['violation'],
+                    historical_only=True,cost=r['cost'],task_match=r['task_match'],result=(dict(violation=r['actual_result']['violation'],
                         sampled_maxima=r['actual_result']['sampled_maxima']) if 'violation' in r['actual_result'] else
                         dict(accepted=r['actual_result']['accepted'],metrics=r['actual_result']['metrics']))) for r in history[:5]],
                 decision_hint='Existing work: read L1 before repeating. State new information or a reproducibility/numerical check purpose. Exact experimental equivalence is unknown until model, point, inputs and grid align. Historical results grant no current execution/SELECT credit; braking and model-physics mechanisms remain unresolved.')
@@ -1206,7 +1220,11 @@ def mathematical_decision_view(card):
             ('name','actual_time_s','time_s','remaining_task_s','phase','input_units')},
         quantities=[{k:v for k,v in q.items() if k!='conditions'} for q in math['quantities']
             if not capability or capability.get('method_version') or q['name'] in ('best_found_violation','optimal_task_violation')],
-        capability=compact,unresolved=summary.get('decision_relevance'))
+        capability=compact,owning_study=card['identity']['study'],
+        unresolved={**(summary.get('decision_relevance') or {}),
+            'evidence_limits':card['evidence_summary']['unresolved']})
+    if summary.get('native_analysis'):
+        result['cost_scope']='Costs belong to owning_study, unknown if unrecorded. Native physics_steps includes prefix reconstruction and rollouts; callbacks are not additional rollouts. Independent physical replay is separate.'
     if summary.get('optimal_sensitivity'):result['optimal_sensitivity']=summary['optimal_sensitivity']
     if summary.get('native_analysis'):
         result['native_analysis']={k:v for k,v in summary['native_analysis'].items() if k!='quantities'}

@@ -323,6 +323,12 @@ def _resources(value, reference):
     for key in ('new_physical_evaluations','evaluation_callbacks','cache_reuses'):
         add(costs,key,'evaluations','/cost_feedback')
     add(costs,'charged_numerical_s','s','/cost_feedback','recorded_elapsed_unspecified')
+    native=value.get('native_dynamics')
+    if native is not None:
+        cost=native.get('cost') or {}
+        for key,unit in (('rollouts','rollouts'),('physics_steps','steps'),('optimization_evaluations','evaluations')):
+            resources.append(ResourceUse(name='native_'+key,amount=cost.get(key),unit=unit,
+                source=_location(reference,'/native_dynamics/cost/'+key) if key in cost else None))
     # No cost computation: each entry is a recorded quantity, never additive by default.
     resources.extend([ResourceUse(name='provider_cost',unit='USD'),
         ResourceUse(name='parent_action_elapsed',unit='s',time_basis='parent_action_wall'),

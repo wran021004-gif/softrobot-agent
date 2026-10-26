@@ -556,7 +556,7 @@ def recover(host):
 def compact_result(value, reference):
     """Compatible public tool response, with exact pointers into raw evidence."""
     summary=dict(reference=reference,**{k:value.get(k) for k in (
-        'status','candidate','operation','proxy_values','origin','charged_numerical_s','charged_analysis_evaluations',
+        'status','candidate','operation','proxy_values','origin','owning_study','charged_numerical_s','charged_analysis_evaluations',
         'local_model_constraints','internal_calculations','score_semantics','scoped_claim','analysis_applicability')})
     summary['stored_result_keys']=list(value)
     summary['retrieval_note']='This is a tool summary, not the stored artifact layout. Read only the explicit stored pointers; oversized full results may be offloaded.'
