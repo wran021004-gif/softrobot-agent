@@ -145,7 +145,7 @@ def optimize(output, name):
         fresh_numeric_execution=True, initial_coefficients_n=[0.]*16)
     atomic_json(folder/'schedule.json', schedule)
     best = result['native_dynamics']['optimization']['best']
-    print(name, result['native_analysis']['comparison'], result['cost'], flush=True)
+    print(name, result['native_analysis']['comparison'], result['native_dynamics']['cost'], flush=True)
     print('stop', result['native_dynamics']['optimization']['stop_reason'], flush=True)
     validated = replay(configuration, schedule, folder/'independent_replay', name)
     predicted = best['measure']
