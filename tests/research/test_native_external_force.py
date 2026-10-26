@@ -79,6 +79,9 @@ class ExternalForceTests(unittest.TestCase):
 
     def test_task_only_pair_composes_with_original_limits_and_same_robot(self):
         from tools.research.config import patch
+        from tools.research.physical_replay import model_context,binding
+        from tools.state_io import digest
+        from tools.platform_store import plain
         from extensions.tendon_family.scene import assemble_physical
         from extensions.tendon_family.backends import physics_for
         zero=read(ROOT/'tasks/b2_load_hold_zero_v1.json')
@@ -88,11 +91,39 @@ class ExternalForceTests(unittest.TestCase):
             cfg=deepcopy(self.cfg);cfg['task']=task['task'];cfg['seed']=task['seed']
             cfg['policy']['controller']['parameters']['data']['settling']=task['settling']
             inp=SessionInput.model_validate(cfg);assemble_physical(inp,physics_for(inp))
+            # The existing family candidate builder materializes the task's zero
+            # rule into this robot's complete named initializer before binding.
+            self.assertEqual(task['task']['initializer']['parameters']['data'],
+                dict(qpos_rad={},qvel_rad_s={},unspecified='zero'))
+            cfg['task']['initializer']['parameters']['data']=deepcopy(self.cfg['task']['initializer']['parameters']['data'])
+            _,physics,scene,spec=model_context(cfg)
+            inp=SessionInput.model_validate(cfg)
+            trajectory=dict(times_s=[i*.01 for i in range(36)],tensions_n=[[.2]*len(physics['tendons'])]*35,
+                tendon_order=spec['tendon_order'],model_identity=spec['identity'],design_identity=spec['design_identity'],
+                task_identity=digest(plain(inp.task)))
+            _,_,bound=binding(cfg,trajectory)
+            self.assertEqual(bound['forces'],scene['forces'])
         self.assertEqual(zero['settling'],force['settling'])
         self.assertEqual(zero['settling']['position_limit_m'],.01)
         self.assertEqual(zero['settling']['speed_limit_m_s'],.02)
         for field in ('goal','timing','evaluator','initializer','observations'):
             self.assertEqual(zero['task'][field],force['task'][field])
+
+    def test_original_acceptance_keeps_incomplete_separate_from_task_failure(self):
+        from tools.research.physical_replay import evaluate_playback
+        from tools.research_tasks import assemble_acceptance
+        reference=dict(artifact_id='a'*64,media_type='application/json')
+        # Fabricated positions deliberately fail the original task; no dynamics.
+        rows=[dict(time_s=i*.01,tip_m=[0,0,0],tip_velocity_m_s=[0,0,0],speed_m_s=0,
+            actual_tension_n=[.2]*4) for i in range(51)]
+        raw=dict(status='completed',physics_steps=1000,samples=rows,tendon_order=self.native.tendons)
+        for status,expected in [('completed','valid_failure'),('incomplete','incomplete')]:
+            raw['status']=status
+            evaluation,profile=evaluate_playback(self.cfg,raw,reference,'fixture')
+            accepted=assemble_acceptance(self.cfg,evaluation,profile,evaluation_reference=reference,
+                profile_reference=reference,motion=[dict(time_s=r['time_s']) for r in rows])
+            self.assertEqual(accepted['status'],expected)
+        self.assertEqual(self.native.cost['physics_steps'],0)
 
 
 if __name__=='__main__':unittest.main()

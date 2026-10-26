@@ -1,0 +1,491 @@
+{
+  "status": "passed",
+  "implementation": "c8311b50f2b2e4ceb0c5ff6fda8d0c737d76cab9",
+  "matches": {
+    "zero_original_native": {
+      "samples": 3,
+      "max_time_difference_s": 0.0,
+      "max_position_difference_m": 0.0,
+      "max_velocity_difference_m_s": 0.0
+    },
+    "zero_playback": {
+      "samples": 3,
+      "max_time_difference_s": 1.3877787807814457e-17,
+      "max_position_difference_m": 0.0,
+      "max_velocity_difference_m_s": 0.0
+    },
+    "nonzero_playback": {
+      "samples": 36,
+      "max_time_difference_s": 2.220446049250313e-16,
+      "max_position_difference_m": 0.0,
+      "max_velocity_difference_m_s": 0.0
+    },
+    "reconstruct_restore_suffix": {
+      "samples": 26,
+      "max_time_difference_s": 0.0,
+      "max_position_difference_m": 0.0,
+      "max_velocity_difference_m_s": 0.0
+    }
+  },
+  "mechanics": {
+    "mass_balance_residual_inf_nm": 6.938893903907228e-18,
+    "generalized_external_force_inf_nm": 0.009973046448539209,
+    "com_to_tip_distance_m": 0.007348469228349573
+  },
+  "force_window_verified_every_step": true,
+  "full_run_active_steps": {
+    "zero_native": 0,
+    "force_native": 300,
+    "force_playback": 300
+  },
+  "nonzero_effect": {
+    "max_position_change_m": 0.012122355491929597,
+    "max_velocity_change_m_s": 0.0994149527147453
+  },
+  "original_acceptance": {
+    "zero": {
+      "contract": "research.task_acceptance",
+      "version": "1.0.0",
+      "protocol_id": "offline_reach_hold_v1",
+      "task_family": "task.reach",
+      "task_identity": "e2ac0f1a2c1b903accb3847f7a39d1acb1073a0001392f304430c86115ef20d2",
+      "status": "valid_failure",
+      "accepted": false,
+      "components": {
+        "evaluation_validity": {
+          "value": "valid",
+          "passed": true,
+          "unit": null,
+          "limit": null,
+          "reason": null
+        },
+        "execution_complete": {
+          "value": true,
+          "passed": true,
+          "unit": null,
+          "limit": null,
+          "reason": null
+        },
+        "task_evaluator": {
+          "value": false,
+          "passed": false,
+          "unit": null,
+          "limit": null,
+          "reason": null
+        },
+        "evaluator:task_bound": {
+          "value": 0.16714657360430127,
+          "passed": false,
+          "unit": "m",
+          "limit": 0.01,
+          "reason": null
+        },
+        "solver_errors": {
+          "value": 0,
+          "passed": true,
+          "unit": "count",
+          "limit": 0,
+          "reason": null
+        },
+        "force_bounds": {
+          "value": 0.0,
+          "passed": true,
+          "unit": "N",
+          "limit": 1e-08,
+          "reason": null
+        },
+        "holding_coverage": {
+          "value": true,
+          "passed": true,
+          "unit": "inclusive uniform samples",
+          "limit": 6,
+          "reason": null
+        },
+        "holding_position": {
+          "value": 0.19453231452732667,
+          "passed": false,
+          "unit": "m",
+          "limit": 0.01,
+          "reason": null
+        },
+        "holding_speed": {
+          "value": 0.7156284066761324,
+          "passed": false,
+          "unit": "m/s",
+          "limit": 0.02,
+          "reason": null
+        }
+      },
+      "metrics": {
+        "terminal_error_m": 0.16714657360430127,
+        "holding_max_error_m": 0.19453231452732667,
+        "holding_max_speed_m_s": 0.7156284066761324
+      },
+      "missing": [],
+      "issues": [],
+      "execution_id": null,
+      "sources": {
+        "evaluation": {
+          "artifact_id": "ff1a1ab8cf31c466ac3883c516664d866e3f78e99b4a2c9da2b6be81930294a5",
+          "media_type": "application/json"
+        },
+        "profile": {
+          "artifact_id": "e0465ed42bf37046a9241b8271df48b70cd62bd119a65d87de78c4735639970d",
+          "media_type": "application/json"
+        }
+      },
+      "evidence_binding": {
+        "evaluation": {
+          "artifact_id": "ff1a1ab8cf31c466ac3883c516664d866e3f78e99b4a2c9da2b6be81930294a5",
+          "media_type": "application/json"
+        },
+        "profile": {
+          "artifact_id": "e0465ed42bf37046a9241b8271df48b70cd62bd119a65d87de78c4735639970d",
+          "media_type": "application/json"
+        },
+        "simulation": {
+          "artifact_id": "276bb17c56decbca2730095035ee17f8ed435a6108809f175cc41bc339421011",
+          "media_type": "application/json"
+        },
+        "evaluation_binding": {
+          "source": {
+            "artifact_id": "276bb17c56decbca2730095035ee17f8ed435a6108809f175cc41bc339421011",
+            "media_type": "application/json"
+          },
+          "source_execution_id": null,
+          "original_execution_id": null
+        },
+        "profile_binding": {
+          "evaluation": {
+            "artifact_id": "ff1a1ab8cf31c466ac3883c516664d866e3f78e99b4a2c9da2b6be81930294a5",
+            "media_type": "application/json"
+          },
+          "simulation": {
+            "artifact_id": "276bb17c56decbca2730095035ee17f8ed435a6108809f175cc41bc339421011",
+            "media_type": "application/json"
+          }
+        }
+      },
+      "evaluator_tension_channels": null,
+      "timing": {
+        "control_period_s": 0.01,
+        "duration_s": 0.35,
+        "sample_period_s": 0.01,
+        "termination": [
+          "duration",
+          "numerical_failure"
+        ],
+        "timestep_s": 0.0005,
+        "real_time_required": false,
+        "real_time_demonstrated": null,
+        "deadline_misses": null,
+        "mean_update_s": null,
+        "simulation_wall_s": null
+      },
+      "continuous_time_guarantee": false
+    },
+    "force": {
+      "contract": "research.task_acceptance",
+      "version": "1.0.0",
+      "protocol_id": "offline_reach_hold_v1",
+      "task_family": "task.reach",
+      "task_identity": "2ba8df1a959bbcae7b6f06857ea1f62a2b225e8ee0f527500b5a51518f9b7f21",
+      "status": "valid_failure",
+      "accepted": false,
+      "components": {
+        "evaluation_validity": {
+          "value": "valid",
+          "passed": true,
+          "unit": null,
+          "limit": null,
+          "reason": null
+        },
+        "execution_complete": {
+          "value": true,
+          "passed": true,
+          "unit": null,
+          "limit": null,
+          "reason": null
+        },
+        "task_evaluator": {
+          "value": false,
+          "passed": false,
+          "unit": null,
+          "limit": null,
+          "reason": null
+        },
+        "evaluator:task_bound": {
+          "value": 0.17473993779128966,
+          "passed": false,
+          "unit": "m",
+          "limit": 0.01,
+          "reason": null
+        },
+        "solver_errors": {
+          "value": 0,
+          "passed": true,
+          "unit": "count",
+          "limit": 0,
+          "reason": null
+        },
+        "force_bounds": {
+          "value": 0.0,
+          "passed": true,
+          "unit": "N",
+          "limit": 1e-08,
+          "reason": null
+        },
+        "holding_coverage": {
+          "value": true,
+          "passed": true,
+          "unit": "inclusive uniform samples",
+          "limit": 6,
+          "reason": null
+        },
+        "holding_position": {
+          "value": 0.20454991235623585,
+          "passed": false,
+          "unit": "m",
+          "limit": 0.01,
+          "reason": null
+        },
+        "holding_speed": {
+          "value": 0.8015450430261628,
+          "passed": false,
+          "unit": "m/s",
+          "limit": 0.02,
+          "reason": null
+        }
+      },
+      "metrics": {
+        "terminal_error_m": 0.17473993779128966,
+        "holding_max_error_m": 0.20454991235623585,
+        "holding_max_speed_m_s": 0.8015450430261628
+      },
+      "missing": [],
+      "issues": [],
+      "execution_id": null,
+      "sources": {
+        "evaluation": {
+          "artifact_id": "22fe4aac2603a9bdf152dcb4716f14a54d11187723914036900ce04fde59de84",
+          "media_type": "application/json"
+        },
+        "profile": {
+          "artifact_id": "9aee70f779ca20bfcd028df3e8a593fa40bf6611504b8061de0380d767bee223",
+          "media_type": "application/json"
+        }
+      },
+      "evidence_binding": {
+        "evaluation": {
+          "artifact_id": "22fe4aac2603a9bdf152dcb4716f14a54d11187723914036900ce04fde59de84",
+          "media_type": "application/json"
+        },
+        "profile": {
+          "artifact_id": "9aee70f779ca20bfcd028df3e8a593fa40bf6611504b8061de0380d767bee223",
+          "media_type": "application/json"
+        },
+        "simulation": {
+          "artifact_id": "2a0acc4036b4b316688941cd95d215314ca7bac36cbe4a629f6ed713112fb524",
+          "media_type": "application/json"
+        },
+        "evaluation_binding": {
+          "source": {
+            "artifact_id": "2a0acc4036b4b316688941cd95d215314ca7bac36cbe4a629f6ed713112fb524",
+            "media_type": "application/json"
+          },
+          "source_execution_id": null,
+          "original_execution_id": null
+        },
+        "profile_binding": {
+          "evaluation": {
+            "artifact_id": "22fe4aac2603a9bdf152dcb4716f14a54d11187723914036900ce04fde59de84",
+            "media_type": "application/json"
+          },
+          "simulation": {
+            "artifact_id": "2a0acc4036b4b316688941cd95d215314ca7bac36cbe4a629f6ed713112fb524",
+            "media_type": "application/json"
+          }
+        }
+      },
+      "evaluator_tension_channels": null,
+      "timing": {
+        "control_period_s": 0.01,
+        "duration_s": 0.35,
+        "sample_period_s": 0.01,
+        "termination": [
+          "duration",
+          "numerical_failure"
+        ],
+        "timestep_s": 0.0005,
+        "real_time_required": false,
+        "real_time_demonstrated": null,
+        "deadline_misses": null,
+        "mean_update_s": null,
+        "simulation_wall_s": null
+      },
+      "continuous_time_guarantee": false
+    }
+  },
+  "cost": {
+    "cap": 5000,
+    "physics_step_attempts": 4360,
+    "physics_steps": 4360,
+    "phases": {
+      "zero_playback_recovered_evaluation": {
+        "physics_step_attempts": 0,
+        "wall_s": 0.013986399997520493
+      },
+      "zero_original_native": {
+        "physics_step_attempts": 40,
+        "wall_s": 0.004937800000334391,
+        "native_cost": {
+          "model_builds": 1,
+          "forward_evaluations": 6,
+          "physics_steps": 40,
+          "rollouts": 1,
+          "mechanics_evaluations": 0
+        }
+      },
+      "zero_native": {
+        "physics_step_attempts": 40,
+        "wall_s": 0.004625000001396984,
+        "native_cost": {
+          "model_builds": 1,
+          "forward_evaluations": 6,
+          "physics_steps": 40,
+          "physics_step_attempts": 40,
+          "rollouts": 1,
+          "mechanics_evaluations": 0
+        }
+      },
+      "force_native": {
+        "physics_step_attempts": 700,
+        "wall_s": 0.06305359999896609,
+        "native_cost": {
+          "model_builds": 1,
+          "forward_evaluations": 72,
+          "physics_steps": 700,
+          "physics_step_attempts": 700,
+          "rollouts": 1,
+          "mechanics_evaluations": 0
+        }
+      },
+      "force_playback": {
+        "physics_step_attempts": 700,
+        "wall_s": 0.17957940000269446
+      },
+      "force_prefix": {
+        "physics_step_attempts": 200,
+        "wall_s": 0.018783100000291597,
+        "native_cost": {
+          "model_builds": 1,
+          "forward_evaluations": 92,
+          "physics_steps": 900,
+          "physics_step_attempts": 900,
+          "rollouts": 1,
+          "mechanics_evaluations": 0
+        }
+      },
+      "force_restored_suffix": {
+        "physics_step_attempts": 500,
+        "wall_s": 0.04418470000018715,
+        "native_cost": {
+          "model_builds": 1,
+          "forward_evaluations": 144,
+          "physics_steps": 1400,
+          "physics_step_attempts": 1400,
+          "rollouts": 2,
+          "mechanics_evaluations": 0
+        }
+      },
+      "force_constant_rollout": {
+        "physics_step_attempts": 40,
+        "wall_s": 0.003940800001146272,
+        "native_cost": {
+          "model_builds": 1,
+          "forward_evaluations": 146,
+          "physics_steps": 1440,
+          "physics_step_attempts": 1440,
+          "rollouts": 3,
+          "mechanics_evaluations": 0
+        }
+      },
+      "force_repeated_candidate": {
+        "physics_step_attempts": 40,
+        "wall_s": 0.003947200002585305,
+        "native_cost": {
+          "model_builds": 1,
+          "forward_evaluations": 148,
+          "physics_steps": 1480,
+          "physics_step_attempts": 1480,
+          "rollouts": 4,
+          "mechanics_evaluations": 0
+        }
+      }
+    },
+    "prior_attempt": {
+      "path": "D:\\softrobot-agent\\.worktrees\\b2-load-force-runtime\\evidence\\b2_external_force_runtime",
+      "cost": {
+        "cap": 5000,
+        "physics_step_attempts": 2100,
+        "physics_steps": 2100,
+        "phases": {
+          "zero_original_native": {
+            "physics_step_attempts": 700,
+            "wall_s": 0.06448040000032051,
+            "native_cost": {
+              "model_builds": 1,
+              "forward_evaluations": 72,
+              "physics_steps": 700,
+              "rollouts": 1,
+              "mechanics_evaluations": 0
+            }
+          },
+          "zero_native": {
+            "physics_step_attempts": 700,
+            "wall_s": 0.06533839999974589,
+            "native_cost": {
+              "model_builds": 1,
+              "forward_evaluations": 72,
+              "physics_steps": 700,
+              "physics_step_attempts": 700,
+              "rollouts": 1,
+              "mechanics_evaluations": 0
+            }
+          },
+          "zero_playback": {
+            "physics_step_attempts": 700,
+            "wall_s": 0.16872199999852455
+          }
+        }
+      },
+      "missing": "Original and new zero Native position/velocity arrays were not saved before evaluation error; repeat only 0.02 s."
+    }
+  },
+  "native_costs": {
+    "original": {
+      "model_builds": 1,
+      "forward_evaluations": 6,
+      "physics_steps": 40,
+      "rollouts": 1,
+      "mechanics_evaluations": 0
+    },
+    "zero": {
+      "model_builds": 1,
+      "forward_evaluations": 6,
+      "physics_steps": 40,
+      "physics_step_attempts": 40,
+      "rollouts": 1,
+      "mechanics_evaluations": 0
+    },
+    "force": {
+      "model_builds": 1,
+      "forward_evaluations": 150,
+      "physics_steps": 1480,
+      "physics_step_attempts": 1480,
+      "rollouts": 4,
+      "mechanics_evaluations": 1
+    }
+  },
+  "limitations": "Matching execution semantics only; no B2 feasibility or structural advantage; task draft remains unfrozen."
+}
