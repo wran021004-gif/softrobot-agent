@@ -41,6 +41,13 @@ def assemble_physical(inp,p):
         semantics=dict(units='SI',world_frame=inp.robot.frame,force_frame='world',
             initial_state='named model coordinates; unspecified joints are zero',
             timing='control observations and force signals are interval-start/pre-step; saved state signals are interval-end/post-step'))
+    if forces:
+        scene['semantics']['external_forces']=dict(version='world_body_com_force_v1',
+            source='task.environment.external_forces',units='N',frame='world',point='named body center_of_mass',
+            window='start_s <= integration-step start < end_s; boundaries on control grid',
+            integration='constant world force refreshed before every mj_step; sum overlapping forces; zero outside windows',
+            torque='zero couple about body COM; joint moments follow body COM Jacobian',
+            tip_site='not the application point; tip_site and body COM generally differ')
     scene['identity']=digest(scene)
     return scene
 

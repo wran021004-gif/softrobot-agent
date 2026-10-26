@@ -1,0 +1,162 @@
+"""Focused force contracts; no mj_step and no scientific feasibility claims."""
+from copy import deepcopy
+from pathlib import Path
+from types import SimpleNamespace
+import unittest
+import mujoco
+import numpy as np
+
+from extensions.tendon_family.backends import _bind_mujoco_forces, _apply_mujoco_forces
+from extensions.tendon_family.mujoco_analysis import NativeModel
+from tools.research.native_analysis import assessment
+from tools.state_io import read
+from schemas.platform import SessionInput
+
+ROOT=Path(__file__).resolve().parents[2]
+
+
+class ExternalForceTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.cfg=read(ROOT/'evidence/b3_r1_history_assisted_050/design_package.json')['configuration']
+        cls.cfg['task']['environment']['data']['external_forces']=[dict(
+            entity='payload',point='center_of_mass',frame='world',force_n=[0.,.02,-.03],start_s=.1,end_s=.25)]
+        cls.native=NativeModel(cls.cfg)
+
+    def test_tick_boundaries_sum_and_clear_world_com_couple(self):
+        model=SimpleNamespace(opt=SimpleNamespace(timestep=.0005),body=lambda name:SimpleNamespace(id={'a':2,'b':1}[name]))
+        scene=dict(forces=[dict(entity='a',force_n=[0.,1.,-2.],start_s=.01,end_s=.02),
+            dict(entity='a',force_n=[1.,0.,0.],start_s=.015,end_s=.02)])
+        forces=_bind_mujoco_forces(model,scene)
+        data=SimpleNamespace(time=0.,xfrc_applied=np.ones((3,6)))
+        for t,expected in [(0.,[0,0,0]),(.01-1e-17,[0,1,-2]),(.015,[1,1,-2]),(.02-1e-17,[0,0,0])]:
+            data.time=t;_apply_mujoco_forces(model,data,forces)
+            np.testing.assert_array_equal(data.xfrc_applied[2,:3],expected)
+            self.assertFalse(np.any(data.xfrc_applied[:,3:]))
+            self.assertFalse(np.any(data.xfrc_applied[:2]))
+
+    def test_assessment_accepts_only_existing_force_contract_and_grid(self):
+        req=SimpleNamespace(required_physics=['external_applied_forces'])
+        self.assertEqual(assessment(SessionInput.model_validate(self.cfg),req)['uses']['native_numerics']['status'],'ACCEPT')
+        for field,value in [('frame','body'),('point','tip_site'),('entity','unknown'),('start_s',.101),('end_s',.51),('force_n',[float('nan'),0,0])]:
+            cfg=deepcopy(self.cfg);cfg['task']['environment']['data']['external_forces'][0][field]=value
+            fit=assessment(SessionInput.model_validate(cfg),req)
+            self.assertEqual(fit['uses']['native_numerics']['status'],'REJECT',(field,fit))
+
+    def test_restore_uses_frozen_force_and_rejects_extra_generalized_force(self):
+        n=self.native;d=mujoco.MjData(n.model);d.time=.1;n.forward(d)
+        point=n.checkpoint(d)
+        restored=n.restore(point);bid=n.model.body('payload').id
+        np.testing.assert_array_equal(restored.xfrc_applied[bid,:3],[0,.02,-.03])
+        # Restored engine user buffers cannot replace the frozen task schedule.
+        d.xfrc_applied[:]=999
+        restored=n.restore(n.checkpoint(d))
+        np.testing.assert_array_equal(restored.xfrc_applied[bid,:3],[0,.02,-.03])
+        d.qfrc_applied[0]=1
+        with self.assertRaisesRegex(ValueError,'UNSCHEDULED_GENERALIZED_FORCE'):n.restore(n.checkpoint(d))
+        self.assertEqual(n.cost['physics_steps'],0)
+
+    def test_mechanics_includes_com_generalized_force_without_tip_couple(self):
+        n=self.native;d=mujoco.MjData(n.model);d.time=.1
+        result=n.mechanics(d,[.2]*len(n.aids));bid=n.model.body('payload').id
+        jac=np.zeros((3,n.model.nv));mujoco.mj_jacBodyCom(n.model,d,jac,None,bid)
+        expected=jac.T@np.array([0,.02,-.03])
+        np.testing.assert_allclose(result['generalized_forces_nm']['external_body'],expected[n.vi],rtol=0,atol=1e-14)
+        self.assertGreater(np.linalg.norm(expected),0)
+        self.assertGreater(np.linalg.norm(d.site_xpos[n.tip]-d.xipos[bid]),.001)
+        forces=result['generalized_forces_nm']
+        np.testing.assert_allclose(np.asarray(result['mass_matrix_kg_m2'])@result['qacc_rad_s2'],
+            np.asarray(forces['passive'])+forces['actuator']+np.asarray(forces['applied'])+forces['external_body']
+            -np.asarray(forces['bias'])+forces['constraint'],rtol=1e-10,atol=1e-12)
+        self.assertFalse(np.any(d.xfrc_applied[:,3:]))
+        self.assertTrue(result['validity']['external_applied_force'])
+
+    def test_reconstruct_rejects_changed_frozen_force_before_steps(self):
+        n=self.native;scene=deepcopy(n.scene);scene['forces'][0]['force_n']=[1,0,0]
+        with self.assertRaisesRegex(ValueError,'FROZEN_SCENE_MISMATCH'):
+            n.reconstruct(dict(physics_identity=n.physics['identity'],native_replay=dict(scene=scene,rows=[])))
+        self.assertEqual(n.cost['physics_steps'],0)
+
+    def test_task_only_pair_composes_with_original_limits_and_same_robot(self):
+        from tools.research.config import patch
+        from tools.research.physical_replay import model_context,binding
+        from tools.state_io import digest
+        from tools.platform_store import plain
+        from extensions.tendon_family.scene import assemble_physical
+        from extensions.tendon_family.backends import physics_for
+        # Generic task-only fixture: the runtime integration does not depend on
+        # B's benchmark drafts, hidden answers, or scientific search scripts.
+        zero=dict(task=deepcopy(self.cfg['task']),seed=self.cfg['seed'],
+            settling=deepcopy(self.cfg['policy']['controller']['parameters']['data']['settling']))
+        zero['task']['timing']['duration_s']=.35
+        zero['task']['sampling']['window_s']=[0.,.35]
+        zero['task']['environment']['data']['external_forces']=[]
+        zero['task']['initializer']['parameters']['data']=dict(qpos_rad={},qvel_rad_s={},unspecified='zero')
+        force=patch(zero,dict(task=dict(environment=dict(data=dict(external_forces=[dict(
+            entity='payload',point='center_of_mass',frame='world',force_n=[0.,.02,-.03],start_s=.1,end_s=.35)])))))
+        for task in (zero,force):
+            cfg=deepcopy(self.cfg);cfg['task']=task['task'];cfg['seed']=task['seed']
+            cfg['policy']['controller']['parameters']['data']['settling']=task['settling']
+            inp=SessionInput.model_validate(cfg);assemble_physical(inp,physics_for(inp))
+            # The existing family candidate builder materializes the task's zero
+            # rule into this robot's complete named initializer before binding.
+            self.assertEqual(task['task']['initializer']['parameters']['data'],
+                dict(qpos_rad={},qvel_rad_s={},unspecified='zero'))
+            cfg['task']['initializer']['parameters']['data']=deepcopy(self.cfg['task']['initializer']['parameters']['data'])
+            _,physics,scene,spec=model_context(cfg)
+            inp=SessionInput.model_validate(cfg)
+            trajectory=dict(times_s=[i*.01 for i in range(36)],tensions_n=[[.2]*len(physics['tendons'])]*35,
+                tendon_order=spec['tendon_order'],model_identity=spec['identity'],design_identity=spec['design_identity'],
+                task_identity=digest(plain(inp.task)))
+            _,_,bound=binding(cfg,trajectory)
+            self.assertEqual(bound['forces'],scene['forces'])
+        self.assertEqual(zero['settling'],force['settling'])
+        self.assertEqual(zero['settling']['position_limit_m'],.01)
+        self.assertEqual(zero['settling']['speed_limit_m_s'],.02)
+        for field in ('goal','timing','evaluator','initializer','observations'):
+            self.assertEqual(zero['task'][field],force['task'][field])
+
+    def test_original_acceptance_keeps_incomplete_separate_from_task_failure(self):
+        from tools.research.physical_replay import evaluate_playback
+        from tools.research_tasks import assemble_acceptance
+        reference=dict(artifact_id='a'*64,media_type='application/json')
+        # Fabricated positions deliberately fail the original task; no dynamics.
+        rows=[dict(time_s=i*.01,tip_m=[0,0,0],tip_velocity_m_s=[0,0,0],speed_m_s=0,
+            actual_tension_n=[.2]*4) for i in range(51)]
+        raw=dict(status='completed',physics_steps=1000,samples=rows,tendon_order=self.native.tendons)
+        for status,expected in [('completed','valid_failure'),('incomplete','incomplete')]:
+            raw['status']=status
+            evaluation,profile=evaluate_playback(self.cfg,raw,reference,'fixture')
+            accepted=assemble_acceptance(self.cfg,evaluation,profile,evaluation_reference=reference,
+                profile_reference=reference,motion=[dict(time_s=r['time_s']) for r in rows])
+            self.assertEqual(accepted['status'],expected)
+        self.assertEqual(self.native.cost['physics_steps'],0)
+
+    def test_six_channel_force_binding_uses_candidate_owned_limits(self):
+        from tools.research.config import resolve
+        from tools.platform_store import plain
+        from extensions.tendon_family.family_space import parse_build
+        from extensions.tendon_family.generated_serial import generate_family
+        from tools.research.physical_replay import model_context,binding
+        from tools.state_io import digest
+        spec=resolve(ROOT/'configs/research/study_family_space_dev.json')
+        build=parse_build(dict(space=spec['family_space'],request=dict(
+            family_space_identity=spec['family_space_identity'],segment_count=2,tendon_count=6)))
+        robot,mesh,physics=generate_family(build)
+        cfg=deepcopy(spec['configuration']);cfg['robot']['structure']['data']=robot
+        cfg['policy']['discretization']['data']=mesh
+        cfg['policy']['candidate_builder']['parameters']['data']=plain(build)
+        cfg['task']['environment']['data']['external_forces']=deepcopy(self.cfg['task']['environment']['data']['external_forces'])
+        cfg['task']['initializer']['parameters']['data']=dict(qpos_rad={j:0. for j in physics['dofs']},
+            qvel_rad_s={j:0. for j in physics['dofs']},unspecified='zero')
+        native=NativeModel(cfg);self.assertEqual(native.limits.shape,(6,2))
+        inp,_,_,model=model_context(cfg)
+        trajectory=dict(times_s=[i*.01 for i in range(36)],tensions_n=[[.2]*6 for _ in range(35)],
+            tendon_order=native.tendons,model_identity=model['identity'],design_identity=model['design_identity'],
+            task_identity=digest(plain(inp.task)))
+        _,_,scene=binding(cfg,trajectory)
+        self.assertEqual(scene['forces'],native.scene['forces'])
+        self.assertEqual(native.cost['physics_steps'],0)
+
+
+if __name__=='__main__':unittest.main()

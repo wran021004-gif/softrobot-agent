@@ -11,7 +11,8 @@ import numpy as np
 
 from schemas.platform import SessionInput
 from tools.platform_store import plain
-from .backends import physics_for, _mujoco_state_failed, MujocoFailureSnapshot
+from .backends import (physics_for, _mujoco_state_failed, MujocoFailureSnapshot,
+    _bind_mujoco_forces, _apply_mujoco_forces)
 from .scene import assemble_physical
 from .mjcf import compile_xml
 
@@ -23,12 +24,12 @@ class NativeModel:
         if inp.policy.backend.extension_id!='backend.family_mujoco':
             raise ValueError('NATIVE_ANALYSIS_REQUIRES_MUJOCO_BACKEND')
         self.physics=physics_for(inp);self.scene=assemble_physical(inp,self.physics)
-        if self.scene['forces']:raise ValueError('NATIVE_V1_EXTERNAL_FORCES_UNSUPPORTED')
         self.scene['control']=dict(tension_execution_mode='ideal_tension')
         xml=BytesIO()
         compile_xml(self.physics,self.scene,registry().parse(inp.policy.backend.parameters),xml)
         self.model=mujoco.MjModel.from_xml_string(xml.getvalue().decode('utf8'))
         m=self.model
+        self.forces=_bind_mujoco_forces(m,self.scene)
         self.safety=MujocoFailureSnapshot(m,self.physics['identity'])
         self.order=self.physics['dofs'];self.tendons=[t['entity'] for t in self.physics['tendons']]
         jids=[m.joint(n).id for n in self.order]
@@ -38,9 +39,10 @@ class NativeModel:
         self.limits=m.actuator_ctrlrange[self.aids].copy()
         if m.nq!=len(self.order) or m.nv!=len(self.order) or m.na:
             raise ValueError('NATIVE_V1_REQUIRES_COMPLETE_NAMED_HINGE_STATE')
-        self.cost=dict(model_builds=1,forward_evaluations=0,physics_steps=0,rollouts=0,mechanics_evaluations=0)
+        self.cost=dict(model_builds=1,forward_evaluations=0,physics_steps=0,physics_step_attempts=0,rollouts=0,mechanics_evaluations=0)
 
     def forward(self, d):
+        _apply_mujoco_forces(self.model,d,self.forces)
         self.safety.call(d,mujoco.mj_forward,'native.forward');self.cost['forward_evaluations']+=1
         self.check_supported(d)
 
@@ -51,7 +53,8 @@ class NativeModel:
                 contacts=[dict(geom1=self.model.geom(int(c.geom1)).name,geom2=self.model.geom(int(c.geom2)).name,
                     distance_m=float(c.dist)) for c in d.contact],
                 evaluation_interval_s=[previous_time,float(d.time)] if previous_time is not None else [float(d.time)] ,
-                phase='last_engine_constraint_evaluation',cost=dict(self.cost))
+                phase='last_engine_constraint_evaluation',cost=dict(self.cost),
+                external_forces=self.scene['forces'],xfrc_applied_world=d.xfrc_applied.tolist())
             self.last_diagnostic=diagnostic
             error=ValueError('NATIVE_V1_REQUIRES_FINITE_CONTACT_FREE_UNCONSTRAINED_STATE')
             error.native_diagnostic=diagnostic
@@ -76,20 +79,24 @@ class NativeModel:
                     not np.array_equal(d.qpos[self.qi],point['qpos_rad']) or
                     not np.array_equal(d.qvel[self.vi],point['qvel_rad_s'])):
                 raise ValueError('NATIVE_STATE_TIME_OR_COORDINATE_MISMATCH')
+        if np.any(d.qfrc_applied):raise ValueError('NATIVE_V1_UNSCHEDULED_GENERALIZED_FORCE_UNSUPPORTED')
+        # The frozen scene owns xfrc_applied, including after checkpoint restore.
         self.forward(d)
-        if np.any(d.qfrc_applied) or np.any(d.xfrc_applied):raise ValueError('NATIVE_V1_APPLIED_EXTERNAL_FORCES_UNSUPPORTED')
         return d
 
     def reconstruct(self, point):
         """Verify the saved prefix once and retain complete engine integration state."""
         scene=point['native_replay']['scene'];d=mujoco.MjData(self.model)
         if point['physics_identity']!=self.physics['identity']:raise ValueError('NATIVE_REPLAY_PHYSICS_MISMATCH')
+        if any(scene[k]!=self.scene[k] for k in ('forces','qpos_rad','qvel_rad_s','control_period_s','timestep_s')):
+            raise ValueError('NATIVE_REPLAY_FROZEN_SCENE_MISMATCH')
         d.qpos[self.qi]=scene['qpos_rad'];d.qvel[self.vi]=scene['qvel_rad_s']
         if not point['native_replay']['rows']:self.forward(d)
         worst=0.
         for row in point['native_replay']['rows']:
             self.apply(d,row['tension_n'])
             for _ in range(round(scene['control_period_s']/self.model.opt.timestep)):
+                _apply_mujoco_forces(self.model,d,self.forces);self.cost['physics_step_attempts']+=1
                 previous=float(d.time);self.safety.call(d,mujoco.mj_step,'native.prefix');self.cost['physics_steps']+=1
                 self.check_supported(d,previous)
                 if _mujoco_state_failed(d,previous):raise ValueError('NATIVE_PREFIX_NUMERICAL_FAILURE')
@@ -137,6 +144,11 @@ class NativeModel:
         mapping=-moments[self.aids].T
         response=np.empty((len(self.aids),m.nv));mujoco.mj_solveM(m,d,response,mapping.T.copy())
         passive=np.empty((1,m.nv));mujoco.mj_solveM(m,d,passive,d.qfrc_passive[None,:].copy())
+        external=np.zeros(m.nv)
+        for bid in {f[0] for f in self.forces}:
+            com_jac=np.zeros((3,m.nv));mujoco.mj_jacBodyCom(m,d,com_jac,None,bid)
+            external+=com_jac.T@d.xfrc_applied[bid,:3]
+        external_response=np.empty((1,m.nv));mujoco.mj_solveM(m,d,external_response,external[None,:].copy())
         tendon_jac=np.zeros((m.ntendon,m.nv))
         mujoco.mju_sparse2dense(tendon_jac,d.ten_J,m.ten_J_rownnz,m.ten_J_rowadr,m.ten_J_colind)
         balance=mass@d.qacc-d.qfrc_smooth-d.qfrc_constraint
@@ -152,14 +164,17 @@ class NativeModel:
             coordinates=dict(dof_order=self.order,tendon_order=self.tendons,tip_frame='world',
                 input_semantics='absolute ideal tension in N; engine actuator force has negative sign'),
             validity=dict(time_s=float(d.time),scope='instantaneous state and input only',contact_count=int(d.ncon),
-                constraint_count=int(d.nefc),external_applied_force=False),
+                constraint_count=int(d.nefc),external_applied_force=bool(np.any(d.xfrc_applied))),
+            external_force_execution=dict(forces=self.scene['forces'],
+                semantics=self.scene['semantics'].get('external_forces'),xfrc_applied_world=d.xfrc_applied.tolist()),
             mass_factorization=dict(source='MuJoCo mj_factorM / mj_solveM',
                 inverse_diagonal=d.qLDiagInv[self.vi].tolist(),inverse_diagonal_unit='1/(kg*m^2)'),
             input_bounds_n=self.limits.tolist(),input_saturation=dict(
                 lower=np.isclose(np.asarray(u),self.limits[:,0],atol=1e-10,rtol=0).tolist(),
                 upper=np.isclose(np.asarray(u),self.limits[:,1],atol=1e-10,rtol=0).tolist()),
-            generalized_forces_nm={key:getattr(d,'qfrc_'+key)[self.vi].tolist() for key in
+            generalized_forces_nm={**{key:getattr(d,'qfrc_'+key)[self.vi].tolist() for key in
                 ('bias','passive','spring','damper','actuator','applied','constraint','smooth')},
+                'external_body':external[self.vi].tolist()},
             gravity_bias_nm=zero.qfrc_bias[self.vi].tolist(),
             velocity_bias_nm=(d.qfrc_bias-zero.qfrc_bias)[self.vi].tolist(),
             tip_jacobian_m_rad=jac[:,self.vi].tolist(),tip_acceleration_m_s2=acceleration.tolist(),
@@ -167,6 +182,7 @@ class NativeModel:
             input_force_map_nm_n=mapping[self.vi].tolist(),
             tip_acceleration_input_map_m_s2_n=drive.tolist(),
             passive_tip_acceleration_contribution_m_s2=(jac@passive[0]).tolist(),
+            external_tip_acceleration_contribution_m_s2=(jac@external_response[0]).tolist(),
             function_metrics=dict(drive_singular_values_m_s2_n=np.linalg.svd(drive,compute_uv=False).tolist(),
                 speed_derivative_m_s2=speed_rate,
                 speed_derivative_input_map_m_s2_n=speed_map.tolist() if speed>0 else None,
@@ -186,6 +202,7 @@ class NativeModel:
         d=mujoco.MjData(m);mujoco.mj_copyData(d,m,start);actual=self.apply(d,u)
         self.cost['rollouts']+=1
         for _ in range(steps):
+            _apply_mujoco_forces(m,d,self.forces);self.cost['physics_step_attempts']+=1
             previous=float(d.time);self.safety.call(d,mujoco.mj_step,'native.rollout');self.cost['physics_steps']+=1
             self.check_supported(d,previous)
             if _mujoco_state_failed(d,previous):raise ValueError('NATIVE_SHORT_ROLLOUT_NUMERICAL_FAILURE')
@@ -213,6 +230,7 @@ class NativeModel:
         for count,u in zip(steps,tensions):
             actual.append(self.apply(d,u).tolist())
             for _ in range(count):
+                _apply_mujoco_forces(self.model,d,self.forces);self.cost['physics_step_attempts']+=1
                 previous=float(d.time);self.safety.call(d,mujoco.mj_step,'native.sequence');self.cost['physics_steps']+=1
                 self.check_supported(d,previous)
                 if _mujoco_state_failed(d,previous):raise ValueError('NATIVE_SEQUENCE_NUMERICAL_FAILURE')
@@ -261,6 +279,7 @@ def calculate(configuration, point, options, operation, comparisons=None):
     mechanics=native.mechanics(start,u)
     raw=dict(initial_state=point,mechanics=mechanics,physics_identity=native.physics['identity'],design_identity=native.physics['design_identity'],
         physical_scene_identity=native.scene['identity'],
+        external_force_execution=dict(forces=native.scene['forces'],semantics=native.scene['semantics'].get('external_forces')),
         representation='native named MuJoCo hinges; world tip; ideal absolute SI tensions',
         runtime=dict(mujoco=mujoco.__version__,timestep_s=native.model.opt.timestep,integrator=int(native.model.opt.integrator)),
         state_comparison='Exact integration checkpoint')

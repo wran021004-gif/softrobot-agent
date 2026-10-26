@@ -97,8 +97,10 @@ class NativeTaskSensitivityTests(unittest.TestCase):
     def test_contact_failure_retains_geometry_time_and_actual_cost(self):
         native=object.__new__(NativeModel)
         native.cost=dict(model_builds=1,physics_steps=17)
+        native.scene=dict(forces=[])
         native.model=SimpleNamespace(geom=lambda i:SimpleNamespace(name=['arm','guide'][i]))
         data=SimpleNamespace(ncon=1,nefc=4,time=.0085,warning=[],qacc=np.array([0.]),
+            xfrc_applied=np.zeros((2,6)),
             contact=[SimpleNamespace(geom1=0,geom2=1,dist=-.001)])
         with self.assertRaisesRegex(ValueError,'CONTACT_FREE') as caught:
             native.check_supported(data,.008)

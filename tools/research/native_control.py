@@ -118,7 +118,8 @@ def calculate(configuration, binding, query, point, requirements, context, check
     cost=dict(**native.cost,optimization_iterations=result['iterations_started'],
         completed_response_steps=len(result['local_responses']),
         optimization_evaluations=len(evaluations),kernel_wall_s=time.perf_counter()-started)
-    raw=dict(initial_state=point,original_schedule=source,optimized_schedule=optimized,optimization=result,cost=cost)
+    raw=dict(initial_state=point,original_schedule=source,optimized_schedule=optimized,optimization=result,cost=cost,
+        external_force_execution=dict(forces=native.scene['forces'],semantics=native.scene['semantics'].get('external_forces')))
     if peak_state is not None:
         peak_state.update(candidate=binding['candidate'],configuration_identity=binding['effective_configuration_identity'],
             provenance=dict(method='baseline_rollout_holding_speed_peak',source=context['source'],inherited_acceptance=False))

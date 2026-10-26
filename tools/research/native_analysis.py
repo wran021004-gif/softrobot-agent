@@ -25,7 +25,7 @@ def decision_summary(value):
         if mechanics.get('validity'):
             summary['mechanics_evidence']=dict(state=mechanics['validity'],coordinates=mechanics['coordinates'],
                 input_saturation=mechanics['input_saturation'],
-                force_relation='M qacc = qfrc_passive + qfrc_actuator + qfrc_applied - qfrc_bias + qfrc_constraint',
+                force_relation='M qacc = qfrc_passive + qfrc_actuator + qfrc_applied + J_body_com.T F_world - qfrc_bias + qfrc_constraint',
                 raw_pointer='/native_dynamics/mechanics',
                 interpretation='Internal engine consistency only; no hardware accuracy or future trajectory guarantee.')
         for name,data,unit,path in (
@@ -88,12 +88,17 @@ def structure_context(base, candidates, request, *, spec=None):
 def assessment(configuration, requirements):
     reasons=[]
     if configuration.policy.backend.extension_id!='backend.family_mujoco':reasons.append('MuJoCo backend required.')
-    if configuration.task.environment.data.get('external_forces'):reasons.append('Native v1 has no scheduled external-force application.')
-    supported={'gravity','elasticity','damping','inertia','tendon_actuation','large_deformation'}
+    if configuration.task.environment.data.get('external_forces'):
+        from extensions.tendon_family.scene import assemble_physical
+        from extensions.tendon_family.backends import physics_for
+        try:assemble_physical(configuration,physics_for(configuration))
+        except ValueError as exc:reasons.append('Native scheduled external force unsupported: '+str(exc))
+    supported={'gravity','elasticity','damping','inertia','tendon_actuation','large_deformation','external_applied_forces'}
     unknown=set(requirements.required_physics)-supported
     if unknown:reasons.append('Native v1 required physics unsupported: '+', '.join(sorted(unknown)))
     return dict(model_id='model.mujoco_native',model_version='1.0.0',representation_id='native_named_hinges_v1',
         relevant_assumptions=['MuJoCo compiled family model; no GVS projection; ideal absolute tensions.',
+            'Frozen world-frame constant force at named body COM on control-grid windows; refreshed every integration step.',
             'Contact-free, unconstrained hinges without activation dynamics; runtime checked.',
             'Native numerical responses; each method declares fixed or time-varying inputs. No optimal-value or KKT interpretation.'],
         uses=dict(native_numerics=dict(status='REJECT' if reasons else 'ACCEPT',reasons=reasons)))
